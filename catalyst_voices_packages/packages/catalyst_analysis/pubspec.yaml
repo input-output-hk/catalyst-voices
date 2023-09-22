@@ -1,0 +1,6 @@
+name: catalyst_analysis
+version: 1.0.0
+description: Lint rules for Dart and Flutter used internally at Catalyst.
+
+environment:
+  sdk: '>=3.1.2 <4.0.0'
