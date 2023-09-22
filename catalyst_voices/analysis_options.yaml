@@ -1,0 +1,8 @@
+include: package:catalyst_analysis/analysis_options.1.0.0.yaml
+
+exclude:
+    - 'build/**'
+    - '**/*.g.dart'
+linter:
+  rules:
+    public_member_api_docs: false
