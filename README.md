@@ -15,6 +15,7 @@ Welcome to the Catalyst Voices mono repo, where we manage and maintain the inter
   - [License](#license)
 
 ## Overview
+
 This monorepo serves as a unified codebase for the Catalyst Voices ecosystem projects.
 Using a monorepo simplifies our dependency management, streamlines testing, and fosters code sharing.
 
@@ -23,8 +24,8 @@ Using a monorepo simplifies our dependency management, streamlines testing, and 
 1. Clone this repository:
 
 ```sh
-git clone [REPO_URL] catalyst-voices
-cd catalyst-catalyst-voices
+git clone https://github.com/input-output-hk/catalyst-voices.git
+cd catalyst-voices
 ```
 
 2. Install global dependencies:
@@ -40,15 +41,15 @@ TODO: Add global dependencies
 
 Athena is our [brief description of what Athena does].
 
-- **Directory:** ./athena
+- **Directory:** [athena](https://github.com/input-output-hk/catalyst-voices/tree/main/athena)
 - **Setup:** Navigate to ./athena and run TODO.
 - **Documentation:** [Link to detailed documentation or Wiki]
 
 ### Catalyst Voices
 
-Catalyst Voices is [brief description of what Catalyst Voices does].
+Catalyst Voices frontend.
 
-- **Directory**: ./catalyst_voices
+- **Directory**: [catalyst_voices](https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices)
 - **Setup**: Navigate to ./catalyst_voices and run TODO.
 - **Documentation**: [Link to detailed documentation or Wiki]
 
@@ -56,7 +57,7 @@ Catalyst Voices is [brief description of what Catalyst Voices does].
 
 The backend services for Catalyst Voices.
 
-- **Directory**: ./catalyst_voices_backend
+- **Directory**: [catalyst-voices-backend](https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst-voices-backend)
 - **Setup**: Navigate to ./catalyst_voices_backend and run TODO.
 - **Documentation**: [Link to detailed documentation or Wiki]
 
@@ -64,7 +65,7 @@ The backend services for Catalyst Voices.
 
 Shared Flutter and Dart packages used across the Catalyst.
 
-- **Directory**: ./catalyst_voices_packages
+- **Directory**: [catalyst_voices_packages](https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices_packages)
 - **Setup**: Navigate to ./catalyst_voices_packages and run TODO.
 - **Documentation**: [Link to detailed documentation or Wiki]
 
