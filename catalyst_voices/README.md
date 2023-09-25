@@ -2,7 +2,7 @@
 
 - [Requirements](#requirements)
 - [Getting Started](#getting-started)
-  - [Boostrapping](#boostrapping)
+  - [Bootstrapping](#bootstrapping)
 - [Running Tests](#running-tests)
 - [Working with Translations](#working-with-translations)
   - [Adding Strings](#adding-strings)
@@ -30,7 +30,7 @@
 
 ## Getting Started
 
-### Boostrapping
+### Bootstrapping
 
 ```sh
 git clone TODO(minikin): add repo
@@ -57,7 +57,7 @@ flutter run --flavor staging --target lib/main_staging.dart
 flutter run --flavor production --target lib/main_production.dart
 ```
 
-_\*Catalyst Voices works on Web.We plan to add iOS and Android later._
+_\*Catalyst Voices works on Web. We plan to add iOS and Android later._
 
 ## Running Tests
 
