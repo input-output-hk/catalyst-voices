@@ -75,8 +75,8 @@ linter:
 
 As the Dart language and its ecosystem evolve, it is important to keep lint sets current by regularly updating them to reflect the best practices for writing Dart code. To accomplish this, we have an informal process in place:
 
-1. Individuals can submit an [issue](TODO(minikin)) to discuss potential changes to the lint sets (such as adding or removing a lint).Feedback is welcome from all Dart/Flutter users.
+1. Individuals can submit an [issue](TODO(minikin)) to discuss potential changes to the lint sets (such as adding or removing a lint). Feedback is welcome from all Dart/Flutter users.
 
-2. Catalyst Engineering team meet periodically to review suggestions and make decisions on what to change.
+2. Catalyst Engineering team meets periodically to review suggestions and make decisions on what to change.
 
 3. Once the updates are made, a new version of the package is published.
