@@ -42,7 +42,7 @@ body:
         - Rust crates
         - Documentation
         - Other (specify in Anything else section)
-      default: "1"
+      default: 1
     validations:
       required: true
 
