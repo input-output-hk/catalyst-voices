@@ -10,4 +10,5 @@ on:
 
 jobs:
   build:
+    name: Validate PR title
     uses: input-output-hk/catalyst-ci/.github/workflows/semantic_pull_request.yml@master
