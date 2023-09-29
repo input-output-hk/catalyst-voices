@@ -1,0 +1,13 @@
+name: Semantic Pull Request
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+
+jobs:
+  build:
+    uses: input-output-hk/catalyst-ci/.github/workflows/semantic_pull_request.yml@master
