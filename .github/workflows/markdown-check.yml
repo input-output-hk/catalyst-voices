@@ -1,0 +1,14 @@
+name: Markdown Check
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+
+jobs:
+  build:
+    name: Check markdown files formatted consistently
+    uses: input-output-hk/catalyst-ci/.github/workflows/markdown-check.yml@master
