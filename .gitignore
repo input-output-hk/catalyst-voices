@@ -77,3 +77,4 @@ $RECYCLE.BIN/
 !/.vscode/extensions.json
 !/.vscode/launch.recommended.json
 !/.vscode/settings.recommended.json
+!/.vscode/tasks.recommended.json

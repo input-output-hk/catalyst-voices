@@ -1,0 +1,43 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "CI - Recursive Markdown Lint - Check",
+			"type": "shell",
+			"command": "earthly -P +markdown-check",
+			"problemMatcher": {
+				"owner": "markdown-check",
+				"pattern": {
+					"regexp": "(\\S+):(\\d+):(\\d+)\\s(.+)",
+					"file": 1,
+					"line": 2,
+					"column": 3,
+					"message": 4
+				}
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			}
+		},
+		{
+			"label": "CI - Recursive Markdown Lint - Fix",
+			"type": "shell",
+			"command": "earthly -P +markdown-check-fix",
+			"problemMatcher": {
+				"owner": "markdown-check",
+				"pattern": {
+					"regexp": "(\\S+):(\\d+):(\\d+)\\s(.+)",
+					"file": 1,
+					"line": 2,
+					"column": 3,
+					"message": 4
+				}
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			}
+		}
+	]
+}

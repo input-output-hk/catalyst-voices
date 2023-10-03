@@ -2,12 +2,12 @@
 
 A collection of Catalyst packages and plugins for Flutter and Dart.
 
-- [Catalyst Flutter](#catalyst-flutter)
-  - [Packages](#packages)
-  - [Requirements](#requirements)
-  - [Boostrapping](#boostrapping)
-  - [Support](#support)
-  - [License](#license)
+* [Catalyst Flutter](#catalyst-flutter)
+  * [Packages](#packages)
+  * [Requirements](#requirements)
+  * [Boostrapping](#boostrapping)
+  * [Support](#support)
+  * [License](#license)
 
 ## Packages
 
@@ -17,15 +17,15 @@ A collection of Catalyst packages and plugins for Flutter and Dart.
 
 ## Requirements
 
-- Flutter: 3.13.4+
-- Dart: 3.1.2+
-- Xcode: 14.2+
-- Android Studio: Android Studio Electric Eel | 2022.1.1 +
-- [Melos](https://melos.invertase.dev)
-- Flutter & Dart plugins:
-  - [Visual Studio Code](https://flutter.dev/docs/get-started/editor?tab=vscode)
-  - [Android Studio / IntelliJ](https://flutter.dev/docs/get-started/editor?tab=androidstudio)
-  - [Emacs](https://docs.flutter.dev/get-started/editor?tab=emacs)
+* Flutter: 3.13.4+
+* Dart: 3.1.2+
+* Xcode: 14.2+
+* Android Studio: Android Studio Electric Eel | 2022.1.1 +
+* [Melos](https://melos.invertase.dev)
+* Flutter & Dart plugins:
+  * [Visual Studio Code](https://flutter.dev/docs/get-started/editor?tab=vscode)
+  * [Android Studio / IntelliJ](https://flutter.dev/docs/get-started/editor?tab=androidstudio)
+  * [Emacs](https://docs.flutter.dev/get-started/editor?tab=emacs)
 
 ## Boostrapping
 
@@ -37,9 +37,9 @@ melos bootstrap
 
 ## Support
 
-Post issues and feature requests on the GitHub [issue tracker]().
+Post issues and feature requests on the GitHub [issue tracker](TODO(minikin)).
 
 ## License
 
 The source code of Popover project is available under the TODO(minikin): add license.
-See the [LICENSE]() file for more info.
+See the [LICENSE](TODO(minikin)) file for more info.

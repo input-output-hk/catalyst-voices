@@ -1,0 +1,27 @@
+// Markdown Lint Configuration.
+// Do not change markdown lint configuration in individual files,
+// except to disable rules which are causing false positives.
+{
+  // Configures the markdownlint-cli2 tool only.
+  // For common markdownlint configuration which this tool also uses, see: ./.markdownlint.jsonc
+  "globs": [
+    "**/*.md"
+  ],
+  "ignores": [],
+  // Set standard config options in `/.markdownlint.jsonc`
+  "config": {
+    "max-one-sentence-per-line": {
+      "ignored__words": [
+        "???+",
+        "???",
+        "!!!+",
+        "!!!"
+      ]
+    }
+  },
+  "customRules": [
+    // For local development, this custom rule needs to be installed with:
+    // `npm install --no-package-lock --production markdownlint-rule-max-one-sentence-per-line`
+    "markdownlint-rule-max-one-sentence-per-line"
+  ]
+}
