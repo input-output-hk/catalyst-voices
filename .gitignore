@@ -71,3 +71,9 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# .vscode ignore local changes to config, but not the recommended settings/launch/extensions
+/.vscode/*
+!/.vscode/extensions.json
+!/.vscode/launch.recommended.json
+!/.vscode/settings.recommended.json
