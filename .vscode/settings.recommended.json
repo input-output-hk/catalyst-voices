@@ -40,5 +40,6 @@
     "backend",
     "backend-lib"
   ],
-  "conventionalCommits.gitmoji": false
+  "conventionalCommits.gitmoji": false,
+  "markdown.extension.toc.unorderedList.marker": "*"
 }

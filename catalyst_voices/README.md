@@ -1,30 +1,33 @@
-<h1 align="center">Catalyst Voices</h1>
+# Catalyst Voices
 
-- [Requirements](#requirements)
-- [Getting Started](#getting-started)
-  - [Bootstrapping](#bootstrapping)
-- [Running Tests](#running-tests)
-- [Working with Translations](#working-with-translations)
-  - [Adding Strings](#adding-strings)
-  - [Adding Supported Locales](#adding-supported-locales)
-  - [Adding Translations](#adding-translations)
+<!-- markdownlint-disable MD029 -->
+
+* [Catalyst Voices](#catalyst-voices)
+  * [Requirements](#requirements)
+  * [Getting Started](#getting-started)
+    * [Bootstrapping](#bootstrapping)
+  * [Running Tests](#running-tests)
+  * [Working with Translations](#working-with-translations)
+    * [Adding Strings](#adding-strings)
+    * [Adding Supported Locales](#adding-supported-locales)
+    * [Adding Translations](#adding-translations)
 
 ## Requirements
 
-- Flutter: 3.13.3+
-- Dart: 3.1.2+
-- Ruby: 2.5+
-- Xcode: 14.2+
-- Android Studio: Android Studio Electric Eel | 2022.1.1 +
-- Android SDK: 23+
-- iOS SDK: 15.0+
-- [Melos](https://melos.invertase.dev)
-- [Fvm](https://fvm.app/)
-- [Fastlane](https://fastlane.tools)
-- Flutter & Dart plugins:
-  - [Visual Studio Code](https://flutter.dev/docs/get-started/editor?tab=vscode)
-  - [Android Studio / IntelliJ](https://flutter.dev/docs/get-started/editor?tab=androidstudio)
-  - [Emacs](https://docs.flutter.dev/get-started/editor?tab=emacs)
+* Flutter: 3.13.3+
+* Dart: 3.1.2+
+* Ruby: 2.5+
+* Xcode: 14.2+
+* Android Studio: Android Studio Electric Eel | 2022.1.1 +
+* Android SDK: 23+
+* iOS SDK: 15.0+
+* [Melos](https://melos.invertase.dev)
+* [Fvm](https://fvm.app/)
+* [Fastlane](https://fastlane.tools)
+* Flutter & Dart plugins:
+  * [Visual Studio Code](https://flutter.dev/docs/get-started/editor?tab=vscode)
+  * [Android Studio / IntelliJ](https://flutter.dev/docs/get-started/editor?tab=androidstudio)
+  * [Emacs](https://docs.flutter.dev/get-started/editor?tab=emacs)
 
 ❗️We recommend using **Visual Studio Code** as the **default editor** for this project.
 
@@ -40,9 +43,9 @@ melos bootstrap
 
 This project contains 3 flavors:
 
-- development
-- staging
-- production
+* development
+* staging
+* production
 
 To run the desired flavor either use the launch configuration in VSCode/Android Studio or use the following commands:
 
@@ -57,7 +60,8 @@ flutter run --flavor staging --target lib/main_staging.dart
 flutter run --flavor production --target lib/main_production.dart
 ```
 
-_\*Catalyst Voices works on Web. We plan to add iOS and Android later._
+*\*Catalyst Voices works on Web.
+We plan to add iOS and Android later.*
 
 ## Running Tests
 
@@ -79,7 +83,8 @@ open coverage/index.html
 
 ## Working with Translations
 
-This project relies on [flutter_localizations](https://github.com/flutter/flutter/tree/master/packages/flutter_localizations) and follows the [official internationalization guide for Flutter](https://docs.flutter.dev/development/accessibility-and-localization/internationalization).
+This project relies on [flutter_localizations](https://github.com/flutter/flutter/tree/master/packages/flutter_localizations).
+It follows the [official internationalization guide for Flutter][flutter-intl-guide].
 
 ### Adding Strings
 
@@ -131,10 +136,10 @@ Update the `CFBundleLocalizations` array in the `Info.plist` at `ios/Runner/Info
     ...
 
     <key>CFBundleLocalizations</key>
-	<array>
-		<string>en</string>
-		<string>es</string>
-	</array>
+ <array>
+  <string>en</string>
+  <string>es</string>
+ </array>
 
     ...
 ```
@@ -143,7 +148,7 @@ Update the `CFBundleLocalizations` array in the `Info.plist` at `ios/Runner/Info
 
 1. For each supported locale, add a new ARB file in `lib/l10n/arb`.
 
-```
+```tree
 ├── l10n
 │   ├── arb
 │   │   ├── app_en.arb
@@ -175,3 +180,5 @@ Update the `CFBundleLocalizations` array in the `Info.plist` at `ios/Runner/Info
     }
 }
 ```
+
+[flutter-intl-guide]: https://docs.flutter.dev/development/accessibility-and-localization/internationalization
