@@ -1,0 +1,226 @@
+{
+    "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
+    "version": "0.2",
+    "enabled": true,
+    "language": "en,en-US",
+    "overrides": [
+        {
+            "language": "es,es_ES",
+            "filename": "**/*_es.arb",
+            "dictionaries": [
+                "es-es"
+            ]
+        },
+        {
+            "filename": "**/*.pbxproj",
+            "allowCompoundWords": true,
+            "words": [
+                "iphoneos",
+                "onone",
+                "xcassets",
+                "objc",
+                "xcconfig",
+                "lproj",
+                "libc",
+                "objc",
+                "dsym"
+            ]
+        },
+        {
+            "filename": "**/*.plist",
+            "allowCompoundWords": true,
+            "words": [
+                "FMWK",
+                "APPL"
+            ]
+        },
+        {
+            "filename": "**/*.yaml",
+            "allowCompoundWords": true
+        },
+        {
+            "filename": "**/gradle.properties",
+            "allowCompoundWords": true,
+            "words": [
+                "jvmargs"
+            ]
+        },
+        {
+            "filename": "**/*.xml",
+            "allowCompoundWords": true
+        },
+        {
+            "filename": "**/build.gradle",
+            "allowCompoundWords": true,
+            "words": [
+                "getenv"
+            ]
+        },
+        {
+            "filename": "**/gradle-wrapper.properties",
+            "words": [
+                "dists"
+            ]
+        },
+        {
+            "filename": "**/*.kt",
+            "allowCompoundWords": true
+        },
+        {
+            "filename": "**/Appfile",
+            "words": [
+                "Appfile"
+            ]
+        },
+        {
+            "filename": "**/*.storyboard",
+            "allowCompoundWords": true
+        },
+        {
+            "filename": "**/*.appiconset/Contents.json",
+            "allowCompoundWords": true,
+            "words": [
+                "xcassets"
+            ]
+        },
+        {
+            "filename": "**/analysis_options.1.0.0.yaml",
+            "words": [
+                "interps",
+                "todos",
+                "pubspec",
+                "unawaited",
+                "bools"
+            ]
+        },
+        {
+            "filename": "**/*.xcscheme",
+            "allowCompoundWords": true,
+            "words": [
+                "LLDB",
+                "xcodeproj"
+            ]
+        },
+        {
+            "filename": "**/*.xcconfig",
+            "words": [
+                "xcconfig"
+            ]
+        },
+        {
+            "filename": "**/*.xcworkspacedata",
+            "words": [
+                "xcodeproj"
+            ]
+        }
+    ],
+    "useGitignore": true,
+    "dictionaryDefinitions": [
+        {
+            "name": "project-words",
+            "path": ".config/dictionaries/project.dic",
+            "description": "Words used in this project",
+            "addWords": true
+        }
+    ],
+    "dictionaries": [
+        // Only enable extra languages as needed.
+        "project-words",
+        // "ada",
+        // "aws",
+        "bash",
+        "companies",
+        // "cpp",
+        "cryptocurrencies",
+        // "csharp",
+        "css",
+        "dart",
+        "data-science",
+        // "django",
+        "docker",
+        // "dotnet",
+        // "elixir",
+        "filetypes",
+        "fonts",
+        // "fsharp",
+        "fullstack",
+        // "gaming-terms",
+        "git",
+        // "golang",
+        // "haskell",
+        "html",
+        "html-symbol-entities",
+        // "java",
+        // "k8s",
+        // "latex",
+        // "lorem-ipsum",
+        // "lua",
+        // "node",
+        // "npm",
+        // "php",
+        // "powershell",
+        "public-licenses",
+        // "python",
+        // "r",
+        // "ruby",
+        "rust",
+        // "scala",
+        "softwareTerms",
+        "sql",
+        // "svelte",
+        // "swift",
+        "typescript"
+        // "vue",
+    ],
+    "import": [
+        // Only enable extra languages as needed.
+        //.config/dictionaries/cspell/al/cspell-ext.json
+        //.config/dictionaries/cspell/ar/cspell-ext.json
+        //.config/dictionaries/cspell/bg_BG/cspell-ext.json
+        //.config/dictionaries/cspell/ca/cspell-ext.json
+        //.config/dictionaries/cspell/city-names-finland/cspell-ext.json
+        //.config/dictionaries/cspell/cs_CZ/cspell-ext.json
+        //.config/dictionaries/cspell/da_DK/cspell-ext.json
+        //.config/dictionaries/cspell/de_AT/cspell-ext.json
+        //.config/dictionaries/cspell/de_CH/cspell-ext.json
+        //.config/dictionaries/cspell/de_DE/cspell-ext.json
+        //.config/dictionaries/cspell/el/cspell-ext.json
+        //.config/dictionaries/cspell/eo/cspell-ext.json
+        ".config/dictionaries/cspell/es_ES/cspell-ext.json", // Spanish
+        //.config/dictionaries/cspell/et-EE/cspell-ext.json
+        //.config/dictionaries/cspell/eu/cspell-ext.json
+        //.config/dictionaries/cspell/fa_IR/cspell-ext.json
+        //.config/dictionaries/cspell/fr_FR/cspell-ext.json
+        //.config/dictionaries/cspell/fr_FR_90/cspell-ext.json
+        //.config/dictionaries/cspell/he/cspell-ext.json
+        //.config/dictionaries/cspell/hr_HR/cspell-ext.json
+        //.config/dictionaries/cspell/it_IT/cspell-ext.json
+        //.config/dictionaries/cspell/lt_LT/cspell-ext.json
+        //.config/dictionaries/cspell/lv/cspell-ext.json
+        ".config/dictionaries/cspell/markdown/cspell-ext.json" // Markdown
+        //.config/dictionaries/cspell/mnemonics/cspell-ext.json
+        //.config/dictionaries/cspell/nb_NO/cspell-ext.json
+        //.config/dictionaries/cspell/nl_NL/cspell-ext.json
+        //.config/dictionaries/cspell/pl_PL/cspell-ext.json
+        //.config/dictionaries/cspell/pt_BR/cspell-ext.json
+        //.config/dictionaries/cspell/pt_PT/cspell-ext.json
+        //.config/dictionaries/cspell/redis/cspell-ext.json
+        //.config/dictionaries/cspell/ro_RO/cspell-ext.json
+        //.config/dictionaries/cspell/ru_RU/cspell-ext.json
+        //.config/dictionaries/cspell/scientific_terms_US/cspell-ext.json
+        //.config/dictionaries/cspell/shell/cspell-ext.json
+        //.config/dictionaries/cspell/sk_SK/cspell-ext.json
+        //.config/dictionaries/cspell/sr_Cyrl/cspell-ext.json
+        //.config/dictionaries/cspell/sr_Latn/cspell-ext.json
+        //.config/dictionaries/cspell/sv/cspell-ext.json
+        //.config/dictionaries/cspell/tr_TR/cspell-ext.json
+        //.config/dictionaries/cspell/uk_UA/cspell-ext.json
+        //.config/dictionaries/cspell/vi_VN/cspell-ext.json        
+    ],
+    "ignorePaths": [
+        ".config/dictionaries/**",
+        "tmp/**",
+        ".github/**",
+        "cspell.json"
+    ]
+}

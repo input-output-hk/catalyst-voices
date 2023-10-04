@@ -5,7 +5,7 @@ A collection of Catalyst packages and plugins for Flutter and Dart.
 * [Catalyst Flutter](#catalyst-flutter)
   * [Packages](#packages)
   * [Requirements](#requirements)
-  * [Boostrapping](#boostrapping)
+  * [Bootstrapping](#bootstrapping)
   * [Support](#support)
   * [License](#license)
 
@@ -27,7 +27,7 @@ A collection of Catalyst packages and plugins for Flutter and Dart.
   * [Android Studio / IntelliJ](https://flutter.dev/docs/get-started/editor?tab=androidstudio)
   * [Emacs](https://docs.flutter.dev/get-started/editor?tab=emacs)
 
-## Boostrapping
+## Bootstrapping
 
 ```sh
 git clone TODO(minikin): add repo

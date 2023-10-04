@@ -16,7 +16,6 @@
 				}
 			},
 			"group": {
-				"kind": "build",
 				"isDefault": false
 			}
 		},
@@ -35,9 +34,48 @@
 				}
 			},
 			"group": {
-				"kind": "build",
 				"isDefault": false
 			}
+		},
+		{
+			"label": "CI - Recursive Spell Check",
+			"type": "shell",
+			"command": "earthly -P +spell-check",
+			"problemMatcher": {
+				"owner": "spell-check",
+				"pattern": {
+					"regexp": "([\\S+]+):(\\d+):(\\d+)\\s-\\s(.+)",
+					"file": 1,
+					"line": 2,
+					"column": 3,
+					"message": 4
+				}
+			},
+			"group": {
+				"isDefault": false
+			}
+		},
+		{
+			"label": "Find word in Dictionary",
+			"type": "shell",
+			"command": "docker run -v ./:/workdir ghcr.io/streetsidesoftware/cspell:latest trace ${input:searchWord} --all",
+			"problemMatcher": [],
+			"presentation": {
+				"echo": true,
+				"reveal": "always",
+				"focus": false,
+				"panel": "shared"
+			},
+			"group": {
+				"isDefault": false
+			}
+		}
+	],
+	"inputs": [
+		{
+			"id": "searchWord",
+			"type": "promptString",
+			"description": "Enter the word to search for"
 		}
 	]
 }

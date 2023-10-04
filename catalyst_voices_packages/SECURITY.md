@@ -12,7 +12,7 @@ Please provide a clear and concise description of the vulnerability, including:
 
 * the affected version(s),
 * steps that can be followed to exercise the vulnerability,
-* any workarounds or mitigations.
+* any workarounds or mitigation's.
 
 If you have developed any code or utilities that can help demonstrate the suspected
 vulnerability, please mention them in your email but ***DO NOT*** attempt to include them as

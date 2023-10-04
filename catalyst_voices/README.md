@@ -136,10 +136,10 @@ Update the `CFBundleLocalizations` array in the `Info.plist` at `ios/Runner/Info
     ...
 
     <key>CFBundleLocalizations</key>
- <array>
-  <string>en</string>
-  <string>es</string>
- </array>
+    <array>
+        <string>en</string>
+        <string>es</string>
+    </array>
 
     ...
 ```
@@ -168,6 +168,8 @@ Update the `CFBundleLocalizations` array in the `Info.plist` at `ios/Runner/Info
     }
 }
 ```
+
+<!-- cspell: words Contador Texto mostrado página -->
 
 `app_es.arb`
 

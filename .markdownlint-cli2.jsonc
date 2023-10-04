@@ -7,7 +7,9 @@
   "globs": [
     "**/*.md"
   ],
-  "ignores": [],
+  "ignores": [
+    ".config/dictionaries/**"
+  ],
   // Set standard config options in `/.markdownlint.jsonc`
   "config": {
     "max-one-sentence-per-line": {
@@ -21,7 +23,7 @@
   },
   "customRules": [
     // For local development, this custom rule needs to be installed with:
-    // `npm install --no-package-lock --production markdownlint-rule-max-one-sentence-per-line`
+    // `npm install -g --no-package-lock --production markdownlint-rule-max-one-sentence-per-line`
     "markdownlint-rule-max-one-sentence-per-line"
   ]
 }

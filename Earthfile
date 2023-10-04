@@ -16,3 +16,10 @@ markdown-check-fix:
     LOCALLY
 
     DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:v1.2.4+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
+
+spell-check:
+    # Check spelling in this repo.
+    LOCALLY
+
+    DO github.com/input-output-hk/catalyst-ci/earthly/cspell:v1.2.4+CSPELL_LOCALLY --src=$(echo ${PWD})
+ 
