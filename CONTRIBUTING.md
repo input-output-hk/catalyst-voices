@@ -2,23 +2,23 @@
 
 First off, thanks for taking the time to contribute! ❤️
 
-- [Contributing to Catalyst Voices](#contributing-to-catalyst-voices)
-  - [Code of Conduct](#code-of-conduct)
-  - [I Have a Question](#i-have-a-question)
-  - [I Want To Contribute](#i-want-to-contribute)
-    - [Reporting Bugs](#reporting-bugs)
-      - [Before Submitting a Bug Report](#before-submitting-a-bug-report)
-      - [How Do I Submit a Good Bug Report?](#how-do-i-submit-a-good-bug-report)
-    - [Suggesting Enhancements](#suggesting-enhancements)
-      - [Before Submitting an Enhancement](#before-submitting-an-enhancement)
-      - [How Do I Submit a Good Enhancement Suggestion?](#how-do-i-submit-a-good-enhancement-suggestion)
-    - [Your First Code Contribution](#your-first-code-contribution)
-    - [Improving The Documentation](#improving-the-documentation)
-  - [Styleguides](#styleguides)
-    - [Rust](#rust)
-    - [Dart](#dart)
-    - [Flutter](#flutter)
-    - [Commit Messages](#commit-messages)
+* [Contributing to Catalyst Voices](#contributing-to-catalyst-voices)
+  * [Code of Conduct](#code-of-conduct)
+  * [I Have a Question](#i-have-a-question)
+  * [I Want To Contribute](#i-want-to-contribute)
+    * [Reporting Bugs](#reporting-bugs)
+      * [Before Submitting a Bug Report](#before-submitting-a-bug-report)
+      * [How Do I Submit a Good Bug Report?](#how-do-i-submit-a-good-bug-report)
+    * [Suggesting Enhancements](#suggesting-enhancements)
+      * [Before Submitting an Enhancement](#before-submitting-an-enhancement)
+      * [How Do I Submit a Good Enhancement Suggestion?](#how-do-i-submit-a-good-enhancement-suggestion)
+    * [Your First Code Contribution](#your-first-code-contribution)
+    * [Improving The Documentation](#improving-the-documentation)
+  * [Styleguides](#styleguides)
+    * [Rust](#rust)
+    * [Dart](#dart)
+    * [Flutter](#flutter)
+    * [Commit Messages](#commit-messages)
 
 All types of contributions are encouraged and valued.
 Please make sure to read the relevant section before making your contribution.
@@ -141,7 +141,9 @@ Enhancement suggestions are tracked as [GitHub issues](https://github.com/input-
 
 ### Your First Code Contribution
 
-Embarking on your first code contribution can be an exhilarating yet intimidating endeavor. Here at Catalyst Voices, we foster a welcoming and supportive environment to ensure that everyone can contribute to the codebase irrespective of their experience level. Below is a step-by-step guide to making your first code contribution to our repository:
+Embarking on your first code contribution can be an exhilarating yet intimidating endeavor.
+Here at Catalyst Voices, we foster a welcoming and supportive environment to ensure that everyone can contribute to the codebase irrespective of their experience level.
+Below is a step-by-step guide to making your first code contribution to our repository:
 
 1. **Set Up Your Environment**:
    - Fork the repository to your GitHub account.
@@ -150,7 +152,8 @@ Embarking on your first code contribution can be an exhilarating yet intimidatin
 
 2. **Pick an Issue**:
    - Browse through the open issues in the GitHub repository.
-   - Pick an issue that interests you and aligns with your skills. Beginners might look for issues tagged as "good first issue" or "beginner-friendly".
+   - Pick an issue that interests you and aligns with your skills. Beginners might look for issues tagged as `good first issue`
+   or `beginner-friendly`.
 
 3. **Understand the Issue**:
    - Thoroughly read through the issue to understand the problem.
@@ -176,7 +179,8 @@ Embarking on your first code contribution can be an exhilarating yet intimidatin
 
 9. **Open a Pull Request**:
    - Open a pull request from your fork to the main repository.
-   - Provide a detailed description of your changes, the issue it addresses, and any additional information that might help maintainers review your contribution.
+   - Provide a detailed description of your changes, the issue it addresses,
+   and any additional information that might help maintainers review your contribution.
 
 10. **Review and Revision**:
     - Respond to any feedback from the maintainers.
@@ -186,11 +190,16 @@ Embarking on your first code contribution can be an exhilarating yet intimidatin
     - Once your pull request is approved, it will be merged into the main codebase.
     - Celebrate your contribution and share it with the community!
 
-Remember, every contributor was new at some point, and we are thrilled to welcome new members to our community. The journey of becoming an adept open-source contributor is rewarding and educational. Your contribution, no matter how small, can make a significant impact. Happy coding!
+Remember, every contributor was new at some point, and we are thrilled to welcome new members to our community.
+The journey of becoming an adept open-source contributor is rewarding and educational.
+Your contribution, no matter how small, can make a significant impact. Happy coding!
 
 ### Improving The Documentation
 
-Documentation is a cornerstone of any successful open-source project. It aids developers in understanding the purpose, structure, and functioning of the code, making the project accessible to all, irrespective of their level of expertise. Our project thrives on the contributions from the community, and improving the documentation is one of the significant ways you can contribute.
+Documentation is a cornerstone of any successful open-source project.
+It aids developers in understanding the purpose, structure, and functioning of the code, making the project accessible to all,
+irrespective of their level of expertise. Our project thrives on the contributions from the community,
+and improving the documentation is one of the significant ways you can contribute.
 
 Here are some ways you could help improve our documentation:
 
@@ -201,7 +210,8 @@ Here are some ways you could help improve our documentation:
 -  **Consistency**: Ensure the documentation maintains a consistent style and tone. Adhering to the style guidelines specified in our styleguide section is crucial.
 - **Technical Accuracy**: Ensure that the documentation reflects the current state of the codebase and is technically accurate.
 
-Your contributions should follow the guidelines specified in our Styleguides section to maintain high quality and consistency. Before making a substantial change, it's a good practice to open an issue to discuss the proposed changes or find an existing issue to work on.
+Your contributions should follow the guidelines specified in our Styleguides section to maintain high quality and consistency.
+Before making a substantial change, it's a good practice to open an issue to discuss the proposed changes or find an existing issue to work on.
 
 Together, we can ensure that our documentation is a valuable resource for all new and experienced developers.
 
@@ -221,7 +231,9 @@ For Flutter, we follow the [Flutter Style Guide](https://github.com/input-output
 
 ### Commit Messages
 
-Clear and consistent commit messages are crucial for maintaining a readable history in our collaborative environment. Adhering to a structured commit message format also enables us to generate changelogs and navigate through the project's history more efficiently. We follow the [Conventional Commits](https://www.conventionalcommits.org) standard for all commit messages in this repository.
+Clear and consistent commit messages are crucial for maintaining a readable history in our collaborative environment.
+Adhering to a structured commit message format also enables us to generate changelogs and navigate through the project's history more efficiently.
+We follow the [Conventional Commits](https://www.conventionalcommits.org) standard for all commit messages in this repository.
 
 Here's a brief overview of the Conventional Commits standard:
 
@@ -230,21 +242,25 @@ Here's a brief overview of the Conventional Commits standard:
 3. **Description**: A short, descriptive message of the change, written in the imperative mood.
 
 Format:
-```
+
+```txt
 <type>(<scope>): <description>
 ```
 
 Example:
-```
+
+```txt
 feat(button): add a 'submit' button to form component
 fix(modal): resolve issue with modal overlay not closing
 chore(tests): update unit tests for utilities module
 ```
 
-- **Breaking Changes**: If your commit introduces a breaking change, it should be flagged with a `!` after the type. Include `BREAKING CHANGE:` in the body or footer of the commit message to describe what changed and its implications.
+- **Breaking Changes**: If your commit introduces a breaking change, it should be flagged with a `!` after the type.
+Include `BREAKING CHANGE:` in the body or footer of the commit message to describe what changed and its implications.
 
 Example:
-```
+
+```txt
 feat!(dropdown): change the behavior of dropdown component
 BREAKING CHANGE: alters dropdown trigger to be activated on hover instead of on click.
 ```
