@@ -14,7 +14,7 @@ First off, thanks for taking the time to contribute! ❤️
       * [How Do I Submit a Good Enhancement Suggestion?](#how-do-i-submit-a-good-enhancement-suggestion)
     * [Your First Code Contribution](#your-first-code-contribution)
     * [Improving The Documentation](#improving-the-documentation)
-  * [Styleguides](#styleguides)
+  * [Style guides](#style-guides)
     * [Rust](#rust)
     * [Dart](#dart)
     * [Flutter](#flutter)
@@ -73,7 +73,7 @@ Please complete the following steps in advance to help us fix any potential bug 
   Check if there is not already a bug report existing for your bug or error in the
 [bug tracker](https://github.com/input-output-hk/catalyst-voices/issues?q=is%3Aopen+is%3Aissue+label%3Abug).
 * Also make sure to search the internet (including Stack Overflow)
-  to see if users outside of the GitHub community have discussed the issue.
+  to see if users outside the GitHub community have discussed the issue.
 * Collect information about the bug:
   * Stack trace (Traceback)
   * OS, Platform and Version (Windows, Linux, macOS, x86, ARM)
@@ -177,14 +177,14 @@ Below is a step-by-step guide to making your first code contribution to our repo
 
 5. **Work on the Issue**:
    * Work on the issue in your local development environment.
-   * Adhere to the coding standards and guidelines provided in the Styleguides section.
+   * Adhere to the coding standards and guidelines provided in the [Style guides](#style-guides) section.
 
 6. **Test Your Changes**:
    * Ensure that your changes are well-tested.
    * Verify that your changes don't break any existing functionality.
 
 7. **Commit Your Changes**:
-   * Write a clear and concise commit message following the Styleguides -> Commit Messages section guidelines.
+   * Write a clear and concise commit message following the [Style guides](#style-guides) -> Commit Messages section guidelines.
 
 8. **Push Your Changes**:
    * Push your changes to your fork on GitHub.
@@ -226,16 +226,17 @@ contributing expanded explanations or new sections is highly encouraged.
 * **Examples**: Adding examples to the documentation can significantly enhance utility.
   If you have examples that illustrate the use of our code, we'd love to include them.
 * **Consistency**: Ensure the documentation maintains a consistent style and tone.
-  Adhering to the style guidelines specified in our styleguide section is crucial.
+  Adhering to the style guidelines specified in our [Style guides](#style-guides) section is crucial.
 * **Technical Accuracy**: Ensure that the documentation reflects the current state of the codebase and is technically accurate.
 
-Your contributions should follow the guidelines specified in our Styleguides section to maintain high quality and consistency.
+Your contributions should follow the guidelines specified in our [Style guides](#style-guides)
+section to maintain high quality and consistency.
 Before making a substantial change, it's a good practice to open an issue to discuss the proposed changes or
 find an existing issue to work on.
 
 Together, we can ensure that our documentation is a valuable resource for all new and experienced developers.
 
-## Styleguides
+## Style guides
 
 ### Rust
 
