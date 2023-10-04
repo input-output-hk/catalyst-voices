@@ -1,7 +1,6 @@
 # Catalyst Voices
 
 <!-- markdownlint-disable MD029 -->
-<!-- cspell: words IntelliJ -->
 
 * [Catalyst Voices](#catalyst-voices)
   * [Requirements](#requirements)
