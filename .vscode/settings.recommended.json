@@ -41,5 +41,10 @@
     "backend-lib"
   ],
   "conventionalCommits.gitmoji": false,
-  "markdown.extension.toc.unorderedList.marker": "*"
+  "markdown.extension.toc.unorderedList.marker": "*",
+  "cSpell.autoFormatConfigFile": true,
+  "cSpell.language": "en,en-US",
+  "files.associations": {
+    "Earthfile": "earthfile"
+  }
 }
