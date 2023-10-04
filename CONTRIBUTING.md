@@ -111,14 +111,16 @@ Once it's filed:
 
 This section guides you through submitting an enhancement suggestion for Catalyst voices,
 **including completely new features and minor improvements to existing functionality**.
-Following these guidelines will help maintainers and the community to understand your suggestion and find related suggestions.
+Following these guidelines will help maintainers and the community to understand your suggestion and
+find related suggestions.
 
 #### Before Submitting an Enhancement
 
 * Make sure that you are using the latest version.
 * Read the [documentation](https://github.com/input-output-hk/catalyst-voices) carefully.
   Find out if the functionality is already covered, maybe by an individual configuration.
-* Perform a [search](https://github.com/input-output-hk/catalyst-voices/issues) to see if the enhancement has already been suggested.
+* Perform a [search](https://github.com/input-output-hk/catalyst-voices/issues) 
+to see if the enhancement has already been suggested.
   If it has, add a comment to the existing issue instead of opening a new one.
 * Find out whether your idea fits with the scope and aims of the project.
   It's up to you to make a strong case to convince the project's developers of the merits of this feature.
@@ -144,7 +146,8 @@ Enhancement suggestions are tracked as [GitHub issues](https://github.com/input-
 ### Your First Code Contribution
 
 Embarking on your first code contribution can be an exhilarating yet intimidating endeavor.
-Here at Catalyst Voices, we foster a welcoming and supportive environment to ensure that everyone can contribute to the codebase irrespective of their experience level.
+Here at Catalyst Voices, we foster a welcoming and supportive environment to ensure
+that everyone can contribute to the codebase irrespective of their experience level.
 Below is a step-by-step guide to making your first code contribution to our repository:
 
 1. **Set Up Your Environment**:
@@ -208,8 +211,10 @@ and improving the documentation is one of the significant ways you can contribut
 
 Here are some ways you could help improve our documentation:
 
-* **Clarification**: If you find any ambiguous or unclear documentation, feel free to clarify the wording or suggest improvements through a pull request.
-* **Expansion**: If areas of the documentation are lacking in detail or missing altogether, contributing expanded explanations or new sections is highly encouraged.
+* **Clarification**: If you find any ambiguous or unclear documentation, feel free to clarify the wording or
+suggest improvements through a pull request.
+* **Expansion**: If areas of the documentation are lacking in detail or missing altogether,
+contributing expanded explanations or new sections is highly encouraged.
 * **Correction**: Spot a mistake?
   Whether it's a spelling error, grammatical error, or incorrect information, your corrections are welcome.
 * **Examples**: Adding examples to the documentation can significantly enhance utility.
@@ -219,7 +224,8 @@ Here are some ways you could help improve our documentation:
 * **Technical Accuracy**: Ensure that the documentation reflects the current state of the codebase and is technically accurate.
 
 Your contributions should follow the guidelines specified in our Styleguides section to maintain high quality and consistency.
-Before making a substantial change, it's a good practice to open an issue to discuss the proposed changes or find an existing issue to work on.
+Before making a substantial change, it's a good practice to open an issue to discuss the proposed changes or
+find an existing issue to work on.
 
 Together, we can ensure that our documentation is a valuable resource for all new and experienced developers.
 
@@ -227,20 +233,24 @@ Together, we can ensure that our documentation is a valuable resource for all ne
 
 ### Rust
 
-For Rust, we follow the [Rust Style Guide](https://input-output-hk.github.io/catalyst-core/main/06_rust_api/rust_style_guide.html).
+For Rust, we follow the
+[Rust Style Guide](https://input-output-hk.github.io/catalyst-core/main/06_rust_api/rust_style_guide.html).
 
 ### Dart
 
-For Dart, we follow the [Effective Dart](https://github.com/input-output-hk/catalyst-engineering/blob/main/style_guides/dart_style_guide.md) style guide.
+For Dart, we follow the
+[Effective Dart](https://github.com/input-output-hk/catalyst-engineering/blob/main/style_guides/dart_style_guide.md) style guide.
 
 ### Flutter
 
-For Flutter, we follow the [Flutter Style Guide](https://github.com/input-output-hk/catalyst-engineering/blob/main/style_guides/flutter_style_guide.md).
+For Flutter, we follow the
+[Flutter Style Guide](https://github.com/input-output-hk/catalyst-engineering/blob/main/style_guides/flutter_style_guide.md).
 
 ### Commit Messages
 
 Clear and consistent commit messages are crucial for maintaining a readable history in our collaborative environment.
-Adhering to a structured commit message format also enables us to generate changelogs and navigate through the project's history more efficiently.
+Adhering to a structured commit message format also enables us to generate changelogs and
+navigate through the project's history more efficiently.
 We follow the [Conventional Commits](https://www.conventionalcommits.org) standard for all commit messages in this repository.
 
 Here's a brief overview of the Conventional Commits standard:
@@ -273,6 +283,8 @@ feat!(dropdown): change the behavior of dropdown component
 BREAKING CHANGE: alters dropdown trigger to be activated on hover instead of on click.
 ```
 
-* **Footer (Optional)**: Any additional metadata regarding your commit, such as related issue trackers or BREAKING CHANGE annotations.
+* **Footer (Optional)**: Any additional metadata regarding your commit, such as related issue trackers or
+BREAKING CHANGE annotations.
 
-Following this format makes the version control history readable and reflects professionalism and foresight in maintaining a clean, well-documented codebase.
+Following this format makes the version control history readable and reflects professionalism and
+foresight in maintaining a clean, well-documented codebase.
