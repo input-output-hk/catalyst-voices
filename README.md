@@ -79,9 +79,12 @@ For development guidelines, tooling information, and best practices, see DEVELOP
 ## Contributing
 
 We welcome contributions from the community!
-Please read our CONTRIBUTING.md for guidelines on how to contribute.
+Please read our [CONTRIBUTING](CONTRIBUTING.md) for guidelines on how to contribute.
 
 ## License
 
-This project is licensed under the [LICENSE_NAME].
-See LICENSE for details.
+Licensed under either of [Apache License, Version 2.0](LICENSE-APACHE) or [MIT license](LICENSE-MIT) at your option.
+
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in this crate by you, as defined in the Apache-2.0 license, shall
+be dual licensed as above, without any additional terms or conditions.
