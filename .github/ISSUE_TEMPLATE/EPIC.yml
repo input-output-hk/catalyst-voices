@@ -1,16 +1,12 @@
 name: "🏛️ Epic"
 description: Create a new Epic.
 title: "🏛️ [EPIC] : <title>"
-labels: [
-  "epic"
-]
-projects: [
-  "/input-output-hk/102"
-]
+labels: ["epic"]
+projects: ["/input-output-hk/102"]
 body:
   - type: markdown
     attributes:
-      value: "⚠️ **Epics are only to be created by the Project Managers!** ⚠️"  
+      value: "⚠️ **Epics are only to be created by the Project Managers!** ⚠️"
   - type: input
     id: summary
     attributes:
@@ -23,8 +19,7 @@ body:
     id: jira-epic
     attributes:
       label: "JIRA Epic"
-      description: 
-        All Epics must have a linked Jira [EPIC](https://input-output.atlassian.net/jira/software/c/projects/NPG/issues)
+      description: All Epics must have a linked Jira [EPIC](https://input-output.atlassian.net/jira/software/c/projects/NPG/issues)
       placeholder: ex. https://input-output.atlassian.net/browse/NPG-8294
     validations:
       required: true
@@ -44,10 +39,10 @@ body:
         ## TODO Lists
 
   - type: textarea
-    id: todos
+    id: todo
     attributes:
-      label: "Todos"
-      description: "Grouped Todos with links to issues when created."
+      label: "Todo"
+      description: "Grouped Todo lists. Each links to its issue, when created."
       placeholder: |
         ### <list 1 name>
 
