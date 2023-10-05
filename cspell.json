@@ -220,7 +220,10 @@
     "ignorePaths": [
         ".config/dictionaries/**",
         "tmp/**",
-        ".github/**",
-        "cspell.json"
+        "cspell.json",
+        ".git/**",
+        "**/.gitignore",
+        ".vscode/**",
+        "**/.idea/**"
     ]
 }
