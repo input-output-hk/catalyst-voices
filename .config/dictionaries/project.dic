@@ -5,6 +5,7 @@ jetbrains
 lcov
 localizable
 mdlint
+mitigations
 pubspec
 rustc
 stevenj
