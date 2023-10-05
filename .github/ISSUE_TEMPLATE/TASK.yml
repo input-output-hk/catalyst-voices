@@ -1,0 +1,34 @@
+name: "🛠️ Task"
+description: |
+  Create a new Task.
+  Tasks document and manage specific to-dos, chores, or assignments within the project.
+title: "🛠️ [TASK] : <title>"
+labels: ["task"]
+projects: ["/input-output-hk/102"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ⚠️ **All Tasks must be listed as a Task in an Epic!** ⚠️
+  - type: input
+    id: summary
+    attributes:
+      label: "Summary"
+      description: "Short Summary of the Task"
+      placeholder: "Short Summary"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: "Description"
+      description: "Extended Description of the Task"
+      placeholder: |
+        Explicit extended description of the task...
+
+        ### Subtask List (Optional)
+
+        - [ ] #1
+        - [ ] Subtask placeholder waiting for an issue.
+    validations:
+      required: true
