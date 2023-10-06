@@ -37,12 +37,13 @@ body:
     validations:
       required: true
 
-  - type: checkboxes
+  - type: dropdown
     id: existing-feature
     attributes:
       label: Is this a modification to an existing feature?
+      multiple: false
       options:
-        - label: Yes
-        - label: No
+        - Yes
+        - No
     validations:
       required: true
