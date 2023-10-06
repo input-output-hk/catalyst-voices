@@ -43,7 +43,7 @@ body:
       label: Is this a modification to an existing feature?
       multiple: false
       options:
-        - Yes
-        - No
+        - "Yes"
+        - "No"
     validations:
       required: true
