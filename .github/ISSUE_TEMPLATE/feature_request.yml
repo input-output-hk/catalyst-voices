@@ -1,0 +1,48 @@
+name: Feature Request
+description: Suggest a new idea or enhancement for this project.
+title: "[Feature]: "
+labels: [enhancement]
+projects: ["/input-output-hk/102"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this feature request!
+
+  - type: input
+    id: title
+    attributes:
+      label: Feature Title
+      description: Provide a clear and concise title for the feature.
+      placeholder: e.g., "New reporting functionality"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Feature Description
+      description: Provide a detailed description of the proposed feature.
+      placeholder: Describe the feature and its benefits.
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: Explain the use case of the proposed feature and how it would be used.
+      placeholder: Describe the use case.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: existing-feature
+    attributes:
+      label: Is this a modification to an existing feature?
+      options:
+        - label: Yes
+        - label: No
+    validations:
+      required: true

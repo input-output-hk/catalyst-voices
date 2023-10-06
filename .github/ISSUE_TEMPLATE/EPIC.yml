@@ -3,10 +3,12 @@ description: Create a new Epic.
 title: "🏛️ [EPIC] : <title>"
 labels: ["epic"]
 projects: ["/input-output-hk/102"]
+
 body:
   - type: markdown
     attributes:
       value: "⚠️ **Epics are only to be created by the Project Managers!** ⚠️"
+
   - type: input
     id: summary
     attributes:
@@ -15,6 +17,7 @@ body:
       placeholder: "Short Summary"
     validations:
       required: true
+
   - type: input
     id: jira-epic
     attributes:
@@ -23,6 +26,7 @@ body:
       placeholder: ex. https://input-output.atlassian.net/browse/NPG-8294
     validations:
       required: true
+
   - type: textarea
     id: description
     attributes:
@@ -46,7 +50,7 @@ body:
       placeholder: |
         ### <list 1 name>
 
-        - [ ] #1 
+        - [ ] #1
         - [ ] #2
         - [ ] issue description when not yet created.
 
@@ -59,7 +63,7 @@ body:
       value: |
         ### <list 1 name>
 
-        - [ ] #1 
+        - [ ] #1
         - [ ] #2
         - [ ] issue description when not yet created.
 
