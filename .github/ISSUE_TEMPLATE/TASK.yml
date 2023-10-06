@@ -5,11 +5,13 @@ description: |
 title: "🛠️ [TASK] : <title>"
 labels: ["task"]
 projects: ["/input-output-hk/102"]
+
 body:
   - type: markdown
     attributes:
       value: |
         ⚠️ **All Tasks must be listed as a Task in an Epic!** ⚠️
+
   - type: input
     id: summary
     attributes:
@@ -18,6 +20,7 @@ body:
       placeholder: "Short Summary"
     validations:
       required: true
+
   - type: textarea
     id: description
     attributes:
