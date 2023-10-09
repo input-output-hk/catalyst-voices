@@ -1,0 +1,26 @@
+[package]
+name = "event-db"
+version.workspace = true
+authors.workspace = true
+edition.workspace = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+thiserror = { workspace = true }
+
+serde_json = { workspace = true }
+
+dotenvy = { workspace = true }
+
+bb8 = { workspace = true }
+bb8-postgres = { workspace = true }
+tokio-postgres = { workspace = true, features = ["with-chrono-0_4", "with-serde_json-1"]}
+
+async-trait = { workspace = true }
+
+tokio = { workspace = true, features = ["full"] }
+
+chrono = { workspace = true }
+
+rust_decimal = { workspace = true, features = ["serde-with-float", "db-tokio-postgres"] }

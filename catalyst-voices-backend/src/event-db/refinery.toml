@@ -1,0 +1,8 @@
+[main]
+db_type = "Postgres"
+db_host = "localhost"
+db_port = "5432"
+db_user = "catalyst-event-dev"
+db_pass = "CHANGE_ME"
+db_name = "CatalystEventDev"
+trust_cert = false
