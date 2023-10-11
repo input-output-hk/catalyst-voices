@@ -22,9 +22,9 @@ async-trait = { version = "0.1.64" }
 
 rust_decimal = { version = "1.29" }
 
-bb8 = { version = "0.8.0" } # Database Connection Pool Manager
-bb8-postgres = { version = "0.8.1" } # BB8 Postgres Connection Support.
-tokio-postgres = { version = "0.7.7" } # Tokio postgres query handler.
+bb8 = { version = "0.8.0" }
+bb8-postgres = { version = "0.8.1" }
+tokio-postgres = { version = "0.7.7" }
 
 tokio = { version = "1" }
 
