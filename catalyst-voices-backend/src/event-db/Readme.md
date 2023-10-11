@@ -2,34 +2,31 @@
 
 This crate defines the structure and RUST access methods for the Catalyst Event Database.
 
-- [Catalyst Event Database](#catalyst-event-database)
-  - [Starting a Local Test DB with Docker](#starting-a-local-test-db-with-docker)
-  - [Creating A Local Test Database](#creating-a-local-test-database)
-    - [Dependencies](#dependencies)
-    - [Setup a clean new dev DB with a single command](#setup-a-clean-new-dev-db-with-a-single-command)
-  - [GraphQL](#graphql)
-    - [GraphQL Users](#graphql-users)
-      - [Authentication API](#authentication-api)
-
 ## Starting a Local Test DB with Docker and Earthly
 
 Fistly you will need to prepare a docker images with all migrations and data.
 
 Prepare a event-db docker image with the historic data
 (from the root directory)
-```
+
+```sh
 earthly ./containers/event-db-migrations+docker
 ```
+
 Prepare a event-db docker image with the test data
 (from the root directory)
-```
+
+```sh
 earthly ./containers/event-db-migrations+docker --data=test
 ```
+
 Run a event db docker container
 (from the root directory)
-```
+
+```sh
 docker-compose -f src/event-db/docker-compose.yml up migrations
 ```
+
 This will run postgres on port `5432`
 
 ## GraphQL
@@ -50,8 +47,8 @@ See <https://www.graphile.org/postgraphile/> for documentation on the GraphQL se
 
 There are two GraphQL Users:
 
-- `cat_admin`: Full admin access to the database.
-- `cat_anon`: Unauthenticated read-only access to the database.
+* `cat_admin`: Full admin access to the database.
+* `cat_anon`: Unauthenticated read-only access to the database.
 
 To authenticate, as the `cat_admin` user, execute the `authenticate` mutation.
 This will return a Signed JWT Token for the user.
