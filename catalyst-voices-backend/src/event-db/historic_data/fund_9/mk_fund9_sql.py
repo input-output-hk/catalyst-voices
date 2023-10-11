@@ -105,7 +105,7 @@ VALUES
 ({event_id}, 'Catalyst Fund {event_id}', '{fund_goal}',
  '2022-06-02 00:00:00', -- Start Time - Date/Time accurate.
  '2022-10-11 00:00:00', -- End Time   - Date/Time -- 7 days after tallying end time (confluence says 2022-09-02).
- '{epoch_to_time(registration_snapshot_time)}', -- Registration Snapshot Time -- Date/time Unkown (confluence schedule doesn't mention snapshot specifically).
+ '{epoch_to_time(registration_snapshot_time)}', -- Registration Snapshot Time -- Date/time Unknown (confluence schedule doesn't mention snapshot specifically).
  '{epoch_to_time(snapshot_start_time)}', -- Snapshot Start - Date/time (same as confluence schedule but it doesn't mention snapshot time specifically).
  {voting_power_threshold},            -- Voting Power Threshold -- Accurate
  100,                   -- Max Voting Power PCT - No max% threshold used in this fund.

@@ -1,4 +1,4 @@
--- Initialise the Project Catalyst Event Database.
+-- Initialize the Project Catalyst Event Database.
 
 -- This script requires a number of variables to be set.
 -- They will default if not set externally.

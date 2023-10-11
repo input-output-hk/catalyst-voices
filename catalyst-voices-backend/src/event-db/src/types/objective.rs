@@ -20,7 +20,7 @@ pub struct ObjectiveSummary {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct RewardDefintion {
+pub struct RewardDefinition {
     pub currency: String,
     pub value: i64,
 }
@@ -34,7 +34,7 @@ pub struct VoterGroup {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ObjectiveDetails {
     pub groups: Vec<VoterGroup>,
-    pub reward: Option<RewardDefintion>,
+    pub reward: Option<RewardDefinition>,
     pub supplemental: Option<Value>,
 }
 

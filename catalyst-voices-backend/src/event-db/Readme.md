@@ -4,7 +4,7 @@ This crate defines the structure and RUST access methods for the Catalyst Event 
 
 ## Starting a Local Test DB with Docker and Earthly
 
-Fistly you will need to prepare a docker images with all migrations and data.
+Firstly you will need to prepare a docker images with all migrations and data.
 
 Prepare a event-db docker image with the historic data
 (from the root directory)

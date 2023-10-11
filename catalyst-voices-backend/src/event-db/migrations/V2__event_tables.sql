@@ -111,7 +111,7 @@ COMMENT ON COLUMN event.committee_size  IS
 
 COMMENT ON COLUMN event.committee_threshold  IS
 'The minimum size of the tally committee to perform the tally.
-Must be <= `comittee_size`';
+Must be <= `committee_size`';
 
 COMMENT ON COLUMN event.extra IS
 'Json Map defining event specific extra data.

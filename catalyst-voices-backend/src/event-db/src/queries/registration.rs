@@ -450,7 +450,7 @@ mod tests {
                         value: 100,
                     }
                 ],
-                reward_address: RewardAddress::new("addrrreward_address_1".to_string()),
+                reward_address: RewardAddress::new("addrr_reward_address_1".to_string()),
                 raw_power: 240,
                 total_power: 1000,
                 as_at: DateTime::<Utc>::from_utc(
@@ -493,7 +493,7 @@ mod tests {
                         value: 100,
                     }
                 ],
-                reward_address: RewardAddress::new("addrrreward_address_1".to_string()),
+                reward_address: RewardAddress::new("addrr_reward_address_1".to_string()),
                 raw_power: 240,
                 total_power: 1000,
                 as_at: DateTime::<Utc>::from_utc(

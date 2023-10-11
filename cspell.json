@@ -224,6 +224,14 @@
         ".git/**",
         "**/.gitignore",
         ".vscode/**",
-        "**/.idea/**"
+        "**/.idea/**",
+        // event-db
+        "*.bin",
+        "*.sqlite3",
+        "**/historic_data/**/*.sql",
+        "**/historic_data/**/*.sql",
+        "**/historic_data/**/*.yaml",
+        "**/historic_data/**/*.json",
+        "**/test_data/**/*.sql"
     ]
 }

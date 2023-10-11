@@ -6,7 +6,7 @@ use crate::{
             event::EventId,
             objective::{
                 Objective, ObjectiveDetails, ObjectiveId, ObjectiveSummary, ObjectiveType,
-                RewardDefintion, VoterGroup,
+                RewardDefinition, VoterGroup,
             },
         },
     },
@@ -33,7 +33,7 @@ impl EventDB {
         WHERE objective.event = $1
         LIMIT $2 OFFSET $3;";
 
-    const VOTING_GROPUS_QEURY: &'static str =
+    const VOTING_GROUPS_QUERY: &'static str =
         "SELECT voteplan.group_id as group, voteplan.token_id as voting_token
         FROM voteplan 
         WHERE objective_id = $1;";
@@ -72,12 +72,12 @@ impl ObjectiveQueries for EventDB {
             let currency: Option<_> = row.try_get("rewards_currency")?;
             let value: Option<_> = row.try_get("rewards_total")?;
             let reward = match (currency, value) {
-                (Some(currency), Some(value)) => Some(RewardDefintion { currency, value }),
+                (Some(currency), Some(value)) => Some(RewardDefinition { currency, value }),
                 _ => None,
             };
 
             let mut groups = Vec::new();
-            let rows = conn.query(Self::VOTING_GROPUS_QEURY, &[&row_id]).await?;
+            let rows = conn.query(Self::VOTING_GROUPS_QUERY, &[&row_id]).await?;
             for row in rows {
                 let group = row.try_get::<_, Option<String>>("group")?.map(VoterGroupId);
                 let voting_token: Option<_> = row.try_get("voting_token")?;
@@ -157,7 +157,7 @@ mod tests {
                                 voting_token: Some("voting token 2".to_string()),
                             }
                         ],
-                        reward: Some(RewardDefintion {
+                        reward: Some(RewardDefinition {
                             currency: "ADA".to_string(),
                             value: 100
                         }),
@@ -218,7 +218,7 @@ mod tests {
                             voting_token: Some("voting token 2".to_string()),
                         }
                     ],
-                    reward: Some(RewardDefintion {
+                    reward: Some(RewardDefinition {
                         currency: "ADA".to_string(),
                         value: 100
                     }),

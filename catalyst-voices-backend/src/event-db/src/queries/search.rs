@@ -99,7 +99,7 @@ impl EventDB {
         order_by_clause
     }
 
-    fn contruct_query(search_query: &SearchQuery) -> String {
+    fn construct_query(search_query: &SearchQuery) -> String {
         let (query, table) = match search_query.table {
             SearchTable::Events => (Self::SEARCH_EVENTS_QUERY, "event"),
             SearchTable::Objectives => (Self::SEARCH_OBJECTIVES_QUERY, "objective"),
@@ -113,7 +113,7 @@ impl EventDB {
         )
     }
 
-    fn contruct_count_query(search_query: &SearchQuery) -> String {
+    fn construct_count_query(search_query: &SearchQuery) -> String {
         let (query, table) = match search_query.table {
             SearchTable::Events => (Self::SEARCH_EVENTS_QUERY, "event"),
             SearchTable::Objectives => (Self::SEARCH_OBJECTIVES_QUERY, "objective"),
@@ -141,7 +141,7 @@ impl SearchQueries for EventDB {
         if total {
             let rows: Vec<tokio_postgres::Row> = conn
                 .query(
-                    &Self::contruct_count_query(&search_query),
+                    &Self::construct_count_query(&search_query),
                     &[&limit, &offset.unwrap_or(0)],
                 )
                 .await
@@ -157,7 +157,7 @@ impl SearchQueries for EventDB {
                 SearchTable::Events => {
                     let rows: Vec<tokio_postgres::Row> = conn
                         .query(
-                            &Self::contruct_query(&search_query),
+                            &Self::construct_query(&search_query),
                             &[&limit, &offset.unwrap_or(0)],
                         )
                         .await
@@ -191,7 +191,7 @@ impl SearchQueries for EventDB {
                 SearchTable::Objectives => {
                     let rows: Vec<tokio_postgres::Row> = conn
                         .query(
-                            &Self::contruct_query(&search_query),
+                            &Self::construct_query(&search_query),
                             &[&limit, &offset.unwrap_or(0)],
                         )
                         .await
@@ -220,7 +220,7 @@ impl SearchQueries for EventDB {
                 SearchTable::Proposals => {
                     let rows: Vec<tokio_postgres::Row> = conn
                         .query(
-                            &Self::contruct_query(&search_query),
+                            &Self::construct_query(&search_query),
                             &[&limit, &offset.unwrap_or(0)],
                         )
                         .await
