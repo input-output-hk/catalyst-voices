@@ -1,8 +1,31 @@
-[package]
-name = "catalyst-voices-backend"
-version = "0.1.0"
+[workspace]
+resolver = "2"
+members = [
+    "src/event-db"
+]
+
+[workspace.package]
 edition = "2021"
+version = "0.0.1"
+authors = [ ]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[workspace.dependencies]
+event-db = { path = "src/event-db" }
 
-[dependencies]
+thiserror = { version = "1.0" }
+
+serde_json = { version = "1.0" }
+
+chrono = { version = "0.4" }
+
+async-trait = { version = "0.1.64" }
+
+rust_decimal = { version = "1.29" }
+
+bb8 = { version = "0.8.0" }
+bb8-postgres = { version = "0.8.1" }
+tokio-postgres = { version = "0.7.7" }
+
+tokio = { version = "1" }
+
+dotenvy = { version = "0.15" }
