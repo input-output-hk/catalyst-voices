@@ -1,7 +1,8 @@
 [workspace]
 resolver = "2"
 members = [
-    "src/event-db"
+    "src/event-db",
+    "src/cat-data-service",
 ]
 
 [workspace.package]
@@ -11,6 +12,7 @@ authors = [ ]
 
 [workspace.dependencies]
 event-db = { path = "src/event-db" }
+cat-data-service = { path = "src/cat-data-service" }
 
 thiserror = { version = "1.0" }
 
