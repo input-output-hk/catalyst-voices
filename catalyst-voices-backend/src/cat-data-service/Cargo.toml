@@ -9,28 +9,28 @@ edition.workspace = true
 [dependencies]
 event-db = { workspace = true }
 
-clap = { workspace = true }
+clap = { workspace = true, features = ["derive", "env"] }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true, features = ["fmt", "json", "time"] }
 
-serde = { version = "1.0", features = ["derive"] }
-serde_json = { version = "1.0" }
-serde_with = { version = "3", features = ["macros"] }
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+serde_with = { workspace = true, features = ["macros"] }
 
-tokio = { version = "1.8", features = ["rt", "macros", "rt-multi-thread"] }
-thiserror = { version = "1.0" }
-axum = { version = "0.6.9" }
-metrics = { version = "0.21.1" }
-metrics-exporter-prometheus = { version = "0.12.1" }
+tokio = { workspace = true, features = ["rt", "macros", "rt-multi-thread"] }
+thiserror = { workspace = true }
+axum = { workspace = true }
+metrics = { workspace = true }
+metrics-exporter-prometheus = { workspace = true }
 
-tower-http = { version = "0.4", features = ["cors"] }
+tower-http = { workspace = true, features = ["cors"] }
 
 rust_decimal = { workspace = true }
 
 chrono = { workspace = true }
 
-poem = { version = "1.3.58", features = ["embed", "prometheus", "compression", "test"] }
-poem-openapi = { version = "3.0.4", features = [
+poem = { workspace = true, features = ["embed", "prometheus", "compression", "test"] }
+poem-openapi = { workspace = true, features = [
     "openapi-explorer",
     "rapidoc",
     "redoc",
@@ -39,27 +39,23 @@ poem-openapi = { version = "3.0.4", features = [
     "url",
     "chrono",
 ] }
-poem-extensions = { version = "0.7.2" }
+poem-extensions = { workspace = true }
 
 # Metrics - Poem
-opentelemetry-prometheus = { version = "0.13" }
+opentelemetry-prometheus = { workspace = true }
 opentelemetry = { workspace = true }
-prometheus = { version = "0.13.0" }
+prometheus = { workspace = true }
 cryptoxide = { workspace = true }
-uuid = { workspace = true }
+uuid = { workspace = true, features = ["v4", "serde"] }
 lazy_static = { workspace = true }
 url = { workspace = true }
 dotenvy = { workspace = true }
-panic-message = "0.3"
+panic-message = { workspace = true }
 regex = { workspace = true }
-tower = { version = "0.4", features = ["util"] }
-hyper = "0.14"
-bytes = "1.4"
-cpu-time = "1.0"
-arc-swap = "1.6"
-ulid = { version = "1.0.1", features = ["serde", "uuid"] }
-rust-embed = "8"
-
-[dev-dependencies]
-quickcheck = { version = "0.9" }
-quickcheck_macros = { version = "0.9" }
+tower = { workspace = true, features = ["util"] }
+hyper = { workspace = true }
+bytes = { workspace = true }
+cpu-time = { workspace = true }
+arc-swap = { workspace = true }
+ulid = { workspace = true, features = ["serde", "uuid"] }
+rust-embed = { workspace = true }

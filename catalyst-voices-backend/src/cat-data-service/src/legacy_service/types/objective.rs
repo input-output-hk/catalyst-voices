@@ -1,8 +1,8 @@
 use super::SerdeType;
 use event_db::types::{
     objective::{
-        Objective, ObjectiveDetails, ObjectiveId, ObjectiveSummary, ObjectiveType, RewardDefintion,
-        VoterGroup,
+        Objective, ObjectiveDetails, ObjectiveId, ObjectiveSummary, ObjectiveType,
+        RewardDefinition, VoterGroup,
     },
     registration::VoterGroupId,
 };
@@ -97,7 +97,7 @@ impl Serialize for SerdeType<ObjectiveSummary> {
     }
 }
 
-impl Serialize for SerdeType<&RewardDefintion> {
+impl Serialize for SerdeType<&RewardDefinition> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -115,7 +115,7 @@ impl Serialize for SerdeType<&RewardDefintion> {
     }
 }
 
-impl Serialize for SerdeType<RewardDefintion> {
+impl Serialize for SerdeType<RewardDefinition> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
@@ -162,7 +162,7 @@ impl Serialize for SerdeType<&ObjectiveDetails> {
         struct ObjectiveDetailsSerde<'a> {
             groups: Vec<SerdeType<&'a VoterGroup>>,
             #[serde(skip_serializing_if = "Option::is_none")]
-            reward: Option<SerdeType<&'a RewardDefintion>>,
+            reward: Option<SerdeType<&'a RewardDefinition>>,
             #[serde(skip_serializing_if = "Option::is_none")]
             supplemental: &'a Option<Value>,
         }
@@ -284,7 +284,7 @@ mod tests {
 
     #[test]
     fn reward_definition_json_test() {
-        let reward_definition = SerdeType(RewardDefintion {
+        let reward_definition = SerdeType(RewardDefinition {
             currency: "ADA".to_string(),
             value: 100,
         });
@@ -327,7 +327,7 @@ mod tests {
                 group: Some(VoterGroupId("group".to_string())),
                 voting_token: Some("token".to_string()),
             }],
-            reward: Some(RewardDefintion {
+            reward: Some(RewardDefinition {
                 currency: "ADA".to_string(),
                 value: 100,
             }),
@@ -373,7 +373,7 @@ mod tests {
                     group: Some(VoterGroupId("group".to_string())),
                     voting_token: Some("token".to_string()),
                 }],
-                reward: Some(RewardDefintion {
+                reward: Some(RewardDefinition {
                     currency: "ADA".to_string(),
                     value: 100,
                 }),

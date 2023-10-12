@@ -21,9 +21,7 @@ impl State {
             None => Arc::new(event_db::establish_connection(None).await?),
         };
 
-        let state = Self {
-            event_db,
-        };
+        let state = Self { event_db };
 
         // We don't care if this succeeds or not.
         // We just try our best to connect to the event DB.
