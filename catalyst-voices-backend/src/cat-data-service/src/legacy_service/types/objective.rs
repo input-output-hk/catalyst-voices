@@ -103,11 +103,11 @@ impl Serialize for SerdeType<&RewardDefinition> {
         S: Serializer,
     {
         #[derive(Serialize)]
-        struct RewardDefintionSerde<'a> {
+        struct RewardDefinitionSerde<'a> {
             currency: &'a String,
             value: i64,
         }
-        RewardDefintionSerde {
+        RewardDefinitionSerde {
             currency: &self.currency,
             value: self.value,
         }

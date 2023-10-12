@@ -220,14 +220,14 @@ mod tests {
     }
 
     #[test]
-    fn search_contraint_json_test() {
+    fn search_constraint_json_test() {
         let json = json!({
             "column": "title",
             "search": "search 1"
         });
-        let search_contraint: SerdeType<SearchConstraint> = serde_json::from_value(json).unwrap();
+        let search_constraint: SerdeType<SearchConstraint> = serde_json::from_value(json).unwrap();
         assert_eq!(
-            search_contraint,
+            search_constraint,
             SerdeType(SearchConstraint {
                 column: SearchColumn::Title,
                 search: "search 1".to_string()

@@ -24,8 +24,8 @@ const GITHUB_ISSUE_TEMPLATE_DEFAULT: &str = "bug_report.md";
 /// Default CLIENT_ID_KEY used in development.
 const CLIENT_ID_KEY_DEFAULT: &str = "3db5301e-40f2-47ed-ab11-55b37674631a";
 
-/// Default API_HOSTNAME/S used in production.  This can be a single hostname, or a list of them.
-const API_HOSTNAMES_DEFAULT: &str = "https://api.prod.projectcatalyst.io";
+/// Default API_HOST_NAME/S used in production.  This can be a single hostname, or a list of them.
+const API_HOST_NAMES_DEFAULT: &str = "https://api.prod.projectcatalyst.io";
 
 /// Default API_URL_PREFIX used in development.
 const API_URL_PREFIX_DEFAULT: &str = "/api";
@@ -92,7 +92,7 @@ impl StringEnvVar {
     }
 }
 
-// Lazy intialization of all env vars which are not command line parameters.
+// Lazy initialization of all env vars which are not command line parameters.
 // All env vars used by the application should be listed here and all should have a default.
 // The default for all NON Secret values should be suitable for Production, and NOT development.
 // Secrets however should only be used with the default value in development.
@@ -110,20 +110,20 @@ lazy_static! {
     pub(crate) static ref CLIENT_ID_KEY: StringEnvVar = StringEnvVar::new("CLIENT_ID_KEY", CLIENT_ID_KEY_DEFAULT);
 
     /// A List of servers to provideThe client id key used to anonymize client connections.
-    pub(crate) static ref API_HOSTNAMES: StringEnvVar = StringEnvVar::new("API_HOSTNAMES", API_HOSTNAMES_DEFAULT);
+    pub(crate) static ref API_HOST_NAMES: StringEnvVar = StringEnvVar::new("API_HOST_NAMES", API_HOST_NAMES_DEFAULT);
 
-    /// The Basepath the API is served at.
+    /// The base path the API is served at.
     pub(crate) static ref API_URL_PREFIX: StringEnvVar = StringEnvVar::new("API_URL_PREFIX", API_URL_PREFIX_DEFAULT);
 
 
 }
 
-/// Transform a string list of hostnames into a vec of hostnames.
+/// Transform a string list of host names into a vec of host names.
 /// Default to the service address if none specified.
 ///
-fn string_to_api_hostnames(addr: &SocketAddr, hosts: &str) -> Vec<String> {
+fn string_to_api_host_names(addr: &SocketAddr, hosts: &str) -> Vec<String> {
     fn invalid_hostname(hostname: &str) -> String {
-        error!("Invalid hostname for API: {}", hostname);
+        error!("Invalid host name for API: {}", hostname);
         String::new()
     }
 
@@ -165,7 +165,7 @@ fn string_to_api_hostnames(addr: &SocketAddr, hosts: &str) -> Vec<String> {
         .filter(|s| !s.is_empty())
         .collect();
 
-    // If there are no hostnames, just use the address of the service.
+    // If there are no host names, just use the address of the service.
     if configured_hosts.is_empty() {
         // If the Socket Address is the "catchall" address, then use localhost.
         if match addr.ip() {
@@ -182,16 +182,16 @@ fn string_to_api_hostnames(addr: &SocketAddr, hosts: &str) -> Vec<String> {
     }
 }
 
-/// Get a list of all hostnames to serve the API on.
+/// Get a list of all host names to serve the API on.
 ///
 /// Used by the `OpenAPI` Documentation to point to the correct backend.
-/// Take a list of [scheme://] + hostnames from the env var and turns it into
+/// Take a list of [scheme://] + host names from the env var and turns it into
 /// a lits of strings.
 ///
-/// Hostnames are taken from the `API_HOSTNAMES` environment variable.
+/// Host names are taken from the `API_HOST_NAMES` environment variable.
 /// If that is not set, `addr` is used.
-pub(crate) fn get_api_hostnames(addr: &SocketAddr) -> Vec<String> {
-    string_to_api_hostnames(addr, API_HOSTNAMES.as_str())
+pub(crate) fn get_api_host_names(addr: &SocketAddr) -> Vec<String> {
+    string_to_api_host_names(addr, API_HOST_NAMES.as_str())
 }
 
 /// Generate a github issue url with a given title
@@ -261,7 +261,7 @@ mod tests {
 
     #[test]
     fn configured_hosts_default() {
-        let configured_hosts = get_api_hostnames(&SocketAddr::from(([127, 0, 0, 1], 8080)));
+        let configured_hosts = get_api_host_names(&SocketAddr::from(([127, 0, 0, 1], 8080)));
         assert_eq!(
             configured_hosts,
             vec!["https://api.prod.projectcatalyst.io"]
@@ -270,7 +270,7 @@ mod tests {
 
     #[test]
     fn configured_hosts_set_multiple() {
-        let configured_hosts = string_to_api_hostnames(
+        let configured_hosts = string_to_api_host_names(
             &SocketAddr::from(([127, 0, 0, 1], 8080)),
             "http://api.prod.projectcatalyst.io , https://api.dev.projectcatalyst.io:1234",
         );
@@ -285,7 +285,7 @@ mod tests {
 
     #[test]
     fn configured_hosts_set_multiple_one_invalid() {
-        let configured_hosts = string_to_api_hostnames(
+        let configured_hosts = string_to_api_host_names(
             &SocketAddr::from(([127, 0, 0, 1], 8080)),
             "not a hostname , https://api.dev.projectcatalyst.io:1234",
         );
@@ -298,13 +298,14 @@ mod tests {
     #[test]
     fn configured_hosts_set_empty() {
         let configured_hosts =
-            string_to_api_hostnames(&SocketAddr::from(([127, 0, 0, 1], 8080)), "");
+            string_to_api_host_names(&SocketAddr::from(([127, 0, 0, 1], 8080)), "");
         assert_eq!(configured_hosts, vec!["http://127.0.0.1:8080"]);
     }
 
     #[test]
     fn configured_hosts_set_empty_undefined_address() {
-        let configured_hosts = string_to_api_hostnames(&SocketAddr::from(([0, 0, 0, 0], 7654)), "");
+        let configured_hosts =
+            string_to_api_host_names(&SocketAddr::from(([0, 0, 0, 0], 7654)), "");
         assert_eq!(configured_hosts, vec!["http://localhost:7654"]);
     }
 }

@@ -4,18 +4,18 @@ use poem_openapi::{types::Example, Object};
 
 #[derive(Object)]
 #[oai(example = true)]
-pub(crate) struct DelegePublicKey {
+pub(crate) struct DelegatePublicKey {
     #[oai(validator(pattern = "0x[0-9a-f]{64}"))]
     address: String,
 }
 
-impl From<String> for DelegePublicKey {
+impl From<String> for DelegatePublicKey {
     fn from(address: String) -> Self {
         Self { address }
     }
 }
 
-impl Example for DelegePublicKey {
+impl Example for DelegatePublicKey {
     fn example() -> Self {
         Self {
             address: "0xad4b948699193634a39dd56f779a2951a24779ad52aa7916f6912b8ec4702cee"

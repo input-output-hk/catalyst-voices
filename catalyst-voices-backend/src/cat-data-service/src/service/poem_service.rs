@@ -10,7 +10,7 @@ use crate::service::utilities::middleware::{
     tracing_mw::{init_prometheus, Tracing},
 };
 use crate::service::Error;
-use crate::settings::{get_api_hostnames, API_URL_PREFIX};
+use crate::settings::{get_api_host_names, API_URL_PREFIX};
 use crate::state::State;
 use poem::endpoint::PrometheusExporter;
 use poem::listener::TcpListener;
@@ -74,7 +74,7 @@ pub async fn run(addr: &SocketAddr, state: Arc<State>) -> Result<(), Error> {
     // help find them in the logs if they happen in production.
     set_panic_hook();
 
-    let hosts = get_api_hostnames(addr);
+    let hosts = get_api_host_names(addr);
 
     let app = mk_app(hosts, None, state);
 

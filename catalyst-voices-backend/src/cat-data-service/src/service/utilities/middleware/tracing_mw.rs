@@ -32,7 +32,7 @@ lazy_static! {
         &METRIC_LABELS
     )
     .unwrap();
-    static ref HTTP_REQ_CPUTIME_MS: HistogramVec = register_histogram_vec!(
+    static ref HTTP_REQ_CPU_TIME_MS: HistogramVec = register_histogram_vec!(
         "http_request_cpu_time_ms",
         "CPU Time of HTTP requests in milliseconds",
         &METRIC_LABELS
@@ -109,7 +109,7 @@ pub struct TracingEndpoint<E> {
 /// adds a supplied key to it, and hashes the result.
 ///
 /// The Hash is unique per client IP, but not able to
-/// be reversed or analysed without both the client IP and the key.
+/// be reversed or analyzed without both the client IP and the key.
 async fn anonymous_client_id(req: &Request) -> String {
     let mut b2b = Blake2b::new(16); // We are going to represent it as a UUID.
     let mut out = [0; 16];
@@ -360,7 +360,7 @@ impl<E: Endpoint> Endpoint for TracingEndpoint<E> {
             HTTP_REQ_DURATION_MS
                 .with_label_values(&[&path, &method, &resp_data.status_code.to_string()])
                 .observe(resp_data.duration);
-            HTTP_REQ_CPUTIME_MS
+            HTTP_REQ_CPU_TIME_MS
                 .with_label_values(&[&path, &method, &resp_data.status_code.to_string()])
                 .observe(resp_data.cpu_time);
             //HTTP_REQUEST_RATE
