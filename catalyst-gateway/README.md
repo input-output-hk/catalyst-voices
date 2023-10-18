@@ -15,3 +15,8 @@ This is the main Catalyst Gateway Application.
 
 These are fully re-usable generalized `rust` crates that the Catalyst Gateway uses and are developed with it.
 They are also able to be used stand-alone in other projects and can be published separately.
+
+### `./event-db`
+
+Defines the Postgres Catalyst Event Database that the Catalyst gateway uses for running Catalyst Events.
+This is DB definition and data only, the actual db interface code is located at `./bin/src/event-db`.
