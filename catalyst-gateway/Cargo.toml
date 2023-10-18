@@ -1,18 +1,18 @@
 [workspace]
 resolver = "2"
 members = [
-    "src/event-db",
-    "src/cat-data-service",
+    "bin",
+    # "crates/<a crate>",
 ]
 
 [workspace.package]
 edition = "2021"
 version = "0.0.1"
-authors = [ ]
+authors = []
 
 [workspace.dependencies]
-event-db = { path = "src/event-db" }
-cat-data-service = { path = "src/cat-data-service" }
+#event-db = { path = "src/event-db" }
+#cat-data-service = { path = "src/cat-data-service" }
 
 clap = "4"
 
