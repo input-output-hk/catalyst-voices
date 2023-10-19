@@ -1,4 +1,4 @@
-use crate::{
+use crate::event_db::{
     types::{
         search::{
             SearchConstraint, SearchOrderBy, SearchQuery, SearchResult, SearchTable, ValueResults,
@@ -266,7 +266,7 @@ impl SearchQueries for EventDB {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{
+    use crate::event_db::{
         establish_connection,
         types::search::{SearchColumn, SearchConstraint, SearchOrderBy},
     };

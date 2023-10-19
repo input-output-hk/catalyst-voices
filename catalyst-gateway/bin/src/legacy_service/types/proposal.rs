@@ -1,5 +1,5 @@
 use super::SerdeType;
-use event_db::types::proposal::{
+use crate::event_db::types::proposal::{
     Proposal, ProposalDetails, ProposalId, ProposalSummary, ProposerDetails,
 };
 use serde::{de::Deserializer, ser::Serializer, Deserialize, Serialize};

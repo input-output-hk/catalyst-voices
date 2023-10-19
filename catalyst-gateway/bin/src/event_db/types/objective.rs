@@ -1,4 +1,4 @@
-use crate::types::registration::VoterGroupId;
+use crate::event_db::types::registration::VoterGroupId;
 use serde_json::Value;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

@@ -1,9 +1,9 @@
 use super::{serialize_option_datetime_as_rfc3339, SerdeType};
-use chrono::{DateTime, Utc};
-use event_db::types::event::{
+use crate::event_db::types::event::{
     Event, EventDetails, EventGoal, EventId, EventRegistration, EventSchedule, EventSummary,
     VotingPowerAlgorithm, VotingPowerSettings,
 };
+use chrono::{DateTime, Utc};
 use rust_decimal::prelude::ToPrimitive;
 use serde::{
     de::Deserializer,

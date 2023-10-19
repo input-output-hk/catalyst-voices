@@ -1,4 +1,4 @@
-use crate::{
+use crate::event_db::{
     error::Error,
     types::event::{
         Event, EventDetails, EventGoal, EventId, EventRegistration, EventSchedule, EventSummary,
@@ -192,7 +192,7 @@ impl EventQueries for EventDB {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::establish_connection;
+    use crate::event_db::establish_connection;
     use chrono::{DateTime, NaiveDate, NaiveTime};
     use rust_decimal::Decimal;
 

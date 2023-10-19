@@ -93,7 +93,7 @@ pub async fn run(
 fn handle_result<T: Serialize>(res: Result<T, Error>) -> Response {
     match res {
         Ok(res) => (StatusCode::OK, Json(res)).into_response(),
-        Err(Error::EventDb(event_db::error::Error::NotFound(error))) => {
+        Err(Error::EventDb(crate::event_db::error::Error::NotFound(error))) => {
             (StatusCode::NOT_FOUND, Json(ErrorMessage::new(error))).into_response()
         }
         Err(error) => (

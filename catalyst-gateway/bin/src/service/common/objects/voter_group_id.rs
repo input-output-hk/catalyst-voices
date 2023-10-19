@@ -20,9 +20,11 @@ impl Example for VoterGroupId {
     }
 }
 
-impl TryFrom<event_db::types::registration::VoterGroupId> for VoterGroupId {
+impl TryFrom<crate::event_db::types::registration::VoterGroupId> for VoterGroupId {
     type Error = String;
-    fn try_from(value: event_db::types::registration::VoterGroupId) -> Result<Self, Self::Error> {
+    fn try_from(
+        value: crate::event_db::types::registration::VoterGroupId,
+    ) -> Result<Self, Self::Error> {
         match value.0.as_str() {
             "rep" => Ok(Self::Rep),
             "direct" => Ok(Self::Direct),

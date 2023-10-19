@@ -1,12 +1,12 @@
 use super::super::{serialize_datetime_as_rfc3339, SerdeType};
-use chrono::{DateTime, Utc};
-use event_db::types::vit_ss::{
+use crate::event_db::types::vit_ss::{
     challenge::Challenge,
     fund::{Fund, FundNextInfo, FundStageDates, FundWithNext},
     goal::Goal,
     group::Group,
     vote_plan::Voteplan,
 };
+use chrono::{DateTime, Utc};
 use serde::{ser::Serializer, Serialize};
 
 impl Serialize for SerdeType<&FundStageDates> {

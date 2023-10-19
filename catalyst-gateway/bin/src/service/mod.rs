@@ -22,7 +22,7 @@ pub enum Error {
     #[error("Cannot run service, error: {0}")]
     CannotRunService(String),
     #[error(transparent)]
-    EventDb(#[from] event_db::error::Error),
+    EventDb(#[from] crate::event_db::error::Error),
     #[error(transparent)]
     Io(#[from] std::io::Error),
 }

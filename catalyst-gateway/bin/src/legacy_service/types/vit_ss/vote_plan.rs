@@ -1,6 +1,6 @@
 use super::super::{serialize_datetime_as_rfc3339, SerdeType};
+use crate::event_db::types::vit_ss::vote_plan::Voteplan;
 use chrono::{DateTime, Utc};
-use event_db::types::vit_ss::vote_plan::Voteplan;
 use serde::{ser::Serializer, Serialize};
 
 impl Serialize for SerdeType<&Voteplan> {

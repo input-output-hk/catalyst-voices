@@ -1,4 +1,5 @@
 use super::LimitOffset;
+use crate::event_db::types::event::{Event, EventId, EventSummary};
 use crate::{
     legacy_service::{handle_result, types::SerdeType},
     service::Error,
@@ -9,7 +10,6 @@ use axum::{
     routing::get,
     Router,
 };
-use event_db::types::event::{Event, EventId, EventSummary};
 use std::sync::Arc;
 
 mod ballots;

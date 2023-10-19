@@ -1,4 +1,4 @@
-use crate::{
+use crate::event_db::{
     error::Error,
     types::{
         event::EventId,
@@ -139,7 +139,7 @@ impl ProposalQueries for EventDB {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::establish_connection;
+    use crate::event_db::establish_connection;
     use serde_json::json;
 
     #[tokio::test]

@@ -30,7 +30,7 @@ poem-extensions = "0.7.2"
 metrics = "0.21.1"
 metrics-exporter-prometheus = "0.12.1"
 opentelemetry-prometheus = "0.13"
-opentelemetry = "0.19"
+opentelemetry = "0.20.0"
 prometheus = "0.13.0"
 cryptoxide = "0.4.4"
 uuid = "1"
@@ -56,9 +56,9 @@ async-trait = "0.1.64"
 
 rust_decimal = "1.29"
 
-bb8 = "0.8.0"
+bb8 = "0.8.1"
 bb8-postgres = "0.8.1"
-tokio-postgres = "0.7.7"
+tokio-postgres = "0.7.10"
 
 tokio = "1"
 

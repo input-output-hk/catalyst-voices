@@ -1,8 +1,8 @@
 use super::{serialize_datetime_as_rfc3339, SerdeType};
-use chrono::{DateTime, Utc};
-use event_db::types::registration::{
+use crate::event_db::types::registration::{
     Delegation, Delegator, RewardAddress, Voter, VoterGroupId, VoterInfo,
 };
+use chrono::{DateTime, Utc};
 use serde::{de::Deserializer, ser::Serializer, Deserialize, Serialize};
 
 impl Serialize for SerdeType<&VoterGroupId> {
@@ -204,8 +204,8 @@ impl Serialize for SerdeType<Delegator> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::event_db::types::registration::RewardAddress;
     use chrono::{DateTime, NaiveDateTime, Utc};
-    use event_db::types::registration::RewardAddress;
     use serde_json::json;
 
     #[test]

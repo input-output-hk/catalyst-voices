@@ -32,9 +32,9 @@ impl Example for VoterRegistration {
     }
 }
 
-impl TryFrom<event_db::types::registration::Voter> for VoterRegistration {
+impl TryFrom<crate::event_db::types::registration::Voter> for VoterRegistration {
     type Error = String;
-    fn try_from(value: event_db::types::registration::Voter) -> Result<Self, Self::Error> {
+    fn try_from(value: crate::event_db::types::registration::Voter) -> Result<Self, Self::Error> {
         Ok(Self {
             voter_info: value.voter_info.try_into()?,
             as_at: value.as_at,

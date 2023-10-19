@@ -1,5 +1,5 @@
 use super::SerdeType;
-use event_db::types::search::{
+use crate::event_db::types::search::{
     SearchColumn, SearchConstraint, SearchOrderBy, SearchQuery, SearchResult, SearchTable,
     ValueResults,
 };

@@ -1,5 +1,5 @@
 use super::super::SerdeType;
-use event_db::types::vit_ss::challenge::{Challenge, ChallengeHighlights};
+use crate::event_db::types::vit_ss::challenge::{Challenge, ChallengeHighlights};
 use serde::{ser::Serializer, Serialize};
 
 impl Serialize for SerdeType<&ChallengeHighlights> {

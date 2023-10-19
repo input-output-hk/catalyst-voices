@@ -1,5 +1,5 @@
 use super::{objective::ObjectiveId, proposal::ProposalId};
-use crate::types::registration::VoterGroupId;
+use crate::event_db::types::registration::VoterGroupId;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ObjectiveChoices(pub Vec<String>);

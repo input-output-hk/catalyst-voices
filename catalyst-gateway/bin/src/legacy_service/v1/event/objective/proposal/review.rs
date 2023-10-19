@@ -1,3 +1,6 @@
+use crate::event_db::types::{
+    event::EventId, objective::ObjectiveId, proposal::ProposalId, review::AdvisorReview,
+};
 use crate::{
     legacy_service::{handle_result, types::SerdeType, v1::LimitOffset},
     service::Error,
@@ -7,9 +10,6 @@ use axum::{
     extract::{Path, Query},
     routing::get,
     Router,
-};
-use event_db::types::{
-    event::EventId, objective::ObjectiveId, proposal::ProposalId, review::AdvisorReview,
 };
 use std::sync::Arc;
 

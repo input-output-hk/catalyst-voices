@@ -1,10 +1,10 @@
+use crate::event_db::types::{ballot::ProposalBallot, event::EventId, objective::ObjectiveId};
 use crate::{
     legacy_service::{handle_result, types::SerdeType},
     service::Error,
     state::State,
 };
 use axum::{extract::Path, routing::get, Router};
-use event_db::types::{ballot::ProposalBallot, event::EventId, objective::ObjectiveId};
 use std::sync::Arc;
 
 pub fn ballots(state: Arc<State>) -> Router {

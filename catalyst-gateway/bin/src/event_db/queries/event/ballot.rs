@@ -1,4 +1,4 @@
-use crate::{
+use crate::event_db::{
     error::Error,
     types::{
         registration::VoterGroupId,
@@ -229,7 +229,7 @@ impl BallotQueries for EventDB {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::establish_connection;
+    use crate::event_db::establish_connection;
 
     #[tokio::test]
     async fn get_ballot_test() {

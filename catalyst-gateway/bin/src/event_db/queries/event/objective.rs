@@ -1,4 +1,4 @@
-use crate::{
+use crate::event_db::{
     error::Error,
     types::{
         registration::VoterGroupId,
@@ -122,7 +122,7 @@ mod tests {
     use serde_json::json;
 
     use super::*;
-    use crate::establish_connection;
+    use crate::event_db::establish_connection;
 
     #[tokio::test]
     async fn get_objectives_test() {

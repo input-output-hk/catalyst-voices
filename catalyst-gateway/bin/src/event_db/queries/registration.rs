@@ -1,4 +1,4 @@
-use crate::{
+use crate::event_db::{
     types::{
         event::EventId,
         registration::{Delegation, Delegator, RewardAddress, Voter, VoterGroupId, VoterInfo},
@@ -267,7 +267,7 @@ impl RegistrationQueries for EventDB {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::establish_connection;
+    use crate::event_db::establish_connection;
     use chrono::{DateTime, NaiveDate, NaiveTime};
 
     #[tokio::test]

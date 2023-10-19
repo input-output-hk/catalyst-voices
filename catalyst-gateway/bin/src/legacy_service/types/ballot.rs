@@ -1,5 +1,5 @@
 use super::SerdeType;
-use event_db::types::{
+use crate::event_db::types::{
     ballot::{
         Ballot, BallotType, GroupVotePlans, ObjectiveBallots, ObjectiveChoices, ProposalBallot,
         VotePlan,
@@ -188,7 +188,7 @@ impl Serialize for SerdeType<ObjectiveBallots> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use event_db::types::{
+    use crate::event_db::types::{
         registration::VoterGroupId,
         {
             ballot::{BallotType, GroupVotePlans, ObjectiveChoices},

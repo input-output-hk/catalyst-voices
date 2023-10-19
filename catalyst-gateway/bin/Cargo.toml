@@ -8,6 +8,14 @@ edition.workspace = true
 
 [dependencies]
 
+async-trait = { workspace = true }
+bb8 = { workspace = true }
+bb8-postgres = { workspace = true }
+tokio-postgres = { workspace = true, features = [
+    "with-chrono-0_4",
+    "with-serde_json-1",
+] }
+
 clap = { workspace = true, features = ["derive", "env"] }
 tracing = { workspace = true }
 tracing-subscriber = { workspace = true, features = ["fmt", "json", "time"] }
@@ -24,7 +32,10 @@ metrics-exporter-prometheus = { workspace = true }
 
 tower-http = { workspace = true, features = ["cors"] }
 
-rust_decimal = { workspace = true }
+rust_decimal = { workspace = true, features = [
+    "serde-with-float",
+    "db-tokio-postgres",
+] }
 
 chrono = { workspace = true }
 

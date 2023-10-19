@@ -1,3 +1,7 @@
+use crate::event_db::types::{
+    event::EventId,
+    registration::{Delegator, Voter},
+};
 use crate::{
     legacy_service::{handle_result, types::SerdeType},
     service::Error,
@@ -7,10 +11,6 @@ use axum::{
     extract::{Path, Query},
     routing::get,
     Router,
-};
-use event_db::types::{
-    event::EventId,
-    registration::{Delegator, Voter},
 };
 use serde::Deserialize;
 use std::sync::Arc;

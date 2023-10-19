@@ -1,5 +1,5 @@
 use super::SerdeType;
-use event_db::types::{
+use crate::event_db::types::{
     objective::{
         Objective, ObjectiveDetails, ObjectiveId, ObjectiveSummary, ObjectiveType,
         RewardDefinition, VoterGroup,
@@ -217,7 +217,7 @@ impl Serialize for SerdeType<Objective> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use event_db::types::registration::VoterGroupId;
+    use crate::event_db::types::registration::VoterGroupId;
     use serde_json::json;
 
     #[test]

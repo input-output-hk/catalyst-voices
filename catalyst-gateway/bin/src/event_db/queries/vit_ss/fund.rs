@@ -1,4 +1,4 @@
-use crate::{
+use crate::event_db::{
     types::vit_ss::{
         challenge::{Challenge, ChallengeHighlights},
         fund::{Fund, FundNextInfo, FundStageDates, FundWithNext},
@@ -367,7 +367,7 @@ impl VitSSFundQueries for EventDB {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::establish_connection;
+    use crate::event_db::establish_connection;
     use chrono::{DateTime, NaiveDate, NaiveTime};
 
     #[tokio::test]

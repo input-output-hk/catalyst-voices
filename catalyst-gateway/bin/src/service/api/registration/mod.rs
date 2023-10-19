@@ -68,7 +68,7 @@ impl RegistrationApi {
                 Ok(voter) => T200(OK(Json(voter))),
                 Err(err) => T500(server_error!("{}", err.to_string())),
             },
-            Err(event_db::error::Error::NotFound(_)) => T404(NotFound),
+            Err(crate::event_db::error::Error::NotFound(_)) => T404(NotFound),
             Err(err) => T500(server_error!("{}", err.to_string())),
         }
     }

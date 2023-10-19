@@ -7,7 +7,7 @@ pub enum Error {
     #[error(transparent)]
     Service(#[from] service::Error),
     #[error(transparent)]
-    EventDb(#[from] event_db::error::Error),
+    EventDb(#[from] crate::event_db::error::Error),
 }
 
 #[derive(Parser)]

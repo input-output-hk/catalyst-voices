@@ -6,7 +6,7 @@ use self::{
     registration::RegistrationQueries,
     search::SearchQueries,
 };
-use crate::EventDB;
+use crate::event_db::EventDB;
 
 pub mod event;
 pub mod registration;

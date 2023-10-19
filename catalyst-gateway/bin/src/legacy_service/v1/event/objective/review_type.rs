@@ -1,3 +1,4 @@
+use crate::event_db::types::{event::EventId, objective::ObjectiveId, review::ReviewType};
 use crate::{
     legacy_service::{handle_result, types::SerdeType, v1::LimitOffset},
     service::Error,
@@ -8,7 +9,6 @@ use axum::{
     routing::get,
     Router,
 };
-use event_db::types::{event::EventId, objective::ObjectiveId, review::ReviewType};
 use std::sync::Arc;
 
 pub fn review_type(state: Arc<State>) -> Router {
