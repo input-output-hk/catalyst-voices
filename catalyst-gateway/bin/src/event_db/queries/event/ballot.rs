@@ -18,6 +18,7 @@ use async_trait::async_trait;
 use std::collections::HashMap;
 
 #[async_trait]
+#[allow(clippy::module_name_repetitions)]
 pub trait BallotQueries: Sync + Send + 'static {
     async fn get_ballot(
         &self,
@@ -100,7 +101,7 @@ impl BallotQueries for EventDB {
                 ballot_type: BallotType(row.try_get("category")?),
                 chain_voteplan_id: row.try_get("id")?,
                 encryption_key: row.try_get("encryption_key")?,
-            })
+            });
         }
 
         Ok(Ballot {
@@ -144,7 +145,7 @@ impl BallotQueries for EventDB {
                     ballot_type: BallotType(row.try_get("category")?),
                     chain_voteplan_id: row.try_get("id")?,
                     encryption_key: row.try_get("encryption_key")?,
-                })
+                });
             }
 
             ballots.push(ProposalBallot {
@@ -153,7 +154,7 @@ impl BallotQueries for EventDB {
                     choices: ObjectiveChoices(choices),
                     voteplans: GroupVotePlans(voteplans),
                 },
-            })
+            });
         }
         Ok(ballots)
     }
@@ -186,7 +187,7 @@ impl BallotQueries for EventDB {
                     ballot_type: BallotType(row.try_get("category")?),
                     chain_voteplan_id: row.try_get("id")?,
                     encryption_key: row.try_get("encryption_key")?,
-                })
+                });
             }
             let ballot = ProposalBallot {
                 proposal_id,
@@ -225,7 +226,7 @@ impl BallotQueries for EventDB {
 /// ```
 /// EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 /// ```
-/// https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md
+/// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -1,5 +1,6 @@
 use serde_json::Value;
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ProposalId(pub i32);
 
@@ -11,6 +12,7 @@ pub struct ProposerDetails {
     pub payment_key: String,
 }
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ProposalDetails {
     pub funds: i64,
@@ -20,6 +22,7 @@ pub struct ProposalDetails {
     pub supplemental: Option<Value>,
 }
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ProposalSummary {
     pub id: ProposalId,

@@ -1,5 +1,6 @@
 use serde_json::Value;
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ReviewType {
     pub id: i32,
@@ -19,6 +20,7 @@ pub struct Rating {
     pub note: Option<String>,
 }
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AdvisorReview {
     pub assessor: String,

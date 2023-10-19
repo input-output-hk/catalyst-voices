@@ -88,7 +88,7 @@ pub async fn establish_connection(url: Option<&str>) -> Result<EventDB, Error> {
 /// ```
 /// EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 /// ```
-/// https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md
+/// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
 #[cfg(test)]
 mod test {
     use super::*;

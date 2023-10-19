@@ -27,7 +27,10 @@ fmt:
 
     RUN cargo fmt --check --all
 
+
+
 prepare-cache:
+    # THIS DOES NOT WORK RELIABLY - DO NOT USE
     # Prepare the build cache
     FROM +builder
     
@@ -37,6 +40,7 @@ prepare-cache:
     SAVE ARTIFACT recipe.json
 
 cached-builder:
+    # THIS DOES NOT WORK RELIABLY - DO NOT USE
     # Our builder with all dependencies cached.
     # Using cutoff-optimization to ensure cache hit
     FROM +builder
@@ -46,11 +50,16 @@ cached-builder:
 
 build:
     # Build the service
-    FROM +cached-builder
+    FROM +builder
     
     DO +COPY_SRC
 
+    RUN ls -al .cargo
+    RUN cat .cargo/config.toml
+
     RUN cargo build --release --workspace --verbose --locked
+    RUN cargo lint
+
     RUN ldd target/x86_64-unknown-linux-musl/release/cat-gateway
     RUN readelf -p .comment target/x86_64-unknown-linux-musl/release/cat-gateway
     RUN strip -v target/x86_64-unknown-linux-musl/release/cat-gateway
@@ -65,5 +74,3 @@ test:
 
     # RUN cargo nextest run --release --workspace --locked -P ci --config-file .config/nextest.toml
     RUN cargo nextest run --release --workspace --locked -P ci
-
-    RUN grunk

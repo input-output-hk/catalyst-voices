@@ -9,6 +9,7 @@ use async_trait::async_trait;
 use chrono::{NaiveDateTime, Utc};
 
 #[async_trait]
+#[allow(clippy::module_name_repetitions)]
 pub trait RegistrationQueries: Sync + Send + 'static {
     async fn get_voter(
         &self,
@@ -124,10 +125,16 @@ impl RegistrationQueries for EventDB {
             })?
             .try_get("total_voting_power")?;
 
-        let voting_power_saturation = if total_voting_power_per_group as f64 != 0_f64 {
-            voting_power as f64 / total_voting_power_per_group as f64
-        } else {
+        let voting_power_saturation = if total_voting_power_per_group == 0 {
             0_f64
+        } else {
+            #[allow(clippy::cast_precision_loss)]
+            let vp = voting_power as f64;
+
+            #[allow(clippy::cast_precision_loss)]
+            let vp_per_group = total_voting_power_per_group as f64;
+
+            vp / vp_per_group
         };
 
         let delegator_addresses = if with_delegations {
@@ -216,7 +223,7 @@ impl RegistrationQueries for EventDB {
                 group: VoterGroupId(row.try_get("voting_group")?),
                 weight: row.try_get("voting_weight")?,
                 value: row.try_get("value")?,
-            })
+            });
         }
 
         let rows = if let Some(version) = event {
@@ -248,6 +255,8 @@ impl RegistrationQueries for EventDB {
         })
     }
 }
+
+/* TODO(SJ): https://github.com/input-output-hk/catalyst-voices/issues/68
 
 /// Need to setup and run a test event db instance
 /// To do it you can use the following commands:
@@ -522,3 +531,5 @@ mod tests {
         );
     }
 }
+
+*/

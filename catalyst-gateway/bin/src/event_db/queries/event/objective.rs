@@ -15,6 +15,7 @@ use crate::event_db::{
 use async_trait::async_trait;
 
 #[async_trait]
+#[allow(clippy::module_name_repetitions)]
 pub trait ObjectiveQueries: Sync + Send + 'static {
     async fn get_objectives(
         &self,
@@ -102,6 +103,7 @@ impl ObjectiveQueries for EventDB {
     }
 }
 
+/* TODO(SJ) : https://github.com/input-output-hk/catalyst-voices/issues/68
 /// Need to setup and run a test event db instance
 /// To do it you can use the following commands:
 /// Prepare docker images
@@ -265,3 +267,4 @@ mod tests {
         assert_eq!(objectives, vec![]);
     }
 }
+*/

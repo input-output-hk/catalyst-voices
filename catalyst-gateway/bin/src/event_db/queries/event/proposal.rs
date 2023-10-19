@@ -10,6 +10,7 @@ use crate::event_db::{
 use async_trait::async_trait;
 
 #[async_trait]
+#[allow(clippy::module_name_repetitions)]
 pub trait ProposalQueries: Sync + Send + 'static {
     async fn get_proposal(
         &self,
@@ -135,7 +136,7 @@ impl ProposalQueries for EventDB {
 /// ```
 /// EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 /// ```
-/// https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md
+/// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
 #[cfg(test)]
 mod tests {
     use super::*;

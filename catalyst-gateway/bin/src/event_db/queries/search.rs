@@ -16,6 +16,7 @@ use async_trait::async_trait;
 use chrono::{NaiveDateTime, Utc};
 
 #[async_trait]
+#[allow(clippy::module_name_repetitions)]
 pub trait SearchQueries: Sync + Send + 'static {
     async fn search(
         &self,
@@ -180,7 +181,7 @@ impl SearchQueries for EventDB {
                                 .map(|val| val.and_local_timezone(Utc).unwrap()),
                             ends,
                             is_final,
-                        })
+                        });
                     }
 
                     Ok(SearchResult {
@@ -247,6 +248,8 @@ impl SearchQueries for EventDB {
         }
     }
 }
+
+/* TODO(SJ) : https://github.com/input-output-hk/catalyst-voices/issues/68
 
 /// Need to setup and run a test event db instance
 /// To do it you can use the following commands:
@@ -1115,3 +1118,4 @@ mod tests {
         )
     }
 }
+*/

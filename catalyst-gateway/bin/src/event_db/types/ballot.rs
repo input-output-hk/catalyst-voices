@@ -4,6 +4,7 @@ use crate::event_db::types::registration::VoterGroupId;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ObjectiveChoices(pub Vec<String>);
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct BallotType(pub String);
 
@@ -25,6 +26,7 @@ pub struct Ballot {
     pub voteplans: GroupVotePlans,
 }
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ProposalBallot {
     pub proposal_id: ProposalId,

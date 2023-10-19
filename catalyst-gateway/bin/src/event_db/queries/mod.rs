@@ -14,6 +14,7 @@ pub mod search;
 // DEPRECATED, added as a backward compatibility with the VIT-SS
 pub mod vit_ss;
 
+#[allow(clippy::module_name_repetitions)]
 pub trait EventDbQueries:
     RegistrationQueries
     + EventQueries

@@ -1,9 +1,11 @@
 use chrono::{DateTime, Utc};
 use rust_decimal::Decimal;
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EventId(pub i32);
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EventSummary {
     pub id: EventId,
@@ -26,6 +28,7 @@ pub struct VotingPowerSettings {
     pub max_pct: Option<Decimal>,
 }
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EventRegistration {
     pub purpose: Option<i64>,
@@ -33,12 +36,14 @@ pub struct EventRegistration {
     pub taken: Option<DateTime<Utc>>,
 }
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EventGoal {
     pub idx: i32,
     pub name: String,
 }
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EventSchedule {
     pub insight_sharing: Option<DateTime<Utc>>,
@@ -52,6 +57,7 @@ pub struct EventSchedule {
     pub tallying_end: Option<DateTime<Utc>>,
 }
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EventDetails {
     pub voting_power: VotingPowerSettings,
@@ -60,6 +66,7 @@ pub struct EventDetails {
     pub goals: Vec<EventGoal>,
 }
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Event {
     pub summary: EventSummary,

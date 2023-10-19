@@ -1,15 +1,18 @@
 use crate::event_db::types::registration::VoterGroupId;
 use serde_json::Value;
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ObjectiveId(pub i32);
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ObjectiveType {
     pub id: String,
     pub description: String,
 }
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ObjectiveSummary {
     pub id: ObjectiveId,
@@ -31,6 +34,7 @@ pub struct VoterGroup {
     pub voting_token: Option<String>,
 }
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ObjectiveDetails {
     pub groups: Vec<VoterGroup>,

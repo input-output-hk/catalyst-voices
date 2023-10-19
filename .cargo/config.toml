@@ -1,2 +1,16 @@
+[unstable]
+# Configure default options for Clippy
+build-std = ["clippy"]
+
 [build]
 target = "x86_64-unknown-linux-musl"
+
+# Set additional options for Clippy
+rustflags = [
+    "-D",
+    "warnings",
+] #, "-A", "clippy::pedantic", "-A", "clippy::cargo"]
+
+[alias]
+lint = "clippy -- -D warnings -W clippy::pedantic -W clippy::unwrap_used -W clippy::expect_used"
+lintfix = "clippy --allow-dirty --fix -- -D warnings -W clippy::pedantic -W clippy::unwrap_used -W clippy::expect_used"

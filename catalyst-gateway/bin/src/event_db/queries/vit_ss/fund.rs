@@ -114,6 +114,7 @@ impl EventDB {
 
 #[async_trait]
 impl VitSSFundQueries for EventDB {
+    #[allow(clippy::too_many_lines)] /* TODO: Reactor this.  */
     async fn get_fund(&self) -> Result<FundWithNext, Error> {
         let conn = self.pool.get().await?;
 
@@ -182,7 +183,7 @@ impl VitSSFundQueries for EventDB {
                 highlights: row
                     .try_get::<_, Option<String>>("highlights")?
                     .map(|sponsor| ChallengeHighlights { sponsor }),
-            })
+            });
         }
 
         let rows = conn.query(Self::FUND_GOALS_QUERY, &[&fund_id]).await?;
@@ -192,7 +193,7 @@ impl VitSSFundQueries for EventDB {
                 id: row.try_get("id")?,
                 goal_name: row.try_get("goal_name")?,
                 fund_id,
-            })
+            });
         }
 
         let rows = conn.query(Self::FUND_GROUPS_QUERY, &[&fund_id]).await?;
@@ -202,7 +203,7 @@ impl VitSSFundQueries for EventDB {
                 group_id: row.try_get("group_id")?,
                 token_identifier: row.try_get("token_identifier")?,
                 fund_id,
-            })
+            });
         }
 
         let fund = Fund {
@@ -348,6 +349,8 @@ impl VitSSFundQueries for EventDB {
         Ok(FundWithNext { fund, next })
     }
 }
+
+/* TODO (SJ) : https://github.com/input-output-hk/catalyst-voices/issues/68
 
 /// Need to setup and run a test event db instance
 /// To do it you can use the following commands:
@@ -637,3 +640,4 @@ mod tests {
         )
     }
 }
+*/
