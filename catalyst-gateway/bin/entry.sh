@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # ---------------------------------------------------------------
-# Entrypoint script for cat-data-service container
+# Entrypoint script for cat-gateway container
 # ---------------------------------------------------------------
 #
-# This script serves as the entrypoint for the cat-data-service container. It sets up
-# the environment, performing optional database initialization if configured,
-# and then runs the cat-data-service.
+# This script serves as the entrypoint for the cat-gateway service container. 
+# It sets up the environment, performing optional database initialization 
+# if configured, and then runs the cat-gateway service.
 #
 # It expects the following environment variables to be set except where noted:
 #
@@ -58,7 +58,7 @@ debug_sleep
 
 # Define the command to be executed
 ARGS=$*
-CMD="/app/cat-data-service run $ARGS"
+CMD="/app/cat-gateway run $ARGS"
 echo ">>> Executing command: $CMD"
 
 # Wait for DEBUG_SLEEP seconds if the DEBUG_SLEEP environment variable is set
@@ -75,6 +75,6 @@ set -e
 
 # If the exit code is 0, the executable returned successfully
 if [ $EXIT_CODE -ne 0 ]; then
-  echo "Error: cat-data-service returned with exit code $EXIT_CODE"
+  echo "Error: cat-gateway returned with exit code $EXIT_CODE"
   exit 1
 fi

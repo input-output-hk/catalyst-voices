@@ -1,4 +1,4 @@
-//! Poem Service for cat-data-service endpoints.
+//! Poem Service for cat-gateway service endpoints.
 //!
 //! This provides only the primary entrypoint to the service.
 

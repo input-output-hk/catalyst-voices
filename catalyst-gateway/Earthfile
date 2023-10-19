@@ -1,0 +1,43 @@
+VERSION 0.7
+
+builder:
+    FROM github.com/input-output-hk/catalyst-ci/earthly/rust:t1+rustup
+
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:t1+RUST_SETUP
+
+    WORKDIR /build
+
+    COPY . .
+    RUN rm -rf target
+    COPY --dir ../+global-cargo-config/.cargo .cargo
+
+fmt:
+    FROM +builder
+    RUN cargo fmt --check --all
+
+# All this seemed to do is break the build.... 
+# Don't use it until we can prove it works properly.
+prepare-cache:
+    FROM +builder
+    RUN cargo chef prepare
+    SAVE ARTIFACT recipe.json
+
+# All this seemed to do is break the build.... 
+# Don't use it until we can prove it works properly.
+# Using cutoff-optimization to ensure cache hit (see examples/cutoff-optimization)
+cached-builder:
+    FROM +builder
+    COPY +prepare-cache/recipe.json ./
+    CACHE target
+    RUN cargo chef cook --release
+
+build:
+    FROM +builder
+    RUN pwd
+    RUN ls -al
+    RUN cargo build --release --workspace
+    #RUN cargo build --verbose --release --all-features --locked --target x86_64-unknown-linux-musl
+    RUN ls -al
+    RUN ls -al target/release
+    RUN ldd target/release/cat-gateway
+    #SAVE ARTIFACT target/release/example-rust example-rust

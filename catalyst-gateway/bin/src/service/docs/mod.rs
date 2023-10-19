@@ -23,7 +23,7 @@ pub(crate) fn docs<T: OpenApi + 'static, W: Webhook + 'static>(
         .nest("/rapidoc", rapidoc_ui)
         .nest("/openapi_explorer", openapi_explorer)
         .at(
-            "/cat-data-service.json",
+            "/cat-gateway.json",
             poem::endpoint::make_sync(move |_| spec.clone()),
         )
 }

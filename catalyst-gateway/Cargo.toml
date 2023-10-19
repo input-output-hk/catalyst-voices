@@ -11,8 +11,6 @@ version = "0.0.1"
 authors = []
 
 [workspace.dependencies]
-#event-db = { path = "src/event-db" }
-#cat-data-service = { path = "src/cat-data-service" }
 
 clap = "4"
 
