@@ -1,4 +1,4 @@
-//! Stoplight Elements OpenAPI UI
+//! Stoplight Elements `OpenAPI` UI
 //!
 mod stoplight_elements;
 use poem::{endpoint::EmbeddedFileEndpoint, get, Route};

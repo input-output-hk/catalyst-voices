@@ -28,7 +28,7 @@ impl TryFrom<crate::event_db::types::registration::VoterGroupId> for VoterGroupI
         match value.0.as_str() {
             "rep" => Ok(Self::Rep),
             "direct" => Ok(Self::Direct),
-            value => Err(format!("Unknown VoterGroupId: {}", value)),
+            value => Err(format!("Unknown VoterGroupId: {value}")),
         }
     }
 }

@@ -35,7 +35,7 @@ where
     }
 }
 
-/// Endpoint for ChainAxum middleware.
+/// Endpoint for `ChainAxum` middleware.
 pub struct ChainAxumEndpoint<E> {
     inner: E,
 }

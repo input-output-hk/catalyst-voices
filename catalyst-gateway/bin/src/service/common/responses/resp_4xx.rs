@@ -12,7 +12,7 @@ pub(crate) struct BadRequest<T: IntoResponse + Payload>(T);
 #[derive(OneResponse)]
 #[oai(status = 400)]
 /// This error means that the request was malformed.
-/// It has failed to pass validation, as specified by the OpenAPI schema.
+/// It has failed to pass validation, as specified by the `OpenAPI` schema.
 pub(crate) struct ApiValidationError(PlainText<String>);
 
 #[derive(OneResponse)]
@@ -39,6 +39,6 @@ pub(crate) struct NotAcceptable;
 #[derive(OneResponse)]
 #[oai(status = 422)]
 /// Common automatically produced validation error for every endpoint.
-/// Is generated automatically when any of the OpenAPI validation rules fail.
+/// Is generated automatically when any of the `OpenAPI` validation rules fail.
 /// Can also be generated manually.
 pub(crate) struct ValidationError;

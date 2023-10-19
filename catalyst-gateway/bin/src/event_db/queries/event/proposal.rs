@@ -86,7 +86,7 @@ impl ProposalQueries for EventDB {
             files: row.try_get("files_url")?,
         };
 
-        Ok(Proposal { details, summary })
+        Ok(Proposal { summary, details })
     }
 
     async fn get_proposals(

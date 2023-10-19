@@ -1,5 +1,5 @@
 //! This module contains common and re-usable responses with a 4xx response code.
-/// While using macro-vis lib, you will get the uncommon_codepoints warning, so you will probably want to place this in your crate root
+/// While using macro-vis lib, you will get the `uncommon_codepoints` warning, so you will probably want to place this in your crate root
 use crate::settings::generate_github_issue_url;
 use poem::error::ResponseError;
 use poem::http::StatusCode;

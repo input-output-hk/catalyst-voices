@@ -1,4 +1,4 @@
-//! OpenAPI Tags we need to classify the endpoints.
+//! `OpenAPI` Tags we need to classify the endpoints.
 //!
 use poem_openapi::Tags;
 

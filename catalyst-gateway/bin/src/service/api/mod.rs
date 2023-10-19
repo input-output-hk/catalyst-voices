@@ -55,7 +55,7 @@ fn get_api_license() -> LicenseObject {
 const TERMS_OF_SERVICE: &str =
     "https://github.com/input-output-hk/catalyst-core/blob/main/book/src/98_CODE_OF_CONDUCT.md";
 
-/// Create the OpenAPI definition
+/// Create the `OpenAPI` definition
 pub(crate) fn mk_api(
     hosts: Vec<String>,
 ) -> OpenApiService<(TestApi, HealthApi, RegistrationApi), ()> {

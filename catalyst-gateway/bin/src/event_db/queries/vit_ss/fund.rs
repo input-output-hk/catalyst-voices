@@ -435,7 +435,7 @@ mod tests {
                                 Utc
                             ),
                             chain_voteplan_payload: "public".to_string(),
-                            chain_vote_encryption_key: "".to_string(),
+                            chain_vote_encryption_key: String::new(),
                             fund_id: 4,
                             token_identifier: "voting token 3".to_string(),
                         },
@@ -464,9 +464,9 @@ mod tests {
                                 Utc
                             ),
                             chain_voteplan_payload: "public".to_string(),
-                            chain_vote_encryption_key: "".to_string(),
+                            chain_vote_encryption_key: String::new(),
                             fund_id: 4,
-                            token_identifier: "".to_string(),
+                            token_identifier: String::new(),
                         }
                     ],
                     challenges: vec![
@@ -492,7 +492,7 @@ mod tests {
                             description: "description 4".to_string(),
                             rewards_total: 0,
                             proposers_rewards: 0,
-                            challenge_url: "".to_string(),
+                            challenge_url: String::new(),
                             fund_id: 4,
                             highlights: None,
                         }
@@ -596,8 +596,8 @@ mod tests {
                         token_identifier: "voting token 3".to_string(),
                         fund_id: 4,
                     },],
-                    survey_url: "".to_string(),
-                    results_url: "".to_string(),
+                    survey_url: String::new(),
+                    results_url: String::new(),
                 },
                 next: Some(FundNextInfo {
                     id: 5,

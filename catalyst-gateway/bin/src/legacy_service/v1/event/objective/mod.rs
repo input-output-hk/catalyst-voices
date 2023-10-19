@@ -77,7 +77,7 @@ fn mocked_voting_status_data() -> (bool, Option<String>) {
                 {
                     "hash": "baf6b54817cf2a3e865f432c3922d28ac5be641e66662c66d445f141e409183e"
                 },
-            "block0_date": 1586637936,
+            "block0_date": 1_586_637_936,
             "slot_duration": 20,
             "time_era":
                 {
