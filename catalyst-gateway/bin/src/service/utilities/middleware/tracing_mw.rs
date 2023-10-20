@@ -1,3 +1,4 @@
+//! Full Tracing and metrics middleware.
 use std::time::Instant;
 
 use cryptoxide::{blake2b::Blake2b, digest::Digest};
@@ -21,7 +22,9 @@ use uuid::Uuid;
 
 use crate::settings::CLIENT_ID_KEY;
 
+/// Labels for the metrics
 const METRIC_LABELS: [&str; 3] = ["endpoint", "method", "status_code"];
+/// Labels for the client metrics
 const CLIENT_METRIC_LABELS: [&str; 2] = ["client", "status_code"];
 
 // Prometheus Metrics maintained by the service
@@ -100,6 +103,7 @@ impl<E: Endpoint> Middleware<E> for Tracing {
 
 /// Endpoint for `Tracing` middleware.
 pub(crate) struct TracingEndpoint<E> {
+    /// Inner endpoint
     inner: E,
 }
 
@@ -139,9 +143,13 @@ async fn anonymous_client_id(req: &Request) -> String {
 
 /// Data we collected about the response
 struct ResponseData {
+    /// Duration of the request
     duration: f64,
+    /// CPU time of the request
     cpu_time: f64,
+    /// Status code returned
     status_code: u16,
+    /// Endpoint name
     endpoint: String,
     //panic: bool,
 }

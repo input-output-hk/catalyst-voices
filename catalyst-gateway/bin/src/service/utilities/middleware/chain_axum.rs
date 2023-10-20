@@ -2,6 +2,10 @@
 //! legacy axum implementation.
 //!
 //! Allows us to have 1 API and seamlessly migrate unconverted requests.
+//! //! This whole module is deprecated, so don;t worry if its not documented how we would like.
+//!
+#![allow(clippy::missing_docs_in_private_items)]
+
 use crate::state::State;
 use crate::{legacy_service, service::common::responses::resp_5xx::server_error};
 
