@@ -2,8 +2,8 @@
 //! legacy axum implementation.
 //!
 //! Allows us to have 1 API and seamlessly migrate unconverted requests.
-use crate::legacy_service;
 use crate::state::State;
+use crate::{legacy_service, service::common::responses::resp_5xx::server_error};
 
 use bytes::Bytes;
 use hyper::{HeaderMap, StatusCode, Version};
@@ -87,7 +87,10 @@ where
         let uri = parts.uri.clone();
         let version = parts.version;
         let headers = parts.headers.clone();
-        let state: &Arc<State> = parts.extensions.get().expect("State must be set.");
+        let state: &Arc<State> = parts
+            .extensions
+            .get()
+            .ok_or(server_error!("Cannot acquire state"))?;
         let state = state.clone();
         let body = body.into_bytes().await.unwrap_or_else(|_| Bytes::new());
         let body_copy = body.clone();
@@ -115,9 +118,10 @@ where
                     // Add the body.
                     let request = request
                         .body(body_copy.into())
-                        .expect("The Request should always be creatable.");
+                        .map_err(|_| server_error!("Cannot build request body"))?;
 
                     // Call the endpoint
+                    #[allow(clippy::expect_used)] // The result here is infallible.
                     let response = app.oneshot(request).await.expect("This is infallible.");
                     let version = response.version();
                     let status = response.status();

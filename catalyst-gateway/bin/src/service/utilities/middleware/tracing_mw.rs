@@ -127,6 +127,7 @@ async fn anonymous_client_id(req: &Request) -> String {
     // Note: This will only panic if the `out` is not 16 bytes long.
     // Which it is.
     // Therefore the `unwrap()` is safe and will not cause a panic here under any circumstances.
+    #[allow(clippy::unwrap_used)]
     uuid::Builder::from_slice(&out)
         .unwrap()
         .with_version(uuid::Version::Random)
