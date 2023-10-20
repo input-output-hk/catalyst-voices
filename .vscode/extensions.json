@@ -11,6 +11,10 @@
         "earthly.earthfile-syntax-highlighting",
         "redhat.vscode-yaml",
         "remcohaszing.schemastore",
-        "tamasfe.even-better-toml"
+        "tamasfe.even-better-toml",
+        "rust-lang.rust-analyzer",
+        "JScearcy.rust-doc-viewer",
+        "serayuzgur.crates",
+        "panicbit.cargo",
     ]
 }
