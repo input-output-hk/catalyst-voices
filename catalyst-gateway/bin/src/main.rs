@@ -9,7 +9,7 @@ mod settings;
 mod state;
 
 #[tokio::main]
-async fn main() -> Result<(), cli::Error> {
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
     cli::Cli::parse().exec().await?;
     Ok(())
 }
