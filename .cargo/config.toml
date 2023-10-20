@@ -1,16 +1,51 @@
-[unstable]
-# Configure default options for Clippy
-build-std = ["clippy"]
-
 [build]
 target = "x86_64-unknown-linux-musl"
 
-# Set additional options for Clippy
 rustflags = [
     "-D",
     "warnings",
-] #, "-A", "clippy::pedantic", "-A", "clippy::cargo"]
+    "-D",
+    "missing_docs",
+    "-D",
+    "let_underscore_drop",
+    "-D",
+    "non_ascii_idents",
+    "-D",
+    "single_use_lifetimes",
+    "-D",
+    "trivial_casts",
+    "-D",
+    "trivial_numeric_casts",
+]
+
+rustdocflags = [
+    "-D",
+    "warnings",
+    "-D",
+    "missing_docs",
+    "-D",
+    "rustdoc::broken_intra_doc_links",
+    "-D",
+    "rustdoc::invalid_codeblock_attributes",
+    "-D",
+    "rustdoc::invalid_html_tags",
+    "-D",
+    "rustdoc::invalid_rust_codeblocks",
+    "-D",
+    "rustdoc::bare_urls",
+    "-D",
+    "rustdoc::unescaped_backticks",
+]
 
 [alias]
-lint = "clippy -- -D warnings -W clippy::pedantic -W clippy::unwrap_used -W clippy::expect_used"
-lintfix = "clippy --allow-dirty --fix -- -D warnings -W clippy::pedantic -W clippy::unwrap_used -W clippy::expect_used"
+lint = "clippy -- -D warnings -D clippy::pedantic -D clippy::unwrap_used -D clippy::expect_used -D clippy::exit -D clippy::get_unwrap -D clippy::index_refutable_slice -D clippy::indexing_slicing -D clippy::match_on_vec_items -D clippy::match_wild_err_arm -D clippy::missing_panics_doc -D clippy::panic -D clippy::string_slice -D clippy::unchecked_duration_subtraction -D clippy::unreachable -D clippy::missing_docs_in_private_items"
+lintfix = "clippy -- -D warnings -D clippy::pedantic -D clippy::unwrap_used -D clippy::expect_used -D clippy::exit -D clippy::get_unwrap -D clippy::index_refutable_slice -D clippy::indexing_slicing -D clippy::match_on_vec_items -D clippy::match_wild_err_arm -D clippy::missing_panics_doc -D clippy::panic -D clippy::string_slice -D clippy::unchecked_duration_subtraction -D clippy::unreachable"
+lintrestrict = "clippy -- -D warnings -D clippy::pedantic -D clippy::restriction"
+#lint-vscode = "clippy --workspace --message-format=json-diagnostic-rendered-ansi --all-targets -- -D warnings -D clippy::pedantic -D clippy::unwrap_used -D clippy::expect_used -D clippy::exit -D clippy::get_unwrap -D clippy::index_refutable_slice -D clippy::indexing_slicing -D clippy::match_on_vec_items -D clippy::match_wild_err_arm -D clippy::missing_panics_doc -D clippy::panic -D clippy::string_slice -D clippy::unchecked_duration_subtraction -D clippy::unreachable -D clippy::missing_docs_in_private_items"
+lint-vscode = "clippy --workspace --message-format=json-diagnostic-rendered-ansi --all-targets -- -D warnings -D clippy::pedantic -D clippy::unwrap_used -D clippy::expect_used -D clippy::exit -D clippy::get_unwrap -D clippy::index_refutable_slice -D clippy::indexing_slicing -D clippy::match_on_vec_items -D clippy::match_wild_err_arm -D clippy::missing_panics_doc -D clippy::panic -D clippy::string_slice -D clippy::unchecked_duration_subtraction -D clippy::unreachable"
+
+docs = "doc --workspace -r --all-features --no-deps --bins --document-private-items --examples --locked"
+# nightly docs build broken... --unit-graph --timings=html,json -Z unstable-options"
+testfast = "nextest run --release --workspace --locked"
+testci = "nextest run --release --workspace --locked --ci"
+testdocs = "test --doc --release --workspace --locked --doc"

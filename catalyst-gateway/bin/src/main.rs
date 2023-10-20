@@ -1,3 +1,4 @@
+//! Catalyst Data Gateway
 use clap::Parser;
 
 mod cli;
