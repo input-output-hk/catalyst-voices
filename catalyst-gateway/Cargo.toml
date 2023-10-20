@@ -26,7 +26,6 @@ poem = "1.3.58"
 poem-openapi = "3.0.4"
 poem-extensions = "0.7.2"
 
-metrics = "0.21.1"
 prometheus = "0.13.0"
 cryptoxide = "0.4.4"
 uuid = "1"

@@ -19,15 +19,17 @@ builder:
 
     WORKDIR /build
 
-fmt:
-    # Check if the code is properly formatted.
+check:
+    # Code checks which don;t need us to build it.
     FROM +builder
 
     DO +COPY_SRC
 
-    RUN cargo fmt --check --all
-
-
+    RUN cargo fmt --check --all; \
+        fmt_chk_failed=$?; \
+        cargo machete; \
+        unused_crate_depenency_check_failed=$?; \
+        exit $(($fmt_chk_failed || $unused_crate_depenency_check_failed))
 
 prepare-cache:
     # THIS DOES NOT WORK RELIABLY - DO NOT USE
@@ -75,5 +77,9 @@ test:
 
     COPY --dir .config .
 
-    # RUN cargo nextest run --release --workspace --locked -P ci --config-file .config/nextest.toml
-    RUN cargo nextest run --release --workspace --locked -P ci
+    # Cargo nextest creates a test artifact. TODO: Work out how to publish it (even if test run fails).
+    RUN cargo testci; \
+        testci_failed=$?; \
+        cargo testdocs; \
+        testdocs_failed=$?; \
+        exit $(($testci_failed || $testdocs_failed))
