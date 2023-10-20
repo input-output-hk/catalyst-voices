@@ -17,22 +17,29 @@ mod common;
 mod poem_service;
 mod utilities;
 
+/// Service level errors
 #[derive(thiserror::Error, Debug)]
 pub(crate) enum Error {
+    /// Cannot run the service
     #[error("Cannot run service, error: {0}")]
     CannotRunService(String),
+    /// An error with the EventDB
     #[error(transparent)]
     EventDb(#[from] crate::event_db::error::Error),
+    /// An IO error has occurred
     #[error(transparent)]
     Io(#[from] std::io::Error),
 }
 
+/// Error message
 #[derive(Serialize, Debug)]
 pub(crate) struct ErrorMessage {
+    /// Error message
     error: String,
 }
 
 impl ErrorMessage {
+    /// Create a new [`ErrorMessage`] with the specified error string.
     pub(crate) fn new(error: String) -> Self {
         Self { error }
     }
