@@ -5,6 +5,7 @@ use serde::Deserialize;
 
 #[derive(NewType, Deserialize)]
 #[oai(example = true)]
+/// Stake Public Key
 pub(crate) struct StakePublicKey(pub(crate) String);
 
 impl Example for StakePublicKey {

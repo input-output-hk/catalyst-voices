@@ -12,6 +12,7 @@ pub(crate) struct VoterInfo {
     #[oai(validator(minimum(value = "0")))]
     voting_power: i64,
 
+    /// Voter's voting group.
     voting_group: VoterGroupId,
 
     /// Total voting power delegated to this voter.
