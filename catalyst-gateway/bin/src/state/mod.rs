@@ -4,6 +4,7 @@ use crate::cli::Error;
 use crate::event_db::queries::EventDbQueries;
 use std::sync::Arc;
 
+/// Global State of the service
 pub(crate) struct State {
     /// This can be None, or a handle to the DB.
     /// If the DB fails, it can be set to None.
@@ -14,6 +15,7 @@ pub(crate) struct State {
 }
 
 impl State {
+    /// Create a new global [`State`]
     pub(crate) async fn new(database_url: Option<String>) -> Result<Self, Error> {
         // Get a connection to the Database.
         let event_db = match database_url.clone() {
