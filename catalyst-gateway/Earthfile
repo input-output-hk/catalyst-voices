@@ -1,12 +1,14 @@
 VERSION 0.7
 
+#cspell: words rustup readelf nextest testci testdocs
+
 COPY_SRC:
     # Copy the build src using this.
     COMMAND
 
     # ONLY copy whats needed to build.  Not everything.
-    # Note: rust-toolchain.toml was already copied when rsut was setup.
-    # Minimising whats copied reduces needless cache misses.
+    # Note: rust-toolchain.toml was already copied when rust was setup.
+    # Minimizing whats copied reduces needless cache misses.
     COPY --dir bin crates Cargo.* .
 
     COPY --dir ../+global-cargo-config/.cargo .cargo
@@ -28,8 +30,8 @@ check:
     RUN cargo fmt --check --all; \
         fmt_chk_failed=$?; \
         cargo machete; \
-        unused_crate_depenency_check_failed=$?; \
-        exit $(($fmt_chk_failed || $unused_crate_depenency_check_failed))
+        unused_crate_dependency_check_failed=$?; \
+        exit $(($fmt_chk_failed || $unused_crate_dependency_check_failed))
 
 prepare-cache:
     # THIS DOES NOT WORK RELIABLY - DO NOT USE
