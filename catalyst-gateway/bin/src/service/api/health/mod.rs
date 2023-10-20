@@ -1,3 +1,5 @@
+//! Health Endpoints
+//!
 use crate::service::common::tags::ApiTags;
 use poem_openapi::OpenApi;
 
@@ -5,6 +7,7 @@ mod live_get;
 mod ready_get;
 mod started_get;
 
+/// Health API Endpoints
 pub(crate) struct HealthApi;
 
 #[OpenApi(prefix_path = "/health", tag = "ApiTags::Health")]

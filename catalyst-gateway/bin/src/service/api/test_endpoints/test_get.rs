@@ -11,6 +11,7 @@ use poem_extensions::response;
 use poem_extensions::UniResponse::{T204, T503};
 use tracing::{error, info, warn};
 
+/// # All Responses
 pub(crate) type AllResponses = response! {
     204: NoContent,
     400: ApiValidationError,

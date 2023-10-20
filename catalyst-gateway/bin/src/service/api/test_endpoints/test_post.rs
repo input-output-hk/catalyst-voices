@@ -6,6 +6,7 @@ use crate::service::common::responses::resp_5xx::{ServerError, ServiceUnavailabl
 use poem_extensions::response;
 use poem_extensions::UniResponse::T204;
 
+/// All responses
 pub(crate) type AllResponses = response! {
     204: NoContent,
     500: ServerError,

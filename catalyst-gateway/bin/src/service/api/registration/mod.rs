@@ -1,3 +1,5 @@
+//! Registration Endpoints
+//!
 use crate::service::common::objects::{
     event_id::EventId, voter_registration::VoterRegistration, voting_public_key::VotingPublicKey,
 };
@@ -15,6 +17,7 @@ use poem_openapi::{
 };
 use std::sync::Arc;
 
+/// Registration API Endpoints
 pub(crate) struct RegistrationApi;
 
 #[OpenApi(prefix_path = "/registration", tag = "ApiTags::Registration")]

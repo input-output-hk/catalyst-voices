@@ -6,6 +6,7 @@ use poem_extensions::response;
 use poem_extensions::UniResponse::T204;
 use tracing::{error, info, warn};
 
+/// All responses
 pub(crate) type AllResponses = response! {
     204: NoContent,
     500: ServerError,

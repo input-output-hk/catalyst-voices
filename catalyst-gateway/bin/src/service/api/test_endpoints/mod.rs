@@ -14,6 +14,7 @@ use poem_openapi::{
     OpenApi,
 };
 
+/// Test API Endpoints
 pub(crate) struct TestApi;
 
 #[OpenApi(prefix_path = "/test", tag = "ApiTags::Test")]
