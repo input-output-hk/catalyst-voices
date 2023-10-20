@@ -7,21 +7,20 @@ pub fn health() -> Router {
     Router::new()
         .route(
             "/health/ready",
-            get(|| async { handle_result(ready_exec().await) }),
+            get(|| async { handle_result(ready_exec()) }),
         )
-        .route(
-            "/health/live",
-            get(|| async { handle_result(live_exec().await) }),
-        )
+        .route("/health/live", get(|| async { handle_result(live_exec()) }))
 }
 
-async fn ready_exec() -> Result<bool, Error> {
+#[allow(clippy::unnecessary_wraps)]
+fn ready_exec() -> Result<bool, Error> {
     tracing::debug!("health ready exec");
 
     Ok(true)
 }
 
-async fn live_exec() -> Result<bool, Error> {
+#[allow(clippy::unnecessary_wraps)]
+fn live_exec() -> Result<bool, Error> {
     tracing::debug!("health live exec");
 
     Ok(true)
@@ -41,7 +40,7 @@ async fn live_exec() -> Result<bool, Error> {
 /// ```
 /// EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 /// ```
-/// https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md
+/// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
 #[cfg(test)]
 mod tests {
     use crate::{legacy_service::app, state::State};

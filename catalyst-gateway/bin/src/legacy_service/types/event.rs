@@ -1,3 +1,8 @@
+//! Obsoleted code
+//!
+//! Because this code is legacy and being obsoleted, we allow certain lints to be used
+//! which would not be permitted if this code was not obsoleted.
+#![allow(deprecated)]
 use super::{serialize_option_datetime_as_rfc3339, SerdeType};
 use crate::event_db::types::event::{
     Event, EventDetails, EventGoal, EventId, EventRegistration, EventSchedule, EventSummary,
@@ -421,7 +426,7 @@ mod tests {
         let voting_power_algorithm = SerdeType(VotingPowerAlgorithm::ThresholdStakedADA);
 
         let json = serde_json::to_value(voting_power_algorithm).unwrap();
-        assert_eq!(json, json!("threshold_staked_ADA"))
+        assert_eq!(json, json!("threshold_staked_ADA"));
     }
 
     #[test]
@@ -614,7 +619,7 @@ mod tests {
                     "goals": [],
                 }
             )
-        )
+        );
     }
 
     #[test]
@@ -689,6 +694,6 @@ mod tests {
                     "goals": [],
                 }
             )
-        )
+        );
     }
 }

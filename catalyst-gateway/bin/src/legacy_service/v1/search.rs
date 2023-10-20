@@ -1,3 +1,9 @@
+//! Obsoleted code
+//!
+//! Because this code is legacy and being obsoleted, we allow certain lints to be used
+//! which would not be permitted if this code was not obsoleted.
+#![allow(clippy::too_many_lines)]
+
 use crate::event_db::types::search::{SearchQuery, SearchResult};
 use crate::{
     legacy_service::{handle_result, types::SerdeType},
@@ -58,7 +64,8 @@ async fn search_exec(
 /// ```
 /// EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 /// ```
-/// https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md
+/// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
+
 #[cfg(test)]
 mod tests {
     use super::*;

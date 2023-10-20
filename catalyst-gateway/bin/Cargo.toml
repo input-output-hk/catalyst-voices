@@ -1,5 +1,10 @@
 [package]
 name = "cat-gateway"
+description = "The Catalyst Data Gateway"
+license = "Apache-2.0"
+repository = "https://github.com/input-output-hk/catalyst-voices"
+keywords = ["cardano", "catalyst", "gateway"]
+categories = ["command-line-utilities"]
 version.workspace = true
 authors.workspace = true
 edition.workspace = true

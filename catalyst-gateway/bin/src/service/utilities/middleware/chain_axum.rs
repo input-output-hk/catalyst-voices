@@ -36,6 +36,7 @@ where
 }
 
 /// Endpoint for `ChainAxum` middleware.
+#[allow(clippy::module_name_repetitions)]
 pub struct ChainAxumEndpoint<E> {
     inner: E,
 }
@@ -94,7 +95,7 @@ where
         let req = Request::from_parts(parts, poem::Body::from(body));
 
         match self.inner.call(req).await {
-            Ok(res) => Ok(res.into_response()),
+            Ok(response) => Ok(response.into_response()),
             Err(err) => {
                 // Only if the error is a 404 (Not found) then try and chain to axum, handler.
                 if err.is::<NotFoundError>() {

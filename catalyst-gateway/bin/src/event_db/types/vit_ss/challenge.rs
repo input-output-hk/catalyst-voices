@@ -1,3 +1,4 @@
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ChallengeHighlights {
     pub sponsor: String,

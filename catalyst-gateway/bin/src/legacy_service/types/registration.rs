@@ -1,3 +1,9 @@
+//! Obsoleted code
+//!
+//! Because this code is legacy and being obsoleted, we allow certain lints to be used
+//! which would not be permitted if this code was not obsoleted.
+#![allow(deprecated)]
+
 use super::{serialize_datetime_as_rfc3339, SerdeType};
 use crate::event_db::types::registration::{
     Delegation, Delegator, RewardAddress, Voter, VoterGroupId, VoterInfo,
@@ -302,7 +308,7 @@ mod tests {
                     "final": true
                 }
             )
-        )
+        );
     }
 
     #[test]

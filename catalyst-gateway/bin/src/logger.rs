@@ -7,7 +7,7 @@ use tracing_subscriber::{
 
 pub const LOG_LEVEL_DEFAULT: &str = "info";
 
-#[derive(ValueEnum, Clone)]
+#[derive(ValueEnum, Clone, Copy)]
 pub enum LogLevel {
     Info,
     Debug,
@@ -27,7 +27,7 @@ impl From<LogLevel> for tracing::Level {
 }
 
 impl LogLevel {
-    pub fn as_log_level(&self) -> tracing::log::LevelFilter {
+    pub fn as_log_level(self) -> tracing::log::LevelFilter {
         match self {
             LogLevel::Info => tracing::log::LevelFilter::Info,
             LogLevel::Debug => tracing::log::LevelFilter::Debug,
@@ -41,7 +41,7 @@ impl LogLevel {
 pub(crate) fn init(log_level: LogLevel) -> Result<(), SetGlobalDefaultError> {
     let subscriber = FmtSubscriber::builder()
         .json()
-        .with_max_level(LevelFilter::from_level(log_level.clone().into()))
+        .with_max_level(LevelFilter::from_level(log_level.into()))
         .with_timer(time::UtcTime::rfc_3339())
         .with_span_events(FmtSpan::CLOSE)
         .with_target(true)

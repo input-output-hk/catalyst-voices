@@ -194,7 +194,7 @@ mod tests {
                     "deleted": false,
                 }
             )
-        )
+        );
     }
 
     #[test]
@@ -263,7 +263,7 @@ mod tests {
                     "proposer": [],
                 }
             )
-        )
+        );
     }
 
     #[test]
@@ -299,6 +299,6 @@ mod tests {
                     "proposer": [],
                 }
             )
-        )
+        );
     }
 }

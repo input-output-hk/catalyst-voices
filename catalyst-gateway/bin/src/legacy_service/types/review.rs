@@ -217,6 +217,6 @@ mod tests {
                         "ratings": [],
                     }
             )
-        )
+        );
     }
 }

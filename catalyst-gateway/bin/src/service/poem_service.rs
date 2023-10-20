@@ -24,7 +24,7 @@ use std::sync::Arc;
 pub(crate) fn mk_app(
     hosts: Vec<String>,
     base_route: Option<Route>,
-    state: Arc<State>,
+    state: &Arc<State>,
 ) -> impl Endpoint {
     // Get the base route if defined, or a new route if not.
     let base_route = match base_route {
@@ -76,7 +76,7 @@ pub async fn run(addr: &SocketAddr, state: Arc<State>) -> Result<(), Error> {
 
     let hosts = get_api_host_names(addr);
 
-    let app = mk_app(hosts, None, state);
+    let app = mk_app(hosts, None, &state);
 
     poem::Server::new(TcpListener::bind(addr))
         .run(app)
@@ -89,7 +89,7 @@ pub mod tests {
     use super::*;
     use poem::test::TestClient;
 
-    pub fn mk_test_app(state: Arc<State>) -> TestClient<impl Endpoint> {
+    pub fn mk_test_app(state: &Arc<State>) -> TestClient<impl Endpoint> {
         let app = mk_app(vec![], None, state);
         TestClient::new(app)
     }

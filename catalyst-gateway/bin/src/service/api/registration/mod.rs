@@ -88,17 +88,19 @@ impl RegistrationApi {
 /// ```
 /// EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 /// ```
-/// https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md
+/// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
 #[cfg(test)]
 mod tests {
     use crate::{service::poem_service::tests::mk_test_app, state::State};
     use poem::http::StatusCode;
     use std::sync::Arc;
 
+    /* TODO (SJ) : https://github.com/input-output-hk/catalyst-voices/issues/68 */
+    #[allow(clippy::too_many_lines)]
     #[tokio::test]
     async fn voter_test() {
         let state = Arc::new(State::new(None).await.unwrap());
-        let app = mk_test_app(state);
+        let app = mk_test_app(&state);
 
         let resp = app
             .get(format!("/api/v1/registration/voter/{0}", "voting_key_1"))

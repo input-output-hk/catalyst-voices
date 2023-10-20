@@ -1,6 +1,7 @@
 use super::{challenge::Challenge, goal::Goal, group::Group, vote_plan::Voteplan};
 use chrono::{DateTime, Utc};
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FundStageDates {
     pub insight_sharing_start: DateTime<Utc>,
@@ -35,6 +36,7 @@ pub struct Fund {
     pub groups: Vec<Group>,
 }
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FundNextInfo {
     pub id: i32,
@@ -42,6 +44,7 @@ pub struct FundNextInfo {
     pub stage_dates: FundStageDates,
 }
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FundWithNext {
     pub fund: Fund,

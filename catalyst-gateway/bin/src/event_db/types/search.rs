@@ -1,5 +1,6 @@
 use super::{event::EventSummary, objective::ObjectiveSummary, proposal::ProposalSummary};
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SearchTable {
     Events,
@@ -7,6 +8,7 @@ pub enum SearchTable {
     Proposals,
 }
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SearchColumn {
     Title,
@@ -28,6 +30,7 @@ impl ToString for SearchColumn {
     }
 }
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 
 pub struct SearchConstraint {
@@ -35,12 +38,14 @@ pub struct SearchConstraint {
     pub search: String,
 }
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SearchOrderBy {
     pub column: SearchColumn,
     pub descending: bool,
 }
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SearchQuery {
     pub table: SearchTable,
@@ -55,6 +60,7 @@ pub enum ValueResults {
     Proposals(Vec<ProposalSummary>),
 }
 
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SearchResult {
     pub total: i64,

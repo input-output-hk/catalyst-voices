@@ -1,3 +1,9 @@
+//! Obsoleted code
+//!
+//! Because this code is legacy and being obsoleted, we allow certain lints to be used
+//! which would not be permitted if this code was not obsoleted.
+#![allow(deprecated, clippy::too_many_lines)]
+
 use super::LimitOffset;
 use crate::event_db::types::event::{Event, EventId, EventSummary};
 use crate::{
@@ -83,7 +89,7 @@ async fn events_exec(
 /// ```
 /// EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 /// ```
-/// https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md
+/// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
 #[cfg(test)]
 mod tests {
     use super::*;

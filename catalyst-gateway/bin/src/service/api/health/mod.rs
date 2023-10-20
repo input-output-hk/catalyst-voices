@@ -83,7 +83,8 @@ impl HealthApi {
 /// ```
 /// EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 /// ```
-/// https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md
+/// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
+
 #[cfg(test)]
 mod tests {
     use crate::{service::poem_service::tests::mk_test_app, state::State};
@@ -93,7 +94,7 @@ mod tests {
     #[tokio::test]
     async fn health_test() {
         let state = Arc::new(State::new(None).await.unwrap());
-        let app = mk_test_app(state);
+        let app = mk_test_app(&state);
 
         let resp = app.get("/api/health/started").send().await;
         resp.assert_status(StatusCode::NO_CONTENT);
