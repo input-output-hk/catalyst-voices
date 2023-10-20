@@ -27,13 +27,11 @@ tracing-subscriber = { workspace = true, features = ["fmt", "json", "time"] }
 
 serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true }
-serde_with = { workspace = true, features = ["macros"] }
 
 tokio = { workspace = true, features = ["rt", "macros", "rt-multi-thread"] }
 thiserror = { workspace = true }
 axum = { workspace = true }
 metrics = { workspace = true }
-metrics-exporter-prometheus = { workspace = true }
 
 tower-http = { workspace = true, features = ["cors"] }
 
@@ -62,8 +60,6 @@ poem-openapi = { workspace = true, features = [
 poem-extensions = { workspace = true }
 
 # Metrics - Poem
-opentelemetry-prometheus = { workspace = true }
-opentelemetry = { workspace = true }
 prometheus = { workspace = true }
 cryptoxide = { workspace = true }
 uuid = { workspace = true, features = ["v4", "serde"] }
@@ -71,11 +67,9 @@ lazy_static = { workspace = true }
 url = { workspace = true }
 dotenvy = { workspace = true }
 panic-message = { workspace = true }
-regex = { workspace = true }
 tower = { workspace = true, features = ["util"] }
 hyper = { workspace = true }
 bytes = { workspace = true }
 cpu-time = { workspace = true }
-arc-swap = { workspace = true }
 ulid = { workspace = true, features = ["serde", "uuid"] }
 rust-embed = { workspace = true }

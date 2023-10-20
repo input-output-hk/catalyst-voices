@@ -23,7 +23,7 @@ impl Cli {
                 logger::init(settings.log_level)?;
 
                 let state = Arc::new(State::new(Some(settings.database_url)).await?);
-                service::run(&settings.address, &settings.metrics_address, state).await?;
+                service::run(&settings.address, state).await?;
                 Ok(())
             }
         }

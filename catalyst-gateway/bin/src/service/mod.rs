@@ -54,11 +54,7 @@ impl ErrorMessage {
 /// `Error::CannotRunService` - cannot run the service
 /// `Error::EventDbError` - cannot connect to the event db
 /// `Error::IoError` - An IO error has occurred.
-pub async fn run(
-    service_addr: &SocketAddr,
-    metrics_addr: &Option<SocketAddr>, // TODO Remove this parameter when Axum is removed.
-    state: Arc<State>,
-) -> Result<(), Error> {
+pub async fn run(service_addr: &SocketAddr, state: Arc<State>) -> Result<(), Error> {
     // Create service addresses to be used during poem migration.
     // Service address is same as official address but +1 to the port.
     let mut legacy_service = *service_addr;
@@ -66,7 +62,7 @@ pub async fn run(
 
     // This can be simplified to an .await when axum is finally removed.
     try_join!(
-        legacy_service::run(&legacy_service, metrics_addr, state.clone()),
+        legacy_service::run(&legacy_service, state.clone()),
         poem_service::run(service_addr, state),
     )?;
 

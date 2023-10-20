@@ -36,10 +36,6 @@ pub struct Settings {
     #[clap(long, default_value = ADDRESS_DEFAULT)]
     pub address: SocketAddr,
 
-    /// Server binding address
-    #[clap(long, default_value = Option::None)]
-    pub metrics_address: Option<SocketAddr>,
-
     /// Url to the postgres event db
     #[clap(long, env)]
     pub database_url: String,
