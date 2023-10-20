@@ -30,6 +30,13 @@ const API_HOST_NAMES_DEFAULT: &str = "https://api.prod.projectcatalyst.io";
 /// Default `API_URL_PREFIX` used in development.
 const API_URL_PREFIX_DEFAULT: &str = "/api";
 
+/// Settings for the application.
+///
+/// This struct represents the configuration settings for the application.
+/// It is used to specify the server binding address,
+/// the URL to the `PostgreSQL` event database,
+/// and the logging level.
+///
 #[derive(Args, Clone)]
 pub(crate) struct Settings {
     /// Server binding address
@@ -118,6 +125,7 @@ lazy_static! {
 /// Default to the service address if none specified.
 ///
 fn string_to_api_host_names(addr: &SocketAddr, hosts: &str) -> Vec<String> {
+    /// Log an invalid hostname.
     fn invalid_hostname(hostname: &str) -> String {
         error!("Invalid host name for API: {}", hostname);
         String::new()

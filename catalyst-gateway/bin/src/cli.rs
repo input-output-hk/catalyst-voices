@@ -1,3 +1,5 @@
+//! CLI interpreter for the service
+//!
 use crate::{logger, service, settings::Settings, state::State};
 use clap::Parser;
 use std::sync::Arc;

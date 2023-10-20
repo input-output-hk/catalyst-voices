@@ -1,3 +1,5 @@
+//! Setup for logging for the service.
+//!
 use clap::ValueEnum;
 use tracing::{level_filters::LevelFilter, subscriber::SetGlobalDefaultError};
 use tracing_subscriber::{
@@ -5,21 +7,27 @@ use tracing_subscriber::{
     FmtSubscriber,
 };
 
+/// Default log level
 pub(crate) const LOG_LEVEL_DEFAULT: &str = "info";
 
+/// All valid logging levels
 #[derive(ValueEnum, Clone, Copy)]
 pub(crate) enum LogLevel {
-    Info,
+    /// Debug messages
     Debug,
+    /// Informational Messages
+    Info,
+    /// Warnings
     Warn,
+    /// Errors
     Error,
 }
 
 impl From<LogLevel> for tracing::Level {
     fn from(val: LogLevel) -> Self {
         match val {
-            LogLevel::Info => Self::INFO,
             LogLevel::Debug => Self::DEBUG,
+            LogLevel::Info => Self::INFO,
             LogLevel::Warn => Self::WARN,
             LogLevel::Error => Self::ERROR,
         }
@@ -27,6 +35,7 @@ impl From<LogLevel> for tracing::Level {
 }
 
 impl LogLevel {
+    /// Map [`LogLevel`] to [`tracing::Level`]
     pub(crate) fn as_log_level(self) -> tracing::log::LevelFilter {
         match self {
             LogLevel::Info => tracing::log::LevelFilter::Info,
