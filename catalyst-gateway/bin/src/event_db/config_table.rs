@@ -116,27 +116,27 @@ fn get_config_record(
 
 /// Individual Permissions assigned to an authorization.
 #[derive(Serialize, Deserialize)]
-pub struct Permissions {
+pub(crate) struct Permissions {
     /// Example permission, at the moment there are no permission categories.
-    pub read: bool,
+    pub(crate) read: bool,
 }
 
 /// Individual Authorization assigned to this API Key.
 #[derive(Serialize, Deserialize)]
-pub struct Authorization {
+pub(crate) struct Authorization {
     /// Name of the API Token Owner
-    pub name: String,
+    pub(crate) name: String,
 
     /// When the API Token was created.
     #[serde(with = "ts_seconds")]
-    pub created: DateTime<Utc>,
+    pub(crate) created: DateTime<Utc>,
 
     /// When the API Token expires.
     #[serde(with = "ts_seconds")]
-    pub expires: DateTime<Utc>,
+    pub(crate) expires: DateTime<Utc>,
 
     /// Individual permissions given to the API Token.
-    pub perms: Permissions,
+    pub(crate) perms: Permissions,
 }
 
 impl ElectionDB {
@@ -168,7 +168,7 @@ impl ElectionDB {
     /// with a key supplied by a `TODO` environment variable.  This prevents a DB
     /// dump from exposing the API keys.
     ///
-    pub fn check_api_token(
+    pub(crate) fn check_api_token(
         &self,
         _token: &str,
     ) -> Result<Authorization, Box<dyn Error + Send + Sync + 'static>> {

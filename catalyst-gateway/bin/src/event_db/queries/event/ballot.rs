@@ -19,7 +19,7 @@ use std::collections::HashMap;
 
 #[async_trait]
 #[allow(clippy::module_name_repetitions)]
-pub trait BallotQueries: Sync + Send + 'static {
+pub(crate) trait BallotQueries: Sync + Send + 'static {
     async fn get_ballot(
         &self,
         event: EventId,

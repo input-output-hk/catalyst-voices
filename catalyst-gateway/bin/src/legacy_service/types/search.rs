@@ -75,9 +75,9 @@ impl<'de> Deserialize<'de> for SerdeType<SearchOrderBy> {
     {
         #[derive(Deserialize)]
         struct SearchOrderBySerde {
-            pub column: SerdeType<SearchColumn>,
+            pub(crate) column: SerdeType<SearchColumn>,
             #[serde(default)]
-            pub descending: bool,
+            pub(crate) descending: bool,
         }
         let SearchOrderBySerde { column, descending } =
             SearchOrderBySerde::deserialize(deserializer)?;
@@ -95,11 +95,11 @@ impl<'de> Deserialize<'de> for SerdeType<SearchQuery> {
     {
         #[derive(Deserialize)]
         struct SearchQuerySerde {
-            pub table: SerdeType<SearchTable>,
+            pub(crate) table: SerdeType<SearchTable>,
             #[serde(default)]
-            pub filter: Vec<SerdeType<SearchConstraint>>,
+            pub(crate) filter: Vec<SerdeType<SearchConstraint>>,
             #[serde(default)]
-            pub order_by: Vec<SerdeType<SearchOrderBy>>,
+            pub(crate) order_by: Vec<SerdeType<SearchOrderBy>>,
         }
         let SearchQuerySerde {
             table,

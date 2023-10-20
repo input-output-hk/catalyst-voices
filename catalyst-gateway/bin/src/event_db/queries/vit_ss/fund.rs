@@ -12,7 +12,7 @@ use async_trait::async_trait;
 use chrono::{NaiveDateTime, Utc};
 
 #[async_trait]
-pub trait VitSSFundQueries: Sync + Send + 'static {
+pub(crate) trait VitSSFundQueries: Sync + Send + 'static {
     async fn get_fund(&self) -> Result<FundWithNext, Error>;
 }
 

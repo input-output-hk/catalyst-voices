@@ -13,7 +13,7 @@ use crate::{
 use axum::{routing::get, Router};
 use std::sync::Arc;
 
-pub fn fund(state: Arc<State>) -> Router {
+pub(crate) fn fund(state: Arc<State>) -> Router {
     Router::new().route(
         "/fund",
         get(|| async { handle_result(fund_exec(state).await) }),

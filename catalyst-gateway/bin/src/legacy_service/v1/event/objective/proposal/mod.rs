@@ -18,7 +18,7 @@ use std::sync::Arc;
 mod ballot;
 mod review;
 
-pub fn proposal(state: Arc<State>) -> Router {
+pub(crate) fn proposal(state: Arc<State>) -> Router {
     let review = review::review(state.clone());
     let ballot = ballot::ballot(state.clone());
 

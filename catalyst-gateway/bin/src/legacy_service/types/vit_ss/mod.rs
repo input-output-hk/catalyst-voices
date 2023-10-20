@@ -1,5 +1,5 @@
-pub mod challenge;
-pub mod fund;
-pub mod goal;
-pub mod group;
-pub mod vote_plan;
+pub(crate) mod challenge;
+pub(crate) mod fund;
+pub(crate) mod goal;
+pub(crate) mod group;
+pub(crate) mod vote_plan;

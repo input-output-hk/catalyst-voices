@@ -12,7 +12,7 @@ use async_trait::async_trait;
 
 #[async_trait]
 #[allow(clippy::module_name_repetitions)]
-pub trait ReviewQueries: Sync + Send + 'static {
+pub(crate) trait ReviewQueries: Sync + Send + 'static {
     async fn get_reviews(
         &self,
         event: EventId,

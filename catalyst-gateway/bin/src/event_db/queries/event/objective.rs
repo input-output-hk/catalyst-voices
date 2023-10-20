@@ -16,7 +16,7 @@ use async_trait::async_trait;
 
 #[async_trait]
 #[allow(clippy::module_name_repetitions)]
-pub trait ObjectiveQueries: Sync + Send + 'static {
+pub(crate) trait ObjectiveQueries: Sync + Send + 'static {
     async fn get_objectives(
         &self,
         event: EventId,

@@ -15,11 +15,11 @@ use std::sync::Arc;
 use tower::ServiceExt;
 
 /// Middleware to chain call Axum if endpoint is not found.
-pub struct ChainAxum;
+pub(crate) struct ChainAxum;
 
 impl ChainAxum {
     /// Create new `ChainAxum` middleware with any value.
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         ChainAxum {}
     }
 }
@@ -37,7 +37,7 @@ where
 
 /// Endpoint for `ChainAxum` middleware.
 #[allow(clippy::module_name_repetitions)]
-pub struct ChainAxumEndpoint<E> {
+pub(crate) struct ChainAxumEndpoint<E> {
     inner: E,
 }
 

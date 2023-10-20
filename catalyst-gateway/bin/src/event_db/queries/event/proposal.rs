@@ -11,7 +11,7 @@ use async_trait::async_trait;
 
 #[async_trait]
 #[allow(clippy::module_name_repetitions)]
-pub trait ProposalQueries: Sync + Send + 'static {
+pub(crate) trait ProposalQueries: Sync + Send + 'static {
     async fn get_proposal(
         &self,
         event: EventId,

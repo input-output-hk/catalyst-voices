@@ -17,7 +17,7 @@ use chrono::{NaiveDateTime, Utc};
 
 #[async_trait]
 #[allow(clippy::module_name_repetitions)]
-pub trait SearchQueries: Sync + Send + 'static {
+pub(crate) trait SearchQueries: Sync + Send + 'static {
     async fn search(
         &self,
         search_query: SearchQuery,

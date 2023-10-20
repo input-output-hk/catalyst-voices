@@ -21,7 +21,7 @@ use std::sync::Arc;
 mod ballots;
 mod objective;
 
-pub fn event(state: Arc<State>) -> Router {
+pub(crate) fn event(state: Arc<State>) -> Router {
     let objective = objective::objective(state.clone());
     let ballots = ballots::ballots(state.clone());
 

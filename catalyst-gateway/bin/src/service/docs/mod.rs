@@ -30,7 +30,7 @@ pub(crate) fn docs<T: OpenApi + 'static, W: Webhook + 'static>(
 
 #[derive(RustEmbed)]
 #[folder = "src/service/docs/files"]
-pub struct Files;
+pub(crate) struct Files;
 
 /// Get an endpoint for favicon.ico
 pub(crate) fn favicon() -> Route {

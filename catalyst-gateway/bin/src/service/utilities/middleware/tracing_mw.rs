@@ -88,7 +88,7 @@ lazy_static! {
 
 /// Middleware for [`tracing`](https://crates.io/crates/tracing).
 #[derive(Default)]
-pub struct Tracing;
+pub(crate) struct Tracing;
 
 impl<E: Endpoint> Middleware<E> for Tracing {
     type Output = TracingEndpoint<E>;
@@ -99,7 +99,7 @@ impl<E: Endpoint> Middleware<E> for Tracing {
 }
 
 /// Endpoint for `Tracing` middleware.
-pub struct TracingEndpoint<E> {
+pub(crate) struct TracingEndpoint<E> {
     inner: E,
 }
 
@@ -388,6 +388,6 @@ impl<E: Endpoint> Endpoint for TracingEndpoint<E> {
 ///
 /// Returns the default prometheus registry.
 #[must_use]
-pub fn init_prometheus() -> Registry {
+pub(crate) fn init_prometheus() -> Registry {
     default_registry().clone()
 }

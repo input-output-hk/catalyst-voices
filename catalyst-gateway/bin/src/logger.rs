@@ -5,10 +5,10 @@ use tracing_subscriber::{
     FmtSubscriber,
 };
 
-pub const LOG_LEVEL_DEFAULT: &str = "info";
+pub(crate) const LOG_LEVEL_DEFAULT: &str = "info";
 
 #[derive(ValueEnum, Clone, Copy)]
-pub enum LogLevel {
+pub(crate) enum LogLevel {
     Info,
     Debug,
     Warn,
@@ -27,7 +27,7 @@ impl From<LogLevel> for tracing::Level {
 }
 
 impl LogLevel {
-    pub fn as_log_level(self) -> tracing::log::LevelFilter {
+    pub(crate) fn as_log_level(self) -> tracing::log::LevelFilter {
         match self {
             LogLevel::Info => tracing::log::LevelFilter::Info,
             LogLevel::Debug => tracing::log::LevelFilter::Debug,

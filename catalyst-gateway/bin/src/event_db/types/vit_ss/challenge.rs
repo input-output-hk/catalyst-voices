@@ -1,20 +1,20 @@
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ChallengeHighlights {
-    pub sponsor: String,
+pub(crate) struct ChallengeHighlights {
+    pub(crate) sponsor: String,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Challenge {
+pub(crate) struct Challenge {
     // this is used only to retain the original insert order
-    pub internal_id: i32,
-    pub id: i32,
-    pub challenge_type: String,
-    pub title: String,
-    pub description: String,
-    pub rewards_total: i64,
-    pub proposers_rewards: i64,
-    pub fund_id: i32,
-    pub challenge_url: String,
-    pub highlights: Option<ChallengeHighlights>,
+    pub(crate) internal_id: i32,
+    pub(crate) id: i32,
+    pub(crate) challenge_type: String,
+    pub(crate) title: String,
+    pub(crate) description: String,
+    pub(crate) rewards_total: i64,
+    pub(crate) proposers_rewards: i64,
+    pub(crate) fund_id: i32,
+    pub(crate) challenge_url: String,
+    pub(crate) highlights: Option<ChallengeHighlights>,
 }

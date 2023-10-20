@@ -8,14 +8,14 @@ use self::{
 };
 use crate::event_db::EventDB;
 
-pub mod event;
-pub mod registration;
-pub mod search;
+pub(crate) mod event;
+pub(crate) mod registration;
+pub(crate) mod search;
 // DEPRECATED, added as a backward compatibility with the VIT-SS
-pub mod vit_ss;
+pub(crate) mod vit_ss;
 
 #[allow(clippy::module_name_repetitions)]
-pub trait EventDbQueries:
+pub(crate) trait EventDbQueries:
     RegistrationQueries
     + EventQueries
     + ObjectiveQueries

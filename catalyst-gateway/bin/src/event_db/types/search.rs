@@ -2,7 +2,7 @@ use super::{event::EventSummary, objective::ObjectiveSummary, proposal::Proposal
 
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum SearchTable {
+pub(crate) enum SearchTable {
     Events,
     Objectives,
     Proposals,
@@ -10,7 +10,7 @@ pub enum SearchTable {
 
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum SearchColumn {
+pub(crate) enum SearchColumn {
     Title,
     Type,
     Description,
@@ -33,28 +33,28 @@ impl ToString for SearchColumn {
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 
-pub struct SearchConstraint {
-    pub column: SearchColumn,
-    pub search: String,
+pub(crate) struct SearchConstraint {
+    pub(crate) column: SearchColumn,
+    pub(crate) search: String,
 }
 
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SearchOrderBy {
-    pub column: SearchColumn,
-    pub descending: bool,
+pub(crate) struct SearchOrderBy {
+    pub(crate) column: SearchColumn,
+    pub(crate) descending: bool,
 }
 
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SearchQuery {
-    pub table: SearchTable,
-    pub filter: Vec<SearchConstraint>,
-    pub order_by: Vec<SearchOrderBy>,
+pub(crate) struct SearchQuery {
+    pub(crate) table: SearchTable,
+    pub(crate) filter: Vec<SearchConstraint>,
+    pub(crate) order_by: Vec<SearchOrderBy>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum ValueResults {
+pub(crate) enum ValueResults {
     Events(Vec<EventSummary>),
     Objectives(Vec<ObjectiveSummary>),
     Proposals(Vec<ProposalSummary>),
@@ -62,7 +62,7 @@ pub enum ValueResults {
 
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SearchResult {
-    pub total: i64,
-    pub results: Option<ValueResults>,
+pub(crate) struct SearchResult {
+    pub(crate) total: i64,
+    pub(crate) results: Option<ValueResults>,
 }

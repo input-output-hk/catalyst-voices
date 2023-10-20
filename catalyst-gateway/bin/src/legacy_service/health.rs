@@ -3,7 +3,7 @@ use axum::{routing::get, Router};
 
 use super::handle_result;
 
-pub fn health() -> Router {
+pub(crate) fn health() -> Router {
     Router::new()
         .route(
             "/health/ready",

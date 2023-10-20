@@ -331,7 +331,7 @@ impl Serialize for SerdeType<&Event> {
         S: Serializer,
     {
         #[derive(Serialize)]
-        pub struct EventSerde<'a> {
+        pub(crate) struct EventSerde<'a> {
             #[serde(flatten)]
             summary: SerdeType<&'a EventSummary>,
             #[serde(flatten)]

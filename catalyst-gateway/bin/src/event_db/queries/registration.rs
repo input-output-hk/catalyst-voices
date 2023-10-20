@@ -10,7 +10,7 @@ use chrono::{NaiveDateTime, Utc};
 
 #[async_trait]
 #[allow(clippy::module_name_repetitions)]
-pub trait RegistrationQueries: Sync + Send + 'static {
+pub(crate) trait RegistrationQueries: Sync + Send + 'static {
     async fn get_voter(
         &self,
         event: &Option<EventId>,

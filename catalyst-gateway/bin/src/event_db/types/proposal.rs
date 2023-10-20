@@ -2,37 +2,37 @@ use serde_json::Value;
 
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ProposalId(pub i32);
+pub(crate) struct ProposalId(pub(crate) i32);
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ProposerDetails {
-    pub name: String,
-    pub email: String,
-    pub url: String,
-    pub payment_key: String,
+pub(crate) struct ProposerDetails {
+    pub(crate) name: String,
+    pub(crate) email: String,
+    pub(crate) url: String,
+    pub(crate) payment_key: String,
 }
 
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ProposalDetails {
-    pub funds: i64,
-    pub url: String,
-    pub files: String,
-    pub proposer: Vec<ProposerDetails>,
-    pub supplemental: Option<Value>,
+pub(crate) struct ProposalDetails {
+    pub(crate) funds: i64,
+    pub(crate) url: String,
+    pub(crate) files: String,
+    pub(crate) proposer: Vec<ProposerDetails>,
+    pub(crate) supplemental: Option<Value>,
 }
 
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ProposalSummary {
-    pub id: ProposalId,
-    pub title: String,
-    pub summary: String,
-    pub deleted: bool,
+pub(crate) struct ProposalSummary {
+    pub(crate) id: ProposalId,
+    pub(crate) title: String,
+    pub(crate) summary: String,
+    pub(crate) deleted: bool,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Proposal {
-    pub summary: ProposalSummary,
-    pub details: ProposalDetails,
+pub(crate) struct Proposal {
+    pub(crate) summary: ProposalSummary,
+    pub(crate) details: ProposalDetails,
 }

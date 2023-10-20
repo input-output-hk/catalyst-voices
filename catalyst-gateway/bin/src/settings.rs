@@ -31,18 +31,18 @@ const API_HOST_NAMES_DEFAULT: &str = "https://api.prod.projectcatalyst.io";
 const API_URL_PREFIX_DEFAULT: &str = "/api";
 
 #[derive(Args, Clone)]
-pub struct Settings {
+pub(crate) struct Settings {
     /// Server binding address
     #[clap(long, default_value = ADDRESS_DEFAULT)]
-    pub address: SocketAddr,
+    pub(crate) address: SocketAddr,
 
     /// Url to the postgres event db
     #[clap(long, env)]
-    pub database_url: String,
+    pub(crate) database_url: String,
 
     /// Logging level
     #[clap(long, default_value = LOG_LEVEL_DEFAULT)]
-    pub log_level: LogLevel,
+    pub(crate) log_level: LogLevel,
 }
 
 /// An environment variable read as a string.

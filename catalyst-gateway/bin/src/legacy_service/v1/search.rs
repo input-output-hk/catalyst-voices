@@ -14,7 +14,7 @@ use axum::{extract::Query, routing::post, Json, Router};
 use serde::Deserialize;
 use std::sync::Arc;
 
-pub fn search(state: Arc<State>) -> Router {
+pub(crate) fn search(state: Arc<State>) -> Router {
     Router::new().route(
         "/search",
         post(move |query, body| async { handle_result(search_exec(query, body, state).await) }),

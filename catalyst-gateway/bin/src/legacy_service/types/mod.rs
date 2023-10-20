@@ -2,19 +2,19 @@ use chrono::{DateTime, Utc};
 use serde::Serializer;
 use std::ops::Deref;
 
-pub mod ballot;
-pub mod event;
-pub mod objective;
-pub mod proposal;
-pub mod registration;
-pub mod review;
-pub mod search;
-pub mod voting_status;
+pub(crate) mod ballot;
+pub(crate) mod event;
+pub(crate) mod objective;
+pub(crate) mod proposal;
+pub(crate) mod registration;
+pub(crate) mod review;
+pub(crate) mod search;
+pub(crate) mod voting_status;
 // DEPRECATED, added as a backward compatibility with the VIT-SS
-pub mod vit_ss;
+pub(crate) mod vit_ss;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct SerdeType<T>(pub T);
+pub(crate) struct SerdeType<T>(pub(crate) T);
 
 impl<T> From<T> for SerdeType<T> {
     fn from(val: T) -> Self {
@@ -29,14 +29,14 @@ impl<T> Deref for SerdeType<T> {
     }
 }
 
-pub fn serialize_datetime_as_rfc3339<S: Serializer>(
+pub(crate) fn serialize_datetime_as_rfc3339<S: Serializer>(
     time: &DateTime<Utc>,
     serializer: S,
 ) -> Result<S::Ok, S::Error> {
     serializer.serialize_str(&time.to_rfc3339())
 }
 
-pub fn serialize_option_datetime_as_rfc3339<S: Serializer>(
+pub(crate) fn serialize_option_datetime_as_rfc3339<S: Serializer>(
     time: &Option<DateTime<Utc>>,
     serializer: S,
 ) -> Result<S::Ok, S::Error> {

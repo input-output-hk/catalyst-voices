@@ -134,7 +134,7 @@ impl Serialize for SerdeType<&Proposal> {
         S: Serializer,
     {
         #[derive(Serialize)]
-        pub struct ProposalSerde<'a> {
+        pub(crate) struct ProposalSerde<'a> {
             #[serde(flatten)]
             summary: SerdeType<&'a ProposalSummary>,
             #[serde(flatten)]

@@ -9,14 +9,14 @@ use crate::event_db::{
 use async_trait::async_trait;
 use chrono::{NaiveDateTime, Utc};
 
-pub mod ballot;
-pub mod objective;
-pub mod proposal;
-pub mod review;
+pub(crate) mod ballot;
+pub(crate) mod objective;
+pub(crate) mod proposal;
+pub(crate) mod review;
 
 #[async_trait]
 #[allow(clippy::module_name_repetitions)]
-pub trait EventQueries: Sync + Send + 'static {
+pub(crate) trait EventQueries: Sync + Send + 'static {
     async fn get_events(
         &self,
         limit: Option<i64>,

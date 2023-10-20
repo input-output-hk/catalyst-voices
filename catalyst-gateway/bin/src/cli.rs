@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 #[derive(thiserror::Error, Debug)]
 /// All service errors
-pub enum Error {
+pub(crate) enum Error {
     #[error(transparent)]
     /// Service oriented errors
     Service(#[from] service::Error),
@@ -16,7 +16,7 @@ pub enum Error {
 #[derive(Parser)]
 #[clap(rename_all = "kebab-case")]
 /// Simple service CLI options
-pub enum Cli {
+pub(crate) enum Cli {
     /// Run the service
     Run(Settings),
 }

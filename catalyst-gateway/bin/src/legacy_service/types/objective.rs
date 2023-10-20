@@ -190,7 +190,7 @@ impl Serialize for SerdeType<&Objective> {
         S: Serializer,
     {
         #[derive(Serialize)]
-        pub struct ObjectiveSerde<'a> {
+        pub(crate) struct ObjectiveSerde<'a> {
             #[serde(flatten)]
             summary: SerdeType<&'a ObjectiveSummary>,
             #[serde(flatten)]

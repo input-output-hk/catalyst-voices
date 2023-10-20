@@ -15,7 +15,7 @@ mod ballots;
 mod proposal;
 mod review_type;
 
-pub fn objective(state: Arc<State>) -> Router {
+pub(crate) fn objective(state: Arc<State>) -> Router {
     let proposal = proposal::proposal(state.clone());
     let review_type = review_type::review_type(state.clone());
     let ballots = ballots::ballots(state.clone());

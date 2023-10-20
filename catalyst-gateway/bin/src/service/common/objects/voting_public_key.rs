@@ -5,7 +5,7 @@ use serde::Deserialize;
 
 #[derive(NewType, Deserialize)]
 #[oai(example = true)]
-pub(crate) struct VotingPublicKey(pub String);
+pub(crate) struct VotingPublicKey(pub(crate) String);
 
 impl Example for VotingPublicKey {
     fn example() -> Self {

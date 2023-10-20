@@ -11,7 +11,7 @@ use axum::{
 };
 use std::sync::Arc;
 
-pub fn review_type(state: Arc<State>) -> Router {
+pub(crate) fn review_type(state: Arc<State>) -> Router {
     Router::new().route(
         "/review_types",
         get(move |path, query| async {

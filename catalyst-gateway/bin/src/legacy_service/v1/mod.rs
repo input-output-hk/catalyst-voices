@@ -13,7 +13,7 @@ struct LimitOffset {
     offset: Option<i64>,
 }
 
-pub fn v1(state: Arc<State>) -> Router {
+pub(crate) fn v1(state: Arc<State>) -> Router {
     let registration = registration::registration(state.clone());
     let event = event::event(state.clone());
     let search = search::search(state);

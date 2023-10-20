@@ -1,1 +1,1 @@
-pub mod fund;
+pub(crate) mod fund;

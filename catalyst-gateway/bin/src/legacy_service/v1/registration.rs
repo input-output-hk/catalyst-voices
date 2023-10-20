@@ -21,7 +21,7 @@ use axum::{
 use serde::Deserialize;
 use std::sync::Arc;
 
-pub fn registration(state: Arc<State>) -> Router {
+pub(crate) fn registration(state: Arc<State>) -> Router {
     Router::new()
         .route(
             "/registration/voter/:voting_key",

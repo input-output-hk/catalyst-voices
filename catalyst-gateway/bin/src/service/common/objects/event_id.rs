@@ -6,7 +6,7 @@ use serde::Deserialize;
 /// The Numeric ID of a Voting Event
 #[derive(NewType, Deserialize)]
 #[oai(example = true)]
-pub(crate) struct EventId(pub i32);
+pub(crate) struct EventId(pub(crate) i32);
 
 impl Example for EventId {
     fn example() -> Self {

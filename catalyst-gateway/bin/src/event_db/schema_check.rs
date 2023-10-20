@@ -4,7 +4,7 @@ use async_trait::async_trait;
 
 /// Trait to check the schema version of a connection.
 #[async_trait]
-pub trait SchemaVersion {
+pub(crate) trait SchemaVersion {
     /// Check the schema version.
     /// return the current schema version if its current.
     /// Otherwise return an error.

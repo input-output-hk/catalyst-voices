@@ -16,7 +16,7 @@ pub(crate) mod types;
 mod v0;
 mod v1;
 
-pub fn app(state: Arc<State>) -> Router {
+pub(crate) fn app(state: Arc<State>) -> Router {
     // build our application with a route
     let v0 = v0::v0(state.clone());
     let v1 = v1::v1(state);
@@ -55,7 +55,7 @@ async fn run_service(app: Router, addr: &SocketAddr, name: &str) -> Result<(), E
 /// `Error::CannotRunService` - cannot run the service
 /// `Error::EventDbError` - cannot connect to the event db
 /// `Error::IoError` - An IO error has occurred.
-pub async fn run(service_addr: &SocketAddr, state: Arc<State>) -> Result<(), Error> {
+pub(crate) async fn run(service_addr: &SocketAddr, state: Arc<State>) -> Result<(), Error> {
     let cors = cors_layer();
 
     let service_app = app(state).layer(cors);
@@ -79,11 +79,11 @@ fn handle_result<T: Serialize>(res: Result<T, Error>) -> Response {
 }
 
 #[cfg(test)]
-pub mod tests {
+pub(crate) mod tests {
     use axum::body::HttpBody;
     use std::str::FromStr;
 
-    pub async fn response_body_to_json<
+    pub(crate) async fn response_body_to_json<
         T: HttpBody<Data = impl Into<Vec<u8>>, Error = axum::Error> + Unpin,
     >(
         response: axum::response::Response<T>,

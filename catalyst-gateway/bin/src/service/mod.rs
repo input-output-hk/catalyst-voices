@@ -18,7 +18,7 @@ mod poem_service;
 mod utilities;
 
 #[derive(thiserror::Error, Debug)]
-pub enum Error {
+pub(crate) enum Error {
     #[error("Cannot run service, error: {0}")]
     CannotRunService(String),
     #[error(transparent)]
@@ -28,12 +28,12 @@ pub enum Error {
 }
 
 #[derive(Serialize, Debug)]
-pub struct ErrorMessage {
+pub(crate) struct ErrorMessage {
     error: String,
 }
 
 impl ErrorMessage {
-    pub fn new(error: String) -> Self {
+    pub(crate) fn new(error: String) -> Self {
         Self { error }
     }
 }
@@ -54,7 +54,7 @@ impl ErrorMessage {
 /// `Error::CannotRunService` - cannot run the service
 /// `Error::EventDbError` - cannot connect to the event db
 /// `Error::IoError` - An IO error has occurred.
-pub async fn run(service_addr: &SocketAddr, state: Arc<State>) -> Result<(), Error> {
+pub(crate) async fn run(service_addr: &SocketAddr, state: Arc<State>) -> Result<(), Error> {
     // Create service addresses to be used during poem migration.
     // Service address is same as official address but +1 to the port.
     let mut legacy_service = *service_addr;

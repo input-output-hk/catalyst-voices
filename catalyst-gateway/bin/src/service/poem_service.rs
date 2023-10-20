@@ -64,7 +64,7 @@ pub(crate) fn mk_app(
 /// * `Error::EventDbError` - cannot connect to the event db
 /// * `Error::IoError` - An IO error has occurred.
 ///
-pub async fn run(addr: &SocketAddr, state: Arc<State>) -> Result<(), Error> {
+pub(crate) async fn run(addr: &SocketAddr, state: Arc<State>) -> Result<(), Error> {
     tracing::info!("Starting Poem Service ...");
     tracing::info!("Listening on {addr}");
 
@@ -85,11 +85,11 @@ pub async fn run(addr: &SocketAddr, state: Arc<State>) -> Result<(), Error> {
 }
 
 #[cfg(test)]
-pub mod tests {
+pub(crate) mod tests {
     use super::*;
     use poem::test::TestClient;
 
-    pub fn mk_test_app(state: &Arc<State>) -> TestClient<impl Endpoint> {
+    pub(crate) fn mk_test_app(state: &Arc<State>) -> TestClient<impl Endpoint> {
         let app = mk_app(vec![], None, state);
         TestClient::new(app)
     }

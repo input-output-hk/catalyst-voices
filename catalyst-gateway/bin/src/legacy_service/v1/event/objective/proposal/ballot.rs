@@ -9,7 +9,7 @@ use crate::{
 use axum::{extract::Path, routing::get, Router};
 use std::sync::Arc;
 
-pub fn ballot(state: Arc<State>) -> Router {
+pub(crate) fn ballot(state: Arc<State>) -> Router {
     Router::new().route(
         "/ballot",
         get(move |path| async { handle_result(ballot_exec(path, state).await) }),
