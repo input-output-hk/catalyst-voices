@@ -1,5 +1,7 @@
 //! Main entrypoint to the Legacy AXUM version of the service
+//! This whole module is deprecated, so don;t worry if its not documented how we would like.
 //!
+#![allow(clippy::missing_docs_in_private_items)]
 use crate::service::{Error, ErrorMessage};
 use crate::state::State;
 use axum::{
