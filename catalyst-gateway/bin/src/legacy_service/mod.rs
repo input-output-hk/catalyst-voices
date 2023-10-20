@@ -3,14 +3,12 @@
 use crate::service::{Error, ErrorMessage};
 use crate::state::State;
 use axum::{
-    extract::MatchedPath,
-    http::{Method, Request, StatusCode},
-    middleware::Next,
+    http::{Method, StatusCode},
     response::{IntoResponse, Response},
     Json, Router,
 };
 use serde::Serialize;
-use std::{net::SocketAddr, sync::Arc, time::Instant};
+use std::{net::SocketAddr, sync::Arc};
 use tower_http::cors::{Any, CorsLayer};
 
 mod health;
