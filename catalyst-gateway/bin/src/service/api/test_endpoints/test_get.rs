@@ -43,7 +43,7 @@ pub(crate) enum Animals {
 /// * 204 No Content - Service is OK and can keep running.
 /// * 500 Server Error - If anything within this function fails unexpectedly. (Possible but unlikely)
 /// * 503 Service Unavailable - Service is possibly not running reliably.
-#[allow(clippy::unused_async)]
+#[allow(clippy::unused_async, clippy::panic)]
 pub(crate) async fn endpoint(
     _state: Arc<State>,
     id: i32,
@@ -61,6 +61,7 @@ pub(crate) async fn endpoint(
             T503(ServiceUnavailable)
         }
         20 => {
+            // Intentional panic for testing purposes - Allowed above.
             panic!("id: {id:?}, action: {action:?}");
         }
         _ => T204(NoContent),
