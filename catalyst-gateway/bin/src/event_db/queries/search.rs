@@ -1,3 +1,4 @@
+//! Search Queries
 use crate::event_db::{
     types::{
         search::{
@@ -17,6 +18,7 @@ use chrono::{NaiveDateTime, Utc};
 
 #[async_trait]
 #[allow(clippy::module_name_repetitions)]
+/// Search Queries Trait
 pub(crate) trait SearchQueries: Sync + Send + 'static {
     async fn search(
         &self,
@@ -28,20 +30,24 @@ pub(crate) trait SearchQueries: Sync + Send + 'static {
 }
 
 impl EventDB {
+    /// Search for events query template
     const SEARCH_EVENTS_QUERY: &'static str =
         "SELECT event.row_id, event.name, event.start_time, event.end_time, snapshot.last_updated
         FROM event
         LEFT JOIN snapshot ON event.row_id = snapshot.event";
 
+    /// Search for objectives query template
     const SEARCH_OBJECTIVES_QUERY: &'static str =
         "SELECT objective.id, objective.title, objective.description, objective.deleted, objective_category.name, objective_category.description as objective_category_description
         FROM objective
         INNER JOIN objective_category on objective.category = objective_category.name";
 
+    /// Search for proposals query template
     const SEARCH_PROPOSALS_QUERY: &'static str =
         "SELECT DISTINCT proposal.id, proposal.title, proposal.summary, proposal.deleted
         FROM proposal";
 
+    /// Build a where clause
     fn build_where_clause(table: &str, filter: &[SearchConstraint]) -> String {
         let mut where_clause = String::new();
         let mut filter_iter = filter.iter();
@@ -70,6 +76,7 @@ impl EventDB {
         where_clause
     }
 
+    /// Build an order by clause
     fn build_order_by_clause(table: &str, order_by: &[SearchOrderBy]) -> String {
         let mut order_by_clause = String::new();
         let mut order_by_iter = order_by.iter();
@@ -100,6 +107,7 @@ impl EventDB {
         order_by_clause
     }
 
+    /// Construct a search query
     fn construct_query(search_query: &SearchQuery) -> String {
         let (query, table) = match search_query.table {
             SearchTable::Events => (Self::SEARCH_EVENTS_QUERY, "event"),
@@ -114,6 +122,7 @@ impl EventDB {
         )
     }
 
+    /// Construct a count query
     fn construct_count_query(search_query: &SearchQuery) -> String {
         let (query, table) = match search_query.table {
             SearchTable::Events => (Self::SEARCH_EVENTS_QUERY, "event"),
@@ -127,6 +136,7 @@ impl EventDB {
         )
     }
 
+    /// Search for a total.
     async fn search_total(
         &self,
         search_query: SearchQuery,
@@ -152,6 +162,7 @@ impl EventDB {
         })
     }
 
+    /// Search for events
     async fn search_events(
         &self,
         search_query: SearchQuery,
@@ -193,6 +204,7 @@ impl EventDB {
         })
     }
 
+    /// Search for objectives
     async fn search_objectives(
         &self,
         search_query: SearchQuery,
@@ -229,6 +241,7 @@ impl EventDB {
         })
     }
 
+    /// Search for proposals
     async fn search_proposals(
         &self,
         search_query: SearchQuery,

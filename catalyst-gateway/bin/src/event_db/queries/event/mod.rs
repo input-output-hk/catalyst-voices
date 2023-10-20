@@ -1,3 +1,5 @@
+//! Event Queries
+//!
 use crate::event_db::{
     error::Error,
     types::event::{

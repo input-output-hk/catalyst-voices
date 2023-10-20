@@ -1,3 +1,5 @@
+//! Registration Queries
+//!
 use crate::event_db::{
     types::{
         event::EventId,
@@ -10,6 +12,7 @@ use chrono::{NaiveDateTime, Utc};
 
 #[async_trait]
 #[allow(clippy::module_name_repetitions)]
+/// Registration Queries Trait
 pub(crate) trait RegistrationQueries: Sync + Send + 'static {
     async fn get_voter(
         &self,
@@ -25,6 +28,7 @@ pub(crate) trait RegistrationQueries: Sync + Send + 'static {
 }
 
 impl EventDB {
+    /// Voter By Event Query template
     const VOTER_BY_EVENT_QUERY: &'static str = "SELECT voter.voting_key, voter.voting_group, voter.voting_power, snapshot.as_at, snapshot.last_updated, snapshot.final, SUM(contribution.value)::BIGINT as delegations_power, COUNT(contribution.value) AS delegations_count
                                             FROM voter
                                             INNER JOIN snapshot ON voter.snapshot_id = snapshot.row_id
@@ -32,51 +36,59 @@ impl EventDB {
                                             WHERE voter.voting_key = $1 AND contribution.voting_key = $1 AND snapshot.event = $2
                                             GROUP BY voter.voting_key, voter.voting_group, voter.voting_power, snapshot.as_at, snapshot.last_updated, snapshot.final;";
 
+    /// Voter By Last Event Query template
     const VOTER_BY_LAST_EVENT_QUERY: &'static str = "SELECT snapshot.event, voter.voting_key, voter.voting_group, voter.voting_power, snapshot.as_at, snapshot.last_updated, snapshot.final, SUM(contribution.value)::BIGINT as delegations_power, COUNT(contribution.value) AS delegations_count
                                                 FROM voter
                                                 INNER JOIN snapshot ON voter.snapshot_id = snapshot.row_id
                                                 INNER JOIN contribution ON contribution.snapshot_id = snapshot.row_id
                                                 WHERE voter.voting_key = $1 AND contribution.voting_key = $1 AND snapshot.last_updated = (SELECT MAX(snapshot.last_updated) as last_updated from snapshot)
                                                 GROUP BY snapshot.event, voter.voting_key, voter.voting_group, voter.voting_power, snapshot.as_at, snapshot.last_updated, snapshot.final;";
-
+    /// Voter Delegators List Query template
     const VOTER_DELEGATORS_LIST_QUERY: &'static str = "SELECT contribution.stake_public_key
                                                 FROM contribution
                                                 INNER JOIN snapshot ON contribution.snapshot_id = snapshot.row_id
                                                 WHERE contribution.voting_key = $1 AND snapshot.event = $2;";
 
+    /// Total By Event Query template
     const TOTAL_BY_EVENT_VOTING_QUERY: &'static str =
         "SELECT SUM(voter.voting_power)::BIGINT as total_voting_power
         FROM voter
         INNER JOIN snapshot ON voter.snapshot_id = snapshot.row_id
         WHERE voter.voting_group = $1 AND snapshot.event = $2;";
 
+    /// Total By Last Event Query template
     const TOTAL_BY_LAST_EVENT_VOTING_QUERY: &'static str =
         "SELECT SUM(voter.voting_power)::BIGINT as total_voting_power
         FROM voter
         INNER JOIN snapshot ON voter.snapshot_id = snapshot.row_id AND snapshot.last_updated = (SELECT MAX(snapshot.last_updated) as last_updated from snapshot)
         WHERE voter.voting_group = $1;";
 
+    /// Delegator snapshot info by event query template
     const DELEGATOR_SNAPSHOT_INFO_BY_EVENT_QUERY: &'static str = "
                                                 SELECT snapshot.as_at, snapshot.last_updated, snapshot.final
                                                 FROM snapshot
                                                 WHERE snapshot.event = $1
                                                 LIMIT 1;";
 
+    /// Delegator snapshot info by last event query template
     const DELEGATOR_SNAPSHOT_INFO_BY_LAST_EVENT_QUERY: &'static str = "SELECT snapshot.event, snapshot.as_at, snapshot.last_updated, snapshot.final
                                                 FROM snapshot
                                                 WHERE snapshot.last_updated = (SELECT MAX(snapshot.last_updated) as last_updated from snapshot)
                                                 LIMIT 1;";
 
+    /// Delegations by event query template
     const DELEGATIONS_BY_EVENT_QUERY: &'static str = "SELECT contribution.voting_key, contribution.voting_group, contribution.voting_weight, contribution.value, contribution.reward_address
                                                 FROM contribution
                                                 INNER JOIN snapshot ON contribution.snapshot_id = snapshot.row_id
                                                 WHERE contribution.stake_public_key = $1 AND snapshot.event = $2;";
 
+    /// Total voting power by event query template
     const TOTAL_POWER_BY_EVENT_QUERY: &'static str = "SELECT SUM(voter.voting_power)::BIGINT as total_voting_power
                                                 FROM voter
                                                 INNER JOIN snapshot ON voter.snapshot_id = snapshot.row_id
                                                 WHERE snapshot.event = $1;";
 
+    /// Total voting power by last event query template
     const TOTAL_POWER_BY_LAST_EVENT_QUERY: &'static str = "SELECT SUM(voter.voting_power)::BIGINT as total_voting_power
                                                 FROM voter
                                                 INNER JOIN snapshot ON voter.snapshot_id = snapshot.row_id

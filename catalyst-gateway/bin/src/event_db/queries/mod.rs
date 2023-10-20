@@ -1,3 +1,4 @@
+//! Database Queries
 use self::{
     event::{
         ballot::BallotQueries, objective::ObjectiveQueries, proposal::ProposalQueries,
@@ -15,6 +16,7 @@ pub(crate) mod search;
 pub(crate) mod vit_ss;
 
 #[allow(clippy::module_name_repetitions)]
+/// Event DB Queries Trait
 pub(crate) trait EventDbQueries:
     RegistrationQueries
     + EventQueries
