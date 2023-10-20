@@ -17,10 +17,10 @@ pub enum Cli {
 }
 
 impl Cli {
-    pub async fn exec(self) -> Result<(), Error> {
+    pub async fn exec(self) -> Result<(), Box<dyn std::error::Error>> {
         match self {
             Self::Run(settings) => {
-                logger::init(settings.log_level).unwrap();
+                logger::init(settings.log_level)?;
 
                 let state = Arc::new(State::new(Some(settings.database_url)).await?);
                 service::run(&settings.address, &settings.metrics_address, state).await?;
