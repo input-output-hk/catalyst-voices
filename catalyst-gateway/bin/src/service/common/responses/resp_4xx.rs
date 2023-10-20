@@ -7,6 +7,7 @@ use poem_openapi::payload::{Payload, PlainText};
 
 #[derive(OneResponse)]
 #[oai(status = 400)]
+/// ## Bad Request
 pub(crate) struct BadRequest<T: IntoResponse + Payload>(T);
 
 #[derive(OneResponse)]
@@ -17,10 +18,12 @@ pub(crate) struct ApiValidationError(PlainText<String>);
 
 #[derive(OneResponse)]
 #[oai(status = 401)]
+/// ## Unauthorized
 pub(crate) struct Unauthorized;
 
 #[derive(OneResponse)]
 #[oai(status = 403)]
+/// ## Forbidden
 pub(crate) struct Forbidden;
 
 #[derive(OneResponse)]
@@ -30,10 +33,12 @@ pub(crate) struct NotFound;
 
 #[derive(OneResponse)]
 #[oai(status = 405)]
+/// ## Method not allowed
 pub(crate) struct MethodNotAllowed;
 
 #[derive(OneResponse)]
 #[oai(status = 406)]
+/// ## Not acceptable
 pub(crate) struct NotAcceptable;
 
 #[derive(OneResponse)]
