@@ -126,6 +126,142 @@ impl EventDB {
             Self::build_where_clause(table, &search_query.filter),
         )
     }
+
+    async fn search_total(
+        &self,
+        search_query: SearchQuery,
+        limit: Option<i64>,
+        offset: Option<i64>,
+    ) -> Result<SearchResult, Error> {
+        let conn = self.pool.get().await?;
+
+        let rows: Vec<tokio_postgres::Row> = conn
+            .query(
+                &Self::construct_count_query(&search_query),
+                &[&limit, &offset.unwrap_or(0)],
+            )
+            .await
+            .map_err(|e| Error::NotFound(e.to_string()))?;
+        let row = rows
+            .get(0)
+            .ok_or_else(|| Error::NotFound("can not get row".to_string()))?;
+
+        Ok(SearchResult {
+            total: row.try_get("total")?,
+            results: None,
+        })
+    }
+
+    async fn search_events(
+        &self,
+        search_query: SearchQuery,
+        limit: Option<i64>,
+        offset: Option<i64>,
+    ) -> Result<SearchResult, Error> {
+        let conn = self.pool.get().await?;
+        let rows: Vec<tokio_postgres::Row> = conn
+            .query(
+                &Self::construct_query(&search_query),
+                &[&limit, &offset.unwrap_or(0)],
+            )
+            .await
+            .map_err(|e| Error::NotFound(e.to_string()))?;
+
+        let mut events = Vec::new();
+        for row in rows {
+            let ends = row
+                .try_get::<&'static str, Option<NaiveDateTime>>("end_time")?
+                .map(|val| val.and_local_timezone(Utc).unwrap());
+            let is_final = ends.map_or(false, |ends| Utc::now() > ends);
+            events.push(EventSummary {
+                id: EventId(row.try_get("row_id")?),
+                name: row.try_get("name")?,
+                starts: row
+                    .try_get::<&'static str, Option<NaiveDateTime>>("start_time")?
+                    .map(|val| val.and_local_timezone(Utc).unwrap()),
+                reg_checked: row
+                    .try_get::<&'static str, Option<NaiveDateTime>>("last_updated")?
+                    .map(|val| val.and_local_timezone(Utc).unwrap()),
+                ends,
+                is_final,
+            });
+        }
+
+        Ok(SearchResult {
+            total: events.len() as i64,
+            results: Some(ValueResults::Events(events)),
+        })
+    }
+
+    async fn search_objectives(
+        &self,
+        search_query: SearchQuery,
+        limit: Option<i64>,
+        offset: Option<i64>,
+    ) -> Result<SearchResult, Error> {
+        let conn = self.pool.get().await?;
+        let rows: Vec<tokio_postgres::Row> = conn
+            .query(
+                &Self::construct_query(&search_query),
+                &[&limit, &offset.unwrap_or(0)],
+            )
+            .await
+            .map_err(|e| Error::NotFound(e.to_string()))?;
+
+        let mut objectives = Vec::new();
+        for row in rows {
+            let objective = ObjectiveSummary {
+                id: ObjectiveId(row.try_get("id")?),
+                objective_type: ObjectiveType {
+                    id: row.try_get("name")?,
+                    description: row.try_get("objective_category_description")?,
+                },
+                title: row.try_get("title")?,
+                description: row.try_get("description")?,
+                deleted: row.try_get("deleted")?,
+            };
+            objectives.push(objective);
+        }
+
+        Ok(SearchResult {
+            total: objectives.len() as i64,
+            results: Some(ValueResults::Objectives(objectives)),
+        })
+    }
+
+    async fn search_proposals(
+        &self,
+        search_query: SearchQuery,
+        limit: Option<i64>,
+        offset: Option<i64>,
+    ) -> Result<SearchResult, Error> {
+        let conn = self.pool.get().await?;
+
+        let rows: Vec<tokio_postgres::Row> = conn
+            .query(
+                &Self::construct_query(&search_query),
+                &[&limit, &offset.unwrap_or(0)],
+            )
+            .await
+            .map_err(|e| Error::NotFound(e.to_string()))?;
+
+        let mut proposals = Vec::new();
+        for row in rows {
+            let summary = ProposalSummary {
+                id: ProposalId(row.try_get("id")?),
+                title: row.try_get("title")?,
+                summary: row.try_get("summary")?,
+                deleted: row.try_get("deleted")?,
+            };
+
+            proposals.push(summary);
+        }
+
+        Ok(SearchResult {
+            total: proposals.len() as i64,
+            results: Some(ValueResults::Proposals(proposals)),
+        })
+    }
 }
 
 #[async_trait]
@@ -137,113 +273,15 @@ impl SearchQueries for EventDB {
         limit: Option<i64>,
         offset: Option<i64>,
     ) -> Result<SearchResult, Error> {
-        let conn = self.pool.get().await?;
-
         if total {
-            let rows: Vec<tokio_postgres::Row> = conn
-                .query(
-                    &Self::construct_count_query(&search_query),
-                    &[&limit, &offset.unwrap_or(0)],
-                )
-                .await
-                .map_err(|e| Error::NotFound(e.to_string()))?;
-            let row = rows.get(0).unwrap();
-
-            Ok(SearchResult {
-                total: row.try_get("total")?,
-                results: None,
-            })
+            self.search_total(search_query, limit, offset).await
         } else {
             match search_query.table {
-                SearchTable::Events => {
-                    let rows: Vec<tokio_postgres::Row> = conn
-                        .query(
-                            &Self::construct_query(&search_query),
-                            &[&limit, &offset.unwrap_or(0)],
-                        )
-                        .await
-                        .map_err(|e| Error::NotFound(e.to_string()))?;
-
-                    let mut events = Vec::new();
-                    for row in rows {
-                        let ends = row
-                            .try_get::<&'static str, Option<NaiveDateTime>>("end_time")?
-                            .map(|val| val.and_local_timezone(Utc).unwrap());
-                        let is_final = ends.map_or(false, |ends| Utc::now() > ends);
-                        events.push(EventSummary {
-                            id: EventId(row.try_get("row_id")?),
-                            name: row.try_get("name")?,
-                            starts: row
-                                .try_get::<&'static str, Option<NaiveDateTime>>("start_time")?
-                                .map(|val| val.and_local_timezone(Utc).unwrap()),
-                            reg_checked: row
-                                .try_get::<&'static str, Option<NaiveDateTime>>("last_updated")?
-                                .map(|val| val.and_local_timezone(Utc).unwrap()),
-                            ends,
-                            is_final,
-                        });
-                    }
-
-                    Ok(SearchResult {
-                        total: events.len() as i64,
-                        results: Some(ValueResults::Events(events)),
-                    })
-                }
+                SearchTable::Events => self.search_events(search_query, limit, offset).await,
                 SearchTable::Objectives => {
-                    let rows: Vec<tokio_postgres::Row> = conn
-                        .query(
-                            &Self::construct_query(&search_query),
-                            &[&limit, &offset.unwrap_or(0)],
-                        )
-                        .await
-                        .map_err(|e| Error::NotFound(e.to_string()))?;
-
-                    let mut objectives = Vec::new();
-                    for row in rows {
-                        let objective = ObjectiveSummary {
-                            id: ObjectiveId(row.try_get("id")?),
-                            objective_type: ObjectiveType {
-                                id: row.try_get("name")?,
-                                description: row.try_get("objective_category_description")?,
-                            },
-                            title: row.try_get("title")?,
-                            description: row.try_get("description")?,
-                            deleted: row.try_get("deleted")?,
-                        };
-                        objectives.push(objective);
-                    }
-
-                    Ok(SearchResult {
-                        total: objectives.len() as i64,
-                        results: Some(ValueResults::Objectives(objectives)),
-                    })
+                    self.search_objectives(search_query, limit, offset).await
                 }
-                SearchTable::Proposals => {
-                    let rows: Vec<tokio_postgres::Row> = conn
-                        .query(
-                            &Self::construct_query(&search_query),
-                            &[&limit, &offset.unwrap_or(0)],
-                        )
-                        .await
-                        .map_err(|e| Error::NotFound(e.to_string()))?;
-
-                    let mut proposals = Vec::new();
-                    for row in rows {
-                        let summary = ProposalSummary {
-                            id: ProposalId(row.try_get("id")?),
-                            title: row.try_get("title")?,
-                            summary: row.try_get("summary")?,
-                            deleted: row.try_get("deleted")?,
-                        };
-
-                        proposals.push(summary);
-                    }
-
-                    Ok(SearchResult {
-                        total: proposals.len() as i64,
-                        results: Some(ValueResults::Proposals(proposals)),
-                    })
-                }
+                SearchTable::Proposals => self.search_proposals(search_query, limit, offset).await,
             }
         }
     }
