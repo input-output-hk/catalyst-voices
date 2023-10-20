@@ -19,7 +19,6 @@ tracing-subscriber = "0.3.16"
 
 serde = "1.0"
 serde_json = "1.0"
-serde_with = "3"
 
 axum = "0.6.9"
 
@@ -28,18 +27,13 @@ poem-openapi = "3.0.4"
 poem-extensions = "0.7.2"
 
 metrics = "0.21.1"
-metrics-exporter-prometheus = "0.12.1"
-opentelemetry-prometheus = "0.13"
-opentelemetry = "0.20.0"
 prometheus = "0.13.0"
 cryptoxide = "0.4.4"
 uuid = "1"
 lazy_static = "1.4"
 panic-message = "0.3"
-regex = "1.9"
 bytes = "1.4"
 cpu-time = "1.0"
-arc-swap = "1.6"
 ulid = "1.0.1"
 rust-embed = "8"
 
