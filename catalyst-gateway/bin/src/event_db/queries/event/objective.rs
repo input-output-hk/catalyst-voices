@@ -1,3 +1,5 @@
+//! Objective Queries
+//!
 use crate::event_db::{
     error::Error,
     types::{
@@ -16,6 +18,7 @@ use async_trait::async_trait;
 
 #[async_trait]
 #[allow(clippy::module_name_repetitions)]
+/// Objective Queries Trait
 pub(crate) trait ObjectiveQueries: Sync + Send + 'static {
     async fn get_objectives(
         &self,
@@ -26,6 +29,7 @@ pub(crate) trait ObjectiveQueries: Sync + Send + 'static {
 }
 
 impl EventDB {
+    /// Objectives query template
     const OBJECTIVES_QUERY: &'static str =
         "SELECT objective.row_id, objective.id, objective.title, objective.description, objective.deleted, objective.rewards_currency, objective.rewards_total, objective.extra,
         objective_category.name, objective_category.description as objective_category_description
@@ -34,6 +38,7 @@ impl EventDB {
         WHERE objective.event = $1
         LIMIT $2 OFFSET $3;";
 
+    /// Voting Groups query template
     const VOTING_GROUPS_QUERY: &'static str =
         "SELECT voteplan.group_id as group, voteplan.token_id as voting_token
         FROM voteplan 

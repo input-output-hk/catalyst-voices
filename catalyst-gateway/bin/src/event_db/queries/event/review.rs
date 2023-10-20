@@ -1,3 +1,5 @@
+//! Review Queries
+//!
 use crate::event_db::{
     error::Error,
     types::{
@@ -12,6 +14,7 @@ use async_trait::async_trait;
 
 #[async_trait]
 #[allow(clippy::module_name_repetitions)]
+/// Review Queries Trait
 pub(crate) trait ReviewQueries: Sync + Send + 'static {
     async fn get_reviews(
         &self,
@@ -32,6 +35,7 @@ pub(crate) trait ReviewQueries: Sync + Send + 'static {
 }
 
 impl EventDB {
+    /// Review query template
     const REVIEWS_QUERY: &'static str = "SELECT proposal_review.row_id, proposal_review.assessor
         FROM proposal_review
         INNER JOIN proposal on proposal.row_id = proposal_review.proposal_id
@@ -39,11 +43,13 @@ impl EventDB {
         WHERE objective.event = $1 AND objective.id = $2 AND proposal.id = $3
         LIMIT $4 OFFSET $5;";
 
+    /// Rating per review query template
     const RATINGS_PER_REVIEW_QUERY: &'static str =
         "SELECT review_rating.metric, review_rating.rating, review_rating.note
         FROM review_rating
         WHERE review_rating.review_id = $1;";
 
+    /// Review types query template
     const REVIEW_TYPES_QUERY: &'static str =
         "SELECT review_metric.row_id, review_metric.name, review_metric.description,
         review_metric.min, review_metric.max, review_metric.map,

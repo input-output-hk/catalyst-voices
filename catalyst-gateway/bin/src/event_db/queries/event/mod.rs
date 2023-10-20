@@ -18,6 +18,7 @@ pub(crate) mod review;
 
 #[async_trait]
 #[allow(clippy::module_name_repetitions)]
+/// Event Queries Trait
 pub(crate) trait EventQueries: Sync + Send + 'static {
     async fn get_events(
         &self,
@@ -28,6 +29,7 @@ pub(crate) trait EventQueries: Sync + Send + 'static {
 }
 
 impl EventDB {
+    /// Events query template
     const EVENTS_QUERY: &'static str =
         "SELECT event.row_id, event.name, event.start_time, event.end_time, snapshot.last_updated
         FROM event
@@ -35,6 +37,7 @@ impl EventDB {
         ORDER BY event.row_id ASC
         LIMIT $1 OFFSET $2;";
 
+    /// Event details query template
     const EVENT_QUERY: &'static str =
         "SELECT event.row_id, event.name, event.start_time, event.end_time,
         event.snapshot_start, event.registration_snapshot_time,
@@ -45,6 +48,7 @@ impl EventDB {
         LEFT JOIN snapshot ON event.row_id = snapshot.event
         WHERE event.row_id = $1;";
 
+    /// Event goals query template
     const EVENT_GOALS_QUERY: &'static str = "SELECT goal.idx, goal.name 
                                             FROM goal 
                                             WHERE goal.event_id = $1;";

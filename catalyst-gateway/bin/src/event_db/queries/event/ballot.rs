@@ -1,3 +1,4 @@
+//! Ballot Queries
 use crate::event_db::{
     error::Error,
     types::{
@@ -19,6 +20,7 @@ use std::collections::HashMap;
 
 #[async_trait]
 #[allow(clippy::module_name_repetitions)]
+/// Ballot Queries Trait
 pub(crate) trait BallotQueries: Sync + Send + 'static {
     async fn get_ballot(
         &self,
@@ -35,12 +37,14 @@ pub(crate) trait BallotQueries: Sync + Send + 'static {
 }
 
 impl EventDB {
+    /// Ballot vote options query template
     const BALLOT_VOTE_OPTIONS_QUERY: &'static str = "SELECT vote_options.objective
         FROM proposal
         INNER JOIN objective ON proposal.objective = objective.row_id
         INNER JOIN vote_options ON objective.vote_options = vote_options.id
         WHERE objective.event = $1 AND objective.id = $2 AND proposal.id = $3;";
 
+    /// Ballot vote plans query template
     const BALLOT_VOTE_PLANS_QUERY: &'static str = "SELECT proposal_voteplan.bb_proposal_index,
         voteplan.id, voteplan.category, voteplan.encryption_key, voteplan.group_id
         FROM proposal_voteplan
@@ -49,6 +53,7 @@ impl EventDB {
         INNER JOIN objective ON proposal.objective = objective.row_id
         WHERE objective.event = $1 AND objective.id = $2 AND proposal.id = $3;";
 
+    /// Ballot vote options per objective query template
     const BALLOTS_VOTE_OPTIONS_PER_OBJECTIVE_QUERY: &'static str =
         "SELECT vote_options.objective, proposal.id as proposal_id
         FROM proposal
@@ -56,6 +61,7 @@ impl EventDB {
         INNER JOIN vote_options ON objective.vote_options = vote_options.id
         WHERE objective.event = $1 AND objective.id = $2;";
 
+    /// Ballot vote options per event query template
     const BALLOTS_VOTE_OPTIONS_PER_EVENT_QUERY: &'static str =
         "SELECT vote_options.objective, proposal.id as proposal_id, objective.id as objective_id
         FROM proposal

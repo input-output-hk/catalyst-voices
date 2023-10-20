@@ -1,3 +1,5 @@
+//! Proposal Queries
+//!
 use crate::event_db::{
     error::Error,
     types::{
@@ -11,6 +13,7 @@ use async_trait::async_trait;
 
 #[async_trait]
 #[allow(clippy::module_name_repetitions)]
+/// Proposal Queries Trait
 pub(crate) trait ProposalQueries: Sync + Send + 'static {
     async fn get_proposal(
         &self,
@@ -30,6 +33,7 @@ pub(crate) trait ProposalQueries: Sync + Send + 'static {
 }
 
 impl EventDB {
+    /// Proposals query template
     const PROPOSALS_QUERY: &'static str =
         "SELECT proposal.id, proposal.title, proposal.summary, proposal.deleted
         FROM proposal
@@ -37,6 +41,7 @@ impl EventDB {
         WHERE objective.event = $1 AND objective.id = $2
         LIMIT $3 OFFSET $4;";
 
+    /// Proposal details query template
     const PROPOSAL_QUERY: &'static str =
         "SELECT proposal.id, proposal.title, proposal.summary, proposal.deleted, proposal.extra,
     proposal.funds, proposal.url, proposal.files_url,
