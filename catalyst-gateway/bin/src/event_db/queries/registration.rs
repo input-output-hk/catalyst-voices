@@ -238,10 +238,12 @@ impl RegistrationQueries for EventDB {
             .ok_or_else(|| Error::NotFound("can not find total power value".to_string()))?
             .try_get("total_voting_power")?;
 
+        #[allow(clippy::indexing_slicing)] // delegation_rows already checked to be not empty.
+        let reward_address = RewardAddress::new(delegation_rows[0].try_get("reward_address")?);
+
         Ok(Delegator {
             raw_power: delegations.iter().map(|delegation| delegation.value).sum(),
-            #[allow(clippy::indexing_slicing)] // delegation_rows already checked to be not empty.
-            reward_address: RewardAddress::new(delegation_rows[0].try_get("reward_address")?),
+            reward_address,
             as_at: delegator_snapshot_info
                 .try_get::<_, NaiveDateTime>("as_at")?
                 .and_local_timezone(Utc)
