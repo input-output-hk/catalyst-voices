@@ -24,9 +24,9 @@ pub(crate) const DATABASE_SCHEMA_VERSION: i32 = 9;
 #[allow(unused)]
 /// Connection to the Election Database
 pub(crate) struct EventDB {
-    // Internal database connection.  DO NOT MAKE PUBLIC.
-    // All database operations (queries, inserts, etc) should be constrained
-    // to this crate and should be exported with a clean data access api.
+    /// Internal database connection.  DO NOT MAKE PUBLIC.
+    /// All database operations (queries, inserts, etc) should be constrained
+    /// to this crate and should be exported with a clean data access api.
     pool: Pool<PostgresConnectionManager<NoTls>>,
 }
 

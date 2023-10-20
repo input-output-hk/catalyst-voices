@@ -1,3 +1,5 @@
+//! Database Errors
+//!
 use std::env::VarError;
 
 use bb8::RunError;
@@ -5,12 +7,21 @@ use bb8::RunError;
 /// Event database errors
 #[derive(thiserror::Error, Debug, PartialEq, Eq)]
 pub(crate) enum Error {
+    /// Schema in database does not match schema supported by the Crate.
     #[error(" Schema in database does not match schema supported by the Crate. The current schema version: {was}, the schema version we expected: {expected}")]
-    MismatchedSchema { was: i32, expected: i32 },
+    MismatchedSchema {
+        /// The current DB schema version.
+        was: i32,
+        /// The expected DB schema version.
+        expected: i32,
+    },
+    /// Cannot find this item
     #[error("Cannot find this item, error: {0}")]
     NotFound(String),
+    /// Unknown error
     #[error("error: {0}")]
     Unknown(String),
+    /// Variable error
     #[error(transparent)]
     VarError(#[from] VarError),
 }

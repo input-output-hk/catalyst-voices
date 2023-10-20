@@ -1,3 +1,4 @@
+//! DB Types
 pub(crate) mod ballot;
 pub(crate) mod event;
 pub(crate) mod objective;
