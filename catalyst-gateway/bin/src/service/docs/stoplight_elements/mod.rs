@@ -1,8 +1,12 @@
+//! Provides a `OpenAPI` UI using the Stoplight Elements interface.
 use poem::{endpoint::make_sync, web::Html, Endpoint};
 
+/// Stoplight Elements UI JavaScript
 const STOPLIGHT_UI_JS: &str = include_str!("web-components.min.js");
+/// Stoplight Elements UI CSS
 const STOPLIGHT_UI_CSS: &str = include_str!("styles.min.css");
 
+/// Stoplight Elements UI Template
 const STOPLIGHT_UI_TEMPLATE: &str = r#"
 <!doctype html>
 <html lang="en">

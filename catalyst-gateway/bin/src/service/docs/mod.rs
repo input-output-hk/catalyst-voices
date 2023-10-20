@@ -5,6 +5,7 @@ use poem::{endpoint::EmbeddedFileEndpoint, get, Route};
 use poem_openapi::{OpenApi, OpenApiService, Webhook};
 use rust_embed::RustEmbed;
 
+/// Create the documentation pages where the `OpenAPI` docs can be viewed.
 pub(crate) fn docs<T: OpenApi + 'static, W: Webhook + 'static>(
     api_service: &OpenApiService<T, W>,
 ) -> Route {
@@ -28,6 +29,7 @@ pub(crate) fn docs<T: OpenApi + 'static, W: Webhook + 'static>(
         )
 }
 
+/// Embed static files.
 #[derive(RustEmbed)]
 #[folder = "src/service/docs/files"]
 pub(crate) struct Files;
