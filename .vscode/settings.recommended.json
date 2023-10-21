@@ -46,5 +46,13 @@
   "cSpell.language": "en,en-US",
   "files.associations": {
     "Earthfile": "earthfile"
-  }
+  },
+  "rust-analyzer.linkedProjects": [
+    "./catalyst-gateway/bin/Cargo.toml"
+  ],
+  "rust-analyzer.check.overrideCommand": [
+    "bash",
+    "-c",
+    "cargo lint-vscode"
+  ]
 }

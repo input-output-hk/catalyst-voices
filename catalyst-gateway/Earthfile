@@ -1,0 +1,87 @@
+VERSION 0.7
+
+#cspell: words rustup readelf nextest testci testdocs
+
+COPY_SRC:
+    # Copy the build src using this.
+    COMMAND
+
+    # ONLY copy whats needed to build.  Not everything.
+    # Note: rust-toolchain.toml was already copied when rust was setup.
+    # Minimizing whats copied reduces needless cache misses.
+    COPY --dir bin crates Cargo.* .
+
+    COPY --dir ../+global-cargo-config/.cargo .cargo
+
+builder:
+    # The builder with all necessary tools and the correct rust versions.
+    FROM github.com/input-output-hk/catalyst-ci/earthly/rust:t1+rustup
+
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:t1+RUST_SETUP
+
+    WORKDIR /build
+
+check:
+    # Code checks which don;t need us to build it.
+    FROM +builder
+
+    DO +COPY_SRC
+
+    RUN cargo fmt --check --all; \
+        fmt_chk_failed=$?; \
+        cargo machete; \
+        unused_crate_dependency_check_failed=$?; \
+        exit $(($fmt_chk_failed || $unused_crate_dependency_check_failed))
+
+prepare-cache:
+    # THIS DOES NOT WORK RELIABLY - DO NOT USE
+    # Prepare the build cache
+    FROM +builder
+    
+    DO +COPY_SRC
+
+    RUN cargo chef prepare --recipe-path recipe.json
+    SAVE ARTIFACT recipe.json
+
+cached-builder:
+    # THIS DOES NOT WORK RELIABLY - DO NOT USE
+    # Our builder with all dependencies cached.
+    # Using cutoff-optimization to ensure cache hit
+    FROM +builder
+    COPY +prepare-cache/recipe.json ./
+    CACHE target
+    RUN cargo chef cook --release --locked --workspace -v
+
+build:
+    # Build the service
+    FROM +builder  # Note: Cached builder DOES NOT WORK and makes broken builds.
+    
+    DO +COPY_SRC
+
+    RUN cargo build --release --workspace --locked; \
+        build_failed=$?; \
+        cargo lint; \
+        lint_failed=$?; \
+        cargo docs; \
+        docs_failed=$?; \
+        exit $(($build_failed || $lint_failed || $docs_failed))
+
+    RUN ldd target/x86_64-unknown-linux-musl/release/cat-gateway
+    RUN readelf -p .comment target/x86_64-unknown-linux-musl/release/cat-gateway
+    RUN strip -v target/x86_64-unknown-linux-musl/release/cat-gateway
+
+    SAVE ARTIFACT target/x86_64-unknown-linux-musl/doc doc
+    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/cat-gateway cat-gateway
+
+test:
+    # Run rust tests.
+    FROM +build
+
+    COPY --dir .config .
+
+    # Cargo nextest creates a test artifact. TODO: Work out how to publish it (even if test run fails).
+    RUN cargo testci; \
+        testci_failed=$?; \
+        cargo testdocs; \
+        testdocs_failed=$?; \
+        exit $(($testci_failed || $testdocs_failed))

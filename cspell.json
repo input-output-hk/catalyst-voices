@@ -225,7 +225,6 @@
         "**/.gitignore",
         ".vscode/**",
         "**/.idea/**",
-        // event-db
         "*.bin",
         "*.sqlite3",
         "**/historic_data/**/*.sql",
@@ -233,7 +232,6 @@
         "**/historic_data/**/*.yaml",
         "**/historic_data/**/*.json",
         "**/test_data/**/*.sql",
-        // cat-data-service
         "styles.min.css",
         "web-components.min.js"
     ]
