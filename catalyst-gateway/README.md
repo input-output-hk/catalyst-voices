@@ -25,7 +25,9 @@ This is DB definition and data only, the actual db interface code is located at 
 
 For the rust code `x86_64-unknown-linux-musl` target has been specified inside `.cargo/config.toml` file,
 which means that in most cases it will be a cross compilation to this target.
-On some platforms this can cause some issues, so for local development as a temporary workaround specify your native target as follows:
-```
+On some platforms this can cause some issues,
+so for local development as a temporary workaround specify your native target as follows:
+
+```sh
 CARGO_BUILD_TARGET=<your-native-target> cargo build/test/clippy
-``` 
+```
