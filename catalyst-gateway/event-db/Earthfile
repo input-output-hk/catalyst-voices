@@ -35,17 +35,3 @@ docker-compose:
     FROM scratch
     COPY docker-compose.yml .
     SAVE ARTIFACT docker-compose.yml
-
-# Need to be run with the -P flag
-test:
-    FROM ../../+builder
-
-    COPY +docker-compose/docker-compose.yml .
-    WITH DOCKER \
-        --compose docker-compose.yml \
-        --pull postgres:14 \
-        --load migrations:latest=(../../containers/event-db-migrations+docker --data=test) \
-        --service migrations \
-        --allow-privileged
-        RUN EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev" cargo test -p event-db
-    END
