@@ -29,18 +29,27 @@ const CLIENT_METRIC_LABELS: [&str; 2] = ["client", "status_code"];
 
 // Prometheus Metrics maintained by the service
 lazy_static! {
-    static ref HTTP_REQ_DURATION_MS: HistogramVec = register_histogram_vec!(
-        "http_request_duration_ms",
-        "Duration of HTTP requests in milliseconds",
-        &METRIC_LABELS
-    )
-    .unwrap();
-    static ref HTTP_REQ_CPU_TIME_MS: HistogramVec = register_histogram_vec!(
-        "http_request_cpu_time_ms",
-        "CPU Time of HTTP requests in milliseconds",
-        &METRIC_LABELS
-    )
-    .unwrap();
+    #[allow(clippy::ignored_unit_patterns)]
+    static ref HTTP_REQ_DURATION_MS: HistogramVec =
+    #[allow(clippy::ignored_unit_patterns)]
+    {
+        register_histogram_vec!(
+            "http_request_duration_ms",
+            "Duration of HTTP requests in milliseconds",
+            &METRIC_LABELS
+        )
+        .unwrap()
+    };
+    static ref HTTP_REQ_CPU_TIME_MS: HistogramVec =
+    #[allow(clippy::ignored_unit_patterns)]
+    {
+        register_histogram_vec!(
+            "http_request_cpu_time_ms",
+            "CPU Time of HTTP requests in milliseconds",
+            &METRIC_LABELS
+        )
+        .unwrap()
+    };
 
     // No Tacho implemented to enable this.
     /*
@@ -52,25 +61,36 @@ lazy_static! {
     .unwrap();
     */
 
-    static ref HTTP_REQUEST_COUNT: IntCounterVec = register_int_counter_vec!(
-        "http_request_count",
-        "Number of HTTP requests",
-        &METRIC_LABELS
-    )
-    .unwrap();
-    static ref CLIENT_REQUEST_COUNT: IntCounterVec = register_int_counter_vec!(
-        "client_request_count",
-        "Number of HTTP requests per client",
-        &CLIENT_METRIC_LABELS
-    )
-    .unwrap();
-
-    static ref PANIC_REQUEST_COUNT: IntCounterVec = register_int_counter_vec!(
-        "panic_request_count",
-        "Number of HTTP requests that panicked",
-        &METRIC_LABELS
-    )
-    .unwrap();
+    static ref HTTP_REQUEST_COUNT: IntCounterVec =
+    #[allow(clippy::ignored_unit_patterns)]
+    {
+        register_int_counter_vec!(
+            "http_request_count",
+            "Number of HTTP requests",
+            &METRIC_LABELS
+        )
+        .unwrap()
+    };
+    static ref CLIENT_REQUEST_COUNT: IntCounterVec =
+    #[allow(clippy::ignored_unit_patterns)]
+    {
+        register_int_counter_vec!(
+            "client_request_count",
+            "Number of HTTP requests per client",
+            &CLIENT_METRIC_LABELS
+        )
+        .unwrap()
+    };
+    static ref PANIC_REQUEST_COUNT: IntCounterVec =
+    #[allow(clippy::ignored_unit_patterns)]
+    {
+        register_int_counter_vec!(
+            "panic_request_count",
+            "Number of HTTP requests that panicked",
+            &METRIC_LABELS
+        )
+        .unwrap()
+    };
 
     // Currently no way to get these values without reading the whole response which is BAD.
     /*

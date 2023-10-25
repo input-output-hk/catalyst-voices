@@ -69,7 +69,7 @@ impl IntoResponse for AxumResponse {
             .status(self.status)
             .version(self.version);
 
-        for (h, v) in self.headers.iter() {
+        for (h, v) in &self.headers {
             resp = resp.header(h, v);
         }
 
@@ -115,7 +115,7 @@ where
                         .version(version);
 
                     // Add all the headers from the request.
-                    for (h, v) in headers.iter() {
+                    for (h, v) in &headers {
                         request = request.header(h, v);
                     }
 

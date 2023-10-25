@@ -199,7 +199,10 @@ impl EventDB {
         }
 
         Ok(SearchResult {
-            total: events.len() as i64,
+            total: events
+                .len()
+                .try_into()
+                .map_err(|e: std::num::TryFromIntError| Error::Unknown(e.to_string()))?,
             results: Some(ValueResults::Events(events)),
         })
     }
@@ -236,7 +239,10 @@ impl EventDB {
         }
 
         Ok(SearchResult {
-            total: objectives.len() as i64,
+            total: objectives
+                .len()
+                .try_into()
+                .map_err(|e: std::num::TryFromIntError| Error::Unknown(e.to_string()))?,
             results: Some(ValueResults::Objectives(objectives)),
         })
     }
@@ -271,7 +277,10 @@ impl EventDB {
         }
 
         Ok(SearchResult {
-            total: proposals.len() as i64,
+            total: proposals
+                .len()
+                .try_into()
+                .map_err(|e: std::num::TryFromIntError| Error::Unknown(e.to_string()))?,
             results: Some(ValueResults::Proposals(proposals)),
         })
     }
