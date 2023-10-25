@@ -20,3 +20,12 @@ They are also able to be used stand-alone in other projects and can be published
 
 Defines the Postgres Catalyst Event Database that the Catalyst gateway uses for running Catalyst Events.
 This is DB definition and data only, the actual db interface code is located at `./bin/src/event-db`.
+
+### Local development
+
+For the rust code `x86_64-unknown-linux-musl` target has been specified inside `.cargo/config.toml` file,
+which means that in most cases it will be a cross compilation to this target.
+On some platforms this can cause some issues, so for local development as a temporary workaround specify your native target as follows:
+```
+CARGO_BUILD_TARGET=<your-native-target> cargo build/test/clippy
+``` 
