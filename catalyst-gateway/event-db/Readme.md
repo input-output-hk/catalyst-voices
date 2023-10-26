@@ -27,7 +27,12 @@ Run a event db docker container
 docker-compose -f catalyst-gateway/event-db/docker-compose.yml up migrations
 ```
 
-This will run postgres on port `5432`
+This will run postgres on port `5432`.
+
+To test that docker image builds fine and migrations correctly applies run
+```sh
+earthly ./catalyst-gateway/event-db+integrate
+```
 
 ## GraphQL
 
