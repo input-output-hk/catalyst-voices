@@ -4,7 +4,8 @@
   "editor.codeActionsOnSave": {
     "source.organizeImports": true,
     "source.sortMembers": true,
-    "source.fixAll": true
+    "source.fixAll": true,
+    "source.fixAll.markdownlint": true
   },
   "files.autoSave": "afterDelay",
   "editor.formatOnType": true,
@@ -54,5 +55,21 @@
     "bash",
     "-c",
     "cargo lint-vscode"
-  ]
+  ],
+  "yaml.schemas": {
+    "https://squidfunk.github.io/mkdocs-material/schema.json": "mkdocs.yml"
+  },
+  "yaml.customTags": [
+    "!ENV scalar",
+    "!ENV sequence",
+    "tag:yaml.org,2002:python/name:materialx.emoji.to_svg",
+    "tag:yaml.org,2002:python/name:materialx.emoji.twemoji",
+    "tag:yaml.org,2002:python/name:pymdownx.superfences.fence_code_format"
+  ],
+  "[markdown]": {
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": true,
+    "files.trimTrailingWhitespace": true,
+    "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+  }
 }

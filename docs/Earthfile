@@ -1,0 +1,17 @@
+# Set the Earthly version to 0.7
+VERSION 0.7
+FROM debian:stable-slim
+
+#mkdocs-material:
+    #BUILD  github.com/input-output-hk/catalyst-ci/earthly/docs:t1+mkdocs-material
+
+build:
+    # Build the site (UDC creates the container itself.)
+    DO github.com/input-output-hk/catalyst-ci/earthly/docs:t1+MKDOCS_BUILD --src=. --extra_files=""../+repo-docs/repo"
+
+    SAVE ARTIFACT /docs/site
+
+local-build:
+    FROM +build
+
+    SAVE ARTIFACT /docs/site AS LOCAL site
