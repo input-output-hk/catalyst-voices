@@ -90,7 +90,7 @@ docker-compose:
     SAVE ARTIFACT docker-compose.yml
 
 # Need to be run with the -P flag
-check:
+integrate:
     FROM python:3.11-slim-bullseye
 
     # Add psql
