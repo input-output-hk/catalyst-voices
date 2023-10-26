@@ -1,5 +1,11 @@
 # Catalyst Data Gateway
 
+* [Catalyst Data Gateway](#catalyst-data-gateway)
+  * [Code Organization](#code-organization)
+    * [`./bin`](#bin)
+    * [`./crates`](#crates)
+    * [`./event-db`](#event-db)
+
 The Catalyst Data Gateway is the backend of the Catalyst Voices hosted stack.
 
 It provides the backend data infrastructure to the catalyst central databases.
