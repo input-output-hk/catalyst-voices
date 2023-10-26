@@ -15,9 +15,9 @@ COPY_SRC:
 
 builder:
     # The builder with all necessary tools and the correct rust versions.
-    FROM github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.1+rustup
+    FROM github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.2+rustup
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.1+RUST_SETUP
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.2+RUST_SETUP
 
     WORKDIR /build
 

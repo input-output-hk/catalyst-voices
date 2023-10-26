@@ -10,21 +10,21 @@ Prepare a event-db docker image with the historic data
 (from the root directory)
 
 ```sh
-earthly ./containers/event-db-migrations+docker
+earthly ./catalyst-gateway/event-db+docker
 ```
 
 Prepare a event-db docker image with the test data
 (from the root directory)
 
 ```sh
-earthly ./containers/event-db-migrations+docker --data=test
+earthly ./catalyst-gateway/event-db+docker --data=test
 ```
 
 Run a event db docker container
 (from the root directory)
 
 ```sh
-docker-compose -f src/event-db/docker-compose.yml up migrations
+docker-compose -f catalyst-gateway/event-db/docker-compose.yml up migrations
 ```
 
 This will run postgres on port `5432`

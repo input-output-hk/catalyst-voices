@@ -31,6 +31,51 @@ build:
     SAVE ARTIFACT test_data # Save the test_data directory as an artifact
     SAVE ARTIFACT stage_data # Save the stage_data directory as an artifact
 
+docker:
+    FROM ../+builder
+    ARG tag="latest"
+    ARG registry
+    ARG data="historic"
+
+    WORKDIR /eventdb
+
+    # Add psql
+    RUN apt-get update && apt-get install -y --no-install-recommends \
+        wget \
+         gnupg2 \
+         ca-certificates \
+         lsb-release \
+         apt-transport-https \
+         && rm -rf /var/lib/apt/lists/* && \
+         wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+         echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
+         apt-get update && \
+         apt-get install -y --no-install-recommends postgresql-14 && \
+         apt-get remove -y wget gnupg2 lsb-release apt-transport-https && \
+         apt-get autoremove -y && \
+         apt-get clean && rm -rf /var/lib/apt/lists/*
+
+    # Add migrations
+    COPY --dir +build/setup ./setup
+    COPY --dir +build/migrations ./migrations
+    IF [ "$data" = "historic" ]
+        COPY --dir +build/historic_data ./historic_data
+    ELSE IF [ "$data" = "test" ]
+        COPY --dir +build/test_data ./test_data
+    END
+    COPY +build/refinery.toml .
+    COPY +build/stage_data ./stage_data
+
+    VOLUME /eventdb/tmp
+    COPY ./entry.sh .
+    RUN chmod ugo+x ./entry.sh
+
+    ENTRYPOINT ["./entry.sh"]
+
+    # Push the container...
+    SAVE IMAGE --push ${registry}migrations:$tag
+
+
 docker-compose:
     FROM scratch
     COPY docker-compose.yml .

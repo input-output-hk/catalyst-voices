@@ -27,9 +27,6 @@ services:
       - DB_SUPERUSER_PASSWORD=postgres
       - DB_USER=catalyst-event-dev
       - DB_USER_PASSWORD=CHANGE_ME
-      - ADMIN_ROLE_PASSWORD=CHANGE_ME
-      - ADMIN_USER_PASSWORD=CHANGE_ME
-      - ANON_ROLE_PASSWORD=CHANGE_ME
       - STAGE=dev
     depends_on:
       postgres:
