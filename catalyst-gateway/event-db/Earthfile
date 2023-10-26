@@ -55,6 +55,9 @@ docker:
          apt-get autoremove -y && \
          apt-get clean && rm -rf /var/lib/apt/lists/*
 
+    # Add refinery
+    RUN cp /usr/local/cargo/bin/refinery .
+
     # Add migrations
     COPY --dir +build/setup ./setup
     COPY --dir +build/migrations ./migrations
