@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# cspell: words REINIT PGHOST PGPORT PGUSER PGPASSWORD PGDATABASE
+
 # ---------------------------------------------------------------
 # Entrypoint script for migrations container
 # ---------------------------------------------------------------
@@ -97,7 +99,7 @@ if [[ ! -f ./tmp/initialized || -n "${REINIT_EVENT_DB:-}" ]]; then
         echo ">>> Initializing event database..."
         psql "${PSQL_FLAGS}" -f ./setup/setup-db.sql \
             -v dbName="${DB_NAME}" \
-            -v dbDescription="Catalayst Event DB" \
+            -v dbDescription="Catalyst Event DB" \
             -v dbUser="${DB_USER}" \
             -v dbUserPw="${DB_USER_PASSWORD}"
     fi
