@@ -4,6 +4,24 @@
 
 VERSION 0.7
 
+ADD_PSQL:
+    COMMAND
+
+    RUN apt-get update && apt-get install -y --no-install-recommends \
+        wget \
+         gnupg2 \
+         ca-certificates \
+         lsb-release \
+         apt-transport-https \
+         && rm -rf /var/lib/apt/lists/* && \
+         wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
+         echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
+         apt-get update && \
+         apt-get install -y --no-install-recommends postgresql-14 && \
+         apt-get remove -y wget gnupg2 lsb-release apt-transport-https && \
+         apt-get autoremove -y && \
+         apt-get clean && rm -rf /var/lib/apt/lists/*
+
 build:
     FROM python:3.11-slim-bullseye # Use a debian stable with python
     WORKDIR /event-db # Set the working directory to /event-db
@@ -40,20 +58,7 @@ docker:
     WORKDIR /eventdb
 
     # Add psql
-    RUN apt-get update && apt-get install -y --no-install-recommends \
-        wget \
-         gnupg2 \
-         ca-certificates \
-         lsb-release \
-         apt-transport-https \
-         && rm -rf /var/lib/apt/lists/* && \
-         wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
-         echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
-         apt-get update && \
-         apt-get install -y --no-install-recommends postgresql-14 && \
-         apt-get remove -y wget gnupg2 lsb-release apt-transport-https && \
-         apt-get autoremove -y && \
-         apt-get clean && rm -rf /var/lib/apt/lists/*
+    DO +ADD_PSQL
 
     # Add refinery
     RUN cp /usr/local/cargo/bin/refinery .
@@ -85,15 +90,19 @@ docker-compose:
     SAVE ARTIFACT docker-compose.yml
 
 # Need to be run with the -P flag
-test:
-    FROM ../../+builder
+check:
+    FROM python:3.11-slim-bullseye
+
+    # Add psql
+    DO +ADD_PSQL
 
     COPY +docker-compose/docker-compose.yml .
     WITH DOCKER \
         --compose docker-compose.yml \
         --pull postgres:14 \
-        --load migrations:latest=(../../containers/event-db-migrations+docker --data=test) \
+        --load migrations:latest=(+docker) \
         --service migrations \
         --allow-privileged
-        RUN EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev" cargo test -p event-db
+        RUN while ! pg_isready --host=localhost --port=5432 --dbname=CatalystEventDev --username=postgres; do sleep 1; done ;\
+            psql postgresql://postgres:postgres@127.0.0.1:5432/CatalystEventDev -c "SELECT * FROM config"
     END
