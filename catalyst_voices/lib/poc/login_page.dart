@@ -14,6 +14,7 @@ abstract class _Constants {
   static const username = 'robot';
   static const password = '1234';
   static const errorMessage = 'Wrong credentials';
+  static const loginButtonText = 'Login';
 }
 
 final class _LoginPageState extends State<LoginPage> {
@@ -67,7 +68,7 @@ final class _LoginPageState extends State<LoginPage> {
                         _showError(context);
                       }
                     },
-                    child: const Text('Login'),
+                    child: const Text(_Constants.loginButtonText),
                   ),
                 ),
               ],
