@@ -9,8 +9,10 @@ use test_endpoints::TestApi;
 use v0::V0Api;
 use v1::V1Api;
 
+use self::fragments::FragmentsApi;
 use crate::settings::API_URL_PREFIX;
 
+mod fragments;
 mod health;
 mod registration;
 mod test_endpoints;
@@ -63,9 +65,26 @@ const TERMS_OF_SERVICE: &str =
 /// Create the `OpenAPI` definition
 pub(crate) fn mk_api(
     hosts: Vec<String>,
-) -> OpenApiService<(TestApi, HealthApi, RegistrationApi, V0Api, V1Api), ()> {
+) -> OpenApiService<
+    (
+        TestApi,
+        HealthApi,
+        RegistrationApi,
+        V0Api,
+        V1Api,
+        FragmentsApi,
+    ),
+    (),
+> {
     let mut service = OpenApiService::new(
-        (TestApi, HealthApi, RegistrationApi, V0Api, V1Api),
+        (
+            TestApi,
+            HealthApi,
+            RegistrationApi,
+            V0Api,
+            V1Api,
+            FragmentsApi,
+        ),
         API_TITLE,
         API_VERSION,
     )
