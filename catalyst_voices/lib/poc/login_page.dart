@@ -25,45 +25,53 @@ final class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       key: WidgetKeys.loginScreen,
       body: Center(
-        child: Card(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              TextFormField(
-                key: WidgetKeys.usernameTextController,
-                controller: usernameTextController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: _Constants.usernameLabelText,
+        child: SizedBox(
+          width: 400,
+          height: 400,
+          child: Card(
+            margin: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: TextFormField(
+                    key: WidgetKeys.usernameTextController,
+                    controller: usernameTextController,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: _Constants.usernameLabelText,
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              TextFormField(
-                key: WidgetKeys.passwordTextController,
-                controller: passwordTextController,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: _Constants.passwordLabelText,
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: TextFormField(
+                    key: WidgetKeys.passwordTextController,
+                    controller: passwordTextController,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: _Constants.passwordLabelText,
+                    ),
+                  ),
                 ),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              ElevatedButton(
-                key: WidgetKeys.loginButton,
-                onPressed: () {
-                  if (_validateCredentials()) {
-                    _navigateToHomeScreen(context);
-                  } else {
-                    _showError(context);
-                  }
-                },
-                child: const Text('Login'),
-              ),
-            ],
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: ElevatedButton(
+                    key: WidgetKeys.loginButton,
+                    onPressed: () {
+                      if (_validateCredentials()) {
+                        _navigateToHomeScreen(context);
+                      } else {
+                        _showError(context);
+                      }
+                    },
+                    child: const Text('Login'),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -85,7 +93,12 @@ final class _LoginPageState extends State<LoginPage> {
   }
 
   void _navigateToHomeScreen(BuildContext context) {
-    Navigator.of(context).pushNamed('/home-page');
+    Navigator.push(
+      context,
+      MaterialPageRoute<HomeScreen>(
+        builder: (context) => const HomeScreen(),
+      ),
+    );
   }
 
   void _showError(BuildContext context) {

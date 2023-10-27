@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/l10n/l10n.dart';
+import 'package:catalyst_voices/poc/poc.dart';
 import 'package:flutter/material.dart';
 
 final class App extends StatelessWidget {
@@ -9,16 +10,7 @@ final class App extends StatelessWidget {
     return const MaterialApp(
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      home: Scaffold(
-        body: Center(
-          child: Text(
-            'Catalyst Voices',
-            style: TextStyle(
-              fontSize: 48,
-            ),
-          ),
-        ),
-      ),
+      home: LoginPage(),
     );
   }
 }
