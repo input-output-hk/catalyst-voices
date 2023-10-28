@@ -58,7 +58,7 @@ pub(crate) async fn establish_connection(url: Option<&str>) -> Result<EventDB, E
     let database_url = match url {
         Some(url) => url.to_string(),
         // If the Database connection URL is not supplied, try and get from the env var.
-        None => std::env::var(DATABASE_URL_ENVVAR)?,
+        None => std::env::var(DATABASE_URL_ENVVAR).map_err(|_| Error::NoDatabaseUrl)?,
     };
 
     let config = tokio_postgres::config::Config::from_str(&database_url)?;

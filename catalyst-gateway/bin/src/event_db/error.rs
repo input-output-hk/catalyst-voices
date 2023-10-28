@@ -15,6 +15,9 @@ pub(crate) enum Error {
         /// The expected DB schema version.
         expected: i32,
     },
+    /// No DB URL was provided
+    #[error("DB URL is undefined")]
+    NoDatabaseUrl,
     /// Cannot find this item
     #[error("Cannot find this item, error: {0}")]
     NotFound(String),
@@ -33,7 +36,7 @@ impl From<RunError<tokio_postgres::Error>> for Error {
     fn from(val: RunError<tokio_postgres::Error>) -> Self {
         match val {
             RunError::TimedOut => Self::TimedOut,
-            _ => Self::Unknown(val.to_string()),
+            RunError::User(_) => Self::Unknown(val.to_string()),
         }
     }
 }
