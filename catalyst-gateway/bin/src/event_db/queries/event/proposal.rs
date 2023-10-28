@@ -150,7 +150,7 @@ mod tests {
 
     #[tokio::test]
     async fn get_proposal_test() {
-        let event_db = establish_connection(None).await.unwrap();
+        let event_db = establish_connection(None, true).await.unwrap();
 
         let proposal = event_db
             .get_proposal(EventId(1), ObjectiveId(1), ProposalId(10))
@@ -192,7 +192,7 @@ mod tests {
 
     #[tokio::test]
     async fn get_proposals_test() {
-        let event_db = establish_connection(None).await.unwrap();
+        let event_db = establish_connection(None, true).await.unwrap();
 
         let proposal_summary = event_db
             .get_proposals(EventId(1), ObjectiveId(1), None, None)

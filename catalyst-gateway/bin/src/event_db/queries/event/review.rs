@@ -169,7 +169,7 @@ mod tests {
 
     #[tokio::test]
     async fn get_reviews_test() {
-        let event_db = establish_connection(None).await.unwrap();
+        let event_db = establish_connection(None, true).await.unwrap();
 
         let reviews = event_db
             .get_reviews(EventId(1), ObjectiveId(1), ProposalId(10), None, None)
