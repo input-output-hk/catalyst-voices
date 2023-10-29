@@ -58,7 +58,7 @@ impl Example for RejectedFragment {
 pub(crate) struct FragmentsProcessingSummary {
     /// IDs of accepted fragments.
     accepted: Vec<FragmentId>,
-    /// Detaild information about rejected fragments.
+    /// Detailed information about rejected fragments.
     rejected: Vec<RejectedFragment>,
 }
 
