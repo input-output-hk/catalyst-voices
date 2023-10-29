@@ -4,11 +4,13 @@
 //! It however does NOT contain any processing for them, that is defined elsewhere.
 use crate::settings::API_URL_PREFIX;
 use health::HealthApi;
+use message::MessageApi;
 use poem_openapi::{ContactObject, LicenseObject, OpenApiService, ServerObject};
 use registration::RegistrationApi;
 use test_endpoints::TestApi;
 
 mod health;
+mod message;
 mod registration;
 mod test_endpoints;
 
@@ -58,9 +60,9 @@ const TERMS_OF_SERVICE: &str =
 /// Create the `OpenAPI` definition
 pub(crate) fn mk_api(
     hosts: Vec<String>,
-) -> OpenApiService<(TestApi, HealthApi, RegistrationApi), ()> {
+) -> OpenApiService<(TestApi, HealthApi, MessageApi, RegistrationApi), ()> {
     let mut service = OpenApiService::new(
-        (TestApi, HealthApi, RegistrationApi),
+        (TestApi, HealthApi, MessageApi, RegistrationApi),
         API_TITLE,
         API_VERSION,
     )
