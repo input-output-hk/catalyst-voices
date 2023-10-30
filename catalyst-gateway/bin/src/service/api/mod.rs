@@ -7,10 +7,12 @@ use health::HealthApi;
 use poem_openapi::{ContactObject, LicenseObject, OpenApiService, ServerObject};
 use registration::RegistrationApi;
 use test_endpoints::TestApi;
+use v0::V0Api;
 
 mod health;
 mod registration;
 mod test_endpoints;
+mod v0;
 
 /// The name of the API
 const API_TITLE: &str = "Catalyst Data Service";
@@ -58,9 +60,9 @@ const TERMS_OF_SERVICE: &str =
 /// Create the `OpenAPI` definition
 pub(crate) fn mk_api(
     hosts: Vec<String>,
-) -> OpenApiService<(TestApi, HealthApi, RegistrationApi), ()> {
+) -> OpenApiService<(TestApi, HealthApi, V0Api, RegistrationApi), ()> {
     let mut service = OpenApiService::new(
-        (TestApi, HealthApi, RegistrationApi),
+        (TestApi, HealthApi, V0Api, RegistrationApi),
         API_TITLE,
         API_VERSION,
     )
