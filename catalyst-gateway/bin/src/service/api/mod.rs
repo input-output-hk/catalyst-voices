@@ -4,15 +4,15 @@
 //! It however does NOT contain any processing for them, that is defined elsewhere.
 use crate::settings::API_URL_PREFIX;
 use health::HealthApi;
-use message::MessageApi;
 use poem_openapi::{ContactObject, LicenseObject, OpenApiService, ServerObject};
 use registration::RegistrationApi;
 use test_endpoints::TestApi;
+use v0::V0Api;
 
 mod health;
-mod message;
 mod registration;
 mod test_endpoints;
+mod v0;
 
 /// The name of the API
 const API_TITLE: &str = "Catalyst Data Service";
@@ -60,9 +60,9 @@ const TERMS_OF_SERVICE: &str =
 /// Create the `OpenAPI` definition
 pub(crate) fn mk_api(
     hosts: Vec<String>,
-) -> OpenApiService<(TestApi, HealthApi, MessageApi, RegistrationApi), ()> {
+) -> OpenApiService<(TestApi, HealthApi, V0Api, RegistrationApi), ()> {
     let mut service = OpenApiService::new(
-        (TestApi, HealthApi, MessageApi, RegistrationApi),
+        (TestApi, HealthApi, V0Api, RegistrationApi),
         API_TITLE,
         API_VERSION,
     )
