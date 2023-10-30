@@ -1,7 +1,7 @@
 //! Shared state used by all endpoints.
 //!
 use crate::cli::Error;
-use crate::event_db::queries::EventDbQueries;
+use crate::event_db::{establish_connection, queries::EventDbQueries};
 use std::sync::Arc;
 
 /// Global State of the service
@@ -17,11 +17,8 @@ pub(crate) struct State {
 impl State {
     /// Create a new global [`State`]
     pub(crate) async fn new(database_url: Option<String>) -> Result<Self, Error> {
-        // Get a connection to the Database.
-        let event_db = match database_url.clone() {
-            Some(url) => Arc::new(crate::event_db::establish_connection(Some(url.as_str())).await?),
-            None => Arc::new(crate::event_db::establish_connection(None).await?),
-        };
+        // Get a configured pool to the Database.
+        let event_db = Arc::new(establish_connection(database_url, false).await?);
 
         let state = Self { event_db };
 

@@ -240,7 +240,7 @@ mod tests {
 
     #[tokio::test]
     async fn get_ballot_test() {
-        let event_db = establish_connection(None).await.unwrap();
+        let event_db = establish_connection(None, true).await.unwrap();
 
         let ballot = event_db
             .get_ballot(EventId(1), ObjectiveId(1), ProposalId(10))
@@ -273,7 +273,7 @@ mod tests {
 
     #[tokio::test]
     async fn get_objective_ballots_test() {
-        let event_db = establish_connection(None).await.unwrap();
+        let event_db = establish_connection(None, true).await.unwrap();
 
         let ballots = event_db
             .get_objective_ballots(EventId(1), ObjectiveId(1))
@@ -340,7 +340,7 @@ mod tests {
 
     #[tokio::test]
     async fn get_event_ballots_test() {
-        let event_db = establish_connection(None).await.unwrap();
+        let event_db = establish_connection(None, true).await.unwrap();
 
         let ballots = event_db.get_event_ballots(EventId(1)).await.unwrap();
 

@@ -1,7 +1,9 @@
 //! Health Endpoints
 //!
-use crate::service::common::tags::ApiTags;
+use crate::{service::common::tags::ApiTags, state::State};
+use poem::web::Data;
 use poem_openapi::OpenApi;
+use std::sync::Arc;
 
 mod live_get;
 mod ready_get;
@@ -48,8 +50,8 @@ impl HealthApi {
     /// * 500 Server Error - If anything within this function fails unexpectedly.
     /// * 503 Service Unavailable - Service is not ready, requests to other
     /// endpoints should not be sent until the service becomes ready.
-    async fn ready_get(&self) -> ready_get::AllResponses {
-        ready_get::endpoint().await
+    async fn ready_get(&self, state: Data<&Arc<State>>) -> ready_get::AllResponses {
+        ready_get::endpoint(state).await
     }
 
     #[oai(path = "/live", method = "get", operation_id = "healthLive")]
