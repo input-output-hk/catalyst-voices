@@ -17,4 +17,6 @@ pub(crate) enum ApiTags {
     Test,
     /// Test Endpoints (Not part of the API)
     TestTag2,
+    /// API Version 1 Endpoints
+    V1,
 }
