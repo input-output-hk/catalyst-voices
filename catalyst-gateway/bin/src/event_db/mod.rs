@@ -38,6 +38,8 @@ pub(crate) struct EventDB {
 ///   database.  IF it is None, then the env var "`DATABASE_URL`" will be used
 ///   for this connection string. eg:
 ///     "`postgres://catalyst-dev:CHANGE_ME@localhost/CatalystDev`"
+/// * `do_schema_check` boolean flag to decide whether to verify the schema version
+///   or not. If it is `true`, a query is made to verify the DB schema version.
 ///
 /// # Errors
 ///
@@ -51,14 +53,17 @@ pub(crate) struct EventDB {
 ///
 /// The env var "`DATABASE_URL`" can be set directly as an anv var, or in a
 /// `.env` file.
-pub(crate) async fn establish_connection(url: Option<&str>) -> Result<EventDB, Error> {
+pub(crate) async fn establish_connection(
+    url: Option<String>,
+    do_schema_check: bool,
+) -> Result<EventDB, Error> {
     // Support env vars in a `.env` file,  doesn't need to exist.
     dotenv().ok();
 
     let database_url = match url {
-        Some(url) => url.to_string(),
+        Some(url) => url,
         // If the Database connection URL is not supplied, try and get from the env var.
-        None => std::env::var(DATABASE_URL_ENVVAR)?,
+        None => std::env::var(DATABASE_URL_ENVVAR).map_err(|_| Error::NoDatabaseUrl)?,
     };
 
     let config = tokio_postgres::config::Config::from_str(&database_url)?;
@@ -69,7 +74,9 @@ pub(crate) async fn establish_connection(url: Option<&str>) -> Result<EventDB, E
 
     let db = EventDB { pool };
 
-    db.schema_version_check().await?;
+    if do_schema_check {
+        db.schema_version_check().await?;
+    }
 
     Ok(db)
 }
@@ -96,6 +103,6 @@ mod test {
     /// Check if the schema version in the DB is up to date.
     #[tokio::test]
     async fn check_schema_version() {
-        establish_connection(None).await.unwrap();
+        establish_connection(None, true).await.unwrap();
     }
 }
