@@ -35,6 +35,9 @@ pub(crate) struct RejectedFragment {
     #[oai(rename = "id")]
     #[oai(validator(max_length = 64, min_length = 64, pattern = "[0-9a-f]{64}"))]
     /// The ID of the rejected fragment.
+    ///
+    /// Currently, the hex encoded bytes that represent the fragment ID. In the
+    /// future, this might change to including the prefix "0x".
     fragment_id: FragmentId,
     /// The number of the pool that caused this error.
     pool_number: usize,
