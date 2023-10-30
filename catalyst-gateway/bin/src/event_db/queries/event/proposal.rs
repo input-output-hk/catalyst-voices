@@ -1,5 +1,6 @@
 //! Proposal Queries
-//!
+use async_trait::async_trait;
+
 use crate::event_db::{
     error::Error,
     types::{
@@ -9,17 +10,13 @@ use crate::event_db::{
     },
     EventDB,
 };
-use async_trait::async_trait;
 
 #[async_trait]
 #[allow(clippy::module_name_repetitions)]
 /// Proposal Queries Trait
 pub(crate) trait ProposalQueries: Sync + Send + 'static {
     async fn get_proposal(
-        &self,
-        event: EventId,
-        objective: ObjectiveId,
-        proposal: ProposalId,
+        &self, event: EventId, objective: ObjectiveId, proposal: ProposalId,
     ) -> Result<Proposal, Error>;
 
     async fn get_proposals(
@@ -40,7 +37,6 @@ impl EventDB {
         INNER JOIN objective on proposal.objective = objective.row_id
         WHERE objective.event = $1 AND objective.id = $2
         LIMIT $3 OFFSET $4;";
-
     /// Proposal details query template
     const PROPOSAL_QUERY: &'static str =
         "SELECT proposal.id, proposal.title, proposal.summary, proposal.deleted, proposal.extra,
@@ -54,10 +50,7 @@ impl EventDB {
 #[async_trait]
 impl ProposalQueries for EventDB {
     async fn get_proposal(
-        &self,
-        event: EventId,
-        objective: ObjectiveId,
-        proposal: ProposalId,
+        &self, event: EventId, objective: ObjectiveId, proposal: ProposalId,
     ) -> Result<Proposal, Error> {
         let conn: bb8::PooledConnection<
             bb8_postgres::PostgresConnectionManager<tokio_postgres::NoTls>,
@@ -96,19 +89,17 @@ impl ProposalQueries for EventDB {
     }
 
     async fn get_proposals(
-        &self,
-        event: EventId,
-        objective: ObjectiveId,
-        limit: Option<i64>,
-        offset: Option<i64>,
+        &self, event: EventId, objective: ObjectiveId, limit: Option<i64>, offset: Option<i64>,
     ) -> Result<Vec<ProposalSummary>, Error> {
         let conn = self.pool.get().await?;
 
         let rows = conn
-            .query(
-                Self::PROPOSALS_QUERY,
-                &[&event.0, &objective.0, &limit, &offset.unwrap_or(0)],
-            )
+            .query(Self::PROPOSALS_QUERY, &[
+                &event.0,
+                &objective.0,
+                &limit,
+                &offset.unwrap_or(0),
+            ])
             .await?;
 
         let mut proposals = Vec::new();
@@ -139,14 +130,15 @@ impl ProposalQueries for EventDB {
 /// ```
 /// Also need establish `EVENT_DB_URL` env variable with the following value
 /// ```
-/// EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+/// EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 /// ```
 /// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
 #[cfg(test)]
 mod tests {
+    use serde_json::json;
+
     use super::*;
     use crate::event_db::establish_connection;
-    use serde_json::json;
 
     #[tokio::test]
     async fn get_proposal_test() {

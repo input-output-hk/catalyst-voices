@@ -2,29 +2,36 @@
 //!
 //! This provides only the primary entrypoint to the service.
 
-use crate::service::api::mk_api;
-use crate::service::docs::{docs, favicon};
-use crate::service::utilities::catch_panic::{set_panic_hook, ServicePanicHandler};
-use crate::service::utilities::middleware::{
-    chain_axum::ChainAxum,
-    tracing_mw::{init_prometheus, Tracing},
+use std::{net::SocketAddr, sync::Arc};
+
+use poem::{
+    endpoint::PrometheusExporter,
+    listener::TcpListener,
+    middleware::{CatchPanic, Compression, Cors},
+    web::CompressionLevel,
+    Endpoint, EndpointExt, Route,
 };
-use crate::service::Error;
-use crate::settings::{get_api_host_names, API_URL_PREFIX};
-use crate::state::State;
-use poem::endpoint::PrometheusExporter;
-use poem::listener::TcpListener;
-use poem::middleware::{CatchPanic, Compression, Cors};
-use poem::web::CompressionLevel;
-use poem::{Endpoint, EndpointExt, Route};
-use std::net::SocketAddr;
-use std::sync::Arc;
+
+use crate::{
+    service::{
+        api::mk_api,
+        docs::{docs, favicon},
+        utilities::{
+            catch_panic::{set_panic_hook, ServicePanicHandler},
+            middleware::{
+                chain_axum::ChainAxum,
+                tracing_mw::{init_prometheus, Tracing},
+            },
+        },
+        Error,
+    },
+    settings::{get_api_host_names, API_URL_PREFIX},
+    state::State,
+};
 
 /// This exists to allow us to add extra routes to the service for testing purposes.
 pub(crate) fn mk_app(
-    hosts: Vec<String>,
-    base_route: Option<Route>,
-    state: &Arc<State>,
+    hosts: Vec<String>, base_route: Option<Route>, state: &Arc<State>,
 ) -> impl Endpoint {
     // Get the base route if defined, or a new route if not.
     let base_route = match base_route {
@@ -63,7 +70,6 @@ pub(crate) fn mk_app(
 /// * `Error::CannotRunService` - cannot run the service
 /// * `Error::EventDbError` - cannot connect to the event db
 /// * `Error::IoError` - An IO error has occurred.
-///
 pub(crate) async fn run(addr: &SocketAddr, state: Arc<State>) -> Result<(), Error> {
     tracing::info!("Starting Poem Service ...");
     tracing::info!("Listening on {addr}");
@@ -86,11 +92,13 @@ pub(crate) async fn run(addr: &SocketAddr, state: Arc<State>) -> Result<(), Erro
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use super::*;
-    use poem::test::TestClient;
-
-    pub(crate) fn mk_test_app(state: &Arc<State>) -> TestClient<impl Endpoint> {
-        let app = mk_app(vec![], None, state);
-        TestClient::new(app)
-    }
+    // Poem TEST violates our License by using Copyleft libraries.
+    // use poem::test::TestClient;
+    //
+    // use super::*;
+    //
+    // pub(crate) fn mk_test_app(state: &Arc<State>) -> TestClient<impl Endpoint> {
+    // let app = mk_app(vec![], None, state);
+    // TestClient::new(app)
+    // }
 }

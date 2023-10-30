@@ -1,12 +1,11 @@
+use serde::{ser::Serializer, Serialize};
+
 use super::super::SerdeType;
 use crate::event_db::types::vit_ss::goal::Goal;
-use serde::{ser::Serializer, Serialize};
 
 impl Serialize for SerdeType<&Goal> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct GoalSerde<'a> {
             id: i32,
@@ -24,17 +23,16 @@ impl Serialize for SerdeType<&Goal> {
 
 impl Serialize for SerdeType<Goal> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use serde_json::json;
+
+    use super::*;
 
     #[test]
     fn goal_json_test() {

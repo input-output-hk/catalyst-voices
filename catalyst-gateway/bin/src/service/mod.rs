@@ -1,12 +1,10 @@
 //! Main entrypoint to the service
-//!
-use crate::legacy_service;
-use crate::state::State;
+use std::{net::SocketAddr, sync::Arc};
 
 use serde::Serialize;
-use std::net::SocketAddr;
-use std::sync::Arc;
 use tokio::try_join;
+
+use crate::{legacy_service, state::State};
 
 // These Modules contain endpoints
 mod api;

@@ -1,22 +1,20 @@
 //! Full Tracing and metrics middleware.
 use std::time::Instant;
 
+use cpu_time::ProcessTime; // ThreadTime doesn't work.
 use cryptoxide::{blake2b::Blake2b, digest::Digest};
 use hyper::header;
 use lazy_static::lazy_static;
+use poem::{
+    async_trait, http::HeaderMap, web::RealIp, Endpoint, Error, FromRequest, IntoResponse,
+    Middleware, PathPattern, Request, Response, Result,
+};
 use poem_openapi::OperationId;
 use prometheus::{
     default_registry, register_histogram_vec, register_int_counter_vec, HistogramVec,
     IntCounterVec, Registry,
 };
 use tracing::{error, field, Instrument, Level, Span};
-
-use poem::{
-    async_trait, http::HeaderMap, web::RealIp, Endpoint, Error, FromRequest, IntoResponse,
-    Middleware, PathPattern, Request, Response, Result,
-};
-
-use cpu_time::ProcessTime; // ThreadTime doesn't work.
 use ulid::Ulid;
 use uuid::Uuid;
 
@@ -29,13 +27,18 @@ const CLIENT_METRIC_LABELS: [&str; 2] = ["client", "status_code"];
 
 // Prometheus Metrics maintained by the service
 lazy_static! {
-    static ref HTTP_REQ_DURATION_MS: HistogramVec = register_histogram_vec!(
+    static ref HTTP_REQ_DURATION_MS: HistogramVec =
+    #[allow(clippy::ignored_unit_patterns)]
+    register_histogram_vec!(
         "http_request_duration_ms",
         "Duration of HTTP requests in milliseconds",
         &METRIC_LABELS
     )
     .unwrap();
-    static ref HTTP_REQ_CPU_TIME_MS: HistogramVec = register_histogram_vec!(
+
+    static ref HTTP_REQ_CPU_TIME_MS: HistogramVec =
+    #[allow(clippy::ignored_unit_patterns)]
+    register_histogram_vec!(
         "http_request_cpu_time_ms",
         "CPU Time of HTTP requests in milliseconds",
         &METRIC_LABELS
@@ -52,20 +55,27 @@ lazy_static! {
     .unwrap();
     */
 
-    static ref HTTP_REQUEST_COUNT: IntCounterVec = register_int_counter_vec!(
+    static ref HTTP_REQUEST_COUNT: IntCounterVec =
+    #[allow(clippy::ignored_unit_patterns)]
+    register_int_counter_vec!(
         "http_request_count",
         "Number of HTTP requests",
         &METRIC_LABELS
     )
     .unwrap();
-    static ref CLIENT_REQUEST_COUNT: IntCounterVec = register_int_counter_vec!(
+
+    static ref CLIENT_REQUEST_COUNT: IntCounterVec =
+    #[allow(clippy::ignored_unit_patterns)]
+    register_int_counter_vec!(
         "client_request_count",
         "Number of HTTP requests per client",
         &CLIENT_METRIC_LABELS
     )
     .unwrap();
 
-    static ref PANIC_REQUEST_COUNT: IntCounterVec = register_int_counter_vec!(
+    static ref PANIC_REQUEST_COUNT: IntCounterVec =
+    #[allow(clippy::ignored_unit_patterns)]
+    register_int_counter_vec!(
         "panic_request_count",
         "Number of HTTP requests that panicked",
         &METRIC_LABELS
@@ -130,7 +140,8 @@ async fn anonymous_client_id(req: &Request) -> String {
 
     // Note: This will only panic if the `out` is not 16 bytes long.
     // Which it is.
-    // Therefore the `unwrap()` is safe and will not cause a panic here under any circumstances.
+    // Therefore the `unwrap()` is safe and will not cause a panic here under any
+    // circumstances.
     #[allow(clippy::unwrap_used)]
     uuid::Builder::from_slice(&out)
         .unwrap()
@@ -151,18 +162,14 @@ struct ResponseData {
     status_code: u16,
     /// Endpoint name
     endpoint: String,
-    //panic: bool,
+    // panic: bool,
 }
 
 impl ResponseData {
     /// Create a new `ResponseData` set from the response.
     /// In the process add relevant data to the span from the response.
     fn new(
-        duration: f64,
-        cpu_time: f64,
-        resp: &Response,
-        panic: Option<Uuid>,
-        span: &Span,
+        duration: f64, cpu_time: f64, resp: &Response, panic: Option<Uuid>, span: &Span,
     ) -> Self {
         // The OpenAPI Operation ID of this request.
         let oid = resp
@@ -198,7 +205,7 @@ impl ResponseData {
             cpu_time,
             status_code: status,
             endpoint,
-            //panic: panic.is_some(),
+            // panic: panic.is_some(),
         }
     }
 }
@@ -311,7 +318,7 @@ impl<E: Endpoint> Endpoint for TracingEndpoint<E> {
 
             match resp {
                 Ok(resp) => {
-                    //let panic = if let Some(panic) = resp.downcast_ref::<ServerError>() {
+                    // let panic = if let Some(panic) = resp.downcast_ref::<ServerError>() {
                     // Add panic ID to the span.
                     //    Some(panic.id());
                     //} else {
@@ -324,9 +331,9 @@ impl<E: Endpoint> Endpoint for TracingEndpoint<E> {
                         ResponseData::new(duration, duration_proc, &resp, None, &inner_span);
 
                     (Ok(resp), response_data)
-                }
+                },
                 Err(err) => {
-                    //let panic = if let Some(panic) = err.downcast_ref::<ServerError>() {
+                    // let panic = if let Some(panic) = err.downcast_ref::<ServerError>() {
                     // Add panic ID to the span.
                     //    Some(panic.id());
                     //} else {
@@ -334,7 +341,8 @@ impl<E: Endpoint> Endpoint for TracingEndpoint<E> {
                     //};
                     let panic: Option<Uuid> = None;
 
-                    // Get the error message, and also for now, log the error to ensure we are preserving all data.
+                    // Get the error message, and also for now, log the error to ensure we are
+                    // preserving all data.
                     error!(err = ?err, "HTTP Response Error:");
                     // Only way I can see to get the message, may not be perfect.
                     let error_message = err.to_string();
@@ -352,14 +360,15 @@ impl<E: Endpoint> Endpoint for TracingEndpoint<E> {
                     }
 
                     (Err(error), response_data)
-                }
+                },
             }
         }
         .instrument(span.clone())
         .await;
 
         span.in_scope(|| {
-            // We really want to use the path_pattern from the response, but if not set use the path from the request.
+            // We really want to use the path_pattern from the response, but if not set use the path
+            // from the request.
             let path = if resp_data.endpoint.is_empty() {
                 uri_path
             } else {
@@ -372,7 +381,7 @@ impl<E: Endpoint> Endpoint for TracingEndpoint<E> {
             HTTP_REQ_CPU_TIME_MS
                 .with_label_values(&[&path, &method, &resp_data.status_code.to_string()])
                 .observe(resp_data.cpu_time);
-            //HTTP_REQUEST_RATE
+            // HTTP_REQUEST_RATE
             //.with_label_values(&[&uri_path, &method, &response.status_code.to_string()])
             //.inc();
             HTTP_REQUEST_COUNT
@@ -381,7 +390,7 @@ impl<E: Endpoint> Endpoint for TracingEndpoint<E> {
             CLIENT_REQUEST_COUNT
                 .with_label_values(&[&client_id, &resp_data.status_code.to_string()])
                 .inc();
-            //HTTP_REQUEST_SIZE_BYTES
+            // HTTP_REQUEST_SIZE_BYTES
             //.with_label_values(&[&uri_path, &method, &response.status_code.to_string()])
             //.observe(response.body().len() as f64);
         });

@@ -4,16 +4,15 @@
 //! which would not be permitted if this code was not obsoleted.
 #![allow(deprecated)]
 
-use super::super::{serialize_datetime_as_rfc3339, SerdeType};
-use crate::event_db::types::vit_ss::vote_plan::Voteplan;
 use chrono::{DateTime, Utc};
 use serde::{ser::Serializer, Serialize};
 
+use super::super::{serialize_datetime_as_rfc3339, SerdeType};
+use crate::event_db::types::vit_ss::vote_plan::Voteplan;
+
 impl Serialize for SerdeType<&Voteplan> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct VoteplanSerde<'a> {
             id: i32,
@@ -46,18 +45,17 @@ impl Serialize for SerdeType<&Voteplan> {
 
 impl Serialize for SerdeType<Voteplan> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use chrono::NaiveDateTime;
     use serde_json::json;
+
+    use super::*;
 
     #[test]
     fn voteplan_json_test() {

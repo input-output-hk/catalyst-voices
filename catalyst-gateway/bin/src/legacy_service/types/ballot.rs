@@ -1,3 +1,5 @@
+use serde::{ser::Serializer, Serialize};
+
 use super::SerdeType;
 use crate::event_db::types::{
     ballot::{
@@ -8,49 +10,38 @@ use crate::event_db::types::{
     proposal::ProposalId,
     registration::VoterGroupId,
 };
-use serde::{ser::Serializer, Serialize};
 
 impl Serialize for SerdeType<&ObjectiveChoices> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         self.0 .0.serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<ObjectiveChoices> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<&BallotType> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         self.0 .0.serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<BallotType> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<&VotePlan> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct VotePlanSerde<'a> {
             chain_proposal_index: i64,
@@ -74,18 +65,14 @@ impl Serialize for SerdeType<&VotePlan> {
 
 impl Serialize for SerdeType<VotePlan> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<&GroupVotePlans> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         self.0
              .0
             .iter()
@@ -97,18 +84,14 @@ impl Serialize for SerdeType<&GroupVotePlans> {
 
 impl Serialize for SerdeType<GroupVotePlans> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<&Ballot> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct BallotSerde<'a> {
             choices: SerdeType<&'a ObjectiveChoices>,
@@ -124,18 +107,14 @@ impl Serialize for SerdeType<&Ballot> {
 
 impl Serialize for SerdeType<Ballot> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<&ProposalBallot> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct ProposalBallotSerde<'a> {
             proposal_id: SerdeType<&'a ProposalId>,
@@ -151,18 +130,14 @@ impl Serialize for SerdeType<&ProposalBallot> {
 
 impl Serialize for SerdeType<ProposalBallot> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<&ObjectiveBallots> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct ObjectiveBallotsSerde<'a> {
             objective_id: SerdeType<&'a ObjectiveId>,
@@ -178,25 +153,22 @@ impl Serialize for SerdeType<&ObjectiveBallots> {
 
 impl Serialize for SerdeType<ObjectiveBallots> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use serde_json::json;
+
     use super::*;
     use crate::event_db::types::{
+        ballot::{BallotType, GroupVotePlans, ObjectiveChoices},
+        objective::ObjectiveId,
+        proposal::ProposalId,
         registration::VoterGroupId,
-        {
-            ballot::{BallotType, GroupVotePlans, ObjectiveChoices},
-            objective::ObjectiveId,
-            proposal::ProposalId,
-        },
     };
-    use serde_json::json;
 
     #[test]
     fn vote_plan_json_test() {

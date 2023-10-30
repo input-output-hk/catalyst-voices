@@ -1,5 +1,4 @@
 //! Database Errors
-//!
 use std::env::VarError;
 
 use bb8::RunError;

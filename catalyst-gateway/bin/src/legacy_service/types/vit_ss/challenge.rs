@@ -1,12 +1,11 @@
+use serde::{ser::Serializer, Serialize};
+
 use super::super::SerdeType;
 use crate::event_db::types::vit_ss::challenge::{Challenge, ChallengeHighlights};
-use serde::{ser::Serializer, Serialize};
 
 impl Serialize for SerdeType<&ChallengeHighlights> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct ChallengeHighlightsSerde<'a> {
             sponsor: &'a String,
@@ -20,18 +19,14 @@ impl Serialize for SerdeType<&ChallengeHighlights> {
 
 impl Serialize for SerdeType<ChallengeHighlights> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<&Challenge> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct ChallengeSerde<'a> {
             internal_id: i32,
@@ -63,17 +58,16 @@ impl Serialize for SerdeType<&Challenge> {
 
 impl Serialize for SerdeType<Challenge> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use serde_json::json;
+
+    use super::*;
 
     #[test]
     fn challenge_highlights_json_test() {

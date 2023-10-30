@@ -1,8 +1,7 @@
 //! Shared state used by all endpoints.
-//!
-use crate::cli::Error;
-use crate::event_db::queries::EventDbQueries;
 use std::sync::Arc;
+
+use crate::{cli::Error, event_db::queries::EventDbQueries};
 
 /// Global State of the service
 pub(crate) struct State {
@@ -10,8 +9,10 @@ pub(crate) struct State {
     /// If the DB fails, it can be set to None.
     /// If its None, an attempt to get it will try and connect to the DB.
     /// This is Private, it needs to be accessed with a function.
-    //event_db_handle: Arc<ArcSwap<Option<dyn EventDbQueries>>>, // Private need to get it with a function.
-    pub(crate) event_db: Arc<dyn EventDbQueries>, // This needs to be obsoleted, we want the DB to be able to be down.
+    // event_db_handle: Arc<ArcSwap<Option<dyn EventDbQueries>>>, // Private need to get it with a
+    // function.
+    pub(crate) event_db: Arc<dyn EventDbQueries>, /* This needs to be obsoleted, we want the DB
+                                                   * to be able to be down. */
 }
 
 impl State {
@@ -27,15 +28,13 @@ impl State {
 
         // We don't care if this succeeds or not.
         // We just try our best to connect to the event DB.
-        //let _ = state.event_db().await;
+        // let _ = state.event_db().await;
 
         Ok(state)
     }
 
-    /*
-    pub(crate) async fn event_db(&self) -> Option<Arc<dyn EventDbQueries>> {
-
-
-    }
-    */
+    // pub(crate) async fn event_db(&self) -> Option<Arc<dyn EventDbQueries>> {
+    //
+    //
+    // }
 }

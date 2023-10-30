@@ -3,11 +3,6 @@
 //! Because this code is legacy and being obsoleted, we allow certain lints to be used
 //! which would not be permitted if this code was not obsoleted.
 #![allow(deprecated)]
-use super::{serialize_option_datetime_as_rfc3339, SerdeType};
-use crate::event_db::types::event::{
-    Event, EventDetails, EventGoal, EventId, EventRegistration, EventSchedule, EventSummary,
-    VotingPowerAlgorithm, VotingPowerSettings,
-};
 use chrono::{DateTime, Utc};
 use rust_decimal::prelude::ToPrimitive;
 use serde::{
@@ -16,38 +11,36 @@ use serde::{
     Deserialize, Serialize,
 };
 
+use super::{serialize_option_datetime_as_rfc3339, SerdeType};
+use crate::event_db::types::event::{
+    Event, EventDetails, EventGoal, EventId, EventRegistration, EventSchedule, EventSummary,
+    VotingPowerAlgorithm, VotingPowerSettings,
+};
+
 impl Serialize for SerdeType<&EventId> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         self.0 .0.serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<EventId> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 impl<'de> Deserialize<'de> for SerdeType<EventId> {
     fn deserialize<D>(deserializer: D) -> Result<SerdeType<EventId>, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
+    where D: Deserializer<'de> {
         Ok(EventId(i32::deserialize(deserializer)?).into())
     }
 }
 
 impl Serialize for SerdeType<&EventSummary> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct EventSummarySerde<'a> {
             id: SerdeType<&'a EventId>,
@@ -84,40 +77,32 @@ impl Serialize for SerdeType<&EventSummary> {
 
 impl Serialize for SerdeType<EventSummary> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<&VotingPowerAlgorithm> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         match self.0 {
             VotingPowerAlgorithm::ThresholdStakedADA => {
                 "threshold_staked_ADA".serialize(serializer)
-            }
+            },
         }
     }
 }
 
 impl Serialize for SerdeType<VotingPowerAlgorithm> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<&VotingPowerSettings> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct VotingPowerSettingsSerde<'a> {
             alg: SerdeType<&'a VotingPowerAlgorithm>,
@@ -145,18 +130,14 @@ impl Serialize for SerdeType<&VotingPowerSettings> {
 
 impl Serialize for SerdeType<VotingPowerSettings> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<&EventRegistration> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct EventRegistrationSerde<'a> {
             #[serde(skip_serializing_if = "Option::is_none")]
@@ -183,18 +164,14 @@ impl Serialize for SerdeType<&EventRegistration> {
 
 impl Serialize for SerdeType<EventRegistration> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<&EventGoal> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct EventGoalSerde<'a> {
             idx: i32,
@@ -210,18 +187,14 @@ impl Serialize for SerdeType<&EventGoal> {
 
 impl Serialize for SerdeType<EventGoal> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<&EventSchedule> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct EventScheduleSerde<'a> {
             #[serde(
@@ -287,18 +260,14 @@ impl Serialize for SerdeType<&EventSchedule> {
 
 impl Serialize for SerdeType<EventSchedule> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<&EventDetails> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct EventDetailsSerde<'a> {
             voting_power: SerdeType<&'a VotingPowerSettings>,
@@ -318,18 +287,14 @@ impl Serialize for SerdeType<&EventDetails> {
 
 impl Serialize for SerdeType<EventDetails> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<&Event> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         pub(crate) struct EventSerde<'a> {
             #[serde(flatten)]
@@ -348,19 +313,18 @@ impl Serialize for SerdeType<&Event> {
 
 impl Serialize for SerdeType<Event> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use chrono::{DateTime, NaiveDateTime, Utc};
     use rust_decimal::Decimal;
     use serde_json::json;
+
+    use super::*;
 
     #[test]
     fn event_id_json_test() {

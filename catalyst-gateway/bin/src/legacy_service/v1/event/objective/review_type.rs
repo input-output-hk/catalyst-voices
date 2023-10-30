@@ -1,21 +1,23 @@
-use crate::event_db::types::{event::EventId, objective::ObjectiveId, review::ReviewType};
-use crate::{
-    legacy_service::{handle_result, types::SerdeType, v1::LimitOffset},
-    service::Error,
-    state::State,
-};
+use std::sync::Arc;
+
 use axum::{
     extract::{Path, Query},
     routing::get,
     Router,
 };
-use std::sync::Arc;
+
+use crate::{
+    event_db::types::{event::EventId, objective::ObjectiveId, review::ReviewType},
+    legacy_service::{handle_result, types::SerdeType, v1::LimitOffset},
+    service::Error,
+    state::State,
+};
 
 pub(crate) fn review_type(state: Arc<State>) -> Router {
     Router::new().route(
         "/review_types",
-        get(move |path, query| async {
-            handle_result(review_types_exec(path, query, state).await)
+        get(move |path, query| {
+            async { handle_result(review_types_exec(path, query, state).await) }
         }),
     )
 }
@@ -25,8 +27,7 @@ async fn review_types_exec(
         SerdeType<EventId>,
         SerdeType<ObjectiveId>,
     )>,
-    lim_ofs: Query<LimitOffset>,
-    state: Arc<State>,
+    lim_ofs: Query<LimitOffset>, state: Arc<State>,
 ) -> Result<Vec<SerdeType<ReviewType>>, Error> {
     tracing::debug!(
         "review_types_query, event:{0} objective: {1}",
@@ -56,19 +57,20 @@ async fn review_types_exec(
 /// ```
 /// Also need establish `EVENT_DB_URL` env variable with the following value
 /// ```
-/// EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+/// EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 /// ```
 /// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::legacy_service::{app, tests::response_body_to_json};
     use axum::{
         body::Body,
         http::{Request, StatusCode},
     };
     use tower::ServiceExt;
+
+    use super::*;
+    use crate::legacy_service::{app, tests::response_body_to_json};
 
     #[tokio::test]
     async fn review_types_test() {

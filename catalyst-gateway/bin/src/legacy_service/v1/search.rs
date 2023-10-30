@@ -4,15 +4,17 @@
 //! which would not be permitted if this code was not obsoleted.
 #![allow(clippy::too_many_lines)]
 
-use crate::event_db::types::search::{SearchQuery, SearchResult};
+use std::sync::Arc;
+
+use axum::{extract::Query, routing::post, Json, Router};
+use serde::Deserialize;
+
 use crate::{
+    event_db::types::search::{SearchQuery, SearchResult},
     legacy_service::{handle_result, types::SerdeType},
     service::Error,
     state::State,
 };
-use axum::{extract::Query, routing::post, Json, Router};
-use serde::Deserialize;
-use std::sync::Arc;
 
 pub(crate) fn search(state: Arc<State>) -> Router {
     Router::new().route(
@@ -31,8 +33,7 @@ struct SearchParam {
 }
 
 async fn search_exec(
-    search_param: Query<SearchParam>,
-    Json(SerdeType(search_query)): Json<SerdeType<SearchQuery>>,
+    search_param: Query<SearchParam>, Json(SerdeType(search_query)): Json<SerdeType<SearchQuery>>,
     state: Arc<State>,
 ) -> Result<SerdeType<SearchResult>, Error> {
     tracing::debug!("search_query",);
@@ -62,19 +63,20 @@ async fn search_exec(
 /// ```
 /// Also need establish `EVENT_DB_URL` env variable with the following value
 /// ```
-/// EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+/// EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 /// ```
 /// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::legacy_service::{app, tests::response_body_to_json};
     use axum::{
         body::Body,
         http::{header, Method, Request, StatusCode},
     };
     use tower::ServiceExt;
+
+    use super::*;
+    use crate::legacy_service::{app, tests::response_body_to_json};
 
     #[tokio::test]
     async fn search_events_test() {

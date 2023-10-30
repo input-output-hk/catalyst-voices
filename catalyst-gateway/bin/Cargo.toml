@@ -45,7 +45,6 @@ poem = { workspace = true, features = [
     "embed",
     "prometheus",
     "compression",
-    "test",
 ] }
 poem-openapi = { workspace = true, features = [
     "openapi-explorer",

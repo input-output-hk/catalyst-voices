@@ -1,7 +1,7 @@
 //! Define individual Voter Information
-//!
-use super::{delegate_public_key::DelegatePublicKey, voter_group_id::VoterGroupId};
 use poem_openapi::{types::Example, Object};
+
+use super::{delegate_public_key::DelegatePublicKey, voter_group_id::VoterGroupId};
 
 /// Voter Info
 #[derive(Object)]
@@ -26,7 +26,8 @@ pub(crate) struct VoterInfo {
 
     /// Voting power's share of the total voting power.
     /// Can be used to gauge potential voting power saturation.
-    /// This value is NOT saturated however, and gives the raw share of total registered voting power.
+    /// This value is NOT saturated however, and gives the raw share of total registered
+    /// voting power.
     #[oai(validator(minimum(value = "0"), maximum(value = "100")))]
     voting_power_saturation: f64,
 
@@ -50,6 +51,7 @@ impl Example for VoterInfo {
 
 impl TryFrom<crate::event_db::types::registration::VoterInfo> for VoterInfo {
     type Error = String;
+
     fn try_from(
         value: crate::event_db::types::registration::VoterInfo,
     ) -> Result<Self, Self::Error> {

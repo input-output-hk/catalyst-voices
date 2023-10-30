@@ -1,11 +1,13 @@
-use crate::event_db::types::{ballot::ObjectiveBallots, event::EventId};
+use std::sync::Arc;
+
+use axum::{extract::Path, routing::get, Router};
+
 use crate::{
+    event_db::types::{ballot::ObjectiveBallots, event::EventId},
     legacy_service::{handle_result, types::SerdeType},
     service::Error,
     state::State,
 };
-use axum::{extract::Path, routing::get, Router};
-use std::sync::Arc;
 
 pub(crate) fn ballots(state: Arc<State>) -> Router {
     Router::new().route(
@@ -15,8 +17,7 @@ pub(crate) fn ballots(state: Arc<State>) -> Router {
 }
 
 async fn ballots_exec(
-    Path(SerdeType(event)): Path<SerdeType<EventId>>,
-    state: Arc<State>,
+    Path(SerdeType(event)): Path<SerdeType<EventId>>, state: Arc<State>,
 ) -> Result<Vec<SerdeType<ObjectiveBallots>>, Error> {
     tracing::debug!("ballots_query, event: {0}", event.0,);
 
@@ -42,18 +43,19 @@ async fn ballots_exec(
 /// ```
 /// Also need establish `EVENT_DB_URL` env variable with the following value
 /// ```
-/// EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+/// EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 /// ```
 /// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::legacy_service::{app, tests::response_body_to_json};
     use axum::{
         body::Body,
         http::{Request, StatusCode},
     };
     use tower::ServiceExt;
+
+    use super::*;
+    use crate::legacy_service::{app, tests::response_body_to_json};
 
     #[tokio::test]
     async fn ballots_test() {

@@ -4,19 +4,21 @@
 //! which would not be permitted if this code was not obsoleted.
 #![allow(deprecated, clippy::too_many_lines)]
 
-use super::LimitOffset;
-use crate::event_db::types::event::{Event, EventId, EventSummary};
-use crate::{
-    legacy_service::{handle_result, types::SerdeType},
-    service::Error,
-    state::State,
-};
+use std::sync::Arc;
+
 use axum::{
     extract::{Path, Query},
     routing::get,
     Router,
 };
-use std::sync::Arc;
+
+use super::LimitOffset;
+use crate::{
+    event_db::types::event::{Event, EventId, EventSummary},
+    legacy_service::{handle_result, types::SerdeType},
+    service::Error,
+    state::State,
+};
 
 mod ballots;
 mod objective;
@@ -46,8 +48,7 @@ pub(crate) fn event(state: Arc<State>) -> Router {
 }
 
 async fn event_exec(
-    Path(SerdeType(event)): Path<SerdeType<EventId>>,
-    state: Arc<State>,
+    Path(SerdeType(event)): Path<SerdeType<EventId>>, state: Arc<State>,
 ) -> Result<SerdeType<Event>, Error> {
     tracing::debug!("event_exec, event: {0}", event.0);
 
@@ -56,8 +57,7 @@ async fn event_exec(
 }
 
 async fn events_exec(
-    lim_ofs: Query<LimitOffset>,
-    state: Arc<State>,
+    lim_ofs: Query<LimitOffset>, state: Arc<State>,
 ) -> Result<Vec<SerdeType<EventSummary>>, Error> {
     tracing::debug!(
         "events_query, limit: {0:?}, offset: {1:?}",
@@ -87,18 +87,19 @@ async fn events_exec(
 /// ```
 /// Also need establish `EVENT_DB_URL` env variable with the following value
 /// ```
-/// EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+/// EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 /// ```
 /// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::legacy_service::{app, tests::response_body_to_json};
     use axum::{
         body::Body,
         http::{Request, StatusCode},
     };
     use tower::ServiceExt;
+
+    use super::*;
+    use crate::legacy_service::{app, tests::response_body_to_json};
 
     #[tokio::test]
     async fn event_test() {

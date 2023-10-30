@@ -1,5 +1,6 @@
 //! Review Queries
-//!
+use async_trait::async_trait;
+
 use crate::event_db::{
     error::Error,
     types::{
@@ -10,31 +11,27 @@ use crate::event_db::{
     },
     EventDB,
 };
-use async_trait::async_trait;
 
 #[async_trait]
 #[allow(clippy::module_name_repetitions)]
 /// Review Queries Trait
 pub(crate) trait ReviewQueries: Sync + Send + 'static {
     async fn get_reviews(
-        &self,
-        event: EventId,
-        objective: ObjectiveId,
-        proposal: ProposalId,
-        limit: Option<i64>,
+        &self, event: EventId, objective: ObjectiveId, proposal: ProposalId, limit: Option<i64>,
         offset: Option<i64>,
     ) -> Result<Vec<AdvisorReview>, Error>;
 
     async fn get_review_types(
-        &self,
-        event: EventId,
-        objective: ObjectiveId,
-        limit: Option<i64>,
-        offset: Option<i64>,
+        &self, event: EventId, objective: ObjectiveId, limit: Option<i64>, offset: Option<i64>,
     ) -> Result<Vec<ReviewType>, Error>;
 }
 
 impl EventDB {
+    /// Rating per review query template
+    const RATINGS_PER_REVIEW_QUERY: &'static str =
+        "SELECT review_rating.metric, review_rating.rating, review_rating.note
+        FROM review_rating
+        WHERE review_rating.review_id = $1;";
     /// Review query template
     const REVIEWS_QUERY: &'static str = "SELECT proposal_review.row_id, proposal_review.assessor
         FROM proposal_review
@@ -42,13 +39,6 @@ impl EventDB {
         INNER JOIN objective on proposal.objective = objective.row_id
         WHERE objective.event = $1 AND objective.id = $2 AND proposal.id = $3
         LIMIT $4 OFFSET $5;";
-
-    /// Rating per review query template
-    const RATINGS_PER_REVIEW_QUERY: &'static str =
-        "SELECT review_rating.metric, review_rating.rating, review_rating.note
-        FROM review_rating
-        WHERE review_rating.review_id = $1;";
-
     /// Review types query template
     const REVIEW_TYPES_QUERY: &'static str =
         "SELECT review_metric.row_id, review_metric.name, review_metric.description,
@@ -64,26 +54,19 @@ impl EventDB {
 #[async_trait]
 impl ReviewQueries for EventDB {
     async fn get_reviews(
-        &self,
-        event: EventId,
-        objective: ObjectiveId,
-        proposal: ProposalId,
-        limit: Option<i64>,
+        &self, event: EventId, objective: ObjectiveId, proposal: ProposalId, limit: Option<i64>,
         offset: Option<i64>,
     ) -> Result<Vec<AdvisorReview>, Error> {
         let conn = self.pool.get().await?;
 
         let rows = conn
-            .query(
-                Self::REVIEWS_QUERY,
-                &[
-                    &event.0,
-                    &objective.0,
-                    &proposal.0,
-                    &limit,
-                    &offset.unwrap_or(0),
-                ],
-            )
+            .query(Self::REVIEWS_QUERY, &[
+                &event.0,
+                &objective.0,
+                &proposal.0,
+                &limit,
+                &offset.unwrap_or(0),
+            ])
             .await?;
 
         let mut reviews = Vec::new();
@@ -110,19 +93,17 @@ impl ReviewQueries for EventDB {
     }
 
     async fn get_review_types(
-        &self,
-        event: EventId,
-        objective: ObjectiveId,
-        limit: Option<i64>,
-        offset: Option<i64>,
+        &self, event: EventId, objective: ObjectiveId, limit: Option<i64>, offset: Option<i64>,
     ) -> Result<Vec<ReviewType>, Error> {
         let conn = self.pool.get().await?;
 
         let rows = conn
-            .query(
-                Self::REVIEW_TYPES_QUERY,
-                &[&event.0, &objective.0, &limit, &offset.unwrap_or(0)],
-            )
+            .query(Self::REVIEW_TYPES_QUERY, &[
+                &event.0,
+                &objective.0,
+                &limit,
+                &offset.unwrap_or(0),
+            ])
             .await?;
         let mut review_types = Vec::new();
         for row in rows {
@@ -158,7 +139,7 @@ impl ReviewQueries for EventDB {
 /// ```
 /// Also need establish `EVENT_DB_URL` env variable with the following value
 /// ```
-/// EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+/// EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 /// ```
 /// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
 #[cfg(test)]
@@ -278,148 +259,147 @@ mod tests {
         );
     }
 
-    /* TODO(SJ) : https://github.com/input-output-hk/catalyst-voices/issues/68
-
-        #[tokio::test]
-        async fn get_review_types_test() {
-            let event_db = establish_connection(None).await.unwrap();
-
-            let review_types = event_db
-                .get_review_types(EventId(1), ObjectiveId(1), None, None)
-                .await
-                .unwrap();
-
-            assert_eq!(
-                vec![
-                    ReviewType {
-                        id: 1,
-                        name: "impact".to_string(),
-                        description: Some("Impact Rating".to_string()),
-                        min: 0,
-                        max: 5,
-                        map: vec![],
-                        note: None,
-                        group: Some("review_group 1".to_string()),
-                    },
-                    ReviewType {
-                        id: 2,
-                        name: "feasibility".to_string(),
-                        description: Some("Feasibility Rating".to_string()),
-                        min: 0,
-                        max: 5,
-                        map: vec![],
-                        note: Some(true),
-                        group: Some("review_group 2".to_string()),
-                    },
-                    ReviewType {
-                        id: 5,
-                        name: "vpa_ranking".to_string(),
-                        description: Some("VPA Ranking of the review".to_string()),
-                        min: 0,
-                        max: 3,
-                        map: vec![
-                            json!(
-                                {"name":"Excellent","desc":"Excellent Review"}
-                            ),
-                            json!({"name":"Good","desc":"Could be improved."}),
-                            json!({"name":"FilteredOut","desc":"Exclude this review"}),
-                            json!({"name":"NA", "desc":"Not Applicable"})
-                        ],
-                        note: Some(false),
-                        group: None,
-                    }
-                ],
-                review_types
-            );
-
-            let review_types = event_db
-                .get_review_types(EventId(1), ObjectiveId(1), Some(2), None)
-                .await
-                .unwrap();
-
-            assert_eq!(
-                vec![
-                    ReviewType {
-                        id: 1,
-                        name: "impact".to_string(),
-                        description: Some("Impact Rating".to_string()),
-                        min: 0,
-                        max: 5,
-                        map: vec![],
-                        note: None,
-                        group: Some("review_group 1".to_string()),
-                    },
-                    ReviewType {
-                        id: 2,
-                        name: "feasibility".to_string(),
-                        description: Some("Feasibility Rating".to_string()),
-                        min: 0,
-                        max: 5,
-                        map: vec![],
-                        note: Some(true),
-                        group: Some("review_group 2".to_string()),
-                    },
-                ],
-                review_types
-            );
-
-            let review_types = event_db
-                .get_review_types(EventId(1), ObjectiveId(1), None, Some(1))
-                .await
-                .unwrap();
-
-            assert_eq!(
-                vec![
-                    ReviewType {
-                        id: 2,
-                        name: "feasibility".to_string(),
-                        description: Some("Feasibility Rating".to_string()),
-                        min: 0,
-                        max: 5,
-                        map: vec![],
-                        note: Some(true),
-                        group: Some("review_group 2".to_string()),
-                    },
-                    ReviewType {
-                        id: 5,
-                        name: "vpa_ranking".to_string(),
-                        description: Some("VPA Ranking of the review".to_string()),
-                        min: 0,
-                        max: 3,
-                        map: vec![
-                            json!(
-                                {"name":"Excellent","desc":"Excellent Review"}
-                            ),
-                            json!({"name":"Good","desc":"Could be improved."}),
-                            json!({"name":"FilteredOut","desc":"Exclude this review"}),
-                            json!({"name":"NA", "desc":"Not Applicable"})
-                        ],
-                        note: Some(false),
-                        group: None,
-                    }
-                ],
-                review_types
-            );
-
-            let review_types = event_db
-                .get_review_types(EventId(1), ObjectiveId(1), Some(1), Some(1))
-                .await
-                .unwrap();
-
-            assert_eq!(
-                vec![ReviewType {
-                    id: 2,
-                    name: "feasibility".to_string(),
-                    description: Some("Feasibility Rating".to_string()),
-                    min: 0,
-                    max: 5,
-                    map: vec![],
-                    note: Some(true),
-                    group: Some("review_group 2".to_string()),
-                }],
-                review_types
-            );
-        }
-
-    */
+    // TODO(SJ) : https://github.com/input-output-hk/catalyst-voices/issues/68
+    //
+    // #[tokio::test]
+    // async fn get_review_types_test() {
+    // let event_db = establish_connection(None).await.unwrap();
+    //
+    // let review_types = event_db
+    // .get_review_types(EventId(1), ObjectiveId(1), None, None)
+    // .await
+    // .unwrap();
+    //
+    // assert_eq!(
+    // vec![
+    // ReviewType {
+    // id: 1,
+    // name: "impact".to_string(),
+    // description: Some("Impact Rating".to_string()),
+    // min: 0,
+    // max: 5,
+    // map: vec![],
+    // note: None,
+    // group: Some("review_group 1".to_string()),
+    // },
+    // ReviewType {
+    // id: 2,
+    // name: "feasibility".to_string(),
+    // description: Some("Feasibility Rating".to_string()),
+    // min: 0,
+    // max: 5,
+    // map: vec![],
+    // note: Some(true),
+    // group: Some("review_group 2".to_string()),
+    // },
+    // ReviewType {
+    // id: 5,
+    // name: "vpa_ranking".to_string(),
+    // description: Some("VPA Ranking of the review".to_string()),
+    // min: 0,
+    // max: 3,
+    // map: vec![
+    // json!(
+    // {"name":"Excellent","desc":"Excellent Review"}
+    // ),
+    // json!({"name":"Good","desc":"Could be improved."}),
+    // json!({"name":"FilteredOut","desc":"Exclude this review"}),
+    // json!({"name":"NA", "desc":"Not Applicable"})
+    // ],
+    // note: Some(false),
+    // group: None,
+    // }
+    // ],
+    // review_types
+    // );
+    //
+    // let review_types = event_db
+    // .get_review_types(EventId(1), ObjectiveId(1), Some(2), None)
+    // .await
+    // .unwrap();
+    //
+    // assert_eq!(
+    // vec![
+    // ReviewType {
+    // id: 1,
+    // name: "impact".to_string(),
+    // description: Some("Impact Rating".to_string()),
+    // min: 0,
+    // max: 5,
+    // map: vec![],
+    // note: None,
+    // group: Some("review_group 1".to_string()),
+    // },
+    // ReviewType {
+    // id: 2,
+    // name: "feasibility".to_string(),
+    // description: Some("Feasibility Rating".to_string()),
+    // min: 0,
+    // max: 5,
+    // map: vec![],
+    // note: Some(true),
+    // group: Some("review_group 2".to_string()),
+    // },
+    // ],
+    // review_types
+    // );
+    //
+    // let review_types = event_db
+    // .get_review_types(EventId(1), ObjectiveId(1), None, Some(1))
+    // .await
+    // .unwrap();
+    //
+    // assert_eq!(
+    // vec![
+    // ReviewType {
+    // id: 2,
+    // name: "feasibility".to_string(),
+    // description: Some("Feasibility Rating".to_string()),
+    // min: 0,
+    // max: 5,
+    // map: vec![],
+    // note: Some(true),
+    // group: Some("review_group 2".to_string()),
+    // },
+    // ReviewType {
+    // id: 5,
+    // name: "vpa_ranking".to_string(),
+    // description: Some("VPA Ranking of the review".to_string()),
+    // min: 0,
+    // max: 3,
+    // map: vec![
+    // json!(
+    // {"name":"Excellent","desc":"Excellent Review"}
+    // ),
+    // json!({"name":"Good","desc":"Could be improved."}),
+    // json!({"name":"FilteredOut","desc":"Exclude this review"}),
+    // json!({"name":"NA", "desc":"Not Applicable"})
+    // ],
+    // note: Some(false),
+    // group: None,
+    // }
+    // ],
+    // review_types
+    // );
+    //
+    // let review_types = event_db
+    // .get_review_types(EventId(1), ObjectiveId(1), Some(1), Some(1))
+    // .await
+    // .unwrap();
+    //
+    // assert_eq!(
+    // vec![ReviewType {
+    // id: 2,
+    // name: "feasibility".to_string(),
+    // description: Some("Feasibility Rating".to_string()),
+    // min: 0,
+    // max: 5,
+    // map: vec![],
+    // note: Some(true),
+    // group: Some("review_group 2".to_string()),
+    // }],
+    // review_types
+    // );
+    // }
+    //
 }

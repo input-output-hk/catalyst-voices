@@ -4,22 +4,24 @@
 //! which would not be permitted if this code was not obsoleted.
 #![allow(clippy::too_many_lines)]
 
-use crate::event_db::types::{
-    event::EventId,
-    registration::{Delegator, Voter},
-};
-use crate::{
-    legacy_service::{handle_result, types::SerdeType},
-    service::Error,
-    state::State,
-};
+use std::sync::Arc;
+
 use axum::{
     extract::{Path, Query},
     routing::get,
     Router,
 };
 use serde::Deserialize;
-use std::sync::Arc;
+
+use crate::{
+    event_db::types::{
+        event::EventId,
+        registration::{Delegator, Voter},
+    },
+    legacy_service::{handle_result, types::SerdeType},
+    service::Error,
+    state::State,
+};
 
 pub(crate) fn registration(state: Arc<State>) -> Router {
     Router::new()
@@ -33,8 +35,8 @@ pub(crate) fn registration(state: Arc<State>) -> Router {
         .route(
             "/registration/delegations/:stake_public_key",
             get({
-                move |path, query| async {
-                    handle_result(delegations_exec(path, query, state).await)
+                move |path, query| {
+                    async { handle_result(delegations_exec(path, query, state).await) }
                 }
             }),
         )
@@ -79,8 +81,7 @@ struct DelegationsQuery {
 
 async fn delegations_exec(
     Path(stake_public_key): Path<String>,
-    Query(DelegationsQuery { event_id }): Query<DelegationsQuery>,
-    state: Arc<State>,
+    Query(DelegationsQuery { event_id }): Query<DelegationsQuery>, state: Arc<State>,
 ) -> Result<SerdeType<Delegator>, Error> {
     tracing::debug!(
         "delegator_query: stake_public_key: {0}, eid: {1:?}",
@@ -108,19 +109,20 @@ async fn delegations_exec(
 /// ```
 /// Also need establish `EVENT_DB_URL` env variable with the following value
 /// ```
-/// EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+/// EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 /// ```
 /// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::legacy_service::{app, tests::response_body_to_json};
     use axum::{
         body::Body,
         http::{Request, StatusCode},
     };
     use tower::ServiceExt;
+
+    use super::*;
+    use crate::legacy_service::{app, tests::response_body_to_json};
 
     #[tokio::test]
     async fn voter_test() {

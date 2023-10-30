@@ -4,14 +4,16 @@
 //! which would not be permitted if this code was not obsoleted.
 #![allow(clippy::too_many_lines)]
 
-use crate::event_db::types::vit_ss::fund::FundWithNext;
+use std::sync::Arc;
+
+use axum::{routing::get, Router};
+
 use crate::{
+    event_db::types::vit_ss::fund::FundWithNext,
     legacy_service::{handle_result, types::SerdeType},
     service::Error,
     state::State,
 };
-use axum::{routing::get, Router};
-use std::sync::Arc;
 
 pub(crate) fn fund(state: Arc<State>) -> Router {
     Router::new().route(
@@ -39,18 +41,19 @@ async fn fund_exec(state: Arc<State>) -> Result<SerdeType<FundWithNext>, Error> 
 /// ```
 /// Also need establish `EVENT_DB_URL` env variable with the following value
 /// ```
-/// EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+/// EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 /// ```
 /// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::legacy_service::{app, tests::response_body_to_json};
     use axum::{
         body::Body,
         http::{Request, StatusCode},
     };
     use tower::ServiceExt;
+
+    use super::*;
+    use crate::legacy_service::{app, tests::response_body_to_json};
 
     #[tokio::test]
     async fn fund_test() {

@@ -1,7 +1,7 @@
-use crate::service::Error;
 use axum::{routing::get, Router};
 
 use super::handle_result;
+use crate::service::Error;
 
 pub(crate) fn health() -> Router {
     Router::new()
@@ -38,18 +38,20 @@ fn live_exec() -> Result<bool, Error> {
 /// ```
 /// Also need establish `EVENT_DB_URL` env variable with the following value
 /// ```
-/// EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+/// EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 /// ```
 /// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
 #[cfg(test)]
 mod tests {
-    use crate::{legacy_service::app, state::State};
+    use std::sync::Arc;
+
     use axum::{
         body::{Body, HttpBody},
         http::{Request, StatusCode},
     };
-    use std::sync::Arc;
     use tower::ServiceExt;
+
+    use crate::{legacy_service::app, state::State};
 
     #[tokio::test]
     async fn health_ready_test() {

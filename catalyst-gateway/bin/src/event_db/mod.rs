@@ -1,10 +1,11 @@
 //! Catalyst Election Database crate
+use std::str::FromStr;
+
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
 use dotenvy::dotenv;
 use error::Error;
 use schema_check::SchemaVersion;
-use std::str::FromStr;
 use tokio_postgres::NoTls;
 
 mod config_table;
@@ -34,18 +35,17 @@ pub(crate) struct EventDB {
 ///
 /// # Parameters
 ///
-/// * `url` set to the postgres connection string needed to connect to the
-///   database.  IF it is None, then the env var "`DATABASE_URL`" will be used
-///   for this connection string. eg:
-///     "`postgres://catalyst-dev:CHANGE_ME@localhost/CatalystDev`"
+/// * `url` set to the postgres connection string needed to connect to the database.  IF
+///   it is None, then the env var "`DATABASE_URL`" will be used for this connection
+///   string. eg: "`postgres://catalyst-dev:CHANGE_ME@localhost/CatalystDev`"
 ///
 /// # Errors
 ///
 /// This function will return an error if:
 /// * `url` is None and the environment variable "`DATABASE_URL`" isn't set.
 /// * There is any error communicating the the database to check its schema.
-/// * The database schema in the DB does not 100% match the schema supported by
-///   this library.
+/// * The database schema in the DB does not 100% match the schema supported by this
+///   library.
 ///
 /// # Notes
 ///
@@ -86,7 +86,7 @@ pub(crate) async fn establish_connection(url: Option<&str>) -> Result<EventDB, E
 /// ```
 /// Also need establish `EVENT_DB_URL` env variable with the following value
 /// ```
-/// EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+/// EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 /// ```
 /// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
 #[cfg(test)]

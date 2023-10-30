@@ -2,11 +2,12 @@
 //!
 //! This defines all endpoints for the Catalyst Data Service API.
 //! It however does NOT contain any processing for them, that is defined elsewhere.
-use crate::settings::API_URL_PREFIX;
 use health::HealthApi;
 use poem_openapi::{ContactObject, LicenseObject, OpenApiService, ServerObject};
 use registration::RegistrationApi;
 use test_endpoints::TestApi;
+
+use crate::settings::API_URL_PREFIX;
 
 mod health;
 mod registration;
