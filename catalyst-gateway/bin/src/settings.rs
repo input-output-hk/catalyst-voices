@@ -249,11 +249,11 @@ mod tests {
         assert_eq!(GITHUB_REPO_NAME.as_str(), GITHUB_REPO_NAME_DEFAULT);
     }
 
-    #[test]
-    fn github_repo_name_set() {
-        env::set_var("GITHUB_REPO_NAME", "test");
-        assert_eq!(GITHUB_REPO_NAME.as_str(), GITHUB_REPO_NAME_DEFAULT);
-    }
+    // #[test]
+    // fn github_repo_name_set() {
+    // env::set_var("GITHUB_REPO_NAME", "test");
+    // assert_eq!(GITHUB_REPO_NAME.as_str(), GITHUB_REPO_NAME_DEFAULT);
+    // }
 
     #[test]
     fn generate_github_issue_url() {

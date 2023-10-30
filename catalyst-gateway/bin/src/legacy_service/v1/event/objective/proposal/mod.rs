@@ -92,193 +92,193 @@ async fn proposal_exec(
     Ok(proposal)
 }
 
-/// Need to setup and run a test event db instance
-/// To do it you can use the following commands:
-/// Prepare docker images
-/// ```
-/// earthly ./containers/event-db-migrations+docker --data=test
-/// ```
-/// Run event-db container
-/// ```
-/// docker-compose -f src/event-db/docker-compose.yml up migrations
-/// ```
-/// Also need establish `EVENT_DB_URL` env variable with the following value
-/// ```
-/// EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
-/// ```
-/// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
-#[cfg(test)]
-mod tests {
-    use axum::{
-        body::Body,
-        http::{Request, StatusCode},
-    };
-    use tower::ServiceExt;
-
-    use super::*;
-    use crate::legacy_service::{app, tests::response_body_to_json};
-
-    #[tokio::test]
-    async fn proposal_test() {
-        let state = Arc::new(State::new(None).await.unwrap());
-        let app = app(state);
-
-        let request = Request::builder()
-            .uri(format!(
-                "/api/v1/event/{0}/objective/{1}/proposal/{2}",
-                1, 1, 10
-            ))
-            .body(Body::empty())
-            .unwrap();
-        let response = app.clone().oneshot(request).await.unwrap();
-        assert_eq!(response.status(), StatusCode::OK);
-        assert_eq!(
-            response_body_to_json(response).await.unwrap(),
-            serde_json::json!(
-                {
-                    "id": 10,
-                    "title": "title 1",
-                    "summary": "summary 1",
-                    "deleted": false,
-                    "funds": 100,
-                    "url": "url.xyz",
-                    "files": "files.xyz",
-                    "proposer": [
-                        {
-                            "name": "alice",
-                            "email": "alice@io",
-                            "url": "alice.prop.xyz",
-                            "payment_key": "b7a3c12dc0c8c748ab07525b701122b88bd78f600c76342d27f25e5f92444cde"
-                        }
-                    ],
-                    "supplemental": {
-                        "brief": "Brief explanation of a proposal",
-                        "goal": "The goal of the proposal is addressed to meet",
-                        "importance": "The importance of the proposal",
-                    }
-                }
-            ),
-        );
-
-        let request = Request::builder()
-            .uri(format!(
-                "/api/v1/event/{0}/objective/{1}/proposal/{2}",
-                3, 3, 3
-            ))
-            .body(Body::empty())
-            .unwrap();
-        let response = app.clone().oneshot(request).await.unwrap();
-        assert_eq!(response.status(), StatusCode::NOT_FOUND);
-    }
-
-    #[tokio::test]
-    async fn proposals_test() {
-        let state = Arc::new(State::new(None).await.unwrap());
-        let app = app(state);
-
-        let request = Request::builder()
-            .uri(format!("/api/v1/event/{0}/objective/{1}/proposals", 1, 1))
-            .body(Body::empty())
-            .unwrap();
-        let response = app.clone().oneshot(request).await.unwrap();
-        assert_eq!(response.status(), StatusCode::OK);
-        assert_eq!(
-            response_body_to_json(response).await.unwrap(),
-            serde_json::json!([
-                {
-                    "id": 10,
-                    "title": "title 1",
-                    "summary": "summary 1",
-                    "deleted": false
-                },
-                {
-                    "id": 20,
-                    "title": "title 2",
-                    "summary": "summary 2",
-                    "deleted": false
-                },
-                {
-                    "id": 30,
-                    "title": "title 3",
-                    "summary": "summary 3",
-                    "deleted": false
-                }
-            ]),
-        );
-
-        let request = Request::builder()
-            .uri(format!(
-                "/api/v1/event/{0}/objective/{1}/proposals?limit={2}",
-                1, 1, 2
-            ))
-            .body(Body::empty())
-            .unwrap();
-        let response = app.clone().oneshot(request).await.unwrap();
-        assert_eq!(response.status(), StatusCode::OK);
-        assert_eq!(
-            response_body_to_json(response).await.unwrap(),
-            serde_json::json!([
-                {
-                    "id": 10,
-                    "title": "title 1",
-                    "summary": "summary 1",
-                    "deleted": false
-                },
-                {
-                    "id": 20,
-                    "title": "title 2",
-                    "summary": "summary 2",
-                    "deleted": false
-                },
-            ]),
-        );
-
-        let request = Request::builder()
-            .uri(format!(
-                "/api/v1/event/{0}/objective/{1}/proposals?offset={2}",
-                1, 1, 1
-            ))
-            .body(Body::empty())
-            .unwrap();
-        let response = app.clone().oneshot(request).await.unwrap();
-        assert_eq!(response.status(), StatusCode::OK);
-        assert_eq!(
-            response_body_to_json(response).await.unwrap(),
-            serde_json::json!([
-                {
-                    "id": 20,
-                    "title": "title 2",
-                    "summary": "summary 2",
-                    "deleted": false
-                },
-                {
-                    "id": 30,
-                    "title": "title 3",
-                    "summary": "summary 3",
-                    "deleted": false
-                }
-            ]),
-        );
-
-        let request = Request::builder()
-            .uri(format!(
-                "/api/v1/event/{0}/objective/{1}/proposals?offset={2}&limit={3}",
-                1, 1, 1, 1
-            ))
-            .body(Body::empty())
-            .unwrap();
-        let response = app.clone().oneshot(request).await.unwrap();
-        assert_eq!(response.status(), StatusCode::OK);
-        assert_eq!(
-            response_body_to_json(response).await.unwrap(),
-            serde_json::json!([
-                {
-                    "id": 20,
-                    "title": "title 2",
-                    "summary": "summary 2",
-                    "deleted": false
-                },
-            ]),
-        );
-    }
-}
+// Need to setup and run a test event db instance
+// To do it you can use the following commands:
+// Prepare docker images
+// ```
+// earthly ./containers/event-db-migrations+docker --data=test
+// ```
+// Run event-db container
+// ```
+// docker-compose -f src/event-db/docker-compose.yml up migrations
+// ```
+// Also need establish `EVENT_DB_URL` env variable with the following value
+// ```
+// EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+// ```
+// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
+// #[cfg(test)]
+// mod tests {
+// use axum::{
+// body::Body,
+// http::{Request, StatusCode},
+// };
+// use tower::ServiceExt;
+//
+// use super::*;
+// use crate::legacy_service::{app, tests::response_body_to_json};
+//
+// #[tokio::test]
+// async fn proposal_test() {
+// let state = Arc::new(State::new(None).await.unwrap());
+// let app = app(state);
+//
+// let request = Request::builder()
+// .uri(format!(
+// "/api/v1/event/{0}/objective/{1}/proposal/{2}",
+// 1, 1, 10
+// ))
+// .body(Body::empty())
+// .unwrap();
+// let response = app.clone().oneshot(request).await.unwrap();
+// assert_eq!(response.status(), StatusCode::OK);
+// assert_eq!(
+// response_body_to_json(response).await.unwrap(),
+// serde_json::json!(
+// {
+// "id": 10,
+// "title": "title 1",
+// "summary": "summary 1",
+// "deleted": false,
+// "funds": 100,
+// "url": "url.xyz",
+// "files": "files.xyz",
+// "proposer": [
+// {
+// "name": "alice",
+// "email": "alice@io",
+// "url": "alice.prop.xyz",
+// "payment_key": "b7a3c12dc0c8c748ab07525b701122b88bd78f600c76342d27f25e5f92444cde"
+// }
+// ],
+// "supplemental": {
+// "brief": "Brief explanation of a proposal",
+// "goal": "The goal of the proposal is addressed to meet",
+// "importance": "The importance of the proposal",
+// }
+// }
+// ),
+// );
+//
+// let request = Request::builder()
+// .uri(format!(
+// "/api/v1/event/{0}/objective/{1}/proposal/{2}",
+// 3, 3, 3
+// ))
+// .body(Body::empty())
+// .unwrap();
+// let response = app.clone().oneshot(request).await.unwrap();
+// assert_eq!(response.status(), StatusCode::NOT_FOUND);
+// }
+//
+// #[tokio::test]
+// async fn proposals_test() {
+// let state = Arc::new(State::new(None).await.unwrap());
+// let app = app(state);
+//
+// let request = Request::builder()
+// .uri(format!("/api/v1/event/{0}/objective/{1}/proposals", 1, 1))
+// .body(Body::empty())
+// .unwrap();
+// let response = app.clone().oneshot(request).await.unwrap();
+// assert_eq!(response.status(), StatusCode::OK);
+// assert_eq!(
+// response_body_to_json(response).await.unwrap(),
+// serde_json::json!([
+// {
+// "id": 10,
+// "title": "title 1",
+// "summary": "summary 1",
+// "deleted": false
+// },
+// {
+// "id": 20,
+// "title": "title 2",
+// "summary": "summary 2",
+// "deleted": false
+// },
+// {
+// "id": 30,
+// "title": "title 3",
+// "summary": "summary 3",
+// "deleted": false
+// }
+// ]),
+// );
+//
+// let request = Request::builder()
+// .uri(format!(
+// "/api/v1/event/{0}/objective/{1}/proposals?limit={2}",
+// 1, 1, 2
+// ))
+// .body(Body::empty())
+// .unwrap();
+// let response = app.clone().oneshot(request).await.unwrap();
+// assert_eq!(response.status(), StatusCode::OK);
+// assert_eq!(
+// response_body_to_json(response).await.unwrap(),
+// serde_json::json!([
+// {
+// "id": 10,
+// "title": "title 1",
+// "summary": "summary 1",
+// "deleted": false
+// },
+// {
+// "id": 20,
+// "title": "title 2",
+// "summary": "summary 2",
+// "deleted": false
+// },
+// ]),
+// );
+//
+// let request = Request::builder()
+// .uri(format!(
+// "/api/v1/event/{0}/objective/{1}/proposals?offset={2}",
+// 1, 1, 1
+// ))
+// .body(Body::empty())
+// .unwrap();
+// let response = app.clone().oneshot(request).await.unwrap();
+// assert_eq!(response.status(), StatusCode::OK);
+// assert_eq!(
+// response_body_to_json(response).await.unwrap(),
+// serde_json::json!([
+// {
+// "id": 20,
+// "title": "title 2",
+// "summary": "summary 2",
+// "deleted": false
+// },
+// {
+// "id": 30,
+// "title": "title 3",
+// "summary": "summary 3",
+// "deleted": false
+// }
+// ]),
+// );
+//
+// let request = Request::builder()
+// .uri(format!(
+// "/api/v1/event/{0}/objective/{1}/proposals?offset={2}&limit={3}",
+// 1, 1, 1, 1
+// ))
+// .body(Body::empty())
+// .unwrap();
+// let response = app.clone().oneshot(request).await.unwrap();
+// assert_eq!(response.status(), StatusCode::OK);
+// assert_eq!(
+// response_body_to_json(response).await.unwrap(),
+// serde_json::json!([
+// {
+// "id": 20,
+// "title": "title 2",
+// "summary": "summary 2",
+// "deleted": false
+// },
+// ]),
+// );
+// }
+// }

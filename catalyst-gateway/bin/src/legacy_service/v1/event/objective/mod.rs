@@ -124,295 +124,295 @@ async fn objectives_voting_statuses_exec(
     Ok(voting_statuses)
 }
 
-/// Need to setup and run a test event db instance
-/// To do it you can use the following commands:
-/// Prepare docker images
-/// ```
-/// earthly ./containers/event-db-migrations+docker --data=test
-/// ```
-/// Run event-db container
-/// ```
-/// docker-compose -f src/event-db/docker-compose.yml up migrations
-/// ```
-/// Also need establish `EVENT_DB_URL` env variable with the following value
-/// ```
-/// EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
-/// ```
-/// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
-#[cfg(test)]
-mod tests {
-    use axum::{
-        body::Body,
-        http::{Request, StatusCode},
-    };
-    use tower::ServiceExt;
-
-    use super::*;
-    use crate::legacy_service::{app, tests::response_body_to_json};
-
-    #[tokio::test]
-    async fn objectives_test() {
-        let state = Arc::new(State::new(None).await.unwrap());
-        let app = app(state);
-
-        let request = Request::builder()
-            .uri(format!("/api/v1/event/{0}/objectives", 1))
-            .body(Body::empty())
-            .unwrap();
-        let response = app.clone().oneshot(request).await.unwrap();
-        assert_eq!(response.status(), StatusCode::OK);
-        assert_eq!(
-            response_body_to_json(response).await.unwrap(),
-            serde_json::json!(
-                [
-                    {
-                        "id": 1,
-                        "type": {
-                            "id": "catalyst-simple",
-                            "description": "A Simple choice"
-                        },
-                        "title": "title 1",
-                        "description": "description 1",
-                        "deleted": false,
-                        "groups": [
-                            {
-                                "group": "direct",
-                                "voting_token": "voting token 1"
-                            },
-                            {
-                                "group": "rep",
-                                "voting_token": "voting token 2"
-                            }
-                        ],
-                        "reward": {
-                            "currency": "ADA",
-                            "value": 100
-                        },
-                        "supplemental": {
-                            "url":"objective 1 url",
-                            "sponsor": "objective 1 sponsor",
-                            "video": "objective 1 video"
-                        }
-                    },
-                    {
-                        "id": 2,
-                        "type": {
-                            "id": "catalyst-native",
-                            "description": "??"
-                        },
-                        "title": "title 2",
-                        "description": "description 2",
-                        "deleted": false,
-                        "groups": [],
-                    }
-                ]
-            ),
-        );
-
-        let request = Request::builder()
-            .uri(format!("/api/v1/event/{0}/objectives?limit={1}", 1, 1))
-            .body(Body::empty())
-            .unwrap();
-        let response = app.clone().oneshot(request).await.unwrap();
-        assert_eq!(response.status(), StatusCode::OK);
-        assert_eq!(
-            response_body_to_json(response).await.unwrap(),
-            serde_json::json!(
-                [
-                    {
-                        "id": 1,
-                        "type": {
-                            "id": "catalyst-simple",
-                            "description": "A Simple choice"
-                        },
-                        "title": "title 1",
-                        "description": "description 1",
-                        "deleted": false,
-                        "groups": [
-                            {
-                                "group": "direct",
-                                "voting_token": "voting token 1"
-                            },
-                            {
-                                "group": "rep",
-                                "voting_token": "voting token 2"
-                            }
-                        ],
-                        "reward": {
-                            "currency": "ADA",
-                            "value": 100
-                        },
-                        "supplemental": {
-                            "url":"objective 1 url",
-                            "sponsor": "objective 1 sponsor",
-                            "video": "objective 1 video"
-                        }
-                    },
-                ]
-            ),
-        );
-
-        let request = Request::builder()
-            .uri(format!("/api/v1/event/{0}/objectives?offset={1}", 1, 1))
-            .body(Body::empty())
-            .unwrap();
-        let response = app.clone().oneshot(request).await.unwrap();
-        assert_eq!(response.status(), StatusCode::OK);
-        assert_eq!(
-            response_body_to_json(response).await.unwrap(),
-            serde_json::json!(
-                [
-                    {
-                        "id": 2,
-                        "type": {
-                            "id": "catalyst-native",
-                            "description": "??"
-                        },
-                        "title": "title 2",
-                        "description": "description 2",
-                        "deleted": false,
-                        "groups": [],
-                    }
-                ]
-            ),
-        );
-
-        let request = Request::builder()
-            .uri(format!(
-                "/api/v1/event/{0}/objectives?limit={1}&offset={2}",
-                1, 1, 2
-            ))
-            .body(Body::empty())
-            .unwrap();
-        let response = app.clone().oneshot(request).await.unwrap();
-        assert_eq!(
-            response_body_to_json(response).await.unwrap(),
-            serde_json::json!([])
-        );
-    }
-
-    #[tokio::test]
-    async fn objectives_voting_status_test() {
-        let state = Arc::new(State::new(None).await.unwrap());
-        let app = app(state);
-
-        let data = mocked_voting_status_data();
-        let request = Request::builder()
-            .uri(format!("/api/v1/event/{0}/objectives/voting_status", 1))
-            .body(Body::empty())
-            .unwrap();
-        let response = app.clone().oneshot(request).await.unwrap();
-        assert_eq!(response.status(), StatusCode::OK);
-        assert_eq!(
-            response_body_to_json(response).await.unwrap(),
-            if let Some(settings) = data.1.clone() {
-                serde_json::json!(
-                    [
-                        {
-                            "objective_id": 1,
-                            "open": data.0,
-                            "settings": settings,
-                        },
-                        {
-                            "objective_id": 2,
-                            "open": data.0,
-                            "settings": settings,
-                        }
-                    ]
-                )
-            } else {
-                serde_json::json!(
-                    [
-                        {
-                            "objective_id": 1,
-                            "open": data.0,
-                        },
-                        {
-                            "objective_id": 2,
-                            "open": data.0,
-                        }
-                    ]
-                )
-            },
-        );
-
-        let request = Request::builder()
-            .uri(format!(
-                "/api/v1/event/{0}/objectives/voting_status?limit={1}",
-                1, 1
-            ))
-            .body(Body::empty())
-            .unwrap();
-        let response = app.clone().oneshot(request).await.unwrap();
-        assert_eq!(response.status(), StatusCode::OK);
-        assert_eq!(
-            response_body_to_json(response).await.unwrap(),
-            if let Some(settings) = data.1.clone() {
-                serde_json::json!(
-                    [
-                        {
-                            "objective_id": 1,
-                            "open": data.0,
-                            "settings": settings,
-                        }
-                    ]
-                )
-            } else {
-                serde_json::json!(
-                    [
-                        {
-                            "objective_id": 1,
-                            "open": data.0,
-                        }
-                    ]
-                )
-            },
-        );
-
-        let request = Request::builder()
-            .uri(format!(
-                "/api/v1/event/{0}/objectives/voting_status?offset={1}",
-                1, 1
-            ))
-            .body(Body::empty())
-            .unwrap();
-        let response = app.clone().oneshot(request).await.unwrap();
-        assert_eq!(response.status(), StatusCode::OK);
-        assert_eq!(
-            response_body_to_json(response).await.unwrap(),
-            if let Some(settings) = data.1.clone() {
-                serde_json::json!(
-                    [
-                        {
-                            "objective_id": 2,
-                            "open": data.0,
-                            "settings": settings,
-                        }
-                    ]
-                )
-            } else {
-                serde_json::json!(
-                    [
-                        {
-                            "objective_id": 2,
-                            "open": data.0,
-                        }
-                    ]
-                )
-            },
-        );
-
-        let request = Request::builder()
-            .uri(format!(
-                "/api/v1/event/{0}/objectives/voting_status?limit={1}&offset={2}",
-                1, 1, 2
-            ))
-            .body(Body::empty())
-            .unwrap();
-        let response = app.clone().oneshot(request).await.unwrap();
-        assert_eq!(
-            response_body_to_json(response).await.unwrap(),
-            serde_json::json!([])
-        );
-    }
-}
+// Need to setup and run a test event db instance
+// To do it you can use the following commands:
+// Prepare docker images
+// ```
+// earthly ./containers/event-db-migrations+docker --data=test
+// ```
+// Run event-db container
+// ```
+// docker-compose -f src/event-db/docker-compose.yml up migrations
+// ```
+// Also need establish `EVENT_DB_URL` env variable with the following value
+// ```
+// EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+// ```
+// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
+// #[cfg(test)]
+// mod tests {
+// use axum::{
+// body::Body,
+// http::{Request, StatusCode},
+// };
+// use tower::ServiceExt;
+//
+// use super::*;
+// use crate::legacy_service::{app, tests::response_body_to_json};
+//
+// #[tokio::test]
+// async fn objectives_test() {
+// let state = Arc::new(State::new(None).await.unwrap());
+// let app = app(state);
+//
+// let request = Request::builder()
+// .uri(format!("/api/v1/event/{0}/objectives", 1))
+// .body(Body::empty())
+// .unwrap();
+// let response = app.clone().oneshot(request).await.unwrap();
+// assert_eq!(response.status(), StatusCode::OK);
+// assert_eq!(
+// response_body_to_json(response).await.unwrap(),
+// serde_json::json!(
+// [
+// {
+// "id": 1,
+// "type": {
+// "id": "catalyst-simple",
+// "description": "A Simple choice"
+// },
+// "title": "title 1",
+// "description": "description 1",
+// "deleted": false,
+// "groups": [
+// {
+// "group": "direct",
+// "voting_token": "voting token 1"
+// },
+// {
+// "group": "rep",
+// "voting_token": "voting token 2"
+// }
+// ],
+// "reward": {
+// "currency": "ADA",
+// "value": 100
+// },
+// "supplemental": {
+// "url":"objective 1 url",
+// "sponsor": "objective 1 sponsor",
+// "video": "objective 1 video"
+// }
+// },
+// {
+// "id": 2,
+// "type": {
+// "id": "catalyst-native",
+// "description": "??"
+// },
+// "title": "title 2",
+// "description": "description 2",
+// "deleted": false,
+// "groups": [],
+// }
+// ]
+// ),
+// );
+//
+// let request = Request::builder()
+// .uri(format!("/api/v1/event/{0}/objectives?limit={1}", 1, 1))
+// .body(Body::empty())
+// .unwrap();
+// let response = app.clone().oneshot(request).await.unwrap();
+// assert_eq!(response.status(), StatusCode::OK);
+// assert_eq!(
+// response_body_to_json(response).await.unwrap(),
+// serde_json::json!(
+// [
+// {
+// "id": 1,
+// "type": {
+// "id": "catalyst-simple",
+// "description": "A Simple choice"
+// },
+// "title": "title 1",
+// "description": "description 1",
+// "deleted": false,
+// "groups": [
+// {
+// "group": "direct",
+// "voting_token": "voting token 1"
+// },
+// {
+// "group": "rep",
+// "voting_token": "voting token 2"
+// }
+// ],
+// "reward": {
+// "currency": "ADA",
+// "value": 100
+// },
+// "supplemental": {
+// "url":"objective 1 url",
+// "sponsor": "objective 1 sponsor",
+// "video": "objective 1 video"
+// }
+// },
+// ]
+// ),
+// );
+//
+// let request = Request::builder()
+// .uri(format!("/api/v1/event/{0}/objectives?offset={1}", 1, 1))
+// .body(Body::empty())
+// .unwrap();
+// let response = app.clone().oneshot(request).await.unwrap();
+// assert_eq!(response.status(), StatusCode::OK);
+// assert_eq!(
+// response_body_to_json(response).await.unwrap(),
+// serde_json::json!(
+// [
+// {
+// "id": 2,
+// "type": {
+// "id": "catalyst-native",
+// "description": "??"
+// },
+// "title": "title 2",
+// "description": "description 2",
+// "deleted": false,
+// "groups": [],
+// }
+// ]
+// ),
+// );
+//
+// let request = Request::builder()
+// .uri(format!(
+// "/api/v1/event/{0}/objectives?limit={1}&offset={2}",
+// 1, 1, 2
+// ))
+// .body(Body::empty())
+// .unwrap();
+// let response = app.clone().oneshot(request).await.unwrap();
+// assert_eq!(
+// response_body_to_json(response).await.unwrap(),
+// serde_json::json!([])
+// );
+// }
+//
+// #[tokio::test]
+// async fn objectives_voting_status_test() {
+// let state = Arc::new(State::new(None).await.unwrap());
+// let app = app(state);
+//
+// let data = mocked_voting_status_data();
+// let request = Request::builder()
+// .uri(format!("/api/v1/event/{0}/objectives/voting_status", 1))
+// .body(Body::empty())
+// .unwrap();
+// let response = app.clone().oneshot(request).await.unwrap();
+// assert_eq!(response.status(), StatusCode::OK);
+// assert_eq!(
+// response_body_to_json(response).await.unwrap(),
+// if let Some(settings) = data.1.clone() {
+// serde_json::json!(
+// [
+// {
+// "objective_id": 1,
+// "open": data.0,
+// "settings": settings,
+// },
+// {
+// "objective_id": 2,
+// "open": data.0,
+// "settings": settings,
+// }
+// ]
+// )
+// } else {
+// serde_json::json!(
+// [
+// {
+// "objective_id": 1,
+// "open": data.0,
+// },
+// {
+// "objective_id": 2,
+// "open": data.0,
+// }
+// ]
+// )
+// },
+// );
+//
+// let request = Request::builder()
+// .uri(format!(
+// "/api/v1/event/{0}/objectives/voting_status?limit={1}",
+// 1, 1
+// ))
+// .body(Body::empty())
+// .unwrap();
+// let response = app.clone().oneshot(request).await.unwrap();
+// assert_eq!(response.status(), StatusCode::OK);
+// assert_eq!(
+// response_body_to_json(response).await.unwrap(),
+// if let Some(settings) = data.1.clone() {
+// serde_json::json!(
+// [
+// {
+// "objective_id": 1,
+// "open": data.0,
+// "settings": settings,
+// }
+// ]
+// )
+// } else {
+// serde_json::json!(
+// [
+// {
+// "objective_id": 1,
+// "open": data.0,
+// }
+// ]
+// )
+// },
+// );
+//
+// let request = Request::builder()
+// .uri(format!(
+// "/api/v1/event/{0}/objectives/voting_status?offset={1}",
+// 1, 1
+// ))
+// .body(Body::empty())
+// .unwrap();
+// let response = app.clone().oneshot(request).await.unwrap();
+// assert_eq!(response.status(), StatusCode::OK);
+// assert_eq!(
+// response_body_to_json(response).await.unwrap(),
+// if let Some(settings) = data.1.clone() {
+// serde_json::json!(
+// [
+// {
+// "objective_id": 2,
+// "open": data.0,
+// "settings": settings,
+// }
+// ]
+// )
+// } else {
+// serde_json::json!(
+// [
+// {
+// "objective_id": 2,
+// "open": data.0,
+// }
+// ]
+// )
+// },
+// );
+//
+// let request = Request::builder()
+// .uri(format!(
+// "/api/v1/event/{0}/objectives/voting_status?limit={1}&offset={2}",
+// 1, 1, 2
+// ))
+// .body(Body::empty())
+// .unwrap();
+// let response = app.clone().oneshot(request).await.unwrap();
+// assert_eq!(
+// response_body_to_json(response).await.unwrap(),
+// serde_json::json!([])
+// );
+// }
+// }

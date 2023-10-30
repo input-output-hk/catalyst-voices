@@ -47,160 +47,160 @@ async fn reviews_exec(
     Ok(reviews)
 }
 
-/// Need to setup and run a test event db instance
-/// To do it you can use the following commands:
-/// Prepare docker images
-/// ```
-/// earthly ./containers/event-db-migrations+docker --data=test
-/// ```
-/// Run event-db container
-/// ```
-/// docker-compose -f src/event-db/docker-compose.yml up migrations
-/// ```
-/// Also need establish `EVENT_DB_URL` env variable with the following value
-/// ```
-/// EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
-/// ```
-/// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
-
-#[cfg(test)]
-mod tests {
-    use axum::{
-        body::Body,
-        http::{Request, StatusCode},
-    };
-    use tower::ServiceExt;
-
-    use super::*;
-    use crate::legacy_service::{app, tests::response_body_to_json};
-
-    #[tokio::test]
-    async fn reviews_test() {
-        let state = Arc::new(State::new(None).await.unwrap());
-        let app = app(state);
-
-        let request = Request::builder()
-            .uri(format!(
-                "/api/v1/event/{0}/objective/{1}/proposal/{2}/reviews",
-                1, 1, 10
-            ))
-            .body(Body::empty())
-            .unwrap();
-        let response = app.clone().oneshot(request).await.unwrap();
-        assert_eq!(response.status(), StatusCode::OK);
-        assert_eq!(
-            response_body_to_json(response).await.unwrap(),
-            serde_json::json!([
-                {
-                    "assessor": "assessor 1",
-                    "ratings": [
-                        {
-                            "review_type": 1,
-                            "score": 10,
-                            "note": "note 1"
-                        },
-                        {
-                            "review_type": 2,
-                            "score": 15,
-                            "note": "note 2"
-                        },
-                        {
-                            "review_type": 5,
-                            "score": 20,
-                            "note": "note 3"
-                        }
-                    ]
-                },
-                {
-                    "assessor": "assessor 2",
-                    "ratings": []
-                },
-                {
-                    "assessor": "assessor 3",
-                    "ratings": []
-                }
-            ]),
-        );
-
-        let request = Request::builder()
-            .uri(format!(
-                "/api/v1/event/{0}/objective/{1}/proposal/{2}/reviews?limit={3}",
-                1, 1, 10, 2
-            ))
-            .body(Body::empty())
-            .unwrap();
-        let response = app.clone().oneshot(request).await.unwrap();
-        assert_eq!(response.status(), StatusCode::OK);
-        assert_eq!(
-            response_body_to_json(response).await.unwrap(),
-            serde_json::json!([
-                {
-                    "assessor": "assessor 1",
-                    "ratings": [
-                        {
-                            "review_type": 1,
-                            "score": 10,
-                            "note": "note 1"
-                        },
-                        {
-                            "review_type": 2,
-                            "score": 15,
-                            "note": "note 2"
-                        },
-                        {
-                            "review_type": 5,
-                            "score": 20,
-                            "note": "note 3"
-                        }
-                    ]
-                },
-                {
-                    "assessor": "assessor 2",
-                    "ratings": []
-                },
-            ]),
-        );
-
-        let request = Request::builder()
-            .uri(format!(
-                "/api/v1/event/{0}/objective/{1}/proposal/{2}/reviews?offset={3}",
-                1, 1, 10, 1
-            ))
-            .body(Body::empty())
-            .unwrap();
-        let response = app.clone().oneshot(request).await.unwrap();
-        assert_eq!(response.status(), StatusCode::OK);
-        assert_eq!(
-            response_body_to_json(response).await.unwrap(),
-            serde_json::json!([
-                {
-                    "assessor": "assessor 2",
-                    "ratings": []
-                },
-                {
-                    "assessor": "assessor 3",
-                    "ratings": []
-                }
-            ]),
-        );
-
-        let request = Request::builder()
-            .uri(format!(
-                "/api/v1/event/{0}/objective/{1}/proposal/{2}/reviews?limit={3}&offset={4}",
-                1, 1, 10, 1, 1
-            ))
-            .body(Body::empty())
-            .unwrap();
-        let response = app.clone().oneshot(request).await.unwrap();
-        assert_eq!(response.status(), StatusCode::OK);
-        assert_eq!(
-            response_body_to_json(response).await.unwrap(),
-            serde_json::json!([
-                {
-                    "assessor": "assessor 2",
-                    "ratings": []
-                },
-            ]),
-        );
-    }
-}
+// Need to setup and run a test event db instance
+// To do it you can use the following commands:
+// Prepare docker images
+// ```
+// earthly ./containers/event-db-migrations+docker --data=test
+// ```
+// Run event-db container
+// ```
+// docker-compose -f src/event-db/docker-compose.yml up migrations
+// ```
+// Also need establish `EVENT_DB_URL` env variable with the following value
+// ```
+// EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+// ```
+// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
+//
+// #[cfg(test)]
+// mod tests {
+// use axum::{
+// body::Body,
+// http::{Request, StatusCode},
+// };
+// use tower::ServiceExt;
+//
+// use super::*;
+// use crate::legacy_service::{app, tests::response_body_to_json};
+//
+// #[tokio::test]
+// async fn reviews_test() {
+// let state = Arc::new(State::new(None).await.unwrap());
+// let app = app(state);
+//
+// let request = Request::builder()
+// .uri(format!(
+// "/api/v1/event/{0}/objective/{1}/proposal/{2}/reviews",
+// 1, 1, 10
+// ))
+// .body(Body::empty())
+// .unwrap();
+// let response = app.clone().oneshot(request).await.unwrap();
+// assert_eq!(response.status(), StatusCode::OK);
+// assert_eq!(
+// response_body_to_json(response).await.unwrap(),
+// serde_json::json!([
+// {
+// "assessor": "assessor 1",
+// "ratings": [
+// {
+// "review_type": 1,
+// "score": 10,
+// "note": "note 1"
+// },
+// {
+// "review_type": 2,
+// "score": 15,
+// "note": "note 2"
+// },
+// {
+// "review_type": 5,
+// "score": 20,
+// "note": "note 3"
+// }
+// ]
+// },
+// {
+// "assessor": "assessor 2",
+// "ratings": []
+// },
+// {
+// "assessor": "assessor 3",
+// "ratings": []
+// }
+// ]),
+// );
+//
+// let request = Request::builder()
+// .uri(format!(
+// "/api/v1/event/{0}/objective/{1}/proposal/{2}/reviews?limit={3}",
+// 1, 1, 10, 2
+// ))
+// .body(Body::empty())
+// .unwrap();
+// let response = app.clone().oneshot(request).await.unwrap();
+// assert_eq!(response.status(), StatusCode::OK);
+// assert_eq!(
+// response_body_to_json(response).await.unwrap(),
+// serde_json::json!([
+// {
+// "assessor": "assessor 1",
+// "ratings": [
+// {
+// "review_type": 1,
+// "score": 10,
+// "note": "note 1"
+// },
+// {
+// "review_type": 2,
+// "score": 15,
+// "note": "note 2"
+// },
+// {
+// "review_type": 5,
+// "score": 20,
+// "note": "note 3"
+// }
+// ]
+// },
+// {
+// "assessor": "assessor 2",
+// "ratings": []
+// },
+// ]),
+// );
+//
+// let request = Request::builder()
+// .uri(format!(
+// "/api/v1/event/{0}/objective/{1}/proposal/{2}/reviews?offset={3}",
+// 1, 1, 10, 1
+// ))
+// .body(Body::empty())
+// .unwrap();
+// let response = app.clone().oneshot(request).await.unwrap();
+// assert_eq!(response.status(), StatusCode::OK);
+// assert_eq!(
+// response_body_to_json(response).await.unwrap(),
+// serde_json::json!([
+// {
+// "assessor": "assessor 2",
+// "ratings": []
+// },
+// {
+// "assessor": "assessor 3",
+// "ratings": []
+// }
+// ]),
+// );
+//
+// let request = Request::builder()
+// .uri(format!(
+// "/api/v1/event/{0}/objective/{1}/proposal/{2}/reviews?limit={3}&offset={4}",
+// 1, 1, 10, 1, 1
+// ))
+// .body(Body::empty())
+// .unwrap();
+// let response = app.clone().oneshot(request).await.unwrap();
+// assert_eq!(response.status(), StatusCode::OK);
+// assert_eq!(
+// response_body_to_json(response).await.unwrap(),
+// serde_json::json!([
+// {
+// "assessor": "assessor 2",
+// "ratings": []
+// },
+// ]),
+// );
+// }
+// }

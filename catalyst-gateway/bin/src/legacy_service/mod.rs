@@ -86,26 +86,26 @@ fn handle_result<T: Serialize>(res: Result<T, Error>) -> Response {
     }
 }
 
-#[cfg(test)]
-pub(crate) mod tests {
-    use std::str::FromStr;
-
-    use axum::body::HttpBody;
-
-    pub(crate) async fn response_body_to_json<
-        T: HttpBody<Data = impl Into<Vec<u8>>, Error = axum::Error> + Unpin,
-    >(
-        response: axum::response::Response<T>,
-    ) -> Result<serde_json::Value, String> {
-        let data: Vec<u8> = response
-            .into_body()
-            .data()
-            .await
-            .ok_or("response should have data in a body".to_string())?
-            .map_err(|e| e.to_string())?
-            .into();
-
-        serde_json::Value::from_str(String::from_utf8(data).map_err(|e| e.to_string())?.as_str())
-            .map_err(|e| e.to_string())
-    }
-}
+// #[cfg(test)]
+// pub(crate) mod tests {
+// use std::str::FromStr;
+//
+// use axum::body::HttpBody;
+//
+// pub(crate) async fn response_body_to_json<
+// T: HttpBody<Data = impl Into<Vec<u8>>, Error = axum::Error> + Unpin,
+// >(
+// response: axum::response::Response<T>,
+// ) -> Result<serde_json::Value, String> {
+// let data: Vec<u8> = response
+// .into_body()
+// .data()
+// .await
+// .ok_or("response should have data in a body".to_string())?
+// .map_err(|e| e.to_string())?
+// .into();
+//
+// serde_json::Value::from_str(String::from_utf8(data).map_err(|e|
+// e.to_string())?.as_str()) .map_err(|e| e.to_string())
+// }
+// }

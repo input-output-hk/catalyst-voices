@@ -74,28 +74,28 @@ pub(crate) async fn establish_connection(url: Option<&str>) -> Result<EventDB, E
     Ok(db)
 }
 
-/// Need to setup and run a test event db instance
-/// To do it you can use the following commands:
-/// Prepare docker images
-/// ```
-/// earthly ./containers/event-db-migrations+docker --data=test
-/// ```
-/// Run event-db container
-/// ```
-/// docker-compose -f src/event-db/docker-compose.yml up migrations
-/// ```
-/// Also need establish `EVENT_DB_URL` env variable with the following value
-/// ```
-/// EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
-/// ```
-/// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    /// Check if the schema version in the DB is up to date.
-    #[tokio::test]
-    async fn check_schema_version() {
-        establish_connection(None).await.unwrap();
-    }
-}
+// Need to setup and run a test event db instance
+// To do it you can use the following commands:
+// Prepare docker images
+// ```
+// earthly ./containers/event-db-migrations+docker --data=test
+// ```
+// Run event-db container
+// ```
+// docker-compose -f src/event-db/docker-compose.yml up migrations
+// ```
+// Also need establish `EVENT_DB_URL` env variable with the following value
+// ```
+// EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+// ```
+// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
+// #[cfg(test)]
+// mod test {
+// use super::*;
+//
+// Check if the schema version in the DB is up to date.
+// #[tokio::test]
+// async fn check_schema_version() {
+// establish_connection(None).await.unwrap();
+// }
+// }

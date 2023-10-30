@@ -29,10 +29,10 @@ build-hosted:
  
     RUN /scripts/std_build.sh
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:t2+SMOKE_TEST --bin=hello_world
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:t2+SMOKE_TEST --bin=cat-gateway
 
     SAVE ARTIFACT target/$TARGETARCH/doc doc
-    SAVE ARTIFACT target/$TARGETARCH/release/hello_world hello_world
+    SAVE ARTIFACT target/$TARGETARCH/release/cat-gateway cat-gateway
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
