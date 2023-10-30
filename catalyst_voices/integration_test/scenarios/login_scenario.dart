@@ -11,10 +11,8 @@ void main() {
   group('Login', () {
     testWidgets('shows error message when login information is missing',
         (tester) async {
-      app.main();
-      await tester.pumpAndSettle();
+      loginRobot = await _configure(tester);
 
-      loginRobot = LoginRobot(widgetTester: tester);
       await loginRobot.enterUsername('Not Valid');
       await loginRobot.tapLoginButton();
       await loginRobot.checkInvalidCredentialsMessageIsShown();
@@ -22,13 +20,17 @@ void main() {
 
     testWidgets('authenticates a user with an username and password',
         (tester) async {
-      app.main();
-      await tester.pumpAndSettle();
+      loginRobot = await _configure(tester);
 
-      loginRobot = LoginRobot(widgetTester: tester);
       await loginRobot.enterUsername('robot');
       await loginRobot.enterPassword('1234');
       await loginRobot.tapLoginButton();
     });
   });
+}
+
+Future<LoginRobot> _configure(WidgetTester tester) async {
+  app.main();
+  await tester.pumpAndSettle();
+  return LoginRobot(widgetTester: tester);
 }
