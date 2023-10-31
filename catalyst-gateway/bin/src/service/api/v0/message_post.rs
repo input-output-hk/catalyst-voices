@@ -24,10 +24,7 @@ pub(crate) type AllResponses = response! {
 ///
 /// Message post endpoint.
 ///
-/// So, it will always just return 200.
-///
-/// In theory it can also return 503 is the service has some startup processing
-/// to complete before it is ready to serve requests.
+/// When successful, returns a summary of fragments accepted and rejected.
 ///
 /// ## Responses
 ///
