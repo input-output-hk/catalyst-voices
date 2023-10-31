@@ -1,4 +1,9 @@
-use crate::{service::common::tags::ApiTags, state::State};
+//! `v1` Endpoints
+
+use crate::{
+    service::common::{objects::account_votes::AccountId, tags::ApiTags},
+    state::State,
+};
 use poem::web::{Data, Path};
 use poem_openapi::OpenApi;
 use std::sync::Arc;
@@ -15,11 +20,12 @@ impl V1Api {
         method = "get",
         operation_id = "AccountVotes"
     )]
+    /// Votes for
     async fn get_account_votes(
         &self,
-        _state: Data<&Arc<State>>,
-        _account_id: Path<String>,
+        state: Data<&Arc<State>>,
+        account_id: Path<AccountId>,
     ) -> account_votes_get::AllResponses {
-        todo!();
+        account_votes_get::endpoint(state, account_id).await
     }
 }

@@ -1,7 +1,7 @@
 //! `v0` Endpoints
-use poem_openapi::{payload::Binary, OpenApi};
 
 use crate::service::common::tags::ApiTags;
+use poem_openapi::{payload::Binary, OpenApi};
 
 mod message_post;
 
