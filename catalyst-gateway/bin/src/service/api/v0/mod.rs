@@ -8,14 +8,9 @@ mod message_post;
 /// `v0` API Endpoints
 pub(crate) struct V0Api;
 
-#[OpenApi(prefix_path = "/v0")]
+#[OpenApi(prefix_path = "/v0", tag = "ApiTags::V0")]
 impl V0Api {
-    #[oai(
-        path = "/message",
-        method = "post",
-        operation_id = "Message",
-        tag = "ApiTags::Message"
-    )]
+    #[oai(path = "/message", method = "post", operation_id = "Message")]
     /// Posts a signed transaction.
     async fn message_post(&self, message: Binary<Vec<u8>>) -> message_post::AllResponses {
         message_post::endpoint(message).await

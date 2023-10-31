@@ -63,7 +63,7 @@ const TERMS_OF_SERVICE: &str =
 /// Create the `OpenAPI` definition
 pub(crate) fn mk_api(
     hosts: Vec<String>,
-) -> OpenApiService<(TestApi, HealthApi, V0Api, RegistrationApi), ()> {
+) -> OpenApiService<(TestApi, HealthApi, RegistrationApi, V0Api, V1Api), ()> {
     let mut service = OpenApiService::new(
         (TestApi, HealthApi, RegistrationApi, V0Api, V1Api),
         API_TITLE,
