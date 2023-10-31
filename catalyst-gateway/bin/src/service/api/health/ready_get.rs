@@ -1,11 +1,13 @@
 //! Implementation of the GET /health/ready endpoint
 
-use poem_extensions::{response, UniResponse::T204};
+use std::sync::Arc;
 
-use crate::service::common::responses::{
-    resp_2xx::NoContent,
-    resp_5xx::{ServerError, ServiceUnavailable},
+use poem::web::Data;
+use poem_extensions::{
+    response,
+    UniResponse::{T204, T500, T503},
 };
+
 use crate::{
     service::common::responses::{
         resp_2xx::NoContent,
@@ -13,10 +15,6 @@ use crate::{
     },
     state::State,
 };
-use poem::web::Data;
-use poem_extensions::response;
-use poem_extensions::UniResponse::{T204, T500, T503};
-use std::sync::Arc;
 
 /// All responses
 pub(crate) type AllResponses = response! {

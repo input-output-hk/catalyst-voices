@@ -1,11 +1,10 @@
 //! Health Endpoints
-//!
-use crate::{service::common::tags::ApiTags, state::State};
-use poem::web::Data;
-use poem_openapi::OpenApi;
 use std::sync::Arc;
 
-use crate::service::common::tags::ApiTags;
+use poem::web::Data;
+use poem_openapi::OpenApi;
+
+use crate::{service::common::tags::ApiTags, state::State};
 
 mod live_get;
 mod ready_get;

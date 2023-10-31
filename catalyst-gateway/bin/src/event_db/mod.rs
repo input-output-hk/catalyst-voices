@@ -35,12 +35,11 @@ pub(crate) struct EventDB {
 ///
 /// # Parameters
 ///
-/// * `url` set to the postgres connection string needed to connect to the
-///   database.  IF it is None, then the env var "`DATABASE_URL`" will be used
-///   for this connection string. eg:
-///     "`postgres://catalyst-dev:CHANGE_ME@localhost/CatalystDev`"
-/// * `do_schema_check` boolean flag to decide whether to verify the schema version
-///   or not. If it is `true`, a query is made to verify the DB schema version.
+/// * `url` set to the postgres connection string needed to connect to the database.  IF
+///   it is None, then the env var "`DATABASE_URL`" will be used for this connection
+///   string. eg: "`postgres://catalyst-dev:CHANGE_ME@localhost/CatalystDev`"
+/// * `do_schema_check` boolean flag to decide whether to verify the schema version or
+///   not. If it is `true`, a query is made to verify the DB schema version.
 ///
 /// # Errors
 ///

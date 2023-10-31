@@ -1,7 +1,7 @@
 //! `v0` Endpoints
-//!
-use crate::service::common::tags::ApiTags;
 use poem_openapi::{payload::Binary, OpenApi};
+
+use crate::service::common::tags::ApiTags;
 
 mod message_post;
 
@@ -34,15 +34,17 @@ impl V0Api {
 /// ```
 /// Also need establish `EVENT_DB_URL` env variable with the following value
 /// ```
-/// EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+/// EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 /// ```
 /// [readme](https://github.com/input-output-hk/catalyst-voices/blob/main/catalyst-gateway/event-db/Readme.md)
 
 #[cfg(test)]
 mod tests {
-    use crate::{service::poem_service::tests::mk_test_app, state::State};
-    use poem::http::StatusCode;
     use std::sync::Arc;
+
+    use poem::http::StatusCode;
+
+    use crate::{service::poem_service::tests::mk_test_app, state::State};
 
     #[tokio::test]
     async fn v0_test() {

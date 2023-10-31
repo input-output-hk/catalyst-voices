@@ -10,7 +10,8 @@ pub(crate) enum ApiTags {
     /// Power.
     /// Message Endpoints
     Message,
-    /// Information relating to Voter Registration, Delegations and Calculated Voting Power.
+    /// Information relating to Voter Registration, Delegations and Calculated Voting
+    /// Power.
     Registration,
     /// Test Endpoints (Not part of the API)
     Test,

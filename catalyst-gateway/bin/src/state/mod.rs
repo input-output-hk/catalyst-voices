@@ -1,10 +1,10 @@
 //! Shared state used by all endpoints.
-//!
-use crate::cli::Error;
-use crate::event_db::{establish_connection, queries::EventDbQueries};
 use std::sync::Arc;
 
-use crate::{cli::Error, event_db::queries::EventDbQueries};
+use crate::{
+    cli::Error,
+    event_db::{establish_connection, queries::EventDbQueries},
+};
 
 /// Global State of the service
 pub(crate) struct State {
