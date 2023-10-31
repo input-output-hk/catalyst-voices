@@ -1,6 +1,6 @@
 VERSION 0.7
 
-#cspell: words rustup readelf nextest testci testdocs
+#cspell: words rustup readelf nextest testci testdocs rustfmt toolsets USERARCH
 
 # Set up our target toolchains, and copy our files.
 builder:
@@ -84,7 +84,7 @@ package:
 integrate:
     FROM scratch
 
-# Publish packlages if all integration tests have passed. (Failure to pass tests will prevent packages being published.)
+# Publish packages if all integration tests have passed. (Failure to pass tests will prevent packages being published.)
 publish:
     FROM scratch
 
