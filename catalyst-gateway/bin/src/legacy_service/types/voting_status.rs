@@ -1,12 +1,11 @@
+use serde::{ser::Serializer, Serialize};
+
 use super::SerdeType;
 use crate::event_db::types::{objective::ObjectiveId, voting_status::VotingStatus};
-use serde::{ser::Serializer, Serialize};
 
 impl Serialize for SerdeType<VotingStatus> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct VotingStatusSerde<'a> {
             objective_id: SerdeType<&'a ObjectiveId>,
@@ -25,9 +24,10 @@ impl Serialize for SerdeType<VotingStatus> {
 
 #[cfg(test)]
 mod tests {
+    use serde_json::json;
+
     use super::*;
     use crate::event_db::types::objective::ObjectiveId;
-    use serde_json::json;
 
     #[test]
     fn voting_status_json_test() {

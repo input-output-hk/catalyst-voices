@@ -1,14 +1,13 @@
 //! This module contains common and re-usable responses with a 4xx response code.
-/// While using macro-vis lib, you will get the `uncommon_codepoints` warning, so you will probably want to place this in your crate root
-use crate::settings::generate_github_issue_url;
-use poem::error::ResponseError;
-use poem::http::StatusCode;
+use poem::{error::ResponseError, http::StatusCode};
 use poem_extensions::OneResponse;
-use poem_openapi::payload::Json;
-use poem_openapi::types::Example;
-use poem_openapi::Object;
+use poem_openapi::{payload::Json, types::Example, Object};
 use url::Url;
 use uuid::Uuid;
+
+/// While using macro-vis lib, you will get the `uncommon_codepoints` warning, so you will
+/// probably want to place this in your crate root
+use crate::settings::generate_github_issue_url;
 
 /// Create a new Server Error Response.
 /// Logging error message.

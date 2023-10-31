@@ -1,6 +1,7 @@
 //! Check if the schema is up-to-date.
-use crate::event_db::{Error, EventDB, DATABASE_SCHEMA_VERSION};
 use async_trait::async_trait;
+
+use crate::event_db::{Error, EventDB, DATABASE_SCHEMA_VERSION};
 
 /// Trait to check the schema version of a connection.
 #[async_trait]

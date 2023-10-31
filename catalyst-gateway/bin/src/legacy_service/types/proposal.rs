@@ -1,42 +1,35 @@
+use serde::{de::Deserializer, ser::Serializer, Deserialize, Serialize};
+use serde_json::Value;
+
 use super::SerdeType;
 use crate::event_db::types::proposal::{
     Proposal, ProposalDetails, ProposalId, ProposalSummary, ProposerDetails,
 };
-use serde::{de::Deserializer, ser::Serializer, Deserialize, Serialize};
-use serde_json::Value;
 
 impl Serialize for SerdeType<&ProposalId> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         self.0 .0.serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<ProposalId> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 impl<'de> Deserialize<'de> for SerdeType<ProposalId> {
     fn deserialize<D>(deserializer: D) -> Result<SerdeType<ProposalId>, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
+    where D: Deserializer<'de> {
         Ok(ProposalId(i32::deserialize(deserializer)?).into())
     }
 }
 
 impl Serialize for SerdeType<&ProposalSummary> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct ProposalSummarySerde<'a> {
             id: SerdeType<&'a ProposalId>,
@@ -56,18 +49,14 @@ impl Serialize for SerdeType<&ProposalSummary> {
 
 impl Serialize for SerdeType<ProposalSummary> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<&ProposerDetails> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct ProposerDetailsSerde<'a> {
             name: &'a String,
@@ -87,18 +76,14 @@ impl Serialize for SerdeType<&ProposerDetails> {
 
 impl Serialize for SerdeType<ProposerDetails> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<&ProposalDetails> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct ProposalDetailsSerde<'a> {
             funds: i64,
@@ -121,18 +106,14 @@ impl Serialize for SerdeType<&ProposalDetails> {
 
 impl Serialize for SerdeType<ProposalDetails> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<&Proposal> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         pub(crate) struct ProposalSerde<'a> {
             #[serde(flatten)]
@@ -151,17 +132,16 @@ impl Serialize for SerdeType<&Proposal> {
 
 impl Serialize for SerdeType<Proposal> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use serde_json::json;
+
+    use super::*;
 
     #[test]
     fn proposal_id_json_test() {

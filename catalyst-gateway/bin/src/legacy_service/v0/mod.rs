@@ -1,6 +1,8 @@
-use crate::state::State;
-use axum::Router;
 use std::sync::Arc;
+
+use axum::Router;
+
+use crate::state::State;
 
 mod fund;
 

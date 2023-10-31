@@ -1,5 +1,7 @@
 //! Registration Queries
-//!
+use async_trait::async_trait;
+use chrono::{NaiveDateTime, Utc};
+
 use crate::event_db::{
     types::{
         event::EventId,
@@ -7,27 +9,58 @@ use crate::event_db::{
     },
     Error, EventDB,
 };
-use async_trait::async_trait;
-use chrono::{NaiveDateTime, Utc};
 
 #[async_trait]
 #[allow(clippy::module_name_repetitions)]
 /// Registration Queries Trait
 pub(crate) trait RegistrationQueries: Sync + Send + 'static {
     async fn get_voter(
-        &self,
-        event: &Option<EventId>,
-        voting_key: String,
-        with_delegations: bool,
+        &self, event: &Option<EventId>, voting_key: String, with_delegations: bool,
     ) -> Result<Voter, Error>;
     async fn get_delegator(
-        &self,
-        event: &Option<EventId>,
-        stake_public_key: String,
+        &self, event: &Option<EventId>, stake_public_key: String,
     ) -> Result<Delegator, Error>;
 }
 
 impl EventDB {
+    /// Delegations by event query template
+    const DELEGATIONS_BY_EVENT_QUERY: &'static str = "SELECT contribution.voting_key, contribution.voting_group, contribution.voting_weight, contribution.value, contribution.reward_address
+                                                FROM contribution
+                                                INNER JOIN snapshot ON contribution.snapshot_id = snapshot.row_id
+                                                WHERE contribution.stake_public_key = $1 AND snapshot.event = $2;";
+    /// Delegator snapshot info by event query template
+    const DELEGATOR_SNAPSHOT_INFO_BY_EVENT_QUERY: &'static str = "
+                                                SELECT snapshot.as_at, snapshot.last_updated, snapshot.final
+                                                FROM snapshot
+                                                WHERE snapshot.event = $1
+                                                LIMIT 1;";
+    /// Delegator snapshot info by last event query template
+    const DELEGATOR_SNAPSHOT_INFO_BY_LAST_EVENT_QUERY: &'static str = "SELECT snapshot.event, snapshot.as_at, snapshot.last_updated, snapshot.final
+                                                FROM snapshot
+                                                WHERE snapshot.last_updated = (SELECT MAX(snapshot.last_updated) as last_updated from snapshot)
+                                                LIMIT 1;";
+    /// Total By Event Query template
+    const TOTAL_BY_EVENT_VOTING_QUERY: &'static str =
+        "SELECT SUM(voter.voting_power)::BIGINT as total_voting_power
+        FROM voter
+        INNER JOIN snapshot ON voter.snapshot_id = snapshot.row_id
+        WHERE voter.voting_group = $1 AND snapshot.event = $2;";
+    /// Total By Last Event Query template
+    const TOTAL_BY_LAST_EVENT_VOTING_QUERY: &'static str =
+        "SELECT SUM(voter.voting_power)::BIGINT as total_voting_power
+        FROM voter
+        INNER JOIN snapshot ON voter.snapshot_id = snapshot.row_id AND snapshot.last_updated = (SELECT MAX(snapshot.last_updated) as last_updated from snapshot)
+        WHERE voter.voting_group = $1;";
+    /// Total voting power by event query template
+    const TOTAL_POWER_BY_EVENT_QUERY: &'static str = "SELECT SUM(voter.voting_power)::BIGINT as total_voting_power
+                                                FROM voter
+                                                INNER JOIN snapshot ON voter.snapshot_id = snapshot.row_id
+                                                WHERE snapshot.event = $1;";
+    /// Total voting power by last event query template
+    const TOTAL_POWER_BY_LAST_EVENT_QUERY: &'static str = "SELECT SUM(voter.voting_power)::BIGINT as total_voting_power
+                                                FROM voter
+                                                INNER JOIN snapshot ON voter.snapshot_id = snapshot.row_id
+                                                WHERE snapshot.last_updated = (SELECT MAX(snapshot.last_updated) as last_updated from snapshot);";
     /// Voter By Event Query template
     const VOTER_BY_EVENT_QUERY: &'static str = "SELECT voter.voting_key, voter.voting_group, voter.voting_power, snapshot.as_at, snapshot.last_updated, snapshot.final, SUM(contribution.value)::BIGINT as delegations_power, COUNT(contribution.value) AS delegations_count
                                             FROM voter
@@ -35,7 +68,6 @@ impl EventDB {
                                             INNER JOIN contribution ON contribution.snapshot_id = snapshot.row_id
                                             WHERE voter.voting_key = $1 AND contribution.voting_key = $1 AND snapshot.event = $2
                                             GROUP BY voter.voting_key, voter.voting_group, voter.voting_power, snapshot.as_at, snapshot.last_updated, snapshot.final;";
-
     /// Voter By Last Event Query template
     const VOTER_BY_LAST_EVENT_QUERY: &'static str = "SELECT snapshot.event, voter.voting_key, voter.voting_group, voter.voting_power, snapshot.as_at, snapshot.last_updated, snapshot.final, SUM(contribution.value)::BIGINT as delegations_power, COUNT(contribution.value) AS delegations_count
                                                 FROM voter
@@ -48,60 +80,12 @@ impl EventDB {
                                                 FROM contribution
                                                 INNER JOIN snapshot ON contribution.snapshot_id = snapshot.row_id
                                                 WHERE contribution.voting_key = $1 AND snapshot.event = $2;";
-
-    /// Total By Event Query template
-    const TOTAL_BY_EVENT_VOTING_QUERY: &'static str =
-        "SELECT SUM(voter.voting_power)::BIGINT as total_voting_power
-        FROM voter
-        INNER JOIN snapshot ON voter.snapshot_id = snapshot.row_id
-        WHERE voter.voting_group = $1 AND snapshot.event = $2;";
-
-    /// Total By Last Event Query template
-    const TOTAL_BY_LAST_EVENT_VOTING_QUERY: &'static str =
-        "SELECT SUM(voter.voting_power)::BIGINT as total_voting_power
-        FROM voter
-        INNER JOIN snapshot ON voter.snapshot_id = snapshot.row_id AND snapshot.last_updated = (SELECT MAX(snapshot.last_updated) as last_updated from snapshot)
-        WHERE voter.voting_group = $1;";
-
-    /// Delegator snapshot info by event query template
-    const DELEGATOR_SNAPSHOT_INFO_BY_EVENT_QUERY: &'static str = "
-                                                SELECT snapshot.as_at, snapshot.last_updated, snapshot.final
-                                                FROM snapshot
-                                                WHERE snapshot.event = $1
-                                                LIMIT 1;";
-
-    /// Delegator snapshot info by last event query template
-    const DELEGATOR_SNAPSHOT_INFO_BY_LAST_EVENT_QUERY: &'static str = "SELECT snapshot.event, snapshot.as_at, snapshot.last_updated, snapshot.final
-                                                FROM snapshot
-                                                WHERE snapshot.last_updated = (SELECT MAX(snapshot.last_updated) as last_updated from snapshot)
-                                                LIMIT 1;";
-
-    /// Delegations by event query template
-    const DELEGATIONS_BY_EVENT_QUERY: &'static str = "SELECT contribution.voting_key, contribution.voting_group, contribution.voting_weight, contribution.value, contribution.reward_address
-                                                FROM contribution
-                                                INNER JOIN snapshot ON contribution.snapshot_id = snapshot.row_id
-                                                WHERE contribution.stake_public_key = $1 AND snapshot.event = $2;";
-
-    /// Total voting power by event query template
-    const TOTAL_POWER_BY_EVENT_QUERY: &'static str = "SELECT SUM(voter.voting_power)::BIGINT as total_voting_power
-                                                FROM voter
-                                                INNER JOIN snapshot ON voter.snapshot_id = snapshot.row_id
-                                                WHERE snapshot.event = $1;";
-
-    /// Total voting power by last event query template
-    const TOTAL_POWER_BY_LAST_EVENT_QUERY: &'static str = "SELECT SUM(voter.voting_power)::BIGINT as total_voting_power
-                                                FROM voter
-                                                INNER JOIN snapshot ON voter.snapshot_id = snapshot.row_id
-                                                WHERE snapshot.last_updated = (SELECT MAX(snapshot.last_updated) as last_updated from snapshot);";
 }
 
 #[async_trait]
 impl RegistrationQueries for EventDB {
     async fn get_voter(
-        &self,
-        event: &Option<EventId>,
-        voting_key: String,
-        with_delegations: bool,
+        &self, event: &Option<EventId>, voting_key: String, with_delegations: bool,
     ) -> Result<Voter, Error> {
         let conn = self.pool.get().await?;
 
@@ -120,10 +104,10 @@ impl RegistrationQueries for EventDB {
         let voting_power = voter.try_get("voting_power")?;
 
         let rows = if let Some(event) = event {
-            conn.query(
-                Self::TOTAL_BY_EVENT_VOTING_QUERY,
-                &[&voting_group.0, &event.0],
-            )
+            conn.query(Self::TOTAL_BY_EVENT_VOTING_QUERY, &[
+                &voting_group.0,
+                &event.0,
+            ])
             .await?
         } else {
             conn.query(Self::TOTAL_BY_LAST_EVENT_VOTING_QUERY, &[&voting_group.0])
@@ -154,10 +138,10 @@ impl RegistrationQueries for EventDB {
                 conn.query(Self::VOTER_DELEGATORS_LIST_QUERY, &[&voting_key, &event.0])
                     .await?
             } else {
-                conn.query(
-                    Self::VOTER_DELEGATORS_LIST_QUERY,
-                    &[&voting_key, &voter.try_get::<_, i32>("event")?],
-                )
+                conn.query(Self::VOTER_DELEGATORS_LIST_QUERY, &[
+                    &voting_key,
+                    &voter.try_get::<_, i32>("event")?,
+                ])
                 .await?
             };
 
@@ -192,9 +176,7 @@ impl RegistrationQueries for EventDB {
     }
 
     async fn get_delegator(
-        &self,
-        event: &Option<EventId>,
-        stake_public_key: String,
+        &self, event: &Option<EventId>, stake_public_key: String,
     ) -> Result<Delegator, Error> {
         let conn = self.pool.get().await?;
         let rows = if let Some(event) = event {
@@ -209,19 +191,16 @@ impl RegistrationQueries for EventDB {
             .ok_or_else(|| Error::NotFound("can not find delegator value".to_string()))?;
 
         let delegation_rows = if let Some(event) = event {
-            conn.query(
-                Self::DELEGATIONS_BY_EVENT_QUERY,
-                &[&stake_public_key, &event.0],
-            )
+            conn.query(Self::DELEGATIONS_BY_EVENT_QUERY, &[
+                &stake_public_key,
+                &event.0,
+            ])
             .await?
         } else {
-            conn.query(
-                Self::DELEGATIONS_BY_EVENT_QUERY,
-                &[
-                    &stake_public_key,
-                    &delegator_snapshot_info.try_get::<_, i32>("event")?,
-                ],
-            )
+            conn.query(Self::DELEGATIONS_BY_EVENT_QUERY, &[
+                &stake_public_key,
+                &delegator_snapshot_info.try_get::<_, i32>("event")?,
+            ])
             .await?
         };
         if delegation_rows.is_empty() {
@@ -271,280 +250,279 @@ impl RegistrationQueries for EventDB {
     }
 }
 
-/* TODO(SJ): https://github.com/input-output-hk/catalyst-voices/issues/68
-
-/// Need to setup and run a test event db instance
-/// To do it you can use the following commands:
-/// Prepare docker images
-/// ```
-/// earthly ./containers/event-db-migrations+docker --data=test
-/// ```
-/// Run event-db container
-/// ```
-/// docker-compose -f src/event-db/docker-compose.yml up migrations
-/// ```
-/// Also need establish `EVENT_DB_URL` env variable with the following value
-/// ```
-/// EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
-/// ```
-/// https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::event_db::establish_connection;
-    use chrono::{DateTime, NaiveDate, NaiveTime};
-
-    #[tokio::test]
-    async fn get_voter_test() {
-        let event_db = establish_connection(None).await.unwrap();
-
-        let voter = event_db
-            .get_voter(&Some(EventId(1)), "voting_key_1".to_string(), true)
-            .await
-            .unwrap();
-
-        assert_eq!(
-            voter,
-            Voter {
-                voter_info: VoterInfo {
-                    voting_power: 250,
-                    voting_group: VoterGroupId("rep".to_string()),
-                    delegations_power: 250,
-                    delegations_count: 2,
-                    voting_power_saturation: 0.625,
-                    delegator_addresses: Some(vec![
-                        "stake_public_key_1".to_string(),
-                        "stake_public_key_2".to_string()
-                    ]),
-                },
-                as_at: DateTime::<Utc>::from_utc(
-                    NaiveDateTime::new(
-                        NaiveDate::from_ymd_opt(2020, 3, 31).unwrap(),
-                        NaiveTime::from_hms_opt(12, 0, 0).unwrap()
-                    ),
-                    Utc
-                ),
-                last_updated: DateTime::<Utc>::from_utc(
-                    NaiveDateTime::new(
-                        NaiveDate::from_ymd_opt(2020, 3, 31).unwrap(),
-                        NaiveTime::from_hms_opt(12, 0, 0).unwrap()
-                    ),
-                    Utc
-                ),
-                is_final: true,
-            }
-        );
-
-        let voter = event_db
-            .get_voter(&Some(EventId(1)), "voting_key_1".to_string(), false)
-            .await
-            .unwrap();
-
-        assert_eq!(
-            voter,
-            Voter {
-                voter_info: VoterInfo {
-                    voting_power: 250,
-                    voting_group: VoterGroupId("rep".to_string()),
-                    delegations_power: 250,
-                    delegations_count: 2,
-                    voting_power_saturation: 0.625,
-                    delegator_addresses: None,
-                },
-                as_at: DateTime::<Utc>::from_utc(
-                    NaiveDateTime::new(
-                        NaiveDate::from_ymd_opt(2020, 3, 31).unwrap(),
-                        NaiveTime::from_hms_opt(12, 0, 0).unwrap()
-                    ),
-                    Utc
-                ),
-                last_updated: DateTime::<Utc>::from_utc(
-                    NaiveDateTime::new(
-                        NaiveDate::from_ymd_opt(2020, 3, 31).unwrap(),
-                        NaiveTime::from_hms_opt(12, 0, 0).unwrap()
-                    ),
-                    Utc
-                ),
-                is_final: true,
-            }
-        );
-
-        let voter = event_db
-            .get_voter(&None, "voting_key_1".to_string(), true)
-            .await
-            .unwrap();
-
-        assert_eq!(
-            voter,
-            Voter {
-                voter_info: VoterInfo {
-                    voting_power: 250,
-                    voting_group: VoterGroupId("rep".to_string()),
-                    delegations_power: 250,
-                    delegations_count: 2,
-                    voting_power_saturation: 0.625,
-                    delegator_addresses: Some(vec![
-                        "stake_public_key_1".to_string(),
-                        "stake_public_key_2".to_string()
-                    ]),
-                },
-                as_at: DateTime::<Utc>::from_utc(
-                    NaiveDateTime::new(
-                        NaiveDate::from_ymd_opt(2022, 3, 31).unwrap(),
-                        NaiveTime::from_hms_opt(12, 0, 0).unwrap()
-                    ),
-                    Utc
-                ),
-                last_updated: DateTime::<Utc>::from_utc(
-                    NaiveDateTime::new(
-                        NaiveDate::from_ymd_opt(2022, 3, 31).unwrap(),
-                        NaiveTime::from_hms_opt(12, 0, 0).unwrap()
-                    ),
-                    Utc
-                ),
-                is_final: true,
-            }
-        );
-
-        let voter = event_db
-            .get_voter(&None, "voting_key_1".to_string(), false)
-            .await
-            .unwrap();
-
-        assert_eq!(
-            voter,
-            Voter {
-                voter_info: VoterInfo {
-                    voting_power: 250,
-                    voting_group: VoterGroupId("rep".to_string()),
-                    delegations_power: 250,
-                    delegations_count: 2,
-                    voting_power_saturation: 0.625,
-                    delegator_addresses: None,
-                },
-                as_at: DateTime::<Utc>::from_utc(
-                    NaiveDateTime::new(
-                        NaiveDate::from_ymd_opt(2022, 3, 31).unwrap(),
-                        NaiveTime::from_hms_opt(12, 0, 0).unwrap()
-                    ),
-                    Utc
-                ),
-                last_updated: DateTime::<Utc>::from_utc(
-                    NaiveDateTime::new(
-                        NaiveDate::from_ymd_opt(2022, 3, 31).unwrap(),
-                        NaiveTime::from_hms_opt(12, 0, 0).unwrap()
-                    ),
-                    Utc
-                ),
-                is_final: true,
-            }
-        );
-
-        assert_eq!(
-            event_db
-                .get_voter(&None, "voting_key".to_string(), true)
-                .await,
-            Err(Error::NotFound("can not find voter value".to_string()))
-        );
-    }
-
-    #[tokio::test]
-    async fn get_delegator_test() {
-        let event_db = establish_connection(None).await.unwrap();
-
-        let delegator = event_db
-            .get_delegator(&Some(EventId(1)), "stake_public_key_1".to_string())
-            .await
-            .unwrap();
-
-        assert_eq!(
-            delegator,
-            Delegator {
-                delegations: vec![
-                    Delegation {
-                        voting_key: "voting_key_1".to_string(),
-                        group: VoterGroupId("rep".to_string()),
-                        weight: 1,
-                        value: 140,
-                    },
-                    Delegation {
-                        voting_key: "voting_key_2".to_string(),
-                        group: VoterGroupId("rep".to_string()),
-                        weight: 1,
-                        value: 100,
-                    }
-                ],
-                reward_address: RewardAddress::new("addrr_reward_address_1".to_string()),
-                raw_power: 240,
-                total_power: 1000,
-                as_at: DateTime::<Utc>::from_utc(
-                    NaiveDateTime::new(
-                        NaiveDate::from_ymd_opt(2020, 3, 31).unwrap(),
-                        NaiveTime::from_hms_opt(12, 0, 0).unwrap()
-                    ),
-                    Utc
-                ),
-                last_updated: DateTime::<Utc>::from_utc(
-                    NaiveDateTime::new(
-                        NaiveDate::from_ymd_opt(2020, 3, 31).unwrap(),
-                        NaiveTime::from_hms_opt(12, 0, 0).unwrap()
-                    ),
-                    Utc
-                ),
-                is_final: true
-            }
-        );
-
-        let delegator = event_db
-            .get_delegator(&None, "stake_public_key_1".to_string())
-            .await
-            .unwrap();
-
-        assert_eq!(
-            delegator,
-            Delegator {
-                delegations: vec![
-                    Delegation {
-                        voting_key: "voting_key_1".to_string(),
-                        group: VoterGroupId("rep".to_string()),
-                        weight: 1,
-                        value: 140,
-                    },
-                    Delegation {
-                        voting_key: "voting_key_2".to_string(),
-                        group: VoterGroupId("rep".to_string()),
-                        weight: 1,
-                        value: 100,
-                    }
-                ],
-                reward_address: RewardAddress::new("addrr_reward_address_1".to_string()),
-                raw_power: 240,
-                total_power: 1000,
-                as_at: DateTime::<Utc>::from_utc(
-                    NaiveDateTime::new(
-                        NaiveDate::from_ymd_opt(2022, 3, 31).unwrap(),
-                        NaiveTime::from_hms_opt(12, 0, 0).unwrap()
-                    ),
-                    Utc
-                ),
-                last_updated: DateTime::<Utc>::from_utc(
-                    NaiveDateTime::new(
-                        NaiveDate::from_ymd_opt(2022, 3, 31).unwrap(),
-                        NaiveTime::from_hms_opt(12, 0, 0).unwrap()
-                    ),
-                    Utc
-                ),
-                is_final: true
-            }
-        );
-
-        assert_eq!(
-            event_db
-                .get_delegator(&None, "stake_public_key".to_string())
-                .await,
-            Err(Error::NotFound("can not find delegator value".to_string()))
-        );
-    }
-}
-
-*/
+// TODO(SJ): https://github.com/input-output-hk/catalyst-voices/issues/68
+//
+// Need to setup and run a test event db instance
+// To do it you can use the following commands:
+// Prepare docker images
+// ```
+// earthly ./containers/event-db-migrations+docker --data=test
+// ```
+// Run event-db container
+// ```
+// docker-compose -f src/event-db/docker-compose.yml up migrations
+// ```
+// Also need establish `EVENT_DB_URL` env variable with the following value
+// ```
+// EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+// ```
+// https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md
+// #[cfg(test)]
+// mod tests {
+// use super::*;
+// use crate::event_db::establish_connection;
+// use chrono::{DateTime, NaiveDate, NaiveTime};
+//
+// #[tokio::test]
+// async fn get_voter_test() {
+// let event_db = establish_connection(None).await.unwrap();
+//
+// let voter = event_db
+// .get_voter(&Some(EventId(1)), "voting_key_1".to_string(), true)
+// .await
+// .unwrap();
+//
+// assert_eq!(
+// voter,
+// Voter {
+// voter_info: VoterInfo {
+// voting_power: 250,
+// voting_group: VoterGroupId("rep".to_string()),
+// delegations_power: 250,
+// delegations_count: 2,
+// voting_power_saturation: 0.625,
+// delegator_addresses: Some(vec![
+// "stake_public_key_1".to_string(),
+// "stake_public_key_2".to_string()
+// ]),
+// },
+// as_at: DateTime::<Utc>::from_utc(
+// NaiveDateTime::new(
+// NaiveDate::from_ymd_opt(2020, 3, 31).unwrap(),
+// NaiveTime::from_hms_opt(12, 0, 0).unwrap()
+// ),
+// Utc
+// ),
+// last_updated: DateTime::<Utc>::from_utc(
+// NaiveDateTime::new(
+// NaiveDate::from_ymd_opt(2020, 3, 31).unwrap(),
+// NaiveTime::from_hms_opt(12, 0, 0).unwrap()
+// ),
+// Utc
+// ),
+// is_final: true,
+// }
+// );
+//
+// let voter = event_db
+// .get_voter(&Some(EventId(1)), "voting_key_1".to_string(), false)
+// .await
+// .unwrap();
+//
+// assert_eq!(
+// voter,
+// Voter {
+// voter_info: VoterInfo {
+// voting_power: 250,
+// voting_group: VoterGroupId("rep".to_string()),
+// delegations_power: 250,
+// delegations_count: 2,
+// voting_power_saturation: 0.625,
+// delegator_addresses: None,
+// },
+// as_at: DateTime::<Utc>::from_utc(
+// NaiveDateTime::new(
+// NaiveDate::from_ymd_opt(2020, 3, 31).unwrap(),
+// NaiveTime::from_hms_opt(12, 0, 0).unwrap()
+// ),
+// Utc
+// ),
+// last_updated: DateTime::<Utc>::from_utc(
+// NaiveDateTime::new(
+// NaiveDate::from_ymd_opt(2020, 3, 31).unwrap(),
+// NaiveTime::from_hms_opt(12, 0, 0).unwrap()
+// ),
+// Utc
+// ),
+// is_final: true,
+// }
+// );
+//
+// let voter = event_db
+// .get_voter(&None, "voting_key_1".to_string(), true)
+// .await
+// .unwrap();
+//
+// assert_eq!(
+// voter,
+// Voter {
+// voter_info: VoterInfo {
+// voting_power: 250,
+// voting_group: VoterGroupId("rep".to_string()),
+// delegations_power: 250,
+// delegations_count: 2,
+// voting_power_saturation: 0.625,
+// delegator_addresses: Some(vec![
+// "stake_public_key_1".to_string(),
+// "stake_public_key_2".to_string()
+// ]),
+// },
+// as_at: DateTime::<Utc>::from_utc(
+// NaiveDateTime::new(
+// NaiveDate::from_ymd_opt(2022, 3, 31).unwrap(),
+// NaiveTime::from_hms_opt(12, 0, 0).unwrap()
+// ),
+// Utc
+// ),
+// last_updated: DateTime::<Utc>::from_utc(
+// NaiveDateTime::new(
+// NaiveDate::from_ymd_opt(2022, 3, 31).unwrap(),
+// NaiveTime::from_hms_opt(12, 0, 0).unwrap()
+// ),
+// Utc
+// ),
+// is_final: true,
+// }
+// );
+//
+// let voter = event_db
+// .get_voter(&None, "voting_key_1".to_string(), false)
+// .await
+// .unwrap();
+//
+// assert_eq!(
+// voter,
+// Voter {
+// voter_info: VoterInfo {
+// voting_power: 250,
+// voting_group: VoterGroupId("rep".to_string()),
+// delegations_power: 250,
+// delegations_count: 2,
+// voting_power_saturation: 0.625,
+// delegator_addresses: None,
+// },
+// as_at: DateTime::<Utc>::from_utc(
+// NaiveDateTime::new(
+// NaiveDate::from_ymd_opt(2022, 3, 31).unwrap(),
+// NaiveTime::from_hms_opt(12, 0, 0).unwrap()
+// ),
+// Utc
+// ),
+// last_updated: DateTime::<Utc>::from_utc(
+// NaiveDateTime::new(
+// NaiveDate::from_ymd_opt(2022, 3, 31).unwrap(),
+// NaiveTime::from_hms_opt(12, 0, 0).unwrap()
+// ),
+// Utc
+// ),
+// is_final: true,
+// }
+// );
+//
+// assert_eq!(
+// event_db
+// .get_voter(&None, "voting_key".to_string(), true)
+// .await,
+// Err(Error::NotFound("can not find voter value".to_string()))
+// );
+// }
+//
+// #[tokio::test]
+// async fn get_delegator_test() {
+// let event_db = establish_connection(None).await.unwrap();
+//
+// let delegator = event_db
+// .get_delegator(&Some(EventId(1)), "stake_public_key_1".to_string())
+// .await
+// .unwrap();
+//
+// assert_eq!(
+// delegator,
+// Delegator {
+// delegations: vec![
+// Delegation {
+// voting_key: "voting_key_1".to_string(),
+// group: VoterGroupId("rep".to_string()),
+// weight: 1,
+// value: 140,
+// },
+// Delegation {
+// voting_key: "voting_key_2".to_string(),
+// group: VoterGroupId("rep".to_string()),
+// weight: 1,
+// value: 100,
+// }
+// ],
+// reward_address: RewardAddress::new("addrr_reward_address_1".to_string()),
+// raw_power: 240,
+// total_power: 1000,
+// as_at: DateTime::<Utc>::from_utc(
+// NaiveDateTime::new(
+// NaiveDate::from_ymd_opt(2020, 3, 31).unwrap(),
+// NaiveTime::from_hms_opt(12, 0, 0).unwrap()
+// ),
+// Utc
+// ),
+// last_updated: DateTime::<Utc>::from_utc(
+// NaiveDateTime::new(
+// NaiveDate::from_ymd_opt(2020, 3, 31).unwrap(),
+// NaiveTime::from_hms_opt(12, 0, 0).unwrap()
+// ),
+// Utc
+// ),
+// is_final: true
+// }
+// );
+//
+// let delegator = event_db
+// .get_delegator(&None, "stake_public_key_1".to_string())
+// .await
+// .unwrap();
+//
+// assert_eq!(
+// delegator,
+// Delegator {
+// delegations: vec![
+// Delegation {
+// voting_key: "voting_key_1".to_string(),
+// group: VoterGroupId("rep".to_string()),
+// weight: 1,
+// value: 140,
+// },
+// Delegation {
+// voting_key: "voting_key_2".to_string(),
+// group: VoterGroupId("rep".to_string()),
+// weight: 1,
+// value: 100,
+// }
+// ],
+// reward_address: RewardAddress::new("addrr_reward_address_1".to_string()),
+// raw_power: 240,
+// total_power: 1000,
+// as_at: DateTime::<Utc>::from_utc(
+// NaiveDateTime::new(
+// NaiveDate::from_ymd_opt(2022, 3, 31).unwrap(),
+// NaiveTime::from_hms_opt(12, 0, 0).unwrap()
+// ),
+// Utc
+// ),
+// last_updated: DateTime::<Utc>::from_utc(
+// NaiveDateTime::new(
+// NaiveDate::from_ymd_opt(2022, 3, 31).unwrap(),
+// NaiveTime::from_hms_opt(12, 0, 0).unwrap()
+// ),
+// Utc
+// ),
+// is_final: true
+// }
+// );
+//
+// assert_eq!(
+// event_db
+// .get_delegator(&None, "stake_public_key".to_string())
+// .await,
+// Err(Error::NotFound("can not find delegator value".to_string()))
+// );
+// }
+// }
+//

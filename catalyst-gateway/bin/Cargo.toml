@@ -9,6 +9,14 @@ version.workspace = true
 authors.workspace = true
 edition.workspace = true
 
+[[bin]]
+name = "cat-gateway"
+path = "src/main.rs"
+
+[lib]
+name = "lib"
+path = "src/lib.rs"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
@@ -45,7 +53,6 @@ poem = { workspace = true, features = [
     "embed",
     "prometheus",
     "compression",
-    "test",
 ] }
 poem-openapi = { workspace = true, features = [
     "openapi-explorer",
