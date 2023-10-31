@@ -5,6 +5,8 @@
   * [Run Integration Tests](#run-integration-tests)
     * [Web](#web)
     * [iOS](#ios)
+      * [Run integration test in Xcode](#run-integration-test-in-xcode)
+      * [Run integration test in Firebase Test Lab](#run-integration-test-in-firebase-test-lab)
     * [Android](#android)
   * [Links](#links)
 
@@ -23,6 +25,20 @@ flutter drive --driver=test_driver/integration_test.dart \
 ```
 
 ### iOS
+
+#### Run integration test in Xcode
+
+1. Build the integration test for iOS
+
+```sh
+flutter build ios --config-only integration_test/main.dart --flavor development
+```
+
+2. Build the integration test for iOS
+
+Open iOS app in Xcode, select appropriate schema and run the integration test target `Product > Test` or `Cmd + U`.
+
+#### Run integration test in Firebase Test Lab
 
 
 ```sh
