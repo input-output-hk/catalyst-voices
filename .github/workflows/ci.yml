@@ -1,4 +1,4 @@
-name: Dogfood
+name: CI
 
 on:
   push:
