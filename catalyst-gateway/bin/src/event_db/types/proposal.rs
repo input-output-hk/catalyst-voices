@@ -1,4 +1,5 @@
 //! Proposal Types
+//!
 use serde_json::Value;
 
 #[allow(clippy::module_name_repetitions)]
