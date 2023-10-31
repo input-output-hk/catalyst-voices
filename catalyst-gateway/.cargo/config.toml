@@ -1,5 +1,7 @@
 # Use MOLD linker where possible, but ONLY in CI applicable targets.
-# cspell: words rustflags armv gnueabihf msvc nextest idents rustdocflags rustdoc lintfix lintrestrict testfast testdocs
+# cspell: words rustflags armv gnueabihf msvc nextest idents rustdocflags 
+# cspell: words rustdoc lintfix lintrestrict testfast testdocs codegen testci
+# cspell: words fmtchk fmtfix
 
 # Configure how Docker container targets build.
 
@@ -80,7 +82,7 @@ opt-level = 3
 debug = false
 debug-assertions = false
 overflow-checks = false
-lto = true
+lto = "thin"
 panic = 'unwind'
 incremental = false
 codegen-units = 16
@@ -98,7 +100,7 @@ opt-level = 3
 debug = false
 debug-assertions = false
 overflow-checks = false
-lto = true
+lto = "thin"
 incremental = false
 codegen-units = 16
 
