@@ -22,7 +22,8 @@ impl V1Api {
         method = "get",
         operation_id = "AccountVotes"
     )]
-    /// Votes for
+    /// Get from all active vote plans, the index of the voted proposals
+    /// by th given account ID.
     async fn get_account_votes(
         &self, state: Data<&Arc<State>>, account_id: Path<AccountId>,
     ) -> account_votes_get::AllResponses {

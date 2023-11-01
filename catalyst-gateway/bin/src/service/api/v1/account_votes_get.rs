@@ -30,7 +30,7 @@ pub(crate) type AllResponses = response! {
 /// Get votes for an `account_id` endpoint.
 ///
 /// For each active vote plan, this endpoint returns an array
-/// with the proposal numbers that the account voted for.
+/// with the proposal index number that the account voted for.
 ///
 /// ## Responses
 ///
