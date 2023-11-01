@@ -6,7 +6,9 @@ use serde::Deserialize;
 #[derive(NewType, Deserialize)]
 #[oai(example = true)]
 /// Unique ID of a user account.
-pub(crate) struct AccountId(String);
+pub(crate) struct AccountId(
+    #[oai(validator(max_length = 64, min_length = 64, pattern = "[0-9a-f]{64}"))] String,
+);
 
 impl Example for AccountId {
     fn example() -> Self {
