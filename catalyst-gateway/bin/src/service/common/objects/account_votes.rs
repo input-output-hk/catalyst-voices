@@ -14,13 +14,24 @@ impl Example for AccountId {
     }
 }
 
+#[derive(NewType, Deserialize)]
+#[oai(example = true)]
+/// Unique ID of a vote plan.
+pub(crate) struct VotePlanId(String);
+
+impl Example for VotePlanId {
+    fn example() -> Self {
+        Self("a6a3c0447aeb9cc54cf6422ba32b294e5e1c3ef6d782f2acff4a70694c4d1663".into())
+    }
+}
+
 #[derive(Object, Deserialize)]
 #[oai(example = true)]
 /// Indexes of a proposal that the account has voted for across all active vote plans.
 pub(crate) struct AccountVote {
     #[oai(validator(max_length = 64, min_length = 64, pattern = "[0-9a-f]{64}"))]
     /// The hex-encoded ID of the vote plan.
-    pub(crate) vote_plan_id: AccountId,
+    pub(crate) vote_plan_id: VotePlanId,
     /// Array of the proposal numbers voted for by the account ID within the vote plan.
     pub(crate) votes: Vec<u8>,
 }
@@ -28,7 +39,7 @@ pub(crate) struct AccountVote {
 impl Example for AccountVote {
     fn example() -> Self {
         Self {
-            vote_plan_id: AccountId::example(),
+            vote_plan_id: VotePlanId::example(),
             votes: vec![1, 3, 9, 123],
         }
     }
