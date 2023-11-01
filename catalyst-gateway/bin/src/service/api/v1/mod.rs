@@ -1,12 +1,14 @@
 //! `v1` Endpoints
 
+use std::sync::Arc;
+
+use poem::web::{Data, Path};
+use poem_openapi::OpenApi;
+
 use crate::{
     service::common::{objects::account_votes::AccountId, tags::ApiTags},
     state::State,
 };
-use poem::web::{Data, Path};
-use poem_openapi::OpenApi;
-use std::sync::Arc;
 
 mod account_votes_get;
 
@@ -22,9 +24,7 @@ impl V1Api {
     )]
     /// Votes for
     async fn get_account_votes(
-        &self,
-        state: Data<&Arc<State>>,
-        account_id: Path<AccountId>,
+        &self, state: Data<&Arc<State>>, account_id: Path<AccountId>,
     ) -> account_votes_get::AllResponses {
         account_votes_get::endpoint(state, account_id).await
     }
