@@ -3,6 +3,7 @@
 * [Flutter Integration Tests](#flutter-integration-tests)
   * [Introduction](#introduction)
   * [Run Integration Tests](#run-integration-tests)
+    * [CI](#ci)
     * [Web](#web)
     * [iOS](#ios)
       * [Run integration test in Xcode](#run-integration-test-in-xcode)
@@ -14,6 +15,12 @@
 
 
 ## Run Integration Tests
+
+### CI
+
+```sh
+./flutter_web_integration_test.sh
+```
 
 ### Web
 

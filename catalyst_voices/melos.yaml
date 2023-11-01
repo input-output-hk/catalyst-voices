@@ -66,6 +66,8 @@ scripts:
       melos exec -- genhtml coverage/lcov.info --output-directory=coverage/
     description: Generate coverage for the selected package.
 
-  build:
-    run: melos exec fvm flutter build
-    description: Build app.
+  build:pub_get:all:
+    run: flutter pub get
+    exec:
+      concurrency: 6
+    description: Install all dependencies
