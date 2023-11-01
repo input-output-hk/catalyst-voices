@@ -25,6 +25,9 @@ jobs:
     name: Web - Integration Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: ./catalyst_voices
     steps:
       - name: ⬇️ Checkout repository
         uses: actions/checkout@v3
