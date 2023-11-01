@@ -1,10 +1,8 @@
 name: catalyst_voices
-repository: https://github.com/minikin/didactic-parakeet/
+repository: https://github.com/input-output-hk/catalyst-voices
 
 packages:
   - lib/**
-  - packages/**
-  - 'tests/*'
 
 command:
   version:
