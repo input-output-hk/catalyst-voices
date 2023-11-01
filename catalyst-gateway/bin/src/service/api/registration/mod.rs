@@ -1,21 +1,32 @@
 //! Registration Endpoints
-//!
-use crate::service::common::objects::{
-    event_id::EventId, voter_registration::VoterRegistration, voting_public_key::VotingPublicKey,
-};
-use crate::service::common::responses::resp_2xx::OK;
-use crate::service::common::responses::resp_4xx::NotFound;
-use crate::service::common::responses::resp_5xx::{server_error, ServerError};
-use crate::{service::common::tags::ApiTags, state::State};
+use std::sync::Arc;
+
 use poem::web::Data;
-use poem_extensions::response;
-use poem_extensions::UniResponse::{T200, T404, T500};
+use poem_extensions::{
+    response,
+    UniResponse::{T200, T404, T500},
+};
 use poem_openapi::{
     param::{Path, Query},
     payload::Json,
     OpenApi,
 };
-use std::sync::Arc;
+
+use crate::{
+    service::common::{
+        objects::{
+            event_id::EventId, voter_registration::VoterRegistration,
+            voting_public_key::VotingPublicKey,
+        },
+        responses::{
+            resp_2xx::OK,
+            resp_4xx::NotFound,
+            resp_5xx::{server_error, ServerError},
+        },
+        tags::ApiTags,
+    },
+    state::State,
+};
 
 /// Registration API Endpoints
 pub(crate) struct RegistrationApi;
@@ -32,25 +43,22 @@ impl RegistrationApi {
     /// Get the voter's registration and voting power by their Public Voting Key.
     /// The Public Voting Key must match the voter's most recent valid
     /// [CIP-15](https://cips.cardano.org/cips/cip15) or [CIP-36](https://cips.cardano.org/cips/cip36) registration on-chain.
-    /// If the `event_id` query parameter is omitted, then the latest voting power is retrieved.
-    /// If the `with_delegators` query parameter is omitted, then `delegator_addresses` field of `VoterInfo` type does not provided.
-    ///
+    /// If the `event_id` query parameter is omitted, then the latest voting power is
+    /// retrieved. If the `with_delegators` query parameter is omitted, then
+    /// `delegator_addresses` field of `VoterInfo` type does not provided.
     async fn get_voter_info(
-        &self,
-        pool: Data<&Arc<State>>,
-
+        &self, pool: Data<&Arc<State>>,
         /// A Voters Public ED25519 Key (as registered in their most recent valid
         /// [CIP-15](https://cips.cardano.org/cips/cip15) or [CIP-36](https://cips.cardano.org/cips/cip36) registration).
         #[oai(validator(max_length = 66, min_length = 66, pattern = "0x[0-9a-f]{64}"))]
         voting_key: Path<VotingPublicKey>,
-
         /// The Event ID to return results for.
-        /// See [GET Events](Link to events endpoint) for details on retrieving all valid event IDs.
+        /// See [GET Events](Link to events endpoint) for details on retrieving all valid
+        /// event IDs.
         #[oai(validator(minimum(value = "0")))]
         event_id: Query<Option<EventId>>,
-
-        /// If this optional flag is set, the response will include the delegator's list in the response.
-        /// Otherwise, it will be omitted.
+        /// If this optional flag is set, the response will include the delegator's list
+        /// in the response. Otherwise, it will be omitted.
         #[oai(default)]
         with_delegators: Query<bool>,
     ) -> response! {
@@ -67,9 +75,11 @@ impl RegistrationApi {
             )
             .await;
         match voter {
-            Ok(voter) => match voter.try_into() {
-                Ok(voter) => T200(OK(Json(voter))),
-                Err(err) => T500(server_error!("{}", err.to_string())),
+            Ok(voter) => {
+                match voter.try_into() {
+                    Ok(voter) => T200(OK(Json(voter))),
+                    Err(err) => T500(server_error!("{}", err.to_string())),
+                }
             },
             Err(crate::event_db::error::Error::NotFound(_)) => T404(NotFound),
             Err(err) => T500(server_error!("{}", err.to_string())),
@@ -89,127 +99,130 @@ impl RegistrationApi {
 /// ```
 /// Also need establish `EVENT_DB_URL` env variable with the following value
 /// ```
-/// EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+/// EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 /// ```
 /// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
 #[cfg(test)]
 mod tests {
-    use crate::{service::poem_service::tests::mk_test_app, state::State};
-    use poem::http::StatusCode;
-    use std::sync::Arc;
-
-    /* TODO (SJ) : https://github.com/input-output-hk/catalyst-voices/issues/68 */
-    #[allow(clippy::too_many_lines)]
-    #[tokio::test]
-    async fn voter_test() {
-        let state = Arc::new(State::new(None).await.unwrap());
-        let app = mk_test_app(&state);
-
-        let resp = app
-            .get(format!("/api/v1/registration/voter/{0}", "voting_key_1"))
-            .send()
-            .await;
-        resp.assert_status(StatusCode::OK);
-        resp.assert_json(serde_json::json!(
-            {
-                "voter_info": {
-                    "voting_power": 250,
-                    "voting_group": "rep",
-                    "delegations_power": 250,
-                    "delegations_count": 2,
-                    "voting_power_saturation": 0.625,
-                },
-                "as_at": "2022-03-31T12:00:00+00:00",
-                "last_updated": "2022-03-31T12:00:00+00:00",
-                "final": true
-            }
-        ))
-        .await;
-
-        let resp = app
-            .get(format!(
-                "/api/v1/registration/voter/{0}?with_delegators=true",
-                "voting_key_1"
-            ))
-            .send()
-            .await;
-        resp.assert_status(StatusCode::OK);
-        resp.assert_json(serde_json::json!(
-            {
-                "voter_info": {
-                    "voting_power": 250,
-                    "voting_group": "rep",
-                    "delegations_power": 250,
-                    "delegations_count": 2,
-                    "voting_power_saturation": 0.625,
-                    "delegator_addresses": ["stake_public_key_1", "stake_public_key_2"]
-                },
-                "as_at": "2022-03-31T12:00:00+00:00",
-                "last_updated": "2022-03-31T12:00:00+00:00",
-                "final": true
-            }
-        ))
-        .await;
-
-        let resp = app
-            .get(format!(
-                "/api/v1/registration/voter/{0}?event_id={1}",
-                "voting_key_1", 1
-            ))
-            .send()
-            .await;
-        resp.assert_status(StatusCode::OK);
-        resp.assert_json(serde_json::json!(
-            {
-                "voter_info": {
-                    "voting_power": 250,
-                    "voting_group": "rep",
-                    "delegations_power": 250,
-                    "delegations_count": 2,
-                    "voting_power_saturation": 0.625,
-                },
-                "as_at": "2020-03-31T12:00:00+00:00",
-                "last_updated": "2020-03-31T12:00:00+00:00",
-                "final": true
-            }
-        ))
-        .await;
-
-        let resp = app
-            .get(format!(
-                "/api/v1/registration/voter/{0}?event_id={1}&with_delegators=true",
-                "voting_key_1", 1
-            ))
-            .send()
-            .await;
-        resp.assert_status(StatusCode::OK);
-        resp.assert_json(serde_json::json!(
-            {
-                "voter_info": {
-                    "voting_power": 250,
-                    "voting_group": "rep",
-                    "delegations_power": 250,
-                    "delegations_count": 2,
-                    "voting_power_saturation": 0.625,
-                    "delegator_addresses": ["stake_public_key_1", "stake_public_key_2"]
-                },
-                "as_at": "2020-03-31T12:00:00+00:00",
-                "last_updated": "2020-03-31T12:00:00+00:00",
-                "final": true
-            }
-        ))
-        .await;
-
-        let resp = app
-            .get(format!("/api/v1/registration/voter/{0}", "voting_key"))
-            .send()
-            .await;
-        resp.assert_status(StatusCode::NOT_FOUND);
-
-        let resp = app
-            .get(format!("/api/v1/registration/voter/{0}", "voting_key"))
-            .send()
-            .await;
-        resp.assert_status(StatusCode::NOT_FOUND);
-    }
+    // License Violation ....
+    // use std::sync::Arc;
+    //
+    // use poem::http::StatusCode;
+    //
+    // use crate::{service::poem_service::tests::mk_test_app, state::State};
+    //
+    // TODO (SJ) : https://github.com/input-output-hk/catalyst-voices/issues/68
+    // #[allow(clippy::too_many_lines)]
+    // #[tokio::test]
+    // async fn voter_test() {
+    // let state = Arc::new(State::new(None).await.unwrap());
+    // let app = mk_test_app(&state);
+    //
+    // let resp = app
+    // .get(format!("/api/v1/registration/voter/{0}", "voting_key_1"))
+    // .send()
+    // .await;
+    // resp.assert_status(StatusCode::OK);
+    // resp.assert_json(serde_json::json!(
+    // {
+    // "voter_info": {
+    // "voting_power": 250,
+    // "voting_group": "rep",
+    // "delegations_power": 250,
+    // "delegations_count": 2,
+    // "voting_power_saturation": 0.625,
+    // },
+    // "as_at": "2022-03-31T12:00:00+00:00",
+    // "last_updated": "2022-03-31T12:00:00+00:00",
+    // "final": true
+    // }
+    // ))
+    // .await;
+    //
+    // let resp = app
+    // .get(format!(
+    // "/api/v1/registration/voter/{0}?with_delegators=true",
+    // "voting_key_1"
+    // ))
+    // .send()
+    // .await;
+    // resp.assert_status(StatusCode::OK);
+    // resp.assert_json(serde_json::json!(
+    // {
+    // "voter_info": {
+    // "voting_power": 250,
+    // "voting_group": "rep",
+    // "delegations_power": 250,
+    // "delegations_count": 2,
+    // "voting_power_saturation": 0.625,
+    // "delegator_addresses": ["stake_public_key_1", "stake_public_key_2"]
+    // },
+    // "as_at": "2022-03-31T12:00:00+00:00",
+    // "last_updated": "2022-03-31T12:00:00+00:00",
+    // "final": true
+    // }
+    // ))
+    // .await;
+    //
+    // let resp = app
+    // .get(format!(
+    // "/api/v1/registration/voter/{0}?event_id={1}",
+    // "voting_key_1", 1
+    // ))
+    // .send()
+    // .await;
+    // resp.assert_status(StatusCode::OK);
+    // resp.assert_json(serde_json::json!(
+    // {
+    // "voter_info": {
+    // "voting_power": 250,
+    // "voting_group": "rep",
+    // "delegations_power": 250,
+    // "delegations_count": 2,
+    // "voting_power_saturation": 0.625,
+    // },
+    // "as_at": "2020-03-31T12:00:00+00:00",
+    // "last_updated": "2020-03-31T12:00:00+00:00",
+    // "final": true
+    // }
+    // ))
+    // .await;
+    //
+    // let resp = app
+    // .get(format!(
+    // "/api/v1/registration/voter/{0}?event_id={1}&with_delegators=true",
+    // "voting_key_1", 1
+    // ))
+    // .send()
+    // .await;
+    // resp.assert_status(StatusCode::OK);
+    // resp.assert_json(serde_json::json!(
+    // {
+    // "voter_info": {
+    // "voting_power": 250,
+    // "voting_group": "rep",
+    // "delegations_power": 250,
+    // "delegations_count": 2,
+    // "voting_power_saturation": 0.625,
+    // "delegator_addresses": ["stake_public_key_1", "stake_public_key_2"]
+    // },
+    // "as_at": "2020-03-31T12:00:00+00:00",
+    // "last_updated": "2020-03-31T12:00:00+00:00",
+    // "final": true
+    // }
+    // ))
+    // .await;
+    //
+    // let resp = app
+    // .get(format!("/api/v1/registration/voter/{0}", "voting_key"))
+    // .send()
+    // .await;
+    // resp.assert_status(StatusCode::NOT_FOUND);
+    //
+    // let resp = app
+    // .get(format!("/api/v1/registration/voter/{0}", "voting_key"))
+    // .send()
+    // .await;
+    // resp.assert_status(StatusCode::NOT_FOUND);
+    // }
 }

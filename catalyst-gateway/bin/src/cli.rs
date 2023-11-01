@@ -1,8 +1,9 @@
 //! CLI interpreter for the service
-//!
-use crate::{logger, service, settings::Settings, state::State};
-use clap::Parser;
 use std::sync::Arc;
+
+use clap::Parser;
+
+use crate::{logger, service, settings::Settings, state::State};
 
 #[derive(thiserror::Error, Debug)]
 /// All service errors
@@ -26,7 +27,8 @@ pub(crate) enum Cli {
 impl Cli {
     /// Execute the specified operation.
     ///
-    /// This method is asynchronous and returns a `Result` indicating whether the operation was successful or if an error occurred.
+    /// This method is asynchronous and returns a `Result` indicating whether the
+    /// operation was successful or if an error occurred.
     ///
     /// # Errors
     ///
@@ -43,7 +45,7 @@ impl Cli {
                 let state = Arc::new(State::new(Some(settings.database_url)).await?);
                 service::run(&settings.address, state).await?;
                 Ok(())
-            }
+            },
         }
     }
 }

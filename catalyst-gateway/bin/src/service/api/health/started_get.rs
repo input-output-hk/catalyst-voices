@@ -1,9 +1,11 @@
 //! Implementation of the GET /health/started endpoint
 
-use crate::service::common::responses::resp_2xx::NoContent;
-use crate::service::common::responses::resp_5xx::{ServerError, ServiceUnavailable};
-use poem_extensions::response;
-use poem_extensions::UniResponse::T204;
+use poem_extensions::{response, UniResponse::T204};
+
+use crate::service::common::responses::{
+    resp_2xx::NoContent,
+    resp_5xx::{ServerError, ServiceUnavailable},
+};
 
 /// All responses
 pub(crate) type AllResponses = response! {
@@ -33,7 +35,8 @@ pub(crate) type AllResponses = response! {
 /// ## Responses
 ///
 /// * 204 No Content - Service is Started and can  serve requests.
-/// * 500 Server Error - If anything within this function fails unexpectedly. (Possible but unlikely)
+/// * 500 Server Error - If anything within this function fails unexpectedly. (Possible
+///   but unlikely)
 /// * 503 Service Unavailable - Service has not started, do not send other requests.
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint() -> AllResponses {

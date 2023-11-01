@@ -1,5 +1,6 @@
-use super::{challenge::Challenge, goal::Goal, group::Group, vote_plan::Voteplan};
 use chrono::{DateTime, Utc};
+
+use super::{challenge::Challenge, goal::Goal, group::Group, vote_plan::Voteplan};
 
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq)]

@@ -4,6 +4,9 @@
 //! which would not be permitted if this code was not obsoleted.
 #![allow(deprecated)]
 
+use chrono::{DateTime, Utc};
+use serde::{ser::Serializer, Serialize};
+
 use super::super::{serialize_datetime_as_rfc3339, SerdeType};
 use crate::event_db::types::vit_ss::{
     challenge::Challenge,
@@ -12,14 +15,10 @@ use crate::event_db::types::vit_ss::{
     group::Group,
     vote_plan::Voteplan,
 };
-use chrono::{DateTime, Utc};
-use serde::{ser::Serializer, Serialize};
 
 impl Serialize for SerdeType<&FundStageDates> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct FundStageDatesSerde<'a> {
             #[serde(serialize_with = "serialize_datetime_as_rfc3339")]
@@ -61,18 +60,14 @@ impl Serialize for SerdeType<&FundStageDates> {
 
 impl Serialize for SerdeType<FundStageDates> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<&Fund> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct FundSerde<'a> {
             id: i32,
@@ -122,18 +117,14 @@ impl Serialize for SerdeType<&Fund> {
 
 impl Serialize for SerdeType<Fund> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<&FundNextInfo> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct FundNextInfoSerde<'a> {
             id: i32,
@@ -152,18 +143,14 @@ impl Serialize for SerdeType<&FundNextInfo> {
 
 impl Serialize for SerdeType<FundNextInfo> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<&FundWithNext> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct FundWithNextSerde<'a> {
             #[serde(flatten)]
@@ -181,18 +168,17 @@ impl Serialize for SerdeType<&FundWithNext> {
 
 impl Serialize for SerdeType<FundWithNext> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use chrono::{DateTime, NaiveDateTime, Utc};
     use serde_json::json;
+
+    use super::*;
 
     #[test]
     fn fund_stage_dates_json_test() {

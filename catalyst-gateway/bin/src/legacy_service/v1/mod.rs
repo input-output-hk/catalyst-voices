@@ -1,7 +1,9 @@
-use crate::state::State;
+use std::sync::Arc;
+
 use axum::Router;
 use serde::Deserialize;
-use std::sync::Arc;
+
+use crate::state::State;
 
 mod event;
 mod registration;

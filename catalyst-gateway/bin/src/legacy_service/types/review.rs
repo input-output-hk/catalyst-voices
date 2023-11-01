@@ -1,13 +1,12 @@
-use super::SerdeType;
-use crate::event_db::types::review::{AdvisorReview, Rating, ReviewType};
 use serde::{ser::Serializer, Serialize};
 use serde_json::Value;
 
+use super::SerdeType;
+use crate::event_db::types::review::{AdvisorReview, Rating, ReviewType};
+
 impl Serialize for SerdeType<&ReviewType> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct ReviewTypeSerde<'a> {
             id: i32,
@@ -38,18 +37,14 @@ impl Serialize for SerdeType<&ReviewType> {
 
 impl Serialize for SerdeType<ReviewType> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<&Rating> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct RatingSerde<'a> {
             review_type: i32,
@@ -68,18 +63,14 @@ impl Serialize for SerdeType<&Rating> {
 
 impl Serialize for SerdeType<Rating> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<&AdvisorReview> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct AdvisorReviewSerde<'a> {
             assessor: &'a String,
@@ -95,17 +86,16 @@ impl Serialize for SerdeType<&AdvisorReview> {
 
 impl Serialize for SerdeType<AdvisorReview> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use serde_json::json;
+
+    use super::*;
 
     #[test]
     fn review_type_json_test() {

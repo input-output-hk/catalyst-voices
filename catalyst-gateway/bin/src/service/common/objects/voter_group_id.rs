@@ -1,5 +1,4 @@
 //! Defines the allowable groups for a Voter
-//!
 use poem_openapi::{types::Example, Enum};
 
 /// Voter Group ID.
@@ -22,6 +21,7 @@ impl Example for VoterGroupId {
 
 impl TryFrom<crate::event_db::types::registration::VoterGroupId> for VoterGroupId {
     type Error = String;
+
     fn try_from(
         value: crate::event_db::types::registration::VoterGroupId,
     ) -> Result<Self, Self::Error> {

@@ -1,5 +1,13 @@
 //! Implementation of the GET /health/ready endpoint
 
+use std::sync::Arc;
+
+use poem::web::Data;
+use poem_extensions::{
+    response,
+    UniResponse::{T204, T500, T503},
+};
+
 use crate::{
     service::common::responses::{
         resp_2xx::NoContent,
@@ -7,10 +15,6 @@ use crate::{
     },
     state::State,
 };
-use poem::web::Data;
-use poem_extensions::response;
-use poem_extensions::UniResponse::{T204, T500, T503};
-use std::sync::Arc;
 
 /// All responses
 pub(crate) type AllResponses = response! {
@@ -40,7 +44,8 @@ pub(crate) type AllResponses = response! {
 /// ## Responses
 ///
 /// * 204 No Content - Service is Ready to serve requests.
-/// * 500 Server Error - If anything within this function fails unexpectedly. (Possible but unlikely)
+/// * 500 Server Error - If anything within this function fails unexpectedly. (Possible
+///   but unlikely)
 /// * 503 Service Unavailable - Service is not ready, do not send other requests.
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(state: Data<&Arc<State>>) -> AllResponses {
