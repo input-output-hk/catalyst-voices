@@ -1,5 +1,6 @@
 addrr
 adminer
+asyncio
 auditability
 BROTLI
 cardano
@@ -24,6 +25,8 @@ Intellij
 jetbrains
 jorm
 jormungandr
+Jörmungandr
+kroki
 lcov
 Leshiy
 localizable

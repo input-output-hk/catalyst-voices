@@ -1,6 +1,7 @@
 # Set the Earthly version to 0.7
 VERSION 0.7
-FROM debian:stable-slim
+
+# cspell: words mkdocs runable
 
 # Copy all the source we need to build the docs
 src:
