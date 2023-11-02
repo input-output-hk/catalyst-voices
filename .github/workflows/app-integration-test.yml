@@ -38,9 +38,11 @@ jobs:
           channel: "stable"
           cache: true
 
+      - name: Check current directory
+        run: pwd
+
       - name: ⚙️ Setup Melos
         uses: bluefireteam/melos-action@v2
-      - run: pwd
 
       - name: ⚙️ Install dependencies for all packages
         run: melos build:pub_get:all
