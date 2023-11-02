@@ -29,6 +29,12 @@ jobs:
       - name: ⬇️ Checkout repository
         uses: actions/checkout@v3
 
+      - name: Uninstall Google Chrome
+        run: |
+          sudo apt-get purge google-chrome-stable
+          sudo apt-get autoremove
+          sudo apt-get clean
+
       - name: ⚙️ Setup Flutter
         uses: subosito/flutter-action@v2
         with:

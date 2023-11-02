@@ -6,8 +6,7 @@ cd web_installers/packages/web_drivers/
 dart pub get
 
 # Run the web driver installer in the background
-# dart lib/web_driver_installer.dart chromedriver --always-install --driver-version="114.0.5735.90" &
-dart lib/web_driver_installer.dart safaridriver &
+dart lib/web_driver_installer.dart chromedriver --always-install &
 # Wait for 20 seconds to allow the driver installer to complete
 sleep 20
 
