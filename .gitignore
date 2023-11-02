@@ -78,3 +78,13 @@ $RECYCLE.BIN/
 !/.vscode/launch.recommended.json
 !/.vscode/settings.recommended.json
 !/.vscode/tasks.recommended.json
+
+# Flutter/Dart/Pub
+.dart_tool/
+.packages
+build/
+pubspec.lock
+.pub-cache/
+.pub/
+coverage/
+.idea/
