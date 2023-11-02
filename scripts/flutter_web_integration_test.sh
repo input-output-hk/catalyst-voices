@@ -9,6 +9,8 @@ set -e
 # dart lib/web_driver_installer.dart chromedriver --always-install --driver-version="114.0.5735.90" &
 # # Wait for 20 seconds to allow the driver installer to complete
 # sleep 20
+cd /usr/local/share/chromedriver-linux64/
+ls
 
 /usr/local/share/chromedriver-linux64 --port=4444 &
 # Wait for 5 seconds to allow ChromeDriver to start
