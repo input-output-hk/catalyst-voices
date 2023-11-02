@@ -42,7 +42,7 @@ jobs:
 
       - name: Move Chrome to /usr/bin/
         run: |
-          sudo mv chrome /usr/bin/google-chrome
+          sudo mv chrome/* /usr/bin/google-chrome
           sudo chmod +x /usr/bin/google-chrome
 
       - name: Verify Chrome Installation
