@@ -1,5 +1,5 @@
+import 'package:catalyst_voices/dummy/dummy.dart';
 import 'package:catalyst_voices/l10n/l10n.dart';
-import 'package:catalyst_voices/dummy/poc.dart';
 import 'package:flutter/material.dart';
 
 final class App extends StatelessWidget {

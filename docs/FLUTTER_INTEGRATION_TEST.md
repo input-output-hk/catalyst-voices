@@ -34,13 +34,13 @@ flutter drive --driver=test_driver/integration_test.dart \
 
 #### Run integration test in Xcode
 
-1. Build the integration test for iOS
+Build the integration test for iOS
 
 ```sh
 flutter build ios --config-only integration_test/main.dart --flavor development
 ```
 
-2. Build the integration test for iOS
+Build the integration test for iOS
 
 Open iOS app in Xcode, select appropriate schema and run the integration test target `Product > Test` or `Cmd + U`.
 
