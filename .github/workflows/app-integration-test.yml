@@ -25,9 +25,6 @@ jobs:
     name: Web - Integration Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    defaults:
-      run:
-        working-directory: ./catalyst_voices
     steps:
       - name: ⬇️ Checkout repository
         uses: actions/checkout@v3
@@ -38,9 +35,6 @@ jobs:
           channel: "stable"
           cache: true
 
-      - name: Check current directory
-        run: pwd
-
       - name: ⚙️ Setup Melos
         uses: bluefireteam/melos-action@v2
 
@@ -48,4 +42,4 @@ jobs:
         run: melos build:pub_get:all
 
       - name: 🤖 Run Integration Tests
-        run: ../scripts/flutter_web_integration_test.sh
+        run: ./scripts/flutter_web_integration_test.sh
