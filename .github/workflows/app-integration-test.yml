@@ -39,10 +39,9 @@ jobs:
           cache: true
 
       - name: ⚙️ Setup Melos
-        run: ls
-
-      - name: ⚙️ Setup Melos
         uses: bluefireteam/melos-action@v2
+        with:
+          run-bootstrap: false
 
       - name: ⚙️ Install dependencies for all packages
         run: melos build:pub_get:all
