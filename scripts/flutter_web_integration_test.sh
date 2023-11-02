@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+# Path to ChromeDriver in Ubuntu image in GitHub Workspace
 /usr/local/share/chromedriver-linux64/chromedriver --port=4444 &
 # Wait for 5 seconds to allow ChromeDriver to start
 sleep 5
