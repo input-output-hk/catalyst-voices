@@ -5,6 +5,7 @@ auditability
 BROTLI
 cardano
 CEST
+cfbundle
 chrono
 ciphertext
 codepoints
@@ -55,7 +56,10 @@ tacho
 thiserror
 timelike
 Traceback
+TXNZD
 vitss
 voteplan
 voteplans
+xcfilelist
+xctest
 yoroi
