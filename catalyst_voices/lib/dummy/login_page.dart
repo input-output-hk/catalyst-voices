@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/poc/poc.dart';
+import 'package:catalyst_voices/dummy/poc.dart';
 import 'package:flutter/material.dart';
 
 final class LoginPage extends StatefulWidget {

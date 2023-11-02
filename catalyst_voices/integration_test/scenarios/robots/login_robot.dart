@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/poc/constants.dart';
+import 'package:catalyst_voices/dummy/constants.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 final class LoginRobot {
