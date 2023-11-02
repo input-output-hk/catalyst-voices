@@ -40,8 +40,7 @@ jobs:
 
       - name: ⚙️ Setup Melos
         uses: bluefireteam/melos-action@v2
-        with:
-          run-bootstrap: false
+      - run: pwd
 
       - name: ⚙️ Install dependencies for all packages
         run: melos build:pub_get:all
