@@ -10,6 +10,7 @@ cfbundle
 chromedriver
 chrono
 ciphertext
+COCOAPODS
 codepoints
 coti
 cryptoxide
@@ -43,6 +44,8 @@ opentelemetry
 permissionless
 pg_isready
 plpgsql
+podfile
+podhelper
 preprod
 psql
 pubkey
@@ -63,6 +66,7 @@ TXNZD
 vitss
 voteplan
 voteplans
+xcconfig
 xcfilelist
 xctest
 yoroi
