@@ -35,6 +35,20 @@ jobs:
           sudo apt-get autoremove
           sudo apt-get clean
 
+      - name: Download and Unzip Google Chrome 114
+        run: |
+          wget https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/114.0.5735.90/linux64/chrome-linux64.zip
+          unzip chrome-linux64.zip -d chrome
+
+      - name: Move Chrome to /usr/bin/
+        run: |
+          sudo mv chrome/chrome /usr/bin/google-chrome
+          sudo chmod +x /usr/bin/google-chrome
+
+      - name: Verify Chrome Installation
+        run: |
+          /usr/bin/google-chrome --version
+
       - name: ⚙️ Setup Flutter
         uses: subosito/flutter-action@v2
         with:
