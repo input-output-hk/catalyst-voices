@@ -1,10 +1,8 @@
 # Project Information
 site_name: Project Catalyst - Catalyst Voices
 site_url: https://input-output-hk.github.io/catalyst-docs
-site_author: Steven Johnson
-#site_url: ""
-dev_addr: "0.0.0.0:10081"
-docs_dir: src
+site_author: The Project Catalyst Team
+copyright: (c) 2023 Input Output Global
 
 # cspell: words Diagramsnet, pymdownx, linenums, inlinehilite, superfences,
 # cspell: words tasklist, betterem, materialx, twemoji, smartsymbols,
@@ -13,9 +11,9 @@ docs_dir: src
 # Repository
 repo_name: input-output-hk/catalyst-voices
 repo_url: https://github.com/input-output-hk/catalyst-voices
-#edit_uri: ""
 
-copyright: (c) 2022 Catalyst Voices
+# The Documentation src to build.
+docs_dir: src
 
 theme:
   name: material
@@ -37,6 +35,7 @@ theme:
 
   features:
     - navigation.instant
+    - navigation.instant.progress
     - navigation.tracking
     #- navigation.tabs
     #- navigation.tabs.sticky
@@ -59,8 +58,6 @@ plugins:
       ServerURL: https://kroki.io
       EnableDiagramsnet: true
       HttpMethod: POST
-      DownloadImages: true
-      #EmbedImages: true
   - glightbox
 
 markdown_extensions:
@@ -139,16 +136,17 @@ nav:
               - Catalyst Ballot Formats: catalyst-standards/ballot/index.md
               - Catalyst V1 Ballot: catalyst-standards/ballot/catalyst-v1.md
               - Catalyst V2 Ballot: catalyst-standards/ballot/catalyst-v2.md
-      - Examples:
-          - Examples: examples/index.md
-          - Abbreviations: examples/abbreviations.md
-          - Admonitions: examples/admonitions.md
-          - Code Formatting: examples/code-formatting.md
-          - Mermaid Diagrams: examples/mermaid-diagrams.md
-          - Kroki Diagrams: examples/kroki-diagrams.md
-      - Important Information:
-          - Important Information: important/index.md
-          - Contributing: important/contributing.md
-          - Code of Conduct: important/coc.md
-          - Security: important/security.md
-          - License: important/license.md
+      - Appendix:
+          - Documentation Examples:
+              - Examples: appendix/examples/index.md
+              - Abbreviations: appendix/examples/abbreviations.md
+              - Admonitions: appendix/examples/admonitions.md
+              - Code Formatting: appendix/examples/code-formatting.md
+              - Mermaid Diagrams: appendix/examples/mermaid-diagrams.md
+              - Kroki Diagrams: appendix/examples/kroki-diagrams.md
+          - Important Information:
+              - Important Information: appendix/important/index.md
+              - Contributing: appendix/important/contributing.md
+              - Code of Conduct: appendix/important/coc.md
+              - Security: appendix/important/security.md
+              - License: appendix/important/license.md

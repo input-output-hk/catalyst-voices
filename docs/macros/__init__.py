@@ -7,5 +7,5 @@ def define_env(env):
     """
 
     @env.macro
-    def include_file(filename, start_line=0, end_line=None):
-        return inc_file(env, filename, start_line, end_line)
+    def include_file(filename, start_line=0, end_line=None, indent=None):
+        return inc_file(env, filename, start_line, end_line, indent)

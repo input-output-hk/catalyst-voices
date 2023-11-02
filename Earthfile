@@ -30,33 +30,12 @@ global-cargo-config:
     COPY --dir .cargo .cargo
     SAVE ARTIFACT .cargo .cargo
 
-local-development-setup:
-    # Build Container we need to serve live docs.
-    #BUILD ./docs+mkdocs-material
-    # Builds the static site-docs.
-    BUILD ./docs+local-build
-
-    # Installs things local developers will need.
-    DO github.com/input-output-hk/catalyst-ci/earthly/docs:t1+DEVELOP --dest=./local
-
-live-docs-development:
-    LOCALLY
-
-    # We use python to open a browser on Windows/Mac or Linux
-    RUN python -c "import webbrowser; webbrowser.open('http://localhost:10080')"
-    RUN docker compose -f local/docker-compose.livedocs.yml up --abort-on-container-exit
-
-site-docs-development:
-    LOCALLY
-
-    # We use python to open a browser on Windows/Mac or Linux
-    RUN python -c "import webbrowser; webbrowser.open('http://localhost:10081')"
-    RUN docker compose -f local/docker-compose.sitedocs.yml up --abort-on-container-exit
 
 repo-docs:
+    # Create artifacts of extra files we embed inside the documentation when its built.
     FROM scratch
 
-    WORKDIR /
-    COPY --dir CODE_OF_CONDUCT.md CONTRIBUTING.md LICENSE-APACHE LICENSE-MIT README.md SECURITY.md /repo
+    WORKDIR /repo
+    COPY --dir *.md LICENSE-APACHE LICENSE-MIT .
 
     SAVE ARTIFACT /repo repo

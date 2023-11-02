@@ -4,8 +4,8 @@ icon: material/format-textbox
 
 # Code Formatting
 
-!!!
-example "Rust"
+<!-- markdownlint-disable max-one-sentence-per-line -->
+!!! example "Rust"
 
     ```rust
     pub(crate) async fn do_something(param: Option<String>) -> Result<String>: {
@@ -13,8 +13,7 @@ example "Rust"
     }
     ```
 
-!!!
-example "Python"
+!!! example "Python"
 
     ```python
     async def sleep():

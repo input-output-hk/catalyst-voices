@@ -4,6 +4,8 @@ icon: material/drawing-box
 
 # Kroki Diagrams
 
+<!-- cspell: words blockdiag -->
+
 ## Kroki Mermaid
 
 * No Links
