@@ -32,6 +32,7 @@ nav:
           - Catalyst V1 Ballot: catalyst-standards/ballot/catalyst-v1.md
           - Catalyst V2 Ballot: catalyst-standards/ballot/catalyst-v2.md
   - Appendix:
+      - Appendix: appendix/index.md
       - Important Information:
           - Important Information: appendix/important/index.md
           - Contributing: appendix/important/contributing.md
