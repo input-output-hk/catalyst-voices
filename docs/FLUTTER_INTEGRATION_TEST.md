@@ -4,13 +4,14 @@
   * [Introduction](#introduction)
   * [Run Integration Tests](#run-integration-tests)
     * [CI](#ci)
-    * [Web](#web)
-    * [iOS](#ios)
-      * [Run integration test in Xcode](#run-integration-test-in-xcode)
-      * [Run integration test from command line](#run-integration-test-from-command-line)
-    * [Android](#android)
-      * [Run integration test in Android Studio](#run-integration-test-in-android-studio)
-      * [Run integration test from command line](#run-integration-test-from-command-line-1)
+    * [Local](#local)
+      * [Web](#web)
+      * [iOS](#ios)
+        * [Run integration test in Xcode](#run-integration-test-in-xcode)
+        * [Run integration test from command line](#run-integration-test-from-command-line)
+      * [Android](#android)
+        * [Run integration test in Android Studio](#run-integration-test-in-android-studio)
+        * [Run integration test from command line](#run-integration-test-from-command-line-1)
     * [Run integration test in Firebase Test Lab](#run-integration-test-in-firebase-test-lab)
   * [Links](#links)
 
@@ -24,7 +25,9 @@
 ./flutter_web_integration_test.sh
 ```
 
-### Web
+### Local
+
+#### Web
 
 Navigate to `catalyst_voices` and run:
 
@@ -35,9 +38,9 @@ flutter drive --driver=test_driver/integration_test.dart \
 -d chrome
 ```
 
-### iOS
+#### iOS
 
-#### Run integration test in Xcode
+##### Run integration test in Xcode
 
 Navigate to `catalyst_voices`
 
@@ -49,8 +52,7 @@ flutter build ios --config-only integration_test/main.dart --flavor development
 
 Open iOS app in Xcode, select appropriate schema and run the integration test target `Product > Test` or `Cmd + U`.
 
-
-#### Run integration test from command line
+##### Run integration test from command line
 
 Navigate to `catalyst_voices`
 
@@ -60,11 +62,23 @@ Start iOS Simulator or connect iOS device and run:
 flutter test integration_test/main.dart --flavor development
 ```
 
-### Android
+#### Android
 
-#### Run integration test in Android Studio
+##### Run integration test in Android Studio
 
-#### Run integration test from command line
+Navigate to `catalyst_voices/android` start Android Emulator or connect Android device and run:
+
+```sh
+./gradlew app:connectedAndroidTest -Ptarget=`pwd`/../integration_test/main.dart
+```
+
+>Note: To use --dart-define with gradlew you must base64 encode all parameters,
+>and pass them to gradle in a comma separated list:
+```sh
+./gradlew project:task -Pdart-defines="{base64(key=value)},[...]"
+```
+
+##### Run integration test from command line
 
 Navigate to `catalyst_voices` start Android Emulator or connect Android device and run:
 

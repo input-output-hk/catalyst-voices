@@ -25,6 +25,7 @@ dreps
 encryptor
 genhtml
 gmtime
+gradlew
 ideascale
 Intellij
 jetbrains
@@ -41,13 +42,16 @@ netkey
 oneshot
 openapi
 opentelemetry
+Pdart
 permissionless
 pg_isready
 plpgsql
 podfile
 podhelper
 preprod
+projectcatalyst
 psql
+Ptarget
 pubkey
 pubspec
 rapidoc
