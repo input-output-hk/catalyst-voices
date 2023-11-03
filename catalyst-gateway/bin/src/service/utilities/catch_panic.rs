@@ -1,15 +1,13 @@
 //! Handle catching panics created by endpoints, logging them and properly responding.
-use crate::service::common::responses::resp_5xx::ServerError;
+use std::{any::Any, backtrace::Backtrace, cell::RefCell};
 
+// use tracing::Level;
+use chrono::prelude::*;
 use panic_message::panic_message;
 use poem::middleware::PanicHandler;
-//use tracing::Level;
-use chrono::prelude::*;
-use std::any::Any;
-use std::backtrace::Backtrace;
-use std::cell::RefCell;
-
 use serde_json::json;
+
+use crate::service::common::responses::resp_5xx::ServerError;
 
 /// Customized Panic handler.
 /// Catches all panics, and turns them into 500.
@@ -26,9 +24,9 @@ thread_local! {
     static LOCATION: RefCell<Option<String>> = RefCell::new(None);
 }
 
-/// Sets a custom panic hook to capture the Backtrace and Panic Location for logging purposes.
-/// This hook gets called BEFORE we catch it.  So the thread local variables stored here are
-/// valid when processing the panic capture.
+/// Sets a custom panic hook to capture the Backtrace and Panic Location for logging
+/// purposes. This hook gets called BEFORE we catch it.  So the thread local variables
+/// stored here are valid when processing the panic capture.
 pub(crate) fn set_panic_hook() {
     std::panic::set_hook(Box::new(|panic_info| {
         // Get the backtrace and format it.

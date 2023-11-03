@@ -1,12 +1,11 @@
+use serde::{ser::Serializer, Serialize};
+
 use super::super::SerdeType;
 use crate::event_db::types::vit_ss::group::Group;
-use serde::{ser::Serializer, Serialize};
 
 impl Serialize for SerdeType<&Group> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct GroupSerde<'a> {
             fund_id: i32,
@@ -24,17 +23,16 @@ impl Serialize for SerdeType<&Group> {
 
 impl Serialize for SerdeType<Group> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use serde_json::json;
+
+    use super::*;
 
     #[test]
     fn group_json_test() {

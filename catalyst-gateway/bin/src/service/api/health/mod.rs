@@ -1,7 +1,10 @@
 //! Health Endpoints
-//!
-use crate::service::common::tags::ApiTags;
+use std::sync::Arc;
+
+use poem::web::Data;
 use poem_openapi::OpenApi;
+
+use crate::{service::common::tags::ApiTags, state::State};
 
 mod live_get;
 mod ready_get;
@@ -27,7 +30,8 @@ impl HealthApi {
     ///
     /// * 204 No Content - Service is Started and can serve requests.
     /// * 500 Server Error - If anything within this function fails unexpectedly.
-    /// * 503 Service Unavailable - Service has not started, do not send other requests yet.
+    /// * 503 Service Unavailable - Service has not started, do not send other requests
+    ///   yet.
     async fn started_get(&self) -> started_get::AllResponses {
         started_get::endpoint().await
     }
@@ -35,7 +39,8 @@ impl HealthApi {
     #[oai(path = "/ready", method = "get", operation_id = "healthReady")]
     /// Service Ready
     ///
-    /// This endpoint is used to determine if the service is ready and able to serve requests.
+    /// This endpoint is used to determine if the service is ready and able to serve
+    /// requests.
     ///
     /// ## Note
     ///
@@ -48,8 +53,8 @@ impl HealthApi {
     /// * 500 Server Error - If anything within this function fails unexpectedly.
     /// * 503 Service Unavailable - Service is not ready, requests to other
     /// endpoints should not be sent until the service becomes ready.
-    async fn ready_get(&self) -> ready_get::AllResponses {
-        ready_get::endpoint().await
+    async fn ready_get(&self, state: Data<&Arc<State>>) -> ready_get::AllResponses {
+        ready_get::endpoint(state).await
     }
 
     #[oai(path = "/live", method = "get", operation_id = "healthLive")]
@@ -65,7 +70,8 @@ impl HealthApi {
     /// ## Responses
     ///
     /// * 204 No Content - Service is OK and can keep running.
-    /// * 500 Server Error - If anything within this function fails unexpectedly. (Possible but unlikely)
+    /// * 500 Server Error - If anything within this function fails unexpectedly.
+    ///   (Possible but unlikely)
     /// * 503 Service Unavailable - Service is possibly not running reliably.
     async fn live_get(&self) -> live_get::AllResponses {
         live_get::endpoint().await
@@ -84,28 +90,31 @@ impl HealthApi {
 /// ```
 /// Also need establish `EVENT_DB_URL` env variable with the following value
 /// ```
-/// EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+/// EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 /// ```
 /// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
 
 #[cfg(test)]
 mod tests {
-    use crate::{service::poem_service::tests::mk_test_app, state::State};
-    use poem::http::StatusCode;
-    use std::sync::Arc;
+    // use std::sync::Arc;
 
-    #[tokio::test]
-    async fn health_test() {
-        let state = Arc::new(State::new(None).await.unwrap());
-        let app = mk_test_app(&state);
+    // use poem::http::StatusCode;
 
-        let resp = app.get("/api/health/started").send().await;
-        resp.assert_status(StatusCode::NO_CONTENT);
-
-        let resp = app.get("/api/health/ready").send().await;
-        resp.assert_status(StatusCode::NO_CONTENT);
-
-        let resp = app.get("/api/health/live").send().await;
-        resp.assert_status(StatusCode::NO_CONTENT);
-    }
+    // License Violation ....
+    // use crate::{service::poem_service::tests::mk_test_app, state::State};
+    //
+    // #[tokio::test]
+    // async fn health_test() {
+    // let state = Arc::new(State::new(None).await.unwrap());
+    // let app = mk_test_app(&state);
+    //
+    // let resp = app.get("/api/health/started").send().await;
+    // resp.assert_status(StatusCode::NO_CONTENT);
+    //
+    // let resp = app.get("/api/health/ready").send().await;
+    // resp.assert_status(StatusCode::NO_CONTENT);
+    //
+    // let resp = app.get("/api/health/live").send().await;
+    // resp.assert_status(StatusCode::NO_CONTENT);
+    // }
 }

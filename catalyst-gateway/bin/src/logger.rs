@@ -1,5 +1,4 @@
 //! Setup for logging for the service.
-//!
 use clap::ValueEnum;
 use tracing::{level_filters::LevelFilter, subscriber::SetGlobalDefaultError};
 use tracing_subscriber::{

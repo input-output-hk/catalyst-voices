@@ -1,87 +1,99 @@
 VERSION 0.7
 
-#cspell: words rustup readelf nextest testci testdocs
+#cspell: words rustup readelf nextest testci testdocs rustfmt toolsets USERARCH
 
-COPY_SRC:
-    # Copy the build src using this.
-    COMMAND
-
-    # ONLY copy whats needed to build.  Not everything.
-    # Note: rust-toolchain.toml was already copied when rust was setup.
-    # Minimizing whats copied reduces needless cache misses.
-    COPY --dir bin crates Cargo.* .
-
-    COPY --dir ../+global-cargo-config/.cargo .cargo
-
+# Set up our target toolchains, and copy our files.
 builder:
-    # The builder with all necessary tools and the correct rust versions.
-    FROM github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.2+rustup
+    FROM github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.3+rust-base
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.2+RUST_SETUP
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.3+SETUP --toolchain=rust-toolchain.toml
 
-    WORKDIR /build
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.3+CP_SRC --src=".cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin crates"
 
-check:
-    # Code checks which don;t need us to build it.
+# Test rust build container - Use best architecture host tools.
+check-hosted:
     FROM +builder
 
-    DO +COPY_SRC
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.3+CHECK
 
-    RUN cargo fmt --check --all; \
-        fmt_chk_failed=$?; \
-        cargo machete; \
-        unused_crate_dependency_check_failed=$?; \
-        exit $(($fmt_chk_failed || $unused_crate_dependency_check_failed))
+# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
+# Only used to validate tooling is working across host toolsets.
+check-all-hosts:    
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +check-hosted
 
-prepare-cache:
-    # THIS DOES NOT WORK RELIABLY - DO NOT USE
-    # Prepare the build cache
-    FROM +builder
-    
-    DO +COPY_SRC
+build-hosted:
+    ARG TARGETPLATFORM
 
-    RUN cargo chef prepare --recipe-path recipe.json
-    SAVE ARTIFACT recipe.json
-
-cached-builder:
-    # THIS DOES NOT WORK RELIABLY - DO NOT USE
-    # Our builder with all dependencies cached.
-    # Using cutoff-optimization to ensure cache hit
-    FROM +builder
-    COPY +prepare-cache/recipe.json ./
-    CACHE target
-    RUN cargo chef cook --release --locked --workspace -v
-
-build:
     # Build the service
-    FROM +builder  # Note: Cached builder DOES NOT WORK and makes broken builds.
-    
-    DO +COPY_SRC
+    FROM +builder
+ 
+    RUN /scripts/std_build.sh
 
-    RUN cargo build --release --workspace --locked; \
-        build_failed=$?; \
-        cargo lint; \
-        lint_failed=$?; \
-        cargo docs; \
-        docs_failed=$?; \
-        exit $(($build_failed || $lint_failed || $docs_failed))
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.3+SMOKE_TEST --bin=cat-gateway
 
-    RUN ldd target/x86_64-unknown-linux-musl/release/cat-gateway
-    RUN readelf -p .comment target/x86_64-unknown-linux-musl/release/cat-gateway
-    RUN strip -v target/x86_64-unknown-linux-musl/release/cat-gateway
+    SAVE ARTIFACT target/$TARGETARCH/doc doc
+    SAVE ARTIFACT target/$TARGETARCH/release/cat-gateway cat-gateway
 
-    SAVE ARTIFACT target/x86_64-unknown-linux-musl/doc doc
-    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/cat-gateway cat-gateway
+# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
+# Only used to validate tooling is working across host toolsets.
+build-all-hosts:    
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +build-hosted
 
-test:
-    # Run rust tests.
-    FROM +build
+## -----------------------------------------------------------------------------
+##
+## Standard CI targets.
+##
+## These targets are discovered and executed automatically by CI.
 
-    COPY --dir .config .
+# Run check using the most efficient host tooling
+# CI Automated Entry point.
+check:
+    FROM busybox
+    # This is necessary to pick the correct architecture build to suit the native machine.
+    # It primarily ensures that Darwin/Arm builds work as expected without needing x86 emulation.
+    # All target implementation of this should follow this pattern.
+    ARG USERARCH
 
-    # Cargo nextest creates a test artifact. TODO: Work out how to publish it (even if test run fails).
-    RUN cargo testci; \
-        testci_failed=$?; \
-        cargo testdocs; \
-        testdocs_failed=$?; \
-        exit $(($testci_failed || $testdocs_failed))
+    IF [ "$USERARCH" == "arm64" ]
+        BUILD --platform=linux/arm64 +check-hosted
+    ELSE
+        BUILD --platform=linux/amd64 +check-hosted
+    END
+
+# Run build using the most efficient host tooling
+# CI Automated Entry point.
+build:
+    FROM busybox
+    # This is necessary to pick the correct architecture build to suit the native machine.
+    # It primarily ensures that Darwin/Arm builds work as expected without needing x86 emulation.
+    # All target implementation of this should follow this pattern.
+    ARG USERARCH
+
+    IF [ "$USERARCH" == "arm64" ]
+        BUILD --platform=linux/arm64 +build-hosted
+    ELSE
+        BUILD --platform=linux/amd64 +build-hosted
+    END
+
+
+# This step will build any packages we would intend to publish or integration test.
+package:
+    FROM scratch
+
+# Run integration tests on all packages built during the `package` step.
+integrate:
+    FROM scratch
+
+# Publish packages if all integration tests have passed. (Failure to pass tests will prevent packages being published.)
+publish:
+    FROM scratch
+
+## -----------------------------------------------------------------------------
+
+# This step simulates the full CI run for local purposes only.
+local-ci-run:
+    BUILD +check
+    BUILD +build
+    BUILD +package
+    BUILD +integrate
+    BUILD +publish

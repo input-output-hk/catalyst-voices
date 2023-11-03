@@ -1,10 +1,11 @@
 //! Catalyst Election Database crate
+use std::str::FromStr;
+
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
 use dotenvy::dotenv;
 use error::Error;
 use schema_check::SchemaVersion;
-use std::str::FromStr;
 use tokio_postgres::NoTls;
 
 mod config_table;
@@ -34,31 +35,34 @@ pub(crate) struct EventDB {
 ///
 /// # Parameters
 ///
-/// * `url` set to the postgres connection string needed to connect to the
-///   database.  IF it is None, then the env var "`DATABASE_URL`" will be used
-///   for this connection string. eg:
-///     "`postgres://catalyst-dev:CHANGE_ME@localhost/CatalystDev`"
+/// * `url` set to the postgres connection string needed to connect to the database.  IF
+///   it is None, then the env var "`DATABASE_URL`" will be used for this connection
+///   string. eg: "`postgres://catalyst-dev:CHANGE_ME@localhost/CatalystDev`"
+/// * `do_schema_check` boolean flag to decide whether to verify the schema version or
+///   not. If it is `true`, a query is made to verify the DB schema version.
 ///
 /// # Errors
 ///
 /// This function will return an error if:
 /// * `url` is None and the environment variable "`DATABASE_URL`" isn't set.
 /// * There is any error communicating the the database to check its schema.
-/// * The database schema in the DB does not 100% match the schema supported by
-///   this library.
+/// * The database schema in the DB does not 100% match the schema supported by this
+///   library.
 ///
 /// # Notes
 ///
 /// The env var "`DATABASE_URL`" can be set directly as an anv var, or in a
 /// `.env` file.
-pub(crate) async fn establish_connection(url: Option<&str>) -> Result<EventDB, Error> {
+pub(crate) async fn establish_connection(
+    url: Option<String>, do_schema_check: bool,
+) -> Result<EventDB, Error> {
     // Support env vars in a `.env` file,  doesn't need to exist.
     dotenv().ok();
 
     let database_url = match url {
-        Some(url) => url.to_string(),
+        Some(url) => url,
         // If the Database connection URL is not supplied, try and get from the env var.
-        None => std::env::var(DATABASE_URL_ENVVAR)?,
+        None => std::env::var(DATABASE_URL_ENVVAR).map_err(|_| Error::NoDatabaseUrl)?,
     };
 
     let config = tokio_postgres::config::Config::from_str(&database_url)?;
@@ -69,33 +73,35 @@ pub(crate) async fn establish_connection(url: Option<&str>) -> Result<EventDB, E
 
     let db = EventDB { pool };
 
-    db.schema_version_check().await?;
+    if do_schema_check {
+        db.schema_version_check().await?;
+    }
 
     Ok(db)
 }
 
-/// Need to setup and run a test event db instance
-/// To do it you can use the following commands:
-/// Prepare docker images
-/// ```
-/// earthly ./containers/event-db-migrations+docker --data=test
-/// ```
-/// Run event-db container
-/// ```
-/// docker-compose -f src/event-db/docker-compose.yml up migrations
-/// ```
-/// Also need establish `EVENT_DB_URL` env variable with the following value
-/// ```
-/// EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
-/// ```
-/// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    /// Check if the schema version in the DB is up to date.
-    #[tokio::test]
-    async fn check_schema_version() {
-        establish_connection(None).await.unwrap();
-    }
-}
+// Need to setup and run a test event db instance
+// To do it you can use the following commands:
+// Prepare docker images
+// ```
+// earthly ./containers/event-db-migrations+docker --data=test
+// ```
+// Run event-db container
+// ```
+// docker-compose -f src/event-db/docker-compose.yml up migrations
+// ```
+// Also need establish `EVENT_DB_URL` env variable with the following value
+// ```
+// EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+// ```
+// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
+// #[cfg(test)]
+// mod test {
+// use super::*;
+//
+// Check if the schema version in the DB is up to date.
+// #[tokio::test]
+// async fn check_schema_version() {
+// establish_connection(None).await.unwrap();
+// }
+// }

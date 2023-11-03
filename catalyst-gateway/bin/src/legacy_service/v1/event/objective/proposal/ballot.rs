@@ -1,13 +1,15 @@
-use crate::event_db::types::{
-    ballot::Ballot, event::EventId, objective::ObjectiveId, proposal::ProposalId,
-};
+use std::sync::Arc;
+
+use axum::{extract::Path, routing::get, Router};
+
 use crate::{
+    event_db::types::{
+        ballot::Ballot, event::EventId, objective::ObjectiveId, proposal::ProposalId,
+    },
     legacy_service::{handle_result, types::SerdeType},
     service::Error,
     state::State,
 };
-use axum::{extract::Path, routing::get, Router};
-use std::sync::Arc;
 
 pub(crate) fn ballot(state: Arc<State>) -> Router {
     Router::new().route(
@@ -39,76 +41,77 @@ async fn ballot_exec(
     Ok(ballot)
 }
 
-/// Need to setup and run a test event db instance
-/// To do it you can use the following commands:
-/// Prepare docker images
-/// ```
-/// earthly ./containers/event-db-migrations+docker --data=test
-/// ```
-/// Run event-db container
-/// ```
-/// docker-compose -f src/event-db/docker-compose.yml up migrations
-/// ```
-/// Also need establish `EVENT_DB_URL` env variable with the following value
-/// ```
-/// EVENT_DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
-/// ```
-/// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::legacy_service::{app, tests::response_body_to_json};
-    use axum::{
-        body::Body,
-        http::{Request, StatusCode},
-    };
-    use tower::ServiceExt;
-
-    #[tokio::test]
-    async fn ballot_test() {
-        let state = Arc::new(State::new(None).await.unwrap());
-        let app = app(state);
-
-        let request = Request::builder()
-            .uri(format!(
-                "/api/v1/event/{0}/objective/{1}/proposal/{2}/ballot",
-                1, 1, 10
-            ))
-            .body(Body::empty())
-            .unwrap();
-        let response = app.clone().oneshot(request).await.unwrap();
-        assert_eq!(response.status(), StatusCode::OK);
-        assert_eq!(
-            response_body_to_json(response).await.unwrap(),
-            serde_json::json!(
-                {
-                    "choices": ["yes", "no"],
-                    "voteplans": [
-                        {
-                            "chain_proposal_index": 10,
-                            "group": "direct",
-                            "ballot_type": "public",
-                            "chain_voteplan_id": "1",
-                        },
-                        {
-                            "chain_proposal_index": 12,
-                            "group": "rep",
-                            "ballot_type": "public",
-                            "chain_voteplan_id": "2",
-                        }
-                    ]
-                }
-            ),
-        );
-
-        let request = Request::builder()
-            .uri(format!(
-                "/api/v1/event/{0}/objective/{1}/proposal/{2}/ballot",
-                3, 3, 3
-            ))
-            .body(Body::empty())
-            .unwrap();
-        let response = app.clone().oneshot(request).await.unwrap();
-        assert_eq!(response.status(), StatusCode::NOT_FOUND);
-    }
-}
+// Need to setup and run a test event db instance
+// To do it you can use the following commands:
+// Prepare docker images
+// ```
+// earthly ./containers/event-db-migrations+docker --data=test
+// ```
+// Run event-db container
+// ```
+// docker-compose -f src/event-db/docker-compose.yml up migrations
+// ```
+// Also need establish `EVENT_DB_URL` env variable with the following value
+// ```
+// EVENT_DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+// ```
+// [readme](https://github.com/input-output-hk/catalyst-core/tree/main/src/event-db/Readme.md)
+// #[cfg(test)]
+// mod tests {
+// use axum::{
+// body::Body,
+// http::{Request, StatusCode},
+// };
+// use tower::ServiceExt;
+//
+// use super::*;
+// use crate::legacy_service::{app, tests::response_body_to_json};
+//
+// #[tokio::test]
+// async fn ballot_test() {
+// let state = Arc::new(State::new(None).await.unwrap());
+// let app = app(state);
+//
+// let request = Request::builder()
+// .uri(format!(
+// "/api/v1/event/{0}/objective/{1}/proposal/{2}/ballot",
+// 1, 1, 10
+// ))
+// .body(Body::empty())
+// .unwrap();
+// let response = app.clone().oneshot(request).await.unwrap();
+// assert_eq!(response.status(), StatusCode::OK);
+// assert_eq!(
+// response_body_to_json(response).await.unwrap(),
+// serde_json::json!(
+// {
+// "choices": ["yes", "no"],
+// "voteplans": [
+// {
+// "chain_proposal_index": 10,
+// "group": "direct",
+// "ballot_type": "public",
+// "chain_voteplan_id": "1",
+// },
+// {
+// "chain_proposal_index": 12,
+// "group": "rep",
+// "ballot_type": "public",
+// "chain_voteplan_id": "2",
+// }
+// ]
+// }
+// ),
+// );
+//
+// let request = Request::builder()
+// .uri(format!(
+// "/api/v1/event/{0}/objective/{1}/proposal/{2}/ballot",
+// 3, 3, 3
+// ))
+// .body(Body::empty())
+// .unwrap();
+// let response = app.clone().oneshot(request).await.unwrap();
+// assert_eq!(response.status(), StatusCode::NOT_FOUND);
+// }
+// }

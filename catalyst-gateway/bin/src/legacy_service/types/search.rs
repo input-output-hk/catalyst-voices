@@ -1,15 +1,14 @@
+use serde::{de::Deserializer, ser::Serializer, Deserialize, Serialize};
+
 use super::SerdeType;
 use crate::event_db::types::search::{
     SearchColumn, SearchConstraint, SearchOrderBy, SearchQuery, SearchResult, SearchTable,
     ValueResults,
 };
-use serde::{de::Deserializer, ser::Serializer, Deserialize, Serialize};
 
 impl<'de> Deserialize<'de> for SerdeType<SearchTable> {
     fn deserialize<D>(deserializer: D) -> Result<SerdeType<SearchTable>, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
+    where D: Deserializer<'de> {
         #[derive(Deserialize)]
         #[serde(rename_all = "kebab-case")]
         enum SearchTableSerde {
@@ -27,9 +26,7 @@ impl<'de> Deserialize<'de> for SerdeType<SearchTable> {
 
 impl<'de> Deserialize<'de> for SerdeType<SearchColumn> {
     fn deserialize<D>(deserializer: D) -> Result<SerdeType<SearchColumn>, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
+    where D: Deserializer<'de> {
         #[derive(Deserialize)]
         #[serde(rename_all = "kebab-case")]
         enum SearchColumnSerde {
@@ -51,9 +48,7 @@ impl<'de> Deserialize<'de> for SerdeType<SearchColumn> {
 
 impl<'de> Deserialize<'de> for SerdeType<SearchConstraint> {
     fn deserialize<D>(deserializer: D) -> Result<SerdeType<SearchConstraint>, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
+    where D: Deserializer<'de> {
         #[derive(Deserialize)]
         struct SearchConstraintSerde {
             column: SerdeType<SearchColumn>,
@@ -70,9 +65,7 @@ impl<'de> Deserialize<'de> for SerdeType<SearchConstraint> {
 
 impl<'de> Deserialize<'de> for SerdeType<SearchOrderBy> {
     fn deserialize<D>(deserializer: D) -> Result<SerdeType<SearchOrderBy>, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
+    where D: Deserializer<'de> {
         #[derive(Deserialize)]
         struct SearchOrderBySerde {
             pub(crate) column: SerdeType<SearchColumn>,
@@ -90,9 +83,7 @@ impl<'de> Deserialize<'de> for SerdeType<SearchOrderBy> {
 
 impl<'de> Deserialize<'de> for SerdeType<SearchQuery> {
     fn deserialize<D>(deserializer: D) -> Result<SerdeType<SearchQuery>, D::Error>
-    where
-        D: Deserializer<'de>,
-    {
+    where D: Deserializer<'de> {
         #[derive(Deserialize)]
         struct SearchQuerySerde {
             pub(crate) table: SerdeType<SearchTable>,
@@ -116,43 +107,43 @@ impl<'de> Deserialize<'de> for SerdeType<SearchQuery> {
 
 impl Serialize for SerdeType<&ValueResults> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         match self.0 {
-            ValueResults::Events(events) => events
-                .iter()
-                .map(SerdeType)
-                .collect::<Vec<_>>()
-                .serialize(serializer),
-            ValueResults::Objectives(events) => events
-                .iter()
-                .map(SerdeType)
-                .collect::<Vec<_>>()
-                .serialize(serializer),
-            ValueResults::Proposals(events) => events
-                .iter()
-                .map(SerdeType)
-                .collect::<Vec<_>>()
-                .serialize(serializer),
+            ValueResults::Events(events) => {
+                events
+                    .iter()
+                    .map(SerdeType)
+                    .collect::<Vec<_>>()
+                    .serialize(serializer)
+            },
+            ValueResults::Objectives(events) => {
+                events
+                    .iter()
+                    .map(SerdeType)
+                    .collect::<Vec<_>>()
+                    .serialize(serializer)
+            },
+            ValueResults::Proposals(events) => {
+                events
+                    .iter()
+                    .map(SerdeType)
+                    .collect::<Vec<_>>()
+                    .serialize(serializer)
+            },
         }
     }
 }
 
 impl Serialize for SerdeType<ValueResults> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 impl Serialize for SerdeType<&SearchResult> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         #[derive(Serialize)]
         struct SearchResultSerde<'a> {
             total: i64,
@@ -169,17 +160,16 @@ impl Serialize for SerdeType<&SearchResult> {
 
 impl Serialize for SerdeType<SearchResult> {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
+    where S: Serializer {
         SerdeType(&self.0).serialize(serializer)
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use serde_json::json;
+
+    use super::*;
 
     #[test]
     fn search_table_json_test() {
