@@ -6,90 +6,51 @@ VERSION 0.7
 
 # cspell: words
 
-ADD_PSQL:
-    COMMAND
+builder:
+    FROM ../../../catalyst-ci/earthly/postgresql+postgres-base
 
-    RUN apt-get update && apt-get install -y --no-install-recommends \
-        wget \
-         gnupg2 \
-         ca-certificates \
-         lsb-release \
-         apt-transport-https \
-         && rm -rf /var/lib/apt/lists/* && \
-         wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
-         echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
-         apt-get update && \
-         apt-get install -y --no-install-recommends postgresql-14 && \
-         apt-get remove -y wget gnupg2 lsb-release apt-transport-https && \
-         apt-get autoremove -y && \
-         apt-get clean && rm -rf /var/lib/apt/lists/*
+    ARG with_historic_data=true
+    ARG with_test_data=true
+
+    WORKDIR /build
+
+    COPY refinery.toml .
+    COPY --dir migrations .
+    RUN mkdir data
+    
+    IF [ $with_historic_data = true ]
+        COPY --dir historic_data .
+
+        RUN python3 historic_data/fund_2/mk_fund2_sql.py historic_data/fund_2/fund2_database_encrypted.sqlite3 >> historic_data/fund_2.sql
+        RUN python3 historic_data/fund_3/mk_fund3_sql.py historic_data/fund_3/fund3_database_encrypted.sqlite3 >> historic_data/fund_3.sql
+        RUN python3 historic_data/fund_4/mk_fund4_sql.py historic_data/fund_4/fund4_database_encrypted.sqlite3 >> historic_data/fund_4.sql
+        RUN python3 historic_data/fund_5/mk_fund5_sql.py historic_data/fund_5/fund5_database_encrypted.sqlite3 >> historic_data/fund_5.sql
+        RUN python3 historic_data/fund_6/mk_fund6_sql.py historic_data/fund_6/fund6_database_encrypted.sqlite3 >> historic_data/fund_6.sql
+        RUN python3 historic_data/fund_7/mk_fund7_sql.py historic_data/fund_7/fund7_database_encrypted.sqlite3 >> historic_data/fund_7.sql
+        RUN python3 historic_data/fund_8/mk_fund8_sql.py historic_data/fund_8/fund8_database_encrypted.sqlite3 >> historic_data/fund_8.sql
+        RUN python3 historic_data/fund_9/mk_fund9_sql.py historic_data/fund_9/fund9_database_encrypted.sqlite3 >> historic_data/fund_9.sql
+        RUN python3 historic_data/fund_9/mk_fund9_voteplan_sql.py historic_data/fund_9/fund9_database_encrypted.sqlite3 >> historic_data/fund_9.sql
+        
+        RUN mv ./historic_data/*.sql ./data
+    END
+
+    IF [ $with_test_data = true ]
+        COPY --dir test_data .
+
+        RUN mv ./test_data/*.sql ./data
+    END
+
+    DO ../../../catalyst-ci/earthly/postgresql+BUILDER
 
 build:
-    FROM python:3.11-slim-bullseye # Use a debian stable with python
-    WORKDIR /event-db # Set the working directory to /event-db
-    COPY refinery.toml . # Copy the refinery.toml file to the working directory
-    COPY --dir setup . # Copy the setup directory to the working directory
-    COPY --dir migrations . # Copy the migrations directory to the working directory
-    COPY --dir historic_data . # Copy the historic_data directory to the working directory
-    COPY --dir test_data . # Copy the test_data directory to the working directory
-    COPY --dir stage_data . # Copy Stage specific data into the working directory.
+    ARG with_historic_data=true
+    ARG with_test_data=true
 
-    RUN python3 historic_data/fund_2/mk_fund2_sql.py historic_data/fund_2/fund2_database_encrypted.sqlite3 >> historic_data/fund_2.sql
-    RUN python3 historic_data/fund_3/mk_fund3_sql.py historic_data/fund_3/fund3_database_encrypted.sqlite3 >> historic_data/fund_3.sql
-    RUN python3 historic_data/fund_4/mk_fund4_sql.py historic_data/fund_4/fund4_database_encrypted.sqlite3 >> historic_data/fund_4.sql
-    RUN python3 historic_data/fund_5/mk_fund5_sql.py historic_data/fund_5/fund5_database_encrypted.sqlite3 >> historic_data/fund_5.sql
-    RUN python3 historic_data/fund_6/mk_fund6_sql.py historic_data/fund_6/fund6_database_encrypted.sqlite3 >> historic_data/fund_6.sql
-    RUN python3 historic_data/fund_7/mk_fund7_sql.py historic_data/fund_7/fund7_database_encrypted.sqlite3 >> historic_data/fund_7.sql
-    RUN python3 historic_data/fund_8/mk_fund8_sql.py historic_data/fund_8/fund8_database_encrypted.sqlite3 >> historic_data/fund_8.sql
-    RUN python3 historic_data/fund_9/mk_fund9_sql.py historic_data/fund_9/fund9_database_encrypted.sqlite3 >> historic_data/fund_9.sql
-    RUN python3 historic_data/fund_9/mk_fund9_voteplan_sql.py historic_data/fund_9/fund9_database_encrypted.sqlite3 >> historic_data/fund_9.sql
-
-    SAVE ARTIFACT refinery.toml # Save the refinery.toml file as an artifact
-    SAVE ARTIFACT setup # Save the setup directory as an artifact
-    SAVE ARTIFACT migrations # Save the migrations directory as an artifact
-    SAVE ARTIFACT historic_data # Save the historic_data directory as an artifact
-    SAVE ARTIFACT test_data # Save the test_data directory as an artifact
-    SAVE ARTIFACT stage_data # Save the stage_data directory as an artifact
-
-docker:
-    FROM ../+builder
+    FROM +builder --with_historic_data=$with_historic_data --with_test_data=$with_test_data
     ARG tag="latest"
     ARG registry
-    ARG data="historic"
 
-    WORKDIR /eventdb
-
-    # Add psql
-    DO +ADD_PSQL
-
-    # Add refinery
-    RUN cp /usr/local/cargo/bin/refinery .
-
-    # Add migrations
-    COPY --dir +build/setup ./setup
-    COPY --dir +build/migrations ./migrations
-    IF [ "$data" = "historic" ]
-        COPY --dir +build/historic_data ./historic_data
-    ELSE IF [ "$data" = "test" ]
-        COPY --dir +build/test_data ./test_data
-    END
-    COPY +build/refinery.toml .
-    COPY +build/stage_data ./stage_data
-
-    VOLUME /eventdb/tmp
-    COPY ./entry.sh .
-    RUN chmod ugo+x ./entry.sh
-
-    ENTRYPOINT ["./entry.sh"]
-
-    # Push the container...
-    SAVE IMAGE --push ${registry}migrations:$tag
-
-
-docker-compose:
-    FROM scratch
-    COPY docker-compose.yml .
-    SAVE ARTIFACT docker-compose.yml
+    DO ../../../catalyst-ci/earthly/postgresql+BUILD --tag=$tag --registry=$registry --image_name=event-db
 
 # Need to be run with the -P flag
 integrate:
