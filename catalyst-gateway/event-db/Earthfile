@@ -4,7 +4,7 @@
 
 VERSION 0.7
 
-# cspell: words pgdg eventdb dbname 
+# cspell: words
 
 ADD_PSQL:
     COMMAND
