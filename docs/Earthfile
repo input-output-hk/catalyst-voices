@@ -5,10 +5,8 @@ VERSION 0.7
 
 # Copy all the source we need to build the docs
 src:
-    FROM github.com/input-output-hk/catalyst-ci/earthly/docs:feat/docs3+mkdocs-material
-
-    # Just copy the actual doc src here.
-    COPY --dir src includes macros overrides mkdocs.yml /docs
+    # Common src setup
+    DO github.com/input-output-hk/catalyst-ci/earthly/docs:feat/docs3+SRC
 
     # Now copy into that any artifacts we pull from the builds.
     COPY --dir ../+repo-docs/repo /docs/includes
