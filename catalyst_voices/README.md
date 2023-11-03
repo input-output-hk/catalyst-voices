@@ -14,8 +14,8 @@
 
 ## Requirements
 
-* Flutter: 3.13.3+
-* Dart: 3.1.2+
+* Flutter: 3.13.9+
+* Dart: 3.1.5+
 * Ruby: 2.5+
 * Xcode: 14.2+
 * Android Studio: Android Studio Electric Eel | 2022.1.1 +
@@ -36,7 +36,7 @@
 ### Bootstrapping
 
 ```sh
-git clone TODO(minikin): add repo
+git clone https://github.com/input-output-hk/catalyst-voices.git
 cd catalyst_voices
 melos bootstrap
 ```

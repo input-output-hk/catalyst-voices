@@ -1,5 +1,4 @@
 //! This module contains common and re-usable responses with a 4xx response code.
-//!
 
 use poem::IntoResponse;
 use poem_extensions::OneResponse;

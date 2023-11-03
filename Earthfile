@@ -23,14 +23,6 @@ spell-check:
 
     DO github.com/input-output-hk/catalyst-ci/earthly/cspell:v1.3.0+CSPELL_LOCALLY --src=$(echo ${PWD})
  
-global-cargo-config:
-    # Needed to get the global cargo config when building rust.
-    # All because Earthly doesn't support copying files from parents.
-    FROM scratch
-    COPY --dir .cargo .cargo
-    SAVE ARTIFACT .cargo .cargo
-
-
 repo-docs:
     # Create artifacts of extra files we embed inside the documentation when its built.
     FROM scratch

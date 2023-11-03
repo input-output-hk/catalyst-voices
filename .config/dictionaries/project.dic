@@ -1,3 +1,4 @@
+aarch
 addrr
 adminer
 asyncio
@@ -12,6 +13,7 @@ coti
 cryptoxide
 dbsync
 delegators
+dockerhub
 dotenv
 dotenvy
 dotglob

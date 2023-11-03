@@ -6,13 +6,13 @@ mod test_post;
 
 use std::sync::Arc;
 
-use crate::{service::common::tags::ApiTags, state::State};
-
 use poem::web::Data;
 use poem_openapi::{
     param::{Path, Query},
     OpenApi,
 };
+
+use crate::{service::common::tags::ApiTags, state::State};
 
 /// Test API Endpoints
 pub(crate) struct TestApi;
@@ -32,12 +32,10 @@ impl TestApi {
     /// ## Note
     ///
     /// *This is not a real endpoint, for test and demo purposes only.  To be removed.*
-    ///
     async fn test_get(
         &self,
         /// Get the state, not part of the path, but supplied by Poem.
         data: Data<&Arc<State>>,
-
         #[oai(validator(
             multiple_of = "5",
             minimum(value = "5"),
@@ -52,7 +50,6 @@ impl TestApi {
         /// * 15 will print a error log
         /// * 20 will panic which should generate a 500
         id: Path<i32>,
-
         #[oai(validator(
             pattern = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
             max_length = "36"
@@ -83,12 +80,12 @@ impl TestApi {
     ///
     /// * 204 No Content - Service is Started and can serve requests.
     /// * 500 Server Error - If anything within this function fails unexpectedly.
-    /// * 503 Service Unavailable - Service has not started, do not send other requests yet.
+    /// * 503 Service Unavailable - Service has not started, do not send other requests
+    ///   yet.
     ///
     /// ## Note
     ///
     /// *This is not a real endpoint, for test and demo purposes only.  To be removed.*
-    ///
     async fn test_post(
         &self,
         #[oai(validator(

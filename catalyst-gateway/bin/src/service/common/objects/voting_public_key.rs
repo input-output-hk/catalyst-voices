@@ -1,5 +1,4 @@
 //! Define the Voters Public Key
-//!
 use poem_openapi::{types::Example, NewType};
 use serde::Deserialize;
 

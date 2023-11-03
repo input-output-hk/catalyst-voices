@@ -8,7 +8,8 @@
     "**/*.md"
   ],
   "ignores": [
-    ".config/dictionaries/**"
+    ".config/dictionaries/**",
+    "catalyst-gateway/target/**"
   ],
   // Set standard config options in `/.markdownlint.jsonc`
   "config": {

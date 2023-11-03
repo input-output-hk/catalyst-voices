@@ -2,14 +2,20 @@
 
 use std::sync::Arc;
 
-use crate::service::common::responses::resp_2xx::NoContent;
-use crate::service::common::responses::resp_4xx::ApiValidationError;
-use crate::service::common::responses::resp_5xx::{ServerError, ServiceUnavailable};
-use crate::state::State;
-
-use poem_extensions::response;
-use poem_extensions::UniResponse::{T204, T503};
+use poem_extensions::{
+    response,
+    UniResponse::{T204, T503},
+};
 use tracing::{error, info, warn};
+
+use crate::{
+    service::common::responses::{
+        resp_2xx::NoContent,
+        resp_4xx::ApiValidationError,
+        resp_5xx::{ServerError, ServiceUnavailable},
+    },
+    state::State,
+};
 
 /// # All Responses
 pub(crate) type AllResponses = response! {
@@ -42,29 +48,27 @@ pub(crate) enum Animals {
 /// ## Responses
 ///
 /// * 204 No Content - Service is OK and can keep running.
-/// * 500 Server Error - If anything within this function fails unexpectedly. (Possible but unlikely)
+/// * 500 Server Error - If anything within this function fails unexpectedly. (Possible
+///   but unlikely)
 /// * 503 Service Unavailable - Service is possibly not running reliably.
 #[allow(clippy::unused_async, clippy::panic)]
 pub(crate) async fn endpoint(
-    _state: Arc<State>,
-    id: i32,
-    action: &Option<String>,
-    pet: &Option<Vec<Animals>>,
+    _state: Arc<State>, id: i32, action: &Option<String>, pet: &Option<Vec<Animals>>,
 ) -> AllResponses {
     info!("id: {id:?}, action: {action:?} pet: {pet:?}");
     let response: AllResponses = match id {
         10 => {
             warn!("id: {id:?}, action: {action:?}");
             T204(NoContent)
-        }
+        },
         15 => {
             error!("id: {id:?}, action: {action:?}");
             T503(ServiceUnavailable)
-        }
+        },
         20 => {
             // Intentional panic for testing purposes - Allowed above.
             panic!("id: {id:?}, action: {action:?}");
-        }
+        },
         _ => T204(NoContent),
     };
 

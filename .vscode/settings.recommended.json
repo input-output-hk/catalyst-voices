@@ -71,5 +71,9 @@
     "editor.formatOnPaste": true,
     "files.trimTrailingWhitespace": true,
     "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
-  }
+  },
+  "rust-analyzer.rustfmt.extraArgs": [
+    "+nightly"
+  ],
+  "rust-analyzer.lens.enable": true
 }

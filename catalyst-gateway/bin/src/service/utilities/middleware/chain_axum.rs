@@ -2,12 +2,11 @@
 //! legacy axum implementation.
 //!
 //! Allows us to have 1 API and seamlessly migrate unconverted requests.
-//! //! This whole module is deprecated, so don;t worry if its not documented how we would like.
-//!
+//! //! This whole module is deprecated, so don;t worry if its not documented how we would
+//! like.
 #![allow(clippy::missing_docs_in_private_items)]
 
-use crate::state::State;
-use crate::{legacy_service, service::common::responses::resp_5xx::server_error};
+use std::sync::Arc;
 
 use bytes::Bytes;
 use hyper::{HeaderMap, StatusCode, Version};
@@ -15,8 +14,9 @@ use poem::{
     async_trait, error::NotFoundError, Endpoint, IntoResponse, Middleware, Request, Response,
     Result,
 };
-use std::sync::Arc;
 use tower::ServiceExt;
+
+use crate::{legacy_service, service::common::responses::resp_5xx::server_error, state::State};
 
 /// Middleware to chain call Axum if endpoint is not found.
 pub(crate) struct ChainAxum;
@@ -29,8 +29,7 @@ impl ChainAxum {
 }
 
 impl<E> Middleware<E> for ChainAxum
-where
-    E: Endpoint,
+where E: Endpoint
 {
     type Output = ChainAxumEndpoint<E>;
 
@@ -69,7 +68,7 @@ impl IntoResponse for AxumResponse {
             .status(self.status)
             .version(self.version);
 
-        for (h, v) in self.headers.iter() {
+        for (h, v) in &self.headers {
             resp = resp.header(h, v);
         }
 
@@ -79,8 +78,7 @@ impl IntoResponse for AxumResponse {
 
 #[async_trait]
 impl<E> Endpoint for ChainAxumEndpoint<E>
-where
-    E: Endpoint,
+where E: Endpoint
 {
     type Output = Response;
 
@@ -115,7 +113,7 @@ where
                         .version(version);
 
                     // Add all the headers from the request.
-                    for (h, v) in headers.iter() {
+                    for (h, v) in &headers {
                         request = request.header(h, v);
                     }
 
@@ -140,23 +138,23 @@ where
                 } else {
                     Err(err)
                 }
-            }
+            },
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    //use super::*;
+    // use super::*;
 
     #[tokio::test]
     async fn test_axum_chain() {
         //#[handler(internal)]
-        //async fn index(req: &Request) {
+        // async fn index(req: &Request) {
         //    assert_eq!(req.extensions().get::<i32>(), Some(&100));
         //}
 
-        //let cli = TestClient::new(index.with(ChainAxum::new(100i32)));
-        //cli.get("/").send().await.assert_status_is_ok();
+        // let cli = TestClient::new(index.with(ChainAxum::new(100i32)));
+        // cli.get("/").send().await.assert_status_is_ok();
     }
 }

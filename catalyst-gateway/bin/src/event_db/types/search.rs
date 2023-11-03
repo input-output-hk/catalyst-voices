@@ -1,5 +1,4 @@
 //! Search Queries
-//!
 use super::{event::EventSummary, objective::ObjectiveSummary, proposal::ProposalSummary};
 
 #[allow(clippy::module_name_repetitions)]

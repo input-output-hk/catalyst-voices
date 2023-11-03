@@ -1,5 +1,4 @@
 //! Voting Status
-//!
 use super::objective::ObjectiveId;
 
 /// A voting status
