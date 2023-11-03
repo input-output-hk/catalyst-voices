@@ -7,7 +7,7 @@ VERSION 0.7
 # cspell: words
 
 builder:
-    FROM ../../../catalyst-ci/earthly/postgresql+postgres-base
+    FROM github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.4+postgres-base
 
     ARG with_historic_data=true
     ARG with_test_data=true
@@ -40,7 +40,7 @@ builder:
         RUN mv ./test_data/*.sql ./data
     END
 
-    DO ../../../catalyst-ci/earthly/postgresql+BUILDER
+    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.4+BUILDER
 
 build:
     ARG with_historic_data=true
@@ -50,12 +50,12 @@ build:
     ARG tag="latest"
     ARG registry
 
-    DO ../../../catalyst-ci/earthly/postgresql+BUILD --tag=$tag --registry=$registry --image_name=event-db
+    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.4+BUILD --tag=$tag --registry=$registry --image_name=event-db
 
 test:
-    FROM ../../../catalyst-ci/earthly/postgresql+postgres-base
+    FROM github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.4+postgres-base
 
-    COPY ../../../catalyst-ci/earthly/utils+shell-assert/assert.sh .
+    COPY github.com/input-output-hk/catalyst-ci/earthly/utils:v2.0.4+shell-assert/assert.sh .
 
     COPY ./docker-compose.yml .
     WITH DOCKER \
