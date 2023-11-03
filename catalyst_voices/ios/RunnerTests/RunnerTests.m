@@ -8,16 +8,4 @@
 @import XCTest;
 @import integration_test;
 
-#pragma mark - Dynamic tests
-
 INTEGRATION_TEST_IOS_RUNNER(RunnerTests)
-
-@interface RunnerTests (DynamicTests)
-@end
-
-@implementation RunnerTests (DynamicTests)
-
-- (void)setUp {
-}
-
-@end
