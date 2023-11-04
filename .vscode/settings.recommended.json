@@ -48,7 +48,7 @@
     "Earthfile": "earthfile"
   },
   "rust-analyzer.linkedProjects": [
-    "./catalyst-gateway/bin/Cargo.toml"
+    "./catalyst-gateway/Cargo.toml"
   ],
   "rust-analyzer.check.overrideCommand": [
     "bash",
