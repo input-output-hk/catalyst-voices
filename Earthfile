@@ -10,7 +10,7 @@ FROM debian:stable-slim
 #  * CATALYST_CI_VER: specific version of the `github.com/input-output-hk/catalyst-ci` dep.
 #    (Does not need to specify it directrly it is specified in `.arg` file)
 markdown-check:
-    ARG --required CATALYST_CI_VER
+    ARG CATALYST_CI_VER
 
     LOCALLY
 
@@ -21,7 +21,7 @@ markdown-check:
 #  * CATALYST_CI_VER: specific version of the `github.com/input-output-hk/catalyst-ci` dep.
 #    (Does not need to specify it directrly it is specified in `.arg` file)
 markdown-check-fix:
-    ARG --required CATALYST_CI_VER
+    ARG CATALYST_CI_VER
 
     LOCALLY
 
@@ -32,7 +32,7 @@ markdown-check-fix:
 #  * CATALYST_CI_VER: specific version of the `github.com/input-output-hk/catalyst-ci` dep.
 #    (Does not need to specify it directrly it is specified in `.arg` file)
 spell-check:
-    ARG --required CATALYST_CI_VER
+    ARG CATALYST_CI_VER
 
     LOCALLY
 
