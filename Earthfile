@@ -5,21 +5,36 @@ FROM debian:stable-slim
 
 # cspell: words livedocs sitedocs
 
+# Markdown check in this repo.
+# Arguments:
+#  * CATALYST_CI_VER: specific version of the `github.com/input-output-hk/catalyst-ci` dep.
+#    (Does not need to specify it directrly it is specified in `.arg` file)
 markdown-check:
-    # Check Markdown in this repo.
+    ARG --required CATALYST_CI_VER
+
     LOCALLY
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:v1.3.0+MDLINT_LOCALLY --src=$(echo ${PWD})
+    DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:$CATALYST_CI_VER+MDLINT_LOCALLY --src=$(echo ${PWD})
 
+# Markdown check fix in this repo.
+# Arguments:
+#  * CATALYST_CI_VER: specific version of the `github.com/input-output-hk/catalyst-ci` dep.
+#    (Does not need to specify it directrly it is specified in `.arg` file)
 markdown-check-fix:
-    # Check Markdown in this repo.
+    ARG --required CATALYST_CI_VER
+
     LOCALLY
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:v1.3.0+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
+    DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:$CATALYST_CI_VER+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
 
+# Check spelling in this repo.
+# Arguments:
+#  * CATALYST_CI_VER: specific version of the `github.com/input-output-hk/catalyst-ci` dep.
+#    (Does not need to specify it directrly it is specified in `.arg` file)
 spell-check:
-    # Check spelling in this repo.
+    ARG --required CATALYST_CI_VER
+
     LOCALLY
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/cspell:v1.3.0+CSPELL_LOCALLY --src=$(echo ${PWD})
+    DO github.com/input-output-hk/catalyst-ci/earthly/cspell:$CATALYST_CI_VER+CSPELL_LOCALLY --src=$(echo ${PWD})
  

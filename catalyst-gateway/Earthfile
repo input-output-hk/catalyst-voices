@@ -3,33 +3,48 @@ VERSION 0.7
 #cspell: words rustup readelf nextest testci testdocs rustfmt toolsets USERARCH
 
 # Set up our target toolchains, and copy our files.
+# Arguments:
+#  * CATALYST_CI_VER: specific version of the `github.com/input-output-hk/catalyst-ci` dep.
+#    (Does not need to specify it directrly it is specified in `.arg` file)
 builder:
-    FROM github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.3+rust-base
+    ARG --required CATALYST_CI_VER
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.3+SETUP --toolchain=rust-toolchain.toml
+    FROM github.com/input-output-hk/catalyst-ci/earthly/rust:$CATALYST_CI_VER+rust-base
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.3+CP_SRC --src=".cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin crates"
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:$CATALYST_CI_VER+SETUP --toolchain=rust-toolchain.toml
+
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:$CATALYST_CI_VER+CP_SRC --src=".cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin crates"
 
 # Test rust build container - Use best architecture host tools.
+# Arguments:
+#  * CATALYST_CI_VER: specific version of the `github.com/input-output-hk/catalyst-ci` dep.
+#    (Does not need to specify it directrly it is specified in `.arg` file)
 check-hosted:
+    ARG --required CATALYST_CI_VER
+
     FROM +builder
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.3+CHECK
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:$CATALYST_CI_VER+CHECK
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
 check-all-hosts:    
     BUILD --platform=linux/amd64 --platform=linux/arm64 +check-hosted
 
+# Arguments:
+#  * TARGETPLATFORM: 
+#  * CATALYST_CI_VER: specific version of the `github.com/input-output-hk/catalyst-ci` dep.
+#    (Does not need to specify it directrly it is specified in `.arg` file)
 build-hosted:
     ARG TARGETPLATFORM
+    ARG --required CATALYST_CI_VER
 
     # Build the service
     FROM +builder
  
     RUN /scripts/std_build.sh
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.3+SMOKE_TEST --bin=cat-gateway
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:CATALYST_CI_VER+SMOKE_TEST --bin=cat-gateway
 
     SAVE ARTIFACT target/$TARGETARCH/doc doc
     SAVE ARTIFACT target/$TARGETARCH/release/cat-gateway cat-gateway
