@@ -44,7 +44,7 @@ build-hosted:
  
     RUN /scripts/std_build.sh
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:CATALYST_CI_VER+SMOKE_TEST --bin=cat-gateway
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:$CATALYST_CI_VER+SMOKE_TEST --bin=cat-gateway
 
     SAVE ARTIFACT target/$TARGETARCH/doc doc
     SAVE ARTIFACT target/$TARGETARCH/release/cat-gateway cat-gateway
