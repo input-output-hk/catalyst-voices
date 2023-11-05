@@ -6,6 +6,10 @@ VERSION 0.7
 
 # cspell: words
 
+# Event db builder target. Prepares all necessary artifacts.
+# Arguments:
+#  * with_historic_data: add historic data from the `historic_data` dir (default `true`).
+#  * with_test_data: add test data from the `test_data` dir (default `true`).
 builder:
     FROM github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.4+postgres-base
 
@@ -42,13 +46,19 @@ builder:
 
     DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.4+BUILDER
 
+# Build event db docker image.
+# Arguments:
+#  * tag: docker image `tag`.
+#  * registry: docker image `registry`.
+#  * with_historic_data: add historic data from the `historic_data` dir (default `true`).
+#  * with_test_data: add test data from the `test_data` dir (default `true`).
 build:
     ARG with_historic_data=true
     ARG with_test_data=true
-
-    FROM +builder --with_historic_data=$with_historic_data --with_test_data=$with_test_data
     ARG tag="latest"
     ARG registry
+
+    FROM +builder --with_historic_data=$with_historic_data --with_test_data=$with_test_data
 
     DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.4+BUILD --tag=$tag --registry=$registry --image_name=event-db
 
