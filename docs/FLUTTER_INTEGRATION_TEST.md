@@ -33,7 +33,9 @@ nightly.(It's expensive to run integration tests on iOS and Android on every PR)
 
 #### View Integration Test Results
 
-To view integration tests results for Web, iOS and Android, navigate to [Firebase Test Lab](https://console.firebase.google.com/u/0/project/dev-catalyst-voice/testlab/histories) and select the appropriate history.
+To view integration tests results for Web, iOS and Android,
+navigate to [Firebase Test Lab](https://console.firebase.google.com/u/0/project/dev-catalyst-voice/testlab/histories)
+and select the appropriate history.
 
 ### Local
 
@@ -84,6 +86,7 @@ Navigate to `catalyst_voices/android` start Android Emulator or connect Android 
 
 >Note: To use --dart-define with gradlew you must base64 encode all parameters,
 >and pass them to gradle in a comma separated list:
+
 ```sh
 ./gradlew project:task -Pdart-defines="{base64(key=value)},[...]"
 ```
