@@ -1,6 +1,8 @@
-name: 🧪 Integration Tests
+name: 🧪 Flutter Web Integration Tests
 
-permissions: write-all
+permissions:
+  contents: read
+  id-token: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref }}

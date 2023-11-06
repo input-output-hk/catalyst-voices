@@ -28,11 +28,8 @@
 ### CI
 
 * We run integration test for Web on every PR using chromedriver.
-* We use [FireBase Test Lab](https://firebase.google.com/docs/test-lab) to run integration tests on iOS and Android, nightly.(It's expensive to run integration tests on iOS and Android on every PR)
-
-```sh
-./flutter_web_integration_test.sh
-```
+* We use [FireBase Test Lab](https://firebase.google.com/docs/test-lab) to run integration tests on iOS and Android,
+nightly.(It's expensive to run integration tests on iOS and Android on every PR)
 
 #### View Integration Test Results
 

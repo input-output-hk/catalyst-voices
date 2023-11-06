@@ -88,3 +88,6 @@ pubspec.lock
 .pub/
 coverage/
 .idea/
+
+# Secrets
+dev-catalyst-voice-9f78f27c6bc5.json

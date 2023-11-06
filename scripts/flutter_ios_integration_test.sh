@@ -1,18 +1,22 @@
 #!/bin/bash
 set -e
 
+output="../build/ios_integ"
+product="build/ios_integ/Build/Products"
+dev_target="15.0"
+
 pushd catalyst_voices
 flutter build ios integration_test/main.dart --release --flavor development
 
 pushd ios
 xcodebuild build-for-testing \
   -workspace Runner.xcworkspace \
-  -scheme Runner \
+  -scheme development \
   -xcconfig Flutter/Release.xcconfig \
   -configuration Release \
   -sdk iphoneos \
   -derivedDataPath \
-  ../build/integration_test/ios/
+  $output
 popd
 
 pushd $product
