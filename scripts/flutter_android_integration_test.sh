@@ -13,7 +13,7 @@ gcloud firebase test android run --type instrumentation \
   --app ../catalyst_voices/build/app/outputs/apk/development/debug/app-development-debug.apk \
   --test ../catalyst_voices/build/app/outputs/apk/androidTest/development/debug/app-development-debug-androidTest.apk \
   --device-ids=redfin \
-  --os-version-ids=25 \
+  --os-version-ids=30 \
   --locales=en_GB \
   --orientations=portrait \
   --use-orchestrator \
