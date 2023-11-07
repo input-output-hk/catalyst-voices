@@ -19,7 +19,6 @@ on:
     paths-ignore:
       - "**.md"
       - "doc/**"
-      - ".git/"
       - ".vscode/"
 
 jobs:
