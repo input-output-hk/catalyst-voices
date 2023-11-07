@@ -30,10 +30,10 @@ jobs:
       - name: ⬇️ Checkout repository
         uses: actions/checkout@v3
 
-      - name : ⤵️ Authenticate with Google Cloud Platform
-        uses: 'google-github-actions/auth@v1'
+      - name: ⤵️ Authenticate with Google Cloud Platform
+        uses: "google-github-actions/auth@v1"
         with:
-          credentials_json: '${{ secrets.GOOGLE_CREDENTIALS_INTEGRATION_TESTS }}
+          credentials_json: "${{ secrets.GOOGLE_CREDENTIALS_INTEGRATION_TESTS }}"
 
       - name: ⚙️ Setup Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v1
