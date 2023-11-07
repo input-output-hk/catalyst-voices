@@ -19,4 +19,4 @@ gcloud firebase test android run --type instrumentation \
   --use-orchestrator \
   --timeout 15m \
   --results-bucket=gs://dev-catalyst-voice.appspot.com \
-  --results-dir=integration_test_results
+  --results-dir=integration_test_results/android/
