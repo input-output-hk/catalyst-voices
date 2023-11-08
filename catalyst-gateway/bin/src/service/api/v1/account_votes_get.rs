@@ -24,7 +24,6 @@ pub(crate) type AllResponses = response! {
     503: ServiceUnavailable,
 };
 
-#[allow(clippy::unused_async)]
 /// GET /v1/votes/plans/account-votes/:account_id
 ///
 /// Get votes for an `account_id` endpoint.
@@ -38,6 +37,7 @@ pub(crate) type AllResponses = response! {
 /// * 500 Server Error - If anything within this function fails unexpectedly. (Possible
 ///   but unlikely)
 /// * 503 Service Unavailable - Service has not started, do not send other requests.
+#[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(
     _state: Data<&Arc<State>>, _account_id: Path<AccountId>,
 ) -> AllResponses {
