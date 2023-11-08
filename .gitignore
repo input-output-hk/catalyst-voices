@@ -78,3 +78,9 @@ $RECYCLE.BIN/
 !/.vscode/launch.recommended.json
 !/.vscode/settings.recommended.json
 !/.vscode/tasks.recommended.json
+
+# Local only development artefacts can get installed here.
+/local
+
+# We only want the actual document source from this directory.
+/docs/site/
