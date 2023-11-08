@@ -7,16 +7,19 @@ use poem_extensions::{response, UniResponse::T200};
 use poem_openapi::payload::Json;
 
 use crate::{
-    service::common::responses::{
-        resp_2xx::OK,
-        resp_5xx::{ServerError, ServiceUnavailable},
+    service::common::{
+        objects::vote_plan::VotePlan,
+        responses::{
+            resp_2xx::OK,
+            resp_5xx::{ServerError, ServiceUnavailable},
+        },
     },
     state::State,
 };
 
 /// All responses
 pub(crate) type AllResponses = response! {
-    200: OK<Json<Vec<String>>>,
+    200: OK<Json<Vec<VotePlan>>>,
     500: ServerError,
     503: ServiceUnavailable,
 };
