@@ -11,7 +11,7 @@ VERSION 0.7
 #  * with_historic_data: add historic data from the `historic_data` dir (default `true`).
 #  * with_test_data: add test data from the `test_data` dir (default `true`).
 builder:
-    FROM github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.4+postgres-base
+    FROM ../../../catalyst-ci/earthly/postgresql+postgres-base
 
     ARG with_historic_data=true
     ARG with_test_data=true
@@ -44,7 +44,17 @@ builder:
         RUN mv ./test_data/*.sql ./data
     END
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.4+BUILDER
+    DO ../../../catalyst-ci/earthly/postgresql+BUILDER
+
+check:
+    FROM +builder
+
+    DO ../../../catalyst-ci/earthly/postgresql+CHECK
+
+format:
+    LOCALLY
+
+    DO ../../../catalyst-ci/earthly/postgresql+FORMAT --src=$(echo ${PWD})   
 
 # Build event db docker image.
 # Arguments:

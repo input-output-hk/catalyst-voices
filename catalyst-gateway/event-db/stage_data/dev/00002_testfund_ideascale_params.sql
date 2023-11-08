@@ -1,9 +1,9 @@
 -- Define F10 IdeaScale parameters.
 INSERT INTO config (id, id2, id3, value) VALUES (
-    'ideascale',
-    '0',
-    '',
-    '{  
+  'ideascale',
+  '0',
+  '',
+  '{  
         "group_id": 37429,
         "review_stage_ids": [171],
         "nr_allocations": [1, 1],
@@ -52,8 +52,8 @@ INSERT INTO config (id, id2, id3, value) VALUES (
 
 -- Use F10 params for event with row_id = 10.
 INSERT INTO config (id, id2, id3, value) VALUES (
-    'event',
-    'ideascale_params',
-    '0',
-    '{"params_id": "TestFund"}'
+  'event',
+  'ideascale_params',
+  '0',
+  '{"params_id": "TestFund"}'
 );

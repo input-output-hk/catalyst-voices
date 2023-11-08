@@ -4,10 +4,10 @@
 
 CREATE TABLE IF NOT EXISTS refinery_schema_history
 (
-    version     INTEGER NOT NULL PRIMARY KEY,
-    name        VARCHAR(255),
-    applied_on  VARCHAR(255),
-    checksum    VARCHAR(255)
+  version INTEGER NOT NULL PRIMARY KEY,
+  name VARCHAR(255),
+  applied_on VARCHAR(255),
+  checksum VARCHAR(255)
 );
 
 COMMENT ON TABLE refinery_schema_history IS
@@ -21,14 +21,14 @@ Managed by the `refinery` cli tool.
 CREATE TABLE config
 (
   row_id SERIAL PRIMARY KEY,
-  id     VARCHAR NOT NULL,
-  id2    VARCHAR NOT NULL,
-  id3    VARCHAR NOT NULL,
-  value  JSONB NULL
+  id VARCHAR NOT NULL,
+  id2 VARCHAR NOT NULL,
+  id3 VARCHAR NOT NULL,
+  value JSONB NULL
 );
 
 -- id+id2+id3 must be unique, they are a combined key.
-CREATE UNIQUE INDEX config_idx ON config(id,id2,id3);
+CREATE UNIQUE INDEX config_idx ON config (id, id2, id3);
 
 COMMENT ON TABLE config IS
 'General JSON Configuration and Data Values.
@@ -69,7 +69,7 @@ Defined  Data Formats:
 COMMENT ON COLUMN config.row_id IS
 'Synthetic unique key.
 Always lookup using id.';
-COMMENT ON COLUMN config.id IS  'The name/id of the general config value/variable';
+COMMENT ON COLUMN config.id IS 'The name/id of the general config value/variable';
 COMMENT ON COLUMN config.id2 IS
 '2nd ID of the general config value.
 Must be defined, use "" if not required.';

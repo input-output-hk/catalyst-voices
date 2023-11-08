@@ -1,5 +1,5 @@
 INSERT INTO goal (id, event_id, idx, name)
-VALUES 
+VALUES
 (1, 1, 1, 'goal 1'),
 (2, 1, 2, 'goal 2'),
 (3, 1, 3, 'goal 3'),

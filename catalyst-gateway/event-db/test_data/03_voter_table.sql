@@ -1,6 +1,6 @@
-INSERT INTO voter 
+INSERT INTO voter
 (row_id, voting_key, snapshot_id, voting_group, voting_power)
-VALUES 
+VALUES
 (1, 'voting_key_1', 1, 'rep', 250),
 (2, 'voting_key_2', 1, 'rep', 150),
 (3, 'voting_key_3', 1, 'direct', 350),

@@ -5,42 +5,44 @@
 
 CREATE TABLE event
 (
-    row_id SERIAL PRIMARY KEY,
+  row_id SERIAL PRIMARY KEY,
 
-    name TEXT NOT NULL,
-    description TEXT NOT NULL,
+  name TEXT NOT NULL,
+  description TEXT NOT NULL,
 
-    registration_snapshot_time TIMESTAMP,
-    snapshot_start TIMESTAMP,
-    voting_power_threshold BIGINT,
-    max_voting_power_pct NUMERIC(6,3) CONSTRAINT percentage CHECK (max_voting_power_pct <= 100 AND max_voting_power_pct >= 0),
+  registration_snapshot_time TIMESTAMP,
+  snapshot_start TIMESTAMP,
+  voting_power_threshold BIGINT,
+  max_voting_power_pct NUMERIC(6, 3) CONSTRAINT percentage CHECK (
+    max_voting_power_pct <= 100 AND max_voting_power_pct >= 0
+  ),
 
-    review_rewards BIGINT,
+  review_rewards BIGINT,
 
-    start_time TIMESTAMP,
-    end_time TIMESTAMP,
+  start_time TIMESTAMP,
+  end_time TIMESTAMP,
 
-    insight_sharing_start TIMESTAMP,
-    proposal_submission_start TIMESTAMP,
-    refine_proposals_start TIMESTAMP,
-    finalize_proposals_start TIMESTAMP,
-    proposal_assessment_start TIMESTAMP,
-    assessment_qa_start TIMESTAMP,
-    voting_start TIMESTAMP,
-    voting_end TIMESTAMP,
-    tallying_end TIMESTAMP,
+  insight_sharing_start TIMESTAMP,
+  proposal_submission_start TIMESTAMP,
+  refine_proposals_start TIMESTAMP,
+  finalize_proposals_start TIMESTAMP,
+  proposal_assessment_start TIMESTAMP,
+  assessment_qa_start TIMESTAMP,
+  voting_start TIMESTAMP,
+  voting_end TIMESTAMP,
+  tallying_end TIMESTAMP,
 
-    block0 BYTEA NULL,
-    block0_hash TEXT NULL,
+  block0 BYTEA NULL,
+  block0_hash TEXT NULL,
 
-    committee_size INTEGER NOT NULL,
-    committee_threshold INTEGER NOT NULL,
+  committee_size INTEGER NOT NULL,
+  committee_threshold INTEGER NOT NULL,
 
-    extra JSONB,
-    cast_to JSONB
+  extra JSONB,
+  cast_to JSONB
 );
 
-CREATE UNIQUE INDEX event_name_idx ON event(name);
+CREATE UNIQUE INDEX event_name_idx ON event (name);
 
 COMMENT ON TABLE event IS 'The basic parameters of each voting/decision event.';
 COMMENT ON COLUMN event.row_id IS 'Synthetic Unique ID for each event.';
@@ -97,7 +99,7 @@ COMMENT ON COLUMN event.tallying_end IS
 'The latest time that tallying the event can complete by.
 NULL = Not yet defined.';
 
-COMMENT ON COLUMN event.block0      IS
+COMMENT ON COLUMN event.block0 IS
 'The copy of Block 0 used to start the Blockchain.
 NULL = Blockchain not started yet.';
 
@@ -105,11 +107,11 @@ COMMENT ON COLUMN event.block0_hash IS
 'The hash of block 0.
 NULL = Blockchain not started yet.';
 
-COMMENT ON COLUMN event.committee_size  IS
+COMMENT ON COLUMN event.committee_size IS
 'The size of the tally committee.
 0 = No Committee, and all votes are therefore public.';
 
-COMMENT ON COLUMN event.committee_threshold  IS
+COMMENT ON COLUMN event.committee_threshold IS
 'The minimum size of the tally committee to perform the tally.
 Must be <= `committee_size`';
 
