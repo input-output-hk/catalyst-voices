@@ -5,23 +5,23 @@ output="../build/ios_integ"
 product="build/ios_integ/Build/Products"
 
 pushd catalyst_voices
-flutter build ios integration_test/main.dart --debug --flavor development --simulator
+flutter build ios integration_test/main.dart --release --flavor development
 
 pushd ios
 xcodebuild build-for-testing \
   -workspace Runner.xcworkspace \
   -scheme development \
   -xcconfig Flutter/Release.xcconfig \
-  -configuration Debug-development \
+  -configuration Release-development \
   -sdk iphoneos \
   -derivedDataPath \
   $output
 popd
 
-# Varify test build
+## Verify test build locally before pushing to  google cloud.
 # xcodebuild test-without-building \
 # -xctestrun "../catalyst_voices/build/ios_integ/Build/Products/development_iphoneos17.0-arm64.xctestrun" \
-# -destination id=700CAA18-787E-4831-B4D7-6B8E32485304
+# -destination id=00008120-001934493663C01E
 
 pushd $product
 zip -r "ios_tests.zip" "Release-iphoneos" "development_iphoneos17.0-arm64.xctestrun"
