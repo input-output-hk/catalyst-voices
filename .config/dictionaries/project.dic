@@ -3,6 +3,7 @@ addrr
 adminer
 androidx
 appspot
+asyncio
 auditability
 bluefireteam
 BROTLI
@@ -36,6 +37,8 @@ iphoneos
 jetbrains
 jorm
 jormungandr
+Jörmungandr
+kroki
 lcov
 Leshiy
 localizable

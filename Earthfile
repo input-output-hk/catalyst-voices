@@ -23,3 +23,11 @@ spell-check:
 
     DO github.com/input-output-hk/catalyst-ci/earthly/cspell:v1.3.0+CSPELL_LOCALLY --src=$(echo ${PWD})
  
+repo-docs:
+    # Create artifacts of extra files we embed inside the documentation when its built.
+    FROM scratch
+
+    WORKDIR /repo
+    COPY --dir *.md LICENSE-APACHE LICENSE-MIT .
+
+    SAVE ARTIFACT /repo repo

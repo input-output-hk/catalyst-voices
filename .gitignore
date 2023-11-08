@@ -91,3 +91,9 @@ coverage/
 
 # Secrets
 dev-catalyst-voice-9f78f27c6bc5.json
+
+# Local only development artefacts can get installed here.
+/local
+
+# We only want the actual document source from this directory.
+/docs/site/

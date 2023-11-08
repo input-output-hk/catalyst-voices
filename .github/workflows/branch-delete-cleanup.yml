@@ -1,0 +1,13 @@
+name: Branch Deleted
+
+on: delete
+
+concurrency:
+  group: "docs"
+  cancel-in-progress: false
+
+jobs:
+  delete:
+    name: On branch deleted
+    if: github.event.ref_type == 'branch'
+    uses: input-output-hk/catalyst-ci/.github/workflows/branch-delete-cleanup.yml@v2.0.6
