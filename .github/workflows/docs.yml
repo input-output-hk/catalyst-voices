@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   ci:
-    uses: input-output-hk/catalyst-ci/.github/workflows/pages.yml@v2.0.6
+    uses: input-output-hk/catalyst-ci/.github/workflows/pages.yml@master
     with:
       aws_role_arn: arn:aws:iam::332405224602:role/ci
       aws_region: eu-central-1
