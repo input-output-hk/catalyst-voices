@@ -11,4 +11,4 @@ on:
 jobs:
   build:
     name: Check markdown files formatted consistently
-    uses: input-output-hk/catalyst-ci/.github/workflows/markdown-check.yml@master
+    uses: input-output-hk/catalyst-ci/.github/workflows/markdown-check.yml@v2.0.6
