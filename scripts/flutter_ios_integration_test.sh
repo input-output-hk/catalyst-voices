@@ -18,6 +18,11 @@ xcodebuild build-for-testing \
   $output
 popd
 
+# Varify test build
+# xcodebuild test-without-building \
+# -xctestrun "../catalyst_voices/build/ios_integ/Build/Products/development_iphoneos17.0-arm64.xctestrun" \
+# -destination id=700CAA18-787E-4831-B4D7-6B8E32485304
+
 pushd $product
 zip -r "ios_tests.zip" "Release-iphoneos" "development_iphoneos17.0-arm64.xctestrun"
 popd
@@ -32,6 +37,4 @@ gcloud firebase test ios run \
   --results-bucket=gs://dev-catalyst-voice.appspot.com \
   --results-dir=integration_test_results/ios/
 
-  # xcodebuild test-without-building \
-  # -xctestrun "../catalyst_voices/build/ios_integ/Build/Products/development_iphoneos17.0-arm64.xctestrun" \
-  # -destination id=700CAA18-787E-4831-B4D7-6B8E32485304
+
