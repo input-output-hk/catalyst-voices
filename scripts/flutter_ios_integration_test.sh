@@ -17,6 +17,8 @@ xcodebuild clean build build-for-testing \
   $output
 popd
 
+# https://cloud.google.com/sdk/gcloud/reference/firebase/test/ios
+
 # pushd $product
 # zip -r "ios_tests.zip" "Release-iphoneos" "development_iphoneos17.0-arm64.xctestrun"
 # popd
