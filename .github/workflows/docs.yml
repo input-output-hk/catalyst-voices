@@ -2,12 +2,7 @@ name: Docs
 
 # cspell: words earthfile
 
-on:
-  push:
-    branches:
-      - "*"
-    tags-ignore:
-      - "*"
+on: push
 
 concurrency:
   group: "docs"
