@@ -1,5 +1,5 @@
 //! CLI interpreter for the service
-use std::sync::Arc;
+use std::{io::Write, sync::Arc};
 
 use clap::Parser;
 
@@ -53,7 +53,9 @@ impl Cli {
                 Ok(())
             },
             Self::Docs(settings) => {
-                service::get_app_docs(&settings.format);
+                let docs = service::get_app_docs(&settings.format);
+                let mut docs_file = std::fs::File::create(settings.output)?;
+                docs_file.write_all(docs.as_bytes())?;
                 Ok(())
             },
         }

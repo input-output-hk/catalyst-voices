@@ -2,6 +2,7 @@
 use std::{
     env,
     net::{IpAddr, SocketAddr},
+    path::PathBuf,
 };
 
 use clap::{Args, ValueEnum};
@@ -33,6 +34,9 @@ const API_HOST_NAMES_DEFAULT: &str = "https://api.prod.projectcatalyst.io";
 
 /// Default `API_URL_PREFIX` used in development.
 const API_URL_PREFIX_DEFAULT: &str = "/api";
+
+/// Default docs format to be generated.
+const DEFAULT_DOCS_FORMAT: &str = "yml";
 
 /// Settings for the application.
 ///
@@ -67,7 +71,11 @@ pub(crate) enum DocsFormat {
 /// Settings specifies the format of the `OpenAPI` docs to be generated.
 #[derive(Args, Clone)]
 pub(crate) struct DocsSettings {
+    /// The output path to the generated docs file
+    pub(crate) output: PathBuf,
+
     /// The format of the docs to be generated
+    #[clap(long, default_value = DEFAULT_DOCS_FORMAT)]
     pub(crate) format: DocsFormat,
 }
 
@@ -244,10 +252,13 @@ pub(crate) fn generate_github_issue_url(title: &str) -> Option<Url> {
         GITHUB_REPO_NAME.as_str()
     );
 
-    match Url::parse_with_params(&path, &[
-        ("template", GITHUB_ISSUE_TEMPLATE.as_str()),
-        ("title", title),
-    ]) {
+    match Url::parse_with_params(
+        &path,
+        &[
+            ("template", GITHUB_ISSUE_TEMPLATE.as_str()),
+            ("title", title),
+        ],
+    ) {
         Ok(url) => Some(url),
         Err(e) => {
             error!(err = e.to_string(); "Failed to generate github issue url");
@@ -283,9 +294,10 @@ mod tests {
     #[test]
     fn configured_hosts_default() {
         let configured_hosts = get_api_host_names(&SocketAddr::from(([127, 0, 0, 1], 8080)));
-        assert_eq!(configured_hosts, vec![
-            "https://api.prod.projectcatalyst.io"
-        ]);
+        assert_eq!(
+            configured_hosts,
+            vec!["https://api.prod.projectcatalyst.io"]
+        );
     }
 
     #[test]
@@ -294,10 +306,13 @@ mod tests {
             &SocketAddr::from(([127, 0, 0, 1], 8080)),
             "http://api.prod.projectcatalyst.io , https://api.dev.projectcatalyst.io:1234",
         );
-        assert_eq!(configured_hosts, vec![
-            "http://api.prod.projectcatalyst.io",
-            "https://api.dev.projectcatalyst.io:1234"
-        ]);
+        assert_eq!(
+            configured_hosts,
+            vec![
+                "http://api.prod.projectcatalyst.io",
+                "https://api.dev.projectcatalyst.io:1234"
+            ]
+        );
     }
 
     #[test]
@@ -306,9 +321,10 @@ mod tests {
             &SocketAddr::from(([127, 0, 0, 1], 8080)),
             "not a hostname , https://api.dev.projectcatalyst.io:1234",
         );
-        assert_eq!(configured_hosts, vec![
-            "https://api.dev.projectcatalyst.io:1234"
-        ]);
+        assert_eq!(
+            configured_hosts,
+            vec!["https://api.dev.projectcatalyst.io:1234"]
+        );
     }
 
     #[test]
