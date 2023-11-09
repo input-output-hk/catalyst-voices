@@ -1,23 +1,8 @@
 version: "3"
 
-# cspell: words healthcheck isready
+# cspell: words
 
 services:
-  postgres:
-    image: postgres:16
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
-      interval: 2s
-      timeout: 5s
-      retries: 10
-    ports:
-      - 5433:5432
-
   event-db:
     image: event-db:latest
     environment:
