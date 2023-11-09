@@ -9,17 +9,9 @@ concurrency:
   cancel-in-progress: true
 
 on:
-  pull_request:
-    types:
-      - opened
-      - reopened
-      - synchronize
-    branches:
-      - "main"
-    paths-ignore:
-      - "**.md"
-      - "doc/**"
-      - ".vscode/"
+  schedule:
+    # Schedule to run at midnight UTC
+    - cron: "0 0 * * *"
 
 jobs:
   integration-tests:
@@ -58,5 +50,6 @@ jobs:
       - name: 🤖 Run Android Integration Tests
         run: ./scripts/flutter_android_integration_test.sh
 
-      - name: 📱 Run iOS Integration Tests
-        run: ./scripts/flutter_ios_integration_test.sh
+      # TODO: https://github.com/input-output-hk/catalyst-voices/issues/135
+      # - name: 📱 Run iOS Integration Tests
+      #   run: ./scripts/flutter_ios_integration_test.sh
