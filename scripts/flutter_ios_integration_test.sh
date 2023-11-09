@@ -9,6 +9,7 @@ flutter build ios integration_test/main.dart --release --flavor development
 
 pushd ios
 xcodebuild -workspace Runner.xcworkspace \
+  -allowProvisioningUpdates \
   -scheme development \
   -xcconfig Flutter/Release.xcconfig \
   -configuration Release-development \
