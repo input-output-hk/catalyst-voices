@@ -1,5 +1,7 @@
 name: Branch Deleted
 
+# cspell: words earthfile
+
 on:
   delete:
     branches:
