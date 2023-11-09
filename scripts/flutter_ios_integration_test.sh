@@ -8,14 +8,12 @@ pushd catalyst_voices
 flutter build ios integration_test/main.dart --release --flavor development
 
 pushd ios
-xcodebuild build-for-testing \
-  -workspace Runner.xcworkspace \
+xcodebuild -workspace Runner.xcworkspace \
   -scheme development \
   -xcconfig Flutter/Release.xcconfig \
   -configuration Release-development \
-  -sdk iphoneos \
-  -derivedDataPath \
-  $output
+  -sdk iphoneos build-for-testing \
+  -derivedDataPath $output
 popd
 
 ## Verify test build locally before pushing to  google cloud.
@@ -24,7 +22,8 @@ popd
 # -destination id=00008120-001934493663C01E
 
 pushd $product
-zip -r "ios_tests.zip" "Release-iphoneos" "development_iphoneos17.0-arm64.xctestrun"
+ls
+zip -r "ios_tests.zip" "Release-development-iphoneos" "development_iphoneos17.0-arm64.xctestrun"
 popd
 
 gcloud firebase test ios run \

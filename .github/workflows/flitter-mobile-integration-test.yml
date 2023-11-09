@@ -55,8 +55,8 @@ jobs:
       - name: ⚙️ Install dependencies for all packages
         run: melos build:pub_get:all
 
-      # - name: 🤖 Run Android Integration Tests
-      #   run: ./scripts/flutter_android_integration_test.sh
+      - name: 🤖 Run Android Integration Tests
+        run: ./scripts/flutter_android_integration_test.sh
 
       - name: 📱 Run iOS Integration Tests
         run: ./scripts/flutter_ios_integration_test.sh
