@@ -252,13 +252,10 @@ pub(crate) fn generate_github_issue_url(title: &str) -> Option<Url> {
         GITHUB_REPO_NAME.as_str()
     );
 
-    match Url::parse_with_params(
-        &path,
-        &[
-            ("template", GITHUB_ISSUE_TEMPLATE.as_str()),
-            ("title", title),
-        ],
-    ) {
+    match Url::parse_with_params(&path, &[
+        ("template", GITHUB_ISSUE_TEMPLATE.as_str()),
+        ("title", title),
+    ]) {
         Ok(url) => Some(url),
         Err(e) => {
             error!(err = e.to_string(); "Failed to generate github issue url");
@@ -294,10 +291,9 @@ mod tests {
     #[test]
     fn configured_hosts_default() {
         let configured_hosts = get_api_host_names(&SocketAddr::from(([127, 0, 0, 1], 8080)));
-        assert_eq!(
-            configured_hosts,
-            vec!["https://api.prod.projectcatalyst.io"]
-        );
+        assert_eq!(configured_hosts, vec![
+            "https://api.prod.projectcatalyst.io"
+        ]);
     }
 
     #[test]
@@ -306,13 +302,10 @@ mod tests {
             &SocketAddr::from(([127, 0, 0, 1], 8080)),
             "http://api.prod.projectcatalyst.io , https://api.dev.projectcatalyst.io:1234",
         );
-        assert_eq!(
-            configured_hosts,
-            vec![
-                "http://api.prod.projectcatalyst.io",
-                "https://api.dev.projectcatalyst.io:1234"
-            ]
-        );
+        assert_eq!(configured_hosts, vec![
+            "http://api.prod.projectcatalyst.io",
+            "https://api.dev.projectcatalyst.io:1234"
+        ]);
     }
 
     #[test]
@@ -321,10 +314,9 @@ mod tests {
             &SocketAddr::from(([127, 0, 0, 1], 8080)),
             "not a hostname , https://api.dev.projectcatalyst.io:1234",
         );
-        assert_eq!(
-            configured_hosts,
-            vec!["https://api.dev.projectcatalyst.io:1234"]
-        );
+        assert_eq!(configured_hosts, vec![
+            "https://api.dev.projectcatalyst.io:1234"
+        ]);
     }
 
     #[test]
