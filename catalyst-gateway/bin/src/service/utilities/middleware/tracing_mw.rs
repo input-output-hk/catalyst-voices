@@ -18,7 +18,7 @@ use tracing::{error, field, Instrument, Level, Span};
 use ulid::Ulid;
 use uuid::Uuid;
 
-use crate::service_settings::CLIENT_ID_KEY;
+use crate::settings::CLIENT_ID_KEY;
 
 /// Labels for the metrics
 const METRIC_LABELS: [&str; 3] = ["endpoint", "method", "status_code"];

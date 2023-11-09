@@ -4,7 +4,7 @@ use std::{
     net::{IpAddr, SocketAddr},
 };
 
-use clap::Args;
+use clap::{Args, ValueEnum};
 use dotenvy::dotenv;
 use lazy_static::lazy_static;
 use tracing::log::error;
@@ -53,6 +53,22 @@ pub(crate) struct ServiceSettings {
     /// Logging level
     #[clap(long, default_value = LOG_LEVEL_DEFAULT)]
     pub(crate) log_level: LogLevel,
+}
+
+/// Docs format to be generated.
+#[derive(ValueEnum, Clone)]
+pub(crate) enum DocsFormat {
+    /// JSON format
+    Json,
+    /// YAML format
+    Yml,
+}
+
+/// Settings specifies the format of the `OpenAPI` docs to be generated.
+#[derive(Args, Clone)]
+pub(crate) struct DocsSettings {
+    /// The format of the docs to be generated
+    pub(crate) format: DocsFormat,
 }
 
 /// An environment variable read as a string.

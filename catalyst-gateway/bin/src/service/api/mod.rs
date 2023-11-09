@@ -9,7 +9,7 @@ use test_endpoints::TestApi;
 use v0::V0Api;
 use v1::V1Api;
 
-use crate::service_settings::API_URL_PREFIX;
+use crate::settings::API_URL_PREFIX;
 
 mod health;
 mod registration;

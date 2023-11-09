@@ -5,9 +5,11 @@ use poem_openapi::{OpenApi, OpenApiService, Webhook};
 use rust_embed::RustEmbed;
 
 /// Create the documentation pages where the `OpenAPI` docs can be viewed.
-pub(crate) fn docs<T: OpenApi + 'static, W: Webhook + 'static>(
-    api_service: &OpenApiService<T, W>,
-) -> Route {
+pub(crate) fn docs<T, W>(api_service: &OpenApiService<T, W>) -> Route
+where
+    T: OpenApi + 'static,
+    W: Webhook + 'static,
+{
     let swagger_ui = api_service.swagger_ui();
     let rapidoc_ui = api_service.rapidoc();
     let redoc_ui = api_service.redoc();

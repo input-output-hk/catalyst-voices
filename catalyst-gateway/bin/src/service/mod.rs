@@ -15,6 +15,8 @@ mod common;
 mod poem_service;
 mod utilities;
 
+pub(crate) use poem_service::get_app_docs;
+
 /// Service level errors
 #[derive(thiserror::Error, Debug)]
 pub(crate) enum Error {
