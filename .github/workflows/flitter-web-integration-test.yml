@@ -1,0 +1,46 @@
+name: 🧪 Flutter Web Integration Tests
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+    branches:
+      - "main"
+    paths-ignore:
+      - "**.md"
+      - "doc/**"
+      - ".vscode/"
+
+jobs:
+  integration-tests:
+    name: Web - Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v3
+
+      - name: ⚙️ Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          cache: true
+
+      - name: ⚙️ Setup Melos
+        uses: bluefireteam/melos-action@v2
+
+      - name: ⚙️ Install dependencies for all packages
+        run: melos build:pub_get:all
+
+      - name: 🤖 Run Integration Tests
+        run: ./scripts/flutter_web_integration_test.sh

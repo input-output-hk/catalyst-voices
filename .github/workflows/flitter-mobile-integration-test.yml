@@ -1,0 +1,55 @@
+name: 🧪 Flutter iOS and Android Integration Tests
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
+on:
+  schedule:
+    # Schedule to run at midnight UTC
+    - cron: "0 0 * * *"
+
+jobs:
+  integration-tests:
+    name: Mobile - Integration Tests
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - name: ⬇️ Checkout repository
+        uses: actions/checkout@v3
+
+      - name: ⤵️ Authenticate with Google Cloud Platform
+        uses: "google-github-actions/auth@v1"
+        with:
+          credentials_json: "${{ secrets.GOOGLE_CREDENTIALS_INTEGRATION_TESTS }}"
+
+      - name: ⚙️ Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: ⚙️ Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: "12.x"
+
+      - name: ⚙️ Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          cache: true
+
+      - name: ⚙️ Setup Melos
+        uses: bluefireteam/melos-action@v2
+
+      - name: ⚙️ Install dependencies for all packages
+        run: melos build:pub_get:all
+
+      - name: 🤖 Run Android Integration Tests
+        run: ./scripts/flutter_android_integration_test.sh
+
+      # TODO: https://github.com/input-output-hk/catalyst-voices/issues/135
+      # - name: 📱 Run iOS Integration Tests
+      #   run: ./scripts/flutter_ios_integration_test.sh

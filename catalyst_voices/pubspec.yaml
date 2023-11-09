@@ -22,7 +22,8 @@ dev_dependencies:
     path: ../catalyst_voices_packages/packages/catalyst_analysis
   flutter_test:
     sdk: flutter
-  melos: ^3.1.1
+  integration_test:
+    sdk: flutter
   mocktail: ^1.0.1
 
 flutter:
