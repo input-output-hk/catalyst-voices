@@ -7,7 +7,7 @@ use uuid::Uuid;
 
 /// While using macro-vis lib, you will get the `uncommon_codepoints` warning, so you will
 /// probably want to place this in your crate root
-use crate::settings::generate_github_issue_url;
+use crate::service_settings::generate_github_issue_url;
 
 /// Create a new Server Error Response.
 /// Logging error message.

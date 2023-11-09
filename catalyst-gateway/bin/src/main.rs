@@ -6,7 +6,7 @@ mod event_db;
 mod legacy_service;
 mod logger;
 mod service;
-mod settings;
+mod service_settings;
 mod state;
 
 #[tokio::main]

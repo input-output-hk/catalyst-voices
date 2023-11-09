@@ -25,7 +25,7 @@ use crate::{
         },
         Error,
     },
-    settings::{get_api_host_names, API_URL_PREFIX},
+    service_settings::{get_api_host_names, API_URL_PREFIX},
     state::State,
 };
 

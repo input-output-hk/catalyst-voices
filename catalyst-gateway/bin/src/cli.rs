@@ -3,7 +3,7 @@ use std::sync::Arc;
 
 use clap::Parser;
 
-use crate::{logger, service, settings::Settings, state::State};
+use crate::{logger, service, service_settings::ServiceSettings, state::State};
 
 #[derive(thiserror::Error, Debug)]
 /// All service errors
@@ -21,7 +21,9 @@ pub(crate) enum Error {
 /// Simple service CLI options
 pub(crate) enum Cli {
     /// Run the service
-    Run(Settings),
+    Run(ServiceSettings),
+    /// Build API docs of the service
+    Docs,
 }
 
 impl Cli {
@@ -46,6 +48,7 @@ impl Cli {
                 service::run(&settings.address, state).await?;
                 Ok(())
             },
+            Self::Docs => Ok(()),
         }
     }
 }
