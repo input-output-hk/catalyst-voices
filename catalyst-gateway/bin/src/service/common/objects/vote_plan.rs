@@ -95,7 +95,6 @@ impl Example for PrivateTallyResultState {
     }
 }
 
-
 /// Private Tally Result Info
 #[derive(Object)]
 #[oai(example = true)]
