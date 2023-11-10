@@ -59,7 +59,7 @@ pub(crate) struct EncryptedTally {
 impl Example for EncryptedTally {
     fn example() -> Self {
         Self {
-            encrypted_tally: "ZmFkc2Zhcw==".to_string(),
+            encrypted_tally: "ZmFkc2Zcw==".to_string(),
         }
     }
 }
