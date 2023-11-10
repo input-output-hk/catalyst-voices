@@ -23,7 +23,6 @@ where
         .nest("/rapidoc", rapidoc_ui)
         .nest("/openapi_explorer", openapi_explorer)
         .at("/cat-gateway.json", api_service.spec_endpoint())
-        .at("/cat-gateway.yml", api_service.spec_endpoint_yaml())
 }
 
 /// Embed static files.

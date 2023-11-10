@@ -35,9 +35,6 @@ const API_HOST_NAMES_DEFAULT: &str = "https://api.prod.projectcatalyst.io";
 /// Default `API_URL_PREFIX` used in development.
 const API_URL_PREFIX_DEFAULT: &str = "/api";
 
-/// Default docs format to be generated.
-const DEFAULT_DOCS_FORMAT: &str = "yml";
-
 /// Settings for the application.
 ///
 /// This struct represents the configuration settings for the application.
@@ -68,15 +65,11 @@ pub(crate) enum DocsFormat {
     Yml,
 }
 
-/// Settings specifies the format of the `OpenAPI` docs to be generated.
+/// Settings specifies `OpenAPI` docs generation.
 #[derive(Args, Clone)]
 pub(crate) struct DocsSettings {
-    /// The output path to the generated docs file
-    pub(crate) output: PathBuf,
-
-    /// The format of the docs to be generated
-    #[clap(long, default_value = DEFAULT_DOCS_FORMAT)]
-    pub(crate) format: DocsFormat,
+    /// The output path to the generated docs file, if omitted prints to stdout.
+    pub(crate) output: Option<PathBuf>,
 }
 
 /// An environment variable read as a string.

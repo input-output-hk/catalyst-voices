@@ -26,7 +26,7 @@ pub(crate) enum Error {
 pub(crate) enum Cli {
     /// Run the service
     Run(ServiceSettings),
-    /// Build API docs of the service
+    /// Build API docs of the service in the JSON format
     Docs(DocsSettings),
 }
 
@@ -53,9 +53,14 @@ impl Cli {
                 Ok(())
             },
             Self::Docs(settings) => {
-                let docs = service::get_app_docs(&settings.format);
-                let mut docs_file = std::fs::File::create(settings.output)?;
-                docs_file.write_all(docs.as_bytes())?;
+                let docs = service::get_app_docs();
+                match settings.output {
+                    Some(path) => {
+                        let mut docs_file = std::fs::File::create(path)?;
+                        docs_file.write_all(docs.as_bytes())?;
+                    },
+                    None => println!("{docs}"),
+                }
                 Ok(())
             },
         }

@@ -25,7 +25,7 @@ use crate::{
         },
         Error,
     },
-    settings::{get_api_host_names, DocsFormat, API_URL_PREFIX},
+    settings::{get_api_host_names, API_URL_PREFIX},
     state::State,
 };
 
@@ -55,13 +55,10 @@ fn mk_app(hosts: Vec<String>, base_route: Option<Route>, state: &Arc<State>) -> 
         .data(state.clone())
 }
 
-/// Get the API docs as a string in the specified format.
-pub(crate) fn get_app_docs(format: &DocsFormat) -> String {
+/// Get the API docs as a string in the JSON format.
+pub(crate) fn get_app_docs() -> String {
     let api_service = mk_api(vec![]);
-    match format {
-        DocsFormat::Json => api_service.spec(),
-        DocsFormat::Yml => api_service.spec_yaml(),
-    }
+    api_service.spec()
 }
 
 /// Run the Poem Service
