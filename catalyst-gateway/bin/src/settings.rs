@@ -5,7 +5,7 @@ use std::{
     path::PathBuf,
 };
 
-use clap::{Args, ValueEnum};
+use clap::Args;
 use dotenvy::dotenv;
 use lazy_static::lazy_static;
 use tracing::log::error;
@@ -54,15 +54,6 @@ pub(crate) struct ServiceSettings {
     /// Logging level
     #[clap(long, default_value = LOG_LEVEL_DEFAULT)]
     pub(crate) log_level: LogLevel,
-}
-
-/// Docs format to be generated.
-#[derive(ValueEnum, Clone)]
-pub(crate) enum DocsFormat {
-    /// JSON format
-    Json,
-    /// YAML format
-    Yml,
 }
 
 /// Settings specifies `OpenAPI` docs generation.
