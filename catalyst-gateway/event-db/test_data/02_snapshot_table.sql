@@ -1,4 +1,3 @@
-
 INSERT INTO snapshot
 (row_id, event, as_at, as_at_slotno, last_updated, last_updated_slotno, final)
 VALUES
