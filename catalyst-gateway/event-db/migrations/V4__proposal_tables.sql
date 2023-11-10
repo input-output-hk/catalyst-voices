@@ -4,35 +4,37 @@
 
 CREATE TABLE proposal
 (
-    row_id SERIAL PRIMARY KEY,
-    id INTEGER NOT NULL,
-    objective INTEGER NOT NULL,
-    title TEXT NOT NULL,
-    summary TEXT NOT NULL,
-    category TEXT NOT NULL,
-    public_key TEXT NOT NULL,
-    funds BIGINT NOT NULL,
-    url TEXT NOT NULL,
-    files_url TEXT NOT NULL,
-    impact_score BIGINT NOT NULL,
+  row_id SERIAL PRIMARY KEY,
+  id INTEGER NOT NULL,
+  objective INTEGER NOT NULL,
+  title TEXT NOT NULL,
+  summary TEXT NOT NULL,
+  category TEXT NOT NULL,
+  public_key TEXT NOT NULL,
+  funds BIGINT NOT NULL,
+  url TEXT NOT NULL,
+  files_url TEXT NOT NULL,
+  impact_score BIGINT NOT NULL,
 
-    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+  deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
-    extra JSONB,
+  extra JSONB,
 
-    proposer_name TEXT NOT NULL,
-    proposer_contact TEXT NOT NULL,
-    proposer_url TEXT NOT NULL,
-    proposer_relevant_experience TEXT NOT NULL,
-    bb_proposal_id BYTEA,
+  proposer_name TEXT NOT NULL,
+  proposer_contact TEXT NOT NULL,
+  proposer_url TEXT NOT NULL,
+  proposer_relevant_experience TEXT NOT NULL,
+  bb_proposal_id BYTEA,
 
-    bb_vote_options TEXT[],
+  bb_vote_options TEXT [],
 
-    FOREIGN KEY(objective) REFERENCES objective(row_id) ON DELETE CASCADE,
-    FOREIGN KEY(bb_vote_options) REFERENCES vote_options(objective) ON DELETE CASCADE
+  FOREIGN KEY (objective) REFERENCES objective (row_id) ON DELETE CASCADE,
+  FOREIGN KEY (bb_vote_options) REFERENCES vote_options (
+    objective
+  ) ON DELETE CASCADE
 );
 
-CREATE UNIQUE INDEX proposal_index ON proposal(id, objective);
+CREATE UNIQUE INDEX proposal_index ON proposal (id, objective);
 
 
 COMMENT ON TABLE proposal IS 'All Proposals for the current fund.';
@@ -73,21 +75,23 @@ COMMENT ON COLUMN proposal.extra IS
 -- Reviewer's levels table
 
 CREATE TABLE reviewer_level (
-    row_id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    total_reward_pct NUMERIC(6,3) CONSTRAINT percentage CHECK (total_reward_pct <= 100 AND total_reward_pct >= 0),
+  row_id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL,
+  total_reward_pct NUMERIC(6, 3) CONSTRAINT percentage CHECK (
+    total_reward_pct <= 100 AND total_reward_pct >= 0
+  ),
 
-    event_id INTEGER NOT NULL,
+  event_id INTEGER NOT NULL,
 
-    FOREIGN KEY (event_id) REFERENCES event(row_id) ON DELETE CASCADE
+  FOREIGN KEY (event_id) REFERENCES event (row_id) ON DELETE CASCADE
 );
 
-COMMENT ON TABLE reviewer_level IS 
+COMMENT ON TABLE reviewer_level IS
 'All levels of reviewers.
 This table represents all different types of reviewer`s levels, which is taken into account during rewarding process.';
 COMMENT ON COLUMN reviewer_level.row_id IS 'Synthetic Unique Key';
 COMMENT ON COLUMN reviewer_level.name IS 'Name of the reviewer level';
-COMMENT ON COLUMN reviewer_level.total_reward_pct IS 
+COMMENT ON COLUMN reviewer_level.total_reward_pct IS
 'Total reviewer`s reward assigned to the specific level, which is defined as a percentage from the total pot of Community Review rewards (See `event.review_rewards` column).';
 COMMENT ON COLUMN reviewer_level.event_id IS 'The specific Event ID this review level is part of.';
 
@@ -114,8 +118,10 @@ CREATE TABLE proposal_review (
   ranking INTEGER,
   flags JSONB NULL,
 
-  FOREIGN KEY (proposal_id) REFERENCES proposal(row_id) ON DELETE CASCADE,
-  FOREIGN KEY (assessor_level) REFERENCES reviewer_level(row_id) ON DELETE CASCADE
+  FOREIGN KEY (proposal_id) REFERENCES proposal (row_id) ON DELETE CASCADE,
+  FOREIGN KEY (assessor_level) REFERENCES reviewer_level (
+    row_id
+  ) ON DELETE CASCADE
 );
 
 COMMENT ON TABLE proposal_review IS 'All Reviews.';
@@ -194,15 +200,16 @@ Each entry =
 -- Define known review metrics
 INSERT INTO review_metric (name, description, min, max, map)
 VALUES
-    ('impact', 'Impact Rating', 0, 5, NULL),
-    ('feasibility','Feasibility Rating', 0, 5, NULL),
-    ('auditability','Auditability Rating', 0, 5, NULL),
-    ('value','Value Proposition Rating', 0, 5, NULL),
-    ('vpa_ranking','VPA Ranking of the review',0,3, ARRAY [
-            '{"name":"Excellent","desc":"Excellent Review"}',
-            '{"name":"Good","desc":"Could be improved."}',
-            '{"name":"FilteredOut","desc":"Exclude this review"}',
-            '{"name":"NA", "desc":"Not Applicable"}']::JSON[]);
+('impact', 'Impact Rating', 0, 5, NULL),
+('feasibility', 'Feasibility Rating', 0, 5, NULL),
+('auditability', 'Auditability Rating', 0, 5, NULL),
+('value', 'Value Proposition Rating', 0, 5, NULL),
+('vpa_ranking', 'VPA Ranking of the review', 0, 3, ARRAY[
+  '{"name":"Excellent","desc":"Excellent Review"}',
+  '{"name":"Good","desc":"Could be improved."}',
+  '{"name":"FilteredOut","desc":"Exclude this review"}',
+  '{"name":"NA", "desc":"Not Applicable"}'
+]::JSON []);
 
 CREATE TABLE objective_review_metric (
   row_id SERIAL PRIMARY KEY,
@@ -211,10 +218,10 @@ CREATE TABLE objective_review_metric (
   note BOOLEAN,
   review_group VARCHAR,
 
-  UNIQUE(objective, metric, review_group),
+  UNIQUE (objective, metric, review_group),
 
-  FOREIGN KEY (objective) REFERENCES objective(row_id) ON DELETE CASCADE,
-  FOREIGN KEY (metric) REFERENCES review_metric(row_id) ON DELETE CASCADE
+  FOREIGN KEY (objective) REFERENCES objective (row_id) ON DELETE CASCADE,
+  FOREIGN KEY (metric) REFERENCES review_metric (row_id) ON DELETE CASCADE
 );
 
 
@@ -235,18 +242,18 @@ CREATE TABLE review_rating (
   review_id INTEGER NOT NULL,
   metric INTEGER NOT NULL,
   rating INTEGER NOT NULL,
-  note   VARCHAR,
+  note VARCHAR,
 
-  UNIQUE ( review_id, metric ),
+  UNIQUE (review_id, metric),
 
-  FOREIGN KEY (review_id) REFERENCES proposal_review(row_id) ON DELETE CASCADE,
-  FOREIGN KEY (metric) REFERENCES review_metric(row_id) ON DELETE CASCADE
+  FOREIGN KEY (review_id) REFERENCES proposal_review (row_id) ON DELETE CASCADE,
+  FOREIGN KEY (metric) REFERENCES review_metric (row_id) ON DELETE CASCADE
 );
 
 
 COMMENT ON TABLE review_rating IS 'An Individual rating for a metric given on a review.';
 COMMENT ON COLUMN review_rating.row_id IS 'Synthetic ID of this individual rating.';
 COMMENT ON COLUMN review_rating.review_id IS 'The review the metric is being given for.';
-COMMENT ON COLUMN review_rating.metric    IS 'Metric the rating is being given for.';
-COMMENT ON COLUMN review_rating.rating    IS 'The rating being given to the metric.';
-COMMENT ON COLUMN review_rating.note      IS 'OPTIONAL: Note about the rating given.';
+COMMENT ON COLUMN review_rating.metric IS 'Metric the rating is being given for.';
+COMMENT ON COLUMN review_rating.rating IS 'The rating being given to the metric.';
+COMMENT ON COLUMN review_rating.note IS 'OPTIONAL: Note about the rating given.';
