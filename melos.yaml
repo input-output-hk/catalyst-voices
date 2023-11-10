@@ -1,25 +1,16 @@
 name: catalyst_voices
-repository: https://github.com/minikin/didactic-parakeet/
+repository: https://github.com/input-output-hk/catalyst-voices
 
 packages:
-  - lib/**
-  - packages/**
-  - 'tests/*'
+  - catalyst_voices/*
+  - catalyst_voices_packages/packages/*
+  - catalyst_voices_packages/packages/*/*
+  - catalyst_voices_packages/packages/*/*/*
 
 command:
   version:
-    # Generate commit links in package changelogs.
     linkToCommits: true
-    # Only allow versioning to happen on main branch.
-    # branch: main
-    # Additionally build a changelog at the root of the workspace.
     workspaceChangelog: true
-
-  bootstrap:
-    # It seems so that running "pub get" in parallel has some issues (like
-    # https://github.com/dart-lang/pub/issues/3404). Disabling this feature
-    # makes the CI much more stable.
-    runPubGetInParallel: false
 
 scripts:
   lint:
@@ -66,6 +57,8 @@ scripts:
       melos exec -- genhtml coverage/lcov.info --output-directory=coverage/
     description: Generate coverage for the selected package.
 
-  build:
-    run: melos exec fvm flutter build
-    description: Build app.
+  build:pub_get:all:
+    run: flutter pub get
+    exec:
+      concurrency: 6
+    description: Install all dependencies

@@ -8,8 +8,8 @@ CREATE TABLE moderation_allocation (
   review_id INTEGER NOT NULL,
   user_id INTEGER NOT NULL,
 
-  FOREIGN KEY (review_id) REFERENCES proposal_review(row_id) ON DELETE CASCADE,
-  FOREIGN KEY (user_id) REFERENCES config(row_id) ON DELETE CASCADE
+  FOREIGN KEY (review_id) REFERENCES proposal_review (row_id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES config (row_id) ON DELETE CASCADE
 );
 
 
@@ -29,8 +29,8 @@ CREATE TABLE moderation (
   rationale VARCHAR,
   UNIQUE (review_id, user_id),
 
-  FOREIGN KEY (review_id) REFERENCES proposal_review(row_id) ON DELETE CASCADE,
-  FOREIGN KEY (user_id) REFERENCES config(row_id) ON DELETE CASCADE
+  FOREIGN KEY (review_id) REFERENCES proposal_review (row_id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES config (row_id) ON DELETE CASCADE
 );
 
 

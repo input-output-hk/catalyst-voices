@@ -4,16 +4,16 @@
 
 CREATE TABLE voteplan_category
 (
-    name TEXT PRIMARY KEY,
-    public_key BOOL
+  name TEXT PRIMARY KEY,
+  public_key BOOL
 );
 
 
 INSERT INTO voteplan_category (name, public_key)
 VALUES
-    ('public', false), -- Fully public votes only
-    ('private', true), -- Fully private votes only.
-    ('cast-private', true); -- Private until tally, then decrypted.
+('public', false), -- Fully public votes only
+('private', true), -- Fully private votes only.
+('cast-private', true); -- Private until tally, then decrypted.
 
 COMMENT ON TABLE voteplan_category IS 'The category of vote plan currently supported.';
 COMMENT ON COLUMN voteplan_category.name IS 'The UNIQUE name of this voteplan category.';
@@ -23,13 +23,13 @@ COMMENT ON COLUMN voteplan_category.public_key IS 'Does this vote plan category 
 -- groups
 
 CREATE TABLE voting_group (
-    name TEXT PRIMARY KEY
+  name TEXT PRIMARY KEY
 );
 
 INSERT INTO voting_group (name)
 VALUES
-    ('direct'), -- Direct Voters
-    ('rep'); -- Delegated Voter (Check what is the real name for this group we already use in snapshot)
+('direct'), -- Direct Voters
+('rep'); -- Delegated Voter (Check what is the real name for this group we already use in snapshot)
 
 COMMENT ON TABLE voting_group IS 'All Groups.';
 COMMENT ON COLUMN voting_group.name IS 'The ID of this voting group.';
@@ -38,18 +38,18 @@ COMMENT ON COLUMN voting_group.name IS 'The ID of this voting group.';
 
 CREATE TABLE voteplan
 (
-    row_id SERIAL PRIMARY KEY,
-    objective_id INTEGER NOT NULL,
+  row_id SERIAL PRIMARY KEY,
+  objective_id INTEGER NOT NULL,
 
-    id VARCHAR NOT NULL,
-    category TEXT NOT NULL,
-    encryption_key VARCHAR,
-    group_id TEXT,
-    token_id TEXT,
+  id VARCHAR NOT NULL,
+  category TEXT NOT NULL,
+  encryption_key VARCHAR,
+  group_id TEXT,
+  token_id TEXT,
 
-    FOREIGN KEY(objective_id) REFERENCES objective(row_id)  ON DELETE CASCADE,
-    FOREIGN KEY(category) REFERENCES voteplan_category(name)  ON DELETE CASCADE,
-    FOREIGN KEY(group_id) REFERENCES voting_group(name)  ON DELETE CASCADE
+  FOREIGN KEY (objective_id) REFERENCES objective (row_id) ON DELETE CASCADE,
+  FOREIGN KEY (category) REFERENCES voteplan_category (name) ON DELETE CASCADE,
+  FOREIGN KEY (group_id) REFERENCES voting_group (name) ON DELETE CASCADE
 );
 
 COMMENT ON TABLE voteplan IS 'All Vote plans.';
@@ -71,16 +71,18 @@ COMMENT ON COLUMN voteplan.group_id IS 'The identifier of voting power token use
 --      and each voteplan can contain multiple proposals.
 CREATE TABLE proposal_voteplan
 (
-    row_id SERIAL PRIMARY KEY,
-    proposal_id INTEGER,
-    voteplan_id INTEGER,
-    bb_proposal_index BIGINT,
+  row_id SERIAL PRIMARY KEY,
+  proposal_id INTEGER,
+  voteplan_id INTEGER,
+  bb_proposal_index BIGINT,
 
-    FOREIGN KEY(proposal_id) REFERENCES proposal(row_id) ON DELETE CASCADE,
-    FOREIGN KEY(voteplan_id) REFERENCES voteplan(row_id) ON DELETE CASCADE
+  FOREIGN KEY (proposal_id) REFERENCES proposal (row_id) ON DELETE CASCADE,
+  FOREIGN KEY (voteplan_id) REFERENCES voteplan (row_id) ON DELETE CASCADE
 );
 
-CREATE UNIQUE INDEX proposal_voteplan_idx ON proposal_voteplan(proposal_id,voteplan_id,bb_proposal_index);
+CREATE UNIQUE INDEX proposal_voteplan_idx ON proposal_voteplan (
+  proposal_id, voteplan_id, bb_proposal_index
+);
 
 COMMENT ON TABLE proposal_voteplan IS 'Table to link Proposals to Vote plans in a Many to Many relationship.';
 COMMENT ON COLUMN proposal_voteplan.row_id IS 'Synthetic ID of this Voteplan/Proposal M-M relationship.';
