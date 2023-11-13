@@ -1,9 +1,13 @@
 //! CLI interpreter for the service
-use std::sync::Arc;
+use std::{io::Write, sync::Arc};
 
 use clap::Parser;
 
-use crate::{logger, service, settings::Settings, state::State};
+use crate::{
+    logger, service,
+    settings::{DocsSettings, ServiceSettings},
+    state::State,
+};
 
 #[derive(thiserror::Error, Debug)]
 /// All service errors
@@ -21,7 +25,9 @@ pub(crate) enum Error {
 /// Simple service CLI options
 pub(crate) enum Cli {
     /// Run the service
-    Run(Settings),
+    Run(ServiceSettings),
+    /// Build API docs of the service in the JSON format
+    Docs(DocsSettings),
 }
 
 impl Cli {
@@ -44,6 +50,17 @@ impl Cli {
 
                 let state = Arc::new(State::new(Some(settings.database_url)).await?);
                 service::run(&settings.address, state).await?;
+                Ok(())
+            },
+            Self::Docs(settings) => {
+                let docs = service::get_app_docs();
+                match settings.output {
+                    Some(path) => {
+                        let mut docs_file = std::fs::File::create(path)?;
+                        docs_file.write_all(docs.as_bytes())?;
+                    },
+                    None => println!("{docs}"),
+                }
                 Ok(())
             },
         }

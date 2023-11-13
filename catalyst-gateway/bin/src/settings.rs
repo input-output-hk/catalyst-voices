@@ -2,6 +2,7 @@
 use std::{
     env,
     net::{IpAddr, SocketAddr},
+    path::PathBuf,
 };
 
 use clap::Args;
@@ -41,7 +42,7 @@ const API_URL_PREFIX_DEFAULT: &str = "/api";
 /// the URL to the `PostgreSQL` event database,
 /// and the logging level.
 #[derive(Args, Clone)]
-pub(crate) struct Settings {
+pub(crate) struct ServiceSettings {
     /// Server binding address
     #[clap(long, default_value = ADDRESS_DEFAULT)]
     pub(crate) address: SocketAddr,
@@ -53,6 +54,13 @@ pub(crate) struct Settings {
     /// Logging level
     #[clap(long, default_value = LOG_LEVEL_DEFAULT)]
     pub(crate) log_level: LogLevel,
+}
+
+/// Settings specifies `OpenAPI` docs generation.
+#[derive(Args, Clone)]
+pub(crate) struct DocsSettings {
+    /// The output path to the generated docs file, if omitted prints to stdout.
+    pub(crate) output: Option<PathBuf>,
 }
 
 /// An environment variable read as a string.
@@ -256,10 +264,10 @@ mod tests {
     // }
 
     #[test]
-    fn generate_github_issue_url() {
+    fn generate_github_issue_url_test() {
         let title = "Hello, World! How are you?";
         assert_eq!(
-            super::generate_github_issue_url(title).unwrap().as_str(),
+            generate_github_issue_url(title).unwrap().as_str(),
             "https://github.com/input-output-hk/catalyst-core/issues/new?template=bug_report.md&title=Hello%2C+World%21+How+are+you%3F"
         );
     }
