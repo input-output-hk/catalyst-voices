@@ -7,6 +7,7 @@ analyzer:
   errors:
     missing_required_param: error
     missing_return: error
+    dead_code: warning
 
   exclude:
     - test/.test_coverage.dart
