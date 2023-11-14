@@ -1,11 +1,12 @@
-# Catalyst Flutter
+# Catalyst Voices Packages
 
 A collection of Catalyst packages and plugins for Flutter and Dart.
 
-* [Catalyst Flutter](#catalyst-flutter)
+* [Catalyst Voices Packages](#catalyst-voices-packages)
   * [Packages](#packages)
   * [Requirements](#requirements)
   * [Bootstrapping](#bootstrapping)
+  * [Contributing](#contributing)
   * [Support](#support)
   * [License](#license)
 
@@ -17,9 +18,9 @@ A collection of Catalyst packages and plugins for Flutter and Dart.
 
 ## Requirements
 
-* Flutter: 3.13.4+
-* Dart: 3.1.2+
-* Xcode: 14.2+
+* Flutter: 3.13.9+
+* Dart: 3.1.5+
+* Xcode: 15.0+
 * Android Studio: Android Studio Electric Eel | 2022.1.1 +
 * [Melos](https://melos.invertase.dev)
 * Flutter & Dart plugins:
@@ -30,16 +31,26 @@ A collection of Catalyst packages and plugins for Flutter and Dart.
 ## Bootstrapping
 
 ```sh
-git clone TODO(minikin): add repo
-cd catalyst_flutter
+git clone https://github.com/input-output-hk/catalyst-voices.git
+cd catalyst-voices
 melos bootstrap
 ```
 
+## Contributing
+
+We welcome contributions from the community!
+Please read our [CONTRIBUTING](https://github.com/input-output-hk/catalyst-voices/blob/main/CONTRIBUTING.md)
+for guidelines on how to contribute.
+
 ## Support
 
-Post issues and feature requests on the GitHub [issue tracker](TODO(minikin)).
+Post issues and feature requests on the GitHub [issue tracker](https://github.com/input-output-hk/catalyst-voices/issues).
 
 ## License
 
-The source code of Popover project is available under the TODO(minikin): add license.
-See the [LICENSE](TODO(minikin)) file for more info.
+Licensed under either of [Apache License, Version 2.0](https://github.com/input-output-hk/catalyst-voices/blob/main/LICENSE-APACHE)
+or [MIT license](https://github.com/input-output-hk/catalyst-voices/blob/main/LICENSE-MIT) at your option.
+
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in this crate by you, as defined in the Apache-2.0 license, shall
+be dual licensed as above, without any additional terms or conditions.
