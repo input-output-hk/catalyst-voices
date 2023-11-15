@@ -28,14 +28,14 @@ impl Example for StatusRejected {
 /// Fragment is included in a block.
 pub(crate) struct StatusInABlock {
     pub date: BlockDate,
-    pub hash: Hash,
+    pub block: Hash,
 }
 
 impl Example for StatusInABlock {
     fn example() -> Self {
         Self {
             date: BlockDate::example(),
-            hash: Hash::example(),
+            block: Hash::example(),
         }
     }
 }
