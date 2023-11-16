@@ -25,9 +25,8 @@ final class HomeScreen extends StatelessWidget {
             SizedBox(
               height: 200,
               width: 200,
-              child: Image.asset(
+              child: CatalystImage.asset(
                 VoicesAssets.images.dummyCatalystVoices.path,
-                package: 'catalyst_voices_assets',
               ),
             ),
           ],
