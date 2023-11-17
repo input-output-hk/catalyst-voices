@@ -27,7 +27,7 @@ flutter:
           weight: 600
 
 flutter_gen:
-  output: lib/src/
+  output: lib/generated/
   assets:
     enabled: true
     outputs:
