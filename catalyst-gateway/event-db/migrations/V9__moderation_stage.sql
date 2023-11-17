@@ -4,12 +4,12 @@
 -- to describe the allocation of moderations that needs to be done.
 
 CREATE TABLE moderation_allocation (
-  row_id SERIAL PRIMARY KEY,
-  review_id INTEGER NOT NULL,
-  user_id INTEGER NOT NULL,
+    row_id SERIAL PRIMARY KEY,
+    review_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
 
-  FOREIGN KEY (review_id) REFERENCES proposal_review(row_id) ON DELETE CASCADE,
-  FOREIGN KEY (user_id) REFERENCES config(row_id) ON DELETE CASCADE
+    FOREIGN KEY (review_id) REFERENCES proposal_review (row_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES config (row_id) ON DELETE CASCADE
 );
 
 
@@ -22,15 +22,15 @@ COMMENT ON COLUMN moderation_allocation.user_id IS 'The user the relationship is
 -- Moderation - Defines the moderation submitted by users for each proposal_review.
 
 CREATE TABLE moderation (
-  row_id SERIAL PRIMARY KEY,
-  review_id INTEGER NOT NULL,
-  user_id INTEGER NOT NULL,
-  classification INTEGER NOT NULL,
-  rationale VARCHAR,
-  UNIQUE (review_id, user_id),
+    row_id SERIAL PRIMARY KEY,
+    review_id INTEGER NOT NULL,
+    user_id INTEGER NOT NULL,
+    classification INTEGER NOT NULL,
+    rationale VARCHAR,
+    UNIQUE (review_id, user_id),
 
-  FOREIGN KEY (review_id) REFERENCES proposal_review(row_id) ON DELETE CASCADE,
-  FOREIGN KEY (user_id) REFERENCES config(row_id) ON DELETE CASCADE
+    FOREIGN KEY (review_id) REFERENCES proposal_review (row_id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES config (row_id) ON DELETE CASCADE
 );
 
 

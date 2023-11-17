@@ -1,13 +1,13 @@
 -- Catalyst Event Database
 CREATE TABLE
-  event_type (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+event_type (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     "name" TEXT NOT NULL,
     description_schema JSONB NOT NULL,
     extra_data_schema JSONB NOT NULL
-  );
+);
 
-CREATE UNIQUE INDEX event_type_name_idx ON event_type (NAME);
+CREATE UNIQUE INDEX event_type_name_idx ON event_type (name);
 
 COMMENT ON TABLE event_type IS 'The types of event which have been defined.';
 
@@ -22,8 +22,8 @@ COMMENT ON COLUMN event_type.extra_data_schema IS 'The JSON Schema which defines
 
 -- Event Table - Defines each voting or decision event
 CREATE TABLE
-  "event" (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid (),
+"event" (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     "type" UUID REFERENCES event_type (id),
     "name" TEXT NOT NULL,
     description JSONB NOT NULL,
@@ -32,35 +32,35 @@ CREATE TABLE
     backing_end TIMESTAMP,
     end_time TIMESTAMP,
     extra_data JSONB NOT NULL
-  );
+);
 
-CREATE UNIQUE INDEX event_name_idx ON EVENT (NAME);
+CREATE UNIQUE INDEX event_name_idx ON event (name);
 
-COMMENT ON TABLE EVENT IS 'The basic parameters of a related set of funding campaigns.';
+COMMENT ON TABLE event IS 'The basic parameters of a related set of funding campaigns.';
 
-COMMENT ON COLUMN EVENT.id IS 'Synthetic Unique ID for each event (UUIDv4).';
+COMMENT ON COLUMN event.id IS 'Synthetic Unique ID for each event (UUIDv4).';
 
-COMMENT ON COLUMN EVENT.name IS 'The name of the event.
+COMMENT ON COLUMN event.name IS 'The name of the event.
 eg. "Fund9" or "SVE1"';
 
-COMMENT ON COLUMN EVENT.type IS 'The type of the event.';
+COMMENT ON COLUMN event.type IS 'The type of the event.';
 
-COMMENT ON COLUMN EVENT.description IS 'A detailed description of the purpose of the event.
+COMMENT ON COLUMN event.description IS 'A detailed description of the purpose of the event.
 Must conform to the JSON Schema defined by `event_type.description_schema.`';
 
-COMMENT ON COLUMN EVENT.start_time IS 'The time (UTC) the event starts.
+COMMENT ON COLUMN event.start_time IS 'The time (UTC) the event starts.
 NULL = Not yet defined.';
 
-COMMENT ON COLUMN EVENT.backing_start IS 'The time (UTC) when backers may start backing the campaigns in the event. This must >= event.start_time.
+COMMENT ON COLUMN event.backing_start IS 'The time (UTC) when backers may start backing the campaigns in the event. This must >= event.start_time.
 NULL = Not yet defined.';
 
-COMMENT ON COLUMN EVENT.backing_end IS 'The time (UTC) when backers may no longer back the campaigns in the event. This must > event.backing_start and <= event.end_time.
+COMMENT ON COLUMN event.backing_end IS 'The time (UTC) when backers may no longer back the campaigns in the event. This must > event.backing_start and <= event.end_time.
 NULL = Not yet defined.';
 
-COMMENT ON COLUMN EVENT.end_time IS 'The time (UTC) the event ends. Must be >= event.backing_end.
+COMMENT ON COLUMN event.end_time IS 'The time (UTC) the event ends. Must be >= event.backing_end.
 NULL = Not yet defined.';
 
-COMMENT ON COLUMN EVENT.extra_data IS 'Extra event type specific data defined about the event.
+COMMENT ON COLUMN event.extra_data IS 'Extra event type specific data defined about the event.
 Must conform to the JSON Schema defined by `event_type.extra_data_schema.`';
 
 --COMMENT ON COLUMN event.registration_snapshot_time IS

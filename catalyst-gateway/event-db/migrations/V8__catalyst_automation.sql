@@ -11,7 +11,7 @@ CREATE TABLE voting_node (
     netkey TEXT NOT NULL,
 
     PRIMARY KEY (hostname, event),
-    FOREIGN KEY(event) REFERENCES event(row_id)  ON DELETE CASCADE
+    FOREIGN KEY (event) REFERENCES event (row_id) ON DELETE CASCADE
 );
 
 COMMENT ON TABLE voting_node IS
@@ -36,16 +36,16 @@ CREATE TABLE tally_committee (
     member_crs TEXT,
     election_key TEXT,
 
-    FOREIGN KEY(event) REFERENCES event(row_id)  ON DELETE CASCADE
+    FOREIGN KEY (event) REFERENCES event (row_id) ON DELETE CASCADE
 );
 
 COMMENT ON TABLE tally_committee IS 'Table for storing data about the tally committee per voting event.';
 COMMENT ON COLUMN tally_committee.row_id IS 'Unique ID for this committee member for this event.';
-COMMENT ON COLUMN tally_committee.event  IS 'The event this committee member is for.';
-COMMENT ON COLUMN tally_committee.committee_pk  IS 'Encrypted private key for the committee wallet. This key can be used to get the committee public address.';
-COMMENT ON COLUMN tally_committee.committee_id  IS 'The hex-encoded public key for the committee wallet.';
-COMMENT ON COLUMN tally_committee.member_crs  IS 'Encrypted Common Reference String shared in the creation of every set of committee member keys.';
-COMMENT ON COLUMN tally_committee.election_key  IS 'Public key generated with all committee member public keys, and is used to encrypt votes. NULL if the event.committee_size is 0.';
+COMMENT ON COLUMN tally_committee.event IS 'The event this committee member is for.';
+COMMENT ON COLUMN tally_committee.committee_pk IS 'Encrypted private key for the committee wallet. This key can be used to get the committee public address.';
+COMMENT ON COLUMN tally_committee.committee_id IS 'The hex-encoded public key for the committee wallet.';
+COMMENT ON COLUMN tally_committee.member_crs IS 'Encrypted Common Reference String shared in the creation of every set of committee member keys.';
+COMMENT ON COLUMN tally_committee.election_key IS 'Public key generated with all committee member public keys, and is used to encrypt votes. NULL if the event.committee_size is 0.';
 
 
 -- Committee Member Table - Stores data about the tally committee members
@@ -62,14 +62,14 @@ CREATE TABLE committee_member (
     member_pk TEXT NOT NULL,
     member_sk TEXT NOT NULL,
 
-    FOREIGN KEY(committee) REFERENCES tally_committee(row_id)
+    FOREIGN KEY (committee) REFERENCES tally_committee (row_id)
 );
 
 COMMENT ON TABLE committee_member IS 'Table for storing data about the tally committee members.';
 COMMENT ON COLUMN committee_member.row_id IS 'Unique ID for this committee member for this event.';
 COMMENT ON COLUMN committee_member.member_index IS 'the zero-based index of the member, ranging from 0 <= index < committee_size.';
 COMMENT ON COLUMN committee_member.committee IS 'The committee this member belongs to.';
-COMMENT ON COLUMN committee_member.comm_pk  IS 'Committee member communication public key.';
-COMMENT ON COLUMN committee_member.comm_sk  IS 'Encrypted committee member communication secret key.';
-COMMENT ON COLUMN committee_member.member_pk  IS 'Committee member public key';
-COMMENT ON COLUMN committee_member.member_sk  IS 'Encrypted committee member secret key';
+COMMENT ON COLUMN committee_member.comm_pk IS 'Committee member communication public key.';
+COMMENT ON COLUMN committee_member.comm_sk IS 'Encrypted committee member communication secret key.';
+COMMENT ON COLUMN committee_member.member_pk IS 'Committee member public key';
+COMMENT ON COLUMN committee_member.member_sk IS 'Encrypted committee member secret key';

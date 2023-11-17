@@ -3,7 +3,7 @@ INSERT INTO voteplan
 VALUES
 (1, 1, '1', 'public', 'direct', 'voting token 1'),
 (2, 1, '2', 'public', 'rep', 'voting token 2'),
-(3, 2, '1', 'public', NULL, NULL),
-(4, 2, '2', 'public', NULL, NULL),
+(3, 2, '1', 'public', null, null),
+(4, 2, '2', 'public', null, null),
 (5, 3, '1', 'public', 'direct', 'voting token 3'),
-(6, 4, '2', 'public', NULL, NULL);
+(6, 4, '2', 'public', null, null);

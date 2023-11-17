@@ -1,27 +1,27 @@
 INSERT INTO
-    objective_review_metric (
-        row_id,
-        objective,
-        metric,
-        note,
-        review_group
-    )
+objective_review_metric (
+    row_id,
+    objective,
+    metric,
+    note,
+    review_group
+)
 VALUES (
     1,
     1,
     1,
-    NULL,
+    null,
     'review_group 1'
-    ), (
+), (
     2,
     1,
     2,
-    TRUE,
+    true,
     'review_group 2'
-    ), (
+), (
     3,
     1,
     5,
-    FALSE,
-    NULL
-    );
+    false,
+    null
+);

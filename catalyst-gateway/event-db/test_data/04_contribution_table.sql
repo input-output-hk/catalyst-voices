@@ -1,6 +1,6 @@
-INSERT INTO contribution 
+INSERT INTO contribution
 (row_id, stake_public_key, snapshot_id, voting_key, voting_weight, voting_key_idx, value, voting_group, reward_address)
-VALUES 
+VALUES
 (1, 'stake_public_key_1', 1, 'voting_key_1', 1, 1, 140, 'rep', 'addrr_reward_address_1'),
 (2, 'stake_public_key_2', 1, 'voting_key_1', 1, 1, 110, 'rep', 'reward_address_2'),
 (3, 'stake_public_key_1', 1, 'voting_key_2', 1, 1, 100, 'rep', 'reward_address_1'),

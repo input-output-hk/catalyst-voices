@@ -33,7 +33,7 @@ INSERT INTO event (
     '1970-01-01 00:00:00',  -- Snapshot Start.
     450000000,              -- Voting Power Threshold
     1,                      -- Max Voting Power PCT
-    NULL,                   -- Review Rewards
+    null,                   -- Review Rewards
     '1970-01-01 00:00:00',  -- Start Time
     '1970-01-01 00:00:00',  -- End Time
     '1970-01-01 00:00:00',  -- Insight Sharing Start
@@ -45,10 +45,10 @@ INSERT INTO event (
     '1970-01-01 00:00:00',  -- Voting Starts
     '1970-01-01 00:00:00',  -- Voting Ends
     '1970-01-01 00:00:00',  -- Tallying Ends
-    NULL,                   -- Block 0 Data
-    NULL,                   -- Block 0 Hash
+    null,                   -- Block 0 Data
+    null,                   -- Block 0 Hash
     1,                      -- Committee Size
     1,                      -- Committee Threshold
-    NULL,                   -- Extra
-    NULL                    -- Cast to
+    null,                   -- Extra
+    null                    -- Cast to
 );

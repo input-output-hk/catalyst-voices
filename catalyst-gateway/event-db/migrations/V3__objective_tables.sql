@@ -12,12 +12,12 @@ COMMENT ON COLUMN objective_category.name IS 'The name of this objective categor
 COMMENT ON COLUMN objective_category.description IS 'A Description of this kind of objective category.';
 
 -- Define known objective categories
-INSERT INTO objective_category (name,  description)
+INSERT INTO objective_category (name, description)
 VALUES
-    ('catalyst-simple','A Simple choice'),
-    ('catalyst-native','??'),
-    ('catalyst-community-choice','Community collective decision'),
-    ('sve-decision','Special voting event decision');
+('catalyst-simple', 'A Simple choice'),
+('catalyst-native', '??'),
+('catalyst-community-choice', 'Community collective decision'),
+('sve-decision', 'Special voting event decision');
 
 -- known currencies - Defines all currently known currencies.
 CREATE TABLE currency
@@ -32,12 +32,12 @@ COMMENT ON COLUMN currency.description IS 'A Description of this kind of currenc
 
 
 -- Define known currencies
-INSERT INTO currency (name,  description)
+INSERT INTO currency (name, description)
 VALUES
-    ('USD_ADA','US Dollars, converted to Cardano ADA at time of reward calculation.'),
-    ('ADA','Cardano ADA.'),
-    ('CLAP', 'CLAP tokens.'),
-    ('COTI', 'COTI tokens.');
+('USD_ADA', 'US Dollars, converted to Cardano ADA at time of reward calculation.'),
+('ADA', 'Cardano ADA.'),
+('CLAP', 'CLAP tokens.'),
+('COTI', 'COTI tokens.');
 
 -- known vote options - Defines all currently known vote options.
 CREATE TABLE vote_options
@@ -54,9 +54,9 @@ COMMENT ON COLUMN vote_options.idea_scale IS 'How this vote option is represente
 COMMENT ON COLUMN vote_options.objective IS 'How the vote options is represented in the objective.';
 
 -- Define known vote_options
-INSERT INTO vote_options (idea_scale,  objective)
+INSERT INTO vote_options (idea_scale, objective)
 VALUES
-    ('{"blank", "yes", "no"}','{"yes", "no"}');
+('{"blank", "yes", "no"}', '{"yes", "no"}');
 
 
 
@@ -70,10 +70,10 @@ CREATE TABLE goal
     idx INTEGER NOT NULL,
     name VARCHAR NOT NULL,
 
-    FOREIGN KEY(event_id) REFERENCES event(row_id) ON DELETE CASCADE
+    FOREIGN KEY (event_id) REFERENCES event (row_id) ON DELETE CASCADE
 );
 
-CREATE UNIQUE INDEX goal_index ON goal(event_id, idx);
+CREATE UNIQUE INDEX goal_index ON goal (event_id, idx);
 
 COMMENT ON TABLE goal IS 'The list of campaign goals for this event.';
 COMMENT ON COLUMN goal.id IS 'Synthetic Unique Key.';
@@ -97,7 +97,7 @@ CREATE TABLE objective
     title TEXT NOT NULL,
     description TEXT NOT NULL,
 
-    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    deleted BOOLEAN NOT NULL DEFAULT false,
 
     rewards_currency TEXT,
     rewards_total BIGINT,
@@ -107,10 +107,10 @@ CREATE TABLE objective
 
     extra JSONB,
 
-    FOREIGN KEY(event) REFERENCES event(row_id) ON DELETE CASCADE,
-    FOREIGN KEY(category) REFERENCES objective_category(name) ON DELETE CASCADE,
-    FOREIGN KEY(rewards_currency) REFERENCES currency(name) ON DELETE CASCADE,
-    FOREIGN KEY(vote_options) REFERENCES vote_options(id) ON DELETE CASCADE
+    FOREIGN KEY (event) REFERENCES event (row_id) ON DELETE CASCADE,
+    FOREIGN KEY (category) REFERENCES objective_category (name) ON DELETE CASCADE,
+    FOREIGN KEY (rewards_currency) REFERENCES currency (name) ON DELETE CASCADE,
+    FOREIGN KEY (vote_options) REFERENCES vote_options (id) ON DELETE CASCADE
 );
 
 CREATE UNIQUE INDEX objective_idx ON objective (id, event);

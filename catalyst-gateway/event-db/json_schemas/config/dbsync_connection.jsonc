@@ -1,0 +1,93 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "DBSync Connection",
+    "type": "object",
+    "properties": {
+        // Optional SSH tunnel needed to communicate to the DBSync Postgres database.
+        "ssh": {
+            "type": "object",
+            "properties": {
+                "sshHost": {
+                    "type": "string",
+                    "description": "The hostname or IP address of the SSH server for tunneling.",
+                    "example": "ssh.example.com"
+                },
+                "sshPort": {
+                    "type": "integer",
+                    "description": "The port number of the SSH server for tunneling.",
+                    "example": 22,
+                    "default": 22,
+                    "minimum": 1,
+                    "maximum": 65535
+                },
+                "sshUser": {
+                    "type": "string",
+                    "description": "The username for SSH authentication.",
+                    "example": "sshuser"
+                },
+                "sshPrivateKey": {
+                    "type": "string",
+                    "description": "The private key file path for SSH authentication. If not set, the private key is defined by the SSH_PRIVATE_KEY env var.",
+                    "example": "/path/to/private_key"
+                },
+                "localPort": {
+                    "type": "integer",
+                    "description": "The local port number to use for the SSH tunnel. If not set, a random port is chosen.",
+                    "example": 54321
+                }
+            },
+            "required": [
+                "sshHost",
+                "sshUser"
+            ]
+        },
+        // DBSync connection
+        "conn": {
+            "type": "object",
+            "properties": {
+                "host": {
+                    "type": "string",
+                    "description": "The hostname or IP address of the PostgreSQL server.",
+                    "example": "localhost",
+                    "default": "localhost"
+                },
+                "port": {
+                    "type": "integer",
+                    "description": "The port number of the PostgreSQL server. Note, the default will be the ssh localPort if the connection is tunneled over SSH.",
+                    "example": 5432,
+                    "default": 5432
+                },
+                "database": {
+                    "type": "string",
+                    "description": "The name of the PostgreSQL database to connect to.",
+                    "example": "cexplorer",
+                    "default": "cexplorer"
+                },
+                "username": {
+                    "type": "string",
+                    "description": "The username for authentication.",
+                    "example": "cexplorer",
+                    "default": "cexplorer"
+                },
+                "password": {
+                    "type": "string",
+                    "description": "The password for authentication.",
+                    "example": "password"
+                },
+                "network": {
+                    "type": "string",
+                    "enum": [
+                        "mainnet",
+                        "preprod",
+                        "preview"
+                    ],
+                    "description": "The Cardano network to connect to.",
+                    "default": "mainnet"
+                },
+            },
+            "required": [
+                "password"
+            ]
+        }
+    }
+}
