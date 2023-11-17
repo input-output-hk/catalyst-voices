@@ -1,5 +1,10 @@
 import 'package:flutter/widgets.dart';
 
+/// [CatalystImage] is a wrapper around [Image.asset] that sets the package
+/// property to `catalyst_voices_assets` by default.
+/// This allows the package to be used without having to specify
+/// the package name every time.
+/// For more information, see [Image.asset].
 final class CatalystImage {
   static Image asset(
     String name, {
