@@ -1,3 +1,5 @@
+//! Defines API schemas for hash types.
+
 use poem_openapi::{types::Example, Object};
 
 #[derive(Object)]

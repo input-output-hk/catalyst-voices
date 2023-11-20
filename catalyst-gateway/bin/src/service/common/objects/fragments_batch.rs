@@ -1,3 +1,5 @@
+//! Defines API schemas for fragment batch types.
+
 use poem_openapi::{types::Example, NewType, Object};
 use serde::Deserialize;
 

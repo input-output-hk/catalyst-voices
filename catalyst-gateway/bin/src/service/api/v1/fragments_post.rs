@@ -30,6 +30,7 @@ pub(crate) type AllResponses = response! {
 /// * 500 Server Error - If anything within this function fails unexpectedly. (Possible
 ///   but unlikely)
 /// * 503 Service Unavailable - Service is possibly not running reliably.
+#[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(_fragments_batch: FragmentsBatch) -> AllResponses {
     T200(OK(Json(FragmentsProcessingSummary::default())))
 }

@@ -1,3 +1,5 @@
+//! Defines API schemas of block related types.
+
 use poem_openapi::{types::Example, NewType, Object};
 
 #[derive(NewType)]
