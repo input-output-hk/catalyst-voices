@@ -61,7 +61,7 @@ final class _LoginPageState extends State<LoginPage> {
                   padding: const EdgeInsets.all(16),
                   child: ElevatedButton(
                     key: WidgetKeys.loginButton,
-                    onPressed: () => _loginButtonPressed(context),
+                    onPressed: () async => _loginButtonPressed(context),
                     child: const Text(_Constants.loginButtonText),
                   ),
                 ),
@@ -87,16 +87,16 @@ final class _LoginPageState extends State<LoginPage> {
     passwordTextController = TextEditingController();
   }
 
-  void _loginButtonPressed(BuildContext context) {
+  Future<void> _loginButtonPressed(BuildContext context) async {
     if (_validateCredentials()) {
-      _navigateToHomeScreen(context);
+      await _navigateToHomeScreen(context);
     } else {
       _showError(context);
     }
   }
 
-  void _navigateToHomeScreen(BuildContext context) {
-    Navigator.push(
+  Future<void> _navigateToHomeScreen(BuildContext context) async {
+    await Navigator.push(
       context,
       MaterialPageRoute<HomeScreen>(
         builder: (context) => const HomeScreen(),
