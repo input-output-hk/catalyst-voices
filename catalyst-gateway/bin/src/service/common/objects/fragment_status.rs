@@ -6,12 +6,12 @@ use crate::service::common::objects::{block::BlockDate, hash::Hash};
 
 #[derive(Object)]
 #[oai(example = false)]
-/// Fragment is pending.
+/// DEPRECATED: Fragment is pending.
 pub(crate) struct StatusPending;
 
 #[derive(Object)]
 #[oai(example = true)]
-/// Fragment was rejected.
+/// DEPRECATED: Fragment was rejected.
 pub(crate) struct StatusRejected {
     /// Reason the fragment was rejected.
     pub reason: String,
@@ -27,7 +27,7 @@ impl Example for StatusRejected {
 
 #[derive(Object)]
 #[oai(example = true)]
-/// Fragment is included in a block.
+/// DEPRECATED: Fragment is included in a block.
 pub(crate) struct StatusInABlock {
     /// Block date at which the fragment was included in a block.
     pub date: BlockDate,
@@ -46,7 +46,7 @@ impl Example for StatusInABlock {
 
 #[derive(Union)]
 #[oai(one_of = true)]
-/// Possible fragment statuses.
+/// DEPRECATED: Possible fragment statuses.
 pub(crate) enum FragmentStatus {
     /// Fragment is pending inclusion in a block.
     Pending(StatusPending),
