@@ -4,6 +4,8 @@ This package contains the localization files for the Catalyst Voices app.
 
 * [Catalyst Voices Localization](#catalyst-voices-localization)
   * [Working with Translations](#working-with-translations)
+  * [Creating New Locale Messages](#creating-new-locale-messages)
+  * [Generating VoicesLocalizations](#generating-voiceslocalizations)
     * [Adding Strings](#adding-strings)
     * [Adding Supported Locales](#adding-supported-locales)
     * [Adding Translations](#adding-translations)
@@ -11,7 +13,30 @@ This package contains the localization files for the Catalyst Voices app.
 ## Working with Translations
 
 This project relies on [flutter_localizations](https://github.com/flutter/flutter/tree/master/packages/flutter_localizations).
-It follows the [official internationalization guide for Flutter][flutter-intl-guide].
+It follows the
+[official internationalization guide for Flutter](https://docs.flutter.dev/development/accessibility-and-localization/internationalization).
+
+## Creating New Locale Messages
+
+To add new strings for localization, modify `intl_en.arb`,
+which this project uses as its template.
+
+New entries must adhere to the format below:
+
+```arb
+  "dartGetterVariableName": "english translation of the message",
+  "@dartGetterVariableName": {
+    "description": "description for use by the localizations delegate."
+  },
+```
+
+Here, `dartGetterVariableName` represents the Dart method/property name utilized in your localizations delegate.
+
+Once you've updated `intl_en.arb` with the new message, regenerate the `VoicesLocalizations` delegate to enable
+immediate use of the English message in your application code through the localizations delegate,
+bypassing the need to wait for translation completion.
+
+## Generating VoicesLocalizations
 
 ### Adding Strings
 
@@ -113,6 +138,3 @@ Update the `CFBundleLocalizations` array in the `Info.plist` at `ios/Runner/Info
 ```shell
 flutter gen-l10n
 ```
-
-
-[flutter-intl-guide]: https://docs.flutter.dev/development/accessibility-and-localization/internationalization
