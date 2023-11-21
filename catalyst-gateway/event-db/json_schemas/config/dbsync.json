@@ -1,10 +1,12 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
+    "$comment": "Custom URI schema: catalyst_schema://<uuid>/<group>/<name>",
+    "$id": "catalyst_schema://d899cd44-3513-487b-ab46-fdca662a724d/config/dbsync",
     "title": "DBSync Connection",
     "type": "object",
     "properties": {
-        // Optional SSH tunnel needed to communicate to the DBSync Postgres database.
         "ssh": {
+            "$comment": "Optional SSH tunnel needed to communicate to the DBSync Postgres database.",
             "type": "object",
             "properties": {
                 "sshHost": {
@@ -41,8 +43,8 @@
                 "sshUser"
             ]
         },
-        // DBSync connection
         "conn": {
+            "$comment": "DBSync connection",
             "type": "object",
             "properties": {
                 "host": {
@@ -83,7 +85,7 @@
                     ],
                     "description": "The Cardano network to connect to.",
                     "default": "mainnet"
-                },
+                }
             },
             "required": [
                 "password"

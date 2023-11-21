@@ -24,9 +24,9 @@ CREATE TABLE json_schema_type_names (
     id TEXT PRIMARY KEY
 );
 
-COMMENT ON TABLE json_schema_type_names IS 'All known Json Schema Types.';
+COMMENT ON TABLE json_schema_type_names IS 'All known Json Schema Type Names.';
 
--- Known Schema Types are inserted when the Table which uses that type is created.
+-- Known Schema Type Names are inserted when the Table which uses that type is created.
 
 
 -- -------------------------------------------------------------------------------------------------
@@ -35,7 +35,7 @@ COMMENT ON TABLE json_schema_type_names IS 'All known Json Schema Types.';
 -- Json Schemas used to validate the contents of JSONB fields in this database.
 -- Catalyst Event Database
 CREATE TABLE json_schema_type (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID PRIMARY KEY,
     type TEXT NOT NULL,
     name TEXT NOT NULL,
     schema JSONB NOT NULL,
@@ -50,13 +50,20 @@ COMMENT ON TABLE json_schema_type IS
 'Library of defined json schemas used to validate JSONB field contents.';
 
 COMMENT ON COLUMN json_schema_type.id IS
-'Synthetic Unique ID for each json_schema_type (UUIDv4).';
+'Synthetic Unique ID for each json_schema_type (UUIDv4).
+Must match $id URI inside the schema.';
 COMMENT ON COLUMN json_schema_type.type IS
 'The type of the json schema type.
-eg. "Event Description"';
+eg. "event"
+Must match $id URI inside the schema.';
 COMMENT ON COLUMN json_schema_type.name IS
 'The name of the json schema type.
-eg. "Catalyst V1"';
+eg. "catalyst_v1"
+Must match $id URI inside the schema.';
+
+-- Known Schema Types are inserted when the Table which uses that type is created.
+-- Or can be added by migrations as the database evolves.
+-- They could also be added outside of the schema setup by inserting directly into the database.
 
 -- -------------------------------------------------------------------------------------------------
 
@@ -113,8 +120,8 @@ VALUES
 INSERT INTO json_schema_type (id, type, name, schema)
 VALUES
 (
-    'd899cd44-3513-487b-ab46-fdca662a724d',
+    'd899cd44-3513-487b-ab46-fdca662a724d', -- Fix the Schema ID so that it is consistent.
     'config',
     'dbsync',
-    (SELECT jsonb FROM pg_read_file('../json_schemas/config/dbsync_connection.json'))
+    (SELECT jsonb FROM pg_read_file('../json_schemas/config/dbsync.json'))
 );

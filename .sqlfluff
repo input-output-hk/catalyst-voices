@@ -1,5 +1,7 @@
 [sqlfluff]
 
+# cspell: words templater cpus ctes capitalisation organisation
+
 # Supported dialects https://docs.sqlfluff.com/en/stable/dialects.html
 # Or run 'sqlfluff dialects'
 # We do not set a global SQL Dialect, so that we can support multiple
