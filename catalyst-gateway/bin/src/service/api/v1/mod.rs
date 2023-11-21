@@ -42,7 +42,8 @@ impl V1Api {
         path = "/fragments",
         method = "post",
         operation_id = "fragments",
-        tag = "ApiTags::Fragments"
+        tag = "ApiTags::Fragments",
+        deprecated = true
     )]
     async fn fragments_post(
         &self,
@@ -59,7 +60,8 @@ impl V1Api {
         path = "/fragments/statuses",
         method = "get",
         operation_id = "fragmentsStatuses",
-        tag = "ApiTags::Fragments"
+        tag = "ApiTags::Fragments",
+        deprecated = true
     )]
     async fn fragments_statuses(
         &self,
