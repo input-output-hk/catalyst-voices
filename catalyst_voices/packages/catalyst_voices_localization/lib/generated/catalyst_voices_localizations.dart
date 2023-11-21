@@ -92,11 +92,35 @@ abstract class VoicesLocalizations {
     Locale('es')
   ];
 
-  /// Text shown in the AppBar of the Counter Page
+  /// Text shown in the login screen for the username field
   ///
   /// In en, this message translates to:
-  /// **'Counter'**
-  String get counterAppBarTitle;
+  /// **'Username'**
+  String get loginScreenUsernameLabelText;
+
+  /// Text shown in the login screen for the password field
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get loginScreenPasswordLabelText;
+
+  /// Text shown in the login screen when the user enters wrong credentials
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong credentials'**
+  String get loginScreenErrorMessage;
+
+  /// Text shown in the login screen for the login button
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get loginScreenLoginButtonText;
+
+  /// Text shown in the home screen
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst Voices'**
+  String get homeScreenText;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

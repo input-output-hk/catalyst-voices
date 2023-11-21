@@ -8,15 +8,15 @@ final class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       restorationScopeId: 'rootVoices',
-      localizationsDelegates: [
+      localizationsDelegates: const [
         ...VoicesLocalizations.localizationsDelegates,
         LocaleNamesLocalizationsDelegate(),
       ],
       supportedLocales: VoicesLocalizations.supportedLocales,
       localeListResolutionCallback: basicLocaleListResolution,
-      home: LoginPage(),
+      home: isUserLoggedIn ? const HomeScreen() : const LoginPage(),
     );
   }
 }

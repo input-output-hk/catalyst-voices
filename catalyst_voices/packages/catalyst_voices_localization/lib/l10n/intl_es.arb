@@ -1,7 +1,8 @@
 {
-    "@@locale": "es",
-    "counterAppBarTitle": "Contador",
-    "@counterAppBarTitle": {
-        "description": "Texto mostrado en la AppBar de la página del contador"
-    }
+  "@@locale": "es",
+  "loginScreenUsernameLabelText": "Nombre de usuario",
+  "loginScreenPasswordLabelText": "Contraseña",
+  "loginScreenErrorMessage": "Credenciales incorrectas",
+  "loginScreenLoginButtonText": "Acceso",
+  "homeScreenLoginButtonText": "Catalyst Voices - Inicio 🇪🇸"
 }

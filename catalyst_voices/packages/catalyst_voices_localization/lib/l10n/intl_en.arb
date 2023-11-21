@@ -1,7 +1,23 @@
 {
-    "@@locale": "en",
-    "counterAppBarTitle": "Counter",
-    "@counterAppBarTitle": {
-        "description": "Text shown in the AppBar of the Counter Page"
-    }
+  "@@locale": "en",
+  "loginScreenUsernameLabelText": "Username",
+  "@loginScreenUsernameLabelText": {
+    "description": "Text shown in the login screen for the username field"
+  },
+  "loginScreenPasswordLabelText": "Password",
+  "@loginScreenPasswordLabelText": {
+    "description": "Text shown in the login screen for the password field"
+  },
+  "loginScreenErrorMessage": "Wrong credentials",
+  "@loginScreenErrorMessage": {
+    "description": "Text shown in the login screen when the user enters wrong credentials"
+  },
+  "loginScreenLoginButtonText": "Login",
+  "@loginScreenLoginButtonText": {
+    "description": "Text shown in the login screen for the login button"
+  },
+  "homeScreenText": "Catalyst Voices",
+  "@homeScreenText": {
+    "description": "Text shown in the home screen"
+  }
 }

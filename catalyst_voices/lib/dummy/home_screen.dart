@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/dummy/dummy.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 final class HomeScreen extends StatelessWidget {
@@ -13,9 +14,9 @@ final class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'Catalyst Voices',
-              style: TextStyle(
+            Text(
+              context.l.homeScreenText,
+              style: const TextStyle(
                 color: VoicesColors.purpleGradientStart,
                 fontFamily: VoicesFonts.sFPro,
                 fontSize: 32,
