@@ -56,4 +56,5 @@ INSERT INTO config (id, id2, id3, value) VALUES (
   'ideascale_params',
   '0',
   '{"params_id": "TestFund"}'
-);
+) ON CONFLICT (id, id2, id3) DO UPDATE
+SET value = EXCLUDED.value;
