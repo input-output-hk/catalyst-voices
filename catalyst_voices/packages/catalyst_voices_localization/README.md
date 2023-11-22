@@ -96,7 +96,8 @@ bypassing the need to wait for translation completion.
 
 `app_es.arb`
 
-<!-- cspell: words Contador Texto mostrado página -->
+<!-- cspell: words Nombre de usuario  Contraseña -->
+
 ```arb
 {
   "@@locale": "es",
