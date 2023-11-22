@@ -13,8 +13,9 @@ This package contains the localization files for the Catalyst Voices app.
 ## Working with Translations
 
 This project relies on [flutter_localizations](https://github.com/flutter/flutter/tree/master/packages/flutter_localizations).
-It follows the
-[official internationalization guide for Flutter](https://docs.flutter.dev/development/accessibility-and-localization/internationalization).
+It follows the official
+[internationalization](https://docs.flutter.dev/development/accessibility-and-localization/internationalization)
+guide for Flutter.
 
 ## Creating New Locale Messages
 
