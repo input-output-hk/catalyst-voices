@@ -5,10 +5,10 @@ This package contains the localization files for the Catalyst Voices app.
 * [Catalyst Voices Localization](#catalyst-voices-localization)
   * [Working with Translations](#working-with-translations)
   * [Creating New Locale Messages](#creating-new-locale-messages)
-  * [Generating VoicesLocalizations](#generating-voiceslocalizations)
     * [Adding Strings](#adding-strings)
-    * [Adding Supported Locales](#adding-supported-locales)
     * [Adding Translations](#adding-translations)
+    * [Adding Supported Locales](#adding-supported-locales)
+  * [Generating VoicesLocalizations](#generating-voiceslocalizations)
 
 ## Working with Translations
 
@@ -36,105 +36,106 @@ Once you've updated `intl_en.arb` with the new message, regenerate the `VoicesLo
 immediate use of the English message in your application code through the localizations delegate,
 bypassing the need to wait for translation completion.
 
-## Generating VoicesLocalizations
-
 ### Adding Strings
 
-1. To add a new localizable string, open the `app_en.arb` file at `lib/l10n/arb/app_en.arb`.
+* To add a new localizable string, open the `intl_en.arb` file at `lib/l10n/`.
 
 ```arb
 {
-    "@@locale": "en",
-    "counterAppBarTitle": "Counter",
-    "@counterAppBarTitle": {
-        "description": "Text shown in the AppBar of the Counter Page"
-    }
+  "@@locale": "en",
+  "loginScreenUsernameLabelText": "Username",
+  "@loginScreenUsernameLabelText": {
+    "description": "Text shown in the login screen for the username field"
+  }
 }
 ```
 
-2. Then add a new key/value and description
+* Then add a new key/value and description
 
 ```arb
 {
-    "@@locale": "en",
-    "counterAppBarTitle": "Counter",
-    "@counterAppBarTitle": {
-        "description": "Text shown in the AppBar of the Counter Page"
-    },
-    "helloWorld": "Hello World",
-    "@helloWorld": {
-        "description": "Hello World Text"
-    }
+  "@@locale": "en",
+  "loginScreenUsernameLabelText": "Username",
+  "@loginScreenUsernameLabelText": {
+    "description": "Text shown in the login screen for the username field"
+  },
+  "loginScreenPasswordLabelText": "Password",
+  "@loginScreenPasswordLabelText": {
+    "description": "Text shown in the login screen for the password field"
+  }
 }
 ```
 
-3. Use the new string
+### Adding Translations
 
-```dart
-import 'package:catalyst_voices/l10n/l10n.dart';
+* For each supported locale, add a new ARB file in `lib/l10n/`.
 
-@override
-Widget build(BuildContext context) {
-  final l10n = context.l10n;
-  return Text(l10n.helloWorld);
+```tree
+├── l10n
+│   ├── intl_en.arb
+│   ├── intl_es.arb
+```
+
+* Add the translated strings to each `.arb` file:
+
+`intl_en.arb`
+
+```arb
+{
+  "@@locale": "en",
+  "loginScreenUsernameLabelText": "Username",
+  "@loginScreenUsernameLabelText": {
+    "description": "Text shown in the login screen for the username field"
+  },
+  "loginScreenPasswordLabelText": "Password",
+  "@loginScreenPasswordLabelText": {
+    "description": "Text shown in the login screen for the password field"
+  }
+}
+```
+
+`app_es.arb`
+
+<!-- cspell: words Contador Texto mostrado página -->
+```arb
+{
+  "@@locale": "es",
+  "loginScreenUsernameLabelText": "Nombre de usuario",
+  "loginScreenPasswordLabelText": "Contraseña",
 }
 ```
 
 ### Adding Supported Locales
 
-Update the `CFBundleLocalizations` array in the `Info.plist` at `ios/Runner/Info.plist` to include the new locale.
+Update the `CFBundleLocalizations` array in the `Info.plist` at
+`ios/Runner/Info.plist` to include the new locale.
 
 ```xml
     ...
-
     <key>CFBundleLocalizations</key>
     <array>
         <string>en</string>
         <string>es</string>
     </array>
-
     ...
 ```
 
-### Adding Translations
+## Generating VoicesLocalizations
 
-1. For each supported locale, add a new ARB file in `lib/l10n/arb`.
+* Run the following command in `catalyst_voices_localization` package to
+generate the `VoicesLocalizations` class:
 
-```tree
-├── l10n
-│   ├── arb
-│   │   ├── app_en.arb
-│   │   └── app_es.arb
-```
-
-2. Add the translated strings to each `.arb` file:
-
-`app_en.arb`
-
-```arb
-{
-    "@@locale": "en",
-    "counterAppBarTitle": "Counter",
-    "@counterAppBarTitle": {
-        "description": "Text shown in the AppBar of the Counter Page"
-    }
-}
-```
-
-<!-- cspell: words Contador Texto mostrado página -->
-
-`app_es.arb`
-
-```arb
-{
-    "@@locale": "es",
-    "counterAppBarTitle": "Contador",
-    "@counterAppBarTitle": {
-        "description": "Texto mostrado en la AppBar de la página del contador"
-    }
-}
-```
-
-```shell
+```sh
 flutter gen-l10n
+```
+
+* Use the new string
+
+```dart
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+
+@override
+Widget build(BuildContext context) {
+  return Text(context.l10n.loginScreenPasswordLabelText);
+}
 ```

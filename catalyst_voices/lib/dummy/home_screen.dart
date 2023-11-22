@@ -15,7 +15,7 @@ final class HomeScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              context.l.homeScreenText,
+              context.l10n.homeScreenText,
               style: const TextStyle(
                 color: VoicesColors.purpleGradientStart,
                 fontFamily: VoicesFonts.sFPro,

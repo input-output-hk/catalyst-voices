@@ -20,6 +20,7 @@ final class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Scaffold(
       key: WidgetKeys.loginScreen,
       body: Center(
@@ -38,7 +39,7 @@ final class _LoginPageState extends State<LoginPage> {
                     controller: usernameTextController,
                     decoration: InputDecoration(
                       border: const OutlineInputBorder(),
-                      labelText: context.l.loginScreenUsernameLabelText,
+                      labelText: l10n.loginScreenUsernameLabelText,
                     ),
                   ),
                 ),
@@ -50,7 +51,7 @@ final class _LoginPageState extends State<LoginPage> {
                     obscureText: true,
                     decoration: InputDecoration(
                       border: const OutlineInputBorder(),
-                      labelText: context.l.loginScreenPasswordLabelText,
+                      labelText: l10n.loginScreenPasswordLabelText,
                     ),
                   ),
                 ),
@@ -59,7 +60,7 @@ final class _LoginPageState extends State<LoginPage> {
                   child: ElevatedButton(
                     key: WidgetKeys.loginButton,
                     onPressed: () async => _loginButtonPressed(context),
-                    child: Text(context.l.loginScreenLoginButtonText),
+                    child: Text(l10n.loginScreenLoginButtonText),
                   ),
                 ),
               ],
@@ -105,7 +106,7 @@ final class _LoginPageState extends State<LoginPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         key: WidgetKeys.loginErrorSnackbar,
-        content: Text(context.l.loginScreenErrorMessage),
+        content: Text(context.l10n.loginScreenErrorMessage),
       ),
     );
   }

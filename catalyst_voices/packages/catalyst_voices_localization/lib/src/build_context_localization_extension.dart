@@ -2,5 +2,5 @@ import 'package:catalyst_voices_localization/generated/catalyst_voices_localizat
 import 'package:flutter/widgets.dart';
 
 extension BuildContextLocalizationExtension on BuildContext {
-  VoicesLocalizations get l => VoicesLocalizations.of(this)!;
+  VoicesLocalizations get l10n => VoicesLocalizations.of(this)!;
 }
