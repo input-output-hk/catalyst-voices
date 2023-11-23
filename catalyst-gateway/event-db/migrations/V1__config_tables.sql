@@ -1,4 +1,4 @@
--- Catalyst Event Database
+-- Catalyst Voices Database - Configuration Data
 -- sqlfluff:dialect:postgres
 
 -- Configuration Tables
@@ -17,30 +17,29 @@ COMMENT ON TABLE refinery_schema_history IS
 'History of Schema Updates to the Database.
 Managed by the `refinery` cli tool.';
 
--- -------------------------------------------------------------------------------------------------
-
--- All known Json Schema Types
-CREATE TABLE json_schema_type_names (
-    id TEXT PRIMARY KEY
-);
-
-COMMENT ON TABLE json_schema_type_names IS 'All known Json Schema Type Names.';
-
--- Known Schema Type Names are inserted when the Table which uses that type is created.
-
 
 -- -------------------------------------------------------------------------------------------------
 
 -- Json Schema Library
 -- Json Schemas used to validate the contents of JSONB fields in this database.
+-- * `id,type,name` matches the $id URI in the schema itself.
+-- * The URI format is customized and is of the form `catalyst_schema://<id>/<type>/<name>`
+-- * Schemas will be added here automatically during migration of the database, or interactively
+-- * during operation of the system.
+-- * They should match the schema they hold, and on read they should be validated.
+-- * The code should refuse to serve or use any schema that does not match.
+-- *
+-- * id - This is unique and can uniquely identify any schema.
+-- * type - This allows us to find all schemas of a known type.
+-- * name - This is the unique name of the schema. `id` always equals the same `type/name`.
+-- * for convention `type` and `name` string should only used a-z,0-9 and underscore. 
+-- * Dashes, symbols or upper case should not be used.
 -- Catalyst Event Database
 CREATE TABLE json_schema_type (
     id UUID PRIMARY KEY,
     type TEXT NOT NULL,
     name TEXT NOT NULL,
-    schema JSONB NOT NULL,
-
-    FOREIGN KEY ("type") REFERENCES json_schema_type_names (id) ON DELETE CASCADE
+    schema JSONB NOT NULL
 );
 
 CREATE INDEX json_schema_type_idx ON json_schema_type ("type");
@@ -51,15 +50,15 @@ COMMENT ON TABLE json_schema_type IS
 
 COMMENT ON COLUMN json_schema_type.id IS
 'Synthetic Unique ID for each json_schema_type (UUIDv4).
-Must match $id URI inside the schema.';
+Must match the `UUID` component of the $id URI inside the schema.';
 COMMENT ON COLUMN json_schema_type.type IS
 'The type of the json schema type.
 eg. "event"
-Must match $id URI inside the schema.';
+Must match the `type` component of the $id URI inside the schema.';
 COMMENT ON COLUMN json_schema_type.name IS
 'The name of the json schema type.
 eg. "catalyst_v1"
-Must match $id URI inside the schema.';
+Must match the `name` component of the $id URI inside the schema.';
 
 -- Known Schema Types are inserted when the Table which uses that type is created.
 -- Or can be added by migrations as the database evolves.
@@ -111,10 +110,12 @@ COMMENT ON INDEX config_idx IS
 'We use three keys combined uniquely rather than forcing string concatenation 
 at the app level to allow for querying groups of data.';
 
--- Add Config Schemas to the known schema types.
-INSERT INTO json_schema_type_names (id)
-VALUES
-('config');-- Configuration Data Schemas
+
+-- -------------------------------------------------------------------------------------------------
+
+-- * Temporary.  
+-- * Insert known json schema manually until automated json schema migration scripting is added.
+-- * This will be removed in the future.
 
 -- Add the Initial Schemas for configuration.
 INSERT INTO json_schema_type (id, type, name, schema)
