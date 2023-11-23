@@ -11,12 +11,12 @@ dependencies:
   bloc: ^8.1.2
   catalyst_voices_assets:
     path: ./packages/catalyst_voices_assets
+  catalyst_voices_localization:
+    path: ./packages/catalyst_voices_localization
   flutter:
     sdk: flutter
   flutter_bloc: ^8.1.3
-  flutter_localizations:
-    sdk: flutter
-  intl: ^0.18.1
+  flutter_localized_locales: ^2.0.5
 
 dev_dependencies:
   bloc_test: ^9.1.4

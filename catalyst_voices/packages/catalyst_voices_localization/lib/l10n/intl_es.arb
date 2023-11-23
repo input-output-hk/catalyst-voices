@@ -1,0 +1,8 @@
+{
+  "@@locale": "es",
+  "loginScreenUsernameLabelText": "Nombre de usuario",
+  "loginScreenPasswordLabelText": "Contraseña",
+  "loginScreenErrorMessage": "Credenciales incorrectas",
+  "loginScreenLoginButtonText": "Acceso",
+  "homeScreenLoginButtonText": "Catalyst Voices - Inicio 🇪🇸"
+}

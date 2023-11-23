@@ -1,0 +1,9 @@
+arb-dir: lib/l10n
+output-dir: lib/generated/
+template-arb-file: intl_en.arb
+output-localization-file: catalyst_voices_localizations.dart
+output-class: VoicesLocalizations
+preferred-supported-locales:
+  - en
+use-deferred-loading: true
+synthetic-package: false
