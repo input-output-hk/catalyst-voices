@@ -1,0 +1,45 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$comment": "Custom URI schema: catalyst_schema://<uuid>/<group>/<name>",
+    "$id": "catalyst_schema://0f917b13-afac-40d2-8263-b17ca8219914/registration/update_stats",
+    "title": "Registration Update Statistics",
+    "description": "Statistical data associated with the registration update.",
+    "type": "object",
+    "properties": {
+        "registrations_lost": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The number of registrations that were lost during the update due to a rollback."
+        },
+        "cip15_added": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The number of CIP-15 registrations that were added during the update."
+        },
+        "cip36_added": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The number of CIP-36 registrations that were added during the update."
+        },
+        "total_valid_registrations": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The total number of registrations in the system as at this update."
+        },
+        "total_unregistered_stake_addresses": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The total number of stake_addresses not currently registered during this update."
+        },
+        "total_staked_lovelace": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The total of all staked lovelace in the system as at this update.  This includes the total number of stake_addresses not currently registered during this update."
+        },
+        "total_registered_lovelace": {
+            "type": "integer",
+            "format": "int64",
+            "description": "The total of all registered staked lovelace in the system as at this update."
+        }
+    }
+}

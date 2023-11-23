@@ -124,5 +124,10 @@ VALUES
     'd899cd44-3513-487b-ab46-fdca662a724d', -- Fix the Schema ID so that it is consistent.
     'config',
     'dbsync',
-    (SELECT jsonb FROM pg_read_file('../json_schemas/config/dbsync.json'))
+    (SELECT jsonb FROM pg_read_file('../json_schemas/config/dbsync.json')),
+    '62d614c0-97a7-41ec-a976-91294b8f4384', -- Fix the Schema ID so that it is consistent.
+    'config',
+    'registration',
+    (SELECT jsonb FROM pg_read_file('../json_schemas/config/registration.json'))
+
 );

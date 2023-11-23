@@ -154,9 +154,9 @@
                     "contentMediaType": "application/octet-stream"
                 },
                 "block0_hash": {
-                    "description": "The BASE64 encoded hash of Block 0 used to start the Blockchain.\nIf not defined then the Blockchain is not yet configured.",
+                    "description": "The BASE16 encoded hash of Block 0 used to start the Blockchain.\nIf not defined then the Blockchain is not yet configured.",
                     "type": "string",
-                    "contentEncoding": "base64",
+                    "contentEncoding": "base16",
                     "contentMediaType": "application/octet-stream"
                 }
             }

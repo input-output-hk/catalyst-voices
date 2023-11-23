@@ -11,7 +11,8 @@
                 "sshuser",
                 "cexplorer",
                 "Cardano",
-                "jormungandr"
+                "jormungandr",
+                "dbsync"
             ]
         }
     ]
