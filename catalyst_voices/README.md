@@ -2,10 +2,14 @@
 
 <!-- markdownlint-disable MD029 -->
 
+This repository contains the Catalyst Voices app and packages.
+
 * [Catalyst Voices](#catalyst-voices)
   * [Requirements](#requirements)
   * [Getting Started](#getting-started)
     * [Bootstrapping](#bootstrapping)
+    * [Packages](#packages)
+    * [Flavors](#flavors)
   * [Running Tests](#running-tests)
 
 ## Requirements
@@ -36,6 +40,20 @@ git clone https://github.com/input-output-hk/catalyst-voices.git
 cd catalyst_voices
 melos bootstrap
 ```
+
+### Packages
+
+| Package                           | Description              | Example   |
+|-----------------------------------|--------------------------|-----------|
+| [catalyst_voices_assets]()        | Assets used in Catalyst Voices |[example]()|
+| [catalyst_voices_blocs]()         | State management of Catalyst Voices |[example]()|
+| [catalyst_voices_localization]()  | Localization files for Catalyst Voices |[example]()|
+| [catalyst_voices_models]()        | Models |[example]()|
+| [catalyst_voices_repositories]()  | Repositories |[example]()|
+| [catalyst_voices_services]()      | Services |[example]()|
+| [catalyst_voices_view_models]()   | ViewModels  |[example]()|
+
+### Flavors
 
 This project contains 3 flavors:
 
