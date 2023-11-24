@@ -1,0 +1,226 @@
+sqlfluff lint - vv catalyst - gateway / event - db / migrations / V8__catalyst_automation.sql
+    ==== sqlfluff ====
+sqlfluff: 2.3.2 python: 3.11.5
+implementation:        cpython verbosity: 2
+dialect:              postgres templater: raw
+rules: all
+    == Raw Config:
+core:
+dialect: postgres
+disable_noqa: False
+encoding: autodetect
+fix_even_unparsable: False
+ignore: []
+ignore_templated_areas: True
+large_file_skip_byte_limit: 20000
+large_file_skip_char_limit: 0
+max_line_length: 120
+nocolor: False
+output_line_length: 80
+processes: 0
+rules: all
+runaway_limit: 10
+sql_file_exts:      .sql,.sql.j2,.dml,.ddl
+templater: raw
+verbose: 2
+warn_unused_ignores: False
+warnings: []
+indentation:
+allow_implicit_indents: False
+indent_unit: space
+indented_ctes: True
+indented_joins: True
+indented_on_contents: True
+indented_then: True
+indented_then_contents: True
+indented_using_on: True
+skip_indentation_in: script_content
+tab_space_size: 4
+template_blocks_indent: True
+trailing_comments: before
+layout:
+type:
+array_accessor:
+spacing_before: touch: inline
+array_type:
+spacing_within: touch: inline
+assignment_operator:
+line_position: leading
+spacing_within: touch
+binary_operator:
+line_position: leading
+spacing_within: touch
+bracketed_arguments:
+spacing_before: touch: inline
+casting_operator:
+spacing_after: touch: inline
+spacing_before: touch
+colon:
+spacing_before: touch
+comma:
+line_position: trailing
+spacing_before: touch
+comment:
+spacing_after: any
+spacing_before: any
+common_table_expression:
+spacing_within: single: inline
+comparison_operator:
+line_position: leading
+spacing_within: touch
+end_angle_bracket:
+spacing_before: touch
+end_bracket:
+spacing_before: touch
+end_of_file:
+spacing_before: touch
+end_square_bracket:
+spacing_before: touch
+from_clause:
+line_position: alone
+function_name:
+spacing_after: touch: inline
+spacing_within: touch: inline
+groupby_clause:
+line_position: alone
+having_clause:
+line_position: alone
+join_clause:
+line_position: alone
+limit_clause:
+line_position: alone
+numeric_literal:
+spacing_within: touch: inline
+object_reference:
+spacing_within: touch: inline
+orderby_clause:
+line_position: leading
+placeholder:
+spacing_after: any
+spacing_before: any
+select_clause:
+line_position: alone
+semi_structured_expression:
+spacing_before: touch: inline
+spacing_within: touch: inline
+set_operator:
+line_position: alone: strict
+sign_indicator:
+spacing_after: touch: inline
+sized_array_type:
+spacing_within: touch
+slice:
+spacing_after: touch
+spacing_before: touch
+start_angle_bracket:
+spacing_after: touch
+start_bracket:
+spacing_after: touch
+start_square_bracket:
+spacing_after: touch
+statement_terminator:
+line_position: trailing
+spacing_before: touch
+struct_type:
+spacing_within: touch: inline
+template_loop:
+spacing_after: any
+spacing_before: any
+tilde:
+spacing_after: touch: inline
+typed_array_literal:
+spacing_within: touch
+typed_struct_literal:
+spacing_within: touch
+where_clause:
+line_position: alone
+rules:
+allow_scalar: True
+single_table_references: consistent
+unquoted_identifiers_policy: all
+aliasing.column:
+aliasing: explicit
+aliasing.forbid:
+force_enable: False
+aliasing.length:
+min_alias_length: 3
+aliasing.table:
+aliasing: explicit
+ambiguous.column_references:
+group_by_and_order_by_style: consistent
+ambiguous.join:
+fully_qualify_join_types: inner
+capitalisation.functions:
+extended_capitalisation_policy: lower
+capitalisation.identifiers:
+capitalisation_policy: lower
+extended_capitalisation_policy: consistent
+capitalisation.keywords:
+capitalisation_policy: upper
+capitalisation.literals:
+capitalisation_policy: lower
+capitalisation.types:
+extended_capitalisation_policy: upper
+convention.blocked_words:
+match_source: False
+convention.casting_style:
+preferred_type_casting_style: consistent
+convention.count_rows:
+prefer_count_0: False
+prefer_count_1: False
+convention.quoted_literals:
+force_enable: False
+preferred_quoted_literal_style: consistent
+convention.select_trailing_comma:
+select_clause_trailing_comma: forbid
+convention.terminator:
+multiline_newline: False
+require_final_semicolon: False
+layout.long_lines:
+ignore_comment_clauses: False
+ignore_comment_lines: False
+layout.select_targets:
+wildcard_policy: single
+references.consistent:
+force_enable: False
+references.from:
+force_enable: False
+references.keywords:
+unquoted_identifiers_policy: aliases
+references.qualification:
+references.quoting:
+force_enable: False
+prefer_quoted_identifiers: False
+prefer_quoted_keywords: False
+references.special_chars:
+allow_space_in_identifier: False
+quoted_identifiers_policy: all
+unquoted_identifiers_policy: all
+structure.join_condition_order:
+preferred_first_table_in_join_clause: earlier
+structure.subquery:
+forbid_subquery_in: join
+templater:
+unwrap_wrapped_queries: True
+dbt:
+project_dir: /home/steven / Development / iohk / catalyst - voices /./
+    jinja:
+apply_dbt_builtins: True
+
+    ==== readout ====
+
+== LINTING(AL01, AL02, AL03, AL04, AL05, AL06, AL07, AL08, AM01, AM02, AM03, AM04, AM05, AM06, AM07, CP01, CP02, CP03, CP04, CP05, CV01, CV02, CV03, CV04, CV05, CV06, CV07, CV08, CV09, CV10, CV11, JJ01, LT01, LT02, LT03, LT04, LT05, LT06, LT07, LT08, LT09, LT10, LT11, LT12, LT13, RF01, RF02, RF03, RF04, RF05, RF06, ST01, ST02, ST03, ST04, ST05, ST06, ST07, ST08, ST09, TQ01)
+    ==  FAIL
+L: 46 | P: 1 | LT05 | Line is too long(158 > 120).
+                       | [layout.long_lines]
+L: 48 | P: 1 | LT05 | Line is too long(146 > 120).
+                       | [layout.long_lines]
+L: 49 | P: 1 | LT05 | Line is too long(181 > 120).
+                       | [layout.long_lines]
+L: 71 | P: 1 | LT05 | Line is too long(131 > 120).
+                       | [layout.long_lines]
+    ==== summary ====
+files: 1 violations: 4
+clean files: 0 unclean files: 1
+avg per file: 4.00 unclean rate: 100 %
+    status: FAIL

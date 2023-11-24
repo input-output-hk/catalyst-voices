@@ -38,5 +38,6 @@ COMMENT ON TABLE moderation IS 'An individual moderation for a proposal review.'
 COMMENT ON COLUMN moderation.row_id IS 'Synthetic ID of this moderation.';
 COMMENT ON COLUMN moderation.review_id IS 'The review the moderation is related to.';
 COMMENT ON COLUMN moderation.user_id IS 'The user the moderation is submitted from.';
-COMMENT ON COLUMN moderation.classification IS 'The value used to describe the moderation (e.g. 0: excluded, 1: included).';
+COMMENT ON COLUMN moderation.classification IS
+'The value used to describe the moderation (e.g. 0: excluded, 1: included).';
 COMMENT ON COLUMN moderation.rationale IS 'The rationale for the given classification.';

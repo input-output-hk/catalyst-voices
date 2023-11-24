@@ -43,7 +43,9 @@ CREATE TABLE json_schema_type (
 );
 
 CREATE INDEX json_schema_type_idx ON json_schema_type ("type");
-CREATE UNIQUE INDEX json_schema_type_name_idx ON json_schema_type ("type", "name");
+CREATE UNIQUE INDEX json_schema_type_name_idx ON json_schema_type (
+    "type", "name"
+);
 
 COMMENT ON TABLE json_schema_type IS
 'Library of defined json schemas used to validate JSONB field contents.';
@@ -129,5 +131,4 @@ VALUES
     'config',
     'registration',
     (SELECT jsonb FROM pg_read_file('../json_schemas/config/registration.json'))
-
 );

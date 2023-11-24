@@ -31,7 +31,9 @@ COMMENT ON INDEX cardano_update_state_time_idx IS
 'Index to allow us to efficiently get find an update state record by its id.
 This index can be used to find the latest state record for a particular network.';
 
-CREATE INDEX cardano_update_state_time_idx ON cardano_update_state (time, network);
+CREATE INDEX cardano_update_state_time_idx ON cardano_update_state (
+    time, network
+);
 
 COMMENT ON INDEX cardano_update_state_time_idx IS
 'Index to allow us to efficiently get find an update state record by time for a particular network.';
@@ -139,7 +141,9 @@ CREATE TABLE cardano_utxo (
     FOREIGN KEY (slot_no, network) REFERENCES slot_index (slot_no, network)
 );
 
-CREATE INDEX cardano_utxo_stake_credential_idx ON utxo (stake_credential, slot_no);
+CREATE INDEX cardano_utxo_stake_credential_idx ON utxo (
+    stake_credential, slot_no
+);
 COMMENT ON INDEX cardano_utxo_stake_credential_idx IS
 'Index to allow us to efficiently lookup a set of UTXOs by stake credential relative to a slot_no.';
 
@@ -228,7 +232,9 @@ CREATE TABLE cardano_reward (
     FOREIGN KEY (slot_no, network) REFERENCES slot_index (slot_no, network)
 );
 
-CREATE INDEX cardano_rewards_stake_credential_idx ON cardano_rewards (stake_credential, slot_no);
+CREATE INDEX cardano_rewards_stake_credential_idx ON cardano_rewards (
+    stake_credential, slot_no
+);
 
 COMMENT ON INDEX cardano_rewards_stake_credential_idx IS
 'Index to allow us to efficiently lookup a set of Rewards by stake credential relative to a slot_no.';
@@ -333,7 +339,9 @@ COMMENT ON INDEX cardano_voter_registration_voting_key_idx IS
 'Optimize lookups for "public_voting_key" or "public_voting_key"+"nonce" or "public_voting_key"+"nonce"+"valid".';
 
 
-CREATE INDEX cardano_voter_registration_voting_key_idx ON cardano_voter_registration (public_voting_key, nonce, valid);
+CREATE INDEX cardano_voter_registration_voting_key_idx ON cardano_voter_registration (
+    public_voting_key, nonce, valid
+);
 COMMENT ON INDEX cardano_voter_registration_voting_key_idx IS
 'Optimize lookups for "public_voting_key" or "public_voting_key"+"nonce" or "public_voting_key"+"nonce"+"valid".';
 

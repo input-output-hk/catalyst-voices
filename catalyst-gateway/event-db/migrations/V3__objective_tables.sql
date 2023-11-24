@@ -34,7 +34,10 @@ COMMENT ON COLUMN currency.description IS 'A Description of this kind of currenc
 -- Define known currencies
 INSERT INTO currency (name, description)
 VALUES
-('USD_ADA', 'US Dollars, converted to Cardano ADA at time of reward calculation.'),
+(
+    'USD_ADA',
+    'US Dollars, converted to Cardano ADA at time of reward calculation.'
+),
 ('ADA', 'Cardano ADA.'),
 ('CLAP', 'CLAP tokens.'),
 ('COTI', 'COTI tokens.');
@@ -97,8 +100,6 @@ CREATE TABLE objective
     title TEXT NOT NULL,
     description TEXT NOT NULL,
 
-    deleted BOOLEAN NOT NULL DEFAULT false,
-
     rewards_currency TEXT,
     rewards_total BIGINT,
     rewards_total_lovelace BIGINT,
@@ -128,10 +129,12 @@ COMMENT ON COLUMN objective.category IS
 See the objective_category table for allowed values.';
 COMMENT ON COLUMN objective.title IS 'The  title of the objective.';
 COMMENT ON COLUMN objective.description IS 'Long form description of the objective.';
-COMMENT ON COLUMN objective.deleted IS 'Flag which defines was this objective (challenge) deleted from ideascale or not. DEPRECATED: only used for ideascale compatibility.';
+
 COMMENT ON COLUMN objective.rewards_currency IS 'The currency rewards values are represented as.';
-COMMENT ON COLUMN objective.rewards_total IS 'The total reward pool to pay on this objective to winning proposals. In the Objective Currency.';
-COMMENT ON COLUMN objective.rewards_total_lovelace IS 'The total reward pool to pay on this objective to winning proposals. In Lovelace.';
+COMMENT ON COLUMN objective.rewards_total IS
+'The total reward pool to pay on this objective to winning proposals. In the Objective Currency.';
+COMMENT ON COLUMN objective.rewards_total_lovelace IS
+'The total reward pool to pay on this objective to winning proposals. In Lovelace.';
 COMMENT ON COLUMN objective.proposers_rewards IS 'Not sure how this is different from rewards_total???';
 COMMENT ON COLUMN objective.vote_options IS 'The Vote Options applicable to all proposals in this objective.';
 COMMENT ON COLUMN objective.extra IS

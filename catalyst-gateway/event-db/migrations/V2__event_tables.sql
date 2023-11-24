@@ -25,7 +25,9 @@ CREATE TABLE event_type (
     description_schema UUID NOT NULL,
     data_schema UUID NOT NULL,
 
-    FOREIGN KEY (description_schema) REFERENCES json_schema_type (id) ON DELETE CASCADE,
+    FOREIGN KEY (description_schema) REFERENCES json_schema_type (
+        id
+    ) ON DELETE CASCADE,
     FOREIGN KEY (data_schema) REFERENCES json_schema_type (id) ON DELETE CASCADE
 );
 
@@ -60,13 +62,19 @@ VALUES
     'd899cd44-3513-487b-ab46-fdca662a724d', -- From the schema file.
     'event_description',
     'multiline_text',
-    (SELECT jsonb FROM pg_read_file('../json_schemas/event/description/multiline_text.json'))
+    (
+        SELECT jsonb
+        FROM pg_read_file('../json_schemas/event/description/multiline_text.json')
+    )
 ),
 (
     '9c5df318-fa9a-4310-80fa-490f46d1cc43', -- From the schema file.
     'event_data',
     'catalyst_v1',
-    (SELECT jsonb FROM pg_read_file('../json_schemas/event/description/catalyst_v1.json'))
+    (
+        SELECT jsonb
+        FROM pg_read_file('../json_schemas/event/description/catalyst_v1.json')
+    )
 );
 
 -- Define a Catalyst V1 Event.

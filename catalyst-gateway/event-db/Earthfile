@@ -6,18 +6,22 @@ VERSION 0.7
 
 # cspell: words
 
-# Event db builder target. Prepares all necessary artifacts.
+# Internal: builder is our Event db builder target. Prepares all necessary artifacts.
+#   CI target : dependency
 # Arguments:
 #  * with_historic_data: add historic data from the `historic_data` dir (default `true`).
 #  * with_test_data: add test data from the `test_data` dir (default `true`).
+# It does not need to be run directly, and is used by the other targets.
 builder:
-    FROM github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.7+postgres-base
+    FROM github.com/input-output-hk/catalyst-ci/earthly/postgresql:fix/postgres-builders+postgres-base
 
     ARG with_historic_data=true
     ARG with_test_data=true
 
     WORKDIR /build
 
+    COPY .sqlfluffignore .
+    COPY ./../../+repo-config/repo/.sqlfluff .
     COPY refinery.toml .
     COPY --dir migrations .
     RUN mkdir data
@@ -44,38 +48,57 @@ builder:
         RUN mv ./test_data/*.sql ./data
     END
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.7+BUILDER
+    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:fix/postgres-builders+BUILDER
 
+# check if the sqlfiles are properly formatted and pass lint quality checks.
+#   CI target : true
 check:
     FROM +builder
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.7+CHECK
+    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:fix/postgres-builders+CHECK
 
+# Internal: build-sqlfluff is a target to build the necessary `sqlfluff` tool container.
+#   CI target : false
+# This allows us to run sqlfluff commands locally without needing to install it locally.
+# It does not need to be run directly, it is used by the `format` target.
+build-sqlfluff:
+    BUILD github.com/input-output-hk/catalyst-ci/earthly/postgresql:fix/postgres-builders+sqlfluff-image   
+
+# format all SQL files in the current project.  Local developers tool.
+#   CI target : false
 format:
     LOCALLY
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.7+FORMAT --src=$(echo ${PWD})   
+    # This is a trick.  Earthly can NOT build and run a container in the same invocation.
+    # Because this target is running LOCALLY, and we know earthly must be installed, we can
+    # call earthly locally to build and publish the local target we need to run the sqlfluff linter.
+    # By recursively running earthly, we sidestep the limitation which prevents us from building 
+    # a container and running it in the same invocation.
+    RUN earthly +build-sqlfluff
 
-# Build event db docker image.
+    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:fix/postgres-builders+FORMAT --src=$(echo ${PWD}/../../)   
+
+# build an event db docker image.
+#   CI target : true
 # Arguments:
 #  * tag: docker image `tag`.
-#  * registry: docker image `registry`.
 #  * with_historic_data: add historic data from the `historic_data` dir (default `true`).
 #  * with_test_data: add test data from the `test_data` dir (default `true`).
 build:
     ARG with_historic_data=true
     ARG with_test_data=true
     ARG tag="latest"
-    ARG registry
 
     FROM +builder --with_historic_data=$with_historic_data --with_test_data=$with_test_data
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.7+BUILD --tag=$tag --registry=$registry --image_name=event-db
+    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:fix/postgres-builders+BUILD --tag=$tag --image_name=event-db
 
+# test the event db database schema
+#   CI target : true
 test:
-    FROM github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.7+postgres-base
+    FROM github.com/input-output-hk/catalyst-ci/earthly/postgresql:fix/postgres-builders+postgres-base
 
-    COPY github.com/input-output-hk/catalyst-ci/earthly/utils:v2.0.7+shell-assert/assert.sh .
+    COPY github.com/input-output-hk/catalyst-ci/earthly/utils:fix/postgres-builders+shell-assert/assert.sh .
 
     COPY ./docker-compose.yml .
     WITH DOCKER \
@@ -83,7 +106,7 @@ test:
         --load event-db:latest=(+build --with_historic_data=false) \
         --service event-db \
         --allow-privileged
-        RUN sleep 5;\
+        RUN sleep 65;\
             res=$(psql postgresql://catalyst-event-dev:CHANGE_ME@0.0.0.0:5432/CatalystEventDev -c "SELECT COUNT(*) FROM event");\
 
             source assert.sh;\

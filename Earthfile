@@ -31,3 +31,12 @@ repo-docs:
     COPY --dir *.md LICENSE-APACHE LICENSE-MIT .
 
     SAVE ARTIFACT /repo repo
+
+repo-config:
+    # Create artifacts of config file we need to refer to in builders.
+    FROM scratch
+
+    WORKDIR /repo
+    COPY --dir .sqlfluff .
+
+    SAVE ARTIFACT /repo repo
