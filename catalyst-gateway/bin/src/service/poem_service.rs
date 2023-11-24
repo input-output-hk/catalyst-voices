@@ -30,9 +30,7 @@ use crate::{
 };
 
 /// This exists to allow us to add extra routes to the service for testing purposes.
-pub(crate) fn mk_app(
-    hosts: Vec<String>, base_route: Option<Route>, state: &Arc<State>,
-) -> impl Endpoint {
+fn mk_app(hosts: Vec<String>, base_route: Option<Route>, state: &Arc<State>) -> impl Endpoint {
     // Get the base route if defined, or a new route if not.
     let base_route = match base_route {
         Some(route) => route,
@@ -55,6 +53,12 @@ pub(crate) fn mk_app(
         .with(CatchPanic::new().with_handler(ServicePanicHandler))
         .with(Tracing)
         .data(state.clone())
+}
+
+/// Get the API docs as a string in the JSON format.
+pub(crate) fn get_app_docs() -> String {
+    let api_service = mk_api(vec![]);
+    api_service.spec()
 }
 
 /// Run the Poem Service

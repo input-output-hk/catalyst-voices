@@ -1,13 +1,23 @@
 INSERT INTO event
 (
     row_id, name, description, registration_snapshot_time, snapshot_start,
-    voting_power_threshold, max_voting_power_pct, start_time, end_time, insight_sharing_start,
+    voting_power_threshold,
+    max_voting_power_pct,
+    start_time,
+    end_time,
+    insight_sharing_start,
     proposal_submission_start,
     refine_proposals_start,
     finalize_proposals_start,
     proposal_assessment_start,
     assessment_qa_start,
-    voting_start, voting_end, tallying_end, block0, block0_hash, committee_size, committee_threshold
+    voting_start,
+    voting_end,
+    tallying_end,
+    block0,
+    block0_hash,
+    committee_size,
+    committee_threshold
 )
 VALUES
 

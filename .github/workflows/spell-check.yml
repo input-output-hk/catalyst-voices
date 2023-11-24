@@ -11,4 +11,4 @@ on:
 jobs:
   build:
     name: Check spelling across all files
-    uses: input-output-hk/catalyst-ci/.github/workflows/spell-check.yml@master
+    uses: input-output-hk/catalyst-ci/.github/workflows/spell-check.yml@v2.0.6

@@ -1,9 +1,9 @@
 -- Define F10 IdeaScale parameters.
 INSERT INTO config (id, id2, id3, value) VALUES (
-    'ideascale',
-    '10',
-    '',
-    '{
+  'ideascale',
+  '10',
+  '',
+  '{
         "group_id": 31051,
         "review_stage_ids": [143, 145],
         "nr_allocations": [30, 80],
@@ -52,8 +52,9 @@ INSERT INTO config (id, id2, id3, value) VALUES (
 
 -- Use F10 params for event with row_id = 10.
 INSERT INTO config (id, id2, id3, value) VALUES (
-    'event',
-    'ideascale_params',
-    '10',
-    '{"params_id": "F10"}'
-);
+  'event',
+  'ideascale_params',
+  '10',
+  '{"params_id": "F10"}'
+) ON CONFLICT (id, id2, id3) DO UPDATE
+SET value = EXCLUDED.value;

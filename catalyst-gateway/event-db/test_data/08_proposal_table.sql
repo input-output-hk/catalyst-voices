@@ -30,7 +30,11 @@ VALUES (
     'url.xyz',
     'files.xyz',
     555,
-    '{"brief": "Brief explanation of a proposal", "importance": "The importance of the proposal", "goal": "The goal of the proposal is addressed to meet"}',
+    '{
+    "brief": "Brief explanation of a proposal",
+    "importance": "The importance of the proposal",
+    "goal": "The goal of the proposal is addressed to meet"
+   }',
     'alice',
     'alice@io',
     'alice.prop.xyz',
@@ -48,7 +52,11 @@ VALUES (
     'url.xyz',
     'files.xyz',
     555,
-    '{"brief": "Brief explanation of a proposal", "importance": "The importance of the proposal", "goal": "The goal of the proposal is addressed to meet"}',
+    '{
+    "brief": "Brief explanation of a proposal",
+    "importance": "The importance of the proposal",
+    "goal": "The goal of the proposal is addressed to meet"
+   }',
     'bob',
     'bob@io',
     'bob.prop.xyz',
@@ -66,7 +74,11 @@ VALUES (
     'url.xyz',
     'files.xyz',
     555,
-    '{"brief": "Brief explanation of a proposal", "importance": "The importance of the proposal", "goal": "The goal of the proposal is addressed to meet"}',
+    '{
+    "brief": "Brief explanation of a proposal",
+    "importance": "The importance of the proposal",
+    "goal": "The goal of the proposal is addressed to meet"
+   }',
     'bob',
     'bob@io',
     'bob.prop.xyz',
@@ -84,7 +96,11 @@ VALUES (
     'url.xyz',
     'files.xyz',
     555,
-    '{"brief": "Brief explanation of a proposal", "importance": "The importance of the proposal", "goal": "The goal of the proposal is addressed to meet"}',
+    '{
+    "brief": "Brief explanation of a proposal",
+    "importance": "The importance of the proposal",
+    "goal": "The goal of the proposal is addressed to meet"
+   }',
     'alice',
     'alice@io',
     'alice.prop.xyz',
@@ -102,7 +118,11 @@ VALUES (
     'url.xyz',
     'files.xyz',
     555,
-    '{"brief": "Brief explanation of a proposal", "importance": "The importance of the proposal", "goal": "The goal of the proposal is addressed to meet"}',
+    '{
+    "brief": "Brief explanation of a proposal",
+    "importance": "The importance of the proposal",
+    "goal": "The goal of the proposal is addressed to meet"
+   }',
     'bob',
     'bob@io',
     'bob.prop.xyz',
@@ -120,7 +140,11 @@ VALUES (
     'url.xyz',
     'files.xyz',
     555,
-    '{"brief": "Brief explanation of a proposal", "importance": "The importance of the proposal", "goal": "The goal of the proposal is addressed to meet"}',
+    '{
+    "brief": "Brief explanation of a proposal",
+    "importance": "The importance of the proposal",
+    "goal": "The goal of the proposal is addressed to meet"
+   }',
     'bob',
     'bob@io',
     'bob.prop.xyz',

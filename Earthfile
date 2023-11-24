@@ -9,19 +9,19 @@ markdown-check:
     # Check Markdown in this repo.
     LOCALLY
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:v1.3.0+MDLINT_LOCALLY --src=$(echo ${PWD})
+    DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:v2.0.9+MDLINT_LOCALLY --src=$(echo ${PWD})
 
 markdown-check-fix:
     # Check Markdown in this repo.
     LOCALLY
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:v1.3.0+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
+    DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:v2.0.9+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
 
 spell-check:
     # Check spelling in this repo.
     LOCALLY
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/cspell:v1.3.0+CSPELL_LOCALLY --src=$(echo ${PWD})
+    DO github.com/input-output-hk/catalyst-ci/earthly/cspell:v2.0.9+CSPELL_LOCALLY --src=$(echo ${PWD})
  
 repo-docs:
     # Create artifacts of extra files we embed inside the documentation when its built.

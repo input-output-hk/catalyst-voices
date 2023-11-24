@@ -33,14 +33,13 @@ impl From<LogLevel> for tracing::Level {
     }
 }
 
-impl LogLevel {
-    /// Map [`LogLevel`] to [`tracing::Level`]
-    pub(crate) fn as_log_level(self) -> tracing::log::LevelFilter {
-        match self {
-            LogLevel::Info => tracing::log::LevelFilter::Info,
-            LogLevel::Debug => tracing::log::LevelFilter::Debug,
-            LogLevel::Warn => tracing::log::LevelFilter::Warn,
-            LogLevel::Error => tracing::log::LevelFilter::Error,
+impl From<LogLevel> for tracing::log::LevelFilter {
+    fn from(val: LogLevel) -> Self {
+        match val {
+            LogLevel::Debug => Self::Debug,
+            LogLevel::Info => Self::Info,
+            LogLevel::Warn => Self::Warn,
+            LogLevel::Error => Self::Error,
         }
     }
 }
@@ -63,7 +62,7 @@ pub(crate) fn init(log_level: LogLevel) -> Result<(), SetGlobalDefaultError> {
         .finish();
 
     // Logging is globally disabled by default, so globally enable it to the required level.
-    tracing::log::set_max_level(log_level.as_log_level());
+    tracing::log::set_max_level(log_level.into());
 
     tracing::subscriber::set_global_default(subscriber)
 }

@@ -2,7 +2,16 @@ name: Docs
 
 # cspell: words earthfile
 
-on: push
+on:
+  push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "**"
+
+concurrency:
+  group: "docs"
+  cancel-in-progress: false
 
 permissions:
   id-token: write
@@ -11,7 +20,7 @@ permissions:
 
 jobs:
   ci:
-    uses: input-output-hk/catalyst-ci/.github/workflows/pages.yml@feat/docs3
+    uses: input-output-hk/catalyst-ci/.github/workflows/pages.yml@master
     with:
       aws_role_arn: arn:aws:iam::332405224602:role/ci
       aws_region: eu-central-1

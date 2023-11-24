@@ -18,7 +18,11 @@ VALUES
     1, 1,
     'catalyst-simple', 'title 1', 'description 1',
     'ADA', 100, 100, 1,
-    '{"url": "objective 1 url", "sponsor": "objective 1 sponsor", "video": "objective 1 video"}'
+    '{
+    "url": "objective 1 url",
+    "sponsor": "objective 1 sponsor",
+    "video": "objective 1 video"
+   }'
 ),
 (
     2,
@@ -32,7 +36,11 @@ VALUES
     3, 4,
     'catalyst-simple', 'title 3', 'description 3',
     'ADA', 100, 100, 1,
-    '{"url": "objective 3 url", "sponsor": "objective 3 sponsor", "video": "objective 3 video"}'
+    '{
+    "url": "objective 3 url",
+    "sponsor": "objective 3 sponsor",
+    "video": "objective 3 video"
+   }'
 ),
 (
     4,
