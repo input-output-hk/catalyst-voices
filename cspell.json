@@ -215,7 +215,7 @@
         //.config/dictionaries/cspell/sv/cspell-ext.json
         //.config/dictionaries/cspell/tr_TR/cspell-ext.json
         //.config/dictionaries/cspell/uk_UA/cspell-ext.json
-        //.config/dictionaries/cspell/vi_VN/cspell-ext.json        
+        //.config/dictionaries/cspell/vi_VN/cspell-ext.json
     ],
     "ignorePaths": [
         ".config/dictionaries/**",
@@ -233,6 +233,7 @@
         "**/historic_data/**/*.json",
         "**/test_data/**/*.sql",
         "styles.min.css",
-        "web-components.min.js"
+        "web-components.min.js",
+        "**/generated/**"
     ]
 }
