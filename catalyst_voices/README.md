@@ -43,6 +43,8 @@ melos bootstrap
 
 ### Packages
 
+<!-- markdownlint-disable MD042 -->
+
 | Package                           | Description              | Example   |
 |-----------------------------------|--------------------------|-----------|
 | [catalyst_voices_assets]()        | Assets used in Catalyst Voices |[example]()|
