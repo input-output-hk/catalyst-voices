@@ -1,0 +1,17 @@
+name: catalyst_voices_services
+description: Catalyst Voices Services.
+version: 0.1.0+1
+publish_to: none
+
+environment:
+  sdk: ">=3.2.0 <4.0.0"
+  flutter: 3.16.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+   catalyst_analysis:
+    path: ../../../catalyst_voices_packages/catalyst_analysis
+   test: ^1.24.9

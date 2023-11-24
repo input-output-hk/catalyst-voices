@@ -1,0 +1,3 @@
+class CatalystVoicesViewModels {
+  const CatalystVoicesViewModels();
+}

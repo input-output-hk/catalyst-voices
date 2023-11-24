@@ -1,0 +1,3 @@
+class CatalystVoicesServices {
+  const CatalystVoicesServices();
+}
