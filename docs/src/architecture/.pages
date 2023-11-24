@@ -1,0 +1,14 @@
+arrange:
+  - index.md
+  - 01_introduction_and_goals.md
+  - 02_architecture_constraints.md
+  - 03_system_scope_and_context.md
+  - 04_solution_strategy.md
+  - 05_building_block_view.md
+  - 06_runtime_view.md
+  - 07_deployment_view.md
+  - 08_concepts.md
+  - 09_architecture_decisions
+  - 10_quality_requirements.md
+  - 11_technical_risks.md
+  - 12_glossary.md
