@@ -22,7 +22,6 @@ This repository contains the Catalyst Voices app and packages.
 * Android SDK: 23+
 * iOS SDK: 15.0+
 * [Melos](https://melos.invertase.dev)
-* [Fvm](https://fvm.app/)
 * [Fastlane](https://fastlane.tools)
 * Flutter & Dart plugins:
   * [Visual Studio Code](https://flutter.dev/docs/get-started/editor?tab=vscode)
