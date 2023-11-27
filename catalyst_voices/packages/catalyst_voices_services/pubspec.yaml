@@ -10,6 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_secure_storage: ^9.0.0
+  rxdart: ^0.27.7
 
 dev_dependencies:
    catalyst_analysis:

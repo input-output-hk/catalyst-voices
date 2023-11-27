@@ -1,3 +1,1 @@
-class CatalystVoicesServices {
-  const CatalystVoicesServices();
-}
+export 'secure_storage/secure_storage.dart';
