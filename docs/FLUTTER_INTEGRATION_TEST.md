@@ -42,6 +42,10 @@ and select the appropriate history.
 
 #### Web
 
+Start chromedriver
+
+`chromedriver --port=4444`
+
 Navigate to `catalyst_voices` and run:
 
 ```sh
