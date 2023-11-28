@@ -25,15 +25,13 @@ pub(crate) enum Error {
     Io(#[from] std::io::Error),
 }
 
-/// # Run all web services.
+/// # Run Catalyst Gateway Service.
 ///
-/// This will currently run both a Axum based Web API, and a Poem based API.
-/// This is only for migration until all endpoints are provided by the Poem service.
+/// Runs the Poem based API.
 ///
 /// ## Arguments
 ///
 /// `service_addr`: &`SocketAddr` - the address to listen on
-/// `metrics_addr`: &`Option<SocketAddr>` - the address to listen on for metrics
 /// `state`: `Arc<State>` - the state
 ///
 /// ## Errors
@@ -42,10 +40,5 @@ pub(crate) enum Error {
 /// `Error::EventDbError` - cannot connect to the event db
 /// `Error::IoError` - An IO error has occurred.
 pub(crate) async fn run(service_addr: &SocketAddr, state: Arc<State>) -> Result<(), Error> {
-    // Create service addresses to be used during poem migration.
-    // Service address is same as official address but +1 to the port.
-    let mut legacy_service = *service_addr;
-    legacy_service.set_port(legacy_service.port() + 1);
-
     poem_service::run(service_addr, state).await
 }
