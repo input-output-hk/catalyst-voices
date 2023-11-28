@@ -1,0 +1,18 @@
+name: catalyst_voices_shared
+description: A Catalyst Voices Shared Package.
+version: 0.1.0+1
+publish_to: none
+
+environment:
+  sdk: '>=3.2.1 <4.0.0'
+  flutter: 3.16.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+   catalyst_analysis:
+    path: ../../../catalyst_voices_packages/catalyst_analysis
+   test: ^1.24.9
+

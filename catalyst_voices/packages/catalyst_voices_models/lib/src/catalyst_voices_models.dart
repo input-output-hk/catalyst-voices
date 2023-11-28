@@ -1,0 +1,3 @@
+class CatalystVoicesModels {
+  const CatalystVoicesModels();
+}
