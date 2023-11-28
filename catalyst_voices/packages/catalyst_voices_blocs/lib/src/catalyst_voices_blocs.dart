@@ -1,0 +1,3 @@
+class CatalystVoicesBlocs {
+  const CatalystVoicesBlocs();
+}

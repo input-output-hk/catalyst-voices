@@ -1,0 +1,20 @@
+name: catalyst_voices_blocs
+description: Catalyst Voices Blocs.
+version: 0.1.0+1
+publish_to: none
+
+environment:
+  sdk: ">=3.2.0 <4.0.0"
+  flutter: 3.16.1
+
+dependencies:
+  bloc: ^8.1.2
+  bloc_concurrency: ^0.2.2
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+   bloc_test: ^9.1.4
+   catalyst_analysis:
+    path: ../../../catalyst_voices_packages/catalyst_analysis
+   test: ^1.24.9
