@@ -42,7 +42,7 @@ and select the appropriate history.
 
 #### Web
 
-Start chromedriver
+On Ubuntu you might be required to start chromedriver. In a separate terminal run:
 
 `chromedriver --port=4444`
 
