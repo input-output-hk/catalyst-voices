@@ -46,14 +46,14 @@ melos bootstrap
 
 | Package                           | Description              | Example   |
 |-----------------------------------|--------------------------|-----------|
-| [catalyst_voices_assets]()        | Assets used in Catalyst Voices |[example]()|
-| [catalyst_voices_blocs]()         | State management of Catalyst Voices |[example]()|
-| [catalyst_voices_localization]()  | Localization files for Catalyst Voices |[example]()|
-| [catalyst_voices_models]()        | Models |[example]()|
-| [catalyst_voices_repositories]()  | Repositories |[example]()|
-| [catalyst_voices_services]()      | Services |[example]()|
-| [catalyst_voices_shared]()   | Shared code  |[example]()|
-| [catalyst_voices_view_models]()   | ViewModels  |[example]()|
+| [catalyst_voices_assets](./packages/catalyst_voices_assets/)        | Assets used in Catalyst Voices |[example](./packages/catalyst_voices_assets/example/lib/src/main.dart)|
+| [catalyst_voices_blocs](./packages/catalyst_voices_blocs/)         | State management of Catalyst Voices |[example](./packages/catalyst_voices_blocs/)|
+| [catalyst_voices_localization](./packages/catalyst_voices_localization/)  | Localization files for Catalyst Voices |[example](./packages/catalyst_voices_localization/)|
+| [catalyst_voices_models](./packages/catalyst_voices_models/)        | Models |[example](./packages/catalyst_voices_models/)|
+| [catalyst_voices_repositories](./packages/catalyst_voices_repositories/)  | Repositories |[example](./packages/catalyst_voices_repositories/)|
+| [catalyst_voices_services](./packages/catalyst_voices_services/)      | Services |[example](./packages/catalyst_voices_services/)|
+| [catalyst_voices_shared](./packages/catalyst_voices_shared/)   | Shared code  |[example](./packages/catalyst_voices_shared/)|
+| [catalyst_voices_view_models](./packages/catalyst_voices_view_models/)   | ViewModels  |[example](./packages/catalyst_voices_view_models/)|
 
 ### Flavors
 
