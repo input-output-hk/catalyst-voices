@@ -3,7 +3,6 @@ use clap::Parser;
 
 mod cli;
 mod event_db;
-mod legacy_service;
 mod logger;
 mod service;
 mod settings;

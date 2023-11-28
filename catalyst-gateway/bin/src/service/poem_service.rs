@@ -18,10 +18,7 @@ use crate::{
         docs::{docs, favicon},
         utilities::{
             catch_panic::{set_panic_hook, ServicePanicHandler},
-            middleware::{
-                chain_axum::ChainAxum,
-                tracing_mw::{init_prometheus, Tracing},
-            },
+            middleware::tracing_mw::{init_prometheus, Tracing},
         },
         Error,
     },
@@ -48,7 +45,6 @@ fn mk_app(hosts: Vec<String>, base_route: Option<Route>, state: &Arc<State>) -> 
         .nest("/metrics", PrometheusExporter::new(prometheus_registry))
         .nest("/favicon.ico", favicon())
         .with(Cors::new())
-        .with(ChainAxum::new()) // TODO: Remove this once all endpoints are ported.
         .with(Compression::new().with_quality(CompressionLevel::Fastest))
         .with(CatchPanic::new().with_handler(ServicePanicHandler))
         .with(Tracing)
