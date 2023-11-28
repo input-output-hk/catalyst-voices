@@ -52,6 +52,7 @@ melos bootstrap
 | [catalyst_voices_models]()        | Models |[example]()|
 | [catalyst_voices_repositories]()  | Repositories |[example]()|
 | [catalyst_voices_services]()      | Services |[example]()|
+| [catalyst_voices_shared]()   | Shared code  |[example]()|
 | [catalyst_voices_view_models]()   | ViewModels  |[example]()|
 
 ### Flavors
