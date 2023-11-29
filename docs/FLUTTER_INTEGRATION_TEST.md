@@ -42,6 +42,11 @@ and select the appropriate history.
 
 #### Web
 
+On Ubuntu you might be required to start chromedriver.  
+In a separate terminal run:  
+
+`chromedriver --port=4444`
+
 Navigate to `catalyst_voices` and run:
 
 ```sh
