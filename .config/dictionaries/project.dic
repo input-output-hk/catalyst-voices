@@ -51,6 +51,7 @@ mitigations
 moderations
 nanos
 netkey
+Oleksandr
 oneshot
 openapi
 opentelemetry
@@ -63,12 +64,14 @@ podfile
 podhelper
 preprod
 projectcatalyst
+Prokhorenko
 psql
 Ptarget
 pubkey
 pubspec
 rapidoc
 redoc
+ripgrep
 rustc
 rxdart
 saibatizoku
