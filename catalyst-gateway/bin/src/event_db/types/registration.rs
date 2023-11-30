@@ -75,16 +75,6 @@ impl RewardAddress {
             reward_address,
         }
     }
-
-    /// Get the reward address
-    pub(crate) fn reward_address(&self) -> &str {
-        &self.reward_address
-    }
-
-    /// Get the reward payable
-    pub(crate) fn reward_payable(&self) -> bool {
-        self.reward_payable
-    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

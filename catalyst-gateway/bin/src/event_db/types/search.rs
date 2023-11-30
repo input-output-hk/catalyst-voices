@@ -6,10 +6,13 @@ use super::{event::EventSummary, objective::ObjectiveSummary, proposal::Proposal
 /// The Table to search
 pub(crate) enum SearchTable {
     /// Search for events
+    #[allow(dead_code)]
     Events,
     /// Search for objectives
+    #[allow(dead_code)]
     Objectives,
     /// Search for proposals
+    #[allow(dead_code)]
     Proposals,
 }
 
@@ -18,14 +21,19 @@ pub(crate) enum SearchTable {
 /// The column to search
 pub(crate) enum SearchColumn {
     /// Search for the Title
+    #[allow(dead_code)]
     Title,
     /// Search for the Type
+    #[allow(dead_code)]
     Type,
     /// Search for the Description
+    #[allow(dead_code)]
     Description,
     /// Search for the Author
+    #[allow(dead_code)]
     Author,
     /// Search for the Funds
+    #[allow(dead_code)]
     Funds,
 }
 
