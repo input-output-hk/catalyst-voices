@@ -1,4 +1,4 @@
-arrange:
+nav:
   - index.md
   - 01_introduction_and_goals.md
   - 02_architecture_constraints.md

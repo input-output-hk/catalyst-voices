@@ -1,5 +1,5 @@
-arrange:
-  - index.md
+nav:
+  - 'Home': index.md
   - getting-started
   - catalyst-standards
   - architecture
