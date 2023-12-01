@@ -4,7 +4,7 @@ icon: material/chat
 
 # Project Catalyst - Catalyst Voices
 
-# Rust docs
+## Rust docs
 
 Documentation of the Rust code you can find [here](./rust/help.html)
 
