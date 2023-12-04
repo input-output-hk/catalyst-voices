@@ -27,7 +27,7 @@ build-hosted:
     # Build the service
     FROM +builder
  
-    RUN /scripts/std_build.sh
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.3+BUILD
 
     DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.3+SMOKE_TEST --bin=cat-gateway
 
@@ -38,6 +38,14 @@ build-hosted:
 # Only used to validate tooling is working across host toolsets.
 build-all-hosts:    
     BUILD --platform=linux/amd64 --platform=linux/arm64 +build-hosted
+
+build-docs:
+    # Build the service
+    FROM +builder
+
+    RUN RUSTDOCFLAGS="--enable-index-page -Zunstable-options" cargo +nightly docs
+
+    SAVE ARTIFACT target/$TARGETARCH/doc doc
 
 ## -----------------------------------------------------------------------------
 ##
