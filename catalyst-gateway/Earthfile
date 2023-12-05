@@ -4,11 +4,11 @@ VERSION 0.7
 
 # Set up our target toolchains, and copy our files.
 builder:
-    FROM github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.3+rust-base
+    FROM github.com/input-output-hk/catalyst-ci/earthly/rust:feat/rust-docs+rust-base
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.3+SETUP --toolchain=rust-toolchain.toml
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:feat/rust-docs+SETUP --toolchain=rust-toolchain.toml
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.3+CP_SRC --src=".cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin crates"
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:feat/rust-docs+CP_SRC --src=".cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin crates"
 
 # Test rust build container - Use best architecture host tools.
 check-hosted:
@@ -27,9 +27,9 @@ build-hosted:
     # Build the service
     FROM +builder
  
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.3+BUILD
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:feat/rust-docs+BUILD
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.3+SMOKE_TEST --bin=cat-gateway
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:feat/rust-docs+SMOKE_TEST --bin=cat-gateway
 
     SAVE ARTIFACT target/$TARGETARCH/doc doc
     SAVE ARTIFACT target/$TARGETARCH/release/cat-gateway cat-gateway
@@ -39,13 +39,6 @@ build-hosted:
 build-all-hosts:    
     BUILD --platform=linux/amd64 --platform=linux/arm64 +build-hosted
 
-build-docs:
-    # Build the service
-    FROM +builder
-
-    RUN RUSTDOCFLAGS="--enable-index-page -Zunstable-options" cargo +nightly docs
-
-    SAVE ARTIFACT target/$TARGETARCH/doc doc
 
 ## -----------------------------------------------------------------------------
 ##
