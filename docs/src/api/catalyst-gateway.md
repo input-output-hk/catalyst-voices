@@ -2,6 +2,8 @@
 icon: material/gate
 ---
 
+<!-- cspell: words RUSTDOC graphviz -->
+
 # Catalyst Gateway Rust docs
 
 <!-- markdownlint-disable no-inline-html -->
@@ -25,4 +27,20 @@ icon: material/gate
 
 ```kroki-graphviz
 @from_file:./api/catalyst-gateway/rust-docs/all.dot
+```
+
+## Module trees
+
+### cat-gateway crate
+
+```rust
+    {{ include_file('src/api/catalyst-gateway/rust-docs/cat-gateway.cat-gateway.bin.modules.tree') }}
+```
+
+## Module graphs
+
+### cat-gateway crate
+
+```kroki-graphviz
+@from_file:./api/catalyst-gateway/rust-docs/cat-gateway.cat-gateway.bin.modules.dot
 ```

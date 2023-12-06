@@ -27,9 +27,9 @@ build-hosted:
     # Build the service
     FROM +builder
  
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:feat/rust-docs+BUILD
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:feat/rust-docs+BUILD --libs="cat-gateway" --bins="cat-gateway/cat-gateway"
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:feat/rust-docs+SMOKE_TEST --bin=cat-gateway
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:feat/rust-docs+SMOKE_TEST --bin="cat-gateway"
 
     SAVE ARTIFACT target/$TARGETARCH/doc doc
     SAVE ARTIFACT target/$TARGETARCH/release/cat-gateway cat-gateway
