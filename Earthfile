@@ -19,7 +19,6 @@ markdown-check-fix:
 
 # spell-check Check spelling in this repo locally.
 spell-check:
-    # Check spelling in this repo.
     LOCALLY
 
     DO github.com/input-output-hk/catalyst-ci/earthly/cspell:v2.0.10+CSPELL_LOCALLY --src=$(echo ${PWD})
