@@ -24,7 +24,7 @@
 			"type": "shell",
 			"command": "earthly -P +markdown-check-fix",
 			"problemMatcher": {
-				"owner": "markdown-check",
+				"owner": "markdown-check-fix",
 				"pattern": {
 					"regexp": "(\\S+):(\\d+):(\\d+)\\s(.+)",
 					"file": 1,
