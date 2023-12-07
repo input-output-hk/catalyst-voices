@@ -21,7 +21,8 @@ check-spelling:
 
 check:
     BUILD +check-spelling
- 
+    BUILD +check-markdown
+
 repo-docs:
     # Create artifacts of extra files we embed inside the documentation when its built.
     FROM scratch
