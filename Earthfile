@@ -17,6 +17,7 @@ markdown-check-fix:
 
     DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:v2.0.9+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
 
+# spell-check Check spelling in this repo locally.
 spell-check:
     # Check spelling in this repo.
     LOCALLY
