@@ -40,9 +40,9 @@
 		{
 			"label": "CI - Recursive Spell Check",
 			"type": "shell",
-			"command": "earthly -P +spell-check",
+			"command": "earthly -P +check-spelling",
 			"problemMatcher": {
-				"owner": "spell-check",
+				"owner": "check-spelling",
 				"pattern": {
 					"regexp": "([\\S+]+):(\\d+):(\\d+)\\s-\\s(.+)",
 					"file": 1,
