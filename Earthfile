@@ -21,7 +21,14 @@ spell-check:
     # Check spelling in this repo.
     LOCALLY
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/cspell:v2.0.9+CSPELL_LOCALLY --src=$(echo ${PWD})
+    DO github.com/input-output-hk/catalyst-ci/earthly/cspell:v2.0.10+CSPELL_LOCALLY --src=$(echo ${PWD})
+
+# check-spelling Check spelling in this repo inside a container.
+check-spelling:
+    DO github.com/input-output-hk/catalyst-ci/earthly/cspell:v2.0.10+CHECK
+
+check:
+    BUILD +check-spelling
  
 repo-docs:
     # Create artifacts of extra files we embed inside the documentation when its built.
