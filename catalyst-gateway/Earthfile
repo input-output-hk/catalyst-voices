@@ -8,7 +8,7 @@ builder:
 
     DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.3+SETUP --toolchain=rust-toolchain.toml
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.3+CP_SRC --src=".cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin crates"
+    COPY --dir .cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin crates .
 
 # Test rust build container - Use best architecture host tools.
 check-hosted:
