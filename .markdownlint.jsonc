@@ -187,7 +187,7 @@
     },
     // MD042/no-empty-links - No empty links
     "MD042": true,
-    // MD043/required-headings/required-headers - Required heading structure
+    // MD043/required-headings/required-headings - Required heading structure
     "MD043": {
         // List of headings
         "headings": [
