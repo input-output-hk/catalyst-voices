@@ -49,6 +49,9 @@ rustflags = [
 ]
 
 rustdocflags = [
+    "--enable-index-page",
+    "-Z",
+    "unstable-options",
     "-D",
     "warnings",
     "-D",
