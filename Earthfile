@@ -19,10 +19,6 @@ markdown-check-fix:
 check-spelling:
     DO github.com/input-output-hk/catalyst-ci/earthly/cspell:v2.0.10+CHECK
 
-check:
-    BUILD +check-spelling
-    BUILD +check-markdown
-
 repo-docs:
     # Create artifacts of extra files we embed inside the documentation when its built.
     FROM scratch

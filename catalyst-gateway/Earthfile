@@ -11,17 +11,17 @@ builder:
     COPY --dir .cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin crates .
 
 # Test rust build container - Use best architecture host tools.
-check-hosted:
+hosted-check:
     FROM +builder
 
     DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.11+CHECK
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
-check-all-hosts:    
-    BUILD --platform=linux/amd64 --platform=linux/arm64 +check-hosted
+all-hosts-check:    
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +hosted-check
 
-build-hosted:
+hosted-build:
     ARG TARGETPLATFORM
 
     # Build the service
@@ -36,8 +36,8 @@ build-hosted:
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
-build-all-hosts:    
-    BUILD --platform=linux/amd64 --platform=linux/arm64 +build-hosted
+all-hosts-build:    
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +hosted-build
 
 
 ## -----------------------------------------------------------------------------
@@ -56,9 +56,9 @@ check:
     ARG USERARCH
 
     IF [ "$USERARCH" == "arm64" ]
-        BUILD --platform=linux/arm64 +check-hosted
+        BUILD --platform=linux/arm64 +hosted-check
     ELSE
-        BUILD --platform=linux/amd64 +check-hosted
+        BUILD --platform=linux/amd64 +hosted-check
     END
 
 # Run build using the most efficient host tooling
@@ -71,9 +71,9 @@ build:
     ARG USERARCH
 
     IF [ "$USERARCH" == "arm64" ]
-        BUILD --platform=linux/arm64 +build-hosted
+        BUILD --platform=linux/arm64 +hosted-build
     ELSE
-        BUILD --platform=linux/amd64 +build-hosted
+        BUILD --platform=linux/amd64 +hosted-build
     END
 
 
