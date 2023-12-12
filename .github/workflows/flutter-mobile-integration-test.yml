@@ -20,7 +20,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: ⬇️ Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: ⤵️ Authenticate with Google Cloud Platform
         uses: "google-github-actions/auth@v1"
