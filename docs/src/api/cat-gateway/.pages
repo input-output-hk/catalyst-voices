@@ -1,0 +1,4 @@
+nav:
+  - index.md
+  - 'Rust docs': rust.md
+  - 'OpenAPI docs': openapi.md
