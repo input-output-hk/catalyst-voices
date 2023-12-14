@@ -2,13 +2,12 @@ VERSION 0.7
 
 test-integration:
     FROM ../+builder
-    RUN cargo nextest run --test integration
-
+    RUN cargo nextest run --locked --test integration
 
 test-end2end:
     FROM ../+builder
-    RUN cargo nextest run --test end2end
+    RUN cargo nextest run --locked --test end2end
 
 test-nonfunctional:
     FROM ../+builder
-    RUN cargo nextest run --test nonfunctional
+    RUN cargo nextest run --locked --test nonfunctional
