@@ -81,8 +81,9 @@ build:
 #    FROM scratch
 
 # Run integration tests on all packages built during the `package` step.
-# test:
-#    FROM scratch
+test:
+    FROM scratch
+    BUILD ./tests+test-integration
 
 # Publish packages if all integration tests have passed. (Failure to pass tests will prevent packages being published.)
 # publish:
@@ -95,5 +96,5 @@ local-ci-run:
     BUILD +check
     BUILD +build
     # BUILD +package
-    # BUILD +test
+    BUILD +test
     # BUILD +publish

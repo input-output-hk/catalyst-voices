@@ -1,4 +1,4 @@
 #[test]
-pub fn non_functional(){
+pub fn non_functional() {
     assert!(true);
 }

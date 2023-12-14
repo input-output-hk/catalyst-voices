@@ -1,4 +1,4 @@
 #[test]
-pub fn integration(){
+pub fn integration() {
     assert!(true);
 }
