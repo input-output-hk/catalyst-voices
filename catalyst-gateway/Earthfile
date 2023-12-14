@@ -8,7 +8,7 @@ builder:
 
     DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.3+SETUP --toolchain=rust-toolchain.toml
 
-    COPY --dir .cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin crates .
+    COPY --dir .cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin crates tests .
 
 # Test rust build container - Use best architecture host tools.
 check-hosted:
@@ -18,7 +18,7 @@ check-hosted:
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
-check-all-hosts:    
+check-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +check-hosted
 
 build-hosted:
@@ -26,7 +26,7 @@ build-hosted:
 
     # Build the service
     FROM +builder
- 
+
     RUN /scripts/std_build.sh
 
     DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.3+SMOKE_TEST --bin=cat-gateway
@@ -36,7 +36,7 @@ build-hosted:
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
-build-all-hosts:    
+build-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +build-hosted
 
 ## -----------------------------------------------------------------------------

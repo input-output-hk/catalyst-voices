@@ -1,0 +1,14 @@
+VERSION 0.7
+
+test-integration:
+    FROM ../+builder
+    RUN cargo nextest run --test integration
+
+
+test-end2end:
+    FROM ../+builder
+    RUN cargo nextest run --test end2end
+
+test-nonfunctional:
+    FROM ../+builder
+    RUN cargo nextest run --test nonfunctional

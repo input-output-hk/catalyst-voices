@@ -7,6 +7,10 @@ publish = false
 [dev-dependencies]
 
 [[test]]
+name = "integration"
+path = "integration/main.rs"
+
+[[test]]
 name = "end2end"
 path = "end2end/main.rs"
 
