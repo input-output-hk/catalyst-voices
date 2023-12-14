@@ -49,6 +49,9 @@ rustflags = [
 ]
 
 rustdocflags = [
+    "--enable-index-page",
+    "-Z",
+    "unstable-options",
     "-D",
     "warnings",
     "-D",
@@ -103,7 +106,6 @@ overflow-checks = false
 lto = "thin"
 incremental = false
 codegen-units = 16
-
 
 [alias]
 lint = "clippy -- -D warnings -D clippy::pedantic -D clippy::unwrap_used -D clippy::expect_used -D clippy::exit -D clippy::get_unwrap -D clippy::index_refutable_slice -D clippy::indexing_slicing -D clippy::match_on_vec_items -D clippy::match_wild_err_arm -D clippy::missing_panics_doc -D clippy::panic -D clippy::string_slice -D clippy::unchecked_duration_subtraction -D clippy::unreachable -D clippy::missing_docs_in_private_items"
