@@ -1,12 +1,12 @@
 VERSION 0.7
 
-#cspell: words rustup readelf nextest testci testdocs rustfmt toolsets USERARCH
+#cspell: words rustfmt toolsets USERARCH
 
 # Set up our target toolchains, and copy our files.
 builder:
-    FROM github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.11+rust-base
+    FROM github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.12+rust-base
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.11+SETUP --toolchain=rust-toolchain.toml
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.12+SETUP --toolchain=rust-toolchain.toml
 
     COPY --dir .cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin crates .
 
@@ -14,7 +14,7 @@ builder:
 check-hosted:
     FROM +builder
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.11+CHECK
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.12+CHECK
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
@@ -27,9 +27,9 @@ build-hosted:
     # Build the service
     FROM +builder
  
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.11+BUILD --bins="cat-gateway/cat-gateway"
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.12+BUILD --bins="cat-gateway/cat-gateway"
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.11+SMOKE_TEST --bin="cat-gateway"
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.12+SMOKE_TEST --bin="cat-gateway"
 
     # generate OpenAPI docs
     RUN ./target/$TARGETARCH/release/cat-gateway docs ./target/$TARGETARCH/doc/cat-gateway-api.json
