@@ -37,7 +37,7 @@ jobs:
           cache: true
 
       - name: ⚙️ Setup Melos
-        uses: bluefireteam/melos-action@v2
+        uses: bluefireteam/melos-action@v3
 
       - name: ⚙️ Install dependencies for all packages
         run: melos build:pub_get:all
