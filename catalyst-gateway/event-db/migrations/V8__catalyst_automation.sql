@@ -3,15 +3,15 @@
 -- Voting Nodes Table - Defines nodes in the network
 -- This table is looked up by hostname and event
 CREATE TABLE voting_node (
-    hostname TEXT NOT NULL,
-    event INTEGER NOT NULL,
+  hostname TEXT NOT NULL,
+  event INTEGER NOT NULL,
 
-    pubkey TEXT NOT NULL,
-    seckey TEXT NOT NULL,
-    netkey TEXT NOT NULL,
+  pubkey TEXT NOT NULL,
+  seckey TEXT NOT NULL,
+  netkey TEXT NOT NULL,
 
-    PRIMARY KEY (hostname, event),
-    FOREIGN KEY (event) REFERENCES event (row_id) ON DELETE CASCADE
+  PRIMARY KEY (hostname, event),
+  FOREIGN KEY (event) REFERENCES event (row_id) ON DELETE CASCADE
 );
 
 COMMENT ON TABLE voting_node IS
@@ -28,16 +28,16 @@ COMMENT ON COLUMN voting_node.netkey IS 'Encrypted Ed25519 secret key for the no
 -- Tally Committee Table - Stores data about the tally committee per voting event
 -- This table is looked up by event
 CREATE TABLE tally_committee (
-    row_id SERIAL PRIMARY KEY,
+  row_id SERIAL PRIMARY KEY,
 
-    event INTEGER NOT NULL UNIQUE,
+  event INTEGER NOT NULL UNIQUE,
 
-    committee_pk TEXT NOT NULL,
-    committee_id TEXT NOT NULL,
-    member_crs TEXT,
-    election_key TEXT,
+  committee_pk TEXT NOT NULL,
+  committee_id TEXT NOT NULL,
+  member_crs TEXT,
+  election_key TEXT,
 
-    FOREIGN KEY (event) REFERENCES event (row_id) ON DELETE CASCADE
+  FOREIGN KEY (event) REFERENCES event (row_id) ON DELETE CASCADE
 );
 
 COMMENT ON TABLE tally_committee IS 'Table for storing data about the tally committee per voting event.';
@@ -56,18 +56,18 @@ NULL if the event.committee_size is 0.';
 -- Committee Member Table - Stores data about the tally committee members
 -- This table is looked up by committee
 CREATE TABLE committee_member (
-    row_id SERIAL PRIMARY KEY,
+  row_id SERIAL PRIMARY KEY,
 
-    committee INTEGER NOT NULL,
+  committee INTEGER NOT NULL,
 
-    member_index INTEGER NOT NULL,
-    threshold INTEGER NOT NULL,
-    comm_pk TEXT NOT NULL,
-    comm_sk TEXT NOT NULL,
-    member_pk TEXT NOT NULL,
-    member_sk TEXT NOT NULL,
+  member_index INTEGER NOT NULL,
+  threshold INTEGER NOT NULL,
+  comm_pk TEXT NOT NULL,
+  comm_sk TEXT NOT NULL,
+  member_pk TEXT NOT NULL,
+  member_sk TEXT NOT NULL,
 
-    FOREIGN KEY (committee) REFERENCES tally_committee (row_id)
+  FOREIGN KEY (committee) REFERENCES tally_committee (row_id)
 );
 
 COMMENT ON TABLE committee_member IS 'Table for storing data about the tally committee members.';

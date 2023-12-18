@@ -3,8 +3,8 @@
 -- objective types table - Defines all currently known objectives types.
 CREATE TABLE objective_category
 (
-    name TEXT PRIMARY KEY,
-    description TEXT
+  name TEXT PRIMARY KEY,
+  description TEXT
 );
 
 COMMENT ON TABLE objective_category IS 'Defines all known and valid objective categories.';
@@ -22,8 +22,8 @@ VALUES
 -- known currencies - Defines all currently known currencies.
 CREATE TABLE currency
 (
-    name TEXT PRIMARY KEY,
-    description TEXT
+  name TEXT PRIMARY KEY,
+  description TEXT
 );
 
 COMMENT ON TABLE currency IS 'Defines all known and valid currencies.';
@@ -35,8 +35,8 @@ COMMENT ON COLUMN currency.description IS 'A Description of this kind of currenc
 INSERT INTO currency (name, description)
 VALUES
 (
-    'USD_ADA',
-    'US Dollars, converted to Cardano ADA at time of reward calculation.'
+  'USD_ADA',
+  'US Dollars, converted to Cardano ADA at time of reward calculation.'
 ),
 ('ADA', 'Cardano ADA.'),
 ('CLAP', 'CLAP tokens.'),
@@ -45,10 +45,10 @@ VALUES
 -- known vote options - Defines all currently known vote options.
 CREATE TABLE vote_options
 (
-    id SERIAL PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
 
-    idea_scale TEXT ARRAY UNIQUE,
-    objective TEXT ARRAY UNIQUE
+  idea_scale TEXT ARRAY UNIQUE,
+  objective TEXT ARRAY UNIQUE
 );
 
 COMMENT ON TABLE vote_options IS 'Defines all known vote plan option types.';
@@ -67,13 +67,13 @@ VALUES
 
 CREATE TABLE goal
 (
-    id SERIAL PRIMARY KEY,
-    event_id INTEGER NOT NULL,
+  id SERIAL PRIMARY KEY,
+  event_id INTEGER NOT NULL,
 
-    idx INTEGER NOT NULL,
-    name VARCHAR NOT NULL,
+  idx INTEGER NOT NULL,
+  name VARCHAR NOT NULL,
 
-    FOREIGN KEY (event_id) REFERENCES event (row_id) ON DELETE CASCADE
+  FOREIGN KEY (event_id) REFERENCES event (row_id) ON DELETE CASCADE
 );
 
 CREATE UNIQUE INDEX goal_index ON goal (event_id, idx);
@@ -91,27 +91,27 @@ COMMENT ON INDEX goal_index IS 'An index to enforce uniqueness of the relative `
 
 CREATE TABLE objective
 (
-    row_id SERIAL PRIMARY KEY,
+  row_id SERIAL PRIMARY KEY,
 
-    id INTEGER NOT NULL,
-    event INTEGER NOT NULL,
+  id INTEGER NOT NULL,
+  event INTEGER NOT NULL,
 
-    category TEXT NOT NULL,
-    title TEXT NOT NULL,
-    description TEXT NOT NULL,
+  category TEXT NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
 
-    rewards_currency TEXT,
-    rewards_total BIGINT,
-    rewards_total_lovelace BIGINT,
-    proposers_rewards BIGINT,
-    vote_options INTEGER,
+  rewards_currency TEXT,
+  rewards_total BIGINT,
+  rewards_total_lovelace BIGINT,
+  proposers_rewards BIGINT,
+  vote_options INTEGER,
 
-    extra JSONB,
+  extra JSONB,
 
-    FOREIGN KEY (event) REFERENCES event (row_id) ON DELETE CASCADE,
-    FOREIGN KEY (category) REFERENCES objective_category (name) ON DELETE CASCADE,
-    FOREIGN KEY (rewards_currency) REFERENCES currency (name) ON DELETE CASCADE,
-    FOREIGN KEY (vote_options) REFERENCES vote_options (id) ON DELETE CASCADE
+  FOREIGN KEY (event) REFERENCES event (row_id) ON DELETE CASCADE,
+  FOREIGN KEY (category) REFERENCES objective_category (name) ON DELETE CASCADE,
+  FOREIGN KEY (rewards_currency) REFERENCES currency (name) ON DELETE CASCADE,
+  FOREIGN KEY (vote_options) REFERENCES vote_options (id) ON DELETE CASCADE
 );
 
 CREATE UNIQUE INDEX objective_idx ON objective (id, event);

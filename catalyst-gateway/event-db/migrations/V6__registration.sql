@@ -11,18 +11,18 @@
 -- Used internally to track the updates to the database.
 CREATE TABLE cardano_update_state (
 
-    id BIGSERIAL PRIMARY KEY,
-    time TIMESTAMP NOT NULL,
-    end_time TIMESTAMP NOT NULL,
-    updater_id TEXT NOT NULL,
+  id BIGSERIAL PRIMARY KEY,
+  time TIMESTAMP NOT NULL,
+  end_time TIMESTAMP NOT NULL,
+  updater_id TEXT NOT NULL,
 
-    network TEXT NOT NULL,
+  network TEXT NOT NULL,
 
-    old_max_slot_no BIGINT NOT NULL,
-    new_max_slot_no BIGINT NOT NULL,
-    rollback_slot_no BIGINT NOT NULL,
+  old_max_slot_no BIGINT NOT NULL,
+  new_max_slot_no BIGINT NOT NULL,
+  rollback_slot_no BIGINT NOT NULL,
 
-    stats JSONB NOT NULL
+  stats JSONB NOT NULL
 );
 
 CREATE INDEX cardano_update_state_idx ON cardano_update_state (id, network);
@@ -32,7 +32,7 @@ COMMENT ON INDEX cardano_update_state_time_idx IS
 This index can be used to find the latest state record for a particular network.';
 
 CREATE INDEX cardano_update_state_time_idx ON cardano_update_state (
-    time, network
+  time, network
 );
 
 COMMENT ON INDEX cardano_update_state_time_idx IS
@@ -82,13 +82,13 @@ Must conform to Schema: `catalyst_schema://0f917b13-afac-40d2-8263-b17ca8219914/
 
 -- Slot Index Table
 CREATE TABLE slot_index (
-    slot_no BIGINT NOT NULL,
-    network TEXT NOT NULL,
-    epoch_no BIGINT NOT NULL,
-    time TIMESTAMP NOT NULL,
-    block_hash BYTEA NOT NULL,
+  slot_no BIGINT NOT NULL,
+  network TEXT NOT NULL,
+  epoch_no BIGINT NOT NULL,
+  time TIMESTAMP NOT NULL,
+  block_hash BYTEA NOT NULL,
 
-    PRIMARY KEY (slot_no, network)
+  PRIMARY KEY (slot_no, network)
 );
 
 CREATE INDEX slot_index_time_idx ON slot_index (time, network);
@@ -127,22 +127,22 @@ COMMENT ON COLUMN slot_index.block_hash IS
 --         INNER JOIN stake_address ON stake_address.id = tx_out.stake_address_id;
 -- network needs to be supplied, as dbsync only has a single database per network.
 CREATE TABLE cardano_utxo (
-    tx_id BIGINT NOT NULL,
-    index INTEGER NOT NULL,
-    network TEXT NOT NULL,
+  tx_id BIGINT NOT NULL,
+  index INTEGER NOT NULL,
+  network TEXT NOT NULL,
 
-    value BIGINT NOT NULL,
+  value BIGINT NOT NULL,
 
-    slot_no BIGINT NOT NULL,
+  slot_no BIGINT NOT NULL,
 
-    stake_credential BYTEA NOT NULL,
+  stake_credential BYTEA NOT NULL,
 
-    PRIMARY KEY (tx_id, index, network),
-    FOREIGN KEY (slot_no, network) REFERENCES slot_index (slot_no, network)
+  PRIMARY KEY (tx_id, index, network),
+  FOREIGN KEY (slot_no, network) REFERENCES slot_index (slot_no, network)
 );
 
 CREATE INDEX cardano_utxo_stake_credential_idx ON utxo (
-    stake_credential, slot_no
+  stake_credential, slot_no
 );
 COMMENT ON INDEX cardano_utxo_stake_credential_idx IS
 'Index to allow us to efficiently lookup a set of UTXOs by stake credential relative to a slot_no.';
@@ -175,16 +175,16 @@ COMMENT ON COLUMN cardano_utxo.stake_credential IS
 --        INNER JOIN block ON tx.block_id = block.id;
 -- network needs to be supplied, as dbsync only has a single database per network.
 CREATE TABLE cardano_stxo (
-    tx_id BIGINT NOT NULL,
-    index INTEGER NOT NULL,
-    network TEXT NOT NULL,
+  tx_id BIGINT NOT NULL,
+  index INTEGER NOT NULL,
+  network TEXT NOT NULL,
 
-    spent_tx_id BIGINT NOT NULL,
-    spent_slot_no BIGINT NOT NULL,
+  spent_tx_id BIGINT NOT NULL,
+  spent_slot_no BIGINT NOT NULL,
 
-    PRIMARY KEY (tx_id, index, network),
-    FOREIGN KEY (tx_id, index, network) REFERENCES utxo (tx_id, index, network),
-    FOREIGN KEY (spent_slot_no, network) REFERENCES slot_index (slot_no, network)
+  PRIMARY KEY (tx_id, index, network),
+  FOREIGN KEY (tx_id, index, network) REFERENCES utxo (tx_id, index, network),
+  FOREIGN KEY (spent_slot_no, network) REFERENCES slot_index (slot_no, network)
 );
 
 CREATE INDEX cardano_stxo_slot_idx ON stxo (spent_slot_no, network);
@@ -220,20 +220,20 @@ This lets us determine when the TX Output was spent, so we can calculate staked 
 -- `slot_no` needs to be calculated from the current earned_epoch_no as the first slot in the next epoch.
 -- 'network' needs to be supplied, as dbsync only has a single database per network.
 CREATE TABLE cardano_reward (
-    slot_no BIGINT NOT NULL, -- First slot of the epoch following the epoch the rewards were earned for.
-    network TEXT NOT NULL,
-    stake_credential BYTEA NOT NULL,
+  slot_no BIGINT NOT NULL, -- First slot of the epoch following the epoch the rewards were earned for.
+  network TEXT NOT NULL,
+  stake_credential BYTEA NOT NULL,
 
-    earned_epoch_no BIGINT NOT NULL,
+  earned_epoch_no BIGINT NOT NULL,
 
-    value BIGINT NOT NULL,
+  value BIGINT NOT NULL,
 
-    PRIMARY KEY (slot_no, network, stake_credential),
-    FOREIGN KEY (slot_no, network) REFERENCES slot_index (slot_no, network)
+  PRIMARY KEY (slot_no, network, stake_credential),
+  FOREIGN KEY (slot_no, network) REFERENCES slot_index (slot_no, network)
 );
 
 CREATE INDEX cardano_rewards_stake_credential_idx ON cardano_rewards (
-    stake_credential, slot_no
+  stake_credential, slot_no
 );
 
 COMMENT ON INDEX cardano_rewards_stake_credential_idx IS
@@ -266,13 +266,13 @@ COMMENT ON COLUMN cardano_reward.value IS
 --              INNER JOIN stake_address ON stake_address.id = withdrawal.addr_id;
 -- 'network' needs to be supplied, as dbsync only has a single database per network.
 CREATE TABLE cardano_withdrawn_reward (
-    slot_no BIGINT NOT NULL,
-    network TEXT NOT NULL,
-    stake_credential BYTEA NOT NULL,
-    value BIGINT NOT NULL,
+  slot_no BIGINT NOT NULL,
+  network TEXT NOT NULL,
+  stake_credential BYTEA NOT NULL,
+  value BIGINT NOT NULL,
 
-    PRIMARY KEY (slot_no, network),
-    FOREIGN KEY (slot_no, network) REFERENCES slot_index (slot_no, network)
+  PRIMARY KEY (slot_no, network),
+  FOREIGN KEY (slot_no, network) REFERENCES slot_index (slot_no, network)
 );
 
 COMMENT ON TABLE cardano_withdrawn_reward IS
@@ -301,46 +301,46 @@ COMMENT ON COLUMN cardano_withdrawn_reward.value IS
 --
 -- 'network' needs to be supplied, as dbsync only has a single database per network.
 CREATE TABLE cardano_voter_registration (
-    txn_hash BYTEA PRIMARY KEY NOT NULL,
+  txn_hash BYTEA PRIMARY KEY NOT NULL,
 
-    slot_no BIGINT NULL,
-    tx_id BIGINT NULL,
-    network TEXT NOT NULL,
+  slot_no BIGINT NULL,
+  tx_id BIGINT NULL,
+  network TEXT NOT NULL,
 
-    stake_credential BYTEA NULL,
-    public_voting_key BYTEA NULL,
-    payment_address BYTEA NULL,
-    nonce BIGINT NULL,
+  stake_credential BYTEA NULL,
+  public_voting_key BYTEA NULL,
+  payment_address BYTEA NULL,
+  nonce BIGINT NULL,
 
-    metadata_61284 BYTEA NULL,  -- We can purge metadata for valid registrations that are old to save storage space. 
-    metadata_61285 BYTEA NULL,  -- We can purge metadata for valid registrations that are old to save storage space.
+  metadata_61284 BYTEA NULL,  -- We can purge metadata for valid registrations that are old to save storage space. 
+  metadata_61285 BYTEA NULL,  -- We can purge metadata for valid registrations that are old to save storage space.
 
-    valid BOOLEAN NOT NULL DEFAULT false,
-    stats JSONB NULL,
-    -- record rolled back in stats if the registration was lost during a rollback, its also invalid at this point.
-    -- Other stats we can record are is it a CIP-36 or CIP-15 registration format.
-    -- does it have a valid reward address but not a payment address, so we can't pay to it.
-    -- other flags about why the registration was invalid.
-    -- other flags about statistical data (if any).
+  valid BOOLEAN NOT NULL DEFAULT false,
+  stats JSONB NULL,
+  -- record rolled back in stats if the registration was lost during a rollback, its also invalid at this point.
+  -- Other stats we can record are is it a CIP-36 or CIP-15 registration format.
+  -- does it have a valid reward address but not a payment address, so we can't pay to it.
+  -- other flags about why the registration was invalid.
+  -- other flags about statistical data (if any).
 
-    FOREIGN KEY (slot_no, network) REFERENCES slot_index (slot_no, network)
+  FOREIGN KEY (slot_no, network) REFERENCES slot_index (slot_no, network)
 );
 
 CREATE INDEX cardano_voter_registration_stake_credential_idx ON cardano_voter_registration (
-    stake_credential, nonce, valid
+  stake_credential, nonce, valid
 );
 COMMENT ON INDEX cardano_voter_registration_stake_credential_idx IS
 'Optimize lookups for "stake_credential" or "stake_credential"+"nonce" or "stake_credential"+"nonce"+"valid".';
 
 CREATE INDEX cardano_voter_registration_voting_key_idx ON cardano_voter_registration (
-    public_voting_key, nonce, valid
+  public_voting_key, nonce, valid
 );
 COMMENT ON INDEX cardano_voter_registration_voting_key_idx IS
 'Optimize lookups for "public_voting_key" or "public_voting_key"+"nonce" or "public_voting_key"+"nonce"+"valid".';
 
 
 CREATE INDEX cardano_voter_registration_voting_key_idx ON cardano_voter_registration (
-    public_voting_key, nonce, valid
+  public_voting_key, nonce, valid
 );
 COMMENT ON INDEX cardano_voter_registration_voting_key_idx IS
 'Optimize lookups for "public_voting_key" or "public_voting_key"+"nonce" or "public_voting_key"+"nonce"+"valid".';

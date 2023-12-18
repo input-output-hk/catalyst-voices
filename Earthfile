@@ -32,7 +32,7 @@ repo-docs:
 
     SAVE ARTIFACT /repo repo
 
-repo-config:
+repo-config-2:
     # Create artifacts of config file we need to refer to in builders.
     FROM scratch
 

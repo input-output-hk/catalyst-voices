@@ -20,15 +20,15 @@
 -- -------------------------------------------------------------------------------------------------
 
 CREATE TABLE event_type (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name TEXT NOT NULL,
-    description_schema UUID NOT NULL,
-    data_schema UUID NOT NULL,
+  id UUID PRIMARY KEY DEFAULT GEN_RANDOM_UUID(),
+  name TEXT NOT NULL,
+  description_schema UUID NOT NULL,
+  data_schema UUID NOT NULL,
 
-    FOREIGN KEY (description_schema) REFERENCES json_schema_type (
-        id
-    ) ON DELETE CASCADE,
-    FOREIGN KEY (data_schema) REFERENCES json_schema_type (id) ON DELETE CASCADE
+  FOREIGN KEY (description_schema) REFERENCES json_schema_type (
+    id
+  ) ON DELETE CASCADE,
+  FOREIGN KEY (data_schema) REFERENCES json_schema_type (id) ON DELETE CASCADE
 );
 
 CREATE UNIQUE INDEX event_type_name_idx ON event_type (name);
@@ -59,22 +59,22 @@ VALUES
 INSERT INTO json_schema_type (id, type, name, schema)
 VALUES
 (
-    'd899cd44-3513-487b-ab46-fdca662a724d', -- From the schema file.
-    'event_description',
-    'multiline_text',
-    (
-        SELECT jsonb
-        FROM pg_read_file('../json_schemas/event/description/multiline_text.json')
-    )
+  'd899cd44-3513-487b-ab46-fdca662a724d', -- From the schema file.
+  'event_description',
+  'multiline_text',
+  (
+    SELECT jsonb
+    FROM PG_READ_FILE('../json_schemas/event/description/multiline_text.json')
+  )
 ),
 (
-    '9c5df318-fa9a-4310-80fa-490f46d1cc43', -- From the schema file.
-    'event_data',
-    'catalyst_v1',
-    (
-        SELECT jsonb
-        FROM pg_read_file('../json_schemas/event/description/catalyst_v1.json')
-    )
+  '9c5df318-fa9a-4310-80fa-490f46d1cc43', -- From the schema file.
+  'event_data',
+  'catalyst_v1',
+  (
+    SELECT jsonb
+    FROM PG_READ_FILE('../json_schemas/event/description/catalyst_v1.json')
+  )
 );
 
 -- Define a Catalyst V1 Event.
@@ -82,27 +82,27 @@ VALUES
 INSERT INTO event_type (name, description_schema, data_schema)
 VALUES
 (
-    'Catalyst V1',
-    'd899cd44-3513-487b-ab46-fdca662a724d',
-    '9c5df318-fa9a-4310-80fa-490f46d1cc43'
+  'Catalyst V1',
+  'd899cd44-3513-487b-ab46-fdca662a724d',
+  '9c5df318-fa9a-4310-80fa-490f46d1cc43'
 );
 
 -- -------------------------------------------------------------------------------------------------
 
 -- Event Table - Defines each voting or decision event
 CREATE TABLE "event" (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    -- The Organizer/Administrator of this event.  
-    -- Update once RBAC is defined, as Organizer is an RBAC Role.
-    organizer TEXT NOT NULL,
-    type UUID REFERENCES event_type (id),
-    name TEXT NOT NULL,
-    description JSONB NOT NULL,
-    start_time TIMESTAMP,
-    backing_start TIMESTAMP,
-    backing_end TIMESTAMP,
-    end_time TIMESTAMP,
-    data JSONB NOT NULL
+  id UUID PRIMARY KEY DEFAULT GEN_RANDOM_UUID(),
+  -- The Organizer/Administrator of this event.  
+  -- Update once RBAC is defined, as Organizer is an RBAC Role.
+  organizer TEXT NOT NULL,
+  type UUID REFERENCES event_type (id),
+  name TEXT NOT NULL,
+  description JSONB NOT NULL,
+  start_time TIMESTAMP,
+  backing_start TIMESTAMP,
+  backing_end TIMESTAMP,
+  end_time TIMESTAMP,
+  data JSONB NOT NULL
 );
 
 CREATE UNIQUE INDEX event_name_idx ON event (name);

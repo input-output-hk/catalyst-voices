@@ -7,10 +7,10 @@
 
 -- Version of the schema (Used by Refinery to manage migrations.).
 CREATE TABLE IF NOT EXISTS refinery_schema_history (
-    version INTEGER NOT NULL PRIMARY KEY,
-    name VARCHAR(255),
-    applied_on VARCHAR(255),
-    checksum VARCHAR(255)
+  version INTEGER NOT NULL PRIMARY KEY,
+  name VARCHAR(255),
+  applied_on VARCHAR(255),
+  checksum VARCHAR(255)
 );
 
 COMMENT ON TABLE refinery_schema_history IS
@@ -36,15 +36,15 @@ Managed by the `refinery` cli tool.';
 -- * Dashes, symbols or upper case should not be used.
 -- Catalyst Event Database
 CREATE TABLE json_schema_type (
-    id UUID PRIMARY KEY,
-    type TEXT NOT NULL,
-    name TEXT NOT NULL,
-    schema JSONB NOT NULL
+  id UUID PRIMARY KEY,
+  type TEXT NOT NULL,
+  name TEXT NOT NULL,
+  schema JSONB NOT NULL
 );
 
 CREATE INDEX json_schema_type_idx ON json_schema_type ("type");
 CREATE UNIQUE INDEX json_schema_type_name_idx ON json_schema_type (
-    "type", "name"
+  "type", "name"
 );
 
 COMMENT ON TABLE json_schema_type IS
@@ -71,14 +71,14 @@ Must match the `name` component of the $id URI inside the schema.';
 -- Config Table
 -- This table is looked up with three keys, `id`, `id2` and `id3`
 CREATE TABLE config (
-    row_id SERIAL PRIMARY KEY,
-    id VARCHAR NOT NULL,
-    id2 VARCHAR NOT NULL,
-    id3 VARCHAR NOT NULL,
-    value JSONB NULL,
-    value_schema UUID,
+  row_id SERIAL PRIMARY KEY,
+  id VARCHAR NOT NULL,
+  id2 VARCHAR NOT NULL,
+  id3 VARCHAR NOT NULL,
+  value JSONB NULL,
+  value_schema UUID,
 
-    FOREIGN KEY (value_schema) REFERENCES json_schema_type (id) ON DELETE CASCADE
+  FOREIGN KEY (value_schema) REFERENCES json_schema_type (id) ON DELETE CASCADE
 );
 
 -- id+id2+id3 must be unique, they are a combined key.
@@ -123,12 +123,12 @@ at the app level to allow for querying groups of data.';
 INSERT INTO json_schema_type (id, type, name, schema)
 VALUES
 (
-    'd899cd44-3513-487b-ab46-fdca662a724d', -- Fix the Schema ID so that it is consistent.
-    'config',
-    'dbsync',
-    (SELECT jsonb FROM pg_read_file('../json_schemas/config/dbsync.json')),
-    '62d614c0-97a7-41ec-a976-91294b8f4384', -- Fix the Schema ID so that it is consistent.
-    'config',
-    'registration',
-    (SELECT jsonb FROM pg_read_file('../json_schemas/config/registration.json'))
+  'd899cd44-3513-487b-ab46-fdca662a724d', -- Fix the Schema ID so that it is consistent.
+  'config',
+  'dbsync',
+  (SELECT jsonb FROM PG_READ_FILE('../json_schemas/config/dbsync.json')),
+  '62d614c0-97a7-41ec-a976-91294b8f4384', -- Fix the Schema ID so that it is consistent.
+  'config',
+  'registration',
+  (SELECT jsonb FROM PG_READ_FILE('../json_schemas/config/registration.json'))
 );

@@ -12,6 +12,8 @@ builder:
     DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:fix/postgres-builders+BUILDER \
         --sqlfluff_cfg=./../../+repo-config/repo/.sqlfluff
 
+    COPY ./../../+repo-config-2/repo/.sqlfluff .
+
 # check if the sqlfiles are properly formatted and pass lint quality checks.
 #   CI target : true
 check:
@@ -19,24 +21,11 @@ check:
 
     DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:fix/postgres-builders+CHECK
 
-# Internal: build-sqlfluff is a target to build the necessary `sqlfluff` tool container.
-#   CI target : false
-# This allows us to run sqlfluff commands locally without needing to install it locally.
-# It does not need to be run directly, it is used by the `format` target.
-build-sqlfluff:
-    BUILD github.com/input-output-hk/catalyst-ci/earthly/postgresql:fix/postgres-builders+sqlfluff-image   
 
 # format all SQL files in the current project.  Local developers tool.
 #   CI target : false
 format:
     LOCALLY
-
-    # This is a trick.  Earthly can NOT build and run a container in the same invocation.
-    # Because this target is running LOCALLY, and we know earthly must be installed, we can
-    # call earthly locally to build and publish the local target we need to run the sqlfluff linter.
-    # By recursively running earthly, we sidestep the limitation which prevents us from building 
-    # a container and running it in the same invocation.
-    RUN earthly +build-sqlfluff
 
     DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:fix/postgres-builders+FORMAT --src=$(echo ${PWD}/../../)   
 

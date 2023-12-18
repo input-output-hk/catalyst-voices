@@ -3,19 +3,19 @@
 -- vote storage (replicates on-chain data for easy querying)
 
 CREATE TABLE ballot (
-    row_id SERIAL8 PRIMARY KEY,
-    objective INTEGER NOT NULL,
-    proposal INTEGER NULL,
+  row_id SERIAL8 PRIMARY KEY,
+  objective INTEGER NOT NULL,
+  proposal INTEGER NULL,
 
-    voter INTEGER NOT NULL,
-    fragment_id TEXT NOT NULL,
-    cast_at TIMESTAMP NOT NULL,
-    choice SMALLINT NULL,
-    raw_fragment BYTEA NOT NULL,
+  voter INTEGER NOT NULL,
+  fragment_id TEXT NOT NULL,
+  cast_at TIMESTAMP NOT NULL,
+  choice SMALLINT NULL,
+  raw_fragment BYTEA NOT NULL,
 
-    FOREIGN KEY (voter) REFERENCES voter (row_id) ON DELETE CASCADE,
-    FOREIGN KEY (objective) REFERENCES objective (row_id) ON DELETE CASCADE,
-    FOREIGN KEY (proposal) REFERENCES proposal (row_id) ON DELETE CASCADE
+  FOREIGN KEY (voter) REFERENCES voter (row_id) ON DELETE CASCADE,
+  FOREIGN KEY (objective) REFERENCES objective (row_id) ON DELETE CASCADE,
+  FOREIGN KEY (proposal) REFERENCES proposal (row_id) ON DELETE CASCADE
 );
 
 CREATE UNIQUE INDEX ballot_proposal_idx ON ballot (proposal, fragment_id);
