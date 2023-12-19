@@ -26,7 +26,7 @@ build-hosted:
 
     # Build the service
     FROM +builder
- 
+
     DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.12+BUILD --bins="cat-gateway/cat-gateway"
 
     DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.12+SMOKE_TEST --bin="cat-gateway"
@@ -84,7 +84,7 @@ build:
 # Run integration tests on all packages built during the `package` step.
 test:
     FROM scratch
-    BUILD ./tests+test-integration
+    BUILD ./tests+test-integration --profile ci
 
 # Publish packages if all integration tests have passed. (Failure to pass tests will prevent packages being published.)
 # publish:

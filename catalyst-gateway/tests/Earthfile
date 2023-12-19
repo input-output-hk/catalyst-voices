@@ -3,13 +3,16 @@ VERSION 0.7
 #cspell: words nextest
 
 test-integration:
+    ARG profile=default
     FROM ../+builder
-    RUN cargo nextest run --locked --test integration
+    RUN cargo nextest run --profile $profile --locked --test integration
 
 test-end2end:
+    ARG profile=default
     FROM ../+builder
-    RUN cargo nextest run --locked --test end2end
+    RUN cargo nextest run --profile $profile --locked --test end2end
 
 test-nonfunctional:
+    ARG profile=default
     FROM ../+builder
-    RUN cargo nextest run --locked --test nonfunctional
+    RUN cargo nextest run --profile $profile --locked --test nonfunctional
