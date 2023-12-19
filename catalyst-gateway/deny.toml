@@ -105,7 +105,8 @@ allow = [
     "MIT",
     "Apache-2.0",
     "Unicode-DFS-2016",
-    "BSD-3-Clause"
+    "BSD-3-Clause",
+    "BlueOak-1.0.0"
 ]
 # List of explicitly disallowed licenses
 # See https://spdx.org/licenses/ for list of possible licenses
