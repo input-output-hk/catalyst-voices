@@ -1,5 +1,7 @@
 VERSION 0.7
 
+#cspell: words nextest
+
 test-integration:
     FROM ../+builder
     RUN cargo nextest run --locked --test integration
