@@ -1,4 +1,1 @@
-#[test]
-pub fn integration() {
-    assert!(true);
-}
+pub mod catalyst_gateway_event_db;

@@ -19,11 +19,3 @@ license = "MIT OR Apache-2.0"
 [[test]]
 name = "integration"
 path = "integration/main.rs"
-
-[[test]]
-name = "end2end"
-path = "end2end/main.rs"
-
-[[test]]
-name = "non_functional"
-path = "non_functional/main.rs"
