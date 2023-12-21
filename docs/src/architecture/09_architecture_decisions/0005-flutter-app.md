@@ -12,7 +12,9 @@
 
 ## Context
 
-For the Catalyst Voices Frontend App, our goal is to establish a structure that ensures scalability, maintainability, and a clear separation of concerns. With the complexity of voting events, it’s crucial to have an architecture that supports extensive functionality and easy adaptability to change.
+For the Catalyst Voices Frontend App, our goal is to establish a structure that ensures scalability,
+maintainability, and a clear separation of concerns. With the complexity of voting events,
+it’s crucial to have an architecture that supports extensive functionality and easy adaptability to change.
 
 ## Assumptions
 
@@ -24,11 +26,11 @@ For the Catalyst Voices Frontend App, our goal is to establish a structure that 
 
 ## Decision
 
-We have chosen to use BLoC with ViewModels, guided by Clean Architecture principles, for the development of the Catalyst Voices Frontend App. This approach will segregate the app into distinct layers - presentation,
-domain, and data, with BLoC serving as the intermediary for state management and business logic.
+We have chosen to use BLoC with ViewModels, guided by Clean Architecture principles,
+for the development of the Catalyst Voices Frontend App. This approach will segregate the app into distinct layers - presentation, domain, and data, with BLoC serving as the intermediary for state management and business logic.
 The BLoC pattern will manage the app's state reactively, making it easier to handle complex state dependencies and asynchronous operations.The ViewModel layer will further aid in abstracting the presentation logic from BLoCs.
 
-TODO: Add diagram of the architecture
+TODO: Add diagram of the architecture and how the different layers interact.
 
 ## Risks
 
@@ -43,10 +45,12 @@ TODO: Add diagram of the architecture
 * Improved scalability, as new components can be added with minimal impact on existing code.
 * A consistent structure across the app, aiding new developers in understanding the codebase.
 
-
 ## More Information
 
+TODO: Add links to resources
+
 * Detailed documentation on Clean Architecture and how it applies to Flutter development.
+* [The Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 * Documentation and best practices for implementing BLoC and ViewModels in Flutter.
 * Examples of successful Flutter apps built using BLoC and Clean Architecture.
 * Training sessions or resources for the team to get proficient in these architectural concepts.
