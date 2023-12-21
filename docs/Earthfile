@@ -14,7 +14,7 @@ src:
     COPY ./../catalyst-gateway+build-hosted/doc /docs/src/api/catalyst-gateway/rust-docs
 
     # Copy docs we build in the postgres example.
-    COPY --dir ../catalyst-gateway/event-db+build/docs src/appendix/examples/built_docs/postgresql
+    COPY --dir ../catalyst-gateway/event-db+build/docs src/architecture/08_concepts/event_db
 
 
 # Build the docs here.

@@ -44,9 +44,11 @@ COMMENT ON COLUMN event_type.name IS
 'The name of the event type.
 eg. "Catalyst V1"';
 COMMENT ON COLUMN event_type.description_schema IS
-'The JSON Schema which defines the structure of the data in the `description` field in the event record.';
+'The JSON Schema which defines the structure of the data in the 
+`description` field in the event record.';
 COMMENT ON COLUMN event_type.data_schema IS
-'The JSON Schema which defines the structure of the data in the `extra_data` field in the event record.';
+'The JSON Schema which defines the structure of the data in the 
+`extra_data` field in the event record.';
 
 -- TODO: Would be better to read the schemas, extract the ID, and add or update new schemas.
 -- Run as required after migrations.
@@ -92,7 +94,7 @@ COMMENT ON COLUMN event_type.data_schema IS
 -- -------------------------------------------------------------------------------------------------
 
 -- Event Table - Defines each voting or decision event
-CREATE TABLE "event" (
+CREATE TABLE event (
   id UUID PRIMARY KEY DEFAULT GEN_RANDOM_UUID(),
   -- The Organizer/Administrator of this event.  
   -- Update once RBAC is defined, as Organizer is an RBAC Role.
@@ -115,6 +117,11 @@ COMMENT ON TABLE event IS
 COMMENT ON COLUMN event.id IS
 'Synthetic Unique ID for each event (UUIDv4).';
 
+COMMENT ON COLUMN event.organizer IS
+'Name of the Event Organizer.
+Placeholder, this will need to be replaced
+with a reference to an authorized organization.';
+
 COMMENT ON COLUMN event.name IS
 'The name of the event.
 eg. "Fund9" or "SVE1"';
@@ -124,16 +131,17 @@ COMMENT ON COLUMN event.type IS
 
 COMMENT ON COLUMN event.description IS
 'A detailed description of the purpose of the event.
-Must conform to the JSON Schema defined by `event_type.description_schema.`';
+Must conform to the JSON Schema defined by 
+`event_type.description_schema.`';
 COMMENT ON COLUMN event.start_time IS
 'The time (UTC) the event starts.
 NULL = Not yet defined.';
 COMMENT ON COLUMN event.backing_start IS
-'The time (UTC) when backers may start backing the campaigns in the event.
+'The time (UTC) when backers may start backing the events campaign/s.
 This must >= event.start_time.
 NULL = Not yet defined.';
 COMMENT ON COLUMN event.backing_end IS
-'The time (UTC) when backers may no longer back the campaigns in the event.
+'The time (UTC) when backers may no longer back the events campaign/s.
 This must > event.backing_start and <= event.end_time.
 NULL = Not yet defined.';
 COMMENT ON COLUMN event.end_time IS
@@ -142,4 +150,5 @@ Must be >= event.backing_end.
 NULL = Not yet defined.';
 COMMENT ON COLUMN event.data IS
 'Event Type specific data defined about the event.
-Must conform to the JSON Schema defined by `event_type.extra_data_schema.`';
+Must conform to the JSON Schema defined by
+`event_type.extra_data_schema.`';
