@@ -13,6 +13,8 @@ builder:
         --sqlfluff_cfg=./../../+repo-config/repo/.sqlfluff
 
     COPY ./../../+repo-config-2/repo/.sqlfluff .
+    COPY setup-db.sql /sql/
+    COPY --dir json_schemas .
 
 # check if the sqlfiles are properly formatted and pass lint quality checks.
 #   CI target : true
@@ -29,20 +31,13 @@ format:
 
     DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:fix/postgres-builders+FORMAT --src=$(echo ${PWD}/../../)   
 
-# build an event db docker image.
+# build - an event db docker image.
 #   CI target : true
-# Arguments:
-#  * tag: docker image `tag`.
-#  * with_historic_data: add historic data from the `historic_data` dir (default `true`).
-#  * with_test_data: add test data from the `test_data` dir (default `true`).
 build:
-    ARG with_historic_data=true
-    ARG with_test_data=true
-    ARG tag="latest"
+    FROM +builder
 
-    FROM +builder --with_historic_data=$with_historic_data --with_test_data=$with_test_data
-
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:fix/postgres-builders+BUILD --tag=$tag --image_name=event-db
+    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:fix/postgres-builders+BUILD --image_name=event-db
+    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:fix/postgres-builders+DOCS --image_name=event-db
 
 # test the event db database schema
 #   CI target : true

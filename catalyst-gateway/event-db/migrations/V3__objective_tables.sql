@@ -1,5 +1,7 @@
 -- Catalyst Event Database
 
+-- Title: Objective Tables
+
 -- objective types table - Defines all currently known objectives types.
 CREATE TABLE objective_category
 (
@@ -68,12 +70,12 @@ VALUES
 CREATE TABLE goal
 (
   id SERIAL PRIMARY KEY,
-  event_id INTEGER NOT NULL,
+  event_id UUID NOT NULL,
 
   idx INTEGER NOT NULL,
   name VARCHAR NOT NULL,
 
-  FOREIGN KEY (event_id) REFERENCES event (row_id) ON DELETE CASCADE
+  FOREIGN KEY (event_id) REFERENCES event (id) ON DELETE CASCADE
 );
 
 CREATE UNIQUE INDEX goal_index ON goal (event_id, idx);
@@ -94,7 +96,7 @@ CREATE TABLE objective
   row_id SERIAL PRIMARY KEY,
 
   id INTEGER NOT NULL,
-  event INTEGER NOT NULL,
+  event UUID NOT NULL,
 
   category TEXT NOT NULL,
   title TEXT NOT NULL,
@@ -108,7 +110,7 @@ CREATE TABLE objective
 
   extra JSONB,
 
-  FOREIGN KEY (event) REFERENCES event (row_id) ON DELETE CASCADE,
+  FOREIGN KEY (event) REFERENCES event (id) ON DELETE CASCADE,
   FOREIGN KEY (category) REFERENCES objective_category (name) ON DELETE CASCADE,
   FOREIGN KEY (rewards_currency) REFERENCES currency (name) ON DELETE CASCADE,
   FOREIGN KEY (vote_options) REFERENCES vote_options (id) ON DELETE CASCADE

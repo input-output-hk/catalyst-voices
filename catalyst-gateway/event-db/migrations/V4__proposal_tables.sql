@@ -1,5 +1,7 @@
 -- Catalyst Event Database
 
+-- Title : Proposals
+
 -- Proposals Table
 
 CREATE TABLE proposal
@@ -23,10 +25,10 @@ CREATE TABLE proposal
   proposer_relevant_experience TEXT NOT NULL,
   bb_proposal_id BYTEA,
 
-  FOREIGN KEY (objective) REFERENCES objective (row_id) ON DELETE CASCADE,
-  FOREIGN KEY (bb_vote_options) REFERENCES vote_options (
-    objective
-  ) ON DELETE CASCADE
+  FOREIGN KEY (objective) REFERENCES objective (row_id) ON DELETE CASCADE
+  --FOREIGN KEY (bb_vote_options) REFERENCES vote_options (
+  --  objective
+  --) ON DELETE CASCADE
 );
 
 CREATE UNIQUE INDEX proposal_index ON proposal (id, objective);
@@ -75,9 +77,9 @@ CREATE TABLE reviewer_level (
     total_reward_pct <= 100 AND total_reward_pct >= 0
   ),
 
-  event_id INTEGER NOT NULL,
+  event_id UUID NOT NULL,
 
-  FOREIGN KEY (event_id) REFERENCES event (row_id) ON DELETE CASCADE
+  FOREIGN KEY (event_id) REFERENCES event (id) ON DELETE CASCADE
 );
 
 COMMENT ON TABLE reviewer_level IS

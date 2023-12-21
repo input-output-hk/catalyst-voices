@@ -1,6 +1,8 @@
 -- Catalyst Voices Database - Role Registration Data
 -- sqlfluff:dialect:postgres
 
+-- Title : Role Registration Data
+
 -- cspell: words utxo stxo
 -- Configuration Tables
 
@@ -27,7 +29,7 @@ CREATE TABLE cardano_update_state (
 
 CREATE INDEX cardano_update_state_idx ON cardano_update_state (id, network);
 
-COMMENT ON INDEX cardano_update_state_time_idx IS
+COMMENT ON INDEX cardano_update_state_idx IS
 'Index to allow us to efficiently get find an update state record by its id.
 This index can be used to find the latest state record for a particular network.';
 
@@ -137,15 +139,26 @@ CREATE TABLE cardano_utxo (
 
   stake_credential BYTEA NOT NULL,
 
+  spent_slot_no BIGINT NULL,
+  spent_tx_id BIGINT NULL,
+
   PRIMARY KEY (tx_id, index, network),
-  FOREIGN KEY (slot_no, network) REFERENCES slot_index (slot_no, network)
+  FOREIGN KEY (slot_no, network) REFERENCES slot_index (slot_no, network),
+  FOREIGN KEY (spent_slot_no, network) REFERENCES slot_index (slot_no, network)
+
 );
 
-CREATE INDEX cardano_utxo_stake_credential_idx ON utxo (
+CREATE INDEX cardano_utxo_stake_credential_idx ON cardano_utxo (
   stake_credential, slot_no
 );
 COMMENT ON INDEX cardano_utxo_stake_credential_idx IS
 'Index to allow us to efficiently lookup a set of UTXOs by stake credential relative to a slot_no.';
+
+CREATE INDEX cardano_stxo_slot_idx ON cardano_utxo (spent_slot_no, network);
+
+COMMENT ON INDEX cardano_stxo_slot_idx IS
+'Index to allow us to efficiently lookup a set of Spent TX Outputs by slot_no.';
+
 
 COMMENT ON TABLE cardano_utxo IS
 'This table holds all UTXOs for any transaction which is tied to a stake address.
@@ -164,49 +177,12 @@ COMMENT ON COLUMN cardano_utxo.slot_no IS
 'The slot number the UTXO appeared in.';
 COMMENT ON COLUMN cardano_utxo.stake_credential IS
 'The stake credential of the address which owns the UTXO.';
-
-
--- -------------------------------------------------------------------------------------------------
-
--- STXO Table -- Spent TX Outputs.
--- Populated with this query from db-sync
---     SELECT tx_out_id as tx_id, tx_out_index as index, tx_in.id as spent_tx_id, slot_no, time  FROM tx_in
---        INNER JOIN tx ON tx_in.tx_in_id = tx.id
---        INNER JOIN block ON tx.block_id = block.id;
--- network needs to be supplied, as dbsync only has a single database per network.
-CREATE TABLE cardano_stxo (
-  tx_id BIGINT NOT NULL,
-  index INTEGER NOT NULL,
-  network TEXT NOT NULL,
-
-  spent_tx_id BIGINT NOT NULL,
-  spent_slot_no BIGINT NOT NULL,
-
-  PRIMARY KEY (tx_id, index, network),
-  FOREIGN KEY (tx_id, index, network) REFERENCES utxo (tx_id, index, network),
-  FOREIGN KEY (spent_slot_no, network) REFERENCES slot_index (slot_no, network)
-);
-
-CREATE INDEX cardano_stxo_slot_idx ON stxo (spent_slot_no, network);
-
-COMMENT ON INDEX cardano_stxo_slot_idx IS
-'Index to allow us to efficiently lookup a set of Spent TX Outputs by slot_no.';
-
-COMMENT ON TABLE cardano_stxo IS
-'This table holds all Spent TX Outputs.
-This data allows us to calculate staked ADA at any particular instant in time.';
-
-COMMENT ON COLUMN cardano_stxo.tx_id IS
-'The ID of the transaction containing the original UTXO.';
-COMMENT ON COLUMN cardano_stxo.index IS
-'The index of the UTXO within the original transaction.';
-COMMENT ON COLUMN cardano_stxo.network IS
-'The Cardano network for the original UTXO.';
-COMMENT ON COLUMN cardano_stxo.spent_tx_id IS
+COMMENT ON COLUMN cardano_utxo.spent_tx_id IS
 'The ID of the transaction which Spent the TX Output.';
-COMMENT ON COLUMN cardano_stxo.spent_slot_no IS
+COMMENT ON COLUMN cardano_utxo.spent_slot_no IS
 'The slot number the TX Output was spent in.
 This lets us determine when the TX Output was spent, so we can calculate staked ada at a particular slot.';
+
 
 
 -- -------------------------------------------------------------------------------------------------
@@ -232,7 +208,7 @@ CREATE TABLE cardano_reward (
   FOREIGN KEY (slot_no, network) REFERENCES slot_index (slot_no, network)
 );
 
-CREATE INDEX cardano_rewards_stake_credential_idx ON cardano_rewards (
+CREATE INDEX cardano_rewards_stake_credential_idx ON cardano_reward (
   stake_credential, slot_no
 );
 
@@ -338,14 +314,7 @@ CREATE INDEX cardano_voter_registration_voting_key_idx ON cardano_voter_registra
 COMMENT ON INDEX cardano_voter_registration_voting_key_idx IS
 'Optimize lookups for "public_voting_key" or "public_voting_key"+"nonce" or "public_voting_key"+"nonce"+"valid".';
 
-
-CREATE INDEX cardano_voter_registration_voting_key_idx ON cardano_voter_registration (
-  public_voting_key, nonce, valid
-);
-COMMENT ON INDEX cardano_voter_registration_voting_key_idx IS
-'Optimize lookups for "public_voting_key" or "public_voting_key"+"nonce" or "public_voting_key"+"nonce"+"valid".';
-
-COMMENT ON TABLE cardano_voter_registrations IS
+COMMENT ON TABLE cardano_voter_registration IS
 'All CIP15/36 Voter Registrations that are on-chain.
 This tables stores all found registrations, even if they are invalid, or have been rolled back.';
 

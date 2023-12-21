@@ -1,17 +1,19 @@
 -- Catalyst Event Database
 
+-- Title : Catalyst Automation
+
 -- Voting Nodes Table - Defines nodes in the network
 -- This table is looked up by hostname and event
 CREATE TABLE voting_node (
   hostname TEXT NOT NULL,
-  event INTEGER NOT NULL,
+  event UUID NOT NULL,
 
   pubkey TEXT NOT NULL,
   seckey TEXT NOT NULL,
   netkey TEXT NOT NULL,
 
   PRIMARY KEY (hostname, event),
-  FOREIGN KEY (event) REFERENCES event (row_id) ON DELETE CASCADE
+  FOREIGN KEY (event) REFERENCES event (id) ON DELETE CASCADE
 );
 
 COMMENT ON TABLE voting_node IS
@@ -30,14 +32,14 @@ COMMENT ON COLUMN voting_node.netkey IS 'Encrypted Ed25519 secret key for the no
 CREATE TABLE tally_committee (
   row_id SERIAL PRIMARY KEY,
 
-  event INTEGER NOT NULL UNIQUE,
+  event UUID NOT NULL UNIQUE,
 
   committee_pk TEXT NOT NULL,
   committee_id TEXT NOT NULL,
   member_crs TEXT,
   election_key TEXT,
 
-  FOREIGN KEY (event) REFERENCES event (row_id) ON DELETE CASCADE
+  FOREIGN KEY (event) REFERENCES event (id) ON DELETE CASCADE
 );
 
 COMMENT ON TABLE tally_committee IS 'Table for storing data about the tally committee per voting event.';

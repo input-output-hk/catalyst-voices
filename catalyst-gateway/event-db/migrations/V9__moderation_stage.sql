@@ -1,5 +1,7 @@
 -- Catalyst Event Database
 
+-- Title : Moderation Stage Data
+
 -- ModerationAllocation - Defines the relationship between users and proposals_reviews
 -- to describe the allocation of moderations that needs to be done.
 

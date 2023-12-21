@@ -1,5 +1,7 @@
 -- Catalyst Event Database
 
+-- Title : Vote Plan
+
 -- Vote Plan Categories
 
 CREATE TABLE voteplan_category

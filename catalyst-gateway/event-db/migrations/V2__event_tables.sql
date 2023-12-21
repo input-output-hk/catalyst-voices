@@ -1,6 +1,8 @@
 -- Catalyst Voices Database - Event Data
 -- sqlfluff:dialect:postgres
 
+-- Title : Event Data
+
 -- `id` mapping.
 -- * `id` is a UUID, in the past it was an auto incrementing value.
 -- * it is changed to a UUID so that the data can be generated independently and it is more friendly 
@@ -50,42 +52,42 @@ COMMENT ON COLUMN event_type.data_schema IS
 -- Run as required after migrations.
 
 -- Add Event Schemas to the known schema types.
-INSERT INTO json_schema_type_names (id)
-VALUES
-('event_description'), -- Event Description schemas
-('event_data');        -- Event Data Schemas
+-- INSERT INTO json_schema_type_names (id)
+-- VALUES
+-- ('event_description'), -- Event Description schemas
+-- ('event_data');        -- Event Data Schemas
 
 -- Add the Initial Schemas for events.
-INSERT INTO json_schema_type (id, type, name, schema)
-VALUES
-(
-  'd899cd44-3513-487b-ab46-fdca662a724d', -- From the schema file.
-  'event_description',
-  'multiline_text',
-  (
-    SELECT jsonb
-    FROM PG_READ_FILE('../json_schemas/event/description/multiline_text.json')
-  )
-),
-(
-  '9c5df318-fa9a-4310-80fa-490f46d1cc43', -- From the schema file.
-  'event_data',
-  'catalyst_v1',
-  (
-    SELECT jsonb
-    FROM PG_READ_FILE('../json_schemas/event/description/catalyst_v1.json')
-  )
-);
+-- INSERT INTO json_schema_type (id, type, name, schema)
+-- VALUES
+--(
+--  'd899cd44-3513-487b-ab46-fdca662a724d', -- From the schema file.
+--  'event_description',
+--  'multiline_text',
+--  (
+--    SELECT jsonb
+--    FROM PG_READ_FILE('../json_schemas/event/description/multiline_text.json')
+--  )
+--),
+--(
+-- '9c5df318-fa9a-4310-80fa-490f46d1cc43', -- From the schema file.
+--  'event_data',
+--  'catalyst_v1',
+--  (
+--    SELECT jsonb
+--    FROM PG_READ_FILE('../json_schemas/event/description/catalyst_v1.json')
+--  )
+--);
 
 -- Define a Catalyst V1 Event.
 
-INSERT INTO event_type (name, description_schema, data_schema)
-VALUES
-(
-  'Catalyst V1',
-  'd899cd44-3513-487b-ab46-fdca662a724d',
-  '9c5df318-fa9a-4310-80fa-490f46d1cc43'
-);
+--INSERT INTO event_type (name, description_schema, data_schema)
+--VALUES
+--(
+--  'Catalyst V1',
+--  'd899cd44-3513-487b-ab46-fdca662a724d',
+--  '9c5df318-fa9a-4310-80fa-490f46d1cc43'
+--);
 
 -- -------------------------------------------------------------------------------------------------
 
