@@ -16,7 +16,7 @@ builder:
     COPY setup-db.sql /sql/
     COPY --dir json_schemas .
 
-# check if the sqlfiles are properly formatted and pass lint quality checks.
+# check if the sql files are properly formatted and pass lint quality checks.
 #   CI target : true
 check:
     FROM +builder
