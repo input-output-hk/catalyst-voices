@@ -1,0 +1,3 @@
+class CatalystVoicesShared {
+  const CatalystVoicesShared();
+}

@@ -1,5 +1,0 @@
----
-icon: material/security
----
-
-# Security

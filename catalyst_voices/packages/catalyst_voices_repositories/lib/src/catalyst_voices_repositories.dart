@@ -1,0 +1,3 @@
+class CatalystVoicesRepositories {
+  const CatalystVoicesRepositories();
+}

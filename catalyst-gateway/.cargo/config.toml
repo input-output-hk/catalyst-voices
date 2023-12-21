@@ -1,12 +1,12 @@
 # Use MOLD linker where possible, but ONLY in CI applicable targets.
-# cspell: words rustflags armv gnueabihf msvc nextest idents rustdocflags 
-# cspell: words rustdoc lintfix lintrestrict testfast testdocs codegen testci
+# cspell: words rustflags armv gnueabihf msvc nextest idents rustdocflags
+# cspell: words rustdoc lintfix lintrestrict testfast testdocs codegen testci testunit
 # cspell: words fmtchk fmtfix
 
 # Configure how Docker container targets build.
 
 # If you want to customize these targets for a local build, then customize them in you:
-#  $CARGO_HOME/config.toml  
+#  $CARGO_HOME/config.toml
 # NOT in the project itself.
 # These targets are ONLY the targets used by CI and inside docker builds.
 
@@ -49,6 +49,9 @@ rustflags = [
 ]
 
 rustdocflags = [
+    "--enable-index-page",
+    "-Z",
+    "unstable-options",
     "-D",
     "warnings",
     "-D",
@@ -104,16 +107,16 @@ lto = "thin"
 incremental = false
 codegen-units = 16
 
-
 [alias]
-lint = "clippy -- -D warnings -D clippy::pedantic -D clippy::unwrap_used -D clippy::expect_used -D clippy::exit -D clippy::get_unwrap -D clippy::index_refutable_slice -D clippy::indexing_slicing -D clippy::match_on_vec_items -D clippy::match_wild_err_arm -D clippy::missing_panics_doc -D clippy::panic -D clippy::string_slice -D clippy::unchecked_duration_subtraction -D clippy::unreachable -D clippy::missing_docs_in_private_items"
-lintfix = "clippy -- -D warnings -D clippy::pedantic -D clippy::unwrap_used -D clippy::expect_used -D clippy::exit -D clippy::get_unwrap -D clippy::index_refutable_slice -D clippy::indexing_slicing -D clippy::match_on_vec_items -D clippy::match_wild_err_arm -D clippy::missing_panics_doc -D clippy::panic -D clippy::string_slice -D clippy::unchecked_duration_subtraction -D clippy::unreachable"
+lint = "clippy --all-targets -- -D warnings -D clippy::pedantic -D clippy::unwrap_used -D clippy::expect_used -D clippy::exit -D clippy::get_unwrap -D clippy::index_refutable_slice -D clippy::indexing_slicing -D clippy::match_on_vec_items -D clippy::match_wild_err_arm -D clippy::missing_panics_doc -D clippy::panic -D clippy::string_slice -D clippy::unchecked_duration_subtraction -D clippy::unreachable -D clippy::missing_docs_in_private_items"
+lintfix = "clippy --all-targets --fix --allow-dirty -- -D warnings -D clippy::pedantic -D clippy::unwrap_used -D clippy::expect_used -D clippy::exit -D clippy::get_unwrap -D clippy::index_refutable_slice -D clippy::indexing_slicing -D clippy::match_on_vec_items -D clippy::match_wild_err_arm -D clippy::missing_panics_doc -D clippy::panic -D clippy::string_slice -D clippy::unchecked_duration_subtraction -D clippy::unreachable -D clippy::missing_docs_in_private_items"
 lintrestrict = "clippy -- -D warnings -D clippy::pedantic -D clippy::restriction -D clippy::missing_docs_in_private_items"
 lint-vscode = "clippy --workspace --message-format=json-diagnostic-rendered-ansi --all-targets -- -D warnings -D clippy::pedantic -D clippy::unwrap_used -D clippy::expect_used -D clippy::exit -D clippy::get_unwrap -D clippy::index_refutable_slice -D clippy::indexing_slicing -D clippy::match_on_vec_items -D clippy::match_wild_err_arm -D clippy::missing_panics_doc -D clippy::panic -D clippy::string_slice -D clippy::unchecked_duration_subtraction -D clippy::unreachable -D clippy::missing_docs_in_private_items"
 
 docs = "doc --workspace -r --all-features --no-deps --bins --document-private-items --examples --locked"
 # nightly docs build broken... when they are'nt we can enable these docs... --unit-graph --timings=html,json -Z unstable-options"
 testfast = "nextest run --release --workspace --locked"
+testunit = "nextest run --release --bins --lib --workspace --locked -P ci"
 testci = "nextest run --release --workspace --locked -P ci"
 testdocs = "test --doc --release --workspace --locked"
 

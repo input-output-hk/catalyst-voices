@@ -5,24 +5,24 @@ FROM debian:stable-slim
 
 # cspell: words livedocs sitedocs
 
-markdown-check:
-    # Check Markdown in this repo.
-    LOCALLY
+# check-markdown markdown check using catalyst-ci.
+check-markdown:
+    DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:v2.0.10+CHECK
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:v2.0.9+MDLINT_LOCALLY --src=$(echo ${PWD})
-
+# markdown-check-fix markdown check and fix using catalyst-ci.
 markdown-check-fix:
-    # Check Markdown in this repo.
     LOCALLY
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:v2.0.9+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
+    DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:v2.0.10+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
 
-spell-check:
-    # Check spelling in this repo.
-    LOCALLY
+# check-spelling Check spelling in this repo inside a container.
+check-spelling:
+    DO github.com/input-output-hk/catalyst-ci/earthly/cspell:v2.0.10+CHECK
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/cspell:v2.0.9+CSPELL_LOCALLY --src=$(echo ${PWD})
- 
+check:
+    BUILD +check-spelling
+    BUILD +check-markdown
+
 repo-docs:
     # Create artifacts of extra files we embed inside the documentation when its built.
     FROM scratch

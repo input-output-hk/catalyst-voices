@@ -257,17 +257,11 @@ mod tests {
         assert_eq!(GITHUB_REPO_NAME.as_str(), GITHUB_REPO_NAME_DEFAULT);
     }
 
-    // #[test]
-    // fn github_repo_name_set() {
-    // env::set_var("GITHUB_REPO_NAME", "test");
-    // assert_eq!(GITHUB_REPO_NAME.as_str(), GITHUB_REPO_NAME_DEFAULT);
-    // }
-
     #[test]
     fn generate_github_issue_url_test() {
         let title = "Hello, World! How are you?";
         assert_eq!(
-            generate_github_issue_url(title).unwrap().as_str(),
+            generate_github_issue_url(title).expect("Failed to generate url").as_str(),
             "https://github.com/input-output-hk/catalyst-core/issues/new?template=bug_report.md&title=Hello%2C+World%21+How+are+you%3F"
         );
     }

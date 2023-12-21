@@ -4,6 +4,8 @@ use poem_openapi::Tags;
 /// `OpenAPI` Tags
 #[derive(Tags)]
 pub(crate) enum ApiTags {
+    /// Fragment endpoints
+    Fragments,
     /// Health Endpoints
     Health,
     /// Information relating to Voter Registration, Delegations and Calculated Voting
