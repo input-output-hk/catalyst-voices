@@ -12,7 +12,7 @@
 
 ## Context
 
-For the Catalyst Voices Frontend App, our goal is to establish a structure that ensures scalability,
+Our goal for the Catalyst Voices Frontend App is to establish a structure that ensures scalability,
 maintainability, and a clear separation of concerns. With the complexity of voting events,
 it’s crucial to have an architecture that supports extensive functionality and easy adaptability to change.
 
@@ -47,10 +47,7 @@ TODO: Add diagram of the architecture and how the different layers interact.
 
 ## More Information
 
-TODO: Add links to resources
-
-* Detailed documentation on Clean Architecture and how it applies to Flutter development.
 * [The Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
-* Documentation and best practices for implementing BLoC and ViewModels in Flutter.
-* Examples of successful Flutter apps built using BLoC and Clean Architecture.
-* Training sessions or resources for the team to get proficient in these architectural concepts.
+* [BLoC Pattern - DartConf 2018](https://youtu.be/PLHln7wHgPE?si=QJ8hXOCWz2WIYFye)
+* [BLoC Pub Documentation](https://bloclibrary.dev/)
+* [Flutter BLoC Examples](https://github.com/felangel/bloc/tree/master/examples)
