@@ -27,10 +27,20 @@ it’s crucial to have an architecture that supports extensive functionality and
 ## Decision
 
 We have chosen to use BLoC with ViewModels, guided by Clean Architecture principles,
-for the development of the Catalyst Voices Frontend App. This approach will segregate the app into distinct layers - presentation, domain, and data, with BLoC serving as the intermediary for state management and business logic.
-The BLoC pattern will manage the app's state reactively, making it easier to handle complex state dependencies and asynchronous operations.The ViewModel layer will further aid in abstracting the presentation logic from BLoCs.
+for the development of the Catalyst Voices Frontend App.
+This approach will segregate the app into distinct layers - presentation, domain, and data,
+with BLoC serving as the intermediary for state management and business logic.
+The BLoC pattern will manage the app's state reactively,
+making it easier to handle complex state dependencies and asynchronous operations.
+The ViewModel layer will further aid in abstracting the presentation logic from BLoCs.
 
-TODO: Add diagram of the architecture and how the different layers interact.
+
+
+
+
+### Practical Example
+
+
 
 ## Risks
 
