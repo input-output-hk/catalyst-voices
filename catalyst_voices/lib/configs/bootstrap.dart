@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:catalyst_voices/app_bloc_observer.dart';
+import 'package:catalyst_voices/configs/app_bloc_observer.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
