@@ -1,0 +1,86 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$comment": "Custom URI schema: catalyst_schema://<uuid>/<group>/<name>",
+    "$id": "catalyst_schema://62d614c0-97a7-41ec-a976-91294b8f4384/config/loadtest",
+    "title": "Registration Configuration",
+    "description": "Registration configuration",
+    "type": "object",
+    "properties": {
+        "common": {
+            "$comment": "This provides the base settings for all networks. Anything thats common to all networks should be defined here.",
+            "$ref": "#/definitions/registration"
+        },
+        "networks": {
+            "$comment": "Individual networks defined here.  Only need to define settings which differ from the common settings. Must define at least 1 network.",
+            "type": "object",
+            "properties": {
+                "mainnet": {
+                    "$ref": "#/definitions/registration"
+                },
+                "preprod": {
+                    "$ref": "#/definitions/registration"
+                },
+                "preview": {
+                    "$ref": "#/definitions/registration"
+                },
+                "local": {
+                    "$ref": "#/definitions/registration"
+                }
+            },
+            "anyOf": [
+                {
+                    "required": [
+                        "mainnet"
+                    ]
+                },
+                {
+                    "required": [
+                        "preprod"
+                    ]
+                },
+                {
+                    "required": [
+                        "preview"
+                    ]
+                },
+                {
+                    "required": [
+                        "local"
+                    ]
+                }
+            ]
+        }
+    },
+    "required": [
+        "common",
+        "networks"
+    ],
+    "additionalProperties": false,
+    "definitions": {
+        "registration": {
+            "$comment": "Registration Configuration",
+            "type": "object",
+            "properties": {
+                "loadtest": {
+                    "type": "boolean",
+                    "description": "Do we create LoadTest registrations when we import registrations for this network?",
+                    "example": true,
+                    "default": false
+                },
+                "rollback_window": {
+                    "type": "integer",
+                    "description": "How many hours do we check for potential rollbacks when importing registrations for the network?  Default is 7 Days, or 1 full clear Epoch.",
+                    "example": 48,
+                    "default": 168
+                },
+                "metadata_retention": {
+                    "type": "integer",
+                    "description": "How many days do we keep metadata for registrations in the database?  Default is 6 months.  0 = Forever.",
+                    "example": 30,
+                    "default": 180
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}

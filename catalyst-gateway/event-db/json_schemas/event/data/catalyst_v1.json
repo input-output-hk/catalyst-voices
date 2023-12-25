@@ -1,0 +1,165 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$comment": "Custom URI schema: catalyst_schema://<uuid>/<group>/<name>",
+    "$id": "catalyst_schema://9c5df318-fa9a-4310-80fa-490f46d1cc43/event_data/catalyst_v1",
+    "title": "Catalyst V1 Event",
+    "description": "Traditional Project Catalyst Event Configuration",
+    "type": "object",
+    "properties": {
+        "timeline": {
+            "$comment": "allows additionalProperties so the schema can be extended in a backwards compatible way in the future",
+            "type": "object",
+            "description": "The timeline of the various stages of the event.",
+            "additionalProperties": true,
+            "properties": {
+                "registration_deadline": {
+                    "description": "The deadline for registrations.\nThe Time (UTC) Registrations are taken from the Cardano blockchain.\nRegistrations after this date are not valid for voting on the event.\nNULL = Not yet defined or Not Applicable.'When the Voting power snapshot is set for.",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "snapshot_stable": {
+                    "description": "The Time (UTC) Registrations taken from Cardano blockchain are considered stable.\nThis is not the Time of the Registration Snapshot.\nThis is the time after which the registration snapshot will be stable.\nNULL = Not yet defined or Not Applicable.",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "insight_sharing_start": {
+                    "description": "TODO.\nNULL = Not yet defined.",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "proposal_submission_start": {
+                    "description": "The Time (UTC) proposals can start to be submitted for the event.\nNULL = Not yet defined, or Not applicable.",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "refine_proposals_start": {
+                    "description": "TODO.\nNULL = Not yet defined.",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "finalize_proposals_start": {
+                    "description": "The Time (UTC) when all proposals must be finalized by.\nNULL = Not yet defined, or Not applicable.",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "proposal_assessment_start": {
+                    "description": "The Time (UTC) when PA Assessors can start assessing proposals.\nNULL = Not yet defined, or Not applicable.",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "assessment_qa_start": {
+                    "description": "The Time (UTC) when vPA Assessors can start assessing assessments.\nNULL = Not yet defined, or Not applicable.",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "voting_start": {
+                    "description": "The earliest time that registered wallets with sufficient voting power can place votes in the event.\nNULL = Not yet defined.\nTypically this is aligned with Backing Start of the event.",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "voting_end": {
+                    "description": "The latest time that registered wallets with sufficient voting power can place votes in the event.\nNULL = Not yet defined.\nTypically aligned with backing End of the Event.",
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "tallying_end": {
+                    "description": "The latest time that tallying the event can complete by.\nNULL = Not yet defined.",
+                    "type": "string",
+                    "format": "date-time"
+                }
+            }
+        },
+        "registration": {
+            "$comment": "Allows additionalProperties so the schema can be extended in a backwards compatible way in the future.",
+            "type": "object",
+            "description": "The options which control the individual selection power of each participant in the event.",
+            "additionalProperties": true,
+            "properties": {
+                "stake_participation_threshold": {
+                    "description": "The Minimum number of Lovelace needed to be staked at the time of snapshot, to be eligible to participate.\nNULL = Not yet defined.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "max_stake_percent": {
+                    "description": "The Maximum Percentage of all registered staked ADA which can be used to participate in the event.",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "default": 100
+                },
+                "network": {
+                    "description": "The Cardano network the event allows registrations from. Can be one or more networks.",
+                    "type": "array",
+                    "minItems": 1,
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "mainnet",
+                            "preprod",
+                            "testnet"
+                        ]
+                    },
+                    "default": [
+                        "mainnet"
+                    ]
+                }
+            }
+        },
+        "rewards": {
+            "$comment": "Allows additionalProperties so the schema can be extended in a backwards compatible way in the future.",
+            "type": "object",
+            "description": "The options which control the reward distribution of the event.",
+            "additionalProperties": true,
+            "properties": {
+                "review": {
+                    "description": "The total reward pool (in lovelace) to pay for community reviewers for their valid reviews of the proposals assigned to this event.",
+                    "type": "integer",
+                    "format": "int64",
+                    "minimum": 0
+                }
+            }
+        },
+        "tally": {
+            "$comment": "Allows additionalProperties so the schema can be extended in a backwards compatible way in the future.",
+            "type": "object",
+            "description": "The options which control the results tally of the event.",
+            "additionalProperties": true,
+            "properties": {
+                "committee_size": {
+                    "description": "The Size of the Tally committee.\n0 = No Committee, and all votes are therefore public.",
+                    "type": "integer",
+                    "format": "",
+                    "minimum": 0,
+                    "default": 0
+                },
+                "committee_threshold": {
+                    "description": "The Minimum Size of the Tally committee to perform the Tally.\nMust be <= `committee_size`.\n0 is equivalent to ALL Committee members are required.",
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 0
+                }
+            }
+        },
+        "jormungandr": {
+            "$comment": "Allows additionalProperties so the schema can be extended in a backwards compatible way in the future.",
+            "type": "object",
+            "description": "The Events Jormungandr configuration.",
+            "additionalProperties": true,
+            "properties": {
+                "block0": {
+                    "description": "The BASE64 encoded copy of Block 0 used to start the Blockchain.\nIf not defined then the Blockchain is not yet configured.",
+                    "type": "string",
+                    "contentEncoding": "base64",
+                    "contentMediaType": "application/octet-stream"
+                },
+                "block0_hash": {
+                    "description": "The BASE16 encoded hash of Block 0 used to start the Blockchain.\nIf not defined then the Blockchain is not yet configured.",
+                    "type": "string",
+                    "contentEncoding": "base16",
+                    "contentMediaType": "application/octet-stream"
+                }
+            }
+        }
+    }
+}
