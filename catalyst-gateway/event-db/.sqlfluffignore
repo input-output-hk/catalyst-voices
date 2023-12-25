@@ -1,0 +1,4 @@
+# Ignore generated historic data files
+
+fund_*.sql
+setup-db.sql
