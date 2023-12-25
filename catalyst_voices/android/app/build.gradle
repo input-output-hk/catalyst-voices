@@ -76,17 +76,22 @@ android {
 
     flavorDimensions "default"
     productFlavors {
-        production {
+        prod {
             dimension "default"
             applicationIdSuffix ""
             manifestPlaceholders = [appName: "Catalyst Voices"]
         }
-        staging {
+        preprod {
             dimension "default"
-            applicationIdSuffix ".stg"
-            manifestPlaceholders = [appName: "[STG] Catalyst Voices"]
+            applicationIdSuffix ".preprod"
+            manifestPlaceholders = [appName: "[PRE] Catalyst Voices"]
         }
-        development {
+        qa {
+            dimension "default"
+            applicationIdSuffix ".qa"
+            manifestPlaceholders = [appName: "[QA] Catalyst Voices"]
+        }
+        dev {
             dimension "default"
             applicationIdSuffix ".dev"
             manifestPlaceholders = [appName: "[DEV] Catalyst Voices"]

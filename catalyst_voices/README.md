@@ -59,21 +59,25 @@ melos bootstrap
 
 This project contains 3 flavors:
 
-* development
-* staging
-* production
+* dev
+* qa
+* preprod
+* prod
 
 To run the desired flavor either use the launch configuration in VSCode/Android Studio or use the following commands:
 
 ```sh
 # Development
-flutter run --flavor development --target lib/main_development.dart
+flutter run --flavor dev --target lib/configs/main_dev.dart
 
-# Staging
-flutter run --flavor staging --target lib/main_staging.dart
+# QA
+flutter run --flavor qa --target lib/configs/main_qa.dart
+
+# Pre-Production
+flutter run --flavor prod --target lib/configs/main_preprod.dart
 
 # Production
-flutter run --flavor production --target lib/main_production.dart
+flutter run --flavor prod --target lib/configs/main_prod.dart
 ```
 
 *\*Catalyst Voices works on Web.
