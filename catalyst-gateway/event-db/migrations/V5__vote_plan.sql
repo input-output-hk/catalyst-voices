@@ -1,5 +1,7 @@
 -- Catalyst Event Database
 
+-- Title : Vote Plan
+
 -- Vote Plan Categories
 
 CREATE TABLE voteplan_category
@@ -88,4 +90,5 @@ COMMENT ON TABLE proposal_voteplan IS 'Table to link Proposals to Vote plans in 
 COMMENT ON COLUMN proposal_voteplan.row_id IS 'Synthetic ID of this Voteplan/Proposal M-M relationship.';
 COMMENT ON COLUMN proposal_voteplan.proposal_id IS 'The link to the Proposal primary key that links to this voteplan.';
 COMMENT ON COLUMN proposal_voteplan.voteplan_id IS 'The link to the Voteplan primary key that links to this proposal.';
-COMMENT ON COLUMN proposal_voteplan.bb_proposal_index IS 'The Index with the voteplan used by the voting ledger/bulletin board that references this proposal.';
+COMMENT ON COLUMN proposal_voteplan.bb_proposal_index IS
+'The Index with the voteplan used by the voting ledger/bulletin board that references this proposal.';

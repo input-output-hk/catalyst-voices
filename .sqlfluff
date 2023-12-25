@@ -1,0 +1,24 @@
+# cspell: words capitalisation
+
+[sqlfluff]
+dialect = postgres
+large_file_skip_char_limit = 0
+max_line_length = 120
+
+[sqlfluff:indentation]
+tab_space_size = 2
+
+[sqlfluff:rules:layout.long_lines]
+ignore_comment_lines = True
+ignore_comment_clauses = True
+
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = upper
+[sqlfluff:rules:capitalisation.identifiers]
+extended_capitalisation_policy = lower
+[sqlfluff:rules:capitalisation.functions]
+extended_capitalisation_policy = upper
+[sqlfluff:rules:capitalisation.literals]
+extended_capitalisation_policy = upper
+[sqlfluff:rules:capitalisation.types]
+extended_capitalisation_policy = upper
