@@ -1,19 +1,19 @@
 -- Define F10 IdeaScale parameters.
 INSERT INTO config (id, id2, id3, value) VALUES (
   'ideascale',
-  '0',
+  '10',
   '',
-  '{  
-        "group_id": 37429,
-        "review_stage_ids": [171],
-        "nr_allocations": [1, 1],
-        "campaign_group_id": 88,
+  '{
+        "group_id": 31051,
+        "review_stage_ids": [143, 145],
+        "nr_allocations": [30, 80],
+        "campaign_group_id": 63,
         "questions": {
-            "Question 1": "Impact / Alignment",
-            "Question 2": "Feasibility",
-            "Question 3": "Auditability"
+            "You are reviewing the positive IMPACT this project will have on the Cardano Ecosystem.\nHas this project clearly demonstrated in all aspects of the proposal that it will have a positive impact on the Cardano Ecosystem?": "Impact / Alignment",
+            "You are reviewing the FEASIBILITY of this project.\nIs this project feasible based on the proposal submitted? Does the plan and associated budget and milestones look achievable? Does the team have the skills, experience, capability and capacity to complete the project successfully?": "Feasibility",
+            "You are reviewing the VALUE FOR MONEY this represents for the Treasury and the Community\nIs the funding amount requested for this project reasonable and does it provide good Value for Money to the Treasury?": "Auditability"
         },
-        "stage_ids": [4684, 4685, 4686],
+        "stage_ids": [4590, 4596, 4602, 4608, 4614, 4620, 4626, 4632, 4638, 4644, 4650, 4656, 4662, 4591, 4597, 4603, 4609, 4615, 4621, 4627, 4633, 4639, 4645, 4651, 4657, 4663, 4592, 4598, 4604, 4610, 4616, 4622, 4628, 4634, 4640, 4646, 4652, 4658, 4664],
         "proposals": {
             "field_mappings": {
                 "proposer_url": ["relevant_link_1", "website__github_repository__or_any_other_relevant_link__", "relevant_link_3"],
@@ -54,7 +54,7 @@ INSERT INTO config (id, id2, id3, value) VALUES (
 INSERT INTO config (id, id2, id3, value) VALUES (
   'event',
   'ideascale_params',
-  '0',
-  '{"params_id": "TestFund"}'
+  '10',
+  '{"params_id": "F10"}'
 ) ON CONFLICT (id, id2, id3) DO UPDATE
-SET value = EXCLUDED.value;
+SET value = excluded.value;

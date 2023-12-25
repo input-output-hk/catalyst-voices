@@ -100,9 +100,9 @@ VALUES
 (
   5,
   'Test Fund 5', 'Test Fund 5 description',
-  NULL, NULL, NULL, NULL,
-  NULL, NULL,
-  NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-  NULL, NULL,
+  null, null, null, null,
+  null, null,
+  null, null, null, null, null, null, null, null, null,
+  null, null,
   6, 6
 );
