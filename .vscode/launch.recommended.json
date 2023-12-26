@@ -1,44 +1,113 @@
 {
-    // Recommended `launch.json` configuration
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Catalyst Voices [DEV][Debug]",
-            "cwd": "catalyst_voices",
-            "request": "launch",
-            "type": "dart",
-            "program": "lib/main_development.dart",
-            "args": [
-                "--flavor",
-                "development",
-            ]
-        },
-        {
-            "name": "Catalyst Voices [DEV][Profile]",
-            "cwd": "catalyst_voices",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "profile",
-            "program": "lib/main_development.dart",
-            "args": [
-                "--flavor",
-                "development",
-            ]
-        },
-        {
-            "name": "Catalyst Voices [DEV][Release]",
-            "cwd": "catalyst_voices",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "release",
-            "program": "lib/main_development.dart",
-            "args": [
-                "--flavor",
-                "development",
-            ]
-        }
-    ]
+  // Recommended `launch.json` configuration
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Catalyst Voices [DEV][Debug]",
+      "cwd": "catalyst_voices",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/configs/main_dev.dart",
+      "args": ["--flavor", "dev"]
+    },
+    {
+      "name": "Catalyst Voices [DEV][Profile]",
+      "cwd": "catalyst_voices",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile",
+      "program": "lib/configs/main_dev.dart",
+      "args": ["--flavor", "dev"]
+    },
+    {
+      "name": "Catalyst Voices [DEV][Release]",
+      "cwd": "catalyst_voices",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "program": "lib/configs/main_dev.dart",
+      "args": ["--flavor", "dev"]
+    },
+    {
+      "name": "Catalyst Voices [QA][Debug]",
+      "cwd": "catalyst_voices",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/configs/main_qa.dart",
+      "args": ["--flavor", "qa"]
+    },
+    {
+      "name": "Catalyst Voices [QA][Profile]",
+      "cwd": "catalyst_voices",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile",
+      "program": "lib/configs/main_qa.dart",
+      "args": ["--flavor", "qa"]
+    },
+    {
+      "name": "Catalyst Voices [QA][Release]",
+      "cwd": "catalyst_voices",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "program": "lib/configs/main_qa.dart",
+      "args": ["--flavor", "qa"]
+    },
+    {
+      "name": "Catalyst Voices [PROD][Debug]",
+      "cwd": "catalyst_voices",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/configs/main_prod.dart",
+      "args": ["--flavor", "prod"]
+    },
+    {
+      "name": "Catalyst Voices [PROD][Profile]",
+      "cwd": "catalyst_voices",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile",
+      "program": "lib/configs/main_prod.dart",
+      "args": ["--flavor", "prod"]
+    },
+    {
+      "name": "Catalyst Voices [PROD][Release]",
+      "cwd": "catalyst_voices",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "program": "lib/configs/main_prod.dart",
+      "args": ["--flavor", "prod"]
+    },
+    {
+      "name": "Catalyst Voices [PRE:PROD][Debug]",
+      "cwd": "catalyst_voices",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/configs/main_preprod.dart",
+      "args": ["--flavor", "preprod"]
+    },
+    {
+      "name": "Catalyst Voices [PRE:PROD][Profile]",
+      "cwd": "catalyst_voices",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile",
+      "program": "lib/configs/main_preprod.dart",
+      "args": ["--flavor", "preprod"]
+    },
+    {
+      "name": "Catalyst Voices [PRE:PROD][Release]",
+      "cwd": "catalyst_voices",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release",
+      "program": "lib/configs/main_preprod.dart",
+      "args": ["--flavor", "preprod"]
+    }
+  ]
 }

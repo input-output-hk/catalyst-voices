@@ -2,6 +2,7 @@
     package="io.projectcatalyst.catalyst_voices">
    <application
         android:label="${appName}"
+        android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
