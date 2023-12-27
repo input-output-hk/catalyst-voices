@@ -8,8 +8,6 @@
         - flutter
 ---
 
---- *This is a template ADR to be copied and completed when adding new ADR* ---
-
 ## Context
 
 Our goal for the Catalyst Voices Frontend App is to establish a structure that ensures scalability,
@@ -38,44 +36,65 @@ The ViewModel layer will further aid in abstracting the presentation logic from 
 ---
 title: Catalyst Voices Fronted Architecture
 ---
-flowchart LR
-    subgraph id1 [BLoC pattern in conjunction with ViewModels steered by the principles of Clean Architecture.]
-      subgraph id2 [Application Layer]
+flowchart TB
+    subgraph id1 [BLoC pattern in conjunction with ViewModels steered by the principles of Clean Architecture]
+      subgraph al01 [Application Layer]
       direction LR
-      subgraph id3 [Presentation Layer]
-      direction RL
-        subgraph id4 [Connect Wallet Screen]
-        id01[Widgets]
+      subgraph al02 [Presentation Layer]
+      direction LR
+        subgraph al03 [Connect Wallet Screen]
+        w1[Widgets]
         end
-        subgraph id5 [View All Events Screen]
-        id02[Widgets]
+        subgraph al04 [View All Events Screen]
+        w2[Widgets]
         end
-        subgraph id6 [Settings Screen]
-        id03[Widgets]
-        end
-      end
-      subgraph id5555 [Business Layer]
-      direction RL
-        subgraph id7 [Connect Wallet Bloc]
-        end
-        subgraph id8 [View All Events Bloc]
-        end
-        subgraph id9 [Settings Bloc]
+        subgraph al05 [Settings Screen]
+        w3[Widgets]
         end
       end
+      subgraph bl01 [Business Layer]
+      direction LR
+        subgraph bl02 [Connect Wallet Bloc]
+        vm01[State <---> Event <---> ViewModel]
+        end
+        subgraph bl03 [View All Events Bloc]
+        vm02[State <---> Event <---> ViewModel]
+        end
+        subgraph bl04 [Settings Bloc]
+        vm03[State <---> Event <---> ViewModel]
+        end
       end
-    subgraph Domain Layer
-    cv1
-    cv2
+      end
+    subgraph dl01 [Domain Layer]
+    direction RL
+    subgraph dl02 [Connect Wallet Repository]
+    end
+    subgraph dl03 [Events Repository]
+    end
+    subgraph dl04 [User Repository]
+    end
     end
     subgraph Data Layer
-    cssdd1
-    cdd2
+    direction RL
+    subgraph dl05 [Connect Wallet API]
+    end
+    subgraph dl06 [Catalyst Events API]
+    end
+    subgraph dl07 [Local Storage]
     end
     end
-    id4 <--> id7
-    id5 <--> id8
-    id6 <--> id9
+    end
+    al03 <--> bl02
+    al04 <--> bl03
+    al05 <--> bl04
+    bl02 <--> dl02
+    bl03 <--> dl03
+    bl04 <--> dl04
+    dl02 <--> dl05
+    dl02 <--> dl07
+    dl03 <--> dl06
+    dl03 <--> dl07
+    dl04 <--> dl07
 ```
 
 
