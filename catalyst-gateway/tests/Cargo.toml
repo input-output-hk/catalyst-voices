@@ -1,4 +1,4 @@
-#cspell: words Stefano Cunego
+#cspell: words Stefano Cunego reqwest rustls
 
 [package]
 name = "tests"
