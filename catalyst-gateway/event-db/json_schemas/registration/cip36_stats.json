@@ -1,0 +1,119 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$comment": "Custom URI schema: catalyst_schema://<uuid>/<group>/<name>",
+    "$id": "catalyst_schema://fd5a2f8f-afb4-4cf7-ae6b-b7a370c85c82/registration/cip36_stats",
+    "title": "Individual Registration Statistics",
+    "description": "Statistical data associated with an individual CIP15/36 registration.",
+    "type": "object",
+    "properties": {
+        "loadtest": {
+            "type": "string",
+            "contentEncoding": "base16",
+            "contentMediaType": "application/octet-stream",
+            "description": "If present, then this is a Loadtest Synthetic registration.  The field itself is the Private key used in a Loadtest to vote with this registration."
+        },
+        "type": {
+            "type": "string",
+            "description": "The type of registration.",
+            "enum": [
+                "Unknown",
+                "CIP-15",
+                "CIP-36"
+            ]
+        },
+        "rollback": {
+            "type": "object",
+            "description": "Data about the last rollback that affected this registration.  If not defined, this registration has never suffered from a rollback.  Invalid registrations could be invalid because they were rolledback, and not re-included in the blockchain.",
+            "properties": {
+                "slot": {
+                    "type": "integer",
+                    "format": "int64",
+                    "description": "The slot number the transaction was in, that got rolledback."
+                },
+                "tip": {
+                    "type": "integer",
+                    "format": "int64",
+                    "description": "The slot number of tip at the time of the rollback."
+                }
+            },
+            "required": [
+                "slot",
+                "tip"
+            ],
+            "additionalProperties": false
+        },
+        "warnings": {
+            "type": "object",
+            "description": "List of warnings associated with the registration.  These do not make it invalid but are signs of potential problems.",
+            "properties": {
+                "nonce_exceeds_slot": {
+                    "type": "boolean",
+                    "description": "Nonce is larger than the slot the registration appears in.  This could make it difficult or impossible to supersede as registration.",
+                    "default": false
+                },
+                "reward_address_present": {
+                    "type": "boolean",
+                    "description": "The Payment address is a reward address.  Payments are impossible to rewards type addresses.",
+                    "default": false
+                }
+            }
+        },
+        "errors": {
+            "type": "object",
+            "description": "List of errors associated with the registration which make it invalid.",
+            "properties": {
+                "registration": {
+                    "type": "object",
+                    "description": "List of errors associated with the registration itself.",
+                    "properties": {
+                        "missing": {
+                            "type": "boolean",
+                            "description": "No 61284 registration metadata found for the registration."
+                        },
+                        "format": {
+                            "type": "boolean",
+                            "description": "Registration metadata was not formatted correctly and could not be parsed."
+                        },
+                        "invalid_voting_key": {
+                            "type": "boolean",
+                            "description": "Voting key was not formatted correctly."
+                        },
+                        "invalid_payment_address": {
+                            "type": "boolean",
+                            "description": "Payment address was not valid."
+                        },
+                        "invalid_purpose": {
+                            "type": "boolean",
+                            "description": "The registration purpose was something other than 0."
+                        },
+                        "multiple_voting_keys": {
+                            "type": "boolean",
+                            "description": "CIP-36 style multiple voting keys are not supported."
+                        }
+                    }
+                },
+                "signature": {
+                    "type": "object",
+                    "description": "List of errors associated with the signature.",
+                    "properties": {
+                        "missing": {
+                            "type": "boolean",
+                            "description": "No 61285 signature metadata found for the registration."
+                        },
+                        "format": {
+                            "type": "boolean",
+                            "description": "Signature metadata was not formatted correctly and could not be parsed."
+                        },
+                        "invalid": {
+                            "type": "boolean",
+                            "description": "Signature failed to validate?"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "required": [
+        "type"
+    ]
+}

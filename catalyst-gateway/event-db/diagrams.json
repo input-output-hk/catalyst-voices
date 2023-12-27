@@ -1,0 +1,16 @@
+{
+    "name": "Catalyst Gateway - Event DB",
+    "all_schema": {
+        "comments": true,
+        "included_tables": [],
+        "excluded_tables": [
+            "refinery_schema_history"
+        ],
+        "column_description_wrap": 50,
+        "table_description_wrap": 120
+    },
+    "full_schema": {
+        "title": "Full Schema",
+        "comments": false
+    }
+}

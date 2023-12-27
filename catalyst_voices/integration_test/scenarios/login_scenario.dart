@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/main_development.dart' as app;
+import 'package:catalyst_voices/configs/main_dev.dart' as app;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 

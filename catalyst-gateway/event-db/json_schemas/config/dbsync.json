@@ -1,0 +1,98 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$comment": "Custom URI schema: catalyst_schema://<uuid>/<group>/<name>",
+    "$id": "catalyst_schema://d899cd44-3513-487b-ab46-fdca662a724d/config/dbsync",
+    "title": "DBSync Connection",
+    "description": "DBSync connection configuration",
+    "type": "object",
+    "properties": {
+        "common": {
+            "$comment": "This provides the base settings for all networks. Anything thats common to all networks should be defined here.",
+            "$ref": "#/definitions/dbsync_conn"
+        },
+        "networks": {
+            "$comment": "Individual networks defined here.  Only need to define settings which differ from the common settings. Must define at least 1 network.",
+            "type": "object",
+            "properties": {
+                "mainnet": {
+                    "$ref": "#/definitions/dbsync_conn"
+                },
+                "preprod": {
+                    "$ref": "#/definitions/dbsync_conn"
+                },
+                "preview": {
+                    "$ref": "#/definitions/dbsync_conn"
+                },
+                "local": {
+                    "$ref": "#/definitions/dbsync_conn"
+                }
+            },
+            "anyOf": [
+                {
+                    "required": [
+                        "mainnet"
+                    ]
+                },
+                {
+                    "required": [
+                        "preprod"
+                    ]
+                },
+                {
+                    "required": [
+                        "preview"
+                    ]
+                },
+                {
+                    "required": [
+                        "local"
+                    ]
+                }
+            ]
+        }
+    },
+    "required": [
+        "common",
+        "networks"
+    ],
+    "additionalProperties": false,
+    "definitions": {
+        "dbsync_conn": {
+            "$comment": "DBSync connection",
+            "type": "object",
+            "properties": {
+                "host": {
+                    "type": "string",
+                    "description": "The hostname or IP address of the PostgreSQL server.",
+                    "example": "localhost",
+                    "default": "localhost"
+                },
+                "port": {
+                    "type": "integer",
+                    "description": "The port number of the PostgreSQL server. Note, the default will be the ssh localPort if the connection is tunneled over SSH.",
+                    "example": 5432,
+                    "default": 5432
+                },
+                "database": {
+                    "type": "string",
+                    "description": "The name of the PostgreSQL database to connect to.",
+                    "example": "cexplorer",
+                    "default": "cexplorer"
+                },
+                "username": {
+                    "type": "string",
+                    "description": "The username for authentication.",
+                    "example": "cexplorer",
+                    "default": "cexplorer"
+                },
+                "password": {
+                    "$comment": "If the password is not defined, it will be read from an env var called either DBSYNC_PWD_<NETWORK> and if thats not defined DBSYNC_PWD.",
+                    "type": "string",
+                    "description": "The password for authentication.",
+                    "example": "password"
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}
