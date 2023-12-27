@@ -97,8 +97,6 @@ flowchart TB
     dl04 <--> dl07
 ```
 
-
-
 ### Practical Example
 
 
@@ -121,5 +119,6 @@ flowchart TB
 * [The Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 * [BLoC Pattern - DartConf 2018](https://youtu.be/PLHln7wHgPE?si=QJ8hXOCWz2WIYFye)
 * [BLoC Pub Documentation](https://bloclibrary.dev/)
-* [Flutter BLoC Examples](https://github.com/felangel/bloc/tree/master/examples)
-* [ViewModel overview](https://developer.android.com/topic/libraries/architecture/viewmodel)
+* [Flutter BLoC Examples](https://github.com/felangel/bloc/tree/master/examples) 
+* [So What Exactly is a View-Model?](https://www.infoq.com/articles/View-Model-Definition/)
+* [ViewModel Overview from Android Developers](https://developer.android.com/topic/libraries/architecture/viewmodel)
