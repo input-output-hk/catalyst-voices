@@ -1,4 +1,4 @@
-// cspell: words reqwest
+//
 // Integration test example
 //
 #[tokio::test]
