@@ -8,7 +8,7 @@ builder:
 
     DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.12+SETUP --toolchain=rust-toolchain.toml
 
-    COPY --dir .cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin crates .
+    COPY --dir .cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin crates tests .
 
 # Test rust build container - Use best architecture host tools.
 check-hosted:
@@ -18,7 +18,7 @@ check-hosted:
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
-check-all-hosts:    
+check-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +check-hosted
 
 build-hosted:
@@ -26,7 +26,7 @@ build-hosted:
 
     # Build the service
     FROM +builder
- 
+
     DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.12+BUILD --bins="cat-gateway/cat-gateway"
 
     DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.12+SMOKE_TEST --bin="cat-gateway"
@@ -36,9 +36,17 @@ build-hosted:
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
-build-all-hosts:    
+build-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +build-hosted
 
+unit-test-hosted:
+    # Build the service
+    FROM +builder
+
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.12+UNIT_TEST
+
+    SAVE ARTIFACT target/nextest/ci/junit.xml junit-report.xml
+    SAVE ARTIFACT coverage-report.info coverage-report.info
 
 ## -----------------------------------------------------------------------------
 ##
@@ -82,8 +90,20 @@ build:
 #    FROM scratch
 
 # Run integration tests on all packages built during the `package` step.
-# test:
-#    FROM scratch
+test:
+    FROM busybox
+    # This is necessary to pick the correct architecture build to suit the native machine.
+    # It primarily ensures that Darwin/Arm builds work as expected without needing x86 emulation.
+    # All target implementation of this should follow this pattern.
+    ARG USERARCH
+
+    IF [ "$USERARCH" == "arm64" ]
+        BUILD --platform=linux/arm64 +unit-test-hosted
+        BUILD --platform=linux/arm64 ./tests+integration-test
+    ELSE
+        BUILD --platform=linux/amd64 +unit-test-hosted
+        BUILD --platform=linux/amd64 ./tests+integration-test
+    END
 
 # Publish packages if all integration tests have passed. (Failure to pass tests will prevent packages being published.)
 # publish:
@@ -96,5 +116,5 @@ local-ci-run:
     BUILD +check
     BUILD +build
     # BUILD +package
-    # BUILD +test
+    BUILD +test
     # BUILD +publish
