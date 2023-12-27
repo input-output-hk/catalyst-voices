@@ -1,7 +1,5 @@
 VERSION 0.7
 
-#cspell: words nextest DIND
-
 integration-test:
 # Example of a setup for integration testing
 # the cat-gateway binary will be replaced by the cat-gateway package when this will be available

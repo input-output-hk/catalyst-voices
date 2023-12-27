@@ -1,4 +1,3 @@
-// cspell: words multidex
 // Generated file.
 //
 // If you wish to remove Flutter's multidex support, delete this entire file.

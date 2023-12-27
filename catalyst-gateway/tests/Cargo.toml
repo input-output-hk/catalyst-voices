@@ -1,5 +1,3 @@
-#cspell: words Stefano Cunego reqwest rustls
-
 [package]
 name = "tests"
 version = "0.1.0"
