@@ -1,4 +1,3 @@
-//
 // Integration test example
 //
 #[tokio::test]
