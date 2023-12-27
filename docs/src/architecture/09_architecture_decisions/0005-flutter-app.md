@@ -122,3 +122,4 @@ flowchart TB
 * [BLoC Pattern - DartConf 2018](https://youtu.be/PLHln7wHgPE?si=QJ8hXOCWz2WIYFye)
 * [BLoC Pub Documentation](https://bloclibrary.dev/)
 * [Flutter BLoC Examples](https://github.com/felangel/bloc/tree/master/examples)
+* [ViewModel overview](https://developer.android.com/topic/libraries/architecture/viewmodel)
