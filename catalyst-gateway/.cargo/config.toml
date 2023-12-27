@@ -115,9 +115,7 @@ lint-vscode = "clippy --workspace --message-format=json-diagnostic-rendered-ansi
 
 docs = "doc --workspace -r --all-features --no-deps --bins --document-private-items --examples --locked"
 # nightly docs build broken... when they are'nt we can enable these docs... --unit-graph --timings=html,json -Z unstable-options"
-testfast = "nextest run --release --workspace --locked"
-testunit = "nextest run --release --bins --lib --workspace --locked -P ci"
-testci = "nextest run --release --workspace --locked -P ci"
+testfast = "nextest --release --workspace --locked"
 testdocs = "test --doc --release --workspace --locked"
 
 # Rust formatting, MUST be run with +nightly

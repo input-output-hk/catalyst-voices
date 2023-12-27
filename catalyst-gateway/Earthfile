@@ -4,9 +4,9 @@ VERSION 0.7
 
 # Set up our target toolchains, and copy our files.
 builder:
-    FROM github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.12+rust-base
+    FROM /home/stefano/work/catalyst-ci/earthly/rust+rust-base
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.12+SETUP --toolchain=rust-toolchain.toml
+    DO /home/stefano/work/catalyst-ci/earthly/rust+SETUP --toolchain=rust-toolchain.toml
 
     COPY --dir .cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin crates tests .
 
@@ -14,7 +14,7 @@ builder:
 check-hosted:
     FROM +builder
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.12+CHECK
+    DO /home/stefano/work/catalyst-ci/earthly/rust+CHECK
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
@@ -27,9 +27,9 @@ build-hosted:
     # Build the service
     FROM +builder
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.12+BUILD --bins="cat-gateway/cat-gateway"
+    DO /home/stefano/work/catalyst-ci/earthly/rust+BUILD --bins="cat-gateway/cat-gateway"
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.12+SMOKE_TEST --bin="cat-gateway"
+    DO /home/stefano/work/catalyst-ci/earthly/rust+SMOKE_TEST --bin="cat-gateway"
 
     SAVE ARTIFACT target/$TARGETARCH/doc doc
     SAVE ARTIFACT target/$TARGETARCH/release/cat-gateway cat-gateway
@@ -39,6 +39,14 @@ build-hosted:
 build-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +build-hosted
 
+unit-test-hosted:
+    # Build the service
+    FROM +builder
+
+    DO /home/stefano/work/catalyst-ci/earthly/rust+UNIT_TEST
+
+    SAVE ARTIFACT target/nextest/ci/junit.xml junit-report.xml
+    SAVE ARTIFACT coverage-report.info coverage-report.info
 
 ## -----------------------------------------------------------------------------
 ##
@@ -83,8 +91,19 @@ build:
 
 # Run integration tests on all packages built during the `package` step.
 test:
-    FROM scratch
-    BUILD ./tests+test-integration --profile ci
+    FROM busybox
+    # This is necessary to pick the correct architecture build to suit the native machine.
+    # It primarily ensures that Darwin/Arm builds work as expected without needing x86 emulation.
+    # All target implementation of this should follow this pattern.
+    ARG USERARCH
+
+    IF [ "$USERARCH" == "arm64" ]
+        BUILD --platform=linux/arm64 +unit-test-hosted
+        BUILD --platform=linux/arm64 ./tests+integration-test
+    ELSE
+        BUILD --platform=linux/amd64 +unit-test-hosted
+        BUILD --platform=linux/amd64 ./tests+integration-test
+    END
 
 # Publish packages if all integration tests have passed. (Failure to pass tests will prevent packages being published.)
 # publish:

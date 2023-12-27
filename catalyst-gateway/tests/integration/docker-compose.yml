@@ -1,0 +1,23 @@
+version: "3"
+
+# cspell: words
+
+services:
+  event-db:
+    image: event-db:latest
+    environment:
+      # Required environment variables for migrations
+      - DB_HOST=localhost
+      - DB_PORT=5432
+      - DB_NAME=CatalystEventDev
+      - DB_DESCRIPTION="Catalyst Event DB"
+      - DB_SUPERUSER=postgres
+      - DB_SUPERUSER_PASSWORD=postgres
+      - DB_USER=catalyst-event-dev
+      - DB_USER_PASSWORD=CHANGE_ME
+
+      - INIT_AND_DROP_DB=true
+      - WITH_MIGRATIONS=true
+      - WITH_SEED_DATA=true
+    ports:
+      - 5432:5432
