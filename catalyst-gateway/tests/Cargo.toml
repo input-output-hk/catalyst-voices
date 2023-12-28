@@ -1,5 +1,3 @@
-#cspell: words Stefano Cunego
-
 [package]
 name = "tests"
 version = "0.1.0"
