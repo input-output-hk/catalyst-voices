@@ -11,7 +11,8 @@
 ## Context
 
 Our goal for the Catalyst Voices Frontend App is to establish a structure that ensures scalability,
-maintainability, and a clear separation of concerns. With the complexity of voting events,
+maintainability, and a clear separation of concerns.
+With the complexity of voting events,
 it’s crucial to have an architecture that supports extensive functionality and easy adaptability to change.
 
 ## Assumptions
@@ -99,7 +100,8 @@ flowchart TB
 
 ### Maintain Uniformity
 
-To the established patterns of the team. Avoid bypassing the structured layers.
+To the established patterns of the team.
+Avoid bypassing the structured layers.
 Ensure each layer maintains a clear relationship hierarchy, preventing direct interactions between non-adjacent layers.
 For instance, the presentation layer should never directly communicate with the data layer's APIs.
 Maintain the hierarchy where the data layer is dependent on the domain layer across all feature development.
@@ -168,6 +170,6 @@ It's vital to adhere to the established guidelines within the codebase to avoid 
 * [SOLID](https://www.digitalocean.com/community/conceptual-articles/s-o-l-i-d-the-first-five-principles-of-object-oriented-design)
 * [BLoC Pattern - DartConf 2018](https://youtu.be/PLHln7wHgPE?si=QJ8hXOCWz2WIYFye)
 * [BLoC Pub Documentation](https://bloclibrary.dev/)
-* [Flutter BLoC Examples](https://github.com/felangel/bloc/tree/master/examples) 
+* [Flutter BLoC Examples](https://github.com/felangel/bloc/tree/master/examples)
 * [So What Exactly is a View-Model?](https://www.infoq.com/articles/View-Model-Definition/)
 * [ViewModel Overview from Android Developers](https://developer.android.com/topic/libraries/architecture/viewmodel)
