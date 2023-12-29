@@ -97,9 +97,57 @@ flowchart TB
     dl04 <--> dl07
 ```
 
-### Practical Example
+### Maintain Uniformity
 
+To the established patterns of the team. Avoid bypassing the structured layers.
+Ensure each layer maintains a clear relationship hierarchy, preventing direct interactions between non-adjacent layers.
+For instance, the presentation layer should never directly communicate with the data layer's APIs.
+Maintain the hierarchy where the data layer is dependent on the domain layer across all feature development.
 
+Effective naming conventions are crucial for ease of navigation within a project.
+While naming is flexible (some may refer to the data layer as infrastructure),
+consistency in these names is essential for maintaining a clear architectural understanding.
+Inconsistency can lead to a disorganized and challenging codebase, potentially causing confusion among team members.
+It's vital to adhere to the established guidelines within the codebase to avoid these issues.
+
+```txt
+├── catalyst_voices
+|   ├── libs
+│   │   ├── app
+│   │   │   └── app.dart
+|   |   |   └── utils.dart
+|   |   └── configs
+|   |   |   └── app_bloc_observer.dart
+|   |   |   └── bootstrap.dart
+|   |   |   └── main_dev.dart
+|   |   |   └── main_prod.dart
+|   |   |   └── main_preprod.dart
+|   |   |   └── main_qa.dart
+│   │   └── connect_wallet
+│   │   |   ├── connect_wallet_page.dart
+|   |   |   └── wallet_list_item.dart
+│   │   |   └── wallets_list.dart
+|   |   └── events
+|   |   |   └── events_page.dart
+|   |   |   └── events_list_item.dart
+|   |   |   └── other_event_widgets.dart
+│   │   ├── setting
+│   │   |   ├── settings_page.dart
+|   |   |   └── user_widget.dart
+|   |   |   └── app_settings.dart
+│   ├── packages
+│   │   ├── catalyst_voices_assets
+│   │   ├── catalyst_voices_blocs
+│   │   ├── catalyst_voices_localization
+│   │   ├── catalyst_voices_models
+│   │   ├── catalyst_voices_repositories
+│   │   ├── catalyst_voices_services
+│   │   ├── catalyst_voices_models
+│   │   ├── catalyst_voices_shared
+│   │   ├── catalyst_voices_view_models
+├── pubspec.lock
+├── pubspec.yaml
+```
 
 ## Risks
 
@@ -117,6 +165,7 @@ flowchart TB
 ## More Information
 
 * [The Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
+* [SOLID](https://www.digitalocean.com/community/conceptual-articles/s-o-l-i-d-the-first-five-principles-of-object-oriented-design)
 * [BLoC Pattern - DartConf 2018](https://youtu.be/PLHln7wHgPE?si=QJ8hXOCWz2WIYFye)
 * [BLoC Pub Documentation](https://bloclibrary.dev/)
 * [Flutter BLoC Examples](https://github.com/felangel/bloc/tree/master/examples) 
