@@ -1,13 +1,11 @@
 VERSION 0.7
 
-#cspell: words nextest
-
 integration-test:
 # Example of a setup for integration testing
-# the cat-gatway binary will be replaced by the cat-gatway package when this will be avalaible
+# the cat-gateway binary will be replaced by the cat-gateway package when this will be available
 
     FROM ../+builder
-    DO github.com/earthly/lib+INSTALL_DIND
+    DO github.com/earthly/lib:2.2.11+INSTALL_DIND
     COPY ../+build-hosted/cat-gateway .
     COPY integration/docker-compose.yml .
     WITH DOCKER \
