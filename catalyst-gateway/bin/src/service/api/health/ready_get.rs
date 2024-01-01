@@ -9,6 +9,8 @@ use poem_extensions::{
 };
 
 use crate::{
+    cli::Error,
+    event_db::error::Error as DBError,
     service::common::responses::{
         resp_2xx::NoContent,
         resp_5xx::{server_error, ServerError, ServiceUnavailable},
@@ -48,23 +50,22 @@ pub(crate) type AllResponses = response! {
 ///   but unlikely)
 /// * 503 Service Unavailable - Service is not ready, do not send other requests.
 pub(crate) async fn endpoint(state: Data<&Arc<State>>) -> AllResponses {
-    match state.event_db.schema_version_check().await {
+    match state.schema_version_check().await {
         Ok(_) => {
             tracing::debug!("DB schema version status ok");
-            if let Ok(mut g) = state.schema_version_status.lock() {
-                *g = SchemaVersionStatus::Ok;
-            }
+            state.set_schema_version_status(SchemaVersionStatus::Ok);
             T204(NoContent)
         },
-        Err(crate::event_db::error::Error::TimedOut) => T503(ServiceUnavailable),
-        Err(err) => {
-            tracing::error!("DB schema version status mismatch");
-            if let Ok(mut g) = state.schema_version_status.lock() {
-                *g = SchemaVersionStatus::Mismatch;
-                T503(ServiceUnavailable)
-            } else {
-                T500(server_error!("{}", err.to_string()))
-            }
+        Err(Error::EventDb(DBError::MismatchedSchema { was, expected })) => {
+            tracing::error!(
+                expected = expected,
+                was = was,
+                "DB schema version status mismatch"
+            );
+            state.set_schema_version_status(SchemaVersionStatus::Mismatch);
+            T503(ServiceUnavailable)
         },
+        Err(Error::EventDb(DBError::TimedOut)) => T503(ServiceUnavailable),
+        Err(err) => T500(server_error!("{}", err.to_string())),
     }
 }
