@@ -4,5 +4,5 @@
 // TODO(minikin): remove dummy files, https://github.com/input-output-hk/catalyst-voices/issues/103.
 
 export 'constants.dart';
-export 'home_screen.dart';
+export 'home_page.dart';
 export 'login_page.dart';
