@@ -4,7 +4,7 @@ use std::sync::Arc;
 use poem::web::Data;
 use poem_extensions::{
     response,
-    UniResponse::{T200, T404, T500},
+    UniResponse::{T200, T404, T500, T503},
 };
 use poem_openapi::{
     param::{Path, Query},
@@ -65,24 +65,28 @@ impl RegistrationApi {
            200: OK<Json<VoterRegistration>>,
            404: NotFound,
            500: ServerError,
+           503: ServiceUnavailable,
        } {
-        let voter = pool
-            .event_db
-            .get_voter(
-                &event_id.0.map(Into::into),
-                voting_key.0 .0,
-                *with_delegators,
-            )
-            .await;
-        match voter {
-            Ok(voter) => {
-                match voter.try_into() {
-                    Ok(voter) => T200(OK(Json(voter))),
-                    Err(err) => T500(server_error!("{}", err.to_string())),
-                }
-            },
-            Err(crate::event_db::error::Error::NotFound(_)) => T404(NotFound),
-            Err(err) => T500(server_error!("{}", err.to_string())),
+        if let Some(event_db) = pool.event_db() {
+            let voter = event_db
+                .get_voter(
+                    &event_id.0.map(Into::into),
+                    voting_key.0 .0,
+                    *with_delegators,
+                )
+                .await;
+            match voter {
+                Ok(voter) => {
+                    match voter.try_into() {
+                        Ok(voter) => T200(OK(Json(voter))),
+                        Err(err) => T500(server_error!("{}", err.to_string())),
+                    }
+                },
+                Err(crate::event_db::error::Error::NotFound(_)) => T404(NotFound),
+                Err(err) => T500(server_error!("{}", err.to_string())),
+            }
+        } else {
+            T503(ServiceUnavailable)
         }
     }
 }
