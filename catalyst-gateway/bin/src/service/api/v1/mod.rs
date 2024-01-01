@@ -6,9 +6,12 @@ use poem::web::{Data, Path};
 use poem_openapi::{param::Query, payload::Json, OpenApi};
 
 use crate::{
-    service::common::{
-        objects::{account_votes::AccountId, fragments_batch::FragmentsBatch},
-        tags::ApiTags,
+    service::{
+        common::{
+            objects::{account_votes::AccountId, fragments_batch::FragmentsBatch},
+            tags::ApiTags,
+        },
+        utilities::middleware::schema_validation::schema_version_validation,
     },
     state::State,
 };
@@ -25,7 +28,8 @@ impl V1Api {
     #[oai(
         path = "/votes/plan/account-votes/:account_id",
         method = "get",
-        operation_id = "AccountVotes"
+        operation_id = "AccountVotes",
+        transform = "schema_version_validation"
     )]
     /// Get from all active vote plans, the index of the voted proposals
     /// by th given account ID.
@@ -43,6 +47,7 @@ impl V1Api {
         method = "post",
         operation_id = "fragments",
         tag = "ApiTags::Fragments",
+        transform = "schema_version_validation",
         deprecated = true
     )]
     async fn fragments_post(
@@ -61,6 +66,7 @@ impl V1Api {
         method = "get",
         operation_id = "fragmentsStatuses",
         tag = "ApiTags::Fragments",
+        transform = "schema_version_validation",
         deprecated = true
     )]
     async fn fragments_statuses(

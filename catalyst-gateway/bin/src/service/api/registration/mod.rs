@@ -13,17 +13,20 @@ use poem_openapi::{
 };
 
 use crate::{
-    service::common::{
-        objects::{
-            event_id::EventId, voter_registration::VoterRegistration,
-            voting_public_key::VotingPublicKey,
+    service::{
+        common::{
+            objects::{
+                event_id::EventId, voter_registration::VoterRegistration,
+                voting_public_key::VotingPublicKey,
+            },
+            responses::{
+                resp_2xx::OK,
+                resp_4xx::NotFound,
+                resp_5xx::{server_error, ServerError, ServiceUnavailable},
+            },
+            tags::ApiTags,
         },
-        responses::{
-            resp_2xx::OK,
-            resp_4xx::NotFound,
-            resp_5xx::{server_error, ServerError},
-        },
-        tags::ApiTags,
+        utilities::middleware::schema_validation::schema_version_validation,
     },
     state::State,
 };
@@ -36,7 +39,8 @@ impl RegistrationApi {
     #[oai(
         path = "/voter/:voting_key",
         method = "get",
-        operation_id = "getVoterInfo"
+        operation_id = "getVoterInfo",
+        transform = "schema_version_validation"
     )]
     /// Voter's info
     ///

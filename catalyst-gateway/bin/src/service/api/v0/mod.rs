@@ -5,7 +5,12 @@ use std::sync::Arc;
 use poem::web::Data;
 use poem_openapi::{payload::Binary, OpenApi};
 
-use crate::{service::common::tags::ApiTags, state::State};
+use crate::{
+    service::{
+        common::tags::ApiTags, utilities::middleware::schema_validation::schema_version_validation,
+    },
+    state::State,
+};
 
 mod message_post;
 mod plans_get;
@@ -25,7 +30,8 @@ impl V0Api {
     #[oai(
         path = "/vote/active/plans",
         method = "get",
-        operation_id = "GetActivePlans"
+        operation_id = "GetActivePlans",
+        transform = "schema_version_validation"
     )]
     async fn plans_get(&self, state: Data<&Arc<State>>) -> plans_get::AllResponses {
         plans_get::endpoint(state).await
