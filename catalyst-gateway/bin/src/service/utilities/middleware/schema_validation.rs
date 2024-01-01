@@ -1,6 +1,6 @@
 //! Middleware to verify the status of the last DB schema version validation.
 //!
-//! If a mistmatch is detected, the middleware returns an error with `ServiceUnavailable`
+//! If a mismatch is detected, the middleware returns an error with `ServiceUnavailable`
 //! status code (503). Otherwise, the middleware calls and returns the wrapped endpoint's
 //! response.
 //!
