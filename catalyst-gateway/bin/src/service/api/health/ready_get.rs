@@ -13,7 +13,7 @@ use crate::{
         resp_2xx::NoContent,
         resp_5xx::{server_error, ServerError, ServiceUnavailable},
     },
-    state::State,
+    state::{SchemaVersionStatus, State},
 };
 
 /// All responses
@@ -47,11 +47,24 @@ pub(crate) type AllResponses = response! {
 /// * 500 Server Error - If anything within this function fails unexpectedly. (Possible
 ///   but unlikely)
 /// * 503 Service Unavailable - Service is not ready, do not send other requests.
-#[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(state: Data<&Arc<State>>) -> AllResponses {
     match state.event_db.schema_version_check().await {
-        Ok(_) => T204(NoContent),
+        Ok(_) => {
+            tracing::debug!("DB schema version status ok");
+            if let Ok(mut g) = state.schema_version_status.lock() {
+                *g = SchemaVersionStatus::Ok;
+            }
+            T204(NoContent)
+        },
         Err(crate::event_db::error::Error::TimedOut) => T503(ServiceUnavailable),
-        Err(err) => T500(server_error!("{}", err.to_string())),
+        Err(err) => {
+            tracing::error!("DB schema version status mismatch");
+            if let Ok(mut g) = state.schema_version_status.lock() {
+                *g = SchemaVersionStatus::Mismatch;
+                T503(ServiceUnavailable)
+            } else {
+                T500(server_error!("{}", err.to_string()))
+            }
+        },
     }
 }
