@@ -1,3 +1,1 @@
-class CatalystVoicesRepositories {
-  const CatalystVoicesRepositories();
-}
+export 'credentials_storage_repository.dart';

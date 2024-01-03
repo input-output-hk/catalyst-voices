@@ -5,11 +5,9 @@ publish_to: none
 
 environment:
   sdk: ">=3.2.3 <4.0.0"
-  flutter: 3.16.5
 
 dependencies:
-  flutter:
-    sdk: flutter
+  meta: ^1.10.0
 
 dev_dependencies:
    catalyst_analysis:
