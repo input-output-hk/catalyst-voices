@@ -1,7 +1,9 @@
+import 'dart:convert';
+
 import 'package:meta/meta.dart';
 
 @immutable
-class SessionData {
+final class SessionData {
   final String? email;
   final String? password;
 
@@ -17,6 +19,19 @@ class SessionData {
     );
   }
 
+  factory SessionData.fromJson(String source) => SessionData.fromMap(
+        json.decode(
+          source,
+        ) as Map<String, Object>,
+      );
+
+  factory SessionData.fromMap(Map<String, Object> map) {
+    return SessionData(
+      email: map['email'] as String? ?? '',
+      password: map['password'] as String? ?? '',
+    );
+  }
+
   @override
   int get hashCode => email.hashCode ^ password.hashCode;
 
@@ -27,6 +42,25 @@ class SessionData {
     return other is SessionData &&
         other.email == email &&
         other.password == password;
+  }
+
+  SessionData copyWith({
+    String? email,
+    String? password,
+  }) {
+    return SessionData(
+      email: email ?? this.email,
+      password: password ?? this.password,
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  Map<String, dynamic> toMap() {
+    return {
+      'email': email,
+      'password': password,
+    };
   }
 
   @override

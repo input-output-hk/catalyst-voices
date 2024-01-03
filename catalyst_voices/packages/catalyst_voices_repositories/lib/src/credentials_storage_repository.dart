@@ -36,16 +36,18 @@ final class CredentialsStorageRepository {
     }
   }
 
-  Future<Result<void, SecureStorageError>> store(SessionData data) async {
+  Future<Result<void, SecureStorageError>> storeSessionData(
+    SessionData sessionData,
+  ) async {
     try {
       await secureStorageService.set(
         SecureStorageKeysConst.dummyEmail,
-        data.email!,
+        sessionData.email!,
       );
 
       await secureStorageService.set(
         SecureStorageKeysConst.dummyPassword,
-        data.password!,
+        sessionData.password!,
       );
       return Success(null);
     } on SecureStorageError catch (_) {
