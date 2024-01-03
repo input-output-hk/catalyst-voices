@@ -31,6 +31,9 @@ build-hosted:
 
     DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.14+SMOKE_TEST --bin="cat-gateway"
 
+    # generate OpenAPI docs
+    RUN ./target/$TARGETARCH/release/cat-gateway docs ./target/$TARGETARCH/doc/cat-gateway-api.json
+
     SAVE ARTIFACT target/$TARGETARCH/doc doc
     SAVE ARTIFACT target/$TARGETARCH/release/cat-gateway cat-gateway
 
