@@ -14,6 +14,8 @@ dependencies:
       path: ../catalyst_voices_models
     catalyst_voices_repositories:
      path: ../catalyst_voices_repositories
+    catalyst_voices_view_models:
+     path: ../catalyst_voices_view_models
     collection: ^1.17.1
     equatable: ^2.0.5
     flutter:

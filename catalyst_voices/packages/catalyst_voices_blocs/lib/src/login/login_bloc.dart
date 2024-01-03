@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:formz/formz.dart';
 

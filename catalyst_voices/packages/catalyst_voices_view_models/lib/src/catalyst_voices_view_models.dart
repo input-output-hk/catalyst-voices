@@ -1,3 +1,1 @@
-class CatalystVoicesViewModels {
-  const CatalystVoicesViewModels();
-}
+export 'authentication/authentication.dart';
