@@ -59,7 +59,7 @@ pub(crate) async fn endpoint(state: Data<&Arc<State>>) -> AllResponses {
         Err(Error::EventDb(DBError::MismatchedSchema { was, expected })) => {
             tracing::error!(
                 expected = expected,
-                was = was,
+                current = was,
                 "DB schema version status mismatch"
             );
             state.set_schema_version_status(SchemaVersionStatus::Mismatch);

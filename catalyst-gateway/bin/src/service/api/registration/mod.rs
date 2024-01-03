@@ -71,7 +71,7 @@ impl RegistrationApi {
            500: ServerError,
            503: ServiceUnavailable,
        } {
-        if let Some(event_db) = pool.event_db() {
+        if let Ok(event_db) = pool.event_db() {
             let voter = event_db
                 .get_voter(
                     &event_id.0.map(Into::into),

@@ -4,6 +4,7 @@ use std::sync::{Arc, Mutex, MutexGuard};
 use crate::{
     cli::Error,
     event_db::{establish_connection, queries::EventDbQueries},
+    service::Error as ServiceError,
 };
 
 /// The status of the expected DB schema version.
@@ -51,11 +52,11 @@ impl State {
     }
 
     /// Get the reference to the database connection pool for `EventDB`.
-    pub(crate) fn event_db(&self) -> Option<Arc<dyn EventDbQueries>> {
-        let guard = self._schema_version_status_lock();
+    pub(crate) fn event_db(&self) -> Result<Arc<dyn EventDbQueries>, Error> {
+        let guard = self.schema_version_status_lock();
         match *guard {
-            SchemaVersionStatus::Ok => Some(self.event_db.clone()),
-            SchemaVersionStatus::Mismatch => None,
+            SchemaVersionStatus::Ok => Ok(self.event_db.clone()),
+            SchemaVersionStatus::Mismatch => Err(ServiceError::SchemaVersionMismatch.into()),
         }
     }
 
@@ -67,13 +68,13 @@ impl State {
     /// Compare the `State`'s inner value with a given `&SchemaVersionStatus`, returns
     /// `bool`.
     pub(crate) fn is_schema_version_status(&self, svs: &SchemaVersionStatus) -> bool {
-        let guard = self._schema_version_status_lock();
+        let guard = self.schema_version_status_lock();
         &*guard == svs
     }
 
     /// Set the state's `SchemaVersionStatus`.
     pub(crate) fn set_schema_version_status(&self, svs: SchemaVersionStatus) {
-        let mut guard = self._schema_version_status_lock();
+        let mut guard = self.schema_version_status_lock();
         tracing::debug!(
             status = format!("{:?}", svs),
             "db schema version status was set"
@@ -84,7 +85,7 @@ impl State {
     /// Get the `MutexGuard<SchemaVersionStatus>` from inner the variable.
     ///
     /// Handle poisoned mutex by recovering the guard, and tracing the error.
-    fn _schema_version_status_lock(&self) -> MutexGuard<SchemaVersionStatus> {
+    fn schema_version_status_lock(&self) -> MutexGuard<SchemaVersionStatus> {
         match self.schema_version_status.lock() {
             Ok(guard) => guard,
             Err(poisoned) => {

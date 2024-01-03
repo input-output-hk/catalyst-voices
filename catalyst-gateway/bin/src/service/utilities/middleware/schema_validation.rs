@@ -39,12 +39,16 @@ impl<E: Endpoint> Endpoint for SchemaVersionValidationImpl<E> {
     type Output = E::Output;
 
     async fn call(&self, req: Request) -> Result<Self::Output> {
-        let req_data: Option<&Data<&Arc<State>>> = req.data();
-        if let Some(state) = req_data {
+        if let Some(state) = req.data::<Data<&Arc<State>>>() {
+            // Check if the inner schema version status is set to `Mismatch`,
+            // if so, return the `ServiceUnavailable` error, which implements
+            // `ResponseError`, with status code `503`.
+            // Otherwise, return the endpoint as usual.
             if state.is_schema_version_status(&SchemaVersionStatus::Mismatch) {
                 return Err(ServiceUnavailable.into());
             }
         }
+        // Calls the endpoint with the request, and returns the response.
         self.ep.call(req).await
     }
 }
