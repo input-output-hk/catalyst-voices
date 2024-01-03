@@ -1,9 +1,10 @@
 import 'dart:convert';
 
+import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
 @immutable
-final class SessionData {
+final class SessionData extends Equatable {
   final String? email;
   final String? password;
 
@@ -33,26 +34,10 @@ final class SessionData {
   }
 
   @override
-  int get hashCode => email.hashCode ^ password.hashCode;
+  List<Object?> get props => [email, password];
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is SessionData &&
-        other.email == email &&
-        other.password == password;
-  }
-
-  SessionData copyWith({
-    String? email,
-    String? password,
-  }) {
-    return SessionData(
-      email: email ?? this.email,
-      password: password ?? this.password,
-    );
-  }
+  bool get stringify => true;
 
   String toJson() => json.encode(toMap());
 
@@ -62,7 +47,4 @@ final class SessionData {
       'password': password,
     };
   }
-
-  @override
-  String toString() => 'SessionData(email: $email, password: $password)';
 }
