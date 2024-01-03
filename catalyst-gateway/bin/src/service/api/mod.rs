@@ -1,6 +1,6 @@
-//! Catalyst Data Service API Definition
+//! Catalyst Gateway API Definition
 //!
-//! This defines all endpoints for the Catalyst Data Service API.
+//! This defines all endpoints for the Catalyst Gateway API.
 //! It however does NOT contain any processing for them, that is defined elsewhere.
 use health::HealthApi;
 use poem_openapi::{ContactObject, LicenseObject, OpenApiService, ServerObject};
@@ -18,7 +18,7 @@ mod v0;
 mod v1;
 
 /// The name of the API
-const API_TITLE: &str = "Catalyst Data Service";
+const API_TITLE: &str = "Catalyst Gateway";
 
 /// The version of the API
 const API_VERSION: &str = "1.2.0";
@@ -32,12 +32,12 @@ fn get_api_contact() -> ContactObject {
 }
 
 /// A summary describing the API
-const API_SUMMARY: &str = "Project Catalyst Data Service API";
+const API_SUMMARY: &str = "Project Catalyst Gateway API";
 
 /// A long description of the API. Markdown is supported
-const API_DESCRIPTION: &str = r#"# Catalyst Data Service API.
+const API_DESCRIPTION: &str = r#"# Catalyst Gateway API.
 
-The Catalyst Data Service API provides realtime data for all prior, current and future Catalyst voting events.
+The Catalyst Gateway API provides realtime data for all prior, current and future Catalyst voting events.
 
 TODO:
 
@@ -46,7 +46,7 @@ TODO:
 * Implement representative registration on main-chain, distinct from voter registration.
 * Implement Voting API abstracting the Jormungandr API from public exposure.
 * Implement Audit API's (Retrieve voting blockchain records,  registration/voting power audit and private tally audit.
-* Implement API's needed to support posting Ideas/Proposals etc.Catalyst Data Service
+* Implement API's needed to support posting Ideas/Proposals etc.Catalyst Gateway
 "#;
 
 /// Get the license details for the API

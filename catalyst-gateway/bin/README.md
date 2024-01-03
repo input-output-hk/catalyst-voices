@@ -1,6 +1,6 @@
-# Catalyst Event Data service
+# Catalyst Gateway binary
 
-Catalyst event data service
+Catalyst Gateway binary crate
 
 ## Build
 
