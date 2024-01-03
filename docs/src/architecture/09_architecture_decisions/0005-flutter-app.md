@@ -34,9 +34,6 @@ making it easier to handle complex state dependencies and asynchronous operation
 The ViewModel layer will further aid in abstracting the presentation logic from BLoCs.
 
 ```mermaid
----
-title: Catalyst Voices Fronted Architecture
----
 flowchart TB
     subgraph id1 [BLoC pattern in conjunction with ViewModels steered by the principles of Clean Architecture]
       subgraph al01 [Application Layer]
