@@ -93,3 +93,9 @@ impl ResponseError for ServerError {
 ///
 /// #### NO DATA BODY IS RETURNED FOR THIS RESPONSE
 pub(crate) struct ServiceUnavailable;
+
+impl ResponseError for ServiceUnavailable {
+    fn status(&self) -> StatusCode {
+        StatusCode::SERVICE_UNAVAILABLE
+    }
+}

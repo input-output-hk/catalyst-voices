@@ -1,12 +1,14 @@
 //! Shared state used by all endpoints.
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc, Mutex, MutexGuard};
 
 use crate::{
     cli::Error,
     event_db::{establish_connection, queries::EventDbQueries},
+    service::Error as ServiceError,
 };
 
 /// The status of the expected DB schema version.
+#[derive(Debug, PartialEq, Eq)]
 pub(crate) enum SchemaVersionStatus {
     /// The current DB schema version matches what is expected.
     Ok,
@@ -23,10 +25,10 @@ pub(crate) struct State {
     /// This is Private, it needs to be accessed with a function.
     // event_db_handle: Arc<ArcSwap<Option<dyn EventDbQueries>>>,
     // Private need to get it with a function.
-    pub(crate) event_db: Arc<dyn EventDbQueries>, /* This needs to be obsoleted, we want the DB
-                                                   * to be able to be down. */
+    event_db: Arc<dyn EventDbQueries>, /* This needs to be obsoleted, we want the DB
+                                        * to be able to be down. */
     /// Status of the last DB schema version check.
-    pub(crate) schema_version_status: Mutex<SchemaVersionStatus>,
+    schema_version_status: Mutex<SchemaVersionStatus>,
 }
 
 impl State {
@@ -49,8 +51,50 @@ impl State {
         Ok(state)
     }
 
-    // pub(crate) async fn event_db(&self) -> Option<Arc<dyn EventDbQueries>> {
-    //
-    //
-    // }
+    /// Get the reference to the database connection pool for `EventDB`.
+    pub(crate) fn event_db(&self) -> Result<Arc<dyn EventDbQueries>, Error> {
+        let guard = self.schema_version_status_lock();
+        match *guard {
+            SchemaVersionStatus::Ok => Ok(self.event_db.clone()),
+            SchemaVersionStatus::Mismatch => Err(ServiceError::SchemaVersionMismatch.into()),
+        }
+    }
+
+    /// Check the DB schema version matches the one expected by the service.
+    pub(crate) async fn schema_version_check(&self) -> Result<i32, Error> {
+        Ok(self.event_db.schema_version_check().await?)
+    }
+
+    /// Compare the `State`'s inner value with a given `&SchemaVersionStatus`, returns
+    /// `bool`.
+    pub(crate) fn is_schema_version_status(&self, svs: &SchemaVersionStatus) -> bool {
+        let guard = self.schema_version_status_lock();
+        &*guard == svs
+    }
+
+    /// Set the state's `SchemaVersionStatus`.
+    pub(crate) fn set_schema_version_status(&self, svs: SchemaVersionStatus) {
+        let mut guard = self.schema_version_status_lock();
+        tracing::debug!(
+            status = format!("{:?}", svs),
+            "db schema version status was set"
+        );
+        *guard = svs;
+    }
+
+    /// Get the `MutexGuard<SchemaVersionStatus>` from inner the variable.
+    ///
+    /// Handle poisoned mutex by recovering the guard, and tracing the error.
+    fn schema_version_status_lock(&self) -> MutexGuard<SchemaVersionStatus> {
+        match self.schema_version_status.lock() {
+            Ok(guard) => guard,
+            Err(poisoned) => {
+                tracing::error!(
+                    error = format!("{:?}", poisoned),
+                    "recovering DB schema version status fom poisoned mutex"
+                );
+                poisoned.into_inner()
+            },
+        }
+    }
 }
