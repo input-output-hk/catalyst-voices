@@ -96,8 +96,8 @@ final class _LoginPageState extends State<LoginPage> {
   Future<void> _navigateToHomeScreen(BuildContext context) async {
     await Navigator.push(
       context,
-      MaterialPageRoute<HomeScreen>(
-        builder: (context) => const HomeScreen(),
+      MaterialPageRoute<HomePage>(
+        builder: (context) => const HomePage(),
       ),
     );
   }

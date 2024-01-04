@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-final class GoRouterRefreshStream extends ChangeNotifier {
+final class AppRouterRefreshStream extends ChangeNotifier {
   late final StreamSubscription<Object> _subscription;
 
-  GoRouterRefreshStream(Stream<Object> stream) {
+  AppRouterRefreshStream(Stream<Object> stream) {
     notifyListeners();
     _subscription = stream.asBroadcastStream().listen((_) => notifyListeners());
   }
