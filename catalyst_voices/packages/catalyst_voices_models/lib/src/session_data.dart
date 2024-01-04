@@ -5,20 +5,13 @@ import 'package:meta/meta.dart';
 
 @immutable
 final class SessionData extends Equatable {
-  final String? email;
-  final String? password;
+  final String email;
+  final String password;
 
   const SessionData({
     required this.email,
     required this.password,
   });
-
-  factory SessionData.empty() {
-    return const SessionData(
-      email: null,
-      password: null,
-    );
-  }
 
   factory SessionData.fromJson(String source) => SessionData.fromMap(
         json.decode(

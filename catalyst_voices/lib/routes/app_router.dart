@@ -32,15 +32,17 @@ final class AppRouter {
     GoRouterState state,
   ) {
     final isAuthenticated = authenticationBloc.isAuthenticated;
-    final signingIn = state.matchedLocation == login_route.loginPath;
+    // final signingIn = state.matchedLocation == login_route.loginPath;
+
+    print('isAuthenticated: $isAuthenticated');
 
     if (!isAuthenticated) {
       return login_route.loginPath;
     }
 
-    if (signingIn) {
-      return home_route.homePath;
-    }
+    // if (signingIn) {
+    //   return home_route.homePath;
+    // }
 
     return null;
   }

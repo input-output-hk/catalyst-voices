@@ -31,6 +31,8 @@ final class AuthenticationRepository {
     try {
       final sessionData = await credentialsStorageRepository.getSessionData();
 
+      print('getSessionData: $sessionData');
+
       if (sessionData.isSuccess) {
         return sessionData.success;
       } else {

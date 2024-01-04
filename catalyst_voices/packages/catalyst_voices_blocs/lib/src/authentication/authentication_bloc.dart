@@ -28,6 +28,7 @@ final class AuthenticationBloc
 
   bool get isAuthenticated =>
       state.status == AuthenticationStatus.authenticated;
+
   bool get isInitial => state.status == AuthenticationStatus.unknown;
   AuthenticationStatus get status => state.status;
 

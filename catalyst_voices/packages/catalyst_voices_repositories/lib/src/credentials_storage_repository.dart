@@ -15,7 +15,7 @@ final class CredentialsStorageRepository {
 
   void get clearSessionData => secureStorageService.deleteAll;
 
-  Future<Result<SessionData, SecureStorageError>> getSessionData() async {
+  Future<Result<SessionData?, SecureStorageError>> getSessionData() async {
     try {
       final email = await secureStorageService.get(
         SecureStorageKeysConst.dummyEmail,
@@ -24,6 +24,10 @@ final class CredentialsStorageRepository {
       final password = await secureStorageService.get(
         SecureStorageKeysConst.dummyPassword,
       );
+
+      if (email == null || password == null) {
+        return Success(null);
+      }
 
       return Success(
         SessionData(
@@ -42,12 +46,12 @@ final class CredentialsStorageRepository {
     try {
       await secureStorageService.set(
         SecureStorageKeysConst.dummyEmail,
-        sessionData.email!,
+        sessionData.email,
       );
 
       await secureStorageService.set(
         SecureStorageKeysConst.dummyPassword,
-        sessionData.password!,
+        sessionData.password,
       );
       return Success(null);
     } on SecureStorageError catch (_) {
