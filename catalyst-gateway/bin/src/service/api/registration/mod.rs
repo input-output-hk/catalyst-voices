@@ -4,7 +4,7 @@ use std::sync::Arc;
 use poem::web::Data;
 use poem_extensions::{
     response,
-    UniResponse::{T200, T404, T500},
+    UniResponse::{T200, T404, T500, T503},
 };
 use poem_openapi::{
     param::{Path, Query},
@@ -13,17 +13,20 @@ use poem_openapi::{
 };
 
 use crate::{
-    service::common::{
-        objects::{
-            event_id::EventId, voter_registration::VoterRegistration,
-            voting_public_key::VotingPublicKey,
+    service::{
+        common::{
+            objects::{
+                event_id::EventId, voter_registration::VoterRegistration,
+                voting_public_key::VotingPublicKey,
+            },
+            responses::{
+                resp_2xx::OK,
+                resp_4xx::NotFound,
+                resp_5xx::{server_error, ServerError, ServiceUnavailable},
+            },
+            tags::ApiTags,
         },
-        responses::{
-            resp_2xx::OK,
-            resp_4xx::NotFound,
-            resp_5xx::{server_error, ServerError},
-        },
-        tags::ApiTags,
+        utilities::middleware::schema_validation::schema_version_validation,
     },
     state::State,
 };
@@ -36,7 +39,8 @@ impl RegistrationApi {
     #[oai(
         path = "/voter/:voting_key",
         method = "get",
-        operation_id = "getVoterInfo"
+        operation_id = "getVoterInfo",
+        transform = "schema_version_validation"
     )]
     /// Voter's info
     ///
@@ -65,24 +69,28 @@ impl RegistrationApi {
            200: OK<Json<VoterRegistration>>,
            404: NotFound,
            500: ServerError,
+           503: ServiceUnavailable,
        } {
-        let voter = pool
-            .event_db
-            .get_voter(
-                &event_id.0.map(Into::into),
-                voting_key.0 .0,
-                *with_delegators,
-            )
-            .await;
-        match voter {
-            Ok(voter) => {
-                match voter.try_into() {
-                    Ok(voter) => T200(OK(Json(voter))),
-                    Err(err) => T500(server_error!("{}", err.to_string())),
-                }
-            },
-            Err(crate::event_db::error::Error::NotFound(_)) => T404(NotFound),
-            Err(err) => T500(server_error!("{}", err.to_string())),
+        if let Ok(event_db) = pool.event_db() {
+            let voter = event_db
+                .get_voter(
+                    &event_id.0.map(Into::into),
+                    voting_key.0 .0,
+                    *with_delegators,
+                )
+                .await;
+            match voter {
+                Ok(voter) => {
+                    match voter.try_into() {
+                        Ok(voter) => T200(OK(Json(voter))),
+                        Err(err) => T500(server_error!("{}", err.to_string())),
+                    }
+                },
+                Err(crate::event_db::error::Error::NotFound(_)) => T404(NotFound),
+                Err(err) => T500(server_error!("{}", err.to_string())),
+            }
+        } else {
+            T503(ServiceUnavailable)
         }
     }
 }
