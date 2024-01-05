@@ -1,15 +1,16 @@
-import 'package:catalyst_voices/dummy/dummy.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 final class HomePage extends StatelessWidget {
+  static const homePageKey = Key('HomePage');
+
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: WidgetKeys.homeScreen,
+      key: homePageKey,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

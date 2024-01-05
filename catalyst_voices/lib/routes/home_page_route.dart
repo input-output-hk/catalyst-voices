@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/dummy/dummy.dart';
+import 'package:catalyst_voices/pages/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 

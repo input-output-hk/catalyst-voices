@@ -54,14 +54,34 @@ final class LoginBloc extends Bloc<LoginEvent, LoginState> {
     if (state.isValid) {
       emit(state.copyWith(status: FormzSubmissionStatus.inProgress));
       try {
-        await _authenticationRepository.signIn(
+        if (_validateTempCredentials(
           email: state.email.value,
           password: state.password.value,
-        );
-        emit(state.copyWith(status: FormzSubmissionStatus.success));
+        )) {
+          await _authenticationRepository.signIn(
+            email: state.email.value,
+            password: state.password.value,
+          );
+
+          emit(state.copyWith(status: FormzSubmissionStatus.success));
+        } else {
+          emit(state.copyWith(status: FormzSubmissionStatus.failure));
+        }
       } catch (_) {
         emit(state.copyWith(status: FormzSubmissionStatus.failure));
       }
     }
   }
+
+  bool _validateTempCredentials({
+    required String email,
+    required String password,
+  }) {
+    return email == _TempConstants.email && password == _TempConstants.password;
+  }
+}
+
+abstract class _TempConstants {
+  static const email = 'mail@example.com';
+  static const password = 'MyPass123';
 }
