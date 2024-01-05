@@ -25,7 +25,7 @@ final class LoginForm extends StatelessWidget {
                 SnackBar(
                   key: loginErrorSnackbarKey,
                   content: Text(l10n.loginScreenErrorMessage),
-                ),g
+                ),
               );
           }
         },
