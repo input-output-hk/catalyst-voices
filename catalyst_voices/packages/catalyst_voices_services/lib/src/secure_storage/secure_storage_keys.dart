@@ -1,5 +1,6 @@
 final class SecureStorageKeysConst {
-  static const dummyKey = 'dummyKey';
+  static const dummyEmail = 'email';
+  static const dummyPassword = 'password';
 
   const SecureStorageKeysConst._();
 }

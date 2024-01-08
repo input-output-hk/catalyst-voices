@@ -1,20 +1,40 @@
 {
   "@@locale": "en",
-  "loginScreenUsernameLabelText": "Username",
-  "@loginScreenUsernameLabelText": {
-    "description": "Text shown in the login screen for the username field"
+  "emailLabelText": "Email",
+  "@emailLabelText": {
+    "description": "Text shown in email field"
   },
-  "loginScreenPasswordLabelText": "Password",
-  "@loginScreenPasswordLabelText": {
-    "description": "Text shown in the login screen for the password field"
+  "emailHintText": "mail@example.com",
+  "@emailHintText": {
+    "description": "Text shown in email field when empty"
+  },
+  "emailErrorText": "mail@example.com",
+  "@emailErrorText": {
+    "description": "Text shown in email field when input is invalid"
+  },
+  "passwordLabelText": "Password",
+  "@passwordLabelText": {
+    "description": "Text shown in password field"
+  },
+  "passwordHintText": "My1SecretPassword",
+  "@passwordHintText": {
+    "description": "Text shown in password field when empty"
+  },
+  "passwordErrorText": "Password must be at least 8 characters long",
+  "@passwordErrorText": {
+    "description": "Text shown in  password field when input is invalid"
+  },
+  "loginTitleText": "Login",
+  "@loginTitleText": {
+    "description": "Text shown in the login screen title"
+  },
+  "loginButtonText": "Login",
+  "@loginButtonText": {
+    "description": "Text shown in the login screen for the login button"
   },
   "loginScreenErrorMessage": "Wrong credentials",
   "@loginScreenErrorMessage": {
     "description": "Text shown in the login screen when the user enters wrong credentials"
-  },
-  "loginScreenLoginButtonText": "Login",
-  "@loginScreenLoginButtonText": {
-    "description": "Text shown in the login screen for the login button"
   },
   "homeScreenText": "Catalyst Voices",
   "@homeScreenText": {

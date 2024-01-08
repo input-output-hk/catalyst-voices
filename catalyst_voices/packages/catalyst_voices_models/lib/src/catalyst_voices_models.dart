@@ -1,3 +1,1 @@
-class CatalystVoicesModels {
-  const CatalystVoicesModels();
-}
+export 'errors/errors.dart';

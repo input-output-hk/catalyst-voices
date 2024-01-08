@@ -10,6 +10,22 @@ command:
   version:
     linkToCommits: true
     workspaceChangelog: true
+  bootstrap:
+    environment:
+      sdk: '>=3.2.1 <4.0.0'
+      flutter: 3.16.5
+    dependencies:
+      bloc_concurrency: ^0.2.2
+      bloc: ^8.1.2
+      collection: ^1.17.1
+      equatable: ^2.0.5
+      formz: ^0.6.1
+      meta: ^1.10.0
+      result_type: ^0.2.0
+    dev_dependencies:
+      test: ^1.24.9
+      build_runner: ^2.3.3
+      mocktail: ^1.0.1
 
 scripts:
   lint:
