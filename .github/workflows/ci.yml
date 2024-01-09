@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   ci:
-    uses: input-output-hk/catalyst-ci/.github/workflows/ci.yml@feat/targets-scanner
+    uses: input-output-hk/catalyst-ci/.github/workflows/ci.yml@master
     with:
       aws_ecr_registry: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
       aws_role_arn: arn:aws:iam::332405224602:role/ci
