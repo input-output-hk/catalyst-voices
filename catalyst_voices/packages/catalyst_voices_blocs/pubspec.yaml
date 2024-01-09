@@ -4,14 +4,25 @@ version: 0.1.0+1
 publish_to: none
 
 environment:
-  sdk: ">=3.2.0 <4.0.0"
-  flutter: 3.16.1
+  sdk: ">=3.2.3 <4.0.0"
+  flutter: 3.16.5
 
 dependencies:
-  bloc: ^8.1.2
-  bloc_concurrency: ^0.2.2
-  flutter:
-    sdk: flutter
+    bloc: ^8.1.2
+    bloc_concurrency: ^0.2.2
+    catalyst_voices_models:
+      path: ../catalyst_voices_models
+    catalyst_voices_repositories:
+     path: ../catalyst_voices_repositories
+    catalyst_voices_view_models:
+     path: ../catalyst_voices_view_models
+    collection: ^1.17.1
+    equatable: ^2.0.5
+    flutter:
+      sdk: flutter
+    formz: ^0.6.1
+    meta: ^1.10.0
+    result_type: ^0.2.0
 
 dev_dependencies:
    bloc_test: ^9.1.4

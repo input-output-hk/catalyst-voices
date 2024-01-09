@@ -1,5 +1,7 @@
 -- Catalyst Event Database
 
+-- Title : Proposals
+
 -- Proposals Table
 
 CREATE TABLE proposal
@@ -9,14 +11,11 @@ CREATE TABLE proposal
   objective INTEGER NOT NULL,
   title TEXT NOT NULL,
   summary TEXT NOT NULL,
-  category TEXT NOT NULL,
   public_key TEXT NOT NULL,
   funds BIGINT NOT NULL,
   url TEXT NOT NULL,
   files_url TEXT NOT NULL,
   impact_score BIGINT NOT NULL,
-
-  deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
   extra JSONB,
 
@@ -26,12 +25,10 @@ CREATE TABLE proposal
   proposer_relevant_experience TEXT NOT NULL,
   bb_proposal_id BYTEA,
 
-  bb_vote_options TEXT [],
-
-  FOREIGN KEY (objective) REFERENCES objective (row_id) ON DELETE CASCADE,
-  FOREIGN KEY (bb_vote_options) REFERENCES vote_options (
-    objective
-  ) ON DELETE CASCADE
+  FOREIGN KEY (objective) REFERENCES objective (row_id) ON DELETE CASCADE
+  --FOREIGN KEY (bb_vote_options) REFERENCES vote_options (
+  --  objective
+  --) ON DELETE CASCADE
 );
 
 CREATE UNIQUE INDEX proposal_index ON proposal (id, objective);
@@ -43,19 +40,18 @@ COMMENT ON COLUMN proposal.id IS 'Actual Proposal Unique ID';
 COMMENT ON COLUMN proposal.objective IS 'The Objective this proposal falls under.';
 COMMENT ON COLUMN proposal.title IS 'Brief title of the proposal.';
 COMMENT ON COLUMN proposal.summary IS 'A Summary of the proposal to be implemented.';
-COMMENT ON COLUMN proposal.category IS 'Objective Category Repeated. DEPRECATED: Only used for Vit-SS compatibility.';
 COMMENT ON COLUMN proposal.public_key IS 'Proposals Reward Address (CIP-19 Payment Key)';
 COMMENT ON COLUMN proposal.funds IS 'How much funds (in the currency of the fund)';
 COMMENT ON COLUMN proposal.url IS 'A URL with supporting information for the proposal.';
 COMMENT ON COLUMN proposal.files_url IS 'A URL link to relevant files supporting the proposal.';
 COMMENT ON COLUMN proposal.impact_score IS 'The Impact score assigned to this proposal by the Assessors.';
-COMMENT ON COLUMN proposal.deleted IS 'Flag which defines was this proposal deleted from ideascale or not. DEPRECATED: only used for ideascale compatibility.';
 COMMENT ON COLUMN proposal.proposer_name IS 'The proposers name.';
 COMMENT ON COLUMN proposal.proposer_contact IS 'Contact details for the proposer.';
 COMMENT ON COLUMN proposal.proposer_url IS 'A URL with details of the proposer.';
-COMMENT ON COLUMN proposal.proposer_relevant_experience IS 'A freeform  string describing the proposers experience relating to their capability to implement the proposal.';
-COMMENT ON COLUMN proposal.bb_proposal_id IS 'The ID used by the voting ledger (bulletin board) to refer to this proposal.';
-COMMENT ON COLUMN proposal.bb_vote_options IS 'The selectable options by the voter. DEPRECATED: Only used for Vit-SS compatibility.';
+COMMENT ON COLUMN proposal.proposer_relevant_experience IS
+'A freeform  string describing the proposers experience relating to their capability to implement the proposal.';
+COMMENT ON COLUMN proposal.bb_proposal_id IS
+'The ID used by the voting ledger (bulletin board) to refer to this proposal.';
 COMMENT ON COLUMN proposal.extra IS
 'Extra data about the proposal.
  The types of extra data are defined by the proposal type and are not enforced.
@@ -81,9 +77,9 @@ CREATE TABLE reviewer_level (
     total_reward_pct <= 100 AND total_reward_pct >= 0
   ),
 
-  event_id INTEGER NOT NULL,
+  event_id UUID NOT NULL,
 
-  FOREIGN KEY (event_id) REFERENCES event (row_id) ON DELETE CASCADE
+  FOREIGN KEY (event_id) REFERENCES event (id) ON DELETE CASCADE
 );
 
 COMMENT ON TABLE reviewer_level IS
@@ -92,7 +88,8 @@ This table represents all different types of reviewer`s levels, which is taken i
 COMMENT ON COLUMN reviewer_level.row_id IS 'Synthetic Unique Key';
 COMMENT ON COLUMN reviewer_level.name IS 'Name of the reviewer level';
 COMMENT ON COLUMN reviewer_level.total_reward_pct IS
-'Total reviewer`s reward assigned to the specific level, which is defined as a percentage from the total pot of Community Review rewards (See `event.review_rewards` column).';
+'Total reviewer`s reward assigned to the specific level, which is defined as a percentage from the 
+total pot of Community Review rewards (See `event.review_rewards` column).';
 COMMENT ON COLUMN reviewer_level.event_id IS 'The specific Event ID this review level is part of.';
 
 -- community advisor reviews
@@ -107,15 +104,6 @@ CREATE TABLE proposal_review (
   assessor_level INTEGER,
   reward_address TEXT,
 
-  -- These fields are deprecated and WILL BE removed in a future migration.
-  -- They MUST only be used for Vit-SS compatibility.
-  impact_alignment_rating_given INTEGER,
-  impact_alignment_note VARCHAR,
-  feasibility_rating_given INTEGER,
-  feasibility_note VARCHAR,
-  auditability_rating_given INTEGER,
-  auditability_note VARCHAR,
-  ranking INTEGER,
   flags JSONB NULL,
 
   FOREIGN KEY (proposal_id) REFERENCES proposal (row_id) ON DELETE CASCADE,
@@ -130,32 +118,6 @@ COMMENT ON COLUMN proposal_review.proposal_id IS 'The Proposal this review is fo
 COMMENT ON COLUMN proposal_review.assessor IS 'Assessors Anonymized ID';
 COMMENT ON COLUMN proposal_review.assessor_level IS 'Assessors level ID';
 COMMENT ON COLUMN proposal_review.reward_address IS 'Assessors reward address';
-
-COMMENT ON COLUMN proposal_review.impact_alignment_rating_given IS
-'The  numeric rating assigned to the proposal by the assessor.
-DEPRECATED: Only used for Vit-SS compatibility.';
-COMMENT ON COLUMN proposal_review.impact_alignment_note IS
-'A note about why the impact rating was given.
-DEPRECATED: Only used for Vit-SS compatibility.';
-
-COMMENT ON COLUMN proposal_review.feasibility_rating_given IS
-'The numeric feasibility rating given.
-DEPRECATED: Only used for Vit-SS compatibility.';
-COMMENT ON COLUMN proposal_review.feasibility_note IS
-'A note about why the feasibility rating was given.
-DEPRECATED: Only used for Vit-SS compatibility.';
-
-COMMENT ON COLUMN proposal_review.auditability_rating_given IS
-'The numeric auditability rating given.
-DEPRECATED: Only used for Vit-SS compatibility.';
-COMMENT ON COLUMN proposal_review.auditability_note IS
-'A note about the auditability rating given.
-DEPRECATED: Only used for Vit-SS compatibility.';
-
-COMMENT ON COLUMN proposal_review.ranking IS
-'Numeric  Measure of quality of this review according to veteran community advisors.
-DEPRECATED: Only used for Vit-SS compatibility.
-';
 
 COMMENT ON COLUMN proposal_review.flags IS
 'OPTIONAL: JSON Array which defines the flags raised for this review.
@@ -200,10 +162,10 @@ Each entry =
 -- Define known review metrics
 INSERT INTO review_metric (name, description, min, max, map)
 VALUES
-('impact', 'Impact Rating', 0, 5, NULL),
-('feasibility', 'Feasibility Rating', 0, 5, NULL),
-('auditability', 'Auditability Rating', 0, 5, NULL),
-('value', 'Value Proposition Rating', 0, 5, NULL),
+('impact', 'Impact Rating', 0, 5, null),
+('feasibility', 'Feasibility Rating', 0, 5, null),
+('auditability', 'Auditability Rating', 0, 5, null),
+('value', 'Value Proposition Rating', 0, 5, null),
 ('vpa_ranking', 'VPA Ranking of the review', 0, 3, ARRAY[
   '{"name":"Excellent","desc":"Excellent Review"}',
   '{"name":"Good","desc":"Could be improved."}',

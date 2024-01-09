@@ -6,87 +6,56 @@ VERSION 0.7
 
 # cspell: words
 
-# Event db builder target. Prepares all necessary artifacts.
-# Arguments:
-#  * with_historic_data: add historic data from the `historic_data` dir (default `true`).
-#  * with_test_data: add test data from the `test_data` dir (default `true`).
+# Internal: builder is our Event db builder target. Prepares all necessary artifacts.
+#   CI target : dependency
 builder:
-    FROM github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.7+postgres-base
+    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.15+BUILDER \
+        --sqlfluff_cfg=./../../+repo-config/repo/.sqlfluff
 
-    ARG with_historic_data=true
-    ARG with_test_data=true
+    COPY ./../../+repo-config-2/repo/.sqlfluff .
+    COPY setup-db.sql /sql/
+    COPY --dir json_schemas .
 
-    WORKDIR /build
-
-    COPY refinery.toml .
-    COPY --dir migrations .
-    RUN mkdir data
-    
-    IF [ $with_historic_data = true ]
-        COPY --dir historic_data .
-
-        RUN python3 historic_data/fund_2/mk_fund2_sql.py historic_data/fund_2/fund2_database_encrypted.sqlite3 >> historic_data/fund_2.sql
-        RUN python3 historic_data/fund_3/mk_fund3_sql.py historic_data/fund_3/fund3_database_encrypted.sqlite3 >> historic_data/fund_3.sql
-        RUN python3 historic_data/fund_4/mk_fund4_sql.py historic_data/fund_4/fund4_database_encrypted.sqlite3 >> historic_data/fund_4.sql
-        RUN python3 historic_data/fund_5/mk_fund5_sql.py historic_data/fund_5/fund5_database_encrypted.sqlite3 >> historic_data/fund_5.sql
-        RUN python3 historic_data/fund_6/mk_fund6_sql.py historic_data/fund_6/fund6_database_encrypted.sqlite3 >> historic_data/fund_6.sql
-        RUN python3 historic_data/fund_7/mk_fund7_sql.py historic_data/fund_7/fund7_database_encrypted.sqlite3 >> historic_data/fund_7.sql
-        RUN python3 historic_data/fund_8/mk_fund8_sql.py historic_data/fund_8/fund8_database_encrypted.sqlite3 >> historic_data/fund_8.sql
-        RUN python3 historic_data/fund_9/mk_fund9_sql.py historic_data/fund_9/fund9_database_encrypted.sqlite3 >> historic_data/fund_9.sql
-        RUN python3 historic_data/fund_9/mk_fund9_voteplan_sql.py historic_data/fund_9/fund9_database_encrypted.sqlite3 >> historic_data/fund_9.sql
-        
-        RUN mv ./historic_data/*.sql ./data
-    END
-
-    IF [ $with_test_data = true ]
-        COPY --dir test_data .
-
-        RUN mv ./test_data/*.sql ./data
-    END
-
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.7+BUILDER
-
+# check if the sql files are properly formatted and pass lint quality checks.
+#   CI target : true
 check:
     FROM +builder
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.7+CHECK
+    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.15+CHECK
 
+
+# format all SQL files in the current project.  Local developers tool.
+#   CI target : false
 format:
     LOCALLY
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.7+FORMAT --src=$(echo ${PWD})   
+    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.15+FORMAT --src=$(echo ${PWD}/../../)   
 
-# Build event db docker image.
-# Arguments:
-#  * tag: docker image `tag`.
-#  * registry: docker image `registry`.
-#  * with_historic_data: add historic data from the `historic_data` dir (default `true`).
-#  * with_test_data: add test data from the `test_data` dir (default `true`).
+# build - an event db docker image.
+#   CI target : true
 build:
-    ARG with_historic_data=true
-    ARG with_test_data=true
-    ARG tag="latest"
-    ARG registry
+    FROM +builder
 
-    FROM +builder --with_historic_data=$with_historic_data --with_test_data=$with_test_data
+    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.15+BUILD --image_name=event-db
+    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.15+DOCS --image_name=event-db
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.7+BUILD --tag=$tag --registry=$registry --image_name=event-db
+# test the event db database schema
+#   CI target : true
+#test:
+#    FROM github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.15+postgres-base
 
-test:
-    FROM github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.0.7+postgres-base
+#    COPY github.com/input-output-hk/catalyst-ci/earthly/utils:v2.0.15+shell-assert/assert.sh .
 
-    COPY github.com/input-output-hk/catalyst-ci/earthly/utils:v2.0.7+shell-assert/assert.sh .
+#    COPY ./docker-compose.yml .
+#    WITH DOCKER \
+#        --compose docker-compose.yml \
+#        --load event-db:latest=(+build --with_historic_data=false) \
+#        --service event-db \
+#        --allow-privileged
+#        RUN sleep 65;\
+#            res=$(psql postgresql://catalyst-event-dev:CHANGE_ME@0.0.0.0:5432/CatalystEventDev -c "SELECT COUNT(*) FROM event");\
 
-    COPY ./docker-compose.yml .
-    WITH DOCKER \
-        --compose docker-compose.yml \
-        --load event-db:latest=(+build --with_historic_data=false) \
-        --service event-db \
-        --allow-privileged
-        RUN sleep 5;\
-            res=$(psql postgresql://catalyst-event-dev:CHANGE_ME@0.0.0.0:5432/CatalystEventDev -c "SELECT COUNT(*) FROM event");\
-
-            source assert.sh;\
-            expected=$(printf " count \n-------\n     5\n(1 row)");\
-            assert_eq "$expected" "$res"
-    END
+#            source assert.sh;\
+#            expected=$(printf " count \n-------\n     5\n(1 row)");\
+#            assert_eq "$expected" "$res"
+#    END

@@ -13,7 +13,7 @@ const STOPLIGHT_UI_TEMPLATE: &str = r#"
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Catalyst Data Service API Documentation - StopLight Elements</title>
+    <title>Catalyst Gateway API Documentation - StopLight Elements</title>
     <style charset="UTF-8">{:style}</style>
     <script charset="UTF-8">{:script}</script>
   </head>

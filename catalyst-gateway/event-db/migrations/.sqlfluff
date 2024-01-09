@@ -1,0 +1,4 @@
+[sqlfluff]
+# Supported dialects <https://docs.sqlfluff.com/en/stable/dialects.html>
+# Set the dialect for all SQL files in this directory
+dialect = postgres

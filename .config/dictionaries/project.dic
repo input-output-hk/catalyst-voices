@@ -1,3 +1,4 @@
+aapt
 aarch
 addrr
 adminer
@@ -18,9 +19,11 @@ COCOAPODS
 codepoints
 coti
 cryptoxide
+Cunego
 Cupertino
 dbsync
 delegators
+DIND
 dockerhub
 dotenv
 dotenvy
@@ -29,6 +32,8 @@ drep
 dreps
 encryptor
 fontawesome
+formz
+Formz
 gapless
 gcloud
 genhtml
@@ -49,8 +54,10 @@ localizable
 mdlint
 mitigations
 moderations
+multidex
 nanos
 netkey
+nextest
 Oleksandr
 oneshot
 openapi
@@ -71,12 +78,16 @@ pubkey
 pubspec
 rapidoc
 redoc
+reqwest
 ripgrep
 rustc
+rustls
 rxdart
 saibatizoku
 seckey
 slotno
+sqlfluff
+Stefano
 stevenj
 subosito
 tacho

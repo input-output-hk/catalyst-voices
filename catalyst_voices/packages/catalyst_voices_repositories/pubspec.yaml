@@ -4,12 +4,18 @@ version: 0.1.0+1
 publish_to: none
 
 environment:
-  sdk: ">=3.2.0 <4.0.0"
-  flutter: 3.16.1
+  sdk: ">=3.2.3 <4.0.0"
+  flutter: 3.16.5
 
 dependencies:
+  catalyst_voices_models:
+    path: ../catalyst_voices_models
+  catalyst_voices_services:
+    path: ../catalyst_voices_services
   flutter:
     sdk: flutter
+  result_type: ^0.2.0
+  rxdart: ^0.27.7
 
 dev_dependencies:
    catalyst_analysis:

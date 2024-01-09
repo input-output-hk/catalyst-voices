@@ -9,11 +9,13 @@ use poem_extensions::{
 };
 
 use crate::{
+    cli::Error,
+    event_db::error::Error as DBError,
     service::common::responses::{
         resp_2xx::NoContent,
         resp_5xx::{server_error, ServerError, ServiceUnavailable},
     },
-    state::State,
+    state::{SchemaVersionStatus, State},
 };
 
 /// All responses
@@ -47,11 +49,23 @@ pub(crate) type AllResponses = response! {
 /// * 500 Server Error - If anything within this function fails unexpectedly. (Possible
 ///   but unlikely)
 /// * 503 Service Unavailable - Service is not ready, do not send other requests.
-#[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(state: Data<&Arc<State>>) -> AllResponses {
-    match state.event_db.schema_version_check().await {
-        Ok(_) => T204(NoContent),
-        Err(crate::event_db::error::Error::TimedOut) => T503(ServiceUnavailable),
+    match state.schema_version_check().await {
+        Ok(_) => {
+            tracing::debug!("DB schema version status ok");
+            state.set_schema_version_status(SchemaVersionStatus::Ok);
+            T204(NoContent)
+        },
+        Err(Error::EventDb(DBError::MismatchedSchema { was, expected })) => {
+            tracing::error!(
+                expected = expected,
+                current = was,
+                "DB schema version status mismatch"
+            );
+            state.set_schema_version_status(SchemaVersionStatus::Mismatch);
+            T503(ServiceUnavailable)
+        },
+        Err(Error::EventDb(DBError::TimedOut)) => T503(ServiceUnavailable),
         Err(err) => T500(server_error!("{}", err.to_string())),
     }
 }

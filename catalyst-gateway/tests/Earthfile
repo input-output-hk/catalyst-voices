@@ -1,0 +1,26 @@
+VERSION 0.7
+
+integration-test:
+# Example of a setup for integration testing
+# the cat-gateway binary will be replaced by the cat-gateway package when this will be available
+
+    FROM ../+builder
+    DO github.com/earthly/lib:2.2.11+INSTALL_DIND
+    COPY ../+hosted-build/cat-gateway .
+    COPY integration/docker-compose.yml .
+    WITH DOCKER \
+        --compose docker-compose.yml \
+        --load event-db:latest=(../event-db+build --with_historic_data=false) \
+        --service event-db \
+        --allow-privileged
+        RUN sleep 5 && \
+            (./cat-gateway run \
+                --address "127.0.0.1:3030" \
+                --database-url=postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev \
+                --log-level=debug &) && \
+            cargo llvm-cov clean --workspace && \
+            cargo llvm-cov nextest --release --locked -P ci --test integration --output-path coverage-report.info
+    END
+
+    SAVE ARTIFACT target/nextest/ci/junit.xml junit-report.xml
+    SAVE ARTIFACT coverage-report.info coverage-report.info

@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/main_development.dart' as app;
+import 'package:catalyst_voices/configs/main_dev.dart' as app;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
@@ -13,17 +13,17 @@ void main() {
         (tester) async {
       loginRobot = await _configure(tester);
 
-      await loginRobot.enterUsername('Not Valid');
+      await loginRobot.enterEmail('Not Valid');
       await loginRobot.tapLoginButton();
       await loginRobot.checkInvalidCredentialsMessageIsShown();
     });
 
-    testWidgets('authenticates a user with an username and password',
+    testWidgets('authenticates a user with an email and password',
         (tester) async {
       loginRobot = await _configure(tester);
 
-      await loginRobot.enterUsername('robot');
-      await loginRobot.enterPassword('1234');
+      await loginRobot.enterEmail('mail@example.com');
+      await loginRobot.enterPassword('MyPass123');
       await loginRobot.tapLoginButton();
     });
   });

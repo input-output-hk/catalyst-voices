@@ -1,0 +1,11 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$comment": "Custom URI schema: catalyst_schema://<uuid>/<group>/<name>",
+    "$id": "catalyst_schema://d8f79cbc-9777-4fee-bbbe-397ce412a75c/event_description/multiline_text",
+    "title": "Simple Catalyst Event Description",
+    "description": "A simple multi-line description used for a Catalyst type event.",
+    "type": "string",
+    "contentEncoding": "utf-8",
+    "contentMediaType": "text/plain",
+    "format": "multiline"
+}
