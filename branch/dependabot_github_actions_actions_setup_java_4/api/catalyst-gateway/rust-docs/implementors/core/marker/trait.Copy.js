@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"cat_gateway":[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.73.0/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"enum\" href=\"cat_gateway/logger/enum.LogLevel.html\" title=\"enum cat_gateway::logger::LogLevel\">LogLevel</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
