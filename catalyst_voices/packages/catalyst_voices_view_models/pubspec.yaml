@@ -8,8 +8,10 @@ environment:
   flutter: 3.16.5
 
 dependencies:
+  equatable: ^2.0.5
   flutter:
     sdk: flutter
+  formz: ^0.6.1
 
 dev_dependencies:
    catalyst_analysis:

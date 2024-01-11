@@ -92,29 +92,59 @@ abstract class VoicesLocalizations {
     Locale('es')
   ];
 
-  /// Text shown in the login screen for the username field
+  /// Text shown in email field
   ///
   /// In en, this message translates to:
-  /// **'Username'**
-  String get loginScreenUsernameLabelText;
+  /// **'Email'**
+  String get emailLabelText;
 
-  /// Text shown in the login screen for the password field
+  /// Text shown in email field when empty
+  ///
+  /// In en, this message translates to:
+  /// **'mail@example.com'**
+  String get emailHintText;
+
+  /// Text shown in email field when input is invalid
+  ///
+  /// In en, this message translates to:
+  /// **'mail@example.com'**
+  String get emailErrorText;
+
+  /// Text shown in password field
   ///
   /// In en, this message translates to:
   /// **'Password'**
-  String get loginScreenPasswordLabelText;
+  String get passwordLabelText;
+
+  /// Text shown in password field when empty
+  ///
+  /// In en, this message translates to:
+  /// **'My1SecretPassword'**
+  String get passwordHintText;
+
+  /// Text shown in  password field when input is invalid
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 8 characters long'**
+  String get passwordErrorText;
+
+  /// Text shown in the login screen title
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get loginTitleText;
+
+  /// Text shown in the login screen for the login button
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get loginButtonText;
 
   /// Text shown in the login screen when the user enters wrong credentials
   ///
   /// In en, this message translates to:
   /// **'Wrong credentials'**
   String get loginScreenErrorMessage;
-
-  /// Text shown in the login screen for the login button
-  ///
-  /// In en, this message translates to:
-  /// **'Login'**
-  String get loginScreenLoginButtonText;
 
   /// Text shown in the home screen
   ///
