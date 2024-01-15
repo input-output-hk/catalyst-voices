@@ -7,7 +7,7 @@ icon: material/telescope
 
 ## Mechanics
 
-![Alt text](images/bootstrapping_flow.excalidraw.svg)
+![Alt text](images/map.svg)
 
 
 ## Config 
