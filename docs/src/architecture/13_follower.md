@@ -9,6 +9,10 @@ icon: material/telescope
 
 ![Alt text](images/map.svg)
 
+## Bootstrap
+![Alt text](images/entry.svg)
+- cli
+- specified networks 
 
 ## Config 
 - check if config exists or in use
@@ -19,7 +23,7 @@ icon: material/telescope
 
 
 ## Follower
-- CLI; start follower with specified networks
+- start follower with specified networks
 - Stream blocks from given (slot,epoch)
 
 
