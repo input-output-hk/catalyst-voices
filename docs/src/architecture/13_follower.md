@@ -11,6 +11,7 @@ icon: material/telescope
 
 ## Bootstrap
 ![Alt text](images/entry.svg)
+
 - cli
 - specified networks 
 
@@ -19,6 +20,7 @@ icon: material/telescope
 
 ## Obtain network metadata
 ![Alt text](images/db_flow.excalidraw.svg)
+
 - specified network (slot epoch)
 
 
