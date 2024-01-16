@@ -12,7 +12,6 @@ icon: material/airplane-cog
     if_state --> !Config: config does not exist
     if_state --> Config : config exists
 
-
     note right of !Config
             Orchestration is coordinated via the config
         end note
@@ -22,35 +21,32 @@ icon: material/airplane-cog
         init --> [*]
     }
     state Config {
-        
-        State Update{
-        [*] --> CheckDB
+        State periodic{
+        [*] --> CheckDB: check for recent updates
         CheckDB --> Locked
         Locked --> CheckDB
-        CheckDB --> Unlocked
-        Unlocked --> UpdateDB
-        Lock --> CheckDB
-        UpdateDB --> Lock
+        CheckDB --> Unlocked: if stale, update
+        Unlocked --> Lock
+        Lock --> UpdateDB
+        UpdateDB --> Unlocked: RAII unlock
         }
 
-        State Updates{
-        [*] --> CheckConfigB
-        CheckConfigB --> LockedConfig
-        LockedConfig --> CheckConfigB
-        CheckConfigB --> UnlockedConfig
-        UnlockedConfig --> UpdateConfig
-        LockConfig --> CheckConfigB
-        UpdateConfig --> LockConfig
-        }
-       
+        State Periodic{
+        [*] --> checkConfig: check if the Node Config has changed
+        checkConfig --> updated
+        checkConfig --> noChange
+        noChange --> checkConfig
+        updated --> restart:  stop all followers cleanly
+        restart --> checkConfig: Restart them with the new config
+        
+        }  
     }
-
     state !Config {
         [*] --> Sleep
         Sleep --> CheckConfig
         CheckConfig --> Sleep
         CheckConfig --> ConfigExists
-        ConfigExists --> [*]        
+        ConfigExists --> [*]: transition to config logic        
     }
 ```
 
