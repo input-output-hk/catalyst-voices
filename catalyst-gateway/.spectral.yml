@@ -8,5 +8,5 @@
 # Use CDN hosted version for spectral-documentation and spectral-owasp
 extends:
 - 'spectral:oas'
-- 'https://unpkg.com/@stoplight/spectral-documentation/dist/ruleset.mjs'
-- 'https://unpkg.com/@stoplight/spectral-owasp-ruleset/dist/ruleset.mjs'
+- 'https://unpkg.com/@stoplight/spectral-documentation@1.3.1/dist/ruleset.mjs'
+- 'https://unpkg.com/@stoplight/spectral-owasp-ruleset@1.4.3/dist/ruleset.mjs'
