@@ -7,10 +7,16 @@ icon: material/telescope
 
 ## Mechanics
 
-![Alt text](images/map.svg)
+```mermaid
+  graph TD;
+      A-->B;
+      A-->C;
+      B-->D;
+      C-->D;
+```
 
 ## Bootstrap
-![Alt text](images/entry.svg)
+
 
 - cli
 - specified networks 
@@ -19,7 +25,7 @@ icon: material/telescope
 - check if config exists or in use
 
 ## Obtain network metadata
-![Alt text](images/db_flow.excalidraw.svg)
+
 
 - specified network (slot epoch)
 
