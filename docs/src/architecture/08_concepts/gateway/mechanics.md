@@ -22,13 +22,26 @@ icon: material/airplane-cog
         init --> [*]
     }
     state Config {
+        
+        State Update{
         [*] --> CheckDB
         CheckDB --> Locked
         Locked --> CheckDB
         CheckDB --> Unlocked
-        Unlocked --> Lock
-        Lock --> UpdateDB
-        UpdateDB --> Unlocked
+        Unlocked --> UpdateDB
+        Lock --> CheckDB
+        UpdateDB --> Lock
+        }
+
+        State Updates{
+        [*] --> CheckConfigB
+        CheckConfigB --> LockedConfig
+        LockedConfig --> CheckConfigB
+        CheckConfigB --> UnlockedConfig
+        UnlockedConfig --> UpdateConfig
+        LockConfig --> CheckConfigB
+        UpdateConfig --> LockConfig
+        }
        
     }
 
@@ -39,7 +52,6 @@ icon: material/airplane-cog
         CheckConfig --> ConfigExists
         ConfigExists --> [*]        
     }
-
 ```
 
 ## Bootstrap
