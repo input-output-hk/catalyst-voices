@@ -1,5 +1,5 @@
 ---
-icon: material/account-tie-hat
+icon: material/airplane-cog
 ---
 
 ## Mechanics
