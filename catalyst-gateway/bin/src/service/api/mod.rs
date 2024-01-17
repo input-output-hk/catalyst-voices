@@ -48,8 +48,7 @@ TODO:
 
 /// Get the license details for the API
 fn get_api_license() -> LicenseObject {
-    LicenseObject::new("Apache 2.0")
-        .url("https://www.apache.org/licenses/LICENSE-2.0")
+    LicenseObject::new("Apache 2.0").url("https://www.apache.org/licenses/LICENSE-2.0")
 }
 
 /// Get the terms of service for the API
