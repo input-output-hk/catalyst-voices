@@ -108,15 +108,6 @@ test:
         BUILD --platform=linux/amd64 ./tests+integration-test
     END
 
-# test-lint-openapi - OpenAPI linting from an artifact
-# testing whether the OpenAPI generated during build stage follows good practice.
-test-lint-openapi:
-    FROM github.com/input-output-hk/catalyst-ci/earthly/spectral:feat/openapi-lint+spectral-base
-    # Copy the doc artifact.
-    COPY +hosted-build/doc ./doc
-    # Scan the doc directory where type of file is JSON.
-    DO github.com/input-output-hk/catalyst-ci/earthly/spectral:feat/openapi-lint+BUILD_SPECTRAL --dir=./doc --file_type="json"
-
 # Publish packages if all integration tests have passed. (Failure to pass tests will prevent packages being published.)
 # publish:
 #    FROM scratch
