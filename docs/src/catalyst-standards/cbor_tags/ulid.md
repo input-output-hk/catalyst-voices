@@ -27,4 +27,4 @@ RFC 7049, October 2013.
 Steven Johnson <steven.johnson@iohk.io>
 
 [ULID]: https://github.com/ulid/spec/blob/master/README.md
-[ULID Binary Layout]: https://github.com/ulid/spec/blob/master/README.md
+[ULID Binary Layout]: https://github.com/ulid/spec/tree/master#binary-layout-and-byte-order
