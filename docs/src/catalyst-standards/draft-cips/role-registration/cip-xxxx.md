@@ -84,7 +84,7 @@ Note: **7222 is RBAC when decoded using the telephone ITU E.161 standard**
 * UTF-8 strings **MUST** be valid UTF-8.
 * Tags **MUST NOT** be used unless specified in the specification.
 * Any Tags defined in the specification are **REQUIRED**, and they **MUST** be present in the encoded data.
-* Fields which should be tagged, but which are not tagged will be considered invalid.
+  * Fields which should be tagged, but which are not tagged will be considered invalid.
 
 These validity checks apply only to the encoding and decoding of the metadata itself.  
 There are other validity requirements based on the role registration data itself.
@@ -129,7 +129,7 @@ Informally, all Registrations follow the same generalized Format (Non-Normative)
   6: #6.37    h'a3c12b1c98af4ee8b54278e77906c0fc'; or  // UUID
      #6.32770 h'018d1d2acaf04486be189dbc5ae35e51',     // ULID
   // Expires - Optional
-  7: 0,
+  7: #6.1 0,
   // dApp Defined Metadata - Optional
   100: <Any>
 }
