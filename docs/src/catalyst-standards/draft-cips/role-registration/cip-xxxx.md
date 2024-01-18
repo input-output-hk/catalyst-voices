@@ -16,24 +16,20 @@ License: CC-BY-4.0 / Apache 2.0
 # Role Based Access Control Registration
 
 ## Abstract
-<!-- A short (\~200 word) description of the proposed solution and the technical issue being addressed. -->
+
 dApps such as Project Catalyst need robust, secure and extensible means for users to register under various roles
 and for the dApp to be able to validate actions against those roles.
 While these Role based registrations are required for future functionality of Project Catalyst, they are also
 intended to be generally useful to any dApp with User roles.
 
 ## Motivation: why is this CIP necessary?
-<!-- A clear explanation that introduces the reason for a proposal, its use cases and stakeholders. 
-If the CIP changes an established design then it must outline design issues that motivate a rework. 
-For complex proposals, authors must write a Cardano Problem Statement (CPS) as defined in CIP-9999 
-and link to it as the `Motivation`. -->
 
 CIP-36 contains a limited form of role registration limited to voters and dreps.
 
 However, Project Catalyst has a large (and growing) number of roles identified in the system, all of
 which can benefit from on-chain registration.
 
-A non-exhaustive list of the roles Project Catalyst needs to identify on-chain are:
+A non-exhaustive example list of the roles Project Catalyst needs to identify securely are:
 
 1. Proposers.
 2. Co-Proposers.
@@ -46,7 +42,7 @@ A non-exhaustive list of the roles Project Catalyst needs to identify on-chain a
 
 Individual dApps may have their own unique list of roles they wish users to register for.
 Roles are such that an individual user may hold multiple roles, one of the purposes of this
-CIP is to allow the user  to unambiguously assert they are acting in the capacity of a selected role.
+CIP is to allow the user to unambiguously assert they are acting in the capacity of a selected role.
 
 CIP-36 offers a "purpose" field, but offers no way to manage it, and offers no way to allow it to be used unambiguously.
 The "purpose" field therefore is insufficient for the needs of identifying roles.
@@ -63,12 +59,6 @@ Registering for various roles and having role specific keys is generally useful 
 motivated to solve problems with Project Catalyst, it is also intended to be generally applicable to other dApps.
 
 ## Specification
-<!-- The technical specification should describe the proposed improvement in sufficient technical detail. 
-In particular, it should provide enough information that an implementation can be performed solely on the basis 
-of the design in the CIP. 
-This is necessary to facilitate multiple, interoperable implementations. 
-This must include how the CIP should be versioned. 
-If a proposal defines structure of on-chain data it must include a CDDL schema in it's specification.-->
 
 Role registration is achieved by using two metadata records attached to the same transaction.
 
@@ -136,7 +126,8 @@ Informally, all Registrations follow the same generalized Format (Non-Normative)
   // Role
   5: 0,
   // dApp ID (UUID or ULID)
-  6: h'',
+  6: #6.37    h'a3c12b1c98af4ee8b54278e77906c0fc'; or  // UUID
+     #6.32770 h'018d1d2acaf04486be189dbc5ae35e51',     // ULID
   // Expires - Optional
   7: 0,
   // dApp Defined Metadata - Optional
@@ -157,7 +148,7 @@ the requirements of the identified dApp.
 Subkey 1 is either:
 
 * A Single [Role Specific Public Key](#subkey-1---role-key---single-role-specific-public-key); OR
-* A [Optionally Weighted List of Role Specific Public Keys](#grouped-role-registration-format).
+* A [Optionally Weighted List of Role Specific Public Keys](#subkey-1---role-key---list-of-role-keys).
 
 #### SubKey 1 - Role Key - Single Role Specific Public Key
 
@@ -210,39 +201,43 @@ It also provides a mechanism to unambiguously identify the role being asserted w
 The Role Specific key derivation path must start with a specific segment:
 
 Path based key derivation is limited to 31 bits, per path component.
-The [dApp ID]() is 128 bits.  
+The [dApp ID] is 128 bits.  
 It is required that the Role key be, as far as practically possible, unique amongst dApps.
 This is to prevent a Role from one dApp being misused by another, either intentionally or inadvertently.
 
-The [dApp ID]() will be reduced to 31 bits by using Blake2B with a 31 bit digest over the [dApp ID]().
-While 31 bits is small, and could be subject to a collision attack, the intention here is not to prevent
-deliberately contrived collisions but to disambiguate dApps under normal circumstances.
-As the [dApp ID]() is not controllable, a malicious dApp could simply use the same dApp ID as another.
-Therefore it is not possible to protect against a collision and the [dApp ID]() is not a security mechanism
-in any event.
-
-However key derivation is limited to 31 bits, accordingly, the [dApp ID][] will be hashed with Blake2B and a
+However key derivation is limited to 31 bits, accordingly, the [dApp ID] will be hashed with Blake2B and a
 31 bit digest will be produced.
 The aim is to as far as practical cause dApps to have distinct Role keys under normal circumstances.
 
-`m / 7222' / 1815' / account' / chain' / blake2b_31(dApp ID) / role`
+`m / 7222' / 1815' / account' / chain' / hash(dApp ID) / role`
 
 * `7222'` : The registration metadata field key from this CIP.
 * `1815'` : The year Ada Lovelace was born - Identifies this key as being for Cardano.
 * `account'` : The voters account
 * `chain'` : The chain on which the voter is registering.
-* `blake2b_31(uuid)` : The [dApp ID]()
+* `hash(dapp ID)` : The [hashed](#hashdapp-id) [dApp ID]
 * `role` :  The role being registered for.
 
-Note: It is specifically required that the Role Key NOT CHANGE for registrations made from the same wallet for the same dApp UUID/Purpose.
-This is because its possible to make both single and array role registrations, and its critical the key be the same regardless of which is used.
+Note: It is specifically required that the Role Key NOT CHANGE for the same dApp UUID/Purpose for any compliant Wallet.
+This is because its possible to make both single and array role registrations, and its critical the key be the same in these.
+It also critical that the Role keys be freely transferable and recoverable across wallets.
 The necessity of this will be expanded on when the witness is discussed below.
 
-If the wallet does not use path based key derivation it is Essential that:
+##### hash(dapp ID)
 
-* Role Specific Public Keys do not change from registration to registration for the same [dApp UUID][dApp-UUID]/Purpose.
-* Role Specific Public Keys are not the same for different Purposes for a UUID.
-* It is acceptable, though undesirable, for different [dApp UUID's][dApp-UUID] to use the same Role Specific Public Keys.
+The [dApp ID] will be reduced to 31 bits by using Blake2B with a 32 bit digest over the [dApp ID].
+
+To ensure the hardening bit is not set, the high bit of the resultant hash will be forced to 0.
+
+```text
+  hash(dapp ID) == blake2b_32(dapp ID) & 0x7FFFFFFF
+```
+
+While 31 bits is small, and could be subject to a collision attack, the intention here is not to prevent
+deliberately contrived collisions but to disambiguate dApps under normal circumstances.
+As the [dApp ID] is not controllable, a malicious dApp could simply use the same dApp ID as another.
+Therefore it is not possible to protect against a collision and the [dApp ID] is not a security mechanism
+in any event.
 
 #### SubKey 1 - Role Key - List of Role Keys
 
@@ -540,3 +535,4 @@ Code samples and reference material are licensed under [Apache 2.0]
 [Apache 2.0]: https://www.apache.org/licenses/LICENSE-2.0.html
 [CBOR]: https://www.rfc-editor.org/rfc/rfc8949.html
 [CBOR - Core Deterministic Encoding Requirements]: https://www.rfc-editor.org/rfc/rfc8949.html#section-4.2.1
+[CIP0003]: https://cips.cardano.org/cip/CIP-0003

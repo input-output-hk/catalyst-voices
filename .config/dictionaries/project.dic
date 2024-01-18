@@ -10,6 +10,7 @@ bluefireteam
 BROTLI
 cardano
 Catalyst
+cbor
 CEST
 cfbundle
 chromedriver
@@ -89,6 +90,7 @@ slotno
 sqlfluff
 Stefano
 stevenj
+Subkey
 subosito
 tacho
 thiserror
