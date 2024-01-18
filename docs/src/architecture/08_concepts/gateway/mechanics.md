@@ -24,6 +24,11 @@ icon: material/airplane-cog
         [*] --> init
         init --> [*]
     }
+
+    state Follower {
+        [*]  
+    }
+
     state Config {
         checkConfigFromDB-->Database: release
         Database-->checkConfigFromDB: wait
@@ -40,9 +45,11 @@ icon: material/airplane-cog
         }
         State checkDB{
             tick --> UpdateThreshold
-            UpdateThreshold --> tick
-            UpdateThreshold--> updatedb: not updated recently
+            UpdateThreshold --> tick: data is fresh
+            UpdateThreshold--> Follower: data is stale
             updatedb --> tick
+            updatedb-->Follower
+            Follower -->updatedb
         }
         state Database{
             Unlocked --> Locked
@@ -65,8 +72,6 @@ icon: material/airplane-cog
             locked--> unlocked
         }   
     }
-  
-
 ```
 
 ## Bootstrap
