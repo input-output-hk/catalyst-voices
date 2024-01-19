@@ -95,7 +95,7 @@ Each dApp may have further validity requirements beyond those stated herein.
 At a high level, Role registration will collect the following data:
 
 1. A [role public key or non-empty list of role public keys](#subkey-1---role-specific-public-key-or-role-public-key-array);
-2. A [stake address for the network that this transaction is submitted to]();
+2. A [stake address for the network that this transaction is submitted to](#subkey-2---stake-public-key);
 3. An *Optional* [Shelley payment address]().
 4. A [nonce]() that identifies that most recent registration.
 5. The [role]() being registered.
@@ -110,15 +110,15 @@ Informally, all Registrations follow the same generalized Format (Non-Normative)
 ```cbor
 7222: {
   // Role Public Key or Role Public Key Array
-  1: #6.??? h'a6a3c0447aeb9cc54cf6422ba32b294e5e1c3ef6d782f2acff4a70694c4d1663' ; or
-     [#6.??? h'A71A8700248D4C91E01A2A2CB5F4F0E664F084EB761C6792AEDD28160C1E403C', 
-      #6.??? h'C606D983C5545800FAF20519D21988AA0A13271BA12BA9A8643FCFAD58697C97'] ; or
+  1: #6.32773(h'a6a3c0447aeb9cc54cf6422ba32b294e5e1c3ef6d782f2acff4a70694c4d1663') ; or
+     [#6.32773(h'A71A8700248D4C91E01A2A2CB5F4F0E664F084EB761C6792AEDD28160C1E403C'), 
+      #6.32773(h'C606D983C5545800FAF20519D21988AA0A13271BA12BA9A8643FCFAD58697C97')] ; or
      [
-      [#6.??? h'A71A8700248D4C91E01A2A2CB5F4F0E664F084EB761C6792AEDD28160C1E403C', 50], 
-      [#6.??? h'C606D983C5545800FAF20519D21988AA0A13271BA12BA9A8643FCFAD58697C97', 50]
+      [#6.32773(h'A71A8700248D4C91E01A2A2CB5F4F0E664F084EB761C6792AEDD28160C1E403C'), 50], 
+      [#6.32773(h'C606D983C5545800FAF20519D21988AA0A13271BA12BA9A8643FCFAD58697C97'), 50]
      ]
   // Stake Public Key
-  2: #6.??? h'ad4b948699193634a39dd56f779a2951a24779ad52aa7916f6912b8ec4702cee',
+  2: #6.32773(h'ad4b948699193634a39dd56f779a2951a24779ad52aa7916f6912b8ec4702cee'),
   // Payment Address
   3: #6.???h'00588e8e1d18cba576a4d35758069fe94e53f638b6faf7c07b8abd2bc5c5cdee47b60edc7772855324c85033c638364214cbfc6627889f81c4',
   // nonce
@@ -129,9 +129,9 @@ Informally, all Registrations follow the same generalized Format (Non-Normative)
   6: #6.37    h'a3c12b1c98af4ee8b54278e77906c0fc'; or  // UUID
      #6.32770 h'018d1d2acaf04486be189dbc5ae35e51',     // ULID
   // Expires - Optional
-  7: #6.1 0,
+  7: #6.1(0),
   // dApp Defined Metadata - Optional
-  100: <Any>
+  100+: <Any>
 }
 ```
 
@@ -333,30 +333,24 @@ Examples of acceptable `keyType`s for supporting tools:
 | `CIP36RoleSigningKey_ed25519` | CIPxx Role Signing Key |
 | `CIP36RoleVerificationKey_ed25519` | CIPxx Role Verification Key |
 
-For hardware implementations:
-| `keyType` | Description |
-| --------- | ----------- |
-| `CIP36RoleVerificationKey_ed25519` | Hardware CIPxx Role Verification Key |
-| `CIP36RoleHWSigningFile_ed25519` | Hardware CIPxx Role Signing File |
-
 ### SubKey 2 - Stake Public Key
 
 This is represented as a CBOR Byte-string, 32 bytes long.
 
-This is the actual ed25519 Stake Public key of the wallet, and NOT the stake key public hash.
-This is the primary key [
-  [h'A71A8700248D4C91E01A2A2CB5F4F0E664F084EB761C6792AEDD28160C1E403C', 25],
-  [h'C606D983C5545800FAF20519D21988AA0A13271BA12BA9A8643FCFAD58697C97', 75]
-]associating the users wallet with their role key.
+This is the actual [ED25519-BIP32] Stake Public key of the wallet, and NOT the stake key public hash.
+This is the primary key associating the users wallet with their role key.
 How the dApp uses this information is dApp specific.
-For example Project Catalyst uses this information to derive voting power for a voter role.
+For example Project Catalyst can use this information to derive voting power for a voter role.
 
 It is an ed25519 public key, and is represented as a byte-string 32 bytes in length.
  Example:
 
 ```cbor
-h'ad4b948699193634a39dd56f779a2951a24779ad52aa7916f6912b8ec4702cee'
+#6.32773(h'ad4b948699193634a39dd56f779a2951a24779ad52aa7916f6912b8ec4702cee')
 ```
+
+Note: There can only be a single Stake Public Key in the registration.
+Multiple Stake Public Keys can be associated with the same Role Key/s, however there needs to be one registration per stake address.
 
 ### SubKey 3 - Payment Address (OPTIONAL)
 
