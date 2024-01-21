@@ -4,29 +4,30 @@ icon: material/airplane-cog
 
 ## Mechanics
 
+Rough napkin sketch: still iterating on final design
+
 ```mermaid
   stateDiagram-v2
     state if_state <<choice>>
-    [*] --> Node
     Node -->if_state
-    if_state --> NoConfig: config does not exist
     if_state --> Config : config exists
+    if_state --> Node: config does not exist
 
-    note right of NoConfig
-            Orchestration is coordinated via the config
-        end note
-    
+
     note right of Config
             Indexing blockchain data provided by follower
         end note
 
+    note right of Node
+            Orchestration is coordinated via the config
+        end note
+
     state Node {
-        [*] --> init
-        init --> [*]
+        init --> init: try until config exists
     }
 
     state Follower {
-        [*]  
+        [*]
     }
 
     state Config {
@@ -56,41 +57,5 @@ icon: material/airplane-cog
             Locked--> Unlocked
         }
     }
-    state NoConfig {
-        checkConfg-->database: release
-        database--> checkConfg: wait   
-
-        state checkConfg{
-            ticker--> configNotPresent
-            configNotPresent-->ticker
-            ticker-->configExists
-            configExists-->[*]: transition to config logic
-        }  
-
-        state database{
-            unlocked --> locked
-            locked--> unlocked
-        }   
-    }
+    
 ```
-
-## Bootstrap
-
-
-- cli
-- specified networks 
-
-## Config 
-- check if config exists or in use
-
-## Obtain network metadata
-
-- specified network (slot epoch)
-
-## Syncing
-
-## Contention
-
-## Multiple nodes
-
-## Roll backs
