@@ -18,6 +18,17 @@ Rough napkin sketch: still iterating on final design
             Indexing blockchain data provided by follower
         end note
 
+    
+    note left of Config
+            checkConfig = thread A
+        end note
+
+    
+    note right of Config
+            checkDB = thread B
+        end note
+
+    
     note right of Node
             Orchestration is coordinated via the config
         end note
@@ -31,13 +42,13 @@ Rough napkin sketch: still iterating on final design
     }
 
     state Config {
-        checkConfigFromDB-->Database: release
-        Database-->checkConfigFromDB: wait
+        checkConfig-->Database: release
+        Database-->checkConfig: wait
 
         checkDB-->Database: release
         Database-->checkDB: wait
 
-        State checkConfigFromDB{
+        State checkConfig{
             Tick --> Updated
             Tick --> NoChange: 
             Updated --> Restart: stop all followers cleanly
@@ -57,5 +68,4 @@ Rough napkin sketch: still iterating on final design
             Locked--> Unlocked
         }
     }
-    
 ```
