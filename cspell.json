@@ -235,5 +235,11 @@
         "styles.min.css",
         "web-components.min.js",
         "**/generated/**"
-    ]
+    ],
+    "flagWords": [
+        "Pseudocode",
+        "pseudocode",
+        "RAII",
+        "updatedb"
+    ],
 }
