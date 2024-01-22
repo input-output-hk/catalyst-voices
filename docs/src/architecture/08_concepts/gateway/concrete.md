@@ -3,6 +3,7 @@ icon: material/hub
 ---
 
 # Pseudocode
+
 Building blocks in the form of *pseudocode*;
 Intended to make the conceptual design more concrete; not setting rules.
 
@@ -108,14 +109,14 @@ fn update_threshold(last_updated: ThresholdMetric) -> bool {
 }
 ```
 
-
-
 ## Follower
-- start follower with specified networks
-- Stream blocks from given (slot,epoch)
 
+* Start follower with specified networks
+
+* Stream blocks from given (slot,epoch)
 
 ## Syncing
+
 Nodes race to update
 
 ## Contention
