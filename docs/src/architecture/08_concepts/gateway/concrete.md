@@ -91,6 +91,14 @@ fn parse(block: Block) -> Result<MetaBlock, Err> {
 }
 ```
 
+Calculate if threshold conditional has been met <br />
+```rust
+fn update_threshold(last_updated: ThresholdMetric) -> bool {
+    // threshold calculation
+    // define conditional
+}
+```
+
 
 ## Follower
 - start follower with specified networks
