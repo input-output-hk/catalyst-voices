@@ -3,12 +3,13 @@ icon: material/hub
 ---
 
 # Pseudocode
-Building blocks in the form of *pseudocode*; 
+Building blocks in the form of *pseudocode*;
 Intended to make the conceptual design more concrete; not setting rules.
 
 ## Node
 
 Restart node with new config
+
 ```rust
 fn restart_node(config: Config) -> Result<(), Err>{
     // graceful restart
@@ -18,6 +19,7 @@ fn restart_node(config: Config) -> Result<(), Err>{
 ## Config
 
 Check if config exists; all orchestration is coordinated via the DB, more specifically the config.
+
 ```rust
 fn config_exists(db: DBHandler) -> Option<Config> {
     // lock db
@@ -28,6 +30,7 @@ fn config_exists(db: DBHandler) -> Option<Config> {
 ```
 
 Node polls for config until it exists in database
+
 ```rust
 fn poll_config(db: DBHandler) -> Option<Config> {
     loop {
@@ -39,6 +42,7 @@ fn poll_config(db: DBHandler) -> Option<Config> {
 ```
 
 Check if config has been updated
+
 ```rust
 fn config_updated(db: DBHandler) -> Option<Config> {
     // lock db
@@ -51,6 +55,7 @@ fn config_updated(db: DBHandler) -> Option<Config> {
 ## Updates
 
 Continually race to update database
+
 ```rust
 fn index_follower_data(db: DBHandler, stream: FollowerIo)-> Result<(), Err> {
         loop {
@@ -63,6 +68,7 @@ fn index_follower_data(db: DBHandler, stream: FollowerIo)-> Result<(), Err> {
 
 Check most recent update on cardano update table
 If it falls within the threshold boundary, node should update db with latest data
+
 ```rust
 fn database_ready_to_update(db: DBHandler) -> bool {
     // lock db
@@ -73,6 +79,7 @@ fn database_ready_to_update(db: DBHandler) -> bool {
 ```
 
 Update database with follower data
+
 ```rust
 fn update_database(db: DBHandler, stream: FollowerIo) -> Result<(), Err> {
     // lock db
@@ -85,6 +92,7 @@ fn update_database(db: DBHandler, stream: FollowerIo) -> Result<(), Err> {
 ```
 
 Parse block
+
 ```rust
 fn parse(block: Block) -> Result<MetaBlock, Err> {
     // extract era, UTXO, spent TXs and registration metadata
@@ -92,6 +100,7 @@ fn parse(block: Block) -> Result<MetaBlock, Err> {
 ```
 
 Calculate if threshold conditional has been met
+
 ```rust
 fn update_threshold(last_updated: ThresholdMetric) -> bool {
     // threshold calculation
