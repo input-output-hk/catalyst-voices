@@ -2,9 +2,9 @@
 icon: material/hub
 ---
 
-# Pseudocode
+# Pseudo code
 
-Building blocks in the form of *pseudocode*;
+Building blocks in the form of *pseudo code*;
 Intended to make the conceptual design more concrete; not setting rules.
 
 ## Node
@@ -26,7 +26,7 @@ fn config_exists(db: DBHandler) -> Option<Config> {
     // lock db
     // if config exists { Some(config) }
     // else { None }
-    // RAII drop trait -> unlock db
+    // Resource acquisition is initialization: drop trait -> unlock db
 }
 ```
 
@@ -49,7 +49,7 @@ fn config_updated(db: DBHandler) -> Option<Config> {
     // lock db
     // if config updated { Some(config) }
     // else { None }
-    // RAII drop trait -> unlock db
+    // Resource acquisition is initialization: drop trait -> unlock db
 }
 ```
 
@@ -75,7 +75,7 @@ fn database_ready_to_update(db: DBHandler) -> bool {
     // lock db
     // let last_updated = CardanoUpdateTable()
     // return update_threshold(last_updated) 
-    // RAII drop trait -> unlock db
+    // Resource acquisition is initialization: drop trait -> unlock db
 }
 ```
 
@@ -88,7 +88,7 @@ fn update_database(db: DBHandler, stream: FollowerIo) -> Result<(), Err> {
         let metadata = parse(block);
         db.insert(metadata);
     }
-    // RAII drop trait -> unlock db
+    // Resource acquisition is initialization: drop trait -> unlock db
 }
 ```
 
@@ -96,7 +96,7 @@ Parse block
 
 ```rust
 fn parse(block: Block) -> Result<MetaBlock, Err> {
-    // extract era, UTXO, spent TXs and registration metadata
+    // extract era, unspent transaction output, spent Transactions and registration metadata
 }
 ```
 
