@@ -2,7 +2,8 @@
 icon: material/hub
 ---
 
-Building blocks in the form of *pseudocode*
+# Pseudocode
+Building blocks in the form of *pseudocode*; 
 Intended to make the conceptual design more concrete; not setting rules.
 
 ## Node
@@ -98,6 +99,7 @@ fn update_threshold(last_updated: ThresholdMetric) -> bool {
     // define conditional
 }
 ```
+
 
 
 ## Follower

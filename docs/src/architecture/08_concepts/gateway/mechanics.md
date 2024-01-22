@@ -2,6 +2,8 @@
 icon: material/airplane-cog
 ---
 
+# Initial blueprint
+
 ```mermaid
   stateDiagram-v2
     state if_state <<choice>>
