@@ -57,9 +57,9 @@ icon: material/airplane-cog
             tick --> UpdateThreshold
             UpdateThreshold --> tick: data is fresh
             UpdateThreshold--> Follower: data is stale
-            updatedatabase --> tick
-            updatedatabase-->Follower
-            Follower -->updatedatabase
+            updateDB --> tick
+            updateDB-->Follower
+            Follower -->updateDB
         }
         state Database{
             Unlocked --> Locked
