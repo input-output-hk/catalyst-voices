@@ -2,7 +2,8 @@
 icon: material/hub
 ---
 
-### Concrete building blocks
+Building blocks in the form of *pseudocode*
+Intended to make the conceptual design more concrete; not setting rules.
 
 ## Node
 
@@ -27,14 +28,13 @@ fn config_exists(db: DBHandler) -> Option<Config> {
 ```
 
 Node polls for config until it exists in db <br />
-TBD: futures
 ```rust
 fn poll_config(db: DBHandler) -> Option<Config> {
-    /*loop {
+    loop {
         if let Some(r) = config_exists(db) {
             return Some(r)
         }
-    }*/
+    }
 }
 ```
 
@@ -49,6 +49,17 @@ fn config_updated(db: DBHandler) -> Option<Config> {
 ```
 
 ## Updates
+
+Continually race to update database <br />
+```rust
+fn index_follower_data(db: DBHandler, stream: FollowerIo)-> Result<(), Err> {
+        loop {
+            if database_ready_to_update(db) {
+                update_database(db, stream)
+            }
+        }
+}
+```
 
 Check most recent update on cardano update table <br />
 If it falls within the threshold boundary, node should update db with latest data <br />
@@ -65,41 +76,26 @@ Update database with follower data <br />
 ```rust
 fn update_database(db: DBHandler, stream: FollowerIo) -> Result<(), Err> {
     // lock db
-   
-    /*
     while let Some(block) = stream.next().await {
         let metadata = parse(block);
         db.insert(metadata);
     }
-    */
-
     // RAII drop trait -> unlock db
 }
 ```
 
-Continually race to update database <br />
+Parse block <br />
 ```rust
-fn index_follower_data(db: DBHandler, stream: FollowerIo)-> Result<(), Err> {
-        /*loop {
-            
-            if database_ready_to_update(db) {
-                update_database(db, stream)
-            }
-        }*/
+fn parse(block: Block) -> Result<MetaBlock, Err> {
+    // extract era, UTXO, spent TXs and registration metadata
 }
 ```
+
 
 ## Follower
 - start follower with specified networks
 - Stream blocks from given (slot,epoch)
 
-## Process blocks
-
-- As each block is received.
-- Parse the block for its era.
-- Read UTXO from each transaction.
-- Read spent TX from each transaction.
-- Check metadata for catalyst registrations.
 
 ## Syncing
 Nodes race to update

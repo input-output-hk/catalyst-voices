@@ -2,29 +2,25 @@
 icon: material/airplane-cog
 ---
 
-## Mechanics
-
-Rough napkin sketch: still iterating on final design
-
 ```mermaid
   stateDiagram-v2
     state if_state <<choice>>
     Node -->if_state
-    if_state --> Config : config exists
+    if_state --> node : config exists
     if_state --> Node: config does not exist
 
 
-    note right of Config
+    note right of node
             Indexing blockchain data provided by follower
         end note
 
     
-    note left of Config
+    note left of node
             checkConfig = thread A
         end note
 
     
-    note right of Config
+    note right of node
             checkDB = thread B
         end note
 
@@ -41,7 +37,7 @@ Rough napkin sketch: still iterating on final design
         [*]
     }
 
-    state Config {
+    state node {
         checkConfig-->Database: release
         Database-->checkConfig: wait
 
@@ -69,3 +65,5 @@ Rough napkin sketch: still iterating on final design
         }
     }
 ```
+
+:construction: Design is still active and not final :construction:
