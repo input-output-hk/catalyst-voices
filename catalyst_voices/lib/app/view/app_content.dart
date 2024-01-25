@@ -4,34 +4,45 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
+import 'package:go_router/go_router.dart';
+
+const _restorationScopeId = 'rootVoices';
 
 final class AppContent extends StatelessWidget {
   const AppContent({super.key});
 
+  List<LocalizationsDelegate<dynamic>> get _localizationsDelegates {
+    return const [
+      ...VoicesLocalizations.localizationsDelegates,
+      LocaleNamesLocalizationsDelegate(),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return BlocListener<AuthenticationBloc, AuthenticationState>(
       listener: (context, state) {},
       child: MaterialApp.router(
-        restorationScopeId: 'rootVoices',
-        localizationsDelegates: const [
-          ...VoicesLocalizations.localizationsDelegates,
-          LocaleNamesLocalizationsDelegate(),
-        ],
+        restorationScopeId: _restorationScopeId,
+        localizationsDelegates: _localizationsDelegates,
         supportedLocales: VoicesLocalizations.supportedLocales,
         localeListResolutionCallback: basicLocaleListResolution,
-        routerConfig: AppRouter.init(
-          authenticationBloc: context.read<AuthenticationBloc>(),
-        ),
-        title: 'Catalyst Voices',
+        routerConfig: _routeConfig(context),
+        title: l10n.homeScreenText,
         theme: ThemeData(
-          useMaterial3: true,
           brightness: Brightness.dark,
           bottomNavigationBarTheme: const BottomNavigationBarThemeData(
             type: BottomNavigationBarType.fixed,
           ),
         ),
       ),
+    );
+  }
+
+  GoRouter _routeConfig(BuildContext context) {
+    return AppRouter.init(
+      authenticationBloc: context.read<AuthenticationBloc>(),
     );
   }
 }
