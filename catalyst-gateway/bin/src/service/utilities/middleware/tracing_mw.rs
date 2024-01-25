@@ -3,11 +3,10 @@ use std::time::Instant;
 
 use cpu_time::ProcessTime; // ThreadTime doesn't work.
 use cryptoxide::{blake2b::Blake2b, digest::Digest};
-use hyper::header;
 use lazy_static::lazy_static;
 use poem::{
     async_trait, http::HeaderMap, web::RealIp, Endpoint, Error, FromRequest, IntoResponse,
-    Middleware, PathPattern, Request, Response, Result,
+    Middleware, PathPattern, Request, Response, Result, http::header
 };
 use poem_openapi::OperationId;
 use prometheus::{

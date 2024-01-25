@@ -62,7 +62,6 @@ lazy_static = { workspace = true }
 url = { workspace = true }
 dotenvy = { workspace = true }
 panic-message = { workspace = true }
-hyper = { workspace = true }
 cpu-time = { workspace = true }
 ulid = { workspace = true, features = ["serde", "uuid"] }
 rust-embed = { workspace = true }
