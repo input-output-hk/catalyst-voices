@@ -27,7 +27,7 @@ aliases:
 overrides:
 - files: ['*']
   rules:
-    # Override documnent description rule
+    # Override document description rule
     # - No limitations on the characters that can start or end a sentence.
     # - Length should be >= 20 characters
     docs-description:
