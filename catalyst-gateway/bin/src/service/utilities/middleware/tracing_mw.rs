@@ -5,8 +5,10 @@ use cpu_time::ProcessTime; // ThreadTime doesn't work.
 use cryptoxide::{blake2b::Blake2b, digest::Digest};
 use lazy_static::lazy_static;
 use poem::{
-    async_trait, http::HeaderMap, web::RealIp, Endpoint, Error, FromRequest, IntoResponse,
-    Middleware, PathPattern, Request, Response, Result, http::header
+    async_trait,
+    http::{header, HeaderMap},
+    web::RealIp,
+    Endpoint, Error, FromRequest, IntoResponse, Middleware, PathPattern, Request, Response, Result,
 };
 use poem_openapi::OperationId;
 use prometheus::{
