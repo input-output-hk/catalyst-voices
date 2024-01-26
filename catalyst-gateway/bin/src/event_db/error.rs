@@ -28,7 +28,7 @@ pub(crate) enum Error {
     Unknown(String),
     /// Variable error
     #[error(transparent)]
-    VarError(#[from] VarError),
+    VarErr(#[from] VarError),
 }
 
 impl From<RunError<tokio_postgres::Error>> for Error {
