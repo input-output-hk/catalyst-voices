@@ -165,7 +165,7 @@ impl VitSSFundQueries for EventDB {
             challenges.push(Challenge {
                 id: row.try_get("id")?,
                 internal_id: row.try_get("internal_id")?,
-                challenge_type: row.try_get("challenge_type")?,
+                c_type: row.try_get("challenge_type")?,
                 title: row.try_get("title")?,
                 description: row.try_get("description")?,
                 rewards_total: row
@@ -175,7 +175,7 @@ impl VitSSFundQueries for EventDB {
                     .try_get::<_, Option<i64>>("proposers_rewards")?
                     .unwrap_or_default(),
                 fund_id,
-                challenge_url: row
+                url: row
                     .try_get::<_, Option<String>>("challenge_url")?
                     .unwrap_or_default(),
                 highlights: row
@@ -189,7 +189,7 @@ impl VitSSFundQueries for EventDB {
         for row in rows {
             goals.push(Goal {
                 id: row.try_get("id")?,
-                goal_name: row.try_get("goal_name")?,
+                name: row.try_get("goal_name")?,
                 fund_id,
             });
         }
@@ -198,7 +198,7 @@ impl VitSSFundQueries for EventDB {
         let mut groups = Vec::new();
         for row in rows {
             groups.push(Group {
-                group_id: row.try_get("group_id")?,
+                g_id: row.try_get("group_id")?,
                 token_identifier: row.try_get("token_identifier")?,
                 fund_id,
             });
@@ -206,14 +206,14 @@ impl VitSSFundQueries for EventDB {
 
         let fund = Fund {
             id: fund_id,
-            fund_name: row.try_get("fund_name")?,
-            fund_goal: row.try_get("fund_goal")?,
+            name: row.try_get("fund_name")?,
+            goal: row.try_get("fund_goal")?,
             voting_power_threshold: row.try_get("voting_power_threshold")?,
-            fund_start_time: row
+            start_time: row
                 .try_get::<_, NaiveDateTime>("fund_start_time")?
                 .and_local_timezone(Utc)
                 .unwrap(),
-            fund_end_time: row
+            end_time: row
                 .try_get::<_, NaiveDateTime>("fund_end_time")?
                 .and_local_timezone(Utc)
                 .unwrap(),

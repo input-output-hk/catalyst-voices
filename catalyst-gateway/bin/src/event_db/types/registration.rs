@@ -26,7 +26,7 @@ pub(crate) struct VoterInfo {
 /// Voter
 pub(crate) struct Voter {
     /// Voter info
-    pub(crate) voter_info: VoterInfo,
+    pub(crate) info: VoterInfo,
     /// As at
     pub(crate) as_at: DateTime<Utc>,
     /// Last updated

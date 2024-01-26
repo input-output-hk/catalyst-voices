@@ -155,7 +155,7 @@ impl RegistrationQueries for EventDB {
         };
 
         Ok(Voter {
-            voter_info: VoterInfo {
+            info: VoterInfo {
                 delegations_power: voter.try_get("delegations_power")?,
                 delegations_count: voter.try_get("delegations_count")?,
                 voting_power_saturation,
