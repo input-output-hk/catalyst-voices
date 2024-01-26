@@ -1,55 +1,12 @@
-VERSION 0.7
+VERSION --try --global-cache 0.7
 
 #cspell: words rustfmt toolsets USERARCH
 
 # Set up our target toolchains, and copy our files.
 builder:
-    FROM github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.14+rust-base
-
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.14+SETUP --toolchain=rust-toolchain.toml
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.6.0+SETUP --toolchain=rust-toolchain.toml
 
     COPY --dir .cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin crates tests .
-
-# Test rust build container - Use best architecture host tools.
-hosted-check:
-    FROM +builder
-
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.14+CHECK
-
-# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
-# Only used to validate tooling is working across host toolsets.
-all-hosts-check:    
-    BUILD --platform=linux/amd64 --platform=linux/arm64 +hosted-check
-
-hosted-build:
-    ARG TARGETPLATFORM
-
-    # Build the service
-    FROM +builder
-
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.14+BUILD --bins="cat-gateway/cat-gateway"
-
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.14+SMOKE_TEST --bin="cat-gateway"
-
-    # generate OpenAPI docs
-    RUN ./target/$TARGETARCH/release/cat-gateway docs ./target/$TARGETARCH/doc/cat-gateway-api.json
-
-    SAVE ARTIFACT target/$TARGETARCH/doc doc
-    SAVE ARTIFACT target/$TARGETARCH/release/cat-gateway cat-gateway
-
-# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
-# Only used to validate tooling is working across host toolsets.
-all-hosts-build:    
-    BUILD --platform=linux/amd64 --platform=linux/arm64 +hosted-build
-
-unit-test-hosted:
-    # Build the service
-    FROM +builder
-
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.14+UNIT_TEST
-
-    SAVE ARTIFACT target/nextest/ci/junit.xml junit-report.xml
-    SAVE ARTIFACT coverage-report.info coverage-report.info
 
 ## -----------------------------------------------------------------------------
 ##
@@ -60,53 +17,35 @@ unit-test-hosted:
 # Run check using the most efficient host tooling
 # CI Automated Entry point.
 check:
-    FROM busybox
-    # This is necessary to pick the correct architecture build to suit the native machine.
-    # It primarily ensures that Darwin/Arm builds work as expected without needing x86 emulation.
-    # All target implementation of this should follow this pattern.
-    ARG USERARCH
+    FROM +builder
 
-    IF [ "$USERARCH" == "arm64" ]
-        BUILD --platform=linux/arm64 +hosted-check
-    ELSE
-        BUILD --platform=linux/amd64 +hosted-check
-    END
+    RUN /scripts/std_checks.py
 
-# Run build using the most efficient host tooling
-# CI Automated Entry point.
+# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
+# Only used to validate tooling is working across host toolsets.
+all-hosts-check:    
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +check
+
 build:
-    FROM busybox
-    # This is necessary to pick the correct architecture build to suit the native machine.
-    # It primarily ensures that Darwin/Arm builds work as expected without needing x86 emulation.
-    # All target implementation of this should follow this pattern.
-    ARG USERARCH
+    # Build the service
+    FROM +builder
 
-    IF [ "$USERARCH" == "arm64" ]
-        BUILD --platform=linux/arm64 +hosted-build
-    ELSE
-        BUILD --platform=linux/amd64 +hosted-build
+    TRY
+        RUN /scripts/std_build.py   --cov_report="coverage-report.info" \
+                                    --bins="cat-gateway/cat-gateway"
+    FINALLY
+        SAVE ARTIFACT target/nextest/ci/junit.xml AS LOCAL example.junit-report.xml
+        SAVE ARTIFACT coverage-report.info AS LOCAL example.coverage-report.info
     END
+    RUN ./target/$TARGETARCH/release/cat-gateway docs ./target/$TARGETARCH/doc/cat-gateway-api.json
+    SAVE ARTIFACT target/$TARGETARCH/doc doc
+    SAVE ARTIFACT target/$TARGETARCH/release/cat-gateway cat-gateway
 
+# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
+# Only used to validate tooling is working across host toolsets.
+all-hosts-build:    
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +build
 
-# This step will build any packages we would intend to publish or integration test.
-# package:
-#    FROM scratch
-
-# Run integration tests on all packages built during the `package` step.
-test:
-    FROM busybox
-    # This is necessary to pick the correct architecture build to suit the native machine.
-    # It primarily ensures that Darwin/Arm builds work as expected without needing x86 emulation.
-    # All target implementation of this should follow this pattern.
-    ARG USERARCH
-
-    IF [ "$USERARCH" == "arm64" ]
-        BUILD --platform=linux/arm64 +unit-test-hosted
-        BUILD --platform=linux/arm64 ./tests+integration-test
-    ELSE
-        BUILD --platform=linux/amd64 +unit-test-hosted
-        BUILD --platform=linux/amd64 ./tests+integration-test
-    END
 
 # Publish packages if all integration tests have passed. (Failure to pass tests will prevent packages being published.)
 # publish:
@@ -119,5 +58,4 @@ local-ci-run:
     BUILD +check
     BUILD +build
     # BUILD +package
-    BUILD +test
     # BUILD +publish
