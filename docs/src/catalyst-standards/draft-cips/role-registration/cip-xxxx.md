@@ -122,7 +122,7 @@ Informally, all Registrations follow the same generalized Format (Non-Normative)
   // Payment Address
   3: #6.???h'00588e8e1d18cba576a4d35758069fe94e53f638b6faf7c07b8abd2bc5c5cdee47b60edc7772855324c85033c638364214cbfc6627889f81c4',
   // nonce
-  4: 5479467,
+  4: #6.32770 h'018d45d8deb3a1b171f6b38577ecee20',     // ULID
   // Role
   5: 0,
   // dApp ID (UUID or ULID)
