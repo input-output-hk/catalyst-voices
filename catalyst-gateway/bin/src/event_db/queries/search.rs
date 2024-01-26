@@ -142,7 +142,7 @@ impl EventDB {
             .await
             .map_err(|e| Error::NotFound(e.to_string()))?;
         let row = rows
-            .get(0)
+            .first()
             .ok_or_else(|| Error::NotFound("can not get row".to_string()))?;
 
         Ok(SearchResult {

@@ -89,7 +89,7 @@ impl EventQueries for EventDB {
 
         let rows = conn.query(Self::EVENT_QUERY, &[&event.0]).await?;
         let row = rows
-            .get(0)
+            .first()
             .ok_or_else(|| Error::NotFound("can not find event value".to_string()))?;
 
         let ends = row
