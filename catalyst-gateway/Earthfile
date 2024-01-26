@@ -34,8 +34,8 @@ build:
         RUN /scripts/std_build.py   --cov_report="coverage-report.info" \
                                     --bins="cat-gateway/cat-gateway"
     FINALLY
-        SAVE ARTIFACT target/nextest/ci/junit.xml AS LOCAL example.junit-report.xml
-        SAVE ARTIFACT coverage-report.info AS LOCAL example.coverage-report.info
+        SAVE ARTIFACT target/nextest/ci/junit.xml AS LOCAL cat-gateway.junit-report.xml
+        SAVE ARTIFACT coverage-report.info AS LOCAL cat-gateway.coverage-report.info
     END
     RUN ./target/$TARGETARCH/release/cat-gateway docs ./target/$TARGETARCH/doc/cat-gateway-api.json
     SAVE ARTIFACT target/$TARGETARCH/doc doc
