@@ -22,7 +22,7 @@ async fn health_live() {
             );
         },
         Err(err) => {
-            eprint!("request failed for {url} error: {err:#?}")
+            eprint!("request failed for {url} error: {err:#?}");
         },
     }
 }
