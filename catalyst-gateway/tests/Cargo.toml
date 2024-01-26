@@ -20,6 +20,9 @@ unwrap = "1.2.1"
 name = "integration"
 path = "integration/main.rs"
 
+[workspace.package]
+edition = "2021"
+
 [workspace.lints.rust]
 warnings = "deny"
 missing_docs = "deny"
