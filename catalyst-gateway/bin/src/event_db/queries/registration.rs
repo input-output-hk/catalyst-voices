@@ -98,7 +98,7 @@ impl RegistrationQueries for EventDB {
         };
         let voter = rows
             .first()
-            .ok_or_else(|| Error::NotFound("can not find voter value".to_string()))?;
+            .ok_or_else(|| Error::NotFound("Cannot find voter value".to_string()))?;
 
         let voting_group = VoterGroupId(voter.try_get("voting_group")?);
         let voting_power = voter.try_get("voting_power")?;
@@ -117,7 +117,7 @@ impl RegistrationQueries for EventDB {
         let total_voting_power_per_group: i64 = rows
             .first()
             .ok_or_else(|| {
-                Error::NotFound("can not find total voting power per group value".to_string())
+                Error::NotFound("Cannot find total voting power per group value".to_string())
             })?
             .try_get("total_voting_power")?;
 
@@ -188,7 +188,7 @@ impl RegistrationQueries for EventDB {
         };
         let delegator_snapshot_info = rows
             .first()
-            .ok_or_else(|| Error::NotFound("can not find delegator value".to_string()))?;
+            .ok_or_else(|| Error::NotFound("Cannot find delegator value".to_string()))?;
 
         let delegation_rows = if let Some(event) = event {
             conn.query(Self::DELEGATIONS_BY_EVENT_QUERY, &[
@@ -204,7 +204,7 @@ impl RegistrationQueries for EventDB {
             .await?
         };
         if delegation_rows.is_empty() {
-            return Err(Error::NotFound("can not find delegator value".to_string()));
+            return Err(Error::NotFound("Cannot find delegator value".to_string()));
         }
 
         let mut delegations = Vec::new();
@@ -226,7 +226,7 @@ impl RegistrationQueries for EventDB {
         };
         let total_power: i64 = rows
             .first()
-            .ok_or_else(|| Error::NotFound("can not find total power value".to_string()))?
+            .ok_or_else(|| Error::NotFound("Cannot find total power value".to_string()))?
             .try_get("total_voting_power")?;
 
         #[allow(clippy::indexing_slicing)] // delegation_rows already checked to be not empty.

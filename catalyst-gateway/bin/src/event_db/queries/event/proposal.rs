@@ -61,7 +61,7 @@ impl ProposalQueries for EventDB {
             .await?;
         let row = rows
             .first()
-            .ok_or_else(|| Error::NotFound("cat not find proposal value".to_string()))?;
+            .ok_or_else(|| Error::NotFound("Cannot find proposal value".to_string()))?;
 
         let proposer = vec![ProposerDetails {
             name: row.try_get("proposer_name")?,

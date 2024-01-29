@@ -119,7 +119,7 @@ impl VitSSFundQueries for EventDB {
         let rows = conn.query(Self::FUND_QUERY, &[]).await?;
         let row = rows
             .first()
-            .ok_or_else(|| Error::NotFound("can not find fund value".to_string()))?;
+            .ok_or_else(|| Error::NotFound("Cannot find fund value".to_string()))?;
 
         let fund_id = row.try_get("id")?;
 
