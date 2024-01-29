@@ -12,7 +12,6 @@ version = "0.0.1"
 authors = [
     "Steven Johnson <steven.johnson@iohk.io>"
 ]
-rust-version = "1.75"
 homepage = "https://input-output-hk.github.io/catalyst-voices"
 repository = "https://github.com/input-output-hk/catalyst-voices"
 license = "MIT OR Apache-2.0"
