@@ -1,0 +1,1069 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Catalyst Gateway",
+    "description": "# Catalyst Gateway API.\n\nThe Catalyst Gateway API provides realtime data for all prior, current and future Catalyst voting events.\n\nTODO:\n\n* Implement Permissionless Auth.\n* Implement Replacement Functionality for GVC.\n* Implement representative registration on main-chain, distinct from voter registration.\n* Implement Voting API abstracting the Jormungandr API from public exposure.\n* Implement Audit API's (Retrieve voting blockchain records,  registration/voting power audit and private tally audit.\n* Implement API's needed to support posting Ideas/Proposals etc.Catalyst Gateway\n",
+    "version": "1.2.0",
+    "termsOfService": "https://github.com/input-output-hk/catalyst-core/blob/main/book/src/98_CODE_OF_CONDUCT.md",
+    "contact": {
+      "name": "Project Catalyst Team",
+      "url": "https://projectcatalyst.io",
+      "email": "contact@projectcatalyst.io"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    }
+  },
+  "tags": [
+    {
+      "name": "Fragments",
+      "description": "Fragment endpoints"
+    },
+    {
+      "name": "Health",
+      "description": "Health Endpoints"
+    },
+    {
+      "name": "Registration",
+      "description": "Information relating to Voter Registration, Delegations and Calculated Voting\nPower."
+    },
+    {
+      "name": "Test",
+      "description": "Test Endpoints (Not part of the API)"
+    },
+    {
+      "name": "TestTag2",
+      "description": "Test Endpoints (Not part of the API)"
+    },
+    {
+      "name": "V0",
+      "description": "API Version 0 Endpoints"
+    },
+    {
+      "name": "V1",
+      "description": "API Version 1 Endpoints"
+    }
+  ],
+  "paths": {
+    "/api/test/test/{id}/test/{action}": {
+      "get": {
+        "tags": [
+          "Test"
+        ],
+        "summary": "Test Get API",
+        "description": "An Endpoint to test validation of get endpoints.\n\n## Note\n\n*This is not a real endpoint, for test and demo purposes only.  To be removed.*",
+        "parameters": [
+          {
+            "name": "id",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "multipleOf": 5.0,
+              "maximum": 21.0,
+              "exclusiveMaximum": true,
+              "minimum": 5.0
+            },
+            "in": "path",
+            "description": "The ID of the test.\n\nThis comment ends up in the documentation.\n\n* 5 will print an info log\n* 10 will print a warn log\n* 15 will print a error log\n* 20 will panic which should generate a 500",
+            "required": true,
+            "deprecated": false,
+            "explode": true
+          },
+          {
+            "name": "action",
+            "schema": {
+              "type": "string",
+              "maxLength": 36,
+              "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+            },
+            "in": "path",
+            "description": "The action just needs to be any valid UUID.\n\n# Make sure its a UUID",
+            "required": false,
+            "deprecated": false,
+            "explode": true
+          },
+          {
+            "name": "pet",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Animals"
+              },
+              "maxItems": 3,
+              "minItems": 0,
+              "uniqueItems": true
+            },
+            "in": "query",
+            "description": "List your favorite pets, in order of preference",
+            "required": false,
+            "deprecated": false,
+            "explode": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "## NO CONTENT\n\nThe operation completed successfully, but there is no data to return.\n\n#### NO DATA BODY IS RETURNED FOR THIS RESPONSE"
+          },
+          "400": {
+            "description": "This error means that the request was malformed.\nIt has failed to pass validation, as specified by the `OpenAPI` schema.",
+            "content": {
+              "text/plain; charset=utf-8": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "## Internal Server Error\n\nAn internal server error occurred.\n\n*The contents of this response should be reported to the projects issue tracker.*",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerErrorPayload"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "## Service Unavailable\n\nThe service is not available.\n\n*This is returned when the service either has not started,\nor has become unavailable.*\n\n#### NO DATA BODY IS RETURNED FOR THIS RESPONSE"
+          }
+        },
+        "deprecated": true,
+        "operationId": "testGet"
+      },
+      "post": {
+        "tags": [
+          "Test",
+          "TestTag2"
+        ],
+        "summary": "Test Post API",
+        "description": "An Endpoint to test validation of get endpoints.\n\n## Responses\n\n* 204 No Content - Service is Started and can serve requests.\n* 500 Server Error - If anything within this function fails unexpectedly.\n* 503 Service Unavailable - Service has not started, do not send other requests\nyet.\n\n## Note\n\n*This is not a real endpoint, for test and demo purposes only.  To be removed.*",
+        "parameters": [
+          {
+            "name": "_id",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "multipleOf": 5.0,
+              "maximum": 21.0,
+              "exclusiveMaximum": true,
+              "minimum": 5.0
+            },
+            "in": "path",
+            "description": "The ID of the test.\n\n* 5 will print an info log\n* 10 will print a warn log\n* 15 will print a error log\n* 20 will panic which should generate a 500",
+            "required": true,
+            "deprecated": false,
+            "explode": true
+          },
+          {
+            "name": "_action",
+            "schema": {
+              "type": "string",
+              "maxLength": 36,
+              "minLength": 36,
+              "pattern": "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+            },
+            "in": "path",
+            "description": "The action just needs to be any valid UUID.\n\n# Make sure its a UUID",
+            "required": false,
+            "deprecated": false,
+            "explode": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "## NO CONTENT\n\nThe operation completed successfully, but there is no data to return.\n\n#### NO DATA BODY IS RETURNED FOR THIS RESPONSE"
+          },
+          "500": {
+            "description": "## Internal Server Error\n\nAn internal server error occurred.\n\n*The contents of this response should be reported to the projects issue tracker.*",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerErrorPayload"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "## Service Unavailable\n\nThe service is not available.\n\n*This is returned when the service either has not started,\nor has become unavailable.*\n\n#### NO DATA BODY IS RETURNED FOR THIS RESPONSE"
+          }
+        },
+        "deprecated": true,
+        "operationId": "testPost"
+      }
+    },
+    "/api/health/started": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Service Started",
+        "description": "This endpoint is used to determine if the service has started properly\nand is able to serve requests.\n\n## Note\n\n*This endpoint is for internal use of the service deployment infrastructure.\nIt may not be exposed publicly.*\n\n## Responses\n\n* 204 No Content - Service is Started and can serve requests.\n* 500 Server Error - If anything within this function fails unexpectedly.\n* 503 Service Unavailable - Service has not started, do not send other requests\nyet.",
+        "responses": {
+          "204": {
+            "description": "## NO CONTENT\n\nThe operation completed successfully, but there is no data to return.\n\n#### NO DATA BODY IS RETURNED FOR THIS RESPONSE"
+          },
+          "500": {
+            "description": "## Internal Server Error\n\nAn internal server error occurred.\n\n*The contents of this response should be reported to the projects issue tracker.*",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerErrorPayload"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "## Service Unavailable\n\nThe service is not available.\n\n*This is returned when the service either has not started,\nor has become unavailable.*\n\n#### NO DATA BODY IS RETURNED FOR THIS RESPONSE"
+          }
+        },
+        "operationId": "healthStarted"
+      }
+    },
+    "/api/health/ready": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Service Ready",
+        "description": "This endpoint is used to determine if the service is ready and able to serve\nrequests.\n\n## Note\n\n*This endpoint is for internal use of the service deployment infrastructure.\nIt may not be exposed publicly.*\n\n## Responses\n\n* 204 No Content - Service is Ready and can serve requests.\n* 500 Server Error - If anything within this function fails unexpectedly.\n* 503 Service Unavailable - Service is not ready, requests to other\nendpoints should not be sent until the service becomes ready.",
+        "responses": {
+          "204": {
+            "description": "## NO CONTENT\n\nThe operation completed successfully, but there is no data to return.\n\n#### NO DATA BODY IS RETURNED FOR THIS RESPONSE"
+          },
+          "500": {
+            "description": "## Internal Server Error\n\nAn internal server error occurred.\n\n*The contents of this response should be reported to the projects issue tracker.*",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerErrorPayload"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "## Service Unavailable\n\nThe service is not available.\n\n*This is returned when the service either has not started,\nor has become unavailable.*\n\n#### NO DATA BODY IS RETURNED FOR THIS RESPONSE"
+          }
+        },
+        "operationId": "healthReady"
+      }
+    },
+    "/api/health/live": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Service Live",
+        "description": "This endpoint is used to determine if the service is live.\n\n## Note\n\n*This endpoint is for internal use of the service deployment infrastructure.\nIt may not be exposed publicly. Refer to []*\n\n## Responses\n\n* 204 No Content - Service is OK and can keep running.\n* 500 Server Error - If anything within this function fails unexpectedly.\n(Possible but unlikely)\n* 503 Service Unavailable - Service is possibly not running reliably.",
+        "responses": {
+          "204": {
+            "description": "## NO CONTENT\n\nThe operation completed successfully, but there is no data to return.\n\n#### NO DATA BODY IS RETURNED FOR THIS RESPONSE"
+          },
+          "500": {
+            "description": "## Internal Server Error\n\nAn internal server error occurred.\n\n*The contents of this response should be reported to the projects issue tracker.*",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerErrorPayload"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "## Service Unavailable\n\nThe service is not available.\n\n*This is returned when the service either has not started,\nor has become unavailable.*\n\n#### NO DATA BODY IS RETURNED FOR THIS RESPONSE"
+          }
+        },
+        "operationId": "healthLive"
+      }
+    },
+    "/api/registration/voter/{voting_key}": {
+      "get": {
+        "tags": [
+          "Registration"
+        ],
+        "summary": "Voter's info",
+        "description": "Get the voter's registration and voting power by their Public Voting Key.\nThe Public Voting Key must match the voter's most recent valid\n[CIP-15](https://cips.cardano.org/cips/cip15) or [CIP-36](https://cips.cardano.org/cips/cip36) registration on-chain.\nIf the `event_id` query parameter is omitted, then the latest voting power is\nretrieved. If the `with_delegators` query parameter is omitted, then\n`delegator_addresses` field of `VoterInfo` type does not provided.",
+        "parameters": [
+          {
+            "name": "voting_key",
+            "schema": {
+              "type": "string",
+              "title": "Voting Public Key",
+              "example": "a6a3c0447aeb9cc54cf6422ba32b294e5e1c3ef6d782f2acff4a70694c4d1663",
+              "maxLength": 66,
+              "minLength": 66,
+              "pattern": "0x[0-9a-f]{64}"
+            },
+            "in": "path",
+            "description": "A Voters Public ED25519 Key (as registered in their most recent valid\n[CIP-15](https://cips.cardano.org/cips/cip15) or [CIP-36](https://cips.cardano.org/cips/cip36) registration).",
+            "required": true,
+            "deprecated": false,
+            "explode": true
+          },
+          {
+            "name": "event_id",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "title": "The Numeric ID of a Voting Event",
+              "example": 11,
+              "minimum": 0.0
+            },
+            "in": "query",
+            "description": "The Event ID to return results for.\nSee [GET Events](Link to events endpoint) for details on retrieving all valid\nevent IDs.",
+            "required": false,
+            "deprecated": false,
+            "explode": true
+          },
+          {
+            "name": "with_delegators",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "in": "query",
+            "description": "If this optional flag is set, the response will include the delegator's list\nin the response. Otherwise, it will be omitted.",
+            "required": false,
+            "deprecated": false,
+            "explode": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "## OK",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoterRegistration"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "## Content not found"
+          },
+          "500": {
+            "description": "## Internal Server Error\n\nAn internal server error occurred.\n\n*The contents of this response should be reported to the projects issue tracker.*",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerErrorPayload"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "## Service Unavailable\n\nThe service is not available.\n\n*This is returned when the service either has not started,\nor has become unavailable.*\n\n#### NO DATA BODY IS RETURNED FOR THIS RESPONSE"
+          }
+        },
+        "operationId": "getVoterInfo"
+      }
+    },
+    "/api/v0/message": {
+      "post": {
+        "tags": [
+          "V0"
+        ],
+        "summary": "Posts a signed transaction.",
+        "requestBody": {
+          "content": {
+            "application/octet-stream": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "## OK",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/FragmentsProcessingSummary"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "## Bad Request",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/FragmentsProcessingSummary"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "## Internal Server Error\n\nAn internal server error occurred.\n\n*The contents of this response should be reported to the projects issue tracker.*",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerErrorPayload"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "## Service Unavailable\n\nThe service is not available.\n\n*This is returned when the service either has not started,\nor has become unavailable.*\n\n#### NO DATA BODY IS RETURNED FOR THIS RESPONSE"
+          }
+        },
+        "operationId": "Message"
+      }
+    },
+    "/api/v0/vote/active/plans": {
+      "get": {
+        "tags": [
+          "V0"
+        ],
+        "summary": "Get all active vote plans endpoint.",
+        "responses": {
+          "200": {
+            "description": "## OK",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VotePlan"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "## Internal Server Error\n\nAn internal server error occurred.\n\n*The contents of this response should be reported to the projects issue tracker.*",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerErrorPayload"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "## Service Unavailable\n\nThe service is not available.\n\n*This is returned when the service either has not started,\nor has become unavailable.*\n\n#### NO DATA BODY IS RETURNED FOR THIS RESPONSE"
+          }
+        },
+        "operationId": "GetActivePlans"
+      }
+    },
+    "/api/v1/votes/plan/account-votes/{account_id}": {
+      "get": {
+        "tags": [
+          "V1"
+        ],
+        "summary": "Get from all active vote plans, the index of the voted proposals\nby th given account ID.",
+        "responses": {
+          "200": {
+            "description": "## OK",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AccountVote"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "## Internal Server Error\n\nAn internal server error occurred.\n\n*The contents of this response should be reported to the projects issue tracker.*",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerErrorPayload"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "## Service Unavailable\n\nThe service is not available.\n\n*This is returned when the service either has not started,\nor has become unavailable.*\n\n#### NO DATA BODY IS RETURNED FOR THIS RESPONSE"
+          }
+        },
+        "operationId": "AccountVotes"
+      }
+    },
+    "/api/v1/fragments": {
+      "post": {
+        "tags": [
+          "V1",
+          "Fragments"
+        ],
+        "summary": "Process fragments",
+        "description": "Posts a fragments batch to be processed.",
+        "requestBody": {
+          "content": {
+            "application/json; charset=utf-8": {
+              "schema": {
+                "$ref": "#/components/schemas/FragmentsBatch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "## OK",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/FragmentsProcessingSummary"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "## Internal Server Error\n\nAn internal server error occurred.\n\n*The contents of this response should be reported to the projects issue tracker.*",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerErrorPayload"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "## Service Unavailable\n\nThe service is not available.\n\n*This is returned when the service either has not started,\nor has become unavailable.*\n\n#### NO DATA BODY IS RETURNED FOR THIS RESPONSE"
+          }
+        },
+        "deprecated": true,
+        "operationId": "fragments"
+      }
+    },
+    "/api/v1/fragments/statuses": {
+      "get": {
+        "tags": [
+          "V1",
+          "Fragments"
+        ],
+        "summary": "Get Fragment Statuses",
+        "description": "Get statuses of the fragments with the given ids.",
+        "parameters": [
+          {
+            "name": "fragment_ids",
+            "schema": {
+              "type": "string",
+              "title": "Comma-separated (no spaces in between) list of fragment IDs."
+            },
+            "in": "query",
+            "description": "Comma-separated list of fragment ids for which the statuses will\nbe retrieved.",
+            "required": true,
+            "deprecated": false,
+            "explode": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "## OK",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/FragmentStatus"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "## Internal Server Error\n\nAn internal server error occurred.\n\n*The contents of this response should be reported to the projects issue tracker.*",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerErrorPayload"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "## Service Unavailable\n\nThe service is not available.\n\n*This is returned when the service either has not started,\nor has become unavailable.*\n\n#### NO DATA BODY IS RETURNED FOR THIS RESPONSE"
+          }
+        },
+        "deprecated": true,
+        "operationId": "fragmentsStatuses"
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccountVote": {
+        "type": "object",
+        "description": "Indexes of a proposal that the account has voted for across all active vote plans.",
+        "required": [
+          "vote_plan_id",
+          "votes"
+        ],
+        "properties": {
+          "vote_plan_id": {
+            "type": "string",
+            "title": "Unique ID of a vote plan.",
+            "description": "The hex-encoded ID of the vote plan.",
+            "example": "a6a3c0447aeb9cc54cf6422ba32b294e5e1c3ef6d782f2acff4a70694c4d1663",
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "[0-9a-f]{64}"
+          },
+          "votes": {
+            "type": "array",
+            "description": "Array of the proposal numbers voted for by the account ID within the vote plan.",
+            "items": {
+              "type": "integer",
+              "format": "uint8"
+            }
+          }
+        },
+        "example": {
+          "vote_plan_id": "a6a3c0447aeb9cc54cf6422ba32b294e5e1c3ef6d782f2acff4a70694c4d1663",
+          "votes": [
+            1,
+            3,
+            9,
+            123
+          ]
+        }
+      },
+      "Animals": {
+        "type": "string",
+        "description": "A query parameter that is one of these animals.",
+        "enum": [
+          "Dogs",
+          "Cats",
+          "Rabbits"
+        ]
+      },
+      "BlockDate": {
+        "type": "object",
+        "description": "Block time defined as the pair (epoch, slot).",
+        "required": [
+          "epoch",
+          "slot_id"
+        ],
+        "properties": {
+          "epoch": {
+            "type": "integer",
+            "format": "uint32",
+            "title": "Epoch number.",
+            "description": "Block's epoch."
+          },
+          "slot_id": {
+            "type": "integer",
+            "format": "uint32",
+            "title": "Slot number.",
+            "description": "Block's slot number."
+          }
+        },
+        "example": {
+          "epoch": 1,
+          "slot_id": 5
+        }
+      },
+      "DelegatePublicKey": {
+        "type": "object",
+        "description": "Delegate Public Key",
+        "required": [
+          "address"
+        ],
+        "properties": {
+          "address": {
+            "type": "string",
+            "description": "Delegate Public Key in hex format",
+            "pattern": "0x[0-9a-f]{64}"
+          }
+        },
+        "example": {
+          "address": "0xad4b948699193634a39dd56f779a2951a24779ad52aa7916f6912b8ec4702cee"
+        }
+      },
+      "FragmentStatus": {
+        "type": "object",
+        "description": "DEPRECATED: Possible fragment statuses.",
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/StatusPending"
+          },
+          {
+            "$ref": "#/components/schemas/StatusRejected"
+          },
+          {
+            "$ref": "#/components/schemas/StatusInABlock"
+          }
+        ]
+      },
+      "FragmentsBatch": {
+        "type": "object",
+        "description": "Batch of hex-encoded fragments.",
+        "required": [
+          "fail_fast",
+          "fragments"
+        ],
+        "properties": {
+          "fail_fast": {
+            "type": "boolean",
+            "description": "Fragments are processed sequentially. If this is true, processing is\nstopped after the first error occurs."
+          },
+          "fragments": {
+            "type": "array",
+            "description": "Array of hex-encoded fragments bytes.",
+            "items": {
+              "type": "string",
+              "title": "Hex-encoded fragment's bytes."
+            }
+          }
+        },
+        "example": {
+          "fail_fast": false,
+          "fragments": []
+        }
+      },
+      "FragmentsProcessingSummary": {
+        "type": "object",
+        "description": "Information about whether a message was accepted or rejected.",
+        "required": [
+          "accepted",
+          "rejected"
+        ],
+        "properties": {
+          "accepted": {
+            "type": "array",
+            "description": "IDs of accepted fragments.",
+            "items": {
+              "type": "string",
+              "title": "Unique ID of a fragment.",
+              "description": "A fragment is the binary representation of a signed transaction.\nThe fragment ID is the hex-encoded representation of 32 bytes.",
+              "example": "7db6f91f3c92c0aef7b3dd497e9ea275229d2ab4dba6a1b30ce6b32db9c9c3b2"
+            }
+          },
+          "rejected": {
+            "type": "array",
+            "description": "Detailed information about rejected fragments.",
+            "items": {
+              "$ref": "#/components/schemas/RejectedFragment"
+            }
+          }
+        },
+        "example": {
+          "accepted": [
+            "7db6f91f3c92c0aef7b3dd497e9ea275229d2ab4dba6a1b30ce6b32db9c9c3b2"
+          ],
+          "rejected": [
+            {
+              "id": "7db6f91f3c92c0aef7b3dd497e9ea275229d2ab4dba6a1b30ce6b32db9c9c3b2",
+              "pool_number": 1,
+              "reason": "FragmentAlreadyInLog"
+            }
+          ]
+        }
+      },
+      "Hash": {
+        "type": "object",
+        "description": "Blake2b256 hash wrapper.",
+        "required": [
+          "hash"
+        ],
+        "properties": {
+          "hash": {
+            "type": "string",
+            "description": "Blake2b256 hash encoded in hex.",
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "[0-9a-f]{64}"
+          }
+        },
+        "example": {
+          "hash": "928b20366943e2afd11ebc0eae2e53a93bf177a4fcf35bcc64d503704e65e202"
+        }
+      },
+      "ReasonRejected": {
+        "type": "string",
+        "description": "The reason for which a fragment was rejected.",
+        "enum": [
+          "FragmentAlreadyInLog",
+          "FragmentInvalid",
+          "PreviousFragmentInvalid",
+          "PoolOverflow"
+        ]
+      },
+      "RejectedFragment": {
+        "type": "object",
+        "description": "Information about a rejected fragment.",
+        "required": [
+          "id",
+          "pool_number",
+          "reason"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Unique ID of a fragment.",
+            "description": "The ID of the rejected fragment.\n\nCurrently, the hex encoded bytes that represent the fragment ID. In the\nfuture, this might change to including the prefix \"0x\".",
+            "example": "7db6f91f3c92c0aef7b3dd497e9ea275229d2ab4dba6a1b30ce6b32db9c9c3b2",
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "[0-9a-f]{64}"
+          },
+          "pool_number": {
+            "type": "integer",
+            "format": "uint64",
+            "description": "The number of the pool that caused this error."
+          },
+          "reason": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ReasonRejected"
+              },
+              {
+                "description": "The reason why this fragment was rejected."
+              }
+            ]
+          }
+        },
+        "example": {
+          "id": "7db6f91f3c92c0aef7b3dd497e9ea275229d2ab4dba6a1b30ce6b32db9c9c3b2",
+          "pool_number": 1,
+          "reason": "FragmentAlreadyInLog"
+        }
+      },
+      "ServerErrorPayload": {
+        "type": "object",
+        "description": "Response payload to a Bad request.",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Unique ID of this Server Error so that it can be located easily for debugging."
+          },
+          "msg": {
+            "type": "string",
+            "description": "*Optional* SHORT Error message.\nWill not contain sensitive information, internal details or backtraces."
+          },
+          "issue": {
+            "type": "string",
+            "format": "url",
+            "description": "A URL to report an issue."
+          }
+        },
+        "example": {
+          "id": "590d44d5-9069-43c3-be65-90fddb27c3f4",
+          "issue": "https://github.com/input-output-hk/catalyst-core/issues/new?template=bug_report.md&title=Internal+Server+Error+-+590d44d5-9069-43c3-be65-90fddb27c3f4",
+          "msg": "Server Error"
+        }
+      },
+      "StatusInABlock": {
+        "type": "object",
+        "description": "DEPRECATED: Fragment is included in a block.",
+        "required": [
+          "date",
+          "block"
+        ],
+        "properties": {
+          "date": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/BlockDate"
+              },
+              {
+                "description": "Block date at which the fragment was included in a block."
+              }
+            ]
+          },
+          "block": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Hash"
+              },
+              {
+                "description": "Hash of the block the fragment was included in."
+              }
+            ]
+          }
+        },
+        "example": {
+          "block": {
+            "hash": "928b20366943e2afd11ebc0eae2e53a93bf177a4fcf35bcc64d503704e65e202"
+          },
+          "date": {
+            "epoch": 1,
+            "slot_id": 5
+          }
+        }
+      },
+      "StatusPending": {
+        "type": "object",
+        "description": "DEPRECATED: Fragment is pending."
+      },
+      "StatusRejected": {
+        "type": "object",
+        "description": "DEPRECATED: Fragment was rejected.",
+        "required": [
+          "reason"
+        ],
+        "properties": {
+          "reason": {
+            "type": "string",
+            "description": "Reason the fragment was rejected."
+          }
+        },
+        "example": {
+          "reason": "Transaction malformed"
+        }
+      },
+      "VotePlan": {
+        "type": "object",
+        "description": "Vote Plan",
+        "required": [
+          "voting_token"
+        ],
+        "properties": {
+          "voting_token": {
+            "type": "string",
+            "description": "Voting token identifier",
+            "maxLength": 121,
+            "minLength": 59,
+            "pattern": "[0-9a-f]{56}\\.[0-9a-f]{2,64}"
+          }
+        },
+        "example": {
+          "voting_token": "134c2d0a0b5761445d3f2d08492a5c193e3a19194453511426153630.0418401957301613"
+        }
+      },
+      "VoterGroupId": {
+        "type": "string",
+        "description": "Voter Group ID.",
+        "enum": [
+          "rep",
+          "direct"
+        ]
+      },
+      "VoterInfo": {
+        "type": "object",
+        "description": "Voter Info",
+        "required": [
+          "voting_power",
+          "voting_group",
+          "delegations_power",
+          "delegations_count",
+          "voting_power_saturation"
+        ],
+        "properties": {
+          "voting_power": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Voter's voting power.\nThis is the true voting power, subject to minimum voting power and max cap.",
+            "minimum": 0.0
+          },
+          "voting_group": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VoterGroupId"
+              },
+              {
+                "description": "Voter's voting group."
+              }
+            ]
+          },
+          "delegations_power": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Total voting power delegated to this voter.\nThis is not capped and not subject to minimum voting power.",
+            "minimum": 0.0
+          },
+          "delegations_count": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Number of registration which delegated to this voter.",
+            "minimum": 0.0
+          },
+          "voting_power_saturation": {
+            "type": "number",
+            "format": "double",
+            "description": "Voting power's share of the total voting power.\nCan be used to gauge potential voting power saturation.\nThis value is NOT saturated however, and gives the raw share of total registered\nvoting power.",
+            "maximum": 100.0,
+            "minimum": 0.0
+          },
+          "delegator_addresses": {
+            "type": "array",
+            "description": "List of stake public key addresses which delegated to this voting key.",
+            "items": {
+              "$ref": "#/components/schemas/DelegatePublicKey"
+            }
+          }
+        },
+        "example": {
+          "delegations_count": 0,
+          "delegations_power": 0,
+          "delegator_addresses": [
+            {
+              "address": "0xad4b948699193634a39dd56f779a2951a24779ad52aa7916f6912b8ec4702cee"
+            }
+          ],
+          "voting_group": "rep",
+          "voting_power": 0,
+          "voting_power_saturation": 0.0
+        }
+      },
+      "VoterRegistration": {
+        "type": "object",
+        "description": "Voter's registration info.",
+        "required": [
+          "voter_info",
+          "as_at",
+          "last_updated",
+          "final"
+        ],
+        "properties": {
+          "voter_info": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VoterInfo"
+              },
+              {
+                "description": "Voter's information."
+              }
+            ]
+          },
+          "as_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time the latest snapshot represents."
+          },
+          "last_updated": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date and time for the latest update to this snapshot information."
+          },
+          "final": {
+            "type": "boolean",
+            "description": "`True` - this is the final snapshot which will be used for voting power in the\nevent. `False` - this is an interim snapshot, subject to change."
+          }
+        },
+        "example": {
+          "as_at": "2024-01-18T14:20:31.322712128+00:00",
+          "final": true,
+          "last_updated": "2024-01-18T14:20:31.322712376+00:00",
+          "voter_info": {
+            "delegations_count": 0,
+            "delegations_power": 0,
+            "delegator_addresses": [
+              {
+                "address": "0xad4b948699193634a39dd56f779a2951a24779ad52aa7916f6912b8ec4702cee"
+              }
+            ],
+            "voting_group": "rep",
+            "voting_power": 0,
+            "voting_power_saturation": 0.0
+          }
+        }
+      }
+    }
+  }
+}
