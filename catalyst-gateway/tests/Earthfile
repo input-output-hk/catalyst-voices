@@ -6,7 +6,7 @@ integration-test:
 
     FROM ../+builder
     DO github.com/earthly/lib:2.2.11+INSTALL_DIND
-    COPY ../+hosted-build/cat-gateway .
+    COPY ../+build/cat-gateway .
     COPY integration/docker-compose.yml .
     WITH DOCKER \
         --compose docker-compose.yml \
