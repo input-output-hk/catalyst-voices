@@ -142,8 +142,8 @@ impl EventDB {
             .await
             .map_err(|e| Error::NotFound(e.to_string()))?;
         let row = rows
-            .get(0)
-            .ok_or_else(|| Error::NotFound("can not get row".to_string()))?;
+            .first()
+            .ok_or_else(|| Error::NotFound("Cannot get row".to_string()))?;
 
         Ok(SearchResult {
             total: row.try_get("total")?,
@@ -187,7 +187,7 @@ impl EventDB {
         let total: i64 = events
             .len()
             .try_into()
-            .map_err(|_| Error::Unknown("can not convert to i64".to_string()))?;
+            .map_err(|_| Error::Unknown("Cannot convert to i64".to_string()))?;
 
         Ok(SearchResult {
             total,
@@ -226,7 +226,7 @@ impl EventDB {
         let total: i64 = objectives
             .len()
             .try_into()
-            .map_err(|_| Error::Unknown("can not convert to i64".to_string()))?;
+            .map_err(|_| Error::Unknown("Cannot convert to i64".to_string()))?;
 
         Ok(SearchResult {
             total,
@@ -263,7 +263,7 @@ impl EventDB {
         let total: i64 = proposals
             .len()
             .try_into()
-            .map_err(|_| Error::Unknown("can not convert to i64".to_string()))?;
+            .map_err(|_| Error::Unknown("Cannot convert to i64".to_string()))?;
 
         Ok(SearchResult {
             total,

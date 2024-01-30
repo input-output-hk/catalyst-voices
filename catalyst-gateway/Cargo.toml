@@ -12,7 +12,6 @@ version = "0.0.1"
 authors = [
     "Steven Johnson <steven.johnson@iohk.io>"
 ]
-rust-version = "1.73"
 homepage = "https://input-output-hk.github.io/catalyst-voices"
 repository = "https://github.com/input-output-hk/catalyst-voices"
 license = "MIT OR Apache-2.0"
@@ -27,9 +26,9 @@ tracing-subscriber = "0.3.16"
 serde = "1.0"
 serde_json = "1.0"
 
-poem = "1.3.58"
-poem-openapi = "3.0.4"
-poem-extensions = "0.7.2"
+poem = "2.0.0"
+poem-openapi = "4.0.0"
+poem-extensions = "0.8.0"
 
 prometheus = "0.13.0"
 cryptoxide = "0.4.4"
@@ -40,7 +39,6 @@ cpu-time = "1.0"
 ulid = "1.0.1"
 rust-embed = "8"
 
-hyper = "0.14"
 url = "2.4.1"
 
 thiserror = "1.0"
@@ -58,3 +56,37 @@ tokio-postgres = "0.7.10"
 tokio = "1"
 
 dotenvy = "0.15"
+
+[workspace.lints.rust]
+warnings = "deny"
+missing_docs = "deny"
+let_underscore_drop = "deny"
+non_ascii_idents = "deny"
+single_use_lifetimes = "deny"
+trivial_casts = "deny"
+trivial_numeric_casts = "deny"
+
+[workspace.lints.rustdoc]
+broken_intra_doc_links = "deny"
+invalid_codeblock_attributes = "deny"
+invalid_html_tags = "deny"
+invalid_rust_codeblocks = "deny"
+bare_urls = "deny"
+unescaped_backticks = "deny"
+
+[workspace.lints.clippy]
+pedantic = "deny"
+unwrap_used = "deny"
+expect_used = "deny"
+exit = "deny"
+get_unwrap = "deny"
+index_refutable_slice = "deny"
+indexing_slicing = "deny"
+match_on_vec_items = "deny"
+match_wild_err_arm = "deny"
+missing_panics_doc = "deny"
+panic = "deny"
+string_slice = "deny"
+unchecked_duration_subtraction = "deny"
+unreachable = "deny"
+missing_docs_in_private_items = "deny"
