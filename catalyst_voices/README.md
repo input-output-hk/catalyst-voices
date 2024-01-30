@@ -57,14 +57,14 @@ melos bootstrap
 
 ### Flavors
 
-This project contains 3 flavors:
+This project contains three flavors:
 
 * dev
 * qa
 * preprod
 * prod
 
-To run the desired flavor either use the launch configuration in VSCode/Android Studio or use the following commands:
+To run the desired flavor, either use the launch configuration in VSCode/Android Studio or use the following commands:
 
 ```sh
 # Development
@@ -74,7 +74,7 @@ flutter run --flavor dev --target lib/configs/main_dev.dart
 flutter run --flavor qa --target lib/configs/main_qa.dart
 
 # Pre-Production
-flutter run --flavor prod --target lib/configs/main_preprod.dart
+flutter run --flavor preprod --target lib/configs/main_preprod.dart
 
 # Production
 flutter run --flavor prod --target lib/configs/main_prod.dart
