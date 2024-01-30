@@ -1,10 +1,10 @@
 // Integration test example
 //
 
-// TODO - move this integration test into other place, 
+// TODO - move this integration test into other place,
 //        so it will not execute during common Rust test procedure.
 #[tokio::test]
-#[ignore] 
+#[ignore]
 async fn health_live() {
     let cat_gateway_address = "http://127.0.0.1:3030";
     let client = reqwest::Client::new();
