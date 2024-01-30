@@ -18,7 +18,7 @@ hosted-check:
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
-all-hosts-check:    
+all-hosts-check:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +hosted-check
 
 hosted-build:
@@ -39,7 +39,7 @@ hosted-build:
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
-all-hosts-build:    
+all-hosts-build:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +hosted-build
 
 unit-test-hosted:
@@ -103,9 +103,11 @@ test:
     IF [ "$USERARCH" == "arm64" ]
         BUILD --platform=linux/arm64 +unit-test-hosted
         BUILD --platform=linux/arm64 ./tests+integration-test
+        BUILD --platform=linux/arm64 ./tests+fuzzer-api-test
     ELSE
         BUILD --platform=linux/amd64 +unit-test-hosted
         BUILD --platform=linux/amd64 ./tests+integration-test
+        BUILD --platform=linux/arm64 ./tests+fuzzer-api-test
     END
 
 # Publish packages if all integration tests have passed. (Failure to pass tests will prevent packages being published.)

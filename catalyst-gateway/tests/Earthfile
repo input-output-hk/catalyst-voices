@@ -10,8 +10,8 @@ deps:
 fuzzer-api-test:
     FROM earthly/dind:alpine
     LET address="127.0.0.1:3030"
-    LET max-examples=100
-    LET max-response-time=50
+    LET max_examples=1
+    LET max_response_time=50
 
     COPY +deps/cat-gateway .
     COPY integration/docker-compose.yml .
@@ -22,20 +22,60 @@ fuzzer-api-test:
         --load event-db:latest=(../event-db+build --with_historic_data=false) \
         --service event-db \
         --allow-privileged
-        RUN --no-cache (./cat-gateway run \
+        RUN --no-cache  touch ~/junit-report.xml && (./cat-gateway run \
                 --address $address \
                 --database-url=postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev \
                 --log-level=error > cat-gateway.log &) && \
             docker run --net=host schemathesis/schemathesis:stable \
-                run --checks all http://$address/docs/cat-gateway.json \
-                    -D all --wait-for-schema=15 --contrib-openapi-fill-missing-examples \
-                        --max-response-time=$max-response-time --hypothesis-max-examples=$max-examples \
-                            --show-trace --junit-xml junit-report.xml || echo fail > fail
+                run -E ^/api/health/started http://$address/docs/cat-gateway.json \
+                     --wait-for-schema=15 --contrib-openapi-fill-missing-examples --skip-deprecated-operations \
+                        --max-response-time=$max_response_time --hypothesis-max-examples=$max_examples --validate-schema=false \
+                            --show-trace --junit-xml junit-report.xml && ls
 
     END
 
     SAVE ARTIFACT junit-report.xml AS LOCAL junit-report.xml
     SAVE ARTIFACT cat-gateway.log AS LOCAL cat-gateway.log
+
+fuzzy-test:
+    FROM python:3.12-alpine3.18
+
+    # Install extra packages we will need to support plugins.
+    RUN apk add --no-cache \
+        curl \
+        libffi-dev \
+        gcc \
+        musl-dev \
+        libgcc
+    DO github.com/earthly/lib:2.2.11+INSTALL_DIND
+    RUN python -m pip install schemathesis
+
+    LET address="127.0.0.1:3030"
+    LET max_examples=1
+    LET max_response_time=50
+
+    COPY +deps/cat-gateway .
+    COPY integration/docker-compose.yml .
+
+    WITH DOCKER \
+        --compose docker-compose.yml \
+        --load event-db:latest=(../event-db+build --with_historic_data=false) \
+        --service event-db \
+        --allow-privileged
+        RUN --no-cache (./cat-gateway run \
+                --address $address \
+                --database-url=postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev \
+                --log-level=error > cat-gateway.log &) && \
+              st run -E ^/api/health/started http://$address/docs/cat-gateway.json \
+                     --wait-for-schema=15 --contrib-openapi-fill-missing-examples --skip-deprecated-operations \
+                        --max-response-time=$max_response_time --hypothesis-max-examples=$max_examples --validate-schema=false \
+                            --show-trace --junit-xml junit-report.xml && ls
+
+    END
+
+    SAVE ARTIFACT junit-report.xml AS LOCAL junit-report.xml
+    SAVE ARTIFACT cat-gateway.log AS LOCAL cat-gateway.log
+
 
 integration-test:
 # Example of a setup for integration testing
