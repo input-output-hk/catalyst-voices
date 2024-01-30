@@ -39,3 +39,15 @@ overrides:
         function: 'length'
         functionOptions:
           min: 20
+
+    # Severity
+    # warn: Should be implemented, but is blocked by a technical issue.
+    # info: Good to be implemented.
+
+    # Rate limit
+    owasp:api4:2019-rate-limit: warn
+    owasp:api4:2019-rate-limit-responses-429: warn
+    # Public API
+    owasp:api2:2019-protection-global-unsafe: info
+    owasp:api2:2019-protection-global-unsafe-strict: info
+    owasp:api3:2019-define-error-responses-401: off
