@@ -23,9 +23,11 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
 
   Bloc.observer = AppBlocObserver();
 
-  final dddd = CatalystPlatform();
+  final platform = CatalystPlatform();
 
-  print('isWebDesktop: ${dddd.isWebDesktop()}');
+  print('isWebDesktop: ${platform.isWebDesktop}');
+
+  print('isIOS: ${platform.isIOS}');
 
   runApp(await builder());
 }

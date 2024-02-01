@@ -1,14 +1,14 @@
 class CatalystPlatform {}
 
 abstract class PlatformInterface {
-  bool isAndroid();
-  bool isDesktop();
-  bool isFuchsia();
-  bool isIOS();
-  bool isLinux();
-  bool isMacOS();
-  bool isMobile();
-  bool isMobileWeb();
-  bool isWebDesktop();
-  bool isWindows();
+  bool get isAndroid;
+  bool get isDesktop;
+  bool get isFuchsia;
+  bool get isIOS;
+  bool get isLinux;
+  bool get isMacOS;
+  bool get isMobile;
+  bool get isMobileWeb;
+  bool get isWebDesktop;
+  bool get isWindows;
 }

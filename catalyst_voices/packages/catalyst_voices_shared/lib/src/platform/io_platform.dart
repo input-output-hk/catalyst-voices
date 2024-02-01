@@ -4,33 +4,33 @@ import 'package:catalyst_voices_shared/src/platform/platform_interface.dart';
 
 final class CatalystPlatform extends PlatformInterface {
   @override
-  bool isAndroid() => Platform.isAndroid;
+  bool get isAndroid => Platform.isAndroid;
 
   @override
-  bool isDesktop() =>
+  bool get isDesktop =>
       Platform.isLinux || Platform.isMacOS || Platform.isWindows;
 
   @override
-  bool isFuchsia() => Platform.isFuchsia;
+  bool get isFuchsia => Platform.isFuchsia;
 
   @override
-  bool isIOS() => Platform.isIOS;
+  bool get isIOS => Platform.isIOS;
 
   @override
-  bool isLinux() => Platform.isLinux;
+  bool get isLinux => Platform.isLinux;
 
   @override
-  bool isMacOS() => Platform.isMacOS;
+  bool get isMacOS => Platform.isMacOS;
 
   @override
-  bool isMobile() => Platform.isAndroid || Platform.isIOS;
+  bool get isMobile => Platform.isAndroid || Platform.isIOS;
 
   @override
-  bool isMobileWeb() => false;
+  bool get isMobileWeb => false;
 
   @override
-  bool isWebDesktop() => false;
+  bool get isWebDesktop => false;
 
   @override
-  bool isWindows() => Platform.isWindows;
+  bool get isWindows => Platform.isWindows;
 }
