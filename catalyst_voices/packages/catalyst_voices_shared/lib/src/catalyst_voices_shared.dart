@@ -1,3 +1,1 @@
-class CatalystVoicesShared {
-  const CatalystVoicesShared();
-}
+export 'platform/catalyst_platform.dart';
