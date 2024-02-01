@@ -53,6 +53,8 @@ poem-openapi = { workspace = true, features = [
     "chrono",
 ] }
 poem-extensions = { workspace = true }
+cardano-chain-follower = { path = "../../../hermes/hermes/crates/cardano-chain-follower/" }
+
 
 # Metrics - Poem
 prometheus = { workspace = true }
@@ -66,3 +68,4 @@ hyper = { workspace = true }
 cpu-time = { workspace = true }
 ulid = { workspace = true, features = ["serde", "uuid"] }
 rust-embed = { workspace = true }
+hex = "0.4.3"

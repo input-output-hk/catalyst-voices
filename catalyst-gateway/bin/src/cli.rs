@@ -1,7 +1,13 @@
 //! CLI interpreter for the service
+use crate::follower::start_followers;
 use std::{io::Write, sync::Arc};
 
 use clap::Parser;
+use tokio::time;
+use tracing::error;
+
+// How often to check for config in db
+const CHECK_CONFIG_TICK: u64 = 5;
 
 use crate::{
     logger, service,
@@ -47,8 +53,33 @@ impl Cli {
         match self {
             Self::Run(settings) => {
                 logger::init(settings.log_level)?;
-
                 let state = Arc::new(State::new(Some(settings.database_url)).await?);
+                let event_db = state.event_db()?;
+
+                // tick until config exists
+                let mut interval = time::interval(time::Duration::from_secs(CHECK_CONFIG_TICK));
+
+                let config = loop {
+                    interval.tick().await;
+
+                    match event_db.get_config().await.map(|config| config) {
+                        Ok(config) => break config,
+                        Err(err) => error!("no config {:?}", err),
+                    }
+                };
+
+                event_db.updates_from_follower().await?;
+
+                let _ = start_followers(config).await?;
+
+                //
+                // config (config wait)
+
+                // start followers sync
+                // single file for starting followers
+                // followers(state) {db get metadata}
+                //
+
                 service::run(&settings.address, state).await?;
                 Ok(())
             },

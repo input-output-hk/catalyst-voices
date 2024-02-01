@@ -29,6 +29,9 @@ pub(crate) enum Error {
     /// Variable error
     #[error(transparent)]
     VarError(#[from] VarError),
+    /// No config
+    #[error("No config")]
+    NoConfig,
 }
 
 impl From<RunError<tokio_postgres::Error>> for Error {

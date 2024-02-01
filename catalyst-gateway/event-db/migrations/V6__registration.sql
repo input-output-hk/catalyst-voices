@@ -13,7 +13,7 @@ CREATE TABLE cardano_slot_index (
   slot_no BIGINT NOT NULL,
   network TEXT NOT NULL,
   epoch_no BIGINT NOT NULL,
-  block_time TIMESTAMP NOT NULL,
+  block_time TIMESTAMP WITH TIME ZONE NOT NULL,
   block_hash BYTEA NOT NULL CHECK (LENGTH(block_hash) = 32),
 
   PRIMARY KEY (slot_no, network)

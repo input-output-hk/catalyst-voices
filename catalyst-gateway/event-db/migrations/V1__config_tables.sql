@@ -114,6 +114,22 @@ COMMENT ON INDEX config_idx IS
 'We use three keys combined uniquely rather than forcing string concatenation 
 at the app level to allow for querying groups of data.';
 
+insert into config(id,id2,id3) VALUES('{
+    "network": "mainnet",
+    "start_from": 22,
+    "block_hash": "a076c4b645ec23e7e6fa909821edb3e28106d0ffa6325cd2d32e0f3b53c1c09b",
+    "relay": "relays-new.cardano-mainnet.iohk.io:3001"
+}','{
+    "network": "preprod",
+    "start_from": 46450966,
+    "block_hash": "0a5df2587e2d65f4e5a5a41b0516d3673e58b78a4a1d5af0238fb84a14d44ad8",
+    "relay": "preprod-node.play.dev.cardano.org:3001"
+}', '{
+    "network": "preview",
+    "start_from": 35209437,
+    "block_hash": "b49f6293f0efe10fa927659700deef23e7332caead044dcf6ad78ba05500ca73",
+    "relay": "preview-node.play.dev.cardano.org:3001"
+}');
 
 -- -------------------------------------------------------------------------------------------------
 

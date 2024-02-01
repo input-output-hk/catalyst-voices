@@ -58,3 +58,4 @@ tokio-postgres = "0.7.10"
 tokio = "1"
 
 dotenvy = "0.15"
+cardano_chain_follower= { path = "../../hermes/hermes/crates/cardano-chain-follower/" }

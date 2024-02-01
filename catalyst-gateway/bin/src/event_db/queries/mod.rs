@@ -1,8 +1,9 @@
 //! Database Queries
 use self::{
     event::{
-        ballot::BallotQueries, objective::ObjectiveQueries, proposal::ProposalQueries,
-        review::ReviewQueries, EventQueries,
+        ballot::BallotQueries, config::ConfigQueries, follower::FollowerQueries,
+        objective::ObjectiveQueries, proposal::ProposalQueries, review::ReviewQueries,
+        EventQueries,
     },
     registration::RegistrationQueries,
     search::SearchQueries,
@@ -27,6 +28,8 @@ pub(crate) trait EventDbQueries:
     + BallotQueries
     + vit_ss::fund::VitSSFundQueries
     + SchemaVersion
+    + ConfigQueries
+    + FollowerQueries
 {
 }
 

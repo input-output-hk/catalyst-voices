@@ -21,7 +21,7 @@ Run
 ```sh
 cat-gateway run \
 --address "127.0.0.1:3030" \
---database-url=postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev \
+--database-url=postgres://catalyst-event-dev:postgres@localhost/CatalystEventDev \
 --log-level=debug \
 --log-format=compact \
 --metrics-address "127.0.0.1:3032"
