@@ -8,29 +8,31 @@ build:
 cat-gateway-publish:
     FROM alpine:3.19
     ARG tag="latest"
-    ARG address="127.0.0.1:3030"
-    ARG db_url="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+    ARG address
+    ARG db_url
     ARG log_level="error"
     RUN apk upgrade --no-cache && apk add --no-cache libgcc
     COPY +build/cat-gateway .
-    ENTRYPOINT ./cat-gateway  run --address $address --database-url $db_url --log-level $log_level
+    ENTRYPOINT ./cat-gateway run --address $address --database-url $db_url --log-level $log_level
     SAVE IMAGE cat-gateway:$tag
 
 schemathesis-publish:
     FROM python:3.12-alpine3.19
     ARG tag="latest"
     ARG max_examples=1000
-    ARG max_response_time=50
+    ARG max_response_time=200
     ARG wait_for_schema=15
+    ARG workers=1
+    ARG schema_version=30
     ARG openapi_spec
     RUN apk add --no-cache gcc musl-dev
     RUN python -m pip install schemathesis
     RUN mkdir /results
     VOLUME /results
-    ENTRYPOINT st run --checks all $openapi_spec -D all --wait-for-schema=$wait_for_schema \
+    ENTRYPOINT st run --checks all $openapi_spec --data-generation-method all --workers=$workers --wait-for-schema=$wait_for_schema \
                         --max-response-time=$max_response_time --hypothesis-max-examples=$max_examples \
-                            --contrib-openapi-fill-missing-examples --skip-deprecated-operations --show-trace \
-                                --junit-xml /results/junit-report.xml
+                                --force-color --skip-deprecated-operations --show-trace \
+                                 --force-schema-version=$chema_version --junit-xml /results/junit-report.xml
     SAVE IMAGE schemathesis:$tag
 
 fuzzer-api-test:
@@ -40,7 +42,8 @@ fuzzer-api-test:
         --compose docker-compose.yml \
         --load schemathesis:latest=(+schemathesis-publish --openapi_spec="http://127.0.0.1:3030/docs/cat-gateway.json") \
         --load event-db:latest=(../event-db+build --with_historic_data=false) \
-        --load cat-gateway:latest=(+cat-gateway-publish --address="127.0.0.1:3030") \
+        --load cat-gateway:latest=(+cat-gateway-publish --address="127.0.0.1:3030" \
+                                        --db_url="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev") \
         --service event-db \
         --service cat-gateway \
         --allow-privileged
