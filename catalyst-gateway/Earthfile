@@ -23,7 +23,7 @@ check:
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
-all-hosts-check:    
+all-hosts-check:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +check
 
 build:
@@ -43,9 +43,8 @@ build:
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
-all-hosts-build:    
+all-hosts-build:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +build
-
 
 # Publish packages if all integration tests have passed. (Failure to pass tests will prevent packages being published.)
 # publish:
