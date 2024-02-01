@@ -11,7 +11,7 @@ cat-gateway-publish:
     ARG address
     ARG db_url
     ARG log_level="error"
-    RUN apk upgrade --no-cache && apk add --no-cache libgcc
+    RUN apk upgrade --no-cache && apk add --no-cache gcc
     COPY +build/cat-gateway .
     ENTRYPOINT ./cat-gateway run --address $address --database-url $db_url --log-level $log_level
     SAVE IMAGE cat-gateway:$tag
@@ -32,7 +32,7 @@ schemathesis-publish:
     ENTRYPOINT st run --checks all $openapi_spec --data-generation-method all --workers=$workers --wait-for-schema=$wait_for_schema \
                         --max-response-time=$max_response_time --hypothesis-max-examples=$max_examples \
                                 --force-color --skip-deprecated-operations --show-trace \
-                                 --force-schema-version=$chema_version --junit-xml /results/junit-report.xml
+                                 --force-schema-version=$schema_version --junit-xml /results/junit-report.xml
     SAVE IMAGE schemathesis:$tag
 
 fuzzer-api-test:
