@@ -109,3 +109,15 @@ xctest
 xctestrun
 xcworkspace
 yoroi
+idents
+rustflags
+rustdoc
+rustdocflags
+codegen
+lintfix
+testunit
+nextest
+testcov
+testdocs
+fmtchk
+fmtfix

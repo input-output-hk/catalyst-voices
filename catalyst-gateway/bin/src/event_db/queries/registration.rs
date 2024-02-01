@@ -97,8 +97,8 @@ impl RegistrationQueries for EventDB {
                 .await?
         };
         let voter = rows
-            .get(0)
-            .ok_or_else(|| Error::NotFound("can not find voter value".to_string()))?;
+            .first()
+            .ok_or_else(|| Error::NotFound("Cannot find voter value".to_string()))?;
 
         let voting_group = VoterGroupId(voter.try_get("voting_group")?);
         let voting_power = voter.try_get("voting_power")?;
@@ -115,9 +115,9 @@ impl RegistrationQueries for EventDB {
         };
 
         let total_voting_power_per_group: i64 = rows
-            .get(0)
+            .first()
             .ok_or_else(|| {
-                Error::NotFound("can not find total voting power per group value".to_string())
+                Error::NotFound("Cannot find total voting power per group value".to_string())
             })?
             .try_get("total_voting_power")?;
 
@@ -155,7 +155,7 @@ impl RegistrationQueries for EventDB {
         };
 
         Ok(Voter {
-            voter_info: VoterInfo {
+            info: VoterInfo {
                 delegations_power: voter.try_get("delegations_power")?,
                 delegations_count: voter.try_get("delegations_count")?,
                 voting_power_saturation,
@@ -187,8 +187,8 @@ impl RegistrationQueries for EventDB {
                 .await?
         };
         let delegator_snapshot_info = rows
-            .get(0)
-            .ok_or_else(|| Error::NotFound("can not find delegator value".to_string()))?;
+            .first()
+            .ok_or_else(|| Error::NotFound("Cannot find delegator value".to_string()))?;
 
         let delegation_rows = if let Some(event) = event {
             conn.query(Self::DELEGATIONS_BY_EVENT_QUERY, &[
@@ -204,7 +204,7 @@ impl RegistrationQueries for EventDB {
             .await?
         };
         if delegation_rows.is_empty() {
-            return Err(Error::NotFound("can not find delegator value".to_string()));
+            return Err(Error::NotFound("Cannot find delegator value".to_string()));
         }
 
         let mut delegations = Vec::new();
@@ -225,8 +225,8 @@ impl RegistrationQueries for EventDB {
                 .await?
         };
         let total_power: i64 = rows
-            .get(0)
-            .ok_or_else(|| Error::NotFound("can not find total power value".to_string()))?
+            .first()
+            .ok_or_else(|| Error::NotFound("Cannot find total power value".to_string()))?
             .try_get("total_voting_power")?;
 
         #[allow(clippy::indexing_slicing)] // delegation_rows already checked to be not empty.
