@@ -1,87 +1,67 @@
-VERSION --arg-scope-and-set 0.7
+VERSION 0.7
 
-deps:
+build:
     FROM ../+builder
     RUN cargo build -p cat-gateway --release
-    RUN ./target/release/cat-gateway docs cat-gateway-api.json
-    SAVE ARTIFACT cat-gateway-api.json cat-gateway-api.json
     SAVE ARTIFACT target/release/cat-gateway cat-gateway
+
+cat-gateway-publish:
+    FROM alpine:3.19
+    ARG tag="latest"
+    ARG address="127.0.0.1:3030"
+    ARG db_url="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
+    ARG log_level="error"
+    RUN apk upgrade --no-cache && apk add --no-cache libgcc
+    COPY +build/cat-gateway .
+    ENTRYPOINT ./cat-gateway  run --address $address --database-url $db_url --log-level $log_level
+    SAVE IMAGE cat-gateway:$tag
+
+schemathesis-publish:
+    FROM python:3.12-alpine3.19
+    ARG tag="latest"
+    ARG max_examples=1000
+    ARG max_response_time=50
+    ARG wait_for_schema=15
+    ARG openapi_spec
+    RUN apk add --no-cache gcc musl-dev
+    RUN python -m pip install schemathesis
+    RUN mkdir /results
+    VOLUME /results
+    ENTRYPOINT st run --checks all $openapi_spec -D all --wait-for-schema=$wait_for_schema \
+                        --max-response-time=$max_response_time --hypothesis-max-examples=$max_examples \
+                            --contrib-openapi-fill-missing-examples --skip-deprecated-operations --show-trace \
+                                --junit-xml /results/junit-report.xml
+    SAVE IMAGE schemathesis:$tag
 
 fuzzer-api-test:
     FROM earthly/dind:alpine
-    LET address="127.0.0.1:3030"
-    LET max_examples=1
-    LET max_response_time=50
-
-    COPY +deps/cat-gateway .
     COPY integration/docker-compose.yml .
-
     WITH DOCKER \
         --compose docker-compose.yml \
-        --pull schemathesis/schemathesis:stable \
+        --load schemathesis:latest=(+schemathesis-publish --openapi_spec="http://127.0.0.1:3030/docs/cat-gateway.json") \
         --load event-db:latest=(../event-db+build --with_historic_data=false) \
+        --load cat-gateway:latest=(+cat-gateway-publish --address="127.0.0.1:3030") \
         --service event-db \
+        --service cat-gateway \
         --allow-privileged
-        RUN --no-cache  touch ~/junit-report.xml && (./cat-gateway run \
-                --address $address \
-                --database-url=postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev \
-                --log-level=error > cat-gateway.log &) && \
-            docker run --net=host schemathesis/schemathesis:stable \
-                run -E ^/api/health/started http://$address/docs/cat-gateway.json \
-                     --wait-for-schema=15 --contrib-openapi-fill-missing-examples --skip-deprecated-operations \
-                        --max-response-time=$max_response_time --hypothesis-max-examples=$max_examples --validate-schema=false \
-                            --show-trace --junit-xml junit-report.xml && ls
-
+        RUN --no-cache docker run --net=host --name=st schemathesis:latest || echo fail > fail && \
+                        docker logs cat-gateway > ./cat-gateway.log && \
+                            docker cp st:/results/junit-report.xml junit-report.xml
     END
-
-    SAVE ARTIFACT junit-report.xml AS LOCAL junit-report.xml
-    SAVE ARTIFACT cat-gateway.log AS LOCAL cat-gateway.log
-
-fuzzy-test:
-    FROM python:3.12-alpine3.18
-
-    # Install extra packages we will need to support plugins.
-    RUN apk add --no-cache \
-        curl \
-        libffi-dev \
-        gcc \
-        musl-dev \
-        libgcc
-    DO github.com/earthly/lib:2.2.11+INSTALL_DIND
-    RUN python -m pip install schemathesis
-
-    LET address="127.0.0.1:3030"
-    LET max_examples=1
-    LET max_response_time=50
-
-    COPY +deps/cat-gateway .
-    COPY integration/docker-compose.yml .
-
-    WITH DOCKER \
-        --compose docker-compose.yml \
-        --load event-db:latest=(../event-db+build --with_historic_data=false) \
-        --service event-db \
-        --allow-privileged
-        RUN --no-cache (./cat-gateway run \
-                --address $address \
-                --database-url=postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev \
-                --log-level=error > cat-gateway.log &) && \
-              st run -E ^/api/health/started http://$address/docs/cat-gateway.json \
-                     --wait-for-schema=15 --contrib-openapi-fill-missing-examples --skip-deprecated-operations \
-                        --max-response-time=$max_response_time --hypothesis-max-examples=$max_examples --validate-schema=false \
-                            --show-trace --junit-xml junit-report.xml && ls
-
+    WAIT
+        SAVE ARTIFACT junit-report.xml AS LOCAL junit-report.xml
+        SAVE ARTIFACT cat-gateway.log AS LOCAL cat-gateway.log
     END
-
-    SAVE ARTIFACT junit-report.xml AS LOCAL junit-report.xml
-    SAVE ARTIFACT cat-gateway.log AS LOCAL cat-gateway.log
-
+    IF [ -f fail ]
+        RUN echo "Schemathesis run failed" && \
+            exit 1
+    END
 
 integration-test:
 # Example of a setup for integration testing
     FROM ../+builder
     DO github.com/earthly/lib:2.2.11+INSTALL_DIND
-    COPY +deps/cat-gateway .
+    COPY +build/cat-gateway .
     COPY integration/docker-compose.yml .
     WITH DOCKER \
         --compose docker-compose.yml \
@@ -93,8 +73,14 @@ integration-test:
                 --database-url=postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev \
                 --log-level=debug &) && \
             cargo llvm-cov clean --workspace && \
-            cargo llvm-cov nextest --release --locked -P ci --test integration --output-path coverage-report.info
+            cargo llvm-cov nextest --release --locked -P ci --test integration --output-path coverage-report.info \
+            || echo fail > fail
     END
-
-    SAVE ARTIFACT target/nextest/ci/junit.xml junit-report.xml
-    SAVE ARTIFACT coverage-report.info coverage-report.info
+    WAIT
+        SAVE ARTIFACT target/nextest/ci/junit.xml junit-report.xml
+        SAVE ARTIFACT coverage-report.info coverage-report.info
+    END
+    IF [ -f fail ]
+        RUN echo "Integration tests failed" && \
+            exit 1
+    END
