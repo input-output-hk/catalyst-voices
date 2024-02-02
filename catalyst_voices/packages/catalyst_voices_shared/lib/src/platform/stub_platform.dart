@@ -1,53 +1,47 @@
-import 'package:catalyst_voices_shared/src/platform/platform_interface.dart';
-
-final class CatalystPlatform extends PlatformInterface {
-  @override
-  bool get isAndroid {
+final class CatalystPlatform {
+  static bool get isAndroid {
     throw UnimplementedError('Stub CatalystPlatform');
   }
 
-  @override
-  bool get isDesktop {
+  static bool get isDesktop {
     throw UnimplementedError('Stub CatalystPlatform');
   }
 
-  @override
-  bool get isFuchsia {
+  static bool get isFuchsia {
     throw UnimplementedError('Stub CatalystPlatform');
   }
 
-  @override
-  bool get isIOS {
+  static bool get isIOS {
     throw UnimplementedError('Stub CatalystPlatform');
   }
 
-  @override
-  bool get isLinux {
+  static bool get isLinux {
     throw UnimplementedError('Stub CatalystPlatform');
   }
 
-  @override
-  bool get isMacOS {
+  static bool get isMacOS {
     throw UnimplementedError('Stub CatalystPlatform');
   }
 
-  @override
-  bool get isMobile {
+  static bool get isMobile {
     throw UnimplementedError('Stub CatalystPlatform');
   }
 
-  @override
-  bool get isMobileWeb {
+  static bool get isMobileWeb {
     throw UnimplementedError('Stub CatalystPlatform');
   }
 
-  @override
-  bool get isWebDesktop {
+  static bool get isWeb {
     throw UnimplementedError('Stub CatalystPlatform');
   }
 
-  @override
-  bool get isWindows {
+  static bool get isWebDesktop {
     throw UnimplementedError('Stub CatalystPlatform');
   }
+
+  static bool get isWindows {
+    throw UnimplementedError('Stub CatalystPlatform');
+  }
+
+  const CatalystPlatform._();
 }
