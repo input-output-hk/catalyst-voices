@@ -12,7 +12,7 @@ pub(crate) struct AccountId(
 
 impl Example for AccountId {
     fn example() -> Self {
-        Self("a6a3c0447aeb9cc54cf6422ba32b294e5e1c3ef6d782f2acff4a70694c4d1663".into())
+        Self("a6a3c0447aeb9cc54cf6422ba32b294e5e1c3ef6d782f2acff4a70694c4d1663".to_string())
     }
 }
 
@@ -35,6 +35,8 @@ pub(crate) struct AccountVote {
     /// The hex-encoded ID of the vote plan.
     pub(crate) vote_plan_id: VotePlanId,
     /// Array of the proposal numbers voted for by the account ID within the vote plan.
+    // TODO - Recheck max items and max value
+    #[oai(validator(max_items = "100", minimum(value = "0"), maximum(value = "500")))]
     pub(crate) votes: Vec<u8>,
 }
 

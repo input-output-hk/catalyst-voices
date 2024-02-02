@@ -31,10 +31,15 @@ impl V1Api {
         operation_id = "AccountVotes",
         transform = "schema_version_validation"
     )]
+
+    /// Get Account Votes
+    ///
     /// Get from all active vote plans, the index of the voted proposals
     /// by th given account ID.
     async fn get_account_votes(
-        &self, state: Data<&Arc<State>>, account_id: Path<AccountId>,
+        &self, state: Data<&Arc<State>>,
+        /// A account ID to get the votes for.
+        account_id: Path<AccountId>,
     ) -> account_votes_get::AllResponses {
         account_votes_get::endpoint(state, account_id).await
     }

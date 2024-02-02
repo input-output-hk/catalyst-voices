@@ -29,8 +29,12 @@ struct ServerErrorPayload {
     id: Uuid,
     /// *Optional* SHORT Error message.
     /// Will not contain sensitive information, internal details or backtraces.
+    // TODO - Recheck max length, pattern is added to avoid err from linter
+    #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z]"))]
     msg: Option<String>,
     /// A URL to report an issue.
+    // TODO - Recheck max length
+    #[oai(validator(max_length = "50"))]
     issue: Option<Url>,
 }
 

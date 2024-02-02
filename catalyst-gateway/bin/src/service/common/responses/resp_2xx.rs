@@ -6,7 +6,7 @@ use poem_openapi::payload::Payload;
 
 #[derive(OneResponse)]
 #[oai(status = 200)]
-/// ## OK
+/// ## OK, success status response code indicates that the request has succeeded
 pub(crate) struct OK<T: IntoResponse + Payload>(pub(crate) T);
 
 #[derive(OneResponse)]
