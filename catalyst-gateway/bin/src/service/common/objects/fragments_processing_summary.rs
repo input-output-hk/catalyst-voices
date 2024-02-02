@@ -8,7 +8,9 @@ use poem_openapi::{types::Example, Enum, NewType, Object};
 ///
 /// A fragment is the binary representation of a signed transaction.
 /// The fragment ID is the hex-encoded representation of 32 bytes.
-pub(crate) struct FragmentId(String);
+pub(crate) struct FragmentId(
+    #[oai(validator(max_length = 64, min_length = 64, pattern = "[0-9a-f]{64}"))] String,
+);
 
 impl Example for FragmentId {
     fn example() -> Self {

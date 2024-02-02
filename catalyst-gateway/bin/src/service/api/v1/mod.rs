@@ -12,7 +12,7 @@ use poem_openapi::{
 use crate::{
     service::{
         common::{
-            objects::{account_votes::AccountId, fragments_batch::FragmentsBatch},
+            objects::{account_votes::AccountId, fragments_batch::FragmentsBatch, fragments_processing_summary::FragmentId},
             tags::ApiTags,
         },
         utilities::middleware::schema_validation::schema_version_validation,
@@ -82,7 +82,7 @@ impl V1Api {
         &self,
         /// Comma-separated list of fragment ids for which the statuses will
         /// be retrieved.
-        Query(fragment_ids): Query<fragments_statuses::FragmentIds>,
+        Query(fragment_ids): Query<Vec<FragmentId>>,
     ) -> fragments_statuses::AllResponses {
         fragments_statuses::endpoint(fragment_ids).await
     }

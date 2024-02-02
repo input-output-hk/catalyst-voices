@@ -7,12 +7,13 @@ use serde::Deserialize;
 #[oai(example = true)]
 /// Unique ID of a user account.
 pub(crate) struct AccountId(
+    // TODO - recheck max length, min length, and pattern
     #[oai(validator(max_length = 64, min_length = 64, pattern = "[0-9a-f]{64}"))] String,
 );
 
 impl Example for AccountId {
     fn example() -> Self {
-        Self("a6a3c0447aeb9cc54cf6422ba32b294e5e1c3ef6d782f2acff4a70694c4d1663".to_string())
+        Self("a6a3c0447aeb9cc54cf6422ba32b294e5e1c3ef6d782f2acff4a70694c4d1663".into())
     }
 }
 

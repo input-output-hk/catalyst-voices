@@ -3,23 +3,16 @@
 use std::collections::HashMap;
 
 use poem_extensions::{response, UniResponse::T200};
-use poem_openapi::{payload::Json, NewType};
+use poem_openapi::payload::Json;
 
 use crate::service::common::{
-    objects::fragment_status::FragmentStatus,
+    objects::{fragment_status::FragmentStatus, fragments_processing_summary::FragmentId},
     responses::{
         resp_2xx::OK,
         resp_4xx::BadRequest,
         resp_5xx::{ServerError, ServiceUnavailable},
     },
 };
-
-/// Comma-separated (no spaces in between) list of fragment IDs.
-#[derive(NewType)]
-pub(crate) struct FragmentIds(
-    // TODO - recheck max length and pattern
-    #[oai(validator(max_length = 64, pattern = "^[0-9a-zA-Z]"))] String,
-);
 
 /// All responses
 pub(crate) type AllResponses = response! {
@@ -41,6 +34,6 @@ pub(crate) type AllResponses = response! {
 ///   but unlikely)
 /// * 503 Service Unavailable - Service is possibly not running reliably.
 #[allow(clippy::unused_async)]
-pub(crate) async fn endpoint(_fragment_ids: FragmentIds) -> AllResponses {
+pub(crate) async fn endpoint(_fragment_ids: Vec<FragmentId>) -> AllResponses {
     T200(OK(Json(HashMap::new())))
 }
