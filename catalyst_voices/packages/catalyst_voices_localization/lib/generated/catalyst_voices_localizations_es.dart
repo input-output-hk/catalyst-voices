@@ -29,7 +29,7 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get loginButtonText => 'Login';
 
   @override
-  String get loginScreenErrorMessage => 'Credenciales incorrectas';
+  String get loginScreenErrorMessage => 'Wrong credentials';
 
   @override
   String get homeScreenText => 'Catalyst Voices';

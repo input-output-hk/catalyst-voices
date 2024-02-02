@@ -5,7 +5,7 @@ publish_to: none
 
 environment:
   sdk: '>=3.2.1 <4.0.0'
-  flutter: 3.16.5
+  flutter: 3.16.9
 
 dependencies:
   animations: ^2.0.11

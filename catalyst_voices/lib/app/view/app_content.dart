@@ -20,7 +20,6 @@ final class AppContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     return BlocListener<AuthenticationBloc, AuthenticationState>(
       listener: (context, state) {},
       child: MaterialApp.router(
@@ -29,7 +28,6 @@ final class AppContent extends StatelessWidget {
         supportedLocales: VoicesLocalizations.supportedLocales,
         localeListResolutionCallback: basicLocaleListResolution,
         routerConfig: _routeConfig(context),
-        title: l10n.homeScreenText,
         theme: ThemeData(
           brightness: Brightness.dark,
           bottomNavigationBarTheme: const BottomNavigationBarThemeData(
