@@ -34,7 +34,7 @@ struct ServerErrorPayload {
     msg: Option<String>,
     /// A URL to report an issue.
     // TODO - Recheck max length
-    #[oai(validator(max_length = "50"))]
+    #[oai(validator(max_length = "1000"))]
     issue: Option<Url>,
 }
 
