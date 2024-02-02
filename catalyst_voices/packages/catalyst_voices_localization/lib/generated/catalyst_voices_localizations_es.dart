@@ -14,22 +14,22 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get emailErrorText => 'mail@example.com';
 
   @override
-  String get passwordLabelText => 'Password';
+  String get passwordLabelText => 'Contraseña';
 
   @override
-  String get passwordHintText => 'My1SecretPassword';
+  String get passwordHintText => 'Mi1ContraseñaSecreta';
 
   @override
-  String get passwordErrorText => 'Password must be at least 8 characters long';
+  String get passwordErrorText => 'La contraseña debe tener al menos 8 caracteres';
 
   @override
-  String get loginTitleText => 'Login';
+  String get loginTitleText => 'Acceso';
 
   @override
-  String get loginButtonText => 'Login';
+  String get loginButtonText => 'Acceso';
 
   @override
-  String get loginScreenErrorMessage => 'Wrong credentials';
+  String get loginScreenErrorMessage => 'Credenciales incorrectas';
 
   @override
   String get homeScreenText => 'Catalyst Voices';

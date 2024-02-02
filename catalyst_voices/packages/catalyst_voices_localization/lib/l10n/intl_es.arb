@@ -3,11 +3,11 @@
   "emailLabelText": "Email",
   "emailHintText": "mail@example.com",
   "emailErrorText": "mail@example.com",
-  "passwordLabelText": "Password",
-  "passwordHintText": "My1SecretPassword",
-  "passwordErrorText": "Password must be at least 8 characters long",
-  "loginTitleText": "Login",
-  "loginButtonText": "Login",
-  "loginScreenErrorMessage": "Wrong credentials",
+  "passwordLabelText": "Contraseña",
+  "passwordHintText": "Mi1ContraseñaSecreta",
+  "passwordErrorText": "La contraseña debe tener al menos 8 caracteres",
+  "loginTitleText": "Acceso",
+  "loginButtonText": "Acceso",
+  "loginScreenErrorMessage": "Credenciales incorrectas",
   "homeScreenText": "Catalyst Voices"
 }
