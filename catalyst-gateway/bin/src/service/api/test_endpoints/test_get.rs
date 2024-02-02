@@ -48,6 +48,7 @@ pub(crate) enum Animals {
 /// ## Responses
 ///
 /// * 204 No Content - Service is OK and can keep running.
+/// * 400 API Validation Error
 /// * 500 Server Error - If anything within this function fails unexpectedly. (Possible
 ///   but unlikely)
 /// * 503 Service Unavailable - Service is possibly not running reliably.

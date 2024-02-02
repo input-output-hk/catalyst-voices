@@ -11,6 +11,7 @@ use crate::{
         objects::vote_plan::VotePlan,
         responses::{
             resp_2xx::OK,
+            resp_4xx::BadRequest,
             resp_5xx::{ServerError, ServiceUnavailable},
         },
     },
@@ -20,6 +21,7 @@ use crate::{
 /// All responses
 pub(crate) type AllResponses = response! {
     200: OK<Json<Vec<VotePlan>>>,
+    400: BadRequest<Json<Vec<VotePlan>>>,
     500: ServerError,
     503: ServiceUnavailable,
 };
@@ -31,6 +33,7 @@ pub(crate) type AllResponses = response! {
 /// ## Responses
 ///
 /// * 200 with a JSON array with the list of vote plans with their respective data.
+/// * 400 Bad request with a JSON array with the list of vote plans with their respective data.
 /// * 500 Server Error - If anything within this function fails unexpectedly. (Possible
 ///   but unlikely)
 /// * 503 Service Unavailable - Service has not started, do not send other requests.
