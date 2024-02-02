@@ -54,7 +54,7 @@ pub(crate) enum Animals {
 /// * 503 Service Unavailable - Service is possibly not running reliably.
 #[allow(clippy::unused_async, clippy::panic)]
 pub(crate) async fn endpoint(
-    _state: Arc<State>, id: i32, action: &Option<String>, pet: &Option<Vec<Animals>>,
+    _state: Arc<State>, id: i32, action: &String, pet: &Option<Vec<Animals>>,
 ) -> AllResponses {
     info!("id: {id:?}, action: {action:?} pet: {pet:?}");
     let response: AllResponses = match id {

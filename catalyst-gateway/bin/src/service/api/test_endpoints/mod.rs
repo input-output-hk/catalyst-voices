@@ -57,7 +57,7 @@ impl TestApi {
         /// The action just needs to be any valid UUID.
         ///
         /// # Make sure its a UUID
-        action: Path<Option<String>>,
+        action: Path<String>,
         #[oai(validator(min_items = 0, max_items = 3, unique_items))]
         /// List your favorite pets, in order of preference
         pet: Query<Option<Vec<test_get::Animals>>>,
@@ -108,7 +108,7 @@ impl TestApi {
         /// The action just needs to be any valid UUID.
         ///
         /// # Make sure its a UUID
-        action: Path<Option<String>>,
+        action: Path<String>,
     ) -> test_post::AllResponses {
         test_post::endpoint(*id, &action).await
     }
