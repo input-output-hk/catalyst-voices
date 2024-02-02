@@ -36,11 +36,9 @@ pub(crate) type AllResponses = response! {
 /// * 503 Service Unavailable - Service is possibly not running reliably.
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(id: i32, action: &String) -> AllResponses {
-    let response: AllResponses = match id {
-        _ => {
-            info!("id: {id:?}, action: {action:?}");
-            T204(NoContent)
-        },
+    let response: AllResponses = {
+        info!("id: {id:?}, action: {action:?}");
+        T204(NoContent)
     };
     response
 }
