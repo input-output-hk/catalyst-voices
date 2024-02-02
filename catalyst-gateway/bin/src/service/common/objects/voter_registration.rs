@@ -39,7 +39,7 @@ impl TryFrom<crate::event_db::types::registration::Voter> for VoterRegistration 
 
     fn try_from(value: crate::event_db::types::registration::Voter) -> Result<Self, Self::Error> {
         Ok(Self {
-            voter_info: value.voter_info.try_into()?,
+            voter_info: value.info.try_into()?,
             as_at: value.as_at,
             last_updated: value.last_updated,
             is_final: value.is_final,

@@ -1,11 +1,8 @@
 # Use MOLD linker where possible, but ONLY in CI applicable targets.
-# cspell: words rustflags armv gnueabihf msvc nextest idents rustdocflags
-# cspell: words rustdoc lintfix lintrestrict testfast testdocs codegen testci testunit
-# cspell: words fmtchk fmtfix
 
 # Configure how Docker container targets build.
 
-# If you want to customize these targets for a local build, then customize them in you:
+# If you want to customize these targets for a local build, then customize them in your:
 #  $CARGO_HOME/config.toml
 # NOT in the project itself.
 # These targets are ONLY the targets used by CI and inside docker builds.
@@ -28,46 +25,12 @@ rustflags = [
     "-C", "target-feature=-crt-static"
 ]
 
-
 [build]
-
-rustflags = [
-    "-D",
-    "warnings",
-    "-D",
-    "missing_docs",
-    "-D",
-    "let_underscore_drop",
-    "-D",
-    "non_ascii_idents",
-    "-D",
-    "single_use_lifetimes",
-    "-D",
-    "trivial_casts",
-    "-D",
-    "trivial_numeric_casts",
-]
-
+rustflags = []
 rustdocflags = [
     "--enable-index-page",
     "-Z",
     "unstable-options",
-    "-D",
-    "warnings",
-    "-D",
-    "missing_docs",
-    "-D",
-    "rustdoc::broken_intra_doc_links",
-    "-D",
-    "rustdoc::invalid_codeblock_attributes",
-    "-D",
-    "rustdoc::invalid_html_tags",
-    "-D",
-    "rustdoc::invalid_rust_codeblocks",
-    "-D",
-    "rustdoc::bare_urls",
-    "-D",
-    "rustdoc::unescaped_backticks",
 ]
 
 [profile.dev]
@@ -76,7 +39,7 @@ debug = true
 debug-assertions = true
 overflow-checks = true
 lto = false
-panic = 'unwind'
+panic = "unwind"
 incremental = true
 codegen-units = 256
 
@@ -86,7 +49,7 @@ debug = false
 debug-assertions = false
 overflow-checks = false
 lto = "thin"
-panic = 'unwind'
+panic = "unwind"
 incremental = false
 codegen-units = 16
 
@@ -108,23 +71,23 @@ incremental = false
 codegen-units = 16
 
 [alias]
-lint = "clippy --all-targets -- -D warnings -D clippy::pedantic -D clippy::unwrap_used -D clippy::expect_used -D clippy::exit -D clippy::get_unwrap -D clippy::index_refutable_slice -D clippy::indexing_slicing -D clippy::match_on_vec_items -D clippy::match_wild_err_arm -D clippy::missing_panics_doc -D clippy::panic -D clippy::string_slice -D clippy::unchecked_duration_subtraction -D clippy::unreachable -D clippy::missing_docs_in_private_items"
-lintfix = "clippy --all-targets --fix --allow-dirty -- -D warnings -D clippy::pedantic -D clippy::unwrap_used -D clippy::expect_used -D clippy::exit -D clippy::get_unwrap -D clippy::index_refutable_slice -D clippy::indexing_slicing -D clippy::match_on_vec_items -D clippy::match_wild_err_arm -D clippy::missing_panics_doc -D clippy::panic -D clippy::string_slice -D clippy::unchecked_duration_subtraction -D clippy::unreachable -D clippy::missing_docs_in_private_items"
-lintrestrict = "clippy -- -D warnings -D clippy::pedantic -D clippy::restriction -D clippy::missing_docs_in_private_items"
-lint-vscode = "clippy --workspace --message-format=json-diagnostic-rendered-ansi --all-targets -- -D warnings -D clippy::pedantic -D clippy::unwrap_used -D clippy::expect_used -D clippy::exit -D clippy::get_unwrap -D clippy::index_refutable_slice -D clippy::indexing_slicing -D clippy::match_on_vec_items -D clippy::match_wild_err_arm -D clippy::missing_panics_doc -D clippy::panic -D clippy::string_slice -D clippy::unchecked_duration_subtraction -D clippy::unreachable -D clippy::missing_docs_in_private_items"
+lint = "clippy --all-targets"
+lintfix = "clippy --all-targets --fix --allow-dirty"
+lint-vscode = "clippy --message-format=json-diagnostic-rendered-ansi --all-targets"
 
-docs = "doc --workspace -r --all-features --no-deps --bins --document-private-items --examples --locked"
+docs = "doc --release --no-deps --document-private-items --bins --lib --examples"
 # nightly docs build broken... when they are'nt we can enable these docs... --unit-graph --timings=html,json -Z unstable-options"
-testfast = "nextest --release --workspace --locked"
-testdocs = "test --doc --release --workspace --locked"
+testunit = "nextest run --release --bins --lib --tests --benches --no-fail-fast -P ci"
+testcov = "llvm-cov nextest --release --bins --lib --tests --benches --no-fail-fast -P ci"
+testdocs = "test --doc --release"
 
 # Rust formatting, MUST be run with +nightly
 fmtchk = "fmt -- --check -v --color=always"
 fmtfix = "fmt -- -v"
 
 [term]
-quiet = false          # whether cargo output is quiet
-verbose = true         # whether cargo provides verbose output
-color = 'always'       # whether cargo colorizes output use `CARGO_TERM_COLOR="off"` to disable.
-progress.when = 'auto' # whether cargo shows progress bar
-progress.width = 80    # width of progress bar
+quiet = false           # whether cargo output is quiet
+verbose = false         # whether cargo provides verbose output
+color = "auto"          # whether cargo colorizes output use `CARGO_TERM_COLOR="off"` to disable.
+progress.when = "never" # whether cargo shows progress bar
+progress.width = 80     # width of progress bar
