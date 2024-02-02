@@ -2,9 +2,9 @@
 
 use std::sync::Arc;
 
-use poem::web::{Data, Path};
+use poem::web::Data;
 use poem_extensions::{response, UniResponse::T200};
-use poem_openapi::payload::Json;
+use poem_openapi::{param::Path, payload::Json};
 
 use crate::{
     service::common::{

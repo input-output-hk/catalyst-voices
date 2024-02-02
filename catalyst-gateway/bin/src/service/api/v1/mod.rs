@@ -2,8 +2,12 @@
 
 use std::sync::Arc;
 
-use poem::web::{Data, Path};
-use poem_openapi::{param::Query, payload::Json, OpenApi};
+use poem::web::Data;
+use poem_openapi::{
+    param::{Path, Query},
+    payload::Json,
+    OpenApi,
+};
 
 use crate::{
     service::{
@@ -35,7 +39,7 @@ impl V1Api {
     /// Get Account Votes
     ///
     /// Get from all active vote plans, the index of the voted proposals
-    /// by th given account ID.
+    /// by the given account ID.
     async fn get_account_votes(
         &self, state: Data<&Arc<State>>,
         /// A account ID to get the votes for.
