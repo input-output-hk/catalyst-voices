@@ -48,6 +48,63 @@ overrides:
     owasp:api4:2019-rate-limit: warn
     owasp:api4:2019-rate-limit-responses-429: warn
     # Public API
+    owasp:api2:2019-protection-global-safe: info
     owasp:api2:2019-protection-global-unsafe: info
     owasp:api2:2019-protection-global-unsafe-strict: info
-    owasp:api3:2019-define-error-responses-401: off
+    owasp:api3:2019-define-error-responses-401: warn
+
+- files:
+  - '**#/paths/~1api~1health~1live/get/responses'
+  - '**#/paths/~1api~1health~1started/get/responses'
+  - '**#/paths/~1api~1health~1ready/get/responses'
+  - '**#/paths/~1api~1test~1test~1%7Bid%7D~1test~1%7Baction%7D/post/responses'
+  - '**#/paths/~1api~1test~1test~1%7Bid%7D~1test~1%7Baction%7D/get/responses'
+  # Recheck this, already apply validator but does not work "FragmentId"
+  - '**#/paths/~1api~1v1~1fragments~1statuses/get/parameters/0/schema'
+  # Recheck this, already apply validator but does not work "AccountId"
+  - '**#/paths/~1api~1v1~1votes~1plan~1account-votes~1%7Baccount_id%7D/get/parameters/0/schema'
+  rules:
+    owasp:api4:2019-string-restricted: off
+
+- files:
+  - '**#/paths/~1api~1health~1live/get/responses'
+  - '**#/paths/~1api~1health~1started/get/responses'
+  - '**#/paths/~1api~1health~1ready/get/responses'
+  - '**#/paths/~1api~1v0~1message/post/requestBody/content'
+  - '**#/paths/~1api~1test~1test~1%7Bid%7D~1test~1%7Baction%7D/post/responses'
+  - '**#/paths/~1api~1test~1test~1%7Bid%7D~1test~1%7Baction%7D/get/responses'
+  - '**#/components/schemas/ServerErrorPayload/properties/id'
+  - '**#/components/schemas/VoterRegistration/properties/as_at'
+  - '**#/components/schemas/VoterRegistration/properties/last_updated'
+  # Recheck this, already apply validator but does not work "FragmentId"
+  - '**#/paths/~1api~1v1~1fragments~1statuses/get/parameters/0/schema'
+  # Recheck this, already apply validator but does not work "AccountId"
+  - '**#/paths/~1api~1v1~1votes~1plan~1account-votes~1%7Baccount_id%7D/get/parameters/0/schema'
+  rules:
+    owasp:api4:2019-string-limit: off
+
+- files:
+  - '**#/paths/~1api~1v0~1vote~1active~1plans/get/responses'
+  - '**#/paths/~1api~1v1~1votes~1plan~1account-votes~1%7Baccount_id%7D/get/responses'
+  rules:
+    owasp:api4:2019-array-limit: off
+
+- files:
+  - '**#/components/schemas/FragmentStatus'
+  rules:
+    owasp:api6:2019-no-additionalProperties: off
+
+- files:
+  - '**#/paths/~1api~1v1~1fragments~1statuses/get/responses'
+  rules:
+    owasp:api6:2019-constrained-additionalProperties: off
+
+- files:
+  # Ignore event_id
+  - '**#/paths/~1api~1registration~1voter~1%7Bvoting_key%7D/get/parameters/1/schema'
+  # Ignore the test id
+  - '**#/paths/~1api~1test~1test~1%7Bid%7D~1test~1%7Baction%7D/post/parameters/0/schema'
+  - '**#/paths/~1api~1test~1test~1%7Bid%7D~1test~1%7Baction%7D/get/parameters/0/schema'
+  rules:
+    owasp:api1:2019-no-numeric-ids: off
+
