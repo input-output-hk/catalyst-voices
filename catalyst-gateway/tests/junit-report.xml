@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<testsuites disabled="0" errors="0" failures="1" tests="7" time="10.39915097199264">
+	<testsuite disabled="0" errors="0" failures="1" name="schemathesis" skipped="0" tests="7" time="10.39915097199264" hostname="buildkitsandbox">
+		<testcase name="GET /api/health/started" time="0.084971"/>
+		<testcase name="GET /api/health/ready" time="0.032210"/>
+		<testcase name="GET /api/health/live" time="0.011960"/>
+		<testcase name="GET /api/registration/voter/{voting_key}" time="0.006370">
+			<failure type="failure" message="1. Undocumented HTTP status code"/>
+		</testcase>
+		<testcase name="POST /api/v0/message" time="10.237300"/>
+		<testcase name="GET /api/v0/vote/active/plans" time="0.013171"/>
+		<testcase name="GET /api/v1/votes/plan/account-votes/{account_id}" time="0.013169"/>
+	</testsuite>
+</testsuites>
