@@ -30,6 +30,7 @@ overrides:
     # Override document description rule
     # - No limitations on the characters that can start or end a sentence.
     # - Length should be >= 20 characters
+    # Ref: https://github.com/stoplightio/spectral-documentation/blob/a34ca1b49cbd1ac5a75cfcb93c69d1d77bde341e/src/ruleset.ts#L173
     docs-description:
       given: '#DescribableObjects'
       then:
@@ -45,12 +46,18 @@ overrides:
     # info: Good to be implemented.
 
     # Rate limit
+    # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L436
     owasp:api4:2019-rate-limit: warn
+    # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L484
     owasp:api4:2019-rate-limit-responses-429: warn
     # Public API
+    # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L305
     owasp:api2:2019-protection-global-safe: info
+    # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L269
     owasp:api2:2019-protection-global-unsafe: info
+    # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L287
     owasp:api2:2019-protection-global-unsafe-strict: info
+    # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L376
     owasp:api3:2019-define-error-responses-401: warn
 
 - files:
@@ -64,6 +71,7 @@ overrides:
   # Recheck this, already apply validator but does not work "AccountId"
   - '**#/paths/~1api~1v1~1votes~1plan~1account-votes~1%7Baccount_id%7D/get/parameters/0/schema'
   rules:
+    # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L551
     owasp:api4:2019-string-restricted: off
 
 - files:
@@ -81,22 +89,26 @@ overrides:
   # Recheck this, already apply validator but does not work "AccountId"
   - '**#/paths/~1api~1v1~1votes~1plan~1account-votes~1%7Baccount_id%7D/get/parameters/0/schema'
   rules:
+    # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L521
     owasp:api4:2019-string-limit: off
 
 - files:
   - '**#/paths/~1api~1v0~1vote~1active~1plans/get/responses'
   - '**#/paths/~1api~1v1~1votes~1plan~1account-votes~1%7Baccount_id%7D/get/responses'
   rules:
+    # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L506
     owasp:api4:2019-array-limit: off
 
 - files:
   - '**#/components/schemas/FragmentStatus'
   rules:
+    # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L678
     owasp:api6:2019-no-additionalProperties: off
 
 - files:
   - '**#/paths/~1api~1v1~1fragments~1statuses/get/responses'
   rules:
+    # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L698
     owasp:api6:2019-constrained-additionalProperties: off
 
 - files:
@@ -106,5 +118,6 @@ overrides:
   - '**#/paths/~1api~1test~1test~1%7Bid%7D~1test~1%7Baction%7D/post/parameters/0/schema'
   - '**#/paths/~1api~1test~1test~1%7Bid%7D~1test~1%7Baction%7D/get/parameters/0/schema'
   rules:
+    # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L102
     owasp:api1:2019-no-numeric-ids: off
 
