@@ -4,7 +4,8 @@ use std::sync::Arc;
 
 use poem::web::Data;
 use poem_extensions::{
-    response, UniResponse::{T204, T500, T503}
+    response,
+    UniResponse::{T204, T500, T503},
 };
 
 use crate::{

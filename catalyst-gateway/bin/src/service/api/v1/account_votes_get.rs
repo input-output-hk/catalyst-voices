@@ -41,7 +41,9 @@ pub(crate) type AllResponses = response! {
 ///   but unlikely)
 /// * 503 Service Unavailable - Service has not started, do not send other requests.
 #[allow(clippy::unused_async)]
-pub(crate) async fn endpoint(_state: Data<&Arc<State>>, _account_id: Path<AccountId>) -> AllResponses {
+pub(crate) async fn endpoint(
+    _state: Data<&Arc<State>>, _account_id: Path<AccountId>,
+) -> AllResponses {
     // otherwise everything seems to be A-OK
     T200(OK(Json(Vec::new())))
 }

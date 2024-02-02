@@ -16,7 +16,7 @@ pub(crate) struct StatusRejected {
     /// Reason the fragment was rejected.
     // TODO - Recheck max length and pattern
     // Should start with capital letter.
-    #[oai(validator(max_length = "250", pattern=r"^[A-Z].*$"))]
+    #[oai(validator(max_length = "250", pattern = r"^[A-Z].*$"))]
     pub reason: String,
 }
 

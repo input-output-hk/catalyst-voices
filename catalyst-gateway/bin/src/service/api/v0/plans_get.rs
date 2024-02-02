@@ -33,7 +33,8 @@ pub(crate) type AllResponses = response! {
 /// ## Responses
 ///
 /// * 200 with a JSON array with the list of vote plans with their respective data.
-/// * 400 Bad request with a JSON array with the list of vote plans with their respective data.
+/// * 400 Bad request with a JSON array with the list of vote plans with their respective
+///   data.
 /// * 500 Server Error - If anything within this function fails unexpectedly. (Possible
 ///   but unlikely)
 /// * 503 Service Unavailable - Service has not started, do not send other requests.
