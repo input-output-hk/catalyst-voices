@@ -6,28 +6,15 @@ builder:
     COPY --dir ./schema_mismatch README.md .
     DO github.com/input-output-hk/catalyst-ci/earthly/python:v2.7.0+BUILDER
 
-build-tester:
+package-tester:
     FROM +builder
 
     CMD poetry run pytest
     # The following is useful for debugging the tests
     # CMD poetry run pytest -vvvv --capture tee-sys --show-capture=stderr
 
-gateway:
-    FROM ../../+builder
-
-    ENV CAT_ADDRESS=0.0.0.0:3030
-    ENV DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
-    ENV LOG_LEVEL=debug
-
-    COPY ../../+build/cat-gateway .
-    CMD ./cat-gateway run \
-        --address "$CAT_ADDRESS" \
-        --database-url=$DB_URL \
-        --log-level=$LOG_LEVEL
-
 test:
-    FROM earthly/dind:alpine-3.18-docker-23.0.6-r4
+    FROM earthly/dind:alpine
 
     WORKDIR /testing
 
@@ -36,8 +23,9 @@ test:
     WITH DOCKER \
         --compose docker-compose.yml \
         --load event-db:latest=(../../event-db+build --with_historic_data=false) \
-        --load cat-gateway:latest=(+gateway) \
-        --load test=(+build-tester) \
+        --load cat-gateway:latest=(../+package-cat-gateway --address="127.0.0.1:3030" \
+                                        --db_url="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev") \
+        --load test=(+package-tester) \
         --service event-db \
         --service cat-gateway \
         --allow-privileged
