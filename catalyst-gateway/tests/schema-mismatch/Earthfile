@@ -9,7 +9,9 @@ builder:
 build-tester:
     FROM +builder
 
-    CMD poetry run pytest -vvvv --capture tee-sys --show-capture=stderr
+    CMD poetry run pytest
+    # The following is useful for debugging the tests
+    # CMD poetry run pytest -vvvv --capture tee-sys --show-capture=stderr
 
 gateway:
     FROM ../../+builder
