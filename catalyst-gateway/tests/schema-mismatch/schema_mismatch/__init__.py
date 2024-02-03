@@ -24,7 +24,7 @@ def fetch_schema_version():
     async def get_current_version():
         conn = await asyncpg.connect(DB_URL)
         if conn is None:
-            raise Exception("no db connection found for")
+            raise Exception("no db connection found")
 
         version = await conn.fetchval(GET_VERSION_QUERY)
         if version is None:

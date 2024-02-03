@@ -29,6 +29,9 @@ gateway:
 test:
     FROM earthly/dind:alpine-3.18-docker-23.0.6-r4
 
+    # This value is derived from the `name` in docker-compose.yml
+    ARG NETWORK_NAME=testing-schema-mismatch_default
+
     COPY ./docker-compose.yml .
 
     WITH DOCKER \
@@ -39,5 +42,5 @@ test:
         --service event-db \
         --service cat-gateway \
         --allow-privileged
-        RUN sleep 5 && docker run --network=default_default test
+        RUN docker run --network=$NETWORK_NAME test
     END

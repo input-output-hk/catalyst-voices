@@ -11,5 +11,4 @@ To run:
 
 ```bash
 earthly -P +test
-
 ```
