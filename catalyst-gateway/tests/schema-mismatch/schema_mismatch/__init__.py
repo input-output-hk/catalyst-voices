@@ -7,10 +7,10 @@ import http.client
 GET_VERSION_QUERY = "SELECT MAX(version) FROM refinery_schema_history"
 UPDATE_QUERY = "UPDATE refinery_schema_history SET version=$1 WHERE version=$2"
 
-DB_URL="postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev"
+DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 
 DEFAULT_TIMEOUT: int = 10
-HOST = "gateway"
+HOST = "localhost"
 PORT = 3030
 
 def call_api_url(method, endpoint, *args, **kwargs):
