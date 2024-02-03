@@ -1,7 +1,5 @@
 version: "3"
 
-# cspell: words
-
 services:
   event-db:
     image: event-db:latest
@@ -35,7 +33,3 @@ services:
     depends_on:
       event-db:
         condition: service_healthy
-
-networks:
-  default:
-    name: testing

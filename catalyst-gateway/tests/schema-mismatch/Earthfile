@@ -16,20 +16,19 @@ package-tester:
 test:
     FROM earthly/dind:alpine
 
-    WORKDIR /testing
+    ARG DB_URL="postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev"
+    ARG CAT_ADDRESS="0.0.0.0:3030"
 
-    ENV COMPOSE_PROJECT_NAME=testing
+    WORKDIR /default
     COPY ./docker-compose.yml .
 
     WITH DOCKER \
         --compose docker-compose.yml \
         --load event-db:latest=(../../event-db+build --with_historic_data=false) \
-        --load cat-gateway:latest=(../+package-cat-gateway --address="0.0.0.0:3030" \
-                                        --db_url="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev") \
-        --load test=(+package-tester) \
+        --load cat-gateway:latest=(../+package-cat-gateway --address=$CAT_ADDRESS --db_url=$DB_URL) \
+        --load test:latest=(+package-tester) \
         --service event-db \
         --service cat-gateway \
         --allow-privileged
-        # `testing` network is defined in docker-compose
-        RUN docker run --network=testing test
+        RUN docker run --network=default_default test
     END
