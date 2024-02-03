@@ -39,5 +39,5 @@ test:
         --service event-db \
         --service cat-gateway \
         --allow-privileged
-        RUN docker run --network=default_default test
+        RUN sleep 5 && docker run --network=default_default test
     END

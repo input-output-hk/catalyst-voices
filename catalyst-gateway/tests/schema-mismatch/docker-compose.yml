@@ -36,9 +36,3 @@ services:
     depends_on:
       event-db:
         condition: service_healthy
-
-  test:
-    image: test:latest
-    depends_on:
-      cat-gateway:
-        condition: service_started
