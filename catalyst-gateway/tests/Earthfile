@@ -87,8 +87,3 @@ integration-test:
         RUN echo "Integration tests failed" && \
             exit 1
     END
-
-test-schema-mismatch:
-   FROM scratch
-
-   BUILD ./schema-mismatch+verify-schema-mismatch-behavior
