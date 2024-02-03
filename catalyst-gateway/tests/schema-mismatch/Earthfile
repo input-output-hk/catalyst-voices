@@ -24,10 +24,10 @@ gateway:
         --database-url=$DB_URL \
         --log-level=$LOG_LEVEL
 
-check-schema-mismatch-behaviour:
+verify-schema-mismatch-behaviour:
     FROM earthly/dind:alpine-3.18-docker-23.0.6-r4
 
-    COPY docker-compose.yml .
+    COPY ./docker-compose.yml .
 
     WITH DOCKER \
         --compose docker-compose.yml \
