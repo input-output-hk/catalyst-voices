@@ -41,5 +41,5 @@ test:
         --service event-db \
         --service cat-gateway \
         --allow-privileged
-        RUN docker run --network=default_default test
+        RUN docker run --network=host test
     END
