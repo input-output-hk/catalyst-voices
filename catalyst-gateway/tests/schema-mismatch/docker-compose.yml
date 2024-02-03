@@ -2,6 +2,7 @@ version: "3"
 
 # cspell: words
 
+name: testing-schema-mismatch
 services:
   event-db:
     image: event-db:latest
