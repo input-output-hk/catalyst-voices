@@ -35,3 +35,7 @@ services:
     depends_on:
       event-db:
         condition: service_healthy
+
+networks:
+  default:
+    name: testing

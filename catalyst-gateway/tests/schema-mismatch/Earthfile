@@ -18,16 +18,18 @@ test:
 
     WORKDIR /testing
 
+    ENV COMPOSE_PROJECT_NAME=testing
     COPY ./docker-compose.yml .
 
     WITH DOCKER \
         --compose docker-compose.yml \
         --load event-db:latest=(../../event-db+build --with_historic_data=false) \
-        --load cat-gateway:latest=(../+package-cat-gateway --address="127.0.0.1:3030" \
+        --load cat-gateway:latest=(../+package-cat-gateway --address="0.0.0.0:3030" \
                                         --db_url="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev") \
         --load test=(+package-tester) \
         --service event-db \
         --service cat-gateway \
         --allow-privileged
-        RUN docker run --network=host test
+        # `testing` network is defined in docker-compose
+        RUN docker run --network=testing test
     END
