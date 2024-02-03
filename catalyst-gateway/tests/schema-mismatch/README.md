@@ -1,1 +1,1 @@
-# Integration testing for DB Schema Version Mismatch behaviour
+# Integration testing for DB Schema Version Mismatch behavior

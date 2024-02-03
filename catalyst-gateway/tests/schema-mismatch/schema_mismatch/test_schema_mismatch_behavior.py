@@ -18,7 +18,7 @@ def check_is_not_ready():
     assert resp.status == 503
     logger.info("cat-gateway service is NOT READY.")
 
-def test_schema_version_mismatch_changes_cat_gateway_behaviour():
+def test_schema_version_mismatch_changes_cat_gateway_behavior():
     # Check that the `live` endpoint is OK
     check_is_live()
 

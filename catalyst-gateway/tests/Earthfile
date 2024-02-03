@@ -91,4 +91,4 @@ integration-test:
 test-schema-mismatch:
    FROM scratch
 
-   BUILD ./schema-mismatch+verify-schema-mismatch-behaviour
+   BUILD ./schema-mismatch+verify-schema-mismatch-behavior

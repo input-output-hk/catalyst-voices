@@ -1,4 +1,4 @@
-"""Utilities for testing schema mismatch behaviour."""
+"""Utilities for testing schema mismatch behavior."""
 
 import asyncio
 import asyncpg
