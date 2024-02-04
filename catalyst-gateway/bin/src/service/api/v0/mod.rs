@@ -21,7 +21,7 @@ pub(crate) struct V0Api;
 #[OpenApi(prefix_path = "/v0", tag = "ApiTags::V0")]
 impl V0Api {
     /// Posts a signed transaction.
-    /// 
+    ///
     /// Post a signed transaction in a form of message to the network.
     #[oai(path = "/message", method = "post", operation_id = "Message")]
     async fn message_post(&self, message: Binary<Vec<u8>>) -> message_post::AllResponses {
@@ -29,7 +29,7 @@ impl V0Api {
     }
 
     /// Get all active vote plans endpoint.
-    /// 
+    ///
     /// Get all active vote plans endpoint.
     #[oai(
         path = "/vote/active/plans",
