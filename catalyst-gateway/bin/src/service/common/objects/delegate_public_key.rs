@@ -5,7 +5,7 @@ use poem_openapi::{types::Example, Object};
 #[oai(example = true)]
 /// Delegate Public Key
 pub(crate) struct DelegatePublicKey {
-    // TODO - Recheck max length
+    // 64 plus 0x = 66
     #[oai(validator(pattern = "0x[0-9a-f]{64}", max_length = "66"))]
     /// Delegate Public Key in hex format
     address: String,

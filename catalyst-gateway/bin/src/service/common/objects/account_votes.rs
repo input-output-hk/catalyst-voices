@@ -6,10 +6,7 @@ use serde::Deserialize;
 #[derive(NewType, Deserialize)]
 #[oai(example = true)]
 /// Unique ID of a user account.
-pub(crate) struct AccountId(
-    // TODO - recheck max length, min length, and pattern
-    #[oai(validator(max_length = 64, min_length = 64, pattern = "[0-9a-f]{64}"))] String,
-);
+pub(crate) struct AccountId(String);
 
 impl Example for AccountId {
     fn example() -> Self {
@@ -36,8 +33,7 @@ pub(crate) struct AccountVote {
     /// The hex-encoded ID of the vote plan.
     pub(crate) vote_plan_id: VotePlanId,
     /// Array of the proposal numbers voted for by the account ID within the vote plan.
-    // TODO - Recheck max items and max value
-    #[oai(validator(max_items = "100", minimum(value = "0"), maximum(value = "500")))]
+    #[oai(validator(max_items = "255", minimum(value = "0"), maximum(value = "500")))]
     pub(crate) votes: Vec<u8>,
 }
 

@@ -9,8 +9,7 @@ use super::{delegate_public_key::DelegatePublicKey, voter_group_id::VoterGroupId
 pub(crate) struct VoterInfo {
     /// Voter's voting power.
     /// This is the true voting power, subject to minimum voting power and max cap.
-    // TODO - Recheck max value
-    #[oai(validator(minimum(value = "0"), maximum(value = "1000000000000000000")))]
+    #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
     voting_power: i64,
 
     /// Voter's voting group.
@@ -18,20 +17,18 @@ pub(crate) struct VoterInfo {
 
     /// Total voting power delegated to this voter.
     /// This is not capped and not subject to minimum voting power.
-    // TODO - Recheck max value
-    #[oai(validator(minimum(value = "0"), maximum(value = "1000000000000000000")))]
+    #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
     delegations_power: i64,
 
     /// Number of registration which delegated to this voter.
-    // TODO - Recheck max value
-    #[oai(validator(minimum(value = "0"), maximum(value = "1000")))]
+    #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
     delegations_count: i64,
 
     /// Voting power's share of the total voting power.
     /// Can be used to gauge potential voting power saturation.
     /// This value is NOT saturated however, and gives the raw share of total registered
     /// voting power.
-    #[oai(validator(minimum(value = "0"), maximum(value = "100")))]
+    #[oai(validator(minimum(value = "0"), maximum(value = "1.7976931348623157e308")))]
     voting_power_saturation: f64,
 
     /// List of stake public key addresses which delegated to this voting key.

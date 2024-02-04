@@ -59,8 +59,7 @@ impl RegistrationApi {
         /// The Event ID to return results for.
         /// See [GET Events](Link to events endpoint) for details on retrieving all valid
         /// event IDs.
-        // TODO - Recheck max value
-        #[oai(validator(minimum(value = "0"), maximum(value = "10000")))]
+        #[oai(validator(minimum(value = "0"), maximum(value = "2147483647")))]
         event_id: Query<Option<EventId>>,
         /// If this optional flag is set, the response will include the delegator's list
         /// in the response. Otherwise, it will be omitted.

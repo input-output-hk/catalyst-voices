@@ -15,11 +15,9 @@ pub(crate) struct Slot(pub u32);
 /// Block time defined as the pair (epoch, slot).
 pub(crate) struct BlockDate {
     /// Block's epoch.
-    // TODO - Recheck max value
     #[oai(validator(minimum(value = "0"), maximum(value = "4294967295")))]
     pub epoch: Epoch,
     /// Block's slot number.
-    // TODO - Recheck max value
     #[oai(validator(minimum(value = "0"), maximum(value = "4294967295")))]
     pub slot_id: Slot,
 }

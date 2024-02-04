@@ -85,8 +85,7 @@ impl V1Api {
         &self,
         /// Comma-separated list of fragment ids for which the statuses will
         /// be retrieved.
-        // TODO - recheck max items
-        #[oai(validator(max_items = 1000))]
+        #[oai(validator(max_items = "1000"))]
         Query(fragment_ids): Query<Vec<FragmentId>>,
     ) -> fragments_statuses::AllResponses {
         fragments_statuses::endpoint(fragment_ids).await
