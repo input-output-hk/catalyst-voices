@@ -61,6 +61,9 @@ async fn init_follower(config: Config, db: Arc<dyn EventDbQueries>) -> Result<()
     let genesis_values = network_genesis_values(&Network::from_str(&config.network)?)
         .expect("obtaining genesis values from follower crate is infallible");
 
+    //Check most recent update on cardano update table If it falls within the threshold boundary, node should update db with latest data
+
+    // instead of loop, close follower when updates finished
     tokio::spawn(async move {
         loop {
             // wait for interupt
