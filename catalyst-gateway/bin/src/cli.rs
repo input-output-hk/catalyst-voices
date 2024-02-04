@@ -1,5 +1,5 @@
 //! CLI interpreter for the service
-use crate::follower::start_followers;
+
 use std::{io::Write, sync::Arc};
 
 use clap::Parser;
@@ -10,6 +10,7 @@ use tracing::error;
 const CHECK_CONFIG_TICK: u64 = 5;
 
 use crate::{
+    follower::start_followers,
     logger, service,
     settings::{DocsSettings, ServiceSettings},
     state::State,
@@ -68,17 +69,7 @@ impl Cli {
                     }
                 };
 
-                event_db.updates_from_follower().await?;
-
-                let _ = start_followers(config).await?;
-
-                //
-                // config (config wait)
-
-                // start followers sync
-                // single file for starting followers
-                // followers(state) {db get metadata}
-                //
+                let _ = start_followers(config, event_db.clone()).await?;
 
                 service::run(&settings.address, state).await?;
                 Ok(())

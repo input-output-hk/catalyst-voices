@@ -9,7 +9,9 @@ use crate::event_db::EventDB;
 #[allow(clippy::module_name_repetitions)]
 /// Follower Queries Trait
 pub(crate) trait FollowerQueries: Sync + Send + 'static {
-    async fn updates_from_follower(&self) -> Result<(), Error>;
+    async fn updates_from_follower(
+        &self, slot_no: i64, network: String, epoch_no: i64, block_time: i64, block_hash: String,
+    ) -> Result<(), Error>;
 }
 
 impl EventDB {
@@ -20,23 +22,22 @@ impl EventDB {
 
 #[async_trait]
 impl FollowerQueries for EventDB {
-    async fn updates_from_follower(&self) -> Result<(), Error> {
+    async fn updates_from_follower(
+        &self, slot_no: i64, network: String, epoch_no: i64, block_time: i64, block_hash: String,
+    ) -> Result<(), Error> {
         let conn = self.pool.get().await?;
 
-        let ts: chrono::DateTime<chrono::Utc> = chrono::Utc.timestamp_nanos(1234567890);
+        let ts: chrono::DateTime<chrono::Utc> = chrono::Utc.timestamp_nanos(block_time);
 
         let _rows = conn
             .query(
                 Self::FOLLOWER_QUERY,
                 &[
-                    &i64::from(1),
-                    &"mainnet",
-                    &i64::from(1),
+                    &i64::from(slot_no),
+                    &network,
+                    &i64::from(epoch_no),
                     &ts,
-                    &hex::decode(
-                        "f2f25bc19b8eb450a63faa4115be199ec2b1e1902ebb82f8d1455146bbfa6d87",
-                    )
-                    .unwrap(),
+                    &hex::decode(block_hash).unwrap(),
                 ],
             )
             .await?;

@@ -13,7 +13,7 @@ pub(crate) trait ConfigQueries: Sync + Send + 'static {
 
 impl EventDB {
     /// Get config
-    const CONFIG_QUERY: &'static str = "SELECT id,id2,id3 FROM config";
+    const CONFIG_QUERY: &'static str = "SELECT id, id2, id3 FROM config";
 }
 
 #[async_trait]
