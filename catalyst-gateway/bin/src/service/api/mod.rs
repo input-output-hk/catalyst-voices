@@ -21,6 +21,8 @@ mod test_endpoints;
 mod v0;
 mod v1;
 
+// cspell: words gethostname afinet netifas
+
 /// The name of the API
 const API_TITLE: &str = "Catalyst Gateway";
 
@@ -79,13 +81,14 @@ pub(crate) fn mk_api(
 
     // Add all the hosts where this API should be reachable.
     for host in hosts {
-        service = service.server(ServerObject::new(host));
+        service = service.server(ServerObject::new(host).description("API Host"));
     }
 
-    // Get local hostname
+    // Get localhost name
     if let Ok(hostname) = gethostname().into_string() {
         let hostname_with_port = format!("{}:{}", hostname, PORT);
-        service = service.server(ServerObject::new(hostname_with_port));
+        service =
+            service.server(ServerObject::new(hostname_with_port).description("Server at localhost name"));
     }
 
     // Get local IP address v4 and v6
@@ -93,11 +96,17 @@ pub(crate) fn mk_api(
     if let Ok(network_interfaces) = network_interfaces {
         for (name, ip) in network_interfaces.iter() {
             if *name == "en0" {
-                let ip_with_port = match ip {
-                    IpAddr::V4(_) => format!("{}:{}", ip, PORT),
-                    IpAddr::V6(_) => format!("[{}]:{}", ip, PORT),
+                let (ip_with_port, desc) = match ip {
+                    IpAddr::V4(_) => {
+                        let ip_str = format!("{}:{}", ip, PORT);
+                        (ip_str, "Server at local IPv4 address")
+                    },
+                    IpAddr::V6(_) => {
+                        let ip_str = format!("[{}]:{}", ip, PORT);
+                        (ip_str, "Server at local IPv6 address")
+                    },
                 };
-                service = service.server(ServerObject::new(ip_with_port));
+                service = service.server(ServerObject::new(ip_with_port).description(desc));
             }
         }
     }
