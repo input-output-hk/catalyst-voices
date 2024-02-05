@@ -10,6 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  web: ^0.3.0
 
 dev_dependencies:
    catalyst_analysis:

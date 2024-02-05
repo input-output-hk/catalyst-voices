@@ -20,10 +20,7 @@ final class AppRouter {
       initialLocation: _isWeb(),
       refreshListenable: AppRouterRefreshStream(authenticationBloc.stream),
       redirect: (context, state) => _guard(authenticationBloc, state),
-      routes: [
-        ...login_route.$appRoutes,
-        ...home_route.$appRoutes,
-      ],
+      routes: _routes(),
     );
   }
 
@@ -51,5 +48,12 @@ final class AppRouter {
     } else {
       return null;
     }
+  }
+
+  static List<RouteBase> _routes() {
+    return [
+      ...login_route.$appRoutes,
+      ...home_route.$appRoutes,
+    ];
   }
 }
