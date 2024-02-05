@@ -121,3 +121,6 @@ testcov
 testdocs
 fmtchk
 fmtfix
+gethostname
+afinet
+netifas

@@ -21,8 +21,6 @@ mod test_endpoints;
 mod v0;
 mod v1;
 
-// cspell: words gethostname afinet netifas
-
 /// The name of the API
 const API_TITLE: &str = "Catalyst Gateway";
 
@@ -87,8 +85,8 @@ pub(crate) fn mk_api(
     // Get localhost name
     if let Ok(hostname) = gethostname().into_string() {
         let hostname_with_port = format!("{}:{}", hostname, PORT);
-        service =
-            service.server(ServerObject::new(hostname_with_port).description("Server at localhost name"));
+        service = service
+            .server(ServerObject::new(hostname_with_port).description("Server at localhost name"));
     }
 
     // Get local IP address v4 and v6
