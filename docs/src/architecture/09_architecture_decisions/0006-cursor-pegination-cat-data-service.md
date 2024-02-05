@@ -12,7 +12,8 @@
 ## Context
 
 Our API currently lacks a pagination mechanism, leading to inefficiencies in data retrieval processes,
-especially when dealing with large datasets. This absence has resulted in longer load times and
+especially when dealing with large datasets.
+This absence has resulted in longer load times and
 a strained user experience, prompting the need for a scalable solution to manage data access and navigation effectively.
 
 ## Assumptions
@@ -71,7 +72,6 @@ utilizing cursor-based pagination.
 Request: GET `/api/resource?limit=2`
 This retrieves the first two items of the dataset.
 
-
 **Fetching the Next Page**
 
 Request: GET `/api/resource?limit=2&starting_after=eyJpZCI6Iml0ZW0xMDAifQ==`
@@ -84,7 +84,7 @@ Request: GET `/api/resource?limit=2&ending_before=eyJpZCI6Iml0ZW0yMDAifQ==`
 Using a `prev_cursor` value, this would fetch the two items before the current page,
 assuming `prev_cursor` is implemented and provided in your system.
 
-These examples demonstrate how clients would use the API to navigate through data pages efficiently, 
+These examples demonstrate how clients would use the API to navigate through data pages efficiently,
 utilizing cursor-based pagination.
 
 ## Risks
