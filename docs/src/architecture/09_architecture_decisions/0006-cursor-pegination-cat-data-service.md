@@ -67,17 +67,17 @@ Example JSON response:
 These examples demonstrate how clients would use the API to navigate through data pages efficiently,
 utilizing cursor-based pagination.
 
-**Initial Fetch with Limit**
+#### Initial Fetch with Limit
 
 Request: GET `/api/resource?limit=2`
 This retrieves the first two items of the dataset.
 
-**Fetching the Next Page**
+#### Fetching the Next Page
 
 Request: GET `/api/resource?limit=2&starting_after=eyJpZCI6Iml0ZW0xMDAifQ==`
 Using the next_cursor from the previous response, this fetches the next two items.
 
-**Fetching the Previous Page**
+#### Fetching the Previous Page
 
 Request: GET `/api/resource?limit=2&ending_before=eyJpZCI6Iml0ZW0yMDAifQ==`
 
