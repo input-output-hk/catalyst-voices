@@ -124,8 +124,6 @@ overrides:
 - files:
   - '**#/servers'
   rules:
-    # Ref: https://github.com/stoplightio/spectral-documentation/blob/a34ca1b49cbd1ac5a75cfcb93c69d1d77bde341e/src/ruleset.ts#L173
-    docs-description: off
     # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L767
     owasp:api7:2019-security-hosts-https-oas3: off
 
