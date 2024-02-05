@@ -5,7 +5,7 @@ build:
     RUN cargo build -p cat-gateway --release
     SAVE ARTIFACT target/release/cat-gateway cat-gateway
 
-cat-gateway-publish:
+package-cat-gateway:
     FROM alpine:3.19
     ARG tag="latest"
     ARG address
@@ -16,7 +16,7 @@ cat-gateway-publish:
     ENTRYPOINT ./cat-gateway run --address $address --database-url $db_url --log-level $log_level
     SAVE IMAGE cat-gateway:$tag
 
-schemathesis-publish:
+package-schemathesis:
     FROM python:3.12-alpine3.19
     ARG tag="latest"
     ARG max_examples=1000
@@ -40,9 +40,9 @@ fuzzer-api-test:
     COPY integration/docker-compose.yml .
     WITH DOCKER \
         --compose docker-compose.yml \
-        --load schemathesis:latest=(+schemathesis-publish --openapi_spec="http://127.0.0.1:3030/docs/cat-gateway.json") \
+        --load schemathesis:latest=(+package-schemathesis --openapi_spec="http://127.0.0.1:3030/docs/cat-gateway.json") \
         --load event-db:latest=(../event-db+build --with_historic_data=false) \
-        --load cat-gateway:latest=(+cat-gateway-publish --address="127.0.0.1:3030" \
+        --load cat-gateway:latest=(+package-cat-gateway --address="127.0.0.1:3030" \
                                         --db_url="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev") \
         --service event-db \
         --service cat-gateway \
