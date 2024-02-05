@@ -84,7 +84,7 @@ pub(crate) fn mk_api(
 
     // Get localhost name
     if let Ok(hostname) = gethostname().into_string() {
-        let hostname_with_port = format!("{}:{}", hostname, PORT);
+        let hostname_with_port = format!("{hostname}:{PORT}");
         service = service
             .server(ServerObject::new(hostname_with_port).description("Server at localhost name"));
     }
@@ -92,15 +92,15 @@ pub(crate) fn mk_api(
     // Get local IP address v4 and v6
     let network_interfaces = list_afinet_netifas();
     if let Ok(network_interfaces) = network_interfaces {
-        for (name, ip) in network_interfaces.iter() {
+        for (name, ip) in &network_interfaces {
             if *name == "en0" {
                 let (ip_with_port, desc) = match ip {
                     IpAddr::V4(_) => {
-                        let ip_str = format!("{}:{}", ip, PORT);
+                        let ip_str = format!("{ip}:{PORT}");
                         (ip_str, "Server at local IPv4 address")
                     },
                     IpAddr::V6(_) => {
-                        let ip_str = format!("[{}]:{}", ip, PORT);
+                        let ip_str = format!("[{ip}]:{PORT}");
                         (ip_str, "Server at local IPv6 address")
                     },
                 };
