@@ -18,7 +18,7 @@ a strained user experience, prompting the need for a scalable solution to manage
 
 ## Assumptions
 
-* he assumption that cursor-based pagination will be universally supported and understood by all clients consuming our API.
+* The assumption that cursor-based pagination will be universally supported and understood by all clients consuming our API.
 * Assuming our database and backend infrastructure can efficiently support cursor-based operations without
  significant refactoring or performance degradation.
 * The expectation that data growth will continue at its current pace or accelerate,
