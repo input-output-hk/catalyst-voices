@@ -33,7 +33,8 @@ pub(crate) struct AccountVote {
     /// The hex-encoded ID of the vote plan.
     pub(crate) vote_plan_id: VotePlanId,
     /// Array of the proposal numbers voted for by the account ID within the vote plan.
-    #[oai(validator(max_items = "255", minimum(value = "0"), maximum(value = "500")))]
+    // TODO - recheck max items
+    #[oai(validator(max_items = "500", minimum(value = "0"), maximum(value = "255")))]
     pub(crate) votes: Vec<u8>,
 }
 
