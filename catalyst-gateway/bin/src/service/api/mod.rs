@@ -2,7 +2,11 @@
 //!
 //! This defines all endpoints for the Catalyst Gateway API.
 //! It however does NOT contain any processing for them, that is defined elsewhere.
+use std::net::IpAddr;
+
+use gethostname::gethostname;
 use health::HealthApi;
+use local_ip_address::list_afinet_netifas;
 use poem_openapi::{ContactObject, LicenseObject, OpenApiService, ServerObject};
 use registration::RegistrationApi;
 use test_endpoints::TestApi;
@@ -22,6 +26,9 @@ const API_TITLE: &str = "Catalyst Gateway";
 
 /// The version of the API
 const API_VERSION: &str = "1.2.0";
+
+/// Port
+const PORT: &str = "5432";
 
 /// Get the contact details for inquiring about the API
 fn get_api_contact() -> ContactObject {
@@ -75,5 +82,24 @@ pub(crate) fn mk_api(
         service = service.server(ServerObject::new(host));
     }
 
+    // Get local hostname
+    if let Ok(hostname) = gethostname().into_string() {
+        let hostname_with_port = format!("{}:{}", hostname, PORT);
+        service = service.server(ServerObject::new(hostname_with_port));
+    }
+
+    // Get local IP address v4 and v6
+    let network_interfaces = list_afinet_netifas();
+    if let Ok(network_interfaces) = network_interfaces {
+        for (name, ip) in network_interfaces.iter() {
+            if *name == "en0" {
+                let ip_with_port = match ip {
+                    IpAddr::V4(_) => format!("{}:{}", ip, PORT),
+                    IpAddr::V6(_) => format!("[{}]:{}", ip, PORT),
+                };
+                service = service.server(ServerObject::new(ip_with_port));
+            }
+        }
+    }
     service
 }
