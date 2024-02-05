@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "schema-mismatch"
+version = "0.1.0"
+description = ""
+authors = ["Joaquín Rosales <joaquin.rosales@iohk.io>"]
+readme = "README.md"
+license = "MIT or Apache-2.0"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+loguru = "^0.7.2"
+asyncio = "^3.4.3"
+asyncpg = "^0.29.0"
+pytest = "^8.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
