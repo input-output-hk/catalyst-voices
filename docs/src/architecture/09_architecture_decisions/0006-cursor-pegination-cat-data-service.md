@@ -1,5 +1,5 @@
 ---
-    title: 0005 Cursor-based pagination for Catalyst Data Service
+    title: 0006 Cursor-based pagination for Catalyst Data Service
     adr:
         author: Oleksandr Prokhorenko
         created: 05-Feb-2024
