@@ -82,9 +82,11 @@ impl RegistrationApi {
                 )
                 .await;
             match voter {
-                Ok(voter) => match voter.try_into() {
-                    Ok(voter) => T200(OK(Json(voter))),
-                    Err(err) => T500(server_error!("{}", err.to_string())),
+                Ok(voter) => {
+                    match voter.try_into() {
+                        Ok(voter) => T200(OK(Json(voter))),
+                        Err(err) => T500(server_error!("{}", err.to_string())),
+                    }
                 },
                 Err(crate::event_db::error::Error::NotFound(_)) => T404(NotFound),
                 Err(err) => T500(server_error!("{}", err.to_string())),
