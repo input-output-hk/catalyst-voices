@@ -90,19 +90,12 @@ pub(crate) fn mk_api(
     }
 
     // Get local IP address v4 and v6
-    let network_interfaces = list_afinet_netifas();
-    if let Ok(network_interfaces) = network_interfaces {
+    if let Ok(network_interfaces) = list_afinet_netifas() {
         for (name, ip) in &network_interfaces {
             if *name == "en0" {
                 let (ip_with_port, desc) = match ip {
-                    IpAddr::V4(_) => {
-                        let ip_str = format!("{ip}:{PORT}");
-                        (ip_str, "Server at local IPv4 address")
-                    },
-                    IpAddr::V6(_) => {
-                        let ip_str = format!("[{ip}]:{PORT}");
-                        (ip_str, "Server at local IPv6 address")
-                    },
+                    IpAddr::V4(_) => (format!("{ip}:{PORT}"), "Server at local IPv4 address"),
+                    IpAddr::V6(_) => (format!("[{ip}]:{PORT}"), "Server at local IPv6 address"),
                 };
                 service = service.server(ServerObject::new(ip_with_port).description(desc));
             }
