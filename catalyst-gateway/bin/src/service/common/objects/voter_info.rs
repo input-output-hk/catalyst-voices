@@ -28,7 +28,7 @@ pub(crate) struct VoterInfo {
     /// Can be used to gauge potential voting power saturation.
     /// This value is NOT saturated however, and gives the raw share of total registered
     /// voting power.
-    #[oai(validator(minimum(value = "0"), maximum(value = "1.7976931348623157e308")))]
+    #[oai(validator(minimum(value = "0"), maximum(value = "100")))]
     voting_power_saturation: f64,
 
     /// List of stake public key addresses which delegated to this voting key.
