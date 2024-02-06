@@ -1,8 +1,7 @@
 // Integration test example
 //
 
-// TODO - move this integration test into other place,
-//        so it will not execute during common Rust test procedure.
+// TODO (Blue) : https://github.com/input-output-hk/catalyst-voices/issues/238
 #[tokio::test]
 #[ignore]
 async fn health_live() {

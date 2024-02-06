@@ -33,7 +33,7 @@ pub(crate) struct VoterInfo {
 
     /// List of stake public key addresses which delegated to this voting key.
     #[oai(skip_serializing_if_is_none = true)]
-    // TODO - Recheck max items
+    // TODO (Blue) : https://github.com/input-output-hk/catalyst-voices/issues/239
     #[oai(validator(max_items = "100"))]
     delegator_addresses: Option<Vec<DelegatePublicKey>>,
 }
