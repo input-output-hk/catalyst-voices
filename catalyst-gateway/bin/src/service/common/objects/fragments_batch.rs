@@ -18,9 +18,9 @@ pub(crate) struct FragmentsBatch {
     // TODO (Blue) : https://github.com/input-output-hk/catalyst-voices/issues/239
     #[oai(validator(
         max_items = "100",
-        max_length = 64,
-        min_length = 64,
-        pattern = "[0-9a-f]{64}"
+        max_length = 66,
+        min_length = 66,
+        pattern = "0x[0-9a-f]{64}"
     ))]
     pub fragments: Vec<FragmentDef>,
 }

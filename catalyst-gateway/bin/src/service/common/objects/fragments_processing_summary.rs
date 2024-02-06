@@ -12,7 +12,7 @@ pub(crate) struct FragmentId(String);
 
 impl Example for FragmentId {
     fn example() -> Self {
-        Self("7db6f91f3c92c0aef7b3dd497e9ea275229d2ab4dba6a1b30ce6b32db9c9c3b2".into())
+        Self("0x7db6f91f3c92c0aef7b3dd497e9ea275229d2ab4dba6a1b30ce6b32db9c9c3b2".into())
     }
 }
 #[derive(Enum)]
@@ -33,7 +33,7 @@ pub(crate) enum ReasonRejected {
 /// Information about a rejected fragment.
 pub(crate) struct RejectedFragment {
     #[oai(rename = "id")]
-    #[oai(validator(max_length = 64, min_length = 64, pattern = "[0-9a-f]{64}"))]
+    #[oai(validator(max_length = 66, min_length = 66, pattern = "0x[0-9a-f]{64}"))]
     /// The ID of the rejected fragment.
     ///
     /// Currently, the hex encoded bytes that represent the fragment ID. In the
@@ -66,9 +66,9 @@ pub(crate) struct FragmentsProcessingSummary {
     // Pattern: hex
     #[oai(validator(
         max_items = "100",
-        max_length = 64,
-        min_length = 64,
-        pattern = "[0-9a-f]{64}"
+        max_length = 66,
+        min_length = 66,
+        pattern = "0x[0-9a-f]{64}"
     ))]
     accepted: Vec<FragmentId>,
     /// Detailed information about rejected fragments.
