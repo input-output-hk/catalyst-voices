@@ -114,10 +114,3 @@ overrides:
   rules:
     # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L698
     owasp:api6:2019-constrained-additionalProperties: off
-
-- files:
-  - '**#/servers'
-  rules:
-    # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L767
-    owasp:api7:2019-security-hosts-https-oas3: off
-
