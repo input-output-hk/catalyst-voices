@@ -60,6 +60,10 @@ overrides:
     # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L376
     owasp:api3:2019-define-error-responses-401: warn
 
+    # UUID rules for name containing "id" is ignored    
+    # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L102
+    owasp:api1:2019-no-numeric-ids: off
+
 - files:
   - '**#/paths/~1api~1health~1live/get/responses'
   - '**#/paths/~1api~1health~1started/get/responses'
@@ -110,16 +114,6 @@ overrides:
   rules:
     # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L698
     owasp:api6:2019-constrained-additionalProperties: off
-
-- files:
-  # Ignore event_id
-  - '**#/paths/~1api~1registration~1voter~1%7Bvoting_key%7D/get/parameters/1/schema'
-  # Ignore the test id
-  - '**#/paths/~1api~1test~1test~1%7Bid%7D~1test~1%7Baction%7D/post/parameters/0/schema'
-  - '**#/paths/~1api~1test~1test~1%7Bid%7D~1test~1%7Baction%7D/get/parameters/0/schema'
-  rules:
-    # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L102
-    owasp:api1:2019-no-numeric-ids: off
 
 - files:
   - '**#/servers'
