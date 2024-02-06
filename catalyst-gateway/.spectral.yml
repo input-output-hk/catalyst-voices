@@ -3,7 +3,7 @@
 # OWASP Top 10: https://github.com/stoplightio/spectral-owasp-ruleset/blob/v1.4.3/src/ruleset.ts
 # Documentations: https://github.com/stoplightio/spectral-documentation/blob/v1.3.1/src/ruleset.ts
 
-# cspell: words OWASP owasp Baction
+# cspell: words OWASP owasp Baction Baccount
 
 # Use CDN hosted version for spectral-documentation and spectral-owasp
 extends:
