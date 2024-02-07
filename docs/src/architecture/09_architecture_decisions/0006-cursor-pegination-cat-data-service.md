@@ -36,7 +36,7 @@ with a minimum of 1 and a maximum no greater than 100.
 
 The JSON response structure will include fields such as
 
-* `data` - containing the requested data,
+* `data` - containing the requested data. Data must always be deterministically sorted, such that id always return in the same order, regardless of the pagination,
 * `has_more` - indicating whether more data is available,
 * `next_cursor`- the cursor to use for the next page of results,
 * `prev_cursor` - the cursor to use for the previous page of results.
