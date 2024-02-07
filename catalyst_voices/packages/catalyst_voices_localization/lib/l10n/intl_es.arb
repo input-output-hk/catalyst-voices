@@ -1,8 +1,13 @@
 {
   "@@locale": "es",
-  "loginScreenUsernameLabelText": "Nombre de usuario",
-  "loginScreenPasswordLabelText": "Contraseña",
+  "emailLabelText": "Email",
+  "emailHintText": "mail@example.com",
+  "emailErrorText": "mail@example.com",
+  "passwordLabelText": "Contraseña",
+  "passwordHintText": "Mi1ContraseñaSecreta",
+  "passwordErrorText": "La contraseña debe tener al menos 8 caracteres",
+  "loginTitleText": "Acceso",
+  "loginButtonText": "Acceso",
   "loginScreenErrorMessage": "Credenciales incorrectas",
-  "loginScreenLoginButtonText": "Acceso",
-  "homeScreenLoginButtonText": "Catalyst Voices - Inicio 🇪🇸"
+  "homeScreenText": "Catalyst Voices"
 }
