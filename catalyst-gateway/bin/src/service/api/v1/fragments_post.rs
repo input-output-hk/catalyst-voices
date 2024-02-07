@@ -9,6 +9,7 @@ use crate::service::common::{
     },
     responses::{
         resp_2xx::OK,
+        resp_4xx::BadRequest,
         resp_5xx::{ServerError, ServiceUnavailable},
     },
 };
@@ -16,6 +17,7 @@ use crate::service::common::{
 /// All responses
 pub(crate) type AllResponses = response! {
     200: OK<Json<FragmentsProcessingSummary>>,
+    400: BadRequest<Json<FragmentsProcessingSummary>>,
     500: ServerError,
     503: ServiceUnavailable,
 };
@@ -27,6 +29,7 @@ pub(crate) type AllResponses = response! {
 /// ## Responses
 ///
 /// * 200 No Content - Service is OK and can keep running.
+/// * 400 Bad Request
 /// * 500 Server Error - If anything within this function fails unexpectedly. (Possible
 ///   but unlikely)
 /// * 503 Service Unavailable - Service is possibly not running reliably.

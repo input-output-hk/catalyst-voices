@@ -2,13 +2,20 @@
 
 use std::sync::Arc;
 
-use poem::web::{Data, Path};
-use poem_openapi::{param::Query, payload::Json, OpenApi};
+use poem::web::Data;
+use poem_openapi::{
+    param::{Path, Query},
+    payload::Json,
+    OpenApi,
+};
 
 use crate::{
     service::{
         common::{
-            objects::{account_votes::AccountId, fragments_batch::FragmentsBatch},
+            objects::{
+                account_votes::AccountId, fragments_batch::FragmentsBatch,
+                fragments_processing_summary::FragmentId,
+            },
             tags::ApiTags,
         },
         utilities::middleware::schema_validation::schema_version_validation,
@@ -31,10 +38,15 @@ impl V1Api {
         operation_id = "AccountVotes",
         transform = "schema_version_validation"
     )]
+
+    /// Get Account Votes
+    ///
     /// Get from all active vote plans, the index of the voted proposals
-    /// by th given account ID.
+    /// by the given account ID.
     async fn get_account_votes(
-        &self, state: Data<&Arc<State>>, account_id: Path<AccountId>,
+        &self, state: Data<&Arc<State>>,
+        /// A account ID to get the votes for.
+        account_id: Path<AccountId>,
     ) -> account_votes_get::AllResponses {
         account_votes_get::endpoint(state, account_id).await
     }
@@ -73,7 +85,9 @@ impl V1Api {
         &self,
         /// Comma-separated list of fragment ids for which the statuses will
         /// be retrieved.
-        Query(fragment_ids): Query<fragments_statuses::FragmentIds>,
+        // TODO (Blue) : https://github.com/input-output-hk/catalyst-voices/issues/239
+        #[oai(validator(max_items = "1000"))]
+        Query(fragment_ids): Query<Vec<FragmentId>>,
     ) -> fragments_statuses::AllResponses {
         fragments_statuses::endpoint(fragment_ids).await
     }

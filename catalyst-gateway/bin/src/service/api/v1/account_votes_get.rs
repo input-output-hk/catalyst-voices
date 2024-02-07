@@ -2,15 +2,16 @@
 
 use std::sync::Arc;
 
-use poem::web::{Data, Path};
+use poem::web::Data;
 use poem_extensions::{response, UniResponse::T200};
-use poem_openapi::payload::Json;
+use poem_openapi::{param::Path, payload::Json};
 
 use crate::{
     service::common::{
         objects::account_votes::{AccountId, AccountVote},
         responses::{
             resp_2xx::OK,
+            resp_4xx::BadRequest,
             resp_5xx::{ServerError, ServiceUnavailable},
         },
     },
@@ -20,6 +21,7 @@ use crate::{
 /// All responses
 pub(crate) type AllResponses = response! {
     200: OK<Json<Vec<AccountVote>>>,
+    400: BadRequest<Json<Vec<AccountVote>>>,
     500: ServerError,
     503: ServiceUnavailable,
 };
@@ -34,6 +36,7 @@ pub(crate) type AllResponses = response! {
 /// ## Responses
 ///
 /// * 200 with a JSON array of the number of voted proposals in a plan.
+/// * 400 Bad request with a JSON array of the number of voted proposals in a plan
 /// * 500 Server Error - If anything within this function fails unexpectedly. (Possible
 ///   but unlikely)
 /// * 503 Service Unavailable - Service has not started, do not send other requests.

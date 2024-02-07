@@ -5,12 +5,14 @@ use tracing::{error, info, warn};
 
 use crate::service::common::responses::{
     resp_2xx::NoContent,
+    resp_4xx::ApiValidationError,
     resp_5xx::{ServerError, ServiceUnavailable},
 };
 
 /// All responses
 pub(crate) type AllResponses = response! {
     204: NoContent,
+    400: ApiValidationError,
     500: ServerError,
     503: ServiceUnavailable,
 };
@@ -28,6 +30,7 @@ pub(crate) type AllResponses = response! {
 /// ## Responses
 ///
 /// * 204 No Content - Service is OK and can keep running.
+/// * 400 API Validation Error
 /// * 500 Server Error - If anything within this function fails unexpectedly. (Possible
 ///   but unlikely)
 /// * 503 Service Unavailable - Service is possibly not running reliably.
