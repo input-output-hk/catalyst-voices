@@ -12,8 +12,8 @@ command:
     workspaceChangelog: true
   bootstrap:
     environment:
-      sdk: '>=3.2.5 <4.0.0'
-      flutter: 3.16.8
+      sdk: '>=3.2.6 <4.0.0'
+      flutter: 3.16.9
     dependencies:
       bloc_concurrency: ^0.2.2
       bloc: ^8.1.2
