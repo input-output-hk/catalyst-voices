@@ -51,6 +51,7 @@ pub(crate) struct ServiceSettings {
     #[clap(long, default_value = LOG_LEVEL_DEFAULT)]
     pub(crate) log_level: LogLevel,
 
+    /// Common settings.
     #[clap(flatten)]
     pub(crate) common_settings: CommonSettings,
 }
@@ -62,10 +63,11 @@ pub(crate) struct DocsSettings {
     pub(crate) output: Option<PathBuf>,
 
     #[clap(flatten)]
+    /// Common settings.
     pub(crate) common_settings: CommonSettings,
 }
 
-/// Common settings for the application and OpenAPI docs generation.
+/// Common settings for the application and `OpenAPI` docs generation.
 #[derive(Args, Clone)]
 pub(crate) struct CommonSettings {
     /// Server binding address

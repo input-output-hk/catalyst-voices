@@ -77,9 +77,6 @@ pub(crate) fn mk_api(
     // Retrieve the port from the socket address
     let port = settings.address.port().to_string();
 
-    let is_http_auto_servers = settings.http_auto_servers;
-    let is_https_auto_servers = settings.https_auto_servers;
-
     let server_name = &settings.server_name;
 
     for host in hosts {
@@ -95,8 +92,8 @@ pub(crate) fn mk_api(
     if let Ok(hostname) = gethostname().into_string() {
         let hostname_addresses = add_protocol_prefix(
             &format!("{hostname}:{port}"),
-            is_http_auto_servers,
-            is_https_auto_servers,
+            settings.http_auto_servers,
+            settings.https_auto_servers,
         );
         for hostname_address in hostname_addresses {
             service = service.server(
@@ -114,7 +111,7 @@ pub(crate) fn mk_api(
                     IpAddr::V6(_) => (format!("[{ip}]:{port}"), "Server at local IPv6 address"),
                 };
                 let ip_addresses =
-                    add_protocol_prefix(&ip_with_port, is_http_auto_servers, is_https_auto_servers);
+                    add_protocol_prefix(&ip_with_port, settings.http_auto_servers, settings.https_auto_servers);
                 for address in ip_addresses {
                     service = service.server(ServerObject::new(address).description(desc));
                 }
@@ -124,16 +121,14 @@ pub(crate) fn mk_api(
     service
 }
 
-// Function to add protocol prefix based on flags
-fn add_protocol_prefix(
-    address: &String, is_http_auto_servers: bool, is_https_auto_servers: bool,
-) -> Vec<String> {
+/// Function to add protocol prefix based on flags.
+fn add_protocol_prefix(address: &String, is_http: bool, is_https: bool) -> Vec<String> {
     let mut addresses = Vec::new();
-    if is_http_auto_servers {
-        addresses.push(format!("http://{}", address));
+    if is_http {
+        addresses.push(format!("http://{address}"));
     }
-    if is_https_auto_servers {
-        addresses.push(format!("https://{}", address));
+    if is_https {
+        addresses.push(format!("https://{address}"));
     }
     addresses
 }
