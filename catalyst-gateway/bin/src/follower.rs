@@ -47,11 +47,8 @@ async fn init_follower(
 
     // Check most recent update on cardano update table If it falls within the threshold boundary, node should update db with latest data
 
-    // instead of loop, close follower when updates finished
     tokio::spawn(async move {
         loop {
-            // wait for interupt
-
             let chain_update = follower.next().await.expect("infallible");
 
             match chain_update {
