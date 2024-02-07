@@ -3,37 +3,20 @@ use std::{error::Error, str::FromStr, sync::Arc};
 use cardano_chain_follower::{
     network_genesis_values, ChainUpdate, Follower, FollowerConfigBuilder, Network, Point,
 };
-use serde::{Deserialize, Serialize};
-
 use tracing::{error, info};
 
-use crate::event_db::queries::EventDbQueries;
-
-#[derive(Serialize, Deserialize, Debug)]
-struct Config {
-    network: String,
-    start_from: u64,
-    block_hash: String,
-    relay: String,
-}
+use crate::event_db::queries::{
+    event::config::{FollowerMeta, NetworkMeta},
+    EventDbQueries,
+};
 
 /// Start followers as per defined in the config
 pub(crate) async fn start_followers(
-    configs: Vec<String>, db: Arc<dyn EventDbQueries>,
+    configs: (Vec<NetworkMeta>, FollowerMeta), db: Arc<dyn EventDbQueries>,
 ) -> Result<(), Box<dyn Error>> {
-    let mut errors = vec![];
+    info!("{:?}", configs);
 
-    let configs: Vec<Config> = configs
-        .iter()
-        .map(|config| serde_json::from_str(&config))
-        .filter_map(|r| r.map_err(|e| errors.push(e)).ok())
-        .collect();
-
-    if !errors.is_empty() {
-        error!("errors parsing config {:?}", errors);
-    }
-
-    for config in configs {
+    for config in configs.0 {
         info!("starting follower for {:?}", config.network);
         init_follower(config, db.clone()).await?;
     }
@@ -42,26 +25,27 @@ pub(crate) async fn start_followers(
 }
 
 /// Initiate single follower
-async fn init_follower(config: Config, db: Arc<dyn EventDbQueries>) -> Result<(), Box<dyn Error>> {
+async fn init_follower(
+    network: NetworkMeta, db: Arc<dyn EventDbQueries>,
+) -> Result<(), Box<dyn Error>> {
+    let (slot_no, block_hash) = db.bootstrap_follower_from(network.network.clone()).await?;
+
     // Defaults to start following from the tip.
     let follower_cfg = FollowerConfigBuilder::default()
-        .follow_from(Point::new(
-            config.start_from,
-            hex::decode(config.block_hash)?,
-        ))
+        .follow_from(Point::new(slot_no.try_into()?, hex::decode(block_hash)?))
         .build();
 
     let mut follower = Follower::connect(
-        &config.relay,
-        Network::from_str(&config.network)?,
+        &network.relay,
+        Network::from_str(&network.network)?,
         follower_cfg,
     )
     .await?;
 
-    let genesis_values = network_genesis_values(&Network::from_str(&config.network)?)
+    let genesis_values = network_genesis_values(&Network::from_str(&network.network)?)
         .expect("obtaining genesis values from follower crate is infallible");
 
-    //Check most recent update on cardano update table If it falls within the threshold boundary, node should update db with latest data
+    // Check most recent update on cardano update table If it falls within the threshold boundary, node should update db with latest data
 
     // instead of loop, close follower when updates finished
     tokio::spawn(async move {
@@ -77,7 +61,7 @@ async fn init_follower(config: Config, db: Arc<dyn EventDbQueries>) -> Result<()
                     match db
                         .updates_from_follower(
                             block.slot().try_into().expect("infallible"),
-                            config.network.clone(),
+                            network.network.clone(),
                             block
                                 .epoch(&genesis_values)
                                 .0
@@ -96,6 +80,13 @@ async fn init_follower(config: Config, db: Arc<dyn EventDbQueries>) -> Result<()
                             error!("unable to index follower data {:?}", err);
                         },
                     }
+                    // index the following
+
+                    // utxo stuff
+
+                    // registration stuff
+
+                    // rewards stuff
                 },
                 ChainUpdate::Rollback(data) => {
                     let block = data.decode().expect("infallible");
