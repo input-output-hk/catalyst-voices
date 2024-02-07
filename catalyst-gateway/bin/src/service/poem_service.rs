@@ -27,7 +27,9 @@ use crate::{
 };
 
 /// This exists to allow us to add extra routes to the service for testing purposes.
-fn mk_app(hosts: Vec<String>, base_route: Option<Route>, state: &Arc<State>, socket_addr: &SocketAddr) -> impl Endpoint {
+fn mk_app(
+    hosts: Vec<String>, base_route: Option<Route>, state: &Arc<State>, socket_addr: &SocketAddr,
+) -> impl Endpoint {
     // Get the base route if defined, or a new route if not.
     let base_route = match base_route {
         Some(route) => route,

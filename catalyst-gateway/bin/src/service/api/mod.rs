@@ -76,7 +76,7 @@ pub(crate) fn mk_api(
 
     // Retrieve the port from the socket address
     let port = socket_addr.port().to_string();
-    
+
     // Add all the hosts where this API should be reachable.
     for host in hosts {
         service = service.server(ServerObject::new(host).description("API Host"));
