@@ -1,7 +1,7 @@
 //! Main entrypoint to the service
 use std::sync::Arc;
 
-use crate::{settings::CommonSettings, state::State};
+use crate::{settings::DocsSettings, state::State};
 
 // These Modules contain endpoints
 mod api;
@@ -34,7 +34,7 @@ pub(crate) enum Error {
 ///
 /// ## Arguments
 ///
-/// `settings`: &`CommonSettings` - common setting for the application and docs.
+/// `settings`: &`DocsSetting` - settings for docs
 /// `state`: `Arc<State>` - the state
 ///
 /// ## Errors
@@ -42,6 +42,6 @@ pub(crate) enum Error {
 /// `Error::CannotRunService` - cannot run the service
 /// `Error::EventDbError` - cannot connect to the event db
 /// `Error::IoError` - An IO error has occurred.
-pub(crate) async fn run(settings: &CommonSettings, state: Arc<State>) -> Result<(), Error> {
+pub(crate) async fn run(settings: &DocsSettings, state: Arc<State>) -> Result<(), Error> {
     poem_service::run(settings, state).await
 }

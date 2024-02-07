@@ -22,13 +22,13 @@ use crate::{
         },
         Error,
     },
-    settings::{get_api_host_names, CommonSettings, API_URL_PREFIX},
+    settings::{get_api_host_names, DocsSettings, API_URL_PREFIX},
     state::State,
 };
 
 /// This exists to allow us to add extra routes to the service for testing purposes.
 fn mk_app(
-    hosts: Vec<String>, base_route: Option<Route>, state: &Arc<State>, settings: &CommonSettings,
+    hosts: Vec<String>, base_route: Option<Route>, state: &Arc<State>, settings: &DocsSettings,
 ) -> impl Endpoint {
     // Get the base route if defined, or a new route if not.
     let base_route = match base_route {
@@ -54,7 +54,7 @@ fn mk_app(
 }
 
 /// Get the API docs as a string in the JSON format.
-pub(crate) fn get_app_docs(setting: &CommonSettings) -> String {
+pub(crate) fn get_app_docs(setting: &DocsSettings) -> String {
     let api_service = mk_api(vec![], setting);
     api_service.spec()
 }
@@ -65,14 +65,14 @@ pub(crate) fn get_app_docs(setting: &CommonSettings) -> String {
 ///
 /// # Arguments
 ///
-/// *`settings`: &`CommonSettings` - common setting for the application and docs.
+/// *`settings`: &`DocsSetting` - settings for docs
 ///
 /// # Errors
 ///
 /// * `Error::CannotRunService` - cannot run the service
 /// * `Error::EventDbError` - cannot connect to the event db
 /// * `Error::IoError` - An IO error has occurred.
-pub(crate) async fn run(settings: &CommonSettings, state: Arc<State>) -> Result<(), Error> {
+pub(crate) async fn run(settings: &DocsSettings, state: Arc<State>) -> Result<(), Error> {
     // The address to listen on
     let addr = settings.address;
     tracing::info!("Starting Poem Service ...");

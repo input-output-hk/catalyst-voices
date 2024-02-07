@@ -13,7 +13,7 @@ use test_endpoints::TestApi;
 use v0::V0Api;
 use v1::V1Api;
 
-use crate::settings::{CommonSettings, API_URL_PREFIX};
+use crate::settings::{DocsSettings, API_URL_PREFIX};
 
 mod health;
 mod registration;
@@ -61,7 +61,7 @@ const TERMS_OF_SERVICE: &str =
 
 /// Create the `OpenAPI` definition
 pub(crate) fn mk_api(
-    hosts: Vec<String>, settings: &CommonSettings,
+    hosts: Vec<String>, settings: &DocsSettings,
 ) -> OpenApiService<(TestApi, HealthApi, RegistrationApi, V0Api, V1Api), ()> {
     let mut service = OpenApiService::new(
         (TestApi, HealthApi, RegistrationApi, V0Api, V1Api),

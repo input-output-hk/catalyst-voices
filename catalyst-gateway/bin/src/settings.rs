@@ -51,9 +51,9 @@ pub(crate) struct ServiceSettings {
     #[clap(long, default_value = LOG_LEVEL_DEFAULT)]
     pub(crate) log_level: LogLevel,
 
-    /// Common settings.
+    /// Docs settings.
     #[clap(flatten)]
-    pub(crate) common_settings: CommonSettings,
+    pub(crate) docs_settings: DocsSettings,
 }
 
 /// Settings specifies `OpenAPI` docs generation.
@@ -62,14 +62,6 @@ pub(crate) struct DocsSettings {
     /// The output path to the generated docs file, if omitted prints to stdout.
     pub(crate) output: Option<PathBuf>,
 
-    #[clap(flatten)]
-    /// Common settings.
-    pub(crate) common_settings: CommonSettings,
-}
-
-/// Common settings for the application and `OpenAPI` docs generation.
-#[derive(Args, Clone)]
-pub(crate) struct CommonSettings {
     /// Server binding address
     #[clap(long, default_value = ADDRESS_DEFAULT)]
     pub(crate) address: SocketAddr,
