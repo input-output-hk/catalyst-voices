@@ -30,7 +30,7 @@ This system will rely on ans enabling clients to efficiently fetch data in chunk
 understand when more data is available:
 
 * `limit` - This establishes a restriction on the quantity of objects to be returned,
-with a minimum of 1 and a maximum of 100.
+with a minimum of 1 and a maximum no greater than 100.
 * `starting_after`- the cursor to start returning results from,
 * `ending_before`- the cursor to stop returning results at.
 
