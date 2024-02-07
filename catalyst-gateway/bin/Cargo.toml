@@ -68,3 +68,5 @@ panic-message = { workspace = true }
 cpu-time = { workspace = true }
 ulid = { workspace = true, features = ["serde", "uuid"] }
 rust-embed = { workspace = true }
+local-ip-address.workspace = true
+gethostname.workspace = true
