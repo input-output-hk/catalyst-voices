@@ -4,7 +4,6 @@
         author: Oleksandr Prokhorenko
         created: 05-Feb-2024
         status:  proposed
-        extends:
     tags:
         - api
 ---
