@@ -2,7 +2,7 @@
 //!
 //! This provides only the primary entrypoint to the service.
 
-use std::{net::SocketAddr, sync::Arc};
+use std::sync::Arc;
 
 use poem::{
     endpoint::PrometheusExporter,
@@ -22,13 +22,13 @@ use crate::{
         },
         Error,
     },
-    settings::{get_api_host_names, API_URL_PREFIX},
+    settings::{get_api_host_names, CommonSettings, API_URL_PREFIX},
     state::State,
 };
 
 /// This exists to allow us to add extra routes to the service for testing purposes.
 fn mk_app(
-    hosts: Vec<String>, base_route: Option<Route>, state: &Arc<State>, socket_addr: &SocketAddr,
+    hosts: Vec<String>, base_route: Option<Route>, state: &Arc<State>, settings: &CommonSettings,
 ) -> impl Endpoint {
     // Get the base route if defined, or a new route if not.
     let base_route = match base_route {
@@ -36,7 +36,7 @@ fn mk_app(
         None => Route::new(),
     };
 
-    let api_service = mk_api(hosts, socket_addr);
+    let api_service = mk_api(hosts, settings);
     let docs = docs(&api_service);
 
     let prometheus_registry = init_prometheus();
@@ -54,8 +54,8 @@ fn mk_app(
 }
 
 /// Get the API docs as a string in the JSON format.
-pub(crate) fn get_app_docs(socket_addr: &SocketAddr) -> String {
-    let api_service = mk_api(vec![], socket_addr);
+pub(crate) fn get_app_docs(setting: &CommonSettings) -> String {
+    let api_service = mk_api(vec![], setting);
     api_service.spec()
 }
 
@@ -65,14 +65,16 @@ pub(crate) fn get_app_docs(socket_addr: &SocketAddr) -> String {
 ///
 /// # Arguments
 ///
-/// *`addr`: &`SocketAddr` - the address to listen on
+/// *`settings`: &`CommonSettings` - common setting for the application and docs.
 ///
 /// # Errors
 ///
 /// * `Error::CannotRunService` - cannot run the service
 /// * `Error::EventDbError` - cannot connect to the event db
 /// * `Error::IoError` - An IO error has occurred.
-pub(crate) async fn run(addr: &SocketAddr, state: Arc<State>) -> Result<(), Error> {
+pub(crate) async fn run(settings: &CommonSettings, state: Arc<State>) -> Result<(), Error> {
+    // The address to listen on
+    let addr = settings.address;
     tracing::info!("Starting Poem Service ...");
     tracing::info!("Listening on {addr}");
 
@@ -82,9 +84,9 @@ pub(crate) async fn run(addr: &SocketAddr, state: Arc<State>) -> Result<(), Erro
     // help find them in the logs if they happen in production.
     set_panic_hook();
 
-    let hosts = get_api_host_names(addr);
+    let hosts = get_api_host_names(&addr);
 
-    let app = mk_app(hosts, None, &state, addr);
+    let app = mk_app(hosts, None, &state, settings);
 
     poem::Server::new(TcpListener::bind(addr))
         .run(app)

@@ -49,11 +49,11 @@ impl Cli {
                 logger::init(settings.log_level)?;
 
                 let state = Arc::new(State::new(Some(settings.database_url)).await?);
-                service::run(&settings.address, state).await?;
+                service::run(&settings.common_settings, state).await?;
                 Ok(())
             },
             Self::Docs(settings) => {
-                let docs = service::get_app_docs(&settings.address);
+                let docs = service::get_app_docs(&settings.common_settings);
                 match settings.output {
                     Some(path) => {
                         let mut docs_file = std::fs::File::create(path)?;
