@@ -110,8 +110,11 @@ pub(crate) fn mk_api(
                     IpAddr::V4(_) => (format!("{ip}:{port}"), "Server at local IPv4 address"),
                     IpAddr::V6(_) => (format!("[{ip}]:{port}"), "Server at local IPv6 address"),
                 };
-                let ip_addresses =
-                    add_protocol_prefix(&ip_with_port, settings.http_auto_servers, settings.https_auto_servers);
+                let ip_addresses = add_protocol_prefix(
+                    &ip_with_port,
+                    settings.http_auto_servers,
+                    settings.https_auto_servers,
+                );
                 for address in ip_addresses {
                     service = service.server(ServerObject::new(address).description(desc));
                 }
