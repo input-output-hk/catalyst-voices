@@ -61,6 +61,10 @@ pub(crate) struct ServiceSettings {
 pub(crate) struct DocsSettings {
     /// The output path to the generated docs file, if omitted prints to stdout.
     pub(crate) output: Option<PathBuf>,
+
+    /// Service settings
+    #[clap(flatten)]
+    pub(crate) service_settings: ServiceSettings,
 }
 
 /// An environment variable read as a string.

@@ -53,7 +53,7 @@ impl Cli {
                 Ok(())
             },
             Self::Docs(settings) => {
-                let docs = service::get_app_docs();
+                let docs = service::get_app_docs(&settings.service_settings.address);
                 match settings.output {
                     Some(path) => {
                         let mut docs_file = std::fs::File::create(path)?;

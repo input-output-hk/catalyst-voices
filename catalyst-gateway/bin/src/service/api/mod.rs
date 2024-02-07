@@ -2,7 +2,7 @@
 //!
 //! This defines all endpoints for the Catalyst Gateway API.
 //! It however does NOT contain any processing for them, that is defined elsewhere.
-use std::net::IpAddr;
+use std::net::{IpAddr, SocketAddr};
 
 use gethostname::gethostname;
 use health::HealthApi;
@@ -26,9 +26,6 @@ const API_TITLE: &str = "Catalyst Gateway";
 
 /// The version of the API
 const API_VERSION: &str = "1.2.0";
-
-/// Port
-const PORT: &str = "5432";
 
 /// Get the contact details for inquiring about the API
 fn get_api_contact() -> ContactObject {
@@ -64,7 +61,7 @@ const TERMS_OF_SERVICE: &str =
 
 /// Create the `OpenAPI` definition
 pub(crate) fn mk_api(
-    hosts: Vec<String>,
+    hosts: Vec<String>, socket_addr: &SocketAddr,
 ) -> OpenApiService<(TestApi, HealthApi, RegistrationApi, V0Api, V1Api), ()> {
     let mut service = OpenApiService::new(
         (TestApi, HealthApi, RegistrationApi, V0Api, V1Api),
@@ -77,6 +74,9 @@ pub(crate) fn mk_api(
     .terms_of_service(TERMS_OF_SERVICE)
     .url_prefix(API_URL_PREFIX.as_str());
 
+    // Retrieve the port from the socket address
+    let port = socket_addr.port().to_string();
+    
     // Add all the hosts where this API should be reachable.
     for host in hosts {
         service = service.server(ServerObject::new(host).description("API Host"));
@@ -84,7 +84,7 @@ pub(crate) fn mk_api(
 
     // Get localhost name
     if let Ok(hostname) = gethostname().into_string() {
-        let hostname_with_port = format!("{hostname}:{PORT}");
+        let hostname_with_port = format!("{hostname}:{port}");
         service = service
             .server(ServerObject::new(hostname_with_port).description("Server at localhost name"));
     }
@@ -94,8 +94,8 @@ pub(crate) fn mk_api(
         for (name, ip) in &network_interfaces {
             if *name == "en0" {
                 let (ip_with_port, desc) = match ip {
-                    IpAddr::V4(_) => (format!("{ip}:{PORT}"), "Server at local IPv4 address"),
-                    IpAddr::V6(_) => (format!("[{ip}]:{PORT}"), "Server at local IPv6 address"),
+                    IpAddr::V4(_) => (format!("{ip}:{port}"), "Server at local IPv4 address"),
+                    IpAddr::V6(_) => (format!("[{ip}]:{port}"), "Server at local IPv6 address"),
                 };
                 service = service.server(ServerObject::new(ip_with_port).description(desc));
             }

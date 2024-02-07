@@ -27,14 +27,14 @@ use crate::{
 };
 
 /// This exists to allow us to add extra routes to the service for testing purposes.
-fn mk_app(hosts: Vec<String>, base_route: Option<Route>, state: &Arc<State>) -> impl Endpoint {
+fn mk_app(hosts: Vec<String>, base_route: Option<Route>, state: &Arc<State>, socket_addr: &SocketAddr) -> impl Endpoint {
     // Get the base route if defined, or a new route if not.
     let base_route = match base_route {
         Some(route) => route,
         None => Route::new(),
     };
 
-    let api_service = mk_api(hosts);
+    let api_service = mk_api(hosts, socket_addr);
     let docs = docs(&api_service);
 
     let prometheus_registry = init_prometheus();
@@ -52,8 +52,8 @@ fn mk_app(hosts: Vec<String>, base_route: Option<Route>, state: &Arc<State>) -> 
 }
 
 /// Get the API docs as a string in the JSON format.
-pub(crate) fn get_app_docs() -> String {
-    let api_service = mk_api(vec![]);
+pub(crate) fn get_app_docs(socket_addr: &SocketAddr) -> String {
+    let api_service = mk_api(vec![], socket_addr);
     api_service.spec()
 }
 
@@ -82,7 +82,7 @@ pub(crate) async fn run(addr: &SocketAddr, state: Arc<State>) -> Result<(), Erro
 
     let hosts = get_api_host_names(addr);
 
-    let app = mk_app(hosts, None, &state);
+    let app = mk_app(hosts, None, &state, addr);
 
     poem::Server::new(TcpListener::bind(addr))
         .run(app)
