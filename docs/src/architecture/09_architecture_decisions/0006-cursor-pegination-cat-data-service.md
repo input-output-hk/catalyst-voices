@@ -3,7 +3,7 @@
     adr:
         author: Oleksandr Prokhorenko
         created: 05-Feb-2024
-        status:  proposed
+        status:  accepted
     tags:
         - api
 ---
@@ -40,8 +40,6 @@ The JSON response structure will include fields such as
   Data must always be deterministically sorted,
 such that id always return in the same order, regardless of the pagination,
 * `has_more` - indicating whether more data is available,
-* `next_cursor`- the cursor to use for the next page of results,
-* `prev_cursor` - the cursor to use for the previous page of results.
 
 Example JSON response:
 
@@ -58,8 +56,6 @@ Example JSON response:
     }
   ],
   "has_more": true
-  "next_cursor": "item3",
-  "prev_cursor": null
 }
 ```
 
