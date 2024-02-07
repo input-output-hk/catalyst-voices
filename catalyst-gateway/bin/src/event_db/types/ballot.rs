@@ -12,7 +12,7 @@ pub(crate) struct ObjectiveChoices(pub(crate) Vec<String>);
 pub(crate) struct BallotType(pub(crate) String);
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-/// Vote Plan
+/// Voting Plan
 pub(crate) struct VotePlan {
     /// Chain proposal index
     pub(crate) chain_proposal_index: i64,

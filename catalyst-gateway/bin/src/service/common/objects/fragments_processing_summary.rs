@@ -12,7 +12,7 @@ pub(crate) struct FragmentId(String);
 
 impl Example for FragmentId {
     fn example() -> Self {
-        Self("7db6f91f3c92c0aef7b3dd497e9ea275229d2ab4dba6a1b30ce6b32db9c9c3b2".into())
+        Self("0x7db6f91f3c92c0aef7b3dd497e9ea275229d2ab4dba6a1b30ce6b32db9c9c3b2".into())
     }
 }
 #[derive(Enum)]
@@ -33,13 +33,15 @@ pub(crate) enum ReasonRejected {
 /// Information about a rejected fragment.
 pub(crate) struct RejectedFragment {
     #[oai(rename = "id")]
-    #[oai(validator(max_length = 64, min_length = 64, pattern = "[0-9a-f]{64}"))]
+    #[oai(validator(max_length = 66, min_length = 66, pattern = "0x[0-9a-f]{64}"))]
     /// The ID of the rejected fragment.
     ///
     /// Currently, the hex encoded bytes that represent the fragment ID. In the
     /// future, this might change to including the prefix "0x".
     fragment_id: FragmentId,
     /// The number of the pool that caused this error.
+    // TODO (Blue) : https://github.com/input-output-hk/catalyst-voices/issues/239
+    #[oai(validator(minimum(value = "0"), maximum(value = "4294967295")))]
     pool_number: usize,
     /// The reason why this fragment was rejected.
     reason: ReasonRejected,
@@ -60,8 +62,18 @@ impl Example for RejectedFragment {
 /// Information about whether a message was accepted or rejected.
 pub(crate) struct FragmentsProcessingSummary {
     /// IDs of accepted fragments.
+    // TODO (Blue) : https://github.com/input-output-hk/catalyst-voices/issues/239
+    // Pattern: hex
+    #[oai(validator(
+        max_items = "100",
+        max_length = 66,
+        min_length = 66,
+        pattern = "0x[0-9a-f]{64}"
+    ))]
     accepted: Vec<FragmentId>,
     /// Detailed information about rejected fragments.
+    // TODO (Blue) : https://github.com/input-output-hk/catalyst-voices/issues/239
+    #[oai(validator(max_items = "100"))]
     rejected: Vec<RejectedFragment>,
 }
 

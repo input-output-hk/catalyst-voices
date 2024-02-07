@@ -15,6 +15,13 @@ pub(crate) struct FragmentsBatch {
     /// stopped after the first error occurs.
     pub fail_fast: bool,
     /// Array of hex-encoded fragments bytes.
+    // TODO (Blue) : https://github.com/input-output-hk/catalyst-voices/issues/239
+    #[oai(validator(
+        max_items = "100",
+        max_length = 66,
+        min_length = 66,
+        pattern = "0x[0-9a-f]{64}"
+    ))]
     pub fragments: Vec<FragmentDef>,
 }
 

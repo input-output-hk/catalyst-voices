@@ -21,7 +21,7 @@ use crate::{
             },
             responses::{
                 resp_2xx::OK,
-                resp_4xx::NotFound,
+                resp_4xx::{BadRequest, NotFound},
                 resp_5xx::{server_error, ServerError, ServiceUnavailable},
             },
             tags::ApiTags,
@@ -59,7 +59,8 @@ impl RegistrationApi {
         /// The Event ID to return results for.
         /// See [GET Events](Link to events endpoint) for details on retrieving all valid
         /// event IDs.
-        #[oai(validator(minimum(value = "0")))]
+        // TODO (Blue) : https://github.com/input-output-hk/catalyst-voices/issues/239
+        #[oai(validator(minimum(value = "0"), maximum(value = "2147483647")))]
         event_id: Query<Option<EventId>>,
         /// If this optional flag is set, the response will include the delegator's list
         /// in the response. Otherwise, it will be omitted.
@@ -67,6 +68,7 @@ impl RegistrationApi {
         with_delegators: Query<bool>,
     ) -> response! {
            200: OK<Json<VoterRegistration>>,
+           400: BadRequest<Json<VoterRegistration>>,
            404: NotFound,
            500: ServerError,
            503: ServiceUnavailable,

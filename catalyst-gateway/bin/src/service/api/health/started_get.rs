@@ -4,12 +4,14 @@ use poem_extensions::{response, UniResponse::T204};
 
 use crate::service::common::responses::{
     resp_2xx::NoContent,
+    resp_4xx::ApiValidationError,
     resp_5xx::{ServerError, ServiceUnavailable},
 };
 
 /// All responses
 pub(crate) type AllResponses = response! {
     204: NoContent,
+    400: ApiValidationError,
     500: ServerError,
     503: ServiceUnavailable,
 };
@@ -35,6 +37,7 @@ pub(crate) type AllResponses = response! {
 /// ## Responses
 ///
 /// * 204 No Content - Service is Started and can  serve requests.
+/// * 400 API Validation Error
 /// * 500 Server Error - If anything within this function fails unexpectedly. (Possible
 ///   but unlikely)
 /// * 503 Service Unavailable - Service has not started, do not send other requests.
