@@ -63,19 +63,19 @@ pub(crate) struct DocsSettings {
     pub(crate) output: Option<PathBuf>,
 
     /// Server binding address
-    #[clap(long, default_value = ADDRESS_DEFAULT)]
+    #[clap(long, default_value = ADDRESS_DEFAULT, env = "ADDRESS")]
     pub(crate) address: SocketAddr,
 
     /// Flag for adding "http" to servers
-    #[clap(long, default_value = "false")]
+    #[clap(long, default_value = "false", env = "HTTP_AUTO_SERVERS")]
     pub(crate) http_auto_servers: bool,
 
     /// Flag for adding "https" to servers
-    #[clap(long, default_value = "true")]
+    #[clap(long, default_value = "true", env = "HTTPS_AUTO_SERVERS")]
     pub(crate) https_auto_servers: bool,
 
     /// Server name
-    #[clap(env = "SERVER_NAME")]
+    #[clap(long, env = "SERVER_NAME")]
     pub(crate) server_name: Option<String>,
 }
 
