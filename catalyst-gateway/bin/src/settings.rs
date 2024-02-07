@@ -43,10 +43,6 @@ const API_URL_PREFIX_DEFAULT: &str = "/api";
 /// and the logging level.
 #[derive(Args, Clone)]
 pub(crate) struct ServiceSettings {
-    /// Server binding address
-    #[clap(long, default_value = ADDRESS_DEFAULT)]
-    pub(crate) address: SocketAddr,
-
     /// Url to the postgres event db
     #[clap(long, env)]
     pub(crate) database_url: String,
@@ -54,6 +50,10 @@ pub(crate) struct ServiceSettings {
     /// Logging level
     #[clap(long, default_value = LOG_LEVEL_DEFAULT)]
     pub(crate) log_level: LogLevel,
+
+    /// Docs settings.
+    #[clap(flatten)]
+    pub(crate) docs_settings: DocsSettings,
 }
 
 /// Settings specifies `OpenAPI` docs generation.
@@ -61,6 +61,22 @@ pub(crate) struct ServiceSettings {
 pub(crate) struct DocsSettings {
     /// The output path to the generated docs file, if omitted prints to stdout.
     pub(crate) output: Option<PathBuf>,
+
+    /// Server binding address
+    #[clap(long, default_value = ADDRESS_DEFAULT, env = "ADDRESS")]
+    pub(crate) address: SocketAddr,
+
+    /// Flag for adding "http" to servers
+    #[clap(long, default_value = "false", env = "HTTP_AUTO_SERVERS")]
+    pub(crate) http_auto_servers: bool,
+
+    /// Flag for adding "https" to servers
+    #[clap(long, default_value = "true", env = "HTTPS_AUTO_SERVERS")]
+    pub(crate) https_auto_servers: bool,
+
+    /// Server name
+    #[clap(long, env = "SERVER_NAME")]
+    pub(crate) server_name: Option<String>,
 }
 
 /// An environment variable read as a string.
