@@ -31,11 +31,8 @@ fn get_api_contact() -> ContactObject {
         .url("https://projectcatalyst.io")
 }
 
-/// A summary describing the API
-const API_SUMMARY: &str = "Project Catalyst Gateway API";
-
 /// A long description of the API. Markdown is supported
-const API_DESCRIPTION: &str = r#"# Catalyst Gateway API.
+const API_DESCRIPTION: &str = "# Catalyst Gateway API.
 
 The Catalyst Gateway API provides realtime data for all prior, current and future Catalyst voting events.
 
@@ -47,13 +44,11 @@ TODO:
 * Implement Voting API abstracting the Jormungandr API from public exposure.
 * Implement Audit API's (Retrieve voting blockchain records,  registration/voting power audit and private tally audit.
 * Implement API's needed to support posting Ideas/Proposals etc.Catalyst Gateway
-"#;
+";
 
 /// Get the license details for the API
 fn get_api_license() -> LicenseObject {
-    LicenseObject::new("Apache 2.0")
-        .url("https://www.apache.org/licenses/LICENSE-2.0")
-        .identifier("Apache-2.0")
+    LicenseObject::new("Apache 2.0").url("https://www.apache.org/licenses/LICENSE-2.0")
 }
 
 /// Get the terms of service for the API
@@ -72,7 +67,6 @@ pub(crate) fn mk_api(
     .contact(get_api_contact())
     .description(API_DESCRIPTION)
     .license(get_api_license())
-    .summary(API_SUMMARY)
     .terms_of_service(TERMS_OF_SERVICE)
     .url_prefix(API_URL_PREFIX.as_str());
 

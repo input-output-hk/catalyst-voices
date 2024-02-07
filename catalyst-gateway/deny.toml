@@ -98,6 +98,8 @@ ignore = [
 [licenses]
 # The lint level for crates which do not have a detectable license
 unlicensed = "deny"
+# Don't warn if a listed license isn't found
+unused-allowed-license="allow"
 # List of explicitly allowed licenses
 # See https://spdx.org/licenses/ for list of possible licenses
 # [possible values: any SPDX 3.11 short identifier (+ optional exception)].
@@ -106,7 +108,9 @@ allow = [
     "Apache-2.0",
     "Unicode-DFS-2016",
     "BSD-3-Clause",
-    "BlueOak-1.0.0"
+    "BSD-2-Clause",
+    "BlueOak-1.0.0",
+    "Apache-2.0 WITH LLVM-exception"
 ]
 # List of explicitly disallowed licenses
 # See https://spdx.org/licenses/ for list of possible licenses
@@ -264,7 +268,11 @@ unknown-git = "deny"
 # if not specified. If it is specified but empty, no registries are allowed.
 allow-registry = ["https://github.com/rust-lang/crates.io-index"]
 # List of URLs for allowed Git repositories
-allow-git = []
+allow-git = [
+    # Remove this once upstream changes are merged.
+    # issue: https://github.com/input-output-hk/hermes/issues/63
+    "https://github.com/input-output-hk/catalyst-pallas"
+]
 
 [sources.allow-org]
 # 1 or more github.com organizations to allow git sources for

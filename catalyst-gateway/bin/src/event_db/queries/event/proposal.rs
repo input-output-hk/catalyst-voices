@@ -60,8 +60,8 @@ impl ProposalQueries for EventDB {
             .query(Self::PROPOSAL_QUERY, &[&event.0, &objective.0, &proposal.0])
             .await?;
         let row = rows
-            .get(0)
-            .ok_or_else(|| Error::NotFound("cat not find proposal value".to_string()))?;
+            .first()
+            .ok_or_else(|| Error::NotFound("Cannot find proposal value".to_string()))?;
 
         let proposer = vec![ProposerDetails {
             name: row.try_get("proposer_name")?,

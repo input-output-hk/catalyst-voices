@@ -20,11 +20,11 @@ pub(crate) struct FundStageDates {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct Fund {
     pub(crate) id: i32,
-    pub(crate) fund_name: String,
-    pub(crate) fund_goal: String,
+    pub(crate) name: String,
+    pub(crate) goal: String,
     pub(crate) voting_power_threshold: i64,
-    pub(crate) fund_start_time: DateTime<Utc>,
-    pub(crate) fund_end_time: DateTime<Utc>,
+    pub(crate) start_time: DateTime<Utc>,
+    pub(crate) end_time: DateTime<Utc>,
     pub(crate) next_fund_start_time: DateTime<Utc>,
     pub(crate) registration_snapshot_time: DateTime<Utc>,
     pub(crate) next_registration_snapshot_time: DateTime<Utc>,

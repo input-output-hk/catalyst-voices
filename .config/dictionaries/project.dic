@@ -5,6 +5,7 @@ adminer
 androidx
 appspot
 asyncio
+asyncpg
 auditability
 bluefireteam
 BROTLI
@@ -32,6 +33,7 @@ dotglob
 drep
 dreps
 encryptor
+fetchval
 fontawesome
 formz
 Formz
@@ -47,11 +49,13 @@ iphoneos
 jetbrains
 jorm
 jormungandr
+Joaquín
 Jörmungandr
 kroki
 lcov
 Leshiy
 localizable
+loguru
 mdlint
 mitigations
 moderations
@@ -77,6 +81,7 @@ psql
 Ptarget
 pubkey
 pubspec
+pytest
 rapidoc
 redoc
 reqwest
@@ -85,6 +90,8 @@ rustc
 rustls
 rxdart
 saibatizoku
+Schemathesis
+schemathesis
 seckey
 slotno
 sqlfluff
@@ -109,3 +116,15 @@ xctest
 xctestrun
 xcworkspace
 yoroi
+idents
+rustflags
+rustdoc
+rustdocflags
+codegen
+lintfix
+testunit
+nextest
+testcov
+testdocs
+fmtchk
+fmtfix

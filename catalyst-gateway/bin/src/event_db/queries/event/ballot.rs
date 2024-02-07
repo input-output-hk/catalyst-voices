@@ -77,7 +77,7 @@ impl BallotQueries for EventDB {
             ])
             .await?;
         let row = rows
-            .get(0)
+            .first()
             .ok_or_else(|| Error::NotFound("cat not find ballot value".to_string()))?;
         let choices = row.try_get("objective")?;
 
