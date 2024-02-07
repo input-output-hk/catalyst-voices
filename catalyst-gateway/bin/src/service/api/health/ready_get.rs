@@ -13,6 +13,7 @@ use crate::{
     event_db::error::Error as DBError,
     service::common::responses::{
         resp_2xx::NoContent,
+        resp_4xx::ApiValidationError,
         resp_5xx::{server_error, ServerError, ServiceUnavailable},
     },
     state::{SchemaVersionStatus, State},
@@ -21,6 +22,7 @@ use crate::{
 /// All responses
 pub(crate) type AllResponses = response! {
     204: NoContent,
+    400: ApiValidationError,
     500: ServerError,
     503: ServiceUnavailable,
 };
@@ -46,6 +48,7 @@ pub(crate) type AllResponses = response! {
 /// ## Responses
 ///
 /// * 204 No Content - Service is Ready to serve requests.
+/// * 400 API Validation Error
 /// * 500 Server Error - If anything within this function fails unexpectedly. (Possible
 ///   but unlikely)
 /// * 503 Service Unavailable - Service is not ready, do not send other requests.
