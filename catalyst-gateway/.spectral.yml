@@ -44,7 +44,7 @@ overrides:
         function: 'pattern'
         functionOptions:
           # Matches any character that is #, *, uppercase or lowercase letters from A to Z, or digits from 0 to 9 at the beginning of the string.
-          # with zero or more occurences of any character except newline.
+          # with zero or more occurrences of any character except newline.
           match: '^[#*A-Za-z0-9].*'
 
     # Severity
