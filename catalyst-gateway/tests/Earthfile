@@ -37,9 +37,9 @@ package-schemathesis:
 
 fuzzer-api-test:
     FROM earthly/dind:alpine
-    COPY integration/docker-compose.yml .
+    COPY st-docker-compose.yml .
     WITH DOCKER \
-        --compose docker-compose.yml \
+        --compose st-docker-compose.yml \
         --load schemathesis:latest=(+package-schemathesis --openapi_spec="http://127.0.0.1:3030/docs/cat-gateway.json") \
         --load event-db:latest=(../event-db+build --with_historic_data=false) \
         --load cat-gateway:latest=(+package-cat-gateway --address="127.0.0.1:3030" \
@@ -65,6 +65,6 @@ fuzzer-api-test:
 test-lint-openapi:
     FROM github.com/input-output-hk/catalyst-ci/earthly/spectral:v2.4.0+spectral-base
     # Copy the doc artifact.
-    COPY +build/doc ./doc
+    COPY ../+build/doc ./doc
     # Scan the doc directory where type of file is JSON.
     DO github.com/input-output-hk/catalyst-ci/earthly/spectral:v2.4.0+BUILD_SPECTRAL --dir=./doc --file_type="json"
