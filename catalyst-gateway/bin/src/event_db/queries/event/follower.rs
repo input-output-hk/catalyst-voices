@@ -31,7 +31,7 @@ impl EventDB {
     const START_FROM_QUERY: &'static str =
         "SELECT network, slot_no, block_hash, ended FROM cardano_update_state WHERE network = $1;";
     /// Last updated
-    const LAST_UPDATED_QUERY: &'static str = " update cardano_update_state set ended = $;";
+    const LAST_UPDATED_QUERY: &'static str = " update cardano_update_state set ended = $;"; // update slot nos for both networks
 }
 
 #[async_trait]
