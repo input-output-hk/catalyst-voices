@@ -14,7 +14,7 @@ package-tester:
     # CMD poetry run pytest -vvvv --capture tee-sys --show-capture=stderr
 
 test:
-    FROM earthly/dind:alpine
+    FROM earthly/dind:alpine-3.19
 
     ARG DB_URL="postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev"
     ARG CAT_ADDRESS="0.0.0.0:3030"

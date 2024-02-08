@@ -36,7 +36,7 @@ package-schemathesis:
     SAVE IMAGE schemathesis:$tag
 
 fuzzer-api-test:
-    FROM earthly/dind:alpine
+    FROM earthly/dind:alpine-3.19
     COPY st-docker-compose.yml .
     WITH DOCKER \
         --compose st-docker-compose.yml \
