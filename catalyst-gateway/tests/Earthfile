@@ -19,6 +19,7 @@ package-schemathesis:
                                  --force-schema-version=$schema_version --junit-xml /results/junit-report.xml
     SAVE IMAGE schemathesis:$tag
 
+# test-fuzzer-api - Fuzzy test cat-gateway using openapi specs
 test-fuzzer-api:
     FROM earthly/dind:alpine-3.19
     COPY st-docker-compose.yml .
