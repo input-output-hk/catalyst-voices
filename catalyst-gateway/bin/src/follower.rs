@@ -14,11 +14,31 @@ use crate::event_db::queries::{
 pub(crate) async fn start_followers(
     configs: (Vec<NetworkMeta>, FollowerMeta), db: Arc<dyn EventDbQueries>,
 ) -> Result<(), Box<dyn Error>> {
-    info!("{:?}", configs);
-
     for config in configs.0 {
         info!("starting follower for {:?}", config.network);
-        init_follower(config, db.clone()).await?;
+
+        let (slot_no, block_hash, last_updated) =
+            db.bootstrap_follower_from(config.network.clone()).await?;
+
+        // threshold which defines if data stale and ready to update or not
+        if chrono::offset::Utc::now().timestamp() - last_updated.timestamp()
+            > configs.1.timing_pattern.into()
+        {
+            info!(
+                "Last update is stale for network {} - ready to update, starting follower now.",
+                config.network
+            );
+            init_follower(
+                config.network,
+                config.relay,
+                slot_no,
+                block_hash,
+                db.clone(),
+            )
+            .await?;
+        } else {
+            info!("data is fresh - do not start follower");
+        }
     }
 
     Ok(())
@@ -26,23 +46,17 @@ pub(crate) async fn start_followers(
 
 /// Initiate single follower
 async fn init_follower(
-    network: NetworkMeta, db: Arc<dyn EventDbQueries>,
+    network: String, relay: String, slot_no: i64, block_hash: String, db: Arc<dyn EventDbQueries>,
 ) -> Result<(), Box<dyn Error>> {
-    let (slot_no, block_hash) = db.bootstrap_follower_from(network.network.clone()).await?;
-
     // Defaults to start following from the tip.
     let follower_cfg = FollowerConfigBuilder::default()
         .follow_from(Point::new(slot_no.try_into()?, hex::decode(block_hash)?))
         .build();
 
-    let mut follower = Follower::connect(
-        &network.relay,
-        Network::from_str(&network.network)?,
-        follower_cfg,
-    )
-    .await?;
+    let mut follower =
+        Follower::connect(&relay, Network::from_str(&network)?, follower_cfg).await?;
 
-    let genesis_values = network_genesis_values(&Network::from_str(&network.network)?)
+    let genesis_values = network_genesis_values(&Network::from_str(&network)?)
         .expect("obtaining genesis values from follower crate is infallible");
 
     // Check most recent update on cardano update table If it falls within the threshold boundary, node should update db with latest data
@@ -58,7 +72,7 @@ async fn init_follower(
                     match db
                         .updates_from_follower(
                             block.slot().try_into().expect("infallible"),
-                            network.network.clone(),
+                            network.clone(),
                             block
                                 .epoch(&genesis_values)
                                 .0

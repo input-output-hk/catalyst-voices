@@ -92,8 +92,8 @@ CREATE TABLE cardano_update_state (
 
   id BIGSERIAL PRIMARY KEY,
 
-  started TIMESTAMP NOT NULL,
-  ended TIMESTAMP NOT NULL,
+  started TIMESTAMP WITH TIME ZONE NOT NULL,
+  ended TIMESTAMP WITH TIME ZONE NOT NULL,
   updater_id TEXT NOT NULL,
 
   slot_no BIGINT NOT NULL,
