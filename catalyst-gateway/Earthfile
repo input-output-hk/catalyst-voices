@@ -46,7 +46,17 @@ build:
 all-hosts-build:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +build
 
-
+package-cat-gateway:
+    FROM alpine:3.19
+    ARG tag="latest"
+    ARG address
+    ARG db_url
+    ARG log_level="error"
+    RUN apk upgrade --no-cache && apk add --no-cache gcc
+    COPY +build/cat-gateway .
+    ENTRYPOINT ./cat-gateway run --address $address --database-url $db_url --log-level $log_level
+    SAVE IMAGE cat-gateway:$tag
+    
 # Publish packages if all integration tests have passed. (Failure to pass tests will prevent packages being published.)
 # publish:
 #    FROM scratch
