@@ -19,6 +19,8 @@ pub(crate) trait FollowerQueries: Sync + Send + 'static {
     async fn bootstrap_follower_from(
         &self, network: String,
     ) -> Result<(i64, String, DateTime<Utc>), Error>;
+
+    async fn last_updated(&self, last_updated: DateTime<Utc>) -> Result<(), Error>;
 }
 
 impl EventDB {
@@ -28,6 +30,8 @@ impl EventDB {
     /// Bootstrap follower from last stopping point in the context of epoch and slot.
     const START_FROM_QUERY: &'static str =
         "SELECT network, slot_no, block_hash, ended FROM cardano_update_state WHERE network = $1;";
+    /// Last updated
+    const LAST_UPDATED_QUERY: &'static str = " update cardano_update_state set ended = $;";
 }
 
 #[async_trait]
@@ -69,5 +73,16 @@ impl FollowerQueries for EventDB {
         let last_updated: chrono::DateTime<chrono::offset::Utc> = rows[0].try_get("ended").unwrap();
 
         Ok((slot_no, block_hash, last_updated))
+    }
+
+    /// Last updated
+    async fn last_updated(&self, last_updated: DateTime<Utc>) -> Result<(), Error> {
+        let conn = self.pool.get().await?;
+
+        let _rows = conn
+            .query(Self::LAST_UPDATED_QUERY, &[&last_updated])
+            .await?;
+
+        Ok(())
     }
 }

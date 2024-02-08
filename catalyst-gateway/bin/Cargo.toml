@@ -70,3 +70,4 @@ cpu-time = { workspace = true }
 ulid = { workspace = true, features = ["serde", "uuid"] }
 rust-embed = { workspace = true }
 hex = "0.4.3"
+async-recursion = "1.0.5"

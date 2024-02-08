@@ -119,11 +119,12 @@ insert into config(cardano,follower,preview) VALUES('{
     "relay": "relays-new.cardano-mainnet.iohk.io:3001"
 }','{
     "mithril_addr": "addr",
-    "timing_pattern": 20
+    "timing_pattern": 25
 }', '{
     "network": "preview",
     "relay": "preview-node.play.dev.cardano.org:3001"
 }');
+
 
 -- -------------------------------------------------------------------------------------------------
 

@@ -7,7 +7,7 @@ use tokio::time;
 use tracing::error;
 
 // How often to check for config in db
-const CHECK_CONFIG_TICK: u64 = 5;
+pub const CHECK_CONFIG_TICK: u64 = 5;
 
 use crate::{
     follower::start_followers,
@@ -59,7 +59,6 @@ impl Cli {
 
                 // tick until config exists
                 let mut interval = time::interval(time::Duration::from_secs(CHECK_CONFIG_TICK));
-
                 let config = loop {
                     interval.tick().await;
 

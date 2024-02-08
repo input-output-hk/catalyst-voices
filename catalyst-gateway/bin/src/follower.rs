@@ -1,20 +1,29 @@
 use std::{error::Error, str::FromStr, sync::Arc};
 
+use async_recursion::async_recursion;
 use cardano_chain_follower::{
     network_genesis_values, ChainUpdate, Follower, FollowerConfigBuilder, Network, Point,
 };
+
+use tokio::time;
 use tracing::{error, info};
 
-use crate::event_db::queries::{
-    event::config::{FollowerMeta, NetworkMeta},
-    EventDbQueries,
+use crate::{
+    cli::CHECK_CONFIG_TICK,
+    event_db::queries::{
+        event::config::{FollowerMeta, NetworkMeta},
+        EventDbQueries,
+    },
 };
 
+#[async_recursion]
 /// Start followers as per defined in the config
 pub(crate) async fn start_followers(
     configs: (Vec<NetworkMeta>, FollowerMeta), db: Arc<dyn EventDbQueries>,
 ) -> Result<(), Box<dyn Error>> {
-    for config in configs.0 {
+    let mut follower_tasks = Vec::new();
+
+    for config in &configs.0 {
         info!("starting follower for {:?}", config.network);
 
         let (slot_no, block_hash, last_updated) =
@@ -28,18 +37,43 @@ pub(crate) async fn start_followers(
                 "Last update is stale for network {} - ready to update, starting follower now.",
                 config.network
             );
-            init_follower(
-                config.network,
-                config.relay,
+            let task_handler = init_follower(
+                config.network.clone(),
+                config.relay.clone(),
                 slot_no,
                 block_hash,
                 db.clone(),
             )
             .await?;
+            follower_tasks.push(task_handler);
         } else {
             info!("data is fresh - do not start follower");
+            // wait until threshold is met?
         }
     }
+
+    let mut interval = time::interval(time::Duration::from_secs(CHECK_CONFIG_TICK));
+    let config = loop {
+        interval.tick().await;
+        match db.get_config().await.map(|config| config) {
+            Ok(config) => {
+                if configs != config {
+                    info!("config has changed! restarting");
+                    break config;
+                }
+            },
+            Err(err) => error!("no config {:?}", err),
+        }
+    };
+
+    // stopping followers
+    for task in follower_tasks {
+        task.abort()
+    }
+
+    db.last_updated(chrono::offset::Utc::now()).await?;
+
+    start_followers(config, db).await?;
 
     Ok(())
 }
@@ -47,7 +81,7 @@ pub(crate) async fn start_followers(
 /// Initiate single follower
 async fn init_follower(
     network: String, relay: String, slot_no: i64, block_hash: String, db: Arc<dyn EventDbQueries>,
-) -> Result<(), Box<dyn Error>> {
+) -> Result<tokio::task::JoinHandle<()>, Box<dyn Error>> {
     // Defaults to start following from the tip.
     let follower_cfg = FollowerConfigBuilder::default()
         .follow_from(Point::new(slot_no.try_into()?, hex::decode(block_hash)?))
@@ -59,7 +93,7 @@ async fn init_follower(
     let genesis_values = network_genesis_values(&Network::from_str(&network)?)
         .expect("obtaining genesis values from follower crate is infallible");
 
-    tokio::spawn(async move {
+    let task = tokio::spawn(async move {
         loop {
             let chain_update = follower.next().await.expect("infallible");
 
@@ -111,5 +145,5 @@ async fn init_follower(
         }
     });
 
-    Ok(())
+    Ok(task)
 }
