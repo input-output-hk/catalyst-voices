@@ -20,7 +20,7 @@ pub(crate) async fn start_followers(
         let (slot_no, block_hash, last_updated) =
             db.bootstrap_follower_from(config.network.clone()).await?;
 
-        // threshold which defines if data is tale and ready to update or not
+        // threshold which defines if data is stale and ready to update or not
         if chrono::offset::Utc::now().timestamp() - last_updated.timestamp()
             > configs.1.timing_pattern.into()
         {

@@ -27,7 +27,7 @@ impl EventDB {
         "INSERT INTO cardano_slot_index(slot_no, network, epoch_no, block_time, block_hash) VALUES($1, $2, $3, $4, $5)";
     /// Bootstrap follower from last stopping point in the context of epoch and slot.
     const START_FROM_QUERY: &'static str =
-        "select network, slot_no, block_hash, ended from cardano_update_state where network = $1;";
+        "SELECT network, slot_no, block_hash, ended FROM cardano_update_state WHERE network = $1;";
 }
 
 #[async_trait]
