@@ -1,21 +1,5 @@
 VERSION 0.7
 
-build:
-    FROM ../+builder
-    RUN cargo build -p cat-gateway --release
-    SAVE ARTIFACT target/release/cat-gateway cat-gateway
-
-package-cat-gateway:
-    FROM alpine:3.19
-    ARG tag="latest"
-    ARG address
-    ARG db_url
-    ARG log_level="error"
-    RUN apk upgrade --no-cache && apk add --no-cache gcc
-    COPY +build/cat-gateway .
-    ENTRYPOINT ./cat-gateway run --address $address --database-url $db_url --log-level $log_level
-    SAVE IMAGE cat-gateway:$tag
-
 package-schemathesis:
     FROM python:3.12-alpine3.19
     ARG tag="latest"
@@ -42,7 +26,7 @@ test-fuzzer-api:
         --compose st-docker-compose.yml \
         --load schemathesis:latest=(+package-schemathesis --openapi_spec="http://127.0.0.1:3030/docs/cat-gateway.json") \
         --load event-db:latest=(../event-db+build --with_historic_data=false) \
-        --load cat-gateway:latest=(+package-cat-gateway --address="127.0.0.1:3030" \
+        --load cat-gateway:latest=(../+package-cat-gateway --address="127.0.0.1:3030" \
                                         --db_url="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev") \
         --service event-db \
         --service cat-gateway \
