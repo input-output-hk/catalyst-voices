@@ -20,7 +20,7 @@ pub(crate) async fn start_followers(
         let (slot_no, block_hash, last_updated) =
             db.bootstrap_follower_from(config.network.clone()).await?;
 
-        // threshold which defines if data stale and ready to update or not
+        // threshold which defines if data is tale and ready to update or not
         if chrono::offset::Utc::now().timestamp() - last_updated.timestamp()
             > configs.1.timing_pattern.into()
         {
@@ -58,8 +58,6 @@ async fn init_follower(
 
     let genesis_values = network_genesis_values(&Network::from_str(&network)?)
         .expect("obtaining genesis values from follower crate is infallible");
-
-    // Check most recent update on cardano update table If it falls within the threshold boundary, node should update db with latest data
 
     tokio::spawn(async move {
         loop {
