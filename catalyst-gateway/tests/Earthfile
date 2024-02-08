@@ -59,3 +59,12 @@ fuzzer-api-test:
         RUN echo "Schemathesis run failed" && \
             exit 1
     END
+
+# test-lint-openapi - OpenAPI linting from an artifact
+# testing whether the OpenAPI generated during build stage follows good practice.
+test-lint-openapi:
+    FROM github.com/input-output-hk/catalyst-ci/earthly/spectral:v2.4.0+spectral-base
+    # Copy the doc artifact.
+    COPY +build/doc ./doc
+    # Scan the doc directory where type of file is JSON.
+    DO github.com/input-output-hk/catalyst-ci/earthly/spectral:v2.4.0+BUILD_SPECTRAL --dir=./doc --file_type="json"
