@@ -15,6 +15,7 @@ package-tester:
 
 test:
     FROM earthly/dind:alpine-3.19
+    RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
 
     ARG DB_URL="postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev"
     ARG CAT_ADDRESS="0.0.0.0:3030"

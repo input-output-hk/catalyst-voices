@@ -22,6 +22,7 @@ package-schemathesis:
 # test-fuzzer-api - Fuzzy test cat-gateway using openapi specs
 test-fuzzer-api:
     FROM earthly/dind:alpine-3.19
+    RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
     COPY st-docker-compose.yml .
     WITH DOCKER \
         --compose st-docker-compose.yml \
