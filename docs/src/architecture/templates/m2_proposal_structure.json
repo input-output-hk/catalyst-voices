@@ -1,0 +1,122 @@
+{
+  "id": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+  "created_at": "2016-01-01T00:00:00Z",
+  "updated_at": "2024-05-01T12:30:00Z",
+  "version": 4,
+  "status": "draft",
+  "proposal_title": {
+    "$comment": "proposal_title",
+    "type": "text_field",
+    "en": "Proposal Title",
+    "is_visible": true,
+    "pattern": "^.{5,100}$",
+    "label_text": "Optional text that describes the input field.",
+    "hint_text": "Optional text that provides a hint to the user.",
+    "error_text": "Optional text that provides an error message to the user."
+  },
+  "fund_categories": [
+    "01HP6TDDV9YW24K4TZ03VCGW5F",
+    "01HP71B61N4Y3HXH4S3ZJ2448X"
+  ],
+  "details": {
+    "0": {
+      "$comment": "setup",
+      "0": {
+        "$comment": "main_applicant",
+        "is_visible": false,
+        "0": {
+          "$comment": "main_applicant",
+          "type": "title",
+          "en": "Main Applicant"
+        },
+        "1": {
+          "$comment": "user input",
+          "type": "text_field",
+          "en": "Dart Vader",
+          "pattern": "^.{5,100}$",
+          "label_text": "Optional text that describes the input field.",
+          "hint_text": "Optional text that provides a hint to the user.",
+          "error_text": "Optional text that provides an error message to the user."
+        }
+      },
+      "1": {
+        "$comment": "individual_or_entity",
+        "is_visible": false,
+        "0": {
+          "type": "title",
+          "en": "Individual or Entity"
+        },
+        "1": {
+          "$comment": "user input",
+          "type": "radio_button",
+          "enum": ["individual", "entity"],
+          "en": "Individual"
+        }
+      },
+      "2": {
+        "$comment": "co_proposers",
+        "is_visible": false,
+        "0": {
+          "$comment": "title",
+          "type": "text",
+          "en": "Co-Proposers"
+        },
+        "1": {
+          "$comment": "user input",
+          "type": "text_field",
+          "pattern": "^(\\s*[A-Za-z]+(\\s+[A-Za-z]+)*\\s*,)*\\s*[A-Za-z]+(\\s+[A-Za-z]+)*\\s*$",
+          "en": "Luke Skywalker, Leia Organa...",
+          "label_text": "Optional text that describes the input field.",
+          "hint_text": "Optional text that provides a hint to the user.",
+          "error_text": "Optional text that provides an error message to the user."
+        }
+      }
+    },
+    "1": {
+      "$comment": "metadata",
+      "0": {
+        "$comment": "proposal_title",
+        "0": {
+          "is_visible": true,
+          "type": "title",
+          "en": "Proposal Title"
+        },
+        "1": {
+          "$comment": "user input",
+          "type": "text_field",
+          "en": "My Proposal Title",
+          "pattern": "^.{5,80}$",
+          "label_text": "Optional text that describes the input field.",
+          "hint_text": "Optional text that provides a hint to the user.",
+          "error_text": "Optional text that provides an error message to the user."
+        }
+      }
+    }
+  },
+  "history": [
+    {
+      "version": 1,
+      "updated_at": "2024-02-01T12:00:00Z",
+      "changes": {
+        "proposal_title": "Jonathan Doe"
+      }
+    },
+    {
+      "version": 2,
+      "updated_at": "2024-03-01T12:00:00Z",
+      "changes": {
+        "name": "Jonathan Doe",
+        "age": 30
+      }
+    },
+    {
+      "version": 3,
+      "updated_at": "2024-04-01T12:00:00Z",
+      "changes": {
+        "name": "Jonathan Doe",
+        "age": 30,
+        "address": "123 Main St"
+      }
+    }
+  ]
+}
