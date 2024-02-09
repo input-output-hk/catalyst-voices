@@ -20,7 +20,9 @@ pub(crate) trait FollowerQueries: Sync + Send + 'static {
         &self, network: String,
     ) -> Result<(i64, String, DateTime<Utc>), Error>;
 
-    async fn last_updated(&self, last_updated: DateTime<Utc>) -> Result<(), Error>;
+    async fn last_updated(
+        &self, last_updated: DateTime<Utc>, slot_no: i64, block_hash: String, network: String,
+    ) -> Result<(), Error>;
 }
 
 impl EventDB {
@@ -31,7 +33,8 @@ impl EventDB {
     const START_FROM_QUERY: &'static str =
         "SELECT network, slot_no, block_hash, ended FROM cardano_update_state WHERE network = $1;";
     /// Last updated
-    const LAST_UPDATED_QUERY: &'static str = " update cardano_update_state set ended = $;"; // update slot nos for both networks
+    const LAST_UPDATED_QUERY: &'static str =
+        "UPDATE cardano_update_state set ended = $1, slot_no = $2, block_hash = $3 WHERE network = $4;";
 }
 
 #[async_trait]
@@ -76,11 +79,16 @@ impl FollowerQueries for EventDB {
     }
 
     /// Last updated
-    async fn last_updated(&self, last_updated: DateTime<Utc>) -> Result<(), Error> {
+    async fn last_updated(
+        &self, last_updated: DateTime<Utc>, slot_no: i64, block_hash: String, network: String,
+    ) -> Result<(), Error> {
         let conn = self.pool.get().await?;
 
         let _rows = conn
-            .query(Self::LAST_UPDATED_QUERY, &[&last_updated])
+            .query(
+                Self::LAST_UPDATED_QUERY,
+                &[&last_updated, &slot_no, &block_hash, &network],
+            )
             .await?;
 
         Ok(())

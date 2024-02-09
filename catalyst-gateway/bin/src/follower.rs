@@ -66,13 +66,12 @@ pub(crate) async fn start_followers(
         }
     };
 
-    // stopping followers
+    info!("Terminating followers");
     for task in follower_tasks {
         task.abort()
     }
 
-    db.last_updated(chrono::offset::Utc::now()).await?;
-
+    info!("Restarting followers with new config");
     start_followers(config, db).await?;
 
     Ok(())
@@ -88,9 +87,9 @@ async fn init_follower(
         .build();
 
     let mut follower =
-        Follower::connect(&relay, Network::from_str(&network)?, follower_cfg).await?;
+        Follower::connect(&relay, Network::from_str(&network.clone())?, follower_cfg).await?;
 
-    let genesis_values = network_genesis_values(&Network::from_str(&network)?)
+    let genesis_values = network_genesis_values(&Network::from_str(&network.clone())?)
         .expect("obtaining genesis values from follower crate is infallible");
 
     let task = tokio::spawn(async move {
@@ -114,7 +113,7 @@ async fn init_follower(
                                 .wallclock(&genesis_values)
                                 .try_into()
                                 .expect("infallible"),
-                            hex::encode(block.hash()),
+                            hex::encode(block.hash().clone()),
                         )
                         .await
                     {
@@ -130,6 +129,16 @@ async fn init_follower(
                     // registration stuff
 
                     // rewards stuff
+
+                    // last updated
+                    db.last_updated(
+                        chrono::offset::Utc::now(),
+                        block.slot().try_into().unwrap(),
+                        hex::encode(block.hash().clone()),
+                        network.clone(),
+                    )
+                    .await
+                    .unwrap();
                 },
                 ChainUpdate::Rollback(data) => {
                     let block = data.decode().expect("infallible");
