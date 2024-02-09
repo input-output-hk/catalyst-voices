@@ -20,10 +20,10 @@ const ADDRESS_DEFAULT: &str = "0.0.0.0:3030";
 const GITHUB_REPO_OWNER_DEFAULT: &str = "input-output-hk";
 
 /// Default Github repo name
-const GITHUB_REPO_NAME_DEFAULT: &str = "catalyst-core";
+const GITHUB_REPO_NAME_DEFAULT: &str = "catalyst-voices";
 
 /// Default Github issue template to use
-const GITHUB_ISSUE_TEMPLATE_DEFAULT: &str = "bug_report.md";
+const GITHUB_ISSUE_TEMPLATE_DEFAULT: &str = "bug_report.yml";
 
 /// Default `CLIENT_ID_KEY` used in development.
 const CLIENT_ID_KEY_DEFAULT: &str = "3db5301e-40f2-47ed-ab11-55b37674631a";
@@ -242,7 +242,7 @@ pub(crate) fn get_api_host_names(addr: &SocketAddr) -> Vec<String> {
 /// # use cat_data_service::settings::generate_github_issue_url;
 /// assert_eq!(
 ///     generate_github_issue_url("Hello, World! How are you?"),
-///     "https://github.com/input-output-hk/catalyst-core/issues/new?template=bug_report.md&title=Hello%2C%20World%21%20How%20are%20you%3F"
+///     "https://github.com/input-output-hk/catalyst-voices/issues/new?template=bug_report.yml&title=Hello%2C%20World%21%20How%20are%20you%3F"
 /// );
 /// ```
 pub(crate) fn generate_github_issue_url(title: &str) -> Option<Url> {
@@ -278,7 +278,7 @@ mod tests {
         let title = "Hello, World! How are you?";
         assert_eq!(
             generate_github_issue_url(title).expect("Failed to generate url").as_str(),
-            "https://github.com/input-output-hk/catalyst-core/issues/new?template=bug_report.md&title=Hello%2C+World%21+How+are+you%3F"
+            "https://github.com/input-output-hk/catalyst-voices/issues/new?template=bug_report.yml&title=Hello%2C+World%21+How+are+you%3F"
         );
     }
 
