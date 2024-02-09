@@ -13,7 +13,7 @@ pub(crate) trait ConfigQueries: Sync + Send + 'static {
     async fn get_config(&self) -> Result<(Vec<NetworkMeta>, FollowerMeta), Error>;
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, PartialOrd)]
 pub(crate) struct NetworkMeta {
     pub network: String,
     pub relay: String,
