@@ -57,7 +57,7 @@ fn get_api_license() -> LicenseObject {
 
 /// Get the terms of service for the API
 const TERMS_OF_SERVICE: &str =
-    "https://github.com/input-output-hk/catalyst-core/blob/main/book/src/98_CODE_OF_CONDUCT.md";
+    "https://github.com/input-output-hk/catalyst-voices/blob/main/CODE_OF_CONDUCT.md";
 
 /// Create the `OpenAPI` definition
 pub(crate) fn mk_api(
