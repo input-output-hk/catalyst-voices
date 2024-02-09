@@ -4,22 +4,25 @@
   "updated_at": "2024-05-01T12:30:00Z",
   "version": 4,
   "status": "draft",
-  "proposal_title": {
-    "$comment": "proposal_title",
-    "type": "text_field",
-    "en": "Proposal Title",
-    "is_visible": true,
-    "pattern": "^.{5,100}$",
-    "label_text": "Optional text that describes the input field.",
-    "hint_text": "Optional text that provides a hint to the user.",
-    "error_text": "Optional text that provides an error message to the user."
-  },
-  "fund_categories": [
-    "01HP6TDDV9YW24K4TZ03VCGW5F",
-    "01HP71B61N4Y3HXH4S3ZJ2448X"
-  ],
   "details": {
     "0": {
+      "$comment": "fund_categories",
+      "0": {
+        "is_visible": true,
+        "0": {
+          "$comment": "cardano_use_case",
+          "type": "title",
+          "en": "Cardano Use Cases / Concepts"
+        },
+        "1": {
+          "$comment": "user input",
+          "type": "menu",
+          "en": "Category 1, Category 2...",
+          "enum": ["category1", "category2", "category3"]
+        }
+      }
+    },
+    "1": {
       "$comment": "setup",
       "0": {
         "$comment": "main_applicant",
@@ -72,7 +75,7 @@
         }
       }
     },
-    "1": {
+    "2": {
       "$comment": "metadata",
       "0": {
         "$comment": "proposal_title",
@@ -98,24 +101,38 @@
       "version": 1,
       "updated_at": "2024-02-01T12:00:00Z",
       "changes": {
-        "proposal_title": "Jonathan Doe"
+        "proposal_title": "Title"
       }
     },
     {
       "version": 2,
       "updated_at": "2024-03-01T12:00:00Z",
       "changes": {
-        "name": "Jonathan Doe",
-        "age": 30
+        "details": {
+          "0": {
+            "0": {
+              "is_visible": false,
+              "0": {
+                "en": "All Applicant"
+              }
+            }
+          }
+        }
       }
     },
     {
       "version": 3,
       "updated_at": "2024-04-01T12:00:00Z",
       "changes": {
-        "name": "Jonathan Doe",
-        "age": 30,
-        "address": "123 Main St"
+        "details": {
+          "0": {
+            "1": {
+              "1": {
+                "en": "Entity"
+              }
+            }
+          }
+        }
       }
     }
   ]
