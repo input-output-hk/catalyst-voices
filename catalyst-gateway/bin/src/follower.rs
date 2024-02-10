@@ -16,6 +16,9 @@ use crate::{
     },
 };
 
+// Tick until data is stale and ready to update
+pub const DATA_STALE_TICK: u64 = 5;
+
 #[async_recursion]
 /// Start followers as per defined in the config
 pub(crate) async fn start_followers(
@@ -26,30 +29,39 @@ pub(crate) async fn start_followers(
     for config in &configs.0 {
         info!("starting follower for {:?}", config.network);
 
-        let (slot_no, block_hash, last_updated) =
-            db.bootstrap_follower_from(config.network.clone()).await?;
+        // tick until data is stale
+        let mut interval = time::interval(time::Duration::from_secs(DATA_STALE_TICK));
+        let task_handler = loop {
+            interval.tick().await;
+            let (slot_no, block_hash, last_updated) =
+                db.bootstrap_follower_from(config.network.clone()).await?;
 
-        // threshold which defines if data is stale and ready to update or not
-        if chrono::offset::Utc::now().timestamp() - last_updated.timestamp()
-            > configs.1.timing_pattern.into()
-        {
-            info!(
-                "Last update is stale for network {} - ready to update, starting follower now.",
-                config.network
-            );
-            let task_handler = init_follower(
-                config.network.clone(),
-                config.relay.clone(),
-                slot_no,
-                block_hash,
-                db.clone(),
-            )
-            .await?;
-            follower_tasks.push(task_handler);
-        } else {
-            info!("data is fresh - do not start follower");
-            // wait until threshold is met?
-        }
+            // threshold which defines if data is stale and ready to update or not
+            if chrono::offset::Utc::now().timestamp() - last_updated.timestamp()
+                > configs.1.timing_pattern.into()
+            {
+                info!(
+                    "Last update is stale for network {} - ready to update, starting follower now.",
+                    config.network
+                );
+                let task_handler = init_follower(
+                    config.network.clone(),
+                    config.relay.clone(),
+                    slot_no,
+                    block_hash,
+                    db.clone(),
+                )
+                .await?;
+                break task_handler;
+            } else {
+                info!(
+                    "data is still fresh for network {}, tick until data is stale",
+                    config.network
+                );
+            }
+        };
+
+        follower_tasks.push(task_handler);
     }
 
     let mut interval = time::interval(time::Duration::from_secs(CHECK_CONFIG_TICK));
