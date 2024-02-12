@@ -23,9 +23,9 @@ package-schemathesis:
 test-fuzzer-api:
     FROM earthly/dind:alpine-3.19
     RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
-    COPY st-docker-compose.yml .
+    COPY schemathesis-docker-compose.yml .
     WITH DOCKER \
-        --compose st-docker-compose.yml \
+        --compose schemathesis-docker-compose.yml \
         --load schemathesis:latest=(+package-schemathesis --openapi_spec="http://127.0.0.1:3030/docs/cat-gateway.json") \
         --load event-db:latest=(../event-db+build --with_historic_data=false) \
         --load cat-gateway:latest=(../+package-cat-gateway --address="127.0.0.1:3030" \
