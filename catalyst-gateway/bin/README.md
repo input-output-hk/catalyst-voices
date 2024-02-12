@@ -12,7 +12,7 @@ cargo build -p cat-gateway
 
 Before running `cat-gateway` you will need to spin up event-db.
 How to do it, you can read this [README.md](
-https://github.com/input-output-hk/catalyst-core/blob/main/src/event-db/Readme.md#starting-a-local-test-db-with-docker
+https://github.com/input-output-hk/catalyst-voices/blob/main/catalyst-gateway/event-db/Readme.md#starting-a-local-test-db-with-docker
 ).
 To run with the specific jorm mock state cleanup timeout you can specify `JORM_CLEANUP_TIMEOUT` env var.
 
