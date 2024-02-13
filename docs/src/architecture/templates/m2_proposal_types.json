@@ -1,11 +1,11 @@
 {
   "header": {
     "type": "header",
-    "flutter_widget": "Text widget with style which makes it look like a H1"
+    "flutter_widget": "Text widget with style which makes it look like a H1."
   },
   "title": {
-    "type": "title",
-    "flutter_widget": "Text widget with style which makes it look like a H2 or H3"
+    "type": "text",
+    "flutter_widget": "Text widget with style which makes it look like a H2."
   },
   "text_field": {
     "type": "text_field",
@@ -15,6 +15,13 @@
       "label_text": "Optional text that describes the input field.",
       "hint_text": "Optional text that provides a hint to the user.",
       "error_text": "Optional text that provides an error message to the user."
+    }
+  },
+  "check_box": {
+    "type": "check_box",
+    "flutter_widget": "M3 CheckBox widget.",
+    "properties": {
+      "pattern": "Regex pattern which can be send as JSON string",
     }
   }
 }
