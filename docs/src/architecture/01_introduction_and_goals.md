@@ -14,5 +14,7 @@ icon: octicons/goal-24
 
 | Role/Name   | Contact        | Expectations       |
 |-------------|----------------|--------------------|
-| *~Role-1~* | *~Contact-1~* | *~Expectation-1~* |
-| *~Role-2~* | *~Contact-2~* | *~Expectation-2~* |
+| *~Product Owner~* | *~Contact-1~* | *~Expectation-1~* |
+| *~Developer~* | *~Contact-2~* | *~Expectation-2~* |
+| *~User~* | *~Contact-2~* | *~Expectation-2~* |
+| *~Admin~* | *~Contact-2~* | *~Expectation-2~* |
