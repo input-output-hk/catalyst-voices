@@ -125,7 +125,6 @@ insert into config(cardano,follower,preview) VALUES('{
     "relay": "preview-node.play.dev.cardano.org:3001"
 }');
 
-
 -- -------------------------------------------------------------------------------------------------
 
 -- * Temporary.  

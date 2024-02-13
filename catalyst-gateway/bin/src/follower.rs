@@ -29,7 +29,7 @@ pub(crate) async fn start_followers(
     for config in &configs.0 {
         info!("starting follower for {:?}", config.network);
 
-        // tick until data is stale
+        // tick until data is stale then start followers
         let mut interval = time::interval(time::Duration::from_secs(DATA_STALE_TICK));
         let task_handler = loop {
             interval.tick().await;
@@ -55,7 +55,7 @@ pub(crate) async fn start_followers(
                 break task_handler;
             } else {
                 info!(
-                    "data is still fresh for network {}, tick until data is stale",
+                    "Data is still fresh for network {}, tick until data is stale",
                     config.network
                 );
             }
@@ -70,11 +70,11 @@ pub(crate) async fn start_followers(
         match db.get_config().await.map(|config| config) {
             Ok(config) => {
                 if configs != config {
-                    info!("config has changed! restarting");
+                    info!("Config has changed! restarting");
                     break config;
                 }
             },
-            Err(err) => error!("no config {:?}", err),
+            Err(err) => error!("No config {:?}", err),
         }
     };
 
@@ -102,36 +102,43 @@ async fn init_follower(
         Follower::connect(&relay, Network::from_str(&network.clone())?, follower_cfg).await?;
 
     let genesis_values = network_genesis_values(&Network::from_str(&network.clone())?)
-        .expect("obtaining genesis values from follower crate is infallible");
+        .expect("Obtaining genesis values from follower crate is infallible");
 
     let task = tokio::spawn(async move {
         loop {
-            let chain_update = follower.next().await.expect("infallible");
+            let chain_update = follower.next().await.unwrap();
 
             match chain_update {
                 ChainUpdate::Block(data) => {
-                    let block = data.decode().expect("infallible");
+                    let block = match data.decode() {
+                        Ok(block) => block,
+                        Err(err) => {
+                            error!("Unable to decode block {:?} - skip..", err);
+                            continue;
+                        },
+                    };
 
                     match db
                         .updates_from_follower(
-                            block.slot().try_into().expect("infallible"),
+                            block.slot().try_into().expect("Slot conversion infallible"),
                             network.clone(),
                             block
                                 .epoch(&genesis_values)
                                 .0
                                 .try_into()
-                                .expect("infallible"),
+                                .expect("Epoch conversion infallible"),
                             block
                                 .wallclock(&genesis_values)
                                 .try_into()
-                                .expect("infallible"),
+                                .expect("Wallclock conversion infallible"),
                             hex::encode(block.hash().clone()),
                         )
                         .await
                     {
                         Ok(_) => (),
                         Err(err) => {
-                            error!("unable to index follower data {:?}", err);
+                            error!("unable to index follower data {:?} - skip..", err);
+                            continue;
                         },
                     }
                     // index the following
@@ -143,17 +150,30 @@ async fn init_follower(
                     // rewards stuff
 
                     // last updated
-                    db.last_updated(
-                        chrono::offset::Utc::now(),
-                        block.slot().try_into().unwrap(),
-                        hex::encode(block.hash().clone()),
-                        network.clone(),
-                    )
-                    .await
-                    .unwrap();
+                    match db
+                        .last_updated(
+                            chrono::offset::Utc::now(),
+                            block.slot().try_into().expect("Slot conversion infallible"),
+                            hex::encode(block.hash().clone()),
+                            network.clone(),
+                        )
+                        .await
+                    {
+                        Ok(_) => (),
+                        Err(err) => {
+                            error!("unable to mark last update point {:?} - skip..", err);
+                            continue;
+                        },
+                    };
                 },
                 ChainUpdate::Rollback(data) => {
-                    let block = data.decode().expect("infallible");
+                    let block = match data.decode() {
+                        Ok(block) => block,
+                        Err(err) => {
+                            error!("unable to decode block {:?} - skip..", err);
+                            continue;
+                        },
+                    };
 
                     info!(
                         "Rollback block NUMBER={} SLOT={} HASH={}",
