@@ -106,7 +106,16 @@ async fn init_follower(
 
     let task = tokio::spawn(async move {
         loop {
-            let chain_update = follower.next().await.unwrap();
+            let chain_update = match follower.next().await {
+                Ok(chain_update) => chain_update,
+                Err(err) => {
+                    error!(
+                        "Unable receive next update from follower {:?} - skip..",
+                        err
+                    );
+                    continue;
+                },
+            };
 
             match chain_update {
                 ChainUpdate::Block(data) => {
