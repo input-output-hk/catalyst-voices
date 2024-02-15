@@ -14,7 +14,8 @@ package-tester:
     # CMD poetry run pytest -vvvv --capture tee-sys --show-capture=stderr
 
 test:
-    FROM earthly/dind:alpine
+    FROM earthly/dind:alpine-3.19
+    RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
 
     ARG DB_URL="postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev"
     ARG CAT_ADDRESS="0.0.0.0:3030"
@@ -25,7 +26,7 @@ test:
     WITH DOCKER \
         --compose docker-compose.yml \
         --load event-db:latest=(../../event-db+build --with_historic_data=false) \
-        --load cat-gateway:latest=(../+package-cat-gateway --address=$CAT_ADDRESS --db_url=$DB_URL) \
+        --load cat-gateway:latest=(../../+package-cat-gateway --address=$CAT_ADDRESS --db_url=$DB_URL) \
         --load test:latest=(+package-tester) \
         --service event-db \
         --service cat-gateway \

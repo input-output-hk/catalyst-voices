@@ -68,8 +68,8 @@ Shared Flutter and Dart packages used across the Catalyst.
 
 ## Development
 
-For development guidelines, tooling information, and best practices, 
-visit [Catalyst Engineering](https://github.com/input-output-hk/catalyst-engineering) 
+For development guidelines, tooling information, and best practices,
+visit [Catalyst Engineering](https://github.com/input-output-hk/catalyst-engineering)
 and [Catalyst CI](https://input-output-hk.github.io/catalyst-ci/).
 
 ## Contributing

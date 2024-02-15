@@ -5,7 +5,6 @@ use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
 use dotenvy::dotenv;
 use error::Error;
-use schema_check::SchemaVersion;
 use tokio_postgres::NoTls;
 
 mod config_table;

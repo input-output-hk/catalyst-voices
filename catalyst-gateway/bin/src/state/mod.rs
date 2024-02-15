@@ -3,7 +3,7 @@ use std::sync::{Arc, Mutex, MutexGuard};
 
 use crate::{
     cli::Error,
-    event_db::{establish_connection, queries::EventDbQueries},
+    event_db::{establish_connection, EventDB},
     service::Error as ServiceError,
 };
 
@@ -25,8 +25,8 @@ pub(crate) struct State {
     /// This is Private, it needs to be accessed with a function.
     // event_db_handle: Arc<ArcSwap<Option<dyn EventDbQueries>>>,
     // Private need to get it with a function.
-    event_db: Arc<dyn EventDbQueries>, /* This needs to be obsoleted, we want the DB
-                                        * to be able to be down. */
+    event_db: Arc<EventDB>, /* This needs to be obsoleted, we want the DB
+                             * to be able to be down. */
     /// Status of the last DB schema version check.
     schema_version_status: Mutex<SchemaVersionStatus>,
 }
@@ -52,7 +52,8 @@ impl State {
     }
 
     /// Get the reference to the database connection pool for `EventDB`.
-    pub(crate) fn event_db(&self) -> Result<Arc<dyn EventDbQueries>, Error> {
+    #[allow(dead_code)]
+    pub(crate) fn event_db(&self) -> Result<Arc<EventDB>, Error> {
         let guard = self.schema_version_status_lock();
         match *guard {
             SchemaVersionStatus::Ok => Ok(self.event_db.clone()),
