@@ -13,7 +13,7 @@ use poem_openapi::{
 };
 
 use crate::{
-    service::{
+    event_db::queries::registration::RegistrationQueries, service::{
         common::{
             objects::{
                 event_id::EventId, voter_registration::VoterRegistration,
@@ -27,8 +27,7 @@ use crate::{
             tags::ApiTags,
         },
         utilities::middleware::schema_validation::schema_version_validation,
-    },
-    state::State,
+    }, state::State
 };
 
 /// Registration API Endpoints
