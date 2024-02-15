@@ -52,6 +52,7 @@ impl State {
     }
 
     /// Get the reference to the database connection pool for `EventDB`.
+    #[allow(dead_code)]
     pub(crate) fn event_db(&self) -> Result<Arc<EventDB>, Error> {
         let guard = self.schema_version_status_lock();
         match *guard {
