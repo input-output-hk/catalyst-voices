@@ -8,15 +8,26 @@ icon: octicons/goal-24
 
 ## Requirements Overview
 
-## Quality Goals
+## Quality Goals (WIP)
 
-## Stakeholders
+Main quality goals:
+
+|  Quality Category |  Quality   |  Description |
+|:-:|:-:|:-:|
+| Usable |  User experience  | Voting and browsing proposals should be easy and intuitive to do  |
+| Usable  | Correctness  | System functions should provide accurate results |
+| Secure   | Access control  | Role-Based Access Control  |
+| Secure   | Privacy  | User information are kept private  |
+| Secure   | Accountability  |  |
+| Reliable   |  Fail-safe | In case of failures the system does not loose data |
+
+## Stakeholders (WIP)
 
 | Role/Name   | Contact        | Expectations       |
 |-------------|----------------|--------------------|
-| *~Product Owner~* | *~Mike~* | *~Expectation-1~* |
-| *~Developer~* | *~Catalyst Team~* | *~Expectation-2~* |
-| *~User~* | *~Catalyst Community~* | *~Expectation-2~* |
-| *~Admin~* | *~Danny~* | *~Expectation-2~* |
-| *~SRE~* | *~Josh~* | *~Expectation-2~* |
-| *~Tester~* | *~Catalyst QA Team~* | *~Expectation-2~* |
+| *~Product-Owner~* | *~Mike~* | *~Expectation~* |
+| *~Developer~* | *~Catalyst-Team~* | *~Expectation~* |
+| *~User~* | *~Catalyst-Community~* | *~Expectation~* |
+| *~Admin~* | *~Danny~* | *~Expectation~* |
+| *~SRE~* | *~Josh~* | *~Expectation~* |
+| *~Tester~* | *~Catalyst-QA-Team~* | *~Expectation~* |
