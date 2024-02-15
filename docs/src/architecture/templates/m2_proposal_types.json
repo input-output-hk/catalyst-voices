@@ -1,14 +1,14 @@
 {
-  "header": {
-    "type": "header",
-    "flutter_widget": "Text widget with style which makes it look like a H1."
-  },
-  "title": {
-    "type": "text",
-    "flutter_widget": "Text widget with style which makes it look like a H2."
+  "text": {
+    "flutter_widget": "Text widget with style.",
+    "properties": {
+      "text": "Regex pattern which can be send as JSON string",
+      "label_text": "Optional text that describes the input field.",
+      "hint_text": "Optional text that provides a hint to the user.",
+      "error_text": "Optional text that provides an error message to the user."
+    }
   },
   "text_field": {
-    "type": "text_field",
     "flutter_widget": "TextField widget which reacts on user input",
     "properties": {
       "pattern": "Regex pattern which can be send as JSON string",
@@ -18,10 +18,9 @@
     }
   },
   "check_box": {
-    "type": "check_box",
-    "flutter_widget": "M3 CheckBox widget.",
+    "flutter_widget": "M3 CheckBox widget or Catalyst Checkbox widget",
     "properties": {
-      "pattern": "Regex pattern which can be send as JSON string",
+      "enum": ["category1", "category2", "category3"]
     }
   }
 }
