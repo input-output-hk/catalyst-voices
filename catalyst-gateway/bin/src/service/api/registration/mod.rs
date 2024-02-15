@@ -50,7 +50,7 @@ impl RegistrationApi {
     /// retrieved. If the `with_delegators` query parameter is omitted, then
     /// `delegator_addresses` field of `VoterInfo` type does not provided.
     #[allow(clippy::unused_async)]
-    #[allow(dead_code)]
+    #[allow(unused_variables)]
     async fn get_voter_info(
         &self, pool: Data<&Arc<State>>,
         /// A Voters Public ED25519 Key (as registered in their most recent valid
