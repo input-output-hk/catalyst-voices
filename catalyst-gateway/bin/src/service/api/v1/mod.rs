@@ -36,7 +36,8 @@ impl V1Api {
         path = "/votes/plan/account-votes/:account_id",
         method = "get",
         operation_id = "AccountVotes",
-        transform = "schema_version_validation"
+        transform = "schema_version_validation",
+        deprecated = true
     )]
 
     /// Get Account Votes

@@ -2,18 +2,16 @@
 use std::sync::Arc;
 
 use poem::web::Data;
-use poem_extensions::{
-    response,
-    UniResponse::{T200, T404, T500, T503},
-};
+use poem_extensions::{response, UniResponse::T200};
 use poem_openapi::{
     param::{Path, Query},
     payload::Json,
+    types::Example,
     OpenApi,
 };
 
 use crate::{
-    event_db::queries::registration::RegistrationQueries, service::{
+    service::{
         common::{
             objects::{
                 event_id::EventId, voter_registration::VoterRegistration,
@@ -22,12 +20,13 @@ use crate::{
             responses::{
                 resp_2xx::OK,
                 resp_4xx::{BadRequest, NotFound},
-                resp_5xx::{server_error, ServerError, ServiceUnavailable},
+                resp_5xx::{ServerError, ServiceUnavailable},
             },
             tags::ApiTags,
         },
         utilities::middleware::schema_validation::schema_version_validation,
-    }, state::State
+    },
+    state::State,
 };
 
 /// Registration API Endpoints
@@ -39,7 +38,8 @@ impl RegistrationApi {
         path = "/voter/:voting_key",
         method = "get",
         operation_id = "getVoterInfo",
-        transform = "schema_version_validation"
+        transform = "schema_version_validation",
+        deprecated = true
     )]
     /// Voter's info
     ///
@@ -49,22 +49,23 @@ impl RegistrationApi {
     /// If the `event_id` query parameter is omitted, then the latest voting power is
     /// retrieved. If the `with_delegators` query parameter is omitted, then
     /// `delegator_addresses` field of `VoterInfo` type does not provided.
+    #[allow(clippy::unused_async)]
     async fn get_voter_info(
-        &self, pool: Data<&Arc<State>>,
+        &self, _pool: Data<&Arc<State>>,
         /// A Voters Public ED25519 Key (as registered in their most recent valid
         /// [CIP-15](https://cips.cardano.org/cips/cip15) or [CIP-36](https://cips.cardano.org/cips/cip36) registration).
         #[oai(validator(max_length = 66, min_length = 66, pattern = "0x[0-9a-f]{64}"))]
-        voting_key: Path<VotingPublicKey>,
+        _voting_key: Path<VotingPublicKey>,
         /// The Event ID to return results for.
         /// See [GET Events](Link to events endpoint) for details on retrieving all valid
         /// event IDs.
         // TODO (Blue) : https://github.com/input-output-hk/catalyst-voices/issues/239
         #[oai(validator(minimum(value = "0"), maximum(value = "2147483647")))]
-        event_id: Query<Option<EventId>>,
+        _event_id: Query<Option<EventId>>,
         /// If this optional flag is set, the response will include the delegator's list
         /// in the response. Otherwise, it will be omitted.
         #[oai(default)]
-        with_delegators: Query<bool>,
+        _with_delegators: Query<bool>,
     ) -> response! {
            200: OK<Json<VoterRegistration>>,
            400: BadRequest<Json<VoterRegistration>>,
@@ -72,26 +73,6 @@ impl RegistrationApi {
            500: ServerError,
            503: ServiceUnavailable,
        } {
-        if let Ok(event_db) = pool.event_db() {
-            let voter = event_db
-                .get_voter(
-                    &event_id.0.map(Into::into),
-                    voting_key.0 .0,
-                    *with_delegators,
-                )
-                .await;
-            match voter {
-                Ok(voter) => {
-                    match voter.try_into() {
-                        Ok(voter) => T200(OK(Json(voter))),
-                        Err(err) => T500(server_error!("{}", err.to_string())),
-                    }
-                },
-                Err(crate::event_db::error::Error::NotFound(_)) => T404(NotFound),
-                Err(err) => T500(server_error!("{}", err.to_string())),
-            }
-        } else {
-            T503(ServiceUnavailable)
-        }
+        T200(OK(Json(VoterRegistration::example())))
     }
 }

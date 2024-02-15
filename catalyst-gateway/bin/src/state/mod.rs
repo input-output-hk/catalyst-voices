@@ -26,7 +26,7 @@ pub(crate) struct State {
     // event_db_handle: Arc<ArcSwap<Option<dyn EventDbQueries>>>,
     // Private need to get it with a function.
     event_db: Arc<EventDB>, /* This needs to be obsoleted, we want the DB
-                                        * to be able to be down. */
+                             * to be able to be down. */
     /// Status of the last DB schema version check.
     schema_version_status: Mutex<SchemaVersionStatus>,
 }
