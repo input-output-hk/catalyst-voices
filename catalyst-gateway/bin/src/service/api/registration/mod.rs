@@ -50,22 +50,23 @@ impl RegistrationApi {
     /// retrieved. If the `with_delegators` query parameter is omitted, then
     /// `delegator_addresses` field of `VoterInfo` type does not provided.
     #[allow(clippy::unused_async)]
+    #[allow(dead_code)]
     async fn get_voter_info(
-        &self, _pool: Data<&Arc<State>>,
+        &self, pool: Data<&Arc<State>>,
         /// A Voters Public ED25519 Key (as registered in their most recent valid
         /// [CIP-15](https://cips.cardano.org/cips/cip15) or [CIP-36](https://cips.cardano.org/cips/cip36) registration).
         #[oai(validator(max_length = 66, min_length = 66, pattern = "0x[0-9a-f]{64}"))]
-        _voting_key: Path<VotingPublicKey>,
+        voting_key: Path<VotingPublicKey>,
         /// The Event ID to return results for.
         /// See [GET Events](Link to events endpoint) for details on retrieving all valid
         /// event IDs.
         // TODO (Blue) : https://github.com/input-output-hk/catalyst-voices/issues/239
         #[oai(validator(minimum(value = "0"), maximum(value = "2147483647")))]
-        _event_id: Query<Option<EventId>>,
+        event_id: Query<Option<EventId>>,
         /// If this optional flag is set, the response will include the delegator's list
         /// in the response. Otherwise, it will be omitted.
         #[oai(default)]
-        _with_delegators: Query<bool>,
+        with_delegators: Query<bool>,
     ) -> response! {
            200: OK<Json<VoterRegistration>>,
            400: BadRequest<Json<VoterRegistration>>,
