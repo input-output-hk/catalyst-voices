@@ -1,15 +1,15 @@
 {
   "text": {
-    "flutter_widget": "Text widget with style.",
+    "_comment": "Text or Catalyst Text widget with style.",
     "properties": {
-      "text": "Regex pattern which can be send as JSON string",
-      "label_text": "Optional text that describes the input field.",
-      "hint_text": "Optional text that provides a hint to the user.",
-      "error_text": "Optional text that provides an error message to the user."
+      "en": "Text in English",
+      "font_size": 18,
+      "font_weight": "w100, w200, w300, w400, w500, w600, w700, w800, w900",
+      "color": "#000000"
     }
   },
   "text_field": {
-    "flutter_widget": "TextField widget which reacts on user input",
+    "_comment": "TextField or Catalyst TextField widget widget which reacts on user input",
     "properties": {
       "pattern": "Regex pattern which can be send as JSON string",
       "label_text": "Optional text that describes the input field.",
@@ -18,7 +18,7 @@
     }
   },
   "check_box": {
-    "flutter_widget": "M3 CheckBox widget or Catalyst Checkbox widget",
+    "_comment": "M3 CheckBox widget or Catalyst Checkbox widget",
     "properties": {
       "enum": ["category1", "category2", "category3"]
     }
