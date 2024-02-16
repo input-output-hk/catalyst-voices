@@ -18,7 +18,7 @@ Main quality goals:
 | Usable  | Correctness  | System functions should provide accurate results |
 | Secure   | Access control  | Role-Based Access Control  |
 | Secure   | Privacy  | User information are kept private  |
-| Secure   | Accountability  |  |
+| Secure   | Accountability  |  Voting results can be audited by external parties |
 | Reliable   |  Fail-safe | In case of failures the system does not loose data |
 
 ## Stakeholders (WIP)
