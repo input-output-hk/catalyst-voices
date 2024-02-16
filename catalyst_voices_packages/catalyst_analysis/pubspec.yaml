@@ -3,4 +3,4 @@ version: 1.0.0
 description: Lint rules for Dart and Flutter used internally at Catalyst.
 
 environment:
-  sdk: '>=3.2.1 <4.0.0'
+  sdk: '>=3.3.0 <4.0.0'
