@@ -9,7 +9,7 @@ use super::{delegate_public_key::DelegatePublicKey, voter_group_id::VoterGroupId
 pub(crate) struct VoterInfo {
     /// Voter's voting power.
     /// This is the true voting power, subject to minimum voting power and max cap.
-    // TODO (Blue) : https://github.com/input-output-hk/catalyst-voices/issues/239
+    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
     #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
     voting_power: i64,
 
@@ -18,12 +18,12 @@ pub(crate) struct VoterInfo {
 
     /// Total voting power delegated to this voter.
     /// This is not capped and not subject to minimum voting power.
-    // TODO (Blue) : https://github.com/input-output-hk/catalyst-voices/issues/239
+    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
     #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
     delegations_power: i64,
 
     /// Number of registration which delegated to this voter.
-    // TODO (Blue) : https://github.com/input-output-hk/catalyst-voices/issues/239
+    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
     #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
     delegations_count: i64,
 
@@ -36,7 +36,7 @@ pub(crate) struct VoterInfo {
 
     /// List of stake public key addresses which delegated to this voting key.
     #[oai(skip_serializing_if_is_none = true)]
-    // TODO (Blue) : https://github.com/input-output-hk/catalyst-voices/issues/239
+    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
     #[oai(validator(max_items = "100"))]
     delegator_addresses: Option<Vec<DelegatePublicKey>>,
 }
