@@ -12,7 +12,12 @@ use poem_openapi::{
     OpenApi,
 };
 
-use crate::{service::common::tags::ApiTags, state::State};
+use crate::{
+    service::{
+        common::tags::ApiTags, utilities::middleware::schema_validation::schema_version_validation,
+    },
+    state::State,
+};
 
 /// Test API Endpoints
 pub(crate) struct TestApi;
@@ -23,6 +28,7 @@ impl TestApi {
         path = "/test/:id/test/:action",
         method = "get",
         operation_id = "testGet",
+        transform = "schema_version_validation",
         deprecated
     )]
     /// Test Get API
