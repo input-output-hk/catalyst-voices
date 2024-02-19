@@ -6,7 +6,7 @@ use poem_extensions::{response, UniResponse::T200};
 use poem_openapi::payload::Json;
 
 use crate::service::common::{
-    objects::{fragment_status::FragmentStatus, fragments_processing_summary::FragmentId},
+    objects::{legacy::fragment_status::FragmentStatus, legacy::fragments_processing_summary::FragmentId},
     responses::{
         resp_2xx::OK,
         resp_4xx::BadRequest,

@@ -8,7 +8,7 @@ use poem_openapi::payload::Json;
 
 use crate::{
     service::common::{
-        objects::vote_plan::VotePlan,
+        objects::legacy::vote_plan::VotePlan,
         responses::{
             resp_2xx::OK,
             resp_4xx::BadRequest,

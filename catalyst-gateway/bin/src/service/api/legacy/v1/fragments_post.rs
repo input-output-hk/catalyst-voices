@@ -5,7 +5,7 @@ use poem_openapi::payload::Json;
 
 use crate::service::common::{
     objects::{
-        fragments_batch::FragmentsBatch, fragments_processing_summary::FragmentsProcessingSummary,
+        legacy::fragments_batch::FragmentsBatch, legacy::fragments_processing_summary::FragmentsProcessingSummary,
     },
     responses::{
         resp_2xx::OK,

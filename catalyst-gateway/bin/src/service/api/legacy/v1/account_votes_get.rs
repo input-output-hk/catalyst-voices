@@ -8,7 +8,7 @@ use poem_openapi::{param::Path, payload::Json};
 
 use crate::{
     service::common::{
-        objects::account_votes::{AccountId, AccountVote},
+        objects::legacy::account_votes::{AccountId, AccountVote},
         responses::{
             resp_2xx::OK,
             resp_4xx::BadRequest,

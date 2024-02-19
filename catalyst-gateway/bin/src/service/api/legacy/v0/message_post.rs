@@ -4,7 +4,7 @@ use poem_extensions::{response, UniResponse::T200};
 use poem_openapi::payload::{Binary, Json};
 
 use crate::service::common::{
-    objects::fragments_processing_summary::FragmentsProcessingSummary,
+    objects::legacy::fragments_processing_summary::FragmentsProcessingSummary,
     responses::{
         resp_2xx::OK,
         resp_4xx::BadRequest,
