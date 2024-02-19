@@ -111,7 +111,7 @@ impl EventDB {
 
 #[async_trait]
 impl VitSSFundQueries for EventDB {
-    // TODO (SJ) : https://github.com/input-output-hk/catalyst-voices/issues/68
+    // TODO(stevenj): https://github.com/input-output-hk/catalyst-voices/issues/68
     #[allow(clippy::too_many_lines)]
     async fn get_fund(&self) -> Result<FundWithNext, Error> {
         let conn = self.pool.get().await?;
