@@ -13,7 +13,7 @@ command:
   bootstrap:
     environment:
       sdk: '>=3.2.6 <4.0.0'
-      flutter: 3.16.9
+      flutter: 3.19.0
     dependencies:
       bloc_concurrency: ^0.2.2
       bloc: ^8.1.2
