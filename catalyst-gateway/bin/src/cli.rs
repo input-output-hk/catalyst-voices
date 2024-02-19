@@ -1,13 +1,10 @@
 //! CLI interpreter for the service
 
-use std::{io::Write, sync::Arc};
+use std::{env, io::Write, sync::Arc};
 
 use clap::Parser;
 use tokio::time;
 use tracing::error;
-
-// How often to check for config in db
-pub const CHECK_CONFIG_TICK: u64 = 5;
 
 use crate::{
     follower::start_followers,
@@ -57,8 +54,12 @@ impl Cli {
                 let state = Arc::new(State::new(Some(settings.database_url)).await?);
                 let event_db = state.event_db()?;
 
+                // Tick every N seconds until config exists in db
+                let check_config_tick = env::var("CHECK_CONFIG_TICK")?;
+
                 // tick until config exists
-                let mut interval = time::interval(time::Duration::from_secs(CHECK_CONFIG_TICK));
+                let mut interval =
+                    time::interval(time::Duration::from_secs(check_config_tick.parse::<u64>()?));
                 let config = loop {
                     interval.tick().await;
 
@@ -68,7 +69,16 @@ impl Cli {
                     }
                 };
 
-                let _ = start_followers(config, event_db.clone()).await?;
+                // Tick every N seconds until data is stale enough to update
+                let data_refresh_tick = env::var("DATA_REFRESH_TICK")?;
+
+                let _ = start_followers(
+                    config,
+                    event_db.clone(),
+                    data_refresh_tick.parse::<u64>()?,
+                    check_config_tick.parse::<u64>()?,
+                )
+                .await?;
 
                 service::run(&settings.address, state).await?;
                 Ok(())

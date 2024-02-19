@@ -8,21 +8,16 @@ use cardano_chain_follower::{
 use tokio::time;
 use tracing::{error, info};
 
-use crate::{
-    cli::CHECK_CONFIG_TICK,
-    event_db::queries::{
-        event::config::{FollowerMeta, NetworkMeta},
-        EventDbQueries,
-    },
+use crate::event_db::queries::{
+    event::config::{FollowerMeta, NetworkMeta},
+    EventDbQueries,
 };
-
-// Tick until data is stale and ready to update
-pub const DATA_STALE_TICK: u64 = 5;
 
 #[async_recursion]
 /// Start followers as per defined in the config
 pub(crate) async fn start_followers(
-    configs: (Vec<NetworkMeta>, FollowerMeta), db: Arc<dyn EventDbQueries>,
+    configs: (Vec<NetworkMeta>, FollowerMeta), db: Arc<dyn EventDbQueries>, data_refresh_tick: u64,
+    check_config_tick: u64,
 ) -> Result<(), Box<dyn Error>> {
     let mut follower_tasks = Vec::new();
 
@@ -30,7 +25,7 @@ pub(crate) async fn start_followers(
         info!("starting follower for {:?}", config.network);
 
         // tick until data is stale then start followers
-        let mut interval = time::interval(time::Duration::from_secs(DATA_STALE_TICK));
+        let mut interval = time::interval(time::Duration::from_secs(data_refresh_tick));
         let task_handler = loop {
             interval.tick().await;
             let (slot_no, block_hash, last_updated) =
@@ -64,7 +59,7 @@ pub(crate) async fn start_followers(
         follower_tasks.push(task_handler);
     }
 
-    let mut interval = time::interval(time::Duration::from_secs(CHECK_CONFIG_TICK));
+    let mut interval = time::interval(time::Duration::from_secs(check_config_tick));
     let config = loop {
         interval.tick().await;
         match db.get_config().await.map(|config| config) {
@@ -84,7 +79,7 @@ pub(crate) async fn start_followers(
     }
 
     info!("Restarting followers with new config");
-    start_followers(config, db).await?;
+    start_followers(config, db, data_refresh_tick, check_config_tick).await?;
 
     Ok(())
 }
@@ -93,7 +88,6 @@ pub(crate) async fn start_followers(
 async fn init_follower(
     network: String, relay: String, slot_no: i64, block_hash: String, db: Arc<dyn EventDbQueries>,
 ) -> Result<tokio::task::JoinHandle<()>, Box<dyn Error>> {
-    // Defaults to start following from the tip.
     let follower_cfg = FollowerConfigBuilder::default()
         .follow_from(Point::new(slot_no.try_into()?, hex::decode(block_hash)?))
         .build();
