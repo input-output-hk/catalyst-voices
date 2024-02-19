@@ -4,10 +4,16 @@ use std::{io::Write, sync::Arc};
 use clap::Parser;
 
 use crate::{
+    event_db::queries::event::config::ConfigQueries,
+    follower::start_followers,
     logger, service,
     settings::{DocsSettings, ServiceSettings},
     state::State,
 };
+
+use std::env;
+use tokio::time;
+use tracing::error;
 
 #[derive(thiserror::Error, Debug)]
 /// All service errors
@@ -49,6 +55,34 @@ impl Cli {
                 logger::init(settings.log_level)?;
 
                 let state = Arc::new(State::new(Some(settings.database_url)).await?);
+                let event_db = state.event_db()?;
+
+                // Tick every N seconds until config exists in db
+                let check_config_tick = env::var("CHECK_CONFIG_TICK")?;
+
+                // tick until config exists
+                let mut interval =
+                    time::interval(time::Duration::from_secs(check_config_tick.parse::<u64>()?));
+                let config = loop {
+                    interval.tick().await;
+
+                    match event_db.get_config().await.map(|config| config) {
+                        Ok(config) => break config,
+                        Err(err) => error!("no config {:?}", err),
+                    }
+                };
+
+                // Tick every N seconds until data is stale enough to update
+                let data_refresh_tick = env::var("DATA_REFRESH_TICK")?;
+
+                let _ = start_followers(
+                    config,
+                    event_db.clone(),
+                    data_refresh_tick.parse::<u64>()?,
+                    check_config_tick.parse::<u64>()?,
+                )
+                .await?;
+
                 service::run(&settings.docs_settings, state).await?;
                 Ok(())
             },

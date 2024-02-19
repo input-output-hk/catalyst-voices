@@ -59,6 +59,9 @@ dotenvy = "0.15"
 local-ip-address = "0.5.7"
 gethostname = "0.4.3"
 
+cardano_chain_follower= { path = "../hermes/hermes/crates/cardano-chain-follower/" }
+
+
 [workspace.lints.rust]
 warnings = "deny"
 missing_docs = "deny"

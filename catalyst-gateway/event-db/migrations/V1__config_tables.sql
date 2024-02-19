@@ -74,17 +74,17 @@ Must match the `name` component of the $id URI inside the schema.';
 -- This table is looked up with three keys, `id`, `id2` and `id3`
 CREATE TABLE config (
   row_id SERIAL PRIMARY KEY,
-  id VARCHAR NOT NULL,
-  id2 VARCHAR NOT NULL,
-  id3 VARCHAR NOT NULL,
+  cardano VARCHAR NOT NULL,
+  follower VARCHAR NOT NULL,
+  preview VARCHAR NOT NULL,
   value JSONB NULL,
   value_schema UUID,
 
   FOREIGN KEY (value_schema) REFERENCES json_schema_type (id) ON DELETE CASCADE
 );
 
--- id+id2+id3 must be unique, they are a combined key.
-CREATE UNIQUE INDEX config_idx ON config (id, id2, id3);
+-- cardano+follower+preview must be unique, they are a combined key.
+CREATE UNIQUE INDEX config_idx ON config (cardano, follower, preview);
 
 COMMENT ON TABLE config IS
 'General JSON Configuration and Data Values.
@@ -94,18 +94,18 @@ Defined  Data Formats:
 
 COMMENT ON COLUMN config.row_id IS
 'Synthetic unique key. 
-Always lookup using `id.id2.id3`';
-COMMENT ON COLUMN config.id IS
+Always lookup using `cardano.follower.preview`';
+COMMENT ON COLUMN config.cardano IS
 'The name/id of the general config value/variable';
-COMMENT ON COLUMN config.id2 IS
+COMMENT ON COLUMN config.follower IS
 '2nd ID of the general config value. 
 Must be defined, use "" if not required.';
 
-COMMENT ON COLUMN config.id3 IS
+COMMENT ON COLUMN config.preview IS
 '3rd ID of the general config value.
 Must be defined, use "" if not required.';
 COMMENT ON COLUMN config.value IS
-'The JSON value of the system variable `id.id2.id3`';
+'The JSON value of the system variable `cardano.follower.preview`';
 COMMENT ON COLUMN config.value_schema IS
 'The Schema the Config Value conforms to.
 The `value` field must conform to this schema.';
@@ -114,6 +114,16 @@ COMMENT ON INDEX config_idx IS
 'We use three keys combined uniquely rather than forcing string concatenation 
 at the app level to allow for querying groups of data.';
 
+insert into config(cardano,follower,preview) VALUES('{
+    "network": "mainnet",
+    "relay": "relays-new.cardano-mainnet.iohk.io:3001"
+}','{
+    "mithril_addr": "addr",
+    "timing_pattern": 25
+}', '{
+    "network": "preview",
+    "relay": "preview-node.play.dev.cardano.org:3001"
+}');
 
 -- -------------------------------------------------------------------------------------------------
 
