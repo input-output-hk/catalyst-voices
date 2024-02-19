@@ -33,7 +33,7 @@ pub(crate) async fn start_followers(
         let task_handler = loop {
             interval.tick().await;
             let (slot_no, block_hash, last_updated) =
-                db.bootstrap_follower_from(config.network.clone()).await?;
+                db.last_updated_metadata(config.network.clone()).await?;
 
             // threshold which defines if data is stale and ready to update or not
             if chrono::offset::Utc::now().timestamp() - last_updated.timestamp()
@@ -134,7 +134,7 @@ async fn init_follower(
                     };
 
                     match db
-                        .updates_from_follower(
+                        .index_follower_data(
                             block.slot().try_into().expect("Slot conversion infallible"),
                             network.clone(),
                             block
@@ -166,7 +166,7 @@ async fn init_follower(
 
                     // last updated
                     match db
-                        .last_updated(
+                        .refresh_last_updated(
                             chrono::offset::Utc::now(),
                             block.slot().try_into().expect("Slot conversion infallible"),
                             hex::encode(block.hash().clone()),
