@@ -2,7 +2,7 @@
 
 use poem_openapi::{types::Example, Object, Union};
 
-use crate::service::common::objects::{legacy::block::BlockDate, legacy::hash::Hash};
+use crate::service::common::objects::legacy::{block::BlockDate, hash::Hash};
 
 #[derive(Object)]
 #[oai(example = false)]

@@ -3,7 +3,7 @@ use async_trait::async_trait;
 
 use crate::event_db::{
     error::Error,
-    types::{
+    legacy::types::{
         event::EventId,
         objective::{
             Objective, ObjectiveDetails, ObjectiveId, ObjectiveSummary, ObjectiveType,

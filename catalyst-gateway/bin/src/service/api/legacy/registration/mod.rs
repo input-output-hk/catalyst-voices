@@ -13,9 +13,9 @@ use poem_openapi::{
 use crate::{
     service::{
         common::{
-            objects::{
-                legacy::event_id::EventId, legacy::voter_registration::VoterRegistration,
-                legacy::voting_public_key::VotingPublicKey,
+            objects::legacy::{
+                event_id::EventId, voter_registration::VoterRegistration,
+                voting_public_key::VotingPublicKey,
             },
             responses::{
                 resp_2xx::OK,

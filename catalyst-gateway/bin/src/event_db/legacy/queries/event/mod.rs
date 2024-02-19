@@ -4,7 +4,7 @@ use chrono::{NaiveDateTime, Utc};
 
 use crate::event_db::{
     error::Error,
-    types::event::{
+    legacy::types::event::{
         Event, EventDetails, EventGoal, EventId, EventRegistration, EventSchedule, EventSummary,
         VotingPowerAlgorithm, VotingPowerSettings,
     },

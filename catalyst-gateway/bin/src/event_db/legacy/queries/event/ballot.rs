@@ -5,7 +5,7 @@ use async_trait::async_trait;
 
 use crate::event_db::{
     error::Error,
-    types::{
+    legacy::types::{
         ballot::{
             Ballot, BallotType, GroupVotePlans, ObjectiveBallots, ObjectiveChoices, ProposalBallot,
             VotePlan,

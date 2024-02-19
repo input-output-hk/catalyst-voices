@@ -12,9 +12,9 @@ use poem_openapi::{
 use crate::{
     service::{
         common::{
-            objects::{
-                legacy::account_votes::AccountId, legacy::fragments_batch::FragmentsBatch,
-                legacy::fragments_processing_summary::FragmentId,
+            objects::legacy::{
+                account_votes::AccountId, fragments_batch::FragmentsBatch,
+                fragments_processing_summary::FragmentId,
             },
             tags::ApiTags,
         },

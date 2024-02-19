@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use chrono::{NaiveDateTime, Utc};
 
 use crate::event_db::{
-    types::vit_ss::{
+    legacy::types::vit_ss::{
         challenge::{Challenge, ChallengeHighlights},
         fund::{Fund, FundNextInfo, FundStageDates, FundWithNext},
         goal::Goal,

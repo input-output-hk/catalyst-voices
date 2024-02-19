@@ -3,7 +3,7 @@ use async_trait::async_trait;
 use chrono::{NaiveDateTime, Utc};
 
 use crate::event_db::{
-    types::{
+    legacy::types::{
         event::EventId,
         registration::{Delegation, Delegator, RewardAddress, Voter, VoterGroupId, VoterInfo},
     },
