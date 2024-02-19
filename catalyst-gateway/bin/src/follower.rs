@@ -28,14 +28,15 @@ pub(crate) async fn start_followers(
     for config in &configs.0 {
         info!("starting follower for {:?}", config.network);
 
-        // tick until data is stale then start followers
+        // Tick until data is stale then start followers
         let mut interval = time::interval(time::Duration::from_secs(data_refresh_tick));
         let task_handler = loop {
             interval.tick().await;
+            // We need to find at which point the last follower stopped updating in order to pick up where it left off.
             let (slot_no, block_hash, last_updated) =
                 db.last_updated_metadata(config.network.clone()).await?;
 
-            // threshold which defines if data is stale and ready to update or not
+            // Threshold which defines if data is stale and ready to update or not
             if chrono::offset::Utc::now().timestamp() - last_updated.timestamp()
                 > configs.1.timing_pattern.into()
             {
@@ -63,6 +64,7 @@ pub(crate) async fn start_followers(
         follower_tasks.push(task_handler);
     }
 
+    // Continue indexing until config has changed
     let mut interval = time::interval(time::Duration::from_secs(check_config_tick));
     let config = loop {
         interval.tick().await;
@@ -80,6 +82,7 @@ pub(crate) async fn start_followers(
         }
     };
 
+    // Config has changed, terminate all followers and restart with new config.
     info!("Terminating followers");
     for task in follower_tasks {
         task.abort()
@@ -96,7 +99,7 @@ pub(crate) async fn start_followers(
     Ok(())
 }
 
-/// Initiate single follower
+/// Initiate single follower and return task handler
 async fn init_follower(
     network: String, relay: String, slot_no: i64, block_hash: String, db: Arc<EventDB>,
 ) -> Result<tokio::task::JoinHandle<()>, Box<dyn Error>> {
@@ -156,15 +159,20 @@ async fn init_follower(
                             continue;
                         },
                     }
-                    // index the following
 
-                    // utxo stuff
+                    // TODO
 
-                    // registration stuff
+                    // Index the following:
 
-                    // rewards stuff
+                    // Utxo stuff
 
-                    // last updated
+                    // Registration stuff
+
+                    // Rewards stuff
+
+                    // Last updated
+
+                    // Refresh update metadata for future followers
                     match db
                         .refresh_last_updated(
                             chrono::offset::Utc::now(),
