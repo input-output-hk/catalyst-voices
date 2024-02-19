@@ -7,6 +7,7 @@ appspot
 asyncio
 asyncpg
 auditability
+bkioshn
 bluefireteam
 BROTLI
 cardano
@@ -59,6 +60,7 @@ mdlint
 mitigations
 moderations
 multidex
+myproject
 nanos
 netkey
 nextest

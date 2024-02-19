@@ -36,7 +36,8 @@ impl V1Api {
         path = "/votes/plan/account-votes/:account_id",
         method = "get",
         operation_id = "AccountVotes",
-        transform = "schema_version_validation"
+        transform = "schema_version_validation",
+        deprecated = true
     )]
 
     /// Get Account Votes
@@ -85,7 +86,7 @@ impl V1Api {
         &self,
         /// Comma-separated list of fragment ids for which the statuses will
         /// be retrieved.
-        // TODO (Blue) : https://github.com/input-output-hk/catalyst-voices/issues/239
+        // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
         #[oai(validator(max_items = "1000"))]
         Query(fragment_ids): Query<Vec<FragmentId>>,
     ) -> fragments_statuses::AllResponses {

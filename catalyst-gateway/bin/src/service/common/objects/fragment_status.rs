@@ -15,7 +15,7 @@ pub(crate) struct StatusPending;
 pub(crate) struct StatusRejected {
     /// Reason the fragment was rejected.
     // Should start with capital letter.
-    // TODO (Blue) : https://github.com/input-output-hk/catalyst-voices/issues/239
+    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
     #[oai(validator(max_length = "250", pattern = r"^[A-Z].*$"))]
     pub reason: String,
 }

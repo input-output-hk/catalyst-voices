@@ -40,7 +40,7 @@ pub(crate) struct RejectedFragment {
     /// future, this might change to including the prefix "0x".
     fragment_id: FragmentId,
     /// The number of the pool that caused this error.
-    // TODO (Blue) : https://github.com/input-output-hk/catalyst-voices/issues/239
+    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
     #[oai(validator(minimum(value = "0"), maximum(value = "4294967295")))]
     pool_number: usize,
     /// The reason why this fragment was rejected.
@@ -62,7 +62,7 @@ impl Example for RejectedFragment {
 /// Information about whether a message was accepted or rejected.
 pub(crate) struct FragmentsProcessingSummary {
     /// IDs of accepted fragments.
-    // TODO (Blue) : https://github.com/input-output-hk/catalyst-voices/issues/239
+    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
     // Pattern: hex
     #[oai(validator(
         max_items = "100",
@@ -72,7 +72,7 @@ pub(crate) struct FragmentsProcessingSummary {
     ))]
     accepted: Vec<FragmentId>,
     /// Detailed information about rejected fragments.
-    // TODO (Blue) : https://github.com/input-output-hk/catalyst-voices/issues/239
+    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
     #[oai(validator(max_items = "100"))]
     rejected: Vec<RejectedFragment>,
 }
