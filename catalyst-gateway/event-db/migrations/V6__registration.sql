@@ -45,9 +45,13 @@ COMMENT ON COLUMN cardano_slot_index.block_time IS
 COMMENT ON COLUMN cardano_slot_index.block_hash IS
 'The hash of the block.';
 
-insert into cardano_slot_index(slot_no, network, epoch_no, block_time, block_hash) VALUES(22, 'mainnet', 0, '2017-09-23 21:52:11+01',decode('a076c4b645ec23e7e6fa909821edb3e28106d0ffa6325cd2d32e0f3b53c1c09b','hex'));
+INSERT INTO cardano_slot_index( slot_no, network, epoch_no, block_time, block_hash) 
+VALUES(22, 'mainnet', 0, '2017-09-23 21:52:11+01',
+decode('a076c4b645ec23e7e6fa909821edb3e28106d0ffa6325cd2d32e0f3b53c1c09b','hex'));
 
-insert into cardano_slot_index(slot_no, network, epoch_no, block_time, block_hash) VALUES(35209437, 'preview', 0, '2023-10-19 10:23:54+01',decode('0a5df2587e2d65f4e5a5a41b0516d3673e58b78a4a1d5af0238fb84a14d44ad8','hex'));
+INSERT INTO cardano_slot_index( slot_no, network, epoch_no, block_time, block_hash) 
+VALUES(35209437, 'preview', 0, '2023-10-19 10:23:54+01',
+decode('0a5df2587e2d65f4e5a5a41b0516d3673e58b78a4a1d5af0238fb84a14d44ad8','hex'));
 
 -- -------------------------------------------------------------------------------------------------
 
