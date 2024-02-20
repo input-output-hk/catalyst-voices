@@ -35,6 +35,8 @@ pub(crate) enum Error {
     /// JSON Parsing error
     #[error("Unable to parse database data: {0}")]
     JsonParseIssue(String),
+    #[error("Decode Error: {0}")]
+    DecodeHexError(String),
 }
 
 impl From<RunError<tokio_postgres::Error>> for Error {

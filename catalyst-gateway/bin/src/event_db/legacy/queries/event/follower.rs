@@ -55,7 +55,7 @@ impl FollowerQueries for EventDB {
                     &network,
                     &i64::from(epoch_no),
                     &ts,
-                    &hex::decode(block_hash).unwrap(),
+                    &hex::decode(block_hash).map_err(|e| Error::DecodeHexError(e.to_string()))?,
                 ],
             )
             .await?;
