@@ -185,8 +185,8 @@ Must conform to Schema:
 
 INSERT INTO cardano_update_state
 (
-    id, started, ended, updater_id, slot_no,
-    network, block_hash, update,rollback, stats
+  id, started, ended, updater_id, slot_no,
+  network, block_hash, update, rollback, stats
 )
 
 VALUES
@@ -195,8 +195,12 @@ VALUES
   'a076c4b645ec23e7e6fa909821edb3e28106d0ffa6325cd2d32e0f3b53c1c09b', '1', '0', '{"metadata": "abc"}'
 );
 
-INSERT INTO cardano_update_state (id, started, ended, updater_id,
- slot_no, network, block_hash, update, rollback, stats)
+INSERT INTO cardano_update_state 
+(
+  id, started, ended, updater_id,
+  slot_no, network, block_hash, update, rollback, stats
+)
+
 VALUES
 (
   2, '2004-10-19 10:23:54+02', '2004-10-19 10:23:54+02',
