@@ -75,4 +75,5 @@ gethostname.workspace = true
 hex = "0.4.3"
 async-recursion = "1.0.5"
 
-cardano-chain-follower= { path = "../../../hermes/hermes/crates/cardano-chain-follower/" }
+
+cardano-chain-follower= { git = "https://github.com/input-output-hk/hermes.git" }
