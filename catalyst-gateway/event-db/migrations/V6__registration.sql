@@ -49,14 +49,14 @@ INSERT INTO cardano_slot_index (slot_no, network, epoch_no, block_time, block_ha
 VALUES
 (
   22, 'mainnet', 0, '2017-09-23 21:52:11+01',
-  Decode('a076c4b645ec23e7e6fa909821edb3e28106d0ffa6325cd2d32e0f3b53c1c09b', 'hex')
+  DECODE('a076c4b645ec23e7e6fa909821edb3e28106d0ffa6325cd2d32e0f3b53c1c09b', 'hex')
 );
 
 INSERT INTO cardano_slot_index (slot_no, network, epoch_no, block_time, block_hash)
 VALUES
 (
-  35209437, 'preview', 0, '2023-10-19 10:23:54+01', 
-  Decode('0a5df2587e2d65f4e5a5a41b0516d3673e58b78a4a1d5af0238fb84a14d44ad8', 'hex')
+  35209437, 'preview', 0, '2023-10-19 10:23:54+01',
+  DECODE('0a5df2587e2d65f4e5a5a41b0516d3673e58b78a4a1d5af0238fb84a14d44ad8', 'hex')
 );
 
 -- -------------------------------------------------------------------------------------------------
@@ -183,7 +183,6 @@ Must conform to Schema:
     `catalyst_schema://0f917b13-afac-40d2-8263-b17ca8219914/registration/update_stats`.';
 
 
- 
 INSERT INTO cardano_update_state (id, started, ended, updater_id, slot_no, network,
 block_hash, update, rollback, stats)
 VALUES
