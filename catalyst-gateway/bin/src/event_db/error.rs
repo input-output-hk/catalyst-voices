@@ -32,6 +32,9 @@ pub(crate) enum Error {
     /// No config
     #[error("No config")]
     NoConfig,
+    /// JSON Parsing error
+    #[error("Unable to parse database data")]
+    JsonParseIssue,
 }
 
 impl From<RunError<tokio_postgres::Error>> for Error {

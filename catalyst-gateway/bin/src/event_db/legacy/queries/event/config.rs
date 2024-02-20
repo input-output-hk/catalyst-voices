@@ -12,6 +12,7 @@ use crate::event_db::EventDB;
 pub(crate) trait ConfigQueries: Sync + Send + 'static {
     async fn get_config(&self) -> Result<(Vec<NetworkMeta>, FollowerMeta), Error>;
 }
+use crate::event_db::Error::JsonParseIssue;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, PartialOrd)]
 pub(crate) struct NetworkMeta {
@@ -44,7 +45,8 @@ impl ConfigQueries for EventDB {
         let mut networks: Vec<String> = Vec::new();
 
         let follower_meta: String = rows[0].try_get("follower")?;
-        let follower_metadata: FollowerMeta = serde_json::from_str(&follower_meta).unwrap();
+        let follower_metadata: FollowerMeta =
+            serde_json::from_str(&follower_meta).map_err(|_| JsonParseIssue)?;
 
         rows[0]
             .try_get("cardano")
