@@ -6,7 +6,7 @@ use tokio::time;
 use tracing::{error, info};
 
 use crate::event_db::{
-    queries::event::{
+    legacy::queries::event::{
         config::{ConfigQueries, FollowerMeta, NetworkMeta},
         follower::FollowerQueries,
     },

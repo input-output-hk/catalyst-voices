@@ -4,7 +4,7 @@ use std::{io::Write, sync::Arc};
 use clap::Parser;
 
 use crate::{
-    event_db::queries::event::config::ConfigQueries,
+    event_db::legacy::queries::event::config::ConfigQueries,
     follower::start_followers,
     logger, service,
     settings::{DocsSettings, ServiceSettings},
