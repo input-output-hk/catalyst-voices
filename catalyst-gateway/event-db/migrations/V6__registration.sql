@@ -47,13 +47,17 @@ COMMENT ON COLUMN cardano_slot_index.block_hash IS
 
 INSERT INTO cardano_slot_index (slot_no, network, epoch_no, block_time, block_hash) 
 VALUES
-(22, 'mainnet', 0, '2017-09-23 21:52:11+01',
-decode('a076c4b645ec23e7e6fa909821edb3e28106d0ffa6325cd2d32e0f3b53c1c09b','hex'));
+(
+  22, 'mainnet', 0, '2017-09-23 21:52:11+01',
+  decode('a076c4b645ec23e7e6fa909821edb3e28106d0ffa6325cd2d32e0f3b53c1c09b','hex')
+);
 
 INSERT INTO cardano_slot_index (slot_no, network, epoch_no, block_time, block_hash) 
 VALUES
-(35209437, 'preview', 0, '2023-10-19 10:23:54+01',
-decode('0a5df2587e2d65f4e5a5a41b0516d3673e58b78a4a1d5af0238fb84a14d44ad8','hex'));
+(
+  35209437, 'preview', 0, '2023-10-19 10:23:54+01',
+  decode('0a5df2587e2d65f4e5a5a41b0516d3673e58b78a4a1d5af0238fb84a14d44ad8','hex')
+);
 
 -- -------------------------------------------------------------------------------------------------
 
@@ -183,14 +187,19 @@ Must conform to Schema:
 INSERT INTO cardano_update_state (id, started, ended, updater_id, slot_no, network,
 block_hash, update, rollback, stats) 
 VALUES 
-(1, '2004-10-19 10:23:54+02', '2004-10-19 10:23:54+02', 'cde', 22, 'mainnet',
-'a076c4b645ec23e7e6fa909821edb3e28106d0ffa6325cd2d32e0f3b53c1c09b', '1', '0', '{"metadata": "abc"}' );
+(
+  1, '2004-10-19 10:23:54+02', '2004-10-19 10:23:54+02', 'cde', 22, 'mainnet',
+  'a076c4b645ec23e7e6fa909821edb3e28106d0ffa6325cd2d32e0f3b53c1c09b', '1', '0', '{"metadata": "abc"}'
+);
 
 INSERT INTO cardano_update_state (id, started, ended, updater_id, slot_no, network,
 block_hash, update, rollback, stats)
-VALUES (2, '2004-10-19 10:23:54+02', '2004-10-19 10:23:54+02',
-'cde', 35209437, 'preview',
-'b49f6293f0efe10fa927659700deef23e7332caead044dcf6ad78ba05500ca73', '1', '0', '{"metadata": "abc"}' );
+VALUES 
+(
+  2, '2004-10-19 10:23:54+02', '2004-10-19 10:23:54+02',
+  'cde', 35209437, 'preview',
+  'b49f6293f0efe10fa927659700deef23e7332caead044dcf6ad78ba05500ca73', '1', '0', '{"metadata": "abc"}' 
+);
 
 
 -- -------------------------------------------------------------------------------------------------
