@@ -108,6 +108,7 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+    namespace 'io.projectcatalyst.catalyst_voices'
 }
 
 flutter {
