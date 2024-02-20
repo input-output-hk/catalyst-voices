@@ -1,7 +1,9 @@
 use std::{error::Error, str::FromStr, sync::Arc};
 
 use async_recursion::async_recursion;
-
+use cardano_chain_follower::{
+    network_genesis_values, ChainUpdate, Follower, FollowerConfigBuilder, Network, Point,
+};
 use tokio::time;
 use tracing::{error, info};
 
@@ -11,10 +13,6 @@ use crate::event_db::{
         follower::FollowerQueries,
     },
     EventDB,
-};
-
-use cardano_chain_follower::{
-    network_genesis_values, ChainUpdate, Follower, FollowerConfigBuilder, Network, Point,
 };
 
 #[async_recursion]
@@ -32,7 +30,8 @@ pub(crate) async fn start_followers(
         let mut interval = time::interval(time::Duration::from_secs(data_refresh_tick));
         let task_handler = loop {
             interval.tick().await;
-            // We need to find at which point the last follower stopped updating in order to pick up where it left off.
+            // We need to find at which point the last follower stopped updating in order to pick up
+            // where it left off.
             let (slot_no, block_hash, last_updated) =
                 db.last_updated_metadata(config.network.clone()).await?;
 

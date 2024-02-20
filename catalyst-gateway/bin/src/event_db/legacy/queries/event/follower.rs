@@ -1,12 +1,8 @@
 //! Follower Queries
 use async_trait::async_trait;
+use chrono::{DateTime, TimeZone, Utc};
 
-use chrono::DateTime;
-use chrono::TimeZone;
-use chrono::Utc;
-
-use crate::event_db::Error;
-use crate::event_db::EventDB;
+use crate::event_db::{Error, EventDB};
 
 #[async_trait]
 #[allow(clippy::module_name_repetitions)]
@@ -29,12 +25,12 @@ impl EventDB {
     /// Update db with follower data
     const INDEX_FOLLOWER_QUERY: &'static str =
         "INSERT INTO cardano_slot_index(slot_no, network, epoch_no, block_time, block_hash) VALUES($1, $2, $3, $4, $5)";
-    /// Bootstrap follower from last stopping point in the context of epoch and slot.
-    const START_FROM_QUERY: &'static str =
-        "SELECT network, slot_no, block_hash, ended FROM cardano_update_state WHERE network = $1;";
     /// Last updated
     const LAST_UPDATED_QUERY: &'static str =
         "UPDATE cardano_update_state set ended = $1, slot_no = $2, block_hash = $3 WHERE network = $4;";
+    /// Bootstrap follower from last stopping point in the context of epoch and slot.
+    const START_FROM_QUERY: &'static str =
+        "SELECT network, slot_no, block_hash, ended FROM cardano_update_state WHERE network = $1;";
 }
 
 #[async_trait]
@@ -48,16 +44,13 @@ impl FollowerQueries for EventDB {
         let ts: chrono::DateTime<chrono::Utc> = chrono::Utc.timestamp_nanos(block_time);
 
         let _rows = conn
-            .query(
-                Self::INDEX_FOLLOWER_QUERY,
-                &[
-                    &i64::from(slot_no),
-                    &network,
-                    &i64::from(epoch_no),
-                    &ts,
-                    &hex::decode(block_hash).map_err(|e| Error::DecodeHexError(e.to_string()))?,
-                ],
-            )
+            .query(Self::INDEX_FOLLOWER_QUERY, &[
+                &i64::from(slot_no),
+                &network,
+                &i64::from(epoch_no),
+                &ts,
+                &hex::decode(block_hash).map_err(|e| Error::DecodeHexError(e.to_string()))?,
+            ])
             .await?;
 
         Ok(())
@@ -85,10 +78,12 @@ impl FollowerQueries for EventDB {
         let conn = self.pool.get().await?;
 
         let _rows = conn
-            .query(
-                Self::LAST_UPDATED_QUERY,
-                &[&last_updated, &slot_no, &block_hash, &network],
-            )
+            .query(Self::LAST_UPDATED_QUERY, &[
+                &last_updated,
+                &slot_no,
+                &block_hash,
+                &network,
+            ])
             .await?;
 
         Ok(())

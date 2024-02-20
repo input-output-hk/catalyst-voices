@@ -1,7 +1,9 @@
 //! CLI interpreter for the service
-use std::{io::Write, sync::Arc};
+use std::{env, io::Write, sync::Arc};
 
 use clap::Parser;
+use tokio::time;
+use tracing::error;
 
 use crate::{
     event_db::legacy::queries::event::config::ConfigQueries,
@@ -10,10 +12,6 @@ use crate::{
     settings::{DocsSettings, ServiceSettings},
     state::State,
 };
-
-use std::env;
-use tokio::time;
-use tracing::error;
 
 #[derive(thiserror::Error, Debug)]
 /// All service errors
