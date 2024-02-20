@@ -111,7 +111,7 @@ async fn init_follower(
         Follower::connect(&relay, Network::from_str(&network.clone())?, follower_cfg).await?;
 
     let genesis_values = network_genesis_values(&Network::from_str(&network.clone())?)
-        .expect("Obtaining genesis values from follower crate is infallible");
+        .ok_or("Obtaining genesis values should be infallible")?;
 
     let task = tokio::spawn(async move {
         loop {
