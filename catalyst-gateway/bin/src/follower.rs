@@ -136,19 +136,38 @@ async fn init_follower(
                         },
                     };
 
+                    // Parse block
+
+                    let epoch = match block.epoch(&genesis_values).0.try_into() {
+                        Ok(epoch) => epoch,
+                        Err(err) => {
+                            error!("Cannot parse epoch from block {:?} - skip..", err);
+                            continue;
+                        },
+                    };
+
+                    let wallclock = match block.wallclock(&genesis_values).try_into() {
+                        Ok(time) => time,
+                        Err(err) => {
+                            error!("Cannot parse wall time from block {:?} - skip..", err);
+                            continue;
+                        },
+                    };
+
+                    let slot = match block.slot().try_into() {
+                        Ok(slot) => slot,
+                        Err(err) => {
+                            error!("Cannot parse slot from block {:?} - skip..", err);
+                            continue;
+                        },
+                    };
+
                     match db
                         .index_follower_data(
-                            block.slot().try_into().expect("Slot conversion infallible"),
+                            slot,
                             network.clone(),
-                            block
-                                .epoch(&genesis_values)
-                                .0
-                                .try_into()
-                                .expect("Epoch conversion infallible"),
-                            block
-                                .wallclock(&genesis_values)
-                                .try_into()
-                                .expect("Wallclock conversion infallible"),
+                            epoch,
+                            wallclock,
                             hex::encode(block.hash().clone()),
                         )
                         .await
@@ -176,7 +195,7 @@ async fn init_follower(
                     match db
                         .refresh_last_updated(
                             chrono::offset::Utc::now(),
-                            block.slot().try_into().expect("Slot conversion infallible"),
+                            slot,
                             hex::encode(block.hash().clone()),
                             network.clone(),
                         )
