@@ -2,6 +2,7 @@
 use async_trait::async_trait;
 use serde::Deserialize;
 use serde::Serialize;
+use tracing::error;
 
 use crate::event_db::Error;
 use crate::event_db::EventDB;
@@ -60,13 +61,17 @@ impl ConfigQueries for EventDB {
             .map(|network| networks.push(network))
             .ok();
 
-        let mut errors = vec![];
+        let mut parse_errors = vec![];
 
         let network_metadata: Vec<NetworkMeta> = networks
             .iter()
             .map(|meta| serde_json::from_str(&meta))
-            .filter_map(|r| r.map_err(|e| errors.push(e)).ok())
+            .filter_map(|r| r.map_err(|e| parse_errors.push(e)).ok())
             .collect();
+
+        if !parse_errors.is_empty() {
+            error!("Parsing errors {:?}", parse_errors);
+        }
 
         Ok((network_metadata, follower_metadata))
     }

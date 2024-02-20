@@ -183,8 +183,12 @@ Must conform to Schema:
     `catalyst_schema://0f917b13-afac-40d2-8263-b17ca8219914/registration/update_stats`.';
 
 
-INSERT INTO cardano_update_state (id, started, ended, updater_id, slot_no,
- network, block_hash, update,rollback, stats)
+INSERT INTO cardano_update_state
+(
+    id, started, ended, updater_id, slot_no,
+    network, block_hash, update,rollback, stats
+)
+
 VALUES
 (
   1, '2004-10-19 10:23:54+02', '2004-10-19 10:23:54+02', 'cde', 22, 'mainnet',
