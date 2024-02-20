@@ -245,7 +245,7 @@ deny = [
 # Certain crates/versions that will be skipped when doing duplicate detection.
 skip = [
     #{ name = "ansi_term", version = "=0.11.0" },
-    cardano-chain-follower= { git = "https://github.com/input-output-hk/hermes.git" }
+    cardano-chain-follower= { git = "https://github.com/input-output-hk/hermes.git" },
 ]
 # Similarly to `skip` allows you to skip certain crates during duplicate
 # detection. Unlike skip, it also includes the entire tree of transitive
