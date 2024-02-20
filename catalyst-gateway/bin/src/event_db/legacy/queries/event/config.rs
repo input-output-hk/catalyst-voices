@@ -46,7 +46,9 @@ impl ConfigQueries for EventDB {
 
         let follower_meta: String = rows[0].try_get("follower")?;
         let follower_metadata: FollowerMeta =
-            serde_json::from_str(&follower_meta).map_err(|_| JsonParseIssue)?;
+            serde_json::from_str(&follower_meta).map_err(|e| {
+                Error::NotFound(JsonParseIssue(format!("issue parsing db json {e}")).to_string())
+            })?;
 
         rows[0]
             .try_get("cardano")
