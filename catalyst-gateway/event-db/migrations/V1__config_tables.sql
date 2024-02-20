@@ -114,7 +114,7 @@ COMMENT ON INDEX config_idx IS
 'We use three keys combined uniquely rather than forcing string concatenation 
 at the app level to allow for querying groups of data.';
 
-insert into config(cardano,follower,preview) VALUES('{
+INSERT INTO config(cardano,follower,preview) VALUES( '{
     "network": "mainnet",
     "relay": "relays-new.cardano-mainnet.iohk.io:3001"
 }','{
@@ -123,7 +123,7 @@ insert into config(cardano,follower,preview) VALUES('{
 }', '{
     "network": "preview",
     "relay": "preview-node.play.dev.cardano.org:3001"
-}');
+}' );
 
 -- -------------------------------------------------------------------------------------------------
 
