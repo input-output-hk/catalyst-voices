@@ -272,7 +272,7 @@ allow-git = [
     # Remove this once upstream changes are merged.
     # issue: https://github.com/input-output-hk/hermes/issues/63
     "https://github.com/input-output-hk/catalyst-pallas",
-    https://github.com/input-output-hk/hermes.git
+    "https://github.com/input-output-hk/hermes.git"
 ]
 
 [sources.allow-org]
