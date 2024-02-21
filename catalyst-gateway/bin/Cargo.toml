@@ -76,5 +76,5 @@ hex = "0.4.3"
 async-recursion = "1.0.5"
 
 
-cardano-chain-follower= { git = "https://github.com/input-output-hk/hermes.git" }
+cardano-chain-follower= { git = "https://github.com/input-output-hk/hermes.git", version="0.0.1"}
 
