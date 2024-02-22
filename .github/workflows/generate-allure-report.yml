@@ -17,6 +17,8 @@ env:
     AWS_ROLE_ARN: arn:aws:iam::332405224602:role/ci
     EARTHLY_TARGET: docker
     ECR_REGISTRY: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
+    ALLURE_RESULTS_PATH: allure-results
+    ALLURE_REPORT_PATH: catalyst-voices/docs/src/allure-report
 
 jobs:
   generate-allure-report:
@@ -32,6 +34,11 @@ jobs:
             aws_role_arn: ${{ env.AWS_ROLE_ARN }}
             aws_region: ${{ env.AWS_REGION }}
             earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
+      - name: Setup Allure history
+        run: |
+          cd ..
+          mkdir -p ${{ env.ALLURE_RESULTS_PATH }}
+          cp -r ${{ env.ALLURE_REPORT_PATH }}/history ${{ env.ALLURE_RESULTS_PATH }}
       - name: Get unit test report
         uses: input-output-hk/catalyst-ci/actions/run@master
         id: build
@@ -43,4 +50,4 @@ jobs:
             runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
             artifact: "false"
       - name: test
-        run: ls catalyst-gateway
+        run: ls
