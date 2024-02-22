@@ -18,7 +18,7 @@ env:
     EARTHLY_TARGET: docker
     ECR_REGISTRY: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
     ALLURE_RESULTS_PATH: allure-results
-    ALLURE_REPORT_PATH: catalyst-voices/docs/src/allure-report
+    ALLURE_REPORT_PATH: docs/src/allure-report
 
 jobs:
   generate-allure-report:
@@ -34,11 +34,6 @@ jobs:
             aws_role_arn: ${{ env.AWS_ROLE_ARN }}
             aws_region: ${{ env.AWS_REGION }}
             earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
-      - name: Setup Allure history
-        run: |
-          cd ..
-          mkdir -p ${{ env.ALLURE_RESULTS_PATH }}
-          cp -r ${{ env.ALLURE_REPORT_PATH }}/history ${{ env.ALLURE_RESULTS_PATH }}
       - name: Get unit test report
         uses: input-output-hk/catalyst-ci/actions/run@master
         id: build
@@ -49,5 +44,17 @@ jobs:
             target_flags:
             runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
             artifact: "false"
+      - name: Setup Allure history
+        run: |
+              mkdir -p ${{ env.ALLURE_RESULTS_PATH }}
+              cp -r ${{ env.ALLURE_REPORT_PATH }}/history ${{ env.ALLURE_RESULTS_PATH }}
+              mv catalyst-gateway/cat-gateway.junit-report.xml ${{ env.ALLURE_RESULTS_PATH }}
+      - name: Generate Allure report
+        uses: simple-elf/allure-report-action@master
+        #if: always()
+        with:
+          allure_results: ${{ env.ALLURE_RESULTS_PATH }}
+          allure_history: allure-history
+          keep_reports: 5
       - name: test
         run: ls
