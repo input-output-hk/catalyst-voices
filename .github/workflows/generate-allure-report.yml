@@ -23,6 +23,15 @@ jobs:
     name: Generate allure report
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+        with:
+            fetch-depth: 0
+      - name: Setup CI
+        uses: input-output-hk/catalyst-ci/actions/setup@master
+        with:
+            aws_role_arn: ${{ env.AWS_ROLE_ARN }}
+            aws_region: ${{ env.AWS_REGION }}
+            earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
       - name: Get unit test report
         uses: input-output-hk/catalyst-ci/actions/run@master
         id: build
