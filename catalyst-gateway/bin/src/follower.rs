@@ -24,7 +24,7 @@ pub(crate) async fn start_followers(
     configs: (Vec<NetworkMeta>, FollowerMeta), db: Arc<EventDB>, data_refresh_tick: u64,
     check_config_tick: u64, machine_id: String,
 ) -> Result<(), Box<dyn Error>> {
-    // spawn followers and obtain thread handlers future cancellation
+    // spawn followers and obtain thread handlers for control and future cancellation
     let follower_tasks = spawn_followers(
         configs.clone(),
         db.clone(),
@@ -75,6 +75,7 @@ pub(crate) async fn start_followers(
     Ok(())
 }
 
+/// Spawn follower threads and return handlers
 async fn spawn_followers(
     configs: (Vec<NetworkMeta>, FollowerMeta), db: Arc<EventDB>, data_refresh_tick: u64,
     machine_id: String,
@@ -97,7 +98,7 @@ async fn spawn_followers(
 
             // Data is marked as stale after N seconds with no updates.
             let threshold = match last_updated {
-                Some(t) => t.timestamp(),
+                Some(last_update) => last_update.timestamp(),
                 None => {
                     info!("No previous followers, staleness not relevant. Start follower from genesis.");
                     DATA_NOT_STALE
