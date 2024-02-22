@@ -23,13 +23,14 @@ flutter:
 build:
     FROM +flutter
 
-    RUN mkdir -p ./dist
     COPY --dir pubspec.yaml lib packages web test test_driver integration_test .
 
     RUN flutter clean
     RUN flutter pub get
     RUN flutter build web --web-renderer canvaskit --release --target lib/configs/main_web.dart
-    RUN  ls -la
+
+    RUN mkdir -p ./dist
+    COPY --dir build/web ./dist
     SAVE ARTIFACT dist /dist AS LOCAL dist
 
 docker:
@@ -39,7 +40,6 @@ docker:
     RUN apk update && apk add bash
 
     COPY +build/dist /app
-    RUN  ls -la
     COPY ./nginx.conf /etc/nginx/nginx.conf
 
     EXPOSE 80
