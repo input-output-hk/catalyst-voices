@@ -37,6 +37,8 @@ pub(crate) enum Error {
     JsonParseIssue(String),
     #[error("Decode Error: {0}")]
     DecodeHexError(String),
+    #[error("LastUpdate metadata not present: {0}")]
+    NoLastUpdateMetadata(String),
 }
 
 impl From<RunError<tokio_postgres::Error>> for Error {

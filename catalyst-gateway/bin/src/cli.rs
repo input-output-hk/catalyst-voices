@@ -52,11 +52,17 @@ impl Cli {
             Self::Run(settings) => {
                 logger::init(settings.log_level)?;
 
-                let state = Arc::new(State::new(Some(settings.database_url)).await?);
-                let event_db = state.event_db()?;
-
                 // Tick every N seconds until config exists in db
                 let check_config_tick = env::var("CHECK_CONFIG_TICK")?;
+
+                // Tick every N seconds until data is stale enough to update
+                let data_refresh_tick = env::var("DATA_REFRESH_TICK")?;
+
+                // Unique machine id
+                let machine_id = env::var("MACHINE_ID")?;
+
+                let state = Arc::new(State::new(Some(settings.database_url)).await?);
+                let event_db = state.event_db()?;
 
                 // tick until config exists
                 let mut interval =
@@ -70,14 +76,12 @@ impl Cli {
                     }
                 };
 
-                // Tick every N seconds until data is stale enough to update
-                let data_refresh_tick = env::var("DATA_REFRESH_TICK")?;
-
                 let _ = start_followers(
                     config,
                     event_db.clone(),
                     data_refresh_tick.parse::<u64>()?,
                     check_config_tick.parse::<u64>()?,
+                    machine_id,
                 )
                 .await?;
 

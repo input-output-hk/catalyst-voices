@@ -13,13 +13,13 @@ pub(crate) trait ConfigQueries: Sync + Send + 'static {
 }
 use crate::event_db::Error::JsonParseIssue;
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, PartialOrd)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, PartialOrd, Clone)]
 pub(crate) struct NetworkMeta {
     pub network: String,
     pub relay: String,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub(crate) struct FollowerMeta {
     pub mithril_addr: String,
     pub timing_pattern: u8,
