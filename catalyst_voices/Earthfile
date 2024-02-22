@@ -1,0 +1,52 @@
+VERSION --try --global-cache 0.8
+
+deps:
+    FROM debian:stable-slim
+    RUN apt-get update
+    RUN apt-get install -y curl tar xz-utils git unzip
+    WORKDIR /frontend
+
+# Download and set-up flutter
+flutter:
+    FROM +deps
+
+    RUN git clone https://github.com/flutter/flutter.git /usr/local/flutter
+    ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:${PATH}"
+
+    RUN flutter channel stable
+    RUN flutter upgrade
+    RUN flutter --version
+    RUN flutter doctor -v
+    RUN flutter config --enable-web
+
+# Build web veriosn of Ctalyst Voices
+build:
+    FROM +flutter
+
+    RUN mkdir -p ./dist
+    COPY --dir pubspec.yaml lib packages web test test_driver integration_test .
+
+    RUN flutter clean
+    RUN flutter pub get
+    RUN flutter build web --web-renderer canvaskit --release --target lib/configs/main_web.dart
+    RUN  ls -la
+    SAVE ARTIFACT dist /dist AS LOCAL dist
+
+docker:
+    FROM +deps
+    FROM nginx:stable-alpine3.17
+
+    RUN apk update && apk add bash
+
+    COPY +build/dist /app
+    RUN  ls -la
+    COPY ./nginx.conf /etc/nginx/nginx.conf
+
+    EXPOSE 80
+
+publish:
+    FROM +docker
+
+    ARG tag='latest'
+
+    SAVE IMAGE catalyst-voices-app:$tag
