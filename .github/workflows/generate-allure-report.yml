@@ -27,7 +27,7 @@ jobs:
         uses: input-output-hk/catalyst-ci/actions/run@master
         id: build
         with:
-            earthfile: .
+            earthfile: ./catalyst-gateway/
             flags:
             targets: build
             target_flags:
