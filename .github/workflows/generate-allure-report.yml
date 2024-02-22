@@ -32,4 +32,4 @@ jobs:
             targets: build
             target_flags:
             runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-            artifact: "true"
+            artifact: "false"
