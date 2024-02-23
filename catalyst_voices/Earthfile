@@ -30,7 +30,8 @@ build:
     RUN flutter build web --web-renderer canvaskit --release --target lib/configs/main_web.dart
 
     RUN mkdir -p ./dist
-    COPY --dir build/web/* ./dist
+    RUN ls -la ./build/web/
+    COPY --dir ./build/web/* ./dist
     SAVE ARTIFACT dist /dist AS LOCAL dist
 
 docker:
