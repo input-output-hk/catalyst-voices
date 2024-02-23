@@ -3,7 +3,7 @@ VERSION --try --global-cache 0.8
 deps:
     FROM debian:stable-slim
     RUN apt-get update
-    RUN apt-get install -y curl tar xz-utils git unzip
+    RUN apt-get install -y curl git unzip bash
     WORKDIR /frontend
 
 # Download and set-up flutter
@@ -30,14 +30,11 @@ build:
     RUN flutter build web --web-renderer canvaskit --release --target lib/configs/main_web.dart
 
     RUN mkdir -p ./dist
-    COPY --dir build/web ./dist
+    COPY --dir build/web/* ./dist
     SAVE ARTIFACT dist /dist AS LOCAL dist
 
 docker:
     FROM +deps
-    FROM nginx:stable-alpine3.17
-
-    RUN apk update && apk add bash
 
     COPY +build/dist /app
     COPY ./nginx.conf /etc/nginx/nginx.conf
