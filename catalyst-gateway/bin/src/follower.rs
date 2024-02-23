@@ -11,7 +11,7 @@ use tracing::{error, info};
 use crate::event_db::{
     legacy::queries::event::{
         config::{ConfigQueries, FollowerMeta, NetworkMeta},
-        follower::{BlockHash, FollowerQueries, LastUpdate, SlotNumber},
+        follower::{BlockHash, FollowerQueries, LastUpdate, MachineId, SlotNumber},
     },
     EventDB,
 };
@@ -117,7 +117,7 @@ async fn spawn_followers(
                 );
                 let follower_handler = init_follower(
                     network,
-                    config.relay.clone(),
+                    &config.relay,
                     (slot_no, block_hash),
                     db.clone(),
                     machine_id.clone(),
@@ -164,8 +164,8 @@ async fn find_last_update_point(
 /// Initiate single follower and returns associated task handler
 /// which facilitates future control over spawned threads.
 async fn init_follower(
-    network: Network, relay: String, start_from: (Option<SlotNumber>, Option<BlockHash>),
-    db: Arc<EventDB>, machine_id: String,
+    network: Network, relay: &str, start_from: (Option<SlotNumber>, Option<BlockHash>),
+    db: Arc<EventDB>, machine_id: MachineId,
 ) -> Result<tokio::task::JoinHandle<()>, Box<dyn Error>> {
     let follower_cfg = generate_follower_config(start_from).await?;
 
@@ -257,7 +257,7 @@ async fn init_follower(
                             slot,
                             hex::encode(block.hash().clone()),
                             network.clone(),
-                            machine_id.clone(),
+                            &machine_id,
                         )
                         .await
                     {
