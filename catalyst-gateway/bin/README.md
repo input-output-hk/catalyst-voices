@@ -18,16 +18,12 @@ To run with the specific jorm mock state cleanup timeout you can specify `JORM_C
 
 ENV VARS
 
-```
+```sh
 export DATA_REFRESH_TICK=5
-
 export CHECK_CONFIG_TICK=5
-
 export MACHINE_ID="UID"
 
-
 ```
-
 
 Run
 
