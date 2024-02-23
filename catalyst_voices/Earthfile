@@ -1,4 +1,4 @@
-VERSION --try --global-cache 0.8
+VERSION --try --global-cache 0.7
 
 deps:
     FROM debian:stable-slim
