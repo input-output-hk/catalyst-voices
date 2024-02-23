@@ -19,7 +19,7 @@ flutter:
     RUN flutter doctor -v
     RUN flutter config --enable-web
 
-# Build web veriosn of Ctalyst Voices
+# Build web version of Catalyst Voices
 build:
     FROM +flutter
 
