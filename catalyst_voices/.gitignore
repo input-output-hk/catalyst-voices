@@ -130,5 +130,3 @@ coverage/
 
 # Fastlane.swift runner binary
 **/fastlane/FastlaneRunner
-
-# End of https://www.toptal.com/developers/gitignore/api/fastlane
