@@ -2,8 +2,7 @@ use std::{error::Error, str::FromStr, sync::Arc};
 
 use async_recursion::async_recursion;
 use cardano_chain_follower::{
-    network_genesis_values, ChainUpdate, Follower, FollowerConfig, FollowerConfigBuilder, Network,
-    Point,
+    network_genesis_values, ChainUpdate, Follower, FollowerConfigBuilder, Network, Point,
 };
 use tokio::{task::JoinHandle, time};
 use tracing::{error, info};
@@ -82,7 +81,10 @@ async fn spawn_followers(
     configs: (Vec<NetworkMeta>, FollowerMeta), db: Arc<EventDB>, data_refresh_tick: u64,
     machine_id: String,
 ) -> Result<Vec<JoinHandle<()>>, Box<dyn Error>> {
+    let snapshot_path = configs.1.mithril_snapshot_path;
+
     let mut follower_tasks = Vec::new();
+
     for config in &configs.0 {
         info!("starting follower for {:?}", config.network);
 
@@ -121,6 +123,7 @@ async fn spawn_followers(
                     (slot_no, block_hash),
                     db.clone(),
                     machine_id.clone(),
+                    &snapshot_path,
                 )
                 .await?;
                 break follower_handler;
@@ -165,11 +168,9 @@ async fn find_last_update_point(
 /// which facilitates future control over spawned threads.
 async fn init_follower(
     network: Network, relay: &str, start_from: (Option<SlotNumber>, Option<BlockHash>),
-    db: Arc<EventDB>, machine_id: MachineId,
+    db: Arc<EventDB>, machine_id: MachineId, snapshot: &str,
 ) -> Result<tokio::task::JoinHandle<()>, Box<dyn Error>> {
-    let follower_cfg = generate_follower_config(start_from).await?;
-
-    let mut follower = Follower::connect(&relay, network, follower_cfg).await?;
+    let mut follower = follower_connection(start_from, snapshot, network, relay).await?;
 
     let genesis_values =
         network_genesis_values(&network).ok_or("Obtaining genesis values should be infallible")?;
@@ -291,12 +292,13 @@ async fn init_follower(
     Ok(task)
 }
 
-/// In the context of setting up the follower config
+/// In the context of setting up the follower connection.
 /// If there is metadata present which allows us to bootstrap from a point in time
 /// We start from there, if not; we start from genesis.
-async fn generate_follower_config(
-    start_from: (Option<SlotNumber>, Option<BlockHash>),
-) -> Result<FollowerConfig, Box<dyn Error>> {
+async fn follower_connection(
+    start_from: (Option<SlotNumber>, Option<BlockHash>), _snapshot: &str, network: Network,
+    relay: &str,
+) -> Result<Follower, Box<dyn Error>> {
     let follower_cfg = if start_from.0.is_none() || start_from.1.is_none() {
         FollowerConfigBuilder::default().build()
     } else {
@@ -315,5 +317,38 @@ async fn generate_follower_config(
             .build()
     };
 
-    Ok(follower_cfg)
+    Ok(Follower::connect(&relay, network, follower_cfg).await?)
+
+    // See https://github.com/input-output-hk/hermes/pull/157
+    //
+    // let mut follower_cfg = if start_from.0.is_none() || start_from.1.is_none() {
+    // start from genesis, no previous followers, hence no starting points.
+    // FollowerConfigBuilder::default()
+    // .mithril_snapshot_path(PathBuf::from(snapshot))
+    // .build()
+    // } else {
+    // start from given point
+    // FollowerConfigBuilder::default()
+    // .follow_from(Point::new(
+    // start_from.0.ok_or("Slot number not present")?.try_into()?,
+    // hex::decode(start_from.1.ok_or("Block Hash not present")?)?,
+    // ))
+    // .mithril_snapshot_path(PathBuf::from(snapshot))
+    // .build()
+    // };
+    //
+    // let follower = match Follower::connect(&relay, network, follower_cfg).await {
+    // Ok(follower) => follower,
+    // Err(err) => {
+    // error!(
+    // "Unable to bootstrap via mithril snapshot {}. Trying network..",
+    // err
+    // );
+    //
+    // We know bootstrapping from the snapshot fails, remove path for it to try from
+    // network follower_cfg.mithril_snapshot_path = None;
+    // Follower::connect(&relay, network, follower_cfg).await?
+    // },
+    // };
+    //
 }
