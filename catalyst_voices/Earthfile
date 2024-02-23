@@ -42,7 +42,7 @@ docker:
 
     EXPOSE 80
 
-publish:
+package:
     FROM +docker
 
     ARG tag='latest'
