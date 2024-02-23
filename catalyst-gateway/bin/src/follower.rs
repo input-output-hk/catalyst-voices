@@ -16,6 +16,8 @@ use crate::event_db::{
     EventDB,
 };
 
+/// Arbritrary value which is only used in the case where there is no
+/// previous followers making the question of data staleness irrelevant.
 const DATA_NOT_STALE: i64 = 1;
 
 #[async_recursion]
@@ -75,7 +77,7 @@ pub(crate) async fn start_followers(
     Ok(())
 }
 
-/// Spawn follower threads and return handlers
+/// Spawn follower threads and return associated handlers
 async fn spawn_followers(
     configs: (Vec<NetworkMeta>, FollowerMeta), db: Arc<EventDB>, data_refresh_tick: u64,
     machine_id: String,
@@ -113,7 +115,7 @@ async fn spawn_followers(
                     "Last update is stale for network {} - ready to update, starting follower now.",
                     config.network
                 );
-                let task_handler = init_follower(
+                let follower_handler = init_follower(
                     network,
                     config.relay.clone(),
                     (slot_no, block_hash),
@@ -121,7 +123,7 @@ async fn spawn_followers(
                     machine_id.clone(),
                 )
                 .await?;
-                break task_handler;
+                break follower_handler;
             } else {
                 info!(
                     "Data is still fresh for network {}, tick until data is stale",
@@ -159,8 +161,8 @@ async fn find_last_update_point(
     Ok((slot_no, block_hash, last_updated))
 }
 
-/// Initiate single follower and return task handler for future control over spawned
-/// threads
+/// Initiate single follower and returns associated task handler
+/// which facilitates future control over spawned threads.
 async fn init_follower(
     network: Network, relay: String, start_from: (Option<SlotNumber>, Option<BlockHash>),
     db: Arc<EventDB>, machine_id: String,
