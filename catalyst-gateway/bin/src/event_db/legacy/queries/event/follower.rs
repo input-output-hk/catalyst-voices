@@ -63,16 +63,13 @@ impl FollowerQueries for EventDB {
         };
 
         let _rows = conn
-            .query(
-                Self::INDEX_FOLLOWER_QUERY,
-                &[
-                    &i64::from(slot_no),
-                    &network,
-                    &i64::from(epoch_no),
-                    &timestamp,
-                    &hex::decode(block_hash).map_err(|e| Error::DecodeHexError(e.to_string()))?,
-                ],
-            )
+            .query(Self::INDEX_FOLLOWER_QUERY, &[
+                &i64::from(slot_no),
+                &network,
+                &i64::from(epoch_no),
+                &timestamp,
+                &hex::decode(block_hash).map_err(|e| Error::DecodeHexError(e.to_string()))?,
+            ])
             .await?;
 
         Ok(())
@@ -124,19 +121,16 @@ impl FollowerQueries for EventDB {
         };
 
         let _rows = conn
-            .query(
-                Self::LAST_UPDATED_QUERY,
-                &[
-                    &i64::from(id),
-                    &last_updated,
-                    &last_updated,
-                    &machine_id,
-                    &slot_no,
-                    &network,
-                    &block_hash,
-                    &update,
-                ],
-            )
+            .query(Self::LAST_UPDATED_QUERY, &[
+                &i64::from(id),
+                &last_updated,
+                &last_updated,
+                &machine_id,
+                &slot_no,
+                &network,
+                &block_hash,
+                &update,
+            ])
             .await?;
 
         Ok(())

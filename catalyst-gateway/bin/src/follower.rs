@@ -91,8 +91,9 @@ async fn spawn_followers(
         let task_handler = loop {
             interval.tick().await;
 
-            // Check if previous follower has indexed, if so, return last update point in order to continue indexing from that point
-            // If there was no previous follower, we start from genesis point.
+            // Check if previous follower has indexed, if so, return last update point in order to
+            // continue indexing from that point If there was no previous follower, we
+            // start from genesis point.
             let (slot_no, block_hash, last_updated) =
                 find_last_update_point(db.clone(), &config.network).await?;
 
@@ -135,8 +136,8 @@ async fn spawn_followers(
     Ok(follower_tasks)
 }
 
-/// Establish point at which the last follower stopped updating in order to pick up where it left off.
-/// If there was no previous follower, start indexing from genesis point.
+/// Establish point at which the last follower stopped updating in order to pick up where
+/// it left off. If there was no previous follower, start indexing from genesis point.
 async fn find_last_update_point(
     db: Arc<EventDB>, network: &String,
 ) -> Result<(Option<SlotNumber>, Option<BlockHash>, Option<LastUpdate>), Box<dyn Error>> {
@@ -158,7 +159,8 @@ async fn find_last_update_point(
     Ok((slot_no, block_hash, last_updated))
 }
 
-/// Initiate single follower and return task handler for future control over spawned threads
+/// Initiate single follower and return task handler for future control over spawned
+/// threads
 async fn init_follower(
     network: Network, relay: String, start_from: (Option<SlotNumber>, Option<BlockHash>),
     db: Arc<EventDB>, machine_id: String,
