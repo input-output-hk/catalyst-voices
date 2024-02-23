@@ -121,7 +121,7 @@ impl FollowerQueries for EventDB {
             Network::Testnet => (4, "testnet".to_string()),
         };
 
-        // An insert only happens once when there is no updata metadata available
+        // An insert only happens once when there is no update metadata available
         // All future additions are just updates on ended, slot_no and block_hash
         let _rows = conn
             .query(Self::LAST_UPDATED_QUERY, &[

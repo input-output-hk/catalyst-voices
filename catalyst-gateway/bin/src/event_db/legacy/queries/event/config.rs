@@ -21,7 +21,7 @@ pub(crate) struct NetworkMeta {
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 pub(crate) struct FollowerMeta {
-    pub mithril_addr: String,
+    pub mithril_snapshot_path: String,
     pub timing_pattern: u8,
 }
 
@@ -69,6 +69,7 @@ impl ConfigQueries for EventDB {
 
         if !parse_errors.is_empty() {
             error!("Parsing errors {:?}", parse_errors);
+            return Err(Error::JsonParseIssue("Unable to parse config".to_string()));
         }
 
         Ok((network_metadata, follower_metadata))

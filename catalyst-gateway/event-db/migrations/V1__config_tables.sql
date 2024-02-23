@@ -119,7 +119,7 @@ INSERT INTO config (cardano, follower, preview)
 VALUES
 (
   '{"network": "mainnet", "relay": "relays-new.cardano-mainnet.iohk.io:3001"}',
-  '{ "mithril_addr": "addr","timing_pattern": 25 }', '{ "network": "preview", "relay":
+  '{ "mithril_snapshot_path": "/usr/snapshot.zst","timing_pattern": 25 }', '{ "network": "preview", "relay":
   "preview-node.play.dev.cardano.org:3001"}'
 );
 
