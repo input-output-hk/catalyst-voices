@@ -23,7 +23,9 @@
                 "lproj",
                 "libc",
                 "objc",
-                "dsym"
+                "dsym",
+                "wallclock",
+                "UTXO"
             ]
         },
         {

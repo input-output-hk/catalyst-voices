@@ -242,7 +242,7 @@ async fn init_follower(
 
                     // Index the following:
 
-                    // Utxo stuff
+                    // UTXO stuff
 
                     // Registration stuff
 
