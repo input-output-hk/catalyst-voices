@@ -11,7 +11,7 @@ dependencies:
   equatable: ^2.0.5
   flutter:
     sdk: flutter
-  formz: ^0.6.1
+  formz: ^0.7.0
 
 dev_dependencies:
    catalyst_analysis:
