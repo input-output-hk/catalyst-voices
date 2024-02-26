@@ -316,7 +316,7 @@ async fn follower_connection(
             .build()
     };
 
-    let follower = match Follower::connect(&relay, network, follower_cfg.clone()).await {
+    let follower = match Follower::connect(relay, network, follower_cfg.clone()).await {
         Ok(follower) => follower,
         Err(err) => {
             error!(
@@ -326,7 +326,7 @@ async fn follower_connection(
 
             // We know bootstrapping from the snapshot fails, remove path for it to try from network
             follower_cfg.mithril_snapshot_path = None;
-            Follower::connect(&relay, network, follower_cfg).await?
+            Follower::connect(relay, network, follower_cfg).await?
         },
     };
 
