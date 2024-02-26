@@ -14,7 +14,6 @@ concurrency:
 
 env:
     ALLURE_RESULTS_PATH: allure-results
-    ALLURE_REPORT_PATH: docs/src/allure-report
     ALLURE_HISTORY_PATH: docs/src/allure-report/history
 
 jobs:
