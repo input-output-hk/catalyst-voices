@@ -67,7 +67,9 @@ impl Cli {
                 tokio::spawn(async move {
                     match service::run(&settings.docs_settings, state.clone()).await {
                         Ok(()) => info!("Endpoints started ok"),
-                        Err(err) => panic!("Error starting endpoints, not recoverable {err}"),
+                        Err(err) => {
+                            error!("Error starting endpoints {err}")
+                        },
                     }
                 });
 
