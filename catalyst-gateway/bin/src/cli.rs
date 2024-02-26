@@ -3,7 +3,7 @@ use std::{env, io::Write, sync::Arc};
 
 use clap::Parser;
 use tokio::time;
-use tracing::error;
+use tracing::{error, info};
 
 use crate::{
     event_db::legacy::queries::event::config::ConfigQueries,
@@ -64,6 +64,13 @@ impl Cli {
                 let state = Arc::new(State::new(Some(settings.database_url)).await?);
                 let event_db = state.event_db()?;
 
+                tokio::spawn(async move {
+                    match service::run(&settings.docs_settings, state.clone()).await {
+                        Ok(_) => info!("Endpoints started ok"),
+                        Err(err) => panic!("Error starting endpoints, not recoverable {}", err),
+                    }
+                });
+
                 // tick until config exists
                 let mut interval =
                     time::interval(time::Duration::from_secs(check_config_tick.parse::<u64>()?));
@@ -85,7 +92,6 @@ impl Cli {
                 )
                 .await?;
 
-                service::run(&settings.docs_settings, state).await?;
                 Ok(())
             },
             Self::Docs(settings) => {
