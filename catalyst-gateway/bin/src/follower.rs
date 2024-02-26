@@ -1,5 +1,5 @@
 //! Logic for orchestrating followers
-use std::{error::Error, str::FromStr, sync::Arc};
+use std::{error::Error, path::PathBuf, str::FromStr, sync::Arc};
 
 use async_recursion::async_recursion;
 use cardano_chain_follower::{
@@ -297,59 +297,38 @@ async fn init_follower(
 /// If there is metadata present which allows us to bootstrap from a point in time
 /// We start from there, if not; we start from genesis.
 async fn follower_connection(
-    start_from: (Option<SlotNumber>, Option<BlockHash>), _snapshot: &str, network: Network,
+    start_from: (Option<SlotNumber>, Option<BlockHash>), snapshot: &str, network: Network,
     relay: &str,
 ) -> Result<Follower, Box<dyn Error>> {
-    let follower_cfg = if start_from.0.is_none() || start_from.1.is_none() {
-        FollowerConfigBuilder::default().build()
+    let mut follower_cfg = if start_from.0.is_none() || start_from.1.is_none() {
+        // start from genesis, no previous followers, hence no starting points.
+        FollowerConfigBuilder::default()
+            .mithril_snapshot_path(PathBuf::from(snapshot))
+            .build()
     } else {
+        // start from given point
         FollowerConfigBuilder::default()
             .follow_from(Point::new(
-                start_from
-                    .0
-                    .ok_or("Slot number not present - should be infallible")?
-                    .try_into()?,
-                hex::decode(
-                    start_from
-                        .1
-                        .ok_or("Block Hash not present - should be infallible")?,
-                )?,
+                start_from.0.ok_or("Slot number not present")?.try_into()?,
+                hex::decode(start_from.1.ok_or("Block Hash not present")?)?,
             ))
+            .mithril_snapshot_path(PathBuf::from(snapshot))
             .build()
     };
 
-    Ok(Follower::connect(relay, network, follower_cfg).await?)
+    let follower = match Follower::connect(&relay, network, follower_cfg.clone()).await {
+        Ok(follower) => follower,
+        Err(err) => {
+            error!(
+                "Unable to bootstrap via mithril snapshot {}. Trying network..",
+                err
+            );
 
-    // See https://github.com/input-output-hk/hermes/pull/157
-    //
-    // let mut follower_cfg = if start_from.0.is_none() || start_from.1.is_none() {
-    // start from genesis, no previous followers, hence no starting points.
-    // FollowerConfigBuilder::default()
-    // .mithril_snapshot_path(PathBuf::from(snapshot))
-    // .build()
-    // } else {
-    // start from given point
-    // FollowerConfigBuilder::default()
-    // .follow_from(Point::new(
-    // start_from.0.ok_or("Slot number not present")?.try_into()?,
-    // hex::decode(start_from.1.ok_or("Block Hash not present")?)?,
-    // ))
-    // .mithril_snapshot_path(PathBuf::from(snapshot))
-    // .build()
-    // };
-    //
-    // let follower = match Follower::connect(&relay, network, follower_cfg).await {
-    // Ok(follower) => follower,
-    // Err(err) => {
-    // error!(
-    // "Unable to bootstrap via mithril snapshot {}. Trying network..",
-    // err
-    // );
-    //
-    // We know bootstrapping from the snapshot fails, remove path for it to try from
-    // network follower_cfg.mithril_snapshot_path = None;
-    // Follower::connect(&relay, network, follower_cfg).await?
-    // },
-    // };
-    //
+            // We know bootstrapping from the snapshot fails, remove path for it to try from network
+            follower_cfg.mithril_snapshot_path = None;
+            Follower::connect(&relay, network, follower_cfg).await?
+        },
+    };
+
+    Ok(follower)
 }
