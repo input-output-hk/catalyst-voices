@@ -9,9 +9,8 @@ use tokio_postgres::NoTls;
 
 mod config_table;
 pub(crate) mod error;
-pub(crate) mod queries;
+pub(crate) mod legacy;
 pub(crate) mod schema_check;
-pub(crate) mod types;
 
 /// Database URL Environment Variable name.
 /// eg: "`postgres://catalyst-dev:CHANGE_ME@localhost/CatalystDev`"
