@@ -324,7 +324,7 @@ async fn follower_connection(
                 err
             );
 
-            // We know bootstrapping from the snapshot fails, remove path for it to try from network
+            // We know bootstrapping from the snapshot fails, remove path and try from network
             follower_cfg.mithril_snapshot_path = None;
             Follower::connect(relay, network, follower_cfg).await?
         },
