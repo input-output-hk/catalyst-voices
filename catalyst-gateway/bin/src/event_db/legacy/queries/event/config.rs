@@ -43,25 +43,24 @@ impl ConfigQueries for EventDB {
 
         let rows = conn.query(Self::CONFIG_QUERY, &[]).await?;
 
-        if rows.is_empty() {
-            return Err(Error::NoConfig);
-        }
+        let row = match rows.get(0) {
+            Some(row) => row,
+            None => return Err(Error::NoConfig),
+        };
 
         let mut networks: Vec<String> = Vec::new();
 
-        let follower_meta: String = rows[0].try_get("follower")?;
+        let follower_meta: String = row.try_get("follower")?;
         let follower_metadata: FollowerMeta =
             serde_json::from_str(&follower_meta).map_err(|e| {
                 Error::NotFound(JsonParseIssue(format!("issue parsing db json {e}")).to_string())
             })?;
 
-        rows[0]
-            .try_get("cardano")
+        row.try_get("cardano")
             .map(|network| networks.push(network))
             .ok();
 
-        rows[0]
-            .try_get("preview")
+        row.try_get("preview")
             .map(|network| networks.push(network))
             .ok();
 

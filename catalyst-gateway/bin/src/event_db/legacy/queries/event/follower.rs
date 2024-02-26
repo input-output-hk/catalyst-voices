@@ -92,16 +92,21 @@ impl FollowerQueries for EventDB {
             return Err(Error::NoLastUpdateMetadata("No metadata".to_string()));
         }
 
-        let slot_no: SlotNumber = match rows[0].try_get("slot_no") {
+        let row = match rows.get(0) {
+            Some(row) => row,
+            None => return Err(Error::NoLastUpdateMetadata("No metadata".to_string())),
+        };
+
+        let slot_no: SlotNumber = match row.try_get("slot_no") {
             Ok(slot) => slot,
             Err(e) => return Err(Error::NoLastUpdateMetadata(e.to_string())),
         };
 
-        let block_hash: BlockHash = match rows[0].try_get("block_hash") {
+        let block_hash: BlockHash = match row.try_get("block_hash") {
             Ok(block_hash) => block_hash,
             Err(e) => return Err(Error::NoLastUpdateMetadata(e.to_string())),
         };
-        let last_updated: LastUpdate = match rows[0].try_get("ended") {
+        let last_updated: LastUpdate = match row.try_get("ended") {
             Ok(last_updated) => last_updated,
             Err(e) => return Err(Error::NoLastUpdateMetadata(e.to_string())),
         };
