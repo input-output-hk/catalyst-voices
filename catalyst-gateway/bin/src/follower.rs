@@ -38,7 +38,7 @@ pub(crate) async fn start_followers(
     let mut interval = time::interval(time::Duration::from_secs(check_config_tick));
     let config = loop {
         interval.tick().await;
-        match db.get_config().await.map(|config| config) {
+        match db.get_config().await {
             Ok(config) => {
                 if configs != config {
                     info!("Config has changed! restarting");
@@ -55,7 +55,7 @@ pub(crate) async fn start_followers(
     // Config has changed, terminate all followers and restart with new config.
     info!("Terminating followers");
     for task in follower_tasks {
-        task.abort()
+        task.abort();
     }
 
     match config {
@@ -230,11 +230,11 @@ async fn init_follower(
                             network,
                             epoch,
                             wallclock,
-                            hex::encode(block.hash().clone()),
+                            hex::encode(block.hash()),
                         )
                         .await
                     {
-                        Ok(_) => (),
+                        Ok(()) => (),
                         Err(err) => {
                             error!("unable to index follower data {:?} - skip..", err);
                             continue;
@@ -256,13 +256,13 @@ async fn init_follower(
                         .refresh_last_updated(
                             chrono::offset::Utc::now(),
                             slot,
-                            hex::encode(block.hash().clone()),
-                            network.clone(),
+                            hex::encode(block.hash()),
+                            network,
                             &machine_id,
                         )
                         .await
                     {
-                        Ok(_) => (),
+                        Ok(()) => (),
                         Err(err) => {
                             error!("unable to mark last update point {:?} - skip..", err);
                             continue;
@@ -317,7 +317,7 @@ async fn follower_connection(
             .build()
     };
 
-    Ok(Follower::connect(&relay, network, follower_cfg).await?)
+    Ok(Follower::connect(relay, network, follower_cfg).await?)
 
     // See https://github.com/input-output-hk/hermes/pull/157
     //

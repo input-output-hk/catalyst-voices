@@ -70,13 +70,13 @@ impl Cli {
                 let config = loop {
                     interval.tick().await;
 
-                    match event_db.get_config().await.map(|config| config) {
+                    match event_db.get_config().await {
                         Ok(config) => break config,
                         Err(err) => error!("no config {:?}", err),
                     }
                 };
 
-                let _ = start_followers(
+                start_followers(
                     config,
                     event_db.clone(),
                     data_refresh_tick.parse::<u64>()?,

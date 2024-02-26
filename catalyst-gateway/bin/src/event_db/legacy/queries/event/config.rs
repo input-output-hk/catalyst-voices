@@ -63,7 +63,7 @@ impl ConfigQueries for EventDB {
 
         let network_metadata: Vec<NetworkMeta> = networks
             .iter()
-            .map(|meta| serde_json::from_str(&meta))
+            .map(|meta| serde_json::from_str(meta))
             .filter_map(|r| r.map_err(|e| parse_errors.push(e)).ok())
             .collect();
 
