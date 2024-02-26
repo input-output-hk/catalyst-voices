@@ -36,7 +36,9 @@ pub(crate) enum Error {
     #[error("Unable to parse database data: {0}")]
     JsonParseIssue(String),
     #[error("Decode Error: {0}")]
-    DecodeHexError(String),
+    /// Unable to decode hex
+    DecodeHex(String),
+    /// No previous followers hence no last updates metadata
     #[error("LastUpdate metadata not present: {0}")]
     NoLastUpdateMetadata(String),
 }

@@ -14,14 +14,20 @@ pub(crate) trait ConfigQueries: Sync + Send + 'static {
 use crate::event_db::Error::JsonParseIssue;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, PartialOrd, Clone)]
+/// Network config metadata
 pub(crate) struct NetworkMeta {
+    /// Mainnet, preview, preprod
     pub network: String,
+    /// Cardano relay address
     pub relay: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+/// Follower metadata
 pub(crate) struct FollowerMeta {
+    /// Path to snapshot file for bootstrap
     pub mithril_snapshot_path: String,
+    /// Defines when data is stale or not
     pub timing_pattern: u8,
 }
 

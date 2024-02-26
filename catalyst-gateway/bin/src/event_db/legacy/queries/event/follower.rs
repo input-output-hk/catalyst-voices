@@ -6,11 +6,17 @@ use chrono::TimeZone;
 
 use crate::event_db::{Error, EventDB};
 
+/// Block time
 pub type BlockTime = i64;
+/// Slot
 pub type SlotNumber = i64;
+/// Epoch
 pub type EpochNumber = i64;
+/// Block hash
 pub type BlockHash = String;
+/// Uniuque follower id
 pub type MachineId = String;
+/// Time when a follower last indexed
 pub type LastUpdate = chrono::DateTime<chrono::offset::Utc>;
 
 #[async_trait]
@@ -68,7 +74,7 @@ impl FollowerQueries for EventDB {
                 &network,
                 &epoch_no,
                 &timestamp,
-                &hex::decode(block_hash).map_err(|e| Error::DecodeHexError(e.to_string()))?,
+                &hex::decode(block_hash).map_err(|e| Error::DecodeHex(e.to_string()))?,
             ])
             .await?;
 

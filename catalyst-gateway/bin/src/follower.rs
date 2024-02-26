@@ -1,3 +1,4 @@
+//! Logic for orchestrating followers
 use std::{error::Error, str::FromStr, sync::Arc};
 
 use async_recursion::async_recursion;
@@ -102,12 +103,13 @@ async fn spawn_followers(
                 find_last_update_point(db.clone(), &config.network).await?;
 
             // Data is marked as stale after N seconds with no updates.
-            let threshold = match last_updated {
-                Some(last_update) => last_update.timestamp(),
-                None => {
-                    info!("No previous followers, staleness not relevant. Start follower from genesis.");
-                    DATA_NOT_STALE
-                },
+            let threshold = if let Some(last_update) = last_updated {
+                last_update.timestamp()
+            } else {
+                info!(
+                    "No previous followers, staleness not relevant. Start follower from genesis."
+                );
+                DATA_NOT_STALE
             };
 
             // Threshold which defines if data is stale and ready to update or not
@@ -127,12 +129,11 @@ async fn spawn_followers(
                 )
                 .await?;
                 break follower_handler;
-            } else {
-                info!(
-                    "Data is still fresh for network {}, tick until data is stale",
-                    config.network
-                );
             }
+            info!(
+                "Data is still fresh for network {}, tick until data is stale",
+                config.network
+            );
         };
 
         follower_tasks.push(task_handler);
