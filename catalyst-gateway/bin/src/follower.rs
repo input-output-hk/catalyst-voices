@@ -97,7 +97,7 @@ async fn spawn_followers(
             interval.tick().await;
 
             // Check if previous follower has indexed, if so, return last update point in order to
-            // continue indexing from that point If there was no previous follower, we
+            // continue indexing from that point. If there was no previous follower, we
             // start from genesis point.
             let (slot_no, block_hash, last_updated) =
                 find_last_update_point(db.clone(), &config.network).await?;
