@@ -14,7 +14,7 @@ pub type SlotNumber = i64;
 pub type EpochNumber = i64;
 /// Block hash
 pub type BlockHash = String;
-/// Uniuque follower id
+/// Unique follower id
 pub type MachineId = String;
 /// Time when a follower last indexed
 pub type LastUpdate = chrono::DateTime<chrono::offset::Utc>;
@@ -69,13 +69,16 @@ impl FollowerQueries for EventDB {
         };
 
         let _rows = conn
-            .query(Self::INDEX_FOLLOWER_QUERY, &[
-                &slot_no,
-                &network,
-                &epoch_no,
-                &timestamp,
-                &hex::decode(block_hash).map_err(|e| Error::DecodeHex(e.to_string()))?,
-            ])
+            .query(
+                Self::INDEX_FOLLOWER_QUERY,
+                &[
+                    &slot_no,
+                    &network,
+                    &epoch_no,
+                    &timestamp,
+                    &hex::decode(block_hash).map_err(|e| Error::DecodeHex(e.to_string()))?,
+                ],
+            )
             .await?;
 
         Ok(())
@@ -130,16 +133,19 @@ impl FollowerQueries for EventDB {
         // An insert only happens once when there is no update metadata available
         // All future additions are just updates on ended, slot_no and block_hash
         let _rows = conn
-            .query(Self::LAST_UPDATED_QUERY, &[
-                &i64::from(id),
-                &last_updated,
-                &last_updated,
-                &machine_id,
-                &slot_no,
-                &network,
-                &block_hash,
-                &update,
-            ])
+            .query(
+                Self::LAST_UPDATED_QUERY,
+                &[
+                    &i64::from(id),
+                    &last_updated,
+                    &last_updated,
+                    &machine_id,
+                    &slot_no,
+                    &network,
+                    &block_hash,
+                    &update,
+                ],
+            )
             .await?;
 
         Ok(())
