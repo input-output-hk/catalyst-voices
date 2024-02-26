@@ -68,7 +68,7 @@ impl Cli {
                     match service::run(&settings.docs_settings, state.clone()).await {
                         Ok(()) => info!("Endpoints started ok"),
                         Err(err) => {
-                            error!("Error starting endpoints {err}")
+                            error!("Error starting endpoints {err}");
                         },
                     }
                 });
