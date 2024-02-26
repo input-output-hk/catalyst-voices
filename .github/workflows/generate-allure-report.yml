@@ -22,9 +22,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-     # - uses: earthly/actions-setup@v1
-     #   with:
-     #     version: v0.8.0
      # - name: Get unit test report
      #   run: |
      #         earthly ./catalyst-gateway/+build
