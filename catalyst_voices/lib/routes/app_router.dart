@@ -28,18 +28,19 @@ final class AppRouter {
     AuthenticationBloc authenticationBloc,
     GoRouterState state,
   ) {
-    final isAuthenticated = authenticationBloc.isAuthenticated;
-    final signingIn = state.matchedLocation == login_route.loginPath;
+    return home_route.homePath;
+    // final isAuthenticated = authenticationBloc.isAuthenticated;
+    // final signingIn = state.matchedLocation == login_route.loginPath;
 
-    if (!isAuthenticated) {
-      return login_route.loginPath;
-    }
+    // if (!isAuthenticated) {
+    //   return login_route.loginPath;
+    // }
 
-    if (signingIn) {
-      return home_route.homePath;
-    }
+    // if (signingIn) {
+    //   return home_route.homePath;
+    // }
 
-    return null;
+    // return null;
   }
 
   static String? _isWeb() {

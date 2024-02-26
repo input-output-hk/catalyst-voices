@@ -29,7 +29,7 @@ final class AppContent extends StatelessWidget {
         localeListResolutionCallback: basicLocaleListResolution,
         routerConfig: _routeConfig(context),
         theme: ThemeData(
-          brightness: Brightness.dark,
+          brightness: Brightness.light,
           bottomNavigationBarTheme: const BottomNavigationBarThemeData(
             type: BottomNavigationBarType.fixed,
           ),
