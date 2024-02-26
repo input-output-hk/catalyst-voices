@@ -43,11 +43,16 @@ jobs:
           allure_results: ${{ env.ALLURE_RESULTS_PATH }}
           allure_history: allure-history
           keep_reports: 15
-      - name: Deploy Allure report to GitHub Pages
-        if: always()
-        uses: peaceiris/actions-gh-pages@v3
+    #  - name: Deploy Allure report to GitHub Pages
+    #    if: always()
+    ##    uses: peaceiris/actions-gh-pages@v3
+    #    with:
+          #github_token: ${{ secrets.GITHUB_TOKEN }}
+    #      publish_branch: gh-pages
+    #      publish_dir: allure-history
+    #      destination_dir: test-report
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: allure-history
-          destination_dir: test-report
+          folder: allure-history
+          target-folder: test-report
