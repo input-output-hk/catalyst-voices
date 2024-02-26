@@ -92,9 +92,8 @@ impl FollowerQueries for EventDB {
             return Err(Error::NoLastUpdateMetadata("No metadata".to_string()));
         }
 
-        let row = match rows.get(0) {
-            Some(row) => row,
-            None => return Err(Error::NoLastUpdateMetadata("No metadata".to_string())),
+        let Some(row) = rows.first() else {
+            return Err(Error::NoLastUpdateMetadata("No metadata".to_string()));
         };
 
         let slot_no: SlotNumber = match row.try_get("slot_no") {

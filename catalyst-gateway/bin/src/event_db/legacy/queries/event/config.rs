@@ -43,9 +43,8 @@ impl ConfigQueries for EventDB {
 
         let rows = conn.query(Self::CONFIG_QUERY, &[]).await?;
 
-        let row = match rows.get(0) {
-            Some(row) => row,
-            None => return Err(Error::NoConfig),
+        let Some(row) = rows.first() else {
+            return Err(Error::NoConfig);
         };
 
         let mut networks: Vec<String> = Vec::new();
