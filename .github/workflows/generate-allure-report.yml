@@ -1,0 +1,57 @@
+name: Allure Report Generation
+
+on:
+  push:
+
+permissions:
+    id-token: write
+    contents: write
+    packages: write
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+env:
+    ALLURE_RESULTS_PATH: allure-results
+    ALLURE_REPORT_PATH: docs/src/allure-report
+    ALLURE_HISTORY_PATH: docs/src/allure-report/history
+
+jobs:
+  generate-allure-report:
+    name: Generate allure report
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+     # - uses: earthly/actions-setup@v1
+     #   with:
+     #     version: v0.8.0
+     # - name: Get unit test report
+     #   run: |
+     #         earthly ./catalyst-gateway/+build
+      - name: Setup Allure results
+        run: |
+              mkdir -p ${{ env.ALLURE_RESULTS_PATH }}
+              mv catalyst-gateway/cat-gateway.junit-report.xml ${{ env.ALLURE_RESULTS_PATH }}
+      - name: Get Allure history
+        uses: actions/checkout@v3
+        if: always()
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: gh-pages
+      - name: Generate Allure report
+        uses: simple-elf/allure-report-action@master
+        if: always()
+        with:
+          gh_pages: gh-pages
+          allure_results: ${{ env.ALLURE_RESULTS_PATH }}
+          allure_history: test-report
+          keep_reports: 20
+      - name: Deploy Allure report to GitHub Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: test-report
