@@ -14,8 +14,8 @@ This repository contains the Catalyst Voices app and packages.
 
 ## Requirements
 
-* flutter: 3.16.5+
-* Dart: 3.2.3+
+* flutter: 3.19.+
+* Dart: 3.3.0+
 * Ruby: 2.5+
 * Xcode: 15.0+
 * Android Studio: Android Studio Electric Eel | 2022.1.1 +
@@ -57,7 +57,7 @@ melos bootstrap
 
 ### Flavors
 
-This project contains three flavors:
+This project contains four flavors:
 
 * dev
 * qa
@@ -80,8 +80,8 @@ flutter run --flavor preprod --target lib/configs/main_preprod.dart
 flutter run --flavor prod --target lib/configs/main_prod.dart
 ```
 
-*\*Catalyst Voices works on Web.
-We plan to add iOS and Android later.*
+>Catalyst Voices works on the Web only.
+>We plan to add support for other targets later.
 
 ## Running Tests
 
