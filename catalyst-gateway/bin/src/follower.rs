@@ -1,6 +1,9 @@
 //! Logic for orchestrating followers
 use std::{error::Error, path::PathBuf, str::FromStr, sync::Arc};
 
+/// Handler for follower tasks, allows for control over spawned follower threads
+pub type FollowerHandler = JoinHandle<()>;
+
 use async_recursion::async_recursion;
 use cardano_chain_follower::{
     network_genesis_values, ChainUpdate, Follower, FollowerConfigBuilder, Network, Point,
@@ -81,7 +84,7 @@ pub(crate) async fn start_followers(
 async fn spawn_followers(
     configs: (Vec<NetworkMeta>, FollowerMeta), db: Arc<EventDB>, data_refresh_tick: u64,
     machine_id: String,
-) -> Result<Vec<JoinHandle<()>>, Box<dyn Error>> {
+) -> Result<Vec<FollowerHandler>, Box<dyn Error>> {
     let snapshot_path = configs.1.mithril_snapshot_path;
 
     let mut follower_tasks = Vec::new();
@@ -170,11 +173,11 @@ async fn find_last_update_point(
 async fn init_follower(
     network: Network, relay: &str, start_from: (Option<SlotNumber>, Option<BlockHash>),
     db: Arc<EventDB>, machine_id: MachineId, snapshot: &str,
-) -> Result<tokio::task::JoinHandle<()>, Box<dyn Error>> {
+) -> Result<FollowerHandler, Box<dyn Error>> {
     let mut follower = follower_connection(start_from, snapshot, network, relay).await?;
 
     let genesis_values =
-        network_genesis_values(&network).ok_or("Obtaining genesis values should be infallible")?;
+        network_genesis_values(&network).ok_or("Obtaining genesis values failed")?;
 
     let task = tokio::spawn(async move {
         loop {
