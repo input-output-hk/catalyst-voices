@@ -16,6 +16,8 @@ jobs:
     name: Generate allure
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Checkout gh-pages
         uses: actions/checkout@v3
         if: always()
@@ -32,7 +34,7 @@ jobs:
         with:
           report_id: 'self-test'
           gh_pages: 'gh-pages-dir'
-          report_dir: './allure-results'
+          report_dir: 'allure-results'
 
       - name: Git Commit and Push Action
         uses: mgrybyk/git-commit-pull-push-action@v1
