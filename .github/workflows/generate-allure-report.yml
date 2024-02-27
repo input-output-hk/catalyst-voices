@@ -28,7 +28,7 @@ jobs:
       - name: Setup Allure results
         run: |
               mkdir -p ../${{ env.ALLURE_RESULTS_PATH }}
-              mv catalystcatalyst-gateway/cat-gateway.junit-report.xml ../${{ env.ALLURE_RESULTS_PATH }}
+              mv catalyst-gateway/cat-gateway.junit-report.xml ../${{ env.ALLURE_RESULTS_PATH }}
       - run: ls
       - name: Get Allure history
         uses: actions/checkout@v3
