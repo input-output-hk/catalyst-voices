@@ -23,7 +23,7 @@ jobs:
         if: always()
         continue-on-error: true
         with:
-          ref: gh-pages # branch name
+          ref: gh-pages # branch 
           path: gh-pages-dir # checkout path
 
       - name: Allure Report Action
