@@ -21,7 +21,7 @@ builder:
 check:
     FROM +builder
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.9.2+CHECK
+   DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.9.3+CHECK
 
 
 # format all SQL files in the current project.  Local developers tool.
