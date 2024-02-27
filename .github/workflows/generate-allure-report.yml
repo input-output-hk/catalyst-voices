@@ -7,6 +7,7 @@ permissions:
     id-token: write
     contents: write
     packages: write
+    pages: write
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
