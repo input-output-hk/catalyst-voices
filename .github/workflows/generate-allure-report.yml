@@ -27,8 +27,8 @@ jobs:
      #         earthly ./catalyst-gateway/+build
       - name: Setup Allure results
         run: |
-              mkdir -p ${{ env.ALLURE_RESULTS_PATH }}
-              mv catalyst-gateway/cat-gateway.junit-report.xml ${{ env.ALLURE_RESULTS_PATH }}
+              mkdir -p ../${{ env.ALLURE_RESULTS_PATH }}
+              mv catalystcatalyst-gateway/cat-gateway.junit-report.xml ../${{ env.ALLURE_RESULTS_PATH }}
       - run: ls
       - name: Get Allure history
         uses: actions/checkout@v3
@@ -43,8 +43,8 @@ jobs:
         if: always()
         with:
           gh_pages: gh-pages
-          allure_results: ${{ env.ALLURE_RESULTS_PATH }}
-          allure_history: allure-history
+          allure_results: ../${{ env.ALLURE_RESULTS_PATH }}
+          allure_history: ../allure-history
           keep_reports: 15
       - run: ls
       - name: Deploy Allure report to GitHub Pages
@@ -53,7 +53,7 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: allure-history
+          publish_dir: ../allure-history
           destination_dir: test-report
     #  - name: Deploy 🚀
     #    uses: JamesIves/github-pages-deploy-action@v4
