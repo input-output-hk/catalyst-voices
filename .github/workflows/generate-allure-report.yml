@@ -28,6 +28,7 @@ jobs:
         run: |
               mkdir -p ${{ env.ALLURE_RESULTS_PATH }}
               mv catalyst-gateway/cat-gateway.junit-report.xml ${{ env.ALLURE_RESULTS_PATH }}
+      - run: ls
       - name: Get Allure history
         uses: actions/checkout@v3
         if: always()
@@ -35,6 +36,7 @@ jobs:
         with:
           ref: gh-pages
           path: gh-pages
+      - run: ls
       - name: Generate Allure report
         uses: simple-elf/allure-report-action@master
         if: always()
@@ -43,16 +45,17 @@ jobs:
           allure_results: ${{ env.ALLURE_RESULTS_PATH }}
           allure_history: allure-history
           keep_reports: 15
-    #  - name: Deploy Allure report to GitHub Pages
-    #    if: always()
-    ##    uses: peaceiris/actions-gh-pages@v3
-    #    with:
-          #github_token: ${{ secrets.GITHUB_TOKEN }}
-    #      publish_branch: gh-pages
-    #      publish_dir: allure-history
-    #      destination_dir: test-report
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
+      - run: ls
+      - name: Deploy Allure report to GitHub Pages
+        if: always()
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          folder: allure-history
-          target-folder: test-report
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: allure-history
+          destination_dir: test-report
+    #  - name: Deploy 🚀
+    #    uses: JamesIves/github-pages-deploy-action@v4
+    #    with:
+    #      folder: allure-history
+    #      target-folder: test-report
