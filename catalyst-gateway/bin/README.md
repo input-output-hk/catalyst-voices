@@ -16,14 +16,6 @@ https://github.com/input-output-hk/catalyst-voices/blob/main/catalyst-gateway/ev
 ).
 To run with the specific jorm mock state cleanup timeout you can specify `JORM_CLEANUP_TIMEOUT` env var.
 
-ENV VARS
-
-```sh
-export DATA_REFRESH_TICK=5
-export CHECK_CONFIG_TICK=5
-export MACHINE_ID="UID"
-
-```
 
 Run
 
