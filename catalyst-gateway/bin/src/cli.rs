@@ -1,17 +1,16 @@
 //! CLI interpreter for the service
-use std::{env, io::Write, sync::Arc};
+use std::{io::Write, sync::Arc};
 
-use clap::Parser;
-use tokio::time;
-use tracing::{error, info};
-
+use crate::event_db::config::ConfigQueries;
 use crate::{
-    event_db::legacy::queries::event::config::ConfigQueries,
     follower::start_followers,
     logger, service,
     settings::{DocsSettings, ServiceSettings},
     state::State,
 };
+use clap::Parser;
+use tokio::time;
+use tracing::{error, info};
 
 #[derive(thiserror::Error, Debug)]
 /// All service errors
@@ -52,14 +51,11 @@ impl Cli {
             Self::Run(settings) => {
                 logger::init(settings.log_level)?;
 
-                // Tick every N seconds until config exists in db
-                let check_config_tick = env::var("CHECK_CONFIG_TICK")?;
-
-                // Tick every N seconds until data is stale enough to update
-                let data_refresh_tick = env::var("DATA_REFRESH_TICK")?;
+                let check_config_tick = settings.follower_settings.check_config_tick;
+                let data_refresh_tick = settings.follower_settings.data_refresh_tick;
 
                 // Unique machine id
-                let machine_id = env::var("MACHINE_ID")?;
+                let machine_id = settings.follower_settings.machine_uid;
 
                 let state = Arc::new(State::new(Some(settings.database_url)).await?);
                 let event_db = state.event_db()?;

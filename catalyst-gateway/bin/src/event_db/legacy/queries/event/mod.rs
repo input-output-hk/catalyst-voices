@@ -12,8 +12,6 @@ use crate::event_db::{
 };
 
 pub(crate) mod ballot;
-pub(crate) mod config;
-pub(crate) mod follower;
 pub(crate) mod objective;
 pub(crate) mod proposal;
 pub(crate) mod review;

@@ -12,10 +12,8 @@ use tokio::{task::JoinHandle, time};
 use tracing::{error, info};
 
 use crate::event_db::{
-    legacy::queries::event::{
-        config::{ConfigQueries, FollowerMeta, NetworkMeta},
-        follower::{BlockHash, FollowerQueries, LastUpdate, MachineId, SlotNumber},
-    },
+    config::{ConfigQueries, FollowerMeta, NetworkMeta},
+    follower::{BlockHash, FollowerQueries, LastUpdate, MachineId, SlotNumber},
     EventDB,
 };
 

@@ -7,8 +7,10 @@ use dotenvy::dotenv;
 use error::Error;
 use tokio_postgres::NoTls;
 
+pub(crate) mod config;
 mod config_table;
 pub(crate) mod error;
+pub(crate) mod follower;
 pub(crate) mod legacy;
 pub(crate) mod schema_check;
 
