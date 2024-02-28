@@ -1,0 +1,64 @@
+name: Allure Report
+
+on:
+  pull_request:
+  push:
+    branches: 'main'
+
+permissions:
+    contents: write
+    pull-requests: write
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+    cancel-in-progress: true
+
+jobs:
+  generate-allure-report:
+    name: Generate allure report
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Allure results folder
+        run: |
+          mkdir allure-results
+          mv cat-gateway.junit-report.xml allure-results
+          mv junit-report.xml allure-results
+
+      - name: Checkout gh-pages
+        uses: actions/checkout@v3
+        if: always()
+        continue-on-error: true
+        with:
+          ref: gh-pages
+          path: gh-pages-dir
+
+      - name: Build Allure report
+        uses: mgrybyk/allure-report-branch-action@v1
+        if: always()
+        continue-on-error: true
+        id: allure
+        with:
+          report_id: 'allure'
+          gh_pages: 'gh-pages-dir'
+          report_dir: 'allure-results'
+
+      - name: Git push to gh-pages
+        uses: mgrybyk/git-commit-pull-push-action@v1
+        if: always()
+        with:
+          repository: gh-pages-dir
+          branch: gh-pages
+          pull_args: --rebase -X ours
+
+      - name: Comment PR with Allure report link
+        if: ${{ always() && github.event_name == 'pull_request' && steps.allure.outputs.report_url }}
+        continue-on-error: true
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            ${{ steps.allure.outputs.test_result_icon }} [Test Report](${{ steps.allure.outputs.report_url }}) | ${\color{lightgreen}Pass: ${{ steps.allure.outputs.test_result_passed }}/${{ steps.allure.outputs.test_result_total }}}$ | ${\color{red}Fail: ${{ steps.allure.outputs.test_result_failed }}/${{ steps.allure.outputs.test_result_total }}}$ |
+          comment_tag: allure_report
+          mode: upsert

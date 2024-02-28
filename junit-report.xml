@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<testsuites disabled="0" errors="0" failures="0" tests="3" time="0.07964284499757923">
+	<testsuite disabled="0" errors="0" failures="0" name="schemathesis" skipped="0" tests="3" time="0.07964284499757923" hostname="buildkitsandbox">
+		<testcase name="GET /api/health/started" time="0.066781"/>
+		<testcase name="GET /api/health/ready" time="0.008106"/>
+		<testcase name="GET /api/health/live" time="0.004755"/>
+	</testsuite>
+</testsuites>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="nextest" tests="7" failures="0" errors="0" uuid="ece785cc-299b-4179-9159-c94633e8feec" timestamp="2024-02-28T09:28:08.581+00:00" time="0.044">
+    <testsuite name="cat-gateway::bin/cat-gateway" tests="7" disabled="0" errors="0" failures="0">
+        <testcase name="settings::tests::configured_hosts_set_multiple_one_invalid" classname="cat-gateway::bin/cat-gateway" timestamp="2024-02-28T09:28:08.583+00:00" time="0.021">
+            <system-out>
+running 1 test
+test settings::tests::configured_hosts_set_multiple_one_invalid ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s
+
+</system-out>
+            <system-err></system-err>
+        </testcase>
+        <testcase name="settings::tests::generate_github_issue_url_test" classname="cat-gateway::bin/cat-gateway" timestamp="2024-02-28T09:28:08.583+00:00" time="0.023">
+            <system-out>
+running 1 test
+test settings::tests::generate_github_issue_url_test ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s
+
+</system-out>
+            <system-err></system-err>
+        </testcase>
+        <testcase name="settings::tests::configured_hosts_set_empty_undefined_address" classname="cat-gateway::bin/cat-gateway" timestamp="2024-02-28T09:28:08.582+00:00" time="0.031">
+            <system-out>
+running 1 test
+test settings::tests::configured_hosts_set_empty_undefined_address ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s
+
+</system-out>
+            <system-err></system-err>
+        </testcase>
+        <testcase name="settings::tests::configured_hosts_set_multiple" classname="cat-gateway::bin/cat-gateway" timestamp="2024-02-28T09:28:08.583+00:00" time="0.034">
+            <system-out>
+running 1 test
+test settings::tests::configured_hosts_set_multiple ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s
+
+</system-out>
+            <system-err></system-err>
+        </testcase>
+        <testcase name="settings::tests::configured_hosts_default" classname="cat-gateway::bin/cat-gateway" timestamp="2024-02-28T09:28:08.581+00:00" time="0.038">
+            <system-out>
+running 1 test
+test settings::tests::configured_hosts_default ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s
+
+</system-out>
+            <system-err></system-err>
+        </testcase>
+        <testcase name="settings::tests::github_repo_name_default" classname="cat-gateway::bin/cat-gateway" timestamp="2024-02-28T09:28:08.584+00:00" time="0.038">
+            <system-out>
+running 1 test
+test settings::tests::github_repo_name_default ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s
+
+</system-out>
+            <system-err></system-err>
+        </testcase>
+        <testcase name="settings::tests::configured_hosts_set_empty" classname="cat-gateway::bin/cat-gateway" timestamp="2024-02-28T09:28:08.582+00:00" time="0.042">
+            <system-out>
+running 1 test
+test settings::tests::configured_hosts_set_empty ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 6 filtered out; finished in 0.00s
+
+</system-out>
+            <system-err></system-err>
+        </testcase>
+    </testsuite>
+</testsuites>
