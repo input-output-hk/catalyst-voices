@@ -1,16 +1,17 @@
 name: Allure Report Generation
 
 on:
+  pull_request:
   push:
+    branches: 'main'
 
 permissions:
-    id-token: write
     contents: write
-    packages: write
+    pull-requests: write
 
 concurrency:
-    group: ${{ github.workflow }}-${{ github.ref }}
-    cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
 
 env:
     AWS_REGION: eu-central-1
@@ -18,22 +19,21 @@ env:
     EARTHLY_TARGET: docker
     ECR_REGISTRY: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
     ALLURE_RESULTS_PATH: allure-results
-    ALLURE_REPORT_PATH: docs/src/allure-report
 
 jobs:
   generate-allure-report:
     name: Generate allure report
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-        with:
-            fetch-depth: 0
+      - uses: actions/checkout@v3
+
       - name: Setup CI
         uses: input-output-hk/catalyst-ci/actions/setup@master
         with:
             aws_role_arn: ${{ env.AWS_ROLE_ARN }}
             aws_region: ${{ env.AWS_REGION }}
             earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
+
       - name: Get unit test report
         uses: input-output-hk/catalyst-ci/actions/run@master
         id: build
@@ -44,18 +44,45 @@ jobs:
             target_flags:
             runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
             artifact: "false"
-      - name: Setup Allure history
+
+      - name: Setup Allure results
         run: |
               mkdir -p ${{ env.ALLURE_RESULTS_PATH }}
-              cp -r ${{ env.ALLURE_REPORT_PATH }}/history ${{ env.ALLURE_RESULTS_PATH }}
               mv catalyst-gateway/cat-gateway.junit-report.xml ${{ env.ALLURE_RESULTS_PATH }}
-      - name: Generate Allure report
-        uses: simple-elf/allure-report-action@master
-        #if: always()
+            # mv junit-report.xml allure-results
+
+      - name: Checkout gh-pages
+        uses: actions/checkout@v3
+        if: always()
+        continue-on-error: true
         with:
-          allure_results: ${{ env.ALLURE_RESULTS_PATH }}
-          allure_history: allure-history
-          keep_reports: 5
-      - name: test
-        run: ls allure-history
-             ls allure-report
+          ref: gh-pages
+          path: gh-pages-dir
+
+      - name: Build Allure report
+        uses: mgrybyk/allure-report-branch-action@v1
+        if: always()
+        continue-on-error: true
+        id: allure
+        with:
+          report_id: 'test-report'
+          gh_pages: 'gh-pages-dir'
+          report_dir: ${{ env.ALLURE_RESULTS_PATH }}
+
+      - name: Git push to gh-pages
+        uses: mgrybyk/git-commit-pull-push-action@v1
+        if: always()
+        with:
+          repository: gh-pages-dir
+          branch: gh-pages
+          pull_args: --rebase -X ours
+
+      - name: Comment PR with Allure report link
+        if: ${{ always() && github.event_name == 'pull_request' && steps.allure.outputs.report_url }}
+        continue-on-error: true
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            ${{ steps.allure.outputs.test_result_icon }} [Test Report](${{ steps.allure.outputs.report_url }}) | ${\color{lightgreen}Pass: ${{ steps.allure.outputs.test_result_passed }}/${{ steps.allure.outputs.test_result_total }}}$ | ${\color{red}Fail: ${{ steps.allure.outputs.test_result_failed }}/${{ steps.allure.outputs.test_result_total }}}$ |
+          comment_tag: allure_report
+          mode: upsert
