@@ -15,5 +15,7 @@
 		<string>$(AppIdentifierPrefix)io.projectcatalyst.catalyst-voices.qa</string>
 		<string>$(AppIdentifierPrefix)io.projectcatalyst.catalyst-voices.preprod</string>
 	</array>
+	<key>com.apple.security.network.client</key>
+	<true/>
 </dict>
 </plist>
