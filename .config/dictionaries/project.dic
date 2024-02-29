@@ -5,6 +5,7 @@ adminer
 afinet
 androidx
 appspot
+Arbritrary
 asyncio
 asyncpg
 auditability
@@ -53,6 +54,7 @@ ideascale
 idents
 integ
 Intellij
+iohk
 iphoneos
 jetbrains
 Joaquín
@@ -67,6 +69,7 @@ localizable
 loguru
 mdlint
 mgrybyk
+mithril
 mitigations
 moderations
 multidex
@@ -124,9 +127,11 @@ timelike
 Traceback
 TXNZD
 unmanaged
+UTXO
 vitss
 voteplan
 voteplans
+wallclock
 xcconfig
 xcfilelist
 xcodebuild
