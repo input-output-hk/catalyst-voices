@@ -1,8 +1,0 @@
-"Status","Start Time","Stop Time","Duration in ms","Parent Suite","Suite","Sub Suite","Test Class","Test Method","Name","Description"
-"passed","","","63","","cat-gateway::bin/cat-gateway","","cat-gateway::bin/cat-gateway","","settings::tests::configured_hosts_default",""
-"passed","","","50","","cat-gateway::bin/cat-gateway","","cat-gateway::bin/cat-gateway","","settings::tests::configured_hosts_set_empty",""
-"passed","","","76","","cat-gateway::bin/cat-gateway","","cat-gateway::bin/cat-gateway","","settings::tests::generate_github_issue_url_test",""
-"passed","","","77","","cat-gateway::bin/cat-gateway","","cat-gateway::bin/cat-gateway","","settings::tests::configured_hosts_set_multiple_one_invalid",""
-"passed","","","69","","cat-gateway::bin/cat-gateway","","cat-gateway::bin/cat-gateway","","settings::tests::github_repo_name_default",""
-"passed","","","84","","cat-gateway::bin/cat-gateway","","cat-gateway::bin/cat-gateway","","settings::tests::configured_hosts_set_multiple",""
-"passed","","","85","","cat-gateway::bin/cat-gateway","","cat-gateway::bin/cat-gateway","","settings::tests::configured_hosts_set_empty_undefined_address",""
