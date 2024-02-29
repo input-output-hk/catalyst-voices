@@ -37,7 +37,6 @@ jobs:
 
       - name: Get unit test report
         uses: input-output-hk/catalyst-ci/actions/run@master
-        id: build
         with:
             earthfile: ./catalyst-gateway/
             flags:
@@ -46,11 +45,21 @@ jobs:
             runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
             artifact: "false"
 
+      - name: Get fuzzer api test report
+        uses: input-output-hk/catalyst-ci/actions/run@master
+        with:
+            earthfile: ./catalyst-gateway/tests/
+            flags:
+            targets: test-fuzzer-api
+            target_flags:
+            runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+            artifact: "false"
+
       - name: Setup Allure results
         run: |
               mkdir -p ${{ env.ALLURE_RESULTS_PATH }}
               mv catalyst-gateway/cat-gateway.junit-report.xml ${{ env.ALLURE_RESULTS_PATH }}
-            # mv junit-report.xml allure-results
+              mv catalyst-gateway/tests/schemathesis.junit-report.xml ${{ env.ALLURE_RESULTS_PATH }}
 
       - name: Checkout gh-pages
         uses: actions/checkout@v3
