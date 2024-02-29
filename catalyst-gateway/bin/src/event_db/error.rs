@@ -29,6 +29,18 @@ pub(crate) enum Error {
     /// Variable error
     #[error(transparent)]
     VarErr(#[from] VarError),
+    /// No config
+    #[error("No config")]
+    NoConfig,
+    /// JSON Parsing error
+    #[error("Unable to parse database data: {0}")]
+    JsonParseIssue(String),
+    #[error("Decode Error: {0}")]
+    /// Unable to decode hex
+    DecodeHex(String),
+    /// No previous followers hence no last updates metadata
+    #[error("LastUpdate metadata not present: {0}")]
+    NoLastUpdateMetadata(String),
 }
 
 impl From<RunError<tokio_postgres::Error>> for Error {

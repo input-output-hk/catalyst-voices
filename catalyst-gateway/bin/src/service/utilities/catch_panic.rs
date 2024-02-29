@@ -20,8 +20,8 @@ pub(crate) struct ServicePanicHandler;
 // Customized Panic handler - data storage.
 // Allows us to catch the backtrace so we can include it in logs.
 thread_local! {
-    static BACKTRACE: RefCell<Option<String>> = RefCell::new(None);
-    static LOCATION: RefCell<Option<String>> = RefCell::new(None);
+    static BACKTRACE: RefCell<Option<String>> = const { RefCell::new(None) };
+    static LOCATION: RefCell<Option<String>> = const { RefCell::new(None) };
 }
 
 /// Sets a custom panic hook to capture the Backtrace and Panic Location for logging
