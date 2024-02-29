@@ -43,6 +43,8 @@ test-fuzzer-api:
     END
     IF [ -f fail ]
         RUN echo "Schemathesis run failed" && \
+            echo "Printing catalyst gateway logs..." && \
+            jq --color-output . cat-gateway.log cat-gateway.log && \
             exit 1
     END
 

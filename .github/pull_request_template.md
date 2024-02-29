@@ -7,7 +7,7 @@ Please fill out this template to help us review your changes.
 
 List the issue numbers related to this pull request.
 
-> e.g., Closes #123, Resolves #456  Fixes #367
+> e.g., Closes #1, Resolves #1  Fixes #1
 
 ## Description of Changes
 
@@ -25,7 +25,7 @@ If applicable, add screenshots to help explain your changes.
 
 If applicable, list any related pull requests.
 
-> e.g., #123, #456
+> e.g., #1, #1
 
 ## Please confirm the following checks
 
