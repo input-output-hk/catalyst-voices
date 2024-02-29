@@ -49,7 +49,7 @@ jobs:
         uses: input-output-hk/catalyst-ci/actions/run@master
         with:
             earthfile: ./catalyst-gateway/tests/
-            flags:
+            flags: --allow-privileged
             targets: test-fuzzer-api
             target_flags:
             runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
