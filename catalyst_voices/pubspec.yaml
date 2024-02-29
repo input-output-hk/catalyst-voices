@@ -34,8 +34,9 @@ dependencies:
     sdk: flutter
   formz: ^0.7.0
   go_router: ^13.2.0
+  http: ^1.2.1
   path: ^1.9.0
-  rfw: ^1.0.23
+  rfw: ^1.0.24
   url_launcher: ^6.2.5
   url_strategy: ^0.2.0
 
