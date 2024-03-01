@@ -1,6 +1,7 @@
 // ignore_for_file: discarded_futures
 
 import 'dart:async';
+import 'dart:io';
 
 import 'package:catalyst_voices/pages/home/catalyst_core.dart' as core;
 import 'package:flutter/material.dart';
@@ -47,6 +48,13 @@ class _NetworkExampleState extends State<NetworkExample> {
         'https://github.com/minikin/minikin.github.io/raw/main/assets/home_page.rfw',
       ),
     );
+
+    final client = await (await HttpClient().getUrl(
+      Uri.parse(
+        'https://github.com/minikin/minikin.github.io/raw/main/assets/home_page.rfw',
+      ),
+    ))
+        .close();
 
     print('res: ${res.bodyBytes}');
 
