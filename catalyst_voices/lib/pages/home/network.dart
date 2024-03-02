@@ -37,7 +37,7 @@ class _NetworkExampleState extends State<NetworkExample> {
     return (RemoteWidget(
       runtime: _runtime,
       data: _data,
-      widget: const FullyQualifiedWidgetName(remoteName, 'root'),
+      widget: const FullyQualifiedWidgetName(remoteName, 'home'),
       onEvent: onEvent,
     ));
   }

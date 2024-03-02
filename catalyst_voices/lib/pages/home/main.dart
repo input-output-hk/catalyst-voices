@@ -17,8 +17,9 @@ Future<void> processFile(
     print('Reading to $inputFilePath');
     final content = await File(inputFilePath).readAsString();
     print('Content: $content');
+    final ddd = parseLibraryFile(content);
 
-    final bytes = encodeLibraryBlob(parseLibraryFile(content));
+    final bytes = encodeLibraryBlob(ddd);
 
     await File(outputFilePath).writeAsBytes(bytes);
     print('Successfully processed $inputFilePath');
