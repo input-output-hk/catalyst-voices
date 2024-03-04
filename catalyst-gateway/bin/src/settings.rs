@@ -302,7 +302,7 @@ mod tests {
 
     #[test]
     fn github_repo_name_default() {
-        assert_eq!("NOT_REPO_NAME", GITHUB_REPO_NAME_DEFAULT);
+        assert_eq!(GITHUB_REPO_NAME.as_str(), GITHUB_REPO_NAME_DEFAULT);
     }
 
     #[test]
