@@ -285,62 +285,64 @@ impl VitSSFundQueries for EventDB {
         };
 
         let next = match row.try_get::<_, Option<i32>>("next_id")? {
-            Some(id) => Some(FundNextInfo {
-                id,
-                fund_name: row.try_get("next_fund_name")?,
-                stage_dates: FundStageDates {
-                    insight_sharing_start: row
-                        .try_get::<_, Option<NaiveDateTime>>("next_insight_sharing_start")?
-                        .unwrap_or_default()
-                        .and_local_timezone(Utc)
-                        .unwrap(),
-                    proposal_submission_start: row
-                        .try_get::<_, Option<NaiveDateTime>>("next_proposal_submission_start")?
-                        .unwrap_or_default()
-                        .and_local_timezone(Utc)
-                        .unwrap(),
-                    refine_proposals_start: row
-                        .try_get::<_, Option<NaiveDateTime>>("next_refine_proposals_start")?
-                        .unwrap_or_default()
-                        .and_local_timezone(Utc)
-                        .unwrap(),
-                    finalize_proposals_start: row
-                        .try_get::<_, Option<NaiveDateTime>>("next_finalize_proposals_start")?
-                        .unwrap_or_default()
-                        .and_local_timezone(Utc)
-                        .unwrap(),
-                    proposal_assessment_start: row
-                        .try_get::<_, Option<NaiveDateTime>>("next_proposal_assessment_start")?
-                        .unwrap_or_default()
-                        .and_local_timezone(Utc)
-                        .unwrap(),
-                    assessment_qa_start: row
-                        .try_get::<_, Option<NaiveDateTime>>("next_assessment_qa_start")?
-                        .unwrap_or_default()
-                        .and_local_timezone(Utc)
-                        .unwrap(),
-                    snapshot_start: row
-                        .try_get::<_, Option<NaiveDateTime>>("next_snapshot_start")?
-                        .unwrap_or_default()
-                        .and_local_timezone(Utc)
-                        .unwrap(),
-                    voting_start: row
-                        .try_get::<_, Option<NaiveDateTime>>("next_voting_start")?
-                        .unwrap_or_default()
-                        .and_local_timezone(Utc)
-                        .unwrap(),
-                    voting_end: row
-                        .try_get::<_, Option<NaiveDateTime>>("next_voting_end")?
-                        .unwrap_or_default()
-                        .and_local_timezone(Utc)
-                        .unwrap(),
-                    tallying_end: row
-                        .try_get::<_, Option<NaiveDateTime>>("next_tallying_end")?
-                        .unwrap_or_default()
-                        .and_local_timezone(Utc)
-                        .unwrap(),
-                },
-            }),
+            Some(id) => {
+                Some(FundNextInfo {
+                    id,
+                    fund_name: row.try_get("next_fund_name")?,
+                    stage_dates: FundStageDates {
+                        insight_sharing_start: row
+                            .try_get::<_, Option<NaiveDateTime>>("next_insight_sharing_start")?
+                            .unwrap_or_default()
+                            .and_local_timezone(Utc)
+                            .unwrap(),
+                        proposal_submission_start: row
+                            .try_get::<_, Option<NaiveDateTime>>("next_proposal_submission_start")?
+                            .unwrap_or_default()
+                            .and_local_timezone(Utc)
+                            .unwrap(),
+                        refine_proposals_start: row
+                            .try_get::<_, Option<NaiveDateTime>>("next_refine_proposals_start")?
+                            .unwrap_or_default()
+                            .and_local_timezone(Utc)
+                            .unwrap(),
+                        finalize_proposals_start: row
+                            .try_get::<_, Option<NaiveDateTime>>("next_finalize_proposals_start")?
+                            .unwrap_or_default()
+                            .and_local_timezone(Utc)
+                            .unwrap(),
+                        proposal_assessment_start: row
+                            .try_get::<_, Option<NaiveDateTime>>("next_proposal_assessment_start")?
+                            .unwrap_or_default()
+                            .and_local_timezone(Utc)
+                            .unwrap(),
+                        assessment_qa_start: row
+                            .try_get::<_, Option<NaiveDateTime>>("next_assessment_qa_start")?
+                            .unwrap_or_default()
+                            .and_local_timezone(Utc)
+                            .unwrap(),
+                        snapshot_start: row
+                            .try_get::<_, Option<NaiveDateTime>>("next_snapshot_start")?
+                            .unwrap_or_default()
+                            .and_local_timezone(Utc)
+                            .unwrap(),
+                        voting_start: row
+                            .try_get::<_, Option<NaiveDateTime>>("next_voting_start")?
+                            .unwrap_or_default()
+                            .and_local_timezone(Utc)
+                            .unwrap(),
+                        voting_end: row
+                            .try_get::<_, Option<NaiveDateTime>>("next_voting_end")?
+                            .unwrap_or_default()
+                            .and_local_timezone(Utc)
+                            .unwrap(),
+                        tallying_end: row
+                            .try_get::<_, Option<NaiveDateTime>>("next_tallying_end")?
+                            .unwrap_or_default()
+                            .and_local_timezone(Utc)
+                            .unwrap(),
+                    },
+                })
+            },
             None => None,
         };
 

@@ -47,10 +47,11 @@ impl ObjectiveQueries for EventDB {
         let conn = self.pool.get().await?;
 
         let rows = conn
-            .query(
-                Self::OBJECTIVES_QUERY,
-                &[&event.0, &limit, &offset.unwrap_or(0)],
-            )
+            .query(Self::OBJECTIVES_QUERY, &[
+                &event.0,
+                &limit,
+                &offset.unwrap_or(0),
+            ])
             .await?;
 
         let mut objectives = Vec::new();
