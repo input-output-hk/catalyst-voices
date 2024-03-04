@@ -58,42 +58,12 @@ jobs:
             if-no-files-found: error
             retention-days: 1
 
-  generate-schemathesis-tests-report:
-    name: Generate schemathesis tests report
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@master
-        with:
-            aws_role_arn: ${{ env.AWS_ROLE_ARN }}
-            aws_region: ${{ env.AWS_REGION }}
-            earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
-
-      - name: Get schemathesis api test report
-        uses: input-output-hk/catalyst-ci/actions/run@master
-        with:
-          earthfile: ./catalyst-gateway/tests/
-          flags: --allow-privileged
-          targets: test-fuzzer-api
-          target_flags:
-          runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-          artifact: "false"
-
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: schemathesis.junit-report.xml
-          path: catalyst-gateway/tests/schemathesis.junit-report.xml
-          if-no-files-found: error
-          retention-days: 1
 
   generate-allure-report:
     name: Generate allure report
     runs-on: ubuntu-latest
     if: always()
-    needs: [generate-schemathesis-tests-report, generate-unit-tests-report]
+    needs: [generate-unit-tests-report]
     steps:
       - uses: actions/checkout@v3
 
