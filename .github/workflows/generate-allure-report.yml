@@ -75,7 +75,7 @@ jobs:
         if: always()
         with:
             name: cat-gateway.junit-report.xml
-            path: cat-gateway.junit-report.xml
+            path: catalyst-gateway/cat-gateway.junit-report.xml
             if-no-files-found: error
             retention-days: 1
 
