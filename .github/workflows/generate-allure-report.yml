@@ -77,7 +77,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-            name: test-reports
             path: '**/*.junit-report.xml'
             if-no-files-found: error
             retention-days: 1
@@ -86,7 +85,6 @@ jobs:
   generate-allure-report:
     name: Generate allure report
     runs-on: ubuntu-latest
-    if: always()
     needs: [generate-test-reports]
     steps:
       - uses: actions/checkout@v3
@@ -98,7 +96,8 @@ jobs:
       - name: Setup Allure results
         run: |
               mkdir -p ${{ env.ALLURE_RESULTS_PATH }}
-              find . -name \*.junit-report.xml -exec cp {} ${{ env.ALLURE_RESULTS_PATH }} \;
+              shopt -s globstar
+              cp **/*.junit-report.xml ${{ env.ALLURE_RESULTS_PATH }}
 
       - name: Checkout gh-pages
         uses: actions/checkout@v3
