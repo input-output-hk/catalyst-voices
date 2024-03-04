@@ -20,6 +20,7 @@ env:
     EARTHLY_TARGET: docker
     ECR_REGISTRY: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
     ALLURE_RESULTS_PATH: allure-results
+    REPORT_EXT: .junit-report.xml
 
 jobs:
   generate-test-reports:
@@ -77,10 +78,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-            path: '**/*.junit-report.xml'
+            path: '**/*${{ env.REPORT_EXT }}'
             if-no-files-found: error
             retention-days: 1
-
 
   generate-allure-report:
     name: Generate allure report
@@ -90,14 +90,12 @@ jobs:
       - uses: actions/checkout@v3
 
       - uses: actions/download-artifact@v4
-        with:
-            merge-multiple: true
 
       - name: Setup Allure results
         run: |
               mkdir -p ${{ env.ALLURE_RESULTS_PATH }}
               shopt -s globstar
-              cp **/*.junit-report.xml ${{ env.ALLURE_RESULTS_PATH }}
+              cp **/*${{ env.REPORT_EXT }} ${{ env.ALLURE_RESULTS_PATH }}
 
       - name: Checkout gh-pages
         uses: actions/checkout@v3
