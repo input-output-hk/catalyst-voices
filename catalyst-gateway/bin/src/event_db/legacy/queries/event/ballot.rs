@@ -70,11 +70,10 @@ impl BallotQueries for EventDB {
         let conn = self.pool.get().await?;
 
         let rows = conn
-            .query(Self::BALLOT_VOTE_OPTIONS_QUERY, &[
-                &event.0,
-                &objective.0,
-                &proposal.0,
-            ])
+            .query(
+                Self::BALLOT_VOTE_OPTIONS_QUERY,
+                &[&event.0, &objective.0, &proposal.0],
+            )
             .await?;
         let row = rows
             .first()
@@ -82,11 +81,10 @@ impl BallotQueries for EventDB {
         let choices = row.try_get("objective")?;
 
         let rows = conn
-            .query(Self::BALLOT_VOTE_PLANS_QUERY, &[
-                &event.0,
-                &objective.0,
-                &proposal.0,
-            ])
+            .query(
+                Self::BALLOT_VOTE_PLANS_QUERY,
+                &[&event.0, &objective.0, &proposal.0],
+            )
             .await?;
         let mut voteplans = Vec::new();
         for row in rows {
@@ -113,10 +111,10 @@ impl BallotQueries for EventDB {
         let conn = self.pool.get().await?;
 
         let rows = conn
-            .query(Self::BALLOTS_VOTE_OPTIONS_PER_OBJECTIVE_QUERY, &[
-                &event.0,
-                &objective.0,
-            ])
+            .query(
+                Self::BALLOTS_VOTE_OPTIONS_PER_OBJECTIVE_QUERY,
+                &[&event.0, &objective.0],
+            )
             .await?;
 
         let mut ballots = Vec::new();
@@ -125,11 +123,10 @@ impl BallotQueries for EventDB {
             let proposal_id = ProposalId(row.try_get("proposal_id")?);
 
             let rows = conn
-                .query(Self::BALLOT_VOTE_PLANS_QUERY, &[
-                    &event.0,
-                    &objective.0,
-                    &proposal_id.0,
-                ])
+                .query(
+                    Self::BALLOT_VOTE_PLANS_QUERY,
+                    &[&event.0, &objective.0, &proposal_id.0],
+                )
                 .await?;
             let mut voteplans = Vec::new();
             for row in rows {
@@ -168,11 +165,10 @@ impl BallotQueries for EventDB {
             let objective_id = ObjectiveId(row.try_get("objective_id")?);
 
             let rows = conn
-                .query(Self::BALLOT_VOTE_PLANS_QUERY, &[
-                    &event.0,
-                    &objective_id.0,
-                    &proposal_id.0,
-                ])
+                .query(
+                    Self::BALLOT_VOTE_PLANS_QUERY,
+                    &[&event.0, &objective_id.0, &proposal_id.0],
+                )
                 .await?;
             let mut voteplans = Vec::new();
             for row in rows {
@@ -201,11 +197,9 @@ impl BallotQueries for EventDB {
 
         Ok(ballots
             .into_iter()
-            .map(|(objective_id, ballots)| {
-                ObjectiveBallots {
-                    objective_id,
-                    ballots,
-                }
+            .map(|(objective_id, ballots)| ObjectiveBallots {
+                objective_id,
+                ballots,
             })
             .collect())
     }

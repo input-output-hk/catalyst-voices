@@ -5,7 +5,7 @@ use std::sync::Arc;
 use poem::web::Data;
 use poem_extensions::{
     response,
-    UniResponse::{T500, T503},
+    UniResponse::{T204, T500, T503},
 };
 
 use crate::{
@@ -66,7 +66,7 @@ pub(crate) async fn endpoint(state: Data<&Arc<State>>) -> AllResponses {
                 "DB schema version status mismatch"
             );
             state.set_schema_version_status(SchemaVersionStatus::Mismatch);
-            T503(ServiceUnavailable)
+            T204(NoContent)
         },
         Err(Error::EventDb(DBError::TimedOut)) => T503(ServiceUnavailable),
         Err(err) => T500(server_error!("{}", err.to_string())),

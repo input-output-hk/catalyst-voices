@@ -94,12 +94,10 @@ impl ProposalQueries for EventDB {
         let conn = self.pool.get().await?;
 
         let rows = conn
-            .query(Self::PROPOSALS_QUERY, &[
-                &event.0,
-                &objective.0,
-                &limit,
-                &offset.unwrap_or(0),
-            ])
+            .query(
+                Self::PROPOSALS_QUERY,
+                &[&event.0, &objective.0, &limit, &offset.unwrap_or(0)],
+            )
             .await?;
 
         let mut proposals = Vec::new();

@@ -60,13 +60,16 @@ impl ReviewQueries for EventDB {
         let conn = self.pool.get().await?;
 
         let rows = conn
-            .query(Self::REVIEWS_QUERY, &[
-                &event.0,
-                &objective.0,
-                &proposal.0,
-                &limit,
-                &offset.unwrap_or(0),
-            ])
+            .query(
+                Self::REVIEWS_QUERY,
+                &[
+                    &event.0,
+                    &objective.0,
+                    &proposal.0,
+                    &limit,
+                    &offset.unwrap_or(0),
+                ],
+            )
             .await?;
 
         let mut reviews = Vec::new();
@@ -98,12 +101,10 @@ impl ReviewQueries for EventDB {
         let conn = self.pool.get().await?;
 
         let rows = conn
-            .query(Self::REVIEW_TYPES_QUERY, &[
-                &event.0,
-                &objective.0,
-                &limit,
-                &offset.unwrap_or(0),
-            ])
+            .query(
+                Self::REVIEW_TYPES_QUERY,
+                &[&event.0, &objective.0, &limit, &offset.unwrap_or(0)],
+            )
             .await?;
         let mut review_types = Vec::new();
         for row in rows {

@@ -135,10 +135,10 @@ impl EventDB {
         let conn = self.pool.get().await?;
 
         let rows: Vec<tokio_postgres::Row> = conn
-            .query(&Self::construct_count_query(&search_query), &[
-                &limit,
-                &offset.unwrap_or(0),
-            ])
+            .query(
+                &Self::construct_count_query(&search_query),
+                &[&limit, &offset.unwrap_or(0)],
+            )
             .await
             .map_err(|e| Error::NotFound(e.to_string()))?;
         let row = rows
@@ -157,10 +157,10 @@ impl EventDB {
     ) -> Result<SearchResult, Error> {
         let conn = self.pool.get().await?;
         let rows: Vec<tokio_postgres::Row> = conn
-            .query(&Self::construct_query(&search_query), &[
-                &limit,
-                &offset.unwrap_or(0),
-            ])
+            .query(
+                &Self::construct_query(&search_query),
+                &[&limit, &offset.unwrap_or(0)],
+            )
             .await
             .map_err(|e| Error::NotFound(e.to_string()))?;
 
@@ -201,10 +201,10 @@ impl EventDB {
     ) -> Result<SearchResult, Error> {
         let conn = self.pool.get().await?;
         let rows: Vec<tokio_postgres::Row> = conn
-            .query(&Self::construct_query(&search_query), &[
-                &limit,
-                &offset.unwrap_or(0),
-            ])
+            .query(
+                &Self::construct_query(&search_query),
+                &[&limit, &offset.unwrap_or(0)],
+            )
             .await
             .map_err(|e| Error::NotFound(e.to_string()))?;
 
@@ -241,10 +241,10 @@ impl EventDB {
         let conn = self.pool.get().await?;
 
         let rows: Vec<tokio_postgres::Row> = conn
-            .query(&Self::construct_query(&search_query), &[
-                &limit,
-                &offset.unwrap_or(0),
-            ])
+            .query(
+                &Self::construct_query(&search_query),
+                &[&limit, &offset.unwrap_or(0)],
+            )
             .await
             .map_err(|e| Error::NotFound(e.to_string()))?;
 

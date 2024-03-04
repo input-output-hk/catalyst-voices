@@ -48,11 +48,6 @@ jobs:
             runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
             artifact: "false"
 
-      - name: ls
-        if: always()
-        run: |
-              ls catalyst-gateway/
-
       - name: Get schemathesis test report
         uses: input-output-hk/catalyst-ci/actions/run@master
         if: always()
@@ -64,16 +59,6 @@ jobs:
           target_flags:
           runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
           artifact: "false"
-
-      - name: ls
-        if: always()
-        run: |
-              ls catalyst-gateway/tests/
-
-      - name: ls
-        if: always()
-        run: |
-              ls catalyst-gateway/
 
       - uses: actions/upload-artifact@v4
         if: always()
@@ -96,6 +81,7 @@ jobs:
               mkdir -p ${{ env.ALLURE_RESULTS_PATH }}
               shopt -s globstar
               cp **/*${{ env.REPORT_EXT }} ${{ env.ALLURE_RESULTS_PATH }}
+              ls ${{ env.ALLURE_RESULTS_PATH }}
 
       - name: Checkout gh-pages
         uses: actions/checkout@v3
