@@ -63,16 +63,12 @@ jobs:
 
       - name: Checkout gh-pages
         uses: actions/checkout@v3
-        if: always()
-        continue-on-error: true
         with:
           ref: gh-pages
           path: gh-pages-dir
 
       - name: Build Allure report
         uses: mgrybyk/allure-report-branch-action@v1
-        if: always()
-        continue-on-error: true
         id: allure
         with:
           report_id: 'test-report'
@@ -81,7 +77,6 @@ jobs:
 
       - name: Git push to gh-pages
         uses: mgrybyk/git-commit-pull-push-action@v1
-        if: always()
         with:
           repository: gh-pages-dir
           branch: gh-pages
@@ -89,7 +84,6 @@ jobs:
 
       - name: Comment PR with Allure report link
         if: ${{ always() && github.event_name == 'pull_request' && steps.allure.outputs.report_url }}
-        continue-on-error: true
         uses: thollander/actions-comment-pull-request@v2
         with:
           message: |

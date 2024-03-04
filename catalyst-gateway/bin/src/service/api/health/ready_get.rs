@@ -5,7 +5,7 @@ use std::sync::Arc;
 use poem::web::Data;
 use poem_extensions::{
     response,
-    UniResponse::{T204, T500, T503},
+    UniResponse::{T500, T503},
 };
 
 use crate::{
@@ -57,7 +57,7 @@ pub(crate) async fn endpoint(state: Data<&Arc<State>>) -> AllResponses {
         Ok(_) => {
             tracing::debug!("DB schema version status ok");
             state.set_schema_version_status(SchemaVersionStatus::Ok);
-            T204(NoContent)
+            T503(ServiceUnavailable)
         },
         Err(Error::EventDb(DBError::MismatchedSchema { was, expected })) => {
             tracing::error!(
