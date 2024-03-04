@@ -46,6 +46,7 @@ jobs:
             artifact: "false"
 
       - name: ls
+        if: always()
         run: |
               ls &&
               ls catalyst-gateway
