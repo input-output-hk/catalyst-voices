@@ -22,8 +22,8 @@ env:
     ALLURE_RESULTS_PATH: allure-results
 
 jobs:
-  generate-unit-tests-report:
-    name: Generate unit tests report
+  generate-test-reports:
+    name: Generate test reports
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -52,7 +52,7 @@ jobs:
         run: |
               ls catalyst-gateway/
 
-      - name: Get schemathesis api test report
+      - name: Get schemathesis test report
         uses: input-output-hk/catalyst-ci/actions/run@master
         if: always()
         continue-on-error: true
@@ -77,7 +77,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-            name: cat-gateway.junit-report.xml
+            name: test-reports
             path: '**/*.junit-report.xml'
             if-no-files-found: error
             retention-days: 1
@@ -87,18 +87,18 @@ jobs:
     name: Generate allure report
     runs-on: ubuntu-latest
     if: always()
-    needs: [generate-unit-tests-report]
+    needs: [generate-test-reports]
     steps:
       - uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v4
+        with:
+            merge-multiple: true
 
       - name: Setup Allure results
         run: |
               mkdir -p ${{ env.ALLURE_RESULTS_PATH }}
-
-      - uses: actions/download-artifact@v4
-        with:
-            path: ${{ env.ALLURE_RESULTS_PATH }}
-            merge-multiple: true
+              find . -name \*.junit-report.xml -exec cp {} ${{ env.ALLURE_RESULTS_PATH }} \;
 
       - name: Checkout gh-pages
         uses: actions/checkout@v3
