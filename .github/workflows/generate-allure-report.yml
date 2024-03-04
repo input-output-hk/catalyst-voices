@@ -46,6 +46,7 @@ jobs:
             artifact: "false"
 
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
             name: cat-gateway.junit-report.xml
             path: catalyst-gateway/cat-gateway.junit-report.xml
@@ -76,6 +77,7 @@ jobs:
           artifact: "false"
 
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: schemathesis.junit-report.xml
           path: catalyst-gateway/tests/schemathesis.junit-report.xml
