@@ -57,7 +57,7 @@ pub(crate) async fn endpoint(state: Data<&Arc<State>>) -> AllResponses {
         Ok(_) => {
             tracing::debug!("DB schema version status ok");
             state.set_schema_version_status(SchemaVersionStatus::Ok);
-            T503(ServiceUnavailable)
+            T204(NoContent)
         },
         Err(Error::EventDb(DBError::MismatchedSchema { was, expected })) => {
             tracing::error!(
@@ -66,7 +66,7 @@ pub(crate) async fn endpoint(state: Data<&Arc<State>>) -> AllResponses {
                 "DB schema version status mismatch"
             );
             state.set_schema_version_status(SchemaVersionStatus::Mismatch);
-            T204(NoContent)
+            T503(ServiceUnavailable)
         },
         Err(Error::EventDb(DBError::TimedOut)) => T503(ServiceUnavailable),
         Err(err) => T500(server_error!("{}", err.to_string())),
