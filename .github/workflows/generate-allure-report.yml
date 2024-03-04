@@ -47,6 +47,7 @@ jobs:
 
       - name: Get schemathesis api test report
         uses: input-output-hk/catalyst-ci/actions/run@master
+        if: always()
         with:
           earthfile: ./catalyst-gateway/tests/
           flags: --allow-privileged
