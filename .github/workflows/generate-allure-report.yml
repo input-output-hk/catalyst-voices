@@ -45,6 +45,11 @@ jobs:
             runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
             artifact: "false"
 
+      - name: ls
+        run: |
+              ls &&
+              ls catalyst-gateway
+
       - uses: actions/upload-artifact@v4
         if: always()
         with:
