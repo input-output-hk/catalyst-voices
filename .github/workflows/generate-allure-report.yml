@@ -37,6 +37,8 @@ jobs:
 
       - name: Get unit test report
         uses: input-output-hk/catalyst-ci/actions/run@master
+        if: always()
+        continue-on-error: true
         with:
             earthfile: ./catalyst-gateway/
             flags:
@@ -53,6 +55,7 @@ jobs:
       - name: Get schemathesis api test report
         uses: input-output-hk/catalyst-ci/actions/run@master
         if: always()
+        continue-on-error: true
         with:
           earthfile: ./catalyst-gateway/tests/
           flags: --allow-privileged
