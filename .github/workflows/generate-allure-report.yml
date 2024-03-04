@@ -48,7 +48,7 @@ jobs:
       - name: ls
         if: always()
         run: |
-              ls catalyst-gateway/tests/
+              ls catalyst-gateway/
 
       - name: Get schemathesis api test report
         uses: input-output-hk/catalyst-ci/actions/run@master
