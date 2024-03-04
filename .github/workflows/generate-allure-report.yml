@@ -64,7 +64,7 @@ jobs:
       - name: ls
         if: always()
         run: |
-              ls /catalyst-gateway/tests/
+              ls catalyst-gateway/tests/
 
       - uses: actions/upload-artifact@v4
         if: always()
