@@ -472,7 +472,6 @@ dependencies = [
  "lazy_static",
  "local-ip-address",
  "pallas",
- "pallas-hardano",
  "panic-message",
  "poem",
  "poem-extensions",
