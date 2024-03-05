@@ -1,7 +1,8 @@
 import core.widgets;
 import core.material;
+import core.catalyst;
 
-widget home = Center(
+widget root = Center(
       child: SizedBox(
         height: 460,
         width: 480,

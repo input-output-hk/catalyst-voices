@@ -1,9 +1,8 @@
-// ignore_for_file: discarded_futures
+// ignore_for_file: discarded_futures, unused_field
 
 import 'dart:async';
-import 'dart:io';
 
-import 'package:catalyst_voices/pages/home/catalyst_core.dart' as core;
+import 'package:catalyst_voices/pages/remote/catalyst_core.dart' as core;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:rfw/rfw.dart';
@@ -17,10 +16,10 @@ class NetworkExample extends StatefulWidget {
 
 class _NetworkExampleState extends State<NetworkExample> {
   static const remoteName = LibraryName(['remote']);
-  static const catalystCore = LibraryName(['catalyst']);
-  static const widgets = LibraryName(['widgets']);
-  static const material = LibraryName(['material']);
-  final dynamicContent = DynamicContent();
+
+  static const catalystCore = LibraryName(['core', 'catalyst']);
+  static const widgets = LibraryName(['core', 'widgets']);
+  static const material = LibraryName(['core', 'material']);
 
   late final Future<void> _initFuture;
 
@@ -34,35 +33,25 @@ class _NetworkExampleState extends State<NetworkExample> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return (RemoteWidget(
+    return RemoteWidget(
       runtime: _runtime,
       data: _data,
-      widget: const FullyQualifiedWidgetName(remoteName, 'home'),
+      widget: const FullyQualifiedWidgetName(remoteName, 'root'),
       onEvent: onEvent,
-    ));
+    );
   }
 
   Future<void> fetchWidget() async {
     final res = await http.get(
       Uri.parse(
-        'https://github.com/minikin/minikin.github.io/raw/main/assets/home_page.rfw',
+        'https://github.com/minikin/minikin.github.io/raw/main/rfw/home_page.rfw',
       ),
     );
 
-    final client = await (await HttpClient().getUrl(
-      Uri.parse(
-        'https://github.com/minikin/minikin.github.io/raw/main/assets/home_page.rfw',
-      ),
-    ))
-        .close();
-
-    print('res: ${res.bodyBytes}');
-
     if (res.statusCode == 200) {
-      final value = decodeDataBlob(res.bodyBytes);
-      print('value: $value');
-      dynamicContent.update('remote', value);
-      // _runtime.update(remoteName, value);
+      final remoteWidget = decodeLibraryBlob(res.bodyBytes);
+      print('remoteWidget: $remoteWidget');
+      _runtime.update(remoteName, remoteWidget);
     }
   }
 

@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/pages/home/network.dart';
+import 'package:catalyst_voices/pages/remote/network.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
