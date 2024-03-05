@@ -4,7 +4,7 @@ version: 0.1.0+1
 publish_to: none
 
 environment:
-  sdk: ">=3.2.6 <4.0.0"
+  sdk: '>=3.3.0 <4.0.0'
   flutter: 3.19.2
 
 dependencies:
@@ -12,8 +12,8 @@ dependencies:
     sdk: flutter
 
 dev_dependencies:
-  build_runner: ^2.1.11
-  flutter_gen_runner: ^5.3.2
+  build_runner: ^2.4.8
+  flutter_gen_runner: ^5.4.0
 
 flutter:
   uses-material-design: true

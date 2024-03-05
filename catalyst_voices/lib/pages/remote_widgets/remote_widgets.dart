@@ -2,7 +2,7 @@
 
 import 'dart:async';
 
-import 'package:catalyst_voices/pages/remote_widgets/library/catalyst_core.dart'
+import 'package:catalyst_voices/pages/remote_widgets/core/catalyst_core.dart'
     as core;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;

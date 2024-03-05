@@ -24,7 +24,7 @@ command:
       result_type: ^0.2.0
     dev_dependencies:
       test: ^1.24.9
-      build_runner: ^2.3.3
+      build_runner: ^2.4.8
       mocktail: ^1.0.1
 
 scripts:
