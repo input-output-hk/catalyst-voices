@@ -10,4 +10,5 @@ icon: material/chat
 * [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/)
 
 ## Test reports
+
 * [Main test report](https://input-output-hk.github.io/catalyst-voices/allure-action/main/test-report/latest.html)
