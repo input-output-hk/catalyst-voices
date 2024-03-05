@@ -8,7 +8,6 @@ use async_recursion::async_recursion;
 use cardano_chain_follower::{
     network_genesis_values, ChainUpdate, Follower, FollowerConfigBuilder, Network, Point,
 };
-
 use tokio::{task::JoinHandle, time};
 use tracing::{error, info};
 

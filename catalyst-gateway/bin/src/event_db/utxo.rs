@@ -1,12 +1,11 @@
 //! Utxo Queries
 
-use crate::event_db::Error::SqlTypeConversionFailure;
-use crate::event_db::{Error, EventDB};
 use async_trait::async_trait;
 use cardano_chain_follower::Network;
 use pallas::ledger::traverse::MultiEraTx;
 
 use super::follower::SlotNumber;
+use crate::event_db::{Error, Error::SqlTypeConversionFailure, EventDB};
 
 #[async_trait]
 #[allow(clippy::module_name_repetitions)]
@@ -21,12 +20,13 @@ pub(crate) trait UtxoQueries: Sync + Send + 'static {
 }
 
 impl EventDB {
+    /// Index of all transactions in the cardano network. It allows us to quickly find a
+    /// transaction by its id, and its slot number.
+    const INDEX_TX: &'static str =
+        "INSERT INTO cardano_txn_index(id, slot_no, network) VALUES($1, $2, $3) ON CONFLICT(id) DO NOTHING";
     /// The ID of the transaction containing the UTXO.
     const INDEX_UTXO_QUERY: &'static str =
         "INSERT INTO cardano_utxo(index, tx_id, value, stake_credential) VALUES($1, $2, $3, $4) ON CONFLICT (index, tx_id) DO NOTHING";
-    /// Index of all transactions in the cardano network. It allows us to quickly find a transaction by its id, and its slot number.
-    const INDEX_TX: &'static str =
-        "INSERT INTO cardano_txn_index(id, slot_no, network) VALUES($1, $2, $3) ON CONFLICT(id) DO NOTHING";
 }
 
 #[async_trait]
