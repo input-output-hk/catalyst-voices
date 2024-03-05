@@ -38,7 +38,7 @@ impl UtxoQueries for EventDB {
         let conn = self.pool.get().await?;
 
         for (index, tx) in txs.iter().enumerate() {
-            self.index_txn_data(&tx.hash().as_slice(), slot_no, network)
+            self.index_txn_data(tx.hash().as_slice(), slot_no, network)
                 .await?;
 
             // index outputs
