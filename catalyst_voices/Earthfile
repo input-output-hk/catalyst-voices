@@ -1,4 +1,4 @@
-VERSION --try --global-cache 0.7
+VERSION --try --global-cache --arg-scope-and-set 0.7
 
 deps:
     FROM debian:stable-slim
@@ -47,3 +47,27 @@ package:
     ARG tag='latest'
 
     SAVE IMAGE catalyst-voices-app:$tag
+
+test-chrome-web:
+    FROM +build
+    LET CHROMEDRIVER_VERSION = '114.0.5735.90'
+    LET CHROME_VERSION = '114.0.5735.90-1'
+
+    RUN apt-get update -y && apt-get install -y wget unzip xserver-xorg-video-dummy gnupg
+    RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
+    RUN echo "deb http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list
+    RUN apt-get update -y
+    # Install Chrome
+    RUN wget --no-verbose -O /tmp/chrome.deb https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_VERSION}_amd64.deb \
+            && apt install -y /tmp/chrome.deb && rm /tmp/chrome.deb
+    # Install Chromedriver
+    LET chromedriver_dir = '/chromedriver'
+    RUN mkdir $chromedriver_dir
+    RUN wget -q --continue -P $chromedriver_dir "http://chromedriver.storage.googleapis.com/$CHROMEDRIVER_VERSION/chromedriver_linux64.zip"
+    RUN unzip $chromedriver_dir/chromedriver* -d $chromedriver_dir
+    ENV PATH $chromedriver_dir:$PATH
+
+    RUN (chromedriver --port=4444 &) && \
+            flutter drive --driver=test_driver/integration_test.dart \
+                --target=integration_test/main.dart \
+                    --flavor development -d web-server --profile --browser-name=chrome
