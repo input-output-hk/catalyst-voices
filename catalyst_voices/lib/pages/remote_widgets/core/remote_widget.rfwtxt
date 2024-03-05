@@ -1,0 +1,33 @@
+import core.widgets;
+import core.material;
+import core.catalyst;
+
+widget root = Center(
+      child: SizedBox(
+        height: 460,
+        width: 480,
+        child: Card(
+          child: Padding(
+            padding:  [ 16.0 ],
+            child: Column(
+              mainAxisSize: "min",
+              crossAxisAlignment: "start",
+              children: [
+                Padding(
+                  padding: [ 20.0 ],
+                  child: TextField(
+                    keyboardType: "emailAddress",
+                    textInputAction: "next",
+                    onChanged: args.onPressed,
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: "FontWeight.w700",
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );

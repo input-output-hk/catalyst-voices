@@ -10,3 +10,6 @@ https://pub.dev/documentation/rfw/latest/rfw/dataBlobSignature-constant.html
 
 https://pub.dev/documentation/rfw/latest/rfw/libraryBlobSignature-constant.html
 
+```sh
+flutter pub run build_runner build
+```

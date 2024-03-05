@@ -6,7 +6,8 @@ import 'dart:io';
 import 'package:rfw/formats.dart';
 
 Future<void> main() async {
-  await processFile('home_page.rfwtxt', 'home_page.rfw');
+  await processFile('remote_widget.rfwtxt', 'remote_widget.rfw');
+  await processFile('new_remote_widget.rfwtxt', 'new_remote_widget.rfw');
 }
 
 Future<void> processFile(
