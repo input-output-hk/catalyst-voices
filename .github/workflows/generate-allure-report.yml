@@ -19,7 +19,7 @@ env:
     AWS_ROLE_ARN: arn:aws:iam::332405224602:role/ci
     EARTHLY_TARGET: docker
     ECR_REGISTRY: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
-    ALLURE_RESULTS_PATH: allure-results
+    ALLURE_REPORT_PATH: allure-report
     REPORT_EXT: .junit-report.xml
 
 jobs:
@@ -60,7 +60,8 @@ jobs:
           runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
           artifact: "false"
 
-      - uses: actions/upload-artifact@v4
+      - name: Collect and upload test reports
+        uses: actions/upload-artifact@v4
         if: always()
         with:
             path: '**/*${{ env.REPORT_EXT }}'
@@ -76,12 +77,12 @@ jobs:
 
       - uses: actions/download-artifact@v4
 
-      - name: Setup Allure results
+      - name: Setup Allure report
         run: |
-              mkdir -p ${{ env.ALLURE_RESULTS_PATH }}
+              mkdir -p ${{ env.ALLURE_REPORT_PATH }}
               shopt -s globstar
-              cp **/*${{ env.REPORT_EXT }} ${{ env.ALLURE_RESULTS_PATH }}
-              ls ${{ env.ALLURE_RESULTS_PATH }}
+              cp **/*${{ env.REPORT_EXT }} ${{ env.ALLURE_REPORT_PATH }}
+              ls ${{ env.ALLURE_REPORT_PATH }}
 
       - name: Checkout gh-pages
         uses: actions/checkout@v3
@@ -95,7 +96,7 @@ jobs:
         with:
           report_id: 'test-report'
           gh_pages: 'gh-pages-dir'
-          report_dir: ${{ env.ALLURE_RESULTS_PATH }}
+          report_dir: ${{ env.ALLURE_REPORT_PATH }}
 
       - name: Git push to gh-pages
         uses: mgrybyk/git-commit-pull-push-action@v1
