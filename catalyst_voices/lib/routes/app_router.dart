@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/routes/home_page_route.dart' as home_route;
 import 'package:catalyst_voices/routes/login_page_route.dart' as login_route;
+import 'package:catalyst_voices/routes/remote_page_route.dart' as remote_route;
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/foundation.dart';
@@ -28,7 +29,7 @@ final class AppRouter {
     AuthenticationBloc authenticationBloc,
     GoRouterState state,
   ) {
-    return home_route.homePath;
+    return remote_route.remotePath;
     // final isAuthenticated = authenticationBloc.isAuthenticated;
     // final signingIn = state.matchedLocation == login_route.loginPath;
 
@@ -55,6 +56,7 @@ final class AppRouter {
     return [
       ...login_route.$appRoutes,
       ...home_route.$appRoutes,
+      ...remote_route.$appRoutes,
     ];
   }
 }
