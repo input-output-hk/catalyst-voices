@@ -8,13 +8,18 @@ use async_recursion::async_recursion;
 use cardano_chain_follower::{
     network_genesis_values, ChainUpdate, Follower, FollowerConfigBuilder, Network, Point,
 };
+
 use tokio::{task::JoinHandle, time};
 use tracing::{error, info};
 
-use crate::event_db::{
-    config::{ConfigQueries, FollowerMeta, NetworkMeta},
-    follower::{BlockHash, FollowerQueries, LastUpdate, MachineId, SlotNumber},
-    EventDB,
+use crate::{
+    event_db::{
+        config::{ConfigQueries, FollowerMeta, NetworkMeta},
+        follower::{BlockHash, FollowerQueries, LastUpdate, MachineId, SlotNumber},
+        utxo::UtxoQueries,
+        EventDB,
+    },
+    util::valid_era,
 };
 
 /// Arbritrary value which is only used in the case where there is no
@@ -200,8 +205,12 @@ async fn init_follower(
                         },
                     };
 
-                    // Parse block
+                    if !valid_era(block.era()) {
+                        // Eras before staking are ignored
+                        continue;
+                    }
 
+                    // Parse block
                     let epoch = match block.epoch(&genesis_values).0.try_into() {
                         Ok(epoch) => epoch,
                         Err(err) => {
@@ -243,15 +252,13 @@ async fn init_follower(
                         },
                     }
 
-                    // Index the following:
-
-                    // UTXO stuff
-
-                    // Registration stuff
-
-                    // Rewards stuff
-
-                    // Last updated
+                    match db.index_utxo_data(block.txs(), slot, network).await {
+                        Ok(()) => (),
+                        Err(err) => {
+                            error!("unable to index utxo data for block {:?} - skip..", err);
+                            continue;
+                        },
+                    }
 
                     // Refresh update metadata for future followers
                     match db
