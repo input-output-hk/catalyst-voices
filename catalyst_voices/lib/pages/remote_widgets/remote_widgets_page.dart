@@ -6,10 +6,12 @@ final class RemoteWidgetsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        height: 300,
-        width: 300,
-        color: Colors.red,
+      body: Center(
+        child: Container(
+          height: 300,
+          width: 300,
+          color: Colors.red,
+        ),
       ),
     );
   }
