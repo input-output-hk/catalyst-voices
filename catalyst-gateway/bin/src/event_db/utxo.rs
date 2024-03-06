@@ -3,7 +3,6 @@
 use async_trait::async_trait;
 use cardano_chain_follower::Network;
 use pallas::ledger::traverse::MultiEraTx;
-use poem_openapi::types::ToJSON;
 
 use super::follower::SlotNumber;
 use crate::{
@@ -69,7 +68,7 @@ impl UtxoQueries for EventDB {
                                 )
                             })?,
                             &tx.hash().as_slice(), // temporary until we have foreign key relationship in the context of registrations
-                            &assets.to_json(),
+                            &assets,
                         ],
                     )
                     .await?;

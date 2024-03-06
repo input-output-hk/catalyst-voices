@@ -187,7 +187,7 @@ async fn init_follower(
                 Ok(chain_update) => chain_update,
                 Err(err) => {
                     error!(
-                        "Unable receive next update from follower {:?} - skip..",
+                        "Unable to receive next update from the follower {:?} - skip..",
                         err
                     );
                     continue;
