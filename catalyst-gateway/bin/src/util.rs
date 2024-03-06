@@ -35,9 +35,11 @@ pub fn valid_era(era: Era) -> bool {
 pub fn parse_policy_assets(assets: &Vec<MultiEraPolicyAssets<'_>>) -> Vec<PolicyAsset> {
     assets
         .iter()
-        .map(|asset| PolicyAsset {
-            policy_hash: asset.policy().to_string(),
-            assets: parse_child_assets(asset.assets()),
+        .map(|asset| {
+            PolicyAsset {
+                policy_hash: asset.policy().to_string(),
+                assets: parse_child_assets(asset.assets()),
+            }
         })
         .collect()
 }
@@ -46,18 +48,24 @@ pub fn parse_policy_assets(assets: &Vec<MultiEraPolicyAssets<'_>>) -> Vec<Policy
 pub fn parse_child_assets(assets: Vec<MultiEraAsset>) -> Vec<Asset> {
     assets
         .iter()
-        .map(|asset| match asset {
-            MultiEraAsset::AlonzoCompatibleOutput(id, name, amount) => Asset {
-                policy_id: id.to_string(),
-                asset_name: name.to_string(),
-                amount: *amount,
-            },
-            MultiEraAsset::AlonzoCompatibleMint(id, name, amount) => Asset {
-                policy_id: id.to_string(),
-                asset_name: name.to_string(),
-                amount: *amount as u64,
-            },
-            _ => Asset::default(),
+        .map(|asset| {
+            match asset {
+                MultiEraAsset::AlonzoCompatibleOutput(id, name, amount) => {
+                    Asset {
+                        policy_id: id.to_string(),
+                        asset_name: name.to_string(),
+                        amount: *amount,
+                    }
+                },
+                MultiEraAsset::AlonzoCompatibleMint(id, name, amount) => {
+                    Asset {
+                        policy_id: id.to_string(),
+                        asset_name: name.to_string(),
+                        amount: *amount as u64,
+                    }
+                },
+                _ => Asset::default(),
+            }
         })
         .collect()
 }
