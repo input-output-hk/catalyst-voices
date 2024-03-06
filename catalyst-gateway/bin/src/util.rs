@@ -9,7 +9,7 @@ pub struct Asset {
     /// Policy id
     pub policy_id: String,
     /// Asset name
-    pub asset_name: String,
+    pub name: String,
     /// Amount in lovelace
     pub amount: u64,
 }
@@ -32,29 +32,29 @@ pub fn valid_era(era: Era) -> bool {
 }
 
 /// Extract assets
-pub fn parse_policy_assets(assets: &Vec<MultiEraPolicyAssets<'_>>) -> Vec<PolicyAsset> {
+pub fn parse_policy_assets(assets: &[MultiEraPolicyAssets<'_>]) -> Vec<PolicyAsset> {
     assets
         .iter()
         .map(|asset| PolicyAsset {
             policy_hash: asset.policy().to_string(),
-            assets: parse_child_assets(asset.assets()),
+            assets: parse_child_assets(&asset.assets()),
         })
         .collect()
 }
 
 /// Parse child assets
-pub fn parse_child_assets(assets: Vec<MultiEraAsset>) -> Vec<Asset> {
+pub fn parse_child_assets(assets: &[MultiEraAsset]) -> Vec<Asset> {
     assets
         .iter()
         .map(|asset| match asset {
             MultiEraAsset::AlonzoCompatibleOutput(id, name, amount) => Asset {
                 policy_id: id.to_string(),
-                asset_name: name.to_string(),
+                name: name.to_string(),
                 amount: *amount,
             },
             MultiEraAsset::AlonzoCompatibleMint(id, name, amount) => Asset {
                 policy_id: id.to_string(),
-                asset_name: name.to_string(),
+                name: name.to_string(),
                 amount: *amount as u64,
             },
             _ => Asset::default(),
