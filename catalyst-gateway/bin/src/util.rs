@@ -4,6 +4,7 @@ use pallas::ledger::traverse::{Era, MultiEraAsset, MultiEraPolicyAssets};
 use serde::Serialize;
 
 #[derive(Default, Debug, Serialize)]
+/// Assets
 pub struct Asset {
     pub policy_id: String,
     pub asset_name: String,
@@ -11,6 +12,7 @@ pub struct Asset {
 }
 
 #[derive(Default, Debug, Serialize)]
+/// Parsed Assets
 pub struct PolicyAsset {
     pub policy_hash: String,
     pub assets: Vec<Asset>,
@@ -30,7 +32,7 @@ pub fn valid_era(era: Era) -> bool {
 }
 
 /// Extract assets
-pub fn parse_policy_assets(assets: Vec<MultiEraPolicyAssets<'_>>) -> Vec<PolicyAsset> {
+pub fn parse_policy_assets(assets: &Vec<MultiEraPolicyAssets<'_>>) -> Vec<PolicyAsset> {
     assets
         .iter()
         .map(|asset| PolicyAsset {

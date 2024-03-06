@@ -47,8 +47,9 @@ impl UtxoQueries for EventDB {
 
             // index outputs
             for tx_out in tx.outputs() {
-                let assets =
-                    serde_json::to_value(parse_policy_assets(tx_out.non_ada_assets())).unwrap();
+                // extract assets
+                let assets = serde_json::to_value(parse_policy_assets(&tx_out.non_ada_assets()))
+                    .map_err(|e| Error::AssetParsingIssue(format!("Asset parsing issue {e}")))?;
 
                 let _rows = conn
                     .query(
