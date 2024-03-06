@@ -12,6 +12,7 @@ pub(crate) mod error;
 pub(crate) mod follower;
 pub(crate) mod legacy;
 pub(crate) mod schema_check;
+pub(crate) mod voter_registration;
 
 /// Database URL Environment Variable name.
 /// eg: "`postgres://catalyst-dev:CHANGE_ME@localhost/CatalystDev`"
