@@ -3,9 +3,13 @@
 use async_trait::async_trait;
 use cardano_chain_follower::Network;
 use pallas::ledger::traverse::MultiEraTx;
+use poem_openapi::types::ToJSON;
 
 use super::follower::SlotNumber;
-use crate::event_db::{Error, Error::SqlTypeConversionFailure, EventDB};
+use crate::{
+    event_db::{Error, Error::SqlTypeConversionFailure, EventDB},
+    util::parse_policy_assets,
+};
 
 #[async_trait]
 #[allow(clippy::module_name_repetitions)]
@@ -26,7 +30,7 @@ impl EventDB {
         "INSERT INTO cardano_txn_index(id, slot_no, network) VALUES($1, $2, $3) ON CONFLICT(id) DO NOTHING";
     /// The ID of the transaction containing the UTXO.
     const INDEX_UTXO_QUERY: &'static str =
-        "INSERT INTO cardano_utxo(index, tx_id, value, stake_credential) VALUES($1, $2, $3, $4) ON CONFLICT (index, tx_id) DO NOTHING";
+        "INSERT INTO cardano_utxo(index, tx_id, value, stake_credential, asset) VALUES($1, $2, $3, $4, $5) ON CONFLICT (index, tx_id) DO NOTHING";
 }
 
 #[async_trait]
@@ -43,6 +47,9 @@ impl UtxoQueries for EventDB {
 
             // index outputs
             for tx_out in tx.outputs() {
+                let assets =
+                    serde_json::to_value(parse_policy_assets(tx_out.non_ada_assets())).unwrap();
+
                 let _rows = conn
                     .query(
                         Self::INDEX_UTXO_QUERY,
@@ -61,6 +68,7 @@ impl UtxoQueries for EventDB {
                                 )
                             })?,
                             &tx.hash().as_slice(), // temporary until we have foreign key relationship in the context of registrations
+                            &assets.to_json(),
                         ],
                     )
                     .await?;

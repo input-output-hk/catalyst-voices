@@ -42,7 +42,7 @@ pub(crate) enum Error {
     #[error("LastUpdate metadata not present: {0}")]
     NoLastUpdateMetadata(String),
     /// Cast error
-    #[error("Unable to convert u64 to i64 for sql type compatability: {0}")]
+    #[error("Unable to convert u64 to i64 for sql type compatibility: {0}")]
     SqlTypeConversionFailure(String),
 }
 
