@@ -31,17 +31,17 @@ pub(crate) struct FollowerMeta {
     pub timing_pattern: u8,
 }
 
-impl EventDB {
-    /// Get config
-    const CONFIG_QUERY: &'static str = "SELECT cardano, follower, preview FROM config";
-}
-
 #[async_trait]
 impl ConfigQueries for EventDB {
     async fn get_config(&self) -> Result<(Vec<NetworkMeta>, FollowerMeta), Error> {
         let conn = self.pool.get().await?;
 
-        let rows = conn.query(Self::CONFIG_QUERY, &[]).await?;
+        let rows = conn
+            .query(
+                include_str!("../../../event-db/queries/config/select_config.sql"),
+                &[],
+            )
+            .await?;
 
         let Some(row) = rows.first() else {
             return Err(Error::NoConfig);
