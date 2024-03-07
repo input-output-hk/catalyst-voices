@@ -12,8 +12,11 @@ builder:
     DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.9.3+BUILDER \
         --sqlfluff_cfg=./../../+repo-config/repo/.sqlfluff
 
-    COPY ./../../+repo-config-2/repo/.sqlfluff .
+    COPY ./../../+repo-config/repo/.sqlfluff .
+    # override setup-db.sql
     COPY setup-db.sql /sql/
+
+    COPY --dir ./queries .
     COPY --dir json_schemas .
 
 # check if the sql files are properly formatted and pass lint quality checks.
