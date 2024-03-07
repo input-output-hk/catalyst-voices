@@ -15,7 +15,6 @@ pub(crate) mod schema_check;
 pub(crate) mod utxo;
 pub(crate) mod voter_registration;
 
-
 /// Database URL Environment Variable name.
 /// eg: "`postgres://catalyst-dev:CHANGE_ME@localhost/CatalystDev`"
 const DATABASE_URL_ENVVAR: &str = "EVENT_DB_URL";
