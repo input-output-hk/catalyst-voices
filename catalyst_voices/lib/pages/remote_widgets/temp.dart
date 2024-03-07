@@ -1,5 +1,3 @@
-// ignore_for_file: discarded_futures, unused_field
-
 import 'dart:async';
 
 import 'package:catalyst_voices/pages/remote_widgets/core/catalyst_core.dart'
@@ -22,23 +20,29 @@ class _NetworkExampleState extends State<NetworkExample> {
   static const widgets = LibraryName(['core', 'widgets']);
   static const material = LibraryName(['core', 'material']);
 
-  late final Future<void> _initFuture;
-
   final _runtime = Runtime();
   final _data = DynamicContent();
   bool loaded = false;
 
   @override
   Widget build(BuildContext context) {
-    if (!loaded) {
-      return const Center(child: CircularProgressIndicator());
-    }
+    // if (!loaded) {
+    //   return const Center(child: CircularProgressIndicator());
+    // }
 
-    return RemoteWidget(
-      runtime: _runtime,
-      data: _data,
-      widget: const FullyQualifiedWidgetName(remoteName, 'root'),
-      onEvent: onEvent,
+    return FutureBuilder<void>(
+      future: fetchWidget(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        return RemoteWidget(
+          runtime: _runtime,
+          data: _data,
+          widget: const FullyQualifiedWidgetName(remoteName, 'root'),
+          onEvent: onEvent,
+        );
+      },
     );
   }
 
@@ -51,15 +55,8 @@ class _NetworkExampleState extends State<NetworkExample> {
 
     if (res.statusCode == 200) {
       final remoteWidget = decodeLibraryBlob(res.bodyBytes);
-      print('remoteWidget: $remoteWidget');
       _runtime.update(remoteName, remoteWidget);
     }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _initFuture = _init();
   }
 
   Future<void> onEvent(String name, DynamicMap arguments) async {
@@ -69,11 +66,7 @@ class _NetworkExampleState extends State<NetworkExample> {
   @override
   void reassemble() {
     super.reassemble();
-    _initFuture = _init();
-  }
-
-  Future<void> _init() async {
-    await _update();
+    _update();
   }
 
   void _registerWidgets() {

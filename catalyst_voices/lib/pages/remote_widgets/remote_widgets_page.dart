@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/remote_widgets/remote_form.dart';
 import 'package:flutter/material.dart';
 
 final class RemoteWidgetsPage extends StatelessWidget {
@@ -5,13 +6,9 @@ final class RemoteWidgetsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Center(
-        child: Container(
-          height: 300,
-          width: 300,
-          color: Colors.red,
-        ),
+        child: RemoteForm(),
       ),
     );
   }
