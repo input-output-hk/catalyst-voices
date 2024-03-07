@@ -247,10 +247,8 @@ async fn init_follower(
                         },
                     }
 
-                    // Eras before staking are ignored
+                    // Block processing for Eras before staking are ignored.
                     if valid_era(block.era()) {
-                        // Block processing
-
                         // Utxo
                         match db.index_utxo_data(block.txs(), slot, network).await {
                             Ok(()) => (),
