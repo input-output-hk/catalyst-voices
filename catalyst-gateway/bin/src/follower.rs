@@ -172,6 +172,7 @@ async fn find_last_update_point(
 
 /// Initiate single follower and returns associated task handler
 /// which facilitates future control over spawned threads.
+#[allow(clippy::too_many_lines)] // we will refactor later
 async fn init_follower(
     network: Network, relay: &str, start_from: (Option<SlotNumber>, Option<BlockHash>),
     db: Arc<EventDB>, machine_id: MachineId, snapshot: &str,
