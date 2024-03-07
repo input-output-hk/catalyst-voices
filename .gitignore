@@ -97,3 +97,6 @@ dev-catalyst-voice-9f78f27c6bc5.json
 
 # We only want the actual document source from this directory.
 /docs/site/
+
+# Rust
+Cargo.lock

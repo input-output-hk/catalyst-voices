@@ -205,11 +205,6 @@ async fn init_follower(
                         },
                     };
 
-                    if !valid_era(block.era()) {
-                        // Eras before staking are ignored
-                        continue;
-                    }
-
                     // Parse block
                     let epoch = match block.epoch(&genesis_values).0.try_into() {
                         Ok(epoch) => epoch,
@@ -247,17 +242,27 @@ async fn init_follower(
                     {
                         Ok(()) => (),
                         Err(err) => {
-                            error!("unable to index follower data {:?} - skip..", err);
+                            error!("Unable to index follower data {:?} - skip..", err);
                             continue;
                         },
                     }
 
-                    match db.index_utxo_data(block.txs(), slot, network).await {
-                        Ok(()) => (),
-                        Err(err) => {
-                            error!("unable to index utxo data for block {:?} - skip..", err);
-                            continue;
-                        },
+                    // Eras before staking are ignored
+                    if valid_era(block.era()) {
+                        // Block processing
+
+                        // Utxo
+                        match db.index_utxo_data(block.txs(), slot, network).await {
+                            Ok(()) => (),
+                            Err(err) => {
+                                error!("Unable to index utxo data for block {:?} - skip..", err);
+                                continue;
+                            },
+                        }
+
+                        // Registration
+
+                        // Rewards
                     }
 
                     // Refresh update metadata for future followers
@@ -273,7 +278,7 @@ async fn init_follower(
                     {
                         Ok(()) => (),
                         Err(err) => {
-                            error!("unable to mark last update point {:?} - skip..", err);
+                            error!("Unable to mark last update point {:?} - skip..", err);
                             continue;
                         },
                     };
@@ -282,7 +287,7 @@ async fn init_follower(
                     let block = match data.decode() {
                         Ok(block) => block,
                         Err(err) => {
-                            error!("unable to decode block {:?} - skip..", err);
+                            error!("Unable to decode block {:?} - skip..", err);
                             continue;
                         },
                     };
