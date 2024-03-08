@@ -458,7 +458,6 @@ name = "cat-gateway"
 version = "0.0.1"
 dependencies = [
  "async-recursion",
- "async-trait",
  "bb8",
  "bb8-postgres",
  "cardano-chain-follower",
