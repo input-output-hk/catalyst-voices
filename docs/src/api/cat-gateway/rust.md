@@ -13,20 +13,20 @@ icon: material/language-rust
 
 ## Workspace Dependency Graph
 
-```kroki-graphviz
-@from_file:./api/cat-gateway/rust-docs/workspace.dot
+```graphviz dot workspace_deps.svg
+{{ include_file('src/api/cat-gateway/rust-docs/workspace.dot') }}
 ```
 
 ## External Dependencies Graph
 
-```kroki-graphviz
-@from_file:./api/cat-gateway/rust-docs/full.dot
+```graphviz dot full_deps.png
+{{ include_file('src/api/cat-gateway/rust-docs/full.dot') }}
 ```
 
 ## Build and Development Dependencies Graph
 
-```kroki-graphviz
-@from_file:./api/cat-gateway/rust-docs/all.dot
+```graphviz dot all_deps.png
+{{ include_file('src/api/cat-gateway/rust-docs/all.dot') }}
 ```
 
 ## Module trees
@@ -34,13 +34,13 @@ icon: material/language-rust
 ### cat-gateway crate
 
 ```rust
-    {{ include_file('src/api/cat-gateway/rust-docs/cat-gateway.cat-gateway.bin.modules.tree') }}
+{{ include_file('src/api/cat-gateway/rust-docs/cat-gateway.cat-gateway.bin.modules.tree') }}
 ```
 
 ## Module graphs
 
 ### cat-gateway crate
 
-```kroki-graphviz
-@from_file:./api/cat-gateway/rust-docs/cat-gateway.cat-gateway.bin.modules.dot
+```graphviz dot modules.png
+{{ include_file('src/api/cat-gateway/rust-docs/cat-gateway.cat-gateway.bin.modules.dot') }}
 ```
