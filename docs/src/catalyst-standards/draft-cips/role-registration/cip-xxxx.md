@@ -12,13 +12,11 @@ Created: 2023-10-24
 License: CC-BY-4.0 / Apache 2.0
 ---
 
-<!-- markdownlint-disable MD025-->
-# Role Based Access Control Registration
-
 ## Abstract
 
 dApps such as Project Catalyst need robust, secure and extensible means for users to register under various roles
-and for the dApp to be able to validate actions against those roles.
+and for the dApp to be able to validate actions against those roles with its users.
+
 While these Role based registrations are required for future functionality of Project Catalyst, they are also
 intended to be generally useful to any dApp with User roles.
 
@@ -59,6 +57,52 @@ Registering for various roles and having role specific keys is generally useful 
 motivated to solve problems with Project Catalyst, it is also intended to be generally applicable to other dApps.
 
 ## Specification
+
+In order to maintain a robust set of role registration capabilities Role registration involves:
+
+1. Creation of a root certificate for a user or set of users and associating it with an on-chain source of trust.
+2. Obtaining for each user of a dapp, or a set of users, their root
+3. Deriving role specific keys from the root certificate.
+4. Optionally registering for those roles on-chain.
+5. Signing and/or encrypting data with the root certificate or a derived key, or a certificate issued by a previously registered root certificate.
+
+Effectively we map the blockchain as PKI (Public Key Infrastructure) and define the methods a dapp can use to exploit this PKI.
+
+### Mapping the PKI to Cardano
+
+A PKI consists of:
+
+* A certificate authority (CA) that stores, issues and signs the digital certificates;
+  * Each dApp can control its own CA,  the user trusts the dApp as CA implicitly (or explicitly) by using the dApp.
+  * It is permissible for root certificates to be self signed, effectively each user becomes their own CA.
+  * However all Certificates are associated with blockchain addresses, typically the Stake address, but also potentially the drep key.
+* A registration authority (RA) which verifies the identity of entities requesting their digital certificates to be stored at the CA;
+  * Each dApp is responsible for identifying certificates relevant for its use that are stored on-chain and are their own RA.
+* A central directory—i.e., a secure location in which keys are stored and indexed;
+  * This is the blockchain itself.
+* A certificate management system managing things like the access to stored certificates or the delivery of the certificates to be issued;
+  * This is managed by each dApp in the manor required of the dApp.
+* A certificate policy stating the PKI's requirements concerning its procedures.
+  Its purpose is to allow outsiders to analyze the PKI's trustworthiness.
+  * This is also defined and managed by each dApp.
+
+### The role x.509 plays in this scheme
+
+We leverage the x.509 PKI primitives and take advantage of the significant existing code bases and infrastructure which already exists.
+
+We encode x.509 certificates using [CBOR Encoded X.509 Certificates][C509], Each certificate includes its on-chain anchor (public key).
+The on-chain anchors currently envisioned are:
+
+1. Stake Address
+2. dRep Key
+
+The transaction that is submitted on-chain which includes the certificate in its metadata MUST be witnessed by it's on-chain anchor.
+This is used to prove that the certificate and on-chain anchor are controlled by the same entity.
+It prevents replay attacks where people could try and associate a different on-chain anchor with a certificate.
+
+---
+
+Note: **The information below is to be reviewed in-light of the above**
 
 Role registration is achieved by using two metadata records attached to the same transaction.
 
@@ -530,3 +574,4 @@ Code samples and reference material are licensed under [Apache 2.0]
 [CBOR]: https://www.rfc-editor.org/rfc/rfc8949.html
 [CBOR - Core Deterministic Encoding Requirements]: https://www.rfc-editor.org/rfc/rfc8949.html#section-4.2.1
 [CIP0003]: https://cips.cardano.org/cip/CIP-0003
+[C509]: https://datatracker.ietf.org/doc/html/draft-ietf-cose-cbor-encoded-cert-07
