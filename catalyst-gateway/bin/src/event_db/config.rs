@@ -1,17 +1,8 @@
 //! Config Queries
-use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use tracing::error;
 
-use crate::event_db::{Error, EventDB};
-
-#[async_trait]
-#[allow(clippy::module_name_repetitions)]
-/// Config Queries Trait
-pub(crate) trait ConfigQueries: Sync + Send + 'static {
-    async fn get_config(&self) -> Result<(Vec<NetworkMeta>, FollowerMeta), Error>;
-}
-use crate::event_db::Error::JsonParseIssue;
+use crate::event_db::{Error, Error::JsonParseIssue, EventDB};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, PartialOrd, Clone)]
 /// Network config metadata
@@ -31,9 +22,9 @@ pub(crate) struct FollowerMeta {
     pub timing_pattern: u8,
 }
 
-#[async_trait]
-impl ConfigQueries for EventDB {
-    async fn get_config(&self) -> Result<(Vec<NetworkMeta>, FollowerMeta), Error> {
+impl EventDB {
+    /// Config query
+    pub(crate) async fn get_config(&self) -> Result<(Vec<NetworkMeta>, FollowerMeta), Error> {
         let conn = self.pool.get().await?;
 
         let rows = conn

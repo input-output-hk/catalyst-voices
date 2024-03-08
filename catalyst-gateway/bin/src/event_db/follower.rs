@@ -1,6 +1,5 @@
 //! Follower Queries
 
-use async_trait::async_trait;
 use cardano_chain_follower::Network;
 use chrono::TimeZone;
 
@@ -19,29 +18,9 @@ pub type MachineId = String;
 /// Time when a follower last indexed
 pub type LastUpdate = chrono::DateTime<chrono::offset::Utc>;
 
-#[async_trait]
-#[allow(clippy::module_name_repetitions)]
-/// Follower Queries Trait
-pub(crate) trait FollowerQueries: Sync + Send + 'static {
-    async fn index_follower_data(
-        &self, slot_no: SlotNumber, network: Network, epoch_no: EpochNumber, block_time: BlockTime,
-        block_hash: BlockHash,
-    ) -> Result<(), Error>;
-
-    async fn last_updated_metadata(
-        &self, network: String,
-    ) -> Result<(SlotNumber, BlockHash, LastUpdate), Error>;
-
-    async fn refresh_last_updated(
-        &self, last_updated: LastUpdate, slot_no: SlotNumber, block_hash: BlockHash,
-        network: Network, machine_id: &MachineId,
-    ) -> Result<(), Error>;
-}
-
-#[async_trait]
-impl FollowerQueries for EventDB {
+impl EventDB {
     /// Index follower block stream
-    async fn index_follower_data(
+    pub(crate) async fn index_follower_data(
         &self, slot_no: SlotNumber, network: Network, epoch_no: EpochNumber, block_time: BlockTime,
         block_hash: BlockHash,
     ) -> Result<(), Error> {
@@ -74,7 +53,7 @@ impl FollowerQueries for EventDB {
 
     /// Check when last update occurred.
     /// Start follower from where previous follower left off.
-    async fn last_updated_metadata(
+    pub(crate) async fn last_updated_metadata(
         &self, network: String,
     ) -> Result<(SlotNumber, BlockHash, LastUpdate), Error> {
         let conn = self.pool.get().await?;
@@ -112,7 +91,7 @@ impl FollowerQueries for EventDB {
 
     /// Mark point in time where the last follower finished indexing in order for future
     /// followers to pick up from this point
-    async fn refresh_last_updated(
+    pub(crate) async fn refresh_last_updated(
         &self, last_updated: LastUpdate, slot_no: SlotNumber, block_hash: BlockHash,
         network: Network, machine_id: &MachineId,
     ) -> Result<(), Error> {
