@@ -77,8 +77,8 @@ impl EventDB {
             Err(e) => return Err(Error::NoLastUpdateMetadata(e.to_string())),
         };
 
-        let block_hash: BlockHash = match row.try_get("block_hash") {
-            Ok(block_hash) => block_hash,
+        let block_hash: BlockHash = match row.try_get::<_, Vec<u8>>("block_hash") {
+            Ok(block_hash) => hex::encode(block_hash),
             Err(e) => return Err(Error::NoLastUpdateMetadata(e.to_string())),
         };
         let last_updated: LastUpdate = match row.try_get("ended") {
@@ -119,7 +119,7 @@ impl EventDB {
                     &machine_id,
                     &slot_no,
                     &network,
-                    &block_hash,
+                    &hex::decode(block_hash).map_err(|e| Error::DecodeHex(e.to_string()))?,
                     &update,
                 ],
             )
