@@ -8,6 +8,7 @@ mod logger;
 mod service;
 mod settings;
 mod state;
+mod util;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

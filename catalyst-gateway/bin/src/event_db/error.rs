@@ -41,6 +41,12 @@ pub(crate) enum Error {
     /// No previous followers hence no last updates metadata
     #[error("LastUpdate metadata not present: {0}")]
     NoLastUpdateMetadata(String),
+    /// Conversion error
+    #[error("Unable to convert u64 to i64 for sql type compatibility: {0}")]
+    SqlTypeConversionFailure(String),
+    /// Unable to extract policy assets
+    #[error("Unable parse assets: {0}")]
+    AssetParsingIssue(String),
 }
 
 impl From<RunError<tokio_postgres::Error>> for Error {

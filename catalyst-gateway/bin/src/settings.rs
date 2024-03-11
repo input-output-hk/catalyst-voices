@@ -290,7 +290,7 @@ pub(crate) fn generate_github_issue_url(title: &str) -> Option<Url> {
     ]) {
         Ok(url) => Some(url),
         Err(e) => {
-            error!(err = e.to_string(); "Failed to generate github issue url");
+            error!("Failed to generate github issue url {:?}", e.to_string());
             None
         },
     }
