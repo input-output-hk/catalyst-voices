@@ -13,9 +13,8 @@ use tracing::{error, info};
 
 use crate::{
     event_db::{
-        config::{ConfigQueries, FollowerMeta, NetworkMeta},
-        follower::{BlockHash, FollowerQueries, LastUpdate, MachineId, SlotNumber},
-        utxo::UtxoQueries,
+        config::{FollowerMeta, NetworkMeta},
+        follower::{BlockHash, LastUpdate, MachineId, SlotNumber},
         EventDB,
     },
     util::valid_era,

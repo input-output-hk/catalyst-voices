@@ -1,6 +1,5 @@
 //! Utxo Queries
 
-use async_trait::async_trait;
 use cardano_chain_follower::Network;
 use pallas::ledger::traverse::MultiEraTx;
 
@@ -10,32 +9,9 @@ use crate::{
     util::parse_policy_assets,
 };
 
-#[async_trait]
-#[allow(clippy::module_name_repetitions)]
-/// Utxo Queries Trait
-pub(crate) trait UtxoQueries: Sync + Send + 'static {
-    async fn index_utxo_data(
-        &self, tx_id: Vec<MultiEraTx<'_>>, slot_no: SlotNumber, network: Network,
-    ) -> Result<(), Error>;
-    async fn index_txn_data(
-        &self, tx_id: &[u8], slot_no: SlotNumber, network: Network,
-    ) -> Result<(), Error>;
-}
-
 impl EventDB {
-    /// Index of all transactions in the cardano network. It allows us to quickly find a
-    /// transaction by its id, and its slot number.
-    const INDEX_TX: &'static str =
-        "INSERT INTO cardano_txn_index(id, slot_no, network) VALUES($1, $2, $3) ON CONFLICT(id) DO NOTHING";
-    /// The ID of the transaction containing the UTXO.
-    const INDEX_UTXO_QUERY: &'static str =
-        "INSERT INTO cardano_utxo(index, tx_id, value, stake_credential, asset) VALUES($1, $2, $3, $4, $5) ON CONFLICT (index, tx_id) DO NOTHING";
-}
-
-#[async_trait]
-impl UtxoQueries for EventDB {
     /// Index utxo data
-    async fn index_utxo_data(
+    pub async fn index_utxo_data(
         &self, txs: Vec<MultiEraTx<'_>>, slot_no: SlotNumber, network: Network,
     ) -> Result<(), Error> {
         let conn = self.pool.get().await?;
@@ -52,7 +28,9 @@ impl UtxoQueries for EventDB {
 
                 let _rows = conn
                     .query(
-                        Self::INDEX_UTXO_QUERY,
+                        include_str!(
+                            "../../../event-db/queries/follower/utxo_index_utxo_query.sql"
+                        ),
                         &[
                             &i32::try_from(index).map_err(|e| {
                                 Error::NotFound(
@@ -79,7 +57,7 @@ impl UtxoQueries for EventDB {
     }
 
     /// Index txn metadata
-    async fn index_txn_data(
+    pub async fn index_txn_data(
         &self, tx_id: &[u8], slot_no: SlotNumber, network: Network,
     ) -> Result<(), Error> {
         let conn = self.pool.get().await?;
@@ -92,7 +70,10 @@ impl UtxoQueries for EventDB {
         };
 
         let _rows = conn
-            .query(Self::INDEX_TX, &[&tx_id, &slot_no, &network])
+            .query(
+                include_str!("../../../event-db/queries/follower/utxo_txn_index.sql"),
+                &[&tx_id, &slot_no, &network],
+            )
             .await?;
 
         Ok(())
