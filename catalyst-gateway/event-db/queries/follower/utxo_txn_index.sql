@@ -1,8 +1,8 @@
 INSERT INTO cardano_txn_index
 (
-    id,
-    slot_no,
-    network
+  id,
+  slot_no,
+  network
 ) 
 
 VALUES($1, $2, $3) 
