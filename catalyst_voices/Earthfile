@@ -14,7 +14,7 @@ flutter:
     ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:${PATH}"
 
     RUN flutter channel stable
-    RUN flutter upgrade --no-cache
+    RUN --no-cache flutter upgrade
     RUN flutter --version
     RUN flutter doctor -v
     RUN flutter config --enable-web
