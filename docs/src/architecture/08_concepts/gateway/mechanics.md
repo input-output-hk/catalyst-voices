@@ -2,7 +2,7 @@
 icon: material/airplane-cog
 ---
 
-# Initial blueprint
+# Mechanics
 
 ```mermaid
   stateDiagram-v2
@@ -67,5 +67,3 @@ icon: material/airplane-cog
         }
     }
 ```
-
-:construction: Design is still active and not final :construction:
