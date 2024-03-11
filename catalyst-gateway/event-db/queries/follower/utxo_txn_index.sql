@@ -5,6 +5,6 @@ INSERT INTO cardano_txn_index
   network
 ) 
 
-VALUES($1, $2, $3) 
+VALUES ($1, $2, $3)
 
 ON CONFLICT(id) DO NOTHING
