@@ -34,8 +34,8 @@ SPEC CHECKSUMS:
   flutter_secure_storage: 23fc622d89d073675f2eaa109381aefbcf5a49be
   integration_test: 13825b8a9334a850581300559b8839134b124670
   path_provider_foundation: 3784922295ac71e43754bd15e0653ccfd36a147c
-  url_launcher_ios: bbd758c6e7f9fd7b5b1d4cde34d2b95fcce5e812
+  url_launcher_ios: 6116280ddcfe98ab8820085d8d76ae7449447586
 
 PODFILE CHECKSUM: ff9ae414ffbc80ad6f9d2058e299051a15f6eca7
 
-COCOAPODS: 1.15.0
+COCOAPODS: 1.15.2

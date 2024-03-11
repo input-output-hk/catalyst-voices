@@ -5,7 +5,7 @@ publish_to: none
 
 environment:
   sdk: '>=3.3.0 <4.0.0'
-  flutter: 3.19.2
+  flutter: 3.19.3
 
 dependencies:
   animations: ^2.0.11
@@ -36,7 +36,7 @@ dependencies:
   go_router: ^13.2.0
   http: ^1.2.1
   path: ^1.9.0
-  rfw: ^1.0.24
+  rfw: ^1.0.25
   url_launcher: ^6.2.5
   url_strategy: ^0.2.0
 

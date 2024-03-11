@@ -8,8 +8,8 @@ Map<String, LocalWidgetBuilder> get _catalystCoreWidgetsDefinitions =>
           // controller: source.v<TextEditingController>(['controller']),
           // focusNode: source.v<FocusNode>(['focusNode']),
           // decoration: source.v<InputDecoration>(['decoration']),
-          // keyboardType: source.v<TextInputType>(['keyboardType']),
-          // textInputAction: source.v<TextInputAction>(['textInputAction']),
+          keyboardType: source.v<TextInputType>(['keyboardType']),
+          textInputAction: source.v<TextInputAction>(['textInputAction']),
           style: ArgumentDecoders.textStyle(source, ['style']),
           onChanged: source.handler(
             <Object>['onChanged'],

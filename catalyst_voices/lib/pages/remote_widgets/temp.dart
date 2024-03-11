@@ -15,33 +15,35 @@ class NetworkExample extends StatefulWidget {
 
 class _NetworkExampleState extends State<NetworkExample> {
   static const remoteName = LibraryName(['remote']);
-
   static const catalystCore = LibraryName(['core', 'catalyst']);
   static const widgets = LibraryName(['core', 'widgets']);
   static const material = LibraryName(['core', 'material']);
 
   final _runtime = Runtime();
   final _data = DynamicContent();
-  bool loaded = false;
 
   @override
   Widget build(BuildContext context) {
-    // if (!loaded) {
-    //   return const Center(child: CircularProgressIndicator());
-    // }
-
     return FutureBuilder<void>(
       future: fetchWidget(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.waiting) {
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
+        } else {
+          return Column(
+            children: [
+              const TextField(),
+              RemoteWidget(
+                runtime: _runtime,
+                data: _data,
+                widget: const FullyQualifiedWidgetName(remoteName, 'root'),
+                onEvent: onEvent,
+              ),
+            ],
+          );
         }
-        return RemoteWidget(
-          runtime: _runtime,
-          data: _data,
-          widget: const FullyQualifiedWidgetName(remoteName, 'root'),
-          onEvent: onEvent,
-        );
       },
     );
   }
@@ -88,6 +90,5 @@ class _NetworkExampleState extends State<NetworkExample> {
   Future<void> _update() async {
     _registerWidgets();
     await fetchWidget();
-    if (mounted) setState(() => loaded = true);
   }
 }
