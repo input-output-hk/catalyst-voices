@@ -45,7 +45,9 @@ impl EventDB {
                                         .to_string(),
                                 )
                             })?,
-                            &tx.hash().as_slice(), // temporary until we have foreign key relationship in the context of registrations
+                            &tx.hash().as_slice(), /* temporary until we have foreign key
+                                                    * relationship in the context of
+                                                    * registrations */
                             &assets,
                         ],
                     )
