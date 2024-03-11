@@ -1,6 +1,6 @@
 INSERT INTO cardano_utxo
 (
-  index, 
+  index,
   tx_id,
   value,
   stake_credential,

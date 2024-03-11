@@ -7,4 +7,4 @@ INSERT INTO cardano_txn_index
 
 VALUES ($1, $2, $3)
 
-ON CONFLICT(id) DO NOTHING
+ON CONFLICT (id) DO NOTHING
