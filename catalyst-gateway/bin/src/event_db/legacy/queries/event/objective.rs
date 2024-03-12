@@ -1,6 +1,4 @@
 //! Objective Queries
-use async_trait::async_trait;
-
 use crate::event_db::{
     error::Error,
     legacy::types::{
@@ -13,15 +11,6 @@ use crate::event_db::{
     },
     EventDB,
 };
-
-#[async_trait]
-#[allow(clippy::module_name_repetitions)]
-/// Objective Queries Trait
-pub(crate) trait ObjectiveQueries: Sync + Send + 'static {
-    async fn get_objectives(
-        &self, event: EventId, limit: Option<i64>, offset: Option<i64>,
-    ) -> Result<Vec<Objective>, Error>;
-}
 
 impl EventDB {
     /// Objectives query template
@@ -39,9 +28,10 @@ impl EventDB {
         WHERE objective_id = $1;";
 }
 
-#[async_trait]
-impl ObjectiveQueries for EventDB {
-    async fn get_objectives(
+impl EventDB {
+    /// Get objectives query
+    #[allow(dead_code)]
+    pub(crate) async fn get_objectives(
         &self, event: EventId, limit: Option<i64>, offset: Option<i64>,
     ) -> Result<Vec<Objective>, Error> {
         let conn = self.pool.get().await?;

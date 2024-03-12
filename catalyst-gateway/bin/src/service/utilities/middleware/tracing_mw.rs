@@ -5,7 +5,6 @@ use cpu_time::ProcessTime; // ThreadTime doesn't work.
 use cryptoxide::{blake2b::Blake2b, digest::Digest};
 use lazy_static::lazy_static;
 use poem::{
-    async_trait,
     http::{header, HeaderMap},
     web::RealIp,
     Endpoint, Error, FromRequest, IntoResponse, Middleware, PathPattern, Request, Response, Result,
@@ -295,7 +294,7 @@ async fn mk_request_span(req: &Request) -> (Span, String, String, String) {
     (span, uri_path, method, client_id)
 }
 
-#[async_trait]
+#[poem::async_trait]
 impl<E: Endpoint> Endpoint for TracingEndpoint<E> {
     type Output = Response;
 
