@@ -1,6 +1,4 @@
 //! Review Queries
-use async_trait::async_trait;
-
 use crate::event_db::{
     error::Error,
     legacy::types::{
@@ -11,20 +9,6 @@ use crate::event_db::{
     },
     EventDB,
 };
-
-#[async_trait]
-#[allow(clippy::module_name_repetitions)]
-/// Review Queries Trait
-pub(crate) trait ReviewQueries: Sync + Send + 'static {
-    async fn get_reviews(
-        &self, event: EventId, objective: ObjectiveId, proposal: ProposalId, limit: Option<i64>,
-        offset: Option<i64>,
-    ) -> Result<Vec<AdvisorReview>, Error>;
-
-    async fn get_review_types(
-        &self, event: EventId, objective: ObjectiveId, limit: Option<i64>, offset: Option<i64>,
-    ) -> Result<Vec<ReviewType>, Error>;
-}
 
 impl EventDB {
     /// Rating per review query template
@@ -51,9 +35,10 @@ impl EventDB {
         LIMIT $3 OFFSET $4;";
 }
 
-#[async_trait]
-impl ReviewQueries for EventDB {
-    async fn get_reviews(
+impl EventDB {
+    /// Get reviews query
+    #[allow(dead_code)]
+    pub(crate) async fn get_reviews(
         &self, event: EventId, objective: ObjectiveId, proposal: ProposalId, limit: Option<i64>,
         offset: Option<i64>,
     ) -> Result<Vec<AdvisorReview>, Error> {
@@ -92,7 +77,9 @@ impl ReviewQueries for EventDB {
         Ok(reviews)
     }
 
-    async fn get_review_types(
+    /// Get review types query
+    #[allow(dead_code)]
+    pub(crate) async fn get_review_types(
         &self, event: EventId, objective: ObjectiveId, limit: Option<i64>, offset: Option<i64>,
     ) -> Result<Vec<ReviewType>, Error> {
         let conn = self.pool.get().await?;

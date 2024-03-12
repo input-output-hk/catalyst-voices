@@ -1,8 +1,6 @@
 //! Ballot Queries
 use std::collections::HashMap;
 
-use async_trait::async_trait;
-
 use crate::event_db::{
     error::Error,
     legacy::types::{
@@ -17,19 +15,6 @@ use crate::event_db::{
     },
     EventDB,
 };
-
-#[async_trait]
-#[allow(clippy::module_name_repetitions)]
-/// Ballot Queries Trait
-pub(crate) trait BallotQueries: Sync + Send + 'static {
-    async fn get_ballot(
-        &self, event: EventId, objective: ObjectiveId, proposal: ProposalId,
-    ) -> Result<Ballot, Error>;
-    async fn get_objective_ballots(
-        &self, event: EventId, objective: ObjectiveId,
-    ) -> Result<Vec<ProposalBallot>, Error>;
-    async fn get_event_ballots(&self, event: EventId) -> Result<Vec<ObjectiveBallots>, Error>;
-}
 
 impl EventDB {
     /// Ballot vote options per event query template
@@ -62,9 +47,10 @@ impl EventDB {
         WHERE objective.event = $1 AND objective.id = $2 AND proposal.id = $3;";
 }
 
-#[async_trait]
-impl BallotQueries for EventDB {
-    async fn get_ballot(
+impl EventDB {
+    /// Get ballot query
+    #[allow(dead_code)]
+    pub(crate) async fn get_ballot(
         &self, event: EventId, objective: ObjectiveId, proposal: ProposalId,
     ) -> Result<Ballot, Error> {
         let conn = self.pool.get().await?;
@@ -107,7 +93,9 @@ impl BallotQueries for EventDB {
         })
     }
 
-    async fn get_objective_ballots(
+    /// Get objective's ballots query
+    #[allow(dead_code)]
+    pub(crate) async fn get_objective_ballots(
         &self, event: EventId, objective: ObjectiveId,
     ) -> Result<Vec<ProposalBallot>, Error> {
         let conn = self.pool.get().await?;
@@ -155,7 +143,11 @@ impl BallotQueries for EventDB {
         Ok(ballots)
     }
 
-    async fn get_event_ballots(&self, event: EventId) -> Result<Vec<ObjectiveBallots>, Error> {
+    /// Get event's ballots query
+    #[allow(dead_code)]
+    pub(crate) async fn get_event_ballots(
+        &self, event: EventId,
+    ) -> Result<Vec<ObjectiveBallots>, Error> {
         let conn = self.pool.get().await?;
 
         let rows = conn

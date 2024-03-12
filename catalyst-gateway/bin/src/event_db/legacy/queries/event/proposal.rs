@@ -1,6 +1,4 @@
 //! Proposal Queries
-use async_trait::async_trait;
-
 use crate::event_db::{
     error::Error,
     legacy::types::{
@@ -10,24 +8,6 @@ use crate::event_db::{
     },
     EventDB,
 };
-
-#[async_trait]
-#[allow(clippy::module_name_repetitions)]
-/// Proposal Queries Trait
-pub(crate) trait ProposalQueries: Sync + Send + 'static {
-    async fn get_proposal(
-        &self, event: EventId, objective: ObjectiveId, proposal: ProposalId,
-    ) -> Result<Proposal, Error>;
-
-    async fn get_proposals(
-        &self,
-        // TODO: Voter Group: future state may require dreps
-        event: EventId,
-        obj_id: ObjectiveId,
-        limit: Option<i64>,
-        offset: Option<i64>,
-    ) -> Result<Vec<ProposalSummary>, Error>;
-}
 
 impl EventDB {
     /// Proposals query template
@@ -47,9 +27,10 @@ impl EventDB {
     WHERE objective.event = $1 AND objective.id = $2 AND proposal.id = $3;";
 }
 
-#[async_trait]
-impl ProposalQueries for EventDB {
-    async fn get_proposal(
+impl EventDB {
+    /// Get proposal query
+    #[allow(dead_code)]
+    pub(crate) async fn get_proposal(
         &self, event: EventId, objective: ObjectiveId, proposal: ProposalId,
     ) -> Result<Proposal, Error> {
         let conn: bb8::PooledConnection<
@@ -88,7 +69,9 @@ impl ProposalQueries for EventDB {
         Ok(Proposal { summary, details })
     }
 
-    async fn get_proposals(
+    /// Get proposals query
+    #[allow(dead_code)]
+    pub(crate) async fn get_proposals(
         &self, event: EventId, objective: ObjectiveId, limit: Option<i64>, offset: Option<i64>,
     ) -> Result<Vec<ProposalSummary>, Error> {
         let conn = self.pool.get().await?;
