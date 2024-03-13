@@ -17,7 +17,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "types": ["vite/client", "react", "react-dom", "@modyfi/vite-plugin-yaml/modules"],
+    "types": ["vite/client", "react", "react-dom"],
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
