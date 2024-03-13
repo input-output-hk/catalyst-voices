@@ -9,11 +9,14 @@ VERSION 0.7
 # Internal: builder is our Event db builder target. Prepares all necessary artifacts.
 #   CI target : dependency
 builder:
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.7.0+BUILDER \
+    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.9.3+BUILDER \
         --sqlfluff_cfg=./../../+repo-config/repo/.sqlfluff
 
-    COPY ./../../+repo-config-2/repo/.sqlfluff .
+    COPY ./../../+repo-config/repo/.sqlfluff .
+    # override setup-db.sql
     COPY setup-db.sql /sql/
+
+    COPY --dir ./queries .
     COPY --dir json_schemas .
 
 # check if the sql files are properly formatted and pass lint quality checks.
@@ -21,7 +24,7 @@ builder:
 check:
     FROM +builder
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.7.0+CHECK
+    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.9.3+CHECK
 
 
 # format all SQL files in the current project.  Local developers tool.
@@ -29,22 +32,22 @@ check:
 format:
     LOCALLY
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.7.0+FORMAT --src=$(echo ${PWD}/../../)
+    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.9.2+FORMAT --src=$(echo ${PWD}/../../)
 
 # build - an event db docker image.
 #   CI target : true
 build:
     FROM +builder
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.7.0+BUILD --image_name=event-db
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.7.0+DOCS --image_name=event-db
+    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.9.2+BUILD --image_name=event-db
+    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.9.2+DOCS --image_name=event-db
 
 # test the event db database schema
 #   CI target : true
 #test:
-#    FROM github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.7.0+postgres-base
+#    FROM github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.9.2+postgres-base
 
-#    COPY github.com/input-output-hk/catalyst-ci/earthly/utils:v2.7.0+shell-assert/assert.sh .
+#    COPY github.com/input-output-hk/catalyst-ci/earthly/utils:v2.9.2+shell-assert/assert.sh .
 
 #    COPY ./docker-compose.yml .
 #    WITH DOCKER \

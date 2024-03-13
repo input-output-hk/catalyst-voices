@@ -20,10 +20,10 @@ const ADDRESS_DEFAULT: &str = "0.0.0.0:3030";
 const GITHUB_REPO_OWNER_DEFAULT: &str = "input-output-hk";
 
 /// Default Github repo name
-const GITHUB_REPO_NAME_DEFAULT: &str = "catalyst-core";
+const GITHUB_REPO_NAME_DEFAULT: &str = "catalyst-voices";
 
 /// Default Github issue template to use
-const GITHUB_ISSUE_TEMPLATE_DEFAULT: &str = "bug_report.md";
+const GITHUB_ISSUE_TEMPLATE_DEFAULT: &str = "bug_report.yml";
 
 /// Default `CLIENT_ID_KEY` used in development.
 const CLIENT_ID_KEY_DEFAULT: &str = "3db5301e-40f2-47ed-ab11-55b37674631a";
@@ -35,6 +35,15 @@ const API_HOST_NAMES_DEFAULT: &str = "https://api.prod.projectcatalyst.io";
 /// Default `API_URL_PREFIX` used in development.
 const API_URL_PREFIX_DEFAULT: &str = "/api";
 
+/// Default `CHECK_CONFIG_TICK` used in development.
+const CHECK_CONFIG_TICK_DEFAULT: &str = "5";
+
+/// Default `DATA_REFRESH_TICK` used in development
+const DATA_REFRESH_TICK_DEFAULT: &str = "5";
+
+/// Default `MACHINE_UID` used in development
+const MACHINE_UID_DEFAULT: &str = "UID";
+
 /// Settings for the application.
 ///
 /// This struct represents the configuration settings for the application.
@@ -43,10 +52,6 @@ const API_URL_PREFIX_DEFAULT: &str = "/api";
 /// and the logging level.
 #[derive(Args, Clone)]
 pub(crate) struct ServiceSettings {
-    /// Server binding address
-    #[clap(long, default_value = ADDRESS_DEFAULT)]
-    pub(crate) address: SocketAddr,
-
     /// Url to the postgres event db
     #[clap(long, env)]
     pub(crate) database_url: String,
@@ -54,6 +59,14 @@ pub(crate) struct ServiceSettings {
     /// Logging level
     #[clap(long, default_value = LOG_LEVEL_DEFAULT)]
     pub(crate) log_level: LogLevel,
+
+    /// Docs settings.
+    #[clap(flatten)]
+    pub(crate) docs_settings: DocsSettings,
+
+    /// Follower settings.
+    #[clap(flatten)]
+    pub(crate) follower_settings: FollowerSettings,
 }
 
 /// Settings specifies `OpenAPI` docs generation.
@@ -61,6 +74,38 @@ pub(crate) struct ServiceSettings {
 pub(crate) struct DocsSettings {
     /// The output path to the generated docs file, if omitted prints to stdout.
     pub(crate) output: Option<PathBuf>,
+
+    /// Server binding address
+    #[clap(long, default_value = ADDRESS_DEFAULT, env = "ADDRESS")]
+    pub(crate) address: SocketAddr,
+
+    /// Flag for adding "http" to servers
+    #[clap(long, default_value = "false", env = "HTTP_AUTO_SERVERS")]
+    pub(crate) http_auto_servers: bool,
+
+    /// Flag for adding "https" to servers
+    #[clap(long, default_value = "true", env = "HTTPS_AUTO_SERVERS")]
+    pub(crate) https_auto_servers: bool,
+
+    /// Server name
+    #[clap(long, env = "SERVER_NAME")]
+    pub(crate) server_name: Option<String>,
+}
+
+/// Settings for follower mechanics.
+#[derive(Args, Clone)]
+pub(crate) struct FollowerSettings {
+    /// Check config tick
+    #[clap(long, default_value = CHECK_CONFIG_TICK_DEFAULT, env = "CHECK_CONFIG_TICK")]
+    pub(crate) check_config_tick: String,
+
+    /// Data Refresh tick
+    #[clap(long, default_value = DATA_REFRESH_TICK_DEFAULT, env = "DATA_REFRESH_TICK")]
+    pub(crate) data_refresh_tick: String,
+
+    /// Machine UID
+    #[clap(long, default_value = MACHINE_UID_DEFAULT, env = "MACHINE_UID")]
+    pub(crate) machine_uid: String,
 }
 
 /// An environment variable read as a string.
@@ -129,6 +174,9 @@ lazy_static! {
 
     /// The base path the API is served at.
     pub(crate) static ref API_URL_PREFIX: StringEnvVar = StringEnvVar::new("API_URL_PREFIX", API_URL_PREFIX_DEFAULT);
+
+    /// Tick every N seconds until config exists in db
+    pub(crate) static ref CHECK_CONFIG_TICK: StringEnvVar = StringEnvVar::new("CHECK_CONFIG_TICK", CHECK_CONFIG_TICK_DEFAULT);
 
 
 }
@@ -226,7 +274,7 @@ pub(crate) fn get_api_host_names(addr: &SocketAddr) -> Vec<String> {
 /// # use cat_data_service::settings::generate_github_issue_url;
 /// assert_eq!(
 ///     generate_github_issue_url("Hello, World! How are you?"),
-///     "https://github.com/input-output-hk/catalyst-core/issues/new?template=bug_report.md&title=Hello%2C%20World%21%20How%20are%20you%3F"
+///     "https://github.com/input-output-hk/catalyst-voices/issues/new?template=bug_report.yml&title=Hello%2C%20World%21%20How%20are%20you%3F"
 /// );
 /// ```
 pub(crate) fn generate_github_issue_url(title: &str) -> Option<Url> {
@@ -262,7 +310,7 @@ mod tests {
         let title = "Hello, World! How are you?";
         assert_eq!(
             generate_github_issue_url(title).expect("Failed to generate url").as_str(),
-            "https://github.com/input-output-hk/catalyst-core/issues/new?template=bug_report.md&title=Hello%2C+World%21+How+are+you%3F"
+            "https://github.com/input-output-hk/catalyst-voices/issues/new?template=bug_report.yml&title=Hello%2C+World%21+How+are+you%3F"
         );
     }
 

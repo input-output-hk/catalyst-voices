@@ -12,7 +12,12 @@ use poem_openapi::{
     OpenApi,
 };
 
-use crate::{service::common::tags::ApiTags, state::State};
+use crate::{
+    service::{
+        common::tags::ApiTags, utilities::middleware::schema_validation::schema_version_validation,
+    },
+    state::State,
+};
 
 /// Test API Endpoints
 pub(crate) struct TestApi;
@@ -23,6 +28,7 @@ impl TestApi {
         path = "/test/:id/test/:action",
         method = "get",
         operation_id = "testGet",
+        transform = "schema_version_validation",
         deprecated
     )]
     /// Test Get API
@@ -57,7 +63,7 @@ impl TestApi {
         /// The action just needs to be any valid UUID.
         ///
         /// # Make sure its a UUID
-        action: Path<Option<String>>,
+        action: Path<String>,
         #[oai(validator(min_items = 0, max_items = 3, unique_items))]
         /// List your favorite pets, in order of preference
         pet: Query<Option<Vec<test_get::Animals>>>,
@@ -99,7 +105,7 @@ impl TestApi {
         /// * 10 will print a warn log
         /// * 15 will print a error log
         /// * 20 will panic which should generate a 500
-        _id: Path<i32>,
+        id: Path<i32>,
         #[oai(validator(
             pattern = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
             max_length = "36",
@@ -108,8 +114,8 @@ impl TestApi {
         /// The action just needs to be any valid UUID.
         ///
         /// # Make sure its a UUID
-        _action: Path<Option<String>>,
+        action: Path<String>,
     ) -> test_post::AllResponses {
-        test_post::endpoint().await
+        test_post::endpoint(*id, &action).await
     }
 }

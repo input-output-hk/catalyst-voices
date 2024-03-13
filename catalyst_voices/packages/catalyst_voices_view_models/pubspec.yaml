@@ -4,14 +4,14 @@ version: 0.1.0+1
 publish_to: none
 
 environment:
-  sdk: ">=3.2.3 <4.0.0"
-  flutter: 3.16.5
+  sdk: ">=3.2.6 <4.0.0"
+  flutter: 3.19.1
 
 dependencies:
   equatable: ^2.0.5
   flutter:
     sdk: flutter
-  formz: ^0.6.1
+  formz: ^0.7.0
 
 dev_dependencies:
    catalyst_analysis:

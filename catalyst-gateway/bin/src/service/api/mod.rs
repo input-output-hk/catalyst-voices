@@ -2,20 +2,20 @@
 //!
 //! This defines all endpoints for the Catalyst Gateway API.
 //! It however does NOT contain any processing for them, that is defined elsewhere.
-use health::HealthApi;
-use poem_openapi::{ContactObject, LicenseObject, OpenApiService, ServerObject};
-use registration::RegistrationApi;
-use test_endpoints::TestApi;
-use v0::V0Api;
-use v1::V1Api;
+use std::net::IpAddr;
 
-use crate::settings::API_URL_PREFIX;
+use gethostname::gethostname;
+use health::HealthApi;
+use legacy::LegacyApi;
+use local_ip_address::list_afinet_netifas;
+use poem_openapi::{ContactObject, LicenseObject, OpenApiService, ServerObject};
+use test_endpoints::TestApi;
+
+use crate::settings::{DocsSettings, API_URL_PREFIX};
 
 mod health;
-mod registration;
+mod legacy;
 mod test_endpoints;
-mod v0;
-mod v1;
 
 /// The name of the API
 const API_TITLE: &str = "Catalyst Gateway";
@@ -53,14 +53,18 @@ fn get_api_license() -> LicenseObject {
 
 /// Get the terms of service for the API
 const TERMS_OF_SERVICE: &str =
-    "https://github.com/input-output-hk/catalyst-core/blob/main/book/src/98_CODE_OF_CONDUCT.md";
+    "https://github.com/input-output-hk/catalyst-voices/blob/main/CODE_OF_CONDUCT.md";
 
 /// Create the `OpenAPI` definition
 pub(crate) fn mk_api(
-    hosts: Vec<String>,
-) -> OpenApiService<(TestApi, HealthApi, RegistrationApi, V0Api, V1Api), ()> {
+    hosts: Vec<String>, settings: &DocsSettings,
+) -> OpenApiService<(TestApi, HealthApi, LegacyApi), ()> {
     let mut service = OpenApiService::new(
-        (TestApi, HealthApi, RegistrationApi, V0Api, V1Api),
+        (
+            TestApi,
+            HealthApi,
+            (legacy::RegistrationApi, legacy::V0Api, legacy::V1Api),
+        ),
         API_TITLE,
         API_VERSION,
     )
@@ -70,10 +74,64 @@ pub(crate) fn mk_api(
     .terms_of_service(TERMS_OF_SERVICE)
     .url_prefix(API_URL_PREFIX.as_str());
 
-    // Add all the hosts where this API should be reachable.
+    // Retrieve the port from the socket address
+    let port = settings.address.port().to_string();
+
+    let server_name = &settings.server_name;
+
     for host in hosts {
-        service = service.server(ServerObject::new(host));
+        service = service.server(ServerObject::new(host).description("API Host"));
     }
 
+    // Add server name if it is set
+    if let Some(name) = server_name {
+        service = service.server(ServerObject::new(name).description("Server at server name"));
+    }
+
+    // Get localhost name
+    if let Ok(hostname) = gethostname().into_string() {
+        let hostname_addresses = add_protocol_prefix(
+            &format!("{hostname}:{port}"),
+            settings.http_auto_servers,
+            settings.https_auto_servers,
+        );
+        for hostname_address in hostname_addresses {
+            service = service.server(
+                ServerObject::new(hostname_address).description("Server at localhost name"),
+            );
+        }
+    }
+
+    // Get local IP address v4 and v6
+    if let Ok(network_interfaces) = list_afinet_netifas() {
+        for (name, ip) in &network_interfaces {
+            if *name == "en0" {
+                let (ip_with_port, desc) = match ip {
+                    IpAddr::V4(_) => (format!("{ip}:{port}"), "Server at local IPv4 address"),
+                    IpAddr::V6(_) => (format!("[{ip}]:{port}"), "Server at local IPv6 address"),
+                };
+                let ip_addresses = add_protocol_prefix(
+                    &ip_with_port,
+                    settings.http_auto_servers,
+                    settings.https_auto_servers,
+                );
+                for address in ip_addresses {
+                    service = service.server(ServerObject::new(address).description(desc));
+                }
+            }
+        }
+    }
     service
+}
+
+/// Function to add protocol prefix based on flags.
+fn add_protocol_prefix(address: &String, is_http: bool, is_https: bool) -> Vec<String> {
+    let mut addresses = Vec::new();
+    if is_http {
+        addresses.push(format!("http://{address}"));
+    }
+    if is_https {
+        addresses.push(format!("https://{address}"));
+    }
+    addresses
 }

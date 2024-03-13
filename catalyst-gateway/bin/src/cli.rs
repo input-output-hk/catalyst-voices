@@ -2,8 +2,12 @@
 use std::{io::Write, sync::Arc};
 
 use clap::Parser;
+use tokio::time;
+use tracing::{error, info};
 
 use crate::{
+    event_db::config::ConfigQueries,
+    follower::start_followers,
     logger, service,
     settings::{DocsSettings, ServiceSettings},
     state::State,
@@ -48,12 +52,49 @@ impl Cli {
             Self::Run(settings) => {
                 logger::init(settings.log_level)?;
 
+                let check_config_tick = settings.follower_settings.check_config_tick;
+                let data_refresh_tick = settings.follower_settings.data_refresh_tick;
+
+                // Unique machine id
+                let machine_id = settings.follower_settings.machine_uid;
+
                 let state = Arc::new(State::new(Some(settings.database_url)).await?);
-                service::run(&settings.address, state).await?;
+                let event_db = state.event_db()?;
+
+                tokio::spawn(async move {
+                    match service::run(&settings.docs_settings, state.clone()).await {
+                        Ok(()) => info!("Endpoints started ok"),
+                        Err(err) => {
+                            error!("Error starting endpoints {err}");
+                        },
+                    }
+                });
+
+                // tick until config exists
+                let mut interval =
+                    time::interval(time::Duration::from_secs(check_config_tick.parse::<u64>()?));
+                let config = loop {
+                    interval.tick().await;
+
+                    match event_db.get_config().await {
+                        Ok(config) => break config,
+                        Err(err) => error!("no config {:?}", err),
+                    }
+                };
+
+                start_followers(
+                    config,
+                    event_db.clone(),
+                    data_refresh_tick.parse::<u64>()?,
+                    check_config_tick.parse::<u64>()?,
+                    machine_id,
+                )
+                .await?;
+
                 Ok(())
             },
             Self::Docs(settings) => {
-                let docs = service::get_app_docs();
+                let docs = service::get_app_docs(&settings);
                 match settings.output {
                     Some(path) => {
                         let mut docs_file = std::fs::File::create(path)?;

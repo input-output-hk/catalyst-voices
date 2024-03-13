@@ -18,7 +18,7 @@ on:
       - "main"
     paths-ignore:
       - "**.md"
-      - "doc/**"
+      - "docs/**"
       - ".vscode/"
 
 jobs:

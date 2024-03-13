@@ -1,0 +1,115 @@
+name: Allure Report Generation
+
+on:
+  pull_request:
+  push:
+    branches: 'main'
+
+permissions:
+    contents: write
+    pull-requests: write
+    id-token: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+env:
+    AWS_REGION: eu-central-1
+    AWS_ROLE_ARN: arn:aws:iam::332405224602:role/ci
+    EARTHLY_TARGET: docker
+    ECR_REGISTRY: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
+    ALLURE_REPORT_PATH: allure-report
+    REPORT_EXT: .junit-report.xml
+
+jobs:
+  generate-test-reports:
+    name: Generate test reports
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup CI
+        uses: input-output-hk/catalyst-ci/actions/setup@master
+        with:
+            aws_role_arn: ${{ env.AWS_ROLE_ARN }}
+            aws_region: ${{ env.AWS_REGION }}
+            earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
+
+      - name: Get unit test report
+        uses: input-output-hk/catalyst-ci/actions/run@master
+        if: always()
+        continue-on-error: true
+        with:
+            earthfile: ./catalyst-gateway/
+            flags:
+            targets: build
+            target_flags:
+            runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+            artifact: "false"
+
+      - name: Get schemathesis test report
+        uses: input-output-hk/catalyst-ci/actions/run@master
+        if: always()
+        continue-on-error: true
+        with:
+          earthfile: ./catalyst-gateway/tests/
+          flags: --allow-privileged
+          targets: test-fuzzer-api
+          target_flags:
+          runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+          artifact: "false"
+
+      - name: Collect and upload test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+            path: '**/*${{ env.REPORT_EXT }}'
+            if-no-files-found: error
+            retention-days: 1
+
+  generate-allure-report:
+    name: Generate allure report
+    runs-on: ubuntu-latest
+    needs: [generate-test-reports]
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v4
+
+      - name: Setup Allure report
+        run: |
+              mkdir -p ${{ env.ALLURE_REPORT_PATH }}
+              shopt -s globstar
+              cp **/*${{ env.REPORT_EXT }} ${{ env.ALLURE_REPORT_PATH }}
+              ls ${{ env.ALLURE_REPORT_PATH }}
+
+      - name: Checkout gh-pages
+        uses: actions/checkout@v3
+        with:
+          ref: gh-pages
+          path: gh-pages-dir
+
+      - name: Build Allure report
+        uses: mgrybyk/allure-report-branch-action@v1
+        id: allure
+        with:
+          report_id: 'test-report'
+          gh_pages: 'gh-pages-dir'
+          report_dir: ${{ env.ALLURE_REPORT_PATH }}
+
+      - name: Git push to gh-pages
+        uses: mgrybyk/git-commit-pull-push-action@v1
+        with:
+          repository: gh-pages-dir
+          branch: gh-pages
+          pull_args: --rebase -X ours
+
+      - name: Comment PR with Allure report link
+        if: ${{ always() && github.event_name == 'pull_request' && steps.allure.outputs.report_url }}
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            ${{ steps.allure.outputs.test_result_icon }} [Test Report](${{ steps.allure.outputs.report_url }}) | ${\color{lightgreen}Pass: ${{ steps.allure.outputs.test_result_passed }}/${{ steps.allure.outputs.test_result_total }}}$ | ${\color{red}Fail: ${{ steps.allure.outputs.test_result_failed }}/${{ steps.allure.outputs.test_result_total }}}$ |
+          comment_tag: allure_report
+          mode: upsert

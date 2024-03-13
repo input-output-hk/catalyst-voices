@@ -29,8 +29,12 @@ struct ServerErrorPayload {
     id: Uuid,
     /// *Optional* SHORT Error message.
     /// Will not contain sensitive information, internal details or backtraces.
+    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
+    #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
     msg: Option<String>,
     /// A URL to report an issue.
+    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
+    #[oai(validator(max_length = "1000"))]
     issue: Option<Url>,
 }
 
