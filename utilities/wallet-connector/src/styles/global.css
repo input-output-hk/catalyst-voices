@@ -24,3 +24,7 @@ button {
   background-color: transparent;
   border: 0;
 }
+
+button:disabled {
+  opacity: 0.6;
+}
