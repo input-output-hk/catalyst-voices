@@ -33,6 +33,7 @@
     "tailwind-merge": "^2.2.1"
   },
   "devDependencies": {
+    "@cardano-sdk/cip30": "^0.5.0",
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^20.11.27",
     "@types/react": "^18.2.65",
