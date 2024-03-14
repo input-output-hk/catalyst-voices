@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/pages/remote_widgets/core/catalyst_core.dart'
+import 'package:catalyst_voices_remote_widgets/catalyst_voices_remote_widgets.dart'
     as core;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -9,14 +9,14 @@ import 'package:rfw/rfw.dart';
 const _remoteWidgetOne =
     'https://github.com/minikin/minikin.github.io/raw/main/rfw/home_page.rfw';
 
-class NetworkExample extends StatefulWidget {
-  const NetworkExample({super.key});
+class RemoteForm extends StatefulWidget {
+  const RemoteForm({super.key});
 
   @override
-  State<NetworkExample> createState() => _NetworkExampleState();
+  State<RemoteForm> createState() => _RemoteFormState();
 }
 
-class _NetworkExampleState extends State<NetworkExample> {
+class _RemoteFormState extends State<RemoteForm> {
   static const remoteName = LibraryName(['remote']);
   static const catalystCore = LibraryName(['core', 'catalyst']);
   static const widgets = LibraryName(['core', 'widgets']);

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:remote_widgets_example/poc/poc.dart';
+import 'package:remote_widgets_example/src/app.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const PoC());
+  runApp(const App());
 }

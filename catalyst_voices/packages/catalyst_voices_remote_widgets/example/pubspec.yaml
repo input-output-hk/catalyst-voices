@@ -12,6 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^1.2.1
+  rfw: ^1.0.26
 
 dev_dependencies:
   flutter_lints: ^3.0.0

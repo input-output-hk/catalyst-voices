@@ -5,26 +5,25 @@ import 'dart:io';
 
 import 'package:rfw/formats.dart';
 
-Future<void> main() async {
-  await processFile('remote_widget.rfwtxt', 'remote_widget.rfw');
-  await processFile('new_remote_widget.rfwtxt', 'new_remote_widget.rfw');
-}
+final class RemoteWidgetConverter {
+  const RemoteWidgetConverter._();
 
-Future<void> processFile(
-  String inputFilePath,
-  String outputFilePath,
-) async {
-  try {
-    print('Reading to $inputFilePath');
-    final content = await File(inputFilePath).readAsString();
-    print('Content: $content');
+  static Future<void> rfwTxtToRfw({
+    required String inputFile,
+    required String outputFile,
+  }) async {
+    try {
+      print('Reading to $inputFile');
+      final content = await File(inputFile).readAsString();
+      print('Content: $content');
 
-    final remoteWidgetLibrary = parseLibraryFile(content);
-    final bytes = encodeLibraryBlob(remoteWidgetLibrary);
+      final remoteWidgetLibrary = parseLibraryFile(content);
+      final bytes = encodeLibraryBlob(remoteWidgetLibrary);
 
-    await File(outputFilePath).writeAsBytes(bytes);
-    print('Successfully processed $inputFilePath');
-  } catch (e) {
-    print('Failed to process $inputFilePath: $e');
+      await File(inputFile).writeAsBytes(bytes);
+      print('Successfully processed $inputFile');
+    } catch (e) {
+      Exception('Failed to process $inputFile: $e');
+    }
   }
 }
