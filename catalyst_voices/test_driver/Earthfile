@@ -1,0 +1,32 @@
+VERSION --try --global-cache --arg-scope-and-set --use-function-keyword 0.7
+
+integration-test-web:
+    FROM ../+build
+    ARG browser
+
+    #COPY ./scripts/install-$browser-linux64.sh .
+    #RUN chmod +x install-$browser-linux64.sh
+    #RUN ./install-$browser-linux64.sh
+
+    IF [ $browser = "chrome" ]
+        LET driver = "chromedriver"
+    END
+
+    IF [ $browser = "firefox" ]
+        LET driver = "geckodriver"
+    END
+
+    IF [ $browser = "edge" ]
+        LET driver = "msedgedriver"
+    END
+
+    RUN ($driver --port=4444 &) && \
+            flutter drive --driver=test_driver/integration_test.dart \
+                --target=integration_test/main.dart \
+                    --flavor development -d web-server --profile --browser-name=$browser
+
+test-web-all:
+    BUILD +integration-test-web \
+            --browser=chrome \
+            --browser=firefox \
+            --browser=edge
