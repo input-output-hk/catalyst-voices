@@ -5,14 +5,14 @@ import { Fragment } from "react/jsx-runtime";
 import { twMerge } from "tailwind-merge";
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import InfoItem from "components/InfoItem";
-import { ExtractedWalletApi } from "types/cardano";
+import type { ExtractedWalletApi } from "types/cardano";
 
 type Props = {
   selectedWallets: string[];
   enablingWallets: string[];
   walletApis: Record<string, ExtractedWalletApi>;
   onEnable?: (walletName: string) => void;
-  onEnableAll?: (walletNames: string[]) => void;
+  onEnableAll?: () => void;
 }
 
 function WalletInfoSection({
@@ -33,7 +33,7 @@ function WalletInfoSection({
                 <p className="font-semibold">Selected wallets: {selectedWallets.length}</p>
               </div>
               <div className="flex items-center">
-                <button type="button" className="bg-primary rounded-md px-4 py-2 text-white">
+                <button type="button" className="bg-primary rounded-md px-4 py-2 text-white" onClick={onEnableAll}>
                   <p>Enable all wallets</p>
                 </button>
               </div>
@@ -60,35 +60,35 @@ function WalletInfoSection({
                     <div className="grid gap-2 pb-4">
                       <InfoItem
                         heading="Balance Lovelace"
-                        value={walletApis[wallet]?.balance}
+                        value={walletApis[wallet]?.balance ?? null}
                       />
                       <InfoItem
                         heading="UTXOs"
-                        value={walletApis[wallet]?.utxos}
+                        value={walletApis[wallet]?.utxos ?? null}
                       />
                       <InfoItem
                         heading="Network ID (0 = testnet; 1 = mainnet)"
-                        value={walletApis[wallet]?.networkId?.toString()}
+                        value={walletApis[wallet]?.networkId?.toString() ?? null}
                       />
                       <InfoItem
                         heading="Collateral"
-                        value={walletApis[wallet]?.collateral}
+                        value={walletApis[wallet]?.collateral ?? null}
                       />
                       <InfoItem
                         heading="Used Addresses"
-                        value={walletApis[wallet]?.usedAddresses}
+                        value={walletApis[wallet]?.usedAddresses ?? null}
                       />
                       <InfoItem
                         heading="Unused Addresses"
-                        value={walletApis[wallet]?.unusedAddresses}
+                        value={walletApis[wallet]?.unusedAddresses ?? null}
                       />
                       <InfoItem
                         heading="Change Address"
-                        value={walletApis[wallet]?.changeAddress}
+                        value={walletApis[wallet]?.changeAddress ?? null}
                       />
                       <InfoItem
                         heading="Reward Address"
-                        value={walletApis[wallet]?.rewardAddresses}
+                        value={walletApis[wallet]?.rewardAddresses ?? null}
                       />
                     </div>
                   ) : (

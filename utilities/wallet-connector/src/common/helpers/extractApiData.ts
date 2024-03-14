@@ -1,5 +1,5 @@
-import { WalletApi } from "@cardano-sdk/cip30";
-import { ExtractedWalletApi } from "types/cardano";
+import type { WalletApi } from "@cardano-sdk/cip30";
+import type { ExtractedWalletApi } from "types/cardano";
 
 export default async function extractApiData(api: WalletApi): Promise<ExtractedWalletApi> {
   return {

@@ -1,22 +1,39 @@
 {
   "compilerOptions": {
+    // Basic Configuration
     "target": "ES2018",
-    "useDefineForClassFields": true,
+    "module": "ESNext",
     "lib": ["DOM", "ESNext"],
-    "baseUrl": "./src",
     "allowJs": false,
-    "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
+    "jsx": "react-jsx",
+    "baseUrl": "./src",
+
+    // Advanced Configuration
     "esModuleInterop": false,
     "allowSyntheticDefaultImports": true,
-    "downlevelIteration": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "ESNext",
+    "downlevelIteration": true,
     "moduleResolution": "Node",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+
+    // Type Checking Configuration
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
     "noEmit": true,
-    "jsx": "react-jsx",
+
+    // Strict
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "exactOptionalPropertyTypes": true,
+    "strictNullChecks": true,
+
+    // Type Definitions Configuration
     "types": ["vite/client", "react", "react-dom"],
   },
   "include": ["src"],

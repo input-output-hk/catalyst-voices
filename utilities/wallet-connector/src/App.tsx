@@ -12,7 +12,7 @@ import { ToastContainer } from "react-toastify";
 import extractApiData from "common/helpers/extractApiData";
 import WalletActionsSection from "modules/WalletActionsSection";
 import WalletInfoSection from "modules/WalletInfoSection";
-import { ExtractedWalletApi } from "types/cardano";
+import type { ExtractedWalletApi } from "types/cardano";
 
 const queryClient = new QueryClient({
   defaultOptions: {
