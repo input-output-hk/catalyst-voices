@@ -1,4 +1,3 @@
-use async_trait::async_trait;
 use chrono::{NaiveDateTime, Utc};
 
 use crate::event_db::{
@@ -11,11 +10,6 @@ use crate::event_db::{
     },
     Error, EventDB,
 };
-
-#[async_trait]
-pub(crate) trait VitSSFundQueries: Sync + Send + 'static {
-    async fn get_fund(&self) -> Result<FundWithNext, Error>;
-}
 
 impl EventDB {
     const FUND_CHALLENGES_QUERY: &'static str = "SELECT
@@ -109,11 +103,11 @@ impl EventDB {
     WHERE event.row_id = $1;";
 }
 
-#[async_trait]
-impl VitSSFundQueries for EventDB {
+impl EventDB {
+    /// Get fund query
     // TODO(stevenj): https://github.com/input-output-hk/catalyst-voices/issues/68
-    #[allow(clippy::too_many_lines)]
-    async fn get_fund(&self) -> Result<FundWithNext, Error> {
+    #[allow(dead_code, clippy::too_many_lines)]
+    pub(crate) async fn get_fund(&self) -> Result<FundWithNext, Error> {
         let conn = self.pool.get().await?;
 
         let rows = conn.query(Self::FUND_QUERY, &[]).await?;

@@ -1,5 +1,4 @@
 //! Search Queries
-use async_trait::async_trait;
 use chrono::{NaiveDateTime, Utc};
 
 use crate::event_db::{
@@ -13,15 +12,6 @@ use crate::event_db::{
     },
     Error, EventDB,
 };
-
-#[async_trait]
-#[allow(clippy::module_name_repetitions)]
-/// Search Queries Trait
-pub(crate) trait SearchQueries: Sync + Send + 'static {
-    async fn search(
-        &self, search_query: SearchQuery, total: bool, limit: Option<i64>, offset: Option<i64>,
-    ) -> Result<SearchResult, Error>;
-}
 
 impl EventDB {
     /// Search for events query template
@@ -272,9 +262,10 @@ impl EventDB {
     }
 }
 
-#[async_trait]
-impl SearchQueries for EventDB {
-    async fn search(
+impl EventDB {
+    /// Search query
+    #[allow(dead_code)]
+    pub(crate) async fn search(
         &self, search_query: SearchQuery, total: bool, limit: Option<i64>, offset: Option<i64>,
     ) -> Result<SearchResult, Error> {
         if total {

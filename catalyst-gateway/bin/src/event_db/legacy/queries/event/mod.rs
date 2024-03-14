@@ -1,5 +1,4 @@
 //! Event Queries
-use async_trait::async_trait;
 use chrono::{NaiveDateTime, Utc};
 
 use crate::event_db::{
@@ -15,16 +14,6 @@ pub(crate) mod ballot;
 pub(crate) mod objective;
 pub(crate) mod proposal;
 pub(crate) mod review;
-
-#[async_trait]
-#[allow(clippy::module_name_repetitions)]
-/// Event Queries Trait
-pub(crate) trait EventQueries: Sync + Send + 'static {
-    async fn get_events(
-        &self, limit: Option<i64>, offset: Option<i64>,
-    ) -> Result<Vec<EventSummary>, Error>;
-    async fn get_event(&self, event: EventId) -> Result<Event, Error>;
-}
 
 impl EventDB {
     /// Events query template
@@ -50,9 +39,10 @@ impl EventDB {
         WHERE event.row_id = $1;";
 }
 
-#[async_trait]
-impl EventQueries for EventDB {
-    async fn get_events(
+impl EventDB {
+    /// Get events query
+    #[allow(dead_code)]
+    pub(crate) async fn get_events(
         &self, limit: Option<i64>, offset: Option<i64>,
     ) -> Result<Vec<EventSummary>, Error> {
         let conn = self.pool.get().await?;
@@ -84,7 +74,9 @@ impl EventQueries for EventDB {
         Ok(events)
     }
 
-    async fn get_event(&self, event: EventId) -> Result<Event, Error> {
+    /// Get event query
+    #[allow(dead_code)]
+    pub(crate) async fn get_event(&self, event: EventId) -> Result<Event, Error> {
         let conn = self.pool.get().await?;
 
         let rows = conn.query(Self::EVENT_QUERY, &[&event.0]).await?;

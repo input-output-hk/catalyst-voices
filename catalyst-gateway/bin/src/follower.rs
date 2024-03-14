@@ -11,10 +11,13 @@ use cardano_chain_follower::{
 use tokio::{task::JoinHandle, time};
 use tracing::{error, info};
 
-use crate::event_db::{
-    config::{ConfigQueries, FollowerMeta, NetworkMeta},
-    follower::{BlockHash, FollowerQueries, LastUpdate, MachineId, SlotNumber},
-    EventDB,
+use crate::{
+    event_db::{
+        config::{FollowerMeta, NetworkMeta},
+        follower::{BlockHash, LastUpdate, MachineId, SlotNumber},
+        EventDB,
+    },
+    util::valid_era,
 };
 
 /// Arbritrary value which is only used in the case where there is no
@@ -168,6 +171,7 @@ async fn find_last_update_point(
 
 /// Initiate single follower and returns associated task handler
 /// which facilitates future control over spawned threads.
+#[allow(clippy::too_many_lines)] // we will refactor later
 async fn init_follower(
     network: Network, relay: &str, start_from: (Option<SlotNumber>, Option<BlockHash>),
     db: Arc<EventDB>, machine_id: MachineId, snapshot: &str,
@@ -183,7 +187,7 @@ async fn init_follower(
                 Ok(chain_update) => chain_update,
                 Err(err) => {
                     error!(
-                        "Unable receive next update from follower {:?} - skip..",
+                        "Unable to receive next update from the follower {:?} - skip..",
                         err
                     );
                     continue;
@@ -201,7 +205,6 @@ async fn init_follower(
                     };
 
                     // Parse block
-
                     let epoch = match block.epoch(&genesis_values).0.try_into() {
                         Ok(epoch) => epoch,
                         Err(err) => {
@@ -238,20 +241,26 @@ async fn init_follower(
                     {
                         Ok(()) => (),
                         Err(err) => {
-                            error!("unable to index follower data {:?} - skip..", err);
+                            error!("Unable to index follower data {:?} - skip..", err);
                             continue;
                         },
                     }
 
-                    // Index the following:
+                    // Block processing for Eras before staking are ignored.
+                    if valid_era(block.era()) {
+                        // Utxo
+                        match db.index_utxo_data(block.txs(), slot, network).await {
+                            Ok(()) => (),
+                            Err(err) => {
+                                error!("Unable to index utxo data for block {:?} - skip..", err);
+                                continue;
+                            },
+                        }
 
-                    // UTXO stuff
+                        // Registration
 
-                    // Registration stuff
-
-                    // Rewards stuff
-
-                    // Last updated
+                        // Rewards
+                    }
 
                     // Refresh update metadata for future followers
                     match db
@@ -266,7 +275,7 @@ async fn init_follower(
                     {
                         Ok(()) => (),
                         Err(err) => {
-                            error!("unable to mark last update point {:?} - skip..", err);
+                            error!("Unable to mark last update point {:?} - skip..", err);
                             continue;
                         },
                     };
@@ -275,7 +284,7 @@ async fn init_follower(
                     let block = match data.decode() {
                         Ok(block) => block,
                         Err(err) => {
-                            error!("unable to decode block {:?} - skip..", err);
+                            error!("Unable to decode block {:?} - skip..", err);
                             continue;
                         },
                     };

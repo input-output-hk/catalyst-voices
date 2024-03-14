@@ -1,6 +1,5 @@
 //! Follower Queries
 
-use async_trait::async_trait;
 use cardano_chain_follower::Network;
 use chrono::TimeZone;
 
@@ -19,41 +18,9 @@ pub type MachineId = String;
 /// Time when a follower last indexed
 pub type LastUpdate = chrono::DateTime<chrono::offset::Utc>;
 
-#[async_trait]
-#[allow(clippy::module_name_repetitions)]
-/// Follower Queries Trait
-pub(crate) trait FollowerQueries: Sync + Send + 'static {
-    async fn index_follower_data(
-        &self, slot_no: SlotNumber, network: Network, epoch_no: EpochNumber, block_time: BlockTime,
-        block_hash: BlockHash,
-    ) -> Result<(), Error>;
-
-    async fn last_updated_metadata(
-        &self, network: String,
-    ) -> Result<(SlotNumber, BlockHash, LastUpdate), Error>;
-
-    async fn refresh_last_updated(
-        &self, last_updated: LastUpdate, slot_no: SlotNumber, block_hash: BlockHash,
-        network: Network, machine_id: &MachineId,
-    ) -> Result<(), Error>;
-}
-
 impl EventDB {
-    /// Update db with follower data
-    const INDEX_FOLLOWER_QUERY: &'static str =
-        "INSERT INTO cardano_slot_index(slot_no, network, epoch_no, block_time, block_hash) VALUES($1, $2, $3, $4, $5)";
-    /// If no last updated metadata, init with metadata. If present update metadata.
-    const LAST_UPDATED_QUERY: &'static str =
-        "INSERT INTO cardano_update_state(id, started, ended, updater_id ,slot_no, network, block_hash, update) VALUES($1, $2, $3 , $4, $5, $6, $7, $8) ON CONFLICT(id) DO UPDATE SET ended = $2, slot_no = $5, block_hash = $7;";
-    /// Start follower from where previous follower left off.
-    const START_FROM_QUERY: &'static str =
-        "SELECT network, slot_no, block_hash, ended FROM cardano_update_state WHERE network = $1;";
-}
-
-#[async_trait]
-impl FollowerQueries for EventDB {
     /// Index follower block stream
-    async fn index_follower_data(
+    pub(crate) async fn index_follower_data(
         &self, slot_no: SlotNumber, network: Network, epoch_no: EpochNumber, block_time: BlockTime,
         block_hash: BlockHash,
     ) -> Result<(), Error> {
@@ -69,25 +36,34 @@ impl FollowerQueries for EventDB {
         };
 
         let _rows = conn
-            .query(Self::INDEX_FOLLOWER_QUERY, &[
-                &slot_no,
-                &network,
-                &epoch_no,
-                &timestamp,
-                &hex::decode(block_hash).map_err(|e| Error::DecodeHex(e.to_string()))?,
-            ])
+            .query(
+                include_str!("../../../event-db/queries/follower/insert_slot_index.sql"),
+                &[
+                    &slot_no,
+                    &network,
+                    &epoch_no,
+                    &timestamp,
+                    &hex::decode(block_hash).map_err(|e| Error::DecodeHex(e.to_string()))?,
+                ],
+            )
             .await?;
 
         Ok(())
     }
 
-    /// Check when last update occurred
-    async fn last_updated_metadata(
+    /// Check when last update occurred.
+    /// Start follower from where previous follower left off.
+    pub(crate) async fn last_updated_metadata(
         &self, network: String,
     ) -> Result<(SlotNumber, BlockHash, LastUpdate), Error> {
         let conn = self.pool.get().await?;
 
-        let rows = conn.query(Self::START_FROM_QUERY, &[&network]).await?;
+        let rows = conn
+            .query(
+                include_str!("../../../event-db/queries/follower/select_update_state.sql"),
+                &[&network],
+            )
+            .await?;
         if rows.is_empty() {
             return Err(Error::NoLastUpdateMetadata("No metadata".to_string()));
         }
@@ -101,8 +77,8 @@ impl FollowerQueries for EventDB {
             Err(e) => return Err(Error::NoLastUpdateMetadata(e.to_string())),
         };
 
-        let block_hash: BlockHash = match row.try_get("block_hash") {
-            Ok(block_hash) => block_hash,
+        let block_hash: BlockHash = match row.try_get::<_, Vec<u8>>("block_hash") {
+            Ok(block_hash) => hex::encode(block_hash),
             Err(e) => return Err(Error::NoLastUpdateMetadata(e.to_string())),
         };
         let last_updated: LastUpdate = match row.try_get("ended") {
@@ -115,7 +91,7 @@ impl FollowerQueries for EventDB {
 
     /// Mark point in time where the last follower finished indexing in order for future
     /// followers to pick up from this point
-    async fn refresh_last_updated(
+    pub(crate) async fn refresh_last_updated(
         &self, last_updated: LastUpdate, slot_no: SlotNumber, block_hash: BlockHash,
         network: Network, machine_id: &MachineId,
     ) -> Result<(), Error> {
@@ -134,16 +110,19 @@ impl FollowerQueries for EventDB {
         // An insert only happens once when there is no update metadata available
         // All future additions are just updates on ended, slot_no and block_hash
         let _rows = conn
-            .query(Self::LAST_UPDATED_QUERY, &[
-                &i64::from(id),
-                &last_updated,
-                &last_updated,
-                &machine_id,
-                &slot_no,
-                &network,
-                &block_hash,
-                &update,
-            ])
+            .query(
+                include_str!("../../../event-db/queries/follower/insert_update_state.sql"),
+                &[
+                    &i64::from(id),
+                    &last_updated,
+                    &last_updated,
+                    &machine_id,
+                    &slot_no,
+                    &network,
+                    &hex::decode(block_hash).map_err(|e| Error::DecodeHex(e.to_string()))?,
+                    &update,
+                ],
+            )
             .await?;
 
         Ok(())
