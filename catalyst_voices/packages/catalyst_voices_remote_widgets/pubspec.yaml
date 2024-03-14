@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
   path: ^1.9.0
-  rfw: ^1.0.25
+  rfw: ^1.0.26
 
 dev_dependencies:
   flutter_test:
