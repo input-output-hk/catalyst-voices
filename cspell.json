@@ -235,5 +235,8 @@
         "styles.min.css",
         "web-components.min.js",
         "**/generated/**"
+    ],
+    "enableFiletypes": [
+        "dart"
     ]
 }

@@ -4,10 +4,6 @@ integration-test-web:
     FROM ../+build
     ARG browser
 
-    #COPY ./scripts/install-$browser-linux64.sh .
-    #RUN chmod +x install-$browser-linux64.sh
-    #RUN ./install-$browser-linux64.sh
-
     IF [ $browser = "chrome" ]
         LET driver = "chromedriver"
     END

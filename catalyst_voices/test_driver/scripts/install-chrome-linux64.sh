@@ -1,13 +1,13 @@
 #!/bin/bash
 # This script installs Chrome for testing and Chromedriver
 PLATFORM=linux64
-DISTRO="Debian 12 (Bookworm)"
+DISTR="Debian 12 (Bookworm)"
 
 # Installing dependencies for Chrome. Workaround for:
 # https://github.com/GoogleChromeLabs/chrome-for-testing/issues/55
 echo "Installing Google Chrome dependencies"
 chrome_deps=$(curl -s https://raw.githubusercontent.com/chromium/chromium/main/chrome/installer/linux/debian/dist_package_versions.json)
-deps=$(echo "$chrome_deps" | jq -r ".\"$DISTRO\" | keys[]")
+deps=$(echo "$chrome_deps" | jq -r ".\"$DISTR\" | keys[]")
 apt-get update
 for dep in $deps; do
   apt-get install -y $dep
