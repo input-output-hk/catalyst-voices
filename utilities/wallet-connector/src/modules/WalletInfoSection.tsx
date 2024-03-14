@@ -44,7 +44,7 @@ function WalletInfoSection({
               {selectedWallets.map((wallet) => (
                 <Tab as={Fragment} key={wallet}>
                   {({ selected }) => (
-                    <div className={twMerge("flex gap-2 items-center p-4", selected && "text-white bg-secondary")}>
+                    <div className={twMerge("flex gap-2 items-center p-4 cursor-pointer", selected && "text-white bg-secondary")}>
                       <img src={getCardano(wallet).icon} width={20} height={20} alt="icon" />
                       <p className="grow truncate">{wallet}</p>
                       {selected && <ArrowRightIcon />}
