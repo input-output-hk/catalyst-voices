@@ -1,7 +1,6 @@
 //! Utxo Queries
 
 use cardano_chain_follower::Network;
-
 use pallas::ledger::traverse::MultiEraTx;
 
 use super::follower::SlotNumber;
