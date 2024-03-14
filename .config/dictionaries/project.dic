@@ -47,6 +47,7 @@ Formz
 fuzzer
 gapless
 gcloud
+geckodriver
 genhtml
 gethostname
 gmtime
@@ -73,6 +74,7 @@ mgrybyk
 mithril
 mitigations
 moderations
+msedgedriver
 multidex
 myproject
 nanos
