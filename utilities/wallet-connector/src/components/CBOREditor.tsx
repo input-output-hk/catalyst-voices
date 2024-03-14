@@ -1,11 +1,12 @@
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import { noop } from "lodash-es";
-import { useState, type CSSProperties } from "react";
+import { useState, type CSSProperties, useEffect } from "react";
 import AceEditor from "react-ace";
 import hex2diag from "common/helpers/hex2diag";
 
 import "ace-builds/src-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/mode-text";
+import diag2hex from 'common/helpers/diag2hex';
 
 type Props = {
   value: string;
@@ -27,17 +28,44 @@ function CBOREditor({
   isReadOnly = false,
   onChange = noop
 }: Props) {
-  const [prevValue, setPrevValue] = useState("");
+  const [shouldRefresh, setShouldRefresh] = useState(true);
+  const [focusingSide, setFocusingSide] = useState<"bin" | "diag">("bin");
+  const [binValue, setBinValue] = useState("");
+  const [diagValue, setDiagValue] = useState("");
+
+  useEffect(() => {
+    if (shouldRefresh) {
+      setDiagValue(hex2diag(value));
+      setBinValue(value);
+      setShouldRefresh(false);
+    }
+  }, [ value, shouldRefresh ]);
 
   function handleBinChange(value: string) {
-    onChange(value);
+    setBinValue(value);
+
+    const result = hex2diag(value);
+
+    result.includes("Error:")
+      ? setDiagValue(hex2diag(value))
+      : (
+        onChange(value),
+        setShouldRefresh(true)
+      );
   }
 
   function handleDiagChange(value: string) {
+    setDiagValue(value);
 
+    const result = diag2hex(value);
+
+    result.includes("Error:")
+      ? setBinValue(result)
+      : (
+        onChange(result),
+        setShouldRefresh(true)
+      );
   }
-
-  console.log(hex2diag("a16474686973a26269736543424f522163796179f5"));
 
   return (
     <div className="rounded-md border border-solid border-black/10 overflow-hidden">
@@ -57,17 +85,19 @@ function CBOREditor({
       </div>
       <div className="grid grid-cols-2">
         <AceEditor
-          value={value}
+          value={focusingSide === "bin" ? undefined : binValue}
           style={EDITOR_STYLE}
           mode="text"
           onChange={handleBinChange}
+          onFocus={() => setFocusingSide("bin")}
           editorProps={{ $blockScrolling: true }}
         />
         <AceEditor
-          value={hex2diag(value)}
+          value={focusingSide === "diag" ? undefined : diagValue}
           style={EDITOR_STYLE}
           mode="text"
           onChange={handleDiagChange}
+          onFocus={() => setFocusingSide("diag")}
           editorProps={{ $blockScrolling: true }}
         />
       </div>

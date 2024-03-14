@@ -51,7 +51,7 @@ function SignTxnPanel({ }: Props) {
           <Controller
             control={payloadForm.control}
             name="tx"
-            render={({ field: { value, onChange} }) => (
+            render={({ field: { value, onChange } }) => (
               <CBOREditor value={value} onChange={onChange} />
             )}
           />
