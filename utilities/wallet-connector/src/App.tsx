@@ -13,6 +13,8 @@ import "react-toastify/dist/ReactToastify.css";
 import extractApiData from "common/helpers/extractApiData";
 import { ExtractedWalletApi } from "types/cardano";
 import "./styles/global.css";
+import InfoItem from "components/InfoItem";
+import WalletActionsSection from "modules/WalletActionsSection";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -120,38 +122,38 @@ function App() {
                               <Tab.Panel key={wallet} className="p-4 h-full">
                                 {walletApis[wallet] ? (
                                   <div className="grid gap-2 pb-4">
-                                    <div className="gap-2">
-                                      <h3 className="font-semibold">Balance Lovelace: </h3>
-                                      <p className="break-all">{walletApis[wallet]?.balance || "-"}</p>
-                                    </div>
-                                    <div className="gap-2">
-                                      <h3 className="font-semibold">UTXOs: </h3>
-                                      <p className="break-all">{walletApis[wallet]?.utxos.join(", ") || "-"}</p>
-                                    </div>
-                                    <div className="gap-2">
-                                      <h3 className="font-semibold">Network ID (0 = testnet; 1 = mainnet): </h3>
-                                      <p className="break-all">{walletApis[wallet]?.networkId || "-"}</p>
-                                    </div>
-                                    <div className="gap-2">
-                                      <h3 className="font-semibold">Collateral: </h3>
-                                      <p className="break-all">{walletApis[wallet]?.collateral?.join(", ") || "-"}</p>
-                                    </div>
-                                    <div className="gap-2">
-                                      <h3 className="font-semibold">Used Addresses: </h3>
-                                      <p className="break-all">{walletApis[wallet]?.usedAddresses?.join(", ") || "-"}</p>
-                                    </div>
-                                    <div className="gap-2">
-                                      <h3 className="font-semibold">Unused Addresses: </h3>
-                                      <p className="break-all">{walletApis[wallet]?.unusedAddresses?.join(", ") || "-"}</p>
-                                    </div>
-                                    <div className="gap-2">
-                                      <h3 className="font-semibold">Change Address: </h3>
-                                      <p className="break-all">{walletApis[wallet]?.changeAddress || "-"}</p>
-                                    </div>
-                                    <div className="gap-2">
-                                      <h3 className="font-semibold">Reward Address: </h3>
-                                      <p className="break-all">{walletApis[wallet]?.rewardAddresses || "-"}</p>
-                                    </div>
+                                    <InfoItem
+                                      heading="Balance Lovelace"
+                                      value={walletApis[wallet]?.balance}
+                                    />
+                                    <InfoItem
+                                      heading="UTXOs"
+                                      value={walletApis[wallet]?.utxos}
+                                    />
+                                    <InfoItem
+                                      heading="Network ID (0 = testnet; 1 = mainnet)"
+                                      value={walletApis[wallet]?.networkId?.toString()}
+                                    />
+                                    <InfoItem
+                                      heading="Collateral"
+                                      value={walletApis[wallet]?.collateral}
+                                    />
+                                    <InfoItem
+                                      heading="Used Addresses"
+                                      value={walletApis[wallet]?.usedAddresses}
+                                    />
+                                    <InfoItem
+                                      heading="Unused Addresses"
+                                      value={walletApis[wallet]?.unusedAddresses}
+                                    />
+                                    <InfoItem
+                                      heading="Change Address"
+                                      value={walletApis[wallet]?.changeAddress}
+                                    />
+                                    <InfoItem
+                                      heading="Reward Address"
+                                      value={walletApis[wallet]?.rewardAddresses}
+                                    />
                                   </div>
                                 ) : (
                                   <div className="flex items-center justify-center w-full h-full">
@@ -171,9 +173,7 @@ function App() {
                       </div>
                     )}
                   </section>
-                  <section className="grid gap-4">
-                    <h2 className="font-semibold">Wallet Actions:</h2>
-                  </section>
+                  <WalletActionsSection />
                 </>
               ) : (
                 <section className="grid gap-4">
