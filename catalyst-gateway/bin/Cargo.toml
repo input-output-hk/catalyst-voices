@@ -78,3 +78,4 @@ async-recursion = "1.0.5"
 cardano-chain-follower= { git = "https://github.com/input-output-hk/hermes.git", version="0.0.1"}
 
 pallas = { version = "0.23.0" }
+ed25519-dalek = "2.1.1"
