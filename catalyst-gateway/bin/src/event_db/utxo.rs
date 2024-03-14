@@ -10,8 +10,8 @@ use crate::{
         EventDB,
     },
     util::{
-        extract_hashed_witnesses, extract_stake_credentials_from_certs, matching_stake_credential,
-        parse_policy_assets,
+        extract_hashed_witnesses, extract_stake_credentials_from_certs,
+        find_matching_stake_credential, parse_policy_assets,
     },
 };
 
@@ -38,10 +38,11 @@ impl EventDB {
                 Err(err) => return Err(Error::HashedWitnessExtraction(err.to_string())),
             };
 
-            let stake_credential = match matching_stake_credential(&witnesses, &stake_credentials) {
-                Ok(s) => s,
-                Err(err) => return Err(Error::StakeCredentialMatch(err.to_string())),
-            };
+            let stake_credential =
+                match find_matching_stake_credential(&witnesses, &stake_credentials) {
+                    Ok(s) => s,
+                    Err(err) => return Err(Error::StakeCredentialMatch(err.to_string())),
+                };
 
             // index outputs
             for tx_out in tx.outputs() {
