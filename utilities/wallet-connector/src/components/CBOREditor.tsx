@@ -1,12 +1,11 @@
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
+import { noop } from "lodash-es";
 import { useState, type CSSProperties } from "react";
 import AceEditor from "react-ace";
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
-import { encode, decode } from "cborg";
-import { noop } from "lodash-es";
-import hex2bin from "common/helpers/hex2bin";
+import hex2diag from "common/helpers/hex2diag";
 
-import "ace-builds/src-noconflict/mode-text";
 import "ace-builds/src-noconflict/ext-language_tools";
+import "ace-builds/src-noconflict/mode-text";
 
 type Props = {
   value: string;
@@ -31,16 +30,14 @@ function CBOREditor({
   const [prevValue, setPrevValue] = useState("");
 
   function handleBinChange(value: string) {
-    
+    onChange(value);
   }
 
   function handleDiagChange(value: string) {
 
   }
 
-  const tmp = decode(hex2bin("a16474686973a26269736543424f522163796179f5"), { })
-
-  // console.log(tokensToDiagnostic(hex2bin("a16474686973a26269736543424f522163796179f5")));
+  console.log(hex2diag("a16474686973a26269736543424f522163796179f5"));
 
   return (
     <div className="rounded-md border border-solid border-black/10 overflow-hidden">
@@ -60,14 +57,14 @@ function CBOREditor({
       </div>
       <div className="grid grid-cols-2">
         <AceEditor
-          value={JSON.stringify(tmp, null, 2)}
+          value={value}
           style={EDITOR_STYLE}
           mode="text"
           onChange={handleBinChange}
           editorProps={{ $blockScrolling: true }}
         />
         <AceEditor
-          value={value}
+          value={hex2diag(value)}
           style={EDITOR_STYLE}
           mode="text"
           onChange={handleDiagChange}

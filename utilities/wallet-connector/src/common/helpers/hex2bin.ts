@@ -1,6 +1,6 @@
 export default function hex2bin(hexString: string): Uint8Array {
   // Remove spaces and convert to uppercase
-  const cleanedHexString = hexString.replace(/\s/g, '').toUpperCase();
+  const cleanedHexString = hexString.replace(/\s/gm, '').toUpperCase();
 
   // Check if the cleaned string is a valid hex string
   if (!/^[0-9a-fA-F]*$/.test(cleanedHexString)) {
