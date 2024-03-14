@@ -11,7 +11,7 @@ use crate::{
         EventDB,
     },
     util::{
-        extract_hashed_keys, extract_hashed_witnesses, match_certificate_with_witness,
+        extract_hashed_witnesses, extract_stake_credentials_from_certs, matching_stake_credential,
         parse_policy_assets,
     },
 };
@@ -27,19 +27,21 @@ impl EventDB {
             self.index_txn_data(tx.hash().as_slice(), slot_no, network)
                 .await?;
 
-            let certs = extract_hashed_keys(tx.certs());
-            if certs.is_empty() {
+            let stake_credentials = extract_stake_credentials_from_certs(tx.certs());
+
+            // Don't index if there is no staking
+            if stake_credentials.is_empty() {
                 return Ok(());
             }
 
             let witnesses = match extract_hashed_witnesses(tx.vkey_witnesses()) {
                 Ok(w) => w,
-                Err(err) => return Err(Error::DecodeHex(err.to_string())),
+                Err(err) => return Err(Error::HashedWitnessExtraction(err.to_string())),
             };
 
-            let stake_credential = match match_certificate_with_witness(witnesses, certs) {
+            let stake_credential = match matching_stake_credential(witnesses, stake_credentials) {
                 Ok(s) => s,
-                Err(err) => return Err(Error::DecodeHex(err.to_string())),
+                Err(err) => return Err(Error::StakeCredentialMatch(err.to_string())),
             };
 
             // index outputs

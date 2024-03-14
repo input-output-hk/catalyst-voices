@@ -18,6 +18,9 @@ pub type WitnessHash = String;
 /// Witness pub key in hex
 pub type WitnessPubKey = String;
 
+/// Stake credential - blake2b hash of Witness pub key
+pub type StakeCredentialHash = String;
+
 #[derive(Default, Debug, Serialize)]
 /// Assets
 pub struct Asset {
@@ -80,8 +83,10 @@ pub fn valid_era(era: Era) -> bool {
     )
 }
 
-/// Extract hashed keys
-pub fn extract_hashed_keys(certs: Vec<MultiEraCert<'_>>) -> Vec<String> {
+/// Extract stake credentials from certificates. Stake credentials are 28 bytes via blake2b hashing.
+pub fn extract_stake_credentials_from_certs(
+    certs: Vec<MultiEraCert<'_>>,
+) -> Vec<StakeCredentialHash> {
     let mut keys = Vec::new();
 
     for c in certs.iter() {
@@ -104,7 +109,7 @@ pub fn extract_hashed_keys(certs: Vec<MultiEraCert<'_>>) -> Vec<String> {
     keys
 }
 
-// Extract witness pub keys and hash them with blake2b in order to find a stake credential match
+// Extract witness pub keys and hash them with blake2b.
 pub fn extract_hashed_witnesses(
     witnesses: &[VKeyWitness],
 ) -> Result<Vec<(WitnessPubKey, WitnessHash)>, Box<dyn Error>> {
@@ -127,8 +132,8 @@ pub fn extract_hashed_witnesses(
     Ok(hashed_witnesses)
 }
 
-/// match certificate keys with witnesses
-pub fn match_certificate_with_witness(
+/// Match hashed witness pub keys with hashed stake credentials from certs to identify correct stake credential key.
+pub fn matching_stake_credential(
     witnesses: Vec<(WitnessPubKey, WitnessHash)>, certs: Vec<String>,
 ) -> Result<String, Box<dyn Error>> {
     let matched_pub_key =
@@ -145,6 +150,8 @@ pub fn match_certificate_with_witness(
 
     match matched_pub_key {
         Some(pub_key) => Ok(pub_key.to_string()),
-        None => Err("no matches".into()),
+        None => Err(
+            "No stake credential from the certificates matches any of the witness pub keys".into(),
+        ),
     }
 }

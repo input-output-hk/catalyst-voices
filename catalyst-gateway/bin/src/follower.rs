@@ -173,29 +173,10 @@ async fn find_last_update_point(
 /// which facilitates future control over spawned threads.
 #[allow(clippy::too_many_lines)] // we will refactor later
 async fn init_follower(
-    network: Network, relay: &str, _start_from: (Option<SlotNumber>, Option<BlockHash>),
+    network: Network, relay: &str, start_from: (Option<SlotNumber>, Option<BlockHash>),
     db: Arc<EventDB>, machine_id: MachineId, snapshot: &str,
 ) -> Result<ManageTasks, Box<dyn Error>> {
-    let start = match network {
-        Network::Mainnet => (
-            Some(118430863),
-            Some("3a1402cd5b1444f3b6011936b578487bdef0c52bbdd7d2f688a72afc15066d4f".to_string()),
-        ),
-        Network::Preprod => (
-            Some(118672213),
-            Some("6281a480c1e324b54d1b58b190032d2cf7bb4a79f7a35274c224b117532e8f91".to_string()),
-        ),
-        Network::Preview => (
-            Some(43199345),
-            Some("fcce88636620210b2148bc930cb7b54fb9b634d0b81716463b25f3ddbcf8d653".to_string()),
-        ),
-        Network::Testnet => (
-            Some(118672213),
-            Some("6281a480c1e324b54d1b58b190032d2cf7bb4a79f7a35274c224b117532e8f91".to_string()),
-        ),
-    };
-
-    let mut follower = follower_connection(start, snapshot, network, relay).await?;
+    let mut follower = follower_connection(start_from, snapshot, network, relay).await?;
 
     let genesis_values =
         network_genesis_values(&network).ok_or("Obtaining genesis values failed")?;

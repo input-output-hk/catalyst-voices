@@ -47,6 +47,12 @@ pub(crate) enum Error {
     /// Unable to extract policy assets
     #[error("Unable parse assets: {0}")]
     AssetParsingIssue(String),
+    /// Unable to extract hashed witnesses
+    #[error("Unable to extract hashed witnesses: {0}")]
+    HashedWitnessExtraction(String),
+    /// Unable to match any stake credential from certificates and witness pub keys
+    #[error("Unable to match stake credential: {0}")]
+    StakeCredentialMatch(String),
 }
 
 impl From<RunError<tokio_postgres::Error>> for Error {
