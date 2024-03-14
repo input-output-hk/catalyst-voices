@@ -1,12 +1,114 @@
+import { Tab } from "@headlessui/react";
+import getCardano from "common/helpers/getCardano";
+import { noop } from "lodash-es";
+import { Fragment } from "react/jsx-runtime";
+import { twMerge } from "tailwind-merge";
+import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import InfoItem from "components/InfoItem";
+import { ExtractedWalletApi } from "types/cardano";
+
 type Props = {
-  
+  selectedWallets: string[];
+  enablingWallets: string[];
+  walletApis: Record<string, ExtractedWalletApi>;
+  onEnable?: (walletName: string) => void;
+  onEnableAll?: (walletNames: string[]) => void;
 }
 
-function WalletInfoSection({ }: Props) {
+function WalletInfoSection({
+  selectedWallets,
+  enablingWallets,
+  walletApis,
+  onEnable = noop,
+  onEnableAll = noop,
+}: Props) {
   return (
-    <div>
-      
-    </div>
+    <section className="grid gap-4">
+      <h2 className="font-semibold">Wallet Informatmion:</h2>
+      {selectedWallets.length ? (
+        <div className="rounded-md border border-solid border-black/10 overflow-hidden">
+          <div className="border-b border-solid border-black/10">
+            <div className="flex justify-between px-4 py-2">
+              <div className="flex items-center">
+                <p className="font-semibold">Selected wallets: {selectedWallets.length}</p>
+              </div>
+              <div className="flex items-center">
+                <button type="button" className="bg-primary rounded-md px-4 py-2 text-white">
+                  <p>Enable all wallets</p>
+                </button>
+              </div>
+            </div>
+          </div>
+          <Tab.Group as="div" className="grid grid-cols-[186px_1fr] h-[320px]">
+            <Tab.List className="bg-background border-r border-solid border-black/10 overflow-y-auto">
+              {selectedWallets.map((wallet) => (
+                <Tab as={Fragment} key={wallet}>
+                  {({ selected }) => (
+                    <div className={twMerge("flex gap-2 items-center p-4", selected && "text-white bg-secondary")}>
+                      <img src={getCardano(wallet).icon} width={20} height={20} alt="icon" />
+                      <p className="grow truncate">{wallet}</p>
+                      {selected && <ArrowRightIcon />}
+                    </div>
+                  )}
+                </Tab>
+              ))}
+            </Tab.List>
+            <Tab.Panels className="h-full overflow-auto">
+              {selectedWallets.map((wallet) => (
+                <Tab.Panel key={wallet} className="p-4 h-full">
+                  {walletApis[wallet] ? (
+                    <div className="grid gap-2 pb-4">
+                      <InfoItem
+                        heading="Balance Lovelace"
+                        value={walletApis[wallet]?.balance}
+                      />
+                      <InfoItem
+                        heading="UTXOs"
+                        value={walletApis[wallet]?.utxos}
+                      />
+                      <InfoItem
+                        heading="Network ID (0 = testnet; 1 = mainnet)"
+                        value={walletApis[wallet]?.networkId?.toString()}
+                      />
+                      <InfoItem
+                        heading="Collateral"
+                        value={walletApis[wallet]?.collateral}
+                      />
+                      <InfoItem
+                        heading="Used Addresses"
+                        value={walletApis[wallet]?.usedAddresses}
+                      />
+                      <InfoItem
+                        heading="Unused Addresses"
+                        value={walletApis[wallet]?.unusedAddresses}
+                      />
+                      <InfoItem
+                        heading="Change Address"
+                        value={walletApis[wallet]?.changeAddress}
+                      />
+                      <InfoItem
+                        heading="Reward Address"
+                        value={walletApis[wallet]?.rewardAddresses}
+                      />
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center w-full h-full">
+                      <button type="button" className="bg-primary rounded-md px-4 py-2 text-white" disabled={enablingWallets.includes(wallet)} onClick={() => onEnable(wallet)}>
+                        <p>Enable</p>
+                      </button>
+                    </div>
+                  )}
+                </Tab.Panel>
+              ))}
+            </Tab.Panels>
+          </Tab.Group>
+        </div>
+      ) : (
+        <div>
+          <p>Please select at least one wallet to view the information.</p>
+        </div>
+      )}
+    </section>
   )
 }
 
