@@ -26,7 +26,7 @@ impl EventDB {
             self.index_txn_data(tx.hash().as_slice(), slot_no, network)
                 .await?;
 
-            let stake_credentials = extract_stake_credentials_from_certs(tx.certs());
+            let stake_credentials = extract_stake_credentials_from_certs(&tx.certs());
 
             // Don't index if there is no staking
             if stake_credentials.is_empty() {
@@ -38,7 +38,7 @@ impl EventDB {
                 Err(err) => return Err(Error::HashedWitnessExtraction(err.to_string())),
             };
 
-            let stake_credential = match matching_stake_credential(witnesses, stake_credentials) {
+            let stake_credential = match matching_stake_credential(&witnesses, &stake_credentials) {
                 Ok(s) => s,
                 Err(err) => return Err(Error::StakeCredentialMatch(err.to_string())),
             };

@@ -43,11 +43,9 @@ pub struct PolicyAsset {
 pub fn parse_policy_assets(assets: &[MultiEraPolicyAssets<'_>]) -> Vec<PolicyAsset> {
     assets
         .iter()
-        .map(|asset| {
-            PolicyAsset {
-                policy_hash: asset.policy().to_string(),
-                assets: parse_child_assets(&asset.assets()),
-            }
+        .map(|asset| PolicyAsset {
+            policy_hash: asset.policy().to_string(),
+            assets: parse_child_assets(&asset.assets()),
         })
         .collect()
 }
@@ -56,25 +54,21 @@ pub fn parse_policy_assets(assets: &[MultiEraPolicyAssets<'_>]) -> Vec<PolicyAss
 pub fn parse_child_assets(assets: &[MultiEraAsset]) -> Vec<Asset> {
     assets
         .iter()
-        .filter_map(|asset| {
-            match asset {
-                MultiEraAsset::AlonzoCompatibleOutput(id, name, amount) => {
-                    Some(Asset {
-                        policy_id: id.to_string(),
-                        name: name.to_string(),
-                        amount: *amount,
-                    })
-                },
-                MultiEraAsset::AlonzoCompatibleMint(id, name, amount) => {
-                    let amount = u64::try_from(*amount).ok()?;
-                    Some(Asset {
-                        policy_id: id.to_string(),
-                        name: name.to_string(),
-                        amount,
-                    })
-                },
-                _ => Some(Asset::default()),
-            }
+        .filter_map(|asset| match asset {
+            MultiEraAsset::AlonzoCompatibleOutput(id, name, amount) => Some(Asset {
+                policy_id: id.to_string(),
+                name: name.to_string(),
+                amount: *amount,
+            }),
+            MultiEraAsset::AlonzoCompatibleMint(id, name, amount) => {
+                let amount = u64::try_from(*amount).ok()?;
+                Some(Asset {
+                    policy_id: id.to_string(),
+                    name: name.to_string(),
+                    amount,
+                })
+            },
+            _ => Some(Asset::default()),
         })
         .collect()
 }
@@ -90,23 +84,21 @@ pub fn valid_era(era: Era) -> bool {
 /// Extract stake credentials from certificates. Stake credentials are 28 bytes via
 /// blake2b hashing.
 pub fn extract_stake_credentials_from_certs(
-    certs: Vec<MultiEraCert<'_>>,
+    certs: &[MultiEraCert<'_>],
 ) -> Vec<StakeCredentialHash> {
     let mut keys = Vec::new();
 
-    for c in certs.iter() {
+    for c in certs {
         if let Some(cert) = c.as_alonzo() {
             match cert {
                 pallas::ledger::primitives::alonzo::Certificate::StakeDelegation(
                     stake_credential,
                     _,
-                ) => {
-                    match stake_credential {
-                        StakeCredential::AddrKeyhash(stake_credential) => {
-                            keys.push(hex::encode(stake_credential.as_slice()))
-                        },
-                        StakeCredential::Scripthash(_) => (),
-                    }
+                ) => match stake_credential {
+                    StakeCredential::AddrKeyhash(stake_credential) => {
+                        keys.push(hex::encode(stake_credential.as_slice()));
+                    },
+                    StakeCredential::Scripthash(_) => (),
                 },
                 _ => continue,
             }
@@ -116,7 +108,7 @@ pub fn extract_stake_credentials_from_certs(
     keys
 }
 
-// Extract witness pub keys and hash them with blake2b.
+/// Extract witness pub keys and hash them with blake2b.
 pub fn extract_hashed_witnesses(
     witnesses: &[VKeyWitness],
 ) -> Result<Vec<(WitnessPubKey, WitnessHash)>, Box<dyn Error>> {
@@ -133,7 +125,7 @@ pub fn extract_hashed_witnesses(
         let mut context = Blake2b::new(28);
         context.input(bytes);
         context.result(&mut digest);
-        hashed_witnesses.push((pub_key_hex, hex::encode(digest)))
+        hashed_witnesses.push((pub_key_hex, hex::encode(digest)));
     }
 
     Ok(hashed_witnesses)
@@ -142,7 +134,7 @@ pub fn extract_hashed_witnesses(
 /// Match hashed witness pub keys with hashed stake credentials from certs to identify
 /// correct stake credential key.
 pub fn matching_stake_credential(
-    witnesses: Vec<(WitnessPubKey, WitnessHash)>, certs: Vec<String>,
+    witnesses: &[(WitnessPubKey, WitnessHash)], certs: &[String],
 ) -> Result<String, Box<dyn Error>> {
     let matched_pub_key =
         certs
@@ -158,11 +150,8 @@ pub fn matching_stake_credential(
 
     match matched_pub_key {
         Some(pub_key) => Ok(pub_key.to_string()),
-        None => {
-            Err(
-                "No stake credential from the certificates matches any of the witness pub keys"
-                    .into(),
-            )
-        },
+        None => Err(
+            "No stake credential from the certificates matches any of the witness pub keys".into(),
+        ),
     }
 }
