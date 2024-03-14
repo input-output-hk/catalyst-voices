@@ -10,7 +10,7 @@ type Props = {
 
 function InputBlock({ variant, name, children }: Props) {
   return (
-    <div className={twMerge("gap-1", variant === "inline" ? "flex" : "grid")}>
+    <div className={twMerge("gap-2", variant === "inline" ? "flex" : "grid")}>
       <div className="flex gap-2">
         <InputIcon />
         <h3>{name}:</h3>

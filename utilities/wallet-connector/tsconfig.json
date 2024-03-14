@@ -4,7 +4,7 @@
     "target": "ES2018",
     "module": "ESNext",
     "lib": ["DOM", "ESNext"],
-    "allowJs": false,
+    "allowJs": true,
     "jsx": "react-jsx",
     "baseUrl": "./src",
 

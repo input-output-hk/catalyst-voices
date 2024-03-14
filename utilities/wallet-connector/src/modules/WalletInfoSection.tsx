@@ -6,6 +6,7 @@ import { twMerge } from "tailwind-merge";
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import InfoItem from "components/InfoItem";
 import type { ExtractedWalletApi } from "types/cardano";
+import Button from "components/Button";
 
 type Props = {
   selectedWallets: string[];
@@ -24,7 +25,7 @@ function WalletInfoSection({
 }: Props) {
   return (
     <section className="grid gap-4">
-      <h2 className="font-semibold">Wallet Informatmion:</h2>
+      <h2 className="font-semibold">Wallet Information:</h2>
       {selectedWallets.length ? (
         <div className="rounded-md border border-solid border-black/10 overflow-hidden">
           <div className="border-b border-solid border-black/10">
@@ -33,9 +34,9 @@ function WalletInfoSection({
                 <p className="font-semibold">Selected wallets: {selectedWallets.length}</p>
               </div>
               <div className="flex items-center">
-                <button type="button" className="bg-primary rounded-md px-4 py-2 text-white" onClick={onEnableAll}>
+                <Button onClick={onEnableAll}>
                   <p>Enable all wallets</p>
-                </button>
+                </Button>
               </div>
             </div>
           </div>
@@ -93,9 +94,9 @@ function WalletInfoSection({
                     </div>
                   ) : (
                     <div className="flex items-center justify-center w-full h-full">
-                      <button type="button" className="bg-primary rounded-md px-4 py-2 text-white" disabled={enablingWallets.includes(wallet)} onClick={() => onEnable(wallet)}>
+                      <Button disabled={enablingWallets.includes(wallet)} onClick={() => onEnable(wallet)}>
                         <p>Enable</p>
-                      </button>
+                      </Button>
                     </div>
                   )}
                 </Tab.Panel>

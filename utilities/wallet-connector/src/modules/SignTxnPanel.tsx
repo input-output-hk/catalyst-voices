@@ -1,4 +1,5 @@
 import InputIcon from "@mui/icons-material/Input";
+import Button from "components/Button";
 import CBOREditor from "components/CBOREditor";
 import CheckBox from "components/CheckBox";
 import InputBlock from "components/InputBlock";
@@ -14,12 +15,16 @@ type FormValues = {
 }
 
 function SignTxnPanel({ }: Props) {
-  const actionForm = useForm<FormValues>({
+  const payloadForm = useForm<FormValues>({
     defaultValues: {
       partialSign: false,
       tx: ""
     }
   });
+
+  function handleExecute() {
+
+  }
 
   return (
     <div className="grid gap-4">
@@ -35,7 +40,7 @@ function SignTxnPanel({ }: Props) {
         <h2 className="font-semibold">Payload:</h2>
         <InputBlock variant="inline" name="partialSign">
           <Controller
-            control={actionForm.control}
+            control={payloadForm.control}
             name="partialSign"
             render={({ field: { value, onChange } }) => (
               <CheckBox value={value} onChange={onChange} />
@@ -43,10 +48,19 @@ function SignTxnPanel({ }: Props) {
           />
         </InputBlock>
         <InputBlock variant="block" name="tx">
-          <CBOREditor
-
+          <Controller
+            control={payloadForm.control}
+            name="tx"
+            render={({ field: { value, onChange} }) => (
+              <CBOREditor value={value} onChange={onChange} />
+            )}
           />
         </InputBlock>
+        <div className="flex">
+          <Button onClick={handleExecute}>
+            <p>Execute</p>
+          </Button>
+        </div>
       </div>
       <div className="grid gap-2">
 
