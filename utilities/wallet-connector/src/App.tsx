@@ -4,7 +4,7 @@ import "./styles/global.css";
 
 import getCardano from "common/helpers/getCardano";
 import WalletCard from "components/WalletCard";
-import { xor } from "lodash-es";
+import { pickBy, xor } from "lodash-es";
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ToastContainer } from "react-toastify";
@@ -13,6 +13,7 @@ import extractApiData from "common/helpers/extractApiData";
 import WalletActionsSection from "modules/WalletActionsSection";
 import WalletInfoSection from "modules/WalletInfoSection";
 import type { ExtractedWalletApi } from "types/cardano";
+import type { Cip30Wallet } from "@cardano-sdk/cip30";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -27,8 +28,11 @@ const queryClient = new QueryClient({
 });
 
 function App() {
-  const [walletApis, setWalletApis] = useState<Record<string, ExtractedWalletApi>>({});
+  // enabled wallets with the API object
+  const [walletApi, setWalletApi] = useState<Record<string, ExtractedWalletApi>>({});
+  // list of wallet names that is being enabled
   const [enablingWallets, setEnablingWallets] = useState<string[]>([]);
+  // wallet name selections
   const [selectedWallets, setSelectedWallets] = useState<string[]>([]);
 
   console.log(getCardano());
@@ -39,29 +43,28 @@ function App() {
     setSelectedWallets((prev) => xor(prev, [walletName]))
   }
 
-  async function enableWallet(walletName: string) {
-    setEnablingWallets((prev) => [...prev, walletName]);
-
-    const api = await getCardano(walletName).enable();
-
-    const extractedApi = await extractApiData(api);
-
-    console.log("api", extractedApi);
-
-    setWalletApis((prev) => ({ ...prev, [walletName]: extractedApi }));
-    setEnablingWallets((prev) => prev.filter((w) => w !== walletName));
+  async function handleEnableWallet(walletName: string) {
+    await handleEnableAllWallets([ walletName ]);
   }
 
-  async function enableAllWallets(walletNames: string[]) {
-    // const toBeEnabledWallets = walletNames.filter((wallet) => )
+  async function handleEnableAllWallets(wallets?: string[]) {
+    const toBeEnabledWallets = (wallets ?? selectedWallets).filter((wallet) => !walletApi[wallet]);
+    const mappedWalletProp = pickBy(getCardano(), (v, k) => toBeEnabledWallets.includes(k)) as Record<string, Cip30Wallet>;
 
-    const walletApis = await Promise.all(Object.entries(getCardano()).map(async ([walletName, walletProps]: any) => {
-      const api = await walletProps.enable({ cip: 30 })
+    setEnablingWallets((prev) => [...prev, ...toBeEnabledWallets]);
 
-      return [walletName, api]
+    const walletApis = await Promise.all(Object.entries(mappedWalletProp).map(async ([walletName, walletProps]) => {
+      const api = await walletProps.enable(/* { cip: 30 } */);
+
+      const extractedApi = await extractApiData(api);
+
+      return [walletName, extractedApi]
     }));
 
-    setWalletApis(Object.fromEntries(walletApis));
+    console.log("api", walletApis);
+
+    setWalletApi((prev) => ({ ...prev, ...Object.fromEntries(walletApis) }));
+    setEnablingWallets((prev) => prev.filter((wallet) => !toBeEnabledWallets.includes(wallet)));
   }
 
   return (
@@ -80,7 +83,7 @@ function App() {
                         <WalletCard
                           key={walletName}
                           isChecked={selectedWallets.includes(walletName)}
-                          isEnabled={Boolean(walletApis[walletName])}
+                          isEnabled={Boolean(walletApi[walletName])}
                           name={walletName}
                           isEnabledStatusDisplayed={true}
                           onClick={() => handleWalletCardClick(walletName)}
@@ -91,12 +94,13 @@ function App() {
                   <WalletInfoSection
                     selectedWallets={selectedWallets}
                     enablingWallets={enablingWallets}
-                    walletApis={walletApis}
-                    onEnable={enableWallet}
+                    walletApi={walletApi}
+                    onEnable={handleEnableWallet}
+                    onEnableAll={handleEnableAllWallets}
                   />
                   <WalletActionsSection
                     selectedWallets={selectedWallets}
-                    walletApis={walletApis}
+                    walletApi={walletApi}
                   />
                 </>
               ) : (

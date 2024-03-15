@@ -14,7 +14,7 @@ import type { ExtractedWalletApi } from 'types/cardano';
 
 type Props = {
   selectedWallets: string[];
-  walletApis: Record<string, ExtractedWalletApi>;
+  walletApi: Record<string, ExtractedWalletApi>;
 }
 
 type FormValues = {
@@ -24,7 +24,7 @@ type FormValues = {
 
 function SignTxnPanel({
   selectedWallets,
-  walletApis
+  walletApi
 }: Props) {
   const [selectedResponseWallet, setSelectedResponseWallet] = useState("");
 
@@ -43,7 +43,7 @@ function SignTxnPanel({
   async function mutateFn(args: Parameters<SignTx>): Promise<Record<string, string>> {
     const responses = await Promise.all(selectedWallets.map(async (wallet) => [
       wallet,
-      await walletApis[wallet]?.signTx(...args)
+      await walletApi[wallet]?.signTx(...args)
     ]));
 
     setSelectedResponseWallet(responses[0]?.[0] ?? "");

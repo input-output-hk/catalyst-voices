@@ -15,11 +15,11 @@ const ACTIONS = [
 
 type Props = {
   selectedWallets: string[];
-  walletApis: Record<string, ExtractedWalletApi>;
+  walletApi: Record<string, ExtractedWalletApi>;
 }
 
 function WalletActionsSection({
-  walletApis,
+  walletApi,
   selectedWallets
 }: Props) {
   return (
@@ -43,7 +43,7 @@ function WalletActionsSection({
             <Tab.Panel className="p-4 h-full">
               <SignTxnPanel
                 selectedWallets={selectedWallets}
-                walletApis={walletApis}
+                walletApi={walletApi}
               />
             </Tab.Panel>
             <Tab.Panel className="p-4 h-full">
