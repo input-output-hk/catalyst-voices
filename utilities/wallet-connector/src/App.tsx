@@ -53,20 +53,22 @@ function App() {
   }
 
   async function enableAllWallets(walletNames: string[]) {
-    /* const walletApis = await Promise.all(Object.entries(getCardano()).map(async ([walletName, walletProps]: any) => {
+    // const toBeEnabledWallets = walletNames.filter((wallet) => )
+
+    const walletApis = await Promise.all(Object.entries(getCardano()).map(async ([walletName, walletProps]: any) => {
       const api = await walletProps.enable({ cip: 30 })
 
       return [walletName, api]
-    })); */
+    }));
 
-    // setWalletApis(Object.fromEntries(walletApis));
+    setWalletApis(Object.fromEntries(walletApis));
   }
 
   return (
     <QueryClientProvider client={queryClient}>
       <ToastContainer />
       <div className="flex flex-col bg-background m-0 text-text min-h-screen">
-        <div className="py-8 px-4">
+        <div className="grid gap-8 py-8 px-4">
           <main className="w-full max-w-[1024px] my-0 mx-auto bg-white rounded-xl shadow">
             <div className="grid gap-8 p-8">
               {isCardanoActivated ? (
@@ -104,6 +106,9 @@ function App() {
               )}
             </div>
           </main>
+          <footer>
+            <div className="text-center">© 2024 Input Output Global · All Rights Reserved</div>
+          </footer>
         </div>
       </div>
     </QueryClientProvider>

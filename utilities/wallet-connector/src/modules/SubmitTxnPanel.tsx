@@ -4,8 +4,10 @@ type Props = {
 
 function SubmitTxnPanel({ }: Props) {
   return (
-    <div>
-      
+    <div className="grid gap-4">
+      <div className="grid gap-2">
+        <h2 className="font-semibold text-center">Not Implemented.</h2>
+      </div>
     </div>
   )
 }

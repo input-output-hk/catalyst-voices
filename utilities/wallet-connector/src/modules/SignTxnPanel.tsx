@@ -105,7 +105,7 @@ function SignTxnPanel({
           </div>
         </div>
       </div>
-      {true && (
+      {data && (
         <>
           <div className="h-px bg-black/10"></div>
           <div className="grid gap-2">
