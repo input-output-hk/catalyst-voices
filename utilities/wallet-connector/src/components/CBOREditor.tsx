@@ -39,7 +39,7 @@ function CBOREditor({
       setBinValue(value);
       setShouldRefresh(false);
     }
-  }, [ value, shouldRefresh ]);
+  }, [value, shouldRefresh]);
 
   function handleBinChange(value: string) {
     setBinValue(value);
@@ -72,8 +72,12 @@ function CBOREditor({
       <div className="px-2 py-1 flex items-center justify-between">
         <p className="flex gap-2 text-sm">
           <span>CBOR Editor</span>
-          <span>|</span>
-          <button type="button" className="hover:underline">Upload</button>
+          {!isReadOnly && (
+            <>
+              <span>|</span>
+              <button type="button" className="hover:underline">Upload</button>
+            </>
+          )}
           <span>|</span>
           <button type="button" className="hover:underline">Export</button>
         </p>
@@ -87,6 +91,7 @@ function CBOREditor({
         <AceEditor
           value={focusingSide === "bin" ? undefined : binValue}
           style={EDITOR_STYLE}
+          readOnly={isReadOnly}
           mode="text"
           onChange={handleBinChange}
           onFocus={() => setFocusingSide("bin")}
@@ -95,6 +100,7 @@ function CBOREditor({
         <AceEditor
           value={focusingSide === "diag" ? undefined : diagValue}
           style={EDITOR_STYLE}
+          readOnly={isReadOnly}
           mode="text"
           onChange={handleDiagChange}
           onFocus={() => setFocusingSide("diag")}

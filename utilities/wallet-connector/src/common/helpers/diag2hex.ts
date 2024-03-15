@@ -4,9 +4,7 @@ export default function diag2hex(diagString: string): string {
   try {
     const result = fromDiag(diagString);
 
-    return Array.from(result, byte => {
-      return ("0" + byte.toString(16)).slice(-2);
-    }).join(" ");
+    return Array.from(result, (byte) => byte.toString(16).padStart(2, "0")).join(" ");
   } catch (err: unknown) {
     return String(err);
   }

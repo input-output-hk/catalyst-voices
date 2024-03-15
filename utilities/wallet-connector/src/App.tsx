@@ -92,7 +92,8 @@ function App() {
                     onEnable={enableWallet}
                   />
                   <WalletActionsSection
-                  
+                    selectedWallets={selectedWallets}
+                    walletApis={walletApis}
                   />
                 </>
               ) : (

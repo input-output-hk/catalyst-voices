@@ -1,12 +1,15 @@
-import InputIcon from "@mui/icons-material/Input";
+import RefreshIcon from '@mui/icons-material/Refresh';
 import Button from "components/Button";
 import CBOREditor from "components/CBOREditor";
 import CheckBox from "components/CheckBox";
 import InputBlock from "components/InputBlock";
 import { Controller, useForm } from "react-hook-form";
+import { useMutation } from "react-query";
+import type { ExtractedWalletApi } from 'types/cardano';
 
 type Props = {
-
+  selectedWallets: string[];
+  walletApis: Record<string, ExtractedWalletApi>;
 }
 
 type FormValues = {
@@ -14,7 +17,18 @@ type FormValues = {
   tx: string;
 }
 
-function SignTxnPanel({ }: Props) {
+function SignTxnPanel({
+  selectedWallets,
+  walletApis
+}: Props) {
+  const { isLoading, mutateAsync, data } = useMutation({
+    mutationFn: mutateFn
+  });
+
+  async function mutateFn() {
+    
+  }
+
   const payloadForm = useForm<FormValues>({
     defaultValues: {
       partialSign: false,
@@ -57,14 +71,30 @@ function SignTxnPanel({ }: Props) {
           />
         </InputBlock>
         <div className="flex">
-          <Button onClick={handleExecute}>
-            <p>Execute</p>
-          </Button>
+          <div className="flex gap-2 items-center">
+            <Button disabled={isLoading} onClick={handleExecute}>
+              <p>Execute</p>
+            </Button>
+            {isLoading && <RefreshIcon className="animate-spin" />}
+          </div>
+          <div>
+
+          </div>
         </div>
       </div>
-      <div className="grid gap-2">
-
-      </div>
+      {true && (
+        <>
+          <div className="h-px bg-black/10"></div>
+          <div className="grid gap-2">
+            <h2 className="font-semibold">Response:</h2>
+            <CBOREditor
+              value={""}
+              onChange={() => null}
+              isReadOnly={true}
+            />
+          </div>
+        </>
+      )}
     </div>
   )
 }
