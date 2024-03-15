@@ -80,6 +80,7 @@ function App() {
                           isChecked={selectedWallets.includes(walletName)}
                           isEnabled={Boolean(walletApis[walletName])}
                           name={walletName}
+                          isEnabledStatusDisplayed={true}
                           onClick={() => handleWalletCardClick(walletName)}
                         />
                       ))}
