@@ -1,10 +1,9 @@
 import { fromDiag } from "cborg/lib/diagnostic";
+import bin2hex from "./bin2hex";
 
 export default function diag2hex(diagString: string): string {
   try {
-    const result = fromDiag(diagString);
-
-    return Array.from(result, (byte) => byte.toString(16).padStart(2, "0")).join(" ");
+    return bin2hex(fromDiag(diagString));
   } catch (err: unknown) {
     return String(err);
   }

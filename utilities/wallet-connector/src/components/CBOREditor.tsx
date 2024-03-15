@@ -2,11 +2,18 @@ import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import { noop } from "lodash-es";
 import { useState, type CSSProperties, useEffect } from "react";
 import AceEditor from "react-ace";
+import JSON5 from "json5";
 import hex2diag from "common/helpers/hex2diag";
 
 import "ace-builds/src-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/mode-text";
 import diag2hex from 'common/helpers/diag2hex';
+import { decode, encode } from 'cborg';
+import hex2bin from 'common/helpers/hex2bin';
+import bin2hex from 'common/helpers/bin2hex';
+
+type Side = "lhs" | "rhs";
+type Mode = "bin2diag" | "bin2json";
 
 type Props = {
   value: string;
@@ -29,42 +36,64 @@ function CBOREditor({
   onChange = noop
 }: Props) {
   const [shouldRefresh, setShouldRefresh] = useState(true);
-  const [focusingSide, setFocusingSide] = useState<"bin" | "diag">("bin");
-  const [binValue, setBinValue] = useState("");
-  const [diagValue, setDiagValue] = useState("");
+  const [mode, setMode] = useState<Mode>("bin2diag");
+  const [focusingSide, setFocusingSide] = useState<Side>("lhs");
+  const [lhsValue, setLhsValue] = useState("");
+  const [rhsValue, setRhsValue] = useState("");
 
   useEffect(() => {
     if (shouldRefresh) {
-      setDiagValue(hex2diag(value));
-      setBinValue(value);
+      try {
+        const rhsValue = mode === "bin2diag"
+        ? hex2diag(value)
+        : JSON5.stringify(decode(hex2bin(value)), null, 2);
+
+        setRhsValue(rhsValue);
+      } catch (e) {
+        setRhsValue(String(e));
+      }
+      
+      setLhsValue(value);
       setShouldRefresh(false);
     }
   }, [value, shouldRefresh]);
 
-  function handleBinChange(value: string) {
-    setBinValue(value);
+  function handleLhsChange(value: string) {
+    setLhsValue(value);
 
     const result = hex2diag(value);
 
     result.includes("Error:")
-      ? setDiagValue(hex2diag(value))
+      ? setRhsValue(hex2diag(value))
       : (
         onChange(value),
         setShouldRefresh(true)
       );
   }
 
-  function handleDiagChange(value: string) {
-    setDiagValue(value);
+  function handleRhsChange(value: string) {
+    setRhsValue(value);
 
-    const result = diag2hex(value);
+    try {
+      const result = mode === "bin2diag"
+        ? diag2hex(value)
+        : bin2hex(encode(JSON5.parse(value)));
 
-    result.includes("Error:")
-      ? setBinValue(result)
-      : (
-        onChange(result),
-        setShouldRefresh(true)
-      );
+      result.includes("Error:")
+        ? setLhsValue(result)
+        : (
+          onChange(result),
+          setShouldRefresh(true)
+        );
+    } catch (e) {
+      setLhsValue(String(e));
+    }
+  }
+
+  function switchMode() {
+    setFocusingSide("lhs");
+    setMode((prev) => prev === "bin2diag" ? "bin2json" : "bin2diag");
+    setShouldRefresh(true);
   }
 
   return (
@@ -83,27 +112,29 @@ function CBOREditor({
         </p>
         <p className="flex gap-1 items-center text-sm">
           <span>bin</span>
-          <SwapHorizIcon fontSize="small" />
-          <span>diag</span>
+          <button type="button" onClick={switchMode}>
+            <SwapHorizIcon fontSize="small" />
+          </button>
+          <span>{mode === "bin2diag" ? "diag" : "json5"}</span>
         </p>
       </div>
       <div className="grid grid-cols-2">
         <AceEditor
-          value={focusingSide === "bin" ? undefined : binValue}
+          value={focusingSide === "lhs" ? undefined : lhsValue}
           style={EDITOR_STYLE}
           readOnly={isReadOnly}
           mode="text"
-          onChange={handleBinChange}
-          onFocus={() => setFocusingSide("bin")}
+          onChange={handleLhsChange}
+          onFocus={() => setFocusingSide("lhs")}
           editorProps={{ $blockScrolling: true }}
         />
         <AceEditor
-          value={focusingSide === "diag" ? undefined : diagValue}
+          value={focusingSide === "rhs" ? undefined : rhsValue}
           style={EDITOR_STYLE}
           readOnly={isReadOnly}
           mode="text"
-          onChange={handleDiagChange}
-          onFocus={() => setFocusingSide("diag")}
+          onChange={handleRhsChange}
+          onFocus={() => setFocusingSide("rhs")}
           editorProps={{ $blockScrolling: true }}
         />
       </div>

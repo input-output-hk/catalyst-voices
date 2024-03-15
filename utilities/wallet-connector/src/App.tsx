@@ -111,7 +111,7 @@ function App() {
             </div>
           </main>
           <footer>
-            <div className="text-center">© 2024 Input Output Global · All Rights Reserved</div>
+            <div className="text-center">Created by Catalyst Team</div>
           </footer>
         </div>
       </div>

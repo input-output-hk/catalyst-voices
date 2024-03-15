@@ -1,0 +1,20 @@
+VERSION --try --global-cache 0.7
+
+builder:
+  FROM node:20-alpine
+  WORKDIR /app
+  COPY package.json package-lock.json .
+  COPY index.html postcss.config.js tailwind.config.js tsconfig* vite.config.ts .
+  COPY src ./src
+
+  RUN npm i
+
+check:
+  FROM +builder
+
+  RUN npx tsc --noEmit
+
+build:
+  FROM +builder
+
+  RUN npm run build
