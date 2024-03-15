@@ -56,12 +56,29 @@ These are some of the key reasons, CIP-36 is insufficient for future Project Cat
 Registering for various roles and having role specific keys is generally useful for dApps, so while this CIP is
 motivated to solve problems with Project Catalyst, it is also intended to be generally applicable to other dApps.
 
+There are a number of interactions with a user in a dApp like Catalyst which require authentication.
+However forcing all authentication through a wallet has several primary disadvantages.
+
+* Wallets only are guaranteed to provide `signData` if they implement CIP30, and that only allows a single signature.
+* There are multiple keys controlled by a wallet and its useful to ensure that all keys reflected are valid.
+* Metadata in a transaction is inaccessible to plutus scripts.
+* Wallets could present raw data to be signed to the user, and that makes the UX poor because the user would have difficulty
+  knowing what they are signing.
+* Wallets could be extended to recognize certain metadata and provide better UX but that shifts dApp UX to every wallet.
+* Putting chain keys in metadata can be redundant if those keys are already in the transaction.
+* Some authentication needs to change with regularity, such as authentication tokens to a backend service,
+  and this would require potentially excessive wallet interactions.
+
+The proposal here is to register dApp specific keys and identity, but strongly associate it with on-chain identity,
+such as Stake Public Keys, Payment Keys and Drep Keys, such that off chain interactions can be fully authenticated,
+and only on-chain interaction requires interaction with a Wallet.
+
 ## Specification
 
 In order to maintain a robust set of role registration capabilities Role registration involves:
 
 1. Creation of a root certificate for a user or set of users and associating it with an on-chain source of trust.
-2. Obtaining for each user of a dapp, or a set of users, their root
+2. Obtaining for each user of a dapp, or a set of users, their root certificate.
 3. Deriving role specific keys from the root certificate.
 4. Optionally registering for those roles on-chain.
 5. Signing and/or encrypting data with the root certificate or a derived key, or a certificate issued by a previously registered root certificate.
@@ -73,22 +90,38 @@ Effectively we map the blockchain as PKI (Public Key Infrastructure) and define 
 A PKI consists of:
 
 * A certificate authority (CA) that stores, issues and signs the digital certificates;
-  * Each dApp can control its own CA,  the user trusts the dApp as CA implicitly (or explicitly) by using the dApp.
-  * It is permissible for root certificates to be self signed, effectively each user becomes their own CA.
-  * However all Certificates are associated with blockchain addresses, typically the Stake address, but also potentially the drep key.
-* A registration authority (RA) which verifies the identity of entities requesting their digital certificates to be stored at the CA;
+  * Each dApp *MAY* control its own CA,  the user trusts the dApp as CA implicitly (or explicitly) by using the dApp.
+  * It is also permissible for root certificates to be self signed, effectively each user becomes their own CA.
+  * However all Certificates are associated with blockchain addresses, typically one or more Stake Public Key.
+    * A certificate could be associated with multiple Stake Addresses, Payment Addresses or DRep Public Keys, as required.
+  * A dApp may require that a well known public CA is used.  
+  The chain of trust can extend off chain to centralized CAs.
+  * DAOs or other organizations can also act as a CA for their members.
+  * This is intentionally left open so that the requirements of the dApp can be flexibly accommodated.
+* A registration authority (RA) which verifies the identity of entities requesting their digital certificates
+  to be stored at the CA;
   * Each dApp is responsible for identifying certificates relevant for its use that are stored on-chain and are their own RA.
+  * The dApp may choose to not do any identifying.
+  * The dApp can rely on decentralized identity to verify identity in a trustless way.
 * A central directory—i.e., a secure location in which keys are stored and indexed;
   * This is the blockchain itself.
-* A certificate management system managing things like the access to stored certificates or the delivery of the certificates to be issued;
-  * This is managed by each dApp in the manor required of the dApp.
+  * As mentioned above, the chain of trust can extend off-chain to traditional Web2 CA's.
+* A certificate management system managing things like the access to stored certificates or the delivery of the
+  certificates to be issued;
+  * This is managed by each dApp according to its requirements.
 * A certificate policy stating the PKI's requirements concerning its procedures.
   Its purpose is to allow outsiders to analyze the PKI's trustworthiness.
-  * This is also defined and managed by each dApp.
+  * This is also defined and managed by each dApp according to its requirements.
 
 ### The role x.509 plays in this scheme
 
-We leverage the x.509 PKI primitives and take advantage of the significant existing code bases and infrastructure which already exists.
+We leverage the x.509 PKI primitives.
+We intentionally take advantage of the significant existing code bases and infrastructure which already exists.
+
+#### Certificate formats
+
+x.509 certificates can be encoded in 
+
 
 We encode x.509 certificates using [CBOR Encoded X.509 Certificates][C509], Each certificate includes its on-chain anchor (public key).
 The on-chain anchors currently envisioned are:
