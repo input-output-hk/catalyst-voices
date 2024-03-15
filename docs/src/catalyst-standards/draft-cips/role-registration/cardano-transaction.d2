@@ -12,7 +12,7 @@ direction: right
 grid-columns: 1
 
 title: |md
-  # Cardano Transactions 
+  # Cardano Transactions - Babbage ERA
 | {
   shape: text
   # near: top-left  
@@ -28,16 +28,17 @@ processing: "Block to Individual Transaction Processing" {
     border-radius: 20
   }
 
-  cardano block transactions: {
+  cardano block transactions: "Cardano Block (Babbage ERA)" {
     shape: sql_table
     link: "https://github.com/IntersectMBO/cardano-ledger/blob/6d860294304749a767d99db92fab42f7c18d9af4/eras/babbage/impl/cddl-files/babbage.cddl#L3-L6"
+    header: "[ header_body, body_signature ]"
     transaction bodies: "[ * transaction_body ]"
     transaction witness sets: "[ *transaction_witness_set ]"
     invalid transactions: "[* transaction_index ]"
     auxiliary data set: "{ *transaction_index => auxiliary_data }"
   }
 
-  individual_transaction: {
+  individual_transaction: "Cardano Transaction" {
     shape: sql_table
     link: "https://github.com/IntersectMBO/cardano-ledger/blob/6d860294304749a767d99db92fab42f7c18d9af4/eras/babbage/impl/cddl-files/babbage.cddl#L13-L18"
     body: "transaction body"
