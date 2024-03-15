@@ -1,5 +1,6 @@
 import type { SignTx } from '@cardano-sdk/cip30';
 import RefreshIcon from '@mui/icons-material/Refresh';
+import cleanHex from 'common/helpers/cleanHex';
 import Button from "components/Button";
 import CBOREditor from "components/CBOREditor";
 import CheckBox from "components/CheckBox";
@@ -59,7 +60,7 @@ function SignTxnPanel({
       return toast.error("Please select at least one wallet to execute.")
     }
 
-    await mutateAsync([formValues.tx, formValues.partialSign]);
+    await mutateAsync([cleanHex(formValues.tx), formValues.partialSign]);
   }
 
   return (

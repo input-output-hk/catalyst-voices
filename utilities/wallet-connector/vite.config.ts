@@ -7,7 +7,7 @@ export default defineConfig(({ mode }) => {
   return {
     resolve: {
       alias: {
-        "cborg/lib/diagnostic": "../../node_modules/cborg/lib/diagnostic"
+        "cborg/lib/diagnostic": "../../../node_modules/cborg/lib/diagnostic"
       }
     },
     server: {
