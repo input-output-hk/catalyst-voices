@@ -1,16 +1,16 @@
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
-import { noop } from "lodash-es";
-import { useState, type CSSProperties, useEffect } from "react";
-import AceEditor from "react-ace";
-import JSON5 from "json5";
+import { decode, encode } from 'cborg';
+import bin2hex from 'common/helpers/bin2hex';
+import diag2hex from 'common/helpers/diag2hex';
+import hex2bin from 'common/helpers/hex2bin';
 import hex2diag from "common/helpers/hex2diag";
+import { noop } from "lodash-es";
+import { useEffect, useState, type CSSProperties } from "react";
+import AceEditor from "react-ace";
 
 import "ace-builds/src-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/mode-text";
-import diag2hex from 'common/helpers/diag2hex';
-import { decode, encode } from 'cborg';
-import hex2bin from 'common/helpers/hex2bin';
-import bin2hex from 'common/helpers/bin2hex';
+import "ace-builds/src-noconflict/mode-json";
 
 type Side = "lhs" | "rhs";
 type Mode = "bin2diag" | "bin2json";
@@ -46,7 +46,7 @@ function CBOREditor({
       try {
         const rhsValue = mode === "bin2diag"
         ? hex2diag(value)
-        : JSON5.stringify(decode(hex2bin(value)), null, 2);
+        : JSON.stringify(decode(hex2bin(value)), null, 2);
 
         setRhsValue(rhsValue);
       } catch (e) {
@@ -77,7 +77,7 @@ function CBOREditor({
     try {
       const result = mode === "bin2diag"
         ? diag2hex(value)
-        : bin2hex(encode(JSON5.parse(value)));
+        : bin2hex(encode(JSON.parse(value)));
 
       result.includes("Error:")
         ? setLhsValue(result)
@@ -115,7 +115,7 @@ function CBOREditor({
           <button type="button" onClick={switchMode}>
             <SwapHorizIcon fontSize="small" />
           </button>
-          <span>{mode === "bin2diag" ? "diag" : "json5"}</span>
+          <span>{mode === "bin2diag" ? "diag" : "json"}</span>
         </p>
       </div>
       <div className="grid grid-cols-2">
@@ -132,7 +132,7 @@ function CBOREditor({
           value={focusingSide === "rhs" ? undefined : rhsValue}
           style={EDITOR_STYLE}
           readOnly={isReadOnly}
-          mode="text"
+          mode={mode === "bin2diag" ? "text" : "json"}
           onChange={handleRhsChange}
           onFocus={() => setFocusingSide("rhs")}
           editorProps={{ $blockScrolling: true }}
