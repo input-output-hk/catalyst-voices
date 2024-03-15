@@ -90,7 +90,7 @@ function WalletInfoSection({
                         value={walletApi[wallet]?.changeAddress ?? null}
                       />
                       <InfoItem
-                        heading="Reward Address"
+                        heading="Reward Addresses"
                         value={walletApi[wallet]?.rewardAddresses ?? null}
                       />
                     </div>

@@ -46,7 +46,7 @@ function CBOREditor({
       try {
         const rhsValue = mode === "bin2diag"
         ? hex2diag(value)
-        : JSON.stringify(decode(hex2bin(value)), null, 2);
+        : JSON.stringify(value ? decode(hex2bin(value)) : undefined, null, 2);
 
         setRhsValue(rhsValue);
       } catch (e) {
@@ -107,8 +107,6 @@ function CBOREditor({
               <button type="button" className="hover:underline">Upload</button>
             </>
           )}
-          <span>|</span>
-          <button type="button" className="hover:underline">Export</button>
         </p>
         <p className="flex gap-1 items-center text-sm">
           <span>bin</span>
