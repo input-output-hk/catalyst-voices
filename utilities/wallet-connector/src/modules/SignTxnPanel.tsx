@@ -1,11 +1,11 @@
 import type { SignTx } from '@cardano-sdk/cip30';
 import RefreshIcon from '@mui/icons-material/Refresh';
 import cleanHex from 'common/helpers/cleanHex';
-import Button from "components/Button";
-import CBOREditor from "components/CBOREditor";
-import CheckBox from "components/CheckBox";
-import InputBlock from "components/InputBlock";
-import WalletResponseSelection from 'components/WalletResponseSelection';
+import Button from "common/components/Button";
+import CBOREditor from "common/components/CBOREditor";
+import CheckBox from "common/components/CheckBox";
+import InputBlock from "common/components/InputBlock";
+import WalletResponseSelection from 'common/components/WalletResponseSelection';
 import { useState } from 'react';
 import { Controller, useForm } from "react-hook-form";
 import { useMutation } from "react-query";

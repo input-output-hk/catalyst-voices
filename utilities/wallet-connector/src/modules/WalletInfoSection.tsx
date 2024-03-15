@@ -4,9 +4,9 @@ import { noop } from "lodash-es";
 import { Fragment } from "react/jsx-runtime";
 import { twMerge } from "tailwind-merge";
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import InfoItem from "components/InfoItem";
+import InfoItem from "common/components/InfoItem";
 import type { ExtractedWalletApi } from "types/cardano";
-import Button from "components/Button";
+import Button from "common/components/Button";
 
 type Props = {
   selectedWallets: string[];

@@ -3,7 +3,7 @@ import "react-toastify/dist/ReactToastify.css";
 import "./styles/global.css";
 
 import getCardano from "common/helpers/getCardano";
-import WalletCard from "components/WalletCard";
+import WalletCard from "common/components/WalletCard";
 import { pickBy, xor } from "lodash-es";
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
