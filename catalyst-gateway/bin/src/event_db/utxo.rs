@@ -42,8 +42,9 @@ impl EventDB {
                 match find_matching_stake_credential(&witnesses, &stake_credentials) {
                     Ok(s) => s,
                     Err(_err) => {
-                        // Most TXs will not have abided by staking rules, hence logging is too noisy.
-                        // We will not index these TXs and ignore them.
+                        // Most TXs will not have abided by staking rules, hence logging is too
+                        // noisy. We will not index these TXs and ignore
+                        // them.
                         return Ok(());
                     },
                 };
