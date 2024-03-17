@@ -41,7 +41,11 @@ impl EventDB {
             let stake_credential =
                 match find_matching_stake_credential(&witnesses, &stake_credentials) {
                     Ok(s) => s,
-                    Err(err) => return Err(Error::StakeCredentialMatch(err.to_string())),
+                    Err(_err) => {
+                        // Most TXs will not have abided by staking rules, hence logging is too noisy.
+                        // We will not index these TXs and ignore them.
+                        return Ok(());
+                    },
                 };
 
             // index outputs
