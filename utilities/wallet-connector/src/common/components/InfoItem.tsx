@@ -11,7 +11,7 @@ function InfoItem({ heading, value }: Props) {
   async function handleCopy(value: string) {
     await navigator.clipboard.writeText(value);
 
-    toast.success("Value coppied.");
+    toast.success("Value copied.");
   }
 
   return (
