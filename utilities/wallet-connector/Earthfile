@@ -19,3 +19,16 @@ build:
   FROM +builder
 
   RUN npm run build
+
+  SAVE ARTIFACT dist
+
+local:
+  FROM nginx:1.25-alpine
+
+  COPY +build/dist /usr/share/nginx/html
+
+  EXPOSE 80
+
+  CMD ["nginx", "-g", "daemon off;"]
+
+  SAVE IMAGE cat-wallet-connector:latest
