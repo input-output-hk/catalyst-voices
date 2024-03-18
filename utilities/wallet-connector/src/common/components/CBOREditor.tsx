@@ -1,7 +1,6 @@
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import { decode, encode } from 'cborg';
 import bin2hex from 'common/helpers/bin2hex';
-import cleanHex from "common/helpers/cleanHex";
 import diag2hex from 'common/helpers/diag2hex';
 import hex2bin from 'common/helpers/hex2bin';
 import hex2diag from "common/helpers/hex2diag";
@@ -32,8 +31,6 @@ const EDITOR_STYLE: CSSProperties = {
   fontSize: 12,
   height: "240px"
 } as const;
-
-// bg-gray-100 font-mono text-xs h-[240px] overflow-y-auto
 
 function CBOREditor({
   value,

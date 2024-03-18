@@ -7,6 +7,7 @@ import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import InfoItem from "common/components/InfoItem";
 import type { ExtractedWalletApi } from "types/cardano";
 import Button from "common/components/Button";
+import WarningIcon from '@mui/icons-material/Warning';
 
 type Props = {
   selectedWallets: string[];
@@ -59,6 +60,16 @@ function WalletInfoSection({
             <Tab.Panels className="h-full overflow-auto">
               {selectedWallets.map((wallet) => (
                 <Tab.Panel key={wallet} className="p-4 h-full">
+                  <div className="grid gap-2 pb-4">
+                    <InfoItem
+                      heading="API Version"
+                      value={getCardano(wallet).apiVersion}
+                    />
+                    <InfoItem
+                      heading="Supported Extensions"
+                      value={getCardano(wallet).supportedExtensions ?? null}
+                    />
+                  </div>
                   {walletApi[wallet] ? (
                     <div className="grid gap-2 pb-4">
                       <InfoItem
@@ -95,10 +106,17 @@ function WalletInfoSection({
                       />
                     </div>
                   ) : (
-                    <div className="flex items-center justify-center w-full h-full">
+                    <div className="flex flex-col gap-2 items-center justify-center w-full">
                       <Button disabled={enablingWallets.includes(wallet)} onClick={() => onEnable(wallet)}>
                         <p>Enable</p>
                       </Button>
+                      <h2 className="font-semibold">Extension (optional)</h2>
+                      <input
+                        className="rounded-md border border-solid border-black/10 p-2"
+                        type="number"
+                        name="cip"
+                        placeholder="cip..."
+                      />
                     </div>
                   )}
                 </Tab.Panel>
@@ -107,8 +125,11 @@ function WalletInfoSection({
           </Tab.Group>
         </div>
       ) : (
-        <div>
-          <p>Please select at least one wallet to view the information.</p>
+        <div className="p-4 rounded-md bg-amber-100 border border-solid border-amber-500 overflow-hidden">
+          <div className="flex gap-4">
+            <WarningIcon className="text-amber-500" />
+            <p>Please select at least one wallet to view the information.</p>
+          </div>
         </div>
       )}
     </section>
