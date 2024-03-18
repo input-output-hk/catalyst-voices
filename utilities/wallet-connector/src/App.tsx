@@ -2,8 +2,8 @@ import "react-toastify/dist/ReactToastify.css";
 
 import "./styles/global.css";
 
-import getCardano from "common/helpers/getCardano";
 import WalletCard from "common/components/WalletCard";
+import getCardano from "common/helpers/getCardano";
 import { isEmpty, pickBy, xor } from "lodash-es";
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
@@ -13,7 +13,6 @@ import extractApiData from "common/helpers/extractApiData";
 import WalletActionsSection from "modules/WalletActionsSection";
 import WalletInfoSection from "modules/WalletInfoSection";
 import type { ExtensionArguments, ExtractedWalletApi } from "types/cardano";
-import type { Cip30Wallet } from "@cardano-sdk/cip30";
 
 const queryClient = new QueryClient({
   defaultOptions: {
