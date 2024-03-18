@@ -1,5 +1,6 @@
 VERSION --try --global-cache 0.7
 
+# builder - Installs node packages.
 builder:
   FROM node:20-alpine
   WORKDIR /app
@@ -9,12 +10,14 @@ builder:
 
   RUN npm i
 
+# check - Runs checks against the source code including type checks and linting.
 check:
   FROM +builder
 
   RUN npm run check \
       && npm run lint
 
+# build - Builds the source code for deployment
 build:
   FROM +builder
 
@@ -22,6 +25,7 @@ build:
 
   SAVE ARTIFACT dist
 
+# local - Makes a docker image that can serve the docs for development purposes.
 local:
   FROM nginx:1.25-alpine
 
