@@ -46,11 +46,9 @@ pub struct PolicyAsset {
 pub fn parse_policy_assets(assets: &[MultiEraPolicyAssets<'_>]) -> Vec<PolicyAsset> {
     assets
         .iter()
-        .map(|asset| {
-            PolicyAsset {
-                policy_hash: asset.policy().to_string(),
-                assets: parse_child_assets(&asset.assets()),
-            }
+        .map(|asset| PolicyAsset {
+            policy_hash: asset.policy().to_string(),
+            assets: parse_child_assets(&asset.assets()),
         })
         .collect()
 }
@@ -59,25 +57,21 @@ pub fn parse_policy_assets(assets: &[MultiEraPolicyAssets<'_>]) -> Vec<PolicyAss
 pub fn parse_child_assets(assets: &[MultiEraAsset]) -> Vec<Asset> {
     assets
         .iter()
-        .filter_map(|asset| {
-            match asset {
-                MultiEraAsset::AlonzoCompatibleOutput(id, name, amount) => {
-                    Some(Asset {
-                        policy_id: id.to_string(),
-                        name: name.to_string(),
-                        amount: *amount,
-                    })
-                },
-                MultiEraAsset::AlonzoCompatibleMint(id, name, amount) => {
-                    let amount = u64::try_from(*amount).ok()?;
-                    Some(Asset {
-                        policy_id: id.to_string(),
-                        name: name.to_string(),
-                        amount,
-                    })
-                },
-                _ => Some(Asset::default()),
-            }
+        .filter_map(|asset| match asset {
+            MultiEraAsset::AlonzoCompatibleOutput(id, name, amount) => Some(Asset {
+                policy_id: id.to_string(),
+                name: name.to_string(),
+                amount: *amount,
+            }),
+            MultiEraAsset::AlonzoCompatibleMint(id, name, amount) => {
+                let amount = u64::try_from(*amount).ok()?;
+                Some(Asset {
+                    policy_id: id.to_string(),
+                    name: name.to_string(),
+                    amount,
+                })
+            },
+            _ => Some(Asset::default()),
         })
         .collect()
 }
@@ -103,13 +97,11 @@ pub fn extract_stake_credentials_from_certs(
                 pallas::ledger::primitives::alonzo::Certificate::StakeDelegation(
                     stake_credential,
                     _,
-                ) => {
-                    match stake_credential {
-                        StakeCredential::AddrKeyhash(stake_credential) => {
-                            stake_credentials.push(hex::encode(stake_credential.as_slice()));
-                        },
-                        StakeCredential::Scripthash(_) => (),
-                    }
+                ) => match stake_credential {
+                    StakeCredential::AddrKeyhash(stake_credential) => {
+                        stake_credentials.push(hex::encode(stake_credential.as_slice()));
+                    },
+                    StakeCredential::Scripthash(_) => (),
                 },
                 _ => continue,
             }
