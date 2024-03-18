@@ -38,7 +38,7 @@ impl EventDB {
                 Err(err) => return Err(Error::HashedWitnessExtraction(err.to_string())),
             };
 
-            let stake_credential =
+            let (_stake_credential, stake_credential_hash) =
                 match find_matching_stake_credential(&witnesses, &stake_credentials) {
                     Ok(s) => s,
                     Err(_err) => {
@@ -74,7 +74,11 @@ impl EventDB {
                                         .to_string(),
                                 )
                             })?,
-                            &stake_credential.as_bytes(),
+                            &hex::decode(stake_credential_hash.clone()).map_err(|e| {
+                                Error::DecodeHex(format!(
+                                    "Unable to decode stake credential hash {e}"
+                                ))
+                            })?,
                             &assets,
                         ],
                     )
