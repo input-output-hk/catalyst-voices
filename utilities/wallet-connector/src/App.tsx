@@ -4,15 +4,15 @@ import "./styles/global.css";
 
 import getCardano from "common/helpers/getCardano";
 import WalletCard from "common/components/WalletCard";
-import { pickBy, xor } from "lodash-es";
+import { isEmpty, pickBy, xor } from "lodash-es";
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
-import { ToastContainer } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 
 import extractApiData from "common/helpers/extractApiData";
 import WalletActionsSection from "modules/WalletActionsSection";
 import WalletInfoSection from "modules/WalletInfoSection";
-import type { ExtractedWalletApi } from "types/cardano";
+import type { ExtensionArguments, ExtractedWalletApi } from "types/cardano";
 import type { Cip30Wallet } from "@cardano-sdk/cip30";
 
 const queryClient = new QueryClient({
@@ -43,28 +43,35 @@ function App() {
     setSelectedWallets((prev) => xor(prev, [walletName]))
   }
 
-  async function handleEnableWallet(walletName: string) {
-    await handleEnableAllWallets([ walletName ]);
+  async function handleEnableWallet(walletName: string, extArg: ExtensionArguments) {
+    await handleEnableAllWallets([ walletName ], { [walletName]: extArg });
   }
 
-  async function handleEnableAllWallets(wallets?: string[]) {
+  async function handleEnableAllWallets(wallets: string[], walletExtArg: Record<string, ExtensionArguments>) {
     const toBeEnabledWallets = (wallets ?? selectedWallets).filter((wallet) => !walletApi[wallet]);
-    const mappedWalletProp = pickBy(getCardano(), (v, k) => toBeEnabledWallets.includes(k)) as Record<string, Cip30Wallet>;
+    const mappedWalletProp = pickBy(getCardano(), (v, k) => toBeEnabledWallets.includes(k));
 
     setEnablingWallets((prev) => [...prev, ...toBeEnabledWallets]);
 
-    const walletApis = await Promise.all(Object.entries(mappedWalletProp).map(async ([walletName, walletProps]) => {
-      const api = await walletProps.enable(/* { cip: 30 } */);
+    try {
+      const walletApis = await Promise.all(Object.entries(mappedWalletProp).map(async ([walletName, walletProps]) => {
+        const api = isEmpty(walletExtArg[walletName])
+          ? await walletProps.enable()
+          : await walletProps.enable({ extensions: [walletExtArg[walletName]] });
+  
+        const extractedApi = await extractApiData(api);
+  
+        return [walletName, extractedApi]
+      }));
 
-      const extractedApi = await extractApiData(api);
+      console.log("api", walletApis);
 
-      return [walletName, extractedApi]
-    }));
-
-    console.log("api", walletApis);
-
-    setWalletApi((prev) => ({ ...prev, ...Object.fromEntries(walletApis) }));
-    setEnablingWallets((prev) => prev.filter((wallet) => !toBeEnabledWallets.includes(wallet)));
+      setWalletApi((prev) => ({ ...prev, ...Object.fromEntries(walletApis) }));
+    } catch (err) {
+      toast.error(String(err))
+    } finally {
+      setEnablingWallets((prev) => prev.filter((wallet) => !toBeEnabledWallets.includes(wallet)));
+    }
   }
 
   return (

@@ -57,7 +57,7 @@ function SignTxnPanel({
 
   async function handleExecute(formValues: FormValues) {
     if (!selectedWallets.length) {
-      return toast.error("Please select at least one wallet to execute.")
+      return void toast.error("Please select at least one wallet to execute.")
     }
 
     await mutateAsync([cleanHex(formValues.tx), formValues.partialSign]);

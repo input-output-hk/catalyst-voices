@@ -2,6 +2,17 @@ import * as cip30 from "@cardano-sdk/cip30";
 
 type Extracted<T extends (...args: any) => any> = Awaited<ReturnType<T>>;
 
+export type WalletCollections = {
+  [k: string]: Omit<cip30.Cip30Wallet, "enable"> & {
+    enable(args: { extensions: { cip: number }[] }): Promise<cip30.WalletApi>;
+    supportedExtensions: { cip: number }[];
+  }
+};
+
+export type ExtensionArguments = {
+  cip?: number
+}
+
 export type ExtractedWalletApi = {
   networkId: Extracted<cip30.GetNetworkId>;
   utxos: Extracted<cip30.GetUtxos>;

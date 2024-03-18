@@ -1,20 +1,25 @@
 import { Tab } from "@headlessui/react";
 import getCardano from "common/helpers/getCardano";
-import { noop } from "lodash-es";
+import { noop, pickBy } from "lodash-es";
 import { Fragment } from "react/jsx-runtime";
 import { twMerge } from "tailwind-merge";
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import InfoItem from "common/components/InfoItem";
-import type { ExtractedWalletApi } from "types/cardano";
+import type { ExtensionArguments, ExtractedWalletApi } from "types/cardano";
 import Button from "common/components/Button";
 import WarningIcon from '@mui/icons-material/Warning';
+import { useForm } from "react-hook-form";
 
 type Props = {
   selectedWallets: string[];
   enablingWallets: string[];
   walletApi: Record<string, ExtractedWalletApi>;
-  onEnable?: (walletName: string) => void;
-  onEnableAll?: () => void;
+  onEnable?: (walletName: string, extArg: ExtensionArguments) => void;
+  onEnableAll?: (walletNames: string[], walletExtArg: Record<string, ExtensionArguments>) => void;
+}
+
+type FormValues = {
+  [walletName: string]: ExtensionArguments;
 }
 
 function WalletInfoSection({
@@ -24,7 +29,18 @@ function WalletInfoSection({
   onEnable = noop,
   onEnableAll = noop,
 }: Props) {
-  const allEnabled = selectedWallets.every((wallet) => walletApi[wallet]);
+  const { register, getValues } = useForm<FormValues>();
+
+  const disabledWallets = selectedWallets.filter((wallet) => !walletApi[wallet]);
+  const allEnabled = !disabledWallets.length;
+
+  function handleEnableWallet(wallet: string) {
+    const arg = getValues(wallet);
+
+    console.log(arg);
+
+    onEnable(wallet, pickBy(arg, Boolean))
+  }
 
   return (
     <section className="grid gap-4">
@@ -37,7 +53,7 @@ function WalletInfoSection({
                 <p className="font-semibold">Selected wallets: {selectedWallets.length}</p>
               </div>
               <div className="flex items-center">
-                <Button className={twMerge(allEnabled && "invisible")} onClick={() => onEnableAll()}>
+                <Button className={twMerge(allEnabled && "invisible")} onClick={() => onEnableAll(disabledWallets, {})}>
                   <p>Enable all wallets</p>
                 </Button>
               </div>
@@ -107,15 +123,15 @@ function WalletInfoSection({
                     </div>
                   ) : (
                     <div className="flex flex-col gap-2 items-center justify-center w-full">
-                      <Button disabled={enablingWallets.includes(wallet)} onClick={() => onEnable(wallet)}>
+                      <Button disabled={enablingWallets.includes(wallet)} onClick={() => handleEnableWallet(wallet)}>
                         <p>Enable</p>
                       </Button>
-                      <h2 className="font-semibold">Extension (optional)</h2>
+                      <h2 className="font-semibold">Extension</h2>
                       <input
                         className="rounded-md border border-solid border-black/10 p-2"
                         type="number"
-                        name="cip"
-                        placeholder="cip..."
+                        placeholder="cip (optional)"
+                        {...register(`${wallet}.cip`, { valueAsNumber: true })}
                       />
                     </div>
                   )}
