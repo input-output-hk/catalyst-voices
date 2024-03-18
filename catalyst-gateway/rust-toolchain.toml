@@ -1,5 +1,5 @@
 [toolchain]
-channel = "1.75.0"
+channel = "nightly"
 profile = "default"
 components = []
 targets = ["x86_64-unknown-linux-musl"]

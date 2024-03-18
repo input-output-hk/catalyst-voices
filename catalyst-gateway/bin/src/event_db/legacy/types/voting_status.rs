@@ -2,6 +2,7 @@
 use super::objective::ObjectiveId;
 
 /// A voting status
+#[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct VotingStatus {
     /// The objective ID
