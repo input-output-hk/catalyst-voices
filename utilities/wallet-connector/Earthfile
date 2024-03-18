@@ -4,7 +4,7 @@ builder:
   FROM node:20-alpine
   WORKDIR /app
   COPY package.json package-lock.json .
-  COPY index.html postcss.config.js tailwind.config.js tsconfig* vite.config.ts .
+  COPY index.html postcss.config.js tailwind.config.js tsconfig* vite.config.ts .eslintrc.yaml .prettierrc.yaml .
   COPY src ./src
 
   RUN npm i
@@ -12,7 +12,8 @@ builder:
 check:
   FROM +builder
 
-  RUN npx tsc --noEmit
+  RUN npm run check \
+      && npm run lint
 
 build:
   FROM +builder
