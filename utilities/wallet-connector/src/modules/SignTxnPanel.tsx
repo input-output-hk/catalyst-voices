@@ -1,26 +1,27 @@
-import type { SignTx } from '@cardano-sdk/cip30';
-import RefreshIcon from '@mui/icons-material/Refresh';
-import cleanHex from 'common/helpers/cleanHex';
+import type { SignTx } from "@cardano-sdk/cip30";
+import RefreshIcon from "@mui/icons-material/Refresh";
+import { useState } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { useMutation } from "react-query";
+import { toast } from "react-toastify";
+
 import Button from "common/components/Button";
 import CBOREditor from "common/components/CBOREditor";
 import CheckBox from "common/components/CheckBox";
 import InputBlock from "common/components/InputBlock";
-import WalletResponseSelection from 'common/components/WalletResponseSelection';
-import { useState } from 'react';
-import { Controller, useForm } from "react-hook-form";
-import { useMutation } from "react-query";
-import { toast } from 'react-toastify';
-import type { ExtractedWalletApi } from 'types/cardano';
+import WalletResponseSelection from "common/components/WalletResponseSelection";
+import cleanHex from "common/helpers/cleanHex";
+import type { ExtractedWalletApi } from "types/cardano";
 
 type Props = {
   selectedWallets: string[];
   walletApi: Record<string, ExtractedWalletApi>;
-}
+};
 
 type FormValues = {
   partialSign: boolean;
   tx: string;
-}
+};
 
 function SignTxnPanel({
   selectedWallets,
@@ -57,7 +58,7 @@ function SignTxnPanel({
 
   async function handleExecute(formValues: FormValues) {
     if (!selectedWallets.length) {
-      return void toast.error("Please select at least one wallet to execute.")
+      return void toast.error("Please select at least one wallet to execute.");
     }
 
     await mutateAsync([cleanHex(formValues.tx), formValues.partialSign]);
@@ -123,7 +124,7 @@ function SignTxnPanel({
         </>
       )}
     </div>
-  )
+  );
 }
 
 export default SignTxnPanel;

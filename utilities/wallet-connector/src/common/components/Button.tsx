@@ -10,7 +10,7 @@ function Button({ children, className = "", type = "button", ...props }: Props) 
     <button type={type} className={twMerge("bg-primary rounded-md px-4 py-2 text-white", className)} {...props}>
       {children}
     </button>
-  )
+  );
 }
 
 export default Button;

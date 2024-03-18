@@ -1,7 +1,8 @@
+import { noop } from "lodash-es";
 import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { twMerge } from "tailwind-merge";
+
 import WalletCard from "./WalletCard";
-import { noop } from "lodash-es";
 
 type Props = {
   selectedWallet: string;
@@ -27,7 +28,7 @@ function WalletResponseSelection({ wallets, selectedWallet, onSelect = noop }: P
         />
       ))}
     </div>
-  )
+  );
 }
 
 export default WalletResponseSelection;

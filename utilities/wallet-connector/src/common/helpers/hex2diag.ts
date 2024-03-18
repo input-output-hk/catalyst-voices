@@ -1,4 +1,5 @@
 import { tokensToDiagnostic } from "cborg/lib/diagnostic";
+
 import hex2bin from "./hex2bin";
 
 export default function hex2diag(hexString: string): string {

@@ -11,7 +11,7 @@ export type WalletCollections = {
 
 export type ExtensionArguments = {
   cip?: number
-}
+};
 
 export type ExtractedWalletApi = {
   networkId: Extracted<cip30.GetNetworkId>;
@@ -25,4 +25,4 @@ export type ExtractedWalletApi = {
   signTx: cip30.SignTx;
   signData: cip30.SignData;
   submitTx: cip30.SubmitTx;
-}
+};

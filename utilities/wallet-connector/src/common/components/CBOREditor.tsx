@@ -1,16 +1,17 @@
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
-import { decode, encode } from 'cborg';
-import bin2hex from 'common/helpers/bin2hex';
-import diag2hex from 'common/helpers/diag2hex';
-import hex2bin from 'common/helpers/hex2bin';
-import hex2diag from "common/helpers/hex2diag";
-import readFile from "common/helpers/readFile";
+import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
+import { decode, encode } from "cborg";
 import { noop } from "lodash-es";
 import { useEffect, useState, type CSSProperties } from "react";
 import AceEditor from "react-ace";
 import { useDropzone } from "react-dropzone";
 import { toast } from "react-toastify";
 import { twMerge } from "tailwind-merge";
+
+import bin2hex from "common/helpers/bin2hex";
+import diag2hex from "common/helpers/diag2hex";
+import hex2bin from "common/helpers/hex2bin";
+import hex2diag from "common/helpers/hex2diag";
+import readFile from "common/helpers/readFile";
 
 import "ace-builds/src-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/mode-json";
@@ -23,7 +24,7 @@ type Props = {
   value: string;
   isReadOnly?: boolean;
   onChange?: (value: string) => void;
-}
+};
 
 const EDITOR_STYLE: CSSProperties = {
   width: "100%",
@@ -59,26 +60,26 @@ function CBOREditor({
 
       if (acceptedFile.type === "application/octet-stream") {
         const result = await readFile(acceptedFile, "buffer") as ArrayBuffer;
-        onChange(bin2hex(new Uint8Array(result)))
+        onChange(bin2hex(new Uint8Array(result)));
       } else if (acceptedFile.type === "application/json") {
         const result = await readFile(acceptedFile, "text") as string;
         try {
-          const finalResult = bin2hex(encode(JSON.parse(result)))
+          const finalResult = bin2hex(encode(JSON.parse(result)));
           onChange(finalResult);
         } catch (err) {
-          toast.error("Failed to read a JSON file.")
+          toast.error("Failed to read a JSON file.");
         }
       } else if (acceptedFile.type === "text/plain") {
         const result = await readFile(acceptedFile, "text") as string;
-        onChange(bin2hex(hex2bin(result)))
+        onChange(bin2hex(hex2bin(result)));
       } else {
         toast.error(`The uploaded file type is unacceptable (${acceptedFile.type}).`);
       }
 
-      setShouldRefresh(true)
-      setFocusingSide(null)
+      setShouldRefresh(true);
+      setFocusingSide(null);
     }
-  })
+  });
 
   useEffect(() => {
     if (shouldRefresh) {
@@ -181,7 +182,7 @@ function CBOREditor({
         />
       </div>
     </div>
-  )
+  );
 }
 
 export default CBOREditor;

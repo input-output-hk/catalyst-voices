@@ -1,10 +1,11 @@
 import { toast } from "react-toastify";
+
 import type { ExtensionArguments } from "types/cardano";
 
 type Props = {
   heading: string;
   value: string | string[] | null | ExtensionArguments[];
-}
+};
 
 function InfoItem({ heading, value }: Props) {
   async function handleCopy(value: string) {
@@ -32,7 +33,7 @@ function InfoItem({ heading, value }: Props) {
         <p className="w-fit break-all">{String(value) || "-"}</p>
       )}
     </div>
-  )
+  );
 }
 
 export default InfoItem;

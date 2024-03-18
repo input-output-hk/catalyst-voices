@@ -1,7 +1,7 @@
-import CheckBoxIcon from '@mui/icons-material/CheckBox';
-import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
-import RadioButtonCheckedIcon from '@mui/icons-material/RadioButtonChecked';
-import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
+import RadioButtonCheckedIcon from "@mui/icons-material/RadioButtonChecked";
+import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import { noop } from "lodash-es";
 
 type Props = {
@@ -9,7 +9,7 @@ type Props = {
   value: boolean;
   label?: string;
   onChange?: (value: boolean) => void;
-}
+};
 
 function CheckBox({
   variant = "checkbox",
@@ -30,7 +30,7 @@ function CheckBox({
       )}
       {label && <div>{label}</div>}
     </button>
-  )
+  );
 }
 
 export default CheckBox;

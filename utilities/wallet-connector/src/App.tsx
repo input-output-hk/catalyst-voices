@@ -2,14 +2,14 @@ import "react-toastify/dist/ReactToastify.css";
 
 import "./styles/global.css";
 
-import WalletCard from "common/components/WalletCard";
-import getCardano from "common/helpers/getCardano";
 import { isEmpty, pickBy, xor } from "lodash-es";
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { ToastContainer, toast } from "react-toastify";
 
+import WalletCard from "common/components/WalletCard";
 import extractApiData from "common/helpers/extractApiData";
+import getCardano from "common/helpers/getCardano";
 import WalletActionsSection from "modules/WalletActionsSection";
 import WalletInfoSection from "modules/WalletInfoSection";
 import type { ExtensionArguments, ExtractedWalletApi } from "types/cardano";
@@ -39,7 +39,7 @@ function App() {
   const isCardanoActivated = typeof getCardano() !== "undefined";
 
   function handleWalletCardClick(walletName: string) {
-    setSelectedWallets((prev) => xor(prev, [walletName]))
+    setSelectedWallets((prev) => xor(prev, [walletName]));
   }
 
   async function handleEnableWallet(walletName: string, extArg: ExtensionArguments) {
@@ -60,14 +60,14 @@ function App() {
   
         const extractedApi = await extractApiData(api);
   
-        return [walletName, extractedApi]
+        return [walletName, extractedApi];
       }));
 
       console.log("api", walletApis);
 
       setWalletApi((prev) => ({ ...prev, ...Object.fromEntries(walletApis) }));
     } catch (err) {
-      toast.error(String(err))
+      toast.error(String(err));
     } finally {
       setEnablingWallets((prev) => prev.filter((wallet) => !toBeEnabledWallets.includes(wallet)));
     }

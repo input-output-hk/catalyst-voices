@@ -1,11 +1,13 @@
 import { Tab } from "@headlessui/react";
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { Fragment } from "react/jsx-runtime";
 import { twMerge } from "tailwind-merge";
+
+import type { ExtractedWalletApi } from "types/cardano";
+
 import SignDataPanel from "./SignDataPanel";
 import SignTxnPanel from "./SignTxnPanel";
 import SubmitTxnPanel from "./SubmitTxnPanel";
-import type { ExtractedWalletApi } from "types/cardano";
 
 const ACTIONS = [
   "Sign Transaction",
@@ -16,7 +18,7 @@ const ACTIONS = [
 type Props = {
   selectedWallets: string[];
   walletApi: Record<string, ExtractedWalletApi>;
-}
+};
 
 function WalletActionsSection({
   walletApi,
@@ -60,7 +62,7 @@ function WalletActionsSection({
         </Tab.Group>
       </div>
     </section>
-  )
+  );
 }
 
 export default WalletActionsSection;

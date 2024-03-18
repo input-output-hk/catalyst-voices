@@ -6,7 +6,7 @@ type Props = {
   variant: "inline" | "block",
   name: string,
   children: ReactNode
-}
+};
 
 function InputBlock({ variant, name, children }: Props) {
   return (
@@ -19,7 +19,7 @@ function InputBlock({ variant, name, children }: Props) {
         {children}
       </div>
     </div>
-  )
+  );
 }
 
 export default InputBlock;

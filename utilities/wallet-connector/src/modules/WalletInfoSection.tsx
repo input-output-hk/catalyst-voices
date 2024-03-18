@@ -1,14 +1,15 @@
 import { Tab } from "@headlessui/react";
-import getCardano from "common/helpers/getCardano";
+import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+import WarningIcon from "@mui/icons-material/Warning";
 import { noop, pickBy } from "lodash-es";
 import { Fragment } from "react/jsx-runtime";
-import { twMerge } from "tailwind-merge";
-import ArrowRightIcon from '@mui/icons-material/ArrowRight';
-import InfoItem from "common/components/InfoItem";
-import type { ExtensionArguments, ExtractedWalletApi } from "types/cardano";
-import Button from "common/components/Button";
-import WarningIcon from '@mui/icons-material/Warning';
 import { useForm } from "react-hook-form";
+import { twMerge } from "tailwind-merge";
+
+import Button from "common/components/Button";
+import InfoItem from "common/components/InfoItem";
+import getCardano from "common/helpers/getCardano";
+import type { ExtensionArguments, ExtractedWalletApi } from "types/cardano";
 
 type Props = {
   selectedWallets: string[];
@@ -16,11 +17,11 @@ type Props = {
   walletApi: Record<string, ExtractedWalletApi>;
   onEnable?: (walletName: string, extArg: ExtensionArguments) => void;
   onEnableAll?: (walletNames: string[], walletExtArg: Record<string, ExtensionArguments>) => void;
-}
+};
 
 type FormValues = {
   [walletName: string]: ExtensionArguments;
-}
+};
 
 function WalletInfoSection({
   selectedWallets,
@@ -39,7 +40,7 @@ function WalletInfoSection({
 
     console.log(arg);
 
-    onEnable(wallet, pickBy(arg, Boolean))
+    onEnable(wallet, pickBy(arg, Boolean));
   }
 
   return (
@@ -149,7 +150,7 @@ function WalletInfoSection({
         </div>
       )}
     </section>
-  )
+  );
 }
 
 export default WalletInfoSection;
