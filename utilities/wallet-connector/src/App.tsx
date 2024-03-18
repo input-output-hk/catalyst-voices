@@ -50,10 +50,9 @@ function App() {
     wallets: string[],
     walletExtArg: Record<string, ExtensionArguments>
   ) {
-    const toBeEnabledWallets = (wallets ?? selectedWallets).filter((wallet) => !walletApi[wallet]);
-    const mappedWalletProp = pickBy(getCardano(), (v, k) => toBeEnabledWallets.includes(k));
+    const mappedWalletProp = pickBy(getCardano(), (v, k) => wallets.includes(k));
 
-    setEnablingWallets((prev) => [...prev, ...toBeEnabledWallets]);
+    setEnablingWallets((prev) => [...prev, ...wallets]);
 
     try {
       const walletApis = await Promise.all(
@@ -74,7 +73,7 @@ function App() {
     } catch (err) {
       toast.error(String(err));
     } finally {
-      setEnablingWallets((prev) => prev.filter((wallet) => !toBeEnabledWallets.includes(wallet)));
+      setEnablingWallets((prev) => prev.filter((wallet) => !wallets.includes(wallet)));
     }
   }
 

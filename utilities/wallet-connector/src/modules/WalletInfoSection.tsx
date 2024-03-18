@@ -38,8 +38,6 @@ function WalletInfoSection({
   function handleEnableWallet(wallet: string) {
     const arg = getValues(wallet);
 
-    console.log(arg);
-
     onEnable(wallet, pickBy(arg, Boolean));
   }
 
@@ -84,16 +82,16 @@ function WalletInfoSection({
             </Tab.List>
             <Tab.Panels className="h-full overflow-auto">
               {selectedWallets.map((wallet) => (
-                <Tab.Panel key={wallet} className="p-4 h-full">
-                  <div className="grid gap-2 pb-4">
+                <Tab.Panel key={wallet} className="grid gap-4 p-4 h-full">
+                  <div className="grid gap-2">
                     <InfoItem heading="API Version" value={getCardano(wallet).apiVersion} />
                     <InfoItem
                       heading="Supported Extensions"
                       value={getCardano(wallet).supportedExtensions ?? null}
                     />
                   </div>
-                  {walletApi[wallet] ? (
-                    <div className="grid gap-2 pb-4">
+                  {Boolean(walletApi[wallet]) && (
+                    <div className="grid gap-2">
                       <InfoItem
                         heading="Balance Lovelace"
                         value={walletApi[wallet]?.balance ?? null}
@@ -124,23 +122,23 @@ function WalletInfoSection({
                         value={walletApi[wallet]?.rewardAddresses ?? null}
                       />
                     </div>
-                  ) : (
-                    <div className="flex flex-col gap-2 items-center justify-center w-full">
-                      <Button
-                        disabled={enablingWallets.includes(wallet)}
-                        onClick={() => handleEnableWallet(wallet)}
-                      >
-                        <p>Enable</p>
-                      </Button>
-                      <h2 className="font-semibold">Extension</h2>
-                      <input
-                        className="rounded-md border border-solid border-black/10 p-2"
-                        type="number"
-                        placeholder="cip (optional)"
-                        {...register(`${wallet}.cip`, { valueAsNumber: true })}
-                      />
-                    </div>
                   )}
+                  <div className="h-px bg-black/10"></div>
+                  <div className="flex flex-col gap-2 items-center justify-center pb-4">
+                    <Button
+                      disabled={enablingWallets.includes(wallet)}
+                      onClick={() => handleEnableWallet(wallet)}
+                    >
+                      <p>{walletApi[wallet] ? "Re-Enable" : "Enable"}</p>
+                    </Button>
+                    <h2 className="font-semibold">Extension</h2>
+                    <input
+                      className="rounded-md border border-solid border-black/10 p-2"
+                      type="number"
+                      placeholder="cip (optional)"
+                      {...register(`${wallet}.cip`, { valueAsNumber: true })}
+                    />
+                  </div>
                 </Tab.Panel>
               ))}
             </Tab.Panels>
