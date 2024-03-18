@@ -34,8 +34,6 @@ function App() {
   // wallet name selections
   const [selectedWallets, setSelectedWallets] = useState<string[]>([]);
 
-  console.log(getCardano());
-
   const isCardanoActivated = typeof getCardano() !== "undefined";
 
   function handleWalletCardClick(walletName: string) {
@@ -66,8 +64,6 @@ function App() {
           return [walletName, extractedApi];
         })
       );
-
-      console.log("api", walletApis);
 
       setWalletApi((prev) => ({ ...prev, ...Object.fromEntries(walletApis) }));
     } catch (err) {
