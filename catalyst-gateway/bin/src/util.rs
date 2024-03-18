@@ -46,11 +46,9 @@ pub struct PolicyAsset {
 pub fn parse_policy_assets(assets: &[MultiEraPolicyAssets<'_>]) -> Vec<PolicyAsset> {
     assets
         .iter()
-        .map(|asset| {
-            PolicyAsset {
-                policy_hash: asset.policy().to_string(),
-                assets: parse_child_assets(&asset.assets()),
-            }
+        .map(|asset| PolicyAsset {
+            policy_hash: asset.policy().to_string(),
+            assets: parse_child_assets(&asset.assets()),
         })
         .collect()
 }
@@ -59,25 +57,21 @@ pub fn parse_policy_assets(assets: &[MultiEraPolicyAssets<'_>]) -> Vec<PolicyAss
 pub fn parse_child_assets(assets: &[MultiEraAsset]) -> Vec<Asset> {
     assets
         .iter()
-        .filter_map(|asset| {
-            match asset {
-                MultiEraAsset::AlonzoCompatibleOutput(id, name, amount) => {
-                    Some(Asset {
-                        policy_id: id.to_string(),
-                        name: name.to_string(),
-                        amount: *amount,
-                    })
-                },
-                MultiEraAsset::AlonzoCompatibleMint(id, name, amount) => {
-                    let amount = u64::try_from(*amount).ok()?;
-                    Some(Asset {
-                        policy_id: id.to_string(),
-                        name: name.to_string(),
-                        amount,
-                    })
-                },
-                _ => Some(Asset::default()),
-            }
+        .filter_map(|asset| match asset {
+            MultiEraAsset::AlonzoCompatibleOutput(id, name, amount) => Some(Asset {
+                policy_id: id.to_string(),
+                name: name.to_string(),
+                amount: *amount,
+            }),
+            MultiEraAsset::AlonzoCompatibleMint(id, name, amount) => {
+                let amount = u64::try_from(*amount).ok()?;
+                Some(Asset {
+                    policy_id: id.to_string(),
+                    name: name.to_string(),
+                    amount,
+                })
+            },
+            _ => Some(Asset::default()),
         })
         .collect()
 }
@@ -103,13 +97,11 @@ pub fn extract_stake_credentials_from_certs(
                 pallas::ledger::primitives::alonzo::Certificate::StakeDelegation(
                     stake_credential,
                     _,
-                ) => {
-                    match stake_credential {
-                        StakeCredential::AddrKeyhash(stake_credential) => {
-                            stake_credentials.push(hex::encode(stake_credential.as_slice()));
-                        },
-                        StakeCredential::Scripthash(_) => (),
-                    }
+                ) => match stake_credential {
+                    StakeCredential::AddrKeyhash(stake_credential) => {
+                        stake_credentials.push(hex::encode(stake_credential.as_slice()));
+                    },
+                    StakeCredential::Scripthash(_) => (),
                 },
                 _ => continue,
             }
@@ -120,6 +112,8 @@ pub fn extract_stake_credentials_from_certs(
 }
 
 /// Extract witness pub keys and pair with blake2b hash of the pub key.
+/// Hashes are generally 32-byte long on Cardano (or 256 bits),
+/// except for credentials (i.e. keys or scripts) which are 28-byte long (or 224 bits)
 pub fn extract_hashed_witnesses(
     witnesses: &[VKeyWitness],
 ) -> Result<Vec<(WitnessPubKey, WitnessHash)>, Box<dyn Error>> {
@@ -131,9 +125,6 @@ pub fn extract_hashed_witnesses(
 
         let bytes = public_key.as_bytes();
         let pub_key_hex = hex::encode(bytes);
-
-        // Hashes are generally 32-byte long on Cardano (or 256 bits),
-        // except for credentials (i.e. keys or scripts) which are 28-byte long (or 224 bits)
 
         let mut digest = [0u8; 28];
         let mut context = Blake2b::new(28);
