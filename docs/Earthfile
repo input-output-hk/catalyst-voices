@@ -6,7 +6,7 @@ VERSION 0.7
 # Copy all the source we need to build the docs
 src:
     # Common src setup
-    DO github.com/input-output-hk/catalyst-ci/earthly/docs:v2.9.5+SRC
+    DO github.com/input-output-hk/catalyst-ci/earthly/docs:v2.9.7+SRC
 
     # Now copy into that any artifacts we pull from the builds.
     COPY --dir ../+repo-docs/repo /docs/includes
@@ -21,12 +21,12 @@ src:
 docs:
     FROM +src
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/docs:v2.9.5+BUILD
+    DO github.com/input-output-hk/catalyst-ci/earthly/docs:v2.9.7+BUILD
 
 # Make a locally runable container that can serve the docs.
 local:
     # Build a self contained service to show built docs locally.
-    DO github.com/input-output-hk/catalyst-ci/earthly/docs:v2.9.5+PACKAGE
+    DO github.com/input-output-hk/catalyst-ci/earthly/docs:v2.9.7+PACKAGE
 
     # Copy the static pages into the container
     COPY +docs/ /usr/share/nginx/html
