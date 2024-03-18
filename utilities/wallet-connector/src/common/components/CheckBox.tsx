@@ -11,22 +11,13 @@ type Props = {
   onChange?: (value: boolean) => void;
 };
 
-function CheckBox({
-  variant = "checkbox",
-  value,
-  label = "",
-  onChange = noop
-}: Props) {
+function CheckBox({ variant = "checkbox", value, label = "", onChange = noop }: Props) {
   return (
     <button type="button" className="flex gap-2" onClick={() => onChange(!value)}>
       {variant === "checkbox" ? (
-        <div>
-          {value ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}
-        </div>
+        <div>{value ? <CheckBoxIcon /> : <CheckBoxOutlineBlankIcon />}</div>
       ) : (
-        <div>
-          {value ? <RadioButtonCheckedIcon /> : <RadioButtonUncheckedIcon />}
-        </div>
+        <div>{value ? <RadioButtonCheckedIcon /> : <RadioButtonUncheckedIcon />}</div>
       )}
       {label && <div>{label}</div>}
     </button>

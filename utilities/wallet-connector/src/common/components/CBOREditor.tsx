@@ -30,21 +30,17 @@ const EDITOR_STYLE: CSSProperties = {
   width: "100%",
   fontFamily: "Fira Code, monospace",
   fontSize: 12,
-  height: "240px"
+  height: "240px",
 } as const;
 
-function CBOREditor({
-  value,
-  isReadOnly = false,
-  onChange = noop
-}: Props) {
+function CBOREditor({ value, isReadOnly = false, onChange = noop }: Props) {
   const [shouldRefresh, setShouldRefresh] = useState(true);
   const [mode, setMode] = useState<Mode>("bin2diag");
   const [focusingSide, setFocusingSide] = useState<Side | null>(null);
   const [lhsValue, setLhsValue] = useState("");
   const [rhsValue, setRhsValue] = useState("");
 
-  const {getRootProps, getInputProps, isDragActive, open} = useDropzone({
+  const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
     accept: {
       "text/plain": [".txt"],
       "application/json": [".json"],
@@ -53,16 +49,16 @@ function CBOREditor({
     multiple: false,
     disabled: isReadOnly,
     noClick: true,
-    onDrop: async ([ acceptedFile ]: File[]) => {
+    onDrop: async ([acceptedFile]: File[]) => {
       if (!acceptedFile) {
         return void toast.error("Invalid file.");
       }
 
       if (acceptedFile.type === "application/octet-stream") {
-        const result = await readFile(acceptedFile, "buffer") as ArrayBuffer;
+        const result = (await readFile(acceptedFile, "buffer")) as ArrayBuffer;
         onChange(bin2hex(new Uint8Array(result)));
       } else if (acceptedFile.type === "application/json") {
-        const result = await readFile(acceptedFile, "text") as string;
+        const result = (await readFile(acceptedFile, "text")) as string;
         try {
           const finalResult = bin2hex(encode(JSON.parse(result)));
           onChange(finalResult);
@@ -70,7 +66,7 @@ function CBOREditor({
           toast.error("Failed to read a JSON file.");
         }
       } else if (acceptedFile.type === "text/plain") {
-        const result = await readFile(acceptedFile, "text") as string;
+        const result = (await readFile(acceptedFile, "text")) as string;
         onChange(bin2hex(hex2bin(result)));
       } else {
         toast.error(`The uploaded file type is unacceptable (${acceptedFile.type}).`);
@@ -78,21 +74,22 @@ function CBOREditor({
 
       setShouldRefresh(true);
       setFocusingSide(null);
-    }
+    },
   });
 
   useEffect(() => {
     if (shouldRefresh) {
       try {
-        const rhsValue = mode === "bin2diag"
-        ? hex2diag(value)
-        : JSON.stringify(value ? decode(hex2bin(value)) : undefined, null, 2);
+        const rhsValue =
+          mode === "bin2diag"
+            ? hex2diag(value)
+            : JSON.stringify(value ? decode(hex2bin(value)) : undefined, null, 2);
 
         setRhsValue(rhsValue);
       } catch (e) {
         setRhsValue(String(e));
       }
-      
+
       setLhsValue(value);
       setShouldRefresh(false);
     }
@@ -105,26 +102,16 @@ function CBOREditor({
 
     result.includes("Error:")
       ? setRhsValue(hex2diag(value))
-      : (
-        onChange(value),
-        setShouldRefresh(true)
-      );
+      : (onChange(value), setShouldRefresh(true));
   }
 
   function handleRhsChange(value: string) {
     setRhsValue(value);
 
     try {
-      const result = mode === "bin2diag"
-        ? diag2hex(value)
-        : bin2hex(encode(JSON.parse(value)));
+      const result = mode === "bin2diag" ? diag2hex(value) : bin2hex(encode(JSON.parse(value)));
 
-      result.includes("Error:")
-        ? setLhsValue(result)
-        : (
-          onChange(result),
-          setShouldRefresh(true)
-        );
+      result.includes("Error:") ? setLhsValue(result) : (onChange(result), setShouldRefresh(true));
     } catch (e) {
       setLhsValue(String(e));
     }
@@ -132,24 +119,34 @@ function CBOREditor({
 
   function switchMode() {
     setFocusingSide("lhs");
-    setMode((prev) => prev === "bin2diag" ? "bin2json" : "bin2diag");
+    setMode((prev) => (prev === "bin2diag" ? "bin2json" : "bin2diag"));
     setShouldRefresh(true);
   }
 
   return (
     <div
-      className={twMerge("relative rounded-md border border-solid border-black/10 overflow-hidden", isDragActive && "border-secondary")}
+      className={twMerge(
+        "relative rounded-md border border-solid border-black/10 overflow-hidden",
+        isDragActive && "border-secondary"
+      )}
       {...getRootProps()}
     >
       <input {...getInputProps()} />
-      <div className={twMerge("absolute bg-secondary/50 w-full h-full z-10", isDragActive ? "block" : "hidden")}></div>
+      <div
+        className={twMerge(
+          "absolute bg-secondary/50 w-full h-full z-10",
+          isDragActive ? "block" : "hidden"
+        )}
+      ></div>
       <div className="px-2 py-1 flex items-center justify-between">
         <p className="flex gap-2 text-sm">
           <span>CBOR Editor</span>
           {!isReadOnly && (
             <>
               <span>|</span>
-              <button type="button" className="hover:underline" onClick={open}>Upload</button>
+              <button type="button" className="hover:underline" onClick={open}>
+                Upload
+              </button>
             </>
           )}
         </p>

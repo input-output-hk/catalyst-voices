@@ -10,7 +10,7 @@ export default async function extractApiData(api: WalletApi): Promise<ExtractedW
       return `Failed: ${String(err)}` as T;
     }
   };
-  
+
   return {
     networkId: await safeTry(api.getNetworkId),
     utxos: await safeTry(api.getUtxos),

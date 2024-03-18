@@ -5,7 +5,7 @@ type Props = {
   walletApi: Record<string, ExtractedWalletApi>;
 };
 
-function SubmitTxnPanel({ }: Props) {
+function SubmitTxnPanel({}: Props) {
   return (
     <div className="grid gap-4">
       <div className="grid gap-2">

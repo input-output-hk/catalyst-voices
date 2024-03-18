@@ -18,12 +18,12 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: false,
-      refetchOnWindowFocus: false
+      refetchOnWindowFocus: false,
     },
     mutations: {
-      retry: false
-    }
-  }
+      retry: false,
+    },
+  },
 });
 
 function App() {
@@ -43,25 +43,30 @@ function App() {
   }
 
   async function handleEnableWallet(walletName: string, extArg: ExtensionArguments) {
-    await handleEnableAllWallets([ walletName ], { [walletName]: extArg });
+    await handleEnableAllWallets([walletName], { [walletName]: extArg });
   }
 
-  async function handleEnableAllWallets(wallets: string[], walletExtArg: Record<string, ExtensionArguments>) {
+  async function handleEnableAllWallets(
+    wallets: string[],
+    walletExtArg: Record<string, ExtensionArguments>
+  ) {
     const toBeEnabledWallets = (wallets ?? selectedWallets).filter((wallet) => !walletApi[wallet]);
     const mappedWalletProp = pickBy(getCardano(), (v, k) => toBeEnabledWallets.includes(k));
 
     setEnablingWallets((prev) => [...prev, ...toBeEnabledWallets]);
 
     try {
-      const walletApis = await Promise.all(Object.entries(mappedWalletProp).map(async ([walletName, walletProps]) => {
-        const api = isEmpty(walletExtArg[walletName])
-          ? await walletProps.enable()
-          : await walletProps.enable({ extensions: [walletExtArg[walletName]] });
-  
-        const extractedApi = await extractApiData(api);
-  
-        return [walletName, extractedApi];
-      }));
+      const walletApis = await Promise.all(
+        Object.entries(mappedWalletProp).map(async ([walletName, walletProps]) => {
+          const api = isEmpty(walletExtArg[walletName])
+            ? await walletProps.enable()
+            : await walletProps.enable({ extensions: [walletExtArg[walletName]] });
+
+          const extractedApi = await extractApiData(api);
+
+          return [walletName, extractedApi];
+        })
+      );
 
       console.log("api", walletApis);
 
@@ -105,10 +110,7 @@ function App() {
                     onEnableAll={handleEnableAllWallets}
                   />
                   {Boolean(selectedWallets.length) && (
-                    <WalletActionsSection
-                      selectedWallets={selectedWallets}
-                      walletApi={walletApi}
-                    />
+                    <WalletActionsSection selectedWallets={selectedWallets} walletApi={walletApi} />
                   )}
                 </>
               ) : (

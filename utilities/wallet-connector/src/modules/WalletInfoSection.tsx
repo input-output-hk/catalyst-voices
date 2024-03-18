@@ -54,7 +54,10 @@ function WalletInfoSection({
                 <p className="font-semibold">Selected wallets: {selectedWallets.length}</p>
               </div>
               <div className="flex items-center">
-                <Button className={twMerge(allEnabled && "invisible")} onClick={() => onEnableAll(disabledWallets, {})}>
+                <Button
+                  className={twMerge(allEnabled && "invisible")}
+                  onClick={() => onEnableAll(disabledWallets, {})}
+                >
                   <p>Enable all wallets</p>
                 </Button>
               </div>
@@ -65,7 +68,12 @@ function WalletInfoSection({
               {selectedWallets.map((wallet) => (
                 <Tab as={Fragment} key={wallet}>
                   {({ selected }) => (
-                    <div className={twMerge("flex gap-2 items-center p-4 cursor-pointer", selected && "text-white bg-secondary")}>
+                    <div
+                      className={twMerge(
+                        "flex gap-2 items-center p-4 cursor-pointer",
+                        selected && "text-white bg-secondary"
+                      )}
+                    >
                       <img src={getCardano(wallet).icon} width={20} height={20} alt="icon" />
                       <p className="grow truncate">{wallet}</p>
                       {selected && <ArrowRightIcon />}
@@ -78,10 +86,7 @@ function WalletInfoSection({
               {selectedWallets.map((wallet) => (
                 <Tab.Panel key={wallet} className="p-4 h-full">
                   <div className="grid gap-2 pb-4">
-                    <InfoItem
-                      heading="API Version"
-                      value={getCardano(wallet).apiVersion}
-                    />
+                    <InfoItem heading="API Version" value={getCardano(wallet).apiVersion} />
                     <InfoItem
                       heading="Supported Extensions"
                       value={getCardano(wallet).supportedExtensions ?? null}
@@ -93,10 +98,7 @@ function WalletInfoSection({
                         heading="Balance Lovelace"
                         value={walletApi[wallet]?.balance ?? null}
                       />
-                      <InfoItem
-                        heading="UTXOs"
-                        value={walletApi[wallet]?.utxos ?? null}
-                      />
+                      <InfoItem heading="UTXOs" value={walletApi[wallet]?.utxos ?? null} />
                       <InfoItem
                         heading="Network ID (0 = testnet; 1 = mainnet)"
                         value={walletApi[wallet]?.networkId?.toString() ?? null}
@@ -124,7 +126,10 @@ function WalletInfoSection({
                     </div>
                   ) : (
                     <div className="flex flex-col gap-2 items-center justify-center w-full">
-                      <Button disabled={enablingWallets.includes(wallet)} onClick={() => handleEnableWallet(wallet)}>
+                      <Button
+                        disabled={enablingWallets.includes(wallet)}
+                        onClick={() => handleEnableWallet(wallet)}
+                      >
                         <p>Enable</p>
                       </Button>
                       <h2 className="font-semibold">Extension</h2>

@@ -15,9 +15,7 @@ function InputBlock({ variant, name, children }: Props) {
         <InputIcon />
         <h3>{name}:</h3>
       </div>
-      <div>
-        {children}
-      </div>
+      <div>{children}</div>
     </div>
   );
 }

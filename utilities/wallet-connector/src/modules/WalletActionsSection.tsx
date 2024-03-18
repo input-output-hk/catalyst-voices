@@ -9,21 +9,14 @@ import SignDataPanel from "./SignDataPanel";
 import SignTxnPanel from "./SignTxnPanel";
 import SubmitTxnPanel from "./SubmitTxnPanel";
 
-const ACTIONS = [
-  "Sign Transaction",
-  "Sign Data",
-  "Submit Transaction"
-];
+const ACTIONS = ["Sign Transaction", "Sign Data", "Submit Transaction"];
 
 type Props = {
   selectedWallets: string[];
   walletApi: Record<string, ExtractedWalletApi>;
 };
 
-function WalletActionsSection({
-  walletApi,
-  selectedWallets
-}: Props) {
+function WalletActionsSection({ walletApi, selectedWallets }: Props) {
   return (
     <section className="grid gap-4">
       <h2 className="font-semibold">Wallet Actions:</h2>
@@ -33,7 +26,12 @@ function WalletActionsSection({
             {ACTIONS.map((action) => (
               <Tab as={Fragment} key={action}>
                 {({ selected }) => (
-                  <div className={twMerge("flex gap-2 items-center p-4 cursor-pointer", selected && "text-white bg-secondary")}>
+                  <div
+                    className={twMerge(
+                      "flex gap-2 items-center p-4 cursor-pointer",
+                      selected && "text-white bg-secondary"
+                    )}
+                  >
                     <p className="grow truncate">{action}</p>
                     {selected && <ArrowRightIcon />}
                   </div>
@@ -43,22 +41,13 @@ function WalletActionsSection({
           </Tab.List>
           <Tab.Panels className="h-full overflow-auto">
             <Tab.Panel className="p-4 h-full">
-              <SignTxnPanel
-                selectedWallets={selectedWallets}
-                walletApi={walletApi}
-              />
+              <SignTxnPanel selectedWallets={selectedWallets} walletApi={walletApi} />
             </Tab.Panel>
             <Tab.Panel className="p-4 h-full">
-              <SignDataPanel
-                selectedWallets={selectedWallets}
-                walletApi={walletApi}
-              />
+              <SignDataPanel selectedWallets={selectedWallets} walletApi={walletApi} />
             </Tab.Panel>
             <Tab.Panel className="p-4 h-full">
-              <SubmitTxnPanel
-                selectedWallets={selectedWallets}
-                walletApi={walletApi}
-              />
+              <SubmitTxnPanel selectedWallets={selectedWallets} walletApi={walletApi} />
             </Tab.Panel>
           </Tab.Panels>
         </Tab.Group>
