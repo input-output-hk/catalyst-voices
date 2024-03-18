@@ -1,5 +1,8 @@
-type Props = {
+import type { ExtractedWalletApi } from "types/cardano";
 
+type Props = {
+  selectedWallets: string[];
+  walletApi: Record<string, ExtractedWalletApi>;
 };
 
 function SignDataPanel({ }: Props) {

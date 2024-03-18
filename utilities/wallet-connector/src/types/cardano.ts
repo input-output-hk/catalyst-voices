@@ -1,5 +1,6 @@
 import * as cip30 from "@cardano-sdk/cip30";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Extracted<T extends (...args: any) => any> = Awaited<ReturnType<T>>;
 
 export type WalletCollections = {

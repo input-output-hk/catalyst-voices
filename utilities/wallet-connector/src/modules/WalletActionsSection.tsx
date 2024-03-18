@@ -50,12 +50,14 @@ function WalletActionsSection({
             </Tab.Panel>
             <Tab.Panel className="p-4 h-full">
               <SignDataPanel
-
+                selectedWallets={selectedWallets}
+                walletApi={walletApi}
               />
             </Tab.Panel>
             <Tab.Panel className="p-4 h-full">
               <SubmitTxnPanel
-
+                selectedWallets={selectedWallets}
+                walletApi={walletApi}
               />
             </Tab.Panel>
           </Tab.Panels>

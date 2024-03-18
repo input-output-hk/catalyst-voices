@@ -1,7 +1,6 @@
 /// <reference types="vite/client" />
-/// <reference types="@cardano-sdk/cip30" />
 
 declare module globalThis {
-  const cardano: Record<string, any>;
+  const cardano: Record<string, unknown>;
   export { cardano };
 }

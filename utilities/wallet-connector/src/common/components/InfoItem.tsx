@@ -18,15 +18,17 @@ function InfoItem({ heading, value }: Props) {
     <div className="gap-2">
       <h3 className="font-semibold">{heading}: </h3>
       {typeof value === "string" ? (
-        <p className="w-fit break-all hover:underline cursor-copy" onClick={() => handleCopy(value)}>
-          {value || "-"}
-        </p>
+        <button type="button" className="w-fit break-all hover:underline cursor-copy" onClick={() => handleCopy(value)}>
+          <p>{value || "-"}</p>
+        </button>
       ) : Array.isArray(value) && value.length ? (
         <ol className="list-disc list-inside">
           {value.map((v) => typeof v === "object" ? JSON.stringify(v) : v).map((v) => (
-            <li key={v} className="w-fit break-all hover:underline cursor-copy" onClick={() => handleCopy(v)}>
-              {v || "-"}
-            </li>
+            <ol key={v}>
+              <button type="button" className="w-fit break-all hover:underline cursor-copy" onClick={() => handleCopy(v)}>
+                {v || "-"}
+              </button>
+            </ol>
           ))}
         </ol>
       ) : (

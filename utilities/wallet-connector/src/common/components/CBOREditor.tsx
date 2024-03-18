@@ -96,7 +96,7 @@ function CBOREditor({
       setLhsValue(value);
       setShouldRefresh(false);
     }
-  }, [value, shouldRefresh]);
+  }, [value, shouldRefresh]); // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleLhsChange(value: string) {
     setLhsValue(value);
