@@ -74,7 +74,7 @@ impl EventDB {
                                         .to_string(),
                                 )
                             })?,
-                            &hex::decode(stake_credential_hash.clone()).map_err(|e| {
+                            &hex::decode(&stake_credential_hash).map_err(|e| {
                                 Error::DecodeHex(format!(
                                     "Unable to decode stake credential hash {e}"
                                 ))
