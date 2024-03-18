@@ -6,7 +6,7 @@ import WalletCard from "./WalletCard";
 
 type Props = {
   selectedWallet: string;
-  wallets: string[],
+  wallets: string[];
   onSelect: (wallet: string) => void;
 };
 

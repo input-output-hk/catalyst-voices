@@ -10,7 +10,7 @@ type Props = {
   isEnabled: boolean;
   name: string;
   isEnabledStatusDisplayed?: boolean;
-  variant?: "checkbox" | "radio"
+  variant?: "checkbox" | "radio";
   onClick?: () => void;
 };
 

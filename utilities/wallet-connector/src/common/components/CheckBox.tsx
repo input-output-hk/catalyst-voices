@@ -5,7 +5,7 @@ import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import { noop } from "lodash-es";
 
 type Props = {
-  variant?: "radio" | "checkbox",
+  variant?: "radio" | "checkbox";
   value: boolean;
   label?: string;
   onChange?: (value: boolean) => void;

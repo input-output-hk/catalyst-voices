@@ -79,5 +79,9 @@ rules:
     - error
     - allowConstantExport: true
   
-  # vanilla
+  # typescript
   "@typescript-eslint/semi": error
+  "@typescript-eslint/member-delimiter-style":
+    - error
+    - singleline:
+        requireLast: true
