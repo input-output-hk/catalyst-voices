@@ -83,10 +83,7 @@ pub fn parse_child_assets(assets: &[MultiEraAsset]) -> Vec<Asset> {
 
 /// Eras before staking should be ignored
 pub fn valid_era(era: Era) -> bool {
-    matches!(
-        era,
-        Era::Shelley | Era::Allegra | Era::Mary | Era::Alonzo | Era::Babbage | Era::Conway
-    )
+    !matches!(era, Era::Byron)
 }
 
 /// Extract stake credentials from certificates. Stake credentials are 28 byte blake2b
