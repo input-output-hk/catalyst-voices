@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:remote_widgets_example/src/home_page.dart';
 
-final class App extends StatelessWidget {
+class App extends StatelessWidget {
   const App({super.key});
 
   @override
