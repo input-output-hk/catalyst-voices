@@ -15,5 +15,7 @@ dependencies:
 dev_dependencies:
    catalyst_analysis:
     path: ../../../catalyst_voices_packages/catalyst_analysis
+   flutter_test:
+      sdk: flutter
    test: ^1.24.9
 
