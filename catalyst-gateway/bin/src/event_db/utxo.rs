@@ -60,9 +60,7 @@ impl EventDB {
 
                 let _rows = conn
                     .query(
-                        include_str!(
-                            "../../../event-db/queries/follower/utxo_index_utxo_query.sql"
-                        ),
+                        include_str!("../../../event-db/queries/utxo/insert_utxo.sql"),
                         &[
                             &i32::try_from(index).map_err(|e| {
                                 Error::NotFound(
@@ -107,7 +105,7 @@ impl EventDB {
 
         let _rows = conn
             .query(
-                include_str!("../../../event-db/queries/follower/utxo_txn_index.sql"),
+                include_str!("../../../event-db/queries/utxo/insert_txn_index.sql"),
                 &[&tx_id, &slot_no, &network],
             )
             .await?;
