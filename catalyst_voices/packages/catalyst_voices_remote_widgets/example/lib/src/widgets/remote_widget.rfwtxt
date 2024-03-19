@@ -1,0 +1,60 @@
+import core.widgets;
+import core.material;
+import core.catalyst;
+
+widget root = Center(
+      child: SizedBox(
+        height: 300.0,
+        width: 500.0,
+        child: Card(
+          child: Padding(
+            padding: [ 16.0 ],
+            child: Column(
+              mainAxisSize: "min",
+              crossAxisAlignment: "start",
+              children: [
+                Center(
+                  child: Text(
+                   text: "Local Widget",
+                    style: TextStyle(
+                      fontSize: 32.0,
+                      fontWeight: "FontWeight.bold",
+                      color: 0xFF66AACC,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16.0),
+                Text(
+                  text: "First Name",
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight:"FontWeight.w700",
+                  ),
+                ),
+                SizedBox(height: 8.0),
+                TextField(
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: "FontWeight.w700",
+                  ),
+                ),
+                SizedBox(height: 24.0),
+                Text(
+                  text:"Second Name",
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: "FontWeight.w700",
+                  ),
+                ),
+                TextField(
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    color: 0xFFFF1F09,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
