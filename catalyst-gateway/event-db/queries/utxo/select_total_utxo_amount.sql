@@ -1,16 +1,18 @@
 -- Select total UTXO's corresponded to the provided stake credential from the given network that have occurred before the given time. 
 
-SELECT SUM(cardano_utxo.value)
+SELECT SUM(cardano_utxo.value), cardano_txn_index.network
 
 FROM cardano_utxo
 
 INNER JOIN cardano_txn_index ON
-    cardano_txn_index.id = cardano_utxo.tx_id
+  cardano_txn_index.id = cardano_utxo.tx_id
+
 INNER JOIN cardano_slot_index ON
-    cardano_slot_index.slot_no = cardano_txn_index.slot_no
-    AND cardano_slot_index.network = cardano_txn_index.network
+  cardano_slot_index.slot_no = cardano_txn_index.slot_no
+  AND cardano_slot_index.network = cardano_txn_index.network
 
 WHERE 
   cardano_utxo.stake_credential = $1
   AND cardano_slot_index.block_time <= $2
-  AND cardano_txn_index.network = $3;
+
+GROUP BY cardano_txn_index.network;
