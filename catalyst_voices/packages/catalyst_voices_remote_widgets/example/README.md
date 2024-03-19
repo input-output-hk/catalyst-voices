@@ -14,7 +14,6 @@
 
 ```
 
-
 ## Create `rfwtxt`
 
 ```rfwtxt
@@ -23,9 +22,7 @@
 
 ```
 
-
 ## Convert rfwtxt to rfw
-
 
 ```sh
 import 'package:catalyst_voices_remote_widgets/catalyst_voices_remote_widgets.dart';
@@ -36,9 +33,7 @@ await RemoteWidgetConverter.rfwTxtToRfw(
 );
 ```
 
-
 ## Upload rfw file to backend
-
 
 ## Use a remote widget in your app
 
