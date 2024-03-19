@@ -3,7 +3,7 @@
 
 -- Title : Role Registration Data
 
--- cspell: words utxo stxo
+-- cspell: words utxo
 -- Configuration Tables
 
 -- -------------------------------------------------------------------------------------------------
@@ -97,8 +97,8 @@ CREATE TABLE cardano_update_state (
   network TEXT NOT NULL,
   block_hash BYTEA NOT NULL CHECK (LENGTH(block_hash) = 32),
 
-  update BOOLEAN,
-  rollback BOOLEAN,
+  update BOOLEAN NOT NULL,
+  rollback BOOLEAN NOT NULL,
 
   stats JSONB,
 
@@ -181,7 +181,7 @@ CREATE TABLE cardano_utxo (
   value BIGINT NOT NULL,
   asset JSONB NULL,
 
-  stake_credential BYTEA NOT NULL,
+  stake_credential BYTEA NOT NULL CHECK (LENGTH(stake_credential) = 32),
 
   spent_tx_id BYTEA NULL REFERENCES cardano_txn_index (id),
 

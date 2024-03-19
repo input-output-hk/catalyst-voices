@@ -121,6 +121,7 @@ impl EventDB {
                     &network,
                     &hex::decode(block_hash).map_err(|e| Error::DecodeHex(e.to_string()))?,
                     &update,
+                    &false,
                 ],
             )
             .await?;
