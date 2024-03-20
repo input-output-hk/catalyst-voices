@@ -14,7 +14,7 @@ x509_envelope = {
 ; 2 : Chunk data is encoded raw
 ; 3 : Data is compressed with Brotli and then chunked.
 ; 4 : Data is compressed with ZSTD and then chunked.
-chunk_type = ( 2..4 )
+chunk_type = (2..4)
 
 ; An individual purpose or set or purposes
 purpose = ( individual_purpose [ * individual_purpose ] )
@@ -34,7 +34,7 @@ validation_signature = (bytes .size (0..64))
 ; Signatures are created by creating the x509_envelope with key `99`, but without all expected signatures set to 0x00's.
 ; Each signature is then computed over that binary data.
 ; Each blank signature is then replaced with the real signature.
-..
+
 ; To validate the opposite occurs, the signatures are copied out of the envelope.
 ; The signature fields are set to 0x00's
 ; The resulting binary buffer is then checked against the signatures which were embedded.
@@ -48,4 +48,5 @@ validation_signature = (bytes .size (0..64))
 ; By signing the metadata envelope with the keys contained within the x509 chunks, we ensure that its not possible
 ; to transpose key certs from one transaction to another.
 
-; This envelope is general in structure, and that structure ensures metadata can not be transposed or tampoered with outside of the inteheg 
+; This envelope is general in structure, and that structure ensures metadata can not be transposed between transactions
+
