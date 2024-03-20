@@ -16,6 +16,7 @@ use crate::settings::{DocsSettings, API_URL_PREFIX};
 mod health;
 mod legacy;
 mod test_endpoints;
+mod utxo;
 
 /// The name of the API
 const API_TITLE: &str = "Catalyst Gateway";
