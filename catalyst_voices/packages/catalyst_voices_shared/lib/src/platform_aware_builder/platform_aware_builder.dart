@@ -1,12 +1,10 @@
-import 'dart:developer';
-import 'dart:io';
-
 import 'package:catalyst_voices_shared/src/platform/catalyst_platform.dart';
+import 'package:catalyst_voices_shared/src/platform/platform_key.dart';
 import 'package:flutter/widgets.dart';
 
 class PlatformAwareBuilder<T> extends StatelessWidget {
   final Widget Function(BuildContext context, T? data) builder;
-  final Map<String, T?> _platformData;
+  final Map<PlatformKey, T?> _platformData;
 
   PlatformAwareBuilder({
     super.key,
@@ -24,18 +22,18 @@ class PlatformAwareBuilder<T> extends StatelessWidget {
     T? windows,
     required T other,
   }) : _platformData = {
-    'android': android,
-    'desktop': desktop,
-    'fuchsia': fuchsia,
-    'iOS': iOS,
-    'linux': linux,
-    'macOS': macOS,
-    'mobile': mobile,
-    'mobileWeb': mobileWeb,
-    'web': isWeb,
-    'webDesktop': webDesktop,
-    'windows': windows,
-    'other': other,
+    PlatformKey.android: android,
+    PlatformKey.desktop: desktop,
+    PlatformKey.fuchsia: fuchsia,
+    PlatformKey.iOS: iOS,
+    PlatformKey.linux: linux,
+    PlatformKey.macOS: macOS,
+    PlatformKey.mobile: mobile,
+    PlatformKey.mobileWeb: mobileWeb,
+    PlatformKey.web: isWeb,
+    PlatformKey.webDesktop: webDesktop,
+    PlatformKey.windows: windows,
+    PlatformKey.other: other,
   };
 
   @override
@@ -49,7 +47,7 @@ class PlatformAwareBuilder<T> extends StatelessWidget {
         // We select the platform only if the platform-specific data
         // is also present.
         (entry) => entry.value && (_platformData[entry.key] != null),
-        orElse: () => const MapEntry('other', true),
+        orElse: () => const MapEntry(PlatformKey.other, true),
       )
       .key;
     return _platformData[currentPlatformKey]!;

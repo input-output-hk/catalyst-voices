@@ -1,3 +1,5 @@
+import 'package:catalyst_voices_shared/src/platform/platform_key.dart';
+
 final class CatalystPlatform {
   static bool get isAndroid {
     throw UnimplementedError('Stub CatalystPlatform');
@@ -43,7 +45,7 @@ final class CatalystPlatform {
     throw UnimplementedError('Stub CatalystPlatform');
   }
 
-  static Map<String, bool> get identifiers {
+  static Map<PlatformKey, bool> get identifiers {
     throw UnimplementedError('Stub CatalystPlatform');
   }
 
