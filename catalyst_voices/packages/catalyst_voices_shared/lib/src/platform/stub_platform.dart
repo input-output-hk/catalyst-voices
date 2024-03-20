@@ -43,5 +43,9 @@ final class CatalystPlatform {
     throw UnimplementedError('Stub CatalystPlatform');
   }
 
+  static Map<String, bool> get identifiers {
+    throw UnimplementedError('Stub CatalystPlatform');
+  }
+
   const CatalystPlatform._();
 }

@@ -23,4 +23,18 @@ final class CatalystPlatform {
   static bool get isWebDesktop => false;
 
   static bool get isWindows => Platform.isWindows;
+
+  static Map<String, bool> get identifiers => {
+    'android': isAndroid,
+    'desktop': isDesktop,
+    'fuchsia': isFuchsia,
+    'iOS': isIOS,
+    'linux': isLinux,
+    'macOS': isMacOS,
+    'mobile': isMobile,
+    'mobileWeb': isMobileWeb,
+    'web': isWeb,
+    'webDesktop': isWebDesktop,
+    'windows': isWindows,
+  };
 }

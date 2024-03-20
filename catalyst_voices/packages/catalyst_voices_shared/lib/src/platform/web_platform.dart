@@ -34,5 +34,19 @@ final class CatalystPlatform {
     return mobileIdentifiers.any(userAgent.contains);
   }
 
+  static Map<String, bool> get identifiers => {
+    'android': isAndroid,
+    'desktop': isDesktop,
+    'fuchsia': isFuchsia,
+    'iOS': isIOS,
+    'linux': isLinux,
+    'macOS': isMacOS,
+    'mobile': isMobile,
+    'mobileWeb': isMobileWeb,
+    'web': isWeb,
+    'webDesktop': isWebDesktop,
+    'windows': isWindows,
+  };
+
   const CatalystPlatform._();
 }
