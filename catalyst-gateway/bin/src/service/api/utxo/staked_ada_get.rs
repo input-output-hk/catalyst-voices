@@ -18,7 +18,6 @@ pub(crate) type AllResponses = response! {
 };
 
 /// # GET `/utxo/staked_ada`
-/// 
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(_state: &State) -> AllResponses {
     // state.event_db();
