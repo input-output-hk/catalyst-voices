@@ -1,7 +1,7 @@
 import 'package:catalyst_voices_shared/src/platform/catalyst_platform.dart';
 import 'package:flutter/widgets.dart';
 
-class PlatformWidgetBuilder<T> extends StatelessWidget {
+class PlatformAwareBuilder<T> extends StatelessWidget {
   final Widget Function(BuildContext context, T? data) builder;
   final T? android;
   final T? desktop;
@@ -16,7 +16,7 @@ class PlatformWidgetBuilder<T> extends StatelessWidget {
   final T? windows;
   final T? other;
 
-  const PlatformWidgetBuilder({
+  const PlatformAwareBuilder({
     super.key,
     required this.builder,
     this.android,

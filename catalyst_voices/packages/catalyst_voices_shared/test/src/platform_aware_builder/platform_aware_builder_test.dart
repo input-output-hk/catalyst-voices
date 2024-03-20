@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_shared/src/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -6,7 +6,7 @@ void main() {
 
   Widget buildApp() => MaterialApp(
     home: Scaffold(
-      body: PlatformWidgetBuilder<String>(
+      body: PlatformAwareBuilder<String>(
         other: 'other',
         builder: (context, platformData) => Text(platformData!),
       ),

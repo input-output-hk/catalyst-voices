@@ -1,2 +1,2 @@
 export 'platform/catalyst_platform.dart';
-export 'platform_widget_builder/platform_widget_builder.dart';
+export 'platform_aware_builder/platform_aware_builder.dart';
