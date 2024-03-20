@@ -11,6 +11,7 @@ use local_ip_address::list_afinet_netifas;
 use poem_openapi::{ContactObject, LicenseObject, OpenApiService, ServerObject};
 use test_endpoints::TestApi;
 
+use self::utxo::UTXOApi;
 use crate::settings::{DocsSettings, API_URL_PREFIX};
 
 mod health;
@@ -59,11 +60,12 @@ const TERMS_OF_SERVICE: &str =
 /// Create the `OpenAPI` definition
 pub(crate) fn mk_api(
     hosts: Vec<String>, settings: &DocsSettings,
-) -> OpenApiService<(TestApi, HealthApi, LegacyApi), ()> {
+) -> OpenApiService<(TestApi, HealthApi, UTXOApi, LegacyApi), ()> {
     let mut service = OpenApiService::new(
         (
             TestApi,
             HealthApi,
+            UTXOApi,
             (legacy::RegistrationApi, legacy::V0Api, legacy::V1Api),
         ),
         API_TITLE,

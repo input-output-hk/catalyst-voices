@@ -1,17 +1,29 @@
 //! Implementation of the GET `/utxo/staked_ada` endpoint
 
-use poem_extensions::{response, UniResponse::T503};
+use chrono::{DateTime, Utc};
+use poem_extensions::{
+    response,
+    UniResponse::{T200, T500, T503},
+};
+use poem_openapi::{payload::Json, types::Example};
 
 use crate::{
-    service::common::responses::{
-        resp_4xx::ApiValidationError,
-        resp_5xx::{ServerError, ServiceUnavailable},
+    cli::Error,
+    event_db::{error::Error as DBError, utxo::StakeCredential},
+    service::common::{
+        objects::{network::Network, stake_amount::StakeAmount},
+        responses::{
+            resp_2xx::OK,
+            resp_4xx::ApiValidationError,
+            resp_5xx::{server_error, ServerError, ServiceUnavailable},
+        },
     },
-    state::State,
+    state::{SchemaVersionStatus, State},
 };
 
 /// # All Responses
 pub(crate) type AllResponses = response! {
+    200: OK<Json<StakeAmount>>,
     400: ApiValidationError,
     500: ServerError,
     503: ServiceUnavailable,
@@ -19,7 +31,27 @@ pub(crate) type AllResponses = response! {
 
 /// # GET `/utxo/staked_ada`
 #[allow(clippy::unused_async)]
-pub(crate) async fn endpoint(_state: &State) -> AllResponses {
-    // state.event_db();
-    T503(ServiceUnavailable)
+pub(crate) async fn endpoint(
+    state: &State, _stake_credential: StakeCredential, _network: Option<Network>,
+    _date: Option<DateTime<Utc>>,
+) -> AllResponses {
+    match state.event_db() {
+        Ok(_event_db) => {
+            // let _res = event_db
+            //     .total_utxo_amount(&stake_credential, chrono::offset::Utc::now())
+            //     .await;
+
+            T200(OK(Json(StakeAmount::example())))
+        },
+        Err(Error::EventDb(DBError::MismatchedSchema { was, expected })) => {
+            tracing::error!(
+                expected = expected,
+                current = was,
+                "DB schema version status mismatch"
+            );
+            state.set_schema_version_status(SchemaVersionStatus::Mismatch);
+            T503(ServiceUnavailable)
+        },
+        Err(err) => T500(server_error!("{}", err.to_string())),
+    }
 }
