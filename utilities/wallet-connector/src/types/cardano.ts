@@ -26,4 +26,5 @@ export type ExtractedWalletApi = {
   signTx: cip30.SignTx;
   signData: cip30.SignData;
   submitTx: cip30.SubmitTx;
+  [key: string]: any
 };

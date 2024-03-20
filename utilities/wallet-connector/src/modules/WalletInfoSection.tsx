@@ -1,7 +1,7 @@
 import { Tab } from "@headlessui/react";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import WarningIcon from "@mui/icons-material/Warning";
-import { noop, pickBy } from "lodash-es";
+import { capitalize, noop, pickBy, upperCase } from "lodash-es";
 import { Fragment } from "react/jsx-runtime";
 import { useForm } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
@@ -54,6 +54,7 @@ function WalletInfoSection({
               <div className="flex items-center">
                 <Button
                   className={twMerge(allEnabled && "invisible")}
+                  disabled={Boolean(enablingWallets.length)}
                   onClick={() => onEnableAll(disabledWallets, {})}
                 >
                   <p>Enable all wallets</p>
@@ -84,43 +85,23 @@ function WalletInfoSection({
               {selectedWallets.map((wallet) => (
                 <Tab.Panel key={wallet} className="grid gap-4 p-4 h-full">
                   <div className="grid gap-2">
-                    <InfoItem heading="API Version" value={getCardano(wallet).apiVersion} />
+                    <InfoItem heading="API version" value={getCardano(wallet).apiVersion} from="base" />
                     <InfoItem
-                      heading="Supported Extensions"
+                      heading="Supported extensions"
                       value={getCardano(wallet).supportedExtensions ?? null}
+                      from="base"
                     />
                   </div>
                   {Boolean(walletApi[wallet]) && (
                     <div className="grid gap-2">
-                      <InfoItem
-                        heading="Balance Lovelace"
-                        value={walletApi[wallet]?.balance ?? null}
-                      />
-                      <InfoItem heading="UTXOs" value={walletApi[wallet]?.utxos ?? null} />
-                      <InfoItem
-                        heading="Network ID (0 = testnet; 1 = mainnet)"
-                        value={walletApi[wallet]?.networkId?.toString() ?? null}
-                      />
-                      <InfoItem
-                        heading="Collateral"
-                        value={walletApi[wallet]?.collateral ?? null}
-                      />
-                      <InfoItem
-                        heading="Used Addresses"
-                        value={walletApi[wallet]?.usedAddresses ?? null}
-                      />
-                      <InfoItem
-                        heading="Unused Addresses"
-                        value={walletApi[wallet]?.unusedAddresses ?? null}
-                      />
-                      <InfoItem
-                        heading="Change Address"
-                        value={walletApi[wallet]?.changeAddress ?? null}
-                      />
-                      <InfoItem
-                        heading="Reward Addresses"
-                        value={walletApi[wallet]?.rewardAddresses ?? null}
-                      />
+                      {Object.entries(walletApi[wallet]?.["info"] ?? {}).map(([key, { from, value }]: [string, any]) => (
+                        <InfoItem
+                          key={key}
+                          heading={capitalize(upperCase(key))}
+                          value={value ?? null}
+                          from={from}
+                        />
+                      ))}
                     </div>
                   )}
                   <div className="h-px bg-black/10"></div>

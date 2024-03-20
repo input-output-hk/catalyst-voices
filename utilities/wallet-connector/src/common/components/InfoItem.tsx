@@ -5,9 +5,10 @@ import type { ExtensionArguments } from "types/cardano";
 type Props = {
   heading: string;
   value: string | string[] | null | ExtensionArguments[];
+  from?: string;
 };
 
-function InfoItem({ heading, value }: Props) {
+function InfoItem({ heading, value, from }: Props) {
   async function handleCopy(value: string) {
     await navigator.clipboard.writeText(value);
 
@@ -16,7 +17,10 @@ function InfoItem({ heading, value }: Props) {
 
   return (
     <div className="gap-2">
-      <h3 className="font-semibold">{heading}: </h3>
+      <div className="flex gap-2 items-center">
+        <div className="text-xs bg-black/10 px-2 rounded">{from?.toUpperCase()}</div>
+        <h3 className="font-semibold">{heading}: </h3>
+      </div>
       {typeof value === "string" ? (
         <button
           type="button"

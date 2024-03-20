@@ -27,7 +27,10 @@ function SignTxnPanel({ selectedWallets, walletApi }: Props) {
   const [selectedResponseWallet, setSelectedResponseWallet] = useState("");
 
   const { isLoading, mutateAsync, data } = useMutation({
-    onError: (err) => void toast.error(String(err)),
+    onError: (err) => {
+      console.log(err);
+      toast.error(String(err));
+    },
     mutationFn: mutateFn,
   });
 

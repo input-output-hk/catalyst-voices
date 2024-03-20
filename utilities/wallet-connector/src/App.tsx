@@ -59,11 +59,13 @@ function App() {
             ? await walletProps.enable()
             : await walletProps.enable({ extensions: [walletExtArg[walletName]] });
 
-          const extractedApi = await extractApiData(api);
+          const extractedApi = await extractApiData(api, walletExtArg[walletName]?.cip ?? undefined);
 
           return [walletName, extractedApi];
         })
       );
+
+      console.log(walletApis);
 
       setWalletApi((prev) => ({ ...prev, ...Object.fromEntries(walletApis) }));
     } catch (err) {
