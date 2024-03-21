@@ -2,7 +2,8 @@ import 'package:catalyst_voices_shared/src/platform/catalyst_platform.dart';
 import 'package:catalyst_voices_shared/src/platform/platform_key.dart';
 import 'package:flutter/widgets.dart';
 
-// A [StatelessWidget] that is aware of the current platform.
+// A [PlatformAwareBuilder] is a StatelessWidget that is aware of the current 
+// platform.
 //
 // This is an abstract widget that has a required argument [builder] that can
 // consume platform-specific data automatically based on platform that is 
