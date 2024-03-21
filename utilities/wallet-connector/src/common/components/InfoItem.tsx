@@ -29,7 +29,9 @@ function InfoItem({ heading, value, raw, from }: Props) {
         {typeof raw !== "undefined" && Boolean(String(raw)) && (
           <div>
             <button type="button" className="inline" onClick={() => handleCopy(raw)}>
-              <p className="w-fit break-all hover:underline cursor-copy text-left text-[10px] text-black/50">{raw}</p>
+              <p className="w-fit break-all hover:underline cursor-copy text-left text-[10px] text-black/50">
+                {raw}
+              </p>
             </button>
           </div>
         )}

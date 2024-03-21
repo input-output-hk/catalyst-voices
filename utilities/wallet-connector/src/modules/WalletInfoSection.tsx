@@ -86,7 +86,11 @@ function WalletInfoSection({
               {selectedWallets.map((wallet) => (
                 <Tab.Panel key={wallet} className="grid gap-4 p-4 h-full">
                   <div className="grid gap-2">
-                    <InfoItem heading="API version" value={getCardano(wallet).apiVersion} from="base" />
+                    <InfoItem
+                      heading="API version"
+                      value={getCardano(wallet).apiVersion}
+                      from="base"
+                    />
                     <InfoItem
                       heading="Supported extensions"
                       value={getCardano(wallet).supportedExtensions ?? null}
@@ -95,15 +99,17 @@ function WalletInfoSection({
                   </div>
                   {Boolean(walletApi[wallet]) && (
                     <div className="grid gap-2">
-                      {Object.entries(walletApi[wallet]?.["info"] ?? {}).map(([key, { from, value, raw }]: [string, any]) => (
-                        <InfoItem
-                          key={key}
-                          heading={capitalize(upperCase(key))}
-                          value={value ?? null}
-                          raw={raw}
-                          from={from}
-                        />
-                      ))}
+                      {Object.entries(walletApi[wallet]?.["info"] ?? {}).map(
+                        ([key, { from, value, raw }]: [string, any]) => (
+                          <InfoItem
+                            key={key}
+                            heading={capitalize(upperCase(key))}
+                            value={value ?? null}
+                            raw={raw}
+                            from={from}
+                          />
+                        )
+                      )}
                     </div>
                   )}
                   <div className="h-px bg-black/10"></div>

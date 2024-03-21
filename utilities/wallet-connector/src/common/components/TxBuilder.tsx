@@ -1,32 +1,32 @@
+import { noop } from "lodash-es";
 import { useForm } from "react-hook-form";
 
 import { BASE_INPUT_STYLE } from "common/constants";
+import type { TxBuilderArguments } from "types/cardano";
 
-type FormValues = {
-  regAddress: string;
-  regAmount: string;
-  regText: string;
-  regLabel: string;
-  stakeCred: string;
-};
+import Button from "./Button";
+
+type FormValues = TxBuilderArguments;
 
 type Props = {
-
+  onSubmit?: (value: FormValues) => void;
 };
 
-function TxBuilder({ }: Props) {
-  const { handleSubmit, register } = useForm<FormValues>({
-    defaultValues: {
-
-    }
+function TxBuilder({ onSubmit: onPropSubmit = noop }: Props) {
+  const { handleSubmit, register, reset } = useForm<FormValues>({
+    defaultValues: {},
   });
 
-  async function onSubmit(formValues: FormValues) {
+  function handleReset() {
+    reset();
+  }
 
+  async function onSubmit(formValues: FormValues) {
+    onPropSubmit(formValues);
   }
 
   return (
-    <form className="grid gap-2" onSubmit={handleSubmit(onSubmit)}>
+    <form className="grid gap-2" autoComplete="off">
       <input
         className={BASE_INPUT_STYLE}
         type="text"
@@ -42,15 +42,23 @@ function TxBuilder({ }: Props) {
       <input
         className={BASE_INPUT_STYLE}
         type="text"
-        placeholder="registration text"
-        {...register("regText")}
+        placeholder="registration label"
+        {...register("regLabel")}
       />
       <input
         className={BASE_INPUT_STYLE}
         type="text"
-        placeholder="registration label"
-        {...register("regLabel")}
+        placeholder="registration text"
+        {...register("regText")}
       />
+      <div className="flex gap-2">
+        <Button className="w-fit" onClick={handleSubmit(onSubmit)}>
+          <p>Build</p>
+        </Button>
+        <Button className="w-fit" onClick={handleReset}>
+          <p>Clear</p>
+        </Button>
+      </div>
     </form>
   );
 }

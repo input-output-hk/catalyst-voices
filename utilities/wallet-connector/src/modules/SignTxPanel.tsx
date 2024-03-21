@@ -9,10 +9,11 @@ import Button from "common/components/Button";
 import CBOREditor from "common/components/CBOREditor";
 import CheckBox from "common/components/CheckBox";
 import InputBlock from "common/components/InputBlock";
+import TxBuilder from "common/components/TxBuilder";
 import WalletResponseSelection from "common/components/WalletResponseSelection";
+import buildUnsingedReg from "common/helpers/buildUnsingedReg";
 import cleanHex from "common/helpers/cleanHex";
-import type { ExtractedWalletApi } from "types/cardano";
-import TxInput from "common/components/TxInput";
+import type { ExtractedWalletApi, TxBuilderArguments } from "types/cardano";
 
 type Props = {
   selectedWallets: string[];
@@ -56,6 +57,26 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
     setSelectedResponseWallet(wallet);
   }
 
+  async function handleTxBuilderSubmit(builderArgs: TxBuilderArguments) {
+    try {
+      const lace = walletApi["lace"];
+
+      const tx = await buildUnsingedReg({
+        regAddress: builderArgs.regAddress,
+        regAmount: builderArgs.regAmount,
+        regLabel: builderArgs.regLabel,
+        regText: builderArgs.regText,
+        usedAddresses: lace.info.usedAddresses.raw,
+        changeAddress: lace.info.changeAddress.raw,
+        rawUtxos: lace.info.utxos.raw,
+      });
+
+      console.log("UnsignedTx:", tx.to_hex());
+    } catch (err) {
+      return void toast.error(String(err));
+    }
+  }
+
   async function handleExecute(formValues: FormValues) {
     if (!selectedWallets.length) {
       return void toast.error("Please select at least one wallet to execute.");
@@ -92,7 +113,10 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
             control={payloadForm.control}
             name="tx"
             render={({ field: { value, onChange } }) => (
-              <TxInput value={value} onChange={onChange} />
+              <div className="grid gap-4">
+                <TxBuilder onSubmit={handleTxBuilderSubmit} />
+                <CBOREditor value={value} onChange={onChange} />
+              </div>
             )}
           />
         </InputBlock>

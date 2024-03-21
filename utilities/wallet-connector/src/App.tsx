@@ -59,7 +59,10 @@ function App() {
             ? await walletProps.enable()
             : await walletProps.enable({ extensions: [walletExtArg[walletName]] });
 
-          const extractedApi = await extractApiData(api, walletExtArg[walletName]?.cip ?? undefined);
+          const extractedApi = await extractApiData(
+            api,
+            walletExtArg[walletName]?.cip ?? undefined
+          );
 
           return [walletName, extractedApi];
         })
