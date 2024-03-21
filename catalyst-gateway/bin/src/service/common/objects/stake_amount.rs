@@ -19,7 +19,7 @@ pub(crate) struct StakeInfo {
     pub(crate) slot_number: SlotNumber,
 
     /// Block date time.
-    pub(crate) date_time: BlockTime,
+    pub(crate) block_time: BlockTime,
 }
 
 impl Example for StakeInfo {
@@ -27,7 +27,7 @@ impl Example for StakeInfo {
         Self {
             amount: 1,
             slot_number: 5,
-            date_time: Utc::now(),
+            block_time: Utc::now(),
         }
     }
 }

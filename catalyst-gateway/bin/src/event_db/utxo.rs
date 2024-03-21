@@ -119,17 +119,32 @@ impl EventDB {
     /// Get total utxo amount
     #[allow(dead_code)]
     pub(crate) async fn total_utxo_amount(
-        &self, stake_credential: StakeCredential<'_>, _network: Network, date_time: BlockTime,
-    ) -> Result<(StakeAmount, SlotNumber), Error> {
+        &self, stake_credential: StakeCredential<'_>, network: Network, date_time: BlockTime,
+    ) -> Result<(StakeAmount, SlotNumber, BlockTime), Error> {
         let conn = self.pool.get().await?;
 
-        let _rows = conn
+        let network = match network {
+            Network::Mainnet => "mainnet".to_string(),
+            Network::Preview => "preview".to_string(),
+            Network::Preprod => "preprod".to_string(),
+            Network::Testnet => "testnet".to_string(),
+        };
+
+        let rows = conn
             .query(
                 include_str!("../../../event-db/queries/utxo/select_total_utxo_amount.sql"),
-                &[&stake_credential, &date_time],
+                &[&stake_credential, &network, &date_time],
             )
             .await?;
 
-        Ok((100, 32150))
+        let row = rows
+            .first()
+            .ok_or_else(|| Error::NotFound("Cannot find total utxo amount".to_string()))?;
+
+        let amount = row.try_get("total_utxo_amount")?;
+        let slot_number = row.try_get("slot_no")?;
+        let block_time = row.try_get("block_time")?;
+
+        Ok((amount, slot_number, block_time))
     }
 }

@@ -84,11 +84,11 @@ pub(crate) async fn endpoint(
                 .total_utxo_amount(stake_credential, network.into(), date_time)
                 .await
             {
-                Ok((amount, slot_number)) => {
+                Ok((amount, slot_number, block_time)) => {
                     T200(OK(Json(StakeInfo {
                         amount,
                         slot_number,
-                        date_time,
+                        block_time,
                     })))
                 },
                 Err(DBError::NotFound(_)) => T404(NotFound),
