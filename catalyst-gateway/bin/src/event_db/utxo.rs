@@ -5,8 +5,14 @@ use pallas::ledger::traverse::MultiEraTx;
 
 use super::follower::SlotNumber;
 use crate::{
-    event_db::{Error, Error::SqlTypeConversionFailure, EventDB},
-    util::parse_policy_assets,
+    event_db::{
+        Error::{self, SqlTypeConversionFailure},
+        EventDB,
+    },
+    util::{
+        extract_hashed_witnesses, extract_stake_credentials_from_certs,
+        find_matching_stake_credential, parse_policy_assets,
+    },
 };
 
 impl EventDB {
@@ -19,6 +25,29 @@ impl EventDB {
         for (index, tx) in txs.iter().enumerate() {
             self.index_txn_data(tx.hash().as_slice(), slot_no, network)
                 .await?;
+
+            let stake_credentials = extract_stake_credentials_from_certs(&tx.certs());
+
+            // Don't index if there is no staking
+            if stake_credentials.is_empty() {
+                return Ok(());
+            }
+
+            let witnesses = match extract_hashed_witnesses(tx.vkey_witnesses()) {
+                Ok(w) => w,
+                Err(err) => return Err(Error::HashedWitnessExtraction(err.to_string())),
+            };
+
+            let (_stake_credential, stake_credential_hash) =
+                match find_matching_stake_credential(&witnesses, &stake_credentials) {
+                    Ok(s) => s,
+                    Err(_err) => {
+                        // Most TXs will not have abided by staking rules, hence logging is too
+                        // noisy. We will not index these TXs and ignore
+                        // them.
+                        return Ok(());
+                    },
+                };
 
             // index outputs
             for tx_out in tx.outputs() {
@@ -45,9 +74,11 @@ impl EventDB {
                                         .to_string(),
                                 )
                             })?,
-                            &tx.hash().as_slice(), /* temporary until we have foreign key
-                                                    * relationship in the context of
-                                                    * registrations */
+                            &hex::decode(&stake_credential_hash).map_err(|e| {
+                                Error::DecodeHex(format!(
+                                    "Unable to decode stake credential hash {e}"
+                                ))
+                            })?,
                             &assets,
                         ],
                     )
