@@ -8,11 +8,10 @@ INSERT INTO cardano_update_state
   slot_no,
   network,
   block_hash,
-  update,
-  rollback
+  update
 )
 
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 
 ON CONFLICT (id) DO UPDATE SET
 ended = $2,
