@@ -4,7 +4,7 @@ use std::ops::Deref;
 
 use pallas::ledger::addresses::{Address, StakeAddress};
 use poem_openapi::{
-    registry::{MetaSchema, MetaSchemaRef},
+    registry::{MetaSchema, MetaSchemaRef, Registry},
     types::{ParseError, ParseFromParameter, ParseResult, Type},
 };
 
@@ -12,6 +12,21 @@ use poem_openapi::{
 /// Should a valid Bech32 encoded stake address followed by the `https://cips.cardano.org/cip/CIP-19/#stake-addresses.`
 #[derive(Debug)]
 pub(crate) struct CardanoStakeAddress(StakeAddress);
+
+impl CardanoStakeAddress {
+    /// Creates a `CardanoStakeAddress` schema definition.
+    fn schema() -> MetaSchema {
+        let mut schema = MetaSchema::new("string");
+        schema.title = Some("CardanoStakeAddress".to_string());
+        schema.description = Some("The stake address of the user. Should a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.");
+        schema.example = Some(serde_json::Value::String(
+            "stake1uyehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gh6ffgw".to_string(),
+        ));
+        schema.max_length = Some(64);
+        schema.pattern = Some("(stake|stake_test)1[a-z0-9]{53}".to_string());
+        schema
+    }
+}
 
 impl Deref for CardanoStakeAddress {
     type Target = StakeAddress;
@@ -28,14 +43,15 @@ impl Type for CardanoStakeAddress {
     const IS_REQUIRED: bool = true;
 
     fn name() -> std::borrow::Cow<'static, str> {
-        "Cardano stake address".into()
+        "CardanoStakeAddress".into()
     }
 
     fn schema_ref() -> MetaSchemaRef {
-        let mut schema = MetaSchema::new("string");
-        schema.max_length = Some(64);
-        schema.pattern = Some("(stake|stake_test)1[a-z0-9]{53}".to_string());
-        MetaSchemaRef::Inline(Box::new(schema))
+        MetaSchemaRef::Reference(Self::name().to_string())
+    }
+
+    fn register(registry: &mut Registry) {
+        registry.create_schema::<Self, _>(Self::name().to_string(), |_| Self::schema());
     }
 
     fn as_raw_value(&self) -> Option<&Self::RawValueType> {
