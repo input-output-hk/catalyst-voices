@@ -1,7 +1,6 @@
 import 'dart:async';
 
-import 'package:catalyst_voices_remote_widgets/catalyst_voices_remote_widgets.dart'
-    as core;
+import 'package:catalyst_voices_remote_widgets/core.dart' as core;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:rfw/rfw.dart';
