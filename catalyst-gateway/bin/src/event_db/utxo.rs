@@ -130,21 +130,23 @@ impl EventDB {
             Network::Testnet => "testnet".to_string(),
         };
 
-        let rows = conn
-            .query(
+        let row = conn
+            .query_one(
                 include_str!("../../../event-db/queries/utxo/select_total_utxo_amount.sql"),
                 &[&stake_credential, &network, &date_time],
             )
             .await?;
 
-        let row = rows
-            .first()
-            .ok_or_else(|| Error::NotFound("Cannot find total utxo amount".to_string()))?;
+        // Aggregate functions as SUM and MAX retun NULL if there are no rows, so we need to
+        // check for it.
+        // https://www.postgresql.org/docs/8.2/functions-aggregate.html
+        if let Some(amount) = row.try_get("total_utxo_amount")? {
+            let slot_number = row.try_get("slot_no")?;
+            let block_time = row.try_get("block_time")?;
 
-        let amount = row.try_get("total_utxo_amount")?;
-        let slot_number = row.try_get("slot_no")?;
-        let block_time = row.try_get("block_time")?;
-
-        Ok((amount, slot_number, block_time))
+            Ok((amount, slot_number, block_time))
+        } else {
+            Err(Error::NotFound("Cannot find total utxo amount".to_string()))
+        }
     }
 }

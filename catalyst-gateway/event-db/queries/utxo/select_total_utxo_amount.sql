@@ -1,6 +1,6 @@
 -- Select total UTXO's corresponded to the provided stake credential from the given network that have occurred before the given time. 
 SELECT
-  SUM(cardano_utxo.value) AS total_utxo_amount,
+  SUM(cardano_utxo.value)::BIGINT AS total_utxo_amount,
   MAX(cardano_slot_index.slot_no) AS slot_no,
   MAX(cardano_slot_index.block_time) AS block_time
 
