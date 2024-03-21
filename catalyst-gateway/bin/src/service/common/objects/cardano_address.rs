@@ -32,10 +32,10 @@ impl Type for CardanoStakeAddress {
     }
 
     fn schema_ref() -> MetaSchemaRef {
-        MetaSchemaRef::Inline(Box::new(MetaSchema::new_with_format(
-            "CardanoStakeAddress",
-            "string",
-        )))
+        let mut schema = MetaSchema::new("string");
+        schema.max_length = Some(64);
+        schema.pattern = Some("(stake|stake_test)1[a-z0-9]{53}".to_string());
+        MetaSchemaRef::Inline(Box::new(schema))
     }
 
     fn as_raw_value(&self) -> Option<&Self::RawValueType> {
