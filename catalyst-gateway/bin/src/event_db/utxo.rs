@@ -116,7 +116,7 @@ impl EventDB {
     /// Get total utxo amount
     #[allow(dead_code)]
     pub(crate) async fn total_utxo_amount(
-        &self, stake_credential: StakeCredential<'_>, date_time: BlockTime,
+        &self, stake_credential: StakeCredential<'_>, _network: Network, date_time: BlockTime,
     ) -> Result<u64, Error> {
         let conn = self.pool.get().await?;
 

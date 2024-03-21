@@ -3,9 +3,9 @@
 use chrono::{DateTime, Utc};
 use poem_extensions::{
     response,
-    UniResponse::{T200, T404, T500, T503},
+    UniResponse::{T200, T400, T404, T500, T503},
 };
-use poem_openapi::payload::Json;
+use poem_openapi::{payload::Json, types::ToJSON};
 
 use crate::{
     cli::Error,
@@ -35,22 +35,53 @@ pub(crate) type AllResponses = response! {
 /// # GET `/utxo/staked_ada`
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(
-    state: &State, stake_address: CardanoStakeAddress, network: Option<Network>,
+    state: &State, stake_address: CardanoStakeAddress, provided_network: Option<Network>,
     date_time: Option<DateTime<Utc>>,
 ) -> AllResponses {
-    tracing::info!(
-        "stake_address: {:?}, network: {:?}, date_time: {:?}",
-        stake_address,
-        network,
-        date_time
-    );
     match state.event_db() {
         Ok(event_db) => {
             let date_time = date_time.unwrap_or_else(Utc::now);
             let stake_credential = stake_address.payload().as_hash().as_ref();
 
+            // check the provided network type with the encoded inside the stake address
+            let network = match stake_address.network() {
+                pallas::ledger::addresses::Network::Mainnet => {
+                    if let Some(network) = provided_network {
+                        if !matches!(&network, Network::Mainnet) {
+                            return T400(ApiValidationError::new(format!(
+                                "Provided network type {} does not match stake address network type Mainnet",  network.to_json_string()
+                            )));
+                        }
+                    }
+                    Network::Mainnet
+                },
+                pallas::ledger::addresses::Network::Testnet => {
+                    // the preprod and preview network types are encoded as `testnet` in the stake
+                    // address, so here we are checking if the `provided_network` type matches the
+                    // one, and if not - we return an error.
+                    // if the `provided_network` omiited - we return the `testnet` network type
+                    if let Some(network) = provided_network {
+                        if !matches!(
+                            network,
+                            Network::Testnet | Network::Preprod | Network::Preview
+                        ) {
+                            return T400(ApiValidationError::new(format!(
+                                "Provided network type {} does not match stake address network type Testnet", network.to_json_string()
+                            )));
+                        }
+                        network
+                    } else {
+                        Network::Testnet
+                    }
+                },
+                pallas::ledger::addresses::Network::Other(x) => {
+                    return T400(ApiValidationError::new(format!("Unknown network type {x}")));
+                },
+            };
+
+            // get the total utxo amount from the database
             match event_db
-                .total_utxo_amount(stake_credential, date_time)
+                .total_utxo_amount(stake_credential, network.into(), date_time)
                 .await
             {
                 Ok(amount) => {
