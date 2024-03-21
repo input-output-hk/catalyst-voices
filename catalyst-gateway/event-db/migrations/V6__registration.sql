@@ -97,8 +97,8 @@ CREATE TABLE cardano_update_state (
   network TEXT NOT NULL,
   block_hash BYTEA NOT NULL CHECK (LENGTH(block_hash) = 32),
 
-  update BOOLEAN NOT NULL,
-  rollback BOOLEAN NOT NULL,
+  update BOOLEAN,
+  rollback BOOLEAN,
 
   stats JSONB,
 
@@ -181,7 +181,7 @@ CREATE TABLE cardano_utxo (
   value BIGINT NOT NULL,
   asset JSONB NULL,
 
-  stake_credential BYTEA NOT NULL CHECK (LENGTH(stake_credential) = 32),
+  stake_credential BYTEA NOT NULL,
 
   spent_tx_id BYTEA NULL REFERENCES cardano_txn_index (id),
 

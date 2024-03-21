@@ -12,7 +12,7 @@ use crate::{
     event_db::error::Error as DBError,
     service::common::{
         objects::{
-            cardano_address::CardanoStakeAddress, network::Network, stake_amount::StakeAmount,
+            cardano_address::CardanoStakeAddress, network::Network, stake_amount::StakeInfo,
         },
         responses::{
             resp_2xx::OK,
@@ -25,7 +25,7 @@ use crate::{
 
 /// # All Responses
 pub(crate) type AllResponses = response! {
-    200: OK<Json<StakeAmount>>,
+    200: OK<Json<StakeInfo>>,
     400: ApiValidationError,
     404: NotFound,
     500: ServerError,
@@ -84,10 +84,10 @@ pub(crate) async fn endpoint(
                 .total_utxo_amount(stake_credential, network.into(), date_time)
                 .await
             {
-                Ok(amount) => {
-                    T200(OK(Json(StakeAmount {
+                Ok((amount, slot_number)) => {
+                    T200(OK(Json(StakeInfo {
                         amount,
-                        slot_number: 0,
+                        slot_number,
                         date_time,
                     })))
                 },

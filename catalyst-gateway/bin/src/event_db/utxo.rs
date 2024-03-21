@@ -18,6 +18,9 @@ use crate::{
     },
 };
 
+/// Stake amount.
+pub(crate) type StakeAmount = i64;
+
 impl EventDB {
     /// Index utxo data
     pub(crate) async fn index_utxo_data(
@@ -117,7 +120,7 @@ impl EventDB {
     #[allow(dead_code)]
     pub(crate) async fn total_utxo_amount(
         &self, stake_credential: StakeCredential<'_>, _network: Network, date_time: BlockTime,
-    ) -> Result<u64, Error> {
+    ) -> Result<(StakeAmount, SlotNumber), Error> {
         let conn = self.pool.get().await?;
 
         let _rows = conn
@@ -127,6 +130,6 @@ impl EventDB {
             )
             .await?;
 
-        Ok(0)
+        Ok((100, 32150))
     }
 }

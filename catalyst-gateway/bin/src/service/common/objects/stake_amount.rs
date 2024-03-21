@@ -1,23 +1,28 @@
 //! Defines API schemas of stake amount type.
 
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use poem_openapi::{types::Example, Object};
 
-/// Stake amount.
+use crate::event_db::{
+    follower::{BlockTime, SlotNumber},
+    utxo::StakeAmount,
+};
+
+/// User's cardano stake info.
 #[derive(Object)]
 #[oai(example = true)]
-pub(crate) struct StakeAmount {
+pub(crate) struct StakeInfo {
     /// Stake amount.
-    pub(crate) amount: u64,
+    pub(crate) amount: StakeAmount,
 
     /// Slot number.
-    pub(crate) slot_number: u64,
+    pub(crate) slot_number: SlotNumber,
 
-    /// Date time.
-    pub(crate) date_time: DateTime<Utc>,
+    /// Block date time.
+    pub(crate) date_time: BlockTime,
 }
 
-impl Example for StakeAmount {
+impl Example for StakeInfo {
     fn example() -> Self {
         Self {
             amount: 1,
