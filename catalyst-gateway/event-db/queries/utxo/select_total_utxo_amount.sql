@@ -11,8 +11,9 @@ INNER JOIN cardano_txn_index
 
 -- filter out orphaned transactions
 INNER JOIN cardano_update_state
-  ON cardano_txn_index.slot_no <= cardano_update_state.slot_no
-  AND cardano_txn_index.network = cardano_update_state.network
+  ON
+    cardano_txn_index.slot_no <= cardano_update_state.slot_no
+    AND cardano_txn_index.network = cardano_update_state.network
 
 INNER JOIN cardano_slot_index
   ON
