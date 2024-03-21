@@ -24,7 +24,7 @@ function InfoItem({ heading, value, from }: Props) {
       {typeof value === "string" ? (
         <button
           type="button"
-          className="w-fit break-all hover:underline cursor-copy text-left"
+          className="w-fit break-all hover:underline cursor-copy text-left text-sm"
           onClick={() => handleCopy(value)}
         >
           <p>{value || "-"}</p>
@@ -37,7 +37,7 @@ function InfoItem({ heading, value, from }: Props) {
               <ol key={v}>
                 <button
                   type="button"
-                  className="w-fit break-all hover:underline cursor-copy text-left"
+                  className="w-fit break-all hover:underline cursor-copy text-left text-sm"
                   onClick={() => handleCopy(v)}
                 >
                   {v || "-"}
@@ -46,7 +46,7 @@ function InfoItem({ heading, value, from }: Props) {
             ))}
         </ol>
       ) : (
-        <p className="w-fit break-all">{String(value) || "-"}</p>
+        <p className="w-fit break-all text-sm">{String(value) || "-"}</p>
       )}
     </div>
   );

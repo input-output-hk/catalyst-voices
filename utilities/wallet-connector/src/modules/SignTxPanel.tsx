@@ -12,6 +12,7 @@ import InputBlock from "common/components/InputBlock";
 import WalletResponseSelection from "common/components/WalletResponseSelection";
 import cleanHex from "common/helpers/cleanHex";
 import type { ExtractedWalletApi } from "types/cardano";
+import TxInput from "common/components/TxInput";
 
 type Props = {
   selectedWallets: string[];
@@ -23,7 +24,7 @@ type FormValues = {
   tx: string;
 };
 
-function SignTxnPanel({ selectedWallets, walletApi }: Props) {
+function SignTxPanel({ selectedWallets, walletApi }: Props) {
   const [selectedResponseWallet, setSelectedResponseWallet] = useState("");
 
   const { isLoading, mutateAsync, data } = useMutation({
@@ -91,7 +92,7 @@ function SignTxnPanel({ selectedWallets, walletApi }: Props) {
             control={payloadForm.control}
             name="tx"
             render={({ field: { value, onChange } }) => (
-              <CBOREditor value={value} onChange={onChange} />
+              <TxInput value={value} onChange={onChange} />
             )}
           />
         </InputBlock>
@@ -123,4 +124,4 @@ function SignTxnPanel({ selectedWallets, walletApi }: Props) {
   );
 }
 
-export default SignTxnPanel;
+export default SignTxPanel;

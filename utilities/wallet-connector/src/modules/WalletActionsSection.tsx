@@ -6,8 +6,8 @@ import { twMerge } from "tailwind-merge";
 import type { ExtractedWalletApi } from "types/cardano";
 
 import SignDataPanel from "./SignDataPanel";
-import SignTxnPanel from "./SignTxnPanel";
-import SubmitTxnPanel from "./SubmitTxnPanel";
+import SignTxPanel from "./SignTxPanel";
+import SubmitTxPanel from "./SubmitTxPanel";
 
 const ACTIONS = ["Sign Transaction", "Sign Data", "Submit Transaction"];
 
@@ -41,13 +41,13 @@ function WalletActionsSection({ walletApi, selectedWallets }: Props) {
           </Tab.List>
           <Tab.Panels className="h-full overflow-auto">
             <Tab.Panel className="p-4 h-full">
-              <SignTxnPanel selectedWallets={selectedWallets} walletApi={walletApi} />
+              <SignTxPanel selectedWallets={selectedWallets} walletApi={walletApi} />
             </Tab.Panel>
             <Tab.Panel className="p-4 h-full">
               <SignDataPanel selectedWallets={selectedWallets} walletApi={walletApi} />
             </Tab.Panel>
             <Tab.Panel className="p-4 h-full">
-              <SubmitTxnPanel selectedWallets={selectedWallets} walletApi={walletApi} />
+              <SubmitTxPanel selectedWallets={selectedWallets} walletApi={walletApi} />
             </Tab.Panel>
           </Tab.Panels>
         </Tab.Group>
