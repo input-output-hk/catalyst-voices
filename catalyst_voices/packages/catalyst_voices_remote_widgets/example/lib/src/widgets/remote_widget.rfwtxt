@@ -37,6 +37,7 @@ widget root = Center(
                     fontSize: 16.0,
                     fontWeight: "FontWeight.w700",
                   },
+                   onChanged: event 'firstNameHasChanged' { },
                 ),
                 SizedBox(height: 24.0),
                 Text(

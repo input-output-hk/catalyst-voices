@@ -39,10 +39,10 @@ class _HomePageState extends State<HomePage> {
             _showLocalWidget ? const LocalWidget() : const RemoteForm(),
           ],
         ),
-        // child: NewLocalWidgets(),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _toggleShownWidget(),
+        tooltip: 'Toggle between local and remote widgets',
         child: const Icon(Icons.refresh),
       ),
     );

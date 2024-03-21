@@ -31,6 +31,7 @@ class _RemoteFormState extends State<RemoteForm> {
   late final Future<void> _widgetFuture;
 
   bool _showInitialWidget = true;
+  String _remoteText = '';
 
   void _toggleShowWidget() {
     setState(() {
@@ -55,7 +56,16 @@ class _RemoteFormState extends State<RemoteForm> {
           return const Center(child: CircularProgressIndicator());
         } else {
           return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Text(
+                _remoteText,
+                style: const TextStyle(
+                  fontSize: 18,
+                  color: Color.fromARGB(255, 227, 17, 38),
+                ),
+              ),
+              const SizedBox(height: 16),
               RemoteWidget(
                 runtime: _runtime,
                 data: _data,
@@ -90,10 +100,9 @@ class _RemoteFormState extends State<RemoteForm> {
 
   Future<void> onEvent(String name, DynamicMap arguments) async {
     debugPrint('user triggered event "$name" with data: $arguments');
-  }
-
-  void _configure() {
-    _widgetFuture = _fetchWidget();
+    setState(() {
+      _remoteText = 'User triggered event "$name" with data: $arguments';
+    });
   }
 
   Future<void> _fetchWidget() async {

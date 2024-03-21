@@ -35,11 +35,12 @@ class LocalWidget extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                const TextField(
-                  style: TextStyle(
+                TextField(
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
+                  onChanged: (value) {},
                 ),
                 const SizedBox(height: 24),
                 const Text(
@@ -54,9 +55,7 @@ class LocalWidget extends StatelessWidget {
                     fontSize: 16,
                     color: Color(0xFFFF1F09),
                   ),
-                  onChanged: (value) {
-                    print(value);
-                  },
+                  onChanged: (value) {},
                 ),
                 const Spacer(),
               ],

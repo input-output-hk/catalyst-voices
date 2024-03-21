@@ -10,13 +10,8 @@ Future<void> main() async {
     outputFile: 'remote_widget.rfw',
   );
 
-  // await RemoteWidgetEncoder.rfwTxtToRfw(
-  //   inputFile: 'new_remote_widget.rfwtxt',
-  //   outputFile: 'new_remote_widget.rfw',
-  // );
-
-  // await RemoteWidgetEncoder.rfwTxtToRfw(
-  //   inputFile: 'test.rfwtxt',
-  //   outputFile: 'test.rfw',
-  // );
+  await RemoteWidgetEncoder.rfwTxtToRfw(
+    inputFile: 'new_remote_widget.rfwtxt',
+    outputFile: 'new_remote_widget.rfw',
+  );
 }
