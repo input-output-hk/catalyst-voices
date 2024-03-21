@@ -137,7 +137,7 @@ impl EventDB {
             )
             .await?;
 
-        // Aggregate functions as SUM and MAX retun NULL if there are no rows, so we need to
+        // Aggregate functions as SUM and MAX return NULL if there are no rows, so we need to
         // check for it.
         // https://www.postgresql.org/docs/8.2/functions-aggregate.html
         if let Some(amount) = row.try_get("total_utxo_amount")? {

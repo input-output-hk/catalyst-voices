@@ -51,15 +51,15 @@ impl UTXOApi {
         /// Should a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
         stake_address: Path<CardanoStakeAddress>,
         /// Cardano network type.
-        /// If ommited network type is identified from the stake address.
+        /// If omitted network type is identified from the stake address.
         /// If specified it must be correspondent to the network type encoded in the stake
         /// address.
-        /// As `preprod` and `preview` network types in the stake address enconded as a
+        /// As `preprod` and `preview` network types in the stake address encoded as a
         /// `testnet`, to specify `preprod` or `preview` network type use this
         /// query parameter.
         network: Query<Option<Network>>,
         /// Date time at which the staked ada amount should be calculated.
-        /// If ommited current date time is used.
+        /// If omitted current date time is used.
         date_time: Query<Option<DateTime<Utc>>>,
     ) -> staked_ada_get::AllResponses {
         staked_ada_get::endpoint(&data, stake_address.0, network.0, date_time.0).await
