@@ -23,7 +23,7 @@ impl CardanoStakeAddress {
             "stake1uyehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gh6ffgw".to_string(),
         ));
         schema.max_length = Some(64);
-        schema.pattern = Some("(stake|stake_test)1[a-z0-9]{53}".to_string());
+        schema.pattern = Some("(stake|stake_test)1[a,c-h,j-n,p-z,0,2-9]{53}".to_string());
         schema
     }
 }
