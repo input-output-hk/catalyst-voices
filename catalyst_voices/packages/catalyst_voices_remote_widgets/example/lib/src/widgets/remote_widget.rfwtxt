@@ -15,42 +15,43 @@ widget root = Center(
               children: [
                 Center(
                   child: Text(
-                   text: "Local Widget",
-                    style: TextStyle(
+                   text: "Sign In",
+                   style : {
                       fontSize: 32.0,
-                      fontWeight: "FontWeight.bold",
-                      color: 0xFF66AACC,
-                    ),
+                      fontWeight: "FontWeight.w700",
+                      color: 0xFF000000,
+                   }
                   ),
                 ),
                 SizedBox(height: 16.0),
                 Text(
                   text: "First Name",
-                  style: TextStyle(
+                  style: {
                     fontSize: 16.0,
-                    fontWeight:"FontWeight.w700",
-                  ),
+                    fontWeight: "FontWeight.w700",
+                  },
                 ),
                 SizedBox(height: 8.0),
                 TextField(
-                  style: TextStyle(
-                    fontSize: 16,
+                  style: {
+                    fontSize: 16.0,
                     fontWeight: "FontWeight.w700",
-                  ),
+                  },
                 ),
                 SizedBox(height: 24.0),
                 Text(
                   text:"Second Name",
-                  style: TextStyle(
+                  style: {
                     fontSize: 16.0,
                     fontWeight: "FontWeight.w700",
-                  ),
+                  },
                 ),
                 TextField(
-                  style: TextStyle(
+                  style: {
                     fontSize: 16.0,
-                    color: 0xFFFF1F09,
-                  ),
+                    fontWeight: "FontWeight.w700",
+                  },
+                  onChanged: event 'secondNameHasChanged' { },
                 ),
               ],
             ),

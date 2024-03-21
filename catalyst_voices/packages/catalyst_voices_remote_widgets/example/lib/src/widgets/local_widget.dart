@@ -5,44 +5,44 @@ class LocalWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: SizedBox(
         height: 300,
         width: 500,
         child: Card(
           child: Padding(
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Center(
+                const Center(
                   child: Text(
-                    'Local Widget',
+                    'Sign In',
                     style: TextStyle(
                       fontSize: 32,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w700,
                       color: Color(0xFF66AACC),
                     ),
                   ),
                 ),
-                SizedBox(height: 16),
-                Text(
+                const SizedBox(height: 16),
+                const Text(
                   'First Name',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
-                SizedBox(height: 8),
-                TextField(
+                const SizedBox(height: 8),
+                const TextField(
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 24),
-                Text(
+                const SizedBox(height: 24),
+                const Text(
                   'Second Name',
                   style: TextStyle(
                     fontSize: 16,
@@ -50,11 +50,15 @@ class LocalWidget extends StatelessWidget {
                   ),
                 ),
                 TextField(
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     color: Color(0xFFFF1F09),
                   ),
+                  onChanged: (value) {
+                    print(value);
+                  },
                 ),
+                const Spacer(),
               ],
             ),
           ),
