@@ -3,12 +3,22 @@ import { Address, TransactionUnspentOutput, Value } from "@emurgo/cardano-serial
 import { camelCase, mapValues } from "lodash-es";
 
 export default async function extractApiData(api: WalletApi, cipExt?: number): Promise<any> {
-  const safeTry = async <T>(fn: () => Promise<T>, transformer?: (v: T) => T): Promise<T> => {
+  const safeTry = async <T>(fn: () => Promise<T>, transformer?: (v: T) => T): Promise<{ raw: T; formatted: T; }> => {
     try {
       const v = await fn();
-      return transformer ? transformer(v) : v;
+      return transformer ? {
+        raw: v,
+        formatted: transformer(v)
+      } : {
+        raw: v,
+        formatted: v
+      };
     } catch (err) {
-      return `Failed: ${String(err)}` as T;
+      const fmtErr = `Failed: ${String(err)}` as T;
+      return {
+        raw: fmtErr,
+        formatted: fmtErr
+      };
     }
   };
 
@@ -41,7 +51,7 @@ export default async function extractApiData(api: WalletApi, cipExt?: number): P
         unusedAddresses: await safeTry(api.getUnusedAddresses, (v) => v?.map((v) => Address.from_hex(v).to_bech32()) ?? v),
         changeAddress: await safeTry(api.getChangeAddress, (v) => Address.from_hex(v).to_bech32()),
         rewardAddresses: await safeTry(api.getRewardAddresses, (v) => v?.map((v) => Address.from_hex(v).to_bech32()) ?? v),
-      }, (v) => ({ from: "cip30", value: v })),
+      }, (v) => ({ from: "cip30", raw: v.raw, value: v.formatted })),
       ...extData
     }
   };

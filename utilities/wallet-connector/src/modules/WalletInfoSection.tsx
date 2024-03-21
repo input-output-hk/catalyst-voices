@@ -95,11 +95,12 @@ function WalletInfoSection({
                   </div>
                   {Boolean(walletApi[wallet]) && (
                     <div className="grid gap-2">
-                      {Object.entries(walletApi[wallet]?.["info"] ?? {}).map(([key, { from, value }]: [string, any]) => (
+                      {Object.entries(walletApi[wallet]?.["info"] ?? {}).map(([key, { from, value, raw }]: [string, any]) => (
                         <InfoItem
                           key={key}
                           heading={capitalize(upperCase(key))}
                           value={value ?? null}
+                          raw={raw}
                           from={from}
                         />
                       ))}
