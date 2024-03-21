@@ -11,7 +11,10 @@ use poem_openapi::{
 
 use crate::{
     service::{
-        common::{objects::network::Network, tags::ApiTags},
+        common::{
+            objects::{cardano_address::CardanoStakeAddress, network::Network},
+            tags::ApiTags,
+        },
         utilities::middleware::schema_validation::schema_version_validation,
     },
     state::State,
@@ -36,7 +39,7 @@ impl UTXOApi {
     /// user's stake address.
     ///
     /// ## Responses
-    /// * 200
+    /// * 200 OK - Returns the staked ada amount.
     /// * 400 Bad Request.
     /// * 500 Server Error - If anything within this function fails unexpectedly.
     /// * 503 Service Unavailable - Service is not ready, requests to other
@@ -45,18 +48,19 @@ impl UTXOApi {
         &self, data: Data<&Arc<State>>,
         /// The stake address of the user.
         /// Should a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
-        stake_address: Path<String>,
+        stake_address: Path<CardanoStakeAddress>,
         /// Cardano network type.
+        /// If ommited network type is identified from the stake address.
+        /// If specified it must be correspondent to the network type encoded in the stake
+        /// address.
+        /// As `preprod` and `preview` network types in the stake address enconded as a
+        /// `testnet`, to specify `preprod` or `preview` network type use this
+        /// query parameter.
         network: Query<Option<Network>>,
-        /// Date time.
+        /// Date time at which the staked ada amount should be calculated.
+        /// If ommited current date time is used.
         date_time: Query<Option<DateTime<Utc>>>,
     ) -> staked_ada_get::AllResponses {
-        tracing::info!(
-            "GET /utxo/staked_ada/:stake_address, stake_address: {}, network: {:?}, date_time: {:?}",
-            stake_address.0,
-            network.0,
-            date_time.0
-        );
         staked_ada_get::endpoint(&data, stake_address.0, network.0, date_time.0).await
     }
 }

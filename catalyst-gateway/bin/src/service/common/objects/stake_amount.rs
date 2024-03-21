@@ -1,4 +1,4 @@
-//! Defines API schemas of stake amount types.
+//! Defines API schemas of stake amount type.
 
 use chrono::{DateTime, Utc};
 use poem_openapi::{types::Example, Object};

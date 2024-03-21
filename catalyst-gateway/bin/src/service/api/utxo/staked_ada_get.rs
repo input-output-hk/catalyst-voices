@@ -9,9 +9,11 @@ use poem_openapi::{payload::Json, types::Example};
 
 use crate::{
     cli::Error,
-    event_db::{error::Error as DBError, utxo::StakeCredential},
+    event_db::error::Error as DBError,
     service::common::{
-        objects::{network::Network, stake_amount::StakeAmount},
+        objects::{
+            cardano_address::CardanoStakeAddress, network::Network, stake_amount::StakeAmount,
+        },
         responses::{
             resp_2xx::OK,
             resp_4xx::ApiValidationError,
@@ -32,9 +34,15 @@ pub(crate) type AllResponses = response! {
 /// # GET `/utxo/staked_ada`
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(
-    state: &State, _stake_credential: StakeCredential, _network: Option<Network>,
-    _date: Option<DateTime<Utc>>,
+    state: &State, stake_address: CardanoStakeAddress, network: Option<Network>,
+    date_time: Option<DateTime<Utc>>,
 ) -> AllResponses {
+    tracing::info!(
+        "stake_address: {:?}, network: {:?}, date_time: {:?}",
+        stake_address,
+        network,
+        date_time
+    );
     match state.event_db() {
         Ok(_event_db) => {
             // let _res = event_db
