@@ -18,8 +18,8 @@ widget root = Center(
                    text: "Sign In",
                    style : {
                       fontSize: 32.0,
-                      fontWeight: "FontWeight.w700",
-                      color: 0xFF000000,
+                      fontWeight: "w700",
+                      color: 0xFF66AACC,
                    }
                   ),
                 ),
@@ -28,14 +28,14 @@ widget root = Center(
                   text: "First Name",
                   style: {
                     fontSize: 16.0,
-                    fontWeight: "FontWeight.w700",
+                    fontWeight: "w700",
                   },
                 ),
                 SizedBox(height: 8.0),
                 TextField(
                   style: {
                     fontSize: 16.0,
-                    fontWeight: "FontWeight.w700",
+                    fontWeight: "w700",
                   },
                    onChanged: event 'firstNameHasChanged' { },
                 ),
@@ -44,13 +44,13 @@ widget root = Center(
                   text:"Second Name",
                   style: {
                     fontSize: 16.0,
-                    fontWeight: "FontWeight.w700",
+                    fontWeight: "w700",
                   },
                 ),
                 TextField(
                   style: {
                     fontSize: 16.0,
-                    fontWeight: "FontWeight.w700",
+                    color: 0xFFFF1F09,
                   },
                   onChanged: event 'secondNameHasChanged' { },
                 ),

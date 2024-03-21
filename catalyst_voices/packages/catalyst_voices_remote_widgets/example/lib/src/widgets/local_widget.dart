@@ -57,7 +57,6 @@ class LocalWidget extends StatelessWidget {
                   ),
                   onChanged: (value) {},
                 ),
-                const Spacer(),
               ],
             ),
           ),
