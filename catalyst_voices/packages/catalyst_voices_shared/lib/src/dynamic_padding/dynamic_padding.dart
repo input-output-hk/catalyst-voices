@@ -1,8 +1,32 @@
 import 'package:flutter/widgets.dart';
 
+// A [DynamicPadding] is a StatelessWidget that applies a padding based on the
+// current screen size.
+//
+// The widget wraps its child into a Padding and it applies the specified
+// EdgeInsets for each screen size.
+//
+// The size considered is the screen width and it's extracted from MediaQuery.
+//
+// The possible arguments are [xs], [sm], [md], [lg], [other] following the 
+// Material design standards for naming and breakpoint sizes.
+// Each screen size has a default value to simplify widget usage.
+//
+// Example usage:
+// 
+// ```dart
+// DynamicPadding(
+//   xs: const EdgeInsets.all(4.0),
+//   sm: const EdgeInsets.all(6.0),
+//   md: const EdgeInsets.only(top: 6.0),
+//   lg: const EdgeInsets.symmetric(vertical: 15.0),
+//   child: Text('This is an example text with dynamic padding.')
+// );
+// ```
+
 class DynamicPadding extends StatelessWidget {
   final Widget child;
-  final Map<String, EdgeInsets?> _paddings;
+  final Map<String, EdgeInsets> _paddings;
 
   DynamicPadding({
     super.key,
