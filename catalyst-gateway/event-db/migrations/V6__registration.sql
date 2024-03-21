@@ -95,7 +95,7 @@ CREATE TABLE cardano_update_state (
 
   slot_no BIGINT NOT NULL,
   network TEXT NOT NULL,
-  block_hash TEXT NOT NULL,
+  block_hash BYTEA NOT NULL CHECK (LENGTH(block_hash) = 32),
 
   update BOOLEAN,
   rollback BOOLEAN,

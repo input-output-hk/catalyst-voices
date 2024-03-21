@@ -1,5 +1,4 @@
 //! Registration Queries
-use async_trait::async_trait;
 use chrono::{NaiveDateTime, Utc};
 
 use crate::event_db::{
@@ -9,18 +8,6 @@ use crate::event_db::{
     },
     Error, EventDB,
 };
-
-#[async_trait]
-#[allow(clippy::module_name_repetitions)]
-/// Registration Queries Trait
-pub(crate) trait RegistrationQueries: Sync + Send + 'static {
-    async fn get_voter(
-        &self, event: &Option<EventId>, voting_key: String, with_delegations: bool,
-    ) -> Result<Voter, Error>;
-    async fn get_delegator(
-        &self, event: &Option<EventId>, stake_public_key: String,
-    ) -> Result<Delegator, Error>;
-}
 
 impl EventDB {
     /// Delegations by event query template
@@ -82,9 +69,10 @@ impl EventDB {
                                                 WHERE contribution.voting_key = $1 AND snapshot.event = $2;";
 }
 
-#[async_trait]
-impl RegistrationQueries for EventDB {
-    async fn get_voter(
+impl EventDB {
+    /// Get voter query
+    #[allow(dead_code)]
+    pub(crate) async fn get_voter(
         &self, event: &Option<EventId>, voting_key: String, with_delegations: bool,
     ) -> Result<Voter, Error> {
         let conn = self.pool.get().await?;
@@ -175,7 +163,9 @@ impl RegistrationQueries for EventDB {
         })
     }
 
-    async fn get_delegator(
+    /// Get delegator query
+    #[allow(dead_code)]
+    pub(crate) async fn get_delegator(
         &self, event: &Option<EventId>, stake_public_key: String,
     ) -> Result<Delegator, Error> {
         let conn = self.pool.get().await?;

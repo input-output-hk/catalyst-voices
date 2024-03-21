@@ -6,7 +6,6 @@ use tokio::time;
 use tracing::{error, info};
 
 use crate::{
-    event_db::config::ConfigQueries,
     follower::start_followers,
     logger, service,
     settings::{DocsSettings, ServiceSettings},

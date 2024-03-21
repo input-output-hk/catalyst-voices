@@ -8,8 +8,12 @@ impl EventDB {
     /// Otherwise return an error.
     pub(crate) async fn schema_version_check(&self) -> Result<i32, Error> {
         let conn = self.pool.get().await?;
+
         let schema_check = conn
-            .query_one("SELECT MAX(version) FROM refinery_schema_history;", &[])
+            .query_one(
+                include_str!("../../../event-db/queries/schema_check/select_max_version.sql"),
+                &[],
+            )
             .await?;
 
         let current_ver = schema_check.try_get("max")?;

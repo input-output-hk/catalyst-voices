@@ -1,17 +1,8 @@
 //! Config Queries
-use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use tracing::error;
 
-use crate::event_db::{Error, EventDB};
-
-#[async_trait]
-#[allow(clippy::module_name_repetitions)]
-/// Config Queries Trait
-pub(crate) trait ConfigQueries: Sync + Send + 'static {
-    async fn get_config(&self) -> Result<(Vec<NetworkMeta>, FollowerMeta), Error>;
-}
-use crate::event_db::Error::JsonParseIssue;
+use crate::event_db::{Error, Error::JsonParseIssue, EventDB};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, PartialOrd, Clone)]
 /// Network config metadata
@@ -32,16 +23,16 @@ pub(crate) struct FollowerMeta {
 }
 
 impl EventDB {
-    /// Get config
-    const CONFIG_QUERY: &'static str = "SELECT cardano, follower, preview FROM config";
-}
-
-#[async_trait]
-impl ConfigQueries for EventDB {
-    async fn get_config(&self) -> Result<(Vec<NetworkMeta>, FollowerMeta), Error> {
+    /// Config query
+    pub(crate) async fn get_config(&self) -> Result<(Vec<NetworkMeta>, FollowerMeta), Error> {
         let conn = self.pool.get().await?;
 
-        let rows = conn.query(Self::CONFIG_QUERY, &[]).await?;
+        let rows = conn
+            .query(
+                include_str!("../../../event-db/queries/config/select_config.sql"),
+                &[],
+            )
+            .await?;
 
         let Some(row) = rows.first() else {
             return Err(Error::NoConfig);
