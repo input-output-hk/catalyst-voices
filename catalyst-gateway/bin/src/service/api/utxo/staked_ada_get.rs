@@ -59,7 +59,7 @@ pub(crate) async fn endpoint(
                     // the preprod and preview network types are encoded as `testnet` in the stake
                     // address, so here we are checking if the `provided_network` type matches the
                     // one, and if not - we return an error.
-                    // if the `provided_network` omiited - we return the `testnet` network type
+                    // if the `provided_network` omitted - we return the `testnet` network type
                     if let Some(network) = provided_network {
                         if !matches!(
                             network,
