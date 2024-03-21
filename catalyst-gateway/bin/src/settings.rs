@@ -35,6 +35,15 @@ const API_HOST_NAMES_DEFAULT: &str = "https://api.prod.projectcatalyst.io";
 /// Default `API_URL_PREFIX` used in development.
 const API_URL_PREFIX_DEFAULT: &str = "/api";
 
+/// Default `CHECK_CONFIG_TICK` used in development.
+const CHECK_CONFIG_TICK_DEFAULT: &str = "5";
+
+/// Default `DATA_REFRESH_TICK` used in development
+const DATA_REFRESH_TICK_DEFAULT: &str = "5";
+
+/// Default `MACHINE_UID` used in development
+const MACHINE_UID_DEFAULT: &str = "UID";
+
 /// Settings for the application.
 ///
 /// This struct represents the configuration settings for the application.
@@ -54,6 +63,10 @@ pub(crate) struct ServiceSettings {
     /// Docs settings.
     #[clap(flatten)]
     pub(crate) docs_settings: DocsSettings,
+
+    /// Follower settings.
+    #[clap(flatten)]
+    pub(crate) follower_settings: FollowerSettings,
 }
 
 /// Settings specifies `OpenAPI` docs generation.
@@ -77,6 +90,22 @@ pub(crate) struct DocsSettings {
     /// Server name
     #[clap(long, env = "SERVER_NAME")]
     pub(crate) server_name: Option<String>,
+}
+
+/// Settings for follower mechanics.
+#[derive(Args, Clone)]
+pub(crate) struct FollowerSettings {
+    /// Check config tick
+    #[clap(long, default_value = CHECK_CONFIG_TICK_DEFAULT, env = "CHECK_CONFIG_TICK")]
+    pub(crate) check_config_tick: String,
+
+    /// Data Refresh tick
+    #[clap(long, default_value = DATA_REFRESH_TICK_DEFAULT, env = "DATA_REFRESH_TICK")]
+    pub(crate) data_refresh_tick: String,
+
+    /// Machine UID
+    #[clap(long, default_value = MACHINE_UID_DEFAULT, env = "MACHINE_UID")]
+    pub(crate) machine_uid: String,
 }
 
 /// An environment variable read as a string.
@@ -145,6 +174,9 @@ lazy_static! {
 
     /// The base path the API is served at.
     pub(crate) static ref API_URL_PREFIX: StringEnvVar = StringEnvVar::new("API_URL_PREFIX", API_URL_PREFIX_DEFAULT);
+
+    /// Tick every N seconds until config exists in db
+    pub(crate) static ref CHECK_CONFIG_TICK: StringEnvVar = StringEnvVar::new("CHECK_CONFIG_TICK", CHECK_CONFIG_TICK_DEFAULT);
 
 
 }
@@ -258,7 +290,7 @@ pub(crate) fn generate_github_issue_url(title: &str) -> Option<Url> {
     ]) {
         Ok(url) => Some(url),
         Err(e) => {
-            error!(err = e.to_string(); "Failed to generate github issue url");
+            error!("Failed to generate github issue url {:?}", e.to_string());
             None
         },
     }

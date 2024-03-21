@@ -13,7 +13,7 @@ CREATE TABLE cardano_slot_index (
   slot_no BIGINT NOT NULL,
   network TEXT NOT NULL,
   epoch_no BIGINT NOT NULL,
-  block_time TIMESTAMP NOT NULL,
+  block_time TIMESTAMP WITH TIME ZONE NOT NULL,
   block_hash BYTEA NOT NULL CHECK (LENGTH(block_hash) = 32),
 
   PRIMARY KEY (slot_no, network)
@@ -44,6 +44,7 @@ COMMENT ON COLUMN cardano_slot_index.block_time IS
 'The time of the slot/block.';
 COMMENT ON COLUMN cardano_slot_index.block_hash IS
 'The hash of the block.';
+
 
 -- -------------------------------------------------------------------------------------------------
 
@@ -88,20 +89,22 @@ CREATE TABLE cardano_update_state (
 
   id BIGSERIAL PRIMARY KEY,
 
-  started TIMESTAMP NOT NULL,
-  ended TIMESTAMP NOT NULL,
+  started TIMESTAMP WITH TIME ZONE NOT NULL,
+  ended TIMESTAMP WITH TIME ZONE NOT NULL,
   updater_id TEXT NOT NULL,
 
   slot_no BIGINT NOT NULL,
   network TEXT NOT NULL,
+  block_hash BYTEA NOT NULL CHECK (LENGTH(block_hash) = 32),
 
-  update BOOLEAN NOT NULL,
-  rollback BOOLEAN NOT NULL,
+  update BOOLEAN,
+  rollback BOOLEAN,
 
-  stats JSONB NOT NULL,
+  stats JSONB,
 
   FOREIGN KEY (slot_no, network) REFERENCES cardano_slot_index (slot_no, network)
 );
+
 
 CREATE INDEX cardano_update_state_idx ON cardano_update_state (id, network);
 
@@ -165,6 +168,7 @@ COMMENT ON COLUMN cardano_update_state.stats IS
 'A JSON stats record containing extra data about this update.
 Must conform to Schema: 
     `catalyst_schema://0f917b13-afac-40d2-8263-b17ca8219914/registration/update_stats`.';
+
 
 -- -------------------------------------------------------------------------------------------------
 

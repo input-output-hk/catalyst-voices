@@ -15,6 +15,7 @@
         "rust-lang.rust-analyzer",
         "JScearcy.rust-doc-viewer",
         "serayuzgur.crates",
-        "panicbit.cargo",
+        "tintinweb.graphviz-interactive-preview",
+        "terrastruct.d2"
     ]
 }

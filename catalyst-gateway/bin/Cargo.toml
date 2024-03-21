@@ -16,12 +16,12 @@ workspace = true
 
 [dependencies]
 
-async-trait = { workspace = true }
 bb8 = { workspace = true }
 bb8-postgres = { workspace = true }
 tokio-postgres = { workspace = true, features = [
     "with-chrono-0_4",
     "with-serde_json-1",
+    "with-time-0_3",
 ] }
 
 clap = { workspace = true, features = ["derive", "env"] }
@@ -70,3 +70,11 @@ ulid = { workspace = true, features = ["serde", "uuid"] }
 rust-embed = { workspace = true }
 local-ip-address.workspace = true
 gethostname.workspace = true
+
+hex = "0.4.3"
+async-recursion = "1.0.5"
+
+
+cardano-chain-follower= { git = "https://github.com/input-output-hk/hermes.git", version="0.0.1"}
+
+pallas = { version = "0.23.0" }

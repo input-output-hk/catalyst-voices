@@ -9,7 +9,7 @@ Firstly you will need to prepare a docker images with all migrations and data.
 Prepare a event-db docker image with the historic and test data
 
 ```sh
-earthly ./catalyst-gateway/event-db+build --tag "latest" --registry "" --with_historic_data true --with_test_data true
+earthly ./catalyst-gateway/event-db+build
 ```
 
 Run a event db docker container

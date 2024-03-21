@@ -29,6 +29,27 @@ pub(crate) enum Error {
     /// Variable error
     #[error(transparent)]
     VarErr(#[from] VarError),
+    /// No config
+    #[error("No config")]
+    NoConfig,
+    /// JSON Parsing error
+    #[error("Unable to parse database data: {0}")]
+    JsonParseIssue(String),
+    #[error("Decode Error: {0}")]
+    /// Unable to decode hex
+    DecodeHex(String),
+    /// No previous followers hence no last updates metadata
+    #[error("LastUpdate metadata not present: {0}")]
+    NoLastUpdateMetadata(String),
+    /// Conversion error
+    #[error("Unable to convert u64 to i64 for sql type compatibility: {0}")]
+    SqlTypeConversionFailure(String),
+    /// Unable to extract policy assets
+    #[error("Unable parse assets: {0}")]
+    AssetParsingIssue(String),
+    /// Unable to extract hashed witnesses
+    #[error("Unable to extract hashed witnesses: {0}")]
+    HashedWitnessExtraction(String),
 }
 
 impl From<RunError<tokio_postgres::Error>> for Error {

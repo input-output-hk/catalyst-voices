@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:catalyst_voices_shared/src/platform/platform_key.dart';
+
 final class CatalystPlatform {
   static bool get isAndroid => Platform.isAndroid;
 
@@ -23,4 +25,18 @@ final class CatalystPlatform {
   static bool get isWebDesktop => false;
 
   static bool get isWindows => Platform.isWindows;
+
+  static Map<PlatformKey, bool> get identifiers => {
+    PlatformKey.android: isAndroid,
+    PlatformKey.desktop: isDesktop,
+    PlatformKey.fuchsia: isFuchsia,
+    PlatformKey.iOS: isIOS,
+    PlatformKey.linux: isLinux,
+    PlatformKey.macOS: isMacOS,
+    PlatformKey.mobile: isMobile,
+    PlatformKey.mobileWeb: isMobileWeb,
+    PlatformKey.web: isWeb,
+    PlatformKey.webDesktop: isWebDesktop,
+    PlatformKey.windows: isWindows,
+  };
 }

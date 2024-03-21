@@ -27,6 +27,10 @@ services:
 
   cat-gateway:
     image: cat-gateway:latest
+    environment:
+      - DATA_REFRESH_TICK=5
+      - CHECK_CONFIG_TICK=5
+      - MACHINE_ID="UID"
     hostname: gateway
     ports:
       - 3030:3030

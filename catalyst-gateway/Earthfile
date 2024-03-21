@@ -4,9 +4,10 @@ VERSION --try --global-cache 0.7
 
 # Set up our target toolchains, and copy our files.
 builder:
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.7.0+SETUP
+   DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.9.8+SETUP
 
     COPY --dir .cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin crates tests .
+    COPY --dir ./event-db/queries ./event-db/queries
 
 ## -----------------------------------------------------------------------------
 ##
@@ -34,8 +35,8 @@ build:
         RUN /scripts/std_build.py   --cov_report="coverage-report.info" \
                                     --bins="cat-gateway/cat-gateway"
     FINALLY
-        SAVE ARTIFACT target/nextest/ci/junit.xml AS LOCAL cat-gateway.junit-report.xml
-        SAVE ARTIFACT coverage-report.info AS LOCAL cat-gateway.coverage-report.info
+        SAVE ARTIFACT --if-exists target/nextest/ci/junit.xml AS LOCAL cat-gateway.junit-report.xml
+        SAVE ARTIFACT --if-exists coverage-report.info AS LOCAL cat-gateway.coverage-report.info
     END
     RUN ./target/$TARGETARCH/release/cat-gateway docs ./target/$TARGETARCH/doc/cat-gateway-api.json
     SAVE ARTIFACT target/$TARGETARCH/doc doc
@@ -56,7 +57,7 @@ package-cat-gateway:
     COPY +build/cat-gateway .
     ENTRYPOINT ./cat-gateway run --address $address --database-url $db_url --log-level $log_level
     SAVE IMAGE cat-gateway:$tag
-    
+
 # Publish packages if all integration tests have passed. (Failure to pass tests will prevent packages being published.)
 # publish:
 #    FROM scratch

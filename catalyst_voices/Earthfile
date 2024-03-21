@@ -1,0 +1,45 @@
+VERSION --try --global-cache --arg-scope-and-set 0.7
+
+deps:
+    FROM debian:bookworm-slim
+    RUN apt-get update
+    RUN apt-get install -y git curl unzip bzip2 bash jq gpg
+    COPY --dir test_driver/scripts .
+    RUN chmod +x scripts/install-chrome-linux64.sh && ./scripts/install-chrome-linux64.sh
+    RUN chmod +x scripts/install-edge-linux64.sh && ./scripts/install-edge-linux64.sh
+    RUN chmod +x scripts/install-firefox-linux64.sh && ./scripts/install-firefox-linux64.sh
+
+    WORKDIR /frontend
+
+    GIT CLONE https://github.com/flutter/flutter.git /usr/local/flutter
+    ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:${PATH}"
+
+    RUN flutter channel stable
+    RUN flutter upgrade
+    RUN flutter --version
+    RUN flutter doctor -v
+    RUN flutter config --enable-web
+
+src:
+    FROM +deps
+    COPY --dir pubspec.yaml lib packages web test test_driver integration_test .
+
+# Build web version of Catalyst Voices
+build:
+    FROM +src
+
+    RUN flutter clean
+    RUN flutter pub get
+    RUN flutter build web --web-renderer canvaskit --release --target lib/configs/main_web.dart
+
+    WORKDIR /frontend/build
+    SAVE ARTIFACT web /web AS LOCAL web
+
+package:
+    FROM nginx:alpine3.18
+    ARG tag='latest'
+    COPY +build/web /app
+    COPY ./nginx.conf /etc/nginx/nginx.conf
+    EXPOSE 80
+
+    SAVE IMAGE catalyst-voices-app:$tag

@@ -38,11 +38,13 @@ test-fuzzer-api:
                     docker cp st:/results/junit-report.xml junit-report.xml
     END
     WAIT
-        SAVE ARTIFACT junit-report.xml AS LOCAL junit-report.xml
+        SAVE ARTIFACT junit-report.xml AS LOCAL schemathesis.junit-report.xml
         SAVE ARTIFACT cat-gateway.log AS LOCAL cat-gateway.log
     END
     IF [ -f fail ]
         RUN echo "Schemathesis run failed" && \
+            echo "Printing catalyst gateway logs..." && \
+            jq --color-output . cat-gateway.log cat-gateway.log && \
             exit 1
     END
 
