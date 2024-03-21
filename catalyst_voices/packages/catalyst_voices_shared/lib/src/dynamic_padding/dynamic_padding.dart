@@ -7,14 +7,16 @@ class DynamicPadding extends StatelessWidget {
   DynamicPadding({
     super.key,
     required this.child,
-    EdgeInsets small = const EdgeInsets.all(8),
-    EdgeInsets medium = const EdgeInsets.all(12),
-    EdgeInsets large = const EdgeInsets.all(16),
+    EdgeInsets xs = const EdgeInsets.all(4),
+    EdgeInsets sm = const EdgeInsets.all(8),
+    EdgeInsets md = const EdgeInsets.all(12),
+    EdgeInsets lg = const EdgeInsets.all(16),
     EdgeInsets other = const EdgeInsets.all(8),
   }) : _paddings = {
-    'small': small,
-    'medium': medium,
-    'large': large,
+    'xs': xs,
+    'sm': sm,
+    'md': md,
+    'lg': lg,
     'other': other,
   };
 
@@ -40,8 +42,9 @@ class DynamicPadding extends StatelessWidget {
   }
 
   final Map<String, ({int min, int max})> _screenSizes = {
-    'small': (min: 0, max: 600),
-    'medium': (min: 601, max: 1024),
-    'large': (min: 1025, max: 2048),
+    'xs': (min: 0, max: 599),
+    'sm': (min: 600, max: 1239),
+    'md': (min: 1240, max: 1439),
+    'lg': (min: 1440, max: 2048),
   };
 }
