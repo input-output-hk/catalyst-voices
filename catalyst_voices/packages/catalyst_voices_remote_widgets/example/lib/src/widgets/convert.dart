@@ -1,17 +1,16 @@
 // ignore_for_file: avoid_print
 
 import 'dart:async';
-import 'dart:io';
 
-import 'package:rfw/formats.dart';
+import 'package:catalyst_voices_remote_widgets/formats.dart';
 
 Future<void> main() async {
-  await RemoteWidgetConverter.rfwTxtToRfw(
+  await RemoteWidgetEncoder.rfwTxtToRfw(
     inputFile: 'remote_widget.rfwtxt',
     outputFile: 'remote_widget.rfw',
   );
 
-  await RemoteWidgetConverter.rfwTxtToRfw(
+  await RemoteWidgetEncoder.rfwTxtToRfw(
     inputFile: 'new_remote_widget.rfwtxt',
     outputFile: 'new_remote_widget.rfw',
   );
@@ -22,28 +21,28 @@ Future<void> main() async {
   // );
 }
 
-final class RemoteWidgetConverter {
-  const RemoteWidgetConverter._();
+// final class RemoteWidgetConverter {
+//   const RemoteWidgetConverter._();
 
-  static Future<void> rfwTxtToRfw({
-    required String inputFile,
-    required String outputFile,
-  }) async {
-    try {
-      print('Reading to $inputFile');
-      final content = await File(inputFile).readAsString();
+//   static Future<void> rfwTxtToRfw({
+//     required String inputFile,
+//     required String outputFile,
+//   }) async {
+//     try {
+//       print('Reading to $inputFile');
+//       final content = await File(inputFile).readAsString();
 
-      print('Content: $content');
-      final remoteWidgetLibrary = parseLibraryFile(content);
+//       print('Content: $content');
+//       final remoteWidgetLibrary = parseLibraryFile(content);
 
-      print('remoteWidgetLibrary: $remoteWidgetLibrary');
+//       print('remoteWidgetLibrary: $remoteWidgetLibrary');
 
-      final bytes = encodeLibraryBlob(remoteWidgetLibrary);
+//       final bytes = encodeLibraryBlob(remoteWidgetLibrary);
 
-      await File(outputFile).writeAsBytes(bytes);
-      print('Successfully processed $inputFile');
-    } catch (e) {
-      Exception('Failed to process $inputFile: $e');
-    }
-  }
-}
+//       await File(outputFile).writeAsBytes(bytes);
+//       print('Successfully processed $inputFile');
+//     } catch (e) {
+//       Exception('Failed to process $inputFile: $e');
+//     }
+//   }
+// }

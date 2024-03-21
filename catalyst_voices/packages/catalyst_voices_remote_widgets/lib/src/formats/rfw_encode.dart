@@ -5,8 +5,8 @@ import 'dart:io';
 
 import 'package:rfw/formats.dart';
 
-final class RemoteWidgetConverter {
-  const RemoteWidgetConverter._();
+final class RemoteWidgetEncoder {
+  const RemoteWidgetEncoder._();
 
   static Future<void> rfwTxtToRfw({
     required String inputFile,
@@ -20,8 +20,8 @@ final class RemoteWidgetConverter {
       final remoteWidgetLibrary = parseLibraryFile(content);
       final bytes = encodeLibraryBlob(remoteWidgetLibrary);
 
-      await File(inputFile).writeAsBytes(bytes);
-      print('Successfully processed $inputFile');
+      await File(outputFile).writeAsBytes(bytes);
+      print('Successfully processed $outputFile');
     } catch (e) {
       Exception('Failed to process $inputFile: $e');
     }
