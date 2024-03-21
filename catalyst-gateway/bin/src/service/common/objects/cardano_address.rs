@@ -1,5 +1,7 @@
 //! Defines API schemas of Cardano address types.
 
+use std::ops::Deref;
+
 use pallas::ledger::addresses::{Address, StakeAddress};
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef},
@@ -10,6 +12,14 @@ use poem_openapi::{
 /// Should a valid Bech32 encoded stake address followed by the `https://cips.cardano.org/cip/CIP-19/#stake-addresses.`
 #[derive(Debug)]
 pub(crate) struct CardanoStakeAddress(StakeAddress);
+
+impl Deref for CardanoStakeAddress {
+    type Target = StakeAddress;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
 
 impl Type for CardanoStakeAddress {
     type RawElementValueType = Self;

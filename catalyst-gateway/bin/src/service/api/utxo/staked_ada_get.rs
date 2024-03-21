@@ -3,9 +3,9 @@
 use chrono::{DateTime, Utc};
 use poem_extensions::{
     response,
-    UniResponse::{T200, T500, T503},
+    UniResponse::{T200, T404, T500, T503},
 };
-use poem_openapi::{payload::Json, types::Example};
+use poem_openapi::payload::Json;
 
 use crate::{
     cli::Error,
@@ -16,7 +16,7 @@ use crate::{
         },
         responses::{
             resp_2xx::OK,
-            resp_4xx::ApiValidationError,
+            resp_4xx::{ApiValidationError, NotFound},
             resp_5xx::{server_error, ServerError, ServiceUnavailable},
         },
     },
@@ -27,6 +27,7 @@ use crate::{
 pub(crate) type AllResponses = response! {
     200: OK<Json<StakeAmount>>,
     400: ApiValidationError,
+    404: NotFound,
     500: ServerError,
     503: ServiceUnavailable,
 };
@@ -44,12 +45,24 @@ pub(crate) async fn endpoint(
         date_time
     );
     match state.event_db() {
-        Ok(_event_db) => {
-            // let _res = event_db
-            //     .total_utxo_amount(&stake_credential, chrono::offset::Utc::now())
-            //     .await;
+        Ok(event_db) => {
+            let date_time = date_time.unwrap_or_else(Utc::now);
+            let stake_credential = stake_address.payload().as_hash().as_ref();
 
-            T200(OK(Json(StakeAmount::example())))
+            match event_db
+                .total_utxo_amount(stake_credential, date_time)
+                .await
+            {
+                Ok(amount) => {
+                    T200(OK(Json(StakeAmount {
+                        amount,
+                        slot_number: 0,
+                        date_time,
+                    })))
+                },
+                Err(DBError::NotFound(_)) => T404(NotFound),
+                Err(err) => T500(server_error!("{}", err.to_string())),
+            }
         },
         Err(Error::EventDb(DBError::MismatchedSchema { was, expected })) => {
             tracing::error!(

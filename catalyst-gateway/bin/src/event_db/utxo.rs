@@ -3,7 +3,10 @@
 use cardano_chain_follower::Network;
 use pallas::ledger::traverse::MultiEraTx;
 
-use super::follower::{BlockTime, SlotNumber};
+use super::{
+    follower::{BlockTime, SlotNumber},
+    voter_registration::StakeCredential,
+};
 use crate::{
     event_db::{
         Error::{self, SqlTypeConversionFailure},
@@ -14,9 +17,6 @@ use crate::{
         find_matching_stake_credential, parse_policy_assets,
     },
 };
-
-/// Stake credential, 32 bytes hex encoded string
-pub type StakeCredential = String;
 
 impl EventDB {
     /// Index utxo data
@@ -116,17 +116,14 @@ impl EventDB {
     /// Get total utxo amount
     #[allow(dead_code)]
     pub(crate) async fn total_utxo_amount(
-        &self, stake_credential: &StakeCredential, block_time: BlockTime,
+        &self, stake_credential: StakeCredential<'_>, date_time: BlockTime,
     ) -> Result<u64, Error> {
         let conn = self.pool.get().await?;
 
         let _rows = conn
             .query(
                 include_str!("../../../event-db/queries/utxo/select_total_utxo_amount.sql"),
-                &[
-                    &hex::decode(stake_credential).map_err(|e| Error::DecodeHex(e.to_string()))?,
-                    &block_time,
-                ],
+                &[&stake_credential, &date_time],
             )
             .await?;
 

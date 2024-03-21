@@ -8,13 +8,13 @@ use poem_openapi::{types::Example, Object};
 #[oai(example = true)]
 pub(crate) struct StakeAmount {
     /// Stake amount.
-    amount: u64,
+    pub(crate) amount: u64,
 
     /// Slot number.
-    slot_number: u64,
+    pub(crate) slot_number: u64,
 
     /// Date time.
-    date: DateTime<Utc>,
+    pub(crate) date_time: DateTime<Utc>,
 }
 
 impl Example for StakeAmount {
@@ -22,7 +22,7 @@ impl Example for StakeAmount {
         Self {
             amount: 1,
             slot_number: 5,
-            date: Utc::now(),
+            date_time: Utc::now(),
         }
     }
 }

@@ -41,6 +41,7 @@ impl UTXOApi {
     /// ## Responses
     /// * 200 OK - Returns the staked ada amount.
     /// * 400 Bad Request.
+    /// * 404 Not Found.
     /// * 500 Server Error - If anything within this function fails unexpectedly.
     /// * 503 Service Unavailable - Service is not ready, requests to other
     /// endpoints should not be sent until the service becomes ready.
