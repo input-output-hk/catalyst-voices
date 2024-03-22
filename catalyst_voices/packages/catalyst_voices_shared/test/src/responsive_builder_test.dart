@@ -85,7 +85,7 @@ void main() {
           final testedElement = find.byType(Text);
           // Verify the Widget renders properly
           expect(testedElement, findsOneWidget);
-          // Verify the proper text is rendered
+
           final paddingWidget = tester.widget<Padding>(
             find.ancestor(
               of: testedElement,
