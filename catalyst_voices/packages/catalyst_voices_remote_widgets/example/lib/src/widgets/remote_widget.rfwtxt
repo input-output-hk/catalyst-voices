@@ -4,7 +4,7 @@ import core.catalyst;
 
 widget root = Center(
       child: SizedBox(
-        height: 300.0,
+        height: 350.0,
         width: 500.0,
         child: Card(
           child: Padding(
@@ -53,6 +53,12 @@ widget root = Center(
                     color: 0xFFFF1F09,
                   },
                   onChanged: event 'secondNameHasChanged' { },
+                ),
+                Text(text: data.counter,
+                  style: {
+                  fontSize: 32.0,
+                    color: 0xFF0000FF,
+                  },
                 ),
               ],
             ),

@@ -7,7 +7,7 @@ class LocalWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: SizedBox(
-        height: 300,
+        height: 350,
         width: 500,
         child: Card(
           child: Padding(
