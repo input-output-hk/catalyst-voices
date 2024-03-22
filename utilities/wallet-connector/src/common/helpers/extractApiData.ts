@@ -64,7 +64,10 @@ export default async function extractApiData(
           balance: await safeTry(api.getBalance, (v) =>
             Number(Value.from_hex(v).coin().to_str()).toLocaleString("en")
           ),
-          collateral: await safeTry(api.getCollateral, (v) => v?.map((v) => TransactionUnspentOutput.from_hex(v).to_json()) ?? v),
+          collateral: await safeTry(
+            api.getCollateral,
+            (v) => v?.map((v) => TransactionUnspentOutput.from_hex(v).to_json()) ?? v
+          ),
           usedAddresses: await safeTry(
             api.getUsedAddresses,
             (v) => v?.map((v) => Address.from_hex(v).to_bech32()) ?? v
