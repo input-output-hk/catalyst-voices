@@ -23,7 +23,6 @@ pub(crate) struct StakeInfo {
     pub(crate) slot_number: SlotNumber,
 
     /// Block date time.
-    #[oai(validator(max_length = "30"))]
     pub(crate) block_time: BlockTime,
 }
 
