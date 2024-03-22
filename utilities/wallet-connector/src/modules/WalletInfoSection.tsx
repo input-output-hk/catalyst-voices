@@ -1,6 +1,5 @@
 import { Tab } from "@headlessui/react";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-import WarningIcon from "@mui/icons-material/Warning";
 import { capitalize, noop, pickBy, upperCase } from "lodash-es";
 import { Fragment } from "react/jsx-runtime";
 import { useForm } from "react-hook-form";

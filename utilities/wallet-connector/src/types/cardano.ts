@@ -5,8 +5,8 @@ type Extracted<T extends (...args: any) => any> = Awaited<ReturnType<T>>;
 
 export type WalletCollections = {
   [k: string]: Omit<cip30.Cip30Wallet, "enable"> & {
-    enable(args: { extensions: { cip: number }[] }): Promise<cip30.WalletApi>;
-    supportedExtensions: { cip: number }[];
+    enable(args: { extensions: { cip: number; }[]; }): Promise<cip30.WalletApi>;
+    supportedExtensions: { cip: number; }[];
   };
 };
 
@@ -26,7 +26,14 @@ export type ExtractedWalletApi = {
   signTx: cip30.SignTx;
   signData: cip30.SignData;
   submitTx: cip30.SubmitTx;
-  [key: string]: any;
+  info: {
+    [key: string]: {
+      from: string;
+      raw: any;
+      value: any;
+    };
+  };
+  [key: `cip${number}`]: any;
 };
 
 export type TxBuilderArguments = {

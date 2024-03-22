@@ -69,9 +69,9 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
           regAmount: builderArgs.regAmount,
           regLabel: builderArgs.regLabel,
           regText: builderArgs.regText,
-          usedAddresses: api.info.usedAddresses.raw,
-          changeAddress: api.info.changeAddress.raw,
-          rawUtxos: api.info.utxos.raw,
+          usedAddresses: api.info["usedAddresses"]?.raw,
+          changeAddress: api.info["changeAddress"]?.raw,
+          rawUtxos: api.info["utxos"]?.raw,
           config: builderArgs.config,
         });
 
