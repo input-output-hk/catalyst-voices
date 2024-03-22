@@ -10,7 +10,6 @@ extends:
   - plugin:react/recommended
   - plugin:react/jsx-runtime
   - plugin:react-hooks/recommended
-  - plugin:@tanstack/eslint-plugin-query/recommended
   - plugin:jsx-a11y/strict
 parserOptions:
   ecmaFeatures:
@@ -28,8 +27,6 @@ plugins:
   - jsx-a11y
   - import
   - react-refresh
-  - i18next
-  - "@tanstack/query"
 overrides:
   - files:
       - "*.yaml"

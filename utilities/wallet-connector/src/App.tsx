@@ -4,7 +4,6 @@ import "./styles/global.css";
 
 import { isEmpty, pickBy, xor } from "lodash-es";
 import { useState } from "react";
-import { QueryClient, QueryClientProvider } from "react-query";
 import { ToastContainer, toast } from "react-toastify";
 
 import WalletCard from "common/components/WalletCard";
@@ -13,18 +12,6 @@ import getCardano from "common/helpers/getCardano";
 import WalletActionsSection from "modules/WalletActionsSection";
 import WalletInfoSection from "modules/WalletInfoSection";
 import type { ExtensionArguments, ExtractedWalletApi } from "types/cardano";
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: false,
-      refetchOnWindowFocus: false,
-    },
-    mutations: {
-      retry: false,
-    },
-  },
-});
 
 function App() {
   // enabled wallets with the API object
@@ -79,7 +66,7 @@ function App() {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <>
       <ToastContainer />
       <div className="flex flex-col bg-background m-0 text-text min-h-screen">
         <div className="grow flex flex-col justify-between gap-8 py-8 px-4">
@@ -125,7 +112,7 @@ function App() {
           </footer>
         </div>
       </div>
-    </QueryClientProvider>
+    </>
   );
 }
 

@@ -46,8 +46,8 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
 
   useEffect(() => {
     const walletNames = Object.keys(walletApi).filter((w) => selectedWallets.includes(w));
-    
-    setSelectedTxWallet((prev) => selectedWallets.includes(prev) ? prev : (walletNames[0] ?? ""));
+
+    setSelectedTxWallet((prev) => (selectedWallets.includes(prev) ? prev : walletNames[0] ?? ""));
   }, [walletApi, selectedWallets]);
 
   const { control, handleSubmit, setValue } = useForm<FormValues>({
