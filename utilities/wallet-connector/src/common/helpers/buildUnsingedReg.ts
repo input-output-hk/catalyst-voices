@@ -5,8 +5,10 @@ import {
   BigNum,
   Ed25519KeyHash,
   GeneralTransactionMetadata,
+  LinearFee,
   Transaction,
   TransactionBuilder,
+  TransactionBuilderConfigBuilder,
   TransactionMetadatum,
   TransactionOutput,
   TransactionUnspentOutput,
@@ -14,6 +16,7 @@ import {
   TransactionWitnessSet,
   Value,
 } from "@emurgo/cardano-serialization-lib-asmjs";
+import type { TxBuilderArguments } from "types/cardano";
 
 type Payload = {
   /** Raw registration address in hex string. */
@@ -30,13 +33,28 @@ type Payload = {
   changeAddress: string;
   /** Raw hex string UTXOs directed from calling `API.getUtxos()`. */
   rawUtxos: string[];
+  /** Transaction config */
+  config: TxBuilderArguments["config"];
 };
 
 export default async function buildUnsingedReg(payload: Payload): Promise<Transaction> {
-  console.log(payload);
-
   // Initialize builder with protocol parameters
-  const txBuilder = new TransactionBuilder();
+  const txBuilder = TransactionBuilder.new(
+    TransactionBuilderConfigBuilder.new()
+      .fee_algo(
+        LinearFee.new(
+          BigNum.from_str(payload.config.linearFee.minFeeA),
+          BigNum.from_str(payload.config.linearFee.minFeeB)
+        )
+      )
+      .pool_deposit(BigNum.from_str(payload.config.poolDeposit))
+      .key_deposit(BigNum.from_str(payload.config.keyDeposit))
+      .coins_per_utxo_word(BigNum.from_str(payload.config.coinsPerUtxoWord))
+      .max_value_size(payload.config.maxValSize)
+      .max_tx_size(payload.config.maxTxSize)
+      .prefer_pure_change(true)
+      .build()
+  );
 
   // Set address to send ada to
   const registrationAddress = Address.from_bech32(payload.regAddress);
@@ -53,8 +71,6 @@ export default async function buildUnsingedReg(payload: Payload): Promise<Transa
   txMetadata.insert(regMessageMetadatumLabel, regMessageMetadatum);
   const auxMetadata = AuxiliaryData.new();
   auxMetadata.set_metadata(txMetadata);
-
-  console.log("passsss");
 
   // Add metadatum to transaction builder, so it can be included in the transaction balancing
   txBuilder.set_auxiliary_data(auxMetadata);
@@ -87,7 +103,7 @@ export default async function buildUnsingedReg(payload: Payload): Promise<Transa
   txBuilder.add_inputs_from(txUnspentOutputs, 3);
 
   // Set change address, incase too much ADA provided for fee
-  const shelleyChangeAddress = Address.from_bech32(payload.changeAddress);
+  const shelleyChangeAddress = Address.from_hex(payload.changeAddress);
   txBuilder.add_change_if_needed(shelleyChangeAddress);
 
   // Make a full transaction, passing in empty witness set

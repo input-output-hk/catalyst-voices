@@ -8,7 +8,7 @@ import { twMerge } from "tailwind-merge";
 
 import Button from "common/components/Button";
 import InfoItem from "common/components/InfoItem";
-import { BASE_INPUT_STYLE } from "common/constants";
+import Input from "common/components/Input";
 import getCardano from "common/helpers/getCardano";
 import type { ExtensionArguments, ExtractedWalletApi } from "types/cardano";
 
@@ -121,11 +121,10 @@ function WalletInfoSection({
                       <p>{walletApi[wallet] ? "Re-Enable" : "Enable"}</p>
                     </Button>
                     <h2 className="font-semibold">Extension</h2>
-                    <input
-                      className={BASE_INPUT_STYLE}
+                    <Input
                       type="number"
-                      placeholder="cip (optional)"
-                      {...register(`${wallet}.cip`, { valueAsNumber: true })}
+                      label="CIP (optional)"
+                      formRegister={register(`${wallet}.cip`, { valueAsNumber: true })}
                     />
                   </div>
                 </Tab.Panel>

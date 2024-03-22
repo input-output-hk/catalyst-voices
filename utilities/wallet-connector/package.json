@@ -9,8 +9,7 @@
     "check": "tsc --noEmit",
     "lint": "eslint './src/**/*.{ts,tsx}'",
     "lintfix": "eslint './src/**/*.{ts,tsx}' --fix",
-    "prettier": "prettier --write './src/**/*.{ts,tsx}'",
-    "fmt": "npm run prettier && npm run fix:scripts",
+    "fmt": "prettier --write './src/**/*.{ts,tsx}'",
     "preview": "vite preview"
   },
   "dependencies": {

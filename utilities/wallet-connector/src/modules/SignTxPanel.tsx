@@ -1,5 +1,7 @@
 import type { SignTx } from "@cardano-sdk/cip30";
+import { Transaction } from "@emurgo/cardano-serialization-lib-asmjs";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import { decode, encode } from "cborg";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useMutation } from "react-query";
@@ -11,8 +13,9 @@ import CheckBox from "common/components/CheckBox";
 import InputBlock from "common/components/InputBlock";
 import TxBuilder from "common/components/TxBuilder";
 import WalletResponseSelection from "common/components/WalletResponseSelection";
+import bin2hex from "common/helpers/bin2hex";
 import buildUnsingedReg from "common/helpers/buildUnsingedReg";
-import cleanHex from "common/helpers/cleanHex";
+import hex2bin from "common/helpers/hex2bin";
 import type { ExtractedWalletApi, TxBuilderArguments } from "types/cardano";
 
 type Props = {
@@ -27,6 +30,7 @@ type FormValues = {
 
 function SignTxPanel({ selectedWallets, walletApi }: Props) {
   const [selectedResponseWallet, setSelectedResponseWallet] = useState("");
+  const [editorRefreshSignal, setEditorRefreshSignal] = useState(0);
 
   const { isLoading, mutateAsync, data } = useMutation({
     onError: (err) => {
@@ -36,7 +40,7 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
     mutationFn: mutateFn,
   });
 
-  const payloadForm = useForm<FormValues>({
+  const { control, handleSubmit, setValue } = useForm<FormValues>({
     defaultValues: {
       partialSign: false,
       tx: "",
@@ -69,9 +73,11 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
         usedAddresses: lace.info.usedAddresses.raw,
         changeAddress: lace.info.changeAddress.raw,
         rawUtxos: lace.info.utxos.raw,
+        config: builderArgs.config,
       });
 
-      console.log("UnsignedTx:", tx.to_hex());
+      setValue("tx", bin2hex(encode(tx.to_js_value())));
+      setEditorRefreshSignal((prev) => (prev ? 0 : 1));
     } catch (err) {
       return void toast.error(String(err));
     }
@@ -82,7 +88,11 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
       return void toast.error("Please select at least one wallet to execute.");
     }
 
-    await mutateAsync([cleanHex(formValues.tx), formValues.partialSign]);
+    const tx = Transaction.from_json(JSON.stringify(decode(hex2bin(formValues.tx))));
+
+    console.log(tx.to_js_value());
+
+    // await mutateAsync([cleanHex(formValues.tx), formValues.partialSign]);
   }
 
   return (
@@ -101,7 +111,7 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
         <h2 className="font-semibold">Payload:</h2>
         <InputBlock variant="inline" name="partialSign">
           <Controller
-            control={payloadForm.control}
+            control={control}
             name="partialSign"
             render={({ field: { value, onChange } }) => (
               <CheckBox value={value} onChange={onChange} />
@@ -110,19 +120,19 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
         </InputBlock>
         <InputBlock variant="block" name="tx">
           <Controller
-            control={payloadForm.control}
+            control={control}
             name="tx"
             render={({ field: { value, onChange } }) => (
               <div className="grid gap-4">
                 <TxBuilder onSubmit={handleTxBuilderSubmit} />
-                <CBOREditor value={value} onChange={onChange} />
+                <CBOREditor key={editorRefreshSignal} value={value} onChange={onChange} />
               </div>
             )}
           />
         </InputBlock>
         <div className="flex">
           <div className="flex gap-2 items-center">
-            <Button disabled={isLoading} onClick={payloadForm.handleSubmit(handleExecute)}>
+            <Button disabled={isLoading} onClick={handleSubmit(handleExecute)}>
               <p>Execute</p>
             </Button>
             {isLoading && <RefreshIcon className="animate-spin" />}
