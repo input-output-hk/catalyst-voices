@@ -75,6 +75,7 @@ function App() {
               {isCardanoActivated ? (
                 <>
                   <section className="grid gap-4">
+                    <h1 className="font-semibold text-xl">Cardano Wallet Tester</h1>
                     <h2 className="font-semibold">Select available wallets:</h2>
                     <div className="flex flex-wrap gap-4 bg-background px-4 py-2 rounded-md border border-solid border-black/10">
                       {Object.keys(getCardano()).map((walletName) => (
