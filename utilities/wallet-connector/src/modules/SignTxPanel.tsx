@@ -2,17 +2,18 @@ import type { SignTx } from "@cardano-sdk/cip30";
 import { Transaction } from "@emurgo/cardano-serialization-lib-asmjs";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { decode, encode } from "cborg";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { useMutation } from "react-query";
 import { toast } from "react-toastify";
 
+import Badge from "common/components/Badge";
 import Button from "common/components/Button";
 import CBOREditor from "common/components/CBOREditor";
 import CheckBox from "common/components/CheckBox";
 import InputBlock from "common/components/InputBlock";
 import TxBuilder from "common/components/TxBuilder";
-import WalletResponseSelection from "common/components/WalletResponseSelection";
+import WalletViewSelection from "common/components/WalletViewSelection";
 import bin2hex from "common/helpers/bin2hex";
 import buildUnsingedReg from "common/helpers/buildUnsingedReg";
 import hex2bin from "common/helpers/hex2bin";
@@ -29,8 +30,16 @@ type FormValues = {
 };
 
 function SignTxPanel({ selectedWallets, walletApi }: Props) {
+  const [selectedTxWallet, setSelectedTxWallet] = useState("");
   const [selectedResponseWallet, setSelectedResponseWallet] = useState("");
   const [editorRefreshSignal, setEditorRefreshSignal] = useState(0);
+
+  useEffect(() => {
+    const walletNames = Object.keys(walletApi);
+    if (!selectedTxWallet && walletNames[0]) {
+      setSelectedTxWallet(walletNames[0]);
+    }
+  }, [walletApi]);
 
   const { isLoading, mutateAsync, data } = useMutation({
     onError: (err) => {
@@ -46,6 +55,8 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
       tx: "",
     },
   });
+
+  const hasEnabledWallet = Boolean(Object.keys(walletApi).length);
 
   async function mutateFn(args: Parameters<SignTx>): Promise<Record<string, string>> {
     const responses = await Promise.all(
@@ -63,6 +74,10 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
 
   async function handleTxBuilderSubmit(builderArgs: TxBuilderArguments) {
     try {
+      /* for (const [name, api] of Object.entries(walletApi)) {
+
+      } */
+      
       const lace = walletApi["lace"];
 
       const tx = await buildUnsingedReg({
@@ -92,7 +107,7 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
 
     console.log(tx.to_js_value());
 
-    // await mutateAsync([cleanHex(formValues.tx), formValues.partialSign]);
+    await mutateAsync([tx.to_hex(), formValues.partialSign]);
   }
 
   return (
@@ -123,28 +138,40 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
             control={control}
             name="tx"
             render={({ field: { value, onChange } }) => (
-              <div className="grid gap-4">
+              <div className="grid gap-2">
                 <TxBuilder onSubmit={handleTxBuilderSubmit} />
-                <CBOREditor key={editorRefreshSignal} value={value} onChange={onChange} />
+                {hasEnabledWallet ? (
+                  <>
+                    <WalletViewSelection
+                      selectedWallet={selectedTxWallet}
+                      wallets={Object.keys(walletApi)}
+                      onSelect={handleResponseWalletSelect}
+                    />
+                    <CBOREditor key={editorRefreshSignal} value={value} onChange={onChange} />
+                  </>
+                ) : (
+                  <Badge variant="warn" text="Please enable at least one wallet." />
+                )}
               </div>
             )}
           />
         </InputBlock>
-        <div className="flex">
-          <div className="flex gap-2 items-center">
-            <Button disabled={isLoading} onClick={handleSubmit(handleExecute)}>
-              <p>Execute</p>
-            </Button>
-            {isLoading && <RefreshIcon className="animate-spin" />}
+        {hasEnabledWallet && (
+          <div className="flex">
+            <div className="flex gap-2 items-center">
+              <Button disabled={isLoading} onClick={handleSubmit(handleExecute)}>
+                <p>Execute</p>
+              </Button>
+              {isLoading && <RefreshIcon className="animate-spin" />}
+            </div>
           </div>
-          <div></div>
-        </div>
+        )}
       </div>
       {data && (
         <>
           <div className="h-px bg-black/10"></div>
           <div className="grid gap-2">
-            <WalletResponseSelection
+            <WalletViewSelection
               selectedWallet={selectedResponseWallet}
               wallets={Object.keys(data ?? {})}
               onSelect={handleResponseWalletSelect}

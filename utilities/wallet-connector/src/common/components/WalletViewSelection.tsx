@@ -8,7 +8,7 @@ type Props = {
   onSelect: (wallet: string) => void;
 };
 
-function WalletResponseSelection({ wallets, selectedWallet, onSelect = noop }: Props) {
+function WalletViewSelection({ wallets, selectedWallet, onSelect = noop }: Props) {
   if (!wallets.length) {
     return null;
   }
@@ -29,4 +29,4 @@ function WalletResponseSelection({ wallets, selectedWallet, onSelect = noop }: P
   );
 }
 
-export default WalletResponseSelection;
+export default WalletViewSelection;

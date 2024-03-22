@@ -11,6 +11,7 @@ import InfoItem from "common/components/InfoItem";
 import Input from "common/components/Input";
 import getCardano from "common/helpers/getCardano";
 import type { ExtensionArguments, ExtractedWalletApi } from "types/cardano";
+import Badge from "common/components/Badge";
 
 type Props = {
   selectedWallets: string[];
@@ -133,12 +134,7 @@ function WalletInfoSection({
           </Tab.Group>
         </div>
       ) : (
-        <div className="p-4 rounded-md bg-amber-100 border border-solid border-amber-500 overflow-hidden">
-          <div className="flex gap-4">
-            <WarningIcon className="text-amber-500" />
-            <p>Please select at least one wallet to view the information.</p>
-          </div>
-        </div>
+        <Badge variant="warn" text="Please select at least one wallet to view the information." />
       )}
     </section>
   );
