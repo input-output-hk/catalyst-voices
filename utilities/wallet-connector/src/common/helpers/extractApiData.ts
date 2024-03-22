@@ -37,11 +37,14 @@ export default async function extractApiData(
     const out = [];
     for (const [key, value] of Object.entries(api[`cip${cipExt}`] ?? {})) {
       if (key.startsWith("get") && value instanceof Function) {
+        const resVal = await value?.();
+
         out.push([
           camelCase(key.slice(3)),
           {
             from: `cip${cipExt}`,
-            value: await value?.(),
+            raw: resVal,
+            value: resVal,
           },
         ]);
       }
@@ -61,7 +64,7 @@ export default async function extractApiData(
           balance: await safeTry(api.getBalance, (v) =>
             Number(Value.from_hex(v).coin().to_str()).toLocaleString("en")
           ),
-          collateral: await safeTry(api.getCollateral),
+          collateral: await safeTry(api.getCollateral, (v) => v?.map((v) => TransactionUnspentOutput.from_hex(v).to_json()) ?? v),
           usedAddresses: await safeTry(
             api.getUsedAddresses,
             (v) => v?.map((v) => Address.from_hex(v).to_bech32()) ?? v
