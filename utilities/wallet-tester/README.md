@@ -16,7 +16,6 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 * **Scripting**: TypeScript 5
 * **UI Framework**: React 18
 * **Styling**: Tailwind CSS
-* **Async State Management**: Tanstack Query
 * **UI Components**: Headless UI
 * **Utilities**: Lodash
 * **Icons**: Material UI Icons
