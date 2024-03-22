@@ -15,6 +15,13 @@ pub(crate) struct BadRequest<T: IntoResponse + Payload>(T);
 /// It has failed to pass validation, as specified by the `OpenAPI` schema.
 pub(crate) struct ApiValidationError(PlainText<String>);
 
+impl ApiValidationError {
+    /// Create new `ApiValidationError`
+    pub(crate) fn new(error: String) -> Self {
+        Self(PlainText(error))
+    }
+}
+
 #[derive(OneResponse)]
 #[oai(status = 401)]
 /// ## Unauthorized
