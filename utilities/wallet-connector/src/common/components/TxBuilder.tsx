@@ -38,7 +38,7 @@ function TxBuilder({ onSubmit: onPropSubmit = noop }: Props) {
       regText: "",
       regLabel: "",
       stakeCred: "",
-      config: cloneDeep(PROTOCOL_PARAMS)
+      config: cloneDeep(PROTOCOL_PARAMS),
     },
   });
 
@@ -76,9 +76,7 @@ function TxBuilder({ onSubmit: onPropSubmit = noop }: Props) {
         <Disclosure.Button className="flex gap-2 items-center text-left text-sm font-semibold">
           {({ open }) => (
             <>
-              <div className="w-[16px]">
-                {open ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}
-              </div>
+              <div className="w-[16px]">{open ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}</div>
               <p>Advanced Configs</p>
             </>
           )}
@@ -101,16 +99,8 @@ function TxBuilder({ onSubmit: onPropSubmit = noop }: Props) {
             label="Coins per UTXO word"
             formRegister={register("config.coinsPerUtxoWord")}
           />
-          <Input
-            type="number"
-            label="Pool Deposit"
-            formRegister={register("config.poolDeposit")}
-          />
-          <Input
-            type="number"
-            label="Key Deposit"
-            formRegister={register("config.keyDeposit")}
-          />
+          <Input type="number" label="Pool Deposit" formRegister={register("config.poolDeposit")} />
+          <Input type="number" label="Key Deposit" formRegister={register("config.keyDeposit")} />
           <Input
             type="number"
             label="Max value size"

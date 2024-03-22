@@ -6,12 +6,12 @@ import { Fragment } from "react/jsx-runtime";
 import { useForm } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
 
+import Badge from "common/components/Badge";
 import Button from "common/components/Button";
 import InfoItem from "common/components/InfoItem";
 import Input from "common/components/Input";
 import getCardano from "common/helpers/getCardano";
 import type { ExtensionArguments, ExtractedWalletApi } from "types/cardano";
-import Badge from "common/components/Badge";
 
 type Props = {
   selectedWallets: string[];

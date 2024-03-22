@@ -6,7 +6,7 @@ export default async function extractApiData(api: WalletApi, cipExt?: number): P
   const safeTry = async <T>(
     fn: () => Promise<T>,
     transformer?: (v: T) => T
-  ): Promise<{ raw: T; formatted: T; }> => {
+  ): Promise<{ raw: T; formatted: T }> => {
     try {
       const v = await fn();
       return transformer

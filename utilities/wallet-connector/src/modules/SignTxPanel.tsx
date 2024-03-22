@@ -1,10 +1,9 @@
-import type { SignTx } from "@cardano-sdk/cip30";
-import { Transaction } from "@emurgo/cardano-serialization-lib-asmjs";
+import { Transaction, TransactionWitnessSet } from "@emurgo/cardano-serialization-lib-asmjs";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { decode, encode } from "cborg";
-import { useEffect, useState } from "react";
+import { isEmpty } from "lodash-es";
+import { Fragment, useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { useMutation } from "react-query";
 import { toast } from "react-toastify";
 
 import Badge from "common/components/Badge";
@@ -24,13 +23,24 @@ type Props = {
   walletApi: Record<string, ExtractedWalletApi>;
 };
 
+type Response = {
+  [walletName: string]: {
+    isError: boolean;
+    data: string;
+  };
+};
+
 type FormValues = {
   partialSign: boolean;
-  tx: string;
+  tx: {
+    [walletName: string]: string;
+  };
 };
 
 function SignTxPanel({ selectedWallets, walletApi }: Props) {
   const [selectedTxWallet, setSelectedTxWallet] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [response, setResponse] = useState<Response>({});
   const [selectedResponseWallet, setSelectedResponseWallet] = useState("");
   const [editorRefreshSignal, setEditorRefreshSignal] = useState(0);
 
@@ -41,57 +51,34 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
     }
   }, [walletApi]);
 
-  const { isLoading, mutateAsync, data } = useMutation({
-    onError: (err) => {
-      console.log(err);
-      toast.error(String(err));
-    },
-    mutationFn: mutateFn,
-  });
-
   const { control, handleSubmit, setValue } = useForm<FormValues>({
     defaultValues: {
       partialSign: false,
-      tx: "",
+      tx: {},
     },
   });
 
-  const hasEnabledWallet = Boolean(Object.keys(walletApi).length);
-
-  async function mutateFn(args: Parameters<SignTx>): Promise<Record<string, string>> {
-    const responses = await Promise.all(
-      selectedWallets.map(async (wallet) => [wallet, await walletApi[wallet]?.signTx(...args)])
-    );
-
-    setSelectedResponseWallet(responses[0]?.[0] ?? "");
-
-    return Object.fromEntries(responses);
-  }
-
-  function handleResponseWalletSelect(wallet: string) {
-    setSelectedResponseWallet(wallet);
-  }
+  const hasResponse = !isEmpty(response);
 
   async function handleTxBuilderSubmit(builderArgs: TxBuilderArguments) {
     try {
-      /* for (const [name, api] of Object.entries(walletApi)) {
+      const resTx: FormValues["tx"] = {};
+      for (const [walletName, api] of Object.entries(walletApi)) {
+        const tx = await buildUnsingedReg({
+          regAddress: builderArgs.regAddress,
+          regAmount: builderArgs.regAmount,
+          regLabel: builderArgs.regLabel,
+          regText: builderArgs.regText,
+          usedAddresses: api.info.usedAddresses.raw,
+          changeAddress: api.info.changeAddress.raw,
+          rawUtxos: api.info.utxos.raw,
+          config: builderArgs.config,
+        });
 
-      } */
-      
-      const lace = walletApi["lace"];
+        resTx[walletName] = bin2hex(encode(tx.to_js_value()));
+      }
 
-      const tx = await buildUnsingedReg({
-        regAddress: builderArgs.regAddress,
-        regAmount: builderArgs.regAmount,
-        regLabel: builderArgs.regLabel,
-        regText: builderArgs.regText,
-        usedAddresses: lace.info.usedAddresses.raw,
-        changeAddress: lace.info.changeAddress.raw,
-        rawUtxos: lace.info.utxos.raw,
-        config: builderArgs.config,
-      });
-
-      setValue("tx", bin2hex(encode(tx.to_js_value())));
+      setValue("tx", resTx);
       setEditorRefreshSignal((prev) => (prev ? 0 : 1));
     } catch (err) {
       return void toast.error(String(err));
@@ -103,11 +90,36 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
       return void toast.error("Please select at least one wallet to execute.");
     }
 
-    const tx = Transaction.from_json(JSON.stringify(decode(hex2bin(formValues.tx))));
+    setIsLoading(true);
 
-    console.log(tx.to_js_value());
+    const response: Response = {};
+    for (const [walletName, cborHex] of Object.entries(formValues.tx)) {
+      if (!walletName) {
+        continue;
+      }
 
-    await mutateAsync([tx.to_hex(), formValues.partialSign]);
+      const jsonTx = JSON.stringify(decode(hex2bin(cborHex)));
+      const tx = Transaction.from_json(jsonTx);
+
+      try {
+        const res = await walletApi[walletName]?.signTx(tx.to_hex(), formValues.partialSign);
+        const resFmt = TransactionWitnessSet.from_hex(res ?? "").to_js_value();
+
+        response[walletName] = {
+          isError: !res,
+          data: bin2hex(encode(resFmt)),
+        };
+      } catch (err) {
+        response[walletName] = {
+          isError: true,
+          data: String(err),
+        };
+      }
+    }
+
+    setResponse(response);
+    setSelectedResponseWallet(Object.keys(formValues.tx)[0] ?? "");
+    setIsLoading(false);
   }
 
   return (
@@ -140,14 +152,20 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
             render={({ field: { value, onChange } }) => (
               <div className="grid gap-2">
                 <TxBuilder onSubmit={handleTxBuilderSubmit} />
-                {hasEnabledWallet ? (
+                {selectedTxWallet ? (
                   <>
                     <WalletViewSelection
                       selectedWallet={selectedTxWallet}
                       wallets={Object.keys(walletApi)}
-                      onSelect={handleResponseWalletSelect}
+                      onSelect={setSelectedTxWallet}
                     />
-                    <CBOREditor key={editorRefreshSignal} value={value} onChange={onChange} />
+                    <Fragment key={selectedTxWallet}>
+                      <CBOREditor
+                        key={editorRefreshSignal}
+                        value={value[selectedTxWallet] ?? ""}
+                        onChange={(v) => onChange({ ...value, [selectedTxWallet]: v })}
+                      />
+                    </Fragment>
                   </>
                 ) : (
                   <Badge variant="warn" text="Please enable at least one wallet." />
@@ -156,7 +174,7 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
             )}
           />
         </InputBlock>
-        {hasEnabledWallet && (
+        {selectedTxWallet && (
           <div className="flex">
             <div className="flex gap-2 items-center">
               <Button disabled={isLoading} onClick={handleSubmit(handleExecute)}>
@@ -167,17 +185,17 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
           </div>
         )}
       </div>
-      {data && (
+      {hasResponse && (
         <>
           <div className="h-px bg-black/10"></div>
           <div className="grid gap-2">
             <WalletViewSelection
               selectedWallet={selectedResponseWallet}
-              wallets={Object.keys(data ?? {})}
-              onSelect={handleResponseWalletSelect}
+              wallets={Object.keys(response)}
+              onSelect={setSelectedResponseWallet}
             />
             <h2 className="font-semibold">Response:</h2>
-            <CBOREditor value={data?.[selectedResponseWallet] ?? ""} isReadOnly={true} />
+            <CBOREditor value={response[selectedResponseWallet]?.data ?? ""} isReadOnly={true} />
           </div>
         </>
       )}
