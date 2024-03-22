@@ -1,15 +1,27 @@
 import WarningIcon from "@mui/icons-material/Warning";
+import { twMerge } from "tailwind-merge";
 
 type Props = {
-  variant: "warn";
+  variant: "warn" | "error";
   text: string;
 };
 
-function Badge({ text }: Props) {
+function Badge({ variant, text }: Props) {
   return (
-    <div className="p-4 rounded-md bg-amber-100 border border-solid border-amber-500 overflow-hidden">
+    <div
+      className={twMerge(
+        "p-4 rounded-md border border-solid overflow-hidden",
+        variant === "warn" && "bg-amber-100 border-amber-500",
+        variant === "error" && "bg-rose-100 border-rose-500"
+      )}
+    >
       <div className="flex gap-4">
-        <WarningIcon className="text-amber-500" />
+        <WarningIcon
+          className={twMerge(
+            variant === "warn" && "text-amber-500",
+            variant === "error" && "text-rose-500"
+          )}
+        />
         <p>{text}</p>
       </div>
     </div>

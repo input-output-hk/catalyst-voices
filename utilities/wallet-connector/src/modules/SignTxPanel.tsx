@@ -58,8 +58,6 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
     },
   });
 
-  const hasResponse = !isEmpty(response);
-
   async function handleTxBuilderSubmit(builderArgs: TxBuilderArguments) {
     try {
       const resTx: FormValues["tx"] = {};
@@ -185,7 +183,7 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
           </div>
         )}
       </div>
-      {hasResponse && (
+      {!isEmpty(response) && (
         <>
           <div className="h-px bg-black/10"></div>
           <div className="grid gap-2">
@@ -195,7 +193,14 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
               onSelect={setSelectedResponseWallet}
             />
             <h2 className="font-semibold">Response:</h2>
-            <CBOREditor value={response[selectedResponseWallet]?.data ?? ""} isReadOnly={true} />
+            {response[selectedResponseWallet]?.isError ? (
+              <Badge
+                variant="error"
+                text={response[selectedResponseWallet]?.data ?? "Empty response."}
+              />
+            ) : (
+              <CBOREditor value={response[selectedResponseWallet]?.data ?? ""} isReadOnly={true} />
+            )}
           </div>
         </>
       )}

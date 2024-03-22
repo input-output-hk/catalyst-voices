@@ -2,7 +2,12 @@ import type { WalletApi } from "@cardano-sdk/cip30";
 import { Address, TransactionUnspentOutput, Value } from "@emurgo/cardano-serialization-lib-asmjs";
 import { camelCase, mapValues } from "lodash-es";
 
-export default async function extractApiData(api: WalletApi, cipExt?: number): Promise<any> {
+import type { ExtractedWalletApi } from "types/cardano";
+
+export default async function extractApiData(
+  api: WalletApi,
+  cipExt?: number
+): Promise<ExtractedWalletApi> {
   const safeTry = async <T>(
     fn: () => Promise<T>,
     transformer?: (v: T) => T

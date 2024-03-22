@@ -54,24 +54,16 @@ function TxBuilder({ onSubmit: onPropSubmit = noop }: Props) {
     <form className="grid gap-2" autoComplete="off">
       <Input
         type="text"
-        label="Registration address"
+        label="Address where to send ADA"
         formRegister={register("regAddress", { required: true })}
       />
       <Input
         type="number"
-        label="Registration amount"
+        label="Lovelaces"
         formRegister={register("regAmount", { required: true })}
       />
-      <Input
-        type="number"
-        label="Registration label"
-        formRegister={register("regLabel", { required: true })}
-      />
-      <Input
-        type="text"
-        label="Registration text"
-        formRegister={register("regText", { required: true })}
-      />
+      <Input type="number" label="Label" formRegister={register("regLabel", { required: true })} />
+      <Input type="text" label="Text" formRegister={register("regText", { required: true })} />
       <Disclosure>
         <Disclosure.Button className="flex gap-2 items-center text-left text-sm font-semibold">
           {({ open }) => (
