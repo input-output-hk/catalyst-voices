@@ -14,7 +14,7 @@ import InputBlock from "common/components/InputBlock";
 import TxBuilder from "common/components/TxBuilder";
 import WalletViewSelection from "common/components/WalletViewSelection";
 import bin2hex from "common/helpers/bin2hex";
-import buildUnsingedReg from "common/helpers/buildUnsingedReg";
+import buildUnsignedTx from "common/helpers/buildUnsignedTx";
 import hex2bin from "common/helpers/hex2bin";
 import type { ExtractedWalletApi, TxBuilderArguments } from "types/cardano";
 
@@ -63,7 +63,7 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
 
       const resTx: FormValues["tx"] = {};
       for (const [walletName, api] of activeWallets) {
-        const tx = await buildUnsingedReg({
+        const tx = await buildUnsignedTx({
           regAddress: builderArgs.regAddress,
           regAmount: builderArgs.regAmount,
           regLabel: builderArgs.regLabel,

@@ -1,3 +1,5 @@
+// cspell: words Metadatum metadatum keyhash
+
 import {
   Address,
   AuxiliaryData,
@@ -38,7 +40,7 @@ type Payload = {
   config: TxBuilderArguments["config"];
 };
 
-export default async function buildUnsingedReg(payload: Payload): Promise<Transaction> {
+export default async function buildUnsignedTx(payload: Payload): Promise<Transaction> {
   // Initialize builder with protocol parameters
   const txBuilder = TransactionBuilder.new(
     TransactionBuilderConfigBuilder.new()
@@ -110,11 +112,11 @@ export default async function buildUnsingedReg(payload: Payload): Promise<Transa
   // Make a full transaction, passing in empty witness set
   const txBody = txBuilder.build();
   const transactionWitnessSet = TransactionWitnessSet.new();
-  const unsingedTx = Transaction.new(
+  const unsignedTx = Transaction.new(
     txBody,
     TransactionWitnessSet.from_bytes(transactionWitnessSet.to_bytes()),
     auxMetadata
   );
 
-  return unsingedTx;
+  return unsignedTx;
 }

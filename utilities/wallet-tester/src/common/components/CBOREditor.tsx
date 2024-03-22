@@ -1,3 +1,5 @@
+// cspell: words noconflict
+
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
 import { decode, encode } from "cborg";
 import { noop } from "lodash-es";

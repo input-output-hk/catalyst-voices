@@ -1,3 +1,5 @@
+// cspell: words Lovelaces Coeff
+
 import { Disclosure } from "@headlessui/react";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
