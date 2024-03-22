@@ -13,9 +13,13 @@ use crate::event_db::{
 #[oai(example = true)]
 pub(crate) struct StakeInfo {
     /// Stake amount.
+    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
+    #[oai(validator(minimum(value = "0"), maximum(value = "4294967295")))]
     pub(crate) amount: StakeAmount,
 
     /// Slot number.
+    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
+    #[oai(validator(minimum(value = "0"), maximum(value = "4294967295")))]
     pub(crate) slot_number: SlotNumber,
 
     /// Block date time.
