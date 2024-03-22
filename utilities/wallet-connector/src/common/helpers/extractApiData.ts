@@ -5,7 +5,7 @@ import { camelCase, mapValues } from "lodash-es";
 import type { ExtractedWalletApi } from "types/cardano";
 
 export default async function extractApiData(
-  api: WalletApi,
+  api: WalletApi & { [ext: `cip${number}`]: unknown; },
   cipExt?: number
 ): Promise<ExtractedWalletApi> {
   const safeTry = async <T>(
@@ -35,7 +35,7 @@ export default async function extractApiData(
   let extData = {};
   if (typeof cipExt === "number") {
     const out = [];
-    for (const [key, value] of Object.entries((api as any)[`cip${cipExt}`] ?? {})) {
+    for (const [key, value] of Object.entries(api[`cip${cipExt}`] ?? {})) {
       if (key.startsWith("get") && value instanceof Function) {
         out.push([
           camelCase(key.slice(3)),

@@ -1,3 +1,5 @@
+/* eslint @typescript-eslint/no-explicit-any: off */
+
 import * as cip30 from "@cardano-sdk/cip30";
 
 export type WalletCollections = {
