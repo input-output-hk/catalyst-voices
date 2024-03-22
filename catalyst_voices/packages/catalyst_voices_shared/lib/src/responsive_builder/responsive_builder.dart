@@ -16,6 +16,8 @@ import 'package:flutter/widgets.dart';
 // - the breakpoint is detected
 // - the breakpoint-specific data argument is present
 // As a fallback the widget uses the [other] argument.
+// The type of the breakpoint-specific data is generic but constrained to Object
+// in order to prevent the use of `dynamic` that can cause run-time crashes.
 //
 // Example to render a specific string based on the breakpoints:
 //
