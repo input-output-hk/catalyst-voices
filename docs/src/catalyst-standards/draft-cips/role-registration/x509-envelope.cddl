@@ -1,52 +1,81 @@
 ; An envelope for cardano metadata which holds the x509 metadata.
-; We do thsi so that the underlying metadata is not restircted to
-; cardano ledger implementation.
-
-; uses 
-x509_envelope = {
-	0: purpose, ; What purpose does this metadata serve.
-	1: required_signers_hash, ; A hash of the `required_signers` field from the transaction the metadata is posted with.
-	chunk_type: [ + x509_chunk ]
-	99: [ + validation_signature ] ; The signature/s of the x509 certificate metadata record.
-}
-
-; Chunk Types - Allows to identify how the chunk data is compressed to save on-chain space.
-; 2 : Chunk data is encoded raw
-; 3 : Data is compressed with Brotli and then chunked.
-; 4 : Data is compressed with ZSTD and then chunked.
-chunk_type = (2..4)
-
-; An individual purpose or set or purposes
-purpose = ( individual_purpose [ * individual_purpose ] )
-
-; A V4 UUID encoded as per https://datatracker.ietf.org/doc/html/rfc4122#section-4.1.2
-individual_purpose = (bytes .size (16))
-
-; Transaction Required Signers Hash - Blake2b-224
-required_signers_hash = (bytes .size (28))
-
-; A single x509 chunk
-x509_chunk = (bytes .size (0..64))
-
-; A Validation Signature
-validation_signature = (bytes .size (0..64))
-
-; Signatures are created by creating the x509_envelope with key `99`, but without all expected signatures set to 0x00's.
-; Each signature is then computed over that binary data.
-; Each blank signature is then replaced with the real signature.
-
-; To validate the opposite occurs, the signatures are copied out of the envelope.
-; The signature fields are set to 0x00's
-; The resulting binary buffer is then checked against the signatures which were embedded.
-
-; Explanation:
 ; The purpose of the Envelope is to ensure that metadata is not transportable between
 ; transactions.
-;
-; Transactions contain a `required_signers` field.  
-; By including a hash of that field within the metatdata, we can validated the transaction it was intended for.
-; By signing the metadata envelope with the keys contained within the x509 chunks, we ensure that its not possible
-; to transpose key certs from one transaction to another.
+; It ensures that it can be unambiguously validated that the auxiliary data attached to a transaction 
+; was intended for that transaction.
+; By including the transactions input hash, the metadata is locked to the transaction as that set of
+; transaction inputs are guaranteed to be unique under the UTXO model.
+; It can not be moved to another transaction without being reconstructed as the transaction inputs would
+; have changed.
 
-; This envelope is general in structure, and that structure ensures metadata can not be transposed between transactions
+; This envelope is general in structure, it can be used to secure any auxiliary data, provided the 
+; Role 0 signing key is defined.  As dApps control metadata, this ensures the data can eb authenticated
+; independently by the dApp as belonging to a particular user.
+; Once a Role 0 signing key is defined for a dApp purpose, then it is not necessary to redefine the 
+; x509 data if the envelope is only being used to secure the auxiliary data to a transaction itself.
 
+; The x509 envelope must be valid cardano metadata.
+x509_envelope = $x509_envelope .within transaction_metadatum
+
+; Strcuture of the x509 envelope itself.
+$x509_envelope /= {
+	0: purpose, ; What purpose does this metadata serve.
+	1: tx_inputs_hash, ; A hash of the `transaction inputs` field from the transaction the metadata is posted with.
+	? chunk_type => [ + x509_chunk ] ; Chunked x509 role registration data.
+	99: validation_signature ; The signature of the x509 envelope plus all other auxiliary data.
+}
+
+; x509 Role Registration data is chunked and optionally (preferably) compressed.
+; This enables the x509 registration data to have a strucutre not supported by the
+; underlying limitions of the on-chain metadatum implementation.
+; As the x509 registration data may be large, compression is used to minimize on-chain space consumed.
+; Best practice would be to compress the data with both brotli and zstd, and only store the 
+; smallest data set. `raw` storage would only be used if compression did not yield any benefits.
+; However an application could choose to implement no compression or only one of either brotli/zstd.
+
+; Chunk Types - Allows to identify how the chunk data is compressed to save on-chain space.
+chunk_types = (
+	raw: 10 ; Data is just chunked, not compressed (raw)
+	brotli: 11 ; Data is compressed with BROTLI and then chunked.
+	zstd: 12 ; Data is compressed with ZSTD and then chunked.
+	reserved_3: 13 ; Reserved
+	reserved_4: 14 ; Reserved
+	reserved_5: 15 ; Reserved
+	reserved_6: 16 ; Reserved
+	reserved_7: 17 ; Reserved
+)
+
+chunk_type = &chunk_types ; All valid chunk encodings, only one of these can be used at a time.
+
+; An individual purpose or set or purposes
+purpose = uuid-v4
+
+; A V4 UUID encoded as per https://datatracker.ietf.org/doc/html/rfc4122#section-4.1.2
+uuid-v4 = bytes .size 16
+
+; Hash of the transaction inputs this registration is attached to.
+tx_inputs_hash = bytes .size 28
+
+; A single x509 chunk
+; All chunks but the last must be 64 bytes in length (not enforced by the CDDL)
+x509_min_chunk_size = 1 ; Can't have an empty chunk
+x509_max_chunk_size = 64 ; Can't have a chunk bigger than 64 bytes
+x509_chunk = bytes .size (x509_min_chunk_size .. x509_max_chunk_size); 
+
+; A list of x509 chunks
+x509_chunks = [ + x509_full_chunk ]
+
+; A Validation Signature
+validation_signature = (bytes .size (1..64))
+
+; This envelope can only be used if the current registration or a prior registration is valid
+; AND they have defined for the purpose a Role 0 signing key.
+; The `validation_signature` uses the Role 0 signing key .
+
+
+; Definition of general cardano metadata, constrains what we can implement here:
+transaction_metadatum = { * transaction_metadatum => transaction_metadatum }
+	/ [ * transaction_metadatum ]
+	/ int
+	/ bytes .size (0..64)
+	/ text .size (0..64)

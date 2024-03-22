@@ -1,0 +1,123 @@
+; An envelope for cardano metadata which holds the x509 metadata.
+; We do thsi so that the underlying metadata is not restircted to
+; cardano ledger implementation.
+
+; uses 
+x509_roles = $x509_roles .within role-structure
+
+role-structure = [ role-version, role-body ]
+
+role-version = uint ; Version is an integer.
+role-body = { + uint => any } ; General role body is a Map of integers to anything.
+
+; Version 0 of the role registration format.
+$x509_roles /= x509-roles-v0
+
+x509-roles-v0 = [ 0, x509-roles-v0-body ]
+
+x509-roles-v0-body = {
+	? x509-certs => [ + x509_der_cert ],
+	? c509-certs => [ + c509_cert ],
+	? pub-keys => [ + simple-public-key-type ],
+	? revocation-list => [ + revocation-set ],
+	? attached-did => dids,
+	? attached-vc => vcs,
+	? role-set => role-data-set,
+	? purpose-key-set => purpose-data-set,
+}
+
+; x509 Certificates
+x509-certs = 10 ; Unorderd bag of X509 DER Encoded certificates
+x509_der_cert = bytes ; A DER Encoded X.509 Certificate (binary)
+
+; c509 Certificates
+c509-certs = 20 ; Unorderd bag of C509 CBOR Encoded certificates
+c509_cert = bytes .cbor any; A CBOR Encoded C.509 Certificate (binary)
+
+; Simple Public Keys
+; These are just signing keys of the specified type, and are not true certs
+; They are used for role keys or other uses where simple keys are sufficient
+simple-public-keys = 30 ; Simple Public Keys
+
+simple-public-key-type = $simple-public-key-types
+$simple-public-key-types /= ed25519-public-key
+ed25519-public-key = #6.32773(bstr .size 32) ; Simple public keys must be tagged to identify their type.
+
+; x509/c509/simple key Revocation Lists
+; Keys can only be revoked by the owner of the key or any issuer CA in the chain.
+; Revocation becomes active AFTER certs in the same transaction are processed.
+revocation-list = 40 ; Revocation List
+revocation-entry = bytes .size 16; A blake2b-128 hash of the certificate/public key to be revoked
+revocation-set = [ + revocation-entry ]
+
+; Digitial ID and Verifiable Credentials attached to this registration.
+
+attached-did = 50 ; DID/s attached to the certificates/on-chain identity
+attached-vc = 51 ; Verifiable Credentials attached to the certificates/on-chain identity
+
+dids = [ + bytes ] ; One or multiple DIDs
+vcs = [ + bytes ] ; One or multiple Verifiable Credentials
+
+; Role Registrations
+
+role-set = 100
+
+role-data-set = [ + role-data ]
+
+role-data = {
+	0: role-number,
+	? 1: role-signing-key,
+	? 2: role-encryption-key,
+	? 3: payment-key,
+	* role-extended-data-keys => role-extended-data,
+}
+
+; Role 0 is the ONLY manditory role.
+; It defines the Validation certificate to be used to sign all registration metadata for this purpose for this identity.
+validation-role = 0
+; role-signing-key must reference a certificate, and NOT a simple key.
+; role-encryption-key must not be defined.
+; There is no other data defined for this role.
+
+; Roles 1+ are purpose specific and not defined in this document.
+role-number = uint
+role-signing-key = key-reference
+role-encryption-key = key-reference
+
+role-extended-data-keys = (10..99)
+
+role-extended-data = any
+key-reference = key-local-ref / key-hash
+
+; Offset reference to a key defined in this registration.
+; More efficient than a key hash.
+key-local-ref = [ x509-certs
+	/ c509-certs
+	/ pub-keys, key-offset ]
+
+; Offset of the key in the specified set.  0 = first entry.
+key-offset = uint
+
+; Reference to a key defined in an earlier registration
+key-hash = bytes .size 16
+
+; Reference to a transaction input/output as the payment key to use for a role
+; Payment key (n) >= 0 = Use Transaction Input Key offset (n) as the payment key
+; Payment key (n) < 0 = Use Transaction Output Key offstet -(n+1) as the payment key
+; IFF a transaction output payment key is defined the payment address must also be in
+; the required_signers of the transaction to ensure the payment address is owned and controlled
+; by the entity posting the registration.
+; If the referenced payment key does not exist in the transaction, or is not witnessed the entire
+; registration is to be considered invalid.
+payment-key = int
+
+; purpose specific data - Undefined here except for the key space
+; Individual purposes can define these keys however they require.
+
+purpose-key-set = (first-purpose-key .. last-purpose-key)
+
+first-purpose-key = 200
+last-purpose-key = 299
+purpose-data-set = any
+
+; Note: any individual error in the role registration invalidates the entire registration.
