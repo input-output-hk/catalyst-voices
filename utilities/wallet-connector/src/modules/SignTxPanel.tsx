@@ -87,8 +87,10 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
   async function handleExecute(formValues: FormValues) {
     setIsLoading(true);
 
+    const activeTx = Object.entries(formValues.tx).filter(([w]) => selectedWallets.includes(w));
+
     const response: Response = {};
-    for (const [walletName, cborHex] of Object.entries(formValues.tx)) {
+    for (const [walletName, cborHex] of activeTx) {
       if (!walletName) {
         continue;
       }
