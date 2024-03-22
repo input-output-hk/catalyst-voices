@@ -31,7 +31,9 @@ impl UTXOApi {
         path = "/staked_ada/:stake_address",
         method = "get",
         operation_id = "stakedAdaAmountGet",
-        transform = "schema_version_validation"
+        transform = "schema_version_validation",
+        // TODO: https://github.com/input-output-hk/catalyst-voices/issues/330
+        deprecated = true
     )]
     /// Get staked ada amount.
     ///
