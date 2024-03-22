@@ -69,7 +69,10 @@ impl Type for CardanoStakeAddress {
 
 impl ParseFromParameter for CardanoStakeAddress {
     fn parse_from_parameter(param: &str) -> ParseResult<Self> {
-        // TODO add prefix checks
+        // prefix checks
+        if !param.starts_with("stake") && !param.starts_with("stake_test") {
+            return Err(ParseError::custom("Invalid Cardano stake address"));
+        }
         let address = Address::from_bech32(param).map_err(|e| ParseError::custom(e.to_string()))?;
         if let Address::Stake(stake_address) = address {
             Ok(Self(stake_address))
