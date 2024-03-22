@@ -20,7 +20,9 @@ impl CardanoStakeAddress {
         schema.title = Some("CardanoStakeAddress".to_string());
         schema.description = Some("The stake address of the user. Should a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.");
         schema.example = Some(serde_json::Value::String(
+            // cspell: disable
             "stake1uyehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gh6ffgw".to_string(),
+            // cspell: enable
         ));
         schema.max_length = Some(64);
         schema.pattern = Some("(stake|stake_test)1[a,c-h,j-n,p-z,0,2-9]{53}".to_string());
@@ -67,6 +69,7 @@ impl Type for CardanoStakeAddress {
 
 impl ParseFromParameter for CardanoStakeAddress {
     fn parse_from_parameter(param: &str) -> ParseResult<Self> {
+        // TODO add prefix checks
         let address = Address::from_bech32(param).map_err(|e| ParseError::custom(e.to_string()))?;
         if let Address::Stake(stake_address) = address {
             Ok(Self(stake_address))
