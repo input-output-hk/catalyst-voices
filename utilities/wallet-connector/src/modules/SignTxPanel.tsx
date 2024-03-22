@@ -45,11 +45,10 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
   const [editorRefreshSignal, setEditorRefreshSignal] = useState(0);
 
   useEffect(() => {
-    const walletNames = Object.keys(walletApi);
-    if (!selectedTxWallet && walletNames[0]) {
-      setSelectedTxWallet(walletNames[0]);
-    }
-  }, [walletApi]);
+    const walletNames = Object.keys(walletApi).filter((w) => selectedWallets.includes(w));
+    
+    setSelectedTxWallet((prev) => selectedWallets.includes(prev) ? prev : (walletNames[0] ?? ""));
+  }, [walletApi, selectedWallets]);
 
   const { control, handleSubmit, setValue } = useForm<FormValues>({
     defaultValues: {
@@ -60,8 +59,10 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
 
   async function handleTxBuilderSubmit(builderArgs: TxBuilderArguments) {
     try {
+      const activeWallets = Object.entries(walletApi).filter(([w]) => selectedWallets.includes(w));
+
       const resTx: FormValues["tx"] = {};
-      for (const [walletName, api] of Object.entries(walletApi)) {
+      for (const [walletName, api] of activeWallets) {
         const tx = await buildUnsingedReg({
           regAddress: builderArgs.regAddress,
           regAmount: builderArgs.regAmount,
@@ -84,10 +85,6 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
   }
 
   async function handleExecute(formValues: FormValues) {
-    if (!selectedWallets.length) {
-      return void toast.error("Please select at least one wallet to execute.");
-    }
-
     setIsLoading(true);
 
     const response: Response = {};
@@ -154,7 +151,7 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
                   <>
                     <WalletViewSelection
                       selectedWallet={selectedTxWallet}
-                      wallets={Object.keys(walletApi)}
+                      wallets={Object.keys(walletApi).filter((w) => selectedWallets.includes(w))}
                       onSelect={setSelectedTxWallet}
                     />
                     <Fragment key={selectedTxWallet}>

@@ -1,5 +1,6 @@
 import { Tab } from "@headlessui/react";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import { capitalize, noop, pickBy, upperCase } from "lodash-es";
 import { Fragment } from "react/jsx-runtime";
 import { useForm } from "react-hook-form";
@@ -65,8 +66,8 @@ function WalletInfoSection({
           </div>
           <Tab.Group as="div" className="grid grid-cols-[186px_1fr] h-[320px]">
             <Tab.List className="bg-background border-r border-solid border-black/10 overflow-y-auto">
-              {selectedWallets.map((wallet) => (
-                <Tab as={Fragment} key={wallet}>
+              {selectedWallets.map((walletName) => (
+                <Tab as={Fragment} key={walletName}>
                   {({ selected }) => (
                     <div
                       className={twMerge(
@@ -74,8 +75,14 @@ function WalletInfoSection({
                         selected && "text-white bg-secondary"
                       )}
                     >
-                      <img src={getCardano(wallet).icon} width={20} height={20} alt="icon" />
-                      <p className="grow truncate">{wallet}</p>
+                      {enablingWallets.includes(walletName) ? (
+                        <div className="flex items-center justify-center w-[20px] h-[20px]">
+                          <RefreshIcon className="animate-spin" />
+                        </div>
+                      ) : (
+                        <img src={getCardano(walletName).icon} width={20} height={20} alt="icon" />
+                      )}
+                      <p className="grow truncate">{walletName}</p>
                       {selected && <ArrowRightIcon />}
                     </div>
                   )}
@@ -100,7 +107,7 @@ function WalletInfoSection({
                   {Boolean(walletApi[wallet]) && (
                     <div className="grid gap-2">
                       {Object.entries(walletApi[wallet]?.["info"] ?? {}).map(
-                        ([key, { from, value, raw }]: [string, any]) => (
+                        ([key, { from, value, raw }]) => (
                           <InfoItem
                             key={key}
                             heading={capitalize(upperCase(key))}
