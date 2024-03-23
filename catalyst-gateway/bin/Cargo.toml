@@ -68,13 +68,9 @@ panic-message = { workspace = true }
 cpu-time = { workspace = true }
 ulid = { workspace = true, features = ["serde", "uuid"] }
 rust-embed = { workspace = true }
-local-ip-address.workspace = true
-gethostname.workspace = true
-
-hex = "0.4.3"
-async-recursion = "1.0.5"
-
-
-cardano-chain-follower= { git = "https://github.com/input-output-hk/hermes.git", version="0.0.1"}
-
-pallas = { version = "0.23.0" }
+local-ip-address = { workspace = true }
+gethostname = { workspace = true }
+hex = { workspace = true }
+async-recursion = { workspace = true }
+pallas = { workspace = true }
+cardano-chain-follower= { workspace = true }
