@@ -6,17 +6,17 @@ import 'package:catalyst_voices_remote_widgets/formats.dart';
 
 Future<void> main() async {
   await RemoteWidgetEncoder.rfwTxtToRfw(
-    inputFile: 'remote_widget.rfwtxt',
-    outputFile: 'remote_widget.rfw',
+    inputFile: 'rfwtxt/remote_widget.rfwtxt',
+    outputFile: 'rfw/remote_widget.rfw',
   );
 
   await RemoteWidgetEncoder.rfwTxtToRfw(
-    inputFile: 'new_remote_widget.rfwtxt',
-    outputFile: 'new_remote_widget.rfw',
+    inputFile: 'rfwtxt/new_remote_widget.rfwtxt',
+    outputFile: 'rfw/new_remote_widget.rfw',
   );
 
   await RemoteWidgetEncoder.rfwTxtToRfw(
-    inputFile: 'test.rfwtxt',
-    outputFile: 'test.rfw',
+    inputFile: 'rfwtxt/test.rfwtxt',
+    outputFile: 'rfw/test.rfw',
   );
 }
