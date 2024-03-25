@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite errors="0" failures="0" tests="0" skipped="0" name=".frontend.packages.catalyst_voices_models.test.src.catalyst_voices_models" timestamp="2024-03-25T15:06:18">
+    <properties>
+      <property name="platform" value="vm"/>
+    </properties>
+  </testsuite>
+  <testsuite errors="0" failures="0" tests="0" skipped="0" name=".frontend.packages.catalyst_voices_services.test.src.catalyst_voices_services" timestamp="2024-03-25T15:06:18">
+    <properties>
+      <property name="platform" value="vm"/>
+    </properties>
+  </testsuite>
+  <testsuite errors="0" failures="0" tests="0" skipped="0" name=".frontend.packages.catalyst_voices_repositories.test.src.catalyst_voices_repositories" timestamp="2024-03-25T15:06:18">
+    <properties>
+      <property name="platform" value="vm"/>
+    </properties>
+  </testsuite>
+  <testsuite errors="0" failures="0" tests="0" skipped="0" name=".frontend.packages.catalyst_voices_view_models.test.src.catalyst_voices_view_models" timestamp="2024-03-25T15:06:18">
+    <properties>
+      <property name="platform" value="vm"/>
+    </properties>
+  </testsuite>
+  <testsuite errors="0" failures="0" tests="0" skipped="0" name=".frontend.packages.catalyst_voices_blocs.test.src.catalyst_voices_blocs" timestamp="2024-03-25T15:06:18">
+    <properties>
+      <property name="platform" value="vm"/>
+    </properties>
+  </testsuite>
+  <testsuite errors="0" failures="0" tests="10" skipped="0" name=".frontend.packages.catalyst_voices_shared.test.src.responsive_builder" timestamp="2024-03-25T15:06:18">
+    <properties>
+      <property name="platform" value="vm"/>
+    </properties>
+    <testcase classname=".frontend.packages.catalyst_voices_shared.test.src.responsive_builder" name="Test screen sizes with Text child ResponsiveBuilder adapts to screen of width MapEntry(280.0: Xs device).key" time="0.519"/>
+    <testcase classname=".frontend.packages.catalyst_voices_shared.test.src.responsive_builder" name="Test screen sizes with Text child ResponsiveBuilder adapts to screen of width MapEntry(620.0: Small device).key" time="0.029"/>
+    <testcase classname=".frontend.packages.catalyst_voices_shared.test.src.responsive_builder" name="Test screen sizes with Text child ResponsiveBuilder adapts to screen of width MapEntry(1280.0: Medium device).key" time="0.027"/>
+    <testcase classname=".frontend.packages.catalyst_voices_shared.test.src.responsive_builder" name="Test screen sizes with Text child ResponsiveBuilder adapts to screen of width MapEntry(1600.0: Large device).key" time="0.022"/>
+    <testcase classname=".frontend.packages.catalyst_voices_shared.test.src.responsive_builder" name="Test screen sizes with Text child ResponsiveBuilder adapts to screen of width MapEntry(3000.0: Other device).key" time="0.026"/>
+    <testcase classname=".frontend.packages.catalyst_voices_shared.test.src.responsive_builder" name="Test screen sizes with specific Padding ResponsiveBuilder adapts to screen of width MapEntry(280.0: EdgeInsets.all(2.0)).key" time="0.029"/>
+    <testcase classname=".frontend.packages.catalyst_voices_shared.test.src.responsive_builder" name="Test screen sizes with specific Padding ResponsiveBuilder adapts to screen of width MapEntry(620.0: EdgeInsets.all(4.0)).key" time="0.026"/>
+    <testcase classname=".frontend.packages.catalyst_voices_shared.test.src.responsive_builder" name="Test screen sizes with specific Padding ResponsiveBuilder adapts to screen of width MapEntry(1280.0: EdgeInsets.all(8.0)).key" time="0.026"/>
+    <testcase classname=".frontend.packages.catalyst_voices_shared.test.src.responsive_builder" name="Test screen sizes with specific Padding ResponsiveBuilder adapts to screen of width MapEntry(1600.0: EdgeInsets.all(16.0)).key" time="0.022"/>
+    <testcase classname=".frontend.packages.catalyst_voices_shared.test.src.responsive_builder" name="Test screen sizes with specific Padding ResponsiveBuilder adapts to screen of width MapEntry(3000.0: EdgeInsets.all(32.0)).key" time="0.028"/>
+  </testsuite>
+  <testsuite errors="0" failures="0" tests="4" skipped="0" name=".frontend.packages.catalyst_voices_shared.test.src.responsive_padding" timestamp="2024-03-25T15:06:18">
+    <properties>
+      <property name="platform" value="vm"/>
+    </properties>
+    <testcase classname=".frontend.packages.catalyst_voices_shared.test.src.responsive_padding" name="Test screen sizes ResponsivePadding adapts to screen of width MapEntry(280.0: EdgeInsets.all(2.0)).key" time="0.451"/>
+    <testcase classname=".frontend.packages.catalyst_voices_shared.test.src.responsive_padding" name="Test screen sizes ResponsivePadding adapts to screen of width MapEntry(620.0: EdgeInsets(0.0, 3.0, 0.0, 3.0)).key" time="0.03"/>
+    <testcase classname=".frontend.packages.catalyst_voices_shared.test.src.responsive_padding" name="Test screen sizes ResponsivePadding adapts to screen of width MapEntry(1280.0: EdgeInsets(4.0, 0.0, 4.0, 0.0)).key" time="0.026"/>
+    <testcase classname=".frontend.packages.catalyst_voices_shared.test.src.responsive_padding" name="Test screen sizes ResponsivePadding adapts to screen of width MapEntry(1600.0: EdgeInsets(0.0, 5.0, 0.0, 0.0)).key" time="0.025"/>
+  </testsuite>
+  <testsuite errors="0" failures="0" tests="1" skipped="0" name=".frontend.packages.catalyst_voices_shared.test.src.platform_aware_builder" timestamp="2024-03-25T15:06:18">
+    <properties>
+      <property name="platform" value="vm"/>
+    </properties>
+    <testcase classname=".frontend.packages.catalyst_voices_shared.test.src.platform_aware_builder" name="Test platform detection PlatformWidgetBuilder fallbacks to other" time="0.443"/>
+  </testsuite>
+  <testsuite errors="0" failures="0" tests="0" skipped="0" name=".frontend.test.app.view.app" timestamp="2024-03-25T15:06:18">
+    <properties>
+      <property name="platform" value="vm"/>
+    </properties>
+  </testsuite>
+</testsuites>

@@ -39,7 +39,7 @@ test-unit:
     FROM +build
     WORKDIR /frontend
     TRY
-        RUN flutter test --reporter expanded --machine | tojunit .
+        RUN flutter test --reporter expanded . --machine | tojunit --output flutter.junit-report.xml
     FINALLY
         SAVE ARTIFACT flutter.junit-report.xml AS LOCAL flutter-unit-tests.junit-report.xml
     END
