@@ -9,6 +9,7 @@ Arbritrary
 asyncio
 asyncpg
 auditability
+bech
 bkioshn
 bluefireteam
 BROTLI
