@@ -457,6 +457,7 @@ dependencies = [
 name = "cat-gateway"
 version = "0.0.1"
 dependencies = [
+ "anyhow",
  "async-recursion",
  "bb8",
  "bb8-postgres",
