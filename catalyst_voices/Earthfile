@@ -35,6 +35,15 @@ build:
     WORKDIR /frontend/build
     SAVE ARTIFACT web /web AS LOCAL web
 
+test-unit:
+    FROM +build
+    WORKDIR /frontend
+    TRY
+        RUN flutter test --reporter expanded --file-reporter json:flutter.junit-report.xml .
+    FINALLY
+        SAVE ARTIFACT flutter.junit-report.xml AS LOCAL flutter-unit-tests.junit-report.xml
+    END
+
 package:
     FROM nginx:alpine3.18
     ARG tag='latest'
