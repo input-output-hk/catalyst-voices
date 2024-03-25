@@ -16,6 +16,7 @@ BROTLI
 canvaskit
 cardano
 Catalyst
+cbor
 CEST
 cfbundle
 chromedriver
@@ -28,6 +29,7 @@ coti
 cryptoxide
 Cunego
 Cupertino
+dalek
 dbsync
 delegators
 DIND
@@ -65,12 +67,14 @@ Joaquín
 jorm
 jormungandr
 Jörmungandr
+Keyhash
 lcov
 Leshiy
 lintfix
 localizable
 loguru
 mdlint
+metadatum
 mgrybyk
 mithril
 mitigations
@@ -114,12 +118,14 @@ rxdart
 saibatizoku
 schemathesis
 Schemathesis
+Scripthash
 seckey
 sendfile
 slotno
 sqlfluff
 Stefano
 stevenj
+Subkey
 subosito
 tacho
 testcov
@@ -133,6 +139,8 @@ TXNZD
 unmanaged
 UTXO
 vitss
+vkey
+vkeywitness
 voteplan
 voteplans
 wallclock
@@ -144,7 +152,3 @@ xctest
 xctestrun
 xcworkspace
 yoroi
-dalek
-Keyhash
-Scripthash
-vkey
