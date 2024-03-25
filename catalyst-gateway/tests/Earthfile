@@ -27,7 +27,7 @@ test-fuzzer-api:
     WITH DOCKER \
         --compose schemathesis-docker-compose.yml \
         --load schemathesis:latest=(+package-schemathesis --openapi_spec="http://127.0.0.1:3030/docs/cat-gateway.json") \
-        --load event-db:latest=(../event-db+build --with_historic_data=false) \
+        --load event-db:latest=(../event-db+build) \
         --load cat-gateway:latest=(../+package-cat-gateway --address="127.0.0.1:3030" \
                                         --db_url="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev") \
         --service event-db \
