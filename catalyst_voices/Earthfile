@@ -12,13 +12,13 @@ deps:
     WORKDIR /frontend
 
     GIT CLONE https://github.com/flutter/flutter.git /usr/local/flutter
-    ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:${PATH}"
-
+    ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
     RUN flutter channel stable
     RUN flutter upgrade
     RUN flutter --version
     RUN flutter doctor -v
     RUN flutter config --enable-web
+    RUN dart pub global activate junitreport
 
 src:
     FROM +deps
@@ -39,7 +39,7 @@ test-unit:
     FROM +build
     WORKDIR /frontend
     TRY
-        RUN flutter test --reporter expanded --file-reporter json:flutter.junit-report.xml .
+        RUN flutter test --reporter expanded --machine | tojunit .
     FINALLY
         SAVE ARTIFACT flutter.junit-report.xml AS LOCAL flutter-unit-tests.junit-report.xml
     END
