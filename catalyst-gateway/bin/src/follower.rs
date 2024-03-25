@@ -1,5 +1,5 @@
 //! Logic for orchestrating followers
-use std::{error::Error, path::PathBuf, str::FromStr, sync::Arc};
+use std::{path::PathBuf, str::FromStr, sync::Arc};
 
 /// Handler for follower tasks, allows for control over spawned follower threads
 pub type ManageTasks = JoinHandle<()>;
@@ -8,13 +8,14 @@ use async_recursion::async_recursion;
 use cardano_chain_follower::{
     network_genesis_values, ChainUpdate, Follower, FollowerConfigBuilder, Network, Point,
 };
+use chrono::TimeZone;
 use tokio::{task::JoinHandle, time};
 use tracing::{error, info};
 
 use crate::{
     event_db::{
         config::{FollowerMeta, NetworkMeta},
-        follower::{BlockHash, LastUpdate, MachineId, SlotNumber},
+        follower::{BlockHash, BlockTime, MachineId, SlotNumber},
         EventDB,
     },
     util::valid_era,
@@ -29,7 +30,7 @@ const DATA_NOT_STALE: i64 = 1;
 pub(crate) async fn start_followers(
     configs: (Vec<NetworkMeta>, FollowerMeta), db: Arc<EventDB>, data_refresh_tick: u64,
     check_config_tick: u64, machine_id: String,
-) -> Result<(), Box<dyn Error>> {
+) -> anyhow::Result<()> {
     // spawn followers and obtain thread handlers for control and future cancellation
     let follower_tasks = spawn_followers(
         configs.clone(),
@@ -75,7 +76,7 @@ pub(crate) async fn start_followers(
             )
             .await?;
         },
-        None => return Err("Config has been deleted...".into()),
+        None => return Err(anyhow::anyhow!("Config has been deleted...")),
     }
 
     Ok(())
@@ -85,7 +86,7 @@ pub(crate) async fn start_followers(
 async fn spawn_followers(
     configs: (Vec<NetworkMeta>, FollowerMeta), db: Arc<EventDB>, data_refresh_tick: u64,
     machine_id: String,
-) -> Result<Vec<ManageTasks>, Box<dyn Error>> {
+) -> anyhow::Result<Vec<ManageTasks>> {
     let snapshot_path = configs.1.mithril_snapshot_path;
 
     let mut follower_tasks = Vec::new();
@@ -150,7 +151,7 @@ async fn spawn_followers(
 /// it left off. If there was no previous follower, start indexing from genesis point.
 async fn find_last_update_point(
     db: Arc<EventDB>, network: &String,
-) -> Result<(Option<SlotNumber>, Option<BlockHash>, Option<LastUpdate>), Box<dyn Error>> {
+) -> anyhow::Result<(Option<SlotNumber>, Option<BlockHash>, Option<BlockTime>)> {
     let (slot_no, block_hash, last_updated) =
         match db.last_updated_metadata(network.to_string()).await {
             Ok((slot_no, block_hash, last_updated)) => {
@@ -175,11 +176,11 @@ async fn find_last_update_point(
 async fn init_follower(
     network: Network, relay: &str, start_from: (Option<SlotNumber>, Option<BlockHash>),
     db: Arc<EventDB>, machine_id: MachineId, snapshot: &str,
-) -> Result<ManageTasks, Box<dyn Error>> {
+) -> anyhow::Result<ManageTasks> {
     let mut follower = follower_connection(start_from, snapshot, network, relay).await?;
 
-    let genesis_values =
-        network_genesis_values(&network).ok_or("Obtaining genesis values failed")?;
+    let genesis_values = network_genesis_values(&network)
+        .ok_or(anyhow::anyhow!("Obtaining genesis values failed"))?;
 
     let task = tokio::spawn(async move {
         loop {
@@ -214,7 +215,7 @@ async fn init_follower(
                     };
 
                     let wallclock = match block.wallclock(&genesis_values).try_into() {
-                        Ok(time) => time,
+                        Ok(time) => chrono::Utc.timestamp_nanos(time),
                         Err(err) => {
                             error!("Cannot parse wall time from block {:?} - skip..", err);
                             continue;
@@ -309,7 +310,7 @@ async fn init_follower(
 async fn follower_connection(
     start_from: (Option<SlotNumber>, Option<BlockHash>), snapshot: &str, network: Network,
     relay: &str,
-) -> Result<Follower, Box<dyn Error>> {
+) -> anyhow::Result<Follower> {
     let mut follower_cfg = if start_from.0.is_none() || start_from.1.is_none() {
         // start from genesis, no previous followers, hence no starting points.
         FollowerConfigBuilder::default()
@@ -319,8 +320,15 @@ async fn follower_connection(
         // start from given point
         FollowerConfigBuilder::default()
             .follow_from(Point::new(
-                start_from.0.ok_or("Slot number not present")?.try_into()?,
-                hex::decode(start_from.1.ok_or("Block Hash not present")?)?,
+                start_from
+                    .0
+                    .ok_or(anyhow::anyhow!("Slot number not present"))?
+                    .try_into()?,
+                hex::decode(
+                    start_from
+                        .1
+                        .ok_or(anyhow::anyhow!("Block Hash not present"))?,
+                )?,
             ))
             .mithril_snapshot_path(PathBuf::from(snapshot))
             .build()

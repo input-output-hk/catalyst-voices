@@ -8,6 +8,8 @@ pub(crate) enum ApiTags {
     Fragments,
     /// Health Endpoints
     Health,
+    /// UTXO Endpoints
+    Utxo,
     /// Information relating to Voter Registration, Delegations and Calculated Voting
     /// Power.
     Registration,
