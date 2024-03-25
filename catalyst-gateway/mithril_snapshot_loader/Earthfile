@@ -1,0 +1,14 @@
+VERSION 0.7
+
+load-mithril-snapshot:
+    ARG network="preprod"
+
+    FROM ../../../catalyst-ci/earthly/python+python-base
+    
+    RUN pip3 install requests
+    RUN pip3 install tqdm
+
+    COPY loader.py /scripts
+
+    RUN /scripts/loader.py --network=$network --out="snapshot"
+    SAVE ARTIFACT ./snapshot snapshot
