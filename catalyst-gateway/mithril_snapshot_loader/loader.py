@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# cspell: words tqdm
+
 import argparse
 import rich
 from rich import print
@@ -31,7 +33,7 @@ class NetworkType(enum.Enum):
 
 def load_snapshot(network_type: NetworkType, out: str):
     resp = requests.get(network_type.get_aggregator_url())
-    # getting the latest snapshot from the list, it's alvails on the first position
+    # getting the latest snapshot from the list, it's always on the first position
     snapshot_info = resp.json()[0]
 
     location = snapshot_info["locations"][0]

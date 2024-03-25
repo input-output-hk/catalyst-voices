@@ -1,5 +1,7 @@
 VERSION 0.7
 
+# cspell: words tqdm
+
 load-mithril-snapshot:
     ARG network="preprod"
 
