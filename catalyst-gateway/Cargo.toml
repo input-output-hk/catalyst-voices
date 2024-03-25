@@ -44,6 +44,11 @@ tokio = "1"
 dotenvy = "0.15"
 local-ip-address = "0.5.7"
 gethostname = "0.4.3"
+hex = "0.4.3"
+async-recursion = "1.0.5"
+pallas = "0.23.0"
+anyhow = "1.0.71"
+cardano-chain-follower= { git = "https://github.com/input-output-hk/hermes.git", version="0.0.1" }
 
 [workspace.lints.rust]
 warnings = "deny"

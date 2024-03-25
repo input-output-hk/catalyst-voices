@@ -1,6 +1,6 @@
 //! Setup for logging for the service.
 use clap::ValueEnum;
-use tracing::{level_filters::LevelFilter, subscriber::SetGlobalDefaultError};
+use tracing::level_filters::LevelFilter;
 use tracing_subscriber::{
     fmt::{format::FmtSpan, time},
     FmtSubscriber,
@@ -45,7 +45,7 @@ impl From<LogLevel> for tracing::log::LevelFilter {
 }
 
 /// Initialize the tracing subscriber
-pub(crate) fn init(log_level: LogLevel) -> Result<(), SetGlobalDefaultError> {
+pub(crate) fn init(log_level: LogLevel) -> anyhow::Result<()> {
     let subscriber = FmtSubscriber::builder()
         .json()
         .with_max_level(LevelFilter::from_level(log_level.into()))
@@ -64,5 +64,6 @@ pub(crate) fn init(log_level: LogLevel) -> Result<(), SetGlobalDefaultError> {
     // Logging is globally disabled by default, so globally enable it to the required level.
     tracing::log::set_max_level(log_level.into());
 
-    tracing::subscriber::set_global_default(subscriber)
+    tracing::subscriber::set_global_default(subscriber)?;
+    Ok(())
 }
