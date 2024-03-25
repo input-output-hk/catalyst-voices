@@ -3,7 +3,7 @@ VERSION --global-cache 0.7
 builder:
     FROM github.com/input-output-hk/catalyst-ci/earthly/python:v2.10.0+python-base
 
-    COPY --dir ./schema_mismatch README.md .
+    COPY --dir ./schema_mismatch .
     DO github.com/input-output-hk/catalyst-ci/earthly/python:v2.10.0+BUILDER
 
 package-tester:
