@@ -1,7 +1,5 @@
 //! Block stream parsing and filtering utils
 
-use std::error::Error;
-
 use cryptoxide::{blake2b::Blake2b, digest::Digest};
 use pallas::ledger::{
     primitives::conway::{StakeCredential, VKeyWitness},
@@ -120,7 +118,7 @@ pub fn extract_stake_credentials_from_certs(
 /// except for credentials (i.e. keys or scripts) which are 28-byte long (or 224 bits)
 pub fn extract_hashed_witnesses(
     witnesses: &[VKeyWitness],
-) -> Result<Vec<(WitnessPubKey, WitnessHash)>, Box<dyn Error>> {
+) -> anyhow::Result<Vec<(WitnessPubKey, WitnessHash)>> {
     let mut hashed_witnesses = Vec::new();
     for witness in witnesses {
         let pub_key_bytes: [u8; 32] = witness.vkey.as_slice().try_into()?;
@@ -141,7 +139,7 @@ pub fn extract_hashed_witnesses(
 /// to identify the correct stake credential key.
 pub fn find_matching_stake_credential(
     witnesses: &[(WitnessPubKey, WitnessHash)], stake_credentials: &[String],
-) -> Result<(StakeCredentialKey, StakeCredentialHash), Box<dyn Error>> {
+) -> anyhow::Result<(StakeCredentialKey, StakeCredentialHash)> {
     stake_credentials
         .iter()
         .zip(witnesses.iter())
@@ -152,7 +150,7 @@ pub fn find_matching_stake_credential(
                 None
             }
         })
-        .ok_or(
-            "No stake credential from the certificates matches any of the witness pub keys".into(),
-        )
+        .ok_or(anyhow::anyhow!(
+            "No stake credential from the certificates matches any of the witness pub keys"
+        ))
 }
