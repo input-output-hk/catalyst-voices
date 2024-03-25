@@ -2,8 +2,8 @@ import 'package:catalyst_voices_shared/src/responsive_builder/responsive_breakpo
 import 'package:catalyst_voices_shared/src/responsive_builder/responsive_builder.dart';
 import 'package:flutter/widgets.dart';
 
-// A [DynamicPadding] is a StatelessWidget that applies a padding based on the
-// current screen size.
+// A [ResponsivePadding] is a StatelessWidget that applies a padding based on
+// the current screen size.
 //
 // The widget wraps its [child] in a ResponsiveBuilder that calculates the 
 // proper padding value based on the screen size and wraps it again in a Padding
@@ -16,7 +16,7 @@ import 'package:flutter/widgets.dart';
 // Example usage:
 // 
 // ```dart
-// DynamicPadding(
+// ResponsivePadding(
 //   xs: const EdgeInsets.all(4.0),
 //   sm: const EdgeInsets.all(6.0),
 //   md: const EdgeInsets.only(top: 6.0),
@@ -25,11 +25,11 @@ import 'package:flutter/widgets.dart';
 // );
 // ```
 
-class DynamicPadding extends StatelessWidget {
+class ResponsivePadding extends StatelessWidget {
   final Widget child;
   final Map<ResponsiveBreakpointKey, EdgeInsets> _paddings;
 
-  DynamicPadding({
+  ResponsivePadding({
     super.key,
     required this.child,
     EdgeInsets xs = const EdgeInsets.all(4),

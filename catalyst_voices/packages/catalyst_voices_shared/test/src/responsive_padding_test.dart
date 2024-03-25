@@ -8,7 +8,7 @@ void main() {
     data: MediaQueryData(size: size), 
     child: MaterialApp(
       home: Scaffold(
-        body: DynamicPadding(
+        body: ResponsivePadding(
           xs: const EdgeInsets.all(2),
           sm: const EdgeInsets.symmetric(vertical: 3),
           md: const EdgeInsets.symmetric(horizontal: 4),
@@ -29,7 +29,7 @@ void main() {
 
     for (final entry in sizesToTest.entries) {
       testWidgets(
-        'DynamicPadding adapts to screen of width $entry.key',
+        'ResponsivePadding adapts to screen of width $entry.key',
         (tester) async {
           await tester.pumpWidget(
             buildApp(Size.fromWidth(entry.key)),
