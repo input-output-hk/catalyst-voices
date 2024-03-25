@@ -1,7 +1,6 @@
 """Test the `catalyst-gateway` service when a DB schema mismatch occurs."""
 
 from loguru import logger
-import requests
 
 from api_tests import DB_URL, call_api_url
 
