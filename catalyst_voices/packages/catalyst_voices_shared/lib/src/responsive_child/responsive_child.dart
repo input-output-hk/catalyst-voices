@@ -2,10 +2,10 @@ import 'package:catalyst_voices_shared/src/responsive_builder/responsive_breakpo
 import 'package:catalyst_voices_shared/src/responsive_builder/responsive_builder.dart';
 import 'package:flutter/material.dart';
 
-class ResponsiveDynamicChild extends StatelessWidget {
+class ResponsiveChild extends StatelessWidget {
   final Map<ResponsiveBreakpointKey, Widget?> _widgets;
 
-  ResponsiveDynamicChild({
+  ResponsiveChild({
     super.key,
     Widget? xs,
     Widget? sm,
