@@ -13,12 +13,14 @@ void main() {
             padding: EdgeInsets.all(50),
             child: Text('Text with padding for small screens.'),
           ),
-          md: const Column(children: [
-            Text('This is'),
-            Text('a set'),
-            Text('of Texts'),
-            Text('for medium screens.'),
-          ],),
+          md: const Column(
+            children: [
+              Text('This is'),
+              Text('a set'),
+              Text('of Texts'),
+              Text('for medium screens.'),
+            ],
+          ),
           other: const Text('The fallback widget.'),
         ),
       ),
