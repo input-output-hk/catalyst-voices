@@ -1,0 +1,198 @@
+vars: {
+  d2-config: {
+    layout-engine: elk
+
+    # Terminal theme code
+    theme-id: 300
+  }
+}
+
+classes: {
+  NONE: {style.opacity: 0}
+  RBAC_TABLE: {
+    shape: sql_table
+    style: {
+      border-radius: 15
+    }
+  }
+  PRIVATE_KEY: {
+    shape: sql_table
+    style: {
+      border-radius: 15
+      stroke: wheat
+      fill: cornsilk
+      font-color: red
+    }
+  }
+  SIGN: {
+    style: {
+      stroke-dash: 3
+      stroke: blueviolet
+      animated: true
+    }
+  }
+}
+
+title: |md
+  # x509 Transaction - Complete
+| {
+  shape: text
+  near: top-center
+  style: {
+    font-size: 30
+  }
+  width: 800
+}
+
+individual_transaction: "Cardano Transaction" {
+  shape: sql_table
+  link: "https://github.com/IntersectMBO/cardano-ledger/blob/6d860294304749a767d99db92fab42f7c18d9af4/eras/babbage/impl/cddl-files/babbage.cddl#L13-L18"
+  body: "transaction body"
+  auxiliary_data: "Option<auxiliary_data>"
+  witnesses: "transaction witness set"
+}
+
+transaction_body: "transaction body" {
+  shape: sql_table
+  link: "https://github.com/IntersectMBO/cardano-ledger/blob/6d860294304749a767d99db92fab42f7c18d9af4/eras/babbage/impl/cddl-files/babbage.cddl#L53-L71"
+  "0 = transaction inputs": "[ * [transaction hash, index] ]"
+  "1 = transaction outputs": "[ * transaction_output ]"
+  "2 = transaction fee": "coin (lovelace uint64)"
+  "? 3 = Time to live \[TTL\]": "uint64"
+  "? 4 = certificates": "[* certificate]"
+  "? 5 = reward withdrawals": "{ * reward_account => coin (lovelace uint64) }"
+  "? 6 = protocol parameter update": "[ proposed_protocol_parameter_updates, epoch ]"
+  "? 7 = auxiliary_data_hash": "32 byte hash"
+  "? 8 = validity interval start": "uint64"
+  "? 9 = mint": "{ * policy_id => { * asset_name => a } }"
+  "? 11 = script_data_hash": "32 byte hash"
+  "? 13 = collateral inputs": "[ * [transaction hash, index] ]"
+  "? 14 = required_signers": "[ * address key hash (blake2b-224) of signing public key ]"
+  "? 15 = network_id": "0 or 1"
+  "? 16 = collateral return": transaction_output (collateral return)
+  "? 17 = total collateral": "coin (lovelace uint64)"
+  "? 18 = reference inputs": set<transaction_input>
+}
+
+individual_transaction.body -> transaction_body: "body"
+individual_transaction.auxiliary_data -> auxiliary.data: "auxiliary_data\n(optional)"
+
+auxiliary: "" {
+  data: "auxiliary data" {
+    shape: sql_table
+    link: "https://github.com/IntersectMBO/cardano-ledger/blob/6d860294304749a767d99db92fab42f7c18d9af4/eras/babbage/impl/cddl-files/babbage.cddl#L359C1-L368"
+    metadata: "{ * uint => transaction_metadatum } : Optional"
+    native_script: "[ * native_script ] : Optional"
+    plutus_v1: "[ * plutus_v1_script ] : Optional"
+    plutus_v2: "[ * plutus_v2_script ] : Optional"
+  }
+
+  509_envelope: "x509 envelope metadata (Key 509)" {
+    shape: sql_table
+    0: "purpose : 128bit UUID V4 of the Metadata Purpose"
+    1: "txn-inputs-hash : Hash of the transaction inputs"
+    "10/11/12": "X509 chunks: [ + x509_chunk ] - x509 Update Data."
+    99: "validation signature : Signature calculated in step 6"
+  }
+
+  data.metadata -> 509_envelope: 509
+
+  rbac: "x509 Role based Access Control" {
+    class: RBAC_TABLE
+    "? 10=x509 certs": "[ + DER Certs ]"
+    "? 20=c509 certs": "[ + CBOR Certs ]"
+    "? 30=public keys": "[ + Public Keys ]"
+    ? 40=revocation set: "[ + Revoked Cert hash]"
+    ? 50=DiD: "DiD???"
+    ? 51=Verifiable Credentials: "[ + VC??? ]"
+    "? 100=Role Data Set": "[ + Role Data ]"
+  }
+
+  509_envelope."10/11/12" -> rbac
+
+  role_data: "Role Data" {
+    class: RBAC_TABLE
+    "0=role number": "uint"
+    "? 1=role-signing-key": "Key Reference"
+    "? 2=role-encryption-key": "Key Reference"
+    "? 3=payment-key": "OnChain Payment Key Reference"
+    "? 10-99=Role Specific Data": "Variable per Role"
+  }
+
+  rbac."? 100=Role Data Set" -> role_data
+
+  role_0: "Role 0 - Metadata Validation Role" {
+    class: RBAC_TABLE
+    "0=role number": "0"
+    "1=role-signing-key": "Key Reference"
+  }
+
+  role_data -> role_0: Required
+
+  # role_data."? 1=role-signing-key" -> rbac."? 10=x509 certs"
+  # role_data."? 1=role-signing-key" -> rbac."? 20=c509 certs"
+  # role_data."? 1=role-signing-key" -> rbac."? 30=public keys"
+
+  # role_data."? 2=role-encryption-key" -> rbac."? 10=x509 certs"
+  # role_data."? 2=role-encryption-key" -> rbac."? 20=c509 certs"
+  # role_data."? 2=role-encryption-key" -> rbac."? 30=public keys"
+}
+
+transaction_body."? 7 = auxiliary_data_hash" -> auxiliary.data: blake2b_256()
+auxiliary.509_envelope.1 <- transaction_body."0 = transaction inputs": blake2b_256()
+auxiliary.role_data."? 3=payment-key" -> transaction_body."0 = transaction inputs"
+auxiliary.role_data."? 3=payment-key" -> transaction_body."1 = transaction outputs"
+
+root-ca: "ROOT CERTIFICATE AUTHORITY (CA)" {
+  # shape: text
+
+  # pad.class: NONE
+
+  key: "Root CA's Key Pair" {
+    class: PRIVATE_KEY
+    private: Secret
+    public: Shared
+  }
+
+  certificate: "Root Certificate (ROOT CA)" {
+    shape: sql_table
+    "Subject`s Name": "ROOT CA Name"
+    "Subject`s PublicKey": Public Key
+    "Issuer`s Name": "ROOT CA Name"
+    "Issuer`s Signature": Signature
+    "Subject Alt Name": "URI:S:ada:stake1vpu...p0u"
+  }
+
+  key.public -> certificate."Subject`s PublicKey": Published
+  key.private -> certificate."Issuer`s Signature": Self Sign {class: SIGN}
+}
+
+auxiliary.rbac."? 10=x509 certs" -> root-ca.certificate: contains
+auxiliary.rbac."? 20=c509 certs" -> root-ca.certificate: contains
+auxiliary.role_0."1=role-signing-key" -> root-ca.certificate
+auxiliary.509_envelope.99 <- root-ca.key.private: Sign {class: SIGN}
+transaction_body."? 14 = required_signers" <- root-ca.certificate."Subject Alt Name": "transaction must\nbe witnessed by"
+
+# ----
+transaction_witness: "" {
+  set: "transaction witness set" {
+    shape: sql_table
+    link: "https://github.com/IntersectMBO/cardano-ledger/blob/6d860294304749a767d99db92fab42f7c18d9af4/eras/babbage/impl/cddl-files/babbage.cddl#L295C1-L303"
+    "? 0": "[* vkeywitness ]"
+    "? 1": "[* native_script]"
+    "? 2": "[* bootstrap_witness]"
+    "? 3": "[* plutus_v1_script]"
+    "? 4": "[* plutus_data]"
+    "? 5": "[* redeemer]"
+    "? 6": "[* plutus_v2_script]"
+  }
+
+  vkeywitness: {
+    shape: sql_table
+    link: "https://github.com/IntersectMBO/cardano-ledger/blob/6d860294304749a767d99db92fab42f7c18d9af4/eras/babbage/impl/cddl-files/babbage.cddl#L370"
+    "vkey": "ED25519-Bip32 Public Key [32 Bytes]"
+    "signature": "ED25519-Bip32 Signature of Transaction [64 bytes]"
+  }
+  set."? 0" -> vkeywitness
+}
+individual_transaction.witnesses -> transaction_witness.set: "witnesses"
