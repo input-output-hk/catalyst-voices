@@ -36,7 +36,7 @@ jobs:
             aws_region: ${{ env.AWS_REGION }}
             earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
 
-      - name: Get catalyt gateway unit test report
+      - name: Get catalyst gateway unit test report
         uses: input-output-hk/catalyst-ci/actions/run@master
         if: always()
         continue-on-error: true
