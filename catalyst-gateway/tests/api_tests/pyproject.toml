@@ -1,9 +1,9 @@
 [tool.poetry]
-name = "api-tests"
+name = "api_tests"
 version = "0.1.0"
 description = ""
 authors = ["Joaquín Rosales <joaquin.rosales@iohk.io>"]
-readme = "README.md"
+readme = "Readme.md"
 license = "MIT or Apache-2.0"
 
 [tool.poetry.dependencies]

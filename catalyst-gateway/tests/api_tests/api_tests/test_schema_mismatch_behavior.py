@@ -1,22 +1,27 @@
 """Test the `catalyst-gateway` service when a DB schema mismatch occurs."""
+
 from loguru import logger
 
-from schema_mismatch import call_api_url, fetch_schema_version, change_version
+from api_tests import call_api_url, fetch_schema_version, change_version
+
 
 def check_is_live():
     resp = call_api_url("GET", "/api/health/live")
     assert resp.status == 204
     logger.info("cat-gateway service is LIVE.")
 
+
 def check_is_ready():
     resp = call_api_url("GET", "/api/health/ready")
     assert resp.status == 204
     logger.info("cat-gateway service is READY.")
 
+
 def check_is_not_ready():
     resp = call_api_url("GET", "/api/health/ready")
     assert resp.status == 503
     logger.info("cat-gateway service is NOT READY.")
+
 
 def test_schema_version_mismatch_changes_cat_gateway_behavior():
     # Check that the `live` endpoint is OK
