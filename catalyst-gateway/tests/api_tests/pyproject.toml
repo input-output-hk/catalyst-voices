@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "schema-mismatch"
+name = "api-tests"
 version = "0.1.0"
 description = ""
 authors = ["Joaquín Rosales <joaquin.rosales@iohk.io>"]
