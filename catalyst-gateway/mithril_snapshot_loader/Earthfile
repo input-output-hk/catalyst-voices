@@ -3,7 +3,7 @@ VERSION 0.7
 load-mithril-snapshot:
     ARG network="preprod"
 
-    FROM ../../../catalyst-ci/earthly/python+python-base
+    FROM github.com/input-output-hk/catalyst-ci/earthly/python:feat/python-builder+python-base
     
     RUN pip3 install requests
     RUN pip3 install tqdm
