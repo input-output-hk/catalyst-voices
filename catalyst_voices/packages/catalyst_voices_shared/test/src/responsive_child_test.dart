@@ -8,12 +8,12 @@ void main() {
     child: MaterialApp(
       home: Scaffold(
         body: ResponsiveChild(
-          xs: const Text('Simple text for extra small screens.'),
-          sm: const Padding(
+          xs: (context) => const Text('Simple text for extra small screens.'),
+          sm: (context) => const Padding(
             padding: EdgeInsets.all(50),
             child: Text('Text with padding for small screens.'),
           ),
-          md: const Column(
+          md: (context) => const Column(
             children: [
               Text('This is'),
               Text('a set'),
@@ -21,7 +21,7 @@ void main() {
               Text('for medium screens.'),
             ],
           ),
-          other: const Text('The fallback widget.'),
+          other: (context) => const Text('The fallback widget.'),
         ),
       ),
     ),

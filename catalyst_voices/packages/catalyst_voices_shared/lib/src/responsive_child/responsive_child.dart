@@ -2,8 +2,8 @@ import 'package:catalyst_voices_shared/src/responsive_builder/responsive_breakpo
 import 'package:catalyst_voices_shared/src/responsive_builder/responsive_builder.dart';
 import 'package:flutter/material.dart';
 
-// A [ResponsiveChild] is a StatelessWidget that displays a Widget based on the 
-// current screen size.
+// A [ResponsiveChild] is a StatelessWidget that selects a WidgetBuilder based 
+// on the current screen size and execute it.
 // This is a simple wrapper around ResponsiveBuilder to simplify development and
 // make it explicit for a reader.
 //
@@ -15,12 +15,12 @@ import 'package:flutter/material.dart';
 // 
 // ```dart
 // ResponsiveChild(
-//   xs: const Text('Simple text for extra small screens.'),
-//   sm: const Padding(
+//   xs: (context) => const Text('Simple text for extra small screens.'),
+//   sm: (context) => const Padding(
 //     padding: EdgeInsets.all(50),
 //       child: Text('Text with padding for small screens.'),
 //     ),
-//   md: const Column(
+//   md: (context) => const Column(
 //     children: [
 //       Text('This is'),
 //       Text('a set'),
@@ -28,20 +28,20 @@ import 'package:flutter/material.dart';
 //       Text('for medium screens.'),
 //     ],
 //   ),
-//   other: const Text('The fallback widget.'),
+//   other: (context) => const Text('The fallback widget.'),
 // );
 // ```
 
 class ResponsiveChild extends StatelessWidget {
-  final Map<ResponsiveBreakpointKey, Widget?> _widgets;
+  final Map<ResponsiveBreakpointKey, WidgetBuilder?> _widgets;
 
   ResponsiveChild({
     super.key,
-    Widget? xs,
-    Widget? sm,
-    Widget? md,
-    Widget? lg,
-    required Widget other,
+    WidgetBuilder? xs,
+    WidgetBuilder? sm,
+    WidgetBuilder? md,
+    WidgetBuilder? lg,
+    required WidgetBuilder other,
   }) : _widgets = {
     ResponsiveBreakpointKey.xs: xs,
     ResponsiveBreakpointKey.sm: sm,
@@ -52,8 +52,8 @@ class ResponsiveChild extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ResponsiveBuilder<Widget>(
-      builder: (context, child) => child!,
+    return ResponsiveBuilder<WidgetBuilder>(
+      builder: (context, childBuilder) => childBuilder!(context),
       xs: _widgets[ResponsiveBreakpointKey.xs],
       sm: _widgets[ResponsiveBreakpointKey.sm],
       md: _widgets[ResponsiveBreakpointKey.md],
