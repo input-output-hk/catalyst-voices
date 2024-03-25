@@ -46,7 +46,7 @@ impl Cli {
     /// - Failed to initialize the logger with the specified log level.
     /// - Failed to create a new `State` with the provided database URL.
     /// - Failed to run the service on the specified address.
-    pub(crate) async fn exec(self) -> Result<(), Box<dyn std::error::Error>> {
+    pub(crate) async fn exec(self) -> anyhow::Result<()> {
         match self {
             Self::Run(settings) => {
                 logger::init(settings.log_level)?;
