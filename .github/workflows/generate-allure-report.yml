@@ -36,7 +36,7 @@ jobs:
             aws_region: ${{ env.AWS_REGION }}
             earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
 
-      - name: Get unit test report
+      - name: Get catalyst gateway unit test report
         uses: input-output-hk/catalyst-ci/actions/run@master
         if: always()
         continue-on-error: true
@@ -59,6 +59,18 @@ jobs:
           target_flags:
           runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
           artifact: "false"
+
+      - name: Get flutter unit test report
+        uses: input-output-hk/catalyst-ci/actions/run@master
+        if: always()
+        continue-on-error: true
+        with:
+            earthfile: ./catalyst_voices/
+            flags:
+            targets: test-unit
+            target_flags:
+            runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+            artifact: "false"
 
       - name: Collect and upload test reports
         uses: actions/upload-artifact@v4
