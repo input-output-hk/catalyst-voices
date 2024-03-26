@@ -19,7 +19,7 @@ integration-test-web:
     #    LET driver = "msedgedriver"
     #END
     RUN ($driver --port=$driver_port > $driver.log &) && \
-            flutter drive --driver=test_driver/integration_test.dart \
+            flutter drive --driver=test_driver/integration_tests.dart \
                 --target=integration_test/main.dart \
                     --flavor development -d web-server --profile \
                         --browser-name=$browser --driver-port=$driver_port || echo fail > fail
