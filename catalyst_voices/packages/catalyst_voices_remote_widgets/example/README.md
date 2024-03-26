@@ -1,11 +1,11 @@
 # Example of how to use Catalyst Voices Remote Widgets
 
-- [Example of how to use Catalyst Voices Remote Widgets](#example-of-how-to-use-catalyst-voices-remote-widgets)
-  - [Create a desire widget in Flutter](#create-a-desire-widget-in-flutter)
-  - [Create `rfwtxt` file](#create-rfwtxt-file)
-  - [Convert rfwtxt to rfw](#convert-rfwtxt-to-rfw)
-  - [Upload rfw file to backend](#upload-rfw-file-to-backend)
-  - [Use a remote widget in your app](#use-a-remote-widget-in-your-app)
+* [Example of how to use Catalyst Voices Remote Widgets](#example-of-how-to-use-catalyst-voices-remote-widgets)
+  * [Create a desire widget in Flutter](#create-a-desire-widget-in-flutter)
+  * [Create `rfwtxt` file](#create-rfwtxt-file)
+  * [Convert rfwtxt to rfw](#convert-rfwtxt-to-rfw)
+  * [Upload rfw file to backend](#upload-rfw-file-to-backend)
+  * [Use a remote widget in your app](#use-a-remote-widget-in-your-app)
 
 ## Create a desire widget in Flutter
 
@@ -82,7 +82,8 @@ class LocalWidget extends StatelessWidget {
 ## Create `rfwtxt` file
 
 Create `remote_widget.rfwtxt` and copy your widget code  after `return` keyword
-and adjust the code to be in the format of `rfwtxt` file. For more about
+and adjust the code to be in the format of `rfwtxt` file.
+For more about
 `rfwtxt` visit [rfw](https://github.com/flutter/packages/tree/main/packages/rfw) repository.
 
 ```rfwtxt
