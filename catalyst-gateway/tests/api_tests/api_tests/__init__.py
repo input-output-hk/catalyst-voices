@@ -2,7 +2,7 @@
 
 import http.client
 
-DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev"
+DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 DEFAULT_TIMEOUT = 10
 CAT_GATEWAY_HOST = "127.0.0.1"
 CAT_GATEWAY_PORT = 3030
