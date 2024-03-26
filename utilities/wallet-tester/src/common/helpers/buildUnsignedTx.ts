@@ -11,6 +11,7 @@ import {
   Transaction,
   TransactionBuilder,
   TransactionBuilderConfigBuilder,
+  TransactionInput,
   TransactionMetadatum,
   TransactionOutput,
   TransactionUnspentOutput,
@@ -66,8 +67,8 @@ export default async function buildUnsignedTx(payload: Payload): Promise<Transac
   const registrationAmount = Value.new(BigNum.from_str(payload.regAmount));
 
   // Set transactional metadatum message
-  const regMessageMetadatum = TransactionMetadatum.new_text(payload.regText);
   const regMessageMetadatumLabel = BigNum.from_str(payload.regLabel);
+  const regMessageMetadatum = TransactionMetadatum.new_text(payload.regText);
 
   // Create Tx metadata object and parse into auxiliary data
   const txMetadata = GeneralTransactionMetadata.new();

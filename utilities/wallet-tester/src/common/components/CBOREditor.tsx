@@ -1,7 +1,7 @@
 // cspell: words noconflict
 
 import SwapHorizIcon from "@mui/icons-material/SwapHoriz";
-import { decode, encode } from "cborg";
+import { encode } from "cborg";
 import { noop } from "lodash-es";
 import { useEffect, useState, type CSSProperties } from "react";
 import AceEditor from "react-ace";
@@ -13,7 +13,9 @@ import bin2hex from "common/helpers/bin2hex";
 import diag2hex from "common/helpers/diag2hex";
 import hex2bin from "common/helpers/hex2bin";
 import hex2diag from "common/helpers/hex2diag";
+import json2tx from "common/helpers/json2tx";
 import readFile from "common/helpers/readFile";
+import tx2json from "common/helpers/tx2json";
 
 import "ace-builds/src-noconflict/ext-language_tools";
 import "ace-builds/src-noconflict/mode-json";
@@ -25,6 +27,8 @@ type Mode = "bin2diag" | "bin2json";
 type Props = {
   value: string;
   isReadOnly?: boolean;
+  cbor2json?: (hex: string) => string;
+  json2cbor?: (json: string) => string;
   onChange?: (value: string) => void;
 };
 
@@ -35,7 +39,13 @@ const EDITOR_STYLE: CSSProperties = {
   height: "240px",
 } as const;
 
-function CBOREditor({ value, isReadOnly = false, onChange = noop }: Props) {
+function CBOREditor({
+  value,
+  cbor2json = tx2json,
+  json2cbor = json2tx,
+  isReadOnly = false,
+  onChange = noop,
+}: Props) {
   const [shouldRefresh, setShouldRefresh] = useState(true);
   const [mode, setMode] = useState<Mode>("bin2diag");
   const [focusingSide, setFocusingSide] = useState<Side | null>(null);
@@ -82,10 +92,7 @@ function CBOREditor({ value, isReadOnly = false, onChange = noop }: Props) {
   useEffect(() => {
     if (shouldRefresh) {
       try {
-        const rhsValue =
-          mode === "bin2diag"
-            ? hex2diag(value)
-            : JSON.stringify(value ? decode(hex2bin(value)) : undefined, null, 2);
+        const rhsValue = mode === "bin2diag" ? hex2diag(value) : cbor2json(value);
 
         setRhsValue(rhsValue);
       } catch (e) {
@@ -111,7 +118,7 @@ function CBOREditor({ value, isReadOnly = false, onChange = noop }: Props) {
     setRhsValue(value);
 
     try {
-      const result = mode === "bin2diag" ? diag2hex(value) : bin2hex(encode(JSON.parse(value)));
+      const result = mode === "bin2diag" ? diag2hex(value) : json2cbor(value);
 
       result.includes("Error:") ? setLhsValue(result) : (onChange(result), setShouldRefresh(true));
     } catch (e) {

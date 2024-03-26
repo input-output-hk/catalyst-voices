@@ -74,7 +74,7 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
           config: builderArgs.config,
         });
 
-        resTx[walletName] = bin2hex(encode(tx.to_js_value()));
+        resTx[walletName] = bin2hex(tx.to_bytes());
       }
 
       setValue("tx", resTx);
