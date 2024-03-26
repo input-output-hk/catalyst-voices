@@ -234,6 +234,9 @@
         "**/test_data/**/*.sql",
         "styles.min.css",
         "web-components.min.js",
-        "**/generated/**"
+        "**/generated/**",
+        "**/windows/**",
+        "**/ios/**",
+        "**/macos/**",
     ]
 }
