@@ -1,4 +1,3 @@
-
 SELECT id3, value
 
 FROM config
