@@ -1,5 +1,10 @@
 //! Voter registration queries
 
+use pallas::ledger::{primitives::Fragment, traverse::MultiEraTx};
+use tracing::info;
+
+use crate::cddl::{validate_reg_cddl, CddlConfig};
+
 use super::{Error, EventDB};
 
 /// Transaction id
@@ -17,7 +22,7 @@ pub(crate) type Metadata61284<'a> = &'a [u8];
 /// Metadata 61285
 pub(crate) type Metadata61285<'a> = &'a [u8];
 /// Stats
-pub(crate) type Stats = Option<serde_json::Value>;
+pub(crate) type _Stats = Option<serde_json::Value>;
 
 impl EventDB {
     /// Inserts voter registration data, replacing any existing data.
@@ -26,7 +31,6 @@ impl EventDB {
         &self, tx_id: TxId, stake_credential: StakeCredential<'_>,
         public_voting_key: PublicVotingKey<'_>, payment_address: PaymentAddress<'_>, nonce: Nonce,
         metadata_61284: Metadata61284<'_>, metadata_61285: Metadata61285<'_>, valid: bool,
-        stats: Stats,
     ) -> Result<(), Error> {
         let conn = self.pool.get().await?;
 
@@ -44,10 +48,58 @@ impl EventDB {
                     &metadata_61284,
                     &metadata_61285,
                     &valid,
-                    &stats,
                 ],
             )
             .await?;
+
+        Ok(())
+    }
+
+    /// Index registration data
+    pub async fn index_registration_data(&self, txs: &[MultiEraTx<'_>]) -> Result<(), Error> {
+        let cddl = CddlConfig::new();
+
+        for tx in txs {
+            if !tx.metadata().is_empty() {
+                match tx.metadata() {
+                    pallas::ledger::traverse::MultiEraMeta::AlonzoCompatible(meta) => {
+                        let cip36 = meta.iter().find_map(|(key, _cip36_registration)| {
+                            if *key == u64::try_from(61284).unwrap()
+                                || *key == u64::try_from(61285).unwrap()
+                            {
+                                info!(
+                                    "raw tx {:?}",
+                                    hex::encode(
+                                        &tx.metadata()
+                                            .as_alonzo()
+                                            .unwrap()
+                                            .encode_fragment()
+                                            .unwrap()
+                                    )
+                                );
+                                let cip36_raw_cbor =
+                                    match tx.metadata().as_alonzo().unwrap().encode_fragment() {
+                                        Ok(alonzo) => alonzo,
+                                        Err(_) => return None,
+                                    };
+
+                                Some(cip36_raw_cbor)
+                            } else {
+                                None
+                            }
+                        });
+
+                        if let Some(cip36) = cip36 {
+                            match validate_reg_cddl(&cip36, &cddl) {
+                                Ok(()) => info!("Registration is good"),
+                                Err(err) => info!("err {:?}", err),
+                            }
+                        }
+                    },
+                    _ => todo!(),
+                }
+            }
+        }
 
         Ok(())
     }

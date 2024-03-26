@@ -296,7 +296,7 @@ CREATE TABLE cardano_voter_registration (
   metadata_61285 BYTEA NULL,  -- We can purge metadata for valid registrations that are old to save storage space.
 
   valid BOOLEAN NOT NULL DEFAULT false,
-  stats JSONB NULL
+  stats JSONB
   -- record rolled back in stats if the registration was lost during a rollback, its also invalid at this point.
   -- Other stats we can record are is it a CIP-36 or CIP-15 registration format.
   -- does it have a valid reward address but not a payment address, so we can't pay to it.

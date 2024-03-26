@@ -50,6 +50,9 @@ pub(crate) enum Error {
     /// Unable to extract hashed witnesses
     #[error("Unable to extract hashed witnesses: {0}")]
     HashedWitnessExtraction(String),
+    /// Unable to extract payment addr
+    #[error("Unable to extract payment addr: {0}")]
+    _PaymentAddrExtraction(String),
 }
 
 impl From<RunError<tokio_postgres::Error>> for Error {

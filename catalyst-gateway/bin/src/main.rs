@@ -1,6 +1,7 @@
 //! Catalyst Data Gateway
 use clap::Parser;
 
+mod cddl;
 mod cli;
 mod event_db;
 mod follower;
