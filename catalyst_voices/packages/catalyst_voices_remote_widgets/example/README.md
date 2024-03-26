@@ -1,6 +1,6 @@
-# Example of how to use Catalyst Voices Remote Widgets
+# Catalyst Voices Remote Widgets Example
 
-* [Example of how to use Catalyst Voices Remote Widgets](#example-of-how-to-use-catalyst-voices-remote-widgets)
+* [Catalyst Voices Remote Widgets Example](#catalyst-voices-remote-widgets-example)
   * [Create a desire widget in Flutter](#create-a-desire-widget-in-flutter)
   * [Create `rfwtxt` file](#create-rfwtxt-file)
   * [Convert rfwtxt to rfw](#convert-rfwtxt-to-rfw)
