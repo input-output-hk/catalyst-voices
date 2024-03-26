@@ -1,4 +1,6 @@
-SELECT id3, value
+SELECT
+  id3,
+  value
 
 FROM config
 
