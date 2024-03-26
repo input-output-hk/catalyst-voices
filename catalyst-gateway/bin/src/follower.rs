@@ -14,7 +14,7 @@ use tracing::{error, info};
 
 use crate::{
     event_db::{
-        config::{FollowerMeta, NetworkMeta},
+        config::FollowerConfig,
         follower::{BlockHash, BlockTime, MachineId, SlotNumber},
         EventDB,
     },
@@ -28,8 +28,8 @@ const DATA_NOT_STALE: i64 = 1;
 #[async_recursion]
 /// Start followers as per defined in the config
 pub(crate) async fn start_followers(
-    configs: (Vec<NetworkMeta>, FollowerMeta), db: Arc<EventDB>, data_refresh_tick: u64,
-    check_config_tick: u64, machine_id: String,
+    configs: Vec<FollowerConfig>, db: Arc<EventDB>, data_refresh_tick: u64, check_config_tick: u64,
+    machine_id: String,
 ) -> anyhow::Result<()> {
     // spawn followers and obtain thread handlers for control and future cancellation
     let follower_tasks = spawn_followers(
@@ -44,7 +44,7 @@ pub(crate) async fn start_followers(
     let mut interval = time::interval(time::Duration::from_secs(check_config_tick));
     let config = loop {
         interval.tick().await;
-        match db.get_config().await {
+        match db.get_follower_config().await {
             Ok(config) => {
                 if configs != config {
                     info!("Config has changed! restarting");
@@ -84,14 +84,11 @@ pub(crate) async fn start_followers(
 
 /// Spawn follower threads and return associated handlers
 async fn spawn_followers(
-    configs: (Vec<NetworkMeta>, FollowerMeta), db: Arc<EventDB>, data_refresh_tick: u64,
-    machine_id: String,
+    configs: Vec<FollowerConfig>, db: Arc<EventDB>, data_refresh_tick: u64, machine_id: String,
 ) -> anyhow::Result<Vec<ManageTasks>> {
-    let snapshot_path = configs.1.mithril_snapshot_path;
-
     let mut follower_tasks = Vec::new();
 
-    for config in &configs.0 {
+    for config in &configs {
         info!("starting follower for {:?}", config.network);
 
         let network = Network::from_str(&config.network)?;
@@ -118,7 +115,8 @@ async fn spawn_followers(
             };
 
             // Threshold which defines if data is stale and ready to update or not
-            if chrono::offset::Utc::now().timestamp() - threshold > configs.1.timing_pattern.into()
+            if chrono::offset::Utc::now().timestamp() - threshold
+                > config.mithril_snapshot.timing_pattern.into()
             {
                 info!(
                     "Last update is stale for network {} - ready to update, starting follower now.",
@@ -130,7 +128,7 @@ async fn spawn_followers(
                     (slot_no, block_hash),
                     db.clone(),
                     machine_id.clone(),
-                    &snapshot_path,
+                    &config.mithril_snapshot.path,
                 )
                 .await?;
                 break follower_handler;

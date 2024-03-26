@@ -1,22 +1,41 @@
 """Test the `catalyst-gateway` service when a DB schema mismatch occurs."""
+
 from loguru import logger
+import asyncio
+import asyncpg
 
-from schema_mismatch import call_api_url, fetch_schema_version, change_version
+from api_tests import DB_URL, check_is_live, check_is_ready, check_is_not_ready
 
-def check_is_live():
-    resp = call_api_url("GET", "/api/health/live")
-    assert resp.status == 204
-    logger.info("cat-gateway service is LIVE.")
+GET_VERSION_QUERY = "SELECT MAX(version) FROM refinery_schema_history"
+UPDATE_QUERY = "UPDATE refinery_schema_history SET version=$1 WHERE version=$2"
 
-def check_is_ready():
-    resp = call_api_url("GET", "/api/health/ready")
-    assert resp.status == 204
-    logger.info("cat-gateway service is READY.")
 
-def check_is_not_ready():
-    resp = call_api_url("GET", "/api/health/ready")
-    assert resp.status == 503
-    logger.info("cat-gateway service is NOT READY.")
+def fetch_schema_version():
+    async def get_current_version():
+        conn = await asyncpg.connect(DB_URL)
+        if conn is None:
+            raise Exception("no db connection found")
+
+        version = await conn.fetchval(GET_VERSION_QUERY)
+        if version is None:
+            raise Exception("failed to fetch version from db")
+        return version
+
+    return asyncio.run(get_current_version())
+
+
+def change_version(from_value: int, change_to: int):
+    async def change_schema_version():
+        conn = await asyncpg.connect(DB_URL)
+        if conn is None:
+            raise Exception("no db connection found for")
+
+        update = await conn.execute(UPDATE_QUERY, change_to, from_value)
+        if update is None:
+            raise Exception("failed to fetch version from db")
+
+    return asyncio.run(change_schema_version())
+
 
 def test_schema_version_mismatch_changes_cat_gateway_behavior():
     # Check that the `live` endpoint is OK
