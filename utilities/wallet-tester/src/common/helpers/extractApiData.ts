@@ -5,13 +5,13 @@ import { camelCase, mapValues } from "lodash-es";
 import type { ExtractedWalletApi } from "types/cardano";
 
 export default async function extractApiData(
-  api: WalletApi & { [ext: `cip${number}`]: unknown },
+  api: WalletApi & { [ext: `cip${number}`]: unknown; },
   cipExt?: number
 ): Promise<ExtractedWalletApi> {
   const safeTry = async <T>(
     fn: () => Promise<T>,
     transformer?: (v: T) => T
-  ): Promise<{ raw: T; formatted: T }> => {
+  ): Promise<{ raw: T; formatted: T; }> => {
     try {
       const v = await fn();
       return transformer

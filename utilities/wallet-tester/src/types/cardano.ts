@@ -4,8 +4,8 @@ import * as cip30 from "@cardano-sdk/cip30";
 
 export type WalletCollections = {
   [k: string]: Omit<cip30.Cip30Wallet, "enable"> & {
-    enable(args: { extensions: { cip: number }[] }): Promise<cip30.WalletApi>;
-    supportedExtensions: { cip: number }[];
+    enable(args: { extensions: { cip: number; }[]; }): Promise<cip30.WalletApi>;
+    supportedExtensions: { cip: number; }[];
   };
 };
 

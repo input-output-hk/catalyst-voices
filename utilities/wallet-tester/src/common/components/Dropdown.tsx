@@ -1,5 +1,6 @@
 import { Menu } from "@headlessui/react";
 import { noop } from "lodash-es";
+import { twMerge } from "tailwind-merge";
 
 type Props = {
   value: string;
@@ -25,9 +26,10 @@ function Dropdown({ value, items, onSelect = noop }: Props) {
               <button
                 type="button"
                 onClick={() => onSelect(item.value)}
-                className={`${
-                  active ? "bg-secondary text-white" : "text-gray-900"
-                } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                className={twMerge(
+                  active ? "bg-secondary text-white" : "text-gray-900",
+                  "group flex w-full items-center rounded-md px-2 py-2 text-sm"
+                )}
               >
                 <p className="truncate">{item.label}</p>
               </button>
