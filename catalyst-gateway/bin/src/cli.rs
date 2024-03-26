@@ -75,7 +75,7 @@ impl Cli {
                 let config = loop {
                     interval.tick().await;
 
-                    match event_db.get_config().await {
+                    match event_db.get_follower_config().await {
                         Ok(config) => break config,
                         Err(err) => error!("no config {:?}", err),
                     }

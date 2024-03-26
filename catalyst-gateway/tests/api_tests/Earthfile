@@ -3,33 +3,23 @@ VERSION --global-cache 0.7
 builder:
     FROM github.com/input-output-hk/catalyst-ci/earthly/python:v2.10.0+python-base
 
-    COPY --dir ./schema_mismatch .
+    COPY --dir ./api_tests .
     DO github.com/input-output-hk/catalyst-ci/earthly/python:v2.10.0+BUILDER
 
-package-tester:
-    FROM +builder
-
-    CMD poetry run pytest
-    # The following is useful for debugging the tests
-    # CMD poetry run pytest -vvvv --capture tee-sys --show-capture=stderr
-
 test:
-    FROM earthly/dind:alpine-3.19
-    RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
+    FROM +builder
 
     ARG DB_URL="postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev"
     ARG CAT_ADDRESS="0.0.0.0:3030"
 
-    WORKDIR /default
     COPY ./docker-compose.yml .
 
     WITH DOCKER \
         --compose docker-compose.yml \
         --load event-db:latest=(../../event-db+build) \
         --load cat-gateway:latest=(../../+package-cat-gateway --address=$CAT_ADDRESS --db_url=$DB_URL) \
-        --load test:latest=(+package-tester) \
         --service event-db \
         --service cat-gateway \
         --allow-privileged
-        RUN docker run --network=default_default test
+        RUN poetry run pytest
     END
