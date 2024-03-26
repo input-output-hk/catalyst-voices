@@ -4,7 +4,7 @@ from loguru import logger
 import asyncio
 import asyncpg
 
-from api_tests import DB_URL, call_api_url
+from api_tests import DB_URL, check_is_live, check_is_ready, check_is_not_ready
 
 GET_VERSION_QUERY = "SELECT MAX(version) FROM refinery_schema_history"
 UPDATE_QUERY = "UPDATE refinery_schema_history SET version=$1 WHERE version=$2"
@@ -35,24 +35,6 @@ def change_version(from_value: int, change_to: int):
             raise Exception("failed to fetch version from db")
 
     return asyncio.run(change_schema_version())
-
-
-def check_is_live():
-    resp = call_api_url("GET", "/api/health/live")
-    assert resp.status == 204
-    logger.info("cat-gateway service is LIVE.")
-
-
-def check_is_ready():
-    resp = call_api_url("GET", "/api/health/ready")
-    assert resp.status == 204
-    logger.info("cat-gateway service is READY.")
-
-
-def check_is_not_ready():
-    resp = call_api_url("GET", "/api/health/ready")
-    assert resp.status == 503
-    logger.info("cat-gateway service is NOT READY.")
 
 
 def test_schema_version_mismatch_changes_cat_gateway_behavior():
