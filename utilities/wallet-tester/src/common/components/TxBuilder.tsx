@@ -3,8 +3,11 @@
 import { Disclosure } from "@headlessui/react";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
-import { cloneDeep, noop } from "lodash-es";
+import SwitchLeftIcon from "@mui/icons-material/SwitchLeft";
+import SwitchRightIcon from "@mui/icons-material/SwitchRight";
+import { capitalize, cloneDeep, noop, upperCase } from "lodash-es";
 import { useFieldArray, useForm } from "react-hook-form";
+import { twMerge } from "tailwind-merge";
 
 import { CertificateType, type TxBuilderArguments } from "types/cardano";
 
@@ -66,7 +69,7 @@ function TxBuilder({ onSubmit: onPropSubmit = noop }: Props) {
     <form className="grid gap-2" autoComplete="off">
       <TxBuilderMultiFieldsSection
         heading="Transaction Inputs"
-        onAddClick={() => txInputFields.append({ hash: "", id: "" })}
+        onAddClick={() => txInputFields.append({ hash: "", index: "" })}
         onRemoveClick={(i) => txInputFields.remove(i)}
         fields={txInputFields.fields}
         render={(i) => (
@@ -78,8 +81,8 @@ function TxBuilder({ onSubmit: onPropSubmit = noop }: Props) {
             />
             <Input
               type="number"
-              label={`ID #${i + 1}`}
-              formRegister={register(`txInputs.${i}.id`)}
+              label={`Index #${i + 1}`}
+              formRegister={register(`txInputs.${i}.index`)}
             />
           </div>
         )}
@@ -122,7 +125,7 @@ function TxBuilder({ onSubmit: onPropSubmit = noop }: Props) {
         heading="Certificates"
         onAddClick={() =>
           certificateFields.append({
-            type: "stake_delegation",
+            type: CertificateType.StakeDelegation,
             hashType: "addr_keyhash",
             hash: "",
             poolKeyhash: "",
@@ -131,15 +134,77 @@ function TxBuilder({ onSubmit: onPropSubmit = noop }: Props) {
         onRemoveClick={(i) => certificateFields.remove(i)}
         fields={certificateFields.fields}
         render={(i) => (
-          <div className="grow flex gap-2">
+          <div className="grow grid gap-2 grid-cols-[168px_1fr]">
             <Dropdown
-              value={CertificateType.StakeDelegation}
-              items={Object.values(CertificateType).map((item) => ({
-                value: item,
-                label: item,
+              value={certificateFields.fields[i]?.type ?? ""}
+              items={Object.entries(CertificateType).map(([key, value]) => ({
+                value: value,
+                label: capitalize(upperCase(key)),
+                // TODO: add more type support
+                disabled: value !== CertificateType.StakeDelegation,
               }))}
+              onSelect={(value) =>
+                certificateFields.fields[i]?.type === value
+                  ? null
+                  : certificateFields.replace({
+                      type: value /* TODO: support default values for each type */,
+                    })
+              }
             />
-            <div className="grow grid grid-cols-2 gap-2"></div>
+            {certificateFields.fields[i]?.type === CertificateType.StakeDelegation ? (
+              <div className="grow flex gap-2">
+                <div className="flex flex-col items-center justify-evenly gap-1">
+                  <button
+                    type="button"
+                    className={twMerge(
+                      "w-full rounded px-1 border border-solid border-black",
+                      certificateFields.fields[i]?.hashType === "addr_keyhash" &&
+                        "bg-black text-white"
+                    )}
+                    onClick={() =>
+                      certificateFields.update(i, {
+                        ...certificateFields.fields[i]!,
+                        hashType: "addr_keyhash",
+                      })
+                    }
+                  >
+                    <p className="text-[10px]">addr_keyhash</p>
+                  </button>
+                  <button
+                    type="button"
+                    className={twMerge(
+                      "w-full rounded px-1 border border-solid border-black",
+                      certificateFields.fields[i]?.hashType === "scripthash" &&
+                        "bg-black text-white"
+                    )}
+                    onClick={() =>
+                      certificateFields.update(i, {
+                        ...certificateFields.fields[i]!,
+                        hashType: "scripthash",
+                      })
+                    }
+                  >
+                    <p className="text-[10px]">scripthash</p>
+                  </button>
+                </div>
+                <div className="grow grid grid-cols-2 gap-2">
+                  <Input
+                    type="text"
+                    label={`Hash #${i + 1}`}
+                    minLength={28}
+                    maxLength={28}
+                    formRegister={register(`certificates.${i}.hash`)}
+                  />
+                  <Input
+                    type="text"
+                    label={`Pool Keyhash #${i + 1}`}
+                    minLength={28}
+                    maxLength={28}
+                    formRegister={register(`certificates.${i}.poolKeyhash`)}
+                  />
+                </div>
+              </div>
+            ) : null}
           </div>
         )}
       />

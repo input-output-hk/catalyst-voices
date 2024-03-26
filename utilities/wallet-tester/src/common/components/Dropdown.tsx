@@ -1,4 +1,6 @@
 import { Menu } from "@headlessui/react";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { noop } from "lodash-es";
 import { twMerge } from "tailwind-merge";
 
@@ -7,6 +9,7 @@ type Props = {
   items: {
     label: string;
     value: string;
+    disabled?: boolean;
   }[];
   onSelect?: (value: string) => void;
 };
@@ -16,8 +19,13 @@ function Dropdown({ value, items, onSelect = noop }: Props) {
 
   return (
     <Menu as="div" className="relative inline-block text-left">
-      <Menu.Button className="w-full rounded-md border border-solid border-black/10 p-2 truncate">
-        <p>{valueLabel}</p>
+      <Menu.Button className="flex items-center w-full rounded-md border border-solid border-black/10 p-2">
+        {({ open }) => (
+          <>
+            <p className="truncate">{valueLabel}</p>
+            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </>
+        )}
       </Menu.Button>
       <Menu.Items className="absolute left-0 mt-2 w-56 origin-top-left divide-y divide-gray-100 rounded-md bg-white shadow-lg ring-1 ring-black/5 focus:outline-none z-50">
         {items.map((item) => (
@@ -25,6 +33,7 @@ function Dropdown({ value, items, onSelect = noop }: Props) {
             {({ active }) => (
               <button
                 type="button"
+                disabled={item.disabled}
                 onClick={() => onSelect(item.value)}
                 className={twMerge(
                   active ? "bg-secondary text-white" : "text-gray-900",

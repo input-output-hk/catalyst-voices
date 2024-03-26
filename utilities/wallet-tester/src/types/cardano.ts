@@ -40,7 +40,7 @@ export enum CertificateType {
 export type TxBuilderArguments = {
   txInputs: {
     hash: string;
-    id: string;
+    index: string;
   }[];
   txOutputs: {
     address: string;
@@ -49,28 +49,28 @@ export type TxBuilderArguments = {
   timeToLive: string;
   certificates: (
     | {
-        type: "stake_registration";
+        type: CertificateType.StakeRegistration;
       }
     | {
-        type: "stake_deregistration";
+        type: CertificateType.StakeDeregistration;
       }
     | {
-        type: "stake_delegation";
+        type: CertificateType.StakeDelegation;
         hashType: "addr_keyhash" | "scripthash";
         hash: string;
         poolKeyhash: string;
       }
     | {
-        type: "pool_registration";
+        type: CertificateType.PoolRegistration;
       }
     | {
-        type: "pool_retirement";
+        type: CertificateType.PoolRetirement;
       }
     | {
-        type: "genesis_key_delegation";
+        type: CertificateType.GenesisKeyDelegation;
       }
     | {
-        type: "move_instantaneous_rewards_cert";
+        type: CertificateType.MoveInstantaneousRewardsCert;
       }
   )[];
   transactionFee: string;
