@@ -235,8 +235,8 @@
         "styles.min.css",
         "web-components.min.js",
         "**/generated/**",
-        "**/windows/**",
-        "**/ios/**",
-        "**/macos/**",
+        "catalyst_voices/packages/catalyst_voices_remote_widgets/example/windows/**",
+        "catalyst_voices/packages/catalyst_voices_remote_widgets/example/ios/**",
+        "catalyst_voices/packages/catalyst_voices_remote_widgets/example/macos/**",
     ]
 }
