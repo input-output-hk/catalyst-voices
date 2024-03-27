@@ -22,7 +22,6 @@ class ComingSoonLogo extends StatelessWidget {
             style: GoogleFonts.notoSans(
               textStyle: const TextStyle(color: VoicesColors.blue),
               fontSize: 19,
-              //height: 61,
               fontWeight: FontWeight.w500,
             ),
           ),

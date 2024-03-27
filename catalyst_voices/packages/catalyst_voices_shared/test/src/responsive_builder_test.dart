@@ -76,7 +76,7 @@ void main() {
                 other: const EdgeInsets.all(32),
                 builder: (context, padding) => Padding(
                   padding: padding!,
-                  child: const Text('Test')
+                  child: const Text('Test'),
                 ),
               ),
             ),

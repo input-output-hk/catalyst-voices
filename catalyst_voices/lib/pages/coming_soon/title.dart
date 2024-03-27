@@ -53,7 +53,7 @@ class ComingSoonTitle extends StatelessWidget {
                 ),
               ],
               totalRepeatCount: 1,
-            )
+            ),
           ),
         ],
       ),
