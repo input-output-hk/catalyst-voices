@@ -12,12 +12,19 @@ import 'package:flutter/widgets.dart';
 class $AssetsImagesGen {
   const $AssetsImagesGen();
 
+  /// File path: assets/images/coming_soon_bkg.webp
+  AssetGenImage get comingSoonBkg =>
+      const AssetGenImage('assets/images/coming_soon_bkg.webp');
+
   /// File path: assets/images/dummy_catalyst_voices.webp
   AssetGenImage get dummyCatalystVoices =>
       const AssetGenImage('assets/images/dummy_catalyst_voices.webp');
 
+  /// File path: assets/images/logo.webp
+  AssetGenImage get logo => const AssetGenImage('assets/images/logo.webp');
+
   /// List of all assets
-  List<AssetGenImage> get values => [dummyCatalystVoices];
+  List<AssetGenImage> get values => [comingSoonBkg, dummyCatalystVoices, logo];
 }
 
 class VoicesAssets {

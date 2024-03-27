@@ -151,6 +151,30 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Catalyst Voices'**
   String get homeScreenText;
+
+  /// Text shown after logo in coming soon page
+  ///
+  /// In en, this message translates to:
+  /// **'Voices'**
+  String get comingSoonSubtitle;
+
+  /// Text shown as main title in coming soon page
+  ///
+  /// In en, this message translates to:
+  /// **'Coming'**
+  String get comingSoonTitle1;
+
+  /// Text shown as main title in coming soon page
+  ///
+  /// In en, this message translates to:
+  /// **'soon'**
+  String get comingSoonTitle2;
+
+  /// Text shown as description in coming soon page
+  ///
+  /// In en, this message translates to:
+  /// **'Project Catalyst is the world\'s largest decentralized innovation engine for solving real-world challenges.'**
+  String get comingSoonDescription;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
