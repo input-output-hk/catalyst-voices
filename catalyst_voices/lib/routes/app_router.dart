@@ -28,7 +28,7 @@ final class AppRouter {
     AuthenticationBloc authenticationBloc,
     GoRouterState state,
   ) {
-    // Always return coming soon page.
+    // Always return home route that defaults to coming soon page.
     return home_route.homePath;
   }
 
