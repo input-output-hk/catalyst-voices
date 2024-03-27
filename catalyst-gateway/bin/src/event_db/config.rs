@@ -1,72 +1,81 @@
 //! Config Queries
 use serde::{Deserialize, Serialize};
-use tracing::error;
 
-use crate::event_db::{Error, Error::JsonParseIssue, EventDB};
+use crate::event_db::{Error, EventDB};
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, PartialOrd, Clone)]
 /// Network config metadata
-pub(crate) struct NetworkMeta {
+pub(crate) struct FollowerConfig {
     /// Mainnet, preview, preprod
-    pub network: String,
+    pub(crate) network: String,
     /// Cardano relay address
-    pub relay: String,
+    pub(crate) relay: String,
+    /// Mithril snapshot info
+    pub(crate) mithril_snapshot: MithrilSnapshotConfig,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, PartialOrd, Clone)]
 /// Follower metadata
-pub(crate) struct FollowerMeta {
+pub(crate) struct MithrilSnapshotConfig {
     /// Path to snapshot file for bootstrap
-    pub mithril_snapshot_path: String,
+    pub(crate) path: String,
     /// Defines when data is stale or not
-    pub timing_pattern: u8,
+    pub(crate) timing_pattern: u8,
 }
 
 impl EventDB {
     /// Config query
-    pub(crate) async fn get_config(&self) -> Result<(Vec<NetworkMeta>, FollowerMeta), Error> {
+    pub(crate) async fn get_follower_config(&self) -> Result<Vec<FollowerConfig>, Error> {
         let conn = self.pool.get().await?;
+
+        let id = "cardano";
+        let id2 = "follower";
 
         let rows = conn
             .query(
                 include_str!("../../../event-db/queries/config/select_config.sql"),
-                &[],
+                &[&id, &id2],
             )
             .await?;
 
-        let Some(row) = rows.first() else {
-            return Err(Error::NoConfig);
-        };
+        let mut follower_configs = Vec::new();
+        for row in rows {
+            let network = row.try_get("id3")?;
+            let config: serde_json::Value = row.try_get("value")?;
 
-        let mut networks: Vec<String> = Vec::new();
+            let relay = config
+                .get("relay")
+                .ok_or(Error::JsonParseIssue(
+                    "Cardano follower config does not have `relay` property".to_string(),
+                ))?
+                .as_str()
+                .ok_or(Error::JsonParseIssue(
+                    "Cardano follower config `relay` not a string type".to_string(),
+                ))?
+                .to_string();
 
-        let follower_meta: String = row.try_get("follower")?;
-        let follower_metadata: FollowerMeta =
-            serde_json::from_str(&follower_meta).map_err(|e| {
-                Error::NotFound(JsonParseIssue(format!("issue parsing db json {e}")).to_string())
-            })?;
+            let mithril_snapshot = serde_json::from_value(
+                config
+                    .get("mithril_snapshot")
+                    .ok_or(Error::JsonParseIssue(
+                        "Cardano follower config does not have `mithril_snapshot` property"
+                            .to_string(),
+                    ))?
+                    .clone(),
+            )
+            .map_err(|e| Error::JsonParseIssue(e.to_string()))?;
 
-        row.try_get("cardano")
-            .map(|network| networks.push(network))
-            .ok();
-
-        row.try_get("preview")
-            .map(|network| networks.push(network))
-            .ok();
-
-        let mut parse_errors = vec![];
-
-        let network_metadata: Vec<NetworkMeta> = networks
-            .iter()
-            .map(|meta| serde_json::from_str(meta))
-            .filter_map(|r| r.map_err(|e| parse_errors.push(e)).ok())
-            .collect();
-
-        if !parse_errors.is_empty() {
-            error!("Parsing errors {:?}", parse_errors);
-            return Err(Error::JsonParseIssue("Unable to parse config".to_string()));
+            follower_configs.push(FollowerConfig {
+                network,
+                relay,
+                mithril_snapshot,
+            });
         }
 
-        Ok((network_metadata, follower_metadata))
+        if follower_configs.is_empty() {
+            Err(Error::NoConfig)
+        } else {
+            Ok(follower_configs)
+        }
     }
 }

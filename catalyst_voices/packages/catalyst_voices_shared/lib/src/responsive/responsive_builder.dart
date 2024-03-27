@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_shared/src/responsive_builder/responsive_breakpoint_key.dart';
+import 'package:catalyst_voices_shared/src/responsive/responsive_breakpoint_key.dart';
 import 'package:flutter/widgets.dart';
 
 // A [ResponsiveBuilder] is a StatelessWidget that is aware about the current 

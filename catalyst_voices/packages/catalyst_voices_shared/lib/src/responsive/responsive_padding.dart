@@ -1,5 +1,5 @@
-import 'package:catalyst_voices_shared/src/responsive_builder/responsive_breakpoint_key.dart';
-import 'package:catalyst_voices_shared/src/responsive_builder/responsive_builder.dart';
+import 'package:catalyst_voices_shared/src/responsive/responsive_breakpoint_key.dart';
+import 'package:catalyst_voices_shared/src/responsive/responsive_builder.dart';
 import 'package:flutter/widgets.dart';
 
 // A [ResponsivePadding] is a StatelessWidget that applies a padding based on
