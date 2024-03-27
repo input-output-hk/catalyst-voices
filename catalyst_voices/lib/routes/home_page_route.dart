@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 part 'home_page_route.g.dart';
 
-const homePath = '/coming-soon';
+const homePath = '/';
 
 @TypedGoRoute<HomeRoute>(path: homePath)
 final class HomeRoute extends GoRouteData {
