@@ -277,7 +277,7 @@ async fn init_follower(
                         }
 
                         // Registration
-                        match db.index_registration_data(&block.txs()).await {
+                        match db.index_registration_data(&block.txs(), network).await {
                             Ok(()) => (),
                             Err(err) => {
                                 error!(
