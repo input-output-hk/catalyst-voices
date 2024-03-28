@@ -6,6 +6,7 @@ afinet
 androidx
 appspot
 Arbritrary
+ARGB
 asyncio
 asyncpg
 auditability
@@ -29,6 +30,7 @@ cryptoxide
 Cunego
 Cupertino
 dalek
+DAPPLICATION
 dbsync
 delegators
 DIND
@@ -41,6 +43,8 @@ dreps
 earthfile
 Edgedriver
 encryptor
+endfunction
+endfunction
 fetchval
 fmtchk
 fmtfix
@@ -55,6 +59,7 @@ genhtml
 gethostname
 gmtime
 gradlew
+icudtl
 ideascale
 idents
 integ
@@ -70,6 +75,8 @@ junitreport
 Keyhash
 lcov
 Leshiy
+libapp
+libflutter
 lintfix
 localizable
 loguru
@@ -82,6 +89,7 @@ msedgedriver
 multidex
 myproject
 nanos
+NDEBUG
 netifas
 netkey
 nextest
@@ -107,7 +115,9 @@ pytest
 rapidoc
 redoc
 reqwest
+rfwtxt
 ripgrep
+RPATH
 rustc
 rustdoc
 rustdocflags
@@ -125,6 +135,7 @@ sqlfluff
 Stefano
 stevenj
 subosito
+SYSROOT
 tacho
 testcov
 testdocs
@@ -143,6 +154,8 @@ vkey
 voteplan
 voteplans
 wallclock
+Werror
+xcassets
 xcconfig
 xcfilelist
 xcodebuild

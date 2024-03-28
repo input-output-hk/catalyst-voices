@@ -1,0 +1,45 @@
+import core.widgets;
+import core.material;
+import core.catalyst;
+
+widget root = Center(
+      child: SizedBox(
+        height: 300.0,
+        width: 500.0,
+        child: Card(
+          child: Padding(
+            padding: [ 16.0 ],
+            child: ListView(
+            padding: [ 8.0 ],
+              children: [
+                Container(
+                  height: 50.0,
+                  color: 0xFF66AACC,
+                  child:  Center(child: Text(text: "Entry A")),
+                ),
+                Container(
+                  height: 50.0,
+                  color:  0xFF00FF00,
+                  child:  Center(child: Text(text:"Entry B")),
+                ),
+                Container(
+                  height: 50.0,
+                  color: 0xFFFF00FF,
+                  child:  Center(child: Text(text:"Entry C")),
+                ),
+                Container(
+                  height: 50.0 ,
+                  color: 0xFF66AACC,
+                  child:  Center(child: Text(text:"Entry D")),
+                ),
+                Container(
+                  height: 50.0,
+                  color: 0xFF00FF00,
+                  child:  Center(child: Text(text:"Entry E")),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
