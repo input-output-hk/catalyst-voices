@@ -45,6 +45,7 @@ export type TxBuilderArguments = {
     address: string;
     amount: string;
   }[];
+  txFee: string;
   timeToLive: string;
   certificates: (
     | {
@@ -72,14 +73,17 @@ export type TxBuilderArguments = {
         type: CertificateType.MoveInstantaneousRewardsCert;
       }
   )[];
-  transactionFee: string;
+  rewardWithdrawals: {
+    address: string;
+    value: string;
+  }[];
   auxilliaryDataHash: string;
   validityIntervalStart: string;
   requiredSigners: {
     address: string;
   }[];
   networkId: string;
-  
+
   auxMetadata: {
     metadata: {
       key: string;
@@ -87,13 +91,6 @@ export type TxBuilderArguments = {
       value: string;
     }[];
   };
-
-
-  regAddress: string;
-  regAmount: string;
-  regText: string;
-  regLabel: string;
-  stakeCred: string;
   config: {
     linearFee: {
       minFeeA: string;

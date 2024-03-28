@@ -42,11 +42,7 @@ function TxBuilder({ txIds, addrs, onSubmit: onPropSubmit = noop }: Props) {
   const { handleSubmit, register, resetField, control, reset } = useForm<FormValues>({
     defaultValues: {
       txInputs: [],
-      regAddress: "",
-      regAmount: "",
-      regText: "",
-      regLabel: "",
-      stakeCred: "",
+      txOutputs: [], 
       config: cloneDeep(PROTOCOL_PARAMS),
     },
   });
@@ -54,6 +50,7 @@ function TxBuilder({ txIds, addrs, onSubmit: onPropSubmit = noop }: Props) {
   const txInputFields = useFieldArray({ control, name: "txInputs" });
   const txOutputFields = useFieldArray({ control, name: "txOutputs" });
   const certificateFields = useFieldArray({ control, name: "certificates" });
+  const rewardWithdrawalFields = useFieldArray({ control, name: "rewardWithdrawals" });
   const requiredSignerFields = useFieldArray({ control, name: "requiredSigners" });
 
   function handleReset() {
@@ -108,9 +105,9 @@ function TxBuilder({ txIds, addrs, onSubmit: onPropSubmit = noop }: Props) {
       />
       <TxBuilderSingleFieldSection
         heading="Transaction Fee"
-        onRemoveClick={() => resetField("transactionFee")}
+        onRemoveClick={() => resetField("txFee")}
         render={() => (
-          <Input type="text" label="Transaction Fee" formRegister={register("transactionFee")} />
+          <Input type="text" label="Transaction Fee" formRegister={register("txFee")} />
         )}
       />
       <TxBuilderSingleFieldSection
@@ -207,6 +204,28 @@ function TxBuilder({ txIds, addrs, onSubmit: onPropSubmit = noop }: Props) {
           </div>
         )}
       />
+      <TxBuilderMultiFieldsSection
+        heading="Reward Withdrawals"
+        onAddClick={() => rewardWithdrawalFields.append({ address: "", value: "" })}
+        onRemoveClick={(i) => rewardWithdrawalFields.remove(i)}
+        fields={rewardWithdrawalFields.fields}
+        render={(i) => (
+          <div className="grow grid grid-cols-4 gap-2">
+            <div className="col-span-3">
+              <Input
+                type="text"
+                label={`Address #${i + 1}`}
+                formRegister={register(`rewardWithdrawals.${i}.address`)}
+              />
+            </div>
+            <Input
+              type="number"
+              label={`Coin #${i + 1}`}
+              formRegister={register(`rewardWithdrawals.${i}.value`)}
+            />
+          </div>
+        )}
+      />
       <TxBuilderSingleFieldSection
         heading="Auxilliary Data Hash"
         onRemoveClick={() => resetField("auxilliaryDataHash")}
@@ -249,25 +268,6 @@ function TxBuilder({ txIds, addrs, onSubmit: onPropSubmit = noop }: Props) {
         onRemoveClick={() => resetField("networkId")}
         render={() => <Input type="text" label="Network ID" formRegister={register("networkId")} />}
       />
-
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-      <Input
-        type="text"
-        label="Address where to send ADA"
-        formRegister={register("regAddress", { required: true })}
-      />
-      <Input
-        type="number"
-        label="Lovelaces"
-        formRegister={register("regAmount", { required: true })}
-      />
-      <Input type="number" label="Label" formRegister={register("regLabel", { required: true })} />
-      <Input type="text" label="Text" formRegister={register("regText", { required: true })} />
       <Disclosure>
         <Disclosure.Button className="flex gap-2 items-center text-left text-sm font-semibold">
           {({ open }) => (
@@ -307,6 +307,30 @@ function TxBuilder({ txIds, addrs, onSubmit: onPropSubmit = noop }: Props) {
             label="Max transaction size"
             formRegister={register("config.maxTxSize", { valueAsNumber: true })}
           />
+        </Disclosure.Panel>
+      </Disclosure>
+      <Disclosure>
+        <Disclosure.Button className="flex gap-2 items-center text-left text-sm font-semibold">
+          {({ open }) => (
+            <>
+              <div className="w-[16px]">{open ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}</div>
+              <p>Auxillary Metadata</p>
+            </>
+          )}
+        </Disclosure.Button>
+        <Disclosure.Panel className="grid gap-2 grid-cols-2">
+          <div className="grid gap-2 grid-cols-2">
+            <Input
+              type="number"
+              label="Linear Fee Coeff."
+              formRegister={register("config.linearFee.minFeeA")}
+            />
+            <Input
+              type="number"
+              label="Linear Fee Constant"
+              formRegister={register("config.linearFee.minFeeB")}
+            />
+          </div>
         </Disclosure.Panel>
       </Disclosure>
       <div className="flex gap-2">

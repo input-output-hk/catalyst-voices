@@ -5,9 +5,14 @@ import {
   AuxiliaryData,
   BaseAddress,
   BigNum,
+  Certificate,
+  Certificates,
   Ed25519KeyHash,
   GeneralTransactionMetadata,
   LinearFee,
+  RewardAddress,
+  StakeCredential,
+  StakeDelegation,
   Transaction,
   TransactionBuilder,
   TransactionBuilderConfigBuilder,
@@ -16,10 +21,11 @@ import {
   TransactionUnspentOutput,
   TransactionUnspentOutputs,
   TransactionWitnessSet,
-  Value
+  Value,
+  Withdrawals
 } from "@emurgo/cardano-serialization-lib-asmjs";
 
-import type { TxBuilderArguments } from "types/cardano";
+import { CertificateType, type TxBuilderArguments } from "types/cardano";
 
 export default async function buildUnsignedTx(payload: TxBuilderArguments): Promise<Transaction> {
   const { config, ...builder } = payload;
@@ -42,10 +48,10 @@ export default async function buildUnsignedTx(payload: TxBuilderArguments): Prom
       .build()
   );
 
-  // add inputs
+  // #0 add inputs
   const utxos = TransactionUnspentOutputs.new();
-  for (const input of builder.txInputs) {
-    const utxo = TransactionUnspentOutput.from_hex(input.hex);
+  for (const item of builder.txInputs.filter((x) => Boolean(x.hex))) {
+    const utxo = TransactionUnspentOutput.from_hex(item.hex);
     utxos.add(utxo);
   }
 
@@ -53,14 +59,70 @@ export default async function buildUnsignedTx(payload: TxBuilderArguments): Prom
     txBuilder.add_inputs_from(utxos, 3);
   }
 
-  // add outputs
-  for (const output of builder.txOutputs) {
-    const address = Address.from_bech32(output.address);
-    const amount = Value.new(BigNum.from_str(output.amount));
+  // #1 add outputs
+  for (const item of builder.txOutputs.filter((x) => Boolean(x.address) && Boolean(x.amount))) {
+    const address = Address.from_bech32(item.address);
+    const amount = Value.new(BigNum.from_str(item.amount));
     txBuilder.add_output(TransactionOutput.new(address, amount));
   }
 
-  // add required signers
+  // #2 add fee
+  if (builder.txFee) {
+    const val = BigNum.from_str(builder.txFee);
+    txBuilder.set_fee(val);
+  }
+
+  // #3 add ttl
+  if (builder.timeToLive) {
+    const val = BigNum.from_str(builder.timeToLive);
+    txBuilder.set_ttl_bignum(val);
+  }
+
+  // #4 add certs
+  const certs = Certificates.new();
+  for (const item of builder.certificates) {
+    // TODO: add other types
+    if (item.type === CertificateType.StakeDelegation) {
+      let cred: StakeCredential;
+      if (item.hashType === "addr_keyhash") {
+        cred = StakeCredential.from_keyhash(Ed25519KeyHash.from_hex(item.hash));
+      } else if (item.hashType === "scripthash") {
+        cred = StakeCredential.from_scripthash(Ed25519KeyHash.from_hex(item.hash));
+      } else {
+        throw new Error("certificate hash type is not defined");
+      }
+
+      const poolKeyhash = Ed25519KeyHash.from_hex(item.poolKeyhash);
+      const value = StakeDelegation.new(cred, poolKeyhash);
+      const cert = Certificate.new_stake_delegation(value);
+      certs.add(cert);
+    } else {
+      throw new Error("cannot build a certificate");
+    }
+  }
+
+  if (certs.len()) {
+    txBuilder.set_certs(certs);
+  }
+
+  // #5 add withdrawals
+  const withdrawals = Withdrawals.new();
+  for (const item of builder.rewardWithdrawals.filter((x) => Boolean(x.address) && Boolean(x.value))) {
+    const rewardAddress = RewardAddress.from_address(Address.from_bech32(item.address));
+    const value = BigNum.from_str(item.value);
+
+    if (!rewardAddress) {
+      throw new Error("cannot create an address");
+    }
+
+    withdrawals.insert(rewardAddress, value);
+  }
+
+  if (withdrawals.len()) {
+    txBuilder.set_withdrawals(withdrawals);
+  }
+
+  // #14 add required signers
   for (const requiredSigner of builder.requiredSigners) {
     const stakeCred = BaseAddress.from_address(Address.from_bech32(requiredSigner.address))
       ?.stake_cred()
