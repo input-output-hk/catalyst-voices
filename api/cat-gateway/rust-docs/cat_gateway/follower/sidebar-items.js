@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["DATA_NOT_STALE"],"fn":["find_last_update_point","follower_connection","init_follower","spawn_followers","start_followers"],"type":["ManageTasks"]};
