@@ -1,5 +1,8 @@
 VERSION --try --global-cache --arg-scope-and-set 0.7
 
+# If running this target with a local ssh agent active, set the environment variable EARTHLY_SSH_AUTH_SOCK=''
+# to make the `+deps` target work. Earthly defaults to ssh authentication when it founds an ssh agent active
+# but the flutter repo needs to be cloned via https to properly use the `channel` subcommand.
 deps:
     FROM debian:bookworm-slim
     RUN apt-get update
@@ -23,6 +26,26 @@ deps:
 src:
     FROM +deps
     COPY --dir pubspec.yaml lib packages web test test_driver integration_test .
+
+# Code generator based on Catalyst Gateway OpenAPI specs.
+code-generator:
+    FROM +deps
+    COPY --dir pubspec.yaml lib packages web test test_driver integration_test .
+    COPY ../catalyst-gateway+build/doc/cat-gateway-api.json /frontend/packages/catalyst_voices_services/openapi/cat-gateway-api.json
+    WORKDIR /frontend/packages/catalyst_voices_services
+    RUN flutter pub get
+    RUN dart run build_runner build --delete-conflicting-outputs
+    SAVE ARTIFACT lib/generated
+
+code-generator-local:
+    FROM +code-generator
+    SAVE ARTIFACT lib/generated/* AS LOCAL ./packages/catalyst_voices_models/lib/generated/
+
+test-code-generator:
+    FROM +code-generator
+    COPY packages/catalyst_voices_models/lib/generated /tmp/repo_generated
+    RUN diff /tmp/repo_generated lib/generated
+
 
 # Build web version of Catalyst Voices
 build:
