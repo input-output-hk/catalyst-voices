@@ -3,8 +3,6 @@
 import { Disclosure } from "@headlessui/react";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
-import SwitchLeftIcon from "@mui/icons-material/SwitchLeft";
-import SwitchRightIcon from "@mui/icons-material/SwitchRight";
 import { capitalize, cloneDeep, noop, upperCase } from "lodash-es";
 import { useFieldArray, useForm } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
@@ -35,10 +33,12 @@ const PROTOCOL_PARAMS = {
 type FormValues = TxBuilderArguments;
 
 type Props = {
+  txIds: string[];
+  addrs: string[];
   onSubmit?: (value: FormValues) => void;
 };
 
-function TxBuilder({ onSubmit: onPropSubmit = noop }: Props) {
+function TxBuilder({ txIds, addrs, onSubmit: onPropSubmit = noop }: Props) {
   const { handleSubmit, register, resetField, control, reset } = useForm<FormValues>({
     defaultValues: {
       txInputs: [],
@@ -69,20 +69,17 @@ function TxBuilder({ onSubmit: onPropSubmit = noop }: Props) {
     <form className="grid gap-2" autoComplete="off">
       <TxBuilderMultiFieldsSection
         heading="Transaction Inputs"
-        onAddClick={() => txInputFields.append({ hash: "", index: "" })}
+        onAddClick={() => txInputFields.append({ hex: "" })}
         onRemoveClick={(i) => txInputFields.remove(i)}
         fields={txInputFields.fields}
         render={(i) => (
-          <div className="grow grid grid-cols-2 gap-2">
+          <div className="grow grid gap-2">
             <Input
               type="text"
-              label={`Hash #${i + 1}`}
-              formRegister={register(`txInputs.${i}.hash`)}
-            />
-            <Input
-              type="number"
-              label={`Index #${i + 1}`}
-              formRegister={register(`txInputs.${i}.index`)}
+              label={`UTXO Hex #${i + 1}`}
+              minLength={32}
+              maxLength={32}
+              formRegister={register(`txInputs.${i}.hex`)}
             />
           </div>
         )}
@@ -93,12 +90,14 @@ function TxBuilder({ onSubmit: onPropSubmit = noop }: Props) {
         onRemoveClick={(i) => txOutputFields.remove(i)}
         fields={txOutputFields.fields}
         render={(i) => (
-          <div className="grow grid grid-cols-2 gap-2">
-            <Input
-              type="text"
-              label={`Address #${i + 1}`}
-              formRegister={register(`txOutputs.${i}.address`)}
-            />
+          <div className="grow grid grid-cols-4 gap-2">
+            <div className="col-span-3">
+              <Input
+                type="text"
+                label={`Address #${i + 1}`}
+                formRegister={register(`txOutputs.${i}.address`)}
+              />
+            </div>
             <Input
               type="number"
               label={`Amount #${i + 1}`}
@@ -147,8 +146,8 @@ function TxBuilder({ onSubmit: onPropSubmit = noop }: Props) {
                 certificateFields.fields[i]?.type === value
                   ? null
                   : certificateFields.replace({
-                      type: value /* TODO: support default values for each type */,
-                    })
+                    type: value /* TODO: support default values for each type */,
+                  })
               }
             />
             {certificateFields.fields[i]?.type === CertificateType.StakeDelegation ? (
@@ -159,7 +158,7 @@ function TxBuilder({ onSubmit: onPropSubmit = noop }: Props) {
                     className={twMerge(
                       "w-full rounded px-1 border border-solid border-black",
                       certificateFields.fields[i]?.hashType === "addr_keyhash" &&
-                        "bg-black text-white"
+                      "bg-black text-white"
                     )}
                     onClick={() =>
                       certificateFields.update(i, {
@@ -175,7 +174,7 @@ function TxBuilder({ onSubmit: onPropSubmit = noop }: Props) {
                     className={twMerge(
                       "w-full rounded px-1 border border-solid border-black",
                       certificateFields.fields[i]?.hashType === "scripthash" &&
-                        "bg-black text-white"
+                      "bg-black text-white"
                     )}
                     onClick={() =>
                       certificateFields.update(i, {
@@ -232,15 +231,15 @@ function TxBuilder({ onSubmit: onPropSubmit = noop }: Props) {
       />
       <TxBuilderMultiFieldsSection
         heading="Required Signers"
-        onAddClick={() => requiredSignerFields.append({ hash: "" })}
+        onAddClick={() => requiredSignerFields.append({ address: "" })}
         onRemoveClick={(i) => requiredSignerFields.remove(i)}
         fields={requiredSignerFields.fields}
         render={(i) => (
-          <div className="grow grid grid-cols-2 gap-2">
+          <div className="grow grid gap-2">
             <Input
               type="text"
               label={`Required Signers #${i + 1}`}
-              formRegister={register(`requiredSigners.${i}.hash`)}
+              formRegister={register(`requiredSigners.${i}.address`)}
             />
           </div>
         )}

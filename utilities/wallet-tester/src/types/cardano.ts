@@ -39,8 +39,7 @@ export enum CertificateType {
 
 export type TxBuilderArguments = {
   txInputs: {
-    hash: string;
-    index: string;
+    hex: string;
   }[];
   txOutputs: {
     address: string;
@@ -77,9 +76,19 @@ export type TxBuilderArguments = {
   auxilliaryDataHash: string;
   validityIntervalStart: string;
   requiredSigners: {
-    hash: string;
+    address: string;
   }[];
   networkId: string;
+  
+  auxMetadata: {
+    metadata: {
+      key: string;
+      valueType: string;
+      value: string;
+    }[];
+  };
+
+
   regAddress: string;
   regAmount: string;
   regText: string;

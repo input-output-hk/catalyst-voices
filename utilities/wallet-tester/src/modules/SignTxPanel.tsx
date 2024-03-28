@@ -1,8 +1,8 @@
 import { Transaction, TransactionWitnessSet } from "@emurgo/cardano-serialization-lib-asmjs";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { decode, encode } from "cborg";
-import { isEmpty } from "lodash-es";
-import { Fragment, useEffect, useState } from "react";
+import { isEmpty, pickBy } from "lodash-es";
+import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
@@ -32,52 +32,33 @@ type Response = {
 
 type FormValues = {
   partialSign: boolean;
-  tx: {
-    [walletName: string]: string;
-  };
+  tx: string;
 };
 
 function SignTxPanel({ selectedWallets, walletApi }: Props) {
-  const [selectedTxWallet, setSelectedTxWallet] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [response, setResponse] = useState<Response>({});
   const [selectedResponseWallet, setSelectedResponseWallet] = useState("");
   const [editorRefreshSignal, setEditorRefreshSignal] = useState(0);
 
-  useEffect(() => {
-    const walletNames = Object.keys(walletApi).filter((w) => selectedWallets.includes(w));
-
-    setSelectedTxWallet((prev) => (selectedWallets.includes(prev) ? prev : walletNames[0] ?? ""));
-  }, [walletApi, selectedWallets]);
-
   const { control, handleSubmit, setValue } = useForm<FormValues>({
     defaultValues: {
       partialSign: false,
-      tx: {},
+      tx: "",
     },
   });
 
+  const sellectedWalletApi = pickBy(walletApi, (v, k) => selectedWallets.includes(k));
+  const txIds = [];
+  const addrs = [
+    ...Object.values(walletApi).flatMap((api) => api.info["usedAddresses"]?.value ?? [])
+  ];
+
   async function handleTxBuilderSubmit(builderArgs: TxBuilderArguments) {
     try {
-      const activeWallets = Object.entries(walletApi).filter(([w]) => selectedWallets.includes(w));
+      const tx = await buildUnsignedTx(builderArgs);
 
-      const resTx: FormValues["tx"] = {};
-      for (const [walletName, api] of activeWallets) {
-        const tx = await buildUnsignedTx({
-          regAddress: builderArgs.regAddress,
-          regAmount: builderArgs.regAmount,
-          regLabel: builderArgs.regLabel,
-          regText: builderArgs.regText,
-          usedAddresses: api.info["usedAddresses"]?.raw,
-          changeAddress: api.info["changeAddress"]?.raw,
-          rawUtxos: api.info["utxos"]?.raw,
-          config: builderArgs.config,
-        });
-
-        resTx[walletName] = bin2hex(tx.to_bytes());
-      }
-
-      setValue("tx", resTx);
+      setValue("tx", bin2hex(tx.to_bytes()));
       setEditorRefreshSignal((prev) => (prev ? 0 : 1));
     } catch (err) {
       return void toast.error(String(err));
@@ -148,30 +129,20 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
             name="tx"
             render={({ field: { value, onChange } }) => (
               <div className="grid gap-2">
-                <TxBuilder onSubmit={handleTxBuilderSubmit} />
-                {selectedTxWallet ? (
-                  <>
-                    <WalletViewSelection
-                      selectedWallet={selectedTxWallet}
-                      wallets={Object.keys(walletApi).filter((w) => selectedWallets.includes(w))}
-                      onSelect={setSelectedTxWallet}
-                    />
-                    <Fragment key={selectedTxWallet}>
-                      <CBOREditor
-                        key={editorRefreshSignal}
-                        value={value[selectedTxWallet] ?? ""}
-                        onChange={(v) => onChange({ ...value, [selectedTxWallet]: v })}
-                      />
-                    </Fragment>
-                  </>
-                ) : (
-                  <Badge variant="warn" text="Please enable at least one wallet." />
-                )}
+                {/* TODO: add empty */}
+                <TxBuilder txIds={[]} addrs={[]} onSubmit={handleTxBuilderSubmit} />
+                <CBOREditor
+                  key={editorRefreshSignal}
+                  value={value}
+                  onChange={onChange}
+                />
               </div>
             )}
           />
         </InputBlock>
-        {selectedTxWallet && (
+        {isEmpty(sellectedWalletApi) ? (
+          <Badge variant="warn" text="Enable at least one wallet to execute" />
+        ) : (
           <div className="flex">
             <div className="flex gap-2 items-center">
               <Button disabled={isLoading} onClick={handleSubmit(handleExecute)}>

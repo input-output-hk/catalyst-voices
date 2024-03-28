@@ -11,113 +11,200 @@ import {
   Transaction,
   TransactionBuilder,
   TransactionBuilderConfigBuilder,
-  TransactionInput,
   TransactionMetadatum,
   TransactionOutput,
   TransactionUnspentOutput,
   TransactionUnspentOutputs,
   TransactionWitnessSet,
-  Value,
+  Value
 } from "@emurgo/cardano-serialization-lib-asmjs";
 
 import type { TxBuilderArguments } from "types/cardano";
 
-type Payload = {
-  /** Raw registration address in hex string. */
-  regAddress: string;
-  /** String number in lovelace unit. */
-  regAmount: string;
-  /** Transaction metadatum text, e.g., Cardano Wallet Tester. */
-  regText: string;
-  /** Transaction metadatum label, e.g., 98117105100108. */
-  regLabel: string;
-  /** Raw hex string address from `API.getUsedAddresses()`. */
-  usedAddresses: string[];
-  /** Raw hex string address from `API.getChangeAddress()`. */
-  changeAddress: string;
-  /** Raw hex string UTXOs directed from calling `API.getUtxos()`. */
-  rawUtxos: string[];
-  /** Transaction config */
-  config: TxBuilderArguments["config"];
-};
+export default async function buildUnsignedTx(payload: TxBuilderArguments): Promise<Transaction> {
+  const { config, ...builder } = payload;
 
-export default async function buildUnsignedTx(payload: Payload): Promise<Transaction> {
   // Initialize builder with protocol parameters
   const txBuilder = TransactionBuilder.new(
     TransactionBuilderConfigBuilder.new()
       .fee_algo(
         LinearFee.new(
-          BigNum.from_str(payload.config.linearFee.minFeeA),
-          BigNum.from_str(payload.config.linearFee.minFeeB)
+          BigNum.from_str(config.linearFee.minFeeA),
+          BigNum.from_str(config.linearFee.minFeeB)
         )
       )
-      .pool_deposit(BigNum.from_str(payload.config.poolDeposit))
-      .key_deposit(BigNum.from_str(payload.config.keyDeposit))
-      .coins_per_utxo_word(BigNum.from_str(payload.config.coinsPerUtxoWord))
-      .max_value_size(payload.config.maxValSize)
-      .max_tx_size(payload.config.maxTxSize)
+      .pool_deposit(BigNum.from_str(config.poolDeposit))
+      .key_deposit(BigNum.from_str(config.keyDeposit))
+      .coins_per_utxo_word(BigNum.from_str(config.coinsPerUtxoWord))
+      .max_value_size(config.maxValSize)
+      .max_tx_size(config.maxTxSize)
       .prefer_pure_change(true)
       .build()
   );
 
-  // Set address to send ada to
-  const registrationAddress = Address.from_bech32(payload.regAddress);
+  // add inputs
+  const utxos = TransactionUnspentOutputs.new();
+  for (const input of builder.txInputs) {
+    const utxo = TransactionUnspentOutput.from_hex(input.hex);
+    utxos.add(utxo);
+  }
 
-  // Set amount to send
-  const registrationAmount = Value.new(BigNum.from_str(payload.regAmount));
+  if (utxos.len()) {
+    txBuilder.add_inputs_from(utxos, 3);
+  }
 
-  // Set transactional metadatum message
-  const regMessageMetadatumLabel = BigNum.from_str(payload.regLabel);
-  const regMessageMetadatum = TransactionMetadatum.new_text(payload.regText);
+  // add outputs
+  for (const output of builder.txOutputs) {
+    const address = Address.from_bech32(output.address);
+    const amount = Value.new(BigNum.from_str(output.amount));
+    txBuilder.add_output(TransactionOutput.new(address, amount));
+  }
 
-  // Create Tx metadata object and parse into auxiliary data
-  const txMetadata = GeneralTransactionMetadata.new();
-  txMetadata.insert(regMessageMetadatumLabel, regMessageMetadatum);
+  // add required signers
+  for (const requiredSigner of builder.requiredSigners) {
+    const stakeCred = BaseAddress.from_address(Address.from_bech32(requiredSigner.address))
+      ?.stake_cred()
+      .to_keyhash()
+      ?.to_hex();
+
+    if (!stakeCred) {
+      throw new Error("cannot create a stake credential");
+    }
+
+    txBuilder.add_required_signer(Ed25519KeyHash.from_hex(stakeCred));
+  }
+
+  // aux data
   const auxMetadata = AuxiliaryData.new();
-  auxMetadata.set_metadata(txMetadata);
-
-  // Add metadatum to transaction builder, so it can be included in the transaction balancing
-  txBuilder.set_auxiliary_data(auxMetadata);
-
-  // Add extra signature witness to transaction builder
-  if (!payload.usedAddresses[0]) {
-    throw new Error("cannot find any used address");
+  const txMetadata =  GeneralTransactionMetadata.new();
+  for (const item of builder.auxMetadata.metadata) {
+    const regMessageMetadatumLabel = BigNum.from_str(item.key);
+    // TODO: support other types
+    const regMessageMetadatum = TransactionMetadatum.new_text(item.value);
+    txMetadata.insert(regMessageMetadatumLabel, regMessageMetadatum);
   }
 
-  const stakeCred = BaseAddress.from_address(Address.from_hex(payload.usedAddresses[0]))
-    ?.stake_cred()
-    .to_keyhash()
-    ?.to_hex();
-
-  if (!stakeCred) {
-    throw new Error("cannot create a stake credential");
+  if (txMetadata.len()) {
+    auxMetadata.set_metadata(txMetadata);
   }
 
-  txBuilder.add_required_signer(Ed25519KeyHash.from_hex(stakeCred));
-
-  // Add outputs to the transaction builder
-  txBuilder.add_output(TransactionOutput.new(registrationAddress, registrationAmount));
-
-  // Find the available UTxOs in the wallet and use them as Inputs for the transaction
-  const txUnspentOutputs = payload.rawUtxos.reduce((acc, utxo) => {
-    acc.add(TransactionUnspentOutput.from_hex(utxo));
-    return acc;
-  }, TransactionUnspentOutputs.new());
-  // Use UTxO selection strategy RandomImproveMultiAsset aka 3
-  txBuilder.add_inputs_from(txUnspentOutputs, 3);
-
-  // Set change address, incase too much ADA provided for fee
-  const shelleyChangeAddress = Address.from_hex(payload.changeAddress);
-  txBuilder.add_change_if_needed(shelleyChangeAddress);
-
-  // Make a full transaction, passing in empty witness set
-  const txBody = txBuilder.build();
-  const transactionWitnessSet = TransactionWitnessSet.new();
+  // build a full transaction, passing in empty witness set
   const unsignedTx = Transaction.new(
-    txBody,
-    TransactionWitnessSet.from_bytes(transactionWitnessSet.to_bytes()),
+    txBuilder.build(),
+    TransactionWitnessSet.new(),
     auxMetadata
   );
 
   return unsignedTx;
 }
+
+// type Payload = {
+//   /** Raw registration address in hex string. */
+//   regAddress: string;
+//   /** String number in lovelace unit. */
+//   regAmount: string;
+//   /** Transaction metadatum text, e.g., Cardano Wallet Tester. */
+//   regText: string;
+//   /** Transaction metadatum label, e.g., 98117105100108. */
+//   regLabel: string;
+//   /** Raw hex string address from `API.getUsedAddresses()`. */
+//   usedAddresses: string[];
+//   /** Raw hex string address from `API.getChangeAddress()`. */
+//   changeAddress: string;
+//   /** Raw hex string UTXOs directed from calling `API.getUtxos()`. */
+//   rawUtxos: string[];
+//   /** Transaction config */
+//   config: TxBuilderArguments["config"];
+// };
+
+// const tx = await buildUnsignedTx({
+//   regAddress: builderArgs.regAddress,
+//   regAmount: builderArgs.regAmount,
+//   regLabel: builderArgs.regLabel,
+//   regText: builderArgs.regText,
+//   usedAddresses: api.info["usedAddresses"]?.raw,
+//   changeAddress: api.info["changeAddress"]?.raw,
+//   rawUtxos: api.info["utxos"]?.raw,
+//   config: builderArgs.config,
+// });
+
+// export default async function buildUnsignedTx(payload: Payload): Promise<Transaction> {
+//   // Initialize builder with protocol parameters
+//   const txBuilder = TransactionBuilder.new(
+//     TransactionBuilderConfigBuilder.new()
+//       .fee_algo(
+//         LinearFee.new(
+//           BigNum.from_str(payload.config.linearFee.minFeeA),
+//           BigNum.from_str(payload.config.linearFee.minFeeB)
+//         )
+//       )
+//       .pool_deposit(BigNum.from_str(payload.config.poolDeposit))
+//       .key_deposit(BigNum.from_str(payload.config.keyDeposit))
+//       .coins_per_utxo_word(BigNum.from_str(payload.config.coinsPerUtxoWord))
+//       .max_value_size(payload.config.maxValSize)
+//       .max_tx_size(payload.config.maxTxSize)
+//       .prefer_pure_change(true)
+//       .build()
+//   );
+
+//   // Set address to send ada to
+//   const registrationAddress = Address.from_bech32(payload.regAddress);
+
+//   // Set amount to send
+//   const registrationAmount = Value.new(BigNum.from_str(payload.regAmount));
+
+//   // Set transactional metadatum message
+//   const regMessageMetadatumLabel = BigNum.from_str(payload.regLabel);
+//   const regMessageMetadatum = TransactionMetadatum.new_text(payload.regText);
+
+//   // Create Tx metadata object and parse into auxiliary data
+//   const txMetadata = GeneralTransactionMetadata.new();
+//   txMetadata.insert(regMessageMetadatumLabel, regMessageMetadatum);
+//   const auxMetadata = AuxiliaryData.new();
+//   auxMetadata.set_metadata(txMetadata);
+
+//   // Add metadatum to transaction builder, so it can be included in the transaction balancing
+//   txBuilder.set_auxiliary_data(auxMetadata);
+
+//   // Add extra signature witness to transaction builder
+//   if (!payload.usedAddresses[0]) {
+//     throw new Error("cannot find any used address");
+//   }
+
+//   const stakeCred = BaseAddress.from_address(Address.from_hex(payload.usedAddresses[0]))
+//     ?.stake_cred()
+//     .to_keyhash()
+//     ?.to_hex();
+
+//   if (!stakeCred) {
+//     throw new Error("cannot create a stake credential");
+//   }
+
+//   txBuilder.add_required_signer(Ed25519KeyHash.from_hex(stakeCred));
+
+//   // Add outputs to the transaction builder
+//   txBuilder.add_output(TransactionOutput.new(registrationAddress, registrationAmount));
+
+//   // Find the available UTxOs in the wallet and use them as Inputs for the transaction
+//   const txUnspentOutputs = payload.rawUtxos.reduce((acc, utxo) => {
+//     acc.add(TransactionUnspentOutput.from_hex(utxo));
+//     return acc;
+//   }, TransactionUnspentOutputs.new());
+//   // Use UTxO selection strategy RandomImproveMultiAsset aka 3
+//   txBuilder.add_inputs_from(txUnspentOutputs, 3);
+
+//   // Set change address, incase too much ADA provided for fee
+//   const shelleyChangeAddress = Address.from_hex(payload.changeAddress);
+//   txBuilder.add_change_if_needed(shelleyChangeAddress);
+
+//   // Make a full transaction, passing in empty witness set
+//   const txBody = txBuilder.build();
+//   const transactionWitnessSet = TransactionWitnessSet.new();
+//   const unsignedTx = Transaction.new(
+//     txBody,
+//     TransactionWitnessSet.from_bytes(transactionWitnessSet.to_bytes()),
+//     auxMetadata
+//   );
+
+//   return unsignedTx;
+// }
