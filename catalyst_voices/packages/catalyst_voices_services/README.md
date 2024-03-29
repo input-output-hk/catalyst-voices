@@ -12,21 +12,24 @@ The process consists in 3 simple steps:
 2. The code is generated and saved as an artifact in the `Earthfile` of
 `catalyst_voices`
 3. Generated code is placed in the proper location within the `catalyst_voices`
-project (`packages/catalyst_voices_models/lib/generated`) and it's ready for
-local usage.
+project (`packages/catalyst_voices_services/lib/generated/catalyst_gateway`)
+and it's ready for local usage.
 
 This process can be achieved by executing from the `catalyst_voices` root
 folder:
 
 ```sh
-earthly +code-generator-local
+earthly +code-generator --platform=linux/amd64 --save_locally=true
 ```
 
-In this way it's possible to generate locally the code using the same version of
+The `--platform=linux/amd64` is necessary only when running the command from a
+different platform.
+
+In this way it's possible to locally generate the code using the same version of
 OpenAPI specs defined in the backend code and developers have full control of
-what must be committed.
+what should be committed.
 
 To ensure the consistency of the generated code (especially when backend changes
 occur) an earthly target is automatically executed on PR against main.
-This `+test-flutter-code-generator` generates the code on the CI and compares it
-with the code currently in repo, failing if there is an inconsistency.
+This `+check-flutter-code-generator` generates the code on the CI and compares
+it with the code currently in repo, failing if there is an inconsistency.
