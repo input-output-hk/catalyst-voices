@@ -46,9 +46,9 @@ local-ip-address = "0.5.7"
 gethostname = "0.4.3"
 hex = "0.4.3"
 async-recursion = "1.0.5"
-pallas = { git = "https://github.com/input-output-hk/catalyst-pallas.git", branch = "fix/immutable-secondary" }
+pallas = { git = "https://github.com/input-output-hk/catalyst-pallas.git", branch = "fix/immutable-secondary", version = "0.24.0" }
 anyhow = "1.0.71"
-cardano-chain-follower= { git = "https://github.com/input-output-hk/hermes.git", branch = "fix/update-pallas" }
+cardano-chain-follower= { git = "https://github.com/input-output-hk/hermes.git", version="0.0.1" }
 
 [workspace.lints.rust]
 warnings = "deny"
