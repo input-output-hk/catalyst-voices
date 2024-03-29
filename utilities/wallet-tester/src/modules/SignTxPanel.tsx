@@ -1,7 +1,7 @@
 import { Transaction, TransactionWitnessSet } from "@emurgo/cardano-serialization-lib-asmjs";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { decode, encode } from "cborg";
-import { isEmpty, pickBy } from "lodash-es";
+import { compact, isEmpty, pickBy, uniq } from "lodash-es";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
@@ -49,10 +49,14 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
   });
 
   const sellectedWalletApi = pickBy(walletApi, (v, k) => selectedWallets.includes(k));
-  const txIds = [];
-  const addrs = [
-    ...Object.values(walletApi).flatMap((api) => api.info["usedAddresses"]?.value ?? [])
-  ];
+  const utxos = uniq([
+    ...Object.values(walletApi).flatMap((api) => api.info["utxos"]?.raw ?? [])
+  ]);
+  const addrs = uniq([
+    ...Object.values(walletApi).flatMap((api) => api.info["usedAddresses"]?.value ?? []),
+    ...Object.values(walletApi).flatMap((api) => compact(api.info["utxos"]?.value?.map?.((x: any) => x?.["output"]?.["address"] ?? null) ?? [])),
+    ...Object.values(walletApi).flatMap((api) => compact(api.info["collateral"]?.value?.map?.((x: any) => x?.["output"]?.["address"] ?? null) ?? [])),
+  ]);
 
   async function handleTxBuilderSubmit(builderArgs: TxBuilderArguments) {
     try {
@@ -130,12 +134,8 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
             render={({ field: { value, onChange } }) => (
               <div className="grid gap-2">
                 {/* TODO: add empty */}
-                <TxBuilder txIds={[]} addrs={[]} onSubmit={handleTxBuilderSubmit} />
-                <CBOREditor
-                  key={editorRefreshSignal}
-                  value={value}
-                  onChange={onChange}
-                />
+                <TxBuilder utxos={utxos} addrs={addrs} onSubmit={handleTxBuilderSubmit} />
+                <CBOREditor key={editorRefreshSignal} value={value} onChange={onChange} />
               </div>
             )}
           />

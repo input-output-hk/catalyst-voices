@@ -4,12 +4,13 @@ import { Disclosure } from "@headlessui/react";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import { capitalize, cloneDeep, noop, upperCase } from "lodash-es";
-import { useFieldArray, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
 
 import { CertificateType, type TxBuilderArguments } from "types/cardano";
 
 import Button from "./Button";
+import Combobox from "./Combobox";
 import Dropdown from "./Dropdown";
 import Input from "./Input";
 import TxBuilderMultiFieldsSection from "./TxBuilderMultiFieldsSection";
@@ -33,16 +34,21 @@ const PROTOCOL_PARAMS = {
 type FormValues = TxBuilderArguments;
 
 type Props = {
-  txIds: string[];
+  /* Hex UTXOs. */
+  utxos: string[];
+  /* Bech32 Addressses. */
   addrs: string[];
   onSubmit?: (value: FormValues) => void;
 };
 
-function TxBuilder({ txIds, addrs, onSubmit: onPropSubmit = noop }: Props) {
+function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
   const { handleSubmit, register, resetField, control, reset } = useForm<FormValues>({
     defaultValues: {
       txInputs: [],
-      txOutputs: [], 
+      txOutputs: [],
+      auxMetadata: {
+        metadata: [],
+      },
       config: cloneDeep(PROTOCOL_PARAMS),
     },
   });
@@ -52,6 +58,7 @@ function TxBuilder({ txIds, addrs, onSubmit: onPropSubmit = noop }: Props) {
   const certificateFields = useFieldArray({ control, name: "certificates" });
   const rewardWithdrawalFields = useFieldArray({ control, name: "rewardWithdrawals" });
   const requiredSignerFields = useFieldArray({ control, name: "requiredSigners" });
+  const metadataFields = useFieldArray({ control, name: "auxMetadata.metadata" });
 
   function handleReset() {
     reset();
@@ -71,12 +78,21 @@ function TxBuilder({ txIds, addrs, onSubmit: onPropSubmit = noop }: Props) {
         fields={txInputFields.fields}
         render={(i) => (
           <div className="grow grid gap-2">
-            <Input
-              type="text"
-              label={`UTXO Hex #${i + 1}`}
-              minLength={32}
-              maxLength={32}
-              formRegister={register(`txInputs.${i}.hex`)}
+            <Controller
+              control={control}
+              name={`txOutputs.${i}.amount`}
+              render={({ field: { value, onChange } }) => (
+                <Combobox
+                  value={value}
+                  label={`UTXO Hex #${i + 1}`}
+                  items={utxos.map((v) => ({
+                    label: v,
+                    value: v,
+                  }))}
+                  onInput={onChange}
+                  onSelect={onChange}
+                />
+              )}
             />
           </div>
         )}
@@ -89,10 +105,21 @@ function TxBuilder({ txIds, addrs, onSubmit: onPropSubmit = noop }: Props) {
         render={(i) => (
           <div className="grow grid grid-cols-4 gap-2">
             <div className="col-span-3">
-              <Input
-                type="text"
-                label={`Address #${i + 1}`}
-                formRegister={register(`txOutputs.${i}.address`)}
+              <Controller
+                control={control}
+                name={`txOutputs.${i}.address`}
+                render={({ field: { value, onChange } }) => (
+                  <Combobox
+                    value={value}
+                    label={`Address #${i + 1}`}
+                    items={addrs.map((v) => ({
+                      label: v,
+                      value: v,
+                    }))}
+                    onInput={onChange}
+                    onSelect={onChange}
+                  />
+                )}
               />
             </div>
             <Input
@@ -212,10 +239,21 @@ function TxBuilder({ txIds, addrs, onSubmit: onPropSubmit = noop }: Props) {
         render={(i) => (
           <div className="grow grid grid-cols-4 gap-2">
             <div className="col-span-3">
-              <Input
-                type="text"
-                label={`Address #${i + 1}`}
-                formRegister={register(`rewardWithdrawals.${i}.address`)}
+              <Controller
+                control={control}
+                name={`rewardWithdrawals.${i}.address`}
+                render={({ field: { value, onChange } }) => (
+                  <Combobox
+                    value={value}
+                    label={`Address #${i + 1}`}
+                    items={addrs.map((v) => ({
+                      label: v,
+                      value: v,
+                    }))}
+                    onInput={onChange}
+                    onSelect={onChange}
+                  />
+                )}
               />
             </div>
             <Input
@@ -255,10 +293,21 @@ function TxBuilder({ txIds, addrs, onSubmit: onPropSubmit = noop }: Props) {
         fields={requiredSignerFields.fields}
         render={(i) => (
           <div className="grow grid gap-2">
-            <Input
-              type="text"
-              label={`Required Signers #${i + 1}`}
-              formRegister={register(`requiredSigners.${i}.address`)}
+            <Controller
+              control={control}
+              name={`requiredSigners.${i}.address`}
+              render={({ field: { value, onChange } }) => (
+                <Combobox
+                  value={value}
+                  label={`Signer Address #${i + 1}`}
+                  items={addrs.map((v) => ({
+                    label: v,
+                    value: v,
+                  }))}
+                  onInput={onChange}
+                  onSelect={onChange}
+                />
+              )}
             />
           </div>
         )}
@@ -318,19 +367,28 @@ function TxBuilder({ txIds, addrs, onSubmit: onPropSubmit = noop }: Props) {
             </>
           )}
         </Disclosure.Button>
-        <Disclosure.Panel className="grid gap-2 grid-cols-2">
-          <div className="grid gap-2 grid-cols-2">
-            <Input
-              type="number"
-              label="Linear Fee Coeff."
-              formRegister={register("config.linearFee.minFeeA")}
-            />
-            <Input
-              type="number"
-              label="Linear Fee Constant"
-              formRegister={register("config.linearFee.minFeeB")}
-            />
-          </div>
+        <Disclosure.Panel className="grid gap-2">
+          <TxBuilderMultiFieldsSection
+            heading="Transaction Metadata"
+            onAddClick={() => metadataFields.append({ key: "", valueType: "", value: "" })}
+            onRemoveClick={(i) => metadataFields.remove(i)}
+            fields={metadataFields.fields}
+            render={(i) => (
+              <div className="grow grid gap-2 grid-cols-2">
+                <Input
+                  type="number"
+                  min={0}
+                  label={`Label #${i + 1}`}
+                  formRegister={register(`auxMetadata.metadata.${i}.key`)}
+                />
+                <Input
+                  type="text"
+                  label={`Metadatum #${i + 1}`}
+                  formRegister={register(`auxMetadata.metadata.${i}.value`)}
+                />
+              </div>
+            )}
+          />
         </Disclosure.Panel>
       </Disclosure>
       <div className="flex gap-2">

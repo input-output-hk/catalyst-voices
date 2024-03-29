@@ -37,6 +37,12 @@ export enum CertificateType {
   MoveInstantaneousRewardsCert = "move_instantaneous_rewards_cert",
 }
 
+export enum AuxMetadataType {
+  Shelley = "shelley",
+  ShelleyMA = "shelley-ma",
+  AlonzoAndBeyond = "alonzo-and-beyond",
+}
+
 export type TxBuilderArguments = {
   txInputs: {
     hex: string;
@@ -85,11 +91,13 @@ export type TxBuilderArguments = {
   networkId: string;
 
   auxMetadata: {
+    type: AuxMetadataType;
     metadata: {
       key: string;
       valueType: string;
       value: string;
     }[];
+    // TODO: add support for scripts
   };
   config: {
     linearFee: {

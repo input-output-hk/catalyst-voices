@@ -22,7 +22,7 @@ import {
   TransactionUnspentOutputs,
   TransactionWitnessSet,
   Value,
-  Withdrawals
+  Withdrawals,
 } from "@emurgo/cardano-serialization-lib-asmjs";
 
 import { CertificateType, type TxBuilderArguments } from "types/cardano";
@@ -107,7 +107,9 @@ export default async function buildUnsignedTx(payload: TxBuilderArguments): Prom
 
   // #5 add withdrawals
   const withdrawals = Withdrawals.new();
-  for (const item of builder.rewardWithdrawals.filter((x) => Boolean(x.address) && Boolean(x.value))) {
+  for (const item of builder.rewardWithdrawals.filter(
+    (x) => Boolean(x.address) && Boolean(x.value)
+  )) {
     const rewardAddress = RewardAddress.from_address(Address.from_bech32(item.address));
     const value = BigNum.from_str(item.value);
 
@@ -138,7 +140,7 @@ export default async function buildUnsignedTx(payload: TxBuilderArguments): Prom
 
   // aux data
   const auxMetadata = AuxiliaryData.new();
-  const txMetadata =  GeneralTransactionMetadata.new();
+  const txMetadata = GeneralTransactionMetadata.new();
   for (const item of builder.auxMetadata.metadata) {
     const regMessageMetadatumLabel = BigNum.from_str(item.key);
     // TODO: support other types
@@ -151,11 +153,7 @@ export default async function buildUnsignedTx(payload: TxBuilderArguments): Prom
   }
 
   // build a full transaction, passing in empty witness set
-  const unsignedTx = Transaction.new(
-    txBuilder.build(),
-    TransactionWitnessSet.new(),
-    auxMetadata
-  );
+  const unsignedTx = Transaction.new(txBuilder.build(), TransactionWitnessSet.new(), auxMetadata);
 
   return unsignedTx;
 }
