@@ -11,8 +11,8 @@ use crate::{
     cli::Error,
     event_db::error::Error as DBError,
     service::common::{
-        objects::{
-            cardano_address::CardanoStakeAddress, network::Network, stake_amount::StakeInfo,
+        objects::cardano::{
+            network::Network, stake_address::StakeAddress, stake_amount::StakeInfo,
         },
         responses::{
             resp_2xx::OK,
@@ -35,7 +35,7 @@ pub(crate) type AllResponses = response! {
 /// # GET `/utxo/staked_ada`
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(
-    state: &State, stake_address: CardanoStakeAddress, provided_network: Option<Network>,
+    state: &State, stake_address: StakeAddress, provided_network: Option<Network>,
     date_time: Option<DateTime<Utc>>,
 ) -> AllResponses {
     match state.event_db() {

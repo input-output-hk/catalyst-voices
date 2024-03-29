@@ -2,7 +2,7 @@
 
 use std::ops::Deref;
 
-use pallas::ledger::addresses::{Address, StakeAddress};
+use pallas::ledger::addresses::{Address, StakeAddress as StakeAddressPallas};
 use poem_openapi::{
     registry::{MetaSchema, MetaSchemaRef, Registry},
     types::{ParseError, ParseFromParameter, ParseResult, Type},
@@ -11,9 +11,9 @@ use poem_openapi::{
 /// Cardano stake address of the user.
 /// Should a valid Bech32 encoded stake address followed by the `https://cips.cardano.org/cip/CIP-19/#stake-addresses.`
 #[derive(Debug)]
-pub(crate) struct CardanoStakeAddress(StakeAddress);
+pub(crate) struct StakeAddress(StakeAddressPallas);
 
-impl CardanoStakeAddress {
+impl StakeAddress {
     /// Creates a `CardanoStakeAddress` schema definition.
     fn schema() -> MetaSchema {
         let mut schema = MetaSchema::new("string");
@@ -30,15 +30,15 @@ impl CardanoStakeAddress {
     }
 }
 
-impl Deref for CardanoStakeAddress {
-    type Target = StakeAddress;
+impl Deref for StakeAddress {
+    type Target = StakeAddressPallas;
 
     fn deref(&self) -> &Self::Target {
         &self.0
     }
 }
 
-impl Type for CardanoStakeAddress {
+impl Type for StakeAddress {
     type RawElementValueType = Self;
     type RawValueType = Self;
 
@@ -67,7 +67,7 @@ impl Type for CardanoStakeAddress {
     }
 }
 
-impl ParseFromParameter for CardanoStakeAddress {
+impl ParseFromParameter for StakeAddress {
     fn parse_from_parameter(param: &str) -> ParseResult<Self> {
         // prefix checks
         if !param.starts_with("stake") && !param.starts_with("stake_test") {

@@ -12,7 +12,7 @@ use poem_openapi::{
 use crate::{
     service::{
         common::{
-            objects::{cardano_address::CardanoStakeAddress, network::Network},
+            objects::cardano::{network::Network, stake_address::StakeAddress},
             tags::ApiTags,
         },
         utilities::middleware::schema_validation::schema_version_validation,
@@ -52,7 +52,7 @@ impl CardanoApi {
         &self, data: Data<&Arc<State>>,
         /// The stake address of the user.
         /// Should a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
-        stake_address: Path<CardanoStakeAddress>,
+        stake_address: Path<StakeAddress>,
         /// Cardano network type.
         /// If omitted network type is identified from the stake address.
         /// If specified it must be correspondent to the network type encoded in the stake
