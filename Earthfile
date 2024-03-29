@@ -38,7 +38,7 @@ repo-config:
     SAVE ARTIFACT /repo repo
 
 catalyst-voices-packages:
-    # Create artifacts of catalyst_voices_packages we need to refer in other earthyl targets.
+    # Create artifacts of catalyst_voices_packages we need to refer to in other earthly targets.
     FROM scratch
 
     WORKDIR /catalyst_voices_packages
