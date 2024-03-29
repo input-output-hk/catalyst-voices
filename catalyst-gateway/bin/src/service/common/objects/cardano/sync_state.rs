@@ -15,6 +15,7 @@ pub(crate) struct SyncState {
     pub(crate) slot_number: SlotNumber,
 
     /// Block hash.
+    #[oai(validator(min_length = "64", max_length = "64", pattern = "0x[0-9a-f]{64}"))]
     pub(crate) block_hash: BlockHash,
 
     /// last updated time.
@@ -25,7 +26,7 @@ impl Example for SyncState {
     fn example() -> Self {
         Self {
             slot_number: 5,
-            block_hash: "0000000000000000000000000000000000000000000000000000000000000000"
+            block_hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
                 .parse()
                 .unwrap(),
             last_updated: DateTime::default(),
