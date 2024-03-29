@@ -13,9 +13,9 @@ deps:
 
     GIT CLONE https://github.com/flutter/flutter.git /usr/local/flutter
     ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
-    RUN flutter channel stable
-    RUN flutter upgrade
-    RUN flutter --version
+    RUN --no-cache flutter channel stable
+    RUN --no-cache flutter upgrade
+    RUN --no-cache flutter --version
     RUN flutter doctor -v
     RUN flutter config --enable-web
     RUN dart pub global activate junitreport
