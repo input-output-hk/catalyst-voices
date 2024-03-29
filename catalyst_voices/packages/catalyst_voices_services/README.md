@@ -7,15 +7,15 @@ It leverages `swagger_dart_code_generator` library and the artifacts generated
 for the documentation of the `catalyst-gateway` backend.
 The process consists in 3 simple steps:
 
-1. The OpenAPI specification is picked from the artifact generated in the 
+1. The OpenAPI specification is picked from the artifact generated in the
 `Earthfile` of `catalyst-gateway`.
-2. The code is generated and saved as an artifact in the `Earthfile` of 
+2. The code is generated and saved as an artifact in the `Earthfile` of
 `catalyst_voices`
 3. Generated code is placed in the proper location within the `catalyst_voices`
 project (`packages/catalyst_voices_models/lib/generated`) and it's ready for
 local usage.
 
-This process can be achieved by executing from the `catalyst_voices` root 
+This process can be achieved by executing from the `catalyst_voices` root
 folder:
 
 ```sh
