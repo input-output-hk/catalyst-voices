@@ -30,22 +30,24 @@ src:
 # Code generator based on Catalyst Gateway OpenAPI specs.
 code-generator:
     FROM +deps
-    COPY --dir pubspec.yaml lib packages web test test_driver integration_test .
-    COPY ../catalyst-gateway+build/doc/cat-gateway-api.json /frontend/packages/catalyst_voices_services/openapi/cat-gateway-api.json
-    WORKDIR /frontend/packages/catalyst_voices_services
+    COPY --dir pubspec.yaml lib packages web test test_driver integration_test catalyst_voices
+    COPY ../+catalyst-voices-packages/catalyst_voices_packages .
+    WORKDIR /frontend/catalyst_voices/packages/catalyst_voices_services
+    COPY ../catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
     RUN flutter pub get
     RUN dart run build_runner build --delete-conflicting-outputs
     SAVE ARTIFACT lib/generated
 
+# This command run the code generator locally and place the proper artifacts in the catalyst_voices_models folder
 code-generator-local:
     FROM +code-generator
     SAVE ARTIFACT lib/generated/* AS LOCAL ./packages/catalyst_voices_models/lib/generated/
 
-test-code-generator:
+# This run the code generation on the CI and checks the code is consistent with what is in the repo
+test-flutter-code-generator:
     FROM +code-generator
     COPY packages/catalyst_voices_models/lib/generated /tmp/repo_generated
     RUN diff /tmp/repo_generated lib/generated
-
 
 # Build web version of Catalyst Voices
 build:
