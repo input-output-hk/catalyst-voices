@@ -11,5 +11,5 @@ targets:
       swagger_dart_code_generator:
         options:
           input_folder: "openapi/"
-          output_folder: "lib/generated/"
+          output_folder: "lib/generated/catalyst_gateway"
           separate_models: true

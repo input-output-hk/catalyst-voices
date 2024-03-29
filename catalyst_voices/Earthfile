@@ -32,7 +32,11 @@ src:
 # code-generator - Generates flutter code.
 # Based on Catalyst Gateway OpenAPI specifications generates models, clients
 # and serialization logic.
+# It accepts [save_locally] ARG that when true place the artifacts in the
+# proper folder of `catalyst_voices_services` local code.
 code-generator:
+    ARG save_locally=false
+
     FROM +deps
     COPY --dir pubspec.yaml lib packages web test test_driver integration_test catalyst_voices
     COPY ../+repo-catalyst-voices-packages/repo .
@@ -40,22 +44,21 @@ code-generator:
     COPY ../catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
     RUN flutter pub get
     RUN dart run build_runner build --delete-conflicting-outputs
-    SAVE ARTIFACT lib/generated
 
-# code-generator-local - Generates flutter code locally.
-# Based on Catalyst Gateway OpenAPI specifications generates models, clients
-# and serialization logic and place the produced artifacts in the
-# catalyst_voices_models folder.
-code-generator-local:
-    FROM +code-generator
-    SAVE ARTIFACT lib/generated/* AS LOCAL ./packages/catalyst_voices_models/lib/generated/
+    IF [ $save_locally = true ]
+        SAVE ARTIFACT lib/generated/catalyst_gateway/* AS LOCAL ./packages/catalyst_voices_services/lib/generated/catalyst_gateway/
+    ELSE
+        SAVE ARTIFACT lib/generated/catalyst_gateway
+    END
 
 # check-flutter-code-generator - Checks that the code generation is consistent
 # with the generated code currently in the repo.
 check-flutter-code-generator:
     FROM +code-generator
-    COPY packages/catalyst_voices_models/lib/generated /tmp/repo_generated
-    RUN diff /tmp/repo_generated lib/generated
+    # Copy generated files in the local file tree to a temporary folder
+    COPY packages/catalyst_voices_services/lib/generated/catalyst_gateway /tmp/repo_generated
+    # Check diff between local code and earthly artifacts
+    RUN diff /tmp/repo_generated lib/generated/catalyst_gateway
 
 # Build web version of Catalyst Voices
 build:
