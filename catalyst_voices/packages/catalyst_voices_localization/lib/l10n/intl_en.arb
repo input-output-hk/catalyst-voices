@@ -39,5 +39,21 @@
   "homeScreenText": "Catalyst Voices",
   "@homeScreenText": {
     "description": "Text shown in the home screen"
+  },
+  "comingSoonSubtitle": "Voices",
+  "@comingSoonSubtitle": {
+    "description": "Text shown after logo in coming soon page"
+  },
+  "comingSoonTitle1": "Coming",
+  "@comingSoonTitle1": {
+    "description": "Text shown as main title in coming soon page"
+  },
+  "comingSoonTitle2": "soon",
+  "@comingSoonTitle2": {
+    "description": "Text shown as main title in coming soon page"
+  },
+  "comingSoonDescription": "Project Catalyst is the world's largest decentralized innovation engine for solving real-world challenges.",
+  "@comingSoonDescription": {
+    "description": "Text shown as description in coming soon page"
   }
 }

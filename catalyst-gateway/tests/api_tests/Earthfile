@@ -1,0 +1,25 @@
+VERSION --global-cache 0.7
+
+builder:
+    FROM github.com/input-output-hk/catalyst-ci/earthly/python:v2.10.0+python-base
+
+    COPY --dir ./api_tests .
+    DO github.com/input-output-hk/catalyst-ci/earthly/python:v2.10.0+BUILDER
+
+test:
+    FROM +builder
+
+    ARG DB_URL="postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev"
+    ARG CAT_ADDRESS="0.0.0.0:3030"
+
+    COPY ./docker-compose.yml .
+
+    WITH DOCKER \
+        --compose docker-compose.yml \
+        --load event-db:latest=(../../event-db+build) \
+        --load cat-gateway:latest=(../../+package-cat-gateway --address=$CAT_ADDRESS --db_url=$DB_URL) \
+        --service event-db \
+        --service cat-gateway \
+        --allow-privileged
+        RUN poetry run pytest
+    END

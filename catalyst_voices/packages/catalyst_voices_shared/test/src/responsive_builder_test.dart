@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_shared/src/responsive_builder/responsive_builder.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -76,7 +76,7 @@ void main() {
                 other: const EdgeInsets.all(32),
                 builder: (context, padding) => Padding(
                   padding: padding!,
-                  child: const Text('Test')
+                  child: const Text('Test'),
                 ),
               ),
             ),

@@ -28,18 +28,8 @@ final class AppRouter {
     AuthenticationBloc authenticationBloc,
     GoRouterState state,
   ) {
-    final isAuthenticated = authenticationBloc.isAuthenticated;
-    final signingIn = state.matchedLocation == login_route.loginPath;
-
-    if (!isAuthenticated) {
-      return login_route.loginPath;
-    }
-
-    if (signingIn) {
-      return home_route.homePath;
-    }
-
-    return null;
+    // Always return home route that defaults to coming soon page.
+    return home_route.homePath;
   }
 
   static String? _isWeb() {

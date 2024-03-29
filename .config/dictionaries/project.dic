@@ -67,6 +67,7 @@ Joaquín
 jorm
 jormungandr
 Jörmungandr
+junitreport
 Keyhash
 lcov
 Leshiy
@@ -135,8 +136,10 @@ testunit
 thiserror
 thollander
 timelike
+tojunit
 Traceback
 TXNZD
+Typer
 unmanaged
 UTXO
 vitss
