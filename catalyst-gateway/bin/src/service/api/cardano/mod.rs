@@ -1,4 +1,4 @@
-//! Cardano UTXO endpoints
+//! Cardano API endpoints
 
 use std::sync::Arc;
 
@@ -21,12 +21,13 @@ use crate::{
 };
 
 mod staked_ada_get;
+mod sync_state_get;
 
-/// Cardano UTXO API Endpoints
-pub(crate) struct UTXOApi;
+/// Cardano Follower API Endpoints
+pub(crate) struct CardanoApi;
 
-#[OpenApi(prefix_path = "/utxo", tag = "ApiTags::Utxo")]
-impl UTXOApi {
+#[OpenApi(prefix_path = "/cardano", tag = "ApiTags::Cardano")]
+impl CardanoApi {
     #[oai(
         path = "/staked_ada/:stake_address",
         method = "get",
@@ -65,5 +66,24 @@ impl UTXOApi {
         date_time: Query<Option<DateTime<Utc>>>,
     ) -> staked_ada_get::AllResponses {
         staked_ada_get::endpoint(&data, stake_address.0, network.0, date_time.0).await
+    }
+
+    #[oai(
+        path = "/sync_state",
+        method = "get",
+        operation_id = "syncStateGet",
+        transform = "schema_version_validation"
+    )]
+    /// Get Cardano follower's sync state.
+    ///
+    /// This endpoint returns the current cardano follower's sync state info.
+    ///
+    /// ## Responses
+    /// * 200 OK - Returns the follower's sync state.
+    /// * 500 Server Error - If anything within this function fails unexpectedly.
+    /// * 503 Service Unavailable - Service is not ready, requests to other
+    /// endpoints should not be sent until the service becomes ready.
+    async fn sync_state_get(&self, data: Data<&Arc<State>>) -> sync_state_get::AllResponses {
+        sync_state_get::endpoint(&data).await
     }
 }

@@ -283,6 +283,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9d297deb1925b89f2ccc13d7635fa0714f12c87adce1c75356b39ca9b7178567"
 
 [[package]]
+name = "base64"
+version = "0.22.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9475866fec1451be56a3c2400fd081ff546538961565ccb5b7142cbd22bc7a51"
+
+[[package]]
 name = "bb8"
 version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -444,7 +450,7 @@ checksum = "a2bd12c1caf447e69cd4528f47f94d203fd2582878ecb9e9465484c4148a8223"
 [[package]]
 name = "cardano-chain-follower"
 version = "0.0.1"
-source = "git+https://github.com/input-output-hk/hermes.git#8b2ac7b2fa79af75fd20f33128db6525d708400a"
+source = "git+https://github.com/input-output-hk/hermes.git?branch=fix/update-pallas#24847386fec4ea7c2c2a51f059e630c7cad9702d"
 dependencies = [
  "pallas",
  "pallas-hardano",
@@ -1654,9 +1660,8 @@ checksum = "b15813163c1d831bf4a13c3610c05c0d03b39feb07f7e09fa234dac9b15aaf39"
 
 [[package]]
 name = "pallas"
-version = "0.23.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "99b6f0578e5802e219f26833516ac5f24c9f50986af7c03aea141fab8f05d5d2"
+version = "0.24.0"
+source = "git+https://github.com/input-output-hk/catalyst-pallas.git?branch=fix/immutable-secondary#c992da03d63c8fb32c64e1d2142b7d969a90ee44"
 dependencies = [
  "pallas-addresses",
  "pallas-applying",
@@ -1671,9 +1676,8 @@ dependencies = [
 
 [[package]]
 name = "pallas-addresses"
-version = "0.23.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7015bf4b1770b7e2ce8c9742d7c798db540914562e67e22953eff4b6d53aab90"
+version = "0.24.0"
+source = "git+https://github.com/input-output-hk/catalyst-pallas.git?branch=fix/immutable-secondary#c992da03d63c8fb32c64e1d2142b7d969a90ee44"
 dependencies = [
  "base58",
  "bech32",
@@ -1687,9 +1691,8 @@ dependencies = [
 
 [[package]]
 name = "pallas-applying"
-version = "0.23.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f762f9cad2ba788fb7e8205442db54b6d45b65a7b0386853e7995002f23524f4"
+version = "0.24.0"
+source = "git+https://github.com/input-output-hk/catalyst-pallas.git?branch=fix/immutable-secondary#c992da03d63c8fb32c64e1d2142b7d969a90ee44"
 dependencies = [
  "hex",
  "pallas-addresses",
@@ -1702,9 +1705,8 @@ dependencies = [
 
 [[package]]
 name = "pallas-codec"
-version = "0.23.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b9f8d41f17000f9a6bab7c26c99b19038a12de5cf004e901e1d0f5fa993e3d7d"
+version = "0.24.0"
+source = "git+https://github.com/input-output-hk/catalyst-pallas.git?branch=fix/immutable-secondary#c992da03d63c8fb32c64e1d2142b7d969a90ee44"
 dependencies = [
  "hex",
  "minicbor",
@@ -1714,11 +1716,10 @@ dependencies = [
 
 [[package]]
 name = "pallas-configs"
-version = "0.23.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b204f901fc5aacd603444eedb790f6162628f7853010b18d25a3acfc08c8b18d"
+version = "0.24.0"
+source = "git+https://github.com/input-output-hk/catalyst-pallas.git?branch=fix/immutable-secondary#c992da03d63c8fb32c64e1d2142b7d969a90ee44"
 dependencies = [
- "base64 0.21.7",
+ "base64 0.22.0",
  "hex",
  "pallas-addresses",
  "pallas-codec",
@@ -1729,9 +1730,8 @@ dependencies = [
 
 [[package]]
 name = "pallas-crypto"
-version = "0.23.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6610d24e42fe2d8408022bda788ba4bf6d125debe3da404e2499848e108788a1"
+version = "0.24.0"
+source = "git+https://github.com/input-output-hk/catalyst-pallas.git?branch=fix/immutable-secondary#c992da03d63c8fb32c64e1d2142b7d969a90ee44"
 dependencies = [
  "cryptoxide",
  "hex",
@@ -1743,9 +1743,8 @@ dependencies = [
 
 [[package]]
 name = "pallas-hardano"
-version = "0.23.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "419c8c9777123b918eff1b85aa1280c765b4f2b44deb52924dd79814064a6bc6"
+version = "0.24.0"
+source = "git+https://github.com/input-output-hk/catalyst-pallas.git?branch=fix/immutable-secondary#c992da03d63c8fb32c64e1d2142b7d969a90ee44"
 dependencies = [
  "binary-layout",
  "pallas-network",
@@ -1757,9 +1756,8 @@ dependencies = [
 
 [[package]]
 name = "pallas-network"
-version = "0.23.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e581074044a45f6d65445b3796dd283fa513f13cf95412784a884da7bab4524e"
+version = "0.24.0"
+source = "git+https://github.com/input-output-hk/catalyst-pallas.git?branch=fix/immutable-secondary#c992da03d63c8fb32c64e1d2142b7d969a90ee44"
 dependencies = [
  "byteorder",
  "hex",
@@ -1775,9 +1773,8 @@ dependencies = [
 
 [[package]]
 name = "pallas-primitives"
-version = "0.23.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "73c1d8c016d49522e0de0b6839abeb0dbd2eb7de5353931d785ddc2cfe189d8a"
+version = "0.24.0"
+source = "git+https://github.com/input-output-hk/catalyst-pallas.git?branch=fix/immutable-secondary#c992da03d63c8fb32c64e1d2142b7d969a90ee44"
 dependencies = [
  "base58",
  "bech32",
@@ -1791,9 +1788,8 @@ dependencies = [
 
 [[package]]
 name = "pallas-traverse"
-version = "0.23.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2a92e50d84b029e069c9d6e36b38b1da2b5fe427c75a066697c8636e30dc9163"
+version = "0.24.0"
+source = "git+https://github.com/input-output-hk/catalyst-pallas.git?branch=fix/immutable-secondary#c992da03d63c8fb32c64e1d2142b7d969a90ee44"
 dependencies = [
  "hex",
  "pallas-addresses",
@@ -1807,9 +1803,8 @@ dependencies = [
 
 [[package]]
 name = "pallas-utxorpc"
-version = "0.23.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6c8ce48285a80d6a013fe5212c243a66e74f21c4f34dfc8f8f2be6687606a0e2"
+version = "0.24.0"
+source = "git+https://github.com/input-output-hk/catalyst-pallas.git?branch=fix/immutable-secondary#c992da03d63c8fb32c64e1d2142b7d969a90ee44"
 dependencies = [
  "pallas-codec",
  "pallas-primitives",
