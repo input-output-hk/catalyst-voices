@@ -13,7 +13,7 @@ use crate::{
         objects::cardano::{network::Network, sync_state::SyncState},
         responses::{
             resp_2xx::OK,
-            resp_4xx::NotFound,
+            resp_4xx::{ApiValidationError, NotFound},
             resp_5xx::{server_error_response, ServerError, ServiceUnavailable},
         },
     },
@@ -23,6 +23,7 @@ use crate::{
 /// # All Responses
 pub(crate) type AllResponses = response! {
     200: OK<Json<Option<SyncState>>>,
+    400: ApiValidationError,
     404: NotFound,
     500: ServerError,
     503: ServiceUnavailable,
