@@ -83,7 +83,15 @@ impl CardanoApi {
     /// * 500 Server Error - If anything within this function fails unexpectedly.
     /// * 503 Service Unavailable - Service is not ready, requests to other
     /// endpoints should not be sent until the service becomes ready.
-    async fn sync_state_get(&self, data: Data<&Arc<State>>) -> sync_state_get::AllResponses {
-        sync_state_get::endpoint(&data).await
+    async fn sync_state_get(
+        &self, data: Data<&Arc<State>>,
+        /// Cardano network type.
+        /// If omitted `mainnet` network type is defined.
+        /// As `preprod` and `preview` network types in the stake address encoded as a
+        /// `testnet`, to specify `preprod` or `preview` network type use this
+        /// query parameter.
+        network: Query<Option<Network>>,
+    ) -> sync_state_get::AllResponses {
+        sync_state_get::endpoint(&data, network.0).await
     }
 }

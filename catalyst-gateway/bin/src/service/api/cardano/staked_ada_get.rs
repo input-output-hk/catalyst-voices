@@ -91,7 +91,7 @@ pub(crate) async fn endpoint(
                         block_time,
                     })))
                 },
-                Err(DBError::NotFound(_)) => T404(NotFound),
+                Err(DBError::NotFound) => T404(NotFound),
                 Err(err) => T500(server_error!("{}", err.to_string())),
             }
         },

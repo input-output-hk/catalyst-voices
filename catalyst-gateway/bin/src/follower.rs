@@ -1,5 +1,5 @@
 //! Logic for orchestrating followers
-use std::{path::PathBuf, str::FromStr, sync::Arc};
+use std::{path::PathBuf, sync::Arc};
 
 /// Handler for follower tasks, allows for control over spawned follower threads
 pub type ManageTasks = JoinHandle<()>;
@@ -91,8 +91,6 @@ async fn spawn_followers(
     for config in &configs {
         info!("starting follower for {:?}", config.network);
 
-        let network = Network::from_str(&config.network)?;
-
         // Tick until data is stale then start followers
         let mut interval = time::interval(time::Duration::from_secs(data_refresh_tick));
         let task_handler = loop {
@@ -102,7 +100,7 @@ async fn spawn_followers(
             // continue indexing from that point. If there was no previous follower, we
             // start from genesis point.
             let (slot_no, block_hash, last_updated) =
-                find_last_update_point(db.clone(), &config.network).await?;
+                find_last_update_point(db.clone(), config.network).await?;
 
             // Data is marked as stale after N seconds with no updates.
             let threshold = if let Some(last_update) = last_updated {
@@ -119,11 +117,11 @@ async fn spawn_followers(
                 > config.mithril_snapshot.timing_pattern.into()
             {
                 info!(
-                    "Last update is stale for network {} - ready to update, starting follower now.",
+                    "Last update is stale for network {:?} - ready to update, starting follower now.",
                     config.network
                 );
                 let follower_handler = init_follower(
-                    network,
+                    config.network,
                     &config.relay,
                     (slot_no, block_hash),
                     db.clone(),
@@ -134,7 +132,7 @@ async fn spawn_followers(
                 break follower_handler;
             }
             info!(
-                "Data is still fresh for network {}, tick until data is stale",
+                "Data is still fresh for network {:?}, tick until data is stale",
                 config.network
             );
         };
@@ -148,22 +146,21 @@ async fn spawn_followers(
 /// Establish point at which the last follower stopped updating in order to pick up where
 /// it left off. If there was no previous follower, start indexing from genesis point.
 async fn find_last_update_point(
-    db: Arc<EventDB>, network: &String,
+    db: Arc<EventDB>, network: Network,
 ) -> anyhow::Result<(Option<SlotNumber>, Option<BlockHash>, Option<BlockTime>)> {
-    let (slot_no, block_hash, last_updated) =
-        match db.last_updated_metadata(network.to_string()).await {
-            Ok((slot_no, block_hash, last_updated)) => {
-                info!(
+    let (slot_no, block_hash, last_updated) = match db.last_updated_metadata(network).await {
+        Ok((slot_no, block_hash, last_updated)) => {
+            info!(
                 "Previous follower stopped updating at Slot_no: {} block_hash:{} last_updated: {}",
                 slot_no, block_hash, last_updated
             );
-                (Some(slot_no), Some(block_hash), Some(last_updated))
-            },
-            Err(err) => {
-                info!("No previous followers, start from genesis. Db msg: {}", err);
-                (None, None, None)
-            },
-        };
+            (Some(slot_no), Some(block_hash), Some(last_updated))
+        },
+        Err(err) => {
+            info!("No previous followers, start from genesis. Db msg: {}", err);
+            (None, None, None)
+        },
+    };
 
     Ok((slot_no, block_hash, last_updated))
 }

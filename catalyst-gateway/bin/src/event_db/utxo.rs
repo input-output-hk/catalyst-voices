@@ -8,10 +8,7 @@ use super::{
     voter_registration::StakeCredential,
 };
 use crate::{
-    event_db::{
-        Error::{self, SqlTypeConversionFailure},
-        EventDB,
-    },
+    event_db::{Error, EventDB},
     util::{
         extract_hashed_witnesses, extract_stake_credentials_from_certs,
         find_matching_stake_credential, parse_policy_assets,
@@ -65,19 +62,10 @@ impl EventDB {
                     .query(
                         include_str!("../../../event-db/queries/utxo/insert_utxo.sql"),
                         &[
-                            &i32::try_from(index).map_err(|e| {
-                                Error::NotFound(
-                                    SqlTypeConversionFailure(format!("Issue converting type {e}"))
-                                        .to_string(),
-                                )
-                            })?,
+                            &i32::try_from(index).map_err(|_| Error::NotFound)?,
                             &tx.hash().as_slice(),
-                            &i64::try_from(tx_out.lovelace_amount()).map_err(|e| {
-                                Error::NotFound(
-                                    SqlTypeConversionFailure(format!("Issue converting type {e}"))
-                                        .to_string(),
-                                )
-                            })?,
+                            &i64::try_from(tx_out.lovelace_amount())
+                                .map_err(|_| Error::NotFound)?,
                             &hex::decode(&stake_credential_hash).map_err(|e| {
                                 Error::DecodeHex(format!(
                                     "Unable to decode stake credential hash {e}"
@@ -146,7 +134,7 @@ impl EventDB {
 
             Ok((amount, slot_number, block_time))
         } else {
-            Err(Error::NotFound("Cannot find total utxo amount".to_string()))
+            Err(Error::NotFound)
         }
     }
 }
