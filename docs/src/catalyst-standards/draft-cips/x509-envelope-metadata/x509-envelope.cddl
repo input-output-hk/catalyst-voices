@@ -21,9 +21,18 @@ x509_envelope = $x509_envelope .within transaction_metadatum
 $x509_envelope /= {
 	0: purpose, ; What purpose does this metadata serve.
 	1: tx_inputs_hash, ; A hash of the `transaction inputs` field from the transaction the metadata is posted with.
+	?2: previous_transaction_id ; Previous transaction ID in the chain of registration updates for this user.
 	? chunk_type => [ + x509_chunk ] ; Chunked x509 role registration data.
 	99: validation_signature ; The signature of the x509 envelope plus all other auxiliary data.
 }
+
+; hash of the previous transaction in the registration chain.
+; There can only be one registration for a user for a purpose that does not have a previous transaction id.
+; This would be the first.
+; Once that is posted, all updates must properly maintian the chain.
+; Dangling registrations for the same purpose are ignored.
+previous_transaction_id = $hash32
+$hash32 /= bytes .size 32
 
 ; x509 Role Registration data is chunked and optionally (preferably) compressed.
 ; This enables the x509 registration data to have a strucutre not supported by the

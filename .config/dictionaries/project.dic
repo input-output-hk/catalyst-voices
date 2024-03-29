@@ -107,6 +107,7 @@ pubspec
 pytest
 rapidoc
 redoc
+Replayability
 reqwest
 ripgrep
 rustc
