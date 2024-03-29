@@ -1,8 +1,10 @@
 VERSION --try --global-cache --arg-scope-and-set 0.7
 
-# If running this target with a local ssh agent active, set the environment variable EARTHLY_SSH_AUTH_SOCK=''
-# to make the `+deps` target work. Earthly defaults to ssh authentication when it founds an ssh agent active
-# but the flutter repo needs to be cloned via https to properly use the `channel` subcommand.
+# If running this target with a local ssh agent active, set the environment
+# variable EARTHLY_SSH_AUTH_SOCK='' to make the `+deps` target work. Earthly
+# defaults to ssh authentication when it founds an ssh agent active but the
+# flutter repo needs to be cloned via https to properly use the `channel`
+# subcommand.
 deps:
     FROM debian:bookworm-slim
     RUN apt-get update
@@ -27,24 +29,30 @@ src:
     FROM +deps
     COPY --dir pubspec.yaml lib packages web test test_driver integration_test .
 
-# Code generator based on Catalyst Gateway OpenAPI specs.
+# code-generator - Generates flutter code.
+# Based on Catalyst Gateway OpenAPI specifications generates models, clients
+# and serialization logic.
 code-generator:
     FROM +deps
     COPY --dir pubspec.yaml lib packages web test test_driver integration_test catalyst_voices
-    COPY ../+catalyst-voices-packages/catalyst_voices_packages .
+    COPY ../+repo-catalyst-voices-packages/repo .
     WORKDIR /frontend/catalyst_voices/packages/catalyst_voices_services
     COPY ../catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
     RUN flutter pub get
     RUN dart run build_runner build --delete-conflicting-outputs
     SAVE ARTIFACT lib/generated
 
-# This command run the code generator locally and place the proper artifacts in the catalyst_voices_models folder
+# code-generator-local - Generates flutter code locally.
+# Based on Catalyst Gateway OpenAPI specifications generates models, clients
+# and serialization logic and place the produced artifacts in the
+# catalyst_voices_models folder.
 code-generator-local:
     FROM +code-generator
     SAVE ARTIFACT lib/generated/* AS LOCAL ./packages/catalyst_voices_models/lib/generated/
 
-# This run the code generation on the CI and checks the code is consistent with what is in the repo
-test-flutter-code-generator:
+# check-flutter-code-generator - Checks that the code generation is consistent
+# with the generated code currently in the repo.
+check-flutter-code-generator:
     FROM +code-generator
     COPY packages/catalyst_voices_models/lib/generated /tmp/repo_generated
     RUN diff /tmp/repo_generated lib/generated
