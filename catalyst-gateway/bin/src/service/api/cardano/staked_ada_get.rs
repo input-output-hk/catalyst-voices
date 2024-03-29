@@ -32,6 +32,46 @@ pub(crate) type AllResponses = response! {
     503: ServiceUnavailable,
 };
 
+/// Check the provided network type with the encoded inside the stake address
+fn check_network(
+    address_network: pallas::ledger::addresses::Network, provided_network: Option<Network>,
+) -> Result<Network, ApiValidationError> {
+    match address_network {
+        pallas::ledger::addresses::Network::Mainnet => {
+            if let Some(network) = provided_network {
+                if !matches!(&network, Network::Mainnet) {
+                    return Err(ApiValidationError::new(format!(
+                                "Provided network type {} does not match stake address network type Mainnet",  network.to_json_string()
+                            )));
+                }
+            }
+            Ok(Network::Mainnet)
+        },
+        pallas::ledger::addresses::Network::Testnet => {
+            // the preprod and preview network types are encoded as `testnet` in the stake
+            // address, so here we are checking if the `provided_network` type matches the
+            // one, and if not - we return an error.
+            // if the `provided_network` omitted - we return the `testnet` network type
+            if let Some(network) = provided_network {
+                if !matches!(
+                    network,
+                    Network::Testnet | Network::Preprod | Network::Preview
+                ) {
+                    return Err(ApiValidationError::new(format!(
+                                "Provided network type {} does not match stake address network type Testnet", network.to_json_string()
+                            )));
+                }
+                Ok(network)
+            } else {
+                Ok(Network::Testnet)
+            }
+        },
+        pallas::ledger::addresses::Network::Other(x) => {
+            Err(ApiValidationError::new(format!("Unknown network type {x}")))
+        },
+    }
+}
+
 /// # GET `/utxo/staked_ada`
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(
@@ -55,40 +95,9 @@ pub(crate) async fn endpoint(
     let date_time = date_time.unwrap_or_else(Utc::now);
     let stake_credential = stake_address.payload().as_hash().as_ref();
 
-    // check the provided network type with the encoded inside the stake address
-    let network = match stake_address.network() {
-        pallas::ledger::addresses::Network::Mainnet => {
-            if let Some(network) = provided_network {
-                if !matches!(&network, Network::Mainnet) {
-                    return T400(ApiValidationError::new(format!(
-                                "Provided network type {} does not match stake address network type Mainnet",  network.to_json_string()
-                            )));
-                }
-            }
-            Network::Mainnet
-        },
-        pallas::ledger::addresses::Network::Testnet => {
-            // the preprod and preview network types are encoded as `testnet` in the stake
-            // address, so here we are checking if the `provided_network` type matches the
-            // one, and if not - we return an error.
-            // if the `provided_network` omitted - we return the `testnet` network type
-            if let Some(network) = provided_network {
-                if !matches!(
-                    network,
-                    Network::Testnet | Network::Preprod | Network::Preview
-                ) {
-                    return T400(ApiValidationError::new(format!(
-                                "Provided network type {} does not match stake address network type Testnet", network.to_json_string()
-                            )));
-                }
-                network
-            } else {
-                Network::Testnet
-            }
-        },
-        pallas::ledger::addresses::Network::Other(x) => {
-            return T400(ApiValidationError::new(format!("Unknown network type {x}")));
-        },
+    let network = match check_network(stake_address.network(), provided_network) {
+        Ok(network) => network,
+        Err(err) => return T400(err),
     };
 
     // get the total utxo amount from the database
