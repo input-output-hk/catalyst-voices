@@ -13,6 +13,12 @@ import 'package:flutter/material.dart';
 class VoicesColors {
   VoicesColors._();
 
+  /// Color: #1235C7
+  static const Color blue = Color(0xFF1235C7);
+
+  /// Color: #506288
+  static const Color blueText = Color(0xFF506288);
+
   /// Color: #000000
   static const Color darkBackground = Color(0xFF000000);
 
