@@ -5,7 +5,7 @@ import WalletCard from "./WalletCard";
 type Props = {
   selectedWallet: string;
   wallets: string[];
-  onSelect: (wallet: string) => void;
+  onSelect?: (wallet: string) => void;
 };
 
 function WalletViewSelection({ wallets, selectedWallet, onSelect = noop }: Props) {

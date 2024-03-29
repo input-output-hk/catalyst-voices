@@ -49,13 +49,19 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
   });
 
   const sellectedWalletApi = pickBy(walletApi, (v, k) => selectedWallets.includes(k));
-  const utxos = uniq([
-    ...Object.values(walletApi).flatMap((api) => api.info["utxos"]?.raw ?? [])
-  ]);
+  const utxos = uniq([...Object.values(walletApi).flatMap((api) => api.info["utxos"]?.raw ?? [])]);
   const addrs = uniq([
     ...Object.values(walletApi).flatMap((api) => api.info["usedAddresses"]?.value ?? []),
-    ...Object.values(walletApi).flatMap((api) => compact(api.info["utxos"]?.value?.map?.((x: any) => x?.["output"]?.["address"] ?? null) ?? [])),
-    ...Object.values(walletApi).flatMap((api) => compact(api.info["collateral"]?.value?.map?.((x: any) => x?.["output"]?.["address"] ?? null) ?? [])),
+    ...Object.values(walletApi).flatMap((api) => api.info["unusedAddresses"]?.value ?? []),
+    ...Object.values(walletApi).flatMap((api) => compact([api.info["changeAddress"]?.value])),
+    ...Object.values(walletApi).flatMap((api) =>
+      compact(api.info["utxos"]?.value?.map?.((x: any) => x?.["output"]?.["address"] ?? null) ?? [])
+    ),
+    ...Object.values(walletApi).flatMap((api) =>
+      compact(
+        api.info["collateral"]?.value?.map?.((x: any) => x?.["output"]?.["address"] ?? null) ?? []
+      )
+    ),
   ]);
 
   async function handleTxBuilderSubmit(builderArgs: TxBuilderArguments) {

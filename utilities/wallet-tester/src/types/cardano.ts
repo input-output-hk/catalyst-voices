@@ -27,6 +27,14 @@ export type ExtractedWalletApi = {
   [key: `cip${number}`]: any;
 };
 
+export enum MetadataValueType {
+  Text = "text",
+  Hex = "hex",
+  Int = "int",
+  List = "list",
+  Map = "map",
+}
+
 export enum CertificateType {
   StakeRegistration = "stake_registration",
   StakeDeregistration = "stake_deregistration",
@@ -94,7 +102,7 @@ export type TxBuilderArguments = {
     type: AuxMetadataType;
     metadata: {
       key: string;
-      valueType: string;
+      valueType: MetadataValueType | "";
       value: string;
     }[];
     // TODO: add support for scripts

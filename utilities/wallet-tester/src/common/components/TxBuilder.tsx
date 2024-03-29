@@ -4,17 +4,20 @@ import { Disclosure } from "@headlessui/react";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
 import { capitalize, cloneDeep, noop, upperCase } from "lodash-es";
+import { useState } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { twMerge } from "tailwind-merge";
 
-import { CertificateType, type TxBuilderArguments } from "types/cardano";
+import { CertificateType, MetadataValueType, type TxBuilderArguments } from "types/cardano";
 
 import Button from "./Button";
+import CBOREditor from "./CBOREditor";
 import Combobox from "./Combobox";
 import Dropdown from "./Dropdown";
 import Input from "./Input";
 import TxBuilderMultiFieldsSection from "./TxBuilderMultiFieldsSection";
 import TxBuilderSingleFieldSection from "./TxBuilderSingleFieldSection";
+import WalletViewSelection from "./WalletViewSelection";
 
 const PROTOCOL_PARAMS = {
   linearFee: {
@@ -42,10 +45,15 @@ type Props = {
 };
 
 function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
+  const [resetSignal, setResetSignal] = useState(0);
+
   const { handleSubmit, register, resetField, control, reset } = useForm<FormValues>({
     defaultValues: {
       txInputs: [],
       txOutputs: [],
+      certificates: [],
+      requiredSigners: [],
+      rewardWithdrawals: [],
       auxMetadata: {
         metadata: [],
       },
@@ -62,15 +70,15 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
 
   function handleReset() {
     reset();
+    setResetSignal((prev) => (prev ? 0 : 1));
   }
 
   async function onSubmit(formValues: FormValues) {
-    console.log(formValues);
     onPropSubmit(formValues);
   }
 
   return (
-    <form className="grid gap-2" autoComplete="off">
+    <form key={resetSignal} className="grid gap-2" autoComplete="off">
       <TxBuilderMultiFieldsSection
         heading="Transaction Inputs"
         onAddClick={() => txInputFields.append({ hex: "" })}
@@ -80,7 +88,7 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
           <div className="grow grid gap-2">
             <Controller
               control={control}
-              name={`txOutputs.${i}.amount`}
+              name={`txInputs.${i}.hex`}
               render={({ field: { value, onChange } }) => (
                 <Combobox
                   value={value}
@@ -170,8 +178,8 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
                 certificateFields.fields[i]?.type === value
                   ? null
                   : certificateFields.replace({
-                    type: value /* TODO: support default values for each type */,
-                  })
+                      type: value /* TODO: support default values for each type */,
+                    })
               }
             />
             {certificateFields.fields[i]?.type === CertificateType.StakeDelegation ? (
@@ -182,7 +190,7 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
                     className={twMerge(
                       "w-full rounded px-1 border border-solid border-black",
                       certificateFields.fields[i]?.hashType === "addr_keyhash" &&
-                      "bg-black text-white"
+                        "bg-black text-white"
                     )}
                     onClick={() =>
                       certificateFields.update(i, {
@@ -198,7 +206,7 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
                     className={twMerge(
                       "w-full rounded px-1 border border-solid border-black",
                       certificateFields.fields[i]?.hashType === "scripthash" &&
-                      "bg-black text-white"
+                        "bg-black text-white"
                     )}
                     onClick={() =>
                       certificateFields.update(i, {
@@ -271,6 +279,8 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
           <Input
             type="text"
             label="Auxilliary Data Hash"
+            placeholder="Auto generated"
+            disabled={true}
             formRegister={register("auxilliaryDataHash")}
           />
         )}
@@ -315,7 +325,15 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
       <TxBuilderSingleFieldSection
         heading="Network ID"
         onRemoveClick={() => resetField("networkId")}
-        render={() => <Input type="text" label="Network ID" formRegister={register("networkId")} />}
+        render={() => (
+          <Input
+            type="text"
+            disabled={true}
+            placeholder="Auto generated"
+            label="Network ID"
+            formRegister={register("networkId")}
+          />
+        )}
       />
       <Disclosure>
         <Disclosure.Button className="flex gap-2 items-center text-left text-sm font-semibold">
@@ -370,21 +388,53 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
         <Disclosure.Panel className="grid gap-2">
           <TxBuilderMultiFieldsSection
             heading="Transaction Metadata"
-            onAddClick={() => metadataFields.append({ key: "", valueType: "", value: "" })}
+            onAddClick={() =>
+              metadataFields.append({ key: "", valueType: MetadataValueType.Text, value: "" })
+            }
             onRemoveClick={(i) => metadataFields.remove(i)}
             fields={metadataFields.fields}
             render={(i) => (
-              <div className="grow grid gap-2 grid-cols-2">
-                <Input
-                  type="number"
-                  min={0}
-                  label={`Label #${i + 1}`}
-                  formRegister={register(`auxMetadata.metadata.${i}.key`)}
-                />
-                <Input
-                  type="text"
-                  label={`Metadatum #${i + 1}`}
-                  formRegister={register(`auxMetadata.metadata.${i}.value`)}
+              <div className="grow grid gap-4">
+                <Controller
+                  control={control}
+                  name={`auxMetadata.metadata.${i}`}
+                  render={({ field: { value, onChange } }) => (
+                    <>
+                      <WalletViewSelection
+                        selectedWallet={value.valueType}
+                        wallets={Object.values(MetadataValueType).filter(
+                          (x) => ![MetadataValueType.List, MetadataValueType.Map].includes(x)
+                        )}
+                        onSelect={(valueType) => onChange({ ...value, valueType, value: "" })}
+                      />
+                      <div
+                        className={twMerge(
+                          "grid gap-2",
+                          value.valueType !== MetadataValueType.Hex && "grid-cols-2"
+                        )}
+                      >
+                        <Input
+                          type="number"
+                          min={0}
+                          label={`Label #${i + 1}`}
+                          formRegister={register(`auxMetadata.metadata.${i}.key`)}
+                        />
+                        {value.valueType === MetadataValueType.Hex ? (
+                          <CBOREditor
+                            value={value.value}
+                            onChange={(val) => onChange({ ...value, value: val })}
+                          />
+                        ) : (
+                          <Input
+                            type="text"
+                            label={`Metadatum #${i + 1}`}
+                            value={value.value}
+                            onChange={(e) => onChange({ ...value, value: e.target.value })}
+                          />
+                        )}
+                      </div>
+                    </>
+                  )}
                 />
               </div>
             )}

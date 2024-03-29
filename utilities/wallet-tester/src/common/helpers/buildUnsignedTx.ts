@@ -9,6 +9,7 @@ import {
   Certificates,
   Ed25519KeyHash,
   GeneralTransactionMetadata,
+  Int,
   LinearFee,
   RewardAddress,
   StakeCredential,
@@ -25,7 +26,9 @@ import {
   Withdrawals,
 } from "@emurgo/cardano-serialization-lib-asmjs";
 
-import { CertificateType, type TxBuilderArguments } from "types/cardano";
+import { CertificateType, MetadataValueType, type TxBuilderArguments } from "types/cardano";
+
+import hex2bin from "./hex2bin";
 
 export default async function buildUnsignedTx(payload: TxBuilderArguments): Promise<Transaction> {
   const { config, ...builder } = payload;
@@ -110,8 +113,18 @@ export default async function buildUnsignedTx(payload: TxBuilderArguments): Prom
   for (const item of builder.rewardWithdrawals.filter(
     (x) => Boolean(x.address) && Boolean(x.value)
   )) {
-    const rewardAddress = RewardAddress.from_address(Address.from_bech32(item.address));
+    let rewardAddress = RewardAddress.from_address(Address.from_bech32(item.address));
     const value = BigNum.from_str(item.value);
+
+    // fallback
+    if (!rewardAddress) {
+      const stakeCred = BaseAddress.from_address(Address.from_bech32(item.address))?.stake_cred();
+
+      if (stakeCred) {
+        const net = item.address.includes("test") ? 0 : 1;
+        rewardAddress = RewardAddress.new(net, stakeCred);
+      }
+    }
 
     if (!rewardAddress) {
       throw new Error("cannot create an address");
@@ -122,6 +135,17 @@ export default async function buildUnsignedTx(payload: TxBuilderArguments): Prom
 
   if (withdrawals.len()) {
     txBuilder.set_withdrawals(withdrawals);
+  }
+
+  // #7 add auxilary data hash
+  if (builder.auxilliaryDataHash) {
+    // auto generated
+  }
+
+  // #8 add validity interval start
+  if (builder.validityIntervalStart) {
+    const val = BigNum.from_str(builder.validityIntervalStart);
+    txBuilder.set_validity_start_interval_bignum(val);
   }
 
   // #14 add required signers
@@ -138,14 +162,41 @@ export default async function buildUnsignedTx(payload: TxBuilderArguments): Prom
     txBuilder.add_required_signer(Ed25519KeyHash.from_hex(stakeCred));
   }
 
+  // #15 add network id
+  if (builder.networkId) {
+    // auto generated
+  }
+
   // aux data
   const auxMetadata = AuxiliaryData.new();
   const txMetadata = GeneralTransactionMetadata.new();
   for (const item of builder.auxMetadata.metadata) {
+    let txMetadatum: TransactionMetadatum;
+    if (item.valueType === MetadataValueType.Text) {
+      txMetadatum = TransactionMetadatum.new_text(item.value);
+    } else if (item.valueType === MetadataValueType.Hex) {
+      txMetadatum = TransactionMetadatum.new_bytes(hex2bin(item.value));
+    } else if (item.valueType === MetadataValueType.Int) {
+      txMetadatum = TransactionMetadatum.new_int(Int.from_str(item.value));
+    } else if (item.valueType === MetadataValueType.List) {
+      // TODO:
+      throw new Error("value type is currently not supported");
+    } else if (item.valueType === MetadataValueType.Map) {
+      // TODO:
+      throw new Error("value type is currently not supported");
+    } else {
+      throw new Error("unknown value type");
+    }
+
     const regMessageMetadatumLabel = BigNum.from_str(item.key);
     // TODO: support other types
-    const regMessageMetadatum = TransactionMetadatum.new_text(item.value);
-    txMetadata.insert(regMessageMetadatumLabel, regMessageMetadatum);
+
+    // MetadataMap.new().insert()
+    // MetadataList.new().add()
+
+    // TransactionMetadatum.new_map(MetadataMap.new())
+    // TransactionMetadatum.new_list(MetadataList.new())
+    txMetadata.insert(regMessageMetadatumLabel, txMetadatum);
   }
 
   if (txMetadata.len()) {
