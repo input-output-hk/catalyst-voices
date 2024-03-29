@@ -2,7 +2,7 @@
 
 use poem_extensions::{
     response,
-    UniResponse::{T200, T404, T500, T503},
+    UniResponse::{T200, T404, T503},
 };
 use poem_openapi::payload::Json;
 
@@ -14,7 +14,7 @@ use crate::{
         responses::{
             resp_2xx::OK,
             resp_4xx::NotFound,
-            resp_5xx::{server_error, ServerError, ServiceUnavailable},
+            resp_5xx::{server_error_response, ServerError, ServiceUnavailable},
         },
     },
     state::{SchemaVersionStatus, State},
@@ -31,22 +31,8 @@ pub(crate) type AllResponses = response! {
 /// # GET `/utxo/staked_ada`
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(state: &State, network: Option<Network>) -> AllResponses {
-    match state.event_db() {
-        Ok(event_db) => {
-            let network = network.unwrap_or(Network::Mainnet);
-
-            match event_db.last_updated_metadata(network.into()).await {
-                Ok((slot_number, block_hash, last_updated)) => {
-                    T200(OK(Json(Some(SyncState {
-                        slot_number,
-                        block_hash,
-                        last_updated,
-                    }))))
-                },
-                Err(DBError::NotFound) => T404(NotFound),
-                Err(err) => T500(server_error!("{}", err.to_string())),
-            }
-        },
+    let event_db = match state.event_db() {
+        Ok(event_db) => event_db,
         Err(Error::EventDb(DBError::MismatchedSchema { was, expected })) => {
             tracing::error!(
                 expected = expected,
@@ -54,8 +40,22 @@ pub(crate) async fn endpoint(state: &State, network: Option<Network>) -> AllResp
                 "DB schema version status mismatch"
             );
             state.set_schema_version_status(SchemaVersionStatus::Mismatch);
-            T503(ServiceUnavailable)
+            return T503(ServiceUnavailable);
         },
-        Err(err) => T500(server_error!("{}", err.to_string())),
+        Err(err) => return server_error_response!("{err}"),
+    };
+
+    let network = network.unwrap_or(Network::Mainnet);
+
+    match event_db.last_updated_metadata(network.into()).await {
+        Ok((slot_number, block_hash, last_updated)) => {
+            T200(OK(Json(Some(SyncState {
+                slot_number,
+                block_hash,
+                last_updated,
+            }))))
+        },
+        Err(DBError::NotFound) => T404(NotFound),
+        Err(err) => server_error_response!("{err}"),
     }
 }
