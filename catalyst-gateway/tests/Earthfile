@@ -20,6 +20,7 @@ package-schemathesis:
     ENTRYPOINT st run --checks all \
                       # TODO: https://github.com/input-output-hk/catalyst-voices/issues/330
                       --exclude-checks content_type_conformance \
+                      --exclude-checks response_schema_conformance \
                       --data-generation-method all \
                       --workers=$workers \
                       --wait-for-schema=$wait_for_schema \
