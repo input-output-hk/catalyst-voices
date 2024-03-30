@@ -1,0 +1,344 @@
+// ignore_for_file: type=lint
+
+import 'package:json_annotation/json_annotation.dart';
+import 'package:collection/collection.dart';
+import 'dart:convert';
+
+import 'cat_gateway_api.models.swagger.dart';
+import 'package:chopper/chopper.dart';
+
+import 'client_mapping.dart';
+import 'dart:async';
+import 'package:http/http.dart' as http;
+import 'package:http/http.dart' show MultipartFile;
+import 'package:chopper/chopper.dart' as chopper;
+import 'cat_gateway_api.enums.swagger.dart' as enums;
+export 'cat_gateway_api.enums.swagger.dart';
+export 'cat_gateway_api.models.swagger.dart';
+
+part 'cat_gateway_api.swagger.chopper.dart';
+
+// **************************************************************************
+// SwaggerChopperGenerator
+// **************************************************************************
+
+@ChopperApi()
+abstract class CatGatewayApi extends ChopperService {
+  static CatGatewayApi create({
+    ChopperClient? client,
+    http.Client? httpClient,
+    Authenticator? authenticator,
+    ErrorConverter? errorConverter,
+    Converter? converter,
+    Uri? baseUrl,
+    Iterable<dynamic>? interceptors,
+  }) {
+    if (client != null) {
+      return _$CatGatewayApi(client);
+    }
+
+    final newClient = ChopperClient(
+        services: [_$CatGatewayApi()],
+        converter: converter ?? $JsonSerializableConverter(),
+        interceptors: interceptors ?? [],
+        client: httpClient,
+        authenticator: authenticator,
+        errorConverter: errorConverter,
+        baseUrl: baseUrl ?? Uri.parse('http://'));
+    return _$CatGatewayApi(newClient);
+  }
+
+  ///Test Get API
+  ///@param id The ID of the test.  This comment ends up in the documentation.  * 5 will print an info log * 10 will print a warn log * 15 will print a error log * 20 will panic which should generate a 500
+  ///@param action The action just needs to be any valid UUID.  # Make sure its a UUID
+  ///@param pet List your favorite pets, in order of preference
+  @deprecated
+  Future<chopper.Response> apiTestTestIdTestActionGet({
+    required int? id,
+    required String? action,
+    List<enums.Animals>? pet,
+  }) {
+    return _apiTestTestIdTestActionGet(
+        id: id, action: action, pet: animalsListToJson(pet));
+  }
+
+  ///Test Get API
+  ///@param id The ID of the test.  This comment ends up in the documentation.  * 5 will print an info log * 10 will print a warn log * 15 will print a error log * 20 will panic which should generate a 500
+  ///@param action The action just needs to be any valid UUID.  # Make sure its a UUID
+  ///@param pet List your favorite pets, in order of preference
+  @deprecated
+  @Get(path: '/api/test/test/{id}/test/{action}')
+  Future<chopper.Response> _apiTestTestIdTestActionGet({
+    @Path('id') required int? id,
+    @Path('action') required String? action,
+    @Query('pet') List<Object?>? pet,
+  });
+
+  ///Test Post API
+  ///@param id The ID of the test.  * 5 will print an info log * 10 will print a warn log * 15 will print a error log * 20 will panic which should generate a 500
+  ///@param action The action just needs to be any valid UUID.  # Make sure its a UUID
+  @deprecated
+  Future<chopper.Response> apiTestTestIdTestActionPost({
+    required int? id,
+    required String? action,
+  }) {
+    return _apiTestTestIdTestActionPost(id: id, action: action);
+  }
+
+  ///Test Post API
+  ///@param id The ID of the test.  * 5 will print an info log * 10 will print a warn log * 15 will print a error log * 20 will panic which should generate a 500
+  ///@param action The action just needs to be any valid UUID.  # Make sure its a UUID
+  @deprecated
+  @Post(
+    path: '/api/test/test/{id}/test/{action}',
+    optionalBody: true,
+  )
+  Future<chopper.Response> _apiTestTestIdTestActionPost({
+    @Path('id') required int? id,
+    @Path('action') required String? action,
+  });
+
+  ///Service Started
+  Future<chopper.Response> apiHealthStartedGet() {
+    return _apiHealthStartedGet();
+  }
+
+  ///Service Started
+  @Get(path: '/api/health/started')
+  Future<chopper.Response> _apiHealthStartedGet();
+
+  ///Service Ready
+  Future<chopper.Response> apiHealthReadyGet() {
+    return _apiHealthReadyGet();
+  }
+
+  ///Service Ready
+  @Get(path: '/api/health/ready')
+  Future<chopper.Response> _apiHealthReadyGet();
+
+  ///Service Live
+  Future<chopper.Response> apiHealthLiveGet() {
+    return _apiHealthLiveGet();
+  }
+
+  ///Service Live
+  @Get(path: '/api/health/live')
+  Future<chopper.Response> _apiHealthLiveGet();
+
+  ///Get staked ada amount.
+  ///@param stake_address The stake address of the user. Should a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
+  ///@param network Cardano network type. If omitted network type is identified from the stake address. If specified it must be correspondent to the network type encoded in the stake address. As `preprod` and `preview` network types in the stake address encoded as a `testnet`, to specify `preprod` or `preview` network type use this query parameter.
+  ///@param date_time Date time at which the staked ada amount should be calculated. If omitted current date time is used.
+  @deprecated
+  Future<chopper.Response<StakeInfo>> apiUtxoStakedAdaStakeAddressGet({
+    required String? stakeAddress,
+    enums.Network? network,
+    DateTime? dateTime,
+  }) {
+    generatedMapping.putIfAbsent(StakeInfo, () => StakeInfo.fromJsonFactory);
+
+    return _apiUtxoStakedAdaStakeAddressGet(
+        stakeAddress: stakeAddress,
+        network: network?.value?.toString(),
+        dateTime: dateTime);
+  }
+
+  ///Get staked ada amount.
+  ///@param stake_address The stake address of the user. Should a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
+  ///@param network Cardano network type. If omitted network type is identified from the stake address. If specified it must be correspondent to the network type encoded in the stake address. As `preprod` and `preview` network types in the stake address encoded as a `testnet`, to specify `preprod` or `preview` network type use this query parameter.
+  ///@param date_time Date time at which the staked ada amount should be calculated. If omitted current date time is used.
+  @deprecated
+  @Get(path: '/api/utxo/staked_ada/{stake_address}')
+  Future<chopper.Response<StakeInfo>> _apiUtxoStakedAdaStakeAddressGet({
+    @Path('stake_address') required String? stakeAddress,
+    @Query('network') String? network,
+    @Query('date_time') DateTime? dateTime,
+  });
+
+  ///Voter's info
+  ///@param voting_key A Voters Public ED25519 Key (as registered in their most recent valid [CIP-15](https://cips.cardano.org/cips/cip15) or [CIP-36](https://cips.cardano.org/cips/cip36) registration).
+  ///@param event_id The Event ID to return results for. See [GET Events](Link to events endpoint) for details on retrieving all valid event IDs.
+  ///@param with_delegators If this optional flag is set, the response will include the delegator's list in the response. Otherwise, it will be omitted.
+  @deprecated
+  Future<chopper.Response<VoterRegistration>> apiRegistrationVoterVotingKeyGet({
+    required String? votingKey,
+    int? eventId,
+    bool? withDelegators,
+  }) {
+    generatedMapping.putIfAbsent(
+        VoterRegistration, () => VoterRegistration.fromJsonFactory);
+
+    return _apiRegistrationVoterVotingKeyGet(
+        votingKey: votingKey, eventId: eventId, withDelegators: withDelegators);
+  }
+
+  ///Voter's info
+  ///@param voting_key A Voters Public ED25519 Key (as registered in their most recent valid [CIP-15](https://cips.cardano.org/cips/cip15) or [CIP-36](https://cips.cardano.org/cips/cip36) registration).
+  ///@param event_id The Event ID to return results for. See [GET Events](Link to events endpoint) for details on retrieving all valid event IDs.
+  ///@param with_delegators If this optional flag is set, the response will include the delegator's list in the response. Otherwise, it will be omitted.
+  @deprecated
+  @Get(path: '/api/registration/voter/{voting_key}')
+  Future<chopper.Response<VoterRegistration>>
+      _apiRegistrationVoterVotingKeyGet({
+    @Path('voting_key') required String? votingKey,
+    @Query('event_id') int? eventId,
+    @Query('with_delegators') bool? withDelegators,
+  });
+
+  ///Posts a signed transaction.
+  @deprecated
+  Future<chopper.Response<FragmentsProcessingSummary>> apiV0MessagePost(
+      {required Object? body}) {
+    generatedMapping.putIfAbsent(FragmentsProcessingSummary,
+        () => FragmentsProcessingSummary.fromJsonFactory);
+
+    return _apiV0MessagePost(body: body);
+  }
+
+  ///Posts a signed transaction.
+  @deprecated
+  @Post(
+    path: '/api/v0/message',
+    optionalBody: true,
+  )
+  Future<chopper.Response<FragmentsProcessingSummary>> _apiV0MessagePost(
+      {@Body() required Object? body});
+
+  ///Get all active vote plans endpoint.
+  @deprecated
+  Future<chopper.Response<List<VotePlan>>> apiV0VoteActivePlansGet() {
+    generatedMapping.putIfAbsent(VotePlan, () => VotePlan.fromJsonFactory);
+
+    return _apiV0VoteActivePlansGet();
+  }
+
+  ///Get all active vote plans endpoint.
+  @deprecated
+  @Get(path: '/api/v0/vote/active/plans')
+  Future<chopper.Response<List<VotePlan>>> _apiV0VoteActivePlansGet();
+
+  ///Get Account Votes
+  ///@param account_id A account ID to get the votes for.
+  @deprecated
+  Future<chopper.Response<List<AccountVote>>>
+      apiV1VotesPlanAccountVotesAccountIdGet({required String? accountId}) {
+    generatedMapping.putIfAbsent(
+        AccountVote, () => AccountVote.fromJsonFactory);
+
+    return _apiV1VotesPlanAccountVotesAccountIdGet(accountId: accountId);
+  }
+
+  ///Get Account Votes
+  ///@param account_id A account ID to get the votes for.
+  @deprecated
+  @Get(path: '/api/v1/votes/plan/account-votes/{account_id}')
+  Future<chopper.Response<List<AccountVote>>>
+      _apiV1VotesPlanAccountVotesAccountIdGet(
+          {@Path('account_id') required String? accountId});
+
+  ///Process fragments
+  @deprecated
+  Future<chopper.Response<FragmentsProcessingSummary>> apiV1FragmentsPost(
+      {required FragmentsBatch? body}) {
+    generatedMapping.putIfAbsent(FragmentsProcessingSummary,
+        () => FragmentsProcessingSummary.fromJsonFactory);
+
+    return _apiV1FragmentsPost(body: body);
+  }
+
+  ///Process fragments
+  @deprecated
+  @Post(
+    path: '/api/v1/fragments',
+    optionalBody: true,
+  )
+  Future<chopper.Response<FragmentsProcessingSummary>> _apiV1FragmentsPost(
+      {@Body() required FragmentsBatch? body});
+
+  ///Get Fragment Statuses
+  ///@param fragment_ids Comma-separated list of fragment ids for which the statuses will be retrieved.
+  @deprecated
+  Future<chopper.Response<Object>> apiV1FragmentsStatusesGet(
+      {required List<String>? fragmentIds}) {
+    return _apiV1FragmentsStatusesGet(fragmentIds: fragmentIds);
+  }
+
+  ///Get Fragment Statuses
+  ///@param fragment_ids Comma-separated list of fragment ids for which the statuses will be retrieved.
+  @deprecated
+  @Get(path: '/api/v1/fragments/statuses')
+  Future<chopper.Response<Object>> _apiV1FragmentsStatusesGet(
+      {@Query('fragment_ids') required List<String>? fragmentIds});
+}
+
+typedef $JsonFactory<T> = T Function(Map<String, dynamic> json);
+
+class $CustomJsonDecoder {
+  $CustomJsonDecoder(this.factories);
+
+  final Map<Type, $JsonFactory> factories;
+
+  dynamic decode<T>(dynamic entity) {
+    if (entity is Iterable) {
+      return _decodeList<T>(entity);
+    }
+
+    if (entity is T) {
+      return entity;
+    }
+
+    if (isTypeOf<T, Map>()) {
+      return entity;
+    }
+
+    if (isTypeOf<T, Iterable>()) {
+      return entity;
+    }
+
+    if (entity is Map<String, dynamic>) {
+      return _decodeMap<T>(entity);
+    }
+
+    return entity;
+  }
+
+  T _decodeMap<T>(Map<String, dynamic> values) {
+    final jsonFactory = factories[T];
+    if (jsonFactory == null || jsonFactory is! $JsonFactory<T>) {
+      return throw "Could not find factory for type $T. Is '$T: $T.fromJsonFactory' included in the CustomJsonDecoder instance creation in bootstrapper.dart?";
+    }
+
+    return jsonFactory(values);
+  }
+
+  List<T> _decodeList<T>(Iterable values) =>
+      values.where((v) => v != null).map<T>((v) => decode<T>(v) as T).toList();
+}
+
+class $JsonSerializableConverter extends chopper.JsonConverter {
+  @override
+  FutureOr<chopper.Response<ResultType>> convertResponse<ResultType, Item>(
+      chopper.Response response) async {
+    if (response.bodyString.isEmpty) {
+      // In rare cases, when let's say 204 (no content) is returned -
+      // we cannot decode the missing json with the result type specified
+      return chopper.Response(response.base, null, error: response.error);
+    }
+
+    if (ResultType == String) {
+      return response.copyWith();
+    }
+
+    if (ResultType == DateTime) {
+      return response.copyWith(
+          body: DateTime.parse((response.body as String).replaceAll('"', ''))
+              as ResultType);
+    }
+
+    final jsonRes = await super.convertResponse(response);
+    return jsonRes.copyWith<ResultType>(
+        body: $jsonDecoder.decode<Item>(jsonRes.body) as ResultType);
+  }
+}
+
+final $jsonDecoder = $CustomJsonDecoder(generatedMapping);
