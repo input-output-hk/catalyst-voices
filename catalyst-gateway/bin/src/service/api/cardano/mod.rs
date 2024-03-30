@@ -32,8 +32,7 @@ impl CardanoApi {
         path = "/staked_ada/:stake_address",
         method = "get",
         operation_id = "stakedAdaAmountGet",
-        transform = "schema_version_validation",
-        // TODO: https://github.com/input-output-hk/catalyst-voices/issues/330
+        transform = "schema_version_validation"
     )]
     /// Get staked ada amount.
     ///
