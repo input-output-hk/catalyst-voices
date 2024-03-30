@@ -10,8 +10,9 @@ use pallas::ledger::{
 use tracing::info;
 
 use crate::cddl::{
-    inspect_metamap_reg, inspect_rewards_addr, inspect_stake_key, inspect_voting_key,
-    raw_sig_conversion, validate_reg_cddl, CddlConfig,
+    inspect_metamap_reg, inspect_nonce, inspect_rewards_addr, inspect_stake_key,
+    inspect_voting_key, inspect_voting_purpose, raw_sig_conversion, validate_reg_cddl, CddlConfig,
+    Registration,
 };
 
 use super::{Error, EventDB};
@@ -71,7 +72,8 @@ impl EventDB {
     ) -> Result<(), Error> {
         for tx in txs {
             if !tx.metadata().is_empty() {
-                filter_registrations(tx.metadata(), network).unwrap();
+                let registration = filter_registrations(tx.metadata(), network).unwrap();
+                info!("registration {:?}", registration);
             }
         }
 
@@ -79,27 +81,23 @@ impl EventDB {
     }
 }
 
-pub fn filter_registrations(meta: MultiEraMeta, network: Network) -> Result<(), Box<dyn Error2>> {
+pub fn filter_registrations(
+    meta: MultiEraMeta, network: Network,
+) -> Result<Registration, Box<dyn Error2>> {
     let cddl = CddlConfig::new();
 
-    let network = match network {
-        Network::Mainnet => "mainnet".to_string(),
-        Network::Preview => "preview".to_string(),
-        Network::Preprod => "preprod".to_string(),
-        Network::Testnet => "testnet".to_string(),
-    };
-
-    match meta {
+    let rr = match meta {
         pallas::ledger::traverse::MultiEraMeta::AlonzoCompatible(meta) => {
+            let mut reg_61284 = Registration::default();
             for (key, cip36_registration) in meta.iter() {
                 if *key == u64::try_from(61284)? {
                     // Potential cip36 registration - validate with cip36 cddl before continuing
-                    let cip36_raw_cbor = meta.encode_fragment()?;
+                    let raw_cbor_61284 = meta.encode_fragment()?;
 
-                    validate_reg_cddl(&cip36_raw_cbor, &cddl)?;
+                    validate_reg_cddl(&raw_cbor_61284, &cddl)?;
 
                     let decoded: ciborium::value::Value =
-                        ciborium::de::from_reader(Cursor::new(&cip36_raw_cbor))?;
+                        ciborium::de::from_reader(Cursor::new(&raw_cbor_61284))?;
 
                     let meta_61284 = match decoded {
                         Value::Map(m) => m.iter().map(|entry| entry.1.clone()).collect::<Vec<_>>(),
@@ -114,7 +112,7 @@ pub fn filter_registrations(meta: MultiEraMeta, network: Network) -> Result<(), 
 
                     // voting key: simply an ED25519 public key. This is the spending credential in the sidechain that will receive voting power
                     // from this delegation. For direct voting it's necessary to have the corresponding private key to cast votes in the sidechain
-                    let _voting_key = match inspect_voting_key(metamap) {
+                    let voting_key = match inspect_voting_key(metamap) {
                         Ok(value) => value,
                         Err(_value) => return Err(format!("Invalid signature").into()),
                     };
@@ -127,21 +125,41 @@ pub fn filter_registrations(meta: MultiEraMeta, network: Network) -> Result<(), 
 
                     // A Shelley payment address (see CIP-0019) discriminated for the same network
                     // this transaction is submitted to, to receive rewards.
-                    let rewards_address = match inspect_rewards_addr(metamap, network_id) {
+                    let rewards_address = match inspect_rewards_addr(metamap, network) {
                         Ok(value) => value,
                         Err(_value) => return Err(format!("Invalid signature").into()),
                     };
 
-                    info!("goitacha {:?}", stake_key);
+                    // A nonce that identifies that most recent delegation
+                    let nonce = match inspect_nonce(metamap) {
+                        Ok(value) => value,
+                        Err(_value) => return Err(format!("Invalid signature").into()),
+                    };
+
+                    // A non-negative integer that indicates the purpose of the vote.
+                    // This is an optional field to allow for compatibility with CIP-15
+                    // 4 entries inside metadata map with one optional entry for the voting purpose
+                    let voting_purpose = inspect_voting_purpose(metamap);
+
+                    reg_61284 = Registration {
+                        voting_key,
+                        stake_key,
+                        rewards_address: rewards_address.to_vec(),
+                        nonce,
+                        voting_purpose,
+                        raw_cbor_61284,
+                    };
                 } else if *key == u64::try_from(61285)? {
                     // Validate 61285 signature
                     let signature = raw_sig_conversion(cip36_registration.encode_fragment()?)?;
                     info!("sig ok {:?}", signature);
                 }
             }
+
+            reg_61284
         },
         _ => todo!(),
-    }
+    };
 
-    Ok(())
+    Ok(rr)
 }
