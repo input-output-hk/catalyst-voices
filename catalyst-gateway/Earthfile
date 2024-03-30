@@ -4,7 +4,7 @@ VERSION --try --global-cache 0.7
 
 # Set up our target toolchains, and copy our files.
 builder:
-   DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.10.1+SETUP
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.10.1+SETUP
 
     COPY --dir .cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin crates tests .
     COPY --dir ./event-db/queries ./event-db/queries
@@ -49,12 +49,16 @@ all-hosts-build:
 
 package-cat-gateway:
     FROM alpine:3.19
+
     ARG tag="latest"
     ARG address
     ARG db_url
     ARG log_level="error"
+
     RUN apk upgrade --no-cache && apk add --no-cache gcc
+
     COPY +build/cat-gateway .
+
     ENTRYPOINT ./cat-gateway run --address $address --database-url $db_url --log-level $log_level
     SAVE IMAGE cat-gateway:$tag
 

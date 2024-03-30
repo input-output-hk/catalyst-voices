@@ -117,18 +117,18 @@ at the app level to allow for querying groups of data.';
 
 INSERT INTO config (id, id2, id3, value)
 VALUES
-(
-  'cardano',
-  'follower',
-  'mainnet',
-  '{
-    "relay": "relays-new.cardano-mainnet.iohk.io:3001",
-    "mithril_snapshot": {
-      "path": "/tmp/mainnet/immutable",
-      "timing_pattern": 25
-    }
-  }'
-),
+-- (
+--   'cardano',
+--   'follower',
+--   'mainnet',
+--   '{
+--     "relay": "relays-new.cardano-mainnet.iohk.io:3001",
+--     "mithril_snapshot": {
+--       "path": "/tmp/mainnet/immutable",
+--       "timing_pattern": 25
+--     }
+--   }'
+-- ),
 (
   'cardano',
   'follower',

@@ -309,6 +309,7 @@ async fn follower_connection(
     let mut follower_cfg = if start_from.0.is_none() || start_from.1.is_none() {
         // start from genesis, no previous followers, hence no starting points.
         FollowerConfigBuilder::default()
+            .follow_from(Point::Origin)
             .mithril_snapshot_path(PathBuf::from(snapshot))
             .build()
     } else {

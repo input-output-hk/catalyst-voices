@@ -37,3 +37,5 @@ services:
     depends_on:
       event-db:
         condition: service_healthy
+    volumes:
+      - ./preview_snapshot:/tmp/immutable/preview

@@ -13,6 +13,11 @@ test:
     ARG CAT_ADDRESS="0.0.0.0:3030"
 
     COPY ./docker-compose.yml .
+    COPY github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:feat/mithril-snapshot+preview-snapshot/preview.tar.zst .
+
+    # extract preview archive
+    RUN apk add zstd
+    RUN mkdir preview_snapshot && zstd -d preview.tar.zst && tar -xf preview.tar -C ./preview_snapshot
 
     WITH DOCKER \
         --compose docker-compose.yml \
