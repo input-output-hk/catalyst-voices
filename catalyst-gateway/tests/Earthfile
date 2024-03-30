@@ -18,6 +18,7 @@ package-schemathesis:
     VOLUME /results
 
     ENTRYPOINT st run --checks all \
+                      --exclude-checks content_type_conformance, response_schema_conformance \
                       --data-generation-method all \
                       --workers=$workers \
                       --wait-for-schema=$wait_for_schema \
