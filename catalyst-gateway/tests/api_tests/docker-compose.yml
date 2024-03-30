@@ -38,4 +38,4 @@ services:
       event-db:
         condition: service_healthy
     volumes:
-      - ./preview_snapshot:/tmp/immutable/preview
+      - ./preview_snapshot:/tmp/preview/immutable
