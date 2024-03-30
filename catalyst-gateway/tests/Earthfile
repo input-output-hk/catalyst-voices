@@ -13,10 +13,20 @@ package-schemathesis:
     RUN python -m pip install schemathesis
     RUN mkdir /results
     VOLUME /results
-    ENTRYPOINT st run --checks all $openapi_spec --data-generation-method all --workers=$workers --wait-for-schema=$wait_for_schema \
-                        --max-response-time=$max_response_time --hypothesis-max-examples=$max_examples \
-                                --force-color --skip-deprecated-operations --show-trace \
-                                 --force-schema-version=$schema_version --junit-xml /results/junit-report.xml
+    ENTRYPOINT st run --checks all \
+                      --data-generation-method all \
+                      --workers=$workers \
+                      --wait-for-schema=$wait_for_schema \
+                      --max-response-time=$max_response_time \
+                      --hypothesis-max-examples=$max_examples \
+                      --force-color \
+                      --skip-deprecated-operations \
+                      --show-trace \
+                      --force-schema-version=$schema_version \
+                      --junit-xml \
+                      $openapi_spec \
+                      /results/junit-report.xml
+
     SAVE IMAGE schemathesis:$tag
 
 # test-fuzzer-api - Fuzzy test cat-gateway using openapi specs
