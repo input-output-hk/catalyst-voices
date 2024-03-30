@@ -9,7 +9,7 @@ def sync_to(network: str, slot_num: int, timeout: int):
     while True:
         if start_time + timeout < time.time():
             logger.info(
-                f"cat-gateway doesnot synced to slot_num: {slot_num}. Exited on timeout."
+                f"cat-gateway doesn't synced to slot_num: {slot_num}. Exited on timeout."
             )
             assert False
 
