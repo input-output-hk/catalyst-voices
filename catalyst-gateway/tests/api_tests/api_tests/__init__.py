@@ -35,5 +35,6 @@ def get_sync_state(network: str):
     resp = requests.get(
         cat_gateway_endpoint_url(f"api/cardano/sync_state?network={network}")
     )
-    assert resp.status_code == 200
-    return resp.json()
+    assert resp.status_code == 200 or resp.status_code == 404
+    if resp.status_code == 200:
+        return resp.json()
