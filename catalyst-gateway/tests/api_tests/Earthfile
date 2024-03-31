@@ -6,6 +6,20 @@ builder:
     COPY --dir ./api_tests .
     DO github.com/input-output-hk/catalyst-ci/earthly/python:v2.10.0+BUILDER
 
+preview-snapshot:
+    FROM alpine:3.19
+
+    WORKDIR /tmp
+
+    COPY github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:feat/mithril-snapshot+preview-snapshot/preview.tar.zst .
+
+    # extract preview archive
+    RUN apk add zstd
+    RUN mkdir preview && zstd -d preview.tar.zst && tar -xf preview.tar -C ./preview
+    RUN rm preview.tar && rm preview.tar.zst
+    
+    SAVE IMAGE preview-snapshot
+
 test:
     FROM +builder
 
@@ -13,16 +27,13 @@ test:
     ARG CAT_ADDRESS="0.0.0.0:3030"
 
     COPY ./docker-compose.yml .
-    COPY github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:feat/mithril-snapshot+preview-snapshot/preview.tar.zst .
-
-    # extract preview archive
-    RUN apk add zstd
-    RUN mkdir preview_snapshot && zstd -d preview.tar.zst && tar -xf preview.tar -C ./preview_snapshot
 
     WITH DOCKER \
         --compose docker-compose.yml \
+        --load preview-snapshot=+preview-snapshot \
         --load event-db:latest=(../../event-db+build) \
         --load cat-gateway:latest=(../../+package-cat-gateway --address=$CAT_ADDRESS --db_url=$DB_URL) \
+        --service preview-snapshot \
         --service event-db \
         --service cat-gateway \
         --allow-privileged
