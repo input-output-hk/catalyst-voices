@@ -5,7 +5,7 @@ services:
     image: preview-snapshot
     entrypoint: ["/bin/sh", "-c", "while true; do sleep 1; done"]
     healthcheck:
-      test: ["CMD-SHELL", "true"]
+      test: ["CMD-SHELL", "ls -1 | (wc -l) > 1"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -47,7 +47,6 @@ services:
       - 3030:3030
     depends_on:
       preview-snapshot:
-        restart: true
         condition: service_healthy
       event-db:
         condition: service_healthy
