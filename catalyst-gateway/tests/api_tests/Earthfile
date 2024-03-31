@@ -34,9 +34,7 @@ test:
         --load preview-snapshot=+preview-snapshot \
         --load event-db:latest=(../../event-db+build) \
         --load cat-gateway:latest=(../../+package-cat-gateway --address=$CAT_ADDRESS --db_url=$DB_URL) \
-        --service preview-snapshot \
-        --service event-db \
         --service cat-gateway \
         --allow-privileged
-        RUN poetry run pytest || docker logs default-cat-gateway-1
+        RUN poetry run pytest || docker-compose logs cat-gateway
     END

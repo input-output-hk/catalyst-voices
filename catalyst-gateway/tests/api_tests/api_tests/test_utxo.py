@@ -27,4 +27,4 @@ def test_staked_ada_endpoint():
     network = "preview"
 
     # block hash `68dcf12857a6a0bbdbb0ce1db982814a88fc585c1d50b216568196cb49b8ecee`
-    sync_to(network=network, slot_num=67173, timeout=300)
+    sync_to(network=network, slot_num=67173, timeout=30)
