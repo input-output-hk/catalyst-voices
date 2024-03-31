@@ -17,7 +17,10 @@ preview-snapshot:
     RUN apk add zstd
     RUN mkdir preview && zstd -d preview.tar.zst && tar -xf preview.tar -C ./preview
     RUN rm preview.tar && rm preview.tar.zst
-    
+    RUN ls /tmp/preview
+
+    # COPY ./preview ./preview
+
     SAVE IMAGE preview-snapshot
 
 test:
