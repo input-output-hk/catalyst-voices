@@ -59,7 +59,7 @@ package-cat-gateway:
 
     COPY +build/cat-gateway .
 
-    ENTRYPOINT ./cat-gateway run --address $address --database-url $db_url --log-level $log_level
+    ENTRYPOINT sleep 10 && ./cat-gateway run --address $address --database-url $db_url --log-level $log_level
     SAVE IMAGE cat-gateway:$tag
 
 # Publish packages if all integration tests have passed. (Failure to pass tests will prevent packages being published.)
