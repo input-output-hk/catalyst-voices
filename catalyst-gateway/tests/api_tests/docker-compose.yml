@@ -5,7 +5,7 @@ services:
     image: preview-snapshot
     entrypoint: ["/bin/sh", "-c", "while true; do sleep 1; done"]
     volumes:
-      - preview_snapshot:/tmp/preview/immutable
+      - preview_snapshot:/snapshot/immutable
 
   event-db:
     image: event-db:latest
