@@ -31,7 +31,7 @@ test:
 
     WITH DOCKER \
         --compose docker-compose.yml \
-        --load preview-snapshot:latest=github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:feat/mithril-snapshot+preview-snapshot-image \
+        --load preview-snapshot:latest=github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:feat/mithril-snapshot+package-preview-snapshot \
         --load event-db:latest=(../../event-db+build) \
         --load cat-gateway:latest=(../../+package-cat-gateway --address=$CAT_ADDRESS --db_url=$DB_URL) \
         --service cat-gateway \
