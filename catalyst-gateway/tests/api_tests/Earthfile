@@ -38,5 +38,5 @@ test:
         --service event-db \
         --service cat-gateway \
         --allow-privileged
-        RUN docker logs cat-gateway
+        RUN poetry run pytest || docker logs default-cat-gateway-1
     END
