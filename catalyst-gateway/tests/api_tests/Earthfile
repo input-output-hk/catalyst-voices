@@ -36,5 +36,5 @@ test:
         --load cat-gateway:latest=(../../+package-cat-gateway --address=$CAT_ADDRESS --db_url=$DB_URL) \
         --service cat-gateway \
         --allow-privileged
-        RUN poetry run pytest || docker-compose logs cat-gateway
+        RUN poetry run pytest
     END
