@@ -62,9 +62,7 @@ impl EventDB {
                 &proposal.0,
             ])
             .await?;
-        let row = rows
-            .first()
-            .ok_or_else(|| Error::NotFound("cat not find ballot value".to_string()))?;
+        let row = rows.first().ok_or(Error::NotFound)?;
         let choices = row.try_get("objective")?;
 
         let rows = conn

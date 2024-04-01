@@ -155,6 +155,18 @@ Map<String, dynamic> _$StatusRejectedToJson(StatusRejected instance) =>
       'reason': instance.reason,
     };
 
+SyncState _$SyncStateFromJson(Map<String, dynamic> json) => SyncState(
+      slotNumber: json['slot_number'] as int,
+      blockHash: json['block_hash'] as String,
+      lastUpdated: DateTime.parse(json['last_updated'] as String),
+    );
+
+Map<String, dynamic> _$SyncStateToJson(SyncState instance) => <String, dynamic>{
+      'slot_number': instance.slotNumber,
+      'block_hash': instance.blockHash,
+      'last_updated': instance.lastUpdated.toIso8601String(),
+    };
+
 VotePlan _$VotePlanFromJson(Map<String, dynamic> json) => VotePlan(
       votingToken: json['voting_token'] as String,
     );
