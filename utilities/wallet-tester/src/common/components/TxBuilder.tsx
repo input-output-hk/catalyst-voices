@@ -18,6 +18,7 @@ import Input from "./Input";
 import TxBuilderMultiFieldsSection from "./TxBuilderMultiFieldsSection";
 import TxBuilderSingleFieldSection from "./TxBuilderSingleFieldSection";
 import WalletViewSelection from "./WalletViewSelection";
+import { TransactionUnspentOutput } from "@emurgo/cardano-serialization-lib-asmjs";
 
 const PROTOCOL_PARAMS = {
   linearFee: {
@@ -77,6 +78,16 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
     onPropSubmit(formValues);
   }
 
+  function formatUtxoAmount(utxoHex: string): string {
+    try {
+      const json = TransactionUnspentOutput.from_hex(utxoHex).to_js_value();
+      
+      return String(json.output.amount.coin);
+    } catch (error) {
+      return "";
+    }
+  }
+
   return (
     <form key={resetSignal} className="grid gap-2" autoComplete="off">
       <TxBuilderMultiFieldsSection
@@ -85,21 +96,31 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
         onRemoveClick={(i) => txInputFields.remove(i)}
         fields={txInputFields.fields}
         render={(i) => (
-          <div className="grow grid gap-2">
+          <div className="grow grid grid-cols-4 gap-2">
             <Controller
               control={control}
               name={`txInputs.${i}.hex`}
               render={({ field: { value, onChange } }) => (
-                <Combobox
-                  value={value}
-                  label={`UTXO Hex #${i + 1}`}
-                  items={utxos.map((v) => ({
-                    label: v,
-                    value: v,
-                  }))}
-                  onInput={onChange}
-                  onSelect={onChange}
-                />
+                <>
+                  <div className="col-span-3">
+                    <Combobox
+                      value={value}
+                      label={`UTXO Hex #${i + 1}`}
+                      items={utxos.map((v) => ({
+                        label: v,
+                        value: v,
+                      }))}
+                      onInput={onChange}
+                      onSelect={onChange}
+                    />
+                  </div>
+                  <Input
+                    type="number"
+                    disabled={true}
+                    value={formatUtxoAmount(value)}
+                    label={`Amount #${i + 1}`}
+                  />
+                </>
               )}
             />
           </div>
@@ -178,8 +199,8 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
                 certificateFields.fields[i]?.type === value
                   ? null
                   : certificateFields.replace({
-                      type: value /* TODO: support default values for each type */,
-                    })
+                    type: value /* TODO: support default values for each type */,
+                  })
               }
             />
             {certificateFields.fields[i]?.type === CertificateType.StakeDelegation ? (
@@ -190,7 +211,7 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
                     className={twMerge(
                       "w-full rounded px-1 border border-solid border-black",
                       certificateFields.fields[i]?.hashType === "addr_keyhash" &&
-                        "bg-black text-white"
+                      "bg-black text-white"
                     )}
                     onClick={() =>
                       certificateFields.update(i, {
@@ -206,7 +227,7 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
                     className={twMerge(
                       "w-full rounded px-1 border border-solid border-black",
                       certificateFields.fields[i]?.hashType === "scripthash" &&
-                        "bg-black text-white"
+                      "bg-black text-white"
                     )}
                     onClick={() =>
                       certificateFields.update(i, {
