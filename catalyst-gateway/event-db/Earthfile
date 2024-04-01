@@ -9,7 +9,7 @@ VERSION 0.7
 # Internal: builder is our Event db builder target. Prepares all necessary artifacts.
 #   CI target : dependency
 builder:
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.10.0+BUILDER \
+    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:feat/mithril-snapshot+BUILDER \
         --sqlfluff_cfg=./../../+repo-config/repo/.sqlfluff
 
     COPY ./../../+repo-config/repo/.sqlfluff .
