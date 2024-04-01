@@ -1,22 +1,13 @@
 //! Voter registration queries
 
 use cardano_chain_follower::Network;
-use ciborium::Value;
-use pallas::ledger::{
-    primitives::Fragment,
-    traverse::{MultiEraMeta, MultiEraTx},
-};
 
+use pallas::ledger::traverse::MultiEraTx;
 use tracing::info;
 
-use crate::cddl::{
-    inspect_metamap_reg, inspect_nonce, inspect_rewards_addr, inspect_stake_key,
-    inspect_voting_key, inspect_voting_purpose, raw_sig_conversion, validate_reg_cddl, CddlConfig,
-    Registration,
-};
+use crate::registration::{parse_registrations_from_metadata, validate_reg_cddl, CddlConfig};
 
-use super::{Error, EventDB};
-use std::{error::Error as Error2, io::Cursor};
+use super::{follower::SlotNumber, Error, EventDB};
 
 /// Transaction id
 pub(crate) type TxId = String;
@@ -29,9 +20,7 @@ pub(crate) type PaymentAddress<'a> = &'a [u8];
 /// Nonce
 pub(crate) type Nonce = i64;
 /// Metadata 61284
-pub(crate) type Metadata61284<'a> = &'a [u8];
-/// Metadata 61285
-pub(crate) type Metadata61285<'a> = &'a [u8];
+pub(crate) type MetadataCip36<'a> = &'a [u8];
 /// Stats
 pub(crate) type _Stats = Option<serde_json::Value>;
 
@@ -41,7 +30,7 @@ impl EventDB {
     async fn insert_voter_registration(
         &self, tx_id: TxId, stake_credential: StakeCredential<'_>,
         public_voting_key: PublicVotingKey<'_>, payment_address: PaymentAddress<'_>, nonce: Nonce,
-        metadata_61284: Metadata61284<'_>, metadata_61285: Metadata61285<'_>, valid: bool,
+        metadata_cip36: MetadataCip36<'_>, valid: bool,
     ) -> Result<(), Error> {
         let conn = self.pool.get().await?;
 
@@ -56,8 +45,7 @@ impl EventDB {
                     &public_voting_key,
                     &payment_address,
                     &nonce,
-                    &metadata_61284,
-                    &metadata_61285,
+                    &metadata_cip36,
                     &valid,
                 ],
             )
@@ -68,98 +56,59 @@ impl EventDB {
 
     /// Index registration data
     pub async fn index_registration_data(
-        &self, txs: &[MultiEraTx<'_>], network: Network,
+        &self, txs: Vec<MultiEraTx<'_>>, _slot_no: SlotNumber, network: Network,
     ) -> Result<(), Error> {
+        let cddl = CddlConfig::new();
+
         for tx in txs {
+            let mut _valid_registration = true;
+
             if !tx.metadata().is_empty() {
-                let registration = filter_registrations(tx.metadata(), network).unwrap();
-                info!("registration {:?}", registration);
+                let registration = match parse_registrations_from_metadata(tx.metadata(), network) {
+                    Ok(registration) => registration,
+                    Err(err) => {
+                        info!("err {:?}", err);
+                        continue;
+                    },
+                };
+
+                let reg = registration.clone();
+                if let Some(cip36) = registration.0.raw_cbor_cip36 {
+                    match validate_reg_cddl(&cip36, &cddl) {
+                        Ok(()) => info!("cddl ok reg {:?}", reg.0),
+                        Err(_err) => continue,
+                    };
+                } else {
+                    // not a valid registration
+                    continue;
+                }
+
+                // cddl is valid continue parsing
+                /*
+                    if let Some(voting_key) = registration.0.voting_key {
+                        match voting_key{
+                            crate::registration::VotingKey::Direct(direct) => direct,
+                            crate::registration::VotingKey::Delegated(delegated) => {
+                                delegated.into_iter().find_map(|(a, _b)| Some(a)).unwrap()
+                            },
+                    }
+
+
+
+                    self.insert_voter_registration(
+                        tx.hash().to_string(),
+                        &registration.stake_key.unwrap().0,
+                        &voting_key.0,
+                        &registration.rewards_address.unwrap(),
+                        registration.nonce.unwrap().try_into().unwrap(),
+                        &raw_cbor_cip36,
+                        valid_registration,
+                    )
+                    .await?;
+                }*/
             }
         }
 
         Ok(())
     }
-}
-
-pub fn filter_registrations(
-    meta: MultiEraMeta, network: Network,
-) -> Result<Registration, Box<dyn Error2>> {
-    let cddl = CddlConfig::new();
-
-    let rr = match meta {
-        pallas::ledger::traverse::MultiEraMeta::AlonzoCompatible(meta) => {
-            let mut reg_61284 = Registration::default();
-            for (key, cip36_registration) in meta.iter() {
-                if *key == u64::try_from(61284)? {
-                    // Potential cip36 registration - validate with cip36 cddl before continuing
-                    let raw_cbor_61284 = meta.encode_fragment()?;
-
-                    validate_reg_cddl(&raw_cbor_61284, &cddl)?;
-
-                    let decoded: ciborium::value::Value =
-                        ciborium::de::from_reader(Cursor::new(&raw_cbor_61284))?;
-
-                    let meta_61284 = match decoded {
-                        Value::Map(m) => m.iter().map(|entry| entry.1.clone()).collect::<Vec<_>>(),
-                        _ => return Err(format!("Invalid signature {:?}", decoded).into()),
-                    };
-
-                    // 4 entries inside metadata map with one optional entry for the voting purpose
-                    let metamap = match inspect_metamap_reg(&meta_61284) {
-                        Ok(value) => value,
-                        Err(_value) => return Err(format!("Invalid signature").into()),
-                    };
-
-                    // voting key: simply an ED25519 public key. This is the spending credential in the sidechain that will receive voting power
-                    // from this delegation. For direct voting it's necessary to have the corresponding private key to cast votes in the sidechain
-                    let voting_key = match inspect_voting_key(metamap) {
-                        Ok(value) => value,
-                        Err(_value) => return Err(format!("Invalid signature").into()),
-                    };
-
-                    // A stake address for the network that this transaction is submitted to (to point to the Ada that is being delegated);
-                    let stake_key = match inspect_stake_key(metamap) {
-                        Ok(value) => value,
-                        Err(_value) => return Err(format!("Invalid signature").into()),
-                    };
-
-                    // A Shelley payment address (see CIP-0019) discriminated for the same network
-                    // this transaction is submitted to, to receive rewards.
-                    let rewards_address = match inspect_rewards_addr(metamap, network) {
-                        Ok(value) => value,
-                        Err(_value) => return Err(format!("Invalid signature").into()),
-                    };
-
-                    // A nonce that identifies that most recent delegation
-                    let nonce = match inspect_nonce(metamap) {
-                        Ok(value) => value,
-                        Err(_value) => return Err(format!("Invalid signature").into()),
-                    };
-
-                    // A non-negative integer that indicates the purpose of the vote.
-                    // This is an optional field to allow for compatibility with CIP-15
-                    // 4 entries inside metadata map with one optional entry for the voting purpose
-                    let voting_purpose = inspect_voting_purpose(metamap);
-
-                    reg_61284 = Registration {
-                        voting_key,
-                        stake_key,
-                        rewards_address: rewards_address.to_vec(),
-                        nonce,
-                        voting_purpose,
-                        raw_cbor_61284,
-                    };
-                } else if *key == u64::try_from(61285)? {
-                    // Validate 61285 signature
-                    let signature = raw_sig_conversion(cip36_registration.encode_fragment()?)?;
-                    info!("sig ok {:?}", signature);
-                }
-            }
-
-            reg_61284
-        },
-        _ => todo!(),
-    };
-
-    Ok(rr)
 }

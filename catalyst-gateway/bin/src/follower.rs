@@ -9,7 +9,10 @@ use cardano_chain_follower::{
     network_genesis_values, ChainUpdate, Follower, FollowerConfigBuilder, Network, Point,
 };
 use chrono::TimeZone;
-use tokio::{task::JoinHandle, time};
+use tokio::{
+    task::JoinHandle,
+    time::{self},
+};
 use tracing::{error, info};
 
 use crate::{
@@ -277,7 +280,8 @@ async fn init_follower(
                         }
 
                         // Registration
-                        match db.index_registration_data(&block.txs(), network).await {
+
+                        match db.index_registration_data(block.txs(), slot, network).await {
                             Ok(()) => (),
                             Err(err) => {
                                 error!(
