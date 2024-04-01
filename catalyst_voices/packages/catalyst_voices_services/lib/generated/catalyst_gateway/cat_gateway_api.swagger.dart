@@ -129,15 +129,14 @@ abstract class CatGatewayApi extends ChopperService {
   ///@param stake_address The stake address of the user. Should a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
   ///@param network Cardano network type. If omitted network type is identified from the stake address. If specified it must be correspondent to the network type encoded in the stake address. As `preprod` and `preview` network types in the stake address encoded as a `testnet`, to specify `preprod` or `preview` network type use this query parameter.
   ///@param date_time Date time at which the staked ada amount should be calculated. If omitted current date time is used.
-  @deprecated
-  Future<chopper.Response<StakeInfo>> apiUtxoStakedAdaStakeAddressGet({
+  Future<chopper.Response<StakeInfo>> apiCardanoStakedAdaStakeAddressGet({
     required String? stakeAddress,
     enums.Network? network,
     DateTime? dateTime,
   }) {
     generatedMapping.putIfAbsent(StakeInfo, () => StakeInfo.fromJsonFactory);
 
-    return _apiUtxoStakedAdaStakeAddressGet(
+    return _apiCardanoStakedAdaStakeAddressGet(
         stakeAddress: stakeAddress,
         network: network?.value?.toString(),
         dateTime: dateTime);
@@ -147,13 +146,27 @@ abstract class CatGatewayApi extends ChopperService {
   ///@param stake_address The stake address of the user. Should a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
   ///@param network Cardano network type. If omitted network type is identified from the stake address. If specified it must be correspondent to the network type encoded in the stake address. As `preprod` and `preview` network types in the stake address encoded as a `testnet`, to specify `preprod` or `preview` network type use this query parameter.
   ///@param date_time Date time at which the staked ada amount should be calculated. If omitted current date time is used.
-  @deprecated
-  @Get(path: '/api/utxo/staked_ada/{stake_address}')
-  Future<chopper.Response<StakeInfo>> _apiUtxoStakedAdaStakeAddressGet({
+  @Get(path: '/api/cardano/staked_ada/{stake_address}')
+  Future<chopper.Response<StakeInfo>> _apiCardanoStakedAdaStakeAddressGet({
     @Path('stake_address') required String? stakeAddress,
     @Query('network') String? network,
     @Query('date_time') DateTime? dateTime,
   });
+
+  ///Get Cardano follower's sync state.
+  ///@param network Cardano network type. If omitted `mainnet` network type is defined. As `preprod` and `preview` network types in the stake address encoded as a `testnet`, to specify `preprod` or `preview` network type use this query parameter.
+  Future<chopper.Response<SyncState>> apiCardanoSyncStateGet(
+      {enums.Network? network}) {
+    generatedMapping.putIfAbsent(SyncState, () => SyncState.fromJsonFactory);
+
+    return _apiCardanoSyncStateGet(network: network?.value?.toString());
+  }
+
+  ///Get Cardano follower's sync state.
+  ///@param network Cardano network type. If omitted `mainnet` network type is defined. As `preprod` and `preview` network types in the stake address encoded as a `testnet`, to specify `preprod` or `preview` network type use this query parameter.
+  @Get(path: '/api/cardano/sync_state')
+  Future<chopper.Response<SyncState>> _apiCardanoSyncStateGet(
+      {@Query('network') String? network});
 
   ///Voter's info
   ///@param voting_key A Voters Public ED25519 Key (as registered in their most recent valid [CIP-15](https://cips.cardano.org/cips/cip15) or [CIP-36](https://cips.cardano.org/cips/cip36) registration).

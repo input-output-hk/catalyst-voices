@@ -6,12 +6,16 @@ use poem_openapi::Enum;
 #[derive(Enum, Debug)]
 pub(crate) enum Network {
     /// Cardano mainnet.
+    #[oai(rename = "mainnet")]
     Mainnet,
     /// Cardano testnet.
+    #[oai(rename = "testnet")]
     Testnet,
     /// Cardano preprod.
+    #[oai(rename = "preprod")]
     Preprod,
     /// Cardano preview.
+    #[oai(rename = "preview")]
     Preview,
 }
 
