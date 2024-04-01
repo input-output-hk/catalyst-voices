@@ -241,11 +241,11 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
       />
       <TxBuilderMultiFieldsSection
         heading="Reward Withdrawals"
-        onAddClick={() => rewardWithdrawalFields.append({ address: "", value: "" })}
+        onAddClick={() => rewardWithdrawalFields.append({ address: "", value: "", network: "" })}
         onRemoveClick={(i) => rewardWithdrawalFields.remove(i)}
         fields={rewardWithdrawalFields.fields}
         render={(i) => (
-          <div className="grow grid grid-cols-4 gap-2">
+          <div className="grow grid grid-cols-5 gap-2">
             <div className="col-span-3">
               <Controller
                 control={control}
@@ -268,6 +268,11 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
               type="number"
               label={`Coin #${i + 1}`}
               formRegister={register(`rewardWithdrawals.${i}.value`)}
+            />
+            <Input
+              type="number"
+              label={`Net. #${i + 1}`}
+              formRegister={register(`rewardWithdrawals.${i}.network`)}
             />
           </div>
         )}

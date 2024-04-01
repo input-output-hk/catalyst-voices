@@ -73,6 +73,7 @@ export type TxBuilderArguments = {
         hashType: "addr_keyhash" | "scripthash";
         hash: string;
         poolKeyhash: string;
+        network: number;
       }
     | {
         type: CertificateType.PoolRegistration;
@@ -89,6 +90,7 @@ export type TxBuilderArguments = {
   )[];
   rewardWithdrawals: {
     address: string;
+    network: string;
     value: string;
   }[];
   auxilliaryDataHash: string;

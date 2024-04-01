@@ -121,7 +121,13 @@ export default async function buildUnsignedTx(payload: TxBuilderArguments): Prom
       const stakeCred = BaseAddress.from_address(Address.from_bech32(item.address))?.stake_cred();
 
       if (stakeCred) {
-        const net = item.address.includes("test") ? 0 : 1;
+        let net: number;
+        if (item.network) {
+          net = Number(item.network);
+        } else {
+          net = item.address.includes("test") ? 0 : 1;
+        }
+        
         rewardAddress = RewardAddress.new(net, stakeCred);
       }
     }
