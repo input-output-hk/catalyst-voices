@@ -55,7 +55,7 @@ package-cat-gateway:
     ARG db_url
     ARG log_level="error"
 
-    RUN apk upgrade --no-cache && apk add --no-cache gcc
+    RUN apk add --no-cache gcc
 
     COPY +build/cat-gateway .
 

@@ -6,20 +6,16 @@ builder:
     COPY --dir ./api_tests .
     DO github.com/input-output-hk/catalyst-ci/earthly/python:v2.10.0+BUILDER
 
-preview-snapshot:
-    FROM alpine:3.19
+    RUN poetry run pytest 
 
-    WORKDIR /tmp
+cat-gateway-test:
+    ARG DB_URL="postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev"
+    ARG CAT_ADDRESS="0.0.0.0:3030"
 
-    COPY github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:master+preview-snapshot/preview.tar.zst .
+    FROM ../../+package-cat-gateway --address=$CAT_ADDRESS --db_url=$DB_URL
 
-    # extract preview archive
-    RUN apk add zstd
-    RUN mkdir preview && zstd -d preview.tar.zst && tar -xf preview.tar -C ./preview
-    RUN rm preview.tar && rm preview.tar.zst
-    RUN ls /tmp/preview
-
-    SAVE IMAGE preview-snapshot
+    COPY github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:fix/mithril-preview-snapshot+package-preview-snapshot/preview /tmp
+    SAVE IMAGE cat-gateway-test:latest
 
 test:
     FROM +builder
@@ -31,9 +27,8 @@ test:
 
     WITH DOCKER \
         --compose docker-compose.yml \
-        --load preview-snapshot:latest=github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:master+package-preview-snapshot \
         --load event-db:latest=(../../event-db+build) \
-        --load cat-gateway:latest=(../../+package-cat-gateway --address=$CAT_ADDRESS --db_url=$DB_URL) \
+        --load cat-gateway-test:latest=(+cat-gateway-test) \
         --service cat-gateway \
         --allow-privileged
         RUN poetry run pytest
