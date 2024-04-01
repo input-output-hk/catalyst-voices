@@ -102,6 +102,19 @@ final class _$CatGatewayApi extends CatGatewayApi {
   }
 
   @override
+  Future<Response<SyncState>> _apiCardanoSyncStateGet({String? network}) {
+    final Uri $url = Uri.parse('/api/cardano/sync_state');
+    final Map<String, dynamic> $params = <String, dynamic>{'network': network};
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+      parameters: $params,
+    );
+    return client.send<SyncState, SyncState>($request);
+  }
+
+  @override
   Future<Response<VoterRegistration>> _apiRegistrationVoterVotingKeyGet({
     required String? votingKey,
     int? eventId,

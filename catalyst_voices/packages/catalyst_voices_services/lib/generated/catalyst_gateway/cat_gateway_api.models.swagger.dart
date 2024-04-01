@@ -641,6 +641,75 @@ extension $StatusRejectedExtension on StatusRejected {
 }
 
 @JsonSerializable(explicitToJson: true)
+class SyncState {
+  const SyncState({
+    required this.slotNumber,
+    required this.blockHash,
+    required this.lastUpdated,
+  });
+
+  factory SyncState.fromJson(Map<String, dynamic> json) =>
+      _$SyncStateFromJson(json);
+
+  static const toJsonFactory = _$SyncStateToJson;
+  Map<String, dynamic> toJson() => _$SyncStateToJson(this);
+
+  @JsonKey(name: 'slot_number')
+  final int slotNumber;
+  @JsonKey(name: 'block_hash')
+  final String blockHash;
+  @JsonKey(name: 'last_updated')
+  final DateTime lastUpdated;
+  static const fromJsonFactory = _$SyncStateFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is SyncState &&
+            (identical(other.slotNumber, slotNumber) ||
+                const DeepCollectionEquality()
+                    .equals(other.slotNumber, slotNumber)) &&
+            (identical(other.blockHash, blockHash) ||
+                const DeepCollectionEquality()
+                    .equals(other.blockHash, blockHash)) &&
+            (identical(other.lastUpdated, lastUpdated) ||
+                const DeepCollectionEquality()
+                    .equals(other.lastUpdated, lastUpdated)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(slotNumber) ^
+      const DeepCollectionEquality().hash(blockHash) ^
+      const DeepCollectionEquality().hash(lastUpdated) ^
+      runtimeType.hashCode;
+}
+
+extension $SyncStateExtension on SyncState {
+  SyncState copyWith(
+      {int? slotNumber, String? blockHash, DateTime? lastUpdated}) {
+    return SyncState(
+        slotNumber: slotNumber ?? this.slotNumber,
+        blockHash: blockHash ?? this.blockHash,
+        lastUpdated: lastUpdated ?? this.lastUpdated);
+  }
+
+  SyncState copyWithWrapped(
+      {Wrapped<int>? slotNumber,
+      Wrapped<String>? blockHash,
+      Wrapped<DateTime>? lastUpdated}) {
+    return SyncState(
+        slotNumber: (slotNumber != null ? slotNumber.value : this.slotNumber),
+        blockHash: (blockHash != null ? blockHash.value : this.blockHash),
+        lastUpdated:
+            (lastUpdated != null ? lastUpdated.value : this.lastUpdated));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
 class VotePlan {
   const VotePlan({
     required this.votingToken,
