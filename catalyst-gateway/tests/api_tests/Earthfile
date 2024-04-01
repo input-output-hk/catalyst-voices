@@ -14,7 +14,7 @@ cat-gateway-test:
 
     FROM ../../+package-cat-gateway --address=$CAT_ADDRESS --db_url=$DB_URL
 
-    COPY github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:fix/mithril-preview-snapshot+package-preview-snapshot/snapshot /tmp
+    COPY github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:fix/mithril-preview-snapshot+package-preview-snapshot/snapshot /tmp/preview
     SAVE IMAGE cat-gateway-test:latest
 
 test:
