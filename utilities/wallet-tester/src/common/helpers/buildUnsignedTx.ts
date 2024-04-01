@@ -184,7 +184,9 @@ export default async function buildUnsignedTx(payload: TxBuilderArguments): Prom
       txMetadatum = TransactionMetadatum.new_bytes(hex2bin(item.value));
     } else if (item.valueType === MetadataValueType.Int) {
       txMetadatum = TransactionMetadatum.new_int(Int.from_str(item.value));
-    } else if (item.valueType === MetadataValueType.List) {
+    } else if (item.valueType === MetadataValueType.Cbor) {
+      txMetadatum = TransactionMetadatum.from_bytes(hex2bin(item.value));
+    }  else if (item.valueType === MetadataValueType.List) {
       // TODO:
       throw new Error("value type is currently not supported");
     } else if (item.valueType === MetadataValueType.Map) {

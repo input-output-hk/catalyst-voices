@@ -1,6 +1,4 @@
-import { Transaction, TransactionWitnessSet } from "@emurgo/cardano-serialization-lib-asmjs";
 import RefreshIcon from "@mui/icons-material/Refresh";
-import { decode, encode } from "cborg";
 import { compact, isEmpty, pickBy, uniq } from "lodash-es";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
@@ -15,7 +13,7 @@ import TxBuilder from "common/components/TxBuilder";
 import WalletViewSelection from "common/components/WalletViewSelection";
 import bin2hex from "common/helpers/bin2hex";
 import buildUnsignedTx from "common/helpers/buildUnsignedTx";
-import hex2bin from "common/helpers/hex2bin";
+import cleanHex from "common/helpers/cleanHex";
 import type { ExtractedWalletApi, TxBuilderArguments } from "types/cardano";
 
 type Props = {
@@ -78,24 +76,20 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
   async function handleExecute(formValues: FormValues) {
     setIsLoading(true);
 
-    const activeTx = Object.entries(formValues.tx).filter(([w]) => selectedWallets.includes(w));
+    const activeApi = Object.entries(walletApi).filter(([w]) => selectedWallets.includes(w));
 
     const response: Response = {};
-    for (const [walletName, cborHex] of activeTx) {
+    for (const [walletName] of activeApi) {
       if (!walletName) {
         continue;
       }
 
-      const jsonTx = JSON.stringify(decode(hex2bin(cborHex)));
-      const tx = Transaction.from_json(jsonTx);
-
       try {
-        const res = await walletApi[walletName]?.signTx(tx.to_hex(), formValues.partialSign);
-        const resFmt = TransactionWitnessSet.from_hex(res ?? "").to_js_value();
+        const res = await walletApi[walletName]?.signTx(cleanHex(formValues.tx), formValues.partialSign);
 
         response[walletName] = {
           isError: !res,
-          data: bin2hex(encode(resFmt)),
+          data: String(res),
         };
       } catch (err) {
         response[walletName] = {
@@ -106,7 +100,7 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
     }
 
     setResponse(response);
-    setSelectedResponseWallet(Object.keys(formValues.tx)[0] ?? "");
+    setSelectedResponseWallet(Object.keys(response)[0] ?? "");
     setIsLoading(false);
   }
 

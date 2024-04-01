@@ -33,6 +33,7 @@ export enum MetadataValueType {
   Int = "int",
   List = "list",
   Map = "map",
+  Cbor = "cbor",
 }
 
 export enum CertificateType {

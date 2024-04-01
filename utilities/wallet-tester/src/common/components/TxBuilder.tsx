@@ -415,7 +415,7 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
                       <div
                         className={twMerge(
                           "grid gap-2",
-                          value.valueType !== MetadataValueType.Hex && "grid-cols-2"
+                          value.valueType !== MetadataValueType.Cbor && "grid-cols-2"
                         )}
                       >
                         <Input
@@ -424,7 +424,7 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
                           label={`Label #${i + 1}`}
                           formRegister={register(`auxMetadata.metadata.${i}.key`)}
                         />
-                        {value.valueType === MetadataValueType.Hex ? (
+                        {value.valueType === MetadataValueType.Cbor ? (
                           <CBOREditor
                             value={value.value}
                             onChange={(val) => onChange({ ...value, value: val })}
