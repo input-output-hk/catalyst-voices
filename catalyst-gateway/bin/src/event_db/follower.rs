@@ -49,9 +49,16 @@ impl EventDB {
     /// Check when last update occurred.
     /// Start follower from where previous follower left off.
     pub(crate) async fn last_updated_metadata(
-        &self, network: String,
+        &self, network: Network,
     ) -> Result<(SlotNumber, BlockHash, BlockTime), Error> {
         let conn = self.pool.get().await?;
+
+        let network = match network {
+            Network::Mainnet => "mainnet".to_string(),
+            Network::Preview => "preview".to_string(),
+            Network::Preprod => "preprod".to_string(),
+            Network::Testnet => "testnet".to_string(),
+        };
 
         let rows = conn
             .query(
@@ -59,27 +66,14 @@ impl EventDB {
                 &[&network],
             )
             .await?;
-        if rows.is_empty() {
-            return Err(Error::NoLastUpdateMetadata("No metadata".to_string()));
-        }
 
         let Some(row) = rows.first() else {
-            return Err(Error::NoLastUpdateMetadata("No metadata".to_string()));
+            return Err(Error::NotFound);
         };
 
-        let slot_no = match row.try_get("slot_no") {
-            Ok(slot) => slot,
-            Err(e) => return Err(Error::NoLastUpdateMetadata(e.to_string())),
-        };
-
-        let block_hash = match row.try_get::<_, Vec<u8>>("block_hash") {
-            Ok(block_hash) => hex::encode(block_hash),
-            Err(e) => return Err(Error::NoLastUpdateMetadata(e.to_string())),
-        };
-        let last_updated = match row.try_get("ended") {
-            Ok(last_updated) => last_updated,
-            Err(e) => return Err(Error::NoLastUpdateMetadata(e.to_string())),
-        };
+        let slot_no = row.try_get("slot_no")?;
+        let block_hash = hex::encode(row.try_get::<_, Vec<u8>>("block_hash")?);
+        let last_updated = row.try_get("ended")?;
 
         Ok((slot_no, block_hash, last_updated))
     }

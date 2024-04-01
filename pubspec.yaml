@@ -1,7 +1,7 @@
 name: catalyst_voices_workspace
 
 environment:
-  sdk: '>=3.3.1 <4.0.0'
+  sdk: '>=3.3.3 <4.0.0'
 
 dev_dependencies:
-  melos: ^4.1.0
+  melos: ^5.2.2
