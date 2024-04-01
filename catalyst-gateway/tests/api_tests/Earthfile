@@ -11,7 +11,7 @@ preview-snapshot:
 
     WORKDIR /tmp
 
-    COPY github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:feat/mithril-snapshot+preview-snapshot/preview.tar.zst .
+    COPY github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:master+preview-snapshot/preview.tar.zst .
 
     # extract preview archive
     RUN apk add zstd
@@ -31,7 +31,7 @@ test:
 
     WITH DOCKER \
         --compose docker-compose.yml \
-        --load preview-snapshot:latest=github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:feat/mithril-snapshot+package-preview-snapshot \
+        --load preview-snapshot:latest=github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:master+package-preview-snapshot \
         --load event-db:latest=(../../event-db+build) \
         --load cat-gateway:latest=(../../+package-cat-gateway --address=$CAT_ADDRESS --db_url=$DB_URL) \
         --service cat-gateway \
