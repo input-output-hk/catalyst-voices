@@ -158,6 +158,7 @@ abstract class CatGatewayApi extends ChopperService {
   Future<chopper.Response<SyncState>> apiCardanoSyncStateGet(
       {enums.Network? network}) {
     generatedMapping.putIfAbsent(SyncState, () => SyncState.fromJsonFactory);
+
     return _apiCardanoSyncStateGet(network: network?.value?.toString());
   }
 
