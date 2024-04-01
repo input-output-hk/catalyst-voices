@@ -21,14 +21,14 @@ enum Network {
   @JsonValue(null)
   swaggerGeneratedUnknown(null),
 
-  @JsonValue('Mainnet')
-  mainnet('Mainnet'),
-  @JsonValue('Testnet')
-  testnet('Testnet'),
-  @JsonValue('Preprod')
-  preprod('Preprod'),
-  @JsonValue('Preview')
-  preview('Preview');
+  @JsonValue('mainnet')
+  mainnet('mainnet'),
+  @JsonValue('testnet')
+  testnet('testnet'),
+  @JsonValue('preprod')
+  preprod('preprod'),
+  @JsonValue('preview')
+  preview('preview');
 
   final String? value;
 

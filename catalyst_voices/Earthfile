@@ -58,7 +58,7 @@ check-flutter-code-generator:
     # Copy generated files in the local file tree to a temporary folder
     COPY packages/catalyst_voices_services/lib/generated/catalyst_gateway /tmp/repo_generated
     # Check diff between local code and earthly artifacts
-    RUN diff -C lines /tmp/repo_generated lib/generated/catalyst_gateway
+    RUN diff /tmp/repo_generated lib/generated/catalyst_gateway
 
 # Build web version of Catalyst Voices
 build:

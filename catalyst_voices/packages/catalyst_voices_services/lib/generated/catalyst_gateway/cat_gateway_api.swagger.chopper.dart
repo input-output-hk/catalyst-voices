@@ -82,12 +82,12 @@ final class _$CatGatewayApi extends CatGatewayApi {
   }
 
   @override
-  Future<Response<StakeInfo>> _apiUtxoStakedAdaStakeAddressGet({
+  Future<Response<StakeInfo>> _apiCardanoStakedAdaStakeAddressGet({
     required String? stakeAddress,
     String? network,
     DateTime? dateTime,
   }) {
-    final Uri $url = Uri.parse('/api/utxo/staked_ada/${stakeAddress}');
+    final Uri $url = Uri.parse('/api/cardano/staked_ada/${stakeAddress}');
     final Map<String, dynamic> $params = <String, dynamic>{
       'network': network,
       'date_time': dateTime,
