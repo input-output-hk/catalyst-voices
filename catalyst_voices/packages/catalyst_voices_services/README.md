@@ -21,9 +21,10 @@ folder:
 ```sh
 earthly +code-generator --platform=linux/amd64 --save_locally=true
 ```
-
-The `--platform=linux/amd64` is necessary only when running the command from a
-different platform.
+The `--platform=linux/amd64` flag is necessary only when running the command from
+a different platform such as **Windows** or **macOS**. It ensures that the
+code generation process is compatible with the target platform. If you are running
+the command on a **Linux** platform, you can omit this flag.
 
 In this way it's possible to locally generate the code using the same version of
 OpenAPI specs defined in the backend code and developers have full control of
