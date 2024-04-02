@@ -244,16 +244,16 @@ function TxBuilder({ utxos, addresses, onSubmit: onPropSubmit = noop }: Props) {
                   <Input
                     type="text"
                     label={`Hash #${i + 1}`}
-                    minLength={28}
-                    maxLength={28}
-                    formRegister={register(`certificates.${i}.hash`)}
+                    minLength={56}
+                    maxLength={56}
+                    formRegister={register(`certificates.${i}.hash`, { required: true })}
                   />
                   <Input
                     type="text"
                     label={`Pool Keyhash #${i + 1}`}
-                    minLength={28}
-                    maxLength={28}
-                    formRegister={register(`certificates.${i}.poolKeyhash`)}
+                    minLength={56}
+                    maxLength={56}
+                    formRegister={register(`certificates.${i}.poolKeyhash`, { required: true })}
                   />
                 </div>
               </div>
