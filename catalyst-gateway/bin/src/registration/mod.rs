@@ -213,12 +213,20 @@ pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingKey, Box<d
             for d in delegations {
                 match d {
                     Value::Array(delegations) => {
-                        let voting_key = match delegations[VOTE_KEY].as_bytes() {
+                        let voting_key = match delegations
+                            .get(VOTE_KEY)
+                            .ok_or("Issue parsing delegations")?
+                            .as_bytes()
+                        {
                             Some(key) => key,
                             None => return Err("Invalid voting key".to_string().into()),
                         };
 
-                        let weight = match delegations[WEIGHT].as_integer() {
+                        let weight = match delegations
+                            .get(WEIGHT)
+                            .ok_or("Issue parsing weight")?
+                            .as_integer()
+                        {
                             Some(weight) => match weight.try_into() {
                                 Ok(weight) => weight,
                                 Err(_err) => {
