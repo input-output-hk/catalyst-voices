@@ -83,12 +83,19 @@ impl Default for CddlConfig {
 /// A catalyst registration on Cardano in either CIP-15 or CIP-36 format
 #[derive(Debug, Clone, PartialEq)]
 pub struct Registration {
+    /// Voting key
     pub voting_key: Option<VotingKey>,
+    /// Stake key
     pub stake_key: Option<StakeKey>,
+    /// Rewards address
     pub rewards_address: Option<RewardsAddress>,
+    /// Nonce
     pub nonce: Option<Nonce>,
+    /// Optional voting purpose
     pub voting_purpose: Option<VotingPurpose>,
+    /// Raw cbor
     pub raw_cbor_cip36: Option<Vec<u8>>,
+    /// Witness signature 61285
     pub signature: Option<Signature>,
 }
 
