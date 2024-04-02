@@ -193,9 +193,18 @@ pub fn raw_sig_conversion(raw_cbor: &[u8]) -> Result<Signature, Box<dyn Error>> 
 #[allow(clippy::manual_let_else)]
 /// Parse cip36 registration tx
 pub fn inspect_metamap_reg(spec_61284: &[Value]) -> Result<&Vec<(Value, Value)>, Box<dyn Error>> {
-    let metamap = match &spec_61284[KEY_61284] {
+    let metamap = match &spec_61284
+        .get(KEY_61284)
+        .ok_or("Issue parsing 61284 parent key")?
+    {
         Value::Map(metamap) => metamap,
-        _ => return Err(format!("Invalid metamap {:?}", spec_61284[KEY_61284]).into()),
+        _ => {
+            return Err(format!(
+                "Invalid metamap {:?}",
+                spec_61284.get(KEY_61284).ok_or("Issue parsing metamap")?
+            )
+            .into())
+        },
     };
     Ok(metamap)
 }
