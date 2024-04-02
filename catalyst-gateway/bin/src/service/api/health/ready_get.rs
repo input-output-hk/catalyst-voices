@@ -5,7 +5,7 @@ use std::sync::Arc;
 use poem::web::Data;
 use poem_extensions::{
     response,
-    UniResponse::{T204, T500, T503},
+    UniResponse::{T204, T503},
 };
 
 use crate::{
@@ -14,7 +14,7 @@ use crate::{
     service::common::responses::{
         resp_2xx::NoContent,
         resp_4xx::ApiValidationError,
-        resp_5xx::{server_error, ServerError, ServiceUnavailable},
+        resp_5xx::{server_error_response, ServerError, ServiceUnavailable},
     },
     state::{SchemaVersionStatus, State},
 };
@@ -69,6 +69,6 @@ pub(crate) async fn endpoint(state: Data<&Arc<State>>) -> AllResponses {
             T503(ServiceUnavailable)
         },
         Err(Error::EventDb(DBError::TimedOut)) => T503(ServiceUnavailable),
-        Err(err) => T500(server_error!("{}", err.to_string())),
+        Err(err) => server_error_response!("{err}"),
     }
 }

@@ -27,7 +27,7 @@ jobs:
     name: Generate test reports
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup CI
         uses: input-output-hk/catalyst-ci/actions/setup@master
@@ -36,7 +36,7 @@ jobs:
             aws_region: ${{ env.AWS_REGION }}
             earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
 
-      - name: Get unit test report
+      - name: Get catalyst gateway unit test report
         uses: input-output-hk/catalyst-ci/actions/run@master
         if: always()
         continue-on-error: true
@@ -60,6 +60,18 @@ jobs:
           runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
           artifact: "false"
 
+      - name: Get flutter unit test report
+        uses: input-output-hk/catalyst-ci/actions/run@master
+        if: always()
+        continue-on-error: true
+        with:
+            earthfile: ./catalyst_voices/
+            flags:
+            targets: test-unit
+            target_flags:
+            runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+            artifact: "false"
+
       - name: Collect and upload test reports
         uses: actions/upload-artifact@v4
         if: always()
@@ -73,7 +85,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [generate-test-reports]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: actions/download-artifact@v4
 
@@ -85,7 +97,7 @@ jobs:
               ls ${{ env.ALLURE_REPORT_PATH }}
 
       - name: Checkout gh-pages
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: gh-pages
           path: gh-pages-dir

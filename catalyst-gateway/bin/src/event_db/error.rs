@@ -18,8 +18,8 @@ pub(crate) enum Error {
     #[error("DB URL is undefined")]
     NoDatabaseUrl,
     /// Cannot find this item
-    #[error("Cannot find this item, error: {0}")]
-    NotFound(String),
+    #[error("Cannot find this item")]
+    NotFound,
     /// DB connection timeout
     #[error("Connection to DB timed out")]
     TimedOut,
@@ -38,15 +38,12 @@ pub(crate) enum Error {
     #[error("Decode Error: {0}")]
     /// Unable to decode hex
     DecodeHex(String),
-    /// No previous followers hence no last updates metadata
-    #[error("LastUpdate metadata not present: {0}")]
-    NoLastUpdateMetadata(String),
-    /// Conversion error
-    #[error("Unable to convert u64 to i64 for sql type compatibility: {0}")]
-    SqlTypeConversionFailure(String),
     /// Unable to extract policy assets
     #[error("Unable parse assets: {0}")]
     AssetParsingIssue(String),
+    /// Unable to extract hashed witnesses
+    #[error("Unable to extract hashed witnesses: {0}")]
+    HashedWitnessExtraction(String),
 }
 
 impl From<RunError<tokio_postgres::Error>> for Error {

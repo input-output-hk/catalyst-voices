@@ -31,6 +31,7 @@ coti
 cryptoxide
 Cunego
 Cupertino
+dalek
 dbsync
 delegators
 DIND
@@ -41,6 +42,7 @@ dotglob
 drep
 dreps
 earthfile
+Edgedriver
 emurgo
 encryptor
 fetchval
@@ -52,6 +54,7 @@ Formz
 fuzzer
 gapless
 gcloud
+geckodriver
 genhtml
 gethostname
 gmtime
@@ -68,6 +71,8 @@ Joaquín
 jorm
 jormungandr
 Jörmungandr
+junitreport
+Keyhash
 lcov
 Leshiy
 lintfix
@@ -78,6 +83,7 @@ mgrybyk
 mithril
 mitigations
 moderations
+msedgedriver
 multidex
 myproject
 nanos
@@ -117,6 +123,7 @@ rxdart
 saibatizoku
 schemathesis
 Schemathesis
+Scripthash
 seckey
 sendfile
 slotno
@@ -133,14 +140,17 @@ thollander
 timelike
 toastify
 Toastify
+tojunit
 Traceback
 TXNZD
+Typer
 unmanaged
 UTXO
 Utxos
 utxos
 vite
 vitss
+vkey
 voteplan
 voteplans
 wallclock

@@ -4,10 +4,11 @@ version: 0.1.0+1
 publish_to: none
 
 environment:
-  sdk: '>=3.3.0 <4.0.0'
-  flutter: 3.19.1
+  sdk: '>=3.3.3 <4.0.0'
+  flutter: 3.19.5
 
 dependencies:
+  animated_text_kit: ^4.2.2
   animations: ^2.0.11
   catalyst_voices_assets:
     path: ./packages/catalyst_voices_assets
@@ -34,6 +35,7 @@ dependencies:
     sdk: flutter
   formz: ^0.7.0
   go_router: ^13.0.0
+  google_fonts: ^6.2.1
   url_launcher: ^6.2.2
   url_strategy: ^0.2.0
 

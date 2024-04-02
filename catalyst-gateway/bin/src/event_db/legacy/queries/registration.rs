@@ -84,9 +84,7 @@ impl EventDB {
             conn.query(Self::VOTER_BY_LAST_EVENT_QUERY, &[&voting_key])
                 .await?
         };
-        let voter = rows
-            .first()
-            .ok_or_else(|| Error::NotFound("Cannot find voter value".to_string()))?;
+        let voter = rows.first().ok_or(Error::NotFound)?;
 
         let voting_group = VoterGroupId(voter.try_get("voting_group")?);
         let voting_power = voter.try_get("voting_power")?;
@@ -104,9 +102,7 @@ impl EventDB {
 
         let total_voting_power_per_group: i64 = rows
             .first()
-            .ok_or_else(|| {
-                Error::NotFound("Cannot find total voting power per group value".to_string())
-            })?
+            .ok_or(Error::NotFound)?
             .try_get("total_voting_power")?;
 
         let voting_power_saturation = if total_voting_power_per_group == 0 {
@@ -176,9 +172,7 @@ impl EventDB {
             conn.query(Self::DELEGATOR_SNAPSHOT_INFO_BY_LAST_EVENT_QUERY, &[])
                 .await?
         };
-        let delegator_snapshot_info = rows
-            .first()
-            .ok_or_else(|| Error::NotFound("Cannot find delegator value".to_string()))?;
+        let delegator_snapshot_info = rows.first().ok_or(Error::NotFound)?;
 
         let delegation_rows = if let Some(event) = event {
             conn.query(Self::DELEGATIONS_BY_EVENT_QUERY, &[
@@ -194,7 +188,7 @@ impl EventDB {
             .await?
         };
         if delegation_rows.is_empty() {
-            return Err(Error::NotFound("Cannot find delegator value".to_string()));
+            return Err(Error::NotFound);
         }
 
         let mut delegations = Vec::new();
@@ -216,7 +210,7 @@ impl EventDB {
         };
         let total_power: i64 = rows
             .first()
-            .ok_or_else(|| Error::NotFound("Cannot find total power value".to_string()))?
+            .ok_or(Error::NotFound)?
             .try_get("total_voting_power")?;
 
         #[allow(clippy::indexing_slicing)] // delegation_rows already checked to be not empty.

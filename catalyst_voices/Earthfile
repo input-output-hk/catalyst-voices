@@ -1,29 +1,68 @@
-VERSION --try --global-cache 0.7
+VERSION --try --global-cache --arg-scope-and-set 0.7
 
+# If running this target with a local ssh agent active, set the environment
+# variable EARTHLY_SSH_AUTH_SOCK='' to make the `+deps` target work. Earthly
+# defaults to ssh authentication when it founds an ssh agent active but the
+# flutter repo needs to be cloned via https to properly use the `channel`
+# subcommand.
 deps:
-    FROM debian:stable-slim
+    FROM debian:bookworm-slim
     RUN apt-get update
-    RUN apt-get install -y curl git unzip bash
+    RUN apt-get install -y git curl unzip bzip2 bash jq gpg
+    COPY --dir test_driver/scripts .
+    RUN chmod +x scripts/install-chrome-linux64.sh && ./scripts/install-chrome-linux64.sh
+    RUN chmod +x scripts/install-edge-linux64.sh && ./scripts/install-edge-linux64.sh
+    RUN chmod +x scripts/install-firefox-linux64.sh && ./scripts/install-firefox-linux64.sh
+
     WORKDIR /frontend
 
-# Download and set-up flutter
-flutter:
-    FROM +deps
-
-    RUN git clone https://github.com/flutter/flutter.git /usr/local/flutter
-    ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:${PATH}"
-
+    GIT CLONE https://github.com/flutter/flutter.git /usr/local/flutter
+    ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
     RUN flutter channel stable
     RUN flutter upgrade
     RUN flutter --version
     RUN flutter doctor -v
     RUN flutter config --enable-web
+    RUN dart pub global activate junitreport
+
+src:
+    FROM +deps
+    COPY --dir pubspec.yaml lib packages web test test_driver integration_test .
+
+# code-generator - Generates flutter code.
+# Based on Catalyst Gateway OpenAPI specifications generates models, clients
+# and serialization logic.
+# It accepts [save_locally] ARG that when true place the artifacts in the
+# proper folder of `catalyst_voices_services` local code.
+code-generator:
+    ARG save_locally=false
+
+    FROM +deps
+    COPY --dir pubspec.yaml lib packages web test test_driver integration_test catalyst_voices
+    COPY ../+repo-catalyst-voices-packages/repo .
+    WORKDIR /frontend/catalyst_voices/packages/catalyst_voices_services
+    COPY ../catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
+    RUN flutter pub get
+    RUN dart run build_runner build --delete-conflicting-outputs
+
+    IF [ $save_locally = true ]
+        SAVE ARTIFACT lib/generated/catalyst_gateway/* AS LOCAL ./packages/catalyst_voices_services/lib/generated/catalyst_gateway/
+    ELSE
+        SAVE ARTIFACT lib/generated/catalyst_gateway
+    END
+
+# check-flutter-code-generator - Checks that the code generation is consistent
+# with the generated code currently in the repo.
+check-flutter-code-generator:
+    FROM +code-generator
+    # Copy generated files in the local file tree to a temporary folder
+    COPY packages/catalyst_voices_services/lib/generated/catalyst_gateway /tmp/repo_generated
+    # Check diff between local code and earthly artifacts
+    RUN diff /tmp/repo_generated lib/generated/catalyst_gateway
 
 # Build web version of Catalyst Voices
 build:
-    FROM +flutter
-
-    COPY --dir pubspec.yaml lib packages web test test_driver integration_test .
+    FROM +src
 
     RUN flutter clean
     RUN flutter pub get
@@ -32,18 +71,20 @@ build:
     WORKDIR /frontend/build
     SAVE ARTIFACT web /web AS LOCAL web
 
-docker:
-    FROM +deps
-    FROM nginx:stable-alpine3.17
-
-    COPY +build/web /app
-    COPY ./nginx.conf /etc/nginx/nginx.conf
-
-    EXPOSE 80
+test-unit:
+    FROM +build
+    WORKDIR /frontend
+    TRY
+        RUN flutter test --reporter expanded . --machine | tojunit --output flutter.junit-report.xml
+    FINALLY
+        SAVE ARTIFACT flutter.junit-report.xml AS LOCAL flutter-unit-tests.junit-report.xml
+    END
 
 package:
-    FROM +docker
-
+    FROM nginx:alpine3.18
     ARG tag='latest'
+    COPY +build/web /app
+    COPY ./nginx.conf /etc/nginx/nginx.conf
+    EXPOSE 80
 
     SAVE IMAGE catalyst-voices-app:$tag

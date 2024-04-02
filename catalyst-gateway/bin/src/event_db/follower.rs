@@ -1,12 +1,11 @@
 //! Follower Queries
 
 use cardano_chain_follower::Network;
-use chrono::TimeZone;
 
 use crate::event_db::{Error, EventDB};
 
 /// Block time
-pub type BlockTime = i64;
+pub type BlockTime = chrono::DateTime<chrono::offset::Utc>;
 /// Slot
 pub type SlotNumber = i64;
 /// Epoch
@@ -15,8 +14,6 @@ pub type EpochNumber = i64;
 pub type BlockHash = String;
 /// Unique follower id
 pub type MachineId = String;
-/// Time when a follower last indexed
-pub type LastUpdate = chrono::DateTime<chrono::offset::Utc>;
 
 impl EventDB {
     /// Index follower block stream
@@ -25,8 +22,6 @@ impl EventDB {
         block_hash: BlockHash,
     ) -> Result<(), Error> {
         let conn = self.pool.get().await?;
-
-        let timestamp: chrono::DateTime<chrono::Utc> = chrono::Utc.timestamp_nanos(block_time);
 
         let network = match network {
             Network::Mainnet => "mainnet".to_string(),
@@ -42,7 +37,7 @@ impl EventDB {
                     &slot_no,
                     &network,
                     &epoch_no,
-                    &timestamp,
+                    &block_time,
                     &hex::decode(block_hash).map_err(|e| Error::DecodeHex(e.to_string()))?,
                 ],
             )
@@ -54,9 +49,16 @@ impl EventDB {
     /// Check when last update occurred.
     /// Start follower from where previous follower left off.
     pub(crate) async fn last_updated_metadata(
-        &self, network: String,
-    ) -> Result<(SlotNumber, BlockHash, LastUpdate), Error> {
+        &self, network: Network,
+    ) -> Result<(SlotNumber, BlockHash, BlockTime), Error> {
         let conn = self.pool.get().await?;
+
+        let network = match network {
+            Network::Mainnet => "mainnet".to_string(),
+            Network::Preview => "preview".to_string(),
+            Network::Preprod => "preprod".to_string(),
+            Network::Testnet => "testnet".to_string(),
+        };
 
         let rows = conn
             .query(
@@ -64,27 +66,14 @@ impl EventDB {
                 &[&network],
             )
             .await?;
-        if rows.is_empty() {
-            return Err(Error::NoLastUpdateMetadata("No metadata".to_string()));
-        }
 
         let Some(row) = rows.first() else {
-            return Err(Error::NoLastUpdateMetadata("No metadata".to_string()));
+            return Err(Error::NotFound);
         };
 
-        let slot_no: SlotNumber = match row.try_get("slot_no") {
-            Ok(slot) => slot,
-            Err(e) => return Err(Error::NoLastUpdateMetadata(e.to_string())),
-        };
-
-        let block_hash: BlockHash = match row.try_get::<_, Vec<u8>>("block_hash") {
-            Ok(block_hash) => hex::encode(block_hash),
-            Err(e) => return Err(Error::NoLastUpdateMetadata(e.to_string())),
-        };
-        let last_updated: LastUpdate = match row.try_get("ended") {
-            Ok(last_updated) => last_updated,
-            Err(e) => return Err(Error::NoLastUpdateMetadata(e.to_string())),
-        };
+        let slot_no = row.try_get("slot_no")?;
+        let block_hash = hex::encode(row.try_get::<_, Vec<u8>>("block_hash")?);
+        let last_updated = row.try_get("ended")?;
 
         Ok((slot_no, block_hash, last_updated))
     }
@@ -92,7 +81,7 @@ impl EventDB {
     /// Mark point in time where the last follower finished indexing in order for future
     /// followers to pick up from this point
     pub(crate) async fn refresh_last_updated(
-        &self, last_updated: LastUpdate, slot_no: SlotNumber, block_hash: BlockHash,
+        &self, last_updated: BlockTime, slot_no: SlotNumber, block_hash: BlockHash,
         network: Network, machine_id: &MachineId,
     ) -> Result<(), Error> {
         let conn = self.pool.get().await?;
