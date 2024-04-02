@@ -25,17 +25,47 @@ const VOTE_PURPOSE: usize = 4;
 const VOTE_KEY: usize = 0;
 const WEIGHT: usize = 1;
 
-// 61285
-//const KEY_61285: usize = 0;
-//const WITNESS: usize = 0;
+/// <https://cips.cardano.org/cips/cip36/schema.cddl>
+const CIP36_61284: usize = 61284;
+const CIP36_61285: usize = 61285;
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 pub struct PubKey(pub Vec<u8>);
 
-pub type Nonce = u64;
-pub type VotingPurpose = u64;
-pub type RewardsAddress = Vec<u8>;
-pub type StakeKey = PubKey;
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+pub struct Nonce(pub u64);
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+pub struct VotingPurpose(pub u64);
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+pub struct RewardsAddress(pub Vec<u8>);
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+pub struct StakeKey(pub PubKey);
+
+pub type ErrorReport = Vec<String>;
+
+/// Cddl schema:
+/// <https://cips.cardano.org/cips/cip36/schema.cddl>
+pub struct CddlConfig {
+    cip_36: String,
+}
+
+impl CddlConfig {
+    #[must_use]
+    pub fn new() -> Self {
+        let cip_36: String = include_str!("cip36.cddl").to_string();
+
+        CddlConfig { cip_36 }
+    }
+}
+
+impl Default for CddlConfig {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 /// A catalyst registration on Cardano in either CIP-15 or CIP-36 format
 #[derive(Debug, Clone, PartialEq)]
@@ -87,138 +117,6 @@ pub fn validate_reg_cddl(bin_reg: &[u8], cddl_config: &CddlConfig) -> Result<(),
     Ok(())
 }
 
-/// Cddl schema:
-/// <https://cips.cardano.org/cips/cip36/schema.cddl>
-pub struct CddlConfig {
-    cip_36: String,
-}
-
-impl CddlConfig {
-    #[must_use]
-    pub fn new() -> Self {
-        let cip_36: String = include_str!("cip36.cddl").to_string();
-
-        CddlConfig { cip_36 }
-    }
-}
-
-impl Default for CddlConfig {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-pub fn raw_sig_conversion(raw_cbor: Vec<u8>) -> Result<Signature, Box<dyn Error>> {
-    let decoded: ciborium::value::Value = ciborium::de::from_reader(Cursor::new(&raw_cbor))?;
-
-    let signature_61285 = match decoded {
-        Value::Map(m) => m.iter().map(|entry| entry.1.clone()).collect::<Vec<_>>(),
-        _ => return Err(format!("Invalid signature {:?}", decoded).into()),
-    };
-
-    let s: [u8; 64] = signature_61285
-        .iter()
-        .find_map(|key| Some(key.clone().into_bytes().unwrap()))
-        .ok_or("Bad signature")?
-        .try_into()
-        .map_err(|e| hex::encode(e))?;
-
-    let sig = Signature::from_bytes(&s);
-
-    Ok(sig)
-}
-
-#[allow(clippy::manual_let_else)]
-pub fn inspect_metamap_reg(spec_61284: &[Value]) -> Result<&Vec<(Value, Value)>, Box<dyn Error>> {
-    let metamap = match &spec_61284[0] {
-        Value::Map(metamap) => metamap,
-        _ => return Err(format!("Invalid metamap {:?}", spec_61284[KEY_61284]).into()),
-    };
-    Ok(metamap)
-}
-
-#[allow(clippy::manual_let_else)]
-pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingKey, Box<dyn Error>> {
-    let voting_key = match &metamap[DELEGATIONS_OR_DIRECT] {
-        (Value::Integer(_one), Value::Bytes(direct)) => {
-            VotingKey::Direct(PubKey(direct.clone()).into())
-        },
-        (Value::Integer(_one), Value::Array(delegations)) => {
-            let mut delegations_map: Vec<(PubKey, u64)> = Vec::new();
-            for d in delegations {
-                match d {
-                    Value::Array(delegations) => {
-                        let voting_key = match delegations[VOTE_KEY].as_bytes() {
-                            Some(key) => key,
-                            None => return Err(format!("Invalid signature").into()),
-                        };
-
-                        let weight = match delegations[WEIGHT].as_integer() {
-                            Some(weight) => match weight.try_into() {
-                                Ok(weight) => weight,
-                                Err(_err) => return Err(format!("Invalid signature").into()),
-                            },
-                            None => return Err(format!("Invalid signature ").into()),
-                        };
-
-                        delegations_map.push(((PubKey(voting_key.clone())), weight));
-                    },
-
-                    _ => return Err(format!("Invalid signature").into()),
-                }
-            }
-
-            VotingKey::Delegated(delegations_map)
-        },
-
-        _ => return Err(format!("Invalid signature").into()),
-    };
-    Ok(voting_key)
-}
-
-pub fn inspect_stake_key(metamap: &[(Value, Value)]) -> Result<PubKey, Box<dyn Error>> {
-    let stake_key = match &metamap[STAKE_ADDRESS] {
-        (Value::Integer(_two), Value::Bytes(stake_addr)) => PubKey(stake_addr.clone()),
-        _ => return Err(format!("Invalid signature").into()),
-    };
-    Ok(stake_key)
-}
-
-pub fn inspect_rewards_addr(
-    metamap: &[(Value, Value)], network_id: Network,
-) -> Result<&Vec<u8>, Box<dyn Error>> {
-    let rewards_address = match &metamap[PAYMENT_ADDRESS] {
-        (Value::Integer(_three), Value::Bytes(rewards_addr)) => rewards_addr,
-        _ => return Err(format!("Invalid signature").into()),
-    };
-
-    if !is_valid_rewards_address(&*rewards_address.get(NETWORK_ID).ok_or("err")?, network_id) {
-        return Err(format!("Invalid signature").into());
-    }
-    Ok(rewards_address)
-}
-
-pub fn inspect_nonce(metamap: &[(Value, Value)]) -> Result<Nonce, Box<dyn Error>> {
-    let nonce = match metamap[NONCE] {
-        (Value::Integer(_four), Value::Integer(nonce)) => nonce.try_into()?,
-        _ => return Err(format!("Invalid signature").into()),
-    };
-    Ok(nonce)
-}
-
-pub fn inspect_voting_purpose(
-    metamap: &Vec<(Value, Value)>,
-) -> Result<Option<VotingPurpose>, Box<dyn Error>> {
-    if metamap.len() == 5 {
-        match metamap[VOTE_PURPOSE] {
-            (Value::Integer(_five), Value::Integer(purpose)) => Ok(Some(purpose.try_into()?)),
-            _ => Ok(None),
-        }
-    } else {
-        Ok(None)
-    }
-}
-
 /// Reward addresses start with a single header byte identifying their type and the network,
 /// followed by 28 bytes of payload identifying either a stake key hash or a script hash.
 /// Function accepts this first header prefix byte.
@@ -251,14 +149,133 @@ pub fn is_valid_rewards_address(rewards_address_prefix: &u8, network: Network) -
     valid_addrs.contains(&addr_type)
 }
 
+/// Convert raw 61285 cbor to witness signature
+pub fn raw_sig_conversion(raw_cbor: Vec<u8>) -> Result<Signature, Box<dyn Error>> {
+    let decoded: ciborium::value::Value = ciborium::de::from_reader(Cursor::new(&raw_cbor))?;
+
+    let signature_61285 = match decoded {
+        Value::Map(m) => m.iter().map(|entry| entry.1.clone()).collect::<Vec<_>>(),
+        _ => return Err(format!("Invalid signature {:?}", decoded).into()),
+    };
+
+    let s: [u8; 64] = signature_61285
+        .iter()
+        .find_map(|key| Some(key.clone().into_bytes().unwrap()))
+        .ok_or("Bad signature")?
+        .try_into()
+        .map_err(|e| hex::encode(e))?;
+
+    let sig = Signature::from_bytes(&s);
+
+    Ok(sig)
+}
+
+#[allow(clippy::manual_let_else)]
+///
+pub fn inspect_metamap_reg(spec_61284: &[Value]) -> Result<&Vec<(Value, Value)>, Box<dyn Error>> {
+    let metamap = match &spec_61284[0] {
+        Value::Map(metamap) => metamap,
+        _ => return Err(format!("Invalid metamap {:?}", spec_61284[KEY_61284]).into()),
+    };
+    Ok(metamap)
+}
+
+#[allow(clippy::manual_let_else)]
+pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingKey, Box<dyn Error>> {
+    let voting_key = match &metamap[DELEGATIONS_OR_DIRECT] {
+        (Value::Integer(_one), Value::Bytes(direct)) => {
+            VotingKey::Direct(PubKey(direct.clone()).into())
+        },
+        (Value::Integer(_one), Value::Array(delegations)) => {
+            let mut delegations_map: Vec<(PubKey, u64)> = Vec::new();
+            for d in delegations {
+                match d {
+                    Value::Array(delegations) => {
+                        let voting_key = match delegations[VOTE_KEY].as_bytes() {
+                            Some(key) => key,
+                            None => return Err(format!("Invalid voting key").into()),
+                        };
+
+                        let weight = match delegations[WEIGHT].as_integer() {
+                            Some(weight) => match weight.try_into() {
+                                Ok(weight) => weight,
+                                Err(_err) => {
+                                    return Err(format!("Invalid weight in delegation").into())
+                                },
+                            },
+                            None => return Err(format!("Invalid delegation").into()),
+                        };
+
+                        delegations_map.push(((PubKey(voting_key.clone())), weight));
+                    },
+
+                    _ => return Err(format!("Invalid voting key").into()),
+                }
+            }
+
+            VotingKey::Delegated(delegations_map)
+        },
+
+        _ => return Err(format!("Invalid signature").into()),
+    };
+    Ok(voting_key)
+}
+
+pub fn inspect_stake_key(metamap: &[(Value, Value)]) -> Result<PubKey, Box<dyn Error>> {
+    let stake_key = match &metamap[STAKE_ADDRESS] {
+        (Value::Integer(_two), Value::Bytes(stake_addr)) => PubKey(stake_addr.clone()),
+        _ => return Err(format!("Invalid stake key").into()),
+    };
+    Ok(stake_key)
+}
+
+pub fn inspect_rewards_addr(
+    metamap: &[(Value, Value)], network_id: Network,
+) -> Result<&Vec<u8>, Box<dyn Error>> {
+    let rewards_address = match &metamap[PAYMENT_ADDRESS] {
+        (Value::Integer(_three), Value::Bytes(rewards_addr)) => rewards_addr,
+        _ => return Err(format!("Invalid rewardsd address").into()),
+    };
+
+    if !is_valid_rewards_address(&*rewards_address.get(NETWORK_ID).ok_or("err")?, network_id) {
+        return Err(format!("Invalid reward address").into());
+    }
+    Ok(rewards_address)
+}
+
+pub fn inspect_nonce(metamap: &[(Value, Value)]) -> Result<Nonce, Box<dyn Error>> {
+    let nonce = match metamap[NONCE] {
+        (Value::Integer(_four), Value::Integer(nonce)) => Nonce(nonce.try_into()?),
+        _ => return Err(format!("Invalid nonce").into()),
+    };
+    Ok(nonce)
+}
+
+pub fn inspect_voting_purpose(
+    metamap: &Vec<(Value, Value)>,
+) -> Result<Option<VotingPurpose>, Box<dyn Error>> {
+    if metamap.len() == 5 {
+        match metamap[VOTE_PURPOSE] {
+            (Value::Integer(_five), Value::Integer(purpose)) => {
+                Ok(Some(VotingPurpose(purpose.try_into()?)))
+            },
+            _ => Ok(None),
+        }
+    } else {
+        Ok(None)
+    }
+}
+
+/// Extract registrations information for TX metadata
+/// Collect secondary errors for granular json error report
 pub fn parse_registrations_from_metadata(
     meta: MultiEraMeta, network: Network,
-) -> Result<(Registration, Vec<String>), Box<dyn Error>> {
+) -> Result<(Registration, ErrorReport), Box<dyn Error>> {
     let mut voting_key: Option<VotingKey> = None;
     let mut stake_key: Option<StakeKey> = None;
     let mut voting_purpose: Option<VotingPurpose> = None;
     let mut rewards_address: Option<RewardsAddress> = None;
-    let mut nonce: Option<u64> = None;
+    let mut nonce: Option<Nonce> = None;
     let mut raw_cbor_cip36: Option<Vec<u8>> = None;
     let mut sig: Option<Signature> = None;
 
@@ -267,7 +284,7 @@ pub fn parse_registrations_from_metadata(
     match meta {
         pallas::ledger::traverse::MultiEraMeta::AlonzoCompatible(meta) => {
             for (key, cip36_registration) in meta.iter() {
-                if *key == u64::try_from(61284)? {
+                if *key == u64::try_from(CIP36_61284)? {
                     let raw_cbor = meta.encode_fragment()?;
                     raw_cbor_cip36 = Some(raw_cbor.clone());
 
@@ -308,7 +325,7 @@ pub fn parse_registrations_from_metadata(
 
                     // A stake address for the network that this transaction is submitted to (to point to the Ada that is being delegated);
                     match inspect_stake_key(metamap) {
-                        Ok(value) => stake_key = Some(value),
+                        Ok(value) => stake_key = Some(StakeKey(value)),
                         Err(err) => {
                             stake_key = None;
                             errors_report
@@ -319,7 +336,7 @@ pub fn parse_registrations_from_metadata(
                     // A Shelley payment address (see CIP-0019) discriminated for the same network
                     // this transaction is submitted to, to receive rewards.
                     match inspect_rewards_addr(metamap, network) {
-                        Ok(value) => rewards_address = Some(value.to_vec()),
+                        Ok(value) => rewards_address = Some(RewardsAddress(value.to_vec())),
                         Err(err) => {
                             rewards_address = None;
                             errors_report.push(
@@ -351,7 +368,7 @@ pub fn parse_registrations_from_metadata(
                             );
                         },
                     };
-                } else if *key == u64::try_from(61285)? {
+                } else if *key == u64::try_from(CIP36_61285)? {
                     // Validate 61285 signature
                     let raw_cbor = cip36_registration.encode_fragment()?;
 
@@ -418,10 +435,4 @@ pub fn test_rewards_addr_permuations() {
         assert!(!is_valid_rewards_address(&test_addr, Network::Testnet));
         assert!(!is_valid_rewards_address(&test_addr, Network::Mainnet));
     }
-}
-
-#[test]
-fn cddl() {
-    let cddl = CddlConfig::new();
-    validate_reg_cddl(&hex::decode("abc").unwrap(), &cddl).unwrap();
 }

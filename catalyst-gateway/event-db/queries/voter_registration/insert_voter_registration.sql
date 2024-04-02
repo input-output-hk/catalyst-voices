@@ -5,8 +5,7 @@ INSERT INTO cardano_voter_registration
   public_voting_key,
   payment_address,
   nonce,
-  metadata_61284,
-  metadata_61285,
+  metadata_cip36,
   valid
 )
 
@@ -17,6 +16,5 @@ stake_credential = $2,
 public_voting_key = $3,
 payment_address = $4,
 nonce = $5,
-metadata_61284 = $6,
-metadata_61285 = $7,
+metadata_cip36 = $6,
 valid = $8

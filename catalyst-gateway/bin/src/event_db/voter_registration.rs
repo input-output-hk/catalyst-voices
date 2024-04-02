@@ -3,9 +3,10 @@
 use cardano_chain_follower::Network;
 
 use pallas::ledger::traverse::MultiEraTx;
-use tracing::info;
 
-use crate::registration::{parse_registrations_from_metadata, validate_reg_cddl, CddlConfig};
+use crate::registration::{
+    parse_registrations_from_metadata, validate_reg_cddl, CddlConfig, Nonce as NonceReg,
+};
 
 use super::{follower::SlotNumber, Error, EventDB};
 
@@ -14,7 +15,7 @@ pub(crate) type TxId = String;
 /// Stake credential
 pub(crate) type StakeCredential<'a> = &'a [u8];
 /// Public voting key
-pub(crate) type PublicVotingKey<'a> = &'a [u8];
+pub(crate) type PublicVotingKey = String;
 /// Payment address
 pub(crate) type PaymentAddress<'a> = &'a [u8];
 /// Nonce
@@ -29,8 +30,8 @@ impl EventDB {
     #[allow(dead_code, clippy::too_many_arguments)]
     async fn insert_voter_registration(
         &self, tx_id: TxId, stake_credential: StakeCredential<'_>,
-        public_voting_key: PublicVotingKey<'_>, payment_address: PaymentAddress<'_>, nonce: Nonce,
-        metadata_cip36: MetadataCip36<'_>, valid: bool,
+        public_voting_key: PublicVotingKey, payment_address: PaymentAddress<'_>,
+        metadata_cip36: MetadataCip36<'_>, nonce: Nonce, valid: bool,
     ) -> Result<(), Error> {
         let conn = self.pool.get().await?;
 
@@ -44,8 +45,8 @@ impl EventDB {
                     &stake_credential,
                     &public_voting_key,
                     &payment_address,
-                    &nonce,
                     &metadata_cip36,
+                    &nonce,
                     &valid,
                 ],
             )
@@ -61,51 +62,73 @@ impl EventDB {
         let cddl = CddlConfig::new();
 
         for tx in txs {
-            let mut _valid_registration = true;
+            let mut valid_registration = true;
 
             if !tx.metadata().is_empty() {
-                let registration = match parse_registrations_from_metadata(tx.metadata(), network) {
-                    Ok(registration) => registration,
-                    Err(err) => {
-                        info!("err {:?}", err);
-                        continue;
-                    },
-                };
+                let (registration, errors_report) =
+                    match parse_registrations_from_metadata(tx.metadata(), network) {
+                        Ok(registration) => registration,
+                        Err(_err) => {
+                            // fatal error parsing registration tx, unable to extract meaningful errors
+                            // assume corrupted tx
+                            continue;
+                        },
+                    };
 
-                let reg = registration.clone();
-                if let Some(cip36) = registration.0.raw_cbor_cip36 {
+                // cddl verification
+                if let Some(cip36) = registration.clone().raw_cbor_cip36 {
                     match validate_reg_cddl(&cip36, &cddl) {
-                        Ok(()) => info!("cddl ok reg {:?}", reg.0),
-                        Err(_err) => continue,
+                        Ok(()) => (),
+                        Err(_err) => {
+                            // did not pass cddl verification, not a valid registration
+                            continue;
+                        },
                     };
                 } else {
-                    // not a valid registration
+                    // registration does not contain cip36 61284 or 61285 keys
+                    // not a valid registration tx
                     continue;
                 }
 
-                // cddl is valid continue parsing
-                /*
-                    if let Some(voting_key) = registration.0.voting_key {
-                        match voting_key{
-                            crate::registration::VotingKey::Direct(direct) => direct,
-                            crate::registration::VotingKey::Delegated(delegated) => {
-                                delegated.into_iter().find_map(|(a, _b)| Some(a)).unwrap()
-                            },
-                    }
-
-
+                // invalid registration
+                // index with invalid registration flag and error report
+                if !errors_report.is_empty() {
+                    valid_registration = false;
 
                     self.insert_voter_registration(
                         tx.hash().to_string(),
-                        &registration.stake_key.unwrap().0,
-                        &voting_key.0,
-                        &registration.rewards_address.unwrap(),
-                        registration.nonce.unwrap().try_into().unwrap(),
-                        &raw_cbor_cip36,
+                        &registration.stake_key.unwrap_or_default().0 .0,
+                        serde_json::to_string(&registration.voting_key.unwrap_or_default())
+                            .unwrap_or_default(),
+                        &registration.rewards_address.unwrap_or_default().0,
+                        &registration.raw_cbor_cip36.unwrap_or_default(),
+                        registration
+                            .nonce
+                            .unwrap_or(NonceReg(1))
+                            .0
+                            .try_into()
+                            .unwrap(),
                         valid_registration,
                     )
                     .await?;
-                }*/
+                } else {
+                    self.insert_voter_registration(
+                        tx.hash().to_string(),
+                        &registration.stake_key.unwrap_or_default().0 .0,
+                        serde_json::to_string(&registration.voting_key.unwrap_or_default())
+                            .unwrap_or_default(),
+                        &registration.rewards_address.unwrap_or_default().0,
+                        &registration.raw_cbor_cip36.unwrap_or_default(),
+                        registration
+                            .nonce
+                            .unwrap_or(NonceReg(1))
+                            .0
+                            .try_into()
+                            .unwrap(),
+                        valid_registration,
+                    )
+                    .await?;
+                }
             }
         }
 

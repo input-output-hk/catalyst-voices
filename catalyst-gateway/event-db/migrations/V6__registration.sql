@@ -292,8 +292,7 @@ CREATE TABLE cardano_voter_registration (
   payment_address BYTEA NULL,
   nonce BIGINT NULL,
 
-  metadata_61284 BYTEA NULL,  -- We can purge metadata for valid registrations that are old to save storage space. 
-  metadata_61285 BYTEA NULL,  -- We can purge metadata for valid registrations that are old to save storage space.
+  metadata_cip36 BYTEA NULL,  -- We can purge metadata for valid registrations that are old to save storage space. 
 
   valid BOOLEAN NOT NULL DEFAULT false,
   stats JSONB
@@ -333,14 +332,10 @@ COMMENT ON COLUMN cardano_voter_registration.payment_address IS
 COMMENT ON COLUMN cardano_voter_registration.nonce IS
 'The nonce of the registration.  Registrations for the same stake address with higher nonces have priority.';
 
-COMMENT ON COLUMN cardano_voter_registration.metadata_61284 IS
+COMMENT ON COLUMN cardano_voter_registration.metadata_cip36 IS
 'The raw metadata for the CIP-15/36 registration.
 This data is optional, a parameter in config specifies how long raw registration metadata should be kept.
 Outside this time, the Registration record will be kept, but the raw metadata will be purged.';
-COMMENT ON COLUMN cardano_voter_registration.metadata_61285 IS
-'The metadata for the CIP-15/36 registration signature.
-This data is optional, a parameter in config specifies how long signature metadata should be kept.
-Outside this time, the Registration record will be kept, but the signature metadata will be purged.';
 
 COMMENT ON COLUMN cardano_voter_registration.valid IS
 'True if the registration is valid, false if the registration is invalid.
