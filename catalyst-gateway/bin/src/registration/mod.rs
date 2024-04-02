@@ -203,7 +203,10 @@ pub fn inspect_metamap_reg(spec_61284: &[Value]) -> Result<&Vec<(Value, Value)>,
 #[allow(clippy::manual_let_else)]
 /// Extract voting key
 pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingKey, Box<dyn Error>> {
-    let voting_key = match &metamap[DELEGATIONS_OR_DIRECT] {
+    let voting_key = match &metamap
+        .get(DELEGATIONS_OR_DIRECT)
+        .ok_or("Issue with voting key 61284 cbor parsing")?
+    {
         (Value::Integer(_one), Value::Bytes(direct)) => VotingKey::Direct(PubKey(direct.clone())),
         (Value::Integer(_one), Value::Array(delegations)) => {
             let mut delegations_map: Vec<(PubKey, u64)> = Vec::new();
@@ -242,7 +245,10 @@ pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingKey, Box<d
 
 /// Extract stake key
 pub fn inspect_stake_key(metamap: &[(Value, Value)]) -> Result<PubKey, Box<dyn Error>> {
-    let stake_key = match &metamap[STAKE_ADDRESS] {
+    let stake_key = match &metamap
+        .get(STAKE_ADDRESS)
+        .ok_or("Issue with stake key parsing")?
+    {
         (Value::Integer(_two), Value::Bytes(stake_addr)) => PubKey(stake_addr.clone()),
         _ => return Err("Invalid stake key".to_string().into()),
     };
@@ -253,7 +259,10 @@ pub fn inspect_stake_key(metamap: &[(Value, Value)]) -> Result<PubKey, Box<dyn E
 pub fn inspect_rewards_addr(
     metamap: &[(Value, Value)], network_id: Network,
 ) -> Result<&Vec<u8>, Box<dyn Error>> {
-    let (Value::Integer(_three), Value::Bytes(rewards_address)) = &metamap[PAYMENT_ADDRESS] else {
+    let (Value::Integer(_three), Value::Bytes(rewards_address)) = &metamap
+        .get(PAYMENT_ADDRESS)
+        .ok_or("Issue with rewards address parsing")?
+    else {
         return Err("Invalid rewardsd address".to_string().into());
     };
 
