@@ -253,9 +253,8 @@ pub fn inspect_stake_key(metamap: &[(Value, Value)]) -> Result<PubKey, Box<dyn E
 pub fn inspect_rewards_addr(
     metamap: &[(Value, Value)], network_id: Network,
 ) -> Result<&Vec<u8>, Box<dyn Error>> {
-    let rewards_address = match &metamap[PAYMENT_ADDRESS] {
-        (Value::Integer(_three), Value::Bytes(rewards_addr)) => rewards_addr,
-        _ => return Err("Invalid rewardsd address".to_string().into()),
+    let (Value::Integer(_three), Value::Bytes(rewards_address)) = &metamap[PAYMENT_ADDRESS] else {
+        return Err("Invalid rewardsd address".to_string().into());
     };
 
     if !is_valid_rewards_address(*rewards_address.get(NETWORK_ID).ok_or("err")?, network_id) {
