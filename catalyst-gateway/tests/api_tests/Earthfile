@@ -13,6 +13,7 @@ cat-gateway-test:
 
     FROM ../../+package-cat-gateway --address=$CAT_ADDRESS --db_url=$DB_URL
 
+    # copy preprod mithril snapshot to /tmp/preprod dir
     COPY github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:fix/mithril-preview-snapshot+package-preprod-snapshot/snapshot /tmp/preprod
 
     SAVE IMAGE cat-gateway-test:latest
@@ -43,7 +44,7 @@ test:
 #     # get mithril preview snapshot
 #     COPY github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:fix/mithril-preview-snapshot+package-preprod-snapshot/snapshot /tmp/preprod 
 
-#     # preprate tests
+#     # prepare tests
 #     COPY --dir ./api_tests .
 #     DO github.com/input-output-hk/catalyst-ci/earthly/python:v2.10.0+BUILDER
 
