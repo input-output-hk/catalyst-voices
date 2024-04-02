@@ -9,7 +9,7 @@ INSERT INTO cardano_voter_registration
   valid
 )
 
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+VALUES ($1, $2, $3, $4, $5, $6, $7)
 
 ON CONFLICT (tx_id) DO UPDATE SET
 stake_credential = $2,
@@ -17,4 +17,4 @@ public_voting_key = $3,
 payment_address = $4,
 nonce = $5,
 metadata_cip36 = $6,
-valid = $8
+valid = $7

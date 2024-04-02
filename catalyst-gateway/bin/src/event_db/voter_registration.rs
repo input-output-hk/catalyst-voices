@@ -66,7 +66,7 @@ impl EventDB {
 
             if !tx.metadata().is_empty() {
                 let (registration, errors_report) =
-                    match parse_registrations_from_metadata(tx.metadata(), network) {
+                    match parse_registrations_from_metadata(&tx.metadata(), network) {
                         Ok(registration) => registration,
                         Err(_err) => {
                             // fatal error parsing registration tx, unable to extract meaningful errors

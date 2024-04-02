@@ -14,36 +14,49 @@ use std::io::Cursor;
 // Networks
 const NETWORK_ID: usize = 0;
 
-// 61284 entries
+// Cip36 - 61284 entries
 const KEY_61284: usize = 0;
-const DELEGATIONS_OR_DIRECT: usize = 0;
-const STAKE_ADDRESS: usize = 1;
-const PAYMENT_ADDRESS: usize = 2;
-const NONCE: usize = 3;
-const VOTE_PURPOSE: usize = 4;
 
+// Cip36
+const STAKE_ADDRESS: usize = 1;
+// Cip36
+const PAYMENT_ADDRESS: usize = 2;
+// Cip36
+const NONCE: usize = 3;
+// Cip36
+const VOTE_PURPOSE: usize = 4;
+// Cip36
+const DELEGATIONS_OR_DIRECT: usize = 0;
+// Cip36
 const VOTE_KEY: usize = 0;
+// Cip36
 const WEIGHT: usize = 1;
 
 /// <https://cips.cardano.org/cips/cip36/schema.cddl>
 const CIP36_61284: usize = 61284;
 const CIP36_61285: usize = 61285;
 
+/// Pub key
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 pub struct PubKey(pub Vec<u8>);
 
+/// Nonce
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 pub struct Nonce(pub u64);
 
+/// Voting purpose
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 pub struct VotingPurpose(pub u64);
 
+/// Rewards address
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 pub struct RewardsAddress(pub Vec<u8>);
 
+/// Stake key
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 pub struct StakeKey(pub PubKey);
 
+/// Error report for serializing
 pub type ErrorReport = Vec<String>;
 
 /// Cddl schema:
@@ -171,7 +184,7 @@ pub fn raw_sig_conversion(raw_cbor: Vec<u8>) -> Result<Signature, Box<dyn Error>
 }
 
 #[allow(clippy::manual_let_else)]
-///
+/// Parse cip36 registration tx
 pub fn inspect_metamap_reg(spec_61284: &[Value]) -> Result<&Vec<(Value, Value)>, Box<dyn Error>> {
     let metamap = match &spec_61284[0] {
         Value::Map(metamap) => metamap,
@@ -181,6 +194,7 @@ pub fn inspect_metamap_reg(spec_61284: &[Value]) -> Result<&Vec<(Value, Value)>,
 }
 
 #[allow(clippy::manual_let_else)]
+/// Extract voting key
 pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingKey, Box<dyn Error>> {
     let voting_key = match &metamap[DELEGATIONS_OR_DIRECT] {
         (Value::Integer(_one), Value::Bytes(direct)) => VotingKey::Direct(PubKey(direct.clone())),
@@ -219,6 +233,7 @@ pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingKey, Box<d
     Ok(voting_key)
 }
 
+/// Extract stake key
 pub fn inspect_stake_key(metamap: &[(Value, Value)]) -> Result<PubKey, Box<dyn Error>> {
     let stake_key = match &metamap[STAKE_ADDRESS] {
         (Value::Integer(_two), Value::Bytes(stake_addr)) => PubKey(stake_addr.clone()),
@@ -227,6 +242,7 @@ pub fn inspect_stake_key(metamap: &[(Value, Value)]) -> Result<PubKey, Box<dyn E
     Ok(stake_key)
 }
 
+/// Extract and validate rewards address
 pub fn inspect_rewards_addr(
     metamap: &[(Value, Value)], network_id: Network,
 ) -> Result<&Vec<u8>, Box<dyn Error>> {
@@ -241,6 +257,7 @@ pub fn inspect_rewards_addr(
     Ok(rewards_address)
 }
 
+/// Extract Nonce
 pub fn inspect_nonce(metamap: &[(Value, Value)]) -> Result<Nonce, Box<dyn Error>> {
     let nonce = match metamap[NONCE] {
         (Value::Integer(_four), Value::Integer(nonce)) => Nonce(nonce.try_into()?),
@@ -249,8 +266,9 @@ pub fn inspect_nonce(metamap: &[(Value, Value)]) -> Result<Nonce, Box<dyn Error>
     Ok(nonce)
 }
 
+/// Extract optional voting purpose
 pub fn inspect_voting_purpose(
-    metamap: &Vec<(Value, Value)>,
+    metamap: &[(Value, Value)],
 ) -> Result<Option<VotingPurpose>, Box<dyn Error>> {
     if metamap.len() == 5 {
         match metamap[VOTE_PURPOSE] {
@@ -267,7 +285,7 @@ pub fn inspect_voting_purpose(
 /// Extract registrations information for TX metadata
 /// Collect secondary errors for granular json error report
 pub fn parse_registrations_from_metadata(
-    meta: MultiEraMeta, network: Network,
+    meta: &MultiEraMeta, network: Network,
 ) -> Result<(Registration, ErrorReport), Box<dyn Error>> {
     let mut voting_key: Option<VotingKey> = None;
     let mut stake_key: Option<StakeKey> = None;
