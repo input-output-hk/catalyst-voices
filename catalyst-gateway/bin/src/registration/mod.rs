@@ -136,7 +136,7 @@ pub fn validate_reg_cddl(bin_reg: &[u8], cddl_config: &CddlConfig) -> Result<(),
 /// Validates first nibble is within the address range: 0x0? - 0x7? + 0xE? , 0xF?
 /// Validates second nibble matches network id: 0/1
 #[must_use]
-pub fn is_valid_rewards_address(rewards_address_prefix: &u8, network: Network) -> bool {
+pub fn is_valid_rewards_address(rewards_address_prefix: u8, network: Network) -> bool {
     let addr_type = rewards_address_prefix >> 4 & 0xf;
     let addr_net = rewards_address_prefix & 0xf;
 
@@ -163,7 +163,7 @@ pub fn is_valid_rewards_address(rewards_address_prefix: &u8, network: Network) -
 }
 
 /// Convert raw 61285 cbor to witness signature
-pub fn raw_sig_conversion(raw_cbor: Vec<u8>) -> Result<Signature, Box<dyn Error>> {
+pub fn raw_sig_conversion(raw_cbor: &[u8]) -> Result<Signature, Box<dyn Error>> {
     let decoded: ciborium::value::Value = ciborium::de::from_reader(Cursor::new(&raw_cbor))?;
 
     let signature_61285 = match decoded {
@@ -171,16 +171,13 @@ pub fn raw_sig_conversion(raw_cbor: Vec<u8>) -> Result<Signature, Box<dyn Error>
         _ => return Err(format!("Invalid signature {decoded:?}").into()),
     };
 
-    let s: [u8; 64] = signature_61285
-        .iter()
-        .find_map(|key| Some(key.clone().into_bytes().unwrap()))
-        .ok_or("Bad signature")?
-        .try_into()
-        .map_err(hex::encode)?;
+    let sig = signature_61285.iter().next().ok_or("no 61285 key")?.clone();
+    let s: [u8; 64] = match sig.into_bytes() {
+        Ok(s) => s.try_into().unwrap_or([0; 64]),
+        Err(err) => return Err(format!("Invalid signature parsing {err:?}").into()),
+    };
 
-    let sig = Signature::from_bytes(&s);
-
-    Ok(sig)
+    Ok(Signature::from_bytes(&s))
 }
 
 #[allow(clippy::manual_let_else)]
@@ -251,7 +248,7 @@ pub fn inspect_rewards_addr(
         _ => return Err("Invalid rewardsd address".to_string().into()),
     };
 
-    if !is_valid_rewards_address(rewards_address.get(NETWORK_ID).ok_or("err")?, network_id) {
+    if !is_valid_rewards_address(*rewards_address.get(NETWORK_ID).ok_or("err")?, network_id) {
         return Err("Invalid reward address".to_string().into());
     }
     Ok(rewards_address)
@@ -376,7 +373,7 @@ pub fn parse_registrations_from_metadata(
                 // Validate 61285 signature
                 let raw_cbor = cip36_registration.encode_fragment()?;
 
-                match raw_sig_conversion(cip36_registration.encode_fragment()?) {
+                match raw_sig_conversion(&cip36_registration.encode_fragment()?) {
                     Ok(signature) => {
                         sig = Some(signature);
                     },
@@ -415,23 +412,23 @@ pub fn test_rewards_addr_permuations() {
 
     for addr_type in valid_addr_types {
         let test_addr = addr_type << 4;
-        assert!(is_valid_rewards_address(&test_addr, Network::Testnet));
-        assert!(!is_valid_rewards_address(&test_addr, Network::Mainnet));
+        assert!(is_valid_rewards_address(test_addr, Network::Testnet));
+        assert!(!is_valid_rewards_address(test_addr, Network::Mainnet));
 
         let test_addr = addr_type << 4 | 1;
-        assert!(!is_valid_rewards_address(&test_addr, Network::Testnet));
-        assert!(is_valid_rewards_address(&test_addr, Network::Mainnet));
+        assert!(!is_valid_rewards_address(test_addr, Network::Testnet));
+        assert!(is_valid_rewards_address(test_addr, Network::Mainnet));
     }
 
     let invalid_addr_types = vec![8, 9, 10, 11, 12, 13];
 
     for addr_type in invalid_addr_types {
         let test_addr = addr_type << 4;
-        assert!(!is_valid_rewards_address(&test_addr, Network::Testnet));
-        assert!(!is_valid_rewards_address(&test_addr, Network::Mainnet));
+        assert!(!is_valid_rewards_address(test_addr, Network::Testnet));
+        assert!(!is_valid_rewards_address(test_addr, Network::Mainnet));
 
         let test_addr = addr_type << 4 | 1;
-        assert!(!is_valid_rewards_address(&test_addr, Network::Testnet));
-        assert!(!is_valid_rewards_address(&test_addr, Network::Mainnet));
+        assert!(!is_valid_rewards_address(test_addr, Network::Testnet));
+        assert!(!is_valid_rewards_address(test_addr, Network::Mainnet));
     }
 }
