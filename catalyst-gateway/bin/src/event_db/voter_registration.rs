@@ -57,7 +57,7 @@ impl EventDB {
 
     /// Index registration data
     pub async fn index_registration_data(
-        &self, txs: Vec<MultiEraTx<'_>>, _slot_no: SlotNumber, network: Network,
+        &self, txs: Vec<MultiEraTx<'_>>, slot_no: SlotNumber, network: Network,
     ) -> Result<(), Error> {
         let cddl = CddlConfig::new();
 
@@ -90,7 +90,11 @@ impl EventDB {
                     continue;
                 }
 
+                self.index_txn_data(tx.hash().as_slice(), slot_no, network)
+                    .await?;
+
                 if errors_report.is_empty() {
+                    // valid registration
                     self.insert_voter_registration(
                         tx.hash().to_string(),
                         &registration.stake_key.unwrap_or_default().0 .0,
