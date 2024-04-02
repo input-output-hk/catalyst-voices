@@ -30,7 +30,7 @@ import { CertificateType, MetadataValueType, type TxBuilderArguments } from "typ
 
 import hex2bin from "./hex2bin";
 
-export default async function buildUnsignedTx(payload: TxBuilderArguments): Promise<Transaction> {
+export default async function buildUnsignedTx(payload: TxBuilderArguments, changeAddress: string): Promise<Transaction> {
   const { config, ...builder } = payload;
 
   // Initialize builder with protocol parameters
@@ -210,6 +210,13 @@ export default async function buildUnsignedTx(payload: TxBuilderArguments): Prom
   if (txMetadata.len()) {
     auxMetadata.set_metadata(txMetadata);
   }
+
+  // generate fee incase too much ADA provided for fee
+  if (!builder.txFee) {
+    const shelleyChangeAddress = Address.from_hex(changeAddress);
+    txBuilder.add_change_if_needed(shelleyChangeAddress);
+  }
+  
 
   // build a full transaction, passing in empty witness set
   const unsignedTx = Transaction.new(txBuilder.build(), TransactionWitnessSet.new(), auxMetadata);

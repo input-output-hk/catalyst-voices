@@ -64,7 +64,10 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
 
   async function handleTxBuilderSubmit(builderArgs: TxBuilderArguments) {
     try {
-      const tx = await buildUnsignedTx(builderArgs);
+      const firstSelection = selectedWallets[0]!;
+      const tmpChange = walletApi[firstSelection]?.info["changeAddress"]?.raw;
+
+      const tx = await buildUnsignedTx(builderArgs, tmpChange);
 
       setValue("tx", bin2hex(tx.to_bytes()));
       setEditorRefreshSignal((prev) => (prev ? 0 : 1));
