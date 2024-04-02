@@ -209,6 +209,7 @@ pub fn inspect_metamap_reg(spec_61284: &[Value]) -> Result<&Vec<(Value, Value)>,
     Ok(metamap)
 }
 
+#[allow(clippy::manual_let_else)]
 /// Extract voting key
 pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingKey, Box<dyn Error>> {
     let voting_key = match &metamap
