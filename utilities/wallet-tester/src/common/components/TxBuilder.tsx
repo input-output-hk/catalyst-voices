@@ -1,4 +1,4 @@
-// cspell: words Lovelaces Coeff
+// cspell: words Lovelaces Coeff keyhash Keyhash scripthash Metadatum
 
 import { TransactionUnspentOutput } from "@emurgo/cardano-serialization-lib-asmjs";
 import { Disclosure } from "@headlessui/react";
@@ -40,12 +40,12 @@ type FormValues = TxBuilderArguments;
 type Props = {
   /* Hex UTXOs. */
   utxos: string[];
-  /* Bech32 Addressses. */
-  addrs: string[];
+  /* Bech32 Addresses. */
+  addresses: string[];
   onSubmit?: (value: FormValues) => void;
 };
 
-function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
+function TxBuilder({ utxos, addresses, onSubmit: onPropSubmit = noop }: Props) {
   const [resetSignal, setResetSignal] = useState(0);
 
   const { handleSubmit, register, resetField, control, reset } = useForm<FormValues>({
@@ -141,7 +141,7 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
                   <Combobox
                     value={value}
                     label={`Address #${i + 1}`}
-                    items={addrs.map((v) => ({
+                    items={addresses.map((v) => ({
                       label: v,
                       value: v,
                     }))}
@@ -276,7 +276,7 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
                   <Combobox
                     value={value}
                     label={`Address #${i + 1}`}
-                    items={addrs.map((v) => ({
+                    items={addresses.map((v) => ({
                       label: v,
                       value: v,
                     }))}
@@ -300,15 +300,15 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
         )}
       />
       <TxBuilderSingleFieldSection
-        heading="Auxilliary Data Hash"
-        onRemoveClick={() => resetField("auxilliaryDataHash")}
+        heading="Auxiliary Data Hash"
+        onRemoveClick={() => resetField("auxiliaryDataHash")}
         render={() => (
           <Input
             type="text"
-            label="Auxilliary Data Hash"
+            label="Auxiliary Data Hash"
             placeholder="Auto generated"
             disabled={true}
-            formRegister={register("auxilliaryDataHash")}
+            formRegister={register("auxiliaryDataHash")}
           />
         )}
       />
@@ -337,7 +337,7 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
                 <Combobox
                   value={value}
                   label={`Signer Address #${i + 1}`}
-                  items={addrs.map((v) => ({
+                  items={addresses.map((v) => ({
                     label: v,
                     value: v,
                   }))}

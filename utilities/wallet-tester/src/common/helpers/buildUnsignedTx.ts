@@ -1,4 +1,4 @@
-// cspell: words Metadatum metadatum keyhash
+// cspell: words Metadatum metadatum keyhash bignum scripthash
 
 import {
   Address,
@@ -146,8 +146,8 @@ export default async function buildUnsignedTx(
     txBuilder.set_withdrawals(withdrawals);
   }
 
-  // #7 add auxilary data hash
-  if (builder.auxilliaryDataHash) {
+  // #7 add auxiliary data hash
+  if (builder.auxiliaryDataHash) {
     // auto generated
   }
 

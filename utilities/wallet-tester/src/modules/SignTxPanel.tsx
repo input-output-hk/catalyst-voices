@@ -47,9 +47,9 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
     },
   });
 
-  const sellectedWalletApi = pickBy(walletApi, (v, k) => selectedWallets.includes(k));
+  const selectedWalletApi = pickBy(walletApi, (v, k) => selectedWallets.includes(k));
   const utxos = uniq([...Object.values(walletApi).flatMap((api) => api.info["utxos"]?.raw ?? [])]);
-  const addrs = uniq([
+  const addresses = uniq([
     ...Object.values(walletApi).flatMap((api) => api.info["usedAddresses"]?.value ?? []),
     ...Object.values(walletApi).flatMap((api) => api.info["unusedAddresses"]?.value ?? []),
     ...Object.values(walletApi).flatMap((api) => compact([api.info["changeAddress"]?.value])),
@@ -148,14 +148,14 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
             render={({ field: { value, onChange } }) => (
               <div className="grid gap-2">
                 {/* TODO: add empty */}
-                <TxBuilder utxos={utxos} addrs={addrs} onSubmit={handleTxBuilderSubmit} />
-                {isEmpty(sellectedWalletApi) ? (
+                <TxBuilder utxos={utxos} addresses={addresses} onSubmit={handleTxBuilderSubmit} />
+                {isEmpty(selectedWalletApi) ? (
                   <Badge variant="warn" text="Enable at least one wallet to execute" />
                 ) : (
                   <>
                     <WalletViewSelection
                       selectedWallet={selectedTxWallet}
-                      wallets={Object.keys(sellectedWalletApi)}
+                      wallets={Object.keys(selectedWalletApi)}
                       onSelect={setSelectedTxWallet}
                     />
                     <Fragment key={selectedTxWallet}>
@@ -171,7 +171,7 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
             )}
           />
         </InputBlock>
-        {!isEmpty(sellectedWalletApi) && (
+        {!isEmpty(selectedWalletApi) && (
           <div className="flex">
             <div className="flex gap-2 items-center">
               <Button disabled={isLoading} onClick={handleSubmit(handleExecute)}>
