@@ -3,6 +3,7 @@
 use cardano_chain_follower::Network;
 
 use pallas::ledger::traverse::MultiEraTx;
+use serde_json::{json, Value};
 
 use crate::registration::{
     parse_registrations_from_metadata, validate_reg_cddl, CddlConfig, Nonce as NonceReg,
@@ -31,7 +32,7 @@ impl EventDB {
     async fn insert_voter_registration(
         &self, tx_id: TxId, stake_credential: StakeCredential<'_>,
         public_voting_key: PublicVotingKey, payment_address: PaymentAddress<'_>,
-        metadata_cip36: MetadataCip36<'_>, nonce: Nonce, valid: bool,
+        metadata_cip36: MetadataCip36<'_>, nonce: Nonce, report: Value, valid: bool,
     ) -> Result<(), Error> {
         let conn = self.pool.get().await?;
 
@@ -47,6 +48,7 @@ impl EventDB {
                     &payment_address,
                     &metadata_cip36,
                     &nonce,
+                    &report,
                     &valid,
                 ],
             )
@@ -93,6 +95,8 @@ impl EventDB {
                 self.index_txn_data(tx.hash().as_slice(), slot_no, network)
                     .await?;
 
+                let report = json!(&errors_report);
+
                 if errors_report.is_empty() {
                     // valid registration
                     self.insert_voter_registration(
@@ -108,6 +112,7 @@ impl EventDB {
                             .0
                             .try_into()
                             .unwrap(),
+                        report,
                         valid_registration,
                     )
                     .await?;
@@ -129,6 +134,7 @@ impl EventDB {
                             .0
                             .try_into()
                             .unwrap(),
+                        report,
                         valid_registration,
                     )
                     .await?;
