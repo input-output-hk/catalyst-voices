@@ -44,10 +44,10 @@ impl EventDB {
                 &[
                     &hex::decode(tx_id).map_err(|e| Error::DecodeHex(e.to_string()))?,
                     &stake_credential,
-                    &public_voting_key,
+                    &public_voting_key.as_bytes(),
                     &payment_address,
-                    &metadata_cip36,
                     &nonce,
+                    &metadata_cip36,
                     &report,
                     &valid,
                 ],
@@ -111,7 +111,7 @@ impl EventDB {
                             .unwrap_or(NonceReg(1))
                             .0
                             .try_into()
-                            .unwrap(),
+                            .unwrap_or(0),
                         report,
                         valid_registration,
                     )
@@ -133,7 +133,7 @@ impl EventDB {
                             .unwrap_or(NonceReg(1))
                             .0
                             .try_into()
-                            .unwrap(),
+                            .unwrap_or(0),
                         report,
                         valid_registration,
                     )
