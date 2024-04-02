@@ -155,7 +155,7 @@ pub fn raw_sig_conversion(raw_cbor: Vec<u8>) -> Result<Signature, Box<dyn Error>
 
     let signature_61285 = match decoded {
         Value::Map(m) => m.iter().map(|entry| entry.1.clone()).collect::<Vec<_>>(),
-        _ => return Err(format!("Invalid signature {:?}", decoded).into()),
+        _ => return Err(format!("Invalid signature {decoded:?}").into()),
     };
 
     let s: [u8; 64] = signature_61285
@@ -163,7 +163,7 @@ pub fn raw_sig_conversion(raw_cbor: Vec<u8>) -> Result<Signature, Box<dyn Error>
         .find_map(|key| Some(key.clone().into_bytes().unwrap()))
         .ok_or("Bad signature")?
         .try_into()
-        .map_err(|e| hex::encode(e))?;
+        .map_err(hex::encode)?;
 
     let sig = Signature::from_bytes(&s);
 
@@ -184,7 +184,7 @@ pub fn inspect_metamap_reg(spec_61284: &[Value]) -> Result<&Vec<(Value, Value)>,
 pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingKey, Box<dyn Error>> {
     let voting_key = match &metamap[DELEGATIONS_OR_DIRECT] {
         (Value::Integer(_one), Value::Bytes(direct)) => {
-            VotingKey::Direct(PubKey(direct.clone()).into())
+            VotingKey::Direct(PubKey(direct.clone()))
         },
         (Value::Integer(_one), Value::Array(delegations)) => {
             let mut delegations_map: Vec<(PubKey, u64)> = Vec::new();
@@ -193,30 +193,30 @@ pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingKey, Box<d
                     Value::Array(delegations) => {
                         let voting_key = match delegations[VOTE_KEY].as_bytes() {
                             Some(key) => key,
-                            None => return Err(format!("Invalid voting key").into()),
+                            None => return Err("Invalid voting key".to_string().into()),
                         };
 
                         let weight = match delegations[WEIGHT].as_integer() {
                             Some(weight) => match weight.try_into() {
                                 Ok(weight) => weight,
                                 Err(_err) => {
-                                    return Err(format!("Invalid weight in delegation").into())
+                                    return Err("Invalid weight in delegation".to_string().into())
                                 },
                             },
-                            None => return Err(format!("Invalid delegation").into()),
+                            None => return Err("Invalid delegation".to_string().into()),
                         };
 
                         delegations_map.push(((PubKey(voting_key.clone())), weight));
                     },
 
-                    _ => return Err(format!("Invalid voting key").into()),
+                    _ => return Err("Invalid voting key".to_string().into()),
                 }
             }
 
             VotingKey::Delegated(delegations_map)
         },
 
-        _ => return Err(format!("Invalid signature").into()),
+        _ => return Err("Invalid signature".to_string().into()),
     };
     Ok(voting_key)
 }
@@ -224,7 +224,7 @@ pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingKey, Box<d
 pub fn inspect_stake_key(metamap: &[(Value, Value)]) -> Result<PubKey, Box<dyn Error>> {
     let stake_key = match &metamap[STAKE_ADDRESS] {
         (Value::Integer(_two), Value::Bytes(stake_addr)) => PubKey(stake_addr.clone()),
-        _ => return Err(format!("Invalid stake key").into()),
+        _ => return Err("Invalid stake key".to_string().into()),
     };
     Ok(stake_key)
 }
@@ -234,11 +234,11 @@ pub fn inspect_rewards_addr(
 ) -> Result<&Vec<u8>, Box<dyn Error>> {
     let rewards_address = match &metamap[PAYMENT_ADDRESS] {
         (Value::Integer(_three), Value::Bytes(rewards_addr)) => rewards_addr,
-        _ => return Err(format!("Invalid rewardsd address").into()),
+        _ => return Err("Invalid rewardsd address".to_string().into()),
     };
 
-    if !is_valid_rewards_address(&*rewards_address.get(NETWORK_ID).ok_or("err")?, network_id) {
-        return Err(format!("Invalid reward address").into());
+    if !is_valid_rewards_address(rewards_address.get(NETWORK_ID).ok_or("err")?, network_id) {
+        return Err("Invalid reward address".to_string().into());
     }
     Ok(rewards_address)
 }
@@ -246,7 +246,7 @@ pub fn inspect_rewards_addr(
 pub fn inspect_nonce(metamap: &[(Value, Value)]) -> Result<Nonce, Box<dyn Error>> {
     let nonce = match metamap[NONCE] {
         (Value::Integer(_four), Value::Integer(nonce)) => Nonce(nonce.try_into()?),
-        _ => return Err(format!("Invalid nonce").into()),
+        _ => return Err("Invalid nonce".to_string().into()),
     };
     Ok(nonce)
 }
@@ -295,7 +295,7 @@ pub fn parse_registrations_from_metadata(
                         Value::Map(m) => m.iter().map(|entry| entry.1.clone()).collect::<Vec<_>>(),
                         _ => {
                             errors_report
-                                .push(format!("61284 parent cddl invalid {:?}", decoded).into());
+                                .push(format!("61284 parent cddl invalid {decoded:?}"));
                             continue;
                         },
                     };
@@ -305,7 +305,7 @@ pub fn parse_registrations_from_metadata(
                         Ok(value) => value,
                         Err(err) => {
                             errors_report.push(
-                                format!("61284 child cddl invalid {:?} {:?}", raw_cbor, err).into(),
+                                format!("61284 child cddl invalid {raw_cbor:?} {err:?}"),
                             );
                             continue;
                         },
@@ -318,7 +318,7 @@ pub fn parse_registrations_from_metadata(
                         Err(err) => {
                             voting_key = None;
                             errors_report.push(
-                                format!("Invalid voting key {:?} {:?}", raw_cbor, err).into(),
+                                format!("Invalid voting key {raw_cbor:?} {err:?}"),
                             );
                         },
                     };
@@ -329,18 +329,18 @@ pub fn parse_registrations_from_metadata(
                         Err(err) => {
                             stake_key = None;
                             errors_report
-                                .push(format!("Invalid stake key {:?} {:?}", raw_cbor, err).into());
+                                .push(format!("Invalid stake key {raw_cbor:?} {err:?}"));
                         },
                     };
 
                     // A Shelley payment address (see CIP-0019) discriminated for the same network
                     // this transaction is submitted to, to receive rewards.
                     match inspect_rewards_addr(metamap, network) {
-                        Ok(value) => rewards_address = Some(RewardsAddress(value.to_vec())),
+                        Ok(value) => rewards_address = Some(RewardsAddress(value.clone())),
                         Err(err) => {
                             rewards_address = None;
                             errors_report.push(
-                                format!("Invalid rewards address {:?} {:?}", raw_cbor, err).into(),
+                                format!("Invalid rewards address {raw_cbor:?} {err:?}"),
                             );
                         },
                     };
@@ -350,7 +350,7 @@ pub fn parse_registrations_from_metadata(
                         Ok(value) => nonce = Some(value),
                         Err(err) => {
                             errors_report
-                                .push(format!("Invalid nonce {:?} {:?}", raw_cbor, err).into());
+                                .push(format!("Invalid nonce {raw_cbor:?} {err:?}"));
                             nonce = None;
                         },
                     };
@@ -364,7 +364,7 @@ pub fn parse_registrations_from_metadata(
                         Err(err) => {
                             voting_purpose = None;
                             errors_report.push(
-                                format!("Invalid voting purpose {:?} {:?}", raw_cbor, err).into(),
+                                format!("Invalid voting purpose {raw_cbor:?} {err:?}"),
                             );
                         },
                     };
@@ -382,8 +382,7 @@ pub fn parse_registrations_from_metadata(
                                     "Invalid signature. cbor: {:?} {:?}",
                                     hex::encode(raw_cbor),
                                     err
-                                )
-                                .into(),
+                                ),
                             );
                             sig = None;
                         },

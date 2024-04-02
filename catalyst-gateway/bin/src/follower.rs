@@ -182,19 +182,19 @@ async fn init_follower(
 ) -> Result<ManageTasks, Box<dyn Error>> {
     let start = match network {
         Network::Mainnet => (
-            Some(114714895),
+            Some(114_714_895),
             Some("682fd779c7606922a124de78daf976276d713f5eaf1e62b11f7542c41bdedb86".to_string()),
         ),
         Network::Preprod => (
-            Some(118672213),
+            Some(118_672_213),
             Some("6281a480c1e324b54d1b58b190032d2cf7bb4a79f7a35274c224b117532e8f91".to_string()),
         ),
         Network::Preview => (
-            Some(43199345),
+            Some(43_199_345),
             Some("fcce88636620210b2148bc930cb7b54fb9b634d0b81716463b25f3ddbcf8d653".to_string()),
         ),
         Network::Testnet => (
-            Some(118672213),
+            Some(118_672_213),
             Some("6281a480c1e324b54d1b58b190032d2cf7bb4a79f7a35274c224b117532e8f91".to_string()),
         ),
     };
