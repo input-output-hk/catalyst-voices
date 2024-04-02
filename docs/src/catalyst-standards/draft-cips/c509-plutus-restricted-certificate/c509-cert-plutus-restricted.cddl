@@ -45,7 +45,7 @@ Attribute = (
 subjectPublicKey = bytes .size (32..32); Ed25519 public key stored in bytes, adjust size of this if other key types are supported.  
 
 ; This is a completely custom Attribute for the RelativeDistringuishedName which is only for use with Plutus scripts.
-; attributeType = The type of cardano key we associate with this certificate.
+; attributeType = The type of Cardano key we associate with this certificate.
 ; proof = Does the transaction require proof that the key is owned by the transaction signer?
 ; attributeValue = The cardano public key hash of the attribute type
 
