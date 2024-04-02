@@ -35,6 +35,7 @@ docker run -p ...:80 -t cat-wallet-connector
 
 First step, the tool will scan all accessible wallets installed as browser extensions.
 It executes fundamental wallet actions as outlined in [CIP30](https://cips.cardano.org/cip/CIP-30/) including:
+
 * Retrieving wallet details
 * Simultaneously signing transactions using multiple wallets
 * (WIP) Simultaneously signing data with multiple wallets
