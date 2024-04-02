@@ -82,7 +82,7 @@ validation_signature = (bytes .size (1..64))
 ; The `validation_signature` uses the Role 0 signing key .
 
 
-; Definition of general cardano metadata, constrains what we can implement here:
+; Definition of general Cardano metadata, constrains what we can implement here:
 transaction_metadatum = { * transaction_metadatum => transaction_metadatum }
 	/ [ * transaction_metadatum ]
 	/ int
