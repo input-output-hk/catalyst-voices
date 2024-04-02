@@ -3,10 +3,9 @@ VERSION --global-cache 0.7
 builder:
     FROM github.com/input-output-hk/catalyst-ci/earthly/python:v2.10.0+python-base
 
+    # preprate tests
     COPY --dir ./api_tests .
     DO github.com/input-output-hk/catalyst-ci/earthly/python:v2.10.0+BUILDER
-
-    RUN poetry run pytest 
 
 cat-gateway-test:
     ARG DB_URL="postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev"
@@ -14,7 +13,8 @@ cat-gateway-test:
 
     FROM ../../+package-cat-gateway --address=$CAT_ADDRESS --db_url=$DB_URL
 
-    COPY github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:fix/mithril-preview-snapshot+package-preview-snapshot/snapshot /tmp/preview
+    COPY github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:fix/mithril-preview-snapshot+package-preprod-snapshot/snapshot /tmp/preprod
+
     SAVE IMAGE cat-gateway-test:latest
 
 test:
@@ -30,3 +30,23 @@ test:
         --allow-privileged
         RUN poetry run pytest
     END
+
+# some-test:
+#     # get event-db
+#     FROM ./../../event-db+builder
+#     # install poetry
+#     RUN apk add poetry
+#     # get cat-gateway
+#     COPY ./../../+build/cat-gateway .
+#     # get run script
+#     COPY run.sh .
+#     # get mithril preview snapshot
+#     COPY github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:fix/mithril-preview-snapshot+package-preprod-snapshot/snapshot /tmp/preprod 
+
+#     # preprate tests
+#     COPY --dir ./api_tests .
+#     DO github.com/input-output-hk/catalyst-ci/earthly/python:v2.10.0+BUILDER
+
+#     USER postgres:postgres
+#     # RUN ./run.sh
+#     RUN false    

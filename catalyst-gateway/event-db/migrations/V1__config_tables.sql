@@ -129,14 +129,26 @@ VALUES
 --     }
 --   }'
 -- ),
+-- (
+--   'cardano',
+--   'follower',
+--   'preview',
+--   '{
+--     "relay": "preview-node.play.dev.cardano.org:3001",
+--     "mithril_snapshot": {
+--       "path": "/tmp/preview/immutable",
+--       "timing_pattern": 25
+--     }
+--   }'
+-- ),
 (
   'cardano',
   'follower',
-  'preview',
+  'preprod',
   '{
-    "relay": "preview-node.play.dev.cardano.org:3001",
+    "relay": "preprod-node.play.dev.cardano.org:3001",
     "mithril_snapshot": {
-      "path": "/tmp/preview/immutable",
+      "path": "/tmp/preprod/immutable",
       "timing_pattern": 25
     }
   }'

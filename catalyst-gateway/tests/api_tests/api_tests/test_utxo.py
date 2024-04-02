@@ -24,7 +24,7 @@ def test_staked_ada_endpoint():
     check_is_live()
     check_is_ready()
 
-    network = "preview"
+    network = "preprod"
 
-    # block hash `68dcf12857a6a0bbdbb0ce1db982814a88fc585c1d50b216568196cb49b8ecee`
-    sync_to(network=network, slot_num=67173, timeout=30)
+    # block hash `8f9fe36879d00042779f85cffa5ba3fa9a1c6c04556d592c934ecc85cd693ef3`
+    sync_to(network=network, slot_num=133642, timeout=30)
