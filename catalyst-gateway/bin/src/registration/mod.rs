@@ -11,25 +11,25 @@ use serde::{Deserialize, Serialize};
 use std::error::Error;
 use std::io::Cursor;
 
-// Networks
+/// Networks
 const NETWORK_ID: usize = 0;
 
-// Cip36 - 61284 entries
+/// Cip36 - 61284 entries
 const KEY_61284: usize = 0;
 
-// Cip36
+/// Cip36
 const STAKE_ADDRESS: usize = 1;
-// Cip36
+///Cip36
 const PAYMENT_ADDRESS: usize = 2;
-// Cip36
+/// Cip36
 const NONCE: usize = 3;
-// Cip36
+/// Cip36
 const VOTE_PURPOSE: usize = 4;
-// Cip36
+/// Cip36
 const DELEGATIONS_OR_DIRECT: usize = 0;
-// Cip36
+/// Cip36
 const VOTE_KEY: usize = 0;
-// Cip36
+/// Cip36
 const WEIGHT: usize = 1;
 
 /// <https://cips.cardano.org/cips/cip36/schema.cddl>
@@ -171,7 +171,7 @@ pub fn raw_sig_conversion(raw_cbor: &[u8]) -> Result<Signature, Box<dyn Error>> 
         _ => return Err(format!("Invalid signature {decoded:?}").into()),
     };
 
-    let sig = signature_61285.iter().next().ok_or("no 61285 key")?.clone();
+    let sig = signature_61285.first().ok_or("no 61285 key")?.clone();
     let s: [u8; 64] = match sig.into_bytes() {
         Ok(s) => s.try_into().unwrap_or([0; 64]),
         Err(err) => return Err(format!("Invalid signature parsing {err:?}").into()),
