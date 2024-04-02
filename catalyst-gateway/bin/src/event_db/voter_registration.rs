@@ -90,11 +90,7 @@ impl EventDB {
                     continue;
                 }
 
-                // invalid registration
-                // index with invalid registration flag and error report
-                if !errors_report.is_empty() {
-                    valid_registration = false;
-
+                if errors_report.is_empty() {
                     self.insert_voter_registration(
                         tx.hash().to_string(),
                         &registration.stake_key.unwrap_or_default().0 .0,
@@ -112,6 +108,10 @@ impl EventDB {
                     )
                     .await?;
                 } else {
+                    // invalid registration
+                    // index with invalid registration flag and error report
+                    valid_registration = false;
+
                     self.insert_voter_registration(
                         tx.hash().to_string(),
                         &registration.stake_key.unwrap_or_default().0 .0,
