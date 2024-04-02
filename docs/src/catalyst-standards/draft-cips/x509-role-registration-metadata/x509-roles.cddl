@@ -72,7 +72,7 @@ role-data = {
 	* role-extended-data-keys => role-extended-data,
 }
 
-; Role 0 is the ONLY manditory role.
+; Role 0 is the ONLY mandatory role.
 ; It defines the Validation certificate to be used to sign all registration metadata for this purpose for this identity.
 validation-role = 0
 ; role-signing-key must reference a certificate, and NOT a simple key.
