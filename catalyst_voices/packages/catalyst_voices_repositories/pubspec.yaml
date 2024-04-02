@@ -12,6 +12,7 @@ dependencies:
     path: ../catalyst_voices_models
   catalyst_voices_services:
     path: ../catalyst_voices_services
+  chopper: ^7.2.0
   flutter:
     sdk: flutter
   result_type: ^0.2.0
