@@ -9,7 +9,7 @@
 ; have changed.
 
 ; This envelope is general in structure, it can be used to secure any auxiliary data, provided the 
-; Role 0 signing key is defined.  As dApps control metadata, this ensures the data can eb authenticated
+; Role 0 signing key is defined.  As dApps control metadata, this ensures the data can be authenticated
 ; independently by the dApp as belonging to a particular user.
 ; Once a Role 0 signing key is defined for a dApp purpose, then it is not necessary to redefine the 
 ; x509 data if the envelope is only being used to secure the auxiliary data to a transaction itself.
