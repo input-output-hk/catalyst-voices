@@ -105,7 +105,6 @@ impl EventDB {
     }
 
     /// Get total utxo amount
-    #[allow(dead_code)]
     pub(crate) async fn total_utxo_amount(
         &self, stake_credential: StakeCredential<'_>, network: Network, date_time: BlockTime,
     ) -> Result<(StakeAmount, SlotNumber, BlockTime), Error> {
