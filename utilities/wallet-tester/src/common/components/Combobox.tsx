@@ -57,7 +57,7 @@ function Combobox({ value, items, label, onInput = noop, onSelect = noop }: Prop
             key={value}
             value={value}
           >
-            {({ active, selected }) => (
+            {({ selected }) => (
               <div className="flex gap-2 items-center">
                 <CheckIcon
                   className={twMerge("h-5 w-5", selected ? "visible" : "invisible")}

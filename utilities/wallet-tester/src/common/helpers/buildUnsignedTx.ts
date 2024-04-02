@@ -30,7 +30,10 @@ import { CertificateType, MetadataValueType, type TxBuilderArguments } from "typ
 
 import hex2bin from "./hex2bin";
 
-export default async function buildUnsignedTx(payload: TxBuilderArguments, changeAddress: string): Promise<Transaction> {
+export default async function buildUnsignedTx(
+  payload: TxBuilderArguments,
+  changeAddress: string
+): Promise<Transaction> {
   const { config, ...builder } = payload;
 
   // Initialize builder with protocol parameters
@@ -127,7 +130,7 @@ export default async function buildUnsignedTx(payload: TxBuilderArguments, chang
         } else {
           net = item.address.includes("test") ? 0 : 1;
         }
-        
+
         rewardAddress = RewardAddress.new(net, stakeCred);
       }
     }
@@ -186,7 +189,7 @@ export default async function buildUnsignedTx(payload: TxBuilderArguments, chang
       txMetadatum = TransactionMetadatum.new_int(Int.from_str(item.value));
     } else if (item.valueType === MetadataValueType.Cbor) {
       txMetadatum = TransactionMetadatum.from_bytes(hex2bin(item.value));
-    }  else if (item.valueType === MetadataValueType.List) {
+    } else if (item.valueType === MetadataValueType.List) {
       // TODO:
       throw new Error("value type is currently not supported");
     } else if (item.valueType === MetadataValueType.Map) {
@@ -216,7 +219,6 @@ export default async function buildUnsignedTx(payload: TxBuilderArguments, chang
     const shelleyChangeAddress = Address.from_hex(changeAddress);
     txBuilder.add_change_if_needed(shelleyChangeAddress);
   }
-  
 
   // build a full transaction, passing in empty witness set
   const unsignedTx = Transaction.new(txBuilder.build(), TransactionWitnessSet.new(), auxMetadata);

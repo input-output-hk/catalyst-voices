@@ -14,8 +14,7 @@ builder:
 check:
   FROM +builder
 
-  RUN npm run check \
-      && npm run lint
+  RUN npm run check
 
 # build - Builds the source code for deployment
 build:

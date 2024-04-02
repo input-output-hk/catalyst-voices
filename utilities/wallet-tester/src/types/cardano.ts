@@ -74,7 +74,7 @@ export type TxBuilderArguments = {
         hashType: "addr_keyhash" | "scripthash";
         hash: string;
         poolKeyhash: string;
-        network: number;
+        network: string;
       }
     | {
         type: CertificateType.PoolRegistration;

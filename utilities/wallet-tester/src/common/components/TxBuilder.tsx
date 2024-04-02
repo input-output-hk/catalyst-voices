@@ -1,5 +1,6 @@
 // cspell: words Lovelaces Coeff
 
+import { TransactionUnspentOutput } from "@emurgo/cardano-serialization-lib-asmjs";
 import { Disclosure } from "@headlessui/react";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import ArrowDropUpIcon from "@mui/icons-material/ArrowDropUp";
@@ -18,7 +19,6 @@ import Input from "./Input";
 import TxBuilderMultiFieldsSection from "./TxBuilderMultiFieldsSection";
 import TxBuilderSingleFieldSection from "./TxBuilderSingleFieldSection";
 import WalletViewSelection from "./WalletViewSelection";
-import { TransactionUnspentOutput } from "@emurgo/cardano-serialization-lib-asmjs";
 
 const PROTOCOL_PARAMS = {
   linearFee: {
@@ -81,7 +81,7 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
   function formatUtxoAmount(utxoHex: string): string {
     try {
       const json = TransactionUnspentOutput.from_hex(utxoHex).to_js_value();
-      
+
       return String(json.output.amount.coin);
     } catch (error) {
       return "";
@@ -181,6 +181,7 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
             hashType: "addr_keyhash",
             hash: "",
             poolKeyhash: "",
+            network: "",
           })
         }
         onRemoveClick={(i) => certificateFields.remove(i)}
@@ -199,8 +200,8 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
                 certificateFields.fields[i]?.type === value
                   ? null
                   : certificateFields.replace({
-                    type: value /* TODO: support default values for each type */,
-                  })
+                      type: value as any /* TODO: support default values for each type */,
+                    })
               }
             />
             {certificateFields.fields[i]?.type === CertificateType.StakeDelegation ? (
@@ -210,14 +211,14 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
                     type="button"
                     className={twMerge(
                       "w-full rounded px-1 border border-solid border-black",
-                      certificateFields.fields[i]?.hashType === "addr_keyhash" &&
-                      "bg-black text-white"
+                      (certificateFields.fields[i] as any)?.hashType === "addr_keyhash" &&
+                        "bg-black text-white"
                     )}
                     onClick={() =>
                       certificateFields.update(i, {
                         ...certificateFields.fields[i]!,
                         hashType: "addr_keyhash",
-                      })
+                      } as any)
                     }
                   >
                     <p className="text-[10px]">addr_keyhash</p>
@@ -226,14 +227,14 @@ function TxBuilder({ utxos, addrs, onSubmit: onPropSubmit = noop }: Props) {
                     type="button"
                     className={twMerge(
                       "w-full rounded px-1 border border-solid border-black",
-                      certificateFields.fields[i]?.hashType === "scripthash" &&
-                      "bg-black text-white"
+                      (certificateFields.fields[i] as any)?.hashType === "scripthash" &&
+                        "bg-black text-white"
                     )}
                     onClick={() =>
                       certificateFields.update(i, {
                         ...certificateFields.fields[i]!,
                         hashType: "scripthash",
-                      })
+                      } as any)
                     }
                   >
                     <p className="text-[10px]">scripthash</p>

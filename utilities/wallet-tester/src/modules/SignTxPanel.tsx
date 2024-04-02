@@ -1,6 +1,6 @@
 import RefreshIcon from "@mui/icons-material/Refresh";
 import { compact, isEmpty, pickBy, uniq } from "lodash-es";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 
@@ -30,19 +30,20 @@ type Response = {
 
 type FormValues = {
   partialSign: boolean;
-  tx: string;
+  walletTx: Record<string, string>;
 };
 
 function SignTxPanel({ selectedWallets, walletApi }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [response, setResponse] = useState<Response>({});
+  const [selectedTxWallet, setSelectedTxWallet] = useState("");
   const [selectedResponseWallet, setSelectedResponseWallet] = useState("");
   const [editorRefreshSignal, setEditorRefreshSignal] = useState(0);
 
   const { control, handleSubmit, setValue } = useForm<FormValues>({
     defaultValues: {
       partialSign: false,
-      tx: "",
+      walletTx: {},
     },
   });
 
@@ -64,13 +65,20 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
 
   async function handleTxBuilderSubmit(builderArgs: TxBuilderArguments) {
     try {
-      const firstSelection = selectedWallets[0]!;
-      const tmpChange = walletApi[firstSelection]?.info["changeAddress"]?.raw;
+      const activeWallets = pickBy(walletApi, (v, k) => selectedWallets.includes(k));
 
-      const tx = await buildUnsignedTx(builderArgs, tmpChange);
+      const resTx: FormValues["walletTx"] = {};
+      for (const walletName of Object.keys(activeWallets)) {
+        const tmpChange = walletApi[walletName]?.info["changeAddress"]?.raw;
 
-      setValue("tx", bin2hex(tx.to_bytes()));
+        const tx = await buildUnsignedTx(builderArgs, tmpChange);
+
+        resTx[walletName] = bin2hex(tx.to_bytes());
+      }
+
+      setValue("walletTx", resTx);
       setEditorRefreshSignal((prev) => (prev ? 0 : 1));
+      setSelectedTxWallet((prev) => prev || (Object.keys(activeWallets)[0] ?? ""));
     } catch (err) {
       return void toast.error(String(err));
     }
@@ -88,7 +96,10 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
       }
 
       try {
-        const res = await walletApi[walletName]?.signTx(cleanHex(formValues.tx), formValues.partialSign);
+        const res = await walletApi[walletName]?.signTx(
+          cleanHex(formValues.walletTx[walletName] ?? ""),
+          formValues.partialSign
+        );
 
         response[walletName] = {
           isError: !res,
@@ -133,19 +144,34 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
         <InputBlock variant="block" name="tx">
           <Controller
             control={control}
-            name="tx"
+            name="walletTx"
             render={({ field: { value, onChange } }) => (
               <div className="grid gap-2">
                 {/* TODO: add empty */}
                 <TxBuilder utxos={utxos} addrs={addrs} onSubmit={handleTxBuilderSubmit} />
-                <CBOREditor key={editorRefreshSignal} value={value} onChange={onChange} />
+                {isEmpty(sellectedWalletApi) ? (
+                  <Badge variant="warn" text="Enable at least one wallet to execute" />
+                ) : (
+                  <>
+                    <WalletViewSelection
+                      selectedWallet={selectedTxWallet}
+                      wallets={Object.keys(sellectedWalletApi)}
+                      onSelect={setSelectedTxWallet}
+                    />
+                    <Fragment key={selectedTxWallet}>
+                      <CBOREditor
+                        key={editorRefreshSignal}
+                        value={value[selectedTxWallet] ?? ""}
+                        onChange={(v) => onChange({ ...value, [selectedTxWallet]: v })}
+                      />
+                    </Fragment>
+                  </>
+                )}
               </div>
             )}
           />
         </InputBlock>
-        {isEmpty(sellectedWalletApi) ? (
-          <Badge variant="warn" text="Enable at least one wallet to execute" />
-        ) : (
+        {!isEmpty(sellectedWalletApi) && (
           <div className="flex">
             <div className="flex gap-2 items-center">
               <Button disabled={isLoading} onClick={handleSubmit(handleExecute)}>
