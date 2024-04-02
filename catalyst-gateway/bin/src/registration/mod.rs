@@ -209,7 +209,6 @@ pub fn inspect_metamap_reg(spec_61284: &[Value]) -> Result<&Vec<(Value, Value)>,
     Ok(metamap)
 }
 
-#[allow(clippy::manual_let_else)]
 /// Extract voting key
 pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingKey, Box<dyn Error>> {
     let voting_key = match &metamap
@@ -289,6 +288,7 @@ pub fn inspect_rewards_addr(
     Ok(rewards_address)
 }
 
+#[allow(clippy::indexing_slicing)]
 /// Extract Nonce
 pub fn inspect_nonce(metamap: &[(Value, Value)]) -> Result<Nonce, Box<dyn Error>> {
     let nonce = match metamap[NONCE] {
@@ -298,6 +298,7 @@ pub fn inspect_nonce(metamap: &[(Value, Value)]) -> Result<Nonce, Box<dyn Error>
     Ok(nonce)
 }
 
+#[allow(clippy::indexing_slicing)]
 /// Extract optional voting purpose
 pub fn inspect_voting_purpose(
     metamap: &[(Value, Value)],
