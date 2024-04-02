@@ -1,4 +1,4 @@
-; An envelope for cardano metadata which holds the x509 metadata.
+; An envelope for Cardano metadata which holds the x509 metadata.
 ; The purpose of the Envelope is to ensure that metadata is not transportable between
 ; transactions.
 ; It ensures that it can be unambiguously validated that the auxiliary data attached to a transaction 
