@@ -17,7 +17,7 @@ TBSCertificate = (
 	subject: Name, ; Reference to on-chain keys related to this certificate
 	subjectPublicKeyAlgorithm: AlgorithmIdentifier, ; Must be 12 = Ed25519
 	subjectPublicKey: subjectPublicKey, ; Ed25519 public key
-	extensions: Extensions, ; No extensions aer currently supported must be set to []
+	extensions: Extensions, ; No extensions are currently supported must be set to []
 	issuerSignatureAlgorithm: AlgorithmIdentifier, ; Must be 12 = Ed25519
 )
 
