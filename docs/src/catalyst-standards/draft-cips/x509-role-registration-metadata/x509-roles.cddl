@@ -1,6 +1,6 @@
-; An envelope for cardano metadata which holds the x509 metadata.
-; We do thsi so that the underlying metadata is not restircted to
-; cardano ledger implementation.
+; An envelope for Cardano metadata which holds the x509 metadata.
+; We do this so that the underlying metadata is not restircted to
+; Cardano ledger implementation.
 
 ; uses 
 x509_roles = $x509_roles .within role-structure
