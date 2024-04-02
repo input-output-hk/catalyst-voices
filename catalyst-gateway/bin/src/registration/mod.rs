@@ -34,6 +34,7 @@ const WEIGHT: usize = 1;
 
 /// <https://cips.cardano.org/cips/cip36/schema.cddl>
 const CIP36_61284: usize = 61284;
+/// <https://cips.cardano.org/cips/cip36/schema.cddl>
 const CIP36_61285: usize = 61285;
 
 /// Pub key
@@ -62,11 +63,13 @@ pub type ErrorReport = Vec<String>;
 /// Cddl schema:
 /// <https://cips.cardano.org/cips/cip36/schema.cddl>
 pub struct CddlConfig {
+    /// Cip36 cddl representation
     cip_36: String,
 }
 
 impl CddlConfig {
     #[must_use]
+    /// Create cddl config
     pub fn new() -> Self {
         let cip_36: String = include_str!("cip36.cddl").to_string();
 
