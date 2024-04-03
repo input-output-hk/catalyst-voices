@@ -180,12 +180,9 @@ pub fn raw_sig_conversion(raw_cbor: &[u8]) -> Result<Signature, Box<dyn Error>> 
 
     let sig = signature_61285.first().ok_or("no 61285 key")?.clone();
     let sig_bytes: [u8; 64] = match sig.into_bytes() {
-        Ok(s) => {
-            let sig_ok = match s.try_into() {
-                Ok(sig) => sig,
-                Err(err) => return Err(format!("Invalid signature length {:?}", err).into()),
-            };
-            sig_ok
+        Ok(s) => match s.try_into() {
+            Ok(sig) => sig,
+            Err(err) => return Err(format!("Invalid signature length {err:?}").into()),
         },
         Err(err) => return Err(format!("Invalid signature parsing {err:?}").into()),
     };
@@ -239,15 +236,11 @@ pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingKey, Box<d
                             .ok_or("Issue parsing weight")?
                             .as_integer()
                         {
-                            Some(weight) => {
-                                match weight.try_into() {
-                                    Ok(weight) => weight,
-                                    Err(_err) => {
-                                        return Err("Invalid weight in delegation"
-                                            .to_string()
-                                            .into())
-                                    },
-                                }
+                            Some(weight) => match weight.try_into() {
+                                Ok(weight) => weight,
+                                Err(_err) => {
+                                    return Err("Invalid weight in delegation".to_string().into())
+                                },
                             },
                             None => return Err("Invalid delegation".to_string().into()),
                         };
