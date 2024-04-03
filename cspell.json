@@ -239,6 +239,7 @@
         "catalyst_voices/packages/**/example/ios/**",
         "catalyst_voices/packages/**/example/macos/**",
         "catalyst_voices/packages/**/example/linux/**",
-        "catalyst_voices/packages/**/example/android/**"
+        "catalyst_voices/packages/**/example/android/**",
+        "utilities/catalyst_voices_remote_widgets/example/**"
     ]
 }
