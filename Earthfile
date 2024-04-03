@@ -36,3 +36,13 @@ repo-config:
     COPY --dir .sqlfluff .
 
     SAVE ARTIFACT /repo repo
+
+# repo-catalyst-voices-packages - Create artifacts of catalyst_voices_packages
+# we need to refer to in other earthly targets.
+repo-catalyst-voices-packages:
+    FROM scratch
+
+    WORKDIR /repo
+    COPY --dir catalyst_voices_packages .
+
+    SAVE ARTIFACT /repo repo

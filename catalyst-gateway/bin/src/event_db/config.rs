@@ -1,20 +1,46 @@
 //! Config Queries
+use std::str::FromStr;
+
+use cardano_chain_follower::Network;
 use serde::{Deserialize, Serialize};
 
 use crate::event_db::{Error, EventDB};
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, PartialOrd, Clone)]
+/// Representation of the `config` table id fields `id`, `id2`, `id3`
+enum ConfigId {
+    /// `id` field
+    #[allow(dead_code)]
+    Id,
+    /// `id2` field
+    #[allow(dead_code)]
+    Id2,
+    /// `id3` field
+    Id3,
+}
+
+impl ConfigId {
+    /// Returns the id field as a string
+    fn as_str(&self) -> &str {
+        match self {
+            ConfigId::Id => "id",
+            ConfigId::Id2 => "id2",
+            ConfigId::Id3 => "id3",
+        }
+    }
+}
+
+#[derive(Debug, PartialEq, Clone)]
 /// Network config metadata
 pub(crate) struct FollowerConfig {
     /// Mainnet, preview, preprod
-    pub(crate) network: String,
+    pub(crate) network: Network,
     /// Cardano relay address
     pub(crate) relay: String,
     /// Mithril snapshot info
     pub(crate) mithril_snapshot: MithrilSnapshotConfig,
 }
 
-#[derive(Serialize, Deserialize, Debug, PartialEq, PartialOrd, Clone)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Clone)]
 /// Follower metadata
 pub(crate) struct MithrilSnapshotConfig {
     /// Path to snapshot file for bootstrap
@@ -40,7 +66,8 @@ impl EventDB {
 
         let mut follower_configs = Vec::new();
         for row in rows {
-            let network = row.try_get("id3")?;
+            let network = Network::from_str(row.try_get::<_, &str>(ConfigId::Id3.as_str())?)
+                .map_err(|e| Error::Unknown(e.to_string()))?;
             let config: serde_json::Value = row.try_get("value")?;
 
             let relay = config
