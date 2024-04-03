@@ -239,11 +239,15 @@ pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingKey, Box<d
                             .ok_or("Issue parsing weight")?
                             .as_integer()
                         {
-                            Some(weight) => match weight.try_into() {
-                                Ok(weight) => weight,
-                                Err(_err) => {
-                                    return Err("Invalid weight in delegation".to_string().into())
-                                },
+                            Some(weight) => {
+                                match weight.try_into() {
+                                    Ok(weight) => weight,
+                                    Err(_err) => {
+                                        return Err("Invalid weight in delegation"
+                                            .to_string()
+                                            .into())
+                                    },
+                                }
                             },
                             None => return Err("Invalid delegation".to_string().into()),
                         };
