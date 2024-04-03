@@ -1,15 +1,13 @@
 //! Voter registration queries
 
 use cardano_chain_follower::Network;
-
 use pallas::ledger::traverse::MultiEraTx;
 use serde_json::{json, Value};
 
+use super::{follower::SlotNumber, Error, EventDB};
 use crate::registration::{
     parse_registrations_from_metadata, validate_reg_cddl, CddlConfig, Nonce as NonceReg,
 };
-
-use super::{follower::SlotNumber, Error, EventDB};
 
 /// Transaction id
 pub(crate) type TxId = String;
@@ -71,8 +69,8 @@ impl EventDB {
                     match parse_registrations_from_metadata(&tx.metadata(), network) {
                         Ok(registration) => registration,
                         Err(_err) => {
-                            // fatal error parsing registration tx, unable to extract meaningful errors
-                            // assume corrupted tx
+                            // fatal error parsing registration tx, unable to extract meaningful
+                            // errors assume corrupted tx
                             continue;
                         },
                     };

@@ -1,15 +1,12 @@
 //! Verify registration TXs
 
+use std::{error::Error, io::Cursor};
+
 use cardano_chain_follower::Network;
 use ciborium::Value;
 use ed25519_dalek::Signature;
-
-use pallas::ledger::primitives::Fragment;
-use pallas::ledger::traverse::MultiEraMeta;
-
+use pallas::ledger::{primitives::Fragment, traverse::MultiEraMeta};
 use serde::{Deserialize, Serialize};
-use std::error::Error;
-use std::io::Cursor;
 
 /// Networks
 const NETWORK_ID: usize = 0;
@@ -19,7 +16,7 @@ const KEY_61284: usize = 0;
 
 /// Cip36
 const STAKE_ADDRESS: usize = 1;
-///Cip36
+/// Cip36
 const PAYMENT_ADDRESS: usize = 2;
 /// Cip36
 const NONCE: usize = 3;
@@ -140,15 +137,15 @@ pub fn validate_reg_cddl(bin_reg: &[u8], cddl_config: &CddlConfig) -> Result<(),
     Ok(())
 }
 
-/// Reward addresses start with a single header byte identifying their type and the network,
-/// followed by 28 bytes of payload identifying either a stake key hash or a script hash.
-/// Function accepts this first header prefix byte.
+/// Reward addresses start with a single header byte identifying their type and the
+/// network, followed by 28 bytes of payload identifying either a stake key hash or a
+/// script hash. Function accepts this first header prefix byte.
 /// Validates first nibble is within the address range: 0x0? - 0x7? + 0xE? , 0xF?
 /// Validates second nibble matches network id: 0/1
 #[must_use]
 pub fn is_valid_rewards_address(rewards_address_prefix: u8, network: Network) -> bool {
-    let addr_type = rewards_address_prefix >> 4 & 0xf;
-    let addr_net = rewards_address_prefix & 0xf;
+    let addr_type = rewards_address_prefix >> 4 & 0xF;
+    let addr_net = rewards_address_prefix & 0xF;
 
     // 0 or 1 are valid addrs in the following cases:
     // type = 0x0 -  Testnet network
@@ -242,11 +239,15 @@ pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingKey, Box<d
                             .ok_or("Issue parsing weight")?
                             .as_integer()
                         {
-                            Some(weight) => match weight.try_into() {
-                                Ok(weight) => weight,
-                                Err(_err) => {
-                                    return Err("Invalid weight in delegation".to_string().into())
-                                },
+                            Some(weight) => {
+                                match weight.try_into() {
+                                    Ok(weight) => weight,
+                                    Err(_err) => {
+                                        return Err("Invalid weight in delegation"
+                                            .to_string()
+                                            .into())
+                                    },
+                                }
                             },
                             None => return Err("Invalid delegation".to_string().into()),
                         };
@@ -363,8 +364,10 @@ pub fn parse_registrations_from_metadata(
                     },
                 };
 
-                // voting key: simply an ED25519 public key. This is the spending credential in the sidechain that will receive voting power
-                // from this delegation. For direct voting it's necessary to have the corresponding private key to cast votes in the sidechain
+                // voting key: simply an ED25519 public key. This is the spending credential in the
+                // sidechain that will receive voting power from this delegation.
+                // For direct voting it's necessary to have the corresponding private key to cast
+                // votes in the sidechain
                 match inspect_voting_key(metamap) {
                     Ok(value) => voting_key = Some(value),
                     Err(err) => {
@@ -373,7 +376,8 @@ pub fn parse_registrations_from_metadata(
                     },
                 };
 
-                // A stake address for the network that this transaction is submitted to (to point to the Ada that is being delegated);
+                // A stake address for the network that this transaction is submitted to (to point
+                // to the Ada that is being delegated);
                 match inspect_stake_key(metamap) {
                     Ok(value) => stake_key = Some(StakeKey(value)),
                     Err(err) => {
