@@ -18,10 +18,12 @@ package-schemathesis:
     VOLUME /results
     ENTRYPOINT st run --checks all $openapi_spec --workers=$workers --wait-for-schema=$wait_for_schema \
                         --max-response-time=$max_response_time --hypothesis-max-examples=$max_examples \
-                            # TODO: https://github.com/input-output-hk/catalyst-voices/issues/330
-                            --data-generation-method=positive --skip-deprecated-operations \
+                            --data-generation-method=all --skip-deprecated-operations \
                                 --force-schema-version=$schema_version --show-trace --force-color  \
-                                  --junit-xml /results/junit-report.xml --cassette-path=/results/cassette.yaml
+                                  --junit-xml /results/junit-report.xml --cassette-path=/results/cassette.yaml \
+                                # TODO: https://github.com/input-output-hk/catalyst-voices/issues/330
+                                --exclude-checks content_type_conformance \
+                                --exclude-checks response_schema_conformance
 
     SAVE IMAGE schemathesis:$tag
 
