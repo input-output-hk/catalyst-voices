@@ -171,6 +171,11 @@
         // "swift",
         "typescript"
         // "vue",
+        "cbor",
+        "addrs",
+        "metamap",
+        "sidechain",
+        "permuations",
     ],
     "import": [
         // Only enable extra languages as needed.
