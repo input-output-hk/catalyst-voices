@@ -1,3 +1,5 @@
+# cspell: words convertbits, segwit
+
 from hashlib import blake2b
 from bitcoin.segwit_addr import bech32_encode, convertbits
 
