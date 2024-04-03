@@ -175,7 +175,7 @@
         "addrs",
         "metamap",
         "sidechain",
-        "permuations",
+        "permutations",
         "cbor"
     ],
     "import": [
