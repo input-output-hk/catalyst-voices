@@ -40,9 +40,7 @@ impl EventDB {
         let rows = conn
             .query(Self::PROPOSAL_QUERY, &[&event.0, &objective.0, &proposal.0])
             .await?;
-        let row = rows
-            .first()
-            .ok_or_else(|| Error::NotFound("Cannot find proposal value".to_string()))?;
+        let row = rows.first().ok_or(Error::NotFound)?;
 
         let proposer = vec![ProposerDetails {
             name: row.try_get("proposer_name")?,

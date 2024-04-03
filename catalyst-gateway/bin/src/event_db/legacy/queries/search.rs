@@ -130,10 +130,8 @@ impl EventDB {
                 &offset.unwrap_or(0),
             ])
             .await
-            .map_err(|e| Error::NotFound(e.to_string()))?;
-        let row = rows
-            .first()
-            .ok_or_else(|| Error::NotFound("Cannot get row".to_string()))?;
+            .map_err(|_| Error::NotFound)?;
+        let row = rows.first().ok_or(Error::NotFound)?;
 
         Ok(SearchResult {
             total: row.try_get("total")?,
@@ -152,7 +150,7 @@ impl EventDB {
                 &offset.unwrap_or(0),
             ])
             .await
-            .map_err(|e| Error::NotFound(e.to_string()))?;
+            .map_err(|_| Error::NotFound)?;
 
         let mut events = Vec::new();
         for row in rows {
@@ -196,7 +194,7 @@ impl EventDB {
                 &offset.unwrap_or(0),
             ])
             .await
-            .map_err(|e| Error::NotFound(e.to_string()))?;
+            .map_err(|_| Error::NotFound)?;
 
         let mut objectives = Vec::new();
         for row in rows {
@@ -236,7 +234,7 @@ impl EventDB {
                 &offset.unwrap_or(0),
             ])
             .await
-            .map_err(|e| Error::NotFound(e.to_string()))?;
+            .map_err(|_| Error::NotFound)?;
 
         let mut proposals = Vec::new();
         for row in rows {

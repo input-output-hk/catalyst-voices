@@ -4,8 +4,8 @@ version: 0.1.0+1
 publish_to: none
 
 environment:
-  sdk: '>=3.3.0 <4.0.0'
-  flutter: 3.19.1
+  sdk: ">=3.3.0 <4.0.0"
+  flutter: 3.19.0
 
 dependencies:
   animated_text_kit: ^4.2.2
@@ -44,9 +44,9 @@ dev_dependencies:
   build_verify: ^3.1.0
   catalyst_analysis:
     git:
-        url: https://github.com/input-output-hk/catalyst-voices.git
-        path: catalyst_voices_packages/catalyst_analysis
-        ref: 3431f7b
+      url: https://github.com/input-output-hk/catalyst-voices.git
+      path: catalyst_voices_packages/catalyst_analysis
+      ref: 3431f7b
   flutter_test:
     sdk: flutter
   go_router_builder: ^2.4.1

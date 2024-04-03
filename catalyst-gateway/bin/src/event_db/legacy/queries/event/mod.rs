@@ -80,9 +80,7 @@ impl EventDB {
         let conn = self.pool.get().await?;
 
         let rows = conn.query(Self::EVENT_QUERY, &[&event.0]).await?;
-        let row = rows
-            .first()
-            .ok_or_else(|| Error::NotFound("Cannot find event value".to_string()))?;
+        let row = rows.first().ok_or(Error::NotFound)?;
 
         let ends = row
             .try_get::<&'static str, Option<NaiveDateTime>>("end_time")?

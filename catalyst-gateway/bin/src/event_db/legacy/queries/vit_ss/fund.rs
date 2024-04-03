@@ -111,9 +111,7 @@ impl EventDB {
         let conn = self.pool.get().await?;
 
         let rows = conn.query(Self::FUND_QUERY, &[]).await?;
-        let row = rows
-            .first()
-            .ok_or_else(|| Error::NotFound("Cannot find fund value".to_string()))?;
+        let row = rows.first().ok_or(Error::NotFound)?;
 
         let fund_id = row.try_get("id")?;
 

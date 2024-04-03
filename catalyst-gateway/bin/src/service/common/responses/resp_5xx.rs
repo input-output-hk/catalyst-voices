@@ -11,15 +11,15 @@ use crate::settings::generate_github_issue_url;
 
 /// Create a new Server Error Response.
 /// Logging error message.
-macro_rules! server_error {
+macro_rules! server_error_response {
     ($($t:tt)*) => {{
         let error = crate::service::common::responses::resp_5xx::ServerError::new(None);
         let id = error.id();
         tracing::error!(id = format!("{id}") ,$($t)*);
-        error
+        poem_extensions::UniResponse::T500(error)
     }};
 }
-pub(crate) use server_error;
+pub(crate) use server_error_response;
 
 #[derive(Debug, Object)]
 #[oai(example, skip_serializing_if_is_none)]
