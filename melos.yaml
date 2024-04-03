@@ -5,6 +5,7 @@ packages:
   - catalyst_voices/*
   - catalyst_voices/packages/**
   - catalyst_voices_packages/**
+  - utilities/*
 
 command:
   version:
