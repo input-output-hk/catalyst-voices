@@ -12,13 +12,13 @@ TBSCertificate = (
 	c509CertificateType: &c509CertificateTypeValues, ; Always 0
 	certificateSerialNumber: CertificateSerialNumber, ; Can be ignored/set to 0 or used as intended.
 	issuer: Name, ; This could be an on-chain reference to the issuer cert, what would be the best way?  Transaction hash/cert hash?
-	validityNotBefore: Time, ; c509 uses UTC, we can use slot# to simplify
-	validityNotAfter: Time, ; c509 uses UTC, we can use slot# to simplify
+	validityNotBefore: Time, ; c509 uses UTC
+	validityNotAfter: Time, ; c509 uses UTC
 	subject: Name, ; Reference to on-chain keys related to this certificate
-	subjectPublicKeyAlgorithm: AlgorithmIdentifier, ; Must be 12 = Ed25519
+	subjectPublicKeyAlgorithm: AlgorithmIdentifier, ; Must be int(12) = Ed25519
 	subjectPublicKey: subjectPublicKey, ; Ed25519 public key
 	extensions: Extensions, ; No extensions are currently supported must be set to []
-	issuerSignatureAlgorithm: AlgorithmIdentifier, ; Must be 12 = Ed25519
+	issuerSignatureAlgorithm: AlgorithmIdentifier, ; Must be int(12) = Ed25519
 )
 
 ; 0 = Native CBOR Certificate type
