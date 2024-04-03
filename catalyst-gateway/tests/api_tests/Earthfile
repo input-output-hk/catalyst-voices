@@ -1,10 +1,10 @@
 VERSION --global-cache 0.7
 
 builder:
-    FROM github.com/input-output-hk/catalyst-ci/earthly/python:v2.0.12+python-base
+    FROM github.com/input-output-hk/catalyst-ci/earthly/python:v2.10.0+python-base
 
     COPY --dir ./api_tests .
-    DO github.com/input-output-hk/catalyst-ci/earthly/python:v2.0.12+BUILDER
+    DO github.com/input-output-hk/catalyst-ci/earthly/python:v2.10.0+BUILDER
 
 test:
     FROM +builder
