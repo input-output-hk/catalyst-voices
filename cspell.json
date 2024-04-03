@@ -169,13 +169,13 @@
         "sql",
         // "svelte",
         // "swift",
-        "typescript"
+        "typescript",
         // "vue",
         "cbor",
         "addrs",
         "metamap",
         "sidechain",
-        "permuations",
+        "permuations"
     ],
     "import": [
         // Only enable extra languages as needed.
