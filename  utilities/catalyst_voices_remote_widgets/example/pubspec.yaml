@@ -15,7 +15,8 @@ dependencies:
   rfw: ^1.0.26
 
 dev_dependencies:
-  flutter_lints: ^3.0.0
+  catalyst_analysis:
+    path: ../../../catalyst_voices_packages/catalyst_analysis
 
 flutter:
   uses-material-design: true

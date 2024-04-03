@@ -34,23 +34,6 @@ class _RemoteFormState extends State<RemoteForm> {
   String _remoteText = '';
   int _counter = 0;
 
-  void _updateCounter() {
-    _counter += 1;
-    _data.update('counter', _counter.toString());
-  }
-
-  void _toggleShowWidget() {
-    setState(() {
-      _showInitialWidget = !_showInitialWidget;
-    });
-    if (_showInitialWidget) {
-      _remoteWidgetUrl = _remoteWidgetOneUrl;
-    } else {
-      _remoteWidgetUrl = _remoteWidgetTwoUrl;
-    }
-    _fetchWidget();
-  }
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<void>(
@@ -81,13 +64,13 @@ class _RemoteFormState extends State<RemoteForm> {
               const SizedBox(height: 16),
               FloatingActionButton(
                 tooltip: 'Fetch new remote widget',
-                onPressed: () => _toggleShowWidget(),
+                onPressed: _toggleShowWidget,
                 child: const Icon(Icons.refresh),
               ),
               const SizedBox(height: 16),
               FloatingActionButton(
                 tooltip: 'Send data to remote widget from host',
-                onPressed: () => _updateCounter(),
+                onPressed: _updateCounter,
                 child: const Icon(Icons.add),
               ),
             ],
@@ -101,13 +84,8 @@ class _RemoteFormState extends State<RemoteForm> {
   void initState() {
     super.initState();
     _registerWidgets();
+    // ignore: discarded_futures
     _widgetFuture = _fetchWidget();
-  }
-
-  @override
-  void reassemble() {
-    super.reassemble();
-    _fetchWidget();
   }
 
   Future<void> onEvent(String name, DynamicMap arguments) async {
@@ -115,6 +93,13 @@ class _RemoteFormState extends State<RemoteForm> {
     setState(() {
       _remoteText = 'User triggered event "$name" with data: $arguments';
     });
+  }
+
+  @override
+  void reassemble() {
+    super.reassemble();
+    // ignore: discarded_futures
+    _fetchWidget();
   }
 
   Future<void> _fetchWidget() async {
@@ -144,5 +129,23 @@ class _RemoteFormState extends State<RemoteForm> {
         catalystCore,
         core.createCatalystCoreWidgets(),
       );
+  }
+
+  void _toggleShowWidget() {
+    setState(() {
+      _showInitialWidget = !_showInitialWidget;
+    });
+    if (_showInitialWidget) {
+      _remoteWidgetUrl = _remoteWidgetOneUrl;
+    } else {
+      _remoteWidgetUrl = _remoteWidgetTwoUrl;
+    }
+    // ignore: discarded_futures
+    _fetchWidget();
+  }
+
+  void _updateCounter() {
+    _counter += 1;
+    _data.update('counter', _counter.toString());
   }
 }

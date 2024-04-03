@@ -22,7 +22,8 @@ Map<String, LocalWidgetBuilder> get _catalystCoreWidgetsDefinitions =>
 
 /// Creates a [LocalWidgetLibrary] containing the Catalyst core widgets.
 ///
-/// The [LocalWidgetLibrary] is created using the [_catalystCoreWidgetsDefinitions]
+/// The [LocalWidgetLibrary] is created using the
+/// [_catalystCoreWidgetsDefinitions]
 /// map of widget definitions.
 LocalWidgetLibrary createCatalystCoreWidgets() =>
     LocalWidgetLibrary(_catalystCoreWidgetsDefinitions);
