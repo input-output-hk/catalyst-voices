@@ -182,12 +182,18 @@ pub fn raw_sig_conversion(raw_cbor: &[u8]) -> Result<Signature, Box<dyn Error>> 
     };
 
     let sig = signature_61285.first().ok_or("no 61285 key")?.clone();
-    let s: [u8; 64] = match sig.into_bytes() {
-        Ok(s) => s.try_into().unwrap_or([0; 64]),
+    let sig_bytes: [u8; 64] = match sig.into_bytes() {
+        Ok(s) => {
+            let sig_ok = match s.try_into() {
+                Ok(sig) => sig,
+                Err(err) => return Err(format!("Invalid signature length {:?}", err).into()),
+            };
+            sig_ok
+        },
         Err(err) => return Err(format!("Invalid signature parsing {err:?}").into()),
     };
 
-    Ok(Signature::from_bytes(&s))
+    Ok(Signature::from_bytes(&sig_bytes))
 }
 
 #[allow(clippy::manual_let_else)]
