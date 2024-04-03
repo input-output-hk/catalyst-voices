@@ -24,7 +24,7 @@ build:
 
   SAVE ARTIFACT dist
 
-# local - Makes a docker image that can serve the docs for development purposes.
+# local - Makes a docker image that can serve the app for development purposes.
 local:
   FROM nginx:1.25-alpine
 
