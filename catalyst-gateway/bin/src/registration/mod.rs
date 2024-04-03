@@ -239,15 +239,11 @@ pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingKey, Box<d
                             .ok_or("Issue parsing weight")?
                             .as_integer()
                         {
-                            Some(weight) => {
-                                match weight.try_into() {
-                                    Ok(weight) => weight,
-                                    Err(_err) => {
-                                        return Err("Invalid weight in delegation"
-                                            .to_string()
-                                            .into())
-                                    },
-                                }
+                            Some(weight) => match weight.try_into() {
+                                Ok(weight) => weight,
+                                Err(_err) => {
+                                    return Err("Invalid weight in delegation".to_string().into())
+                                },
                             },
                             None => return Err("Invalid delegation".to_string().into()),
                         };
@@ -365,9 +361,9 @@ pub fn parse_registrations_from_metadata(
                 };
 
                 // voting key: simply an ED25519 public key. This is the spending credential in the
-                // sidechain that will receive voting power from this delegation.
+                // side chain that will receive voting power from this delegation.
                 // For direct voting it's necessary to have the corresponding private key to cast
-                // votes in the sidechain
+                // votes in the side chain
                 match inspect_voting_key(metamap) {
                     Ok(value) => voting_key = Some(value),
                     Err(err) => {
@@ -452,7 +448,7 @@ pub fn parse_registrations_from_metadata(
 
 #[cfg(test)]
 #[test]
-pub fn test_rewards_addr_permuations() {
+pub fn test_rewards_addr_permutations() {
     // Valid addrs: 0x0?, 0x1?, 0x2?, 0x3?, 0x4?, 0x5?, 0x6?, 0x7?, 0xE?, 0xF?.
 
     let valid_addr_types = vec![0, 1, 2, 3, 4, 5, 6, 7, 14, 15];
