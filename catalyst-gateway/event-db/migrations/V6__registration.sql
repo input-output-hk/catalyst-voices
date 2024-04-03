@@ -181,7 +181,7 @@ CREATE TABLE cardano_utxo (
   value BIGINT NOT NULL,
   asset JSONB NULL,
 
-  stake_credential BYTEA NOT NULL,
+  stake_credential BYTEA NULL,
 
   spent_tx_id BYTEA NULL REFERENCES cardano_txn_index (id),
 

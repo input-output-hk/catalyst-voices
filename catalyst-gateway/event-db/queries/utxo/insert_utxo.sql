@@ -9,4 +9,4 @@ INSERT INTO cardano_utxo
 
 VALUES ($1, $2, $3, $4, $5)
 
-ON CONFLICT (index, tx_id) DO NOTHING
+ON CONFLICT (index, tx_id) DO NOTHING;

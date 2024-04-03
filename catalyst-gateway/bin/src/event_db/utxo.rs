@@ -1,7 +1,7 @@
 //! Utxo Queries
 
 use cardano_chain_follower::Network;
-use pallas::ledger::traverse::MultiEraTx;
+use pallas::ledger::{addresses::Address, traverse::MultiEraTx};
 
 use super::{
     follower::{BlockTime, SlotNumber},
@@ -9,10 +9,7 @@ use super::{
 };
 use crate::{
     event_db::{Error, EventDB},
-    util::{
-        extract_hashed_witnesses, extract_stake_credentials_from_certs,
-        find_matching_stake_credential, parse_policy_assets,
-    },
+    util::parse_policy_assets,
 };
 
 /// Stake amount.
@@ -25,53 +22,54 @@ impl EventDB {
     ) -> Result<(), Error> {
         let conn = self.pool.get().await?;
 
-        for (index, tx) in txs.iter().enumerate() {
-            self.index_txn_data(tx.hash().as_slice(), slot_no, network)
+        for tx in txs {
+            let tx_hash = tx.hash();
+            self.index_txn_data(tx_hash.as_slice(), slot_no, network)
                 .await?;
 
-            let stake_credentials = extract_stake_credentials_from_certs(&tx.certs());
-
-            // Don't index if there is no staking
-            if stake_credentials.is_empty() {
-                return Ok(());
-            }
-
-            let witnesses = match extract_hashed_witnesses(tx.vkey_witnesses()) {
-                Ok(w) => w,
-                Err(err) => return Err(Error::HashedWitnessExtraction(err.to_string())),
-            };
-
-            let (_stake_credential, stake_credential_hash) =
-                match find_matching_stake_credential(&witnesses, &stake_credentials) {
-                    Ok(s) => s,
-                    Err(_err) => {
-                        // Most TXs will not have abided by staking rules, hence logging is too
-                        // noisy. We will not index these TXs and ignore
-                        // them.
-                        return Ok(());
-                    },
-                };
-
             // index outputs
-            for tx_out in tx.outputs() {
+            for (index, tx_out) in tx.outputs().iter().enumerate() {
                 // extract assets
                 let assets = serde_json::to_value(parse_policy_assets(&tx_out.non_ada_assets()))
                     .map_err(|e| Error::AssetParsingIssue(format!("Asset parsing issue {e}")))?;
+
+                let stake_address = match tx_out
+                    .address()
+                    .map_err(|e| Error::Unknown(format!("Address issue {e}")))?
+                {
+                    Address::Shelley(address) => address.try_into().ok(),
+                    Address::Stake(stake_address) => Some(stake_address),
+                    Address::Byron(_) => None,
+                };
+                let stake_credential = stake_address.map(|val| val.payload().as_hash().to_vec());
 
                 let _rows = conn
                     .query(
                         include_str!("../../../event-db/queries/utxo/insert_utxo.sql"),
                         &[
-                            &i32::try_from(index).map_err(|_| Error::NotFound)?,
-                            &tx.hash().as_slice(),
+                            &i32::try_from(index).map_err(|e| Error::Unknown(e.to_string()))?,
+                            &tx_hash.as_slice(),
                             &i64::try_from(tx_out.lovelace_amount())
-                                .map_err(|_| Error::NotFound)?,
-                            &hex::decode(&stake_credential_hash).map_err(|e| {
-                                Error::DecodeHex(format!(
-                                    "Unable to decode stake credential hash {e}"
-                                ))
-                            })?,
+                                .map_err(|e| Error::Unknown(e.to_string()))?,
+                            &stake_credential,
                             &assets,
+                        ],
+                    )
+                    .await?;
+            }
+            // update outputs with inputs
+            for tx_in in tx.inputs() {
+                let output = tx_in.output_ref();
+                let output_tx_hash = output.hash();
+                let out_index = output.index();
+
+                let _rows = conn
+                    .query(
+                        include_str!("../../../event-db/queries/utxo/update_utxo.sql"),
+                        &[
+                            &tx_hash.as_slice(),
+                            &output_tx_hash.as_slice(),
+                            &i32::try_from(out_index).map_err(|e| Error::Unknown(e.to_string()))?,
                         ],
                     )
                     .await?;

@@ -242,16 +242,17 @@ async fn init_follower(
                         },
                     }
 
+                    // index utxo
+                    match db.index_utxo_data(block.txs(), slot, network).await {
+                        Ok(()) => (),
+                        Err(err) => {
+                            error!("Unable to index utxo data for block {:?} - skip..", err);
+                            continue;
+                        },
+                    }
+
                     // Block processing for Eras before staking are ignored.
                     if valid_era(block.era()) {
-                        // Utxo
-                        match db.index_utxo_data(block.txs(), slot, network).await {
-                            Ok(()) => (),
-                            Err(err) => {
-                                error!("Unable to index utxo data for block {:?} - skip..", err);
-                                continue;
-                            },
-                        }
 
                         // Registration
 
