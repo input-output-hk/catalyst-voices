@@ -30,24 +30,4 @@ test:
         --service cat-gateway \
         --allow-privileged
         RUN poetry run pytest
-    END
-
-# some-test:
-#     # get event-db
-#     FROM ./../../event-db+builder
-#     # install poetry
-#     RUN apk add poetry
-#     # get cat-gateway
-#     COPY ./../../+build/cat-gateway .
-#     # get run script
-#     COPY run.sh .
-#     # get mithril preview snapshot
-#     COPY github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:fix/mithril-preview-snapshot+package-preprod-snapshot/snapshot /tmp/preprod 
-
-#     # prepare tests
-#     COPY --dir ./api_tests .
-#     DO github.com/input-output-hk/catalyst-ci/earthly/python:v2.10.0+BUILDER
-
-#     USER postgres:postgres
-#     # RUN ./run.sh
-#     RUN false    
+    END  
