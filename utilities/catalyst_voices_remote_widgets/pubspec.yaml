@@ -1,0 +1,21 @@
+name: catalyst_voices_remote_widgets
+description: Catalyst remote widgets.
+version: 0.1.0+1
+publish_to: none
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+  flutter: 3.19.3
+
+dependencies:
+  flutter:
+    sdk: flutter
+  path: ^1.9.0
+  rfw: ^1.0.26
+
+dev_dependencies:
+  catalyst_analysis:
+    path: ../../catalyst_voices_packages/catalyst_analysis
+
+flutter:
+  uses-material-design: true
