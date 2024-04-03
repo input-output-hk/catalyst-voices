@@ -240,6 +240,10 @@
         "catalyst_voices/packages/**/example/macos/**",
         "catalyst_voices/packages/**/example/linux/**",
         "catalyst_voices/packages/**/example/android/**",
-        "utilities/catalyst_voices_remote_widgets/example/**/**",
+        "utilities/catalyst_voices_remote_widgets/example/windows/**",
+        "utilities/catalyst_voices_remote_widgets/example/ios/**",
+        "utilities/catalyst_voices_remote_widgets/example/linux*/**",
+        "utilities/catalyst_voices_remote_widgets/example/windows*/**",
+        "utilities/catalyst_voices_remote_widgets/example/android*/**"
     ]
 }
