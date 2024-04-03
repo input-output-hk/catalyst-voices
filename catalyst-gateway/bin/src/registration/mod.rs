@@ -4,7 +4,6 @@ use std::{error::Error, io::Cursor};
 
 use cardano_chain_follower::Network;
 use ciborium::Value;
-use ed25519_dalek::Signature;
 use pallas::ledger::{primitives::Fragment, traverse::MultiEraMeta};
 use serde::{Deserialize, Serialize};
 
@@ -56,6 +55,48 @@ pub struct StakeKey(pub PubKey);
 
 /// Error report for serializing
 pub type ErrorReport = Vec<String>;
+
+/// Size of a single component of an Ed25519 signature.
+const COMPONENT_SIZE: usize = 32;
+
+/// Size of an `R` or `s` component of an Ed25519 signature when serialized
+/// as bytes.
+pub type ComponentBytes = [u8; COMPONENT_SIZE];
+
+/// Ed25519 signature serialized as a byte array.
+pub type SignatureBytes = [u8; Signature::BYTE_SIZE];
+
+/// Ed25519 signature.
+///
+/// This type represents a container for the byte serialization of an Ed25519
+/// signature, and does not necessarily represent well-formed field or curve
+/// elements.
+///
+/// Signature verification libraries are expected to reject invalid field
+/// elements at the time a signature is verified.
+#[derive(Copy, Clone, Eq, PartialEq, Debug)]
+#[repr(C)]
+pub struct Signature {
+    r: ComponentBytes,
+    s: ComponentBytes,
+}
+
+impl Signature {
+    /// Size of an encoded Ed25519 signature in bytes.
+    pub const BYTE_SIZE: usize = COMPONENT_SIZE * 2;
+
+    /// Parse an Ed25519 signature from a byte slice.
+    pub fn from_bytes(bytes: &SignatureBytes) -> Self {
+        let mut r = ComponentBytes::default();
+        let mut s = ComponentBytes::default();
+
+        let components = bytes.split_at(COMPONENT_SIZE);
+        r.copy_from_slice(components.0);
+        s.copy_from_slice(components.1);
+
+        Self { r, s }
+    }
+}
 
 /// Cddl schema:
 /// <https://cips.cardano.org/cips/cip36/schema.cddl>
@@ -180,11 +221,9 @@ pub fn raw_sig_conversion(raw_cbor: &[u8]) -> Result<Signature, Box<dyn Error>> 
 
     let sig = signature_61285.first().ok_or("no 61285 key")?.clone();
     let sig_bytes: [u8; 64] = match sig.into_bytes() {
-        Ok(s) => {
-            match s.try_into() {
-                Ok(sig) => sig,
-                Err(err) => return Err(format!("Invalid signature length {err:?}").into()),
-            }
+        Ok(s) => match s.try_into() {
+            Ok(sig) => sig,
+            Err(err) => return Err(format!("Invalid signature length {err:?}").into()),
         },
         Err(err) => return Err(format!("Invalid signature parsing {err:?}").into()),
     };
@@ -238,15 +277,11 @@ pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingKey, Box<d
                             .ok_or("Issue parsing weight")?
                             .as_integer()
                         {
-                            Some(weight) => {
-                                match weight.try_into() {
-                                    Ok(weight) => weight,
-                                    Err(_err) => {
-                                        return Err("Invalid weight in delegation"
-                                            .to_string()
-                                            .into())
-                                    },
-                                }
+                            Some(weight) => match weight.try_into() {
+                                Ok(weight) => weight,
+                                Err(_err) => {
+                                    return Err("Invalid weight in delegation".to_string().into())
+                                },
                             },
                             None => return Err("Invalid delegation".to_string().into()),
                         };

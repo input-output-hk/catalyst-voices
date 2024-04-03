@@ -68,4 +68,3 @@ cardano-chain-follower= { workspace = true }
 anyhow = { workspace = true }
 cddl = "0.9.2"
 ciborium = "0.2"
-ed25519-dalek = "2"
