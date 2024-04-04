@@ -465,7 +465,6 @@ class StakeInfo {
   const StakeInfo({
     required this.amount,
     required this.slotNumber,
-    required this.blockTime,
   });
 
   factory StakeInfo.fromJson(Map<String, dynamic> json) =>
@@ -478,8 +477,6 @@ class StakeInfo {
   final int amount;
   @JsonKey(name: 'slot_number')
   final int slotNumber;
-  @JsonKey(name: 'block_time')
-  final DateTime blockTime;
   static const fromJsonFactory = _$StakeInfoFromJson;
 
   @override
@@ -490,10 +487,7 @@ class StakeInfo {
                 const DeepCollectionEquality().equals(other.amount, amount)) &&
             (identical(other.slotNumber, slotNumber) ||
                 const DeepCollectionEquality()
-                    .equals(other.slotNumber, slotNumber)) &&
-            (identical(other.blockTime, blockTime) ||
-                const DeepCollectionEquality()
-                    .equals(other.blockTime, blockTime)));
+                    .equals(other.slotNumber, slotNumber)));
   }
 
   @override
@@ -503,26 +497,22 @@ class StakeInfo {
   int get hashCode =>
       const DeepCollectionEquality().hash(amount) ^
       const DeepCollectionEquality().hash(slotNumber) ^
-      const DeepCollectionEquality().hash(blockTime) ^
       runtimeType.hashCode;
 }
 
 extension $StakeInfoExtension on StakeInfo {
-  StakeInfo copyWith({int? amount, int? slotNumber, DateTime? blockTime}) {
+  StakeInfo copyWith({int? amount, int? slotNumber}) {
     return StakeInfo(
-        amount: amount ?? this.amount,
-        slotNumber: slotNumber ?? this.slotNumber,
-        blockTime: blockTime ?? this.blockTime);
+      amount: amount ?? this.amount,
+      slotNumber: slotNumber ?? this.slotNumber,
+    );
   }
 
-  StakeInfo copyWithWrapped(
-      {Wrapped<int>? amount,
-      Wrapped<int>? slotNumber,
-      Wrapped<DateTime>? blockTime}) {
+  StakeInfo copyWithWrapped({Wrapped<int>? amount, Wrapped<int>? slotNumber}) {
     return StakeInfo(
-        amount: (amount != null ? amount.value : this.amount),
-        slotNumber: (slotNumber != null ? slotNumber.value : this.slotNumber),
-        blockTime: (blockTime != null ? blockTime.value : this.blockTime));
+      amount: (amount != null ? amount.value : this.amount),
+      slotNumber: (slotNumber != null ? slotNumber.value : this.slotNumber),
+    );
   }
 }
 

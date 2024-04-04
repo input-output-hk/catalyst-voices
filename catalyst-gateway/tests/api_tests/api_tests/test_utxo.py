@@ -48,7 +48,7 @@ def test_staked_ada_endpoint():
         res = get_staked_ada(stake_address, network=network, slot_number=slot_num)
         logger.info(f"checking stake address: {stake_address}")
         # it is possible that snapshot tool collected data for the stake key which does not have any unspent utxo
-        # at this case cat-gateway return 404, that is why we are checking this case additionaly
+        # at this case cat-gateway return 404, that is why we are checking this case additionally
         assert (res != None and res["amount"] == expected_amount) or (
             expected_amount == 0
         )
