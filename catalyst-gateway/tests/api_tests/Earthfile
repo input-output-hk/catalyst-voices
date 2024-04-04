@@ -1,11 +1,11 @@
 VERSION --global-cache 0.7
 
 builder:
-    FROM github.com/input-output-hk/catalyst-ci/earthly/python:v2.10.2+python-base
+    FROM github.com/input-output-hk/catalyst-ci/earthly/python:v2.11.0+python-base
 
     # prepare tests
     COPY --dir ./api_tests .
-    DO github.com/input-output-hk/catalyst-ci/earthly/python:v2.10.2+BUILDER
+    DO github.com/input-output-hk/catalyst-ci/earthly/python:v2.11.0+BUILDER
 
 cat-gateway-test:
     ARG DB_URL="postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev"
@@ -14,7 +14,7 @@ cat-gateway-test:
     FROM ../../+package-cat-gateway --address=$CAT_ADDRESS --db_url=$DB_URL
 
     # copy preprod mithril snapshot to /tmp/preprod dir
-    COPY github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:v2.10.2+package-preprod-snapshot/snapshot /tmp/preprod
+    COPY github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:v2.11.0+package-preprod-snapshot/snapshot /tmp/preprod
 
     SAVE IMAGE cat-gateway-test:latest
 
