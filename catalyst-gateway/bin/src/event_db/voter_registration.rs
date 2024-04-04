@@ -14,7 +14,7 @@ pub(crate) type TxId = String;
 /// Stake credential
 pub(crate) type StakeCredential<'a> = &'a [u8];
 /// Public voting key
-pub(crate) type PublicVotingKey = String;
+pub(crate) type PublicVotingKey<'a> = &'a [u8];
 /// Payment address
 pub(crate) type PaymentAddress<'a> = &'a [u8];
 /// Nonce
@@ -29,7 +29,7 @@ impl EventDB {
     #[allow(dead_code, clippy::too_many_arguments)]
     async fn insert_voter_registration(
         &self, tx_id: TxId, stake_credential: StakeCredential<'_>,
-        public_voting_key: PublicVotingKey, payment_address: PaymentAddress<'_>,
+        public_voting_key: PublicVotingKey<'_>, payment_address: PaymentAddress<'_>,
         metadata_cip36: MetadataCip36<'_>, nonce: Nonce, report: Value, valid: bool,
     ) -> Result<(), Error> {
         let conn = self.pool.get().await?;
@@ -42,7 +42,7 @@ impl EventDB {
                 &[
                     &hex::decode(tx_id).map_err(|e| Error::DecodeHex(e.to_string()))?,
                     &stake_credential,
-                    &public_voting_key.as_bytes(),
+                    &public_voting_key,
                     &payment_address,
                     &nonce,
                     &metadata_cip36,
@@ -101,7 +101,8 @@ impl EventDB {
                         tx.hash().to_string(),
                         &registration.stake_key.unwrap_or_default().0 .0,
                         serde_json::to_string(&registration.voting_key.unwrap_or_default())
-                            .unwrap_or_default(),
+                            .unwrap_or_default()
+                            .as_bytes(),
                         &registration.rewards_address.unwrap_or_default().0,
                         &registration.raw_cbor_cip36.unwrap_or_default(),
                         registration
@@ -123,7 +124,8 @@ impl EventDB {
                         tx.hash().to_string(),
                         &registration.stake_key.unwrap_or_default().0 .0,
                         serde_json::to_string(&registration.voting_key.unwrap_or_default())
-                            .unwrap_or_default(),
+                            .unwrap_or_default()
+                            .as_bytes(),
                         &registration.rewards_address.unwrap_or_default().0,
                         &registration.raw_cbor_cip36.unwrap_or_default(),
                         registration
