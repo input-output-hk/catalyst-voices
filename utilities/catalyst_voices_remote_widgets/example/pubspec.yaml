@@ -1,0 +1,22 @@
+name: remote_widgets_example
+description: "A new Flutter project."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.1 <4.0.0'
+
+dependencies:
+  catalyst_voices_remote_widgets:
+    path: ../
+  flutter:
+    sdk: flutter
+  http: ^1.2.1
+  rfw: ^1.0.26
+
+dev_dependencies:
+  catalyst_analysis:
+    path: ../../../catalyst_voices_packages/catalyst_analysis
+
+flutter:
+  uses-material-design: true
