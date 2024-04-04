@@ -3,10 +3,7 @@
 use cardano_chain_follower::Network;
 use pallas::ledger::{addresses::Address, traverse::MultiEraTx};
 
-use super::{
-    follower::{BlockTime, SlotNumber},
-    voter_registration::StakeCredential,
-};
+use super::{follower::SlotNumber, voter_registration::StakeCredential};
 use crate::{
     event_db::{Error, EventDB},
     util::parse_policy_assets,
@@ -104,8 +101,8 @@ impl EventDB {
 
     /// Get total utxo amount
     pub(crate) async fn total_utxo_amount(
-        &self, stake_credential: StakeCredential<'_>, network: Network, date_time: BlockTime,
-    ) -> Result<(StakeAmount, SlotNumber, BlockTime), Error> {
+        &self, stake_credential: StakeCredential<'_>, network: Network, slot_num: SlotNumber,
+    ) -> Result<(StakeAmount, SlotNumber), Error> {
         let conn = self.pool.get().await?;
 
         let network = match network {
@@ -118,7 +115,7 @@ impl EventDB {
         let row = conn
             .query_one(
                 include_str!("../../../event-db/queries/utxo/select_total_utxo_amount.sql"),
-                &[&stake_credential, &network, &date_time],
+                &[&stake_credential, &network, &slot_num],
             )
             .await?;
 
@@ -127,9 +124,8 @@ impl EventDB {
         // https://www.postgresql.org/docs/8.2/functions-aggregate.html
         if let Some(amount) = row.try_get("total_utxo_amount")? {
             let slot_number = row.try_get("slot_no")?;
-            let block_time = row.try_get("block_time")?;
 
-            Ok((amount, slot_number, block_time))
+            Ok((amount, slot_number))
         } else {
             Err(Error::NotFound)
         }
