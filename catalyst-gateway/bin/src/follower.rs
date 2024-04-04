@@ -254,6 +254,16 @@ async fn init_follower(
                         }
 
                         // Registration
+                        match db.index_registration_data(block.txs(), slot, network).await {
+                            Ok(()) => (),
+                            Err(err) => {
+                                error!(
+                                    "Unable to index registration data for block {:?} - skip..",
+                                    err
+                                );
+                                continue;
+                            },
+                        }
 
                         // Rewards
                     }
