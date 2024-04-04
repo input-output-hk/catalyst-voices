@@ -3,7 +3,6 @@
 
 -- Title : Role Registration Data
 
--- cspell: words utxo
 -- Configuration Tables
 
 -- -------------------------------------------------------------------------------------------------

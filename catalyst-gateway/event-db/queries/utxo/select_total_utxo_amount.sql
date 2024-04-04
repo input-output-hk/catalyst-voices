@@ -8,7 +8,7 @@ FROM cardano_utxo
 INNER JOIN cardano_txn_index
   ON cardano_utxo.tx_id = cardano_txn_index.id
 
-LEFT JOIN cardano_txn_index as spent_txn_index
+LEFT JOIN cardano_txn_index AS spent_txn_index
   ON cardano_utxo.spent_tx_id = spent_txn_index.id
 
 -- filter out orphaned transactions
