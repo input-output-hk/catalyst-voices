@@ -503,16 +503,14 @@ class StakeInfo {
 extension $StakeInfoExtension on StakeInfo {
   StakeInfo copyWith({int? amount, int? slotNumber}) {
     return StakeInfo(
-      amount: amount ?? this.amount,
-      slotNumber: slotNumber ?? this.slotNumber,
-    );
+        amount: amount ?? this.amount,
+        slotNumber: slotNumber ?? this.slotNumber);
   }
 
   StakeInfo copyWithWrapped({Wrapped<int>? amount, Wrapped<int>? slotNumber}) {
     return StakeInfo(
-      amount: (amount != null ? amount.value : this.amount),
-      slotNumber: (slotNumber != null ? slotNumber.value : this.slotNumber),
-    );
+        amount: (amount != null ? amount.value : this.amount),
+        slotNumber: (slotNumber != null ? slotNumber.value : this.slotNumber));
   }
 }
 
