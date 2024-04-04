@@ -61,6 +61,8 @@ impl CardanoApi {
         network: Query<Option<Network>>,
         /// Slot number at which the staked ada amount should be calculated.
         /// If omitted latest slot number is used.
+        // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
+        #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
         slot_number: Query<Option<SlotNumber>>,
     ) -> staked_ada_get::AllResponses {
         staked_ada_get::endpoint(&data, stake_address.0, network.0, slot_number.0).await
