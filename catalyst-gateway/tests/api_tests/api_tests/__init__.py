@@ -38,3 +38,14 @@ def get_sync_state(network: str):
     assert resp.status_code == 200 or resp.status_code == 404
     if resp.status_code == 200:
         return resp.json()
+
+
+def get_staked_ada(address: str, network: str, slot_number):
+    resp = requests.get(
+        cat_gateway_endpoint_url(
+            f"api/cardano/staked_ada/{address}?network={network}&slot_number={slot_number}"
+        )
+    )
+    assert resp.status_code == 200 or resp.status_code == 404
+    if resp.status_code == 200:
+        return resp.json()
