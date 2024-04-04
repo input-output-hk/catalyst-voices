@@ -5,6 +5,7 @@ mod cli;
 mod event_db;
 mod follower;
 mod logger;
+mod registration;
 mod service;
 mod settings;
 mod state;

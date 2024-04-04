@@ -164,3 +164,6 @@ xctest
 xctestrun
 xcworkspace
 yoroi
+cbor
+metamap
+repr
