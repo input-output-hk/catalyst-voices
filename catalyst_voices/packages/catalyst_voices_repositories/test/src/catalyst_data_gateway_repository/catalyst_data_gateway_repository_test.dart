@@ -90,11 +90,13 @@ void main() {
       final stakeInfo = StakeInfo(
         amount: 1,
         slotNumber: 5,
-        blockTime: DateTime.utc(1969, 7, 20, 20, 18, 04),
+        blockTime: DateTime.utc(1970),
       );
-      when(mock.getCardanoStakedAdaStakeAddress(
-        stakeAddress: validStakeAddress,
-      ),).thenAnswer((_) async => Success(stakeInfo));
+      when(
+        mock.getCardanoStakedAdaStakeAddress(
+          stakeAddress: validStakeAddress,
+        ),
+      ).thenAnswer((_) async => Success(stakeInfo));
       final result = await mock.getCardanoStakedAdaStakeAddress(
         stakeAddress: validStakeAddress,
       );
@@ -102,9 +104,11 @@ void main() {
       expect(result.success, equals(stakeInfo));
     });
     test('getCardanoStakedAdaStakeAddress Bad request', () async {
-      when(mock.getCardanoStakedAdaStakeAddress(
-        stakeAddress: notValidStakeAddress,
-      ),).thenAnswer((_) async {
+      when(
+        mock.getCardanoStakedAdaStakeAddress(
+          stakeAddress: notValidStakeAddress,
+        ),
+      ).thenAnswer((_) async {
         return Failure(NetworkErrors.badRequest);
       });
       final result = await mock.getCardanoStakedAdaStakeAddress(
@@ -114,9 +118,11 @@ void main() {
       expect(result.failure, equals(NetworkErrors.badRequest));
     });
     test('getCardanoStakedAdaStakeAddress Not found', () async {
-      when(mock.getCardanoStakedAdaStakeAddress(
-        stakeAddress: validStakeAddress,
-      ),).thenAnswer((_) async {
+      when(
+        mock.getCardanoStakedAdaStakeAddress(
+          stakeAddress: validStakeAddress,
+        ),
+      ).thenAnswer((_) async {
         return Failure(NetworkErrors.notFound);
       });
       final result = await mock.getCardanoStakedAdaStakeAddress(
@@ -126,9 +132,11 @@ void main() {
       expect(result.failure, equals(NetworkErrors.notFound));
     });
     test('getCardanoStakedAdaStakeAddress Server Error', () async {
-      when(mock.getCardanoStakedAdaStakeAddress(
-        stakeAddress: validStakeAddress,
-      ),).thenAnswer((_) async {
+      when(
+        mock.getCardanoStakedAdaStakeAddress(
+          stakeAddress: validStakeAddress,
+        ),
+      ).thenAnswer((_) async {
         return Failure(NetworkErrors.internalServerError);
       });
       final result = await mock.getCardanoStakedAdaStakeAddress(
@@ -147,6 +155,36 @@ void main() {
       final result = await mock.getCardanoStakedAdaStakeAddress(
         stakeAddress: validStakeAddress,
       );
+      expect(result.isFailure, true);
+      expect(result.failure, equals(NetworkErrors.serviceUnavailable));
+    });
+    test('getCardanoSyncState success', () async {
+      final syncState = SyncState(
+        slotNumber: 5,
+        blockHash: 
+          '0x0000000000000000000000000000000000000000000000000000000000000000',
+        lastUpdated: DateTime.utc(1970),
+      );
+      when(mock.getCardanoSyncState()).thenAnswer(
+        (_) async => Success(syncState),
+      );
+      final result = await mock.getCardanoSyncState();
+      expect(result.isSuccess, true);
+      expect(result.success, equals(syncState));
+    });
+    test('getCardanoSyncState Server Error', () async {
+      when(mock.getCardanoSyncState()).thenAnswer(
+        (_) async => Failure(NetworkErrors.internalServerError),
+      );
+      final result = await mock.getCardanoSyncState();
+      expect(result.isFailure, true);
+      expect(result.failure, equals(NetworkErrors.internalServerError));
+    });
+    test('getCardanoSyncState Service Unavailable', () async {
+      when(mock.getCardanoSyncState()).thenAnswer(
+        (_) async => Failure(NetworkErrors.serviceUnavailable),
+      );
+      final result = await mock.getCardanoSyncState();
       expect(result.isFailure, true);
       expect(result.failure, equals(NetworkErrors.serviceUnavailable));
     });
