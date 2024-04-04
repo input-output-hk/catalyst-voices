@@ -10,9 +10,7 @@ use crate::{
     cli::Error,
     event_db::{error::Error as DBError, follower::SlotNumber},
     service::common::{
-        objects::cardano::{
-            network::Network, stake_address::StakeAddress, stake_amount::StakeInfo,
-        },
+        objects::cardano::{network::Network, stake_address::StakeAddress, stake_info::StakeInfo},
         responses::{
             resp_2xx::OK,
             resp_4xx::{ApiValidationError, NotFound},
