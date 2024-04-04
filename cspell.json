@@ -130,7 +130,7 @@
         // "aws",
         "bash",
         "companies",
-        // "cpp",
+        "cpp",
         "cryptocurrencies",
         // "csharp",
         "css",
@@ -150,7 +150,7 @@
         // "haskell",
         "html",
         "html-symbol-entities",
-        // "java",
+        "java",
         // "k8s",
         // "latex",
         // "lorem-ipsum",
@@ -168,7 +168,7 @@
         "softwareTerms",
         "sql",
         // "svelte",
-        // "swift",
+        "swift",
         "typescript"
         // "vue",
     ],
@@ -234,6 +234,7 @@
         "**/test_data/**/*.sql",
         "styles.min.css",
         "web-components.min.js",
-        "**/generated/**"
+        "**/generated/**",
+        "utilities/catalyst_voices_remote_widgets/example/**/**",
     ]
 }
