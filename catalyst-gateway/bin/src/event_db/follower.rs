@@ -5,7 +5,7 @@ use cardano_chain_follower::Network;
 use crate::event_db::{Error, EventDB};
 
 /// Block time
-pub type BlockTime = chrono::DateTime<chrono::offset::Utc>;
+pub type DateTime = chrono::DateTime<chrono::offset::Utc>;
 /// Slot
 pub type SlotNumber = i64;
 /// Epoch
@@ -18,7 +18,7 @@ pub type MachineId = String;
 impl EventDB {
     /// Index follower block stream
     pub(crate) async fn index_follower_data(
-        &self, slot_no: SlotNumber, network: Network, epoch_no: EpochNumber, block_time: BlockTime,
+        &self, slot_no: SlotNumber, network: Network, epoch_no: EpochNumber, block_time: DateTime,
         block_hash: BlockHash,
     ) -> Result<(), Error> {
         let conn = self.pool.get().await?;
@@ -50,7 +50,7 @@ impl EventDB {
     /// Start follower from where previous follower left off.
     pub(crate) async fn last_updated_metadata(
         &self, network: Network,
-    ) -> Result<(SlotNumber, BlockHash, BlockTime), Error> {
+    ) -> Result<(SlotNumber, BlockHash, DateTime), Error> {
         let conn = self.pool.get().await?;
 
         let network = match network {
@@ -81,7 +81,7 @@ impl EventDB {
     /// Mark point in time where the last follower finished indexing in order for future
     /// followers to pick up from this point
     pub(crate) async fn refresh_last_updated(
-        &self, last_updated: BlockTime, slot_no: SlotNumber, block_hash: BlockHash,
+        &self, last_updated: DateTime, slot_no: SlotNumber, block_hash: BlockHash,
         network: Network, machine_id: &MachineId,
     ) -> Result<(), Error> {
         let conn = self.pool.get().await?;

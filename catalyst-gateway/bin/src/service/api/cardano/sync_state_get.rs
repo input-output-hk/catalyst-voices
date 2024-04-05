@@ -1,8 +1,8 @@
-//! Implementation of the GET `/follower/sync_state` endpoint
+//! Implementation of the GET `/sync_state` endpoint
 
 use poem_extensions::{
     response,
-    UniResponse::{T200, T404, T503},
+    UniResponse::{T200, T503},
 };
 use poem_openapi::payload::Json;
 
@@ -13,7 +13,7 @@ use crate::{
         objects::cardano::{network::Network, sync_state::SyncState},
         responses::{
             resp_2xx::OK,
-            resp_4xx::{ApiValidationError, NotFound},
+            resp_4xx::ApiValidationError,
             resp_5xx::{server_error_response, ServerError, ServiceUnavailable},
         },
     },
@@ -24,12 +24,11 @@ use crate::{
 pub(crate) type AllResponses = response! {
     200: OK<Json<Option<SyncState>>>,
     400: ApiValidationError,
-    404: NotFound,
     500: ServerError,
     503: ServiceUnavailable,
 };
 
-/// # GET `/utxo/staked_ada`
+/// # GET `/staked_ada`
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(state: &State, network: Option<Network>) -> AllResponses {
     let event_db = match state.event_db() {
@@ -56,7 +55,6 @@ pub(crate) async fn endpoint(state: &State, network: Option<Network>) -> AllResp
                 last_updated,
             }))))
         },
-        Err(DBError::NotFound) => T404(NotFound),
         Err(err) => server_error_response!("{err}"),
     }
 }

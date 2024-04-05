@@ -15,7 +15,7 @@ use tracing::{error, info};
 use crate::{
     event_db::{
         config::FollowerConfig,
-        follower::{BlockHash, BlockTime, MachineId, SlotNumber},
+        follower::{BlockHash, DateTime, MachineId, SlotNumber},
         EventDB,
     },
     util::valid_era,
@@ -147,7 +147,7 @@ async fn spawn_followers(
 /// it left off. If there was no previous follower, start indexing from genesis point.
 async fn find_last_update_point(
     db: Arc<EventDB>, network: Network,
-) -> anyhow::Result<(Option<SlotNumber>, Option<BlockHash>, Option<BlockTime>)> {
+) -> anyhow::Result<(Option<SlotNumber>, Option<BlockHash>, Option<DateTime>)> {
     let (slot_no, block_hash, last_updated) = match db.last_updated_metadata(network).await {
         Ok((slot_no, block_hash, last_updated)) => {
             info!(
@@ -253,7 +253,6 @@ async fn init_follower(
 
                     // Block processing for Eras before staking are ignored.
                     if valid_era(block.era()) {
-
                         // Registration
                         match db.index_registration_data(block.txs(), slot, network).await {
                             Ok(()) => (),

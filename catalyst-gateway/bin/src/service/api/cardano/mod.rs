@@ -9,7 +9,7 @@ use poem_openapi::{
 };
 
 use crate::{
-    event_db::follower::SlotNumber,
+    event_db::follower::{DateTime, SlotNumber},
     service::{
         common::{
             objects::cardano::{network::Network, stake_address::StakeAddress},
@@ -20,6 +20,7 @@ use crate::{
     state::State,
 };
 
+mod date_time_to_slot_number_get;
 mod staked_ada_get;
 mod sync_state_get;
 
@@ -93,5 +94,34 @@ impl CardanoApi {
         network: Query<Option<Network>>,
     ) -> sync_state_get::AllResponses {
         sync_state_get::endpoint(&data, network.0).await
+    }
+
+    #[oai(
+        path = "/date_time_to_slot_number/:date_time",
+        method = "get",
+        operation_id = "dateTimeToSlotNumberGet",
+        transform = "schema_version_validation"
+    )]
+    /// Get Cardano slot number to the provided date-time.
+    ///
+    /// This endpoint returns the closest cardano slot number to the provided date-time.
+    ///
+    /// ## Responses
+    /// * 200 OK - Returns the slot number.
+    /// * 500 Server Error - If anything within this function fails unexpectedly.
+    /// * 503 Service Unavailable - Service is not ready, requests to other
+    /// endpoints should not be sent until the service becomes ready.
+    async fn date_time_to_slot_number_get(
+        &self, data: Data<&Arc<State>>,
+        /// The date-time for which the slot number should be calculated.
+        date_time: Path<DateTime>,
+        /// Cardano network type.
+        /// If omitted `mainnet` network type is defined.
+        /// As `preprod` and `preview` network types in the stake address encoded as a
+        /// `testnet`, to specify `preprod` or `preview` network type use this
+        /// query parameter.
+        network: Query<Option<Network>>,
+    ) -> date_time_to_slot_number_get::AllResponses {
+        date_time_to_slot_number_get::endpoint(&data, date_time.0, network.0).await
     }
 }
