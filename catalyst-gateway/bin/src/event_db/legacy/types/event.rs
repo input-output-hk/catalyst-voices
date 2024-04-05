@@ -19,9 +19,9 @@ pub(crate) struct EventSummary {
     pub(crate) starts: Option<DateTime<Utc>>,
     /// Ends
     pub(crate) ends: Option<DateTime<Utc>>,
-    /// reg_checked
+    /// `reg_checked`
     pub(crate) reg_checked: Option<DateTime<Utc>>,
-    /// is_final
+    /// `is_final`
     pub(crate) is_final: bool,
 }
 
@@ -69,17 +69,17 @@ pub(crate) struct EventGoal {
 #[derive(Debug, Clone, PartialEq, Eq)]
 /// Event Schedule
 pub(crate) struct EventSchedule {
-    /// insight_sharing
+    /// `insight_sharing`
     pub(crate) insight_sharing: Option<DateTime<Utc>>,
-    /// proposal_submission
+    /// `proposal_submission`
     pub(crate) proposal_submission: Option<DateTime<Utc>>,
-    /// refine_proposals
+    /// `refine_proposals`
     pub(crate) refine_proposals: Option<DateTime<Utc>>,
-    /// finalize_proposals
+    /// `finalize_proposals`
     pub(crate) finalize_proposals: Option<DateTime<Utc>>,
-    /// proposal_assessment
+    /// `proposal_assessment`
     pub(crate) proposal_assessment: Option<DateTime<Utc>>,
-    /// proposal_assessment_qa_start
+    /// `proposal_assessment_qa_start`
     pub(crate) assessment_qa_start: Option<DateTime<Utc>>,
     /// voting start
     pub(crate) voting: Option<DateTime<Utc>>,
