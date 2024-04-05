@@ -46,6 +46,68 @@ impl EventDB {
         Ok(())
     }
 
+    /// Get current slot info for the provided date-time and network
+    pub(crate) async fn current_slot_info(
+        &self, date_time: DateTime, network: Network,
+    ) -> Result<(SlotNumber, BlockHash), Error> {
+        let conn = self.pool.get().await?;
+
+        let network = match network {
+            Network::Mainnet => "mainnet".to_string(),
+            Network::Preview => "preview".to_string(),
+            Network::Preprod => "preprod".to_string(),
+            Network::Testnet => "testnet".to_string(),
+        };
+
+        let row = conn
+            .query_one(
+                include_str!(
+                    "../../../event-db/queries/follower/select_slot_index_by_datetime/current_slot_no.sql"
+                ),
+                &[&network, &date_time],
+            )
+            .await?;
+
+        let slot_number: Option<SlotNumber> = row.try_get("slot_no")?;
+        if let Some(slot_number) = slot_number {
+            let block_hash = hex::encode(row.try_get::<_, Vec<u8>>("block_hash")?);
+            Ok((slot_number, block_hash))
+        } else {
+            Err(Error::NotFound)
+        }
+    }
+
+    /// Get next slot info for the provided date-time and network
+    pub(crate) async fn next_slot_info(
+        &self, date_time: DateTime, network: Network,
+    ) -> Result<(SlotNumber, BlockHash), Error> {
+        let conn = self.pool.get().await?;
+
+        let network = match network {
+            Network::Mainnet => "mainnet".to_string(),
+            Network::Preview => "preview".to_string(),
+            Network::Preprod => "preprod".to_string(),
+            Network::Testnet => "testnet".to_string(),
+        };
+
+        let row = conn
+            .query_one(
+                include_str!(
+                    "../../../event-db/queries/follower/select_slot_index_by_datetime/next_slot_no.sql"
+                ),
+                &[&network, &date_time],
+            )
+            .await?;
+
+        let slot_number: Option<SlotNumber> = row.try_get("slot_no")?;
+        if let Some(slot_number) = slot_number {
+            let block_hash = hex::encode(row.try_get::<_, Vec<u8>>("block_hash")?);
+            Ok((slot_number, block_hash))
+        } else {
+            Err(Error::NotFound)
+        }
+    }
+
     /// Check when last update occurred.
     /// Start follower from where previous follower left off.
     pub(crate) async fn last_updated_metadata(

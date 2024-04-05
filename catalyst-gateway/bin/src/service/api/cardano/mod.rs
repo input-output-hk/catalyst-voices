@@ -97,7 +97,7 @@ impl CardanoApi {
     }
 
     #[oai(
-        path = "/date_time_to_slot_number/:date_time",
+        path = "/date_time_to_slot_number",
         method = "get",
         operation_id = "dateTimeToSlotNumberGet",
         transform = "schema_version_validation"
@@ -114,7 +114,8 @@ impl CardanoApi {
     async fn date_time_to_slot_number_get(
         &self, data: Data<&Arc<State>>,
         /// The date-time for which the slot number should be calculated.
-        date_time: Path<DateTime>,
+        /// If omitted current date time is used.
+        date_time: Query<Option<DateTime>>,
         /// Cardano network type.
         /// If omitted `mainnet` network type is defined.
         /// As `preprod` and `preview` network types in the stake address encoded as a
