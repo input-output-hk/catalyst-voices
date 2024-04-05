@@ -62,11 +62,43 @@ impl EventDB {
         let rows = conn
             .query(
                 include_str!(
-                    "../../../event-db/queries/follower/select_slot_index_by_datetime/current_slot_no.sql"
+                    "../../../event-db/queries/follower/select_slot_index_by_datetime/current_slot_info.sql"
                 ),
                 &[&network, &date_time],
             )
             .await?;
+
+        let Some(row) = rows.first() else {
+            return Err(Error::NotFound);
+        };
+
+        let slot_number: SlotNumber = row.try_get("slot_no")?;
+        let block_hash = hex::encode(row.try_get::<_, Vec<u8>>("block_hash")?);
+        let block_time = row.try_get("block_time")?;
+        Ok((slot_number, block_hash, block_time))
+    }
+
+    /// Get previous slot info for the provided date-time and network
+    pub(crate) async fn previous_slot_info(
+        &self, date_time: DateTime, network: Network,
+    ) -> Result<(SlotNumber, BlockHash, DateTime), Error> {
+        let conn = self.pool.get().await?;
+
+        let network = match network {
+            Network::Mainnet => "mainnet".to_string(),
+            Network::Preview => "preview".to_string(),
+            Network::Preprod => "preprod".to_string(),
+            Network::Testnet => "testnet".to_string(),
+        };
+
+        let rows = conn
+                .query(
+                    include_str!(
+                        "../../../event-db/queries/follower/select_slot_index_by_datetime/previous_slot_info.sql"
+                    ),
+                    &[&network, &date_time],
+                )
+                .await?;
 
         let Some(row) = rows.first() else {
             return Err(Error::NotFound);
@@ -94,7 +126,7 @@ impl EventDB {
         let rows = conn
             .query(
                 include_str!(
-                    "../../../event-db/queries/follower/select_slot_index_by_datetime/next_slot_no.sql"
+                    "../../../event-db/queries/follower/select_slot_index_by_datetime/next_slot_info.sql"
                 ),
                 &[&network, &date_time],
             )

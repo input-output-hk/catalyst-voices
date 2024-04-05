@@ -38,6 +38,9 @@ impl Example for Slot {
 #[derive(Object)]
 #[oai(example = true)]
 pub(crate) struct SlotInfo {
+    /// Previous slot info.
+    pub(crate) previous: Option<Slot>,
+
     /// Current slot info.
     pub(crate) current: Option<Slot>,
 
@@ -48,6 +51,7 @@ pub(crate) struct SlotInfo {
 impl Example for SlotInfo {
     fn example() -> Self {
         Self {
+            previous: Some(Slot::example()),
             current: Some(Slot::example()),
             next: Some(Slot::example()),
         }

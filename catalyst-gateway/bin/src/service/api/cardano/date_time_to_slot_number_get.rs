@@ -68,6 +68,21 @@ pub(crate) async fn endpoint(
         Err(err) => return server_error_response!("{err}"),
     };
 
+    let previous = match event_db
+        .previous_slot_info(date_time, network.clone().into())
+        .await
+    {
+        Ok((slot_number, block_hash, block_time)) => {
+            Some(Slot {
+                slot_number,
+                block_hash,
+                block_time,
+            })
+        },
+        Err(DBError::NotFound) => None,
+        Err(err) => return server_error_response!("{err}"),
+    };
+
     let next = match event_db.next_slot_info(date_time, network.into()).await {
         Ok((slot_number, block_hash, block_time)) => {
             Some(Slot {
@@ -80,5 +95,9 @@ pub(crate) async fn endpoint(
         Err(err) => return server_error_response!("{err}"),
     };
 
-    T200(OK(Json(SlotInfo { current, next })))
+    T200(OK(Json(SlotInfo {
+        previous,
+        current,
+        next,
+    })))
 }
