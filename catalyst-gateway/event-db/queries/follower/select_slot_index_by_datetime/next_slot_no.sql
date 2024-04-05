@@ -1,6 +1,7 @@
 SELECT
   cardano_slot_index.slot_no,
-  cardano_slot_index.block_hash
+  cardano_slot_index.block_hash,
+  cardano_slot_index.block_time
 
 FROM cardano_slot_index
 

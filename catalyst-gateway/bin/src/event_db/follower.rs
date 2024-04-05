@@ -49,7 +49,7 @@ impl EventDB {
     /// Get current slot info for the provided date-time and network
     pub(crate) async fn current_slot_info(
         &self, date_time: DateTime, network: Network,
-    ) -> Result<(SlotNumber, BlockHash), Error> {
+    ) -> Result<(SlotNumber, BlockHash, DateTime), Error> {
         let conn = self.pool.get().await?;
 
         let network = match network {
@@ -74,13 +74,14 @@ impl EventDB {
 
         let slot_number: SlotNumber = row.try_get("slot_no")?;
         let block_hash = hex::encode(row.try_get::<_, Vec<u8>>("block_hash")?);
-        Ok((slot_number, block_hash))
+        let block_time = row.try_get("block_time")?;
+        Ok((slot_number, block_hash, block_time))
     }
 
     /// Get next slot info for the provided date-time and network
     pub(crate) async fn next_slot_info(
         &self, date_time: DateTime, network: Network,
-    ) -> Result<(SlotNumber, BlockHash), Error> {
+    ) -> Result<(SlotNumber, BlockHash, DateTime), Error> {
         let conn = self.pool.get().await?;
 
         let network = match network {
@@ -104,7 +105,8 @@ impl EventDB {
 
         let slot_number: SlotNumber = row.try_get("slot_no")?;
         let block_hash = hex::encode(row.try_get::<_, Vec<u8>>("block_hash")?);
-        Ok((slot_number, block_hash))
+        let block_time = row.try_get("block_time")?;
+        Ok((slot_number, block_hash, block_time))
     }
 
     /// Check when last update occurred.

@@ -8,7 +8,6 @@ use async_recursion::async_recursion;
 use cardano_chain_follower::{
     network_genesis_values, ChainUpdate, Follower, FollowerConfigBuilder, Network, Point,
 };
-use chrono::TimeZone;
 use tokio::{task::JoinHandle, time};
 use tracing::{error, info};
 
@@ -210,7 +209,7 @@ async fn init_follower(
                     };
 
                     let wallclock = match block.wallclock(&genesis_values).try_into() {
-                        Ok(time) => chrono::Utc.timestamp_nanos(time),
+                        Ok(time) => chrono::DateTime::from_timestamp(time, 0).unwrap_or_default(),
                         Err(err) => {
                             error!("Cannot parse wall time from block {:?} - skip..", err);
                             continue;
