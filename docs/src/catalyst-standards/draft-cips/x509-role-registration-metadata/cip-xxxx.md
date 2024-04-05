@@ -120,8 +120,7 @@ We intentionally take advantage of the significant existing code bases and infra
 
 #### Certificate formats
 
-x.509 certificates can be encoded in 
-
+x.509 certificates can be encoded in
 
 We encode x.509 certificates using [CBOR Encoded X.509 Certificates][C509], Each certificate includes its on-chain anchor (public key).
 The on-chain anchors currently envisioned are:
@@ -595,6 +594,8 @@ and answer any questions that the CPS poses for potential solutions.
 
 ### Implementation Plan
 <!-- A plan to meet those criteria. Or `N/A` if not applicable. -->
+
+## References
 
 ## Copyright
 

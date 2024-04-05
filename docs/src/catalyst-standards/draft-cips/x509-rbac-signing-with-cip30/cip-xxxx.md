@@ -65,5 +65,13 @@ and answer any questions that the CPS poses for potential solutions.
 ### Implementation Plan
 <!-- A plan to meet those criteria. Or `N/A` if not applicable. -->
 
+## References
+
 ## Copyright
-<!-- The CIP must be explicitly licensed under acceptable copyright terms. -->
+
+This CIP is licensed under [CC-BY-4.0]
+
+Code samples and reference material are licensed under [Apache 2.0]
+
+[CC-BY-4.0]: https://creativecommons.org/licenses/by/4.0/legalcode
+[Apache 2.0]: https://www.apache.org/licenses/LICENSE-2.0.html
