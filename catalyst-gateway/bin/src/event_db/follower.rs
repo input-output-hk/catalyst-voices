@@ -59,8 +59,8 @@ impl EventDB {
             Network::Testnet => "testnet".to_string(),
         };
 
-        let row = conn
-            .query_one(
+        let rows = conn
+            .query(
                 include_str!(
                     "../../../event-db/queries/follower/select_slot_index_by_datetime/current_slot_no.sql"
                 ),
@@ -68,13 +68,13 @@ impl EventDB {
             )
             .await?;
 
-        let slot_number: Option<SlotNumber> = row.try_get("slot_no")?;
-        if let Some(slot_number) = slot_number {
-            let block_hash = hex::encode(row.try_get::<_, Vec<u8>>("block_hash")?);
-            Ok((slot_number, block_hash))
-        } else {
-            Err(Error::NotFound)
-        }
+        let Some(row) = rows.first() else {
+            return Err(Error::NotFound);
+        };
+
+        let slot_number: SlotNumber = row.try_get("slot_no")?;
+        let block_hash = hex::encode(row.try_get::<_, Vec<u8>>("block_hash")?);
+        Ok((slot_number, block_hash))
     }
 
     /// Get next slot info for the provided date-time and network
@@ -90,22 +90,21 @@ impl EventDB {
             Network::Testnet => "testnet".to_string(),
         };
 
-        let row = conn
-            .query_one(
+        let rows = conn
+            .query(
                 include_str!(
                     "../../../event-db/queries/follower/select_slot_index_by_datetime/next_slot_no.sql"
                 ),
                 &[&network, &date_time],
             )
             .await?;
+        let Some(row) = rows.first() else {
+            return Err(Error::NotFound);
+        };
 
-        let slot_number: Option<SlotNumber> = row.try_get("slot_no")?;
-        if let Some(slot_number) = slot_number {
-            let block_hash = hex::encode(row.try_get::<_, Vec<u8>>("block_hash")?);
-            Ok((slot_number, block_hash))
-        } else {
-            Err(Error::NotFound)
-        }
+        let slot_number: SlotNumber = row.try_get("slot_no")?;
+        let block_hash = hex::encode(row.try_get::<_, Vec<u8>>("block_hash")?);
+        Ok((slot_number, block_hash))
     }
 
     /// Check when last update occurred.

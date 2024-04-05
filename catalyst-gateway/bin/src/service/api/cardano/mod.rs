@@ -104,10 +104,11 @@ impl CardanoApi {
     )]
     /// Get Cardano slot number to the provided date-time.
     ///
-    /// This endpoint returns the closest cardano slot number to the provided date-time.
+    /// This endpoint returns the closest cardano slot info to the provided
+    /// date-time.
     ///
     /// ## Responses
-    /// * 200 OK - Returns the slot number.
+    /// * 200 OK - Returns the slot info.
     /// * 500 Server Error - If anything within this function fails unexpectedly.
     /// * 503 Service Unavailable - Service is not ready, requests to other
     /// endpoints should not be sent until the service becomes ready.
