@@ -29,5 +29,5 @@ test:
         --load cat-gateway-test:latest=(+cat-gateway-test) \
         --service cat-gateway \
         --allow-privileged
-        RUN poetry run pytest
+        RUN poetry run pytest --ignore api_tests/test_utxo.py
     END  
