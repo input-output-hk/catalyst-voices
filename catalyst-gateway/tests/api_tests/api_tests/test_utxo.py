@@ -25,6 +25,7 @@ def sync_to(network: str, slot_num: int, timeout: int):
         if sync_state != None and sync_state["slot_number"] >= slot_num:
             logger.info(f"cat-gateway synced to: {sync_state}")
             break
+        logger.info(f"current sync state is {sync_state}")
         time.sleep(5)
 
 
