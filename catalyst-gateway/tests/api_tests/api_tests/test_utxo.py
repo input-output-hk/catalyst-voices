@@ -25,7 +25,7 @@ def sync_to(network: str, slot_num: int, timeout: int):
     logger.info(
         f"{'synced to slot' : ^16} : "
         + f"{'in total time' : ^16} : "
-        + f"{'slots/second' : ^16} : "
+        + f"{'slots/sec (interval)' : ^20} : "
         + f"{'slots remaining' : ^16} : "
         + f"{'est. time to go' : ^16} :"
     )
@@ -43,18 +43,27 @@ def sync_to(network: str, slot_num: int, timeout: int):
 
         # If the sync state changed since last time, reset the timeout and log the new sync state
         if last_slot_num != sync_state["slot_number"]:
+            slots_last_interval = (sync_state["slot_number"] - last_slot_num) + 1
+            last_interval = time.time() - start_time
+            sps_last_interval = slots_last_interval / max(last_interval, 1.0)
+
             last_slot_num = sync_state["slot_number"]
             start_time = time.time()
+
             total_time = start_time - true_start
             total_slots = (last_slot_num - first_slot_num) + 1
             slots_per_second = total_slots / max(total_time, 0.001)
+
             residual_sync_slots = max(slot_num - last_slot_num, 0)
             estimated_time_remaining = residual_sync_slots / slots_per_second
+
+            # Total slots/second and in the last interval
+            sps = f"{slots_per_second:.2f}({sps_last_interval:.2f})"
 
             logger.info(
                 f"{last_slot_num : >16} : "
                 + f"{printable_time(total_time) : >16} : "
-                + f"{slots_per_second : >16.2f} : "
+                + f"{sps : >20} : "
                 + f"{residual_sync_slots : >16} : "
                 + f"{printable_time(estimated_time_remaining) : >16} :"
             )
