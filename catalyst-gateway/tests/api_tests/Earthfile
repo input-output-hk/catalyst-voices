@@ -5,6 +5,7 @@ builder:
 
     # prepare tests
     COPY --dir ./api_tests .
+    COPY ./snapshot_tool-56364174.json .
     DO github.com/input-output-hk/catalyst-ci/earthly/python:v2.11.0+BUILDER
 
 cat-gateway-test:
