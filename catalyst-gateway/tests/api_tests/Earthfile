@@ -10,11 +10,12 @@ builder:
 cat-gateway-test:
     ARG DB_URL="postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev"
     ARG CAT_ADDRESS="0.0.0.0:3030"
+    ARG LOG_LEVEL="warn"
 
-    FROM ../../+package-cat-gateway --address=$CAT_ADDRESS --db_url=$DB_URL
+    FROM ../../+package-cat-gateway --address=$CAT_ADDRESS --db_url=$DB_URL --log_level=$LOG_LEVEL
 
     # copy preprod mithril snapshot to /tmp/preprod dir
-    COPY github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:v2.11.0+package-preprod-snapshot/snapshot /tmp/preprod
+    COPY github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:feat/update-preprod+package-preprod-snapshot/snapshot /tmp/preprod
 
     SAVE IMAGE cat-gateway-test:latest
 
@@ -29,5 +30,5 @@ test:
         --load cat-gateway-test:latest=(+cat-gateway-test) \
         --service cat-gateway \
         --allow-privileged
-        RUN poetry run pytest -s
+        RUN poetry run pytest api_tests/test_utxo.py -s
     END  

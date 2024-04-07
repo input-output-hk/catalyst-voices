@@ -56,6 +56,7 @@ impl EventDB {
     }
 
     /// Index registration data
+    #[allow(dead_code)]
     pub async fn index_registration_data(
         &self, txs: Vec<MultiEraTx<'_>>, slot_no: SlotNumber, network: Network,
     ) -> Result<(), Error> {

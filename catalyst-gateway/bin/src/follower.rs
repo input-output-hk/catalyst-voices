@@ -10,7 +10,7 @@ use cardano_chain_follower::{
 };
 use chrono::TimeZone;
 use tokio::{task::JoinHandle, time};
-use tracing::{error, info};
+use tracing::{error, info, warn};
 
 use crate::{
     event_db::{
@@ -199,7 +199,6 @@ async fn init_follower(
                             continue;
                         },
                     };
-
                     // Parse block
                     let epoch = match block.epoch(&genesis_values).0.try_into() {
                         Ok(epoch) => epoch,
@@ -208,6 +207,7 @@ async fn init_follower(
                             continue;
                         },
                     };
+                    warn!("Block hash: {}", block.hash());
 
                     let wallclock = match block.wallclock(&genesis_values).try_into() {
                         Ok(time) => chrono::Utc.timestamp_nanos(time),
@@ -224,7 +224,7 @@ async fn init_follower(
                             continue;
                         },
                     };
-
+                    warn!("Start index follower data...");
                     match db
                         .index_follower_data(
                             slot,
@@ -243,6 +243,7 @@ async fn init_follower(
                     }
 
                     // index utxo
+                    warn!("Start index utxo data...");
                     match db.index_utxo_data(block.txs(), slot, network).await {
                         Ok(()) => (),
                         Err(err) => {
@@ -253,23 +254,24 @@ async fn init_follower(
 
                     // Block processing for Eras before staking are ignored.
                     if valid_era(block.era()) {
-
                         // Registration
-                        match db.index_registration_data(block.txs(), slot, network).await {
-                            Ok(()) => (),
-                            Err(err) => {
-                                error!(
-                                    "Unable to index registration data for block {:?} - skip..",
-                                    err
-                                );
-                                continue;
-                            },
-                        }
+                        warn!("Start index registration data...");
+                        // match db.index_registration_data(block.txs(), slot,
+                        // network).await {     Ok(()) => (),
+                        //     Err(err) => {
+                        //         error!(
+                        //             "Unable to index registration data for block {:?} -
+                        // skip..",             err
+                        //         );
+                        //         continue;
+                        //     },
+                        // }
 
                         // Rewards
                     }
 
                     // Refresh update metadata for future followers
+                    warn!("Refresh last updated...");
                     match db
                         .refresh_last_updated(
                             chrono::offset::Utc::now(),
