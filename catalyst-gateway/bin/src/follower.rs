@@ -10,7 +10,7 @@ use cardano_chain_follower::{
 };
 use chrono::TimeZone;
 use tokio::{task::JoinHandle, time};
-use tracing::{error, info, warn};
+use tracing::{error, info};
 
 use crate::{
     event_db::{
@@ -207,7 +207,6 @@ async fn init_follower(
                             continue;
                         },
                     };
-                    warn!("Block hash: {}", block.hash());
 
                     let wallclock = match block.wallclock(&genesis_values).try_into() {
                         Ok(time) => chrono::Utc.timestamp_nanos(time),
@@ -224,7 +223,7 @@ async fn init_follower(
                             continue;
                         },
                     };
-                    warn!("Start index follower data...");
+
                     match db
                         .index_follower_data(
                             slot,
@@ -243,7 +242,6 @@ async fn init_follower(
                     }
 
                     // index utxo
-                    warn!("Start index utxo data...");
                     match db.index_utxo_data(block.txs(), slot, network).await {
                         Ok(()) => (),
                         Err(err) => {
@@ -254,8 +252,7 @@ async fn init_follower(
 
                     // Block processing for Eras before staking are ignored.
                     if valid_era(block.era()) {
-                        // Registration
-                        warn!("Start index registration data...");
+                        // index catalyst registrations
                         // match db.index_registration_data(block.txs(), slot,
                         // network).await {     Ok(()) => (),
                         //     Err(err) => {
@@ -271,7 +268,6 @@ async fn init_follower(
                     }
 
                     // Refresh update metadata for future followers
-                    warn!("Refresh last updated...");
                     match db
                         .refresh_last_updated(
                             chrono::offset::Utc::now(),

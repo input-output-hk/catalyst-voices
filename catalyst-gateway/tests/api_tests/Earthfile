@@ -11,7 +11,7 @@ builder:
 cat-gateway-test:
     ARG DB_URL="postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev"
     ARG CAT_ADDRESS="0.0.0.0:3030"
-    ARG LOG_LEVEL="warn"
+    ARG LOG_LEVEL="error"
 
     FROM ../../+package-cat-gateway --address=$CAT_ADDRESS --db_url=$DB_URL --log_level=$LOG_LEVEL
 
@@ -31,5 +31,5 @@ test:
         --load cat-gateway-test:latest=(+cat-gateway-test) \
         --service cat-gateway \
         --allow-privileged
-        RUN poetry run pytest api_tests/test_utxo.py -s
+        RUN poetry run pytest -s
     END  
