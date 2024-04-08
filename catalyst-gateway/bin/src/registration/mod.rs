@@ -223,11 +223,9 @@ pub fn raw_sig_conversion(raw_cbor: &[u8]) -> Result<Signature, Box<dyn Error>> 
 
     let sig = signature_61285.first().ok_or("no 61285 key")?.clone();
     let sig_bytes: [u8; 64] = match sig.into_bytes() {
-        Ok(s) => {
-            match s.try_into() {
-                Ok(sig) => sig,
-                Err(err) => return Err(format!("Invalid signature length {err:?}").into()),
-            }
+        Ok(s) => match s.try_into() {
+            Ok(sig) => sig,
+            Err(err) => return Err(format!("Invalid signature length {err:?}").into()),
         },
         Err(err) => return Err(format!("Invalid signature parsing {err:?}").into()),
     };
@@ -281,15 +279,11 @@ pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingKey, Box<d
                             .ok_or("Issue parsing weight")?
                             .as_integer()
                         {
-                            Some(weight) => {
-                                match weight.try_into() {
-                                    Ok(weight) => weight,
-                                    Err(_err) => {
-                                        return Err("Invalid weight in delegation"
-                                            .to_string()
-                                            .into())
-                                    },
-                                }
+                            Some(weight) => match weight.try_into() {
+                                Ok(weight) => weight,
+                                Err(_err) => {
+                                    return Err("Invalid weight in delegation".to_string().into())
+                                },
                             },
                             None => return Err("Invalid delegation".to_string().into()),
                         };
@@ -338,25 +332,27 @@ pub fn inspect_rewards_addr(
     Ok(rewards_address)
 }
 
-#[allow(clippy::indexing_slicing)]
 /// Extract Nonce
 pub fn inspect_nonce(metamap: &[(Value, Value)]) -> Result<Nonce, Box<dyn Error>> {
-    let nonce = match metamap[NONCE] {
-        (Value::Integer(_four), Value::Integer(nonce)) => Nonce(nonce.try_into()?),
+    let nonce: i128 = match metamap.get(NONCE).ok_or("Issue with nonce parsing")? {
+        (Value::Integer(_four), Value::Integer(nonce)) => i128::from(*nonce),
         _ => return Err("Invalid nonce".to_string().into()),
     };
-    Ok(nonce)
+
+    Ok(Nonce(nonce.try_into()?))
 }
 
-#[allow(clippy::indexing_slicing)]
 /// Extract optional voting purpose
 pub fn inspect_voting_purpose(
     metamap: &[(Value, Value)],
 ) -> Result<Option<VotingPurpose>, Box<dyn Error>> {
     if metamap.len() == 5 {
-        match metamap[VOTE_PURPOSE] {
+        match metamap
+            .get(VOTE_PURPOSE)
+            .ok_or("Issue with voting purpose parsing")?
+        {
             (Value::Integer(_five), Value::Integer(purpose)) => {
-                Ok(Some(VotingPurpose(purpose.try_into()?)))
+                Ok(Some(VotingPurpose(i128::from(*purpose).try_into()?)))
             },
             _ => Ok(None),
         }
