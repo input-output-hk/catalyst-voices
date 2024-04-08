@@ -9,6 +9,6 @@ WHERE
   cardano_slot_index.network = $1
   AND cardano_slot_index.block_time >= $2
 
-ORDER by cardano_slot_index.slot_no
+ORDER BY cardano_slot_index.slot_no
 
 LIMIT 1;
