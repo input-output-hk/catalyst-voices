@@ -100,3 +100,21 @@ genhtml coverage/lcov.info -o coverage/
 # Open Coverage Report
 open coverage/index.html
 ```
+
+### Generate mocks for Tests
+
+To test some specific internal packages, like `catalyst_voices_repositories` is necessary to generate proper mocks to have them available in tests.
+To do that we need to run
+
+```sh
+flutter pub run build_runner build --delete-conflicting-outputs
+```
+
+ or
+
+ ```sh
+dart run build_runner build --delete-conflicting-outputs
+```
+
+in the package root.
+The decorator `@GenerateNiceMocks` provided by mockito is used to indicate the repository to generate the mocks for.

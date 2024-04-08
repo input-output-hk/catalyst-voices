@@ -6,6 +6,44 @@ import 'package:catalyst_voices_services/generated/catalyst_gateway/cat_gateway_
 import 'package:chopper/chopper.dart';
 import 'package:result_type/result_type.dart';
 
+// The [CatalystDataGatewayRepository] provides a structured interface to
+// interact with the `catalyst-gateway` backend API.
+// Network communication and error handling is abstracted allowing the
+// integration of API calls in an easy way.
+// All methods return `Future` objects to allow async execution.
+//
+// The repository uses, under the hood, the [CatGatewayApi] directly generated
+// from backend OpenAPI specification.
+//
+// To use the repository is necessary to initialize it by specifying the API 
+// base URL:
+// 
+// ```dart
+// final repository = CatalystDataGatewayRepository(Uri.parse('https://example.org/api'));
+// ```
+//
+// Once initialized it is possible, for example, to check the health status of
+// the service:
+//
+// ```dart
+// final health_status = await repository.getHealthLive();
+// ```
+// 
+// fetch staked ADA by stake address:
+//
+// ```dart
+// final stake_info = await repository.getCardanoStakedAdaStakeAddress(
+//   // cspell: disable-next-line
+//   stakeAddress:'stake1uyehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gh6ffgw',
+// );
+// ```
+//
+// or get the sync state:
+//
+// ```dart
+// final sync_state = await repository.getCardanoSyncState();
+// ```
+
 interface class CatalystDataGatewayRepository {
   final CatGatewayApi _catGatewayApi;
 
