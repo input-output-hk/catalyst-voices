@@ -9,7 +9,7 @@ VERSION 0.7
 # Internal: builder is our Event db builder target. Prepares all necessary artifacts.
 #   CI target : dependency
 builder:
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.10.0+BUILDER \
+    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.11.0+BUILDER \
         --sqlfluff_cfg=./../../+repo-config/repo/.sqlfluff
 
     COPY ./../../+repo-config/repo/.sqlfluff .
@@ -24,7 +24,7 @@ builder:
 check:
     FROM +builder
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.10.0+CHECK
+    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.11.0+CHECK
 
 
 # format all SQL files in the current project.  Local developers tool.
@@ -32,15 +32,15 @@ check:
 format:
     LOCALLY
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.10.0+FORMAT --src=$(echo ${PWD}/../../)
+    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.11.0+FORMAT --src=$(echo ${PWD}/../../)
 
 # build - an event db docker image.
 #   CI target : true
 build:
     FROM +builder
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.10.0+BUILD --image_name=event-db
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.10.0+DOCS --image_name=event-db
+    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.11.0+BUILD --image_name=event-db
+    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.11.0+DOCS --image_name=event-db
 
 # test the event db database schema
 #   CI target : true

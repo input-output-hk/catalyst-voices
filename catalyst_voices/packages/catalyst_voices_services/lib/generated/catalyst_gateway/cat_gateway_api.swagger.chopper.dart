@@ -85,12 +85,12 @@ final class _$CatGatewayApi extends CatGatewayApi {
   Future<Response<StakeInfo>> _apiCardanoStakedAdaStakeAddressGet({
     required String? stakeAddress,
     String? network,
-    DateTime? dateTime,
+    int? slotNumber,
   }) {
     final Uri $url = Uri.parse('/api/cardano/staked_ada/${stakeAddress}');
     final Map<String, dynamic> $params = <String, dynamic>{
       'network': network,
-      'date_time': dateTime,
+      'slot_number': slotNumber,
     };
     final Request $request = Request(
       'GET',

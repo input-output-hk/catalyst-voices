@@ -42,6 +42,7 @@ pub(crate) enum Error {
     #[error("Unable parse assets: {0}")]
     AssetParsingIssue(String),
     /// Unable to extract hashed witnesses
+    #[allow(dead_code)]
     #[error("Unable to extract hashed witnesses: {0}")]
     HashedWitnessExtraction(String),
 }

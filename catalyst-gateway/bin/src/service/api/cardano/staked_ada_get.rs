@@ -1,6 +1,5 @@
 //! Implementation of the GET `/utxo/staked_ada` endpoint
 
-use chrono::{DateTime, Utc};
 use poem_extensions::{
     response,
     UniResponse::{T200, T400, T404, T503},
@@ -9,11 +8,9 @@ use poem_openapi::{payload::Json, types::ToJSON};
 
 use crate::{
     cli::Error,
-    event_db::error::Error as DBError,
+    event_db::{error::Error as DBError, follower::SlotNumber},
     service::common::{
-        objects::cardano::{
-            network::Network, stake_address::StakeAddress, stake_amount::StakeInfo,
-        },
+        objects::cardano::{network::Network, stake_address::StakeAddress, stake_info::StakeInfo},
         responses::{
             resp_2xx::OK,
             resp_4xx::{ApiValidationError, NotFound},
@@ -76,7 +73,7 @@ fn check_network(
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(
     state: &State, stake_address: StakeAddress, provided_network: Option<Network>,
-    date_time: Option<DateTime<Utc>>,
+    slot_num: Option<SlotNumber>,
 ) -> AllResponses {
     let event_db = match state.event_db() {
         Ok(event_db) => event_db,
@@ -92,7 +89,7 @@ pub(crate) async fn endpoint(
         Err(err) => return server_error_response!("{err}"),
     };
 
-    let date_time = date_time.unwrap_or_else(Utc::now);
+    let date_time = slot_num.unwrap_or(SlotNumber::MAX);
     let stake_credential = stake_address.payload().as_hash().as_ref();
 
     let network = match check_network(stake_address.network(), provided_network) {
@@ -105,11 +102,10 @@ pub(crate) async fn endpoint(
         .total_utxo_amount(stake_credential, network.into(), date_time)
         .await
     {
-        Ok((amount, slot_number, block_time)) => {
+        Ok((amount, slot_number)) => {
             T200(OK(Json(StakeInfo {
                 amount,
                 slot_number,
-                block_time,
             })))
         },
         Err(DBError::NotFound) => T404(NotFound),

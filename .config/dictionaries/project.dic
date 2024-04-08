@@ -157,6 +157,7 @@ TXNZD
 Typer
 unmanaged
 UTXO
+utxo
 Utxos
 utxos
 vite
@@ -175,3 +176,6 @@ xctest
 xctestrun
 xcworkspace
 yoroi
+cbor
+metamap
+repr
