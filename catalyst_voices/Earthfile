@@ -16,7 +16,7 @@ deps:
 
     WORKDIR /frontend
 
-    GIT CLONE https://github.com/flutter/flutter.git /usr/local/flutter
+    RUN git clone https://github.com/flutter/flutter.git /usr/local/flutter
     ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
     RUN flutter channel stable
     RUN flutter upgrade
@@ -87,4 +87,10 @@ package:
     COPY ./nginx.conf /etc/nginx/nginx.conf
     EXPOSE 80
 
-    SAVE IMAGE catalyst-voices-app:$tag
+    SAVE IMAGE voices-frontend:$tag
+
+publish:
+    FROM +package
+    ARG tag='latest'
+
+    SAVE IMAGE voices-frontend:$tag
