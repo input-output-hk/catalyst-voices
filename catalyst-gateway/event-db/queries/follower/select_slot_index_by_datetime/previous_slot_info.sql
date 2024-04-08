@@ -7,7 +7,7 @@ FROM cardano_slot_index
 
 WHERE
   cardano_slot_index.network = $1
-  AND cardano_slot_index.block_time <= $2
+  AND cardano_slot_index.block_time < $2
 
 ORDER BY cardano_slot_index.slot_no DESC
 

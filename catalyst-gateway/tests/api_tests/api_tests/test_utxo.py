@@ -4,7 +4,6 @@ import requests
 from api_tests import (
     check_is_live,
     check_is_ready,
-    get_sync_state,
     get_staked_ada,
     sync_to,
     utils,

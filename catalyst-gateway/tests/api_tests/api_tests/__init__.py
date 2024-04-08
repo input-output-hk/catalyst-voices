@@ -4,6 +4,7 @@ from loguru import logger
 import requests
 import time
 import math
+from datetime import datetime
 
 DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 DEFAULT_TIMEOUT = 10
@@ -57,7 +58,9 @@ def get_staked_ada(address: str, network: str, slot_number: int):
         return resp.json()
 
 
-def get_date_time_to_slot_number(address: str, network: str, date_time: str):
+def get_date_time_to_slot_number(network: str, date_time: datetime):
+    # replace special characters
+    date_time = date_time.isoformat().replace(":", "%3A").replace("+", "%2B")
     resp = requests.get(
         cat_gateway_endpoint_url(
             f"api/cardano/date_time_to_slot_number?network={network}&date_time={date_time}"
