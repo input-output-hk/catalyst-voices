@@ -82,25 +82,6 @@ final class _$CatGatewayApi extends CatGatewayApi {
   }
 
   @override
-  Future<Response<SlotInfo> _apiCardanoDateTimeToSlotNumberGet({
-      DateTime? dateTime,
-      String? network,
-  }){
-    final Uri $url = Uri.parse('/api/cardano/date_time_to_slot_number');
-    final Map<String, dynamic> $params = <String, dynamic>{
-      'date_time': dateTime,
-      'network': network,
-    };
-    final Request $request = Request(
-      'GET',
-      $url,
-      client.baseUrl,
-      parameters: $params,
-    );
-    return client.send<SlotInfo, SlotInfo>($request);
-  }
-
-  @override
   Future<Response<StakeInfo>> _apiCardanoStakedAdaStakeAddressGet({
     required String? stakeAddress,
     String? network,
@@ -131,6 +112,25 @@ final class _$CatGatewayApi extends CatGatewayApi {
       parameters: $params,
     );
     return client.send<SyncState, SyncState>($request);
+  }
+
+  @override
+  Future<Response<SlotInfo> _apiCardanoDateTimeToSlotNumberGet({
+      DateTime? dateTime,
+      String? network,
+  }){
+    final Uri $url = Uri.parse('/api/cardano/date_time_to_slot_number');
+    final Map<String, dynamic> $params = <String, dynamic>{
+      'date_time': dateTime,
+      'network': network,
+    };
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+      parameters: $params,
+    );
+    return client.send<SlotInfo, SlotInfo>($request);
   }
 
   @override

@@ -460,6 +460,7 @@ extension $ServerErrorPayloadExtension on ServerErrorPayload {
   }
 }
 
+@JsonSerializable(explicitToJson: true)
 class Slot {
   const Slot({
     required this.slotNumber,
