@@ -2,11 +2,17 @@
 
 from loguru import logger
 import requests
+import time
+import math
 
 DB_URL = "postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
 DEFAULT_TIMEOUT = 10
 CAT_GATEWAY_HOST = "127.0.0.1"
 CAT_GATEWAY_PORT = 3030
+
+
+def printable_time(time: float):
+    return f"{math.floor(time / 3600):02}:{math.floor((time % 3600) / 60):02}:{math.floor(time % 60):02}"
 
 
 def cat_gateway_endpoint_url(endpoint: str):
@@ -40,7 +46,7 @@ def get_sync_state(network: str):
         return resp.json()
 
 
-def get_staked_ada(address: str, network: str, slot_number):
+def get_staked_ada(address: str, network: str, slot_number: int):
     resp = requests.get(
         cat_gateway_endpoint_url(
             f"api/cardano/staked_ada/{address}?network={network}&slot_number={slot_number}"
@@ -51,8 +57,14 @@ def get_staked_ada(address: str, network: str, slot_number):
         return resp.json()
 
 
-def printable_time(time: float):
-    return f"{math.floor(time / 3600):02}:{math.floor((time % 3600) / 60):02}:{math.floor(time % 60):02}"
+def get_date_time_to_slot_number(address: str, network: str, date_time: str):
+    resp = requests.get(
+        cat_gateway_endpoint_url(
+            f"api/cardano/date_time_to_slot_number?network={network}&date_time={date_time}"
+        )
+    )
+    assert resp.status_code == 200
+    return resp.json()
 
 
 # Wait until service will sync to the provided slot number

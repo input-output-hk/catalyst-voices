@@ -1,4 +1,3 @@
-import time
 import json
 from loguru import logger
 import requests
@@ -10,7 +9,6 @@ from api_tests import (
     sync_to,
     utils,
 )
-import math
 
 
 def test_staked_ada_endpoint():
