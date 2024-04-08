@@ -102,7 +102,7 @@ impl CardanoApi {
         operation_id = "dateTimeToSlotNumberGet",
         transform = "schema_version_validation"
     )]
-    /// Get Cardano slot number to the provided date-time.
+    /// Get Cardano slot info to the provided date-time.
     ///
     /// This endpoint returns the closest cardano slot info to the provided
     /// date-time.
