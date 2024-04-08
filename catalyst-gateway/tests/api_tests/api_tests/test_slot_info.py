@@ -15,7 +15,7 @@ def test_date_time_to_slot_number_endpoint():
     check_is_ready()
 
     network = "preprod"
-    slot_num = 13899520
+    slot_num = 16010056
 
     # block hash `65b13e1227c36a3327fb1333ae801d15c50c7f5af66919d467befce8d67a4284`
     # 60 second timeout (3 block times iof syncing from tip)
