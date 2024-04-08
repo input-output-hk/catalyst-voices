@@ -86,6 +86,7 @@ pub fn valid_era(era: Era) -> bool {
 
 /// Extract stake credentials from certificates. Stake credentials are 28 byte blake2b
 /// hashes.
+#[allow(dead_code)]
 pub fn extract_stake_credentials_from_certs(
     certs: &[MultiEraCert<'_>],
 ) -> Vec<StakeCredentialHash> {
@@ -116,6 +117,7 @@ pub fn extract_stake_credentials_from_certs(
 /// Extract witness pub keys and pair with blake2b hash of the pub key.
 /// Hashes are generally 32-byte long on Cardano (or 256 bits),
 /// except for credentials (i.e. keys or scripts) which are 28-byte long (or 224 bits)
+#[allow(dead_code)]
 pub fn extract_hashed_witnesses(
     witnesses: &[VKeyWitness],
 ) -> anyhow::Result<Vec<(WitnessPubKey, WitnessHash)>> {
@@ -137,6 +139,7 @@ pub fn extract_hashed_witnesses(
 
 /// Match hashed witness pub keys with hashed stake credentials from the TX certificates
 /// to identify the correct stake credential key.
+#[allow(dead_code)]
 pub fn find_matching_stake_credential(
     witnesses: &[(WitnessPubKey, WitnessHash)], stake_credentials: &[String],
 ) -> anyhow::Result<(StakeCredentialKey, StakeCredentialHash)> {

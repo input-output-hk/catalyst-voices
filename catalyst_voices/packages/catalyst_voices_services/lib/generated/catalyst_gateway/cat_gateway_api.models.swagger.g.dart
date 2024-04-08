@@ -118,13 +118,11 @@ Map<String, dynamic> _$ServerErrorPayloadToJson(ServerErrorPayload instance) =>
 StakeInfo _$StakeInfoFromJson(Map<String, dynamic> json) => StakeInfo(
       amount: json['amount'] as int,
       slotNumber: json['slot_number'] as int,
-      blockTime: DateTime.parse(json['block_time'] as String),
     );
 
 Map<String, dynamic> _$StakeInfoToJson(StakeInfo instance) => <String, dynamic>{
       'amount': instance.amount,
       'slot_number': instance.slotNumber,
-      'block_time': instance.blockTime.toIso8601String(),
     };
 
 StatusInABlock _$StatusInABlockFromJson(Map<String, dynamic> json) =>

@@ -117,26 +117,38 @@ at the app level to allow for querying groups of data.';
 
 INSERT INTO config (id, id2, id3, value)
 VALUES
+-- (
+--   'cardano',
+--   'follower',
+--   'mainnet',
+--   '{
+--     "relay": "relays-new.cardano-mainnet.iohk.io:3001",
+--     "mithril_snapshot": {
+--       "path": "/tmp/mainnet/immutable",
+--       "timing_pattern": 25
+--     }
+--   }'
+-- ),
+-- (
+--   'cardano',
+--   'follower',
+--   'preview',
+--   '{
+--     "relay": "preview-node.play.dev.cardano.org:3001",
+--     "mithril_snapshot": {
+--       "path": "/tmp/preview/immutable",
+--       "timing_pattern": 25
+--     }
+--   }'
+-- ),
 (
   'cardano',
   'follower',
-  'mainnet',
+  'preprod',
   '{
-    "relay": "relays-new.cardano-mainnet.iohk.io:3001",
+    "relay": "preprod-node.play.dev.cardano.org:3001",
     "mithril_snapshot": {
-      "path": "/tmp/mainnet/immutable",
-      "timing_pattern": 25
-    }
-  }'
-),
-(
-  'cardano',
-  'follower',
-  'preview',
-  '{
-    "relay": "preview-node.play.dev.cardano.org:3001",
-    "mithril_snapshot": {
-      "path": "/tmp/preview/immutable",
+      "path": "/tmp/preprod/immutable",
       "timing_pattern": 25
     }
   }'
