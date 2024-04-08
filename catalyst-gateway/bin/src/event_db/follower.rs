@@ -15,6 +15,15 @@ pub type BlockHash = String;
 /// Unique follower id
 pub type MachineId = String;
 
+/// `slot_no` column name
+const SLOT_NO_COLUMN: &str = "slot_no";
+/// `block_hash` column name
+const BLOCK_HASH_COLUMN: &str = "block_hash";
+/// `block_time` column name
+const BLOCK_TIME_COLUMN: &str = "block_time";
+/// `ended` column name
+const ENDED_COLUMN: &str = "ended";
+
 impl EventDB {
     /// Index follower block stream
     pub(crate) async fn index_follower_data(
@@ -58,9 +67,9 @@ impl EventDB {
             return Err(Error::NotFound);
         };
 
-        let slot_number: SlotNumber = row.try_get("slot_no")?;
-        let block_hash = hex::encode(row.try_get::<_, Vec<u8>>("block_hash")?);
-        let block_time = row.try_get("block_time")?;
+        let slot_number: SlotNumber = row.try_get(SLOT_NO_COLUMN)?;
+        let block_hash = hex::encode(row.try_get::<_, Vec<u8>>(BLOCK_HASH_COLUMN)?);
+        let block_time = row.try_get(BLOCK_TIME_COLUMN)?;
         Ok((slot_number, block_hash, block_time))
     }
 
@@ -83,9 +92,9 @@ impl EventDB {
             return Err(Error::NotFound);
         };
 
-        let slot_number: SlotNumber = row.try_get("slot_no")?;
-        let block_hash = hex::encode(row.try_get::<_, Vec<u8>>("block_hash")?);
-        let block_time = row.try_get("block_time")?;
+        let slot_number: SlotNumber = row.try_get(SLOT_NO_COLUMN)?;
+        let block_hash = hex::encode(row.try_get::<_, Vec<u8>>(BLOCK_HASH_COLUMN)?);
+        let block_time = row.try_get(BLOCK_TIME_COLUMN)?;
         Ok((slot_number, block_hash, block_time))
     }
 
@@ -107,9 +116,9 @@ impl EventDB {
             return Err(Error::NotFound);
         };
 
-        let slot_number: SlotNumber = row.try_get("slot_no")?;
-        let block_hash = hex::encode(row.try_get::<_, Vec<u8>>("block_hash")?);
-        let block_time = row.try_get("block_time")?;
+        let slot_number: SlotNumber = row.try_get(SLOT_NO_COLUMN)?;
+        let block_hash = hex::encode(row.try_get::<_, Vec<u8>>(BLOCK_HASH_COLUMN)?);
+        let block_time = row.try_get(BLOCK_TIME_COLUMN)?;
         Ok((slot_number, block_hash, block_time))
     }
 
@@ -131,9 +140,9 @@ impl EventDB {
             return Err(Error::NotFound);
         };
 
-        let slot_no = row.try_get("slot_no")?;
-        let block_hash = hex::encode(row.try_get::<_, Vec<u8>>("block_hash")?);
-        let last_updated = row.try_get("ended")?;
+        let slot_no = row.try_get(SLOT_NO_COLUMN)?;
+        let block_hash = hex::encode(row.try_get::<_, Vec<u8>>(BLOCK_HASH_COLUMN)?);
+        let last_updated = row.try_get(ENDED_COLUMN)?;
 
         Ok((slot_no, block_hash, last_updated))
     }
