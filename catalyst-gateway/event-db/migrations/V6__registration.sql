@@ -3,7 +3,6 @@
 
 -- Title : Role Registration Data
 
--- cspell: words utxo
 -- Configuration Tables
 
 -- -------------------------------------------------------------------------------------------------
@@ -181,7 +180,7 @@ CREATE TABLE cardano_utxo (
   value BIGINT NOT NULL,
   asset JSONB NULL,
 
-  stake_credential BYTEA NOT NULL,
+  stake_credential BYTEA NULL,
 
   spent_tx_id BYTEA NULL REFERENCES cardano_txn_index (id),
 
@@ -292,11 +291,10 @@ CREATE TABLE cardano_voter_registration (
   payment_address BYTEA NULL,
   nonce BIGINT NULL,
 
-  metadata_61284 BYTEA NULL,  -- We can purge metadata for valid registrations that are old to save storage space. 
-  metadata_61285 BYTEA NULL,  -- We can purge metadata for valid registrations that are old to save storage space.
+  metadata_cip36 BYTEA NULL,  -- We can purge metadata for valid registrations that are old to save storage space. 
 
   valid BOOLEAN NOT NULL DEFAULT false,
-  stats JSONB NULL
+  stats JSONB
   -- record rolled back in stats if the registration was lost during a rollback, its also invalid at this point.
   -- Other stats we can record are is it a CIP-36 or CIP-15 registration format.
   -- does it have a valid reward address but not a payment address, so we can't pay to it.
@@ -333,14 +331,10 @@ COMMENT ON COLUMN cardano_voter_registration.payment_address IS
 COMMENT ON COLUMN cardano_voter_registration.nonce IS
 'The nonce of the registration.  Registrations for the same stake address with higher nonces have priority.';
 
-COMMENT ON COLUMN cardano_voter_registration.metadata_61284 IS
+COMMENT ON COLUMN cardano_voter_registration.metadata_cip36 IS
 'The raw metadata for the CIP-15/36 registration.
 This data is optional, a parameter in config specifies how long raw registration metadata should be kept.
 Outside this time, the Registration record will be kept, but the raw metadata will be purged.';
-COMMENT ON COLUMN cardano_voter_registration.metadata_61285 IS
-'The metadata for the CIP-15/36 registration signature.
-This data is optional, a parameter in config specifies how long signature metadata should be kept.
-Outside this time, the Registration record will be kept, but the signature metadata will be purged.';
 
 COMMENT ON COLUMN cardano_voter_registration.valid IS
 'True if the registration is valid, false if the registration is invalid.
