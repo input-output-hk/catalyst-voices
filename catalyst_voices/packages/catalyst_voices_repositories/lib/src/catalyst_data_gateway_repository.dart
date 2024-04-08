@@ -42,13 +42,13 @@ interface class CatalystDataGatewayRepository {
   Future<Result<StakeInfo, NetworkErrors>> getCardanoStakedAdaStakeAddress({
     required String stakeAddress,
     enums.Network network = enums.Network.mainnet,
-    DateTime? dateTime,
+    int? slotNumber,
   }) async {
     try {
       final stakeInfo = await _catGatewayApi.apiCardanoStakedAdaStakeAddressGet(
         stakeAddress: stakeAddress,
         network: network,
-        dateTime: dateTime,
+        slotNumber: slotNumber,
       );
       return Success(stakeInfo.bodyOrThrow);
     } on ChopperHttpException catch (error) {

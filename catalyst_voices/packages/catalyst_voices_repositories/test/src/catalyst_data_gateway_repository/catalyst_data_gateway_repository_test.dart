@@ -87,10 +87,9 @@ void main() {
     // cspell: enable
     const notValidStakeAddress = 'stake1wrong1stake';
     test('getCardanoStakedAdaStakeAddress success', () async {
-      final stakeInfo = StakeInfo(
+      const stakeInfo = StakeInfo(
         amount: 1,
         slotNumber: 5,
-        blockTime: DateTime.utc(1970),
       );
       when(
         mock.getCardanoStakedAdaStakeAddress(
