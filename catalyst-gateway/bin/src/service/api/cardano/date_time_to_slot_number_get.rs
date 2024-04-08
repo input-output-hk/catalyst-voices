@@ -53,45 +53,36 @@ pub(crate) async fn endpoint(
     let date_time = date_time.unwrap_or_else(chrono::Utc::now);
     let network = network.unwrap_or(Network::Mainnet);
 
-    let current = match event_db
-        .current_slot_info(date_time, network.clone().into())
-        .await
-    {
-        Ok((slot_number, block_hash, block_time)) => {
-            Some(Slot {
-                slot_number,
-                block_hash,
-                block_time,
-            })
-        },
-        Err(DBError::NotFound) => None,
-        Err(err) => return server_error_response!("{err}"),
+    let (current, previous, next) = tokio::join!(
+        event_db.current_slot_info(date_time, network.clone().into()),
+        event_db.previous_slot_info(date_time, network.clone().into(),),
+        event_db.next_slot_info(date_time, network.into())
+    );
+
+    let process_slot_info_result = |slot_info_result| {
+        match slot_info_result {
+            Ok((slot_number, block_hash, block_time)) => {
+                Ok(Some(Slot {
+                    slot_number,
+                    block_hash,
+                    block_time,
+                }))
+            },
+            Err(DBError::NotFound) => Ok(None),
+            Err(err) => Err(err),
+        }
     };
 
-    let previous = match event_db
-        .previous_slot_info(date_time, network.clone().into())
-        .await
-    {
-        Ok((slot_number, block_hash, block_time)) => {
-            Some(Slot {
-                slot_number,
-                block_hash,
-                block_time,
-            })
-        },
-        Err(DBError::NotFound) => None,
+    let current = match process_slot_info_result(current) {
+        Ok(current) => current,
         Err(err) => return server_error_response!("{err}"),
     };
-
-    let next = match event_db.next_slot_info(date_time, network.into()).await {
-        Ok((slot_number, block_hash, block_time)) => {
-            Some(Slot {
-                slot_number,
-                block_hash,
-                block_time,
-            })
-        },
-        Err(DBError::NotFound) => None,
+    let previous = match process_slot_info_result(previous) {
+        Ok(current) => current,
+        Err(err) => return server_error_response!("{err}"),
+    };
+    let next = match process_slot_info_result(next) {
+        Ok(current) => current,
         Err(err) => return server_error_response!("{err}"),
     };
 
