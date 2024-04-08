@@ -1,29 +1,22 @@
 //! Defines API schemas of stake amount type.
 
-use chrono::Utc;
 use poem_openapi::{types::Example, Object};
 
-use crate::event_db::{
-    follower::{BlockTime, SlotNumber},
-    utxo::StakeAmount,
-};
+use crate::event_db::{follower::SlotNumber, utxo::StakeAmount};
 
 /// User's cardano stake info.
 #[derive(Object)]
 #[oai(example = true)]
 pub(crate) struct StakeInfo {
-    /// Stake amount.
+    /// Total stake amount.
     // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
-    #[oai(validator(minimum(value = "0"), maximum(value = "4294967295")))]
+    #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
     pub(crate) amount: StakeAmount,
 
-    /// Slot number.
+    /// Block's slot number which contains the latest unspent UTXO.
     // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
-    #[oai(validator(minimum(value = "0"), maximum(value = "4294967295")))]
+    #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
     pub(crate) slot_number: SlotNumber,
-
-    /// Block date time.
-    pub(crate) block_time: BlockTime,
 }
 
 impl Example for StakeInfo {
@@ -31,7 +24,6 @@ impl Example for StakeInfo {
         Self {
             amount: 1,
             slot_number: 5,
-            block_time: Utc::now(),
         }
     }
 }

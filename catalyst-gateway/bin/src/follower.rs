@@ -199,7 +199,6 @@ async fn init_follower(
                             continue;
                         },
                     };
-
                     // Parse block
                     let epoch = match block.epoch(&genesis_values).0.try_into() {
                         Ok(epoch) => epoch,
@@ -242,28 +241,28 @@ async fn init_follower(
                         },
                     }
 
+                    // index utxo
+                    match db.index_utxo_data(block.txs(), slot, network).await {
+                        Ok(()) => (),
+                        Err(err) => {
+                            error!("Unable to index utxo data for block {:?} - skip..", err);
+                            continue;
+                        },
+                    }
+
                     // Block processing for Eras before staking are ignored.
                     if valid_era(block.era()) {
-                        // Utxo
-                        match db.index_utxo_data(block.txs(), slot, network).await {
-                            Ok(()) => (),
-                            Err(err) => {
-                                error!("Unable to index utxo data for block {:?} - skip..", err);
-                                continue;
-                            },
-                        }
-
-                        // Registration
-                        match db.index_registration_data(block.txs(), slot, network).await {
-                            Ok(()) => (),
-                            Err(err) => {
-                                error!(
-                                    "Unable to index registration data for block {:?} - skip..",
-                                    err
-                                );
-                                continue;
-                            },
-                        }
+                        // index catalyst registrations
+                        // match db.index_registration_data(block.txs(), slot,
+                        // network).await {     Ok(()) => (),
+                        //     Err(err) => {
+                        //         error!(
+                        //             "Unable to index registration data for block {:?} -
+                        // skip..",             err
+                        //         );
+                        //         continue;
+                        //     },
+                        // }
 
                         // Rewards
                     }
@@ -319,6 +318,7 @@ async fn follower_connection(
     let mut follower_cfg = if start_from.0.is_none() || start_from.1.is_none() {
         // start from genesis, no previous followers, hence no starting points.
         FollowerConfigBuilder::default()
+            .follow_from(Point::Origin)
             .mithril_snapshot_path(PathBuf::from(snapshot))
             .build()
     } else {
