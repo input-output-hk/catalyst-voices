@@ -1,6 +1,5 @@
 import json
 from loguru import logger
-import requests
 from api_tests import (
     check_is_live,
     check_is_ready,
