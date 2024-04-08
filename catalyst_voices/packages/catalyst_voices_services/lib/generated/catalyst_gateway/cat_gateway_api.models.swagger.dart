@@ -471,7 +471,6 @@ class Slot {
   factory Slot.fromJson(Map<String, dynamic> json) => _$SlotFromJson(json);
 
   static const toJsonFactory = _$SlotToJson;
-
   Map<String, dynamic> toJson() => _$SlotToJson(this);
 
   @JsonKey(name: 'slot_number')
