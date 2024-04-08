@@ -55,6 +55,7 @@ pub(crate) async fn endpoint(state: &State, network: Option<Network>) -> AllResp
                 last_updated,
             }))))
         },
+        Err(DBError::NotFound) => T200(OK(Json(None))),
         Err(err) => server_error_response!("{err}"),
     }
 }
