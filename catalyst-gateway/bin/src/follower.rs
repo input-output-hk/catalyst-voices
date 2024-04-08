@@ -198,7 +198,6 @@ async fn init_follower(
                             continue;
                         },
                     };
-
                     // Parse block
                     let epoch = match block.epoch(&genesis_values).0.try_into() {
                         Ok(epoch) => epoch,
@@ -252,17 +251,17 @@ async fn init_follower(
 
                     // Block processing for Eras before staking are ignored.
                     if valid_era(block.era()) {
-                        // Registration
-                        match db.index_registration_data(block.txs(), slot, network).await {
-                            Ok(()) => (),
-                            Err(err) => {
-                                error!(
-                                    "Unable to index registration data for block {:?} - skip..",
-                                    err
-                                );
-                                continue;
-                            },
-                        }
+                        // index catalyst registrations
+                        // match db.index_registration_data(block.txs(), slot,
+                        // network).await {     Ok(()) => (),
+                        //     Err(err) => {
+                        //         error!(
+                        //             "Unable to index registration data for block {:?} -
+                        // skip..",             err
+                        //         );
+                        //         continue;
+                        //     },
+                        // }
 
                         // Rewards
                     }

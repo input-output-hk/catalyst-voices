@@ -9,7 +9,7 @@ use poem_openapi::{
 };
 
 use crate::{
-    event_db::follower::{DateTime, SlotNumber},
+    event_db::follower::SlotNumber,
     service::{
         common::{
             objects::cardano::{network::Network, stake_address::StakeAddress},
