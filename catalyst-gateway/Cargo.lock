@@ -513,7 +513,7 @@ checksum = "a2bd12c1caf447e69cd4528f47f94d203fd2582878ecb9e9465484c4148a8223"
 [[package]]
 name = "cardano-chain-follower"
 version = "0.0.1"
-source = "git+https://github.com/input-output-hk/hermes.git#e22e0576d2ed5694ffad0e28b48761d2187b27f1"
+source = "git+https://github.com/input-output-hk/hermes.git#5a814ce79714ccef2254014b9b1a122f3cebef4d"
 dependencies = [
  "pallas",
  "pallas-hardano",

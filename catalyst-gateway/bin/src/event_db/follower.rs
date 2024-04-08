@@ -23,19 +23,12 @@ impl EventDB {
     ) -> Result<(), Error> {
         let conn = self.pool.get().await?;
 
-        let network = match network {
-            Network::Mainnet => "mainnet".to_string(),
-            Network::Preview => "preview".to_string(),
-            Network::Preprod => "preprod".to_string(),
-            Network::Testnet => "testnet".to_string(),
-        };
-
         let _rows = conn
             .query(
                 include_str!("../../../event-db/queries/follower/insert_slot_index.sql"),
                 &[
                     &slot_no,
-                    &network,
+                    &network.to_string(),
                     &epoch_no,
                     &block_time,
                     &hex::decode(block_hash).map_err(|e| Error::DecodeHex(e.to_string()))?,
@@ -52,19 +45,12 @@ impl EventDB {
     ) -> Result<(SlotNumber, BlockHash, DateTime), Error> {
         let conn = self.pool.get().await?;
 
-        let network = match network {
-            Network::Mainnet => "mainnet".to_string(),
-            Network::Preview => "preview".to_string(),
-            Network::Preprod => "preprod".to_string(),
-            Network::Testnet => "testnet".to_string(),
-        };
-
         let rows = conn
             .query(
                 include_str!(
                     "../../../event-db/queries/follower/select_slot_index_by_datetime/current_slot_info.sql"
                 ),
-                &[&network, &date_time],
+                &[&network.to_string(), &date_time],
             )
             .await?;
 
@@ -84,19 +70,12 @@ impl EventDB {
     ) -> Result<(SlotNumber, BlockHash, DateTime), Error> {
         let conn = self.pool.get().await?;
 
-        let network = match network {
-            Network::Mainnet => "mainnet".to_string(),
-            Network::Preview => "preview".to_string(),
-            Network::Preprod => "preprod".to_string(),
-            Network::Testnet => "testnet".to_string(),
-        };
-
         let rows = conn
                 .query(
                     include_str!(
                         "../../../event-db/queries/follower/select_slot_index_by_datetime/previous_slot_info.sql"
                     ),
-                    &[&network, &date_time],
+                    &[&network.to_string(), &date_time],
                 )
                 .await?;
 
@@ -116,19 +95,12 @@ impl EventDB {
     ) -> Result<(SlotNumber, BlockHash, DateTime), Error> {
         let conn = self.pool.get().await?;
 
-        let network = match network {
-            Network::Mainnet => "mainnet".to_string(),
-            Network::Preview => "preview".to_string(),
-            Network::Preprod => "preprod".to_string(),
-            Network::Testnet => "testnet".to_string(),
-        };
-
         let rows = conn
             .query(
                 include_str!(
                     "../../../event-db/queries/follower/select_slot_index_by_datetime/next_slot_info.sql"
                 ),
-                &[&network, &date_time],
+                &[&network.to_string(), &date_time],
             )
             .await?;
         let Some(row) = rows.first() else {
@@ -148,17 +120,10 @@ impl EventDB {
     ) -> Result<(SlotNumber, BlockHash, DateTime), Error> {
         let conn = self.pool.get().await?;
 
-        let network = match network {
-            Network::Mainnet => "mainnet".to_string(),
-            Network::Preview => "preview".to_string(),
-            Network::Preprod => "preprod".to_string(),
-            Network::Testnet => "testnet".to_string(),
-        };
-
         let rows = conn
             .query(
                 include_str!("../../../event-db/queries/follower/select_update_state.sql"),
-                &[&network],
+                &[&network.to_string()],
             )
             .await?;
 
@@ -184,12 +149,7 @@ impl EventDB {
         // Rollback or update
         let update = true;
 
-        let (id, network) = match network {
-            Network::Mainnet => (1, "mainnet".to_string()),
-            Network::Preview => (2, "preview".to_string()),
-            Network::Preprod => (3, "preprod".to_string()),
-            Network::Testnet => (4, "testnet".to_string()),
-        };
+        let network_id: u64 = network.into();
 
         // An insert only happens once when there is no update metadata available
         // All future additions are just updates on ended, slot_no and block_hash
@@ -197,12 +157,13 @@ impl EventDB {
             .query(
                 include_str!("../../../event-db/queries/follower/insert_update_state.sql"),
                 &[
-                    &i64::from(id),
+                    &i64::try_from(network_id)
+                        .map_err(|_| Error::Unknown("Network id out of range".to_string()))?,
                     &last_updated,
                     &last_updated,
                     &machine_id,
                     &slot_no,
-                    &network,
+                    &network.to_string(),
                     &hex::decode(block_hash).map_err(|e| Error::DecodeHex(e.to_string()))?,
                     &update,
                 ],
