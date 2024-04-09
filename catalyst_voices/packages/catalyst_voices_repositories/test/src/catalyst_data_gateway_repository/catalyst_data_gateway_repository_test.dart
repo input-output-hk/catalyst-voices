@@ -1,65 +1,96 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/catalyst_data_gateway_repository.dart';
+import 'package:catalyst_voices_services/generated/catalyst_gateway/cat_gateway_api.enums.swagger.dart' as enums;
 import 'package:catalyst_voices_services/generated/catalyst_gateway/cat_gateway_api.swagger.dart';
 import 'package:chopper/chopper.dart' as chopper;
 import 'package:http/http.dart' as http;
-import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-import 'catalyst_data_gateway_repository_test.mocks.dart';
+class FakeCatGatewayApi<T> extends Fake implements CatGatewayApi {
+  final chopper.Response<T> response;
 
+  FakeCatGatewayApi(this.response);
 
-@GenerateNiceMocks([MockSpec<CatGatewayApi>()])
-void main() {
+  @override
+  Future<chopper.Response<dynamic>> apiHealthStartedGet() async {
+    return response;
+  }
   
-  provideDummy(chopper.Response<dynamic>(http.Response('', 204), ''));
-  final baseUrl = Uri.parse('https://localhost/api');
-  late MockCatGatewayApi mockCatGatewayApi;
-  late CatalystDataGatewayRepository repository;
-  setUpAll(() {
-    mockCatGatewayApi = MockCatGatewayApi();
-    repository = CatalystDataGatewayRepository(
-      baseUrl,
-      catGatewayApiInstance: mockCatGatewayApi,
+  @override
+  Future<chopper.Response<dynamic>> apiHealthReadyGet() async {
+    return response;
+  }
+
+  @override
+  Future<chopper.Response<dynamic>> apiHealthLiveGet() async {
+    return response;
+  }
+
+  @override
+  Future<chopper.Response<StakeInfo>> apiCardanoStakedAdaStakeAddressGet({
+    required String? stakeAddress,
+    enums.Network? network,
+    int? slotNumber,
+  }) async {
+    return response as chopper.Response<StakeInfo>;
+  }
+
+  @override
+  Future<chopper.Response<SyncState>> apiCardanoSyncStateGet({
+    enums.Network? network,
+  }) async {
+    return response as chopper.Response<SyncState>;
+  }
+}
+
+void main() {
+
+  CatalystDataGatewayRepository setupRepository<T>(
+    chopper.Response<T> response,
+  ) {
+    final fakeCatGatewayApi = FakeCatGatewayApi<T>(response);
+    return CatalystDataGatewayRepository(
+      Uri.parse('https://localhost/api'),
+      catGatewayApiInstance: fakeCatGatewayApi,
     );
-  });
+  }
+  
   group('CatalystDataGatewayRepository', () {
-    
+    final repository = setupRepository(
+      chopper.Response(http.Response('', 204), null),
+    );
     test('getHealthStarted success', () async {
-      when(mockCatGatewayApi.apiHealthStartedGet()).thenAnswer((_) async =>
-        chopper.Response(http.Response('', 204), null),
-      );
       final result = await repository.getHealthStarted();
       expect(result.isSuccess, true);
     });
     test('getHealthStarted Internal Server Error', () async {
-      when(mockCatGatewayApi.apiHealthStartedGet()).thenAnswer((_) async =>
+      final repository = setupRepository(
         chopper.Response(http.Response('', 500), null),
       );
-
       final result = await repository.getHealthStarted();
-
       expect(result.isFailure, true);
       expect(result.failure, equals(NetworkErrors.internalServerError));
     });
     test('getHealthStarted Service Unavailable', () async {
-      when(mockCatGatewayApi.apiHealthStartedGet()).thenAnswer((_) async =>
+      final repository = setupRepository(
         chopper.Response(http.Response('', 503), null),
       );
       final result = await repository.getHealthStarted();
       expect(result.isFailure, true);
       expect(result.failure, equals(NetworkErrors.serviceUnavailable));
     });
+
     test('getHealthReady success', () async {
-      when(mockCatGatewayApi.apiHealthReadyGet()).thenAnswer((_) async =>
+      final repository = setupRepository(
         chopper.Response(http.Response('', 204), null),
       );
       final result = await repository.getHealthReady();
       expect(result.isSuccess, true);
     });
+
     test('getHealthReady Internal Server Error', () async {
-      when(mockCatGatewayApi.apiHealthReadyGet()).thenAnswer((_) async =>
+      final repository = setupRepository(
         chopper.Response(http.Response('', 500), null),
       );
       final result = await repository.getHealthReady();
@@ -67,7 +98,7 @@ void main() {
       expect(result.failure, equals(NetworkErrors.internalServerError));
     });
     test('getHealthReady Service Unavailable', () async {
-      when(mockCatGatewayApi.apiHealthReadyGet()).thenAnswer((_) async =>
+      final repository = setupRepository(
         chopper.Response(http.Response('', 503), null),
       );
       final result = await repository.getHealthReady();
@@ -76,14 +107,14 @@ void main() {
     });
 
     test('getHealthLive success', () async {
-      when(mockCatGatewayApi.apiHealthLiveGet()).thenAnswer((_) async =>
-        chopper.Response(http.Response('', 204), null),
+      final repository = setupRepository(
+        chopper.Response(http.Response('', 200), null),
       );
       final result = await repository.getHealthLive();
       expect(result.isSuccess, true);
     });
     test('getHealthLive Internal Server Error', () async {
-      when(mockCatGatewayApi.apiHealthLiveGet()).thenAnswer((_) async =>
+      final repository = setupRepository(
         chopper.Response(http.Response('', 500), null),
       );
       final result = await repository.getHealthLive();
@@ -91,7 +122,7 @@ void main() {
       expect(result.failure, equals(NetworkErrors.internalServerError));
     });
     test('getHealthLive Service Unavailable', () async {
-      when(mockCatGatewayApi.apiHealthLiveGet()).thenAnswer((_) async =>
+      final repository = setupRepository(
         chopper.Response(http.Response('', 503), null),
       );
       final result = await repository.getHealthLive();
@@ -104,22 +135,14 @@ void main() {
       'stake1uyehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gh6ffgw';
     // cspell: enable
     const notValidStakeAddress = 'stake1wrong1stake';
+    
     test('getCardanoStakedAdaStakeAddress success', () async {
       const stakeInfo = StakeInfo(
         amount: 1,
         slotNumber: 5,
       );
-      provideDummy(
-        chopper.Response<StakeInfo>(http.Response('', 200), stakeInfo),
-      );
-      when(
-        mockCatGatewayApi.apiCardanoStakedAdaStakeAddressGet(
-          stakeAddress: validStakeAddress,
-        ),
-      ).thenAnswer(
-        (_) async => chopper.Response<StakeInfo>(
-          http.Response('', 200), stakeInfo,
-        ),
+      final repository = setupRepository<StakeInfo>(
+        chopper.Response(http.Response('', 200), stakeInfo),
       );
       final result = await repository.getCardanoStakedAdaStakeAddress(
         stakeAddress: validStakeAddress,
@@ -128,13 +151,8 @@ void main() {
       expect(result.success, equals(stakeInfo));
     });
     test('getCardanoStakedAdaStakeAddress Bad request', () async {
-      provideDummy(chopper.Response<StakeInfo>(http.Response('', 400), null));
-      when(
-        mockCatGatewayApi.apiCardanoStakedAdaStakeAddressGet(
-          stakeAddress: notValidStakeAddress,
-        ),
-      ).thenAnswer(
-        (_) async => chopper.Response(http.Response('', 400), null),
+      final repository = setupRepository<StakeInfo>(
+        chopper.Response(http.Response('', 400), null),
       );
       final result = await repository.getCardanoStakedAdaStakeAddress(
         stakeAddress: notValidStakeAddress,
@@ -142,14 +160,10 @@ void main() {
       expect(result.isFailure, true);
       expect(result.failure, equals(NetworkErrors.badRequest));
     });
+
     test('getCardanoStakedAdaStakeAddress Not found', () async {
-      provideDummy(chopper.Response<StakeInfo>(http.Response('', 404), null));
-      when(
-        mockCatGatewayApi.apiCardanoStakedAdaStakeAddressGet(
-          stakeAddress: notValidStakeAddress,
-        ),
-      ).thenAnswer(
-        (_) async => chopper.Response(http.Response('', 404), null),
+      final repository = setupRepository<StakeInfo>(
+        chopper.Response(http.Response('', 404), null),
       );
       final result = await repository.getCardanoStakedAdaStakeAddress(
         stakeAddress: notValidStakeAddress,
@@ -158,13 +172,8 @@ void main() {
       expect(result.failure, equals(NetworkErrors.notFound));
     });
     test('getCardanoStakedAdaStakeAddress Server Error', () async {
-      provideDummy(chopper.Response<StakeInfo>(http.Response('', 500), null));
-      when(
-        mockCatGatewayApi.apiCardanoStakedAdaStakeAddressGet(
-          stakeAddress: validStakeAddress,
-        ),
-      ).thenAnswer(
-        (_) async => chopper.Response(http.Response('', 500), null),
+      final repository = setupRepository<StakeInfo>(
+        chopper.Response(http.Response('', 500), null),
       );
       final result = await repository.getCardanoStakedAdaStakeAddress(
         stakeAddress: validStakeAddress,
@@ -172,14 +181,10 @@ void main() {
       expect(result.isFailure, true);
       expect(result.failure, equals(NetworkErrors.internalServerError));
     });
+
     test('getCardanoStakedAdaStakeAddress Service Unavailable', () async {
-      provideDummy(chopper.Response<StakeInfo>(http.Response('', 503), null));
-      when(
-        mockCatGatewayApi.apiCardanoStakedAdaStakeAddressGet(
-          stakeAddress: validStakeAddress,
-        ),
-      ).thenAnswer(
-        (_) async => chopper.Response(http.Response('', 503), null),
+      final repository = setupRepository<StakeInfo>(
+        chopper.Response(http.Response('', 503), null),
       );
       final result = await repository.getCardanoStakedAdaStakeAddress(
         stakeAddress: validStakeAddress,
@@ -187,6 +192,7 @@ void main() {
       expect(result.isFailure, true);
       expect(result.failure, equals(NetworkErrors.serviceUnavailable));
     });
+
     test('getCardanoSyncState success', () async {
       final syncState = SyncState(
         slotNumber: 5,
@@ -194,35 +200,25 @@ void main() {
           '0x0000000000000000000000000000000000000000000000000000000000000000',
         lastUpdated: DateTime.utc(1970),
       );
-      provideDummy(
-        chopper.Response<SyncState>(http.Response('', 200), syncState),
-      );
-      when(
-        mockCatGatewayApi.apiCardanoSyncStateGet(),
-      ).thenAnswer(
-        (_) async => chopper.Response(http.Response('', 200), syncState),
+      final repository = setupRepository<SyncState>(
+        chopper.Response(http.Response('', 200), syncState),
       );
       final result = await repository.getCardanoSyncState();
       expect(result.isSuccess, true);
       expect(result.success, equals(syncState));
     });
+
     test('getCardanoSyncState Server Error', () async {
-      provideDummy(chopper.Response<SyncState>(http.Response('', 500), null));
-      when(
-        mockCatGatewayApi.apiCardanoSyncStateGet(),
-      ).thenAnswer(
-        (_) async => chopper.Response(http.Response('', 500), null),
+      final repository = setupRepository<SyncState>(
+        chopper.Response(http.Response('', 500), null),
       );
       final result = await repository.getCardanoSyncState();
       expect(result.isFailure, true);
       expect(result.failure, equals(NetworkErrors.internalServerError));
     });
     test('getCardanoSyncState Service Unavailable', () async {
-      provideDummy(chopper.Response<SyncState>(http.Response('', 503), null));
-      when(
-        mockCatGatewayApi.apiCardanoSyncStateGet(),
-      ).thenAnswer(
-        (_) async => chopper.Response(http.Response('', 503), null),
+      final repository = setupRepository<SyncState>(
+        chopper.Response(http.Response('', 503), null),
       );
       final result = await repository.getCardanoSyncState();
       expect(result.isFailure, true);
