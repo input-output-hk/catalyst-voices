@@ -1,0 +1,9 @@
+VERSION 0.7
+
+build: 
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.11.0+SETUP
+    RUN cargo install wasm-pack
+    WORKDIR /work
+    COPY . .
+    RUN wasm-pack build --target web
+    SAVE ARTIFACT ./pkg c509-certificate-binding
