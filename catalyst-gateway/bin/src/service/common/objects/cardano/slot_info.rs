@@ -25,11 +25,11 @@ pub(crate) struct Slot {
 impl Example for Slot {
     fn example() -> Self {
         Self {
-            slot_number: 5,
-            block_hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
-                .parse()
-                .unwrap(),
-            block_time: chrono::DateTime::default(),
+            slot_number: 121_099_410,
+            block_hash: "0xaa34657bf91e04eb5b506d76a66f688dbfbc509dbf70bc38124d4e8832fdd68a"
+                .to_string(),
+            block_time: chrono::DateTime::from_timestamp(1_712_676_501, 0)
+                .expect("Invalid timestamp"),
         }
     }
 }
@@ -51,9 +51,27 @@ pub(crate) struct SlotInfo {
 impl Example for SlotInfo {
     fn example() -> Self {
         Self {
-            previous: Some(Slot::example()),
-            current: Some(Slot::example()),
-            next: Some(Slot::example()),
+            previous: Some(Slot {
+                slot_number: 121_099_406,
+                block_hash: "0x162ae0e2d08dd238233308eef328bf39ba529b82bc0b87c4eeea3c1dae4fc877"
+                    .to_string(),
+                block_time: chrono::DateTime::from_timestamp(1_712_676_497, 0)
+                    .expect("Invalid timestamp"),
+            }),
+            current: Some(Slot {
+                slot_number: 121_099_409,
+                block_hash: "0xaa34657bf91e04eb5b506d76a66f688dbfbc509dbf70bc38124d4e8832fdd68a"
+                    .to_string(),
+                block_time: chrono::DateTime::from_timestamp(1_712_676_501, 0)
+                    .expect("Invalid timestamp"),
+            }),
+            next: Some(Slot {
+                slot_number: 121_099_422,
+                block_hash: "0x83ad63288ae14e75de1a1f794bda5d317fa59cbdbf1cc4dc83471d76555a5e89"
+                    .to_string(),
+                block_time: chrono::DateTime::from_timestamp(1_712_676_513, 0)
+                    .expect("Invalid timestamp"),
+            }),
         }
     }
 }
