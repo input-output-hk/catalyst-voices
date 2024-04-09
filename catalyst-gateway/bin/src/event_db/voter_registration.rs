@@ -56,7 +56,7 @@ impl EventDB {
     }
 
     /// Index registration data
-    pub async fn index_registration_data(
+    pub(crate) async fn index_registration_data(
         &self, txs: Vec<MultiEraTx<'_>>, slot_no: SlotNumber, network: Network,
     ) -> Result<(), Error> {
         let cddl = CddlConfig::new();
@@ -141,6 +141,23 @@ impl EventDB {
                 }
             }
         }
+
+        Ok(())
+    }
+
+    pub(crate) async fn get_registration_info(
+        &self, stake_credential: StakeCredential<'_>, network: Network, slot_num: SlotNumber,
+    ) -> Result<(), Error> {
+        let conn = self.pool.get().await?;
+
+        let _row = conn
+            .query_one(
+                include_str!(
+                    "../../../event-db/queries/voter_registration/select_voter_registration.sql"
+                ),
+                &[&stake_credential, &network.to_string(), &slot_num],
+            )
+            .await?;
 
         Ok(())
     }

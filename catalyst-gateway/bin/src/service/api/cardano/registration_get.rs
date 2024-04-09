@@ -2,7 +2,7 @@
 
 use poem_extensions::{
     response,
-    UniResponse::{T200, T400, T503},
+    UniResponse::{T200, T400, T404, T503},
 };
 use poem_openapi::{payload::Json, types::Example};
 
@@ -40,7 +40,7 @@ pub(crate) async fn endpoint(
     state: &State, stake_address: StakeAddress, provided_network: Option<Network>,
     slot_num: Option<SlotNumber>,
 ) -> AllResponses {
-    let _event_db = match state.event_db() {
+    let event_db = match state.event_db() {
         Ok(event_db) => event_db,
         Err(Error::EventDb(DBError::MismatchedSchema { was, expected })) => {
             tracing::error!(
@@ -53,12 +53,20 @@ pub(crate) async fn endpoint(
         },
         Err(err) => return server_error_response!("{err}"),
     };
-    let _date_time = slot_num.unwrap_or(SlotNumber::MAX);
-    let _stake_credential = stake_address.payload().as_hash().as_ref();
-    let _network = match check_network(stake_address.network(), provided_network) {
+    let date_time = slot_num.unwrap_or(SlotNumber::MAX);
+    let stake_credential = stake_address.payload().as_hash().as_ref();
+    let network = match check_network(stake_address.network(), provided_network) {
         Ok(network) => network,
         Err(err) => return T400(err),
     };
 
-    T200(OK(Json(RegistrationInfo::example())))
+    // get the total utxo amount from the database
+    match event_db
+        .get_registration_info(stake_credential, network.into(), date_time)
+        .await
+    {
+        Ok(()) => T200(OK(Json(RegistrationInfo::example()))),
+        Err(DBError::NotFound) => T404(NotFound),
+        Err(err) => server_error_response!("{err}"),
+    }
 }
