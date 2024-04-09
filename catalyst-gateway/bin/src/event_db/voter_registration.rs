@@ -26,7 +26,7 @@ pub(crate) type _Stats = Option<serde_json::Value>;
 
 impl EventDB {
     /// Inserts voter registration data, replacing any existing data.
-    #[allow(dead_code, clippy::too_many_arguments)]
+    #[allow(clippy::too_many_arguments)]
     async fn insert_voter_registration(
         &self, tx_id: TxId, stake_credential: StakeCredential<'_>,
         public_voting_key: PublicVotingKey<'_>, payment_address: PaymentAddress<'_>,
@@ -56,7 +56,6 @@ impl EventDB {
     }
 
     /// Index registration data
-    #[allow(dead_code)]
     pub async fn index_registration_data(
         &self, txs: Vec<MultiEraTx<'_>>, slot_no: SlotNumber, network: Network,
     ) -> Result<(), Error> {

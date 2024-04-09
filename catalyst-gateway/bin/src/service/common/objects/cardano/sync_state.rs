@@ -26,8 +26,7 @@ impl Example for SyncState {
         Self {
             slot_number: 5,
             block_hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
-                .parse()
-                .unwrap(),
+                .to_string(),
             last_updated: chrono::DateTime::default(),
         }
     }
