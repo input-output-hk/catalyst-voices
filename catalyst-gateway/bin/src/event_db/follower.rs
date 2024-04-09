@@ -24,6 +24,13 @@ const BLOCK_TIME_COLUMN: &str = "block_time";
 /// `ended` column name
 const ENDED_COLUMN: &str = "ended";
 
+/// Query type
+pub(crate) enum SlotInfoQueryType {
+    Previous,
+    Current,
+    Next,
+}
+
 impl EventDB {
     /// Index follower block stream
     pub(crate) async fn index_follower_data(
@@ -48,70 +55,29 @@ impl EventDB {
         Ok(())
     }
 
-    /// Get current slot info for the provided date-time and network
-    pub(crate) async fn current_slot_info(
-        &self, date_time: DateTime, network: Network,
+    /// Get slot info for the provided date-time and network and query type
+    pub(crate) async fn get_slot_info(
+        &self, date_time: DateTime, network: Network, query_type: SlotInfoQueryType,
     ) -> Result<(SlotNumber, BlockHash, DateTime), Error> {
         let conn = self.pool.get().await?;
 
         let rows = conn
             .query(
-                include_str!(
-                    "../../../event-db/queries/follower/select_slot_index_by_datetime/current_slot_info.sql"
-                ),
-                &[&network.to_string(), &date_time],
-            )
-            .await?;
-
-        let Some(row) = rows.first() else {
-            return Err(Error::NotFound);
-        };
-
-        let slot_number: SlotNumber = row.try_get(SLOT_NO_COLUMN)?;
-        let block_hash = hex::encode(row.try_get::<_, Vec<u8>>(BLOCK_HASH_COLUMN)?);
-        let block_time = row.try_get(BLOCK_TIME_COLUMN)?;
-        Ok((slot_number, block_hash, block_time))
-    }
-
-    /// Get previous slot info for the provided date-time and network
-    pub(crate) async fn previous_slot_info(
-        &self, date_time: DateTime, network: Network,
-    ) -> Result<(SlotNumber, BlockHash, DateTime), Error> {
-        let conn = self.pool.get().await?;
-
-        let rows = conn
-                .query(
-                    include_str!(
+                match query_type {
+                    SlotInfoQueryType::Previous => include_str!(
                         "../../../event-db/queries/follower/select_slot_index_by_datetime/previous_slot_info.sql"
                     ),
-                    &[&network.to_string(), &date_time],
-                )
-                .await?;
-
-        let Some(row) = rows.first() else {
-            return Err(Error::NotFound);
-        };
-
-        let slot_number: SlotNumber = row.try_get(SLOT_NO_COLUMN)?;
-        let block_hash = hex::encode(row.try_get::<_, Vec<u8>>(BLOCK_HASH_COLUMN)?);
-        let block_time = row.try_get(BLOCK_TIME_COLUMN)?;
-        Ok((slot_number, block_hash, block_time))
-    }
-
-    /// Get next slot info for the provided date-time and network
-    pub(crate) async fn next_slot_info(
-        &self, date_time: DateTime, network: Network,
-    ) -> Result<(SlotNumber, BlockHash, DateTime), Error> {
-        let conn = self.pool.get().await?;
-
-        let rows = conn
-            .query(
-                include_str!(
-                    "../../../event-db/queries/follower/select_slot_index_by_datetime/next_slot_info.sql"
-                ),
+                    SlotInfoQueryType::Current => include_str!(
+                        "../../../event-db/queries/follower/select_slot_index_by_datetime/current_slot_info.sql"
+                    ),
+                    SlotInfoQueryType::Next => include_str!(
+                        "../../../event-db/queries/follower/select_slot_index_by_datetime/next_slot_info.sql"
+                    ),
+                },
                 &[&network.to_string(), &date_time],
             )
             .await?;
+
         let Some(row) = rows.first() else {
             return Err(Error::NotFound);
         };
