@@ -3,17 +3,17 @@
 // Do not manually edit this file.
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'dart:async' as _i4;
+import 'dart:async' as _i5;
 
-import 'package:catalyst_voices_models/catalyst_voices_models.dart' as _i5;
-import 'package:catalyst_voices_repositories/src/catalyst_data_gateway_repository.dart'
-    as _i3;
 import 'package:catalyst_voices_services/generated/catalyst_gateway/cat_gateway_api.enums.swagger.dart'
+    as _i6;
+import 'package:catalyst_voices_services/generated/catalyst_gateway/cat_gateway_api.models.swagger.dart'
     as _i7;
 import 'package:catalyst_voices_services/generated/catalyst_gateway/cat_gateway_api.swagger.dart'
-    as _i6;
+    as _i2;
+import 'package:chopper/chopper.dart' as _i3;
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:result_type/result_type.dart' as _i2;
+import 'package:mockito/src/dummies.dart' as _i4;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -28,8 +28,8 @@ import 'package:result_type/result_type.dart' as _i2;
 // ignore_for_file: camel_case_types
 // ignore_for_file: subtype_of_sealed_class
 
-class _FakeResult_0<S, F> extends _i1.SmartFake implements _i2.Result<S, F> {
-  _FakeResult_0(
+class _FakeType_0 extends _i1.SmartFake implements Type {
+  _FakeType_0(
     Object parent,
     Invocation parentInvocation,
   ) : super(
@@ -38,164 +38,467 @@ class _FakeResult_0<S, F> extends _i1.SmartFake implements _i2.Result<S, F> {
         );
 }
 
-/// A class which mocks [CatalystDataGatewayRepository].
+/// A class which mocks [CatGatewayApi].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockCatalystDataGatewayRepository extends _i1.Mock
-    implements _i3.CatalystDataGatewayRepository {
+class MockCatGatewayApi extends _i1.Mock implements _i2.CatGatewayApi {
   @override
-  _i4.Future<_i2.Result<void, _i5.NetworkErrors>> getHealthStarted() =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #getHealthStarted,
-          [],
+  _i3.ChopperClient get client => (super.noSuchMethod(
+        Invocation.getter(#client),
+        returnValue: _i4.dummyValue<_i3.ChopperClient>(
+          this,
+          Invocation.getter(#client),
         ),
-        returnValue: _i4.Future<_i2.Result<void, _i5.NetworkErrors>>.value(
-            _FakeResult_0<void, _i5.NetworkErrors>(
+        returnValueForMissingStub: _i4.dummyValue<_i3.ChopperClient>(
           this,
-          Invocation.method(
-            #getHealthStarted,
-            [],
-          ),
-        )),
-        returnValueForMissingStub:
-            _i4.Future<_i2.Result<void, _i5.NetworkErrors>>.value(
-                _FakeResult_0<void, _i5.NetworkErrors>(
-          this,
-          Invocation.method(
-            #getHealthStarted,
-            [],
-          ),
-        )),
-      ) as _i4.Future<_i2.Result<void, _i5.NetworkErrors>>);
+          Invocation.getter(#client),
+        ),
+      ) as _i3.ChopperClient);
 
   @override
-  _i4.Future<_i2.Result<void, _i5.NetworkErrors>> getHealthReady() =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #getHealthReady,
-          [],
+  set client(_i3.ChopperClient? _client) => super.noSuchMethod(
+        Invocation.setter(
+          #client,
+          _client,
         ),
-        returnValue: _i4.Future<_i2.Result<void, _i5.NetworkErrors>>.value(
-            _FakeResult_0<void, _i5.NetworkErrors>(
-          this,
-          Invocation.method(
-            #getHealthReady,
-            [],
-          ),
-        )),
-        returnValueForMissingStub:
-            _i4.Future<_i2.Result<void, _i5.NetworkErrors>>.value(
-                _FakeResult_0<void, _i5.NetworkErrors>(
-          this,
-          Invocation.method(
-            #getHealthReady,
-            [],
-          ),
-        )),
-      ) as _i4.Future<_i2.Result<void, _i5.NetworkErrors>>);
+        returnValueForMissingStub: null,
+      );
 
   @override
-  _i4.Future<_i2.Result<void, _i5.NetworkErrors>> getHealthLive() =>
-      (super.noSuchMethod(
-        Invocation.method(
-          #getHealthLive,
-          [],
+  Type get definitionType => (super.noSuchMethod(
+        Invocation.getter(#definitionType),
+        returnValue: _FakeType_0(
+          this,
+          Invocation.getter(#definitionType),
         ),
-        returnValue: _i4.Future<_i2.Result<void, _i5.NetworkErrors>>.value(
-            _FakeResult_0<void, _i5.NetworkErrors>(
+        returnValueForMissingStub: _FakeType_0(
           this,
-          Invocation.method(
-            #getHealthLive,
-            [],
-          ),
-        )),
-        returnValueForMissingStub:
-            _i4.Future<_i2.Result<void, _i5.NetworkErrors>>.value(
-                _FakeResult_0<void, _i5.NetworkErrors>(
-          this,
-          Invocation.method(
-            #getHealthLive,
-            [],
-          ),
-        )),
-      ) as _i4.Future<_i2.Result<void, _i5.NetworkErrors>>);
+          Invocation.getter(#definitionType),
+        ),
+      ) as Type);
 
   @override
-  _i4.Future<_i2.Result<_i6.StakeInfo, _i5.NetworkErrors>>
-      getCardanoStakedAdaStakeAddress({
+  _i5.Future<_i3.Response<dynamic>> apiTestTestIdTestActionGet({
+    required int? id,
+    required String? action,
+    List<_i6.Animals>? pet,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #apiTestTestIdTestActionGet,
+          [],
+          {
+            #id: id,
+            #action: action,
+            #pet: pet,
+          },
+        ),
+        returnValue: _i5.Future<_i3.Response<dynamic>>.value(
+            _i4.dummyValue<_i3.Response<dynamic>>(
+          this,
+          Invocation.method(
+            #apiTestTestIdTestActionGet,
+            [],
+            {
+              #id: id,
+              #action: action,
+              #pet: pet,
+            },
+          ),
+        )),
+        returnValueForMissingStub: _i5.Future<_i3.Response<dynamic>>.value(
+            _i4.dummyValue<_i3.Response<dynamic>>(
+          this,
+          Invocation.method(
+            #apiTestTestIdTestActionGet,
+            [],
+            {
+              #id: id,
+              #action: action,
+              #pet: pet,
+            },
+          ),
+        )),
+      ) as _i5.Future<_i3.Response<dynamic>>);
+
+  @override
+  _i5.Future<_i3.Response<dynamic>> apiTestTestIdTestActionPost({
+    required int? id,
+    required String? action,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #apiTestTestIdTestActionPost,
+          [],
+          {
+            #id: id,
+            #action: action,
+          },
+        ),
+        returnValue: _i5.Future<_i3.Response<dynamic>>.value(
+            _i4.dummyValue<_i3.Response<dynamic>>(
+          this,
+          Invocation.method(
+            #apiTestTestIdTestActionPost,
+            [],
+            {
+              #id: id,
+              #action: action,
+            },
+          ),
+        )),
+        returnValueForMissingStub: _i5.Future<_i3.Response<dynamic>>.value(
+            _i4.dummyValue<_i3.Response<dynamic>>(
+          this,
+          Invocation.method(
+            #apiTestTestIdTestActionPost,
+            [],
+            {
+              #id: id,
+              #action: action,
+            },
+          ),
+        )),
+      ) as _i5.Future<_i3.Response<dynamic>>);
+
+  @override
+  _i5.Future<_i3.Response<dynamic>> apiHealthStartedGet() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #apiHealthStartedGet,
+          [],
+        ),
+        returnValue: _i5.Future<_i3.Response<dynamic>>.value(
+            _i4.dummyValue<_i3.Response<dynamic>>(
+          this,
+          Invocation.method(
+            #apiHealthStartedGet,
+            [],
+          ),
+        )),
+        returnValueForMissingStub: _i5.Future<_i3.Response<dynamic>>.value(
+            _i4.dummyValue<_i3.Response<dynamic>>(
+          this,
+          Invocation.method(
+            #apiHealthStartedGet,
+            [],
+          ),
+        )),
+      ) as _i5.Future<_i3.Response<dynamic>>);
+
+  @override
+  _i5.Future<_i3.Response<dynamic>> apiHealthReadyGet() => (super.noSuchMethod(
+        Invocation.method(
+          #apiHealthReadyGet,
+          [],
+        ),
+        returnValue: _i5.Future<_i3.Response<dynamic>>.value(
+            _i4.dummyValue<_i3.Response<dynamic>>(
+          this,
+          Invocation.method(
+            #apiHealthReadyGet,
+            [],
+          ),
+        )),
+        returnValueForMissingStub: _i5.Future<_i3.Response<dynamic>>.value(
+            _i4.dummyValue<_i3.Response<dynamic>>(
+          this,
+          Invocation.method(
+            #apiHealthReadyGet,
+            [],
+          ),
+        )),
+      ) as _i5.Future<_i3.Response<dynamic>>);
+
+  @override
+  _i5.Future<_i3.Response<dynamic>> apiHealthLiveGet() => (super.noSuchMethod(
+        Invocation.method(
+          #apiHealthLiveGet,
+          [],
+        ),
+        returnValue: _i5.Future<_i3.Response<dynamic>>.value(
+            _i4.dummyValue<_i3.Response<dynamic>>(
+          this,
+          Invocation.method(
+            #apiHealthLiveGet,
+            [],
+          ),
+        )),
+        returnValueForMissingStub: _i5.Future<_i3.Response<dynamic>>.value(
+            _i4.dummyValue<_i3.Response<dynamic>>(
+          this,
+          Invocation.method(
+            #apiHealthLiveGet,
+            [],
+          ),
+        )),
+      ) as _i5.Future<_i3.Response<dynamic>>);
+
+  @override
+  _i5.Future<_i3.Response<_i7.StakeInfo>> apiCardanoStakedAdaStakeAddressGet({
     required String? stakeAddress,
-    _i7.Network? network = _i7.Network.mainnet,
+    _i6.Network? network,
     int? slotNumber,
+  }) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #apiCardanoStakedAdaStakeAddressGet,
+          [],
+          {
+            #stakeAddress: stakeAddress,
+            #network: network,
+            #slotNumber: slotNumber,
+          },
+        ),
+        returnValue: _i5.Future<_i3.Response<_i7.StakeInfo>>.value(
+            _i4.dummyValue<_i3.Response<_i7.StakeInfo>>(
+          this,
+          Invocation.method(
+            #apiCardanoStakedAdaStakeAddressGet,
+            [],
+            {
+              #stakeAddress: stakeAddress,
+              #network: network,
+              #slotNumber: slotNumber,
+            },
+          ),
+        )),
+        returnValueForMissingStub:
+            _i5.Future<_i3.Response<_i7.StakeInfo>>.value(
+                _i4.dummyValue<_i3.Response<_i7.StakeInfo>>(
+          this,
+          Invocation.method(
+            #apiCardanoStakedAdaStakeAddressGet,
+            [],
+            {
+              #stakeAddress: stakeAddress,
+              #network: network,
+              #slotNumber: slotNumber,
+            },
+          ),
+        )),
+      ) as _i5.Future<_i3.Response<_i7.StakeInfo>>);
+
+  @override
+  _i5.Future<_i3.Response<_i7.SyncState>> apiCardanoSyncStateGet(
+          {_i6.Network? network}) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #apiCardanoSyncStateGet,
+          [],
+          {#network: network},
+        ),
+        returnValue: _i5.Future<_i3.Response<_i7.SyncState>>.value(
+            _i4.dummyValue<_i3.Response<_i7.SyncState>>(
+          this,
+          Invocation.method(
+            #apiCardanoSyncStateGet,
+            [],
+            {#network: network},
+          ),
+        )),
+        returnValueForMissingStub:
+            _i5.Future<_i3.Response<_i7.SyncState>>.value(
+                _i4.dummyValue<_i3.Response<_i7.SyncState>>(
+          this,
+          Invocation.method(
+            #apiCardanoSyncStateGet,
+            [],
+            {#network: network},
+          ),
+        )),
+      ) as _i5.Future<_i3.Response<_i7.SyncState>>);
+
+  @override
+  _i5.Future<_i3.Response<_i7.VoterRegistration>>
+      apiRegistrationVoterVotingKeyGet({
+    required String? votingKey,
+    int? eventId,
+    bool? withDelegators,
   }) =>
           (super.noSuchMethod(
             Invocation.method(
-              #getCardanoStakedAdaStakeAddress,
+              #apiRegistrationVoterVotingKeyGet,
               [],
               {
-                #stakeAddress: stakeAddress,
-                #network: network,
-                #slotNumber: slotNumber,
+                #votingKey: votingKey,
+                #eventId: eventId,
+                #withDelegators: withDelegators,
               },
             ),
-            returnValue:
-                _i4.Future<_i2.Result<_i6.StakeInfo, _i5.NetworkErrors>>.value(
-                    _FakeResult_0<_i6.StakeInfo, _i5.NetworkErrors>(
+            returnValue: _i5.Future<_i3.Response<_i7.VoterRegistration>>.value(
+                _i4.dummyValue<_i3.Response<_i7.VoterRegistration>>(
               this,
               Invocation.method(
-                #getCardanoStakedAdaStakeAddress,
+                #apiRegistrationVoterVotingKeyGet,
                 [],
                 {
-                  #stakeAddress: stakeAddress,
-                  #network: network,
-                  #slotNumber: slotNumber,
+                  #votingKey: votingKey,
+                  #eventId: eventId,
+                  #withDelegators: withDelegators,
                 },
               ),
             )),
             returnValueForMissingStub:
-                _i4.Future<_i2.Result<_i6.StakeInfo, _i5.NetworkErrors>>.value(
-                    _FakeResult_0<_i6.StakeInfo, _i5.NetworkErrors>(
+                _i5.Future<_i3.Response<_i7.VoterRegistration>>.value(
+                    _i4.dummyValue<_i3.Response<_i7.VoterRegistration>>(
               this,
               Invocation.method(
-                #getCardanoStakedAdaStakeAddress,
+                #apiRegistrationVoterVotingKeyGet,
                 [],
                 {
-                  #stakeAddress: stakeAddress,
-                  #network: network,
-                  #slotNumber: slotNumber,
+                  #votingKey: votingKey,
+                  #eventId: eventId,
+                  #withDelegators: withDelegators,
                 },
               ),
             )),
-          ) as _i4.Future<_i2.Result<_i6.StakeInfo, _i5.NetworkErrors>>);
+          ) as _i5.Future<_i3.Response<_i7.VoterRegistration>>);
 
   @override
-  _i4.Future<_i2.Result<_i6.SyncState, _i5.NetworkErrors>> getCardanoSyncState(
-          {_i7.Network? network = _i7.Network.mainnet}) =>
+  _i5.Future<_i3.Response<_i7.FragmentsProcessingSummary>> apiV0MessagePost(
+          {required Object? body}) =>
       (super.noSuchMethod(
         Invocation.method(
-          #getCardanoSyncState,
+          #apiV0MessagePost,
           [],
-          {#network: network},
+          {#body: body},
         ),
         returnValue:
-            _i4.Future<_i2.Result<_i6.SyncState, _i5.NetworkErrors>>.value(
-                _FakeResult_0<_i6.SyncState, _i5.NetworkErrors>(
+            _i5.Future<_i3.Response<_i7.FragmentsProcessingSummary>>.value(
+                _i4.dummyValue<_i3.Response<_i7.FragmentsProcessingSummary>>(
           this,
           Invocation.method(
-            #getCardanoSyncState,
+            #apiV0MessagePost,
             [],
-            {#network: network},
+            {#body: body},
           ),
         )),
         returnValueForMissingStub:
-            _i4.Future<_i2.Result<_i6.SyncState, _i5.NetworkErrors>>.value(
-                _FakeResult_0<_i6.SyncState, _i5.NetworkErrors>(
+            _i5.Future<_i3.Response<_i7.FragmentsProcessingSummary>>.value(
+                _i4.dummyValue<_i3.Response<_i7.FragmentsProcessingSummary>>(
           this,
           Invocation.method(
-            #getCardanoSyncState,
+            #apiV0MessagePost,
             [],
-            {#network: network},
+            {#body: body},
           ),
         )),
-      ) as _i4.Future<_i2.Result<_i6.SyncState, _i5.NetworkErrors>>);
+      ) as _i5.Future<_i3.Response<_i7.FragmentsProcessingSummary>>);
+
+  @override
+  _i5.Future<_i3.Response<List<_i7.VotePlan>>> apiV0VoteActivePlansGet() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #apiV0VoteActivePlansGet,
+          [],
+        ),
+        returnValue: _i5.Future<_i3.Response<List<_i7.VotePlan>>>.value(
+            _i4.dummyValue<_i3.Response<List<_i7.VotePlan>>>(
+          this,
+          Invocation.method(
+            #apiV0VoteActivePlansGet,
+            [],
+          ),
+        )),
+        returnValueForMissingStub:
+            _i5.Future<_i3.Response<List<_i7.VotePlan>>>.value(
+                _i4.dummyValue<_i3.Response<List<_i7.VotePlan>>>(
+          this,
+          Invocation.method(
+            #apiV0VoteActivePlansGet,
+            [],
+          ),
+        )),
+      ) as _i5.Future<_i3.Response<List<_i7.VotePlan>>>);
+
+  @override
+  _i5.Future<_i3.Response<List<_i7.AccountVote>>>
+      apiV1VotesPlanAccountVotesAccountIdGet({required String? accountId}) =>
+          (super.noSuchMethod(
+            Invocation.method(
+              #apiV1VotesPlanAccountVotesAccountIdGet,
+              [],
+              {#accountId: accountId},
+            ),
+            returnValue: _i5.Future<_i3.Response<List<_i7.AccountVote>>>.value(
+                _i4.dummyValue<_i3.Response<List<_i7.AccountVote>>>(
+              this,
+              Invocation.method(
+                #apiV1VotesPlanAccountVotesAccountIdGet,
+                [],
+                {#accountId: accountId},
+              ),
+            )),
+            returnValueForMissingStub:
+                _i5.Future<_i3.Response<List<_i7.AccountVote>>>.value(
+                    _i4.dummyValue<_i3.Response<List<_i7.AccountVote>>>(
+              this,
+              Invocation.method(
+                #apiV1VotesPlanAccountVotesAccountIdGet,
+                [],
+                {#accountId: accountId},
+              ),
+            )),
+          ) as _i5.Future<_i3.Response<List<_i7.AccountVote>>>);
+
+  @override
+  _i5.Future<_i3.Response<_i7.FragmentsProcessingSummary>> apiV1FragmentsPost(
+          {required _i7.FragmentsBatch? body}) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #apiV1FragmentsPost,
+          [],
+          {#body: body},
+        ),
+        returnValue:
+            _i5.Future<_i3.Response<_i7.FragmentsProcessingSummary>>.value(
+                _i4.dummyValue<_i3.Response<_i7.FragmentsProcessingSummary>>(
+          this,
+          Invocation.method(
+            #apiV1FragmentsPost,
+            [],
+            {#body: body},
+          ),
+        )),
+        returnValueForMissingStub:
+            _i5.Future<_i3.Response<_i7.FragmentsProcessingSummary>>.value(
+                _i4.dummyValue<_i3.Response<_i7.FragmentsProcessingSummary>>(
+          this,
+          Invocation.method(
+            #apiV1FragmentsPost,
+            [],
+            {#body: body},
+          ),
+        )),
+      ) as _i5.Future<_i3.Response<_i7.FragmentsProcessingSummary>>);
+
+  @override
+  _i5.Future<_i3.Response<Object>> apiV1FragmentsStatusesGet(
+          {required List<String>? fragmentIds}) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #apiV1FragmentsStatusesGet,
+          [],
+          {#fragmentIds: fragmentIds},
+        ),
+        returnValue: _i5.Future<_i3.Response<Object>>.value(
+            _i4.dummyValue<_i3.Response<Object>>(
+          this,
+          Invocation.method(
+            #apiV1FragmentsStatusesGet,
+            [],
+            {#fragmentIds: fragmentIds},
+          ),
+        )),
+        returnValueForMissingStub: _i5.Future<_i3.Response<Object>>.value(
+            _i4.dummyValue<_i3.Response<Object>>(
+          this,
+          Invocation.method(
+            #apiV1FragmentsStatusesGet,
+            [],
+            {#fragmentIds: fragmentIds},
+          ),
+        )),
+      ) as _i5.Future<_i3.Response<Object>>);
 }

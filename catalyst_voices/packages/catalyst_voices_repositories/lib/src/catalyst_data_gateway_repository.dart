@@ -44,11 +44,15 @@ import 'package:result_type/result_type.dart';
 // final sync_state = await repository.getCardanoSyncState();
 // ```
 
-interface class CatalystDataGatewayRepository {
+final class CatalystDataGatewayRepository {
   final CatGatewayApi _catGatewayApi;
 
-  CatalystDataGatewayRepository(Uri baseUrl)
-    : _catGatewayApi = CatGatewayApi.create(baseUrl: baseUrl);
+  CatalystDataGatewayRepository(
+    Uri baseUrl,
+    {CatGatewayApi? catGatewayApiInstance,}
+  )
+    : _catGatewayApi = catGatewayApiInstance ?? 
+      CatGatewayApi.create(baseUrl: baseUrl);
 
   Future<Result<void, NetworkErrors>> getHealthStarted() async {
     try {
