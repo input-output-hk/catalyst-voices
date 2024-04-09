@@ -24,11 +24,37 @@ const BLOCK_TIME_COLUMN: &str = "block_time";
 /// `ended` column name
 const ENDED_COLUMN: &str = "ended";
 
+/// `insert_slot_index.sql`
+const INSERT_SLOT_INDEX_SQL: &str =
+    include_str!("../../../event-db/queries/follower/insert_slot_index.sql");
+/// `previous_slot_info.sql`
+const PREVIOUS_SLOT_INFO_SQL: &str = include_str!(
+    "../../../event-db/queries/follower/select_slot_index_by_datetime/previous_slot_info.sql"
+);
+/// `current_slot_info.sql`
+const CURRENT_SLOT_INFO_SQL: &str = include_str!(
+    "../../../event-db/queries/follower/select_slot_index_by_datetime/current_slot_info.sql"
+);
+/// `next_slot_info.sql`
+const NEXT_SLOT_INFO_SQL: &str = include_str!(
+    "../../../event-db/queries/follower/select_slot_index_by_datetime/next_slot_info.sql"
+);
+
 /// Query type
 pub(crate) enum SlotInfoQueryType {
     Previous,
     Current,
     Next,
+}
+
+impl SlotInfoQueryType {
+    fn get_sql_query(&self) -> &'static str {
+        match self {
+            SlotInfoQueryType::Previous => PREVIOUS_SLOT_INFO_SQL,
+            SlotInfoQueryType::Current => CURRENT_SLOT_INFO_SQL,
+            SlotInfoQueryType::Next => NEXT_SLOT_INFO_SQL,
+        }
+    }
 }
 
 impl EventDB {
@@ -40,16 +66,13 @@ impl EventDB {
         let conn = self.pool.get().await?;
 
         let _rows = conn
-            .query(
-                include_str!("../../../event-db/queries/follower/insert_slot_index.sql"),
-                &[
-                    &slot_no,
-                    &network.to_string(),
-                    &epoch_no,
-                    &block_time,
-                    &hex::decode(block_hash).map_err(|e| Error::DecodeHex(e.to_string()))?,
-                ],
-            )
+            .query(INSERT_SLOT_INDEX_SQL, &[
+                &slot_no,
+                &network.to_string(),
+                &epoch_no,
+                &block_time,
+                &hex::decode(block_hash).map_err(|e| Error::DecodeHex(e.to_string()))?,
+            ])
             .await?;
 
         Ok(())
@@ -62,20 +85,10 @@ impl EventDB {
         let conn = self.pool.get().await?;
 
         let rows = conn
-            .query(
-                match query_type {
-                    SlotInfoQueryType::Previous => include_str!(
-                        "../../../event-db/queries/follower/select_slot_index_by_datetime/previous_slot_info.sql"
-                    ),
-                    SlotInfoQueryType::Current => include_str!(
-                        "../../../event-db/queries/follower/select_slot_index_by_datetime/current_slot_info.sql"
-                    ),
-                    SlotInfoQueryType::Next => include_str!(
-                        "../../../event-db/queries/follower/select_slot_index_by_datetime/next_slot_info.sql"
-                    ),
-                },
-                &[&network.to_string(), &date_time],
-            )
+            .query(query_type.get_sql_query(), &[
+                &network.to_string(),
+                &date_time,
+            ])
             .await?;
 
         let Some(row) = rows.first() else {
