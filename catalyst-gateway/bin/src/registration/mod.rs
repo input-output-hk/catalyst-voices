@@ -338,25 +338,27 @@ pub fn inspect_rewards_addr(
     Ok(rewards_address)
 }
 
-#[allow(clippy::indexing_slicing)]
 /// Extract Nonce
 pub fn inspect_nonce(metamap: &[(Value, Value)]) -> Result<Nonce, Box<dyn Error>> {
-    let nonce = match metamap[NONCE] {
-        (Value::Integer(_four), Value::Integer(nonce)) => Nonce(nonce.try_into()?),
+    let nonce: i128 = match metamap.get(NONCE).ok_or("Issue with nonce parsing")? {
+        (Value::Integer(_four), Value::Integer(nonce)) => i128::from(*nonce),
         _ => return Err("Invalid nonce".to_string().into()),
     };
-    Ok(nonce)
+
+    Ok(Nonce(nonce.try_into()?))
 }
 
-#[allow(clippy::indexing_slicing)]
 /// Extract optional voting purpose
 pub fn inspect_voting_purpose(
     metamap: &[(Value, Value)],
 ) -> Result<Option<VotingPurpose>, Box<dyn Error>> {
     if metamap.len() == 5 {
-        match metamap[VOTE_PURPOSE] {
+        match metamap
+            .get(VOTE_PURPOSE)
+            .ok_or("Issue with voting purpose parsing")?
+        {
             (Value::Integer(_five), Value::Integer(purpose)) => {
-                Ok(Some(VotingPurpose(purpose.try_into()?)))
+                Ok(Some(VotingPurpose(i128::from(*purpose).try_into()?)))
             },
             _ => Ok(None),
         }
