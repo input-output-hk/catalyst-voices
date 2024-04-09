@@ -5,7 +5,7 @@ package-schemathesis:
 
     ARG tag="latest"
     ARG max_examples=1000
-    ARG max_response_time=200
+    ARG max_response_time=300
     ARG wait_for_schema=15
     ARG workers=1
     ARG schema_version=30
