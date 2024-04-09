@@ -70,7 +70,7 @@ class ResponsiveBuilder<T extends Object> extends StatelessWidget {
   }
 
   T _getResponsiveBreakpoint(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
+    final screenWidth = MediaQuery.sizeOf(context).width;
 
     final breakpointKey = _breakpoints.entries
       .firstWhere(

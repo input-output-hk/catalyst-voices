@@ -1,0 +1,37 @@
+VERSION --try --global-cache 0.7
+
+# builder - Installs node packages.
+builder:
+  FROM node:20-alpine
+  WORKDIR /app
+  COPY package.json package-lock.json .
+  COPY index.html postcss.config.js tailwind.config.js tsconfig* vite.config.ts .eslintrc.yaml .prettierrc.yaml .
+  COPY src ./src
+
+  RUN npm i
+
+# check - Runs checks against the source code including type checks and linting.
+check:
+  FROM +builder
+
+  RUN npm run check
+
+# build - Builds the source code for deployment
+build:
+  FROM +builder
+
+  RUN npm run build
+
+  SAVE ARTIFACT dist
+
+# local - Makes a docker image that can serve the app for development purposes.
+local:
+  FROM nginx:1.25-alpine
+
+  COPY +build/dist /usr/share/nginx/html
+
+  EXPOSE 80
+
+  CMD ["nginx", "-g", "daemon off;"]
+
+  SAVE IMAGE cat-wallet-connector:latest
