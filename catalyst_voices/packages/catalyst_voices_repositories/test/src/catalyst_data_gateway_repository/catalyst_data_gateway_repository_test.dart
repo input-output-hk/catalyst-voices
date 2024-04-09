@@ -7,6 +7,11 @@ import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
+// `@GenerateNiceMocks` from `mockito` can't be used here because
+// `chopper.Response` use the `base` modifier which "disallows 
+// implementations outside of its own library". For this reason
+// `@GenerateNiceMocks` doesn't work as intended and we opted to
+// mock the `CatGatewayApi` using `Fake`.
 class FakeCatGatewayApi<T> extends Fake implements CatGatewayApi {
   final chopper.Response<T> response;
 
