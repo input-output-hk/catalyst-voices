@@ -7,6 +7,7 @@ androidx
 appspot
 Arbritrary
 ARGB
+asmjs
 asyncio
 asyncpg
 auditability
@@ -17,6 +18,8 @@ BROTLI
 canvaskit
 cardano
 Catalyst
+CBOR
+cborg
 CEST
 cfbundle
 chromedriver
@@ -42,6 +45,7 @@ drep
 dreps
 earthfile
 Edgedriver
+emurgo
 encryptor
 endfunction
 endfunction
@@ -59,6 +63,7 @@ genhtml
 gethostname
 gmtime
 gradlew
+headlessui
 icudtl
 ideascale
 idents
@@ -104,6 +109,7 @@ pg_isready
 plpgsql
 podfile
 podhelper
+postcss
 preprod
 projectcatalyst
 Prokhorenko
@@ -143,12 +149,18 @@ testunit
 thiserror
 thollander
 timelike
+toastify
+Toastify
 tojunit
 Traceback
 TXNZD
 Typer
 unmanaged
+UTXO
 utxo
+Utxos
+utxos
+vite
 vitss
 vkey
 voteplan

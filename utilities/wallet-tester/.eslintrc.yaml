@@ -1,0 +1,84 @@
+parser: "@typescript-eslint/parser"
+root: true
+env:
+  es2021: true
+  browser: true
+  node: true
+extends:
+  - plugin:@typescript-eslint/eslint-recommended
+  - plugin:@typescript-eslint/recommended
+  - plugin:react/recommended
+  - plugin:react/jsx-runtime
+  - plugin:react-hooks/recommended
+  - plugin:jsx-a11y/strict
+parserOptions:
+  ecmaFeatures:
+    jsx: true
+  ecmaVersion: latest
+  sourceType: module
+  tsconfigRootDir: ./
+  project:
+    - ./tsconfig.json
+    - ./tsconfig.node.json
+plugins:
+  - "@typescript-eslint"
+  - react
+  - react-hooks
+  - jsx-a11y
+  - import
+  - react-refresh
+overrides:
+  - files:
+      - "*.yaml"
+      - "*.yml"
+    parser: yaml-eslint-parser
+    extends:
+      - plugin:yml/standard
+settings:
+  react:
+    version: detect
+ignorePatterns:
+  - node_modules
+rules:
+  # import
+  import/order:
+    - warn
+    - newlines-between: always
+      alphabetize:
+        order: asc
+        caseInsensitive: false
+      pathGroups:
+        # internal
+        - pattern: "common/**"
+          group: parent
+        - pattern: "modules/**"
+          group: parent
+        - pattern: "styles/**"
+          group: parent
+        - pattern: "types/**"
+          group: parent
+        # sibling
+        - pattern: "../**"
+          group: sibling
+        # styles
+        - pattern: "./*.css"
+          group: sibling
+          position: after
+      pathGroupsExcludedImportTypes: []
+
+  # vanilla js
+  quotes:
+    - error
+    - double
+
+  # react-refresh
+  react-refresh/only-export-components:
+    - error
+    - allowConstantExport: true
+  
+  # typescript
+  "@typescript-eslint/semi": error
+  "@typescript-eslint/member-delimiter-style":
+    - error
+    - singleline:
+        requireLast: true
