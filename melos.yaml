@@ -13,7 +13,7 @@ command:
     workspaceChangelog: true
   bootstrap:
     environment:
-      sdk: ">=3.3.3 <4.0.0"
+      sdk: '>=3.3.0 <4.0.0'
       flutter: 3.19.5
     dependencies:
       bloc_concurrency: ^0.2.2
@@ -34,8 +34,8 @@ scripts:
     description: Run all static analysis checks.
 
   format:
-    run: melos exec dart format . --fix
-    description: Run `dart format` for all packages.
+      run: melos exec dart format . --fix
+      description: Run `dart format` for all packages.
 
   format-check:
     run: melos exec dart format . --set-exit-if-changed
