@@ -4,7 +4,7 @@ use poem_extensions::{
     response,
     UniResponse::{T200, T400, T404, T503},
 };
-use poem_openapi::{payload::Json, types::Example};
+use poem_openapi::payload::Json;
 
 use crate::{
     cli::Error,
@@ -65,7 +65,12 @@ pub(crate) async fn endpoint(
         .get_registration_info(stake_credential, network.into(), date_time)
         .await
     {
-        Ok(()) => T200(OK(Json(RegistrationInfo::example()))),
+        Ok((tx_id, payment_address)) => {
+            T200(OK(Json(RegistrationInfo {
+                tx_hash: tx_id.into(),
+                rewards_address: hex::encode(payment_address),
+            })))
+        },
         Err(DBError::NotFound) => T404(NotFound),
         Err(err) => server_error_response!("{err}"),
     }

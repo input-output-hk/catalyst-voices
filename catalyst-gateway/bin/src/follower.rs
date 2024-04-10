@@ -169,47 +169,9 @@ async fn find_last_update_point(
 /// which facilitates future control over spawned threads.
 #[allow(clippy::too_many_lines)] // we will refactor later
 async fn init_follower(
-    network: Network, relay: &str, _start_from: (Option<SlotNumber>, Option<BlockHash>),
+    network: Network, relay: &str, start_from: (Option<SlotNumber>, Option<BlockHash>),
     db: Arc<EventDB>, machine_id: MachineId, snapshot: &str,
 ) -> anyhow::Result<ManageTasks> {
-    let start_from = match network {
-        Network::Mainnet => {
-            (
-                Some(114_714_895),
-                Some(
-                    hex::decode("682fd779c7606922a124de78daf976276d713f5eaf1e62b11f7542c41bdedb86")
-                        .unwrap(),
-                ),
-            )
-        },
-        Network::Preprod => {
-            (
-                Some(40_262_406),
-                Some(
-                    hex::decode("020a4a63dbdfbb7b4bd72e177e95af5b22f3fbe194165d52685a153a5dd344c4")
-                        .unwrap(),
-                ),
-            )
-        },
-        Network::Preview => {
-            (
-                Some(43_199_345),
-                Some(
-                    hex::decode("fcce88636620210b2148bc930cb7b54fb9b634d0b81716463b25f3ddbcf8d653")
-                        .unwrap(),
-                ),
-            )
-        },
-        Network::Testnet => {
-            (
-                Some(118_672_213),
-                Some(
-                    hex::decode("6281a480c1e324b54d1b58b190032d2cf7bb4a79f7a35274c224b117532e8f91")
-                        .unwrap(),
-                ),
-            )
-        },
-    };
     let mut follower = follower_connection(start_from, snapshot, network, relay).await?;
 
     let genesis_values = network_genesis_values(&network)

@@ -7,7 +7,6 @@ use serde_json::json;
 use super::{follower::SlotNumber, Error, EventDB};
 use crate::registration::{
     parse_registrations_from_metadata, validate_reg_cddl, CddlConfig, ErrorReport,
-    Nonce as NonceReg,
 };
 
 /// Transaction id
@@ -15,7 +14,7 @@ pub(crate) type TxId = Vec<u8>;
 /// Stake credential
 pub(crate) type StakeCredential = Vec<u8>;
 /// Public voting key
-pub(crate) type PublicVotingKey<'a> = &'a [u8];
+pub(crate) type PublicVotingKey = Vec<u8>;
 /// Payment address
 pub(crate) type PaymentAddress = Vec<u8>;
 /// Nonce
@@ -24,6 +23,11 @@ pub(crate) type Nonce = i64;
 pub(crate) type MetadataCip36 = Vec<u8>;
 /// Stats
 pub(crate) type _Stats = Option<serde_json::Value>;
+
+/// `tx_id` column name
+const TX_ID_COLUMN: &str = "tx_id";
+/// `payment_address` column name
+const PAYMENT_ADDRESS_COLUMN: &str = "payment_address";
 
 /// `insert_voter_registration.sql`
 const INSERT_VOTER_REGISTRATION_SQL: &str = include_str!("insert_voter_registration.sql");
@@ -35,15 +39,19 @@ impl EventDB {
     #[allow(clippy::too_many_arguments)]
     async fn insert_voter_registration(
         &self, tx_id: TxId, stake_credential: Option<StakeCredential>,
-        public_voting_key: PublicVotingKey<'_>, payment_address: Option<PaymentAddress>,
-        metadata_cip36: Option<MetadataCip36>, nonce: Nonce, errors_report: ErrorReport,
+        public_voting_key: Option<PublicVotingKey>, payment_address: Option<PaymentAddress>,
+        metadata_cip36: Option<MetadataCip36>, nonce: Option<Nonce>, errors_report: ErrorReport,
     ) -> Result<(), Error> {
         let conn = self.pool.get().await?;
 
         let is_valid = stake_credential.is_some()
+            && public_voting_key.is_some()
             && payment_address.is_some()
             && metadata_cip36.is_some()
+            && nonce.is_some()
             && errors_report.is_empty();
+
+        println!("Voter registration tx_id: {}", hex::encode(&tx_id));
 
         let _rows = conn
             .query(INSERT_VOTER_REGISTRATION_SQL, &[
@@ -93,20 +101,29 @@ impl EventDB {
                 return Ok(());
             }
 
+            let encoded_voting_key = if let Some(voting_key) = registration.voting_key {
+                if let Ok(encoded_voting_key) = serde_json::to_string(&voting_key) {
+                    Some(encoded_voting_key.as_bytes().to_vec())
+                } else {
+                    None
+                }
+            } else {
+                None
+            };
+            let nonce = if let Some(nonce) = registration.nonce {
+                Some(nonce.0.try_into().map_err(|_| {
+                    Error::Unknown("Cannot cast registration nonce from u64 to i64".to_string())
+                })?)
+            } else {
+                None
+            };
             self.insert_voter_registration(
                 tx.hash().to_vec(),
                 registration.stake_key.map(|val| val.0 .0),
-                serde_json::to_string(&registration.voting_key.unwrap_or_default())
-                    .unwrap_or_default()
-                    .as_bytes(),
+                encoded_voting_key,
                 registration.rewards_address.map(|val| val.0),
                 registration.raw_cbor_cip36,
-                registration
-                    .nonce
-                    .unwrap_or(NonceReg(1))
-                    .0
-                    .try_into()
-                    .unwrap_or(0),
+                nonce,
                 errors_report,
             )
             .await?;
@@ -118,17 +135,23 @@ impl EventDB {
     /// Get registration info
     pub(crate) async fn get_registration_info(
         &self, stake_credential: StakeCredential, network: Network, slot_num: SlotNumber,
-    ) -> Result<(), Error> {
+    ) -> Result<(TxId, PaymentAddress), Error> {
         let conn = self.pool.get().await?;
 
-        let _row = conn
-            .query_one(SELECT_VOTER_REGISTRATION_SQL, &[
+        let rows = conn
+            .query(SELECT_VOTER_REGISTRATION_SQL, &[
                 &stake_credential,
                 &network.to_string(),
                 &slot_num,
             ])
             .await?;
 
-        Ok(())
+        let Some(row) = rows.first() else {
+            return Err(Error::NotFound);
+        };
+
+        let tx_id = row.try_get(TX_ID_COLUMN)?;
+        let payment_address = row.try_get(PAYMENT_ADDRESS_COLUMN)?;
+        Ok((tx_id, payment_address))
     }
 }
