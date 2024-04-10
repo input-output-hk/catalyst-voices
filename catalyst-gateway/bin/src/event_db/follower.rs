@@ -1,6 +1,7 @@
 //! Follower Queries
 
 use cardano_chain_follower::Network;
+use handlebars::Handlebars;
 
 use crate::event_db::{Error, EventDB};
 
@@ -27,33 +28,57 @@ const ENDED_COLUMN: &str = "ended";
 /// `insert_slot_index.sql`
 const INSERT_SLOT_INDEX_SQL: &str =
     include_str!("../../../event-db/queries/follower/insert_slot_index.sql");
-/// `previous_slot_info.sql`
-const PREVIOUS_SLOT_INFO_SQL: &str = include_str!(
-    "../../../event-db/queries/follower/select_slot_index_by_datetime/previous_slot_info.sql"
-);
-/// `current_slot_info.sql`
-const CURRENT_SLOT_INFO_SQL: &str = include_str!(
-    "../../../event-db/queries/follower/select_slot_index_by_datetime/current_slot_info.sql"
-);
-/// `next_slot_info.sql`
-const NEXT_SLOT_INFO_SQL: &str = include_str!(
-    "../../../event-db/queries/follower/select_slot_index_by_datetime/next_slot_info.sql"
-);
+/// `select_slot_info_by_datetime.sql.tmpl`
+const SLOT_INFO_SQL_TMPL: &str =
+    include_str!("../../../event-db/queries/follower/select_slot_info_by_datetime.sql.tmpl");
 
 /// Query type
 pub(crate) enum SlotInfoQueryType {
+    /// Previous slot info query type
     Previous,
+    /// Current slot info query type
     Current,
+    /// Next slot info query type
     Next,
 }
 
+/// Slot info query template fields
+#[derive(serde::Serialize)]
+struct SlotInfoQueryTmplFields {
+    /// `sign` field from the sql template
+    sign: &'static str,
+    /// `ordering` field from the sql template
+    ordering: Option<&'static str>,
+}
+
 impl SlotInfoQueryType {
-    fn get_sql_query(&self) -> &'static str {
-        match self {
-            SlotInfoQueryType::Previous => PREVIOUS_SLOT_INFO_SQL,
-            SlotInfoQueryType::Current => CURRENT_SLOT_INFO_SQL,
-            SlotInfoQueryType::Next => NEXT_SLOT_INFO_SQL,
-        }
+    /// Get SQL query
+    fn get_sql_query(&self) -> Result<String, Error> {
+        let mut reg = Handlebars::new();
+        // disable default `html_escape` function
+        // which transforms `<`, `>` symbols to `&lt`, `&gt`
+        reg.register_escape_fn(|s| s.into());
+        let query = match self {
+            SlotInfoQueryType::Previous => {
+                reg.render_template(SLOT_INFO_SQL_TMPL, &SlotInfoQueryTmplFields {
+                    sign: "<",
+                    ordering: Some("DESC"),
+                })
+            },
+            SlotInfoQueryType::Current => {
+                reg.render_template(SLOT_INFO_SQL_TMPL, &SlotInfoQueryTmplFields {
+                    sign: "=",
+                    ordering: None,
+                })
+            },
+            SlotInfoQueryType::Next => {
+                reg.render_template(SLOT_INFO_SQL_TMPL, &SlotInfoQueryTmplFields {
+                    sign: ">",
+                    ordering: None,
+                })
+            },
+        };
+        query.map_err(|e| Error::Unknown(e.to_string()))
     }
 }
 
@@ -85,7 +110,7 @@ impl EventDB {
         let conn = self.pool.get().await?;
 
         let rows = conn
-            .query(query_type.get_sql_query(), &[
+            .query(&query_type.get_sql_query()?, &[
                 &network.to_string(),
                 &date_time,
             ])
