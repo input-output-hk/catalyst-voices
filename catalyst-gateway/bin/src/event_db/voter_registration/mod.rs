@@ -63,55 +63,53 @@ impl EventDB {
 
     /// Index registration data
     pub(crate) async fn index_registration_data(
-        &self, txs: Vec<MultiEraTx<'_>>, network: Network,
+        &self, tx: &MultiEraTx<'_>, network: Network,
     ) -> Result<(), Error> {
         let cddl = CddlConfig::new();
 
-        for tx in txs {
-            if !tx.metadata().is_empty() {
-                let (registration, errors_report) =
-                    match parse_registrations_from_metadata(&tx.metadata(), network) {
-                        Ok(registration) => registration,
-                        Err(_err) => {
-                            // fatal error parsing registration tx, unable to extract meaningful
-                            // errors assume corrupted tx
-                            continue;
-                        },
-                    };
+        if !tx.metadata().is_empty() {
+            let (registration, errors_report) =
+                match parse_registrations_from_metadata(&tx.metadata(), network) {
+                    Ok(registration) => registration,
+                    Err(_err) => {
+                        // fatal error parsing registration tx, unable to extract meaningful
+                        // errors assume corrupted tx
+                        return Ok(());
+                    },
+                };
 
-                // cddl verification
-                if let Some(cip36) = registration.clone().raw_cbor_cip36 {
-                    match validate_reg_cddl(&cip36, &cddl) {
-                        Ok(()) => (),
-                        Err(_err) => {
-                            // did not pass cddl verification, not a valid registration
-                            continue;
-                        },
-                    };
-                } else {
-                    // registration does not contain cip36 61284 or 61285 keys
-                    // not a valid registration tx
-                    continue;
-                }
-
-                self.insert_voter_registration(
-                    tx.hash().to_vec(),
-                    registration.stake_key.map(|val| val.0 .0),
-                    serde_json::to_string(&registration.voting_key.unwrap_or_default())
-                        .unwrap_or_default()
-                        .as_bytes(),
-                    registration.rewards_address.map(|val| val.0),
-                    registration.raw_cbor_cip36,
-                    registration
-                        .nonce
-                        .unwrap_or(NonceReg(1))
-                        .0
-                        .try_into()
-                        .unwrap_or(0),
-                    errors_report,
-                )
-                .await?;
+            // cddl verification
+            if let Some(cip36) = registration.clone().raw_cbor_cip36 {
+                match validate_reg_cddl(&cip36, &cddl) {
+                    Ok(()) => (),
+                    Err(_err) => {
+                        // did not pass cddl verification, not a valid registration
+                        return Ok(());
+                    },
+                };
+            } else {
+                // registration does not contain cip36 61284 or 61285 keys
+                // not a valid registration tx
+                return Ok(());
             }
+
+            self.insert_voter_registration(
+                tx.hash().to_vec(),
+                registration.stake_key.map(|val| val.0 .0),
+                serde_json::to_string(&registration.voting_key.unwrap_or_default())
+                    .unwrap_or_default()
+                    .as_bytes(),
+                registration.rewards_address.map(|val| val.0),
+                registration.raw_cbor_cip36,
+                registration
+                    .nonce
+                    .unwrap_or(NonceReg(1))
+                    .0
+                    .try_into()
+                    .unwrap_or(0),
+                errors_report,
+            )
+            .await?;
         }
 
         Ok(())

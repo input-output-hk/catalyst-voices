@@ -273,31 +273,41 @@ async fn init_follower(
                         },
                     }
 
-                    // index utxo
-                    match db.index_utxo_data(block.txs(), slot, network).await {
-                        Ok(()) => (),
-                        Err(err) => {
-                            error!("Unable to index utxo data for block {:?} - skip..", err);
-                            continue;
-                        },
-                    }
-
-                    // Block processing for Eras before staking are ignored.
-                    if valid_era(block.era()) {
-                        // index catalyst registrations
-                        match db.index_registration_data(block.txs(), network).await {
+                    for tx in block.txs() {
+                        // index tx
+                        match db.index_txn_data(tx.hash().as_slice(), slot, network).await {
                             Ok(()) => (),
                             Err(err) => {
-                                error!(
-                                    "Unable to index registration data for block {:?} -
-                                 skip..",
-                                    err
-                                );
+                                error!("Unable to index txn data {:?} - skip..", err);
                                 continue;
                             },
                         }
 
-                        // Rewards
+                        // index utxo
+                        match db.index_utxo_data(&tx, slot, network).await {
+                            Ok(()) => (),
+                            Err(err) => {
+                                error!("Unable to index utxo data for tx {:?} - skip..", err);
+                                continue;
+                            },
+                        }
+
+                        // Block processing for Eras before staking are ignored.
+                        if valid_era(block.era()) {
+                            // index catalyst registrations
+                            match db.index_registration_data(&tx, network).await {
+                                Ok(()) => (),
+                                Err(err) => {
+                                    error!(
+                                        "Unable to index registration data for tx {:?} - skip..",
+                                        err
+                                    );
+                                    continue;
+                                },
+                            }
+
+                            // Rewards
+                        }
                     }
 
                     // Refresh update metadata for future followers
