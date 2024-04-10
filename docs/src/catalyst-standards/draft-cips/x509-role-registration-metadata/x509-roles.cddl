@@ -20,8 +20,6 @@ x509-roles-v0-body = {
 	? c509-certs => [ + c509_cert ],
 	? pub-keys => [ + simple-public-key-type ],
 	? revocation-list => [ + revocation-set ],
-	? attached-did => dids,
-	? attached-vc => vcs,
 	? role-set => role-data-set,
 	? purpose-key-set => purpose-data-set,
 }
@@ -40,8 +38,16 @@ c509_cert = bytes .cbor any; A CBOR Encoded C.509 Certificate (binary)
 simple-public-keys = 30 ; Simple Public Keys
 
 simple-public-key-type = $simple-public-key-types
-$simple-public-key-types /= ed25519-public-key
+$simple-public-key-types /= undefined_key ; Key not defined in this array (use any previous definition)
+$simple-public-key-types /= deleted_key ; Key is to be deleted in any previously defined for this position.
+$simple-public-key-types /= ed25519-public-key ; ED25519 Public Key
+
+; Currently supported simple public key types
 ed25519-public-key = #6.32773(bstr .size 32) ; Simple public keys must be tagged to identify their type.
+
+; These entries come from https://github.com/svaarala/cbor-specs/blob/master/cbor-absent-tag.rst
+undefined_key = undefined ; No change to the key in this position of the array
+deleted_key = #6.31(undefined) ; delete the key (if any) at this position of the array
 
 ; x509/c509/simple key Revocation Lists
 ; Keys can only be revoked by the owner of the key or any issuer CA in the chain.
@@ -49,14 +55,6 @@ ed25519-public-key = #6.32773(bstr .size 32) ; Simple public keys must be tagged
 revocation-list = 40 ; Revocation List
 revocation-entry = bytes .size 16; A blake2b-128 hash of the certificate/public key to be revoked
 revocation-set = [ + revocation-entry ]
-
-; Digitial ID and Verifiable Credentials attached to this registration.
-
-attached-did = 50 ; DID/s attached to the certificates/on-chain identity
-attached-vc = 51 ; Verifiable Credentials attached to the certificates/on-chain identity
-
-dids = [ + bytes ] ; One or multiple DIDs
-vcs = [ + bytes ] ; One or multiple Verifiable Credentials
 
 ; Role Registrations
 
