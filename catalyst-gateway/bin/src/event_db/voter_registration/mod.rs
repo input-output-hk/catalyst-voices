@@ -24,6 +24,11 @@ pub(crate) type MetadataCip36<'a> = &'a [u8];
 /// Stats
 pub(crate) type _Stats = Option<serde_json::Value>;
 
+/// `insert_voter_registration.sql`
+const INSERT_VOTER_REGISTRATION_SQL: &str = include_str!("insert_voter_registration.sql");
+/// `select_voter_registration.sql`
+const SELECT_VOTER_REGISTRATION_SQL: &str = include_str!("select_voter_registration.sql");
+
 impl EventDB {
     /// Inserts voter registration data, replacing any existing data.
     #[allow(clippy::too_many_arguments)]
@@ -35,21 +40,16 @@ impl EventDB {
         let conn = self.pool.get().await?;
 
         let _rows = conn
-            .query(
-                include_str!(
-                    "../../../event-db/queries/voter_registration/insert_voter_registration.sql"
-                ),
-                &[
-                    &hex::decode(tx_id).map_err(|e| Error::DecodeHex(e.to_string()))?,
-                    &stake_credential,
-                    &public_voting_key,
-                    &payment_address,
-                    &nonce,
-                    &metadata_cip36,
-                    &report,
-                    &valid,
-                ],
-            )
+            .query(INSERT_VOTER_REGISTRATION_SQL, &[
+                &hex::decode(tx_id).map_err(|e| Error::DecodeHex(e.to_string()))?,
+                &stake_credential,
+                &public_voting_key,
+                &payment_address,
+                &nonce,
+                &metadata_cip36,
+                &report,
+                &valid,
+            ])
             .await?;
 
         Ok(())
@@ -145,18 +145,18 @@ impl EventDB {
         Ok(())
     }
 
+    /// Get registration info
     pub(crate) async fn get_registration_info(
         &self, stake_credential: StakeCredential<'_>, network: Network, slot_num: SlotNumber,
     ) -> Result<(), Error> {
         let conn = self.pool.get().await?;
 
         let _row = conn
-            .query_one(
-                include_str!(
-                    "../../../event-db/queries/voter_registration/select_voter_registration.sql"
-                ),
-                &[&stake_credential, &network.to_string(), &slot_num],
-            )
+            .query_one(SELECT_VOTER_REGISTRATION_SQL, &[
+                &stake_credential,
+                &network.to_string(),
+                &slot_num,
+            ])
             .await?;
 
         Ok(())
