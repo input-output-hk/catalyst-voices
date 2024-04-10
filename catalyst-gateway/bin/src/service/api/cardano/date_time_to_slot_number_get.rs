@@ -8,7 +8,10 @@ use poem_openapi::payload::Json;
 
 use crate::{
     cli::Error,
-    event_db::{error::Error as DBError, follower::DateTime},
+    event_db::{
+        error::Error as DBError,
+        follower::{DateTime, SlotInfoQueryType},
+    },
     service::common::{
         objects::cardano::{
             network::Network,
@@ -53,10 +56,18 @@ pub(crate) async fn endpoint(
     let date_time = date_time.unwrap_or_else(chrono::Utc::now);
     let network = network.unwrap_or(Network::Mainnet);
 
-    let (current, previous, next) = tokio::join!(
-        event_db.current_slot_info(date_time, network.clone().into()),
-        event_db.previous_slot_info(date_time, network.clone().into(),),
-        event_db.next_slot_info(date_time, network.into())
+    let (previous, current, next) = tokio::join!(
+        event_db.get_slot_info(
+            date_time,
+            network.clone().into(),
+            SlotInfoQueryType::Previous
+        ),
+        event_db.get_slot_info(
+            date_time,
+            network.clone().into(),
+            SlotInfoQueryType::Current
+        ),
+        event_db.get_slot_info(date_time, network.into(), SlotInfoQueryType::Next)
     );
 
     let process_slot_info_result = |slot_info_result| {
