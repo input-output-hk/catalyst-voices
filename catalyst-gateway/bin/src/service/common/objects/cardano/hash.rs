@@ -79,14 +79,19 @@ impl ParseFromJSON for Hash {
         let str = value.as_str().ok_or(ParseError::custom(
             "Invalid Cardano hash. Should be string.",
         ))?;
-        hex::decode(str)
-            .map_err(|_| ParseError::custom("Invalid Cardano hash. Should be hex string."))
-            .map(Self)
+        hex::decode(str.strip_prefix("0x").ok_or(ParseError::custom(
+            "Invalid Cardano hash. hex string should start with `0x`.",
+        ))?)
+        .map_err(|_| ParseError::custom("Invalid Cardano hash. Should be hex string."))
+        .map(Self)
     }
 }
 
 impl ToJSON for Hash {
     fn to_json(&self) -> Option<serde_json::Value> {
-        Some(serde_json::Value::String(hex::encode(&self.0)))
+        Some(serde_json::Value::String(format!(
+            "0x{}",
+            hex::encode(&self.0)
+        )))
     }
 }
