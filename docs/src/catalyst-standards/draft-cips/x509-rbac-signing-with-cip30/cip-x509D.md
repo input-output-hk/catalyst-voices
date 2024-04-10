@@ -92,25 +92,25 @@ Once the transaction has been properly constructed and signed, anyone with a cop
 it is recommended that dApps post the transaction to their own backend logic, which handles posting the data on-chain
 vs posting the data on-chain through the wallet.
 
-The reason for this, is this affords the dApp backend the opportunity to 
+The reason for this, is this affords the dApp backend the opportunity to
 validate the registration data in its entirety before posting it on-chain.
 
-It is preferable to inform a user their registration is invalid or has problems 
-BEFORE they spend the ADA required to post the transaction, 
+It is preferable to inform a user their registration is invalid or has problems
+BEFORE they spend the ADA required to post the transaction,
 and the only authoritive way this can be achieved is through the dApp.
 
 having validated the registration would be valid if posted on-chain, it is then posted by the dapp on-chain.
 
-Once the dApp sees the registration appear in the ledger, 
-it is now confirmed that not only was the registration valid, but that the transaction itself was valid, 
+Once the dApp sees the registration appear in the ledger,
+it is now confirmed that not only was the registration valid, but that the transaction itself was valid,
 properly spent valid UTXOs, etc.
 
-The dApp may cache registration data it received from users, 
+The dApp may cache registration data it received from users,
 but it should never act on it until it has been seen validly posted on-chain.
 
 ## Rationale: how does this CIP achieve its goals?
 
-This CIP defines wallet interactions and how CIP-30 is used to create and 
+This CIP defines wallet interactions and how CIP-30 is used to create and
 post transactions that conform to the x509 metadata specification.
 
 ## Path to Active
