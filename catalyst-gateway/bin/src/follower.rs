@@ -8,14 +8,13 @@ use async_recursion::async_recursion;
 use cardano_chain_follower::{
     network_genesis_values, ChainUpdate, Follower, FollowerConfigBuilder, Network, Point,
 };
-use chrono::TimeZone;
 use tokio::{task::JoinHandle, time};
 use tracing::{error, info};
 
 use crate::{
     event_db::{
         config::FollowerConfig,
-        follower::{BlockHash, BlockTime, MachineId, SlotNumber},
+        follower::{BlockHash, DateTime, MachineId, SlotNumber},
         EventDB,
     },
     util::valid_era,
@@ -147,7 +146,7 @@ async fn spawn_followers(
 /// it left off. If there was no previous follower, start indexing from genesis point.
 async fn find_last_update_point(
     db: Arc<EventDB>, network: Network,
-) -> anyhow::Result<(Option<SlotNumber>, Option<BlockHash>, Option<BlockTime>)> {
+) -> anyhow::Result<(Option<SlotNumber>, Option<BlockHash>, Option<DateTime>)> {
     let (slot_no, block_hash, last_updated) = match db.last_updated_metadata(network).await {
         Ok((slot_no, block_hash, last_updated)) => {
             info!(
@@ -209,7 +208,7 @@ async fn init_follower(
                     };
 
                     let wallclock = match block.wallclock(&genesis_values).try_into() {
-                        Ok(time) => chrono::Utc.timestamp_nanos(time),
+                        Ok(time) => chrono::DateTime::from_timestamp(time, 0).unwrap_or_default(),
                         Err(err) => {
                             error!("Cannot parse wall time from block {:?} - skip..", err);
                             continue;

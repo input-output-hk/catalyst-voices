@@ -66,5 +66,6 @@ async-recursion = { workspace = true }
 pallas = { workspace = true }
 cardano-chain-follower= { workspace = true }
 anyhow = { workspace = true }
-cddl = "0.9.2"
-ciborium = "0.2"
+handlebars = { workspace = true }
+cddl = { workspace = true }
+ciborium = { workspace = true }
