@@ -253,16 +253,17 @@ async fn init_follower(
                     // Block processing for Eras before staking are ignored.
                     if valid_era(block.era()) {
                         // index catalyst registrations
-                        // match db.index_registration_data(block.txs(), slot,
-                        // network).await {     Ok(()) => (),
-                        //     Err(err) => {
-                        //         error!(
-                        //             "Unable to index registration data for block {:?} -
-                        // skip..",             err
-                        //         );
-                        //         continue;
-                        //     },
-                        // }
+                        match db.index_registration_data(block.txs(), slot, network).await {
+                            Ok(()) => (),
+                            Err(err) => {
+                                error!(
+                                    "Unable to index registration data for block {:?} -
+                                 skip..",
+                                    err
+                                );
+                                continue;
+                            },
+                        }
 
                         // Rewards
                     }
