@@ -78,7 +78,7 @@ and only on-chain interaction requires interaction with a Wallet.
 
 ## Specification
 
-Role registration is encapsulated inside a [x509 Envelope](../x509-envelope-metadata/cip-xxxx.md) metadata record.
+Role registration is encapsulated inside a [x509 Envelope](../x509-envelope-metadata/cip-509A.md) metadata record.
 This enables the data to both be compressed, saving on-chain space and also to have more expressivity and
 less restrictions vs raw on-chain metadata.
 
@@ -167,7 +167,7 @@ At a high level, Role registration will collect the following data:
 3. An [optional list](#simple-public-keys) list of tagged simple public keys.
 4. An [optional certificate revocation](#certificate-revocation-list) set.
 5. An [optional set](#role-definitions) of role registration data.
-6. An [optional list] of purpose specific data.
+6. An [optional list](#dapp-specific-registration-data) of purpose specific data.
 
 ### x509 Certificate Lists
 

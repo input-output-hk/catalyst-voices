@@ -219,7 +219,7 @@ Code samples and reference material are licensed under [Apache 2.0]
 <!-- References -->
 [CC-BY-4.0]: https://creativecommons.org/licenses/by/4.0/legalcode
 [Apache 2.0]: https://www.apache.org/licenses/LICENSE-2.0.html
-[x509 Metadata Envelope CDDL]: ./x509_envelope.cddl
+[x509 Metadata Envelope CDDL]: ./x509-envelope.cddl
 [specification for the encoding of all Cardano metadata]: https://github.com/IntersectMBO/cardano-ledger/blob/ab8d57cf43be912a336e872b68d1a2526c93dc6a/eras/conway/impl/cddl-files/conway.cddl#L511-L531
 [dCBOR]: https://datatracker.ietf.org/doc/draft-mcnally-deterministic-cbor/
 [Brotli]: https://github.com/google/brotli
