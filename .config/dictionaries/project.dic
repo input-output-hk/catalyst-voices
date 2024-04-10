@@ -23,6 +23,7 @@ cfbundle
 chromedriver
 chrono
 ciphertext
+CIPs
 COCOAPODS
 codegen
 codepoints
@@ -44,7 +45,6 @@ dreps
 earthfile
 Edgedriver
 encryptor
-endfunction
 endfunction
 fetchval
 fmtchk
@@ -83,6 +83,7 @@ localizable
 loguru
 mdlint
 metadatum
+metamap
 mgrybyk
 mithril
 mitigations
@@ -117,6 +118,7 @@ pytest
 rapidoc
 redoc
 Replayability
+repr
 reqwest
 rfwtxt
 ripgrep
@@ -169,6 +171,3 @@ xctest
 xctestrun
 xcworkspace
 yoroi
-cbor
-metamap
-repr
