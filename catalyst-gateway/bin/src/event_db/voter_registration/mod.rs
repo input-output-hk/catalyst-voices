@@ -10,7 +10,7 @@ use crate::registration::{
 };
 
 /// Transaction id
-pub(crate) type TxId = String;
+pub(crate) type TxId<'a> = &'a [u8];
 /// Stake credential
 pub(crate) type StakeCredential<'a> = &'a [u8];
 /// Public voting key
@@ -33,7 +33,7 @@ impl EventDB {
     /// Inserts voter registration data, replacing any existing data.
     #[allow(clippy::too_many_arguments)]
     async fn insert_voter_registration(
-        &self, tx_id: TxId, stake_credential: StakeCredential<'_>,
+        &self, tx_id: TxId<'_>, stake_credential: StakeCredential<'_>,
         public_voting_key: PublicVotingKey<'_>, payment_address: PaymentAddress<'_>,
         metadata_cip36: MetadataCip36<'_>, nonce: Nonce, report: Value, valid: bool,
     ) -> Result<(), Error> {
@@ -41,7 +41,7 @@ impl EventDB {
 
         let _rows = conn
             .query(INSERT_VOTER_REGISTRATION_SQL, &[
-                &hex::decode(tx_id).map_err(|e| Error::DecodeHex(e.to_string()))?,
+                &tx_id,
                 &stake_credential,
                 &public_voting_key,
                 &payment_address,
@@ -98,7 +98,7 @@ impl EventDB {
                 if errors_report.is_empty() {
                     // valid registration
                     self.insert_voter_registration(
-                        tx.hash().to_string(),
+                        tx.hash().as_slice(),
                         &registration.stake_key.unwrap_or_default().0 .0,
                         serde_json::to_string(&registration.voting_key.unwrap_or_default())
                             .unwrap_or_default()
@@ -121,7 +121,7 @@ impl EventDB {
                     valid_registration = false;
 
                     self.insert_voter_registration(
-                        tx.hash().to_string(),
+                        tx.hash().as_slice(),
                         &registration.stake_key.unwrap_or_default().0 .0,
                         serde_json::to_string(&registration.voting_key.unwrap_or_default())
                             .unwrap_or_default()

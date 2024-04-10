@@ -12,7 +12,7 @@ pub type SlotNumber = i64;
 /// Epoch
 pub type EpochNumber = i64;
 /// Block hash
-pub type BlockHash = String;
+pub type BlockHash = Vec<u8>;
 /// Unique follower id
 pub type MachineId = String;
 
@@ -100,7 +100,7 @@ impl EventDB {
                 &network.to_string(),
                 &epoch_no,
                 &block_time,
-                &hex::decode(block_hash).map_err(|e| Error::DecodeHex(e.to_string()))?,
+                &block_hash,
             ])
             .await?;
 
@@ -125,7 +125,7 @@ impl EventDB {
         };
 
         let slot_number: SlotNumber = row.try_get(SLOT_NO_COLUMN)?;
-        let block_hash = hex::encode(row.try_get::<_, Vec<u8>>(BLOCK_HASH_COLUMN)?);
+        let block_hash = row.try_get(BLOCK_HASH_COLUMN)?;
         let block_time = row.try_get(BLOCK_TIME_COLUMN)?;
         Ok((slot_number, block_hash, block_time))
     }
@@ -146,7 +146,7 @@ impl EventDB {
         };
 
         let slot_no = row.try_get(SLOT_NO_COLUMN)?;
-        let block_hash = hex::encode(row.try_get::<_, Vec<u8>>(BLOCK_HASH_COLUMN)?);
+        let block_hash = row.try_get(BLOCK_HASH_COLUMN)?;
         let last_updated = row.try_get(ENDED_COLUMN)?;
 
         Ok((slot_no, block_hash, last_updated))
@@ -176,7 +176,7 @@ impl EventDB {
                 &machine_id,
                 &slot_no,
                 &network.to_string(),
-                &hex::decode(block_hash).map_err(|e| Error::DecodeHex(e.to_string()))?,
+                &block_hash,
                 &update,
             ])
             .await?;

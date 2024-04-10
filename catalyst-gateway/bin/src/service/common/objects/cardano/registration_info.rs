@@ -2,8 +2,6 @@
 
 use poem_openapi::{types::Example, Object};
 
-use crate::event_db::voter_registration::TxId;
-
 /// User's [CIP-36](https://cips.cardano.org/cip/CIP-36/) registration info.
 #[derive(Object)]
 #[oai(example = true)]
@@ -14,7 +12,7 @@ pub(crate) struct RegistrationInfo {
 
     /// Transaction id in which the [CIP-36](https://cips.cardano.org/cip/CIP-36/) registration is made.
     #[oai(validator(min_length = "66", max_length = "66", pattern = "0x[0-9a-f]{64}"))]
-    pub(crate) tx_id: TxId,
+    pub(crate) tx_id: String,
 }
 
 impl Example for RegistrationInfo {

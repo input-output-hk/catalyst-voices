@@ -52,7 +52,7 @@ pub(crate) async fn endpoint(state: &State, network: Option<Network>) -> AllResp
         Ok((slot_number, block_hash, last_updated)) => {
             T200(OK(Json(SyncState {
                 slot_number,
-                block_hash,
+                block_hash: block_hash.into(),
                 last_updated,
             })))
         },
