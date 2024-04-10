@@ -17,6 +17,7 @@ is a binary [ULID] as specified by the [ULID Binary Layout].
 ## References
 
 <!-- markdownlint-disable max-one-sentence-per-line -->
+<!-- cspell: words Bormann -->
 [1] [C. Bormann, and P. Hoffman. "Concise Binary Object Representation (CBOR)". RFC 8949, October 2020.][RFC 8949]
 <!-- markdownlint-enable max-one-sentence-per-line -->
 
