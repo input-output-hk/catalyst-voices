@@ -26,11 +26,13 @@ const BLOCK_TIME_COLUMN: &str = "block_time";
 const ENDED_COLUMN: &str = "ended";
 
 /// `insert_slot_index.sql`
-const INSERT_SLOT_INDEX_SQL: &str =
-    include_str!("../../../event-db/queries/follower/insert_slot_index.sql");
+const INSERT_SLOT_INDEX_SQL: &str = include_str!("insert_slot_index.sql");
+/// `insert_update_state.sql`
+const INSERT_UPDATE_STATE_SQL: &str = include_str!("insert_update_state.sql");
+/// `select_update_state.sql`
+const SELECT_UPDATE_STATE_SQL: &str = include_str!("select_update_state.sql");
 /// `select_slot_info_by_datetime.sql.tmpl`
-const SLOT_INFO_SQL_TMPL: &str =
-    include_str!("../../../event-db/queries/follower/select_slot_info_by_datetime.sql.tmpl");
+const SLOT_INFO_SQL_TMPL: &str = include_str!("select_slot_info_by_datetime.sql.tmpl");
 
 /// Query type
 pub(crate) enum SlotInfoQueryType {
@@ -54,31 +56,33 @@ struct SlotInfoQueryTmplFields {
 impl SlotInfoQueryType {
     /// Get SQL query
     fn get_sql_query(&self) -> Result<String, Error> {
+        let tmpl_fields = match self {
+            SlotInfoQueryType::Previous => {
+                SlotInfoQueryTmplFields {
+                    sign: "<",
+                    ordering: Some("DESC"),
+                }
+            },
+            SlotInfoQueryType::Current => {
+                SlotInfoQueryTmplFields {
+                    sign: "=",
+                    ordering: None,
+                }
+            },
+            SlotInfoQueryType::Next => {
+                SlotInfoQueryTmplFields {
+                    sign: ">",
+                    ordering: None,
+                }
+            },
+        };
+
         let mut reg = Handlebars::new();
         // disable default `html_escape` function
         // which transforms `<`, `>` symbols to `&lt`, `&gt`
         reg.register_escape_fn(|s| s.into());
-        let query = match self {
-            SlotInfoQueryType::Previous => {
-                reg.render_template(SLOT_INFO_SQL_TMPL, &SlotInfoQueryTmplFields {
-                    sign: "<",
-                    ordering: Some("DESC"),
-                })
-            },
-            SlotInfoQueryType::Current => {
-                reg.render_template(SLOT_INFO_SQL_TMPL, &SlotInfoQueryTmplFields {
-                    sign: "=",
-                    ordering: None,
-                })
-            },
-            SlotInfoQueryType::Next => {
-                reg.render_template(SLOT_INFO_SQL_TMPL, &SlotInfoQueryTmplFields {
-                    sign: ">",
-                    ordering: None,
-                })
-            },
-        };
-        query.map_err(|e| Error::Unknown(e.to_string()))
+        reg.render_template(SLOT_INFO_SQL_TMPL, &tmpl_fields)
+            .map_err(|e| Error::Unknown(e.to_string()))
     }
 }
 
@@ -134,10 +138,7 @@ impl EventDB {
         let conn = self.pool.get().await?;
 
         let rows = conn
-            .query(
-                include_str!("../../../event-db/queries/follower/select_update_state.sql"),
-                &[&network.to_string()],
-            )
+            .query(SELECT_UPDATE_STATE_SQL, &[&network.to_string()])
             .await?;
 
         let Some(row) = rows.first() else {
@@ -167,20 +168,17 @@ impl EventDB {
         // An insert only happens once when there is no update metadata available
         // All future additions are just updates on ended, slot_no and block_hash
         let _rows = conn
-            .query(
-                include_str!("../../../event-db/queries/follower/insert_update_state.sql"),
-                &[
-                    &i64::try_from(network_id)
-                        .map_err(|_| Error::Unknown("Network id out of range".to_string()))?,
-                    &last_updated,
-                    &last_updated,
-                    &machine_id,
-                    &slot_no,
-                    &network.to_string(),
-                    &hex::decode(block_hash).map_err(|e| Error::DecodeHex(e.to_string()))?,
-                    &update,
-                ],
-            )
+            .query(INSERT_UPDATE_STATE_SQL, &[
+                &i64::try_from(network_id)
+                    .map_err(|_| Error::Unknown("Network id out of range".to_string()))?,
+                &last_updated,
+                &last_updated,
+                &machine_id,
+                &slot_no,
+                &network.to_string(),
+                &hex::decode(block_hash).map_err(|e| Error::DecodeHex(e.to_string()))?,
+                &update,
+            ])
             .await?;
 
         Ok(())
