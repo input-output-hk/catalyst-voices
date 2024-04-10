@@ -103,7 +103,7 @@ any actual role or certificate updates.
 The data required to register certificates or roles could be large.
 The [specification for the encoding of all Cardano metadata] also introduces difficulties in encoding x509 certificates.
 
-The contents of the x509 RABC Registration data stored in this key is documented separately.
+The contents of the x509 RBAC Registration data stored in this key is documented separately.
 Its exact contents are not important for this specification except to note, that it will always define at least:
 
 * 1 Role 0 signing key MUST always be defined.

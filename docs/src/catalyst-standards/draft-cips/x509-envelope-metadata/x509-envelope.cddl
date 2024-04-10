@@ -17,7 +17,7 @@
 ; The x509 envelope must be valid cardano metadata.
 x509_envelope = $x509_envelope .within transaction_metadatum
 
-; Strcuture of the x509 envelope itself.
+; Structure of the x509 envelope itself.
 $x509_envelope /= {
 	0: purpose, ; What purpose does this metadata serve.
 	1: tx_inputs_hash, ; A hash of the `transaction inputs` field from the transaction the metadata is posted with.
@@ -26,21 +26,21 @@ $x509_envelope /= {
 	99: validation_signature ; The signature of the x509 envelope plus all other auxiliary data.
 }
 
-; When a Role 0 certificate is replaced, the transaction MUST be signed by the previous certificate beign revoked
+; When a Role 0 certificate is replaced, the transaction MUST be signed by the previous certificate being revoked
 ; As well as the new certificate that is replacing it.
 certificate_replacement_signature = [ old: validation_signature, new: validation_signature ]
 
 ; hash of the previous transaction in the registration chain.
 ; There can only be one registration for a user for a purpose that does not have a previous transaction id.
 ; This would be the first.
-; Once that is posted, all updates must properly maintian the chain.
+; Once that is posted, all updates must properly maintain the chain.
 ; Dangling registrations for the same purpose are ignored.
 previous_transaction_id = $hash32
 $hash32 /= bytes .size 32
 
 ; x509 Role Registration data is chunked and optionally (preferably) compressed.
-; This enables the x509 registration data to have a strucutre not supported by the
-; underlying limitions of the on-chain metadatum implementation.
+; This enables the x509 registration data to have a structure not supported by the
+; underlying limitations of the on-chain metadatum implementation.
 ; As the x509 registration data may be large, compression is used to minimize on-chain space consumed.
 ; Best practice would be to compress the data with both brotli and zstd, and only store the 
 ; smallest data set. `raw` storage would only be used if compression did not yield any benefits.

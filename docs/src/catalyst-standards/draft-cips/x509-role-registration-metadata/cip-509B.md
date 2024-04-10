@@ -435,7 +435,7 @@ Provided the dApp will accept the individuals registration.
 Other certificates DO NOT need to have references to the on-chain identity of the user.
 However, if they do, they must be witnessed in the transaction to prove they are validly held and referenced.
 
-### Deregistering
+### De-registering
 
 Once a user has registered for Role 0, the only way they can de-register is to revoke their Role 0 key.
 If the Role 0 key is revoked, and is not replaced in the same transaction with a new key, then all

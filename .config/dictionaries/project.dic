@@ -87,6 +87,7 @@ localizable
 loguru
 mdlint
 metadatum
+metadatums
 metamap
 mgrybyk
 mithril
@@ -161,10 +162,10 @@ Traceback
 TXNZD
 Typer
 unmanaged
-UTXO
 utxo
-Utxos
+UTXO
 utxos
+Utxos
 vite
 vitss
 vkey
