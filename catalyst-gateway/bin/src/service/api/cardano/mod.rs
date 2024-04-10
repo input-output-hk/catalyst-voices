@@ -73,7 +73,7 @@ impl CardanoApi {
     #[oai(
         path = "/registration/:stake_address",
         method = "get",
-        operation_id = "stakedAdaAmountGet",
+        operation_id = "registrationGet",
         transform = "schema_version_validation"
     )]
     /// Get registration info.

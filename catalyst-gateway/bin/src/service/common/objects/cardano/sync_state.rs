@@ -29,7 +29,7 @@ impl Example for SyncState {
         Self {
             slot_number: 5,
             block_hash: hex::decode(
-                "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "0000000000000000000000000000000000000000000000000000000000000000",
             )
             .expect("Invalid hex")
             .into(),

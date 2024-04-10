@@ -7,7 +7,7 @@ use poem_openapi::{
 
 use crate::event_db::follower::BlockHash;
 
-/// Cardano 32 bytes hash type.
+/// Cardano Blake2b256 hash encoded in hex.
 #[derive(Debug)]
 pub(crate) struct Hash(Vec<u8>);
 
@@ -22,7 +22,7 @@ impl Hash {
     fn schema() -> MetaSchema {
         let mut schema = MetaSchema::new("string");
         schema.title = Some(Self::name().to_string());
-        schema.description = Some("Cardano Hash type.");
+        schema.description = Some("Cardano Blake2b256 hash encoded in hex.");
         schema.example = Some(serde_json::Value::String(
             // cspell: disable
             "0x0000000000000000000000000000000000000000000000000000000000000000".to_string(),
