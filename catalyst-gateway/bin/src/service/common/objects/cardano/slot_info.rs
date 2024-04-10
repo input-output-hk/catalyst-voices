@@ -23,6 +23,7 @@ pub(crate) struct Slot {
 }
 
 impl Example for Slot {
+    #[allow(clippy::expect_used)]
     fn example() -> Self {
         Self {
             slot_number: 121_099_410,
@@ -49,6 +50,7 @@ pub(crate) struct SlotInfo {
 }
 
 impl Example for SlotInfo {
+    #[allow(clippy::expect_used)]
     fn example() -> Self {
         Self {
             previous: Some(Slot {

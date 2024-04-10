@@ -31,8 +31,8 @@ const INSERT_SLOT_INDEX_SQL: &str = include_str!("insert_slot_index.sql");
 const INSERT_UPDATE_STATE_SQL: &str = include_str!("insert_update_state.sql");
 /// `select_update_state.sql`
 const SELECT_UPDATE_STATE_SQL: &str = include_str!("select_update_state.sql");
-/// `select_slot_info_by_datetime.sql.tmpl`
-const SLOT_INFO_SQL_TMPL: &str = include_str!("select_slot_info_by_datetime.sql.tmpl");
+/// `select_slot_info_by_datetime.sql.hbs`
+const SLOT_INFO_SQL_HBS: &str = include_str!("select_slot_info_by_datetime.sql.hbs");
 
 /// Query type
 pub(crate) enum SlotInfoQueryType {
@@ -81,7 +81,7 @@ impl SlotInfoQueryType {
         // disable default `html_escape` function
         // which transforms `<`, `>` symbols to `&lt`, `&gt`
         reg.register_escape_fn(|s| s.into());
-        reg.render_template(SLOT_INFO_SQL_TMPL, &tmpl_fields)
+        reg.render_template(SLOT_INFO_SQL_HBS, &tmpl_fields)
             .map_err(|e| Error::Unknown(e.to_string()))
     }
 }
