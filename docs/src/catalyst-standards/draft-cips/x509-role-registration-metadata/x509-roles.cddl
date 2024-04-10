@@ -16,12 +16,12 @@ $x509_roles /= x509-roles-v0
 x509-roles-v0 = [ 0, x509-roles-v0-body ]
 
 x509-roles-v0-body = {
-	? x509-certs => [ + x509_der_cert ],
-	? c509-certs => [ + c509_cert ],
-	? pub-keys => [ + simple-public-key-type ],
-	? revocation-list => [ + revocation-set ],
-	? role-set => role-data-set,
-	? purpose-key-set => purpose-data-set,
+	? x509-certs => [ + x509_der_cert ], ; Unordered List of DER encoded x509 certificates
+	? c509-certs => [ + c509_cert ], ; Unordewed List of CBOR encoded C509 certificates (or metadatum references)
+	? pub-keys => [ + simple-public-key-type ], ; Ordered list of simple public keys that are registered.
+	? revocation-list => [ + revocation-set ], ; Revocation list of certs being revoked by an issuer.
+	? role-set => role-data-set, ; Set of role registration data
+	? purpose-key-set => purpose-data-set, ; Set of purpose specific data to be registered.
 }
 
 ; x509 Certificates
@@ -30,7 +30,29 @@ x509_der_cert = bytes ; A DER Encoded X.509 Certificate (binary)
 
 ; c509 Certificates
 c509-certs = 20 ; Unorderd bag of C509 CBOR Encoded certificates
-c509_cert = bytes .cbor any; A CBOR Encoded C.509 Certificate (binary)
+c509_cert = (
+  C509CertInMetadatumReference / ; A reference to a certificate encoded in a metadatum
+  C509Certificate ; An actual certificate.
+)
+
+; C509 Certificate from https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/
+C509Certificate = [
+	TBSCertificate: bytes .cbor any, ; A CBOR Encoded C.509 Certificate (binary)	issuerSignatureValue: any, ; The issuers signature (dependent on the signature algorithm used by the certificate)]
+
+; A reference to a C509 certificate held in a metadatum.
+; if there are multiple transaction outputs that contain certificates they need to be listed individually.
+C509CertInMetadatumReference = [
+	txn_output_field: uint, ; Currently this is always 1.  It references the key of the transaction outputs to use from the transaction.
+	txn_output_index: uint,  ; The specific transaction output to use in the list of transaction outputs.
+	cert_ref: C509CertInMetadatumReferenceOffset ; Reference to the certificates in the metadatum.
+]
+
+; Which certificate/s to reference
+C509CertInMetadatumReferenceOffset = (
+	null //  ; Reference is a single cert, or an array of certs, include them all, in order listed.
+	uint // ; Reference a single cert at this offset in a CBOR array, or at this key in a CBOR map.
+	[ + uint ] ; Reference multiple certs at these offsets in a CBOR array, or at these keys in a CBOR map, in the order listed.
+)
 
 ; Simple Public Keys
 ; These are just signing keys of the specified type, and are not true certs

@@ -166,7 +166,8 @@ At a high level, Role registration will collect the following data:
 2. An [optional list](#x509-certificate-lists) of [CBOR Encoded X.509 Certificates][C509]
 3. An [optional list](#simple-public-keys) list of tagged simple public keys.
 4. An [optional certificate revocation](#certificate-revocation-list) set.
-5. An optional set of role registration data.
+5. An [optional set](#role-definitions) of role registration data.
+6. An [optional list] of purpose specific data.
 
 ### x509 Certificate Lists
 
@@ -192,6 +193,26 @@ Individual dApps can strengthen this requirement to MUST.
 By including the Signature in the transaction, we are able to make a verifiable link between the
 off-chain certificate and the on-chain identity.
 This can not be forged.
+
+#### Plutus access to x509 certificates
+
+Plutus is currently incapable of reading any metadata attached to a transaction.
+This specification allows for C509 encoded certificates to be present in the datum output of the transaction itself.
+Any C509 certificates present in the metadatum of the transaction are considered to be part of the C509
+certificate list for the purposes of this specification.
+
+A C509 certificate in a metadatum that is to be included in the registration MUST be included in the C509 certificate list
+as a reference.
+
+The reference defines the metadatum the C509 certificate can be found in the transaction,
+and the offset in that metadatum where the certificate is located.
+The Certificates MUST be in the same transaction as the Metadatum, it is not possible to refer to a certificate
+embedded in metadatum in another transaction.
+
+Certificates in metadatum that are not linked in this way are ignored for the purpose of this specification.
+
+Transaction outputs at key 1 of the transaction can contain any number of arrays of certificates.
+This is only limited by the transaction itself.
 
 ### Simple Public Keys
 
@@ -266,17 +287,25 @@ The validity of the registration is as per the rules for roles defined by the dA
 Role registration data is further divided into:
 
 1. [A Role number](#role-number)
-2. An Optional reference to the roles signing key
-3. An Optional reference to the roles encryption key
-4. An optional reference to the on-chain payment key to use for the role.
-5. And an optional dApp defined set of role specific data.
+2. An [Optional reference](#reference-to-a-role-signing-key) to the roles signing key
+3. An [Optional reference](#reference-to-a-role-encryption-key) to the roles encryption key
+4. An [optional reference](#on-chain-payment-key-reference) to the on-chain payment key to use for the role.
+5. And [an optional](#role-extended-data-keys) dApp defined set of role specific data.
 
 #### Role Number
 
 All roles, except for Role 0, are defined by the dApp.
 
-Role 0 is the primary role and is used to sign the metadata.
+Role 0 is the primary role and is used to sign the metadata and declare on-chain/off-chain identity linkage.
 All compliant implementations of this specification use Role 0 in this way.
+
+dApps can extend what other use cases Role 0 has, but it will always be used to secure the Role registrations.
+
+For example, in Catalyst Role 0 is a basic voters role.
+Voters do not need to register for any other role to have basic interaction with project Catalyst.
+
+The recommendation is that Role 0 be used by dApps to give the minimum level of access the dApp requires and
+other extended roles are defined as Role 1+.
 
 #### Reference to a role signing key
 
@@ -288,39 +317,166 @@ or one of the defined simple public keys.
 A dApp can define is roles allow the use of certificates, or simple public keys, or both.
 
 Role 0 MUST have a signing key, and it must be a certificate.
+Simple keys can not be used for signing against Role 0.
+
+The reason for this is the Role 0 certificate MUST include a reference to the on-chain identity/s to be bound to the registration.
+Simple public keys can not contain this reference, which is why they are not permissible for Role 0 keys.
 
 A reference to a key/certificate can be a cert in the same registration, or any previous registration.
 If the certificate is revoked, the role is unusable for signing unless and until a new signing certificate
 is registered for the role.
 
-### SubKey 100+ - dApp Defined Extended Metadata
+#### Reference to a role encryption key
 
-Subkeys 100+ are available for dApp authors to add further metadata to registrations under this CIP.
-The dApp author should clearly document what this metadata is, how it is represented and formatted.
+A Role may require the ability to transfer encrypted data.
+The registration can include the Public key use by the role to encrypt the roles data.
+Due to the way public key encryption works, this key can only be used to send encrypted data to the holder of the public key.
+However, when two users have registered public keys,
+they can use them off-chain to perform key exchange and communicate privately between themselves.
 
-It is valid for different extended metadata to be defined for different purposes for the same [dApp UUID][dApp-UUID].
+The Role encryption key must be a reference to a key that supports public key encryption, and not just a signing key.
+If the key referenced does not support public key encryption, the registration is invalid.
 
-Examples of extended metadata:
+#### On-chain payment key reference
 
-* Social Media contacts for a particular role.
-* A Description of the person or group covered by the registration.
-* Links to other systems with expanded information related to the registration.
+Some dApps may require a user to register their payment key, so that they can be sent rewards,
+or native tokens or nft's or for other use cases.
 
-The wallet when signing these registration transactions should not validate this metadata strictly.
-If the wallet believes it is invalid, it can warn the user, but should still allow it to be signed.
-This is because definition of this metadata is intentionally fluid to allow the dApp authors to add or remove optional metadata, and this should be able to occur without breaking supporting tooling.
+Registrations like CIP-15/36 for catalyst include a payment key.
+However, a fundamental problem with these metadata standards is there is no way to validate:
 
-### High level overview of the Role Registration witness data
+1. The payment key declared is valid and capable of receiving payments.
+2. That the entity posting the registration actually owns the payment key registered.
+
+It is important that payment keys be verifiable and provably owned to the registrar.
+
+A Payment key reference in this CIP solves this problem by only allowing a reference to either a transaction input or output.
+
+The reference is a simple signed integer.
+If the integer is positive, then it is referencing the spent UTXO in the transaction Input at the same offset.
+Because its is required to prove one can spend a UTXO to post the transaction,
+the transaction itself proves that the Payment address being registered is both valid and owned by the registrar.
+
+If the reference is negative, then the payment key references a transaction output.  
+The value is negated to get the offset into the transaction output array.
+
+If the transaction output address IS also an input to the transaction,
+then the same proof has already been attached to the transaction.
+
+However, if the transaction output is not also an input, the transaction MUST include the output address
+in the required signers field, and the transaction must carry a witness proving the payment key is owned.
+
+This provides guarantees that the entity posting the registration has posted a valid payment address, and that they control it.
+
+If a payment address is not able to be validated, then the entire registration metadata is invalid.
+
+#### Role extended data keys
+
+Each dApp can declare that roles can have either mandatory or optional data items that can be posted with any role registration.
+
+Each role can have a different set of defined role registration data.
+It is not required that all roles have the same data.
+
+As the role data is dApp specific, it is not detailed here.
+Each dApp will need to produce a specification of what role specific data it requires, and how it is validated.
+
+### dApp specific registration data
+
+Each dApp can define data which is required for registration to the dApp.
+This data can be defined as required or optional by the dApp.
+
+The data is global and applies to all roles registered by the same identity.
+
+This can include information such as ADA Handles, or reputation data associated with a registration.
+
+As this data is dApp specific it is not detailed here.
+
+### Registration validity
+
+Any registration metadata must be 100% valid, or the entire registration data set is rejected as invalid.
+
+For example, if three roles were registered, Role 0, 1 and 2.
+
+Role 0 is perfectly fine, as is Role 1.
+However Role 2 has an error with the payment key.
+None of the role registrations will take effect.
+
+### Optional fields
+
+As role registration is cumulative and each new registration for an entity on a dApp simply updates a previous
+registration, then all fields are optional.
+
+The individual posting the registration need ONLY post the data that has changed or is being added.
+This is intended to minimize the amount of on-chain data.
+It does mean that a registration state can only be known by collecting all registration for an individual from the chain.
+
+### First Registration
+
+The very first registration must have the following features:
+
+1. It MUST have a certificate that is appropriately issued (either self signed or issued by a trusted CA).
+   1. The certificate requirement is defined by each dApp.
+   2. The certificate MUST link to at least 1 on-chain identity.
+      dApps define what the required identities are.
+      It is valid for a dApp to require multiple on-chain identities to be referenced.
+      However, general validity can be inferred by the presence or lack of a referenced on-chain identity.
+      1. Either currently a Stake Address; or
+      2. Another on-chain identity key (such as dRep).
+   3. The transaction MUST be witnessed by ALL the Role 0 referenced on-chain identities.
+      1. If the address is not a natural address to witness the transaction, it MUST be included in the
+          required signers field of the transaction.
+          And it must appear in the witness set.
+2. It MUST have a Role 0 defined, that references the certificate.
+3. It must be signed by the Role 0 certificate.
+
+Once the Role 0 certificate is registered, the entity is registered for the dApp.
+Provided the dApp will accept the individuals registration.
+
+Other certificates DO NOT need to have references to the on-chain identity of the user.
+However, if they do, they must be witnessed in the transaction to prove they are validly held and referenced.
+
+### Deregistering
+
+Once a user has registered for Role 0, the only way they can de-register is to revoke their Role 0 key.
+If the Role 0 key is revoked, and is not replaced in the same transaction with a new key, then all
+registration data for that user is revoked.
+
+A user could then create a new registration with a new Role 0 certificate,
+but they would also need to register for any Roles again.
+
+This is because if the Role 0 certificate is not immediately rolled over, then all role registrations are deemed terminated.
+
+It is also possible for a de-registration to cause a linked registration to use a new on-chain identity.
+
+For example, if the current Role 0 registration referenced Stake address 123,  
+and a new registration is posted that revokes the old cert, and posts a new cert referencing Stake address 456,
+then the on-chain stake address identity will have changed from 123 to 456.
+
+Note: in the case of a CA revoked certificate,
+the subject must have registered a new Role 0 certificate before the issuer revokes it.
+
+Otherwise, they will become de-registered when the issuer revokes their certificate, and they must then completely re-register.
 
 ## Rationale: how does this CIP achieve its goals?
 
 ## Path to Active
+
+* All related CIP's are implemented in a MVP implementation for Project Catalyst.
+* All implementation details have been refined allowing unambiguous implementation for the MVP.
+* Appropriate community driven feedback has occurred to allow the specification to mature.
 
 ### Acceptance Criteria
 
 ### Implementation Plan
 
 ## References
+
+* [CC-BY-4.0]
+* [Apache 2.0]
+* [CBOR]
+* [CBOR - Core Deterministic Encoding Requirements]
+* [C509]
+* [CBOR Undefined/Absent Tags]
 
 ## Copyright
 

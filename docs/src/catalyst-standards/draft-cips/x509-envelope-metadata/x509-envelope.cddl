@@ -21,10 +21,14 @@ x509_envelope = $x509_envelope .within transaction_metadatum
 $x509_envelope /= {
 	0: purpose, ; What purpose does this metadata serve.
 	1: tx_inputs_hash, ; A hash of the `transaction inputs` field from the transaction the metadata is posted with.
-	?2: previous_transaction_id ; Previous transaction ID in the chain of registration updates for this user.
-	? chunk_type => [ + x509_chunk ] ; Chunked x509 role registration data.
+	? 2: previous_transaction_id ; Previous transaction ID in the chain of registration updates for this user.
+	chunk_type => [ + x509_chunk ] ; Chunked x509 role registration data.
 	99: validation_signature ; The signature of the x509 envelope plus all other auxiliary data.
 }
+
+; When a Role 0 certificate is replaced, the transaction MUST be signed by the previous certificate beign revoked
+; As well as the new certificate that is replacing it.
+certificate_replacement_signature = [ old: validation_signature, new: validation_signature ]
 
 ; hash of the previous transaction in the registration chain.
 ; There can only be one registration for a user for a purpose that does not have a previous transaction id.
@@ -43,6 +47,7 @@ $hash32 /= bytes .size 32
 ; However an application could choose to implement no compression or only one of either brotli/zstd.
 
 ; Chunk Types - Allows to identify how the chunk data is compressed to save on-chain space.
+
 chunk_types = (
 	raw: 10 ; Data is just chunked, not compressed (raw)
 	brotli: 11 ; Data is compressed with BROTLI and then chunked.
