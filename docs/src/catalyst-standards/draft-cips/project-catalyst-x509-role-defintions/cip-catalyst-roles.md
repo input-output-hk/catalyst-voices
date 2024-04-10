@@ -245,7 +245,7 @@ the Role 0 payment key is used for the proposers payment key.
 Because the purpose of a Proposer is to earn funding from the Catalyst Fund,
 A proposal registration is INVALID if it does not have an associated payment address.
 
-#### dApp purpsoe specific keys
+#### dApp purpose specific keys
 
 Project Catalyst defines the following data which can be declared globally in any registration.
 
