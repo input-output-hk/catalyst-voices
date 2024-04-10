@@ -54,7 +54,7 @@ pub(crate) async fn endpoint(
         Err(err) => return server_error_response!("{err}"),
     };
     let date_time = slot_num.unwrap_or(SlotNumber::MAX);
-    let stake_credential = stake_address.payload().as_hash().as_ref();
+    let stake_credential = stake_address.payload().as_hash().to_vec();
     let network = match check_network(stake_address.network(), provided_network) {
         Ok(network) => network,
         Err(err) => return T400(err),

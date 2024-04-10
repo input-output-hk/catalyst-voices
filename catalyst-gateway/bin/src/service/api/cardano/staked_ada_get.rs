@@ -35,7 +35,6 @@ pub(crate) type AllResponses = response! {
 };
 
 /// # GET `/staked_ada`
-#[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(
     state: &State, stake_address: StakeAddress, provided_network: Option<Network>,
     slot_num: Option<SlotNumber>,
@@ -55,7 +54,7 @@ pub(crate) async fn endpoint(
     };
 
     let date_time = slot_num.unwrap_or(SlotNumber::MAX);
-    let stake_credential = stake_address.payload().as_hash().as_ref();
+    let stake_credential = stake_address.payload().as_hash().to_vec();
 
     let network = match check_network(stake_address.network(), provided_network) {
         Ok(network) => network,

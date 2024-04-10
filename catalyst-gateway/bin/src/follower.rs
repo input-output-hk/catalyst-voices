@@ -285,7 +285,7 @@ async fn init_follower(
                     // Block processing for Eras before staking are ignored.
                     if valid_era(block.era()) {
                         // index catalyst registrations
-                        match db.index_registration_data(block.txs(), slot, network).await {
+                        match db.index_registration_data(block.txs(), network).await {
                             Ok(()) => (),
                             Err(err) => {
                                 error!(
