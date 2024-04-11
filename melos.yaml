@@ -13,7 +13,7 @@ command:
     workspaceChangelog: true
   bootstrap:
     environment:
-      sdk: '>=3.3.0 <4.0.0'
+      sdk: ">=3.3.0 <4.0.0"
       flutter: 3.19.5
     dependencies:
       bloc_concurrency: ^0.2.2
@@ -34,11 +34,11 @@ scripts:
     description: Run all static analysis checks.
 
   format:
-      run: melos exec dart format . --fix
-      description: Run `dart format` for all packages.
+    run: melos exec -- dart format lib --fix
+    description: Run `dart format` for all packages.
 
   format-check:
-    run: melos exec dart format . --set-exit-if-changed
+    run: melos exec -- dart format lib --set-exit-if-changed
     description: Run `dart format` checks for all packages.
 
   analyze:
@@ -46,9 +46,9 @@ scripts:
     # the analysis server on low performance machines (like GitHub Actions).
     run: |
       melos exec -c 1 -- \
-        dart analyze . --fatal-infos
+        flutter analyze --fatal-infos
     description: |
-      Run `dart analyze` in all packages.
+      Run `flutter analyze` in all packages.
        - Note: you can also rely on your IDEs Dart Analysis / Issues window.
 
   metrics:
@@ -73,6 +73,17 @@ scripts:
     run: |
       melos exec --dir-exists="test" -- \
        "flutter test --reporter expanded --coverage --machine | tojunit --output flutter.junit-report.xml"
+
+      # removes generated code coverage
+      melos exec --dir-exists="test" -- \
+        lcov --remove coverage/lcov.info -o coverage/lcov.info --ignore-errors unused \
+        '*.swagger.dart' \
+        '*.chopper.dart' \
+        '*.g.dart' \
+        '*.freezed.dart' \
+        'lib/generated/**'
+
+      # converts coverage to a HTML report
       melos exec --dir-exists="test" -- \
         "genhtml coverage/lcov.info --output-directory=coverage/"
     description: Run `flutter test` for all packages and generate junit and coverage reports.
