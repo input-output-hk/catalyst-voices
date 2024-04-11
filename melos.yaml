@@ -33,13 +33,9 @@ scripts:
     run: melos analyze
     description: Run all static analysis checks.
 
-  format:
-    run: melos exec -c 1 -- dart format lib --fix
-    description: Run `dart format` for all packages.
-
-  format-check:
-    run: melos exec -c 1 -- dart format lib --set-exit-if-changed
-    description: Run `dart format` checks for all packages.
+  analyze:
+    run: melos analyze
+    description: Run all static analysis checks.
 
   metrics:
     run: |
@@ -48,6 +44,14 @@ scripts:
     description: |
       Run `dart_code_metrics` in all packages.
       - Note: you can also rely on your IDEs Dart Analysis / Issues window.
+
+  format:
+    run: melos exec -c 1 -- dart format lib --fix
+    description: Run `dart format` for all packages.
+
+  format-check:
+    run: melos exec -c 1 -- dart format lib --set-exit-if-changed
+    description: Run `dart format` checks for all packages.
 
   test:select:
     run: |
@@ -65,13 +69,13 @@ scripts:
       rm -fR $MELOS_ROOT_PATH/test_reports
       mkdir $MELOS_ROOT_PATH/test_reports
 
-      # run tests & generate junit reports in /test_reports/
+      # run tests, generate junit reports in /test_reports/ & code coverage report
       melos exec -c 1 --dir-exists="test" -- \
        "flutter test --reporter expanded --coverage --machine | tojunit --output MELOS_ROOT_PATH/test_reports/MELOS_PACKAGE_NAME.junit-report.xml"
 
-      # removes generated code coverage
+      # removes code coverage for generated code
       melos exec -c 1 --dir-exists="test" -- \
-        lcov --remove coverage/lcov.info -o coverage/lcov.info --ignore-errors unused \
+        lcov --remove coverage/lcov.info -o coverage/lcov.info --ignore-errors unused,unused \
         '*.swagger.dart' \
         '*.chopper.dart' \
         '*.g.dart' \
@@ -84,6 +88,7 @@ scripts:
     description: |
       Run `flutter test` for all packages and generate junit and coverage reports.
       The test reports are saved in /test_reports folder.
+      The coverages are saved for each package separately in /coverage folder.
 
   build:pub_get:all:
     run: flutter pub get
