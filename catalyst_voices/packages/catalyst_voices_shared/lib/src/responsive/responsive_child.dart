@@ -2,17 +2,17 @@ import 'package:catalyst_voices_shared/src/responsive/responsive_breakpoint_key.
 import 'package:catalyst_voices_shared/src/responsive/responsive_builder.dart';
 import 'package:flutter/material.dart';
 
-// A [ResponsiveChild] is a StatelessWidget that selects a WidgetBuilder based 
+// A [ResponsiveChild] is a StatelessWidget that selects a WidgetBuilder based
 // on the current screen size and execute it.
 // This is a simple wrapper around ResponsiveBuilder to simplify development and
 // make it explicit for a reader.
 //
-// The possible arguments are [xs], [sm], [md], [lg], [other] following the 
+// The possible arguments are [xs], [sm], [md], [lg], [other] following the
 // the ResponsiveBuilder arguments.
 // [other] is required and acts as fallback.
 //
 // Example usage:
-// 
+//
 // ```dart
 // ResponsiveChild(
 //   xs: (context) => const Text('Simple text for extra small screens.'),
@@ -43,12 +43,12 @@ class ResponsiveChild extends StatelessWidget {
     WidgetBuilder? lg,
     required WidgetBuilder other,
   }) : _widgets = {
-    ResponsiveBreakpointKey.xs: xs,
-    ResponsiveBreakpointKey.sm: sm,
-    ResponsiveBreakpointKey.md: md,
-    ResponsiveBreakpointKey.lg: lg,
-    ResponsiveBreakpointKey.other: other,
-  };
+          ResponsiveBreakpointKey.xs: xs,
+          ResponsiveBreakpointKey.sm: sm,
+          ResponsiveBreakpointKey.md: md,
+          ResponsiveBreakpointKey.lg: lg,
+          ResponsiveBreakpointKey.other: other,
+        };
 
   @override
   Widget build(BuildContext context) {

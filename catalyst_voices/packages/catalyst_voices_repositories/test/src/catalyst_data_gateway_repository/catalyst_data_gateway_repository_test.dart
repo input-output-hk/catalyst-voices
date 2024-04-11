@@ -217,7 +217,7 @@ void main() {
       final syncState = SyncState(
         slotNumber: 5,
         blockHash:
-          '0x0000000000000000000000000000000000000000000000000000000000000000',
+            '0x0000000000000000000000000000000000000000000000000000000000000000',
         lastUpdated: DateTime.utc(1970),
       );
       final repository = setupRepository<SyncState>(
