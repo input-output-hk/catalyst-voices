@@ -1,6 +1,8 @@
 SELECT
+  cardano_voter_registration.tx_id,
   cardano_voter_registration.payment_address,
-  cardano_voter_registration.tx_id
+  cardano_voter_registration.public_voting_key,
+  cardano_voter_registration.nonce
 
 FROM cardano_voter_registration
 

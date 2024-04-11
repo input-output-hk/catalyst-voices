@@ -65,11 +65,12 @@ pub(crate) async fn endpoint(
         .get_registration_info(stake_credential, network.into(), date_time)
         .await
     {
-        Ok((tx_id, payment_address)) => {
-            T200(OK(Json(RegistrationInfo {
-                tx_hash: tx_id.into(),
-                rewards_address: hex::encode(payment_address),
-            })))
+        Ok((tx_id, payment_address, _voting_info, nonce)) => {
+            T200(OK(Json(RegistrationInfo::new(
+                tx_id,
+                payment_address,
+                nonce,
+            ))))
         },
         Err(DBError::NotFound) => T404(NotFound),
         Err(err) => server_error_response!("{err}"),

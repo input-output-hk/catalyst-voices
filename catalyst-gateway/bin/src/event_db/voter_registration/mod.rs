@@ -6,7 +6,7 @@ use serde_json::json;
 
 use super::{follower::SlotNumber, Error, EventDB};
 use crate::registration::{
-    parse_registrations_from_metadata, validate_reg_cddl, CddlConfig, ErrorReport,
+    parse_registrations_from_metadata, validate_reg_cddl, CddlConfig, ErrorReport, VotingInfo,
 };
 
 /// Transaction id
@@ -14,7 +14,7 @@ pub(crate) type TxId = Vec<u8>;
 /// Stake credential
 pub(crate) type StakeCredential = Vec<u8>;
 /// Public voting key
-pub(crate) type PublicVotingKey = Vec<u8>;
+pub(crate) type PublicVotingInfo = VotingInfo;
 /// Payment address
 pub(crate) type PaymentAddress = Vec<u8>;
 /// Nonce
@@ -28,6 +28,10 @@ pub(crate) type _Stats = Option<serde_json::Value>;
 const TX_ID_COLUMN: &str = "tx_id";
 /// `payment_address` column name
 const PAYMENT_ADDRESS_COLUMN: &str = "payment_address";
+/// `public_voting_key` column name
+const PUBLIC_VOTING_KEY_COLUMN: &str = "public_voting_key";
+/// `nonce` column name
+const NONCE_COLUMN: &str = "nonce";
 
 /// `insert_voter_registration.sql`
 const INSERT_VOTER_REGISTRATION_SQL: &str = include_str!("insert_voter_registration.sql");
@@ -39,25 +43,34 @@ impl EventDB {
     #[allow(clippy::too_many_arguments)]
     async fn insert_voter_registration(
         &self, tx_id: TxId, stake_credential: Option<StakeCredential>,
-        public_voting_key: Option<PublicVotingKey>, payment_address: Option<PaymentAddress>,
+        public_voting_key: Option<PublicVotingInfo>, payment_address: Option<PaymentAddress>,
         metadata_cip36: Option<MetadataCip36>, nonce: Option<Nonce>, errors_report: ErrorReport,
     ) -> Result<(), Error> {
         let conn = self.pool.get().await?;
 
+        let encoded_voting_key = if let Some(voting_key) = public_voting_key {
+            Some(
+                serde_json::to_string(&voting_key)
+                    .map_err(|_| Error::Unknown("Cannot encode voting key".to_string()))?
+                    .as_bytes()
+                    .to_vec(),
+            )
+        } else {
+            None
+        };
+
         let is_valid = stake_credential.is_some()
-            && public_voting_key.is_some()
+            && encoded_voting_key.is_some()
             && payment_address.is_some()
             && metadata_cip36.is_some()
             && nonce.is_some()
             && errors_report.is_empty();
 
-        println!("Voter registration tx_id: {}", hex::encode(&tx_id));
-
         let _rows = conn
             .query(INSERT_VOTER_REGISTRATION_SQL, &[
                 &tx_id,
                 &stake_credential,
-                &public_voting_key,
+                &encoded_voting_key,
                 &payment_address,
                 &nonce,
                 &metadata_cip36,
@@ -101,15 +114,6 @@ impl EventDB {
                 return Ok(());
             }
 
-            let encoded_voting_key = if let Some(voting_key) = registration.voting_key {
-                if let Ok(encoded_voting_key) = serde_json::to_string(&voting_key) {
-                    Some(encoded_voting_key.as_bytes().to_vec())
-                } else {
-                    None
-                }
-            } else {
-                None
-            };
             let nonce = if let Some(nonce) = registration.nonce {
                 Some(nonce.0.try_into().map_err(|_| {
                     Error::Unknown("Cannot cast registration nonce from u64 to i64".to_string())
@@ -122,7 +126,7 @@ impl EventDB {
                 registration
                     .stake_key
                     .map(|val| val.get_credentials().to_vec()),
-                encoded_voting_key,
+                registration.voting_key,
                 registration.rewards_address.map(|val| val.0),
                 registration.raw_cbor_cip36,
                 nonce,
@@ -137,7 +141,7 @@ impl EventDB {
     /// Get registration info
     pub(crate) async fn get_registration_info(
         &self, stake_credential: StakeCredential, network: Network, slot_num: SlotNumber,
-    ) -> Result<(TxId, PaymentAddress), Error> {
+    ) -> Result<(TxId, PaymentAddress, PublicVotingInfo, Nonce), Error> {
         let conn = self.pool.get().await?;
 
         let rows = conn
@@ -154,6 +158,13 @@ impl EventDB {
 
         let tx_id = row.try_get(TX_ID_COLUMN)?;
         let payment_address = row.try_get(PAYMENT_ADDRESS_COLUMN)?;
-        Ok((tx_id, payment_address))
+        let nonce = row.try_get(NONCE_COLUMN)?;
+        let public_voting_info: PublicVotingInfo = serde_json::from_str(
+            &String::from_utf8(row.try_get(PUBLIC_VOTING_KEY_COLUMN)?)
+                .map_err(|_| Error::Unknown("Cannot parse public voting key".to_string()))?,
+        )
+        .map_err(|_| Error::Unknown("Cannot parse public voting key".to_string()))?;
+
+        Ok((tx_id, payment_address, public_voting_info, nonce))
     }
 }

@@ -23,6 +23,7 @@ def test_voter_registration_endpoint():
     snapshot_tool_data = json.load(open("./snapshot_tool-56364174.json"))
     for entry in snapshot_tool_data:
         expected_rewards_address = entry["rewards_address"]
+        expected_nonce = entry["nonce"]
         stake_address = utils.stake_public_key_to_address(
             key=entry["stake_public_key"][2:], is_stake=True, network_type=network
         )
@@ -33,4 +34,7 @@ def test_voter_registration_endpoint():
         # it is possible that snapshot tool collected data for the stake key which does not have any unspent utxo
         # at this case cat-gateway return 404, that is why we are checking this case additionally
         logger.info(f"curent: {res}, expected: {entry}")
-        assert res["rewards_address"] == expected_rewards_address
+        assert (
+            res["rewards_address"] == expected_rewards_address
+            and res["nonce"] == expected_nonce
+        )

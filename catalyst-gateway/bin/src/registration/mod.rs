@@ -135,7 +135,7 @@ impl Default for CddlConfig {
 #[derive(Debug, Clone, PartialEq)]
 pub struct Registration {
     /// Voting key
-    pub voting_key: Option<VotingKey>,
+    pub voting_key: Option<VotingInfo>,
     /// Stake key
     pub stake_key: Option<PubKey>,
     /// Rewards address
@@ -158,7 +158,7 @@ pub struct Registration {
 #[derive(Serialize, Deserialize)]
 #[serde(untagged)]
 #[derive(Debug, Clone, PartialEq)]
-pub enum VotingKey {
+pub enum VotingInfo {
     /// Direct voting
     ///
     /// Voting power is based on the staked ada of the given key
@@ -171,9 +171,9 @@ pub enum VotingKey {
     Delegated(Vec<(PubKey, u64)>),
 }
 
-impl Default for VotingKey {
+impl Default for VotingInfo {
     fn default() -> Self {
-        VotingKey::Direct(PubKey(Vec::new()))
+        VotingInfo::Direct(PubKey(Vec::new()))
     }
 }
 
@@ -264,12 +264,12 @@ pub fn inspect_metamap_reg(spec_61284: &[Value]) -> Result<&Vec<(Value, Value)>,
 
 #[allow(clippy::manual_let_else)]
 /// Extract voting key
-pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingKey, Box<dyn Error>> {
+pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingInfo, Box<dyn Error>> {
     let voting_key = match &metamap
         .get(DELEGATIONS_OR_DIRECT)
         .ok_or("Issue with voting key 61284 cbor parsing")?
     {
-        (Value::Integer(_one), Value::Bytes(direct)) => VotingKey::Direct(PubKey(direct.clone())),
+        (Value::Integer(_one), Value::Bytes(direct)) => VotingInfo::Direct(PubKey(direct.clone())),
         (Value::Integer(_one), Value::Array(delegations)) => {
             let mut delegations_map: Vec<(PubKey, u64)> = Vec::new();
             for d in delegations {
@@ -309,7 +309,7 @@ pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingKey, Box<d
                 }
             }
 
-            VotingKey::Delegated(delegations_map)
+            VotingInfo::Delegated(delegations_map)
         },
 
         _ => return Err("Invalid signature".to_string().into()),
@@ -380,7 +380,7 @@ pub fn inspect_voting_purpose(
 pub fn parse_registrations_from_metadata(
     meta: &MultiEraMeta, network: Network,
 ) -> Result<(Registration, ErrorReport), Box<dyn Error>> {
-    let mut voting_key: Option<VotingKey> = None;
+    let mut voting_key: Option<VotingInfo> = None;
     let mut stake_key: Option<PubKey> = None;
     let mut voting_purpose: Option<VotingPurpose> = None;
     let mut rewards_address: Option<RewardsAddress> = None;
