@@ -8,7 +8,7 @@ VERSION --try --global-cache --arg-scope-and-set 0.7
 deps:
     FROM debian:bookworm-slim
     RUN apt-get update
-    RUN apt-get install -y git curl unzip bzip2 bash jq gpg
+    RUN apt-get install -y git curl unzip bzip2 bash jq gpg lcov
     COPY --dir test_driver/scripts .
     RUN chmod +x scripts/install-chrome-linux64.sh && ./scripts/install-chrome-linux64.sh
     RUN chmod +x scripts/install-edge-linux64.sh && ./scripts/install-edge-linux64.sh
@@ -41,7 +41,6 @@ code-generator:
 
     FROM +deps
     COPY --dir pubspec.yaml lib packages web test test_driver integration_test catalyst_voices
-    COPY ../+repo-catalyst-voices-packages/repo ../
     COPY ../+repo-catalyst-voices-packages/repo .
     WORKDIR /frontend/catalyst_voices/packages/catalyst_voices_services
     COPY ../catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
@@ -88,13 +87,13 @@ build:
     WORKDIR /frontend/build
     SAVE ARTIFACT web /web AS LOCAL web
 
-test-unit:
-    FROM +build
-    WORKDIR /frontend
-    TRY
-        RUN flutter test --reporter expanded . --coverage --machine | tojunit --output flutter.junit-report.xml
-    FINALLY
-        SAVE ARTIFACT flutter.junit-report.xml AS LOCAL flutter-unit-tests.junit-report.xml
+test-report:
+    FROM +deps
+    COPY ../+repo-catalyst-voices-all/repo repo/
+    WORKDIR repo
+    RUN melos run test-report
+    WAIT
+        SAVE ARTIFACT test_reports AS LOCAL test_reports
     END
 
 package:
