@@ -23,11 +23,14 @@ deps:
     RUN flutter --version
     RUN flutter doctor -v
     RUN flutter config --enable-web
+    RUN dart pub global activate melos
     RUN dart pub global activate junitreport
+    RUN dart pub global activate coverage
 
 src:
     FROM +deps
     COPY --dir pubspec.yaml lib packages web test test_driver integration_test .
+    COPY ../+repo-catalyst-voices/repo repo/
 
 # code-generator - Generates flutter code.
 # Based on Catalyst Gateway OpenAPI specifications generates models, clients
@@ -39,6 +42,7 @@ code-generator:
 
     FROM +deps
     COPY --dir pubspec.yaml lib packages web test test_driver integration_test catalyst_voices
+    COPY ../+repo-catalyst-voices-packages/repo ../
     COPY ../+repo-catalyst-voices-packages/repo .
     WORKDIR /frontend/catalyst_voices/packages/catalyst_voices_services
     COPY ../catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
@@ -60,6 +64,19 @@ check-flutter-code-generator:
     # Check diff between local code and earthly artifacts
     RUN diff /tmp/repo_generated lib/generated/catalyst_gateway
 
+check-static-analysis:
+    FROM +src
+    WORKDIR repo
+    RUN melos bootstrap
+    RUN melos run analyze
+
+check-code-formatting:
+    FROM +src
+    WORKDIR repo
+    RUN melos bootstrap
+    RUN melos run format-check
+
+
 # Build web version of Catalyst Voices
 build:
     FROM +src
@@ -75,7 +92,7 @@ test-unit:
     FROM +build
     WORKDIR /frontend
     TRY
-        RUN flutter test --reporter expanded . --machine | tojunit --output flutter.junit-report.xml
+        RUN flutter test --reporter expanded . --coverage --machine | tojunit --output flutter.junit-report.xml
     FINALLY
         SAVE ARTIFACT flutter.junit-report.xml AS LOCAL flutter-unit-tests.junit-report.xml
     END

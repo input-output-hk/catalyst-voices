@@ -46,3 +46,11 @@ repo-catalyst-voices-packages:
     COPY --dir catalyst_voices_packages .
 
     SAVE ARTIFACT /repo repo
+
+repo-catalyst-voices:
+    FROM scratch
+
+    WORKDIR /repo
+    COPY . .
+
+    SAVE ARTIFACT /repo repo

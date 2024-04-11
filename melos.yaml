@@ -2,7 +2,7 @@ name: catalyst_voices
 repository: https://github.com/input-output-hk/catalyst-voices
 
 packages:
-  - catalyst_voices/*
+  - catalyst_voices
   - catalyst_voices/packages/**
   - catalyst_voices_packages/**
   - utilities/*
