@@ -53,7 +53,7 @@ scripts:
 
   metrics:
     run: |
-      melos exec -c 1 --ignore="*example*" -- \
+      melos exec --ignore="*example*" -- \
         flutter pub run dart_code_metrics:metrics analyze
     description: |
       Run `dart_code_metrics` in all packages.
@@ -61,7 +61,7 @@ scripts:
 
   test:select:
     run: |
-      melos exec -c 1 --dir-exists="test" -- flutter test
+      melos exec --dir-exists="test" -- flutter test
     description: Run `flutter test` for selected packages.
 
   test:
@@ -71,15 +71,11 @@ scripts:
 
   test-report:
     run: |
-      melos exec -c 1 --dir-exists="test" -- \
-        flutter test --reporter expanded --coverage --machine | tojunit > flutter.junit-report.xml
+      melos exec --dir-exists="test" -- \
+       "flutter test --reporter expanded --coverage --machine | tojunit --output flutter.junit-report.xml"
+      melos exec --dir-exists="test" -- \
+        "genhtml coverage/lcov.info --output-directory=coverage/"
     description: Run `flutter test` for all packages and generate junit and coverage reports.
-
-  coverage:
-    run: |
-      melos exec -- flutter test --coverage &&
-      melos exec -- genhtml coverage/lcov.info --output-directory=coverage/
-    description: Generate coverage for the selected package.
 
   build:pub_get:all:
     run: flutter pub get
