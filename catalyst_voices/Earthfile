@@ -10,9 +10,9 @@ deps:
     RUN apt-get update
     RUN apt-get install -y git curl unzip bzip2 bash jq gpg
     COPY --dir test_driver/scripts .
-    RUN chmod +x scripts/install-chrome-linux64.sh && ./scripts/install-chrome-linux64.sh
-    RUN chmod +x scripts/install-edge-linux64.sh && ./scripts/install-edge-linux64.sh
-    RUN chmod +x scripts/install-firefox-linux64.sh && ./scripts/install-firefox-linux64.sh
+    # RUN chmod +x scripts/install-chrome-linux64.sh && ./scripts/install-chrome-linux64.sh
+    # RUN chmod +x scripts/install-edge-linux64.sh && ./scripts/install-edge-linux64.sh
+    # RUN chmod +x scripts/install-firefox-linux64.sh && ./scripts/install-firefox-linux64.sh
 
     WORKDIR /frontend
 
@@ -75,7 +75,6 @@ check-code-formatting:
     WORKDIR repo
     RUN melos bootstrap
     RUN melos run format-check
-
 
 # Build web version of Catalyst Voices
 build:
