@@ -30,30 +30,20 @@ command:
 
 scripts:
   lint:
-    run: melos run analyze
+    run: melos analyze
     description: Run all static analysis checks.
 
   format:
-    run: melos exec -- dart format lib --fix
+    run: melos exec -c 1 -- dart format lib --fix
     description: Run `dart format` for all packages.
 
   format-check:
-    run: melos exec -- dart format lib --set-exit-if-changed
+    run: melos exec -c 1 -- dart format lib --set-exit-if-changed
     description: Run `dart format` checks for all packages.
-
-  analyze:
-    # We are setting the concurrency to 1 because a higher concurrency can crash
-    # the analysis server on low performance machines (like GitHub Actions).
-    run: |
-      melos exec -c 1 -- \
-        flutter analyze --fatal-infos
-    description: |
-      Run `flutter analyze` in all packages.
-       - Note: you can also rely on your IDEs Dart Analysis / Issues window.
 
   metrics:
     run: |
-      melos exec --ignore="*example*" -- \
+      melos exec -c 1 -- \
         flutter pub run dart_code_metrics:metrics analyze
     description: |
       Run `dart_code_metrics` in all packages.

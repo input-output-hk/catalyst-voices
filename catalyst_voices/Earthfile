@@ -16,8 +16,13 @@ deps:
 
     WORKDIR /frontend
 
-    RUN git clone https://github.com/flutter/flutter.git /usr/local/flutter
-    ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
+    # create a new user called "ci-flutter",
+    # flutter strongly recommends not running the command as root
+    RUN useradd -ms /bin/bash ci-flutter
+    USER ci-flutter
+
+    RUN git clone https://github.com/flutter/flutter.git /home/ci-flutter/sdk/
+    ENV PATH="/home/ci-flutter/sdk/bin:/home/ci-flutter/sdk/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
     RUN flutter channel stable
     RUN flutter upgrade
     RUN flutter --version
@@ -67,7 +72,7 @@ check-static-analysis:
     COPY ../+repo-catalyst-voices-all/repo repo/
     WORKDIR repo
     RUN melos bootstrap
-    RUN melos run analyze
+    RUN melos analyze --fatal-infos --fatal-warnings
 
 check-code-formatting:
     FROM +deps
