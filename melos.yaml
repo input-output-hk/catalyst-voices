@@ -38,11 +38,17 @@ scripts:
       - Note: you can also rely on your IDEs Dart Analysis / Issues window.
 
   format:
-    run: melos exec -c 1 -- dart format lib --fix
+    run: |
+      melos exec -c 1 --dir-exists="lib" -- dart format lib --fix
+      melos exec -c 1 --dir-exists="test" -- dart format test --fix
+      melos exec -c 1 --dir-exists="integration_test" -- dart format integration_test --fix
     description: Run `dart format` for all packages.
 
   format-check:
-    run: melos exec -c 1 -- dart format lib --set-exit-if-changed
+    run: |
+      melos exec -c 1 --dir-exists="lib" -- dart format lib  --set-exit-if-changed
+      melos exec -c 1 --dir-exists="test" -- dart format test  --set-exit-if-changed
+      melos exec -c 1 --dir-exists="integration_test" -- dart format integration_test  --set-exit-if-changed
     description: Run `dart format` checks for all packages.
 
   test:select:
