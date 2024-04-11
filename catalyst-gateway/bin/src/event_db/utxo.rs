@@ -14,14 +14,11 @@ pub(crate) type StakeAmount = i64;
 
 impl EventDB {
     /// Index utxo data
-    pub(crate) async fn index_utxo_data(
-        &self, tx: &MultiEraTx<'_>, slot_no: SlotNumber, network: Network,
-    ) -> Result<(), Error> {
+    #[allow(dead_code)]
+    pub(crate) async fn index_utxo_data(&self, tx: &MultiEraTx<'_>) -> Result<(), Error> {
         let conn = self.pool.get().await?;
 
         let tx_hash = tx.hash();
-        self.index_txn_data(tx_hash.as_slice(), slot_no, network)
-            .await?;
 
         // index outputs
         for (index, tx_out) in tx.outputs().iter().enumerate() {

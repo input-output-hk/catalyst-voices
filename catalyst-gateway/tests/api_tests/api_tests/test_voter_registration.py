@@ -9,6 +9,21 @@ from api_tests import (
 )
 
 
+def check_delegations(provided, expected):
+    if type(expected) is list:
+        for i in range(0, len(expected)):
+            expected_voting_key = expected[i][0]
+            expected_power = expected[i][1]
+            provided_voting_key = provided[i]["voting_key"]
+            provided_power = provided[i]["power"]
+            assert (
+                expected_voting_key == provided_voting_key
+                and expected_power == provided_power
+            )
+    else:
+        assert provided == expected
+
+
 def test_voter_registration_endpoint():
     check_is_live()
     check_is_ready()
@@ -38,3 +53,4 @@ def test_voter_registration_endpoint():
             res["rewards_address"] == expected_rewards_address
             and res["nonce"] == expected_nonce
         )
+        check_delegations(res["voting_info"], entry["delegations"])

@@ -31,5 +31,5 @@ test:
         --load cat-gateway-test:latest=(+cat-gateway-test) \
         --service cat-gateway \
         --allow-privileged
-        RUN poetry run pytest -s ./api_tests/test_voter_registration.py
+        RUN poetry run pytest -s
     END  

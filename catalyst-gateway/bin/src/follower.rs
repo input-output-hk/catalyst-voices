@@ -246,7 +246,7 @@ async fn init_follower(
                         }
 
                         // index utxo
-                        match db.index_utxo_data(&tx, slot, network).await {
+                        match db.index_utxo_data(&tx).await {
                             Ok(()) => (),
                             Err(err) => {
                                 error!("Unable to index utxo data for tx {:?} - skip..", err);
