@@ -87,6 +87,18 @@ Map<String, dynamic> _$HashToJson(Hash instance) => <String, dynamic>{
       'hash': instance.hash,
     };
 
+RegistrationInfo _$RegistrationInfoFromJson(Map<String, dynamic> json) =>
+    RegistrationInfo(
+      rewardsAddress: json['rewards_address'] as String,
+      txHash: json['tx_hash'] as String,
+    );
+
+Map<String, dynamic> _$RegistrationInfoToJson(RegistrationInfo instance) =>
+    <String, dynamic>{
+      'rewards_address': instance.rewardsAddress,
+      'tx_hash': instance.txHash,
+    };
+
 RejectedFragment _$RejectedFragmentFromJson(Map<String, dynamic> json) =>
     RejectedFragment(
       id: json['id'] as String,

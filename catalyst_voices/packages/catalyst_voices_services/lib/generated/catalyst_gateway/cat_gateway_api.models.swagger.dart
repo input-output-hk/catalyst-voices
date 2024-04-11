@@ -331,6 +331,63 @@ extension $HashExtension on Hash {
 }
 
 @JsonSerializable(explicitToJson: true)
+class RegistrationInfo {
+  const RegistrationInfo({
+    required this.rewardsAddress,
+    required this.txHash,
+  });
+
+  factory RegistrationInfo.fromJson(Map<String, dynamic> json) =>
+      _$RegistrationInfoFromJson(json);
+
+  static const toJsonFactory = _$RegistrationInfoToJson;
+  Map<String, dynamic> toJson() => _$RegistrationInfoToJson(this);
+
+  @JsonKey(name: 'rewards_address')
+  final String rewardsAddress;
+  @JsonKey(name: 'tx_hash')
+  final String txHash;
+  static const fromJsonFactory = _$RegistrationInfoFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is RegistrationInfo &&
+            (identical(other.rewardsAddress, rewardsAddress) ||
+                const DeepCollectionEquality()
+                    .equals(other.rewardsAddress, rewardsAddress)) &&
+            (identical(other.txHash, txHash) ||
+                const DeepCollectionEquality().equals(other.txHash, txHash)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(rewardsAddress) ^
+      const DeepCollectionEquality().hash(txHash) ^
+      runtimeType.hashCode;
+}
+
+extension $RegistrationInfoExtension on RegistrationInfo {
+  RegistrationInfo copyWith({String? rewardsAddress, String? txHash}) {
+    return RegistrationInfo(
+        rewardsAddress: rewardsAddress ?? this.rewardsAddress,
+        txHash: txHash ?? this.txHash);
+  }
+
+  RegistrationInfo copyWithWrapped(
+      {Wrapped<String>? rewardsAddress, Wrapped<String>? txHash}) {
+    return RegistrationInfo(
+        rewardsAddress: (rewardsAddress != null
+            ? rewardsAddress.value
+            : this.rewardsAddress),
+        txHash: (txHash != null ? txHash.value : this.txHash));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
 class RejectedFragment {
   const RejectedFragment({
     required this.id,
