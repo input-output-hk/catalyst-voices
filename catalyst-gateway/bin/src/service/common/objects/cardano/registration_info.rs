@@ -3,8 +3,8 @@
 use poem_openapi::{types::Example, Object, Union};
 
 use crate::{
-    event_db::voter_registration::{Nonce, PaymentAddress, TxId},
-    service::common::objects::cardano::hash::Hash,
+    event_db::voter_registration::{Nonce, PaymentAddress, PublicVotingInfo, TxId},
+    service::{common::objects::cardano::hash::Hash, utilities::to_hex_with_prefix},
 };
 
 /// Delegation type
@@ -51,12 +51,33 @@ pub(crate) struct RegistrationInfo {
 
 impl RegistrationInfo {
     /// Creates a new `RegistrationInfo`
-    pub(crate) fn new(tx_hash: TxId, rewards_address: PaymentAddress, nonce: Nonce) -> Self {
+    pub(crate) fn new(
+        tx_hash: TxId, rewards_address: &PaymentAddress, voting_info: PublicVotingInfo,
+        nonce: Nonce,
+    ) -> Self {
+        let voting_info = match voting_info {
+            PublicVotingInfo::Direct(voting_key) => {
+                VotingInfo::Direct(to_hex_with_prefix(voting_key.bytes()))
+            },
+            PublicVotingInfo::Delegated(delegations) => {
+                VotingInfo::Delegated(
+                    delegations
+                        .into_iter()
+                        .map(|(voting_key, power)| {
+                            Delegation {
+                                voting_key: to_hex_with_prefix(voting_key.bytes()),
+                                power,
+                            }
+                        })
+                        .collect(),
+                )
+            },
+        };
         Self {
             tx_hash: tx_hash.into(),
-            rewards_address: format!("0x{}", hex::encode(rewards_address)),
+            rewards_address: to_hex_with_prefix(rewards_address),
             nonce,
-            voting_info: VotingInfo::Delegated(vec![]),
+            voting_info,
         }
     }
 }
@@ -73,7 +94,11 @@ impl Example for RegistrationInfo {
             .expect("Invalid hex")
             .into(),
             nonce: 11_623_850,
-            voting_info: VotingInfo::Delegated(vec![]),
+            voting_info: VotingInfo::Delegated(vec![Delegation {
+                voting_key: "0xb16f03d67e95ddd321df4bee8658901eb183d4cb5623624ff5edd7fe54f8e857"
+                    .to_string(),
+                power: 1,
+            }]),
         }
     }
 }

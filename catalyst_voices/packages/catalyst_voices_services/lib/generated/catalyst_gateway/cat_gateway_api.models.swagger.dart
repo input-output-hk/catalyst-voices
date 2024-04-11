@@ -157,6 +157,60 @@ extension $DelegatePublicKeyExtension on DelegatePublicKey {
 }
 
 @JsonSerializable(explicitToJson: true)
+class Delegation {
+  const Delegation({
+    required this.votingKey,
+    required this.power,
+  });
+
+  factory Delegation.fromJson(Map<String, dynamic> json) =>
+      _$DelegationFromJson(json);
+
+  static const toJsonFactory = _$DelegationToJson;
+  Map<String, dynamic> toJson() => _$DelegationToJson(this);
+
+  @JsonKey(name: 'voting_key')
+  final String votingKey;
+  @JsonKey(name: 'power')
+  final int power;
+  static const fromJsonFactory = _$DelegationFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is Delegation &&
+            (identical(other.votingKey, votingKey) ||
+                const DeepCollectionEquality()
+                    .equals(other.votingKey, votingKey)) &&
+            (identical(other.power, power) ||
+                const DeepCollectionEquality().equals(other.power, power)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(votingKey) ^
+      const DeepCollectionEquality().hash(power) ^
+      runtimeType.hashCode;
+}
+
+extension $DelegationExtension on Delegation {
+  Delegation copyWith({String? votingKey, int? power}) {
+    return Delegation(
+        votingKey: votingKey ?? this.votingKey, power: power ?? this.power);
+  }
+
+  Delegation copyWithWrapped(
+      {Wrapped<String>? votingKey, Wrapped<int>? power}) {
+    return Delegation(
+        votingKey: (votingKey != null ? votingKey.value : this.votingKey),
+        power: (power != null ? power.value : this.power));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
 class FragmentStatus {
   const FragmentStatus();
 
@@ -335,6 +389,8 @@ class RegistrationInfo {
   const RegistrationInfo({
     required this.rewardsAddress,
     required this.txHash,
+    required this.nonce,
+    required this.votingInfo,
   });
 
   factory RegistrationInfo.fromJson(Map<String, dynamic> json) =>
@@ -347,6 +403,10 @@ class RegistrationInfo {
   final String rewardsAddress;
   @JsonKey(name: 'tx_hash')
   final String txHash;
+  @JsonKey(name: 'nonce')
+  final int nonce;
+  @JsonKey(name: 'voting_info')
+  final VotingInfo votingInfo;
   static const fromJsonFactory = _$RegistrationInfoFromJson;
 
   @override
@@ -357,7 +417,12 @@ class RegistrationInfo {
                 const DeepCollectionEquality()
                     .equals(other.rewardsAddress, rewardsAddress)) &&
             (identical(other.txHash, txHash) ||
-                const DeepCollectionEquality().equals(other.txHash, txHash)));
+                const DeepCollectionEquality().equals(other.txHash, txHash)) &&
+            (identical(other.nonce, nonce) ||
+                const DeepCollectionEquality().equals(other.nonce, nonce)) &&
+            (identical(other.votingInfo, votingInfo) ||
+                const DeepCollectionEquality()
+                    .equals(other.votingInfo, votingInfo)));
   }
 
   @override
@@ -367,23 +432,36 @@ class RegistrationInfo {
   int get hashCode =>
       const DeepCollectionEquality().hash(rewardsAddress) ^
       const DeepCollectionEquality().hash(txHash) ^
+      const DeepCollectionEquality().hash(nonce) ^
+      const DeepCollectionEquality().hash(votingInfo) ^
       runtimeType.hashCode;
 }
 
 extension $RegistrationInfoExtension on RegistrationInfo {
-  RegistrationInfo copyWith({String? rewardsAddress, String? txHash}) {
+  RegistrationInfo copyWith(
+      {String? rewardsAddress,
+      String? txHash,
+      int? nonce,
+      VotingInfo? votingInfo}) {
     return RegistrationInfo(
         rewardsAddress: rewardsAddress ?? this.rewardsAddress,
-        txHash: txHash ?? this.txHash);
+        txHash: txHash ?? this.txHash,
+        nonce: nonce ?? this.nonce,
+        votingInfo: votingInfo ?? this.votingInfo);
   }
 
   RegistrationInfo copyWithWrapped(
-      {Wrapped<String>? rewardsAddress, Wrapped<String>? txHash}) {
+      {Wrapped<String>? rewardsAddress,
+      Wrapped<String>? txHash,
+      Wrapped<int>? nonce,
+      Wrapped<VotingInfo>? votingInfo}) {
     return RegistrationInfo(
         rewardsAddress: (rewardsAddress != null
             ? rewardsAddress.value
             : this.rewardsAddress),
-        txHash: (txHash != null ? txHash.value : this.txHash));
+        txHash: (txHash != null ? txHash.value : this.txHash),
+        nonce: (nonce != null ? nonce.value : this.nonce),
+        votingInfo: (votingInfo != null ? votingInfo.value : this.votingInfo));
   }
 }
 
@@ -1129,6 +1207,7 @@ extension $VoterRegistrationExtension on VoterRegistration {
   }
 }
 
+typedef VotingInfo = Map<String, dynamic>;
 String? animalsNullableToJson(enums.Animals? animals) {
   return animals?.value;
 }

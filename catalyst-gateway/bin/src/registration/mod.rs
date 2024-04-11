@@ -72,6 +72,11 @@ impl PubKey {
         context.result(&mut digest);
         digest
     }
+
+    /// Get bytes
+    pub(crate) fn bytes(&self) -> &[u8] {
+        &self.0
+    }
 }
 
 /// Ed25519 signature.
@@ -168,7 +173,7 @@ pub enum VotingInfo {
     ///
     /// Voting power is based on the staked ada of the delegated keys
     /// order of elements is important and must be preserved.
-    Delegated(Vec<(PubKey, u64)>),
+    Delegated(Vec<(PubKey, i64)>),
 }
 
 impl Default for VotingInfo {
@@ -271,7 +276,7 @@ pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingInfo, Box<
     {
         (Value::Integer(_one), Value::Bytes(direct)) => VotingInfo::Direct(PubKey(direct.clone())),
         (Value::Integer(_one), Value::Array(delegations)) => {
-            let mut delegations_map: Vec<(PubKey, u64)> = Vec::new();
+            let mut delegations_map: Vec<(PubKey, i64)> = Vec::new();
             for d in delegations {
                 match d {
                     Value::Array(delegations) => {

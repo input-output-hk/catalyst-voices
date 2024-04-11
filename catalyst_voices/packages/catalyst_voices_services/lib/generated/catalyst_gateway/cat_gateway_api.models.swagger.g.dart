@@ -38,6 +38,17 @@ Map<String, dynamic> _$DelegatePublicKeyToJson(DelegatePublicKey instance) =>
       'address': instance.address,
     };
 
+Delegation _$DelegationFromJson(Map<String, dynamic> json) => Delegation(
+      votingKey: json['voting_key'] as String,
+      power: json['power'] as int,
+    );
+
+Map<String, dynamic> _$DelegationToJson(Delegation instance) =>
+    <String, dynamic>{
+      'voting_key': instance.votingKey,
+      'power': instance.power,
+    };
+
 FragmentStatus _$FragmentStatusFromJson(Map<String, dynamic> json) =>
     FragmentStatus();
 
@@ -91,12 +102,16 @@ RegistrationInfo _$RegistrationInfoFromJson(Map<String, dynamic> json) =>
     RegistrationInfo(
       rewardsAddress: json['rewards_address'] as String,
       txHash: json['tx_hash'] as String,
+      nonce: json['nonce'] as int,
+      votingInfo: json['voting_info'] as Map<String, dynamic>,
     );
 
 Map<String, dynamic> _$RegistrationInfoToJson(RegistrationInfo instance) =>
     <String, dynamic>{
       'rewards_address': instance.rewardsAddress,
       'tx_hash': instance.txHash,
+      'nonce': instance.nonce,
+      'voting_info': instance.votingInfo,
     };
 
 RejectedFragment _$RejectedFragmentFromJson(Map<String, dynamic> json) =>

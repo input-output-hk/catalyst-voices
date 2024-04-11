@@ -9,6 +9,11 @@ use crate::service::common::{
     objects::cardano::network::Network, responses::resp_4xx::ApiValidationError,
 };
 
+/// Convert bytes to hex string with the `0x` prefix
+pub(crate) fn to_hex_with_prefix(bytes: &[u8]) -> String {
+    format!("0x{}", hex::encode(bytes))
+}
+
 /// Check the provided network type with the encoded inside the stake address
 pub(crate) fn check_network(
     address_network: PallasNetwork, provided_network: Option<Network>,

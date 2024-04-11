@@ -65,10 +65,11 @@ pub(crate) async fn endpoint(
         .get_registration_info(stake_credential, network.into(), date_time)
         .await
     {
-        Ok((tx_id, payment_address, _voting_info, nonce)) => {
+        Ok((tx_id, payment_address, voting_info, nonce)) => {
             T200(OK(Json(RegistrationInfo::new(
                 tx_id,
-                payment_address,
+                &payment_address,
+                voting_info,
                 nonce,
             ))))
         },
