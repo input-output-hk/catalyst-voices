@@ -19,6 +19,6 @@ WHERE
   AND cardano_txn_index.network = $2
   AND cardano_txn_index.slot_no <= $3
 
-ORDER BY cardano_txn_index.nonce DESC
+ORDER BY cardano_voter_registration.nonce DESC
 
 LIMIT 1;
