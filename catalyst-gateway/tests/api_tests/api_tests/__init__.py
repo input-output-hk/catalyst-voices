@@ -76,6 +76,7 @@ def get_voter_registration(address: str, network: str, slot_number: int):
             f"api/cardano/registration/{address}?network={network}&slot_number={slot_number}"
         )
     )
+    logger.info(f"get_voter_registration resp: {resp}")
     assert resp.status_code == 200 or resp.status_code == 404
     if resp.status_code == 200:
         return resp.json()
