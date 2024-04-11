@@ -29,14 +29,6 @@ command:
       mocktail: ^1.0.1
 
 scripts:
-  lint:
-    run: melos analyze
-    description: Run all static analysis checks.
-
-  analyze:
-    run: melos analyze
-    description: Run all static analysis checks.
-
   metrics:
     run: |
       melos exec -c 1 -- \
@@ -89,9 +81,3 @@ scripts:
       Run `flutter test` for all packages and generate junit and coverage reports.
       The test reports are saved in /test_reports folder.
       The coverages are saved for each package separately in /coverage folder.
-
-  build:pub_get:all:
-    run: flutter pub get
-    exec:
-      concurrency: 6
-    description: Install all dependencies
