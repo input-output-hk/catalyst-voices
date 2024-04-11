@@ -4,6 +4,7 @@ use std::{error::Error, io::Cursor};
 
 use cardano_chain_follower::Network;
 use ciborium::Value;
+use cryptoxide::{blake2b::Blake2b, digest::Digest};
 use pallas::ledger::{primitives::Fragment, traverse::MultiEraMeta};
 use serde::{Deserialize, Serialize};
 
@@ -43,7 +44,7 @@ pub struct Nonce(pub u64);
 
 /// Voting purpose
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
-pub struct VotingPurpose(pub u64);
+pub struct VotingPurpose(u64);
 
 /// Rewards address
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
@@ -51,7 +52,7 @@ pub struct RewardsAddress(pub Vec<u8>);
 
 /// Stake key
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
-pub struct StakeKey(pub PubKey);
+pub struct StakeKey(PubKey);
 
 /// Error report for serializing
 pub type ErrorReport = Vec<String>;
@@ -65,6 +66,17 @@ pub type ComponentBytes = [u8; COMPONENT_SIZE];
 
 /// Ed25519 signature serialized as a byte array.
 pub type SignatureBytes = [u8; Signature::BYTE_SIZE];
+
+impl StakeKey {
+    /// Get stake creadentials, a blake2b 28 hash of the stake key
+    pub(crate) fn get_credential(&self) -> [u8; 28] {
+        let mut digest = [0u8; 28];
+        let mut context = Blake2b::new(28);
+        context.input(&self.0 .0);
+        context.result(&mut digest);
+        digest
+    }
+}
 
 /// Ed25519 signature.
 ///

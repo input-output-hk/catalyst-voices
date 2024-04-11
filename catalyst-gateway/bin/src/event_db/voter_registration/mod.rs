@@ -119,7 +119,9 @@ impl EventDB {
             };
             self.insert_voter_registration(
                 tx.hash().to_vec(),
-                registration.stake_key.map(|val| val.0 .0),
+                registration
+                    .stake_key
+                    .map(|val| val.get_credential().to_vec()),
                 encoded_voting_key,
                 registration.rewards_address.map(|val| val.0),
                 registration.raw_cbor_cip36,
