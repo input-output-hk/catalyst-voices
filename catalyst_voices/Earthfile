@@ -30,7 +30,6 @@ deps:
 src:
     FROM +deps
     COPY --dir pubspec.yaml lib packages web test test_driver integration_test .
-    COPY ../+repo-catalyst-voices-all/repo repo/
 
 # code-generator - Generates flutter code.
 # Based on Catalyst Gateway OpenAPI specifications generates models, clients
@@ -65,13 +64,15 @@ check-flutter-code-generator:
     RUN diff /tmp/repo_generated lib/generated/catalyst_gateway
 
 check-static-analysis:
-    FROM +src
+    FROM +deps
+    COPY ../+repo-catalyst-voices-all/repo repo/
     WORKDIR repo
     RUN melos bootstrap
     RUN melos run analyze
 
 check-code-formatting:
-    FROM +src
+    FROM +deps
+    COPY ../+repo-catalyst-voices-all/repo repo/
     WORKDIR repo
     RUN melos bootstrap
     RUN melos run format-check
