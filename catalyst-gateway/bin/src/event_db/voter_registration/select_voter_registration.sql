@@ -1,6 +1,6 @@
 SELECT
-  payment_address,
-  tx_id
+  cardano_voter_registration.payment_address,
+  cardano_voter_registration.tx_id
 
 FROM cardano_voter_registration
 
@@ -18,7 +18,7 @@ WHERE
   AND cardano_voter_registration.stake_credential = $1
   AND cardano_txn_index.network = $2
   AND cardano_txn_index.slot_no <= $3
-  
-ORDER BY cardano_txn_index.nonce DESC 
+
+ORDER BY cardano_txn_index.nonce DESC
 
 LIMIT 1;
