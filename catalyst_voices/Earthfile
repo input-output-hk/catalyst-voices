@@ -87,7 +87,7 @@ build:
     WORKDIR /frontend/build
     SAVE ARTIFACT web /web AS LOCAL web
 
-test-report:
+test-unit:
     FROM +deps
     COPY ../+repo-catalyst-voices-all/repo repo/
     WORKDIR repo
