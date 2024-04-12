@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_services/generated/catalyst_gateway/cat_gateway_api.enums.swagger.dart' as enums;
+import 'package:catalyst_voices_services/generated/catalyst_gateway/cat_gateway_api.enums.swagger.dart'
+    as enums;
 import 'package:catalyst_voices_services/generated/catalyst_gateway/cat_gateway_api.swagger.dart';
 import 'package:chopper/chopper.dart';
 import 'package:result_type/result_type.dart';
@@ -15,9 +16,9 @@ import 'package:result_type/result_type.dart';
 // The repository uses, under the hood, the [CatGatewayApi] directly generated
 // from backend OpenAPI specification.
 //
-// To use the repository is necessary to initialize it by specifying the API 
+// To use the repository is necessary to initialize it by specifying the API
 // base URL:
-// 
+//
 // ```dart
 // final repository = CatalystDataGatewayRepository(Uri.parse('https://example.org/api'));
 // ```
@@ -28,7 +29,7 @@ import 'package:result_type/result_type.dart';
 // ```dart
 // final health_status = await repository.getHealthLive();
 // ```
-// 
+//
 // fetch staked ADA by stake address:
 //
 // ```dart
@@ -48,11 +49,10 @@ final class CatalystDataGatewayRepository {
   final CatGatewayApi _catGatewayApi;
 
   CatalystDataGatewayRepository(
-    Uri baseUrl,
-    {CatGatewayApi? catGatewayApiInstance,}
-  )
-    : _catGatewayApi = catGatewayApiInstance ?? 
-      CatGatewayApi.create(baseUrl: baseUrl);
+    Uri baseUrl, {
+    CatGatewayApi? catGatewayApiInstance,
+  }) : _catGatewayApi =
+            catGatewayApiInstance ?? CatGatewayApi.create(baseUrl: baseUrl);
 
   Future<Result<void, NetworkErrors>> getHealthStarted() async {
     try {
@@ -120,10 +120,10 @@ final class CatalystDataGatewayRepository {
   Result<void, NetworkErrors> _emptyBodyOrThrow(Response<dynamic> response) {
     // `bodyOrThrow` from chopper can't be used when the body is empty (like in
     // case the endpoint replies with 204) because it would throw an exception
-    // as a false positive. 
+    // as a false positive.
     if (response.isSuccessful) {
       return Success(null);
     }
     throw ChopperHttpException(response);
-  } 
+  }
 }

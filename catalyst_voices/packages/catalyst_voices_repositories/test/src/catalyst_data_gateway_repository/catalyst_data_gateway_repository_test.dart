@@ -214,10 +214,12 @@ void main() {
     });
 
     test('getCardanoSyncState success', () async {
+      const blockHash =
+          '0x0000000000000000000000000000000000000000000000000000000000000000';
+
       final syncState = SyncState(
         slotNumber: 5,
-        blockHash:
-          '0x0000000000000000000000000000000000000000000000000000000000000000',
+        blockHash: blockHash,
         lastUpdated: DateTime.utc(1970),
       );
       final repository = setupRepository<SyncState>(
