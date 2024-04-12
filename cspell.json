@@ -175,5 +175,6 @@
         "web-components.min.js",
         "**/generated/**",
         "utilities/catalyst_voices_remote_widgets/example/**/**",
+        "**/*.svg"
     ]
 }
