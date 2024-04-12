@@ -1,4 +1,5 @@
 SELECT
+  network,
   slot_no,
   block_hash,
   ended

@@ -115,36 +115,6 @@ Map<String, dynamic> _$ServerErrorPayloadToJson(ServerErrorPayload instance) =>
       'issue': instance.issue,
     };
 
-Slot _$SlotFromJson(Map<String, dynamic> json) => Slot(
-      slotNumber: json['slot_number'] as int,
-      blockHash: json['block_hash'] as String,
-      blockTime: DateTime.parse(json['block_time'] as String),
-    );
-
-Map<String, dynamic> _$SlotToJson(Slot instance) => <String, dynamic>{
-      'slot_number': instance.slotNumber,
-      'block_hash': instance.blockHash,
-      'block_time': instance.blockTime.toIso8601String(),
-    };
-
-SlotInfo _$SlotInfoFromJson(Map<String, dynamic> json) => SlotInfo(
-      previous: json['previous'] == null
-          ? null
-          : Slot.fromJson(json['previous'] as Map<String, dynamic>),
-      current: json['current'] == null
-          ? null
-          : Slot.fromJson(json['current'] as Map<String, dynamic>),
-      next: json['next'] == null
-          ? null
-          : Slot.fromJson(json['next'] as Map<String, dynamic>),
-    );
-
-Map<String, dynamic> _$SlotInfoToJson(SlotInfo instance) => <String, dynamic>{
-      'previous': instance.previous?.toJson(),
-      'current': instance.current?.toJson(),
-      'next': instance.next?.toJson(),
-    };
-
 StakeInfo _$StakeInfoFromJson(Map<String, dynamic> json) => StakeInfo(
       amount: json['amount'] as int,
       slotNumber: json['slot_number'] as int,

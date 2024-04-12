@@ -1,4 +1,4 @@
-//! Implementation of the GET `/staked_ada` endpoint
+//! Implementation of the GET `/utxo/staked_ada` endpoint
 
 use poem_extensions::{
     response,
@@ -69,7 +69,7 @@ fn check_network(
     }
 }
 
-/// # GET `/staked_ada`
+/// # GET `/utxo/staked_ada`
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(
     state: &State, stake_address: StakeAddress, provided_network: Option<Network>,

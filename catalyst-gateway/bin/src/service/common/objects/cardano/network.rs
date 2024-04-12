@@ -3,7 +3,7 @@
 use poem_openapi::Enum;
 
 /// Cardano network type.
-#[derive(Clone, Enum, Debug)]
+#[derive(Enum, Debug)]
 pub(crate) enum Network {
     /// Cardano mainnet.
     #[oai(rename = "mainnet")]

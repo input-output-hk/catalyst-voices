@@ -1,8 +1,9 @@
 //! Defines API schemas of Cardano sync state types.
 
+use chrono::DateTime;
 use poem_openapi::{types::Example, Object};
 
-use crate::event_db::follower::{BlockHash, DateTime, SlotNumber};
+use crate::event_db::follower::{BlockHash, BlockTime, SlotNumber};
 
 /// Cardano follower's sync state info.
 #[derive(Debug, Object)]
@@ -18,7 +19,7 @@ pub(crate) struct SyncState {
     pub(crate) block_hash: BlockHash,
 
     /// last updated time.
-    pub(crate) last_updated: DateTime,
+    pub(crate) last_updated: BlockTime,
 }
 
 impl Example for SyncState {
@@ -28,7 +29,7 @@ impl Example for SyncState {
             block_hash: "0x0000000000000000000000000000000000000000000000000000000000000000"
                 .parse()
                 .unwrap(),
-            last_updated: chrono::DateTime::default(),
+            last_updated: DateTime::default(),
         }
     }
 }
