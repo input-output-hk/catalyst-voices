@@ -48,6 +48,15 @@ impl EventDB {
     ) -> Result<(), Error> {
         let conn = self.pool.get().await?;
 
+        // for the catalyst we dont support multiple delegations
+        let multiple_delegations = public_voting_key.as_ref().is_some_and(|voting_info| {
+            if let PublicVotingInfo::Delegated(delegations) = voting_info {
+                delegations.len() > 1
+            } else {
+                false
+            }
+        });
+
         let encoded_voting_key = if let Some(voting_key) = public_voting_key {
             Some(
                 serde_json::to_string(&voting_key)
@@ -59,7 +68,8 @@ impl EventDB {
             None
         };
 
-        let is_valid = stake_credential.is_some()
+        let is_valid = !multiple_delegations
+            && stake_credential.is_some()
             && encoded_voting_key.is_some()
             && payment_address.is_some()
             && metadata_cip36.is_some()
