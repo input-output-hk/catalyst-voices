@@ -16,7 +16,7 @@ cat-gateway-test:
     FROM ../../+package-cat-gateway --address=$CAT_ADDRESS --db_url=$DB_URL --log_level=$LOG_LEVEL
 
     # copy preprod mithril snapshot to /tmp/preprod dir
-    COPY github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:feat/update-preprod+package-preprod-snapshot/snapshot /tmp/preprod
+    COPY github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:v2.11.1+package-preprod-snapshot/snapshot /tmp/preprod
 
     SAVE IMAGE cat-gateway-test:latest
 
