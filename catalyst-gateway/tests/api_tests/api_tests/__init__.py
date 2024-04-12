@@ -70,6 +70,17 @@ def get_date_time_to_slot_number(network: str, date_time: datetime):
     return resp.json()
 
 
+def get_voter_registration(address: str, network: str, slot_number: int):
+    resp = requests.get(
+        cat_gateway_endpoint_url(
+            f"api/cardano/registration/{address}?network={network}&slot_number={slot_number}"
+        )
+    )
+    assert resp.status_code == 200 or resp.status_code == 404
+    if resp.status_code == 200:
+        return resp.json()
+
+
 # Wait until service will sync to the provided slot number
 def sync_to(network: str, slot_num: int, timeout: int):
     start_time = time.time()

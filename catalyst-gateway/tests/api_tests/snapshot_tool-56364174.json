@@ -205,7 +205,7 @@
     "voting_power": 403470717,
     "voting_purpose": 0,
     "tx_id": 1205915,
-    "nonce": 36151489
+    "nonce": 36168765
   },
   {
     "delegations": [
@@ -224,7 +224,7 @@
   {
     "delegations": [
       [
-        "0x926cddb15c7ec46a71db0323d1d8ab18a83f8f9d73e159000b2dcfc3f7050de0",
+        "0x030606c166a947a33bf60043e70f240eac1df7936aa056429f2521553f9d4220",
         1
       ]
     ],
@@ -233,7 +233,7 @@
     "voting_power": 894284145,
     "voting_purpose": 0,
     "tx_id": 1151432,
-    "nonce": 36190561
+    "nonce": 181865062
   },
   {
     "delegations": "0x1493fb2c46ef5e99928f08776b83166b2b18833389d06f8cb66e816e3829a627",

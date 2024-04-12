@@ -14,63 +14,57 @@ pub(crate) type StakeAmount = i64;
 
 impl EventDB {
     /// Index utxo data
-    pub(crate) async fn index_utxo_data(
-        &self, txs: Vec<MultiEraTx<'_>>, slot_no: SlotNumber, network: Network,
-    ) -> Result<(), Error> {
+    pub(crate) async fn index_utxo_data(&self, tx: &MultiEraTx<'_>) -> Result<(), Error> {
         let conn = self.pool.get().await?;
 
-        for tx in txs {
-            let tx_hash = tx.hash();
-            self.index_txn_data(tx_hash.as_slice(), slot_no, network)
+        let tx_hash = tx.hash();
+
+        // index outputs
+        for (index, tx_out) in tx.outputs().iter().enumerate() {
+            // extract assets
+            let assets = serde_json::to_value(parse_policy_assets(&tx_out.non_ada_assets()))
+                .map_err(|e| Error::AssetParsingIssue(format!("Asset parsing issue {e}")))?;
+
+            let stake_address = match tx_out
+                .address()
+                .map_err(|e| Error::Unknown(format!("Address issue {e}")))?
+            {
+                Address::Shelley(address) => address.try_into().ok(),
+                Address::Stake(stake_address) => Some(stake_address),
+                Address::Byron(_) => None,
+            };
+            let stake_credential = stake_address.map(|val| val.payload().as_hash().to_vec());
+
+            let _rows = conn
+                .query(
+                    include_str!("../../../event-db/queries/utxo/insert_utxo.sql"),
+                    &[
+                        &i32::try_from(index).map_err(|e| Error::Unknown(e.to_string()))?,
+                        &tx_hash.as_slice(),
+                        &i64::try_from(tx_out.lovelace_amount())
+                            .map_err(|e| Error::Unknown(e.to_string()))?,
+                        &stake_credential,
+                        &assets,
+                    ],
+                )
                 .await?;
+        }
+        // update outputs with inputs
+        for tx_in in tx.inputs() {
+            let output = tx_in.output_ref();
+            let output_tx_hash = output.hash();
+            let out_index = output.index();
 
-            // index outputs
-            for (index, tx_out) in tx.outputs().iter().enumerate() {
-                // extract assets
-                let assets = serde_json::to_value(parse_policy_assets(&tx_out.non_ada_assets()))
-                    .map_err(|e| Error::AssetParsingIssue(format!("Asset parsing issue {e}")))?;
-
-                let stake_address = match tx_out
-                    .address()
-                    .map_err(|e| Error::Unknown(format!("Address issue {e}")))?
-                {
-                    Address::Shelley(address) => address.try_into().ok(),
-                    Address::Stake(stake_address) => Some(stake_address),
-                    Address::Byron(_) => None,
-                };
-                let stake_credential = stake_address.map(|val| val.payload().as_hash().to_vec());
-
-                let _rows = conn
-                    .query(
-                        include_str!("../../../event-db/queries/utxo/insert_utxo.sql"),
-                        &[
-                            &i32::try_from(index).map_err(|e| Error::Unknown(e.to_string()))?,
-                            &tx_hash.as_slice(),
-                            &i64::try_from(tx_out.lovelace_amount())
-                                .map_err(|e| Error::Unknown(e.to_string()))?,
-                            &stake_credential,
-                            &assets,
-                        ],
-                    )
-                    .await?;
-            }
-            // update outputs with inputs
-            for tx_in in tx.inputs() {
-                let output = tx_in.output_ref();
-                let output_tx_hash = output.hash();
-                let out_index = output.index();
-
-                let _rows = conn
-                    .query(
-                        include_str!("../../../event-db/queries/utxo/update_utxo.sql"),
-                        &[
-                            &tx_hash.as_slice(),
-                            &output_tx_hash.as_slice(),
-                            &i32::try_from(out_index).map_err(|e| Error::Unknown(e.to_string()))?,
-                        ],
-                    )
-                    .await?;
-            }
+            let _rows = conn
+                .query(
+                    include_str!("../../../event-db/queries/utxo/update_utxo.sql"),
+                    &[
+                        &tx_hash.as_slice(),
+                        &output_tx_hash.as_slice(),
+                        &i32::try_from(out_index).map_err(|e| Error::Unknown(e.to_string()))?,
+                    ],
+                )
+                .await?;
         }
 
         Ok(())
@@ -94,7 +88,7 @@ impl EventDB {
 
     /// Get total utxo amount
     pub(crate) async fn total_utxo_amount(
-        &self, stake_credential: StakeCredential<'_>, network: Network, slot_num: SlotNumber,
+        &self, stake_credential: StakeCredential, network: Network, slot_num: SlotNumber,
     ) -> Result<(StakeAmount, SlotNumber), Error> {
         let conn = self.pool.get().await?;
 

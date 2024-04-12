@@ -75,7 +75,7 @@ pub(crate) async fn endpoint(
             Ok((slot_number, block_hash, block_time)) => {
                 Ok(Some(Slot {
                     slot_number,
-                    block_hash,
+                    block_hash: From::from(block_hash),
                     block_time,
                 }))
             },
