@@ -14,12 +14,12 @@ deps:
     RUN chmod +x scripts/install-edge-linux64.sh && ./scripts/install-edge-linux64.sh
     RUN chmod +x scripts/install-firefox-linux64.sh && ./scripts/install-firefox-linux64.sh
 
-    WORKDIR /frontend
-
     # create a new user called "ci-flutter",
     # flutter strongly recommends not running the command as root
     RUN useradd -ms /bin/bash ci-flutter
     USER ci-flutter
+
+    WORKDIR /frontend
 
     RUN git clone https://github.com/flutter/flutter.git /home/ci-flutter/sdk/
     ENV PATH="/home/ci-flutter/sdk/bin:/home/ci-flutter/sdk/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
