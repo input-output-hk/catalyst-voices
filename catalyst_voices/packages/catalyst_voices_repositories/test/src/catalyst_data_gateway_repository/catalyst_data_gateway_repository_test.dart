@@ -10,6 +10,8 @@ import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
+const _notUsed = Object();
+
 // `@GenerateNiceMocks` from `mockito` can't be used here because
 // `chopper.Response` use the `base` modifier which "disallows
 // implementations outside of its own library". For this reason
@@ -18,7 +20,9 @@ import 'package:test/test.dart';
 class FakeCatGatewayApi<T> extends Fake implements CatGatewayApi {
   final chopper.Response<T> response;
 
-  FakeCatGatewayApi(this.response);
+  FakeCatGatewayApi(
+    this.response
+  );
 
   @override
   Future<chopper.Response<dynamic>> apiHealthStartedGet() async => response;
