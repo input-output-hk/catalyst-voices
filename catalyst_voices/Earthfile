@@ -7,6 +7,14 @@ VERSION --try --global-cache --arg-scope-and-set 0.7
 # subcommand.
 deps:
     FROM debian:bookworm-slim
+    ARG TARGETARCH
+    ARG TARGETOS
+    ARG NATIVEOS
+    ARG TARGETPLATFORM
+    RUN --no-cache echo "tarch "$TARGETARCH
+    RUN --no-cache echo "tos " $TARGETOS
+    RUN --no-cache echo "nos " $NATIVEOS
+    RUN --no-cache echo "tplatform " $TARGETPLATFORM
     RUN apt-get update
     RUN apt-get install -y git curl unzip bzip2 bash jq gpg
     COPY --dir test_driver/scripts .
