@@ -10,8 +10,6 @@ import 'package:http/http.dart' as http;
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-const _notUsed = Object();
-
 // `@GenerateNiceMocks` from `mockito` can't be used here because
 // `chopper.Response` use the `base` modifier which "disallows
 // implementations outside of its own library". For this reason
@@ -20,9 +18,7 @@ const _notUsed = Object();
 class FakeCatGatewayApi<T> extends Fake implements CatGatewayApi {
   final chopper.Response<T> response;
 
-  FakeCatGatewayApi(
-    this.response
-  );
+  FakeCatGatewayApi(this.response);
 
   @override
   Future<chopper.Response<dynamic>> apiHealthStartedGet() async => response;
@@ -218,10 +214,12 @@ void main() {
     });
 
     test('getCardanoSyncState success', () async {
+      const blockHash =
+          '0x0000000000000000000000000000000000000000000000000000000000000000';
+      
       final syncState = SyncState(
         slotNumber: 5,
-        blockHash:
-            '0x0000000000000000000000000000000000000000000000000000000000000000',
+        blockHash: blockHash,
         lastUpdated: DateTime.utc(1970),
       );
       final repository = setupRepository<SyncState>(
