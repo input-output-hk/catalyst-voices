@@ -216,7 +216,7 @@ void main() {
     test('getCardanoSyncState success', () async {
       const blockHash =
           '0x0000000000000000000000000000000000000000000000000000000000000000';
-      
+
       final syncState = SyncState(
         slotNumber: 5,
         blockHash: blockHash,
