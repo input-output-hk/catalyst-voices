@@ -1,12 +1,12 @@
 VERSION --global-cache 0.7
 
 builder:
-    FROM github.com/input-output-hk/catalyst-ci/earthly/python:v2.11.0+python-base
+    FROM github.com/input-output-hk/catalyst-ci/earthly/python:v2.11.1+python-base
 
     # prepare tests
     COPY --dir ./api_tests .
     COPY ./snapshot_tool-56364174.json .
-    DO github.com/input-output-hk/catalyst-ci/earthly/python:v2.11.0+BUILDER
+    DO github.com/input-output-hk/catalyst-ci/earthly/python:v2.11.1+BUILDER
 
 cat-gateway-test:
     ARG DB_URL="postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev"

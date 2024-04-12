@@ -82,17 +82,10 @@ impl EventDB {
     ) -> Result<(), Error> {
         let conn = self.pool.get().await?;
 
-        let network = match network {
-            Network::Mainnet => "mainnet".to_string(),
-            Network::Preview => "preview".to_string(),
-            Network::Preprod => "preprod".to_string(),
-            Network::Testnet => "testnet".to_string(),
-        };
-
         let _rows = conn
             .query(
                 include_str!("../../../event-db/queries/utxo/insert_txn_index.sql"),
-                &[&tx_id, &slot_no, &network],
+                &[&tx_id, &slot_no, &network.to_string()],
             )
             .await?;
 
@@ -105,17 +98,10 @@ impl EventDB {
     ) -> Result<(StakeAmount, SlotNumber), Error> {
         let conn = self.pool.get().await?;
 
-        let network = match network {
-            Network::Mainnet => "mainnet".to_string(),
-            Network::Preview => "preview".to_string(),
-            Network::Preprod => "preprod".to_string(),
-            Network::Testnet => "testnet".to_string(),
-        };
-
         let row = conn
             .query_one(
                 include_str!("../../../event-db/queries/utxo/select_total_utxo_amount.sql"),
-                &[&stake_credential, &network, &slot_num],
+                &[&stake_credential, &network.to_string(), &slot_num],
             )
             .await?;
 
