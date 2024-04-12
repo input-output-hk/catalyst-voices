@@ -169,7 +169,7 @@ impl EventDB {
         let tx_id = row.try_get(TX_ID_COLUMN)?;
         let payment_address = row.try_get(PAYMENT_ADDRESS_COLUMN)?;
         let nonce = row.try_get(NONCE_COLUMN)?;
-        let public_voting_info: PublicVotingInfo = serde_json::from_str(
+        let public_voting_info = serde_json::from_str(
             &String::from_utf8(row.try_get(PUBLIC_VOTING_KEY_COLUMN)?)
                 .map_err(|_| Error::Unknown("Cannot parse public voting key".to_string()))?,
         )

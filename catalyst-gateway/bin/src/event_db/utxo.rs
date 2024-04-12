@@ -14,7 +14,6 @@ pub(crate) type StakeAmount = i64;
 
 impl EventDB {
     /// Index utxo data
-    #[allow(dead_code)]
     pub(crate) async fn index_utxo_data(&self, tx: &MultiEraTx<'_>) -> Result<(), Error> {
         let conn = self.pool.get().await?;
 

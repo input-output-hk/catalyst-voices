@@ -65,9 +65,11 @@ impl Type for Hash {
 
 impl ParseFromParameter for Hash {
     fn parse_from_parameter(param: &str) -> ParseResult<Self> {
-        hex::decode(param)
-            .map_err(|_| ParseError::custom("Invalid Cardano hash. Should be hex string."))
-            .map(Self)
+        hex::decode(param.strip_prefix("0x").ok_or(ParseError::custom(
+            "Invalid Cardano hash. hex string should start with `0x`.",
+        ))?)
+        .map_err(|_| ParseError::custom("Invalid Cardano hash. Should be hex string."))
+        .map(Self)
     }
 }
 
