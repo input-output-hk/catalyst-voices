@@ -5,7 +5,7 @@ use pallas::ledger::{addresses::Address, traverse::MultiEraTx};
 
 use super::{follower::SlotNumber, voter_registration::StakeCredential};
 use crate::{
-    event_db::{Error, EventDB},
+    event_db::{error::Error, EventDB},
     util::parse_policy_assets,
 };
 

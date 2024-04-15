@@ -4,7 +4,7 @@ use cardano_chain_follower::Network;
 use pallas::ledger::traverse::MultiEraTx;
 use serde_json::json;
 
-use super::{follower::SlotNumber, Error, EventDB};
+use super::{error::Error, follower::SlotNumber, EventDB};
 use crate::registration::{
     parse_registrations_from_metadata, validate_reg_cddl, CddlConfig, ErrorReport, VotingInfo,
 };

@@ -4,7 +4,6 @@ use std::str::FromStr;
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
 use dotenvy::dotenv;
-use error::Error;
 use tokio_postgres::NoTls;
 
 pub(crate) mod config;
