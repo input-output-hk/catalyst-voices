@@ -5,8 +5,8 @@ use poem_openapi::payload::Json;
 
 use crate::{
     event_db::{
-        error::Error as DBError,
-        follower::{DateTime, SlotInfoQueryType},
+        error::NotFoundError,
+        follower::{BlockHash, DateTime, SlotInfoQueryType, SlotNumber},
     },
     service::common::{
         objects::cardano::{
@@ -54,19 +54,20 @@ pub(crate) async fn endpoint(
         event_db.get_slot_info(date_time, network.into(), SlotInfoQueryType::Next)
     );
 
-    let process_slot_info_result = |slot_info_result| {
-        match slot_info_result {
-            Ok((slot_number, block_hash, block_time)) => {
-                Ok(Some(Slot {
-                    slot_number,
-                    block_hash: From::from(block_hash),
-                    block_time,
-                }))
-            },
-            Err(DBError::NotFound) => Ok(None),
-            Err(err) => Err(err),
-        }
-    };
+    let process_slot_info_result =
+        |slot_info_result: anyhow::Result<(SlotNumber, BlockHash, DateTime)>| {
+            match slot_info_result {
+                Ok((slot_number, block_hash, block_time)) => {
+                    Ok(Some(Slot {
+                        slot_number,
+                        block_hash: From::from(block_hash),
+                        block_time,
+                    }))
+                },
+                Err(err) if err.is::<NotFoundError>() => Ok(None),
+                Err(err) => Err(err),
+            }
+        };
 
     let current = match process_slot_info_result(current) {
         Ok(current) => current,

@@ -7,7 +7,7 @@ use poem_extensions::{
 use poem_openapi::payload::Json;
 
 use crate::{
-    event_db::error::Error as DBError,
+    event_db::error::NotFoundError,
     service::common::{
         objects::cardano::{network::Network, sync_state::SyncState},
         responses::{
@@ -43,7 +43,7 @@ pub(crate) async fn endpoint(state: &State, network: Option<Network>) -> AllResp
                 last_updated,
             })))
         },
-        Err(DBError::NotFound) => T404(NotFound),
+        Err(err) if err.is::<NotFoundError>() => T404(NotFound),
         Err(err) => server_error_response!("{err}"),
     }
 }
