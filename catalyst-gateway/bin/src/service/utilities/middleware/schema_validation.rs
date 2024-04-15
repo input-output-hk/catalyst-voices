@@ -11,10 +11,7 @@ use std::sync::Arc;
 
 use poem::{web::Data, Endpoint, EndpointExt, Middleware, Request, Result};
 
-use crate::{
-    service::common::responses::resp_5xx::ServiceUnavailable,
-    state::{SchemaVersionStatus, State},
-};
+use crate::{service::common::responses::resp_5xx::ServiceUnavailable, state::State};
 
 /// A middleware that raises an error  with `ServiceUnavailable` and 503 status code
 /// if a DB schema version mismatch is found the existing `State`.
@@ -44,7 +41,7 @@ impl<E: Endpoint> Endpoint for SchemaVersionValidationImpl<E> {
             // if so, return the `ServiceUnavailable` error, which implements
             // `ResponseError`, with status code `503`.
             // Otherwise, return the endpoint as usual.
-            if state.is_schema_version_status(&SchemaVersionStatus::Mismatch) {
+            if state.schema_version_check().await.is_err() {
                 return Err(ServiceUnavailable.into());
             }
         }

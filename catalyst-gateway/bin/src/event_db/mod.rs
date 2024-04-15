@@ -54,9 +54,7 @@ pub(crate) struct EventDB {
 ///
 /// The env var "`DATABASE_URL`" can be set directly as an anv var, or in a
 /// `.env` file.
-pub(crate) async fn establish_connection(
-    url: Option<String>, do_schema_check: bool,
-) -> Result<EventDB, Error> {
+pub(crate) async fn establish_connection(url: Option<String>) -> Result<EventDB, Error> {
     // Support env vars in a `.env` file,  doesn't need to exist.
     dotenv().ok();
 
@@ -72,11 +70,5 @@ pub(crate) async fn establish_connection(
 
     let pool = Pool::builder().build(pg_mgr).await?;
 
-    let db = EventDB { pool };
-
-    if do_schema_check {
-        db.schema_version_check().await?;
-    }
-
-    Ok(db)
+    Ok(EventDB { pool })
 }

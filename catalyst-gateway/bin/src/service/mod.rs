@@ -23,9 +23,6 @@ pub(crate) enum Error {
     /// An IO error has occurred
     #[error(transparent)]
     Io(#[from] std::io::Error),
-    /// A mismatch in the expected `EventDB` schema version
-    #[error("expected schema version mismatch")]
-    SchemaVersionMismatch,
 }
 
 /// # Run Catalyst Gateway Service.
