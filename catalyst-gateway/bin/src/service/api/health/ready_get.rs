@@ -9,14 +9,13 @@ use poem_extensions::{
 };
 
 use crate::{
-    cli::Error,
     event_db::error::Error as DBError,
     service::common::responses::{
         resp_2xx::NoContent,
         resp_4xx::ApiValidationError,
         resp_5xx::{server_error_response, ServerError, ServiceUnavailable},
     },
-    state::{SchemaVersionStatus, State},
+    state::State,
 };
 
 /// All responses
@@ -53,22 +52,20 @@ pub(crate) type AllResponses = response! {
 ///   but unlikely)
 /// * 503 Service Unavailable - Service is not ready, do not send other requests.
 pub(crate) async fn endpoint(state: Data<&Arc<State>>) -> AllResponses {
-    match state.schema_version_check().await {
+    match state.event_db().schema_version_check().await {
         Ok(_) => {
             tracing::debug!("DB schema version status ok");
-            state.set_schema_version_status(SchemaVersionStatus::Ok);
             T204(NoContent)
         },
-        Err(Error::EventDb(DBError::MismatchedSchema { was, expected })) => {
+        Err(DBError::MismatchedSchema { was, expected }) => {
             tracing::error!(
                 expected = expected,
                 current = was,
                 "DB schema version status mismatch"
             );
-            state.set_schema_version_status(SchemaVersionStatus::Mismatch);
             T503(ServiceUnavailable)
         },
-        Err(Error::EventDb(DBError::TimedOut)) => T503(ServiceUnavailable),
+        Err(DBError::TimedOut) => T503(ServiceUnavailable),
         Err(err) => server_error_response!("{err}"),
     }
 }
