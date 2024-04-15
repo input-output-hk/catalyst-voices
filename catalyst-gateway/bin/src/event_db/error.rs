@@ -24,9 +24,6 @@ pub(crate) enum Error {
     /// Unknown error
     #[error("error: {0}")]
     Unknown(String),
-    /// Unable to extract policy assets
-    #[error("Unable parse assets: {0}")]
-    AssetParsingIssue(String),
     /// Unable to extract hashed witnesses
     #[allow(dead_code)]
     #[error("Unable to extract hashed witnesses: {0}")]

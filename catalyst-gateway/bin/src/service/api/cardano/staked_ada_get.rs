@@ -7,7 +7,7 @@ use poem_extensions::{
 use poem_openapi::payload::Json;
 
 use crate::{
-    event_db::{error::Error as DBError, follower::SlotNumber},
+    event_db::{error::NotFoundError, follower::SlotNumber},
     service::{
         common::{
             objects::cardano::{
@@ -59,7 +59,7 @@ pub(crate) async fn endpoint(
                 slot_number,
             })))
         },
-        Err(DBError::NotFound) => T404(NotFound),
+        Err(err) if err.is::<NotFoundError>() => T404(NotFound),
         Err(err) => server_error_response!("{err}"),
     }
 }
