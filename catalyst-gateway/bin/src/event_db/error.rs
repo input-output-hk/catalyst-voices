@@ -19,12 +19,6 @@ pub(crate) enum Error {
     /// Unknown error
     #[error("error: {0}")]
     Unknown(String),
-    /// No config
-    #[error("No config")]
-    NoConfig,
-    /// JSON Parsing error
-    #[error("Unable to parse database data: {0}")]
-    JsonParseIssue(String),
     /// Unable to extract policy assets
     #[error("Unable parse assets: {0}")]
     AssetParsingIssue(String),

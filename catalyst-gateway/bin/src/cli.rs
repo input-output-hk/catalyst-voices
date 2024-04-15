@@ -18,9 +18,6 @@ pub(crate) enum Error {
     #[error(transparent)]
     /// Service oriented errors
     Service(#[from] service::Error),
-    #[error(transparent)]
-    /// DB oriented errors
-    EventDb(#[from] crate::event_db::error::Error),
 }
 
 #[derive(Parser)]
@@ -77,7 +74,7 @@ impl Cli {
 
                     match event_db.get_follower_config().await {
                         Ok(config) => break config,
-                        Err(err) => error!("no config {:?}", err),
+                        Err(err) => error!("Get follower config error: {err}"),
                     }
                 };
 

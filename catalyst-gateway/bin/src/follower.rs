@@ -51,7 +51,7 @@ pub(crate) async fn start_followers(
                 }
             },
             Err(err) => {
-                error!("No config {:?}", err);
+                error!("Get follower config error: {err}");
                 break None;
             },
         }
