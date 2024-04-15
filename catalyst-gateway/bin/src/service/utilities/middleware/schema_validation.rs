@@ -41,7 +41,7 @@ impl<E: Endpoint> Endpoint for SchemaVersionValidationImpl<E> {
             // if so, return the `ServiceUnavailable` error, which implements
             // `ResponseError`, with status code `503`.
             // Otherwise, return the endpoint as usual.
-            if state.schema_version_check().await.is_err() {
+            if state.event_db().schema_version_check().await.is_err() {
                 return Err(ServiceUnavailable.into());
             }
         }

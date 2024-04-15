@@ -37,9 +37,4 @@ impl State {
     pub(crate) fn event_db(&self) -> Arc<EventDB> {
         self.event_db.clone()
     }
-
-    /// Check the DB schema version matches the one expected by the service.
-    pub(crate) async fn schema_version_check(&self) -> Result<i32, Error> {
-        Ok(self.event_db.schema_version_check().await?)
-    }
 }
