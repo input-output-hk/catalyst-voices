@@ -5,7 +5,7 @@ use pallas::ledger::{addresses::Address, traverse::MultiEraTx};
 
 use super::{follower::SlotNumber, voter_registration::StakeCredential};
 use crate::{
-    event_db::{error::Error, EventDB},
+    event_db::{error::NotFoundError, EventDB},
     util::parse_policy_assets,
 };
 
@@ -14,7 +14,7 @@ pub(crate) type StakeAmount = i64;
 
 impl EventDB {
     /// Index utxo data
-    pub(crate) async fn index_utxo_data(&self, tx: &MultiEraTx<'_>) -> Result<(), Error> {
+    pub(crate) async fn index_utxo_data(&self, tx: &MultiEraTx<'_>) -> anyhow::Result<()> {
         let conn = self.pool.get().await?;
 
         let tx_hash = tx.hash();
@@ -23,12 +23,9 @@ impl EventDB {
         for (index, tx_out) in tx.outputs().iter().enumerate() {
             // extract assets
             let assets = serde_json::to_value(parse_policy_assets(&tx_out.non_ada_assets()))
-                .map_err(|e| Error::AssetParsingIssue(format!("Asset parsing issue {e}")))?;
+                .map_err(|e| anyhow::anyhow!(format!("Asset parsing issue {e}")))?;
 
-            let stake_address = match tx_out
-                .address()
-                .map_err(|e| Error::Unknown(format!("Address issue {e}")))?
-            {
+            let stake_address = match tx_out.address()? {
                 Address::Shelley(address) => address.try_into().ok(),
                 Address::Stake(stake_address) => Some(stake_address),
                 Address::Byron(_) => None,
@@ -39,10 +36,9 @@ impl EventDB {
                 .query(
                     include_str!("../../../event-db/queries/utxo/insert_utxo.sql"),
                     &[
-                        &i32::try_from(index).map_err(|e| Error::Unknown(e.to_string()))?,
+                        &i32::try_from(index)?,
                         &tx_hash.as_slice(),
-                        &i64::try_from(tx_out.lovelace_amount())
-                            .map_err(|e| Error::Unknown(e.to_string()))?,
+                        &i64::try_from(tx_out.lovelace_amount())?,
                         &stake_credential,
                         &assets,
                     ],
@@ -61,7 +57,7 @@ impl EventDB {
                     &[
                         &tx_hash.as_slice(),
                         &output_tx_hash.as_slice(),
-                        &i32::try_from(out_index).map_err(|e| Error::Unknown(e.to_string()))?,
+                        &i32::try_from(out_index)?,
                     ],
                 )
                 .await?;
@@ -73,7 +69,7 @@ impl EventDB {
     /// Index txn metadata
     pub(crate) async fn index_txn_data(
         &self, tx_id: &[u8], slot_no: SlotNumber, network: Network,
-    ) -> Result<(), Error> {
+    ) -> anyhow::Result<()> {
         let conn = self.pool.get().await?;
 
         let _rows = conn
@@ -89,7 +85,7 @@ impl EventDB {
     /// Get total utxo amount
     pub(crate) async fn total_utxo_amount(
         &self, stake_credential: StakeCredential, network: Network, slot_num: SlotNumber,
-    ) -> Result<(StakeAmount, SlotNumber), Error> {
+    ) -> anyhow::Result<(StakeAmount, SlotNumber)> {
         let conn = self.pool.get().await?;
 
         let row = conn
@@ -107,7 +103,7 @@ impl EventDB {
 
             Ok((amount, slot_number))
         } else {
-            Err(Error::NotFound)
+            Err(NotFoundError.into())
         }
     }
 }
