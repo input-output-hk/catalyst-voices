@@ -153,6 +153,37 @@ abstract class CatGatewayApi extends ChopperService {
     @Query('slot_number') int? slotNumber,
   });
 
+  ///Get registration info.
+  ///@param stake_address The stake address of the user. Should a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
+  ///@param network Cardano network type. If omitted network type is identified from the stake address. If specified it must be correspondent to the network type encoded in the stake address. As `preprod` and `preview` network types in the stake address encoded as a `testnet`, to specify `preprod` or `preview` network type use this query parameter.
+  ///@param slot_number Slot number at which the staked ada amount should be calculated. If omitted latest slot number is used.
+  Future<chopper.Response<RegistrationInfo>>
+      apiCardanoRegistrationStakeAddressGet({
+    required String? stakeAddress,
+    enums.Network? network,
+    int? slotNumber,
+  }) {
+    generatedMapping.putIfAbsent(
+        RegistrationInfo, () => RegistrationInfo.fromJsonFactory);
+
+    return _apiCardanoRegistrationStakeAddressGet(
+        stakeAddress: stakeAddress,
+        network: network?.value?.toString(),
+        slotNumber: slotNumber);
+  }
+
+  ///Get registration info.
+  ///@param stake_address The stake address of the user. Should a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
+  ///@param network Cardano network type. If omitted network type is identified from the stake address. If specified it must be correspondent to the network type encoded in the stake address. As `preprod` and `preview` network types in the stake address encoded as a `testnet`, to specify `preprod` or `preview` network type use this query parameter.
+  ///@param slot_number Slot number at which the staked ada amount should be calculated. If omitted latest slot number is used.
+  @Get(path: '/api/cardano/registration/{stake_address}')
+  Future<chopper.Response<RegistrationInfo>>
+      _apiCardanoRegistrationStakeAddressGet({
+    @Path('stake_address') required String? stakeAddress,
+    @Query('network') String? network,
+    @Query('slot_number') int? slotNumber,
+  });
+
   ///Get Cardano follower's sync state.
   ///@param network Cardano network type. If omitted `mainnet` network type is defined. As `preprod` and `preview` network types in the stake address encoded as a `testnet`, to specify `preprod` or `preview` network type use this query parameter.
   Future<chopper.Response<SyncState>> apiCardanoSyncStateGet(
@@ -167,6 +198,28 @@ abstract class CatGatewayApi extends ChopperService {
   @Get(path: '/api/cardano/sync_state')
   Future<chopper.Response<SyncState>> _apiCardanoSyncStateGet(
       {@Query('network') String? network});
+
+  ///Get Cardano slot info to the provided date-time.
+  ///@param date_time The date-time for which the slot number should be calculated. If omitted current date time is used.
+  ///@param network Cardano network type. If omitted `mainnet` network type is defined. As `preprod` and `preview` network types in the stake address encoded as a `testnet`, to specify `preprod` or `preview` network type use this query parameter.
+  Future<chopper.Response<SlotInfo>> apiCardanoDateTimeToSlotNumberGet({
+    DateTime? dateTime,
+    enums.Network? network,
+  }) {
+    generatedMapping.putIfAbsent(SlotInfo, () => SlotInfo.fromJsonFactory);
+
+    return _apiCardanoDateTimeToSlotNumberGet(
+        dateTime: dateTime, network: network?.value?.toString());
+  }
+
+  ///Get Cardano slot info to the provided date-time.
+  ///@param date_time The date-time for which the slot number should be calculated. If omitted current date time is used.
+  ///@param network Cardano network type. If omitted `mainnet` network type is defined. As `preprod` and `preview` network types in the stake address encoded as a `testnet`, to specify `preprod` or `preview` network type use this query parameter.
+  @Get(path: '/api/cardano/date_time_to_slot_number')
+  Future<chopper.Response<SlotInfo>> _apiCardanoDateTimeToSlotNumberGet({
+    @Query('date_time') DateTime? dateTime,
+    @Query('network') String? network,
+  });
 
   ///Voter's info
   ///@param voting_key A Voters Public ED25519 Key (as registered in their most recent valid [CIP-15](https://cips.cardano.org/cips/cip15) or [CIP-36](https://cips.cardano.org/cips/cip36) registration).

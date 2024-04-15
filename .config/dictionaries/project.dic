@@ -25,6 +25,7 @@ cfbundle
 chromedriver
 chrono
 ciphertext
+CIPs
 COCOAPODS
 codegen
 codepoints
@@ -47,7 +48,6 @@ earthfile
 Edgedriver
 emurgo
 encryptor
-endfunction
 endfunction
 fetchval
 fmtchk
@@ -86,6 +86,9 @@ lintfix
 localizable
 loguru
 mdlint
+metadatum
+metadatums
+metamap
 mgrybyk
 mithril
 mitigations
@@ -120,6 +123,8 @@ pubspec
 pytest
 rapidoc
 redoc
+Replayability
+repr
 reqwest
 rfwtxt
 ripgrep
@@ -140,6 +145,7 @@ slotno
 sqlfluff
 Stefano
 stevenj
+Subkey
 subosito
 SYSROOT
 tacho
@@ -156,13 +162,14 @@ Traceback
 TXNZD
 Typer
 unmanaged
-UTXO
 utxo
-Utxos
+UTXO
 utxos
+Utxos
 vite
 vitss
 vkey
+vkeywitness
 voteplan
 voteplans
 wallclock
@@ -176,6 +183,3 @@ xctest
 xctestrun
 xcworkspace
 yoroi
-cbor
-metamap
-repr

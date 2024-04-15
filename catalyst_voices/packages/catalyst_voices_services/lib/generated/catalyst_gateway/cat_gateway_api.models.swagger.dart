@@ -157,6 +157,60 @@ extension $DelegatePublicKeyExtension on DelegatePublicKey {
 }
 
 @JsonSerializable(explicitToJson: true)
+class Delegation {
+  const Delegation({
+    required this.votingKey,
+    required this.power,
+  });
+
+  factory Delegation.fromJson(Map<String, dynamic> json) =>
+      _$DelegationFromJson(json);
+
+  static const toJsonFactory = _$DelegationToJson;
+  Map<String, dynamic> toJson() => _$DelegationToJson(this);
+
+  @JsonKey(name: 'voting_key')
+  final String votingKey;
+  @JsonKey(name: 'power')
+  final int power;
+  static const fromJsonFactory = _$DelegationFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is Delegation &&
+            (identical(other.votingKey, votingKey) ||
+                const DeepCollectionEquality()
+                    .equals(other.votingKey, votingKey)) &&
+            (identical(other.power, power) ||
+                const DeepCollectionEquality().equals(other.power, power)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(votingKey) ^
+      const DeepCollectionEquality().hash(power) ^
+      runtimeType.hashCode;
+}
+
+extension $DelegationExtension on Delegation {
+  Delegation copyWith({String? votingKey, int? power}) {
+    return Delegation(
+        votingKey: votingKey ?? this.votingKey, power: power ?? this.power);
+  }
+
+  Delegation copyWithWrapped(
+      {Wrapped<String>? votingKey, Wrapped<int>? power}) {
+    return Delegation(
+        votingKey: (votingKey != null ? votingKey.value : this.votingKey),
+        power: (power != null ? power.value : this.power));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
 class FragmentStatus {
   const FragmentStatus();
 
@@ -331,6 +385,87 @@ extension $HashExtension on Hash {
 }
 
 @JsonSerializable(explicitToJson: true)
+class RegistrationInfo {
+  const RegistrationInfo({
+    required this.rewardsAddress,
+    required this.txHash,
+    required this.nonce,
+    required this.votingInfo,
+  });
+
+  factory RegistrationInfo.fromJson(Map<String, dynamic> json) =>
+      _$RegistrationInfoFromJson(json);
+
+  static const toJsonFactory = _$RegistrationInfoToJson;
+  Map<String, dynamic> toJson() => _$RegistrationInfoToJson(this);
+
+  @JsonKey(name: 'rewards_address')
+  final String rewardsAddress;
+  @JsonKey(name: 'tx_hash')
+  final String txHash;
+  @JsonKey(name: 'nonce')
+  final int nonce;
+  @JsonKey(name: 'voting_info')
+  final VotingInfo votingInfo;
+  static const fromJsonFactory = _$RegistrationInfoFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is RegistrationInfo &&
+            (identical(other.rewardsAddress, rewardsAddress) ||
+                const DeepCollectionEquality()
+                    .equals(other.rewardsAddress, rewardsAddress)) &&
+            (identical(other.txHash, txHash) ||
+                const DeepCollectionEquality().equals(other.txHash, txHash)) &&
+            (identical(other.nonce, nonce) ||
+                const DeepCollectionEquality().equals(other.nonce, nonce)) &&
+            (identical(other.votingInfo, votingInfo) ||
+                const DeepCollectionEquality()
+                    .equals(other.votingInfo, votingInfo)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(rewardsAddress) ^
+      const DeepCollectionEquality().hash(txHash) ^
+      const DeepCollectionEquality().hash(nonce) ^
+      const DeepCollectionEquality().hash(votingInfo) ^
+      runtimeType.hashCode;
+}
+
+extension $RegistrationInfoExtension on RegistrationInfo {
+  RegistrationInfo copyWith(
+      {String? rewardsAddress,
+      String? txHash,
+      int? nonce,
+      VotingInfo? votingInfo}) {
+    return RegistrationInfo(
+        rewardsAddress: rewardsAddress ?? this.rewardsAddress,
+        txHash: txHash ?? this.txHash,
+        nonce: nonce ?? this.nonce,
+        votingInfo: votingInfo ?? this.votingInfo);
+  }
+
+  RegistrationInfo copyWithWrapped(
+      {Wrapped<String>? rewardsAddress,
+      Wrapped<String>? txHash,
+      Wrapped<int>? nonce,
+      Wrapped<VotingInfo>? votingInfo}) {
+    return RegistrationInfo(
+        rewardsAddress: (rewardsAddress != null
+            ? rewardsAddress.value
+            : this.rewardsAddress),
+        txHash: (txHash != null ? txHash.value : this.txHash),
+        nonce: (nonce != null ? nonce.value : this.nonce),
+        votingInfo: (votingInfo != null ? votingInfo.value : this.votingInfo));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
 class RejectedFragment {
   const RejectedFragment({
     required this.id,
@@ -457,6 +592,138 @@ extension $ServerErrorPayloadExtension on ServerErrorPayload {
         id: (id != null ? id.value : this.id),
         msg: (msg != null ? msg.value : this.msg),
         issue: (issue != null ? issue.value : this.issue));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class Slot {
+  const Slot({
+    required this.slotNumber,
+    required this.blockHash,
+    required this.blockTime,
+  });
+
+  factory Slot.fromJson(Map<String, dynamic> json) => _$SlotFromJson(json);
+
+  static const toJsonFactory = _$SlotToJson;
+  Map<String, dynamic> toJson() => _$SlotToJson(this);
+
+  @JsonKey(name: 'slot_number')
+  final int slotNumber;
+  @JsonKey(name: 'block_hash')
+  final String blockHash;
+  @JsonKey(name: 'block_time')
+  final DateTime blockTime;
+  static const fromJsonFactory = _$SlotFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is Slot &&
+            (identical(other.slotNumber, slotNumber) ||
+                const DeepCollectionEquality()
+                    .equals(other.slotNumber, slotNumber)) &&
+            (identical(other.blockHash, blockHash) ||
+                const DeepCollectionEquality()
+                    .equals(other.blockHash, blockHash)) &&
+            (identical(other.blockTime, blockTime) ||
+                const DeepCollectionEquality()
+                    .equals(other.blockTime, blockTime)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(slotNumber) ^
+      const DeepCollectionEquality().hash(blockHash) ^
+      const DeepCollectionEquality().hash(blockTime) ^
+      runtimeType.hashCode;
+}
+
+extension $SlotExtension on Slot {
+  Slot copyWith({int? slotNumber, String? blockHash, DateTime? blockTime}) {
+    return Slot(
+        slotNumber: slotNumber ?? this.slotNumber,
+        blockHash: blockHash ?? this.blockHash,
+        blockTime: blockTime ?? this.blockTime);
+  }
+
+  Slot copyWithWrapped(
+      {Wrapped<int>? slotNumber,
+      Wrapped<String>? blockHash,
+      Wrapped<DateTime>? blockTime}) {
+    return Slot(
+        slotNumber: (slotNumber != null ? slotNumber.value : this.slotNumber),
+        blockHash: (blockHash != null ? blockHash.value : this.blockHash),
+        blockTime: (blockTime != null ? blockTime.value : this.blockTime));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class SlotInfo {
+  const SlotInfo({
+    this.previous,
+    this.current,
+    this.next,
+  });
+
+  factory SlotInfo.fromJson(Map<String, dynamic> json) =>
+      _$SlotInfoFromJson(json);
+
+  static const toJsonFactory = _$SlotInfoToJson;
+  Map<String, dynamic> toJson() => _$SlotInfoToJson(this);
+
+  @JsonKey(name: 'previous')
+  final Slot? previous;
+  @JsonKey(name: 'current')
+  final Slot? current;
+  @JsonKey(name: 'next')
+  final Slot? next;
+  static const fromJsonFactory = _$SlotInfoFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is SlotInfo &&
+            (identical(other.previous, previous) ||
+                const DeepCollectionEquality()
+                    .equals(other.previous, previous)) &&
+            (identical(other.current, current) ||
+                const DeepCollectionEquality()
+                    .equals(other.current, current)) &&
+            (identical(other.next, next) ||
+                const DeepCollectionEquality().equals(other.next, next)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(previous) ^
+      const DeepCollectionEquality().hash(current) ^
+      const DeepCollectionEquality().hash(next) ^
+      runtimeType.hashCode;
+}
+
+extension $SlotInfoExtension on SlotInfo {
+  SlotInfo copyWith({Slot? previous, Slot? current, Slot? next}) {
+    return SlotInfo(
+        previous: previous ?? this.previous,
+        current: current ?? this.current,
+        next: next ?? this.next);
+  }
+
+  SlotInfo copyWithWrapped(
+      {Wrapped<Slot?>? previous,
+      Wrapped<Slot?>? current,
+      Wrapped<Slot?>? next}) {
+    return SlotInfo(
+        previous: (previous != null ? previous.value : this.previous),
+        current: (current != null ? current.value : this.current),
+        next: (next != null ? next.value : this.next));
   }
 }
 
@@ -940,6 +1207,7 @@ extension $VoterRegistrationExtension on VoterRegistration {
   }
 }
 
+typedef VotingInfo = Map<String, dynamic>;
 String? animalsNullableToJson(enums.Animals? animals) {
   return animals?.value;
 }

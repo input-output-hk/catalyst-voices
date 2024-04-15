@@ -4,6 +4,7 @@ use std::{error::Error, io::Cursor};
 
 use cardano_chain_follower::Network;
 use ciborium::Value;
+use cryptoxide::{blake2b::Blake2b, digest::Digest};
 use pallas::ledger::{primitives::Fragment, traverse::MultiEraMeta};
 use serde::{Deserialize, Serialize};
 
@@ -35,7 +36,7 @@ const CIP36_61285: usize = 61285;
 
 /// Pub key
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
-pub struct PubKey(pub Vec<u8>);
+pub struct PubKey(Vec<u8>);
 
 /// Nonce
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
@@ -43,15 +44,11 @@ pub struct Nonce(pub u64);
 
 /// Voting purpose
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
-pub struct VotingPurpose(pub u64);
+pub struct VotingPurpose(u64);
 
 /// Rewards address
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 pub struct RewardsAddress(pub Vec<u8>);
-
-/// Stake key
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
-pub struct StakeKey(pub PubKey);
 
 /// Error report for serializing
 pub type ErrorReport = Vec<String>;
@@ -65,6 +62,22 @@ pub type ComponentBytes = [u8; COMPONENT_SIZE];
 
 /// Ed25519 signature serialized as a byte array.
 pub type SignatureBytes = [u8; Signature::BYTE_SIZE];
+
+impl PubKey {
+    /// Get credentials, a blake2b 28 bytes hash of the pub key
+    pub(crate) fn get_credentials(&self) -> [u8; 28] {
+        let mut digest = [0u8; 28];
+        let mut context = Blake2b::new(28);
+        context.input(&self.0);
+        context.result(&mut digest);
+        digest
+    }
+
+    /// Get bytes
+    pub(crate) fn bytes(&self) -> &[u8] {
+        &self.0
+    }
+}
 
 /// Ed25519 signature.
 ///
@@ -127,9 +140,9 @@ impl Default for CddlConfig {
 #[derive(Debug, Clone, PartialEq)]
 pub struct Registration {
     /// Voting key
-    pub voting_key: Option<VotingKey>,
+    pub voting_key: Option<VotingInfo>,
     /// Stake key
-    pub stake_key: Option<StakeKey>,
+    pub stake_key: Option<PubKey>,
     /// Rewards address
     pub rewards_address: Option<RewardsAddress>,
     /// Nonce
@@ -150,7 +163,7 @@ pub struct Registration {
 #[derive(Serialize, Deserialize)]
 #[serde(untagged)]
 #[derive(Debug, Clone, PartialEq)]
-pub enum VotingKey {
+pub enum VotingInfo {
     /// Direct voting
     ///
     /// Voting power is based on the staked ada of the given key
@@ -160,12 +173,12 @@ pub enum VotingKey {
     ///
     /// Voting power is based on the staked ada of the delegated keys
     /// order of elements is important and must be preserved.
-    Delegated(Vec<(PubKey, u64)>),
+    Delegated(Vec<(PubKey, i64)>),
 }
 
-impl Default for VotingKey {
+impl Default for VotingInfo {
     fn default() -> Self {
-        VotingKey::Direct(PubKey(Vec::new()))
+        VotingInfo::Direct(PubKey(Vec::new()))
     }
 }
 
@@ -256,14 +269,14 @@ pub fn inspect_metamap_reg(spec_61284: &[Value]) -> Result<&Vec<(Value, Value)>,
 
 #[allow(clippy::manual_let_else)]
 /// Extract voting key
-pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingKey, Box<dyn Error>> {
+pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingInfo, Box<dyn Error>> {
     let voting_key = match &metamap
         .get(DELEGATIONS_OR_DIRECT)
         .ok_or("Issue with voting key 61284 cbor parsing")?
     {
-        (Value::Integer(_one), Value::Bytes(direct)) => VotingKey::Direct(PubKey(direct.clone())),
+        (Value::Integer(_one), Value::Bytes(direct)) => VotingInfo::Direct(PubKey(direct.clone())),
         (Value::Integer(_one), Value::Array(delegations)) => {
-            let mut delegations_map: Vec<(PubKey, u64)> = Vec::new();
+            let mut delegations_map: Vec<(PubKey, i64)> = Vec::new();
             for d in delegations {
                 match d {
                     Value::Array(delegations) => {
@@ -301,7 +314,7 @@ pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingKey, Box<d
                 }
             }
 
-            VotingKey::Delegated(delegations_map)
+            VotingInfo::Delegated(delegations_map)
         },
 
         _ => return Err("Invalid signature".to_string().into()),
@@ -372,8 +385,8 @@ pub fn inspect_voting_purpose(
 pub fn parse_registrations_from_metadata(
     meta: &MultiEraMeta, network: Network,
 ) -> Result<(Registration, ErrorReport), Box<dyn Error>> {
-    let mut voting_key: Option<VotingKey> = None;
-    let mut stake_key: Option<StakeKey> = None;
+    let mut voting_key: Option<VotingInfo> = None;
+    let mut stake_key: Option<PubKey> = None;
     let mut voting_purpose: Option<VotingPurpose> = None;
     let mut rewards_address: Option<RewardsAddress> = None;
     let mut nonce: Option<Nonce> = None;
@@ -412,42 +425,42 @@ pub fn parse_registrations_from_metadata(
                 // side chain that will receive voting power from this delegation.
                 // For direct voting it's necessary to have the corresponding private key to cast
                 // votes in the side chain
-                match inspect_voting_key(metamap) {
-                    Ok(value) => voting_key = Some(value),
-                    Err(err) => {
-                        voting_key = None;
+                voting_key = inspect_voting_key(metamap).map_or_else(
+                    |err| {
                         errors_report.push(format!("Invalid voting key {raw_cbor:?} {err:?}"));
+                        None
                     },
-                };
+                    Some,
+                );
 
                 // A stake address for the network that this transaction is submitted to (to point
                 // to the Ada that is being delegated);
-                match inspect_stake_key(metamap) {
-                    Ok(value) => stake_key = Some(StakeKey(value)),
-                    Err(err) => {
-                        stake_key = None;
+                stake_key = inspect_stake_key(metamap).map_or_else(
+                    |err| {
                         errors_report.push(format!("Invalid stake key {raw_cbor:?} {err:?}"));
+                        None
                     },
-                };
+                    Some,
+                );
 
                 // A Shelley payment address (see CIP-0019) discriminated for the same network
                 // this transaction is submitted to, to receive rewards.
-                match inspect_rewards_addr(metamap, network) {
-                    Ok(value) => rewards_address = Some(RewardsAddress(value.clone())),
-                    Err(err) => {
-                        rewards_address = None;
+                rewards_address = inspect_rewards_addr(metamap, network).map_or_else(
+                    |err| {
                         errors_report.push(format!("Invalid rewards address {raw_cbor:?} {err:?}"));
+                        None
                     },
-                };
+                    |val| Some(RewardsAddress(val.clone())),
+                );
 
                 // A nonce that identifies that most recent delegation
-                match inspect_nonce(metamap) {
-                    Ok(value) => nonce = Some(value),
-                    Err(err) => {
+                nonce = inspect_nonce(metamap).map_or_else(
+                    |err| {
                         errors_report.push(format!("Invalid nonce {raw_cbor:?} {err:?}"));
-                        nonce = None;
+                        None
                     },
-                };
+                    Some,
+                );
 
                 // A non-negative integer that indicates the purpose of the vote.
                 // This is an optional field to allow for compatibility with CIP-15

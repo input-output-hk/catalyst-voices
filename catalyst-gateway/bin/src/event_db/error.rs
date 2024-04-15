@@ -35,9 +35,6 @@ pub(crate) enum Error {
     /// JSON Parsing error
     #[error("Unable to parse database data: {0}")]
     JsonParseIssue(String),
-    #[error("Decode Error: {0}")]
-    /// Unable to decode hex
-    DecodeHex(String),
     /// Unable to extract policy assets
     #[error("Unable parse assets: {0}")]
     AssetParsingIssue(String),

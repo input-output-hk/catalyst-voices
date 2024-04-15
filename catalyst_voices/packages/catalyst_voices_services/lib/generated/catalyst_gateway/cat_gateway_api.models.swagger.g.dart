@@ -38,6 +38,17 @@ Map<String, dynamic> _$DelegatePublicKeyToJson(DelegatePublicKey instance) =>
       'address': instance.address,
     };
 
+Delegation _$DelegationFromJson(Map<String, dynamic> json) => Delegation(
+      votingKey: json['voting_key'] as String,
+      power: json['power'] as int,
+    );
+
+Map<String, dynamic> _$DelegationToJson(Delegation instance) =>
+    <String, dynamic>{
+      'voting_key': instance.votingKey,
+      'power': instance.power,
+    };
+
 FragmentStatus _$FragmentStatusFromJson(Map<String, dynamic> json) =>
     FragmentStatus();
 
@@ -87,6 +98,22 @@ Map<String, dynamic> _$HashToJson(Hash instance) => <String, dynamic>{
       'hash': instance.hash,
     };
 
+RegistrationInfo _$RegistrationInfoFromJson(Map<String, dynamic> json) =>
+    RegistrationInfo(
+      rewardsAddress: json['rewards_address'] as String,
+      txHash: json['tx_hash'] as String,
+      nonce: json['nonce'] as int,
+      votingInfo: json['voting_info'] as Map<String, dynamic>,
+    );
+
+Map<String, dynamic> _$RegistrationInfoToJson(RegistrationInfo instance) =>
+    <String, dynamic>{
+      'rewards_address': instance.rewardsAddress,
+      'tx_hash': instance.txHash,
+      'nonce': instance.nonce,
+      'voting_info': instance.votingInfo,
+    };
+
 RejectedFragment _$RejectedFragmentFromJson(Map<String, dynamic> json) =>
     RejectedFragment(
       id: json['id'] as String,
@@ -113,6 +140,36 @@ Map<String, dynamic> _$ServerErrorPayloadToJson(ServerErrorPayload instance) =>
       'id': instance.id,
       'msg': instance.msg,
       'issue': instance.issue,
+    };
+
+Slot _$SlotFromJson(Map<String, dynamic> json) => Slot(
+      slotNumber: json['slot_number'] as int,
+      blockHash: json['block_hash'] as String,
+      blockTime: DateTime.parse(json['block_time'] as String),
+    );
+
+Map<String, dynamic> _$SlotToJson(Slot instance) => <String, dynamic>{
+      'slot_number': instance.slotNumber,
+      'block_hash': instance.blockHash,
+      'block_time': instance.blockTime.toIso8601String(),
+    };
+
+SlotInfo _$SlotInfoFromJson(Map<String, dynamic> json) => SlotInfo(
+      previous: json['previous'] == null
+          ? null
+          : Slot.fromJson(json['previous'] as Map<String, dynamic>),
+      current: json['current'] == null
+          ? null
+          : Slot.fromJson(json['current'] as Map<String, dynamic>),
+      next: json['next'] == null
+          ? null
+          : Slot.fromJson(json['next'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$SlotInfoToJson(SlotInfo instance) => <String, dynamic>{
+      'previous': instance.previous?.toJson(),
+      'current': instance.current?.toJson(),
+      'next': instance.next?.toJson(),
     };
 
 StakeInfo _$StakeInfoFromJson(Map<String, dynamic> json) => StakeInfo(

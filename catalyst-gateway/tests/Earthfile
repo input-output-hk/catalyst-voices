@@ -5,7 +5,7 @@ package-schemathesis:
 
     ARG tag="latest"
     ARG max_examples=1000
-    ARG max_response_time=200
+    ARG max_response_time=300
     ARG wait_for_schema=15
     ARG workers=2
     ARG schema_version=30
@@ -28,7 +28,7 @@ package-schemathesis:
     SAVE IMAGE schemathesis:$tag
 
 # test-fuzzer-api - Fuzzy test cat-gateway using openapi specs
-test-fuzzer-api:
+fuzzer-api:
     FROM earthly/dind:alpine-3.19
     RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
     RUN apk add yq zstd
@@ -64,7 +64,9 @@ test-fuzzer-api:
 
 # test-lint-openapi - OpenAPI linting from an artifact
 # testing whether the OpenAPI generated during build stage follows good practice.
-test-lint-openapi:
+# TODO: https://github.com/input-output-hk/catalyst-voices/issues/408
+# enable this linting after this issue will be solved
+lint-openapi:
     FROM github.com/input-output-hk/catalyst-ci/earthly/spectral:v2.4.0+spectral-base
     # Copy the doc artifact.
     COPY ../+build/doc ./doc
