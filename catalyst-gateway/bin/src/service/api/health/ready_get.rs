@@ -9,7 +9,7 @@ use poem_extensions::{
 };
 
 use crate::{
-    event_db::error::Error as DBError,
+    event_db::schema_check::MismatchedSchemaError,
     service::common::responses::{
         resp_2xx::NoContent,
         resp_4xx::ApiValidationError,
@@ -57,15 +57,11 @@ pub(crate) async fn endpoint(state: Data<&Arc<State>>) -> AllResponses {
             tracing::debug!("DB schema version status ok");
             T204(NoContent)
         },
-        Err(DBError::MismatchedSchema { was, expected }) => {
-            tracing::error!(
-                expected = expected,
-                current = was,
-                "DB schema version status mismatch"
-            );
+        Err(err) if err.is::<MismatchedSchemaError>() => {
+            tracing::error!("{err}");
             T503(ServiceUnavailable)
         },
-        Err(DBError::TimedOut) => T503(ServiceUnavailable),
+        // Err(DBError::TimedOut) => T503(ServiceUnavailable),
         Err(err) => server_error_response!("{err}"),
     }
 }

@@ -32,6 +32,11 @@ pub(crate) struct EventDB {
     pool: Pool<PostgresConnectionManager<NoTls>>,
 }
 
+/// No DB URL was provided
+#[derive(thiserror::Error, Debug, PartialEq, Eq)]
+#[error("DB URL is undefined")]
+pub(crate) struct NoDatabaseUrlError;
+
 /// Establish a connection to the database, and check the schema is up-to-date.
 ///
 /// # Parameters
@@ -54,14 +59,14 @@ pub(crate) struct EventDB {
 ///
 /// The env var "`DATABASE_URL`" can be set directly as an anv var, or in a
 /// `.env` file.
-pub(crate) async fn establish_connection(url: Option<String>) -> Result<EventDB, Error> {
+pub(crate) async fn establish_connection(url: Option<String>) -> anyhow::Result<EventDB> {
     // Support env vars in a `.env` file,  doesn't need to exist.
     dotenv().ok();
 
     let database_url = match url {
         Some(url) => url,
         // If the Database connection URL is not supplied, try and get from the env var.
-        None => std::env::var(DATABASE_URL_ENVVAR).map_err(|_| Error::NoDatabaseUrl)?,
+        None => std::env::var(DATABASE_URL_ENVVAR).map_err(|_| NoDatabaseUrlError)?,
     };
 
     let config = tokio_postgres::config::Config::from_str(&database_url)?;

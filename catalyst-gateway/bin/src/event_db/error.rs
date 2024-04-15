@@ -2,20 +2,14 @@
 
 use bb8::RunError;
 
+/// DB connection timeout error
+#[derive(thiserror::Error, Debug)]
+#[error("Connection to DB timed out")]
+pub(crate) struct TimedOutError(#[from] RunError<tokio_postgres::Error>);
+
 /// Event database errors
 #[derive(thiserror::Error, Debug, PartialEq, Eq)]
 pub(crate) enum Error {
-    /// Schema in database does not match schema supported by the Crate.
-    #[error(" Schema in database does not match schema supported by the Crate. The current schema version: {was}, the schema version we expected: {expected}")]
-    MismatchedSchema {
-        /// The current DB schema version.
-        was: i32,
-        /// The expected DB schema version.
-        expected: i32,
-    },
-    /// No DB URL was provided
-    #[error("DB URL is undefined")]
-    NoDatabaseUrl,
     /// Cannot find this item
     #[error("Cannot find this item")]
     NotFound,
