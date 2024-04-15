@@ -14,14 +14,6 @@ mod utilities;
 
 pub(crate) use poem_service::get_app_docs;
 
-/// Service level errors
-#[derive(thiserror::Error, Debug)]
-pub(crate) enum Error {
-    /// An IO error has occurred
-    #[error(transparent)]
-    Io(#[from] std::io::Error),
-}
-
 /// # Run Catalyst Gateway Service.
 ///
 /// Runs the Poem based API.
@@ -36,6 +28,6 @@ pub(crate) enum Error {
 /// `Error::CannotRunService` - cannot run the service
 /// `Error::EventDbError` - cannot connect to the event db
 /// `Error::IoError` - An IO error has occurred.
-pub(crate) async fn run(settings: &DocsSettings, state: Arc<State>) -> Result<(), Error> {
+pub(crate) async fn run(settings: &DocsSettings, state: Arc<State>) -> anyhow::Result<()> {
     poem_service::run(settings, state).await
 }

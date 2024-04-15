@@ -12,14 +12,6 @@ use crate::{
     state::State,
 };
 
-#[derive(thiserror::Error, Debug)]
-/// All service errors
-pub(crate) enum Error {
-    #[error(transparent)]
-    /// Service oriented errors
-    Service(#[from] service::Error),
-}
-
 #[derive(Parser)]
 #[clap(rename_all = "kebab-case")]
 /// Simple service CLI options
