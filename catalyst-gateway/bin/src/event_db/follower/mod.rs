@@ -120,9 +120,7 @@ impl EventDB {
             ])
             .await?;
 
-        let Some(row) = rows.first() else {
-            return Err(NotFoundError.into());
-        };
+        let row = rows.first().ok_or(NotFoundError)?;
 
         let slot_number: SlotNumber = row.try_get(SLOT_NO_COLUMN)?;
         let block_hash = row.try_get(BLOCK_HASH_COLUMN)?;
@@ -141,9 +139,7 @@ impl EventDB {
             .query(SELECT_UPDATE_STATE_SQL, &[&network.to_string()])
             .await?;
 
-        let Some(row) = rows.first() else {
-            return Err(NotFoundError.into());
-        };
+        let row = rows.first().ok_or(NotFoundError)?;
 
         let slot_no = row.try_get(SLOT_NO_COLUMN)?;
         let block_hash = row.try_get(BLOCK_HASH_COLUMN)?;

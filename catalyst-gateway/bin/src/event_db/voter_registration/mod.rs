@@ -4,7 +4,7 @@ use cardano_chain_follower::Network;
 use pallas::ledger::traverse::MultiEraTx;
 use serde_json::json;
 
-use super::{error::Error, follower::SlotNumber, EventDB};
+use super::{error::NotFoundError, follower::SlotNumber, EventDB};
 use crate::registration::{
     parse_registrations_from_metadata, validate_reg_cddl, CddlConfig, ErrorReport, VotingInfo,
 };
@@ -45,7 +45,7 @@ impl EventDB {
         &self, tx_id: TxId, stake_credential: Option<StakeCredential>,
         public_voting_key: Option<PublicVotingInfo>, payment_address: Option<PaymentAddress>,
         metadata_cip36: Option<MetadataCip36>, nonce: Option<Nonce>, errors_report: ErrorReport,
-    ) -> Result<(), Error> {
+    ) -> anyhow::Result<()> {
         let conn = self.pool.get().await?;
 
         // for the catalyst we dont support multiple delegations
@@ -60,7 +60,7 @@ impl EventDB {
         let encoded_voting_key = if let Some(voting_key) = public_voting_key {
             Some(
                 serde_json::to_string(&voting_key)
-                    .map_err(|_| Error::Unknown("Cannot encode voting key".to_string()))?
+                    .map_err(|_| anyhow::anyhow!("Cannot encode voting key".to_string()))?
                     .as_bytes()
                     .to_vec(),
             )
@@ -95,7 +95,7 @@ impl EventDB {
     /// Index registration data
     pub(crate) async fn index_registration_data(
         &self, tx: &MultiEraTx<'_>, network: Network,
-    ) -> Result<(), Error> {
+    ) -> anyhow::Result<()> {
         let cddl = CddlConfig::new();
 
         if !tx.metadata().is_empty() {
@@ -125,9 +125,7 @@ impl EventDB {
             }
 
             let nonce = if let Some(nonce) = registration.nonce {
-                Some(nonce.0.try_into().map_err(|_| {
-                    Error::Unknown("Cannot cast registration nonce from u64 to i64".to_string())
-                })?)
+                Some(nonce.0.try_into()?)
             } else {
                 None
             };
@@ -151,7 +149,7 @@ impl EventDB {
     /// Get registration info
     pub(crate) async fn get_registration_info(
         &self, stake_credential: StakeCredential, network: Network, slot_num: SlotNumber,
-    ) -> Result<(TxId, PaymentAddress, PublicVotingInfo, Nonce), Error> {
+    ) -> anyhow::Result<(TxId, PaymentAddress, PublicVotingInfo, Nonce)> {
         let conn = self.pool.get().await?;
 
         let rows = conn
@@ -162,18 +160,16 @@ impl EventDB {
             ])
             .await?;
 
-        let Some(row) = rows.first() else {
-            return Err(Error::NotFound);
-        };
+        let row = rows.first().ok_or(NotFoundError)?;
 
         let tx_id = row.try_get(TX_ID_COLUMN)?;
         let payment_address = row.try_get(PAYMENT_ADDRESS_COLUMN)?;
         let nonce = row.try_get(NONCE_COLUMN)?;
         let public_voting_info = serde_json::from_str(
             &String::from_utf8(row.try_get(PUBLIC_VOTING_KEY_COLUMN)?)
-                .map_err(|_| Error::Unknown("Cannot parse public voting key".to_string()))?,
+                .map_err(|_| anyhow::anyhow!("Cannot parse public voting key".to_string()))?,
         )
-        .map_err(|_| Error::Unknown("Cannot parse public voting key".to_string()))?;
+        .map_err(|_| anyhow::anyhow!("Cannot parse public voting key".to_string()))?;
 
         Ok((tx_id, payment_address, public_voting_info, nonce))
     }
