@@ -4,6 +4,7 @@ use std::str::FromStr;
 use cardano_chain_follower::Network;
 use serde::{Deserialize, Serialize};
 
+use super::error::NotFoundError;
 use crate::event_db::EventDB;
 
 /// Representation of the `config` table id fields `id`, `id2`, `id3`
@@ -98,7 +99,7 @@ impl EventDB {
         }
 
         if follower_configs.is_empty() {
-            Err(anyhow::anyhow!("No config found"))
+            Err(NotFoundError.into())
         } else {
             Ok(follower_configs)
         }

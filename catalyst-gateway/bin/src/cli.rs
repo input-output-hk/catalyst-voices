@@ -66,7 +66,7 @@ impl Cli {
 
                     match event_db.get_follower_config().await {
                         Ok(config) => break config,
-                        Err(err) => error!("Get follower config error: {err}"),
+                        Err(err) => error!("No follower config found, error: {err}"),
                     }
                 };
 
