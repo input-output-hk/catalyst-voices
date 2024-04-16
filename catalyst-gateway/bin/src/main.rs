@@ -12,7 +12,7 @@ mod state;
 mod util;
 
 #[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
+async fn main() -> anyhow::Result<()> {
     cli::Cli::parse().exec().await?;
     Ok(())
 }

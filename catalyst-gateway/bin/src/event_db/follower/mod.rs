@@ -3,7 +3,8 @@
 use cardano_chain_follower::Network;
 use handlebars::Handlebars;
 
-use crate::event_db::{Error, EventDB};
+use super::error::NotFoundError;
+use crate::event_db::EventDB;
 
 /// Block time
 pub type DateTime = chrono::DateTime<chrono::offset::Utc>;
@@ -55,7 +56,7 @@ struct SlotInfoQueryTmplFields {
 
 impl SlotInfoQueryType {
     /// Get SQL query
-    fn get_sql_query(&self) -> Result<String, Error> {
+    fn get_sql_query(&self) -> anyhow::Result<String> {
         let tmpl_fields = match self {
             SlotInfoQueryType::Previous => {
                 SlotInfoQueryTmplFields {
@@ -81,8 +82,7 @@ impl SlotInfoQueryType {
         // disable default `html_escape` function
         // which transforms `<`, `>` symbols to `&lt`, `&gt`
         reg.register_escape_fn(|s| s.into());
-        reg.render_template(SLOT_INFO_SQL_HBS, &tmpl_fields)
-            .map_err(|e| Error::Unknown(e.to_string()))
+        Ok(reg.render_template(SLOT_INFO_SQL_HBS, &tmpl_fields)?)
     }
 }
 
@@ -91,7 +91,7 @@ impl EventDB {
     pub(crate) async fn index_follower_data(
         &self, slot_no: SlotNumber, network: Network, epoch_no: EpochNumber, block_time: DateTime,
         block_hash: BlockHash,
-    ) -> Result<(), Error> {
+    ) -> anyhow::Result<()> {
         let conn = self.pool.get().await?;
 
         let _rows = conn
@@ -110,7 +110,7 @@ impl EventDB {
     /// Get slot info for the provided date-time and network and query type
     pub(crate) async fn get_slot_info(
         &self, date_time: DateTime, network: Network, query_type: SlotInfoQueryType,
-    ) -> Result<(SlotNumber, BlockHash, DateTime), Error> {
+    ) -> anyhow::Result<(SlotNumber, BlockHash, DateTime)> {
         let conn = self.pool.get().await?;
 
         let rows = conn
@@ -120,9 +120,7 @@ impl EventDB {
             ])
             .await?;
 
-        let Some(row) = rows.first() else {
-            return Err(Error::NotFound);
-        };
+        let row = rows.first().ok_or(NotFoundError)?;
 
         let slot_number: SlotNumber = row.try_get(SLOT_NO_COLUMN)?;
         let block_hash = row.try_get(BLOCK_HASH_COLUMN)?;
@@ -134,16 +132,14 @@ impl EventDB {
     /// Start follower from where previous follower left off.
     pub(crate) async fn last_updated_metadata(
         &self, network: Network,
-    ) -> Result<(SlotNumber, BlockHash, DateTime), Error> {
+    ) -> anyhow::Result<(SlotNumber, BlockHash, DateTime)> {
         let conn = self.pool.get().await?;
 
         let rows = conn
             .query(SELECT_UPDATE_STATE_SQL, &[&network.to_string()])
             .await?;
 
-        let Some(row) = rows.first() else {
-            return Err(Error::NotFound);
-        };
+        let row = rows.first().ok_or(NotFoundError)?;
 
         let slot_no = row.try_get(SLOT_NO_COLUMN)?;
         let block_hash = row.try_get(BLOCK_HASH_COLUMN)?;
@@ -157,7 +153,7 @@ impl EventDB {
     pub(crate) async fn refresh_last_updated(
         &self, last_updated: DateTime, slot_no: SlotNumber, block_hash: BlockHash,
         network: Network, machine_id: &MachineId,
-    ) -> Result<(), Error> {
+    ) -> anyhow::Result<()> {
         let conn = self.pool.get().await?;
 
         // Rollback or update
@@ -169,8 +165,7 @@ impl EventDB {
         // All future additions are just updates on ended, slot_no and block_hash
         let _rows = conn
             .query(INSERT_UPDATE_STATE_SQL, &[
-                &i64::try_from(network_id)
-                    .map_err(|_| Error::Unknown("Network id out of range".to_string()))?,
+                &i64::try_from(network_id)?,
                 &last_updated,
                 &last_updated,
                 &machine_id,

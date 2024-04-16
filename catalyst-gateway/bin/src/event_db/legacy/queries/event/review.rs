@@ -1,6 +1,5 @@
 //! Review Queries
 use crate::event_db::{
-    error::Error,
     legacy::types::{
         event::EventId,
         objective::ObjectiveId,
@@ -41,7 +40,7 @@ impl EventDB {
     pub(crate) async fn get_reviews(
         &self, event: EventId, objective: ObjectiveId, proposal: ProposalId, limit: Option<i64>,
         offset: Option<i64>,
-    ) -> Result<Vec<AdvisorReview>, Error> {
+    ) -> anyhow::Result<Vec<AdvisorReview>> {
         let conn = self.pool.get().await?;
 
         let rows = conn
@@ -81,7 +80,7 @@ impl EventDB {
     #[allow(dead_code)]
     pub(crate) async fn get_review_types(
         &self, event: EventId, objective: ObjectiveId, limit: Option<i64>, offset: Option<i64>,
-    ) -> Result<Vec<ReviewType>, Error> {
+    ) -> anyhow::Result<Vec<ReviewType>> {
         let conn = self.pool.get().await?;
 
         let rows = conn
