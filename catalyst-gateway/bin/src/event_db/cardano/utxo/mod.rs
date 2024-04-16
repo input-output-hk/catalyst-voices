@@ -12,6 +12,15 @@ use crate::{
 /// Stake amount.
 pub(crate) type StakeAmount = i64;
 
+/// `insert_txn_index.sql`
+const INSERT_TXN_INDEX_SQL: &str = include_str!("insert_txn_index.sql");
+/// `insert_utxo.sql`
+const INSERT_UTXO_SQL: &str = include_str!("insert_utxo.sql");
+/// `select_total_utxo_amount.sql`
+const SELECT_TOTAL_UTXO_AMOUNT_SQL: &str = include_str!("select_total_utxo_amount.sql");
+/// `update_utxo.sql`
+const UPDATE_UTXO_SQL: &str = include_str!("update_utxo.sql");
+
 impl EventDB {
     /// Index utxo data
     pub(crate) async fn index_utxo_data(&self, tx: &MultiEraTx<'_>) -> anyhow::Result<()> {
@@ -33,7 +42,7 @@ impl EventDB {
             let stake_credential = stake_address.map(|val| val.payload().as_hash().to_vec());
 
             let _rows = conn
-                .query(include_str!("insert_utxo.sql"), &[
+                .query(INSERT_UTXO_SQL, &[
                     &i32::try_from(index)?,
                     &tx_hash.as_slice(),
                     &i64::try_from(tx_out.lovelace_amount())?,
@@ -49,7 +58,7 @@ impl EventDB {
             let out_index = output.index();
 
             let _rows = conn
-                .query(include_str!("update_utxo.sql"), &[
+                .query(UPDATE_UTXO_SQL, &[
                     &tx_hash.as_slice(),
                     &output_tx_hash.as_slice(),
                     &i32::try_from(out_index)?,
@@ -67,7 +76,7 @@ impl EventDB {
         let conn = self.pool.get().await?;
 
         let _rows = conn
-            .query(include_str!("insert_txn_index.sql"), &[
+            .query(INSERT_TXN_INDEX_SQL, &[
                 &tx_id,
                 &slot_no,
                 &network.to_string(),
@@ -84,7 +93,7 @@ impl EventDB {
         let conn = self.pool.get().await?;
 
         let row = conn
-            .query_one(include_str!("select_total_utxo_amount.sql"), &[
+            .query_one(SELECT_TOTAL_UTXO_AMOUNT_SQL, &[
                 &stake_credential,
                 &network.to_string(),
                 &slot_num,

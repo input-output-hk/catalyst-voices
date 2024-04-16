@@ -49,6 +49,9 @@ pub(crate) struct MithrilSnapshotConfig {
     pub(crate) timing_pattern: u8,
 }
 
+/// `select_config.sql`
+const SELECT_CONFIG_SQL: &str = include_str!("select_config.sql");
+
 impl EventDB {
     /// Config query
     pub(crate) async fn get_follower_config(&self) -> anyhow::Result<Vec<FollowerConfig>> {
@@ -57,9 +60,7 @@ impl EventDB {
         let id = "cardano";
         let id2 = "follower";
 
-        let rows = conn
-            .query(include_str!("select_config.sql"), &[&id, &id2])
-            .await?;
+        let rows = conn.query(SELECT_CONFIG_SQL, &[&id, &id2]).await?;
 
         let mut follower_configs = Vec::new();
         for row in rows {
