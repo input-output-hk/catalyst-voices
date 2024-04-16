@@ -10,6 +10,8 @@ environment:
 dependencies:
     bloc: ^8.1.2
     bloc_concurrency: ^0.2.2
+    catalyst_voices_assets:
+      path: ../catalyst_voices_assets
     catalyst_voices_models:
       path: ../catalyst_voices_models
     catalyst_voices_repositories:
