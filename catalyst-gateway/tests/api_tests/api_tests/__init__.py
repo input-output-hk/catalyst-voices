@@ -70,6 +70,17 @@ def get_date_time_to_slot_number(network: str, date_time: datetime):
     return resp.json()
 
 
+def get_voter_registration(address: str, network: str, slot_number: int):
+    resp = requests.get(
+        cat_gateway_endpoint_url(
+            f"api/cardano/registration/{address}?network={network}&slot_number={slot_number}"
+        )
+    )
+    assert resp.status_code == 200 or resp.status_code == 404
+    if resp.status_code == 200:
+        return resp.json()
+
+
 # Wait until service will sync to the provided slot number
 def sync_to(network: str, slot_num: int, timeout: int):
     start_time = time.time()
@@ -87,40 +98,44 @@ def sync_to(network: str, slot_num: int, timeout: int):
     while True:
         # Get current sync state
         sync_state = get_sync_state(network=network)
-        if last_slot_num == -1:
-            first_slot_num = sync_state["slot_number"]
 
-        # If we reached our target sync state, then continue the test
-        if sync_state != None and sync_state["slot_number"] >= slot_num:
-            logger.info(f"cat-gateway synced to target slot {slot_num}: {sync_state}")
-            break
+        if sync_state != None:
+            if last_slot_num == -1:
+                first_slot_num = sync_state["slot_number"]
 
-        # If the sync state changed since last time, reset the timeout and log the new sync state
-        if last_slot_num != sync_state["slot_number"]:
-            slots_last_interval = (sync_state["slot_number"] - last_slot_num) + 1
-            last_interval = time.time() - start_time
-            sps_last_interval = slots_last_interval / max(last_interval, 1.0)
+            # If we reached our target sync state, then continue the test
+            if sync_state["slot_number"] >= slot_num:
+                logger.info(
+                    f"cat-gateway synced to target slot {slot_num}: {sync_state}"
+                )
+                break
 
-            last_slot_num = sync_state["slot_number"]
-            start_time = time.time()
+            # If the sync state changed since last time, reset the timeout and log the new sync state
+            if last_slot_num != sync_state["slot_number"]:
+                slots_last_interval = (sync_state["slot_number"] - last_slot_num) + 1
+                last_interval = time.time() - start_time
+                sps_last_interval = slots_last_interval / max(last_interval, 1.0)
 
-            total_time = start_time - true_start
-            total_slots = (last_slot_num - first_slot_num) + 1
-            slots_per_second = total_slots / max(total_time, 0.001)
+                last_slot_num = sync_state["slot_number"]
+                start_time = time.time()
 
-            residual_sync_slots = max(slot_num - last_slot_num, 0)
-            estimated_time_remaining = residual_sync_slots / slots_per_second
+                total_time = start_time - true_start
+                total_slots = (last_slot_num - first_slot_num) + 1
+                slots_per_second = total_slots / max(total_time, 0.001)
 
-            # Total slots/second and in the last interval
-            sps = f"{slots_per_second:.2f}({sps_last_interval:.2f})"
+                residual_sync_slots = max(slot_num - last_slot_num, 0)
+                estimated_time_remaining = residual_sync_slots / slots_per_second
 
-            logger.info(
-                f"{last_slot_num : >16} : "
-                + f"{printable_time(total_time) : >16} : "
-                + f"{sps : >20} : "
-                + f"{residual_sync_slots : >16} : "
-                + f"{printable_time(estimated_time_remaining) : >16} :"
-            )
+                # Total slots/second and in the last interval
+                sps = f"{slots_per_second:.2f}({sps_last_interval:.2f})"
+
+                logger.info(
+                    f"{last_slot_num : >16} : "
+                    + f"{printable_time(total_time) : >16} : "
+                    + f"{sps : >20} : "
+                    + f"{residual_sync_slots : >16} : "
+                    + f"{printable_time(estimated_time_remaining) : >16} :"
+                )
 
         # If sync state does not update for timeout seconds, then fail the test
         if start_time + timeout <= time.time():

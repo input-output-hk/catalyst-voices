@@ -9,7 +9,7 @@ deps:
     FROM debian:bookworm-slim
     ARG TARGETARCH
     RUN apt-get update
-    RUN apt-get install -y git curl unzip bzip2 bash jq gpg
+    RUN apt-get install -y git curl unzip bzip2 bash jq gpg lcov
     COPY --dir test_driver/scripts .
     RUN chmod +x scripts/install-chrome-linux64.sh && ./scripts/install-chrome-linux64.sh
     RUN chmod +x scripts/install-edge-linux64.sh && ./scripts/install-edge-linux64.sh
@@ -24,7 +24,9 @@ deps:
     RUN flutter --version
     RUN flutter doctor -v
     RUN flutter config --enable-web
+    RUN dart pub global activate melos
     RUN dart pub global activate junitreport
+    RUN dart pub global activate coverage
 
 src:
     FROM +deps
@@ -61,6 +63,20 @@ check-flutter-code-generator:
     # Check diff between local code and earthly artifacts
     RUN diff /tmp/repo_generated lib/generated/catalyst_gateway
 
+check-static-analysis:
+    FROM +deps
+    COPY ../+repo-catalyst-voices-all/repo repo/
+    WORKDIR repo
+    RUN melos bootstrap
+    RUN melos analyze --fatal-infos --fatal-warnings
+
+check-code-formatting:
+    FROM +deps
+    COPY ../+repo-catalyst-voices-all/repo repo/
+    WORKDIR repo
+    RUN melos bootstrap
+    RUN melos run format-check
+
 # Build web version of Catalyst Voices
 build:
     FROM +src
@@ -73,12 +89,12 @@ build:
     SAVE ARTIFACT web /web AS LOCAL web
 
 test-unit:
-    FROM +build
-    WORKDIR /frontend
-    TRY
-        RUN flutter test --reporter expanded . --machine | tojunit --output flutter.junit-report.xml
-    FINALLY
-        SAVE ARTIFACT flutter.junit-report.xml AS LOCAL flutter-unit-tests.junit-report.xml
+    FROM +deps
+    COPY ../+repo-catalyst-voices-all/repo repo/
+    WORKDIR repo
+    RUN melos run test-report
+    WAIT
+        SAVE ARTIFACT test_reports AS LOCAL test_reports
     END
 
 package:

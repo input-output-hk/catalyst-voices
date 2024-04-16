@@ -29,19 +29,19 @@ def test_date_time_to_slot_number_endpoint():
         res["current"] != None
         and res["current"]["slot_number"] == 16010006
         and res["current"]["block_hash"]
-        == "65b13e1227c36a3327fb1333ae801d15c50c7f5af66919d467befce8d67a4284"
+        == "0x65b13e1227c36a3327fb1333ae801d15c50c7f5af66919d467befce8d67a4284"
     )
 
     assert (
         res["previous"] != None
         and res["previous"]["slot_number"] == 16009980
         and res["previous"]["block_hash"]
-        == "2e8475d3c4cf7fb97fa6d99ab29e05b39635b99253f1e27b9097acf5c4f4239d"
+        == "0x2e8475d3c4cf7fb97fa6d99ab29e05b39635b99253f1e27b9097acf5c4f4239d"
     )
 
     assert (
         res["next"] != None
         and res["next"]["slot_number"] == 16010056
         and res["next"]["block_hash"]
-        == "9768fb8df7c3e336da30c82dd93dc664135f866080c773402b528288c970c5b0"
+        == "0x9768fb8df7c3e336da30c82dd93dc664135f866080c773402b528288c970c5b0"
     )

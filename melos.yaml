@@ -2,7 +2,7 @@ name: catalyst_voices
 repository: https://github.com/input-output-hk/catalyst-voices
 
 packages:
-  - catalyst_voices/*
+  - catalyst_voices
   - catalyst_voices/packages/**
   - catalyst_voices_packages/**
   - utilities/*
@@ -13,7 +13,7 @@ command:
     workspaceChangelog: true
   bootstrap:
     environment:
-      sdk: '>=3.3.0 <4.0.0'
+      sdk: ">=3.3.0 <4.0.0"
       flutter: 3.19.5
     dependencies:
       bloc_concurrency: ^0.2.2
@@ -29,52 +29,61 @@ command:
       mocktail: ^1.0.1
 
 scripts:
-  lint:
-    run: melos run analyze
-    description: Run all static analysis checks.
-
-  format:
-      run: melos exec dart format . --fix
-      description: Run `dart format` for all packages.
-
-  format-check:
-    run: melos exec dart format . --set-exit-if-changed
-    description: Run `dart format` checks for all packages.
-
-  analyze:
-    # We are setting the concurrency to 1 because a higher concurrency can crash
-    # the analysis server on low performance machines (like GitHub Actions).
-    run: |
-      melos exec -c 1 -- \
-        dart analyze . --fatal-infos
-    description: |
-      Run `dart analyze` in all packages.
-       - Note: you can also rely on your IDEs Dart Analysis / Issues window.
-
   metrics:
     run: |
-      melos exec -c 1 --ignore="*example*" -- \
+      melos exec -c 1 -- \
         flutter pub run dart_code_metrics:metrics analyze
     description: |
       Run `dart_code_metrics` in all packages.
       - Note: you can also rely on your IDEs Dart Analysis / Issues window.
 
+  format:
+    run: |
+      melos exec -c 1 --dir-exists="lib" -- dart format lib --fix
+      melos exec -c 1 --dir-exists="test" -- dart format test --fix
+      melos exec -c 1 --dir-exists="integration_test" -- dart format integration_test --fix
+    description: Run `dart format` for all packages.
+
+  format-check:
+    run: |
+      melos exec -c 1 --dir-exists="lib" -- dart format lib  --set-exit-if-changed
+      melos exec -c 1 --dir-exists="test" -- dart format test  --set-exit-if-changed
+      melos exec -c 1 --dir-exists="integration_test" -- dart format integration_test  --set-exit-if-changed
+    description: Run `dart format` checks for all packages.
+
   test:select:
-    run: melos exec -- flutter test
+    run: |
+      melos exec -c 1 --dir-exists="test" -- flutter test
     description: Run `flutter test` for selected packages.
 
   test:
-    run: melos run test:select --no-select
-    description: Run all Flutter tests in this project.
-
-  coverage:
     run: |
-      melos exec -- flutter test --coverage &&
-      melos exec -- genhtml coverage/lcov.info --output-directory=coverage/
-    description: Generate coverage for the selected package.
+      melos run test:select --no-select
+    description: Run `flutter test` for all packages.
 
-  build:pub_get:all:
-    run: flutter pub get
-    exec:
-      concurrency: 6
-    description: Install all dependencies
+  test-report:
+    run: |
+      # cleanup from previous build and create new folders
+      rm -fR $MELOS_ROOT_PATH/test_reports
+      mkdir $MELOS_ROOT_PATH/test_reports
+
+      # run tests, generate junit reports in /test_reports/ & code coverage report
+      melos exec -c 1 --dir-exists="test" -- \
+       "flutter test --reporter expanded --coverage --machine | tojunit --output MELOS_ROOT_PATH/test_reports/MELOS_PACKAGE_NAME.junit-report.xml"
+
+      # removes code coverage for generated code
+      melos exec -c 1 --dir-exists="test" -- \
+        lcov --remove coverage/lcov.info -o coverage/lcov.info --ignore-errors unused,unused \
+        '*.swagger.dart' \
+        '*.chopper.dart' \
+        '*.g.dart' \
+        '*.freezed.dart' \
+        'lib/generated/**'
+
+      # converts coverage to a HTML report
+      melos exec -c 1 --dir-exists="test" -- \
+        "genhtml coverage/lcov.info --output-directory=coverage/"
+    description: |
+      Run `flutter test` for all packages and generate junit and coverage reports.
+      The test reports are saved in /test_reports folder.
+      The coverages are saved for each package separately in /coverage folder.

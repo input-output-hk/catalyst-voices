@@ -1,4 +1,4 @@
-//! Implementation of the GET `/staked_ada` endpoint
+//! Implementation of the GET `/registration` endpoint
 
 use poem_extensions::{
     response,
@@ -11,7 +11,7 @@ use crate::{
     service::{
         common::{
             objects::cardano::{
-                network::Network, stake_address::StakeAddress, stake_info::StakeInfo,
+                network::Network, registration_info::RegistrationInfo, stake_address::StakeAddress,
             },
             responses::{
                 resp_2xx::OK,
@@ -25,15 +25,16 @@ use crate::{
 };
 
 /// # All Responses
+#[allow(dead_code)]
 pub(crate) type AllResponses = response! {
-    200: OK<Json<StakeInfo>>,
+    200: OK<Json<RegistrationInfo>>,
     400: ApiValidationError,
     404: NotFound,
     500: ServerError,
     503: ServiceUnavailable,
 };
 
-/// # GET `/staked_ada`
+/// # GET `/registration`
 pub(crate) async fn endpoint(
     state: &State, stake_address: StakeAddress, provided_network: Option<Network>,
     slot_num: Option<SlotNumber>,
@@ -42,7 +43,6 @@ pub(crate) async fn endpoint(
 
     let date_time = slot_num.unwrap_or(SlotNumber::MAX);
     let stake_credential = stake_address.payload().as_hash().to_vec();
-
     let network = match check_network(stake_address.network(), provided_network) {
         Ok(network) => network,
         Err(err) => return T400(err),
@@ -50,14 +50,16 @@ pub(crate) async fn endpoint(
 
     // get the total utxo amount from the database
     match event_db
-        .total_utxo_amount(stake_credential, network.into(), date_time)
+        .get_registration_info(stake_credential, network.into(), date_time)
         .await
     {
-        Ok((amount, slot_number)) => {
-            T200(OK(Json(StakeInfo {
-                amount,
-                slot_number,
-            })))
+        Ok((tx_id, payment_address, voting_info, nonce)) => {
+            T200(OK(Json(RegistrationInfo::new(
+                tx_id,
+                &payment_address,
+                voting_info,
+                nonce,
+            ))))
         },
         Err(err) if err.is::<NotFoundError>() => T404(NotFound),
         Err(err) => handle_5xx_response!(err),

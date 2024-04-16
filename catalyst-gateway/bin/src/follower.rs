@@ -51,7 +51,7 @@ pub(crate) async fn start_followers(
                 }
             },
             Err(err) => {
-                error!("No config {:?}", err);
+                error!("Get follower config error: {err}");
                 break None;
             },
         }
@@ -147,19 +147,20 @@ async fn spawn_followers(
 async fn find_last_update_point(
     db: Arc<EventDB>, network: Network,
 ) -> anyhow::Result<(Option<SlotNumber>, Option<BlockHash>, Option<DateTime>)> {
-    let (slot_no, block_hash, last_updated) = match db.last_updated_metadata(network).await {
-        Ok((slot_no, block_hash, last_updated)) => {
-            info!(
+    let (slot_no, block_hash, last_updated) =
+        match db.last_updated_metadata(network).await {
+            Ok((slot_no, block_hash, last_updated)) => {
+                info!(
                 "Previous follower stopped updating at Slot_no: {} block_hash:{} last_updated: {}",
-                slot_no, block_hash, last_updated
+                slot_no, hex::encode(&block_hash), last_updated
             );
-            (Some(slot_no), Some(block_hash), Some(last_updated))
-        },
-        Err(err) => {
-            info!("No previous followers, start from genesis. Db msg: {}", err);
-            (None, None, None)
-        },
-    };
+                (Some(slot_no), Some(block_hash), Some(last_updated))
+            },
+            Err(err) => {
+                info!("No previous followers, start from genesis. Db msg: {}", err);
+                (None, None, None)
+            },
+        };
 
     Ok((slot_no, block_hash, last_updated))
 }
@@ -224,13 +225,7 @@ async fn init_follower(
                     };
 
                     match db
-                        .index_follower_data(
-                            slot,
-                            network,
-                            epoch,
-                            wallclock,
-                            hex::encode(block.hash()),
-                        )
+                        .index_follower_data(slot, network, epoch, wallclock, block.hash().to_vec())
                         .await
                     {
                         Ok(()) => (),
@@ -240,31 +235,41 @@ async fn init_follower(
                         },
                     }
 
-                    // index utxo
-                    match db.index_utxo_data(block.txs(), slot, network).await {
-                        Ok(()) => (),
-                        Err(err) => {
-                            error!("Unable to index utxo data for block {:?} - skip..", err);
-                            continue;
-                        },
-                    }
-
-                    // Block processing for Eras before staking are ignored.
-                    if valid_era(block.era()) {
-                        // index catalyst registrations
-                        match db.index_registration_data(block.txs(), slot, network).await {
+                    for tx in block.txs() {
+                        // index tx
+                        match db.index_txn_data(tx.hash().as_slice(), slot, network).await {
                             Ok(()) => (),
                             Err(err) => {
-                                error!(
-                                    "Unable to index registration data for block {:?} -
-                                 skip..",
-                                    err
-                                );
+                                error!("Unable to index txn data {:?} - skip..", err);
                                 continue;
                             },
                         }
 
-                        // Rewards
+                        // index utxo
+                        match db.index_utxo_data(&tx).await {
+                            Ok(()) => (),
+                            Err(err) => {
+                                error!("Unable to index utxo data for tx {:?} - skip..", err);
+                                continue;
+                            },
+                        }
+
+                        // Block processing for Eras before staking are ignored.
+                        if valid_era(block.era()) {
+                            // index catalyst registrations
+                            match db.index_registration_data(&tx, network).await {
+                                Ok(()) => (),
+                                Err(err) => {
+                                    error!(
+                                        "Unable to index registration data for tx {:?} - skip..",
+                                        err
+                                    );
+                                    continue;
+                                },
+                            }
+
+                            // Rewards
+                        }
                     }
 
                     // Refresh update metadata for future followers
@@ -272,7 +277,7 @@ async fn init_follower(
                         .refresh_last_updated(
                             chrono::offset::Utc::now(),
                             slot,
-                            hex::encode(block.hash()),
+                            block.hash().to_vec(),
                             network,
                             &machine_id,
                         )
@@ -329,11 +334,9 @@ async fn follower_connection(
                     .0
                     .ok_or(anyhow::anyhow!("Slot number not present"))?
                     .try_into()?,
-                hex::decode(
-                    start_from
-                        .1
-                        .ok_or(anyhow::anyhow!("Block Hash not present"))?,
-                )?,
+                start_from
+                    .1
+                    .ok_or(anyhow::anyhow!("Block Hash not present"))?,
             ))
             .mithril_snapshot_path(PathBuf::from(snapshot))
             .build()
