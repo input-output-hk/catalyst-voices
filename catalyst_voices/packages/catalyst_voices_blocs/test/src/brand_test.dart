@@ -48,7 +48,11 @@ void main() {
 
   group('Test brands', () {
 
+    // Colors used in the Brand themes as primary. They are used for
+    // the color of the widgets we are testing and they are the colors
+    // we will check against to ensure correct rendering.
     const dummyColor = Color(0xFFFF5722);
+    const catalystColor = VoicesColors.blue;
 
     testWidgets('Default Catalyst theme is applied', (tester) async {
       await tester.pumpWidget(
@@ -62,11 +66,11 @@ void main() {
       expect(dummyButton, findsOneWidget);
       expect(
         tester.widget<MaterialButton>(catalystButton).color,
-        VoicesColors.blue,
+        catalystColor,
       );
       expect(
         tester.widget<MaterialButton>(dummyButton).color,
-        VoicesColors.blue,
+        catalystColor,
       );
     });
     testWidgets('Dummy Theme is applied after switch', (tester) async {
@@ -104,17 +108,20 @@ void main() {
       expect(catalystButton, findsOneWidget);
       expect(dummyButton, findsOneWidget);
       
+      // We first switch do DummyBrand, we wait for the animation completion
+      // and then we switch back to the CatalystBrand to check the correct
+      // color is applied.
       await tester.tap(dummyButton);
       await tester.pumpAndSettle();
       await tester.tap(catalystButton);
       await tester.pumpAndSettle(); 
       expect(
         tester.widget<MaterialButton>(catalystButton).color,
-        VoicesColors.blue,
+        catalystColor,
       );
       expect(
         tester.widget<MaterialButton>(catalystButton).color,
-        VoicesColors.blue,
+        catalystColor,
       );
     });
 
