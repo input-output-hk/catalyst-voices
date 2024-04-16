@@ -3,8 +3,7 @@
 use cardano_chain_follower::Network;
 use handlebars::Handlebars;
 
-use super::error::NotFoundError;
-use crate::event_db::EventDB;
+use crate::event_db::{error::NotFoundError, EventDB};
 
 /// Block time
 pub type DateTime = chrono::DateTime<chrono::offset::Utc>;

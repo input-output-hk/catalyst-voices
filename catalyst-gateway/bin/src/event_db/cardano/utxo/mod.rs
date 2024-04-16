@@ -33,16 +33,13 @@ impl EventDB {
             let stake_credential = stake_address.map(|val| val.payload().as_hash().to_vec());
 
             let _rows = conn
-                .query(
-                    include_str!("../../../event-db/queries/utxo/insert_utxo.sql"),
-                    &[
-                        &i32::try_from(index)?,
-                        &tx_hash.as_slice(),
-                        &i64::try_from(tx_out.lovelace_amount())?,
-                        &stake_credential,
-                        &assets,
-                    ],
-                )
+                .query(include_str!("insert_utxo.sql"), &[
+                    &i32::try_from(index)?,
+                    &tx_hash.as_slice(),
+                    &i64::try_from(tx_out.lovelace_amount())?,
+                    &stake_credential,
+                    &assets,
+                ])
                 .await?;
         }
         // update outputs with inputs
@@ -52,14 +49,11 @@ impl EventDB {
             let out_index = output.index();
 
             let _rows = conn
-                .query(
-                    include_str!("../../../event-db/queries/utxo/update_utxo.sql"),
-                    &[
-                        &tx_hash.as_slice(),
-                        &output_tx_hash.as_slice(),
-                        &i32::try_from(out_index)?,
-                    ],
-                )
+                .query(include_str!("update_utxo.sql"), &[
+                    &tx_hash.as_slice(),
+                    &output_tx_hash.as_slice(),
+                    &i32::try_from(out_index)?,
+                ])
                 .await?;
         }
 
@@ -73,10 +67,11 @@ impl EventDB {
         let conn = self.pool.get().await?;
 
         let _rows = conn
-            .query(
-                include_str!("../../../event-db/queries/utxo/insert_txn_index.sql"),
-                &[&tx_id, &slot_no, &network.to_string()],
-            )
+            .query(include_str!("insert_txn_index.sql"), &[
+                &tx_id,
+                &slot_no,
+                &network.to_string(),
+            ])
             .await?;
 
         Ok(())
@@ -89,10 +84,11 @@ impl EventDB {
         let conn = self.pool.get().await?;
 
         let row = conn
-            .query_one(
-                include_str!("../../../event-db/queries/utxo/select_total_utxo_amount.sql"),
-                &[&stake_credential, &network.to_string(), &slot_num],
-            )
+            .query_one(include_str!("select_total_utxo_amount.sql"), &[
+                &stake_credential,
+                &network.to_string(),
+                &slot_num,
+            ])
             .await?;
 
         // Aggregate functions as SUM and MAX return NULL if there are no rows, so we need to

@@ -13,8 +13,10 @@ use tracing::{error, info};
 
 use crate::{
     event_db::{
-        config::FollowerConfig,
-        follower::{BlockHash, DateTime, MachineId, SlotNumber},
+        cardano::{
+            config::FollowerConfig,
+            follower::{BlockHash, DateTime, MachineId, SlotNumber},
+        },
         EventDB,
     },
     util::valid_era,

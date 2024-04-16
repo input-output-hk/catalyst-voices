@@ -1,11 +1,10 @@
-//! Config Queries
+//! Follower config queries
 use std::str::FromStr;
 
 use cardano_chain_follower::Network;
 use serde::{Deserialize, Serialize};
 
-use super::error::NotFoundError;
-use crate::event_db::EventDB;
+use crate::event_db::{error::NotFoundError, EventDB};
 
 /// Representation of the `config` table id fields `id`, `id2`, `id3`
 enum ConfigId {
@@ -59,10 +58,7 @@ impl EventDB {
         let id2 = "follower";
 
         let rows = conn
-            .query(
-                include_str!("../../../event-db/queries/config/select_config.sql"),
-                &[&id, &id2],
-            )
+            .query(include_str!("select_config.sql"), &[&id, &id2])
             .await?;
 
         let mut follower_configs = Vec::new();
