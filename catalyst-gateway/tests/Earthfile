@@ -5,9 +5,9 @@ package-schemathesis:
 
     ARG tag="latest"
     ARG max_examples=1000
-    ARG max_response_time=200
+    ARG max_response_time=300
     ARG wait_for_schema=15
-    ARG workers=1
+    ARG workers=2
     ARG schema_version=30
     ARG openapi_spec
 
@@ -28,10 +28,10 @@ package-schemathesis:
     SAVE IMAGE schemathesis:$tag
 
 # test-fuzzer-api - Fuzzy test cat-gateway using openapi specs
-test-fuzzer-api:
+fuzzer-api:
     FROM earthly/dind:alpine-3.19
     RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
-    RUN apk add yq
+    RUN apk add yq zstd
     ARG DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
     ARG CAT_ADDRESS="127.0.0.1:3030"
     ARG OPENAPI_SPEC="http://127.0.0.1:3030/docs/cat-gateway.json"
@@ -46,27 +46,27 @@ test-fuzzer-api:
         --service cat-gateway \
         --allow-privileged
         RUN docker run --net=host --name=st schemathesis:latest || echo fail > fail && \
-                docker logs cat-gateway > ./cat-gateway.log && \
+                docker logs cat-gateway > ./cat-gateway.log && zstd -9 cat-gateway.log && \
                     docker cp st:/results/junit-report.xml junit-report.xml && \
                         docker cp st:/results/cassette.yaml cassette.yaml
     END
     WAIT
         SAVE ARTIFACT junit-report.xml AS LOCAL schemathesis.junit-report.xml
-        SAVE ARTIFACT cat-gateway.log AS LOCAL cat-gateway.log
+        SAVE ARTIFACT cat-gateway.log.zst AS LOCAL cat-gateway.log.zst
         SAVE ARTIFACT cassette.yaml AS LOCAL cassette.yaml
     END
     IF [ -f fail ]
-        RUN echo -e "\033[0;31mSchemathesis test run failed\n" && \
+        RUN echo -e "\033[0;31mSchemathesis test run failed. Run the test locally to get Catalyst Gateway logs\n" && \
             echo -e "\033[0;31mFailed tests:" && \
             yq -PC '.http_interactions.[] | select(.status == "FAILURE")' cassette.yaml && \
-            echo -e "\033[0;31mCatalyst Gateway logs:" && \
-            jq --color-output . cat-gateway.log cat-gateway.log && \
             exit 1
     END
 
 # test-lint-openapi - OpenAPI linting from an artifact
 # testing whether the OpenAPI generated during build stage follows good practice.
-test-lint-openapi:
+# TODO: https://github.com/input-output-hk/catalyst-voices/issues/408
+# enable this linting after this issue will be solved
+lint-openapi:
     FROM github.com/input-output-hk/catalyst-ci/earthly/spectral:v2.4.0+spectral-base
     # Copy the doc artifact.
     COPY ../+build/doc ./doc

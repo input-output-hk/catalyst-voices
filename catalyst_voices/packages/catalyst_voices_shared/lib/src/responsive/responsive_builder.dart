@@ -1,17 +1,17 @@
 import 'package:catalyst_voices_shared/src/responsive/responsive_breakpoint_key.dart';
 import 'package:flutter/widgets.dart';
 
-// A [ResponsiveBuilder] is a StatelessWidget that is aware about the current 
+// A [ResponsiveBuilder] is a StatelessWidget that is aware about the current
 // device breakpoint.
 //
 // This is an abstract widget that has a required argument [builder] that can
-// consume breakpoint-specific data automatically based on breakpoint that is 
+// consume breakpoint-specific data automatically based on breakpoint that is
 // detected.
 //
-// The breakpoint is identified by using the screen width exposed by MediaQuery 
+// The breakpoint is identified by using the screen width exposed by MediaQuery
 // of the context.
 //
-// The widget accepts an argument for each breakpoint defined in 
+// The widget accepts an argument for each breakpoint defined in
 // [ResponsiveBreakpointKey]. The breakpoint specific [data] is selected when:
 // - the breakpoint is detected
 // - the breakpoint-specific data argument is present
@@ -32,7 +32,7 @@ import 'package:flutter/widgets.dart';
 // );
 //
 // or to have a specific padding:
-// 
+//
 // ```dart
 // ResponsiveBuilder<EdgeInsetsGeometry>(
 //   xs: EdgeInsets.all(4.0),
@@ -57,12 +57,12 @@ class ResponsiveBuilder<T extends Object> extends StatelessWidget {
     T? lg,
     required T other,
   }) : _responsiveData = {
-    ResponsiveBreakpointKey.xs: xs,
-    ResponsiveBreakpointKey.sm: sm,
-    ResponsiveBreakpointKey.md: md,
-    ResponsiveBreakpointKey.lg: lg,
-    ResponsiveBreakpointKey.other: other,
-  };
+          ResponsiveBreakpointKey.xs: xs,
+          ResponsiveBreakpointKey.sm: sm,
+          ResponsiveBreakpointKey.md: md,
+          ResponsiveBreakpointKey.lg: lg,
+          ResponsiveBreakpointKey.other: other,
+        };
 
   @override
   Widget build(BuildContext context) {
@@ -73,18 +73,17 @@ class ResponsiveBuilder<T extends Object> extends StatelessWidget {
     final screenWidth = MediaQuery.sizeOf(context).width;
 
     final breakpointKey = _breakpoints.entries
-      .firstWhere(
-        (entry) => (
-          screenWidth >= entry.value.min &&
-          screenWidth <= entry.value.max &&
-          _responsiveData[entry.key] != null
-        ),
-        orElse: () => const MapEntry(
-          ResponsiveBreakpointKey.other, (min: 0, max: 0),
-        ),
-      )
-      .key;
-      return _responsiveData[breakpointKey]!;
+        .firstWhere(
+          (entry) => (screenWidth >= entry.value.min &&
+              screenWidth <= entry.value.max &&
+              _responsiveData[entry.key] != null),
+          orElse: () => const MapEntry(
+            ResponsiveBreakpointKey.other,
+            (min: 0, max: 0),
+          ),
+        )
+        .key;
+    return _responsiveData[breakpointKey]!;
   }
 
   final Map<ResponsiveBreakpointKey, ({int min, int max})> _breakpoints = {

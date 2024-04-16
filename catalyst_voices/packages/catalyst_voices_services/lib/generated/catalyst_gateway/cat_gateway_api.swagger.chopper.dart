@@ -102,6 +102,26 @@ final class _$CatGatewayApi extends CatGatewayApi {
   }
 
   @override
+  Future<Response<RegistrationInfo>> _apiCardanoRegistrationStakeAddressGet({
+    required String? stakeAddress,
+    String? network,
+    int? slotNumber,
+  }) {
+    final Uri $url = Uri.parse('/api/cardano/registration/${stakeAddress}');
+    final Map<String, dynamic> $params = <String, dynamic>{
+      'network': network,
+      'slot_number': slotNumber,
+    };
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+      parameters: $params,
+    );
+    return client.send<RegistrationInfo, RegistrationInfo>($request);
+  }
+
+  @override
   Future<Response<SyncState>> _apiCardanoSyncStateGet({String? network}) {
     final Uri $url = Uri.parse('/api/cardano/sync_state');
     final Map<String, dynamic> $params = <String, dynamic>{'network': network};
@@ -112,6 +132,25 @@ final class _$CatGatewayApi extends CatGatewayApi {
       parameters: $params,
     );
     return client.send<SyncState, SyncState>($request);
+  }
+
+  @override
+  Future<Response<SlotInfo>> _apiCardanoDateTimeToSlotNumberGet({
+    DateTime? dateTime,
+    String? network,
+  }) {
+    final Uri $url = Uri.parse('/api/cardano/date_time_to_slot_number');
+    final Map<String, dynamic> $params = <String, dynamic>{
+      'date_time': dateTime,
+      'network': network,
+    };
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+      parameters: $params,
+    );
+    return client.send<SlotInfo, SlotInfo>($request);
   }
 
   @override
