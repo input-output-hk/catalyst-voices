@@ -1,6 +1,6 @@
 #!/bin/bash
 # This script installs Chrome/Chromium for testing and Chromedriver
-if [ "$TARGETARCH" == "arm64"]
+if [ "$TARGETARCH" == "arm64" ]
   # There is no Chrome for testing for arm64, using chromium instead
   # https://github.com/GoogleChromeLabs/chrome-for-testing/issues/1
 then

@@ -1,7 +1,7 @@
 #!/bin/bash
 # This script installs Firefox and Geckodriver. Geckodriver supported versions:
 # https://firefox-source-docs.mozilla.org/testing/geckodriver/Support.html
-if [ "$TARGETARCH" == "arm64"]
+if [ "$TARGETARCH" == "arm64" ]
 then
     PLATFORM=aarch64
 else

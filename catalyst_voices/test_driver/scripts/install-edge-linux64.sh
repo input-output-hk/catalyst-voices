@@ -1,6 +1,6 @@
 #!/bin/bash
 # This script installs Edge and Edgedriver.
-if [ "$TARGETARCH" == "arm64"]
+if [ "$TARGETARCH" == "arm64" ]
 then
     PLATFORM=arm64
 else
