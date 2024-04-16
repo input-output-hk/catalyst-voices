@@ -16,7 +16,7 @@ use crate::{
         responses::{
             resp_2xx::OK,
             resp_4xx::ApiValidationError,
-            resp_5xx::{server_error_response, ServerError, ServiceUnavailable},
+            resp_5xx::{handle_5xx_response, ServerError, ServiceUnavailable},
         },
     },
     state::State,
@@ -71,15 +71,15 @@ pub(crate) async fn endpoint(
 
     let current = match process_slot_info_result(current) {
         Ok(current) => current,
-        Err(err) => return server_error_response!("{err}"),
+        Err(err) => return handle_5xx_response!(err),
     };
     let previous = match process_slot_info_result(previous) {
         Ok(current) => current,
-        Err(err) => return server_error_response!("{err}"),
+        Err(err) => return handle_5xx_response!(err),
     };
     let next = match process_slot_info_result(next) {
         Ok(current) => current,
-        Err(err) => return server_error_response!("{err}"),
+        Err(err) => return handle_5xx_response!(err),
     };
 
     T200(OK(Json(SlotInfo {

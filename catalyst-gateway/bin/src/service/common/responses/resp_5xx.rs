@@ -9,17 +9,23 @@ use uuid::Uuid;
 /// probably want to place this in your crate root
 use crate::settings::generate_github_issue_url;
 
-/// Create a new Server Error Response.
+/// Handle a 5xx response.
+/// Returns a Server Error or a Service Unavailable response.
 /// Logging error message.
-macro_rules! server_error_response {
-    ($($t:tt)*) => {{
-        let error = crate::service::common::responses::resp_5xx::ServerError::new(None);
-        let id = error.id();
-        tracing::error!(id = format!("{id}") ,$($t)*);
-        poem_extensions::UniResponse::T500(error)
+/// Argument must be `anyhow::Error` type.
+macro_rules! handle_5xx_response {
+    ($err:ident) => {{
+        if $err.is::<bb8::RunError<tokio_postgres::Error>>() {
+            poem_extensions::UniResponse::T503(ServiceUnavailable)
+        } else {
+            let error = crate::service::common::responses::resp_5xx::ServerError::new(None);
+            let id = error.id();
+            tracing::error!(id = format!("{id}"), "{}", $err);
+            poem_extensions::UniResponse::T500(error)
+        }
     }};
 }
-pub(crate) use server_error_response;
+pub(crate) use handle_5xx_response;
 
 #[derive(Debug, Object)]
 #[oai(example, skip_serializing_if_is_none)]

@@ -13,7 +13,7 @@ use crate::{
     service::common::responses::{
         resp_2xx::NoContent,
         resp_4xx::ApiValidationError,
-        resp_5xx::{server_error_response, ServerError, ServiceUnavailable},
+        resp_5xx::{handle_5xx_response, ServerError, ServiceUnavailable},
     },
     state::State,
 };
@@ -61,7 +61,6 @@ pub(crate) async fn endpoint(state: Data<&Arc<State>>) -> AllResponses {
             tracing::error!("{err}");
             T503(ServiceUnavailable)
         },
-        // Err(DBError::TimedOut) => T503(ServiceUnavailable),
-        Err(err) => server_error_response!("{err}"),
+        Err(err) => handle_5xx_response!(err),
     }
 }

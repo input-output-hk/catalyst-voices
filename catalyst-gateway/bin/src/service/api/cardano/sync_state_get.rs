@@ -13,7 +13,7 @@ use crate::{
         responses::{
             resp_2xx::OK,
             resp_4xx::{ApiValidationError, NotFound},
-            resp_5xx::{server_error_response, ServerError, ServiceUnavailable},
+            resp_5xx::{handle_5xx_response, ServerError, ServiceUnavailable},
         },
     },
     state::State,
@@ -44,6 +44,6 @@ pub(crate) async fn endpoint(state: &State, network: Option<Network>) -> AllResp
             })))
         },
         Err(err) if err.is::<NotFoundError>() => T404(NotFound),
-        Err(err) => server_error_response!("{err}"),
+        Err(err) => handle_5xx_response!(err),
     }
 }
