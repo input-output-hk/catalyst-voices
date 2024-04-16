@@ -1,0 +1,123 @@
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_blocs/src/brand/brand_bloc.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  const catalystKey = Key('C');
+  const dummyKey = Key('D');
+
+  Widget buildApp() => BlocProvider(
+    create: (context) => BrandBloc(),
+    child: BlocBuilder<BrandBloc, BrandState>(
+      builder: (context, state) {
+        return MaterialApp(
+          builder: (context, state) => Scaffold(
+            body: Row(
+              children: [
+                MaterialButton(
+                  key: catalystKey,
+                  color: Theme.of(context).primaryColor,
+                  onPressed: () {
+                    context.read<BrandBloc>().add(
+                      const BrandChanged(BrandKey.catalyst),
+                    );
+                  },
+                  child: const Text('Catalyst'),
+                ),
+                MaterialButton(
+                  key: dummyKey,
+                  color: Theme.of(context).primaryColor,
+                  child: const Text('Dummy'),
+                  onPressed: () {
+                    context.read<BrandBloc>().add(
+                      const BrandChanged(BrandKey.dummy),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+          theme: state.themeData,
+        );
+      },
+    ),
+  );
+
+  group('Test brands', () {
+
+    const dummyColor = Color(0xFFFF5722);
+
+    testWidgets('Default Catalyst theme is applied', (tester) async {
+      await tester.pumpWidget(
+        buildApp(),
+      );
+
+      final catalystButton = find.byKey(catalystKey);
+      final dummyButton = find.byKey(dummyKey);
+
+      expect(catalystButton, findsOneWidget);
+      expect(dummyButton, findsOneWidget);
+      expect(
+        tester.widget<MaterialButton>(catalystButton).color,
+        VoicesColors.blue,
+      );
+      expect(
+        tester.widget<MaterialButton>(dummyButton).color,
+        VoicesColors.blue,
+      );
+    });
+    testWidgets('Dummy Theme is applied after switch', (tester) async {
+      await tester.pumpWidget(
+        buildApp(),
+      );
+
+      final catalystButton = find.byKey(catalystKey);
+      final dummyButton = find.byKey(dummyKey);
+
+      expect(catalystButton, findsOneWidget);
+      expect(dummyButton, findsOneWidget);
+      
+      await tester.tap(dummyButton);
+      // We need to wait for the animation to complete
+      await tester.pumpAndSettle();      
+      expect(
+        tester.widget<MaterialButton>(catalystButton).color,
+        dummyColor,
+      );
+      expect(
+        tester.widget<MaterialButton>(catalystButton).color,
+        dummyColor,
+      );
+    });
+
+    testWidgets('Catalyst Theme is applied after switch', (tester) async {
+      await tester.pumpWidget(
+        buildApp(),
+      );
+
+      final catalystButton = find.byKey(catalystKey);
+      final dummyButton = find.byKey(dummyKey);
+
+      expect(catalystButton, findsOneWidget);
+      expect(dummyButton, findsOneWidget);
+      
+      await tester.tap(dummyButton);
+      await tester.pumpAndSettle();
+      await tester.tap(catalystButton);
+      await tester.pumpAndSettle(); 
+      expect(
+        tester.widget<MaterialButton>(catalystButton).color,
+        VoicesColors.blue,
+      );
+      expect(
+        tester.widget<MaterialButton>(catalystButton).color,
+        VoicesColors.blue,
+      );
+    });
+
+  });
+
+}

@@ -33,4 +33,7 @@ dev_dependencies:
    bloc_test: ^9.1.4
    catalyst_analysis:
     path: ../../../catalyst_voices_packages/catalyst_analysis
+   flutter_bloc: ^8.1.5
+   flutter_test:
+      sdk: flutter
    test: ^1.24.9
