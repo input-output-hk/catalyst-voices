@@ -34,20 +34,20 @@ final class CatalystPlatform {
     ];
     return mobileIdentifiers.any(userAgent.contains);
   }
-  
+
   static Map<PlatformKey, bool> get identifiers => {
-    PlatformKey.android: isAndroid,
-    PlatformKey.desktop: isDesktop,
-    PlatformKey.fuchsia: isFuchsia,
-    PlatformKey.iOS: isIOS,
-    PlatformKey.linux: isLinux,
-    PlatformKey.macOS: isMacOS,
-    PlatformKey.mobile: isMobile,
-    PlatformKey.mobileWeb: isMobileWeb,
-    PlatformKey.web: isWeb,
-    PlatformKey.webDesktop: isWebDesktop,
-    PlatformKey.windows: isWindows,
-  };
+        PlatformKey.android: isAndroid,
+        PlatformKey.desktop: isDesktop,
+        PlatformKey.fuchsia: isFuchsia,
+        PlatformKey.iOS: isIOS,
+        PlatformKey.linux: isLinux,
+        PlatformKey.macOS: isMacOS,
+        PlatformKey.mobile: isMobile,
+        PlatformKey.mobileWeb: isMobileWeb,
+        PlatformKey.web: isWeb,
+        PlatformKey.webDesktop: isWebDesktop,
+        PlatformKey.windows: isWindows,
+      };
 
   const CatalystPlatform._();
 }

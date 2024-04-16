@@ -19,8 +19,8 @@ final class ComingSoonPage extends StatelessWidget {
         decoration: BoxDecoration(
           image: DecorationImage(
             image: CatalystImage.asset(
-                VoicesAssets.images.comingSoonBkg.path,
-              ).image,
+              VoicesAssets.images.comingSoonBkg.path,
+            ).image,
             fit: BoxFit.cover,
           ),
         ),

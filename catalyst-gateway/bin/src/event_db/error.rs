@@ -1,5 +1,4 @@
 //! Database Errors
-use std::env::VarError;
 
 use bb8::RunError;
 
@@ -26,9 +25,6 @@ pub(crate) enum Error {
     /// Unknown error
     #[error("error: {0}")]
     Unknown(String),
-    /// Variable error
-    #[error(transparent)]
-    VarErr(#[from] VarError),
     /// No config
     #[error("No config")]
     NoConfig,

@@ -2,12 +2,11 @@
 
 use poem_extensions::{
     response,
-    UniResponse::{T200, T400, T404, T503},
+    UniResponse::{T200, T400, T404},
 };
 use poem_openapi::payload::Json;
 
 use crate::{
-    cli::Error,
     event_db::{error::Error as DBError, follower::SlotNumber},
     service::{
         common::{
@@ -22,7 +21,7 @@ use crate::{
         },
         utilities::check_network,
     },
-    state::{SchemaVersionStatus, State},
+    state::State,
 };
 
 /// # All Responses
@@ -40,19 +39,8 @@ pub(crate) async fn endpoint(
     state: &State, stake_address: StakeAddress, provided_network: Option<Network>,
     slot_num: Option<SlotNumber>,
 ) -> AllResponses {
-    let event_db = match state.event_db() {
-        Ok(event_db) => event_db,
-        Err(Error::EventDb(DBError::MismatchedSchema { was, expected })) => {
-            tracing::error!(
-                expected = expected,
-                current = was,
-                "DB schema version status mismatch"
-            );
-            state.set_schema_version_status(SchemaVersionStatus::Mismatch);
-            return T503(ServiceUnavailable);
-        },
-        Err(err) => return server_error_response!("{err}"),
-    };
+    let event_db = state.event_db();
+
     let date_time = slot_num.unwrap_or(SlotNumber::MAX);
     let stake_credential = stake_address.payload().as_hash().to_vec();
     let network = match check_network(stake_address.network(), provided_network) {

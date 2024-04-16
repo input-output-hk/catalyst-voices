@@ -58,7 +58,7 @@ impl Cli {
                 let machine_id = settings.follower_settings.machine_uid;
 
                 let state = Arc::new(State::new(Some(settings.database_url)).await?);
-                let event_db = state.event_db()?;
+                let event_db = state.event_db();
 
                 tokio::spawn(async move {
                     match service::run(&settings.docs_settings, state.clone()).await {

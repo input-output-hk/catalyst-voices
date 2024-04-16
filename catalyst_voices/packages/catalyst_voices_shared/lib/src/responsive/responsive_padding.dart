@@ -5,16 +5,16 @@ import 'package:flutter/widgets.dart';
 // A [ResponsivePadding] is a StatelessWidget that applies a padding based on
 // the current screen size.
 //
-// The widget wraps its [child] in a ResponsiveBuilder that calculates the 
+// The widget wraps its [child] in a ResponsiveBuilder that calculates the
 // proper padding value based on the screen size and wraps it again in a Padding
 // to display the selected padding value.
 //
-// The possible arguments are [xs], [sm], [md], [lg], [other] following the 
+// The possible arguments are [xs], [sm], [md], [lg], [other] following the
 // Material design standards and the ResponsiveBuilder arguments.
 // Each screen size has a default value to simplify widget usage.
 //
 // Example usage:
-// 
+//
 // ```dart
 // ResponsivePadding(
 //   xs: const EdgeInsets.all(4.0),
@@ -38,12 +38,12 @@ class ResponsivePadding extends StatelessWidget {
     EdgeInsets lg = const EdgeInsets.all(16),
     EdgeInsets other = const EdgeInsets.all(8),
   }) : _paddings = {
-    ResponsiveBreakpointKey.xs: xs,
-    ResponsiveBreakpointKey.sm: sm,
-    ResponsiveBreakpointKey.md: md,
-    ResponsiveBreakpointKey.lg: lg,
-    ResponsiveBreakpointKey.other: other,
-  };
+          ResponsiveBreakpointKey.xs: xs,
+          ResponsiveBreakpointKey.sm: sm,
+          ResponsiveBreakpointKey.md: md,
+          ResponsiveBreakpointKey.lg: lg,
+          ResponsiveBreakpointKey.other: other,
+        };
 
   @override
   Widget build(BuildContext context) {
@@ -59,5 +59,4 @@ class ResponsivePadding extends StatelessWidget {
       other: _paddings[ResponsiveBreakpointKey.other]!,
     );
   }
-
 }
