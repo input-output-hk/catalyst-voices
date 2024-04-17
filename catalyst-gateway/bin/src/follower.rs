@@ -1,5 +1,5 @@
 //! Logic for orchestrating followers
-use std::{error::Error, path::PathBuf, str::FromStr, sync::Arc};
+use std::{path::PathBuf, sync::Arc};
 
 /// Handler for follower tasks, allows for control over spawned follower threads
 pub type ManageTasks = JoinHandle<()>;
@@ -13,8 +13,8 @@ use tracing::{error, info};
 
 use crate::{
     event_db::{
-        config::{FollowerMeta, NetworkMeta},
-        follower::{BlockHash, LastUpdate, MachineId, SlotNumber},
+        config::FollowerConfig,
+        follower::{BlockHash, DateTime, MachineId, SlotNumber},
         EventDB,
     },
     util::valid_era,
@@ -27,9 +27,9 @@ const DATA_NOT_STALE: i64 = 1;
 #[async_recursion]
 /// Start followers as per defined in the config
 pub(crate) async fn start_followers(
-    configs: (Vec<NetworkMeta>, FollowerMeta), db: Arc<EventDB>, data_refresh_tick: u64,
-    check_config_tick: u64, machine_id: String,
-) -> Result<(), Box<dyn Error>> {
+    configs: Vec<FollowerConfig>, db: Arc<EventDB>, data_refresh_tick: u64, check_config_tick: u64,
+    machine_id: String,
+) -> anyhow::Result<()> {
     // spawn followers and obtain thread handlers for control and future cancellation
     let follower_tasks = spawn_followers(
         configs.clone(),
@@ -43,7 +43,7 @@ pub(crate) async fn start_followers(
     let mut interval = time::interval(time::Duration::from_secs(check_config_tick));
     let config = loop {
         interval.tick().await;
-        match db.get_config().await {
+        match db.get_follower_config().await {
             Ok(config) => {
                 if configs != config {
                     info!("Config has changed! restarting");
@@ -51,7 +51,7 @@ pub(crate) async fn start_followers(
                 }
             },
             Err(err) => {
-                error!("No config {:?}", err);
+                error!("Get follower config error: {err}");
                 break None;
             },
         }
@@ -75,7 +75,7 @@ pub(crate) async fn start_followers(
             )
             .await?;
         },
-        None => return Err("Config has been deleted...".into()),
+        None => return Err(anyhow::anyhow!("Config has been deleted...")),
     }
 
     Ok(())
@@ -83,17 +83,12 @@ pub(crate) async fn start_followers(
 
 /// Spawn follower threads and return associated handlers
 async fn spawn_followers(
-    configs: (Vec<NetworkMeta>, FollowerMeta), db: Arc<EventDB>, data_refresh_tick: u64,
-    machine_id: String,
-) -> Result<Vec<ManageTasks>, Box<dyn Error>> {
-    let snapshot_path = configs.1.mithril_snapshot_path;
-
+    configs: Vec<FollowerConfig>, db: Arc<EventDB>, data_refresh_tick: u64, machine_id: String,
+) -> anyhow::Result<Vec<ManageTasks>> {
     let mut follower_tasks = Vec::new();
 
-    for config in &configs.0 {
+    for config in &configs {
         info!("starting follower for {:?}", config.network);
-
-        let network = Network::from_str(&config.network)?;
 
         // Tick until data is stale then start followers
         let mut interval = time::interval(time::Duration::from_secs(data_refresh_tick));
@@ -104,7 +99,7 @@ async fn spawn_followers(
             // continue indexing from that point. If there was no previous follower, we
             // start from genesis point.
             let (slot_no, block_hash, last_updated) =
-                find_last_update_point(db.clone(), &config.network).await?;
+                find_last_update_point(db.clone(), config.network).await?;
 
             // Data is marked as stale after N seconds with no updates.
             let threshold = if let Some(last_update) = last_updated {
@@ -117,25 +112,26 @@ async fn spawn_followers(
             };
 
             // Threshold which defines if data is stale and ready to update or not
-            if chrono::offset::Utc::now().timestamp() - threshold > configs.1.timing_pattern.into()
+            if chrono::offset::Utc::now().timestamp() - threshold
+                > config.mithril_snapshot.timing_pattern.into()
             {
                 info!(
-                    "Last update is stale for network {} - ready to update, starting follower now.",
+                    "Last update is stale for network {:?} - ready to update, starting follower now.",
                     config.network
                 );
                 let follower_handler = init_follower(
-                    network,
+                    config.network,
                     &config.relay,
                     (slot_no, block_hash),
                     db.clone(),
                     machine_id.clone(),
-                    &snapshot_path,
+                    &config.mithril_snapshot.path,
                 )
                 .await?;
                 break follower_handler;
             }
             info!(
-                "Data is still fresh for network {}, tick until data is stale",
+                "Data is still fresh for network {:?}, tick until data is stale",
                 config.network
             );
         };
@@ -149,14 +145,14 @@ async fn spawn_followers(
 /// Establish point at which the last follower stopped updating in order to pick up where
 /// it left off. If there was no previous follower, start indexing from genesis point.
 async fn find_last_update_point(
-    db: Arc<EventDB>, network: &String,
-) -> Result<(Option<SlotNumber>, Option<BlockHash>, Option<LastUpdate>), Box<dyn Error>> {
+    db: Arc<EventDB>, network: Network,
+) -> anyhow::Result<(Option<SlotNumber>, Option<BlockHash>, Option<DateTime>)> {
     let (slot_no, block_hash, last_updated) =
-        match db.last_updated_metadata(network.to_string()).await {
+        match db.last_updated_metadata(network).await {
             Ok((slot_no, block_hash, last_updated)) => {
                 info!(
                 "Previous follower stopped updating at Slot_no: {} block_hash:{} last_updated: {}",
-                slot_no, block_hash, last_updated
+                slot_no, hex::encode(&block_hash), last_updated
             );
                 (Some(slot_no), Some(block_hash), Some(last_updated))
             },
@@ -175,11 +171,11 @@ async fn find_last_update_point(
 async fn init_follower(
     network: Network, relay: &str, start_from: (Option<SlotNumber>, Option<BlockHash>),
     db: Arc<EventDB>, machine_id: MachineId, snapshot: &str,
-) -> Result<ManageTasks, Box<dyn Error>> {
+) -> anyhow::Result<ManageTasks> {
     let mut follower = follower_connection(start_from, snapshot, network, relay).await?;
 
-    let genesis_values =
-        network_genesis_values(&network).ok_or("Obtaining genesis values failed")?;
+    let genesis_values = network_genesis_values(&network)
+        .ok_or(anyhow::anyhow!("Obtaining genesis values failed"))?;
 
     let task = tokio::spawn(async move {
         loop {
@@ -203,7 +199,6 @@ async fn init_follower(
                             continue;
                         },
                     };
-
                     // Parse block
                     let epoch = match block.epoch(&genesis_values).0.try_into() {
                         Ok(epoch) => epoch,
@@ -214,7 +209,7 @@ async fn init_follower(
                     };
 
                     let wallclock = match block.wallclock(&genesis_values).try_into() {
-                        Ok(time) => time,
+                        Ok(time) => chrono::DateTime::from_timestamp(time, 0).unwrap_or_default(),
                         Err(err) => {
                             error!("Cannot parse wall time from block {:?} - skip..", err);
                             continue;
@@ -230,13 +225,7 @@ async fn init_follower(
                     };
 
                     match db
-                        .index_follower_data(
-                            slot,
-                            network,
-                            epoch,
-                            wallclock,
-                            hex::encode(block.hash()),
-                        )
+                        .index_follower_data(slot, network, epoch, wallclock, block.hash().to_vec())
                         .await
                     {
                         Ok(()) => (),
@@ -246,20 +235,41 @@ async fn init_follower(
                         },
                     }
 
-                    // Block processing for Eras before staking are ignored.
-                    if valid_era(block.era()) {
-                        // Utxo
-                        match db.index_utxo_data(block.txs(), slot, network).await {
+                    for tx in block.txs() {
+                        // index tx
+                        match db.index_txn_data(tx.hash().as_slice(), slot, network).await {
                             Ok(()) => (),
                             Err(err) => {
-                                error!("Unable to index utxo data for block {:?} - skip..", err);
+                                error!("Unable to index txn data {:?} - skip..", err);
                                 continue;
                             },
                         }
 
-                        // Registration
+                        // index utxo
+                        match db.index_utxo_data(&tx).await {
+                            Ok(()) => (),
+                            Err(err) => {
+                                error!("Unable to index utxo data for tx {:?} - skip..", err);
+                                continue;
+                            },
+                        }
 
-                        // Rewards
+                        // Block processing for Eras before staking are ignored.
+                        if valid_era(block.era()) {
+                            // index catalyst registrations
+                            match db.index_registration_data(&tx, network).await {
+                                Ok(()) => (),
+                                Err(err) => {
+                                    error!(
+                                        "Unable to index registration data for tx {:?} - skip..",
+                                        err
+                                    );
+                                    continue;
+                                },
+                            }
+
+                            // Rewards
+                        }
                     }
 
                     // Refresh update metadata for future followers
@@ -267,7 +277,7 @@ async fn init_follower(
                         .refresh_last_updated(
                             chrono::offset::Utc::now(),
                             slot,
-                            hex::encode(block.hash()),
+                            block.hash().to_vec(),
                             network,
                             &machine_id,
                         )
@@ -309,18 +319,24 @@ async fn init_follower(
 async fn follower_connection(
     start_from: (Option<SlotNumber>, Option<BlockHash>), snapshot: &str, network: Network,
     relay: &str,
-) -> Result<Follower, Box<dyn Error>> {
+) -> anyhow::Result<Follower> {
     let mut follower_cfg = if start_from.0.is_none() || start_from.1.is_none() {
         // start from genesis, no previous followers, hence no starting points.
         FollowerConfigBuilder::default()
+            .follow_from(Point::Origin)
             .mithril_snapshot_path(PathBuf::from(snapshot))
             .build()
     } else {
         // start from given point
         FollowerConfigBuilder::default()
             .follow_from(Point::new(
-                start_from.0.ok_or("Slot number not present")?.try_into()?,
-                hex::decode(start_from.1.ok_or("Block Hash not present")?)?,
+                start_from
+                    .0
+                    .ok_or(anyhow::anyhow!("Slot number not present"))?
+                    .try_into()?,
+                start_from
+                    .1
+                    .ok_or(anyhow::anyhow!("Block Hash not present"))?,
             ))
             .mithril_snapshot_path(PathBuf::from(snapshot))
             .build()

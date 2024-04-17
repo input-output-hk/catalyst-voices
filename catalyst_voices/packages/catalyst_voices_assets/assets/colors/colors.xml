@@ -9,4 +9,6 @@
     <color name="green">#7CAE7A</color>
     <color name="red">#B02E0C</color>
     <color name="today">#565656</color>
+    <color name="blue">#1235C7</color>
+    <color name="blue_text">#506288</color>
 </resources>

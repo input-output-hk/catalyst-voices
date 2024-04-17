@@ -11,8 +11,10 @@ use local_ip_address::list_afinet_netifas;
 use poem_openapi::{ContactObject, LicenseObject, OpenApiService, ServerObject};
 use test_endpoints::TestApi;
 
+use self::cardano::CardanoApi;
 use crate::settings::{DocsSettings, API_URL_PREFIX};
 
+mod cardano;
 mod health;
 mod legacy;
 mod test_endpoints;
@@ -58,11 +60,12 @@ const TERMS_OF_SERVICE: &str =
 /// Create the `OpenAPI` definition
 pub(crate) fn mk_api(
     hosts: Vec<String>, settings: &DocsSettings,
-) -> OpenApiService<(TestApi, HealthApi, LegacyApi), ()> {
+) -> OpenApiService<(TestApi, HealthApi, CardanoApi, LegacyApi), ()> {
     let mut service = OpenApiService::new(
         (
             TestApi,
             HealthApi,
+            CardanoApi,
             (legacy::RegistrationApi, legacy::V0Api, legacy::V1Api),
         ),
         API_TITLE,

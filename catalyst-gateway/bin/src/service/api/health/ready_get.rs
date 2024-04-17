@@ -5,18 +5,17 @@ use std::sync::Arc;
 use poem::web::Data;
 use poem_extensions::{
     response,
-    UniResponse::{T204, T500, T503},
+    UniResponse::{T204, T503},
 };
 
 use crate::{
-    cli::Error,
-    event_db::error::Error as DBError,
+    event_db::schema_check::MismatchedSchemaError,
     service::common::responses::{
         resp_2xx::NoContent,
         resp_4xx::ApiValidationError,
-        resp_5xx::{server_error, ServerError, ServiceUnavailable},
+        resp_5xx::{handle_5xx_response, ServerError, ServiceUnavailable},
     },
-    state::{SchemaVersionStatus, State},
+    state::State,
 };
 
 /// All responses
@@ -53,22 +52,15 @@ pub(crate) type AllResponses = response! {
 ///   but unlikely)
 /// * 503 Service Unavailable - Service is not ready, do not send other requests.
 pub(crate) async fn endpoint(state: Data<&Arc<State>>) -> AllResponses {
-    match state.schema_version_check().await {
+    match state.event_db().schema_version_check().await {
         Ok(_) => {
             tracing::debug!("DB schema version status ok");
-            state.set_schema_version_status(SchemaVersionStatus::Ok);
             T204(NoContent)
         },
-        Err(Error::EventDb(DBError::MismatchedSchema { was, expected })) => {
-            tracing::error!(
-                expected = expected,
-                current = was,
-                "DB schema version status mismatch"
-            );
-            state.set_schema_version_status(SchemaVersionStatus::Mismatch);
+        Err(err) if err.is::<MismatchedSchemaError>() => {
+            tracing::error!("{err}");
             T503(ServiceUnavailable)
         },
-        Err(Error::EventDb(DBError::TimedOut)) => T503(ServiceUnavailable),
-        Err(err) => T500(server_error!("{}", err.to_string())),
+        Err(err) => handle_5xx_response!(err),
     }
 }

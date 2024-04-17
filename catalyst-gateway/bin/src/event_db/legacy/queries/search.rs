@@ -2,6 +2,7 @@
 use chrono::{NaiveDateTime, Utc};
 
 use crate::event_db::{
+    error::NotFoundError,
     legacy::types::{
         event::{EventId, EventSummary},
         objective::{ObjectiveId, ObjectiveSummary, ObjectiveType},
@@ -10,7 +11,7 @@ use crate::event_db::{
             SearchConstraint, SearchOrderBy, SearchQuery, SearchResult, SearchTable, ValueResults,
         },
     },
-    Error, EventDB,
+    EventDB,
 };
 
 impl EventDB {
@@ -121,7 +122,7 @@ impl EventDB {
     /// Search for a total.
     async fn search_total(
         &self, search_query: SearchQuery, limit: Option<i64>, offset: Option<i64>,
-    ) -> Result<SearchResult, Error> {
+    ) -> anyhow::Result<SearchResult> {
         let conn = self.pool.get().await?;
 
         let rows: Vec<tokio_postgres::Row> = conn
@@ -130,10 +131,8 @@ impl EventDB {
                 &offset.unwrap_or(0),
             ])
             .await
-            .map_err(|e| Error::NotFound(e.to_string()))?;
-        let row = rows
-            .first()
-            .ok_or_else(|| Error::NotFound("Cannot get row".to_string()))?;
+            .map_err(|_| NotFoundError)?;
+        let row = rows.first().ok_or(NotFoundError)?;
 
         Ok(SearchResult {
             total: row.try_get("total")?,
@@ -144,7 +143,7 @@ impl EventDB {
     /// Search for events
     async fn search_events(
         &self, search_query: SearchQuery, limit: Option<i64>, offset: Option<i64>,
-    ) -> Result<SearchResult, Error> {
+    ) -> anyhow::Result<SearchResult> {
         let conn = self.pool.get().await?;
         let rows: Vec<tokio_postgres::Row> = conn
             .query(&Self::construct_query(&search_query), &[
@@ -152,7 +151,7 @@ impl EventDB {
                 &offset.unwrap_or(0),
             ])
             .await
-            .map_err(|e| Error::NotFound(e.to_string()))?;
+            .map_err(|_| NotFoundError)?;
 
         let mut events = Vec::new();
         for row in rows {
@@ -174,10 +173,7 @@ impl EventDB {
             });
         }
 
-        let total: i64 = events
-            .len()
-            .try_into()
-            .map_err(|_| Error::Unknown("Cannot convert to i64".to_string()))?;
+        let total: i64 = events.len().try_into()?;
 
         Ok(SearchResult {
             total,
@@ -188,7 +184,7 @@ impl EventDB {
     /// Search for objectives
     async fn search_objectives(
         &self, search_query: SearchQuery, limit: Option<i64>, offset: Option<i64>,
-    ) -> Result<SearchResult, Error> {
+    ) -> anyhow::Result<SearchResult> {
         let conn = self.pool.get().await?;
         let rows: Vec<tokio_postgres::Row> = conn
             .query(&Self::construct_query(&search_query), &[
@@ -196,7 +192,7 @@ impl EventDB {
                 &offset.unwrap_or(0),
             ])
             .await
-            .map_err(|e| Error::NotFound(e.to_string()))?;
+            .map_err(|_| NotFoundError)?;
 
         let mut objectives = Vec::new();
         for row in rows {
@@ -213,10 +209,7 @@ impl EventDB {
             objectives.push(objective);
         }
 
-        let total: i64 = objectives
-            .len()
-            .try_into()
-            .map_err(|_| Error::Unknown("Cannot convert to i64".to_string()))?;
+        let total: i64 = objectives.len().try_into()?;
 
         Ok(SearchResult {
             total,
@@ -227,7 +220,7 @@ impl EventDB {
     /// Search for proposals
     async fn search_proposals(
         &self, search_query: SearchQuery, limit: Option<i64>, offset: Option<i64>,
-    ) -> Result<SearchResult, Error> {
+    ) -> anyhow::Result<SearchResult> {
         let conn = self.pool.get().await?;
 
         let rows: Vec<tokio_postgres::Row> = conn
@@ -236,7 +229,7 @@ impl EventDB {
                 &offset.unwrap_or(0),
             ])
             .await
-            .map_err(|e| Error::NotFound(e.to_string()))?;
+            .map_err(|_| NotFoundError)?;
 
         let mut proposals = Vec::new();
         for row in rows {
@@ -250,10 +243,7 @@ impl EventDB {
             proposals.push(summary);
         }
 
-        let total: i64 = proposals
-            .len()
-            .try_into()
-            .map_err(|_| Error::Unknown("Cannot convert to i64".to_string()))?;
+        let total: i64 = proposals.len().try_into()?;
 
         Ok(SearchResult {
             total,
@@ -267,7 +257,7 @@ impl EventDB {
     #[allow(dead_code)]
     pub(crate) async fn search(
         &self, search_query: SearchQuery, total: bool, limit: Option<i64>, offset: Option<i64>,
-    ) -> Result<SearchResult, Error> {
+    ) -> anyhow::Result<SearchResult> {
         if total {
             self.search_total(search_query, limit, offset).await
         } else {

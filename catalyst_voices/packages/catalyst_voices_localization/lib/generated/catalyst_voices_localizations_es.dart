@@ -20,7 +20,8 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get passwordHintText => 'Mi1ContraseñaSecreta';
 
   @override
-  String get passwordErrorText => 'La contraseña debe tener al menos 8 caracteres';
+  String get passwordErrorText =>
+      'La contraseña debe tener al menos 8 caracteres';
 
   @override
   String get loginTitleText => 'Acceso';
@@ -33,4 +34,17 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get homeScreenText => 'Catalyst Voices';
+
+  @override
+  String get comingSoonSubtitle => 'Voices';
+
+  @override
+  String get comingSoonTitle1 => 'Coming';
+
+  @override
+  String get comingSoonTitle2 => 'soon';
+
+  @override
+  String get comingSoonDescription =>
+      'Project Catalyst is the world\'s largest decentralized innovation engine for solving real-world challenges.';
 }

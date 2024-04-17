@@ -1,6 +1,6 @@
 //! Proposal Queries
 use crate::event_db::{
-    error::Error,
+    error::NotFoundError,
     legacy::types::{
         event::EventId,
         objective::ObjectiveId,
@@ -32,7 +32,7 @@ impl EventDB {
     #[allow(dead_code)]
     pub(crate) async fn get_proposal(
         &self, event: EventId, objective: ObjectiveId, proposal: ProposalId,
-    ) -> Result<Proposal, Error> {
+    ) -> anyhow::Result<Proposal> {
         let conn: bb8::PooledConnection<
             bb8_postgres::PostgresConnectionManager<tokio_postgres::NoTls>,
         > = self.pool.get().await?;
@@ -40,9 +40,7 @@ impl EventDB {
         let rows = conn
             .query(Self::PROPOSAL_QUERY, &[&event.0, &objective.0, &proposal.0])
             .await?;
-        let row = rows
-            .first()
-            .ok_or_else(|| Error::NotFound("Cannot find proposal value".to_string()))?;
+        let row = rows.first().ok_or(NotFoundError)?;
 
         let proposer = vec![ProposerDetails {
             name: row.try_get("proposer_name")?,
@@ -73,7 +71,7 @@ impl EventDB {
     #[allow(dead_code)]
     pub(crate) async fn get_proposals(
         &self, event: EventId, objective: ObjectiveId, limit: Option<i64>, offset: Option<i64>,
-    ) -> Result<Vec<ProposalSummary>, Error> {
+    ) -> anyhow::Result<Vec<ProposalSummary>> {
         let conn = self.pool.get().await?;
 
         let rows = conn

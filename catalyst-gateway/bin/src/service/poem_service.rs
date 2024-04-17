@@ -20,7 +20,6 @@ use crate::{
             catch_panic::{set_panic_hook, ServicePanicHandler},
             middleware::tracing_mw::{init_prometheus, Tracing},
         },
-        Error,
     },
     settings::{get_api_host_names, DocsSettings, API_URL_PREFIX},
     state::State,
@@ -72,7 +71,7 @@ pub(crate) fn get_app_docs(setting: &DocsSettings) -> String {
 /// * `Error::CannotRunService` - cannot run the service
 /// * `Error::EventDbError` - cannot connect to the event db
 /// * `Error::IoError` - An IO error has occurred.
-pub(crate) async fn run(settings: &DocsSettings, state: Arc<State>) -> Result<(), Error> {
+pub(crate) async fn run(settings: &DocsSettings, state: Arc<State>) -> anyhow::Result<()> {
     // The address to listen on
     let addr = settings.address;
     tracing::info!("Starting Poem Service ...");
@@ -88,10 +87,7 @@ pub(crate) async fn run(settings: &DocsSettings, state: Arc<State>) -> Result<()
 
     let app = mk_app(hosts, None, &state, settings);
 
-    poem::Server::new(TcpListener::bind(addr))
-        .run(app)
-        .await
-        .map_err(Error::Io)
+    Ok(poem::Server::new(TcpListener::bind(addr)).run(app).await?)
 }
 
 #[cfg(test)]

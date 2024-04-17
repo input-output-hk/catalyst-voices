@@ -12,17 +12,6 @@ use crate::{
     state::State,
 };
 
-#[derive(thiserror::Error, Debug)]
-/// All service errors
-pub(crate) enum Error {
-    #[error(transparent)]
-    /// Service oriented errors
-    Service(#[from] service::Error),
-    #[error(transparent)]
-    /// DB oriented errors
-    EventDb(#[from] crate::event_db::error::Error),
-}
-
 #[derive(Parser)]
 #[clap(rename_all = "kebab-case")]
 /// Simple service CLI options
@@ -46,7 +35,7 @@ impl Cli {
     /// - Failed to initialize the logger with the specified log level.
     /// - Failed to create a new `State` with the provided database URL.
     /// - Failed to run the service on the specified address.
-    pub(crate) async fn exec(self) -> Result<(), Box<dyn std::error::Error>> {
+    pub(crate) async fn exec(self) -> anyhow::Result<()> {
         match self {
             Self::Run(settings) => {
                 logger::init(settings.log_level)?;
@@ -58,7 +47,7 @@ impl Cli {
                 let machine_id = settings.follower_settings.machine_uid;
 
                 let state = Arc::new(State::new(Some(settings.database_url)).await?);
-                let event_db = state.event_db()?;
+                let event_db = state.event_db();
 
                 tokio::spawn(async move {
                     match service::run(&settings.docs_settings, state.clone()).await {
@@ -75,9 +64,9 @@ impl Cli {
                 let config = loop {
                     interval.tick().await;
 
-                    match event_db.get_config().await {
+                    match event_db.get_follower_config().await {
                         Ok(config) => break config,
-                        Err(err) => error!("no config {:?}", err),
+                        Err(err) => error!("No follower config found, error: {err}"),
                     }
                 };
 
