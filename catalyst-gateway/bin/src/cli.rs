@@ -6,7 +6,7 @@ use tokio::time;
 use tracing::{error, info};
 
 use crate::{
-    follower::start_followers,
+    cardano::start_followers,
     logger, service,
     settings::{DocsSettings, ServiceSettings},
     state::State,

@@ -12,6 +12,7 @@ use tokio::{task::JoinHandle, time};
 use tracing::{error, info};
 
 use crate::{
+    cardano::util::valid_era,
     event_db::{
         cardano::{
             config::FollowerConfig,
@@ -19,8 +20,10 @@ use crate::{
         },
         EventDB,
     },
-    util::valid_era,
 };
+
+pub(crate) mod registration;
+pub(crate) mod util;
 
 /// Arbritrary value which is only used in the case where there is no
 /// previous followers making the question of data staleness irrelevant.

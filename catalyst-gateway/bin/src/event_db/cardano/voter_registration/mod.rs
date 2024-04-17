@@ -5,10 +5,10 @@ use pallas::ledger::traverse::MultiEraTx;
 use serde_json::json;
 
 use crate::{
-    event_db::{cardano::follower::SlotNumber, error::NotFoundError, EventDB},
-    registration::{
+    cardano::registration::{
         parse_registrations_from_metadata, validate_reg_cddl, CddlConfig, ErrorReport, VotingInfo,
     },
+    event_db::{cardano::follower::SlotNumber, error::NotFoundError, EventDB},
 };
 
 /// Transaction id

@@ -5,8 +5,8 @@ use pallas::ledger::{addresses::Address, traverse::MultiEraTx};
 
 use super::{follower::SlotNumber, voter_registration::StakeCredential};
 use crate::{
+    cardano::util::parse_policy_assets,
     event_db::{error::NotFoundError, EventDB},
-    util::parse_policy_assets,
 };
 
 /// Stake amount.
