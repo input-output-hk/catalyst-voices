@@ -61,7 +61,24 @@ earthly +package-cat-gateway
 ```
 
 To build a cat-gateway with preprod snapshot data run
+(for local development and testing it is more appropriate case to build)
 
 ```sh
 earthly +package-cat-gateway-with-preprod-snapshot
+```
+
+To build an event-db image run
+
+```sh
+earthly ./event-db+build
+```
+
+Note that everytime when you are building an image it obsoletes an old image but does not remove it,
+so dont forget to cleanup dangling images of the event-db and cat-gateway in your docker environment.
+
+### Run
+And to finally run everything which we already build you can easily run it
+
+```sh
+docker-compose up cat-gateway
 ```

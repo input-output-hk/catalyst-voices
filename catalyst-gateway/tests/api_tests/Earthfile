@@ -20,4 +20,4 @@ test:
         --service cat-gateway \
         --allow-privileged
         RUN poetry run pytest -s
-    END  
+    END

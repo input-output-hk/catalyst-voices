@@ -64,7 +64,7 @@ package-cat-gateway:
 package-cat-gateway-with-preprod-snapshot:
     ARG tag="latest"
 
-    FROM ../../+package-cat-gateway
+    FROM +package-cat-gateway
 
     # copy preprod mithril snapshot to /tmp/preprod dir
     COPY github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:v2.11.1+package-preprod-snapshot/snapshot /tmp/preprod
