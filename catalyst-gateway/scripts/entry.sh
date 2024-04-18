@@ -10,21 +10,12 @@
 #
 # It expects the following environment variables to be set except where noted:
 #
-# DATABASE_URL - URL for the EventDB.
-# DEBUG - If set, the script will print debug information (optional)
+# DB_URL - URL for the EventDB.
+# CAT_ADDRESS - Address to bind the cat-gateway service to.
+# LOG_LEVEL - Log level for the cat-gateway service.
 # DEBUG_SLEEP - If set, the script will sleep for the specified number of seconds (optional)
 # ---------------------------------------------------------------
 
-# Enable strict mode
-set +x
-set -o errexit
-set -o pipefail
-set -o nounset
-set -o functrace
-set -o errtrace
-set -o monitor
-set -o posix
-shopt -s dotglob
 
 check_env_vars() {
     local env_vars=("$@")
@@ -49,7 +40,9 @@ echo ">>> Starting entrypoint script..."
 
 # Check if all required environment variables are set
 REQUIRED_ENV=(
-    "DATABASE_URL"
+    "DB_URL"
+    "CAT_ADDRESS"
+    "LOG_LEVEL"
 )
 check_env_vars "${REQUIRED_ENV[@]}"
 
@@ -58,7 +51,7 @@ debug_sleep
 
 # Define the command to be executed
 ARGS=$*
-CMD="/app/cat-gateway run $ARGS"
+CMD="./cat-gateway run --address $CAT_ADDRESS --database-url $DB_URL --log-level $LOG_LEVEL $ARGS"
 echo ">>> Executing command: $CMD"
 
 # Wait for DEBUG_SLEEP seconds if the DEBUG_SLEEP environment variable is set
