@@ -5,6 +5,9 @@
     * [`./bin`](#bin)
     * [`./crates`](#crates)
     * [`./event-db`](#event-db)
+  * [Build and Run](#build-and-run)
+    * [Docker images](#docker-images)
+    * [Rust binary](#rust-binary)
 
 The Catalyst Data Gateway is the backend of the Catalyst Voices hosted stack.
 
@@ -30,57 +33,37 @@ This is DB definition and data only, the actual db interface code is located at 
 ## Build and Run
 
 There are several options how you can build this service,
-as a native binary from the Rust code explicitly,
+as a Rust binary from the Rust code explicitly,
 or you can build a docker image and run everything with the `docker-compose`.
-
-### Native binary
-
-To build a native binary run
-
-```sh
-cargo build -p cat-gateway --release
-```
-
-and to run the service (but of course before running you need to spin up event-db
-[README.md](./event-db/Readme.md#starting-a-local-test-db-with-docker-and-earthly))
-
-```sh
-cat-gateway run \
---address "127.0.0.1:3030" \
---database-url=postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev \
---log-level=debug \
---log-format=compact \
---metrics-address "127.0.0.1:3032"
-```
 
 ### Docker images
 
-To build docker image of cat-gateway you can just run the following
+To build and run docker images follow these steps:
 
-```sh
-earthly +package-cat-gateway
-```
-
-To build a cat-gateway with preprod snapshot data run
-(for local development and testing it is more appropriate case to build)
-
-```sh
-earthly +package-cat-gateway-with-preprod-snapshot
-```
-
-To build an event-db image run
-
-```sh
-earthly ./event-db+build
-```
+1. Run `earthly +package-cat-gateway` or `earthly +package-cat-gateway-with-preprod-snapshot`
+  to build a cat-gateway docker image without `preprod-snapshot` or with it.
+2. Run `earthly ./event-db+build` to build an event-db docker image.
+3. Run `docker-compose up cat-gateway` to spin up cat-gateway with event-db from already built images.
 
 Note that every time when you are building an image it obsoletes an old image but does not remove it,
 so dont forget to cleanup dangling images of the event-db and cat-gateway in your docker environment.
 
-### Run
+### Rust binary
 
-And to finally run everything which we already build you can easily run it
+To build and run a Rust binary follow these steps:
 
+1. Run `cargo build -p cat-gateway --release`
+  to compile a release version of the cat-gateway
+2. Run `earthly ./event-db+build` to build an event-db docker image
+3. If you need to have a `preprod-snapshot` unarchive snapshot data to the `/tmp/preprod/` dir.
+  You can download `preprod-snapshot` from this
+  [resource](https://mithril.network/explorer/?aggregator=https%3A%2F%2Faggregator.release-preprod.api.mithril.network%2Faggregator).
+4. Run
 ```sh
-docker-compose up cat-gateway
+  ./target/release/cat-gateway run \
+  --address "127.0.0.1:3030" \
+  --database-url=postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev \
+  --log-level=debug \
+  --log-format=compact \
+  --metrics-address "127.0.0.1:3032"
 ```
