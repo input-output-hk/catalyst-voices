@@ -89,6 +89,9 @@ pubspec.lock
 coverage/
 .idea/
 
+# Melos
+*pubspec_overrides.yaml
+
 # Secrets
 dev-catalyst-voice-9f78f27c6bc5.json
 
