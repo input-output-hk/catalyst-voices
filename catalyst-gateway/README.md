@@ -59,11 +59,12 @@ To build and run a Rust binary follow these steps:
   You can download `preprod-snapshot` from this
   [resource](https://mithril.network/explorer/?aggregator=https%3A%2F%2Faggregator.release-preprod.api.mithril.network%2Faggregator).
 4. Run
-```sh
-  ./target/release/cat-gateway run \
-  --address "127.0.0.1:3030" \
-  --database-url=postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev \
-  --log-level=debug \
-  --log-format=compact \
-  --metrics-address "127.0.0.1:3032"
-```
+
+    ```sh
+      ./target/release/cat-gateway run \
+      --address "127.0.0.1:3030" \
+      --database-url=postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev \
+      --log-level=debug \
+      --log-format=compact \
+      --metrics-address "127.0.0.1:3032"
+    ```
