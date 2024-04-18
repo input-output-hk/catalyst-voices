@@ -78,6 +78,7 @@ Note that everytime when you are building an image it obsoletes an old image but
 so dont forget to cleanup dangling images of the event-db and cat-gateway in your docker environment.
 
 ### Run
+
 And to finally run everything which we already build you can easily run it
 
 ```sh
