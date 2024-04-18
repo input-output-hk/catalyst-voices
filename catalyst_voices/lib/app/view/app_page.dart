@@ -43,10 +43,10 @@ final class _AppState extends State<App> {
   List<BlocProvider> _multiBlocProviders() {
     return [
       BlocProvider<AuthenticationBloc>(
-        create: (_) => DependencyProvider.instance.get<AuthenticationBloc>(),
+        create: (_) => Dependencies.instance.get<AuthenticationBloc>(),
       ),
       BlocProvider<LoginBloc>(
-        create: (_) => DependencyProvider.instance.get<LoginBloc>(),
+        create: (_) => Dependencies.instance.get<LoginBloc>(),
       ),
     ];
   }
