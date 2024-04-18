@@ -5,8 +5,6 @@
 # ---------------------------------------------------------------
 #
 # This script serves as the entrypoint for the cat-gateway service container. 
-# It sets up the environment, performing optional database initialization 
-# if configured, and then runs the cat-gateway service.
 #
 # It expects the following environment variables to be set except where noted:
 #
