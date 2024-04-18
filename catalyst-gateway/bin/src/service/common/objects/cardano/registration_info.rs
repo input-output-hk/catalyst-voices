@@ -3,7 +3,7 @@
 use poem_openapi::{types::Example, Object, Union};
 
 use crate::{
-    event_db::voter_registration::{Nonce, PaymentAddress, PublicVotingInfo, TxId},
+    event_db::cardano::voter_registration::{Nonce, PaymentAddress, PublicVotingInfo, TxId},
     service::{common::objects::cardano::hash::Hash, utilities::to_hex_with_prefix},
 };
 

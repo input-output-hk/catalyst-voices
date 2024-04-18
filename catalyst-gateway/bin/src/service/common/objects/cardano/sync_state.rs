@@ -3,7 +3,7 @@
 use poem_openapi::{types::Example, Object};
 
 use crate::{
-    event_db::follower::{DateTime, SlotNumber},
+    event_db::cardano::follower::{DateTime, SlotNumber},
     service::common::objects::cardano::hash::Hash,
 };
 
