@@ -23,7 +23,6 @@ dependencies:
     flutter:
       sdk: flutter
     formz: ^0.7.0
-    get_it: ^7.6.7
     meta: ^1.10.0
     result_type: ^0.2.0
 
