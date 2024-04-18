@@ -20,12 +20,6 @@ abstract class DependencyProvider {
   /// 
   /// Must be called before the instance could be accessed.
   static set instance(DependencyProvider instance) {
-    if (_instance != null) {
-      throw StateError(
-        'An instance of DependencyProvider has already been set.',
-      );
-    }
-
     _instance = instance;
   }
 
