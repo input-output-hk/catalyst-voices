@@ -74,7 +74,7 @@ To build an event-db image run
 earthly ./event-db+build
 ```
 
-Note that everytime when you are building an image it obsoletes an old image but does not remove it,
+Note that every time when you are building an image it obsoletes an old image but does not remove it,
 so dont forget to cleanup dangling images of the event-db and cat-gateway in your docker environment.
 
 ### Run
