@@ -16,7 +16,9 @@ abstract class DependencyProvider {
     return _instance!;
   }
 
-  /// Sets a new instance
+  /// Sets an instance of [DependencyProvider].
+  /// 
+  /// Must be called before the instance could be accessed.
   static set instance(DependencyProvider instance) {
     if (_instance != null) {
       throw StateError(
