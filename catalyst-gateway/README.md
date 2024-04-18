@@ -41,7 +41,8 @@ To build a native binary run
 cargo build -p cat-gateway --release
 ```
 
-and to run the service (but of course before running you need to spin up event-db [README.md](./event-db/Readme.md#starting-a-local-test-db-with-docker-and-earthly))
+and to run the service (but of course before running you need to spin up event-db
+[README.md](./event-db/Readme.md#starting-a-local-test-db-with-docker-and-earthly))
 
 ```sh
 cat-gateway run \
