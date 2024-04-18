@@ -41,7 +41,7 @@ fuzzer-api:
         --compose schemathesis-docker-compose.yml \
         --load schemathesis:latest=(+package-schemathesis --openapi_spec=$OPENAPI_SPEC) \
         --load event-db:latest=(../event-db+build) \
-        --load cat-gateway:latest=(../+package-cat-gateway --address=$CAT_ADDRESS --db_url=$DB_URL) \
+        --load cat-gateway:latest=(../+package-cat-gateway) \
         --service event-db \
         --service cat-gateway \
         --allow-privileged
