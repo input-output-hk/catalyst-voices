@@ -9,10 +9,7 @@ use cardano_chain_follower::{
 };
 use pallas::ledger::traverse::{wellknown::GenesisValues, MultiEraBlock};
 use poem::error::NotFoundError;
-use tokio::{
-    task::JoinHandle,
-    time::{self, Interval},
-};
+use tokio::{task::JoinHandle, time};
 use tracing::{error, info};
 
 use crate::{
@@ -27,7 +24,8 @@ pub(crate) mod registration;
 pub(crate) mod util;
 
 /// Returns a follower configs, waits until they present inside the db
-async fn get_follower_config(interval: &mut Interval, db: Arc<EventDB>) -> Vec<FollowerConfig> {
+async fn get_follower_config(check_config_tick: u64, db: Arc<EventDB>) -> Vec<FollowerConfig> {
+    let mut interval = time::interval(time::Duration::from_secs(check_config_tick));
     loop {
         // tick until config exists
         interval.tick().await;
@@ -41,19 +39,22 @@ async fn get_follower_config(interval: &mut Interval, db: Arc<EventDB>) -> Vec<F
 
 /// Start followers as per defined in the config
 pub(crate) async fn start_followers(
-    db: Arc<EventDB>, check_config_tick: u64, machine_id: String,
+    db: Arc<EventDB>, check_config_tick: u64, data_refresh_tick: u64, machine_id: String,
 ) -> anyhow::Result<()> {
-    // tick until config exists
-    let mut interval = time::interval(time::Duration::from_secs(check_config_tick));
-    let mut current_config = get_follower_config(&mut interval, db.clone()).await;
+    let mut current_config = get_follower_config(check_config_tick, db.clone()).await;
     loop {
         // spawn followers and obtain thread handlers for control and future cancellation
-        let follower_tasks =
-            spawn_followers(current_config.clone(), db.clone(), machine_id.clone()).await?;
+        let follower_tasks = spawn_followers(
+            current_config.clone(),
+            db.clone(),
+            data_refresh_tick,
+            machine_id.clone(),
+        )
+        .await?;
 
         // Followers should continue indexing until config has changed
         current_config = loop {
-            let new_config = get_follower_config(&mut interval, db.clone()).await;
+            let new_config = get_follower_config(check_config_tick, db.clone()).await;
             if new_config != current_config {
                 info!("Config has changed! restarting");
                 break new_config;
@@ -70,7 +71,7 @@ pub(crate) async fn start_followers(
 
 /// Spawn follower threads and return associated handlers
 async fn spawn_followers(
-    configs: Vec<FollowerConfig>, db: Arc<EventDB>, machine_id: String,
+    configs: Vec<FollowerConfig>, db: Arc<EventDB>, _data_refresh_tick: u64, machine_id: String,
 ) -> anyhow::Result<Vec<ManageTasks>> {
     let mut follower_tasks = Vec::new();
 

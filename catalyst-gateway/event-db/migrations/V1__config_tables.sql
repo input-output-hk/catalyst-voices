@@ -124,7 +124,8 @@ VALUES
 --   '{
 --     "relay": "relays-new.cardano-mainnet.iohk.io:3001",
 --     "mithril_snapshot": {
---       "path": "/tmp/mainnet/immutable"
+--       "path": "/tmp/mainnet/immutable",
+--       "timing_pattern": 25
 --     }
 --   }'
 -- ),
@@ -135,7 +136,8 @@ VALUES
 --   '{
 --     "relay": "preview-node.play.dev.cardano.org:3001",
 --     "mithril_snapshot": {
---       "path": "/tmp/preview/immutable"
+--       "path": "/tmp/preview/immutable",
+--       "timing_pattern": 25
 --     }
 --   }'
 -- ),
@@ -146,7 +148,8 @@ VALUES
   '{
     "relay": "preprod-node.play.dev.cardano.org:3001",
     "mithril_snapshot": {
-      "path": "/tmp/preprod/immutable"
+      "path": "/tmp/preprod/immutable",
+      "timing_pattern": 25
     }
   }'
 );
