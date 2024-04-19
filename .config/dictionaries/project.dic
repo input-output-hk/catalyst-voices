@@ -12,6 +12,7 @@ asyncio
 asyncpg
 auditability
 bech
+bindgen
 bkioshn
 bluefireteam
 BROTLI
