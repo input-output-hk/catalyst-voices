@@ -45,8 +45,6 @@ pub(crate) struct FollowerConfig {
 pub(crate) struct MithrilSnapshotConfig {
     /// Path to snapshot file for bootstrap
     pub(crate) path: String,
-    /// Defines when data is stale or not
-    pub(crate) timing_pattern: u8,
 }
 
 /// `select_config.sql`
