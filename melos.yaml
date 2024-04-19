@@ -23,6 +23,7 @@ command:
       formz: ^0.7.0
       meta: ^1.10.0
       result_type: ^0.2.0
+      plugin_platform_interface: ^2.1.7
     dev_dependencies:
       test: ^1.24.9
       build_runner: ^2.3.3

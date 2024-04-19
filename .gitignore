@@ -91,6 +91,7 @@ coverage/
 
 # Melos
 *pubspec_overrides.yaml
+melos*.iml
 
 # Secrets
 dev-catalyst-voice-9f78f27c6bc5.json
