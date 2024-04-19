@@ -56,7 +56,6 @@ impl Cli {
 
                 start_followers(
                     event_db.clone(),
-                    settings.follower_settings.data_refresh_tick,
                     settings.follower_settings.check_config_tick,
                     machine_id,
                 )

@@ -127,9 +127,8 @@ impl EventDB {
         Ok((slot_number, block_hash, block_time))
     }
 
-    /// Check when last update occurred.
-    /// Start follower from where previous follower left off.
-    pub(crate) async fn last_updated_metadata(
+    /// Check when last update chain state occurred.
+    pub(crate) async fn last_updated_state(
         &self, network: Network,
     ) -> anyhow::Result<(SlotNumber, BlockHash, DateTime)> {
         let conn = self.pool.get().await?;

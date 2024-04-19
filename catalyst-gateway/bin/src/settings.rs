@@ -38,9 +38,6 @@ const API_URL_PREFIX_DEFAULT: &str = "/api";
 /// Default `CHECK_CONFIG_TICK` used in development.
 const CHECK_CONFIG_TICK_DEFAULT: &str = "5";
 
-/// Default `DATA_REFRESH_TICK` used in development
-const DATA_REFRESH_TICK_DEFAULT: &str = "5";
-
 /// Default `MACHINE_UID` used in development
 const MACHINE_UID_DEFAULT: &str = "UID";
 
@@ -98,10 +95,6 @@ pub(crate) struct FollowerSettings {
     /// Check config tick
     #[clap(long, default_value = CHECK_CONFIG_TICK_DEFAULT, env = "CHECK_CONFIG_TICK")]
     pub(crate) check_config_tick: u64,
-
-    /// Data Refresh tick
-    #[clap(long, default_value = DATA_REFRESH_TICK_DEFAULT, env = "DATA_REFRESH_TICK")]
-    pub(crate) data_refresh_tick: u64,
 
     /// Machine UID
     #[clap(long, default_value = MACHINE_UID_DEFAULT, env = "MACHINE_UID")]
