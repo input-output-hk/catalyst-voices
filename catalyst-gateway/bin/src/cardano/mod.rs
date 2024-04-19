@@ -147,9 +147,9 @@ async fn process_blocks(
                 let start_index_block = time::Instant::now();
                 index_block(db.clone(), genesis_values, network, &machine_id, &block).await;
                 debug!(
-                    "{network:?} block {} indexing time: {}ms. txs amount: {}",
+                    "{network:?} block {} indexing time: {}ns. txs amount: {}",
                     block.hash().to_string(),
-                    start_index_block.elapsed().as_millis(),
+                    start_index_block.elapsed().as_nanos(),
                     block.txs().len()
                 );
             },
@@ -215,8 +215,8 @@ async fn index_block(
         },
     }
     debug!(
-        "{network:?} follower data indexing time: {}ms",
-        start_index_follower_data.elapsed().as_millis()
+        "{network:?} follower data indexing time: {}ns",
+        start_index_follower_data.elapsed().as_nanos()
     );
 
     for tx in block.txs() {
@@ -230,9 +230,9 @@ async fn index_block(
             },
         }
         debug!(
-            "{network:?} tx {} data indexing time: {}ms",
+            "{network:?} tx {} data indexing time: {}ns",
             tx.hash().to_string(),
-            start_index_txn_data.elapsed().as_millis()
+            start_index_txn_data.elapsed().as_nanos()
         );
 
         // index utxo
@@ -245,9 +245,9 @@ async fn index_block(
             },
         }
         debug!(
-            "{network:?} tx {} utxo data indexing time: {}ms",
+            "{network:?} tx {} utxo data indexing time: {}ns",
             tx.hash().to_string(),
-            start_index_utxo_data.elapsed().as_millis()
+            start_index_utxo_data.elapsed().as_nanos()
         );
 
         // Block processing for Eras before staking are ignored.
@@ -262,9 +262,9 @@ async fn index_block(
                 },
             }
             debug!(
-                "{network:?} tx {} registration data indexing time: {}ms",
+                "{network:?} tx {} registration data indexing time: {}ns",
                 tx.hash().to_string(),
-                start_index_registration_data.elapsed().as_millis()
+                start_index_registration_data.elapsed().as_nanos()
             );
 
             // Rewards
