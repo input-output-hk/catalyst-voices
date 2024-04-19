@@ -1,0 +1,16 @@
+
+<!doctype html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8" />
+    <title>hello from c509 certificate!</title>
+  </head>
+  <body>
+    <script type="module">
+      import init, { greet } from "./pkg/c509_certificate.js";
+      init().then(() => {
+        greet("WebAssembly");
+      });
+    </script>
+  </body>
+</html>

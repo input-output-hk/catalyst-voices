@@ -1,9 +1,10 @@
 VERSION 0.7
 
 build: 
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.11.0+SETUP
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:fix/improve-rust-builder+SETUP
     RUN cargo install wasm-pack
     WORKDIR /work
     COPY . .
     RUN wasm-pack build --target web
-    SAVE ARTIFACT ./pkg c509-certificate-binding
+    # AS LOCAL is for local testing only, will be removed in the future
+    SAVE ARTIFACT ./pkg c509-certificate-binding AS LOCAL ./pkg
