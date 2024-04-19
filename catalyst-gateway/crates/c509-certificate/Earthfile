@@ -2,7 +2,6 @@ VERSION 0.7
 
 build: 
     DO github.com/input-output-hk/catalyst-ci/earthly/rust:fix/improve-rust-builder+SETUP
-    RUN cargo install wasm-pack
     WORKDIR /work
     COPY . .
     RUN wasm-pack build --target web
