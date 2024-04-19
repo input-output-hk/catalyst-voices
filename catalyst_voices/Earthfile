@@ -7,6 +7,7 @@ VERSION --try --global-cache --arg-scope-and-set 0.7
 # subcommand.
 deps:
     FROM debian:bookworm-slim
+    ARG TARGETARCH
     RUN apt-get update
     RUN apt-get install -y git curl unzip bzip2 bash jq gpg lcov
     COPY --dir test_driver/scripts .

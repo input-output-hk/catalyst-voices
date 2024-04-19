@@ -7,7 +7,7 @@ use poem_extensions::{
 use poem_openapi::payload::Json;
 
 use crate::{
-    event_db::{error::Error as DBError, follower::SlotNumber},
+    event_db::{cardano::follower::SlotNumber, error::NotFoundError},
     service::{
         common::{
             objects::cardano::{
@@ -16,7 +16,7 @@ use crate::{
             responses::{
                 resp_2xx::OK,
                 resp_4xx::{ApiValidationError, NotFound},
-                resp_5xx::{server_error_response, ServerError, ServiceUnavailable},
+                resp_5xx::{handle_5xx_response, ServerError, ServiceUnavailable},
             },
         },
         utilities::check_network,
@@ -59,7 +59,7 @@ pub(crate) async fn endpoint(
                 slot_number,
             })))
         },
-        Err(DBError::NotFound) => T404(NotFound),
-        Err(err) => server_error_response!("{err}"),
+        Err(err) if err.is::<NotFoundError>() => T404(NotFound),
+        Err(err) => handle_5xx_response!(err),
     }
 }

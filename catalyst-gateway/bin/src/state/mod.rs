@@ -1,10 +1,7 @@
 //! Shared state used by all endpoints.
 use std::sync::Arc;
 
-use crate::{
-    cli::Error,
-    event_db::{establish_connection, EventDB},
-};
+use crate::event_db::{establish_connection, EventDB};
 
 /// Global State of the service
 pub(crate) struct State {
@@ -20,7 +17,7 @@ pub(crate) struct State {
 
 impl State {
     /// Create a new global [`State`]
-    pub(crate) async fn new(database_url: Option<String>) -> Result<Self, Error> {
+    pub(crate) async fn new(database_url: Option<String>) -> anyhow::Result<Self> {
         // Get a configured pool to the Database, runs schema version check internally.
         let event_db = Arc::new(establish_connection(database_url).await?);
 

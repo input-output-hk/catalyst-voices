@@ -2,7 +2,7 @@
 use chrono::{NaiveDateTime, Utc};
 
 use crate::event_db::{
-    error::Error,
+    error::NotFoundError,
     legacy::types::event::{
         Event, EventDetails, EventGoal, EventId, EventRegistration, EventSchedule, EventSummary,
         VotingPowerAlgorithm, VotingPowerSettings,
@@ -44,7 +44,7 @@ impl EventDB {
     #[allow(dead_code)]
     pub(crate) async fn get_events(
         &self, limit: Option<i64>, offset: Option<i64>,
-    ) -> Result<Vec<EventSummary>, Error> {
+    ) -> anyhow::Result<Vec<EventSummary>> {
         let conn = self.pool.get().await?;
 
         let rows = conn
@@ -76,11 +76,11 @@ impl EventDB {
 
     /// Get event query
     #[allow(dead_code)]
-    pub(crate) async fn get_event(&self, event: EventId) -> Result<Event, Error> {
+    pub(crate) async fn get_event(&self, event: EventId) -> anyhow::Result<Event> {
         let conn = self.pool.get().await?;
 
         let rows = conn.query(Self::EVENT_QUERY, &[&event.0]).await?;
-        let row = rows.first().ok_or(Error::NotFound)?;
+        let row = rows.first().ok_or(NotFoundError)?;
 
         let ends = row
             .try_get::<&'static str, Option<NaiveDateTime>>("end_time")?

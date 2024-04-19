@@ -5,16 +5,25 @@ use pallas::ledger::{addresses::Address, traverse::MultiEraTx};
 
 use super::{follower::SlotNumber, voter_registration::StakeCredential};
 use crate::{
-    event_db::{Error, EventDB},
-    util::parse_policy_assets,
+    cardano::util::parse_policy_assets,
+    event_db::{error::NotFoundError, EventDB},
 };
 
 /// Stake amount.
 pub(crate) type StakeAmount = i64;
 
+/// `insert_txn_index.sql`
+const INSERT_TXN_INDEX_SQL: &str = include_str!("insert_txn_index.sql");
+/// `insert_utxo.sql`
+const INSERT_UTXO_SQL: &str = include_str!("insert_utxo.sql");
+/// `select_total_utxo_amount.sql`
+const SELECT_TOTAL_UTXO_AMOUNT_SQL: &str = include_str!("select_total_utxo_amount.sql");
+/// `update_utxo.sql`
+const UPDATE_UTXO_SQL: &str = include_str!("update_utxo.sql");
+
 impl EventDB {
     /// Index utxo data
-    pub(crate) async fn index_utxo_data(&self, tx: &MultiEraTx<'_>) -> Result<(), Error> {
+    pub(crate) async fn index_utxo_data(&self, tx: &MultiEraTx<'_>) -> anyhow::Result<()> {
         let conn = self.pool.get().await?;
 
         let tx_hash = tx.hash();
@@ -23,12 +32,9 @@ impl EventDB {
         for (index, tx_out) in tx.outputs().iter().enumerate() {
             // extract assets
             let assets = serde_json::to_value(parse_policy_assets(&tx_out.non_ada_assets()))
-                .map_err(|e| Error::AssetParsingIssue(format!("Asset parsing issue {e}")))?;
+                .map_err(|e| anyhow::anyhow!(format!("Asset parsing issue {e}")))?;
 
-            let stake_address = match tx_out
-                .address()
-                .map_err(|e| Error::Unknown(format!("Address issue {e}")))?
-            {
+            let stake_address = match tx_out.address()? {
                 Address::Shelley(address) => address.try_into().ok(),
                 Address::Stake(stake_address) => Some(stake_address),
                 Address::Byron(_) => None,
@@ -36,17 +42,13 @@ impl EventDB {
             let stake_credential = stake_address.map(|val| val.payload().as_hash().to_vec());
 
             let _rows = conn
-                .query(
-                    include_str!("../../../event-db/queries/utxo/insert_utxo.sql"),
-                    &[
-                        &i32::try_from(index).map_err(|e| Error::Unknown(e.to_string()))?,
-                        &tx_hash.as_slice(),
-                        &i64::try_from(tx_out.lovelace_amount())
-                            .map_err(|e| Error::Unknown(e.to_string()))?,
-                        &stake_credential,
-                        &assets,
-                    ],
-                )
+                .query(INSERT_UTXO_SQL, &[
+                    &i32::try_from(index)?,
+                    &tx_hash.as_slice(),
+                    &i64::try_from(tx_out.lovelace_amount())?,
+                    &stake_credential,
+                    &assets,
+                ])
                 .await?;
         }
         // update outputs with inputs
@@ -56,14 +58,11 @@ impl EventDB {
             let out_index = output.index();
 
             let _rows = conn
-                .query(
-                    include_str!("../../../event-db/queries/utxo/update_utxo.sql"),
-                    &[
-                        &tx_hash.as_slice(),
-                        &output_tx_hash.as_slice(),
-                        &i32::try_from(out_index).map_err(|e| Error::Unknown(e.to_string()))?,
-                    ],
-                )
+                .query(UPDATE_UTXO_SQL, &[
+                    &tx_hash.as_slice(),
+                    &output_tx_hash.as_slice(),
+                    &i32::try_from(out_index)?,
+                ])
                 .await?;
         }
 
@@ -73,14 +72,15 @@ impl EventDB {
     /// Index txn metadata
     pub(crate) async fn index_txn_data(
         &self, tx_id: &[u8], slot_no: SlotNumber, network: Network,
-    ) -> Result<(), Error> {
+    ) -> anyhow::Result<()> {
         let conn = self.pool.get().await?;
 
         let _rows = conn
-            .query(
-                include_str!("../../../event-db/queries/utxo/insert_txn_index.sql"),
-                &[&tx_id, &slot_no, &network.to_string()],
-            )
+            .query(INSERT_TXN_INDEX_SQL, &[
+                &tx_id,
+                &slot_no,
+                &network.to_string(),
+            ])
             .await?;
 
         Ok(())
@@ -89,14 +89,15 @@ impl EventDB {
     /// Get total utxo amount
     pub(crate) async fn total_utxo_amount(
         &self, stake_credential: StakeCredential, network: Network, slot_num: SlotNumber,
-    ) -> Result<(StakeAmount, SlotNumber), Error> {
+    ) -> anyhow::Result<(StakeAmount, SlotNumber)> {
         let conn = self.pool.get().await?;
 
         let row = conn
-            .query_one(
-                include_str!("../../../event-db/queries/utxo/select_total_utxo_amount.sql"),
-                &[&stake_credential, &network.to_string(), &slot_num],
-            )
+            .query_one(SELECT_TOTAL_UTXO_AMOUNT_SQL, &[
+                &stake_credential,
+                &network.to_string(),
+                &slot_num,
+            ])
             .await?;
 
         // Aggregate functions as SUM and MAX return NULL if there are no rows, so we need to
@@ -107,7 +108,7 @@ impl EventDB {
 
             Ok((amount, slot_number))
         } else {
-            Err(Error::NotFound)
+            Err(NotFoundError.into())
         }
     }
 }

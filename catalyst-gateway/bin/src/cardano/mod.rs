@@ -4,81 +4,79 @@ use std::{path::PathBuf, sync::Arc};
 /// Handler for follower tasks, allows for control over spawned follower threads
 pub type ManageTasks = JoinHandle<()>;
 
-use async_recursion::async_recursion;
 use cardano_chain_follower::{
     network_genesis_values, ChainUpdate, Follower, FollowerConfigBuilder, Network, Point,
 };
-use tokio::{task::JoinHandle, time};
+use pallas::ledger::traverse::{wellknown::GenesisValues, MultiEraBlock};
+use tokio::{
+    task::JoinHandle,
+    time::{self, Interval},
+};
 use tracing::{error, info};
 
 use crate::{
+    cardano::util::valid_era,
     event_db::{
-        config::FollowerConfig,
-        follower::{BlockHash, DateTime, MachineId, SlotNumber},
+        cardano::{
+            config::FollowerConfig,
+            follower::{BlockHash, DateTime, MachineId, SlotNumber},
+        },
         EventDB,
     },
-    util::valid_era,
 };
+
+pub(crate) mod registration;
+pub(crate) mod util;
 
 /// Arbritrary value which is only used in the case where there is no
 /// previous followers making the question of data staleness irrelevant.
 const DATA_NOT_STALE: i64 = 1;
 
-#[async_recursion]
+/// Returns a follower configs, waits until they present inside the db
+async fn get_follower_config(interval: &mut Interval, db: Arc<EventDB>) -> Vec<FollowerConfig> {
+    loop {
+        // tick until config exists
+        interval.tick().await;
+
+        match db.get_follower_config().await {
+            Ok(config) => break config,
+            Err(err) => error!("No follower config found, error: {err}"),
+        }
+    }
+}
+
 /// Start followers as per defined in the config
 pub(crate) async fn start_followers(
-    configs: Vec<FollowerConfig>, db: Arc<EventDB>, data_refresh_tick: u64, check_config_tick: u64,
-    machine_id: String,
+    db: Arc<EventDB>, data_refresh_tick: u64, check_config_tick: u64, machine_id: String,
 ) -> anyhow::Result<()> {
-    // spawn followers and obtain thread handlers for control and future cancellation
-    let follower_tasks = spawn_followers(
-        configs.clone(),
-        db.clone(),
-        data_refresh_tick,
-        machine_id.clone(),
-    )
-    .await?;
-
-    // Followers should continue indexing until config has changed
+    // tick until config exists
     let mut interval = time::interval(time::Duration::from_secs(check_config_tick));
-    let config = loop {
-        interval.tick().await;
-        match db.get_follower_config().await {
-            Ok(config) => {
-                if configs != config {
-                    info!("Config has changed! restarting");
-                    break Some(config);
-                }
-            },
-            Err(err) => {
-                error!("No config {:?}", err);
-                break None;
-            },
+    let mut current_config = get_follower_config(&mut interval, db.clone()).await;
+    loop {
+        // spawn followers and obtain thread handlers for control and future cancellation
+        let follower_tasks = spawn_followers(
+            current_config.clone(),
+            db.clone(),
+            data_refresh_tick,
+            machine_id.clone(),
+        )
+        .await?;
+
+        // Followers should continue indexing until config has changed
+        current_config = loop {
+            let new_config = get_follower_config(&mut interval, db.clone()).await;
+            if new_config != current_config {
+                info!("Config has changed! restarting");
+                break new_config;
+            }
+        };
+
+        // Config has changed, terminate all followers and restart with new config.
+        info!("Terminating followers");
+        for task in follower_tasks {
+            task.abort();
         }
-    };
-
-    // Config has changed, terminate all followers and restart with new config.
-    info!("Terminating followers");
-    for task in follower_tasks {
-        task.abort();
     }
-
-    match config {
-        Some(config) => {
-            info!("Restarting followers with new config");
-            start_followers(
-                config,
-                db,
-                data_refresh_tick,
-                check_config_tick,
-                machine_id.clone(),
-            )
-            .await?;
-        },
-        None => return Err(anyhow::anyhow!("Config has been deleted...")),
-    }
-
-    Ok(())
 }
 
 /// Spawn follower threads and return associated handlers
@@ -167,7 +165,6 @@ async fn find_last_update_point(
 
 /// Initiate single follower and returns associated task handler
 /// which facilitates future control over spawned threads.
-#[allow(clippy::too_many_lines)] // we will refactor later
 async fn init_follower(
     network: Network, relay: &str, start_from: (Option<SlotNumber>, Option<BlockHash>),
     db: Arc<EventDB>, machine_id: MachineId, snapshot: &str,
@@ -199,96 +196,7 @@ async fn init_follower(
                             continue;
                         },
                     };
-                    // Parse block
-                    let epoch = match block.epoch(&genesis_values).0.try_into() {
-                        Ok(epoch) => epoch,
-                        Err(err) => {
-                            error!("Cannot parse epoch from block {:?} - skip..", err);
-                            continue;
-                        },
-                    };
-
-                    let wallclock = match block.wallclock(&genesis_values).try_into() {
-                        Ok(time) => chrono::DateTime::from_timestamp(time, 0).unwrap_or_default(),
-                        Err(err) => {
-                            error!("Cannot parse wall time from block {:?} - skip..", err);
-                            continue;
-                        },
-                    };
-
-                    let slot = match block.slot().try_into() {
-                        Ok(slot) => slot,
-                        Err(err) => {
-                            error!("Cannot parse slot from block {:?} - skip..", err);
-                            continue;
-                        },
-                    };
-
-                    match db
-                        .index_follower_data(slot, network, epoch, wallclock, block.hash().to_vec())
-                        .await
-                    {
-                        Ok(()) => (),
-                        Err(err) => {
-                            error!("Unable to index follower data {:?} - skip..", err);
-                            continue;
-                        },
-                    }
-
-                    for tx in block.txs() {
-                        // index tx
-                        match db.index_txn_data(tx.hash().as_slice(), slot, network).await {
-                            Ok(()) => (),
-                            Err(err) => {
-                                error!("Unable to index txn data {:?} - skip..", err);
-                                continue;
-                            },
-                        }
-
-                        // index utxo
-                        match db.index_utxo_data(&tx).await {
-                            Ok(()) => (),
-                            Err(err) => {
-                                error!("Unable to index utxo data for tx {:?} - skip..", err);
-                                continue;
-                            },
-                        }
-
-                        // Block processing for Eras before staking are ignored.
-                        if valid_era(block.era()) {
-                            // index catalyst registrations
-                            match db.index_registration_data(&tx, network).await {
-                                Ok(()) => (),
-                                Err(err) => {
-                                    error!(
-                                        "Unable to index registration data for tx {:?} - skip..",
-                                        err
-                                    );
-                                    continue;
-                                },
-                            }
-
-                            // Rewards
-                        }
-                    }
-
-                    // Refresh update metadata for future followers
-                    match db
-                        .refresh_last_updated(
-                            chrono::offset::Utc::now(),
-                            slot,
-                            block.hash().to_vec(),
-                            network,
-                            &machine_id,
-                        )
-                        .await
-                    {
-                        Ok(()) => (),
-                        Err(err) => {
-                            error!("Unable to mark last update point {:?} - skip..", err);
-                            continue;
-                        },
-                    };
+                    index_block(db.clone(), &genesis_values, network, &machine_id, &block).await;
                 },
                 ChainUpdate::Rollback(data) => {
                     let block = match data.decode() {
@@ -311,6 +219,102 @@ async fn init_follower(
     });
 
     Ok(task)
+}
+
+/// Index block data, store it in our db
+async fn index_block(
+    db: Arc<EventDB>, genesis_values: &GenesisValues, network: Network, machine_id: &MachineId,
+    block: &MultiEraBlock<'_>,
+) {
+    // Parse block
+    let epoch = match block.epoch(genesis_values).0.try_into() {
+        Ok(epoch) => epoch,
+        Err(err) => {
+            error!("Cannot parse epoch from block {:?} - skip..", err);
+            return;
+        },
+    };
+
+    let wallclock = match block.wallclock(genesis_values).try_into() {
+        Ok(time) => chrono::DateTime::from_timestamp(time, 0).unwrap_or_default(),
+        Err(err) => {
+            error!("Cannot parse wall time from block {:?} - skip..", err);
+            return;
+        },
+    };
+
+    let slot = match block.slot().try_into() {
+        Ok(slot) => slot,
+        Err(err) => {
+            error!("Cannot parse slot from block {:?} - skip..", err);
+            return;
+        },
+    };
+
+    match db
+        .index_follower_data(slot, network, epoch, wallclock, block.hash().to_vec())
+        .await
+    {
+        Ok(()) => (),
+        Err(err) => {
+            error!("Unable to index follower data {:?} - skip..", err);
+            return;
+        },
+    }
+
+    for tx in block.txs() {
+        // index tx
+        match db.index_txn_data(tx.hash().as_slice(), slot, network).await {
+            Ok(()) => (),
+            Err(err) => {
+                error!("Unable to index txn data {:?} - skip..", err);
+                continue;
+            },
+        }
+
+        // index utxo
+        match db.index_utxo_data(&tx).await {
+            Ok(()) => (),
+            Err(err) => {
+                error!("Unable to index utxo data for tx {:?} - skip..", err);
+                continue;
+            },
+        }
+
+        // Block processing for Eras before staking are ignored.
+        if valid_era(block.era()) {
+            // index catalyst registrations
+            match db.index_registration_data(&tx, network).await {
+                Ok(()) => (),
+                Err(err) => {
+                    error!(
+                        "Unable to index registration data for tx {:?} - skip..",
+                        err
+                    );
+                    continue;
+                },
+            }
+
+            // Rewards
+        }
+    }
+
+    // Refresh update metadata for future followers
+    match db
+        .refresh_last_updated(
+            chrono::offset::Utc::now(),
+            slot,
+            block.hash().to_vec(),
+            network,
+            machine_id,
+        )
+        .await
+    {
+        Ok(()) => {},
+        Err(err) => {
+            error!("Unable to mark last update point {:?} - skip..", err);
+        },
+    };
 }
 
 /// In the context of setting up the follower connection.

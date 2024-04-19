@@ -7,7 +7,6 @@ builder:
     DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.11.1+SETUP
 
     COPY --dir .cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin crates .
-    COPY --dir ./event-db/queries ./event-db/queries
 
 ## -----------------------------------------------------------------------------
 ##

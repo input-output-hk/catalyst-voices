@@ -5,14 +5,14 @@ use poem_openapi::{
     types::{ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
 };
 
-use crate::{event_db::follower::BlockHash, service::utilities::to_hex_with_prefix};
+use crate::service::utilities::to_hex_with_prefix;
 
 /// Cardano Blake2b256 hash encoded in hex.
 #[derive(Debug)]
 pub(crate) struct Hash(Vec<u8>);
 
 impl From<Vec<u8>> for Hash {
-    fn from(hash: BlockHash) -> Self {
+    fn from(hash: Vec<u8>) -> Self {
         Self(hash)
     }
 }

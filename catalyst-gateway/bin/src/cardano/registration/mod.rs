@@ -1,6 +1,6 @@
 //! Verify registration TXs
 
-use std::{error::Error, io::Cursor};
+use std::io::Cursor;
 
 use cardano_chain_follower::Network;
 use ciborium::Value;
@@ -187,7 +187,7 @@ impl Default for VotingInfo {
 /// # Errors
 ///
 /// Failure will occur if parsed keys do not match CDDL spec
-pub fn validate_reg_cddl(bin_reg: &[u8], cddl_config: &CddlConfig) -> Result<(), Box<dyn Error>> {
+pub fn validate_reg_cddl(bin_reg: &[u8], cddl_config: &CddlConfig) -> anyhow::Result<()> {
     cddl::validate_cbor_from_slice(&cddl_config.cip_36, bin_reg, None)?;
 
     Ok(())
@@ -226,23 +226,26 @@ pub fn is_valid_rewards_address(rewards_address_prefix: u8, network: Network) ->
 }
 
 /// Convert raw 61285 cbor to witness signature
-pub fn raw_sig_conversion(raw_cbor: &[u8]) -> Result<Signature, Box<dyn Error>> {
+pub fn raw_sig_conversion(raw_cbor: &[u8]) -> anyhow::Result<Signature> {
     let decoded: ciborium::value::Value = ciborium::de::from_reader(Cursor::new(&raw_cbor))?;
 
     let signature_61285 = match decoded {
         Value::Map(m) => m.iter().map(|entry| entry.1.clone()).collect::<Vec<_>>(),
-        _ => return Err(format!("Invalid signature {decoded:?}").into()),
+        _ => return Err(anyhow::anyhow!("Invalid signature {decoded:?}")),
     };
 
-    let sig = signature_61285.first().ok_or("no 61285 key")?.clone();
+    let sig = signature_61285
+        .first()
+        .ok_or(anyhow::anyhow!("no 61285 key"))?
+        .clone();
     let sig_bytes: [u8; 64] = match sig.into_bytes() {
         Ok(s) => {
             match s.try_into() {
                 Ok(sig) => sig,
-                Err(err) => return Err(format!("Invalid signature length {err:?}").into()),
+                Err(err) => return Err(anyhow::anyhow!("Invalid signature length {err:?}")),
             }
         },
-        Err(err) => return Err(format!("Invalid signature parsing {err:?}").into()),
+        Err(err) => return Err(anyhow::anyhow!("Invalid signature parsing {err:?}")),
     };
 
     Ok(Signature::from_bytes(&sig_bytes))
@@ -250,18 +253,19 @@ pub fn raw_sig_conversion(raw_cbor: &[u8]) -> Result<Signature, Box<dyn Error>> 
 
 #[allow(clippy::manual_let_else)]
 /// Parse cip36 registration tx
-pub fn inspect_metamap_reg(spec_61284: &[Value]) -> Result<&Vec<(Value, Value)>, Box<dyn Error>> {
+pub fn inspect_metamap_reg(spec_61284: &[Value]) -> anyhow::Result<&Vec<(Value, Value)>> {
     let metamap = match &spec_61284
         .get(KEY_61284)
-        .ok_or("Issue parsing 61284 parent key")?
+        .ok_or(anyhow::anyhow!("Issue parsing 61284 parent key"))?
     {
         Value::Map(metamap) => metamap,
         _ => {
-            return Err(format!(
+            return Err(anyhow::anyhow!(
                 "Invalid metamap {:?}",
-                spec_61284.get(KEY_61284).ok_or("Issue parsing metamap")?
-            )
-            .into())
+                spec_61284
+                    .get(KEY_61284)
+                    .ok_or(anyhow::anyhow!("Issue parsing metamap"))?
+            ))
         },
     };
     Ok(metamap)
@@ -269,10 +273,10 @@ pub fn inspect_metamap_reg(spec_61284: &[Value]) -> Result<&Vec<(Value, Value)>,
 
 #[allow(clippy::manual_let_else)]
 /// Extract voting key
-pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingInfo, Box<dyn Error>> {
+pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> anyhow::Result<VotingInfo> {
     let voting_key = match &metamap
         .get(DELEGATIONS_OR_DIRECT)
-        .ok_or("Issue with voting key 61284 cbor parsing")?
+        .ok_or(anyhow::anyhow!("Issue with voting key 61284 cbor parsing"))?
     {
         (Value::Integer(_one), Value::Bytes(direct)) => VotingInfo::Direct(PubKey(direct.clone())),
         (Value::Integer(_one), Value::Array(delegations)) => {
@@ -282,54 +286,52 @@ pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> Result<VotingInfo, Box<
                     Value::Array(delegations) => {
                         let voting_key = match delegations
                             .get(VOTE_KEY)
-                            .ok_or("Issue parsing delegations")?
+                            .ok_or(anyhow::anyhow!("Issue parsing delegations"))?
                             .as_bytes()
                         {
                             Some(key) => key,
-                            None => return Err("Invalid voting key".to_string().into()),
+                            None => return Err(anyhow::anyhow!("Invalid voting key")),
                         };
 
                         let weight = match delegations
                             .get(WEIGHT)
-                            .ok_or("Issue parsing weight")?
+                            .ok_or(anyhow::anyhow!("Issue parsing weight"))?
                             .as_integer()
                         {
                             Some(weight) => {
                                 match weight.try_into() {
                                     Ok(weight) => weight,
                                     Err(_err) => {
-                                        return Err("Invalid weight in delegation"
-                                            .to_string()
-                                            .into())
+                                        return Err(anyhow::anyhow!("Invalid weight in delegation"))
                                     },
                                 }
                             },
-                            None => return Err("Invalid delegation".to_string().into()),
+                            None => return Err(anyhow::anyhow!("Invalid delegation")),
                         };
 
                         delegations_map.push(((PubKey(voting_key.clone())), weight));
                     },
 
-                    _ => return Err("Invalid voting key".to_string().into()),
+                    _ => return Err(anyhow::anyhow!("Invalid voting key")),
                 }
             }
 
             VotingInfo::Delegated(delegations_map)
         },
 
-        _ => return Err("Invalid signature".to_string().into()),
+        _ => return Err(anyhow::anyhow!("Invalid signature")),
     };
     Ok(voting_key)
 }
 
 /// Extract stake key
-pub fn inspect_stake_key(metamap: &[(Value, Value)]) -> Result<PubKey, Box<dyn Error>> {
+pub fn inspect_stake_key(metamap: &[(Value, Value)]) -> anyhow::Result<PubKey> {
     let stake_key = match &metamap
         .get(STAKE_ADDRESS)
-        .ok_or("Issue with stake key parsing")?
+        .ok_or(anyhow::anyhow!("Issue with stake key parsing"))?
     {
         (Value::Integer(_two), Value::Bytes(stake_addr)) => PubKey(stake_addr.clone()),
-        _ => return Err("Invalid stake key".to_string().into()),
+        _ => return Err(anyhow::anyhow!("Invalid stake key")),
     };
     Ok(stake_key)
 }
@@ -337,38 +339,44 @@ pub fn inspect_stake_key(metamap: &[(Value, Value)]) -> Result<PubKey, Box<dyn E
 /// Extract and validate rewards address
 pub fn inspect_rewards_addr(
     metamap: &[(Value, Value)], network_id: Network,
-) -> Result<&Vec<u8>, Box<dyn Error>> {
+) -> anyhow::Result<&Vec<u8>> {
     let (Value::Integer(_three), Value::Bytes(rewards_address)) = &metamap
         .get(PAYMENT_ADDRESS)
-        .ok_or("Issue with rewards address parsing")?
+        .ok_or(anyhow::anyhow!("Issue with rewards address parsing"))?
     else {
-        return Err("Invalid rewards address".to_string().into());
+        return Err(anyhow::anyhow!("Invalid rewards address"));
     };
 
-    if !is_valid_rewards_address(*rewards_address.get(NETWORK_ID).ok_or("err")?, network_id) {
-        return Err("Invalid reward address".to_string().into());
+    if !is_valid_rewards_address(
+        *rewards_address
+            .get(NETWORK_ID)
+            .ok_or(anyhow::anyhow!("Cannot get network id byte"))?,
+        network_id,
+    ) {
+        return Err(anyhow::anyhow!("Invalid reward address"));
     }
     Ok(rewards_address)
 }
 
 /// Extract Nonce
-pub fn inspect_nonce(metamap: &[(Value, Value)]) -> Result<Nonce, Box<dyn Error>> {
-    let nonce: i128 = match metamap.get(NONCE).ok_or("Issue with nonce parsing")? {
+pub fn inspect_nonce(metamap: &[(Value, Value)]) -> anyhow::Result<Nonce> {
+    let nonce: i128 = match metamap
+        .get(NONCE)
+        .ok_or(anyhow::anyhow!("Issue with nonce parsing"))?
+    {
         (Value::Integer(_four), Value::Integer(nonce)) => i128::from(*nonce),
-        _ => return Err("Invalid nonce".to_string().into()),
+        _ => return Err(anyhow::anyhow!("Invalid nonce")),
     };
 
     Ok(Nonce(nonce.try_into()?))
 }
 
 /// Extract optional voting purpose
-pub fn inspect_voting_purpose(
-    metamap: &[(Value, Value)],
-) -> Result<Option<VotingPurpose>, Box<dyn Error>> {
+pub fn inspect_voting_purpose(metamap: &[(Value, Value)]) -> anyhow::Result<Option<VotingPurpose>> {
     if metamap.len() == 5 {
         match metamap
             .get(VOTE_PURPOSE)
-            .ok_or("Issue with voting purpose parsing")?
+            .ok_or(anyhow::anyhow!("Issue with voting purpose parsing"))?
         {
             (Value::Integer(_five), Value::Integer(purpose)) => {
                 Ok(Some(VotingPurpose(i128::from(*purpose).try_into()?)))
@@ -384,7 +392,7 @@ pub fn inspect_voting_purpose(
 /// Collect secondary errors for granular json error report
 pub fn parse_registrations_from_metadata(
     meta: &MultiEraMeta, network: Network,
-) -> Result<(Registration, ErrorReport), Box<dyn Error>> {
+) -> anyhow::Result<(Registration, ErrorReport)> {
     let mut voting_key: Option<VotingInfo> = None;
     let mut stake_key: Option<PubKey> = None;
     let mut voting_purpose: Option<VotingPurpose> = None;
@@ -398,7 +406,7 @@ pub fn parse_registrations_from_metadata(
     if let pallas::ledger::traverse::MultiEraMeta::AlonzoCompatible(meta) = meta {
         for (key, cip36_registration) in meta.iter() {
             if *key == u64::try_from(CIP36_61284)? {
-                let raw_cbor = meta.encode_fragment()?;
+                let raw_cbor = meta.encode_fragment().map_err(|e| anyhow::anyhow!("{e}"))?;
                 raw_cbor_cip36 = Some(raw_cbor.clone());
 
                 let decoded: ciborium::value::Value =
@@ -475,9 +483,15 @@ pub fn parse_registrations_from_metadata(
                 };
             } else if *key == u64::try_from(CIP36_61285)? {
                 // Validate 61285 signature
-                let raw_cbor = cip36_registration.encode_fragment()?;
+                let raw_cbor = cip36_registration
+                    .encode_fragment()
+                    .map_err(|e| anyhow::anyhow!("{e}"))?;
 
-                match raw_sig_conversion(&cip36_registration.encode_fragment()?) {
+                match raw_sig_conversion(
+                    &cip36_registration
+                        .encode_fragment()
+                        .map_err(|e| anyhow::anyhow!("{e}"))?,
+                ) {
                     Ok(signature) => {
                         sig = Some(signature);
                     },

@@ -1,14 +1,15 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_blocs/src/dependency/dependency_provider.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 
-final class Dependency extends DependencyProvider {
-  static final Dependency instance = Dependency._();
+final class Dependencies extends DependencyProvider {
+  static final Dependencies instance = Dependencies._();
 
-  Dependency._();
+  Dependencies._();
 
   Future<void> init() async {
+    DependencyProvider.instance = this;
     _registerServices();
     _registerRepositories();
     _registerBlocsWithDependencies();
