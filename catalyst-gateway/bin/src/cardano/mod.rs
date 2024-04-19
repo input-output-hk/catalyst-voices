@@ -112,49 +112,57 @@ async fn spawn_follower(
         .ok_or(anyhow::anyhow!("Obtaining genesis values failed"))?;
 
     let task = tokio::spawn(async move {
-        loop {
-            let chain_update = match follower.next().await {
-                Ok(chain_update) => chain_update,
-                Err(err) => {
-                    error!(
-                        "Unable to receive next update from the {network:?} follower err: {err} - skip..",
-                    );
-                    continue;
-                },
-            };
-
-            match chain_update {
-                ChainUpdate::Block(data) => {
-                    let block = match data.decode() {
-                        Ok(block) => block,
-                        Err(err) => {
-                            error!("Unable to decode {network:?} block {err} - skip..",);
-                            continue;
-                        },
-                    };
-                    index_block(db.clone(), &genesis_values, network, &machine_id, &block).await;
-                },
-                ChainUpdate::Rollback(data) => {
-                    let block = match data.decode() {
-                        Ok(block) => block,
-                        Err(err) => {
-                            error!("Unable to decode {network:?} block {err} - skip..");
-                            continue;
-                        },
-                    };
-
-                    info!(
-                        "Rollback block NUMBER={} SLOT={} HASH={}",
-                        block.number(),
-                        block.slot(),
-                        hex::encode(block.hash()),
-                    );
-                },
-            }
-        }
+        process_blocks(&mut follower, db, network, machine_id, &genesis_values).await;
     });
 
     Ok(task)
+}
+
+/// Process next block from the follower
+async fn process_blocks(
+    follower: &mut Follower, db: Arc<EventDB>, network: Network, machine_id: MachineId,
+    genesis_values: &GenesisValues,
+) {
+    loop {
+        let chain_update = match follower.next().await {
+            Ok(chain_update) => chain_update,
+            Err(err) => {
+                error!(
+                    "Unable to receive next update from the {network:?} follower err: {err} - skip..",
+                );
+                continue;
+            },
+        };
+
+        match chain_update {
+            ChainUpdate::Block(data) => {
+                let block = match data.decode() {
+                    Ok(block) => block,
+                    Err(err) => {
+                        error!("Unable to decode {network:?} block {err} - skip..",);
+                        continue;
+                    },
+                };
+                index_block(db.clone(), genesis_values, network, &machine_id, &block).await;
+            },
+            ChainUpdate::Rollback(data) => {
+                let block = match data.decode() {
+                    Ok(block) => block,
+                    Err(err) => {
+                        error!("Unable to decode {network:?} block {err} - skip..");
+                        continue;
+                    },
+                };
+
+                info!(
+                    "Rollback block NUMBER={} SLOT={} HASH={}",
+                    block.number(),
+                    block.slot(),
+                    hex::encode(block.hash()),
+                );
+            },
+        }
+    }
 }
 
 /// Index block data, store it in our db
