@@ -31,8 +31,9 @@ build:
     FROM +builder
 
     TRY
-        RUN /scripts/std_build.py   --cov_report="coverage-report.info" \
-                                    --bins="cat-gateway/cat-gateway"
+        RUN /scripts/std_build.py \
+                --cov_report="coverage-report.info" \
+                --bins="cat-gateway/cat-gateway"
     FINALLY
         SAVE ARTIFACT --if-exists target/nextest/ci/junit.xml AS LOCAL cat-gateway.junit-report.xml
         SAVE ARTIFACT --if-exists coverage-report.info AS LOCAL cat-gateway.coverage-report.info
@@ -47,29 +48,29 @@ all-hosts-build:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +build
 
 package-cat-gateway:
-    FROM alpine:3.19
-
     ARG tag="latest"
-    ARG address
-    ARG db_url
-    ARG log_level="error"
 
-    RUN apk add --no-cache gcc
+    FROM alpine:3.19
+    WORKDIR /cat-gateway
+
+    RUN apk add --no-cache gcc bash
 
     COPY +build/cat-gateway .
+    COPY ./scripts/entry.sh .
 
-    ENTRYPOINT ./cat-gateway run --address $address --database-url $db_url --log-level $log_level
+    ENTRYPOINT ./entry.sh
+    SAVE IMAGE cat-gateway:$tag
+
+package-cat-gateway-with-preprod-snapshot:
+    ARG tag="latest"
+
+    FROM +package-cat-gateway
+
+    # copy preprod mithril snapshot to /tmp/preprod dir
+    COPY github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:v2.11.1+package-preprod-snapshot/snapshot /tmp/preprod
+
     SAVE IMAGE cat-gateway:$tag
 
 # Publish packages if all integration tests have passed. (Failure to pass tests will prevent packages being published.)
 # publish:
 #    FROM scratch
-
-## -----------------------------------------------------------------------------
-
-# This step simulates the full CI run for local purposes only.
-local-ci-run:
-    BUILD +check
-    BUILD +build
-    # BUILD +package
-    # BUILD +publish
