@@ -14,12 +14,19 @@ import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 abstract class CardanoMultiplatformLibPlatform extends PlatformInterface {
   static final Object _token = Object();
 
-  static late CardanoMultiplatformLibPlatform _instance;
+  static CardanoMultiplatformLibPlatform? _instance;
 
   /// The default instance of [CardanoMultiplatformLibPlatform] to use.
   ///
   /// Must be set with [instance] setter before it can be used.
-  static CardanoMultiplatformLibPlatform get instance => _instance;
+  static CardanoMultiplatformLibPlatform get instance {
+    assert(
+      _instance != null,
+      'Make sure to register the instance via '
+      'instance setter before it is used.',
+    );
+    return _instance!;
+  }
 
   /// Platform-specific plugins should set this with their own platform-specific
   /// class that extends [CardanoMultiplatformLibPlatform] when they register
