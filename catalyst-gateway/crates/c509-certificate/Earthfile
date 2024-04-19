@@ -1,9 +1,36 @@
 VERSION 0.7
 
-build: 
+#cspell: words rustfmt
+
+# Set up our target toolchains, and copy our files.
+builder:
     DO github.com/input-output-hk/catalyst-ci/earthly/rust:fix/improve-rust-builder+SETUP
-    WORKDIR /work
-    COPY . .
+    COPY --dir src .cargo .config .
+    COPY Cargo.toml clippy.toml deny.toml rustfmt.toml .
+
+## -----------------------------------------------------------------------------
+##
+## Standard CI targets.
+##
+## These targets are discovered and executed automatically by CI.
+
+# Run check using the most efficient host tooling
+# CI Automated Entry point.
+check:
+    FROM +builder
+
+    RUN /scripts/std_checks.py
+
+# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
+# Only used to validate tooling is working across host toolsets.
+all-hosts-check:
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +check
+
+# Run build using the most efficient host tooling
+# CI Automated Entry point.
+build:
+    FROM +builder
+
     RUN wasm-pack build --target web
     # AS LOCAL is for local testing only, will be removed in the future
     SAVE ARTIFACT ./pkg c509-certificate-binding AS LOCAL ./pkg
