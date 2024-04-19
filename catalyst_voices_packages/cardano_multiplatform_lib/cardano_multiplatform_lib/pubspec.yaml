@@ -1,0 +1,29 @@
+name: cardano_multiplatform_lib
+description: Flutter plugin wrapping the Cardano Multiplatform Lib Rust library.
+repository: https://github.com/input-output-hk/catalyst-voices/tree/main/utilities/cardano_multiplatform_lib/cardano_multiplatform_lib
+issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
+topics: [blockchain, cardano, cryptocurrency, wallet]
+version: 1.0.0
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+  flutter: 3.19.5
+
+flutter:
+  plugin:
+    platforms:
+      web:
+        default_package: cardano_multiplatform_lib_web
+
+dependencies:
+  cardano_multiplatform_lib_platform_interface: ^1.0.0
+  cardano_multiplatform_lib_web: ^1.0.0
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  catalyst_analysis:
+    path: ../../catalyst_analysis
+  flutter_test:
+    sdk: flutter
+  plugin_platform_interface: ^2.1.7
