@@ -10,5 +10,5 @@ extern "C" {
 #[wasm_bindgen]
 /// Sample function for test only
 pub fn greet(name: &str) {
-    alert(&format!("Hello, {}!", name));
+    alert(&format!("Hello, {name}!"));
 }
