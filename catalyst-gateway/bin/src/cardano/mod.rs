@@ -8,14 +8,14 @@ use cardano_chain_follower::{
     network_genesis_values, ChainUpdate, Follower, FollowerConfigBuilder, Network, Point,
 };
 use pallas::ledger::traverse::{wellknown::GenesisValues, MultiEraBlock};
-use poem::error::NotFoundError;
 use tokio::{task::JoinHandle, time};
-use tracing::{error, info};
+use tracing::{debug, error, info};
 
 use crate::{
     cardano::util::valid_era,
     event_db::{
         cardano::{config::FollowerConfig, follower::MachineId},
+        error::NotFoundError,
         EventDB,
     },
 };
@@ -144,7 +144,14 @@ async fn process_blocks(
                         continue;
                     },
                 };
+                let start_index_block = time::Instant::now();
                 index_block(db.clone(), genesis_values, network, &machine_id, &block).await;
+                debug!(
+                    "{network:?} block {} indexing time: {}ms. txs amount: {}",
+                    block.hash().to_string(),
+                    start_index_block.elapsed().as_millis(),
+                    block.txs().len()
+                );
             },
             ChainUpdate::Rollback(data) => {
                 let block = match data.decode() {
@@ -196,6 +203,7 @@ async fn index_block(
         },
     };
 
+    let start_index_follower_data = time::Instant::now();
     match db
         .index_follower_data(slot, network, epoch, wallclock, block.hash().to_vec())
         .await
@@ -206,9 +214,14 @@ async fn index_block(
             return;
         },
     }
+    debug!(
+        "{network:?} follower data indexing time: {}ms",
+        start_index_follower_data.elapsed().as_millis()
+    );
 
     for tx in block.txs() {
         // index tx
+        let start_index_txn_data = time::Instant::now();
         match db.index_txn_data(tx.hash().as_slice(), slot, network).await {
             Ok(()) => (),
             Err(err) => {
@@ -216,8 +229,14 @@ async fn index_block(
                 continue;
             },
         }
+        debug!(
+            "{network:?} tx {} data indexing time: {}ms",
+            tx.hash().to_string(),
+            start_index_txn_data.elapsed().as_millis()
+        );
 
         // index utxo
+        let start_index_utxo_data = time::Instant::now();
         match db.index_utxo_data(&tx).await {
             Ok(()) => (),
             Err(err) => {
@@ -225,10 +244,16 @@ async fn index_block(
                 continue;
             },
         }
+        debug!(
+            "{network:?} tx {} utxo data indexing time: {}ms",
+            tx.hash().to_string(),
+            start_index_utxo_data.elapsed().as_millis()
+        );
 
         // Block processing for Eras before staking are ignored.
         if valid_era(block.era()) {
             // index catalyst registrations
+            let start_index_registration_data = time::Instant::now();
             match db.index_registration_data(&tx, network).await {
                 Ok(()) => (),
                 Err(err) => {
@@ -236,6 +261,11 @@ async fn index_block(
                     continue;
                 },
             }
+            debug!(
+                "{network:?} tx {} registration data indexing time: {}ms",
+                tx.hash().to_string(),
+                start_index_registration_data.elapsed().as_millis()
+            );
 
             // Rewards
         }
