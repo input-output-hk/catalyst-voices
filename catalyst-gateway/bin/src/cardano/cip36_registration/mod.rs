@@ -29,9 +29,9 @@ const VOTE_KEY: usize = 0;
 /// Cip36
 const WEIGHT: usize = 1;
 
-/// <https://cips.cardano.org/cips/cip36/schema.cddl>
+/// <https://cips.cardano.org/cips/cip36>
 const CIP36_61284: usize = 61284;
-/// <https://cips.cardano.org/cips/cip36/schema.cddl>
+/// <https://cips.cardano.org/cips/cip36>
 const CIP36_61285: usize = 61285;
 
 /// Pub key
