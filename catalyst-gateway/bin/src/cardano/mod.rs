@@ -14,7 +14,7 @@ use tracing::{debug, error, info};
 use crate::{
     cardano::util::valid_era,
     event_db::{
-        cardano::{config::FollowerConfig, follower::MachineId},
+        cardano::{config::FollowerConfig, chain_state::MachineId},
         error::NotFoundError,
         EventDB,
     },

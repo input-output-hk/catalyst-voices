@@ -8,7 +8,7 @@ use crate::{
     cardano::registration::{
         parse_registrations_from_metadata, validate_reg_cddl, CddlConfig, ErrorReport, VotingInfo,
     },
-    event_db::{cardano::follower::SlotNumber, error::NotFoundError, EventDB},
+    event_db::{cardano::chain_state::SlotNumber, error::NotFoundError, EventDB},
 };
 
 /// Transaction id
