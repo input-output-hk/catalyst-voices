@@ -6,7 +6,7 @@ use serde_json::json;
 
 use crate::{
     cardano::cip36_registration::{
-        parse_registrations_from_metadata, validate_reg_cddl, CddlConfig, ErrorReport, VotingInfo,
+        validate_reg_cddl, CddlConfig, Cip36Registration, ErrorReport, VotingInfo,
     },
     event_db::{cardano::chain_state::SlotNumber, error::NotFoundError, EventDB},
 };
@@ -100,50 +100,44 @@ impl EventDB {
     ) -> anyhow::Result<()> {
         let cddl = CddlConfig::new();
 
-        if !tx.metadata().is_empty() {
-            let (registration, errors_report) =
-                match parse_registrations_from_metadata(&tx.metadata(), network) {
-                    Ok(registration) => registration,
-                    Err(_err) => {
-                        // fatal error parsing registration tx, unable to extract meaningful
-                        // errors assume corrupted tx
-                        return Ok(());
-                    },
-                };
-
-            // cddl verification
-            if let Some(cip36) = registration.clone().raw_cbor_cip36 {
-                match validate_reg_cddl(&cip36, &cddl) {
-                    Ok(()) => (),
-                    Err(_err) => {
-                        // did not pass cddl verification, not a valid registration
-                        return Ok(());
-                    },
-                };
-            } else {
-                // registration does not contain cip36 61284 or 61285 keys
-                // not a valid registration tx
-                return Ok(());
-            }
-
-            let nonce = if let Some(nonce) = registration.nonce {
-                Some(nonce.0.try_into()?)
-            } else {
-                None
+        let registration =
+            match Cip36Registration::generate_from_tx_metadata(&tx.metadata(), network) {
+                Ok(Some(registration)) => registration,
+                Ok(None) => return Ok(()),
+                Err(_err) => {
+                    // fatal error parsing registration tx, unable to extract meaningful
+                    // errors assume corrupted tx
+                    return Ok(());
+                },
             };
-            self.insert_voter_registration(
-                tx.hash().to_vec(),
-                registration
-                    .stake_key
-                    .map(|val| val.get_credentials().to_vec()),
-                registration.voting_key,
-                registration.rewards_address.map(|val| val.0),
-                registration.raw_cbor_cip36,
-                nonce,
-                errors_report,
-            )
-            .await?;
+
+        // cddl verification
+        if let Some(cip36) = registration.clone().raw_cbor_cip36 {
+            match validate_reg_cddl(&cip36, &cddl) {
+                Ok(()) => (),
+                Err(_err) => {
+                    // did not pass cddl verification, not a valid registration
+                    return Ok(());
+                },
+            };
+        } else {
+            // registration does not contain cip36 61284 or 61285 keys
+            // not a valid registration tx
+            return Ok(());
         }
+
+        self.insert_voter_registration(
+            tx.hash().to_vec(),
+            registration
+                .stake_key
+                .map(|val| val.get_credentials().to_vec()),
+            registration.voting_key,
+            registration.rewards_address.map(|val| val.0),
+            registration.raw_cbor_cip36,
+            registration.nonce.map(|nonce| nonce.0),
+            registration.errors_report,
+        )
+        .await?;
 
         Ok(())
     }
