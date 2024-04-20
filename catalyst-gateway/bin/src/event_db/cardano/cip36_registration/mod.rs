@@ -5,7 +5,7 @@ use pallas::ledger::traverse::MultiEraTx;
 use serde_json::json;
 
 use crate::{
-    cardano::registration::{
+    cardano::cip36_registration::{
         parse_registrations_from_metadata, validate_reg_cddl, CddlConfig, ErrorReport, VotingInfo,
     },
     event_db::{cardano::chain_state::SlotNumber, error::NotFoundError, EventDB},
@@ -36,9 +36,9 @@ const PUBLIC_VOTING_KEY_COLUMN: &str = "public_voting_key";
 const NONCE_COLUMN: &str = "nonce";
 
 /// `insert_voter_registration.sql`
-const INSERT_VOTER_REGISTRATION_SQL: &str = include_str!("insert_voter_registration.sql");
+const INSERT_VOTER_REGISTRATION_SQL: &str = include_str!("insert_cip36_registration.sql");
 /// `select_voter_registration.sql`
-const SELECT_VOTER_REGISTRATION_SQL: &str = include_str!("select_voter_registration.sql");
+const SELECT_VOTER_REGISTRATION_SQL: &str = include_str!("select_cip36_registration.sql");
 
 impl EventDB {
     /// Inserts voter registration data, replacing any existing data.

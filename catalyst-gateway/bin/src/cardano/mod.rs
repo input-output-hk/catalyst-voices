@@ -20,7 +20,7 @@ use crate::{
     },
 };
 
-pub(crate) mod registration;
+pub(crate) mod cip36_registration;
 pub(crate) mod util;
 
 /// Returns a follower configs, waits until they present inside the db
