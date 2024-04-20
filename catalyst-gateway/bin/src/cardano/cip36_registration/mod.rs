@@ -30,38 +30,38 @@ const VOTE_KEY: usize = 0;
 const WEIGHT: usize = 1;
 
 /// <https://cips.cardano.org/cips/cip36>
-const CIP36_61284: usize = 61284;
+const CIP36_61284: u64 = 61284;
 /// <https://cips.cardano.org/cips/cip36>
-const CIP36_61285: usize = 61285;
+const CIP36_61285: u64 = 61285;
 
 /// Pub key
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
-pub struct PubKey(Vec<u8>);
+pub(crate) struct PubKey(Vec<u8>);
 
 /// Nonce
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
-pub struct Nonce(pub u64);
+pub(crate) struct Nonce(pub u64);
 
 /// Voting purpose
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
-pub struct VotingPurpose(u64);
+pub(crate) struct VotingPurpose(u64);
 
 /// Rewards address
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
-pub struct RewardsAddress(pub Vec<u8>);
+pub(crate) struct RewardsAddress(pub Vec<u8>);
 
 /// Error report for serializing
-pub type ErrorReport = Vec<String>;
+pub(crate) type ErrorReport = Vec<String>;
 
 /// Size of a single component of an Ed25519 signature.
 const COMPONENT_SIZE: usize = 32;
 
 /// Size of an `R` or `s` component of an Ed25519 signature when serialized
 /// as bytes.
-pub type ComponentBytes = [u8; COMPONENT_SIZE];
+type ComponentBytes = [u8; COMPONENT_SIZE];
 
 /// Ed25519 signature serialized as a byte array.
-pub type SignatureBytes = [u8; Signature::BYTE_SIZE];
+type SignatureBytes = [u8; Signature::BYTE_SIZE];
 
 impl PubKey {
     /// Get credentials, a blake2b 28 bytes hash of the pub key
@@ -130,15 +130,30 @@ impl CddlConfig {
     }
 }
 
-impl Default for CddlConfig {
-    fn default() -> Self {
-        Self::new()
-    }
+/// The source of voting power for a given registration
+///
+/// The voting power can either come from:
+///  - a single wallet, OR
+///  - a set of delegations
+#[derive(Serialize, Deserialize)]
+#[serde(untagged)]
+#[derive(Debug, Clone, PartialEq)]
+pub(crate) enum VotingInfo {
+    /// Direct voting
+    ///
+    /// Voting power is based on the staked ada of the given key
+    Direct(PubKey),
+
+    /// Delegated voting
+    ///
+    /// Voting power is based on the staked ada of the delegated keys
+    /// order of elements is important and must be preserved.
+    Delegated(Vec<(PubKey, i64)>),
 }
 
 /// A catalyst registration on Cardano in either CIP-15 or CIP-36 format
 #[derive(Debug, Clone, PartialEq)]
-pub struct Registration {
+pub(crate) struct Registration {
     /// Voting key
     pub voting_key: Option<VotingInfo>,
     /// Stake key
@@ -153,33 +168,6 @@ pub struct Registration {
     pub raw_cbor_cip36: Option<Vec<u8>>,
     /// Witness signature 61285
     pub signature: Option<Signature>,
-}
-
-/// The source of voting power for a given registration
-///
-/// The voting power can either come from:
-///  - a single wallet, OR
-///  - a set of delegations
-#[derive(Serialize, Deserialize)]
-#[serde(untagged)]
-#[derive(Debug, Clone, PartialEq)]
-pub enum VotingInfo {
-    /// Direct voting
-    ///
-    /// Voting power is based on the staked ada of the given key
-    Direct(PubKey),
-
-    /// Delegated voting
-    ///
-    /// Voting power is based on the staked ada of the delegated keys
-    /// order of elements is important and must be preserved.
-    Delegated(Vec<(PubKey, i64)>),
-}
-
-impl Default for VotingInfo {
-    fn default() -> Self {
-        VotingInfo::Direct(PubKey(Vec::new()))
-    }
 }
 
 /// Validate raw registration binary against 61284 CDDL spec
@@ -199,7 +187,7 @@ pub fn validate_reg_cddl(bin_reg: &[u8], cddl_config: &CddlConfig) -> anyhow::Re
 /// Validates first nibble is within the address range: 0x0? - 0x7? + 0xE? , 0xF?
 /// Validates second nibble matches network id: 0/1
 #[must_use]
-pub fn is_valid_rewards_address(rewards_address_prefix: u8, network: Network) -> bool {
+fn is_valid_rewards_address(rewards_address_prefix: u8, network: Network) -> bool {
     let addr_type = rewards_address_prefix >> 4 & 0xF;
     let addr_net = rewards_address_prefix & 0xF;
 
@@ -226,7 +214,7 @@ pub fn is_valid_rewards_address(rewards_address_prefix: u8, network: Network) ->
 }
 
 /// Convert raw 61285 cbor to witness signature
-pub fn raw_sig_conversion(raw_cbor: &[u8]) -> anyhow::Result<Signature> {
+fn raw_sig_conversion(raw_cbor: &[u8]) -> anyhow::Result<Signature> {
     let decoded: ciborium::value::Value = ciborium::de::from_reader(Cursor::new(&raw_cbor))?;
 
     let signature_61285 = match decoded {
@@ -253,7 +241,7 @@ pub fn raw_sig_conversion(raw_cbor: &[u8]) -> anyhow::Result<Signature> {
 
 #[allow(clippy::manual_let_else)]
 /// Parse cip36 registration tx
-pub fn inspect_metamap_reg(spec_61284: &[Value]) -> anyhow::Result<&Vec<(Value, Value)>> {
+fn inspect_metamap_reg(spec_61284: &[Value]) -> anyhow::Result<&Vec<(Value, Value)>> {
     let metamap = match &spec_61284
         .get(KEY_61284)
         .ok_or(anyhow::anyhow!("Issue parsing 61284 parent key"))?
@@ -273,7 +261,7 @@ pub fn inspect_metamap_reg(spec_61284: &[Value]) -> anyhow::Result<&Vec<(Value, 
 
 #[allow(clippy::manual_let_else)]
 /// Extract voting key
-pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> anyhow::Result<VotingInfo> {
+fn inspect_voting_key(metamap: &[(Value, Value)]) -> anyhow::Result<VotingInfo> {
     let voting_key = match &metamap
         .get(DELEGATIONS_OR_DIRECT)
         .ok_or(anyhow::anyhow!("Issue with voting key 61284 cbor parsing"))?
@@ -325,7 +313,7 @@ pub fn inspect_voting_key(metamap: &[(Value, Value)]) -> anyhow::Result<VotingIn
 }
 
 /// Extract stake key
-pub fn inspect_stake_key(metamap: &[(Value, Value)]) -> anyhow::Result<PubKey> {
+fn inspect_stake_key(metamap: &[(Value, Value)]) -> anyhow::Result<PubKey> {
     let stake_key = match &metamap
         .get(STAKE_ADDRESS)
         .ok_or(anyhow::anyhow!("Issue with stake key parsing"))?
@@ -337,7 +325,7 @@ pub fn inspect_stake_key(metamap: &[(Value, Value)]) -> anyhow::Result<PubKey> {
 }
 
 /// Extract and validate rewards address
-pub fn inspect_rewards_addr(
+fn inspect_rewards_addr(
     metamap: &[(Value, Value)], network_id: Network,
 ) -> anyhow::Result<&Vec<u8>> {
     let (Value::Integer(_three), Value::Bytes(rewards_address)) = &metamap
@@ -359,7 +347,7 @@ pub fn inspect_rewards_addr(
 }
 
 /// Extract Nonce
-pub fn inspect_nonce(metamap: &[(Value, Value)]) -> anyhow::Result<Nonce> {
+fn inspect_nonce(metamap: &[(Value, Value)]) -> anyhow::Result<Nonce> {
     let nonce: i128 = match metamap
         .get(NONCE)
         .ok_or(anyhow::anyhow!("Issue with nonce parsing"))?
@@ -372,7 +360,7 @@ pub fn inspect_nonce(metamap: &[(Value, Value)]) -> anyhow::Result<Nonce> {
 }
 
 /// Extract optional voting purpose
-pub fn inspect_voting_purpose(metamap: &[(Value, Value)]) -> anyhow::Result<Option<VotingPurpose>> {
+fn inspect_voting_purpose(metamap: &[(Value, Value)]) -> anyhow::Result<Option<VotingPurpose>> {
     if metamap.len() == 5 {
         match metamap
             .get(VOTE_PURPOSE)
@@ -390,7 +378,7 @@ pub fn inspect_voting_purpose(metamap: &[(Value, Value)]) -> anyhow::Result<Opti
 
 /// Extract registrations information for TX metadata
 /// Collect secondary errors for granular json error report
-pub fn parse_registrations_from_metadata(
+pub(crate) fn parse_registrations_from_metadata(
     meta: &MultiEraMeta, network: Network,
 ) -> anyhow::Result<(Registration, ErrorReport)> {
     let mut voting_key: Option<VotingInfo> = None;
@@ -405,7 +393,7 @@ pub fn parse_registrations_from_metadata(
 
     if let pallas::ledger::traverse::MultiEraMeta::AlonzoCompatible(meta) = meta {
         for (key, cip36_registration) in meta.iter() {
-            if *key == u64::try_from(CIP36_61284)? {
+            if *key == CIP36_61284 {
                 let raw_cbor = meta.encode_fragment().map_err(|e| anyhow::anyhow!("{e}"))?;
                 raw_cbor_cip36 = Some(raw_cbor.clone());
 
@@ -481,7 +469,7 @@ pub fn parse_registrations_from_metadata(
                         errors_report.push(format!("Invalid voting purpose {raw_cbor:?} {err:?}"));
                     },
                 };
-            } else if *key == u64::try_from(CIP36_61285)? {
+            } else if *key == CIP36_61285 {
                 // Validate 61285 signature
                 let raw_cbor = cip36_registration
                     .encode_fragment()
@@ -523,7 +511,7 @@ pub fn parse_registrations_from_metadata(
 
 #[cfg(test)]
 #[test]
-pub fn test_rewards_addr_permutations() {
+fn test_rewards_addr_permutations() {
     // Valid addrs: 0x0?, 0x1?, 0x2?, 0x3?, 0x4?, 0x5?, 0x6?, 0x7?, 0xE?, 0xF?.
 
     let valid_addr_types = vec![0, 1, 2, 3, 4, 5, 6, 7, 14, 15];
