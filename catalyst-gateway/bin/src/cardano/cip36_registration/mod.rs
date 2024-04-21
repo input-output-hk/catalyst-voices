@@ -196,7 +196,7 @@ impl Cip36Registration {
             for (key, cip36_registration) in tx_metadata.iter() {
                 match *key {
                     CIP36_61284 => {
-                        raw_cbor_cip36 = cip36_registration.encode_fragment().map_or_else(
+                        raw_cbor_cip36 = tx_metadata.encode_fragment().map_or_else(
                             |err| {
                                 errors_report.push(format!("61284 invalid cbor {err}"));
                                 None
