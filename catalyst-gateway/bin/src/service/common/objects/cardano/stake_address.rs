@@ -17,7 +17,7 @@ impl StakeAddress {
     /// Creates a `CardanoStakeAddress` schema definition.
     fn schema() -> MetaSchema {
         let mut schema = MetaSchema::new("string");
-        schema.title = Some("CardanoStakeAddress".to_string());
+        schema.title = Some(Self::name().to_string());
         schema.description = Some("The stake address of the user. Should a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.");
         schema.example = Some(serde_json::Value::String(
             // cspell: disable

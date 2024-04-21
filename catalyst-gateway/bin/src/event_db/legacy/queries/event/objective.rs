@@ -1,6 +1,5 @@
 //! Objective Queries
 use crate::event_db::{
-    error::Error,
     legacy::types::{
         event::EventId,
         objective::{
@@ -33,7 +32,7 @@ impl EventDB {
     #[allow(dead_code)]
     pub(crate) async fn get_objectives(
         &self, event: EventId, limit: Option<i64>, offset: Option<i64>,
-    ) -> Result<Vec<Objective>, Error> {
+    ) -> anyhow::Result<Vec<Objective>> {
         let conn = self.pool.get().await?;
 
         let rows = conn

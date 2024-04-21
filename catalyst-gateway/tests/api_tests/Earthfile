@@ -8,18 +8,6 @@ builder:
     COPY ./snapshot_tool-56364174.json .
     DO github.com/input-output-hk/catalyst-ci/earthly/python:v2.11.1+BUILDER
 
-cat-gateway-test:
-    ARG DB_URL="postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev"
-    ARG CAT_ADDRESS="0.0.0.0:3030"
-    ARG LOG_LEVEL="error"
-
-    FROM ../../+package-cat-gateway --address=$CAT_ADDRESS --db_url=$DB_URL --log_level=$LOG_LEVEL
-
-    # copy preprod mithril snapshot to /tmp/preprod dir
-    COPY github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:feat/update-preprod+package-preprod-snapshot/snapshot /tmp/preprod
-
-    SAVE IMAGE cat-gateway-test:latest
-
 test:
     FROM +builder
 
@@ -28,8 +16,8 @@ test:
     WITH DOCKER \
         --compose docker-compose.yml \
         --load event-db:latest=(../../event-db+build) \
-        --load cat-gateway-test:latest=(+cat-gateway-test) \
+        --load cat-gateway:latest=(../../+package-cat-gateway-with-preprod-snapshot) \
         --service cat-gateway \
         --allow-privileged
         RUN poetry run pytest -s
-    END  
+    END

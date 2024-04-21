@@ -93,48 +93,32 @@ pub(crate) fn mk_api(
 
     // Get localhost name
     if let Ok(hostname) = gethostname().into_string() {
-        let hostname_addresses = add_protocol_prefix(
-            &format!("{hostname}:{port}"),
-            settings.http_auto_servers,
-            settings.https_auto_servers,
-        );
-        for hostname_address in hostname_addresses {
-            service = service.server(
-                ServerObject::new(hostname_address).description("Server at localhost name"),
-            );
-        }
+        let hostname_address = format!("http://{hostname}:{port}");
+        service = service
+            .server(ServerObject::new(hostname_address).description("Server at localhost name"));
     }
 
     // Get local IP address v4 and v6
     if let Ok(network_interfaces) = list_afinet_netifas() {
         for (name, ip) in &network_interfaces {
             if *name == "en0" {
-                let (ip_with_port, desc) = match ip {
-                    IpAddr::V4(_) => (format!("{ip}:{port}"), "Server at local IPv4 address"),
-                    IpAddr::V6(_) => (format!("[{ip}]:{port}"), "Server at local IPv6 address"),
+                let (address, desc) = match ip {
+                    IpAddr::V4(_) => {
+                        (
+                            format!("http://{ip}:{port}"),
+                            "Server at local IPv4 address",
+                        )
+                    },
+                    IpAddr::V6(_) => {
+                        (
+                            format!("http://[{ip}]:{port}"),
+                            "Server at local IPv6 address",
+                        )
+                    },
                 };
-                let ip_addresses = add_protocol_prefix(
-                    &ip_with_port,
-                    settings.http_auto_servers,
-                    settings.https_auto_servers,
-                );
-                for address in ip_addresses {
-                    service = service.server(ServerObject::new(address).description(desc));
-                }
+                service = service.server(ServerObject::new(address).description(desc));
             }
         }
     }
     service
-}
-
-/// Function to add protocol prefix based on flags.
-fn add_protocol_prefix(address: &String, is_http: bool, is_https: bool) -> Vec<String> {
-    let mut addresses = Vec::new();
-    if is_http {
-        addresses.push(format!("http://{address}"));
-    }
-    if is_https {
-        addresses.push(format!("https://{address}"));
-    }
-    addresses
 }

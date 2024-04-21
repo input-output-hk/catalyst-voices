@@ -78,9 +78,11 @@ jormungandr
 Jörmungandr
 junitreport
 Keyhash
+keyserver
 lcov
 Leshiy
 libapp
+libavcodec
 libflutter
 lintfix
 localizable
@@ -183,3 +185,5 @@ xctest
 xctestrun
 xcworkspace
 yoroi
+multiplatform
+Multiplatform

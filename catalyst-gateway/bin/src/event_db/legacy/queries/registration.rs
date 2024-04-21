@@ -2,11 +2,12 @@
 use chrono::{NaiveDateTime, Utc};
 
 use crate::event_db::{
+    error::NotFoundError,
     legacy::types::{
         event::EventId,
         registration::{Delegation, Delegator, RewardAddress, Voter, VoterGroupId, VoterInfo},
     },
-    Error, EventDB,
+    EventDB,
 };
 
 impl EventDB {
@@ -74,7 +75,7 @@ impl EventDB {
     #[allow(dead_code)]
     pub(crate) async fn get_voter(
         &self, event: &Option<EventId>, voting_key: String, with_delegations: bool,
-    ) -> Result<Voter, Error> {
+    ) -> anyhow::Result<Voter> {
         let conn = self.pool.get().await?;
 
         let rows = if let Some(event) = event {
@@ -84,7 +85,7 @@ impl EventDB {
             conn.query(Self::VOTER_BY_LAST_EVENT_QUERY, &[&voting_key])
                 .await?
         };
-        let voter = rows.first().ok_or(Error::NotFound)?;
+        let voter = rows.first().ok_or(NotFoundError)?;
 
         let voting_group = VoterGroupId(voter.try_get("voting_group")?);
         let voting_power = voter.try_get("voting_power")?;
@@ -102,7 +103,7 @@ impl EventDB {
 
         let total_voting_power_per_group: i64 = rows
             .first()
-            .ok_or(Error::NotFound)?
+            .ok_or(NotFoundError)?
             .try_get("total_voting_power")?;
 
         let voting_power_saturation = if total_voting_power_per_group == 0 {
@@ -163,7 +164,7 @@ impl EventDB {
     #[allow(dead_code)]
     pub(crate) async fn get_delegator(
         &self, event: &Option<EventId>, stake_public_key: String,
-    ) -> Result<Delegator, Error> {
+    ) -> anyhow::Result<Delegator> {
         let conn = self.pool.get().await?;
         let rows = if let Some(event) = event {
             conn.query(Self::DELEGATOR_SNAPSHOT_INFO_BY_EVENT_QUERY, &[&event.0])
@@ -172,7 +173,7 @@ impl EventDB {
             conn.query(Self::DELEGATOR_SNAPSHOT_INFO_BY_LAST_EVENT_QUERY, &[])
                 .await?
         };
-        let delegator_snapshot_info = rows.first().ok_or(Error::NotFound)?;
+        let delegator_snapshot_info = rows.first().ok_or(NotFoundError)?;
 
         let delegation_rows = if let Some(event) = event {
             conn.query(Self::DELEGATIONS_BY_EVENT_QUERY, &[
@@ -188,7 +189,7 @@ impl EventDB {
             .await?
         };
         if delegation_rows.is_empty() {
-            return Err(Error::NotFound);
+            return Err(NotFoundError.into());
         }
 
         let mut delegations = Vec::new();
@@ -210,7 +211,7 @@ impl EventDB {
         };
         let total_power: i64 = rows
             .first()
-            .ok_or(Error::NotFound)?
+            .ok_or(NotFoundError)?
             .try_get("total_voting_power")?;
 
         #[allow(clippy::indexing_slicing)] // delegation_rows already checked to be not empty.
