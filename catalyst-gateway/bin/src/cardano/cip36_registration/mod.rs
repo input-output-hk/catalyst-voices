@@ -177,9 +177,9 @@ impl Cip36Registration {
     /// Collect secondary errors for granular json error report
     #[allow(clippy::too_many_lines)]
     pub(crate) fn generate_from_tx_metadata(
-        meta: &MultiEraMeta, network: Network,
+        tx_metadata: &MultiEraMeta, network: Network,
     ) -> anyhow::Result<Option<Self>> {
-        if meta.is_empty() {
+        if tx_metadata.is_empty() {
             return Ok(None);
         }
 
@@ -190,113 +190,142 @@ impl Cip36Registration {
         let mut nonce: Option<Nonce> = None;
         let mut raw_cbor_cip36: Option<Vec<u8>> = None;
         let mut signature: Option<Signature> = None;
-
         let mut errors_report = Vec::new();
 
-        if let pallas::ledger::traverse::MultiEraMeta::AlonzoCompatible(meta) = meta {
-            for (key, cip36_registration) in meta.iter() {
-                if *key == CIP36_61284 {
-                    let raw_cbor = meta.encode_fragment().map_err(|e| anyhow::anyhow!("{e}"))?;
-                    raw_cbor_cip36 = Some(raw_cbor.clone());
+        if let pallas::ledger::traverse::MultiEraMeta::AlonzoCompatible(tx_metadata) = tx_metadata {
+            for (key, cip36_registration) in tx_metadata.iter() {
+                match *key {
+                    CIP36_61284 => {
+                        raw_cbor_cip36 = cip36_registration.encode_fragment().map_or_else(
+                            |err| {
+                                errors_report.push(format!("61284 invalid cbor {err}"));
+                                None
+                            },
+                            Some,
+                        );
 
-                    let decoded: ciborium::value::Value =
-                        ciborium::de::from_reader(Cursor::new(&raw_cbor))?;
-
-                    let meta_61284 = if let Value::Map(m) = decoded {
-                        m.iter().map(|entry| entry.1.clone()).collect::<Vec<_>>()
-                    } else {
-                        errors_report.push(format!("61284 parent cddl invalid {decoded:?}"));
-                        continue;
-                    };
-
-                    // 4 entries inside metadata map with one optional entry for the voting purpose
-                    let metamap = match inspect_metamap_reg(&meta_61284) {
-                        Ok(value) => value,
-                        Err(err) => {
-                            errors_report
-                                .push(format!("61284 child cddl invalid {raw_cbor:?} {err:?}"));
+                        let Some(raw_cbor) = raw_cbor_cip36.as_ref() else {
                             continue;
-                        },
-                    };
+                        };
 
-                    // voting key: simply an ED25519 public key. This is the spending credential in
-                    // the side chain that will receive voting power from this
-                    // delegation. For direct voting it's necessary to have the
-                    // corresponding private key to cast votes in the side chain
-                    voting_key = inspect_voting_key(metamap).map_or_else(
-                        |err| {
-                            errors_report.push(format!("Invalid voting key {raw_cbor:?} {err:?}"));
-                            None
-                        },
-                        Some,
-                    );
+                        let decoded: ciborium::value::Value =
+                            ciborium::de::from_reader(Cursor::new(raw_cbor))?;
 
-                    // A stake address for the network that this transaction is submitted to (to
-                    // point to the Ada that is being delegated);
-                    stake_key = inspect_stake_key(metamap).map_or_else(
-                        |err| {
-                            errors_report.push(format!("Invalid stake key {raw_cbor:?} {err:?}"));
-                            None
-                        },
-                        Some,
-                    );
+                        let meta_61284 = if let Value::Map(m) = decoded {
+                            m.iter().map(|entry| entry.1.clone()).collect::<Vec<_>>()
+                        } else {
+                            errors_report.push(format!("61284 parent cddl invalid {decoded:?}"));
+                            continue;
+                        };
 
-                    // A Shelley payment address (see CIP-0019) discriminated for the same network
-                    // this transaction is submitted to, to receive rewards.
-                    rewards_address = inspect_rewards_addr(metamap, network).map_or_else(
-                        |err| {
-                            errors_report
-                                .push(format!("Invalid rewards address {raw_cbor:?} {err:?}"));
-                            None
-                        },
-                        |val| Some(RewardsAddress(val.clone())),
-                    );
+                        // 4 entries inside metadata map with one optional entry for the voting
+                        // purpose
+                        let metamap = match inspect_metamap_reg(&meta_61284) {
+                            Ok(value) => value,
+                            Err(err) => {
+                                errors_report.push(format!(
+                                    "61284 child cddl invalid {} {err}",
+                                    hex::encode(raw_cbor)
+                                ));
+                                continue;
+                            },
+                        };
 
-                    // A nonce that identifies that most recent delegation
-                    nonce = inspect_nonce(metamap).map_or_else(
-                        |err| {
-                            errors_report.push(format!("Invalid nonce {raw_cbor:?} {err:?}"));
-                            None
-                        },
-                        Some,
-                    );
+                        // voting key: simply an ED25519 public key. This is the spending credential
+                        // in the side chain that will receive voting power
+                        // from this delegation. For direct voting it's
+                        // necessary to have the corresponding private key
+                        // to cast votes in the side chain
+                        voting_key = inspect_voting_key(metamap).map_or_else(
+                            |err| {
+                                errors_report.push(format!(
+                                    "Invalid voting key {} {err}",
+                                    hex::encode(raw_cbor)
+                                ));
+                                None
+                            },
+                            Some,
+                        );
 
-                    // A non-negative integer that indicates the purpose of the vote.
-                    // This is an optional field to allow for compatibility with CIP-15
-                    // 4 entries inside metadata map with one optional entry for the voting purpose
-                    match inspect_voting_purpose(metamap) {
-                        Ok(Some(value)) => voting_purpose = Some(value),
-                        Ok(None) => voting_purpose = None,
-                        Err(err) => {
-                            voting_purpose = None;
-                            errors_report
-                                .push(format!("Invalid voting purpose {raw_cbor:?} {err:?}"));
-                        },
-                    };
-                } else if *key == CIP36_61285 {
-                    // Validate 61285 signature
-                    let raw_cbor = cip36_registration
-                        .encode_fragment()
-                        .map_err(|e| anyhow::anyhow!("{e}"))?;
+                        // A stake address for the network that this transaction is submitted to (to
+                        // point to the Ada that is being delegated);
+                        stake_key = inspect_stake_key(metamap).map_or_else(
+                            |err| {
+                                errors_report.push(format!(
+                                    "Invalid stake key {} {err}",
+                                    hex::encode(raw_cbor)
+                                ));
+                                None
+                            },
+                            Some,
+                        );
 
-                    match raw_sig_conversion(
-                        &cip36_registration
+                        // A Shelley payment address (see CIP-0019) discriminated for the same
+                        // network this transaction is submitted to, to
+                        // receive rewards.
+                        rewards_address = inspect_rewards_addr(metamap, network).map_or_else(
+                            |err| {
+                                errors_report.push(format!(
+                                    "Invalid rewards address {} {err}",
+                                    hex::encode(raw_cbor)
+                                ));
+                                None
+                            },
+                            |val| Some(RewardsAddress(val.clone())),
+                        );
+
+                        // A nonce that identifies that most recent delegation
+                        nonce = inspect_nonce(metamap).map_or_else(
+                            |err| {
+                                errors_report
+                                    .push(format!("Invalid nonce {} {err}", hex::encode(raw_cbor)));
+                                None
+                            },
+                            Some,
+                        );
+
+                        // A non-negative integer that indicates the purpose of the vote.
+                        // This is an optional field to allow for compatibility with CIP-15
+                        // 4 entries inside metadata map with one optional entry for the voting
+                        // purpose
+                        match inspect_voting_purpose(metamap) {
+                            Ok(Some(value)) => voting_purpose = Some(value),
+                            Ok(None) => voting_purpose = None,
+                            Err(err) => {
+                                voting_purpose = None;
+                                errors_report.push(format!(
+                                    "Invalid voting purpose {} {err}",
+                                    hex::encode(raw_cbor)
+                                ));
+                            },
+                        };
+                    },
+
+                    CIP36_61285 => {
+                        // Validate 61285 signature
+                        let raw_cbor = cip36_registration
                             .encode_fragment()
-                            .map_err(|e| anyhow::anyhow!("{e}"))?,
-                    ) {
-                        Ok(sig) => {
-                            signature = Some(sig);
-                        },
-                        Err(err) => {
-                            errors_report.push(format!(
-                                "Invalid signature. cbor: {:?} {:?}",
-                                hex::encode(raw_cbor),
-                                err
-                            ));
-                            signature = None;
-                        },
-                    };
-                }
+                            .map_err(|e| anyhow::anyhow!("{e}"))?;
+
+                        match raw_sig_conversion(
+                            &cip36_registration
+                                .encode_fragment()
+                                .map_err(|e| anyhow::anyhow!("{e}"))?,
+                        ) {
+                            Ok(sig) => {
+                                signature = Some(sig);
+                            },
+                            Err(err) => {
+                                errors_report.push(format!(
+                                    "Invalid signature. cbor: {} {err}",
+                                    hex::encode(raw_cbor),
+                                ));
+                                signature = None;
+                            },
+                        };
+                    },
+                    _ => continue,
+                };
             }
         };
 
