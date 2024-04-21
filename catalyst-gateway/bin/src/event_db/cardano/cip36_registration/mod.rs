@@ -5,9 +5,7 @@ use pallas::ledger::traverse::MultiEraTx;
 use serde_json::json;
 
 use crate::{
-    cardano::cip36_registration::{
-        validate_reg_cddl, CddlConfig, Cip36Registration, ErrorReport, VotingInfo,
-    },
+    cardano::cip36_registration::{Cip36Registration, ErrorReport, VotingInfo},
     event_db::{cardano::chain_state::SlotNumber, error::NotFoundError, EventDB},
 };
 
@@ -98,8 +96,6 @@ impl EventDB {
     pub(crate) async fn index_registration_data(
         &self, tx: &MultiEraTx<'_>, network: Network,
     ) -> anyhow::Result<()> {
-        let cddl = CddlConfig::new();
-
         let registration =
             match Cip36Registration::generate_from_tx_metadata(&tx.metadata(), network) {
                 Ok(Some(registration)) => registration,
@@ -111,21 +107,6 @@ impl EventDB {
                 },
             };
 
-        // cddl verification
-        if let Some(cip36) = registration.clone().raw_cbor_cip36 {
-            match validate_reg_cddl(&cip36, &cddl) {
-                Ok(()) => (),
-                Err(_err) => {
-                    // did not pass cddl verification, not a valid registration
-                    return Ok(());
-                },
-            };
-        } else {
-            // registration does not contain cip36 61284 or 61285 keys
-            // not a valid registration tx
-            return Ok(());
-        }
-
         self.insert_voter_registration(
             tx.hash().to_vec(),
             registration
@@ -133,7 +114,7 @@ impl EventDB {
                 .map(|val| val.get_credentials().to_vec()),
             registration.voting_key,
             registration.rewards_address.map(|val| val.0),
-            registration.raw_cbor_cip36,
+            registration.raw_registration,
             registration.nonce.map(|nonce| nonce.0),
             registration.errors_report,
         )

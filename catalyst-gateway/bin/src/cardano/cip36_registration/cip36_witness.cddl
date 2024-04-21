@@ -1,0 +1,5 @@
+registration_witness = {
+  1 : $stake_witness
+}
+
+$stake_witness /= $ed25519_signature
