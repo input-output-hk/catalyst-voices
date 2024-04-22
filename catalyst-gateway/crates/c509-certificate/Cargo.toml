@@ -16,3 +16,4 @@ workspace = true
 
 [dependencies]
 wasm-bindgen = { workspace = true }
+regex = { workspace = true }
