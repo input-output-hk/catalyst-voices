@@ -19,17 +19,6 @@ const PAYMENT_ADDRESS: usize = 2;
 const NONCE: usize = 3;
 /// Cip36
 const VOTE_PURPOSE: usize = 4;
-/// Cip36
-const DELEGATIONS_OR_DIRECT: usize = 0;
-/// Cip36
-const VOTE_KEY: usize = 0;
-/// Cip36
-const WEIGHT: usize = 1;
-
-/// Cip36 registration CDDL definition
-const CIP36_REGISTRATION_CDDL: &str = include_str!("cip36_registration.cddl");
-/// Cip36 witness CDDL definition
-const CIP36_WITNESS_CDDL: &str = include_str!("cip36_witness.cddl");
 
 /// <https://cips.cardano.org/cips/cip36>
 const CIP36_CBOR_REGISTRATION_KEY: u64 = 61284;
@@ -216,7 +205,7 @@ impl Cip36Registration {
                         // from this delegation. For direct voting it's
                         // necessary to have the corresponding private key
                         // to cast votes in the side chain
-                        voting_key = inspect_voting_key(cbor_map).map_or_else(
+                        voting_key = inspect_voting_info(cbor_map).map_or_else(
                             |err| {
                                 errors_report.push(format!("Invalid voting key, err: {err}",));
                                 None
@@ -303,6 +292,9 @@ impl Cip36Registration {
 
 /// Validate binary data agains CIP-36 registration CDDL spec
 fn validate_cip36_registration(data: &[u8]) -> anyhow::Result<()> {
+    /// Cip36 registration CDDL definition
+    const CIP36_REGISTRATION_CDDL: &str = include_str!("cip36_registration.cddl");
+
     cddl::validate_cbor_from_slice(CIP36_REGISTRATION_CDDL, data, None)?;
     Ok(())
 }
@@ -310,6 +302,9 @@ fn validate_cip36_registration(data: &[u8]) -> anyhow::Result<()> {
 /// Validate binary data agains CIP-36 registration CDDL spec
 #[allow(dead_code)]
 fn validate_cip36_witness(data: &[u8]) -> anyhow::Result<()> {
+    /// Cip36 witness CDDL definition
+    const CIP36_WITNESS_CDDL: &str = include_str!("cip36_witness.cddl");
+
     cddl::validate_cbor_from_slice(CIP36_WITNESS_CDDL, data, None)?;
     Ok(())
 }
@@ -319,7 +314,6 @@ fn validate_cip36_witness(data: &[u8]) -> anyhow::Result<()> {
 /// script hash. Function accepts this first header prefix byte.
 /// Validates first nibble is within the address range: 0x0? - 0x7? + 0xE? , 0xF?
 /// Validates second nibble matches network id: 0/1
-#[must_use]
 fn is_valid_rewards_address(rewards_address_prefix: u8, network: Network) -> bool {
     let addr_type = rewards_address_prefix >> 4 & 0xF;
     let addr_net = rewards_address_prefix & 0xF;
@@ -372,48 +366,43 @@ fn raw_sig_conversion(raw_cbor: &[u8]) -> anyhow::Result<Signature> {
     Ok(Signature::from_bytes(&sig_bytes))
 }
 
-/// Extract voting key
-fn inspect_voting_key(metamap: &[(Value, Value)]) -> anyhow::Result<VotingInfo> {
-    let voting_key = match &metamap
-        .get(DELEGATIONS_OR_DIRECT)
-        .ok_or(anyhow::anyhow!("Issue with voting key 61284 cbor parsing"))?
-    {
-        (Value::Integer(_one), Value::Bytes(direct)) => VotingInfo::Direct(PubKey(direct.clone())),
-        (Value::Integer(_one), Value::Array(delegations)) => {
-            let mut delegations_map: Vec<(PubKey, i64)> = Vec::new();
-            for d in delegations {
-                match d {
-                    Value::Array(delegations) => {
-                        let voting_key = delegations
-                            .get(VOTE_KEY)
-                            .ok_or(anyhow::anyhow!("Issue parsing delegations"))?
-                            .as_bytes()
-                            .ok_or(anyhow::anyhow!("Invalid voting key"))?;
+/// Extract voting info
+fn inspect_voting_info(metamap: &[(Value, Value)]) -> anyhow::Result<VotingInfo> {
+    /// Voting info cbor key
+    const VOTING_INFO_CBOR_KEY: usize = 0;
+    /// Voting info vote cbor key
+    const VOTING_INFO_VOTE_KEY: usize = 0;
+    /// Voting info vote cbor key
+    const VOTING_INFO_WEIGTH_KEY: usize = 0;
 
-                        let weight = match delegations
-                            .get(WEIGHT)
-                            .ok_or(anyhow::anyhow!("Issue parsing weight"))?
-                            .as_integer()
-                        {
-                            Some(weight) => {
-                                match weight.try_into() {
-                                    Ok(weight) => weight,
-                                    Err(_err) => {
-                                        return Err(anyhow::anyhow!("Invalid weight in delegation"))
-                                    },
-                                }
-                            },
-                            None => return Err(anyhow::anyhow!("Invalid delegation")),
-                        };
+    let voting_key = match &metamap.get(VOTING_INFO_CBOR_KEY).ok_or(anyhow::anyhow!(
+        "Issue with registation voting info cbor parsing"
+    ))? {
+        (Value::Integer(_), Value::Bytes(direct)) => VotingInfo::Direct(PubKey(direct.clone())),
+        (Value::Integer(_), Value::Array(cbor_array)) => {
+            let mut delegations = Vec::new();
+            for cbor_value in cbor_array {
+                let delegation_info = cbor_value
+                    .as_array()
+                    .ok_or(anyhow::anyhow!("Invalid delegation info"))?;
 
-                        delegations_map.push(((PubKey(voting_key.clone())), weight));
-                    },
+                let voting_key = delegation_info
+                    .get(VOTING_INFO_VOTE_KEY)
+                    .ok_or(anyhow::anyhow!("Issue parsing delegation key"))?
+                    .as_bytes()
+                    .ok_or(anyhow::anyhow!("Issue parsing delegation key"))?;
 
-                    _ => return Err(anyhow::anyhow!("Invalid voting key")),
-                }
+                let weight = delegation_info
+                    .get(VOTING_INFO_WEIGTH_KEY)
+                    .ok_or(anyhow::anyhow!("Issue parsing delegation weight"))?
+                    .as_integer()
+                    .ok_or(anyhow::anyhow!("Issue parsing delegation weight"))?
+                    .try_into()?;
+
+                delegations.push(((PubKey(voting_key.clone())), weight));
             }
 
-            VotingInfo::Delegated(delegations_map)
+            VotingInfo::Delegated(delegations)
         },
 
         _ => return Err(anyhow::anyhow!("Invalid signature")),
