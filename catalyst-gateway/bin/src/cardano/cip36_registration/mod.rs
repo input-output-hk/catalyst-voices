@@ -170,7 +170,7 @@ impl Cip36Registration {
             for (key, metadata) in tx_metadata.iter() {
                 match *key {
                     CIP36_CBOR_REGISTRATION_KEY => {
-                        let metada_bytes = match metadata.encode_fragment() {
+                        let metadata_bytes = match metadata.encode_fragment() {
                             Ok(raw_cbor) => raw_cbor,
                             Err(err) => {
                                 errors_report
@@ -179,14 +179,14 @@ impl Cip36Registration {
                             },
                         };
 
-                        if let Err(err) = validate_cip36_registration(metada_bytes.as_slice()) {
+                        if let Err(err) = validate_cip36_registration(metadata_bytes.as_slice()) {
                             errors_report
                                 .push(format!("Not a valid cbor cip36 registration, err: {err}"));
                             continue;
                         }
 
                         let Ok(cbor_object) = ciborium::de::from_reader::<ciborium::Value, _>(
-                            metada_bytes.as_slice(),
+                            metadata_bytes.as_slice(),
                         ) else {
                             errors_report.push("Cannot decode cbor object from bytes".to_string());
                             continue;
@@ -290,7 +290,7 @@ impl Cip36Registration {
     }
 }
 
-/// Validate binary data agains CIP-36 registration CDDL spec
+/// Validate binary data against CIP-36 registration CDDL spec
 fn validate_cip36_registration(data: &[u8]) -> anyhow::Result<()> {
     /// Cip36 registration CDDL definition
     const CIP36_REGISTRATION_CDDL: &str = include_str!("cip36_registration.cddl");
@@ -299,7 +299,7 @@ fn validate_cip36_registration(data: &[u8]) -> anyhow::Result<()> {
     Ok(())
 }
 
-/// Validate binary data agains CIP-36 registration CDDL spec
+/// Validate binary data against CIP-36 registration CDDL spec
 #[allow(dead_code)]
 fn validate_cip36_witness(data: &[u8]) -> anyhow::Result<()> {
     /// Cip36 witness CDDL definition
@@ -370,13 +370,13 @@ fn raw_sig_conversion(raw_cbor: &[u8]) -> anyhow::Result<Signature> {
 fn inspect_voting_info(metamap: &[(Value, Value)]) -> anyhow::Result<VotingInfo> {
     /// Voting info cbor key
     const VOTING_INFO_CBOR_KEY: usize = 0;
-    /// Voting info vote cbor key
-    const VOTING_INFO_VOTE_KEY: usize = 0;
-    /// Voting info vote cbor key
-    const VOTING_INFO_WEIGTH_KEY: usize = 0;
+    /// Voting key cbor key
+    const VOTE_KEY_CBOR_KEY: usize = 0;
+    /// Weight cbor key
+    const WEIGHT_CBOR_KEY: usize = 0;
 
     let voting_key = match &metamap.get(VOTING_INFO_CBOR_KEY).ok_or(anyhow::anyhow!(
-        "Issue with registation voting info cbor parsing"
+        "Issue with registration voting info cbor parsing"
     ))? {
         (Value::Integer(_), Value::Bytes(direct)) => VotingInfo::Direct(PubKey(direct.clone())),
         (Value::Integer(_), Value::Array(cbor_array)) => {
@@ -387,13 +387,13 @@ fn inspect_voting_info(metamap: &[(Value, Value)]) -> anyhow::Result<VotingInfo>
                     .ok_or(anyhow::anyhow!("Invalid delegation info"))?;
 
                 let voting_key = delegation_info
-                    .get(VOTING_INFO_VOTE_KEY)
+                    .get(VOTE_KEY_CBOR_KEY)
                     .ok_or(anyhow::anyhow!("Issue parsing delegation key"))?
                     .as_bytes()
                     .ok_or(anyhow::anyhow!("Issue parsing delegation key"))?;
 
                 let weight = delegation_info
-                    .get(VOTING_INFO_WEIGTH_KEY)
+                    .get(WEIGHT_CBOR_KEY)
                     .ok_or(anyhow::anyhow!("Issue parsing delegation weight"))?
                     .as_integer()
                     .ok_or(anyhow::anyhow!("Issue parsing delegation weight"))?
