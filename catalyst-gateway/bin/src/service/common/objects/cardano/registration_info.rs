@@ -71,14 +71,14 @@ impl RegistrationInfo {
             PublicVotingInfo::Delegated(delegations) => {
                 VotingInfo::Delegated(Delegations {
                     delegations: delegations
-                    .into_iter()
-                    .map(|(voting_key, power)| {
-                        Delegation {
-                            voting_key: to_hex_with_prefix(voting_key.bytes()),
-                            power,
-                        }
-                    })
-                    .collect()
+                        .into_iter()
+                        .map(|(voting_key, power)| {
+                            Delegation {
+                                voting_key: to_hex_with_prefix(voting_key.bytes()),
+                                power,
+                            }
+                        })
+                        .collect(),
                 })
             },
         };
@@ -105,10 +105,11 @@ impl Example for RegistrationInfo {
             nonce: 11_623_850,
             voting_info: VotingInfo::Delegated(Delegations {
                 delegations: vec![Delegation {
-                    voting_key: "0xb16f03d67e95ddd321df4bee8658901eb183d4cb5623624ff5edd7fe54f8e857"
-                        .to_string(),
+                    voting_key:
+                        "0xb16f03d67e95ddd321df4bee8658901eb183d4cb5623624ff5edd7fe54f8e857"
+                            .to_string(),
                     power: 1,
-                }]
+                }],
             }),
         }
     }
