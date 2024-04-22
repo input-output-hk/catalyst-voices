@@ -35,7 +35,7 @@ pub(crate) async fn endpoint(state: &State, network: Option<Network>) -> AllResp
 
     let network = network.unwrap_or(Network::Mainnet);
 
-    match event_db.last_updated_metadata(network.into()).await {
+    match event_db.last_updated_state(network.into()).await {
         Ok((slot_number, block_hash, last_updated)) => {
             T200(OK(Json(SyncState {
                 slot_number,
