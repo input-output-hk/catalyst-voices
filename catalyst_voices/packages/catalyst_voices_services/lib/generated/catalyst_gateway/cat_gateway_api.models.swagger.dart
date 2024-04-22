@@ -211,6 +211,51 @@ extension $DelegationExtension on Delegation {
 }
 
 @JsonSerializable(explicitToJson: true)
+class Delegations {
+  const Delegations({
+    required this.delegations,
+  });
+
+  factory Delegations.fromJson(Map<String, dynamic> json) =>
+      _$DelegationsFromJson(json);
+
+  static const toJsonFactory = _$DelegationsToJson;
+  Map<String, dynamic> toJson() => _$DelegationsToJson(this);
+
+  @JsonKey(name: 'delegations', defaultValue: <Delegation>[])
+  final List<Delegation> delegations;
+  static const fromJsonFactory = _$DelegationsFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is Delegations &&
+            (identical(other.delegations, delegations) ||
+                const DeepCollectionEquality()
+                    .equals(other.delegations, delegations)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(delegations) ^ runtimeType.hashCode;
+}
+
+extension $DelegationsExtension on Delegations {
+  Delegations copyWith({List<Delegation>? delegations}) {
+    return Delegations(delegations: delegations ?? this.delegations);
+  }
+
+  Delegations copyWithWrapped({Wrapped<List<Delegation>>? delegations}) {
+    return Delegations(
+        delegations:
+            (delegations != null ? delegations.value : this.delegations));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
 class FragmentStatus {
   const FragmentStatus();
 
@@ -1207,7 +1252,123 @@ extension $VoterRegistrationExtension on VoterRegistration {
   }
 }
 
-typedef VotingInfo = Map<String, dynamic>;
+@JsonSerializable(explicitToJson: true)
+class VotingInfo {
+  const VotingInfo();
+
+  factory VotingInfo.fromJson(Map<String, dynamic> json) =>
+      _$VotingInfoFromJson(json);
+
+  static const toJsonFactory = _$VotingInfoToJson;
+  Map<String, dynamic> toJson() => _$VotingInfoToJson(this);
+
+  static const fromJsonFactory = _$VotingInfoFromJson;
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+}
+
+@JsonSerializable(explicitToJson: true)
+class VotingInfoDelegations {
+  const VotingInfoDelegations({
+    required this.type,
+    required this.delegations,
+  });
+
+  factory VotingInfoDelegations.fromJson(Map<String, dynamic> json) =>
+      _$VotingInfoDelegationsFromJson(json);
+
+  static const toJsonFactory = _$VotingInfoDelegationsToJson;
+  Map<String, dynamic> toJson() => _$VotingInfoDelegationsToJson(this);
+
+  @JsonKey(name: 'type')
+  final String type;
+  @JsonKey(name: 'delegations', defaultValue: <Delegation>[])
+  final List<Delegation> delegations;
+  static const fromJsonFactory = _$VotingInfoDelegationsFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is VotingInfoDelegations &&
+            (identical(other.type, type) ||
+                const DeepCollectionEquality().equals(other.type, type)) &&
+            (identical(other.delegations, delegations) ||
+                const DeepCollectionEquality()
+                    .equals(other.delegations, delegations)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(type) ^
+      const DeepCollectionEquality().hash(delegations) ^
+      runtimeType.hashCode;
+}
+
+extension $VotingInfoDelegationsExtension on VotingInfoDelegations {
+  VotingInfoDelegations copyWith(
+      {String? type, List<Delegation>? delegations}) {
+    return VotingInfoDelegations(
+        type: type ?? this.type, delegations: delegations ?? this.delegations);
+  }
+
+  VotingInfoDelegations copyWithWrapped(
+      {Wrapped<String>? type, Wrapped<List<Delegation>>? delegations}) {
+    return VotingInfoDelegations(
+        type: (type != null ? type.value : this.type),
+        delegations:
+            (delegations != null ? delegations.value : this.delegations));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class VotingInfoString {
+  const VotingInfoString({
+    required this.type,
+  });
+
+  factory VotingInfoString.fromJson(Map<String, dynamic> json) =>
+      _$VotingInfoStringFromJson(json);
+
+  static const toJsonFactory = _$VotingInfoStringToJson;
+  Map<String, dynamic> toJson() => _$VotingInfoStringToJson(this);
+
+  @JsonKey(name: 'type')
+  final String type;
+  static const fromJsonFactory = _$VotingInfoStringFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is VotingInfoString &&
+            (identical(other.type, type) ||
+                const DeepCollectionEquality().equals(other.type, type)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(type) ^ runtimeType.hashCode;
+}
+
+extension $VotingInfoStringExtension on VotingInfoString {
+  VotingInfoString copyWith({String? type}) {
+    return VotingInfoString(type: type ?? this.type);
+  }
+
+  VotingInfoString copyWithWrapped({Wrapped<String>? type}) {
+    return VotingInfoString(type: (type != null ? type.value : this.type));
+  }
+}
+
 String? animalsNullableToJson(enums.Animals? animals) {
   return animals?.value;
 }
