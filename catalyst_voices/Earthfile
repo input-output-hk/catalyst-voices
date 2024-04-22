@@ -92,6 +92,7 @@ test-unit:
     FROM +deps
     COPY ../+repo-catalyst-voices-all/repo repo/
     WORKDIR repo
+    RUN melos bootstrap
     RUN melos run test-report
     WAIT
         SAVE ARTIFACT test_reports AS LOCAL test_reports
