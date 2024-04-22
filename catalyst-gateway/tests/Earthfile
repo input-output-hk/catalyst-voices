@@ -64,7 +64,6 @@ fuzzer-api:
 
 # test-lint-openapi - OpenAPI linting from an artifact
 # testing whether the OpenAPI generated during build stage follows good practice.
-# TODO: https://github.com/input-output-hk/catalyst-voices/issues/408
 # enable this linting after this issue will be solved
 lint-openapi:
     FROM github.com/input-output-hk/catalyst-ci/earthly/spectral:v2.4.0+spectral-base

@@ -22,11 +22,20 @@ struct Delegation {
 
 /// Voting key type
 #[derive(Union)]
+#[oai(discriminator_name = "type", one_of = true)]
 enum VotingInfo {
     /// direct voting key
     Direct(String),
     /// delegations
-    Delegated(Vec<Delegation>),
+    Delegated(Delegations),
+}
+
+/// Represents a list of delegations
+#[derive(Object)]
+struct Delegations {
+    /// A list of delegations.
+    #[oai(validator(max_items = "100"))]
+    delegations: Vec<Delegation>,
 }
 
 /// User's [CIP-36](https://cips.cardano.org/cip/CIP-36/) registration info.
@@ -60,17 +69,17 @@ impl RegistrationInfo {
                 VotingInfo::Direct(to_hex_with_prefix(voting_key.bytes()))
             },
             PublicVotingInfo::Delegated(delegations) => {
-                VotingInfo::Delegated(
-                    delegations
-                        .into_iter()
-                        .map(|(voting_key, power)| {
-                            Delegation {
-                                voting_key: to_hex_with_prefix(voting_key.bytes()),
-                                power,
-                            }
-                        })
-                        .collect(),
-                )
+                VotingInfo::Delegated(Delegations {
+                    delegations: delegations
+                    .into_iter()
+                    .map(|(voting_key, power)| {
+                        Delegation {
+                            voting_key: to_hex_with_prefix(voting_key.bytes()),
+                            power,
+                        }
+                    })
+                    .collect()
+                })
             },
         };
         Self {
@@ -94,11 +103,13 @@ impl Example for RegistrationInfo {
             .expect("Invalid hex")
             .into(),
             nonce: 11_623_850,
-            voting_info: VotingInfo::Delegated(vec![Delegation {
-                voting_key: "0xb16f03d67e95ddd321df4bee8658901eb183d4cb5623624ff5edd7fe54f8e857"
-                    .to_string(),
-                power: 1,
-            }]),
+            voting_info: VotingInfo::Delegated(Delegations {
+                delegations: vec![Delegation {
+                    voting_key: "0xb16f03d67e95ddd321df4bee8658901eb183d4cb5623624ff5edd7fe54f8e857"
+                        .to_string(),
+                    power: 1,
+                }]
+            }),
         }
     }
 }
