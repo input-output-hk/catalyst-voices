@@ -1,11 +1,12 @@
 //! Verify registration TXs
 
-use std::io::Cursor;
-
 use cardano_chain_follower::Network;
 use ciborium::Value;
 use cryptoxide::{blake2b::Blake2b, digest::Digest};
-use pallas::ledger::{primitives::Fragment, traverse::MultiEraMeta};
+use pallas::ledger::{
+    primitives::{conway::Metadatum, Fragment},
+    traverse::MultiEraMeta,
+};
 use serde::{Deserialize, Serialize};
 
 /// Networks
@@ -19,11 +20,6 @@ const PAYMENT_ADDRESS: usize = 2;
 const NONCE: usize = 3;
 /// Cip36
 const VOTE_PURPOSE: usize = 4;
-
-/// <https://cips.cardano.org/cips/cip36>
-const CIP36_CBOR_REGISTRATION_KEY: u64 = 61284;
-/// <https://cips.cardano.org/cips/cip36>
-const CIP36_CBOR_WITNESS_KEY: u64 = 61285;
 
 /// Pub key
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
@@ -43,16 +39,6 @@ pub(crate) struct RewardsAddress(pub Vec<u8>);
 
 /// Error report for serializing
 pub(crate) type ErrorReport = Vec<String>;
-
-/// Size of a single component of an Ed25519 signature.
-const COMPONENT_SIZE: usize = 32;
-
-/// Size of an `R` or `s` component of an Ed25519 signature when serialized
-/// as bytes.
-type ComponentBytes = [u8; COMPONENT_SIZE];
-
-/// Ed25519 signature serialized as a byte array.
-type SignatureBytes = [u8; Signature::BYTE_SIZE];
 
 impl PubKey {
     /// Get credentials, a blake2b 28 bytes hash of the pub key
@@ -82,21 +68,23 @@ impl PubKey {
 #[repr(C)]
 pub struct Signature {
     /// Component of an Ed25519 signature when serialized as bytes
-    r: ComponentBytes,
+    r: [u8; Self::COMPONENT_SIZE],
     /// Component of an Ed25519 signature when serialized as bytes
-    s: ComponentBytes,
+    s: [u8; Self::COMPONENT_SIZE],
 }
 
 impl Signature {
     /// Size of an encoded Ed25519 signature in bytes.
-    pub const BYTE_SIZE: usize = COMPONENT_SIZE * 2;
+    const BYTE_SIZE: usize = Self::COMPONENT_SIZE * 2;
+    /// Size of a single component of an Ed25519 signature.
+    const COMPONENT_SIZE: usize = 32;
 
     /// Parse an Ed25519 signature from a byte slice.
-    pub fn from_bytes(bytes: &SignatureBytes) -> Self {
-        let mut r = ComponentBytes::default();
-        let mut s = ComponentBytes::default();
+    fn from_bytes(bytes: &[u8; Self::BYTE_SIZE]) -> Self {
+        let mut r = <[u8; Self::COMPONENT_SIZE]>::default();
+        let mut s = <[u8; Self::COMPONENT_SIZE]>::default();
 
-        let components = bytes.split_at(COMPONENT_SIZE);
+        let components = bytes.split_at(Self::COMPONENT_SIZE);
         r.copy_from_slice(components.0);
         s.copy_from_slice(components.1);
 
@@ -138,8 +126,8 @@ pub(crate) struct Cip36Registration {
     pub nonce: Option<Nonce>,
     /// Optional voting purpose
     pub voting_purpose: Option<VotingPurpose>,
-    /// Raw registration
-    pub raw_registration: Option<Vec<u8>>,
+    /// Raw tx metadata
+    pub raw_metadata: Option<Vec<u8>>,
     /// Witness signature 61285
     pub signature: Option<Signature>,
     /// Errors report
@@ -152,9 +140,9 @@ impl Cip36Registration {
     #[allow(clippy::too_many_lines)]
     pub(crate) fn generate_from_tx_metadata(
         tx_metadata: &MultiEraMeta, network: Network,
-    ) -> anyhow::Result<Option<Self>> {
+    ) -> Option<Self> {
         if tx_metadata.is_empty() {
-            return Ok(None);
+            return None;
         }
 
         let mut voting_key: Option<VotingInfo> = None;
@@ -162,37 +150,36 @@ impl Cip36Registration {
         let mut voting_purpose: Option<VotingPurpose> = None;
         let mut rewards_address: Option<RewardsAddress> = None;
         let mut nonce: Option<Nonce> = None;
-        // let mut raw_registration: Option<Vec<u8>> = None;
+        let mut raw_metadata: Option<Vec<u8>> = None;
         let mut signature: Option<Signature> = None;
         let mut errors_report = Vec::new();
 
         if let pallas::ledger::traverse::MultiEraMeta::AlonzoCompatible(tx_metadata) = tx_metadata {
+            /// <https://cips.cardano.org/cips/cip36>
+            const CIP36_WITNESS_CBOR_KEY: u64 = 61285;
+            /// <https://cips.cardano.org/cips/cip36>
+            const CIP36_REGISTRATION_CBOR_KEY: u64 = 61284;
+
+            raw_metadata = tx_metadata.encode_fragment().map_or_else(
+                |err| {
+                    errors_report.push(format!("cannot encode tx metadata into bytes {err}"));
+                    None
+                },
+                Some,
+            );
+
             for (key, metadata) in tx_metadata.iter() {
                 match *key {
-                    CIP36_CBOR_REGISTRATION_KEY => {
-                        let metadata_bytes = match metadata.encode_fragment() {
+                    CIP36_REGISTRATION_CBOR_KEY => {
+                        let cbor_value = match convert_pallas_metadatum_to_cbor_value(metadata) {
                             Ok(raw_cbor) => raw_cbor,
                             Err(err) => {
-                                errors_report
-                                    .push(format!("cannot encode tx metadata into bytes {err}"));
+                                errors_report.push(err.to_string());
                                 continue;
                             },
                         };
 
-                        if let Err(err) = validate_cip36_registration(metadata_bytes.as_slice()) {
-                            errors_report
-                                .push(format!("Not a valid cbor cip36 registration, err: {err}"));
-                            continue;
-                        }
-
-                        let Ok(cbor_object) = ciborium::de::from_reader::<ciborium::Value, _>(
-                            metadata_bytes.as_slice(),
-                        ) else {
-                            errors_report.push("Cannot decode cbor object from bytes".to_string());
-                            continue;
-                        };
-
-                        let Some(cbor_map) = cbor_object.as_map() else {
+                        let Some(cbor_map) = cbor_value.as_map() else {
                             errors_report.push(
                                 "Not a valid cbor cip36 registration, should be a cbor map"
                                     .to_string(),
@@ -257,40 +244,53 @@ impl Cip36Registration {
                         };
                     },
 
-                    CIP36_CBOR_WITNESS_KEY => {
-                        let raw_cbor = metadata
-                            .encode_fragment()
-                            .map_err(|e| anyhow::anyhow!("{e}"))?;
-
-                        match raw_sig_conversion(&raw_cbor) {
-                            Ok(sig) => {
-                                signature = Some(sig);
-                            },
+                    CIP36_WITNESS_CBOR_KEY => {
+                        let cbor_value = match convert_pallas_metadatum_to_cbor_value(metadata) {
+                            Ok(raw_cbor) => raw_cbor,
                             Err(err) => {
-                                errors_report.push(format!("Invalid signature. err: {err}",));
-                                signature = None;
+                                errors_report.push(err.to_string());
+                                continue;
                             },
                         };
+
+                        signature = inspect_signature(cbor_value).map_or_else(
+                            |err| {
+                                errors_report.push(format!("Invalid signature, err: {err}",));
+                                None
+                            },
+                            Some,
+                        );
                     },
                     _ => continue,
                 };
             }
         };
 
-        Ok(Some(Self {
+        Some(Self {
             voting_key,
             stake_key,
             rewards_address,
             nonce,
             voting_purpose,
-            raw_registration: None,
+            raw_metadata,
             signature,
             errors_report,
-        }))
+        })
     }
 }
 
+/// Convert Pallas Metadatum to Cbor Value
+fn convert_pallas_metadatum_to_cbor_value(metadata: &Metadatum) -> anyhow::Result<ciborium::Value> {
+    let metadata_bytes = metadata
+        .encode_fragment()
+        .map_err(|err| anyhow::anyhow!("cannot encode tx metadata into bytes {err}"))?;
+
+    ciborium::de::from_reader(metadata_bytes.as_slice())
+        .map_err(|err| anyhow::anyhow!("Cannot decode cbor object from bytes, err: {err}"))
+}
+
 /// Validate binary data against CIP-36 registration CDDL spec
+#[allow(dead_code)]
 fn validate_cip36_registration(data: &[u8]) -> anyhow::Result<()> {
     /// Cip36 registration CDDL definition
     const CIP36_REGISTRATION_CDDL: &str = include_str!("cip36_registration.cddl");
@@ -340,30 +340,29 @@ fn is_valid_rewards_address(rewards_address_prefix: u8, network: Network) -> boo
     valid_addrs.contains(&addr_type)
 }
 
-/// Convert raw 61285 cbor to witness signature
-fn raw_sig_conversion(raw_cbor: &[u8]) -> anyhow::Result<Signature> {
-    let decoded: ciborium::value::Value = ciborium::de::from_reader(Cursor::new(&raw_cbor))?;
+/// Extract signature
+fn inspect_signature(cbor_value: ciborium::value::Value) -> anyhow::Result<Signature> {
+    let cbor_map = cbor_value
+        .into_map()
+        .map_err(|_| anyhow::anyhow!("Invalid cip36 witnesss cbor, should be a map"))?;
 
-    let signature_61285 = match decoded {
-        Value::Map(m) => m.iter().map(|entry| entry.1.clone()).collect::<Vec<_>>(),
-        _ => return Err(anyhow::anyhow!("Invalid signature {decoded:?}")),
-    };
+    let (_, cbor_signature) = cbor_map.into_iter().next().ok_or(anyhow::anyhow!(
+        "Invalid cip36 witnesss cbor, should have at least one entry"
+    ))?;
 
-    let sig = signature_61285
-        .first()
-        .ok_or(anyhow::anyhow!("no 61285 key"))?
-        .clone();
-    let sig_bytes: [u8; 64] = match sig.into_bytes() {
-        Ok(s) => {
-            match s.try_into() {
-                Ok(sig) => sig,
-                Err(err) => return Err(anyhow::anyhow!("Invalid signature length {err:?}")),
-            }
-        },
-        Err(err) => return Err(anyhow::anyhow!("Invalid signature parsing {err:?}")),
-    };
+    let signature = cbor_signature
+        .into_bytes()
+        .map_err(|_| anyhow::anyhow!("Invalid cip36 witnesss cbor, signature should be bytes"))?
+        .try_into()
+        .map_err(|vec: Vec<_>| {
+            anyhow::anyhow!(
+                "Invalid signature length, expected: {}, got {}",
+                Signature::BYTE_SIZE,
+                vec.len()
+            )
+        })?;
 
-    Ok(Signature::from_bytes(&sig_bytes))
+    Ok(Signature::from_bytes(&signature))
 }
 
 /// Extract voting info

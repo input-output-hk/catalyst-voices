@@ -96,16 +96,11 @@ impl EventDB {
     pub(crate) async fn index_registration_data(
         &self, tx: &MultiEraTx<'_>, network: Network,
     ) -> anyhow::Result<()> {
-        let registration =
-            match Cip36Registration::generate_from_tx_metadata(&tx.metadata(), network) {
-                Ok(Some(registration)) => registration,
-                Ok(None) => return Ok(()),
-                Err(_err) => {
-                    // fatal error parsing registration tx, unable to extract meaningful
-                    // errors assume corrupted tx
-                    return Ok(());
-                },
-            };
+        let Some(registration) =
+            Cip36Registration::generate_from_tx_metadata(&tx.metadata(), network)
+        else {
+            return Ok(());
+        };
 
         self.insert_voter_registration(
             tx.hash().to_vec(),
@@ -114,7 +109,7 @@ impl EventDB {
                 .map(|val| val.get_credentials().to_vec()),
             registration.voting_key,
             registration.rewards_address.map(|val| val.0),
-            registration.raw_registration,
+            registration.raw_metadata,
             registration.nonce.map(|nonce| nonce.0),
             registration.errors_report,
         )
