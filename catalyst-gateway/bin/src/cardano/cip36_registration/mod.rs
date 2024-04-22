@@ -167,7 +167,6 @@ impl Cip36Registration {
                 },
                 Some,
             );
-
             for (key, metadata) in tx_metadata.iter() {
                 match *key {
                     CIP36_REGISTRATION_CBOR_KEY => {
@@ -221,7 +220,6 @@ impl Cip36Registration {
                             |val| Some(RewardsAddress(val.clone())),
                         );
 
-                        // A nonce that identifies that most recent delegation
                         nonce = inspect_nonce(cbor_map).map_or_else(
                             |err| {
                                 errors_report.push(format!("Invalid nonce, err: {err}",));
@@ -230,20 +228,14 @@ impl Cip36Registration {
                             Some,
                         );
 
-                        // A non-negative integer that indicates the purpose of the vote.
-                        // This is an optional field to allow for compatibility with CIP-15
-                        // 4 entries inside metadata map with one optional entry for the voting
-                        // purpose
-                        match inspect_voting_purpose(cbor_map) {
-                            Ok(Some(value)) => voting_purpose = Some(value),
-                            Ok(None) => voting_purpose = None,
-                            Err(err) => {
-                                voting_purpose = None;
+                        voting_purpose = inspect_voting_purpose(cbor_map).map_or_else(
+                            |err| {
                                 errors_report.push(format!("Invalid voting purpose, err: {err}",));
+                                None
                             },
-                        };
+                            Some,
+                        );
                     },
-
                     CIP36_WITNESS_CBOR_KEY => {
                         let cbor_value = match convert_pallas_metadatum_to_cbor_value(metadata) {
                             Ok(raw_cbor) => raw_cbor,
@@ -344,15 +336,15 @@ fn is_valid_rewards_address(rewards_address_prefix: u8, network: Network) -> boo
 fn inspect_signature(cbor_value: ciborium::value::Value) -> anyhow::Result<Signature> {
     let cbor_map = cbor_value
         .into_map()
-        .map_err(|_| anyhow::anyhow!("Invalid cip36 witnesss cbor, should be a map"))?;
+        .map_err(|_| anyhow::anyhow!("Invalid cip36 witness cbor, should be a map"))?;
 
     let (_, cbor_signature) = cbor_map.into_iter().next().ok_or(anyhow::anyhow!(
-        "Invalid cip36 witnesss cbor, should have at least one entry"
+        "Invalid cip36 witness cbor, should have at least one entry"
     ))?;
 
     let signature = cbor_signature
         .into_bytes()
-        .map_err(|_| anyhow::anyhow!("Invalid cip36 witnesss cbor, signature should be bytes"))?
+        .map_err(|_| anyhow::anyhow!("Invalid cip36 witness cbor, signature should be bytes"))?
         .try_into()
         .map_err(|vec: Vec<_>| {
             anyhow::anyhow!(
@@ -366,7 +358,7 @@ fn inspect_signature(cbor_value: ciborium::value::Value) -> anyhow::Result<Signa
 }
 
 /// Extract voting info
-fn inspect_voting_info(metamap: &[(Value, Value)]) -> anyhow::Result<VotingInfo> {
+fn inspect_voting_info(cbor_map: &[(Value, Value)]) -> anyhow::Result<VotingInfo> {
     /// Voting info cbor key
     const VOTING_INFO_CBOR_KEY: usize = 0;
     /// Voting key cbor key
@@ -374,7 +366,7 @@ fn inspect_voting_info(metamap: &[(Value, Value)]) -> anyhow::Result<VotingInfo>
     /// Weight cbor key
     const WEIGHT_CBOR_KEY: usize = 0;
 
-    let voting_key = match &metamap.get(VOTING_INFO_CBOR_KEY).ok_or(anyhow::anyhow!(
+    let voting_key = match cbor_map.get(VOTING_INFO_CBOR_KEY).ok_or(anyhow::anyhow!(
         "Issue with registration voting info cbor parsing"
     ))? {
         (Value::Integer(_), Value::Bytes(direct)) => VotingInfo::Direct(PubKey(direct.clone())),
@@ -404,28 +396,28 @@ fn inspect_voting_info(metamap: &[(Value, Value)]) -> anyhow::Result<VotingInfo>
             VotingInfo::Delegated(delegations)
         },
 
-        _ => return Err(anyhow::anyhow!("Invalid signature")),
+        _ => return Err(anyhow::anyhow!("Missing voting info")),
     };
     Ok(voting_key)
 }
 
 /// Extract stake key
-fn inspect_stake_key(metamap: &[(Value, Value)]) -> anyhow::Result<PubKey> {
-    let stake_key = match &metamap
+fn inspect_stake_key(cbor_map: &[(Value, Value)]) -> anyhow::Result<PubKey> {
+    let stake_key = match cbor_map
         .get(STAKE_ADDRESS)
         .ok_or(anyhow::anyhow!("Issue with stake key parsing"))?
     {
         (Value::Integer(_two), Value::Bytes(stake_addr)) => PubKey(stake_addr.clone()),
-        _ => return Err(anyhow::anyhow!("Invalid stake key")),
+        _ => return Err(anyhow::anyhow!("Missing stake key")),
     };
     Ok(stake_key)
 }
 
 /// Extract and validate rewards address
 fn inspect_rewards_addr(
-    metamap: &[(Value, Value)], network_id: Network,
+    cbor_map: &[(Value, Value)], network_id: Network,
 ) -> anyhow::Result<&Vec<u8>> {
-    let (Value::Integer(_three), Value::Bytes(rewards_address)) = &metamap
+    let (Value::Integer(_three), Value::Bytes(rewards_address)) = &cbor_map
         .get(PAYMENT_ADDRESS)
         .ok_or(anyhow::anyhow!("Issue with rewards address parsing"))?
     else {
@@ -444,32 +436,30 @@ fn inspect_rewards_addr(
 }
 
 /// Extract Nonce
-fn inspect_nonce(metamap: &[(Value, Value)]) -> anyhow::Result<Nonce> {
-    let nonce: i128 = match metamap
+fn inspect_nonce(cbor_map: &[(Value, Value)]) -> anyhow::Result<Nonce> {
+    match cbor_map
         .get(NONCE)
         .ok_or(anyhow::anyhow!("Issue with nonce parsing"))?
     {
-        (Value::Integer(_four), Value::Integer(nonce)) => i128::from(*nonce),
-        _ => return Err(anyhow::anyhow!("Invalid nonce")),
-    };
-
-    Ok(Nonce(nonce.try_into()?))
+        (Value::Integer(_four), Value::Integer(nonce)) => Ok(Nonce(i128::from(*nonce).try_into()?)),
+        _ => Err(anyhow::anyhow!("Missing nonce")),
+    }
 }
 
 /// Extract optional voting purpose
-fn inspect_voting_purpose(metamap: &[(Value, Value)]) -> anyhow::Result<Option<VotingPurpose>> {
-    if metamap.len() == 5 {
-        match metamap
-            .get(VOTE_PURPOSE)
-            .ok_or(anyhow::anyhow!("Issue with voting purpose parsing"))?
-        {
-            (Value::Integer(_five), Value::Integer(purpose)) => {
-                Ok(Some(VotingPurpose(i128::from(*purpose).try_into()?)))
-            },
-            _ => Ok(None),
-        }
-    } else {
-        Ok(None)
+fn inspect_voting_purpose(metamap: &[(Value, Value)]) -> anyhow::Result<VotingPurpose> {
+    // A non-negative integer that indicates the purpose of the vote.
+    // This is an optional field to allow for compatibility with CIP-15
+    // 4 entries inside metadata map with one optional entry for the voting
+    // purpose
+    match metamap
+        .get(VOTE_PURPOSE)
+        .ok_or(anyhow::anyhow!("Issue with voting purpose parsing"))?
+    {
+        (Value::Integer(_five), Value::Integer(purpose)) => {
+            Ok(VotingPurpose(i128::from(*purpose).try_into()?))
+        },
+        _ => Err(anyhow::anyhow!("Missing voting purpose")),
     }
 }
 
