@@ -51,6 +51,8 @@ overrides:
       # warn: Should be implemented, but is blocked by a technical issue.
       # info: Good to be implemented.
 
+      # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L767
+      owasp:api7:2019-security-hosts-https-oas3: info
       # Rate limit
       # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L436
       owasp:api4:2019-rate-limit: warn
