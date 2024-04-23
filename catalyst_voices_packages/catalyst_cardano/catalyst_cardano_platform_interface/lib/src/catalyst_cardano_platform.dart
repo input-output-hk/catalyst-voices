@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
@@ -41,7 +42,17 @@ abstract class CatalystCardanoPlatform extends PlatformInterface {
 
   /// Temporary method which will be replaced by actual implementation of
   /// cardano multiplatform lib.
-  Future<void> printHello() {
-    throw UnimplementedError('printHello() has not been implemented.');
+  Future<void> encodeArbitraryBytesAsMetadatum(Uint8List bytes) {
+    throw UnimplementedError(
+      'encodeArbitraryBytesAsMetadatum() has not been implemented.',
+    );
+  }
+
+  /// Initializer method to boostrap internals of Cardano Multiplatform Lib.
+  ///
+  /// Must be called and awaited exactly once before any
+  /// additional interaction with the lib.
+  Future<void> init() {
+    throw UnimplementedError('initialize() has not been implemented.');
   }
 }

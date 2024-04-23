@@ -14,8 +14,11 @@ flutter:
     implements: catalyst_cardano
     platforms:
       web:
-        pluginClass: CatalystCardanoPlugin
+        pluginClass: CatalystCardanoWeb
         fileName: catalyst_cardano_web.dart
+
+  assets:
+    - assets/js/
 
 dependencies:
   catalyst_cardano_platform_interface: ^1.0.0

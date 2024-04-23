@@ -1,5 +1,8 @@
 // ignore_for_file: discarded_futures
 
+import 'dart:typed_data';
+
+import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices/app/view/app_content.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -36,7 +39,19 @@ final class _AppState extends State<App> {
   }
 
   Future<void> _init() async {
-    await Dependencies.instance.init();
+    try {
+      await Dependencies.instance.init();
+      await CatalystCardano.instance.init();
+      await CatalystCardano.instance
+          .encodeArbitraryBytesAsMetadatum(Uint8List(3));
+    } catch (error, stackTrace) {
+      // TODO(dtscalac): FutureBuilder that uses this future silences all
+      // errors, replace it here with proper logging solution. This logging here
+      // is needed to spot early-on any issues with catalyst_cardano plugin.
+      FlutterError.dumpErrorToConsole(
+        FlutterErrorDetails(exception: error, stack: stackTrace),
+      );
+    }
   }
 
   List<BlocProvider> _multiBlocProviders() {
