@@ -256,6 +256,50 @@ extension $DelegationsExtension on Delegations {
 }
 
 @JsonSerializable(explicitToJson: true)
+class DirectVoter {
+  const DirectVoter({
+    required this.votingKey,
+  });
+
+  factory DirectVoter.fromJson(Map<String, dynamic> json) =>
+      _$DirectVoterFromJson(json);
+
+  static const toJsonFactory = _$DirectVoterToJson;
+  Map<String, dynamic> toJson() => _$DirectVoterToJson(this);
+
+  @JsonKey(name: 'voting_key')
+  final String votingKey;
+  static const fromJsonFactory = _$DirectVoterFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is DirectVoter &&
+            (identical(other.votingKey, votingKey) ||
+                const DeepCollectionEquality()
+                    .equals(other.votingKey, votingKey)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(votingKey) ^ runtimeType.hashCode;
+}
+
+extension $DirectVoterExtension on DirectVoter {
+  DirectVoter copyWith({String? votingKey}) {
+    return DirectVoter(votingKey: votingKey ?? this.votingKey);
+  }
+
+  DirectVoter copyWithWrapped({Wrapped<String>? votingKey}) {
+    return DirectVoter(
+        votingKey: (votingKey != null ? votingKey.value : this.votingKey));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
 class FragmentStatus {
   const FragmentStatus();
 
@@ -1328,27 +1372,33 @@ extension $VotingInfoDelegationsExtension on VotingInfoDelegations {
 }
 
 @JsonSerializable(explicitToJson: true)
-class VotingInfoString {
-  const VotingInfoString({
+class VotingInfoDirectVoter {
+  const VotingInfoDirectVoter({
     required this.type,
+    required this.votingKey,
   });
 
-  factory VotingInfoString.fromJson(Map<String, dynamic> json) =>
-      _$VotingInfoStringFromJson(json);
+  factory VotingInfoDirectVoter.fromJson(Map<String, dynamic> json) =>
+      _$VotingInfoDirectVoterFromJson(json);
 
-  static const toJsonFactory = _$VotingInfoStringToJson;
-  Map<String, dynamic> toJson() => _$VotingInfoStringToJson(this);
+  static const toJsonFactory = _$VotingInfoDirectVoterToJson;
+  Map<String, dynamic> toJson() => _$VotingInfoDirectVoterToJson(this);
 
   @JsonKey(name: 'type')
   final String type;
-  static const fromJsonFactory = _$VotingInfoStringFromJson;
+  @JsonKey(name: 'voting_key')
+  final String votingKey;
+  static const fromJsonFactory = _$VotingInfoDirectVoterFromJson;
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other is VotingInfoString &&
+        (other is VotingInfoDirectVoter &&
             (identical(other.type, type) ||
-                const DeepCollectionEquality().equals(other.type, type)));
+                const DeepCollectionEquality().equals(other.type, type)) &&
+            (identical(other.votingKey, votingKey) ||
+                const DeepCollectionEquality()
+                    .equals(other.votingKey, votingKey)));
   }
 
   @override
@@ -1356,16 +1406,22 @@ class VotingInfoString {
 
   @override
   int get hashCode =>
-      const DeepCollectionEquality().hash(type) ^ runtimeType.hashCode;
+      const DeepCollectionEquality().hash(type) ^
+      const DeepCollectionEquality().hash(votingKey) ^
+      runtimeType.hashCode;
 }
 
-extension $VotingInfoStringExtension on VotingInfoString {
-  VotingInfoString copyWith({String? type}) {
-    return VotingInfoString(type: type ?? this.type);
+extension $VotingInfoDirectVoterExtension on VotingInfoDirectVoter {
+  VotingInfoDirectVoter copyWith({String? type, String? votingKey}) {
+    return VotingInfoDirectVoter(
+        type: type ?? this.type, votingKey: votingKey ?? this.votingKey);
   }
 
-  VotingInfoString copyWithWrapped({Wrapped<String>? type}) {
-    return VotingInfoString(type: (type != null ? type.value : this.type));
+  VotingInfoDirectVoter copyWithWrapped(
+      {Wrapped<String>? type, Wrapped<String>? votingKey}) {
+    return VotingInfoDirectVoter(
+        type: (type != null ? type.value : this.type),
+        votingKey: (votingKey != null ? votingKey.value : this.votingKey));
   }
 }
 

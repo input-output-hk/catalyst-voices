@@ -28,7 +28,7 @@ struct Delegations {
     delegations: Vec<Delegation>,
 }
 
-/// Direct voting key
+/// Direct voter type
 #[derive(Object)]
 struct DirectVoter {
     /// Voting key.
