@@ -175,7 +175,7 @@
         "web-components.min.js",
         "**/generated/**",
         "utilities/catalyst_voices_remote_widgets/example/**/**",
-        "catalyst_voices_packages/cardano_catalyst/cardano_catalyst_web/assets/js/**",
+        "catalyst_voices_packages/catalyst_cardano/catalyst_cardano_web/assets/js/**",
         "**/*.svg"
     ]
 }

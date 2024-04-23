@@ -48,7 +48,7 @@ abstract class CatalystCardanoPlatform extends PlatformInterface {
     );
   }
 
-  /// Initializer method to boostrap internals of Cardano Multiplatform Lib.
+  /// Initializer method to bootstrap internals of Cardano Multiplatform Lib.
   ///
   /// Must be called and awaited exactly once before any
   /// additional interaction with the lib.
