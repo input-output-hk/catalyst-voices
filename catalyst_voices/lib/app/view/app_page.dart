@@ -42,8 +42,6 @@ final class _AppState extends State<App> {
     try {
       await Dependencies.instance.init();
       await CatalystCardano.instance.init();
-      await CatalystCardano.instance
-          .encodeArbitraryBytesAsMetadatum(Uint8List(3));
     } catch (error, stackTrace) {
       // TODO(dtscalac): FutureBuilder that uses this future silences all
       // errors, replace it here with proper logging solution. This logging here
