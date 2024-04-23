@@ -2,6 +2,8 @@
 
 use cardano_chain_follower::Network;
 use handlebars::Handlebars;
+use pallas::ledger::traverse::{wellknown::GenesisValues, MultiEraBlock};
+use tracing::error;
 
 use crate::event_db::{error::NotFoundError, EventDB};
 
@@ -25,8 +27,6 @@ const BLOCK_TIME_COLUMN: &str = "block_time";
 /// `ended` column name
 const ENDED_COLUMN: &str = "ended";
 
-/// `insert_slot_index.sql`
-const INSERT_SLOT_INDEX_SQL: &str = include_str!("insert_slot_index.sql");
 /// `insert_update_state.sql`
 const INSERT_UPDATE_STATE_SQL: &str = include_str!("insert_update_state.sql");
 /// `select_update_state.sql`
@@ -85,23 +85,107 @@ impl SlotInfoQueryType {
     }
 }
 
+/// Params required for indexing follower data.
+pub(crate) struct IndexedFollowerDataParams<'a> {
+    /// Block's slot number.
+    pub slot_no: SlotNumber,
+    /// Block's epoch number.
+    pub epoch_no: EpochNumber,
+    /// Block's network.
+    pub network: &'a str,
+    /// Block's time.
+    pub block_time: DateTime,
+    /// Block's hash.
+    pub block_hash: Vec<u8>,
+}
+
+impl<'a> IndexedFollowerDataParams<'a> {
+    /// Creates a [`IndexedFollowerDataParams`] from block data.
+    pub(crate) fn from_block_data(
+        genesis_values: &GenesisValues, network: &'a str, block: &MultiEraBlock<'a>,
+    ) -> Option<Self> {
+        let epoch = match block.epoch(genesis_values).0.try_into() {
+            Ok(epoch) => epoch,
+            Err(err) => {
+                error!("Cannot parse epoch from {network:?} block {err} - skip..");
+                return None;
+            },
+        };
+
+        let wallclock = match block.wallclock(genesis_values).try_into() {
+            Ok(time) => chrono::DateTime::from_timestamp(time, 0).unwrap_or_default(),
+            Err(err) => {
+                error!("Cannot parse wall time from {network:?} block {err} - skip..");
+                return None;
+            },
+        };
+
+        let slot = match block.slot().try_into() {
+            Ok(slot) => slot,
+            Err(err) => {
+                error!("Cannot parse slot from {network:?} block {err} - skip..");
+                return None;
+            },
+        };
+
+        Some(IndexedFollowerDataParams {
+            slot_no: slot,
+            network,
+            epoch_no: epoch,
+            block_time: wallclock,
+            block_hash: block.hash().to_vec(),
+        })
+    }
+}
+
 impl EventDB {
-    /// Index follower block stream
-    pub(crate) async fn index_follower_data(
-        &self, slot_no: SlotNumber, network: Network, epoch_no: EpochNumber, block_time: DateTime,
-        block_hash: BlockHash,
+    /// Batch writes follower data.
+    pub(crate) async fn index_many_follower_data(
+        &self, values: &[IndexedFollowerDataParams<'_>],
     ) -> anyhow::Result<()> {
+        if values.is_empty() {
+            return Ok(());
+        }
+
         let conn = self.pool.get().await?;
 
-        let _rows = conn
-            .query(INSERT_SLOT_INDEX_SQL, &[
-                &slot_no,
-                &network.to_string(),
-                &epoch_no,
-                &block_time,
-                &block_hash,
-            ])
-            .await?;
+        let chunk_size = (i16::MAX / 5) as usize;
+        for chunk in values.chunks(chunk_size) {
+            // Build query VALUES statements
+            let mut values_strings = Vec::with_capacity(chunk.len());
+            let mut i = 1;
+
+            for _ in chunk {
+                values_strings.push(format!(
+                    "(${},${},${},${},${})",
+                    i,
+                    i + 1,
+                    i + 2,
+                    i + 3,
+                    i + 4,
+                ));
+
+                i += 5;
+            }
+
+            let query = format!("INSERT INTO cardano_slot_index (slot_no, network, epoch_no, block_time, block_hash) VALUES {} ON CONFLICT DO NOTHING", values_strings.join(","));
+
+            #[allow(trivial_casts)]
+            let params: Vec<_> = chunk
+                .iter()
+                .flat_map(|vs| {
+                    [
+                        &vs.slot_no as &(dyn tokio_postgres::types::ToSql + Sync),
+                        &vs.network,
+                        &vs.epoch_no,
+                        &vs.block_time,
+                        &vs.block_hash,
+                    ]
+                })
+                .collect();
+
+            conn.execute(&query, &params).await?;
+        }
 
         Ok(())
     }

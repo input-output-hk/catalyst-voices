@@ -1,5 +1,5 @@
 //! Logic for orchestrating followers
-use std::{path::PathBuf, sync::Arc};
+use std::{path::PathBuf, sync::Arc, time::Duration};
 
 /// Handler for follower tasks, allows for control over spawned follower threads
 pub type ManageTasks = JoinHandle<()>;
@@ -9,15 +9,17 @@ use cardano_chain_follower::{
 };
 use pallas::ledger::traverse::{wellknown::GenesisValues, MultiEraBlock};
 use tokio::{task::JoinHandle, time};
-use tracing::{debug, error, info};
+use tracing::{error, info};
 
-use crate::{
-    cardano::util::valid_era,
-    event_db::{
-        cardano::{chain_state::MachineId, config::FollowerConfig},
-        error::NotFoundError,
-        EventDB,
+use crate::event_db::{
+    cardano::{
+        chain_state::{IndexedFollowerDataParams, MachineId},
+        cip36_registration::IndexedVoterRegistrationParams,
+        config::FollowerConfig,
+        utxo::{IndexedTxnInputParams, IndexedTxnOutputParams, IndexedTxnParams},
     },
+    error::NotFoundError,
+    EventDB,
 };
 
 pub(crate) mod cip36_registration;
@@ -130,159 +132,130 @@ async fn process_blocks(
     follower: &mut Follower, db: Arc<EventDB>, network: Network, machine_id: MachineId,
     genesis_values: &GenesisValues,
 ) {
+    info!("Follower started processing blocks");
+
+    let mut blocks_buffer = Vec::new();
+
+    let mut ticker = tokio::time::interval(Duration::from_secs(1));
+    ticker.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Delay);
+
     loop {
-        let chain_update = match follower.next().await {
-            Ok(chain_update) => chain_update,
-            Err(err) => {
-                error!(
-                    "Unable to receive next update from the {network:?} follower err: {err} - skip..",
-                );
-                continue;
-            },
-        };
+        tokio::select! {
+            result = follower.next() => match result {
+                Ok(chain_update) => match chain_update {
+                    ChainUpdate::Block(data) => {
+                        blocks_buffer.push(data);
 
-        match chain_update {
-            ChainUpdate::Block(data) => {
-                let block = match data.decode() {
-                    Ok(block) => block,
-                    Err(err) => {
-                        error!("Unable to decode {network:?} block {err} - skip..",);
-                        continue;
-                    },
-                };
-                let start_index_block = time::Instant::now();
-                index_block(db.clone(), genesis_values, network, &machine_id, &block).await;
-                debug!(
-                    "{network:?} block {} indexing time: {}ns. txs amount: {}",
-                    block.hash().to_string(),
-                    start_index_block.elapsed().as_nanos(),
-                    block.txs().len()
-                );
-            },
-            ChainUpdate::Rollback(data) => {
-                let block = match data.decode() {
-                    Ok(block) => block,
-                    Err(err) => {
-                        error!("Unable to decode {network:?} block {err} - skip..");
-                        continue;
-                    },
-                };
+                        // We have enough blocks to index
+                        if blocks_buffer.len() >= 1024 {
+                            let current_buffer = std::mem::take(&mut blocks_buffer);
+                            index_block_buffer(db.clone(), genesis_values, network, &machine_id, current_buffer).await;
 
-                info!(
-                    "Rollback block NUMBER={} SLOT={} HASH={}",
-                    block.number(),
-                    block.slot(),
-                    hex::encode(block.hash()),
-                );
+                            // Since we just wrote stuff to the database,
+                            // reset the ticker so the next write is at least 1 interval from now.
+                            ticker.reset();
+                        }
+                    },
+                    ChainUpdate::Rollback(data) => {
+                        let block = match data.decode() {
+                            Ok(block) => block,
+                            Err(err) => {
+                                error!("Unable to decode {network:?} block {err} - skip..");
+                                continue;
+                            },
+                        };
+
+                        info!(
+                            "Rollback block NUMBER={} SLOT={} HASH={}",
+                            block.number(),
+                            block.slot(),
+                            hex::encode(block.hash()),
+                        );
+                    },
+                },
+                Err(err) => {
+                    error!(
+                        "Unable to receive next update from the {network:?} follower err: {err} - skip..",
+                    );
+                    continue;
+                },
             },
+            _ = ticker.tick() => {
+                // This executes when we have not indexed blocks for more than the configured
+                // tick interval. This means that if any errors occur in that time we lose the buffered block data (e.g.
+                // cat-gateway is shutdown ungracefully). This is not a problem since cat-gateway
+                // checkpoints the latest database writes so it simply restarts from the last
+                // written block.
+                //
+                // This is most likely to happen when following from the tip or receiving blocks
+                // from the network (since updates will come at larger intervals).
+                if blocks_buffer.is_empty() {
+                    continue;
+                }
+
+                let current_buffer = std::mem::take(&mut blocks_buffer);
+                index_block_buffer(db.clone(), genesis_values, network, &machine_id, current_buffer).await;
+
+                // Reset the ticker so it counts the interval as starting after we wrote everything
+                // to the database.
+                ticker.reset();
+            }
         }
     }
 }
 
-/// Index block data, store it in our db
-async fn index_block(
+/// Consumes a block buffer and indexes its data.
+async fn index_block_buffer(
     db: Arc<EventDB>, genesis_values: &GenesisValues, network: Network, machine_id: &MachineId,
-    block: &MultiEraBlock<'_>,
+    buffer: Vec<cardano_chain_follower::MultiEraBlockData>,
 ) {
-    // Parse block
-    let epoch = match block.epoch(genesis_values).0.try_into() {
-        Ok(epoch) => epoch,
-        Err(err) => {
-            error!("Cannot parse epoch from {network:?} block {err} - skip..");
-            return;
-        },
-    };
+    info!("Starting data indexing");
 
-    let wallclock = match block.wallclock(genesis_values).try_into() {
-        Ok(time) => chrono::DateTime::from_timestamp(time, 0).unwrap_or_default(),
-        Err(err) => {
-            error!("Cannot parse wall time from {network:?} block {err} - skip..");
-            return;
-        },
-    };
+    let mut blocks = Vec::new();
 
-    let slot = match block.slot().try_into() {
-        Ok(slot) => slot,
-        Err(err) => {
-            error!("Cannot parse slot from {network:?} block {err} - skip..");
-            return;
-        },
-    };
-
-    let start_index_follower_data = time::Instant::now();
-    match db
-        .index_follower_data(slot, network, epoch, wallclock, block.hash().to_vec())
-        .await
-    {
-        Ok(()) => (),
-        Err(err) => {
-            error!("Unable to index {network:?} follower data {err} - skip..");
-            return;
-        },
-    }
-    debug!(
-        "{network:?} follower data indexing time: {}ns",
-        start_index_follower_data.elapsed().as_nanos()
-    );
-
-    for tx in block.txs() {
-        // index tx
-        let start_index_txn_data = time::Instant::now();
-        match db.index_txn_data(tx.hash().as_slice(), slot, network).await {
-            Ok(()) => (),
-            Err(err) => {
-                error!("Unable to index {network:?} txn data {err} - skip..");
-                continue;
+    for block_data in &buffer {
+        match block_data.decode() {
+            Ok(block) => blocks.push(block),
+            Err(e) => {
+                error!(error = ?e, "Failed to decode block");
             },
-        }
-        debug!(
-            "{network:?} tx {} data indexing time: {}ns",
-            tx.hash().to_string(),
-            start_index_txn_data.elapsed().as_nanos()
-        );
-
-        // index utxo
-        let start_index_utxo_data = time::Instant::now();
-        match db.index_utxo_data(&tx).await {
-            Ok(()) => (),
-            Err(err) => {
-                error!("Unable to index {network:?} utxo data for tx {err} - skip..");
-                continue;
-            },
-        }
-        debug!(
-            "{network:?} tx {} utxo data indexing time: {}ns",
-            tx.hash().to_string(),
-            start_index_utxo_data.elapsed().as_nanos()
-        );
-
-        // Block processing for Eras before staking are ignored.
-        if valid_era(block.era()) {
-            // index catalyst registrations
-            let start_index_registration_data = time::Instant::now();
-            match db.index_registration_data(&tx, network).await {
-                Ok(()) => (),
-                Err(err) => {
-                    error!("Unable to index {network:?} registration data for tx {err} - skip..",);
-                    continue;
-                },
-            }
-            debug!(
-                "{network:?} tx {} registration data indexing time: {}ns",
-                tx.hash().to_string(),
-                start_index_registration_data.elapsed().as_nanos()
-            );
-
-            // Rewards
         }
     }
 
-    // Refresh update metadata for future followers
+    index_many_blocks(db.clone(), genesis_values, network, machine_id, &blocks).await;
+}
+
+/// Index a slice of blocks.
+async fn index_many_blocks(
+    db: Arc<EventDB>, genesis_values: &GenesisValues, network: Network, machine_id: &MachineId,
+    blocks: &[MultiEraBlock<'_>],
+) {
+    let Some(last_block) = blocks.last() else {
+        return;
+    };
+
+    let network_str = network.to_string();
+
+    if !index_blocks(&db, genesis_values, &network_str, blocks).await {
+        return;
+    }
+
+    if !index_transactions(&db, blocks, &network_str).await {
+        return;
+    }
+
+    if !index_voter_registrations(&db, blocks, network).await {
+        return;
+    }
+
+    // SAFETY: This is safe to ignore because we would not reach this point if
+    // the try_into inside the block indexing loop had failed.
+    #[allow(clippy::cast_possible_wrap)]
     match db
         .refresh_last_updated(
             chrono::offset::Utc::now(),
-            slot,
-            block.hash().to_vec(),
+            last_block.slot() as i64,
+            last_block.hash().to_vec(),
             network,
             machine_id,
         )
@@ -293,6 +266,131 @@ async fn index_block(
             error!("Unable to mark {network:?} last update point {err} - skip..",);
         },
     };
+}
+
+///
+async fn index_blocks(
+    db: &EventDB, genesis_values: &GenesisValues, network_str: &str, blocks: &[MultiEraBlock<'_>],
+) -> bool {
+    let values: Vec<_> = blocks
+        .iter()
+        .filter_map(|block| {
+            IndexedFollowerDataParams::from_block_data(genesis_values, network_str, block)
+        })
+        .collect();
+
+    match db.index_many_follower_data(&values).await {
+        Ok(()) => {
+            info!(count = values.len(), "Finished indexing block data");
+            true
+        },
+        Err(e) => {
+            error!(error = ?e, "Failed to write DB entries");
+            false
+        },
+    }
+}
+
+/// Index transactions (and its inputs and outputs) from a slice of blocks.
+async fn index_transactions(db: &EventDB, blocks: &[MultiEraBlock<'_>], network_str: &str) -> bool {
+    let blocks_txs: Vec<_> = blocks
+        .iter()
+        .flat_map(|b| b.txs().into_iter().map(|tx| (b.slot(), tx)))
+        .collect();
+
+    // Index transaction data
+    {
+        let values: Vec<_> = blocks_txs
+            .iter()
+            .map(|(slot, tx)| {
+                // SAFETY: This is safe to ignore because we would not reach this point if
+                // the try_into inside the block indexing loop had failed.
+                #[allow(clippy::cast_possible_wrap)]
+                IndexedTxnParams {
+                    id: tx.hash().to_vec(),
+                    slot_no: *slot as i64,
+                    network: network_str,
+                }
+            })
+            .collect();
+
+        match db.index_many_txn_data(&values).await {
+            Ok(()) => info!(count = values.len(), "Finished indexing transactions"),
+            Err(e) => {
+                error!(error = ?e, "Failed to index transactions");
+                return false;
+            },
+        }
+    }
+
+    // Index transaction output data
+    {
+        let values: Vec<_> = blocks_txs
+            .iter()
+            .flat_map(|(_, tx)| IndexedTxnOutputParams::from_txn_data(tx))
+            .collect();
+
+        match db.index_many_txn_output_data(&values).await {
+            Ok(()) => {
+                info!(
+                    count = values.len(),
+                    "Finished indexing transaction outputs data"
+                );
+            },
+            Err(e) => {
+                error!(error = ?e, "Failed to index transaction outputs data");
+                return false;
+            },
+        }
+    }
+
+    // Index transaction input data
+    {
+        let values: Vec<_> = blocks_txs
+            .iter()
+            .flat_map(|(_, tx)| IndexedTxnInputParams::from_txn_data(tx))
+            .collect();
+
+        match db.index_many_txn_input_data(&values).await {
+            Ok(()) => {
+                info!(
+                    count = values.len(),
+                    "Finished indexing transaction inputs data"
+                );
+            },
+            Err(e) => {
+                error!(error = ?e, "Failed to index transaction inputs data");
+                return false;
+            },
+        }
+    }
+
+    true
+}
+
+/// Index voter registrations from a slice of blocks.
+async fn index_voter_registrations(
+    db: &EventDB, blocks: &[MultiEraBlock<'_>], network: Network,
+) -> bool {
+    let values: Vec<_> = blocks
+        .iter()
+        .filter_map(|block| IndexedVoterRegistrationParams::from_block_data(block, network))
+        .flatten()
+        .collect();
+
+    match db.index_many_voter_registration_data(&values).await {
+        Ok(()) => {
+            info!(
+                count = values.len(),
+                "Finished indexing voter registrations data"
+            );
+            true
+        },
+        Err(e) => {
+            error!(error = ?e, "Failed to index voter registrations data");
+            false
+        },
+    }
 }
 
 /// Instantiate the follower.
