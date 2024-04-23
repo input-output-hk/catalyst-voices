@@ -47,6 +47,8 @@ final class _AppState extends State<App> {
       FlutterError.dumpErrorToConsole(
         FlutterErrorDetails(exception: error, stack: stackTrace),
       );
+
+      rethrow;
     }
   }
 
