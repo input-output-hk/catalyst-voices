@@ -3,7 +3,7 @@
 use cardano_chain_follower::Network;
 use pallas::ledger::{addresses::Address, traverse::MultiEraTx};
 
-use super::{follower::SlotNumber, voter_registration::StakeCredential};
+use super::{chain_state::SlotNumber, cip36_registration::StakeCredential};
 use crate::{
     cardano::util::parse_policy_assets,
     event_db::{error::NotFoundError, EventDB},

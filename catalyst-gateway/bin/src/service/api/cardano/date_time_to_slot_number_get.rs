@@ -5,7 +5,7 @@ use poem_openapi::payload::Json;
 
 use crate::{
     event_db::{
-        cardano::follower::{BlockHash, DateTime, SlotInfoQueryType, SlotNumber},
+        cardano::chain_state::{BlockHash, DateTime, SlotInfoQueryType, SlotNumber},
         error::NotFoundError,
     },
     service::common::{

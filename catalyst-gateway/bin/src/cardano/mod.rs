@@ -14,13 +14,13 @@ use tracing::{debug, error, info};
 use crate::{
     cardano::util::valid_era,
     event_db::{
-        cardano::{config::FollowerConfig, follower::MachineId},
+        cardano::{chain_state::MachineId, config::FollowerConfig},
         error::NotFoundError,
         EventDB,
     },
 };
 
-pub(crate) mod registration;
+pub(crate) mod cip36_registration;
 pub(crate) mod util;
 
 /// Returns a follower configs, waits until they present inside the db
