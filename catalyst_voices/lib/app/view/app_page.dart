@@ -1,7 +1,5 @@
 // ignore_for_file: discarded_futures
 
-import 'dart:typed_data';
-
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices/app/view/app_content.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
