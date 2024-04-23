@@ -43,13 +43,13 @@ impl EventDB {
     #[allow(clippy::too_many_arguments)]
     async fn insert_voter_registration(
         &self, tx_id: TxId, stake_credential: Option<StakeCredential>,
-        public_voting_key: Option<PublicVotingInfo>, payment_address: Option<PaymentAddress>,
+        voting_info: Option<PublicVotingInfo>, payment_address: Option<PaymentAddress>,
         metadata_cip36: Option<MetadataCip36>, nonce: Option<Nonce>, errors_report: ErrorReport,
     ) -> anyhow::Result<()> {
         let conn = self.pool.get().await?;
 
         // for the catalyst we dont support multiple delegations
-        let multiple_delegations = public_voting_key.as_ref().is_some_and(|voting_info| {
+        let multiple_delegations = voting_info.as_ref().is_some_and(|voting_info| {
             if let PublicVotingInfo::Delegated(delegations) = voting_info {
                 delegations.len() > 1
             } else {
@@ -57,9 +57,9 @@ impl EventDB {
             }
         });
 
-        let encoded_voting_key = if let Some(voting_key) = public_voting_key {
+        let encoded_voting_info = if let Some(voting_info) = voting_info {
             Some(
-                serde_json::to_string(&voting_key)
+                serde_json::to_string(&voting_info)
                     .map_err(|_| anyhow::anyhow!("Cannot encode voting key".to_string()))?
                     .as_bytes()
                     .to_vec(),
@@ -70,7 +70,7 @@ impl EventDB {
 
         let is_valid = !multiple_delegations
             && stake_credential.is_some()
-            && encoded_voting_key.is_some()
+            && encoded_voting_info.is_some()
             && payment_address.is_some()
             && metadata_cip36.is_some()
             && nonce.is_some()
@@ -80,7 +80,7 @@ impl EventDB {
             .query(INSERT_VOTER_REGISTRATION_SQL, &[
                 &tx_id,
                 &stake_credential,
-                &encoded_voting_key,
+                &encoded_voting_info,
                 &payment_address,
                 &nonce,
                 &metadata_cip36,
@@ -107,7 +107,7 @@ impl EventDB {
             registration
                 .stake_key
                 .map(|val| val.get_credentials().to_vec()),
-            registration.voting_key,
+            registration.voting_info,
             registration.rewards_address.map(|val| val.0),
             registration.raw_metadata,
             registration.nonce.map(|nonce| nonce.0),

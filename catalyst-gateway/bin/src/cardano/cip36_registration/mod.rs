@@ -104,8 +104,8 @@ pub(crate) enum VotingInfo {
 /// A catalyst CIP-36 registration on Cardano
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct Cip36Registration {
-    /// Voting key
-    pub voting_key: Option<VotingInfo>,
+    /// Voting info
+    pub voting_info: Option<VotingInfo>,
     /// Stake key
     pub stake_key: Option<PubKey>,
     /// Rewards address
@@ -133,7 +133,7 @@ impl Cip36Registration {
             return None;
         }
 
-        let mut voting_key: Option<VotingInfo> = None;
+        let mut voting_info: Option<VotingInfo> = None;
         let mut stake_key: Option<PubKey> = None;
         let mut voting_purpose: Option<VotingPurpose> = None;
         let mut rewards_address: Option<RewardsAddress> = None;
@@ -179,7 +179,7 @@ impl Cip36Registration {
                         // from this delegation. For direct voting it's
                         // necessary to have the corresponding private key
                         // to cast votes in the side chain
-                        voting_key = inspect_voting_info(cbor_map).map_or_else(
+                        voting_info = inspect_voting_info(cbor_map).map_or_else(
                             |err| {
                                 errors_report.push(format!("Invalid voting key, err: {err}",));
                                 None
@@ -247,7 +247,7 @@ impl Cip36Registration {
         };
 
         Some(Self {
-            voting_key,
+            voting_info,
             stake_key,
             rewards_address,
             nonce,
