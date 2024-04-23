@@ -20,22 +20,30 @@ struct Delegation {
     power: i64,
 }
 
-/// Voting key type
-#[derive(Union)]
-#[oai(discriminator_name = "type", one_of = true)]
-enum VotingInfo {
-    /// direct voting key
-    Direct(String),
-    /// delegations
-    Delegated(Delegations),
-}
-
 /// Represents a list of delegations
 #[derive(Object)]
 struct Delegations {
     /// A list of delegations.
     #[oai(validator(max_items = "100"))]
     delegations: Vec<Delegation>,
+}
+
+/// Direct voting key
+#[derive(Object)]
+struct DirectVoter {
+    /// Voting key.
+    #[oai(validator(min_length = "66", max_length = "66", pattern = "0x[0-9a-f]{64}"))]
+    voting_key: String,
+}
+
+/// Voting key type
+#[derive(Union)]
+#[oai(discriminator_name = "type", one_of = true)]
+enum VotingInfo {
+    /// direct voting key
+    Direct(DirectVoter),
+    /// delegations
+    Delegated(Delegations),
 }
 
 /// User's [CIP-36](https://cips.cardano.org/cip/CIP-36/) registration info.
@@ -66,7 +74,9 @@ impl RegistrationInfo {
     ) -> Self {
         let voting_info = match voting_info {
             PublicVotingInfo::Direct(voting_key) => {
-                VotingInfo::Direct(to_hex_with_prefix(voting_key.bytes()))
+                VotingInfo::Direct(DirectVoter {
+                    voting_key: to_hex_with_prefix(voting_key.bytes()),
+                })
             },
             PublicVotingInfo::Delegated(delegations) => {
                 VotingInfo::Delegated(Delegations {
