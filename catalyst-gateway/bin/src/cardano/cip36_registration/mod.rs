@@ -9,24 +9,12 @@ use pallas::ledger::{
 };
 use serde::{Deserialize, Serialize};
 
-/// Networks
-const NETWORK_ID: usize = 0;
-
-/// Cip36
-const STAKE_ADDRESS: usize = 1;
-/// Cip36
-const PAYMENT_ADDRESS: usize = 2;
-/// Cip36
-const NONCE: usize = 3;
-/// Cip36
-const VOTE_PURPOSE: usize = 4;
-
 /// Pub key
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub(crate) struct PubKey(Vec<u8>);
 
 /// Nonce
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub(crate) struct Nonce(pub i64);
 
 /// Voting purpose
@@ -34,7 +22,7 @@ pub(crate) struct Nonce(pub i64);
 pub(crate) struct VotingPurpose(u64);
 
 /// Rewards address
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub(crate) struct RewardsAddress(pub Vec<u8>);
 
 /// Error report for serializing
@@ -403,8 +391,11 @@ fn inspect_voting_info(cbor_map: &[(Value, Value)]) -> anyhow::Result<VotingInfo
 
 /// Extract stake key
 fn inspect_stake_key(cbor_map: &[(Value, Value)]) -> anyhow::Result<PubKey> {
+    /// Stake key cbor key
+    const STAKE_ADDRESS_CBOR_KEY: usize = 1;
+
     let stake_key = match cbor_map
-        .get(STAKE_ADDRESS)
+        .get(STAKE_ADDRESS_CBOR_KEY)
         .ok_or(anyhow::anyhow!("Issue with stake key parsing"))?
     {
         (Value::Integer(_two), Value::Bytes(stake_addr)) => PubKey(stake_addr.clone()),
@@ -417,19 +408,20 @@ fn inspect_stake_key(cbor_map: &[(Value, Value)]) -> anyhow::Result<PubKey> {
 fn inspect_rewards_addr(
     cbor_map: &[(Value, Value)], network_id: Network,
 ) -> anyhow::Result<&Vec<u8>> {
+    /// Payment address cbor key
+    const PAYMENT_ADDRESS_CBOR_KEY: usize = 2;
+
     let (Value::Integer(_three), Value::Bytes(rewards_address)) = &cbor_map
-        .get(PAYMENT_ADDRESS)
+        .get(PAYMENT_ADDRESS_CBOR_KEY)
         .ok_or(anyhow::anyhow!("Issue with rewards address parsing"))?
     else {
         return Err(anyhow::anyhow!("Invalid rewards address"));
     };
 
-    if !is_valid_rewards_address(
-        *rewards_address
-            .get(NETWORK_ID)
-            .ok_or(anyhow::anyhow!("Cannot get network id byte"))?,
-        network_id,
-    ) {
+    let network_prefix = rewards_address.first().ok_or(anyhow::anyhow!(
+        "Invalid rewards address, missing network prefix"
+    ))?;
+    if !is_valid_rewards_address(*network_prefix, network_id) {
         return Err(anyhow::anyhow!("Invalid reward address"));
     }
     Ok(rewards_address)
@@ -437,8 +429,11 @@ fn inspect_rewards_addr(
 
 /// Extract Nonce
 fn inspect_nonce(cbor_map: &[(Value, Value)]) -> anyhow::Result<Nonce> {
+    /// Nonce cbor key
+    const NONCE_CBOR_KEY: usize = 3;
+
     match cbor_map
-        .get(NONCE)
+        .get(NONCE_CBOR_KEY)
         .ok_or(anyhow::anyhow!("Issue with nonce parsing"))?
     {
         (Value::Integer(_four), Value::Integer(nonce)) => Ok(Nonce(i128::from(*nonce).try_into()?)),
@@ -448,18 +443,19 @@ fn inspect_nonce(cbor_map: &[(Value, Value)]) -> anyhow::Result<Nonce> {
 
 /// Extract optional voting purpose
 fn inspect_voting_purpose(metamap: &[(Value, Value)]) -> anyhow::Result<VotingPurpose> {
+    /// Voting purpose cbor key
+    const VOTING_PURPOSE_CBOR_KEY: usize = 4;
+
     // A non-negative integer that indicates the purpose of the vote.
     // This is an optional field to allow for compatibility with CIP-15
     // 4 entries inside metadata map with one optional entry for the voting
     // purpose
-    match metamap
-        .get(VOTE_PURPOSE)
-        .ok_or(anyhow::anyhow!("Issue with voting purpose parsing"))?
-    {
-        (Value::Integer(_five), Value::Integer(purpose)) => {
+    match metamap.get(VOTING_PURPOSE_CBOR_KEY) {
+        Some((Value::Integer(_five), Value::Integer(purpose))) => {
             Ok(VotingPurpose(i128::from(*purpose).try_into()?))
         },
-        _ => Err(anyhow::anyhow!("Missing voting purpose")),
+        Some(_) => Err(anyhow::anyhow!("Missing voting purpose")),
+        None => Ok(VotingPurpose::default()),
     }
 }
 
