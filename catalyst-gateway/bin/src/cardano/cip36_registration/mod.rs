@@ -156,9 +156,9 @@ impl Cip36Registration {
 
         if let pallas::ledger::traverse::MultiEraMeta::AlonzoCompatible(tx_metadata) = tx_metadata {
             /// <https://cips.cardano.org/cips/cip36>
-            const CIP36_WITNESS_CBOR_KEY: u64 = 61285;
-            /// <https://cips.cardano.org/cips/cip36>
             const CIP36_REGISTRATION_CBOR_KEY: u64 = 61284;
+            /// <https://cips.cardano.org/cips/cip36>
+            const CIP36_WITNESS_CBOR_KEY: u64 = 61285;
 
             raw_metadata = tx_metadata.encode_fragment().map_or_else(
                 |err| {
@@ -275,7 +275,7 @@ impl Cip36Registration {
 fn convert_pallas_metadatum_to_cbor_value(metadata: &Metadatum) -> anyhow::Result<ciborium::Value> {
     let metadata_bytes = metadata
         .encode_fragment()
-        .map_err(|err| anyhow::anyhow!("cannot encode tx metadata into bytes {err}"))?;
+        .map_err(|err| anyhow::anyhow!("cannot encode metadata into bytes {err}"))?;
 
     ciborium::de::from_reader(metadata_bytes.as_slice())
         .map_err(|err| anyhow::anyhow!("Cannot decode cbor object from bytes, err: {err}"))
@@ -364,7 +364,7 @@ fn inspect_voting_info(cbor_map: &[(Value, Value)]) -> anyhow::Result<VotingInfo
     /// Voting key cbor key
     const VOTE_KEY_CBOR_KEY: usize = 0;
     /// Weight cbor key
-    const WEIGHT_CBOR_KEY: usize = 0;
+    const WEIGHT_CBOR_KEY: usize = 1;
 
     let voting_key = match cbor_map.get(VOTING_INFO_CBOR_KEY).ok_or(anyhow::anyhow!(
         "Issue with registration voting info cbor parsing"
@@ -373,9 +373,9 @@ fn inspect_voting_info(cbor_map: &[(Value, Value)]) -> anyhow::Result<VotingInfo
         (Value::Integer(_), Value::Array(cbor_array)) => {
             let mut delegations = Vec::new();
             for cbor_value in cbor_array {
-                let delegation_info = cbor_value
-                    .as_array()
-                    .ok_or(anyhow::anyhow!("Invalid delegation info"))?;
+                let delegation_info = cbor_value.as_array().ok_or(anyhow::anyhow!(
+                    "Invalid delegations, should be a cbor array"
+                ))?;
 
                 let voting_key = delegation_info
                     .get(VOTE_KEY_CBOR_KEY)
