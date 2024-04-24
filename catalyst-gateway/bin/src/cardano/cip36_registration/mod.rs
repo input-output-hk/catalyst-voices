@@ -1,7 +1,6 @@
 //! Verify registration TXs
 
 use cardano_chain_follower::Network;
-use ciborium::Value;
 use cryptoxide::{blake2b::Blake2b, digest::Digest};
 use pallas::ledger::{
     primitives::{conway::Metadatum, Fragment},
@@ -193,18 +192,7 @@ impl Cip36Metadata {
     }
 }
 
-/// Convert Pallas Metadatum to Cbor Value
-fn convert_pallas_metadatum_to_cbor_value(metadata: &Metadatum) -> anyhow::Result<ciborium::Value> {
-    let metadata_bytes = metadata
-        .encode_fragment()
-        .map_err(|err| anyhow::anyhow!("cannot encode metadata into bytes {err}"))?;
-
-    ciborium::de::from_reader(metadata_bytes.as_slice())
-        .map_err(|err| anyhow::anyhow!("Cannot decode cbor object from bytes, err: {err}"))
-}
-
 /// Validate binary data against CIP-36 registration CDDL spec
-#[allow(dead_code)]
 fn validate_cip36_registration(data: &[u8]) -> anyhow::Result<()> {
     /// Cip36 registration CDDL definition
     const CIP36_REGISTRATION_CDDL: &str = include_str!("cip36_registration.cddl");
@@ -214,7 +202,6 @@ fn validate_cip36_registration(data: &[u8]) -> anyhow::Result<()> {
 }
 
 /// Validate binary data against CIP-36 registration CDDL spec
-#[allow(dead_code)]
 fn validate_cip36_witness(data: &[u8]) -> anyhow::Result<()> {
     /// Cip36 witness CDDL definition
     const CIP36_WITNESS_CDDL: &str = include_str!("cip36_witness.cddl");
@@ -256,7 +243,15 @@ fn is_valid_rewards_address(rewards_address_prefix: u8, network: Network) -> boo
 
 /// Extract witness from tx metadata
 fn inspect_witness_from_metadata(metadata: &Metadatum) -> anyhow::Result<Signature> {
-    let cbor_value = convert_pallas_metadatum_to_cbor_value(metadata)?;
+    let metadata_bytes = metadata
+        .encode_fragment()
+        .map_err(|err| anyhow::anyhow!("cannot encode metadata into bytes {err}"))?;
+
+    validate_cip36_witness(metadata_bytes.as_slice())?;
+
+    let cbor_value = ciborium::de::from_reader(metadata_bytes.as_slice())
+        .map_err(|err| anyhow::anyhow!("Cannot decode cbor object from bytes, err: {err}"))?;
+
     inspect_signature(cbor_value)
 }
 
@@ -289,7 +284,14 @@ fn inspect_signature(cbor_value: ciborium::value::Value) -> anyhow::Result<Signa
 fn inspect_registration_from_metadata(
     metadata: &Metadatum, network: Network,
 ) -> anyhow::Result<Registration> {
-    let cbor_value = convert_pallas_metadatum_to_cbor_value(metadata)?;
+    let metadata_bytes = metadata
+        .encode_fragment()
+        .map_err(|err| anyhow::anyhow!("cannot encode metadata into bytes {err}"))?;
+
+    validate_cip36_registration(metadata_bytes.as_slice())?;
+
+    let cbor_value = ciborium::de::from_reader::<ciborium::Value, _>(metadata_bytes.as_slice())
+        .map_err(|err| anyhow::anyhow!("Cannot decode cbor object from bytes, err: {err}"))?;
 
     let cbor_map = cbor_value.as_map().ok_or(anyhow::anyhow!(
         "Not a valid cbor cip36 registration, should be a map"
@@ -315,7 +317,9 @@ fn inspect_registration_from_metadata(
 /// from this delegation. For direct voting it's
 /// necessary to have the corresponding private key
 /// to cast votes in the side chain
-fn inspect_voting_info(cbor_map: &[(Value, Value)]) -> anyhow::Result<VotingInfo> {
+fn inspect_voting_info(
+    cbor_map: &[(ciborium::Value, ciborium::Value)],
+) -> anyhow::Result<VotingInfo> {
     /// Voting info cbor key
     const VOTING_INFO_CBOR_KEY: usize = 0;
     /// Voting key cbor key
@@ -326,8 +330,10 @@ fn inspect_voting_info(cbor_map: &[(Value, Value)]) -> anyhow::Result<VotingInfo
     let voting_key = match cbor_map.get(VOTING_INFO_CBOR_KEY).ok_or(anyhow::anyhow!(
         "Issue with registration voting info cbor parsing"
     ))? {
-        (Value::Integer(_), Value::Bytes(direct)) => VotingInfo::Direct(PubKey(direct.clone())),
-        (Value::Integer(_), Value::Array(cbor_array)) => {
+        (ciborium::Value::Integer(_), ciborium::Value::Bytes(direct)) => {
+            VotingInfo::Direct(PubKey(direct.clone()))
+        },
+        (ciborium::Value::Integer(_), ciborium::Value::Array(cbor_array)) => {
             let mut delegations = Vec::new();
             for cbor_value in cbor_array {
                 let delegation_info = cbor_value.as_array().ok_or(anyhow::anyhow!(
@@ -359,7 +365,7 @@ fn inspect_voting_info(cbor_map: &[(Value, Value)]) -> anyhow::Result<VotingInfo
 }
 
 /// Extract stake key.
-fn inspect_stake_key(cbor_map: &[(Value, Value)]) -> anyhow::Result<PubKey> {
+fn inspect_stake_key(cbor_map: &[(ciborium::Value, ciborium::Value)]) -> anyhow::Result<PubKey> {
     /// Stake key cbor key
     const STAKE_ADDRESS_CBOR_KEY: usize = 1;
 
@@ -367,7 +373,9 @@ fn inspect_stake_key(cbor_map: &[(Value, Value)]) -> anyhow::Result<PubKey> {
         .get(STAKE_ADDRESS_CBOR_KEY)
         .ok_or(anyhow::anyhow!("Issue with stake key parsing"))?
     {
-        (Value::Integer(_two), Value::Bytes(stake_addr)) => PubKey(stake_addr.clone()),
+        (ciborium::Value::Integer(_two), ciborium::Value::Bytes(stake_addr)) => {
+            PubKey(stake_addr.clone())
+        },
         _ => return Err(anyhow::anyhow!("Missing stake key")),
     };
     Ok(stake_key)
@@ -378,14 +386,15 @@ fn inspect_stake_key(cbor_map: &[(Value, Value)]) -> anyhow::Result<PubKey> {
 /// network this transaction is submitted to, to
 /// receive rewards.
 fn inspect_rewards_addr(
-    cbor_map: &[(Value, Value)], network_id: Network,
+    cbor_map: &[(ciborium::Value, ciborium::Value)], network_id: Network,
 ) -> anyhow::Result<RewardsAddress> {
     /// Payment address cbor key
     const PAYMENT_ADDRESS_CBOR_KEY: usize = 2;
 
-    let (Value::Integer(_three), Value::Bytes(rewards_address_bytes)) = &cbor_map
-        .get(PAYMENT_ADDRESS_CBOR_KEY)
-        .ok_or(anyhow::anyhow!("Issue with rewards address parsing"))?
+    let (ciborium::Value::Integer(_three), ciborium::Value::Bytes(rewards_address_bytes)) =
+        &cbor_map
+            .get(PAYMENT_ADDRESS_CBOR_KEY)
+            .ok_or(anyhow::anyhow!("Issue with rewards address parsing"))?
     else {
         return Err(anyhow::anyhow!("Invalid rewards address"));
     };
@@ -400,7 +409,7 @@ fn inspect_rewards_addr(
 }
 
 /// Extract Nonce
-fn inspect_nonce(cbor_map: &[(Value, Value)]) -> anyhow::Result<Nonce> {
+fn inspect_nonce(cbor_map: &[(ciborium::Value, ciborium::Value)]) -> anyhow::Result<Nonce> {
     /// Nonce cbor key
     const NONCE_CBOR_KEY: usize = 3;
 
@@ -408,13 +417,17 @@ fn inspect_nonce(cbor_map: &[(Value, Value)]) -> anyhow::Result<Nonce> {
         .get(NONCE_CBOR_KEY)
         .ok_or(anyhow::anyhow!("Issue with nonce parsing"))?
     {
-        (Value::Integer(_four), Value::Integer(nonce)) => Ok(Nonce(i128::from(*nonce).try_into()?)),
+        (ciborium::Value::Integer(_four), ciborium::Value::Integer(nonce)) => {
+            Ok(Nonce(i128::from(*nonce).try_into()?))
+        },
         _ => Err(anyhow::anyhow!("Missing nonce")),
     }
 }
 
 /// Extract optional voting purpose
-fn inspect_voting_purpose(metamap: &[(Value, Value)]) -> anyhow::Result<VotingPurpose> {
+fn inspect_voting_purpose(
+    metamap: &[(ciborium::Value, ciborium::Value)],
+) -> anyhow::Result<VotingPurpose> {
     /// Voting purpose cbor key
     const VOTING_PURPOSE_CBOR_KEY: usize = 4;
 
@@ -423,7 +436,7 @@ fn inspect_voting_purpose(metamap: &[(Value, Value)]) -> anyhow::Result<VotingPu
     // 4 entries inside metadata map with one optional entry for the voting
     // purpose
     match metamap.get(VOTING_PURPOSE_CBOR_KEY) {
-        Some((Value::Integer(_five), Value::Integer(purpose))) => {
+        Some((ciborium::Value::Integer(_five), ciborium::Value::Integer(purpose))) => {
             Ok(VotingPurpose(i128::from(*purpose).try_into()?))
         },
         Some(_) => Err(anyhow::anyhow!("Missing voting purpose")),
