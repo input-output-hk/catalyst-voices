@@ -5,7 +5,7 @@ use pallas::ledger::traverse::MultiEraTx;
 use serde_json::json;
 
 use crate::{
-    cardano::cip36_registration::{Cip36Registration, ErrorReport, VotingInfo},
+    cardano::cip36_registration::{Cip36Metadata, ErrorReport, VotingInfo},
     event_db::{cardano::chain_state::SlotNumber, error::NotFoundError, EventDB},
 };
 
@@ -96,22 +96,30 @@ impl EventDB {
     pub(crate) async fn index_registration_data(
         &self, tx: &MultiEraTx<'_>, network: Network,
     ) -> anyhow::Result<()> {
-        let Some(registration) =
-            Cip36Registration::generate_from_tx_metadata(&tx.metadata(), network)
-        else {
+        let Some(cip36) = Cip36Metadata::generate_from_tx_metadata(&tx.metadata(), network) else {
             return Ok(());
         };
+        let tx_hash = tx.hash().to_vec();
+        let (stake_credential, voting_info, rewards_address, nonce) =
+            if let Some(reg) = cip36.registration {
+                (
+                    Some(reg.stake_key.get_credentials().to_vec()),
+                    Some(reg.voting_info),
+                    Some(reg.rewards_address.0),
+                    Some(reg.nonce.0),
+                )
+            } else {
+                (None, None, None, None)
+            };
 
         self.insert_voter_registration(
-            tx.hash().to_vec(),
-            registration
-                .stake_key
-                .map(|val| val.get_credentials().to_vec()),
-            registration.voting_info,
-            registration.rewards_address.map(|val| val.0),
-            registration.raw_metadata,
-            registration.nonce.map(|nonce| nonce.0),
-            registration.errors_report,
+            tx_hash,
+            stake_credential,
+            voting_info,
+            rewards_address,
+            cip36.raw_metadata,
+            nonce,
+            cip36.errors_report,
         )
         .await?;
 
