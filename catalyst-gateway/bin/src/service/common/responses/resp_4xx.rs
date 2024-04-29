@@ -2,7 +2,9 @@
 
 use poem::IntoResponse;
 use poem_extensions::OneResponse;
-use poem_openapi::payload::{Payload, PlainText};
+use poem_openapi::payload::{Json, Payload};
+
+use crate::service::common::objects::error_message::ErrorMessage;
 
 #[derive(OneResponse)]
 #[oai(status = 400)]
@@ -13,12 +15,12 @@ pub(crate) struct BadRequest<T: IntoResponse + Payload>(T);
 #[oai(status = 400)]
 /// This error means that the request was malformed.
 /// It has failed to pass validation, as specified by the `OpenAPI` schema.
-pub(crate) struct ApiValidationError(PlainText<String>);
+pub(crate) struct ApiValidationError(Json<ErrorMessage>);
 
 impl ApiValidationError {
     /// Create new `ApiValidationError`
-    pub(crate) fn new(error: String) -> Self {
-        Self(PlainText(error))
+    pub(crate) fn new(message: String) -> Self {
+        Self(Json(ErrorMessage { message }))
     }
 }
 
