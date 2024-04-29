@@ -13,10 +13,11 @@ icon: material/quality-high
 |:-:|:-:|:-:|:-:|
 | Usable  |  Voting User experience  | Voting and browsing proposals should be easy and intuitive to do  | SC1-SC11 |
 | Usable  |  Proposer User experience  | Voting and browsing proposals should be easy and intuitive to do  | SC12-SC15 |
-| Usable  |  Correctness  | System functions should provide accurate results | SC9 |
-| Usable  |  Accessibility  | The system should be design so as to be usable by everyone  | SC12 SC13|
-| Secure   |  Access control  | Role-Based Access Control  | SC24-SC31  |
-| Secure   |  Privacy  | User information are kept private  | SC8  |
+| Usable  |  Correctness  | System functions should provide accurate results | SC50-SC53 |
+| Usable  |  Accessibility  | The system should be design so as to be usable by everyone  | SC12-SC13 |
+| Usable  |  Engagement  | Users should actively participate with the system | SC57-SC60 |
+| Secure   |  Access control  | Role-Based Access Control  | SC24-SC31 |
+| Secure   |  Privacy  | User information are kept private  | SC8 |
 | Secure   |  Auditability  | Voting results can be audited by external parties  | SC20-SC23 |
 | Secure   |  Compliancy  |  | SC40-SC41 |
 | Reliable   |  Fail-safe  | In case of failures the system does not loose data |  SC7 |
@@ -84,12 +85,24 @@ icon: material/quality-high
 |  SC47 | Up to 100k proposals |
 |  SC48 | Up to 500k comments |
 |  SC49 | Up to 250k registered accounts |
+|  SC50 |  Correct search results |
+|  SC51 |  As a user, if I mark my proposal private, only I (and my team) can see it |
+|  SC52 |  As a user, if I mark my proposal as public, anyone can see it |
+|  SC53 |  As a user, only me and my team can make edits to my proposal |
+|  SC54 | Notifications properly delivered to all target accounts |
+|  SC55 | Updates to event parameters reflected in less than 1 hour across all users |
+|  SC56 | Users always shown accurate dates for an event |
+|  SC57 | % of circulating supply that registers to vote |
+|  SC58 | % of registered stake that submits a vote |
+|  SC59 | % of voting stake that casts at least 25 votes |
+|  SC60 | Users should need external docs / help very seldom |
+
 
 |  SC5 |  The system can handle correctly at least 30 votes per second |
 |  SC6 |  The system does not permit to vote twice |
 |  SC7 |  If the system gets more then 30 votes per second the votes are not lost |
 |  SC8 |  User private key are secure |
-|  SC9 |  Correct search results |
+
 |  SC10 |  Rollout of a new feature |
 |  SC11 |  Quick Unit tests |
 |  SC12 | Localizable to several languages |
