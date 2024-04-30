@@ -1,20 +1,14 @@
 //! Implementation of the GET /health/started endpoint
 
-use poem_extensions::{response, UniResponse::T204};
-
-use crate::service::common::responses::{
-    resp_2xx::NoContent,
-    resp_4xx::ApiValidationError,
-    resp_5xx::{ServerError, ServiceUnavailable},
-};
+use poem_openapi::ApiResponse;
 
 /// All responses
-pub(crate) type AllResponses = response! {
-    204: NoContent,
-    400: ApiValidationError,
-    500: ServerError,
-    503: ServiceUnavailable,
-};
+#[derive(ApiResponse)]
+pub(crate) enum AllResponses {
+    /// Service is Started and can serve requests.
+    #[oai(status = 204)]
+    NoContent,
+}
 
 /// # GET /health/started
 ///
@@ -33,16 +27,7 @@ pub(crate) type AllResponses = response! {
 /// into memory or processed in some way before the API can return valid
 /// responses.  In that scenario this endpoint would return 503 until that
 /// startup processing was fully completed.
-///
-/// ## Responses
-///
-/// * 204 No Content - Service is Started and can  serve requests.
-/// * 400 API Validation Error
-/// * 500 Server Error - If anything within this function fails unexpectedly. (Possible
-///   but unlikely)
-/// * 503 Service Unavailable - Service has not started, do not send other requests.
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint() -> AllResponses {
-    // otherwise everything seems to be A-OK
-    T204(NoContent)
+    AllResponses::NoContent
 }

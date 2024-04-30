@@ -3,28 +3,29 @@
 use std::sync::Arc;
 
 use poem::web::Data;
-use poem_extensions::{
-    response,
-    UniResponse::{T204, T503},
-};
+use poem_openapi::{payload::Json, ApiResponse};
 
 use crate::{
     event_db::schema_check::MismatchedSchemaError,
-    service::common::responses::{
-        resp_2xx::NoContent,
-        resp_4xx::ApiValidationError,
-        resp_5xx::{handle_5xx_response, ServerError, ServiceUnavailable},
-    },
+    service::common::{objects::server_error::ServerError, responses::handle_5xx_response},
     state::State,
 };
 
 /// All responses
-pub(crate) type AllResponses = response! {
-    204: NoContent,
-    400: ApiValidationError,
-    500: ServerError,
-    503: ServiceUnavailable,
-};
+#[derive(ApiResponse)]
+pub(crate) enum AllResponses {
+    /// Service is Started and can serve requests.
+    #[oai(status = 204)]
+    NoContent,
+    /// Internal Server Error.
+    ///
+    /// *The contents of this response should be reported to the projects issue tracker.*
+    #[oai(status = 500)]
+    ServerError(Json<ServerError>),
+    /// Service is not ready, do not send other requests.
+    #[oai(status = 503)]
+    ServiceUnavailable,
+}
 
 /// # GET /health/ready
 ///
@@ -43,23 +44,15 @@ pub(crate) type AllResponses = response! {
 /// and is not able to properly service requests while it is occurring.
 /// This would let the load balancer shift traffic to other instances of this
 /// service that are ready.
-///
-/// ## Responses
-///
-/// * 204 No Content - Service is Ready to serve requests.
-/// * 400 API Validation Error
-/// * 500 Server Error - If anything within this function fails unexpectedly. (Possible
-///   but unlikely)
-/// * 503 Service Unavailable - Service is not ready, do not send other requests.
 pub(crate) async fn endpoint(state: Data<&Arc<State>>) -> AllResponses {
     match state.event_db().schema_version_check().await {
         Ok(_) => {
             tracing::debug!("DB schema version status ok");
-            T204(NoContent)
+            AllResponses::NoContent
         },
         Err(err) if err.is::<MismatchedSchemaError>() => {
             tracing::error!("{err}");
-            T503(ServiceUnavailable)
+            AllResponses::ServiceUnavailable
         },
         Err(err) => handle_5xx_response!(err),
     }
