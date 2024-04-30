@@ -9,7 +9,6 @@ use health::HealthApi;
 use legacy::LegacyApi;
 use local_ip_address::list_afinet_netifas;
 use poem_openapi::{ContactObject, LicenseObject, OpenApiService, ServerObject};
-use test_endpoints::TestApi;
 
 use self::cardano::CardanoApi;
 use crate::settings::{DocsSettings, API_URL_PREFIX};
@@ -17,7 +16,6 @@ use crate::settings::{DocsSettings, API_URL_PREFIX};
 mod cardano;
 mod health;
 mod legacy;
-mod test_endpoints;
 
 /// The name of the API
 const API_TITLE: &str = "Catalyst Gateway";
@@ -60,10 +58,9 @@ const TERMS_OF_SERVICE: &str =
 /// Create the `OpenAPI` definition
 pub(crate) fn mk_api(
     hosts: Vec<String>, settings: &DocsSettings,
-) -> OpenApiService<(TestApi, HealthApi, CardanoApi, LegacyApi), ()> {
+) -> OpenApiService<(HealthApi, CardanoApi, LegacyApi), ()> {
     let mut service = OpenApiService::new(
         (
-            TestApi,
             HealthApi,
             CardanoApi,
             (legacy::RegistrationApi, legacy::V0Api, legacy::V1Api),
