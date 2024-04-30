@@ -62,7 +62,6 @@ rust-embed = { workspace = true }
 local-ip-address = { workspace = true }
 gethostname = { workspace = true }
 hex = { workspace = true }
-async-recursion = { workspace = true }
 pallas = { workspace = true }
 cardano-chain-follower= { workspace = true }
 anyhow = { workspace = true }
