@@ -53,6 +53,6 @@ abstract class CatalystCardanoPlatform extends PlatformInterface {
   /// Must be called and awaited exactly once before any
   /// additional interaction with the lib.
   Future<void> init() {
-    throw UnimplementedError('initialize() has not been implemented.');
+    throw UnimplementedError('init() has not been implemented.');
   }
 }
