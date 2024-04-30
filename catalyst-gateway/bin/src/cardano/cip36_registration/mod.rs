@@ -3,7 +3,6 @@
 use anyhow::Ok;
 use cardano_chain_follower::Network;
 use cryptoxide::{blake2b::Blake2b, digest::Digest};
-
 use ed25519_dalek::{Signature, VerifyingKey};
 use pallas::ledger::{
     primitives::{conway::Metadatum, Fragment},
