@@ -154,9 +154,10 @@ impl Cip36Metadata {
         };
 
         if let Some(raw_61284) = raw_61284 {
-            let _ = validate_signature(raw_61284, registration.clone(), signature).map_err(|err| {
-                errors_report.push(format!("{err}"));
-            });
+            let _ =
+                validate_signature(&raw_61284, registration.clone(), signature).map_err(|err| {
+                    errors_report.push(format!("{err}"));
+                });
         }
 
         Some(Self {
@@ -173,7 +174,7 @@ impl Cip36Metadata {
 ///  - blake2b-256 hashing those bytes
 ///  - signing the hash with the private key used to generate the stake key
 pub fn validate_signature(
-    raw_61284: Vec<u8>, registration: Option<Registration>, signature: Option<Signature>,
+    raw_61284: &[u8], registration: Option<Registration>, signature: Option<Signature>,
 ) -> anyhow::Result<()> {
     let hash_bytes = hash(&raw_61284);
 

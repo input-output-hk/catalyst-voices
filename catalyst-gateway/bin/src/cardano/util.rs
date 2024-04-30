@@ -19,6 +19,7 @@ pub type StakeCredentialHash = String;
 /// Correct stake credential key in hex
 pub type StakeCredentialKey = String;
 
+/// Hash size
 pub(crate) const BLAKE_2B_256_HASH_SIZE: usize = 256 / 8;
 
 /// Helper function to generate the `blake2b_256` hash of a byte slice
