@@ -89,7 +89,7 @@ icon: material/quality-high
 |  SC54 |  Notifications properly delivered to all target accounts |
 |  SC55 |  Updates to event parameters reflected in less than 1 hour across all users |
 |  SC56 |  Users always shown accurate dates for an event |
-|  SC57 |  20% of circulating supply that registers to vote | CHECK
+|  SC57 |  10% of circulating supply that registers to vote |
 |  SC58 |  80% of registered stake that submits a vote |
 |  SC59 |  50% of voting stake that casts at least 25 votes |
 |  SC60 |  Users should not reach to customer service for help on how to use the system |
