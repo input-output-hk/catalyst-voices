@@ -8,7 +8,7 @@ icon: octicons/goal-24
 
 ## Requirements Overview
 
-## Quality Goals (WIP)
+## Quality Goals
 
 Main quality goals:
 
@@ -21,13 +21,13 @@ Main quality goals:
 | Secure   | Accountability  |  Voting results can be audited by external parties |
 | Reliable   |  Fail-safe | In case of failures the system does not loose data |
 
-## Stakeholders (WIP)
+## Stakeholders
 
-| Role/Name   | Contact        | Expectations       |
-|-------------|----------------|--------------------|
-| *~Product-Owner~* | *~Mike~* | *~Expectation~* |
-| *~Developer~* | *~Catalyst-Team~* | *~Expectation~* |
-| *~User~* | *~Catalyst-Community~* | *~Expectation~* |
-| *~Admin~* | *~Danny~* | *~Expectation~* |
-| *~SRE~* | *~Josh~* | *~Expectation~* |
-| *~Tester~* | *~Catalyst-QA-Team~* | *~Expectation~* |
+| Role/Name   | Contact        |
+|-------------|----------------|
+| *Product-Owner* | *Mike* |
+| *Developers* | *Catalyst-Team* |
+| *Users* | *Catalyst-Community* |
+| *Admin* | *Danny* |
+| *SRE* | *Josh* |
+| *Testers* | *Catalyst-QA-Team* |

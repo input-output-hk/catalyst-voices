@@ -9,38 +9,35 @@ icon: material/quality-high
 ## Quality Tree
 
 |  Quality Category |  Quality   |  Description | Scenarios  |
-
 |:-:|:-:|:-:|:-:|
-| Usable  |  Voting User experience  | Voting and browsing proposals should be easy and intuitive to do  | SC1-SC11 |
-| Usable  |  Proposer User experience  | Voting and browsing proposals should be easy and intuitive to do  | SC12-SC15 |
+| Usable  |  Voting User experience  | Voting and browsing proposals should be easy and intuitive to do  | SC1-SC4, SC7-SC9 |
+| Usable  |  Proposer User experience  | Creating and managing proposals should be easy and intuitive to do  | SC12-SC15 |
 | Usable  |  Correctness  | System functions should provide accurate results | SC50-SC53 |
 | Usable  |  Accessibility  | The system should be design so as to be usable by everyone  | SC63-SC64 |
 | Usable  |  Engagement  | Users should actively participate with the system | SC57-SC60 |
 | Secure   |  Access control  | Role-Based Access Control  | SC24-SC31 |
 | Secure   |  Privacy  | User information are kept private  | SC66 |
 | Secure   |  Auditability  | Voting results can be audited by external parties  | SC20-SC23 |
-| Secure   |  Compliancy  |  | SC40-SC41 |
-| Reliable   |  Fail-safe  | In case of failures the system does not loose data |  SC65 |
-| Reliable   |  Integrity of the vote |  |  SC16-SC19 |
-| Reliable   |  Scalability  |  |  SC43-SC49 |
-| Efficient   |  Response Time  | The system should give feedback in timely manner |   |
-| Efficient   |  Code Complexity  |  Code should be easy to understand and well documented |   |
-| Operable   |  Deployability  |  The system should be easy to deploy and operate | SC37-SC40  |
-| Operable   |  Testability  | Tests should be easy to run and give a clear feedback   | SC61-SC62  |
-| Operable   |  Clarity  | Clarity in technical documentation  | |
-| Flexible   |  Configurable  |  Efficient change of business rules | SC32-SC36   |
-| Safe   |   |   |   |
+| Secure   |  Compliancy  | The system is complaint with local laws | SC41-SC42 |
+| Reliable   |  Fail-safe  | In case of failures the system does not loose data/votes | SC16-SC19, SC65 |
+| Reliable   |  Scalability  | The system should scale well with increasing number of users/votes | SC43-SC49 |
+| Efficient   |  Response Time  | The system should give feedback in timely manner | SC5, SC6, SC10, SC11 |
+| Efficient   |  Code Complexity  |  Code should be easy to understand and well documented | SC68 |
+| Operable   |  Deployability  |  The system should be easy to deploy and operate | SC37-SC40 |
+| Operable   |  Testability  | Tests should be easy to run and give a clear feedback | SC61-SC62  |
+| Operable   |  Clarity  | Clarity in technical documentation  | SC67 |
+| Flexible   |  Configurable  |  Efficient change of business rules | SC32-SC36 |
 
 ## Quality Scenarios
 
 |  Id |  Scenario   |
 |:-:|:-:|
-|  SC1 |  A user who is new to Catalyst can easily understand how to vote. |
+|  SC1 |  A user who is new to Catalyst can understand how to vote in 5 minutes maximum. |
 |  SC2 |  A user should be able to stop voting and restart voting without loosing votes  |
 |  SC3 |  If a user tries to vote on the same proposal twice he will receive a clear error message |
-|  SC4 |  After a user cast a vote he will receive a clear and timely feedback on the status of his vote |
+|  SC4 |  After a user cast a vote he will receive a clear feedback on the status of his vote |
 |  SC5 |  Proposals are fully loaded and able to be navigated by user in less than 10 seconds |
-|  SC6 |  Search / sort / filter results returned in less than 5 seconds |
+|  SC6 |  Search/sort/ filter results returned in less than 5 seconds |
 |  SC7 |  User clicks on one of the top 5 search results in at least 80% of search queries |
 |  SC8 |  A user can vote in less than 3 clicks from loading proposals page |
 |  SC9 |  A user can vote on another proposal in less than 2 clicks after voting on one proposal |
@@ -76,29 +73,31 @@ icon: material/quality-high
 |  SC39 |  Important metrics viewable by non technical users |
 |  SC40 |  New versions can be deployed by SRE in less than 1 hour |
 |  SC41 |  On chain immutable record of registrations, proposals, votes, and tally for every event |
-|  SC42 |  KYC maintained by 3rd party for all relevant user types |
+|  SC42 |  Due Diligence maintained by 3rd party for all relevant user types |
 |  SC43 |  Up to 1M concurrent users - wallet connect, login, registration, proposal create, comment, vote |
 |  SC44 |  Up to 100 votes per second |
 |  SC45 |  Up to 10 people editing the same proposal |
-|  SC45 |  Up to 50 concurrent brands / customers running parallel events on platform |
-|  SC46 |  Up to 500 concurrent events / voting rounds |
+|  SC45 |  Up to 50 concurrent brands/customers running parallel events on platform |
+|  SC46 |  Up to 500 concurrent events/voting rounds |
 |  SC47 |  Up to 100k proposals |
 |  SC48 |  Up to 500k comments |
 |  SC49 |  Up to 250k registered accounts |
-|  SC50 |  Correct search results |
+|  SC50 |  The search click-through rate should be more then 50% |
 |  SC51 |  As a user, if I mark my proposal private, only I (and my team) can see it |
 |  SC52 |  As a user, if I mark my proposal as public, anyone can see it |
 |  SC53 |  As a user, only me and my team can make edits to my proposal |
 |  SC54 |  Notifications properly delivered to all target accounts |
 |  SC55 |  Updates to event parameters reflected in less than 1 hour across all users |
 |  SC56 |  Users always shown accurate dates for an event |
-|  SC57 |  % of circulating supply that registers to vote |
-|  SC58 |  % of registered stake that submits a vote |
-|  SC59 |  % of voting stake that casts at least 25 votes |
-|  SC60 |  Users should need external docs / help very seldom |
-|  SC61 |  Quick Unit tests |
-|  SC62 |  Clear test reporting |
+|  SC57 |  20% of circulating supply that registers to vote | CHECK
+|  SC58 |  80% of registered stake that submits a vote |
+|  SC59 |  50% of voting stake that casts at least 25 votes |
+|  SC60 |  Users should not reach to customer service for help on how to use the system |
+|  SC61 |  Unit tests should take less then 30 minutes to run |
+|  SC62 |  Test report should be available and up to date |
 |  SC63 |  Localizable to several languages |
 |  SC64 |  Compliance with WCA accessibility guidelines |
-|  SC65 |  If the system gets more then 30 votes per second the votes are not lost |
+|  SC65 |  If the system gets more then 100 votes per second votes are not lost |
 |  SC66 |  User private key are secure |
+|  SC67 |  New team member can be onboarded without help from the team |
+|  SC68 |  Tests functions have a comment explaining the steps of the test |
