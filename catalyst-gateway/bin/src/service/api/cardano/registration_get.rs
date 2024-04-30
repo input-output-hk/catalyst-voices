@@ -7,7 +7,7 @@ use poem_extensions::{
 use poem_openapi::payload::Json;
 
 use crate::{
-    event_db::{error::NotFoundError, follower::SlotNumber},
+    event_db::{cardano::chain_state::SlotNumber, error::NotFoundError},
     service::{
         common::{
             objects::cardano::{

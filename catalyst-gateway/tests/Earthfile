@@ -32,8 +32,6 @@ fuzzer-api:
     FROM earthly/dind:alpine-3.19
     RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
     RUN apk add yq zstd
-    ARG DB_URL="postgres://catalyst-event-dev:CHANGE_ME@localhost/CatalystEventDev"
-    ARG CAT_ADDRESS="127.0.0.1:3030"
     ARG OPENAPI_SPEC="http://127.0.0.1:3030/docs/cat-gateway.json"
 
     COPY schemathesis-docker-compose.yml .
@@ -41,7 +39,7 @@ fuzzer-api:
         --compose schemathesis-docker-compose.yml \
         --load schemathesis:latest=(+package-schemathesis --openapi_spec=$OPENAPI_SPEC) \
         --load event-db:latest=(../event-db+build) \
-        --load cat-gateway:latest=(../+package-cat-gateway --address=$CAT_ADDRESS --db_url=$DB_URL) \
+        --load cat-gateway:latest=(../+package-cat-gateway) \
         --service event-db \
         --service cat-gateway \
         --allow-privileged
@@ -64,9 +62,8 @@ fuzzer-api:
 
 # test-lint-openapi - OpenAPI linting from an artifact
 # testing whether the OpenAPI generated during build stage follows good practice.
-# TODO: https://github.com/input-output-hk/catalyst-voices/issues/408
 # enable this linting after this issue will be solved
-lint-openapi:
+test-lint-openapi:
     FROM github.com/input-output-hk/catalyst-ci/earthly/spectral:v2.4.0+spectral-base
     # Copy the doc artifact.
     COPY ../+build/doc ./doc

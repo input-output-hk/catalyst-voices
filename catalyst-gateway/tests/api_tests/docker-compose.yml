@@ -26,8 +26,11 @@ services:
       retries: 10
 
   cat-gateway:
-    image: cat-gateway-test:latest
+    image: cat-gateway:latest
     environment:
+      - DB_URL=postgres://catalyst-event-dev:CHANGE_ME@event-db/CatalystEventDev
+      - CAT_ADDRESS=0.0.0.0:3030
+      - LOG_LEVEL=error
       - DATA_REFRESH_TICK=5
       - CHECK_CONFIG_TICK=5
       - MACHINE_ID="UID"

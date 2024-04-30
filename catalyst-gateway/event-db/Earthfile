@@ -14,7 +14,6 @@ builder:
     # override setup-db.sql
     COPY setup-db.sql /sql/
 
-    COPY --dir ./queries .
     COPY --dir json_schemas .
 
 # build - an event db docker image.

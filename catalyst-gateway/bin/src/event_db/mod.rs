@@ -6,13 +6,10 @@ use bb8_postgres::PostgresConnectionManager;
 use dotenvy::dotenv;
 use tokio_postgres::NoTls;
 
-pub(crate) mod config;
+pub(crate) mod cardano;
 pub(crate) mod error;
-pub(crate) mod follower;
 pub(crate) mod legacy;
 pub(crate) mod schema_check;
-pub(crate) mod utxo;
-pub(crate) mod voter_registration;
 
 /// Database URL Environment Variable name.
 /// eg: "`postgres://catalyst-dev:CHANGE_ME@localhost/CatalystDev`"
