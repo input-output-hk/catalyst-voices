@@ -5,10 +5,8 @@ use pallas::ledger::traverse::MultiEraTx;
 use serde_json::json;
 
 use crate::{
-    cardano::registration::{
-        parse_registrations_from_metadata, validate_reg_cddl, CddlConfig, ErrorReport, VotingInfo,
-    },
-    event_db::{cardano::follower::SlotNumber, error::NotFoundError, EventDB},
+    cardano::cip36_registration::{Cip36Metadata, ErrorReport, VotingInfo},
+    event_db::{cardano::chain_state::SlotNumber, error::NotFoundError, EventDB},
 };
 
 /// Transaction id
@@ -36,22 +34,22 @@ const PUBLIC_VOTING_KEY_COLUMN: &str = "public_voting_key";
 const NONCE_COLUMN: &str = "nonce";
 
 /// `insert_voter_registration.sql`
-const INSERT_VOTER_REGISTRATION_SQL: &str = include_str!("insert_voter_registration.sql");
+const INSERT_VOTER_REGISTRATION_SQL: &str = include_str!("insert_cip36_registration.sql");
 /// `select_voter_registration.sql`
-const SELECT_VOTER_REGISTRATION_SQL: &str = include_str!("select_voter_registration.sql");
+const SELECT_VOTER_REGISTRATION_SQL: &str = include_str!("select_cip36_registration.sql");
 
 impl EventDB {
     /// Inserts voter registration data, replacing any existing data.
     #[allow(clippy::too_many_arguments)]
     async fn insert_voter_registration(
         &self, tx_id: TxId, stake_credential: Option<StakeCredential>,
-        public_voting_key: Option<PublicVotingInfo>, payment_address: Option<PaymentAddress>,
+        voting_info: Option<PublicVotingInfo>, payment_address: Option<PaymentAddress>,
         metadata_cip36: Option<MetadataCip36>, nonce: Option<Nonce>, errors_report: ErrorReport,
     ) -> anyhow::Result<()> {
         let conn = self.pool.get().await?;
 
         // for the catalyst we dont support multiple delegations
-        let multiple_delegations = public_voting_key.as_ref().is_some_and(|voting_info| {
+        let multiple_delegations = voting_info.as_ref().is_some_and(|voting_info| {
             if let PublicVotingInfo::Delegated(delegations) = voting_info {
                 delegations.len() > 1
             } else {
@@ -59,9 +57,9 @@ impl EventDB {
             }
         });
 
-        let encoded_voting_key = if let Some(voting_key) = public_voting_key {
+        let encoded_voting_info = if let Some(voting_info) = voting_info {
             Some(
-                serde_json::to_string(&voting_key)
+                serde_json::to_string(&voting_info)
                     .map_err(|_| anyhow::anyhow!("Cannot encode voting key".to_string()))?
                     .as_bytes()
                     .to_vec(),
@@ -72,7 +70,7 @@ impl EventDB {
 
         let is_valid = !multiple_delegations
             && stake_credential.is_some()
-            && encoded_voting_key.is_some()
+            && encoded_voting_info.is_some()
             && payment_address.is_some()
             && metadata_cip36.is_some()
             && nonce.is_some()
@@ -82,7 +80,7 @@ impl EventDB {
             .query(INSERT_VOTER_REGISTRATION_SQL, &[
                 &tx_id,
                 &stake_credential,
-                &encoded_voting_key,
+                &encoded_voting_info,
                 &payment_address,
                 &nonce,
                 &metadata_cip36,
@@ -98,52 +96,32 @@ impl EventDB {
     pub(crate) async fn index_registration_data(
         &self, tx: &MultiEraTx<'_>, network: Network,
     ) -> anyhow::Result<()> {
-        let cddl = CddlConfig::new();
-
-        if !tx.metadata().is_empty() {
-            let (registration, errors_report) =
-                match parse_registrations_from_metadata(&tx.metadata(), network) {
-                    Ok(registration) => registration,
-                    Err(_err) => {
-                        // fatal error parsing registration tx, unable to extract meaningful
-                        // errors assume corrupted tx
-                        return Ok(());
-                    },
-                };
-
-            // cddl verification
-            if let Some(cip36) = registration.clone().raw_cbor_cip36 {
-                match validate_reg_cddl(&cip36, &cddl) {
-                    Ok(()) => (),
-                    Err(_err) => {
-                        // did not pass cddl verification, not a valid registration
-                        return Ok(());
-                    },
-                };
+        let Some(cip36) = Cip36Metadata::generate_from_tx_metadata(&tx.metadata(), network) else {
+            return Ok(());
+        };
+        let tx_hash = tx.hash().to_vec();
+        let (stake_credential, voting_info, rewards_address, nonce) =
+            if let Some(reg) = cip36.registration {
+                (
+                    Some(reg.stake_key.get_credentials().to_vec()),
+                    Some(reg.voting_info),
+                    Some(reg.rewards_address.0),
+                    Some(reg.nonce.0),
+                )
             } else {
-                // registration does not contain cip36 61284 or 61285 keys
-                // not a valid registration tx
-                return Ok(());
-            }
-
-            let nonce = if let Some(nonce) = registration.nonce {
-                Some(nonce.0.try_into()?)
-            } else {
-                None
+                (None, None, None, None)
             };
-            self.insert_voter_registration(
-                tx.hash().to_vec(),
-                registration
-                    .stake_key
-                    .map(|val| val.get_credentials().to_vec()),
-                registration.voting_key,
-                registration.rewards_address.map(|val| val.0),
-                registration.raw_cbor_cip36,
-                nonce,
-                errors_report,
-            )
-            .await?;
-        }
+
+        self.insert_voter_registration(
+            tx_hash,
+            stake_credential,
+            voting_info,
+            rewards_address,
+            cip36.raw_metadata,
+            nonce,
+            cip36.errors_report,
+        )
+        .await?;
 
         Ok(())
     }

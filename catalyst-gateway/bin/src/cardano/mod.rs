@@ -14,25 +14,31 @@ use tracing::{debug, error, info};
 use crate::{
     cardano::util::valid_era,
     event_db::{
-        cardano::{config::FollowerConfig, follower::MachineId},
+        cardano::{chain_state::MachineId, config::FollowerConfig},
         error::NotFoundError,
         EventDB,
     },
 };
 
-pub(crate) mod registration;
+pub(crate) mod cip36_registration;
 pub(crate) mod util;
 
 /// Returns a follower configs, waits until they present inside the db
-async fn get_follower_config(check_config_tick: u64, db: Arc<EventDB>) -> Vec<FollowerConfig> {
+async fn get_follower_config(
+    check_config_tick: u64, db: Arc<EventDB>,
+) -> anyhow::Result<Vec<FollowerConfig>> {
     let mut interval = time::interval(time::Duration::from_secs(check_config_tick));
     loop {
         // tick until config exists
         interval.tick().await;
 
         match db.get_follower_config().await {
-            Ok(config) => break config,
-            Err(err) => error!("No follower config found, error: {err}"),
+            Ok(configs) => break Ok(configs),
+            Err(err) if err.is::<NotFoundError>() => {
+                error!("No follower config found");
+                continue;
+            },
+            Err(err) => break Err(err),
         }
     }
 }
@@ -41,7 +47,7 @@ async fn get_follower_config(check_config_tick: u64, db: Arc<EventDB>) -> Vec<Fo
 pub(crate) async fn start_followers(
     db: Arc<EventDB>, check_config_tick: u64, data_refresh_tick: u64, machine_id: String,
 ) -> anyhow::Result<()> {
-    let mut current_config = get_follower_config(check_config_tick, db.clone()).await;
+    let mut current_config = get_follower_config(check_config_tick, db.clone()).await?;
     loop {
         // spawn followers and obtain thread handlers for control and future cancellation
         let follower_tasks = spawn_followers(
@@ -54,7 +60,7 @@ pub(crate) async fn start_followers(
 
         // Followers should continue indexing until config has changed
         current_config = loop {
-            let new_config = get_follower_config(check_config_tick, db.clone()).await;
+            let new_config = get_follower_config(check_config_tick, db.clone()).await?;
             if new_config != current_config {
                 info!("Config has changed! restarting");
                 break new_config;
