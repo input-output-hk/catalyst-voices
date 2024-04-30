@@ -77,16 +77,19 @@ impl EventDB {
             && errors_report.is_empty();
 
         let _rows = conn
-            .query(INSERT_VOTER_REGISTRATION_SQL, &[
-                &tx_id,
-                &stake_credential,
-                &encoded_voting_info,
-                &payment_address,
-                &nonce,
-                &metadata_cip36,
-                &json!(&errors_report),
-                &is_valid,
-            ])
+            .query(
+                INSERT_VOTER_REGISTRATION_SQL,
+                &[
+                    &tx_id,
+                    &stake_credential,
+                    &encoded_voting_info,
+                    &payment_address,
+                    &nonce,
+                    &metadata_cip36,
+                    &json!(&errors_report),
+                    &is_valid,
+                ],
+            )
             .await?;
 
         Ok(())
@@ -99,6 +102,7 @@ impl EventDB {
         let Some(cip36) = Cip36Metadata::generate_from_tx_metadata(&tx.metadata(), network) else {
             return Ok(());
         };
+
         let tx_hash = tx.hash().to_vec();
         let (stake_credential, voting_info, rewards_address, nonce) =
             if let Some(reg) = cip36.registration {
@@ -133,11 +137,10 @@ impl EventDB {
         let conn = self.pool.get().await?;
 
         let rows = conn
-            .query(SELECT_VOTER_REGISTRATION_SQL, &[
-                &stake_credential,
-                &network.to_string(),
-                &slot_num,
-            ])
+            .query(
+                SELECT_VOTER_REGISTRATION_SQL,
+                &[&stake_credential, &network.to_string(), &slot_num],
+            )
             .await?;
 
         let row = rows.first().ok_or(NotFoundError)?;
