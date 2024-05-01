@@ -106,7 +106,7 @@ async fn spawn_follower(
     // where it left off. If there was no previous follower, start indexing from
     // genesis point.
     let start_from = match db.last_updated_state(network).await {
-        Ok((slot_no, block_hash, _)) => Point::new(slot_no.try_into()?, block_hash),
+        Ok((slot_no, block_hash, _)) => Point::new(slot_no.try_into().unwrap(), block_hash),
         Err(err) if err.is::<NotFoundError>() => Point::Origin,
         Err(err) => return Err(err),
     };
