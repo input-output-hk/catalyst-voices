@@ -48,7 +48,6 @@ poem-openapi = { workspace = true, features = [
     "url",
     "chrono",
 ] }
-poem-extensions = { workspace = true }
 prometheus = { workspace = true }
 cryptoxide = { workspace = true }
 uuid = { workspace = true, features = ["v4", "serde"] }

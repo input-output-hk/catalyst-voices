@@ -23,7 +23,6 @@ serde = "1.0"
 serde_json = "1.0"
 poem = { git = "https://github.com/input-output-hk/catalyst-poem.git", rev = "0c28d4351e9a7a1081f85ad62cc7bcb8986ba4dc" }
 poem-openapi = { git = "https://github.com/input-output-hk/catalyst-poem.git", rev = "0c28d4351e9a7a1081f85ad62cc7bcb8986ba4dc" }
-poem-extensions = "0.8.0"
 prometheus = "0.13.0"
 cryptoxide = "0.4.4"
 uuid = "1"
