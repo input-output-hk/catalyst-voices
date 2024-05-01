@@ -294,7 +294,6 @@ async fn mk_request_span(req: &Request) -> (Span, String, String, String) {
     (span, uri_path, method, client_id)
 }
 
-#[poem::async_trait]
 impl<E: Endpoint> Endpoint for TracingEndpoint<E> {
     type Output = Response;
 

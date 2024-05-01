@@ -1,7 +1,6 @@
 //! Implementation of the GET `/date_time_to_slot_number` endpoint
 
-use poem_extensions::{response, UniResponse::T200};
-use poem_openapi::payload::Json;
+use poem_openapi::{payload::Json, ApiResponse};
 
 use crate::{
     event_db::{
@@ -9,26 +8,33 @@ use crate::{
         error::NotFoundError,
     },
     service::common::{
-        objects::cardano::{
-            network::Network,
-            slot_info::{Slot, SlotInfo},
+        objects::{
+            cardano::{
+                network::Network,
+                slot_info::{Slot, SlotInfo},
+            },
+            server_error::ServerError,
         },
-        responses::{
-            resp_2xx::OK,
-            resp_4xx::ApiValidationError,
-            resp_5xx::{handle_5xx_response, ServerError, ServiceUnavailable},
-        },
+        responses::handle_5xx_response,
     },
     state::State,
 };
 
-/// # All Responses
-pub(crate) type AllResponses = response! {
-    200: OK<Json<SlotInfo>>,
-    400: ApiValidationError,
-    500: ServerError,
-    503: ServiceUnavailable,
-};
+/// All Responses
+#[derive(ApiResponse)]
+pub(crate) enum AllResponses {
+    /// Returns the slot info.
+    #[oai(status = 200)]
+    Ok(Json<SlotInfo>),
+    /// Internal Server Error.
+    ///
+    /// *The contents of this response should be reported to the projects issue tracker.*
+    #[oai(status = 500)]
+    ServerError(Json<ServerError>),
+    /// Service is not ready, do not send other requests.
+    #[oai(status = 503)]
+    ServiceUnavailable,
+}
 
 /// # GET `/date_time_to_slot_number`
 #[allow(clippy::unused_async)]
@@ -82,9 +88,9 @@ pub(crate) async fn endpoint(
         Err(err) => return handle_5xx_response!(err),
     };
 
-    T200(OK(Json(SlotInfo {
+    AllResponses::Ok(Json(SlotInfo {
         previous,
         current,
         next,
-    })))
+    }))
 }
