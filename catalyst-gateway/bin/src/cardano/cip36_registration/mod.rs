@@ -110,7 +110,7 @@ impl Cip36Metadata {
         let mut registration = None;
         let mut raw_metadata = None;
         let mut signature = None;
-        let mut raw_61284 = None;
+        //let mut raw_61284 = None;
         let mut errors_report = Vec::new();
 
         if let pallas::ledger::traverse::MultiEraMeta::AlonzoCompatible(tx_metadata) = tx_metadata {
@@ -137,7 +137,7 @@ impl Cip36Metadata {
                                 },
                                 Some,
                             );
-                        raw_61284 = Some(metadata.encode_fragment().ok()?);
+                        //raw_61284 = Some(metadata.encode_fragment().ok()?);
                     },
                     CIP36_WITNESS_CBOR_KEY => {
                         signature = inspect_witness_from_metadata(metadata).map_or_else(
@@ -153,11 +153,11 @@ impl Cip36Metadata {
             }
         };
 
-        if let Some(raw_61284) = raw_61284 {
+        /*if let Some(raw_61284) = raw_61284 {
             let _ = validate_signature(&raw_61284, &registration, &signature).map_err(|err| {
                 errors_report.push(format!("{err}"));
             });
-        }
+        }*/
 
         Some(Self {
             registration: registration.clone(),
@@ -172,6 +172,7 @@ impl Cip36Metadata {
 ///  - CBOR encoding the registration
 ///  - blake2b-256 hashing those bytes
 ///  - signing the hash with the private key used to generate the stake key
+#[allow(dead_code)]
 pub fn validate_signature(
     raw_61284: &[u8], registration: &Option<Registration>, signature: &Option<Signature>,
 ) -> anyhow::Result<()> {
