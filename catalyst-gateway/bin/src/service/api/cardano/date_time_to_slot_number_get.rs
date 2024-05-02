@@ -8,33 +8,25 @@ use crate::{
         error::NotFoundError,
     },
     service::common::{
-        objects::{
-            cardano::{
-                network::Network,
-                slot_info::{Slot, SlotInfo},
-            },
-            server_error::ServerError,
+        objects::cardano::{
+            network::Network,
+            slot_info::{Slot, SlotInfo},
         },
-        responses::handle_5xx_response,
+        responses::WithErrorResponses,
     },
     state::State,
 };
 
-/// All Responses
+/// Endpoint responses.
 #[derive(ApiResponse)]
-pub(crate) enum AllResponses {
+pub(crate) enum Responses {
     /// Returns the slot info.
     #[oai(status = 200)]
     Ok(Json<SlotInfo>),
-    /// Internal Server Error.
-    ///
-    /// *The contents of this response should be reported to the projects issue tracker.*
-    #[oai(status = 500)]
-    ServerError(Json<ServerError>),
-    /// Service is not ready, do not send other requests.
-    #[oai(status = 503)]
-    ServiceUnavailable,
 }
+
+/// All responses.
+pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # GET `/date_time_to_slot_number`
 #[allow(clippy::unused_async)]
@@ -77,20 +69,21 @@ pub(crate) async fn endpoint(
 
     let current = match process_slot_info_result(current) {
         Ok(current) => current,
-        Err(err) => return handle_5xx_response!(err),
+        Err(err) => return AllResponses::handle_5xx_response(&err),
     };
     let previous = match process_slot_info_result(previous) {
         Ok(current) => current,
-        Err(err) => return handle_5xx_response!(err),
+        Err(err) => return AllResponses::handle_5xx_response(&err),
     };
     let next = match process_slot_info_result(next) {
         Ok(current) => current,
-        Err(err) => return handle_5xx_response!(err),
+        Err(err) => return AllResponses::handle_5xx_response(&err),
     };
 
-    AllResponses::Ok(Json(SlotInfo {
+    Responses::Ok(Json(SlotInfo {
         previous,
         current,
         next,
     }))
+    .into()
 }

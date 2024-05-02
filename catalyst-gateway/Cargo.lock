@@ -765,12 +765,12 @@ checksum = "6245d59a3e82a7fc217c5828a6692dbc6dfb63a0c8c90495621f7b9d79704a0e"
 
 [[package]]
 name = "cookie"
-version = "0.18.0"
+version = "0.18.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3cd91cf61412820176e137621345ee43b3f4423e589e7ae4e50d601d93e35ef8"
+checksum = "4ddef33a339a91ea89fb53151bd0a4689cfce27055c291dfa69945475d22c747"
 dependencies = [
  "aes-gcm",
- "base64 0.21.7",
+ "base64 0.22.0",
  "hkdf",
  "hmac",
  "percent-encoding",
@@ -2372,7 +2372,8 @@ checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
 [[package]]
 name = "poem"
 version = "3.0.0"
-source = "git+https://github.com/input-output-hk/catalyst-poem.git?rev=0c28d4351e9a7a1081f85ad62cc7bcb8986ba4dc#0c28d4351e9a7a1081f85ad62cc7bcb8986ba4dc"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8b735eaaaa6bc7ed2dcbcab1d5373afe1f6d03a37d8695ba3c42101f733a8455"
 dependencies = [
  "async-compression",
  "bytes",
@@ -2419,7 +2420,8 @@ dependencies = [
 [[package]]
 name = "poem-derive"
 version = "3.0.0"
-source = "git+https://github.com/input-output-hk/catalyst-poem.git?rev=0c28d4351e9a7a1081f85ad62cc7bcb8986ba4dc#0c28d4351e9a7a1081f85ad62cc7bcb8986ba4dc"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c2b961d58a6c53380c20236394381d9292fda03577f902b158f1638932964dcf"
 dependencies = [
  "proc-macro-crate",
  "proc-macro2",
@@ -2430,7 +2432,8 @@ dependencies = [
 [[package]]
 name = "poem-openapi"
 version = "5.0.0"
-source = "git+https://github.com/input-output-hk/catalyst-poem.git?rev=0c28d4351e9a7a1081f85ad62cc7bcb8986ba4dc#0c28d4351e9a7a1081f85ad62cc7bcb8986ba4dc"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "24375f20342eeffd8e5e4f55483ebcda2f3fcc301a2926b61edc761842528d06"
 dependencies = [
  "base64 0.22.0",
  "bytes",
@@ -2458,7 +2461,8 @@ dependencies = [
 [[package]]
 name = "poem-openapi-derive"
 version = "5.0.0"
-source = "git+https://github.com/input-output-hk/catalyst-poem.git?rev=0c28d4351e9a7a1081f85ad62cc7bcb8986ba4dc#0c28d4351e9a7a1081f85ad62cc7bcb8986ba4dc"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d7c57d06358cf40434bb0e2f92c1ef578288e9ab8821d1d471a967efa74017b6"
 dependencies = [
  "darling",
  "http 1.1.0",

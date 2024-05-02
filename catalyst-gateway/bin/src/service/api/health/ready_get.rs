@@ -3,29 +3,24 @@
 use std::sync::Arc;
 
 use poem::web::Data;
-use poem_openapi::{payload::Json, ApiResponse};
+use poem_openapi::ApiResponse;
 
 use crate::{
     event_db::schema_check::MismatchedSchemaError,
-    service::common::{objects::server_error::ServerError, responses::handle_5xx_response},
+    service::common::responses::{ErrorResponses, WithErrorResponses},
     state::State,
 };
 
-/// All responses
+/// Endpoint responses.
 #[derive(ApiResponse)]
-pub(crate) enum AllResponses {
+pub(crate) enum Responses {
     /// Service is Started and can serve requests.
     #[oai(status = 204)]
     NoContent,
-    /// Internal Server Error.
-    ///
-    /// *The contents of this response should be reported to the projects issue tracker.*
-    #[oai(status = 500)]
-    ServerError(Json<ServerError>),
-    /// Service is not ready, do not send other requests.
-    #[oai(status = 503)]
-    ServiceUnavailable,
 }
+
+/// All responses.
+pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # GET /health/ready
 ///
@@ -48,12 +43,12 @@ pub(crate) async fn endpoint(state: Data<&Arc<State>>) -> AllResponses {
     match state.event_db().schema_version_check().await {
         Ok(_) => {
             tracing::debug!("DB schema version status ok");
-            AllResponses::NoContent
+            Responses::NoContent.into()
         },
         Err(err) if err.is::<MismatchedSchemaError>() => {
             tracing::error!("{err}");
-            AllResponses::ServiceUnavailable
+            AllResponses::Error(ErrorResponses::ServiceUnavailable)
         },
-        Err(err) => handle_5xx_response!(err),
+        Err(err) => AllResponses::handle_5xx_response(&err),
     }
 }

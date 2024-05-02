@@ -6,39 +6,29 @@ use crate::{
     event_db::{cardano::chain_state::SlotNumber, error::NotFoundError},
     service::{
         common::{
-            objects::{
-                cardano::{network::Network, stake_address::StakeAddress, stake_info::StakeInfo},
-                server_error::ServerError,
-                validation_error::ValidationError,
+            objects::cardano::{
+                network::Network, stake_address::StakeAddress, stake_info::StakeInfo,
             },
-            responses::handle_5xx_response,
+            responses::WithErrorResponses,
         },
         utilities::check_network,
     },
     state::State,
 };
 
-/// All Responses
+/// Endpoint responses.
 #[derive(ApiResponse)]
-pub(crate) enum AllResponses {
+pub(crate) enum Responses {
     /// Returns the staked ada amount.
     #[oai(status = 200)]
     Ok(Json<StakeInfo>),
-    /// Content validation error.
-    #[oai(status = 400)]
-    ValidationError(Json<ValidationError>),
-    /// Content not found.
+    /// Nothing found for the provided stake address and provided slot number.
     #[oai(status = 404)]
     NotFound,
-    /// Internal Server Error.
-    ///
-    /// *The contents of this response should be reported to the projects issue tracker.*
-    #[oai(status = 500)]
-    ServerError(Json<ServerError>),
-    /// Service is not ready, do not send other requests.
-    #[oai(status = 503)]
-    ServiceUnavailable,
 }
+
+/// All responses.
+pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # GET `/staked_ada`
 pub(crate) async fn endpoint(
@@ -52,7 +42,7 @@ pub(crate) async fn endpoint(
 
     let network = match check_network(stake_address.network(), provided_network) {
         Ok(network) => network,
-        Err(err) => return AllResponses::ValidationError(Json(err)),
+        Err(err) => return err.into(),
     };
 
     // get the total utxo amount from the database
@@ -61,26 +51,13 @@ pub(crate) async fn endpoint(
         .await
     {
         Ok((amount, slot_number)) => {
-            AllResponses::Ok(Json(StakeInfo {
+            Responses::Ok(Json(StakeInfo {
                 amount,
                 slot_number,
             }))
+            .into()
         },
-        Err(err) if err.is::<NotFoundError>() => AllResponses::NotFound,
-        Err(err) => handle_5xx_response!(err),
+        Err(err) if err.is::<NotFoundError>() => Responses::NotFound.into(),
+        Err(err) => AllResponses::handle_5xx_response(&err),
     }
-}
-
-#[test]
-fn test() {
-    use poem::IntoResponse;
-    let meta = AllResponses::meta();
-    println!("meta: {meta:?}",);
-    let resp = AllResponses::ValidationError(Json(ValidationError {
-        message: "some".to_string(),
-    }))
-    .into_response();
-    println!("resp: {resp:?}");
-    let resp = "some".to_string().into_response();
-    println!("resp: {resp:?}");
 }

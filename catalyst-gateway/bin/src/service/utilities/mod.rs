@@ -22,9 +22,13 @@ pub(crate) fn check_network(
         PallasNetwork::Mainnet => {
             if let Some(network) = provided_network {
                 if !matches!(&network, Network::Mainnet) {
-                    return Err(ValidationError{message: format!(
-                                "Provided network type {} does not match stake address network type Mainnet",  network.to_json_string()
-                            )});
+                    return Err(
+                        ValidationError::new(
+                            format!(
+                                "Provided network type {} does not match stake address network type Mainnet",
+                                network.to_json_string()
+                            )
+                        ));
                 }
             }
             Ok(Network::Mainnet)
@@ -39,19 +43,18 @@ pub(crate) fn check_network(
                     network,
                     Network::Testnet | Network::Preprod | Network::Preview
                 ) {
-                    return Err(ValidationError{ message:format!(
-                                "Provided network type {} does not match stake address network type Testnet", network.to_json_string()
-                            )});
+                    return Err(ValidationError::new(
+                        format!(
+                            "Provided network type {} does not match stake address network type Testnet",
+                            network.to_json_string()
+                        )
+                    ));
                 }
                 Ok(network)
             } else {
                 Ok(Network::Testnet)
             }
         },
-        PallasNetwork::Other(x) => {
-            Err(ValidationError {
-                message: format!("Unknown network type {x}"),
-            })
-        },
+        PallasNetwork::Other(x) => Err(ValidationError::new(format!("Unknown network type {x}"))),
     }
 }

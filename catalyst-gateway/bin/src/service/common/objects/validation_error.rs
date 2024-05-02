@@ -8,5 +8,12 @@ use poem_openapi::Object;
 pub(crate) struct ValidationError {
     /// Error message
     #[oai(validator(max_length = "100"))]
-    pub(crate) message: String,
+    message: String,
+}
+
+impl ValidationError {
+    /// Create a new `ValidationError`
+    pub(crate) fn new(message: String) -> Self {
+        Self { message }
+    }
 }

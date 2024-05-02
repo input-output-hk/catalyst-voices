@@ -2,13 +2,18 @@
 
 use poem_openapi::ApiResponse;
 
-/// All responses
+use crate::service::common::responses::WithErrorResponses;
+
+/// Endpoint responses.
 #[derive(ApiResponse)]
-pub(crate) enum AllResponses {
+pub(crate) enum Responses {
     /// Service is Started and can serve requests.
     #[oai(status = 204)]
     NoContent,
 }
+
+/// All responses.
+pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # GET /health/live
 ///
@@ -21,5 +26,5 @@ pub(crate) enum AllResponses {
 /// by an endpoint in a short window.
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint() -> AllResponses {
-    AllResponses::NoContent
+    Responses::NoContent.into()
 }
