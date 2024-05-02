@@ -7,7 +7,7 @@ use poem_openapi::Object;
 #[derive(Object)]
 pub(crate) struct ValidationError {
     /// Error message
-    #[oai(validator(max_length = "100"))]
+    #[oai(validator(max_length = "1000"))]
     message: String,
 }
 

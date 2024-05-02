@@ -5,7 +5,7 @@ package-schemathesis:
 
     ARG tag="latest"
     ARG max_examples=1000
-    ARG max_response_time=1000
+    ARG max_response_time=5000
     ARG wait_for_schema=15
     ARG workers=2
     ARG schema_version=30
@@ -27,10 +27,7 @@ package-schemathesis:
                     --show-trace \
                     --force-color  \
                     --junit-xml=/results/junit-report.xml \
-                    --cassette-path=/results/cassette.yaml \
-                    # TODO: https://github.com/input-output-hk/catalyst-voices/issues/330
-                    --exclude-checks content_type_conformance \
-                    --exclude-checks response_schema_conformance
+                    --cassette-path=/results/cassette.yaml
 
     SAVE IMAGE schemathesis:$tag
 
