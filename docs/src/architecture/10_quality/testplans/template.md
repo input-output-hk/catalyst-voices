@@ -1,20 +1,24 @@
-<!-- Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlinks_s -->
+<!--
+     Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlinks_s
+               https://testing.googleblog.com/2016/06/the-inquiry-method-for-test-planning.html
+               https://testing.googleblog.com/2011/09/10-minute-test-plan.html
+-->
 
-# [Test Plan for <insert test plan name>](https://github.com/input-output-hk/catalyst-voices/issues/1)
+# [Test Plan <insert test plan name and link to the github testplan issue>](https://github.com/input-output-hk/catalyst-voices/issues/1)
 
 - [INFORMATIONS](#informations)
   - [STAKEHOLDERS](#stakeholders)
   - [ABSTRACT](#abstract)
-  - [UNIT TEST SECTION](#unit-test-section)
+- [UNIT TESTS](#unit-test)
   - [UNIT TEST STRATEGY](#unit-test-strategy)
   - [UNIT TEST CASES](#unit-test-cases)
-- [REGRESSION TEST SECTION](#regression-test-section)
+- [REGRESSION TESTS](#regression-test-section)
   - [REGRESSION TEST STRATEGY](#regression-test-strategy)
   - [REGRESSION TEST CASES](#regression-test-cases)
-- [INTEGRATION TEST SECTION](#integration-test-section)
+- [INTEGRATION TESTS](#integration-test-section)
   - [INTEGRATION TEST STRATEGY](#integration-test-strategy)
   - [INTEGRATION TEST CASES](#integration-test-cases)
-- [USER ACCEPTANCE TEST SECTION](#user-acceptance-test-section)
+- [USER ACCEPTANCE TESTS](#user-acceptance-test-section)
   - [USER ACCEPTANCE TEST STRATEGY](#user-acceptance-test-strategy)
   - [USER ACCEPTANCE TEST CASES](#user-acceptance-test-cases)
 
@@ -23,7 +27,7 @@
 
 ### STAKEHOLDERS
 
-<Relevant parties that need to review and approve the test plan>
+<Insert the relevant parties that need to review and approve the test plan>
 
 | Role/Name   | Contact        | Approval |
 |-------------|----------------|----------------|
@@ -36,23 +40,27 @@
 
 ### ABSTRACT
 
-<Description of the feature or release to test>
+<Description of the feature, features or release to test>
 
 ### REQUIREMENTS
 
 <Business requirements, possibly insert links to relevant Github or JIRA tickets >
 
-RISK
-TOOLS
-Coverage
-Process
+### RISKS
+### TOOLS
+### COVERAGE
+### PROCESS
 
-1. Attributes the adverbs and adjectives that describe the high level concepts testing is meant to ensure. Attributes such as fast, usable, secure, accessible and so forth.
-2. Components the nouns that define the major code chunks that comprise the product. These are classes, module names and features of the application.
-3. Capabilities the verbs that describe user actions and activities.
+### ATTRIBUTES
+````diff
++ the adverbs and adjectives that describe the high level concepts testing is meant to ensure. Attributes such as fast, usable, secure, accessible and so forth.
 
+### COMPONENTS
+the nouns that define the major code chunks that comprise the product. These are classes, module names and features of the application.
+### CAPABILITIES
+the verbs that describe user actions and activities.
 
-## UNIT TEST SECTION
+## UNIT TESTS
 
 ### UNIT TEST STRATEGY
 
@@ -64,7 +72,7 @@ Process
 | --- | --------- | ----- | ---------------- | ----------------- |
 | 1   |           |       |                  |                   |
 
-## REGRESSION TEST SECTION
+## REGRESSION TESTS
 
 <Ensure that previously developed and tested software still performs after change.>
 
@@ -78,7 +86,7 @@ Process
 | --- | --------- | ----- | ---------------- | -------- |
 | 1   |           |       |                  |          |
 
-## INTEGRATION TEST SECTION
+## INTEGRATION TEST
 
 Combine individual software modules and test as a group.
 
@@ -92,7 +100,7 @@ Evaluate all integrations with locally developed shared libraries, with consumed
 | --- | --------- | ----- | ---------------- | ----------------- |
 | 1   |           |       |                  |                   |
 
-## USER ACCEPTANCE TEST SECTION
+## USER ACCEPTANCE TEST
 
 Verify that the solution works for the user
 
