@@ -31,7 +31,7 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 <Describe the design and architecture of the system in a way that highlights possible points of failure>
 
 ### Stakeholders
-<Insert the relevant stakeholders that needs to understand, review and approve the test plan>
+<Insert the relevant stakeholders that needs to understand review and approve the test plan>
 
 | Role/Name   | Contact        | Approval |
 |-------------|----------------|----------------|
