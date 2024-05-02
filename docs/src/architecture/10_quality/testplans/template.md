@@ -6,7 +6,7 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 
 <This is meant to be only a guideline, the paragraphs can be removed or added as they fit>
 
-# [Test Plan <--insert test plan name and link to the github testplan issue-->](https://github.com/input-output-hk/catalyst-voices/issues/1)
+# [Test Plan <insert test plan name and link to the github testplan issue>](https://github.com/input-output-hk/catalyst-voices/issues/1)
 
 - [GENERAL INFORMATIONS](#general-informations)
   - [STAKEHOLDERS](#stakeholders)
@@ -27,8 +27,10 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 
 ## General Informations
 
-### Stakeholders
+### Abstract
+<Describe the design and architecture of the system in a way that highlights possible points of failure>
 
+### Stakeholders
 <Insert the relevant stakeholders that needs to understand, review and approve the test plan>
 
 | Role/Name   | Contact        | Approval |
@@ -39,14 +41,15 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 | *SRE* |  |  |
 | *Testers* |  |  |
 
-### Abstract
-<Briefly describe the features or release to test, describe the design and architecture of the system in a way that highlights possible points of failure.>
 
 ### Requirements
 <Business requirements, insert links to relevant Github or JIRA tickets, list what platforms are supported, what will not be tested etc>
 
 ### Tools
 <Describe what tools will be needed for the testing, if new tools are needed to be developed>
+
+## ACC framework
+<Use the [ACC framework](https://testing.googleblog.com/2011/09/10-minute-test-plan.html) to help you define the testcases>
 
 ### Attributes
 <The adverbs and adjectives that describe the high level concepts testing is meant to ensure. Attributes such as fast, usable, secure, accessible and so forth. The quality metrics document in this repo should and can be used as a guideline>
@@ -65,9 +68,9 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 
 ### UNIT TEST CASES
 
-| \#  | OBJECTIVE | INPUT | EXPECTED RESULTS | AUTOMATED |
-| --- | --------- | ----- | ---------------- | --------- |
-| 1   |           |       |                  |           |
+| \#  | OBJECTIVE | INPUT | EXPECTED RESULTS | TO BE AUTOMATED |
+| --- | --------- | ----- | ---------------- | --------------- |
+| 1   |           |       |                  |                 |
 
 ## REGRESSION TESTS
 
@@ -79,9 +82,9 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 
 ### REGRESSION TEST CASES
 
-| #   | OBJECTIVE | INPUT | EXPECTED RESULTS | OBSERVED |
-| --- | --------- | ----- | ---------------- | -------- |
-| 1   |           |       |                  |          |
+| \#  | OBJECTIVE | INPUT | EXPECTED RESULTS | TO BE AUTOMATED |
+| --- | --------- | ----- | ---------------- | --------------- |
+| 1   |           |       |                  |                 |
 
 ## INTEGRATION TEST
 
@@ -93,20 +96,20 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 
 ### INTEGRATION TEST CASES
 
-| #   | OBJECTIVE | INPUT | EXPECTED RESULTS | TEST DELIVERABLES |
-| --- | --------- | ----- | ---------------- | ----------------- |
-| 1   |           |       |                  |                   |
+| \#  | OBJECTIVE | INPUT | EXPECTED RESULTS | TO BE AUTOMATED |
+| --- | --------- | ----- | ---------------- | --------------- |
+| 1   |           |       |                  |                 |
 
-## End-to-end testing
+## End-to-end test
 
 <Verify that the solution works for the user>
 
-### USER ACCEPTANCE TEST STRATEGY
+### End-to-end test strategy
 
 <Explain how user acceptance testing will be accomplished>
 
-### USER ACCEPTANCE TEST CASES
+### ## End-to-end test cases
 
-| #   | TEST ITEM | EXPECTED RESULTS | ACTUAL RESULTS | DATE |
-| --- | --------- | ---------------- | -------------- | ---- |
-| 1   |           |                  |                |      |
+| \#  | OBJECTIVE | INPUT | EXPECTED RESULTS | TO BE AUTOMATED |
+| --- | --------- | ----- | ---------------- | --------------- |
+| 1   |           |       |                  |                 |
