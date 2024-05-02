@@ -1,7 +1,7 @@
 <!--
-     Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlinks_s
-               https://testing.googleblog.com/2016/06/the-inquiry-method-for-test-planning.html
-               https://testing.googleblog.com/2011/09/10-minute-test-plan.html
+Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlinks_s
+          https://testing.googleblog.com/2016/06/the-inquiry-method-for-test-planning.html
+          https://testing.googleblog.com/2011/09/10-minute-test-plan.html
 -->
 
 # [Test Plan <insert test plan name and link to the github testplan issue>](https://github.com/input-output-hk/catalyst-voices/issues/1)
