@@ -1,13 +1,9 @@
 name: Test Case
 description: Create a test case
-title: "[Test Case]: "
+title: "[Test Case]: <title>"
 labels: ["testcase"]
+projects: ["/input-output-hk/102"]
 body:
-  - type: markdown
-    attributes:
-      value: |
-        Thanks for taking the time to fill out this bug report!
-
   - type: textarea
     attributes:
       label: Objective
@@ -36,11 +32,23 @@ body:
     attributes:
       label: Instructions
       description: A concise description of what you expected to happen.
+      placeholder: |
+        ### <list 1 name>
+
+        - [ ] #1
+        - [ ] #2
+        - [ ] issue description when not yet created.
+
+        ### <list 2 name>
+
+        - [ ] #3
+        - [ ] #4
+        - [ ] issue description when not yet created.
     validations:
       required: false
   - type: textarea
     attributes:
-      label: Anything else?
+      label: Notes
       description: |
         Links? References? Anything that will give us more context about the issue you are encountering!
 
