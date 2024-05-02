@@ -6,23 +6,33 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 
 *This is meant to be only a guideline, the paragraphs can be removed or added as they fit*
 
-# [Test Plan Template *insert test plan name and link to the github testplan issue*](https://github.com/input-output-hk/catalyst-voices/issues/1)
+# [Test Plan Template](https://github.com/input-output-hk/catalyst-voices/issues/1)
+*insert test plan name and link to the github testplan issue*
 
-- [GENERAL INFORMATIONS](#general-informations)
-  - [STAKEHOLDERS](#stakeholders)
-  - [ABSTRACT](#abstract)
-- [UNIT TESTS](#unit-test)
-  - [UNIT TEST STRATEGY](#unit-test-strategy)
-  - [UNIT TEST CASES](#unit-test-cases)
-- [REGRESSION TESTS](#regression-test-section)
-  - [REGRESSION TEST STRATEGY](#regression-test-strategy)
-  - [REGRESSION TEST CASES](#regression-test-cases)
-- [INTEGRATION TESTS](#integration-test-section)
-  - [INTEGRATION TEST STRATEGY](#integration-test-strategy)
-  - [INTEGRATION TEST CASES](#integration-test-cases)
-- [USER ACCEPTANCE TESTS](#user-acceptance-test-section)
-  - [USER ACCEPTANCE TEST STRATEGY](#user-acceptance-test-strategy)
-  - [USER ACCEPTANCE TEST CASES](#user-acceptance-test-cases)
+- [General informations](#general-informations)
+  - [Abstract](#abstract)
+  - [Stakeholders](#stakeholders)
+  - [Requirements](#requirements)
+  - [Tools](#tools)
+- [ACC framework](#acc-framework)
+  - [Attributes](#attributes)
+  - [Components](#components)
+  - [Capabilities](#capabilities)
+- [Unit tests](#unit-tests)
+  - [Unit test strategy](#unit-test-strategy)
+  - [Unit test cases](#unit-test-cases)
+- [Feature tests](#feature-tests)
+  - [Feature test strategy](#feature-tests-strategy)
+  - [Feature test cases](#feature-test-cases)
+- [Regression tests](#regression-tests)
+  - [Regression test strategy](#regression-tests-strategy)
+  - [Regression test cases](#regression-test-cases)
+- [Integration tests](#integration-tests)
+  - [Integration test strategy](#integration-tests-strategy)
+  - [Integration test cases](#integration-test-cases)
+- [End-to-end tests](#end-to-end-tests)
+  - [End-to-end test strategy](#end-to-end-tests-strategy)
+  - [End-to-end test cases](#end-to-end-test-cases)
 
 
 ## General Informations
@@ -72,43 +82,43 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 | --- | --------- | ----- | ---------------- | --------------- |
 | 1   |           |       |                  |                 |
 
-## REGRESSION TESTS
+## Regression tests
 
 *Ensure that previously developed and tested software still performs after change.*
 
-### REGRESSION TEST STRATEGY
+### Regression tests strategy
 
 *Evaluate all reports introduced in previous releases*
 
-### REGRESSION TEST CASES
+### Regression test cases
 
 | \#  | OBJECTIVE | INPUT | EXPECTED RESULTS | TO BE AUTOMATED |
 | --- | --------- | ----- | ---------------- | --------------- |
 | 1   |           |       |                  |                 |
 
-## INTEGRATION TEST
+## Integration tests
 
 *Combine individual software modules and test as a group.*
 
-### INTEGRATION TEST STRATEGY
+### Integration tests strategy
 
 *Evaluate all integrations with locally developed shared libraries, with consumed services, and other touch points.*
 
-### INTEGRATION TEST CASES
+### Integration test cases
 
 | \#  | OBJECTIVE | INPUT | EXPECTED RESULTS | TO BE AUTOMATED |
 | --- | --------- | ----- | ---------------- | --------------- |
 | 1   |           |       |                  |                 |
 
-## End-to-end test
+## End-to-end tests
 
 *Verify that the solution works for the user*
 
-### End-to-end test strategy
+### End-to-end tests strategy
 
-*Explain how user acceptance testing will be accomplished*
+*For end-to-end testing, how will test infrastructure, systems under test, and other dependencies be managed? How will they be deployed? How will persistence be set-up/torn-down? How will you handle required migrations from one datacenter to another?*
 
-### ## End-to-end test cases
+### End-to-end test cases
 
 | \#  | OBJECTIVE | INPUT | EXPECTED RESULTS | TO BE AUTOMATED |
 | --- | --------- | ----- | ---------------- | --------------- |

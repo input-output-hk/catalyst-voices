@@ -37,7 +37,8 @@ body:
       label: Steps
       description: The steps needed to complete the test
       placeholder: |
-        || Step No. || Step description || Expected result ||
+        | \# | Step description          | Expected result                              |
+        | -- | ------------------------- | -------------------------------------------- |
         | 1. | <what a tester should do> | <what a tester should see when they do that> |
         | 2. | <what a tester should do> | <what a tester should see when they do that> |
     validations:
