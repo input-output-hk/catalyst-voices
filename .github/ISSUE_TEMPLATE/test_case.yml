@@ -36,9 +36,8 @@ body:
     attributes:
       label: Steps
       placeholder: |
-      || Step No. || Step description || Expected result ||  
-      | 1. | <what a tester should do> | <what a tester should see when they do that> |
-      | 2. | <what a tester should do> | <what a tester should see when they do that> |
+      || Step No. || Step description || Expected result ||
+      
     validations:
       required: true
 
