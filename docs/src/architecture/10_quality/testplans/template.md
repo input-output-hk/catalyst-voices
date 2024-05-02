@@ -21,9 +21,9 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 - [Unit tests](#unit-tests)
   - [Unit test strategy](#unit-test-strategy)
   - [Unit test cases](#unit-test-cases)
-- [Feature tests](#feature-tests)
-  - [Feature test strategy](#feature-tests-strategy)
-  - [Feature test cases](#feature-test-cases)
+- [Functional tests](#functional-tests)
+  - [Functional test strategy](#functional-tests-strategy)
+  - [Functional test cases](#functional-test-cases)
 - [Regression tests](#regression-tests)
   - [Regression test strategy](#regression-tests-strategy)
   - [Regression test cases](#regression-test-cases)
@@ -77,6 +77,18 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 *Evaluate new features and bug fixes introduced in this release, and the extent of the unit tests*
 
 ### Unit test cases
+
+| \#  | OBJECTIVE | INPUT | EXPECTED RESULTS | TO BE AUTOMATED |
+| --- | --------- | ----- | ---------------- | --------------- |
+| 1   |           |       |                  |                 |
+
+## Functional tests
+
+### Functional tests strategy
+
+*Evaluate new features and bug fixes introduced in this release, and the extent of the unit tests*
+
+### Functional test cases
 
 | \#  | OBJECTIVE | INPUT | EXPECTED RESULTS | TO BE AUTOMATED |
 | --- | --------- | ----- | ---------------- | --------------- |
