@@ -1,14 +1,5 @@
 [
   {
-    "delegations": "0xec3b9b097f8cb6e3937a584cae29c584355c4684ef0b2fffe3733b66473f0720",
-    "rewards_address": "0x0004047d932c83d551083c08959f293ff69c7ed2218f6923ec102cfffdfea0a5ba6e9bf493c239df735d1dcf909fdd4b41067246aecf1e4500",
-    "stake_public_key": "0x7d84a4ac0a98a10f92b8a11e76a5d33e5400a0ea77f0826f789fcb37db6365fb",
-    "voting_power": 1868641388,
-    "voting_purpose": null,
-    "tx_id": 1002935,
-    "nonce": 32363153
-  },
-  {
     "delegations": [
       [
         "0xc606d983c5545800faf20519d21988aa0a13271ba12ba9a8643fcfad58697c97",
