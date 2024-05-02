@@ -30,7 +30,8 @@ deps:
 
 src:
     FROM +deps
-    COPY --dir pubspec.yaml lib packages web test test_driver integration_test .
+    COPY ../+repo-catalyst-voices-all/repo .
+    RUN melos bootstrap
 
 # code-generator - Generates flutter code.
 # Based on Catalyst Gateway OpenAPI specifications generates models, clients
@@ -40,9 +41,7 @@ src:
 code-generator:
     ARG save_locally=false
 
-    FROM +deps
-    COPY --dir pubspec.yaml lib packages web test test_driver integration_test catalyst_voices
-    COPY ../+repo-catalyst-voices-packages/repo .
+    FROM +src
     WORKDIR /frontend/catalyst_voices/packages/catalyst_voices_services
     COPY ../catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
     RUN flutter pub get
@@ -64,35 +63,27 @@ check-flutter-code-generator:
     RUN diff /tmp/repo_generated lib/generated/catalyst_gateway
 
 check-static-analysis:
-    FROM +deps
-    COPY ../+repo-catalyst-voices-all/repo repo/
-    WORKDIR repo
-    RUN melos bootstrap
+    FROM +src
     RUN melos analyze --fatal-infos --fatal-warnings
 
 check-code-formatting:
-    FROM +deps
-    COPY ../+repo-catalyst-voices-all/repo repo/
-    WORKDIR repo
-    RUN melos bootstrap
+    FROM +src
     RUN melos run format-check
 
 # Build web version of Catalyst Voices
 build:
     FROM +src
 
+    WORKDIR /frontend/catalyst_voices
     RUN flutter clean
     RUN flutter pub get
     RUN flutter build web --web-renderer canvaskit --release --target lib/configs/main_web.dart
 
-    WORKDIR /frontend/build
+    WORKDIR /frontend/catalyst_voices/build
     SAVE ARTIFACT web /web AS LOCAL web
 
 test-unit:
-    FROM +deps
-    COPY ../+repo-catalyst-voices-all/repo repo/
-    WORKDIR repo
-    RUN melos bootstrap
+    FROM +src
     RUN melos run test-report
     WAIT
         SAVE ARTIFACT test_reports AS LOCAL test_reports
