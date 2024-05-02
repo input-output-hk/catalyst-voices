@@ -4,9 +4,11 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
           https://testing.googleblog.com/2011/09/10-minute-test-plan.html
 -->
 
-# [Test Plan <insert test plan name and link to the github testplan issue>](https://github.com/input-output-hk/catalyst-voices/issues/1)
+<This is meant to be only a guideline, the paragraphs can be removed or added as they fit>
 
-- [INFORMATIONS](#informations)
+# [Test Plan <--insert test plan name and link to the github testplan issue-->](https://github.com/input-output-hk/catalyst-voices/issues/1)
+
+- [GENERAL INFORMATIONS](#general-informations)
   - [STAKEHOLDERS](#stakeholders)
   - [ABSTRACT](#abstract)
 - [UNIT TESTS](#unit-test)
@@ -23,11 +25,11 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
   - [USER ACCEPTANCE TEST CASES](#user-acceptance-test-cases)
 
 
-## INFORMATIONS
+## General Informations
 
-### STAKEHOLDERS
+### Stakeholders
 
-<Insert the relevant parties that need to review and approve the test plan>
+<Insert the relevant stakeholders that needs to understand, review and approve the test plan>
 
 | Role/Name   | Contact        | Approval |
 |-------------|----------------|----------------|
@@ -37,28 +39,23 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 | *SRE* |  |  |
 | *Testers* |  |  |
 
+### Abstract
+<Briefly describe the features or release to test, describe the design and architecture of the system in a way that highlights possible points of failure.>
 
-### ABSTRACT
+### Requirements
+<Business requirements, insert links to relevant Github or JIRA tickets, list what platforms are supported, what will not be tested etc>
 
-<Description of the feature, features or release to test>
+### Tools
+<Describe what tools will be needed for the testing, if new tools are needed to be developed>
 
-### REQUIREMENTS
+### Attributes
+<The adverbs and adjectives that describe the high level concepts testing is meant to ensure. Attributes such as fast, usable, secure, accessible and so forth. The quality metrics document in this repo should and can be used as a guideline>
 
-<Business requirements, possibly insert links to relevant Github or JIRA tickets >
+### Components
+<The nouns that define the major code chunks that comprise the product. These are classes, module names and features of the application.>
 
-### RISKS
-### TOOLS
-### COVERAGE
-### PROCESS
-
-### ATTRIBUTES
-````diff
-+ the adverbs and adjectives that describe the high level concepts testing is meant to ensure. Attributes such as fast, usable, secure, accessible and so forth.
-
-### COMPONENTS
-the nouns that define the major code chunks that comprise the product. These are classes, module names and features of the application.
-### CAPABILITIES
-the verbs that describe user actions and activities.
+### Capabilities
+<The verbs that describe user actions and activities.>
 
 ## UNIT TESTS
 
@@ -68,9 +65,9 @@ the verbs that describe user actions and activities.
 
 ### UNIT TEST CASES
 
-| \#  | OBJECTIVE | INPUT | EXPECTED RESULTS | TEST DELIVERABLES |
-| --- | --------- | ----- | ---------------- | ----------------- |
-| 1   |           |       |                  |                   |
+| \#  | OBJECTIVE | INPUT | EXPECTED RESULTS | AUTOMATED |
+| --- | --------- | ----- | ---------------- | --------- |
+| 1   |           |       |                  |           |
 
 ## REGRESSION TESTS
 
@@ -88,11 +85,11 @@ the verbs that describe user actions and activities.
 
 ## INTEGRATION TEST
 
-Combine individual software modules and test as a group.
+<Combine individual software modules and test as a group.>
 
 ### INTEGRATION TEST STRATEGY
 
-Evaluate all integrations with locally developed shared libraries, with consumed services, and other touch points.
+<Evaluate all integrations with locally developed shared libraries, with consumed services, and other touch points.>
 
 ### INTEGRATION TEST CASES
 
@@ -100,13 +97,13 @@ Evaluate all integrations with locally developed shared libraries, with consumed
 | --- | --------- | ----- | ---------------- | ----------------- |
 | 1   |           |       |                  |                   |
 
-## USER ACCEPTANCE TEST
+## End-to-end testing
 
-Verify that the solution works for the user
+<Verify that the solution works for the user>
 
 ### USER ACCEPTANCE TEST STRATEGY
 
-{Explain how user acceptance testing will be accomplished}
+<Explain how user acceptance testing will be accomplished>
 
 ### USER ACCEPTANCE TEST CASES
 
