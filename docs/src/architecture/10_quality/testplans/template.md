@@ -1,6 +1,6 @@
 <!-- Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlinks_s -->
 
-# [Test Plan for <insert test plan name>](#https://github.com/input-output-hk/catalyst-voices/issues/1)
+# [Test Plan for <insert test plan name>](https://github.com/input-output-hk/catalyst-voices/issues/1)
 
 - [INFORMATIONS](#informations)
   - [STAKEHOLDERS](#stakeholders)
