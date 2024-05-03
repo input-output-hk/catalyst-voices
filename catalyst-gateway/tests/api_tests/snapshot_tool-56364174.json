@@ -914,20 +914,6 @@
     "nonce": 20696648
   },
   {
-    "delegations": [
-      [
-        "0xcd53ba0d64e3dc8beff82434d6514d9c3f485a4851201941e2dd9ff7f958a3c9",
-        1
-      ]
-    ],
-    "rewards_address": "0x009acd97fb8933e9a532ea59f3cc31eebb114d39fcdee1db603988b9f465bee679132338efa3df975f8aa5d7d9047d1ad465a7ee4575904596",
-    "stake_public_key": "0xdf1d4a395a166b178c7dc8f2ee59c440b6b4e8f898c2020e35537a819bf8b234",
-    "voting_power": 403470717,
-    "voting_purpose": 0,
-    "tx_id": 1205915,
-    "nonce": 36151489
-  },
-  {
     "delegations": "0xf10fe155499a990abda8a19bed2eca9bc8ad7298c834ab9735ad177edae321cf",
     "rewards_address": "0x0028deb61e10b13fd92b5eae688471c362854d0e7f447e069f9ddf83434b2cd046a01d85b8afb2239fdce23f2121f84b3ada94d329267822e7",
     "stake_public_key": "0xadab8bc8b404f25ddd3cc49dfb6955bd76c91b366440512ce7038e713996bd0b",
