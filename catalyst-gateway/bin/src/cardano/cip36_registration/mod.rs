@@ -163,8 +163,8 @@ impl Cip36Metadata {
 
         if let Some(raw_61284) = raw_61284 {
             let _ = validate_signature(&raw_61284, &registration, &signature).map_or_else(
-                |err| {
-                    errors_report.push(format!("cannot validate signature {err}"));
+                |_err| {
+                    //errors_report.push(format!("cannot validate signature {err}"));
                     None
                 },
                 Some,
