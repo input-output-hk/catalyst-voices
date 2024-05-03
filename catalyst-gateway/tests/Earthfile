@@ -4,8 +4,8 @@ package-schemathesis:
     FROM python:3.12-alpine3.19
 
     ARG tag="latest"
-    # https://github.com/input-output-hk/catalyst-voices/issues/465
     ARG max_examples=1000
+    # TODO: https://github.com/input-output-hk/catalyst-voices/issues/465
     ARG max_response_time=1000
     ARG wait_for_schema=15
     ARG workers=2
