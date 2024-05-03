@@ -3,6 +3,7 @@
 use anyhow::Ok;
 use cardano_chain_follower::Network;
 use cryptoxide::{blake2b::Blake2b, digest::Digest};
+use ed25519_dalek::Verifier;
 use ed25519_dalek::{Signature, VerifyingKey};
 use pallas::ledger::{
     primitives::{conway::Metadatum, Fragment},
@@ -203,7 +204,7 @@ pub fn validate_signature(
         .ok_or("cannot verify payload without signature".to_string())
         .map_err(|err| anyhow::anyhow!("{err}"))?;
 
-    Ok(verifying_key.verify_strict(&hash_bytes, &sig)?)
+    Ok(verifying_key.verify(&hash_bytes, &sig)?)
 }
 
 /// Validate binary data against CIP-36 registration CDDL spec
