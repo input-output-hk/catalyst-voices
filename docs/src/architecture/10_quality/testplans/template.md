@@ -41,15 +41,15 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 *Describe the design and architecture of the system in a way that highlights possible points of failure*
 
 ### Stakeholders
-*Insert the relevant stakeholders that needs to understand, review and approve the test plan*
+*Insert the relevant stakeholders that need to understand, review and approve the test plan*
 
-| Role/Name   | Contact        | Approval |
-|-------------|----------------|----------------|
-| *Product-Owner* |  |  |
-| *Developers* |  |  |
-| *Admin* |  |  |
-| *SRE* |  |  |
-| *Testers* |  |  |
+| Role/Name       | Contact        | Approval       |
+|-----------------|----------------|----------------|
+| *Product-Owner* |                |                |
+| *Developers*    |                |                |
+| *Admin*         |                |                |
+| *SRE*           |                |                |
+| *Testers*       |                |                |
 
 
 ### Requirements
@@ -59,7 +59,7 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 *Describe what tools will be needed for the testing, if new tools are needed to be developed*
 
 ## ACC framework
-*Use the [ACC framework](https://testing.googleblog.com/2011/09/10-minute-test-plan.html) to help you define the testcases*
+*Use the [ACC framework](https://testing.googleblog.com/2011/09/10-minute-test-plan.html) to help you define the test cases*
 
 ### Attributes
 *The adverbs and adjectives that describe the high level concepts testing is meant to ensure. Attributes such as fast, usable, secure, accessible and so forth. The quality metrics document in this repo should and can be used as a guideline*
@@ -73,7 +73,6 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 ## Unit tests
 
 ### Unit tests strategy
-
 *Evaluate new features and bug fixes introduced in this release, and the extent of the unit tests*
 
 ### Unit test cases
@@ -85,8 +84,7 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 ## Functional tests
 
 ### Functional tests strategy
-
-*Evaluate new features and bug fixes introduced in this release, and the extent of the functional tests*
+*Evaluate new features introduced in this release, and the extent of the functional tests*
 
 ### Functional test cases
 
@@ -97,7 +95,6 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 ## Regression tests
 
 ### Regression tests strategy
-
 *Ensure that previously developed and tested software still performs after change.*
 
 ### Regression test cases
@@ -109,7 +106,6 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 ## Integration tests
 
 ### Integration tests strategy
-
 *Evaluate all integrations with other functions, services etc.*
 
 ### Integration test cases
@@ -121,7 +117,6 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 ## End-to-end tests
 
 ### End-to-end tests strategy
-
 *Evaluate how will test infrastructure, systems under test, and other dependencies be managed? How will they be deployed? How will persistence be set-up/torn-down? How will you handle required migrations from one datacenter to another?*
 
 ### End-to-end test cases
