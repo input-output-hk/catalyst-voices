@@ -1,0 +1,31 @@
+name: Test Plan
+description: Create a test plan
+title: "[Test plan]: <title>"
+labels: ["testplan"]
+projects: ["/input-output-hk/102"]
+body:
+  - type: input
+    attributes:
+      label: Objective
+      description: A concise description of the objective of the test plan.
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Test plan document
+      placeholder: https://input-output-hk.github.io/catalyst-voices/architecture/10_quality/testplans/template
+      description: A link to the test plan document.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Test cases
+      description: The of the test cases that are part of the test plan
+      placeholder: |
+        -[] https://github.com/input-output-hk/catalyst-voices/issues/1
+        -[] https://github.com/input-output-hk/catalyst-voices/issues/1
+        -[] https://github.com/input-output-hk/catalyst-voices/issues/1
+    validations:
+      required: true
