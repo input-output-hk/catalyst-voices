@@ -4,7 +4,7 @@
 // Reference: https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference.html
 // Encoding rules reference: https://en.wikipedia.org/wiki/X.690#Encoding
 // pub const ASN1_BOOL: u8 = 0x01;
-// pub const ASN1_INT: u8 = 0x02;
+pub const ASN1_INT: u8 = 0x02;
 // pub const ASN1_BIT_STR: u8 = 0x03;
 // pub const ASN1_OCTET_STR: u8 = 0x04;
 // pub const ASN1_OID: u8 = 0x06;
@@ -13,10 +13,10 @@
 // pub const ASN1_IA5_SRT: u8 = 0x16;
 // pub const ASN1_UTC_TIME: u8 = 0x17;
 // pub const ASN1_GEN_TIME: u8 = 0x18;
-// pub const ASN1_SEQ: u8 = 0x30; // Tag 16, but is a constructed form
-// pub const ASN1_SET: u8 = 0x31; // Tag 17, but is a constructed form
-// pub const ASN1_INDEX_ZERO: u8 = 0xa0;
-// pub const ASN1_INDEX_ONE: u8 = 0xa1;
+pub const ASN1_SEQ: u8 = 0x30; // Tag 16, but is a constructed form
+                               // pub const ASN1_SET: u8 = 0x31; // Tag 17, but is a constructed form
+                               // pub const ASN1_INDEX_ZERO: u8 = 0xa0;
+                               // pub const ASN1_INDEX_ONE: u8 = 0xa1;
 
 #[allow(unused)]
 pub fn extract_der_value_by_tag(b: &[u8], tag: u8) {
@@ -24,6 +24,8 @@ pub fn extract_der_value_by_tag(b: &[u8], tag: u8) {
     if b[0] != tag {
         // return Err(Error::InvalidData);
         println!("Error");
+    } else {
+        println!("Tag matched");
     }
 }
 
@@ -38,8 +40,15 @@ pub fn extract_der_value_by_tag(b: &[u8], tag: u8) {
 // - 0x82 represent N = 2 octet
 // - 0x83 represent N = 3 octet
 // If the length is more than 3 octet, it is not supported in this lib.
+
+// Params
+// - b: byte string
+// - value_only: boolean to indicate whether to return the value V only or the whole TLV
+
+// Return
+// - Tuple of byte string that want to extract and the remaining byte string
 #[allow(unused)]
-fn extract_value_by_length(b: &[u8]) {
+fn extract_value_by_length(b: &[u8], value_only: bool) -> (&[u8], &[u8]) {
     let length = b[1];
 
     // Length should not exceed 4 octet.
@@ -63,17 +72,47 @@ fn extract_value_by_length(b: &[u8]) {
         _ => (2, 2 + length as usize),
     };
 
-    let result = (&b[start..end], &b[end..]);
-    println!("{:?}", result);
+    let result = (&b[value_only as usize * start..end], &b[end..]);
+    result
 }
 
 #[allow(unused)]
+// Convert byte string to u64
 fn bytes_to_u64(bytes: &[u8]) -> u64 {
     let mut result = 0u64;
     for &byte in bytes {
         result = (result << 8) | u64::from(byte);
     }
     result
+}
+
+// Parse a DER encoded tag and returns the value
+#[allow(unused)]
+pub fn parse_der_tag(b: &[u8], tag: u8) -> &[u8] {
+    // Every first byte of TLV should match the given tag
+    if b[0] != tag {
+        println!("b[0] not equal to tag");
+        return &[];
+    }
+
+    println!("{:?}", b);
+    // Want only the value V
+    let (value, _) = extract_value_by_length(b, true);
+    value
+}
+
+// Parse a DER encoded sequence/set
+#[allow(unused)]
+pub fn parse_der_sequence_set(b: &[u8], tag: u8) -> Vec<&[u8]> {
+    let mut vec = Vec::new();
+    let mut value = parse_der_tag(b, tag);
+
+    while !value.is_empty() {
+        let (tlv, temp) = extract_value_by_length(value, false);
+        vec.push(tlv);
+        value = temp;
+    }
+    vec
 }
 
 #[cfg(test)]
@@ -113,6 +152,19 @@ mod tests {
 
     #[test]
     fn test_extract_value_by_length() {
-        extract_value_by_length(&CERT);
+        let certificate = parse_der_sequence_set(&CERT, ASN1_SEQ);
+        // x509 certificate has 3 elements including tbscertificate, signature algorithm, and signature value
+        // ref: https://datatracker.ietf.org/doc/html/rfc5280#section-4.1
+        assert_eq!(certificate.len(), 3);
+
+        let tbs_certificate = parse_der_sequence_set(certificate[0], 0x30);
+
+        let version = parse_der_tag(tbs_certificate[0], 0xa0);
+        let serial_number = parse_der_tag(tbs_certificate[1], ASN1_INT);
+        let signature = parse_der_tag(tbs_certificate[2], ASN1_SEQ);
+        let issuer = parse_der_tag(tbs_certificate[3], ASN1_SEQ);
+        let validity = parse_der_tag(tbs_certificate[4], ASN1_SEQ);
+        let subject = parse_der_tag(tbs_certificate[5], ASN1_SEQ);
+        let subject_public_key_info = parse_der_tag(tbs_certificate[6], ASN1_SEQ);
     }
 }
