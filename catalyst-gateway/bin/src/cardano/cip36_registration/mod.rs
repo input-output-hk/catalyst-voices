@@ -4,7 +4,6 @@ use anyhow::Ok;
 use cardano_chain_follower::Network;
 use chain_crypto::{AsymmetricPublicKey, Ed25519, Verification, VerificationAlgorithm};
 use cryptoxide::{blake2b::Blake2b, digest::Digest};
-
 use pallas::ledger::{
     primitives::{conway::Metadatum, Fragment},
     traverse::MultiEraMeta,
@@ -209,9 +208,11 @@ pub fn validate_signature(
         &hash_bytes,
     ) {
         Verification::Success => Ok(()),
-        Verification::Failed => Err(anyhow::anyhow!(
-            "Cannot decode cbor object from bytes, err: "
-        )),
+        Verification::Failed => {
+            Err(anyhow::anyhow!(
+                "Cannot decode cbor object from bytes, err: "
+            ))
+        },
     }
 }
 
