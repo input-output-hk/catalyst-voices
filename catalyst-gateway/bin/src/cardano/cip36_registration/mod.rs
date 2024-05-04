@@ -9,7 +9,6 @@ use pallas::ledger::{
     traverse::MultiEraMeta,
 };
 use serde::{Deserialize, Serialize};
-use tracing::info;
 
 use super::util::hash;
 
@@ -166,11 +165,9 @@ impl Cip36Metadata {
             }
         };
 
-        if let Some(raw_61284) = raw_61284 {
-            let _ = if validate_signature(&raw_61284, &registration.clone(), &signature).is_ok() {
-                info!("sig ok");
-            };
-        }
+        let _ = validate_signature(&raw_61284, &registration.clone(), &signature).map_err(|err| {
+            errors_report.push(format!("{err}"));
+        });
 
         Some(Self {
             registration: registration.clone(),
