@@ -2,29 +2,15 @@
   {
     "delegations": [
       [
-        "0x627510960279286b23505748ec667364475e638d9e38a8c3517953368bbadd68",
-        1
+        "0x26cf0618f527df3c42c7237432500ad3fa33bc7bd10c73d7f2042c61d20aac20",
+        100
       ]
     ],
-    "rewards_address": "0x00ad6a01b9390630e4be401c05860bcc50bf62dc0b9d2a64ffc4615de41a42d217652f0036c3ec8af5f3b12cb8727497ec8382518c2d8d4fca",
-    "stake_public_key": "0x2e1cb95cd34235bf86273b203be5eca2054bf2bab0f9093a151521dcaa198413",
-    "voting_power": 4470233,
+    "rewards_address": "0xe00fe224a3b96e9be8dd8b1e0010c6ec831c732c6f63ef0c326907859d",
+    "stake_public_key": "0xc4e32dc7ba2a0ad68f7651439f2e55a2a6a29fc703dae1cbc644dd7a1cf4f988",
+    "voting_power": 9995077200,
     "voting_purpose": 0,
-    "tx_id": 835522,
-    "nonce": 28120865
-  },
-  {
-    "delegations": [
-      [
-        "0x017eb974b12593e7368bf405f1a9dfd1c0ad8c83d59d2f9b8531640dd3faf8c8",
-        1
-      ]
-    ],
-    "rewards_address": "0x003a0d6292ac87f9e64928b0294053d8764018d8639d8aea9c8ed23d6c9ad5eba6672b059a02567647cfde7c270972b6684c7a5f99941c8609",
-    "stake_public_key": "0xd2de2a0b16af4f2a98a2f996ded2d8394c5a5b2a75bce166204fcb385e02f0ef",
-    "voting_power": 5823499,
-    "voting_purpose": 0,
-    "tx_id": 636967,
-    "nonce": 24331038
+    "tx_id": 253945,
+    "nonce": 16027290
   }
 ]
