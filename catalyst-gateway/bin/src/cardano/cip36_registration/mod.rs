@@ -165,9 +165,12 @@ impl Cip36Metadata {
             }
         };
 
-        let _ = validate_signature(&raw_61284, &registration.clone(), &signature).map_err(|err| {
-            errors_report.push(format!("{err}"));
-        });
+        if let Some(raw_61284) = raw_61284 {
+            let _ =
+                validate_signature(&raw_61284, &registration.clone(), &signature).map_err(|err| {
+                    errors_report.push(format!("{err}"));
+                });
+        }
 
         Some(Self {
             registration: registration.clone(),
