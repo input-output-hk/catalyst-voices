@@ -2,8 +2,10 @@
 
 use anyhow::Ok;
 use cardano_chain_follower::Network;
-use chain_crypto::{AsymmetricPublicKey, Ed25519, Verification, VerificationAlgorithm};
+
 use cryptoxide::{blake2b::Blake2b, digest::Digest};
+use ed25519_dalek::Verifier;
+use ed25519_dalek::{Signature, VerifyingKey};
 use pallas::ledger::{
     primitives::{conway::Metadatum, Fragment},
     traverse::MultiEraMeta,
@@ -11,10 +13,6 @@ use pallas::ledger::{
 use serde::{Deserialize, Serialize};
 
 use super::util::hash;
-
-/// An ED25519 signature
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub struct Signature(pub [u8; 64]);
 
 /// Pub key
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -190,26 +188,21 @@ pub fn validate_signature(
 ) -> anyhow::Result<()> {
     let hash_bytes = hash(raw_61284);
 
+    let verifying_key = VerifyingKey::from_bytes(
+        registration
+            .clone()
+            .ok_or("no registration data".to_string())
+            .map_err(|err| anyhow::anyhow!("{err}"))?
+            .stake_key
+            .bytes()
+            .try_into()?,
+    )?;
+
     let sig = signature
         .ok_or("cannot verify payload without signature".to_string())
         .map_err(|err| anyhow::anyhow!("{err}"))?;
 
-    match Ed25519::verify_bytes(
-        &Ed25519::public_from_binary(
-            registration
-                .clone()
-                .ok_or("no registration data".to_string())
-                .map_err(|err| anyhow::anyhow!("{err}"))?
-                .stake_key
-                .bytes()
-                .try_into()?,
-        )?,
-        &Ed25519::signature_from_bytes(&sig.0)?,
-        &hash_bytes,
-    ) {
-        Verification::Success => Ok(()),
-        Verification::Failed => Err(anyhow::anyhow!("Invalid signature")),
-    }
+    Ok(verifying_key.verify(&hash_bytes, &sig)?)
 }
 
 /// Validate binary data against CIP-36 registration CDDL spec
@@ -293,7 +286,7 @@ fn inspect_signature(cbor_value: ciborium::value::Value) -> anyhow::Result<Signa
             anyhow::anyhow!("Invalid signature length, expected:  got {}", vec.len())
         })?;
 
-    Ok(Signature(signature))
+    Ok(Signature::from_bytes(&signature))
 }
 
 /// Extract registration from tx metadata
