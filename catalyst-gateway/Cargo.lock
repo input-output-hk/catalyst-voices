@@ -622,7 +622,7 @@ checksum = "fd16c4719339c4530435d38e511904438d07cce7950afa3718a84ac36c10e89e"
 [[package]]
 name = "chain-crypto"
 version = "0.1.0"
-source = "git+https://github.com/input-output-hk/chain-libs.git#a68e3769e918288cee76893f16cae0ac3b680da9"
+source = "git+https://github.com/input-output-hk/chain-libs.git?branch=stable-dalek#a68e3769e918288cee76893f16cae0ac3b680da9"
 dependencies = [
  "bech32 0.8.1",
  "cryptoxide",
@@ -3854,7 +3854,7 @@ checksum = "6af6ae20167a9ece4bcb41af5b80f8a1f1df981f6391189ce00fd257af04126a"
 [[package]]
 name = "typed-bytes"
 version = "0.1.0"
-source = "git+https://github.com/input-output-hk/chain-libs.git#a68e3769e918288cee76893f16cae0ac3b680da9"
+source = "git+https://github.com/input-output-hk/chain-libs.git?branch=stable-dalek#a68e3769e918288cee76893f16cae0ac3b680da9"
 
 [[package]]
 name = "typenum"
