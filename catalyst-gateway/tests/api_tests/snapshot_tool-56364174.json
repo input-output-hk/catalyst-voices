@@ -2436,20 +2436,6 @@
   {
     "delegations": [
       [
-        "0x627510960279286b23505748ec667364475e638d9e38a8c3517953368bbadd68",
-        1
-      ]
-    ],
-    "rewards_address": "0x00ad6a01b9390630e4be401c05860bcc50bf62dc0b9d2a64ffc4615de41a42d217652f0036c3ec8af5f3b12cb8727497ec8382518c2d8d4fca",
-    "stake_public_key": "0x2e1cb95cd34235bf86273b203be5eca2054bf2bab0f9093a151521dcaa198413",
-    "voting_power": 4470233,
-    "voting_purpose": 0,
-    "tx_id": 835522,
-    "nonce": 28120865
-  },
-  {
-    "delegations": [
-      [
         "0x10830d93572f90765f0eac5101254d15f24e5a57dfcf160a97bd2d7f6405e387",
         1
       ]
@@ -3747,20 +3733,6 @@
     "voting_purpose": 0,
     "tx_id": 949132,
     "nonce": 31500349
-  },
-  {
-    "delegations": [
-      [
-        "0xdc06cc9b46c983af66e4c5c52463086b174780c8ab09b9aa9f4e3441c0cc9da6",
-        1
-      ]
-    ],
-    "rewards_address": "0x0002f1c39e73708869c5d068efce51c7a8a779620639e919adbffdf7ba7e872b69a8844a5c619738e87338d34135ea3bebb973f7181a6ff40d",
-    "stake_public_key": "0xed05e31db7866366a12c7414fbc3b6708740e9bdad00f6c190068db14a24ba4b",
-    "voting_power": 999823499,
-    "voting_purpose": 0,
-    "tx_id": 144983,
-    "nonce": 13450365
   },
   {
     "delegations": [
