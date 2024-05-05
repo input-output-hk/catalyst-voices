@@ -126,7 +126,7 @@ impl Cip36Metadata {
                 },
                 Some,
             );
-            for (key, metadata) in tx_metadata.iter() {
+            for (index, (key, metadata)) in tx_metadata.iter().enumerate() {
                 match *key {
                     CIP36_REGISTRATION_CBOR_KEY => {
                         registration = inspect_registration_from_metadata(metadata, network)
@@ -138,7 +138,7 @@ impl Cip36Metadata {
                                 Some,
                             );
 
-                        raw_61284 = metadata.encode_fragment().map_or_else(
+                        raw_61284 = tx_metadata.get(index)?.encode_fragment().map_or_else(
                             |err| {
                                 errors_report
                                     .push(format!("cannot encode 61284 metadata into bytes {err}"));
