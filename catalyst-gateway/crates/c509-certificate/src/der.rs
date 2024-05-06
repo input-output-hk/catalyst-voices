@@ -3,6 +3,30 @@
 // ANS.1 tags BER-encoded
 // Reference: https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference.html
 // Encoding rules reference: https://en.wikipedia.org/wiki/X.690#Encoding
+// ASN.1 and DER for X.509 refernece: https://www.zytrax.com/tech/survival/asn1.html
+
+// X509 Certificate should look like
+// Certificate  ::=  SIGNED{TBSCertificate}
+
+//   TBSCertificate  ::=  SEQUENCE  {
+//       version         [0]  Version DEFAULT v1,
+//       serialNumber         CertificateSerialNumber,
+//       signature            AlgorithmIdentifier{SIGNATURE-ALGORITHM,
+//                                 {SignatureAlgorithms}},
+//       issuer               Name,
+//       validity             Validity,
+//       subject              Name,
+//       subjectPublicKeyInfo SubjectPublicKeyInfo,
+//       ... ,
+//       [[2:               -- If present, version MUST be v2
+//       issuerUniqueID  [1]  IMPLICIT UniqueIdentifier OPTIONAL,
+//       subjectUniqueID [2]  IMPLICIT UniqueIdentifier OPTIONAL
+//       ]],
+//       [[3:               -- If present, version MUST be v3 --
+//       extensions      [3]  Extensions{{CertExtensions}} OPTIONAL
+//       ]], ... }
+
+
 // pub const ASN1_BOOL: u8 = 0x01;
 pub const ASN1_INT: u8 = 0x02;
 // pub const ASN1_BIT_STR: u8 = 0x03;
@@ -14,9 +38,9 @@ pub const ASN1_INT: u8 = 0x02;
 // pub const ASN1_UTC_TIME: u8 = 0x17;
 // pub const ASN1_GEN_TIME: u8 = 0x18;
 pub const ASN1_SEQ: u8 = 0x30; // Tag 16, but is a constructed form
-                               // pub const ASN1_SET: u8 = 0x31; // Tag 17, but is a constructed form
-                               // pub const ASN1_INDEX_ZERO: u8 = 0xa0;
-                               // pub const ASN1_INDEX_ONE: u8 = 0xa1;
+// pub const ASN1_SET: u8 = 0x31; // Tag 17, but is a constructed form
+pub const ASN1_VERSION: u8 = 0xa0; // For version
+pub const ASN1_EXTENSION_ADDITION_GROUP_3: u8 = 0xa3;
 
 #[allow(unused)]
 pub fn extract_der_value_by_tag(b: &[u8], tag: u8) {
@@ -91,7 +115,7 @@ fn bytes_to_u64(bytes: &[u8]) -> u64 {
 pub fn parse_der_tag(b: &[u8], tag: u8) -> &[u8] {
     // Every first byte of TLV should match the given tag
     if b[0] != tag {
-        println!("b[0] not equal to tag");
+        println!("b[0] {} not equal to tag {}", b[0], tag);
         return &[];
     }
 
@@ -150,6 +174,16 @@ mod tests {
         0x16,
     ];
 
+    // Parse into section for tbs certificate
+    // Version [160, 3, 2, 1, 2]
+    // Serial Number [2, 3, 1, 245, 13]
+    // Signature [48, 10, 6, 8, 42, 134, 72, 206, 61, 4, 3, 2]
+    // Issuer [48, 22, 49, 20, 48, 18, 6, 3, 85, 4, 3, 12, 11, 82, 70, 67, 32, 116, 101, 115, 116, 32, 67, 65]
+    // Validity [48, 30, 23, 13, 50, 51, 48, 49, 48, 49, 48, 48, 48, 48, 48, 48, 90, 23, 13, 50, 54, 48, 49, 48, 49, 48, 48, 48, 48, 48, 48, 90]
+    // Subject [48, 34, 49, 32, 48, 30, 6, 3, 85, 4, 3, 12, 23, 48, 49, 45, 50, 51, 45, 52, 53, 45, 70, 70, 45, 70, 69, 45, 54, 55, 45, 56, 57, 45, 65, 66]
+    // SubjectPublicKeyInfo [48, 89, 48, 19, 6, 7, 42, 134, 72, 206, 61, 2, 1, 6, 8, 42, 134, 72, 206, 61, 3, 1, 7, 3, 66, 0, 4, 177, 33, 106, 185, 110, 91, 59, 51, 64, 245, 189, 240, 46, 105, 63, 22, 33, 58, 4, 82, 94, 212, 68, 80, 177, 1, 156, 45, 253, 56, 56, 171, 172, 78, 20, 216, 108, 9, 131, 237, 94, 158, 239, 36, 72, 198, 134, 28, 196, 6, 84, 113, 119, 230, 2, 96, 48, 208, 81, 247, 121, 42, 194, 6]
+    // Extension [163, 15, 48, 13, 48, 11, 6, 3, 85, 29, 15, 4, 4, 3, 2, 7, 128]
+
     #[test]
     fn test_extract_value_by_length() {
         let certificate = parse_der_sequence_set(&CERT, ASN1_SEQ);
@@ -157,14 +191,22 @@ mod tests {
         // ref: https://datatracker.ietf.org/doc/html/rfc5280#section-4.1
         assert_eq!(certificate.len(), 3);
 
+        // TBS Certificate
         let tbs_certificate = parse_der_sequence_set(certificate[0], 0x30);
 
-        let version = parse_der_tag(tbs_certificate[0], 0xa0);
+        // Only support X.509 v3
+        let version = parse_der_tag(tbs_certificate[0], ASN1_VERSION);
+        // Version  ::=  INTEGER  {  v1(0), v2(1), v3(2)  }
+        if parse_der_tag(version, ASN1_INT)[0] == 2 {
+            println!("X.509 v3");
+        }
+
         let serial_number = parse_der_tag(tbs_certificate[1], ASN1_INT);
         let signature = parse_der_tag(tbs_certificate[2], ASN1_SEQ);
         let issuer = parse_der_tag(tbs_certificate[3], ASN1_SEQ);
         let validity = parse_der_tag(tbs_certificate[4], ASN1_SEQ);
         let subject = parse_der_tag(tbs_certificate[5], ASN1_SEQ);
         let subject_public_key_info = parse_der_tag(tbs_certificate[6], ASN1_SEQ);
+        let extensions = parse_der_tag(tbs_certificate[7], ASN1_EXTENSION_ADDITION_GROUP_3);
     }
 }
