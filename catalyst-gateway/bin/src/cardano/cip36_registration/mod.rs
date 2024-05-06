@@ -9,7 +9,6 @@ use pallas::ledger::{
     primitives::{conway::Metadatum, Fragment},
     traverse::MultiEraMeta,
 };
-
 use serde::{Deserialize, Serialize};
 
 use super::util::hash;
