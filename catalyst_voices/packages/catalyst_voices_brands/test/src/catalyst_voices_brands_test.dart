@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   const catalystKey = Key('C');
-  const dummyKey = Key('D');
+  const fallbackKey = Key('F');
 
   Widget buildApp() => BlocProvider(
     create: (context) => BrandBloc(),
@@ -29,12 +29,12 @@ void main() {
                     child: const Text('Catalyst'),
                   ),
                   MaterialButton(
-                    key: dummyKey,
+                    key: fallbackKey,
                     color: Theme.of(context).primaryColor,
-                    child: const Text('Dummy'),
+                    child: const Text('Fallback'),
                     onPressed: () {
                       context.read<BrandBloc>().add(
-                        const BrandChangedEvent(BrandKey.dummy),
+                        const BrandChangedEvent(BrandKey.fallback),
                       );
                     },
                   ),
@@ -53,7 +53,7 @@ void main() {
     // Colors used in the Brand themes as primary. They are used for
     // the color of the widgets we are testing and they are the colors
     // we will check against to ensure correct rendering.
-    const dummyColor = Color(0xFFFF5722);
+    final fallbackColor = ThemeData(useMaterial3: true).primaryColor;
     const catalystColor = VoicesColors.blue;
 
     testWidgets('Default Catalyst theme is applied', (tester) async {
@@ -62,40 +62,40 @@ void main() {
       );
 
       final catalystButton = find.byKey(catalystKey);
-      final dummyButton = find.byKey(dummyKey);
+      final fallbackButton = find.byKey(fallbackKey);
 
       expect(catalystButton, findsOneWidget);
-      expect(dummyButton, findsOneWidget);
+      expect(fallbackButton, findsOneWidget);
       expect(
         tester.widget<MaterialButton>(catalystButton).color,
         catalystColor,
       );
       expect(
-        tester.widget<MaterialButton>(dummyButton).color,
+        tester.widget<MaterialButton>(fallbackButton).color,
         catalystColor,
       );
     });
-    testWidgets('Dummy Theme is applied after switch', (tester) async {
+    testWidgets('Fallback Theme is applied after switch', (tester) async {
       await tester.pumpWidget(
         buildApp(),
       );
 
       final catalystButton = find.byKey(catalystKey);
-      final dummyButton = find.byKey(dummyKey);
+      final fallbackButton = find.byKey(fallbackKey);
 
       expect(catalystButton, findsOneWidget);
-      expect(dummyButton, findsOneWidget);
+      expect(fallbackButton, findsOneWidget);
       
-      await tester.tap(dummyButton);
+      await tester.tap(fallbackButton);
       // We need to wait for the animation to complete
       await tester.pumpAndSettle();      
       expect(
         tester.widget<MaterialButton>(catalystButton).color,
-        dummyColor,
+        fallbackColor,
       );
       expect(
         tester.widget<MaterialButton>(catalystButton).color,
-        dummyColor,
+        fallbackColor,
       );
     });
 
@@ -105,15 +105,15 @@ void main() {
       );
 
       final catalystButton = find.byKey(catalystKey);
-      final dummyButton = find.byKey(dummyKey);
+      final fallbackButton = find.byKey(fallbackKey);
 
       expect(catalystButton, findsOneWidget);
-      expect(dummyButton, findsOneWidget);
+      expect(fallbackButton, findsOneWidget);
       
-      // We first switch do DummyBrand, we wait for the animation completion
+      // We first switch do FallbackBrand, we wait for the animation completion
       // and then we switch back to the CatalystBrand to check the correct
       // color is applied.
-      await tester.tap(dummyButton);
+      await tester.tap(fallbackButton);
       await tester.pumpAndSettle();
       await tester.tap(catalystButton);
       await tester.pumpAndSettle(); 
