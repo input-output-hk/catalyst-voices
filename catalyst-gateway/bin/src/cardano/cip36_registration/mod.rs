@@ -2,12 +2,14 @@
 
 use anyhow::Ok;
 use cardano_chain_follower::Network;
+use ciborium::{value::Integer, Value};
 use cryptoxide::{blake2b::Blake2b, digest::Digest};
 use ed25519_dalek::{Signature, Verifier, VerifyingKey};
 use pallas::ledger::{
     primitives::{conway::Metadatum, Fragment},
     traverse::MultiEraMeta,
 };
+
 use serde::{Deserialize, Serialize};
 
 use super::util::hash;
@@ -126,7 +128,8 @@ impl Cip36Metadata {
                 },
                 Some,
             );
-            for (index, (key, metadata)) in tx_metadata.iter().enumerate() {
+
+            for (key, metadata) in tx_metadata.iter() {
                 match *key {
                     CIP36_REGISTRATION_CBOR_KEY => {
                         registration = inspect_registration_from_metadata(metadata, network)
@@ -138,10 +141,9 @@ impl Cip36Metadata {
                                 Some,
                             );
 
-                        raw_61284 = tx_metadata.get(index)?.encode_fragment().map_or_else(
+                        raw_61284 = original_61284_payload(metadata).map_or_else(
                             |err| {
-                                errors_report
-                                    .push(format!("cannot encode 61284 metadata into bytes {err}"));
+                                errors_report.push(format!("{err}"));
                                 None
                             },
                             Some,
@@ -285,6 +287,36 @@ fn inspect_signature(cbor_value: ciborium::value::Value) -> anyhow::Result<Signa
         })?;
 
     Ok(Signature::from_bytes(&signature))
+}
+
+/// Rebuild 61284 from pallas metadata to match original signed 61284 payload
+fn original_61284_payload(metadata: &Metadatum) -> anyhow::Result<Vec<u8>> {
+    /// 61284 CIP-36
+    const CIP_36_61284: usize = 61284;
+
+    let metadata_bytes = metadata
+        .encode_fragment()
+        .map_err(|err| anyhow::anyhow!("cannot encode metadata into bytes {err}"))?;
+
+    validate_cip36_registration(metadata_bytes.as_slice())?;
+
+    let cbor_value = ciborium::de::from_reader::<ciborium::Value, _>(metadata_bytes.as_slice())
+        .map_err(|err| anyhow::anyhow!("Cannot decode cbor object from bytes, err: {err}"))?;
+
+    let cbor_map = cbor_value.as_map().ok_or(anyhow::anyhow!(
+        "Not a valid cbor cip36 registration, should be a map"
+    ))?;
+
+    let registration_payload = Value::Map(vec![(
+        Value::Integer(Integer::from(CIP_36_61284)),
+        ciborium::Value::Map(cbor_map.to_vec()),
+    )]);
+
+    let mut raw_61284 = Vec::new();
+    ciborium::ser::into_writer(&registration_payload, &mut raw_61284)
+        .map_err(|err| anyhow::anyhow!("Cannot decode cbor object from bytes, err: {err}"))?;
+
+    Ok(raw_61284)
 }
 
 /// Extract registration from tx metadata
