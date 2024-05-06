@@ -37,19 +37,21 @@ part 'brand_state.dart';
 ///   child: BlocBuilder<BrandBloc, BrandState>(
 ///     builder: (context, state) {
 ///       return MaterialApp(
-///         builder: (context, state) => Scaffold(
-///           body: Row(
-///             children: [
-///               MaterialButton(
-///                 color: Theme.of(context).primaryColor,
-///                 onPressed: () {
-///                   context.read<BrandBloc>().add(
-///                     const BrandChangedEvent(BrandKey.catalyst),
-///                   );
-///                 },
-///                 child: const Text('Switch to Catalyst Theme'),
-///               ),
-///             ],
+///         home: Builder(
+///           builder: (context) => Scaffold(
+///             body: Row(
+///               children: [
+///                 MaterialButton(
+///                   color: Theme.of(context).primaryColor,
+///                   onPressed: () {
+///                     context.read<BrandBloc>().add(
+///                       const BrandChangedEvent(BrandKey.catalyst),
+///                     );
+///                   },
+///                   child: const Text('Switch to Catalyst Theme'),
+///                 ),
+///               ],
+///             ),
 ///           ),
 ///         ),
 ///         theme: ThemeBuilder.buildTheme(state.brandKey),

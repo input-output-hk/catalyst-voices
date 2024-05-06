@@ -14,30 +14,32 @@ void main() {
     child: BlocBuilder<BrandBloc, BrandState>(
       builder: (context, state) {
         return MaterialApp(
-          builder: (context, state) => Scaffold(
-            body: Row(
-              children: [
-                MaterialButton(
-                  key: catalystKey,
-                  color: Theme.of(context).primaryColor,
-                  onPressed: () {
-                    context.read<BrandBloc>().add(
-                      const BrandChangedEvent(BrandKey.catalyst),
-                    );
-                  },
-                  child: const Text('Catalyst'),
-                ),
-                MaterialButton(
-                  key: dummyKey,
-                  color: Theme.of(context).primaryColor,
-                  child: const Text('Dummy'),
-                  onPressed: () {
-                    context.read<BrandBloc>().add(
-                      const BrandChangedEvent(BrandKey.dummy),
-                    );
-                  },
-                ),
-              ],
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: Row(
+                children: [
+                  MaterialButton(
+                    key: catalystKey,
+                    color: Theme.of(context).primaryColor,
+                    onPressed: () {
+                      context.read<BrandBloc>().add(
+                        const BrandChangedEvent(BrandKey.catalyst),
+                      );
+                    },
+                    child: const Text('Catalyst'),
+                  ),
+                  MaterialButton(
+                    key: dummyKey,
+                    color: Theme.of(context).primaryColor,
+                    child: const Text('Dummy'),
+                    onPressed: () {
+                      context.read<BrandBloc>().add(
+                        const BrandChangedEvent(BrandKey.dummy),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
           theme: ThemeBuilder.buildTheme(state.brandKey),
