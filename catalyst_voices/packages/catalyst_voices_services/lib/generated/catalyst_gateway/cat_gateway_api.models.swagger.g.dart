@@ -8,9 +8,7 @@ part of 'cat_gateway_api.models.swagger.dart';
 
 AccountVote _$AccountVoteFromJson(Map<String, dynamic> json) => AccountVote(
       votePlanId: json['vote_plan_id'] as String,
-      votes: (json['votes'] as List<dynamic>?)
-              ?.map((e) => (e as num).toInt())
-              .toList() ??
+      votes: (json['votes'] as List<dynamic>?)?.map((e) => e as int).toList() ??
           [],
     );
 
@@ -21,8 +19,8 @@ Map<String, dynamic> _$AccountVoteToJson(AccountVote instance) =>
     };
 
 BlockDate _$BlockDateFromJson(Map<String, dynamic> json) => BlockDate(
-      epoch: (json['epoch'] as num).toInt(),
-      slotId: (json['slot_id'] as num).toInt(),
+      epoch: json['epoch'] as int,
+      slotId: json['slot_id'] as int,
     );
 
 Map<String, dynamic> _$BlockDateToJson(BlockDate instance) => <String, dynamic>{
@@ -42,7 +40,7 @@ Map<String, dynamic> _$DelegatePublicKeyToJson(DelegatePublicKey instance) =>
 
 Delegation _$DelegationFromJson(Map<String, dynamic> json) => Delegation(
       votingKey: json['voting_key'] as String,
-      power: (json['power'] as num).toInt(),
+      power: json['power'] as int,
     );
 
 Map<String, dynamic> _$DelegationToJson(Delegation instance) =>
@@ -125,7 +123,7 @@ RegistrationInfo _$RegistrationInfoFromJson(Map<String, dynamic> json) =>
     RegistrationInfo(
       rewardsAddress: json['rewards_address'] as String,
       txHash: json['tx_hash'] as String,
-      nonce: (json['nonce'] as num).toInt(),
+      nonce: json['nonce'] as int,
       votingInfo:
           VotingInfo.fromJson(json['voting_info'] as Map<String, dynamic>),
     );
@@ -141,7 +139,7 @@ Map<String, dynamic> _$RegistrationInfoToJson(RegistrationInfo instance) =>
 RejectedFragment _$RejectedFragmentFromJson(Map<String, dynamic> json) =>
     RejectedFragment(
       id: json['id'] as String,
-      poolNumber: (json['pool_number'] as num).toInt(),
+      poolNumber: json['pool_number'] as int,
       reason: reasonRejectedFromJson(json['reason']),
     );
 
@@ -167,7 +165,7 @@ Map<String, dynamic> _$ServerErrorPayloadToJson(ServerErrorPayload instance) =>
     };
 
 Slot _$SlotFromJson(Map<String, dynamic> json) => Slot(
-      slotNumber: (json['slot_number'] as num).toInt(),
+      slotNumber: json['slot_number'] as int,
       blockHash: json['block_hash'] as String,
       blockTime: DateTime.parse(json['block_time'] as String),
     );
@@ -197,8 +195,8 @@ Map<String, dynamic> _$SlotInfoToJson(SlotInfo instance) => <String, dynamic>{
     };
 
 StakeInfo _$StakeInfoFromJson(Map<String, dynamic> json) => StakeInfo(
-      amount: (json['amount'] as num).toInt(),
-      slotNumber: (json['slot_number'] as num).toInt(),
+      amount: json['amount'] as int,
+      slotNumber: json['slot_number'] as int,
     );
 
 Map<String, dynamic> _$StakeInfoToJson(StakeInfo instance) => <String, dynamic>{
@@ -235,7 +233,7 @@ Map<String, dynamic> _$StatusRejectedToJson(StatusRejected instance) =>
     };
 
 SyncState _$SyncStateFromJson(Map<String, dynamic> json) => SyncState(
-      slotNumber: (json['slot_number'] as num).toInt(),
+      slotNumber: json['slot_number'] as int,
       blockHash: json['block_hash'] as String,
       lastUpdated: DateTime.parse(json['last_updated'] as String),
     );
@@ -255,10 +253,10 @@ Map<String, dynamic> _$VotePlanToJson(VotePlan instance) => <String, dynamic>{
     };
 
 VoterInfo _$VoterInfoFromJson(Map<String, dynamic> json) => VoterInfo(
-      votingPower: (json['voting_power'] as num).toInt(),
+      votingPower: json['voting_power'] as int,
       votingGroup: voterGroupIdFromJson(json['voting_group']),
-      delegationsPower: (json['delegations_power'] as num).toInt(),
-      delegationsCount: (json['delegations_count'] as num).toInt(),
+      delegationsPower: json['delegations_power'] as int,
+      delegationsCount: json['delegations_count'] as int,
       votingPowerSaturation:
           (json['voting_power_saturation'] as num).toDouble(),
       delegatorAddresses: (json['delegator_addresses'] as List<dynamic>?)
