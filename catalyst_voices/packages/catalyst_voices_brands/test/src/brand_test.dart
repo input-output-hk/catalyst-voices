@@ -1,6 +1,6 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/src/brand/brand_bloc.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -22,7 +22,7 @@ void main() {
                   color: Theme.of(context).primaryColor,
                   onPressed: () {
                     context.read<BrandBloc>().add(
-                      const BrandChanged(BrandKey.catalyst),
+                      const BrandChangedEvent(BrandKey.catalyst),
                     );
                   },
                   child: const Text('Catalyst'),
@@ -33,14 +33,14 @@ void main() {
                   child: const Text('Dummy'),
                   onPressed: () {
                     context.read<BrandBloc>().add(
-                      const BrandChanged(BrandKey.dummy),
+                      const BrandChangedEvent(BrandKey.dummy),
                     );
                   },
                 ),
               ],
             ),
           ),
-          theme: state.themeData,
+          theme: ThemeBuilder.buildTheme(state.brandKey),
         );
       },
     ),

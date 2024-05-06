@@ -1,0 +1,24 @@
+name: catalyst_voices_brands
+description: Catalyst Voices Brands.
+version: 0.1.0+1
+publish_to: none
+
+environment:
+  sdk: ">=3.2.6 <4.0.0"
+  flutter: 3.19.5
+
+dependencies:
+  catalyst_voices_assets:
+    path: ../catalyst_voices_assets
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  catalyst_analysis:
+    path: ../../../catalyst_voices_packages/catalyst_analysis
+  catalyst_voices_blocs:
+    path: ../catalyst_voices_blocs
+  flutter_bloc: ^8.1.5
+  flutter_test:
+    sdk: flutter
+  test: ^1.24.9
