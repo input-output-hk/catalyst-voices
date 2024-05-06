@@ -67,7 +67,7 @@ jobs:
         with:
             earthfile: ./catalyst_voices/
             flags:
-            targets: test-report
+            targets: test-unit
             target_flags:
             runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
             artifact: "false"

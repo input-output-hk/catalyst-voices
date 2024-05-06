@@ -79,14 +79,6 @@ pub(crate) struct DocsSettings {
     #[clap(long, default_value = ADDRESS_DEFAULT, env = "ADDRESS")]
     pub(crate) address: SocketAddr,
 
-    /// Flag for adding "http" to servers
-    #[clap(long, default_value = "false", env = "HTTP_AUTO_SERVERS")]
-    pub(crate) http_auto_servers: bool,
-
-    /// Flag for adding "https" to servers
-    #[clap(long, default_value = "true", env = "HTTPS_AUTO_SERVERS")]
-    pub(crate) https_auto_servers: bool,
-
     /// Server name
     #[clap(long, env = "SERVER_NAME")]
     pub(crate) server_name: Option<String>,
@@ -97,11 +89,11 @@ pub(crate) struct DocsSettings {
 pub(crate) struct FollowerSettings {
     /// Check config tick
     #[clap(long, default_value = CHECK_CONFIG_TICK_DEFAULT, env = "CHECK_CONFIG_TICK")]
-    pub(crate) check_config_tick: String,
+    pub(crate) check_config_tick: u64,
 
     /// Data Refresh tick
     #[clap(long, default_value = DATA_REFRESH_TICK_DEFAULT, env = "DATA_REFRESH_TICK")]
-    pub(crate) data_refresh_tick: String,
+    pub(crate) data_refresh_tick: u64,
 
     /// Machine UID
     #[clap(long, default_value = MACHINE_UID_DEFAULT, env = "MACHINE_UID")]

@@ -1,6 +1,7 @@
 // ignore_for_file: discarded_futures
 
 import 'package:catalyst_voices/app/view/app_content.dart';
+import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -35,16 +36,16 @@ final class _AppState extends State<App> {
   }
 
   Future<void> _init() async {
-    await Dependency.instance.init();
+    await Dependencies.instance.init();
   }
 
   List<BlocProvider> _multiBlocProviders() {
     return [
       BlocProvider<AuthenticationBloc>(
-        create: (_) => Dependency.instance.get<AuthenticationBloc>(),
+        create: (_) => Dependencies.instance.get<AuthenticationBloc>(),
       ),
       BlocProvider<LoginBloc>(
-        create: (_) => Dependency.instance.get<LoginBloc>(),
+        create: (_) => Dependencies.instance.get<LoginBloc>(),
       ),
     ];
   }

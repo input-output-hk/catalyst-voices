@@ -2,11 +2,10 @@
 use std::{io::Write, sync::Arc};
 
 use clap::Parser;
-use tokio::time;
 use tracing::{error, info};
 
 use crate::{
-    follower::start_followers,
+    cardano::start_followers,
     logger, service,
     settings::{DocsSettings, ServiceSettings},
     state::State,
@@ -40,9 +39,6 @@ impl Cli {
             Self::Run(settings) => {
                 logger::init(settings.log_level)?;
 
-                let check_config_tick = settings.follower_settings.check_config_tick;
-                let data_refresh_tick = settings.follower_settings.data_refresh_tick;
-
                 // Unique machine id
                 let machine_id = settings.follower_settings.machine_uid;
 
@@ -58,23 +54,10 @@ impl Cli {
                     }
                 });
 
-                // tick until config exists
-                let mut interval =
-                    time::interval(time::Duration::from_secs(check_config_tick.parse::<u64>()?));
-                let config = loop {
-                    interval.tick().await;
-
-                    match event_db.get_follower_config().await {
-                        Ok(config) => break config,
-                        Err(err) => error!("No follower config found, error: {err}"),
-                    }
-                };
-
                 start_followers(
-                    config,
                     event_db.clone(),
-                    data_refresh_tick.parse::<u64>()?,
-                    check_config_tick.parse::<u64>()?,
+                    settings.follower_settings.check_config_tick,
+                    settings.follower_settings.data_refresh_tick,
                     machine_id,
                 )
                 .await?;
