@@ -288,7 +288,8 @@ fn inspect_signature(cbor_value: ciborium::value::Value) -> anyhow::Result<Signa
     Ok(Signature::from_bytes(&signature))
 }
 
-/// Rebuild 61284 from pallas metadata to match original signed 61284 payload
+/// Rebuild 61284 from pallas metadata to match original signed 61284 payload, pallas does not preserve exact 61284 bytes
+/// which is required for signature verification. It must be rebuilt and re-serialzed to perform signature verification.
 fn original_61284_payload(metadata: &Metadatum) -> anyhow::Result<Vec<u8>> {
     /// 61284 CIP-36
     const CIP_36_61284: usize = 61284;
@@ -296,8 +297,6 @@ fn original_61284_payload(metadata: &Metadatum) -> anyhow::Result<Vec<u8>> {
     let metadata_bytes = metadata
         .encode_fragment()
         .map_err(|err| anyhow::anyhow!("cannot encode metadata into bytes {err}"))?;
-
-    validate_cip36_registration(metadata_bytes.as_slice())?;
 
     let cbor_value = ciborium::de::from_reader::<ciborium::Value, _>(metadata_bytes.as_slice())
         .map_err(|err| anyhow::anyhow!("Cannot decode cbor object from bytes, err: {err}"))?;
