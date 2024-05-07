@@ -152,7 +152,7 @@ impl EventDB {
         let chunk_size = (i16::MAX / 5) as usize;
         for chunk in values.chunks(chunk_size) {
             // Build query VALUES statements
-            let values_strings = prepare_sql_params_list(5, chunk.len());
+            let values_strings = prepare_sql_params_list(&[None; 5], chunk.len());
 
             let query = format!("INSERT INTO cardano_slot_index (slot_no, network, epoch_no, block_time, block_hash) VALUES {} ON CONFLICT DO NOTHING", values_strings.join(","));
 

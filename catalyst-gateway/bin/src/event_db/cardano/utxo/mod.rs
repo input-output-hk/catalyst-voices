@@ -136,7 +136,7 @@ impl EventDB {
         // Postgres has a limit of i16::MAX parameters a query can have.
         let chunk_size = (i16::MAX / 5) as usize;
         for chunk in values.chunks(chunk_size) {
-            let values_strings = prepare_sql_params_list(5, chunk.len());
+            let values_strings = prepare_sql_params_list(&[None; 5], chunk.len());
 
             let query = format!(
                 "INSERT INTO cardano_utxo (tx_id, index, asset, stake_credential, value) VALUES {} ON CONFLICT (index, tx_id) DO NOTHING",
@@ -177,7 +177,10 @@ impl EventDB {
         // Postgres has a limit of i16::MAX parameters a query can have.
         let chunk_size = (i16::MAX / 3) as usize;
         for chunk in values.chunks(chunk_size) {
-            let values_strings = prepare_sql_params_list(3, chunk.len());
+            let values_strings = prepare_sql_params_list(
+                &[Some("bytea"), Some("bytea"), Some("integer")],
+                chunk.len(),
+            );
 
             let query = format!(
                 "UPDATE cardano_utxo AS c SET spent_tx_id = v.tx_id FROM (VALUES {}) AS v(tx_id, output_hash, index) WHERE v.index = c.index AND v.output_hash = c.tx_id",
@@ -217,7 +220,7 @@ impl EventDB {
         let chunk_size = (i16::MAX / 3) as usize;
         for chunk in values.chunks(chunk_size) {
             // Build query VALUES statements
-            let values_strings = prepare_sql_params_list(3, chunk.len());
+            let values_strings = prepare_sql_params_list(&[None; 3], chunk.len());
 
             let query = format!(
                 "INSERT INTO cardano_txn_index (id, slot_no, network) VALUES {} ON CONFLICT (id) DO NOTHING",

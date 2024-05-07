@@ -153,7 +153,7 @@ impl EventDB {
         let chunk_size = (i16::MAX / 8) as usize;
         for chunk in values.chunks(chunk_size) {
             // Build query VALUES statements
-            let values_strings = prepare_sql_params_list(8, chunk.len());
+            let values_strings = prepare_sql_params_list(&[None; 8], chunk.len());
 
             let query = format!(
                 r#"INSERT INTO cardano_voter_registration (tx_id, stake_credential, public_voting_key, payment_address, nonce, metadata_cip36, stats, valid) VALUES {} 
