@@ -1,6 +1,10 @@
 // FIXME - Restructuring, return type
 
 // ANS.1 tags BER-encoded
+// RFC ref: 
+// X509 https://datatracker.ietf.org/doc/html/rfc5280
+// Update version of ASN.1 2002 https://datatracker.ietf.org/doc/html/rfc5912
+
 // Reference: https://www.oss.com/asn1/resources/asn1-made-simple/asn1-quick-reference.html
 // Encoding rules reference: https://en.wikipedia.org/wiki/X.690#Encoding
 // ASN.1 and DER for X.509 refernece: https://www.zytrax.com/tech/survival/asn1.html
@@ -26,16 +30,38 @@
 //       extensions      [3]  Extensions{{CertExtensions}} OPTIONAL
 //       ]], ... }
 
+// Name ::= CHOICE { -- only one possibility for now --
+//     rdnSequence  RDNSequence }
+
+//   RDNSequence ::= SEQUENCE OF RelativeDistinguishedName
+
+//   RelativeDistinguishedName ::=
+//     SET SIZE (1..MAX) OF AttributeTypeAndValue
+
+//   AttributeTypeAndValue ::= SEQUENCE {
+//     type     AttributeType,
+//     value    AttributeValue }
+
+//   AttributeType ::= OBJECT IDENTIFIER
+
+//   AttributeValue ::= ANY -- DEFINED BY AttributeType
+
+//   DirectoryString ::= CHOICE {
+//         teletexString           TeletexString (SIZE (1..MAX)),
+//         printableString         PrintableString (SIZE (1..MAX)),
+//         universalString         UniversalString (SIZE (1..MAX)),
+//         utf8String              UTF8String (SIZE (1..MAX)),
+//         bmpString               BMPString (SIZE (1..MAX)) }
 
 // pub const ASN1_BOOL: u8 = 0x01;
 pub const ASN1_INT: u8 = 0x02;
-// pub const ASN1_BIT_STR: u8 = 0x03;
+pub const ASN1_BIT_STR: u8 = 0x03;
 // pub const ASN1_OCTET_STR: u8 = 0x04;
-// pub const ASN1_OID: u8 = 0x06;
+// pub const ASN1_OID: u8 = 0x06; // Object Identifier
 // pub const ASN1_UTF8_STR: u8 = 0x0C;
 // pub const ASN1_PRINT_STR: u8 = 0x13;
 // pub const ASN1_IA5_SRT: u8 = 0x16;
-// pub const ASN1_UTC_TIME: u8 = 0x17;
+pub const ASN1_UTC_TIME: u8 = 0x17;
 // pub const ASN1_GEN_TIME: u8 = 0x18;
 pub const ASN1_SEQ: u8 = 0x30; // Tag 16, but is a constructed form
 // pub const ASN1_SET: u8 = 0x31; // Tag 17, but is a constructed form
@@ -112,7 +138,7 @@ fn bytes_to_u64(bytes: &[u8]) -> u64 {
 
 // Parse a DER encoded tag and returns the value
 #[allow(unused)]
-pub fn parse_der_tag(b: &[u8], tag: u8) -> &[u8] {
+pub fn parse_der_tlv(b: &[u8], tag: u8) -> &[u8] {
     // Every first byte of TLV should match the given tag
     if b[0] != tag {
         println!("b[0] {} not equal to tag {}", b[0], tag);
@@ -129,7 +155,7 @@ pub fn parse_der_tag(b: &[u8], tag: u8) -> &[u8] {
 #[allow(unused)]
 pub fn parse_der_sequence_set(b: &[u8], tag: u8) -> Vec<&[u8]> {
     let mut vec = Vec::new();
-    let mut value = parse_der_tag(b, tag);
+    let mut value = parse_der_tlv(b, tag);
 
     while !value.is_empty() {
         let (tlv, temp) = extract_value_by_length(value, false);
@@ -192,21 +218,46 @@ mod tests {
         assert_eq!(certificate.len(), 3);
 
         // TBS Certificate
-        let tbs_certificate = parse_der_sequence_set(certificate[0], 0x30);
+        let tbs_certificate = parse_der_sequence_set(certificate[0], ASN1_SEQ);
+        let signature_algorithm = certificate[1];
+        println!("Signature {:?}", signature_algorithm);
+
+        let signature_value = parse_der_tlv(certificate[2], ASN1_BIT_STR);
 
         // Only support X.509 v3
-        let version = parse_der_tag(tbs_certificate[0], ASN1_VERSION);
+        let version = parse_der_tlv(tbs_certificate[0], ASN1_VERSION);
         // Version  ::=  INTEGER  {  v1(0), v2(1), v3(2)  }
-        if parse_der_tag(version, ASN1_INT)[0] == 2 {
+        let version_value = parse_der_tlv(version, ASN1_INT);
+        if version_value[0] == 2 {
             println!("X.509 v3");
         }
 
-        let serial_number = parse_der_tag(tbs_certificate[1], ASN1_INT);
-        let signature = parse_der_tag(tbs_certificate[2], ASN1_SEQ);
-        let issuer = parse_der_tag(tbs_certificate[3], ASN1_SEQ);
-        let validity = parse_der_tag(tbs_certificate[4], ASN1_SEQ);
-        let subject = parse_der_tag(tbs_certificate[5], ASN1_SEQ);
-        let subject_public_key_info = parse_der_tag(tbs_certificate[6], ASN1_SEQ);
-        let extensions = parse_der_tag(tbs_certificate[7], ASN1_EXTENSION_ADDITION_GROUP_3);
+        let serial_number = parse_der_tlv(tbs_certificate[1], ASN1_INT);
+
+        let signature = tbs_certificate[2];
+
+        // MUST contain the same algorithm identifier as the signatureAlgorithm field in the sequence Certificate
+        if signature == signature_algorithm {
+            println!("Signature Match");
+        }
+
+
+        // Name
+        let issuer = parse_der_tlv(tbs_certificate[3], ASN1_SEQ);
+
+        let validity_seq = parse_der_sequence_set(tbs_certificate[4], ASN1_SEQ);
+        if validity_seq.len() == 2 {
+            println!("Validity seq length");
+            // Can be UTC time or Generalized time
+            let not_before = parse_der_tlv(validity_seq[0], ASN1_UTC_TIME); // Certificate validity period begins
+            let not_after = parse_der_tlv(validity_seq[1], ASN1_UTC_TIME); // Certificate validity period ends
+            println!("Not before {:?}", not_before);
+            println!("Not after {:?}", not_after); 
+        }
+
+        // Name
+        let subject = parse_der_tlv(tbs_certificate[5], ASN1_SEQ);
+        let subject_public_key_info = parse_der_tlv(tbs_certificate[6], ASN1_SEQ);
+        let extensions = parse_der_tlv(tbs_certificate[7], ASN1_EXTENSION_ADDITION_GROUP_3);
     }
 }
