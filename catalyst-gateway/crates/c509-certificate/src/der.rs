@@ -57,14 +57,14 @@
 pub const ASN1_INT: u8 = 0x02;
 pub const ASN1_BIT_STR: u8 = 0x03;
 // pub const ASN1_OCTET_STR: u8 = 0x04;
-// pub const ASN1_OID: u8 = 0x06; // Object Identifier
+pub const ASN1_OID: u8 = 0x06; // Object Identifier
 // pub const ASN1_UTF8_STR: u8 = 0x0C;
 // pub const ASN1_PRINT_STR: u8 = 0x13;
 // pub const ASN1_IA5_SRT: u8 = 0x16;
 pub const ASN1_UTC_TIME: u8 = 0x17;
 // pub const ASN1_GEN_TIME: u8 = 0x18;
 pub const ASN1_SEQ: u8 = 0x30; // Tag 16, but is a constructed form
-// pub const ASN1_SET: u8 = 0x31; // Tag 17, but is a constructed form
+pub const ASN1_SET: u8 = 0x31; // Tag 17, but is a constructed form
 pub const ASN1_VERSION: u8 = 0xa0; // For version
 pub const ASN1_EXTENSION_ADDITION_GROUP_3: u8 = 0xa3;
 
@@ -145,7 +145,6 @@ pub fn parse_der_tlv(b: &[u8], tag: u8) -> &[u8] {
         return &[];
     }
 
-    println!("{:?}", b);
     // Want only the value V
     let (value, _) = extract_value_by_length(b, true);
     value
@@ -168,6 +167,10 @@ pub fn parse_der_sequence_set(b: &[u8], tag: u8) -> Vec<&[u8]> {
 #[cfg(test)]
 #[allow(unused)]
 mod tests {
+
+    use x509_cert::name::RelativeDistinguishedName;
+
+    use crate::der::{parse_der_sequence_set, parse_der_tlv};
 
     use super::*;
 
@@ -218,32 +221,45 @@ mod tests {
         assert_eq!(certificate.len(), 3);
 
         // TBS Certificate
+        // ref: https://datatracker.ietf.org/doc/html/rfc5280#section-4.1
         let tbs_certificate = parse_der_sequence_set(certificate[0], ASN1_SEQ);
+        assert_eq!(tbs_certificate.len(), 8);
         let signature_algorithm = certificate[1];
-        println!("Signature {:?}", signature_algorithm);
-
         let signature_value = parse_der_tlv(certificate[2], ASN1_BIT_STR);
 
-        // Only support X.509 v3
         let version = parse_der_tlv(tbs_certificate[0], ASN1_VERSION);
-        // Version  ::=  INTEGER  {  v1(0), v2(1), v3(2)  }
         let version_value = parse_der_tlv(version, ASN1_INT);
-        if version_value[0] == 2 {
-            println!("X.509 v3");
-        }
+        assert_eq!(version_value[0], 2);
+        println!("Version {:?}", version_value[0]);
 
         let serial_number = parse_der_tlv(tbs_certificate[1], ASN1_INT);
+        println!("Serial number {:?}", serial_number);
 
-        let signature = tbs_certificate[2];
-
-        // MUST contain the same algorithm identifier as the signatureAlgorithm field in the sequence Certificate
-        if signature == signature_algorithm {
-            println!("Signature Match");
+        assert_eq!(tbs_certificate[2], signature_algorithm);
+        let signature = parse_der_sequence_set(tbs_certificate[2], ASN1_SEQ);
+        for x in signature {
+            let signature_algorithm = parse_der_tlv(x, ASN1_OID);
+            println!("Signature algorithm {:?}", signature_algorithm);
         }
 
-
         // Name
-        let issuer = parse_der_tlv(tbs_certificate[3], ASN1_SEQ);
+        let issuer_seq_name = parse_der_sequence_set(tbs_certificate[3], ASN1_SEQ);
+        println!("Issuer sequence name {:?}", issuer_seq_name);
+        // Each sequence name will contain a set of RelativeDistinguishedName
+        for x in issuer_seq_name {
+            let issuer_set_rdn = parse_der_sequence_set(x, ASN1_SET);
+            println!("  Issuer set rdn {:?}", issuer_set_rdn);
+            for y in issuer_set_rdn {
+                let issuer_attr_type_value = parse_der_sequence_set(y, ASN1_SEQ);
+                // Have 2 value, type and value
+                assert_eq!(issuer_attr_type_value.len(), 2);
+                let issuer_attr_type = parse_der_tlv(issuer_attr_type_value[0], ASN1_OID);
+                let issuer_attr_value = parse_der_tlv(issuer_attr_type_value[1], issuer_attr_type_value[1][0]); // HACK - value can be off any type
+                println!("      Issuer attribute type {:?}", issuer_attr_type);
+                println!("      Issuer attribute value {:?}", issuer_attr_value);
+            }
+        }
+
 
         let validity_seq = parse_der_sequence_set(tbs_certificate[4], ASN1_SEQ);
         if validity_seq.len() == 2 {
@@ -251,13 +267,25 @@ mod tests {
             // Can be UTC time or Generalized time
             let not_before = parse_der_tlv(validity_seq[0], ASN1_UTC_TIME); // Certificate validity period begins
             let not_after = parse_der_tlv(validity_seq[1], ASN1_UTC_TIME); // Certificate validity period ends
-            println!("Not before {:?}", not_before);
-            println!("Not after {:?}", not_after); 
+            println!("  Not before {:?}", not_before);
+            println!("  Not after {:?}", not_after);
         }
 
-        // Name
-        let subject = parse_der_tlv(tbs_certificate[5], ASN1_SEQ);
-        let subject_public_key_info = parse_der_tlv(tbs_certificate[6], ASN1_SEQ);
+        // Name (Same as issuer)
+        let subject = parse_der_sequence_set(tbs_certificate[5], ASN1_SEQ);
+
+        let subject_public_key_info = parse_der_sequence_set(tbs_certificate[6], ASN1_SEQ);
+        assert_eq!(subject_public_key_info.len(), 2);
+        let subject_public_key_algorithm = parse_der_sequence_set(subject_public_key_info[0], ASN1_SEQ);
+        assert_eq!(subject_public_key_algorithm.len(), 2);
+        println!("Subject public key algorithm identifier{:?}", subject_public_key_algorithm);
+        let subject_public_key_algorithm_oid = parse_der_tlv(subject_public_key_algorithm[0], ASN1_OID);
+        println!("  Algorithm{:?}", subject_public_key_algorithm_oid);
+        let subject_public_key_algorithm_param = parse_der_tlv(subject_public_key_algorithm[1], ASN1_OID);
+        println!("  Param{:?}", subject_public_key_algorithm_param);
+        let subject_public_key = parse_der_tlv(subject_public_key_info[1], ASN1_BIT_STR);
+        println!("Subject public key{:?}", subject_public_key);
+
         let extensions = parse_der_tlv(tbs_certificate[7], ASN1_EXTENSION_ADDITION_GROUP_3);
     }
 }
