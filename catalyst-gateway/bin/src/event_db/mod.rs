@@ -10,6 +10,7 @@ pub(crate) mod cardano;
 pub(crate) mod error;
 pub(crate) mod legacy;
 pub(crate) mod schema_check;
+pub(crate) mod utils;
 
 /// Database URL Environment Variable name.
 /// eg: "`postgres://catalyst-dev:CHANGE_ME@localhost/CatalystDev`"

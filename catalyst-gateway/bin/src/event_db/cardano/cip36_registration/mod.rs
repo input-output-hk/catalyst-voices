@@ -8,7 +8,10 @@ use crate::{
         cip36_registration::{Cip36Metadata, VotingInfo},
         util::valid_era,
     },
-    event_db::{cardano::chain_state::SlotNumber, error::NotFoundError, EventDB},
+    event_db::{
+        cardano::chain_state::SlotNumber, error::NotFoundError, utils::prepare_sql_params_list,
+        EventDB,
+    },
 };
 
 /// Transaction id
@@ -150,24 +153,7 @@ impl EventDB {
         let chunk_size = (i16::MAX / 8) as usize;
         for chunk in values.chunks(chunk_size) {
             // Build query VALUES statements
-            let mut values_strings = Vec::with_capacity(chunk.len());
-            let mut i = 1;
-
-            for _ in chunk {
-                values_strings.push(format!(
-                    "(${},${},${},${},${},${},${},${})",
-                    i,
-                    i + 1,
-                    i + 2,
-                    i + 3,
-                    i + 4,
-                    i + 5,
-                    i + 6,
-                    i + 7,
-                ));
-
-                i += 8;
-            }
+            let values_strings = prepare_sql_params_list(8, chunk.len());
 
             let query = format!(
                 r#"INSERT INTO cardano_voter_registration (tx_id, stake_credential, public_voting_key, payment_address, nonce, metadata_cip36, stats, valid) VALUES {} 

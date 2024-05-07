@@ -7,7 +7,7 @@ use tracing::error;
 use super::{chain_state::SlotNumber, cip36_registration::StakeCredential};
 use crate::{
     cardano::util::parse_policy_assets,
-    event_db::{error::NotFoundError, EventDB},
+    event_db::{error::NotFoundError, utils::prepare_sql_params_list, EventDB},
 };
 
 /// Stake amount.
@@ -136,20 +136,7 @@ impl EventDB {
         // Postgres has a limit of i16::MAX parameters a query can have.
         let chunk_size = (i16::MAX / 5) as usize;
         for chunk in values.chunks(chunk_size) {
-            let mut values_strings = Vec::with_capacity(chunk.len());
-            let mut i = 1;
-
-            for _ in chunk {
-                values_strings.push(format!(
-                    "(${},${},${},${},${})",
-                    i,
-                    i + 1,
-                    i + 2,
-                    i + 3,
-                    i + 4
-                ));
-                i += 5;
-            }
+            let values_strings = prepare_sql_params_list(5, chunk.len());
 
             let query = format!(
                 "INSERT INTO cardano_utxo (tx_id, index, asset, stake_credential, value) VALUES {} ON CONFLICT (index, tx_id) DO NOTHING",
@@ -190,18 +177,7 @@ impl EventDB {
         // Postgres has a limit of i16::MAX parameters a query can have.
         let chunk_size = (i16::MAX / 3) as usize;
         for chunk in values.chunks(chunk_size) {
-            let mut values_strings = Vec::with_capacity(chunk.len());
-            let mut i = 1;
-
-            for _ in chunk {
-                values_strings.push(format!(
-                    "(${}::bytea,${}::bytea,${}::integer)",
-                    i,
-                    i + 1,
-                    i + 2
-                ));
-                i += 3;
-            }
+            let values_strings = prepare_sql_params_list(3, chunk.len());
 
             let query = format!(
                 "UPDATE cardano_utxo AS c SET spent_tx_id = v.tx_id FROM (VALUES {}) AS v(tx_id, output_hash, index) WHERE v.index = c.index AND v.output_hash = c.tx_id",
@@ -241,13 +217,7 @@ impl EventDB {
         let chunk_size = (i16::MAX / 3) as usize;
         for chunk in values.chunks(chunk_size) {
             // Build query VALUES statements
-            let mut values_strings = Vec::with_capacity(chunk.len());
-            let mut i = 1;
-
-            for _ in chunk {
-                values_strings.push(format!("(${},${},${})", i, i + 1, i + 2));
-                i += 3;
-            }
+            let values_strings = prepare_sql_params_list(3, chunk.len());
 
             let query = format!(
                 "INSERT INTO cardano_txn_index (id, slot_no, network) VALUES {} ON CONFLICT (id) DO NOTHING",

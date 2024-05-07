@@ -5,7 +5,7 @@ use handlebars::Handlebars;
 use pallas::ledger::traverse::{wellknown::GenesisValues, MultiEraBlock};
 use tracing::error;
 
-use crate::event_db::{error::NotFoundError, EventDB};
+use crate::event_db::{error::NotFoundError, utils::prepare_sql_params_list, EventDB};
 
 /// Block time
 pub type DateTime = chrono::DateTime<chrono::offset::Utc>;
@@ -152,21 +152,7 @@ impl EventDB {
         let chunk_size = (i16::MAX / 5) as usize;
         for chunk in values.chunks(chunk_size) {
             // Build query VALUES statements
-            let mut values_strings = Vec::with_capacity(chunk.len());
-            let mut i = 1;
-
-            for _ in chunk {
-                values_strings.push(format!(
-                    "(${},${},${},${},${})",
-                    i,
-                    i + 1,
-                    i + 2,
-                    i + 3,
-                    i + 4,
-                ));
-
-                i += 5;
-            }
+            let values_strings = prepare_sql_params_list(5, chunk.len());
 
             let query = format!("INSERT INTO cardano_slot_index (slot_no, network, epoch_no, block_time, block_hash) VALUES {} ON CONFLICT DO NOTHING", values_strings.join(","));
 
