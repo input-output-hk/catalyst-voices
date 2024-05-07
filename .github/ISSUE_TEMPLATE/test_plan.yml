@@ -14,7 +14,7 @@ body:
   - type: input
     attributes:
       label: Test plan document
-      placeholder: https://input-output-hk.github.io/catalyst-voices/architecture/10_quality/testplans/template
+      placeholder: https://input-output-hk.github.io/catalyst-voices/architecture/10_quality/testplans/template.md
       description: A link to the test plan document.
     validations:
       required: true
@@ -22,7 +22,7 @@ body:
   - type: textarea
     attributes:
       label: Test cases
-      description: The of the test cases that are part of the test plan
+      description: The list of the test cases that are part of the test plan
       placeholder: |
         -[] https://github.com/input-output-hk/catalyst-voices/issues/1
         -[] https://github.com/input-output-hk/catalyst-voices/issues/1
