@@ -290,7 +290,7 @@ fn inspect_signature(cbor_value: ciborium::value::Value) -> anyhow::Result<Signa
 
 /// Rebuild 61284 from pallas metadata to match original signed 61284 payload, pallas does
 /// not preserve exact 61284 bytes which is required for signature verification. It must
-/// be rebuilt and re-serialzed to perform signature verification.
+/// be rebuilt and re-serialized to perform signature verification.
 fn original_61284_payload(metadata: &Metadatum) -> anyhow::Result<Vec<u8>> {
     /// 61284 CIP-36
     const CIP_36_61284: usize = 61284;
