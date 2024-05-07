@@ -308,7 +308,7 @@ fn original_61284_payload(metadata: &Metadatum) -> anyhow::Result<Vec<u8>> {
 
     let registration_payload = Value::Map(vec![(
         Value::Integer(Integer::from(CIP_36_61284)),
-        ciborium::Value::Map(cbor_map.to_vec()),
+        ciborium::Value::Map(cbor_map.clone()),
     )]);
 
     let mut raw_61284 = Vec::new();
