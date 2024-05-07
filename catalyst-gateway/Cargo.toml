@@ -49,8 +49,8 @@ handlebars = "5.1.2"
 anyhow = "1.0.71"
 cddl = "0.9.2"
 ciborium = "0.2"
-pallas = { git = "https://github.com/input-output-hk/catalyst-pallas.git", branch = "fix/immutable-secondary", version = "0.24.0" }
-cardano-chain-follower= { git = "https://github.com/input-output-hk/hermes.git", version="0.0.1" }
+pallas = { git = "https://github.com/input-output-hk/catalyst-pallas.git", rev = "954e99db9e9c3e4c4b1677614054fbe18f692504", version = "0.25.0" }
+cardano-chain-follower = { git = "https://github.com/input-output-hk/hermes.git", version="0.0.1" }
 
 [workspace.lints.rust]
 warnings = "deny"
