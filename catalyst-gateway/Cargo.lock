@@ -337,12 +337,6 @@ checksum = "6107fe1be6682a68940da878d9e9f5e90ca5745b3dec9fd1bb393c8777d4f581"
 
 [[package]]
 name = "base64"
-version = "0.13.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9e1b586273c5702936fe7b7d6896644d8be71e6314cfe09d3167c95f712589e8"
-
-[[package]]
-name = "base64"
 version = "0.21.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9d297deb1925b89f2ccc13d7635fa0714f12c87adce1c75356b39ca9b7178567"
@@ -542,9 +536,9 @@ checksum = "a2bd12c1caf447e69cd4528f47f94d203fd2582878ecb9e9465484c4148a8223"
 [[package]]
 name = "cardano-chain-follower"
 version = "0.0.1"
-source = "git+https://github.com/input-output-hk/hermes.git#5a814ce79714ccef2254014b9b1a122f3cebef4d"
+source = "git+https://github.com/input-output-hk/hermes.git#c45ba64a53942c179862572a60fff80c8171f4f0"
 dependencies = [
- "pallas 0.24.0",
+ "pallas",
  "pallas-hardano",
  "thiserror",
  "tokio",
@@ -571,7 +565,7 @@ dependencies = [
  "hex",
  "lazy_static",
  "local-ip-address",
- "pallas 0.25.0",
+ "pallas",
  "panic-message",
  "poem",
  "poem-extensions",
@@ -1408,15 +1402,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "home"
-version = "0.5.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e3d1354bf6b7235cb4a0576c2619fd4ed18183f689b12b006a0ee7329eeff9a5"
-dependencies = [
- "windows-sys 0.52.0",
-]
-
-[[package]]
 name = "http"
 version = "0.2.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1666,15 +1651,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "29c15563dc2726973df627357ce0c9ddddbea194836909d655df6a75d2cf296d"
 dependencies = [
  "wasm-bindgen",
-]
-
-[[package]]
-name = "keccak"
-version = "0.1.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ecc2af9a1119c51f12a14607e783cb977bde58bc069ff0c3da1095e635d70654"
-dependencies = [
- "cpufeatures",
 ]
 
 [[package]]
@@ -2109,50 +2085,19 @@ checksum = "b15813163c1d831bf4a13c3610c05c0d03b39feb07f7e09fa234dac9b15aaf39"
 
 [[package]]
 name = "pallas"
-version = "0.24.0"
-source = "git+https://github.com/input-output-hk/catalyst-pallas.git?branch=fix/immutable-secondary#c992da03d63c8fb32c64e1d2142b7d969a90ee44"
-dependencies = [
- "pallas-addresses 0.24.0",
- "pallas-applying 0.24.0",
- "pallas-codec 0.24.0",
- "pallas-configs 0.24.0",
- "pallas-crypto 0.24.0",
- "pallas-network 0.24.0",
- "pallas-primitives 0.24.0",
- "pallas-traverse 0.24.0",
- "pallas-utxorpc 0.24.0",
-]
-
-[[package]]
-name = "pallas"
 version = "0.25.0"
 source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=954e99db9e9c3e4c4b1677614054fbe18f692504#954e99db9e9c3e4c4b1677614054fbe18f692504"
 dependencies = [
- "pallas-addresses 0.25.0",
- "pallas-applying 0.25.0",
- "pallas-codec 0.25.0",
- "pallas-configs 0.25.0",
- "pallas-crypto 0.25.0",
- "pallas-network 0.25.0",
- "pallas-primitives 0.25.0",
- "pallas-traverse 0.25.0",
+ "pallas-addresses",
+ "pallas-applying",
+ "pallas-codec",
+ "pallas-configs",
+ "pallas-crypto",
+ "pallas-network",
+ "pallas-primitives",
+ "pallas-traverse",
  "pallas-txbuilder",
- "pallas-utxorpc 0.25.0",
-]
-
-[[package]]
-name = "pallas-addresses"
-version = "0.24.0"
-source = "git+https://github.com/input-output-hk/catalyst-pallas.git?branch=fix/immutable-secondary#c992da03d63c8fb32c64e1d2142b7d969a90ee44"
-dependencies = [
- "base58",
- "bech32",
- "crc",
- "hex",
- "pallas-codec 0.24.0",
- "pallas-crypto 0.24.0",
- "sha3",
- "thiserror",
+ "pallas-utxorpc",
 ]
 
 [[package]]
@@ -2165,23 +2110,9 @@ dependencies = [
  "crc",
  "cryptoxide",
  "hex",
- "pallas-codec 0.25.0",
- "pallas-crypto 0.25.0",
+ "pallas-codec",
+ "pallas-crypto",
  "thiserror",
-]
-
-[[package]]
-name = "pallas-applying"
-version = "0.24.0"
-source = "git+https://github.com/input-output-hk/catalyst-pallas.git?branch=fix/immutable-secondary#c992da03d63c8fb32c64e1d2142b7d969a90ee44"
-dependencies = [
- "hex",
- "pallas-addresses 0.24.0",
- "pallas-codec 0.24.0",
- "pallas-crypto 0.24.0",
- "pallas-primitives 0.24.0",
- "pallas-traverse 0.24.0",
- "rand",
 ]
 
 [[package]]
@@ -2190,23 +2121,12 @@ version = "0.25.0"
 source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=954e99db9e9c3e4c4b1677614054fbe18f692504#954e99db9e9c3e4c4b1677614054fbe18f692504"
 dependencies = [
  "hex",
- "pallas-addresses 0.25.0",
- "pallas-codec 0.25.0",
- "pallas-crypto 0.25.0",
- "pallas-primitives 0.25.0",
- "pallas-traverse 0.25.0",
+ "pallas-addresses",
+ "pallas-codec",
+ "pallas-crypto",
+ "pallas-primitives",
+ "pallas-traverse",
  "rand",
-]
-
-[[package]]
-name = "pallas-codec"
-version = "0.24.0"
-source = "git+https://github.com/input-output-hk/catalyst-pallas.git?branch=fix/immutable-secondary#c992da03d63c8fb32c64e1d2142b7d969a90ee44"
-dependencies = [
- "hex",
- "minicbor",
- "serde",
- "thiserror",
 ]
 
 [[package]]
@@ -2218,20 +2138,6 @@ dependencies = [
  "minicbor",
  "serde",
  "thiserror",
-]
-
-[[package]]
-name = "pallas-configs"
-version = "0.24.0"
-source = "git+https://github.com/input-output-hk/catalyst-pallas.git?branch=fix/immutable-secondary#c992da03d63c8fb32c64e1d2142b7d969a90ee44"
-dependencies = [
- "base64 0.22.0",
- "hex",
- "pallas-addresses 0.24.0",
- "pallas-codec 0.24.0",
- "pallas-crypto 0.24.0",
- "serde",
- "serde_json",
 ]
 
 [[package]]
@@ -2242,10 +2148,10 @@ dependencies = [
  "base64 0.22.0",
  "hex",
  "num-rational",
- "pallas-addresses 0.25.0",
- "pallas-codec 0.25.0",
- "pallas-crypto 0.25.0",
- "pallas-primitives 0.25.0",
+ "pallas-addresses",
+ "pallas-codec",
+ "pallas-crypto",
+ "pallas-primitives",
  "serde",
  "serde_json",
  "serde_with",
@@ -2253,25 +2159,12 @@ dependencies = [
 
 [[package]]
 name = "pallas-crypto"
-version = "0.24.0"
-source = "git+https://github.com/input-output-hk/catalyst-pallas.git?branch=fix/immutable-secondary#c992da03d63c8fb32c64e1d2142b7d969a90ee44"
-dependencies = [
- "cryptoxide",
- "hex",
- "pallas-codec 0.24.0",
- "rand_core",
- "serde",
- "thiserror",
-]
-
-[[package]]
-name = "pallas-crypto"
 version = "0.25.0"
 source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=954e99db9e9c3e4c4b1677614054fbe18f692504#954e99db9e9c3e4c4b1677614054fbe18f692504"
 dependencies = [
  "cryptoxide",
  "hex",
- "pallas-codec 0.25.0",
+ "pallas-codec",
  "rand_core",
  "serde",
  "thiserror",
@@ -2279,12 +2172,12 @@ dependencies = [
 
 [[package]]
 name = "pallas-hardano"
-version = "0.24.0"
-source = "git+https://github.com/input-output-hk/catalyst-pallas.git?branch=fix/immutable-secondary#c992da03d63c8fb32c64e1d2142b7d969a90ee44"
+version = "0.25.0"
+source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=954e99db9e9c3e4c4b1677614054fbe18f692504#954e99db9e9c3e4c4b1677614054fbe18f692504"
 dependencies = [
  "binary-layout",
- "pallas-network 0.24.0",
- "pallas-traverse 0.24.0",
+ "pallas-network",
+ "pallas-traverse",
  "tap",
  "thiserror",
  "tracing",
@@ -2292,51 +2185,19 @@ dependencies = [
 
 [[package]]
 name = "pallas-network"
-version = "0.24.0"
-source = "git+https://github.com/input-output-hk/catalyst-pallas.git?branch=fix/immutable-secondary#c992da03d63c8fb32c64e1d2142b7d969a90ee44"
-dependencies = [
- "byteorder",
- "hex",
- "itertools 0.12.1",
- "pallas-codec 0.24.0",
- "pallas-crypto 0.24.0",
- "rand",
- "socket2",
- "thiserror",
- "tokio",
- "tracing",
-]
-
-[[package]]
-name = "pallas-network"
 version = "0.25.0"
 source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=954e99db9e9c3e4c4b1677614054fbe18f692504#954e99db9e9c3e4c4b1677614054fbe18f692504"
 dependencies = [
  "byteorder",
  "hex",
  "itertools 0.12.1",
- "pallas-codec 0.25.0",
- "pallas-crypto 0.25.0",
+ "pallas-codec",
+ "pallas-crypto",
  "rand",
  "socket2",
  "thiserror",
  "tokio",
  "tracing",
-]
-
-[[package]]
-name = "pallas-primitives"
-version = "0.24.0"
-source = "git+https://github.com/input-output-hk/catalyst-pallas.git?branch=fix/immutable-secondary#c992da03d63c8fb32c64e1d2142b7d969a90ee44"
-dependencies = [
- "base58",
- "bech32",
- "hex",
- "log",
- "pallas-codec 0.24.0",
- "pallas-crypto 0.24.0",
- "serde",
- "serde_json",
 ]
 
 [[package]]
@@ -2348,25 +2209,10 @@ dependencies = [
  "bech32",
  "hex",
  "log",
- "pallas-codec 0.25.0",
- "pallas-crypto 0.25.0",
+ "pallas-codec",
+ "pallas-crypto",
  "serde",
  "serde_json",
-]
-
-[[package]]
-name = "pallas-traverse"
-version = "0.24.0"
-source = "git+https://github.com/input-output-hk/catalyst-pallas.git?branch=fix/immutable-secondary#c992da03d63c8fb32c64e1d2142b7d969a90ee44"
-dependencies = [
- "hex",
- "pallas-addresses 0.24.0",
- "pallas-codec 0.24.0",
- "pallas-crypto 0.24.0",
- "pallas-primitives 0.24.0",
- "paste",
- "serde",
- "thiserror",
 ]
 
 [[package]]
@@ -2375,10 +2221,10 @@ version = "0.25.0"
 source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=954e99db9e9c3e4c4b1677614054fbe18f692504#954e99db9e9c3e4c4b1677614054fbe18f692504"
 dependencies = [
  "hex",
- "pallas-addresses 0.25.0",
- "pallas-codec 0.25.0",
- "pallas-crypto 0.25.0",
- "pallas-primitives 0.25.0",
+ "pallas-addresses",
+ "pallas-codec",
+ "pallas-crypto",
+ "pallas-primitives",
  "paste",
  "serde",
  "thiserror",
@@ -2390,11 +2236,11 @@ version = "0.25.0"
 source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=954e99db9e9c3e4c4b1677614054fbe18f692504#954e99db9e9c3e4c4b1677614054fbe18f692504"
 dependencies = [
  "hex",
- "pallas-addresses 0.25.0",
- "pallas-codec 0.25.0",
- "pallas-crypto 0.25.0",
- "pallas-primitives 0.25.0",
- "pallas-traverse 0.25.0",
+ "pallas-addresses",
+ "pallas-codec",
+ "pallas-crypto",
+ "pallas-primitives",
+ "pallas-traverse",
  "pallas-wallet",
  "serde",
  "serde_json",
@@ -2403,24 +2249,13 @@ dependencies = [
 
 [[package]]
 name = "pallas-utxorpc"
-version = "0.24.0"
-source = "git+https://github.com/input-output-hk/catalyst-pallas.git?branch=fix/immutable-secondary#c992da03d63c8fb32c64e1d2142b7d969a90ee44"
-dependencies = [
- "pallas-codec 0.24.0",
- "pallas-primitives 0.24.0",
- "pallas-traverse 0.24.0",
- "utxorpc-spec 0.3.0",
-]
-
-[[package]]
-name = "pallas-utxorpc"
 version = "0.25.0"
 source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=954e99db9e9c3e4c4b1677614054fbe18f692504#954e99db9e9c3e4c4b1677614054fbe18f692504"
 dependencies = [
- "pallas-codec 0.25.0",
- "pallas-primitives 0.25.0",
- "pallas-traverse 0.25.0",
- "utxorpc-spec 0.5.1",
+ "pallas-codec",
+ "pallas-primitives",
+ "pallas-traverse",
+ "utxorpc-spec",
 ]
 
 [[package]]
@@ -2432,7 +2267,7 @@ dependencies = [
  "bip39",
  "cryptoxide",
  "ed25519-bip32",
- "pallas-crypto 0.25.0",
+ "pallas-crypto",
  "rand",
  "thiserror",
 ]
@@ -2474,16 +2309,6 @@ checksum = "de3145af08024dea9fa9914f381a17b8fc6034dfb00f3a84013f7ff43f29ed4c"
 
 [[package]]
 name = "pbjson"
-version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "048f9ac93c1eab514f9470c4bc8d97ca2a0a236b84f45cc19d69a59fc11467f6"
-dependencies = [
- "base64 0.13.1",
- "serde",
-]
-
-[[package]]
-name = "pbjson"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1030c719b0ec2a2d25a5df729d6cff1acf3cc230bf766f4f97833591f7577b90"
@@ -2494,41 +2319,14 @@ dependencies = [
 
 [[package]]
 name = "pbjson-build"
-version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bdbb7b706f2afc610f3853550cdbbf6372fd324824a087806bd4480ea4996e24"
-dependencies = [
- "heck 0.4.1",
- "itertools 0.10.5",
- "prost 0.11.9",
- "prost-types 0.11.9",
-]
-
-[[package]]
-name = "pbjson-build"
 version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2580e33f2292d34be285c5bc3dba5259542b083cfad6037b6d70345f24dcb735"
 dependencies = [
  "heck 0.4.1",
  "itertools 0.11.0",
- "prost 0.12.4",
- "prost-types 0.12.4",
-]
-
-[[package]]
-name = "pbjson-types"
-version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4a88c8d87f99a4ac14325e7a4c24af190fca261956e3b82dd7ed67e77e6c7043"
-dependencies = [
- "bytes",
- "chrono",
- "pbjson 0.5.1",
- "pbjson-build 0.5.1",
- "prost 0.11.9",
- "prost-build 0.11.9",
- "serde",
+ "prost",
+ "prost-types",
 ]
 
 [[package]]
@@ -2539,10 +2337,10 @@ checksum = "18f596653ba4ac51bdecbb4ef6773bc7f56042dc13927910de1684ad3d32aa12"
 dependencies = [
  "bytes",
  "chrono",
- "pbjson 0.6.0",
- "pbjson-build 0.6.2",
- "prost 0.12.4",
- "prost-build 0.12.4",
+ "pbjson",
+ "pbjson-build",
+ "prost",
+ "prost-build",
  "serde",
 ]
 
@@ -2883,16 +2681,6 @@ dependencies = [
 
 [[package]]
 name = "prettyplease"
-version = "0.1.25"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6c8646e95016a7a6c4adea95bafa8a16baab64b583356217f2c85db4a39d9a86"
-dependencies = [
- "proc-macro2",
- "syn 1.0.109",
-]
-
-[[package]]
-name = "prettyplease"
 version = "0.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8d3928fb5db768cb86f891ff014f0144589297e3c6a1aba6ed7cecfdace270c7"
@@ -2960,44 +2748,12 @@ dependencies = [
 
 [[package]]
 name = "prost"
-version = "0.11.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0b82eaa1d779e9a4bc1c3217db8ffbeabaae1dca241bf70183242128d48681cd"
-dependencies = [
- "bytes",
- "prost-derive 0.11.9",
-]
-
-[[package]]
-name = "prost"
 version = "0.12.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d0f5d036824e4761737860779c906171497f6d55681139d8312388f8fe398922"
 dependencies = [
  "bytes",
- "prost-derive 0.12.4",
-]
-
-[[package]]
-name = "prost-build"
-version = "0.11.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "119533552c9a7ffacc21e099c24a0ac8bb19c2a2a3f363de84cd9b844feab270"
-dependencies = [
- "bytes",
- "heck 0.4.1",
- "itertools 0.10.5",
- "lazy_static",
- "log",
- "multimap",
- "petgraph",
- "prettyplease 0.1.25",
- "prost 0.11.9",
- "prost-types 0.11.9",
- "regex",
- "syn 1.0.109",
- "tempfile",
- "which",
+ "prost-derive",
 ]
 
 [[package]]
@@ -3007,31 +2763,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "80b776a1b2dc779f5ee0641f8ade0125bc1298dd41a9a0c16d8bd57b42d222b1"
 dependencies = [
  "bytes",
- "heck 0.4.1",
- "itertools 0.10.5",
+ "heck 0.5.0",
+ "itertools 0.11.0",
  "log",
  "multimap",
  "once_cell",
  "petgraph",
- "prettyplease 0.2.17",
- "prost 0.12.4",
- "prost-types 0.12.4",
+ "prettyplease",
+ "prost",
+ "prost-types",
  "regex",
  "syn 2.0.53",
  "tempfile",
-]
-
-[[package]]
-name = "prost-derive"
-version = "0.11.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e5d2d8d10f3c6ded6da8b05b5fb3b8a5082514344d56c9f871412d29b4e075b4"
-dependencies = [
- "anyhow",
- "itertools 0.10.5",
- "proc-macro2",
- "quote",
- "syn 1.0.109",
 ]
 
 [[package]]
@@ -3041,19 +2784,10 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "19de2de2a00075bf566bee3bd4db014b11587e84184d3f7a791bc17f1a8e9e48"
 dependencies = [
  "anyhow",
- "itertools 0.10.5",
+ "itertools 0.11.0",
  "proc-macro2",
  "quote",
  "syn 2.0.53",
-]
-
-[[package]]
-name = "prost-types"
-version = "0.11.9"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "213622a1460818959ac1181aaeb2dc9c7f63df720db7d788b3e24eacd1983e13"
-dependencies = [
- "prost 0.11.9",
 ]
 
 [[package]]
@@ -3062,7 +2796,7 @@ version = "0.12.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3235c33eb02c1f1e212abdbe34c78b264b038fb58ca612664343271e36e55ffe"
 dependencies = [
- "prost 0.12.4",
+ "prost",
 ]
 
 [[package]]
@@ -3476,16 +3210,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "sha3"
-version = "0.10.8"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "75872d278a8f37ef87fa0ddbda7802605cb18344497949862c0d4dcb291eba60"
-dependencies = [
- "digest",
- "keccak",
-]
-
-[[package]]
 name = "sharded-slab"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3876,34 +3600,6 @@ dependencies = [
 
 [[package]]
 name = "tonic"
-version = "0.9.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3082666a3a6433f7f511c7192923fa1fe07c69332d3c6a2e6bb040b569199d5a"
-dependencies = [
- "async-trait",
- "axum",
- "base64 0.21.7",
- "bytes",
- "futures-core",
- "futures-util",
- "h2 0.3.26",
- "http 0.2.12",
- "http-body 0.4.6",
- "hyper 0.14.28",
- "hyper-timeout",
- "percent-encoding",
- "pin-project",
- "prost 0.11.9",
- "tokio",
- "tokio-stream",
- "tower",
- "tower-layer",
- "tower-service",
- "tracing",
-]
-
-[[package]]
-name = "tonic"
 version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "76c4eb7a4e9ef9d4763600161f12f5070b92a578e1b634db88a6887844c91a13"
@@ -3920,7 +3616,7 @@ dependencies = [
  "hyper-timeout",
  "percent-encoding",
  "pin-project",
- "prost 0.12.4",
+ "prost",
  "tokio",
  "tokio-stream",
  "tower",
@@ -4172,31 +3868,17 @@ checksum = "711b9620af191e0cdc7468a8d14e709c3dcdb115b36f838e601583af800a370a"
 
 [[package]]
 name = "utxorpc-spec"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "88f80e24bfe310d0972406d15c0892ff09b6c81ded2cdefc0183aac35cf0514f"
-dependencies = [
- "bytes",
- "pbjson 0.5.1",
- "pbjson-types 0.5.1",
- "prost 0.11.9",
- "serde",
- "tonic 0.9.2",
-]
-
-[[package]]
-name = "utxorpc-spec"
 version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e6ed1da9027ea2010458a9aa5da7d896518176165d630f0325ad2c994f69772b"
 dependencies = [
  "bytes",
  "futures-core",
- "pbjson 0.6.0",
- "pbjson-types 0.6.0",
- "prost 0.12.4",
+ "pbjson",
+ "pbjson-types",
+ "prost",
  "serde",
- "tonic 0.11.0",
+ "tonic",
 ]
 
 [[package]]
@@ -4324,18 +4006,6 @@ checksum = "5a6580f308b1fad9207618087a65c04e7a10bc77e02c8e84e9b00dd4b12fa0bb"
 dependencies = [
  "js-sys",
  "wasm-bindgen",
-]
-
-[[package]]
-name = "which"
-version = "4.4.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "87ba24419a2078cd2b0f2ede2691b6c66d8e47836da3b6db8265ebad47afbfc7"
-dependencies = [
- "either",
- "home",
- "once_cell",
- "rustix",
 ]
 
 [[package]]
