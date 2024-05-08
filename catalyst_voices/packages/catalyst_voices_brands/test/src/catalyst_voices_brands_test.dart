@@ -55,7 +55,7 @@ void main() {
     // the color of the widgets we are testing and they are the colors
     // we will check against to ensure correct rendering.
     final fallbackColor = ThemeData(useMaterial3: true).primaryColor;
-    const catalystColor = VoicesColors.blue;
+    const catalystColor = VoicesColors.lightPrimary;
 
     testWidgets('Default Catalyst theme is applied', (tester) async {
       await tester.pumpWidget(
