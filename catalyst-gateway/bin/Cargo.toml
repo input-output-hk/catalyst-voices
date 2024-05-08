@@ -62,10 +62,10 @@ rust-embed = { workspace = true }
 local-ip-address = { workspace = true }
 gethostname = { workspace = true }
 hex = { workspace = true }
-async-recursion = { workspace = true }
 pallas = { workspace = true }
 cardano-chain-follower= { workspace = true }
 anyhow = { workspace = true }
 handlebars = { workspace = true }
 cddl = { workspace = true }
 ciborium = { workspace = true }
+ed25519-dalek = "2.1.1"

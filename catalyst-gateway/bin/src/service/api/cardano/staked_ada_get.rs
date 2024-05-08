@@ -2,22 +2,26 @@
 
 use poem_extensions::{
     response,
-    UniResponse::{T200, T400, T404, T503},
+    UniResponse::{T200, T400, T404},
 };
-use poem_openapi::{payload::Json, types::ToJSON};
+use poem_openapi::payload::Json;
 
 use crate::{
-    cli::Error,
-    event_db::{error::Error as DBError, follower::SlotNumber},
-    service::common::{
-        objects::cardano::{network::Network, stake_address::StakeAddress, stake_info::StakeInfo},
-        responses::{
-            resp_2xx::OK,
-            resp_4xx::{ApiValidationError, NotFound},
-            resp_5xx::{server_error_response, ServerError, ServiceUnavailable},
+    event_db::{cardano::chain_state::SlotNumber, error::NotFoundError},
+    service::{
+        common::{
+            objects::cardano::{
+                network::Network, stake_address::StakeAddress, stake_info::StakeInfo,
+            },
+            responses::{
+                resp_2xx::OK,
+                resp_4xx::{ApiValidationError, NotFound},
+                resp_5xx::{handle_5xx_response, ServerError, ServiceUnavailable},
+            },
         },
+        utilities::check_network,
     },
-    state::{SchemaVersionStatus, State},
+    state::State,
 };
 
 /// # All Responses
@@ -29,68 +33,15 @@ pub(crate) type AllResponses = response! {
     503: ServiceUnavailable,
 };
 
-/// Check the provided network type with the encoded inside the stake address
-fn check_network(
-    address_network: pallas::ledger::addresses::Network, provided_network: Option<Network>,
-) -> Result<Network, ApiValidationError> {
-    match address_network {
-        pallas::ledger::addresses::Network::Mainnet => {
-            if let Some(network) = provided_network {
-                if !matches!(&network, Network::Mainnet) {
-                    return Err(ApiValidationError::new(format!(
-                                "Provided network type {} does not match stake address network type Mainnet",  network.to_json_string()
-                            )));
-                }
-            }
-            Ok(Network::Mainnet)
-        },
-        pallas::ledger::addresses::Network::Testnet => {
-            // the preprod and preview network types are encoded as `testnet` in the stake
-            // address, so here we are checking if the `provided_network` type matches the
-            // one, and if not - we return an error.
-            // if the `provided_network` omitted - we return the `testnet` network type
-            if let Some(network) = provided_network {
-                if !matches!(
-                    network,
-                    Network::Testnet | Network::Preprod | Network::Preview
-                ) {
-                    return Err(ApiValidationError::new(format!(
-                                "Provided network type {} does not match stake address network type Testnet", network.to_json_string()
-                            )));
-                }
-                Ok(network)
-            } else {
-                Ok(Network::Testnet)
-            }
-        },
-        pallas::ledger::addresses::Network::Other(x) => {
-            Err(ApiValidationError::new(format!("Unknown network type {x}")))
-        },
-    }
-}
-
 /// # GET `/staked_ada`
-#[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(
     state: &State, stake_address: StakeAddress, provided_network: Option<Network>,
     slot_num: Option<SlotNumber>,
 ) -> AllResponses {
-    let event_db = match state.event_db() {
-        Ok(event_db) => event_db,
-        Err(Error::EventDb(DBError::MismatchedSchema { was, expected })) => {
-            tracing::error!(
-                expected = expected,
-                current = was,
-                "DB schema version status mismatch"
-            );
-            state.set_schema_version_status(SchemaVersionStatus::Mismatch);
-            return T503(ServiceUnavailable);
-        },
-        Err(err) => return server_error_response!("{err}"),
-    };
+    let event_db = state.event_db();
 
     let date_time = slot_num.unwrap_or(SlotNumber::MAX);
-    let stake_credential = stake_address.payload().as_hash().as_ref();
+    let stake_credential = stake_address.payload().as_hash().to_vec();
 
     let network = match check_network(stake_address.network(), provided_network) {
         Ok(network) => network,
@@ -108,7 +59,7 @@ pub(crate) async fn endpoint(
                 slot_number,
             })))
         },
-        Err(DBError::NotFound) => T404(NotFound),
-        Err(err) => server_error_response!("{err}"),
+        Err(err) if err.is::<NotFoundError>() => T404(NotFound),
+        Err(err) => handle_5xx_response!(err),
     }
 }

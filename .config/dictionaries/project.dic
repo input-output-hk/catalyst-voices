@@ -22,7 +22,7 @@ CBOR
 cborg
 CEST
 cfbundle
-chromedriver
+chromedriverFeat/cips
 chrono
 ciphertext
 CIPs
@@ -78,9 +78,11 @@ jormungandr
 Jörmungandr
 junitreport
 Keyhash
+keyserver
 lcov
 Leshiy
 libapp
+libavcodec
 libflutter
 lintfix
 localizable
@@ -102,6 +104,7 @@ netifas
 netkey
 nextest
 Oleksandr
+onboarded
 oneshot
 openapi
 opentelemetry
@@ -183,3 +186,5 @@ xctest
 xctestrun
 xcworkspace
 yoroi
+multiplatform
+Multiplatform

@@ -9,7 +9,7 @@ use poem_openapi::{
 };
 
 use crate::{
-    event_db::follower::{DateTime, SlotNumber},
+    event_db::cardano::chain_state::{DateTime, SlotNumber},
     service::{
         common::{
             objects::cardano::{network::Network, stake_address::StakeAddress},
@@ -21,6 +21,7 @@ use crate::{
 };
 
 mod date_time_to_slot_number_get;
+mod registration_get;
 mod staked_ada_get;
 mod sync_state_get;
 
@@ -67,6 +68,46 @@ impl CardanoApi {
         slot_number: Query<Option<SlotNumber>>,
     ) -> staked_ada_get::AllResponses {
         staked_ada_get::endpoint(&data, stake_address.0, network.0, slot_number.0).await
+    }
+
+    #[oai(
+        path = "/registration/:stake_address",
+        method = "get",
+        operation_id = "registrationGet",
+        transform = "schema_version_validation"
+    )]
+    /// Get registration info.
+    ///
+    /// This endpoint returns the registration info followed by the [CIP-36](https://cips.cardano.org/cip/CIP-36/) to the
+    /// corresponded user's stake address.
+    ///
+    /// ## Responses
+    /// * 200 OK - Returns the registration info.
+    /// * 400 Bad Request.
+    /// * 404 Not Found.
+    /// * 500 Server Error - If anything within this function fails unexpectedly.
+    /// * 503 Service Unavailable - Service is not ready, requests to other
+    /// endpoints should not be sent until the service becomes ready.
+    async fn registration_get(
+        &self, data: Data<&Arc<State>>,
+        /// The stake address of the user.
+        /// Should a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
+        stake_address: Path<StakeAddress>,
+        /// Cardano network type.
+        /// If omitted network type is identified from the stake address.
+        /// If specified it must be correspondent to the network type encoded in the stake
+        /// address.
+        /// As `preprod` and `preview` network types in the stake address encoded as a
+        /// `testnet`, to specify `preprod` or `preview` network type use this
+        /// query parameter.
+        network: Query<Option<Network>>,
+        /// Slot number at which the staked ada amount should be calculated.
+        /// If omitted latest slot number is used.
+        // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
+        #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
+        slot_number: Query<Option<SlotNumber>>,
+    ) -> registration_get::AllResponses {
+        registration_get::endpoint(&data, stake_address.0, network.0, slot_number.0).await
     }
 
     #[oai(

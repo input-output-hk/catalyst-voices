@@ -7,8 +7,9 @@ VERSION --try --global-cache --arg-scope-and-set 0.7
 # subcommand.
 deps:
     FROM debian:bookworm-slim
+    ARG TARGETARCH
     RUN apt-get update
-    RUN apt-get install -y git curl unzip bzip2 bash jq gpg
+    RUN apt-get install -y git curl unzip bzip2 bash jq gpg lcov
     COPY --dir test_driver/scripts .
     RUN chmod +x scripts/install-chrome-linux64.sh && ./scripts/install-chrome-linux64.sh
     RUN chmod +x scripts/install-edge-linux64.sh && ./scripts/install-edge-linux64.sh
@@ -23,11 +24,14 @@ deps:
     RUN flutter --version
     RUN flutter doctor -v
     RUN flutter config --enable-web
+    RUN dart pub global activate melos
     RUN dart pub global activate junitreport
+    RUN dart pub global activate coverage
 
 src:
     FROM +deps
-    COPY --dir pubspec.yaml lib packages web test test_driver integration_test .
+    COPY ../+repo-catalyst-voices-all/repo .
+    RUN melos bootstrap
 
 # code-generator - Generates flutter code.
 # Based on Catalyst Gateway OpenAPI specifications generates models, clients
@@ -37,9 +41,7 @@ src:
 code-generator:
     ARG save_locally=false
 
-    FROM +deps
-    COPY --dir pubspec.yaml lib packages web test test_driver integration_test catalyst_voices
-    COPY ../+repo-catalyst-voices-packages/repo .
+    FROM +src
     WORKDIR /frontend/catalyst_voices/packages/catalyst_voices_services
     COPY ../catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
     RUN flutter pub get
@@ -60,24 +62,31 @@ check-flutter-code-generator:
     # Check diff between local code and earthly artifacts
     RUN diff /tmp/repo_generated lib/generated/catalyst_gateway
 
+check-static-analysis:
+    FROM +src
+    RUN melos analyze --fatal-infos --fatal-warnings
+
+check-code-formatting:
+    FROM +src
+    RUN melos run format-check
+
 # Build web version of Catalyst Voices
 build:
     FROM +src
 
+    WORKDIR /frontend/catalyst_voices
     RUN flutter clean
     RUN flutter pub get
     RUN flutter build web --web-renderer canvaskit --release --target lib/configs/main_web.dart
 
-    WORKDIR /frontend/build
+    WORKDIR /frontend/catalyst_voices/build
     SAVE ARTIFACT web /web AS LOCAL web
 
 test-unit:
-    FROM +build
-    WORKDIR /frontend
-    TRY
-        RUN flutter test --reporter expanded . --machine | tojunit --output flutter.junit-report.xml
-    FINALLY
-        SAVE ARTIFACT flutter.junit-report.xml AS LOCAL flutter-unit-tests.junit-report.xml
+    FROM +src
+    RUN melos run test-report
+    WAIT
+        SAVE ARTIFACT test_reports AS LOCAL test_reports
     END
 
 package:

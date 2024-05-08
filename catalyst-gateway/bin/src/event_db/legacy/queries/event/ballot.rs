@@ -2,7 +2,7 @@
 use std::collections::HashMap;
 
 use crate::event_db::{
-    error::Error,
+    error::NotFoundError,
     legacy::types::{
         ballot::{
             Ballot, BallotType, GroupVotePlans, ObjectiveBallots, ObjectiveChoices, ProposalBallot,
@@ -52,7 +52,7 @@ impl EventDB {
     #[allow(dead_code)]
     pub(crate) async fn get_ballot(
         &self, event: EventId, objective: ObjectiveId, proposal: ProposalId,
-    ) -> Result<Ballot, Error> {
+    ) -> anyhow::Result<Ballot> {
         let conn = self.pool.get().await?;
 
         let rows = conn
@@ -62,7 +62,7 @@ impl EventDB {
                 &proposal.0,
             ])
             .await?;
-        let row = rows.first().ok_or(Error::NotFound)?;
+        let row = rows.first().ok_or(NotFoundError)?;
         let choices = row.try_get("objective")?;
 
         let rows = conn
@@ -95,7 +95,7 @@ impl EventDB {
     #[allow(dead_code)]
     pub(crate) async fn get_objective_ballots(
         &self, event: EventId, objective: ObjectiveId,
-    ) -> Result<Vec<ProposalBallot>, Error> {
+    ) -> anyhow::Result<Vec<ProposalBallot>> {
         let conn = self.pool.get().await?;
 
         let rows = conn
@@ -145,7 +145,7 @@ impl EventDB {
     #[allow(dead_code)]
     pub(crate) async fn get_event_ballots(
         &self, event: EventId,
-    ) -> Result<Vec<ObjectiveBallots>, Error> {
+    ) -> anyhow::Result<Vec<ObjectiveBallots>> {
         let conn = self.pool.get().await?;
 
         let rows = conn
