@@ -37,7 +37,7 @@ impl Cli {
     pub(crate) async fn exec(self) -> anyhow::Result<()> {
         match self {
             Self::Run(settings) => {
-                logger::init(settings.log_level)?;
+                let logger_handle = logger::init(settings.log_level);
 
                 // Unique machine id
                 let machine_id = settings.follower_settings.machine_uid;
