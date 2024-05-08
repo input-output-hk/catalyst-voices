@@ -156,7 +156,7 @@ impl EventDB {
             let values_strings = prepare_sql_params_list(&[None; 8], chunk.len());
 
             let query = format!(
-                r#"INSERT INTO cardano_voter_registration (tx_id, stake_credential, public_voting_key, payment_address, nonce, metadata_cip36, stats, valid) VALUES {} 
+                r#"EXPLAIN (BUFFERS TRUE, ANALYZE TRUE) INSERT INTO cardano_voter_registration (tx_id, stake_credential, public_voting_key, payment_address, nonce, metadata_cip36, stats, valid) VALUES {} 
                 ON CONFLICT (tx_id) DO UPDATE SET stake_credential = EXCLUDED.stake_credential, public_voting_key = EXCLUDED.public_voting_key, payment_address = EXCLUDED.payment_address,
                 nonce = EXCLUDED.nonce, metadata_cip36 = EXCLUDED.metadata_cip36, stats = EXCLUDED.stats, valid = EXCLUDED.valid"#,
                 values_strings.join(",")

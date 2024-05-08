@@ -3,9 +3,10 @@
 use cardano_chain_follower::Network;
 use handlebars::Handlebars;
 use pallas::ledger::traverse::{wellknown::GenesisValues, MultiEraBlock};
+use tokio_postgres::{binary_copy::BinaryCopyInWriter, types::Type};
 use tracing::error;
 
-use crate::event_db::{error::NotFoundError, utils::prepare_sql_params_list, EventDB};
+use crate::event_db::{error::NotFoundError, EventDB};
 
 /// Block time
 pub type DateTime = chrono::DateTime<chrono::offset::Utc>;
@@ -147,31 +148,47 @@ impl EventDB {
             return Ok(());
         }
 
-        let conn = self.pool.get().await?;
+        let mut conn = self.pool.get().await?;
+        let tx = conn.transaction().await?;
 
-        let chunk_size = (i16::MAX / 5) as usize;
-        for chunk in values.chunks(chunk_size) {
-            // Build query VALUES statements
-            let values_strings = prepare_sql_params_list(&[None; 5], chunk.len());
+        tx.execute(
+            "CREATE TEMPORARY TABLE tmp_cardano_slot_index (LIKE cardano_slot_index) ON COMMIT DROP",
+            &[],
+        )
+        .await?;
 
-            let query = format!("INSERT INTO cardano_slot_index (slot_no, network, epoch_no, block_time, block_hash) VALUES {} ON CONFLICT DO NOTHING", values_strings.join(","));
+        {
+            let sink = tx
+                .copy_in("COPY tmp_cardano_slot_index (slot_no, network, epoch_no, block_time, block_hash) FROM STDIN BINARY")
+                .await?;
+            let writer = BinaryCopyInWriter::new(sink, &[
+                Type::INT8,
+                Type::TEXT,
+                Type::INT8,
+                Type::TIMESTAMPTZ,
+                Type::BYTEA,
+            ]);
+            tokio::pin!(writer);
 
-            #[allow(trivial_casts)]
-            let params: Vec<_> = chunk
-                .iter()
-                .flat_map(|vs| {
-                    [
-                        &vs.slot_no as &(dyn tokio_postgres::types::ToSql + Sync),
-                        &vs.network,
-                        &vs.epoch_no,
-                        &vs.block_time,
-                        &vs.block_hash,
-                    ]
-                })
-                .collect();
+            for params in values {
+                #[allow(trivial_casts)]
+                writer
+                    .as_mut()
+                    .write(&[
+                        &params.slot_no as &(dyn tokio_postgres::types::ToSql + Sync),
+                        &params.network,
+                        &params.epoch_no,
+                        &params.block_time,
+                        &params.block_hash,
+                    ])
+                    .await?;
+            }
 
-            conn.execute(&query, &params).await?;
+            writer.finish().await?;
         }
+
+        tx.execute("INSERT INTO cardano_slot_index (slot_no, network, epoch_no, block_time, block_hash) SELECT slot_no, network, epoch_no, block_time, block_hash FROM tmp_cardano_slot_index ON CONFLICT DO NOTHING", &[]).await?;
+        tx.commit().await?;
 
         Ok(())
     }

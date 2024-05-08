@@ -136,7 +136,7 @@ async fn process_blocks(
 
     let mut blocks_buffer = Vec::new();
 
-    let mut ticker = tokio::time::interval(Duration::from_secs(1));
+    let mut ticker = tokio::time::interval(Duration::from_secs(60));
     ticker.set_missed_tick_behavior(tokio::time::MissedTickBehavior::Delay);
 
     loop {

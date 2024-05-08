@@ -2,12 +2,13 @@
 
 use cardano_chain_follower::Network;
 use pallas::ledger::{addresses::Address, traverse::MultiEraTx};
+use tokio_postgres::{binary_copy::BinaryCopyInWriter, types::Type};
 use tracing::error;
 
 use super::{chain_state::SlotNumber, cip36_registration::StakeCredential};
 use crate::{
     cardano::util::parse_policy_assets,
-    event_db::{error::NotFoundError, utils::prepare_sql_params_list, EventDB},
+    event_db::{error::NotFoundError, EventDB},
 };
 
 /// Stake amount.
@@ -130,35 +131,47 @@ impl EventDB {
             return Ok(());
         }
 
-        let conn = self.pool.get().await?;
+        let mut conn = self.pool.get().await?;
+        let tx = conn.transaction().await?;
 
-        // Queries are divided into chunks because
-        // Postgres has a limit of i16::MAX parameters a query can have.
-        let chunk_size = (i16::MAX / 5) as usize;
-        for chunk in values.chunks(chunk_size) {
-            let values_strings = prepare_sql_params_list(&[None; 5], chunk.len());
+        tx.execute(
+            "CREATE TEMPORARY TABLE tmp_cardano_utxo (LIKE cardano_utxo) ON COMMIT DROP",
+            &[],
+        )
+        .await?;
 
-            let query = format!(
-                "INSERT INTO cardano_utxo (tx_id, index, asset, stake_credential, value) VALUES {} ON CONFLICT (index, tx_id) DO NOTHING",
-                values_strings.join(",")
-            );
+        {
+            let sink = tx
+            .copy_in("COPY tmp_cardano_utxo (tx_id, index, asset, stake_credential, value) FROM STDIN BINARY")
+            .await?;
+            let writer = BinaryCopyInWriter::new(sink, &[
+                Type::BYTEA,
+                Type::INT4,
+                Type::JSONB,
+                Type::BYTEA,
+                Type::INT8,
+            ]);
+            tokio::pin!(writer);
 
-            #[allow(trivial_casts)]
-            let params: Vec<_> = chunk
-                .iter()
-                .flat_map(|vs| {
-                    [
-                        &vs.id as &(dyn tokio_postgres::types::ToSql + Sync),
-                        &vs.index,
-                        &vs.asset,
-                        &vs.stake_credential,
-                        &vs.value,
-                    ]
-                })
-                .collect();
+            for params in values {
+                #[allow(trivial_casts)]
+                writer
+                    .as_mut()
+                    .write(&[
+                        &params.id as &(dyn tokio_postgres::types::ToSql + Sync),
+                        &params.index,
+                        &params.asset,
+                        &params.stake_credential,
+                        &params.value,
+                    ])
+                    .await?;
+            }
 
-            conn.execute(&query, &params).await?;
+            writer.finish().await?;
         }
+
+        tx.execute("INSERT INTO cardano_utxo (tx_id, index, asset, stake_credential, value) SELECT tx_id, index, asset, stake_credential, value FROM tmp_cardano_utxo ON CONFLICT (tx_id, index) DO NOTHING", &[]).await?;
+        tx.commit().await?;
 
         Ok(())
     }
@@ -171,36 +184,41 @@ impl EventDB {
             return Ok(());
         }
 
-        let conn = self.pool.get().await?;
+        let mut conn = self.pool.get().await?;
+        let tx = conn.transaction().await?;
 
-        // Queries are divided into chunks because
-        // Postgres has a limit of i16::MAX parameters a query can have.
-        let chunk_size = (i16::MAX / 3) as usize;
-        for chunk in values.chunks(chunk_size) {
-            let values_strings = prepare_sql_params_list(
-                &[Some("bytea"), Some("bytea"), Some("integer")],
-                chunk.len(),
-            );
+        tx.execute(
+            "CREATE TEMPORARY TABLE tmp_cardano_utxo_update (tx_id BYTEA, output_hash BYTEA, index INTEGER) ON COMMIT DROP",
+            &[],
+        )
+        .await?;
 
-            let query = format!(
-                "UPDATE cardano_utxo AS c SET spent_tx_id = v.tx_id FROM (VALUES {}) AS v(tx_id, output_hash, index) WHERE v.index = c.index AND v.output_hash = c.tx_id",
-                values_strings.join(",")
-            );
+        {
+            let sink = tx
+                .copy_in(
+                    "COPY tmp_cardano_utxo_update (tx_id, output_hash, index) FROM STDIN BINARY",
+                )
+                .await?;
+            let writer = BinaryCopyInWriter::new(sink, &[Type::BYTEA, Type::BYTEA, Type::INT4]);
+            tokio::pin!(writer);
 
-            #[allow(trivial_casts)]
-            let params: Vec<_> = chunk
-                .iter()
-                .flat_map(|vs| {
-                    [
-                        &vs.id as &(dyn tokio_postgres::types::ToSql + Sync),
-                        &vs.output_hash,
-                        &vs.output_index,
-                    ]
-                })
-                .collect();
+            for params in values {
+                #[allow(trivial_casts)]
+                writer
+                    .as_mut()
+                    .write(&[
+                        &params.id as &(dyn tokio_postgres::types::ToSql + Sync),
+                        &params.output_hash,
+                        &params.output_index,
+                    ])
+                    .await?;
+            }
 
-            conn.execute(&query, &params).await?;
+            writer.finish().await?;
         }
+
+        tx.execute("UPDATE cardano_utxo AS c SET spent_tx_id = v.tx_id FROM (SELECT * FROM tmp_cardano_utxo_update) AS v WHERE v.index = c.index AND v.output_hash = c.tx_id", &[]).await?;
+        tx.commit().await?;
 
         Ok(())
     }
@@ -213,34 +231,39 @@ impl EventDB {
             return Ok(());
         }
 
-        let conn = self.pool.get().await?;
+        let mut conn = self.pool.get().await?;
+        let tx = conn.transaction().await?;
 
-        // Queries are divided into chunks because
-        // Postgres has a limit of i16::MAX parameters a query can have.
-        let chunk_size = (i16::MAX / 3) as usize;
-        for chunk in values.chunks(chunk_size) {
-            // Build query VALUES statements
-            let values_strings = prepare_sql_params_list(&[None; 3], chunk.len());
+        tx.execute(
+            "CREATE TEMPORARY TABLE tmp_cardano_txn_index (LIKE cardano_txn_index) ON COMMIT DROP",
+            &[],
+        )
+        .await?;
 
-            let query = format!(
-                "INSERT INTO cardano_txn_index (id, slot_no, network) VALUES {} ON CONFLICT (id) DO NOTHING",
-                values_strings.join(",")
-            );
+        {
+            let sink = tx
+                .copy_in("COPY tmp_cardano_txn_index (id, slot_no, network) FROM STDIN BINARY")
+                .await?;
+            let writer = BinaryCopyInWriter::new(sink, &[Type::BYTEA, Type::INT8, Type::TEXT]);
+            tokio::pin!(writer);
 
-            #[allow(trivial_casts)]
-            let params: Vec<_> = chunk
-                .iter()
-                .flat_map(|vs| {
-                    [
-                        &vs.id as &(dyn tokio_postgres::types::ToSql + Sync),
-                        &vs.slot_no,
-                        &vs.network,
-                    ]
-                })
-                .collect();
+            for params in values {
+                #[allow(trivial_casts)]
+                writer
+                    .as_mut()
+                    .write(&[
+                        &params.id as &(dyn tokio_postgres::types::ToSql + Sync),
+                        &params.slot_no,
+                        &params.network,
+                    ])
+                    .await?;
+            }
 
-            conn.execute(&query, &params).await?;
+            writer.finish().await?;
         }
+
+        tx.execute("INSERT INTO cardano_txn_index (id, slot_no, network) SELECT id, slot_no, network FROM tmp_cardano_txn_index ON CONFLICT (id) DO NOTHING", &[]).await?;
+        tx.commit().await?;
 
         Ok(())
     }
