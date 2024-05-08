@@ -99,6 +99,7 @@ impl EventDB {
         let Some(cip36) = Cip36Metadata::generate_from_tx_metadata(&tx.metadata(), network) else {
             return Ok(());
         };
+
         let tx_hash = tx.hash().to_vec();
         let (stake_credential, voting_info, rewards_address, nonce) =
             if let Some(reg) = cip36.registration {
