@@ -8,3 +8,5 @@ final ThemeData catalyst = ThemeData(
     primary: VoicesColors.blue,
   ),
 );
+
+final ThemeData darkCatalyst = ThemeData.dark();

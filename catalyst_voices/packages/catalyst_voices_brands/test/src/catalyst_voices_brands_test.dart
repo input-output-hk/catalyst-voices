@@ -43,6 +43,7 @@ void main() {
             ),
           ),
           theme: ThemeBuilder.buildTheme(state.brandKey),
+          darkTheme: ThemeBuilder.buildTheme(state.brandKey),
         );
       },
     ),
