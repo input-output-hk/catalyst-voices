@@ -1,11 +1,16 @@
 //! Health Endpoints
 use std::sync::Arc;
 
-use poem::web::Data;
+use poem::web::{Data, Query};
 use poem_openapi::OpenApi;
 
-use crate::{service::common::tags::ApiTags, state::State};
+use crate::{
+    logger::LogLevel,
+    service::common::tags::ApiTags,
+    state::{DeepQueryInspection, State},
+};
 
+mod inspection_get;
 mod live_get;
 mod ready_get;
 mod started_get;
@@ -75,5 +80,18 @@ impl HealthApi {
     /// * 503 Service Unavailable - Service is possibly not running reliably.
     async fn live_get(&self) -> live_get::AllResponses {
         live_get::endpoint().await
+    }
+
+    #[oai(
+        path = "/inspection",
+        method = "get",
+        operation_id = "healthInspection"
+    )]
+    /// Options for service inspection.
+    async fn inspection(
+        &self, state: Data<&Arc<State>>, log_level: Query<Option<LogLevel>>,
+        query_inspection: Query<Option<DeepQueryInspection>>,
+    ) -> inspection_get::AllResponses {
+        inspection_get::endpoint(state, log_level.0, query_inspection.0).await
     }
 }

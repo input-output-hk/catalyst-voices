@@ -27,6 +27,24 @@ pub(crate) struct InspectionSettings {
     pub(crate) logger_handle: Handle<LevelFilter, Registry>,
 }
 
+impl InspectionSettings {
+    /// Modify the deep query inspection setting.
+    pub(crate) fn modify_deep_query(&self, deep_query: DeepQueryInspection) -> anyhow::Result<()> {
+        *self
+            .deep_query
+            .lock()
+            .map_err(|_| Error::QueryInspectionUpdate)? = deep_query;
+        Ok(())
+    }
+
+    /// Modify the logger level setting.
+    /// This will reload the logger.
+    pub(crate) fn modify_logger_level(&self, level: LogLevel) -> anyhow::Result<()> {
+        self.logger_handle
+            .modify(|f| *f = LevelFilter::from_level(level.into()))?;
+        Ok(())
+    }
+}
 /// Global State of the service
 pub(crate) struct State {
     /// This can be None, or a handle to the DB.
@@ -71,4 +89,12 @@ impl State {
     pub(crate) fn inspection_settings(&self) -> Arc<InspectionSettings> {
         self.inspection.clone()
     }
+}
+
+#[derive(thiserror::Error, Debug)]
+/// `State` error.
+pub(crate) enum Error {
+    #[error("failed to update deep query inspection mode")]
+    /// Failed to update deep query inspection mode.
+    QueryInspectionUpdate,
 }
