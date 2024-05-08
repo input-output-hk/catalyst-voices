@@ -4,11 +4,13 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
           https://testing.googleblog.com/2011/09/10-minute-test-plan.html
 -->
 
-*This is meant to be only a guideline, the paragraphs can be removed or added as they fit*
+# Test Plan Template
 
-# [Test Plan Template](https://github.com/input-output-hk/catalyst-voices/issues/1)
+> :memo: **Note:** Substitute with test plan name and link to the github testplan issue.
+>
+# [Test Plan Name](https://github.com/input-output-hk/catalyst-voices/issues/1)
 
-*insert test plan name and link to the github testplan issue*
+> :memo: **Note:** This is meant to be only a guideline, the paragraphs can be removed or added as they fit.
 
 * [General informations](#general-informations)
   * [Abstract](#abstract)
@@ -39,11 +41,11 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 
 ### Abstract
 
-*Describe the design and architecture of the system in a way that highlights possible points of failure*
+> :memo: **Note:** Describe the design and architecture of the system in a way that highlights possible points of failure
 
 ### Stakeholders
 
-*Insert the relevant stakeholders that need to understand, review and approve the test plan*
+> :memo: **Note:** Insert the relevant stakeholders that need to understand, review and approve the test plan
 
 | Role/Name       | Contact        | Approval       |
 |-----------------|----------------|----------------|
@@ -55,37 +57,39 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 
 ### Requirements
 
-*Business requirements, insert links to relevant Github or JIRA tickets, list what platforms are supported, what will not be tested, etc*
+> :memo: **Note:** Business requirements, insert links to relevant Github or JIRA tickets,
+> list what platforms are supported, what will not be tested, etc
 
 ### Tools
 
-*Describe what tools will be needed for the testing, if new tools are needed to be developed*
+> :memo: **Note:** Describe what tools will be needed for the testing, if new tools are needed to be developed
 
 ## ACC framework
 
-*Use the [ACC framework](https://testing.googleblog.com/2011/09/10-minute-test-plan.html) to help you define the test cases*
+> :memo: **Note:** Use the [ACC framework](https://testing.googleblog.com/2011/09/10-minute-test-plan.html)
+> to help you define the test cases
 
 ### Attributes
 
-*The adverbs and adjectives that describe the high level concepts testing is meant to ensure.
-Attributes such as fast, usable, secure, accessible and so forth.
-The quality metrics document in this repo should and can be used as a guideline*
+> :memo: **Note:** The adverbs and adjectives that describe the high level concepts testing is meant to ensure.
+> Attributes such as fast, usable, secure, accessible and so forth.
+> The quality metrics document in this repo should and can be used as a guideline
 
 ### Components
 
-*The nouns that define the major code chunks that comprise the product.
-These are classes, module names and features of the application.*
+> :memo: **Note:** The nouns that define the major code chunks that comprise the product.
+These are classes, module names and features of the application.
 
 ### Capabilities
 
-*The verbs that describe user actions and activities.
-Every capability should be testable.*
+> :memo: **Note:** The verbs that describe user actions and activities.
+> Every capability should be testable.
 
 ## Unit tests
 
 ### Unit tests strategy
 
-*Evaluate new features and bug fixes introduced in this release, and the extent of the unit tests*
+> :memo: **Note:** Evaluate new features and bug fixes introduced in this release, and the extent of the unit tests
 
 ### Unit test cases
 
@@ -97,7 +101,7 @@ Every capability should be testable.*
 
 ### Functional tests strategy
 
-*Evaluate new features introduced in this release, and the extent of the functional tests*
+> :memo: **Note:** Evaluate new features introduced in this release, and the extent of the functional tests
 
 ### Functional test cases
 
@@ -109,7 +113,7 @@ Every capability should be testable.*
 
 ### Regression tests strategy
 
-*Ensure that previously developed and tested software still performs after change.*
+> :memo: **Note:** Ensure that previously developed and tested software still performs after change.
 
 ### Regression test cases
 
@@ -121,7 +125,7 @@ Every capability should be testable.*
 
 ### Integration tests strategy
 
-*Evaluate all integrations with other functions, services etc.*
+> :memo: **Note:** Evaluate all integrations with other functions, services etc.
 
 ### Integration test cases
 
@@ -133,10 +137,10 @@ Every capability should be testable.*
 
 ### End-to-end tests strategy
 
-*Evaluate how will test infrastructure, systems under test, and other dependencies be managed?
-How will they be deployed?
-How will persistence be set-up/torn-down?
-How will you handle required migrations from one datacenter to another?*
+> :memo: **Note:** Evaluate how will test infrastructure, systems under test, and other dependencies be managed?
+> How will they be deployed?
+> How will persistence be set-up/torn-down?
+> How will you handle required migrations from one datacenter to another?
 
 ### End-to-end test cases
 
