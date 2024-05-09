@@ -49,9 +49,9 @@ test-fuzzer-api:
         --service cat-gateway \
         --allow-privileged
         RUN docker run --net=host --name=st schemathesis:latest || echo fail > fail && \
-                docker logs cat-gateway > ./cat-gateway.log && zstd -9 cat-gateway.log && \
-                    docker cp st:/results/junit-report.xml junit-report.xml && \
-                        docker cp st:/results/cassette.yaml cassette.yaml
+            docker-compose logs cat-gateway > ./cat-gateway.log && zstd -9 cat-gateway.log && \
+            docker cp st:/results/junit-report.xml junit-report.xml && \
+            docker cp st:/results/cassette.yaml cassette.yaml
     END
     WAIT
         SAVE ARTIFACT junit-report.xml AS LOCAL schemathesis.junit-report.xml
