@@ -19,32 +19,70 @@ pub(crate) enum DeepQueryInspection {
     Disabled,
 }
 
+#[derive(Clone, Copy)]
+/// Settings for database inspection
+pub(crate) struct DatabaseInspectionSettings {
+    /// Toggle deep query inspection.
+    deep_query: DeepQueryInspection,
+    /// UUID for deep query inspection.
+    uuid: uuid::Uuid,
+}
+
+/// Settings for logger level
+pub(crate) struct LoggerSettings {
+    /// Reload handle for formatting layer.
+    layer_handle: Handle<LevelFilter, Registry>,
+}
+
 /// Settings for service inspection during runtime
 pub(crate) struct InspectionSettings {
-    /// Toggle deep query inspection.
-    pub(crate) deep_query: Arc<Mutex<DeepQueryInspection>>,
-    /// Reload handle for logger.
-    pub(crate) logger_handle: Handle<LevelFilter, Registry>,
+    /// Settings for inspecting the database.
+    db: DatabaseInspectionSettings,
+    /// Settings for inspecting the logs.
+    log: LoggerSettings,
 }
 
 impl InspectionSettings {
+    /// Create a new inspection settings
+    ///
+    /// # Arguments
+    /// * `deep_query_inspection_enabled` - enable deep query inspection
+    /// * `layer_handle` - reload handle for formatting layer
+    ///
+    /// # Returns
+    /// A new inspection settings
+    pub(crate) fn new(
+        deep_query_inspection_enabled: bool, layer_handle: Handle<LevelFilter, Registry>,
+    ) -> Self {
+        Self {
+            db: DatabaseInspectionSettings {
+                deep_query: if deep_query_inspection_enabled {
+                    DeepQueryInspection::Enabled
+                } else {
+                    DeepQueryInspection::Disabled
+                },
+                uuid: uuid::Uuid::new_v4(),
+            },
+            log: LoggerSettings { layer_handle },
+        }
+    }
+
     /// Modify the deep query inspection setting.
-    pub(crate) fn modify_deep_query(&self, deep_query: DeepQueryInspection) -> anyhow::Result<()> {
-        *self
-            .deep_query
-            .lock()
-            .map_err(|_| Error::QueryInspectionUpdate)? = deep_query;
-        Ok(())
+    pub(crate) fn modify_deep_query(&mut self, deep_query: DeepQueryInspection) {
+        self.db.deep_query = deep_query;
+        self.db.uuid = uuid::Uuid::new_v4();
     }
 
     /// Modify the logger level setting.
     /// This will reload the logger.
     pub(crate) fn modify_logger_level(&self, level: LogLevel) -> anyhow::Result<()> {
-        self.logger_handle
+        self.log
+            .layer_handle
             .modify(|f| *f = LevelFilter::from_level(level.into()))?;
         Ok(())
     }
 }
+
 /// Global State of the service
 pub(crate) struct State {
     /// This can be None, or a handle to the DB.
@@ -56,7 +94,7 @@ pub(crate) struct State {
     event_db: Arc<EventDB>, /* This needs to be obsoleted, we want the DB
                              * to be able to be down. */
     /// Settings for service inspection during runtime.
-    inspection: Arc<InspectionSettings>,
+    inspection: Arc<Mutex<InspectionSettings>>,
 }
 
 impl State {
@@ -66,7 +104,7 @@ impl State {
     ) -> anyhow::Result<Self> {
         // Get a configured pool to the Database, runs schema version check internally.
         let event_db = Arc::new(establish_connection(database_url).await?);
-        let inspection = Arc::new(inspection_settings);
+        let inspection = Arc::new(Mutex::new(inspection_settings));
 
         let state = Self {
             event_db,
@@ -86,15 +124,7 @@ impl State {
     }
 
     /// Get the reference to the inspection settings.
-    pub(crate) fn inspection_settings(&self) -> Arc<InspectionSettings> {
+    pub(crate) fn inspection_settings(&self) -> Arc<Mutex<InspectionSettings>> {
         self.inspection.clone()
     }
-}
-
-#[derive(thiserror::Error, Debug)]
-/// `State` error.
-pub(crate) enum Error {
-    #[error("failed to update deep query inspection mode")]
-    /// Failed to update deep query inspection mode.
-    QueryInspectionUpdate,
 }

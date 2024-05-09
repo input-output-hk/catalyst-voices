@@ -1,8 +1,5 @@
 //! CLI interpreter for the service
-use std::{
-    io::Write,
-    sync::{Arc, Mutex},
-};
+use std::{io::Write, sync::Arc};
 
 use clap::Parser;
 use tracing::{error, info};
@@ -11,7 +8,7 @@ use crate::{
     cardano::start_followers,
     logger, service,
     settings::{DocsSettings, ServiceSettings},
-    state::{DeepQueryInspection, InspectionSettings, State},
+    state::{InspectionSettings, State},
 };
 
 #[derive(Parser)]
@@ -45,16 +42,8 @@ impl Cli {
                 // Unique machine id
                 let machine_id = settings.follower_settings.machine_uid;
 
-                let deep_query_mode = if settings.deep_query_inspection {
-                    DeepQueryInspection::Enabled
-                } else {
-                    DeepQueryInspection::Disabled
-                };
-
-                let inspection = InspectionSettings {
-                    deep_query: Arc::new(Mutex::new(deep_query_mode)),
-                    logger_handle,
-                };
+                let inspection =
+                    InspectionSettings::new(settings.deep_query_inspection, logger_handle);
                 let state = Arc::new(State::new(Some(settings.database_url), inspection).await?);
                 let event_db = state.event_db();
 
