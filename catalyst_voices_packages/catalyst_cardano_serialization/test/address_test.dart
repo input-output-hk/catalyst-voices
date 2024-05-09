@@ -4,6 +4,7 @@ import 'package:test/test.dart';
 
 void main() {
   group(ShelleyAddress, () {
+    /* cSpell:disable */
     final mainnetAddr = ShelleyAddress.fromBech32(
       'addr1qx2fxv2umyhttkxyxp8x0dlpdt3k6cwng5pxj3jhsydzer3n0d3vllmyqws'
       'x5wktcd8cc3sq835lu7drv2xwl2wywfgse35a3x',
@@ -17,6 +18,7 @@ void main() {
     final testnetStakeAddr = ShelleyAddress.fromBech32(
       'stake_test1uqehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gssrtvn',
     );
+    /* cSpell:enable */
 
     test('round-trip conversion from and to bytes', () {
       expect(
