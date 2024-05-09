@@ -69,11 +69,18 @@ void main() {
       expect(testnetStakeAddr.hrp, equals('stake_test'));
     });
 
-    test('network from address', () {
+    test('network ID from address', () {
       expect(mainnetAddr.network, equals(NetworkId.mainnet));
       expect(testnetAddr.network, equals(NetworkId.testnet));
       expect(mainnetStakeAddr.network, equals(NetworkId.mainnet));
       expect(testnetStakeAddr.network, equals(NetworkId.testnet));
+    });
+
+    test('toString returns bech32', () {
+      expect(mainnetAddr.toString(), equals(mainnetAddr.toBech32()));
+      expect(testnetAddr.toString(), equals(testnetAddr.toBech32()));
+      expect(mainnetStakeAddr.toString(), equals(mainnetStakeAddr.toBech32()));
+      expect(testnetStakeAddr.toString(), equals(testnetStakeAddr.toBech32()));
     });
   });
 }

@@ -8,7 +8,7 @@ import 'package:catalyst_cardano_serialization/src/exceptions.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:cbor/cbor.dart';
 
-/// ShelleyAddress supports bech32 encoded addresses as defined in CIP19.
+/// [ShelleyAddress] supports bech32 encoded addresses as defined in CIP19.
 class ShelleyAddress {
   /// The prefix of a base address.
   static const String defaultAddrHrp = 'addr';
@@ -93,7 +93,7 @@ class ShelleyAddress {
   }
 
   @override
-  int get hashCode => bytes.hashCode;
+  int get hashCode => Object.hash(bytes.hashCode, hrp);
 
   @override
   bool operator ==(Object other) {
@@ -109,9 +109,9 @@ class ShelleyAddress {
   }
 
   @override
-  String toString() => bytes.toString();
+  String toString() => toBech32();
 
-  // If were using the testnet, make sure the hrp ends with '_test'
+  /// If were using the testnet, make sure the hrp ends with '_test'
   static String _computeHrp(NetworkId id, String prefix) {
     if (id == NetworkId.mainnet) {
       return prefix;
