@@ -66,7 +66,7 @@ class ShelleyAddress {
   }
 
   /// Returns the [NetworkId] related to this address.
-  NetworkId get network => NetworkId.testnet.magicId == (bytes[0] & 0x0f)
+  NetworkId get network => NetworkId.testnet.id == (bytes[0] & 0x0f)
       ? NetworkId.testnet
       : NetworkId.mainnet;
 
