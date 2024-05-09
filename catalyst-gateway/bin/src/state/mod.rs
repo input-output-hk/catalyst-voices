@@ -1,7 +1,9 @@
 //! Shared state used by all endpoints.
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 
-use tracing::level_filters::LevelFilter;
+use tokio::sync::Mutex;
+use tokio_postgres::{types::ToSql, Row};
+use tracing::{debug, level_filters::LevelFilter};
 use tracing_subscriber::{reload::Handle, Registry};
 
 use crate::{
@@ -81,6 +83,19 @@ impl InspectionSettings {
             .modify(|f| *f = LevelFilter::from_level(level.into()))?;
         Ok(())
     }
+
+    /// Check if deep query inspection is enabled.
+    pub(crate) fn is_deep_query_enabled(&self) -> bool {
+        match self.db.deep_query {
+            DeepQueryInspection::Enabled => true,
+            DeepQueryInspection::Disabled => false,
+        }
+    }
+
+    /// Get the deep query inspection UUID.
+    pub(crate) fn get_deep_query_uuid(&self) -> uuid::Uuid {
+        self.db.uuid
+    }
 }
 
 /// Global State of the service
@@ -126,5 +141,37 @@ impl State {
     /// Get the reference to the inspection settings.
     pub(crate) fn inspection_settings(&self) -> Arc<Mutex<InspectionSettings>> {
         self.inspection.clone()
+    }
+
+    /// Query the database.
+    ///
+    /// If deep query inspection is enabled, this will log the query plan inside a
+    /// rolled-back transaction, before running the query.
+    ///
+    /// # Arguments
+    /// * `stmt` - `&str` SQL statement.
+    /// * `params` - `&[&(dyn ToSql + Sync)]` SQL parameters.
+    ///
+    /// # Returns
+    /// `Result<Vec<Row>, anyhow::Error>`
+    pub(crate) async fn query(
+        &self, stmt: &str, params: &[&(dyn ToSql + Sync)],
+    ) -> Result<Vec<Row>, anyhow::Error> {
+        let mut conn = self.event_db.conn().await?;
+        let inspection_settings = self.inspection.lock().await;
+        if inspection_settings.is_deep_query_enabled() {
+            let transaction = conn.transaction().await?;
+            let explain_stmt = transaction
+                .prepare(format!("EXPLAIN ANALYZE {stmt}").as_str())
+                .await?;
+            let query_plan = transaction.query_one(&explain_stmt, params).await?;
+            debug!(
+                { uuid = inspection_settings.get_deep_query_uuid().to_string(), query = stmt },
+                "{:#?}", query_plan
+            );
+            transaction.rollback().await?;
+        }
+        let rows = conn.query(stmt, params).await?;
+        Ok(rows)
     }
 }

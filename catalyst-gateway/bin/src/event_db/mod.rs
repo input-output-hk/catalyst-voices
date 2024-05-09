@@ -33,6 +33,18 @@ pub(crate) struct EventDB {
 #[error("DB URL is undefined")]
 pub(crate) struct NoDatabaseUrlError;
 
+impl EventDB {
+    /// Get a pooled connection to the database.
+    pub(crate) async fn conn(
+        &self,
+    ) -> Result<
+        bb8::PooledConnection<'_, bb8_postgres::PostgresConnectionManager<tokio_postgres::NoTls>>,
+        bb8::RunError<tokio_postgres::Error>,
+    > {
+        self.pool.get().await
+    }
+}
+
 /// Establish a connection to the database, and check the schema is up-to-date.
 ///
 /// # Parameters

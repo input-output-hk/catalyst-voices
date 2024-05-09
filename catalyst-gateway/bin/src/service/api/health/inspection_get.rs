@@ -42,15 +42,10 @@ pub(crate) async fn endpoint(
     query_inspection: Option<DeepQueryInspection>,
 ) -> AllResponses {
     if let Some(level) = log_level {
-        match state.inspection_settings().lock() {
-            Ok(settings) => {
-                match settings.modify_logger_level(level) {
-                    Ok(()) => debug!("successfully set log level to: {:?}", level),
-                    Err(_) => {
-                        error!("failed to set log level: {:?}", level);
-                    },
-                }
-            },
+        let insp_sett = state.inspection_settings();
+        let settings = insp_sett.lock().await;
+        match settings.modify_logger_level(level) {
+            Ok(()) => debug!("successfully set log level to: {:?}", level),
             Err(_) => {
                 error!("failed to set log level: {:?}", level);
             },
@@ -58,21 +53,13 @@ pub(crate) async fn endpoint(
     }
 
     if let Some(inspection_mode) = query_inspection {
-        match state.inspection_settings().lock() {
-            Ok(mut settings) => {
-                settings.modify_deep_query(inspection_mode);
-                debug!(
-                    "successfully set deep query inspection mode to: {:?}",
-                    inspection_mode
-                );
-            },
-            Err(_) => {
-                error!(
-                    "failed to set deep query inspection mode: {:?}",
-                    inspection_mode
-                );
-            },
-        }
+        let insp_sett = state.inspection_settings();
+        let mut settings = insp_sett.lock().await;
+        settings.modify_deep_query(inspection_mode);
+        debug!(
+            "successfully set deep query inspection mode to: {:?}",
+            inspection_mode
+        );
     }
     // otherwise everything seems to be A-OK
     T204(NoContent)
