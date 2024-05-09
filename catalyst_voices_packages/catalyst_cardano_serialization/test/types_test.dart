@@ -25,7 +25,9 @@ void main() {
 
     test('comparison', () {
       expect(Coin(3) > Coin(2), isTrue);
-      expect(Coin(100) < Coin(50), isFalse);
+      expect(Coin(3) >= Coin(3), isTrue);
+      expect(Coin(100) < Coin(100), isFalse);
+      expect(Coin(100) <= Coin(100), isTrue);
     });
   });
 }
