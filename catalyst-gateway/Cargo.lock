@@ -357,6 +357,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "base64ct"
+version = "1.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8c3c1a368f70d6cf7302d78f8f7093da241fb8e8807c05cc9e51a125895a6d5b"
+
+[[package]]
 name = "bb8"
 version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -536,7 +542,7 @@ checksum = "a2bd12c1caf447e69cd4528f47f94d203fd2582878ecb9e9465484c4148a8223"
 [[package]]
 name = "cardano-chain-follower"
 version = "0.0.1"
-source = "git+https://github.com/input-output-hk/hermes.git#c45ba64a53942c179862572a60fff80c8171f4f0"
+source = "git+https://github.com/input-output-hk/hermes.git#145bfee76048f8efcd9ce5e16bf01ed72b5809f1"
 dependencies = [
  "pallas",
  "pallas-hardano",
@@ -560,6 +566,7 @@ dependencies = [
  "cpu-time",
  "cryptoxide",
  "dotenvy",
+ "ed25519-dalek",
  "gethostname",
  "handlebars",
  "hex",
@@ -794,6 +801,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "const-oid"
+version = "0.9.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c2459377285ad874054d797f3ccebf984978aa39129f6eafde5cdc8315b612f8"
+
+[[package]]
 name = "convert_case"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -924,6 +937,34 @@ dependencies = [
 ]
 
 [[package]]
+name = "curve25519-dalek"
+version = "4.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0a677b8922c94e01bdbb12126b0bc852f00447528dee1782229af9c720c3f348"
+dependencies = [
+ "cfg-if",
+ "cpufeatures",
+ "curve25519-dalek-derive",
+ "digest",
+ "fiat-crypto",
+ "platforms",
+ "rustc_version",
+ "subtle",
+ "zeroize",
+]
+
+[[package]]
+name = "curve25519-dalek-derive"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f46882e17999c6cc590af592290432be3bce0428cb0d5f8b6715e4dc7b383eb3"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.53",
+]
+
+[[package]]
 name = "darling"
 version = "0.20.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -963,6 +1004,16 @@ name = "data-encoding"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7e962a19be5cfc3f3bf6dd8f61eb50107f356ad6270fbb3ed41476571db78be5"
+
+[[package]]
+name = "der"
+version = "0.7.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f55bf8e7b65898637379c1b74eb1551107c8294ed26d855ceb9fd1a09cfc9bc0"
+dependencies = [
+ "const-oid",
+ "zeroize",
+]
 
 [[package]]
 name = "deranged"
@@ -1022,12 +1073,36 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1aaf95b3e5c8f23aa320147307562d361db0ae0d51242340f558153b4eb2439b"
 
 [[package]]
+name = "ed25519"
+version = "2.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "115531babc129696a58c64a4fef0a8bf9e9698629fb97e9e40767d235cfbcd53"
+dependencies = [
+ "pkcs8",
+ "signature",
+]
+
+[[package]]
 name = "ed25519-bip32"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cb588f93c0d91b2f668849fd6d030cddb0b2e31f105963be189da5acdf492a21"
 dependencies = [
  "cryptoxide",
+]
+
+[[package]]
+name = "ed25519-dalek"
+version = "2.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4a3daa8e81a3963a60642bcc1f90a670680bd4a77535faa384e9d1c79d620871"
+dependencies = [
+ "curve25519-dalek",
+ "ed25519",
+ "serde",
+ "sha2",
+ "subtle",
+ "zeroize",
 ]
 
 [[package]]
@@ -1072,6 +1147,12 @@ name = "fastrand"
 version = "2.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "25cbce373ec4653f1a01a31e8a5e5ec0c622dc27ff9c4e6606eefef5cbbed4a5"
+
+[[package]]
+name = "fiat-crypto"
+version = "0.2.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "38793c55593b33412e3ae40c2c9781ffaa6f438f6f8c10f24e71846fbd7ae01e"
 
 [[package]]
 name = "finl_unicode"
@@ -2086,7 +2167,7 @@ checksum = "b15813163c1d831bf4a13c3610c05c0d03b39feb07f7e09fa234dac9b15aaf39"
 [[package]]
 name = "pallas"
 version = "0.25.0"
-source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=954e99db9e9c3e4c4b1677614054fbe18f692504#954e99db9e9c3e4c4b1677614054fbe18f692504"
+source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=709acb19c52c6b789279ecc4bc8793b5d8b5abe9#709acb19c52c6b789279ecc4bc8793b5d8b5abe9"
 dependencies = [
  "pallas-addresses",
  "pallas-applying",
@@ -2103,7 +2184,7 @@ dependencies = [
 [[package]]
 name = "pallas-addresses"
 version = "0.25.0"
-source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=954e99db9e9c3e4c4b1677614054fbe18f692504#954e99db9e9c3e4c4b1677614054fbe18f692504"
+source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=709acb19c52c6b789279ecc4bc8793b5d8b5abe9#709acb19c52c6b789279ecc4bc8793b5d8b5abe9"
 dependencies = [
  "base58",
  "bech32",
@@ -2118,7 +2199,7 @@ dependencies = [
 [[package]]
 name = "pallas-applying"
 version = "0.25.0"
-source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=954e99db9e9c3e4c4b1677614054fbe18f692504#954e99db9e9c3e4c4b1677614054fbe18f692504"
+source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=709acb19c52c6b789279ecc4bc8793b5d8b5abe9#709acb19c52c6b789279ecc4bc8793b5d8b5abe9"
 dependencies = [
  "hex",
  "pallas-addresses",
@@ -2132,7 +2213,7 @@ dependencies = [
 [[package]]
 name = "pallas-codec"
 version = "0.25.0"
-source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=954e99db9e9c3e4c4b1677614054fbe18f692504#954e99db9e9c3e4c4b1677614054fbe18f692504"
+source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=709acb19c52c6b789279ecc4bc8793b5d8b5abe9#709acb19c52c6b789279ecc4bc8793b5d8b5abe9"
 dependencies = [
  "hex",
  "minicbor",
@@ -2143,7 +2224,7 @@ dependencies = [
 [[package]]
 name = "pallas-configs"
 version = "0.25.0"
-source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=954e99db9e9c3e4c4b1677614054fbe18f692504#954e99db9e9c3e4c4b1677614054fbe18f692504"
+source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=709acb19c52c6b789279ecc4bc8793b5d8b5abe9#709acb19c52c6b789279ecc4bc8793b5d8b5abe9"
 dependencies = [
  "base64 0.22.0",
  "hex",
@@ -2160,7 +2241,7 @@ dependencies = [
 [[package]]
 name = "pallas-crypto"
 version = "0.25.0"
-source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=954e99db9e9c3e4c4b1677614054fbe18f692504#954e99db9e9c3e4c4b1677614054fbe18f692504"
+source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=709acb19c52c6b789279ecc4bc8793b5d8b5abe9#709acb19c52c6b789279ecc4bc8793b5d8b5abe9"
 dependencies = [
  "cryptoxide",
  "hex",
@@ -2173,7 +2254,7 @@ dependencies = [
 [[package]]
 name = "pallas-hardano"
 version = "0.25.0"
-source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=954e99db9e9c3e4c4b1677614054fbe18f692504#954e99db9e9c3e4c4b1677614054fbe18f692504"
+source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=709acb19c52c6b789279ecc4bc8793b5d8b5abe9#709acb19c52c6b789279ecc4bc8793b5d8b5abe9"
 dependencies = [
  "binary-layout",
  "pallas-network",
@@ -2186,7 +2267,7 @@ dependencies = [
 [[package]]
 name = "pallas-network"
 version = "0.25.0"
-source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=954e99db9e9c3e4c4b1677614054fbe18f692504#954e99db9e9c3e4c4b1677614054fbe18f692504"
+source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=709acb19c52c6b789279ecc4bc8793b5d8b5abe9#709acb19c52c6b789279ecc4bc8793b5d8b5abe9"
 dependencies = [
  "byteorder",
  "hex",
@@ -2203,7 +2284,7 @@ dependencies = [
 [[package]]
 name = "pallas-primitives"
 version = "0.25.0"
-source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=954e99db9e9c3e4c4b1677614054fbe18f692504#954e99db9e9c3e4c4b1677614054fbe18f692504"
+source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=709acb19c52c6b789279ecc4bc8793b5d8b5abe9#709acb19c52c6b789279ecc4bc8793b5d8b5abe9"
 dependencies = [
  "base58",
  "bech32",
@@ -2218,7 +2299,7 @@ dependencies = [
 [[package]]
 name = "pallas-traverse"
 version = "0.25.0"
-source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=954e99db9e9c3e4c4b1677614054fbe18f692504#954e99db9e9c3e4c4b1677614054fbe18f692504"
+source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=709acb19c52c6b789279ecc4bc8793b5d8b5abe9#709acb19c52c6b789279ecc4bc8793b5d8b5abe9"
 dependencies = [
  "hex",
  "pallas-addresses",
@@ -2233,7 +2314,7 @@ dependencies = [
 [[package]]
 name = "pallas-txbuilder"
 version = "0.25.0"
-source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=954e99db9e9c3e4c4b1677614054fbe18f692504#954e99db9e9c3e4c4b1677614054fbe18f692504"
+source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=709acb19c52c6b789279ecc4bc8793b5d8b5abe9#709acb19c52c6b789279ecc4bc8793b5d8b5abe9"
 dependencies = [
  "hex",
  "pallas-addresses",
@@ -2250,7 +2331,7 @@ dependencies = [
 [[package]]
 name = "pallas-utxorpc"
 version = "0.25.0"
-source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=954e99db9e9c3e4c4b1677614054fbe18f692504#954e99db9e9c3e4c4b1677614054fbe18f692504"
+source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=709acb19c52c6b789279ecc4bc8793b5d8b5abe9#709acb19c52c6b789279ecc4bc8793b5d8b5abe9"
 dependencies = [
  "pallas-codec",
  "pallas-primitives",
@@ -2261,7 +2342,7 @@ dependencies = [
 [[package]]
 name = "pallas-wallet"
 version = "0.25.0"
-source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=954e99db9e9c3e4c4b1677614054fbe18f692504#954e99db9e9c3e4c4b1677614054fbe18f692504"
+source = "git+https://github.com/input-output-hk/catalyst-pallas.git?rev=709acb19c52c6b789279ecc4bc8793b5d8b5abe9#709acb19c52c6b789279ecc4bc8793b5d8b5abe9"
 dependencies = [
  "bech32",
  "bip39",
@@ -2464,6 +2545,22 @@ name = "pin-utils"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8b870d8c151b6f2fb93e84a13146138f05d02ed11c7e7c54f8826aaaf7c9f184"
+
+[[package]]
+name = "pkcs8"
+version = "0.10.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f950b2377845cebe5cf8b5165cb3cc1a5e0fa5cfa3e1f7f55707d8fd82e0a7b7"
+dependencies = [
+ "der",
+ "spki",
+]
+
+[[package]]
+name = "platforms"
+version = "3.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "db23d408679286588f4d4644f965003d056e3dd5abcaaa938116871d7ce2fee7"
 
 [[package]]
 name = "poem"
@@ -2764,7 +2861,7 @@ checksum = "80b776a1b2dc779f5ee0641f8ade0125bc1298dd41a9a0c16d8bd57b42d222b1"
 dependencies = [
  "bytes",
  "heck 0.5.0",
- "itertools 0.11.0",
+ "itertools 0.10.5",
  "log",
  "multimap",
  "once_cell",
@@ -2784,7 +2881,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "19de2de2a00075bf566bee3bd4db014b11587e84184d3f7a791bc17f1a8e9e48"
 dependencies = [
  "anyhow",
- "itertools 0.11.0",
+ "itertools 0.10.5",
  "proc-macro2",
  "quote",
  "syn 2.0.53",
@@ -3249,6 +3346,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "signature"
+version = "2.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "77549399552de45a898a580c1b41d445bf730df867cc44e6c0233bbc4b8329de"
+dependencies = [
+ "rand_core",
+]
+
+[[package]]
 name = "simdutf8"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3301,6 +3407,16 @@ name = "spin"
 version = "0.9.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6980e8d7511241f8acf4aebddbb1ff938df5eebe98691418c4468d0b72a96a67"
+
+[[package]]
+name = "spki"
+version = "0.7.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d91ed6c858b01f942cd56b37a94b3e0a1798290327d1236e4d9cf4eaca44d29d"
+dependencies = [
+ "base64ct",
+ "der",
+]
 
 [[package]]
 name = "static_assertions"
@@ -4214,3 +4330,9 @@ checksum = "05f360fc0b24296329c78fda852a1e9ae82de9cf7b27dae4b7f62f118f77b9ed"
 dependencies = [
  "tap",
 ]
+
+[[package]]
+name = "zeroize"
+version = "1.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "525b4ec142c6b68a2d10f01f7bbf6755599ca3f81ea53b8431b7dd348f5fdb2d"

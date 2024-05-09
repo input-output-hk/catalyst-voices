@@ -97,6 +97,8 @@ mitigations
 moderations
 msedgedriver
 multidex
+multiplatform
+Multiplatform
 myproject
 nanos
 NDEBUG
@@ -154,6 +156,7 @@ SYSROOT
 tacho
 testcov
 testdocs
+testplan
 testunit
 thiserror
 thollander
