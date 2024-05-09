@@ -28,6 +28,18 @@ extension type Coin(int value) {
   /// Divides this value by [other] value without remainder
   /// and returns a new [Coin].
   Coin operator ~/(Coin other) => Coin(value ~/ other.value);
+
+  /// Returns true if [value] is greater than [other] value.
+  bool operator >(Coin other) => value > other.value;
+
+  /// Returns true if [value] is greater than or equal [other] value.
+  bool operator >=(Coin other) => value > other.value || value == other.value;
+
+  /// Returns true if [value] is smaller than [other] value.
+  bool operator <(Coin other) => value < other.value;
+
+  /// Returns true if [value] is smaller than or equal [other] value.
+  bool operator <=(Coin other) => value < other.value || value == other.value;
 }
 
 /// A blockchain slot number.
