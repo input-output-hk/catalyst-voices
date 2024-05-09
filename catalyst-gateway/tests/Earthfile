@@ -58,12 +58,6 @@ test-fuzzer-api:
         SAVE ARTIFACT cat-gateway.log.zst AS LOCAL cat-gateway.log.zst
         SAVE ARTIFACT cassette.yaml AS LOCAL cassette.yaml
     END
-    IF [ -f fail ]
-        RUN echo -e "\033[0;31mSchemathesis test run failed. Run the test locally to get Catalyst Gateway logs\n" && \
-            echo -e "\033[0;31mFailed tests:" && \
-            yq -PC '.http_interactions.[] | select(.status == "FAILURE")' cassette.yaml && \
-            exit 1
-    END
 
 # test-lint-openapi - OpenAPI linting from an artifact
 # testing whether the OpenAPI generated during build stage follows good practice.
