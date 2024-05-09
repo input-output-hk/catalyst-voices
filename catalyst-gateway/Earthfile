@@ -38,7 +38,7 @@ build:
         --cmd="/scripts/std_build.py" \
         --args1="--bins=cat-gateway/cat-gateway" \
         --args2="--verbose" \
-        --output="target/$TARGETARCH/release/cat-gateway" \
+        --output="$TARGETARCH/release/cat-gateway" \
         --junit="cat-gateway.junit-report.xml" \
         --coverage="cat-gateway.coverage-report.info" \
         --docs="true"
