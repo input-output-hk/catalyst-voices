@@ -1,8 +1,42 @@
 import 'package:flutter/material.dart';
 
 @immutable
-class ExtendedColorScheme extends ThemeExtension<ExtendedColorScheme> {
-  const ExtendedColorScheme({
+class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
+  final Color? textPrimary;
+  final Color? textOnPrimary;
+  final Color? textOnPrimaryContainer;
+  final Color? textDisabled;
+  final Color? success;
+  final Color? onSuccess;
+  final Color? successContainer;
+  final Color? onSuccessContainer;
+  final Color? warning;
+  final Color? onWarning;
+  final Color? warningContainer;
+  final Color? onWarningContainer;
+  final Color? onSurfaceNeutral08;
+  final Color? onSurfaceNeutral012;
+  final Color? onSurfaceNeutral016;
+  final Color? onSurfacePrimaryContainer;
+  final Color? onSurfacePrimary08;
+  final Color? onSurfacePrimary012;
+  final Color? onSurfacePrimary016;
+  final Color? onSurfaceSecondary08;
+  final Color? onSurfaceSecondary012;
+  final Color? onSurfaceSecondary016;
+  final Color? onSurfaceError08;
+  final Color? onSurfaceError012;
+  final Color? onSurfaceError016;
+  final Color? iconsForeground;
+  final Color? iconsBackground;
+  final Color? iconsDisabled;
+  final Color? iconsPrimary;
+  final Color? iconsSecondary;
+  final Color? iconsSuccess;
+  final Color? iconsWarning;
+  final Color? iconsError;
+
+  const VoicesColorScheme({
     required this.textPrimary,
     required this.textOnPrimary,
     required this.textOnPrimaryContainer,
@@ -38,42 +72,8 @@ class ExtendedColorScheme extends ThemeExtension<ExtendedColorScheme> {
     required this.iconsError,
   });
 
-  final Color? textPrimary;
-  final Color? textOnPrimary;
-  final Color? textOnPrimaryContainer;
-  final Color? textDisabled;
-  final Color? success;
-  final Color? onSuccess;
-  final Color? successContainer;
-  final Color? onSuccessContainer;
-  final Color? warning;
-  final Color? onWarning;
-  final Color? warningContainer;
-  final Color? onWarningContainer;
-  final Color? onSurfaceNeutral08;
-  final Color? onSurfaceNeutral012;
-  final Color? onSurfaceNeutral016;
-  final Color? onSurfacePrimaryContainer;
-  final Color? onSurfacePrimary08;
-  final Color? onSurfacePrimary012;
-  final Color? onSurfacePrimary016;
-  final Color? onSurfaceSecondary08;
-  final Color? onSurfaceSecondary012;
-  final Color? onSurfaceSecondary016;
-  final Color? onSurfaceError08;
-  final Color? onSurfaceError012;
-  final Color? onSurfaceError016;
-  final Color? iconsForeground;
-  final Color? iconsBackground;
-  final Color? iconsDisabled;
-  final Color? iconsPrimary;
-  final Color? iconsSecondary;
-  final Color? iconsSuccess;
-  final Color? iconsWarning;
-  final Color? iconsError;
-
   @override
-  ThemeExtension<ExtendedColorScheme> copyWith({
+  ThemeExtension<VoicesColorScheme> copyWith({
     Color? textPrimary,
     Color? textOnPrimary,
     Color? textOnPrimaryContainer,
@@ -108,7 +108,7 @@ class ExtendedColorScheme extends ThemeExtension<ExtendedColorScheme> {
     Color? iconsWarning,
     Color? iconsError,
   }) {
-    return ExtendedColorScheme(
+    return VoicesColorScheme(
       textPrimary: textPrimary ?? this.textPrimary,
       textOnPrimary: textOnPrimary ?? this.textOnPrimary,
       textOnPrimaryContainer:
@@ -150,14 +150,14 @@ class ExtendedColorScheme extends ThemeExtension<ExtendedColorScheme> {
   }
 
   @override
-  ExtendedColorScheme lerp(
-    ThemeExtension<ExtendedColorScheme>? other,
+  VoicesColorScheme lerp(
+    ThemeExtension<VoicesColorScheme>? other,
     double t,
   ) {
-    if (other is! ExtendedColorScheme) {
+    if (other is! VoicesColorScheme) {
       return this;
     }
-    return ExtendedColorScheme(
+    return VoicesColorScheme(
       textPrimary: Color.lerp(textPrimary, other.textPrimary, t),
       textOnPrimary: Color.lerp(textOnPrimary, other.textOnPrimary, t),
       textOnPrimaryContainer:
@@ -214,6 +214,6 @@ class ExtendedColorScheme extends ThemeExtension<ExtendedColorScheme> {
 }
 
 extension ExtendedColorsExtension on ThemeData {
-  ExtendedColorScheme get colors => extension<ExtendedColorScheme>()!;
+  VoicesColorScheme get colors => extension<VoicesColorScheme>()!;
   Color get linksPrimary => primaryColor;
 }
