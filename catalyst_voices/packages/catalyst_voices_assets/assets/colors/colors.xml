@@ -39,6 +39,14 @@
     <color name="light_on_surface_error_08">#14CC0000</color>
     <color name="light_on_surface_error_012">#1FCC0000</color>
     <color name="light_on_surface_error_016">#29CC0000</color>
+    <color name="light_icons_foreground">#212A3D</color>
+    <color name="light_icons_background">#FFFFFF</color>
+    <color name="light_icons_disabled">#61212A3D</color>
+    <color name="light_icons_primary">#123CD3</color>
+    <color name="light_icons_secondary">#C014EB</color>
+    <color name="light_icons_success">#218230</color>
+    <color name="light_icons_warning">#E76309</color>
+    <color name="light_icons_error">#CC0000</color>
     <color name="dark_text_primary">#FFFFFF</color>
     <color name="dark_text_on_primary">#E6E9F0</color>
     <color name="dark_text_on_primary_container">#0C288D</color>
@@ -78,4 +86,12 @@
     <color name="dark_on_surface_error_08">#1FFFC2C2</color>
     <color name="dark_on_surface_error_012">#1FCC0000</color>
     <color name="dark_on_surface_error_016">#29CC0000</color>
+    <color name="dark_icons_foreground">#F2F4F8</color>
+    <color name="dark_icons_background">#212A3D</color>
+    <color name="dark_icons_disabled">#61BFC8D9</color>
+    <color name="dark_icons_primary">#728EF3</color>
+    <color name="dark_icons_secondary">#DF8AF5</color>
+    <color name="dark_icons_success">#85E093</color>
+    <color name="dark_icons_warning">#FAB484</color>
+    <color name="dark_icons_error">#FF9999</color>
 </resources>

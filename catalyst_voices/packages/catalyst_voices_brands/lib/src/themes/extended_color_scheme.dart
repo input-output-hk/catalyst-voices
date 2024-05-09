@@ -28,6 +28,14 @@ class ExtendedColorScheme extends ThemeExtension<ExtendedColorScheme> {
     required this.onSurfaceError08,
     required this.onSurfaceError012,
     required this.onSurfaceError016,
+    required this.iconsForeground,
+    required this.iconsBackground,
+    required this.iconsDisabled,
+    required this.iconsPrimary,
+    required this.iconsSecondary,
+    required this.iconsSuccess,
+    required this.iconsWarning,
+    required this.iconsError,
   });
 
   final Color? textPrimary;
@@ -55,6 +63,14 @@ class ExtendedColorScheme extends ThemeExtension<ExtendedColorScheme> {
   final Color? onSurfaceError08;
   final Color? onSurfaceError012;
   final Color? onSurfaceError016;
+  final Color? iconsForeground;
+  final Color? iconsBackground;
+  final Color? iconsDisabled;
+  final Color? iconsPrimary;
+  final Color? iconsSecondary;
+  final Color? iconsSuccess;
+  final Color? iconsWarning;
+  final Color? iconsError;
 
   @override
   ThemeExtension<ExtendedColorScheme> copyWith({
@@ -83,6 +99,14 @@ class ExtendedColorScheme extends ThemeExtension<ExtendedColorScheme> {
     Color? onSurfaceError08,
     Color? onSurfaceError012,
     Color? onSurfaceError016,
+    Color? iconsForeground,
+    Color? iconsBackground,
+    Color? iconsDisabled,
+    Color? iconsPrimary,
+    Color? iconsSecondary,
+    Color? iconsSuccess,
+    Color? iconsWarning,
+    Color? iconsError,
   }) {
     return ExtendedColorScheme(
       textPrimary: textPrimary ?? this.textPrimary,
@@ -114,6 +138,14 @@ class ExtendedColorScheme extends ThemeExtension<ExtendedColorScheme> {
       onSurfaceError08: onSurfaceError08 ?? this.onSurfaceError08,
       onSurfaceError012: onSurfaceError012 ?? this.onSurfaceError012,
       onSurfaceError016: onSurfaceError016 ?? this.onSurfaceError016,
+      iconsForeground: iconsForeground ?? this.iconsForeground,
+      iconsBackground: iconsBackground ?? this.iconsBackground,
+      iconsDisabled: iconsDisabled ?? this.iconsDisabled,
+      iconsPrimary: iconsPrimary ?? this.iconsPrimary,
+      iconsSecondary: iconsSecondary ?? this.iconsSecondary,
+      iconsSuccess: iconsSuccess ?? this.iconsSuccess,
+      iconsWarning: iconsWarning ?? this.iconsWarning,
+      iconsError: iconsError ?? this.iconsError,
     );
   }
 
@@ -128,34 +160,34 @@ class ExtendedColorScheme extends ThemeExtension<ExtendedColorScheme> {
     return ExtendedColorScheme(
       textPrimary: Color.lerp(textPrimary, other.textPrimary, t),
       textOnPrimary: Color.lerp(textOnPrimary, other.textOnPrimary, t),
-      textOnPrimaryContainer: 
-        Color.lerp(textOnPrimaryContainer, other.textOnPrimaryContainer, t),
+      textOnPrimaryContainer:
+          Color.lerp(textOnPrimaryContainer, other.textOnPrimaryContainer, t),
       textDisabled: Color.lerp(textDisabled, other.textDisabled, t),
       success: Color.lerp(success, other.success, t),
       onSuccess: Color.lerp(onSuccess, other.onSuccess, t),
       successContainer: Color.lerp(successContainer, other.successContainer, t),
       onSuccessContainer:
-        Color.lerp(onSuccessContainer, other.onSuccessContainer, t),
+          Color.lerp(onSuccessContainer, other.onSuccessContainer, t),
       warning: Color.lerp(warning, other.warning, t),
       onWarning: Color.lerp(onWarning, other.onWarning, t),
       warningContainer: Color.lerp(warningContainer, other.warningContainer, t),
       onWarningContainer:
-        Color.lerp(onWarningContainer, other.onWarningContainer, t),
-      onSurfaceNeutral08: 
-        Color.lerp(onSurfaceNeutral08, other.onSurfaceNeutral08, t),
+          Color.lerp(onWarningContainer, other.onWarningContainer, t),
+      onSurfaceNeutral08:
+          Color.lerp(onSurfaceNeutral08, other.onSurfaceNeutral08, t),
       onSurfaceNeutral012:
-        Color.lerp(onSurfaceNeutral012, other.onSurfaceNeutral012, t),
+          Color.lerp(onSurfaceNeutral012, other.onSurfaceNeutral012, t),
       onSurfaceNeutral016:
-        Color.lerp(onSurfaceNeutral016, other.onSurfaceNeutral016, t),
+          Color.lerp(onSurfaceNeutral016, other.onSurfaceNeutral016, t),
       onSurfacePrimaryContainer: Color.lerp(
         onSurfacePrimaryContainer,
         other.onSurfacePrimaryContainer,
         t,
       ),
-      onSurfacePrimary08: 
-        Color.lerp(onSurfacePrimary08, other.onSurfacePrimary08, t),
-      onSurfacePrimary012: 
-        Color.lerp(onSurfacePrimary012, other.onSurfacePrimary012, t),
+      onSurfacePrimary08:
+          Color.lerp(onSurfacePrimary08, other.onSurfacePrimary08, t),
+      onSurfacePrimary012:
+          Color.lerp(onSurfacePrimary012, other.onSurfacePrimary012, t),
       onSurfacePrimary016:
           Color.lerp(onSurfacePrimary016, other.onSurfacePrimary016, t),
       onSurfaceSecondary08:
@@ -169,6 +201,14 @@ class ExtendedColorScheme extends ThemeExtension<ExtendedColorScheme> {
           Color.lerp(onSurfaceError012, other.onSurfaceError012, t),
       onSurfaceError016:
           Color.lerp(onSurfaceError016, other.onSurfaceError016, t),
+      iconsForeground: Color.lerp(iconsForeground, other.iconsForeground, t),
+      iconsBackground: Color.lerp(iconsBackground, other.iconsBackground, t),
+      iconsDisabled: Color.lerp(iconsDisabled, other.iconsDisabled, t),
+      iconsPrimary: Color.lerp(iconsPrimary, other.iconsPrimary, t),
+      iconsSecondary: Color.lerp(iconsSecondary, other.iconsSecondary, t),
+      iconsSuccess: Color.lerp(iconsSuccess, other.iconsSuccess, t),
+      iconsWarning: Color.lerp(iconsWarning, other.iconsWarning, t),
+      iconsError: Color.lerp(iconsError, other.iconsError, t),
     );
   }
 }

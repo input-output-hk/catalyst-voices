@@ -157,6 +157,14 @@ const ExtendedColorScheme lightExtendedColorScheme = ExtendedColorScheme(
   onSurfaceError08: VoicesColors.lightOnSurfaceError08,
   onSurfaceError012: VoicesColors.lightOnSurfaceError012,
   onSurfaceError016: VoicesColors.lightOnSurfaceError016,
+  iconsForeground: VoicesColors.lightIconsForeground,
+  iconsBackground: VoicesColors.lightIconsBackground,
+  iconsDisabled: VoicesColors.lightIconsDisabled,
+  iconsPrimary: VoicesColors.lightIconsPrimary,
+  iconsSecondary: VoicesColors.lightIconsSecondary,
+  iconsSuccess: VoicesColors.lightIconsSuccess,
+  iconsWarning: VoicesColors.lightIconsWarning,
+  iconsError: VoicesColors.lightIconsError,
 );
 
 const ColorScheme darkColorScheme = ColorScheme.dark(
@@ -200,6 +208,14 @@ const ExtendedColorScheme darkExtendedColorScheme = ExtendedColorScheme(
   onSurfaceError08: VoicesColors.darkOnSurfaceError08,
   onSurfaceError012: VoicesColors.darkOnSurfaceError012,
   onSurfaceError016: VoicesColors.darkOnSurfaceError016,
+  iconsForeground: VoicesColors.darkIconsForeground,
+  iconsBackground: VoicesColors.darkIconsBackground,
+  iconsDisabled: VoicesColors.darkIconsDisabled,
+  iconsPrimary: VoicesColors.darkIconsPrimary,
+  iconsSecondary: VoicesColors.darkIconsSecondary,
+  iconsSuccess: VoicesColors.darkIconsSuccess,
+  iconsWarning: VoicesColors.darkIconsWarning,
+  iconsError: VoicesColors.darkIconsError,
 );
 
 /// [ThemeData] for the `catalyst` brand.

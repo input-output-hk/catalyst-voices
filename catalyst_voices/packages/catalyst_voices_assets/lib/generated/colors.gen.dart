@@ -19,6 +19,30 @@ class VoicesColors {
   /// Color: #AD0000
   static const Color darkErrorContainer = Color(0xFFAD0000);
 
+  /// Color: #212A3D
+  static const Color darkIconsBackground = Color(0xFF212A3D);
+
+  /// Color: #61BFC8D9
+  static const Color darkIconsDisabled = Color(0x61BFC8D9);
+
+  /// Color: #FF9999
+  static const Color darkIconsError = Color(0xFFFF9999);
+
+  /// Color: #F2F4F8
+  static const Color darkIconsForeground = Color(0xFFF2F4F8);
+
+  /// Color: #728EF3
+  static const Color darkIconsPrimary = Color(0xFF728EF3);
+
+  /// Color: #DF8AF5
+  static const Color darkIconsSecondary = Color(0xFFDF8AF5);
+
+  /// Color: #85E093
+  static const Color darkIconsSuccess = Color(0xFF85E093);
+
+  /// Color: #FAB484
+  static const Color darkIconsWarning = Color(0xFFFAB484);
+
   /// Color: #380000
   static const Color darkOnError = Color(0xFF380000);
 
@@ -135,6 +159,30 @@ class VoicesColors {
 
   /// Color: #FFD1D1
   static const Color lightErrorContainer = Color(0xFFFFD1D1);
+
+  /// Color: #FFFFFF
+  static const Color lightIconsBackground = Color(0xFFFFFFFF);
+
+  /// Color: #61212A3D
+  static const Color lightIconsDisabled = Color(0x61212A3D);
+
+  /// Color: #CC0000
+  static const Color lightIconsError = Color(0xFFCC0000);
+
+  /// Color: #212A3D
+  static const Color lightIconsForeground = Color(0xFF212A3D);
+
+  /// Color: #123CD3
+  static const Color lightIconsPrimary = Color(0xFF123CD3);
+
+  /// Color: #C014EB
+  static const Color lightIconsSecondary = Color(0xFFC014EB);
+
+  /// Color: #218230
+  static const Color lightIconsSuccess = Color(0xFF218230);
+
+  /// Color: #E76309
+  static const Color lightIconsWarning = Color(0xFFE76309);
 
   /// Color: #FFFFFF
   static const Color lightOnError = Color(0xFFFFFFFF);
