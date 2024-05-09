@@ -8,7 +8,7 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 
 > :memo: **Note:** Substitute with test plan name and link to the github testplan issue.
 >
-# [Test Plan Name](https://github.com/input-output-hk/catalyst-voices/issues/480)
+# [Test Plan Name](https://github.com/input-output-hk/catalyst-voices/issues/481)
 
 > :memo: **Note:** This is meant to be only a guideline, the paragraphs can be removed or added as they fit.
 
