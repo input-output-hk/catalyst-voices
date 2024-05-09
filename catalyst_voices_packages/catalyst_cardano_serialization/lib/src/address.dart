@@ -88,9 +88,7 @@ class ShelleyAddress {
   }
 
   /// Serializes the type as cbor.
-  CborValue toCbor() {
-    return CborBytes(bytes);
-  }
+  CborValue toCbor() => CborBytes(bytes);
 
   @override
   int get hashCode => Object.hash(bytes.hashCode, hrp);
