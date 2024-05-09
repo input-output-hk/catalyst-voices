@@ -13,12 +13,10 @@ class MaxTxSizeExceededException implements Exception {
   });
 
   @override
-  String toString() {
-    return 'MaxTxSizeExceededException('
-        'maxTxSize=$maxTxSize'
-        ', actualTxSize:$actualTxSize'
-        ')';
-  }
+  String toString() => 'MaxTxSizeExceededException('
+      'maxTxSize=$maxTxSize'
+      ', actualTxSize:$actualTxSize'
+      ')';
 }
 
 /// Exception thrown when building a transaction that doesn't specify the fee.
@@ -27,9 +25,7 @@ class TxFeeNotSpecifiedException implements Exception {
   const TxFeeNotSpecifiedException();
 
   @override
-  String toString() {
-    return 'TxFeeNotSpecifiedException';
-  }
+  String toString() => 'TxFeeNotSpecifiedException';
 }
 
 /// Exception thrown when parsing a transaction hash that has incorrect length.
@@ -38,9 +34,7 @@ class TransactionHashFormatException implements Exception {
   const TransactionHashFormatException();
 
   @override
-  String toString() {
-    return 'TransactionHashFormatException';
-  }
+  String toString() => 'TransactionHashFormatException';
 }
 
 /// Exception thrown if the address doesn't match the bech32 specification
