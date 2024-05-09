@@ -22,7 +22,7 @@ extension type Coin(int value) {
   /// Subtracts [other] values from this value and returns a new [Coin].
   Coin operator -(Coin other) => Coin(value - other.value);
 
-  /// Multiplies this value per [other] values and returns a new [Coin].
+  /// Multiplies this value by [other] values and returns a new [Coin].
   Coin operator *(Coin other) => Coin(value * other.value);
 
   /// Divides this value by [other] value without remainder
