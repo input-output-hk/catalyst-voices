@@ -1,20 +1,25 @@
-# Set the Earthly version to 0.7
-VERSION 0.7
+VERSION 0.8
+
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/docs:fix/improve-rust-builder-sj AS docs-ci
+
+IMPORT .. AS repo
+IMPORT ../catalyst-gateway AS catalyst-gateway
+IMPORT ../catalyst-gateway/event-db AS event-db
 
 # cspell: words mkdocs runable
 
 # Copy all the source we need to build the docs
 src:
     # Common src setup
-    DO github.com/input-output-hk/catalyst-ci/earthly/docs:v2.11.1+SRC
+    DO docs-ci+SRC
 
     # Now copy into that any artifacts we pull from the builds.
-    COPY --dir ../+repo-docs/repo /docs/includes
+    COPY --dir repo+repo-docs/repo /docs/includes
     # copy Rust docs
-    COPY ./../catalyst-gateway+build/doc /docs/src/api/cat-gateway/rust-docs
+    COPY catalyst-gateway+build/doc /docs/src/api/cat-gateway/rust-docs
 
     # Copy docs we build in the postgres example.
-    COPY --dir ../catalyst-gateway/event-db+build/docs src/architecture/08_concepts/event_db
+    COPY --dir event-db+build/docs src/architecture/08_concepts/event_db
 
 
 # Build the docs here.

@@ -1,15 +1,16 @@
 # This is a Dockerfile for building a container image for the Catalyst Event Database.
 # The container image is built from scratch and includes the necessary files for running
 # the database and its associated software.
+VERSION 0.8
 
-VERSION 0.7
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:fix/improve-rust-builder-sj AS postgresql-ci
 
 # cspell: words
 
 # Internal: builder is our Event db builder target. Prepares all necessary artifacts.
 #   CI target : dependency
 builder:
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.11.1+BUILDER
+    DO postgresql-ci+BUILDER
 
     # override setup-db.sql
     COPY setup-db.sql /sql/
@@ -21,8 +22,8 @@ builder:
 build:
     FROM +builder
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.11.1+BUILD --image_name=event-db
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.11.1+DOCS --image_name=event-db
+    DO postgresql-ci+BUILD --image_name=event-db
+    DO postgresql-ci+DOCS --image_name=event-db
 
 # test the event db database schema
 #   CI target : true
