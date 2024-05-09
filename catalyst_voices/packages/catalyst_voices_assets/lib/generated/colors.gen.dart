@@ -13,6 +13,123 @@ import 'package:flutter/material.dart';
 class VoicesColors {
   VoicesColors._();
 
+  /// Color: #FF9999
+  static const Color darkError = Color(0xFFFF9999);
+
+  /// Color: #AD0000
+  static const Color darkErrorContainer = Color(0xFFAD0000);
+
+  /// Color: #380000
+  static const Color darkOnError = Color(0xFF380000);
+
+  /// Color: #FFD1D1
+  static const Color darkOnErrorContainer = Color(0xFFFFD1D1);
+
+  /// Color: #0C288D
+  static const Color darkOnPrimary = Color(0xFF0C288D);
+
+  /// Color: #E8ECFD
+  static const Color darkOnPrimaryContainer = Color(0xFFE8ECFD);
+
+  /// Color: #26042F
+  static const Color darkOnSecondary = Color(0xFF26042F);
+
+  /// Color: #9910BC
+  static const Color darkOnSecondaryContainer = Color(0xFF9910BC);
+
+  /// Color: #08210C
+  static const Color darkOnSuccess = Color(0xFF08210C);
+
+  /// Color: #CEF3D4
+  static const Color darkOnSuccessContainer = Color(0xFFCEF3D4);
+
+  /// Color: #1FCC0000
+  static const Color darkOnSurfaceError012 = Color(0x1FCC0000);
+
+  /// Color: #29CC0000
+  static const Color darkOnSurfaceError016 = Color(0x29CC0000);
+
+  /// Color: #1FFFC2C2
+  static const Color darkOnSurfaceError08 = Color(0x1FFFC2C2);
+
+  /// Color: #1FBFC8D9
+  static const Color darkOnSurfaceNeutral012 = Color(0x1FBFC8D9);
+
+  /// Color: #29212A3D
+  static const Color darkOnSurfaceNeutral016 = Color(0x29212A3D);
+
+  /// Color: #1FBFC8D9
+  static const Color darkOnSurfaceNeutral08 = Color(0x1FBFC8D9);
+
+  /// Color: #1F123CD3
+  static const Color darkOnSurfacePrimary012 = Color(0x1F123CD3);
+
+  /// Color: #29123CD3
+  static const Color darkOnSurfacePrimary016 = Color(0x29123CD3);
+
+  /// Color: #1F123CD3
+  static const Color darkOnSurfacePrimary08 = Color(0x1F123CD3);
+
+  /// Color: #0C288D
+  static const Color darkOnSurfacePrimaryContainer = Color(0xFF0C288D);
+
+  /// Color: #1FC014EB
+  static const Color darkOnSurfaceSecondary012 = Color(0x1FC014EB);
+
+  /// Color: #29C014EB
+  static const Color darkOnSurfaceSecondary016 = Color(0x29C014EB);
+
+  /// Color: #1FD972F3
+  static const Color darkOnSurfaceSecondary08 = Color(0x1FD972F3);
+
+  /// Color: #2C1302
+  static const Color darkOnWarning = Color(0xFF2C1302);
+
+  /// Color: #FDE1CE
+  static const Color darkOnWarningContainer = Color(0xFFFDE1CE);
+
+  /// Color: #7F90B3
+  static const Color darkOutline = Color(0xFF7F90B3);
+
+  /// Color: #364463
+  static const Color darkOutlineVariant = Color(0xFF364463);
+
+  /// Color: #728EF3
+  static const Color darkPrimary = Color(0xFF728EF3);
+
+  /// Color: #1035BC
+  static const Color darkPrimaryContainer = Color(0xFF1035BC);
+
+  /// Color: #DF8AF5
+  static const Color darkSecondary = Color(0xFFDF8AF5);
+
+  /// Color: #9910BC
+  static const Color darkSecondaryContainer = Color(0xFF9910BC);
+
+  /// Color: #BAEDC2
+  static const Color darkSuccess = Color(0xFFBAEDC2);
+
+  /// Color: #1D722A
+  static const Color darkSuccessContainer = Color(0xFF1D722A);
+
+  /// Color: #61D9DEE8
+  static const Color darkTextDisabled = Color(0x61D9DEE8);
+
+  /// Color: #E6E9F0
+  static const Color darkTextOnPrimary = Color(0xFFE6E9F0);
+
+  /// Color: #0C288D
+  static const Color darkTextOnPrimaryContainer = Color(0xFF0C288D);
+
+  /// Color: #FFFFFF
+  static const Color darkTextPrimary = Color(0xFFFFFFFF);
+
+  /// Color: #FBC9A7
+  static const Color darkWarning = Color(0xFFFBC9A7);
+
+  /// Color: #B64E07
+  static const Color darkWarningContainer = Color(0xFFB64E07);
+
   /// Color: #CC0000
   static const Color lightError = Color(0xFFCC0000);
 
