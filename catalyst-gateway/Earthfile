@@ -38,16 +38,16 @@ build:
         --cmd="/scripts/std_build.py" \
         --args1="--bins=cat-gateway/cat-gateway" \
         --args2="--verbose" \
-        --output="$TARGETARCH/release/cat-gateway" \
+        --output="release/cat-gateway" \
         --junit="cat-gateway.junit-report.xml" \
         --coverage="cat-gateway.coverage-report.info" \
         --docs="true"
 
     # Generate the OpenAPI doc from the cat-gateway executable itself.
-    RUN ./target/$TARGETARCH/release/cat-gateway docs ./target/$TARGETARCH/doc/cat-gateway-api.json
+    RUN ./target/release/cat-gateway docs ./target/doc/cat-gateway-api.json
 
-    SAVE ARTIFACT target/$TARGETARCH/doc doc
-    SAVE ARTIFACT target/$TARGETARCH/release/cat-gateway cat-gateway
+    SAVE ARTIFACT target/doc doc
+    SAVE ARTIFACT target/release/cat-gateway cat-gateway
 
 # all-hosts-build : Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
