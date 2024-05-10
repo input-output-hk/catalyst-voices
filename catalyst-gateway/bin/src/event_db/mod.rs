@@ -1,10 +1,14 @@
 //! Catalyst Election Database crate
-use std::str::FromStr;
+use std::{str::FromStr, sync::Arc};
 
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
 use dotenvy::dotenv;
-use tokio_postgres::NoTls;
+use tokio::sync::RwLock;
+use tokio_postgres::{types::ToSql, NoTls, Row};
+use tracing::{debug, debug_span, Instrument};
+
+use crate::state::{DatabaseInspectionSettings, DeepQueryInspection};
 
 pub(crate) mod cardano;
 pub(crate) mod error;
@@ -26,6 +30,8 @@ pub(crate) struct EventDB {
     /// All database operations (queries, inserts, etc) should be constrained
     /// to this crate and should be exported with a clean data access api.
     pool: Pool<PostgresConnectionManager<NoTls>>,
+    /// Settings for inspecting the database.
+    inspection_settings: Arc<RwLock<DatabaseInspectionSettings>>,
 }
 
 /// No DB URL was provided
@@ -34,14 +40,79 @@ pub(crate) struct EventDB {
 pub(crate) struct NoDatabaseUrlError;
 
 impl EventDB {
-    /// Get a pooled connection to the database.
-    pub(crate) async fn conn(
-        &self,
-    ) -> Result<
-        bb8::PooledConnection<'_, bb8_postgres::PostgresConnectionManager<tokio_postgres::NoTls>>,
-        bb8::RunError<tokio_postgres::Error>,
-    > {
-        self.pool.get().await
+    /// Determine if deep query inspection is enabled.
+    pub(crate) async fn is_deep_query_enabled(&self) -> bool {
+        self.inspection_settings.read().await.deep_query == DeepQueryInspection::Enabled
+    }
+
+    /// Modify the deep query inspection setting.
+    pub(crate) async fn modify_deep_query(&self, deep_query: DeepQueryInspection) {
+        let mut settings = self.inspection_settings.write().await;
+        settings.deep_query = deep_query;
+    }
+
+    /// Query the database.
+    ///
+    /// If deep query inspection is enabled, this will log the query plan inside a
+    /// rolled-back transaction, before running the query.
+    ///
+    /// # Arguments
+    /// * `stmt` - `&str` SQL statement.
+    /// * `params` - `&[&(dyn ToSql + Sync)]` SQL parameters.
+    ///
+    /// # Returns
+    /// `Result<Vec<Row>, anyhow::Error>`
+    pub(crate) async fn query(
+        &self, stmt: &str, params: &[&(dyn ToSql + Sync)],
+    ) -> Result<Vec<Row>, anyhow::Error> {
+        if self.is_deep_query_enabled().await {
+            self.explain_analyze(stmt, params).await?;
+        }
+        let conn = self.pool.get().await?;
+        let rows = conn.query(stmt, params).await?;
+        Ok(rows)
+    }
+
+    /// Query the database for a single row.
+    pub(crate) async fn query_one(
+        &self, stmt: &str, params: &[&(dyn ToSql + Sync)],
+    ) -> Result<Row, anyhow::Error> {
+        if self.is_deep_query_enabled().await {
+            self.explain_analyze(stmt, params).await?;
+        }
+        let conn = self.pool.get().await?;
+        let row = conn.query_one(stmt, params).await?;
+        Ok(row)
+    }
+
+    /// Prepend `EXPLAIN ANALYZE` to the query.
+    ///
+    /// Log the query plan inside a rolled-back transaction.
+    async fn explain_analyze(
+        &self, stmt: &str, params: &[&(dyn ToSql + Sync)],
+    ) -> anyhow::Result<()> {
+        let span = debug_span!(
+            "query_plan",
+            query_statement = stmt,
+            params = format!("{:?}", params),
+            uuid = uuid::Uuid::new_v4().to_string()
+        );
+        async move {
+            let mut conn = self.pool.get().await?;
+            let transaction = conn.transaction().await?;
+            let explain_stmt = transaction
+                .prepare(format!("EXPLAIN ANALYZE {stmt}").as_str())
+                .await?;
+            let rows = transaction.query(&explain_stmt, params).await?;
+            for r in rows {
+                let c: String = r.get("QUERY PLAN");
+                debug!("{}", c);
+            }
+            transaction.rollback().await?;
+            Ok(())
+        }
+        .instrument(span)
+        .await
     }
 }
 
@@ -83,5 +154,8 @@ pub(crate) async fn establish_connection(url: Option<String>) -> anyhow::Result<
 
     let pool = Pool::builder().build(pg_mgr).await?;
 
-    Ok(EventDB { pool })
+    Ok(EventDB {
+        pool,
+        inspection_settings: Arc::new(RwLock::new(DatabaseInspectionSettings::default())),
+    })
 }

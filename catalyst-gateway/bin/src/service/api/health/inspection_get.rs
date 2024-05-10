@@ -42,8 +42,8 @@ pub(crate) async fn endpoint(
     query_inspection: Option<DeepQueryInspection>,
 ) -> AllResponses {
     if let Some(level) = log_level {
-        let insp_sett = state.inspection_settings();
-        let settings = insp_sett.lock().await;
+        let inspection_settings = state.inspection_settings();
+        let settings = inspection_settings.read().await;
         match settings.modify_logger_level(level) {
             Ok(()) => debug!("successfully set log level to: {:?}", level),
             Err(_) => {
@@ -53,9 +53,8 @@ pub(crate) async fn endpoint(
     }
 
     if let Some(inspection_mode) = query_inspection {
-        let insp_sett = state.inspection_settings();
-        let mut settings = insp_sett.lock().await;
-        settings.modify_deep_query(inspection_mode);
+        let event_db = state.event_db();
+        event_db.modify_deep_query(inspection_mode).await;
         debug!(
             "successfully set deep query inspection mode to: {:?}",
             inspection_mode

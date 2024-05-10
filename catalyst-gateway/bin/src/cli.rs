@@ -42,10 +42,12 @@ impl Cli {
                 // Unique machine id
                 let machine_id = settings.follower_settings.machine_uid;
 
-                let inspection =
-                    InspectionSettings::new(settings.deep_query_inspection, logger_handle);
+                let inspection = InspectionSettings::new(logger_handle);
                 let state = Arc::new(State::new(Some(settings.database_url), inspection).await?);
                 let event_db = state.event_db();
+                event_db
+                    .modify_deep_query(settings.deep_query_inspection.into())
+                    .await;
 
                 tokio::spawn(async move {
                     match service::run(&settings.docs_settings, state.clone()).await {
