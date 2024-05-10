@@ -46,8 +46,6 @@ impl EventDB {
         voting_info: Option<PublicVotingInfo>, payment_address: Option<PaymentAddress>,
         metadata_cip36: Option<MetadataCip36>, nonce: Option<Nonce>, errors_report: ErrorReport,
     ) -> anyhow::Result<()> {
-        let conn = self.pool.get().await?;
-
         // for the catalyst we dont support multiple delegations
         let multiple_delegations = voting_info.as_ref().is_some_and(|voting_info| {
             if let PublicVotingInfo::Delegated(delegations) = voting_info {
@@ -76,7 +74,7 @@ impl EventDB {
             && nonce.is_some()
             && errors_report.is_empty();
 
-        let _rows = conn
+        let _rows = self
             .query(INSERT_VOTER_REGISTRATION_SQL, &[
                 &tx_id,
                 &stake_credential,
@@ -131,9 +129,7 @@ impl EventDB {
     pub(crate) async fn get_registration_info(
         &self, stake_credential: StakeCredential, network: Network, slot_num: SlotNumber,
     ) -> anyhow::Result<(TxId, PaymentAddress, PublicVotingInfo, Nonce)> {
-        let conn = self.pool.get().await?;
-
-        let rows = conn
+        let rows = self
             .query(SELECT_VOTER_REGISTRATION_SQL, &[
                 &stake_credential,
                 &network.to_string(),
