@@ -213,7 +213,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
   }
 }
 
-extension ExtendedColorsExtension on ThemeData {
+extension VoicesColorSchemeExtension on ThemeData {
   VoicesColorScheme get colors => extension<VoicesColorScheme>()!;
   Color get linksPrimary => primaryColor;
 }

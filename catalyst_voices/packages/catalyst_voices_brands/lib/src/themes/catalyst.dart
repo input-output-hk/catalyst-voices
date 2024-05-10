@@ -1,6 +1,6 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_assets/generated/colors.gen.dart';
-import 'package:catalyst_voices_brands/src/themes/extended_color_scheme.dart';
+import 'package:catalyst_voices_brands/src/themes/voices_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
