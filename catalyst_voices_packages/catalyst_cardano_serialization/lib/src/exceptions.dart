@@ -1,5 +1,5 @@
 /// Exception thrown when the transaction exceeds the allowed maximum size.
-class MaxTxSizeExceededException implements Exception {
+final class MaxTxSizeExceededException implements Exception {
   /// The maximum amount of bytes per transaction.
   final int maxTxSize;
 
@@ -20,7 +20,7 @@ class MaxTxSizeExceededException implements Exception {
 }
 
 /// Exception thrown when building a transaction that doesn't specify the fee.
-class TxFeeNotSpecifiedException implements Exception {
+final class TxFeeNotSpecifiedException implements Exception {
   /// The default constructor for [TxFeeNotSpecifiedException].
   const TxFeeNotSpecifiedException();
 
@@ -28,18 +28,18 @@ class TxFeeNotSpecifiedException implements Exception {
   String toString() => 'TxFeeNotSpecifiedException';
 }
 
-/// Exception thrown when parsing a transaction hash that has incorrect length.
-class TransactionHashFormatException implements Exception {
-  /// The default constructor for [TransactionHashFormatException].
-  const TransactionHashFormatException();
+/// Exception thrown when parsing a hash that has incorrect length.
+final class HashFormatException implements Exception {
+  /// The default constructor for [HashFormatException].
+  const HashFormatException();
 
   @override
-  String toString() => 'TransactionHashFormatException';
+  String toString() => 'HashFormatException';
 }
 
 /// Exception thrown if the address doesn't match the bech32 specification
 /// for Shelley addresses.
-class InvalidAddressException implements Exception {
+final class InvalidAddressException implements Exception {
   /// Exception details.
   final String message;
 
