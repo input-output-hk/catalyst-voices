@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/docs:fix/improve-rust-builder-sj AS docs-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/docs:fix/improve-rust-builder AS docs-ci
 
 IMPORT .. AS repo
 IMPORT ../catalyst-gateway AS catalyst-gateway

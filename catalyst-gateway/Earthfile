@@ -1,7 +1,7 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:fix/improve-rust-builder-sj AS rust-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:fix/improve-rust-builder-sj AS mithril-snapshot-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:fix/improve-rust-builder AS rust-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:fix/improve-rust-builder AS mithril-snapshot-ci
 
 #cspell: words rustfmt toolsets USERARCH
 
