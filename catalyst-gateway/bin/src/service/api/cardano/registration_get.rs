@@ -42,7 +42,7 @@ pub(crate) async fn endpoint(
     let stake_credential = stake_address.payload().as_hash().to_vec();
     let network = match check_network(stake_address.network(), provided_network) {
         Ok(network) => network,
-        Err(err) => return err.into(),
+        Err(err) => return AllResponses::handle_error(&err),
     };
 
     // get the total utxo amount from the database
@@ -60,6 +60,6 @@ pub(crate) async fn endpoint(
             .into()
         },
         Err(err) if err.is::<NotFoundError>() => Responses::NotFound.into(),
-        Err(err) => AllResponses::handle_5xx_response(&err),
+        Err(err) => AllResponses::handle_error(&err),
     }
 }

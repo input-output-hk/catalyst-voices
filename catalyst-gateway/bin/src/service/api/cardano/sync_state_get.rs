@@ -42,6 +42,6 @@ pub(crate) async fn endpoint(state: &State, network: Option<Network>) -> AllResp
             .into()
         },
         Err(err) if err.is::<NotFoundError>() => Responses::NotFound.into(),
-        Err(err) => AllResponses::handle_5xx_response(&err),
+        Err(err) => AllResponses::handle_error(&err),
     }
 }

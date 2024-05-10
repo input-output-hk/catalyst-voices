@@ -69,15 +69,15 @@ pub(crate) async fn endpoint(
 
     let current = match process_slot_info_result(current) {
         Ok(current) => current,
-        Err(err) => return AllResponses::handle_5xx_response(&err),
+        Err(err) => return AllResponses::handle_error(&err),
     };
     let previous = match process_slot_info_result(previous) {
         Ok(current) => current,
-        Err(err) => return AllResponses::handle_5xx_response(&err),
+        Err(err) => return AllResponses::handle_error(&err),
     };
     let next = match process_slot_info_result(next) {
         Ok(current) => current,
-        Err(err) => return AllResponses::handle_5xx_response(&err),
+        Err(err) => return AllResponses::handle_error(&err),
     };
 
     Responses::Ok(Json(SlotInfo {

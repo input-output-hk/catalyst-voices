@@ -8,6 +8,7 @@ use poem_openapi::{
 };
 
 use super::objects::{server_error::ServerError, validation_error::ValidationError};
+use crate::service::utilities::NetworkValidationError;
 
 /// Default error responses
 #[derive(ApiResponse)]
@@ -34,17 +35,24 @@ pub(crate) enum WithErrorResponses<T> {
 }
 
 impl<T> WithErrorResponses<T> {
-    /// Handle a 5xx response.
-    /// Returns a Server Error or a Service Unavailable response.
-    /// Logging error message.
-    pub(crate) fn handle_5xx_response(err: &anyhow::Error) -> Self {
-        if err.is::<bb8::RunError<tokio_postgres::Error>>() {
-            WithErrorResponses::Error(ErrorResponses::ServiceUnavailable)
-        } else {
-            let error = crate::service::common::objects::server_error::ServerError::new(None);
-            let id = error.id();
-            tracing::error!(id = format!("{id}"), "{}", err);
-            WithErrorResponses::Error(ErrorResponses::ServerError(Json(error)))
+    /// Handle a 5xx or 4xx response.
+    /// Returns a Server Error, a Bad Request or a Service Unavailable response.
+    pub(crate) fn handle_error(err: &anyhow::Error) -> Self {
+        match err {
+            err if err.is::<NetworkValidationError>() => {
+                WithErrorResponses::Error(ErrorResponses::BadRequest(Json(ValidationError::new(
+                    err.to_string(),
+                ))))
+            },
+            err if err.is::<NetworkValidationError>() => {
+                WithErrorResponses::Error(ErrorResponses::ServiceUnavailable)
+            },
+            err => {
+                let error = crate::service::common::objects::server_error::ServerError::new(None);
+                let id = error.id();
+                tracing::error!(id = format!("{id}"), "{}", err);
+                WithErrorResponses::Error(ErrorResponses::ServerError(Json(error)))
+            },
         }
     }
 }
@@ -52,12 +60,6 @@ impl<T> WithErrorResponses<T> {
 impl<T: ApiResponse> From<T> for WithErrorResponses<T> {
     fn from(val: T) -> Self {
         Self::With(val)
-    }
-}
-
-impl<T: ApiResponse> From<ValidationError> for WithErrorResponses<T> {
-    fn from(val: ValidationError) -> Self {
-        Self::Error(ErrorResponses::BadRequest(Json(val)))
     }
 }
 

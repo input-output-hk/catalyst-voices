@@ -5,30 +5,37 @@ pub(crate) mod middleware;
 use pallas::ledger::addresses::Network as PallasNetwork;
 use poem_openapi::types::ToJSON;
 
-use crate::service::common::objects::{
-    cardano::network::Network, validation_error::ValidationError,
-};
+use crate::service::common::objects::cardano::network::Network;
 
 /// Convert bytes to hex string with the `0x` prefix
 pub(crate) fn to_hex_with_prefix(bytes: &[u8]) -> String {
     format!("0x{}", hex::encode(bytes))
 }
 
+/// Network validation error
+#[derive(thiserror::Error, Debug)]
+pub(crate) enum NetworkValidationError {
+    /// Provided network type does not match stake address
+    #[error("Provided network type {0} does not match stake address network type {1}")]
+    NetworkMismatch(String, String),
+    /// Unknown address network type
+    #[error("Unknown address network type {0}")]
+    UnknownNetwork(u8),
+}
+
 /// Check the provided network type with the encoded inside the stake address
 pub(crate) fn check_network(
     address_network: PallasNetwork, provided_network: Option<Network>,
-) -> Result<Network, ValidationError> {
+) -> anyhow::Result<Network> {
     match address_network {
         PallasNetwork::Mainnet => {
             if let Some(network) = provided_network {
                 if !matches!(&network, Network::Mainnet) {
-                    return Err(
-                        ValidationError::new(
-                            format!(
-                                "Provided network type {} does not match stake address network type Mainnet",
-                                network.to_json_string()
-                            )
-                        ));
+                    return Err(NetworkValidationError::NetworkMismatch(
+                        network.to_json_string(),
+                        "Mainnet".to_string(),
+                    )
+                    .into());
                 }
             }
             Ok(Network::Mainnet)
@@ -43,18 +50,17 @@ pub(crate) fn check_network(
                     network,
                     Network::Testnet | Network::Preprod | Network::Preview
                 ) {
-                    return Err(ValidationError::new(
-                        format!(
-                            "Provided network type {} does not match stake address network type Testnet",
-                            network.to_json_string()
-                        )
-                    ));
+                    return Err(NetworkValidationError::NetworkMismatch(
+                        network.to_json_string(),
+                        "Testnet".to_string(),
+                    )
+                    .into());
                 }
                 Ok(network)
             } else {
                 Ok(Network::Testnet)
             }
         },
-        PallasNetwork::Other(x) => Err(ValidationError::new(format!("Unknown network type {x}"))),
+        PallasNetwork::Other(x) => Err(NetworkValidationError::UnknownNetwork(x).into()),
     }
 }

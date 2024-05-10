@@ -49,6 +49,6 @@ pub(crate) async fn endpoint(state: Data<&Arc<State>>) -> AllResponses {
             tracing::error!("{err}");
             AllResponses::Error(ErrorResponses::ServiceUnavailable)
         },
-        Err(err) => AllResponses::handle_5xx_response(&err),
+        Err(err) => AllResponses::handle_error(&err),
     }
 }
