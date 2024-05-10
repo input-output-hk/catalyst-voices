@@ -10,7 +10,7 @@ import 'package:pinenacl/digests.dart';
 
 /// Implements a common base of hash types that holds
 /// binary [bytes] of exact [length].
-abstract class BaseHash {
+abstract base class BaseHash {
   /// The raw [bytes] of a hash.
   final List<int> bytes;
 

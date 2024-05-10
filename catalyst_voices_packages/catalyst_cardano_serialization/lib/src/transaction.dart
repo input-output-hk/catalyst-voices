@@ -5,7 +5,7 @@ import 'package:cbor/cbor.dart';
 
 /// Represents the signed transaction with a list of witnesses
 /// which are used to verify the validity of a transaction.
-class Transaction {
+final class Transaction {
   /// The transaction body containing the inputs, outputs, fees, etc.
   final TransactionBody body;
 
@@ -37,7 +37,7 @@ class Transaction {
 /// Represents the details of a transaction including inputs, outputs, fee, etc.
 ///
 /// Does not contain the witnesses which are used to verify the transaction.
-class TransactionBody {
+final class TransactionBody {
   /// The transaction inputs.
   final Set<TransactionInput> inputs;
 
@@ -84,7 +84,7 @@ class TransactionBody {
 
 /// The transaction output of a previous transaction,
 /// acts as input for the next transaction.
-class TransactionInput {
+final class TransactionInput {
   /// The hash of the given transaction.
   final TransactionHash transactionId;
 
@@ -108,7 +108,7 @@ class TransactionInput {
 
 /// The transaction output which assigns the owner of given address
 /// with leftover change from previous transaction.
-class TransactionOutput {
+final class TransactionOutput {
   /// The address associated with the transaction.
   final ShelleyAddress address;
 
@@ -131,7 +131,7 @@ class TransactionOutput {
 }
 
 /// The UTXO that can be used as an input in a new transaction.
-class TransactionUnspentOutput {
+final class TransactionUnspentOutput {
   /// The transaction output of a previous transaction,
   /// acts as input for the next transaction.
   final TransactionInput input;
@@ -156,7 +156,7 @@ class TransactionUnspentOutput {
 }
 
 /// The transaction metadata as a list of key-value pairs (a map).
-class AuxiliaryData {
+final class AuxiliaryData {
   /// The transaction metadata map.
   final Map<CborSmallInt, CborValue> map;
 
