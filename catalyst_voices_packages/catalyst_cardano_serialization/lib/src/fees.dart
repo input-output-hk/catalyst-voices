@@ -22,7 +22,7 @@ final class LinearFee {
 
   /// Calculates the fee for the transaction denominated in lovelaces.
   ///
-  /// The formula doesn't take into account the smart contract.
+  /// The formula doesn't take into account smart contract scripts.
   Coin minNoScriptFee(Transaction tx) {
     final bytesCount = cbor.encode(tx.toCbor()).length;
     return Coin(bytesCount) * coefficient + constant;
