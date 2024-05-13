@@ -1,8 +1,8 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:fix/improve-rust-builder AS mdlint-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:fix/improve-rust-builder AS cspell-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:fix/improve-rust-builder AS postgresql-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:v3.00.0 AS mdlint-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:v3.00.0 AS cspell-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.00.0 AS postgresql-ci
 
 FROM debian:stable-slim
 
