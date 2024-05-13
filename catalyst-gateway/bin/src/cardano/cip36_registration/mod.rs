@@ -100,7 +100,6 @@ pub(crate) struct Cip36Metadata {
 impl Cip36Metadata {
     /// Create new `Cip36Registration` from tx metadata
     /// Collect secondary errors for granular json error report
-    #[allow(clippy::too_many_lines)]
     pub(crate) fn generate_from_tx_metadata(
         tx_metadata: &MultiEraMeta, network: Network,
     ) -> Option<Self> {
@@ -119,14 +118,6 @@ impl Cip36Metadata {
             const CIP36_REGISTRATION_CBOR_KEY: u64 = 61284;
             /// <https://cips.cardano.org/cips/cip36>
             const CIP36_WITNESS_CBOR_KEY: u64 = 61285;
-
-            raw_metadata = tx_metadata.encode_fragment().map_or_else(
-                |err| {
-                    errors_report.push(format!("cannot encode tx metadata into bytes {err}"));
-                    None
-                },
-                Some,
-            );
 
             for (key, metadata) in tx_metadata.iter() {
                 match *key {
@@ -159,6 +150,16 @@ impl Cip36Metadata {
                     },
                     _ => continue,
                 };
+            }
+
+            if signature.is_some() || registration.is_some() {
+                raw_metadata = tx_metadata.encode_fragment().map_or_else(
+                    |err| {
+                        errors_report.push(format!("cannot encode tx metadata into bytes {err}"));
+                        None
+                    },
+                    Some,
+                );
             }
         };
 
