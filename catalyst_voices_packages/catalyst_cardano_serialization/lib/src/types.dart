@@ -15,7 +15,7 @@ enum NetworkId {
 }
 
 /// Specifies an amount of ADA in terms of lovelace.
-extension type Coin(int value) {
+extension type const Coin(int value) {
   /// Adds [other] value to this value and returns a new [Coin].
   Coin operator +(Coin other) => Coin(value + other.value);
 
@@ -40,10 +40,21 @@ extension type Coin(int value) {
 
   /// Returns true if [value] is smaller than or equal [other] value.
   bool operator <=(Coin other) => value < other.value || value == other.value;
+
+  /// Serializes the type as cbor.
+  CborValue toCbor() => CborSmallInt(value);
 }
 
 /// A blockchain slot number.
-extension type SlotBigNum(int value) {
+extension type const SlotBigNum(int value) {
   /// Serializes the type as cbor.
   CborValue toCbor() => CborSmallInt(value);
+}
+
+/// Holds cbor tags not specified by the official cbor package.
+final class CborCustomTags {
+  const CborCustomTags._();
+
+  /// A cbor tag describing a key-value pairs data.
+  static const int map = 259;
 }

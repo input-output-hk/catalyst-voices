@@ -91,7 +91,7 @@ class ShelleyAddress {
   CborValue toCbor() => CborBytes(bytes);
 
   @override
-  int get hashCode => Object.hash(bytes.hashCode, hrp);
+  int get hashCode => Object.hash(bytes, hrp);
 
   @override
   bool operator ==(Object other) {
