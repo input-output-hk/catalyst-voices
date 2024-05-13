@@ -1,0 +1,30 @@
+VERSION 0.8
+
+# start-cluster : starts the local development cluster
+# Needs both Vagrant and Virtualbox installed on the local machine.
+start-cluster:
+    LOCALLY
+    RUN vagrant up
+
+# stop-cluster : stops the locally running cluster
+stop-cluster:
+    LOCALLY
+    RUN vagrant destroy -f
+
+# test-cluster : Checks if the cluster is running on the local machine.
+test-cluster:
+    LOCALLY
+    RUN kubectl --kubeconfig shared/k3s.yaml -o wide get nodes
+
+# test-inside-earthly : Checks if we can see the cluster from INSIDE Earthly and not locally.
+test-inside-earthly:
+    FROM alpine:3.19
+    
+    # Install kubectl
+    RUN apk update && \
+        apk upgrade && \
+        apk add kubectl
+
+    COPY shared shared
+
+    RUN kubectl --kubeconfig shared/k3s.yaml -o wide get nodes

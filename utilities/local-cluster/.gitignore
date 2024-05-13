@@ -1,0 +1,4 @@
+shared/*
+.vagrant
+
+!shared/.do_not_remove
