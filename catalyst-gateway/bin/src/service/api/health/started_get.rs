@@ -10,6 +10,10 @@ pub(crate) enum Responses {
     /// Service is Started and can serve requests.
     #[oai(status = 204)]
     NoContent,
+    /// Service is not ready, do not send other requests.
+    #[oai(status = 503)]
+    #[allow(dead_code)]
+    ServiceUnavailable,
 }
 
 /// All responses.

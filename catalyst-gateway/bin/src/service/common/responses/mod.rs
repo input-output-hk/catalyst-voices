@@ -1,9 +1,14 @@
 //! Generic Responses are all contained in their own modules, grouped by response codes.
 
+use std::{
+    collections::HashSet,
+    hash::{Hash, Hasher},
+};
+
 use poem::IntoResponse;
 use poem_openapi::{
     payload::Json,
-    registry::{MetaResponses, Registry},
+    registry::{MetaResponse, MetaResponses, Registry},
     ApiResponse,
 };
 
@@ -79,17 +84,28 @@ impl<T: ApiResponse> ApiResponse for WithErrorResponses<T> {
     fn meta() -> MetaResponses {
         let t_meta = T::meta();
         let default_meta = ErrorResponses::meta();
-        let responses = t_meta
-            .responses
-            .into_iter()
-            .chain(default_meta.responses)
-            .collect();
+
+        let mut responses = HashSet::new();
+        responses.extend(
+            t_meta
+                .responses
+                .into_iter()
+                .map(FilteredByStatusCodeResponse),
+        );
+        responses.extend(
+            default_meta
+                .responses
+                .into_iter()
+                .map(FilteredByStatusCodeResponse),
+        );
+
+        let responses = responses.into_iter().map(|val| val.0).collect();
         MetaResponses { responses }
     }
 
     fn register(registry: &mut Registry) {
-        T::register(registry);
         ErrorResponses::register(registry);
+        T::register(registry);
     }
 
     fn from_parse_request_error(err: poem::Error) -> Self {
@@ -105,5 +121,21 @@ impl<T: IntoResponse + Send> IntoResponse for WithErrorResponses<T> {
             Self::With(t) => t.into_response(),
             Self::Error(default) => default.into_response(),
         }
+    }
+}
+
+/// `FilteredByStatusCodeResponse` is used to filter out duplicate responses by status
+/// code.
+struct FilteredByStatusCodeResponse(MetaResponse);
+
+impl PartialEq for FilteredByStatusCodeResponse {
+    fn eq(&self, other: &Self) -> bool {
+        self.0.status.eq(&other.0.status)
+    }
+}
+impl Eq for FilteredByStatusCodeResponse {}
+impl Hash for FilteredByStatusCodeResponse {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.0.status.hash(state);
     }
 }
