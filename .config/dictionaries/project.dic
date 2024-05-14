@@ -98,6 +98,8 @@ mitigations
 moderations
 msedgedriver
 multidex
+multiplatform
+Multiplatform
 myproject
 nanos
 NDEBUG
@@ -155,6 +157,7 @@ SYSROOT
 tacho
 testcov
 testdocs
+testplan
 testunit
 thiserror
 thollander
@@ -177,6 +180,7 @@ vkeywitness
 voteplan
 voteplans
 wallclock
+wasmtime
 Werror
 xcassets
 xcconfig
@@ -189,3 +193,8 @@ xcworkspace
 yoroi
 multiplatform
 Multiplatform
+Easterling
+lovelace
+lovelaces
+pinenacl
+dtscalac

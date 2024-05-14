@@ -68,3 +68,4 @@ anyhow = { workspace = true }
 handlebars = { workspace = true }
 cddl = { workspace = true }
 ciborium = { workspace = true }
+ed25519-dalek = "2.1.1"

@@ -1,4 +1,6 @@
-VERSION --try --global-cache --arg-scope-and-set 0.7
+VERSION 0.8
+
+IMPORT ../catalyst-gateway AS catalyst-gateway
 
 # If running this target with a local ssh agent active, set the environment
 # variable EARTHLY_SSH_AUTH_SOCK='' to make the `+deps` target work. Earthly
@@ -8,6 +10,7 @@ VERSION --try --global-cache --arg-scope-and-set 0.7
 deps:
     FROM debian:bookworm-slim
     ARG TARGETARCH
+    ARG FLUTTER_VERSION=3.19.5
     RUN apt-get update
     RUN apt-get install -y git curl unzip bzip2 bash jq gpg lcov
     COPY --dir test_driver/scripts .
@@ -17,10 +20,8 @@ deps:
 
     WORKDIR /frontend
 
-    RUN git clone https://github.com/flutter/flutter.git /usr/local/flutter
+    RUN git clone --depth 1 --branch $FLUTTER_VERSION https://github.com/flutter/flutter.git /usr/local/flutter
     ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
-    RUN flutter channel stable
-    RUN flutter upgrade
     RUN flutter --version
     RUN flutter doctor -v
     RUN flutter config --enable-web
@@ -43,7 +44,7 @@ code-generator:
 
     FROM +src
     WORKDIR /frontend/catalyst_voices/packages/catalyst_voices_services
-    COPY ../catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
+    COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
     RUN flutter pub get
     RUN dart run build_runner build --delete-conflicting-outputs
 

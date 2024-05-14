@@ -1,12 +1,15 @@
-VERSION --global-cache 0.7
+VERSION 0.8
 
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.00.0 AS python-ci
+
+# builder : 
 builder:
-    FROM github.com/input-output-hk/catalyst-ci/earthly/python:v2.11.1+python-base
+    FROM python-ci+python-base
 
     # prepare tests
     COPY --dir ./api_tests .
     COPY ./snapshot_tool-56364174.json .
-    DO github.com/input-output-hk/catalyst-ci/earthly/python:v2.11.1+BUILDER
+    DO python-ci+BUILDER
 
 test:
     FROM +builder
