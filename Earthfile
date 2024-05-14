@@ -1,31 +1,34 @@
-# Set the Earthly version to 0.7
+VERSION 0.8
 
-VERSION 0.7
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:v3.00.0 AS mdlint-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:v3.00.0 AS cspell-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.00.0 AS postgresql-ci
+
 FROM debian:stable-slim
 
 # cspell: words livedocs sitedocs
 
 # check-markdown markdown check using catalyst-ci.
 check-markdown:
-    DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:v2.11.1+CHECK
+    DO mdlint-ci+CHECK
 
 # markdown-check-fix markdown check and fix using catalyst-ci.
 markdown-check-fix:
     LOCALLY
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:v2.11.1+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
+    DO mdlint-ci+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
 
 # check-spelling Check spelling in this repo inside a container.
 check-spelling:
-    DO github.com/input-output-hk/catalyst-ci/earthly/cspell:v2.11.1+CHECK
+    DO cspell-ci+CHECK
 
 # check if the sql files are properly formatted and pass lint quality checks.
 check-sqlfluff:
-    FROM github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.11.1+postgres-base
+    FROM postgresql-ci+postgres-base
 
     COPY . .
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:v2.11.1+CHECK
+    DO postgresql-ci+CHECK
 
 repo-docs:
     # Create artifacts of extra files we embed inside the documentation when its built.
