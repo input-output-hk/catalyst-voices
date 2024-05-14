@@ -22,7 +22,7 @@ pub(crate) enum Responses {
     /// Returns the staked ada amount.
     #[oai(status = 200)]
     Ok(Json<StakeInfo>),
-    /// Nothing found for the provided stake address and provided slot number.
+    /// The queried stake address was not found at the requested slot number.
     #[oai(status = 404)]
     NotFound,
 }
