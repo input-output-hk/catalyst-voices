@@ -17,7 +17,7 @@ pub(crate) enum Responses {
     /// Returns the sync state.
     #[oai(status = 200)]
     Ok(Json<SyncState>),
-    /// Cardano chain follower was not syncing for the provided network.
+    /// The network is unknown. Catalayst gateway is not syncing the queried network.
     #[oai(status = 404)]
     NotFound,
 }
