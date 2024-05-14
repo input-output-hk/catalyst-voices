@@ -19,7 +19,7 @@ use crate::{
 /// Endpoint responses
 #[derive(ApiResponse)]
 pub(crate) enum Responses {
-    /// Returns the staked ada amount.
+    /// The registration information for the stake address queried.
     #[oai(status = 200)]
     Ok(Json<RegistrationInfo>),
     /// No valid registration found for the provided stake address
