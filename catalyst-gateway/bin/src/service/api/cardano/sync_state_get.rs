@@ -14,7 +14,7 @@ use crate::{
 /// Endpoint responses.
 #[derive(ApiResponse)]
 pub(crate) enum Responses {
-    /// Returns the sync state.
+    /// The synchronisation state of the blockchain with the catalyst gateway service.
     #[oai(status = 200)]
     Ok(Json<SyncState>),
     /// The network is unknown. Catalayst gateway is not syncing the queried network.
