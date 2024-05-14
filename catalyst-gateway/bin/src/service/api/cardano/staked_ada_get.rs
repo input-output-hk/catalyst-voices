@@ -19,7 +19,7 @@ use crate::{
 /// Endpoint responses.
 #[derive(ApiResponse)]
 pub(crate) enum Responses {
-    /// Returns the staked ada amount.
+    /// The amount of ADA staked by the queried stake address, as at the indicated slot.
     #[oai(status = 200)]
     Ok(Json<StakeInfo>),
     /// The queried stake address was not found at the requested slot number.
