@@ -3,9 +3,18 @@
 
 server_ip = "192.168.58.10"
 
+# Determine the maximum number of agents, and set their IP addresses
 agents = { "agent1" => "192.168.58.11",
            "agent2" => "192.168.58.12",
            "agent3" => "192.168.58.13" }
+
+server_vcpu = "2" # Number of vCPUs in the VM
+server_memory = "2048" # 2G of Memory
+
+agent_vcpu = "4" # Number of vCPUs in the VM
+agent_memory = "4096" # 4G of Memory
+
+is_darwin_arm64 = Vagrant::Util::Platform.darwin? && Vagrant::Util::Platform.arch == "arm64"
 
 # Extra parameters in INSTALL_K3S_EXEC variable because of
 # K3s picking up the wrong interface when starting server and agent
@@ -36,11 +45,22 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "server", primary: true do |server|
     server.vm.network "private_network", ip: server_ip
-    server.vm.synced_folder "./shared", "/vagrant_shared"
     server.vm.hostname = "server"
-    server.vm.provider "virtualbox" do |vb|
-      vb.memory = "2048"
-      vb.cpus = "2"
+
+    if !is_darwin_arm64
+      # x86 anything should work with this
+      server.vm.synced_folder "./shared", "/vagrant_shared"
+      server.vm.provider "virtualbox" do |vb|
+        vb.memory = server_memory
+        vb.cpus = server_vcpu
+      end
+    else
+      # Specific config just for Arm Macs.
+      server.vm.synced_folder "./shared", "/vagrant_shared", type: "smb"
+      server.vm.provider "qemu" do |qe|
+        qe.memory = server_memory
+        qe.smp = server_vcpu
+      end
     end
     server.vm.provision "shell", inline: server_script
   end
@@ -48,11 +68,19 @@ Vagrant.configure("2") do |config|
   agents.each do |agent_name, agent_ip|
     config.vm.define agent_name do |agent|
       agent.vm.network "private_network", ip: agent_ip
-      agent.vm.synced_folder "./shared", "/vagrant_shared"
       agent.vm.hostname = agent_name
-      agent.vm.provider "virtualbox" do |vb|
-        vb.memory = "4096"
-        vb.cpus = "4"
+      if !is_darwin_arm64
+        agent.vm.synced_folder "./shared", "/vagrant_shared"
+        agent.vm.provider "virtualbox" do |vb|
+          vb.memory = agent_memory
+          vb.cpus = agent_vcpu
+        end
+      else
+        agent.vm.synced_folder "./shared", "/vagrant_shared", type: "smb"
+        agent.vm.provider "qemu" do |qe|
+          qe.memory = agent_memory_memory
+          qe.smp = agent_vcpu
+        end
       end
       agent.vm.provision "shell", inline: agent_script
     end
