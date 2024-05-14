@@ -10,6 +10,7 @@ IMPORT ../catalyst-gateway AS catalyst-gateway
 deps:
     FROM debian:bookworm-slim
     ARG TARGETARCH
+    ARG FLUTTER_VERSION=3.19.5
     RUN apt-get update
     RUN apt-get install -y git curl unzip bzip2 bash jq gpg lcov
     COPY --dir test_driver/scripts .
@@ -19,10 +20,8 @@ deps:
 
     WORKDIR /frontend
 
-    RUN git clone https://github.com/flutter/flutter.git /usr/local/flutter
+    RUN git clone --depth 1 --branch $FLUTTER_VERSION https://github.com/flutter/flutter.git /usr/local/flutter
     ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
-    RUN flutter channel stable
-    RUN flutter upgrade
     RUN flutter --version
     RUN flutter doctor -v
     RUN flutter config --enable-web
