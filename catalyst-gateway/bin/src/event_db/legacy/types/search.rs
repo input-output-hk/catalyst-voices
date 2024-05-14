@@ -1,4 +1,6 @@
 //! Search Queries
+use std::fmt::Display;
+
 use super::{event::EventSummary, objective::ObjectiveSummary, proposal::ProposalSummary};
 
 #[allow(clippy::module_name_repetitions)]
@@ -37,14 +39,14 @@ pub(crate) enum SearchColumn {
     Funds,
 }
 
-impl ToString for SearchColumn {
-    fn to_string(&self) -> String {
+impl Display for SearchColumn {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            SearchColumn::Title => "title".to_string(),
-            SearchColumn::Type => "type".to_string(),
-            SearchColumn::Description => "description".to_string(),
-            SearchColumn::Author => "author".to_string(),
-            SearchColumn::Funds => "funds".to_string(),
+            SearchColumn::Title => write!(f, "title"),
+            SearchColumn::Type => write!(f, "type"),
+            SearchColumn::Description => write!(f, "description"),
+            SearchColumn::Author => write!(f, "author"),
+            SearchColumn::Funds => write!(f, "funds"),
         }
     }
 }

@@ -31,7 +31,6 @@ pub(crate) struct SchemaVersionValidationImpl<E> {
     ep: E,
 }
 
-#[poem::async_trait]
 impl<E: Endpoint> Endpoint for SchemaVersionValidationImpl<E> {
     type Output = E::Output;
 
