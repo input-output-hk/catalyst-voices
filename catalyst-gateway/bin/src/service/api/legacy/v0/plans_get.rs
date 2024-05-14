@@ -5,20 +5,26 @@ use std::sync::Arc;
 use poem::web::Data;
 use poem_openapi::{payload::Json, ApiResponse};
 
-use crate::{service::common::objects::legacy::vote_plan::VotePlan, state::State};
+use crate::{
+    service::common::{objects::legacy::vote_plan::VotePlan, responses::WithErrorResponses},
+    state::State,
+};
 
-/// All responses
+/// Endpoint responses
 #[derive(ApiResponse)]
-pub(crate) enum AllResponses {
+pub(crate) enum Responses {
     /// JSON array with the list of vote plans with their respective data.
     #[oai(status = 200)]
     Ok(Json<Vec<VotePlan>>),
 }
+
+/// All responses
+pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// GET /v0/vote/active/plans
 ///
 /// Get all active vote plans endpoint.
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(_state: Data<&Arc<State>>) -> AllResponses {
-    AllResponses::Ok(Json(Vec::new()))
+    Responses::Ok(Json(Vec::new())).into()
 }

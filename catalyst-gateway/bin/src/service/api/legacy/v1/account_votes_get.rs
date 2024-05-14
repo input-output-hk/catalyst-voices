@@ -6,17 +6,23 @@ use poem::web::Data;
 use poem_openapi::{param::Path, payload::Json, ApiResponse};
 
 use crate::{
-    service::common::objects::legacy::account_votes::{AccountId, AccountVote},
+    service::common::{
+        objects::legacy::account_votes::{AccountId, AccountVote},
+        responses::WithErrorResponses,
+    },
     state::State,
 };
 
-/// All responses
+/// Endpoint responses
 #[derive(ApiResponse)]
-pub(crate) enum AllResponses {
+pub(crate) enum Responses {
     /// JSON array of the number of voted proposals in a plan.
     #[oai(status = 200)]
     Ok(Json<Vec<AccountVote>>),
 }
+
+/// All responses
+pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// GET /v1/votes/plans/account-votes/:account_id
 ///
@@ -28,5 +34,5 @@ pub(crate) enum AllResponses {
 pub(crate) async fn endpoint(
     _state: Data<&Arc<State>>, _account_id: Path<AccountId>,
 ) -> AllResponses {
-    AllResponses::Ok(Json(Vec::new()))
+    Responses::Ok(Json(Vec::new())).into()
 }

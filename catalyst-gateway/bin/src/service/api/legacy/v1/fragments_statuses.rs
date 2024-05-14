@@ -4,22 +4,26 @@ use std::collections::HashMap;
 
 use poem_openapi::{payload::Json, ApiResponse};
 
-use crate::service::common::objects::legacy::{
-    fragment_status::FragmentStatus, fragments_processing_summary::FragmentId,
+use crate::service::common::{
+    objects::legacy::{fragment_status::FragmentStatus, fragments_processing_summary::FragmentId},
+    responses::WithErrorResponses,
 };
 
-/// All responses
+/// Endpoint responses
 #[derive(ApiResponse)]
-pub(crate) enum AllResponses {
+pub(crate) enum Responses {
     /// Statuses of the fragments by id.
     #[oai(status = 200)]
     Ok(Json<HashMap<String, FragmentStatus>>),
 }
+
+/// All responses
+pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # GET /fragments/statuses
 ///
 /// Get fragments statuses endpoint.
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(_fragment_ids: Vec<FragmentId>) -> AllResponses {
-    AllResponses::Ok(Json(HashMap::new()))
+    Responses::Ok(Json(HashMap::new())).into()
 }

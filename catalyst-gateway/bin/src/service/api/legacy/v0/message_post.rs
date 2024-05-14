@@ -5,15 +5,21 @@ use poem_openapi::{
     ApiResponse,
 };
 
-use crate::service::common::objects::legacy::fragments_processing_summary::FragmentsProcessingSummary;
+use crate::service::common::{
+    objects::legacy::fragments_processing_summary::FragmentsProcessingSummary,
+    responses::WithErrorResponses,
+};
 
-/// All responses
+/// Endpoint responses
 #[derive(ApiResponse)]
-pub(crate) enum AllResponses {
+pub(crate) enum Responses {
     /// Contains information about accepted and rejected fragments.
     #[oai(status = 200)]
     Ok(Json<FragmentsProcessingSummary>),
 }
+
+/// All responses
+pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # POST /message
 ///
@@ -23,5 +29,5 @@ pub(crate) enum AllResponses {
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(_message: Binary<Vec<u8>>) -> AllResponses {
     // otherwise everything seems to be A-OK
-    AllResponses::Ok(Json(FragmentsProcessingSummary::default()))
+    Responses::Ok(Json(FragmentsProcessingSummary::default())).into()
 }

@@ -16,6 +16,7 @@ use crate::{
                 event_id::EventId, voter_registration::VoterRegistration,
                 voting_public_key::VotingPublicKey,
             },
+            responses::WithErrorResponses,
             tags::ApiTags,
         },
         utilities::middleware::schema_validation::schema_version_validation,
@@ -26,13 +27,16 @@ use crate::{
 /// Registration API Endpoints
 pub(crate) struct RegistrationApi;
 
-/// All responses
+/// Endpoint responses
 #[derive(ApiResponse)]
-enum AllResponses {
+enum Responses {
     /// Voter's registration info
     #[oai(status = 200)]
     Ok(Json<VoterRegistration>),
 }
+
+/// All responses
+type AllResponses = WithErrorResponses<Responses>;
 
 #[OpenApi(prefix_path = "/registration", tag = "ApiTags::Registration")]
 impl RegistrationApi {
@@ -70,6 +74,6 @@ impl RegistrationApi {
         #[oai(default)]
         with_delegators: Query<bool>,
     ) -> AllResponses {
-        AllResponses::Ok(Json(VoterRegistration::example()))
+        Responses::Ok(Json(VoterRegistration::example())).into()
     }
 }
