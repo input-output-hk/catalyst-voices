@@ -14,7 +14,7 @@ server_memory = "2048" # 2G of Memory
 agent_vcpu = "4" # Number of vCPUs in the VM
 agent_memory = "4096" # 4G of Memory
 
-is_darwin_arm64 = Vagrant::Util::Platform.darwin? && Vagrant::Util::Platform.arch == "arm64"
+is_darwin_arm64 = Vagrant::Util::Platform.architecture == "arm64" && Vagrant::Util::Platform.darwin?
 
 # Extra parameters in INSTALL_K3S_EXEC variable because of
 # K3s picking up the wrong interface when starting server and agent
