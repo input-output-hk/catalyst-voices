@@ -7,7 +7,7 @@ use crate::service::common::responses::WithErrorResponses;
 /// Endpoint responses.
 #[derive(ApiResponse)]
 pub(crate) enum Responses {
-    /// Service is Started and can serve requests.
+    /// Service is OK and can keep running.
     #[oai(status = 204)]
     NoContent,
 }

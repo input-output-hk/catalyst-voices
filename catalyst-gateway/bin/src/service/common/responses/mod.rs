@@ -13,15 +13,25 @@ use crate::service::utilities::NetworkValidationError;
 /// Default error responses
 #[derive(ApiResponse)]
 pub(crate) enum ErrorResponses {
-    /// Content validation error.
+    /// ## Content validation error.
+    ///
+    /// This error means that the request was malformed.
+    /// It has failed to pass validation, as specified by the `OpenAPI` schema.
     #[oai(status = 400)]
     BadRequest(Json<ValidationError>),
-    /// Internal Server Error.
+    /// ## Internal Server Error.
+    ///
+    /// An internal server error occurred.
     ///
     /// *The contents of this response should be reported to the projects issue tracker.*
     #[oai(status = 500)]
     ServerError(Json<ServerError>),
-    /// Service is not ready, do not send other requests.
+    /// ## Service Unavailable
+    ///
+    /// The service is not available, do not send other requests.
+    ///
+    /// *This is returned when the service either has not started,
+    /// or has become unavailable.*
     #[oai(status = 503)]
     ServiceUnavailable,
 }
