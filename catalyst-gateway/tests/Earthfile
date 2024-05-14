@@ -1,4 +1,4 @@
-VERSION 0.7
+VERSION 0.8
 
 package-schemathesis:
     FROM python:3.12-alpine3.19
@@ -12,7 +12,7 @@ package-schemathesis:
     ARG openapi_spec
 
     RUN apk add --no-cache gcc musl-dev
-    RUN python -m pip install schemathesis
+    RUN python -m pip install schemathesis==3.27.1
     RUN mkdir /results
 
     VOLUME /results

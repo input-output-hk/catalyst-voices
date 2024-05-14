@@ -22,7 +22,6 @@
 # Icon must end with two \r
 Icon
 
-
 # Thumbnails
 ._*
 
@@ -103,4 +102,8 @@ dev-catalyst-voice-9f78f27c6bc5.json
 /docs/site/
 
 # Rust
+
+# By default ignore Cargo.lock
+# Specifically exclude it in the directory it appears, if its required.
+# More information here https://doc.rust-lang.org/cargo/guide/cargo-toml-vs-cargo-lock.html
 Cargo.lock

@@ -1,4 +1,6 @@
-VERSION --try --global-cache --arg-scope-and-set 0.7
+VERSION 0.8
+
+IMPORT ../catalyst-gateway AS catalyst-gateway
 
 # If running this target with a local ssh agent active, set the environment
 # variable EARTHLY_SSH_AUTH_SOCK='' to make the `+deps` target work. Earthly
@@ -43,7 +45,7 @@ code-generator:
 
     FROM +src
     WORKDIR /frontend/catalyst_voices/packages/catalyst_voices_services
-    COPY ../catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
+    COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
     RUN flutter pub get
     RUN dart run build_runner build --delete-conflicting-outputs
 

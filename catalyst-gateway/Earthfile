@@ -1,10 +1,13 @@
-VERSION --try --global-cache 0.7
+VERSION 0.8
+
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.00.0 AS rust-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:v3.00.0 AS mithril-snapshot-ci
 
 #cspell: words rustfmt toolsets USERARCH
 
-# Set up our target toolchains, and copy our files.
+# builder : Set up our target toolchains, and copy our files.
 builder:
-    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.11.1+SETUP
+    DO rust-ci+SETUP
 
     COPY --dir .cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin crates .
 
@@ -14,39 +17,45 @@ builder:
 ##
 ## These targets are discovered and executed automatically by CI.
 
-# Run check using the most efficient host tooling
+# check : Run check using the most efficient host tooling
 # CI Automated Entry point.
 check:
     FROM +builder
 
-    RUN /scripts/std_checks.py
+    DO rust-ci+EXECUTE --cmd="/scripts/std_checks.py"
 
-# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
+# all-hosts-check : Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
 all-hosts-check:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +check
 
+# build : Build the catalyst-gateway service
 build:
     # Build the service
     FROM +builder
 
-    TRY
-        RUN /scripts/std_build.py \
-                --cov_report="coverage-report.info" \
-                --bins="cat-gateway/cat-gateway"
-    FINALLY
-        SAVE ARTIFACT --if-exists target/nextest/ci/junit.xml AS LOCAL cat-gateway.junit-report.xml
-        SAVE ARTIFACT --if-exists coverage-report.info AS LOCAL cat-gateway.coverage-report.info
-    END
-    RUN ./target/$TARGETARCH/release/cat-gateway docs ./target/$TARGETARCH/doc/cat-gateway-api.json
-    SAVE ARTIFACT target/$TARGETARCH/doc doc
-    SAVE ARTIFACT target/$TARGETARCH/release/cat-gateway cat-gateway
+    DO rust-ci+EXECUTE \
+        --cmd="/scripts/std_build.py" \
+        --args1="--bins=cat-gateway/cat-gateway" \
+        --args2="--cov_report=$HOME/coverage-report.info" \
+        --args3="--verbose" \
+        --output="release/cat-gateway" \
+        --junit="cat-gateway.junit-report.xml" \
+        --coverage="cat-gateway.coverage-report.info" \
+        --docs="true"
 
-# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
+    # Generate the OpenAPI doc from the cat-gateway executable itself.
+    RUN ./target/release/cat-gateway docs ./target/doc/cat-gateway-api.json
+
+    SAVE ARTIFACT target/doc doc
+    SAVE ARTIFACT target/release/cat-gateway cat-gateway
+
+# all-hosts-build : Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
 all-hosts-build:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +build
 
+# package-cat-gateway : Create a deployable container for catalyst-gateway
 package-cat-gateway:
     ARG tag="latest"
 
@@ -61,13 +70,15 @@ package-cat-gateway:
     ENTRYPOINT ./entry.sh
     SAVE IMAGE cat-gateway:$tag
 
+# package-cat-gateway : Create a deployable container for catalyst-gateway
+# And bundle a Mithril snapshot of cardano preprod
 package-cat-gateway-with-preprod-snapshot:
     ARG tag="latest"
 
     FROM +package-cat-gateway
 
     # copy preprod mithril snapshot to /tmp/preprod dir
-    COPY github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:v2.11.1+package-preprod-snapshot/snapshot /tmp/preprod
+    COPY mithril-snapshot-ci+package-preprod-snapshot/snapshot /tmp/preprod
 
     SAVE IMAGE cat-gateway:$tag
 
