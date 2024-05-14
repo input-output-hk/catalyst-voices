@@ -1,7 +1,7 @@
 //! Setup for logging for the service.
 
 use clap::ValueEnum;
-use serde::Deserialize;
+use poem_openapi::Enum;
 use tracing::level_filters::LevelFilter;
 use tracing_subscriber::{
     fmt::{self, format::FmtSpan, time},
@@ -14,8 +14,8 @@ use tracing_subscriber::{
 pub(crate) const LOG_LEVEL_DEFAULT: &str = "info";
 
 /// All valid logging levels
-#[derive(ValueEnum, Clone, Copy, Debug, Deserialize)]
-#[serde(rename(deserialize = "lowercase"))]
+#[derive(ValueEnum, Clone, Copy, Debug, Enum)]
+#[oai(rename_all = "lowercase")]
 pub(crate) enum LogLevel {
     /// Debug messages
     Debug,

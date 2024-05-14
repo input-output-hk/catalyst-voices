@@ -1,8 +1,8 @@
 //! Health Endpoints
 use std::sync::Arc;
 
-use poem::web::{Data, Query};
-use poem_openapi::OpenApi;
+use poem::web::Data;
+use poem_openapi::{param::Query, OpenApi};
 
 use crate::{
     logger::LogLevel,

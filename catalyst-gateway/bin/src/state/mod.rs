@@ -1,6 +1,7 @@
 //! Shared state used by all endpoints.
 use std::sync::Arc;
 
+use poem_openapi::Enum;
 use tokio::sync::RwLock;
 use tracing::level_filters::LevelFilter;
 use tracing_subscriber::{reload::Handle, Registry};
@@ -10,8 +11,8 @@ use crate::{
     logger::LogLevel,
 };
 
-#[derive(Clone, Copy, Debug, serde::Deserialize, PartialEq, Eq)]
-#[serde(rename(deserialize = "lowercase"))]
+#[derive(Clone, Copy, Debug, Enum, PartialEq, Eq)]
+#[oai(rename_all = "lowercase")]
 /// Settings for deep query inspection
 pub(crate) enum DeepQueryInspection {
     /// Enable deep query inspection
