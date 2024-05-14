@@ -17,7 +17,7 @@ final class Example extends StatelessWidget {
               const Text(
                 'Catalyst Assets',
                 style: TextStyle(
-                  color: VoicesColors.purpleGradientStart,
+                  color: VoicesColors.lightPrimary,
                   fontFamily: VoicesFonts.sFPro,
                   fontSize: 32,
                 ),
