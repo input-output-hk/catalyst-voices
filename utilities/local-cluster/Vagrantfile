@@ -78,7 +78,7 @@ Vagrant.configure("2") do |config|
       else
         agent.vm.synced_folder "./shared", "/vagrant_shared", type: "smb"
         agent.vm.provider "qemu" do |qe|
-          qe.memory = agent_memory_memory
+          qe.memory = agent_memory
           qe.smp = agent_vcpu
         end
       end
