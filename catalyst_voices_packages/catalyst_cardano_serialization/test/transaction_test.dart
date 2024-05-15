@@ -3,7 +3,7 @@ import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 import 'package:test/test.dart';
 
-import 'utils/test_data.dart';
+import 'test_utils/test_data.dart';
 
 void main() {
   group(Transaction, () {

@@ -1,3 +1,5 @@
+import 'package:catalyst_cardano_serialization/src/types.dart';
+
 /// Exception thrown when the transaction exceeds the allowed maximum size.
 final class MaxTxSizeExceededException implements Exception {
   /// The maximum amount of bytes per transaction.
@@ -14,8 +16,29 @@ final class MaxTxSizeExceededException implements Exception {
 
   @override
   String toString() => 'MaxTxSizeExceededException('
-      'maxTxSize=$maxTxSize'
+      'maxTxSize:$maxTxSize'
       ', actualTxSize:$actualTxSize'
+      ')';
+}
+
+/// Exception thrown when the transaction outputs exceed the inputs.
+final class InsufficientUtxoBalanceException implements Exception {
+  /// The amount of [Coin] that user has.
+  final Coin actualAmount;
+
+  /// The amount of [Coin] that user wants to spend.
+  final Coin requiredAmount;
+
+  /// The default constructor for [InsufficientUtxoBalanceException].
+  const InsufficientUtxoBalanceException({
+    required this.actualAmount,
+    required this.requiredAmount,
+  });
+
+  @override
+  String toString() => 'InsufficientUtxoBalanceException('
+      'actualAmount:$actualAmount'
+      ', requiredAmount:$requiredAmount'
       ')';
 }
 
@@ -48,4 +71,20 @@ final class InvalidAddressException implements Exception {
 
   @override
   String toString() => 'InvalidAddressException: $message';
+}
+
+/// Exception thrown when the number of witnesses doesn't match
+/// the expected amount.
+///
+/// When calculating the fee for the transaction the amount of witnesses
+/// needs to be specified since they affect the transaction bytes length.
+/// 
+/// Thus less or more witnesses than were included when calculating
+/// the fee are not allowed.
+final class InvalidTransactionWitnessesException implements Exception {
+  /// The default constructor for [InvalidTransactionWitnessesException].
+  const InvalidTransactionWitnessesException();
+
+  @override
+  String toString() => 'InvalidTransactionWitnessesException';
 }
