@@ -20,7 +20,7 @@ class ComingSoonLogo extends StatelessWidget {
           child: Text(
             l10n.comingSoonSubtitle,
             style: GoogleFonts.notoSans(
-              textStyle: const TextStyle(color: VoicesColors.blue),
+              textStyle: const TextStyle(color: VoicesColors.lightPrimary),
               fontSize: 19,
               fontWeight: FontWeight.w500,
             ),

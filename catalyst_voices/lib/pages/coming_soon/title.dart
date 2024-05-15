@@ -18,7 +18,7 @@ class ComingSoonTitle extends StatelessWidget {
         children: [
           DefaultTextStyle(
             style: GoogleFonts.poppins(
-              textStyle: const TextStyle(color: VoicesColors.blue),
+              textStyle: const TextStyle(color: VoicesColors.lightPrimary),
               fontSize: 53,
               height: 1.15,
               fontWeight: FontWeight.w700,
@@ -35,7 +35,7 @@ class ComingSoonTitle extends StatelessWidget {
           ),
           DefaultTextStyle(
             style: GoogleFonts.poppins(
-              textStyle: const TextStyle(color: VoicesColors.blue),
+              textStyle: const TextStyle(color: VoicesColors.lightPrimary),
               fontSize: 53,
               height: 1.15,
               fontWeight: FontWeight.w700,
