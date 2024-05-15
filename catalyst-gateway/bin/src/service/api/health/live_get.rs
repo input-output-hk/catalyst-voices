@@ -45,8 +45,8 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint() -> AllResponses {
     if is_live() {
-        Responses::NoContent.into()
-    } else {
         Responses::ServiceUnavailable.into()
+    } else {
+        Responses::NoContent.into()
     }
 }
