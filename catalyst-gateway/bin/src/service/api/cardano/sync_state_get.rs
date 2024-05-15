@@ -17,7 +17,7 @@ pub(crate) enum Responses {
     /// The synchronisation state of the blockchain with the catalyst gateway service.
     #[oai(status = 200)]
     Ok(Json<SyncState>),
-    /// The network is unknown. Catalayst gateway is not syncing the queried network.
+    /// The network is unknown. Catalyst gateway is not syncing the queried network.
     #[oai(status = 404)]
     NotFound,
 }
