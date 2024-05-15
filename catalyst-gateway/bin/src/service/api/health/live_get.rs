@@ -12,7 +12,7 @@ static IS_LIVE: AtomicBool = AtomicBool::new(true);
 /// Set the started flag to `true`
 #[allow(dead_code)]
 pub(crate) fn set_live(flag: bool) {
-    IS_LIVE.store(flag, Ordering::Relaxed);
+    IS_LIVE.store(flag, Ordering::Release);
 }
 /// Get the started flag
 #[allow(dead_code)]

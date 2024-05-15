@@ -11,11 +11,11 @@ static IS_STARTED: AtomicBool = AtomicBool::new(false);
 
 /// Set the started flag to `true`
 pub(crate) fn started() {
-    IS_STARTED.store(true, Ordering::Relaxed);
+    IS_STARTED.store(true, Ordering::Release);
 }
 /// Get the started flag
 fn is_started() -> bool {
-    IS_STARTED.load(Ordering::Relaxed)
+    IS_STARTED.load(Ordering::Acquire)
 }
 
 /// Endpoint responses.
