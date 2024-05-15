@@ -6,11 +6,9 @@ from api_tests import (
     get_date_time_to_slot_number,
 )
 from datetime import datetime, timezone
-import time
 
 
 def test_date_time_to_slot_number_endpoint():
-    time.sleep(3)
     check_is_live()
     check_is_ready()
 

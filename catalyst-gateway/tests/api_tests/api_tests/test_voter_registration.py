@@ -1,5 +1,4 @@
 import json
-import time
 from loguru import logger
 from api_tests import (
     check_is_live,
@@ -27,7 +26,6 @@ def check_delegations(provided, expected):
 
 
 def test_voter_registration_endpoint():
-    time.sleep(3)
     check_is_live()
     check_is_ready()
 

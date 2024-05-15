@@ -1,5 +1,4 @@
 import json
-import time
 from loguru import logger
 from api_tests import (
     check_is_live,
@@ -11,7 +10,6 @@ from api_tests import (
 
 
 def test_staked_ada_endpoint():
-    time.sleep(3)
     check_is_live()
     check_is_ready()
 
