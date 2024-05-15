@@ -6,7 +6,8 @@ use tracing::{error, info};
 
 use crate::{
     cardano::start_followers,
-    logger, service,
+    logger,
+    service::{self, set_started},
     settings::{DocsSettings, ServiceSettings},
     state::State,
 };
@@ -54,13 +55,14 @@ impl Cli {
                     }
                 });
 
-                start_followers(
+                let followers_fut = start_followers(
                     event_db.clone(),
                     settings.follower_settings.check_config_tick,
                     settings.follower_settings.data_refresh_tick,
                     machine_id,
-                )
-                .await?;
+                );
+                set_started(true);
+                followers_fut.await?;
 
                 Ok(())
             },

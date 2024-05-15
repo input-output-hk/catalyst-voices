@@ -6,8 +6,7 @@ use poem::web::Data;
 use poem_openapi::ApiResponse;
 
 use crate::{
-    event_db::schema_check::MismatchedSchemaError,
-    service::common::responses::{ErrorResponses, WithErrorResponses},
+    event_db::schema_check::MismatchedSchemaError, service::common::responses::WithErrorResponses,
     state::State,
 };
 
@@ -19,7 +18,6 @@ pub(crate) enum Responses {
     NoContent,
     /// Service is not ready, do not send other requests.
     #[oai(status = 503)]
-    #[allow(dead_code)]
     ServiceUnavailable,
 }
 
@@ -51,7 +49,7 @@ pub(crate) async fn endpoint(state: Data<&Arc<State>>) -> AllResponses {
         },
         Err(err) if err.is::<MismatchedSchemaError>() => {
             tracing::error!("{err}");
-            AllResponses::Error(ErrorResponses::ServiceUnavailable)
+            Responses::ServiceUnavailable.into()
         },
         Err(err) => AllResponses::handle_error(&err),
     }

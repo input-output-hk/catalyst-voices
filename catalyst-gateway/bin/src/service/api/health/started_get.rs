@@ -1,8 +1,22 @@
 //! Implementation of the GET /health/started endpoint
 
+use std::sync::atomic::{AtomicBool, Ordering};
+
 use poem_openapi::ApiResponse;
 
 use crate::service::common::responses::WithErrorResponses;
+
+/// Flag to determine if the service has started
+static IS_STARTED: AtomicBool = AtomicBool::new(false);
+
+/// Set the started flag to `true`
+pub(crate) fn set_started(flag: bool) {
+    IS_STARTED.store(flag, Ordering::Relaxed);
+}
+/// Get the started flag
+fn is_started() -> bool {
+    IS_STARTED.load(Ordering::Relaxed)
+}
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
@@ -12,7 +26,6 @@ pub(crate) enum Responses {
     NoContent,
     /// Service is not ready, do not send other requests.
     #[oai(status = 503)]
-    #[allow(dead_code)]
     ServiceUnavailable,
 }
 
@@ -38,5 +51,9 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// startup processing was fully completed.
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint() -> AllResponses {
-    Responses::NoContent.into()
+    if is_started() {
+        Responses::NoContent.into()
+    } else {
+        Responses::ServiceUnavailable.into()
+    }
 }
