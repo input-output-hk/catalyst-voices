@@ -74,18 +74,17 @@ impl EventDB {
             && nonce.is_some()
             && errors_report.is_empty();
 
-        let _rows = self
-            .query(INSERT_VOTER_REGISTRATION_SQL, &[
-                &tx_id,
-                &stake_credential,
-                &encoded_voting_info,
-                &payment_address,
-                &nonce,
-                &metadata_cip36,
-                &json!(&errors_report),
-                &is_valid,
-            ])
-            .await?;
+        self.modify(INSERT_VOTER_REGISTRATION_SQL, &[
+            &tx_id,
+            &stake_credential,
+            &encoded_voting_info,
+            &payment_address,
+            &nonce,
+            &metadata_cip36,
+            &json!(&errors_report),
+            &is_valid,
+        ])
+        .await?;
 
         Ok(())
     }

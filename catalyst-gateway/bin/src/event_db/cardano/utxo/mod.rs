@@ -39,15 +39,14 @@ impl EventDB {
             };
             let stake_credential = stake_address.map(|val| val.payload().as_hash().to_vec());
 
-            let _rows = self
-                .query(INSERT_UTXO_SQL, &[
-                    &i32::try_from(index)?,
-                    &tx_hash.as_slice(),
-                    &i64::try_from(tx_out.lovelace_amount())?,
-                    &stake_credential,
-                    &assets,
-                ])
-                .await?;
+            self.modify(INSERT_UTXO_SQL, &[
+                &i32::try_from(index)?,
+                &tx_hash.as_slice(),
+                &i64::try_from(tx_out.lovelace_amount())?,
+                &stake_credential,
+                &assets,
+            ])
+            .await?;
         }
         // update outputs with inputs
         for tx_in in tx.inputs() {
@@ -55,13 +54,12 @@ impl EventDB {
             let output_tx_hash = output.hash();
             let out_index = output.index();
 
-            let _rows = self
-                .query(UPDATE_UTXO_SQL, &[
-                    &tx_hash.as_slice(),
-                    &output_tx_hash.as_slice(),
-                    &i32::try_from(out_index)?,
-                ])
-                .await?;
+            self.modify(UPDATE_UTXO_SQL, &[
+                &tx_hash.as_slice(),
+                &output_tx_hash.as_slice(),
+                &i32::try_from(out_index)?,
+            ])
+            .await?;
         }
 
         Ok(())
@@ -71,13 +69,12 @@ impl EventDB {
     pub(crate) async fn index_txn_data(
         &self, tx_id: &[u8], slot_no: SlotNumber, network: Network,
     ) -> anyhow::Result<()> {
-        let _rows = self
-            .query(INSERT_TXN_INDEX_SQL, &[
-                &tx_id,
-                &slot_no,
-                &network.to_string(),
-            ])
-            .await?;
+        self.modify(INSERT_TXN_INDEX_SQL, &[
+            &tx_id,
+            &slot_no,
+            &network.to_string(),
+        ])
+        .await?;
 
         Ok(())
     }
