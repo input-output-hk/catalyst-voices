@@ -2,6 +2,7 @@ import 'package:catalyst_cardano_serialization/src/address.dart';
 import 'package:catalyst_cardano_serialization/src/hashes.dart';
 import 'package:catalyst_cardano_serialization/src/transaction.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
+import 'package:catalyst_cardano_serialization/src/witness.dart';
 import 'package:cbor/cbor.dart';
 
 /* cSpell:disable */
@@ -43,6 +44,7 @@ Transaction minimalTestTransaction() {
       fee: const Coin(10000000),
     ),
     isValid: true,
+    witnessSet: const TransactionWitnessSet(vkeyWitnesses: {}),
   );
 }
 
@@ -74,6 +76,10 @@ Transaction fullTestTransaction() {
       networkId: NetworkId.testnet,
     ),
     isValid: true,
+    // TODO(dtscalac): provide witness
+    witnessSet: const TransactionWitnessSet(
+      vkeyWitnesses: {},
+    ),
     auxiliaryData: auxiliaryData,
   );
 }

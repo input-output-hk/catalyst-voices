@@ -50,11 +50,3 @@ extension type const SlotBigNum(int value) {
   /// Serializes the type as cbor.
   CborValue toCbor() => CborSmallInt(value);
 }
-
-/// Holds cbor tags not specified by the official cbor package.
-final class CborCustomTags {
-  const CborCustomTags._();
-
-  /// A cbor tag describing a key-value pairs data.
-  static const int map = 259;
-}

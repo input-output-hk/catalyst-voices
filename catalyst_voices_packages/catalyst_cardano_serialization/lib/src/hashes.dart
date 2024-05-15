@@ -71,6 +71,15 @@ final class TransactionHash extends BaseHash {
   /// of [bytes].
   TransactionHash.fromHex(super.string) : super.fromHex();
 
+  /// Constructs the [TransactionHash] from a [TransactionBody].
+  TransactionHash.fromTransactionBody(TransactionBody body)
+      : super.fromBytes(
+          bytes: Hash.blake2b(
+            Uint8List.fromList(cbor.encode(body.toCbor())),
+            digestSize: _length,
+          ),
+        );
+
   @override
   int get length => _length;
 }
