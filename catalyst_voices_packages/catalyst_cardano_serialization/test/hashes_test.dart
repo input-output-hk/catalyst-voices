@@ -1,5 +1,6 @@
 import 'package:catalyst_cardano_serialization/src/hashes.dart';
 import 'package:catalyst_cardano_serialization/src/transaction.dart';
+import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 import 'package:test/test.dart';
@@ -18,6 +19,24 @@ void main() {
     test('from and to bytes', () {
       final hash = TransactionHash.fromBytes(bytes: bytes);
       expect(hash.bytes, equals(bytes));
+    });
+
+    test('from transaction body', () {
+      const body = TransactionBody(
+        inputs: {},
+        outputs: [],
+        fee: Coin(0),
+      );
+
+      final hash = TransactionHash.fromTransactionBody(body);
+      expect(
+        hash,
+        equals(
+          TransactionHash.fromHex(
+            '36fdff68dfe3660f1ceea60f018a0fd7a83da13def229108794c397a879b0436',
+          ),
+        ),
+      );
     });
 
     test('toCbor returns bytes', () {

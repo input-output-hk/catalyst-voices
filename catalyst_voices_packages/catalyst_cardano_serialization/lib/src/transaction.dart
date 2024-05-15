@@ -1,6 +1,8 @@
 import 'package:catalyst_cardano_serialization/src/address.dart';
 import 'package:catalyst_cardano_serialization/src/hashes.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
+import 'package:catalyst_cardano_serialization/src/utils/cbor.dart';
+import 'package:catalyst_cardano_serialization/src/witness.dart';
 import 'package:cbor/cbor.dart';
 
 /// Represents the signed transaction with a list of witnesses
@@ -8,6 +10,9 @@ import 'package:cbor/cbor.dart';
 final class Transaction {
   /// The transaction body containing the inputs, outputs, fees, etc.
   final TransactionBody body;
+
+  /// The set of witnesses that have signed given transaction.
+  final TransactionWitnessSet witnessSet;
 
   /// True if the transaction is valid, false otherwise.
   final bool isValid;
@@ -19,6 +24,7 @@ final class Transaction {
   const Transaction({
     required this.body,
     required this.isValid,
+    required this.witnessSet,
     this.auxiliaryData,
   });
 
@@ -26,8 +32,7 @@ final class Transaction {
   CborValue toCbor() {
     return CborList([
       body.toCbor(),
-      // TODO(dtscalac): implement witnesses
-      CborMap({}),
+      witnessSet.toCbor(),
       CborBool(isValid),
       (auxiliaryData ?? const AuxiliaryData()).toCbor(),
     ]);

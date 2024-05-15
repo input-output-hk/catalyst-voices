@@ -2,7 +2,7 @@ import 'package:catalyst_cardano_serialization/src/fees.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:test/test.dart';
 
-import 'utils/test_data.dart';
+import 'test_utils/test_data.dart';
 
 void main() {
   group(LinearFee, () {
