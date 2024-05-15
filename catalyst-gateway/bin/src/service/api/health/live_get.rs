@@ -15,7 +15,6 @@ pub(crate) fn set_live(flag: bool) {
     IS_LIVE.store(flag, Ordering::Relaxed);
 }
 /// Get the started flag
-#[allow(dead_code)]
 fn is_live() -> bool {
     IS_LIVE.load(Ordering::Relaxed)
 }
@@ -28,7 +27,6 @@ pub(crate) enum Responses {
     NoContent,
     /// Service is possibly not running reliably.
     #[oai(status = 503)]
-    #[allow(dead_code)]
     ServiceUnavailable,
 }
 
@@ -46,5 +44,9 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// by an endpoint in a short window.
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint() -> AllResponses {
-    Responses::NoContent.into()
+    if is_live() {
+        Responses::NoContent.into()
+    } else {
+        Responses::ServiceUnavailable.into()
+    }
 }

@@ -3,6 +3,7 @@
 from loguru import logger
 import asyncio
 import asyncpg
+import time
 
 from api_tests import DB_URL, check_is_live, check_is_ready, check_is_not_ready
 
@@ -38,6 +39,7 @@ def change_version(from_value: int, change_to: int):
 
 
 def test_schema_version_mismatch_changes_cat_gateway_behavior():
+    time.sleep(3)
     # Check that the `live` endpoint is OK
     check_is_live()
 
