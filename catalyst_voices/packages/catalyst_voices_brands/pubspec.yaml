@@ -12,6 +12,7 @@ dependencies:
     path: ../catalyst_voices_assets
   flutter:
     sdk: flutter
+  google_fonts: ^6.2.1
 
 dev_dependencies:
   catalyst_analysis:
