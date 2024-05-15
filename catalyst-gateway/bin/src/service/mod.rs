@@ -11,7 +11,7 @@ mod common;
 mod poem_service;
 mod utilities;
 
-pub(crate) use api::set_started;
+pub(crate) use api::started;
 pub(crate) use poem_service::get_app_docs;
 
 /// # Run Catalyst Gateway Service.

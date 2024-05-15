@@ -17,7 +17,7 @@ mod cardano;
 mod health;
 mod legacy;
 
-pub(crate) use health::set_started;
+pub(crate) use health::started;
 
 /// The name of the API
 const API_TITLE: &str = "Catalyst Gateway";

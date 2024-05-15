@@ -10,8 +10,8 @@ use crate::service::common::responses::WithErrorResponses;
 static IS_STARTED: AtomicBool = AtomicBool::new(false);
 
 /// Set the started flag to `true`
-pub(crate) fn set_started(flag: bool) {
-    IS_STARTED.store(flag, Ordering::Relaxed);
+pub(crate) fn started() {
+    IS_STARTED.store(true, Ordering::Relaxed);
 }
 /// Get the started flag
 fn is_started() -> bool {

@@ -10,7 +10,7 @@ mod live_get;
 mod ready_get;
 mod started_get;
 
-pub(crate) use started_get::set_started;
+pub(crate) use started_get::started;
 
 /// Health API Endpoints
 pub(crate) struct HealthApi;
