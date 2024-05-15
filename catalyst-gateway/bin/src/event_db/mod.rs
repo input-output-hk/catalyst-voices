@@ -46,6 +46,10 @@ impl EventDB {
     }
 
     /// Modify the deep query inspection setting.
+    ///
+    /// # Arguments
+    ///
+    /// * `deep_query` - `DeepQueryInspection` setting.
     pub(crate) async fn modify_deep_query(&self, deep_query: DeepQueryInspection) {
         let mut settings = self.inspection_settings.write().await;
         settings.deep_query = deep_query;
@@ -57,16 +61,19 @@ impl EventDB {
     /// rolled-back transaction, before running the query.
     ///
     /// # Arguments
+    ///
     /// * `stmt` - `&str` SQL statement.
     /// * `params` - `&[&(dyn ToSql + Sync)]` SQL parameters.
     ///
     /// # Returns
+    ///
     /// `Result<Vec<Row>, anyhow::Error>`
+    #[must_use = "ONLY use this function for SELECT type operations which return row data, otherwise use `modify()`"]
     pub(crate) async fn query(
         &self, stmt: &str, params: &[&(dyn ToSql + Sync)],
     ) -> Result<Vec<Row>, anyhow::Error> {
         if self.is_deep_query_enabled().await {
-            self.explain_analyze(stmt, params).await?;
+            self.explain_analyze(stmt, params, true).await?;
         }
         let conn = self.pool.get().await?;
         let rows = conn.query(stmt, params).await?;
@@ -74,22 +81,62 @@ impl EventDB {
     }
 
     /// Query the database for a single row.
+    ///
+    /// # Arguments
+    ///
+    /// * `stmt` - `&str` SQL statement.
+    /// * `params` - `&[&(dyn ToSql + Sync)]` SQL parameters.
+    ///
+    /// # Returns
+    ///
+    /// `Result<Row, anyhow::Error>`
+    #[must_use = "ONLY use this function for SELECT type operations which return row data, otherwise use `modify()`"]
     pub(crate) async fn query_one(
         &self, stmt: &str, params: &[&(dyn ToSql + Sync)],
     ) -> Result<Row, anyhow::Error> {
         if self.is_deep_query_enabled().await {
-            self.explain_analyze(stmt, params).await?;
+            self.explain_analyze(stmt, params, true).await?;
         }
         let conn = self.pool.get().await?;
         let row = conn.query_one(stmt, params).await?;
         Ok(row)
     }
 
+    /// Modify the database.
+    ///
+    /// Use this for `UPDATE`, `DELETE`, and other DB statements that
+    /// don't return data.
+    ///
+    /// # Arguments
+    ///
+    /// * `stmt` - `&str` SQL statement.
+    /// * `params` - `&[&(dyn ToSql + Sync)]` SQL parameters.
+    ///
+    /// # Returns
+    ///
+    /// `Result<(), anyhow::Error>`
+    pub(crate) async fn modify(
+        &self, stmt: &str, params: &[&(dyn ToSql + Sync)],
+    ) -> Result<(), anyhow::Error> {
+        if self.is_deep_query_enabled().await {
+            self.explain_analyze(stmt, params, false).await?;
+        }
+        let conn = self.pool.get().await?;
+        let _row = conn.query(stmt, params).await?;
+        Ok(())
+    }
+
     /// Prepend `EXPLAIN ANALYZE` to the query.
     ///
-    /// Log the query plan inside a rolled-back transaction.
+    /// Log the query plan inside a transaction that may be committed or rolled back.
+    ///
+    /// # Arguments
+    ///
+    /// * `stmt` - `&str` SQL statement.
+    /// * `params` - `&[&(dyn ToSql + Sync)]` SQL parameters.
+    /// * `rollback` - `bool` whether to roll back the transaction or not.
     async fn explain_analyze(
-        &self, stmt: &str, params: &[&(dyn ToSql + Sync)],
+        &self, stmt: &str, params: &[&(dyn ToSql + Sync)], rollback: bool,
     ) -> anyhow::Result<()> {
         let span = debug_span!(
             "query_plan",
@@ -97,6 +144,7 @@ impl EventDB {
             params = format!("{:?}", params),
             uuid = uuid::Uuid::new_v4().to_string()
         );
+
         async move {
             let mut conn = self.pool.get().await?;
             let transaction = conn.transaction().await?;
@@ -105,10 +153,14 @@ impl EventDB {
                 .await?;
             let rows = transaction.query(&explain_stmt, params).await?;
             for r in rows {
-                let c: String = r.get("QUERY PLAN");
-                debug!("{}", c);
+                let query_plan_str: String = r.get("QUERY PLAN");
+                debug!("{}", query_plan_str);
             }
-            transaction.rollback().await?;
+            if rollback {
+                transaction.rollback().await?;
+            } else {
+                transaction.commit().await?;
+            }
             Ok(())
         }
         .instrument(span)
