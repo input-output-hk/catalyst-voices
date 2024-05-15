@@ -7,7 +7,7 @@ use poem_openapi::ApiResponse;
 use crate::service::common::responses::WithErrorResponses;
 
 /// Flag to determine if the service has started
-static IS_LIVE: AtomicBool = AtomicBool::new(false);
+static IS_LIVE: AtomicBool = AtomicBool::new(true);
 
 /// Set the started flag to `true`
 #[allow(dead_code)]
