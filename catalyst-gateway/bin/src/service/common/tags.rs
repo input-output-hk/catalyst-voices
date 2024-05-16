@@ -13,10 +13,6 @@ pub(crate) enum ApiTags {
     /// Information relating to Voter Registration, Delegations and Calculated Voting
     /// Power.
     Registration,
-    /// Test Endpoints (Not part of the API)
-    Test,
-    /// Test Endpoints (Not part of the API)
-    TestTag2,
     /// API Version 0 Endpoints
     V0,
     /// API Version 1 Endpoints

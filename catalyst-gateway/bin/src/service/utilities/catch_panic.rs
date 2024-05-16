@@ -1,13 +1,13 @@
 //! Handle catching panics created by endpoints, logging them and properly responding.
 use std::{any::Any, backtrace::Backtrace, cell::RefCell};
 
-// use tracing::Level;
 use chrono::prelude::*;
 use panic_message::panic_message;
-use poem::middleware::PanicHandler;
+use poem::{http::StatusCode, middleware::PanicHandler, IntoResponse};
+use poem_openapi::payload::Json;
 use serde_json::json;
 
-use crate::service::common::responses::resp_5xx::ServerError;
+use crate::service::common::objects::server_error::ServerError;
 
 /// Customized Panic handler.
 /// Catches all panics, and turns them into 500.
@@ -44,15 +44,15 @@ pub(crate) fn set_panic_hook() {
 }
 
 impl PanicHandler for ServicePanicHandler {
-    type Response = ServerError;
+    type Response = poem::Response;
 
     /// Handle a panic.
     /// Log the panic and respond with a 500 with appropriate data.
-    fn get_response(&self, err: Box<dyn Any + Send + 'static>) -> ServerError {
-        let response = ServerError::new(None);
+    fn get_response(&self, err: Box<dyn Any + Send + 'static>) -> Self::Response {
+        let server_err = ServerError::new(None);
 
         // Get the unique identifier for this panic, so we can find it in the logs.
-        let panic_identifier = response.id().to_string();
+        let panic_identifier = server_err.id().to_string();
 
         // Get the message from the panic as best we can.
         let err_msg = panic_message(&err);
@@ -85,6 +85,8 @@ impl PanicHandler for ServicePanicHandler {
 
         println!("{json_log}");
 
-        response
+        let mut resp = Json(server_err).into_response();
+        resp.set_status(StatusCode::INTERNAL_SERVER_ERROR);
+        resp
     }
 }

@@ -1,20 +1,36 @@
 //! Implementation of the GET /health/started endpoint
 
-use poem_extensions::{response, UniResponse::T204};
+use std::sync::atomic::{AtomicBool, Ordering};
 
-use crate::service::common::responses::{
-    resp_2xx::NoContent,
-    resp_4xx::ApiValidationError,
-    resp_5xx::{ServerError, ServiceUnavailable},
-};
+use poem_openapi::ApiResponse;
 
-/// All responses
-pub(crate) type AllResponses = response! {
-    204: NoContent,
-    400: ApiValidationError,
-    500: ServerError,
-    503: ServiceUnavailable,
-};
+use crate::service::common::responses::WithErrorResponses;
+
+/// Flag to determine if the service has started
+static IS_STARTED: AtomicBool = AtomicBool::new(false);
+
+/// Set the started flag to `true`
+pub(crate) fn started() {
+    IS_STARTED.store(true, Ordering::Release);
+}
+/// Get the started flag
+fn is_started() -> bool {
+    IS_STARTED.load(Ordering::Acquire)
+}
+
+/// Endpoint responses.
+#[derive(ApiResponse)]
+pub(crate) enum Responses {
+    /// Service is Started and can serve requests.
+    #[oai(status = 204)]
+    NoContent,
+    /// Service is not ready, do not send other requests.
+    #[oai(status = 503)]
+    ServiceUnavailable,
+}
+
+/// All responses.
+pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # GET /health/started
 ///
@@ -33,16 +49,11 @@ pub(crate) type AllResponses = response! {
 /// into memory or processed in some way before the API can return valid
 /// responses.  In that scenario this endpoint would return 503 until that
 /// startup processing was fully completed.
-///
-/// ## Responses
-///
-/// * 204 No Content - Service is Started and can  serve requests.
-/// * 400 API Validation Error
-/// * 500 Server Error - If anything within this function fails unexpectedly. (Possible
-///   but unlikely)
-/// * 503 Service Unavailable - Service has not started, do not send other requests.
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint() -> AllResponses {
-    // otherwise everything seems to be A-OK
-    T204(NoContent)
+    if is_started() {
+        Responses::NoContent.into()
+    } else {
+        Responses::ServiceUnavailable.into()
+    }
 }
