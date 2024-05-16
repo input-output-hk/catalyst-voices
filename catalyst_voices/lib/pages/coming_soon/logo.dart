@@ -12,8 +12,9 @@ class ComingSoonLogo extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        CatalystImage.asset(
-          VoicesAssets.images.logo.path,
+        CatalystSvgPicture.asset(
+          VoicesAssets.images.catalystLogo.path,
+          width: 202,
         ),
         Container(
           margin: const EdgeInsets.only(left: 13, bottom: 6),
