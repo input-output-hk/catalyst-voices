@@ -80,6 +80,7 @@ junitreport
 Keyhash
 keyserver
 lcov
+lerp
 Leshiy
 libapp
 libavcodec
@@ -191,3 +192,11 @@ xctest
 xctestrun
 xcworkspace
 yoroi
+multiplatform
+Multiplatform
+Easterling
+lovelace
+lovelaces
+pinenacl
+dtscalac
+vkeys
