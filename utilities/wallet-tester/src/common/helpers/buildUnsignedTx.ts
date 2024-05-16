@@ -172,11 +172,6 @@ export default async function buildUnsignedTx(
     txBuilder.add_required_signer(Ed25519KeyHash.from_hex(stakeCred));
   }
 
-  // #15 add network id
-  if (builder.networkId) {
-    // note: network id will be added after build the transaction builder
-  }
-
   // aux data
   const auxMetadata = AuxiliaryData.new();
   const txMetadata = GeneralTransactionMetadata.new();
@@ -225,7 +220,7 @@ export default async function buildUnsignedTx(
   // build a full transaction, passing in empty witness set
   const txBody = txBuilder.build();
   
-  // set network id after build
+  // #15 add network id
   if (builder.networkId && [0, 1].includes(Number(builder.networkId))) {
     const networkId = Number(builder.networkId) === 0 ? NetworkId.testnet() : NetworkId.mainnet()
     txBody.set_network_id(networkId);
