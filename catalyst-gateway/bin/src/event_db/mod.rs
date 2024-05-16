@@ -4,6 +4,7 @@ use std::{str::FromStr, sync::Arc};
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
 use dotenvy::dotenv;
+use stringzilla::StringZilla;
 use tokio::sync::RwLock;
 use tokio_postgres::{types::ToSql, NoTls, Row};
 use tracing::{debug, debug_span, Instrument};
@@ -210,4 +211,37 @@ pub(crate) async fn establish_connection(url: Option<String>) -> anyhow::Result<
         pool,
         inspection_settings: Arc::new(RwLock::new(DatabaseInspectionSettings::default())),
     })
+}
+
+/// Determine if the statement is a query statement.
+///
+/// If the query statement starts with `SELECT` or contains `RETURNING`, then it is a
+/// query.
+#[allow(dead_code)]
+fn is_query_stmt(stmt: &str) -> bool {
+    matches!(
+        (stmt.sz_find("SELECT"), stmt.sz_find("RETURNING"),),
+        (Some(0), _) | (_, Some(_)),
+    )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_is_query_statement() {
+        let stmt = "SELECT * FROM dummy";
+        assert!(is_query_stmt(stmt));
+        let stmt = "UPDATE dummy SET foo = $1 WHERE bar = $2 RETURNING *";
+        assert!(is_query_stmt(stmt));
+    }
+
+    #[test]
+    fn test_is_not_query_statement() {
+        let stmt = "UPDATE dummy SET foo_count = foo_count + 1 WHERE bar = (SELECT bar_id FROM foos WHERE name = 'FooBar')";
+        assert!(!is_query_stmt(stmt));
+        let stmt = "UPDATE dummy SET foo = $1 WHERE bar = $2";
+        assert!(!is_query_stmt(stmt));
+    }
 }
