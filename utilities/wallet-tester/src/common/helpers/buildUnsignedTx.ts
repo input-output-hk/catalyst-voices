@@ -11,6 +11,7 @@ import {
   GeneralTransactionMetadata,
   Int,
   LinearFee,
+  NetworkId,
   RewardAddress,
   StakeCredential,
   StakeDelegation,
@@ -173,8 +174,7 @@ export default async function buildUnsignedTx(
 
   // #15 add network id
   if (builder.networkId) {
-    txBuilder.add_change_if_needed
-    // note: auto generated
+    // note: network id will be after build the transaction builder
   }
 
   // aux data
@@ -223,7 +223,15 @@ export default async function buildUnsignedTx(
   }
 
   // build a full transaction, passing in empty witness set
-  const unsignedTx = Transaction.new(txBuilder.build(), TransactionWitnessSet.new(), auxMetadata);
+  const txBody = txBuilder.build();
+  
+  // set network id after build
+  if (builder.networkId && [0, 1].includes(Number(builder.networkId))) {
+    const networkId = Number(builder.networkId) === 0 ? NetworkId.testnet() : NetworkId.mainnet()
+    txBody.set_network_id(networkId);
+  }
+
+  const unsignedTx = Transaction.new(txBody, TransactionWitnessSet.new(), auxMetadata);
 
   return unsignedTx;
 }
