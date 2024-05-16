@@ -6,12 +6,12 @@ use crate::{settings::DocsSettings, state::State};
 // These Modules contain endpoints
 mod api;
 mod docs;
-
 // These modules are utility or common types/functions
 mod common;
 mod poem_service;
 mod utilities;
 
+pub(crate) use api::started;
 pub(crate) use poem_service::get_app_docs;
 
 /// # Run Catalyst Gateway Service.

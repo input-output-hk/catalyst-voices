@@ -1,10 +1,6 @@
 //! Implementation of the GET `/staked_ada` endpoint
 
-use poem_extensions::{
-    response,
-    UniResponse::{T200, T400, T404},
-};
-use poem_openapi::payload::Json;
+use poem_openapi::{payload::Json, ApiResponse};
 
 use crate::{
     event_db::{cardano::chain_state::SlotNumber, error::NotFoundError},
@@ -13,25 +9,26 @@ use crate::{
             objects::cardano::{
                 network::Network, stake_address::StakeAddress, stake_info::StakeInfo,
             },
-            responses::{
-                resp_2xx::OK,
-                resp_4xx::{ApiValidationError, NotFound},
-                resp_5xx::{handle_5xx_response, ServerError, ServiceUnavailable},
-            },
+            responses::WithErrorResponses,
         },
         utilities::check_network,
     },
     state::State,
 };
 
-/// # All Responses
-pub(crate) type AllResponses = response! {
-    200: OK<Json<StakeInfo>>,
-    400: ApiValidationError,
-    404: NotFound,
-    500: ServerError,
-    503: ServiceUnavailable,
-};
+/// Endpoint responses.
+#[derive(ApiResponse)]
+pub(crate) enum Responses {
+    /// The amount of ADA staked by the queried stake address, as at the indicated slot.
+    #[oai(status = 200)]
+    Ok(Json<StakeInfo>),
+    /// The queried stake address was not found at the requested slot number.
+    #[oai(status = 404)]
+    NotFound,
+}
+
+/// All responses.
+pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # GET `/staked_ada`
 pub(crate) async fn endpoint(
@@ -45,7 +42,7 @@ pub(crate) async fn endpoint(
 
     let network = match check_network(stake_address.network(), provided_network) {
         Ok(network) => network,
-        Err(err) => return T400(err),
+        Err(err) => return AllResponses::handle_error(&err),
     };
 
     // get the total utxo amount from the database
@@ -54,12 +51,13 @@ pub(crate) async fn endpoint(
         .await
     {
         Ok((amount, slot_number)) => {
-            T200(OK(Json(StakeInfo {
+            Responses::Ok(Json(StakeInfo {
                 amount,
                 slot_number,
-            })))
+            }))
+            .into()
         },
-        Err(err) if err.is::<NotFoundError>() => T404(NotFound),
-        Err(err) => handle_5xx_response!(err),
+        Err(err) if err.is::<NotFoundError>() => Responses::NotFound.into(),
+        Err(err) => AllResponses::handle_error(&err),
     }
 }
