@@ -174,7 +174,7 @@ export default async function buildUnsignedTx(
 
   // #15 add network id
   if (builder.networkId) {
-    // note: network id will be after build the transaction builder
+    // note: network id will be added after build the transaction builder
   }
 
   // aux data
