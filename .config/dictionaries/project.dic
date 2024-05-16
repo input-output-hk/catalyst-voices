@@ -80,6 +80,7 @@ junitreport
 Keyhash
 keyserver
 lcov
+lerp
 Leshiy
 libapp
 libavcodec
@@ -179,6 +180,7 @@ vkeywitness
 voteplan
 voteplans
 wallclock
+wasmtime
 Werror
 xcassets
 xcconfig
@@ -189,3 +191,11 @@ xctest
 xctestrun
 xcworkspace
 yoroi
+multiplatform
+Multiplatform
+Easterling
+lovelace
+lovelaces
+pinenacl
+dtscalac
+vkeys

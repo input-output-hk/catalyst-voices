@@ -23,7 +23,6 @@ pub type StakeCredentialKey = String;
 pub(crate) const BLAKE_2B_256_HASH_SIZE: usize = 256 / 8;
 
 /// Helper function to generate the `blake2b_256` hash of a byte slice
-#[allow(dead_code)]
 pub(crate) fn hash(bytes: &[u8]) -> [u8; BLAKE_2B_256_HASH_SIZE] {
     let mut digest = [0u8; BLAKE_2B_256_HASH_SIZE];
     let mut context = Blake2b::new(BLAKE_2B_256_HASH_SIZE);
@@ -54,7 +53,7 @@ pub struct PolicyAsset {
 }
 
 /// Extract assets
-pub fn parse_policy_assets(assets: &[MultiEraPolicyAssets<'_>]) -> Vec<PolicyAsset> {
+pub(crate) fn parse_policy_assets(assets: &[MultiEraPolicyAssets<'_>]) -> Vec<PolicyAsset> {
     assets
         .iter()
         .map(|asset| {
@@ -67,7 +66,7 @@ pub fn parse_policy_assets(assets: &[MultiEraPolicyAssets<'_>]) -> Vec<PolicyAss
 }
 
 /// Parse child assets
-pub fn parse_child_assets(assets: &[MultiEraAsset]) -> Vec<Asset> {
+fn parse_child_assets(assets: &[MultiEraAsset]) -> Vec<Asset> {
     assets
         .iter()
         .filter_map(|asset| {

@@ -18,7 +18,7 @@ final class HomePage extends StatelessWidget {
             Text(
               context.l10n.homeScreenText,
               style: const TextStyle(
-                color: VoicesColors.purpleGradientStart,
+                color: VoicesColors.lightPrimary,
                 fontFamily: VoicesFonts.sFPro,
                 fontSize: 32,
               ),
