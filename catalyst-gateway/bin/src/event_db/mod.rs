@@ -215,14 +215,17 @@ pub(crate) async fn establish_connection(url: Option<String>) -> anyhow::Result<
 
 /// Determine if the statement is a query statement.
 ///
-/// If the query statement starts with `SELECT` or contains `RETURNING`, then it is a
-/// query.
+/// Returns true f the query statement starts with `SELECT` or contains `RETURNING`.
 #[allow(dead_code)]
 fn is_query_stmt(stmt: &str) -> bool {
-    matches!(
-        (stmt.sz_find("SELECT"), stmt.sz_find("RETURNING"),),
-        (Some(0), _) | (_, Some(_)),
-    )
+    // First, determine if the statement is a `SELECT` operation
+    if let Some(stmt) = &stmt.get(..6) {
+        if *stmt == "SELECT" {
+            return true;
+        }
+    }
+    // Otherwise, determine if the statement contains `RETURNING`
+    stmt.sz_rfind("RETURNING").is_some()
 }
 
 #[cfg(test)]
@@ -239,7 +242,7 @@ mod tests {
 
     #[test]
     fn test_is_not_query_statement() {
-        let stmt = "UPDATE dummy SET foo_count = foo_count + 1 WHERE bar = (SELECT bar_id FROM foos WHERE name = 'FooBar')";
+        let stmt = "UPDATE dummy SET foo_count = foo_count + 1 WHERE bar = (SELECT bar_id FROM foo WHERE name = 'FooBar')";
         assert!(!is_query_stmt(stmt));
         let stmt = "UPDATE dummy SET foo = $1 WHERE bar = $2";
         assert!(!is_query_stmt(stmt));
