@@ -148,7 +148,7 @@ export default async function buildUnsignedTx(
 
   // #7 add auxiliary data hash
   if (builder.auxiliaryDataHash) {
-    // auto generated
+    // note: the hash will be set after building auxillary data
   }
 
   // #8 add validity interval start
@@ -173,7 +173,8 @@ export default async function buildUnsignedTx(
 
   // #15 add network id
   if (builder.networkId) {
-    // auto generated
+    txBuilder.add_change_if_needed
+    // note: auto generated
   }
 
   // aux data
@@ -212,6 +213,7 @@ export default async function buildUnsignedTx(
 
   if (txMetadata.len()) {
     auxMetadata.set_metadata(txMetadata);
+    txBuilder.set_auxiliary_data(auxMetadata);
   }
 
   // generate fee incase too much ADA provided for fee
