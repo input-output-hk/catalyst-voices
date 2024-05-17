@@ -625,31 +625,31 @@ extension $RejectedFragmentExtension on RejectedFragment {
 }
 
 @JsonSerializable(explicitToJson: true)
-class ServerErrorPayload {
-  const ServerErrorPayload({
+class ServerError {
+  const ServerError({
     required this.id,
-    this.msg,
+    required this.msg,
     this.issue,
   });
 
-  factory ServerErrorPayload.fromJson(Map<String, dynamic> json) =>
-      _$ServerErrorPayloadFromJson(json);
+  factory ServerError.fromJson(Map<String, dynamic> json) =>
+      _$ServerErrorFromJson(json);
 
-  static const toJsonFactory = _$ServerErrorPayloadToJson;
-  Map<String, dynamic> toJson() => _$ServerErrorPayloadToJson(this);
+  static const toJsonFactory = _$ServerErrorToJson;
+  Map<String, dynamic> toJson() => _$ServerErrorToJson(this);
 
   @JsonKey(name: 'id')
   final String id;
   @JsonKey(name: 'msg')
-  final String? msg;
+  final String msg;
   @JsonKey(name: 'issue')
   final String? issue;
-  static const fromJsonFactory = _$ServerErrorPayloadFromJson;
+  static const fromJsonFactory = _$ServerErrorFromJson;
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other is ServerErrorPayload &&
+        (other is ServerError &&
             (identical(other.id, id) ||
                 const DeepCollectionEquality().equals(other.id, id)) &&
             (identical(other.msg, msg) ||
@@ -669,15 +669,15 @@ class ServerErrorPayload {
       runtimeType.hashCode;
 }
 
-extension $ServerErrorPayloadExtension on ServerErrorPayload {
-  ServerErrorPayload copyWith({String? id, String? msg, String? issue}) {
-    return ServerErrorPayload(
+extension $ServerErrorExtension on ServerError {
+  ServerError copyWith({String? id, String? msg, String? issue}) {
+    return ServerError(
         id: id ?? this.id, msg: msg ?? this.msg, issue: issue ?? this.issue);
   }
 
-  ServerErrorPayload copyWithWrapped(
-      {Wrapped<String>? id, Wrapped<String?>? msg, Wrapped<String?>? issue}) {
-    return ServerErrorPayload(
+  ServerError copyWithWrapped(
+      {Wrapped<String>? id, Wrapped<String>? msg, Wrapped<String?>? issue}) {
+    return ServerError(
         id: (id != null ? id.value : this.id),
         msg: (msg != null ? msg.value : this.msg),
         issue: (issue != null ? issue.value : this.issue));
@@ -1054,6 +1054,49 @@ extension $SyncStateExtension on SyncState {
 }
 
 @JsonSerializable(explicitToJson: true)
+class ValidationError {
+  const ValidationError({
+    required this.message,
+  });
+
+  factory ValidationError.fromJson(Map<String, dynamic> json) =>
+      _$ValidationErrorFromJson(json);
+
+  static const toJsonFactory = _$ValidationErrorToJson;
+  Map<String, dynamic> toJson() => _$ValidationErrorToJson(this);
+
+  @JsonKey(name: 'message')
+  final String message;
+  static const fromJsonFactory = _$ValidationErrorFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is ValidationError &&
+            (identical(other.message, message) ||
+                const DeepCollectionEquality().equals(other.message, message)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(message) ^ runtimeType.hashCode;
+}
+
+extension $ValidationErrorExtension on ValidationError {
+  ValidationError copyWith({String? message}) {
+    return ValidationError(message: message ?? this.message);
+  }
+
+  ValidationError copyWithWrapped({Wrapped<String>? message}) {
+    return ValidationError(
+        message: (message != null ? message.value : this.message));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
 class VotePlan {
   const VotePlan({
     required this.votingToken,
@@ -1423,68 +1466,6 @@ extension $VotingInfoDirectVoterExtension on VotingInfoDirectVoter {
         type: (type != null ? type.value : this.type),
         votingKey: (votingKey != null ? votingKey.value : this.votingKey));
   }
-}
-
-String? animalsNullableToJson(enums.Animals? animals) {
-  return animals?.value;
-}
-
-String? animalsToJson(enums.Animals animals) {
-  return animals.value;
-}
-
-enums.Animals animalsFromJson(
-  Object? animals, [
-  enums.Animals? defaultValue,
-]) {
-  return enums.Animals.values.firstWhereOrNull((e) => e.value == animals) ??
-      defaultValue ??
-      enums.Animals.swaggerGeneratedUnknown;
-}
-
-enums.Animals? animalsNullableFromJson(
-  Object? animals, [
-  enums.Animals? defaultValue,
-]) {
-  if (animals == null) {
-    return null;
-  }
-  return enums.Animals.values.firstWhereOrNull((e) => e.value == animals) ??
-      defaultValue;
-}
-
-String animalsExplodedListToJson(List<enums.Animals>? animals) {
-  return animals?.map((e) => e.value!).join(',') ?? '';
-}
-
-List<String> animalsListToJson(List<enums.Animals>? animals) {
-  if (animals == null) {
-    return [];
-  }
-
-  return animals.map((e) => e.value!).toList();
-}
-
-List<enums.Animals> animalsListFromJson(
-  List? animals, [
-  List<enums.Animals>? defaultValue,
-]) {
-  if (animals == null) {
-    return defaultValue ?? [];
-  }
-
-  return animals.map((e) => animalsFromJson(e.toString())).toList();
-}
-
-List<enums.Animals>? animalsNullableListFromJson(
-  List? animals, [
-  List<enums.Animals>? defaultValue,
-]) {
-  if (animals == null) {
-    return defaultValue;
-  }
-
-  return animals.map((e) => animalsFromJson(e.toString())).toList();
 }
 
 String? networkNullableToJson(enums.Network? network) {

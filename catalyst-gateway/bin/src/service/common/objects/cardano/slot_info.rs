@@ -45,12 +45,15 @@ impl Example for Slot {
 #[oai(example = true)]
 pub(crate) struct SlotInfo {
     /// Previous slot info.
+    #[oai(skip_serializing_if_is_none)]
     pub(crate) previous: Option<Slot>,
 
     /// Current slot info.
+    #[oai(skip_serializing_if_is_none)]
     pub(crate) current: Option<Slot>,
 
     /// Next slot info.
+    #[oai(skip_serializing_if_is_none)]
     pub(crate) next: Option<Slot>,
 }
 

@@ -152,14 +152,13 @@ Map<String, dynamic> _$RejectedFragmentToJson(RejectedFragment instance) =>
       'reason': reasonRejectedToJson(instance.reason),
     };
 
-ServerErrorPayload _$ServerErrorPayloadFromJson(Map<String, dynamic> json) =>
-    ServerErrorPayload(
+ServerError _$ServerErrorFromJson(Map<String, dynamic> json) => ServerError(
       id: json['id'] as String,
-      msg: json['msg'] as String?,
+      msg: json['msg'] as String,
       issue: json['issue'] as String?,
     );
 
-Map<String, dynamic> _$ServerErrorPayloadToJson(ServerErrorPayload instance) =>
+Map<String, dynamic> _$ServerErrorToJson(ServerError instance) =>
     <String, dynamic>{
       'id': instance.id,
       'msg': instance.msg,
@@ -244,6 +243,16 @@ Map<String, dynamic> _$SyncStateToJson(SyncState instance) => <String, dynamic>{
       'slot_number': instance.slotNumber,
       'block_hash': instance.blockHash,
       'last_updated': instance.lastUpdated.toIso8601String(),
+    };
+
+ValidationError _$ValidationErrorFromJson(Map<String, dynamic> json) =>
+    ValidationError(
+      message: json['message'] as String,
+    );
+
+Map<String, dynamic> _$ValidationErrorToJson(ValidationError instance) =>
+    <String, dynamic>{
+      'message': instance.message,
     };
 
 VotePlan _$VotePlanFromJson(Map<String, dynamic> json) => VotePlan(

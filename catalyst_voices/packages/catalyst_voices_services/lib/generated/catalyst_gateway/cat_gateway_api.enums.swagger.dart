@@ -1,22 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:collection/collection.dart';
 
-enum Animals {
-  @JsonValue(null)
-  swaggerGeneratedUnknown(null),
-
-  @JsonValue('Dogs')
-  dogs('Dogs'),
-  @JsonValue('Cats')
-  cats('Cats'),
-  @JsonValue('Rabbits')
-  rabbits('Rabbits');
-
-  final String? value;
-
-  const Animals(this.value);
-}
-
 enum Network {
   @JsonValue(null)
   swaggerGeneratedUnknown(null),
