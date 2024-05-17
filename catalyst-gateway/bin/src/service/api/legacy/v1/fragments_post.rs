@@ -6,7 +6,7 @@ use crate::service::common::{
     objects::legacy::{
         fragments_batch::FragmentsBatch, fragments_processing_summary::FragmentsProcessingSummary,
     },
-    responses::WithErrorResponses,
+    responses::WithAllErrorResponse,
 };
 
 /// Endpoint responses
@@ -18,7 +18,7 @@ pub(crate) enum Responses {
 }
 
 /// All responses
-pub(crate) type AllResponses = WithErrorResponses<Responses>;
+pub(crate) type AllResponses = WithAllErrorResponse<Responses>;
 
 /// # GET /fragments
 ///

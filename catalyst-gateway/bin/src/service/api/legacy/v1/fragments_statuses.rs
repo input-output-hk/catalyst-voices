@@ -6,7 +6,7 @@ use poem_openapi::{payload::Json, ApiResponse};
 
 use crate::service::common::{
     objects::legacy::{fragment_status::FragmentStatus, fragments_processing_summary::FragmentId},
-    responses::WithErrorResponses,
+    responses::WithAllErrorResponse,
 };
 
 /// Endpoint responses
@@ -18,7 +18,7 @@ pub(crate) enum Responses {
 }
 
 /// All responses
-pub(crate) type AllResponses = WithErrorResponses<Responses>;
+pub(crate) type AllResponses = WithAllErrorResponse<Responses>;
 
 /// # GET /fragments/statuses
 ///
