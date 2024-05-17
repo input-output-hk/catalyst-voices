@@ -75,7 +75,7 @@ class VkeyWitness {
 /// The public key of the witness.
 extension type Vkey._(List<int> bytes) {
   /// The length of the [Vkey].
-  static const length = 32;
+  static const int length = 32;
 
   /// The default constructor for [Vkey].
   Vkey.fromBytes(this.bytes) {
@@ -100,7 +100,7 @@ extension type Vkey._(List<int> bytes) {
 /// The witness signature of the transaction.
 extension type Ed25519Signature._(List<int> bytes) {
   /// The length of the [Ed25519Signature].
-  static const length = 64;
+  static const int length = 64;
 
   /// The default constructor for [Ed25519Signature].
   Ed25519Signature.fromBytes(this.bytes) {
