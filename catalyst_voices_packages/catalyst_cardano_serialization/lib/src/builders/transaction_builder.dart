@@ -11,6 +11,11 @@ import 'package:catalyst_cardano_serialization/src/witness.dart';
 import 'package:cbor/cbor.dart';
 
 /// A builder which helps to create the [TransactionBody].
+///
+/// The class collects the [inputs], [outputs], calculates the [fee]
+/// and adds a change address if some UTXOs are not fully spent.
+///
+/// Algorithms inspired by [cardano-multiplatform-lib](https://github.com/dcSpark/cardano-multiplatform-lib/blob/255500b3c683618849fb38107896170ea09c95dc/chain/rust/src/builders/tx_builder.rs#L380) implementation.
 class TransactionBuilder {
   /// Contains the protocol parameters for Cardano blockchain.
   final TransactionBuilderConfig config;
@@ -28,6 +33,9 @@ class TransactionBuilder {
 
   /// The amount of lovelaces that will be charged as the fee
   /// for adding the transaction to the blockchain.
+  ///
+  /// If left null then it will be auto calculated,
+  /// set explicitly with [withFee] to specify a custom fee.
   final Coin? fee;
 
   /// The absolute slot value before the tx becomes invalid.
