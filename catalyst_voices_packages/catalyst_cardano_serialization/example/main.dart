@@ -4,6 +4,7 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 
+/* cSpell:disable */
 void main() {
   const txBuilderConfig = TransactionBuilderConfig(
     feeAlgo: LinearFee(
@@ -57,7 +58,7 @@ void main() {
   final txBuilder = TransactionBuilder(
     config: txBuilderConfig,
     inputs: [utxo],
-    // fee can be left empty so that it's autocalculated or can be hardcoded
+    // fee can be left empty so that it's auto calculated or can be hardcoded
     // fee: const Coin(1000000),
     ttl: const SlotBigNum(410021),
     auxiliaryData: txMetadata,
@@ -72,7 +73,7 @@ void main() {
   final txBody = txBuilder
       .withOutput(txOutput)
       .withChangeAddressIfNeeded(changeAddress)
-      // fee can be set manually or left empty to be autocalculated
+      // fee can be set manually or left empty to be auto calculated
       // .withFee(const Coin(10000000))
       .buildBody();
 
@@ -114,3 +115,5 @@ TransactionWitnessSet _signTransaction(TransactionHash txHash) {
     },
   );
 }
+
+/* cSpell:enable */
