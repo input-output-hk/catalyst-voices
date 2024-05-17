@@ -9,7 +9,7 @@ use crate::{
             objects::cardano::{
                 network::Network, stake_address::StakeAddress, stake_info::StakeInfo,
             },
-            responses::WithErrorResponses,
+            responses::WithAllErrorResponse,
         },
         utilities::check_network,
     },
@@ -28,7 +28,7 @@ pub(crate) enum Responses {
 }
 
 /// All responses.
-pub(crate) type AllResponses = WithErrorResponses<Responses>;
+pub(crate) type AllResponses = WithAllErrorResponse<Responses>;
 
 /// # GET `/staked_ada`
 pub(crate) async fn endpoint(
@@ -51,13 +51,16 @@ pub(crate) async fn endpoint(
         .await
     {
         Ok((amount, slot_number)) => {
-            Responses::Ok(Json(StakeInfo {
+            let resp = Responses::Ok(Json(StakeInfo {
                 amount,
                 slot_number,
-            }))
-            .into()
+            }));
+            AllResponses::new(resp)
         },
-        Err(err) if err.is::<NotFoundError>() => Responses::NotFound.into(),
+        Err(err) if err.is::<NotFoundError>() => {
+            let resp = Responses::NotFound;
+            AllResponses::new(resp)
+        },
         Err(err) => AllResponses::handle_error(&err),
     }
 }

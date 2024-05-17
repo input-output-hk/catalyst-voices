@@ -4,7 +4,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 use poem_openapi::ApiResponse;
 
-use crate::service::common::responses::WithErrorResponses;
+use crate::service::common::responses::WithBadRequestAndInternalServerErrorResponse;
 
 /// Flag to determine if the service has started
 static IS_STARTED: AtomicBool = AtomicBool::new(false);
@@ -30,7 +30,7 @@ pub(crate) enum Responses {
 }
 
 /// All responses.
-pub(crate) type AllResponses = WithErrorResponses<Responses>;
+pub(crate) type AllResponses = WithBadRequestAndInternalServerErrorResponse<Responses>;
 
 /// # GET /health/started
 ///
@@ -52,8 +52,8 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint() -> AllResponses {
     if is_started() {
-        Responses::NoContent.into()
+        AllResponses::new(Responses::NoContent)
     } else {
-        Responses::ServiceUnavailable.into()
+        AllResponses::new(Responses::ServiceUnavailable)
     }
 }

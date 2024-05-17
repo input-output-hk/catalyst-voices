@@ -6,8 +6,8 @@ use poem::web::Data;
 use poem_openapi::ApiResponse;
 
 use crate::{
-    event_db::schema_check::MismatchedSchemaError, service::common::responses::WithErrorResponses,
-    state::State,
+    event_db::schema_check::MismatchedSchemaError,
+    service::common::responses::WithBadRequestAndInternalServerErrorResponse, state::State,
 };
 
 /// Endpoint responses.
@@ -22,7 +22,7 @@ pub(crate) enum Responses {
 }
 
 /// All responses.
-pub(crate) type AllResponses = WithErrorResponses<Responses>;
+pub(crate) type AllResponses = WithBadRequestAndInternalServerErrorResponse<Responses>;
 
 /// # GET /health/ready
 ///
@@ -45,11 +45,11 @@ pub(crate) async fn endpoint(state: Data<&Arc<State>>) -> AllResponses {
     match state.event_db().schema_version_check().await {
         Ok(_) => {
             tracing::debug!("DB schema version status ok");
-            Responses::NoContent.into()
+            AllResponses::new(Responses::NoContent)
         },
         Err(err) if err.is::<MismatchedSchemaError>() => {
             tracing::error!("{err}");
-            Responses::ServiceUnavailable.into()
+            AllResponses::new(Responses::ServiceUnavailable)
         },
         Err(err) => AllResponses::handle_error(&err),
     }
