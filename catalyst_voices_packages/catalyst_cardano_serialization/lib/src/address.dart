@@ -8,7 +8,7 @@ import 'package:catalyst_cardano_serialization/src/exceptions.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:cbor/cbor.dart';
 
-/// [ShelleyAddress] supports bech32 encoded addresses as defined in CIP19.
+/// [ShelleyAddress] supports bech32 encoded addresses as defined in CIP-19.
 class ShelleyAddress {
   /// The prefix of a base address.
   static const String defaultAddrHrp = 'addr';
@@ -65,6 +65,15 @@ class ShelleyAddress {
     }
   }
 
+  /// Deserializes the type from cbor.
+  factory ShelleyAddress.fromCbor(CborValue value) {
+    // TODO(dtscalac): how to parse the hrp
+    return ShelleyAddress((value as CborBytes).bytes);
+  }
+
+  /// Serializes the type as cbor.
+  CborValue toCbor() => CborBytes(bytes);
+
   /// Returns the [NetworkId] related to this address.
   NetworkId get network => NetworkId.testnet.id == (bytes[0] & 0x0f)
       ? NetworkId.testnet
@@ -86,9 +95,6 @@ class ShelleyAddress {
         return Bech32Encoder(hrp: prefix).encode(bytes);
     }
   }
-
-  /// Serializes the type as cbor.
-  CborValue toCbor() => CborBytes(bytes);
 
   @override
   int get hashCode => Object.hash(bytes, hrp);

@@ -16,7 +16,7 @@ class TransactionWitnessSetBuilder {
   /// transaction is signed.
   final int vkeysCount;
 
-  /// The default constructor for the [TransactionWitnessSetBuilder].
+  /// The default constructor for [TransactionWitnessSetBuilder].
   const TransactionWitnessSetBuilder({
     required this.vkeys,
     required this.vkeysCount,
