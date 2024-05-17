@@ -4,15 +4,15 @@ use poem_openapi::{payload::Json, ApiResponse};
 
 use crate::{
     event_db::{
-        cardano::chain_state::{BlockHash, DateTime, SlotInfoQueryType, SlotNumber},
-        error::NotFoundError,
+        cardano::chain_state::{DateTime, SlotInfoQueryType},
+        error::{NotFoundError, TimedOutError},
     },
     service::common::{
         objects::cardano::{
             network::Network,
             slot_info::{Slot, SlotInfo},
         },
-        responses::WithErrorResponses,
+        responses::WithAllErrorResponse,
     },
     state::State,
 };
@@ -26,10 +26,27 @@ pub(crate) enum Responses {
 }
 
 /// All responses.
-pub(crate) type AllResponses = WithErrorResponses<Responses>;
+pub(crate) type AllResponses = WithAllErrorResponse<Responses>;
+
+/// Process slot info result
+macro_rules! process_slot_info_result {
+    ($slot_info_result:ident) => {
+        match $slot_info_result {
+            Ok((slot_number, block_hash, block_time)) => {
+                Some(Slot {
+                    slot_number,
+                    block_hash: From::from(block_hash),
+                    block_time,
+                })
+            },
+            Err(err) if err.is::<NotFoundError>() => None,
+            Err(err) if err.is::<TimedOutError>() => return AllResponses::service_unavailable(),
+            Err(err) => return AllResponses::internal_server_error(&err),
+        }
+    };
+}
 
 /// # GET `/date_time_to_slot_number`
-#[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(
     state: &State, date_time: Option<DateTime>, network: Option<Network>,
 ) -> AllResponses {
@@ -52,33 +69,9 @@ pub(crate) async fn endpoint(
         event_db.get_slot_info(date_time, network.into(), SlotInfoQueryType::Next)
     );
 
-    let process_slot_info_result =
-        |slot_info_result: anyhow::Result<(SlotNumber, BlockHash, DateTime)>| {
-            match slot_info_result {
-                Ok((slot_number, block_hash, block_time)) => {
-                    Ok(Some(Slot {
-                        slot_number,
-                        block_hash: From::from(block_hash),
-                        block_time,
-                    }))
-                },
-                Err(err) if err.is::<NotFoundError>() => Ok(None),
-                Err(err) => Err(err),
-            }
-        };
-
-    let current = match process_slot_info_result(current) {
-        Ok(current) => current,
-        Err(err) => return AllResponses::handle_error(&err),
-    };
-    let previous = match process_slot_info_result(previous) {
-        Ok(current) => current,
-        Err(err) => return AllResponses::handle_error(&err),
-    };
-    let next = match process_slot_info_result(next) {
-        Ok(current) => current,
-        Err(err) => return AllResponses::handle_error(&err),
-    };
+    let current = process_slot_info_result!(current);
+    let previous = process_slot_info_result!(previous);
+    let next = process_slot_info_result!(next);
 
     Responses::Ok(Json(SlotInfo {
         previous,
