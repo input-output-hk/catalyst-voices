@@ -50,7 +50,7 @@ class TransactionBuilder {
   const TransactionBuilder({
     required this.config,
     required this.inputs,
-    required this.outputs,
+    this.outputs = const [],
     this.fee,
     this.ttl,
     this.auxiliaryData,

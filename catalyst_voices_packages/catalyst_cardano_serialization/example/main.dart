@@ -57,7 +57,6 @@ void main() {
   final txBuilder = TransactionBuilder(
     config: txBuilderConfig,
     inputs: [utxo],
-    outputs: [],
     // fee can be left empty so that it's autocalculated or can be hardcoded
     // fee: const Coin(1000000),
     ttl: const SlotBigNum(410021),

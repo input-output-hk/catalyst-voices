@@ -29,15 +29,26 @@ final testTransactionHash = TransactionHash.fromHex(
   '4c1fbc5433ec764164945d736a09dc087d59ff30e64d26d462ff8570cd4be9a7',
 );
 
+TransactionUnspentOutput testUtxo() {
+  return TransactionUnspentOutput(
+    input: TransactionInput(
+      transactionId: testTransactionHash,
+      index: 0,
+    ),
+    output: TransactionOutput(
+      address: ShelleyAddress.fromBech32(
+        'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5'
+        'ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w',
+      ),
+      amount: const Coin(100000000),
+    ),
+  );
+}
+
 Transaction minimalUnsignedTestTransaction() {
   return Transaction(
     body: TransactionBody(
-      inputs: {
-        TransactionInput(
-          transactionId: testTransactionHash,
-          index: 0,
-        ),
-      },
+      inputs: {testUtxo().input},
       outputs: [
         TransactionOutput(
           address: testnetAddr,
@@ -61,12 +72,7 @@ Transaction minimalUnsignedTestTransaction() {
 Transaction minimalSignedTestTransaction() {
   return Transaction(
     body: TransactionBody(
-      inputs: {
-        TransactionInput(
-          transactionId: testTransactionHash,
-          index: 0,
-        ),
-      },
+      inputs: {testUtxo().input},
       outputs: [
         TransactionOutput(
           address: testnetAddr,
@@ -103,31 +109,11 @@ Transaction minimalSignedTestTransaction() {
 }
 
 Transaction fullUnsignedTestTransaction() {
-  final auxiliaryData = AuxiliaryData(
-    map: {
-      const CborSmallInt(1): CborString('Test'),
-      const CborSmallInt(2): CborBytes(hex.decode('aabbccddeeff')),
-      const CborSmallInt(3): const CborSmallInt(997),
-      const CborSmallInt(4): cbor.decode(
-        hex.decode(
-          '82a50081825820afcf8497561065afe1ca623823508753cc580eb575ac8f1d6cfa'
-          'a18c3ceeac010001818258390080f9e2c88e6c817008f3a812ed889b4a4da8e0bd'
-          '103f86e7335422aa122a946b9ad3d2ddf029d3a828f0468aece76895f15c9efbd6'
-          '9b42771a00df1560021a0002e63003182f075820bdc2b27e6869aa9a5fa23a1f1f'
-          'd3a87025d8703df4fd7b120d058c839dc0415c82a10141aa80',
-        ),
-      ),
-    },
-  );
+  final auxiliaryData = testAuxiliaryData();
 
   return Transaction(
     body: TransactionBody(
-      inputs: {
-        TransactionInput(
-          transactionId: testTransactionHash,
-          index: 0,
-        ),
-      },
+      inputs: {testUtxo().input},
       outputs: [
         TransactionOutput(
           address: testnetAddr,
@@ -153,31 +139,11 @@ Transaction fullUnsignedTestTransaction() {
 
 /// Returns a full transaction with all possible optional fields.
 Transaction fullSignedTestTransaction() {
-  final auxiliaryData = AuxiliaryData(
-    map: {
-      const CborSmallInt(1): CborString('Test'),
-      const CborSmallInt(2): CborBytes(hex.decode('aabbccddeeff')),
-      const CborSmallInt(3): const CborSmallInt(997),
-      const CborSmallInt(4): cbor.decode(
-        hex.decode(
-          '82a50081825820afcf8497561065afe1ca623823508753cc580eb575ac8f1d6cfa'
-          'a18c3ceeac010001818258390080f9e2c88e6c817008f3a812ed889b4a4da8e0bd'
-          '103f86e7335422aa122a946b9ad3d2ddf029d3a828f0468aece76895f15c9efbd6'
-          '9b42771a00df1560021a0002e63003182f075820bdc2b27e6869aa9a5fa23a1f1f'
-          'd3a87025d8703df4fd7b120d058c839dc0415c82a10141aa80',
-        ),
-      ),
-    },
-  );
+  final auxiliaryData = testAuxiliaryData();
 
   return Transaction(
     body: TransactionBody(
-      inputs: {
-        TransactionInput(
-          transactionId: testTransactionHash,
-          index: 0,
-        ),
-      },
+      inputs: {testUtxo().input},
       outputs: [
         TransactionOutput(
           address: testnetAddr,
@@ -214,6 +180,25 @@ Transaction fullSignedTestTransaction() {
       },
     ),
     auxiliaryData: auxiliaryData,
+  );
+}
+
+AuxiliaryData testAuxiliaryData() {
+  return AuxiliaryData(
+    map: {
+      const CborSmallInt(1): CborString('Test'),
+      const CborSmallInt(2): CborBytes(hex.decode('aabbccddeeff')),
+      const CborSmallInt(3): const CborSmallInt(997),
+      const CborSmallInt(4): cbor.decode(
+        hex.decode(
+          '82a50081825820afcf8497561065afe1ca623823508753cc580eb575ac8f1d6cfa'
+          'a18c3ceeac010001818258390080f9e2c88e6c817008f3a812ed889b4a4da8e0bd'
+          '103f86e7335422aa122a946b9ad3d2ddf029d3a828f0468aece76895f15c9efbd6'
+          '9b42771a00df1560021a0002e63003182f075820bdc2b27e6869aa9a5fa23a1f1f'
+          'd3a87025d8703df4fd7b120d058c839dc0415c82a10141aa80',
+        ),
+      ),
+    },
   );
 }
 
