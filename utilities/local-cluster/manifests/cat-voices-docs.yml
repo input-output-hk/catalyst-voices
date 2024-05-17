@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cat-gateway-docs
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: docs-nginx
+  template:
+    metadata:
+      labels:
+        app: docs-nginx
+    spec:
+      containers:
+        - name: docs-nginx
+          image: localhost/cat-voices-docs:latest
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500Mi
+            requests:
+              cpu: "0.1"
+              memory: 100Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cat-gateway-docs
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 8080
+      targetPort: 80
+  selector:
+    app: cat-gateway-docs

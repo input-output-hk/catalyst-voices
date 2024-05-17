@@ -4,7 +4,15 @@ VERSION 0.8
 # Needs both Vagrant and Virtualbox installed on the local machine.
 start-cluster:
     LOCALLY
+    # Check if the necessary tools are present locally
+    RUN kubectl version --client=true
+    RUN helm version --short
+    # Check if the necessary local DNS entries exist
+    RUN python scripts/check-cluster-dns.py ./shared/extra.hosts
+    # Everything checks out so far, try and start the cluster.
     RUN vagrant up
+    # Add default services
+    # Add grafana/loki
 
 # stop-cluster : stops the locally running cluster
 stop-cluster:
@@ -16,15 +24,39 @@ test-cluster:
     LOCALLY
     RUN kubectl --kubeconfig shared/k3s.yaml -o wide get nodes
 
-# test-inside-earthly : Checks if we can see the cluster from INSIDE Earthly and not locally.
-test-inside-earthly:
+# kubernetes-base : base container with tooling set up for local access
+kubernetes-base:
     FROM alpine:3.19
     
     # Install kubectl
     RUN apk update && \
         apk upgrade && \
-        apk add kubectl
+        apk add kubectl \
+                helm
 
-    COPY shared shared
+    COPY shared/k3s.yaml $HOME/.kube/config
 
-    RUN kubectl --kubeconfig shared/k3s.yaml -o wide get nodes
+    COPY --dir manifests manifests
+
+# test targets to deploy the local documentation
+deploy-docs:
+    FROM +kubernetes-base
+
+    RUN kubectl apply -f manifests/docs.yml
+
+# test target to stop the local documentation
+stop-docs:
+    FROM +kubernetes-base
+
+    RUN kubectl delete deployment cat-gateway-docs
+    RUN kubectl delete service cat-gateway-docs
+
+# show-info : list important info about the running cluster
+show-info:
+    FROM +kubernetes-base
+    
+    # RUN kubectl --kubeconfig shared/k3s.yaml -o wide get nodes
+    RUN --no-cache kubectl -n kube-system get all
+    RUN --no-cache kubectl -o wide get nodes
+    RUN --no-cache kubectl -o wide get pods
+    RUN --no-cache kubectl -o wide get service

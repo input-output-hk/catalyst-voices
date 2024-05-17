@@ -18,6 +18,7 @@
         "anweiss.cddl-languageserver",
         "tintinweb.graphviz-interactive-preview",
         "terrastruct.d2",
-        "bbenoist.vagrant"
+        "bbenoist.vagrant",
+        "ms-kubernetes-tools.vscode-kubernetes-tools"
     ]
 }

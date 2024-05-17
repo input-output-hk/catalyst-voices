@@ -1,4 +1,6 @@
 shared/*
 .vagrant
 
-!shared/.do_not_remove
+# These are shared configs, need to be checked in to git.
+!shared/k3s
+!shared/extra.hosts
