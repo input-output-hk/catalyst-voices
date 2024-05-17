@@ -101,19 +101,10 @@ impl<T> From<T> for WithBadRequestAndInternalServerErrorResponse<T> {
 }
 
 impl<T> WithBadRequestAndInternalServerErrorResponse<T> {
-    /// Handle a 5xx or 4xx response.
-    /// Returns a Server Error or a Bad Request response.
-    pub(crate) fn handle_error(err: &anyhow::Error) -> Self {
-        match err {
-            err if err.is::<NetworkValidationError>() => {
-                let resp = BadRequestResponse::new(err);
-                Self::T2(CombinedResponse::T1(resp))
-            },
-            err => {
-                let resp = InternalServerErrorResponse::new(err);
-                Self::T2(CombinedResponse::T2(resp))
-            },
-        }
+    /// Build internal server error response
+    pub(crate) fn internal_server_error(err: &anyhow::Error) -> Self {
+        let resp = InternalServerErrorResponse::new(err);
+        Self::T2(CombinedResponse::T2(resp))
     }
 }
 
@@ -133,23 +124,22 @@ impl<T> From<T> for WithAllErrorResponse<T> {
 }
 
 impl<T> WithAllErrorResponse<T> {
-    /// Handle a 5xx or 4xx response.
-    /// Returns a Server Error, a Bad Request or a Service Unavailable response.
-    pub(crate) fn handle_error(err: &anyhow::Error) -> Self {
-        match err {
-            err if err.is::<NetworkValidationError>() => {
-                let resp = BadRequestResponse::new(err);
-                Self::T2(CombinedResponse::T1(resp))
-            },
-            err if err.is::<bb8::RunError<tokio_postgres::Error>>() => {
-                let resp = ServiceUnavailableResponse::new();
-                Self::T2(CombinedResponse::T2(CombinedResponse::T2(resp)))
-            },
-            err => {
-                let resp = InternalServerErrorResponse::new(err);
-                Self::T2(CombinedResponse::T2(CombinedResponse::T1(resp)))
-            },
-        }
+    /// Build bad request response
+    pub(crate) fn bad_request(err: &anyhow::Error) -> Self {
+        let resp = BadRequestResponse::new(err);
+        Self::T2(CombinedResponse::T1(resp))
+    }
+
+    /// Build internal server error response
+    pub(crate) fn internal_server_error(err: &anyhow::Error) -> Self {
+        let resp = InternalServerErrorResponse::new(err);
+        Self::T2(CombinedResponse::T2(CombinedResponse::T1(resp)))
+    }
+
+    /// Build service unavailable response
+    pub(crate) fn service_unavailable() -> Self {
+        let resp = ServiceUnavailableResponse::new();
+        Self::T2(CombinedResponse::T2(CombinedResponse::T2(resp)))
     }
 }
 

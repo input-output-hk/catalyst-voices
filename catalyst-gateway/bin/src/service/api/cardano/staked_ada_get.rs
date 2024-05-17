@@ -3,7 +3,10 @@
 use poem_openapi::{payload::Json, ApiResponse};
 
 use crate::{
-    event_db::{cardano::chain_state::SlotNumber, error::NotFoundError},
+    event_db::{
+        cardano::chain_state::SlotNumber,
+        error::{NotFoundError, TimedOutError},
+    },
     service::{
         common::{
             objects::cardano::{
@@ -42,7 +45,7 @@ pub(crate) async fn endpoint(
 
     let network = match check_network(stake_address.network(), provided_network) {
         Ok(network) => network,
-        Err(err) => return AllResponses::handle_error(&err),
+        Err(err) => return AllResponses::bad_request(&err),
     };
 
     // get the total utxo amount from the database
@@ -58,6 +61,7 @@ pub(crate) async fn endpoint(
             .into()
         },
         Err(err) if err.is::<NotFoundError>() => Responses::NotFound.into(),
-        Err(err) => AllResponses::handle_error(&err),
+        Err(err) if err.is::<TimedOutError>() => AllResponses::service_unavailable(),
+        Err(err) => AllResponses::internal_server_error(&err),
     }
 }
