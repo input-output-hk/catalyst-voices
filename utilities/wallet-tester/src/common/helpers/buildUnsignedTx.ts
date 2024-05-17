@@ -11,6 +11,7 @@ import {
   GeneralTransactionMetadata,
   Int,
   LinearFee,
+  NetworkId,
   RewardAddress,
   StakeCredential,
   StakeDelegation,
@@ -148,7 +149,7 @@ export default async function buildUnsignedTx(
 
   // #7 add auxiliary data hash
   if (builder.auxiliaryDataHash) {
-    // auto generated
+    // note: the hash will be set after building auxillary data
   }
 
   // #8 add validity interval start
@@ -169,11 +170,6 @@ export default async function buildUnsignedTx(
     }
 
     txBuilder.add_required_signer(Ed25519KeyHash.from_hex(stakeCred));
-  }
-
-  // #15 add network id
-  if (builder.networkId) {
-    // auto generated
   }
 
   // aux data
@@ -212,6 +208,7 @@ export default async function buildUnsignedTx(
 
   if (txMetadata.len()) {
     auxMetadata.set_metadata(txMetadata);
+    txBuilder.set_auxiliary_data(auxMetadata);
   }
 
   // generate fee incase too much ADA provided for fee
@@ -221,7 +218,15 @@ export default async function buildUnsignedTx(
   }
 
   // build a full transaction, passing in empty witness set
-  const unsignedTx = Transaction.new(txBuilder.build(), TransactionWitnessSet.new(), auxMetadata);
+  const txBody = txBuilder.build();
+  
+  // #15 add network id
+  if (builder.networkId && [0, 1].includes(Number(builder.networkId))) {
+    const networkId = Number(builder.networkId) === 0 ? NetworkId.testnet() : NetworkId.mainnet()
+    txBody.set_network_id(networkId);
+  }
+
+  const unsignedTx = Transaction.new(txBody, TransactionWitnessSet.new(), auxMetadata);
 
   return unsignedTx;
 }

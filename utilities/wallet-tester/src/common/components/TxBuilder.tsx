@@ -354,9 +354,10 @@ function TxBuilder({ utxos, addresses, onSubmit: onPropSubmit = noop }: Props) {
         onRemoveClick={() => resetField("networkId")}
         render={() => (
           <Input
-            type="text"
-            disabled={true}
-            placeholder="Auto generated"
+            type="number"
+            min={0}
+            max={1}
+            placeholder="0: testnet, 1: mainnet"
             label="Network ID"
             formRegister={register("networkId")}
           />
