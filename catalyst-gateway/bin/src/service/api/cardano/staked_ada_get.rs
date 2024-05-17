@@ -51,16 +51,13 @@ pub(crate) async fn endpoint(
         .await
     {
         Ok((amount, slot_number)) => {
-            let resp = Responses::Ok(Json(StakeInfo {
+            Responses::Ok(Json(StakeInfo {
                 amount,
                 slot_number,
-            }));
-            AllResponses::new(resp)
+            }))
+            .into()
         },
-        Err(err) if err.is::<NotFoundError>() => {
-            let resp = Responses::NotFound;
-            AllResponses::new(resp)
-        },
+        Err(err) if err.is::<NotFoundError>() => Responses::NotFound.into(),
         Err(err) => AllResponses::handle_error(&err),
     }
 }

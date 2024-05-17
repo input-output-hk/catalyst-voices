@@ -52,8 +52,8 @@ pub(crate) type AllResponses = WithBadRequestAndInternalServerErrorResponse<Resp
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint() -> AllResponses {
     if is_started() {
-        AllResponses::new(Responses::NoContent)
+        Responses::NoContent.into()
     } else {
-        AllResponses::new(Responses::ServiceUnavailable)
+        Responses::ServiceUnavailable.into()
     }
 }

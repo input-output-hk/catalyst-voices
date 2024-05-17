@@ -94,13 +94,13 @@ pub(crate) enum CombinedResponse<T1, T2> {
 pub(crate) type WithBadRequestAndInternalServerErrorResponse<T> =
     CombinedResponse<T, CombinedResponse<BadRequestResponse, InternalServerErrorResponse>>;
 
-impl<T> WithBadRequestAndInternalServerErrorResponse<T> {
-    /// Create a new `WithBadRequestAndInternalServerErrorResponse` from a provided `T`
-    /// val.
-    pub(crate) fn new(val: T) -> Self {
+impl<T> From<T> for WithBadRequestAndInternalServerErrorResponse<T> {
+    fn from(val: T) -> Self {
         Self::T1(val)
     }
+}
 
+impl<T> WithBadRequestAndInternalServerErrorResponse<T> {
     /// Handle a 5xx or 4xx response.
     /// Returns a Server Error or a Bad Request response.
     pub(crate) fn handle_error(err: &anyhow::Error) -> Self {
@@ -126,12 +126,13 @@ pub(crate) type WithAllErrorResponse<T> = CombinedResponse<
     >,
 >;
 
-impl<T> WithAllErrorResponse<T> {
-    /// Create a new `WithAllErrorResponse` from a provided `T` val.
-    pub(crate) fn new(val: T) -> Self {
+impl<T> From<T> for WithAllErrorResponse<T> {
+    fn from(val: T) -> Self {
         Self::T1(val)
     }
+}
 
+impl<T> WithAllErrorResponse<T> {
     /// Handle a 5xx or 4xx response.
     /// Returns a Server Error, a Bad Request or a Service Unavailable response.
     pub(crate) fn handle_error(err: &anyhow::Error) -> Self {

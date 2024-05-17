@@ -45,11 +45,11 @@ pub(crate) async fn endpoint(state: Data<&Arc<State>>) -> AllResponses {
     match state.event_db().schema_version_check().await {
         Ok(_) => {
             tracing::debug!("DB schema version status ok");
-            AllResponses::new(Responses::NoContent)
+            Responses::NoContent.into()
         },
         Err(err) if err.is::<MismatchedSchemaError>() => {
             tracing::error!("{err}");
-            AllResponses::new(Responses::ServiceUnavailable)
+            Responses::ServiceUnavailable.into()
         },
         Err(err) => AllResponses::handle_error(&err),
     }
