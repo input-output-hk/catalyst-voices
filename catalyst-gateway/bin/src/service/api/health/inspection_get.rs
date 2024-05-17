@@ -3,26 +3,25 @@
 use std::sync::Arc;
 
 use poem::web::Data;
-use poem_extensions::{response, UniResponse::T204};
+use poem_openapi::ApiResponse;
 use tracing::{debug, error};
 
 use crate::{
     logger::LogLevel,
-    service::common::responses::{
-        resp_2xx::NoContent,
-        resp_4xx::ApiValidationError,
-        resp_5xx::{ServerError, ServiceUnavailable},
-    },
+    service::common::responses::WithErrorResponses,
     state::{DeepQueryInspection, State},
 };
 
-/// All responses
-pub(crate) type AllResponses = response! {
-    204: NoContent,
-    400: ApiValidationError,
-    500: ServerError,
-    503: ServiceUnavailable,
-};
+/// Endpoint responses.
+#[derive(ApiResponse)]
+pub(crate) enum Responses {
+    /// Service is Started and can serve requests.
+    #[oai(status = 204)]
+    NoContent,
+}
+
+/// All responses.
+pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # GET /health/inspection
 ///
@@ -61,5 +60,5 @@ pub(crate) async fn endpoint(
         );
     }
     // otherwise everything seems to be A-OK
-    T204(NoContent)
+    Responses::NoContent.into()
 }

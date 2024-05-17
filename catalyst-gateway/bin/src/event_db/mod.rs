@@ -35,15 +35,18 @@ pub(crate) struct EventDB {
     inspection_settings: Arc<RwLock<DatabaseInspectionSettings>>,
 }
 
-/// No DB URL was provided
+/// `EventDB` Errors
 #[derive(thiserror::Error, Debug, PartialEq, Eq)]
 pub(crate) enum Error {
+    /// Database statement is not a valid modify statement
     #[error("Invalid Modify Statement")]
     InvalidModifyStatement,
+    /// Database statement is not a valid query statement
     #[error("Invalid Query Statement")]
     InvalidQueryStatement,
+    /// No DB URL was provided
     #[error("DB URL is undefined")]
-    NoDatabaseUrlError,
+    NoDatabaseUrl,
 }
 
 impl EventDB {
@@ -230,7 +233,7 @@ pub(crate) async fn establish_connection(url: Option<String>) -> anyhow::Result<
     let database_url = match url {
         Some(url) => url,
         // If the Database connection URL is not supplied, try and get from the env var.
-        None => std::env::var(DATABASE_URL_ENVVAR).map_err(|_| Error::NoDatabaseUrlError)?,
+        None => std::env::var(DATABASE_URL_ENVVAR).map_err(|_| Error::NoDatabaseUrl)?,
     };
 
     let config = tokio_postgres::config::Config::from_str(&database_url)?;
