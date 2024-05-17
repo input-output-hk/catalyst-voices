@@ -37,8 +37,14 @@ pub(crate) struct EventDB {
 
 /// No DB URL was provided
 #[derive(thiserror::Error, Debug, PartialEq, Eq)]
-#[error("DB URL is undefined")]
-pub(crate) struct NoDatabaseUrlError;
+pub(crate) enum Error {
+    #[error("Invalid Modify Statement")]
+    InvalidModifyStatement,
+    #[error("Invalid Query Statement")]
+    InvalidQueryStatement,
+    #[error("DB URL is undefined")]
+    NoDatabaseUrlError,
+}
 
 impl EventDB {
     /// Determine if deep query inspection is enabled.
@@ -74,10 +80,14 @@ impl EventDB {
         &self, stmt: &str, params: &[&(dyn ToSql + Sync)],
     ) -> Result<Vec<Row>, anyhow::Error> {
         if self.is_deep_query_enabled().await {
-            self.explain_analyze(stmt, params, true).await?;
+            // Check if this is a query statement
+            if is_query_stmt(stmt) {
+                self.explain_analyze_rollback(stmt, params).await?;
+            } else {
+                return Err(Error::InvalidQueryStatement.into());
+            }
         }
-        let conn = self.pool.get().await?;
-        let rows = conn.query(stmt, params).await?;
+        let rows = self.pool.get().await?.query(stmt, params).await?;
         Ok(rows)
     }
 
@@ -96,10 +106,14 @@ impl EventDB {
         &self, stmt: &str, params: &[&(dyn ToSql + Sync)],
     ) -> Result<Row, anyhow::Error> {
         if self.is_deep_query_enabled().await {
-            self.explain_analyze(stmt, params, true).await?;
+            // Check if this is a query statement
+            if is_query_stmt(stmt) {
+                self.explain_analyze_rollback(stmt, params).await?;
+            } else {
+                return Err(Error::InvalidQueryStatement.into());
+            }
         }
-        let conn = self.pool.get().await?;
-        let row = conn.query_one(stmt, params).await?;
+        let row = self.pool.get().await?.query_one(stmt, params).await?;
         Ok(row)
     }
 
@@ -120,11 +134,29 @@ impl EventDB {
         &self, stmt: &str, params: &[&(dyn ToSql + Sync)],
     ) -> Result<(), anyhow::Error> {
         if self.is_deep_query_enabled().await {
-            self.explain_analyze(stmt, params, false).await?;
+            // Check if this is a query statement
+            if is_query_stmt(stmt) {
+                return Err(Error::InvalidModifyStatement.into());
+            }
+            self.explain_analyze_commit(stmt, params).await?;
+        } else {
+            self.pool.get().await?.query(stmt, params).await?;
         }
-        let conn = self.pool.get().await?;
-        let _row = conn.query(stmt, params).await?;
         Ok(())
+    }
+
+    /// Prepend `EXPLAIN ANALYZE` to the query, and rollback the transaction.
+    async fn explain_analyze_rollback(
+        &self, stmt: &str, params: &[&(dyn ToSql + Sync)],
+    ) -> anyhow::Result<()> {
+        self.explain_analyze(stmt, params, true).await
+    }
+
+    /// Prepend `EXPLAIN ANALYZE` to the query, and commit the transaction.
+    async fn explain_analyze_commit(
+        &self, stmt: &str, params: &[&(dyn ToSql + Sync)],
+    ) -> anyhow::Result<()> {
+        self.explain_analyze(stmt, params, false).await
     }
 
     /// Prepend `EXPLAIN ANALYZE` to the query.
@@ -198,7 +230,7 @@ pub(crate) async fn establish_connection(url: Option<String>) -> anyhow::Result<
     let database_url = match url {
         Some(url) => url,
         // If the Database connection URL is not supplied, try and get from the env var.
-        None => std::env::var(DATABASE_URL_ENVVAR).map_err(|_| NoDatabaseUrlError)?,
+        None => std::env::var(DATABASE_URL_ENVVAR).map_err(|_| Error::NoDatabaseUrlError)?,
     };
 
     let config = tokio_postgres::config::Config::from_str(&database_url)?;
@@ -216,7 +248,6 @@ pub(crate) async fn establish_connection(url: Option<String>) -> anyhow::Result<
 /// Determine if the statement is a query statement.
 ///
 /// Returns true f the query statement starts with `SELECT` or contains `RETURNING`.
-#[allow(dead_code)]
 fn is_query_stmt(stmt: &str) -> bool {
     // First, determine if the statement is a `SELECT` operation
     if let Some(stmt) = &stmt.get(..6) {
