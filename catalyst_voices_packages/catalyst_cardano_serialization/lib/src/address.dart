@@ -67,7 +67,6 @@ class ShelleyAddress {
 
   /// Deserializes the type from cbor.
   factory ShelleyAddress.fromCbor(CborValue value) {
-    // TODO(dtscalac): how to parse the hrp
     return ShelleyAddress((value as CborBytes).bytes);
   }
 
