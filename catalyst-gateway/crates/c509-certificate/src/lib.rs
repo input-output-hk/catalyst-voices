@@ -1,6 +1,9 @@
 //! x509 Certificate library
 
 use wasm_bindgen::prelude::*;
+mod c509_cert;
+mod c509_enum;
+mod cbor;
 
 #[wasm_bindgen]
 extern "C" {
