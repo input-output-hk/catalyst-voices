@@ -44,7 +44,9 @@ dotenvy
 dotglob
 drep
 dreps
+dtscalac
 earthfile
+Easterling
 Edgedriver
 emurgo
 encryptor
@@ -88,6 +90,8 @@ libflutter
 lintfix
 localizable
 loguru
+lovelace
+lovelaces
 mdlint
 metadatum
 metadatums
@@ -115,6 +119,7 @@ pbxproj
 Pdart
 permissionless
 pg_isready
+pinenacl
 plpgsql
 podfile
 podhelper
@@ -134,6 +139,7 @@ reloadable
 repr
 reqwest
 rfwtxt
+rgloader
 ripgrep
 RPATH
 rustc
@@ -178,6 +184,7 @@ Utxos
 vite
 vitss
 vkey
+vkeys
 vkeywitness
 voteplan
 voteplans
@@ -193,11 +200,3 @@ xctest
 xctestrun
 xcworkspace
 yoroi
-multiplatform
-Multiplatform
-Easterling
-lovelace
-lovelaces
-pinenacl
-dtscalac
-vkeys
