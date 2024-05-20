@@ -1,0 +1,33 @@
+permittedLicenses:
+- MIT
+- Apache-2.0
+- Unicode-DFS-2016
+- BSD-3-Clause
+- BSD-2-Clause
+- BlueOak-1.0.0
+- Apache-2.0 WITH LLVM-exception
+- CC0-1.0
+
+packageLicenseOverride:
+  fuchsia_remote_debug_protocol: BSD-3-Clause
+  flutter_driver: BSD-3-Clause
+  flutter_localizations: BSD-3-Clause
+  flutter_test: BSD-3-Clause
+  flutter_web_plugins: BSD-3-Clause
+  integration_test: BSD-3-Clause
+  rxdart: Apache-2.0
+  vector_math: Apache-2.0 # Have 2 licenses Apache-2.0 and Zlib
+  sky_engine: Apache-2.0 # Recheck this, got MIT-Modern-Variant
+  flutter_gen: MIT
+
+packageSourceOverride:
+  fuchsia_remote_debug_protocol: https://github.com/flutter/flutter/blob/3.19.5/LICENSE # v0.0.0
+  flutter_driver: https://github.com/flutter/flutter/blob/3.19.5/LICENSE
+  flutter_localizations: https://github.com/flutter/flutter/blob/3.19.5/LICENSE
+  flutter_test: https://github.com/flutter/flutter/blob/3.19.5/LICENSE
+  flutter_web_plugins: https://github.com/flutter/flutter/blob/3.19.5/LICENSE
+  integration_test: https://github.com/flutter/flutter/blob/3.19.5/LICENSE
+  rxdart: https://github.com/ReactiveX/rxdart/blob/0.27.7/LICENSE
+  vector_math: https://github.com/google/vector_math.dart/blob/v2.1.4/LICENSE
+  sky_engine: https://github.com/flutter/engine/blob/main/sky/packages/sky_engine/LICENSE
+  flutter_gen: https://github.com/FlutterGen/flutter_gen/blob/main/LICENSE
