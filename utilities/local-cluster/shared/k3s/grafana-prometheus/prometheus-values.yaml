@@ -1,12 +1,12 @@
 # Disable etcd monitoring. See https://github.com/cablespaghetti/k3s-monitoring/issues/4
 kubeEtcd:
-  enabled: false
+  enabled: true
 
 # Disable kube-controller-manager and kube-scheduler monitoring. See https://github.com/cablespaghetti/k3s-monitoring/issues/2
 kubeControllerManager:
-  enabled: false
+  enabled: true
 kubeScheduler:
-  enabled: false
+  enabled: true
 
 prometheus:
   prometheusSpec:
@@ -26,7 +26,7 @@ prometheus:
 
 grafana:
   plugins:
-  - grafana-piechart-panel
+    - grafana-piechart-panel
   enabled: true
   grafana.ini:
     users:
@@ -49,5 +49,5 @@ grafana:
   #  size: 4Gi
   #  finalizers:
   #  - kubernetes.io/pvc-protection
-  # ALTERNATIVELY IF YOU HAVE AN EXISTING CLAME YOU WISH TO USE/REUSE
+  # ALTERNATIVELY IF YOU HAVE AN EXISTING CLAIM YOU WISH TO USE/REUSE
   # existingClaim: prom-grafana

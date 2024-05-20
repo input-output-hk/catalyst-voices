@@ -22,20 +22,24 @@ def parse_extra_hostnames(hostnames):
     return result
 
 
+HOSTNAME_SPACE = 27
+RESOLVED_IP_SPACE = 15
+
+
 def status(hostname, resolved_ip, ok):
-    print(f"{hostname:<25} : {resolved_ip:>15} : {ok}")
+    print(f"{hostname:<{HOSTNAME_SPACE}} : {resolved_ip:>{RESOLVED_IP_SPACE}} : {ok}")
 
 
 def check_hostname(hostname, ip):
-    # Check the hostame resolves to the expected IP
+    # Check the hostname resolves to the expected IP
     ok = "OK"
     try:
         resolved_ip = socket.gethostbyname(hostname)
         if resolved_ip != ip:
-            ok = f"FAIL. Set `{ip:<15} {hostname:<25}` in /etc/hosts."
+            ok = f"FAIL. Set `{ip:<{RESOLVED_IP_SPACE}} {hostname:<{HOSTNAME_SPACE}}` in /etc/hosts."
     except socket.error as e:
         resolved_ip = "None"
-        ok = f"FAIL. Add `{ip:<15} {hostname:<25}` to /etc/hosts"
+        ok = f"FAIL. Add `{ip:<{RESOLVED_IP_SPACE}} {hostname:<{HOSTNAME_SPACE}}` to /etc/hosts"
 
     status(hostname, resolved_ip, ok)
 
@@ -47,7 +51,7 @@ everything_ok = True
 extra_hosts = parse_extra_hostnames(sys.argv[1])
 
 status("HOSTNAME", "RESOLVED IP", "STATUS")
-status("-------------------------", "---------------", "------")
+status("-" * HOSTNAME_SPACE, "-" * RESOLVED_IP_SPACE, "------")
 
 for host in extra_hosts:
     everything_ok = check_hostname(host[1], host[0]) and everything_ok

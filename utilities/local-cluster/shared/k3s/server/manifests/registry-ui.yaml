@@ -1,3 +1,4 @@
+# cspell: words joxit kubernetescrd
 apiVersion: v1
 kind: Service
 metadata:
@@ -36,6 +37,13 @@ spec:
               value: "Catalyst Test Cluster - Container Registry"
             - name: REGISTRY_URL
               value: "http://registry.cluster.test:5000"
+          resources:
+            limits:
+              cpu: "0.2"
+              memory: 500Mi
+            requests:
+              cpu: "0.1"
+              memory: 100Mi
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
