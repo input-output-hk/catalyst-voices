@@ -4,8 +4,9 @@ This package comes with serialization & deserialization of data structures relat
 blockchain transactions and useful utility functions.
 
 The goal of the package is to generate an unsigned transaction cbor that
-can be signed and submitted to the blockchain. The package communicates neither with the wallet
-nor with the blockchain therefore signing and submission are outside of scope of this package.
+can be signed and submitted to the blockchain.
+The package communicates neither with the wallet nor with the blockchain therefore signing
+and submission are outside of scope of this package.
 
 ## Usage
 
@@ -15,7 +16,8 @@ for any remaining unspent UTXOs and build the transaction body.
 
 The transaction body must be signed by witnesses in order to be submitted to the blockchain.
 Otherwise the validity of the transaction could not be established and such transaction
-would be rejected. The caller must prove that they are eligible to spend the input UTXOs.
+would be rejected.
+The caller must prove that they are eligible to spend the input UTXOs.
 
 Example:
 
@@ -142,10 +144,11 @@ TransactionWitnessSet _signTransaction(TransactionHash txHash) {
 ## Limitations
 
 This package supports a minimal `TransactionBuilder` that does not yet work with
-Smart Contracts, scripts or NFTs. However AuxiliaryMetadata is already supported thus
-it's possible to fulfill some of the use cases.
+Smart Contracts, scripts or NFTs.
+However AuxiliaryMetadata is already supported thus it's possible to fulfill some of the use cases.
 
-Only Shelley era bech32 base and stake addresses are supported. Byron era addresses are not supported.
+Only Shelley era bech32 base and stake addresses are supported.
+Byron era addresses are not supported.
 
 ## Supported transaction body fields
 
@@ -172,4 +175,5 @@ Only Shelley era bech32 base and stake addresses are supported. Byron era addres
 ## Reference documentation
 
 * [Cardano transaction specification](https://github.com/input-output-hk/catalyst-CIPs/blob/x509-rbac-signing-with-cip30/CIP-XXXX/README.md#specification)
-* [Cardano Multiplatform Lib](https://github.com/dcSpark/cardano-multiplatform-lib) with reference implementation for fee calculation algorithm and change address management.
+* [Cardano Multiplatform Lib](https://github.com/dcSpark/cardano-multiplatform-lib) with reference
+implementation for fee calculation algorithm and change address management.
