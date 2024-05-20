@@ -15,5 +15,7 @@ crate-type = ["cdylib"]
 workspace = true
 
 [dependencies]
-wasm-bindgen = { workspace = true }
-regex = { workspace = true }
+wasm-bindgen = "0.2"
+minicbor = { version = "0.24", features = ["alloc"] }
+hex = "0.4.3"
+regex = "1.0.0"
