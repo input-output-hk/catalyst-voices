@@ -1,4 +1,17 @@
-# Catalyst Cardano Serialization
+# Content
+
+* [Content](#content)
+  * [Features](#features)
+  * [Requirements](#requirements)
+  * [Install](#install)
+  * [Example](#example)
+  * [Limitations](#limitations)
+  * [Supported transaction body fields](#supported-transaction-body-fields)
+  * [Reference documentation](#reference-documentation)
+  * [Support](#support)
+  * [License](#license)
+
+## Features
 
 This package comes with serialization & deserialization of data structures related to Cardano
 blockchain transactions and useful utility functions.
@@ -8,7 +21,19 @@ can be signed and submitted to the blockchain.
 The package communicates neither with the wallet nor with the blockchain therefore signing
 and submission are outside of scope of this package.
 
-## Usage
+## Requirements
+
+* Dart: 3.3.0+
+* Flutter: 3.19.5+
+
+## Install
+
+```yaml
+dependencies:
+  catalyst_cardano_serialization: ^0.1.0
+```
+
+## Example
 
 Import `package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart`,
 instantiate `TransactionBuilder`, provide transaction inputs, outputs, add change address
@@ -18,8 +43,6 @@ The transaction body must be signed by witnesses in order to be submitted to the
 Otherwise the validity of the transaction could not be established and such transaction
 would be rejected.
 The caller must prove that they are eligible to spend the input UTXOs.
-
-Example:
 
 ```dart
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
@@ -177,3 +200,19 @@ Byron era addresses are not supported.
 * [Cardano transaction specification](https://github.com/input-output-hk/catalyst-CIPs/blob/x509-rbac-signing-with-cip30/CIP-XXXX/README.md#specification)
 * [Cardano Multiplatform Lib](https://github.com/dcSpark/cardano-multiplatform-lib) with reference
 implementation for fee calculation algorithm and change address management.
+
+## Support
+
+Post issues and feature requests on the GitHub [issue tracker](https://github.com/input-output-hk/catalyst-voices/issues).
+Please read our [CONTRIBUTING](https://github.com/input-output-hk/catalyst-voices/blob/main/CONTRIBUTING.md)
+for guidelines on how to contribute.
+
+## License
+
+Licensed under either of [Apache License, Version 2.0](https://github.com/input-output-hk/catalyst-voices/blob/main/LICENSE-APACHE)
+or [MIT license](https://github.com/input-output-hk/catalyst-voices/blob/main/LICENSE-MIT)
+at your option.
+
+Unless you explicitly state otherwise, any contribution intentionally submitted
+for inclusion in this crate by you, as defined in the Apache-2.0 license, shall
+be dual licensed as above, without any additional terms or conditions.
