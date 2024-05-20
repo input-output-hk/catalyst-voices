@@ -2,12 +2,11 @@
 use std::sync::Arc;
 
 use poem::web::Data;
-use poem_extensions::{response, UniResponse::T200};
 use poem_openapi::{
     param::{Path, Query},
     payload::Json,
     types::Example,
-    OpenApi,
+    ApiResponse, OpenApi,
 };
 
 use crate::{
@@ -17,11 +16,7 @@ use crate::{
                 event_id::EventId, voter_registration::VoterRegistration,
                 voting_public_key::VotingPublicKey,
             },
-            responses::{
-                resp_2xx::OK,
-                resp_4xx::{BadRequest, NotFound},
-                resp_5xx::{ServerError, ServiceUnavailable},
-            },
+            responses::WithErrorResponses,
             tags::ApiTags,
         },
         utilities::middleware::schema_validation::schema_version_validation,
@@ -31,6 +26,17 @@ use crate::{
 
 /// Registration API Endpoints
 pub(crate) struct RegistrationApi;
+
+/// Endpoint responses
+#[derive(ApiResponse)]
+enum Responses {
+    /// Voter's registration info
+    #[oai(status = 200)]
+    Ok(Json<VoterRegistration>),
+}
+
+/// All responses
+type AllResponses = WithErrorResponses<Responses>;
 
 #[OpenApi(prefix_path = "/registration", tag = "ApiTags::Registration")]
 impl RegistrationApi {
@@ -67,13 +73,7 @@ impl RegistrationApi {
         /// in the response. Otherwise, it will be omitted.
         #[oai(default)]
         with_delegators: Query<bool>,
-    ) -> response! {
-           200: OK<Json<VoterRegistration>>,
-           400: BadRequest<Json<VoterRegistration>>,
-           404: NotFound,
-           500: ServerError,
-           503: ServiceUnavailable,
-       } {
-        T200(OK(Json(VoterRegistration::example())))
+    ) -> AllResponses {
+        Responses::Ok(Json(VoterRegistration::example())).into()
     }
 }

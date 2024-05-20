@@ -1,21 +1,38 @@
 //! Implementation of the GET /health/live endpoint
 
-use poem_extensions::{response, UniResponse::T204};
-use tracing::{error, info, warn};
+use std::sync::atomic::{AtomicBool, Ordering};
 
-use crate::service::common::responses::{
-    resp_2xx::NoContent,
-    resp_4xx::ApiValidationError,
-    resp_5xx::{ServerError, ServiceUnavailable},
-};
+use poem_openapi::ApiResponse;
 
-/// All responses
-pub(crate) type AllResponses = response! {
-    204: NoContent,
-    400: ApiValidationError,
-    500: ServerError,
-    503: ServiceUnavailable,
-};
+use crate::service::common::responses::WithErrorResponses;
+
+/// Flag to determine if the service has started
+static IS_LIVE: AtomicBool = AtomicBool::new(true);
+
+/// Set the started flag to `true`
+#[allow(dead_code)]
+pub(crate) fn set_live(flag: bool) {
+    IS_LIVE.store(flag, Ordering::Release);
+}
+/// Get the started flag
+#[allow(dead_code)]
+fn is_live() -> bool {
+    IS_LIVE.load(Ordering::Acquire)
+}
+
+/// Endpoint responses.
+#[derive(ApiResponse)]
+pub(crate) enum Responses {
+    /// Service is OK and can keep running.
+    #[oai(status = 204)]
+    NoContent,
+    /// Service is possibly not running reliably.
+    #[oai(status = 503)]
+    ServiceUnavailable,
+}
+
+/// All responses.
+pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # GET /health/live
 ///
@@ -26,24 +43,11 @@ pub(crate) type AllResponses = response! {
 ///
 /// In this service, liveness is assumed unless there are multiple panics generated
 /// by an endpoint in a short window.
-///
-/// ## Responses
-///
-/// * 204 No Content - Service is OK and can keep running.
-/// * 400 API Validation Error
-/// * 500 Server Error - If anything within this function fails unexpectedly. (Possible
-///   but unlikely)
-/// * 503 Service Unavailable - Service is possibly not running reliably.
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint() -> AllResponses {
-    // TODO: Detect if too many panics have occurred in a defined window.
-    // If so, return a 503
-    // T503(ServiceUnavailable)
-
-    info!("liveness check");
-    warn!("liveness check - warn");
-    error!("liveness check - error");
-
-    // otherwise everything seems to be A-OK
-    T204(NoContent)
+    if is_live() {
+        Responses::NoContent.into()
+    } else {
+        Responses::ServiceUnavailable.into()
+    }
 }
