@@ -139,7 +139,6 @@ TransactionWitnessSet _signTransaction(TransactionHash txHash) {
 /* cSpell:enable */
 ```
 
-
 ## Limitations
 
 This package supports a minimal `TransactionBuilder` that does not yet work with
@@ -169,3 +168,8 @@ Only Shelley era bech32 base and stake addresses are supported. Byron era addres
 | 16 = collateral return | ❌️ |
 | 17 = total collateral | ❌️ |
 | 18 = reference inputs | ❌️ |
+
+## Reference documentation
+
+* [Cardano transaction specification](https://github.com/input-output-hk/catalyst-CIPs/blob/x509-rbac-signing-with-cip30/CIP-XXXX/README.md#specification)
+* [Cardano Multiplatform Lib](https://github.com/dcSpark/cardano-multiplatform-lib) with reference implementation for fee calculation algorithm and change address management.
