@@ -77,8 +77,8 @@ jobs:
         if: always()
         continue-on-error: true
         with:
-            earthfile: ./catalyst-gateway/tests/api-tests/
-            flags:
+            earthfile: ./catalyst-gateway/tests/api_tests/
+            flags: --allow-privileged
             targets: test
             target_flags:
             runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
