@@ -48,7 +48,6 @@ poem-openapi = { workspace = true, features = [
     "url",
     "chrono",
 ] }
-poem-extensions = { workspace = true }
 prometheus = { workspace = true }
 cryptoxide = { workspace = true }
 uuid = { workspace = true, features = ["v4", "serde"] }
@@ -68,3 +67,4 @@ anyhow = { workspace = true }
 handlebars = { workspace = true }
 cddl = { workspace = true }
 ciborium = { workspace = true }
+ed25519-dalek = "2.1.1"

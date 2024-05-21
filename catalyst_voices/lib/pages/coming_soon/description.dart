@@ -13,7 +13,7 @@ class ComingSoonDescription extends StatelessWidget {
       height: 66,
       child: DefaultTextStyle(
         style: GoogleFonts.notoSans(
-          textStyle: const TextStyle(color: VoicesColors.blueText),
+          textStyle: const TextStyle(color: VoicesColors.lightTextOnPrimary),
           fontSize: 16,
           fontWeight: FontWeight.w400,
         ),

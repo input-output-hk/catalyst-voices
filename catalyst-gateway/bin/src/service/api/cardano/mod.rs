@@ -9,7 +9,7 @@ use poem_openapi::{
 };
 
 use crate::{
-    event_db::cardano::follower::{DateTime, SlotNumber},
+    event_db::cardano::chain_state::{DateTime, SlotNumber},
     service::{
         common::{
             objects::cardano::{network::Network, stake_address::StakeAddress},
@@ -40,14 +40,6 @@ impl CardanoApi {
     ///
     /// This endpoint returns the total Cardano's staked ada amount to the corresponded
     /// user's stake address.
-    ///
-    /// ## Responses
-    /// * 200 OK - Returns the staked ada amount.
-    /// * 400 Bad Request.
-    /// * 404 Not Found.
-    /// * 500 Server Error - If anything within this function fails unexpectedly.
-    /// * 503 Service Unavailable - Service is not ready, requests to other
-    /// endpoints should not be sent until the service becomes ready.
     async fn staked_ada_get(
         &self, data: Data<&Arc<State>>,
         /// The stake address of the user.
@@ -80,14 +72,6 @@ impl CardanoApi {
     ///
     /// This endpoint returns the registration info followed by the [CIP-36](https://cips.cardano.org/cip/CIP-36/) to the
     /// corresponded user's stake address.
-    ///
-    /// ## Responses
-    /// * 200 OK - Returns the registration info.
-    /// * 400 Bad Request.
-    /// * 404 Not Found.
-    /// * 500 Server Error - If anything within this function fails unexpectedly.
-    /// * 503 Service Unavailable - Service is not ready, requests to other
-    /// endpoints should not be sent until the service becomes ready.
     async fn registration_get(
         &self, data: Data<&Arc<State>>,
         /// The stake address of the user.
@@ -119,14 +103,6 @@ impl CardanoApi {
     /// Get Cardano follower's sync state.
     ///
     /// This endpoint returns the current cardano follower's sync state info.
-    ///
-    /// ## Responses
-    /// * 200 OK - Returns the follower's sync state.
-    /// * 400 Bad Request.
-    /// * 404 Not Found.
-    /// * 500 Server Error - If anything within this function fails unexpectedly.
-    /// * 503 Service Unavailable - Service is not ready, requests to other
-    /// endpoints should not be sent until the service becomes ready.
     async fn sync_state_get(
         &self, data: Data<&Arc<State>>,
         /// Cardano network type.
@@ -149,13 +125,6 @@ impl CardanoApi {
     ///
     /// This endpoint returns the closest cardano slot info to the provided
     /// date-time.
-    ///
-    /// ## Responses
-    /// * 200 OK - Returns the slot info.
-    /// * 400 Bad Request.
-    /// * 500 Server Error - If anything within this function fails unexpectedly.
-    /// * 503 Service Unavailable - Service is not ready, requests to other
-    /// endpoints should not be sent until the service becomes ready.
     async fn date_time_to_slot_number_get(
         &self, data: Data<&Arc<State>>,
         /// The date-time for which the slot number should be calculated.

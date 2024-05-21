@@ -12,15 +12,16 @@ class ComingSoonLogo extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        CatalystImage.asset(
-          VoicesAssets.images.logo.path,
+        CatalystSvgPicture.asset(
+          VoicesAssets.images.catalystLogo.path,
+          width: 202,
         ),
         Container(
           margin: const EdgeInsets.only(left: 13, bottom: 6),
           child: Text(
             l10n.comingSoonSubtitle,
             style: GoogleFonts.notoSans(
-              textStyle: const TextStyle(color: VoicesColors.blue),
+              textStyle: const TextStyle(color: VoicesColors.lightPrimary),
               fontSize: 19,
               fontWeight: FontWeight.w500,
             ),

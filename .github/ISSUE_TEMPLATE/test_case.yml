@@ -1,0 +1,55 @@
+name: Test Case
+description: Create a test case
+title: "[Test Case]: <title>"
+labels: ["testcase"]
+projects: ["/input-output-hk/102"]
+body:
+  - type: input
+    attributes:
+      label: Objective
+      description: A concise description of what we want to test.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: References
+      description: Any useful references like github issues, jira epics.
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Environment
+      description: The environment where to run the testcase
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Preconditions
+      description: Any step or setup that is needed before running the testcase
+    validations:
+      required: false
+
+  - type: textarea
+    attributes:
+      label: Steps
+      description: The steps needed to complete the test
+      placeholder: |
+        | \# | Step description          | Expected result                              |
+        | -- | ------------------------- | -------------------------------------------- |
+        | 1. | <what a tester should do> | <what a tester should see when they do that> |
+        | 2. | <what a tester should do> | <what a tester should see when they do that> |
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Notes
+      description: |
+        Any additional information
+
+        Tip: You can attach images or log files by clicking this area to highlight it and then dragging files in.
+    validations:
+      required: false
