@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cat-gateway-docs
+  namespace: cat-voices
 spec:
   replicas: 1
   selector:
@@ -14,7 +15,7 @@ spec:
     spec:
       containers:
         - name: docs-nginx
-          image: localhost/cat-voices-docs:latest
+          image: registry.cluster.test/cat-voices-docs:latest
           ports:
             - containerPort: 80
               name: http
@@ -31,10 +32,33 @@ apiVersion: v1
 kind: Service
 metadata:
   name: cat-gateway-docs
+  namespace: cat-voices
 spec:
   type: LoadBalancer
   ports:
-    - port: 8080
+    - name: docs
+      port: 80
       targetPort: 80
+      protocol: TCP
   selector:
     app: cat-gateway-docs
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cat-gateway-docs
+  namespace: cat-voices
+  annotations:
+    spec.ingressClassName: traefik
+spec:
+  rules:
+    - host: docs.voices.cluster.test
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: cat-gateway-docs
+                port:
+                  number: 80
