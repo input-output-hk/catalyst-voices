@@ -16,12 +16,12 @@ packageLicenseOverride:
   flutter_web_plugins: BSD-3-Clause
   integration_test: BSD-3-Clause
   rxdart: Apache-2.0
-  vector_math: Apache-2.0 # Have 2 licenses Apache-2.0 and Zlib
-  sky_engine: Apache-2.0 # Recheck this, got MIT-Modern-Variant
+  vector_math: Apache-2.0
+  sky_engine: Apache-2.0
   flutter_gen: MIT
 
 packageSourceOverride:
-  fuchsia_remote_debug_protocol: https://github.com/flutter/flutter/blob/3.19.5/LICENSE # v0.0.0
+  fuchsia_remote_debug_protocol: https://github.com/flutter/flutter/blob/3.19.5/LICENSE
   flutter_driver: https://github.com/flutter/flutter/blob/3.19.5/LICENSE
   flutter_localizations: https://github.com/flutter/flutter/blob/3.19.5/LICENSE
   flutter_test: https://github.com/flutter/flutter/blob/3.19.5/LICENSE
@@ -29,5 +29,5 @@ packageSourceOverride:
   integration_test: https://github.com/flutter/flutter/blob/3.19.5/LICENSE
   rxdart: https://github.com/ReactiveX/rxdart/blob/0.27.7/LICENSE
   vector_math: https://github.com/google/vector_math.dart/blob/v2.1.4/LICENSE
-  sky_engine: https://github.com/flutter/engine/blob/main/sky/packages/sky_engine/LICENSE
-  flutter_gen: https://github.com/FlutterGen/flutter_gen/blob/main/LICENSE
+  sky_engine: https://github.com/flutter/engine/blob/3.22.0/sky/packages/sky_engine/LICENSE
+  flutter_gen: https://github.com/FlutterGen/flutter_gen/blob/v5.4.0/LICENSE
