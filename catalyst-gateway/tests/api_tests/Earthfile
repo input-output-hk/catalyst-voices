@@ -22,5 +22,8 @@ test:
         --load cat-gateway:latest=(../../+package-cat-gateway-with-preprod-snapshot) \
         --service cat-gateway \
         --allow-privileged
-        RUN poetry run pytest -s
+        RUN poetry run pytest -s --junitxml=junit-report.xml
+    END
+    WAIT
+        SAVE ARTIFACT junit-report.xml AS LOCAL backendpython.junit-report.xml
     END
