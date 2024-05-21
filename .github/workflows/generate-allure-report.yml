@@ -77,7 +77,7 @@ jobs:
         if: always()
         continue-on-error: true
         with:
-            earthfile: Get backend python test report
+            earthfile: ./catalyst-gateway/tests/api_tests/
             flags: --allow-privileged
             targets: test
             target_flags:
