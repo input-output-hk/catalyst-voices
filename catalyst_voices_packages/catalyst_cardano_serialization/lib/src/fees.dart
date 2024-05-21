@@ -13,7 +13,8 @@ final class LinearFee {
   /// The amount of [Coin] per transaction byte that is charged per transaction.
   final Coin coefficient;
 
-  /// The default constructor for the [LinearFee].
+  /// The default constructor for [LinearFee].
+  ///
   /// The parameters are Cardano protocol parameters.
   const LinearFee({
     required this.constant,
