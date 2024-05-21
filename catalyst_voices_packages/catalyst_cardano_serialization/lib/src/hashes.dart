@@ -21,15 +21,19 @@ abstract base class BaseHash {
     }
   }
 
+  /// Deserializes the type from cbor.
+  BaseHash.fromCbor(CborValue value)
+      : this.fromBytes(bytes: (value as CborBytes).bytes);
+
+  /// Serializes the type as cbor.
+  CborValue toCbor() => CborBytes(bytes);
+
   /// Constructs the [BaseHash] from a hex string representation
   /// of [bytes].
   BaseHash.fromHex(String string) : this.fromBytes(bytes: hex.decode(string));
 
   /// The expected length of the transaction hash bytes.
   int get length;
-
-  /// Serializes the type as cbor.
-  CborValue toCbor() => CborBytes(bytes);
 
   /// Returns the hex string representation of [bytes].
   String toHex() => hex.encode(bytes);
@@ -80,6 +84,9 @@ final class TransactionHash extends BaseHash {
           ),
         );
 
+  /// Deserializes the type from cbor.
+  TransactionHash.fromCbor(super.value) : super.fromCbor();
+
   @override
   int get length => _length;
 }
@@ -104,6 +111,9 @@ final class AuxiliaryDataHash extends BaseHash {
             digestSize: _length,
           ),
         );
+
+  /// Deserializes the type from cbor.
+  AuxiliaryDataHash.fromCbor(super.value) : super.fromCbor();
 
   @override
   int get length => _length;
