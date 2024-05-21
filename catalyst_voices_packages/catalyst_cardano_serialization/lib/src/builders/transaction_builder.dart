@@ -83,6 +83,8 @@ class TransactionBuilder {
   /// i.e. the remaining change is too small to cover for extra fee that such
   /// extra output would generate then the transaction fee is increased to burn
   /// any remaining change.
+  /// 
+  /// Follows code style of Cardano Multiplatform Lib to make patching easy.
   TransactionBuilder withChangeAddressIfNeeded(ShelleyAddress address) {
     if (this.fee != null) {
       // generating the change output involves changing the fee
