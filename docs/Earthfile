@@ -34,6 +34,7 @@ docs:
 local:
     # Change this to point to another local registry, OR set to "" to disable
     # pushing to a local registry even if `--push` is passed.
+    # this should be "registry.cluster.test:5000" but Earthly can not reliably locate it in a hosts file.
     ARG local_registry="192.168.58.10:5000"
     # Build a self contained service to show built docs locally.
     DO docs-ci+PACKAGE

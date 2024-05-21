@@ -42,21 +42,27 @@ kubernetes-base:
 deploy-docs:
     FROM +kubernetes-base
 
-    RUN kubectl apply -f manifests/docs.yml
+    RUN kubectl create namespace cat-voices || true
+    RUN kubectl apply -f manifests/cat-voices-docs.yml
 
 # test target to stop the local documentation
 stop-docs:
     FROM +kubernetes-base
 
-    RUN kubectl delete deployment cat-gateway-docs
-    RUN kubectl delete service cat-gateway-docs
+    RUN kubectl delete ingress cat-gateway-docs -n cat-voices || true
+    RUN kubectl delete deployment cat-gateway-docs -n cat-voices || true
+    RUN kubectl delete service cat-gateway-docs -n cat-voices || true
 
 # show-info : list important info about the running cluster
 show-info:
     FROM +kubernetes-base
-    
-    # RUN kubectl --kubeconfig shared/k3s.yaml -o wide get nodes
-    RUN --no-cache kubectl -n kube-system get all
-    RUN --no-cache kubectl -o wide get nodes
-    RUN --no-cache kubectl -o wide get pods
-    RUN --no-cache kubectl -o wide get service
+    ARG local_file=""
+
+    # Get everything from all namespaces    
+    RUN --no-cache kubectl -o wide get all --all-namespaces > cluster.info
+
+    IF [ "$local_file" == "" ]
+        RUN cat cluster.info
+    ELSE
+        SAVE ARTIFACT cluster.info AS LOCAL "$local_file"
+    END

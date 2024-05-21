@@ -23,7 +23,24 @@ build:
     FROM +builder
 
     DO postgresql-ci+BUILD --image_name=event-db
-    DO postgresql-ci+DOCS --image_name=event-db
+    DO postgresql-ci+DOCS 
+
+# local : Make a locally runable container that can serve the db.
+#   --push will cause this image to be pushed to the local development cluster
+#   --local_registry : Set this to the hostname of your local registry or "" to inhibit.
+local:
+    # Change this to point to another local registry, OR set to "" to disable
+    # pushing to a local registry even if `--push` is passed.
+    # this should be "registry.cluster.test:5000" but Earthly can not reliably locate it in a hosts file.
+    ARG local_registry="192.168.58.10:5000"
+
+    FROM +build
+
+    # Publish to the local development cluster 
+    IF [ "$local_registry" != "" ]
+        SAVE IMAGE --push --insecure $local_registry/event-db:latest
+    END
+
 
 # test the event db database schema
 #   CI target : true
