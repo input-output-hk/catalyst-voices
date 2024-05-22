@@ -71,6 +71,18 @@ jobs:
             target_flags:
             runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
             artifact: "false"
+      
+      - name: Get backend python test report
+        uses: input-output-hk/catalyst-ci/actions/run@master
+        if: always()
+        continue-on-error: true
+        with:
+            earthfile: ./catalyst-gateway/tests/api_tests/
+            flags: --allow-privileged
+            targets: test
+            target_flags:
+            runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+            artifact: "false"
 
       - name: Collect and upload test reports
         uses: actions/upload-artifact@v4
