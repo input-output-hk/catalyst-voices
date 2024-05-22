@@ -1,0 +1,11 @@
+[package]
+name = "catalyst-chaindata-writer"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+catalyst-chaindata-types = { workspace = true }
+postgres-util = { workspace = true }
+
+anyhow = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt", "sync"] }

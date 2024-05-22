@@ -1,0 +1,13 @@
+[package]
+name = "catalyst-chaindata-types"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = { workspace = true }
+chrono = { workspace = true }
+lazy_static = { workspace = true }
+pallas-addresses = { workspace = true }
+pallas-traverse = { workspace = true }
+serde_json = { workspace = true }
+serde = { workspace = true, features = ["derive", "std"] }

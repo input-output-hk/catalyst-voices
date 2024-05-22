@@ -1,0 +1,16 @@
+[package]
+name = "cardano-immutabledb-reader"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = { workspace = true }
+binary-layout = "4.0.2"
+pallas-codec = { workspace = true }
+pallas-traverse = { workspace = true }
+tokio = { workspace = true, features = ["fs", "macros", "io-util", "sync", "rt"] }
+tokio-util = "0.7.11"
+
+[dev-dependencies]
+pallas-traverse = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt"] }

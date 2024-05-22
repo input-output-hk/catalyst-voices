@@ -1,0 +1,11 @@
+[package]
+name = "catalyst-immutabledb-reader-testbench"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+cardano-immutabledb-reader = { workspace = true }
+clap = { version = "4.5.4", default-features = false, features = ["derive", "help", "usage", "std"] }
+pallas-traverse = "0.25.0"
+parse-size = "1.0.0"
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time"] }

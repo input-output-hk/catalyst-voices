@@ -1,0 +1,31 @@
+[workspace]
+resolver = "2"
+
+members = [
+    "bin/catalyst-chain-syncer",
+    "crates/cardano-immutabledb-reader",
+    "crates/cardano-immutabledb-reader/testbench",
+    "crates/catalyst-chaindata-types",
+    "crates/catalyst-chaindata-writer",
+    "crates/postgres-util",
+]
+
+[workspace.dependencies]
+postgres-util = { path = "crates/postgres-util" }
+cardano-immutabledb-reader = { path = "crates/cardano-immutabledb-reader" }
+catalyst-chaindata-types = { path = "crates/catalyst-chaindata-types" }
+catalyst-chaindata-writer = { path = "crates/catalyst-chaindata-writer" }
+
+anyhow = "1.0.83"
+chrono = "0.4.38"
+lazy_static = "1.4.0"
+pallas-addresses = "0.25.0"
+pallas-codec = "0.25.0"
+pallas-traverse = "0.25.0"
+serde = { version = "1.0.202", default-features = false }
+serde_json = "1.0.117"
+tokio = { version = "1.37.0", default-features = false }
+
+[profile.release]
+# Should be on just for profiling
+debug = true

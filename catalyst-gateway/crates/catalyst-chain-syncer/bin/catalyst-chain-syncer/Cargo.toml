@@ -1,0 +1,16 @@
+[package]
+name = "catalyst-chain-syncer"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+cardano-immutabledb-reader = { workspace = true }
+catalyst-chaindata-types = { workspace = true }
+catalyst-chaindata-writer = { workspace = true }
+postgres-util = { workspace = true }
+
+clap = { version = "4.5.4", default-features = false, features = ["derive", "help", "usage", "std"] }
+memory-stats = "1.1.0"
+pallas-traverse = { workspace = true }
+parse-size = "1.0.0"
+tokio = { workspace = true, features = ["rt-multi-thread", "macros", "signal", "sync"] }
