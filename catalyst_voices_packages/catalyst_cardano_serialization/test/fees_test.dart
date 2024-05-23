@@ -12,8 +12,8 @@ void main() {
         coefficient: Coin(44),
       );
 
-      final tx = fullTestTransaction();
-      expect(linearFee.minNoScriptFee(tx), equals(159693));
+      final tx = fullSignedTestTransaction();
+      expect(linearFee.minNoScriptFee(tx), equals(176369));
     });
 
     test('minFeeNoScript with constant fee only', () {
@@ -22,7 +22,7 @@ void main() {
         coefficient: Coin(0),
       );
 
-      final tx = fullTestTransaction();
+      final tx = fullSignedTestTransaction();
       expect(linearFee.minNoScriptFee(tx), equals(linearFee.constant));
     });
 
@@ -32,8 +32,8 @@ void main() {
         coefficient: Coin(44),
       );
 
-      final tx = fullTestTransaction();
-      expect(linearFee.minNoScriptFee(tx), equals(4312));
+      final tx = fullSignedTestTransaction();
+      expect(linearFee.minNoScriptFee(tx), equals(20988));
     });
   });
 }
