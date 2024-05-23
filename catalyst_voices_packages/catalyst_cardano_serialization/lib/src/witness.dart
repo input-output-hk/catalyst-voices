@@ -8,6 +8,14 @@ class TransactionWitnessSet {
   /// The default constructor for [TransactionWitnessSet].
   const TransactionWitnessSet({required this.vkeyWitnesses});
 
+  /// Deserializes the type from cbor.
+  factory TransactionWitnessSet.fromCbor(CborValue value) {
+    final map = value as CborMap;
+    return TransactionWitnessSet(
+      vkeyWitnesses: map.values.map(VkeyWitness.fromCbor).toSet(),
+    );
+  }
+
   /// Serializes the type as cbor.
   CborValue toCbor() {
     return CborMap({
@@ -40,11 +48,26 @@ class VkeyWitness {
     );
   }
 
+  /// Deserializes the type from cbor.
+  factory VkeyWitness.fromCbor(CborValue value) {
+    final list = value as CborList;
+    final innerList = list[0] as CborList;
+    final vkey = innerList[0];
+    final signature = innerList[1];
+
+    return VkeyWitness(
+      vkey: Vkey.fromCbor(vkey),
+      signature: Ed25519Signature.fromCbor(signature),
+    );
+  }
+
   /// Serializes the type as cbor.
   CborValue toCbor() {
     return CborList([
-      vkey.toCbor(),
-      signature.toCbor(),
+      CborList([
+        vkey.toCbor(),
+        signature.toCbor(),
+      ]),
     ]);
   }
 }
@@ -64,6 +87,11 @@ extension type Vkey._(List<int> bytes) {
   /// Returns the [Vkey] filled with [byte] that can be
   /// used to reserve size to calculate the final transaction bytes size.
   factory Vkey.seeded(int byte) => Vkey.fromBytes(List.filled(length, byte));
+
+  /// Deserializes the type from cbor.
+  factory Vkey.fromCbor(CborValue value) {
+    return Vkey.fromBytes((value as CborBytes).bytes);
+  }
 
   /// Serializes the type as cbor.
   CborValue toCbor() => CborBytes(bytes);
@@ -87,6 +115,11 @@ extension type Ed25519Signature._(List<int> bytes) {
   /// used to reserve size to calculate the final transaction bytes size.
   factory Ed25519Signature.seeded(int byte) =>
       Ed25519Signature.fromBytes(List.filled(length, byte));
+
+  /// Deserializes the type from cbor.
+  factory Ed25519Signature.fromCbor(CborValue value) {
+    return Ed25519Signature.fromBytes((value as CborBytes).bytes);
+  }
 
   /// Serializes the type as cbor.
   CborValue toCbor() => CborBytes(bytes);

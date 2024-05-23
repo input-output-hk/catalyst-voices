@@ -11,6 +11,7 @@ asmjs
 asyncio
 asyncpg
 auditability
+backendpython
 bech
 bkioshn
 bluefireteam
@@ -44,7 +45,9 @@ dotenvy
 dotglob
 drep
 dreps
+dtscalac
 earthfile
+Easterling
 Edgedriver
 emurgo
 encryptor
@@ -76,6 +79,7 @@ Joaquín
 jorm
 jormungandr
 Jörmungandr
+junitxml
 junitreport
 Keyhash
 keyserver
@@ -88,6 +92,8 @@ libflutter
 lintfix
 localizable
 loguru
+lovelace
+lovelaces
 mdlint
 metadatum
 metadatums
@@ -115,6 +121,7 @@ pbxproj
 Pdart
 permissionless
 pg_isready
+pinenacl
 plpgsql
 podfile
 podhelper
@@ -133,6 +140,7 @@ Replayability
 repr
 reqwest
 rfwtxt
+rgloader
 ripgrep
 RPATH
 rustc
@@ -176,6 +184,7 @@ Utxos
 vite
 vitss
 vkey
+vkeys
 vkeywitness
 voteplan
 voteplans
@@ -191,11 +200,3 @@ xctest
 xctestrun
 xcworkspace
 yoroi
-multiplatform
-Multiplatform
-Easterling
-lovelace
-lovelaces
-pinenacl
-dtscalac
-vkeys

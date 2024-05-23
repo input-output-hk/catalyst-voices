@@ -1,8 +1,8 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.00.0 AS python-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.00.1 AS python-ci
 
-# builder : 
+# builder :
 builder:
     FROM python-ci+python-base
 
@@ -22,5 +22,8 @@ test:
         --load cat-gateway:latest=(../../+package-cat-gateway-with-preprod-snapshot) \
         --service cat-gateway \
         --allow-privileged
-        RUN poetry run pytest -s
+        RUN poetry run pytest -s --junitxml=junit-report.xml
+    END
+    WAIT
+        SAVE ARTIFACT junit-report.xml AS LOCAL backendpython.junit-report.xml
     END
