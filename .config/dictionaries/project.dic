@@ -11,6 +11,7 @@ asmjs
 asyncio
 asyncpg
 auditability
+backendpython
 bech
 bkioshn
 bluefireteam
@@ -78,6 +79,7 @@ Joaquín
 jorm
 jormungandr
 Jörmungandr
+junitxml
 junitreport
 Keyhash
 keyserver
