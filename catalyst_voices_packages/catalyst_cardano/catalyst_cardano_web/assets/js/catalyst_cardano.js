@@ -1,11 +1,20 @@
-import init, * as cardano_multiplatform_lib from './cardano_multiplatform_lib.js';
+// queries available wallet extensions exposed with
+// cardano.{wallet-name} according to CIP - 30 standard.
+function _getCardanoWallets() {
+    const cardano = window.cardano;
+    if (cardano) {
+        const keys = Object.keys(window.cardano);
+        const possibleWallets = keys.map((k) => cardano[k]);
+        return possibleWallets.filter((w) => typeof w === "object" && "enable" in w);
+    }
 
-// since cardano_multiplatform_lib is not extensible import,
-// lets create a wrapper, put all functions from cardano multiplatform
-// and include the missing ones
+    return [];
+}
+
+// a namespace containing the JS functions that
+// can be executed from dart side
 const catalyst_cardano = {
-    init: init,
-    ...cardano_multiplatform_lib,
+    getCardanoWallets: _getCardanoWallets,
 }
 
 // expose cardano multiplatform as globally accessible
