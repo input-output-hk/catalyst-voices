@@ -63,7 +63,9 @@ impl<T> WithErrorResponses<T> {
                 WithErrorResponses::Error(ErrorResponses::ServiceUnavailable)
             },
             err => {
-                let error = crate::service::common::objects::server_error::ServerError::new(None);
+                let error = crate::service::common::objects::server_error::ServerError::new(Some(
+                    err.to_string(),
+                ));
                 let id = error.id();
                 tracing::error!(id = format!("{id}"), "{}", err);
                 WithErrorResponses::Error(ErrorResponses::ServerError(Json(error)))
