@@ -26,16 +26,6 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// # GET /health/inspection
 ///
 /// Inspection settings endpoint.
-///
-///
-/// ## Responses
-///
-/// * 204 No Content - Service is Started and can  serve requests.
-/// * 400 API Validation Error
-/// * 500 Server Error - If anything within this function fails unexpectedly. (Possible
-///   but unlikely)
-/// * 503 Service Unavailable - Service has not started, do not send other requests.
-#[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(
     state: Data<&Arc<State>>, log_level: Option<LogLevel>,
     query_inspection: Option<DeepQueryInspection>,

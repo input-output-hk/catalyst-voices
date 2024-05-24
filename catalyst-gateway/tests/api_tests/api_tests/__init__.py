@@ -22,7 +22,6 @@ def cat_gateway_endpoint_url(endpoint: str):
 
 def check_is_live():
     resp = requests.get(cat_gateway_endpoint_url("api/health/live"))
-    print(f"resp: {resp}, code: {resp.status_code}")
     assert resp.status_code == 204
     logger.info("cat-gateway service is LIVE.")
 
@@ -54,6 +53,7 @@ def get_staked_ada(address: str, network: str, slot_number: int):
             f"api/cardano/staked_ada/{address}?network={network}&slot_number={slot_number}"
         )
     )
+    print(f"code: {resp.status_code}, data: {resp.json()}")
     assert resp.status_code == 200 or resp.status_code == 404
     if resp.status_code == 200:
         return resp.json()
