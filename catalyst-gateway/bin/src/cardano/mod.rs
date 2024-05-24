@@ -296,7 +296,7 @@ async fn index_many_blocks(
     };
 }
 
-///
+/// Index the data from the given blocks.
 async fn index_blocks(
     db: &EventDB, genesis_values: &GenesisValues, network_str: &str, blocks: &[MultiEraBlock<'_>],
 ) -> bool {
