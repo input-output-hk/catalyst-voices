@@ -10,7 +10,7 @@ IMPORT ../catalyst-gateway AS catalyst-gateway
 deps:
     FROM debian:bookworm-slim
     ARG TARGETARCH
-    ARG FLUTTER_VERSION=3.19.5
+    ARG FLUTTER_VERSION=3.22.1
     RUN apt-get update
     RUN apt-get install -y git curl unzip bzip2 bash jq gpg lcov
     COPY --dir test_driver/scripts .
