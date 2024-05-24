@@ -191,10 +191,11 @@ impl EventDB {
         let conn = self.pool.get().await?;
 
         let rows = conn
-            .query(
-                SELECT_VOTER_REGISTRATION_SQL,
-                &[&stake_credential, &network.to_string(), &slot_num],
-            )
+            .query(SELECT_VOTER_REGISTRATION_SQL, &[
+                &stake_credential,
+                &network.to_string(),
+                &slot_num,
+            ])
             .await?;
 
         let row = rows.first().ok_or(NotFoundError)?;
