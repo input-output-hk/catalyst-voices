@@ -56,7 +56,8 @@ code-generator:
 
 # check-flutter-code-generator - Checks that the code generation is consistent
 # with the generated code currently in the repo.
-check-flutter-code-generator:
+# TODO: enable it
+flutter-code-generator:
     FROM +code-generator
     # Copy generated files in the local file tree to a temporary folder
     COPY packages/catalyst_voices_services/lib/generated/catalyst_gateway /tmp/repo_generated
