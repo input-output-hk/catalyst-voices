@@ -132,10 +132,10 @@ impl EventDB {
     ///
     /// # Returns
     ///
-    /// `Result<(), anyhow::Error>`
+    /// `anyhow::Result<()>`
     pub(crate) async fn modify(
         &self, stmt: &str, params: &[&(dyn ToSql + Sync)],
-    ) -> Result<(), anyhow::Error> {
+    ) -> anyhow::Result<()> {
         if self.is_deep_query_enabled().await {
             // Check if this is a query statement
             if is_query_stmt(stmt) {
