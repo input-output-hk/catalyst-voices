@@ -4,12 +4,11 @@ use std::{str::FromStr, sync::Arc};
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
 use dotenvy::dotenv;
+use poem_openapi::Enum;
 use stringzilla::StringZilla;
 use tokio::sync::RwLock;
 use tokio_postgres::{types::ToSql, NoTls, Row};
 use tracing::{debug, debug_span, Instrument};
-
-use crate::state::{DatabaseInspectionSettings, DeepQueryInspection};
 
 pub(crate) mod cardano;
 pub(crate) mod error;
@@ -24,6 +23,27 @@ const DATABASE_URL_ENVVAR: &str = "EVENT_DB_URL";
 /// Must equal the last Migrations Version Number.
 pub(crate) const DATABASE_SCHEMA_VERSION: i32 = 9;
 
+#[derive(Clone, Copy, Default, Debug, Enum, PartialEq, Eq)]
+#[oai(rename_all = "lowercase")]
+/// Settings for deep query inspection
+pub(crate) enum DeepQueryInspectionFlag {
+    /// Enable deep query inspection
+    Enabled,
+    /// Disable deep query inspection
+    #[default]
+    Disabled,
+}
+
+impl From<bool> for DeepQueryInspectionFlag {
+    fn from(b: bool) -> Self {
+        if b {
+            Self::Enabled
+        } else {
+            Self::Disabled
+        }
+    }
+}
+
 #[allow(unused)]
 /// Connection to the Election Database
 pub(crate) struct EventDB {
@@ -31,8 +51,8 @@ pub(crate) struct EventDB {
     /// All database operations (queries, inserts, etc) should be constrained
     /// to this crate and should be exported with a clean data access api.
     pool: Pool<PostgresConnectionManager<NoTls>>,
-    /// Settings for inspecting the database.
-    inspection_settings: Arc<RwLock<DatabaseInspectionSettings>>,
+    /// Deep query inspection flag.
+    deep_query_inspection_flag: Arc<RwLock<DeepQueryInspectionFlag>>,
 }
 
 /// `EventDB` Errors
@@ -52,7 +72,7 @@ pub(crate) enum Error {
 impl EventDB {
     /// Determine if deep query inspection is enabled.
     pub(crate) async fn is_deep_query_enabled(&self) -> bool {
-        self.inspection_settings.read().await.deep_query == DeepQueryInspection::Enabled
+        *self.deep_query_inspection_flag.read().await == DeepQueryInspectionFlag::Enabled
     }
 
     /// Modify the deep query inspection setting.
@@ -60,9 +80,11 @@ impl EventDB {
     /// # Arguments
     ///
     /// * `deep_query` - `DeepQueryInspection` setting.
-    pub(crate) async fn modify_deep_query(&self, deep_query: DeepQueryInspection) {
-        let mut settings = self.inspection_settings.write().await;
-        settings.deep_query = deep_query;
+    pub(crate) async fn modify_deep_query(
+        &self, deep_query_inspection_flag: DeepQueryInspectionFlag,
+    ) {
+        let mut flag = self.deep_query_inspection_flag.write().await;
+        *flag = deep_query_inspection_flag;
     }
 
     /// Query the database.
@@ -244,7 +266,7 @@ pub(crate) async fn establish_connection(url: Option<String>) -> anyhow::Result<
 
     Ok(EventDB {
         pool,
-        inspection_settings: Arc::new(RwLock::new(DatabaseInspectionSettings::default())),
+        deep_query_inspection_flag: Arc::default(),
     })
 }
 

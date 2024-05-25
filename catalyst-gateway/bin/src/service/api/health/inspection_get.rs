@@ -7,9 +7,8 @@ use poem_openapi::ApiResponse;
 use tracing::{debug, error};
 
 use crate::{
-    logger::LogLevel,
-    service::common::responses::WithErrorResponses,
-    state::{DeepQueryInspection, State},
+    event_db::DeepQueryInspectionFlag, logger::LogLevel,
+    service::common::responses::WithErrorResponses, state::State,
 };
 
 /// Endpoint responses.
@@ -28,7 +27,7 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// Inspection settings endpoint.
 pub(crate) async fn endpoint(
     state: Data<&Arc<State>>, log_level: Option<LogLevel>,
-    query_inspection: Option<DeepQueryInspection>,
+    query_inspection: Option<DeepQueryInspectionFlag>,
 ) -> AllResponses {
     if let Some(level) = log_level {
         let inspection_settings = state.inspection_settings();

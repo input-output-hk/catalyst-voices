@@ -5,9 +5,8 @@ use poem::web::Data;
 use poem_openapi::{param::Query, OpenApi};
 
 use crate::{
-    logger::LogLevel,
-    service::common::tags::ApiTags,
-    state::{DeepQueryInspection, State},
+    event_db::DeepQueryInspectionFlag, logger::LogLevel, service::common::tags::ApiTags,
+    state::State,
 };
 
 mod inspection_get;
@@ -71,7 +70,7 @@ impl HealthApi {
     /// Options for service inspection.
     async fn inspection(
         &self, state: Data<&Arc<State>>, log_level: Query<Option<LogLevel>>,
-        query_inspection: Query<Option<DeepQueryInspection>>,
+        query_inspection: Query<Option<DeepQueryInspectionFlag>>,
     ) -> inspection_get::AllResponses {
         inspection_get::endpoint(state, log_level.0, query_inspection.0).await
     }

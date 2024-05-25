@@ -1,7 +1,6 @@
 //! Shared state used by all endpoints.
 use std::sync::Arc;
 
-use poem_openapi::Enum;
 use tokio::sync::RwLock;
 use tracing::level_filters::LevelFilter;
 use tracing_subscriber::{reload::Handle, Registry};
@@ -10,41 +9,6 @@ use crate::{
     event_db::{establish_connection, EventDB},
     logger::LogLevel,
 };
-
-#[derive(Clone, Copy, Debug, Enum, PartialEq, Eq)]
-#[oai(rename_all = "lowercase")]
-/// Settings for deep query inspection
-pub(crate) enum DeepQueryInspection {
-    /// Enable deep query inspection
-    Enabled,
-    /// Disable deep query inspection
-    Disabled,
-}
-
-impl From<bool> for DeepQueryInspection {
-    fn from(b: bool) -> Self {
-        if b {
-            Self::Enabled
-        } else {
-            Self::Disabled
-        }
-    }
-}
-
-#[derive(Clone, Copy)]
-/// Settings for database inspection
-pub(crate) struct DatabaseInspectionSettings {
-    /// Toggle deep query inspection.
-    pub(crate) deep_query: DeepQueryInspection,
-}
-
-impl Default for DatabaseInspectionSettings {
-    fn default() -> Self {
-        Self {
-            deep_query: DeepQueryInspection::Disabled,
-        }
-    }
-}
 
 /// Settings for logger level
 pub(crate) struct LoggerSettings {
