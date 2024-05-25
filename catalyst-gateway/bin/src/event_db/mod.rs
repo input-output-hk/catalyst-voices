@@ -106,11 +106,12 @@ impl EventDB {
     ) -> Result<Vec<Row>, anyhow::Error> {
         if self.is_deep_query_enabled().await {
             // Check if this is a query statement
-            if is_query_stmt(stmt) {
-                self.explain_analyze_rollback(stmt, params).await?;
-            } else {
-                return Err(Error::InvalidQueryStatement.into());
-            }
+            // if is_query_stmt(stmt) {
+            //     self.explain_analyze_rollback(stmt, params).await?;
+            // } else {
+            //     return Err(Error::InvalidQueryStatement.into());
+            // }
+            self.explain_analyze_rollback(stmt, params).await?;
         }
         let rows = self.pool.get().await?.query(stmt, params).await?;
         Ok(rows)
@@ -132,11 +133,12 @@ impl EventDB {
     ) -> Result<Row, anyhow::Error> {
         if self.is_deep_query_enabled().await {
             // Check if this is a query statement
-            if is_query_stmt(stmt) {
-                self.explain_analyze_rollback(stmt, params).await?;
-            } else {
-                return Err(Error::InvalidQueryStatement.into());
-            }
+            // if is_query_stmt(stmt) {
+            //     self.explain_analyze_rollback(stmt, params).await?;
+            // } else {
+            //     return Err(Error::InvalidQueryStatement.into());
+            // }
+            self.explain_analyze_rollback(stmt, params).await?;
         }
         let row = self.pool.get().await?.query_one(stmt, params).await?;
         Ok(row)
@@ -160,9 +162,9 @@ impl EventDB {
     ) -> anyhow::Result<()> {
         if self.is_deep_query_enabled().await {
             // Check if this is a query statement
-            if is_query_stmt(stmt) {
-                return Err(Error::InvalidModifyStatement.into());
-            }
+            // if is_query_stmt(stmt) {
+            //     return Err(Error::InvalidModifyStatement.into());
+            // }
             self.explain_analyze_commit(stmt, params).await?;
         } else {
             self.pool.get().await?.query(stmt, params).await?;
