@@ -69,7 +69,7 @@ pub(crate) struct ServiceSettings {
     pub(crate) follower_settings: FollowerSettings,
 
     /// Enable deep query inspection.
-    #[clap(long, action = clap::ArgAction::SetFalse)]
+    #[clap(long, action = clap::ArgAction::SetTrue)]
     pub(crate) deep_query_inspection: bool,
 }
 
