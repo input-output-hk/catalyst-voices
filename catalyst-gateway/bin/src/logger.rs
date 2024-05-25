@@ -66,7 +66,7 @@ pub(crate) fn init(log_level: LogLevel) -> Handle<LevelFilter, Registry> {
         .with_span_list(true);
     // Create a reloadable layer with the specified log_level
     let filter = LevelFilter::from_level(log_level.into());
-    let (filter, reload_handle) = reload::Layer::new(filter);
+    let (filter, logger_handle) = reload::Layer::new(filter);
     tracing_subscriber::registry()
         .with(filter)
         .with(layer)
@@ -75,5 +75,5 @@ pub(crate) fn init(log_level: LogLevel) -> Handle<LevelFilter, Registry> {
     // Logging is globally disabled by default, so globally enable it to the required level.
     tracing::log::set_max_level(log_level.into());
 
-    reload_handle
+    logger_handle
 }

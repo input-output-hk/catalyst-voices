@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use poem::web::Data;
 use poem_openapi::ApiResponse;
-use tracing::{debug, error};
+use tracing::debug;
 
 use crate::{
     event_db::DeepQueryInspectionFlag, logger::LogLevel,
@@ -30,13 +30,9 @@ pub(crate) async fn endpoint(
     query_inspection: Option<DeepQueryInspectionFlag>,
 ) -> AllResponses {
     if let Some(level) = log_level {
-        let inspection_settings = state.inspection_settings();
-        let settings = inspection_settings.read().await;
-        match settings.modify_logger_level(level) {
+        match state.modify_logger_level(level) {
             Ok(()) => debug!("successfully set log level to: {:?}", level),
-            Err(_) => {
-                error!("failed to set log level: {:?}", level);
-            },
+            Err(err) => return AllResponses::handle_error(&err),
         }
     }
 
