@@ -15,9 +15,11 @@ package-schemathesis:
     RUN apk add --no-cache gcc musl-dev
     RUN python -m pip install schemathesis==3.27.1
     RUN mkdir /results
+    COPY ./api_tests/api_tests/hooks.py .    
 
     VOLUME /results
-    ENTRYPOINT st run --checks all $openapi_spec \
+    ENTRYPOINT export SCHEMATHESIS_HOOKS=hooks \ 
+                    && st run --checks all $openapi_spec \
                     --workers=$workers \
                     --wait-for-schema=$wait_for_schema \
                     --max-response-time=$max_response_time \
