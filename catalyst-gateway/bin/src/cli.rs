@@ -9,7 +9,7 @@ use crate::{
     logger,
     service::{self, started},
     settings::{DocsSettings, ServiceSettings},
-    state::{InspectionSettings, State},
+    state::State,
 };
 
 #[derive(Parser)]
@@ -43,8 +43,7 @@ impl Cli {
                 // Unique machine id
                 let machine_id = settings.follower_settings.machine_uid;
 
-                let inspection = InspectionSettings::new(logger_handle);
-                let state = Arc::new(State::new(Some(settings.database_url), inspection).await?);
+                let state = Arc::new(State::new(Some(settings.database_url), logger_handle).await?);
                 let event_db = state.event_db();
                 event_db
                     .modify_deep_query(settings.deep_query_inspection.into())
