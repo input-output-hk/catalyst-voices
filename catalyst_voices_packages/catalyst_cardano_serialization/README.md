@@ -23,8 +23,8 @@ and submission are outside of scope of this package.
 
 ## Requirements
 
-* Dart: 3.3.0+
-* Flutter: 3.19.5+
+* Dart: 3.3.4+
+* Flutter: 3.22.1+
 
 ## Install
 

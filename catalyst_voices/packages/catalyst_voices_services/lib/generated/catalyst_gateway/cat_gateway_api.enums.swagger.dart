@@ -50,3 +50,27 @@ enum VoterGroupId {
 
   const VoterGroupId(this.value);
 }
+
+enum VotingInfoDelegationsType {
+  @JsonValue(null)
+  swaggerGeneratedUnknown(null),
+
+  @JsonValue('Delegated')
+  delegated('Delegated');
+
+  final String? value;
+
+  const VotingInfoDelegationsType(this.value);
+}
+
+enum VotingInfoDirectVoterType {
+  @JsonValue(null)
+  swaggerGeneratedUnknown(null),
+
+  @JsonValue('Direct')
+  direct('Direct');
+
+  final String? value;
+
+  const VotingInfoDirectVoterType(this.value);
+}
