@@ -3,7 +3,7 @@ use std::io;
 use minicbor::{Encode, Encoder};
 use regex::Regex;
 
-use crate::c509_enum::StringType;
+use crate::{c509_enum::{PubKeyAlgoRegistry, StringType}, cbor::cbor_encode_bytes};
 
 impl<'a> Encode<()> for StringType {
     fn encode<W: minicbor::encode::Write>(
@@ -78,6 +78,30 @@ fn encode_common_name(name: &str, encoder: &mut Encoder<&mut Vec<u8>>) {
         }
     } else {
         encoder.str(name).unwrap();
+    }
+}
+
+#[allow(unused)]
+fn encode_subject_public_key(pubk_type: PubKeyAlgoRegistry, pubk: Vec<u8>, encoder: &mut Encoder<&mut Vec<u8>>) {
+    // RSA public keys
+    if pubk_type == PubKeyAlgoRegistry::RSA {
+        println!("Not support yet");
+    // Elliptic curve public keys in Weierstraß
+    } else if [
+        PubKeyAlgoRegistry::Secp256r1,
+        PubKeyAlgoRegistry::Secp384r1,
+        PubKeyAlgoRegistry::Secp521r1,
+        PubKeyAlgoRegistry::Brainpool256r1,
+        PubKeyAlgoRegistry::Brainpool384r1,
+        PubKeyAlgoRegistry::Brainpool512r1,
+        PubKeyAlgoRegistry::Frp256v1,
+        PubKeyAlgoRegistry::SM2P256v1,
+    ]
+    .contains(&pubk_type)
+    {
+        println!("Not support yet");
+    } else {
+        cbor_encode_bytes(pubk, encoder);
     }
 }
 

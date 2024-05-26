@@ -12,5 +12,9 @@ pub(crate) fn cbor_encode_integer_as_bytestring(integer: u64, encoder: &mut Enco
         .collect::<Vec<u8>>();
 
     // Encode the significant bytes as a byte string in CBOR format
-    encoder.bytes(&significant_bytes).unwrap();
+    cbor_encode_bytes(significant_bytes, encoder);
+}
+
+pub(crate) fn cbor_encode_bytes(bytes: Vec<u8>, encoder: &mut Encoder<&mut Vec<u8>>) {
+    encoder.bytes(&bytes).unwrap();
 }

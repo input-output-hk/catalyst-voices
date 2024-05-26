@@ -38,6 +38,7 @@ pub(crate) enum AttributesRegistry {
 }
 
 #[allow(unused)]
+#[derive(PartialEq)]
 pub(crate) enum PubKeyAlgoRegistry {
     RSA = 0,
     Secp256r1 = 1 ,
