@@ -7,7 +7,7 @@ pub type ManageTasks = JoinHandle<()>;
 use cardano_chain_follower::{
     network_genesis_values, ChainUpdate, Follower, FollowerConfigBuilder, Network, Point,
 };
-use pallas::ledger::traverse::{wellknown::GenesisValues, MultiEraBlock};
+use pallas::ledger::traverse::{wellknown::GenesisValues, MultiEraBlock, MultiEraTx};
 use tokio::{sync::mpsc, task::JoinHandle, time};
 use tracing::{error, info};
 
@@ -196,31 +196,29 @@ async fn process_blocks(
 
     loop {
         match follower.next().await {
-            Ok(chain_update) => {
-                match chain_update {
-                    ChainUpdate::Block(data) => {
-                        if blocks_tx.send(data).await.is_err() {
-                            error!("Block indexing task not running");
-                            break;
-                        };
-                    },
-                    ChainUpdate::Rollback(data) => {
-                        let block = match data.decode() {
-                            Ok(block) => block,
-                            Err(err) => {
-                                error!("Unable to decode {network:?} block {err} - skip..");
-                                continue;
-                            },
-                        };
+            Ok(chain_update) => match chain_update {
+                ChainUpdate::Block(data) => {
+                    if blocks_tx.send(data).await.is_err() {
+                        error!("Block indexing task not running");
+                        break;
+                    };
+                },
+                ChainUpdate::Rollback(data) => {
+                    let block = match data.decode() {
+                        Ok(block) => block,
+                        Err(err) => {
+                            error!("Unable to decode {network:?} block {err} - skip..");
+                            continue;
+                        },
+                    };
 
-                        info!(
-                            "Rollback block NUMBER={} SLOT={} HASH={}",
-                            block.number(),
-                            block.slot(),
-                            hex::encode(block.hash()),
-                        );
-                    },
-                }
+                    info!(
+                        "Rollback block NUMBER={} SLOT={} HASH={}",
+                        block.number(),
+                        block.slot(),
+                        hex::encode(block.hash()),
+                    );
+                },
             },
             Err(err) => {
                 error!(
@@ -326,74 +324,94 @@ async fn index_transactions(db: &EventDB, blocks: &[MultiEraBlock<'_>], network_
         .flat_map(|b| b.txs().into_iter().map(|tx| (b.slot(), tx)))
         .collect();
 
-    // Index transaction data
-    {
-        let values: Vec<_> = blocks_txs
-            .iter()
-            .map(|(slot, tx)| {
-                // SAFETY: This is safe to ignore because we would not reach this point if
-                // the try_into inside the block indexing loop had failed.
-                #[allow(clippy::cast_possible_wrap)]
-                IndexedTxnParams {
-                    id: tx.hash().to_vec(),
-                    slot_no: *slot as i64,
-                    network: network_str,
-                }
-            })
-            .collect();
-
-        match db.index_many_txn_data(&values).await {
-            Ok(()) => info!(count = values.len(), "Finished indexing transactions"),
-            Err(e) => {
-                error!(error = ?e, "Failed to index transactions");
-                return false;
-            },
-        }
+    if !index_transactions_data(db, network_str, &blocks_txs).await {
+        return false;
     }
 
-    // Index transaction output data
-    {
-        let values: Vec<_> = blocks_txs
-            .iter()
-            .flat_map(|(_, tx)| IndexedTxnOutputParams::from_txn_data(tx))
-            .collect();
-
-        match db.index_many_txn_output_data(&values).await {
-            Ok(()) => {
-                info!(
-                    count = values.len(),
-                    "Finished indexing transaction outputs data"
-                );
-            },
-            Err(e) => {
-                error!(error = ?e, "Failed to index transaction outputs data");
-                return false;
-            },
-        }
+    if !index_transaction_outputs_data(db, &blocks_txs).await {
+        return false;
     }
 
-    // Index transaction input data
-    {
-        let values: Vec<_> = blocks_txs
-            .iter()
-            .flat_map(|(_, tx)| IndexedTxnInputParams::from_txn_data(tx))
-            .collect();
-
-        match db.index_many_txn_input_data(&values).await {
-            Ok(()) => {
-                info!(
-                    count = values.len(),
-                    "Finished indexing transaction inputs data"
-                );
-            },
-            Err(e) => {
-                error!(error = ?e, "Failed to index transaction inputs data");
-                return false;
-            },
-        }
+    if !index_transaction_inputs_data(db, &blocks_txs).await {
+        return false;
     }
 
     true
+}
+
+/// Index transactions data.
+async fn index_transactions_data(
+    db: &EventDB, network_str: &str, blocks_txs: &[(u64, MultiEraTx<'_>)],
+) -> bool {
+    let values: Vec<_> = blocks_txs
+        .iter()
+        .map(|(slot, tx)| {
+            // SAFETY: This is safe to ignore because we would not reach this point if
+            // the try_into inside the block indexing loop had failed.
+            #[allow(clippy::cast_possible_wrap)]
+            IndexedTxnParams {
+                id: tx.hash().to_vec(),
+                slot_no: *slot as i64,
+                network: network_str,
+            }
+        })
+        .collect();
+
+    match db.index_many_txn_data(&values).await {
+        Ok(()) => info!(count = values.len(), "Finished indexing transactions"),
+        Err(e) => {
+            error!(error = ?e, "Failed to index transactions");
+            return false;
+        },
+    }
+
+    true
+}
+
+/// Index transaction outputs data.
+async fn index_transaction_outputs_data(
+    db: &EventDB, blocks_txs: &[(u64, MultiEraTx<'_>)],
+) -> bool {
+    let values: Vec<_> = blocks_txs
+        .iter()
+        .flat_map(|(_, tx)| IndexedTxnOutputParams::from_txn_data(tx))
+        .collect();
+
+    match db.index_many_txn_output_data(&values).await {
+        Ok(()) => {
+            info!(
+                count = values.len(),
+                "Finished indexing transaction outputs data"
+            );
+            true
+        },
+        Err(e) => {
+            error!(error = ?e, "Failed to index transaction outputs data");
+            false
+        },
+    }
+}
+
+/// Index transaction inputs data.
+async fn index_transaction_inputs_data(db: &EventDB, blocks_txs: &[(u64, MultiEraTx<'_>)]) -> bool {
+    let values: Vec<_> = blocks_txs
+        .iter()
+        .flat_map(|(_, tx)| IndexedTxnInputParams::from_txn_data(tx))
+        .collect();
+
+    match db.index_many_txn_input_data(&values).await {
+        Ok(()) => {
+            info!(
+                count = values.len(),
+                "Finished indexing transaction inputs data"
+            );
+            true
+        },
+        Err(e) => {
+            error!(error = ?e, "Failed to index transaction inputs data");
+            false
+        },
+    }
 }
 
 /// Index voter registrations from a slice of blocks.
