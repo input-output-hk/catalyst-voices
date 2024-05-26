@@ -4,7 +4,6 @@ use std::{str::FromStr, sync::Arc};
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
 use dotenvy::dotenv;
-use poem_openapi::Enum;
 use stringzilla::StringZilla;
 use tokio::sync::RwLock;
 use tokio_postgres::{types::ToSql, NoTls, Row};
@@ -23,8 +22,7 @@ const DATABASE_URL_ENVVAR: &str = "EVENT_DB_URL";
 /// Must equal the last Migrations Version Number.
 pub(crate) const DATABASE_SCHEMA_VERSION: i32 = 9;
 
-#[derive(Clone, Copy, Default, Debug, Enum, PartialEq, Eq)]
-#[oai(rename_all = "lowercase")]
+#[derive(Clone, Copy, Default, Debug, PartialEq, Eq)]
 /// Settings for deep query inspection
 pub(crate) enum DeepQueryInspectionFlag {
     /// Enable deep query inspection
