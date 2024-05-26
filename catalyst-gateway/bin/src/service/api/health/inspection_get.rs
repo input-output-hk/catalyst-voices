@@ -8,7 +8,7 @@ use tracing::debug;
 
 use crate::{event_db, logger, service::common::responses::WithErrorResponses, state::State};
 
-/// LogLevel api argument.
+/// `LogLevel` Open API definition.
 #[derive(Debug, Clone, Copy, Enum)]
 #[oai(rename_all = "lowercase")]
 pub(crate) enum LogLevel {
@@ -22,9 +22,9 @@ pub(crate) enum LogLevel {
     Error,
 }
 
-impl Into<logger::LogLevel> for LogLevel {
-    fn into(self) -> logger::LogLevel {
-        match self {
+impl From<LogLevel> for logger::LogLevel {
+    fn from(val: LogLevel) -> Self {
+        match val {
             LogLevel::Debug => logger::LogLevel::Debug,
             LogLevel::Info => logger::LogLevel::Info,
             LogLevel::Warn => logger::LogLevel::Warn,
@@ -33,9 +33,9 @@ impl Into<logger::LogLevel> for LogLevel {
     }
 }
 
+/// `DeepQueryInspectionFlag` Open API definition.
 #[derive(Debug, Clone, Copy, Enum)]
 #[oai(rename_all = "lowercase")]
-/// Settings for deep query inspection
 pub(crate) enum DeepQueryInspectionFlag {
     /// Enable deep query inspection
     Enabled,
@@ -43,9 +43,9 @@ pub(crate) enum DeepQueryInspectionFlag {
     Disabled,
 }
 
-impl Into<event_db::DeepQueryInspectionFlag> for DeepQueryInspectionFlag {
-    fn into(self) -> event_db::DeepQueryInspectionFlag {
-        match self {
+impl From<DeepQueryInspectionFlag> for event_db::DeepQueryInspectionFlag {
+    fn from(val: DeepQueryInspectionFlag) -> Self {
+        match val {
             DeepQueryInspectionFlag::Enabled => event_db::DeepQueryInspectionFlag::Enabled,
             DeepQueryInspectionFlag::Disabled => event_db::DeepQueryInspectionFlag::Disabled,
         }
