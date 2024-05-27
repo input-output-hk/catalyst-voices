@@ -9,9 +9,16 @@ spec:
       - "--api"
       - "--api.dashboard=true"
       - "--api.insecure=true"
+    logs:
+      level: INFO
+      access:
+        enabled: true      
     ports:
       traefik:
         expose: true
     providers:
       kubernetesCRD:
         allowCrossNamespace: true
+    deployment:
+      kind: DaemonSet
+    hostNetwork: true

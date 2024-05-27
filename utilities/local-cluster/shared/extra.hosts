@@ -1,6 +1,7 @@
 # Basic cluster Hostnames
 192.168.58.10   cluster.test                # The cluster default hostname
 192.168.58.10   registry.cluster.test       # The local container registry
+192.168.58.10   registry-ui.cluster.test    # The local container registry UI
 192.168.58.10   traefik.cluster.test        # The Traefik Ingress dashboard
 192.168.58.10   grafana.cluster.test        # The Grafana dashboard
 192.168.58.10   alert-manager.cluster.test  # The Alert manager service.

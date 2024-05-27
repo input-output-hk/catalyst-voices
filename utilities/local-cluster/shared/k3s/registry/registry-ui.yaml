@@ -36,7 +36,7 @@ spec:
             - name: REGISTRY_TITLE
               value: "Catalyst Test Cluster - Container Registry"
             - name: REGISTRY_URL
-              value: "http://registry.cluster.test:5000"
+              value: "https://registry.cluster.test"
           resources:
             limits:
               cpu: "0.2"
@@ -51,13 +51,10 @@ metadata:
   name: registry-ui-ingress
   annotations:
     spec.ingressClassName: traefik
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    # use this if you want basic auth on the UI
-    # you have to use the registry credential any way
-    # traefik.ingress.kubernetes.io/router.middlewares: default-registry-basic-auth@kubernetescrd
+    cert-manager.io/cluster-issuer: selfsigned-cluster-issuer
 spec:
   rules:
-    - host: registry.cluster.test
+    - host: registry-ui.cluster.test
       http:
         paths:
           - path: /
@@ -67,3 +64,7 @@ spec:
                 name: registry-ui
                 port:
                   number: 80
+  tls:
+    - secretName: registry-ui-tls
+      hosts:
+        - registry-ui.cluster.test

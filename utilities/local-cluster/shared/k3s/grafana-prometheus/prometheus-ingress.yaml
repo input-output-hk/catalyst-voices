@@ -5,8 +5,7 @@ metadata:
   name: prometheus-ingress
   annotations:
     spec.ingressClassName: traefik
-    #cert-manager.io/cluster-issuer: letsencrypt-prod
-    #traefik.ingress.kubernetes.io/router.middlewares: default-my-basic-auth@kubernetescrd
+    cert-manager.io/cluster-issuer: selfsigned-cluster-issuer
 spec:
   rules:
     - host: prometheus.cluster.test
@@ -19,7 +18,7 @@ spec:
                 name: prometheus-stack-kube-prom-prometheus
                 port:
                   number: 9090
-  #tls:
-  #  - secretName: prometheus-tls
-  #    hosts:
-  #      - prometheus.cluster.test
+  tls:
+    - secretName: prometheus-tls
+      hosts:
+        - prometheus.cluster.test

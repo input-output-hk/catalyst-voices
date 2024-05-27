@@ -2,7 +2,6 @@
 kubeEtcd:
   enabled: true
 
-# Disable kube-controller-manager and kube-scheduler monitoring. See https://github.com/cablespaghetti/k3s-monitoring/issues/2
 kubeControllerManager:
   enabled: true
 kubeScheduler:
@@ -11,18 +10,17 @@ kubeScheduler:
 prometheus:
   prometheusSpec:
     retention: 3d
-
-    # storageSpec:
-    #  volumeClaimTemplate:
-    #    metadata:
-    #      name: prometheus-longhorn-pvc
-    #    spec:
-    #      accessModes:
-    #        - ReadWriteOnce
-    #      storageClassName: longhorn
-    #      resources:
-    #        requests:
-    #          storage: 2Gi
+    storageSpec:
+      volumeClaimTemplate:
+        metadata:
+          name: prometheus-pvc
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          storageClassName: local-path
+          resources:
+            requests:
+              storage: 2Gi
 
 grafana:
   plugins:
@@ -39,15 +37,12 @@ grafana:
       org_role: Admin
     auth.basic:
       enabled: false
-
-  # persistence:
-  #  enabled: true
-  #  type: pvc
-  #  storageClassName: longhorn
-  #  accessModes:
-  #  - ReadWriteOnce
-  #  size: 4Gi
-  #  finalizers:
-  #  - kubernetes.io/pvc-protection
-  # ALTERNATIVELY IF YOU HAVE AN EXISTING CLAIM YOU WISH TO USE/REUSE
-  # existingClaim: prom-grafana
+    persistence:
+      enabled: true
+      type: pvc
+      storageClassName: local-path
+      accessModes:
+        - ReadWriteOnce
+      size: 4Gi
+      finalizers:
+        - kubernetes.io/pvc-protection

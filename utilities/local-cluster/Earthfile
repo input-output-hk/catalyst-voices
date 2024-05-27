@@ -4,15 +4,17 @@ VERSION 0.8
 # Needs both Vagrant and Virtualbox installed on the local machine.
 start-cluster:
     LOCALLY
+    ARG NATIVEPLATFORM
     # Check if the necessary tools are present locally
     RUN kubectl version --client=true
     RUN helm version --short
     # Check if the necessary local DNS entries exist
     RUN python scripts/check-cluster-dns.py ./shared/extra.hosts
     # Everything checks out so far, try and start the cluster.
+    IF [ "$NATIVEPLATFORM" = "darwin/arm64" ]
+        RUN VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 vagrant plugin install vagrant-qemu
+    END
     RUN vagrant up
-    # Add default services
-    # Add grafana/loki
 
 # stop-cluster : stops the locally running cluster
 stop-cluster:

@@ -1,30 +1,50 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-
-server_ip = "192.168.58.10"
+control_ip = "192.168.58.10"
 
 # Determine the maximum number of agents, and set their IP addresses
 agents = { "agent1" => "192.168.58.11",
            "agent2" => "192.168.58.12" }
 
-server_vcpu = "4" # Number of vCPUs in the VM
-server_memory = "51292" # 5G of Memory (An extra gig because its the server node)
+# This is sized so that a machine with 16 threads and 16GB will allocate at most 
+# ~3/4 of its resources to the cluster.
+control_vcpu = "4" # Number of vCPUs in the VM
+control_memory = "5192" # 5G of Memory (An extra gig because its the control-plane node)
 
 agent_vcpu = "4" # Number of vCPUs in the VM
 agent_memory = "4096" # 4G of Memory
 
 is_darwin_arm64 = Vagrant::Util::Platform.architecture == "arm64" && Vagrant::Util::Platform.darwin?
 
-# Extra parameters in INSTALL_K3S_EXEC variable because of
-# K3s picking up the wrong interface when starting server and agent
-# https://github.com/alexellis/k3sup/issues/306
-
 static_ips = <<-SHELL
     sudo -i
     cat /vagrant_shared/extra.hosts >> /etc/hosts
     SHELL
 
-server_script = <<-SHELL
+debian_packages = <<-SHELL
+    sudo -i
+    # Install necessary System tools/libraries
+    apt-get update
+    DEBIAN_FRONTEND=noninteractive apt-get upgrade -yqq --no-install-recommends
+    echo "Updated and Upgraded"
+    DEBIAN_FRONTEND=noninteractive apt-get install -yqq --no-install-recommends \
+                    curl \
+                    ca-certificates \
+                    open-iscsi \
+                    wget \
+                    unzip \
+                    zstd
+    SHELL
+
+helm_install_script = <<-SHELL
+    sudo -i
+    curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list
+    apt-get update
+    apt-get install helm    
+    SHELL
+
+control_plane_script = <<-SHELL
     sudo -i
     # Read preconfiguration from shared directory and install it
     mkdir -p /etc/rancher/k3s/
@@ -32,13 +52,20 @@ server_script = <<-SHELL
     cp /vagrant_shared/k3s/server/manifests/* /var/lib/rancher/k3s/server/manifests/
     cp /vagrant_shared/k3s/registries.yaml /etc/rancher/k3s/
     # Install and start k3s server node
-    export INSTALL_K3S_EXEC="--bind-address=#{server_ip} --node-external-ip=#{server_ip} --flannel-iface=eth1"
+    # Extra parameters in INSTALL_K3S_EXEC variable because of
+    # K3s picking up the wrong interface when starting the control-plane and agents
+    # https://github.com/alexellis/k3sup/issues/306
+    export INSTALL_K3S_EXEC="--bind-address=#{control_ip} --node-external-ip=#{control_ip} --flannel-iface=eth1"
     curl -sfL https://get.k3s.io | sh -
     echo "Sleeping for 5 seconds to wait for k3s to start"
     sleep 5
     # Export generated config into shared directory so we can use it outside the cluster.
     cp /var/lib/rancher/k3s/server/token /vagrant_shared/
     cp /etc/rancher/k3s/k3s.yaml /vagrant_shared/
+    # Install kubetail for debugging
+    curl -sfL https://github.com/johanhaleby/kubetail/archive/refs/tags/1.6.20.tar.gz | tar xz
+    mv kubetail-*/kubetail /usr/local/bin
+    rm -rf kubetail-*
     SHELL
 
 agent_script = <<-SHELL
@@ -46,14 +73,44 @@ agent_script = <<-SHELL
     # Read preconfiguration from shared directory and install it
     mkdir -p /etc/rancher/k3s/
     cp /vagrant_shared/k3s/registries.yaml /etc/rancher/k3s/
-    # Install and start k3s agent/worker node
+    # Install and start k3s agent nodes
     export K3S_TOKEN_FILE=/vagrant_shared/token
-    export K3S_URL=https://#{server_ip}:6443
+    export K3S_URL=https://#{control_ip}:6443
     export INSTALL_K3S_EXEC="--flannel-iface=eth1"
     curl -sfL https://get.k3s.io | sh -
     SHELL
 
-registry_script = <<-SHELL
+cert_manager_install_script = <<-SHELL
+    # See: https://cert-manager.io/docs/installation/helm/
+    sudo  -i
+    export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+    helm repo add jetstack https://charts.jetstack.io
+    helm repo update
+    helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --set installCRDs=true
+    kubectl apply -f /vagrant_shared/k3s/cert-manager/self-signed-issuer.yaml
+    SHELL
+
+longhorn_install_script = <<-SHELL
+    # See: https://docs.k3s.io/storage
+    #      https://longhorn.io/docs/1.6.2/deploy/install/install-with-kubectl
+    # Note: This fails to work because virtualbox file shares do not support the necessary
+    # filesystem operations required by longhorn.\
+    sudo  -i
+    export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+    helm repo add longhorn https://charts.longhorn.io
+    helm repo update
+    helm install longhorn longhorn/longhorn --namespace longhorn-system --create-namespace --version 1.6.2
+    kubectl apply -f /vagrant_shared/k3s/longhorn/storage-classes.yaml
+    kubectl apply -f /vagrant_shared/k3s/longhorn/ingress.yaml     
+    SHELL
+
+local_path_provisioner_script = <<-SHELL
+    # See: https://github.com/rancher/local-path-provisioner/blob/master/README.md
+    sudo   -i
+    kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.26/deploy/local-path-storage.yaml
+    SHELL
+
+registry_script_old = <<-SHELL
     sudo -i
     # Start local docker registry - running on the server VM
     # Keeps files in the persistent shared directory
@@ -67,20 +124,19 @@ registry_script = <<-SHELL
       --name registry registry:2
     SHELL
 
-helm_install_script = <<-SHELL
+registry_script = <<-SHELL
     sudo -i
-    curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
-    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list
-    apt-get update
-    apt-get install helm    
+    kubectl apply -f /vagrant_shared/k3s/registry/registry-service.yaml
+    kubectl apply -f /vagrant_shared/k3s/registry/registry-ui.yaml
     SHELL
+
 
 monitoring_install_script = <<-SHELL
     # See: https://k3s.rocks/metrics/
     sudo -i
+    export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
     helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
     helm repo update    
-    export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
     helm install prometheus-stack --version 58.6.0 -f /vagrant_shared/k3s/grafana-prometheus/prometheus-values.yaml prometheus-community/kube-prometheus-stack
     kubectl apply -f /vagrant_shared/k3s/grafana-prometheus/alert-manager-ingress.yaml
     kubectl apply -f /vagrant_shared/k3s/grafana-prometheus/prometheus-ingress.yaml
@@ -89,36 +145,69 @@ monitoring_install_script = <<-SHELL
     kubectl apply -f /vagrant_shared/k3s/grafana-prometheus/traefik-dashboard.yaml
     SHELL
 
+scylladb_install_script = <<-SHELL
+    # See: https://operator.docs.scylladb.com/stable/generic.html
+    sudo -i
+    export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+    git clone --single-branch --branch v1.12.2 --depth=1 https://github.com/scylladb/scylla-operator.git scylla-operator
+    pushd scylla-operator
+    kubectl apply -f deploy/operator.yaml
+    kubectl wait --for condition=established crd/scyllaclusters.scylla.scylladb.com
+    kubectl -n scylla-operator rollout status deployment.apps/scylla-operator
+    #kubectl -n scylla-operator logs deployment.apps/scylla-operator
+    kubectl create -f /vagrant_shared/k3s/scylladb/cluster.yaml
+    popd
+    rm -rf scylla-operator
+    SHELL
+
+
+cassandra_install_script = <<-SHELL
+    # See: https://docs.k8ssandra.io/install/local/single-cluster-helm/
+    sudo -i
+    export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+    helm repo add k8ssandra https://helm.k8ssandra.io/stable
+    helm install k8ssandra-operator k8ssandra/k8ssandra-operator -n k8ssandra-operator --set global.clusterScoped=true --create-namespace --wait
+    kubectl apply -f /vagrant_shared/k3s/cassandra/k8c1.yml
+    SHELL
+
 
 Vagrant.configure("2") do |config|
   config.vm.box = "generic/debian12"
 
-  config.vm.define "server", primary: true do |server|
-    server.vm.network "private_network", ip: server_ip
-    server.vm.hostname = "server"
-    server.vm.network "forwarded_port", guest: 5000, host: 5000
+  config.vm.define "control", primary: true do |control|
+    control.vm.network "private_network", ip: control_ip
+    control.vm.hostname = "control"
 
     if !is_darwin_arm64
       # x86 anything should work with this
-      server.vm.synced_folder "./shared", "/vagrant_shared"
-      server.vm.provider "virtualbox" do |vb|
-        vb.memory = server_memory
-        vb.cpus = server_vcpu
+      control.vm.synced_folder "./shared", "/vagrant_shared"
+      # control.vm.synced_folder "./shared/longhorn/control", "/var/lib/longhorn"
+      control.vm.synced_folder "./shared/storage/control", "/opt/local-path-provisioner"
+      control.vm.provider "virtualbox" do |vb|
+        vb.memory = control_memory
+        vb.cpus = control_vcpu
       end
     else
       # Specific config just for Arm Macs.
-      server.vm.synced_folder "./shared", "/vagrant_shared", type: "smb"
-      server.vm.provider "qemu" do |qe|
-        qe.memory = server_memory
-        qe.smp = server_vcpu
+      control.vm.synced_folder "./shared", "/vagrant_shared", type: "smb"
+      # control.vm.synced_folder "./shared/longhorn/control", "/var/lib/longhorn", type: "smb"
+      control.vm.synced_folder "./shared/storage/control", "/opt/local-path-provisioner", type: "smb"
+      control.vm.provider "qemu" do |qe|
+        qe.memory = control_memory
+        qe.smp = control_vcpu
       end
     end
-    server.vm.provision :docker
-    server.vm.provision "shell", inline: static_ips
-    server.vm.provision "shell", inline: registry_script
-    server.vm.provision "shell", inline: server_script
-    server.vm.provision "shell", inline: helm_install_script
-    server.vm.provision "shell", inline: monitoring_install_script
+    control.vm.provision "shell", inline: static_ips
+    control.vm.provision "shell", inline: debian_packages
+    control.vm.provision "shell", inline: helm_install_script
+    control.vm.provision "shell", inline: control_plane_script
+    control.vm.provision "shell", inline: cert_manager_install_script
+    control.vm.provision "shell", inline: local_path_provisioner_script
+    # control.vm.provision "shell", inline: longhorn_install_script
+    control.vm.provision "shell", inline: monitoring_install_script
+    control.vm.provision "shell", inline: registry_script
+    control.vm.provision "shell", inline: scylladb_install_script
+    # control.vm.provision "shell", inline: cassandra_install_script
   end
 
   agents.each do |agent_name, agent_ip|
@@ -127,18 +216,23 @@ Vagrant.configure("2") do |config|
       agent.vm.hostname = agent_name
       if !is_darwin_arm64
         agent.vm.synced_folder "./shared", "/vagrant_shared"
+        # agent.vm.synced_folder "./shared/longhorn/"+agent_name, "/var/lib/longhorn"
+        agent.vm.synced_folder "./shared/storage/"+agent_name, "/opt/local-path-provisioner"
         agent.vm.provider "virtualbox" do |vb|
           vb.memory = agent_memory
           vb.cpus = agent_vcpu
         end
       else
         agent.vm.synced_folder "./shared", "/vagrant_shared", type: "smb"
+        #agent.vm.synced_folder "./shared/longhorn/"+agent_name, "/var/lib/longhorn", type: "smb"
+        agent.vm.synced_folder "./shared/storage/"+agent_name, "/opt/local-path-provisioner", type: "smb"
         agent.vm.provider "qemu" do |qe|
           qe.memory = agent_memory
           qe.smp = agent_vcpu
         end
       end
       agent.vm.provision "shell", inline: static_ips
+      agent.vm.provision "shell", inline: debian_packages
       agent.vm.provision "shell", inline: agent_script
     end
   end

@@ -2,4 +2,4 @@
 mirrors:
   registry.cluster.test:
     endpoint:
-      - "http://registry.cluster.test:5000"
+      - "http://registry.cluster.test"

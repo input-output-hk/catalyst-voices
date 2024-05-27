@@ -1,24 +1,24 @@
-# cspell: words kubernetescrd
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: grafana-ingress
+  name: longhorn-ingress
+  namespace: longhorn-system
   annotations:
     spec.ingressClassName: traefik
     cert-manager.io/cluster-issuer: selfsigned-cluster-issuer
 spec:
   rules:
-    - host: grafana.cluster.test
+    - host: longhorn.cluster.test
       http:
         paths:
-          - path: /
-            pathType: Prefix
+          - pathType: Prefix
+            path: "/"
             backend:
               service:
-                name: prometheus-stack-grafana
+                name: longhorn-frontend
                 port:
                   number: 80
   tls:
-    - secretName: grafana-tls
+    - secretName: longhorn-tls
       hosts:
-        - grafana.cluster.test
+        - longhorn.cluster.test
