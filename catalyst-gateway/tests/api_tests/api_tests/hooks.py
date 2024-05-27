@@ -29,7 +29,7 @@ def before_load_schema(
         if "patch" not in endpoint_data:
             endpoint_data.update([("patch", new_info),])
         if "delete" not in endpoint_data:
-            endpoint_data.update([("patch", new_info),])
+            endpoint_data.update([("delete", new_info),])
 
         # Update endpoint
         raw_schema["paths"][endpoint] = endpoint_data
