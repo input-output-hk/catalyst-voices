@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:typed_data';
 
+import 'package:catalyst_cardano_platform_interface/src/cardano_wallet.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 /// The interface that implementations of catalyst_cardano must
@@ -40,19 +40,9 @@ abstract class CatalystCardanoPlatform extends PlatformInterface {
   /// Constructs a CatalystCardanoPlatform.
   CatalystCardanoPlatform() : super(token: _token);
 
-  /// Temporary method which will be replaced by actual implementation of
-  /// cardano multiplatform lib.
-  Future<void> encodeArbitraryBytesAsMetadatum(Uint8List bytes) {
-    throw UnimplementedError(
-      'encodeArbitraryBytesAsMetadatum() has not been implemented.',
-    );
-  }
-
-  /// Initializer method to bootstrap internals of Cardano Multiplatform Lib.
-  ///
-  /// Must be called and awaited exactly once before any
-  /// additional interaction with the lib.
-  Future<void> init() {
-    throw UnimplementedError('init() has not been implemented.');
+  /// Returns available wallet extensions exposed under
+  /// cardano.{walletName} according to CIP-30 standard.
+  Future<List<CardanoWallet>> getCardanoWallets() {
+    throw UnimplementedError('getCardanoWallets() has not been implemented.');
   }
 }

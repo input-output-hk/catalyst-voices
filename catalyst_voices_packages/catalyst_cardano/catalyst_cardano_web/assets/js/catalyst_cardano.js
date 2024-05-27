@@ -1,5 +1,5 @@
-// queries available wallet extensions exposed with
-// cardano.{wallet-name} according to CIP - 30 standard.
+// Returns available wallet extensions exposed under
+// cardano.{walletName} according to CIP-30 standard.
 function _getCardanoWallets() {
     const cardano = window.cardano;
     if (cardano) {
@@ -11,13 +11,13 @@ function _getCardanoWallets() {
     return [];
 }
 
-// a namespace containing the JS functions that
+// A namespace containing the JS functions that
 // can be executed from dart side
 const catalyst_cardano = {
     getCardanoWallets: _getCardanoWallets,
 }
 
-// expose cardano multiplatform as globally accessible
+// Expose cardano multiplatform as globally accessible
 // so that we can call it via catalyst_cardano.function_name() from
 // other scripts or dart without needing to care about module imports
 window.catalyst_cardano = catalyst_cardano;

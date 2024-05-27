@@ -1,6 +1,5 @@
 // ignore_for_file: discarded_futures
 
-import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices/app/view/app_content.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -39,7 +38,6 @@ final class _AppState extends State<App> {
   Future<void> _init() async {
     try {
       await Dependencies.instance.init();
-      await CatalystCardano.instance.init();
     } catch (error, stackTrace) {
       // TODO(dtscalac): FutureBuilder that uses this future silences all
       // errors, replace it here with proper logging solution. This logging here

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:js_interop';
-import 'dart:typed_data';
 
 import 'package:catalyst_cardano_platform_interface/catalyst_cardano_platform_interface.dart';
 import 'package:catalyst_cardano_web/src/interop/catalyst_cardano_interop.dart'
@@ -17,13 +16,9 @@ class CatalystCardanoWeb extends CatalystCardanoPlatform {
   CatalystCardanoWeb();
 
   @override
-  Future<void> encodeArbitraryBytesAsMetadatum(Uint8List bytes) async {
-    interop.encodeArbitraryBytesAsMetadatum(bytes.toJS);
-  }
-
-  @override
-  Future<void> init() async {
-    await interop.init().toDart;
+  Future<List<CardanoWallet>> getCardanoWallets() async {
+    final wallets = interop.getCardanoWallets().toDart;
+    return wallets.map((e) => e.toDart).toList();
   }
 
   /// Registers this class as the default instance of
