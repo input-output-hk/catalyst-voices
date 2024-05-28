@@ -78,11 +78,8 @@ impl IndexedVoterRegistrationParams {
                     return None;
                 }
 
-                let Some(cip36_metadata) =
-                    Cip36Metadata::generate_from_tx_metadata(&tx.metadata(), network)
-                else {
-                    return None;
-                };
+                let cip36_metadata =
+                    Cip36Metadata::generate_from_tx_metadata(&tx.metadata(), network)?;
 
                 let (stake_credential, voting_info, rewards_address, nonce) =
                     if let Some(reg) = cip36_metadata.registration {
