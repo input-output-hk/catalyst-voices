@@ -505,6 +505,7 @@ version = "0.0.1"
 dependencies = [
  "hex",
  "minicbor 0.24.0",
+ "oid",
  "regex",
  "thiserror",
  "wasm-bindgen",
@@ -1974,6 +1975,12 @@ checksum = "a6a622008b6e321afc04970976f62ee297fdbaa6f95318ca343e3eebb9648441"
 dependencies = [
  "memchr",
 ]
+
+[[package]]
+name = "oid"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9c19903c598813dba001b53beeae59bb77ad4892c5c1b9b3500ce4293a0d06c2"
 
 [[package]]
 name = "once_cell"
