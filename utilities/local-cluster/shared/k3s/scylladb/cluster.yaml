@@ -1,3 +1,9 @@
+# Namespace where the Scylla Cluster will be created
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: scylla
+---
 # Simple Scylla Cluster
 apiVersion: scylla.scylladb.com/v1
 kind: ScyllaCluster
@@ -10,6 +16,8 @@ spec:
   agentVersion: 3.2.8
   version: 5.4.3
   developerMode: true
+  sysctls:
+    - "fs.aio-max-nr=2097152"
   #cpuset: true
   #network:
   #  hostNetworking: true

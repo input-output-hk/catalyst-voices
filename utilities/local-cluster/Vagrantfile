@@ -147,17 +147,24 @@ monitoring_install_script = <<-SHELL
 
 scylladb_install_script = <<-SHELL
     # See: https://operator.docs.scylladb.com/stable/generic.html
+    # https://github.com/scylladb/scylla-operator/blob/master/docs/source/helm.md
     sudo -i
     export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-    git clone --single-branch --branch v1.12.2 --depth=1 https://github.com/scylladb/scylla-operator.git scylla-operator
-    pushd scylla-operator
-    kubectl apply -f deploy/operator.yaml
-    kubectl wait --for condition=established crd/scyllaclusters.scylla.scylladb.com
-    kubectl -n scylla-operator rollout status deployment.apps/scylla-operator
+    helm repo add scylla https://scylla-operator-charts.storage.googleapis.com/stable
+    helm repo update
+    helm install scylla-operator scylla/scylla-operator --values /vagrant_shared/k3s/scylladb/values.operator.yaml  --create-namespace --namespace scylla-operator --wait
+    # For now disable the manager.  See: https://github.com/scylladb/scylla-operator/blob/master/docs/source/manager.md
+    # helm install scylla-manager scylla/scylla-manager --values /vagrant_shared/k3s/scylladb/values.manager.yaml --create-namespace --namespace scylla-manager
+    helm install scylla scylla/scylla --values /vagrant_shared/k3s/scylladb/values.cluster.yaml --create-namespace --namespace scylla
+    #git clone --single-branch --branch v1.12.2 --depth=1 https://github.com/scylladb/scylla-operator.git scylla-operator
+    #pushd scylla-operator
+    #kubectl apply -f deploy/operator.yaml
+    #kubectl wait --for condition=established crd/scyllaclusters.scylla.scylladb.com
+    #kubectl -n scylla-operator rollout status deployment.apps/scylla-operator
     #kubectl -n scylla-operator logs deployment.apps/scylla-operator
-    kubectl create -f /vagrant_shared/k3s/scylladb/cluster.yaml
-    popd
-    rm -rf scylla-operator
+    #kubectl create -f /vagrant_shared/k3s/scylladb/cluster.yaml
+    #popd
+    #rm -rf scylla-operator
     SHELL
 
 

@@ -1,0 +1,42 @@
+# Scylla Manager image
+image:
+  tag: 3.2.8
+
+# Resources allocated to Scylla Manager pods
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 200m
+    memory: 32Mi
+# Resources allocated to Scylla Manager Controller pods
+controllerResources:
+  limits:
+    cpu: 200m
+    memory: 128Mi
+  requests:
+    cpu: 200m
+    memory: 32Mi
+
+# Scylla instance for Manager
+scylla:
+  developerMode: true
+  scyllaImage:
+    tag: 5.4.3
+  agentImage:
+    tag: 3.2.8
+  datacenter: manager-dc
+  racks:
+    - name: manager-rack
+      members: 1
+      storage:
+        capacity: 5Gi
+        storageClassName: local-path
+      resources:
+        limits:
+          cpu: 1
+          memory: 200Mi
+        requests:
+          cpu: 1
+          memory: 200Mi
