@@ -4,6 +4,7 @@ use wasm_bindgen::prelude::*;
 mod c509_cert;
 mod c509_enum;
 mod cbor;
+mod extensions;
 
 #[wasm_bindgen]
 extern "C" {
