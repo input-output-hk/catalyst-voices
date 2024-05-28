@@ -1,6 +1,8 @@
 #[allow(unused)]
 pub(crate) enum C509CertificateType {
+    // Natively Signed C509 cert
     SignedC509Cert,
+    // Re-encoded x.509 v3 DER cert
     C509Cert,
 }
 #[allow(unused)]
