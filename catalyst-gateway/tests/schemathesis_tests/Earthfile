@@ -25,7 +25,7 @@ package-schemathesis:
                     --max-response-time=$max_response_time \
                     --hypothesis-max-examples=$max_examples \
                     --data-generation-method=all \
-                    # --skip-deprecated-operations \
+                    --skip-deprecated-operations \
                     --force-schema-version=$schema_version \
                     --show-trace \
                     --force-color  \
