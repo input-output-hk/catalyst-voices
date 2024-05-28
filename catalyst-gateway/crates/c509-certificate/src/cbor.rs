@@ -20,6 +20,17 @@ pub(crate) fn cbor_encode_biguint(integer: u64, encoder: &mut Encoder<&mut Vec<u
     // Encode the significant bytes as a byte string in CBOR format
     encoder.bytes(&significant_bytes);
 }
+// ---------------------------------------------------
+#[allow(unused)]
+pub(crate) fn cbor_encode_time(time: u32, encoder: &mut Encoder<&mut Vec<u8>>) {
+    // The value "99991231235959Z" (no expiration date) is encoded as CBOR null
+    // Make it easy to implemented using 0 instead
+    if time == 0 {
+        encoder.null();
+    } else {
+        encoder.u32(time);
+    }
+}
 
 // ---------------------------------------------------
 pub(crate) struct RelativeDistinguishedName {
@@ -62,8 +73,6 @@ pub(crate) fn cbor_encode_type_name(
         encoder.array(b.len() as u64 * 2);
         for data in b {
             let sign = data.value.str_type.get_sign();
-            // arr.push(data.name as i8 * sign);
-            // arr
             encoder.i8(data.name as i8 * sign);
             encoder.str(&data.value.str_value);
         }
@@ -152,6 +161,19 @@ mod test_cbor_encoder {
         assert_eq!(
             hex::encode(buffer),
             "6b524643207465737420434147010123456789ab"
+        );
+    }
+
+    #[test]
+    fn test_cbor_encode_time() {
+        let mut buffer: Vec<u8> = Vec::new();
+        let mut encoder: Encoder<&mut Vec<u8>> = Encoder::new(&mut buffer);
+        let time = 1672531200;
+        cbor_encode_time(time, &mut encoder);
+        cbor_encode_time(0, &mut encoder);
+        assert_eq!(
+            hex::encode(buffer),
+            "1a63b0cd00f6"
         );
     }
 
