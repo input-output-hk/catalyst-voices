@@ -110,7 +110,6 @@ mod tests {
             gn_value: GeneralNamesType::String("example.com".to_string()),
         };
         encode_alt_name(vec![general_name], false, &mut encoder);
-        // FIXME - Recheck this section 3.3.1 https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/
         println!("{:?}", hex::encode(buffer));
     }
 
