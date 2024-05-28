@@ -4,6 +4,7 @@ pub(crate) enum C509CertificateType {
     C509Cert,
 }
 #[allow(unused)]
+#[derive(PartialEq)]
 pub(crate) enum AttributesRegistry {
     Email,
     CommonName,             // CN
