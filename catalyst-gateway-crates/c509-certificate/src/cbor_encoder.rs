@@ -1,12 +1,30 @@
 use hex::FromHexError;
 use minicbor::Encoder;
+use oid::ObjectIdentifier;
 use regex::Regex;
 use thiserror::Error;
 
 use crate::c509_enum::AttributesRegistry;
 
-trait CborEncoder {
-    fn encoder(&self, encoder: &mut Encoder<&mut Vec<u8>>);
+pub(crate) trait CborEncoder {
+    fn encode(&self, encoder: &mut Encoder<&mut Vec<u8>>);
+
+    fn encode_string(&self, encoder: &mut Encoder<&mut Vec<u8>>, s: &str) {
+        let _unused = encoder.str(s);
+    }
+
+    fn encode_bytes(&self, encoder: &mut Encoder<&mut Vec<u8>>, b: &[u8]) {
+        let _unused = encoder.bytes(b);
+    }
+
+    fn encode_oid(&self, encoder: &mut Encoder<&mut Vec<u8>>, s: &str) {
+        let oid = match ObjectIdentifier::try_from(s) {
+            Ok(oid) => oid,
+            Err(_) => return,
+        };
+        let oid: Vec<u8> = (&oid).into();
+        let _unused = encoder.bytes(&oid);
+    }
 }
 
 // ---------------------------------------------------
@@ -17,7 +35,7 @@ pub enum UnwrappedBiguint {
 }
 
 impl CborEncoder for UnwrappedBiguint {
-    fn encoder(&self, encoder: &mut Encoder<&mut Vec<u8>>) {
+    fn encode(&self, encoder: &mut Encoder<&mut Vec<u8>>) {
         match self {
             UnwrappedBiguint::U64Value(u) => {
                 // Convert the integer to bytes
@@ -30,7 +48,8 @@ impl CborEncoder for UnwrappedBiguint {
                     .collect::<Vec<u8>>();
 
                 // Encode the significant bytes as a byte string in CBOR format
-                let _unused = encoder.bytes(&significant_bytes);
+                // FIXME - Is it better to just use encoder.bytes(&significant_bytes)?
+                self.encode_bytes(encoder, &significant_bytes);
             },
         }
     }
@@ -38,16 +57,17 @@ impl CborEncoder for UnwrappedBiguint {
 
 // ---------------------------------------------------
 
+const NOEXPDATE: u64 = 99991231235959;
 pub type Time = u64;
 
 impl CborEncoder for Time {
-    fn encoder(&self, encoder: &mut Encoder<&mut Vec<u8>>) {
+    fn encode(&self, encoder: &mut Encoder<&mut Vec<u8>>) {
         // The value "99991231235959Z" (no expiration date) is encoded as CBOR null
         // Also add an option for using 0 as no expiration date
-        if *self == 0 || *self == 99991231235959 {
-            let _unused_exp = encoder.null();
+        if *self == 0 || *self == NOEXPDATE {
+            let _unused = encoder.null();
         } else {
-            let _unused_time = encoder.u64(*self);
+            let _unused = encoder.u64(*self);
         }
     }
 }
@@ -77,16 +97,16 @@ impl CborEncoder for Name {
     /// Encode type Name
     /// Since it is currently support only natively signed C509 certificates,
     /// all text strings are UTF-8 encoded and all attributeType SHALL be non-negative
-    fn encoder(&self, encoder: &mut Encoder<&mut Vec<u8>>) {
+    fn encode(&self, encoder: &mut Encoder<&mut Vec<u8>>) {
         // If type Name contain single attribute common-name
         if self.len() == 1 && self[0].name == AttributesRegistry::CommonName {
             let _unused = encode_common_name_cn(&self[0].value.str_value, encoder);
         } else {
-            let _unused_arr = encoder.array(self.len() as u64 * 2);
+            let _unused = encoder.array(self.len() as u64 * 2);
             // a (CBOR int, CBOR text string) pair,
             for data in self {
-                let _unused_u8 = encoder.u8(data.name as u8);
-                let _unused_str = encoder.str(&data.value.str_value);
+                let _unused = encoder.u8(data.name as u8);
+                let _unused = encoder.str(&data.value.str_value);
             }
         }
     }
@@ -141,7 +161,7 @@ mod test_cbor_encoder {
         let mut buffer: Vec<u8> = Vec::new();
         let mut encoder: Encoder<&mut Vec<u8>> = Encoder::new(&mut buffer);
         let number = UnwrappedBiguint::U64Value(128269);
-        number.encoder(&mut encoder);
+        number.encode(&mut encoder);
         let result = hex::encode(buffer);
         assert_eq!(result, "4301f50d");
     }
@@ -151,9 +171,9 @@ mod test_cbor_encoder {
         let mut buffer: Vec<u8> = Vec::new();
         let mut encoder: Encoder<&mut Vec<u8>> = Encoder::new(&mut buffer);
         let time: Time = 1672531200;
-        time.encoder(&mut encoder);
+        time.encode(&mut encoder);
         let exp_time: Time = 99991231235959;
-        exp_time.encoder(&mut encoder);
+        exp_time.encode(&mut encoder);
         assert_eq!(hex::encode(buffer), "1a63b0cd00f6");
     }
 
@@ -168,7 +188,7 @@ mod test_cbor_encoder {
                 str_value: "RFC test CA".to_string(),
             },
         }];
-        name1.encoder(&mut encoder);
+        name1.encode(&mut encoder);
 
         let name2: Name = vec![RelativeDistinguishedName {
             name: AttributesRegistry::CommonName,
@@ -177,8 +197,8 @@ mod test_cbor_encoder {
                 str_value: "01-23-45-FF-FE-67-89-AB".to_string(),
             },
         }];
-        name2.encoder(&mut encoder);
-        
+        name2.encode(&mut encoder);
+
         assert_eq!(
             hex::encode(buffer),
             "6b524643207465737420434147010123456789ab"
@@ -191,7 +211,7 @@ mod test_cbor_encoder {
         let mut encoder: Encoder<&mut Vec<u8>> = Encoder::new(&mut buffer);
 
         // Issuer: C=US, ST=CA, O=Example Inc, OU=certification, CN=802.1AR CA
-        let name: Name =  vec![
+        let name: Name = vec![
             RelativeDistinguishedName {
                 name: AttributesRegistry::Country,
                 value: AttributeRegistryValue {
@@ -228,7 +248,7 @@ mod test_cbor_encoder {
                 },
             },
         ];
-        name.encoder(&mut encoder);
+        name.encode(&mut encoder);
         assert_eq!(
             hex::encode(buffer),
             "8a0462555306624341086b4578616d706c6520496e63096d63657274696669636174696f6e016a3830322e314152204341"
