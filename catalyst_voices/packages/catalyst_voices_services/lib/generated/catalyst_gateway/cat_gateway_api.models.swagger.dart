@@ -1371,12 +1371,8 @@ class VotingInfoDelegations {
   static const toJsonFactory = _$VotingInfoDelegationsToJson;
   Map<String, dynamic> toJson() => _$VotingInfoDelegationsToJson(this);
 
-  @JsonKey(
-    name: 'type',
-    toJson: votingInfoDelegationsTypeToJson,
-    fromJson: votingInfoDelegationsTypeFromJson,
-  )
-  final enums.VotingInfoDelegationsType type;
+  @JsonKey(name: 'type')
+  final String type;
   @JsonKey(name: 'delegations', defaultValue: <Delegation>[])
   final List<Delegation> delegations;
   static const fromJsonFactory = _$VotingInfoDelegationsFromJson;
@@ -1404,14 +1400,13 @@ class VotingInfoDelegations {
 
 extension $VotingInfoDelegationsExtension on VotingInfoDelegations {
   VotingInfoDelegations copyWith(
-      {enums.VotingInfoDelegationsType? type, List<Delegation>? delegations}) {
+      {String? type, List<Delegation>? delegations}) {
     return VotingInfoDelegations(
         type: type ?? this.type, delegations: delegations ?? this.delegations);
   }
 
   VotingInfoDelegations copyWithWrapped(
-      {Wrapped<enums.VotingInfoDelegationsType>? type,
-      Wrapped<List<Delegation>>? delegations}) {
+      {Wrapped<String>? type, Wrapped<List<Delegation>>? delegations}) {
     return VotingInfoDelegations(
         type: (type != null ? type.value : this.type),
         delegations:
@@ -1432,12 +1427,8 @@ class VotingInfoDirectVoter {
   static const toJsonFactory = _$VotingInfoDirectVoterToJson;
   Map<String, dynamic> toJson() => _$VotingInfoDirectVoterToJson(this);
 
-  @JsonKey(
-    name: 'type',
-    toJson: votingInfoDirectVoterTypeToJson,
-    fromJson: votingInfoDirectVoterTypeFromJson,
-  )
-  final enums.VotingInfoDirectVoterType type;
+  @JsonKey(name: 'type')
+  final String type;
   @JsonKey(name: 'voting_key')
   final String votingKey;
   static const fromJsonFactory = _$VotingInfoDirectVoterFromJson;
@@ -1464,15 +1455,13 @@ class VotingInfoDirectVoter {
 }
 
 extension $VotingInfoDirectVoterExtension on VotingInfoDirectVoter {
-  VotingInfoDirectVoter copyWith(
-      {enums.VotingInfoDirectVoterType? type, String? votingKey}) {
+  VotingInfoDirectVoter copyWith({String? type, String? votingKey}) {
     return VotingInfoDirectVoter(
         type: type ?? this.type, votingKey: votingKey ?? this.votingKey);
   }
 
   VotingInfoDirectVoter copyWithWrapped(
-      {Wrapped<enums.VotingInfoDirectVoterType>? type,
-      Wrapped<String>? votingKey}) {
+      {Wrapped<String>? type, Wrapped<String>? votingKey}) {
     return VotingInfoDirectVoter(
         type: (type != null ? type.value : this.type),
         votingKey: (votingKey != null ? votingKey.value : this.votingKey));
@@ -1673,152 +1662,6 @@ List<enums.VoterGroupId>? voterGroupIdNullableListFromJson(
   }
 
   return voterGroupId.map((e) => voterGroupIdFromJson(e.toString())).toList();
-}
-
-String? votingInfoDelegationsTypeNullableToJson(
-    enums.VotingInfoDelegationsType? votingInfoDelegationsType) {
-  return votingInfoDelegationsType?.value;
-}
-
-String? votingInfoDelegationsTypeToJson(
-    enums.VotingInfoDelegationsType votingInfoDelegationsType) {
-  return votingInfoDelegationsType.value;
-}
-
-enums.VotingInfoDelegationsType votingInfoDelegationsTypeFromJson(
-  Object? votingInfoDelegationsType, [
-  enums.VotingInfoDelegationsType? defaultValue,
-]) {
-  return enums.VotingInfoDelegationsType.values
-          .firstWhereOrNull((e) => e.value == votingInfoDelegationsType) ??
-      defaultValue ??
-      enums.VotingInfoDelegationsType.swaggerGeneratedUnknown;
-}
-
-enums.VotingInfoDelegationsType? votingInfoDelegationsTypeNullableFromJson(
-  Object? votingInfoDelegationsType, [
-  enums.VotingInfoDelegationsType? defaultValue,
-]) {
-  if (votingInfoDelegationsType == null) {
-    return null;
-  }
-  return enums.VotingInfoDelegationsType.values
-          .firstWhereOrNull((e) => e.value == votingInfoDelegationsType) ??
-      defaultValue;
-}
-
-String votingInfoDelegationsTypeExplodedListToJson(
-    List<enums.VotingInfoDelegationsType>? votingInfoDelegationsType) {
-  return votingInfoDelegationsType?.map((e) => e.value!).join(',') ?? '';
-}
-
-List<String> votingInfoDelegationsTypeListToJson(
-    List<enums.VotingInfoDelegationsType>? votingInfoDelegationsType) {
-  if (votingInfoDelegationsType == null) {
-    return [];
-  }
-
-  return votingInfoDelegationsType.map((e) => e.value!).toList();
-}
-
-List<enums.VotingInfoDelegationsType> votingInfoDelegationsTypeListFromJson(
-  List? votingInfoDelegationsType, [
-  List<enums.VotingInfoDelegationsType>? defaultValue,
-]) {
-  if (votingInfoDelegationsType == null) {
-    return defaultValue ?? [];
-  }
-
-  return votingInfoDelegationsType
-      .map((e) => votingInfoDelegationsTypeFromJson(e.toString()))
-      .toList();
-}
-
-List<enums.VotingInfoDelegationsType>?
-    votingInfoDelegationsTypeNullableListFromJson(
-  List? votingInfoDelegationsType, [
-  List<enums.VotingInfoDelegationsType>? defaultValue,
-]) {
-  if (votingInfoDelegationsType == null) {
-    return defaultValue;
-  }
-
-  return votingInfoDelegationsType
-      .map((e) => votingInfoDelegationsTypeFromJson(e.toString()))
-      .toList();
-}
-
-String? votingInfoDirectVoterTypeNullableToJson(
-    enums.VotingInfoDirectVoterType? votingInfoDirectVoterType) {
-  return votingInfoDirectVoterType?.value;
-}
-
-String? votingInfoDirectVoterTypeToJson(
-    enums.VotingInfoDirectVoterType votingInfoDirectVoterType) {
-  return votingInfoDirectVoterType.value;
-}
-
-enums.VotingInfoDirectVoterType votingInfoDirectVoterTypeFromJson(
-  Object? votingInfoDirectVoterType, [
-  enums.VotingInfoDirectVoterType? defaultValue,
-]) {
-  return enums.VotingInfoDirectVoterType.values
-          .firstWhereOrNull((e) => e.value == votingInfoDirectVoterType) ??
-      defaultValue ??
-      enums.VotingInfoDirectVoterType.swaggerGeneratedUnknown;
-}
-
-enums.VotingInfoDirectVoterType? votingInfoDirectVoterTypeNullableFromJson(
-  Object? votingInfoDirectVoterType, [
-  enums.VotingInfoDirectVoterType? defaultValue,
-]) {
-  if (votingInfoDirectVoterType == null) {
-    return null;
-  }
-  return enums.VotingInfoDirectVoterType.values
-          .firstWhereOrNull((e) => e.value == votingInfoDirectVoterType) ??
-      defaultValue;
-}
-
-String votingInfoDirectVoterTypeExplodedListToJson(
-    List<enums.VotingInfoDirectVoterType>? votingInfoDirectVoterType) {
-  return votingInfoDirectVoterType?.map((e) => e.value!).join(',') ?? '';
-}
-
-List<String> votingInfoDirectVoterTypeListToJson(
-    List<enums.VotingInfoDirectVoterType>? votingInfoDirectVoterType) {
-  if (votingInfoDirectVoterType == null) {
-    return [];
-  }
-
-  return votingInfoDirectVoterType.map((e) => e.value!).toList();
-}
-
-List<enums.VotingInfoDirectVoterType> votingInfoDirectVoterTypeListFromJson(
-  List? votingInfoDirectVoterType, [
-  List<enums.VotingInfoDirectVoterType>? defaultValue,
-]) {
-  if (votingInfoDirectVoterType == null) {
-    return defaultValue ?? [];
-  }
-
-  return votingInfoDirectVoterType
-      .map((e) => votingInfoDirectVoterTypeFromJson(e.toString()))
-      .toList();
-}
-
-List<enums.VotingInfoDirectVoterType>?
-    votingInfoDirectVoterTypeNullableListFromJson(
-  List? votingInfoDirectVoterType, [
-  List<enums.VotingInfoDirectVoterType>? defaultValue,
-]) {
-  if (votingInfoDirectVoterType == null) {
-    return defaultValue;
-  }
-
-  return votingInfoDirectVoterType
-      .map((e) => votingInfoDirectVoterTypeFromJson(e.toString()))
-      .toList();
 }
 
 // ignore: unused_element
