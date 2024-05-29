@@ -3,7 +3,7 @@
 use wasm_bindgen::prelude::*;
 mod c509_cert;
 mod c509_enum;
-mod cbor;
+mod cbor_encoder;
 mod extensions;
 
 #[wasm_bindgen]
