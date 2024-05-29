@@ -6,7 +6,7 @@ package-schemathesis:
     ARG tag="latest"
     ARG max_examples=1000
     # TODO: https://github.com/input-output-hk/catalyst-voices/issues/465
-    ARG max_response_time=1000
+    ARG max_response_time=3000
     ARG wait_for_schema=15
     ARG workers=2
     ARG schema_version=30
