@@ -32,7 +32,7 @@ scylla:
       members: 1
       storage:
         capacity: 5Gi
-        storageClassName: local-path
+        storageClassName: longhorn-strict-local
       resources:
         limits:
           cpu: 1

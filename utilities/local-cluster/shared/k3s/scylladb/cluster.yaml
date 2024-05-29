@@ -30,7 +30,7 @@ spec:
         members: 3
         storage:
           capacity: 5Gi
-          storageClassName: local-path
+          storageClassName: longhorn-strict-local
 
         resources:
           requests:
@@ -46,3 +46,6 @@ spec:
         volumeMounts:
           - mountPath: /tmp/coredumps
             name: coredumpfs
+  exposeOptions:
+    nodeService:
+      type: LoadBalancer

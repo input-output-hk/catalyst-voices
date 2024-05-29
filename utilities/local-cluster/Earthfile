@@ -12,6 +12,7 @@ start-cluster:
     RUN python scripts/check-cluster-dns.py ./shared/extra.hosts
     # Everything checks out so far, try and start the cluster.
     IF [ "$NATIVEPLATFORM" = "darwin/arm64" ]
+        # Install necessary Vagrant plugins for ARM Mac
         RUN VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 vagrant plugin install vagrant-qemu
     END
     RUN vagrant up

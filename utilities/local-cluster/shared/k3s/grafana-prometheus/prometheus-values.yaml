@@ -17,7 +17,7 @@ prometheus:
         spec:
           accessModes:
             - ReadWriteOnce
-          storageClassName: local-path
+          storageClassName: longhorn-best-effort-local
           resources:
             requests:
               storage: 2Gi
@@ -40,7 +40,7 @@ grafana:
     persistence:
       enabled: true
       type: pvc
-      storageClassName: local-path
+      storageClassName: longhorn-best-effort-local
       accessModes:
         - ReadWriteOnce
       size: 4Gi

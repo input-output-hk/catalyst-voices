@@ -36,7 +36,7 @@ spec:
             - name: REGISTRY_TITLE
               value: "Catalyst Test Cluster - Container Registry"
             - name: REGISTRY_URL
-              value: "https://registry.cluster.test"
+              value: "http://registry.cluster.test"
           resources:
             limits:
               cpu: "0.2"
@@ -64,7 +64,3 @@ spec:
                 name: registry-ui
                 port:
                   number: 80
-  tls:
-    - secretName: registry-ui-tls
-      hosts:
-        - registry-ui.cluster.test

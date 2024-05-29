@@ -86,3 +86,27 @@ To display the registry service logs:
 ```sh
 docker logs registry
 ```
+
+## Local UI to access ScyllaDB
+
+Found (and tested) description how to connect using only open-source via DBeaver: <https://javaresolutions.blogspot.com/2018/04/opensource-db-ui-tool-for-cassandra-db.html>
+
+1. Download dbeaver (Community Edition)
+2. Download cassandra jdbc jar files: <http://www.dbschema.com/cassandra-jdbc-driver.html> (Downloading and Testing the Driver Binaries section have links to binary and source)
+3. extract cassandra jdbc zip
+4. run dbeaver
+5. go to Database > Driver Manager
+6. click New
+7. Fill in details as follow:
+   * Driver Name: Cassandra (or whatever you want it to say)
+   * Driver Type: Generic
+   * Class Name: com.dbschema.CassandraJdbcDriver
+   * URL Template: jdbc:cassandra://{host}[:{port}][/{database}]
+   * Default Port: 9042
+   * Embedded: no
+   * Category:
+   * Description: Cassandra (or whatever you want it to say)
+8. click Add File and add all of the jars in the cassandra jdbc zip
+9. click Find Class to make sure the Class Name is found okay
+10. click OK
+11. Create New Connection, selecting the database driver you just added

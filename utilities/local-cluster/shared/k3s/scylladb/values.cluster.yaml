@@ -16,7 +16,7 @@ racks:
     members: 3
     storage:
       capacity: 5Gi
-      storageClassName: local-path
+      storageClassName: longhorn-strict-local
 
     resources:
       limits:

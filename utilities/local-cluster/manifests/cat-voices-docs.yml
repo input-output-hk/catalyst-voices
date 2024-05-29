@@ -62,3 +62,7 @@ spec:
                 name: cat-gateway-docs
                 port:
                   number: 80
+  tls:
+    - secretName: cat-voices-docs-tls
+      hosts:
+        - docs.voices.cluster.test

@@ -3,8 +3,8 @@
 control_ip = "192.168.58.10"
 
 # Determine the maximum number of agents, and set their IP addresses
-agents = { "agent1" => "192.168.58.11",
-           "agent2" => "192.168.58.12" }
+agents = { "agent86" => "192.168.58.86",
+           "agent99" => "192.168.58.99" }
 
 # This is sized so that a machine with 16 threads and 16GB will allocate at most 
 # ~3/4 of its resources to the cluster.
@@ -93,8 +93,7 @@ cert_manager_install_script = <<-SHELL
 longhorn_install_script = <<-SHELL
     # See: https://docs.k3s.io/storage
     #      https://longhorn.io/docs/1.6.2/deploy/install/install-with-kubectl
-    # Note: This fails to work because virtualbox file shares do not support the necessary
-    # filesystem operations required by longhorn.\
+    #      https://longhorn.io/docs/1.6.2/deploy/install/install-with-helm/
     sudo  -i
     export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
     helm repo add longhorn https://charts.longhorn.io
@@ -136,6 +135,7 @@ monitoring_install_script = <<-SHELL
     sudo -i
     export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
     helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+    helm repo add grafana https://grafana.github.io/helm-charts
     helm repo update    
     helm install prometheus-stack --version 58.6.0 -f /vagrant_shared/k3s/grafana-prometheus/prometheus-values.yaml prometheus-community/kube-prometheus-stack
     kubectl apply -f /vagrant_shared/k3s/grafana-prometheus/alert-manager-ingress.yaml
@@ -146,25 +146,14 @@ monitoring_install_script = <<-SHELL
     SHELL
 
 scylladb_install_script = <<-SHELL
-    # See: https://operator.docs.scylladb.com/stable/generic.html
-    # https://github.com/scylladb/scylla-operator/blob/master/docs/source/helm.md
+    # See: https://github.com/scylladb/scylla-operator/blob/master/docs/source/helm.md
     sudo -i
     export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
     helm repo add scylla https://scylla-operator-charts.storage.googleapis.com/stable
     helm repo update
     helm install scylla-operator scylla/scylla-operator --values /vagrant_shared/k3s/scylladb/values.operator.yaml  --create-namespace --namespace scylla-operator --wait
-    # For now disable the manager.  See: https://github.com/scylladb/scylla-operator/blob/master/docs/source/manager.md
-    # helm install scylla-manager scylla/scylla-manager --values /vagrant_shared/k3s/scylladb/values.manager.yaml --create-namespace --namespace scylla-manager
+    helm install scylla-manager scylla/scylla-manager --values /vagrant_shared/k3s/scylladb/values.manager.yaml --create-namespace --namespace scylla-manager
     helm install scylla scylla/scylla --values /vagrant_shared/k3s/scylladb/values.cluster.yaml --create-namespace --namespace scylla
-    #git clone --single-branch --branch v1.12.2 --depth=1 https://github.com/scylladb/scylla-operator.git scylla-operator
-    #pushd scylla-operator
-    #kubectl apply -f deploy/operator.yaml
-    #kubectl wait --for condition=established crd/scyllaclusters.scylla.scylladb.com
-    #kubectl -n scylla-operator rollout status deployment.apps/scylla-operator
-    #kubectl -n scylla-operator logs deployment.apps/scylla-operator
-    #kubectl create -f /vagrant_shared/k3s/scylladb/cluster.yaml
-    #popd
-    #rm -rf scylla-operator
     SHELL
 
 
@@ -188,8 +177,6 @@ Vagrant.configure("2") do |config|
     if !is_darwin_arm64
       # x86 anything should work with this
       control.vm.synced_folder "./shared", "/vagrant_shared"
-      # control.vm.synced_folder "./shared/longhorn/control", "/var/lib/longhorn"
-      control.vm.synced_folder "./shared/storage/control", "/opt/local-path-provisioner"
       control.vm.provider "virtualbox" do |vb|
         vb.memory = control_memory
         vb.cpus = control_vcpu
@@ -197,8 +184,6 @@ Vagrant.configure("2") do |config|
     else
       # Specific config just for Arm Macs.
       control.vm.synced_folder "./shared", "/vagrant_shared", type: "smb"
-      # control.vm.synced_folder "./shared/longhorn/control", "/var/lib/longhorn", type: "smb"
-      control.vm.synced_folder "./shared/storage/control", "/opt/local-path-provisioner", type: "smb"
       control.vm.provider "qemu" do |qe|
         qe.memory = control_memory
         qe.smp = control_vcpu
@@ -209,12 +194,12 @@ Vagrant.configure("2") do |config|
     control.vm.provision "shell", inline: helm_install_script
     control.vm.provision "shell", inline: control_plane_script
     control.vm.provision "shell", inline: cert_manager_install_script
-    control.vm.provision "shell", inline: local_path_provisioner_script
-    # control.vm.provision "shell", inline: longhorn_install_script
+    # We use longhorn, so don;t setup the local-path-provisioner
+    # control.vm.provision "shell", inline: local_path_provisioner_script
+    control.vm.provision "shell", inline: longhorn_install_script
     control.vm.provision "shell", inline: monitoring_install_script
     control.vm.provision "shell", inline: registry_script
     control.vm.provision "shell", inline: scylladb_install_script
-    # control.vm.provision "shell", inline: cassandra_install_script
   end
 
   agents.each do |agent_name, agent_ip|
@@ -223,16 +208,12 @@ Vagrant.configure("2") do |config|
       agent.vm.hostname = agent_name
       if !is_darwin_arm64
         agent.vm.synced_folder "./shared", "/vagrant_shared"
-        # agent.vm.synced_folder "./shared/longhorn/"+agent_name, "/var/lib/longhorn"
-        agent.vm.synced_folder "./shared/storage/"+agent_name, "/opt/local-path-provisioner"
         agent.vm.provider "virtualbox" do |vb|
           vb.memory = agent_memory
           vb.cpus = agent_vcpu
         end
       else
         agent.vm.synced_folder "./shared", "/vagrant_shared", type: "smb"
-        #agent.vm.synced_folder "./shared/longhorn/"+agent_name, "/var/lib/longhorn", type: "smb"
-        agent.vm.synced_folder "./shared/storage/"+agent_name, "/opt/local-path-provisioner", type: "smb"
         agent.vm.provider "qemu" do |qe|
           qe.memory = agent_memory
           qe.smp = agent_vcpu

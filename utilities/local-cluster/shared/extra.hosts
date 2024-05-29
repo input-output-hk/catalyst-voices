@@ -6,8 +6,10 @@
 192.168.58.10   grafana.cluster.test        # The Grafana dashboard
 192.168.58.10   alert-manager.cluster.test  # The Alert manager service.
 192.168.58.10   prometheus.cluster.test     # The Prometheus service.
+192.168.58.10   longhorn.cluster.test       # The Longhorn Storage service UI.
+192.168.58.10   scylladb.cluster.test       # The exposed scylladb running on the cluster.
 
 # Catalyst Voices specific Hostnames
 192.168.58.10   voices.cluster.test         # cat voices - Front end
 192.168.58.10   docs.voices.cluster.test    # local docs server for cat voices (port 80)
-192.168.59.10   db.voices.cluster.test      # cat-voices exposed DB. UI on 80, DB itself on 5432
+

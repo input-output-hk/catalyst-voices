@@ -5,7 +5,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: local-path
+  storageClassName: longhorn-best-effort-local
   resources:
     requests:
       storage: 20Gi
@@ -22,6 +22,7 @@ spec:
       - "HEAD"
     accessControlAllowOriginList:
       - "https://registry-ui.cluster.test"
+      - "http://registry-ui.cluster.test"
     accessControlAllowCredentials: false
     accessControlMaxAge: 100
     addVaryHeader: true
@@ -37,6 +38,19 @@ spec:
   type: ClusterIP
   ports:
     - port: 80
+      targetPort: 5000
+  selector:
+    app: registry
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: registry-raw
+spec:
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 5000
       targetPort: 5000
   selector:
     app: registry
