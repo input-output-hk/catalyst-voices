@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+/// A `ThemeExtension` that encapsulates a set color properties and extends the
+/// standard material color scheme.
+///
+/// `VoicesColorScheme` is used to define a comprehensive set of color 
+/// attributes that can be used in the Voices application to ensure consistency.
 @immutable
 class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
   final Color? textPrimary;
