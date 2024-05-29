@@ -40,12 +40,11 @@ class BrandAssets extends ThemeExtension<BrandAssets> {
   ) {
     if (other is! BrandAssets) {
       return this;
+    } else if (t >= 0.5) {
+      return other;
+    } else {
+      return this;
     }
-
-    return BrandAssets(
-      logo: logo,
-      logoIcon: logoIcon,
-    );
   }
 }
 
