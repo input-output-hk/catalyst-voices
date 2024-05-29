@@ -53,10 +53,12 @@ def get_staked_ada(address: str, network: str, slot_number: int):
             f"api/cardano/staked_ada/{address}?network={network}&slot_number={slot_number}"
         )
     )
-    print(f"code: {resp.status_code}, data: {resp.json()}")
     assert resp.status_code == 200 or resp.status_code == 404
     if resp.status_code == 200:
+        print(f"code: {resp.status_code}, data: {resp.json()}")
         return resp.json()
+    elif resp.status_code == 404:
+        print(f"code: {resp.status_code}")
 
 
 def get_date_time_to_slot_number(network: str, date_time: datetime):
