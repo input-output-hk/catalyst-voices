@@ -18,7 +18,7 @@ package-schemathesis:
     COPY ./hooks/hooks.py .    
 
     VOLUME /results
-    ENTRYPOINT export SCHEMATHESIS_HOOKS=hooks \ 
+    ENTRYPOINT export SCHEMATHESIS_HOOKS=hooks \
                     && st run --checks all $openapi_spec \
                     --workers=$workers \
                     --wait-for-schema=$wait_for_schema \
