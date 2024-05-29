@@ -2,7 +2,6 @@
 resolver = "2"
 members = [
     "bin",
-    "crates/c509-certificate",
     # "crates/<a crate>",
 ]
 
