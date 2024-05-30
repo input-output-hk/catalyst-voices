@@ -107,9 +107,7 @@ impl EventDB {
     async fn search_total(
         &self, search_query: SearchQuery, limit: Option<i64>, offset: Option<i64>,
     ) -> anyhow::Result<SearchResult> {
-        let conn = self.pool.get().await?;
-
-        let rows: Vec<tokio_postgres::Row> = conn
+        let rows: Vec<tokio_postgres::Row> = self
             .query(&Self::construct_count_query(&search_query), &[
                 &limit,
                 &offset.unwrap_or(0),
@@ -128,8 +126,7 @@ impl EventDB {
     async fn search_events(
         &self, search_query: SearchQuery, limit: Option<i64>, offset: Option<i64>,
     ) -> anyhow::Result<SearchResult> {
-        let conn = self.pool.get().await?;
-        let rows: Vec<tokio_postgres::Row> = conn
+        let rows: Vec<tokio_postgres::Row> = self
             .query(&Self::construct_query(&search_query), &[
                 &limit,
                 &offset.unwrap_or(0),
@@ -169,8 +166,7 @@ impl EventDB {
     async fn search_objectives(
         &self, search_query: SearchQuery, limit: Option<i64>, offset: Option<i64>,
     ) -> anyhow::Result<SearchResult> {
-        let conn = self.pool.get().await?;
-        let rows: Vec<tokio_postgres::Row> = conn
+        let rows: Vec<tokio_postgres::Row> = self
             .query(&Self::construct_query(&search_query), &[
                 &limit,
                 &offset.unwrap_or(0),
@@ -205,9 +201,7 @@ impl EventDB {
     async fn search_proposals(
         &self, search_query: SearchQuery, limit: Option<i64>, offset: Option<i64>,
     ) -> anyhow::Result<SearchResult> {
-        let conn = self.pool.get().await?;
-
-        let rows: Vec<tokio_postgres::Row> = conn
+        let rows: Vec<tokio_postgres::Row> = self
             .query(&Self::construct_query(&search_query), &[
                 &limit,
                 &offset.unwrap_or(0),

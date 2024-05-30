@@ -56,7 +56,7 @@ jobs:
         if: always()
         continue-on-error: true
         with:
-          earthfile: ./catalyst-gateway/tests/
+          earthfile: ./catalyst-gateway/tests/schemathesis_tests
           flags: --allow-privileged
           targets: test-fuzzer-api
           target_flags:

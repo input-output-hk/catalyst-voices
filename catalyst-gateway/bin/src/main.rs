@@ -3,6 +3,7 @@ use clap::Parser;
 
 mod cardano;
 mod cli;
+#[allow(dead_code)]
 mod event_db;
 mod logger;
 mod service;

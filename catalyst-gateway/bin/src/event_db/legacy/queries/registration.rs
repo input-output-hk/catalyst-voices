@@ -76,13 +76,11 @@ impl EventDB {
     pub(crate) async fn get_voter(
         &self, event: &Option<EventId>, voting_key: String, with_delegations: bool,
     ) -> anyhow::Result<Voter> {
-        let conn = self.pool.get().await?;
-
         let rows = if let Some(event) = event {
-            conn.query(Self::VOTER_BY_EVENT_QUERY, &[&voting_key, &event.0])
+            self.query(Self::VOTER_BY_EVENT_QUERY, &[&voting_key, &event.0])
                 .await?
         } else {
-            conn.query(Self::VOTER_BY_LAST_EVENT_QUERY, &[&voting_key])
+            self.query(Self::VOTER_BY_LAST_EVENT_QUERY, &[&voting_key])
                 .await?
         };
         let voter = rows.first().ok_or(NotFoundError)?;
@@ -91,13 +89,13 @@ impl EventDB {
         let voting_power = voter.try_get("voting_power")?;
 
         let rows = if let Some(event) = event {
-            conn.query(Self::TOTAL_BY_EVENT_VOTING_QUERY, &[
+            self.query(Self::TOTAL_BY_EVENT_VOTING_QUERY, &[
                 &voting_group.0,
                 &event.0,
             ])
             .await?
         } else {
-            conn.query(Self::TOTAL_BY_LAST_EVENT_VOTING_QUERY, &[&voting_group.0])
+            self.query(Self::TOTAL_BY_LAST_EVENT_VOTING_QUERY, &[&voting_group.0])
                 .await?
         };
 
@@ -120,10 +118,10 @@ impl EventDB {
 
         let delegator_addresses = if with_delegations {
             let rows = if let Some(event) = event {
-                conn.query(Self::VOTER_DELEGATORS_LIST_QUERY, &[&voting_key, &event.0])
+                self.query(Self::VOTER_DELEGATORS_LIST_QUERY, &[&voting_key, &event.0])
                     .await?
             } else {
-                conn.query(Self::VOTER_DELEGATORS_LIST_QUERY, &[
+                self.query(Self::VOTER_DELEGATORS_LIST_QUERY, &[
                     &voting_key,
                     &voter.try_get::<_, i32>("event")?,
                 ])
@@ -165,24 +163,23 @@ impl EventDB {
     pub(crate) async fn get_delegator(
         &self, event: &Option<EventId>, stake_public_key: String,
     ) -> anyhow::Result<Delegator> {
-        let conn = self.pool.get().await?;
         let rows = if let Some(event) = event {
-            conn.query(Self::DELEGATOR_SNAPSHOT_INFO_BY_EVENT_QUERY, &[&event.0])
+            self.query(Self::DELEGATOR_SNAPSHOT_INFO_BY_EVENT_QUERY, &[&event.0])
                 .await?
         } else {
-            conn.query(Self::DELEGATOR_SNAPSHOT_INFO_BY_LAST_EVENT_QUERY, &[])
+            self.query(Self::DELEGATOR_SNAPSHOT_INFO_BY_LAST_EVENT_QUERY, &[])
                 .await?
         };
         let delegator_snapshot_info = rows.first().ok_or(NotFoundError)?;
 
         let delegation_rows = if let Some(event) = event {
-            conn.query(Self::DELEGATIONS_BY_EVENT_QUERY, &[
+            self.query(Self::DELEGATIONS_BY_EVENT_QUERY, &[
                 &stake_public_key,
                 &event.0,
             ])
             .await?
         } else {
-            conn.query(Self::DELEGATIONS_BY_EVENT_QUERY, &[
+            self.query(Self::DELEGATIONS_BY_EVENT_QUERY, &[
                 &stake_public_key,
                 &delegator_snapshot_info.try_get::<_, i32>("event")?,
             ])
@@ -203,10 +200,10 @@ impl EventDB {
         }
 
         let rows = if let Some(version) = event {
-            conn.query(Self::TOTAL_POWER_BY_EVENT_QUERY, &[&version.0])
+            self.query(Self::TOTAL_POWER_BY_EVENT_QUERY, &[&version.0])
                 .await?
         } else {
-            conn.query(Self::TOTAL_POWER_BY_LAST_EVENT_QUERY, &[])
+            self.query(Self::TOTAL_POWER_BY_LAST_EVENT_QUERY, &[])
                 .await?
         };
         let total_power: i64 = rows

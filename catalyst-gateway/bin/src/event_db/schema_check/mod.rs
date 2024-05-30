@@ -20,9 +20,7 @@ impl EventDB {
     /// return the current schema version if its current.
     /// Otherwise return an error.
     pub(crate) async fn schema_version_check(&self) -> anyhow::Result<i32> {
-        let conn = self.pool.get().await?;
-
-        let schema_check = conn.query_one(SELECT_MAX_VERSION_SQL, &[]).await?;
+        let schema_check = self.query_one(SELECT_MAX_VERSION_SQL, &[]).await?;
 
         let current_ver = schema_check.try_get("max")?;
 
