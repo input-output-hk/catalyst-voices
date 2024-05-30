@@ -48,9 +48,6 @@ jobs:
             runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
             artifact: "false"
 
-      - run:
-          ls catalyst-gateway
-
       - name: Get schemathesis test report
         uses: input-output-hk/catalyst-ci/actions/run@master
         if: always()
@@ -101,7 +98,7 @@ jobs:
         if: always()
         with:
             name: coverage-reports
-            path: '**/cat-gateway.coverage-report.info'
+            path: 'catalyst-gateway/cat-gateway.coverage-report.info'
             if-no-files-found: error
             retention-days: 1
 
@@ -163,3 +160,8 @@ jobs:
               - uses: actions/download-artifact@v4
                 with:
                   name: coverage-reports
+
+              - run:
+                  curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C /usr/local/bin
+                  coveralls report
+
