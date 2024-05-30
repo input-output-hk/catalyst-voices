@@ -161,7 +161,6 @@ jobs:
                 with:
                   name: coverage-reports
 
-              - run:
+              - run: |
                   curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C /usr/local/bin
                   coveralls report
-
