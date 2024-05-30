@@ -49,7 +49,7 @@ jobs:
             artifact: "false"
 
       - run:
-          ls
+          ls catalyst-gateway
 
       - name: Get schemathesis test report
         uses: input-output-hk/catalyst-ci/actions/run@master
