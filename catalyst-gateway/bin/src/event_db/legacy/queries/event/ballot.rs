@@ -53,9 +53,7 @@ impl EventDB {
     pub(crate) async fn get_ballot(
         &self, event: EventId, objective: ObjectiveId, proposal: ProposalId,
     ) -> anyhow::Result<Ballot> {
-        let conn = self.pool.get().await?;
-
-        let rows = conn
+        let rows = self
             .query(Self::BALLOT_VOTE_OPTIONS_QUERY, &[
                 &event.0,
                 &objective.0,
@@ -65,7 +63,7 @@ impl EventDB {
         let row = rows.first().ok_or(NotFoundError)?;
         let choices = row.try_get("objective")?;
 
-        let rows = conn
+        let rows = self
             .query(Self::BALLOT_VOTE_PLANS_QUERY, &[
                 &event.0,
                 &objective.0,
@@ -96,9 +94,7 @@ impl EventDB {
     pub(crate) async fn get_objective_ballots(
         &self, event: EventId, objective: ObjectiveId,
     ) -> anyhow::Result<Vec<ProposalBallot>> {
-        let conn = self.pool.get().await?;
-
-        let rows = conn
+        let rows = self
             .query(Self::BALLOTS_VOTE_OPTIONS_PER_OBJECTIVE_QUERY, &[
                 &event.0,
                 &objective.0,
@@ -110,7 +106,7 @@ impl EventDB {
             let choices = row.try_get("objective")?;
             let proposal_id = ProposalId(row.try_get("proposal_id")?);
 
-            let rows = conn
+            let rows = self
                 .query(Self::BALLOT_VOTE_PLANS_QUERY, &[
                     &event.0,
                     &objective.0,
@@ -146,9 +142,7 @@ impl EventDB {
     pub(crate) async fn get_event_ballots(
         &self, event: EventId,
     ) -> anyhow::Result<Vec<ObjectiveBallots>> {
-        let conn = self.pool.get().await?;
-
-        let rows = conn
+        let rows = self
             .query(Self::BALLOTS_VOTE_OPTIONS_PER_EVENT_QUERY, &[&event.0])
             .await?;
         let mut ballots = HashMap::<ObjectiveId, Vec<ProposalBallot>>::new();
@@ -157,7 +151,7 @@ impl EventDB {
             let proposal_id = ProposalId(row.try_get("proposal_id")?);
             let objective_id = ObjectiveId(row.try_get("objective_id")?);
 
-            let rows = conn
+            let rows = self
                 .query(Self::BALLOT_VOTE_PLANS_QUERY, &[
                     &event.0,
                     &objective_id.0,

@@ -38,13 +38,16 @@ impl Cli {
     pub(crate) async fn exec(self) -> anyhow::Result<()> {
         match self {
             Self::Run(settings) => {
-                logger::init(settings.log_level)?;
+                let logger_handle = logger::init(settings.log_level);
 
                 // Unique machine id
                 let machine_id = settings.follower_settings.machine_uid;
 
-                let state = Arc::new(State::new(Some(settings.database_url)).await?);
+                let state = Arc::new(State::new(Some(settings.database_url), logger_handle).await?);
                 let event_db = state.event_db();
+                event_db
+                    .modify_deep_query(settings.deep_query_inspection.into())
+                    .await;
 
                 tokio::spawn(async move {
                     match service::run(&settings.docs_settings, state.clone()).await {

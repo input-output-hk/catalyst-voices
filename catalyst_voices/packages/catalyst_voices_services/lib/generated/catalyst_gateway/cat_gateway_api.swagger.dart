@@ -75,6 +75,27 @@ abstract class CatGatewayApi extends ChopperService {
   @Get(path: '/api/health/live')
   Future<chopper.Response> _apiHealthLiveGet();
 
+  ///Options for service inspection.
+  ///@param log_level
+  ///@param query_inspection
+  Future<chopper.Response> apiHealthInspectionGet({
+    enums.LogLevel? logLevel,
+    enums.DeepQueryInspection? queryInspection,
+  }) {
+    return _apiHealthInspectionGet(
+        logLevel: logLevel?.value?.toString(),
+        queryInspection: queryInspection?.value?.toString());
+  }
+
+  ///Options for service inspection.
+  ///@param log_level
+  ///@param query_inspection
+  @Get(path: '/api/health/inspection')
+  Future<chopper.Response> _apiHealthInspectionGet({
+    @Query('log_level') String? logLevel,
+    @Query('query_inspection') String? queryInspection,
+  });
+
   ///Get staked ada amount.
   ///@param stake_address The stake address of the user. Should a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
   ///@param network Cardano network type. If omitted network type is identified from the stake address. If specified it must be correspondent to the network type encoded in the stake address. As `preprod` and `preview` network types in the stake address encoded as a `testnet`, to specify `preprod` or `preview` network type use this query parameter.
