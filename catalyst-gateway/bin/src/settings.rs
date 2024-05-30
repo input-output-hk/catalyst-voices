@@ -67,6 +67,10 @@ pub(crate) struct ServiceSettings {
     /// Follower settings.
     #[clap(flatten)]
     pub(crate) follower_settings: FollowerSettings,
+
+    /// Enable deep query inspection.
+    #[clap(long, action = clap::ArgAction::SetTrue)]
+    pub(crate) deep_query_inspection: bool,
 }
 
 /// Settings specifies `OpenAPI` docs generation.

@@ -1,6 +1,38 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:collection/collection.dart';
 
+enum DeepQueryInspection {
+  @JsonValue(null)
+  swaggerGeneratedUnknown(null),
+
+  @JsonValue('enabled')
+  enabled('enabled'),
+  @JsonValue('disabled')
+  disabled('disabled');
+
+  final String? value;
+
+  const DeepQueryInspection(this.value);
+}
+
+enum LogLevel {
+  @JsonValue(null)
+  swaggerGeneratedUnknown(null),
+
+  @JsonValue('debug')
+  debug('debug'),
+  @JsonValue('info')
+  info('info'),
+  @JsonValue('warn')
+  warn('warn'),
+  @JsonValue('error')
+  error('error');
+
+  final String? value;
+
+  const LogLevel(this.value);
+}
+
 enum Network {
   @JsonValue(null)
   swaggerGeneratedUnknown(null),

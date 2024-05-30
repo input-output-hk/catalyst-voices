@@ -22,7 +22,6 @@ def cat_gateway_endpoint_url(endpoint: str):
 
 def check_is_live():
     resp = requests.get(cat_gateway_endpoint_url("api/health/live"))
-    print(f"resp: {resp}, code: {resp.status_code}")
     assert resp.status_code == 204
     logger.info("cat-gateway service is LIVE.")
 

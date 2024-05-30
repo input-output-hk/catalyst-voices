@@ -51,6 +51,25 @@ final class _$CatGatewayApi extends CatGatewayApi {
   }
 
   @override
+  Future<Response<dynamic>> _apiHealthInspectionGet({
+    String? logLevel,
+    String? queryInspection,
+  }) {
+    final Uri $url = Uri.parse('/api/health/inspection');
+    final Map<String, dynamic> $params = <String, dynamic>{
+      'log_level': logLevel,
+      'query_inspection': queryInspection,
+    };
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+      parameters: $params,
+    );
+    return client.send<dynamic, dynamic>($request);
+  }
+
+  @override
   Future<Response<StakeInfo>> _apiCardanoStakedAdaStakeAddressGet({
     required String? stakeAddress,
     String? network,
