@@ -1,16 +1,19 @@
 //! Setup for logging for the service.
+
 use clap::ValueEnum;
 use tracing::level_filters::LevelFilter;
 use tracing_subscriber::{
-    fmt::{format::FmtSpan, time},
-    FmtSubscriber,
+    fmt::{self, format::FmtSpan, time},
+    prelude::*,
+    reload::{self, Handle},
+    Registry,
 };
 
 /// Default log level
 pub(crate) const LOG_LEVEL_DEFAULT: &str = "info";
 
 /// All valid logging levels
-#[derive(ValueEnum, Clone, Copy)]
+#[derive(ValueEnum, Clone, Copy, Debug)]
 pub(crate) enum LogLevel {
     /// Debug messages
     Debug,
@@ -45,10 +48,10 @@ impl From<LogLevel> for tracing::log::LevelFilter {
 }
 
 /// Initialize the tracing subscriber
-pub(crate) fn init(log_level: LogLevel) -> anyhow::Result<()> {
-    let subscriber = FmtSubscriber::builder()
+pub(crate) fn init(log_level: LogLevel) -> Handle<LevelFilter, Registry> {
+    // Create the formatting layer
+    let layer = fmt::layer()
         .json()
-        .with_max_level(LevelFilter::from_level(log_level.into()))
         .with_timer(time::UtcTime::rfc_3339())
         .with_span_events(FmtSpan::CLOSE)
         .with_target(true)
@@ -58,12 +61,17 @@ pub(crate) fn init(log_level: LogLevel) -> anyhow::Result<()> {
         .with_thread_names(true)
         .with_thread_ids(true)
         .with_current_span(true)
-        .with_span_list(true)
-        .finish();
+        .with_span_list(true);
+    // Create a reloadable layer with the specified log_level
+    let filter = LevelFilter::from_level(log_level.into());
+    let (filter, logger_handle) = reload::Layer::new(filter);
+    tracing_subscriber::registry()
+        .with(filter)
+        .with(layer)
+        .init();
 
     // Logging is globally disabled by default, so globally enable it to the required level.
     tracing::log::set_max_level(log_level.into());
 
-    tracing::subscriber::set_global_default(subscriber)?;
-    Ok(())
+    logger_handle
 }

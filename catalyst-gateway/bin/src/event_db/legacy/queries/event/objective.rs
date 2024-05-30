@@ -33,9 +33,7 @@ impl EventDB {
     pub(crate) async fn get_objectives(
         &self, event: EventId, limit: Option<i64>, offset: Option<i64>,
     ) -> anyhow::Result<Vec<Objective>> {
-        let conn = self.pool.get().await?;
-
-        let rows = conn
+        let rows = self
             .query(Self::OBJECTIVES_QUERY, &[
                 &event.0,
                 &limit,
@@ -64,7 +62,7 @@ impl EventDB {
             };
 
             let mut groups = Vec::new();
-            let rows = conn.query(Self::VOTING_GROUPS_QUERY, &[&row_id]).await?;
+            let rows = self.query(Self::VOTING_GROUPS_QUERY, &[&row_id]).await?;
             for row in rows {
                 let group = row.try_get::<_, Option<String>>("group")?.map(VoterGroupId);
                 let voting_token: Option<_> = row.try_get("voting_token")?;

@@ -24,8 +24,6 @@ const UPDATE_UTXO_SQL: &str = include_str!("update_utxo.sql");
 impl EventDB {
     /// Index utxo data
     pub(crate) async fn index_utxo_data(&self, tx: &MultiEraTx<'_>) -> anyhow::Result<()> {
-        let conn = self.pool.get().await?;
-
         let tx_hash = tx.hash();
 
         // index outputs
@@ -41,15 +39,14 @@ impl EventDB {
             };
             let stake_credential = stake_address.map(|val| val.payload().as_hash().to_vec());
 
-            let _rows = conn
-                .query(INSERT_UTXO_SQL, &[
-                    &i32::try_from(index)?,
-                    &tx_hash.as_slice(),
-                    &i64::try_from(tx_out.lovelace_amount())?,
-                    &stake_credential,
-                    &assets,
-                ])
-                .await?;
+            self.modify(INSERT_UTXO_SQL, &[
+                &i32::try_from(index)?,
+                &tx_hash.as_slice(),
+                &i64::try_from(tx_out.lovelace_amount())?,
+                &stake_credential,
+                &assets,
+            ])
+            .await?;
         }
         // update outputs with inputs
         for tx_in in tx.inputs() {
@@ -57,13 +54,12 @@ impl EventDB {
             let output_tx_hash = output.hash();
             let out_index = output.index();
 
-            let _rows = conn
-                .query(UPDATE_UTXO_SQL, &[
-                    &tx_hash.as_slice(),
-                    &output_tx_hash.as_slice(),
-                    &i32::try_from(out_index)?,
-                ])
-                .await?;
+            self.modify(UPDATE_UTXO_SQL, &[
+                &tx_hash.as_slice(),
+                &output_tx_hash.as_slice(),
+                &i32::try_from(out_index)?,
+            ])
+            .await?;
         }
 
         Ok(())
@@ -73,15 +69,12 @@ impl EventDB {
     pub(crate) async fn index_txn_data(
         &self, tx_id: &[u8], slot_no: SlotNumber, network: Network,
     ) -> anyhow::Result<()> {
-        let conn = self.pool.get().await?;
-
-        let _rows = conn
-            .query(INSERT_TXN_INDEX_SQL, &[
-                &tx_id,
-                &slot_no,
-                &network.to_string(),
-            ])
-            .await?;
+        self.modify(INSERT_TXN_INDEX_SQL, &[
+            &tx_id,
+            &slot_no,
+            &network.to_string(),
+        ])
+        .await?;
 
         Ok(())
     }
@@ -90,9 +83,7 @@ impl EventDB {
     pub(crate) async fn total_utxo_amount(
         &self, stake_credential: StakeCredential, network: Network, slot_num: SlotNumber,
     ) -> anyhow::Result<(StakeAmount, SlotNumber)> {
-        let conn = self.pool.get().await?;
-
-        let row = conn
+        let row = self
             .query_one(SELECT_TOTAL_UTXO_AMOUNT_SQL, &[
                 &stake_credential,
                 &network.to_string(),

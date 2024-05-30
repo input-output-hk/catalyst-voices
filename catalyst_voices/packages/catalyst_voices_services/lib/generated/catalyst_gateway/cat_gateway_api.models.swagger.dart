@@ -1468,6 +1468,140 @@ extension $VotingInfoDirectVoterExtension on VotingInfoDirectVoter {
   }
 }
 
+String? deepQueryInspectionNullableToJson(
+    enums.DeepQueryInspection? deepQueryInspection) {
+  return deepQueryInspection?.value;
+}
+
+String? deepQueryInspectionToJson(
+    enums.DeepQueryInspection deepQueryInspection) {
+  return deepQueryInspection.value;
+}
+
+enums.DeepQueryInspection deepQueryInspectionFromJson(
+  Object? deepQueryInspection, [
+  enums.DeepQueryInspection? defaultValue,
+]) {
+  return enums.DeepQueryInspection.values
+          .firstWhereOrNull((e) => e.value == deepQueryInspection) ??
+      defaultValue ??
+      enums.DeepQueryInspection.swaggerGeneratedUnknown;
+}
+
+enums.DeepQueryInspection? deepQueryInspectionNullableFromJson(
+  Object? deepQueryInspection, [
+  enums.DeepQueryInspection? defaultValue,
+]) {
+  if (deepQueryInspection == null) {
+    return null;
+  }
+  return enums.DeepQueryInspection.values
+          .firstWhereOrNull((e) => e.value == deepQueryInspection) ??
+      defaultValue;
+}
+
+String deepQueryInspectionExplodedListToJson(
+    List<enums.DeepQueryInspection>? deepQueryInspection) {
+  return deepQueryInspection?.map((e) => e.value!).join(',') ?? '';
+}
+
+List<String> deepQueryInspectionListToJson(
+    List<enums.DeepQueryInspection>? deepQueryInspection) {
+  if (deepQueryInspection == null) {
+    return [];
+  }
+
+  return deepQueryInspection.map((e) => e.value!).toList();
+}
+
+List<enums.DeepQueryInspection> deepQueryInspectionListFromJson(
+  List? deepQueryInspection, [
+  List<enums.DeepQueryInspection>? defaultValue,
+]) {
+  if (deepQueryInspection == null) {
+    return defaultValue ?? [];
+  }
+
+  return deepQueryInspection
+      .map((e) => deepQueryInspectionFromJson(e.toString()))
+      .toList();
+}
+
+List<enums.DeepQueryInspection>? deepQueryInspectionNullableListFromJson(
+  List? deepQueryInspection, [
+  List<enums.DeepQueryInspection>? defaultValue,
+]) {
+  if (deepQueryInspection == null) {
+    return defaultValue;
+  }
+
+  return deepQueryInspection
+      .map((e) => deepQueryInspectionFromJson(e.toString()))
+      .toList();
+}
+
+String? logLevelNullableToJson(enums.LogLevel? logLevel) {
+  return logLevel?.value;
+}
+
+String? logLevelToJson(enums.LogLevel logLevel) {
+  return logLevel.value;
+}
+
+enums.LogLevel logLevelFromJson(
+  Object? logLevel, [
+  enums.LogLevel? defaultValue,
+]) {
+  return enums.LogLevel.values.firstWhereOrNull((e) => e.value == logLevel) ??
+      defaultValue ??
+      enums.LogLevel.swaggerGeneratedUnknown;
+}
+
+enums.LogLevel? logLevelNullableFromJson(
+  Object? logLevel, [
+  enums.LogLevel? defaultValue,
+]) {
+  if (logLevel == null) {
+    return null;
+  }
+  return enums.LogLevel.values.firstWhereOrNull((e) => e.value == logLevel) ??
+      defaultValue;
+}
+
+String logLevelExplodedListToJson(List<enums.LogLevel>? logLevel) {
+  return logLevel?.map((e) => e.value!).join(',') ?? '';
+}
+
+List<String> logLevelListToJson(List<enums.LogLevel>? logLevel) {
+  if (logLevel == null) {
+    return [];
+  }
+
+  return logLevel.map((e) => e.value!).toList();
+}
+
+List<enums.LogLevel> logLevelListFromJson(
+  List? logLevel, [
+  List<enums.LogLevel>? defaultValue,
+]) {
+  if (logLevel == null) {
+    return defaultValue ?? [];
+  }
+
+  return logLevel.map((e) => logLevelFromJson(e.toString())).toList();
+}
+
+List<enums.LogLevel>? logLevelNullableListFromJson(
+  List? logLevel, [
+  List<enums.LogLevel>? defaultValue,
+]) {
+  if (logLevel == null) {
+    return defaultValue;
+  }
+
+  return logLevel.map((e) => logLevelFromJson(e.toString())).toList();
+}
+
 String? networkNullableToJson(enums.Network? network) {
   return network?.value;
 }
