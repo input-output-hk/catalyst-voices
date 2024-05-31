@@ -48,14 +48,8 @@ check-code-formatting:
 # Build web version of Catalyst Voices
 build:
     FROM +src
-
     WORKDIR /frontend/catalyst_voices
-    RUN flutter clean
-    RUN flutter pub get
-    RUN flutter build web --web-renderer canvaskit --release --target lib/configs/main_web.dart
-
-    WORKDIR /frontend/catalyst_voices/build
-    SAVE ARTIFACT web /web AS LOCAL web
+    DO flutter-ci+BUILD_WEB --TARGET=lib/configs/main_web.dart
 
 test-unit:
     FROM +src
