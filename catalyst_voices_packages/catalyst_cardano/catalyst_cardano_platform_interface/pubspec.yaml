@@ -3,13 +3,14 @@ description: A common platform interface for the catalyst_cardano plugin.
 repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices_packages/catalyst_cardano/catalyst_cardano_platform_interface
 issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
 topics: [blockchain, cardano, cryptocurrency, wallet]
-version: 1.0.0
+version: 0.1.0
 
 environment:
   sdk: ">=3.3.0 <4.0.0"
   flutter: 3.19.5
 
 dependencies:
+  catalyst_cardano_serialization: ^0.1.0
   flutter:
     sdk: flutter
   plugin_platform_interface: ^2.1.7
