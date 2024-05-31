@@ -163,4 +163,5 @@ jobs:
 
               - run: |
                   curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C /usr/local/bin
-                  coveralls report
+                  ls
+                  coveralls report coverage-reports/cat-gateway.coverage-report.info
