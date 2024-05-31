@@ -48,8 +48,9 @@ check-code-formatting:
 # Build web version of Catalyst Voices
 build:
     FROM +src
-    WORKDIR /frontend/catalyst_voices
-    DO flutter-ci+BUILD_WEB --TARGET=lib/configs/main_web.dart
+    ARG WORKDIR=/frontend/catalyst_voices
+    DO flutter-ci+BUILD_WEB --TARGET=lib/configs/main_web.dart --WORKDIR=$WORKDIR
+    SAVE ARTIFACT web
 
 test-unit:
     FROM +src
@@ -58,7 +59,7 @@ test-unit:
 package:
     FROM nginx:alpine3.18
     ARG tag='latest'
-    BUILD +build
+    COPY +build/web web
     COPY ./nginx.conf /etc/nginx/nginx.conf
     EXPOSE 80
 
