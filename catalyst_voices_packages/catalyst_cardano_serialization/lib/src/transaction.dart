@@ -40,8 +40,9 @@ final class Transaction {
       body: TransactionBody.fromCbor(body),
       isValid: (isValid as CborBool).value,
       witnessSet: TransactionWitnessSet.fromCbor(witnessSet),
-      auxiliaryData:
-          auxiliaryData != null ? AuxiliaryData.fromCbor(auxiliaryData) : null,
+      auxiliaryData: (auxiliaryData != null && auxiliaryData is! CborNull)
+          ? AuxiliaryData.fromCbor(auxiliaryData)
+          : null,
     );
   }
 
