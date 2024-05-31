@@ -2,16 +2,14 @@
 
 use cardano_chain_follower::Network;
 use pallas::ledger::traverse::MultiEraBlock;
+use tokio_postgres::{binary_copy::BinaryCopyInWriter, types::Type};
 
 use crate::{
     cardano::{
         cip36_registration::{Cip36Metadata, VotingInfo},
         util::valid_era,
     },
-    event_db::{
-        cardano::chain_state::SlotNumber, error::NotFoundError, utils::prepare_sql_params_list,
-        EventDB,
-    },
+    event_db::{cardano::chain_state::SlotNumber, error::NotFoundError, EventDB},
 };
 
 /// Transaction id
@@ -145,38 +143,56 @@ impl EventDB {
             return Ok(());
         }
 
-        let conn = self.pool.get().await?;
+        let mut conn = self.pool.get().await?;
+        let tx = conn.transaction().await?;
 
-        let chunk_size = (i16::MAX / 8) as usize;
-        for chunk in values.chunks(chunk_size) {
-            // Build query VALUES statements
-            let values_strings = prepare_sql_params_list(&[None; 8], chunk.len());
+        tx.execute(
+            "CREATE TEMPORARY TABLE tmp_cardano_voter_registration (LIKE cardano_voter_registration) ON COMMIT DROP",
+            &[],
+        )
+        .await?;
 
-            let query = format!(
-                r#"EXPLAIN (BUFFERS TRUE, ANALYZE TRUE) INSERT INTO cardano_voter_registration (tx_id, stake_credential, public_voting_key, payment_address, nonce, metadata_cip36, stats, valid) VALUES {} 
-                ON CONFLICT (tx_id) DO UPDATE SET stake_credential = EXCLUDED.stake_credential, public_voting_key = EXCLUDED.public_voting_key, payment_address = EXCLUDED.payment_address,
-                nonce = EXCLUDED.nonce, metadata_cip36 = EXCLUDED.metadata_cip36, stats = EXCLUDED.stats, valid = EXCLUDED.valid"#,
-                values_strings.join(",")
-            );
+        {
+            let sink = tx
+            .copy_in("COPY  tmp_cardano_voter_registration (tx_id, stake_credential, public_voting_key, payment_address, nonce, metadata_cip36, stats, valid) FROM STDIN BINARY")
+            .await?;
+            let writer = BinaryCopyInWriter::new(sink, &[
+                Type::BYTEA,
+                Type::BYTEA,
+                Type::BYTEA,
+                Type::BYTEA,
+                Type::INT8,
+                Type::BYTEA,
+                Type::JSONB,
+                Type::BOOL,
+            ]);
+            tokio::pin!(writer);
 
-            #[allow(trivial_casts)]
-            let params: Vec<_> = chunk
-                .iter()
-                .flat_map(|vs| {
-                    [
-                        &vs.tx_id as &(dyn tokio_postgres::types::ToSql + Sync),
-                        &vs.stake_credential,
-                        &vs.public_voting_key,
-                        &vs.payment_address,
-                        &vs.nonce,
-                        &vs.cip36_metadata,
-                        &vs.stats,
-                        &vs.valid,
-                    ]
-                })
-                .collect();
-            conn.execute(&query, &params).await?;
+            for params in values {
+                #[allow(trivial_casts)]
+                writer
+                    .as_mut()
+                    .write(&[
+                        &params.tx_id as &(dyn tokio_postgres::types::ToSql + Sync),
+                        &params.stake_credential,
+                        &params.public_voting_key,
+                        &params.payment_address,
+                        &params.nonce,
+                        &params.cip36_metadata,
+                        &params.stats,
+                        &params.valid,
+                    ])
+                    .await?;
+            }
+
+            writer.finish().await?;
         }
+
+        tx.execute("INSERT INTO cardano_voter_registration (tx_id, stake_credential, public_voting_key, payment_address, nonce, metadata_cip36, stats, valid) 
+                   SELECT tx_id, stake_credential, public_voting_key, payment_address, nonce, metadata_cip36, stats, valid FROM tmp_cardano_voter_registration
+                   ON CONFLICT (tx_id) DO UPDATE SET stake_credential = EXCLUDED.stake_credential, public_voting_key = EXCLUDED.public_voting_key, payment_address = EXCLUDED.payment_address,
+                   nonce = EXCLUDED.nonce, metadata_cip36 = EXCLUDED.metadata_cip36, stats = EXCLUDED.stats, valid = EXCLUDED.valid", &[]).await?;
+        tx.commit().await?;
 
         Ok(())
     }
