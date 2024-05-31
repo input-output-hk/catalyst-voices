@@ -52,7 +52,7 @@ abstract interface class CardanoWallet {
   /// transparent to web pages using this API. If a wallet is already connected
   /// this function should not request access a second time, and instead just
   /// return the API object.
-  Future<CardanoWalletApi> enable();
+  Future<CardanoWalletApi> enable({List<CipExtension>? extensions});
 }
 
 /// The full API of enabled wallet extension.
@@ -112,6 +112,20 @@ abstract interface class CardanoWalletApi {
   Future<List<TransactionUnspentOutput>> getUtxos({
     Coin? amount,
     Paginate? paginate,
+  });
+
+  /// This endpoint utilizes the CIP-0008 signing spec for
+  /// standardization/safety reasons. It allows the dApp to request the user
+  /// to sign a payload conforming to said spec. The user's consent should be
+  /// requested and the message to sign shown to the user. The payment key
+  /// from [address] will be used for base, enterprise and pointer addresses to
+  /// determine the EdDSA25519 key used. The staking key will be used for
+  /// reward addresses.
+  ///
+  /// Throws [WalletDataSignException].
+  Future<VkeyWitness> signData({
+    required ShelleyAddress address,
+    required List<int> payload,
   });
 
   /// Requests that a user sign the unsigned portions

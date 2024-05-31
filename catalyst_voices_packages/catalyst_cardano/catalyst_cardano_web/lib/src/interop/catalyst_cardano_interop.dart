@@ -29,7 +29,9 @@ extension type JSCardanoWallet(JSObject _) implements JSObject {
   external JSPromise<JSBoolean> isEnabled();
 
   /// See [CardanoWallet.enable].
-  external JSPromise<JSCardanoWalletApi> enable();
+  external JSPromise<JSCardanoWalletApi> enable([
+    JSCipExtensions? extensions,
+  ]);
 
   /// Converts JS representation to pure dart representation.
   CardanoWallet get toDart => JSCardanoWalletProxy(this);
@@ -66,25 +68,57 @@ extension type JSCardanoWalletApi(JSObject _) implements JSObject {
     JSPaginate? paginate,
   ]);
 
+  /// See [CardanoWalletApi.signData].
+  external JSPromise<JSString> signData(
+    JSString address,
+    JSString payload,
+  );
+
   /// See [CardanoWalletApi.signTx].
-  external JSPromise<JSString> signTx([
-    JSString tx,
+  external JSPromise<JSString> signTx(
+    JSString tx, [
     JSBoolean? partialSign,
   ]);
 
   /// See [CardanoWalletApi.submitTx].
-  external JSPromise<JSString> submitTx([
-    JSString tx,
-  ]);
+  external JSPromise<JSString> submitTx(JSString tx);
 
   /// Converts JS representation to pure dart representation.
   CardanoWalletApi get toDart => JSCardanoWalletApiProxy(this);
 }
 
+/// Represents wallet extensions to be activated in [JSCardanoWallet.enable].
+extension type JSCipExtensions._(JSObject _) implements JSObject {
+  /// An array of extensions.
+  external JSArray<JSCipExtension> get extensions;
+
+  /// The default constructor for [JSCipExtensions].
+  external factory JSCipExtensions({JSArray<JSCipExtension> extensions});
+
+  /// Constructs [JSCipExtensions] from dart representation.
+  factory JSCipExtensions.fromDart(List<CipExtension> extensions) {
+    return JSCipExtensions(
+      extensions: extensions.map(JSCipExtension.fromDart).toList().toJS,
+    );
+  }
+
+  /// Converts JS representation to pure dart representation.
+  List<CipExtension> get toDart =>
+      extensions.toDart.map((e) => e.toDart).toList();
+}
+
 /// The JS representation of the [CipExtension].
-extension type JSCipExtension(JSObject _) implements JSObject {
+extension type JSCipExtension._(JSObject _) implements JSObject {
   /// See [JSCipExtension.cip].
   external JSNumber get cip;
+
+  /// The default constructor for [JSCipExtension].
+  external factory JSCipExtension({JSNumber cip});
+
+  /// Constructs [JSCipExtension] from dart representation.
+  factory JSCipExtension.fromDart(CipExtension extension) {
+    return JSCipExtension(cip: extension.cip.toJS);
+  }
 
   /// Converts JS representation to pure dart representation.
   CipExtension get toDart => CipExtension(cip: cip.toDartInt);

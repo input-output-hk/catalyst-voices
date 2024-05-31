@@ -40,8 +40,7 @@ final class _AppState extends State<App> {
       await Dependencies.instance.init();
     } catch (error, stackTrace) {
       // TODO(dtscalac): FutureBuilder that uses this future silences all
-      // errors, replace it here with proper logging solution. This logging here
-      // is needed to spot early-on any issues with catalyst_cardano plugin.
+      // errors, replace it here with proper logging solution.
       FlutterError.dumpErrorToConsole(
         FlutterErrorDetails(exception: error, stack: stackTrace),
       );

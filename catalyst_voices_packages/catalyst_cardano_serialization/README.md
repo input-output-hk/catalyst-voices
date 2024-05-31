@@ -1,15 +1,15 @@
 # Content
 
-* [Content](#content)
-  * [Features](#features)
-  * [Requirements](#requirements)
-  * [Install](#install)
-  * [Example](#example)
-  * [Limitations](#limitations)
-  * [Supported transaction body fields](#supported-transaction-body-fields)
-  * [Reference documentation](#reference-documentation)
-  * [Support](#support)
-  * [License](#license)
+- [Content](#content)
+  - [Features](#features)
+  - [Requirements](#requirements)
+  - [Install](#install)
+  - [Example](#example)
+  - [Limitations](#limitations)
+  - [Supported transaction body fields](#supported-transaction-body-fields)
+  - [Reference documentation](#reference-documentation)
+  - [Support](#support)
+  - [License](#license)
 
 ## Features
 
@@ -122,22 +122,28 @@ void main() {
       // .withFee(const Coin(10000000))
       .buildBody();
 
-  final txHash = TransactionHash.fromTransactionBody(txBody);
-  final witnessSet = _signTransaction(txHash);
+  final unsignedTx = Transaction(
+    body: txBody,
+    isValid: true,
+    witnessSet: const TransactionWitnessSet(
+      vkeyWitnesses: {},
+    ),
+  );
+  final witnessSet = _signTransaction(unsignedTx);
 
-  final tx = Transaction(
+  final signedTx = Transaction(
     body: txBody,
     isValid: true,
     witnessSet: witnessSet,
     auxiliaryData: txMetadata,
   );
 
-  final txBytes = cbor.encode(tx.toCbor());
+  final txBytes = cbor.encode(signedTx.toCbor());
   final txBytesHex = hex.encode(txBytes);
   print(txBytesHex);
 }
 
-TransactionWitnessSet _signTransaction(TransactionHash txHash) {
+TransactionWitnessSet _signTransaction(Transaction transaction) {
   // return a fake witness set, in real world the wallet
   // would sign the transaction hash and provide this
   return TransactionWitnessSet(

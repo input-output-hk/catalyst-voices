@@ -51,7 +51,7 @@ final class Transaction {
       body.toCbor(),
       witnessSet.toCbor(),
       CborBool(isValid),
-      (auxiliaryData ?? const AuxiliaryData()).toCbor(),
+      auxiliaryData?.toCbor() ?? const CborNull(),
     ]);
   }
 }
