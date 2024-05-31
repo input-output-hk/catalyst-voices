@@ -161,7 +161,14 @@ jobs:
                 with:
                   name: coverage-reports
 
-              - run: |
-                  curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C /usr/local/bin
-                  ls
-                  coveralls report cat-gateway.coverage-report.info
+             # - run: |
+             #     curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C /usr/local/bin
+             #     ls
+             #     coveralls report cat-gateway.coverage-report.info
+
+              - name: Coveralls
+                env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                uses: coverallsapp/github-action@v2
+                with:
+                  file: "cat-gateway.coverage-report.info"
