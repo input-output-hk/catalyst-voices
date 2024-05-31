@@ -3,3 +3,6 @@
 .packages
 build/
 pubspec.lock
+pubspec_overrides.yaml
+.flutter-plugins
+.flutter-plugins-dependencies
