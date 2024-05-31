@@ -50,6 +50,7 @@ cddl = "0.9.2"
 ciborium = "0.2"
 pallas = { git = "https://github.com/input-output-hk/catalyst-pallas.git", rev = "709acb19c52c6b789279ecc4bc8793b5d8b5abe9", version = "0.25.0" }
 cardano-chain-follower = { git = "https://github.com/input-output-hk/hermes.git", version="0.0.1" }
+stringzilla = "3.8.4"
 
 [workspace.lints.rust]
 warnings = "deny"

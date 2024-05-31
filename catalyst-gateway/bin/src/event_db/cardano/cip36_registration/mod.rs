@@ -90,7 +90,6 @@ impl IndexedVoterRegistrationParams {
                     } else {
                         (None, None, None, None)
                     };
-
                 let encoded_voting_key = if let Some(voting_info) = voting_info.as_ref() {
                     let Ok(enc) = serde_json::to_string(voting_info) else {
                         return None;
@@ -156,16 +155,19 @@ impl EventDB {
             let sink = tx
             .copy_in("COPY  tmp_cardano_voter_registration (tx_id, stake_credential, public_voting_key, payment_address, nonce, metadata_cip36, stats, valid) FROM STDIN BINARY")
             .await?;
-            let writer = BinaryCopyInWriter::new(sink, &[
-                Type::BYTEA,
-                Type::BYTEA,
-                Type::BYTEA,
-                Type::BYTEA,
-                Type::INT8,
-                Type::BYTEA,
-                Type::JSONB,
-                Type::BOOL,
-            ]);
+            let writer = BinaryCopyInWriter::new(
+                sink,
+                &[
+                    Type::BYTEA,
+                    Type::BYTEA,
+                    Type::BYTEA,
+                    Type::BYTEA,
+                    Type::INT8,
+                    Type::BYTEA,
+                    Type::JSONB,
+                    Type::BOOL,
+                ],
+            );
             tokio::pin!(writer);
 
             for params in values {
@@ -201,14 +203,11 @@ impl EventDB {
     pub(crate) async fn get_registration_info(
         &self, stake_credential: StakeCredential, network: Network, slot_num: SlotNumber,
     ) -> anyhow::Result<(TxId, PaymentAddress, PublicVotingInfo, Nonce)> {
-        let conn = self.pool.get().await?;
-
-        let rows = conn
-            .query(SELECT_VOTER_REGISTRATION_SQL, &[
-                &stake_credential,
-                &network.to_string(),
-                &slot_num,
-            ])
+        let rows = self
+            .query(
+                SELECT_VOTER_REGISTRATION_SQL,
+                &[&stake_credential, &network.to_string(), &slot_num],
+            )
             .await?;
 
         let row = rows.first().ok_or(NotFoundError)?;

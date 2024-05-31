@@ -58,23 +58,17 @@ impl SlotInfoQueryType {
     /// Get SQL query
     fn get_sql_query(&self) -> anyhow::Result<String> {
         let tmpl_fields = match self {
-            SlotInfoQueryType::Previous => {
-                SlotInfoQueryTmplFields {
-                    sign: "<",
-                    ordering: Some("DESC"),
-                }
+            SlotInfoQueryType::Previous => SlotInfoQueryTmplFields {
+                sign: "<",
+                ordering: Some("DESC"),
             },
-            SlotInfoQueryType::Current => {
-                SlotInfoQueryTmplFields {
-                    sign: "=",
-                    ordering: None,
-                }
+            SlotInfoQueryType::Current => SlotInfoQueryTmplFields {
+                sign: "=",
+                ordering: None,
             },
-            SlotInfoQueryType::Next => {
-                SlotInfoQueryTmplFields {
-                    sign: ">",
-                    ordering: None,
-                }
+            SlotInfoQueryType::Next => SlotInfoQueryTmplFields {
+                sign: ">",
+                ordering: None,
             },
         };
 
@@ -161,13 +155,16 @@ impl EventDB {
             let sink = tx
                 .copy_in("COPY tmp_cardano_slot_index (slot_no, network, epoch_no, block_time, block_hash) FROM STDIN BINARY")
                 .await?;
-            let writer = BinaryCopyInWriter::new(sink, &[
-                Type::INT8,
-                Type::TEXT,
-                Type::INT8,
-                Type::TIMESTAMPTZ,
-                Type::BYTEA,
-            ]);
+            let writer = BinaryCopyInWriter::new(
+                sink,
+                &[
+                    Type::INT8,
+                    Type::TEXT,
+                    Type::INT8,
+                    Type::TIMESTAMPTZ,
+                    Type::BYTEA,
+                ],
+            );
             tokio::pin!(writer);
 
             for params in values {
@@ -197,13 +194,11 @@ impl EventDB {
     pub(crate) async fn get_slot_info(
         &self, date_time: DateTime, network: Network, query_type: SlotInfoQueryType,
     ) -> anyhow::Result<(SlotNumber, BlockHash, DateTime)> {
-        let conn = self.pool.get().await?;
-
-        let rows = conn
-            .query(&query_type.get_sql_query()?, &[
-                &network.to_string(),
-                &date_time,
-            ])
+        let rows = self
+            .query(
+                &query_type.get_sql_query()?,
+                &[&network.to_string(), &date_time],
+            )
             .await?;
 
         let row = rows.first().ok_or(NotFoundError)?;
@@ -218,9 +213,7 @@ impl EventDB {
     pub(crate) async fn last_updated_state(
         &self, network: Network,
     ) -> anyhow::Result<(SlotNumber, BlockHash, DateTime)> {
-        let conn = self.pool.get().await?;
-
-        let rows = conn
+        let rows = self
             .query(SELECT_UPDATE_STATE_SQL, &[&network.to_string()])
             .await?;
 
@@ -239,8 +232,6 @@ impl EventDB {
         &self, last_updated: DateTime, slot_no: SlotNumber, block_hash: BlockHash,
         network: Network, machine_id: &MachineId,
     ) -> anyhow::Result<()> {
-        let conn = self.pool.get().await?;
-
         // Rollback or update
         let update = true;
 
@@ -248,8 +239,9 @@ impl EventDB {
 
         // An insert only happens once when there is no update metadata available
         // All future additions are just updates on ended, slot_no and block_hash
-        let _rows = conn
-            .query(INSERT_UPDATE_STATE_SQL, &[
+        self.modify(
+            INSERT_UPDATE_STATE_SQL,
+            &[
                 &i64::try_from(network_id)?,
                 &last_updated,
                 &last_updated,
@@ -258,8 +250,9 @@ impl EventDB {
                 &network.to_string(),
                 &block_hash,
                 &update,
-            ])
-            .await?;
+            ],
+        )
+        .await?;
 
         Ok(())
     }
