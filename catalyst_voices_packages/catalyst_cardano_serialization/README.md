@@ -1,15 +1,15 @@
 # Content
 
-- [Content](#content)
-  - [Features](#features)
-  - [Requirements](#requirements)
-  - [Install](#install)
-  - [Example](#example)
-  - [Limitations](#limitations)
-  - [Supported transaction body fields](#supported-transaction-body-fields)
-  - [Reference documentation](#reference-documentation)
-  - [Support](#support)
-  - [License](#license)
+* [Content](#content)
+  * [Features](#features)
+  * [Requirements](#requirements)
+  * [Install](#install)
+  * [Example](#example)
+  * [Limitations](#limitations)
+  * [Supported transaction body fields](#supported-transaction-body-fields)
+  * [Reference documentation](#reference-documentation)
+  * [Support](#support)
+  * [License](#license)
 
 ## Features
 
