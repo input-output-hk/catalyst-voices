@@ -56,7 +56,14 @@ dev_dependencies:
     sdk: flutter
   mockito: ^5.4.4
   mocktail: ^1.0.1
+  patrol: ^3.6.1
 
 flutter:
   uses-material-design: true
   generate: true
+
+patrol:
+  app_name: Catalyst Voices
+  flavor: qa
+  android:
+    package_name: io.projectcatalyst.catalyst_voices
