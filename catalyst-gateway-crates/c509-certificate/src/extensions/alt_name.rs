@@ -8,7 +8,7 @@ use super::is_critical;
 // Section 9.9 https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/
 #[allow(unused)]
 #[derive(Debug, PartialEq, Clone)]
-enum GeneralNamesRegistry {
+pub enum GeneralNamesRegistry {
     OtherNameBundleEID = -3,          // eid-structure from RFC 9171
     OtherNameSmtpUTF8Mailbox = -2,    // text
     OtherNameHardwareModuleName = -1, // [ ~oid, bytes ]
@@ -98,9 +98,9 @@ impl CborEncoder for Eid {
 }
 // Define the GeneralName struct
 #[derive(Clone)]
-pub(crate) struct GeneralName {
-    gn_name: GeneralNamesRegistry,
-    gn_value: GeneralNamesRegistryType,
+pub struct GeneralName {
+    pub gn_name: GeneralNamesRegistry,
+    pub gn_value: GeneralNamesRegistryType,
 }
 
 impl CborEncoder for GeneralNamesRegistryType {
@@ -118,6 +118,17 @@ impl CborEncoder for GeneralNamesRegistryType {
 impl GeneralName {
     fn encode(&self, encoder: &mut Encoder<&mut Vec<u8>>) {
         self.gn_value.encode(encoder)
+    }
+}
+
+pub struct AltName {
+    pub general_names: Vec<GeneralName>,
+    pub critical: bool,
+}
+
+impl CborEncoder for AltName {
+    fn encode(&self, encoder: &mut Encoder<&mut Vec<u8>>) {
+        encode_alt_name(self.general_names.clone(), self.critical, encoder)
     }
 }
 
@@ -142,7 +153,6 @@ fn encode_alt_name(b: Vec<GeneralName>, critical: bool, encoder: &mut Encoder<&m
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
     use minicbor::Encoder;
 
@@ -154,8 +164,12 @@ mod tests {
             gn_name: GeneralNamesRegistry::DNSName,
             gn_value: GeneralNamesRegistryType::String("example.com".to_string()),
         };
-        encode_alt_name(vec![general_name], false, &mut encoder);
-        println!("{:?}", hex::encode(buffer));
+        let alt_name = AltName {
+            general_names: vec![general_name],
+            critical: false,
+        };
+        alt_name.encode(&mut encoder);
+        assert_eq!(hex::encode(buffer), "026b6578616d706c652e636f6d");
     }
 
     // [ ~oid, bytes ]
@@ -178,7 +192,11 @@ mod tests {
                 hw_serial_num: vec![0x01, 0x02, 0x03, 0x04],
             }]),
         };
-        encode_alt_name(vec![general_name], false, &mut encoder);
+        let alt_name = AltName {
+            general_names: vec![general_name],
+            critical: false,
+        };
+        alt_name.encode(&mut encoder);
         assert_eq!(hex::encode(buffer), "822081492b06010401b01f0a014401020304");
     }
 
@@ -193,7 +211,11 @@ mod tests {
                 ssp: "dtn://node1/service1/data".to_string(),
             }),
         };
-        encode_alt_name(vec![general_name], false, &mut encoder);
+        let alt_name = AltName {
+            general_names: vec![general_name],
+            critical: false,
+        };
+        alt_name.encode(&mut encoder);
         assert_eq!(
             hex::encode(buffer),
             "822201581964746e3a2f2f6e6f6465312f73657276696365312f64617461"
