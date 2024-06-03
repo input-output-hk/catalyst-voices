@@ -74,23 +74,23 @@ impl CborEncoder for Time {
 
 // ---------------------------------------------------
 
-type Name = Vec<RelativeDistinguishedName>;
+pub type Name = Vec<RelativeDistinguishedName>;
 
-pub(crate) struct RelativeDistinguishedName {
-    name: AttributesRegistry,
-    value: AttributeRegistryValue,
+pub struct RelativeDistinguishedName {
+    pub name: AttributesRegistry,
+    pub value: AttributeRegistryValue,
 }
 
 #[allow(unused)]
 #[derive(Debug)]
-enum StringType {
+pub enum StringType {
     Utf8String,
 }
 
 #[allow(unused)]
-struct AttributeRegistryValue {
-    str_type: StringType,
-    str_value: String,
+pub struct AttributeRegistryValue {
+    pub str_type: StringType,
+    pub str_value: String,
 }
 
 impl CborEncoder for Name {
