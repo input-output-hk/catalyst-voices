@@ -10,7 +10,7 @@ class CatalystCardano {
 
   /// Returns available wallet extensions exposed under
   /// cardano.{walletName} according to CIP-30 standard.
-  Future<List<CardanoWallet>> getCardanoWallets() async {
-    return CatalystCardanoPlatform.instance.getCardanoWallets();
+  Future<List<CardanoWallet>> getWallets() async {
+    return CatalystCardanoPlatform.instance.getWallets();
   }
 }

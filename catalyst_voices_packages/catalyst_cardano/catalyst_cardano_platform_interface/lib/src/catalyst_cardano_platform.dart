@@ -42,7 +42,7 @@ abstract class CatalystCardanoPlatform extends PlatformInterface {
 
   /// Returns available wallet extensions exposed under
   /// cardano.{walletName} according to CIP-30 standard.
-  Future<List<CardanoWallet>> getCardanoWallets() {
-    throw UnimplementedError('getCardanoWallets() has not been implemented.');
+  Future<List<CardanoWallet>> getWallets() {
+    throw UnimplementedError('getWallets() has not been implemented.');
   }
 }
