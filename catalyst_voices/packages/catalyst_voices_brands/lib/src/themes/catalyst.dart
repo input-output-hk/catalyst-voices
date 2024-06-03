@@ -1,12 +1,13 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
-import 'package:catalyst_voices_assets/generated/colors.gen.dart';
-import 'package:catalyst_voices_brands/src/themes/voices_color_scheme.dart';
+import 'package:catalyst_voices_brands/src/theme_extensions/brand_assets.dart';
+import 'package:catalyst_voices_brands/src/theme_extensions/voices_color_scheme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 ThemeData _buildThemeData(
   ColorScheme colorScheme,
   VoicesColorScheme voicesColorScheme,
+  BrandAssets brandAssets,
 ) {
   return ThemeData(
     textTheme: TextTheme(
@@ -113,6 +114,7 @@ ThemeData _buildThemeData(
     colorScheme: colorScheme,
     extensions: <ThemeExtension<dynamic>>[
       voicesColorScheme,
+      brandAssets,
     ],
   );
 }
@@ -219,14 +221,26 @@ const VoicesColorScheme darkVoicesColorScheme = VoicesColorScheme(
   iconsError: VoicesColors.darkIconsError,
 );
 
+final BrandAssets lightBrandAssets = BrandAssets(
+  logo: VoicesAssets.images.catalystLogo,
+  logoIcon: VoicesAssets.images.catalystLogoIcon,
+);
+
+final BrandAssets darkBrandAssets = BrandAssets(
+  logo: VoicesAssets.images.catalystLogoWhite,
+  logoIcon: VoicesAssets.images.catalystLogoIconWhite,
+);
+
 /// [ThemeData] for the `catalyst` brand.
 final ThemeData catalyst = _buildThemeData(
   lightColorScheme,
   lightVoicesColorScheme,
+  lightBrandAssets,
 );
 
 /// Dark [ThemeData] for the `catalyst` brand.
 final ThemeData darkCatalyst = _buildThemeData(
   darkColorScheme,
   darkVoicesColorScheme,
+  darkBrandAssets,
 );

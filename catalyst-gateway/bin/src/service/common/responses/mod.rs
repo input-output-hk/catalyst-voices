@@ -59,7 +59,7 @@ impl<T> WithErrorResponses<T> {
                     err.to_string(),
                 ))))
             },
-            err if err.is::<NetworkValidationError>() => {
+            err if err.is::<bb8::RunError<tokio_postgres::Error>>() => {
                 WithErrorResponses::Error(ErrorResponses::ServiceUnavailable)
             },
             err => {
