@@ -16,8 +16,8 @@ class CatalystCardanoWeb extends CatalystCardanoPlatform {
   CatalystCardanoWeb();
 
   @override
-  Future<List<CardanoWallet>> getCardanoWallets() async {
-    final wallets = interop.getCardanoWallets().toDart;
+  Future<List<CardanoWallet>> getWallets() async {
+    final wallets = interop.getWallets().toDart;
     return wallets.map((e) => e.toDart).toList();
   }
 

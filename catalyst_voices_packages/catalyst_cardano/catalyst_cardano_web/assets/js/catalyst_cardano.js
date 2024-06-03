@@ -1,6 +1,6 @@
 // Returns available wallet extensions exposed under
 // cardano.{walletName} according to CIP-30 standard.
-function _getCardanoWallets() {
+function _getWallets() {
     const cardano = window.cardano;
     if (cardano) {
         const keys = Object.keys(window.cardano);
@@ -14,7 +14,7 @@ function _getCardanoWallets() {
 // A namespace containing the JS functions that
 // can be executed from dart side
 const catalyst_cardano = {
-    getCardanoWallets: _getCardanoWallets,
+    getWallets: _getWallets,
 }
 
 // Expose cardano multiplatform as globally accessible
