@@ -59,7 +59,7 @@ impl CborEncoder for Vec<OtherNameType> {
 // BundleProtocolURISchemeTypes enum defines the type of URI scheme
 // URI Scheme can be found in Section 9.7
 // https://datatracker.ietf.org/doc/rfc9171/
-// 
+//
 // DTN scheme syntax
 //  dtn-uri = "dtn:" ("none" / dtn-hier-part)
 //  dtn-hier-part = "//" node-name name-delim demux ; a path-rootless
@@ -92,8 +92,8 @@ pub(crate) struct Eid {
 
 impl CborEncoder for Eid {
     fn encode(&self, encoder: &mut Encoder<&mut Vec<u8>>) {
-       let _unused = encoder.u8(self.uri_code.clone() as u8);
-       let _unused = encoder.str(&self.ssp);
+        let _unused = encoder.u8(self.uri_code.clone() as u8);
+        let _unused = encoder.bytes(&self.ssp.as_bytes());
     }
 }
 // Define the GeneralName struct
@@ -194,7 +194,9 @@ mod tests {
             }),
         };
         encode_alt_name(vec![general_name], false, &mut encoder);
-        // FIXME - recheck this
-        assert_eq!(hex::encode(buffer), "822201781964746e3a2f2f6e6f6465312f73657276696365312f64617461");
+        assert_eq!(
+            hex::encode(buffer),
+            "822201581964746e3a2f2f6e6f6465312f73657276696365312f64617461"
+        );
     }
 }
