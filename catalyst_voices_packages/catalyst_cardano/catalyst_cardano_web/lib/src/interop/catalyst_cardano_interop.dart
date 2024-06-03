@@ -9,7 +9,7 @@ import 'package:catalyst_cardano_web/src/interop/catalyst_cardano_wallet_proxy.d
 /// Lists all injected Cardano wallet extensions that are reachable
 /// via window.cardano.{walletName} in javascript.
 @JS()
-external JSArray<JSCardanoWallet> getCardanoWallets();
+external JSArray<JSCardanoWallet> getWallets();
 
 /// The JS representation of the [CardanoWallet].
 extension type JSCardanoWallet(JSObject _) implements JSObject {
