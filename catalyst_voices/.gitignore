@@ -130,3 +130,6 @@ coverage/
 
 # Fastlane.swift runner binary
 **/fastlane/FastlaneRunner
+
+# Patrol auto-generated file
+test_bundle.dart
