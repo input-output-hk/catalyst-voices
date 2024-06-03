@@ -4,10 +4,8 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
-import 'catalyst_voices_localizations_en.dart'
-    deferred as catalyst_voices_localizations_en;
-import 'catalyst_voices_localizations_es.dart'
-    deferred as catalyst_voices_localizations_es;
+import 'catalyst_voices_localizations_en.dart' deferred as catalyst_voices_localizations_en;
+import 'catalyst_voices_localizations_es.dart' deferred as catalyst_voices_localizations_es;
 
 /// Callers can lookup localized strings with an instance of VoicesLocalizations
 /// returned by `VoicesLocalizations.of(context)`.
@@ -61,8 +59,7 @@ import 'catalyst_voices_localizations_es.dart'
 /// be consistent with the languages listed in the VoicesLocalizations.supportedLocales
 /// property.
 abstract class VoicesLocalizations {
-  VoicesLocalizations(String locale)
-      : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  VoicesLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -70,8 +67,7 @@ abstract class VoicesLocalizations {
     return Localizations.of<VoicesLocalizations>(context, VoicesLocalizations);
   }
 
-  static const LocalizationsDelegate<VoicesLocalizations> delegate =
-      _VoicesLocalizationsDelegate();
+  static const LocalizationsDelegate<VoicesLocalizations> delegate = _VoicesLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -83,8 +79,7 @@ abstract class VoicesLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
-      <LocalizationsDelegate<dynamic>>[
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
     delegate,
     GlobalMaterialLocalizations.delegate,
     GlobalCupertinoLocalizations.delegate,
@@ -180,10 +175,39 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Project Catalyst is the world\'s largest decentralized innovation engine for solving real-world challenges.'**
   String get comingSoonDescription;
+
+  /// Label text shown in the ConnectingStatus widget during re-connection.
+  ///
+  /// In en, this message translates to:
+  /// **'re-connecting'**
+  String get connectingStatusLabelText;
+
+  /// Label text shown in the FinishAccountButton widget.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish account'**
+  String get finishAccountButtonLabelText;
+
+  /// Label text shown in the GetStartedButton widget.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get getStartedButtonLabelText;
+
+  /// Label text shown in the UnlockButton widget.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock'**
+  String get unlockButtonLabelText;
+
+  /// Label text shown in the UserProfileButton widget when a user is not connected.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest'**
+  String get userProfileGuestLabelText;
 }
 
-class _VoicesLocalizationsDelegate
-    extends LocalizationsDelegate<VoicesLocalizations> {
+class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
   const _VoicesLocalizationsDelegate();
 
   @override
@@ -192,27 +216,25 @@ class _VoicesLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['en', 'es'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>['en', 'es'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_VoicesLocalizationsDelegate old) => false;
 }
 
 Future<VoicesLocalizations> lookupVoicesLocalizations(Locale locale) {
+
+
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'en':
-      return catalyst_voices_localizations_en.loadLibrary().then((dynamic _) =>
-          catalyst_voices_localizations_en.VoicesLocalizationsEn());
-    case 'es':
-      return catalyst_voices_localizations_es.loadLibrary().then((dynamic _) =>
-          catalyst_voices_localizations_es.VoicesLocalizationsEs());
+    case 'en': return catalyst_voices_localizations_en.loadLibrary().then((dynamic _) => catalyst_voices_localizations_en.VoicesLocalizationsEn());
+    case 'es': return catalyst_voices_localizations_es.loadLibrary().then((dynamic _) => catalyst_voices_localizations_es.VoicesLocalizationsEs());
   }
 
   throw FlutterError(
-      'VoicesLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
-      'an issue with the localizations generation tool. Please file an issue '
-      'on GitHub with a reproducible sample app and the gen-l10n configuration '
-      'that was used.');
+    'VoicesLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
+    'an issue with the localizations generation tool. Please file an issue '
+    'on GitHub with a reproducible sample app and the gen-l10n configuration '
+    'that was used.'
+  );
 }
