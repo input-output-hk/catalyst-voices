@@ -1,0 +1,31 @@
+name: catalyst_cardano_example
+description: Demonstrates usage of catalyst_cardano plugin.
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+  flutter: 3.19.5
+
+dependencies:
+  catalyst_cardano:
+    path: "../"
+  catalyst_cardano_serialization:
+    path: "../"
+  catalyst_cardano_web:
+    path: "../../catalyst_cardano_web"
+  cbor: ^6.2.0
+  convert: ^3.1.1
+  cupertino_icons: ^1.0.6
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  catalyst_analysis:
+    path: ../../../catalyst_analysis
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
