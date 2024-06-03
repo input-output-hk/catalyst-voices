@@ -118,7 +118,11 @@ enum TxSignErrorCode {
   proofGeneration(tag: 1),
 
   /// User declined to sign the transaction.
-  userDeclined(tag: 2);
+  userDeclined(tag: 2),
+
+  /// Returned regardless of user consent
+  /// if the transaction contains a depreciated certificate.
+  depreciatedCertificate(tag: 3);
 
   /// The error code number.
   final int tag;
