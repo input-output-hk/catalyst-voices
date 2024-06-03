@@ -14,6 +14,8 @@ dependencies:
     path: ../catalyst_voices_packages/catalyst_cardano/catalyst_cardano
   catalyst_cardano_serialization:
     path: ../catalyst_voices_packages/catalyst_cardano_serialization
+  catalyst_cardano_web:
+    path: ../catalyst_voices_packages/catalyst_cardano/catalyst_cardano_web
   catalyst_voices_assets:
     path: ./packages/catalyst_voices_assets
   catalyst_voices_blocs:
