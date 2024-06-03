@@ -53,7 +53,9 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "pl.leancode.patrol.PatrolJUnitRunner"
+        testInstrumentationRunnerArguments clearPackageData: "true"
+        multiDexEnabled true
     }
 
     signingConfigs {
@@ -108,6 +110,10 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+    testOptions {
+        execution "ANDROIDX_TEST_ORCHESTRATOR"
+    }
+
 }
 
 flutter {
@@ -116,7 +122,10 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.android.support:multidex:2.0.1'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.3'
+    androidTestUtil "androidx.test:orchestrator:1.4.2"
+
 }
