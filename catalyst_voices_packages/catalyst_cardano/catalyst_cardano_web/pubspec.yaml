@@ -17,7 +17,7 @@ flutter:
         pluginClass: CatalystCardanoWeb
         fileName: catalyst_cardano_web.dart
 
-assets:
+  assets:
     - assets/js/
 
 dependencies:
