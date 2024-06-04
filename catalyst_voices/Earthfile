@@ -7,7 +7,7 @@ IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:fix/flutter-builde
 # builder - Copy all the necessary files and running bootstrap
 builder:
     DO flutter-ci+SETUP
-    COPY cat-voice-ci+repo-catalyst-voices-all/repo .
+    COPY ../+repo-catalyst-voices-all/repo .
     DO flutter-ci+BOOTSTRAP
 
 # code-generator - Generates flutter code.
@@ -64,7 +64,7 @@ test-unit:
 package:
     FROM nginx:alpine3.18
     ARG tag='latest'
-    COPY +build-web/web web
+    COPY +build-web/web /app
     COPY ./nginx.conf /etc/nginx/nginx.conf
     EXPOSE 80
 
