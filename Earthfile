@@ -59,11 +59,3 @@ repo-catalyst-voices-all:
     COPY --dir catalyst_voices catalyst_voices_packages utilities melos.yaml pubspec.yaml  .
 
     SAVE ARTIFACT /repo repo
-
-# check-cat-voices-license - Check the license of catalyst_voices.
-check-cat-voices-license:
-    FROM flutter-ci+license-checker-base
-    COPY ./catalyst_voices .
-    # catalyst_voices depends on catalyst_voices_packages
-    COPY --dir catalyst_voices_packages ../
-    DO flutter-ci+LICENSE_CHECK

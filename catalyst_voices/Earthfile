@@ -1,6 +1,7 @@
 VERSION 0.8
 
 IMPORT ../catalyst-gateway AS catalyst-gateway
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:fix/flutter-builder-ci AS flutter-ci
 
 # If running this target with a local ssh agent active, set the environment
 # variable EARTHLY_SSH_AUTH_SOCK='' to make the `+deps` target work. Earthly
@@ -105,3 +106,12 @@ publish:
     ARG tag='latest'
 
     SAVE IMAGE voices-frontend:$tag
+
+# check-cat-voices-license - Check the license of catalyst_voices.
+check-cat-voices-license:
+    FROM flutter-ci+license-checker-base
+    # catalyst_voices depends on catalyst_voices_packages
+    COPY ../+repo-catalyst-voices-all/repo .
+    RUN mv base catalyst_voices/base
+    WORKDIR /frontend/catalyst_voices
+    DO flutter-ci+LICENSE_CHECK
