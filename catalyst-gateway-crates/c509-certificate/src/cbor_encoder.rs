@@ -9,14 +9,7 @@ use crate::c509_enum::AttributesRegistry;
 pub(crate) trait CborEncoder {
     fn encode(&self, encoder: &mut Encoder<&mut Vec<u8>>);
 
-    fn encode_string(&self, encoder: &mut Encoder<&mut Vec<u8>>, s: &str) {
-        let _unused = encoder.str(s);
-    }
-
-    fn encode_bytes(&self, encoder: &mut Encoder<&mut Vec<u8>>, b: &[u8]) {
-        let _unused = encoder.bytes(b);
-    }
-
+    // Encoding Oid
     fn encode_oid(&self, encoder: &mut Encoder<&mut Vec<u8>>, s: &str) {
         let oid = match ObjectIdentifier::try_from(s) {
             Ok(oid) => oid,
@@ -48,8 +41,7 @@ impl CborEncoder for UnwrappedBiguint {
                     .collect::<Vec<u8>>();
 
                 // Encode the significant bytes as a byte string in CBOR format
-                // FIXME - Is it better to just use encoder.bytes(&significant_bytes)?
-                self.encode_bytes(encoder, &significant_bytes);
+                let _unused = encoder.bytes(&significant_bytes);
             },
         }
     }
@@ -103,7 +95,7 @@ impl CborEncoder for Name {
             let _unused = encode_common_name_cn(&self[0].value.str_value, encoder);
         } else {
             let _unused = encoder.array(self.len() as u64 * 2);
-            // a (CBOR int, CBOR text string) pair,
+            // A (CBOR int, CBOR text string) pair,
             for data in self {
                 let _unused = encoder.u8(data.name as u8);
                 let _unused = encoder.str(&data.value.str_value);
@@ -162,8 +154,7 @@ mod test_cbor_encoder {
         let mut encoder: Encoder<&mut Vec<u8>> = Encoder::new(&mut buffer);
         let number = UnwrappedBiguint::U64Value(128269);
         number.encode(&mut encoder);
-        let result = hex::encode(buffer);
-        assert_eq!(result, "4301f50d");
+        assert_eq!(hex::encode(buffer), "4301f50d");
     }
 
     #[test]
