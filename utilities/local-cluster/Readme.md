@@ -124,23 +124,24 @@ TODO.
 
 From the root of the repo:
 
-1. Make sure the documentation is built, and its container pushed to the container repo:
+ 1. Make sure the documentation is built, and its container pushed to the container repo:
 
-```sh
-earthly --push ./docs+local
-```
-
+  ```sh
+  earthly --push ./docs+local
+  ```
+<!-- markdownlint-disable-next-line ol-prefix -->
 2. Deploy the Documentation Service:
 
-```sh
-earthly ./utilities/local-cluster+deploy-docs
-```
+  ```sh
+  earthly ./utilities/local-cluster+deploy-docs
+  ```
 
-2. Stop the Documentation Service:
+<!-- markdownlint-disable-next-line ol-prefix -->
+3. Stop the Documentation Service:
 
-```sh
-earthly ./utilities/local-cluster+stop-docs
-```
+  ```sh
+  earthly ./utilities/local-cluster+stop-docs
+  ```
 
 ## Debugging the cluster
 
