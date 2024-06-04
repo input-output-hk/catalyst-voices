@@ -1,0 +1,7 @@
+VERSION 0.8
+
+IMPORT ../../../ AS cat-voice-ci
+
+# check-license - Check the license of catalyst_voices_view_models.
+check-license:
+    DO cat-voice-ci+LICENSE_CHECK --path=catalyst_voices/packages/catalyst_voices_view_models
