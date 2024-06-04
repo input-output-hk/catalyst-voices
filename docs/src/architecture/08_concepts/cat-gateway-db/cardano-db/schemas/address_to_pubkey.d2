@@ -1,0 +1,24 @@
+vars: {
+  d2-config: {
+    layout-engine: elk
+
+    # Terminal theme code
+    theme-id: 300
+  }
+}
+
+query: |md
+
+  # Cardano Address to Public Key
+
+  For a given 29 byte Cardano Address, get it's 32 byte PublicKey 
+|
+
+address_to_pubkey: {
+  shape: sql_table
+
+  address: blob {constraint: K}
+  pubkey: blob
+}
+
+query -> address_to_pubkey

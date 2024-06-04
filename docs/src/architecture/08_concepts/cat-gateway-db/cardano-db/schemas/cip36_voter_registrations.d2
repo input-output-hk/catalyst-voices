@@ -1,0 +1,29 @@
+vars: {
+  d2-config: {
+    layout-engine: elk
+
+    # Terminal theme code
+    theme-id: 300
+  }
+}
+
+query: |md
+
+  # Latest CIP36 Voter Registration
+
+  For a given 29 byte Cardano Address that is a StakeKeyHash, get the latest registration.
+|
+
+stakekey_to_registration: {
+  shape: sql_table
+
+  stake_key: blob {constraint: K}
+  nonce: varint {constraint: C↑}
+  
+  voting_key: blob
+  payment_address: blob
+
+  txn_id: blob
+}
+
+query -> stakekey_to_registration
