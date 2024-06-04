@@ -1,6 +1,4 @@
-import 'package:catalyst_voices/app/app.dart';
 import 'package:catalyst_voices/configs/app_bloc_observer.dart';
-import 'package:catalyst_voices/configs/bootstrap.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_strategy/url_strategy.dart';

@@ -10,7 +10,6 @@ export 'package:patrol/patrol.dart';
 const _nativeAutomatorConfig = NativeAutomatorConfig(
   findTimeout: Duration(seconds: 30), // 10 seconds is too short for some CIs
 );
-const _patrolTesterConfig = PatrolTesterConfig();
 
 Future<void> createApp(PatrolIntegrationTester $) async {
   await app.main();
