@@ -7,13 +7,15 @@ use crate::{
     extensions::{encode_extensions, Extensions},
 };
 
-#[allow(unused)]
+// ---------------------------------------------------
+
+// Ref - Section 3.1. Message Fields -> subjectPublicKeyInfo
 fn encode_subject_public_key(
     pubk_type: PubKeyAlgoRegistry, pubk: Vec<u8>, encoder: &mut Encoder<&mut Vec<u8>>,
 ) {
     // RSA public keys
     if pubk_type == PubKeyAlgoRegistry::RSA {
-        println!("Not support yet");
+        panic!("Not support yet");
     // Elliptic curve public keys in Weierstraß
     } else if [
         PubKeyAlgoRegistry::Secp256r1,
@@ -27,25 +29,34 @@ fn encode_subject_public_key(
     ]
     .contains(&pubk_type)
     {
-        println!("Not support yet");
+        panic!("Not support yet");
     } else {
-        encoder.bytes(&pubk);
+        let _unused = encoder.i8(pubk_type as i8);
+        let _unused = encoder.bytes(&pubk);
     }
 }
 
-#[allow(unused)]
+// ---------------------------------------------------
+
+// Ref - Section 3.1. Message Fields -> signatureAlgorithm
 fn encode_signature_algorithm(
     sig_algo: SignatureAlgoRegistry, encoder: &mut Encoder<&mut Vec<u8>>,
 ) {
     let _unused = encoder.i8(sig_algo as i8);
 }
 
-#[allow(unused)]
-fn encode_signature_value(sig_value: Vec<u8>, encoder: &mut Encoder<&mut Vec<u8>>) {
-    // For natively signed C509 certificates
-    todo!()
+// ---------------------------------------------------
+
+// Ref - Section 3.1. Message Fields -> signatureValue
+fn encode_issuer_signature_value(_sig_value: Vec<u8>, encoder: &mut Encoder<&mut Vec<u8>>) {
+    // Currently will generate an unsigned C509 certificates,
+    // hence the value is null
+    let _unused = encoder.null();
 }
 
+// ---------------------------------------------------
+
+// Ref - Figure 1: CDDL for C509Certificate
 #[wasm_bindgen]
 pub struct TbsCertificate {
     certificate_type: C509CertificateType,
@@ -60,14 +71,21 @@ pub struct TbsCertificate {
     issuer_sig_algo: SignatureAlgoRegistry,
 }
 
-#[allow(unused)]
-pub(crate) fn generate_c509_cert(tbs_cert: TbsCertificate) -> Vec<u8>{
+// C509 certificate type contains 2 elements,
+// TbsCertificate and issuerSignatureValue
+const C509_CERTIFICATE_ELEMENTS: u64 = 2;
+
+// Generate C509 certificate
+// accepts TbsCertificate and returns a C509 certificate
+pub(crate) fn generate_c509_cert(tbs_cert: TbsCertificate) -> Vec<u8> {
     let mut buffer: Vec<u8> = Vec::new();
 
     // Create a new encoder, passing the buffer by mutable reference
     let mut encoder: Encoder<&mut Vec<u8>> = Encoder::new(&mut buffer);
+
+    let _unused = encoder.array(C509_CERTIFICATE_ELEMENTS);
     // Encode the certificate type
-    encoder.u8(tbs_cert.certificate_type as u8).unwrap();
+    let _unused = encoder.u8(tbs_cert.certificate_type as u8);
     // Encode the certificate serial number
     tbs_cert.certificate_serial_number.encode(&mut encoder);
     // Encode issuer
@@ -88,17 +106,22 @@ pub(crate) fn generate_c509_cert(tbs_cert: TbsCertificate) -> Vec<u8>{
     encode_extensions(tbs_cert.extensions, &mut encoder);
     // Encode issuer signature algorithm
     encode_signature_algorithm(tbs_cert.issuer_sig_algo, &mut encoder);
+    // issuerSignatureValue
+    encode_issuer_signature_value(vec![], &mut encoder);
+
     buffer
 }
-#[cfg(test)]
-#[allow(unused)]
-mod tests {
 
-    use std::ops::Sub;
+// ---------------------------------------------------
+
+#[cfg(test)]
+mod tests {
 
     use crate::c509_enum::AttributesRegistry;
     use crate::cbor_encoder::{AttributeRegistryValue, RelativeDistinguishedName, StringType};
-    use crate::extensions::alt_name::{AltName, GeneralName, GeneralNamesRegistry, GeneralNamesRegistryType};
+    use crate::extensions::alt_name::{
+        GeneralName, GeneralNamesRegistry, GeneralNamesRegistryType,
+    };
     use crate::extensions::{Extension, ExtensionRegistry, ExtensionValue};
 
     use super::*;
@@ -119,21 +142,18 @@ mod tests {
                 str_value: "01-23-45-FF-FE-67-89-AB".to_string(),
             },
         }];
-        // FIXME - Recheck
         let pub_key_ed25519 = vec![
             25, 191, 68, 9, 105, 84, 205, 254, 85, 41, 186, 193, 67, 220, 59, 150, 200, 80, 86,
             170, 48, 182, 182, 203, 12, 92, 56, 173, 112, 49, 102, 225,
         ];
-        // FIXME - Recheck
         let extensions: Extensions = vec![Extension {
             extension_type: ExtensionRegistry::SubjectAltName,
-            extension_value: ExtensionValue::SubjectAltName(AltName {
-                general_names: vec![GeneralName {
-                    gn_name: GeneralNamesRegistry::DNSName,
-                    gn_value: GeneralNamesRegistryType::String("example.com".to_string()),
-                }],
+            critical: true,
+            extension_value: ExtensionValue::SubjectAltName(vec![GeneralName {
+                gn_name: GeneralNamesRegistry::DNSName,
+                gn_value: GeneralNamesRegistryType::Text("example.com".to_string()),
                 critical: false,
-            }),
+            }]),
         }];
 
         let tbs_cert = TbsCertificate {
@@ -149,6 +169,7 @@ mod tests {
             issuer_sig_algo: SignatureAlgoRegistry::Ed25519,
         };
         let buffer = generate_c509_cert(tbs_cert);
-        println!("{:?}", buffer);
+        assert_ne!(buffer.len(), 0);
+        println!("{:?}", hex::encode(buffer));
     }
 }
