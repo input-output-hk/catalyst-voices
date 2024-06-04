@@ -1,9 +1,9 @@
 name: catalyst_cardano
-description: Flutter plugin wrapping the Cardano Multiplatform Lib Rust library.
+description: A Flutter plugin exposing the CIP-30 and CIP-95 APIs.
 repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices_packages/catalyst_cardano/catalyst_cardano
 issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
 topics: [blockchain, cardano, cryptocurrency, wallet]
-version: 1.0.0
+version: 0.1.0
 
 environment:
   sdk: ">=3.3.4 <4.0.0"
@@ -16,8 +16,9 @@ flutter:
         default_package: catalyst_cardano_web
 
 dependencies:
-  catalyst_cardano_platform_interface: ^1.0.0
-  catalyst_cardano_web: ^1.0.0
+  catalyst_cardano_platform_interface: ^0.1.0
+  catalyst_cardano_serialization: ^0.1.0
+  catalyst_cardano_web: ^0.1.0
   flutter:
     sdk: flutter
 
