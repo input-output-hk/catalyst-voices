@@ -36,7 +36,17 @@ final class _AppState extends State<App> {
   }
 
   Future<void> _init() async {
-    await Dependencies.instance.init();
+    try {
+      await Dependencies.instance.init();
+    } catch (error, stackTrace) {
+      // TODO(dtscalac): FutureBuilder that uses this future silences all
+      // errors, replace it here with proper logging solution.
+      FlutterError.dumpErrorToConsole(
+        FlutterErrorDetails(exception: error, stack: stackTrace),
+      );
+
+      rethrow;
+    }
   }
 
   List<BlocProvider> _multiBlocProviders() {

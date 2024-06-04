@@ -36,8 +36,9 @@ class ShelleyAddress {
   final String hrp;
 
   /// The constructor for [ShelleyAddress] from raw [bytes] and [hrp].
-  ShelleyAddress(List<int> bytes, {this.hrp = defaultAddrHrp})
-      : bytes = Uint8List.fromList(bytes);
+  ShelleyAddress(List<int> bytes)
+      : bytes = Uint8List.fromList(bytes),
+        hrp = _extractHrp(bytes);
 
   /// The constructor which parses the address from bech32 format.
   factory ShelleyAddress.fromBech32(String address) {
@@ -50,17 +51,16 @@ class ShelleyAddress {
 
     switch (hrp) {
       case defaultAddrHrp:
-        return ShelleyAddress(_mainNetEncoder.decode(address), hrp: hrp);
+        return ShelleyAddress(_mainNetEncoder.decode(address));
       case const (defaultAddrHrp + testnetHrpSuffix):
-        return ShelleyAddress(_testNetEncoder.decode(address), hrp: hrp);
+        return ShelleyAddress(_testNetEncoder.decode(address));
       case defaultRewardHrp:
-        return ShelleyAddress(_mainNetRewardEncoder.decode(address), hrp: hrp);
+        return ShelleyAddress(_mainNetRewardEncoder.decode(address));
       case const (defaultRewardHrp + testnetHrpSuffix):
-        return ShelleyAddress(_testNetRewardEncoder.decode(address), hrp: hrp);
+        return ShelleyAddress(_testNetRewardEncoder.decode(address));
       default:
         return ShelleyAddress(
           Bech32Encoder(hrp: hrp).decode(address),
-          hrp: hrp,
         );
     }
   }
@@ -74,9 +74,7 @@ class ShelleyAddress {
   CborValue toCbor() => CborBytes(bytes);
 
   /// Returns the [NetworkId] related to this address.
-  NetworkId get network => NetworkId.testnet.id == (bytes[0] & 0x0f)
-      ? NetworkId.testnet
-      : NetworkId.mainnet;
+  NetworkId get network => _extractNetworkId(bytes);
 
   /// Encodes the address in bech32 format.
   String toBech32() {
@@ -129,5 +127,22 @@ class ShelleyAddress {
     final s = addr.trim();
     final i = s.indexOf('1');
     return s.substring(0, i > 0 ? i : 0);
+  }
+
+  static String _extractHrp(List<int> bytes) {
+    final header = bytes[0];
+    switch (header & 0xF0) {
+      case 0xE0:
+      case 0xF0:
+        return _computeHrp(_extractNetworkId(bytes), defaultRewardHrp);
+      default:
+        return _computeHrp(_extractNetworkId(bytes), defaultAddrHrp);
+    }
+  }
+
+  static NetworkId _extractNetworkId(List<int> bytes) {
+    return NetworkId.testnet.id == (bytes[0] & 0x0f)
+        ? NetworkId.testnet
+        : NetworkId.mainnet;
   }
 }
