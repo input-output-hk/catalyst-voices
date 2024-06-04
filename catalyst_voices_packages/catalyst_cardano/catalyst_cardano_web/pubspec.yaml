@@ -3,7 +3,7 @@ description: Web platform implementation of catalyst_cardano
 repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices_packages/catalyst_cardano/catalyst_cardano_web
 issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
 topics: [blockchain, cardano, cryptocurrency, wallet]
-version: 1.0.0
+version: 0.1.0
 
 environment:
   sdk: ^3.3.0
@@ -14,11 +14,17 @@ flutter:
     implements: catalyst_cardano
     platforms:
       web:
-        pluginClass: CatalystCardanoPlugin
+        pluginClass: CatalystCardanoWeb
         fileName: catalyst_cardano_web.dart
 
+  assets:
+    - assets/js/
+
 dependencies:
-  catalyst_cardano_platform_interface: ^1.0.0
+  catalyst_cardano_platform_interface: ^0.1.0
+  catalyst_cardano_serialization: ^0.1.0
+  cbor: ^6.2.0
+  convert: ^3.1.1
   flutter:
     sdk: flutter
   flutter_web_plugins:
