@@ -59,3 +59,18 @@ repo-catalyst-voices-all:
     COPY --dir catalyst_voices catalyst_voices_packages utilities melos.yaml pubspec.yaml  .
 
     SAVE ARTIFACT /repo repo
+
+# cat-repo-license-checker-base - Base image for license checker.
+cat-repo-license-checker-base:
+    FROM flutter-ci+license-checker-base
+    COPY +repo-catalyst-voices-all/repo .
+
+LICENSE_CHECK:
+    FUNCTION
+    FROM +cat-repo-license-checker-base
+    # Path of the package that needs to be checked for licenses
+    ARG --required path
+    # template_license_checker.yaml needs to be present in the same directory as the path
+    RUN mv template_license_checker.yaml $path/template_license_checker.yaml
+    WORKDIR $path
+    DO flutter-ci+LICENSE_CHECK
