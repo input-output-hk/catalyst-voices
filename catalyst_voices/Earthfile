@@ -63,7 +63,7 @@ test-unit:
 package:
     FROM nginx:alpine3.18
     ARG tag='latest'
-    COPY +build-web/web web
+    COPY +build-web/web /app
     COPY ./nginx.conf /etc/nginx/nginx.conf
     EXPOSE 80
 
