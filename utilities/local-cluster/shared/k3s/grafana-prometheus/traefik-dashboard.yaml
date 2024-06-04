@@ -1,9 +1,11 @@
+# cspell: words ymax, ymin, topk, flot, xaxis, yaxes, yaxis
 apiVersion: v1
 kind: ConfigMap
 metadata:
   name: traefik-dashboard
+  namespace: monitoring
   labels:
-     grafana_dashboard: "true"
+    grafana_dashboard: "true"
 data:
   traefik-dashboard.json: |-
     {

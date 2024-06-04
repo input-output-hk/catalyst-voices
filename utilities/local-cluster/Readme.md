@@ -28,36 +28,118 @@ It has 3 Internal nodes, configured as:
 
 ## Default Services
 
-### Container Registry
+These services are installed by default and provide the basic management and monitoring of the cluster.
 
-### Traefik
+* [Container Registry API](http://registry.cluster.test/v2/)
+  * [HTTPS](https://registry.cluster.test/v2/)
+  * [192.168.58.10:5000](http://192.168.58.10:5000)
+* [Container Registry Web UI](http://registry-ui.cluster.test/)
+  * Note: HTTPS not supported currently for this UI.
+* [Traefik Ingress Dashboard](http://traefik.cluster.test/)
+  * [HTTPS](https://traefik.cluster.test/)
+  * [192.168.58.10:3000](http://192.168.58.10:3000)
+* [Grafana Dashboard](http://grafana.cluster.test/)
+  * [HTTPS](https://grafana.cluster.test/)
+* [Prometheus Dashboard](http://prometheus.cluster.test/)
+  * [HTTPS](https://prometheus.cluster.test/)
+* [Alert manager UI](http://alert-manager.cluster.test/)
+  * [HTTPS](https://alert-manager.cluster.test/)
 
-### Grafana/Prometheus/Loki
+### Scylla DB
 
-## Interacting with the cluster
+This service is provisioned globally for use by services in the cluster.
+It does not have a UI outside of any Grafana dashboards that are installed.
 
-### Start the cluster
+For testing purposes the ScyllaDB is accessible on the Cluster IP Address: `192.168.58.10`.
+
+## Deploying the Cluster
+
+### Startup
+
+#### Linux/Windows
+
+From the root of the repo:
 
 ```sh
-earthly +start-cluster
+just start-cluster
 ```
 
-### Stop the cluster
+#### MacOS
+
+From the root of the repo:
 
 ```sh
-earthly +stop-cluster
+just start-cluster-aarch64-macos
 ```
 
-### Test if the cluster is visible locally
+### Getting Basic Cluster details
+
+From the root of the repo:
 
 ```sh
-earthly +test-cluster
+just show-cluster
 ```
 
-### Test if the cluster is visible inside Earthly docker containers
+Note the report is **VERY** Wide.  
+Best viewed with a small terminal font.
+
+### Suspending the Cluster
+
+The cluster can be suspended to save local system resources, without tearing it down.
 
 ```sh
-earthly +test-inside-earthly
+just suspend-cluster
+```
+
+### Resuming a suspended the Cluster
+
+The suspended cluster can then be resumed with:
+
+```sh
+just resume-cluster
+```
+
+### Stopping the Cluster
+
+```sh
+just stop-cluster
+```
+
+## Catalyst Voices Services
+
+These services are not deployed by default.
+
+* [Catalyst Voices Frontend](http://voices.cluster.test/)
+  * [HTTPS](https://voices.cluster.test/)
+* [Catalyst Voices Backend](http://voices.cluster.test/api/)
+  * [HTTPS](https://voices.cluster.test/api/)
+* [Catalyst Voices Documentation](http://docs.voices.cluster.test/)
+  * [HTTPS](https://voices.cluster.test/docs/)
+
+### Deploying Catalyst Voices Frontend and Backend Services
+
+TODO.
+
+### Deploying Catalyst Voices Documentation Service
+
+From the root of the repo:
+
+1. Make sure the documentation is built, and its container pushed to the container repo:
+
+```sh
+earthly --push ./docs+local
+```
+
+2. Deploy the Documentation Service:
+
+```sh
+earthly ./utilities/local-cluster+deploy-docs
+```
+
+2. Stop the Documentation Service:
+
+```sh
+earthly ./utilities/local-cluster+stop-docs
 ```
 
 ## Debugging the cluster
@@ -67,46 +149,38 @@ earthly +test-inside-earthly
 To SSH into a VM running the cluster, use `vagrant`:
 
 ```sh
-vagrant ssh server
+vagrant ssh control
 ```
 
 ```sh
-vagrant ssh agent1
+vagrant ssh agent86
 ```
 
-etc.
-
-### Debug the local registry
-
-The local registry is running inside docker, on the `server` VM.
-First ssh into the VM.
-
-To display the registry service logs:
-
 ```sh
-docker logs registry
+vagrant ssh agent99
 ```
 
 ## Local UI to access ScyllaDB
 
-Found (and tested) description how to connect using only open-source via DBeaver: <https://javaresolutions.blogspot.com/2018/04/opensource-db-ui-tool-for-cassandra-db.html>
+Found (and tested) description how to connect using only open-source via DBeaver:
 
 1. Download dbeaver (Community Edition)
-2. Download cassandra jdbc jar files: <http://www.dbschema.com/cassandra-jdbc-driver.html> (Downloading and Testing the Driver Binaries section have links to binary and source)
+2. Download cassandra jdbc jar files: <http://www.dbschema.com/cassandra-jdbc-driver.html>
+   (Downloading and Testing the Driver Binaries section have links to binary and source)
 3. extract cassandra jdbc zip
 4. run dbeaver
 5. go to Database > Driver Manager
 6. click New
-7. Fill in details as follow:
-   * Driver Name: Cassandra (or whatever you want it to say)
-   * Driver Type: Generic
-   * Class Name: com.dbschema.CassandraJdbcDriver
-   * URL Template: jdbc:cassandra://{host}[:{port}][/{database}]
-   * Default Port: 9042
-   * Embedded: no
+7. Fill in details as follows:
+   * Driver Name: `Cassandra` (or whatever you want it to say)
+   * Driver Type: `Generic`
+   * Class Name: `com.dbschema.CassandraJdbcDriver`
+   * URL Template: `jdbc:cassandra://{host}[:{port}][/{database}]`
+   * Default Port: `9042`
+   * Embedded: `no`
    * Category:
-   * Description: Cassandra (or whatever you want it to say)
-8. click Add File and add all of the jars in the cassandra jdbc zip
+   * Description: `Cassandra` (or whatever you want it to say)
+8. click Add File and add all the jars in the cassandra jdbc zip file.
 9. click Find Class to make sure the Class Name is found okay
 10. click OK
 11. Create New Connection, selecting the database driver you just added

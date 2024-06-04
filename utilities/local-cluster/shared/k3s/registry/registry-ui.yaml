@@ -3,6 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: registry-ui
+  namespace: registry
 spec:
   type: ClusterIP
   ports:
@@ -15,6 +16,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: registry-ui
+  namespace: registry
 spec:
   selector:
     matchLabels:
@@ -49,6 +51,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: registry-ui-ingress
+  namespace: registry
   annotations:
     spec.ingressClassName: traefik
     cert-manager.io/cluster-issuer: selfsigned-cluster-issuer

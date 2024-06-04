@@ -1,5 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
+# cspell: words vcpu, noninteractive, iscsi, preconfiguration, inotify, jetstack
 control_ip = "192.168.58.10"
 
 # Determine the maximum number of agents, and set their IP addresses
@@ -109,26 +110,12 @@ local_path_provisioner_script = <<-SHELL
     kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.26/deploy/local-path-storage.yaml
     SHELL
 
-registry_script_old = <<-SHELL
-    sudo -i
-    # Start local docker registry - running on the server VM
-    # Keeps files in the persistent shared directory
-    docker run -d -p 5000:5000 \
-      --restart=always \
-      -v /vagrant_shared/registry:/var/lib/registry \
-      -e REGISTRY_HTTP_HEADERS_Access-Control-Allow-Origin='[http://registry.cluster.test]' \
-      -e REGISTRY_HTTP_HEADERS_Access-Control-Allow-Headers='[Authorization,Accept,Cache-Control]' \
-      -e REGISTRY_HTTP_HEADERS_Access-Control-Expose-Headers='[Docker-Content-Digest]' \
-      -e REGISTRY_STORAGE_DELETE_ENABLED='true' \
-      --name registry registry:2
-    SHELL
-
 registry_script = <<-SHELL
     sudo -i
+    kubectl create namespace registry
     kubectl apply -f /vagrant_shared/k3s/registry/registry-service.yaml
     kubectl apply -f /vagrant_shared/k3s/registry/registry-ui.yaml
     SHELL
-
 
 monitoring_install_script = <<-SHELL
     # See: https://k3s.rocks/metrics/
@@ -137,12 +124,13 @@ monitoring_install_script = <<-SHELL
     helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
     helm repo add grafana https://grafana.github.io/helm-charts
     helm repo update    
-    helm install prometheus-stack --version 58.6.0 -f /vagrant_shared/k3s/grafana-prometheus/prometheus-values.yaml prometheus-community/kube-prometheus-stack
+    helm install prometheus-stack --version 58.6.0 -f /vagrant_shared/k3s/grafana-prometheus/prometheus-values.yaml prometheus-community/kube-prometheus-stack --create-namespace --namespace monitoring --wait
     kubectl apply -f /vagrant_shared/k3s/grafana-prometheus/alert-manager-ingress.yaml
     kubectl apply -f /vagrant_shared/k3s/grafana-prometheus/prometheus-ingress.yaml
     kubectl apply -f /vagrant_shared/k3s/grafana-prometheus/grafana-ingress.yaml
     kubectl apply -f /vagrant_shared/k3s/grafana-prometheus/traefik-service-monitor.yaml
     kubectl apply -f /vagrant_shared/k3s/grafana-prometheus/traefik-dashboard.yaml
+    helm install loki grafana/loki-stack --namespace monitoring
     SHELL
 
 scylladb_install_script = <<-SHELL
@@ -152,20 +140,17 @@ scylladb_install_script = <<-SHELL
     helm repo add scylla https://scylla-operator-charts.storage.googleapis.com/stable
     helm repo update
     helm install scylla-operator scylla/scylla-operator --values /vagrant_shared/k3s/scylladb/values.operator.yaml  --create-namespace --namespace scylla-operator --wait
-    helm install scylla-manager scylla/scylla-manager --values /vagrant_shared/k3s/scylladb/values.manager.yaml --create-namespace --namespace scylla-manager
+    # Disable the Scylla Manager for now, consumes resources and we aren't using it.
+    # helm install scylla-manager scylla/scylla-manager --values /vagrant_shared/k3s/scylladb/values.manager.yaml --create-namespace --namespace scylla-manager
     helm install scylla scylla/scylla --values /vagrant_shared/k3s/scylladb/values.cluster.yaml --create-namespace --namespace scylla
+    # kubectl apply -f /vagrant_shared/k3s/scylladb/load-balancer.yaml
     SHELL
 
-
-cassandra_install_script = <<-SHELL
-    # See: https://docs.k8ssandra.io/install/local/single-cluster-helm/
-    sudo -i
-    export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
-    helm repo add k8ssandra https://helm.k8ssandra.io/stable
-    helm install k8ssandra-operator k8ssandra/k8ssandra-operator -n k8ssandra-operator --set global.clusterScoped=true --create-namespace --wait
-    kubectl apply -f /vagrant_shared/k3s/cassandra/k8c1.yml
+update_sysctl_limits = <<-SHELL
+    echo "fs.inotify.max_user_watches=65536" >> /etc/sysctl.conf
+    echo "fs.inotify.max_user_instances=1024" >> /etc/sysctl.conf
+    sysctl -p
     SHELL
-
 
 Vagrant.configure("2") do |config|
   config.vm.box = "generic/debian12"
@@ -189,6 +174,7 @@ Vagrant.configure("2") do |config|
         qe.smp = control_vcpu
       end
     end
+    control.vm.provision "shell", inline: update_sysctl_limits
     control.vm.provision "shell", inline: static_ips
     control.vm.provision "shell", inline: debian_packages
     control.vm.provision "shell", inline: helm_install_script
@@ -219,6 +205,7 @@ Vagrant.configure("2") do |config|
           qe.smp = agent_vcpu
         end
       end
+      agent.vm.provision "shell", inline: update_sysctl_limits
       agent.vm.provision "shell", inline: static_ips
       agent.vm.provision "shell", inline: debian_packages
       agent.vm.provision "shell", inline: agent_script

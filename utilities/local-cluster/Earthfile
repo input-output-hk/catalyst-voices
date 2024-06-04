@@ -1,4 +1,5 @@
 VERSION 0.8
+# cspell: words NATIVEPLATFORM
 
 # start-cluster : starts the local development cluster
 # Needs both Vagrant and Virtualbox installed on the local machine.

@@ -1,8 +1,8 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name:  traefik
-  namespace: default
+  name: traefik
+  namespace: monitoring
   labels:
     app: traefik
     release: prometheus-stack
@@ -14,7 +14,7 @@ spec:
       app.kubernetes.io/name: traefik-dashboard
   namespaceSelector:
     matchNames:
-    - kube-system
+      - kube-system
   endpoints:
-  - port: traefik
-    path: /metrics
+    - port: traefik
+      path: /metrics

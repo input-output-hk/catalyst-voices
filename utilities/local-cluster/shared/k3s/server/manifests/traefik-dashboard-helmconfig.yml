@@ -4,6 +4,10 @@ metadata:
   name: traefik
   namespace: kube-system
 spec:
+  #deployment:
+  #  kind: DaemonSet
+  #       - "--entryPoints.scylladb.address=:9042/tcp"
+  #hostNetwork: true
   valuesContent: |-
     additionalArguments:
       - "--api"
@@ -19,6 +23,3 @@ spec:
     providers:
       kubernetesCRD:
         allowCrossNamespace: true
-    #deployment:
-    #  kind: DaemonSet
-    #hostNetwork: true

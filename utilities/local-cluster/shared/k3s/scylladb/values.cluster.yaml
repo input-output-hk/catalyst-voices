@@ -17,7 +17,6 @@ racks:
     storage:
       capacity: 5Gi
       storageClassName: longhorn-strict-local
-
     resources:
       limits:
         cpu: 3
@@ -25,3 +24,13 @@ racks:
       requests:
         cpu: 1
         memory: 1Gi
+exposeOptions:
+  nodeService:
+    type: ClusterIP
+  broadcastOptions:
+    clients:
+      type: ServiceClusterIP
+    nodes:
+      type: ServiceClusterIP
+#network:
+#  hostNetworking: true
