@@ -80,7 +80,7 @@ abstract class CatGatewayApi extends ChopperService {
   ///@param query_inspection
   Future<chopper.Response> apiHealthInspectionGet({
     enums.LogLevel? logLevel,
-    enums.DeepQueryInspection? queryInspection,
+    enums.DeepQueryInspectionFlag? queryInspection,
   }) {
     return _apiHealthInspectionGet(
         logLevel: logLevel?.value?.toString(),
