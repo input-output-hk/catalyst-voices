@@ -2,10 +2,11 @@
 use std::sync::Arc;
 
 use poem::web::Data;
-use poem_openapi::OpenApi;
+use poem_openapi::{param::Query, OpenApi};
 
 use crate::{service::common::tags::ApiTags, state::State};
 
+mod inspection_get;
 mod live_get;
 mod ready_get;
 mod started_get;
@@ -56,5 +57,18 @@ impl HealthApi {
     /// It may not be exposed publicly. Refer to []*
     async fn live_get(&self) -> live_get::AllResponses {
         live_get::endpoint().await
+    }
+
+    #[oai(
+        path = "/inspection",
+        method = "get",
+        operation_id = "healthInspection"
+    )]
+    /// Options for service inspection.
+    async fn inspection(
+        &self, state: Data<&Arc<State>>, log_level: Query<Option<inspection_get::LogLevel>>,
+        query_inspection: Query<Option<inspection_get::DeepQueryInspectionFlag>>,
+    ) -> inspection_get::AllResponses {
+        inspection_get::endpoint(state, log_level.0, query_inspection.0).await
     }
 }

@@ -18,6 +18,18 @@ class $AssetsImagesGen {
   SvgGenImage get catalystLogo =>
       const SvgGenImage('assets/images/catalyst_logo.svg');
 
+  /// File path: assets/images/catalyst_logo_icon.svg
+  SvgGenImage get catalystLogoIcon =>
+      const SvgGenImage('assets/images/catalyst_logo_icon.svg');
+
+  /// File path: assets/images/catalyst_logo_icon_white.svg
+  SvgGenImage get catalystLogoIconWhite =>
+      const SvgGenImage('assets/images/catalyst_logo_icon_white.svg');
+
+  /// File path: assets/images/catalyst_logo_white.svg
+  SvgGenImage get catalystLogoWhite =>
+      const SvgGenImage('assets/images/catalyst_logo_white.svg');
+
   /// File path: assets/images/coming_soon_bkg.webp
   AssetGenImage get comingSoonBkg =>
       const AssetGenImage('assets/images/coming_soon_bkg.webp');
@@ -26,9 +38,25 @@ class $AssetsImagesGen {
   AssetGenImage get dummyCatalystVoices =>
       const AssetGenImage('assets/images/dummy_catalyst_voices.webp');
 
+  /// File path: assets/images/fallback_logo.svg
+  SvgGenImage get fallbackLogo =>
+      const SvgGenImage('assets/images/fallback_logo.svg');
+
+  /// File path: assets/images/fallback_logo_icon.svg
+  SvgGenImage get fallbackLogoIcon =>
+      const SvgGenImage('assets/images/fallback_logo_icon.svg');
+
   /// List of all assets
-  List<dynamic> get values =>
-      [catalystLogo, comingSoonBkg, dummyCatalystVoices];
+  List<dynamic> get values => [
+        catalystLogo,
+        catalystLogoIcon,
+        catalystLogoIconWhite,
+        catalystLogoWhite,
+        comingSoonBkg,
+        dummyCatalystVoices,
+        fallbackLogo,
+        fallbackLogoIcon
+      ];
 }
 
 class VoicesAssets {

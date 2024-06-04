@@ -20,13 +20,30 @@ final class Transaction {
   /// The optional transaction metadata.
   final AuxiliaryData? auxiliaryData;
 
-  /// The default constructor for the [Transaction].
+  /// The default constructor for [Transaction].
   const Transaction({
     required this.body,
     required this.isValid,
     required this.witnessSet,
     this.auxiliaryData,
   });
+
+  /// Deserializes the type from cbor.
+  factory Transaction.fromCbor(CborValue value) {
+    final list = value as CborList;
+    final body = list[0];
+    final witnessSet = list[1];
+    final isValid = list[2];
+    final auxiliaryData = list.length >= 4 ? list[3] : null;
+
+    return Transaction(
+      body: TransactionBody.fromCbor(body),
+      isValid: (isValid as CborBool).value,
+      witnessSet: TransactionWitnessSet.fromCbor(witnessSet),
+      auxiliaryData:
+          auxiliaryData != null ? AuxiliaryData.fromCbor(auxiliaryData) : null,
+    );
+  }
 
   /// Serializes the type as cbor.
   CborValue toCbor() {
@@ -72,6 +89,28 @@ final class TransactionBody {
     this.networkId,
   });
 
+  /// Deserializes the type from cbor.
+  factory TransactionBody.fromCbor(CborValue value) {
+    final map = value as CborMap;
+    final inputs = map[const CborSmallInt(0)]! as CborList;
+    final outputs = map[const CborSmallInt(1)]! as CborList;
+    final fee = map[const CborSmallInt(2)]!;
+    final ttl = map[const CborSmallInt(3)];
+    final auxiliaryDataHash = map[const CborSmallInt(7)];
+    final networkId = map[const CborSmallInt(15)] as CborSmallInt?;
+
+    return TransactionBody(
+      inputs: inputs.map(TransactionInput.fromCbor).toSet(),
+      outputs: outputs.map(TransactionOutput.fromCbor).toList(),
+      fee: Coin.fromCbor(fee),
+      ttl: ttl != null ? SlotBigNum.fromCbor(ttl) : null,
+      auxiliaryDataHash: auxiliaryDataHash != null
+          ? AuxiliaryDataHash.fromCbor(auxiliaryDataHash)
+          : null,
+      networkId: networkId != null ? NetworkId.fromId(networkId.value) : null,
+    );
+  }
+
   /// Serializes the type as cbor.
   CborValue toCbor() {
     return CborMap({
@@ -83,6 +122,10 @@ final class TransactionBody {
       ]),
       const CborSmallInt(2): fee.toCbor(),
       if (ttl != null) const CborSmallInt(3): ttl!.toCbor(),
+      if (auxiliaryDataHash != null)
+        const CborSmallInt(7): auxiliaryDataHash!.toCbor(),
+      if (networkId != null)
+        const CborSmallInt(15): CborSmallInt(networkId!.id),
     });
   }
 }
@@ -102,6 +145,18 @@ final class TransactionInput {
     required this.index,
   });
 
+  /// Deserializes the type from cbor.
+  factory TransactionInput.fromCbor(CborValue value) {
+    final list = value as CborList;
+    final transactionId = list[0];
+    final index = list[1];
+
+    return TransactionInput(
+      transactionId: TransactionHash.fromCbor(transactionId),
+      index: (index as CborSmallInt).value,
+    );
+  }
+
   /// Serializes the type as cbor.
   CborValue toCbor() {
     return CborList([
@@ -111,8 +166,8 @@ final class TransactionInput {
   }
 }
 
-/// The transaction output which assigns the owner of given address
-/// with leftover change from previous transaction.
+/// The transaction output which describes which [address]
+/// will receive what [amount] of [Coin].
 final class TransactionOutput {
   /// The address associated with the transaction.
   final ShelleyAddress address;
@@ -120,11 +175,23 @@ final class TransactionOutput {
   /// The leftover change from the previous transaction that can be spent.
   final Coin amount;
 
-  /// The default constructor for the [TransactionOutput].
+  /// The default constructor for [TransactionOutput].
   const TransactionOutput({
     required this.address,
     required this.amount,
   });
+
+  /// Deserializes the type from cbor.
+  factory TransactionOutput.fromCbor(CborValue value) {
+    final list = value as CborList;
+    final address = list[0];
+    final amount = list[1];
+
+    return TransactionOutput(
+      address: ShelleyAddress.fromCbor(address),
+      amount: Coin.fromCbor(amount),
+    );
+  }
 
   /// Serializes the type as cbor.
   CborValue toCbor() {
@@ -151,6 +218,18 @@ final class TransactionUnspentOutput {
     required this.output,
   });
 
+  /// Deserializes the type from cbor.
+  factory TransactionUnspentOutput.fromCbor(CborValue value) {
+    final list = value as CborList;
+    final input = list[0];
+    final output = list[1];
+
+    return TransactionUnspentOutput(
+      input: TransactionInput.fromCbor(input),
+      output: TransactionOutput.fromCbor(output),
+    );
+  }
+
   /// Serializes the type as cbor.
   CborValue toCbor() {
     return CborList([
@@ -163,10 +242,16 @@ final class TransactionUnspentOutput {
 /// The transaction metadata as a list of key-value pairs (a map).
 final class AuxiliaryData {
   /// The transaction metadata map.
-  final Map<CborSmallInt, CborValue> map;
+  final Map<CborValue, CborValue> map;
 
-  /// The default constructor for the [AuxiliaryData].
+  /// The default constructor for [AuxiliaryData].
   const AuxiliaryData({this.map = const {}});
+
+  /// Deserializes the type from cbor.
+  factory AuxiliaryData.fromCbor(CborValue value) {
+    final map = value as CborMap;
+    return AuxiliaryData(map: Map.fromEntries(map.entries));
+  }
 
   /// Serializes the type as cbor.
   CborValue toCbor() {

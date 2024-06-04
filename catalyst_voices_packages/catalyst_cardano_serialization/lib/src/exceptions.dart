@@ -51,6 +51,28 @@ final class TxFeeNotSpecifiedException implements Exception {
   String toString() => 'TxFeeNotSpecifiedException';
 }
 
+/// Exception thrown when the transaction output amount
+/// is less than required by the network.
+final class TxValueBelowMinUtxoValueException implements Exception {
+  /// The amount of [Coin] in the transaction output.
+  final Coin actualAmount;
+
+  /// The amount of [Coin] that is the minimum.
+  final Coin requiredAmount;
+
+  /// The default constructor for [TxValueBelowMinUtxoValueException].
+  const TxValueBelowMinUtxoValueException({
+    required this.actualAmount,
+    required this.requiredAmount,
+  });
+
+  @override
+  String toString() => 'TxValueBelowMinUtxoValueException('
+      'actualAmount:$actualAmount'
+      ', requiredAmount:$requiredAmount'
+      ')';
+}
+
 /// Exception thrown when parsing a hash that has incorrect length.
 final class HashFormatException implements Exception {
   /// The default constructor for [HashFormatException].

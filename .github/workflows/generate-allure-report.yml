@@ -53,7 +53,7 @@ jobs:
         if: always()
         continue-on-error: true
         with:
-          earthfile: ./catalyst-gateway/tests/
+          earthfile: ./catalyst-gateway/tests/schemathesis_tests
           flags: --allow-privileged
           targets: test-fuzzer-api
           target_flags:
@@ -68,6 +68,18 @@ jobs:
             earthfile: ./catalyst_voices/
             flags:
             targets: test-unit
+            target_flags:
+            runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+            artifact: "false"
+      
+      - name: Get backend python test report
+        uses: input-output-hk/catalyst-ci/actions/run@master
+        if: always()
+        continue-on-error: true
+        with:
+            earthfile: ./catalyst-gateway/tests/api_tests/
+            flags: --allow-privileged
+            targets: test
             target_flags:
             runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
             artifact: "false"
