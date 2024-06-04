@@ -64,6 +64,7 @@ repo-catalyst-voices-all:
 cat-repo-license-checker-base:
     FROM flutter-ci+license-checker-base
     COPY +repo-catalyst-voices-all/repo .
+    DO flutter-ci+BOOTSTRAP
 
 LICENSE_CHECK:
     FUNCTION
