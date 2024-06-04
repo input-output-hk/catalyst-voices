@@ -46,8 +46,6 @@ class _MyHomePageState extends State<MyHomePage> {
     unawaited(_loadWallets());
   }
 
-  final walletsFuture = CatalystCardano.instance.getCardanoWallets();
-
   @override
   Widget build(BuildContext context) {
     final Widget child;
@@ -82,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _loadWallets() async {
     try {
       setState(() => _isLoading = true);
-      final wallets = await CatalystCardano.instance.getCardanoWallets();
+      final wallets = await CatalystCardano.instance.getWallets();
       setState(() => _wallets = wallets);
     } catch (error) {
       setState(() => _error = error);
