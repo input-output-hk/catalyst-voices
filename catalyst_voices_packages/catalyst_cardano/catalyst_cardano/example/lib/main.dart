@@ -216,7 +216,7 @@ class _WalletDetails extends StatefulWidget {
 }
 
 class _WalletDetailsState extends State<_WalletDetails> {
-  Coin? _balance;
+  Value? _balance;
   List<CipExtension>? _extensions;
   NetworkId? _networkId;
   ShelleyAddress? _changeAddress;
@@ -281,7 +281,7 @@ class _WalletDetailsState extends State<_WalletDetails> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('Balance: ${_balance ?? '---'}\n'),
+              Text('Balance: ${_balance?.amount ?? '---'}\n'),
               Text('Extensions: ${_formatExtensions(_extensions)}\n'),
               Text('Network ID: $_networkId\n'),
               Text('Change address:\n${_changeAddress?.toBech32() ?? '---'}\n'),

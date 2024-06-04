@@ -70,3 +70,33 @@ extension type const SlotBigNum(int value) {
   /// Serializes the type as cbor.
   CborValue toCbor() => CborSmallInt(value);
 }
+
+/// Represents the balance of the wallet in terms of [Coin].
+///
+/// For now, other assets than Ada are not supported and are ignored.
+final class Value {
+  /// The [amount] of [Coin] that the wallet holds.
+  final Coin amount;
+
+  /// The default constructor for [Value].
+  const Value({
+    required this.amount,
+  });
+
+  /// Deserializes the type from cbor.
+  factory Value.fromCbor(CborValue value) {
+    final CborValue amount;
+    if (value is CborList) {
+      amount = value.first;
+    } else {
+      amount = value;
+    }
+
+    return Value(
+      amount: Coin.fromCbor(amount),
+    );
+  }
+
+  /// Serializes the type as cbor.
+  CborValue toCbor() => amount.toCbor();
+}
