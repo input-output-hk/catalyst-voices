@@ -420,7 +420,7 @@ String _formatUtxos(List<TransactionUnspentOutput>? utxos) {
 String _formatUtxo(TransactionUnspentOutput utxo) {
   return 'Tx: ${utxo.input.transactionId}'
       '\nIndex: ${utxo.input.index}'
-      '\nAmount: ${utxo.output.amount}\n';
+      '\nAmount: ${utxo.output.amount.coin}\n';
 }
 
 Transaction _buildUnsignedTx({
