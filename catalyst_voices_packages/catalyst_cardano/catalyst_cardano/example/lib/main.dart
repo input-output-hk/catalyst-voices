@@ -281,9 +281,9 @@ class _WalletDetailsState extends State<_WalletDetails> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('Balance: ${_balance?.amount ?? '---'}\n'),
+              Text('Balance: ${_balance?.coin ?? '---'}\n'),
               Text('Extensions: ${_formatExtensions(_extensions)}\n'),
-              Text('Network ID: $_networkId\n'),
+              Text('Network ID: ${_networkId ?? '---'}\n'),
               Text('Change address:\n${_changeAddress?.toBech32() ?? '---'}\n'),
               Text(
                 'Reward addresses:\n${_formatAddresses(_rewardAddresses)}\n',
@@ -444,7 +444,7 @@ Transaction _buildUnsignedTx({
 
   final txOutput = TransactionOutput(
     address: preprodFaucetAddress,
-    amount: const Coin(1000000),
+    amount: const Value(coin: Coin(1000000)),
   );
 
   final txBuilder = TransactionBuilder(

@@ -83,7 +83,7 @@ class TransactionBuilder {
   /// i.e. the remaining change is too small to cover for extra fee that such
   /// extra output would generate then the transaction fee is increased to burn
   /// any remaining change.
-  /// 
+  ///
   /// Follows code style of Cardano Multiplatform Lib to make patching easy.
   TransactionBuilder withChangeAddressIfNeeded(ShelleyAddress address) {
     if (this.fee != null) {
@@ -94,8 +94,9 @@ class TransactionBuilder {
     final fee = minFee();
 
     final inputTotal =
-        inputs.map((e) => e.output.amount).reduce((a, b) => a + b);
-    final outputTotal = outputs.map((e) => e.amount).reduce((a, b) => a + b);
+        inputs.map((e) => e.output.amount.coin).reduce((a, b) => a + b);
+    final outputTotal =
+        outputs.map((e) => e.amount.coin).reduce((a, b) => a + b);
     final outputTotalPlusFee = outputTotal + fee;
 
     if (outputTotalPlusFee == inputTotal) {
@@ -110,7 +111,10 @@ class TransactionBuilder {
       final changeEstimator = inputTotal - outputTotal;
 
       final minAda = TransactionOutputBuilder.minimumAdaForOutput(
-        TransactionOutput(address: address, amount: changeEstimator),
+        TransactionOutput(
+          address: address,
+          amount: Value(coin: changeEstimator),
+        ),
         config.coinsPerUtxoByte,
       );
 
@@ -123,7 +127,7 @@ class TransactionBuilder {
             this,
             TransactionOutput(
               address: address,
-              amount: changeEstimator,
+              amount: Value(coin: changeEstimator),
             ),
           );
 
@@ -137,7 +141,7 @@ class TransactionBuilder {
               return withFee(newFee).withOutput(
                 TransactionOutput(
                   address: address,
-                  amount: changeEstimator - newFee,
+                  amount: Value(coin: changeEstimator - newFee),
                 ),
               );
           }
@@ -161,9 +165,9 @@ class TransactionBuilder {
       config.coinsPerUtxoByte,
     );
 
-    if (output.amount < minAdaPerUtxoEntry) {
+    if (output.amount.coin < minAdaPerUtxoEntry) {
       throw TxValueBelowMinUtxoValueException(
-        actualAmount: output.amount,
+        actualAmount: output.amount.coin,
         requiredAmount: minAdaPerUtxoEntry,
       );
     }
@@ -327,7 +331,7 @@ class TransactionOutputBuilder {
 
     // how many bytes the coin part of the value will take,
     // can vary based on encoding used
-    final oldCoinSize = 1 + CborSize.ofInt(output.amount.value).bytes;
+    final oldCoinSize = 1 + CborSize.ofInt(output.amount.coin.value).bytes;
 
     // most recent estimate of the size in bytes to include
     // the minimum ada value

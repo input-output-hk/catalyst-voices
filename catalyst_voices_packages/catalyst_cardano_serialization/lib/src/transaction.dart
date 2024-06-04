@@ -174,7 +174,7 @@ final class TransactionOutput {
   final ShelleyAddress address;
 
   /// The leftover change from the previous transaction that can be spent.
-  final Coin amount;
+  final Value amount;
 
   /// The default constructor for [TransactionOutput].
   const TransactionOutput({
@@ -190,7 +190,7 @@ final class TransactionOutput {
 
     return TransactionOutput(
       address: ShelleyAddress.fromCbor(address),
-      amount: Coin.fromCbor(amount),
+      amount: Value.fromCbor(amount),
     );
   }
 

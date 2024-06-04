@@ -38,13 +38,13 @@ void main() {
       const nativeTokensValue = '821b00000002536918eca1581cff5b52ec72ff3c4f7ed'
           '39d1d1c504f4efa72c51ba34588a604d47408a14a536372616461436f696e1832';
       final cborValue = cbor.decode(hex.decode(nativeTokensValue));
-      expect(Value.fromCbor(cborValue).amount, equals(const Coin(9989331180)));
+      expect(Value.fromCbor(cborValue).coin, equals(const Coin(9989331180)));
     });
 
     test('value without native tokens deserialized from cbor', () {
       const value = '1B00000002536918EC';
       final cborValue = cbor.decode(hex.decode(value));
-      expect(Value.fromCbor(cborValue).amount, equals(const Coin(9989331180)));
+      expect(Value.fromCbor(cborValue).coin, equals(const Coin(9989331180)));
     });
   });
 }

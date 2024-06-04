@@ -75,28 +75,28 @@ extension type const SlotBigNum(int value) {
 ///
 /// For now, other assets than Ada are not supported and are ignored.
 final class Value {
-  /// The [amount] of [Coin] that the wallet holds.
-  final Coin amount;
+  /// The amount of [Coin] that the wallet holds.
+  final Coin coin;
 
   /// The default constructor for [Value].
   const Value({
-    required this.amount,
+    required this.coin,
   });
 
   /// Deserializes the type from cbor.
   factory Value.fromCbor(CborValue value) {
-    final CborValue amount;
+    final CborValue coin;
     if (value is CborList) {
-      amount = value.first;
+      coin = value.first;
     } else {
-      amount = value;
+      coin = value;
     }
 
     return Value(
-      amount: Coin.fromCbor(amount),
+      coin: Coin.fromCbor(coin),
     );
   }
 
   /// Serializes the type as cbor.
-  CborValue toCbor() => amount.toCbor();
+  CborValue toCbor() => coin.toCbor();
 }
