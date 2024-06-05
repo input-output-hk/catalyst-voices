@@ -29,7 +29,12 @@ class UnlockButton extends StatelessWidget {
           size: 18,
         ),
         label: Text(context.l10n.unlockButtonLabelText),
-        // TODO(coire1): flutter upgrade iconAlignment: IconAlignment.start,
+        iconAlignment: IconAlignment.end,
+        style: ButtonStyle(
+          padding: WidgetStateProperty.all<EdgeInsets>(
+            const EdgeInsets.only(left: 24, right: 16),
+          ),
+        ),
       ),
     );
   }

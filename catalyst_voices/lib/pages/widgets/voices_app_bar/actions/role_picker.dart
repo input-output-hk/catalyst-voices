@@ -16,9 +16,18 @@ class RolePicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return OutlinedButton.icon(
+      style: ButtonStyle(
+        padding: WidgetStateProperty.all<EdgeInsets>(
+          const EdgeInsets.only(left: 24, right: 16),
+        ),
+      ),
       onPressed: onPressed,
-      icon: const Icon(CatalystVoicesIcons.cheveron_down),
+      icon: const Icon(
+        CatalystVoicesIcons.cheveron_down,
+        size: 18,
+      ),
       label: Text(currentRole),
+      iconAlignment: IconAlignment.end,
     );
   }
 }
