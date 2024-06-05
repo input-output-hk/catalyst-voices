@@ -24,7 +24,7 @@ stop-cluster:
     RUN vagrant destroy -f
 
 # test-cluster : Checks if the cluster is running on the local machine.
-test-cluster:
+cluster-test:
     LOCALLY
     RUN kubectl --kubeconfig shared/k3s.yaml -o wide get nodes
 
