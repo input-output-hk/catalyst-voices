@@ -47,8 +47,8 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return ResponsiveBuilder<double>(
-      other: 24,
       xs: 8,
+      other: 24,
       builder: (context, data) => AppBar(
         titleSpacing: data,
         toolbarHeight: 64,
