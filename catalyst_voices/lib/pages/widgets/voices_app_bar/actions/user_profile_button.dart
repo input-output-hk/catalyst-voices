@@ -2,6 +2,8 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
+/// A [UserProfileButton] widget displays a `CirceAvatar` with the first name of
+/// the user when the [user] parameter is set or a generic `Chip` for guests.
 class UserProfileButton extends StatelessWidget {
   final String? user;
 

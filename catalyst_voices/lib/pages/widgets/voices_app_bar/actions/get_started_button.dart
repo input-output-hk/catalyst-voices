@@ -1,6 +1,8 @@
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
+/// A [GetStartedButton] widget that is used to display a call to action to
+/// start an account registration.
 class GetStartedButton extends StatelessWidget {
   final void Function()? onPressed;
 

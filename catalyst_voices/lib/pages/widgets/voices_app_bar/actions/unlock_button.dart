@@ -4,6 +4,8 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
+/// An [UnlockButton] widget that is used to display a call to action to
+/// unlock an account currently locked in the app.
 class UnlockButton extends StatelessWidget {
   final void Function()? onPressed;
 

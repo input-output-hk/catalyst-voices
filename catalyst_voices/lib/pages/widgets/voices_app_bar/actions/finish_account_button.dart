@@ -1,6 +1,8 @@
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
+/// A [FinishAccountButton] widget that is used to display a call to action to
+/// complete a pending account registration.
 class FinishAccountButton extends StatelessWidget {
   final void Function()? onPressed;
 

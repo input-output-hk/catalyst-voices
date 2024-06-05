@@ -1,6 +1,8 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 
+/// A [NotificationsIndicator] widget that is used to display pending 
+/// notifications.
 class NotificationsIndicator extends StatelessWidget {
   final String? badgeText;
   final void Function()? onPressed;
