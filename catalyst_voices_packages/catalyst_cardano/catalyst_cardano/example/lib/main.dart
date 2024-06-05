@@ -444,7 +444,7 @@ Transaction _buildUnsignedTx({
 
   final txOutput = TransactionOutput(
     address: preprodFaucetAddress,
-    amount: const Coin(1000000),
+    amount: const Value(coin: Coin(1000000)),
   );
 
   final txBuilder = TransactionBuilder(
