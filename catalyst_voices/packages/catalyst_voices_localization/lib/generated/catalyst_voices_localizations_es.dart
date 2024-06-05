@@ -60,4 +60,7 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get userProfileGuestLabelText => 'Guest';
+
+  @override
+  String get searchButtonLabelText => '[cmd=K]';
 }

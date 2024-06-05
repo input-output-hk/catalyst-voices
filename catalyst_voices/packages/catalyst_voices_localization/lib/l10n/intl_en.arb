@@ -75,5 +75,9 @@
   "userProfileGuestLabelText": "Guest",
   "@userProfileGuestLabelText": {
     "description": "Label text shown in the UserProfileButton widget when a user is not connected."
+  },
+  "searchButtonLabelText": "[cmd=K]",
+  "@searchButtonLabelText": {
+    "description": "Label text shown in the Search widget."
   }
 }

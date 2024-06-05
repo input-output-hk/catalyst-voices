@@ -205,6 +205,12 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Guest'**
   String get userProfileGuestLabelText;
+
+  /// Label text shown in the Search widget.
+  ///
+  /// In en, this message translates to:
+  /// **'[cmd=K]'**
+  String get searchButtonLabelText;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
