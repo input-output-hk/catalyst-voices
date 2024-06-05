@@ -1,20 +1,36 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:collection/collection.dart';
 
-enum Animals {
+enum DeepQueryInspectionFlag {
   @JsonValue(null)
   swaggerGeneratedUnknown(null),
 
-  @JsonValue('Dogs')
-  dogs('Dogs'),
-  @JsonValue('Cats')
-  cats('Cats'),
-  @JsonValue('Rabbits')
-  rabbits('Rabbits');
+  @JsonValue('enabled')
+  enabled('enabled'),
+  @JsonValue('disabled')
+  disabled('disabled');
 
   final String? value;
 
-  const Animals(this.value);
+  const DeepQueryInspectionFlag(this.value);
+}
+
+enum LogLevel {
+  @JsonValue(null)
+  swaggerGeneratedUnknown(null),
+
+  @JsonValue('debug')
+  debug('debug'),
+  @JsonValue('info')
+  info('info'),
+  @JsonValue('warn')
+  warn('warn'),
+  @JsonValue('error')
+  error('error');
+
+  final String? value;
+
+  const LogLevel(this.value);
 }
 
 enum Network {
@@ -65,4 +81,28 @@ enum VoterGroupId {
   final String? value;
 
   const VoterGroupId(this.value);
+}
+
+enum VotingInfoDelegationsType {
+  @JsonValue(null)
+  swaggerGeneratedUnknown(null),
+
+  @JsonValue('Delegated')
+  delegated('Delegated');
+
+  final String? value;
+
+  const VotingInfoDelegationsType(this.value);
+}
+
+enum VotingInfoDirectVoterType {
+  @JsonValue(null)
+  swaggerGeneratedUnknown(null),
+
+  @JsonValue('Direct')
+  direct('Direct');
+
+  final String? value;
+
+  const VotingInfoDirectVoterType(this.value);
 }

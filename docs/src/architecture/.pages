@@ -9,7 +9,6 @@ nav:
   - 07_deployment_view.md
   - 08_concepts
   - 09_architecture_decisions
-  - 10_quality_requirements.md
+  - 10_quality
   - 11_technical_risks.md
   - 12_glossary.md
-

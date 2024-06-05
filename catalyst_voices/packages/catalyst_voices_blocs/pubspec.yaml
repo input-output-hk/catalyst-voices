@@ -4,12 +4,14 @@ version: 0.1.0+1
 publish_to: none
 
 environment:
-  sdk: ">=3.3.0 <4.0.0"
-  flutter: 3.19.5
+  sdk: ">=3.3.4 <4.0.0"
+  flutter: 3.22.1
 
 dependencies:
     bloc: ^8.1.2
     bloc_concurrency: ^0.2.2
+    catalyst_voices_brands:
+      path: ../catalyst_voices_brands
     catalyst_voices_models:
       path: ../catalyst_voices_models
     catalyst_voices_repositories:
@@ -30,4 +32,7 @@ dev_dependencies:
    bloc_test: ^9.1.4
    catalyst_analysis:
     path: ../../../catalyst_voices_packages/catalyst_analysis
+   flutter_bloc: ^8.1.5
+   flutter_test:
+      sdk: flutter
    test: ^1.24.9

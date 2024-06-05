@@ -18,37 +18,6 @@ final class _$CatGatewayApi extends CatGatewayApi {
   final Type definitionType = CatGatewayApi;
 
   @override
-  Future<Response<dynamic>> _apiTestTestIdTestActionGet({
-    required int? id,
-    required String? action,
-    List<Object?>? pet,
-  }) {
-    final Uri $url = Uri.parse('/api/test/test/${id}/test/${action}');
-    final Map<String, dynamic> $params = <String, dynamic>{'pet': pet};
-    final Request $request = Request(
-      'GET',
-      $url,
-      client.baseUrl,
-      parameters: $params,
-    );
-    return client.send<dynamic, dynamic>($request);
-  }
-
-  @override
-  Future<Response<dynamic>> _apiTestTestIdTestActionPost({
-    required int? id,
-    required String? action,
-  }) {
-    final Uri $url = Uri.parse('/api/test/test/${id}/test/${action}');
-    final Request $request = Request(
-      'POST',
-      $url,
-      client.baseUrl,
-    );
-    return client.send<dynamic, dynamic>($request);
-  }
-
-  @override
   Future<Response<dynamic>> _apiHealthStartedGet() {
     final Uri $url = Uri.parse('/api/health/started');
     final Request $request = Request(
@@ -77,6 +46,25 @@ final class _$CatGatewayApi extends CatGatewayApi {
       'GET',
       $url,
       client.baseUrl,
+    );
+    return client.send<dynamic, dynamic>($request);
+  }
+
+  @override
+  Future<Response<dynamic>> _apiHealthInspectionGet({
+    String? logLevel,
+    String? queryInspection,
+  }) {
+    final Uri $url = Uri.parse('/api/health/inspection');
+    final Map<String, dynamic> $params = <String, dynamic>{
+      'log_level': logLevel,
+      'query_inspection': queryInspection,
+    };
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+      parameters: $params,
     );
     return client.send<dynamic, dynamic>($request);
   }

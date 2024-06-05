@@ -11,6 +11,7 @@ asmjs
 asyncio
 asyncpg
 auditability
+backendpython
 bech
 bindgen
 bkioshn
@@ -46,7 +47,9 @@ dotenvy
 dotglob
 drep
 dreps
+dtscalac
 earthfile
+Easterling
 Edgedriver
 emurgo
 encryptor
@@ -78,10 +81,12 @@ Joaquín
 jorm
 jormungandr
 Jörmungandr
+junitxml
 junitreport
 Keyhash
 keyserver
 lcov
+lerp
 Leshiy
 libapp
 libavcodec
@@ -89,6 +94,8 @@ libflutter
 lintfix
 localizable
 loguru
+lovelace
+lovelaces
 mdlint
 metadatum
 metadatums
@@ -99,6 +106,8 @@ mitigations
 moderations
 msedgedriver
 multidex
+multiplatform
+Multiplatform
 myproject
 nanos
 NDEBUG
@@ -106,6 +115,7 @@ netifas
 netkey
 nextest
 Oleksandr
+onboarded
 oneshot
 openapi
 opentelemetry
@@ -113,6 +123,7 @@ pbxproj
 Pdart
 permissionless
 pg_isready
+pinenacl
 plpgsql
 podfile
 podhelper
@@ -128,9 +139,11 @@ pytest
 rapidoc
 redoc
 Replayability
+reloadable
 repr
 reqwest
 rfwtxt
+rgloader
 ripgrep
 RPATH
 rustc
@@ -149,12 +162,14 @@ slotno
 sqlfluff
 Stefano
 stevenj
+stringzilla
 Subkey
 subosito
 SYSROOT
 tacho
 testcov
 testdocs
+testplan
 testunit
 thiserror
 thollander
@@ -173,10 +188,12 @@ Utxos
 vite
 vitss
 vkey
+vkeys
 vkeywitness
 voteplan
 voteplans
 wallclock
+wasmtime
 Werror
 xcassets
 xcconfig
@@ -187,5 +204,5 @@ xctest
 xctestrun
 xcworkspace
 yoroi
-multiplatform
-Multiplatform
+multiasset
+unawaited

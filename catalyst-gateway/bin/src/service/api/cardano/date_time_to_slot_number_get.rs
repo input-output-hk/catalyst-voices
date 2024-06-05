@@ -1,11 +1,10 @@
 //! Implementation of the GET `/date_time_to_slot_number` endpoint
 
-use poem_extensions::{response, UniResponse::T200};
-use poem_openapi::payload::Json;
+use poem_openapi::{payload::Json, ApiResponse};
 
 use crate::{
     event_db::{
-        cardano::follower::{BlockHash, DateTime, SlotInfoQueryType, SlotNumber},
+        cardano::chain_state::{BlockHash, DateTime, SlotInfoQueryType, SlotNumber},
         error::NotFoundError,
     },
     service::common::{
@@ -13,22 +12,21 @@ use crate::{
             network::Network,
             slot_info::{Slot, SlotInfo},
         },
-        responses::{
-            resp_2xx::OK,
-            resp_4xx::ApiValidationError,
-            resp_5xx::{handle_5xx_response, ServerError, ServiceUnavailable},
-        },
+        responses::WithErrorResponses,
     },
     state::State,
 };
 
-/// # All Responses
-pub(crate) type AllResponses = response! {
-    200: OK<Json<SlotInfo>>,
-    400: ApiValidationError,
-    500: ServerError,
-    503: ServiceUnavailable,
-};
+/// Endpoint responses.
+#[derive(ApiResponse)]
+pub(crate) enum Responses {
+    /// Returns the slot info.
+    #[oai(status = 200)]
+    Ok(Json<SlotInfo>),
+}
+
+/// All responses.
+pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # GET `/date_time_to_slot_number`
 #[allow(clippy::unused_async)]
@@ -71,20 +69,21 @@ pub(crate) async fn endpoint(
 
     let current = match process_slot_info_result(current) {
         Ok(current) => current,
-        Err(err) => return handle_5xx_response!(err),
+        Err(err) => return AllResponses::handle_error(&err),
     };
     let previous = match process_slot_info_result(previous) {
         Ok(current) => current,
-        Err(err) => return handle_5xx_response!(err),
+        Err(err) => return AllResponses::handle_error(&err),
     };
     let next = match process_slot_info_result(next) {
         Ok(current) => current,
-        Err(err) => return handle_5xx_response!(err),
+        Err(err) => return AllResponses::handle_error(&err),
     };
 
-    T200(OK(Json(SlotInfo {
+    Responses::Ok(Json(SlotInfo {
         previous,
         current,
         next,
-    })))
+    }))
+    .into()
 }

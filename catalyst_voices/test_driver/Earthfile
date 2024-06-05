@@ -1,7 +1,9 @@
-VERSION --try --global-cache --arg-scope-and-set 0.7
+VERSION 0.8
+
+IMPORT ../ AS catalyst-voices
 
 integration-test-web:
-    FROM ../+build
+    FROM catalyst-voices+build-web
     ARG TARGETARCH
     ARG browser
     LET driver_port = 4444

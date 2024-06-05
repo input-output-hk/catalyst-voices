@@ -211,6 +211,95 @@ extension $DelegationExtension on Delegation {
 }
 
 @JsonSerializable(explicitToJson: true)
+class Delegations {
+  const Delegations({
+    required this.delegations,
+  });
+
+  factory Delegations.fromJson(Map<String, dynamic> json) =>
+      _$DelegationsFromJson(json);
+
+  static const toJsonFactory = _$DelegationsToJson;
+  Map<String, dynamic> toJson() => _$DelegationsToJson(this);
+
+  @JsonKey(name: 'delegations', defaultValue: <Delegation>[])
+  final List<Delegation> delegations;
+  static const fromJsonFactory = _$DelegationsFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is Delegations &&
+            (identical(other.delegations, delegations) ||
+                const DeepCollectionEquality()
+                    .equals(other.delegations, delegations)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(delegations) ^ runtimeType.hashCode;
+}
+
+extension $DelegationsExtension on Delegations {
+  Delegations copyWith({List<Delegation>? delegations}) {
+    return Delegations(delegations: delegations ?? this.delegations);
+  }
+
+  Delegations copyWithWrapped({Wrapped<List<Delegation>>? delegations}) {
+    return Delegations(
+        delegations:
+            (delegations != null ? delegations.value : this.delegations));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class DirectVoter {
+  const DirectVoter({
+    required this.votingKey,
+  });
+
+  factory DirectVoter.fromJson(Map<String, dynamic> json) =>
+      _$DirectVoterFromJson(json);
+
+  static const toJsonFactory = _$DirectVoterToJson;
+  Map<String, dynamic> toJson() => _$DirectVoterToJson(this);
+
+  @JsonKey(name: 'voting_key')
+  final String votingKey;
+  static const fromJsonFactory = _$DirectVoterFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is DirectVoter &&
+            (identical(other.votingKey, votingKey) ||
+                const DeepCollectionEquality()
+                    .equals(other.votingKey, votingKey)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(votingKey) ^ runtimeType.hashCode;
+}
+
+extension $DirectVoterExtension on DirectVoter {
+  DirectVoter copyWith({String? votingKey}) {
+    return DirectVoter(votingKey: votingKey ?? this.votingKey);
+  }
+
+  DirectVoter copyWithWrapped({Wrapped<String>? votingKey}) {
+    return DirectVoter(
+        votingKey: (votingKey != null ? votingKey.value : this.votingKey));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
 class FragmentStatus {
   const FragmentStatus();
 
@@ -536,31 +625,31 @@ extension $RejectedFragmentExtension on RejectedFragment {
 }
 
 @JsonSerializable(explicitToJson: true)
-class ServerErrorPayload {
-  const ServerErrorPayload({
+class ServerError {
+  const ServerError({
     required this.id,
-    this.msg,
+    required this.msg,
     this.issue,
   });
 
-  factory ServerErrorPayload.fromJson(Map<String, dynamic> json) =>
-      _$ServerErrorPayloadFromJson(json);
+  factory ServerError.fromJson(Map<String, dynamic> json) =>
+      _$ServerErrorFromJson(json);
 
-  static const toJsonFactory = _$ServerErrorPayloadToJson;
-  Map<String, dynamic> toJson() => _$ServerErrorPayloadToJson(this);
+  static const toJsonFactory = _$ServerErrorToJson;
+  Map<String, dynamic> toJson() => _$ServerErrorToJson(this);
 
   @JsonKey(name: 'id')
   final String id;
   @JsonKey(name: 'msg')
-  final String? msg;
+  final String msg;
   @JsonKey(name: 'issue')
   final String? issue;
-  static const fromJsonFactory = _$ServerErrorPayloadFromJson;
+  static const fromJsonFactory = _$ServerErrorFromJson;
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other is ServerErrorPayload &&
+        (other is ServerError &&
             (identical(other.id, id) ||
                 const DeepCollectionEquality().equals(other.id, id)) &&
             (identical(other.msg, msg) ||
@@ -580,15 +669,15 @@ class ServerErrorPayload {
       runtimeType.hashCode;
 }
 
-extension $ServerErrorPayloadExtension on ServerErrorPayload {
-  ServerErrorPayload copyWith({String? id, String? msg, String? issue}) {
-    return ServerErrorPayload(
+extension $ServerErrorExtension on ServerError {
+  ServerError copyWith({String? id, String? msg, String? issue}) {
+    return ServerError(
         id: id ?? this.id, msg: msg ?? this.msg, issue: issue ?? this.issue);
   }
 
-  ServerErrorPayload copyWithWrapped(
-      {Wrapped<String>? id, Wrapped<String?>? msg, Wrapped<String?>? issue}) {
-    return ServerErrorPayload(
+  ServerError copyWithWrapped(
+      {Wrapped<String>? id, Wrapped<String>? msg, Wrapped<String?>? issue}) {
+    return ServerError(
         id: (id != null ? id.value : this.id),
         msg: (msg != null ? msg.value : this.msg),
         issue: (issue != null ? issue.value : this.issue));
@@ -965,6 +1054,49 @@ extension $SyncStateExtension on SyncState {
 }
 
 @JsonSerializable(explicitToJson: true)
+class ValidationError {
+  const ValidationError({
+    required this.message,
+  });
+
+  factory ValidationError.fromJson(Map<String, dynamic> json) =>
+      _$ValidationErrorFromJson(json);
+
+  static const toJsonFactory = _$ValidationErrorToJson;
+  Map<String, dynamic> toJson() => _$ValidationErrorToJson(this);
+
+  @JsonKey(name: 'message')
+  final String message;
+  static const fromJsonFactory = _$ValidationErrorFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is ValidationError &&
+            (identical(other.message, message) ||
+                const DeepCollectionEquality().equals(other.message, message)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(message) ^ runtimeType.hashCode;
+}
+
+extension $ValidationErrorExtension on ValidationError {
+  ValidationError copyWith({String? message}) {
+    return ValidationError(message: message ?? this.message);
+  }
+
+  ValidationError copyWithWrapped({Wrapped<String>? message}) {
+    return ValidationError(
+        message: (message != null ? message.value : this.message));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
 class VotePlan {
   const VotePlan({
     required this.votingToken,
@@ -1207,67 +1339,279 @@ extension $VoterRegistrationExtension on VoterRegistration {
   }
 }
 
-typedef VotingInfo = Map<String, dynamic>;
-String? animalsNullableToJson(enums.Animals? animals) {
-  return animals?.value;
+@JsonSerializable(explicitToJson: true)
+class VotingInfo {
+  const VotingInfo();
+
+  factory VotingInfo.fromJson(Map<String, dynamic> json) =>
+      _$VotingInfoFromJson(json);
+
+  static const toJsonFactory = _$VotingInfoToJson;
+  Map<String, dynamic> toJson() => _$VotingInfoToJson(this);
+
+  static const fromJsonFactory = _$VotingInfoFromJson;
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode => runtimeType.hashCode;
 }
 
-String? animalsToJson(enums.Animals animals) {
-  return animals.value;
+@JsonSerializable(explicitToJson: true)
+class VotingInfoDelegations {
+  const VotingInfoDelegations({
+    required this.type,
+    required this.delegations,
+  });
+
+  factory VotingInfoDelegations.fromJson(Map<String, dynamic> json) =>
+      _$VotingInfoDelegationsFromJson(json);
+
+  static const toJsonFactory = _$VotingInfoDelegationsToJson;
+  Map<String, dynamic> toJson() => _$VotingInfoDelegationsToJson(this);
+
+  @JsonKey(
+    name: 'type',
+    toJson: votingInfoDelegationsTypeToJson,
+    fromJson: votingInfoDelegationsTypeFromJson,
+  )
+  final enums.VotingInfoDelegationsType type;
+  @JsonKey(name: 'delegations', defaultValue: <Delegation>[])
+  final List<Delegation> delegations;
+  static const fromJsonFactory = _$VotingInfoDelegationsFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is VotingInfoDelegations &&
+            (identical(other.type, type) ||
+                const DeepCollectionEquality().equals(other.type, type)) &&
+            (identical(other.delegations, delegations) ||
+                const DeepCollectionEquality()
+                    .equals(other.delegations, delegations)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(type) ^
+      const DeepCollectionEquality().hash(delegations) ^
+      runtimeType.hashCode;
 }
 
-enums.Animals animalsFromJson(
-  Object? animals, [
-  enums.Animals? defaultValue,
+extension $VotingInfoDelegationsExtension on VotingInfoDelegations {
+  VotingInfoDelegations copyWith(
+      {enums.VotingInfoDelegationsType? type, List<Delegation>? delegations}) {
+    return VotingInfoDelegations(
+        type: type ?? this.type, delegations: delegations ?? this.delegations);
+  }
+
+  VotingInfoDelegations copyWithWrapped(
+      {Wrapped<enums.VotingInfoDelegationsType>? type,
+      Wrapped<List<Delegation>>? delegations}) {
+    return VotingInfoDelegations(
+        type: (type != null ? type.value : this.type),
+        delegations:
+            (delegations != null ? delegations.value : this.delegations));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class VotingInfoDirectVoter {
+  const VotingInfoDirectVoter({
+    required this.type,
+    required this.votingKey,
+  });
+
+  factory VotingInfoDirectVoter.fromJson(Map<String, dynamic> json) =>
+      _$VotingInfoDirectVoterFromJson(json);
+
+  static const toJsonFactory = _$VotingInfoDirectVoterToJson;
+  Map<String, dynamic> toJson() => _$VotingInfoDirectVoterToJson(this);
+
+  @JsonKey(
+    name: 'type',
+    toJson: votingInfoDirectVoterTypeToJson,
+    fromJson: votingInfoDirectVoterTypeFromJson,
+  )
+  final enums.VotingInfoDirectVoterType type;
+  @JsonKey(name: 'voting_key')
+  final String votingKey;
+  static const fromJsonFactory = _$VotingInfoDirectVoterFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is VotingInfoDirectVoter &&
+            (identical(other.type, type) ||
+                const DeepCollectionEquality().equals(other.type, type)) &&
+            (identical(other.votingKey, votingKey) ||
+                const DeepCollectionEquality()
+                    .equals(other.votingKey, votingKey)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(type) ^
+      const DeepCollectionEquality().hash(votingKey) ^
+      runtimeType.hashCode;
+}
+
+extension $VotingInfoDirectVoterExtension on VotingInfoDirectVoter {
+  VotingInfoDirectVoter copyWith(
+      {enums.VotingInfoDirectVoterType? type, String? votingKey}) {
+    return VotingInfoDirectVoter(
+        type: type ?? this.type, votingKey: votingKey ?? this.votingKey);
+  }
+
+  VotingInfoDirectVoter copyWithWrapped(
+      {Wrapped<enums.VotingInfoDirectVoterType>? type,
+      Wrapped<String>? votingKey}) {
+    return VotingInfoDirectVoter(
+        type: (type != null ? type.value : this.type),
+        votingKey: (votingKey != null ? votingKey.value : this.votingKey));
+  }
+}
+
+String? deepQueryInspectionFlagNullableToJson(
+    enums.DeepQueryInspectionFlag? deepQueryInspectionFlag) {
+  return deepQueryInspectionFlag?.value;
+}
+
+String? deepQueryInspectionFlagToJson(
+    enums.DeepQueryInspectionFlag deepQueryInspectionFlag) {
+  return deepQueryInspectionFlag.value;
+}
+
+enums.DeepQueryInspectionFlag deepQueryInspectionFlagFromJson(
+  Object? deepQueryInspectionFlag, [
+  enums.DeepQueryInspectionFlag? defaultValue,
 ]) {
-  return enums.Animals.values.firstWhereOrNull((e) => e.value == animals) ??
+  return enums.DeepQueryInspectionFlag.values
+          .firstWhereOrNull((e) => e.value == deepQueryInspectionFlag) ??
       defaultValue ??
-      enums.Animals.swaggerGeneratedUnknown;
+      enums.DeepQueryInspectionFlag.swaggerGeneratedUnknown;
 }
 
-enums.Animals? animalsNullableFromJson(
-  Object? animals, [
-  enums.Animals? defaultValue,
+enums.DeepQueryInspectionFlag? deepQueryInspectionFlagNullableFromJson(
+  Object? deepQueryInspectionFlag, [
+  enums.DeepQueryInspectionFlag? defaultValue,
 ]) {
-  if (animals == null) {
+  if (deepQueryInspectionFlag == null) {
     return null;
   }
-  return enums.Animals.values.firstWhereOrNull((e) => e.value == animals) ??
+  return enums.DeepQueryInspectionFlag.values
+          .firstWhereOrNull((e) => e.value == deepQueryInspectionFlag) ??
       defaultValue;
 }
 
-String animalsExplodedListToJson(List<enums.Animals>? animals) {
-  return animals?.map((e) => e.value!).join(',') ?? '';
+String deepQueryInspectionFlagExplodedListToJson(
+    List<enums.DeepQueryInspectionFlag>? deepQueryInspectionFlag) {
+  return deepQueryInspectionFlag?.map((e) => e.value!).join(',') ?? '';
 }
 
-List<String> animalsListToJson(List<enums.Animals>? animals) {
-  if (animals == null) {
+List<String> deepQueryInspectionFlagListToJson(
+    List<enums.DeepQueryInspectionFlag>? deepQueryInspectionFlag) {
+  if (deepQueryInspectionFlag == null) {
     return [];
   }
 
-  return animals.map((e) => e.value!).toList();
+  return deepQueryInspectionFlag.map((e) => e.value!).toList();
 }
 
-List<enums.Animals> animalsListFromJson(
-  List? animals, [
-  List<enums.Animals>? defaultValue,
+List<enums.DeepQueryInspectionFlag> deepQueryInspectionFlagListFromJson(
+  List? deepQueryInspectionFlag, [
+  List<enums.DeepQueryInspectionFlag>? defaultValue,
 ]) {
-  if (animals == null) {
+  if (deepQueryInspectionFlag == null) {
     return defaultValue ?? [];
   }
 
-  return animals.map((e) => animalsFromJson(e.toString())).toList();
+  return deepQueryInspectionFlag
+      .map((e) => deepQueryInspectionFlagFromJson(e.toString()))
+      .toList();
 }
 
-List<enums.Animals>? animalsNullableListFromJson(
-  List? animals, [
-  List<enums.Animals>? defaultValue,
+List<enums.DeepQueryInspectionFlag>?
+    deepQueryInspectionFlagNullableListFromJson(
+  List? deepQueryInspectionFlag, [
+  List<enums.DeepQueryInspectionFlag>? defaultValue,
 ]) {
-  if (animals == null) {
+  if (deepQueryInspectionFlag == null) {
     return defaultValue;
   }
 
-  return animals.map((e) => animalsFromJson(e.toString())).toList();
+  return deepQueryInspectionFlag
+      .map((e) => deepQueryInspectionFlagFromJson(e.toString()))
+      .toList();
+}
+
+String? logLevelNullableToJson(enums.LogLevel? logLevel) {
+  return logLevel?.value;
+}
+
+String? logLevelToJson(enums.LogLevel logLevel) {
+  return logLevel.value;
+}
+
+enums.LogLevel logLevelFromJson(
+  Object? logLevel, [
+  enums.LogLevel? defaultValue,
+]) {
+  return enums.LogLevel.values.firstWhereOrNull((e) => e.value == logLevel) ??
+      defaultValue ??
+      enums.LogLevel.swaggerGeneratedUnknown;
+}
+
+enums.LogLevel? logLevelNullableFromJson(
+  Object? logLevel, [
+  enums.LogLevel? defaultValue,
+]) {
+  if (logLevel == null) {
+    return null;
+  }
+  return enums.LogLevel.values.firstWhereOrNull((e) => e.value == logLevel) ??
+      defaultValue;
+}
+
+String logLevelExplodedListToJson(List<enums.LogLevel>? logLevel) {
+  return logLevel?.map((e) => e.value!).join(',') ?? '';
+}
+
+List<String> logLevelListToJson(List<enums.LogLevel>? logLevel) {
+  if (logLevel == null) {
+    return [];
+  }
+
+  return logLevel.map((e) => e.value!).toList();
+}
+
+List<enums.LogLevel> logLevelListFromJson(
+  List? logLevel, [
+  List<enums.LogLevel>? defaultValue,
+]) {
+  if (logLevel == null) {
+    return defaultValue ?? [];
+  }
+
+  return logLevel.map((e) => logLevelFromJson(e.toString())).toList();
+}
+
+List<enums.LogLevel>? logLevelNullableListFromJson(
+  List? logLevel, [
+  List<enums.LogLevel>? defaultValue,
+]) {
+  if (logLevel == null) {
+    return defaultValue;
+  }
+
+  return logLevel.map((e) => logLevelFromJson(e.toString())).toList();
 }
 
 String? networkNullableToJson(enums.Network? network) {
@@ -1464,6 +1808,152 @@ List<enums.VoterGroupId>? voterGroupIdNullableListFromJson(
   }
 
   return voterGroupId.map((e) => voterGroupIdFromJson(e.toString())).toList();
+}
+
+String? votingInfoDelegationsTypeNullableToJson(
+    enums.VotingInfoDelegationsType? votingInfoDelegationsType) {
+  return votingInfoDelegationsType?.value;
+}
+
+String? votingInfoDelegationsTypeToJson(
+    enums.VotingInfoDelegationsType votingInfoDelegationsType) {
+  return votingInfoDelegationsType.value;
+}
+
+enums.VotingInfoDelegationsType votingInfoDelegationsTypeFromJson(
+  Object? votingInfoDelegationsType, [
+  enums.VotingInfoDelegationsType? defaultValue,
+]) {
+  return enums.VotingInfoDelegationsType.values
+          .firstWhereOrNull((e) => e.value == votingInfoDelegationsType) ??
+      defaultValue ??
+      enums.VotingInfoDelegationsType.swaggerGeneratedUnknown;
+}
+
+enums.VotingInfoDelegationsType? votingInfoDelegationsTypeNullableFromJson(
+  Object? votingInfoDelegationsType, [
+  enums.VotingInfoDelegationsType? defaultValue,
+]) {
+  if (votingInfoDelegationsType == null) {
+    return null;
+  }
+  return enums.VotingInfoDelegationsType.values
+          .firstWhereOrNull((e) => e.value == votingInfoDelegationsType) ??
+      defaultValue;
+}
+
+String votingInfoDelegationsTypeExplodedListToJson(
+    List<enums.VotingInfoDelegationsType>? votingInfoDelegationsType) {
+  return votingInfoDelegationsType?.map((e) => e.value!).join(',') ?? '';
+}
+
+List<String> votingInfoDelegationsTypeListToJson(
+    List<enums.VotingInfoDelegationsType>? votingInfoDelegationsType) {
+  if (votingInfoDelegationsType == null) {
+    return [];
+  }
+
+  return votingInfoDelegationsType.map((e) => e.value!).toList();
+}
+
+List<enums.VotingInfoDelegationsType> votingInfoDelegationsTypeListFromJson(
+  List? votingInfoDelegationsType, [
+  List<enums.VotingInfoDelegationsType>? defaultValue,
+]) {
+  if (votingInfoDelegationsType == null) {
+    return defaultValue ?? [];
+  }
+
+  return votingInfoDelegationsType
+      .map((e) => votingInfoDelegationsTypeFromJson(e.toString()))
+      .toList();
+}
+
+List<enums.VotingInfoDelegationsType>?
+    votingInfoDelegationsTypeNullableListFromJson(
+  List? votingInfoDelegationsType, [
+  List<enums.VotingInfoDelegationsType>? defaultValue,
+]) {
+  if (votingInfoDelegationsType == null) {
+    return defaultValue;
+  }
+
+  return votingInfoDelegationsType
+      .map((e) => votingInfoDelegationsTypeFromJson(e.toString()))
+      .toList();
+}
+
+String? votingInfoDirectVoterTypeNullableToJson(
+    enums.VotingInfoDirectVoterType? votingInfoDirectVoterType) {
+  return votingInfoDirectVoterType?.value;
+}
+
+String? votingInfoDirectVoterTypeToJson(
+    enums.VotingInfoDirectVoterType votingInfoDirectVoterType) {
+  return votingInfoDirectVoterType.value;
+}
+
+enums.VotingInfoDirectVoterType votingInfoDirectVoterTypeFromJson(
+  Object? votingInfoDirectVoterType, [
+  enums.VotingInfoDirectVoterType? defaultValue,
+]) {
+  return enums.VotingInfoDirectVoterType.values
+          .firstWhereOrNull((e) => e.value == votingInfoDirectVoterType) ??
+      defaultValue ??
+      enums.VotingInfoDirectVoterType.swaggerGeneratedUnknown;
+}
+
+enums.VotingInfoDirectVoterType? votingInfoDirectVoterTypeNullableFromJson(
+  Object? votingInfoDirectVoterType, [
+  enums.VotingInfoDirectVoterType? defaultValue,
+]) {
+  if (votingInfoDirectVoterType == null) {
+    return null;
+  }
+  return enums.VotingInfoDirectVoterType.values
+          .firstWhereOrNull((e) => e.value == votingInfoDirectVoterType) ??
+      defaultValue;
+}
+
+String votingInfoDirectVoterTypeExplodedListToJson(
+    List<enums.VotingInfoDirectVoterType>? votingInfoDirectVoterType) {
+  return votingInfoDirectVoterType?.map((e) => e.value!).join(',') ?? '';
+}
+
+List<String> votingInfoDirectVoterTypeListToJson(
+    List<enums.VotingInfoDirectVoterType>? votingInfoDirectVoterType) {
+  if (votingInfoDirectVoterType == null) {
+    return [];
+  }
+
+  return votingInfoDirectVoterType.map((e) => e.value!).toList();
+}
+
+List<enums.VotingInfoDirectVoterType> votingInfoDirectVoterTypeListFromJson(
+  List? votingInfoDirectVoterType, [
+  List<enums.VotingInfoDirectVoterType>? defaultValue,
+]) {
+  if (votingInfoDirectVoterType == null) {
+    return defaultValue ?? [];
+  }
+
+  return votingInfoDirectVoterType
+      .map((e) => votingInfoDirectVoterTypeFromJson(e.toString()))
+      .toList();
+}
+
+List<enums.VotingInfoDirectVoterType>?
+    votingInfoDirectVoterTypeNullableListFromJson(
+  List? votingInfoDirectVoterType, [
+  List<enums.VotingInfoDirectVoterType>? defaultValue,
+]) {
+  if (votingInfoDirectVoterType == null) {
+    return defaultValue;
+  }
+
+  return votingInfoDirectVoterType
+      .map((e) => votingInfoDirectVoterTypeFromJson(e.toString()))
+      .toList();
 }
 
 // ignore: unused_element

@@ -48,56 +48,6 @@ abstract class CatGatewayApi extends ChopperService {
     return _$CatGatewayApi(newClient);
   }
 
-  ///Test Get API
-  ///@param id The ID of the test.  This comment ends up in the documentation.  * 5 will print an info log * 10 will print a warn log * 15 will print a error log * 20 will panic which should generate a 500
-  ///@param action The action just needs to be any valid UUID.  # Make sure its a UUID
-  ///@param pet List your favorite pets, in order of preference
-  @deprecated
-  Future<chopper.Response> apiTestTestIdTestActionGet({
-    required int? id,
-    required String? action,
-    List<enums.Animals>? pet,
-  }) {
-    return _apiTestTestIdTestActionGet(
-        id: id, action: action, pet: animalsListToJson(pet));
-  }
-
-  ///Test Get API
-  ///@param id The ID of the test.  This comment ends up in the documentation.  * 5 will print an info log * 10 will print a warn log * 15 will print a error log * 20 will panic which should generate a 500
-  ///@param action The action just needs to be any valid UUID.  # Make sure its a UUID
-  ///@param pet List your favorite pets, in order of preference
-  @deprecated
-  @Get(path: '/api/test/test/{id}/test/{action}')
-  Future<chopper.Response> _apiTestTestIdTestActionGet({
-    @Path('id') required int? id,
-    @Path('action') required String? action,
-    @Query('pet') List<Object?>? pet,
-  });
-
-  ///Test Post API
-  ///@param id The ID of the test.  * 5 will print an info log * 10 will print a warn log * 15 will print a error log * 20 will panic which should generate a 500
-  ///@param action The action just needs to be any valid UUID.  # Make sure its a UUID
-  @deprecated
-  Future<chopper.Response> apiTestTestIdTestActionPost({
-    required int? id,
-    required String? action,
-  }) {
-    return _apiTestTestIdTestActionPost(id: id, action: action);
-  }
-
-  ///Test Post API
-  ///@param id The ID of the test.  * 5 will print an info log * 10 will print a warn log * 15 will print a error log * 20 will panic which should generate a 500
-  ///@param action The action just needs to be any valid UUID.  # Make sure its a UUID
-  @deprecated
-  @Post(
-    path: '/api/test/test/{id}/test/{action}',
-    optionalBody: true,
-  )
-  Future<chopper.Response> _apiTestTestIdTestActionPost({
-    @Path('id') required int? id,
-    @Path('action') required String? action,
-  });
-
   ///Service Started
   Future<chopper.Response> apiHealthStartedGet() {
     return _apiHealthStartedGet();
@@ -124,6 +74,27 @@ abstract class CatGatewayApi extends ChopperService {
   ///Service Live
   @Get(path: '/api/health/live')
   Future<chopper.Response> _apiHealthLiveGet();
+
+  ///Options for service inspection.
+  ///@param log_level
+  ///@param query_inspection
+  Future<chopper.Response> apiHealthInspectionGet({
+    enums.LogLevel? logLevel,
+    enums.DeepQueryInspectionFlag? queryInspection,
+  }) {
+    return _apiHealthInspectionGet(
+        logLevel: logLevel?.value?.toString(),
+        queryInspection: queryInspection?.value?.toString());
+  }
+
+  ///Options for service inspection.
+  ///@param log_level
+  ///@param query_inspection
+  @Get(path: '/api/health/inspection')
+  Future<chopper.Response> _apiHealthInspectionGet({
+    @Query('log_level') String? logLevel,
+    @Query('query_inspection') String? queryInspection,
+  });
 
   ///Get staked ada amount.
   ///@param stake_address The stake address of the user. Should a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.

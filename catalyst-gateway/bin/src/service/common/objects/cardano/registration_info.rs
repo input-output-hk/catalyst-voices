@@ -3,7 +3,7 @@
 use poem_openapi::{types::Example, Object, Union};
 
 use crate::{
-    event_db::cardano::voter_registration::{Nonce, PaymentAddress, PublicVotingInfo, TxId},
+    event_db::cardano::cip36_registration::{Nonce, PaymentAddress, PublicVotingInfo, TxId},
     service::{common::objects::cardano::hash::Hash, utilities::to_hex_with_prefix},
 };
 
@@ -20,13 +20,30 @@ struct Delegation {
     power: i64,
 }
 
+/// Represents a list of delegations
+#[derive(Object)]
+struct Delegations {
+    /// A list of delegations.
+    #[oai(validator(max_items = "100"))]
+    delegations: Vec<Delegation>,
+}
+
+/// Direct voter type
+#[derive(Object)]
+struct DirectVoter {
+    /// Voting key.
+    #[oai(validator(min_length = "66", max_length = "66", pattern = "0x[0-9a-f]{64}"))]
+    voting_key: String,
+}
+
 /// Voting key type
 #[derive(Union)]
+#[oai(discriminator_name = "type", one_of = true)]
 enum VotingInfo {
     /// direct voting key
-    Direct(String),
+    Direct(DirectVoter),
     /// delegations
-    Delegated(Vec<Delegation>),
+    Delegated(Delegations),
 }
 
 /// User's [CIP-36](https://cips.cardano.org/cip/CIP-36/) registration info.
@@ -57,11 +74,13 @@ impl RegistrationInfo {
     ) -> Self {
         let voting_info = match voting_info {
             PublicVotingInfo::Direct(voting_key) => {
-                VotingInfo::Direct(to_hex_with_prefix(voting_key.bytes()))
+                VotingInfo::Direct(DirectVoter {
+                    voting_key: to_hex_with_prefix(voting_key.bytes()),
+                })
             },
             PublicVotingInfo::Delegated(delegations) => {
-                VotingInfo::Delegated(
-                    delegations
+                VotingInfo::Delegated(Delegations {
+                    delegations: delegations
                         .into_iter()
                         .map(|(voting_key, power)| {
                             Delegation {
@@ -70,7 +89,7 @@ impl RegistrationInfo {
                             }
                         })
                         .collect(),
-                )
+                })
             },
         };
         Self {
@@ -94,11 +113,14 @@ impl Example for RegistrationInfo {
             .expect("Invalid hex")
             .into(),
             nonce: 11_623_850,
-            voting_info: VotingInfo::Delegated(vec![Delegation {
-                voting_key: "0xb16f03d67e95ddd321df4bee8658901eb183d4cb5623624ff5edd7fe54f8e857"
-                    .to_string(),
-                power: 1,
-            }]),
+            voting_info: VotingInfo::Delegated(Delegations {
+                delegations: vec![Delegation {
+                    voting_key:
+                        "0xb16f03d67e95ddd321df4bee8658901eb183d4cb5623624ff5edd7fe54f8e857"
+                            .to_string(),
+                    power: 1,
+                }],
+            }),
         }
     }
 }
