@@ -216,7 +216,7 @@ class _WalletDetails extends StatefulWidget {
 }
 
 class _WalletDetailsState extends State<_WalletDetails> {
-  Value? _balance;
+  Coin? _balance;
   List<CipExtension>? _extensions;
   NetworkId? _networkId;
   ShelleyAddress? _changeAddress;
@@ -281,9 +281,9 @@ class _WalletDetailsState extends State<_WalletDetails> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('Balance: ${_balance?.coin ?? '---'}\n'),
+              Text('Balance: ${_balance ?? '---'}\n'),
               Text('Extensions: ${_formatExtensions(_extensions)}\n'),
-              Text('Network ID: ${_networkId ?? '---'}\n'),
+              Text('Network ID: $_networkId\n'),
               Text('Change address:\n${_changeAddress?.toBech32() ?? '---'}\n'),
               Text(
                 'Reward addresses:\n${_formatAddresses(_rewardAddresses)}\n',
@@ -420,7 +420,7 @@ String _formatUtxos(List<TransactionUnspentOutput>? utxos) {
 String _formatUtxo(TransactionUnspentOutput utxo) {
   return 'Tx: ${utxo.input.transactionId}'
       '\nIndex: ${utxo.input.index}'
-      '\nAmount: ${utxo.output.amount.coin}\n';
+      '\nAmount: ${utxo.output.amount}\n';
 }
 
 Transaction _buildUnsignedTx({
@@ -444,7 +444,7 @@ Transaction _buildUnsignedTx({
 
   final txOutput = TransactionOutput(
     address: preprodFaucetAddress,
-    amount: const Value(coin: Coin(1000000)),
+    amount: const Coin(1000000),
   );
 
   final txBuilder = TransactionBuilder(

@@ -56,10 +56,10 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   JSCardanoWalletApiProxy(this._delegate);
 
   @override
-  Future<Value> getBalance() async {
+  Future<Coin> getBalance() async {
     try {
       final result = await _delegate.getBalance().toDart.then((e) => e.toDart);
-      return Value.fromCbor(cbor.decode(hex.decode(result)));
+      return Coin.fromCbor(cbor.decode(hex.decode(result)));
     } catch (ex) {
       throw _mapApiException(ex) ?? _fallbackApiException(ex);
     }
