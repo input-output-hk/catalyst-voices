@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 
 class NotificationsIndicator extends StatelessWidget {
@@ -21,7 +22,7 @@ class NotificationsIndicator extends StatelessWidget {
   }
 
   Widget get _iconButton => IconButton.outlined(
-        icon: const Icon(Icons.notifications_none),
+        icon: const Icon(CatalystVoicesIcons.bell),
         onPressed: onPressed,
       );
 }

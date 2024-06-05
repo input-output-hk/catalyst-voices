@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 
 class RolePicker extends StatelessWidget {
@@ -14,7 +15,7 @@ class RolePicker extends StatelessWidget {
   Widget build(BuildContext context) {
     return OutlinedButton.icon(
       onPressed: onPressed,
-      icon: const Icon(Icons.keyboard_arrow_down_outlined),
+      icon: const Icon(CatalystVoicesIcons.cheveron_down),
       label: Text(currentRole),
     );
   }
