@@ -1,6 +1,6 @@
 import 'package:catalyst_voices/app/app.dart';
 import 'package:catalyst_voices/app/view/app_page.dart';
-import 'package:catalyst_voices/configs/main_qa.dart' as app;
+import 'package:catalyst_voices/configs/main_qa_patrol.dart' as app;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:patrol/patrol.dart';
 

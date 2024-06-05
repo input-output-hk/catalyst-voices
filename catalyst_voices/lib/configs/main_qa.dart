@@ -1,12 +1,6 @@
-import 'package:catalyst_voices/configs/app_bloc_observer.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import 'package:url_strategy/url_strategy.dart';
+import 'package:catalyst_voices/app/app.dart';
+import 'package:catalyst_voices/configs/bootstrap.dart';
 
-Future<void> main() async {
-  GoRouter.optionURLReflectsImperativeAPIs = true;
-  setPathUrlStrategy();
-  Bloc.observer = AppBlocObserver();
-
-  // await bootstrap(() => const App());
+void main() async {
+  await bootstrap(() => const App());
 }
