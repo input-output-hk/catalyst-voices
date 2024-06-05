@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/widgets/voices_app_bar/actions/voices_app_bar_actions.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -62,21 +63,59 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               )
             : null,
-        title: Row(
-          children: [
-            ResponsiveBuilder<String>(
-              builder: (context, data) => CatalystSvgPicture.asset(
-                data!,
+        title: Container(
+          height: 64,
+          alignment: Alignment.centerLeft,
+          child: ResponsiveBuilder<({List<Widget> widgets, double itemGap})>(
+            builder: (context, data) => ListView.separated(
+              shrinkWrap: true,
+              itemBuilder: (context, index) => data.widgets[index],
+              separatorBuilder: (context, index) => SizedBox(
+                width: data.itemGap,
               ),
-              xs: Theme.of(context).brandAssets.logoIcon.path,
-              other: Theme.of(context).brandAssets.logo.path,
+              itemCount: data!.widgets.length,
+              scrollDirection: Axis.horizontal,
             ),
-          ],
+            xs: (
+              widgets: [
+                CatalystSvgPicture.asset(
+                  Theme.of(context).brandAssets.logoIcon.path,
+                ),
+              ],
+              itemGap: 8
+            ),
+            sm: (
+              widgets: [
+                CatalystSvgPicture.asset(
+                  Theme.of(context).brandAssets.logo.path,
+                ),
+                SearchButton(
+                  onPressed: () => {},
+                ),
+              ],
+              itemGap: 16
+            ),
+            other: (
+              widgets: [
+                CatalystSvgPicture.asset(
+                  Theme.of(context).brandAssets.logo.path,
+                ),
+                SearchButton(
+                  onPressed: () => {},
+                ),
+              ],
+              itemGap: 24
+            ),
+          ),
         ),
         actions: [
           ResponsiveBuilder<({EdgeInsets wrapperPadding, double itemGap})>(
             xs: const (
               wrapperPadding: EdgeInsets.only(right: 8),
+              itemGap: 6,
+            ),
+            sm: const (
+              wrapperPadding: EdgeInsets.only(right: 16),
               itemGap: 6,
             ),
             other: const (
