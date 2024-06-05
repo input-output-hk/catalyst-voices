@@ -23,13 +23,13 @@ packageLicenseOverride:
   flutter_gen: MIT
 
 packageSourceOverride:
-  fuchsia_remote_debug_protocol: https://github.com/flutter/flutter/blob/3.22.1/LICENSE
-  flutter_driver: https://github.com/flutter/flutter/blob/3.22.1/LICENSE
-  flutter_localizations: https://github.com/flutter/flutter/blob/3.22.1/LICENSE
-  flutter_test: https://github.com/flutter/flutter/blob/3.22.1/LICENSE
-  flutter_web_plugins: https://github.com/flutter/flutter/blob/3.22.1/LICENSE
-  integration_test: https://github.com/flutter/flutter/blob/3.22.1/LICENSE
-  rxdart: https://github.com/ReactiveX/rxdart/blob/0.27.7/LICENSE
-  vector_math: https://github.com/google/vector_math.dart/blob/v2.1.4/LICENSE
-  sky_engine: https://github.com/flutter/engine/blob/3.22.1/sky/packages/sky_engine/LICENSE
-  flutter_gen: https://github.com/FlutterGen/flutter_gen/blob/v5.4.0/LICENSE
+  fuchsia_remote_debug_protocol: https://github.com/flutter/flutter/blob/main/LICENSE
+  flutter_driver: https://github.com/flutter/flutter/blob/main/LICENSE
+  flutter_localizations: https://github.com/flutter/flutter/blob/main/LICENSE
+  flutter_test: https://github.com/flutter/flutter/blob/main/LICENSE
+  flutter_web_plugins: https://github.com/flutter/flutter/blob/main/LICENSE
+  integration_test: https://github.com/flutter/flutter/blob/main/LICENSE
+  rxdart: https://github.com/ReactiveX/rxdart/blob/master/LICENSE
+  vector_math: https://github.com/google/vector_math.dart/blob/master/LICENSE
+  sky_engine: https://github.com/flutter/engine/blob/main/sky/packages/sky_engine/LICENSE
+  flutter_gen: https://github.com/FlutterGen/flutter_gen/blob/main/LICENSE
