@@ -8,6 +8,8 @@ import 'package:go_router/go_router.dart';
 import 'package:url_strategy/url_strategy.dart';
 
 /// Initializes and runs the application provided by the [builder].
+/// 
+/// When updating see docs for [bootstrapForTests].
 Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -32,6 +34,8 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
 /// - Must not override [FlutterError.onError].
 /// - Must be synced with [bootstrap], to run exactly the same
 ///   initialization logic except for the above exclusions.
+/// 
+/// Keep the function close to [bootstrap] so that they get updated together.
 Future<void> bootstrapForTests() async {
   GoRouter.optionURLReflectsImperativeAPIs = true;
   setPathUrlStrategy();
