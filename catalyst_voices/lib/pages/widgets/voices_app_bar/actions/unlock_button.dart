@@ -25,7 +25,7 @@ class UnlockButton extends StatelessWidget {
       other: (context) => FilledButton.icon(
         onPressed: onPressed,
         icon: const Icon(
-          Icons.lock_open,
+          CatalystVoicesIcons.lock_open,
           size: 18,
         ),
         label: Text(context.l10n.unlockButtonLabelText),
