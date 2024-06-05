@@ -173,3 +173,4 @@ jobs:
                 uses: coverallsapp/github-action@v2
                 with:
                   file: "cat-gateway.coverage-report.info"
+                  allow-empty: true
