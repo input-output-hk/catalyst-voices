@@ -311,7 +311,7 @@ Map<String, dynamic> _$VotingInfoToJson(VotingInfo instance) =>
 VotingInfoDelegations _$VotingInfoDelegationsFromJson(
         Map<String, dynamic> json) =>
     VotingInfoDelegations(
-      type: json['type'] as String,
+      type: votingInfoDelegationsTypeFromJson(json['type']),
       delegations: (json['delegations'] as List<dynamic>?)
               ?.map((e) => Delegation.fromJson(e as Map<String, dynamic>))
               .toList() ??
@@ -321,20 +321,20 @@ VotingInfoDelegations _$VotingInfoDelegationsFromJson(
 Map<String, dynamic> _$VotingInfoDelegationsToJson(
         VotingInfoDelegations instance) =>
     <String, dynamic>{
-      'type': instance.type,
+      'type': votingInfoDelegationsTypeToJson(instance.type),
       'delegations': instance.delegations.map((e) => e.toJson()).toList(),
     };
 
 VotingInfoDirectVoter _$VotingInfoDirectVoterFromJson(
         Map<String, dynamic> json) =>
     VotingInfoDirectVoter(
-      type: json['type'] as String,
+      type: votingInfoDirectVoterTypeFromJson(json['type']),
       votingKey: json['voting_key'] as String,
     );
 
 Map<String, dynamic> _$VotingInfoDirectVoterToJson(
         VotingInfoDirectVoter instance) =>
     <String, dynamic>{
-      'type': instance.type,
+      'type': votingInfoDirectVoterTypeToJson(instance.type),
       'voting_key': instance.votingKey,
     };

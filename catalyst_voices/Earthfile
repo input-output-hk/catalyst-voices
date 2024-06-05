@@ -1,38 +1,13 @@
 VERSION 0.8
 
 IMPORT ../catalyst-gateway AS catalyst-gateway
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:fix/flutter-builder-ci AS flutter-ci 
 
-# If running this target with a local ssh agent active, set the environment
-# variable EARTHLY_SSH_AUTH_SOCK='' to make the `+deps` target work. Earthly
-# defaults to ssh authentication when it founds an ssh agent active but the
-# flutter repo needs to be cloned via https to properly use the `channel`
-# subcommand.
-deps:
-    FROM debian:bookworm-slim
-    ARG TARGETARCH
-    ARG FLUTTER_VERSION=3.19.5
-    RUN apt-get update
-    RUN apt-get install -y git curl unzip bzip2 bash jq gpg lcov
-    COPY --dir test_driver/scripts .
-    RUN chmod +x scripts/install-chrome-linux64.sh && ./scripts/install-chrome-linux64.sh
-    RUN chmod +x scripts/install-edge-linux64.sh && ./scripts/install-edge-linux64.sh
-    RUN chmod +x scripts/install-firefox-linux64.sh && ./scripts/install-firefox-linux64.sh
-
-    WORKDIR /frontend
-
-    RUN git clone --depth 1 --branch $FLUTTER_VERSION https://github.com/flutter/flutter.git /usr/local/flutter
-    ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
-    RUN flutter --version
-    RUN flutter doctor -v
-    RUN flutter config --enable-web
-    RUN dart pub global activate melos
-    RUN dart pub global activate junitreport
-    RUN dart pub global activate coverage
-
-src:
-    FROM +deps
+# builder - Copy all the necessary files and running bootstrap
+builder:
+    DO flutter-ci+SETUP
     COPY ../+repo-catalyst-voices-all/repo .
-    RUN melos bootstrap
+    DO flutter-ci+BOOTSTRAP
 
 # code-generator - Generates flutter code.
 # Based on Catalyst Gateway OpenAPI specifications generates models, clients
@@ -41,60 +16,54 @@ src:
 # proper folder of `catalyst_voices_services` local code.
 code-generator:
     ARG save_locally=false
-
-    FROM +src
-    WORKDIR /frontend/catalyst_voices/packages/catalyst_voices_services
+    
+    LET gen_code_path  = lib/generated/catalyst_gateway
+    LET local_gen_code_path = packages/catalyst_voices_services/lib/generated/catalyst_gateway/
+    
+    FROM +builder
+    WORKDIR catalyst_voices/packages/catalyst_voices_services
     COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
-    RUN flutter pub get
-    RUN dart run build_runner build --delete-conflicting-outputs
+    DO flutter-ci+OPENAPI_CODE_GEN \
+        --SAVE_LOCALLY=$save_locally \
+        --GEN_CODE_PATH=$gen_code_path \ 
+        --LOCAL_GEN_CODE_PATH=$local_gen_code_path
 
-    IF [ $save_locally = true ]
-        SAVE ARTIFACT lib/generated/catalyst_gateway/* AS LOCAL ./packages/catalyst_voices_services/lib/generated/catalyst_gateway/
-    ELSE
-        SAVE ARTIFACT lib/generated/catalyst_gateway
-    END
 
 # check-flutter-code-generator - Checks that the code generation is consistent
 # with the generated code currently in the repo.
-# TODO: enable it
-flutter-code-generator:
+check-flutter-code-generator:
     FROM +code-generator
     # Copy generated files in the local file tree to a temporary folder
     COPY packages/catalyst_voices_services/lib/generated/catalyst_gateway /tmp/repo_generated
     # Check diff between local code and earthly artifacts
     RUN diff /tmp/repo_generated lib/generated/catalyst_gateway
 
+# check-static-analysis - Runs static analysis on the code
 check-static-analysis:
-    FROM +src
-    RUN melos analyze --fatal-infos --fatal-warnings
+    FROM +builder
+    DO flutter-ci+ANALYZE
 
+# check-code-formatting - Runs code formatting checks
 check-code-formatting:
-    FROM +src
-    RUN melos run format-check
+    FROM +builder
+    DO flutter-ci+FORMAT
 
-# Build web version of Catalyst Voices
-build:
-    FROM +src
+# build-web - Build web version of Catalyst Voices
+build-web:
+    FROM +builder
+    ARG WORKDIR=/frontend/catalyst_voices
+    DO flutter-ci+BUILD_WEB --TARGET=lib/configs/main_web.dart --WORKDIR=$WORKDIR
+    SAVE ARTIFACT web
 
-    WORKDIR /frontend/catalyst_voices
-    RUN flutter clean
-    RUN flutter pub get
-    RUN flutter build web --web-renderer canvaskit --release --target lib/configs/main_web.dart
-
-    WORKDIR /frontend/catalyst_voices/build
-    SAVE ARTIFACT web /web AS LOCAL web
-
+# test-unit - Run unit tests
 test-unit:
-    FROM +src
-    RUN melos run test-report
-    WAIT
-        SAVE ARTIFACT test_reports AS LOCAL test_reports
-    END
+    FROM +builder
+    DO flutter-ci+UNIT_TESTS
 
 package:
     FROM nginx:alpine3.18
     ARG tag='latest'
-    COPY +build/web /app
+    COPY +build-web/web /app
     COPY ./nginx.conf /etc/nginx/nginx.conf
     EXPOSE 80
 

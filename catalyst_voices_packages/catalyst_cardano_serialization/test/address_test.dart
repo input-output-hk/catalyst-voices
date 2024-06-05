@@ -8,22 +8,22 @@ void main() {
   group(ShelleyAddress, () {
     test('round-trip conversion from and to bytes', () {
       expect(
-        ShelleyAddress(mainnetAddr.bytes, hrp: mainnetAddr.hrp),
+        ShelleyAddress(mainnetAddr.bytes),
         equals(mainnetAddr),
       );
 
       expect(
-        ShelleyAddress(testnetAddr.bytes, hrp: testnetAddr.hrp),
+        ShelleyAddress(testnetAddr.bytes),
         equals(testnetAddr),
       );
 
       expect(
-        ShelleyAddress(mainnetStakeAddr.bytes, hrp: mainnetStakeAddr.hrp),
+        ShelleyAddress(mainnetStakeAddr.bytes),
         equals(mainnetStakeAddr),
       );
 
       expect(
-        ShelleyAddress(testnetStakeAddr.bytes, hrp: testnetStakeAddr.hrp),
+        ShelleyAddress(testnetStakeAddr.bytes),
         equals(testnetStakeAddr),
       );
     });

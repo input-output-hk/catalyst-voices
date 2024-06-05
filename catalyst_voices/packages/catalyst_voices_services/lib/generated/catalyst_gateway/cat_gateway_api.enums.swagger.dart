@@ -1,7 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:collection/collection.dart';
 
-enum DeepQueryInspection {
+enum DeepQueryInspectionFlag {
   @JsonValue(null)
   swaggerGeneratedUnknown(null),
 
@@ -12,7 +12,7 @@ enum DeepQueryInspection {
 
   final String? value;
 
-  const DeepQueryInspection(this.value);
+  const DeepQueryInspectionFlag(this.value);
 }
 
 enum LogLevel {
@@ -81,4 +81,28 @@ enum VoterGroupId {
   final String? value;
 
   const VoterGroupId(this.value);
+}
+
+enum VotingInfoDelegationsType {
+  @JsonValue(null)
+  swaggerGeneratedUnknown(null),
+
+  @JsonValue('Delegated')
+  delegated('Delegated');
+
+  final String? value;
+
+  const VotingInfoDelegationsType(this.value);
+}
+
+enum VotingInfoDirectVoterType {
+  @JsonValue(null)
+  swaggerGeneratedUnknown(null),
+
+  @JsonValue('Direct')
+  direct('Direct');
+
+  final String? value;
+
+  const VotingInfoDirectVoterType(this.value);
 }

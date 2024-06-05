@@ -23,8 +23,8 @@ and submission are outside of scope of this package.
 
 ## Requirements
 
-* Dart: 3.3.0+
-* Flutter: 3.19.5+
+* Dart: 3.3.4+
+* Flutter: 3.22.1+
 
 ## Install
 
@@ -122,22 +122,28 @@ void main() {
       // .withFee(const Coin(10000000))
       .buildBody();
 
-  final txHash = TransactionHash.fromTransactionBody(txBody);
-  final witnessSet = _signTransaction(txHash);
+  final unsignedTx = Transaction(
+    body: txBody,
+    isValid: true,
+    witnessSet: const TransactionWitnessSet(
+      vkeyWitnesses: {},
+    ),
+  );
+  final witnessSet = _signTransaction(unsignedTx);
 
-  final tx = Transaction(
+  final signedTx = Transaction(
     body: txBody,
     isValid: true,
     witnessSet: witnessSet,
     auxiliaryData: txMetadata,
   );
 
-  final txBytes = cbor.encode(tx.toCbor());
+  final txBytes = cbor.encode(signedTx.toCbor());
   final txBytesHex = hex.encode(txBytes);
   print(txBytesHex);
 }
 
-TransactionWitnessSet _signTransaction(TransactionHash txHash) {
+TransactionWitnessSet _signTransaction(Transaction transaction) {
   // return a fake witness set, in real world the wallet
   // would sign the transaction hash and provide this
   return TransactionWitnessSet(
