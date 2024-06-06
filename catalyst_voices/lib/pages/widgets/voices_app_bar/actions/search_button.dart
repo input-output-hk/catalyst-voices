@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 /// A [SearchButton] widget that is used to display a call to action to
 /// search within the app.
 class SearchButton extends StatelessWidget {
-  final void Function()? onPressed;
+  final VoidCallback? onPressed;
 
   const SearchButton({
     super.key,

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 /// A [GetStartedButton] widget that is used to display a call to action to
 /// start an account registration.
 class GetStartedButton extends StatelessWidget {
-  final void Function()? onPressed;
+  final VoidCallback? onPressed;
 
   const GetStartedButton({
     super.key,

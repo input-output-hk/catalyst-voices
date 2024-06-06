@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 /// A [FinishAccountButton] widget that is used to display a call to action to
 /// complete a pending account registration.
 class FinishAccountButton extends StatelessWidget {
-  final void Function()? onPressed;
+  final VoidCallback? onPressed;
 
   const FinishAccountButton({
     super.key,

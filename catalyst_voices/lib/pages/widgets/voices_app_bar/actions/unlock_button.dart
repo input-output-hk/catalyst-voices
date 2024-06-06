@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 /// An [UnlockButton] widget that is used to display a call to action to
 /// unlock an account currently locked in the app.
 class UnlockButton extends StatelessWidget {
-  final void Function()? onPressed;
+  final VoidCallback? onPressed;
 
   const UnlockButton({
     super.key,

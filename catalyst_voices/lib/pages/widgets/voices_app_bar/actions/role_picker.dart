@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 /// role.
 class RolePicker extends StatelessWidget {
   final String currentRole;
-  final void Function()? onPressed;
+  final VoidCallback? onPressed;
 
   const RolePicker({
     super.key,

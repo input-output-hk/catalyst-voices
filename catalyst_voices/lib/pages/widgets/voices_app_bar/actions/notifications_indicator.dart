@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 /// notifications.
 class NotificationsIndicator extends StatelessWidget {
   final String? badgeText;
-  final void Function()? onPressed;
+  final VoidCallback? onPressed;
 
   const NotificationsIndicator({
     super.key,
