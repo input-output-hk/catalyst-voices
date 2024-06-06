@@ -109,9 +109,7 @@ impl EventDB {
     // TODO(stevenj): https://github.com/input-output-hk/catalyst-voices/issues/68
     #[allow(dead_code, clippy::too_many_lines)]
     pub(crate) async fn get_fund(&self) -> anyhow::Result<FundWithNext> {
-        let conn = self.pool.get().await?;
-
-        let rows = conn.query(Self::FUND_QUERY, &[]).await?;
+        let rows = self.query(Self::FUND_QUERY, &[]).await?;
         let row = rows.first().ok_or(NotFoundError)?;
 
         let fund_id = row.try_get("id")?;
@@ -132,7 +130,7 @@ impl EventDB {
             .and_local_timezone(Utc)
             .unwrap();
 
-        let rows = conn.query(Self::FUND_VOTE_PLANS_QUERY, &[&fund_id]).await?;
+        let rows = self.query(Self::FUND_VOTE_PLANS_QUERY, &[&fund_id]).await?;
         let mut chain_vote_plans = Vec::new();
         for row in rows {
             chain_vote_plans.push(Voteplan {
@@ -152,7 +150,7 @@ impl EventDB {
             });
         }
 
-        let rows = conn.query(Self::FUND_CHALLENGES_QUERY, &[&fund_id]).await?;
+        let rows = self.query(Self::FUND_CHALLENGES_QUERY, &[&fund_id]).await?;
         let mut challenges = Vec::new();
         for row in rows {
             challenges.push(Challenge {
@@ -177,7 +175,7 @@ impl EventDB {
             });
         }
 
-        let rows = conn.query(Self::FUND_GOALS_QUERY, &[&fund_id]).await?;
+        let rows = self.query(Self::FUND_GOALS_QUERY, &[&fund_id]).await?;
         let mut goals = Vec::new();
         for row in rows {
             goals.push(Goal {
@@ -187,7 +185,7 @@ impl EventDB {
             });
         }
 
-        let rows = conn.query(Self::FUND_GROUPS_QUERY, &[&fund_id]).await?;
+        let rows = self.query(Self::FUND_GROUPS_QUERY, &[&fund_id]).await?;
         let mut groups = Vec::new();
         for row in rows {
             groups.push(Group {

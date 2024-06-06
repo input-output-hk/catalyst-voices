@@ -12,10 +12,28 @@ enum NetworkId {
   final int id;
 
   const NetworkId({required this.id});
+
+  factory NetworkId.fromId(int id) {
+    for (final value in values) {
+      if (value.id == id) {
+        return value;
+      }
+    }
+
+    throw ArgumentError('Unsupported NetworkId: $id');
+  }
 }
 
 /// Specifies an amount of ADA in terms of lovelace.
 extension type const Coin(int value) {
+  /// Deserializes the type from cbor.
+  factory Coin.fromCbor(CborValue value) {
+    return Coin((value as CborSmallInt).value);
+  }
+
+  /// Serializes the type as cbor.
+  CborValue toCbor() => CborSmallInt(value);
+
   /// Adds [other] value to this value and returns a new [Coin].
   Coin operator +(Coin other) => Coin(value + other.value);
 
@@ -40,13 +58,15 @@ extension type const Coin(int value) {
 
   /// Returns true if [value] is smaller than or equal [other] value.
   bool operator <=(Coin other) => value < other.value || value == other.value;
-
-  /// Serializes the type as cbor.
-  CborValue toCbor() => CborSmallInt(value);
 }
 
 /// A blockchain slot number.
 extension type const SlotBigNum(int value) {
+  /// Deserializes the type from cbor.
+  factory SlotBigNum.fromCbor(CborValue value) {
+    return SlotBigNum((value as CborSmallInt).value);
+  }
+
   /// Serializes the type as cbor.
   CborValue toCbor() => CborSmallInt(value);
 }
