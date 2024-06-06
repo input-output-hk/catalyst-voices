@@ -78,5 +78,4 @@ publish:
 
 # check-license - Check the license of catalyst_voices.
 check-license:
-    FROM cat-voice-ci+cat-repo-license-checker-base 
-    DO  cat-voice-ci+LICENSE_CHECK --path=catalyst_voices
+    DO cat-voice-ci+LICENSE_CHECK --path=catalyst_voices
