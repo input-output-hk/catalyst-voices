@@ -217,11 +217,18 @@ class MultiAsset {
         final currentAssetValue = assets[asset.key];
         if (currentAssetValue == null) {
           throw const AssetDoesNotExistException();
+        } else if (currentAssetValue == asset.value) {
+          assets.remove(asset.key);
         } else {
           assets[asset.key] = currentAssetValue - asset.value;
         }
       }
-      bundleCopy[policy.key] = assets;
+
+      if (assets.isEmpty) {
+        bundleCopy.remove(policy.key);
+      } else {
+        bundleCopy[policy.key] = assets;
+      }
     }
 
     return MultiAsset(bundle: bundleCopy);
