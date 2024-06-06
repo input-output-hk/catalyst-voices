@@ -94,18 +94,17 @@ class TransactionBuilder {
     final fee = minFee();
 
     final inputTotal =
-        inputs.map((e) => e.output.amount.coin).reduce((a, b) => a + b);
-    final outputTotal =
-        outputs.map((e) => e.amount.coin).reduce((a, b) => a + b);
-    final outputTotalPlusFee = outputTotal + fee;
+        inputs.map((e) => e.output.amount).reduce((a, b) => a + b);
+    final outputTotal = outputs.map((e) => e.amount).reduce((a, b) => a + b);
+    final outputTotalPlusFee = outputTotal + Value(coin: fee);
 
-    if (outputTotalPlusFee == inputTotal) {
+    if (outputTotalPlusFee.coin == inputTotal.coin) {
       // ignore: avoid_returning_this
       return this;
-    } else if (outputTotalPlusFee > inputTotal) {
+    } else if (outputTotalPlusFee.coin > inputTotal.coin) {
       throw InsufficientUtxoBalanceException(
-        actualAmount: inputTotal,
-        requiredAmount: outputTotalPlusFee,
+        actualAmount: inputTotal.coin,
+        requiredAmount: outputTotalPlusFee.coin,
       );
     } else {
       final changeEstimator = inputTotal - outputTotal;
@@ -113,35 +112,35 @@ class TransactionBuilder {
       final minAda = TransactionOutputBuilder.minimumAdaForOutput(
         TransactionOutput(
           address: address,
-          amount: Value(coin: changeEstimator),
+          amount: changeEstimator,
         ),
         config.coinsPerUtxoByte,
       );
 
-      switch (changeEstimator >= minAda) {
+      switch (changeEstimator.coin >= minAda) {
         case false:
           // burn remaining change as fee
-          return withFee(changeEstimator);
+          return withFee(changeEstimator.coin);
         case true:
           final feeForChange = TransactionOutputBuilder.feeForOutput(
             this,
             TransactionOutput(
               address: address,
-              amount: Value(coin: changeEstimator),
+              amount: changeEstimator,
             ),
           );
 
           final newFee = fee + feeForChange;
 
-          switch (changeEstimator >= minAda) {
+          switch (changeEstimator.coin >= minAda) {
             case false:
               // burn remaining change as fee
-              return withFee(changeEstimator);
+              return withFee(changeEstimator.coin);
             case true:
               return withFee(newFee).withOutput(
                 TransactionOutput(
                   address: address,
-                  amount: Value(coin: changeEstimator - newFee),
+                  amount: changeEstimator - Value(coin: newFee),
                 ),
               );
           }
