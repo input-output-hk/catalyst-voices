@@ -216,7 +216,7 @@ class _WalletDetails extends StatefulWidget {
 }
 
 class _WalletDetailsState extends State<_WalletDetails> {
-  Coin? _balance;
+  Value? _balance;
   List<CipExtension>? _extensions;
   NetworkId? _networkId;
   ShelleyAddress? _changeAddress;
