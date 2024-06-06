@@ -163,7 +163,7 @@ impl Cip36Metadata {
 
             // If registration invalid for some reason or signature is missing store the raw
             // metadata of the transaction.
-            if !errors_report.is_empty() || (registration.is_some() && signature.is_none()) {
+            if !errors_report.is_empty() {
                 raw_metadata = tx_metadata.encode_fragment().map_or_else(
                     |err| {
                         errors_report.push(format!("cannot encode tx metadata into bytes {err}"));
@@ -195,16 +195,13 @@ pub fn validate_signature(
     let verifying_key = VerifyingKey::from_bytes(
         registration
             .clone()
-            .ok_or("no registration data".to_string())
-            .map_err(|err| anyhow::anyhow!("{err}"))?
+            .ok_or(anyhow::anyhow!("no registration data"))?
             .stake_key
             .bytes()
             .try_into()?,
     )?;
 
-    let sig = signature
-        .ok_or("cannot verify payload without signature".to_string())
-        .map_err(|err| anyhow::anyhow!("{err}"))?;
+    let sig = signature.ok_or(anyhow::anyhow!("cannot verify payload without signature"))?;
 
     Ok(verifying_key.verify(&hash_bytes, &sig)?)
 }
