@@ -11,7 +11,7 @@ builder:
     COPY ./snapshot_tool-56364174.json .
     DO python-ci+BUILDER
 
-disable-test:
+test:
     FROM +builder
 
     COPY ./docker-compose.yml .
