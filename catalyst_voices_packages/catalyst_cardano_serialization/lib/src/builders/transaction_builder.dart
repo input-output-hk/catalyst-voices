@@ -240,7 +240,7 @@ final class TransactionBuilder extends Equatable {
     while (changeLeft.hasMultiAssets()) {
       final nftChanges = _packNftsForChange(
         changeAddress: address,
-        changeEstimator: changeEstimator,
+        changeEstimator: changeLeft,
       );
 
       for (final nftChange in nftChanges) {

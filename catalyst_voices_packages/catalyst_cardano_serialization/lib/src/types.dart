@@ -113,15 +113,26 @@ final class Value extends Equatable {
   }
 
   /// Serializes the type as cbor.
-  CborValue toCbor() => coin.toCbor();
+  CborValue toCbor() {
+    final multiAsset = this.multiAsset;
+    if (multiAsset == null) {
+      return coin.toCbor();
+    }
+
+    return CborList([
+      coin.toCbor(),
+      multiAsset.toCbor(),
+    ]);
+  }
 
   /// Adds [other] value to this value and returns a new [Value].
   Value operator +(Value other) {
     final MultiAsset? newMultiAsset;
-    if (multiAsset != null && other.multiAsset != null) {
-      newMultiAsset = multiAsset! + other.multiAsset!;
+    if (multiAsset == null && other.multiAsset == null) {
+      newMultiAsset = null;
     } else {
-      newMultiAsset = multiAsset ?? other.multiAsset;
+      newMultiAsset = (multiAsset ?? const MultiAsset.empty()) +
+          (other.multiAsset ?? const MultiAsset.empty());
     }
 
     return Value(
@@ -194,6 +205,9 @@ final class MultiAsset extends Equatable {
   const MultiAsset({
     required this.bundle,
   });
+
+  /// Returns an empty [MultiAsset].
+  const MultiAsset.empty() : this(bundle: const {});
 
   /// Deserializes the type from cbor.
   factory MultiAsset.fromCbor(CborValue value) {
