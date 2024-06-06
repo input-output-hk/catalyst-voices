@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/docs:v3.00.0 AS docs-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/docs:v3.1.5 AS docs-ci
 
 IMPORT .. AS repo
 IMPORT ../catalyst-gateway AS catalyst-gateway
@@ -26,12 +26,12 @@ src:
 docs:
     FROM +src
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/docs:v2.11.1+BUILD
+    DO docs-ci+BUILD
 
 # Make a locally runable container that can serve the docs.
 local:
     # Build a self contained service to show built docs locally.
-    DO github.com/input-output-hk/catalyst-ci/earthly/docs:v2.11.1+PACKAGE
+    DO docs-ci+PACKAGE
 
     # Copy the static pages into the container
     COPY +docs/ /usr/share/nginx/html
