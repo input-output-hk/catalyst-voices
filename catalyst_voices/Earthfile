@@ -2,7 +2,7 @@ VERSION 0.8
 
 IMPORT ../ AS cat-voice-ci
 IMPORT ../catalyst-gateway AS catalyst-gateway
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:fix/flutter-src AS flutter-ci 
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.1.5 AS flutter-ci 
 
 # builder - Copy all the necessary files and running bootstrap
 builder:
