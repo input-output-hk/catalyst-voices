@@ -281,7 +281,7 @@ class _WalletDetailsState extends State<_WalletDetails> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('Balance: ${_balance ?? '---'}\n'),
+              Text('Balance: ${_formatBalance(_balance)}\n'),
               Text('Extensions: ${_formatExtensions(_extensions)}\n'),
               Text('Network ID: $_networkId\n'),
               Text('Change address:\n${_changeAddress?.toBech32() ?? '---'}\n'),
@@ -409,6 +409,25 @@ String _formatAddresses(List<ShelleyAddress>? addresses) {
   return addresses.map((e) => e.toBech32()).join('\n');
 }
 
+String _formatBalance(Value? balance) {
+  if (balance == null) {
+    return '---';
+  }
+
+  final buffer = StringBuffer('Ada (lovelaces): ${balance.coin.value}');
+
+  final multiAsset = balance.multiAsset;
+  if (multiAsset != null) {
+    for (final policy in multiAsset.bundle.entries) {
+      for (final asset in policy.value.entries) {
+        buffer.write(', ${asset.key}: ${asset.value}');
+      }
+    }
+  }
+
+  return buffer.toString();
+}
+
 String _formatUtxos(List<TransactionUnspentOutput>? utxos) {
   if (utxos == null) {
     return '---';
@@ -420,7 +439,7 @@ String _formatUtxos(List<TransactionUnspentOutput>? utxos) {
 String _formatUtxo(TransactionUnspentOutput utxo) {
   return 'Tx: ${utxo.input.transactionId}'
       '\nIndex: ${utxo.input.index}'
-      '\nAmount: ${utxo.output.amount}\n';
+      '\nAmount: ${_formatBalance(utxo.output.amount)}\n';
 }
 
 Transaction _buildUnsignedTx({

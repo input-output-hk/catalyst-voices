@@ -1,4 +1,5 @@
 import 'package:cbor/cbor.dart';
+import 'package:convert/convert.dart';
 
 /// Specifies on which network the code will run.
 enum NetworkId {
@@ -78,9 +79,13 @@ final class Value {
   /// The amount of [Coin] that the wallet holds.
   final Coin coin;
 
+  /// The amounts of native assets that the wallet holds.
+  final MultiAsset? multiAsset;
+
   /// The default constructor for [Value].
   const Value({
     required this.coin,
+    this.multiAsset,
   });
 
   /// Deserializes the type from cbor.
@@ -92,11 +97,90 @@ final class Value {
       coin = value;
     }
 
+    final CborValue? multiAsset;
+    if (value is CborList && value.length >= 2) {
+      multiAsset = value[1];
+    } else {
+      multiAsset = null;
+    }
+
     return Value(
       coin: Coin.fromCbor(coin),
+      multiAsset: multiAsset != null ? MultiAsset.fromCbor(multiAsset) : null,
     );
   }
 
   /// Serializes the type as cbor.
   CborValue toCbor() => coin.toCbor();
+}
+
+/// Holds native assets minted with [PolicyId].
+class MultiAsset {
+  /// The map of native assets.
+  ///
+  /// The [Coin] is used to describe the amount of native assets
+  /// the wallet holds but they are not Ada or Lovelace,
+  /// instead these native assets should be referred to as [AssetName].
+  final Map<PolicyId, Map<AssetName, Coin>> bundle;
+
+  /// The default constructor for [MultiAsset].
+  const MultiAsset({
+    required this.bundle,
+  });
+
+  /// Deserializes the type from cbor.
+  factory MultiAsset.fromCbor(CborValue value) {
+    final map = value as CborMap;
+    final bundle = <PolicyId, Map<AssetName, Coin>>{};
+
+    for (final policy in map.entries) {
+      final policyId = PolicyId.fromCbor(policy.key);
+      final cborAssets = policy.value as CborMap;
+      final assets = <AssetName, Coin>{};
+
+      for (final asset in cborAssets.entries) {
+        final assetName = AssetName.fromCbor(asset.key);
+        final coin = Coin.fromCbor(asset.value);
+        assets[assetName] = coin;
+      }
+
+      bundle[policyId] = assets;
+    }
+
+    return MultiAsset(bundle: bundle);
+  }
+
+  /// Serializes the type as cbor.
+  CborValue toCbor() {
+    return CborMap({
+      for (final policy in bundle.entries)
+        policy.key.toCbor(): CborMap({
+          for (final asset in policy.value.entries)
+            asset.key.toCbor(): asset.value.toCbor(),
+        }),
+    });
+  }
+}
+
+/// The hash of policy ID that minted native assets.
+extension type PolicyId(String hash) {
+  /// Deserializes the type from cbor.
+  factory PolicyId.fromCbor(CborValue value) {
+    return PolicyId(hex.encode((value as CborBytes).bytes));
+  }
+
+  /// Serializes the type as cbor.
+  CborValue toCbor() => CborBytes(hex.decode(hash));
+}
+
+/// The name of a native asset.
+extension type AssetName(String name) {
+  /// Deserializes the type from cbor.
+  factory AssetName.fromCbor(CborValue value) {
+    final bytes = (value as CborBytes).bytes;
+    return AssetName(CborString.fromUtf8(bytes).toString());
+  }
+
+  /// Serializes the type as cbor.
+  CborValue toCbor() => CborBytes(CborString(name).utf8Bytes);
 }

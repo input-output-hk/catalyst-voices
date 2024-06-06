@@ -38,7 +38,9 @@ void main() {
       const nativeTokensValue = '821b00000002536918eca1581cff5b52ec72ff3c4f7ed'
           '39d1d1c504f4efa72c51ba34588a604d47408a14a536372616461436f696e1832';
       final cborValue = cbor.decode(hex.decode(nativeTokensValue));
-      expect(Value.fromCbor(cborValue).coin, equals(const Coin(9989331180)));
+      final value = Value.fromCbor(cborValue);
+      expect(value.coin, equals(const Coin(9989331180)));
+      expect(value.multiAsset, isNotNull);
     });
 
     test('value without native tokens deserialized from cbor', () {
