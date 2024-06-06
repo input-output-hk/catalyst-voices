@@ -137,6 +137,8 @@ final class Value extends Equatable {
       newMultiAsset = multiAsset! - other.multiAsset!;
     } else if (other.multiAsset != null) {
       throw const AssetDoesNotExistException();
+    } else if (multiAsset != null) {
+      newMultiAsset = multiAsset;
     } else {
       newMultiAsset = null;
     }
