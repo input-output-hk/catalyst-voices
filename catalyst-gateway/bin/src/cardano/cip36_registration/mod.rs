@@ -89,8 +89,6 @@ pub(crate) struct Registration {
 pub(crate) struct Cip36Metadata {
     /// CIP-36 registration 61284
     pub(crate) registration: Option<Registration>,
-    /// Raw tx metadata
-    pub raw_metadata: Option<Vec<u8>>,
     /// CIP-36 witness signature 61285
     pub signature: Option<Signature>,
     /// Errors report
@@ -108,7 +106,6 @@ impl Cip36Metadata {
         }
 
         let mut registration = None;
-        let mut raw_metadata = None;
         let mut signature = None;
         let mut errors_report = Vec::new();
 
@@ -160,23 +157,10 @@ impl Cip36Metadata {
                     },
                 );
             }
-
-            // If registration invalid for some reason or signature is missing store the raw
-            // metadata of the transaction.
-            if !errors_report.is_empty() {
-                raw_metadata = tx_metadata.encode_fragment().map_or_else(
-                    |err| {
-                        errors_report.push(format!("cannot encode tx metadata into bytes {err}"));
-                        None
-                    },
-                    Some,
-                );
-            }
         };
 
         Some(Self {
             registration: registration.clone(),
-            raw_metadata,
             signature,
             errors_report,
         })
