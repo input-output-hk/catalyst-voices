@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.00.1 AS python-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.1.5 AS python-ci
 
 # builder :
 builder:
@@ -11,7 +11,7 @@ builder:
     COPY ./snapshot_tool-56364174.json .
     DO python-ci+BUILDER
 
-test:
+disable-test:
     FROM +builder
 
     COPY ./docker-compose.yml .

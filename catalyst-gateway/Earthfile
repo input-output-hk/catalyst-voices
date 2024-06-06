@@ -1,7 +1,7 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.00.1 AS rust-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:v3.00.1 AS mithril-snapshot-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.1.5 AS rust-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:v3.1.5 AS mithril-snapshot-ci
 
 #cspell: words rustfmt toolsets USERARCH
 
@@ -72,7 +72,7 @@ package-cat-gateway:
 
 # package-cat-gateway : Create a deployable container for catalyst-gateway
 # And bundle a Mithril snapshot of cardano preprod
-package-cat-gateway-with-preprod-snapshot:
+disable-package-cat-gateway-with-preprod-snapshot:
     ARG tag="latest"
 
     FROM +package-cat-gateway
