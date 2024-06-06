@@ -100,7 +100,7 @@ final class InvalidAddressException implements Exception {
 ///
 /// When calculating the fee for the transaction the amount of witnesses
 /// needs to be specified since they affect the transaction bytes length.
-/// 
+///
 /// Thus less or more witnesses than were included when calculating
 /// the fee are not allowed.
 final class InvalidTransactionWitnessesException implements Exception {
@@ -109,4 +109,14 @@ final class InvalidTransactionWitnessesException implements Exception {
 
   @override
   String toString() => 'InvalidTransactionWitnessesException';
+}
+
+/// Exception thrown when a native asset that is required
+/// does not exist in the wallet.
+final class AssetDoesNotExistException implements Exception {
+  /// The default constructor for [AssetDoesNotExistException].
+  const AssetDoesNotExistException();
+
+  @override
+  String toString() => 'AssetDoesNotExistException';
 }

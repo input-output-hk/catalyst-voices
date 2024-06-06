@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano_serialization/src/exceptions.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 
@@ -112,6 +113,38 @@ final class Value {
 
   /// Serializes the type as cbor.
   CborValue toCbor() => coin.toCbor();
+
+  /// Adds [other] value to this value and returns a new [Value].
+  Value operator +(Value other) {
+    final MultiAsset? newMultiAsset;
+    if (multiAsset != null && other.multiAsset != null) {
+      newMultiAsset = multiAsset! + other.multiAsset!;
+    } else {
+      newMultiAsset = multiAsset ?? other.multiAsset;
+    }
+
+    return Value(
+      coin: coin + other.coin,
+      multiAsset: newMultiAsset,
+    );
+  }
+
+  /// Subtracts [other] values from this value and returns a new [Value].
+  Value operator -(Value other) {
+    final MultiAsset? newMultiAsset;
+    if (multiAsset != null && other.multiAsset != null) {
+      newMultiAsset = multiAsset! - other.multiAsset!;
+    } else if (other.multiAsset != null) {
+      throw const AssetDoesNotExistException();
+    } else {
+      newMultiAsset = null;
+    }
+
+    return Value(
+      coin: coin - other.coin,
+      multiAsset: newMultiAsset,
+    );
+  }
 }
 
 /// Holds native assets minted with [PolicyId].
@@ -159,6 +192,39 @@ class MultiAsset {
             asset.key.toCbor(): asset.value.toCbor(),
         }),
     });
+  }
+
+  /// Adds [other] value to this value and returns a new [MultiAsset].
+  MultiAsset operator +(MultiAsset other) {
+    final bundleCopy = Map.of(bundle);
+    for (final policy in other.bundle.entries) {
+      final assets = Map.of(bundleCopy[policy.key] ?? <AssetName, Coin>{});
+      for (final asset in policy.value.entries) {
+        assets[asset.key] = (assets[asset.key] ?? const Coin(0)) + asset.value;
+      }
+      bundleCopy[policy.key] = assets;
+    }
+
+    return MultiAsset(bundle: bundleCopy);
+  }
+
+  /// Subtracts [other] values from this value and returns a new [MultiAsset].
+  MultiAsset operator -(MultiAsset other) {
+    final bundleCopy = Map.of(bundle);
+    for (final policy in other.bundle.entries) {
+      final assets = Map.of(bundleCopy[policy.key] ?? <AssetName, Coin>{});
+      for (final asset in policy.value.entries) {
+        final currentAssetValue = assets[asset.key];
+        if (currentAssetValue == null) {
+          throw const AssetDoesNotExistException();
+        } else {
+          assets[asset.key] = currentAssetValue - asset.value;
+        }
+      }
+      bundleCopy[policy.key] = assets;
+    }
+
+    return MultiAsset(bundle: bundleCopy);
   }
 }
 
