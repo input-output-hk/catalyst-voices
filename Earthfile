@@ -60,15 +60,15 @@ repo-catalyst-voices-all:
 
     SAVE ARTIFACT /repo repo
 
-# cat-repo-license-checker-base - Base image for license checker.
-cat-repo-license-checker-base:
+# license-checker-base - Base image for license checker.
+license-checker-base:
     FROM flutter-ci+license-checker-base
     COPY +repo-catalyst-voices-all/repo .
     DO flutter-ci+BOOTSTRAP
 
 LICENSE_CHECK:
     FUNCTION
-    FROM +cat-repo-license-checker-base
+    FROM +license-checker-base
     # Path of the package that needs to be checked for licenses
     ARG --required path
     # template_license_checker.yaml needs to be present in the same directory as the path
