@@ -102,7 +102,6 @@ final class TransactionBuilder extends Equatable {
       );
     } else {
       final changeEstimator = inputTotal - outputTotal;
-
       if (changeEstimator.hasMultiAssets()) {
         return _withChangeAddressIfNeededWithMultiAssets(
           address: address,
@@ -245,12 +244,11 @@ final class TransactionBuilder extends Equatable {
       );
 
       for (final nftChange in nftChanges) {
-        final changeOutput = TransactionOutput(
+        final changeOutput =
+            TransactionOutputBuilder.withAssetAndMinRequiredCoin(
           address: address,
-          amount: Value(
-            coin: const Coin(0),
-            multiAsset: nftChange,
-          ),
+          multiAsset: nftChange,
+          coinsPerUtxoByte: config.coinsPerUtxoByte,
         );
 
         final feeForChange = TransactionOutputBuilder.feeForOutput(
@@ -261,7 +259,6 @@ final class TransactionBuilder extends Equatable {
         newFee = newFee + feeForChange;
 
         final changeAdaPlusFee = changeOutput.amount.coin + newFee;
-
         if (changeLeft.coin < changeAdaPlusFee) {
           throw const InsufficientAdaForAssetsException();
         }
@@ -538,7 +535,7 @@ final class TransactionOutputBuilder {
   ///
   /// Adds a minimum amount of [Coin] to the transaction to pass
   /// the [minimumAdaForOutput] validation.
-  TransactionOutput withAssetAndMinRequiredCoin({
+  static TransactionOutput withAssetAndMinRequiredCoin({
     required ShelleyAddress address,
     required MultiAsset multiAsset,
     required Coin coinsPerUtxoByte,
