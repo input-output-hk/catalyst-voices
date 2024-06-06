@@ -110,7 +110,6 @@ impl Cip36Metadata {
         let mut registration = None;
         let mut raw_metadata = None;
         let mut signature = None;
-        let mut raw_61284 = None;
         let mut errors_report = Vec::new();
 
         if let pallas::ledger::traverse::MultiEraMeta::AlonzoCompatible(tx_metadata) = tx_metadata {
@@ -118,6 +117,8 @@ impl Cip36Metadata {
             const CIP36_REGISTRATION_CBOR_KEY: u64 = 61284;
             /// <https://cips.cardano.org/cips/cip36>
             const CIP36_WITNESS_CBOR_KEY: u64 = 61285;
+
+            let mut raw_61284 = None;
 
             for (key, metadata) in tx_metadata.iter() {
                 match *key {
@@ -152,7 +153,17 @@ impl Cip36Metadata {
                 };
             }
 
-            if signature.is_some() || registration.is_some() {
+            if let Some(raw_61284) = raw_61284 {
+                let _ = validate_signature(&raw_61284, &registration.clone(), &signature).map_err(
+                    |err| {
+                        errors_report.push(format!("{err}"));
+                    },
+                );
+            }
+
+            // If registration invalid for some reason or signature is missing store the raw
+            // metadata of the transaction.
+            if !errors_report.is_empty() || (registration.is_some() && signature.is_none()) {
                 raw_metadata = tx_metadata.encode_fragment().map_or_else(
                     |err| {
                         errors_report.push(format!("cannot encode tx metadata into bytes {err}"));
@@ -162,13 +173,6 @@ impl Cip36Metadata {
                 );
             }
         };
-
-        if let Some(raw_61284) = raw_61284 {
-            let _ =
-                validate_signature(&raw_61284, &registration.clone(), &signature).map_err(|err| {
-                    errors_report.push(format!("{err}"));
-                });
-        }
 
         Some(Self {
             registration: registration.clone(),
