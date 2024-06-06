@@ -67,10 +67,10 @@ class CatalystVoicesIcons {
   static const IconData chat_alt_2 = IconData(0xe82b, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData check = IconData(0xe82c, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData check_circle = IconData(0xe82d, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData cheveron_down = IconData(0xe82e, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData cheveron_left = IconData(0xe82f, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData cheveron_right = IconData(0xe830, fontFamily: _kFontFam, fontPackage: _kFontPkg);
-  static const IconData cheveron_up = IconData(0xe831, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData chevron_down = IconData(0xe8ec, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData chevron_left = IconData(0xe8ed, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData chevron_right = IconData(0xe8ee, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData chevron_up = IconData(0xe8ef, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData chevron_double_down = IconData(0xe832, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData chevron_double_left = IconData(0xe833, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData chevron_double_up = IconData(0xe834, fontFamily: _kFontFam, fontPackage: _kFontPkg);
