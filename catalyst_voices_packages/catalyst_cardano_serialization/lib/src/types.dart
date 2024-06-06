@@ -1,6 +1,7 @@
 import 'package:catalyst_cardano_serialization/src/exceptions.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
+import 'package:equatable/equatable.dart';
 
 /// Specifies on which network the code will run.
 enum NetworkId {
@@ -76,7 +77,7 @@ extension type const SlotBigNum(int value) {
 /// Represents the balance of the wallet in terms of [Coin].
 ///
 /// For now, other assets than Ada are not supported and are ignored.
-final class Value {
+final class Value extends Equatable {
   /// The amount of [Coin] that the wallet holds.
   final Coin coin;
 
@@ -145,10 +146,41 @@ final class Value {
       multiAsset: newMultiAsset,
     );
   }
+
+  /// Returns true if
+  bool get isZero => coin == const Coin(0) && !hasMultiAssets();
+
+  /// Returns true if at least one native asset with non-zero amount exists.
+  bool hasMultiAssets() {
+    final multiAsset = this.multiAsset;
+    if (multiAsset == null) return false;
+
+    for (final policy in multiAsset.bundle.entries) {
+      for (final asset in policy.value.entries) {
+        if (asset.value != const Coin(0)) return true;
+      }
+    }
+
+    return false;
+  }
+
+  /// Return a copy of this value with [coin] and [multiAsset] if present.
+  Value copyWith({
+    Coin? coin,
+    MultiAsset? multiAsset,
+  }) {
+    return Value(
+      coin: coin ?? this.coin,
+      multiAsset: multiAsset ?? this.multiAsset,
+    );
+  }
+
+  @override
+  List<Object?> get props => [coin, multiAsset];
 }
 
 /// Holds native assets minted with [PolicyId].
-class MultiAsset {
+final class MultiAsset extends Equatable {
   /// The map of native assets.
   ///
   /// The [Coin] is used to describe the amount of native assets
@@ -233,6 +265,9 @@ class MultiAsset {
 
     return MultiAsset(bundle: bundleCopy);
   }
+
+  @override
+  List<Object?> get props => [bundle];
 }
 
 /// The hash of policy ID that minted native assets.

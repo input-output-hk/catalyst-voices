@@ -1,7 +1,8 @@
 import 'package:catalyst_cardano_serialization/src/types.dart';
+import 'package:equatable/equatable.dart';
 
 /// Exception thrown when the transaction exceeds the allowed maximum size.
-final class MaxTxSizeExceededException implements Exception {
+final class MaxTxSizeExceededException extends Equatable implements Exception {
   /// The maximum amount of bytes per transaction.
   final int maxTxSize;
 
@@ -19,10 +20,14 @@ final class MaxTxSizeExceededException implements Exception {
       'maxTxSize:$maxTxSize'
       ', actualTxSize:$actualTxSize'
       ')';
+
+  @override
+  List<Object?> get props => [maxTxSize, actualTxSize];
 }
 
 /// Exception thrown when the transaction outputs exceed the inputs.
-final class InsufficientUtxoBalanceException implements Exception {
+final class InsufficientUtxoBalanceException extends Equatable
+    implements Exception {
   /// The amount of [Coin] that user has.
   final Coin actualAmount;
 
@@ -40,20 +45,27 @@ final class InsufficientUtxoBalanceException implements Exception {
       'actualAmount:$actualAmount'
       ', requiredAmount:$requiredAmount'
       ')';
+
+  @override
+  List<Object?> get props => [actualAmount, requiredAmount];
 }
 
 /// Exception thrown when building a transaction that doesn't specify the fee.
-final class TxFeeNotSpecifiedException implements Exception {
+final class TxFeeNotSpecifiedException extends Equatable implements Exception {
   /// The default constructor for [TxFeeNotSpecifiedException].
   const TxFeeNotSpecifiedException();
 
   @override
   String toString() => 'TxFeeNotSpecifiedException';
+
+  @override
+  List<Object?> get props => [];
 }
 
 /// Exception thrown when the transaction output amount
 /// is less than required by the network.
-final class TxValueBelowMinUtxoValueException implements Exception {
+final class TxValueBelowMinUtxoValueException extends Equatable
+    implements Exception {
   /// The amount of [Coin] in the transaction output.
   final Coin actualAmount;
 
@@ -71,20 +83,52 @@ final class TxValueBelowMinUtxoValueException implements Exception {
       'actualAmount:$actualAmount'
       ', requiredAmount:$requiredAmount'
       ')';
+
+  @override
+  List<Object?> get props => [actualAmount, requiredAmount];
+}
+
+/// Exception thrown when the transaction output
+/// takes more bytes than allowed by [maxValueSize].
+final class TxValueSizeExceededException extends Equatable
+    implements Exception {
+  /// The size in bytes that the value has.
+  final int actualValueSize;
+
+  /// The maximum allowed value size.
+  final int maxValueSize;
+
+  /// The default constructor for [TxValueSizeExceededException].
+  const TxValueSizeExceededException({
+    required this.actualValueSize,
+    required this.maxValueSize,
+  });
+
+  @override
+  String toString() => 'TxValueSizeExceededException('
+      'actualValueSize:$actualValueSize'
+      ', maxValueSize:$maxValueSize'
+      ')';
+
+  @override
+  List<Object?> get props => [actualValueSize, maxValueSize];
 }
 
 /// Exception thrown when parsing a hash that has incorrect length.
-final class HashFormatException implements Exception {
+final class HashFormatException extends Equatable implements Exception {
   /// The default constructor for [HashFormatException].
   const HashFormatException();
 
   @override
   String toString() => 'HashFormatException';
+
+  @override
+  List<Object?> get props => [];
 }
 
 /// Exception thrown if the address doesn't match the bech32 specification
 /// for Shelley addresses.
-final class InvalidAddressException implements Exception {
+final class InvalidAddressException extends Equatable implements Exception {
   /// Exception details.
   final String message;
 
@@ -93,6 +137,9 @@ final class InvalidAddressException implements Exception {
 
   @override
   String toString() => 'InvalidAddressException: $message';
+
+  @override
+  List<Object?> get props => [message];
 }
 
 /// Exception thrown when the number of witnesses doesn't match
@@ -103,20 +150,40 @@ final class InvalidAddressException implements Exception {
 ///
 /// Thus less or more witnesses than were included when calculating
 /// the fee are not allowed.
-final class InvalidTransactionWitnessesException implements Exception {
+final class InvalidTransactionWitnessesException extends Equatable
+    implements Exception {
   /// The default constructor for [InvalidTransactionWitnessesException].
   const InvalidTransactionWitnessesException();
 
   @override
   String toString() => 'InvalidTransactionWitnessesException';
+
+  @override
+  List<Object?> get props => [];
 }
 
 /// Exception thrown when a native asset that is required
 /// does not exist in the wallet.
-final class AssetDoesNotExistException implements Exception {
+final class AssetDoesNotExistException extends Equatable implements Exception {
   /// The default constructor for [AssetDoesNotExistException].
   const AssetDoesNotExistException();
 
   @override
   String toString() => 'AssetDoesNotExistException';
+
+  @override
+  List<Object?> get props => [];
+}
+
+/// Exception thrown when there's not enough [Coin] to transfer native assets.
+final class InsufficientAdaForAssetsException extends Equatable
+    implements Exception {
+  /// The default constructor for [InsufficientAdaForAssetsException].
+  const InsufficientAdaForAssetsException();
+
+  @override
+  String toString() => 'InsufficientAdaForAssetsException';
+
+  @override
+  List<Object?> get props => [];
 }

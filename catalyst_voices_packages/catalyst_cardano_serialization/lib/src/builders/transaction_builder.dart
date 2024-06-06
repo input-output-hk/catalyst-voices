@@ -1,14 +1,8 @@
-import 'package:catalyst_cardano_serialization/src/address.dart';
-import 'package:catalyst_cardano_serialization/src/builders/witness_builder.dart';
-import 'package:catalyst_cardano_serialization/src/exceptions.dart';
-import 'package:catalyst_cardano_serialization/src/fees.dart';
-import 'package:catalyst_cardano_serialization/src/hashes.dart';
-import 'package:catalyst_cardano_serialization/src/transaction.dart';
-import 'package:catalyst_cardano_serialization/src/types.dart';
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_cardano_serialization/src/utils/cbor.dart';
 import 'package:catalyst_cardano_serialization/src/utils/numbers.dart';
-import 'package:catalyst_cardano_serialization/src/witness.dart';
 import 'package:cbor/cbor.dart';
+import 'package:equatable/equatable.dart';
 
 /// A builder which helps to create the [TransactionBody].
 ///
@@ -16,7 +10,7 @@ import 'package:cbor/cbor.dart';
 /// and adds a change address if some UTXOs are not fully spent.
 ///
 /// Algorithms inspired by [cardano-multiplatform-lib](https://github.com/dcSpark/cardano-multiplatform-lib/blob/255500b3c683618849fb38107896170ea09c95dc/chain/rust/src/builders/tx_builder.rs#L380) implementation.
-class TransactionBuilder {
+final class TransactionBuilder extends Equatable {
   /// Contains the protocol parameters for Cardano blockchain.
   final TransactionBuilderConfig config;
 
@@ -109,41 +103,18 @@ class TransactionBuilder {
     } else {
       final changeEstimator = inputTotal - outputTotal;
 
-      final minAda = TransactionOutputBuilder.minimumAdaForOutput(
-        TransactionOutput(
+      if (changeEstimator.hasMultiAssets()) {
+        return _withChangeAddressIfNeededWithMultiAssets(
           address: address,
-          amount: changeEstimator,
-        ),
-        config.coinsPerUtxoByte,
-      );
-
-      switch (changeEstimator.coin >= minAda) {
-        case false:
-          // burn remaining change as fee
-          return withFee(changeEstimator.coin);
-        case true:
-          final feeForChange = TransactionOutputBuilder.feeForOutput(
-            this,
-            TransactionOutput(
-              address: address,
-              amount: changeEstimator,
-            ),
-          );
-
-          final newFee = fee + feeForChange;
-
-          switch (changeEstimator.coin >= minAda) {
-            case false:
-              // burn remaining change as fee
-              return withFee(changeEstimator.coin);
-            case true:
-              return withFee(newFee).withOutput(
-                TransactionOutput(
-                  address: address,
-                  amount: changeEstimator - Value(coin: newFee),
-                ),
-              );
-          }
+          fee: fee,
+          changeEstimator: changeEstimator,
+        );
+      } else {
+        return _withChangeAddressIfNeededWithoutMultiAssets(
+          address: address,
+          fee: fee,
+          changeEstimator: changeEstimator,
+        );
       }
     }
   }
@@ -159,6 +130,14 @@ class TransactionBuilder {
   /// by [TransactionOutputBuilder.minimumAdaForOutput],
   /// otherwise [TxValueBelowMinUtxoValueException] is thrown.
   TransactionBuilder withOutput(TransactionOutput output) {
+    final valueSize = cbor.encode(output.amount.toCbor()).length;
+    if (valueSize > config.maxValueSize) {
+      throw TxValueSizeExceededException(
+        actualValueSize: valueSize,
+        maxValueSize: config.maxValueSize,
+      );
+    }
+
     final minAdaPerUtxoEntry = TransactionOutputBuilder.minimumAdaForOutput(
       output,
       config.coinsPerUtxoByte,
@@ -238,6 +217,245 @@ class TransactionBuilder {
     return config.feeAlgo.minNoScriptFee(fullTx);
   }
 
+  @override
+  List<Object?> get props => [
+        config,
+        inputs,
+        outputs,
+        fee,
+        ttl,
+        auxiliaryData,
+        networkId,
+        witnessBuilder,
+      ];
+
+  TransactionBuilder _withChangeAddressIfNeededWithMultiAssets({
+    required ShelleyAddress address,
+    required Coin fee,
+    required Value changeEstimator,
+  }) {
+    var builder = this;
+    var changeLeft = changeEstimator;
+    var newFee = fee;
+
+    while (changeLeft.hasMultiAssets()) {
+      final nftChanges = _packNftsForChange(
+        changeAddress: address,
+        changeEstimator: changeEstimator,
+      );
+
+      for (final nftChange in nftChanges) {
+        final changeOutput = TransactionOutput(
+          address: address,
+          amount: Value(
+            coin: const Coin(0),
+            multiAsset: nftChange,
+          ),
+        );
+
+        final feeForChange = TransactionOutputBuilder.feeForOutput(
+          this,
+          changeOutput,
+        );
+
+        newFee = newFee + feeForChange;
+
+        final changeAdaPlusFee = changeOutput.amount.coin + newFee;
+
+        if (changeLeft.coin < changeAdaPlusFee) {
+          throw const InsufficientAdaForAssetsException();
+        }
+
+        changeLeft -= changeOutput.amount;
+        builder = builder.withOutput(changeOutput);
+      }
+    }
+
+    changeLeft -= Value(coin: newFee);
+    builder = builder.withFee(newFee);
+
+    if (!changeLeft.isZero) {
+      final outputs = List.of(builder.outputs);
+      final lastOutput = outputs.removeLast();
+      final newOutput =
+          lastOutput.copyWith(amount: lastOutput.amount + changeLeft);
+      outputs.add(newOutput);
+      builder = builder._copyWith(outputs: outputs);
+    }
+
+    return builder;
+  }
+
+  TransactionBuilder _withChangeAddressIfNeededWithoutMultiAssets({
+    required ShelleyAddress address,
+    required Coin fee,
+    required Value changeEstimator,
+  }) {
+    final minAda = TransactionOutputBuilder.minimumAdaForOutput(
+      TransactionOutput(
+        address: address,
+        amount: changeEstimator,
+      ),
+      config.coinsPerUtxoByte,
+    );
+
+    switch (changeEstimator.coin >= minAda) {
+      case false:
+        // burn remaining change as fee
+        return withFee(changeEstimator.coin);
+      case true:
+        final feeForChange = TransactionOutputBuilder.feeForOutput(
+          this,
+          TransactionOutput(
+            address: address,
+            amount: changeEstimator,
+          ),
+        );
+
+        final newFee = fee + feeForChange;
+
+        switch (changeEstimator.coin >= minAda) {
+          case false:
+            // burn remaining change as fee
+            return withFee(changeEstimator.coin);
+          case true:
+            return withFee(newFee).withOutput(
+              TransactionOutput(
+                address: address,
+                amount: changeEstimator - Value(coin: newFee),
+              ),
+            );
+        }
+    }
+  }
+
+  /// Returns true if adding additional [assetToAdd] to [currentAssets]
+  /// will trigger size overflow in [output].
+  ///
+  /// The function is used to split native assets into
+  /// multiple outputs if they don't fit in one output.
+  bool _willAddingAssetMakeOutputOverflow({
+    required TransactionOutput output,
+    required Map<AssetName, Coin> currentAssets,
+    required (PolicyId, AssetName, Coin) assetToAdd,
+  }) {
+    final (policy, assetName, value) = assetToAdd;
+
+    final valueWithExtraMultiAssets = Value(
+      coin: const Coin(0),
+      multiAsset: MultiAsset(
+        bundle: {
+          policy: {
+            ...currentAssets,
+            assetName: value,
+          },
+        },
+      ),
+    );
+
+    final outputWithExtraMultiAssets = TransactionOutput(
+      address: output.address,
+      amount: output.amount + valueWithExtraMultiAssets,
+    );
+
+    final minAdaForExtraOutput = TransactionOutputBuilder.minimumAdaForOutput(
+      outputWithExtraMultiAssets,
+      config.coinsPerUtxoByte,
+    );
+
+    final valueWithExtraAmountAndMultiAssets = Value(
+      coin: minAdaForExtraOutput,
+      multiAsset: outputWithExtraMultiAssets.amount.multiAsset,
+    );
+
+    final bytes = cbor.encode(valueWithExtraAmountAndMultiAssets.toCbor());
+    return bytes.length > config.maxValueSize;
+  }
+
+  /// Splits the native assets into multiple [MultiAsset]
+  /// if they don't fit into one transaction output.
+  List<MultiAsset> _packNftsForChange({
+    required ShelleyAddress changeAddress,
+    required Value changeEstimator,
+  }) {
+    final baseMultiAsset = changeEstimator.multiAsset;
+    if (baseMultiAsset == null) return [];
+
+    final changeAssets = <MultiAsset>[];
+    var baseCoin = Value(coin: changeEstimator.coin);
+    var output = TransactionOutput(address: changeAddress, amount: baseCoin);
+
+    for (final policy in baseMultiAsset.bundle.entries) {
+      var oldAmount = output.amount;
+      var val = const Value(coin: Coin(0));
+      var nextNft = const MultiAsset(bundle: {});
+      var rebuiltAssets = <AssetName, Coin>{};
+
+      for (final asset in policy.value.entries) {
+        if (_willAddingAssetMakeOutputOverflow(
+          output: output,
+          currentAssets: rebuiltAssets,
+          assetToAdd: (policy.key, asset.key, asset.value),
+        )) {
+          // if we got here, this means we will run into a overflow error,
+          // so we want to split into multiple outputs, for that we...
+
+          // 1. insert the current assets as they are, as this won't overflow
+          nextNft = MultiAsset(
+            bundle: {
+              ...nextNft.bundle,
+              policy.key: rebuiltAssets,
+            },
+          );
+
+          val = val.copyWith(multiAsset: nextNft);
+          output = output.copyWith(amount: output.amount + val);
+          changeAssets.add(output.amount.multiAsset!);
+
+          // 2. create a new output with the base coin value as zero
+          baseCoin = const Value(coin: Coin(0));
+          output = TransactionOutput(
+            address: changeAddress,
+            amount: baseCoin,
+          );
+
+          // 3. continue building the new output from the asset we stopped
+          oldAmount = output.amount;
+          val = const Value(coin: Coin(0));
+          nextNft = const MultiAsset(bundle: {});
+          rebuiltAssets = {};
+        }
+
+        rebuiltAssets[asset.key] = asset.value;
+      }
+
+      nextNft = MultiAsset(
+        bundle: {
+          ...nextNft.bundle,
+          policy.key: rebuiltAssets,
+        },
+      );
+      val = val.copyWith(multiAsset: nextNft);
+      output = output.copyWith(amount: output.amount + val);
+
+      final outputCopy = output.copyWith(amount: val);
+      final minAda = TransactionOutputBuilder.minimumAdaForOutput(
+        outputCopy,
+        config.coinsPerUtxoByte,
+      );
+
+      final amountCopy = output.amount.copyWith(coin: minAda);
+      final bytes = cbor.encode(amountCopy.toCbor());
+      if (bytes.length > config.maxValueSize) {
+        output = output.copyWith(amount: oldAmount);
+        break;
+      }
+    }
+
+    changeAssets.add(output.amount.multiAsset!);
+    return changeAssets;
+  }
+
   TransactionBody _buildBody() {
     final fee = this.fee;
     if (fee == null) {
@@ -276,12 +494,16 @@ class TransactionBuilder {
 
 /// A configuration for the [TransactionBuilder] which holds
 /// protocol parameters and other constants.
-class TransactionBuilderConfig {
+final class TransactionBuilderConfig extends Equatable {
   /// The protocol parameter which describes the transaction fee algorithm.
   final LinearFee feeAlgo;
 
   /// The protocol parameter which limits the maximum transaction size in bytes.
   final int maxTxSize;
+
+  /// The protocol parameter which limits the maximum transaction output value
+  /// size in bytes.
+  final int maxValueSize;
 
   /// The protocol parameter that establishes the minimum amount of [Coin]
   /// required per UTXO entry.
@@ -293,15 +515,54 @@ class TransactionBuilderConfig {
   const TransactionBuilderConfig({
     required this.feeAlgo,
     required this.maxTxSize,
+    required this.maxValueSize,
     required this.coinsPerUtxoByte,
   });
+
+  @override
+  List<Object?> get props =>
+      [feeAlgo, maxTxSize, maxValueSize, coinsPerUtxoByte];
 }
 
 /// Builder and utils around [TransactionOutput].
-class TransactionOutputBuilder {
+final class TransactionOutputBuilder {
   /// Constant from figure 5 in Babbage spec meant to represent
   /// the size of the input in a UTXO.
   static const int constantOverhead = 160;
+
+  /// Prevents creating instances of [TransactionOutputBuilder].
+  const TransactionOutputBuilder._();
+
+  /// Creates a new [TransactionOutput] that transfers
+  /// the [multiAsset] to the address.
+  ///
+  /// Adds a minimum amount of [Coin] to the transaction to pass
+  /// the [minimumAdaForOutput] validation.
+  TransactionOutput withAssetAndMinRequiredCoin({
+    required ShelleyAddress address,
+    required MultiAsset multiAsset,
+    required Coin coinsPerUtxoByte,
+  }) {
+    final minOutput = TransactionOutput(
+      address: address,
+      amount: const Value(coin: Coin(0)),
+    );
+
+    final minPossibleCoin = minimumAdaForOutput(minOutput, coinsPerUtxoByte);
+
+    final checkOutput = minOutput.copyWith(
+      amount: Value(
+        coin: minPossibleCoin,
+        multiAsset: multiAsset,
+      ),
+    );
+
+    final requiredCoin = minimumAdaForOutput(checkOutput, coinsPerUtxoByte);
+    return TransactionOutput(
+      address: address,
+      amount: Value(coin: requiredCoin, multiAsset: multiAsset),
+    );
+  }
 
   /// Calculates the additional fee for adding the [output] to the [builder].
   static Coin feeForOutput(

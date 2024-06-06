@@ -11,7 +11,8 @@ void main() {
       constant: Coin(155381),
       coefficient: Coin(44),
     ),
-    maxTxSize: 8000,
+    maxTxSize: 16384,
+    maxValueSize: 5000,
     coinsPerUtxoByte: Coin(4310),
   );
 
