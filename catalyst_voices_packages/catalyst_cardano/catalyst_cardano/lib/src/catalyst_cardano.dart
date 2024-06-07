@@ -1,8 +1,16 @@
 import 'package:catalyst_cardano_platform_interface/catalyst_cardano_platform_interface.dart';
 
-/// Prints hello message, function to be removed later by providing actual
-/// implementations of methods related to cardano multiplatform lib.
-Future<void> printCatalystCardanoHello() async {
-  // ignore: avoid_print, will be replaced later by actual implementation
-  await CatalystCardanoPlatform.instance.printHello();
+/// A Flutter plugin exposing the [CIP-30](https://cips.cardano.org/cip/CIP-30)
+/// and [CIP-95](https://cips.cardano.org/cip/CIP-95) APIs.
+class CatalystCardano {
+  /// The default instance of [CatalystCardano] to use.
+  static final CatalystCardano instance = CatalystCardano._();
+
+  CatalystCardano._();
+
+  /// Returns available wallet extensions exposed under
+  /// cardano.{walletName} according to CIP-30 standard.
+  Future<List<CardanoWallet>> getWallets() async {
+    return CatalystCardanoPlatform.instance.getWallets();
+  }
 }

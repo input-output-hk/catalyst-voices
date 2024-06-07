@@ -1,0 +1,29 @@
+VERSION 0.8
+
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.1.5 AS python-ci
+
+# builder :
+builder:
+    FROM python-ci+python-base
+
+    # prepare tests
+    COPY --dir ./api_tests .
+    COPY ./snapshot_tool-56364174.json .
+    DO python-ci+BUILDER
+
+test:
+    FROM +builder
+
+    COPY ./docker-compose.yml .
+
+    WITH DOCKER \
+        --compose docker-compose.yml \
+        --load event-db:latest=(../../event-db+build) \
+        --load cat-gateway:latest=(../../+package-cat-gateway-with-preprod-snapshot) \
+        --service cat-gateway \
+        --allow-privileged
+        RUN poetry run pytest -s --junitxml=junit-report.xml
+    END
+    WAIT
+        SAVE ARTIFACT junit-report.xml AS LOCAL backendpython.junit-report.xml
+    END

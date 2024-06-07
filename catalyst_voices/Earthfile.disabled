@@ -1,0 +1,76 @@
+VERSION 0.8
+
+IMPORT ../catalyst-gateway AS catalyst-gateway
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.1.5 AS flutter-ci 
+
+# builder - Copy all the necessary files and running bootstrap
+builder:
+    DO flutter-ci+SETUP
+    COPY ../+repo-catalyst-voices-all/repo .
+    DO flutter-ci+BOOTSTRAP
+
+# code-generator - Generates flutter code.
+# Based on Catalyst Gateway OpenAPI specifications generates models, clients
+# and serialization logic.
+# It accepts [save_locally] ARG that when true place the artifacts in the
+# proper folder of `catalyst_voices_services` local code.
+code-generator:
+    ARG save_locally=false
+    
+    LET gen_code_path  = lib/generated/catalyst_gateway
+    LET local_gen_code_path = packages/catalyst_voices_services/lib/generated/catalyst_gateway/
+    
+    FROM +builder
+    WORKDIR catalyst_voices/packages/catalyst_voices_services
+    COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
+    DO flutter-ci+OPENAPI_CODE_GEN \
+        --SAVE_LOCALLY=$save_locally \
+        --GEN_CODE_PATH=$gen_code_path \ 
+        --LOCAL_GEN_CODE_PATH=$local_gen_code_path
+
+
+# check-flutter-code-generator - Checks that the code generation is consistent
+# with the generated code currently in the repo.
+check-flutter-code-generator:
+    FROM +code-generator
+    # Copy generated files in the local file tree to a temporary folder
+    COPY packages/catalyst_voices_services/lib/generated/catalyst_gateway /tmp/repo_generated
+    # Check diff between local code and earthly artifacts
+    RUN diff /tmp/repo_generated lib/generated/catalyst_gateway
+
+# check-static-analysis - Runs static analysis on the code
+check-static-analysis:
+    FROM +builder
+    DO flutter-ci+ANALYZE
+
+# check-code-formatting - Runs code formatting checks
+check-code-formatting:
+    FROM +builder
+    DO flutter-ci+FORMAT
+
+# build-web - Build web version of Catalyst Voices
+build-web:
+    FROM +builder
+    ARG WORKDIR=/frontend/catalyst_voices
+    DO flutter-ci+BUILD_WEB --TARGET=lib/configs/main_web.dart --WORKDIR=$WORKDIR
+    SAVE ARTIFACT web
+
+# test-unit - Run unit tests
+test-unit:
+    FROM +builder
+    DO flutter-ci+UNIT_TESTS
+
+package:
+    FROM nginx:alpine3.18
+    ARG tag='latest'
+    COPY +build-web/web /app
+    COPY ./nginx.conf /etc/nginx/nginx.conf
+    EXPOSE 80
+
+    SAVE IMAGE voices-frontend:$tag
+
+publish:
+    FROM +package
+    ARG tag='latest'
+
+    SAVE IMAGE voices-frontend:$tag

@@ -2,6 +2,9 @@
 
 use cardano_chain_follower::Network;
 use handlebars::Handlebars;
+use pallas::ledger::traverse::{wellknown::GenesisValues, MultiEraBlock};
+use tokio_postgres::{binary_copy::BinaryCopyInWriter, types::Type};
+use tracing::error;
 
 use crate::event_db::{error::NotFoundError, EventDB};
 
@@ -25,8 +28,6 @@ const BLOCK_TIME_COLUMN: &str = "block_time";
 /// `ended` column name
 const ENDED_COLUMN: &str = "ended";
 
-/// `insert_slot_index.sql`
-const INSERT_SLOT_INDEX_SQL: &str = include_str!("insert_slot_index.sql");
 /// `insert_update_state.sql`
 const INSERT_UPDATE_STATE_SQL: &str = include_str!("insert_update_state.sql");
 /// `select_update_state.sql`
@@ -85,23 +86,109 @@ impl SlotInfoQueryType {
     }
 }
 
-impl EventDB {
-    /// Index follower block stream
-    pub(crate) async fn index_follower_data(
-        &self, slot_no: SlotNumber, network: Network, epoch_no: EpochNumber, block_time: DateTime,
-        block_hash: BlockHash,
-    ) -> anyhow::Result<()> {
-        let conn = self.pool.get().await?;
+/// Params required for indexing follower data.
+pub(crate) struct IndexedFollowerDataParams<'a> {
+    /// Block's slot number.
+    pub slot_no: SlotNumber,
+    /// Block's epoch number.
+    pub epoch_no: EpochNumber,
+    /// Block's network.
+    pub network: &'a str,
+    /// Block's time.
+    pub block_time: DateTime,
+    /// Block's hash.
+    pub block_hash: Vec<u8>,
+}
 
-        let _rows = conn
-            .query(INSERT_SLOT_INDEX_SQL, &[
-                &slot_no,
-                &network.to_string(),
-                &epoch_no,
-                &block_time,
-                &block_hash,
-            ])
-            .await?;
+impl<'a> IndexedFollowerDataParams<'a> {
+    /// Creates a [`IndexedFollowerDataParams`] from block data.
+    pub(crate) fn from_block_data(
+        genesis_values: &GenesisValues, network: &'a str, block: &MultiEraBlock<'a>,
+    ) -> Option<Self> {
+        let epoch = match block.epoch(genesis_values).0.try_into() {
+            Ok(epoch) => epoch,
+            Err(err) => {
+                error!("Cannot parse epoch from {network:?} block {err} - skip..");
+                return None;
+            },
+        };
+
+        let wallclock = match block.wallclock(genesis_values).try_into() {
+            Ok(time) => chrono::DateTime::from_timestamp(time, 0).unwrap_or_default(),
+            Err(err) => {
+                error!("Cannot parse wall time from {network:?} block {err} - skip..");
+                return None;
+            },
+        };
+
+        let slot = match block.slot().try_into() {
+            Ok(slot) => slot,
+            Err(err) => {
+                error!("Cannot parse slot from {network:?} block {err} - skip..");
+                return None;
+            },
+        };
+
+        Some(IndexedFollowerDataParams {
+            slot_no: slot,
+            network,
+            epoch_no: epoch,
+            block_time: wallclock,
+            block_hash: block.hash().to_vec(),
+        })
+    }
+}
+
+impl EventDB {
+    /// Batch writes follower data.
+    pub(crate) async fn index_many_follower_data(
+        &self, values: &[IndexedFollowerDataParams<'_>],
+    ) -> anyhow::Result<()> {
+        if values.is_empty() {
+            return Ok(());
+        }
+
+        let mut conn = self.pool.get().await?;
+        let tx = conn.transaction().await?;
+
+        tx.execute(
+            "CREATE TEMPORARY TABLE tmp_cardano_slot_index (LIKE cardano_slot_index) ON COMMIT DROP",
+            &[],
+        )
+        .await?;
+
+        {
+            let sink = tx
+                .copy_in("COPY tmp_cardano_slot_index (slot_no, network, epoch_no, block_time, block_hash) FROM STDIN BINARY")
+                .await?;
+            let writer = BinaryCopyInWriter::new(sink, &[
+                Type::INT8,
+                Type::TEXT,
+                Type::INT8,
+                Type::TIMESTAMPTZ,
+                Type::BYTEA,
+            ]);
+            tokio::pin!(writer);
+
+            for params in values {
+                #[allow(trivial_casts)]
+                writer
+                    .as_mut()
+                    .write(&[
+                        &params.slot_no as &(dyn tokio_postgres::types::ToSql + Sync),
+                        &params.network,
+                        &params.epoch_no,
+                        &params.block_time,
+                        &params.block_hash,
+                    ])
+                    .await?;
+            }
+
+            writer.finish().await?;
+        }
+
+        tx.execute("INSERT INTO cardano_slot_index (slot_no, network, epoch_no, block_time, block_hash) SELECT slot_no, network, epoch_no, block_time, block_hash FROM tmp_cardano_slot_index ON CONFLICT DO NOTHING", &[]).await?;
+        tx.commit().await?;
 
         Ok(())
     }
@@ -110,9 +197,7 @@ impl EventDB {
     pub(crate) async fn get_slot_info(
         &self, date_time: DateTime, network: Network, query_type: SlotInfoQueryType,
     ) -> anyhow::Result<(SlotNumber, BlockHash, DateTime)> {
-        let conn = self.pool.get().await?;
-
-        let rows = conn
+        let rows = self
             .query(&query_type.get_sql_query()?, &[
                 &network.to_string(),
                 &date_time,
@@ -131,9 +216,7 @@ impl EventDB {
     pub(crate) async fn last_updated_state(
         &self, network: Network,
     ) -> anyhow::Result<(SlotNumber, BlockHash, DateTime)> {
-        let conn = self.pool.get().await?;
-
-        let rows = conn
+        let rows = self
             .query(SELECT_UPDATE_STATE_SQL, &[&network.to_string()])
             .await?;
 
@@ -152,8 +235,6 @@ impl EventDB {
         &self, last_updated: DateTime, slot_no: SlotNumber, block_hash: BlockHash,
         network: Network, machine_id: &MachineId,
     ) -> anyhow::Result<()> {
-        let conn = self.pool.get().await?;
-
         // Rollback or update
         let update = true;
 
@@ -161,18 +242,17 @@ impl EventDB {
 
         // An insert only happens once when there is no update metadata available
         // All future additions are just updates on ended, slot_no and block_hash
-        let _rows = conn
-            .query(INSERT_UPDATE_STATE_SQL, &[
-                &i64::try_from(network_id)?,
-                &last_updated,
-                &last_updated,
-                &machine_id,
-                &slot_no,
-                &network.to_string(),
-                &block_hash,
-                &update,
-            ])
-            .await?;
+        self.modify(INSERT_UPDATE_STATE_SQL, &[
+            &i64::try_from(network_id)?,
+            &last_updated,
+            &last_updated,
+            &machine_id,
+            &slot_no,
+            &network.to_string(),
+            &block_hash,
+            &update,
+        ])
+        .await?;
 
         Ok(())
     }

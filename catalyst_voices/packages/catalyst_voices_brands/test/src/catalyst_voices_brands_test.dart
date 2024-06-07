@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/src/brand/brand_bloc.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_brands/src/theme_extensions/brand_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -18,6 +19,9 @@ void main() {
                 builder: (context) => Scaffold(
                   body: Row(
                     children: [
+                      CatalystSvgPicture.asset(
+                        Theme.of(context).brandAssets.logo.path,
+                      ),
                       MaterialButton(
                         key: catalystKey,
                         color: Theme.of(context).primaryColor,
@@ -124,6 +128,69 @@ void main() {
       expect(
         tester.widget<MaterialButton>(catalystButton).color,
         catalystColor,
+      );
+    });
+  });
+  group('Test brand_assets', () {
+    final catalystLogo = CatalystSvgPicture.asset(
+      VoicesAssets.images.catalystLogo.path,
+    );
+    final fallbackLogo = CatalystSvgPicture.asset(
+      VoicesAssets.images.fallbackLogo.path,
+    );
+    testWidgets('Logo from Default theme is applied', (tester) async {
+      await tester.pumpWidget(
+        buildApp(),
+      );
+
+      final logo = find.byType(CatalystSvgPicture).first;
+
+      expect(logo, findsOneWidget);
+      expect(
+        tester.widget<CatalystSvgPicture>(logo).bytesLoader,
+        catalystLogo.bytesLoader,
+      );
+    });
+
+    testWidgets('Fallback Logo is applied after switch', (tester) async {
+      await tester.pumpWidget(
+        buildApp(),
+      );
+
+      final logo = find.byType(CatalystSvgPicture).first;
+      final fallbackButton = find.byKey(fallbackKey);
+
+      expect(logo, findsOneWidget);
+      expect(fallbackButton, findsOneWidget);
+
+      await tester.tap(fallbackButton);
+      await tester.pumpAndSettle();
+      expect(
+        tester.widget<CatalystSvgPicture>(logo).bytesLoader,
+        fallbackLogo.bytesLoader,
+      );
+    });
+
+    testWidgets('Catalyst Logo is applied after switch', (tester) async {
+      await tester.pumpWidget(
+        buildApp(),
+      );
+
+      final logo = find.byType(CatalystSvgPicture).first;
+      final catalystButton = find.byKey(catalystKey);
+      final fallbackButton = find.byKey(fallbackKey);
+
+      expect(logo, findsOneWidget);
+      expect(catalystButton, findsOneWidget);
+      expect(fallbackButton, findsOneWidget);
+
+      await tester.tap(fallbackButton);
+      await tester.pumpAndSettle();
+      await tester.tap(catalystButton);
+      await tester.pumpAndSettle();
+      expect(
+        tester.widget<CatalystSvgPicture>(logo).bytesLoader,
+        catalystLogo.bytesLoader,
       );
     });
   });

@@ -4,8 +4,8 @@ version: 0.1.0+1
 publish_to: none
 
 environment:
-  sdk: ">=3.3.0 <4.0.0"
-  flutter: 3.19.5
+  sdk: ">=3.3.4 <4.0.0"
+  flutter: 3.22.1
 
 dependencies:
   flutter:
@@ -17,7 +17,6 @@ dev_dependencies:
   flutter_gen_runner: ^5.3.2
 
 flutter:
-  uses-material-design: true
   generate: true
   assets:
     - assets/images/
