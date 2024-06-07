@@ -6,7 +6,10 @@ use poem::web::Data;
 use poem_openapi::{ApiResponse, Enum};
 use tracing::debug;
 
-use crate::{event_db, logger, service::common::responses::WithErrorResponses, state::State};
+use crate::{
+    event_db, logger, service::common::responses::WithBadRequestAndInternalServerErrorResponse,
+    state::State,
+};
 
 /// `LogLevel` Open API definition.
 #[derive(Debug, Clone, Copy, Enum)]
@@ -61,7 +64,7 @@ pub(crate) enum Responses {
 }
 
 /// All responses.
-pub(crate) type AllResponses = WithErrorResponses<Responses>;
+pub(crate) type AllResponses = WithBadRequestAndInternalServerErrorResponse<Responses>;
 
 /// # GET /health/inspection
 ///
@@ -73,7 +76,7 @@ pub(crate) async fn endpoint(
     if let Some(level) = log_level {
         match state.modify_logger_level(level.into()) {
             Ok(()) => debug!("successfully set log level to: {:?}", level),
-            Err(err) => return AllResponses::handle_error(&err),
+            Err(err) => return AllResponses::internal_server_error(&err),
         }
     }
 
