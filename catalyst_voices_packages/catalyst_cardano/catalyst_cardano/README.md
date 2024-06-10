@@ -1,7 +1,3 @@
-## TODO(dtscalac): document plugin setup
-
-
-
 # Content
 
 * [Content](#content)
