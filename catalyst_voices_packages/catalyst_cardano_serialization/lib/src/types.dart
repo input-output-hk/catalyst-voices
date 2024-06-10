@@ -135,8 +135,9 @@ final class Value extends Equatable {
           (other.multiAsset ?? const MultiAsset.empty());
     }
 
+    final newCoin = coin + other.coin;
     return Value(
-      coin: coin + other.coin,
+      coin: newCoin,
       multiAsset: newMultiAsset,
     );
   }
@@ -154,8 +155,9 @@ final class Value extends Equatable {
       newMultiAsset = null;
     }
 
+    final newCoin = coin - other.coin;
     return Value(
-      coin: coin - other.coin,
+      coin: newCoin,
       multiAsset: newMultiAsset,
     );
   }
