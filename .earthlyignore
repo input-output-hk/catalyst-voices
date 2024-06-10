@@ -8,3 +8,4 @@
 **/.flutter-plugins-dependencies
 **/.idea/
 **/*.iml
+**/Earthfile
