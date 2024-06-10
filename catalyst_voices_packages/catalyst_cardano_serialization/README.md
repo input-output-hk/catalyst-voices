@@ -175,7 +175,8 @@ TransactionWitnessSet _signTransaction(Transaction transaction) {
 ## Limitations
 
 This package supports a minimal `TransactionBuilder` that does not yet work with
-Smart Contracts, scripts or NFTs.
+Smart Contracts or scripts.
+NFTs are partially supported, it's already possible to transfer them in a transaction.
 However AuxiliaryMetadata is already supported thus it's possible to fulfill some of the use cases.
 
 Only Shelley era bech32 base and stake addresses are supported.
