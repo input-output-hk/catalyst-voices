@@ -252,7 +252,7 @@ class JSCardanoWalletCip95ApiProxy implements CardanoWalletCip95Api {
     try {
       final result =
           await _delegate.getPubDRepKey().toDart.then((e) => e.toDart);
-      return PubDRepKey.fromCbor(cbor.decode(hex.decode(result)));
+      return PubDRepKey(result);
     } catch (ex) {
       throw _mapApiException(ex) ?? _fallbackApiException(ex);
     }
@@ -262,10 +262,8 @@ class JSCardanoWalletCip95ApiProxy implements CardanoWalletCip95Api {
   Future<List<PubStakeKey>> getRegisteredPubStakeKeys() async {
     try {
       return await _delegate.getRegisteredPubStakeKeys().toDart.then(
-            (jsArray) => jsArray.toDart.map((key) {
-              final cborValue = cbor.decode(hex.decode(key.toDart));
-              return PubStakeKey.fromCbor(cborValue);
-            }).toList(),
+            (jsArray) =>
+                jsArray.toDart.map((key) => PubStakeKey(key.toDart)).toList(),
           );
     } catch (ex) {
       throw _mapApiException(ex) ?? _fallbackApiException(ex);
@@ -276,10 +274,8 @@ class JSCardanoWalletCip95ApiProxy implements CardanoWalletCip95Api {
   Future<List<PubStakeKey>> getUnregisteredPubStakeKeys() async {
     try {
       return await _delegate.getUnregisteredPubStakeKeys().toDart.then(
-            (jsArray) => jsArray.toDart.map((key) {
-              final cborValue = cbor.decode(hex.decode(key.toDart));
-              return PubStakeKey.fromCbor(cborValue);
-            }).toList(),
+            (jsArray) =>
+                jsArray.toDart.map((key) => PubStakeKey(key.toDart)).toList(),
           );
     } catch (ex) {
       throw _mapApiException(ex) ?? _fallbackApiException(ex);

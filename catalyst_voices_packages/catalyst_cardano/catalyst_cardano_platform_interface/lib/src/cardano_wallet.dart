@@ -1,5 +1,6 @@
 import 'package:catalyst_cardano_platform_interface/src/exceptions.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:equatable/equatable.dart';
 
 /// A cardano wallet extension that has been injected
 /// into the browser's cardano.{walletName} object.
@@ -207,7 +208,7 @@ abstract interface class CardanoWalletCip95Api {
 }
 
 /// Defines the [cip] extension version.
-final class CipExtension {
+final class CipExtension extends Equatable {
   /// The version of the CIP extension.
   final int cip;
 
@@ -215,13 +216,16 @@ final class CipExtension {
   const CipExtension({
     required this.cip,
   });
+
+  @override
+  List<Object?> get props => [cip];
 }
 
 /// Defines the pagination constraints when querying data.
 ///
 /// Instead of fetching the whole data-set at once,
 /// the data can be queried in batches.
-final class Paginate {
+final class Paginate extends Equatable {
   /// The batch index.
   ///
   /// Starts counting from 0.
@@ -235,4 +239,7 @@ final class Paginate {
     required this.page,
     required this.limit,
   });
+
+  @override
+  List<Object?> get props => [page, limit];
 }

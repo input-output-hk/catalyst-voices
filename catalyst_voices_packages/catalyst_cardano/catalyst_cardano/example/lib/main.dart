@@ -92,7 +92,9 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _onEnableWallet(CardanoWallet wallet) async {
     try {
       setState(() => _isLoading = true);
-      final api = await wallet.enable();
+      final api = await wallet.enable(
+        extensions: const [CipExtension(cip: 95)],
+      );
       setState(() => _api = api);
     } catch (error) {
       setState(() => _error = error);
@@ -224,6 +226,9 @@ class _WalletDetailsState extends State<_WalletDetails> {
   List<ShelleyAddress>? _unusedAddresses;
   List<ShelleyAddress>? _usedAddresses;
   List<TransactionUnspentOutput>? _utxos;
+  PubDRepKey? _pubDRepKey;
+  List<PubStakeKey>? _registeredPubStakeKeys;
+  List<PubStakeKey>? _unregisteredPubStakeKeys;
 
   @override
   void initState() {
@@ -262,6 +267,22 @@ class _WalletDetailsState extends State<_WalletDetails> {
           _utxos = utxos;
         });
       }
+
+      if (extensions.contains(const CipExtension(cip: 95))) {
+        final pubDRepKey = await widget.api.cip95.getPubDRepKey();
+        final registeredPubStakeKeys =
+            await widget.api.cip95.getRegisteredPubStakeKeys();
+        final unregisteredPubStakeKeys =
+            await widget.api.cip95.getUnregisteredPubStakeKeys();
+
+        if (mounted) {
+          setState(() {
+            _pubDRepKey = pubDRepKey;
+            _registeredPubStakeKeys = registeredPubStakeKeys;
+            _unregisteredPubStakeKeys = unregisteredPubStakeKeys;
+          });
+        }
+      }
     } catch (error) {
       await _showDialog(
         title: 'Load data',
@@ -293,6 +314,15 @@ class _WalletDetailsState extends State<_WalletDetails> {
               ),
               Text('Used addresses:\n${_formatAddresses(_usedAddresses)}\n'),
               Text('UTXOs:\n${_formatUtxos(_utxos)}\n'),
+              Text('Public DRep Key: ${_pubDRepKey?.value ?? '---'}'),
+              Text(
+                'Registered Public Stake Keys: '
+                '${_registeredPubStakeKeys?.map((e) => e.value) ?? '---'}',
+              ),
+              Text(
+                'Unregistered Public Stake Keys: '
+                '${_unregisteredPubStakeKeys?.map((e) => e.value) ?? '---'}',
+              ),
               Row(
                 children: [
                   ElevatedButton(
