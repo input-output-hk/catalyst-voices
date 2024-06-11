@@ -45,7 +45,7 @@ void main() {
         'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70'
         'qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w',
       ),
-      amount: const Value(coin: Coin(10162333)),
+      amount: const Balance(coin: Coin(10162333)),
     ),
   );
 
@@ -53,7 +53,7 @@ void main() {
     address: ShelleyAddress.fromBech32(
       'addr_test1vzpwq95z3xyum8vqndgdd9mdnmafh3djcxnc6jemlgdmswcve6tkw',
     ),
-    amount: const Value(coin: Coin(1000000)),
+    amount: const Balance(coin: Coin(1000000)),
   );
 
   final txBuilder = TransactionBuilder(

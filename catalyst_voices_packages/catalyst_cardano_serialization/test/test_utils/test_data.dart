@@ -40,7 +40,7 @@ TransactionUnspentOutput testUtxo() {
         'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5'
         'ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w',
       ),
-      amount: const Value(coin: Coin(100000000)),
+      amount: const Balance(coin: Coin(100000000)),
     ),
   );
 }
@@ -52,11 +52,11 @@ Transaction minimalUnsignedTestTransaction() {
       outputs: [
         TransactionOutput(
           address: testnetAddr,
-          amount: const Value(coin: Coin(1000000)),
+          amount: const Balance(coin: Coin(1000000)),
         ),
         TransactionOutput(
           address: testnetChangeAddr,
-          amount: const Value(coin: Coin(9998833003)),
+          amount: const Balance(coin: Coin(9998833003)),
         ),
       ],
       fee: const Coin(166997),
@@ -76,11 +76,11 @@ Transaction minimalSignedTestTransaction() {
       outputs: [
         TransactionOutput(
           address: testnetAddr,
-          amount: const Value(coin: Coin(1000000)),
+          amount: const Balance(coin: Coin(1000000)),
         ),
         TransactionOutput(
           address: testnetChangeAddr,
-          amount: const Value(coin: Coin(9998833003)),
+          amount: const Balance(coin: Coin(9998833003)),
         ),
       ],
       fee: const Coin(166997),
@@ -117,11 +117,11 @@ Transaction fullUnsignedTestTransaction() {
       outputs: [
         TransactionOutput(
           address: testnetAddr,
-          amount: const Value(coin: Coin(1000000)),
+          amount: const Balance(coin: Coin(1000000)),
         ),
         TransactionOutput(
           address: testnetChangeAddr,
-          amount: const Value(coin: Coin(9998832827)),
+          amount: const Balance(coin: Coin(9998832827)),
         ),
       ],
       fee: const Coin(167173),
@@ -147,11 +147,11 @@ Transaction fullSignedTestTransaction() {
       outputs: [
         TransactionOutput(
           address: testnetAddr,
-          amount: const Value(coin: Coin(1000000)),
+          amount: const Balance(coin: Coin(1000000)),
         ),
         TransactionOutput(
           address: testnetChangeAddr,
-          amount: const Value(coin: Coin(9998832827)),
+          amount: const Balance(coin: Coin(9998832827)),
         ),
       ],
       fee: const Coin(167173),

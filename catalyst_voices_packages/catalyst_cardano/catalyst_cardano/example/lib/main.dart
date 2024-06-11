@@ -216,7 +216,7 @@ class _WalletDetails extends StatefulWidget {
 }
 
 class _WalletDetailsState extends State<_WalletDetails> {
-  Value? _balance;
+  Balance? _balance;
   List<CipExtension>? _extensions;
   NetworkId? _networkId;
   ShelleyAddress? _changeAddress;
@@ -409,7 +409,7 @@ String _formatAddresses(List<ShelleyAddress>? addresses) {
   return addresses.map((e) => e.toBech32()).join('\n');
 }
 
-String _formatBalance(Value? balance) {
+String _formatBalance(Balance? balance) {
   if (balance == null) {
     return '---';
   }
@@ -464,7 +464,7 @@ Transaction _buildUnsignedTx({
 
   final txOutput = TransactionOutput(
     address: preprodFaucetAddress,
-    amount: const Value(coin: Coin(1000000)),
+    amount: const Balance(coin: Coin(1000000)),
   );
 
   final txBuilder = TransactionBuilder(
