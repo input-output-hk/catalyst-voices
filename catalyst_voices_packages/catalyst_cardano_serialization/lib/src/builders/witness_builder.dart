@@ -1,10 +1,11 @@
 import 'package:catalyst_cardano_serialization/src/exceptions.dart';
 import 'package:catalyst_cardano_serialization/src/witness.dart';
+import 'package:equatable/equatable.dart';
 
 /// A builder that builds [TransactionWitnessSet].
 ///
 /// Holds transaction witnesses that sign the transaction and prove it is valid.
-class TransactionWitnessSetBuilder {
+final class TransactionWitnessSetBuilder extends Equatable {
   /// The map of transaction witnesses.
   final Map<Vkey, VkeyWitness> vkeys;
 
@@ -63,4 +64,7 @@ class TransactionWitnessSetBuilder {
       },
     );
   }
+
+  @override
+  List<Object?> get props => [vkeys, vkeysCount];
 }

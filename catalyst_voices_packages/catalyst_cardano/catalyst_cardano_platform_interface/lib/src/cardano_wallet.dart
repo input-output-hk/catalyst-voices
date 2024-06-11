@@ -63,7 +63,7 @@ abstract interface class CardanoWalletApi {
   /// but it is both useful to dApps and likely already maintained by the
   /// implementing wallet in a more efficient manner so it has been included
   /// in the API as well.
-  Future<Coin> getBalance();
+  Future<Balance> getBalance();
 
   /// Retrieves the list of extensions enabled by the wallet.
   ///
