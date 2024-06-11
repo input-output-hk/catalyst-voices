@@ -1,3 +1,6 @@
+//! This module contains the implementation of the Extensions field in the c509
+//! certificate. Please refer to the [c509-certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/) for more information.
+
 use alt_name::AltName;
 use minicbor::Encoder;
 
@@ -5,25 +8,40 @@ use crate::cbor_encoder::CborEncoder;
 
 pub mod alt_name;
 
-// Extension struct represent each extension
-// CBOR int (see Section 9.4), CBOR item of ExtensionValue, and critical flag
+/// Extensions field is an array of `Extension`, representing multiple extensions in a
+/// C509 certificate.
+pub type Extensions = Vec<Extension>;
+
+/// Represents an Extension in a C509 certificate.
+/// Each Extension includes its type, value, and a critical flag.
+///
+/// # Fields
+/// * `extension_type` - The type of the extension as defined in the `ExtensionRegistry`.
+/// * `extension_value` - The value of the extension, which can be different types of
+///   extension values.
+/// * `critical` - A boolean indicating whether the extension is critical.
 pub struct Extension {
     pub extension_type: ExtensionRegistry,
     pub extension_value: ExtensionValue,
     pub critical: bool,
 }
 
-// Extensions field is an array of Extension
-pub type Extensions = Vec<Extension>;
-
-// Extension possible values
+/// Currently implemented values for an extension.
 #[allow(unused)]
 pub enum ExtensionValue {
+    /// Alternative names for the issuer.
     IssuerAltName(AltName),
+    /// Alternative names for the subject.
     SubjectAltName(AltName),
 }
 
 impl CborEncoder for ExtensionValue {
+    /// Encodes a `ExtensionValue` using the provided CBOR encoder.
+    ///
+    /// # Arguments
+    ///
+    /// * `encoder` - A mutable reference to a `minicbor::Encoder` to encode the
+    ///   extensions into.
     fn encode(&self, encoder: &mut Encoder<&mut Vec<u8>>) {
         match self {
             ExtensionValue::IssuerAltName(alt_name) => alt_name.encode(encoder),
@@ -32,8 +50,9 @@ impl CborEncoder for ExtensionValue {
     }
 }
 
-// Ref - 9.4. C509 Extensions Registry
 #[allow(unused)]
+/// Enum of possible C509 extension types.
+/// Please refer to the [c509-certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/) Section 9.4 C509 Extensions Registry for more information.
 pub enum ExtensionRegistry {
     SubjectKeyIdentifier = 1,
     KeyUsage = 2,
@@ -66,8 +85,15 @@ pub enum ExtensionRegistry {
     ChallengePassword = 255,
 }
 
-// Determine if the extension is critical or not
-// return -1 if critical, 1 if not
+/// Determines if an Extension is critical or not.
+///
+/// # Parameters
+///
+/// * `critical` - A boolean indicating if the extension is critical.
+///
+/// # Returns
+///
+/// Returns `-1` if the Extension is critical, `1` otherwise.
 pub(crate) fn is_critical(critical: bool) -> i16 {
     if critical {
         return -1;
@@ -75,8 +101,15 @@ pub(crate) fn is_critical(critical: bool) -> i16 {
     1
 }
 
-// Encoding the extension
-// Extension field is encoded as a CBOR array of Extension
+/// Encodes a list of Extensions into CBOR format.
+/// This function iterates over each `Extension` in the provided `extensions` vector and
+/// encodes
+///
+/// # Parameters
+///
+/// * `extensions` - A vector of `Extension` objects to be encoded.
+/// * `encoder` - A mutable reference to a `minicbor::Encoder` to encode the extensions
+///   into.
 pub(crate) fn encode_extensions(extensions: Extensions, encoder: &mut Encoder<&mut Vec<u8>>) {
     let _unused = encoder.array(extensions.len() as u64);
     for ext in extensions {
@@ -88,9 +121,10 @@ pub(crate) fn encode_extensions(extensions: Extensions, encoder: &mut Encoder<&m
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use alt_name::{GeneralName, GeneralNamesRegistry, GeneralNamesRegistryType, OtherNameType};
     use minicbor::Encoder;
+
+    use super::*;
 
     #[test]
     fn test_encode_extensions() {
@@ -127,7 +161,7 @@ mod tests {
                 critical: false,
             },
         ];
-        
+
         encode_extensions(extensions, &mut encoder);
         // 82 -> 2 extensions (2 item in array)
         // 38 18 -> IssuerAltName type 25 with critical flag true (-25)

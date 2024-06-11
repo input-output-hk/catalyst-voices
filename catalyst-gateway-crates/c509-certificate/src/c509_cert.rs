@@ -1,3 +1,6 @@
+//! This module provides essential functions for encoding and generating C509
+//! certificates. Please refer to the [c509-certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/) for more information.
+
 use minicbor::Encoder;
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -9,7 +12,23 @@ use crate::{
 
 // ---------------------------------------------------
 
-// Ref - Section 3.1. Message Fields -> subjectPublicKeyInfo
+/// Encodes the subject public key information.
+///
+/// # Arguments
+///
+/// * `pubk_type` - The type of the public key algorithm.
+/// * `pubk` - The public key bytes.
+/// * `encoder` - A mutable reference to a `minicbor::Encoder` to encode the extensions
+///   into.
+///
+/// # Panics
+///
+/// Panics if the public key type is not supported (RSA and Elliptic curve in Weierstraß
+/// public keys).
+///
+/// # References
+///
+/// Please refer to the [c509-certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/) Section 3.1. Message Fields -> subjectPublicKeyInfo for more information.
 fn encode_subject_public_key(
     pubk_type: PubKeyAlgoRegistry, pubk: Vec<u8>, encoder: &mut Encoder<&mut Vec<u8>>,
 ) {
@@ -38,7 +57,14 @@ fn encode_subject_public_key(
 
 // ---------------------------------------------------
 
-// Ref - Section 3.1. Message Fields -> signatureAlgorithm
+/// Encodes the signature algorithm information.
+///
+/// # Arguments
+///
+/// * `sig_algo` - The signature algorithm.
+/// * `encoder` - A mutable reference to a `minicbor::Encoder` to encode the extensions
+///   into.
+/// Please refer to the [c509-certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/) Section 3.1. Message Fields -> signatureAlgorithm for more information.
 fn encode_signature_algorithm(
     sig_algo: SignatureAlgoRegistry, encoder: &mut Encoder<&mut Vec<u8>>,
 ) {
@@ -47,7 +73,17 @@ fn encode_signature_algorithm(
 
 // ---------------------------------------------------
 
-// Ref - Section 3.1. Message Fields -> signatureValue
+/// Encodes the issuer signature value.
+///
+/// # Arguments
+///
+/// * `_sig_value` - The signature value (currently unused).
+/// * `encoder` - A mutable reference to a `minicbor::Encoder` to encode the extensions
+///   into.
+///
+/// # Remarks
+/// This function will be implemented in the future.
+/// Please refer to the [c509-certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/) Section 3.1. Message Fields -> signatureValue for more information.
 fn encode_issuer_signature_value(_sig_value: Vec<u8>, encoder: &mut Encoder<&mut Vec<u8>>) {
     // Currently will generate an unsigned C509 certificates,
     // hence the value is null
@@ -56,8 +92,32 @@ fn encode_issuer_signature_value(_sig_value: Vec<u8>, encoder: &mut Encoder<&mut
 
 // ---------------------------------------------------
 
-// Ref - Figure 1: CDDL for C509Certificate
 #[wasm_bindgen]
+/// Represents the "To Be Signed" (TBS) part of a C509 certificate.
+///
+/// The TBS certificate contains all the information that will be signed by the
+/// certificate issuer, including the certificate type, serial number, issuer name,
+/// validity period, subject name, subject public key, extensions, and the signature
+/// algorithm used by the issuer.
+///
+/// # Fields
+///
+/// * `certificate_type` - The type of the certificate.
+/// * `certificate_serial_number` - The serial number of the certificate, uniquely
+///   identifying it.
+/// * `issuer` - The distinguished name of the certificate issuer.
+/// * `validity_not_before` - The start time of the certificate's validity period.
+/// * `validity_not_after` - The end time of the certificate's validity period.
+/// * `subject` - The distinguished name of the certificate subject (the entity being
+///   certified).
+/// * `subject_public_key_algo` - The public key algorithm used by the subject.
+/// * `subject_public_key` - The public key of the subject.
+/// * `extensions` - Additional attributes associated with the certificate, such as
+///   alternative names or key usage.
+/// * `issuer_sig_algo` - The signature algorithm used by the issuer to sign the
+///   certificate.
+///
+/// Please refer to the [c509-certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/) Figure 1: CDDL for C509Certificate for more information.
 pub struct TbsCertificate {
     certificate_type: C509CertificateType,
     certificate_serial_number: UnwrappedBiguint,
@@ -71,13 +131,59 @@ pub struct TbsCertificate {
     issuer_sig_algo: SignatureAlgoRegistry,
 }
 
-// C509 certificate type contains 2 elements,
-// TbsCertificate and issuerSignatureValue
+/// The number of elements in a C509 certificate.
+///
+/// A C509 certificate is composed of two elements:
+/// 1. The `TbsCertificate` which contains all the information that will be signed.
+/// 2. The `issuerSignatureValue` which is the signature of the `TbsCertificate`.
 const C509_CERTIFICATE_ELEMENTS: u64 = 2;
 
-// Generate C509 certificate
-// accepts TbsCertificate and returns a C509 certificate
-pub(crate) fn generate_c509_cert(tbs_cert: TbsCertificate) -> Vec<u8> {
+/// Generates a C509 certificate.
+///
+/// This function takes a `TbsCertificate` as input and returns an unsigned C509
+/// certificate as a vector of bytes. The C509 certificate consists of the
+/// `TbsCertificate` information and an `issuerSignatureValue` which is currently set to
+/// null (indicating an unsigned certificate).
+///
+/// # Parameters
+///
+/// * `tbs_cert` - The `TbsCertificate` containing all the information to be signed by the
+///   issuer.
+///
+/// # Returns
+///
+/// A vector of bytes representing the C509 certificate.
+///
+/// # Example
+///
+/// ```rust
+/// use crate::{
+///     generate_unsigned_c509_cert, C509CertificateType, Extensions, Name, PubKeyAlgoRegistry,
+///     SignatureAlgoRegistry, TbsCertificate, Time, UnwrappedBiguint,
+/// };
+///
+/// let issuer: Name = vec![];
+/// let subject: Name = vec![];
+/// let pub_key: Vec<u8> = vec![0x01, 0x02, 0x03];
+/// let extensions: Extensions = vec![];
+///
+/// let tbs_cert = TbsCertificate {
+///     certificate_type: C509CertificateType::SignedC509Cert,
+///     certificate_serial_number: UnwrappedBiguint::U64Value(123456),
+///     issuer,
+///     validity_not_before: 1672531200,
+///     validity_not_after: 1767225600,
+///     subject,
+///     subject_public_key_algo: PubKeyAlgoRegistry::Ed25519,
+///     subject_public_key: pub_key,
+///     extensions,
+///     issuer_sig_algo: SignatureAlgoRegistry::Ed25519,
+/// };
+///
+/// let c509_cert = generate_unsigned_c509_cert(tbs_cert);
+/// assert!(!c509_cert.is_empty());
+/// ```
+pub(crate) fn generate_unsigned_c509_cert(tbs_cert: TbsCertificate) -> Vec<u8> {
     let mut buffer: Vec<u8> = Vec::new();
 
     // Create a new encoder, passing the buffer by mutable reference
@@ -117,14 +223,15 @@ pub(crate) fn generate_c509_cert(tbs_cert: TbsCertificate) -> Vec<u8> {
 #[cfg(test)]
 mod tests {
 
-    use crate::c509_enum::AttributesRegistry;
-    use crate::cbor_encoder::{AttributeRegistryValue, RelativeDistinguishedName, StringType};
-    use crate::extensions::alt_name::{
-        GeneralName, GeneralNamesRegistry, GeneralNamesRegistryType,
-    };
-    use crate::extensions::{Extension, ExtensionRegistry, ExtensionValue};
-
     use super::*;
+    use crate::{
+        c509_enum::AttributesRegistry,
+        cbor_encoder::{AttributeRegistryValue, RelativeDistinguishedName, StringType},
+        extensions::{
+            alt_name::{GeneralName, GeneralNamesRegistry, GeneralNamesRegistryType},
+            Extension, ExtensionRegistry, ExtensionValue,
+        },
+    };
 
     #[test]
     fn test_generate_c509() {

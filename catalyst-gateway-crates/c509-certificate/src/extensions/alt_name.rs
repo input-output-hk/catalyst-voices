@@ -1,14 +1,17 @@
-use crate::cbor_encoder::CborEncoder;
+//! This module provides encoder of Alternative Name used in C509 certificates.
+//! Please refer to the [c509-certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/) for more information.
+
 use minicbor::Encoder;
 
 use super::is_critical;
+use crate::cbor_encoder::CborEncoder;
 
 // ---------------------------------------------------
 
-// Define the GeneralNamesRegistry enum
-// Ref - Section 9.9 C509 General Names Registry
 #[allow(unused)]
 #[derive(Debug, PartialEq, Clone, Copy)]
+/// Enum of `GeneralNamesRegistry` in a C509 certificate.
+/// Please refer to the [c509-certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/) Section 9.9 C509 General Names Registry for more information.
 pub enum GeneralNamesRegistry {
     OtherNameBundleEID = -3,          // eid-structure from RFC 9171
     OtherNameSmtpUTF8Mailbox = -2,    // text
@@ -24,16 +27,26 @@ pub enum GeneralNamesRegistry {
 
 // ---------------------------------------------------
 
-// Type othername mention in Section 3.3
-// Struct of OtherNameType 'otherName + hardwareModuleName' is used in a form
-// of [ ~oid, bytes ] which, contain the pair ( hwType, hwSerialNum )
 #[derive(Clone)]
+/// Represents the type and serial number of the `OtherName` type in a C509 certificate.
+/// Struct of `OtherNameType` 'otherName + hardwareModuleName' is used in a form
+/// of [ ~oid, bytes ] which, contain the pair ( hwType, hwSerialNum )
+///
+/// # Fields
+/// * `hw_type` - The hardware type of the device.
+/// * `hw_serial_num` - The serial number of the device.
 pub struct OtherNameType {
     pub hw_type: String,
     pub hw_serial_num: Vec<u8>,
 }
 
 impl CborEncoder for OtherNameType {
+    /// Encodes a `OtherNameType` using the provided CBOR encoder.
+    ///
+    /// # Arguments
+    ///
+    /// * `encoder` - A mutable reference to a `minicbor::Encoder` to encode the
+    ///   extensions into.
     fn encode(&self, encoder: &mut Encoder<&mut Vec<u8>>) {
         // 2 items in OtherNameType
         let _unused = encoder.array(2);
@@ -44,41 +57,55 @@ impl CborEncoder for OtherNameType {
 
 // ---------------------------------------------------
 
-// BundleProtocolURISchemeTypes enum defines the type of URI scheme
-// URI Scheme can be found in Section 9.7
-// https://datatracker.ietf.org/doc/rfc9171/
-//
-// DTN scheme syntax
-//  dtn-uri = "dtn:" ("none" / dtn-hier-part)
-//  dtn-hier-part = "//" node-name name-delim demux ; a path-rootless
-//  node-name = reg-name
-//  name-delim = "/"
-//  demux = *VCHAR
-// Note that - *VCHAR consists of zero or more visible characters
-// Example dtn://node1/service1/data
-
-// IPN scheme syntax
-//  ipn-uri = "ipn:" ipn-hier-part
-//  ipn-hier-part = node-nbr nbr-delim service-nbr ; a path-rootless
-//  node-nbr = 1*DIGIT
-//  nbr-delim = "."
-//  service-nbr = 1*DIGIT
-// Note that 1*DIGIT consists of one or more digits
 #[allow(unused)]
 #[derive(Clone)]
+/// An Enum of `BundleProtocolURISchemeTypes` defines the type of URI scheme
+/// URI Scheme can be found in [RFC9171](https://datatracker.ietf.org/doc/rfc9171/) Section 9.7
+///
+/// DTN scheme syntax
+/// ```text
+/// dtn-uri = "dtn:" ("none" / dtn-hier-part)
+/// dtn-hier-part = "//" node-name name-delim demux ; a path-rootless
+/// node-name = reg-name
+/// name-delim = "/"
+/// demux = *VCHAR
+/// ```
+/// Note that - *VCHAR consists of zero or more visible characters
+/// Example dtn://node1/service1/data
+///
+/// IPN scheme syntax
+/// ```text
+/// ipn-uri = "ipn:" ipn-hier-part
+/// ipn-hier-part = node-nbr nbr-delim service-nbr ; a path-rootless
+/// node-nbr = 1*DIGIT
+/// nbr-delim = "."
+/// service-nbr = 1*DIGIT
+/// ```
+/// Note that 1*DIGIT consists of one or more digits
 pub(crate) enum BundleProtocolURISchemeTypes {
     Dtn = 1,
     Ipn = 2,
 }
 
-// EID structure define in https://datatracker.ietf.org/doc/rfc9171/
 #[derive(Clone)]
+/// Represents an Endpoint IDentifier (EID) in the Bundle Protocol.
+/// EID structure define in https://datatracker.ietf.org/doc/rfc9171/
+///
+/// # Fields
+/// * `uri_code` - The URI code of the EID.
+/// * `ssp` - The Scheme Specific Part (SSP) of the EID.
 pub struct Eid {
     pub uri_code: BundleProtocolURISchemeTypes,
     pub ssp: String,
 }
 
 impl CborEncoder for Eid {
+    /// Encodes a `Eid` using the provided CBOR encoder.
+    ///
+    /// # Arguments
+    ///
+    /// * `encoder` - A mutable reference to a `minicbor::Encoder` to encode the
+    ///   extensions into.
     fn encode(&self, encoder: &mut Encoder<&mut Vec<u8>>) {
         // 2 items in Eid
         let _unused = encoder.array(2);
@@ -89,9 +116,9 @@ impl CborEncoder for Eid {
 
 // ---------------------------------------------------
 
-// GeneralNamesRegistryType enum defines a type used in GeneralNamesRegistry
 #[allow(unused)]
 #[derive(Clone)]
+/// Enum represents the types of `GeneralNamesRegistryType`.
 pub(crate) enum GeneralNamesRegistryType {
     Text(String),
     Bytes(Vec<u8>),
@@ -100,37 +127,51 @@ pub(crate) enum GeneralNamesRegistryType {
     Eid(Eid),
 }
 
-// Define the GeneralName struct
-// ( GeneralNameType : int, GeneralNameValue : any )
 #[derive(Clone)]
+/// Represents a `GeneralName` in a C509 certificate.
+/// ( GeneralNameType : int, GeneralNameValue : any )
+///
+/// # Fields
+/// * `gn_name` - The type of the general name as defined in the `GeneralNamesRegistry`.
+/// * `gn_value` - The value of the general name, which can be different types of general
+///   name values.
+/// * `critical` - A boolean indicating whether the general name is critical.
 pub struct GeneralName {
     pub gn_name: GeneralNamesRegistry,
     pub gn_value: GeneralNamesRegistryType,
     pub critical: bool,
 }
 
+/// Implements the encoding for an `GeneralNamesRegistryType`.
+/// Including `Text`, `Bytes`, `Oid`, `OidAndBytes`, and `Eid`.
 impl CborEncoder for GeneralNamesRegistryType {
     fn encode(&self, encoder: &mut Encoder<&mut Vec<u8>>) {
         match self {
             GeneralNamesRegistryType::Text(s) => {
                 let _unused = encoder.str(s);
-            }
+            },
             GeneralNamesRegistryType::Bytes(b) => {
                 let _unused = encoder.bytes(b);
-            }
+            },
             GeneralNamesRegistryType::Oid(s) => {
                 self.encode_oid(encoder, s);
-            }
+            },
             GeneralNamesRegistryType::OidAndBytes(b) => {
                 b.encode(encoder);
-            }
+            },
             GeneralNamesRegistryType::Eid(e) => {
                 e.encode(encoder);
-            }
+            },
         }
     }
 }
 
+/// Encodes a `GeneralName` using the provided CBOR encoder.
+///
+/// # Arguments
+///
+/// * `encoder` - A mutable reference to a `minicbor::Encoder` to encode the extensions
+///   into.
 impl CborEncoder for GeneralName {
     fn encode(&self, encoder: &mut Encoder<&mut Vec<u8>>) {
         let c = is_critical(self.critical);
@@ -141,19 +182,31 @@ impl CborEncoder for GeneralName {
 
 // ---------------------------------------------------
 
-// Define the AltName struct for Alternative Name
-// GeneralName = ( GeneralNameType : int, GeneralNameValue : any )
-// GeneralNames = [ + GeneralName ]
-// SubjectAltName = GeneralNames / text
+/// Represents an Alternative Name in a C509 certificate.`
 pub type AltName = Vec<GeneralName>;
 
 impl CborEncoder for AltName {
+    /// Encodes a `AltName` using the provided CBOR encoder.
+    ///
+    /// # Arguments
+    ///
+    /// * `encoder` - A mutable reference to a `minicbor::Encoder` to encode the
+    ///   extensions into.
     fn encode(&self, encoder: &mut Encoder<&mut Vec<u8>>) {
         encode_alt_name(self.clone(), encoder)
     }
 }
 
-// Implement the encoding for alternative name
+/// Encodes an Alternative Name (AltName) in a C509 certificate.
+///
+/// If the `AltName` contains exactly one DNSName, the array and the integer are omitted,
+/// and the extension value is the DNSName encoded as a CBOR text string.
+///
+/// # Arguments
+///
+/// * `alt_name` - The Alternative Name to encode.
+/// * `encoder` - A mutable reference to a `minicbor::Encoder` to encode the extensions
+///   into.
 fn encode_alt_name(alt_name: AltName, encoder: &mut Encoder<&mut Vec<u8>>) {
     // If subjectAltName contains exactly one dNSName, the array and the int
     // are omitted and extensionValue is the dNSName encoded as a CBOR text string.
@@ -172,8 +225,9 @@ fn encode_alt_name(alt_name: AltName, encoder: &mut Encoder<&mut Vec<u8>>) {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use minicbor::Encoder;
+
+    use super::*;
 
     #[test]
     fn test_encode_general_name_only_one_dns() {
