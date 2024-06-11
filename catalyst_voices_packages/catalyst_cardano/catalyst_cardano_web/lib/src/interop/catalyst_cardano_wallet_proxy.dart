@@ -56,6 +56,15 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   JSCardanoWalletApiProxy(this._delegate);
 
   @override
+  CardanoWalletCip95Api get cip95 {
+    try {
+      return JSCardanoWalletCip95ApiProxy(_delegate.cip95);
+    } catch (ex) {
+      throw _mapApiException(ex) ?? _fallbackApiException(ex);
+    }
+  }
+
+  @override
   Future<Balance> getBalance() async {
     try {
       final result = await _delegate.getBalance().toDart.then((e) => e.toDart);
@@ -226,6 +235,83 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
     } catch (ex) {
       throw _mapApiException(ex) ??
           _mapTxSendException(ex) ??
+          _fallbackApiException(ex);
+    }
+  }
+}
+
+/// A wrapper around [JSCardanoWalletCip95Api] that translates between JS/dart layers.
+class JSCardanoWalletCip95ApiProxy implements CardanoWalletCip95Api {
+  final JSCardanoWalletCip95Api _delegate;
+
+  /// The default constructor for [JSCardanoWalletCip95ApiProxy].
+  JSCardanoWalletCip95ApiProxy(this._delegate);
+
+  @override
+  Future<PubDRepKey> getPubDRepKey() async {
+    try {
+      final result =
+          await _delegate.getPubDRepKey().toDart.then((e) => e.toDart);
+      return PubDRepKey(result);
+    } catch (ex) {
+      throw _mapApiException(ex) ?? _fallbackApiException(ex);
+    }
+  }
+
+  @override
+  Future<List<PubStakeKey>> getRegisteredPubStakeKeys() async {
+    try {
+      return await _delegate.getRegisteredPubStakeKeys().toDart.then(
+            (jsArray) =>
+                jsArray.toDart.map((key) => PubStakeKey(key.toDart)).toList(),
+          );
+    } catch (ex) {
+      throw _mapApiException(ex) ?? _fallbackApiException(ex);
+    }
+  }
+
+  @override
+  Future<List<PubStakeKey>> getUnregisteredPubStakeKeys() async {
+    try {
+      return await _delegate.getUnregisteredPubStakeKeys().toDart.then(
+            (jsArray) =>
+                jsArray.toDart.map((key) => PubStakeKey(key.toDart)).toList(),
+          );
+    } catch (ex) {
+      throw _mapApiException(ex) ?? _fallbackApiException(ex);
+    }
+  }
+
+  @override
+  Future<VkeyWitness> signData({
+    required (ShelleyAddress?, DRepID?) address,
+    required List<int> payload,
+  }) async {
+    final String cborAddress;
+    final shelleyAddress = address.$1;
+    final dRepID = address.$2;
+
+    if (shelleyAddress != null) {
+      cborAddress = hex.encode(cbor.encode(shelleyAddress.toCbor()));
+    } else if (dRepID != null) {
+      cborAddress = hex.encode(cbor.encode(dRepID.toCbor()));
+    } else {
+      throw _fallbackApiException(
+        ArgumentError('Either address or DRepId must be provided'),
+      );
+    }
+
+    try {
+      return await _delegate
+          .signData(
+            cborAddress.toJS,
+            hex.encode(payload).toJS,
+          )
+          .toDart
+          .then((e) => VkeyWitness.fromCbor(cbor.decode(hex.decode(e.toDart))));
+    } catch (ex) {
+      throw _mapApiException(ex) ??
+          _mapDataSignException(ex) ??
           _fallbackApiException(ex);
     }
   }

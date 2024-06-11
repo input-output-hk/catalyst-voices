@@ -63,8 +63,8 @@ final class WalletDataSignException implements Exception {
 
 /// A specific error code related to the [WalletDataSignException].
 enum WalletDataSignErrorCode {
-  /// Wallet could not sign the data (e.g. does not have the secret key
-  /// associated with the address).
+  /// Wallet could not sign the data; because the wallet does not
+  ///  have the secret key to the associated with the address or DRep ID.
   proofGeneration(tag: 1),
 
   /// Address was not a P2PK address and thus had no SK associated with it.
@@ -118,7 +118,11 @@ enum TxSignErrorCode {
   proofGeneration(tag: 1),
 
   /// User declined to sign the transaction.
-  userDeclined(tag: 2);
+  userDeclined(tag: 2),
+
+  /// Returned regardless of user consent
+  /// if the transaction contains a depreciated certificate.
+  depreciatedCertificate(tag: 3);
 
   /// The error code number.
   final int tag;
