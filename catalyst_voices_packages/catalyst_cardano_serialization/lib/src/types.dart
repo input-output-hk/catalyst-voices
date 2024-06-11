@@ -75,8 +75,6 @@ extension type const SlotBigNum(int value) {
 }
 
 /// Represents the balance of the wallet in terms of [Coin].
-///
-/// For now, other assets than Ada are not supported and are ignored.
 final class Balance extends Equatable {
   /// The amount of [Coin] that the wallet holds.
   final Coin coin;
