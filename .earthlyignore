@@ -1,8 +1,11 @@
 # Files and directories created by pub
-.dart_tool/
-.packages
-build/
-pubspec.lock
-pubspec_overrides.yaml
-.flutter-plugins
-.flutter-plugins-dependencies
+**/.dart_tool/
+**/.packages
+**/build/
+**/pubspec.lock
+**/pubspec_overrides.yaml
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.idea/
+**/*.iml
+**/Earthfile
