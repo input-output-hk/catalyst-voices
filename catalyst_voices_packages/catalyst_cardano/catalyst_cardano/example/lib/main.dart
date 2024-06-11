@@ -314,14 +314,14 @@ class _WalletDetailsState extends State<_WalletDetails> {
               ),
               Text('Used addresses:\n${_formatAddresses(_usedAddresses)}\n'),
               Text('UTXOs:\n${_formatUtxos(_utxos)}\n'),
-              Text('Public DRep Key: ${_pubDRepKey?.value ?? '---'}'),
+              Text('Public DRep Key: ${_pubDRepKey?.value ?? '---'}\n'),
               Text(
                 'Registered Public Stake Keys: '
-                '${_registeredPubStakeKeys?.map((e) => e.value) ?? '---'}',
+                '${_registeredPubStakeKeys?.map((e) => e.value) ?? '---'}\n',
               ),
               Text(
                 'Unregistered Public Stake Keys: '
-                '${_unregisteredPubStakeKeys?.map((e) => e.value) ?? '---'}',
+                '${_unregisteredPubStakeKeys?.map((e) => e.value) ?? '---'}\n',
               ),
               Row(
                 children: [
