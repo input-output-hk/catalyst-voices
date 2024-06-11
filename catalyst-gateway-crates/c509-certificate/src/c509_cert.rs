@@ -221,7 +221,7 @@ pub(crate) fn generate_unsigned_c509_cert(tbs_cert: TbsCertificate) -> Vec<u8> {
 // ---------------------------------------------------
 
 #[cfg(test)]
-mod tests {
+mod test_c509_cert {
 
     use super::*;
     use crate::{
@@ -275,7 +275,7 @@ mod tests {
             extensions,
             issuer_sig_algo: SignatureAlgoRegistry::Ed25519,
         };
-        let buffer = generate_c509_cert(tbs_cert);
+        let buffer = generate_unsigned_c509_cert(tbs_cert);
         assert_ne!(buffer.len(), 0);
         println!("{:?}", hex::encode(buffer));
     }

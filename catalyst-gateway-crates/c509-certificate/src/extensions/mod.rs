@@ -120,7 +120,7 @@ pub(crate) fn encode_extensions(extensions: Extensions, encoder: &mut Encoder<&m
 }
 
 #[cfg(test)]
-mod tests {
+mod test_extensions {
     use alt_name::{GeneralName, GeneralNamesRegistry, GeneralNamesRegistryType, OtherNameType};
     use minicbor::Encoder;
 

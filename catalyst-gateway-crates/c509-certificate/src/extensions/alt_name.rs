@@ -224,7 +224,7 @@ fn encode_alt_name(alt_name: AltName, encoder: &mut Encoder<&mut Vec<u8>>) {
 // ---------------------------------------------------
 
 #[cfg(test)]
-mod tests {
+mod test_alt_name {
     use minicbor::Encoder;
 
     use super::*;
