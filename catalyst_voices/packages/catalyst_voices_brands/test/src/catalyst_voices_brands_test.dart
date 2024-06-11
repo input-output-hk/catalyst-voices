@@ -1,7 +1,6 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/src/brand/brand_bloc.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
-import 'package:catalyst_voices_brands/src/theme_extensions/brand_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
