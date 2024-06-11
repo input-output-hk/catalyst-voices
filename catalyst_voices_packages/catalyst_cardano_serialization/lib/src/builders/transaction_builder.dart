@@ -90,7 +90,7 @@ final class TransactionBuilder extends Equatable {
     final inputTotal =
         inputs.map((e) => e.output.amount).reduce((a, b) => a + b);
     final outputTotal = outputs.map((e) => e.amount).reduce((a, b) => a + b);
-    final outputTotalPlusFee = outputTotal + Value(coin: fee);
+    final outputTotalPlusFee = outputTotal + Balance(coin: fee);
 
     if (outputTotalPlusFee.coin == inputTotal.coin) {
       // ignore: avoid_returning_this
@@ -231,7 +231,7 @@ final class TransactionBuilder extends Equatable {
   TransactionBuilder _withChangeAddressIfNeededWithMultiAssets({
     required ShelleyAddress address,
     required Coin fee,
-    required Value changeEstimator,
+    required Balance changeEstimator,
   }) {
     var builder = this;
     var changeLeft = changeEstimator;
@@ -268,7 +268,7 @@ final class TransactionBuilder extends Equatable {
       }
     }
 
-    changeLeft -= Value(coin: newFee);
+    changeLeft -= Balance(coin: newFee);
     builder = builder.withFee(newFee);
 
     if (!changeLeft.isZero) {
@@ -286,7 +286,7 @@ final class TransactionBuilder extends Equatable {
   TransactionBuilder _withChangeAddressIfNeededWithoutMultiAssets({
     required ShelleyAddress address,
     required Coin fee,
-    required Value changeEstimator,
+    required Balance changeEstimator,
   }) {
     final minAda = TransactionOutputBuilder.minimumAdaForOutput(
       TransactionOutput(
@@ -319,7 +319,7 @@ final class TransactionBuilder extends Equatable {
             return withFee(newFee).withOutput(
               TransactionOutput(
                 address: address,
-                amount: changeEstimator - Value(coin: newFee),
+                amount: changeEstimator - Balance(coin: newFee),
               ),
             );
         }
@@ -338,7 +338,7 @@ final class TransactionBuilder extends Equatable {
   }) {
     final (policy, assetName, value) = assetToAdd;
 
-    final valueWithExtraMultiAssets = Value(
+    final valueWithExtraMultiAssets = Balance(
       coin: const Coin(0),
       multiAsset: MultiAsset(
         bundle: {
@@ -360,7 +360,7 @@ final class TransactionBuilder extends Equatable {
       config.coinsPerUtxoByte,
     );
 
-    final valueWithExtraAmountAndMultiAssets = Value(
+    final valueWithExtraAmountAndMultiAssets = Balance(
       coin: minAdaForExtraOutput,
       multiAsset: outputWithExtraMultiAssets.amount.multiAsset,
     );
@@ -373,18 +373,18 @@ final class TransactionBuilder extends Equatable {
   /// if they don't fit into one transaction output.
   List<MultiAsset> _packNftsForChange({
     required ShelleyAddress changeAddress,
-    required Value changeEstimator,
+    required Balance changeEstimator,
   }) {
     final baseMultiAsset = changeEstimator.multiAsset;
     if (baseMultiAsset == null) return [];
 
     final changeAssets = <MultiAsset>[];
-    var baseCoin = Value(coin: changeEstimator.coin);
+    var baseCoin = Balance(coin: changeEstimator.coin);
     var output = TransactionOutput(address: changeAddress, amount: baseCoin);
 
     for (final policy in baseMultiAsset.bundle.entries) {
       var oldAmount = output.amount;
-      var val = const Value(coin: Coin(0));
+      var val = const Balance(coin: Coin(0));
       var nextNft = const MultiAsset(bundle: {});
       var rebuiltAssets = <AssetName, Coin>{};
 
@@ -410,7 +410,7 @@ final class TransactionBuilder extends Equatable {
           changeAssets.add(output.amount.multiAsset!);
 
           // 2. create a new output with the base coin value as zero
-          baseCoin = const Value(coin: Coin(0));
+          baseCoin = const Balance(coin: Coin(0));
           output = TransactionOutput(
             address: changeAddress,
             amount: baseCoin,
@@ -418,7 +418,7 @@ final class TransactionBuilder extends Equatable {
 
           // 3. continue building the new output from the asset we stopped
           oldAmount = output.amount;
-          val = const Value(coin: Coin(0));
+          val = const Balance(coin: Coin(0));
           nextNft = const MultiAsset(bundle: {});
           rebuiltAssets = {};
         }
@@ -542,13 +542,13 @@ final class TransactionOutputBuilder {
   }) {
     final minOutput = TransactionOutput(
       address: address,
-      amount: const Value(coin: Coin(0)),
+      amount: const Balance(coin: Coin(0)),
     );
 
     final minPossibleCoin = minimumAdaForOutput(minOutput, coinsPerUtxoByte);
 
     final checkOutput = minOutput.copyWith(
-      amount: Value(
+      amount: Balance(
         coin: minPossibleCoin,
         multiAsset: multiAsset,
       ),
@@ -557,7 +557,7 @@ final class TransactionOutputBuilder {
     final requiredCoin = minimumAdaForOutput(checkOutput, coinsPerUtxoByte);
     return TransactionOutput(
       address: address,
-      amount: Value(coin: requiredCoin, multiAsset: multiAsset),
+      amount: Balance(coin: requiredCoin, multiAsset: multiAsset),
     );
   }
 

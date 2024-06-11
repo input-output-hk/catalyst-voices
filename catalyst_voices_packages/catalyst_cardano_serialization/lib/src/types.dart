@@ -77,21 +77,21 @@ extension type const SlotBigNum(int value) {
 /// Represents the balance of the wallet in terms of [Coin].
 ///
 /// For now, other assets than Ada are not supported and are ignored.
-final class Value extends Equatable {
+final class Balance extends Equatable {
   /// The amount of [Coin] that the wallet holds.
   final Coin coin;
 
   /// The amounts of native assets that the wallet holds.
   final MultiAsset? multiAsset;
 
-  /// The default constructor for [Value].
-  const Value({
+  /// The default constructor for [Balance].
+  const Balance({
     required this.coin,
     this.multiAsset,
   });
 
   /// Deserializes the type from cbor.
-  factory Value.fromCbor(CborValue value) {
+  factory Balance.fromCbor(CborValue value) {
     final CborValue coin;
     if (value is CborList) {
       coin = value.first;
@@ -106,7 +106,7 @@ final class Value extends Equatable {
       multiAsset = null;
     }
 
-    return Value(
+    return Balance(
       coin: Coin.fromCbor(coin),
       multiAsset: multiAsset != null ? MultiAsset.fromCbor(multiAsset) : null,
     );
@@ -125,8 +125,8 @@ final class Value extends Equatable {
     ]);
   }
 
-  /// Adds [other] value to this value and returns a new [Value].
-  Value operator +(Value other) {
+  /// Adds [other] value to this value and returns a new [Balance].
+  Balance operator +(Balance other) {
     final MultiAsset? newMultiAsset;
     if (multiAsset == null && other.multiAsset == null) {
       newMultiAsset = null;
@@ -136,14 +136,14 @@ final class Value extends Equatable {
     }
 
     final newCoin = coin + other.coin;
-    return Value(
+    return Balance(
       coin: newCoin,
       multiAsset: newMultiAsset,
     );
   }
 
-  /// Subtracts [other] values from this value and returns a new [Value].
-  Value operator -(Value other) {
+  /// Subtracts [other] values from this value and returns a new [Balance].
+  Balance operator -(Balance other) {
     final MultiAsset? newMultiAsset;
     if (multiAsset != null && other.multiAsset != null) {
       newMultiAsset = multiAsset! - other.multiAsset!;
@@ -156,7 +156,7 @@ final class Value extends Equatable {
     }
 
     final newCoin = coin - other.coin;
-    return Value(
+    return Balance(
       coin: newCoin,
       multiAsset: newMultiAsset,
     );
@@ -180,11 +180,11 @@ final class Value extends Equatable {
   }
 
   /// Return a copy of this value with [coin] and [multiAsset] if present.
-  Value copyWith({
+  Balance copyWith({
     Coin? coin,
     MultiAsset? multiAsset,
   }) {
-    return Value(
+    return Balance(
       coin: coin ?? this.coin,
       multiAsset: multiAsset ?? this.multiAsset,
     );

@@ -185,7 +185,7 @@ final class TransactionOutput extends Equatable {
   final ShelleyAddress address;
 
   /// The leftover change from the previous transaction that can be spent.
-  final Value amount;
+  final Balance amount;
 
   /// The default constructor for [TransactionOutput].
   const TransactionOutput({
@@ -201,7 +201,7 @@ final class TransactionOutput extends Equatable {
 
     return TransactionOutput(
       address: ShelleyAddress.fromCbor(address),
-      amount: Value.fromCbor(amount),
+      amount: Balance.fromCbor(amount),
     );
   }
 
@@ -216,7 +216,7 @@ final class TransactionOutput extends Equatable {
   /// Return a copy of this output with [address] and [amount] if present.
   TransactionOutput copyWith({
     ShelleyAddress? address,
-    Value? amount,
+    Balance? amount,
   }) {
     return TransactionOutput(
       address: address ?? this.address,
