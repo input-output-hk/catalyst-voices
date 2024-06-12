@@ -56,10 +56,12 @@ For testing purposes the ScyllaDB is accessible on the Cluster IP Address: `192.
 
 ### Setup hosts on windows
 
-On Windows you need to setup the hosts before starting the cluster
-From Windows terminal open the hosts file:
-`notepad %SystemRoot%\System32\drivers\etc\hosts`
-and copy the hosts from `./shared/extra.hosts` into the Windows host file
+On Windows you need to setup the hosts before starting the cluster  
+From Windows terminal open the hosts file:  
+```sh
+notepad %SystemRoot%\System32\drivers\etc\hosts  
+```  
+and copy the hosts from `./shared/extra.hosts` into the Windows host file  
 
 ### Startup
 
