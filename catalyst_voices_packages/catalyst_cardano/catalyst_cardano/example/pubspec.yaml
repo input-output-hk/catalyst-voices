@@ -26,6 +26,8 @@ dev_dependencies:
     path: ../../../catalyst_analysis
   flutter_test:
     sdk: flutter
+  integration_test:
+    sdk: flutter
 
 flutter:
   uses-material-design: true
