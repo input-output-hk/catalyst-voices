@@ -80,7 +80,7 @@ From the root of the repo:
 just show-cluster
 ```
 
-Note the report is **VERY** Wide.  
+Note the report is **VERY** Wide.
 Best viewed with a small terminal font.
 
 ### Suspending the Cluster
@@ -114,7 +114,7 @@ These services are not deployed by default.
 * [Catalyst Voices Backend](http://voices.cluster.test/api/)
   * [HTTPS](https://voices.cluster.test/api/)
 * [Catalyst Voices Documentation](http://docs.voices.cluster.test/)
-  * [HTTPS](https://voices.cluster.test/docs/)
+  * [HTTPS](https://docs.voices.cluster.test/)
 
 ### Deploying Catalyst Voices Frontend and Backend Services
 
