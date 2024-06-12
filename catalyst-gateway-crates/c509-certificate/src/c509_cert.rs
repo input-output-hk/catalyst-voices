@@ -192,27 +192,18 @@ pub(crate) fn generate_unsigned_c509_cert(tbs_cert: TbsCertificate) -> Vec<u8> {
     let _unused = encoder.array(C509_CERTIFICATE_ELEMENTS);
     // Encode the certificate type
     let _unused = encoder.u8(tbs_cert.certificate_type as u8);
-    // Encode the certificate serial number
     tbs_cert.certificate_serial_number.encode(&mut encoder);
-    // Encode issuer
     tbs_cert.issuer.encode(&mut encoder);
-    // Encode validity_not_before
     tbs_cert.validity_not_before.encode(&mut encoder);
-    // Encode validity_not_after
     tbs_cert.validity_not_after.encode(&mut encoder);
-    // Encode subject
     tbs_cert.subject.encode(&mut encoder);
-    // Encode subject public key
     encode_subject_public_key(
         tbs_cert.subject_public_key_algo,
         tbs_cert.subject_public_key,
         &mut encoder,
     );
-    // Encode extensions
     encode_extensions(tbs_cert.extensions, &mut encoder);
-    // Encode issuer signature algorithm
     encode_signature_algorithm(tbs_cert.issuer_sig_algo, &mut encoder);
-    // issuerSignatureValue
     encode_issuer_signature_value(vec![], &mut encoder);
 
     buffer
