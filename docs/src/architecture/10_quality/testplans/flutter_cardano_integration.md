@@ -87,5 +87,7 @@ User submit transactions
 
 | \#  | OBJECTIVE | STEPS | EXPECTED RESULTS | TO BE AUTOMATED |
 | --- | --------- | ----- | ---------------- | --------------- |
-| 1   | User can retrieve his wallet details |  Start application, Download wallet chrome extention, Connect wallet extention in the application  | The application and the api will show the correct wallet details | YES  |
-| 2   | User can sign data | Connect the wallet as #1, click sign data,
+| 1   | User can retrieve his wallet details |  Start application, Download wallet chrome extention, Connect wallet extention in the application, Enable wallet  | Wallet details (balance, addresses, etc.) is correctly returned | YES  |
+| 2   | User can sign data | Connect the wallet as #1, sign data | No exceptions are thrown, VkeyWitness is valid | YES | 
+| 3   | User can sign transactions | Connect the wallet as #1, sign transaction data | No exceptions are thrown, and in TransactionWitnessSet, atleast one VkeyWitness is present | YES |
+| 4   | User can submit transactions | Connect the wallet as #1, submit transaction | No exceptions are thrown, Returned TransactionHash is not empty| YES |
