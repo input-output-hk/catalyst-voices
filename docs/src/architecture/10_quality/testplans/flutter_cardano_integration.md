@@ -36,26 +36,26 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 
 ### Requirements
 
-[EPIC](https://github.com/input-output-hk/catalyst-voices/issues/399)
-[CIP-30](https://cips.cardano.org/cip/CIP-30)
-[CIP-95](https://cips.cardano.org/cip/CIP-95)
-Testing will be focused only on web applications for the time being.
-Focus needs to be on compliance with CIP-30 and CIP-95 specs, reliability and security especially when handling wallet interactions and message signing. UI testing is out of scope, the web application will be used only for setup purpose.
+[EPIC](https://github.com/input-output-hk/catalyst-voices/issues/399)  
+[CIP-30](https://cips.cardano.org/cip/CIP-30)  
+[CIP-95](https://cips.cardano.org/cip/CIP-95)  
+Testing will be focused only on web applications for the time being.  
+Focus needs to be on compliance with CIP-30 and CIP-95 specs, reliability and security especially when handling wallet interactions and message signing. UI testing is out of scope, the web application will be used only for setup purpose.  
 
 ### Acceptance criteria
 
--[] The package must comply with CIP-30 and CIP-95 specifications, focusing on the web.
--[] High unit test coverage to ensure reliability and security.
--[] Clear and comprehensive documentation for developers.
--[] An example web application that effectively demonstrates the package's functionalities.
+-[] The package must comply with CIP-30 and CIP-95 specifications, focusing on the web.  
+-[] High unit test coverage to ensure reliability and security.  
+-[] Clear and comprehensive documentation for developers.  
+-[] An example web application that effectively demonstrates the package's functionalities.  
 
 ### Risks
 
-Documentation is not complete yet, integration dart package might be not enough
+Documentation is not complete yet, integration dart package might be not enough  
 
 ### Tools
 
-The main tool we will use is dart integration test package. We still need to investigate if all the testing needed can be archived only with dart or if we need to use playwright for the web UI part
+The main tool we will use is dart integration test package. We still need to investigate if all the testing needed can be archived only with dart or if we need to use playwright for the web UI part  
 
 ## ACC framework
 
@@ -64,18 +64,18 @@ The main tool we will use is dart integration test package. We still need to inv
 
 ### Attributes
 
-Secure, complaint with CIP 30 and 36, reliable
+Secure, complaint with CIP 30 and 36, reliable    
 
 ### Components
 
-Web application
+Web application  
 
 ### Capabilities
 
-User can retrieve his wallet details
-User can sign data
-User can sign transactions
-User submit transactions
+User can retrieve his wallet details  
+User can sign data  
+User can sign transactions  
+User submit transactions  
 
 ## Integration tests
 
