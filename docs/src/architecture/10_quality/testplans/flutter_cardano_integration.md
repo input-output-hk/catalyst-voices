@@ -44,10 +44,10 @@ Focus needs to be on compliance with CIP-30 and CIP-95 specs, reliability and se
 
 ### Acceptance criteria
 
--[] The package must comply with CIP-30 and CIP-95 specifications, focusing on the web.  
--[] High unit test coverage to ensure reliability and security.  
--[] Clear and comprehensive documentation for developers.  
--[] An example web application that effectively demonstrates the package's functionalities.  
+- The package must comply with CIP-30 and CIP-95 specifications, focusing on the web.  
+- High unit test coverage to ensure reliability and security.  
+- Clear and comprehensive documentation for developers.  
+- An example web application that effectively demonstrates the package's functionalities.  
 
 ### Risks
 
