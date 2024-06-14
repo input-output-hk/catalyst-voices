@@ -54,7 +54,7 @@ Documentation is not complete yet, integration dart package might be not enough
 
 ### Tools
 
-The main tool we will use is dart integration test package. We still need to investigate if all the testing needed can be archived only with dart or if we need to use playwright for the web UI part  
+The main tool we will use is dart integration test package. We still need to investigate if all the testing needed can be achieved only with dart or if we need to use playwright for the web UI part  
 
 ## ACC framework
 
@@ -63,7 +63,7 @@ The main tool we will use is dart integration test package. We still need to inv
 
 ### Attributes
 
-Secure, complaint with CIP 30 and 36, reliable    
+Secure, comply with CIP-30 and CIP-95, reliable    
 
 ### Components
 
