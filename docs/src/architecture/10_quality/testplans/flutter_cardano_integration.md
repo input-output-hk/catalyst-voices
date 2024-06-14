@@ -23,8 +23,7 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 ## General Informations
 
 ### Abstract
-
-> :memo: **Note:** Describe the design and architecture of the system in a way that highlights possible points of failure
+Catalyst Cardano is a web application that facilitate interaction with the Cardano blockchain, incorporating CIP-30 (Wallet DAppBridge) and CIP-95 (Message Signing) specifications. It requires connection to the wallet third party extensions (e.g Eternl) to be able to perform actions like retrieving wallet details, signing data/transactions and submiting transactions.
 
 ### Stakeholders
 
