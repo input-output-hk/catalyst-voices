@@ -1,6 +1,4 @@
-VERSION 0.7
-
-#cspell: words rustfmt
+VERSION 0.8
 
 # Set up our target toolchains, and copy our files.
 builder:
