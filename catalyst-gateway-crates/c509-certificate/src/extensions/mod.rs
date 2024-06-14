@@ -50,9 +50,9 @@ impl CborEncoder for ExtensionValue {
     }
 }
 
-#[allow(unused)]
 /// Enum of possible C509 extension types.
 /// Please refer to the [c509-certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/) Section 9.4 C509 Extensions Registry for more information.
+#[allow(unused)]
 pub enum ExtensionRegistry {
     SubjectKeyIdentifier = 1,
     KeyUsage = 2,

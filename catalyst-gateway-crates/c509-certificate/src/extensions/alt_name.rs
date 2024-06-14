@@ -8,10 +8,10 @@ use crate::cbor_encoder::CborEncoder;
 
 // ---------------------------------------------------
 
-#[allow(unused)]
-#[derive(Debug, PartialEq, Clone, Copy)]
 /// Enum of `GeneralNamesRegistry` in a C509 certificate.
 /// Please refer to the [c509-certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/) Section 9.9 C509 General Names Registry for more information.
+#[allow(unused)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum GeneralNamesRegistry {
     OtherNameBundleEID = -3,          // eid-structure from RFC 9171
     OtherNameSmtpUTF8Mailbox = -2,    // text
@@ -27,7 +27,6 @@ pub enum GeneralNamesRegistry {
 
 // ---------------------------------------------------
 
-#[derive(Clone)]
 /// Represents the type and serial number of the `OtherName` type in a C509 certificate.
 /// Struct of `OtherNameType` 'otherName + hardwareModuleName' is used in a form
 /// of [ ~oid, bytes ] which, contain the pair ( hwType, hwSerialNum )
@@ -35,6 +34,7 @@ pub enum GeneralNamesRegistry {
 /// # Fields
 /// * `hw_type` - The hardware type of the device.
 /// * `hw_serial_num` - The serial number of the device.
+#[derive(Clone)]
 pub struct OtherNameType {
     pub hw_type: String,
     pub hw_serial_num: Vec<u8>,
@@ -57,8 +57,6 @@ impl CborEncoder for OtherNameType {
 
 // ---------------------------------------------------
 
-#[allow(unused)]
-#[derive(Clone)]
 /// An Enum of `BundleProtocolURISchemeTypes` defines the type of URI scheme
 /// URI Scheme can be found in [RFC9171](https://datatracker.ietf.org/doc/rfc9171/) Section 9.7
 ///
@@ -82,18 +80,20 @@ impl CborEncoder for OtherNameType {
 /// service-nbr = 1*DIGIT
 /// ```
 /// Note that 1*DIGIT consists of one or more digits
+#[allow(unused)]
+#[derive(Clone)]
 pub(crate) enum BundleProtocolURISchemeTypes {
     Dtn = 1,
     Ipn = 2,
 }
 
-#[derive(Clone)]
 /// Represents an Endpoint IDentifier (EID) in the Bundle Protocol.
 /// EID structure define in https://datatracker.ietf.org/doc/rfc9171/
 ///
 /// # Fields
 /// * `uri_code` - The URI code of the EID.
 /// * `ssp` - The Scheme Specific Part (SSP) of the EID.
+#[derive(Clone)]
 pub struct Eid {
     pub uri_code: BundleProtocolURISchemeTypes,
     pub ssp: String,
@@ -116,9 +116,9 @@ impl CborEncoder for Eid {
 
 // ---------------------------------------------------
 
+/// Enum represents the types of `GeneralNamesRegistryType`.
 #[allow(unused)]
 #[derive(Clone)]
-/// Enum represents the types of `GeneralNamesRegistryType`.
 pub(crate) enum GeneralNamesRegistryType {
     Text(String),
     Bytes(Vec<u8>),
@@ -127,7 +127,6 @@ pub(crate) enum GeneralNamesRegistryType {
     Eid(Eid),
 }
 
-#[derive(Clone)]
 /// Represents a `GeneralName` in a C509 certificate.
 /// ( GeneralNameType : int, GeneralNameValue : any )
 ///
@@ -136,6 +135,7 @@ pub(crate) enum GeneralNamesRegistryType {
 /// * `gn_value` - The value of the general name, which can be different types of general
 ///   name values.
 /// * `critical` - A boolean indicating whether the general name is critical.
+#[derive(Clone)]
 pub struct GeneralName {
     pub gn_name: GeneralNamesRegistry,
     pub gn_value: GeneralNamesRegistryType,

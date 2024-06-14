@@ -1,21 +1,21 @@
 //! This module provides essential enumerators used in C509 certificates.
 //! Please refer to the [c509-certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/) for more information.
 
-#[allow(unused)]
 /// Represents the types of C509 certificates.
 ///
 /// Currently, only natively signed C509 certificates are supported.
+#[allow(unused)]
 pub enum C509CertificateType {
     // Natively Signed C509 cert
     SignedC509Cert,
 }
 
-#[allow(unused)]
-#[derive(PartialEq, Copy, Clone)]
 /// Enum of C509 Attributes Registry used in certificates.
 ///
 /// Each attribute is assigned a unique integer value.
 /// Please refer to the [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/) Section 9.3 C509 Attributes Registry for more information.
+#[allow(unused)]
+#[derive(PartialEq, Copy, Clone)]
 pub enum AttributesRegistry {
     /// Email address (emailAddress, e-mailAddress).
     Email = 0,
@@ -79,12 +79,12 @@ pub enum AttributesRegistry {
     UnstructuredAddress = 29,
 }
 
-#[allow(unused)]
-#[derive(PartialEq)]
 /// Enum of registry of public key algorithms.
 ///
 /// Each algorithm is assigned a unique integer value.
 /// Please refer to the [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/) 9.11 C509 Public Key Algorithms Registry for more information.
+#[allow(unused)]
+#[derive(PartialEq)]
 pub enum PubKeyAlgoRegistry {
     /// RSA public key algorithm
     RSA = 0,
@@ -120,12 +120,12 @@ pub enum PubKeyAlgoRegistry {
     SM2P256v1 = 28,
 }
 
-#[allow(unused)]
-#[derive(PartialEq)]
 /// Enum of registry of signature algorithms.
 ///
 /// Each algorithm is assigned a unique integer value.
 /// Please refer to the [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/) 9.10 C509 Signature Algorithms Registry for more information.
+#[allow(unused)]
+#[derive(PartialEq)]
 pub enum SignatureAlgoRegistry {
     /// RSASSA-PKCS1-v1_5 with SHA-1
     RsassaPkcs1V15Sha1 = -256,

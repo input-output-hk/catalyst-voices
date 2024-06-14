@@ -42,8 +42,8 @@ pub(crate) trait CborEncoder {
 
 // ---------------------------------------------------
 
-#[allow(unused)]
 /// Represents an unwrapped unsigned 64-bit integer.
+#[allow(unused)]
 pub enum UnwrappedBiguint {
     U64Value(u64),
 }
@@ -113,21 +113,21 @@ pub struct RelativeDistinguishedName {
     pub value: AttributeRegistryValue,
 }
 
-#[allow(unused)]
 /// Represents the value of an attribute in the registry.
 ///
 /// # Fields
 ///
 /// * `str_type` - The type of the string, represented as a `StringType`.
 /// * `str_value` - The value of the string.
+#[allow(unused)]
 pub struct AttributeRegistryValue {
     pub str_type: StringType,
     pub str_value: String,
 }
 
+/// Enum of string types that are used in C509 certificate.
 #[allow(unused)]
 #[derive(Debug)]
-/// Enum of string types that are used in C509 certificate.
 pub enum StringType {
     Utf8String,
 }
@@ -166,7 +166,6 @@ enum Error {
     HexDecodingError(#[from] FromHexError),
 }
 
-#[allow(unused)]
 /// Encodes a common name (CN) using the provided CBOR encoder.
 /// Please refer to the [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/) Section 3.1 Message Fields for more information.
 ///
@@ -179,6 +178,7 @@ enum Error {
 /// # Errors
 ///
 /// Returns an `Error` if the regex creation or hex decoding fails.
+#[allow(unused)]
 fn encode_common_name_cn(
     name: &str, encoder: &mut minicbor::Encoder<&mut Vec<u8>>,
 ) -> Result<(), Error> {

@@ -92,7 +92,6 @@ fn encode_issuer_signature_value(_sig_value: Vec<u8>, encoder: &mut Encoder<&mut
 
 // ---------------------------------------------------
 
-#[wasm_bindgen]
 /// Represents the "To Be Signed" (TBS) part of a C509 certificate.
 ///
 /// The TBS certificate contains all the information that will be signed by the
@@ -118,6 +117,7 @@ fn encode_issuer_signature_value(_sig_value: Vec<u8>, encoder: &mut Encoder<&mut
 ///   certificate.
 ///
 /// Please refer to the [c509-certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/) Figure 1: CDDL for C509Certificate for more information.
+#[wasm_bindgen]
 pub struct TbsCertificate {
     certificate_type: C509CertificateType,
     certificate_serial_number: UnwrappedBiguint,
