@@ -60,6 +60,14 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 > :memo: **Note:** Business requirements, insert links to relevant Github or JIRA tickets,
 > list what platforms are supported, what will not be tested, etc
 
+### Acceptance criteria
+
+> :memo: **Note:** List the acceptance criteria for this feature  
+
+### Risks
+
+> :memo: **Note:** Describe what risks can affect the accomplishment of the testplan.For example documentation is missing, not enough resources etc
+
 ### Tools
 
 > :memo: **Note:** Describe what tools will be needed for the testing, if new tools are needed to be developed
