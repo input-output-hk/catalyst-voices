@@ -103,8 +103,10 @@ open coverage/index.html
 ```
 
 ## Common issues
+
 1. Mixed dependencies from a hosted repository and local path:
-```
+
+```sh
 Because every version of catalyst_cardano_web from path depends on catalyst_cardano_serialization
   from hosted and catalyst_voices depends on catalyst_cardano_serialization from path,
   catalyst_cardano_web from path is forbidden.
@@ -115,7 +117,8 @@ Solution:
 
 When adding a new local dependency, hosted repository (i.e. pub.dev) should be preferred over local paths.
 However to make it easier to depend on local changes use `melos bootstrap` to generate `pubspec_overrides.yaml`.
-This allows to publish the source code on remote repository that points to official dependency versions but use local changes during regular development.
+This allows to publish the source code on remote repository that points to official dependency versions
+but use local changes during regular development.
 
 The issue appears if you have added a new dependency or pulled code that adds dependency and you haven't run `melos bootstrap`.
 
