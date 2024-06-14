@@ -12,7 +12,6 @@ mod c509_enum;
 mod cbor_encoder;
 mod extensions;
 
-#[wasm_bindgen]
 /// Generates an unsigned C509 certificate from the provided `TbsCertificate`.
 ///
 /// C509 certicate contains 2 parts
@@ -53,6 +52,7 @@ mod extensions;
 ///
 /// This function relies on the `c509_cert` module's `generate_unsigned_c509_cert` function for the
 /// actual generation process.
+#[wasm_bindgen]
 pub fn generate_unsigned_c509_cert(tbs_cert: TbsCertificate) -> Vec<u8> {
     c509_cert::generate_unsigned_c509_cert(tbs_cert)
 }
