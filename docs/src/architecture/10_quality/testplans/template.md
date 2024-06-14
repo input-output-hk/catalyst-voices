@@ -16,6 +16,8 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
   * [Abstract](#abstract)
   * [Stakeholders](#stakeholders)
   * [Requirements](#requirements)
+  * [Acceptance criteria](#acceptance-criteria)
+  * [Risks](#risks)
   * [Tools](#tools)
 * [ACC framework](#acc-framework)
   * [Attributes](#attributes)
@@ -62,7 +64,7 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 
 ### Acceptance criteria
 
-> :memo: **Note:** List the acceptance criteria for this feature  
+> :memo: **Note:** List the acceptance criteria for this feature
 
 ### Risks
 
