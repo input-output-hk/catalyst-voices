@@ -63,8 +63,9 @@ impl<'b, C> Decode<'b, C> for C509oid<'_> {
 
 #[cfg(test)]
 mod test_c509_oid {
+
     use asn1_rs::oid;
-    use minicbor::{Decoder, Encoder};
+    use minicbor::{Decode, Decoder, Encode, Encoder};
 
     use crate::c509_oid::C509oid;
 
@@ -75,11 +76,12 @@ mod test_c509_oid {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
         let oid = C509oid::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1));
-        encoder.encode(&oid).expect("Failed to encode OID");
+        oid.encode(&mut encoder, &mut ())
+            .expect("Failed to encode OID");
         assert_eq!(hex::encode(buffer.clone()), "49608648016503040201");
 
         let mut decoder = Decoder::new(&buffer);
-        let decoded_oid = decoder.decode::<C509oid>().expect("Failed to decode OID");
+        let decoded_oid = C509oid::decode(&mut decoder, &mut ()).expect("Failed to decode OID");
         assert_eq!(oid, decoded_oid);
     }
 
@@ -89,11 +91,12 @@ mod test_c509_oid {
         let mut encoder = Encoder::new(&mut buffer);
         // OID_HASH_SHA1 = 1.3.14.3.2.26
         let oid = C509oid::new(oid_registry::OID_HASH_SHA1);
-        encoder.encode(&oid).expect("Failed to encode OID");
+        oid.encode(&mut encoder, &mut ())
+            .expect("Failed to encode OID");
         assert_eq!(hex::encode(buffer.clone()), "452b0e03021a");
 
         let mut decoder = Decoder::new(&buffer);
-        let decoded_oid = decoder.decode::<C509oid>().expect("Failed to decode OID");
+        let decoded_oid = C509oid::decode(&mut decoder, &mut ()).expect("Failed to decode OID");
         assert_eq!(oid, decoded_oid);
     }
 
