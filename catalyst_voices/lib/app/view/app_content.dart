@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/routes/routes.dart' show AppRouter;
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,12 +29,8 @@ final class AppContent extends StatelessWidget {
         supportedLocales: VoicesLocalizations.supportedLocales,
         localeListResolutionCallback: basicLocaleListResolution,
         routerConfig: _routeConfig(context),
-        theme: ThemeData(
-          //brightness: Brightness.dark,
-          bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-            type: BottomNavigationBarType.fixed,
-          ),
-        ),
+        theme: ThemeBuilder.buildTheme(BrandKey.catalyst),
+        darkTheme: ThemeBuilder.buildDarkTheme(BrandKey.catalyst),
       ),
     );
   }
