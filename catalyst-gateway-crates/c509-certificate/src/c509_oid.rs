@@ -3,7 +3,11 @@
 //! Please refer to [CDDL Wrapping](https://datatracker.ietf.org/doc/html/rfc8610#section-3.7) for unwrapped types.
 
 use asn1_rs::FromDer;
-use minicbor::{Decoder, Encoder};
+use minicbor::{
+    decode,
+    encode::{self, Write},
+    Decode, Decoder, Encode, Encoder,
+};
 use oid_registry::Oid;
 
 /// Represent an instance of C509 OID where it contains an oid.
@@ -22,7 +26,9 @@ impl<'a> C509oid<'a> {
     pub fn new(oid: Oid<'a>) -> Self {
         C509oid { oid }
     }
+}
 
+impl<C> Encode<C> for C509oid<'_> {
     /// Encode an unwrapped OID (as bytes string without tag).
     /// ~oid indicates a unwrapped OID.
     ///
@@ -30,30 +36,27 @@ impl<'a> C509oid<'a> {
     ///
     /// A vector of bytes containing the CBOR encoded unwrapped OID.
     /// If the encoding fails, it will return an error.
-    pub fn encode(&self) -> anyhow::Result<Vec<u8>> {
-        let mut buffer = Vec::new();
-        let mut encoder = Encoder::new(&mut buffer);
-        encoder
-            .bytes((&self.oid).as_bytes())
-            .map_err(|e| anyhow::anyhow!(e.to_string()))?;
-        Ok(buffer)
+    fn encode<W: Write>(
+        &self, e: &mut Encoder<W>, _ctx: &mut C,
+    ) -> Result<(), encode::Error<W::Error>> {
+        let oid_bytes: &[u8] = self.oid.as_bytes();
+        e.bytes(oid_bytes)?.ok()
     }
+}
 
+impl<'b, C> Decode<'b, C> for C509oid<'_> {
     /// Decode an unwrapped OID.
     ///
     /// # Returns
     ///
     /// A C509oid instance containing the decoded OID.
     /// If the decoding fails, it will return an error.
-    pub fn decode(cbor_bytes: &Vec<u8>) -> anyhow::Result<C509oid> {
-        let mut decoder = Decoder::new(cbor_bytes);
-        let oid_bytes = decoder
-            .bytes()
-            .map_err(|e| anyhow::anyhow!(e.to_string()))?;
+    fn decode(d: &mut Decoder<'b>, _ctx: &mut C) -> Result<Self, decode::Error> {
+        let oid_bytes = d.bytes()?;
         // Time Length Value (TLV) format.
         let mut der_bytes = vec![DER_OID_TAG, oid_bytes.len() as u8];
         der_bytes.extend_from_slice(oid_bytes);
-        let oid = Oid::from_der(&der_bytes).map_err(|e| anyhow::anyhow!(e.to_string()))?;
+        let oid = Oid::from_der(&der_bytes).map_err(|e| decode::Error::message(e.to_string()))?;
         Ok(C509oid::new(oid.1.to_owned()))
     }
 }
@@ -61,6 +64,7 @@ impl<'a> C509oid<'a> {
 #[cfg(test)]
 mod test_c509_oid {
     use asn1_rs::oid;
+    use minicbor::{Decoder, Encoder};
 
     use crate::c509_oid::C509oid;
 
@@ -68,26 +72,29 @@ mod test_c509_oid {
     // https://datatracker.ietf.org/doc/rfc9090/
     #[test]
     fn test_encode_decode() {
+        let mut buffer = Vec::new();
+        let mut encoder = Encoder::new(&mut buffer);
         let oid = C509oid::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1));
-        let encoded_unwrap_oid = oid.encode().expect("Failed to encode OID");
-        assert_eq!(
-            hex::encode(encoded_unwrap_oid.clone()),
-            "49608648016503040201"
-        );
-        let decoded_unwrap_oid =
-            C509oid::decode(&encoded_unwrap_oid).expect("Failed to decode OID");
-        assert_eq!(oid, decoded_unwrap_oid);
+        encoder.encode(&oid).expect("Failed to encode OID");
+        assert_eq!(hex::encode(buffer.clone()), "49608648016503040201");
+
+        let mut decoder = Decoder::new(&buffer);
+        let decoded_oid = decoder.decode::<C509oid>().expect("Failed to decode OID");
+        assert_eq!(oid, decoded_oid);
     }
 
     #[test]
     fn test_encode_decode_from_registry() {
+        let mut buffer = Vec::new();
+        let mut encoder = Encoder::new(&mut buffer);
         // OID_HASH_SHA1 = 1.3.14.3.2.26
         let oid = C509oid::new(oid_registry::OID_HASH_SHA1);
-        let encoded_unwrap_oid = oid.encode().expect("Failed to encode OID");
-        assert_eq!(hex::encode(encoded_unwrap_oid.clone()), "452b0e03021a");
-        let decoded_unwrap_oid =
-            C509oid::decode(&encoded_unwrap_oid).expect("Failed to decode OID");
-        assert_eq!(oid, decoded_unwrap_oid);
+        encoder.encode(&oid).expect("Failed to encode OID");
+        assert_eq!(hex::encode(buffer.clone()), "452b0e03021a");
+
+        let mut decoder = Decoder::new(&buffer);
+        let decoded_oid = decoder.decode::<C509oid>().expect("Failed to decode OID");
+        assert_eq!(oid, decoded_oid);
     }
 
     #[test]
