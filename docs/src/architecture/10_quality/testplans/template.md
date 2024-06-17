@@ -68,7 +68,8 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 
 ### Risks
 
-> :memo: **Note:** Describe what risks can affect the accomplishment of the testplan.For example documentation is missing, not enough resources etc
+> :memo: **Note:** Describe what risks can affect the accomplishment of the testplan.
+For example documentation is missing, not enough resources etc
 
 ### Tools
 
