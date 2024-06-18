@@ -16,14 +16,49 @@ use oid_registry::Oid;
 #[derive(Debug, PartialEq)]
 pub struct C509oid<'a> {
     oid: Oid<'a>,
+    pen_supported:bool
 }
 
+/*
+/// A C509 Oid with Registered Integer Encoding/Decoding.
+pub struct C509oidRegistered {
+    oid: C509oid,
+    registration_table: Arc<&phf::Map<Oid, Keyword>>
+}
+
+impl C509oidRegistered {
+    fn new(oid: Oid<'a>, table: Arc<&phf::Map<Oid, Keyword>>) {
+        C509oidRegistered {
+            oid : C509oid::new(oid),
+            registration_table: table.clone()
+        }
+    }
+}
+*/
+
+/*
+// In a seperate file say "c509_oid_extension"
+struct C509ExtensionOid(C509oidRegistered);
+
+// Use https://github.com/billyrieger/bimap-rs instead of PHF
+static ExtensionsTable: phf::Map<oid, uint64> = phf_map! {
+    oid!(1.2.3.4.5.6) => 5,
+    oid!(1.2.3.4.5.7.8.9) => 11,
+};
+
+
+impl C509ExtensionOid {
+    fn new(oid: Oid<'a>) {
+        C509ExtensionOid(C509oidRegistered::new(oid, ExtenionsTable).pen_encoded)
+    }
+}
+*/
 /// Tag representing DER OID.
 const DER_OID_TAG: u8 = 0x06;
 /// Tag representing DER Relative OID.
 const DER_RELATIVE_OID_TAG: u8 = 0x0d;
 /// IANA Private Enterprise Number OID prefix.
-const PEN_PREFIX: &str = "1.3.6.1.4.1.";
+const PEN_PREFIX: Oid<'static> = oid!(1.3.6 .1 .4 .1);
 /// Number of bytes for the PEN_PREFIX.
 /// - five bytes shorter by leaving out the prefix h'2b06010401'
 /// from the enclosed byte string.
@@ -36,7 +71,13 @@ const OID_PEN_TAG: u64 = 112;
 impl<'a> C509oid<'a> {
     /// Create an new instance of C509oid.
     pub fn new(oid: Oid<'a>) -> Self {
-        C509oid { oid }
+        C509oid { oid, pen_supported = false }
+    }
+
+    /// Is PEN Encoding supported for this OID
+    pub fn pen_encoded(&self) -> Self {
+        self.pen_supported = true;
+        self
     }
 }
 
@@ -53,9 +94,17 @@ impl<C> Encode<C> for C509oid<'_> {
     ) -> Result<(), encode::Error<W::Error>> {
         let oid_bytes = self.oid.as_bytes();
 
-        if self.oid.to_string().starts_with(PEN_PREFIX) {
+        if self.pen_supported && self.oid.starts_with(PEN_PREFIX) {
             e.tag(Tag::new(OID_PEN_TAG))?;
-            e.bytes(&oid_bytes[PEN_PREFIX_BYTES_LEN..])?.ok()
+
+            // raw_oid = [1,3,6,1,4,1,...]
+            let raw_oid: Vec<u64> = self.oid.iter().collect();
+            // relative_oid = raw_oid relative to 1.3.6.1.4.1
+            let relative_oid = Oid::from_relative(raw_oid[6..])?;
+            // ber encoded realtive OID.
+            let ber_encoded_relative_oid = relative_oid.as_bytes();
+
+            e.bytes(ber_encoded_relative_oid)?.ok()
         } else {
             e.bytes(oid_bytes)?.ok()
         }
@@ -70,30 +119,34 @@ impl<'b, C> Decode<'b, C> for C509oid<'_> {
     /// A C509oid instance containing the decoded OID.
     /// If the decoding fails, it will return an error.
     fn decode(d: &mut Decoder<'b>, _ctx: &mut C) -> Result<Self, decode::Error> {
-        let dt = d.datatype()?;
-        if dt == minicbor::data::Type::Tag {
-            let tag = d.tag()?;
-            if tag == Tag::new(112) {
-                let oid_bytes = d.bytes()?;
-                let mut der_bytes = vec![DER_RELATIVE_OID_TAG, 6 + oid_bytes.len() as u8, 1, 3, 6, 1, 4, 1];
-                der_bytes.extend_from_slice(oid_bytes);
-                println!("OID bytes: {:?}", der_bytes);
-                let oid =
-                    Oid::from_der(&der_bytes).map_err(|e| decode::Error::message(e.to_string()))?;
-                return Ok(C509oid::new(oid.1.to_owned()));
-            } else {
-                todo!()
-            }
-        } else {
+
+        if (minicbor::data::Type::Tag == d.datatype()?) && (Tag::new(PEN_PREFIX) == d.tag()?) {
+            decode_pen(d.bytes()?)?
+
+            // This should be a function.
             let oid_bytes = d.bytes()?;
-            // Time Length Value (TLV) format.
-            let mut der_bytes = vec![DER_OID_TAG, oid_bytes.len() as u8];
-            der_bytes.extend_from_slice(oid_bytes);
-            println!("OID bytes: {:?}", der_bytes);
-            let oid =
-                Oid::from_der(&der_bytes).map_err(|e| decode::Error::message(e.to_string()))?;
-            Ok(C509oid::new(oid.1.to_owned()))
+           
+            let relative_oid = Oid::from_ber_relative(oid_bytes)?;
+
+            // [...]
+            let raw_relative_oid: Vec<u64> = self.oid.iter().collect();
+            let raw_oid = PEN_PREFIX.oid.iter().collect().append(raw_relative_oid);
+
+            let oid =  Oid::from(raw_oid).map_err(|e| decode::Error::message(e.to_string()))?;
+
+            return Ok(C509oid::new(oid.1.to_owned()).pen_encoded());
         }
+
+        // Not a PEN Relative OID, so treat as a normal OID
+        let oid_bytes = d.bytes()?;
+        // Time Length Value (TLV) format.
+        let mut der_bytes = vec![DER_OID_TAG, oid_bytes.len() as u8];
+        der_bytes.extend_from_slice(oid_bytes);
+        println!("OID bytes: {:?}", der_bytes);
+        let oid =
+            Oid::from_der(&der_bytes).map_err(|e| decode::Error::message(e.to_string()))?;
+        Ok(C509oid::new(oid.1.to_owned()))
+        
     }
 }
 
