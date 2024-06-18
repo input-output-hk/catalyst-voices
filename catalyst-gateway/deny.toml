@@ -13,7 +13,6 @@ targets = [
     "wasm32-wasip1",
     "wasm32-wasip2",
 ]
-all-features = true
 
 [advisories]
 version = 2
@@ -72,6 +71,7 @@ allow = [
     "Apache-2.0 WITH LLVM-exception",
     "CC0-1.0",
     "ISC",
+    "Unicode-3.0"
 ]
 exceptions = [
     #{ allow = ["Zlib"], crate = "tinyvec" },
