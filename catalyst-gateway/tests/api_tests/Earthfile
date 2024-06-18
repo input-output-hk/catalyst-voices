@@ -1,8 +1,7 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.1.5 AS python-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.1.7 AS python-ci
 
-# builder :
 builder:
     FROM python-ci+python-base
 
@@ -28,4 +27,5 @@ test:
     WAIT
         SAVE ARTIFACT junit-report.xml AS LOCAL api-tests.junit-report.xml
         SAVE ARTIFACT coverage.lcov AS LOCAL api-tests.coverage.info
+
     END
