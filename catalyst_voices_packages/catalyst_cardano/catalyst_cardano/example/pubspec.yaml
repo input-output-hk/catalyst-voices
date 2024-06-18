@@ -20,6 +20,8 @@ dependencies:
   cupertino_icons: ^1.0.6
   flutter:
     sdk: flutter
+  http: ^1.2.1
+  webdriver: ^3.0.3
 
 dev_dependencies:
   catalyst_analysis:
