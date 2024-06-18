@@ -102,7 +102,7 @@ jobs:
      #       if-no-files-found: error
      #       retention-days: 1
 
-      - run: ls /catalyst-gateway/tests/api_tests/
+      - run: ls catalyst-gateway/tests/api_tests/
 
       - name: Collect and upload test coverage
         uses: actions/upload-artifact@v4
