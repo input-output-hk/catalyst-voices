@@ -16,6 +16,7 @@ asyncpg = "^0.29.0"
 requests = "^2.32.0"
 pytest = "^8.0.0"
 python-bitcoinlib = "^0.12.2"
+pytest-cov = "^5.0.0"
 
 [build-system]
 requires = ["poetry-core"]
