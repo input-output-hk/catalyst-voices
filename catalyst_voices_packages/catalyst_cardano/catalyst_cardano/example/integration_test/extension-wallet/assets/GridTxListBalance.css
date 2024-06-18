@@ -1,0 +1,11 @@
+
+.vjs-tree {
+    font-size: 0.75rem;
+    line-height: 1rem;
+}
+.vjs-key {
+    white-space: nowrap;
+}
+.vjs-value {
+    overflow-wrap: break-word;
+}

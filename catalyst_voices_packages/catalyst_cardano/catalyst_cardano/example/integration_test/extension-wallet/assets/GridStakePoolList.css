@@ -1,0 +1,26 @@
+
+.item-text[data-v-85473b4d] {
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500
+}
+@media (min-width: 768px) {
+.item-text[data-v-85473b4d] {
+        font-size: 0.875rem;
+        line-height: 1.25rem
+}
+}
+
+
+.item-text[data-v-e69a52e5] {
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500
+}
+@media (min-width: 768px) {
+.item-text[data-v-e69a52e5] {
+        font-size: 0.875rem;
+        line-height: 1.25rem
+}
+}
+
