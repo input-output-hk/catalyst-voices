@@ -1,8 +1,7 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.1.5 AS python-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.1.7 AS python-ci
 
-# builder :
 builder:
     FROM python-ci+python-base
 
@@ -19,7 +18,7 @@ test:
     WITH DOCKER \
         --compose docker-compose.yml \
         --load event-db:latest=(../../event-db+build) \
-        --load cat-gateway:latest=(../../+package-cat-gateway-with-preprod-snapshot) \
+        --load cat-gateway:latest=(../../+package-cat-gateway-with-preprod) \
         --service cat-gateway \
         --allow-privileged
         RUN poetry run pytest -s --junitxml=junit-report.xml
