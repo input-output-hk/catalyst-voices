@@ -98,7 +98,7 @@ jobs:
      #   if: always()
      #   with:
      #       name: coverage-reports
-     #       path: 'catalyst-gateway/cat-gateway.coverage-report.info'
+     #       path: 'catalyst-gateway/cat-gateway.coverage.info'
      #       if-no-files-found: error
      #       retention-days: 1
 
@@ -173,7 +173,7 @@ jobs:
              # - run: |
              #     curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C /usr/local/bin
              #     ls
-             #     coveralls report cat-gateway.coverage-report.info
+             #     coveralls report cat-gateway.coverage.info
               - run: |
                    cat api-tests.coverage.info
               - name: Coveralls
