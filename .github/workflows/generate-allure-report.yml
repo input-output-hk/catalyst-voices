@@ -72,7 +72,7 @@ jobs:
             runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
             artifact: "false"
 
-      - name: Get backend python test report
+      - name: Get python api test report
         uses: input-output-hk/catalyst-ci/actions/run@master
         if: always()
         continue-on-error: true
