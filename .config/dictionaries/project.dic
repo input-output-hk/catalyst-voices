@@ -30,6 +30,7 @@ COCOAPODS
 codegen
 codepoints
 coti
+coverallsapp
 cryptoxide
 Cunego
 Cupertino
@@ -78,8 +79,8 @@ Joaquín
 jorm
 jormungandr
 Jörmungandr
-junitxml
 junitreport
+junitxml
 Keyhash
 keyserver
 lcov
@@ -102,6 +103,7 @@ mithril
 mitigations
 moderations
 msedgedriver
+multiasset
 multidex
 multiplatform
 Multiplatform
@@ -135,8 +137,8 @@ pubspec
 pytest
 rapidoc
 redoc
-Replayability
 reloadable
+Replayability
 repr
 reqwest
 rfwtxt
@@ -177,6 +179,7 @@ tojunit
 Traceback
 TXNZD
 Typer
+unawaited
 unmanaged
 utxo
 UTXO
@@ -201,5 +204,3 @@ xctest
 xctestrun
 xcworkspace
 yoroi
-multiasset
-unawaited
