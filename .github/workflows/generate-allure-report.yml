@@ -102,12 +102,14 @@ jobs:
      #       if-no-files-found: error
      #       retention-days: 1
 
+      - run: ls /catalyst-gateway/tests/api_tests/
+
       - name: Collect and upload test coverage
         uses: actions/upload-artifact@v4
         if: always()
         with:
             name: coverage-reports
-            path: 'catalyst-gateway/tests/api_tests/api-tests.coverage.info'
+            path: '/catalyst-gateway/tests/api_tests/api-tests.coverage.info'
             if-no-files-found: error
             retention-days: 1
 
