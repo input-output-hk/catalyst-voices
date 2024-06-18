@@ -15,6 +15,9 @@ import bin2hex from "common/helpers/bin2hex";
 import buildUnsignedTx from "common/helpers/buildUnsignedTx";
 import cleanHex from "common/helpers/cleanHex";
 import type { ExtractedWalletApi, TxBuilderArguments } from "types/cardano";
+import { match } from "ts-pattern";
+import { TxBuilderLib } from "common/constants";
+import builidUnsignedTxWithMultiplatformLib from "common/helpers/builidUnsignedTxWithMultiplatformLib";
 
 type Props = {
   selectedWallets: string[];
@@ -71,9 +74,12 @@ function SignTxPanel({ selectedWallets, walletApi }: Props) {
       for (const walletName of Object.keys(activeWallets)) {
         const tmpChange = walletApi[walletName]?.info["changeAddress"]?.raw;
 
-        const tx = await buildUnsignedTx(builderArgs, tmpChange);
+        const txBytes = await match(builderArgs.txBuilderLib)
+          .with(TxBuilderLib.Emurgo, () => buildUnsignedTx(builderArgs, tmpChange))
+          .with(TxBuilderLib.Dcspark, () => builidUnsignedTxWithMultiplatformLib(builderArgs, tmpChange))
+          .otherwise(() => new Uint8Array());
 
-        resTx[walletName] = bin2hex(tx.to_bytes());
+        resTx[walletName] = bin2hex(txBytes);
       }
 
       setValue("walletTx", resTx);

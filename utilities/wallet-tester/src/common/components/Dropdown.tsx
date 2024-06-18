@@ -18,7 +18,7 @@ function Dropdown({ value, items, onSelect = noop }: Props) {
   const valueLabel = items.find((item) => item.value === value)?.label ?? value;
 
   return (
-    <Menu as="div" className="relative inline-block text-left">
+    <Menu as="div" className="relative inline-block text-left w-full">
       <Menu.Button className="flex items-center w-full rounded-md border border-solid border-black/10 p-2">
         {({ open }) => (
           <>
@@ -40,7 +40,7 @@ function Dropdown({ value, items, onSelect = noop }: Props) {
                   "group flex w-full items-center rounded-md px-2 py-2 text-sm"
                 )}
               >
-                <p className="truncate">{item.label}</p>
+                <p title={item.label} className="truncate">{item.label}</p>
               </button>
             )}
           </Menu.Item>

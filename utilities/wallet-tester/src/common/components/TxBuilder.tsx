@@ -19,6 +19,7 @@ import Input from "./Input";
 import TxBuilderMultiFieldsSection from "./TxBuilderMultiFieldsSection";
 import TxBuilderSingleFieldSection from "./TxBuilderSingleFieldSection";
 import WalletViewSelection from "./WalletViewSelection";
+import { TxBuilderLib } from "common/constants";
 
 const PROTOCOL_PARAMS = {
   linearFee: {
@@ -50,6 +51,7 @@ function TxBuilder({ utxos, addresses, onSubmit: onPropSubmit = noop }: Props) {
 
   const { handleSubmit, register, resetField, control, reset } = useForm<FormValues>({
     defaultValues: {
+      txBuilderLib: TxBuilderLib.Emurgo,
       txInputs: [],
       txOutputs: [],
       certificates: [],
@@ -476,6 +478,22 @@ function TxBuilder({ utxos, addresses, onSubmit: onPropSubmit = noop }: Props) {
         <Button className="w-fit" onClick={handleReset}>
           <p>Clear</p>
         </Button>
+        <div className="w-56">
+          <Controller
+            control={control}
+            name="txBuilderLib"
+            render={({ field: { value, onChange }}) => (
+              <Dropdown
+                value={value}
+                items={Object.entries(TxBuilderLib).map(([, value]) => ({
+                  label: value,
+                  value
+                }))}
+                onSelect={onChange}
+              />
+            )}
+          />
+        </div>
       </div>
     </form>
   );

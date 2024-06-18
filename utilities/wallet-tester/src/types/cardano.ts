@@ -3,6 +3,7 @@
 /* eslint @typescript-eslint/no-explicit-any: off */
 
 import * as cip30 from "@cardano-sdk/cip30";
+import type { TxBuilderLib } from "common/constants";
 
 export type WalletCollections = {
   [k: string]: Omit<cip30.Cip30Wallet, "enable"> & {
@@ -55,6 +56,7 @@ export enum AuxMetadataType {
 }
 
 export type TxBuilderArguments = {
+  txBuilderLib: TxBuilderLib,
   txInputs: {
     hex: string;
   }[];
