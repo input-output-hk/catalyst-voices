@@ -31,7 +31,7 @@ test-fuzzer-api:
     RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
     RUN apk add yq zstd
     COPY schemathesis-docker-compose.yml .
-    ARG OPENAPI_SPEC="http://127.0.0.1:3030/docs/cat-gateway.json"
+    LET OPENAPI_SPEC="http://127.0.0.1:3030/docs/cat-gateway.json"
     WITH DOCKER \
         --compose schemathesis-docker-compose.yml \
         --load schemathesis:latest=(+package-schemathesis --openapi_spec=$OPENAPI_SPEC) \
