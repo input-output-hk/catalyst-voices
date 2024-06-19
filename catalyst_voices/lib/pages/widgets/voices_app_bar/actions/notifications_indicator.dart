@@ -1,7 +1,7 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 
-/// A [NotificationsIndicator] widget that is used to display pending 
+/// A [NotificationsIndicator] widget that is used to display pending
 /// notifications.
 class NotificationsIndicator extends StatelessWidget {
   final String? badgeText;
@@ -18,13 +18,24 @@ class NotificationsIndicator extends StatelessWidget {
     return badgeText != null
         ? Badge(
             label: Text(badgeText!),
-            child: _iconButton,
+            child: _IconButton(onPressed: onPressed),
           )
-        : _iconButton;
+        : _IconButton(onPressed: onPressed);
   }
+}
 
-  Widget get _iconButton => IconButton.outlined(
-        icon: const Icon(CatalystVoicesIcons.bell),
-        onPressed: onPressed,
-      );
+class _IconButton extends StatelessWidget {
+  final VoidCallback? onPressed;
+
+  const _IconButton({
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton.outlined(
+      icon: const Icon(CatalystVoicesIcons.bell),
+      onPressed: onPressed,
+    );
+  }
 }
