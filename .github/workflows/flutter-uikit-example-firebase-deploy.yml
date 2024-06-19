@@ -1,6 +1,7 @@
 name: UIKit Flutter Example Firebase Hosting Deploy
 
 on:
+  # TODO(dtscalac): only deploy on pushes
   pull_request:
   push:
     branches: "main"
@@ -21,8 +22,8 @@ env:
   ECR_REGISTRY: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
 
 jobs:
-  generate-test-reports:
-    name: Generate test reports
+  deploy-uikit-example:
+    name: Deploy UIKit example on Firebase Hosting
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
