@@ -87,6 +87,8 @@ pubspec.lock
 .pub/
 coverage/
 .idea/
+.flutter-plugins
+.flutter-plugins-dependencies
 
 # Melos
 *pubspec_overrides.yaml

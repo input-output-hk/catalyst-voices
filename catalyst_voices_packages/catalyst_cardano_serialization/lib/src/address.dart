@@ -7,9 +7,10 @@ import 'package:bip32_ed25519/bip32_ed25519.dart';
 import 'package:catalyst_cardano_serialization/src/exceptions.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:cbor/cbor.dart';
+import 'package:equatable/equatable.dart';
 
 /// [ShelleyAddress] supports bech32 encoded addresses as defined in CIP-19.
-class ShelleyAddress {
+class ShelleyAddress extends Equatable {
   /// The prefix of a base address.
   static const String defaultAddrHrp = 'addr';
 
@@ -111,6 +112,9 @@ class ShelleyAddress {
 
   @override
   String toString() => toBech32();
+
+  @override
+  List<Object?> get props => [toBech32()];
 
   /// If were using the testnet, make sure the hrp ends with '_test'
   static String _computeHrp(NetworkId id, String prefix) {
