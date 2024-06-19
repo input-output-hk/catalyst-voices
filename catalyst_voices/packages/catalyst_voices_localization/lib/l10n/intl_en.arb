@@ -55,5 +55,29 @@
   "comingSoonDescription": "Project Catalyst is the world's largest decentralized innovation engine for solving real-world challenges.",
   "@comingSoonDescription": {
     "description": "Text shown as description in coming soon page"
+  },
+  "connectingStatusLabelText": "re-connecting",
+  "@connectingStatusLabelText": {
+    "description": "Label text shown in the ConnectingStatus widget during re-connection."
+  },
+  "finishAccountButtonLabelText": "Finish account",
+  "@finishAccountButtonLabelText": {
+    "description": "Label text shown in the FinishAccountButton widget."
+  },
+  "getStartedButtonLabelText": "Get Started",
+  "@getStartedButtonLabelText": {
+    "description": "Label text shown in the GetStartedButton widget."
+  },
+  "unlockButtonLabelText": "Unlock",
+  "@unlockButtonLabelText": {
+    "description": "Label text shown in the UnlockButton widget."
+  },
+  "userProfileGuestLabelText": "Guest",
+  "@userProfileGuestLabelText": {
+    "description": "Label text shown in the UserProfileButton widget when a user is not connected."
+  },
+  "searchButtonLabelText": "[cmd=K]",
+  "@searchButtonLabelText": {
+    "description": "Label text shown in the Search widget."
   }
 }

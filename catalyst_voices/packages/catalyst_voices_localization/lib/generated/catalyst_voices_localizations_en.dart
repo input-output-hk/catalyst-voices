@@ -44,6 +44,23 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get comingSoonTitle2 => 'soon';
 
   @override
-  String get comingSoonDescription =>
-      'Project Catalyst is the world\'s largest decentralized innovation engine for solving real-world challenges.';
+  String get comingSoonDescription => 'Project Catalyst is the world\'s largest decentralized innovation engine for solving real-world challenges.';
+
+  @override
+  String get connectingStatusLabelText => 're-connecting';
+
+  @override
+  String get finishAccountButtonLabelText => 'Finish account';
+
+  @override
+  String get getStartedButtonLabelText => 'Get Started';
+
+  @override
+  String get unlockButtonLabelText => 'Unlock';
+
+  @override
+  String get userProfileGuestLabelText => 'Guest';
+
+  @override
+  String get searchButtonLabelText => '[cmd=K]';
 }

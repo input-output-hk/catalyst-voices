@@ -10,7 +10,8 @@ builder:
     COPY ./snapshot_tool-56364174.json .
     DO python-ci+BUILDER
 
-test:
+# Disabled in CI, to enable rename it to `test`.
+api-test:
     FROM +builder
 
     COPY ./docker-compose.yml .

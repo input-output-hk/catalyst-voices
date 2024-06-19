@@ -1,4 +1,6 @@
 import 'package:catalyst_cardano_serialization/src/types.dart';
+import 'package:cbor/cbor.dart';
+import 'package:convert/convert.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -28,6 +30,23 @@ void main() {
       expect(const Coin(3) >= const Coin(3), isTrue);
       expect(const Coin(100) < const Coin(100), isFalse);
       expect(const Coin(100) <= const Coin(100), isTrue);
+    });
+  });
+
+  group(Balance, () {
+    test('value with native tokens deserialized from cbor', () {
+      const nativeTokensValue = '821b00000002536918eca1581cff5b52ec72ff3c4f7ed'
+          '39d1d1c504f4efa72c51ba34588a604d47408a14a536372616461436f696e1832';
+      final cborValue = cbor.decode(hex.decode(nativeTokensValue));
+      final value = Balance.fromCbor(cborValue);
+      expect(value.coin, equals(const Coin(9989331180)));
+      expect(value.multiAsset, isNotNull);
+    });
+
+    test('value without native tokens deserialized from cbor', () {
+      const value = '1B00000002536918EC';
+      final cborValue = cbor.decode(hex.decode(value));
+      expect(Balance.fromCbor(cborValue).coin, equals(const Coin(9989331180)));
     });
   });
 }
