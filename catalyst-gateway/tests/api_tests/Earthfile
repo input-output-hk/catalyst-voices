@@ -10,7 +10,7 @@ builder:
     COPY ./snapshot_tool-56364174.json .
     DO python-ci+BUILDER
 
-test:
+api_test:
     FROM +builder
 
     COPY ./docker-compose.yml .
