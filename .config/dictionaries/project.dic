@@ -58,8 +58,10 @@ fetchval
 fmtchk
 fmtfix
 fontawesome
+fontello
 formz
 Formz
+fluttericon
 fuzzer
 gapless
 gcloud
@@ -140,6 +142,7 @@ Ptarget
 pubkey
 pubspec
 pytest
+qrcode
 rapidoc
 redoc
 Replayability
