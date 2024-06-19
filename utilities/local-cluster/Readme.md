@@ -48,9 +48,9 @@ These services are installed by default and provide the basic management and mon
 ### Scylla DB
 
 This service is provisioned globally for use by services in the cluster.
-It does not have a UI outside of any Grafana dashboards that are installed.
+It does not have a UI outside any Grafana dashboards that are installed.
 
-For testing purposes the ScyllaDB is accessible on the Cluster IP Address: `192.168.58.10`.
+For testing purposes, the ScyllaDB is accessible on the Cluster IP Address: `192.168.58.10`.
 
 ## Deploying the Cluster
 
@@ -58,9 +58,11 @@ For testing purposes the ScyllaDB is accessible on the Cluster IP Address: `192.
 
 On Windows you need to setup the hosts before starting the cluster  
 From Windows terminal open the hosts file:  
+
 ```sh
 notepad %SystemRoot%\System32\drivers\etc\hosts  
 ```  
+
 and copy the hosts from `./shared/extra.hosts` into the Windows host file  
 
 ### Startup
