@@ -25,7 +25,8 @@ package-schemathesis:
     ARG tag="latest"
     SAVE IMAGE schemathesis:$tag
 
-# test-fuzzer-api - Fuzzy test cat-gateway using openapi specs
+# test-fuzzer-api - Fuzzy test cat-gateway using openapi specs.
+# Disabled in CI, to enable it rename to `test-fuzzer-api`.
 fuzzer-api:
     FROM earthly/dind:alpine-3.19
     RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784

@@ -10,6 +10,7 @@ builder:
     COPY ./snapshot_tool-56364174.json .
     DO python-ci+BUILDER
 
+# Disabled in CI, to enable rename it to `test`.
 api-test:
     FROM +builder
 
