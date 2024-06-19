@@ -1,0 +1,66 @@
+# use with https://github.com/casey/just
+#
+# Catalyst Voices Test Cluster basic Control
+export KUBECONFIG := "shared/k3s.yaml"
+
+# cspell: words prereqs, commitlog
+
+default:
+    @just --list --unsorted
+
+_check-cluster-prereqs:
+    kubectl version --client=true
+    helm version --short
+    # Check if the necessary local DNS entries exist
+    python scripts/check-cluster-dns.py ./shared/extra.hosts
+
+# Start the development cluster - linux/windows x86_64
+start-cluster: _check-cluster-prereqs
+    vagrant up
+
+# Start the development cluster - only on a aarch64 macos machine
+start-cluster-aarch64-macos: _check-cluster-prereqs
+    VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 vagrant plugin install vagrant-qemu
+    vagrant up --provider qemu
+
+# Pause the development cluster - does not destroy it
+suspend-cluster:
+    vagrant suspend
+
+# Resume a paused development cluster
+resume-cluster:
+    vagrant resume
+
+# Stop the development cluster - destroys it completely
+stop-cluster:
+     vagrant destroy -f
+
+# Show whats running in the cluster
+show-cluster:
+    kubectl -o wide get all --all-namespaces
+
+# SSH into the control-plane node
+ssh-into-control:
+    vagrant ssh control
+
+# SSH into the agent86 node
+ssh-into-agent86:
+    vagrant ssh agent86
+
+# SSH into the agent99 node
+ssh-into-agent99:
+    vagrant ssh agent99    
+
+get-all-logs:
+    mkdir -p logs    
+    kail --log-level=error --since 6h > cluster.logs
+
+# Temporary local scylla dev DB until we can get it exposed from the cluster.
+# TODO: Get the cluster scylla DB exposed on port 9042 of the cluster.
+temp-scylla-dev-db:
+    mkdir -p /var/lib/scylla/data /var/lib/scylla/commitlog /var/lib/scylla/hints /var/lib/scylla/view_hints
+    docker run --privileged -p 9042:9042  --name scylla-dev --volume /var/lib/scylla:/var/lib/scylla -d scylladb/scylla --developer-mode=0  --smp 24
+
+stop-temp-scylla-dev-db:
+    docker stop scylla-dev
+    docker rm scylla-dev

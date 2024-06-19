@@ -17,6 +17,8 @@
         "serayuzgur.crates",
         "anweiss.cddl-languageserver",
         "tintinweb.graphviz-interactive-preview",
-        "terrastruct.d2"
+        "terrastruct.d2",
+        "bbenoist.vagrant",
+        "ms-kubernetes-tools.vscode-kubernetes-tools"
     ]
 }

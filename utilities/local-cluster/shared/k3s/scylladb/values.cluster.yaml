@@ -1,0 +1,36 @@
+# Version information
+scyllaImage:
+  tag: 5.4.3
+agentImage:
+  tag: 3.2.8
+
+# Cluster information
+serviceMonitor:
+  create: true
+developerMode: true
+datacenter: local-dc
+sysctls:
+  - "fs.aio-max-nr=2097152"
+racks:
+  - name: test-rack
+    members: 3
+    storage:
+      capacity: 5Gi
+      storageClassName: longhorn-strict-local
+    resources:
+      limits:
+        cpu: 3
+        memory: 3Gi
+      requests:
+        cpu: 1
+        memory: 1Gi
+exposeOptions:
+  nodeService:
+    type: ClusterIP
+  broadcastOptions:
+    clients:
+      type: ServiceClusterIP
+    nodes:
+      type: ServiceClusterIP
+#network:
+#  hostNetworking: true
