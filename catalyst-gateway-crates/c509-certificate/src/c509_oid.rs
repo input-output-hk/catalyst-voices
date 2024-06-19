@@ -2,14 +2,9 @@
 //! Please refer to [RFC9090](https://datatracker.ietf.org/doc/rfc9090/) for OID encoding
 //! Please refer to [CDDL Wrapping](https://datatracker.ietf.org/doc/html/rfc8610#section-3.7) for unwrapped types.
 
+use anyhow::Result;
 use asn1_rs::oid;
-use asn1_rs::FromBer;
-use minicbor::{
-    data::Tag,
-    decode,
-    encode::{self, Write},
-    Decode, Decoder, Encode, Encoder,
-};
+use minicbor::{data::Tag, decode, encode::Write, Decode, Decoder, Encode, Encoder};
 use oid_registry::Oid;
 
 /// Represent an instance of C509 OID where it contains an oid.
@@ -54,14 +49,8 @@ impl C509ExtensionOid {
     }
 }
 */
-/// Tag representing BER OID.
-const BER_OID_TAG: u8 = 0x06;
-/// Tag representing BER Relative OID.
-const BER_RELATIVE_OID_TAG: u8 = 0x0d;
 /// IANA Private Enterprise Number OID prefix.
 const PEN_PREFIX: Oid<'static> = oid!(1.3.6 .1 .4 .1);
-/// Length of the PEN prefix.
-const PEN_PREFIX_LEN: usize = 6;
 /// Tag number representing IANA Private Enterprise Number (PEN) OID.
 const OID_PEN_TAG: u64 = 112;
 
@@ -82,26 +71,10 @@ impl<'a> C509oid<'a> {
     }
 }
 
-/// Encode an OID as Private Enterprise Number (PEN) OID.
-fn encode_pen<W: Write>(oid: &Oid, e: &mut Encoder<W>) -> Result<(), encode::Error<W::Error>> {
-    e.tag(Tag::new(OID_PEN_TAG))?;
-    // Extracts the OID components, collects them into a Vec<u64>.
-    let raw_oid: Vec<u64> =
-        oid.iter()
-            .map(|iter| iter.collect())
-            .ok_or(minicbor::encode::Error::message(
-                "Failed to collect OID components from iterator",
-            ))?;
-    // relative_oid = raw_oid relative to PEN_PREFIX 1.3.6.1.4.1
-    let relative_oid = Oid::from_relative(&raw_oid[PEN_PREFIX_LEN..])
-        .map_err(|_| minicbor::encode::Error::message("Failed to build a relative OID"))?;
-    e.bytes(relative_oid.as_bytes())?.ok()
-}
-
 impl<C> Encode<C> for C509oid<'_> {
     /// Encode an OID
-    /// If `pen_supported` flag is set, and OID start with a valid `PEN_PREFIX`
-    /// is encoded as PEN (Private Enterprise Number)
+    /// If `pen_supported` flag is set, and OID start with a valid `PEN_PREFIX`,
+    /// it is encoded as PEN (Private Enterprise Number)
     /// else encode as an unwrapped OID (~oid) - as bytes string without tag.
     ///
     /// # Returns
@@ -110,10 +83,23 @@ impl<C> Encode<C> for C509oid<'_> {
     /// If the encoding fails, it will return an error.
     fn encode<W: Write>(
         &self, e: &mut Encoder<W>, _ctx: &mut C,
-    ) -> Result<(), encode::Error<W::Error>> {
+    ) -> Result<(), minicbor::encode::Error<W::Error>> {
         // Check if PEN encoding is supported and the OID starts with the PEN prefix.
         if self.pen_supported && self.oid.starts_with(&PEN_PREFIX) {
-            return encode_pen(&self.oid, e);
+            // Set the CBOR tag.
+            e.tag(Tag::new(OID_PEN_TAG))?;
+            // Convert OID originally store as [u8] to [u64]
+            let raw_oid: Vec<u64> = self.oid.iter().map(|iter| iter.collect()).ok_or(
+                minicbor::encode::Error::message("Failed to collect OID components from iterator"),
+            )?;
+            let raw_pen_prefix: Vec<u64> = PEN_PREFIX.iter().map(|iter| iter.collect()).ok_or(
+                minicbor::encode::Error::message("Failed to collect OID components from iterator"),
+            )?;
+            // relative_oid is OID that follows PEN_PREFIX (relative to PEN_PREFIX)
+            // Use the [u64] PEN prefix length to extract the relative OID
+            let relative_oid = Oid::from_relative(&raw_oid[raw_pen_prefix.len()..])
+                .map_err(|_| minicbor::encode::Error::message("Failed to get a relative OID"))?;
+            return e.bytes(relative_oid.as_bytes())?.ok();
         }
         let oid_bytes = self.oid.as_bytes();
         e.bytes(oid_bytes)?.ok()
@@ -133,35 +119,16 @@ impl<'b, C> Decode<'b, C> for C509oid<'_> {
     fn decode(d: &mut Decoder<'b>, _ctx: &mut C) -> Result<Self, decode::Error> {
         if (minicbor::data::Type::Tag == d.datatype()?) && (Tag::new(OID_PEN_TAG) == d.tag()?) {
             let oid_bytes = d.bytes()?;
-            // Time Length Value (TLV) format.
-            let mut ber_bytes = vec![BER_RELATIVE_OID_TAG, oid_bytes.len() as u8];
-            ber_bytes.extend_from_slice(oid_bytes);
-            // Generate a relative OID from the BER bytes.
-            let relative_oid = Oid::from_ber_relative(&ber_bytes).map_err(|_| {
-                minicbor::decode::Error::message("Failed to generate a relative OID from BER bytes")
-            })?;
-            let relative_oid_u64: Vec<u64> =
-                relative_oid.1.iter().map(|iter| iter.collect()).ok_or(
-                    minicbor::decode::Error::message("Failed to collect OID components"),
-                )?;
-            let mut pen_prefix_oid_u64: Vec<u64> =
-                PEN_PREFIX.iter().map(|iter| iter.collect()).ok_or(
-                    minicbor::decode::Error::message("Failed to collect OID components"),
-                )?;
-            // Combine the PEN prefix and the relative OID.
-            pen_prefix_oid_u64.extend_from_slice(&relative_oid_u64);
-            let oid = Oid::from(&pen_prefix_oid_u64)
-                .map_err(|_| minicbor::decode::Error::message("Failed to build an OID"))?;
-            return Ok(C509oid::new(oid).pen_encoded());
+            let mut raw_oid = Vec::new();
+            raw_oid.extend_from_slice(PEN_PREFIX.as_bytes());
+            raw_oid.extend_from_slice(&oid_bytes);
+            let oid = Oid::new(raw_oid.into());
+            return Ok(C509oid::new(oid.into()).pen_encoded());
         }
         // Not a PEN Relative OID, so treat as a normal OID
         let oid_bytes = d.bytes()?;
-        // Time Length Value (TLV) format.
-        let mut ber_bytes = vec![BER_OID_TAG, oid_bytes.len() as u8];
-        ber_bytes.extend_from_slice(oid_bytes);
-        let oid = Oid::from_ber(&ber_bytes)
-            .map_err(|e| minicbor::decode::Error::message(e.to_string()))?;
-        Ok(C509oid::new(oid.1.to_owned()))
+        let oid = Oid::new(oid_bytes.to_owned().into());
+        Ok(C509oid::new(oid.into()))
     }
 }
 
