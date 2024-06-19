@@ -89,8 +89,6 @@ pub(crate) struct Registration {
 pub(crate) struct Cip36Metadata {
     /// CIP-36 registration 61284
     pub(crate) registration: Option<Registration>,
-    /// Raw tx metadata
-    pub raw_metadata: Option<Vec<u8>>,
     /// CIP-36 witness signature 61285
     pub signature: Option<Signature>,
     /// Errors report
@@ -100,7 +98,6 @@ pub(crate) struct Cip36Metadata {
 impl Cip36Metadata {
     /// Create new `Cip36Registration` from tx metadata
     /// Collect secondary errors for granular json error report
-    #[allow(clippy::too_many_lines)]
     pub(crate) fn generate_from_tx_metadata(
         tx_metadata: &MultiEraMeta, network: Network,
     ) -> Option<Self> {
@@ -109,9 +106,7 @@ impl Cip36Metadata {
         }
 
         let mut registration = None;
-        let mut raw_metadata = None;
         let mut signature = None;
-        let mut raw_61284 = None;
         let mut errors_report = Vec::new();
 
         if let pallas::ledger::traverse::MultiEraMeta::AlonzoCompatible(tx_metadata) = tx_metadata {
@@ -120,13 +115,7 @@ impl Cip36Metadata {
             /// <https://cips.cardano.org/cips/cip36>
             const CIP36_WITNESS_CBOR_KEY: u64 = 61285;
 
-            raw_metadata = tx_metadata.encode_fragment().map_or_else(
-                |err| {
-                    errors_report.push(format!("cannot encode tx metadata into bytes {err}"));
-                    None
-                },
-                Some,
-            );
+            let mut raw_61284 = None;
 
             for (key, metadata) in tx_metadata.iter() {
                 match *key {
@@ -160,18 +149,18 @@ impl Cip36Metadata {
                     _ => continue,
                 };
             }
-        };
 
-        if let Some(raw_61284) = raw_61284 {
-            let _ =
-                validate_signature(&raw_61284, &registration.clone(), &signature).map_err(|err| {
-                    errors_report.push(format!("{err}"));
-                });
-        }
+            if let Some(raw_61284) = raw_61284 {
+                let _ = validate_signature(&raw_61284, &registration.clone(), &signature).map_err(
+                    |err| {
+                        errors_report.push(format!("{err}"));
+                    },
+                );
+            }
+        };
 
         Some(Self {
             registration: registration.clone(),
-            raw_metadata,
             signature,
             errors_report,
         })
@@ -190,16 +179,13 @@ pub fn validate_signature(
     let verifying_key = VerifyingKey::from_bytes(
         registration
             .clone()
-            .ok_or("no registration data".to_string())
-            .map_err(|err| anyhow::anyhow!("{err}"))?
+            .ok_or(anyhow::anyhow!("no registration data"))?
             .stake_key
             .bytes()
             .try_into()?,
     )?;
 
-    let sig = signature
-        .ok_or("cannot verify payload without signature".to_string())
-        .map_err(|err| anyhow::anyhow!("{err}"))?;
+    let sig = signature.ok_or(anyhow::anyhow!("cannot verify payload without signature"))?;
 
     Ok(verifying_key.verify(&hash_bytes, &sig)?)
 }
