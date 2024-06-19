@@ -86,5 +86,8 @@
   "rust-analyzer.rustfmt.extraArgs": [
     "+nightly"
   ],
-  "rust-analyzer.lens.enable": true
+  "rust-analyzer.lens.enable": true,
+  "vs-kubernetes": {
+    "vs-kubernetes.kubeconfig": "utilities/local-cluster/shared/k3s.yaml"
+  }
 }

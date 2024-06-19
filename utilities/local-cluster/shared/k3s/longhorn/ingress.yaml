@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: longhorn-ingress
+  namespace: longhorn-system
+  annotations:
+    spec.ingressClassName: traefik
+    cert-manager.io/cluster-issuer: selfsigned-cluster-issuer
+spec:
+  rules:
+    - host: longhorn.cluster.test
+      http:
+        paths:
+          - pathType: Prefix
+            path: "/"
+            backend:
+              service:
+                name: longhorn-frontend
+                port:
+                  number: 80
+  tls:
+    - secretName: longhorn-tls
+      hosts:
+        - longhorn.cluster.test
