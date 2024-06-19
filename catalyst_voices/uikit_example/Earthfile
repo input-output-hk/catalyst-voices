@@ -8,4 +8,4 @@ build-web:
     FROM catalyst-voices+builder
     ARG WORKDIR=/frontend/catalyst_voices/uikit_example
     DO flutter-ci+BUILD_WEB --TARGET=lib/main.dart --WORKDIR=$WORKDIR
-    SAVE ARTIFACT web AS LOCAL build
+    SAVE ARTIFACT web AS LOCAL public
