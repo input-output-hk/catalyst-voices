@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/configs/sentry/sentry.dart';
 import 'package:catalyst_voices/pages/coming_soon/description.dart';
 import 'package:catalyst_voices/pages/coming_soon/logo.dart';
 import 'package:catalyst_voices/pages/coming_soon/title.dart';
@@ -34,14 +35,19 @@ final class ComingSoonPage extends StatelessWidget {
             alignment: Alignment.centerLeft,
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 356),
-              child: const Column(
+              child: Column(
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  ComingSoonLogo(),
-                  ComingSoonTitle(),
-                  ComingSoonDescription(),
+                  const ComingSoonLogo(),
+                  const ComingSoonTitle(),
+                  const ComingSoonDescription(),
+                  // TODO:(minikin) Remove this button after the demo.
+                  ElevatedButton(
+                    onPressed: () async => SentryService.crash(),
+                    child: const Text('Report Crash'),
+                  ),
                 ],
               ),
             ),
