@@ -3,6 +3,7 @@ repository: https://github.com/input-output-hk/catalyst-voices
 
 packages:
   - catalyst_voices
+  - catalyst_voices/uikit_example
   - catalyst_voices/packages/**
   - catalyst_voices_packages/**
   - utilities/*
@@ -20,6 +21,7 @@ command:
       bloc: ^8.1.2
       collection: ^1.17.1
       equatable: ^2.0.5
+      flutter_localized_locales: ^2.0.5
       formz: ^0.7.0
       meta: ^1.10.0
       result_type: ^0.2.0

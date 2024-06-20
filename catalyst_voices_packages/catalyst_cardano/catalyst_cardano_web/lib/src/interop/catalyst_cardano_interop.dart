@@ -39,6 +39,9 @@ extension type JSCardanoWallet(JSObject _) implements JSObject {
 
 /// The JS representation of the [CardanoWalletApi].
 extension type JSCardanoWalletApi(JSObject _) implements JSObject {
+  /// See [CardanoWalletApi.cip95].
+  external JSCardanoWalletCip95Api get cip95;
+
   /// See [CardanoWalletApi.getBalance].
   external JSPromise<JSString> getBalance();
 
@@ -85,6 +88,27 @@ extension type JSCardanoWalletApi(JSObject _) implements JSObject {
 
   /// Converts JS representation to pure dart representation.
   CardanoWalletApi get toDart => JSCardanoWalletApiProxy(this);
+}
+
+/// The JS representation of the [CardanoWalletCip95Api].
+extension type JSCardanoWalletCip95Api(JSObject _) implements JSObject {
+  /// See [CardanoWalletCip95Api.getPubDRepKey].
+  external JSPromise<JSString> getPubDRepKey();
+
+  /// See [CardanoWalletCip95Api.getRegisteredPubStakeKeys].
+  external JSPromise<JSArray<JSString>> getRegisteredPubStakeKeys();
+
+  /// See [CardanoWalletCip95Api.getUnregisteredPubStakeKeys].
+  external JSPromise<JSArray<JSString>> getUnregisteredPubStakeKeys();
+
+  /// See [CardanoWalletApi.signData].
+  external JSPromise<JSString> signData(
+    JSString address,
+    JSString payload,
+  );
+
+  /// Converts JS representation to pure dart representation.
+  CardanoWalletCip95Api get toDart => JSCardanoWalletCip95ApiProxy(this);
 }
 
 /// Represents wallet extensions to be activated in [JSCardanoWallet.enable].

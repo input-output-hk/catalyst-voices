@@ -4,10 +4,11 @@ import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:catalyst_cardano_serialization/src/utils/cbor.dart';
 import 'package:catalyst_cardano_serialization/src/witness.dart';
 import 'package:cbor/cbor.dart';
+import 'package:equatable/equatable.dart';
 
 /// Represents the signed transaction with a list of witnesses
 /// which are used to verify the validity of a transaction.
-final class Transaction {
+final class Transaction extends Equatable {
   /// The transaction body containing the inputs, outputs, fees, etc.
   final TransactionBody body;
 
@@ -55,12 +56,15 @@ final class Transaction {
       auxiliaryData?.toCbor() ?? const CborNull(),
     ]);
   }
+
+  @override
+  List<Object?> get props => [body, isValid, witnessSet, auxiliaryData];
 }
 
 /// Represents the details of a transaction including inputs, outputs, fee, etc.
 ///
 /// Does not contain the witnesses which are used to verify the transaction.
-final class TransactionBody {
+final class TransactionBody extends Equatable {
   /// The transaction inputs.
   final Set<TransactionInput> inputs;
 
@@ -129,11 +133,15 @@ final class TransactionBody {
         const CborSmallInt(15): CborSmallInt(networkId!.id),
     });
   }
+
+  @override
+  List<Object?> get props =>
+      [inputs, outputs, fee, ttl, auxiliaryDataHash, networkId];
 }
 
 /// The transaction output of a previous transaction,
 /// acts as input for the next transaction.
-final class TransactionInput {
+final class TransactionInput extends Equatable {
   /// The hash of the given transaction.
   final TransactionHash transactionId;
 
@@ -165,16 +173,19 @@ final class TransactionInput {
       CborSmallInt(index),
     ]);
   }
+
+  @override
+  List<Object?> get props => [transactionId, index];
 }
 
 /// The transaction output which describes which [address]
 /// will receive what [amount] of [Coin].
-final class TransactionOutput {
+final class TransactionOutput extends Equatable {
   /// The address associated with the transaction.
   final ShelleyAddress address;
 
   /// The leftover change from the previous transaction that can be spent.
-  final Coin amount;
+  final Balance amount;
 
   /// The default constructor for [TransactionOutput].
   const TransactionOutput({
@@ -190,7 +201,7 @@ final class TransactionOutput {
 
     return TransactionOutput(
       address: ShelleyAddress.fromCbor(address),
-      amount: Coin.fromCbor(amount),
+      amount: Balance.fromCbor(amount),
     );
   }
 
@@ -201,10 +212,24 @@ final class TransactionOutput {
       amount.toCbor(),
     ]);
   }
+
+  /// Return a copy of this output with [address] and [amount] if present.
+  TransactionOutput copyWith({
+    ShelleyAddress? address,
+    Balance? amount,
+  }) {
+    return TransactionOutput(
+      address: address ?? this.address,
+      amount: amount ?? this.amount,
+    );
+  }
+
+  @override
+  List<Object?> get props => [address, amount];
 }
 
 /// The UTXO that can be used as an input in a new transaction.
-final class TransactionUnspentOutput {
+final class TransactionUnspentOutput extends Equatable {
   /// The transaction output of a previous transaction,
   /// acts as input for the next transaction.
   final TransactionInput input;
@@ -238,10 +263,13 @@ final class TransactionUnspentOutput {
       output.toCbor(),
     ]);
   }
+
+  @override
+  List<Object?> get props => [input, output];
 }
 
 /// The transaction metadata as a list of key-value pairs (a map).
-final class AuxiliaryData {
+final class AuxiliaryData extends Equatable {
   /// The transaction metadata map.
   final Map<CborValue, CborValue> map;
 
@@ -261,4 +289,7 @@ final class AuxiliaryData {
       tags: map.isNotEmpty ? const [] : [CborCustomTags.map],
     );
   }
+
+  @override
+  List<Object?> get props => [map];
 }

@@ -11,7 +11,8 @@ void main() {
       constant: Coin(155381),
       coefficient: Coin(44),
     ),
-    maxTxSize: 8000,
+    maxTxSize: 16384,
+    maxValueSize: 5000,
     coinsPerUtxoByte: Coin(4310),
   );
 
@@ -44,7 +45,7 @@ void main() {
         'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70'
         'qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w',
       ),
-      amount: const Coin(10162333),
+      amount: const Balance(coin: Coin(10162333)),
     ),
   );
 
@@ -52,7 +53,7 @@ void main() {
     address: ShelleyAddress.fromBech32(
       'addr_test1vzpwq95z3xyum8vqndgdd9mdnmafh3djcxnc6jemlgdmswcve6tkw',
     ),
-    amount: const Coin(1000000),
+    amount: const Balance(coin: Coin(1000000)),
   );
 
   final txBuilder = TransactionBuilder(

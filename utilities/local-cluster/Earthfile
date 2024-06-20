@@ -1,0 +1,72 @@
+VERSION 0.8
+# cspell: words NATIVEPLATFORM
+
+# start-cluster : starts the local development cluster
+# Needs both Vagrant and Virtualbox installed on the local machine.
+start-cluster:
+    LOCALLY
+    ARG NATIVEPLATFORM
+    # Check if the necessary tools are present locally
+    RUN kubectl version --client=true
+    RUN helm version --short
+    # Check if the necessary local DNS entries exist
+    RUN python scripts/check-cluster-dns.py ./shared/extra.hosts
+    # Everything checks out so far, try and start the cluster.
+    IF [ "$NATIVEPLATFORM" = "darwin/arm64" ]
+        # Install necessary Vagrant plugins for ARM Mac
+        RUN VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 vagrant plugin install vagrant-qemu
+    END
+    RUN vagrant up
+
+# stop-cluster : stops the locally running cluster
+stop-cluster:
+    LOCALLY
+    RUN vagrant destroy -f
+
+# test-cluster : Checks if the cluster is running on the local machine.
+cluster-test:
+    LOCALLY
+    RUN kubectl --kubeconfig shared/k3s.yaml -o wide get nodes
+
+# kubernetes-base : base container with tooling set up for local access
+kubernetes-base:
+    FROM alpine:3.19
+    
+    # Install kubectl
+    RUN apk update && \
+        apk upgrade && \
+        apk add kubectl \
+                helm
+
+    COPY shared/k3s.yaml $HOME/.kube/config
+
+    COPY --dir manifests manifests
+
+# test targets to deploy the local documentation
+deploy-docs:
+    FROM +kubernetes-base
+
+    RUN kubectl create namespace cat-voices || true
+    RUN kubectl apply -f manifests/cat-voices-docs.yml
+
+# test target to stop the local documentation
+stop-docs:
+    FROM +kubernetes-base
+
+    RUN kubectl delete ingress cat-gateway-docs -n cat-voices || true
+    RUN kubectl delete deployment cat-gateway-docs -n cat-voices || true
+    RUN kubectl delete service cat-gateway-docs -n cat-voices || true
+
+# show-info : list important info about the running cluster
+show-info:
+    FROM +kubernetes-base
+    ARG local_file=""
+
+    # Get everything from all namespaces    
+    RUN --no-cache kubectl -o wide get all --all-namespaces > cluster.info
+
+    IF [ "$local_file" == "" ]
+        RUN cat cluster.info
+    ELSE
+        SAVE ARTIFACT cluster.info AS LOCAL "$local_file"
+    END

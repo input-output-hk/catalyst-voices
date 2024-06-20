@@ -1,7 +1,7 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.1.5 AS rust-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:v3.1.5 AS mithril-snapshot-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.1.7 AS rust-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:v3.1.7 AS mithril-snapshot-ci
 
 #cspell: words rustfmt toolsets USERARCH
 
@@ -38,7 +38,6 @@ build:
         --cmd="/scripts/std_build.py" \
         --args1="--bins=cat-gateway/cat-gateway" \
         --args2="--cov_report=$HOME/coverage-report.info" \
-        --args3="--verbose" \
         --output="release/cat-gateway" \
         --junit="cat-gateway.junit-report.xml" \
         --coverage="cat-gateway.coverage-report.info" \
@@ -72,16 +71,22 @@ package-cat-gateway:
 
 # package-cat-gateway : Create a deployable container for catalyst-gateway
 # And bundle a Mithril snapshot of cardano preprod
-disable-package-cat-gateway-with-preprod-snapshot:
+package-cat-gateway-with-preprod:
     ARG tag="latest"
 
     FROM +package-cat-gateway
 
     # copy preprod mithril snapshot to /tmp/preprod dir
-    COPY mithril-snapshot-ci+package-preprod-snapshot/snapshot /tmp/preprod
+    COPY mithril-snapshot-ci+preprod/snapshot /tmp/preprod
 
     SAVE IMAGE cat-gateway:$tag
 
 # Publish packages if all integration tests have passed. (Failure to pass tests will prevent packages being published.)
 # publish:
 #    FROM scratch
+
+# get-api-locally : Get a copy of the OpenAPI json document locally.
+get-api-locally:
+    FROM scratch
+    COPY +build/doc/cat-gateway-api.json cat-gateway-api.json
+    SAVE ARTIFACT cat-gateway-api.json AS LOCAL cat-gateway-api.json
