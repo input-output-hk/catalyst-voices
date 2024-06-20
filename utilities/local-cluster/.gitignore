@@ -1,0 +1,6 @@
+shared/*
+.vagrant
+
+# These are shared configs, need to be checked in to git.
+!shared/k3s
+!shared/extra.hosts

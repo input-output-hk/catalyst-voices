@@ -1,0 +1,48 @@
+# Disable etcd monitoring. See https://github.com/cablespaghetti/k3s-monitoring/issues/4
+kubeEtcd:
+  enabled: true
+
+kubeControllerManager:
+  enabled: true
+kubeScheduler:
+  enabled: true
+
+prometheus:
+  prometheusSpec:
+    retention: 3d
+    storageSpec:
+      volumeClaimTemplate:
+        metadata:
+          name: prometheus-pvc
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          storageClassName: longhorn-best-effort-local
+          resources:
+            requests:
+              storage: 2Gi
+
+grafana:
+  plugins:
+    - grafana-piechart-panel
+  enabled: true
+  grafana.ini:
+    users:
+      viewers_can_edit: true
+    auth:
+      disable_login_form: true
+      disable_signout_menu: true
+    auth.anonymous:
+      enabled: true
+      org_role: Admin
+    auth.basic:
+      enabled: false
+    persistence:
+      enabled: true
+      type: pvc
+      storageClassName: longhorn-best-effort-local
+      accessModes:
+        - ReadWriteOnce
+      size: 4Gi
+      finalizers:
+        - kubernetes.io/pvc-protection

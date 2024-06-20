@@ -52,7 +52,7 @@ allow-git = [
     "https://github.com/input-output-hk/hermes.git",
     "https://github.com/input-output-hk/catalyst-pallas.git",
     "https://github.com/bytecodealliance/wasmtime",
-     "https://github.com/aldanor/hdf5-rust",
+    "https://github.com/aldanor/hdf5-rust",
 ]
 
 [licenses]
