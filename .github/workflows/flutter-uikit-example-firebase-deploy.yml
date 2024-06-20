@@ -1,8 +1,6 @@
 name: UIKit Flutter Example Firebase Hosting Deploy
 
 on:
-  # TODO(dtscalac): only deploy on pushes
-  pull_request:
   push:
     branches: "main"
 
