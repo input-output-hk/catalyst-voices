@@ -1,0 +1,14 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRouteTCP
+metadata:
+  name: scylladb-ingressroute
+  namespace: scylla
+spec:
+  entryPoints:
+    - scylladb
+  routes:
+    # Match is the rule corresponding to an underlying router.
+    - match: HostSNI(`*`)
+      services:
+        - name: scylla-client
+          port: 9042

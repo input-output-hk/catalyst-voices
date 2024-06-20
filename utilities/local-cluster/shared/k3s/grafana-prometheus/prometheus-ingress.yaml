@@ -1,0 +1,25 @@
+# cspell: words joxit kubernetescrd
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: prometheus-ingress
+  namespace: monitoring
+  annotations:
+    spec.ingressClassName: traefik
+    cert-manager.io/cluster-issuer: selfsigned-cluster-issuer
+spec:
+  rules:
+    - host: prometheus.cluster.test
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: prometheus-stack-kube-prom-prometheus
+                port:
+                  number: 9090
+  tls:
+    - secretName: prometheus-tls
+      hosts:
+        - prometheus.cluster.test
