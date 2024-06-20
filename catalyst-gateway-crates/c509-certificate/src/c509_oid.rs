@@ -89,6 +89,12 @@ impl<C> Encode<C> for C509oid<'_> {
             // Set the CBOR tag.
             e.tag(Tag::new(OID_PEN_TAG))?;
             // Convert OID originally store as [u8] to [u64]
+            // This process is necessary to get the correct OID
+            // For example given - 1.3.6 .1 .4 .1.4.999
+            // This OID will be stored as [u8] - [43, 6, 1, 4, 1, 4, 135, 103]
+            // The first 2 integer has a special encoding formula where,
+            // values is computed using X * 40 + Y (See RFC9090 for more info)
+            // The number 999 exceed the 225 limit (max of u8), so it will be encoded as 2 bytes
             let raw_oid: Vec<u64> = self.oid.iter().map(|iter| iter.collect()).ok_or(
                 minicbor::encode::Error::message("Failed to collect OID components from iterator"),
             )?;
@@ -119,9 +125,11 @@ impl<'b, C> Decode<'b, C> for C509oid<'_> {
     fn decode(d: &mut Decoder<'b>, _ctx: &mut C) -> Result<Self, decode::Error> {
         if (minicbor::data::Type::Tag == d.datatype()?) && (Tag::new(OID_PEN_TAG) == d.tag()?) {
             let oid_bytes = d.bytes()?;
+            // raw_oid contains the whole OID which stored in bytes
             let mut raw_oid = Vec::new();
             raw_oid.extend_from_slice(PEN_PREFIX.as_bytes());
             raw_oid.extend_from_slice(&oid_bytes);
+            // Convert the raw_oid to Oid
             let oid = Oid::new(raw_oid.into());
             return Ok(C509oid::new(oid.into()).pen_encoded());
         }
