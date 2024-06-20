@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cat-gateway-docs
+  namespace: cat-voices
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: docs-nginx
+  template:
+    metadata:
+      labels:
+        app: docs-nginx
+    spec:
+      containers:
+        - name: docs-nginx
+          image: registry.cluster.test/cat-voices-docs:latest
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 500Mi
+            requests:
+              cpu: "0.1"
+              memory: 100Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cat-gateway-docs
+  namespace: cat-voices
+spec:
+  type: LoadBalancer
+  ports:
+    - name: docs
+      port: 80
+      targetPort: 80
+      protocol: TCP
+  selector:
+    app: docs-nginx
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cat-gateway-docs
+  namespace: cat-voices
+  annotations:
+    spec.ingressClassName: traefik
+spec:
+  rules:
+    - host: docs.voices.cluster.test
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: cat-gateway-docs
+                port:
+                  number: 80
+  tls:
+    - secretName: cat-voices-docs-tls
+      hosts:
+        - docs.voices.cluster.test

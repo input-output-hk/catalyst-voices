@@ -1,0 +1,5 @@
+# Sets up registries the k3s cluster can see
+mirrors:
+  registry.cluster.test:
+    endpoint:
+      - "http://registry.cluster.test"

@@ -36,6 +36,8 @@ Cunego
 Cupertino
 dalek
 DAPPLICATION
+dbeaver
+dbschema
 dbsync
 delegators
 DIND
@@ -76,6 +78,7 @@ integ
 Intellij
 iohk
 iphoneos
+jdbc
 jetbrains
 Joaquín
 jorm
@@ -85,6 +88,9 @@ junitxml
 junitreport
 Keyhash
 keyserver
+KUBECONFIG
+kubernetescrd
+kubetail
 lcov
 lerp
 Leshiy
@@ -157,6 +163,7 @@ saibatizoku
 schemathesis
 Schemathesis
 Scripthash
+ScyllaDB
 seckey
 sendfile
 slotno
@@ -179,6 +186,7 @@ toastify
 Toastify
 tojunit
 Traceback
+traefik
 TXNZD
 Typer
 unmanaged

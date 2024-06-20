@@ -25,10 +25,10 @@ import 'package:flutter/material.dart';
 ///     actions: [
 ///       NotificationsIndicator(
 ///         badgeText: '5',
-///         onPressed: () => {},
+///         onPressed: () {},
 ///       ),
 ///       UnlockButton(
-///         onPressed: () => {},
+///         onPressed: () {},
 ///       ),
 ///     ],
 ///   ),
@@ -90,7 +90,7 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
                   Theme.of(context).brandAssets.logo.path,
                 ),
                 SearchButton(
-                  onPressed: () => {},
+                  onPressed: () {},
                 ),
               ],
               itemGap: 16
@@ -101,7 +101,7 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
                   Theme.of(context).brandAssets.logo.path,
                 ),
                 SearchButton(
-                  onPressed: () => {},
+                  onPressed: () {},
                 ),
               ],
               itemGap: 24
