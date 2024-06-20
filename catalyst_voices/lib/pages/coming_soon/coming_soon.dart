@@ -43,7 +43,7 @@ final class ComingSoonPage extends StatelessWidget {
                   const ComingSoonLogo(),
                   const ComingSoonTitle(),
                   const ComingSoonDescription(),
-                  // TODO:(minikin) Remove this button after the demo.
+                  // TODO(minikin): Remove this button after the demo.
                   ElevatedButton(
                     onPressed: () async => SentryService.crash(),
                     child: const Text('Report Crash'),
