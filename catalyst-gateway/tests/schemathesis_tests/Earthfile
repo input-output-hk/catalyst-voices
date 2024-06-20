@@ -2,46 +2,37 @@ VERSION 0.8
 
 package-schemathesis:
     FROM python:3.12-alpine3.19
-
-    ARG tag="latest"
-    ARG max_examples=1000
     # TODO: https://github.com/input-output-hk/catalyst-voices/issues/465
-    ARG max_response_time=3000
-    ARG wait_for_schema=15
-    ARG workers=2
-    ARG schema_version=30
-    ARG openapi_spec
-
     RUN apk add --no-cache gcc musl-dev
     RUN python -m pip install schemathesis==3.27.1
     RUN mkdir /results
-    COPY ./hooks/hooks.py .    
-
+    COPY ./hooks/hooks.py .
     VOLUME /results
+    ARG openapi_spec
     ENTRYPOINT export SCHEMATHESIS_HOOKS=hooks \
                     && st run --checks all $openapi_spec \
-                    --workers=$workers \
-                    --wait-for-schema=$wait_for_schema \
-                    --max-response-time=$max_response_time \
-                    --hypothesis-max-examples=$max_examples \
+                    --workers=2 \
+                    --wait-for-schema=15 \
+                    --max-response-time=5000 \
+                    --hypothesis-max-examples=1000 \
                     --data-generation-method=all \
                     --skip-deprecated-operations \
-                    --force-schema-version=$schema_version \
+                    --force-schema-version=30 \
                     --show-trace \
                     --force-color  \
                     --junit-xml=/results/junit-report.xml \
                     --cassette-path=/results/cassette.yaml
-
+    ARG tag="latest"
     SAVE IMAGE schemathesis:$tag
 
-# test-fuzzer-api - Fuzzy test cat-gateway using openapi specs
-test-fuzzer-api:
+# test-fuzzer-api - Fuzzy test cat-gateway using openapi specs.
+# Disabled in CI, to enable it rename to `test-fuzzer-api`.
+fuzzer-api:
     FROM earthly/dind:alpine-3.19
     RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
     RUN apk add yq zstd
-    ARG OPENAPI_SPEC="http://127.0.0.1:3030/docs/cat-gateway.json"
-
     COPY schemathesis-docker-compose.yml .
+    LET OPENAPI_SPEC="http://127.0.0.1:3030/docs/cat-gateway.json"
     WITH DOCKER \
         --compose schemathesis-docker-compose.yml \
         --load schemathesis:latest=(+package-schemathesis --openapi_spec=$OPENAPI_SPEC) \
@@ -50,13 +41,11 @@ test-fuzzer-api:
         --service event-db \
         --service cat-gateway \
         --allow-privileged
-        RUN docker run --net=host --name=st schemathesis:latest || echo fail > fail && \
-            docker-compose logs cat-gateway > ./cat-gateway.log && zstd -9 cat-gateway.log && \
+        RUN docker run --net=host --name=st schemathesis:latest && \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml
     END
     WAIT
         SAVE ARTIFACT junit-report.xml AS LOCAL schemathesis.junit-report.xml
-        SAVE ARTIFACT cat-gateway.log.zst AS LOCAL cat-gateway.log.zst
         SAVE ARTIFACT cassette.yaml AS LOCAL cassette.yaml
     END
