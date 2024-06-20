@@ -49,6 +49,6 @@ jobs:
 
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
-          projectId: uikit-entrails8verb6january6
+          firebaseServiceAccount: "${{ secrets.UIKIT_FIREBASE_SERVICE_ACCOUNT }}"
+          projectId: "${{ secrets.UIKIT_FIREBASE_PROJECT_ID }}"
           channelId: live
