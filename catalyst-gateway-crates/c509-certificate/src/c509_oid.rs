@@ -4,6 +4,7 @@
 
 use anyhow::Result;
 use asn1_rs::oid;
+use bimap::BiMap;
 use minicbor::{data::Tag, decode, encode::Write, Decode, Decoder, Encode, Encoder};
 use oid_registry::Oid;
 
@@ -15,40 +16,29 @@ pub struct C509oid<'a> {
     pen_supported: bool,
 }
 
-/*
 /// A C509 Oid with Registered Integer Encoding/Decoding.
-pub struct C509oidRegistered {
-    oid: C509oid,
-    registration_table: Arc<&phf::Map<Oid, Keyword>>
+pub struct C509oidRegistered<'a> {
+    oid: C509oid<'a>,
+    registration_table: BiMap<Oid<'static>, u64>,
 }
 
-impl C509oidRegistered {
-    fn new(oid: Oid<'a>, table: Arc<&phf::Map<Oid, Keyword>>) {
+impl<'a> C509oidRegistered<'a> {
+    /// Create a new instance of C509oidRegistered.
+    pub(crate) fn new(oid: Oid<'a>, table: BiMap<Oid<'static>, u64>) -> Self {
         C509oidRegistered {
-            oid : C509oid::new(oid),
-            registration_table: table.clone()
+            oid: C509oid::new(oid),
+            registration_table: table.clone(),
         }
     }
-}
-*/
 
-/*
-// In a seperate file say "c509_oid_extension"
-struct C509ExtensionOid(C509oidRegistered);
-
-// Use https://github.com/billyrieger/bimap-rs instead of PHF
-static ExtensionsTable: phf::Map<oid, uint64> = phf_map! {
-    oid!(1.2.3.4.5.6) => 5,
-    oid!(1.2.3.4.5.7.8.9) => 11,
-};
-
-
-impl C509ExtensionOid {
-    fn new(oid: Oid<'a>) {
-        C509ExtensionOid(C509oidRegistered::new(oid, ExtenionsTable).pen_encoded)
+    /// Is PEN Encoding supported for this OID.
+    /// Depends on each registration table.
+    pub(crate) fn pen_encoded(mut self) -> Self {
+        self.oid.pen_supported = true;
+        self
     }
 }
-*/
+
 /// IANA Private Enterprise Number OID prefix.
 const PEN_PREFIX: Oid<'static> = oid!(1.3.6 .1 .4 .1);
 /// Tag number representing IANA Private Enterprise Number (PEN) OID.
