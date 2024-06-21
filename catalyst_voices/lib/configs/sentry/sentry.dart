@@ -7,23 +7,16 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 final class SentryService {
   const SentryService._();
 
-  static Future<void> captureException(
-    Object error,
-    StackTrace stackTrace,
-  ) async {
-    await Sentry.captureException(
-      error,
-      stackTrace: stackTrace,
-    );
-  }
-
   /// Never call it in release mode.
   /// It is only for development and testing.
   static Future<void> crash() async {
     try {
       throw Exception('Capture Exception!');
     } catch (error, stackTrace) {
-      await SentryService.captureException(error, stackTrace);
+      await Sentry.captureException(
+        error,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -33,7 +26,8 @@ final class SentryService {
     await SentryFlutter.init(
       (options) {
         options
-          ..dsn = AppConfig.sentryDsn
+          ..dsn = BuildConfig.sentryDsn
+          ..environment = BuildConfig.sentryEnvironment
           ..tracesSampleRate = 1.0
           ..profilesSampleRate = 1.0
           ..attachScreenshot = true

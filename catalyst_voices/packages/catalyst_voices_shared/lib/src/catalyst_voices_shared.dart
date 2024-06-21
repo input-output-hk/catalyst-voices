@@ -1,4 +1,4 @@
-export 'common/app_config.dart';
+export 'common/build_config.dart';
 export 'dependency/dependency_provider.dart';
 export 'platform/catalyst_platform.dart';
 export 'platform_aware_builder/platform_aware_builder.dart';

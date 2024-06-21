@@ -8,7 +8,7 @@
 /// To access the environment variables, use the `AppConfig` class.
 /// For example, to get the 'SENTRY_DSN' environment variable,
 ///  use `AppConfig.sentryDsn`.
-final class AppConfig {
+final class BuildConfig {
   /// Gets the 'SENTRY_DSN' from the environment variables.
   static String sentryDsn = const String.fromEnvironment(
     'SENTRY_DSN',
@@ -27,5 +27,5 @@ final class AppConfig {
     'SENTRY_RELEASE',
   );
 
-  AppConfig._();
+  BuildConfig._();
 }

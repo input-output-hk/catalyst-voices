@@ -63,13 +63,12 @@ dev_dependencies:
     sdk: flutter
   mockito: ^5.4.4
   mocktail: ^1.0.1
-  sentry_dart_plugin: ^1.0.0
+  sentry_dart_plugin: ^2.1.0
 
 flutter:
   uses-material-design: true
   generate: true
 
 sentry:
-  upload_debug_symbols: true
   upload_source_maps: true
-  upload_sources: false
+  upload_sources: true
