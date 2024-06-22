@@ -1,7 +1,7 @@
 VERSION 0.8
 
 IMPORT ../catalyst-gateway AS catalyst-gateway
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.1.7 AS flutter-ci 
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.1.9 AS flutter-ci
 
 # builder - Copy all the necessary files and running bootstrap
 builder:
@@ -16,10 +16,10 @@ builder:
 # proper folder of `catalyst_voices_services` local code.
 code-generator:
     ARG save_locally=false
-    
+
     LET gen_code_path  = lib/generated/catalyst_gateway
     LET local_gen_code_path = packages/catalyst_voices_services/lib/generated/catalyst_gateway/
-    
+
     FROM +builder
     WORKDIR catalyst_voices/packages/catalyst_voices_services
     COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
@@ -52,7 +52,7 @@ check-code-formatting:
 build-web:
     FROM +builder
     ARG WORKDIR=/frontend/catalyst_voices
-    DO flutter-ci+BUILD_WEB --TARGET=lib/configs/main_web.dart --WORKDIR=$WORKDIR
+    DO flutter-ci+BUILD_WEB --TARGET=lib/configs/main_web.dart ---dart-define SENTRY_DSN='' --WORKDIR=$WORKDIR
     SAVE ARTIFACT web
 
 # test-unit - Run unit tests

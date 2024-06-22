@@ -4,14 +4,15 @@
 
 This repository contains the Catalyst Voices app and packages.
 
-* [Catalyst Voices](#catalyst-voices)
-  * [Requirements](#requirements)
-  * [Getting Started](#getting-started)
-    * [Bootstrapping](#bootstrapping)
-    * [Packages](#packages)
-    * [Flavors](#flavors)
-  * [Running Tests](#running-tests)
-  * [Common issues](#common-issues)
+- [Catalyst Voices](#catalyst-voices)
+  - [Requirements](#requirements)
+  - [Getting Started](#getting-started)
+    - [Bootstrapping](#bootstrapping)
+    - [Packages](#packages)
+    - [Flavors](#flavors)
+    - [Environment variables](#environment-variables)
+  - [Running Tests](#running-tests)
+  - [Common issues](#common-issues)
 
 ## Requirements
 
@@ -83,6 +84,18 @@ flutter run --flavor prod --target lib/configs/main_prod.dart
 
 >Catalyst Voices works on the Web only.
 >We plan to add support for other targets later.
+
+### Environment variables
+
+We use [dart defines](https://dart.dev/guides/language/language-tour#using-variables)
+to manage environment variables.
+
+For example if you need to pass `SENTRY_DSN` as environment variable,
+you can use the following command:
+
+```sh
+flutter build web --target lib/configs/main_web.dart --dart-define SENTRY_DSN=REPLACE_WITH_SENTRY_DSN_URL
+```
 
 ## Running Tests
 
