@@ -5,6 +5,7 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 final class AppRouter {
   static final _rootNavigatorKey = GlobalKey<NavigatorState>(
@@ -20,6 +21,9 @@ final class AppRouter {
       initialLocation: _isWeb(),
       refreshListenable: AppRouterRefreshStream(authenticationBloc.stream),
       redirect: (context, state) => _guard(authenticationBloc, state),
+      observers: [
+        SentryNavigatorObserver(),
+      ],
       routes: _routes(),
     );
   }
