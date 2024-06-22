@@ -4,7 +4,7 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/generated/catalyst_voices_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
-import 'package:uikit_example/examples/voices_app_bar_example.dart';
+import 'package:uikit_example/examples/voices_navigation_example.dart';
 
 void main() {
   runApp(const UIKitExampleApp());
@@ -52,8 +52,8 @@ class _ExamplesList extends StatelessWidget {
   List<_Example> get _examples {
     return const [
       _Example(
-        title: 'VoicesAppBar',
-        example: VoicesAppBarExample(),
+        title: 'VoicesNavigation (AppBar + Drawer)',
+        example: VoicesNavigationExample(),
       ),
     ];
   }

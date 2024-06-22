@@ -58,7 +58,11 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
                 padding: EdgeInsets.only(top: 8, bottom: 8, left: data),
                 child: IconButton(
                   color: Theme.of(context).colors.iconsForeground,
-                  onPressed: () {},
+                  onPressed: () {
+                    context
+                        .findAncestorStateOfType<ScaffoldState>()
+                        ?.openDrawer();
+                  },
                   icon: const Icon(CatalystVoicesIcons.menu),
                 ),
               )

@@ -48,6 +48,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
   final Color? avatarsSuccess;
   final Color? avatarsWarning;
   final Color? avatarsError;
+  final Color? elevationsOnSurfaceNeutralLv0;
 
   const VoicesColorScheme({
     required this.textPrimary,
@@ -91,6 +92,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     required this.avatarsSuccess,
     required this.avatarsWarning,
     required this.avatarsError,
+    required this.elevationsOnSurfaceNeutralLv0,
   });
 
   @override
@@ -136,6 +138,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     Color? avatarsSuccess,
     Color? avatarsWarning,
     Color? avatarsError,
+    Color? elevationsOnSurfaceNeutralLv0,
   }) {
     return VoicesColorScheme(
       textPrimary: textPrimary ?? this.textPrimary,
@@ -186,6 +189,8 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       avatarsSuccess: avatarsSuccess ?? this.avatarsSuccess,
       avatarsWarning: avatarsWarning ?? this.avatarsWarning,
       avatarsError: avatarsError ?? this.avatarsError,
+      elevationsOnSurfaceNeutralLv0:
+          elevationsOnSurfaceNeutralLv0 ?? this.elevationsOnSurfaceNeutralLv0,
     );
   }
 
@@ -269,6 +274,11 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       avatarsSuccess: Color.lerp(avatarsSuccess, other.avatarsSuccess, t),
       avatarsWarning: Color.lerp(avatarsWarning, other.avatarsWarning, t),
       avatarsError: Color.lerp(avatarsError, other.avatarsError, t),
+      elevationsOnSurfaceNeutralLv0: Color.lerp(
+        elevationsOnSurfaceNeutralLv0,
+        other.elevationsOnSurfaceNeutralLv0,
+        t,
+      ),
     );
   }
 }
