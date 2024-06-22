@@ -4,15 +4,15 @@
 
 This repository contains the Catalyst Voices app and packages.
 
-- [Catalyst Voices](#catalyst-voices)
-  - [Requirements](#requirements)
-  - [Getting Started](#getting-started)
-    - [Bootstrapping](#bootstrapping)
-    - [Packages](#packages)
-    - [Flavors](#flavors)
-    - [Environment variables](#environment-variables)
-  - [Running Tests](#running-tests)
-  - [Common issues](#common-issues)
+* [Catalyst Voices](#catalyst-voices)
+  * [Requirements](#requirements)
+  * [Getting Started](#getting-started)
+    * [Bootstrapping](#bootstrapping)
+    * [Packages](#packages)
+    * [Flavors](#flavors)
+    * [Environment variables](#environment-variables)
+  * [Running Tests](#running-tests)
+  * [Common issues](#common-issues)
 
 ## Requirements
 
