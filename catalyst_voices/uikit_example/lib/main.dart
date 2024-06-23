@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/pages/widgets/menu/voices_list_tile.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/generated/catalyst_voices_localizations.dart';
 import 'package:flutter/material.dart';
@@ -70,7 +71,7 @@ class _Example extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
+    return VoicesListTile(
       title: Text(title),
       trailing: const Icon(Icons.chevron_right),
       onTap: () {

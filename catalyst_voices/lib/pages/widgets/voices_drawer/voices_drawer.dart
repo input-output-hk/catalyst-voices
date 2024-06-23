@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/widgets/menu/voices_list_tile.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +11,7 @@ import 'package:flutter/material.dart';
 /// To add a sticky bottom menu item provide [bottom] widget.
 ///
 /// The [VoicesDrawer] is indented to be used as the [Scaffold.drawer].
-/// Menu items should primarily be constructed as [ListTile]s.
+/// Menu items should primarily be constructed as [VoicesListTile]s.
 class VoicesDrawer extends StatelessWidget {
   /// The menu items displayed from the top to the bottom in a vertical list.
   final List<Widget> children;
@@ -34,6 +35,9 @@ class VoicesDrawer extends StatelessWidget {
           indent: 24,
           endIndent: 24,
           space: 16,
+        ),
+        iconTheme: theme.iconTheme.copyWith(
+          size: 22,
         ),
       ),
       child: Drawer(

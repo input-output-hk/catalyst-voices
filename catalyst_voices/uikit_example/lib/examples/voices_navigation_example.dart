@@ -1,3 +1,5 @@
+import 'package:catalyst_voices/pages/widgets/menu/voices_expandable_list_tile.dart';
+import 'package:catalyst_voices/pages/widgets/menu/voices_list_tile.dart';
 import 'package:catalyst_voices/pages/widgets/voices_app_bar/actions/voices_app_bar_actions.dart';
 import 'package:catalyst_voices/pages/widgets/voices_app_bar/voices_app_bar.dart';
 import 'package:catalyst_voices/pages/widgets/voices_drawer/voices_drawer.dart';
@@ -25,28 +27,53 @@ class VoicesNavigationExample extends StatelessWidget {
       drawer: VoicesDrawer(
         bottom: const _DrawerChooser(),
         children: [
-          ListTile(
+          VoicesExpandableListTile(
+            title: const Text('My Dashboard'),
             leading: const Icon(CatalystVoicesIcons.home),
-            title: const Text('Saved Videos'),
-            onTap: () {
-              Navigator.pop(context);
-            },
-          ),
-          ListTile(
-            leading: const Icon(CatalystVoicesIcons.user),
             trailing: const Icon(CatalystVoicesIcons.eye),
-            title: const Text('Edit Profile'),
-            onTap: () {
-              Navigator.pop(context);
-            },
+            expandedChildren: [
+              VoicesListTile(
+                trailing: const Icon(CatalystVoicesIcons.eye),
+                title: const Text('My Catalyst Proposals'),
+                onTap: () {},
+              ),
+              VoicesListTile(
+                trailing: const Icon(CatalystVoicesIcons.eye),
+                title: const Text('My Actions'),
+                onTap: () {},
+              ),
+              VoicesListTile(
+                trailing: const Icon(CatalystVoicesIcons.eye),
+                title: const Text('Catalyst Campaign Timeline'),
+                onTap: () {},
+              ),
+            ],
           ),
           const Divider(),
-          ListTile(
-            leading: const Icon(CatalystVoicesIcons.logout),
-            title: const Text('LogOut'),
-            onTap: () {
-              Navigator.pop(context);
-            },
+          VoicesListTile(
+            leading: const Icon(CatalystVoicesIcons.user),
+            trailing: const Icon(CatalystVoicesIcons.eye),
+            title: const Text('Catalyst Roles'),
+            onTap: () => Navigator.pop(context),
+          ),
+          VoicesListTile(
+            leading: const Icon(CatalystVoicesIcons.annotation),
+            trailing: const Icon(CatalystVoicesIcons.eye),
+            title: const Text('Feedback'),
+            onTap: () => Navigator.pop(context),
+          ),
+          const Divider(),
+          VoicesListTile(
+            leading: const Icon(CatalystVoicesIcons.arrow_right),
+            trailing: const Icon(CatalystVoicesIcons.eye),
+            title: const Text('Catalyst Gitbook documentation'),
+            onTap: () => Navigator.pop(context),
+          ),
+          VoicesListTile(
+            leading: const Icon(CatalystVoicesIcons.arrow_right),
+            trailing: const Icon(CatalystVoicesIcons.eye),
+            title: const Text('Opportunity board'),
+            onTap: () => Navigator.pop(context),
           ),
         ],
       ),
