@@ -15,26 +15,6 @@ import 'package:flutter/material.dart';
 /// display as actions in the app bar.
 ///
 /// A set of possible actions widget are available in the actions subfolder.
-///
-/// Example usage:
-///
-/// ```dart
-/// Scaffold(
-///   appBar: VoicesAppBar(
-///     isNavVisible: true,
-///     actions: [
-///       NotificationsIndicator(
-///         badgeText: '5',
-///         onPressed: () {},
-///       ),
-///       UnlockButton(
-///         onPressed: () {},
-///       ),
-///     ],
-///   ),
-///   body: Center(child: Text('Content')),
-/// );
-/// ```
 class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
   final bool isNavVisible;
   final List<Widget> actions;
