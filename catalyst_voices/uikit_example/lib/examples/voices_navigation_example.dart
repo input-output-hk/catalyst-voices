@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 
 class VoicesNavigationExample extends StatelessWidget {
   static const String route = '/navigation-example';
-  
+
   const VoicesNavigationExample({super.key});
 
   @override
@@ -91,12 +91,12 @@ class _DrawerChooser extends StatefulWidget {
 }
 
 class _DrawerChooserState extends State<_DrawerChooser> {
-  Space _selectedSpace = Space.ideas;
+  _Space _selectedSpace = _Space.ideas;
 
   @override
   Widget build(BuildContext context) {
-    return VoicesDrawerChooser<Space>(
-      items: Space.values,
+    return VoicesDrawerChooser<_Space>(
+      items: _Space.values,
       selectedItem: _selectedSpace,
       onSelected: _onSpaceSelected,
       itemBuilder: _itemBuilder,
@@ -107,7 +107,7 @@ class _DrawerChooserState extends State<_DrawerChooser> {
     );
   }
 
-  void _onSpaceSelected(Space space) {
+  void _onSpaceSelected(_Space space) {
     setState(() {
       _selectedSpace = space;
     });
@@ -115,7 +115,7 @@ class _DrawerChooserState extends State<_DrawerChooser> {
 
   Widget _itemBuilder({
     required BuildContext context,
-    required Space item,
+    required _Space item,
     required bool isSelected,
   }) {
     if (isSelected) {
@@ -130,7 +130,7 @@ class _DrawerChooserState extends State<_DrawerChooser> {
   }
 }
 
-enum Space {
+enum _Space {
   ideas,
   discovery,
   proposals,
@@ -138,39 +138,39 @@ enum Space {
 
   IconData getIcon() {
     switch (this) {
-      case Space.ideas:
+      case _Space.ideas:
         return CatalystVoicesIcons.light_bulb;
-      case Space.discovery:
+      case _Space.discovery:
         return CatalystVoicesIcons.shopping_cart;
-      case Space.proposals:
+      case _Space.proposals:
         return CatalystVoicesIcons.fund;
-      case Space.settings:
+      case _Space.settings:
         return CatalystVoicesIcons.cog_gear;
     }
   }
 
   Color getForegroundColor(BuildContext context) {
     switch (this) {
-      case Space.ideas:
+      case _Space.ideas:
         return Theme.of(context).colorScheme.primary;
-      case Space.discovery:
+      case _Space.discovery:
         return Theme.of(context).colorScheme.secondary;
-      case Space.proposals:
+      case _Space.proposals:
         return Colors.white;
-      case Space.settings:
+      case _Space.settings:
         return Colors.white;
     }
   }
 
   Color getBackgroundColor(BuildContext context) {
     switch (this) {
-      case Space.ideas:
+      case _Space.ideas:
         return Theme.of(context).colorScheme.primaryContainer;
-      case Space.discovery:
+      case _Space.discovery:
         return Theme.of(context).colorScheme.secondaryContainer;
-      case Space.proposals:
+      case _Space.proposals:
         return Colors.orange;
-      case Space.settings:
+      case _Space.settings:
         return Colors.green;
     }
   }
