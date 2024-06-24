@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/widgets/chips/voices_chip.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 
 class VoicesChipExample extends StatelessWidget {
@@ -8,18 +9,46 @@ class VoicesChipExample extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    final backgrounds = [
+      null,
+      Theme.of(context).colorScheme.primaryContainer,
+    ];
+
+    final leadings = [
+      null,
+      const Icon(CatalystVoicesIcons.library_icon),
+    ];
+
+    final trailings = [
+      null,
+      const Icon(CatalystVoicesIcons.x),
+    ];
+
+    return Scaffold(
       body: Padding(
-        padding: EdgeInsets.all(32),
-        child: Column(
+        padding: const EdgeInsets.all(32),
+        child: Wrap(
+          spacing: 16,
+          runSpacing: 16,
           children: [
-            VoicesChip.round(
-              content: Text('Label'),
-            ),
-            SizedBox(height: 16),
-            VoicesChip.rectangular(
-              content: Text('Label'),
-            ),
+            for (final background in backgrounds)
+              for (final leading in leadings)
+                for (final trailing in trailings) ...[
+                  VoicesChip.round(
+                    content: const Text('Label'),
+                    leading: leading,
+                    trailing: trailing,
+                    backgroundColor: background,
+                    onTap: () {},
+                  ),
+                  VoicesChip.rectangular(
+                    content: const Text('Label'),
+                    leading: leading,
+                    trailing: trailing,
+                    backgroundColor: background,
+                    onTap: () {},
+                  ),
+                ],
           ],
         ),
       ),

@@ -7,6 +7,8 @@ class VoicesChip extends StatelessWidget {
   final Widget? trailing;
   final Color? backgroundColor;
   final BorderRadius borderRadius;
+  final EdgeInsets padding;
+  final VoidCallback? onTap;
 
   const VoicesChip({
     super.key,
@@ -15,6 +17,8 @@ class VoicesChip extends StatelessWidget {
     this.trailing,
     this.backgroundColor,
     required this.borderRadius,
+    this.padding = const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+    this.onTap,
   });
 
   const VoicesChip.round({
@@ -23,6 +27,8 @@ class VoicesChip extends StatelessWidget {
     this.leading,
     this.trailing,
     this.backgroundColor,
+    this.padding = const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+    this.onTap,
   }) : borderRadius = const BorderRadius.all(Radius.circular(32));
 
   const VoicesChip.rectangular({
@@ -31,12 +37,13 @@ class VoicesChip extends StatelessWidget {
     this.leading,
     this.trailing,
     this.backgroundColor,
+    this.padding = const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+    this.onTap,
   }) : borderRadius = const BorderRadius.all(Radius.circular(8));
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: backgroundColor,
         border: backgroundColor != null
@@ -46,13 +53,41 @@ class VoicesChip extends StatelessWidget {
               ),
         borderRadius: borderRadius,
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (leading != null) leading!,
-          content,
-          if (trailing != null) trailing!,
-        ],
+      child: Material(
+        type: MaterialType.transparency,
+        borderRadius: borderRadius,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: padding,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (leading != null)
+                  Padding(
+                    padding: const EdgeInsetsDirectional.only(end: 8),
+                    child: IconTheme(
+                      data: const IconThemeData(size: 18),
+                      child: leading!,
+                    ),
+                  ),
+                DefaultTextStyle(
+                  style: Theme.of(context).textTheme.labelLarge!,
+                  child: content,
+                ),
+                if (trailing != null)
+                  Padding(
+                    padding: const EdgeInsetsDirectional.only(start: 8),
+                    child: IconTheme(
+                      data: const IconThemeData(size: 18),
+                      child: trailing!,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
