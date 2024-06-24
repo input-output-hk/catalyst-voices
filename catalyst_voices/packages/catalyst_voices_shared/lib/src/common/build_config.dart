@@ -13,7 +13,7 @@ import 'package:catalyst_voices_shared/src/common/build_environment.dart';
 ///  use `AppConfig.sentryDsn`.
 final class BuildConfig {
   /// Gets the 'SENTRY_DSN' from the environment variables.
-  static String sentryDsn = const String.fromEnvironment(
+  static const String sentryDsn = String.fromEnvironment(
     'SENTRY_DSN',
   );
 
@@ -25,7 +25,7 @@ final class BuildConfig {
   );
 
   /// Gets the 'SENTRY_RELEASE' from the environment variables.
-  static String sentryRelease = const String.fromEnvironment(
+  static const String sentryRelease = String.fromEnvironment(
     'SENTRY_RELEASE',
   );
 
