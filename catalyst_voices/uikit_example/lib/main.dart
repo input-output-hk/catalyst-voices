@@ -26,7 +26,10 @@ class UIKitExampleApp extends StatelessWidget {
       localeListResolutionCallback: basicLocaleListResolution,
       theme: ThemeBuilder.buildTheme(BrandKey.catalyst),
       darkTheme: ThemeBuilder.buildDarkTheme(BrandKey.catalyst),
-      home: const _ExamplesList(),
+      routes: {
+        Navigator.defaultRouteName: (_) => const _ExamplesList(),
+        VoicesNavigationExample.route: (_) => const VoicesNavigationExample(),
+      },
     );
   }
 }
@@ -54,7 +57,7 @@ class _ExamplesList extends StatelessWidget {
     return const [
       _Example(
         title: 'VoicesNavigation (AppBar + Drawer)',
-        example: VoicesNavigationExample(),
+        route: VoicesNavigationExample.route,
       ),
     ];
   }
@@ -62,11 +65,11 @@ class _ExamplesList extends StatelessWidget {
 
 class _Example extends StatelessWidget {
   final String title;
-  final Widget example;
+  final String route;
 
   const _Example({
     required this.title,
-    required this.example,
+    required this.route,
   });
 
   @override
@@ -74,12 +77,7 @@ class _Example extends StatelessWidget {
     return VoicesListTile(
       title: Text(title),
       trailing: const Icon(Icons.chevron_right),
-      onTap: () {
-        unawaited(
-          Navigator.of(context)
-              .push(MaterialPageRoute(builder: (_) => example)),
-        );
-      },
+      onTap: () => unawaited(Navigator.of(context).pushNamed(route)),
     );
   }
 }

@@ -7,6 +7,8 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 
 class VoicesNavigationExample extends StatelessWidget {
+  static const String route = '/navigation-example';
+  
   const VoicesNavigationExample({super.key});
 
   @override
