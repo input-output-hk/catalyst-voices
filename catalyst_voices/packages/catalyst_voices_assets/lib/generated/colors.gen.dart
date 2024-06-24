@@ -142,6 +142,12 @@ class VoicesColors {
   /// Color: #7F90B3
   static const Color darkOutline = Color(0xFF7F90B3);
 
+  /// Color: #FF7F90B3
+  static const Color darkOutlineBorderOutline = Color(0xFF7F90B3);
+
+  /// Color: #FF364463
+  static const Color darkOutlineBorderOutlineVariant = Color(0xFF364463);
+
   /// Color: #364463
   static const Color darkOutlineVariant = Color(0xFF364463);
 
@@ -309,6 +315,12 @@ class VoicesColors {
 
   /// Color: #D9DEE8
   static const Color lightOutline = Color(0xFFD9DEE8);
+
+  /// Color: #FFD9DEE8
+  static const Color lightOutlineBorderOutline = Color(0xFFD9DEE8);
+
+  /// Color: #61BFC8D9
+  static const Color lightOutlineBorderOutlineVariant = Color(0x61BFC8D9);
 
   /// Color: #61BFC8D9
   static const Color lightOutlineVariant = Color(0x61BFC8D9);

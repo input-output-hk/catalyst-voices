@@ -1,10 +1,11 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/pages/widgets/menu/voices_list_tile.dart';
+import 'package:catalyst_voices/widgets/menu/voices_list_tile.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/generated/catalyst_voices_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
+import 'package:uikit_example/examples/voices_chip_example.dart';
 import 'package:uikit_example/examples/voices_navigation_example.dart';
 
 void main() {
@@ -29,6 +30,7 @@ class UIKitExampleApp extends StatelessWidget {
       routes: {
         Navigator.defaultRouteName: (_) => const _ExamplesList(),
         VoicesNavigationExample.route: (_) => const VoicesNavigationExample(),
+        VoicesChipExample.route: (_) => const VoicesChipExample(),
       },
     );
   }
@@ -58,6 +60,10 @@ class _ExamplesList extends StatelessWidget {
       _Example(
         title: 'VoicesNavigation (AppBar + Drawer)',
         route: VoicesNavigationExample.route,
+      ),
+      _Example(
+        title: 'Voices Chips',
+        route: VoicesChipExample.route,
       ),
     ];
   }
