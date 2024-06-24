@@ -14,6 +14,26 @@ const PEN_PREFIX: Oid<'static> = oid!(1.3.6 .1 .4 .1);
 const OID_PEN_TAG: u64 = 112;
 
 // -----------------------------------------
+#[derive(Debug)]
+pub(crate) struct OidToIntegerTable {
+    map: BiMap<i16, Oid<'static>>,
+}
+
+impl OidToIntegerTable {
+    pub(crate) fn new(table: Vec<(i16, Oid<'static>)>) -> Self {
+        let mut map = BiMap::new();
+
+        for entry in table {
+            map.insert(entry.0, entry.1);
+        }
+
+        Self { map }
+    }
+
+    pub(crate) fn get_map(&self) -> &BiMap<i16, Oid<'static>> {
+        &self.map
+    }
+}
 
 #[allow(dead_code)]
 #[derive(Debug, Clone)]
@@ -21,13 +41,13 @@ const OID_PEN_TAG: u64 = 112;
 /// Value of registered OID in the table can be negative.
 pub struct C509oidRegistered<'a> {
     oid: C509oid<'a>,
-    registration_table: &'static BiMap<C509oid<'static>, i16>,
+    registration_table: &'static OidToIntegerTable,
 }
 
 #[allow(dead_code)]
 impl<'a> C509oidRegistered<'a> {
     /// Create a new instance of C509oidRegistered.
-    pub(crate) fn new(oid: Oid<'a>, table: &'static BiMap<C509oid<'static>, i16>) -> Self {
+    pub(crate) fn new(oid: Oid<'a>, table: &'static OidToIntegerTable) -> Self {
         C509oidRegistered {
             oid: C509oid::new(oid),
             registration_table: table,
@@ -41,12 +61,16 @@ impl<'a> C509oidRegistered<'a> {
         self
     }
 
-    pub fn c509_oid(&self) -> C509oid<'a>{
+    pub(crate) fn get_oid(&self) -> Oid<'a> {
+        // FIXME - Should this be cloned?
+        self.oid.oid.clone()
+    }
+    pub(crate) fn get_c509_oid(&self) -> C509oid<'a> {
         // FIXME - Should this be cloned?
         self.oid.clone()
     }
 
-    pub fn get_table(&self) -> &'static BiMap<C509oid<'static>, i16> {
+    pub fn get_table(&self) -> &'static OidToIntegerTable {
         self.registration_table
     }
 }
@@ -60,7 +84,6 @@ pub struct C509oid<'a> {
     oid: Oid<'a>,
     pen_supported: bool,
 }
-
 
 #[allow(dead_code)]
 impl<'a> C509oid<'a> {
@@ -149,7 +172,6 @@ impl<'b, C> Decode<'b, C> for C509oid<'_> {
 }
 
 // -----------------------------------------
-
 
 #[cfg(test)]
 mod test_c509_oid {
