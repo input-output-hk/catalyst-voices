@@ -7,18 +7,6 @@ import 'package:sentry_flutter/sentry_flutter.dart';
 final class SentryService {
   const SentryService._();
 
-  // TODO(minikin): Remove this method after the demo.
-  static Future<void> crash() async {
-    try {
-      throw Exception('Capture Exception!');
-    } catch (error, stackTrace) {
-      await Sentry.captureException(
-        error,
-        stackTrace: stackTrace,
-      );
-    }
-  }
-
   static Future<void> init(
     Widget app,
   ) async {
