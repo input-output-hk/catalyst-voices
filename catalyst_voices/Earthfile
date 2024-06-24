@@ -53,6 +53,14 @@ test-unit:
     FROM +builder
     DO flutter-ci+UNIT_TESTS
 
+# Build web version of Catalyst Voices without arguments.
+# This is used for development purposes to validate build on PRs.
+build-web-on-pr:
+    FROM +builder
+
+    ARG WORKDIR=/frontend/catalyst_voices
+    DO flutter-ci+BUILD_WEB --TARGET=lib/configs/main_web.dart --WORKDIR=$WORKDIR
+
 # Build web version of Catalyst Voices
 build-web:
     FROM +builder
@@ -61,10 +69,10 @@ build-web:
 
     IF [$SECRETS_ARE_AVAILABLE]
         ARG WORKDIR=/frontend/catalyst_voices
-        DO flutter-ci+BUILD_WEB --TARGET=lib/configs/main_web.dart ---dart-define SENTRY_DSN=$SENTRY_DSN --WORKDIR=$WORKDIR
+        DO flutter-ci+BUILD_WEB --TARGET=lib/configs/main_web.dart --dart-define SENTRY_DSN=$SENTRY_DSN --WORKDIR=$WORKDIR
         SAVE ARTIFACT web
     ELSE
-        RUN echo "No secrets available in Erthly yet."
+        RUN echo "No secrets are available in Earthly yet."
     END
 
 package:
@@ -79,7 +87,7 @@ package:
 
         SAVE IMAGE voices-frontend:$tag
     ELSE
-        RUN echo "No secrets available in Erthly yet."
+        RUN echo "No secrets are available in Earthly yet."
     END
 
 publish:
@@ -90,5 +98,5 @@ publish:
     IF [$SECRETS_ARE_AVAILABLE]
         SAVE IMAGE voices-frontend:$tag
     ELSE
-        RUN echo "No secrets available in Erthly yet."
+        RUN echo "No secrets are available in Earthly yet."
     END
