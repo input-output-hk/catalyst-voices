@@ -1,4 +1,4 @@
-name: Deploy Flutter Web
+name: Deploy Catalyst Voices Web App
 
 on:
   push:
@@ -55,7 +55,7 @@ jobs:
         with:
           earthfile: ./catalyst_voices/
           flags: --allow-privileged
-          targets: build-web
+          targets: package
           target_flags: SECRETS_ARE_AVAILABLE=true
           runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
           artifact: "true"
