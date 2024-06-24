@@ -41,19 +41,19 @@ jobs:
       - name: Build Flutter Web
         uses: input-output-hk/catalyst-ci/actions/run@master
         if: always()
-        continue-on-error: true
+        continue-on-error: false
         with:
           earthfile: ./catalyst_voices/
           flags: --allow-privileged
-          targets: build-web
-          target_flags: SECRETS_ARE_AVAILABLE=true, SENTRY_DSN=${{ secrets.SENTRY_DSN }}
+          targets: build-web SECRETS_ARE_AVAILABLE=true, SENTRY_DSN=${{ secrets.SENTRY_DSN }}
+          target_flags:
           runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
           artifact: "true"
 
       - name: Package Flutter Web
         uses: input-output-hk/catalyst-ci/actions/run@master
         if: always()
-        continue-on-error: true
+        continue-on-error: false
         with:
           earthfile: ./catalyst_voices/
           flags: --allow-privileged
@@ -65,7 +65,7 @@ jobs:
       - name: Publish Flutter Web
         uses: input-output-hk/catalyst-ci/actions/run@master
         if: always()
-        continue-on-error: true
+        continue-on-error: false
         with:
           earthfile: ./catalyst_voices/
           flags: --allow-privileged
