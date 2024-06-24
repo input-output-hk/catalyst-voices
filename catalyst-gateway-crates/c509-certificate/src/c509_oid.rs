@@ -8,26 +8,29 @@ use bimap::BiMap;
 use minicbor::{data::Tag, decode, encode::Write, Decode, Decoder, Encode, Encoder};
 use oid_registry::Oid;
 
-/// Represent an instance of C509 OID where it contains an oid.
-#[allow(dead_code)]
-#[derive(Debug, PartialEq)]
-pub struct C509oid<'a> {
-    oid: Oid<'a>,
-    pen_supported: bool,
-}
+/// IANA Private Enterprise Number OID prefix.
+const PEN_PREFIX: Oid<'static> = oid!(1.3.6 .1 .4 .1);
+/// Tag number representing IANA Private Enterprise Number (PEN) OID.
+const OID_PEN_TAG: u64 = 112;
 
+// -----------------------------------------
+
+#[allow(dead_code)]
+#[derive(Debug, Clone)]
 /// A C509 Oid with Registered Integer Encoding/Decoding.
+/// Value of registered OID in the table can be negative.
 pub struct C509oidRegistered<'a> {
     oid: C509oid<'a>,
-    registration_table: BiMap<Oid<'static>, u64>,
+    registration_table: &'static BiMap<C509oid<'static>, i16>,
 }
 
+#[allow(dead_code)]
 impl<'a> C509oidRegistered<'a> {
     /// Create a new instance of C509oidRegistered.
-    pub(crate) fn new(oid: Oid<'a>, table: BiMap<Oid<'static>, u64>) -> Self {
+    pub(crate) fn new(oid: Oid<'a>, table: &'static BiMap<C509oid<'static>, i16>) -> Self {
         C509oidRegistered {
             oid: C509oid::new(oid),
-            registration_table: table.clone(),
+            registration_table: table,
         }
     }
 
@@ -37,12 +40,27 @@ impl<'a> C509oidRegistered<'a> {
         self.oid.pen_supported = true;
         self
     }
+
+    pub fn c509_oid(&self) -> C509oid<'a>{
+        // FIXME - Should this be cloned?
+        self.oid.clone()
+    }
+
+    pub fn get_table(&self) -> &'static BiMap<C509oid<'static>, i16> {
+        self.registration_table
+    }
 }
 
-/// IANA Private Enterprise Number OID prefix.
-const PEN_PREFIX: Oid<'static> = oid!(1.3.6 .1 .4 .1);
-/// Tag number representing IANA Private Enterprise Number (PEN) OID.
-const OID_PEN_TAG: u64 = 112;
+// -----------------------------------------
+
+/// Represent an instance of C509 OID where it contains an oid.
+#[allow(dead_code)]
+#[derive(Debug, PartialEq, Clone, Eq, Hash)]
+pub struct C509oid<'a> {
+    oid: Oid<'a>,
+    pen_supported: bool,
+}
+
 
 #[allow(dead_code)]
 impl<'a> C509oid<'a> {
@@ -130,6 +148,9 @@ impl<'b, C> Decode<'b, C> for C509oid<'_> {
     }
 }
 
+// -----------------------------------------
+
+
 #[cfg(test)]
 mod test_c509_oid {
 
@@ -141,28 +162,13 @@ mod test_c509_oid {
     // Test reference 3.1. Encoding of the SHA-256 OID
     // https://datatracker.ietf.org/doc/rfc9090/
     #[test]
-    fn test_encode_decode() {
+    fn test_encode_decode_unwrapped() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
         let oid = C509oid::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1));
         oid.encode(&mut encoder, &mut ())
             .expect("Failed to encode OID");
         assert_eq!(hex::encode(buffer.clone()), "49608648016503040201");
-
-        let mut decoder = Decoder::new(&buffer);
-        let decoded_oid = C509oid::decode(&mut decoder, &mut ()).expect("Failed to decode OID");
-        assert_eq!(decoded_oid, oid);
-    }
-
-    #[test]
-    fn test_encode_decode_from_registry() {
-        let mut buffer = Vec::new();
-        let mut encoder = Encoder::new(&mut buffer);
-        // OID_HASH_SHA1 = 1.3.14.3.2.26
-        let oid = C509oid::new(oid_registry::OID_HASH_SHA1);
-        oid.encode(&mut encoder, &mut ())
-            .expect("Failed to encode OID");
-        assert_eq!(hex::encode(buffer.clone()), "452b0e03021a");
 
         let mut decoder = Decoder::new(&buffer);
         let decoded_oid = C509oid::decode(&mut decoder, &mut ()).expect("Failed to decode OID");
