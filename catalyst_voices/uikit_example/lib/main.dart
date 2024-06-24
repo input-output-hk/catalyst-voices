@@ -1,10 +1,12 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/widgets/menu/voices_list_tile.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/generated/catalyst_voices_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
-import 'package:uikit_example/examples/voices_app_bar_example.dart';
+import 'package:uikit_example/examples/voices_chip_example.dart';
+import 'package:uikit_example/examples/voices_navigation_example.dart';
 
 void main() {
   runApp(const UIKitExampleApp());
@@ -25,7 +27,11 @@ class UIKitExampleApp extends StatelessWidget {
       localeListResolutionCallback: basicLocaleListResolution,
       theme: ThemeBuilder.buildTheme(BrandKey.catalyst),
       darkTheme: ThemeBuilder.buildDarkTheme(BrandKey.catalyst),
-      home: const _ExamplesList(),
+      routes: {
+        Navigator.defaultRouteName: (_) => const _ExamplesList(),
+        VoicesNavigationExample.route: (_) => const VoicesNavigationExample(),
+        VoicesChipExample.route: (_) => const VoicesChipExample(),
+      },
     );
   }
 }
@@ -52,8 +58,12 @@ class _ExamplesList extends StatelessWidget {
   List<_Example> get _examples {
     return const [
       _Example(
-        title: 'VoicesAppBar',
-        example: VoicesAppBarExample(),
+        title: 'VoicesNavigation (AppBar + Drawer)',
+        route: VoicesNavigationExample.route,
+      ),
+      _Example(
+        title: 'Voices Chips',
+        route: VoicesChipExample.route,
       ),
     ];
   }
@@ -61,24 +71,19 @@ class _ExamplesList extends StatelessWidget {
 
 class _Example extends StatelessWidget {
   final String title;
-  final Widget example;
+  final String route;
 
   const _Example({
     required this.title,
-    required this.example,
+    required this.route,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
+    return VoicesListTile(
       title: Text(title),
       trailing: const Icon(Icons.chevron_right),
-      onTap: () {
-        unawaited(
-          Navigator.of(context)
-              .push(MaterialPageRoute(builder: (_) => example)),
-        );
-      },
+      onTap: () => unawaited(Navigator.of(context).pushNamed(route)),
     );
   }
 }

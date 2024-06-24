@@ -1,5 +1,5 @@
 import 'package:catalyst_voices/pages/login/login.dart';
-import 'package:catalyst_voices/pages/widgets/widgets.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 final class LoginRobot {

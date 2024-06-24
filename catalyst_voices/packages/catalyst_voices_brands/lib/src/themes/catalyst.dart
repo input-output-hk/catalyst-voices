@@ -9,6 +9,8 @@ ThemeData _buildThemeData(
   VoicesColorScheme voicesColorScheme,
   BrandAssets brandAssets,
 ) {
+  final textTheme = _buildTextTheme(voicesColorScheme);
+
   return ThemeData(
     appBarTheme: AppBarTheme(
       backgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv1,
@@ -32,112 +34,128 @@ ThemeData _buildThemeData(
         iconSize: 24,
       ),
     ),
-    textTheme: TextTheme(
-      displayLarge: GoogleFonts.notoSans(
-        color: voicesColorScheme.textPrimary,
-        fontSize: 57,
-        letterSpacing: -1.14,
-        fontWeight: FontWeight.w700,
-        height: 1.12,
-      ),
-      displayMedium: GoogleFonts.poppins(
-        color: voicesColorScheme.textPrimary,
-        fontSize: 45,
-        fontWeight: FontWeight.w700,
-        height: 1.15,
-      ),
-      displaySmall: GoogleFonts.poppins(
-        color: voicesColorScheme.textPrimary,
-        fontSize: 36,
-        fontWeight: FontWeight.w700,
-        height: 1.22,
-      ),
-      headlineLarge: GoogleFonts.poppins(
-        color: voicesColorScheme.textPrimary,
-        fontSize: 32,
-        fontWeight: FontWeight.w700,
-        height: 1.25,
-      ),
-      headlineMedium: GoogleFonts.poppins(
-        color: voicesColorScheme.textPrimary,
-        fontSize: 28,
-        fontWeight: FontWeight.w700,
-        height: 1.28,
-      ),
-      headlineSmall: GoogleFonts.poppins(
-        color: voicesColorScheme.textPrimary,
-        fontSize: 24,
-        fontWeight: FontWeight.w700,
-        height: 1.33,
-      ),
-      titleLarge: GoogleFonts.poppins(
-        color: voicesColorScheme.textPrimary,
-        fontSize: 22,
-        fontWeight: FontWeight.w700,
-        height: 1.27,
-        letterSpacing: 0.66,
-      ),
-      titleMedium: GoogleFonts.poppins(
-        color: voicesColorScheme.textPrimary,
-        fontSize: 16,
-        fontWeight: FontWeight.w700,
-        height: 1.5,
-        letterSpacing: 0.48,
-      ),
-      titleSmall: GoogleFonts.poppins(
-        color: voicesColorScheme.textPrimary,
-        fontSize: 14,
-        fontWeight: FontWeight.w700,
-        height: 1.42,
-        letterSpacing: 0.42,
-      ),
-      bodyLarge: GoogleFonts.notoSans(
-        color: voicesColorScheme.textPrimary,
-        fontSize: 16,
-        fontWeight: FontWeight.w500,
-        height: 1.5,
-        letterSpacing: 0.08,
-      ),
-      bodyMedium: GoogleFonts.notoSans(
-        color: voicesColorScheme.textPrimary,
-        fontSize: 14,
-        fontWeight: FontWeight.w500,
-        height: 1.42,
-        letterSpacing: 0.04,
-      ),
-      bodySmall: GoogleFonts.notoSans(
-        color: voicesColorScheme.textPrimary,
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-        height: 1.33,
-        letterSpacing: 0.05,
-      ),
-      labelLarge: GoogleFonts.notoSans(
-        color: voicesColorScheme.textPrimary,
-        fontSize: 14,
-        fontWeight: FontWeight.w500,
-        height: 1.42,
-        letterSpacing: 0.10,
-      ),
-      labelMedium: GoogleFonts.notoSans(
-        color: voicesColorScheme.textPrimary,
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-        height: 1,
-      ),
-      labelSmall: GoogleFonts.notoSans(
-        color: voicesColorScheme.textPrimary,
-        fontSize: 11,
-        fontWeight: FontWeight.w500,
-        height: 1.45,
-        letterSpacing: 0.50,
-      ),
+    drawerTheme: DrawerThemeData(
+      backgroundColor: voicesColorScheme.elevationsOnSurfaceNeutralLv0,
     ),
+    listTileTheme: ListTileThemeData(
+      shape: const StadiumBorder(),
+      minTileHeight: 56,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+      titleTextStyle: textTheme.labelLarge,
+    ),
+    dividerTheme: DividerThemeData(
+      color: colorScheme.outlineVariant,
+    ),
+    textTheme: textTheme,
     colorScheme: colorScheme,
     extensions: <ThemeExtension<dynamic>>[
       voicesColorScheme,
       brandAssets,
     ],
+  );
+}
+
+TextTheme _buildTextTheme(VoicesColorScheme voicesColorScheme) {
+  return TextTheme(
+    displayLarge: GoogleFonts.notoSans(
+      color: voicesColorScheme.textPrimary,
+      fontSize: 57,
+      letterSpacing: -1.14,
+      fontWeight: FontWeight.w700,
+      height: 1.12,
+    ),
+    displayMedium: GoogleFonts.poppins(
+      color: voicesColorScheme.textPrimary,
+      fontSize: 45,
+      fontWeight: FontWeight.w700,
+      height: 1.15,
+    ),
+    displaySmall: GoogleFonts.poppins(
+      color: voicesColorScheme.textPrimary,
+      fontSize: 36,
+      fontWeight: FontWeight.w700,
+      height: 1.22,
+    ),
+    headlineLarge: GoogleFonts.poppins(
+      color: voicesColorScheme.textPrimary,
+      fontSize: 32,
+      fontWeight: FontWeight.w700,
+      height: 1.25,
+    ),
+    headlineMedium: GoogleFonts.poppins(
+      color: voicesColorScheme.textPrimary,
+      fontSize: 28,
+      fontWeight: FontWeight.w700,
+      height: 1.28,
+    ),
+    headlineSmall: GoogleFonts.poppins(
+      color: voicesColorScheme.textPrimary,
+      fontSize: 24,
+      fontWeight: FontWeight.w700,
+      height: 1.33,
+    ),
+    titleLarge: GoogleFonts.poppins(
+      color: voicesColorScheme.textPrimary,
+      fontSize: 22,
+      fontWeight: FontWeight.w700,
+      height: 1.27,
+      letterSpacing: 0.66,
+    ),
+    titleMedium: GoogleFonts.poppins(
+      color: voicesColorScheme.textPrimary,
+      fontSize: 16,
+      fontWeight: FontWeight.w700,
+      height: 1.5,
+      letterSpacing: 0.48,
+    ),
+    titleSmall: GoogleFonts.poppins(
+      color: voicesColorScheme.textPrimary,
+      fontSize: 14,
+      fontWeight: FontWeight.w700,
+      height: 1.42,
+      letterSpacing: 0.42,
+    ),
+    bodyLarge: GoogleFonts.notoSans(
+      color: voicesColorScheme.textPrimary,
+      fontSize: 16,
+      fontWeight: FontWeight.w500,
+      height: 1.5,
+      letterSpacing: 0.08,
+    ),
+    bodyMedium: GoogleFonts.notoSans(
+      color: voicesColorScheme.textPrimary,
+      fontSize: 14,
+      fontWeight: FontWeight.w500,
+      height: 1.42,
+      letterSpacing: 0.04,
+    ),
+    bodySmall: GoogleFonts.notoSans(
+      color: voicesColorScheme.textPrimary,
+      fontSize: 12,
+      fontWeight: FontWeight.w500,
+      height: 1.33,
+      letterSpacing: 0.05,
+    ),
+    labelLarge: GoogleFonts.notoSans(
+      color: voicesColorScheme.textPrimary,
+      fontSize: 14,
+      fontWeight: FontWeight.w500,
+      height: 1.42,
+      letterSpacing: 0.10,
+    ),
+    labelMedium: GoogleFonts.notoSans(
+      color: voicesColorScheme.textPrimary,
+      fontSize: 12,
+      fontWeight: FontWeight.w500,
+      height: 1,
+    ),
+    labelSmall: GoogleFonts.notoSans(
+      color: voicesColorScheme.textPrimary,
+      fontSize: 11,
+      fontWeight: FontWeight.w500,
+      height: 1.45,
+      letterSpacing: 0.50,
+    ),
   );
 }
 
@@ -198,6 +216,10 @@ const VoicesColorScheme lightVoicesColorScheme = VoicesColorScheme(
   avatarsSuccess: VoicesColors.lightAvatarsSuccess,
   avatarsWarning: VoicesColors.lightAvatarsWarning,
   avatarsError: VoicesColors.lightAvatarsError,
+  elevationsOnSurfaceNeutralLv0:
+      VoicesColors.lightElevationsOnSurfaceNeutralLv0,
+  outlineBorder: VoicesColors.lightOutlineBorderOutline,
+  outlineBorderVariant: VoicesColors.lightOutlineBorderOutlineVariant,
 );
 
 const ColorScheme darkColorScheme = ColorScheme.dark(
@@ -257,6 +279,9 @@ const VoicesColorScheme darkVoicesColorScheme = VoicesColorScheme(
   avatarsSuccess: VoicesColors.darkAvatarsSuccess,
   avatarsWarning: VoicesColors.darkAvatarsWarning,
   avatarsError: VoicesColors.darkAvatarsError,
+  elevationsOnSurfaceNeutralLv0: VoicesColors.darkElevationsOnSurfaceNeutralLv0,
+  outlineBorder: VoicesColors.darkOutlineBorderOutline,
+  outlineBorderVariant: VoicesColors.darkOutlineBorderOutlineVariant,
 );
 
 final BrandAssets lightBrandAssets = BrandAssets(

@@ -48,6 +48,9 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
   final Color? avatarsSuccess;
   final Color? avatarsWarning;
   final Color? avatarsError;
+  final Color? elevationsOnSurfaceNeutralLv0;
+  final Color? outlineBorder;
+  final Color? outlineBorderVariant;
 
   const VoicesColorScheme({
     required this.textPrimary,
@@ -91,6 +94,9 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     required this.avatarsSuccess,
     required this.avatarsWarning,
     required this.avatarsError,
+    required this.elevationsOnSurfaceNeutralLv0,
+    required this.outlineBorder,
+    required this.outlineBorderVariant,
   });
 
   @override
@@ -136,6 +142,9 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     Color? avatarsSuccess,
     Color? avatarsWarning,
     Color? avatarsError,
+    Color? elevationsOnSurfaceNeutralLv0,
+    Color? outlineBorder,
+    Color? outlineBorderVariant,
   }) {
     return VoicesColorScheme(
       textPrimary: textPrimary ?? this.textPrimary,
@@ -186,6 +195,10 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       avatarsSuccess: avatarsSuccess ?? this.avatarsSuccess,
       avatarsWarning: avatarsWarning ?? this.avatarsWarning,
       avatarsError: avatarsError ?? this.avatarsError,
+      elevationsOnSurfaceNeutralLv0:
+          elevationsOnSurfaceNeutralLv0 ?? this.elevationsOnSurfaceNeutralLv0,
+      outlineBorder: outlineBorder ?? this.outlineBorder,
+      outlineBorderVariant: outlineBorderVariant ?? this.outlineBorderVariant,
     );
   }
 
@@ -269,6 +282,14 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       avatarsSuccess: Color.lerp(avatarsSuccess, other.avatarsSuccess, t),
       avatarsWarning: Color.lerp(avatarsWarning, other.avatarsWarning, t),
       avatarsError: Color.lerp(avatarsError, other.avatarsError, t),
+      elevationsOnSurfaceNeutralLv0: Color.lerp(
+        elevationsOnSurfaceNeutralLv0,
+        other.elevationsOnSurfaceNeutralLv0,
+        t,
+      ),
+      outlineBorder: Color.lerp(outlineBorder, other.outlineBorder, t),
+      outlineBorderVariant:
+          Color.lerp(outlineBorderVariant, other.outlineBorderVariant, t),
     );
   }
 }
