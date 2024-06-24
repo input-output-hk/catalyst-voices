@@ -28,6 +28,9 @@ class VoicesColors {
   /// Color: #B64E07
   static const Color darkAvatarsWarning = Color(0xFFB64E07);
 
+  /// Color: #121721
+  static const Color darkElevationsOnSurfaceNeutralLv0 = Color(0xFF121721);
+
   /// Color: #FF9999
   static const Color darkError = Color(0xFFFF9999);
 
@@ -192,6 +195,9 @@ class VoicesColors {
 
   /// Color: #FDE1CE
   static const Color lightAvatarsWarning = Color(0xFFFDE1CE);
+
+  /// Color: #FFFFFF
+  static const Color lightElevationsOnSurfaceNeutralLv0 = Color(0xFFFFFFFF);
 
   /// Color: #CC0000
   static const Color lightError = Color(0xFFCC0000);

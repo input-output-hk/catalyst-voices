@@ -55,6 +55,7 @@
     <color name="light_avatars_success">#CEF3D4</color>
     <color name="light_avatars_warning">#FDE1CE</color>
     <color name="light_avatars_error">#FFD1D1</color>
+    <color name="light_elevations_on_surface_neutral_lv0">#FFFFFF</color>
     <color name="dark_text_primary">#FFFFFF</color>
     <color name="dark_text_on_primary">#E6E9F0</color>
     <color name="dark_text_on_primary_container">#0C288D</color>
@@ -110,4 +111,5 @@
     <color name="dark_avatars_success">#1D722A</color>
     <color name="dark_avatars_warning">#B64E07</color>
     <color name="dark_avatars_error">#AD0000</color>
+    <color name="dark_elevations_on_surface_neutral_lv0">#121721</color>
 </resources>
