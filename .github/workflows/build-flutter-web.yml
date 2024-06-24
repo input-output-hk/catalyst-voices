@@ -46,6 +46,7 @@ jobs:
           earthfile: ./catalyst_voices/
           flags: --allow-privileged --SECRETS_ARE_AVAILABLE=true, SENTRY_DSN=${{ secrets.SENTRY_DSN }}
           targets: build-web
+          target_flags:
           runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
           artifact: "true"
 
@@ -57,6 +58,7 @@ jobs:
           earthfile: ./catalyst_voices/
           flags: --allow-privileged --SECRETS_ARE_AVAILABLE=true
           targets: package
+          target_flags:
           runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
           artifact: "true"
 
@@ -68,5 +70,6 @@ jobs:
           earthfile: ./catalyst_voices/
           flags: --allow-privileged --SECRETS_ARE_AVAILABLE=true
           targets: publish
+          target_flags:
           runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
           artifact: "true"
