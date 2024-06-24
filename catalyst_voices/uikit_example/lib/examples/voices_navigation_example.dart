@@ -120,9 +120,9 @@ class _DrawerChooserState extends State<_DrawerChooser> {
   }) {
     if (isSelected) {
       return VoicesDrawerChooserItem(
-        icon: item.getIcon(),
-        foregroundColor: item.getForegroundColor(context),
-        backgroundColor: item.getBackgroundColor(context),
+        icon: item.icon(),
+        foregroundColor: item.foregroundColor(context),
+        backgroundColor: item.backgroundColor(context),
       );
     } else {
       return const VoicesDrawerChooserItemPlaceholder();
@@ -136,7 +136,7 @@ enum _Space {
   proposals,
   settings;
 
-  IconData getIcon() {
+  IconData icon() {
     switch (this) {
       case _Space.ideas:
         return CatalystVoicesIcons.light_bulb;
@@ -149,7 +149,7 @@ enum _Space {
     }
   }
 
-  Color getForegroundColor(BuildContext context) {
+  Color foregroundColor(BuildContext context) {
     switch (this) {
       case _Space.ideas:
         return Theme.of(context).colorScheme.primary;
@@ -162,7 +162,7 @@ enum _Space {
     }
   }
 
-  Color getBackgroundColor(BuildContext context) {
+  Color backgroundColor(BuildContext context) {
     switch (this) {
       case _Space.ideas:
         return Theme.of(context).colorScheme.primaryContainer;
