@@ -218,6 +218,8 @@ const VoicesColorScheme lightVoicesColorScheme = VoicesColorScheme(
   avatarsError: VoicesColors.lightAvatarsError,
   elevationsOnSurfaceNeutralLv0:
       VoicesColors.lightElevationsOnSurfaceNeutralLv0,
+  outlineBorder: VoicesColors.lightOutlineBorderOutline,
+  outlineBorderVariant: VoicesColors.lightOutlineBorderOutlineVariant,
 );
 
 const ColorScheme darkColorScheme = ColorScheme.dark(
@@ -278,6 +280,8 @@ const VoicesColorScheme darkVoicesColorScheme = VoicesColorScheme(
   avatarsWarning: VoicesColors.darkAvatarsWarning,
   avatarsError: VoicesColors.darkAvatarsError,
   elevationsOnSurfaceNeutralLv0: VoicesColors.darkElevationsOnSurfaceNeutralLv0,
+  outlineBorder: VoicesColors.darkOutlineBorderOutline,
+  outlineBorderVariant: VoicesColors.darkOutlineBorderOutlineVariant,
 );
 
 final BrandAssets lightBrandAssets = BrandAssets(
