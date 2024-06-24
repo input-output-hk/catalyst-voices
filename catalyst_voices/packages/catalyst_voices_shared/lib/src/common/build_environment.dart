@@ -5,7 +5,7 @@ enum BuildEnvironment {
   prod;
 
   /// Converts a `String` value to a corresponding `BuildEnvironment`
-  /// enum value.
+  /// name of the enum value.
   static String fromEnvironment(String value) {
     switch (value) {
       case 'dev':
