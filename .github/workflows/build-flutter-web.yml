@@ -44,9 +44,8 @@ jobs:
         continue-on-error: false
         with:
           earthfile: ./catalyst_voices/
-          flags: --allow-privileged
-          targets: build-web SECRETS_ARE_AVAILABLE=true, SENTRY_DSN=${{ secrets.SENTRY_DSN }}
-          target_flags:
+          flags: --allow-privileged --SECRETS_ARE_AVAILABLE=true, SENTRY_DSN=${{ secrets.SENTRY_DSN }}
+          targets: build-web
           runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
           artifact: "true"
 
@@ -56,9 +55,8 @@ jobs:
         continue-on-error: false
         with:
           earthfile: ./catalyst_voices/
-          flags: --allow-privileged
+          flags: --allow-privileged --SECRETS_ARE_AVAILABLE=true
           targets: package
-          target_flags: SECRETS_ARE_AVAILABLE=true
           runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
           artifact: "true"
 
@@ -68,8 +66,7 @@ jobs:
         continue-on-error: false
         with:
           earthfile: ./catalyst_voices/
-          flags: --allow-privileged
+          flags: --allow-privileged --SECRETS_ARE_AVAILABLE=true
           targets: publish
-          target_flags: SECRETS_ARE_AVAILABLE=true
           runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
           artifact: "true"
