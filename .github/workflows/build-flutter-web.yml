@@ -2,7 +2,7 @@ name: Deploy Catalyst Voices Web App
 
 on:
   push:
-    branches: "main"
+    branches: "**"
   pull_request:
     types:
       - opened
