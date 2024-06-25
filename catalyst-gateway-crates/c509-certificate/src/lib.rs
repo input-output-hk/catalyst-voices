@@ -5,13 +5,8 @@
 //!
 //! Please refer to the [c509-certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/) for more information.
 
-use c509_cert::TbsCertificate;
 use wasm_bindgen::prelude::wasm_bindgen;
-mod c509_cert;
-mod c509_enum;
 mod c509_oid;
-mod cbor_encoder;
-mod extensions;
 mod c509_extension;
 
 /// Generates an unsigned C509 certificate from the provided `TbsCertificate`.
@@ -55,6 +50,7 @@ mod c509_extension;
 /// This function relies on the `c509_cert` module's `generate_unsigned_c509_cert`
 /// function for the actual generation process.
 #[wasm_bindgen]
-pub fn generate_unsigned_c509_cert(tbs_cert: TbsCertificate) -> Vec<u8> {
-    c509_cert::generate_unsigned_c509_cert(tbs_cert)
+pub fn generate_unsigned_c509_cert() -> Vec<u8> {
+    // c509_cert::generate_unsigned_c509_cert(tbs_cert)
+    todo!()
 }
