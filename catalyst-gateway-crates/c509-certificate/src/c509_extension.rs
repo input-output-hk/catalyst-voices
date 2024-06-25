@@ -1,9 +1,7 @@
-//! C509 OID Extension OIDs
+//! C509 Extension
 //! Extension fallback of C509 OID extension
 //! Given OID if not found in the registered OID table, it will be encoded as a PEN OID.
 //! If the OID is not a PEN OID, it will be encoded as an unwrapped OID.
-
-// FIXME - Consider rename and moving this file to a more appropriate location.
 
 use asn1_rs::{oid, Oid};
 use minicbor::{decode, encode::Write, Decode, Decoder, Encode, Encoder};
@@ -44,6 +42,17 @@ static EXTENSIONS_TABLE: Lazy<OidToIntegerTable> = Lazy::new(|| {
 });
 
 // -----------------------------------------
+
+// // Extensions: Vec<C509Extension>
+// struct Extensions {
+//     extensions: Vec<C509Extension>,
+
+// }
+
+// impl encode for Extensions
+// new() empty Vec
+// add_extension
+// get_extensions -> Vec
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq)]
@@ -118,38 +127,39 @@ where
     T: Encode<()> + Decode<'a, ()>,
 {
     fn decode(d: &mut Decoder<'a>, _ctx: &mut C) -> Result<Self, decode::Error> {
-        // Get the OID int if possible
-        match d.i16() {
-            // Handle CBOR int
-            Ok(oid_value) => {
-                // Absolute the OID int
-                let abs_oid_value = oid_value.abs();
-
-                // Get the OID from the EXTENSIONS_TABLE
-                let oid = EXTENSIONS_TABLE
-                    .get_map()
-                    .get_by_left(&abs_oid_value)
-                    .ok_or_else(|| decode::Error::message("OID int not found"))?;
-
-                let extension = if oid_value.is_positive() {
-                    C509Extension::new(oid.to_owned(), d.decode()?)
-                } else {
-                    C509Extension::new(oid.to_owned(), d.decode()?).critical()
-                };
-
-                Ok(extension)
-            },
-            // Handle unwrapped CBOR OID or CBOR PEN
-            Err(_) => {
-                let c509_oid: C509oid = d.decode()?;
-                match d.bool() {
-                    Ok(true) => Ok(C509Extension::new(c509_oid.get_oid(), d.decode()?).critical()),
-                    _ => Ok(C509Extension::new(c509_oid.get_oid(), d.decode()?)),
-                }
-            },
+        // Check whether OID is an int
+        // Even the encoding is i16, the minicbor decoder doesn't know what type we encoded,
+        // so need to check every possible type.
+        if minicbor::data::Type::U8 == d.datatype()?
+            || minicbor::data::Type::U16 == d.datatype()?
+            || minicbor::data::Type::I8 == d.datatype()?
+            || minicbor::data::Type::I16 == d.datatype()?
+        {
+            let oid_value = d.i16()?;
+            let abs_oid_value = oid_value.abs();
+            let oid = EXTENSIONS_TABLE
+                .get_map()
+                .get_by_left(&abs_oid_value)
+                .ok_or_else(|| decode::Error::message("OID int not found"))?;
+            let extension = if oid_value.is_positive() {
+                C509Extension::new(oid.to_owned(), d.decode()?)
+            } else {
+                C509Extension::new(oid.to_owned(), d.decode()?).critical()
+            };
+            Ok(extension)
+        // Handle unwrapped CBOR OID or CBOR PEN
+        } else {
+            let c509_oid: C509oid = d.decode()?;
+            let extension = if minicbor::data::Type::Bool == d.datatype()? && d.bool()? {
+                C509Extension::new(c509_oid.get_oid(), d.decode()?).critical()
+            } else {
+                C509Extension::new(c509_oid.get_oid(), d.decode()?)
+            };
+            Ok(extension)
         }
     }
 }
+
 // -----------------------------------------
 
 #[cfg(test)]
@@ -162,17 +172,17 @@ mod test_c509_extension {
         let mut encoder = Encoder::new(&mut buffer);
 
         // Precertificate Signing Certificate
-        let oid = C509Extension::new(oid!(1.3.6 .1 .4 .1 .11129 .2 .4 .4), 2);
-        oid.encode(&mut encoder, &mut ())
+        let ext = C509Extension::new(oid!(1.3.6 .1 .4 .1 .11129 .2 .4 .4), 2);
+        ext.encode(&mut encoder, &mut ())
             .expect("Failed to encode OID");
         // OID : 0x1825
         // 2 : 0x02
         assert_eq!(hex::encode(buffer.clone()), "182502");
 
         let mut decoder = Decoder::new(&buffer);
-        let decoded_ext = C509Extension::decode(&mut decoder, &mut ()).expect("Failed to decode OID");
-        assert_eq!(decoded_ext, oid);
-
+        let decoded_ext =
+            C509Extension::decode(&mut decoder, &mut ()).expect("Failed to decode OID");
+        assert_eq!(decoded_ext, ext);
     }
 
     #[test]
@@ -181,16 +191,17 @@ mod test_c509_extension {
         let mut encoder = Encoder::new(&mut buffer);
 
         // Precertificate Signing Certificate
-        let oid = C509Extension::new(oid!(1.3.6 .1 .4 .1 .11129 .2 .4 .4), "test").critical();
-        oid.encode(&mut encoder, &mut ())
+        let ext = C509Extension::new(oid!(1.3.6 .1 .4 .1 .11129 .2 .4 .4), "test").critical();
+        ext.encode(&mut encoder, &mut ())
             .expect("Failed to encode OID");
         // OID : 0x3824
         // "test" : 0x6474657374
         assert_eq!(hex::encode(buffer.clone()), "38246474657374");
 
         let mut decoder = Decoder::new(&buffer);
-        let decoded_ext = C509Extension::decode(&mut decoder, &mut ()).expect("Failed to decode OID");
-        assert_eq!(decoded_ext, oid);
+        let decoded_ext =
+            C509Extension::decode(&mut decoder, &mut ()).expect("Failed to decode OID");
+        assert_eq!(decoded_ext, ext);
     }
 
     #[test]
@@ -199,16 +210,17 @@ mod test_c509_extension {
         let mut encoder = Encoder::new(&mut buffer);
 
         // Precertificate Signing Certificate
-        let oid = C509Extension::new(oid!(1.3.6 .1 .4 .1 .1 .1 .29), [0, 1, 2, 3]);
-        oid.encode(&mut encoder, &mut ())
+        let ext = C509Extension::new(oid!(1.3.6 .1 .4 .1 .1 .1 .29), [0, 1, 2, 3]);
+        ext.encode(&mut encoder, &mut ())
             .expect("Failed to encode OID");
         // OID : 0xd8704301011d
         // [0, 1, 2, 3] : 0x8400010203
         assert_eq!(hex::encode(buffer.clone()), "d8704301011d8400010203");
 
         let mut decoder = Decoder::new(&buffer);
-        let decoded_ext = C509Extension::decode(&mut decoder, &mut ()).expect("Failed to decode OID");
-        assert_eq!(decoded_ext, oid);
+        let decoded_ext =
+            C509Extension::decode(&mut decoder, &mut ()).expect("Failed to decode OID");
+        assert_eq!(decoded_ext, ext);
     }
 
     #[test]
@@ -226,7 +238,8 @@ mod test_c509_extension {
         assert_eq!(hex::encode(buffer.clone()), "d8704301011df51861");
 
         let mut decoder = Decoder::new(&buffer);
-        let decoded_ext = C509Extension::decode(&mut decoder, &mut ()).expect("Failed to decode OID");
+        let decoded_ext =
+            C509Extension::decode(&mut decoder, &mut ()).expect("Failed to decode OID");
         assert_eq!(decoded_ext, ext);
     }
 
@@ -234,27 +247,30 @@ mod test_c509_extension {
     fn test_c509_extension_oid_unwrapped_with_i8_value() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
+
         // Not PEN OID and not in the registry table
-        let oid = C509Extension::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1), -1);
-        oid.encode(&mut encoder, &mut ())
+        let ext = C509Extension::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1), -1);
+        ext.encode(&mut encoder, &mut ())
             .expect("Failed to encode OID");
         // OID : 0x49608648016503040201
         // -1 : 0x20
         assert_eq!(hex::encode(buffer.clone()), "4960864801650304020120");
-        
+
         let mut decoder = Decoder::new(&buffer);
-        let decoded_ext = C509Extension::decode(&mut decoder, &mut ()).expect("Failed to decode OID");
-        assert_eq!(decoded_ext, oid);
+        let decoded_ext =
+            C509Extension::decode(&mut decoder, &mut ()).expect("Failed to decode OID");
+        assert_eq!(decoded_ext, ext);
     }
 
     #[test]
     fn test_c509_extension_oid_unwrapped_critical_with_f8_value() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
+
         // Not PEN OID and not in the registry table
         // Critical should not work since the OID is not in the registry table
-        let oid = C509Extension::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1), 1.5).critical();
-        oid.encode(&mut encoder, &mut ())
+        let ext = C509Extension::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1), 1.5).critical();
+        ext.encode(&mut encoder, &mut ())
             .expect("Failed to encode OID");
         // OID : 0x49608648016503040201
         // True : 0xf5
@@ -265,7 +281,8 @@ mod test_c509_extension {
         );
 
         let mut decoder = Decoder::new(&buffer);
-        let decoded_ext = C509Extension::decode(&mut decoder, &mut ()).expect("Failed to decode OID");
-        assert_eq!(decoded_ext, oid);
+        let decoded_ext =
+            C509Extension::decode(&mut decoder, &mut ()).expect("Failed to decode OID");
+        assert_eq!(decoded_ext, ext);
     }
 }

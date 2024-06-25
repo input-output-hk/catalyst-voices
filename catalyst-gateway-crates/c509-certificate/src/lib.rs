@@ -12,7 +12,7 @@ mod c509_enum;
 mod c509_oid;
 mod cbor_encoder;
 mod extensions;
-mod c509_oid_extension;
+mod c509_extension;
 
 /// Generates an unsigned C509 certificate from the provided `TbsCertificate`.
 ///
