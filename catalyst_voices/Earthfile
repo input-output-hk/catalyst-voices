@@ -48,11 +48,6 @@ check-code-formatting:
     FROM +builder
     DO flutter-ci+FORMAT
 
-# Run unit tests
-test-unit:
-    FROM +builder
-    DO flutter-ci+UNIT_TESTS
-
 # Build web version of Catalyst Voices without arguments.
 # This is used for development purposes to validate build on PRs.
 build-web-on-pr:
@@ -60,6 +55,11 @@ build-web-on-pr:
 
     ARG WORKDIR=/frontend/catalyst_voices
     DO flutter-ci+BUILD_WEB --TARGET=lib/configs/main_web.dart --WORKDIR=$WORKDIR
+
+# Run unit tests
+test-unit:
+    FROM +builder
+    DO flutter-ci+UNIT_TESTS
 
 # Build web version of Catalyst Voices
 build-web:
