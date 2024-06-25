@@ -14,7 +14,7 @@ const PEN_PREFIX: Oid<'static> = oid!(1.3.6 .1 .4 .1);
 const OID_PEN_TAG: u64 = 112;
 
 // -----------------------------------------
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 pub(crate) struct OidToIntegerTable {
     map: BiMap<i16, Oid<'static>>,
 }
@@ -36,7 +36,7 @@ impl OidToIntegerTable {
 }
 
 #[allow(dead_code)]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 /// A C509 Oid with Registered Integer Encoding/Decoding.
 /// Value of registered OID in the table can be negative.
 pub struct C509oidRegistered<'a> {
@@ -88,7 +88,7 @@ pub struct C509oid<'a> {
 #[allow(dead_code)]
 impl<'a> C509oid<'a> {
     /// Create an new instance of C509oid.
-    pub fn new(oid: Oid<'a>) -> Self {
+    pub(crate) fn new(oid: Oid<'a>) -> Self {
         C509oid {
             oid,
             pen_supported: false,
@@ -96,9 +96,13 @@ impl<'a> C509oid<'a> {
     }
 
     /// Is PEN Encoding supported for this OID
-    pub fn pen_encoded(mut self) -> Self {
+    pub(crate) fn pen_encoded(mut self) -> Self {
         self.pen_supported = true;
         self
+    }
+
+    pub(crate) fn get_oid(&self) -> Oid<'a> {
+        self.oid.clone()
     }
 }
 
@@ -143,7 +147,7 @@ impl<C> Encode<C> for C509oid<'_> {
     }
 }
 
-impl<'b, C> Decode<'b, C> for C509oid<'_> {
+impl<'a, C> Decode<'a, C> for C509oid<'_> {
     /// Decode an OID
     /// If the data to be decoded is a `Tag`, and the tag is an `OID_PEN_TAG`,
     /// then decode the OID as Private Enterprise Number (PEN) OID.
@@ -153,7 +157,7 @@ impl<'b, C> Decode<'b, C> for C509oid<'_> {
     ///
     /// A C509oid instance.
     /// If the decoding fails, it will return an error.
-    fn decode(d: &mut Decoder<'b>, _ctx: &mut C) -> Result<Self, decode::Error> {
+    fn decode(d: &mut Decoder<'a>, _ctx: &mut C) -> Result<Self, decode::Error> {
         if (minicbor::data::Type::Tag == d.datatype()?) && (Tag::new(OID_PEN_TAG) == d.tag()?) {
             let oid_bytes = d.bytes()?;
             // raw_oid contains the whole OID which stored in bytes
