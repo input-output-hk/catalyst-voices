@@ -1,0 +1,11 @@
+VERSION 0.8
+
+IMPORT ../ AS catalyst-voices
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.1.10 AS flutter-ci 
+
+# build-web - Build web version of UIKit example
+build-web:
+    FROM catalyst-voices+builder
+    ARG WORKDIR=/frontend/catalyst_voices/uikit_example
+    DO flutter-ci+BUILD_WEB --TARGET=lib/main.dart --WORKDIR=$WORKDIR
+    SAVE ARTIFACT web AS LOCAL public

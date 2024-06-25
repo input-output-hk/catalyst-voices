@@ -92,7 +92,9 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> _onEnableWallet(CardanoWallet wallet) async {
     try {
       setState(() => _isLoading = true);
-      final api = await wallet.enable();
+      final api = await wallet.enable(
+        extensions: const [CipExtension(cip: 95)],
+      );
       setState(() => _api = api);
     } catch (error) {
       setState(() => _error = error);
@@ -216,7 +218,7 @@ class _WalletDetails extends StatefulWidget {
 }
 
 class _WalletDetailsState extends State<_WalletDetails> {
-  Coin? _balance;
+  Balance? _balance;
   List<CipExtension>? _extensions;
   NetworkId? _networkId;
   ShelleyAddress? _changeAddress;
@@ -224,6 +226,9 @@ class _WalletDetailsState extends State<_WalletDetails> {
   List<ShelleyAddress>? _unusedAddresses;
   List<ShelleyAddress>? _usedAddresses;
   List<TransactionUnspentOutput>? _utxos;
+  PubDRepKey? _pubDRepKey;
+  List<PubStakeKey>? _registeredPubStakeKeys;
+  List<PubStakeKey>? _unregisteredPubStakeKeys;
 
   @override
   void initState() {
@@ -262,6 +267,22 @@ class _WalletDetailsState extends State<_WalletDetails> {
           _utxos = utxos;
         });
       }
+
+      if (extensions.contains(const CipExtension(cip: 95))) {
+        final pubDRepKey = await widget.api.cip95.getPubDRepKey();
+        final registeredPubStakeKeys =
+            await widget.api.cip95.getRegisteredPubStakeKeys();
+        final unregisteredPubStakeKeys =
+            await widget.api.cip95.getUnregisteredPubStakeKeys();
+
+        if (mounted) {
+          setState(() {
+            _pubDRepKey = pubDRepKey;
+            _registeredPubStakeKeys = registeredPubStakeKeys;
+            _unregisteredPubStakeKeys = unregisteredPubStakeKeys;
+          });
+        }
+      }
     } catch (error) {
       await _showDialog(
         title: 'Load data',
@@ -281,7 +302,7 @@ class _WalletDetailsState extends State<_WalletDetails> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('Balance: ${_balance ?? '---'}\n'),
+              Text('Balance: ${_formatBalance(_balance)}\n'),
               Text('Extensions: ${_formatExtensions(_extensions)}\n'),
               Text('Network ID: $_networkId\n'),
               Text('Change address:\n${_changeAddress?.toBech32() ?? '---'}\n'),
@@ -293,6 +314,15 @@ class _WalletDetailsState extends State<_WalletDetails> {
               ),
               Text('Used addresses:\n${_formatAddresses(_usedAddresses)}\n'),
               Text('UTXOs:\n${_formatUtxos(_utxos)}\n'),
+              Text('Public DRep Key: ${_pubDRepKey?.value ?? '---'}\n'),
+              Text(
+                'Registered Public Stake Keys: '
+                '${_registeredPubStakeKeys?.map((e) => e.value) ?? '---'}\n',
+              ),
+              Text(
+                'Unregistered Public Stake Keys: '
+                '${_unregisteredPubStakeKeys?.map((e) => e.value) ?? '---'}\n',
+              ),
               Row(
                 children: [
                   ElevatedButton(
@@ -409,6 +439,25 @@ String _formatAddresses(List<ShelleyAddress>? addresses) {
   return addresses.map((e) => e.toBech32()).join('\n');
 }
 
+String _formatBalance(Balance? balance) {
+  if (balance == null) {
+    return '---';
+  }
+
+  final buffer = StringBuffer('Ada (lovelaces): ${balance.coin.value}');
+
+  final multiAsset = balance.multiAsset;
+  if (multiAsset != null) {
+    for (final policy in multiAsset.bundle.entries) {
+      for (final asset in policy.value.entries) {
+        buffer.write(', ${asset.key}: ${asset.value}');
+      }
+    }
+  }
+
+  return buffer.toString();
+}
+
 String _formatUtxos(List<TransactionUnspentOutput>? utxos) {
   if (utxos == null) {
     return '---';
@@ -420,7 +469,7 @@ String _formatUtxos(List<TransactionUnspentOutput>? utxos) {
 String _formatUtxo(TransactionUnspentOutput utxo) {
   return 'Tx: ${utxo.input.transactionId}'
       '\nIndex: ${utxo.input.index}'
-      '\nAmount: ${utxo.output.amount}\n';
+      '\nAmount: ${_formatBalance(utxo.output.amount)}\n';
 }
 
 Transaction _buildUnsignedTx({
@@ -432,7 +481,8 @@ Transaction _buildUnsignedTx({
       constant: Coin(155381),
       coefficient: Coin(44),
     ),
-    maxTxSize: 8000,
+    maxTxSize: 16384,
+    maxValueSize: 5000,
     coinsPerUtxoByte: Coin(4310),
   );
 
@@ -444,7 +494,7 @@ Transaction _buildUnsignedTx({
 
   final txOutput = TransactionOutput(
     address: preprodFaucetAddress,
-    amount: const Coin(1000000),
+    amount: const Balance(coin: Coin(1000000)),
   );
 
   final txBuilder = TransactionBuilder(

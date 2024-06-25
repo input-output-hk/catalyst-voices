@@ -38,6 +38,8 @@ Cunego
 Cupertino
 dalek
 DAPPLICATION
+dbeaver
+dbschema
 dbsync
 delegators
 DIND
@@ -58,8 +60,10 @@ fetchval
 fmtchk
 fmtfix
 fontawesome
+fontello
 formz
 Formz
+fluttericon
 fuzzer
 gapless
 gcloud
@@ -76,6 +80,7 @@ integ
 Intellij
 iohk
 iphoneos
+jdbc
 jetbrains
 Joaquín
 jorm
@@ -85,6 +90,9 @@ junitxml
 junitreport
 Keyhash
 keyserver
+KUBECONFIG
+kubernetescrd
+kubetail
 lcov
 lerp
 Leshiy
@@ -136,6 +144,7 @@ Ptarget
 pubkey
 pubspec
 pytest
+qrcode
 rapidoc
 redoc
 Replayability
@@ -156,6 +165,7 @@ saibatizoku
 schemathesis
 Schemathesis
 Scripthash
+ScyllaDB
 seckey
 sendfile
 slotno
@@ -178,6 +188,7 @@ toastify
 Toastify
 tojunit
 Traceback
+traefik
 TXNZD
 Typer
 unmanaged
@@ -206,3 +217,5 @@ xcworkspace
 yoroi
 multiasset
 unawaited
+Gitbook
+trailings

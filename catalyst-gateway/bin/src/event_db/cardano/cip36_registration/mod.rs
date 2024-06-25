@@ -112,7 +112,6 @@ impl IndexedVoterRegistrationParams {
                     && stake_credential.is_some()
                     && encoded_voting_key.is_some()
                     && rewards_address.is_some()
-                    && cip36_metadata.raw_metadata.is_some()
                     && nonce.is_some()
                     && cip36_metadata.errors_report.is_empty();
 
@@ -122,7 +121,7 @@ impl IndexedVoterRegistrationParams {
                     public_voting_key: encoded_voting_key,
                     payment_address: rewards_address,
                     nonce,
-                    cip36_metadata: cip36_metadata.raw_metadata,
+                    cip36_metadata: None,
                     stats: serde_json::json!(cip36_metadata.errors_report),
                     valid: is_valid,
                 })

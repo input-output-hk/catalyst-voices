@@ -1,0 +1,25 @@
+apiVersion: helm.cattle.io/v1
+kind: HelmChartConfig
+metadata:
+  name: traefik
+  namespace: kube-system
+spec:
+  #deployment:
+  #  kind: DaemonSet
+  #       - "--entryPoints.scylladb.address=:9042/tcp"
+  #hostNetwork: true
+  valuesContent: |-
+    additionalArguments:
+      - "--api"
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+    logs:
+      level: INFO
+      access:
+        enabled: true      
+    ports:
+      traefik:
+        expose: true
+    providers:
+      kubernetesCRD:
+        allowCrossNamespace: true

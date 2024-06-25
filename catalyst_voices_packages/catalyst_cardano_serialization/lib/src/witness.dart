@@ -1,7 +1,8 @@
 import 'package:cbor/cbor.dart';
+import 'package:equatable/equatable.dart';
 
 /// A set of witnesses that sign the transaction.
-class TransactionWitnessSet {
+final class TransactionWitnessSet extends Equatable {
   /// The witnesses that sign the transaction.
   final Set<VkeyWitness> vkeyWitnesses;
 
@@ -23,10 +24,13 @@ class TransactionWitnessSet {
         CborSmallInt(vkey.$1): vkey.$2.toCbor(),
     });
   }
+
+  @override
+  List<Object?> get props => [vkeyWitnesses];
 }
 
 /// The transaction witness with a [signature] of the transaction.
-class VkeyWitness {
+final class VkeyWitness extends Equatable {
   /// The public key of the witness.
   final Vkey vkey;
 
@@ -70,6 +74,9 @@ class VkeyWitness {
       ]),
     ]);
   }
+
+  @override
+  List<Object?> get props => [vkey, signature];
 }
 
 /// The public key of the witness.

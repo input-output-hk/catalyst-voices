@@ -13,6 +13,24 @@ import 'package:flutter/material.dart';
 class VoicesColors {
   VoicesColors._();
 
+  /// Color: #AD0000
+  static const Color darkAvatarsError = Color(0xFFAD0000);
+
+  /// Color: #1035BC
+  static const Color darkAvatarsPrimary = Color(0xFF1035BC);
+
+  /// Color: #9910BC
+  static const Color darkAvatarsSecondary = Color(0xFF9910BC);
+
+  /// Color: #1D722A
+  static const Color darkAvatarsSuccess = Color(0xFF1D722A);
+
+  /// Color: #B64E07
+  static const Color darkAvatarsWarning = Color(0xFFB64E07);
+
+  /// Color: #121721
+  static const Color darkElevationsOnSurfaceNeutralLv0 = Color(0xFF121721);
+
   /// Color: #FF9999
   static const Color darkError = Color(0xFFFF9999);
 
@@ -85,6 +103,15 @@ class VoicesColors {
   /// Color: #1FBFC8D9
   static const Color darkOnSurfaceNeutral08 = Color(0x1FBFC8D9);
 
+  /// Color: #000000
+  static const Color darkOnSurfaceNeutralOpaqueLv0 = Color(0xFF000000);
+
+  /// Color: #212A3D
+  static const Color darkOnSurfaceNeutralOpaqueLv1 = Color(0xFF212A3D);
+
+  /// Color: #212A3D
+  static const Color darkOnSurfaceNeutralOpaqueLv2 = Color(0xFF212A3D);
+
   /// Color: #1F123CD3
   static const Color darkOnSurfacePrimary012 = Color(0x1F123CD3);
 
@@ -114,6 +141,12 @@ class VoicesColors {
 
   /// Color: #7F90B3
   static const Color darkOutline = Color(0xFF7F90B3);
+
+  /// Color: #FF7F90B3
+  static const Color darkOutlineBorderOutline = Color(0xFF7F90B3);
+
+  /// Color: #FF364463
+  static const Color darkOutlineBorderOutlineVariant = Color(0xFF364463);
 
   /// Color: #364463
   static const Color darkOutlineVariant = Color(0xFF364463);
@@ -153,6 +186,24 @@ class VoicesColors {
 
   /// Color: #B64E07
   static const Color darkWarningContainer = Color(0xFFB64E07);
+
+  /// Color: #FFD1D1
+  static const Color lightAvatarsError = Color(0xFFFFD1D1);
+
+  /// Color: #D0D9FB
+  static const Color lightAvatarsPrimary = Color(0xFFD0D9FB);
+
+  /// Color: #F2D0FB
+  static const Color lightAvatarsSecondary = Color(0xFFF2D0FB);
+
+  /// Color: #CEF3D4
+  static const Color lightAvatarsSuccess = Color(0xFFCEF3D4);
+
+  /// Color: #FDE1CE
+  static const Color lightAvatarsWarning = Color(0xFFFDE1CE);
+
+  /// Color: #FFFFFF
+  static const Color lightElevationsOnSurfaceNeutralLv0 = Color(0xFFFFFFFF);
 
   /// Color: #CC0000
   static const Color lightError = Color(0xFFCC0000);
@@ -226,6 +277,15 @@ class VoicesColors {
   /// Color: #14212A3D
   static const Color lightOnSurfaceNeutral08 = Color(0x14212A3D);
 
+  /// Color: #FFFFFF
+  static const Color lightOnSurfaceNeutralOpaqueLv0 = Color(0xFFFFFFFF);
+
+  /// Color: #F2F4F8
+  static const Color lightOnSurfaceNeutralOpaqueLv1 = Color(0xFFF2F4F8);
+
+  /// Color: #E6E9F0
+  static const Color lightOnSurfaceNeutralOpaqueLv2 = Color(0xFFE6E9F0);
+
   /// Color: #1F123CD3
   static const Color lightOnSurfacePrimary012 = Color(0x1F123CD3);
 
@@ -255,6 +315,12 @@ class VoicesColors {
 
   /// Color: #D9DEE8
   static const Color lightOutline = Color(0xFFD9DEE8);
+
+  /// Color: #FFD9DEE8
+  static const Color lightOutlineBorderOutline = Color(0xFFD9DEE8);
+
+  /// Color: #61BFC8D9
+  static const Color lightOutlineBorderOutlineVariant = Color(0x61BFC8D9);
 
   /// Color: #61BFC8D9
   static const Color lightOutlineVariant = Color(0x61BFC8D9);

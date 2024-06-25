@@ -10,7 +10,9 @@ This repository contains the Catalyst Voices app and packages.
     * [Bootstrapping](#bootstrapping)
     * [Packages](#packages)
     * [Flavors](#flavors)
+    * [Environment variables](#environment-variables)
   * [Running Tests](#running-tests)
+  * [Common issues](#common-issues)
 
 ## Requirements
 
@@ -83,6 +85,18 @@ flutter run --flavor prod --target lib/configs/main_prod.dart
 >Catalyst Voices works on the Web only.
 >We plan to add support for other targets later.
 
+### Environment variables
+
+We use [dart defines](https://dart.dev/guides/language/language-tour#using-variables)
+to manage environment variables.
+
+For example if you need to pass `SENTRY_DSN` as environment variable,
+you can use the following command:
+
+```sh
+flutter build web --target lib/configs/main_web.dart --dart-define SENTRY_DSN=REPLACE_WITH_SENTRY_DSN_URL
+```
+
 ## Running Tests
 
 To run all unit and widget tests use the following command:
@@ -100,3 +114,25 @@ genhtml coverage/lcov.info -o coverage/
 # Open Coverage Report
 open coverage/index.html
 ```
+
+## Common issues
+
+1. Mixed dependencies from a hosted repository and local path:
+
+```sh
+Because every version of catalyst_cardano_web from path depends on catalyst_cardano_serialization
+  from hosted and catalyst_voices depends on catalyst_cardano_serialization from path,
+  catalyst_cardano_web from path is forbidden.
+So, because catalyst_voices depends on catalyst_cardano_web from path, version solving failed.
+```
+
+Solution:
+
+When adding a new local dependency, hosted repository (i.e. pub.dev) should be preferred over local paths.
+However to make it easier to depend on local changes use `melos bootstrap` to generate `pubspec_overrides.yaml`.
+This allows to publish the source code on remote repository that points to official dependency versions
+but use local changes during regular development.
+
+The issue appears if you have added a new dependency or pulled code that adds dependency and you haven't run `melos bootstrap`.
+
+See [Melos](https://melos.invertase.dev).
