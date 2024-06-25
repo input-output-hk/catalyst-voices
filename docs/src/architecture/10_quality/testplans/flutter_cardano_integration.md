@@ -6,30 +6,31 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 
 # [Flutter Cardano Integration](https://github.com/input-output-hk/catalyst-voices/issues/481)
 
-- [Flutter Cardano Integration](#flutter-cardano-integration)
-  - [General Informations](#general-informations)
-    - [Abstract](#abstract)
-    - [Stakeholders](#stakeholders)
-    - [Requirements](#requirements)
-    - [Acceptance criteria](#acceptance-criteria)
-    - [Risks](#risks)
-    - [Tools](#tools)
-  - [ACC framework](#acc-framework)
-    - [Attributes](#attributes)
-    - [Components](#components)
-    - [Capabilities](#capabilities)
-  - [Integration tests](#integration-tests)
-    - [Integration tests strategy](#integration-tests-strategy)
-    - [Integration test cases](#integration-test-cases)
-  - [Extensions](#extensions)
-  - [User actions](#user-actions)
-  - [Wallet](#wallet)
-
+* [Flutter Cardano Integration](#flutter-cardano-integration)
+  * [General Informations](#general-informations)
+    * [Abstract](#abstract)
+    * [Stakeholders](#stakeholders)
+    * [Requirements](#requirements)
+    * [Acceptance criteria](#acceptance-criteria)
+    * [Risks](#risks)
+    * [Tools](#tools)
+  * [ACC framework](#acc-framework)
+    * [Attributes](#attributes)
+    * [Components](#components)
+    * [Capabilities](#capabilities)
+  * [Integration tests](#integration-tests)
+    * [Integration tests strategy](#integration-tests-strategy)
+    * [Integration test cases](#integration-test-cases)
+  * [Extensions](#extensions)
+  * [User actions](#user-actions)
+  * [Wallet](#wallet)
 
 ## General Informations
 
 ### Abstract
-Catalyst Cardano is a web application that facilitate interaction with the Cardano blockchain, incorporating CIP-30 (Wallet DAppBridge) and CIP-95 (Message Signing) specifications. It requires connection to the wallet third party extensions (e.g Eternl) to be able to perform actions like retrieving wallet details, signing data/transactions and submiting transactions.
+
+Catalyst Cardano is a web application that facilitate interaction with the Cardano blockchain, incorporating CIP-30 (Wallet DAppBridge) and CIP-95 (Message Signing) specifications. 
+It requires connection to the wallet third party extensions (e.g Eternl) to be able to perform actions like retrieving wallet details, signing data/transactions and submiting transactions.
 
 ### Stakeholders
 
@@ -45,14 +46,15 @@ Catalyst Cardano is a web application that facilitate interaction with the Carda
 [CIP-30](https://cips.cardano.org/cip/CIP-30)  
 [CIP-95](https://cips.cardano.org/cip/CIP-95)  
 Testing will be focused only on web applications for the time being.  
-Focus needs to be on compliance with CIP-30 and CIP-95 specs, reliability and security especially when handling wallet interactions and message signing. UI testing is out of scope, the web application will be used only for setup purpose.  
+Focus needs to be on compliance with CIP-30 and CIP-95 specs, reliability and security especially when handling wallet interactions and message signing.
+UI testing is out of scope, the web application will be used only for setup purpose.  
 
 ### Acceptance criteria
 
-- The package must comply with CIP-30 and CIP-95 specifications, focusing on the web.  
-- High unit test coverage to ensure reliability and security.  
-- Clear and comprehensive documentation for developers.  
-- An example web application that effectively demonstrates the package's functionalities.  
+* The package must comply with CIP-30 and CIP-95 specifications, focusing on the web.  
+* High unit test coverage to ensure reliability and security.  
+* Clear and comprehensive documentation for developers.  
+* An example web application that effectively demonstrates the package's functionalities.  
 
 ### Risks
 
@@ -60,7 +62,8 @@ Documentation is not complete yet, integration dart package might be not enough
 
 ### Tools
 
-The main tool we will use is dart integration test package. We still need to investigate if all the testing needed can be achieved only with dart or if we need to use playwright for the web UI part  
+The main tool we will use is dart integration test package.
+We still need to investigate if all the testing needed can be achieved only with dart or if we need to use playwright for the web UI part  
 
 ## ACC framework
 
@@ -69,7 +72,7 @@ The main tool we will use is dart integration test package. We still need to inv
 
 ### Attributes
 
-Secure, comply with CIP-30 and CIP-95, reliable    
+Secure, comply with CIP-30 and CIP-95, reliable
 
 ### Components
 
@@ -103,7 +106,7 @@ User submit transactions
 | \#  | OBJECTIVE | STEPS | EXPECTED RESULTS | TO BE AUTOMATED |
 | --- | --------- | ----- | ---------------- | --------------- |
 | 1   | User can retrieve his wallet details |  Start application, Download wallet chrome extention, Connect wallet extention in the application, Enable wallet  | Wallet details (balance, addresses, etc.) is correctly returned | YES  |
-| 2   | User can sign data | Connect the wallet as #1, sign data | No exceptions are thrown, VkeyWitness is valid | YES | 
+| 2   | User can sign data | Connect the wallet as #1, sign data | No exceptions are thrown, VkeyWitness is valid | YES |
 | 3   | User can sign transactions | Connect the wallet as #1, sign transaction data | No exceptions are thrown, and in TransactionWitnessSet, atleast one VkeyWitness is present | YES |
 | 4   | User can submit transactions | Connect the wallet as #1, submit transaction | No exceptions are thrown, Returned TransactionHash is not empty, Metadata is not included| YES |
 | 5   | User can handle invalid transactions | Connect the wallet as #1, create and submit an invalid transaction (e.g., incorrect signature, insufficient funds, malformed data) | Appropriate error message is returned, Transaction is not processed | YES |
