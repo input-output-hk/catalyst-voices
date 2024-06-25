@@ -29,8 +29,10 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 
 ### Abstract
 
-Catalyst Cardano is a web application that facilitate interaction with the Cardano blockchain, incorporating CIP-30 (Wallet DAppBridge) and CIP-95 (Message Signing) specifications. 
-It requires connection to the wallet third party extensions (e.g Eternl) to be able to perform actions like retrieving wallet details, signing data/transactions and submiting transactions.
+Catalyst Cardano is a web application that facilitate interaction with the Cardano blockchain.
+It incorporates CIP-30 (Wallet DAppBridge) and CIP-95 (Message Signing) specifications.
+It requires connection to the wallet third party extensions (e.g Eternl) to be able to perform wallet actions.
+These actions are namely retrieving wallet details, signing data/transactions and submiting transactions.
 
 ### Stakeholders
 
@@ -45,8 +47,9 @@ It requires connection to the wallet third party extensions (e.g Eternl) to be a
 [EPIC](https://github.com/input-output-hk/catalyst-voices/issues/399)  
 [CIP-30](https://cips.cardano.org/cip/CIP-30)  
 [CIP-95](https://cips.cardano.org/cip/CIP-95)  
-Testing will be focused only on web applications for the time being.  
-Focus needs to be on compliance with CIP-30 and CIP-95 specs, reliability and security especially when handling wallet interactions and message signing.
+Testing will be focused only on web applications for the time being.
+Focus needs to be on compliance with CIP-30 and CIP-95 specs, reliability and security.
+This is especially needed when handling wallet interactions and message signing.
 UI testing is out of scope, the web application will be used only for setup purpose.  
 
 ### Acceptance criteria
@@ -63,7 +66,7 @@ Documentation is not complete yet, integration dart package might be not enough
 ### Tools
 
 The main tool we will use is dart integration test package.
-We still need to investigate if all the testing needed can be achieved only with dart or if we need to use playwright for the web UI part  
+We still need to investigate if the testing can be achieved only with dart or if we need to use playwright for the web UI part.
 
 ## ACC framework
 
