@@ -48,7 +48,7 @@ static EXTENSIONS_TABLE: Lazy<OidToIntegerTable> = Lazy::new(|| {
 #[allow(dead_code)]
 pub struct C509Extension<'a, T>
 where
-    T: Encode<T> + Decode<'a, T>,
+    T: Encode<()> + Decode<'a, ()>,
 {
     registered_oid: C509oidRegistered<'a>,
     critical: bool,
@@ -58,7 +58,7 @@ where
 #[allow(dead_code)]
 impl<'a, T> C509Extension<'a, T>
 where
-    T: Encode<T> + Decode<'a, T>,
+    T: Encode<()> + Decode<'a, ()>,
 {
     fn new(oid: Oid<'a>, value: T) -> Self {
         C509Extension {
@@ -81,8 +81,12 @@ where
 
 impl<'a, T, C> Encode<C> for C509Extension<'a, T>
 where
-    T: Encode<T> + Decode<'a, T>,
+    T: Encode<()> + Decode<'a, ()>,
 {
+    /// Extension can be encoded as:
+    /// - (extensionID: int, extensionValue: any)
+    /// - (extensionID: ~oid, ? critical: true, extensionValue: bytes)
+    /// - (extensionID: pen, ? critical: true, extensionValue: bytes)
     fn encode<W: Write>(
         &self, e: &mut Encoder<W>, ctx: &mut C,
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
@@ -103,8 +107,7 @@ where
                 e.bool(true)?;
             }
         }
-        // FIXME - Handle encoding of value
-        self.value.encode(e, _)?;
+        self.value.encode(e, &mut ())?;
         Ok(())
     }
 }
@@ -116,74 +119,87 @@ mod test_c509_extension {
     use super::*;
 
     #[test]
-    fn test_c509_extension_int() {
+    fn test_c509_extension_int_with_uint_value() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
         // Precertificate Signing Certificate
-        let oid = C509ExtensionOid::new(oid!(1.3.6 .1 .4 .1 .11129 .2 .4 .4));
+        let oid = C509Extension::new(oid!(1.3.6 .1 .4 .1 .11129 .2 .4 .4), 2);
         oid.encode(&mut encoder, &mut ())
             .expect("Failed to encode OID");
-        assert_eq!(hex::encode(buffer), "1825");
+        // OID : 0x1825
+        // 2 : 0x02
+        assert_eq!(hex::encode(buffer), "182502");
     }
 
     #[test]
-    fn test_c509_extension_oid_critical() {
+    fn test_c509_extension_oid_critical_with_str_value() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
         // Precertificate Signing Certificate
-        let oid = C509ExtensionOid::new(oid!(1.3.6 .1 .4 .1 .11129 .2 .4 .4)).critical();
+        let oid = C509Extension::new(oid!(1.3.6 .1 .4 .1 .11129 .2 .4 .4), "test").critical();
         oid.encode(&mut encoder, &mut ())
             .expect("Failed to encode OID");
-        assert_eq!(hex::encode(buffer), "3824");
+        // OID : 0x3824
+        // "test" : 0x6474657374
+        assert_eq!(hex::encode(buffer), "38246474657374");
     }
 
     #[test]
-    fn test_c509_extension_oid_pen() {
+    fn test_c509_extension_oid_pen_with_arr_value() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
         // Precertificate Signing Certificate
-        let oid = C509ExtensionOid::new(oid!(1.3.6 .1 .4 .1 .1 .1 .29));
+        let oid = C509Extension::new(oid!(1.3.6 .1 .4 .1 .1 .1 .29), [0, 1, 2, 3]);
         oid.encode(&mut encoder, &mut ())
             .expect("Failed to encode OID");
-        assert_eq!(hex::encode(buffer), "d8704301011d");
+        // OID : 0xd8704301011d
+        // [0, 1, 2, 3] : 0x8400010203
+        assert_eq!(hex::encode(buffer), "d8704301011d8400010203");
     }
 
     #[test]
-    fn test_c509_extension_oid_pen_critical() {
+    fn test_c509_extension_oid_pen_critical_with_char_value() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
         // Precertificate Signing Certificate
         // Critical should not work since the OID is not in the registry table
-        let oid = C509ExtensionOid::new(oid!(1.3.6 .1 .4 .1 .1 .1 .29)).critical();
+        let oid = C509Extension::new(oid!(1.3.6 .1 .4 .1 .1 .1 .29), 'a').critical();
         oid.encode(&mut encoder, &mut ())
             .expect("Failed to encode OID");
-        assert_eq!(hex::encode(buffer), "d8704301011d");
+        // OID : d8704301011df5
+        // 'a' : 1861
+        assert_eq!(hex::encode(buffer), "d8704301011df51861");
     }
 
     #[test]
-    fn test_c509_extension_oid_unwrapped() {
+    fn test_c509_extension_oid_unwrapped_with_i8_value() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
         // Not PEN OID and not in the registry table
-        let oid = C509ExtensionOid::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1));
+        let oid = C509Extension::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1), -1);
         oid.encode(&mut encoder, &mut ())
             .expect("Failed to encode OID");
-        assert_eq!(hex::encode(buffer.clone()), "49608648016503040201");
+        // OID : 0x49608648016503040201
+        // -1 : 0x20
+        assert_eq!(hex::encode(buffer.clone()), "4960864801650304020120");
     }
 
     #[test]
-    fn test_c509_extension_oid_unwrapped_critical() {
+    fn test_c509_extension_oid_unwrapped_critical_with_f8_value() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
         // Not PEN OID and not in the registry table
         // Critical should not work since the OID is not in the registry table
-        let oid = C509ExtensionOid::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1)).critical();
+        let oid = C509Extension::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1), 1.5).critical();
         oid.encode(&mut encoder, &mut ())
             .expect("Failed to encode OID");
-        assert_eq!(hex::encode(buffer.clone()), "49608648016503040201");
+        // OID : 0x49608648016503040201
+        // True : 0xf5
+        // 1.5 : 0xfb3ff8000000000000
+        assert_eq!(hex::encode(buffer.clone()), "49608648016503040201f5fb3ff8000000000000");
     }
 }
