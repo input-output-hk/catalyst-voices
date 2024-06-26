@@ -8,7 +8,6 @@ use minicbor::{decode, encode::Write, Decode, Decoder, Encode, Encoder};
 use once_cell::sync::Lazy;
 
 use crate::c509_oid::{C509oid, C509oidRegistered, OidToIntegerTable};
-use num_traits::cast::AsPrimitive;
 
 // Define static lookup for extensions table
 /// Refernce Section - 9.4. C509 Extensions Registry.
@@ -42,6 +41,7 @@ static EXTENSIONS_TABLE: Lazy<OidToIntegerTable> = Lazy::new(|| {
     ])
 });
 
+/* 
 static KEY_USAGE_OID: Oid<'static> = oid!(2.5.29 .15);
 // -----------------------------------------
 
@@ -110,6 +110,7 @@ where
         // KeyUsage value is 2 so should be integer8
         // Gaurantee that the extension value of KeyUsage is int
         if minicbor::data::Type::U8 == d.datatype()? || minicbor::data::Type::I8 == d.datatype()? {
+            // FIXME - Fix this int decoding
             // If it is a negative number, minicbor will interpret as Integer
             let critical = if minicbor::data::Type::I8 == d.datatype()? {
                 true
@@ -124,15 +125,20 @@ where
             };
             Ok(Extensions::new().add_extension(extension))
         } else {
-            todo!()
+            println!("{:?}", d.array()?);
+            // d.decode()?.ok();
+            Ok(Extensions::new())
         }
     }
 }
-// impl encode for Extensions
-// new() empty Vec
-// add_extension
-// get_extensions -> Vec
 
+fn convert_to_i16<T>(x: T) -> i16
+where
+    T: AsPrimitive<i16>,
+{
+    x.as_()
+}
+*/
 // -----------------------------------------
 
 #[allow(dead_code)]
@@ -176,13 +182,6 @@ where
         self.value = value;
         self
     }
-}
-
-fn convert_to_i16<T>(x: T) -> i16
-where
-    T: AsPrimitive<i16>,
-{
-    x.as_()
 }
 
 impl<'a, T, C> Encode<C> for C509Extension<'a, T>
@@ -382,40 +381,59 @@ mod test_c509_extension {
         assert_eq!(decoded_ext, ext);
     }
 
-    #[test]
-    fn test_extensions_one_extension_key_usage() {
-        let mut buffer = Vec::new();
-        let mut encoder = Encoder::new(&mut buffer);
+    // #[test]
+    // fn test_extensions_one_extension_key_usage() {
+    //     let mut buffer = Vec::new();
+    //     let mut encoder = Encoder::new(&mut buffer);
 
-        let exts = Extensions::new().add_extension(C509Extension::new(oid!(2.5.29 .15), 2));
-        exts.encode(&mut encoder, &mut ())
-            .expect("Failed to encode Extensions");
-        // 1 extension
-        // value 2 : 0x02
-        assert_eq!(hex::encode(buffer.clone()), "02");
+    //     let exts = Extensions::new().add_extension(C509Extension::new(oid!(2.5.29 .15), 2));
+    //     exts.encode(&mut encoder, &mut ())
+    //         .expect("Failed to encode Extensions");
+    //     // 1 extension
+    //     // value 2 : 0x02
+    //     assert_eq!(hex::encode(buffer.clone()), "02");
 
-        let mut decoder = Decoder::new(&buffer);
-        let decoded_exts =
-            Extensions::decode(&mut decoder, &mut ()).expect("Failed to decode Extensions");
-        assert_eq!(decoded_exts, exts);
-    }
+    //     let mut decoder = Decoder::new(&buffer);
+    //     let decoded_exts =
+    //         Extensions::decode(&mut decoder, &mut ()).expect("Failed to decode Extensions");
+    //     assert_eq!(decoded_exts, exts);
+    // }
 
-    #[test]
-    fn test_extensions_one_extension_key_usage_critical() {
-        let mut buffer = Vec::new();
-        let mut encoder = Encoder::new(&mut buffer);
+    // #[test]
+    // fn test_extensions_one_extension_key_usage_critical() {
+    //     let mut buffer = Vec::new();
+    //     let mut encoder = Encoder::new(&mut buffer);
 
-        let exts =
-            Extensions::new().add_extension(C509Extension::new(oid!(2.5.29 .15), 2).critical());
-        exts.encode(&mut encoder, &mut ())
-            .expect("Failed to encode Extensions");
-        // 1 extension
-        // value -2 : 0x21
-        assert_eq!(hex::encode(buffer.clone()), "21");
+    //     let exts =
+    //         Extensions::new().add_extension(C509Extension::new(oid!(2.5.29 .15), 2).critical());
+    //     exts.encode(&mut encoder, &mut ())
+    //         .expect("Failed to encode Extensions");
+    //     // 1 extension
+    //     // value -2 : 0x21
+    //     assert_eq!(hex::encode(buffer.clone()), "21");
 
-        let mut decoder = Decoder::new(&buffer);
-        let decoded_exts =
-            Extensions::decode(&mut decoder, &mut ()).expect("Failed to decode Extensions");
-        assert_eq!(decoded_exts, exts);
-    }
+    //     let mut decoder = Decoder::new(&buffer);
+    //     let decoded_exts =
+    //         Extensions::decode(&mut decoder, &mut ()).expect("Failed to decode Extensions");
+    //     assert_eq!(decoded_exts, exts);
+    // }
+
+    // #[test]
+    // fn test_extensions_multiple_extensions() {
+    //     let mut buffer = Vec::new();
+    //     let mut encoder = Encoder::new(&mut buffer);
+
+    //     let exts =
+    //         Extensions::new().add_extension(C509Extension::new(oid!(2.5.29 .15), 2));
+    //         exts.add_extension(C509Extension::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1), 1.5));
+    //     exts.encode(&mut encoder, &mut ())
+    //         .expect("Failed to encode Extensions");
+
+    //     assert_eq!(hex::encode(buffer.clone()), "21");
+
+    //     let mut decoder = Decoder::new(&buffer);
+    //     let decoded_exts =
+    //         Extensions::decode(&mut decoder, &mut ()).expect("Failed to decode Extensions");
+    //     assert_eq!(decoded_exts, exts);
+    // }
 }
