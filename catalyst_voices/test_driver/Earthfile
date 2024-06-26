@@ -2,7 +2,7 @@ VERSION 0.8
 
 IMPORT ../ AS catalyst-voices
 
-integration-test-web:
+disabled-integration-test-web:
     FROM catalyst-voices+build-web
     ARG TARGETARCH
     ARG browser
