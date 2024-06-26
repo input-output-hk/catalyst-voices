@@ -4,7 +4,7 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
           https://testing.googleblog.com/2011/09/10-minute-test-plan.html
 -->
 
-# [Flutter Cardano Integration](https://github.com/input-output-hk/catalyst-voices/issues/481)
+# [Flutter Cardano Integration](https://github.com/input-output-hk/catalyst-voices/issues/546)
 
 * [Flutter Cardano Integration](#flutter-cardano-integration)
   * [General Informations](#general-informations)
