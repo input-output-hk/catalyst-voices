@@ -8,6 +8,7 @@ use minicbor::{decode, encode::Write, Decode, Decoder, Encode, Encoder};
 use once_cell::sync::Lazy;
 
 use crate::c509_oid::{C509oid, C509oidRegistered, OidToIntegerTable};
+use num_traits::cast::AsPrimitive;
 
 // Define static lookup for extensions table
 /// Refernce Section - 9.4. C509 Extensions Registry.
@@ -41,18 +42,98 @@ static EXTENSIONS_TABLE: Lazy<OidToIntegerTable> = Lazy::new(|| {
     ])
 });
 
+static KEY_USAGE_OID: Oid<'static> = oid!(2.5.29 .15);
 // -----------------------------------------
 
-// // Extensions: Vec<C509Extension>
-// struct Extensions {
-//     extensions: Vec<C509Extension>,
+#[derive(Debug, Clone, PartialEq)]
+pub(crate) struct Extensions<'a, T>
+where
+    T: Encode<()> + Decode<'a, ()>,
+{
+    extensions: Vec<C509Extension<'a, T>>,
+}
 
-// }
+#[allow(dead_code)]
+impl<'a, T> Extensions<'a, T>
+where
+    T: Encode<()> + Decode<'a, ()>,
+{
+    pub fn new() -> Self {
+        Extensions {
+            extensions: Vec::new(),
+        }
+    }
 
+    pub fn add_extension(mut self, extension: C509Extension<'a, T>) -> Self {
+        self.extensions.push(extension);
+        self
+    }
+
+    // pub fn get_extensions(&self) -> Vec<C509Extension<'a, T>> {
+    //     self.extensions.clone()
+    // }
+}
+
+impl<'a, T, C> Encode<C> for Extensions<'a, T>
+where
+    T: Encode<()> + Decode<'a, ()> + AsPrimitive<i16>,
+{
+    fn encode<W: Write>(
+        &self, e: &mut Encoder<W>, ctx: &mut C,
+    ) -> Result<(), minicbor::encode::Error<W::Error>> {
+        if self.extensions.len() == 1
+            && self.extensions[0].registered_oid.get_oid() == KEY_USAGE_OID
+        {
+            // Gaurantee that the extension value of KeyUsage is int
+            // FIXME - Should be a better way to cast this
+            let cast_value: i16 = convert_to_i16(*self.extensions[0].get_value());
+            let value = if self.extensions[0].get_critical() {
+                -cast_value
+            } else {
+                cast_value
+            };
+            e.i16(value)?.ok()
+        } else {
+            e.array(self.extensions.len() as u64)?;
+            Ok(for extension in &self.extensions {
+                extension.encode(e, ctx)?;
+            })
+        }
+    }
+}
+
+impl<'a, T, C> Decode<'a, C> for Extensions<'a, T>
+where
+    T: Encode<()> + Decode<'a, ()>,
+{
+    fn decode(d: &mut Decoder<'a>, _ctx: &mut C) -> Result<Self, decode::Error> {
+        // KeyUsage value is 2 so should be integer8
+        // Gaurantee that the extension value of KeyUsage is int
+        if minicbor::data::Type::U8 == d.datatype()? || minicbor::data::Type::I8 == d.datatype()? {
+            // If it is a negative number, minicbor will interpret as Integer
+            let critical = if minicbor::data::Type::I8 == d.datatype()? {
+                true
+            } else {
+                false
+            };
+            let decoded_extension = C509Extension::new(KEY_USAGE_OID.clone(), d.decode()?);
+            let extension = if critical {
+                decoded_extension.critical()
+            } else {
+                decoded_extension
+            };
+            Ok(Extensions::new().add_extension(extension))
+        } else {
+            todo!()
+        }
+    }
+}
 // impl encode for Extensions
 // new() empty Vec
 // add_extension
 // get_extensions -> Vec
+
+// -----------------------------------------
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq)]
@@ -78,15 +159,30 @@ where
         }
     }
 
+    pub fn get_value(&self) -> &T {
+        &self.value
+    }
+
+    pub fn get_critical(&self) -> bool {
+        self.critical
+    }
+
     pub fn critical(mut self) -> Self {
         self.critical = true;
         self
     }
 
-    pub fn set(mut self, value: T) -> Self {
+    pub fn set_value(mut self, value: T) -> Self {
         self.value = value;
         self
     }
+}
+
+fn convert_to_i16<T>(x: T) -> i16
+where
+    T: AsPrimitive<i16>,
+{
+    x.as_()
 }
 
 impl<'a, T, C> Encode<C> for C509Extension<'a, T>
@@ -174,14 +270,14 @@ mod test_c509_extension {
         // Precertificate Signing Certificate
         let ext = C509Extension::new(oid!(1.3.6 .1 .4 .1 .11129 .2 .4 .4), 2);
         ext.encode(&mut encoder, &mut ())
-            .expect("Failed to encode OID");
+            .expect("Failed to encode Extension");
         // OID : 0x1825
         // 2 : 0x02
         assert_eq!(hex::encode(buffer.clone()), "182502");
 
         let mut decoder = Decoder::new(&buffer);
         let decoded_ext =
-            C509Extension::decode(&mut decoder, &mut ()).expect("Failed to decode OID");
+            C509Extension::decode(&mut decoder, &mut ()).expect("Failed to decode Extension");
         assert_eq!(decoded_ext, ext);
     }
 
@@ -193,14 +289,14 @@ mod test_c509_extension {
         // Precertificate Signing Certificate
         let ext = C509Extension::new(oid!(1.3.6 .1 .4 .1 .11129 .2 .4 .4), "test").critical();
         ext.encode(&mut encoder, &mut ())
-            .expect("Failed to encode OID");
+            .expect("Failed to encode Extension");
         // OID : 0x3824
         // "test" : 0x6474657374
         assert_eq!(hex::encode(buffer.clone()), "38246474657374");
 
         let mut decoder = Decoder::new(&buffer);
         let decoded_ext =
-            C509Extension::decode(&mut decoder, &mut ()).expect("Failed to decode OID");
+            C509Extension::decode(&mut decoder, &mut ()).expect("Failed to decode Extension");
         assert_eq!(decoded_ext, ext);
     }
 
@@ -212,14 +308,14 @@ mod test_c509_extension {
         // Precertificate Signing Certificate
         let ext = C509Extension::new(oid!(1.3.6 .1 .4 .1 .1 .1 .29), [0, 1, 2, 3]);
         ext.encode(&mut encoder, &mut ())
-            .expect("Failed to encode OID");
+            .expect("Failed to encode Extension");
         // OID : 0xd8704301011d
         // [0, 1, 2, 3] : 0x8400010203
         assert_eq!(hex::encode(buffer.clone()), "d8704301011d8400010203");
 
         let mut decoder = Decoder::new(&buffer);
         let decoded_ext =
-            C509Extension::decode(&mut decoder, &mut ()).expect("Failed to decode OID");
+            C509Extension::decode(&mut decoder, &mut ()).expect("Failed to decode Extension");
         assert_eq!(decoded_ext, ext);
     }
 
@@ -232,14 +328,14 @@ mod test_c509_extension {
         // Critical should not work since the OID is not in the registry table
         let ext = C509Extension::new(oid!(1.3.6 .1 .4 .1 .1 .1 .29), 'a').critical();
         ext.encode(&mut encoder, &mut ())
-            .expect("Failed to encode OID");
+            .expect("Failed to encode Extension");
         // OID : 0xd8704301011df5
         // 'a' : 0x1861
         assert_eq!(hex::encode(buffer.clone()), "d8704301011df51861");
 
         let mut decoder = Decoder::new(&buffer);
         let decoded_ext =
-            C509Extension::decode(&mut decoder, &mut ()).expect("Failed to decode OID");
+            C509Extension::decode(&mut decoder, &mut ()).expect("Failed to decode Extension");
         assert_eq!(decoded_ext, ext);
     }
 
@@ -251,14 +347,14 @@ mod test_c509_extension {
         // Not PEN OID and not in the registry table
         let ext = C509Extension::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1), -1);
         ext.encode(&mut encoder, &mut ())
-            .expect("Failed to encode OID");
+            .expect("Failed to encode Extension");
         // OID : 0x49608648016503040201
         // -1 : 0x20
         assert_eq!(hex::encode(buffer.clone()), "4960864801650304020120");
 
         let mut decoder = Decoder::new(&buffer);
         let decoded_ext =
-            C509Extension::decode(&mut decoder, &mut ()).expect("Failed to decode OID");
+            C509Extension::decode(&mut decoder, &mut ()).expect("Failed to decode Extension");
         assert_eq!(decoded_ext, ext);
     }
 
@@ -271,7 +367,7 @@ mod test_c509_extension {
         // Critical should not work since the OID is not in the registry table
         let ext = C509Extension::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1), 1.5).critical();
         ext.encode(&mut encoder, &mut ())
-            .expect("Failed to encode OID");
+            .expect("Failed to encode Extension");
         // OID : 0x49608648016503040201
         // True : 0xf5
         // 1.5 : 0xfb3ff8000000000000
@@ -282,7 +378,44 @@ mod test_c509_extension {
 
         let mut decoder = Decoder::new(&buffer);
         let decoded_ext =
-            C509Extension::decode(&mut decoder, &mut ()).expect("Failed to decode OID");
+            C509Extension::decode(&mut decoder, &mut ()).expect("Failed to decode Extension");
         assert_eq!(decoded_ext, ext);
+    }
+
+    #[test]
+    fn test_extensions_one_extension_key_usage() {
+        let mut buffer = Vec::new();
+        let mut encoder = Encoder::new(&mut buffer);
+
+        let exts = Extensions::new().add_extension(C509Extension::new(oid!(2.5.29 .15), 2));
+        exts.encode(&mut encoder, &mut ())
+            .expect("Failed to encode Extensions");
+        // 1 extension
+        // value 2 : 0x02
+        assert_eq!(hex::encode(buffer.clone()), "02");
+
+        let mut decoder = Decoder::new(&buffer);
+        let decoded_exts =
+            Extensions::decode(&mut decoder, &mut ()).expect("Failed to decode Extensions");
+        assert_eq!(decoded_exts, exts);
+    }
+
+    #[test]
+    fn test_extensions_one_extension_key_usage_critical() {
+        let mut buffer = Vec::new();
+        let mut encoder = Encoder::new(&mut buffer);
+
+        let exts =
+            Extensions::new().add_extension(C509Extension::new(oid!(2.5.29 .15), 2).critical());
+        exts.encode(&mut encoder, &mut ())
+            .expect("Failed to encode Extensions");
+        // 1 extension
+        // value -2 : 0x21
+        assert_eq!(hex::encode(buffer.clone()), "21");
+
+        let mut decoder = Decoder::new(&buffer);
+        let decoded_exts =
+            Extensions::decode(&mut decoder, &mut ()).expect("Failed to decode Extensions");
+        assert_eq!(decoded_exts, exts);
     }
 }
