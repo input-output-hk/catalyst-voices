@@ -6,6 +6,15 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "name": "Catalyst Voices [Web]",
+      "cwd": "catalyst_voices",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "debug",
+      "program": "lib/configs/main_web.dart",
+      "args": ["--dart-define", "SENTRY_DSN=REPLACE_WITH_SENTRY_DSN_URL"]
+    },
+    {
       "name": "Catalyst Voices [DEV][Debug]",
       "cwd": "catalyst_voices",
       "request": "launch",
