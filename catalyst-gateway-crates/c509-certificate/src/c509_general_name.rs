@@ -51,6 +51,7 @@ static GENERAL_NAMES_TABLE: Lazy<IntegerToGNRegistryTable> = Lazy::new(|| {
 /// * `uri_code` - The URI code of the EID.
 /// * `ssp` - The Scheme Specific Part (SSP) of the EID.
 #[allow(dead_code)]
+#[derive(Debug, Clone, PartialEq)]
 pub(crate) struct Eid {
     pub uri_code: BundleProtocolURISchemeTypes,
     pub ssp: String,
@@ -80,7 +81,7 @@ pub(crate) struct Eid {
 /// ```
 /// Note that 1*DIGIT consists of one or more digits
 #[allow(dead_code)]
-#[derive(Clone, FromPrimitive)]
+#[derive(Debug, Clone, PartialEq, FromPrimitive)]
 pub(crate) enum BundleProtocolURISchemeTypes {
     Dtn = 1,
     Ipn = 2,
@@ -132,6 +133,7 @@ impl<'a, C> Decode<'a, C> for Eid {
 /// * `hw_type` - The hardware type OID.
 /// * `hw_serial_num` - The hardware serial number represent in bytes.
 #[allow(dead_code)]
+#[derive(Debug, Clone, PartialEq)]
 pub(crate) struct OtherNameHardwareModuleName<'a> {
     hw_type: C509oid<'a>,
     hw_serial_num: Vec<u8>,
@@ -215,28 +217,25 @@ impl GeneralNameRegistered {
 /// # Fields
 /// * `names` - The array of GeneralName.
 #[allow(dead_code)]
-pub struct GeneralNames<T> {
-    names: Vec<GeneralName<T>>,
+pub struct GeneralNames<'a> {
+    names: Vec<GeneralName<'a>>,
 }
 
 #[allow(dead_code)]
-impl<T> GeneralNames<T> {
+impl<'a> GeneralNames<'a> {
     /// Create a new empty instance of GeneralNames.
     pub fn new() -> Self {
         Self { names: Vec::new() }
     }
 
     /// Add a new GeneralName to the GeneralNames instance.
-    pub fn add(&mut self, gn: GeneralName<T>) {
+    pub fn add(&mut self, gn: GeneralName<'a>) {
         self.names.push(gn);
     }
 }
 
 #[allow(dead_code)]
-impl<T, C> Encode<C> for GeneralNames<T>
-where
-    T: Encode<()> + TryInto<String> + Clone,
-{
+impl<C> Encode<C> for GeneralNames<'_> {
     fn encode<W: Write>(
         &self, e: &mut Encoder<W>, _ctx: &mut C,
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
@@ -244,11 +243,8 @@ where
         if self.names.len() == 1
             && self.names[0].registered_gn.get_gn_type() == GeneralNamesRegistry::DNSName
         {
-            let dns_value: String = self.names[0].value.clone().try_into().map_err(|_| {
-                minicbor::encode::Error::message("Failed to convert DNS value to String")
-            })?;
             // Array and GeneralName type is ommited, DNSName value is encoded as text string
-            e.str(&dns_value)?;
+            self.names[0].value.encode(e, &mut ())?;
         } else {
             e.array(self.names.len() as u64)?;
             for gn in &self.names {
@@ -259,17 +255,17 @@ where
     }
 }
 
-impl<'a, C, T> Decode<'a, C> for GeneralNames<T>
-where
-    T: Decode<'a, ()>,
-{
+impl<'a, C> Decode<'a, C> for GeneralNames<'a> {
     fn decode(d: &mut Decoder<'a>, _ctx: &mut C) -> Result<Self, minicbor::decode::Error> {
         // Special case checking GeneralNames contains exactly one GeneralName and it is dNSName
         // Array and GeneralName type is ommited, DNSName value is encoded as text string
         if minicbor::data::Type::String == d.datatype()? {
             let dns_name = d.str()?;
-            let mut gn = GeneralNames::new();
-            gn.add(GeneralName::new(GeneralNamesRegistry::DNSName, dns_name));
+            let mut gn: GeneralNames<'a> = GeneralNames::new();
+            gn.add(GeneralName::new(
+                GeneralNamesRegistry::DNSName,
+                GeneralNameValueType::Text(dns_name.to_string()),
+            ));
             return Ok(gn);
         }
         let len = d.array()?.ok_or(minicbor::decode::Error::message(
@@ -285,6 +281,58 @@ where
 
 // -----------------------------------------
 
+/// An Enum of GeneralNameValueType defines the type of GeneralName value.
+// Since the type of GeneralName value is dynamic and known, enum is used
+#[allow(dead_code)]
+#[derive(Debug, Clone, PartialEq)]
+pub enum GeneralNameValueType<'a> {
+    Text(String),
+    Bytes(Vec<u8>),
+    Oid(C509oid<'a>),
+    OtherNameHardwareModuleName(OtherNameHardwareModuleName<'a>),
+    Eid(Eid),
+}
+
+impl<C> Encode<C> for GeneralNameValueType<'_> {
+    fn encode<W: Write>(
+        &self, e: &mut Encoder<W>, _ctx: &mut C,
+    ) -> Result<(), minicbor::encode::Error<W::Error>> {
+        match self {
+            GeneralNameValueType::Text(text) => {
+                e.str(&text)?;
+            },
+            GeneralNameValueType::Bytes(bytes) => {
+                e.bytes(bytes)?;
+            },
+            GeneralNameValueType::Oid(oid) => {
+                oid.encode(e, &mut ())?;
+            },
+            GeneralNameValueType::Eid(eid) => {
+                eid.encode(e, &mut ())?;
+            },
+            GeneralNameValueType::OtherNameHardwareModuleName(hw) => {
+                hw.encode(e, &mut ())?;
+            },
+        }
+        Ok(())
+    }
+}
+impl<'a, C> Decode<'a, C> for GeneralNameValueType<'a> {
+    fn decode(d: &mut Decoder<'a>, _ctx: &mut C) -> Result<Self, minicbor::decode::Error> {
+        // FIXME - Implement for the rest of the types
+        let value = match d.datatype()? {
+            minicbor::data::Type::String => GeneralNameValueType::Text(d.str()?.to_string()),
+            minicbor::data::Type::Bytes => GeneralNameValueType::Bytes(d.bytes()?.to_vec()),
+            _ => {
+                return Err(minicbor::decode::Error::message(
+                    "GeneralNameValueType not supported",
+                ));
+            },
+        };
+        Ok(value)
+    }
+}
+
 /// A struct represents a GeneralName.
 /// GeneralName = ( GeneralNameType : int, GeneralNameValue : any )
 ///
@@ -293,15 +341,15 @@ where
 /// * `value` - The value of the GeneralName.
 #[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq)]
-pub struct GeneralName<T> {
+pub struct GeneralName<'a> {
     registered_gn: GeneralNameRegistered,
-    value: T,
+    value: GeneralNameValueType<'a>,
 }
 
 #[allow(dead_code)]
-impl<T> GeneralName<T> {
+impl<'a> GeneralName<'a> {
     /// Create a new instance of GeneralName.
-    pub fn new(gn: GeneralNamesRegistry, value: T) -> Self {
+    pub fn new(gn: GeneralNamesRegistry, value: GeneralNameValueType<'a>) -> Self {
         Self {
             registered_gn: GeneralNameRegistered::new(gn, &GENERAL_NAMES_TABLE),
             value,
@@ -310,10 +358,7 @@ impl<T> GeneralName<T> {
 }
 
 #[allow(dead_code)]
-impl<T, C> Encode<C> for GeneralName<T>
-where
-    T: Encode<()>,
-{
+impl<C> Encode<C> for GeneralName<'_> {
     fn encode<W: Write>(
         &self, e: &mut Encoder<W>, _ctx: &mut C,
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
@@ -334,10 +379,7 @@ where
     }
 }
 
-impl<'a, C, T> Decode<'a, C> for GeneralName<T>
-where
-    T: Decode<'a, ()>,
-{
+impl<'a, C> Decode<'a, C> for GeneralName<'a> {
     fn decode(d: &mut Decoder<'a>, _ctx: &mut C) -> Result<Self, minicbor::decode::Error> {
         // Since the GENERAL_NAMES_TABLE int doesn't exceed max of int8, minicbor will interpret
         // as i8 or u8
@@ -373,7 +415,10 @@ mod test_general_name {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
-        let gn = GeneralName::new(GeneralNamesRegistry::DNSName, "example.com");
+        let gn = GeneralName::new(
+            GeneralNamesRegistry::DNSName,
+            GeneralNameValueType::Text("example.com".to_string()),
+        );
         gn.encode(&mut encoder, &mut ())
             .expect("Failed to encode GeneralName");
         // DNSName: 0x02
