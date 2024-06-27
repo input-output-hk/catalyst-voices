@@ -62,6 +62,7 @@ class VoicesChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final iconTheme = Theme.of(context).iconTheme.copyWith(size: 18);
     return DecoratedBox(
       decoration: BoxDecoration(
         color: backgroundColor,
@@ -87,7 +88,7 @@ class VoicesChip extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsetsDirectional.only(end: 8),
                     child: IconTheme(
-                      data: const IconThemeData(size: 18),
+                      data: iconTheme,
                       child: leading!,
                     ),
                   ),
@@ -99,7 +100,7 @@ class VoicesChip extends StatelessWidget {
                   Padding(
                     padding: const EdgeInsetsDirectional.only(start: 8),
                     child: IconTheme(
-                      data: const IconThemeData(size: 18),
+                      data: iconTheme,
                       child: trailing!,
                     ),
                   ),
