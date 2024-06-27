@@ -3,7 +3,3 @@
 .packages
 build/
 pubspec.lock
-
-# melos
-*pubspec_overrides.yaml
-melos*.iml
