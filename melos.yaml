@@ -13,9 +13,10 @@ command:
     linkToCommits: true
     workspaceChangelog: true
   bootstrap:
+    runPubGetInParallel: true
     environment:
       sdk: ">=3.3.4 <4.0.0"
-      flutter: 3.22.1
+      flutter: ">=3.22.1"
     dependencies:
       bloc_concurrency: ^0.2.2
       bloc: ^8.1.2
