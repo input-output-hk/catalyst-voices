@@ -62,7 +62,7 @@ class VoicesChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconTheme = Theme.of(context).iconTheme.copyWith(size: 18);
+    final iconTheme = IconTheme.of(context).copyWith(size: 18);
     return DecoratedBox(
       decoration: BoxDecoration(
         color: backgroundColor,
