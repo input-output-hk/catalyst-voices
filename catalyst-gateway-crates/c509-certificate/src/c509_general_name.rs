@@ -226,7 +226,7 @@ impl<T> GeneralNames<T> {
         Self { names: Vec::new() }
     }
 
-    /// Add a new GeneralName to the GeneralNames.
+    /// Add a new GeneralName to the GeneralNames instance.
     pub fn add(&mut self, gn: GeneralName<T>) {
         self.names.push(gn);
     }
@@ -235,14 +235,25 @@ impl<T> GeneralNames<T> {
 #[allow(dead_code)]
 impl<T, C> Encode<C> for GeneralNames<T>
 where
-    T: Encode<()>,
+    T: Encode<()> + TryInto<String> + Clone,
 {
     fn encode<W: Write>(
         &self, e: &mut Encoder<W>, _ctx: &mut C,
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
-        e.array(self.names.len() as u64)?;
-        for gn in &self.names {
-            gn.encode(e, &mut ())?;
+        // Special case checking GeneralNames contains exactly one GeneralName and it is dNSName
+        if self.names.len() == 1
+            && self.names[0].registered_gn.get_gn_type() == GeneralNamesRegistry::DNSName
+        {
+            let dns_value: String = self.names[0].value.clone().try_into().map_err(|_| {
+                minicbor::encode::Error::message("Failed to convert DNS value to String")
+            })?;
+            // Array and GeneralName type is ommited, DNSName value is encoded as text string
+            e.str(&dns_value)?;
+        } else {
+            e.array(self.names.len() as u64)?;
+            for gn in &self.names {
+                gn.encode(e, &mut ())?;
+            }
         }
         Ok(())
     }
@@ -253,6 +264,14 @@ where
     T: Decode<'a, ()>,
 {
     fn decode(d: &mut Decoder<'a>, _ctx: &mut C) -> Result<Self, minicbor::decode::Error> {
+        // Special case checking GeneralNames contains exactly one GeneralName and it is dNSName
+        // Array and GeneralName type is ommited, DNSName value is encoded as text string
+        if minicbor::data::Type::String == d.datatype()? {
+            let dns_name = d.str()?;
+            let mut gn = GeneralNames::new();
+            gn.add(GeneralName::new(GeneralNamesRegistry::DNSName, dns_name));
+            return Ok(gn);
+        }
         let len = d.array()?.ok_or(minicbor::decode::Error::message(
             "GeneralNames should be array",
         ))?;
