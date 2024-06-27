@@ -1,7 +1,11 @@
 //! C509 Alternative Name
 
 use asn1_rs::Oid;
-use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
+use minicbor::{
+    decode,
+    encode::{self, Write},
+    Decode, Decoder, Encode, Encoder,
+};
 use num_derive::FromPrimitive;
 use num_traits::FromPrimitive;
 use once_cell::sync::Lazy;
@@ -104,17 +108,16 @@ impl<C> Encode<C> for Eid {
 
 #[allow(dead_code)]
 impl<'a, C> Decode<'a, C> for Eid {
-    fn decode(d: &mut Decoder<'a>, _ctx: &mut C) -> Result<Self, minicbor::decode::Error> {
+    fn decode(d: &mut Decoder<'a>, _ctx: &mut C) -> Result<Self, decode::Error> {
         d.array()?;
         let uri_code = d.u8()?;
         let ssp = d.bytes()?;
         Ok(Eid::new(
-            FromPrimitive::from_u8(uri_code).ok_or(minicbor::decode::Error::message(format!(
+            FromPrimitive::from_u8(uri_code).ok_or(decode::Error::message(format!(
                 "Invalid uri code value, provided {uri_code}"
             )))?,
-            String::from_utf8(ssp.to_vec()).map_err(|_| {
-                minicbor::decode::Error::message("Failed to convert bytes to string")
-            })?,
+            String::from_utf8(ssp.to_vec())
+                .map_err(|_| decode::Error::message("Failed to convert bytes to string"))?,
         ))
     }
 }
@@ -148,7 +151,7 @@ impl<'a> OtherNameHardwareModuleName<'a> {
 impl<C> Encode<C> for OtherNameHardwareModuleName<'_> {
     fn encode<W: Write>(
         &self, e: &mut Encoder<W>, _ctx: &mut C,
-    ) -> Result<(), minicbor::encode::Error<W::Error>> {
+    ) -> Result<(), encode::Error<W::Error>> {
         e.array(2)?;
         self.hw_type.encode(e, &mut ())?;
         e.bytes(&self.hw_serial_num)?;
@@ -157,7 +160,7 @@ impl<C> Encode<C> for OtherNameHardwareModuleName<'_> {
 }
 
 impl<'a, C> Decode<'a, C> for OtherNameHardwareModuleName<'_> {
-    fn decode(d: &mut Decoder<'a>, _ctx: &mut C) -> Result<Self, minicbor::decode::Error> {
+    fn decode(d: &mut Decoder<'a>, _ctx: &mut C) -> Result<Self, decode::Error> {
         d.array()?;
         let hw_type = C509oid::decode(d, &mut ())?;
         let hw_serial_num = d.bytes()?.to_vec();
@@ -347,7 +350,7 @@ mod test_general_name {
     use asn1_rs::oid;
 
     #[test]
-    fn test_encode_general_name_text() {
+    fn test_encode_decode_gn_text() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
@@ -360,7 +363,7 @@ mod test_general_name {
     }
 
     #[test]
-    fn test_encode_general_name_hw_module_name() {
+    fn test_encode_decode_gn_hw_module_name() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
@@ -377,7 +380,7 @@ mod test_general_name {
     }
 
     #[test]
-    fn test_encode_general_name_ip() {
+    fn test_encode_decode_gn_ip() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
@@ -391,7 +394,7 @@ mod test_general_name {
     }
 
     #[test]
-    fn test_encode_general_name_oid() {
+    fn test_encode_decode_gn_oid() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 

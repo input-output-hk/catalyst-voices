@@ -4,7 +4,7 @@
 //! If the OID is not a PEN OID, it will be encoded as an unwrapped OID.
 
 use asn1_rs::{oid, Oid};
-use minicbor::{decode, encode::Write, Decode, Decoder, Encode, Encoder};
+use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 use once_cell::sync::Lazy;
 
 use crate::{
@@ -224,7 +224,7 @@ impl<'a, T, C> Decode<'a, C> for C509Extension<'a, T>
 where
     T: Encode<()> + Decode<'a, ()>,
 {
-    fn decode(d: &mut Decoder<'a>, _ctx: &mut C) -> Result<Self, decode::Error> {
+    fn decode(d: &mut Decoder<'a>, _ctx: &mut C) -> Result<Self, minicbor::decode::Error> {
         // Check whether OID is an int
         // Even the encoding is i16, the minicbor decoder doesn't know what type we encoded,
         // so need to check every possible type.
@@ -238,7 +238,7 @@ where
             let oid = EXTENSIONS_TABLE
                 .get_map()
                 .get_by_left(&abs_oid_value)
-                .ok_or_else(|| decode::Error::message("OID int not found"))?;
+                .ok_or_else(|| minicbor::decode::Error::message("OID int not found"))?;
             let extension = if oid_value.is_positive() {
                 C509Extension::new(oid.to_owned(), d.decode()?)
             } else {
