@@ -14,7 +14,6 @@ command:
     workspaceChangelog: true
   bootstrap:
     runPubGetInParallel: true
-    usePubspecOverrides: true
     environment:
       sdk: ">=3.3.4 <4.0.0"
       flutter: ">=3.22.1"
