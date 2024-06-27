@@ -7,13 +7,16 @@ use asn1_rs::{oid, Oid};
 use minicbor::{decode, encode::Write, Decode, Decoder, Encode, Encoder};
 use once_cell::sync::Lazy;
 
-use crate::c509_oid::{C509oid, C509oidRegistered, OidToIntegerTable};
+use crate::{
+    c509_oid::{C509oid, C509oidRegistered},
+    tables::IntegerToOidTable,
+};
 
 // Define static lookup for extensions table
 /// Refernce Section - 9.4. C509 Extensions Registry.
 /// Map of OID to Extension Registry integer value.
-static EXTENSIONS_TABLE: Lazy<OidToIntegerTable> = Lazy::new(|| {
-    OidToIntegerTable::new(vec![
+static EXTENSIONS_TABLE: Lazy<IntegerToOidTable> = Lazy::new(|| {
+    IntegerToOidTable::new(vec![
         (1, oid!(2.5.29 .14)),                      // Subject Key Identifier
         (2, oid!(2.5.29 .15)),                      // Key Usage
         (3, oid!(2.5.29 .17)),                      // Subject Alternative Name
@@ -41,7 +44,7 @@ static EXTENSIONS_TABLE: Lazy<OidToIntegerTable> = Lazy::new(|| {
     ])
 });
 
-/* 
+/*
 static KEY_USAGE_OID: Oid<'static> = oid!(2.5.29 .15);
 // -----------------------------------------
 

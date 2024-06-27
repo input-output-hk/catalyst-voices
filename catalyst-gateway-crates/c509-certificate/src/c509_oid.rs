@@ -4,36 +4,15 @@
 
 use anyhow::Result;
 use asn1_rs::oid;
-use bimap::BiMap;
 use minicbor::{data::Tag, decode, encode::Write, Decode, Decoder, Encode, Encoder};
 use oid_registry::Oid;
+
+use crate::tables::IntegerToOidTable;
 
 /// IANA Private Enterprise Number OID prefix.
 const PEN_PREFIX: Oid<'static> = oid!(1.3.6 .1 .4 .1);
 /// Tag number representing IANA Private Enterprise Number (PEN) OID.
 const OID_PEN_TAG: u64 = 112;
-
-// -----------------------------------------
-#[derive(Debug, Clone, PartialEq)]
-pub(crate) struct OidToIntegerTable {
-    map: BiMap<i16, Oid<'static>>,
-}
-
-impl OidToIntegerTable {
-    pub(crate) fn new(table: Vec<(i16, Oid<'static>)>) -> Self {
-        let mut map = BiMap::new();
-
-        for entry in table {
-            map.insert(entry.0, entry.1);
-        }
-
-        Self { map }
-    }
-
-    pub(crate) fn get_map(&self) -> &BiMap<i16, Oid<'static>> {
-        &self.map
-    }
-}
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq)]
@@ -41,13 +20,13 @@ impl OidToIntegerTable {
 /// Value of registered OID in the table can be negative.
 pub struct C509oidRegistered<'a> {
     oid: C509oid<'a>,
-    registration_table: &'static OidToIntegerTable,
+    registration_table: &'static IntegerToOidTable,
 }
 
 #[allow(dead_code)]
 impl<'a> C509oidRegistered<'a> {
     /// Create a new instance of C509oidRegistered.
-    pub(crate) fn new(oid: Oid<'a>, table: &'static OidToIntegerTable) -> Self {
+    pub(crate) fn new(oid: Oid<'a>, table: &'static IntegerToOidTable) -> Self {
         C509oidRegistered {
             oid: C509oid::new(oid),
             registration_table: table,
@@ -70,7 +49,7 @@ impl<'a> C509oidRegistered<'a> {
         self.oid.clone()
     }
 
-    pub fn get_table(&self) -> &'static OidToIntegerTable {
+    pub fn get_table(&self) -> &'static IntegerToOidTable {
         self.registration_table
     }
 }
