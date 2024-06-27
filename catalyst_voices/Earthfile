@@ -1,7 +1,7 @@
 VERSION 0.8
 
 IMPORT ../catalyst-gateway AS catalyst-gateway
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.1.10 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.1.11 AS flutter-ci
 
 # Copy all the necessary files and running bootstrap
 builder:
@@ -37,15 +37,20 @@ check-flutter-code-generator:
     # Check diff between local code and earthly artifacts
     RUN diff /tmp/repo_generated lib/generated/catalyst_gateway
 
-# Runs static analysis on the code
+# Runs static analysis on the code.
 check-static-analysis:
     FROM +builder
     DO flutter-ci+ANALYZE
 
-# Runs code formatting checks
+# Runs code formatting checks.
 check-code-formatting:
     FROM +builder
     DO flutter-ci+FORMAT
+
+# Runs dry-run publish to verify that publishable packages can be published.
+check-package-publishing:
+    FROM +builder
+    DO flutter-ci+PUBLISH_DRY_RUN
 
 # Build web version of Catalyst Voices without arguments.
 # This is used for development purposes to validate build on PRs.
