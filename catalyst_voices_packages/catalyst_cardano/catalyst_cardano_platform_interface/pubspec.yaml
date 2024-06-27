@@ -7,7 +7,7 @@ version: 0.1.0
 
 environment:
   sdk: ">=3.3.4 <4.0.0"
-  flutter: 3.22.1
+  flutter: ">=3.22.1"
 
 dependencies:
   catalyst_cardano_serialization: ^0.1.0
