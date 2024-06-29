@@ -3,7 +3,8 @@ use asn1_rs::Oid;
 use bimap::BiMap;
 use std::hash::Hash;
 
-use crate::c509_general_name::GeneralNamesRegistry;
+// use crate::c509_general_name::GeneralNamesRegistry;
+#[allow(dead_code)]
 pub(crate) trait TableTrait<K, V> {
     fn new(table: Vec<(K, V)>) -> Self;
     fn get_map(&self) -> &BiMap<K, V>;
@@ -36,6 +37,7 @@ pub(crate) struct IntegerToOidTable {
     map: BiMap<i16, Oid<'static>>,
 }
 
+#[allow(dead_code)]
 impl IntegerToOidTable {
     pub(crate) fn new(table: Vec<(i16, Oid<'static>)>) -> Self {
         let map = IntTable::<Oid<'static>>::new(table);
@@ -49,24 +51,3 @@ impl IntegerToOidTable {
     }
 }
 
-// -----------------------------------------
-
-#[allow(dead_code)]
-#[derive(Debug, Clone, PartialEq)]
-pub(crate) struct IntegerToGNRegistryTable {
-    map: BiMap<i16, GeneralNamesRegistry>,
-}
-
-#[allow(dead_code)]
-impl IntegerToGNRegistryTable {
-    pub(crate) fn new(table: Vec<(i16, GeneralNamesRegistry)>) -> Self {
-        let map = IntTable::<GeneralNamesRegistry>::new(table);
-        Self {
-            map: map.get_map().clone(),
-        }
-    }
-
-    pub(crate) fn get_map(&self) -> &BiMap<i16, GeneralNamesRegistry> {
-        &self.map
-    }
-}
