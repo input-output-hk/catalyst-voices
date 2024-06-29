@@ -7,7 +7,7 @@
 
 use wasm_bindgen::prelude::wasm_bindgen;
 mod c509_oid;
-mod c509_extension;
+mod c509_extensions;
 mod c509_general_name;
 mod tables;
 
