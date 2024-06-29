@@ -3,6 +3,8 @@
 //! Given OID if not found in the registered OID table, it will be encoded as a PEN OID.
 //! If the OID is not a PEN OID, it will be encoded as an unwrapped OID.
 
+use std::fmt::Debug;
+
 use asn1_rs::{oid, Oid};
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 use once_cell::sync::Lazy;
@@ -142,25 +144,26 @@ where
     x.as_()
 }
 */
+
 // -----------------------------------------
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq)]
-pub struct C509Extension<'a, T>
+pub struct C509Extension<T>
 where
-    T: Encode<()> + Decode<'a, ()>,
+    T: Encode<()> + for<'a> Decode<'a, ()>,
 {
-    registered_oid: C509oidRegistered<'a>,
+    registered_oid: C509oidRegistered,
     critical: bool,
     value: T,
 }
 
 #[allow(dead_code)]
-impl<'a, T> C509Extension<'a, T>
+impl<T> C509Extension<T>
 where
-    T: Encode<()> + Decode<'a, ()>,
+    T: Encode<()> + for<'a> Decode<'a, ()>,
 {
-    fn new(oid: Oid<'a>, value: T) -> Self {
+    fn new(oid: Oid<'static>, value: T) -> Self {
         C509Extension {
             registered_oid: C509oidRegistered::new(oid, &EXTENSIONS_TABLE).pen_encoded(),
             critical: false,
@@ -187,9 +190,9 @@ where
     }
 }
 
-impl<'a, T, C> Encode<C> for C509Extension<'a, T>
+impl<T, C> Encode<C> for C509Extension<T>
 where
-    T: Encode<()> + Decode<'a, ()>,
+    T: Encode<()> + for<'a> Decode<'a, ()>,
 {
     /// Extension can be encoded as:
     /// - (extensionID: int, extensionValue: any)
@@ -220,11 +223,11 @@ where
     }
 }
 
-impl<'a, T, C> Decode<'a, C> for C509Extension<'a, T>
+impl<T, C> Decode<'_, C> for C509Extension<T>
 where
-    T: Encode<()> + Decode<'a, ()>,
+    T: Encode<()> + for<'a> Decode<'a, ()>,
 {
-    fn decode(d: &mut Decoder<'a>, _ctx: &mut C) -> Result<Self, minicbor::decode::Error> {
+    fn decode(d: &mut Decoder<'_>, _ctx: &mut C) -> Result<Self, minicbor::decode::Error> {
         // Check whether OID is an int
         // Even the encoding is i16, the minicbor decoder doesn't know what type we encoded,
         // so need to check every possible type.
@@ -289,7 +292,8 @@ mod test_c509_extension {
         let mut encoder = Encoder::new(&mut buffer);
 
         // Precertificate Signing Certificate
-        let ext = C509Extension::new(oid!(1.3.6 .1 .4 .1 .11129 .2 .4 .4), "test").critical();
+        let ext =
+            C509Extension::new(oid!(1.3.6 .1 .4 .1 .11129 .2 .4 .4), "test".to_string()).critical();
         ext.encode(&mut encoder, &mut ())
             .expect("Failed to encode Extension");
         // OID : 0x3824

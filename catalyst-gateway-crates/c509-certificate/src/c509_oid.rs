@@ -2,12 +2,11 @@
 //! Please refer to [RFC9090](https://datatracker.ietf.org/doc/rfc9090/) for OID encoding
 //! Please refer to [CDDL Wrapping](https://datatracker.ietf.org/doc/html/rfc8610#section-3.7) for unwrapped types.
 
+use crate::tables::IntegerToOidTable;
 use anyhow::Result;
 use asn1_rs::oid;
 use minicbor::{data::Tag, decode, encode::Write, Decode, Decoder, Encode, Encoder};
 use oid_registry::Oid;
-
-use crate::tables::IntegerToOidTable;
 
 /// IANA Private Enterprise Number OID prefix.
 const PEN_PREFIX: Oid<'static> = oid!(1.3.6 .1 .4 .1);
@@ -18,17 +17,17 @@ const OID_PEN_TAG: u64 = 112;
 #[derive(Debug, Clone, PartialEq)]
 /// A C509 Oid with Registered Integer Encoding/Decoding.
 /// Value of registered OID in the table can be negative.
-pub struct C509oidRegistered<'a> {
-    oid: C509oid<'a>,
+pub struct C509oidRegistered {
+    oid: C509oid,
     registration_table: &'static IntegerToOidTable,
 }
 
 #[allow(dead_code)]
-impl<'a> C509oidRegistered<'a> {
+impl C509oidRegistered {
     /// Create a new instance of C509oidRegistered.
-    pub(crate) fn new(oid: Oid<'a>, table: &'static IntegerToOidTable) -> Self {
+    pub(crate) fn new(oid: Oid<'static>, table: &'static IntegerToOidTable) -> Self {
         C509oidRegistered {
-            oid: C509oid::new(oid),
+            oid: C509oid::new(oid).to_owned(),
             registration_table: table,
         }
     }
@@ -40,11 +39,11 @@ impl<'a> C509oidRegistered<'a> {
         self
     }
 
-    pub(crate) fn get_oid(&self) -> Oid<'a> {
+    pub(crate) fn get_oid(&self) -> Oid {
         // FIXME - Should this be cloned?
         self.oid.oid.clone()
     }
-    pub(crate) fn get_c509_oid(&self) -> C509oid<'a> {
+    pub(crate) fn get_c509_oid(&self) -> C509oid {
         // FIXME - Should this be cloned?
         self.oid.clone()
     }
@@ -59,15 +58,15 @@ impl<'a> C509oidRegistered<'a> {
 /// Represent an instance of C509 OID where it contains an oid.
 #[allow(dead_code)]
 #[derive(Debug, PartialEq, Clone, Eq, Hash)]
-pub struct C509oid<'a> {
-    oid: Oid<'a>,
+pub struct C509oid {
+    oid: Oid<'static>,
     pen_supported: bool,
 }
 
 #[allow(dead_code)]
-impl<'a> C509oid<'a> {
+impl C509oid {
     /// Create an new instance of C509oid.
-    pub(crate) fn new(oid: Oid<'a>) -> Self {
+    pub(crate) fn new(oid: Oid<'static>) -> Self {
         C509oid {
             oid,
             pen_supported: false,
@@ -80,12 +79,20 @@ impl<'a> C509oid<'a> {
         self
     }
 
-    pub(crate) fn get_oid(&self) -> Oid<'a> {
+    pub(crate) fn get_oid(self) -> Oid<'static> {
         self.oid.clone()
     }
 }
 
-impl<C> Encode<C> for C509oid<'_> {
+impl Default for C509oid {
+    fn default() -> Self {
+        C509oid {
+            oid: oid!(0),
+            pen_supported: false,
+        }
+    }
+}
+impl<C> Encode<C> for C509oid {
     /// Encode an OID
     /// If `pen_supported` flag is set, and OID start with a valid `PEN_PREFIX`,
     /// it is encoded as PEN (Private Enterprise Number)
@@ -126,7 +133,7 @@ impl<C> Encode<C> for C509oid<'_> {
     }
 }
 
-impl<'a, C> Decode<'a, C> for C509oid<'_> {
+impl<C> Decode<'_, C> for C509oid {
     /// Decode an OID
     /// If the data to be decoded is a `Tag`, and the tag is an `OID_PEN_TAG`,
     /// then decode the OID as Private Enterprise Number (PEN) OID.
@@ -136,7 +143,7 @@ impl<'a, C> Decode<'a, C> for C509oid<'_> {
     ///
     /// A C509oid instance.
     /// If the decoding fails, it will return an error.
-    fn decode(d: &mut Decoder<'a>, _ctx: &mut C) -> Result<Self, decode::Error> {
+    fn decode(d: &mut Decoder, _ctx: &mut C) -> Result<Self, decode::Error> {
         if (minicbor::data::Type::Tag == d.datatype()?) && (Tag::new(OID_PEN_TAG) == d.tag()?) {
             let oid_bytes = d.bytes()?;
             // raw_oid contains the whole OID which stored in bytes
