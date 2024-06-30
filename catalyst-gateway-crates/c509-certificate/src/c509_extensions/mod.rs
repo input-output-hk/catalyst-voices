@@ -3,6 +3,8 @@
 //! Given OID if not found in the registered OID table, it will be encoded as a PEN OID.
 //! If the OID is not a PEN OID, it will be encoded as an unwrapped OID.
 
+mod subject_alt_name;
+
 use std::fmt::Debug;
 
 use asn1_rs::{oid, Oid};
