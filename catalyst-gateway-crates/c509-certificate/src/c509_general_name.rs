@@ -30,7 +30,7 @@ pub enum GeneralNamesRegistry {
 
 impl GeneralNamesRegistry {
     /// Get the value integer associated with the GeneralName.
-    fn get_int(&self) -> i8 {
+    pub(crate) fn get_int(&self) -> i8 {
         match self {
             GeneralNamesRegistry::OtherNameBundleEID => -3,
             GeneralNamesRegistry::OtherNameSmtpUTF8Mailbox(_) => -2,
@@ -49,7 +49,6 @@ impl<C> Encode<C> for GeneralNamesRegistry {
     fn encode<W: Write>(
         &self, e: &mut Encoder<W>, _ctx: &mut C,
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
-        e.i8(self.get_int())?;
         match self {
             GeneralNamesRegistry::OtherNameHardwareModuleName(hm) => {
                 OtherNameHardwareModuleName::encode(hm, e, &mut ())?;
@@ -253,17 +252,23 @@ pub struct GeneralNames {
     general_names: Vec<GeneralName>,
 }
 
+#[allow(dead_code)]
 impl GeneralNames {
     /// Create a new empty instance of GeneralNames.
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         Self {
             general_names: Vec::new(),
         }
     }
 
     /// Add a new GeneralName to the GeneralNames instance.
-    pub fn add(&mut self, gn: GeneralName) {
+    pub(crate) fn add(&mut self, gn: GeneralName) {
         self.general_names.push(gn);
+    }
+
+    /// Get the a list of GeneralName.
+    pub(crate) fn get_gns(&self) -> &Vec<GeneralName> {
+        &self.general_names
     }
 }
 
@@ -306,8 +311,13 @@ pub struct GeneralName {
 
 impl GeneralName {
     /// Create a new instance of GeneralName.
-    pub fn new(gn: GeneralNamesRegistry) -> Self {
+    pub(crate) fn new(gn: GeneralNamesRegistry) -> Self {
         Self { gn }
+    }
+    
+    #[allow(dead_code)]
+    pub(crate) fn get_gn(&self) -> &GeneralNamesRegistry {
+        &self.gn
     }
 }
 
@@ -315,6 +325,7 @@ impl<C> Encode<C> for GeneralName {
     fn encode<W: Write>(
         &self, e: &mut Encoder<W>, _ctx: &mut C,
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
+        e.i8(self.gn.get_int())?;
         self.gn.encode(e, &mut ())?;
         Ok(())
     }
