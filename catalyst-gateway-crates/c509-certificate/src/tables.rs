@@ -3,8 +3,6 @@ use asn1_rs::Oid;
 use bimap::BiMap;
 use std::hash::Hash;
 
-// use crate::c509_general_name::GeneralNamesRegistry;
-#[allow(dead_code)]
 pub(crate) trait TableTrait<K, V> {
     fn new(table: Vec<(K, V)>) -> Self;
     fn get_map(&self) -> &BiMap<K, V>;
@@ -13,6 +11,7 @@ pub(crate) trait TableTrait<K, V> {
 // -----------------------------------------
 #[derive(Debug)]
 pub(crate) struct IntTable<T> {
+    // Using i16 because the int value can be -256 to 255
     map: BiMap<i16, T>,
 }
 

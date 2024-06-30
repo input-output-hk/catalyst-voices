@@ -2,7 +2,6 @@
 
 use asn1_rs::Oid;
 use minicbor::{
-    decode,
     encode::{self, Write},
     Decode, Decoder, Encode, Encoder,
 };
@@ -229,7 +228,7 @@ impl<C> Encode<C> for OtherNameHardwareModuleName {
 }
 
 impl<'a, C> Decode<'a, C> for OtherNameHardwareModuleName {
-    fn decode(d: &mut Decoder<'a>, _ctx: &mut C) -> Result<Self, decode::Error> {
+    fn decode(d: &mut Decoder<'a>, _ctx: &mut C) -> Result<Self, minicbor::decode::Error> {
         d.array()?;
         let hw_type = C509oid::decode(d, &mut ())?;
         let hw_serial_num = d.bytes()?.to_vec();
@@ -274,11 +273,11 @@ impl GeneralNames {
 
 impl<C> Encode<C> for GeneralNames {
     fn encode<W: Write>(
-        &self, e: &mut Encoder<W>, _ctx: &mut C,
+        &self, e: &mut Encoder<W>, ctx: &mut C,
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
         e.array(self.general_names.len() as u64)?;
         for gn in &self.general_names {
-            gn.encode(e, &mut ())?;
+            gn.encode(e, ctx)?;
         }
         Ok(())
     }
@@ -314,7 +313,7 @@ impl GeneralName {
     pub(crate) fn new(gn: GeneralNamesRegistry) -> Self {
         Self { gn }
     }
-    
+
     #[allow(dead_code)]
     pub(crate) fn get_gn(&self) -> &GeneralNamesRegistry {
         &self.gn

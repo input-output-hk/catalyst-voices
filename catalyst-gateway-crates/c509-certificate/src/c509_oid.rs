@@ -1,4 +1,4 @@
-//! This module provides an encoding and decoding of C509 Object Identifier (OID).
+//! C509 OID provides an encoding and decoding of C509 Object Identifier (OID).
 //! Please refer to [RFC9090](https://datatracker.ietf.org/doc/rfc9090/) for OID encoding
 //! Please refer to [CDDL Wrapping](https://datatracker.ietf.org/doc/html/rfc8610#section-3.7) for unwrapped types.
 
@@ -8,23 +8,27 @@ use asn1_rs::oid;
 use minicbor::{data::Tag, decode, encode::Write, Decode, Decoder, Encode, Encoder};
 use oid_registry::Oid;
 
-/// IANA Private Enterprise Number OID prefix.
+// FIXME - Revisit visibility
+
+/// IANA Private Enterprise Number (PEN) OID prefix.
 const PEN_PREFIX: Oid<'static> = oid!(1.3.6 .1 .4 .1);
+
 /// Tag number representing IANA Private Enterprise Number (PEN) OID.
 const OID_PEN_TAG: u64 = 112;
 
-#[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq)]
-/// A C509 Oid with Registered Integer Encoding/Decoding.
-/// Value of registered OID in the table can be negative.
+/// A strut of C509 OID with Registered Integer Encoding/Decoding.
+/// 
+/// # Fields
+/// * oid - The `C509oid`.
+/// * registration_table - The registration table.
 pub struct C509oidRegistered {
     oid: C509oid,
     registration_table: &'static IntegerToOidTable,
 }
 
-#[allow(dead_code)]
 impl C509oidRegistered {
-    /// Create a new instance of C509oidRegistered.
+    /// Create a new instance of `C509oidRegistered`.
     pub(crate) fn new(oid: Oid<'static>, table: &'static IntegerToOidTable) -> Self {
         C509oidRegistered {
             oid: C509oid::new(oid).to_owned(),
@@ -39,15 +43,12 @@ impl C509oidRegistered {
         self
     }
 
-    pub(crate) fn get_oid(&self) -> Oid {
-        // FIXME - Should this be cloned?
-        self.oid.oid.clone()
-    }
+    /// Get the `C509oid`.
     pub(crate) fn get_c509_oid(&self) -> C509oid {
-        // FIXME - Should this be cloned?
         self.oid.clone()
     }
 
+    /// Get the registration table.
     pub fn get_table(&self) -> &'static IntegerToOidTable {
         self.registration_table
     }
@@ -55,8 +56,11 @@ impl C509oidRegistered {
 
 // -----------------------------------------
 
-/// Represent an instance of C509 OID where it contains an oid.
-#[allow(dead_code)]
+/// A struct represent an instance of `C509oid`.
+/// 
+/// # Fields
+/// * oid - The OID.
+/// * pen_supported - The flag to indicate whether PEN encoding is supported.
 #[derive(Debug, PartialEq, Clone, Eq, Hash)]
 pub struct C509oid {
     oid: Oid<'static>,
@@ -65,7 +69,8 @@ pub struct C509oid {
 
 #[allow(dead_code)]
 impl C509oid {
-    /// Create an new instance of C509oid.
+    /// Create an new instance of `C509oid`.
+    /// Default value of PEN flag is false
     pub(crate) fn new(oid: Oid<'static>) -> Self {
         C509oid {
             oid,
@@ -79,19 +84,12 @@ impl C509oid {
         self
     }
 
+    /// Get the underlying OID of the `C509oid`
     pub(crate) fn get_oid(self) -> Oid<'static> {
         self.oid.clone()
     }
 }
 
-impl Default for C509oid {
-    fn default() -> Self {
-        C509oid {
-            oid: oid!(0),
-            pen_supported: false,
-        }
-    }
-}
 impl<C> Encode<C> for C509oid {
     /// Encode an OID
     /// If `pen_supported` flag is set, and OID start with a valid `PEN_PREFIX`,
