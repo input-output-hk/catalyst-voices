@@ -44,28 +44,28 @@ impl GeneralNamesRegistry {
         }
     }
 }
-impl<C> Encode<C> for GeneralNamesRegistry {
+impl Encode<()> for GeneralNamesRegistry {
     fn encode<W: Write>(
-        &self, e: &mut Encoder<W>, _ctx: &mut C,
+        &self, e: &mut Encoder<W>, ctx: &mut (),
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
         match self {
             GeneralNamesRegistry::OtherNameHardwareModuleName(hm) => {
-                OtherNameHardwareModuleName::encode(hm, e, &mut ())?;
+                OtherNameHardwareModuleName::encode(hm, e, ctx)?;
             },
             GeneralNamesRegistry::OtherName(hm) => {
-                OtherNameHardwareModuleName::encode(hm, e, &mut ())?;
+                OtherNameHardwareModuleName::encode(hm, e, ctx)?;
             },
             GeneralNamesRegistry::IPAddress(ip) => {
                 e.bytes(ip)?;
             },
             GeneralNamesRegistry::RegisteredID(id) => {
-                C509oid::encode(id, e, &mut ())?;
+                C509oid::encode(id, e, ctx)?;
             },
             GeneralNamesRegistry::OtherNameSmtpUTF8Mailbox(s)
             | GeneralNamesRegistry::UniformResourceIdentifier(s)
             | GeneralNamesRegistry::Rfc822Name(s)
             | GeneralNamesRegistry::DNSName(s) => {
-                s.encode(e, &mut ())?;
+                s.encode(e, ctx)?;
             },
             _ => {},
         };
@@ -73,17 +73,17 @@ impl<C> Encode<C> for GeneralNamesRegistry {
     }
 }
 
-impl<'a, C> Decode<'a, C> for GeneralNamesRegistry {
-    fn decode(d: &mut Decoder<'a>, _ctx: &mut C) -> Result<Self, minicbor::decode::Error> {
+impl<'a> Decode<'a, ()> for GeneralNamesRegistry {
+    fn decode(d: &mut Decoder<'a>, ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
         match d.i8()? {
             -2 => Ok(GeneralNamesRegistry::OtherNameSmtpUTF8Mailbox(
                 d.str()?.to_string(),
             )),
             -1 => Ok(GeneralNamesRegistry::OtherNameHardwareModuleName(
-                OtherNameHardwareModuleName::decode(d, &mut ())?,
+                OtherNameHardwareModuleName::decode(d, ctx)?,
             )),
             0 => Ok(GeneralNamesRegistry::OtherName(
-                OtherNameHardwareModuleName::decode(d, &mut ())?,
+                OtherNameHardwareModuleName::decode(d, ctx)?,
             )),
             1 => Ok(GeneralNamesRegistry::Rfc822Name(d.str()?.to_string())),
             2 => Ok(GeneralNamesRegistry::DNSName(d.str()?.to_string())),
@@ -91,10 +91,7 @@ impl<'a, C> Decode<'a, C> for GeneralNamesRegistry {
                 d.str()?.to_string(),
             )),
             7 => Ok(GeneralNamesRegistry::IPAddress(d.bytes()?.to_vec())),
-            8 => Ok(GeneralNamesRegistry::RegisteredID(C509oid::decode(
-                d,
-                &mut (),
-            )?)),
+            8 => Ok(GeneralNamesRegistry::RegisteredID(C509oid::decode(d, ctx)?)),
             _ => Err(minicbor::decode::Error::message(
                 "GeneralName not supported",
             )),
@@ -164,9 +161,9 @@ impl Eid {
     }
 }
 
-impl<C> Encode<C> for Eid {
+impl Encode<()> for Eid {
     fn encode<W: Write>(
-        &self, e: &mut Encoder<W>, _ctx: &mut C,
+        &self, e: &mut Encoder<W>, _ctx: &mut (),
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
         e.array(2)?;
         e.u8(self.uri_code.clone() as u8)?;
@@ -175,8 +172,8 @@ impl<C> Encode<C> for Eid {
     }
 }
 
-impl<'a, C> Decode<'a, C> for Eid {
-    fn decode(d: &mut Decoder<'a>, _ctx: &mut C) -> Result<Self, decode::Error> {
+impl<'a> Decode<'a, ()> for Eid {
+    fn decode(d: &mut Decoder<'a>, _ctx: &mut ()) -> Result<Self, decode::Error> {
         d.array()?;
         let uri_code = d.u8()?;
         let ssp = d.bytes()?;
@@ -216,21 +213,21 @@ impl OtherNameHardwareModuleName {
     }
 }
 
-impl<C> Encode<C> for OtherNameHardwareModuleName {
+impl Encode<()> for OtherNameHardwareModuleName {
     fn encode<W: Write>(
-        &self, e: &mut Encoder<W>, _ctx: &mut C,
+        &self, e: &mut Encoder<W>, ctx: &mut (),
     ) -> Result<(), encode::Error<W::Error>> {
         e.array(2)?;
-        self.hw_type.encode(e, &mut ())?;
+        self.hw_type.encode(e, ctx)?;
         e.bytes(&self.hw_serial_num)?;
         Ok(())
     }
 }
 
-impl<'a, C> Decode<'a, C> for OtherNameHardwareModuleName {
-    fn decode(d: &mut Decoder<'a>, _ctx: &mut C) -> Result<Self, minicbor::decode::Error> {
+impl<'a> Decode<'a, ()> for OtherNameHardwareModuleName {
+    fn decode(d: &mut Decoder<'a>, ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
         d.array()?;
-        let hw_type = C509oid::decode(d, &mut ())?;
+        let hw_type = C509oid::decode(d, ctx)?;
         let hw_serial_num = d.bytes()?.to_vec();
         Ok(OtherNameHardwareModuleName::new(
             hw_type.get_oid(),
@@ -271,9 +268,9 @@ impl GeneralNames {
     }
 }
 
-impl<C> Encode<C> for GeneralNames {
+impl Encode<()> for GeneralNames {
     fn encode<W: Write>(
-        &self, e: &mut Encoder<W>, ctx: &mut C,
+        &self, e: &mut Encoder<W>, ctx: &mut (),
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
         e.array(self.general_names.len() as u64)?;
         for gn in &self.general_names {
@@ -283,14 +280,14 @@ impl<C> Encode<C> for GeneralNames {
     }
 }
 
-impl<'a, C> Decode<'a, C> for GeneralNames {
-    fn decode(d: &mut Decoder<'a>, _ctx: &mut C) -> Result<Self, minicbor::decode::Error> {
+impl<'a> Decode<'a, ()> for GeneralNames {
+    fn decode(d: &mut Decoder<'a>, ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
         let len = d.array()?.ok_or(minicbor::decode::Error::message(
             "GeneralNames should be an array",
         ))?;
         let mut gn = GeneralNames::new();
         for _ in 0..len {
-            gn.add(GeneralName::decode(d, &mut ())?);
+            gn.add(GeneralName::decode(d, ctx)?);
         }
         Ok(gn)
     }
@@ -320,20 +317,20 @@ impl GeneralName {
     }
 }
 
-impl<C> Encode<C> for GeneralName {
+impl Encode<()> for GeneralName {
     fn encode<W: Write>(
-        &self, e: &mut Encoder<W>, _ctx: &mut C,
+        &self, e: &mut Encoder<W>, ctx: &mut (),
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
         e.i8(self.gn.get_int())?;
-        self.gn.encode(e, &mut ())?;
+        self.gn.encode(e, ctx)?;
         Ok(())
     }
 }
 
-impl<'a, C> Decode<'a, C> for GeneralName {
-    fn decode(d: &mut Decoder<'a>, _ctx: &mut C) -> Result<Self, minicbor::decode::Error> {
+impl<'a> Decode<'a, ()> for GeneralName {
+    fn decode(d: &mut Decoder<'a>, ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
         if minicbor::data::Type::U8 == d.datatype()? || minicbor::data::Type::I8 == d.datatype()? {
-            Ok(GeneralName::new(GeneralNamesRegistry::decode(d, &mut ())?))
+            Ok(GeneralName::new(GeneralNamesRegistry::decode(d, ctx)?))
         } else {
             // GeneralName is not type int
             Err(minicbor::decode::Error::message(

@@ -90,7 +90,7 @@ impl C509oid {
     }
 }
 
-impl<C> Encode<C> for C509oid {
+impl Encode<()> for C509oid {
     /// Encode an OID
     /// If `pen_supported` flag is set, and OID start with a valid `PEN_PREFIX`,
     /// it is encoded as PEN (Private Enterprise Number)
@@ -101,7 +101,7 @@ impl<C> Encode<C> for C509oid {
     /// A vector of bytes containing the CBOR encoded OID.
     /// If the encoding fails, it will return an error.
     fn encode<W: Write>(
-        &self, e: &mut Encoder<W>, _ctx: &mut C,
+        &self, e: &mut Encoder<W>, _ctx: &mut (),
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
         // Check if PEN encoding is supported and the OID starts with the PEN prefix.
         if self.pen_supported && self.oid.starts_with(&PEN_PREFIX) {
@@ -131,7 +131,7 @@ impl<C> Encode<C> for C509oid {
     }
 }
 
-impl<C> Decode<'_, C> for C509oid {
+impl Decode<'_, ()> for C509oid {
     /// Decode an OID
     /// If the data to be decoded is a `Tag`, and the tag is an `OID_PEN_TAG`,
     /// then decode the OID as Private Enterprise Number (PEN) OID.
@@ -141,7 +141,7 @@ impl<C> Decode<'_, C> for C509oid {
     ///
     /// A C509oid instance.
     /// If the decoding fails, it will return an error.
-    fn decode(d: &mut Decoder, _ctx: &mut C) -> Result<Self, decode::Error> {
+    fn decode(d: &mut Decoder, _ctx: &mut ()) -> Result<Self, decode::Error> {
         if (minicbor::data::Type::Tag == d.datatype()?) && (Tag::new(OID_PEN_TAG) == d.tag()?) {
             let oid_bytes = d.bytes()?;
             // raw_oid contains the whole OID which stored in bytes

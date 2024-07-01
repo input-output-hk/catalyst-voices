@@ -98,7 +98,7 @@ where
     T: Encode<()> + Decode<'a, ()> + AsPrimitive<i16>,
 {
     fn encode<W: Write>(
-        &self, e: &mut Encoder<W>, ctx: &mut C,
+        &self, e: &mut Encoder<W>, ctx: &mut (),
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
         if self.extensions.len() == 1
             && self.extensions[0].registered_oid.get_oid() == KEY_USAGE_OID
@@ -125,7 +125,7 @@ impl<'a, T, C> Decode<'a, C> for Extensions<'a, T>
 where
     T: Encode<()> + Decode<'a, ()>,
 {
-    fn decode(d: &mut Decoder<'a>, _ctx: &mut C) -> Result<Self, decode::Error> {
+    fn decode(d: &mut Decoder<'a>, _ctx: &mut ()) -> Result<Self, decode::Error> {
         // KeyUsage value is 2 so should be integer8
         // Gaurantee that the extension value of KeyUsage is int
         if minicbor::data::Type::U8 == d.datatype()? || minicbor::data::Type::I8 == d.datatype()? {
@@ -214,7 +214,7 @@ where
     }
 }
 
-impl<T, C> Encode<C> for C509Extension<T>
+impl<T> Encode<()> for C509Extension<T>
 where
     T: Encode<()> + for<'a> Decode<'a, ()>,
 {
@@ -223,7 +223,7 @@ where
     /// - (extensionID: ~oid, ? critical: true, extensionValue: bytes)
     /// - (extensionID: pen, ? critical: true, extensionValue: bytes)
     fn encode<W: Write>(
-        &self, e: &mut Encoder<W>, ctx: &mut C,
+        &self, e: &mut Encoder<W>, ctx: &mut (),
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
         // Handle CBOR int
         if let Some(&oid) = self
@@ -240,16 +240,16 @@ where
             self.registered_oid.get_c509_oid().encode(e, ctx)?;
             e.bool(self.critical)?;
         }
-        self.value.encode(e, &mut ())?;
+        self.value.encode(e, ctx)?;
         Ok(())
     }
 }
 
-impl<T, C> Decode<'_, C> for C509Extension<T>
+impl<T> Decode<'_, ()> for C509Extension<T>
 where
     T: Encode<()> + for<'a> Decode<'a, ()>,
 {
-    fn decode(d: &mut Decoder<'_>, _ctx: &mut C) -> Result<Self, minicbor::decode::Error> {
+    fn decode(d: &mut Decoder<'_>, _ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
         // Check whether OID is an int
         // Even the encoding is i16, the minicbor decoder doesn't know what type we encoded,
         // so need to check every possible type.

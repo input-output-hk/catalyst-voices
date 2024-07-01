@@ -33,9 +33,9 @@ impl AltName {
     }
 }
 
-impl<C> Encode<C> for AltName {
+impl Encode<()> for AltName {
     fn encode<W: Write>(
-        &self, e: &mut Encoder<W>, ctx: &mut C,
+        &self, e: &mut Encoder<W>, ctx: &mut (),
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
         match &self.value {
             GeneralNamesOrText::GeneralNames(gns) => {
@@ -55,8 +55,8 @@ impl<C> Encode<C> for AltName {
     }
 }
 
-impl<'a, C> Decode<'a, C> for AltName {
-    fn decode(d: &mut Decoder<'a>, ctx: &mut C) -> Result<Self, minicbor::decode::Error> {
+impl<'a> Decode<'a, ()> for AltName {
+    fn decode(d: &mut Decoder<'a>, ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
         // FIXME - can't distinguish between GeneralNames(only DNSName) and Text
         match d.datatype()? {
             minicbor::data::Type::String => {
