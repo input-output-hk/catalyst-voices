@@ -6,24 +6,24 @@ Based on: https://books.google.it/books?id=vHlTOVTKHeUC&hl=it&source=gbs_navlink
 
 # [Flutter Cardano Integration](https://github.com/input-output-hk/catalyst-voices/issues/546)
 
-* [Flutter Cardano Integration](#flutter-cardano-integration)
-  * [General Informations](#general-informations)
-    * [Abstract](#abstract)
-    * [Stakeholders](#stakeholders)
-    * [Requirements](#requirements)
-    * [Acceptance criteria](#acceptance-criteria)
-    * [Risks](#risks)
-    * [Tools](#tools)
-  * [ACC framework](#acc-framework)
-    * [Attributes](#attributes)
-    * [Components](#components)
-    * [Capabilities](#capabilities)
-  * [Integration tests](#integration-tests)
-    * [Integration tests strategy](#integration-tests-strategy)
-    * [Integration test cases](#integration-test-cases)
-  * [Extensions](#extensions)
-  * [User actions](#user-actions)
-  * [Wallet](#wallet)
+- [Flutter Cardano Integration](#flutter-cardano-integration)
+  - [General Informations](#general-informations)
+    - [Abstract](#abstract)
+    - [Stakeholders](#stakeholders)
+    - [Requirements](#requirements)
+    - [Acceptance criteria](#acceptance-criteria)
+    - [Risks](#risks)
+    - [Tools](#tools)
+  - [ACC framework](#acc-framework)
+    - [Attributes](#attributes)
+    - [Components](#components)
+    - [Capabilities](#capabilities)
+  - [Integration tests](#integration-tests)
+    - [Integration tests strategy](#integration-tests-strategy)
+    - [Integration test cases](#integration-test-cases)
+  - [Extensions](#extensions)
+  - [User actions](#user-actions)
+  - [Wallet](#wallet)
 
 ## General Informations
 
@@ -44,24 +44,24 @@ These actions are namely retrieving wallet details, signing data/transactions an
 
 ### Requirements
 
-[EPIC](https://github.com/input-output-hk/catalyst-voices/issues/399)  
-[CIP-30](https://cips.cardano.org/cip/CIP-30)  
-[CIP-95](https://cips.cardano.org/cip/CIP-95)  
+[EPIC](https://github.com/input-output-hk/catalyst-voices/issues/399)
+[CIP-30](https://cips.cardano.org/cip/CIP-30)
+[CIP-95](https://cips.cardano.org/cip/CIP-95)
 Testing will be focused only on web applications for the time being.
 Focus needs to be on compliance with CIP-30 and CIP-95 specs, reliability and security.
 This is especially needed when handling wallet interactions and message signing.
-UI testing is out of scope, the web application will be used only for setup purpose.  
+UI testing is out of scope, the web application will be used only for setup purpose.
 
 ### Acceptance criteria
 
-* The package must comply with CIP-30 and CIP-95 specifications, focusing on the web.  
-* High unit test coverage to ensure reliability and security.  
-* Clear and comprehensive documentation for developers.  
-* An example web application that effectively demonstrates the package's functionalities.  
+* The package must comply with CIP-30 and CIP-95 specifications, focusing on the web.
+* High unit test coverage to ensure reliability and security.
+* Clear and comprehensive documentation for developers.
+* An example web application that effectively demonstrates the package's functionalities.
 
 ### Risks
 
-Documentation is not complete yet, integration dart package might be not enough  
+Documentation is not complete yet, integration dart package might be not enough.
 
 ### Tools
 
@@ -79,14 +79,14 @@ Secure, comply with CIP-30 and CIP-95, reliable
 
 ### Components
 
-Web application  
+Web application
 
 ### Capabilities
 
-User can retrieve his wallet details  
-User can sign data  
-User can sign transactions  
-User submit transactions  
+User can retrieve his wallet details
+User can sign data
+User can sign transactions
+User submit transactions
 
 ## Integration tests
 
