@@ -18,7 +18,7 @@ const OID_PEN_TAG: u64 = 112;
 
 #[derive(Debug, Clone, PartialEq)]
 /// A strut of C509 OID with Registered Integer Encoding/Decoding.
-/// 
+///
 /// # Fields
 /// * oid - The `C509oid`.
 /// * registration_table - The registration table.
@@ -57,7 +57,7 @@ impl C509oidRegistered {
 // -----------------------------------------
 
 /// A struct represent an instance of `C509oid`.
-/// 
+///
 /// # Fields
 /// * oid - The OID.
 /// * pen_supported - The flag to indicate whether PEN encoding is supported.
@@ -164,10 +164,7 @@ impl<C> Decode<'_, C> for C509oid {
 #[cfg(test)]
 mod test_c509_oid {
 
-    use asn1_rs::oid;
-    use minicbor::{Decode, Decoder, Encode, Encoder};
-
-    use crate::c509_oid::C509oid;
+    use super::*;
 
     // Test reference 3.1. Encoding of the SHA-256 OID
     // https://datatracker.ietf.org/doc/rfc9090/
