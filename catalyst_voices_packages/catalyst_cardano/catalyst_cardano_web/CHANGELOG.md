@@ -1,3 +1,7 @@
+## 0.1.1+1
+
+ - Update a dependency to the latest release.
+
 ## 0.1.1
 
  - **FIX**: issues before publishing catalyst-cardano ([#581](https://github.com/input-output-hk/catalyst-voices/issues/581)). ([7b5338b3](https://github.com/input-output-hk/catalyst-voices/commit/7b5338b3dd6ab028e56c958a3664b6bf20b24d65))

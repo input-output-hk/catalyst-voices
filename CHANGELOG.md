@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-07-01
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`catalyst_analysis` - `v1.1.1`](#catalyst_analysis---v111)
+ - [`catalyst_cardano` - `v0.1.1+1`](#catalyst_cardano---v0111)
+ - [`catalyst_cardano_serialization` - `v0.1.1+1`](#catalyst_cardano_serialization---v0111)
+ - [`catalyst_cardano_web` - `v0.1.1+1`](#catalyst_cardano_web---v0111)
+ - [`catalyst_cardano_platform_interface` - `v0.1.1+1`](#catalyst_cardano_platform_interface---v0111)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `catalyst_cardano_web` - `v0.1.1+1`
+ - `catalyst_cardano_platform_interface` - `v0.1.1+1`
+
+---
+
+#### `catalyst_analysis` - `v1.1.1`
+
+ - **FIX**: readme versioning for catalyst packages ([#585](https://github.com/input-output-hk/catalyst-voices/issues/585)). ([e433b2db](https://github.com/input-output-hk/catalyst-voices/commit/e433b2dbba7a43c50f4411ea5279a623c221b66b))
+
+#### `catalyst_cardano` - `v0.1.1+1`
+
+ - **FIX**: readme versioning for catalyst packages ([#585](https://github.com/input-output-hk/catalyst-voices/issues/585)). ([e433b2db](https://github.com/input-output-hk/catalyst-voices/commit/e433b2dbba7a43c50f4411ea5279a623c221b66b))
+
+#### `catalyst_cardano_serialization` - `v0.1.1+1`
+
+ - **FIX**: readme versioning for catalyst packages ([#585](https://github.com/input-output-hk/catalyst-voices/issues/585)). ([e433b2db](https://github.com/input-output-hk/catalyst-voices/commit/e433b2dbba7a43c50f4411ea5279a623c221b66b))
+
+
 ## 2024-06-28
 
 ### Changes
