@@ -16,6 +16,7 @@ autorecalculates
 autoresizing
 backendpython
 bech
+bindgen
 bkioshn
 bluefireteam
 BROTLI
@@ -25,6 +26,7 @@ Catalyst
 CBOR
 cborg
 CEST
+cdylib
 cfbundle
 chromedriver
 chrono
