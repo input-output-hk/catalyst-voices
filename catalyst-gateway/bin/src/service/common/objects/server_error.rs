@@ -47,6 +47,6 @@ impl ServerError {
 impl Example for ServerError {
     /// Example for the Server Error Payload.
     fn example() -> Self {
-        Self::new(Some("Server Error".to_string()))
+        Self::new(None)
     }
 }

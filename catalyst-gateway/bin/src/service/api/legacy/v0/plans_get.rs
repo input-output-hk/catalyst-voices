@@ -6,7 +6,7 @@ use poem::web::Data;
 use poem_openapi::{payload::Json, ApiResponse};
 
 use crate::{
-    service::common::{objects::legacy::vote_plan::VotePlan, responses::WithErrorResponses},
+    service::common::{objects::legacy::vote_plan::VotePlan, responses::WithAllErrorResponse},
     state::State,
 };
 
@@ -19,7 +19,7 @@ pub(crate) enum Responses {
 }
 
 /// All responses
-pub(crate) type AllResponses = WithErrorResponses<Responses>;
+pub(crate) type AllResponses = WithAllErrorResponse<Responses>;
 
 /// GET /v0/vote/active/plans
 ///

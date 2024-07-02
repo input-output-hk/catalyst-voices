@@ -3,10 +3,10 @@
 use poem_openapi::{payload::Json, ApiResponse};
 
 use crate::{
-    event_db::error::NotFoundError,
+    event_db::error::{NotFoundError, TimedOutError},
     service::common::{
         objects::cardano::{network::Network, sync_state::SyncState},
-        responses::WithErrorResponses,
+        responses::WithAllErrorResponse,
     },
     state::State,
 };
@@ -23,10 +23,9 @@ pub(crate) enum Responses {
 }
 
 /// All responses.
-pub(crate) type AllResponses = WithErrorResponses<Responses>;
+pub(crate) type AllResponses = WithAllErrorResponse<Responses>;
 
 /// # GET `/sync_state`
-#[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(state: &State, network: Option<Network>) -> AllResponses {
     let event_db = state.event_db();
 
@@ -42,6 +41,7 @@ pub(crate) async fn endpoint(state: &State, network: Option<Network>) -> AllResp
             .into()
         },
         Err(err) if err.is::<NotFoundError>() => Responses::NotFound.into(),
-        Err(err) => AllResponses::handle_error(&err),
+        Err(err) if err.is::<TimedOutError>() => AllResponses::service_unavailable(),
+        Err(err) => AllResponses::internal_server_error(&err),
     }
 }
