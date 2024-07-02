@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["DATABASE_SCHEMA_VERSION","DATABASE_URL_ENVVAR"],"fn":["establish_connection"],"mod":["config","error","follower","legacy","schema_check","utxo","voter_registration"],"struct":["EventDB"]};

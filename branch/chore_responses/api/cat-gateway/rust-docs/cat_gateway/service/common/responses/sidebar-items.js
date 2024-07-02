@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["BadRequestResponse","CombinedResponse","InternalServerErrorResponse","ServiceUnavailableResponse"],"type":["WithAllErrorResponse","WithBadRequestAndInternalServerErrorResponse"]};

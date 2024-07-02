@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Animals"],"fn":["endpoint"],"type":["AllResponses"]};

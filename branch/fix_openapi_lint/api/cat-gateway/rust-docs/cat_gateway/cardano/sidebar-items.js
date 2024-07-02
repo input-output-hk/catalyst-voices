@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["get_follower_config","index_block","instantiate_follower","process_blocks","spawn_follower","spawn_followers","start_followers"],"mod":["registration","util"],"type":["ManageTasks"]};

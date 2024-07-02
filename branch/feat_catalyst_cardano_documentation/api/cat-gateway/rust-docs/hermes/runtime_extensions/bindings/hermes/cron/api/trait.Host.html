@@ -1,0 +1,114 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `Host` trait in crate `hermes`."><title>Host in hermes::runtime_extensions::bindings::hermes::cron::api - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../../static.files/rustdoc-b21aa549bf6d91ff.css"><meta name="rustdoc-vars" data-root-path="../../../../../../" data-static-root-path="../../../../../../static.files/" data-current-crate="hermes" data-themes="" data-resource-suffix="" data-rustdoc-version="1.80.0-nightly (9c9b56879 2024-05-05)" data-channel="nightly" data-search-js="search-d52510db62a78183.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../../../static.files/storage-e32f0c247825364d.js"></script><script defer src="sidebar-items.js"></script><script defer src="../../../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../../../static.files/noscript-09095024cf37855e.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc trait"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../../../../hermes/index.html">hermes</a><span class="version">0.0.1</span></h2></div><h2 class="location"><a href="#">Host</a></h2><div class="sidebar-elems"><section><h3><a href="#required-methods">Required Methods</a></h3><ul class="block"><li><a href="#tymethod.add">add</a></li><li><a href="#tymethod.delay">delay</a></li><li><a href="#tymethod.ls">ls</a></li><li><a href="#tymethod.mkcron">mkcron</a></li><li><a href="#tymethod.rm">rm</a></li></ul><h3><a href="#implementors">Implementors</a></h3></section><h2><a href="index.html">In hermes::runtime_extensions::bindings::hermes::cron::api</a></h2></div></nav><div class="sidebar-resizer"></div><main><div class="width-limiter"><nav class="sub"><form class="search-form"><span></span><div id="sidebar-button" tabindex="-1"><a href="../../../../../../hermes/all.html" title="show sidebar"></a></div><input class="search-input" name="search" aria-label="Run search in the documentation" autocomplete="off" spellcheck="false" placeholder="Type ‘S’ or ‘/’ to search, ‘?’ for more options…" type="search"><div id="help-button" tabindex="-1"><a href="../../../../../../help.html" title="help">?</a></div><div id="settings-menu" tabindex="-1"><a href="../../../../../../settings.html" title="settings">Settings</a></div></form></nav><section id="main-content" class="content"><div class="main-heading"><h1>Trait <a href="../../../../../index.html">hermes</a>::<wbr><a href="../../../../index.html">runtime_extensions</a>::<wbr><a href="../../../index.html">bindings</a>::<wbr><a href="../../index.html">hermes</a>::<wbr><a href="../index.html">cron</a>::<wbr><a href="index.html">api</a>::<wbr><a class="trait" href="#">Host</a><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><span class="out-of-band"><a class="src" href="../../../../../../src/hermes/runtime_extensions/bindings.rs.html#13-16">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><pre class="rust item-decl"><code>pub trait Host {
+    // Required methods
+    fn <a href="#tymethod.add" class="fn">add</a>(&amp;mut self, entry: <a class="struct" href="struct.CronTagged.html" title="struct hermes::runtime_extensions::bindings::hermes::cron::api::CronTagged">CronTagged</a>, retrigger: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.83/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>&gt;;
+<span class="item-spacer"></span>    fn <a href="#tymethod.delay" class="fn">delay</a>(&amp;mut self, duration: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>, tag: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.83/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>&gt;;
+<span class="item-spacer"></span>    fn <a href="#tymethod.ls" class="fn">ls</a>(&amp;mut self, tag: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.83/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;(<a class="struct" href="struct.CronTagged.html" title="struct hermes::runtime_extensions::bindings::hermes::cron::api::CronTagged">CronTagged</a>, <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>)&gt;&gt;;
+<span class="item-spacer"></span>    fn <a href="#tymethod.rm" class="fn">rm</a>(&amp;mut self, entry: <a class="struct" href="struct.CronTagged.html" title="struct hermes::runtime_extensions::bindings::hermes::cron::api::CronTagged">CronTagged</a>) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.83/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>&gt;;
+<span class="item-spacer"></span>    fn <a href="#tymethod.mkcron" class="fn">mkcron</a>(
+        &amp;mut self,
+        dow: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="enum" href="enum.CronComponent.html" title="enum hermes::runtime_extensions::bindings::hermes::cron::api::CronComponent">CronComponent</a>&gt;,
+        month: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="enum" href="enum.CronComponent.html" title="enum hermes::runtime_extensions::bindings::hermes::cron::api::CronComponent">CronComponent</a>&gt;,
+        day: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="enum" href="enum.CronComponent.html" title="enum hermes::runtime_extensions::bindings::hermes::cron::api::CronComponent">CronComponent</a>&gt;,
+        hour: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="enum" href="enum.CronComponent.html" title="enum hermes::runtime_extensions::bindings::hermes::cron::api::CronComponent">CronComponent</a>&gt;,
+        minute: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="enum" href="enum.CronComponent.html" title="enum hermes::runtime_extensions::bindings::hermes::cron::api::CronComponent">CronComponent</a>&gt;
+    ) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.83/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;;
+}</code></pre><h2 id="required-methods" class="section-header">Required Methods<a href="#required-methods" class="anchor">§</a></h2><div class="methods"><details class="toggle method-toggle" open><summary><section id="tymethod.add" class="method"><a class="src rightside" href="../../../../../../src/hermes/runtime_extensions/bindings.rs.html#13-16">source</a><h4 class="code-header">fn <a href="#tymethod.add" class="fn">add</a>(&amp;mut self, entry: <a class="struct" href="struct.CronTagged.html" title="struct hermes::runtime_extensions::bindings::hermes::cron::api::CronTagged">CronTagged</a>, retrigger: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.83/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>&gt;</h4></section></summary><div class="docblock"><h5 id="schedule-recurrent-cron-event"><a class="doc-anchor" href="#schedule-recurrent-cron-event">§</a>Schedule Recurrent CRON event</h5>
+<p>Cron events will be delivered to the <code>on-cron</code> event handler.</p>
+<h6 id="parameters"><a class="doc-anchor" href="#parameters">§</a>Parameters</h6>
+<ul>
+<li><code>entry</code>: The crontab entry to add.</li>
+<li><code>when</code>: When the event triggers.  Standard crontab format.</li>
+<li><code>tag</code>: A tag which will accompany the triggered event.</li>
+<li><code>retrigger</code>:</li>
+<li><code>true</code>: The event will re-trigger every time the crontab entry matches until cancelled.</li>
+<li><code>false</code>: The event will automatically cancel after it is generated once.</li>
+</ul>
+<h6 id="returns"><a class="doc-anchor" href="#returns">§</a>Returns</h6>
+<ul>
+<li><code>true</code>: Crontab added successfully.  (Or the crontab event already exists)</li>
+<li><code>false</code>: Crontab failed to be added.</li>
+</ul>
+<h6 id="note"><a class="doc-anchor" href="#note">§</a>Note:</h6>
+<p>If the crontab entry already exists, the retrigger flag can be changed by calling
+this function.  This could be useful where a retriggering crontab event is desired
+to be stopped, but ONLY after it has triggered once more.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="tymethod.delay" class="method"><a class="src rightside" href="../../../../../../src/hermes/runtime_extensions/bindings.rs.html#13-16">source</a><h4 class="code-header">fn <a href="#tymethod.delay" class="fn">delay</a>(&amp;mut self, duration: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>, tag: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.83/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>&gt;</h4></section></summary><div class="docblock"><h5 id="schedule-a-single-cron-event-after-a-fixed-delay"><a class="doc-anchor" href="#schedule-a-single-cron-event-after-a-fixed-delay">§</a>Schedule A Single cron event after a fixed delay.</h5>
+<p>Allows for easy timed wait events to be delivered without
+requiring datetime calculations or formatting cron entries.</p>
+<h6 id="parameters-1"><a class="doc-anchor" href="#parameters-1">§</a>Parameters</h6>
+<ul>
+<li><code>duration</code>: How many nanoseconds to delay.  The delay will be AT LEAST this long.</li>
+<li><code>tag</code>: A tag which will accompany the triggered event.</li>
+</ul>
+<h6 id="returns-1"><a class="doc-anchor" href="#returns-1">§</a>Returns</h6>
+<ul>
+<li><code>true</code>: Crontab added successfully.</li>
+<li><code>false</code>: Crontab failed to be added.</li>
+</ul>
+<h6 id="note-1"><a class="doc-anchor" href="#note-1">§</a>Note:</h6>
+<p>This is a convenience function which will automatically calculate the crontab
+entry needed to trigger the event after the requested <code>duration</code>.
+It is added as a non-retriggering event.
+Listing the crontabs after this call will list the delay in addition to all other
+crontab entries.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="tymethod.ls" class="method"><a class="src rightside" href="../../../../../../src/hermes/runtime_extensions/bindings.rs.html#13-16">source</a><h4 class="code-header">fn <a href="#tymethod.ls" class="fn">ls</a>(&amp;mut self, tag: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.83/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;(<a class="struct" href="struct.CronTagged.html" title="struct hermes::runtime_extensions::bindings::hermes::cron::api::CronTagged">CronTagged</a>, <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>)&gt;&gt;</h4></section></summary><div class="docblock"><h5 id="list-currently-active-cron-schedule"><a class="doc-anchor" href="#list-currently-active-cron-schedule">§</a>List currently active cron schedule.</h5>
+<p>Allows for management of scheduled cron events.</p>
+<h6 id="parameters-2"><a class="doc-anchor" href="#parameters-2">§</a>Parameters</h6>
+<ul>
+<li><code>tag</code>: Optional, the tag to limit the list to.  If <code>none</code> then all crons listed.</li>
+</ul>
+<h6 id="returns-2"><a class="doc-anchor" href="#returns-2">§</a>Returns</h6>
+<ul>
+<li>A list of tuples containing the scheduled crontabs and their tags, along with the current retrigger flag.
+The list is sorted from most crontab that will trigger soonest to latest.
+Crontabs are only listed once, in the case where a crontab may be scheduled
+may times before a later one.</li>
+<li><code>0</code> - <code>cron-tagged</code> - The Tagged crontab event.</li>
+<li><code>1</code> - <code>bool</code> - The state of the retrigger flag.</li>
+</ul>
+</div></details><details class="toggle method-toggle" open><summary><section id="tymethod.rm" class="method"><a class="src rightside" href="../../../../../../src/hermes/runtime_extensions/bindings.rs.html#13-16">source</a><h4 class="code-header">fn <a href="#tymethod.rm" class="fn">rm</a>(&amp;mut self, entry: <a class="struct" href="struct.CronTagged.html" title="struct hermes::runtime_extensions::bindings::hermes::cron::api::CronTagged">CronTagged</a>) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.83/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>&gt;</h4></section></summary><div class="docblock"><h5 id="remove-the-requested-crontab"><a class="doc-anchor" href="#remove-the-requested-crontab">§</a>Remove the requested crontab.</h5>
+<p>Allows for management of scheduled cron events.</p>
+<h6 id="parameters-3"><a class="doc-anchor" href="#parameters-3">§</a>Parameters</h6>
+<ul>
+<li><code>when</code>: The crontab entry to add.  Standard crontab format.</li>
+<li><code>tag</code>: A tag which will accompany the triggered event.</li>
+</ul>
+<h6 id="returns-3"><a class="doc-anchor" href="#returns-3">§</a>Returns</h6>
+<ul>
+<li><code>true</code>: The requested crontab was deleted and will not trigger.</li>
+<li><code>false</code>: The requested crontab does not exist.</li>
+</ul>
+</div></details><details class="toggle method-toggle" open><summary><section id="tymethod.mkcron" class="method"><a class="src rightside" href="../../../../../../src/hermes/runtime_extensions/bindings.rs.html#13-16">source</a><h4 class="code-header">fn <a href="#tymethod.mkcron" class="fn">mkcron</a>(
+    &amp;mut self,
+    dow: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="enum" href="enum.CronComponent.html" title="enum hermes::runtime_extensions::bindings::hermes::cron::api::CronComponent">CronComponent</a>&gt;,
+    month: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="enum" href="enum.CronComponent.html" title="enum hermes::runtime_extensions::bindings::hermes::cron::api::CronComponent">CronComponent</a>&gt;,
+    day: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="enum" href="enum.CronComponent.html" title="enum hermes::runtime_extensions::bindings::hermes::cron::api::CronComponent">CronComponent</a>&gt;,
+    hour: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="enum" href="enum.CronComponent.html" title="enum hermes::runtime_extensions::bindings::hermes::cron::api::CronComponent">CronComponent</a>&gt;,
+    minute: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="enum" href="enum.CronComponent.html" title="enum hermes::runtime_extensions::bindings::hermes::cron::api::CronComponent">CronComponent</a>&gt;
+) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.83/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;</h4></section></summary><div class="docblock"><h5 id="make-a-crontab-entry-from-individual-time-values"><a class="doc-anchor" href="#make-a-crontab-entry-from-individual-time-values">§</a>Make a crontab entry from individual time values.</h5>
+<p>Crates the properly formatted cron entry
+from numeric cron time components.
+Convenience function to make building cron strings simpler when they are
+calculated from data.</p>
+<h6 id="parameters-4"><a class="doc-anchor" href="#parameters-4">§</a>Parameters</h6>
+<ul>
+<li><code>dow</code> - DayOfWeek (0-7, 0 or 7 = Sunday)</li>
+<li><code>month</code> - Month of the year (1-12, 1 = January)</li>
+<li><code>day</code> - Day in the month (1-31)</li>
+<li><code>hour</code> - Hour in the day (0-23)</li>
+<li><code>minute</code> - Minute in the hour (0-59)</li>
+</ul>
+<h6 id="returns-4"><a class="doc-anchor" href="#returns-4">§</a>Returns</h6>
+<ul>
+<li>A matching <code>cron-sched</code> ready for use in the cron functions above.</li>
+</ul>
+<h6 id="note-2"><a class="doc-anchor" href="#note-2">§</a>Note:</h6>
+<p>No checking is done to determine if the requested date is valid.
+If a particular component is out of its allowable range it will be silently
+clamped within the allowable range of each parameter.
+Redundant entries will be removed.</p>
+<ul>
+<li>For example specifying a <code>month</code> as <code>3</code> and <code>2-4</code> will
+remove the individual month and only produce the range.</li>
+</ul>
+</div></details></div><h2 id="implementors" class="section-header">Implementors<a href="#implementors" class="anchor">§</a></h2><div id="implementors-list"><section id="impl-Host-for-HermesRuntimeContext" class="impl"><a class="src rightside" href="../../../../../../src/hermes/runtime_extensions/hermes/cron/host.rs.html#15-140">source</a><a href="#impl-Host-for-HermesRuntimeContext" class="anchor">§</a><h3 class="code-header">impl <a class="trait" href="trait.Host.html" title="trait hermes::runtime_extensions::bindings::hermes::cron::api::Host">Host</a> for <a class="struct" href="../../../../../runtime_context/struct.HermesRuntimeContext.html" title="struct hermes::runtime_context::HermesRuntimeContext">HermesRuntimeContext</a></h3></section></div><script src="../../../../../../trait.impl/hermes/runtime_extensions/bindings/hermes/cron/api/trait.Host.js" async></script></section></div></main></body></html>

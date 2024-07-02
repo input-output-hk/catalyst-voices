@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["bind","column","finalize","step"]};

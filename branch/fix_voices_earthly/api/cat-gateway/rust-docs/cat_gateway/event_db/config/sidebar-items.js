@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["ConfigId"],"struct":["FollowerConfig","MithrilSnapshotConfig"]};

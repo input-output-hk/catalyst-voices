@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Responses"],"fn":["endpoint"],"macro":["process_slot_info_result"],"type":["AllResponses"]};

@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"cat_gateway":[["impl Args for <a class=\"struct\" href=\"cat_gateway/settings/struct.FollowerSettings.html\" title=\"struct cat_gateway::settings::FollowerSettings\">FollowerSettings</a>"],["impl Args for <a class=\"struct\" href=\"cat_gateway/settings/struct.ServiceSettings.html\" title=\"struct cat_gateway::settings::ServiceSettings\">ServiceSettings</a>"],["impl Args for <a class=\"struct\" href=\"cat_gateway/settings/struct.DocsSettings.html\" title=\"struct cat_gateway::settings::DocsSettings\">DocsSettings</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

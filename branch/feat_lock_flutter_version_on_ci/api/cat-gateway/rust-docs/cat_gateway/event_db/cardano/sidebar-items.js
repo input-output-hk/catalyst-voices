@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["chain_state","cip36_registration","config","utxo"]};

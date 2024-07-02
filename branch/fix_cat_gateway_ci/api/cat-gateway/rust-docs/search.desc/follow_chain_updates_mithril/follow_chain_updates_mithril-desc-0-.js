@@ -1,0 +1,1 @@
+searchState.loadedDescShard("follow_chain_updates_mithril", 0, "This example shows how to use the chain follower to follow …")
