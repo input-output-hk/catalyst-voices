@@ -1,14 +1,14 @@
 //! C509 Alternative Name uses for Subject Alternative Name extension and
 //! Issuer Alternative Name extension.
 
+// FIXME - revisit visibility
+
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 
 use crate::c509_general_name::GeneralNames;
 
-// FIXME - revisit visibility
 
-/// Alternative can be a `GeneralNames` or a text.
-#[allow(dead_code)]
+/// Enum for type that can be a `GeneralNames` or a text.
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) enum GeneralNamesOrText {
     GeneralNames(GeneralNames),
@@ -16,16 +16,15 @@ pub(crate) enum GeneralNamesOrText {
 }
 
 /// Alternative Name extension.
+/// Can be interpreted as a GeneralNames / text
 ///
 /// # Fields
 /// * value - A value of alternative name that can be either a `GeneralNames` or a text.
-#[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct AltName {
     value: GeneralNamesOrText,
 }
 
-#[allow(dead_code)]
 impl AltName {
     /// Create a new instance of AltName given value.
     fn new(value: GeneralNamesOrText) -> Self {
@@ -39,24 +38,23 @@ impl Encode<()> for AltName {
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
         match &self.value {
             GeneralNamesOrText::GeneralNames(gns) => {
-                // FIXME - ugly
                 // Check whether there is only 1 item in the array which is a DNSName
-                if gns.get_gns().len() == 1 && gns.get_gns()[0].get_gn().get_int() == 2 {
-                    Ok(gns.get_gns()[0].get_gn().encode(e, ctx))?
+                if gns.get_gns().len() == 1 && gns.get_gns()[0].get_gn().is_dns_name() {
+                    gns.get_gns()[0].get_gn_value().encode(e, ctx)?
                 } else {
-                    Ok(gns.encode(e, ctx))?
+                    gns.encode(e, ctx)?
                 }
             },
             GeneralNamesOrText::Text(text) => {
                 e.str(&text)?;
-                Ok(())
             },
         }
+        Ok(())
     }
 }
 
-impl<'a> Decode<'a, ()> for AltName {
-    fn decode(d: &mut Decoder<'a>, ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
+impl Decode<'_, ()> for AltName {
+    fn decode(d: &mut Decoder<'_>, ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
         // FIXME - can't distinguish between GeneralNames(only DNSName) and Text
         match d.datatype()? {
             minicbor::data::Type::String => {
@@ -71,9 +69,10 @@ impl<'a> Decode<'a, ()> for AltName {
         }
     }
 }
+
 #[cfg(test)]
 mod test_alt_name {
-    use crate::c509_general_name::{GeneralName, GeneralNamesRegistry};
+    use crate::c509_general_name::{GeneralName, GeneralNameRegistry, GeneralNameValue};
 
     use super::*;
 
@@ -82,9 +81,10 @@ mod test_alt_name {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
         let mut gns = GeneralNames::new();
-        gns.add(GeneralName::new(GeneralNamesRegistry::DNSName(
-            "example.com".to_string(),
-        )));
+        gns.add(GeneralName::new(
+            GeneralNameRegistry::DNSName,
+            GeneralNameValue::Text("example.com".to_string()),
+        ));
         let alt_name = AltName::new(GeneralNamesOrText::GeneralNames(gns));
         alt_name
             .encode(&mut encoder, &mut ())
