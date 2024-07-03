@@ -40,7 +40,7 @@ jobs:
         with:
           earthfile: ./catalyst_voices/uikit_example
           flags: --allow-privileged
-          targets: build-web
+          targets: local-build-web
           target_flags:
           runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
           artifact: "false"

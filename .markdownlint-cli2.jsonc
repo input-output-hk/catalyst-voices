@@ -9,7 +9,10 @@
   ],
   "ignores": [
     ".config/dictionaries/**",
-    "catalyst-gateway/target/**"
+    "catalyst-gateway/target/**",
+    "CHANGELOG.md",
+    "catalyst_voices_packages/**/CHANGELOG.md",
+    "catalyst_voices/macos/Pods/**"
   ],
   // Set standard config options in `/.markdownlint.jsonc`
   "config": {
