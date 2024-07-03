@@ -1,7 +1,13 @@
 //! Tables
+//! A bimap table for bidirectional lookup.
+
+// FIXME - revisit visibility
+
 use asn1_rs::Oid;
 use bimap::BiMap;
 use std::hash::Hash;
+
+use crate::c509_general_name::GeneralNameRegistry;
 
 pub(crate) trait TableTrait<K, V> {
     fn new() -> Self;
@@ -48,6 +54,29 @@ impl IntegerToOidTable {
     }
 
     pub(crate) fn get_map(&self) -> &BiMap<i16, Oid<'static>> {
+        self.table.get_map()
+    }
+}
+
+// -----------------------------------------
+
+#[derive(Debug, Clone, PartialEq)]
+pub(crate) struct IntegerToGNTable {
+    table: IntTable<GeneralNameRegistry>,
+}
+
+#[allow(dead_code)]
+impl IntegerToGNTable {
+    pub(crate) fn new() -> Self {
+        Self {
+            table: IntTable::<GeneralNameRegistry>::new(),
+        }
+    }
+    pub(crate) fn add(&mut self, k: i16, v: GeneralNameRegistry) {
+        self.table.add(k, v);
+    }
+
+    pub(crate) fn get_map(&self) -> &BiMap<i16, GeneralNameRegistry> {
         self.table.get_map()
     }
 }
