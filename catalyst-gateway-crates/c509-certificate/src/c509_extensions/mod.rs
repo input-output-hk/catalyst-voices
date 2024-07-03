@@ -14,6 +14,7 @@
 //! For more information about Extension(s), visit [C509](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
 
 // FIXME - revisit visibility
+
 mod alt_name;
 
 use std::{collections::HashMap, fmt::Debug};
@@ -29,6 +30,10 @@ use crate::{
 };
 use strum_macros::EnumDiscriminants;
 
+// ------------------Extensions Data-------------------
+
+/// Type of Extension data
+/// Int | OID | Type | Name
 type ExtensionDataTuple = (i16, Oid<'static>, ExtensionValueType, &'static str);
 const EXTENSION_DATA: [ExtensionDataTuple; 25] = [
     (
@@ -178,14 +183,18 @@ const EXTENSION_DATA: [ExtensionDataTuple; 25] = [
     ),
 ];
 
+/// A struct of data that contains lookup tables for `Extension`.
+///
+/// # Fields
+/// * `int_to_oid_table` - A table of integer to OID, provide a bidrectional lookup.
+/// * `int_to_type_table` - A table of integer to `ExtensionValueType`, provide a lookup for `Extension` value type.
 struct ExtensionData {
     int_to_oid_table: IntegerToOidTable,
     int_to_type_table: HashMap<i16, ExtensionValueType>,
 }
 
 /// Define static lookup for extensions table
-/// Refernce Section - 9.4. C509 Extensions Registry.
-/// Map of OID to Extension Registry integer value.
+/// Reference Section - 9.4. C509 Extensions Registry.
 static EXTENSIONS_TABLES: Lazy<ExtensionData> = Lazy::new(|| {
     let mut int_to_oid_table = IntegerToOidTable::new();
     let mut int_to_type_table = HashMap::new();
@@ -201,87 +210,7 @@ static EXTENSIONS_TABLES: Lazy<ExtensionData> = Lazy::new(|| {
     };
 });
 
-// -----------------------------------------
-
-trait ExtensionValueTypeTrait {
-    fn get_value(&self) -> ExtensionValueType;
-}
-
-#[allow(dead_code)]
-#[derive(Debug, Clone, PartialEq, EnumDiscriminants)]
-#[strum_discriminants(name(ExtensionValueType))]
-pub enum ExtensionValue {
-    // integer in the range [-2^64, 2^64-1]
-    Int(i64),
-    Text(String),
-    Bytes(Vec<u8>),
-    AltName(AltName),
-    Unsupported,
-}
-
-impl ExtensionValueTypeTrait for ExtensionValueType {
-    fn get_value(&self) -> ExtensionValueType {
-        self.clone()
-    }
-}
-
-impl Encode<()> for ExtensionValue {
-    fn encode<W: Write>(
-        &self, e: &mut Encoder<W>, ctx: &mut (),
-    ) -> Result<(), minicbor::encode::Error<W::Error>> {
-        match self {
-            ExtensionValue::Int(value) => {
-                e.i64(*value)?;
-            },
-            ExtensionValue::Text(value) => {
-                e.str(value)?;
-            },
-            ExtensionValue::Bytes(value) => {
-                e.bytes(value)?;
-            },
-            ExtensionValue::AltName(value) => {
-                value.encode(e, ctx)?;
-            },
-            ExtensionValue::Unsupported => {
-                return Err(minicbor::encode::Error::message(
-                    "Unsupported extension value",
-                ));
-            },
-        }
-        Ok(())
-    }
-}
-
-impl<C> Decode<'_, C> for ExtensionValue
-where
-    C: ExtensionValueTypeTrait + Debug,
-{
-    fn decode(d: &mut Decoder<'_>, ctx: &mut C) -> Result<Self, minicbor::decode::Error> {
-        match ctx.get_value() {
-            ExtensionValueType::Int => {
-                let value = d.i64()?;
-                Ok(ExtensionValue::Int(value))
-            },
-            ExtensionValueType::Text => {
-                let value = d.str()?;
-                Ok(ExtensionValue::Text(value.to_string()))
-            },
-            ExtensionValueType::Bytes => {
-                let value = d.bytes()?;
-                Ok(ExtensionValue::Bytes(value.to_vec()))
-            },
-            ExtensionValueType::AltName => {
-                let value = AltName::decode(d, &mut ())?;
-                Ok(ExtensionValue::AltName(value))
-            },
-            ExtensionValueType::Unsupported => Err(minicbor::decode::Error::message(
-                "Cannot decode Unsupported extension value",
-            )),
-        }
-    }
-}
-
-// -----------------------------------------
+// --------------------Extensions---------------------
 
 /// OID of KeyUsage extension
 static KEY_USAGE_OID: Oid<'static> = oid!(2.5.29 .15);
@@ -291,7 +220,7 @@ static KEY_USAGE_OID: Oid<'static> = oid!(2.5.29 .15);
 /// # Fields
 /// * `extensions` - A vector of C509Extension.
 #[derive(Debug, Clone, PartialEq)]
-pub(crate) struct Extensions {
+pub struct Extensions {
     extensions: Vec<C509Extension>,
 }
 
@@ -304,9 +233,8 @@ impl Extensions {
     }
 
     /// Add an `Extension` to the `Extensions`.
-    pub fn add_extension(mut self, extension: C509Extension) -> Self {
+    pub fn add(&mut self, extension: C509Extension) {
         self.extensions.push(extension);
-        self
     }
 }
 
@@ -325,7 +253,7 @@ impl Encode<()> for Extensions {
                         let ku_value = if extension.get_critical() {
                             -value
                         } else {
-                            value
+                            *value
                         };
                         e.i64(ku_value)?;
                         return Ok(());
@@ -352,7 +280,9 @@ impl Decode<'_, ()> for Extensions {
         if d.datatype()? == minicbor::data::Type::U8 || d.datatype()? == minicbor::data::Type::I8 {
             // Check if it's a negative number (critical extension)
             let critical = d.datatype()? == minicbor::data::Type::I8;
-            let value = d.i64()?;
+            // Note that 'KeyUsage' BIT STRING is interpreted as an unsigned integer,
+            // so we can absolute the value
+            let value = d.i64()?.abs();
 
             let extension_value = ExtensionValue::Int(value);
             let decoded_extension = C509Extension::new(KEY_USAGE_OID.clone(), extension_value);
@@ -362,7 +292,9 @@ impl Decode<'_, ()> for Extensions {
             } else {
                 decoded_extension
             };
-            return Ok(Extensions::new().add_extension(extension));
+            let mut extensions = Extensions::new();
+            extensions.add(extension);
+            return Ok(extensions);
         }
         // Handle array of extensions
         let len = d
@@ -372,21 +304,21 @@ impl Decode<'_, ()> for Extensions {
 
         for _ in 0..len {
             let extension = C509Extension::decode(d, &mut ())?;
-            extensions = extensions.add_extension(extension);
+            extensions.add(extension);
         }
 
         Ok(extensions)
     }
 }
 
-// -----------------------------------------
+// -------------------Extension----------------------
 
 /// A struct of C509 Extension
 ///
 /// # Fields
-/// * `registered_oid` - The registered OID of the extension.
-/// * `critical` - The critical flag of the extension negative if critical is true, otherwise positive.
-/// * `value` - The value of the extension in `ExtensionValue`.
+/// * `registered_oid` - The registered OID of the `Extension`.
+/// * `critical` - The critical flag of the `Extension` negative if critical is true, otherwise positive.
+/// * `value` - The value of the `Extension` in `ExtensionValue`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct C509Extension {
     registered_oid: C509oidRegistered,
@@ -407,23 +339,23 @@ impl C509Extension {
         }
     }
 
-    /// Get the value of the C509Extension.
-    pub(crate) fn get_value(&self) -> ExtensionValue {
-        self.value.clone()
+    /// Get the value of the `C509Extension` in `ExtensionValue`.
+    pub(crate) fn get_value(&self) -> &ExtensionValue {
+        &self.value
     }
 
-    /// Get the critical flag of the C509Extension.
+    /// Get the critical flag of the `C509Extension`.
     pub(crate) fn get_critical(&self) -> bool {
         self.critical
     }
 
-    /// Set the critical flag of the C509Extension.
+    /// Set the critical flag of the `C509Extension`.
     pub(crate) fn set_critical(mut self) -> Self {
         self.critical = true;
         self
     }
 
-    /// Set the value of the C509Extension.
+    /// Set the value of the `C509Extension`.
     pub fn set_value(mut self, value: ExtensionValue) -> Self {
         self.value = value;
         self
@@ -465,8 +397,8 @@ impl Encode<()> for C509Extension {
     }
 }
 
-impl<'a> Decode<'a, ()> for C509Extension {
-    fn decode(d: &mut Decoder<'a>, ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
+impl Decode<'_, ()> for C509Extension {
+    fn decode(d: &mut Decoder<'_>, ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
         match d.datatype()? {
             // Check whether OID is an int
             // Even the encoding is i16, the minicbor decoder doesn't know what type we encoded,
@@ -492,7 +424,7 @@ impl<'a> Decode<'a, ()> for C509Extension {
                         minicbor::decode::Error::message("Extension value type not found")
                     })?;
 
-                let extension_value = ExtensionValue::decode(d, &mut value_type.get_value())?;
+                let extension_value = ExtensionValue::decode(d, &mut value_type.get_type())?;
                 // Set the critical flag to true if the OID is negative
                 let extension = if oid_value.is_positive() {
                     C509Extension::new(oid.to_owned(), extension_value)
@@ -528,16 +460,89 @@ impl<'a> Decode<'a, ()> for C509Extension {
 
 // -----------------------------------------
 
+/// Trait for `ExtensionValueType`
+trait ExtensionValueTypeTrait {
+    /// Get the type of the `ExtensionValueType`.
+    fn get_type(&self) -> ExtensionValueType;
+}
+
+#[allow(dead_code)]
+#[derive(Debug, Clone, PartialEq, EnumDiscriminants)]
+#[strum_discriminants(name(ExtensionValueType))]
+pub enum ExtensionValue {
+    // integer in the range [-2^64, 2^64-1]
+    Int(i64),
+    Bytes(Vec<u8>),
+    AltName(AltName),
+    Unsupported,
+}
+
+impl ExtensionValueTypeTrait for ExtensionValueType {
+    fn get_type(&self) -> ExtensionValueType {
+        self.clone()
+    }
+}
+
+impl Encode<()> for ExtensionValue {
+    fn encode<W: Write>(
+        &self, e: &mut Encoder<W>, ctx: &mut (),
+    ) -> Result<(), minicbor::encode::Error<W::Error>> {
+        match self {
+            ExtensionValue::Int(value) => {
+                e.i64(*value)?;
+            },
+            ExtensionValue::Bytes(value) => {
+                e.bytes(value)?;
+            },
+            ExtensionValue::AltName(value) => {
+                value.encode(e, ctx)?;
+            },
+            ExtensionValue::Unsupported => {
+                return Err(minicbor::encode::Error::message(
+                    "Cannot encode unsupported Extension value",
+                ));
+            },
+        }
+        Ok(())
+    }
+}
+
+impl<C> Decode<'_, C> for ExtensionValue
+where
+    C: ExtensionValueTypeTrait + Debug,
+{
+    fn decode(d: &mut Decoder<'_>, ctx: &mut C) -> Result<Self, minicbor::decode::Error> {
+        match ctx.get_type() {
+            ExtensionValueType::Int => {
+                let value = d.i64()?;
+                Ok(ExtensionValue::Int(value))
+            },
+            ExtensionValueType::Bytes => {
+                let value = d.bytes()?.to_vec();
+                Ok(ExtensionValue::Bytes(value))
+            },
+            ExtensionValueType::AltName => {
+                let value = AltName::decode(d, &mut ())?;
+                Ok(ExtensionValue::AltName(value))
+            },
+            ExtensionValueType::Unsupported => Err(minicbor::decode::Error::message(
+                "Cannot decode Unsupported extension value",
+            )),
+        }
+    }
+}
+
+// ------------------Test----------------------
+
 #[cfg(test)]
 mod test_c509_extension {
     use super::*;
 
     #[test]
-    fn test_c509_extension_int_oid_with_int_value() {
+    fn test_c509_extension_int_oid_inhibit_anypolicy() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
-        // Key Usage
         let ext = C509Extension::new(oid!(2.5.29 .54), ExtensionValue::Int(2));
         ext.encode(&mut encoder, &mut ())
             .expect("Failed to encode Extension");
@@ -552,7 +557,7 @@ mod test_c509_extension {
     }
 
     #[test]
-    fn test_c509_extension_unwrapped_oid_critical_with_int_value() {
+    fn test_c509_extension_unwrapped_oid_critical_with_negative_key_usage() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
@@ -596,12 +601,30 @@ mod test_c509_extension {
     }
 
     #[test]
+    fn test_c509_extension_mismatch_type() {
+        let mut buffer = Vec::new();
+        let mut encoder = Encoder::new(&mut buffer);
+
+        // Subject Key Identifier should be bytes
+        let ext = C509Extension::new(oid!(2.5.29 .14), ExtensionValue::Int(2));
+        ext.encode(&mut encoder, &mut ())
+            .expect("Failed to encode Extension");
+        // Key Usage : 0x15
+        // 2 : 0x02
+        assert_eq!(hex::encode(buffer.clone()), "0102");
+
+        let mut decoder = Decoder::new(&buffer);
+        // Decode should fail, because rely on the int value
+        C509Extension::decode(&mut decoder, &mut ()).expect_err("Failed to decode Extension");
+    }
+
+    #[test]
     fn test_extensions_one_extension_key_usage() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
-        let exts = Extensions::new()
-            .add_extension(C509Extension::new(oid!(2.5.29 .15), ExtensionValue::Int(2)));
+        let mut exts = Extensions::new();
+        exts.add(C509Extension::new(oid!(2.5.29 .15), ExtensionValue::Int(2)));
         exts.encode(&mut encoder, &mut ())
             .expect("Failed to encode Extensions");
         // 1 extension
@@ -614,41 +637,44 @@ mod test_c509_extension {
         assert_eq!(decoded_exts, exts);
     }
 
-    // #[test]
-    // fn test_extensions_one_extension_key_usage_set_critical() {
-    //     let mut buffer = Vec::new();
-    //     let mut encoder = Encoder::new(&mut buffer);
+    #[test]
+    fn test_extensions_one_extension_key_usage_set_critical() {
+        let mut buffer = Vec::new();
+        let mut encoder = Encoder::new(&mut buffer);
 
-    //     let exts =
-    //         Extensions::new().add_extension(C509Extension::new(oid!(2.5.29 .15),ExtensionValue::Int(2)).set_critical());
-    //     exts.encode(&mut encoder, &mut ())
-    //         .expect("Failed to encode Extensions");
-    //     // 1 extension
-    //     // value -2 : 0x21
-    //     assert_eq!(hex::encode(buffer.clone()), "21");
+        let mut exts = Extensions::new();
+        exts.add(C509Extension::new(oid!(2.5.29 .15), ExtensionValue::Int(2)).set_critical());
+        exts.encode(&mut encoder, &mut ())
+            .expect("Failed to encode Extensions");
+        // 1 extension
+        // value -2 : 0x21
+        assert_eq!(hex::encode(buffer.clone()), "21");
 
-    //     let mut decoder = Decoder::new(&buffer);
-    //     let decoded_exts =
-    //         Extensions::decode(&mut decoder, &mut ()).expect("Failed to decode Extensions");
-    //     assert_eq!(decoded_exts, exts);
-    // }
+        let mut decoder = Decoder::new(&buffer);
+        let decoded_exts =
+            Extensions::decode(&mut decoder, &mut ()).expect("Failed to decode Extensions");
+        assert_eq!(decoded_exts, exts);
+    }
 
-    // #[test]
-    // fn test_extensions_multiple_extensions() {
-    //     let mut buffer = Vec::new();
-    //     let mut encoder = Encoder::new(&mut buffer);
+    #[test]
+    fn test_extensions_multiple_extensions() {
+        let mut buffer = Vec::new();
+        let mut encoder = Encoder::new(&mut buffer);
 
-    //     let exts =
-    //         Extensions::new().add_extension(C509Extension::new(oid!(2.5.29 .15), 2));
-    //         exts.add_extension(C509Extension::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1), 1.5));
-    //     exts.encode(&mut encoder, &mut ())
-    //         .expect("Failed to encode Extensions");
+        let mut exts = Extensions::new();
+        exts.add(C509Extension::new(oid!(2.5.29 .15), ExtensionValue::Int(2)));
+        exts.add(C509Extension::new(
+            oid!(2.5.29 .14),
+            ExtensionValue::Bytes([1, 2, 3, 4].to_vec()),
+        ));
+        exts.encode(&mut encoder, &mut ())
+            .expect("Failed to encode Extensions");
 
-    //     assert_eq!(hex::encode(buffer.clone()), "21");
+        assert_eq!(hex::encode(buffer.clone()), "820202014401020304");
 
-    //     let mut decoder = Decoder::new(&buffer);
-    //     let decoded_exts =
-    //         Extensions::decode(&mut decoder, &mut ()).expect("Failed to decode Extensions");
-    //     assert_eq!(decoded_exts, exts);
-    // }
+        let mut decoder = Decoder::new(&buffer);
+        let decoded_exts =
+            Extensions::decode(&mut decoder, &mut ()).expect("Failed to decode Extensions");
+        assert_eq!(decoded_exts, exts);
+    }
 }
