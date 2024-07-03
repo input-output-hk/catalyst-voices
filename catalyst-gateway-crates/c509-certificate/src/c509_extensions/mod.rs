@@ -16,7 +16,7 @@
 // FIXME - revisit visibility
 mod alt_name;
 
-use std::fmt::Debug;
+use std::{collections::HashMap, fmt::Debug};
 
 use alt_name::AltName;
 use asn1_rs::{oid, Oid};
@@ -27,53 +27,202 @@ use crate::{
     c509_oid::{C509oid, C509oidRegistered},
     tables::IntegerToOidTable,
 };
+use strum_macros::EnumDiscriminants;
+
+type ExtensionDataTuple = (i16, Oid<'static>, ExtensionValueType, &'static str);
+const EXTENSION_DATA: [ExtensionDataTuple; 25] = [
+    (
+        1,
+        oid!(2.5.29 .14),
+        ExtensionValueType::Bytes,
+        "Subject Key Identifier",
+    ),
+    (2, oid!(2.5.29 .15), ExtensionValueType::Int, "Key Usage"),
+    (
+        3,
+        oid!(2.5.29 .17),
+        ExtensionValueType::AltName,
+        "Subject Alternative Name",
+    ),
+    (
+        4,
+        oid!(2.5.29 .19),
+        ExtensionValueType::Int,
+        "Basic Constraints",
+    ),
+    (
+        5,
+        oid!(2.5.29 .31),
+        ExtensionValueType::Unsupported,
+        "CRL Distribution Points",
+    ),
+    (
+        6,
+        oid!(2.5.29 .32),
+        ExtensionValueType::Unsupported,
+        "Certificate Policies",
+    ),
+    (
+        7,
+        oid!(2.5.29 .35),
+        ExtensionValueType::Unsupported,
+        "Authority Key Identifier",
+    ),
+    (
+        8,
+        oid!(2.5.29 .37),
+        ExtensionValueType::Unsupported,
+        "Extended Key Usage",
+    ),
+    (
+        9,
+        oid!(1.3.6 .1 .5 .5 .7 .1 .1),
+        ExtensionValueType::Unsupported,
+        "Authority Information Access",
+    ),
+    (
+        10,
+        oid!(1.3.6 .1 .4 .1 .11129 .2 .4 .2),
+        ExtensionValueType::Unsupported,
+        "Signed Certificate Timestamp List",
+    ),
+    (
+        24,
+        oid!(2.5.29 .9),
+        ExtensionValueType::Unsupported,
+        "Subject Directory Attributes",
+    ),
+    (
+        25,
+        oid!(2.5.29 .18),
+        ExtensionValueType::AltName,
+        "Issuer Alternative Name",
+    ),
+    (
+        26,
+        oid!(2.5.29 .30),
+        ExtensionValueType::Unsupported,
+        "Name Constraints",
+    ),
+    (
+        27,
+        oid!(2.5.29 .33),
+        ExtensionValueType::Unsupported,
+        "Policy Mappings",
+    ),
+    (
+        28,
+        oid!(2.5.29 .36),
+        ExtensionValueType::Unsupported,
+        "Policy Constraints",
+    ),
+    (
+        29,
+        oid!(2.5.29 .46),
+        ExtensionValueType::Unsupported,
+        "Freshest CRL",
+    ),
+    (
+        30,
+        oid!(2.5.29 .54),
+        ExtensionValueType::Int,
+        "Inhibit anyPolicy",
+    ),
+    (
+        31,
+        oid!(1.3.6 .1 .5 .5 .7 .1 .11),
+        ExtensionValueType::Unsupported,
+        "Subject Information Access",
+    ),
+    (
+        32,
+        oid!(1.3.6 .1 .5 .5 .7 .1 .7),
+        ExtensionValueType::Unsupported,
+        "IP Resources",
+    ),
+    (
+        33,
+        oid!(1.3.6 .1 .5 .5 .7 .1 .7),
+        ExtensionValueType::Unsupported,
+        "AS Resource",
+    ),
+    (
+        34,
+        oid!(1.3.6 .1 .5 .5 .7 .1 .28),
+        ExtensionValueType::Unsupported,
+        "IP Resources v2",
+    ),
+    (
+        35,
+        oid!(1.3.6 .1 .5 .5 .7 .1 .29),
+        ExtensionValueType::Unsupported,
+        "AS Resources v2",
+    ),
+    (
+        36,
+        oid!(1.3.6 .1 .5 .5 .7 .1 .2),
+        ExtensionValueType::Unsupported,
+        "Biometric Information",
+    ),
+    (
+        37,
+        oid!(1.3.6 .1 .4 .1 .11129 .2 .4 .4),
+        ExtensionValueType::Unsupported,
+        "Precertificate Signing Certificate",
+    ),
+    (
+        38,
+        oid!(1.3.6 .1 .5 .5 .7 .48 .1 .5),
+        ExtensionValueType::Unsupported,
+        "OCSP No Check",
+    ),
+];
+
+struct ExtensionData {
+    int_to_oid_table: IntegerToOidTable,
+    int_to_type_table: HashMap<i16, ExtensionValueType>,
+}
 
 /// Define static lookup for extensions table
 /// Refernce Section - 9.4. C509 Extensions Registry.
 /// Map of OID to Extension Registry integer value.
-static EXTENSIONS_TABLE: Lazy<IntegerToOidTable> = Lazy::new(|| {
-    // Int | OID | Extension Name | Type
-    IntegerToOidTable::new(vec![
-        (1, oid!(2.5.29 .14)),                      // Subject Key Identifier | bytes
-        (2, oid!(2.5.29 .15)),                      // Key Usage | int
-        (3, oid!(2.5.29 .17)),                      // Subject Alternative Name | AltName
-        (4, oid!(2.5.29 .19)),                      // Basic Constraints | int
-        (5, oid!(2.5.29 .31)), // CRL Distribution Points | CRLDistributionPoints
-        (6, oid!(2.5.29 .32)), // Certificate Policies | CertificatePolicies
-        (7, oid!(2.5.29 .35)), // Authority Key Identifier | KeyIdentifierArray
-        (8, oid!(2.5.29 .37)), // Extended Key Usage | ExtKeyUsageSyntax
-        (9, oid!(1.3.6 .1 .5 .5 .7 .1 .1)), // Authority Information Access | AuthorityInfoAccessSyntax
-        (10, oid!(1.3.6 .1 .4 .1 .11129 .2 .4 .2)), // Signed Certificate Timestamp List | SignedCertificateTimestamps
-        (24, oid!(2.5.29 .9)), // Subject Directory Attributes | SubjectDirectoryAttributes
-        (25, oid!(2.5.29 .18)), // Issuer Alternative Name | AltName
-        (26, oid!(2.5.29 .30)), // Name Constraints | NameConstraints
-        (27, oid!(2.5.29 .33)), // Policy Mappings | PolicyMappings
-        (28, oid!(2.5.29 .36)), // Policy Constraints | PolicyConstraints
-        (29, oid!(2.5.29 .46)), // Freshest CRL | FreshestCRL
-        (30, oid!(2.5.29 .54)), // Inhibit anyPolicy | uint
-        (31, oid!(1.3.6 .1 .5 .5 .7 .1 .11)), // Subject Information Access | SubjectInfoAccessSyntax
-        (32, oid!(1.3.6 .1 .5 .5 .7 .1 .7)),  // IP Resources | IPAddrBlocks
-        (33, oid!(1.3.6 .1 .5 .5 .7 .1 .7)),  // AS Resource | ASIdentifiers
-        (34, oid!(1.3.6 .1 .5 .5 .7 .1 .28)), // IP Resources v2 | IPAddrBlocks
-        (35, oid!(1.3.6 .1 .5 .5 .7 .1 .29)), // AS Resources v2 | ASIdentifiers
-        (36, oid!(1.3.6 .1 .5 .5 .7 .1 .2)),  // Biometric Information
-        (37, oid!(1.3.6 .1 .4 .1 .11129 .2 .4 .4)), // Precertificate Signing Certificate
-        (38, oid!(1.3.6 .1 .5 .5 .7 .48 .1 .5)), // OCSP No Check
-    ])
+static EXTENSIONS_TABLES: Lazy<ExtensionData> = Lazy::new(|| {
+    let mut int_to_oid_table = IntegerToOidTable::new();
+    let mut int_to_type_table = HashMap::new();
+
+    for data in EXTENSION_DATA {
+        int_to_oid_table.add(data.0, data.1);
+        int_to_type_table.insert(data.0, data.2);
+    }
+
+    return ExtensionData {
+        int_to_oid_table,
+        int_to_type_table,
+    };
 });
 
 // -----------------------------------------
 
+trait ExtensionValueTypeTrait {
+    fn get_value(&self) -> ExtensionValueType;
+}
+
 #[allow(dead_code)]
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, EnumDiscriminants)]
+#[strum_discriminants(name(ExtensionValueType))]
 pub enum ExtensionValue {
     // integer in the range [-2^64, 2^64-1]
     Int(i64),
-    // unsigned integer in the range [0, 2^64-1]
-    Uint(u64),
     Text(String),
     Bytes(Vec<u8>),
     AltName(AltName),
+    Unsupported,
+}
+
+impl ExtensionValueTypeTrait for ExtensionValueType {
+    fn get_value(&self) -> ExtensionValueType {
+        self.clone()
+    }
 }
 
 impl Encode<()> for ExtensionValue {
@@ -84,9 +233,6 @@ impl Encode<()> for ExtensionValue {
             ExtensionValue::Int(value) => {
                 e.i64(*value)?;
             },
-            ExtensionValue::Uint(value) => {
-                e.u64(*value)?;
-            },
             ExtensionValue::Text(value) => {
                 e.str(value)?;
             },
@@ -96,6 +242,11 @@ impl Encode<()> for ExtensionValue {
             ExtensionValue::AltName(value) => {
                 value.encode(e, ctx)?;
             },
+            ExtensionValue::Unsupported => {
+                return Err(minicbor::encode::Error::message(
+                    "Unsupported extension value",
+                ));
+            },
         }
         Ok(())
     }
@@ -103,17 +254,29 @@ impl Encode<()> for ExtensionValue {
 
 impl<C> Decode<'_, C> for ExtensionValue
 where
-    C: std::convert::Into<i16> + Clone,
+    C: ExtensionValueTypeTrait + Debug,
 {
     fn decode(d: &mut Decoder<'_>, ctx: &mut C) -> Result<Self, minicbor::decode::Error> {
-        let n: i16 = ctx.clone().into();
-        // Need extension type to know what to decode
-        match n {
-            1 => Ok(ExtensionValue::Bytes(d.bytes()?.to_vec())),
-            2 | 4 => Ok(ExtensionValue::Int(d.i64()?)),
-            3 | 25 => Ok(ExtensionValue::AltName(AltName::decode(d, &mut ())?)),
-            30 => Ok(ExtensionValue::Uint(d.u64()?)),
-            _ => Err(minicbor::decode::Error::message("Not implemented yet")),
+        match ctx.get_value() {
+            ExtensionValueType::Int => {
+                let value = d.i64()?;
+                Ok(ExtensionValue::Int(value))
+            },
+            ExtensionValueType::Text => {
+                let value = d.str()?;
+                Ok(ExtensionValue::Text(value.to_string()))
+            },
+            ExtensionValueType::Bytes => {
+                let value = d.bytes()?;
+                Ok(ExtensionValue::Bytes(value.to_vec()))
+            },
+            ExtensionValueType::AltName => {
+                let value = AltName::decode(d, &mut ())?;
+                Ok(ExtensionValue::AltName(value))
+            },
+            ExtensionValueType::Unsupported => Err(minicbor::decode::Error::message(
+                "Cannot decode Unsupported extension value",
+            )),
         }
     }
 }
@@ -237,7 +400,8 @@ impl C509Extension {
     /// Critical flag is originally set to false.
     fn new(oid: Oid<'static>, value: ExtensionValue) -> Self {
         C509Extension {
-            registered_oid: C509oidRegistered::new(oid, &EXTENSIONS_TABLE).pen_encoded(),
+            registered_oid: C509oidRegistered::new(oid, &EXTENSIONS_TABLES.int_to_oid_table)
+                .pen_encoded(),
             critical: false,
             value,
         }
@@ -301,24 +465,6 @@ impl Encode<()> for C509Extension {
     }
 }
 
-// FIXME - Revisit
-#[derive(Clone)]
-struct IntContext {
-    value: i16,
-}
-
-impl IntContext {
-    fn new(value: i16) -> Self {
-        IntContext { value }
-    }
-}
-
-impl std::convert::Into<i16> for IntContext {
-    fn into(self) -> i16 {
-        self.value
-    }
-}
-
 impl<'a> Decode<'a, ()> for C509Extension {
     fn decode(d: &mut Decoder<'a>, ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
         match d.datatype()? {
@@ -333,13 +479,20 @@ impl<'a> Decode<'a, ()> for C509Extension {
                 // OID can be negative due to critical flag, so need absolute the value
                 let abs_oid_value = oid_value.abs();
                 // Get the OID associated with the int value
-                let oid = EXTENSIONS_TABLE
+                let oid = EXTENSIONS_TABLES
+                    .int_to_oid_table
                     .get_map()
                     .get_by_left(&abs_oid_value)
                     .ok_or_else(|| minicbor::decode::Error::message("OID int not found"))?;
                 // Decode extension value
-                let extension_value = ExtensionValue::decode(d, &mut IntContext::new(abs_oid_value))?;
+                let value_type = *EXTENSIONS_TABLES
+                    .int_to_type_table
+                    .get(&abs_oid_value)
+                    .ok_or_else(|| {
+                        minicbor::decode::Error::message("Extension value type not found")
+                    })?;
 
+                let extension_value = ExtensionValue::decode(d, &mut value_type.get_value())?;
                 // Set the critical flag to true if the OID is negative
                 let extension = if oid_value.is_positive() {
                     C509Extension::new(oid.to_owned(), extension_value)
@@ -385,7 +538,7 @@ mod test_c509_extension {
         let mut encoder = Encoder::new(&mut buffer);
 
         // Key Usage
-        let ext = C509Extension::new(oid!(2.5.29 .54), ExtensionValue::Uint(2));
+        let ext = C509Extension::new(oid!(2.5.29 .54), ExtensionValue::Int(2));
         ext.encode(&mut encoder, &mut ())
             .expect("Failed to encode Extension");
         // Inhibit anyPolicy : 0x181e
