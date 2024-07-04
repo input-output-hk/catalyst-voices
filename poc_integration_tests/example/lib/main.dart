@@ -171,6 +171,8 @@ class _WalletItem extends StatelessWidget {
   final CardanoWallet wallet;
   final VoidCallback onEnable;
 
+  static const enableWalletButtonKey = Key('EnableWalletButton');
+
   const _WalletItem({
     required this.wallet,
     required this.onEnable,
@@ -197,9 +199,13 @@ class _WalletItem extends StatelessWidget {
               '${_formatExtensions(wallet.supportedExtensions)}',
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: onEnable,
-              child: const Text('Enable wallet'),
+            Semantics(
+              label: 'EnableWalletButton',
+              child: ElevatedButton(
+                key: enableWalletButtonKey,
+                onPressed: onEnable,
+                child: const Text('Enable wallet'),
+              ),
             ),
           ],
         ),

@@ -1,0 +1,17 @@
+{
+  "name": "cardano-wallet-interface",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "node scripts/start.js",
+    "e2e": "jest --detectOpenHandles"
+  },
+  "dependencies": {
+    "@rentready/flutter-selenium-bridge": "^1.0.5",
+    "jest": "^29.7.0",
+    "jest-circus": "^29.7.0",
+    "jest-resolve": "^29.7.0",
+    "jest-watch-typeahead": "^2.2.2",
+    "puppeteer": "^22.12.1"
+  }
+}
