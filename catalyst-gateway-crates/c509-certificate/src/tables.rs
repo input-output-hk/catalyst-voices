@@ -1,10 +1,9 @@
 //! A bimap table for bidirectional lookup.
 
+use std::hash::Hash;
 
 use asn1_rs::Oid;
 use bimap::BiMap;
-use std::hash::Hash;
-
 
 pub(crate) trait TableTrait<K, V> {
     fn new() -> Self;
@@ -27,6 +26,7 @@ impl<T: Eq + Hash> TableTrait<i16, T> for IntTable<T> {
     fn add(&mut self, k: i16, v: T) {
         self.map.insert(k, v);
     }
+
     fn get_map(&self) -> &BiMap<i16, T> {
         &self.map
     }
@@ -46,6 +46,7 @@ impl IntegerToOidTable {
             table: IntTable::<Oid<'static>>::new(),
         }
     }
+
     pub(crate) fn add(&mut self, k: i16, v: Oid<'static>) {
         self.table.add(k, v);
     }

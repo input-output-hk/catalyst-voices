@@ -1,14 +1,14 @@
-//! Extension data provides a necessary information for encoding and decoding of C509 Extension.
-//! See [RFC9090](https://datatracker.ietf.org/doc/rfc9090/) Section 9.4 C509 Extensions Registry
+//! Extension data provides a necessary information for encoding and decoding of C509
+//! Extension. See [RFC9090](https://datatracker.ietf.org/doc/rfc9090/) Section 9.4 C509 Extensions Registry
 //! for more information.
 
 use std::collections::HashMap;
 
-use crate::tables::IntegerToOidTable;
 use asn1_rs::{oid, Oid};
 use once_cell::sync::Lazy;
 
 use super::ExtensionValueType;
+use crate::tables::IntegerToOidTable;
 
 /// Type of Extension data
 /// Int | OID | Type | Name
@@ -166,7 +166,8 @@ const EXTENSION_DATA: [ExtensionDataTuple; 25] = [
 ///
 /// # Fields
 /// * `int_to_oid_table` - A table of integer to OID, provide a bidirectional lookup.
-/// * `int_to_type_table` - A table of integer to `ExtensionValueType`, provide a lookup for `Extension` value type.
+/// * `int_to_type_table` - A table of integer to `ExtensionValueType`, provide a lookup
+///   for `Extension` value type.
 pub(crate) struct ExtensionData {
     int_to_oid_table: IntegerToOidTable,
     int_to_type_table: HashMap<i16, ExtensionValueType>,

@@ -71,11 +71,10 @@ impl Decode<'_, ()> for AltName {
 
 #[cfg(test)]
 mod test_alt_name {
+    use super::*;
     use crate::c509_general_names::general_name::{
         GeneralName, GeneralNameRegistry, GeneralNameValue,
     };
-
-    use super::*;
 
     #[test]
     fn encode_only_dns() {

@@ -1,21 +1,22 @@
 //! C509 Extension use to construct an Extensions message field for C509 Certificate.
 
 mod data;
+use std::fmt::Debug;
+
 use asn1_rs::Oid;
 use data::EXTENSIONS_TABLES;
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
-use std::fmt::Debug;
 use strum_macros::EnumDiscriminants;
 
-use crate::c509_oid::{C509oid, C509oidRegistered};
-
 use super::alt_name::AltName;
+use crate::c509_oid::{C509oid, C509oidRegistered};
 
 /// A struct of C509 Extension
 ///
 /// # Fields
 /// * `registered_oid` - The registered OID of the `Extension`.
-/// * `critical` - The critical flag of the `Extension` negative if critical is true, otherwise positive.
+/// * `critical` - The critical flag of the `Extension` negative if critical is true,
+///   otherwise positive.
 /// * `value` - The value of the `Extension` in `ExtensionValue`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Extension {
@@ -211,8 +212,7 @@ impl Encode<()> for ExtensionValue {
 }
 
 impl<C> Decode<'_, C> for ExtensionValue
-where
-    C: ExtensionValueTypeTrait + Debug,
+where C: ExtensionValueTypeTrait + Debug
 {
     fn decode(d: &mut Decoder<'_>, ctx: &mut C) -> Result<Self, minicbor::decode::Error> {
         match ctx.get_type() {
@@ -228,9 +228,11 @@ where
                 let value = AltName::decode(d, &mut ())?;
                 Ok(ExtensionValue::AltName(value))
             },
-            ExtensionValueType::Unsupported => Err(minicbor::decode::Error::message(
-                "Cannot decode Unsupported extension value",
-            )),
+            ExtensionValueType::Unsupported => {
+                Err(minicbor::decode::Error::message(
+                    "Cannot decode Unsupported extension value",
+                ))
+            },
         }
     }
 }
@@ -239,8 +241,9 @@ where
 
 #[cfg(test)]
 mod test_extension {
-    use super::*;
     use asn1_rs::oid;
+
+    use super::*;
 
     #[test]
     fn int_oid_inhibit_anypolicy_value_unsigned_int() {

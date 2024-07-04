@@ -1,8 +1,8 @@
 //! C509 Certificate GeneralNames
 
 mod data;
-mod other_name_hw_module;
 pub mod general_name;
+mod other_name_hw_module;
 
 use general_name::GeneralName;
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
@@ -73,11 +73,12 @@ mod test_general_names {
 
     use std::net::Ipv4Addr;
 
-    use super::*;
-    use crate::c509_oid::C509oid;
     use asn1_rs::oid;
     use general_name::{GeneralNameRegistry, GeneralNameValue};
     use other_name_hw_module::OtherNameHardwareModuleName;
+
+    use super::*;
+    use crate::c509_oid::C509oid;
 
     #[test]
     fn encode_decode_gns() {

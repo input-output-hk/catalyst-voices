@@ -2,11 +2,12 @@
 //! Please refer to [RFC9090](https://datatracker.ietf.org/doc/rfc9090/) for OID encoding
 //! Please refer to [CDDL Wrapping](https://datatracker.ietf.org/doc/html/rfc8610#section-3.7) for unwrapped types.
 
-use crate::tables::IntegerToOidTable;
 use anyhow::Result;
 use asn1_rs::oid;
 use minicbor::{data::Tag, decode, encode::Write, Decode, Decoder, Encode, Encoder};
 use oid_registry::Oid;
+
+use crate::tables::IntegerToOidTable;
 
 // FIXME - Revisit visibility
 

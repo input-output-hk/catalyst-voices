@@ -1,14 +1,14 @@
 //! GeneralName in C509 Certificate
 //! GeneralName = ( GeneralNameType : int, GeneralNameValue : any )
 
+use std::fmt::Debug;
+
 use anyhow::Error;
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
-use std::fmt::Debug;
 use strum_macros::{EnumDiscriminants, EnumIs};
 
-use crate::c509_oid::C509oid;
-
 use super::{data::GENERAL_NAME_TABLES, other_name_hw_module::OtherNameHardwareModuleName};
+use crate::c509_oid::C509oid;
 
 /// A struct represents a GeneralName.
 /// GeneralName = ( GeneralNameType : int, GeneralNameValue : any )
@@ -171,8 +171,7 @@ impl Encode<()> for GeneralNameValue {
     }
 }
 impl<C> Decode<'_, C> for GeneralNameValue
-where
-    C: GeneralNameValueTrait + Debug,
+where C: GeneralNameValueTrait + Debug
 {
     fn decode(d: &mut Decoder<'_>, ctx: &mut C) -> Result<Self, minicbor::decode::Error> {
         match ctx.get_type() {
@@ -192,9 +191,11 @@ where
                 let value = OtherNameHardwareModuleName::decode(d, &mut ())?;
                 Ok(GeneralNameValue::OtherNameHWModuleName(value))
             },
-            GeneralNameValueType::Unsupported => Err(minicbor::decode::Error::message(
-                "Cannot decode Unsupported GeneralName value",
-            )),
+            GeneralNameValueType::Unsupported => {
+                Err(minicbor::decode::Error::message(
+                    "Cannot decode Unsupported GeneralName value",
+                ))
+            },
         }
     }
 }
@@ -205,8 +206,9 @@ where
 mod test_general_name {
     use std::net::Ipv4Addr;
 
-    use super::*;
     use asn1_rs::oid;
+
+    use super::*;
 
     #[test]
     fn encode_decode_text() {
@@ -234,10 +236,9 @@ mod test_general_name {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
-        let hw = OtherNameHardwareModuleName::new(
-            oid!(2.16.840 .1 .101 .3 .4 .2 .1),
-            vec![0x01, 0x02, 0x03, 0x04],
-        );
+        let hw = OtherNameHardwareModuleName::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1), vec![
+            0x01, 0x02, 0x03, 0x04,
+        ]);
         let gn = GeneralName::new(
             GeneralNameRegistry::OtherNameHardwareModuleName,
             GeneralNameValue::OtherNameHWModuleName(hw),

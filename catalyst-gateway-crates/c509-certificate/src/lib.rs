@@ -6,9 +6,9 @@
 //! Please refer to the [c509-certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/) for more information.
 
 use wasm_bindgen::prelude::wasm_bindgen;
-mod c509_oid;
 mod c509_extensions;
 mod c509_general_names;
+mod c509_oid;
 mod tables;
 
 /// Generates an unsigned C509 certificate from the provided `TbsCertificate`.

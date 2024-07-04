@@ -1,6 +1,6 @@
 //! OtherNameHardwareModuleName, special type for hardwareModuleName type of otherName.
 //!  When 'otherName + hardwareModuleName' is used, then [ ~oid, bytes ] is
-//! used to contain the pair ( hwType, hwSerialNum ) directly as specified in [RFC4108] 
+//! used to contain the pair ( hwType, hwSerialNum ) directly as specified in [RFC4108]
 
 use asn1_rs::Oid;
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};

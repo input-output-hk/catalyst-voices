@@ -1,5 +1,5 @@
-//! General Name data provides a necessary information for encoding and decoding of C509 GeneralName.
-//! See [C509 Certificate]https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/) Section 9.9 C509 General Names Registry
+//! General Name data provides a necessary information for encoding and decoding of C509
+//! GeneralName. See [C509 Certificate]https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/) Section 9.9 C509 General Names Registry
 //! for more information.
 
 use std::collections::HashMap;
@@ -7,9 +7,8 @@ use std::collections::HashMap;
 use bimap::BiMap;
 use once_cell::sync::Lazy;
 
-use crate::tables::{IntTable, TableTrait};
-
 use super::general_name::{GeneralNameRegistry, GeneralNameValueType};
+use crate::tables::{IntTable, TableTrait};
 
 /// Type of GeneralName data.
 /// Int | Name | Type
@@ -66,8 +65,10 @@ const GENERAL_NAME_DATA: [GeneralNameDataTuple; 10] = [
 /// A struct of data that contains lookup table for `GeneralName`.
 ///
 /// # Fields
-/// * `int_to_name_table` - A table of integer to `GeneralNameRegistry`, provide a bidirectional lookup.
-/// * `int_to_type_table` - A table of integer to `GeneralNameValueType`, provide a lookup for the type of `GeneralName` value.
+/// * `int_to_name_table` - A table of integer to `GeneralNameRegistry`, provide a
+///   bidirectional lookup.
+/// * `int_to_type_table` - A table of integer to `GeneralNameValueType`, provide a lookup
+///   for the type of `GeneralName` value.
 pub(crate) struct GeneralNameData {
     int_to_name_table: IntegerToGNTable,
     int_to_type_table: HashMap<i16, GeneralNameValueType>,
@@ -98,6 +99,7 @@ impl IntegerToGNTable {
             table: IntTable::<GeneralNameRegistry>::new(),
         }
     }
+
     pub(crate) fn add(&mut self, k: i16, v: GeneralNameRegistry) {
         self.table.add(k, v);
     }
