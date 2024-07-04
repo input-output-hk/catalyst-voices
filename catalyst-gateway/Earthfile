@@ -9,7 +9,7 @@ IMPORT github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:v3.1.7 AS
 builder:
     DO rust-ci+SETUP
 
-    COPY --dir .cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin crates .
+    COPY --dir Cargo.* clippy.toml deny.toml rustfmt.toml rust-toolchain.toml bin .
 
 ## -----------------------------------------------------------------------------
 ##
