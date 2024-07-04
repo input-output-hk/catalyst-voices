@@ -27,5 +27,6 @@ jobs:
           publish-dry-run: true
           publish: true
           create-pr: true
+          tag: true
           git-email: melos-action@users.noreply.github.com
           git-name: "Melos Action"
