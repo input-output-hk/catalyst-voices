@@ -1,4 +1,4 @@
-// cspell: words hier, VCAR
+// cspell: words hier, VCHAR
 
 /*
 /// A struct represents an Endpoint IDentifier (EID) in the Bundle Protocol.
