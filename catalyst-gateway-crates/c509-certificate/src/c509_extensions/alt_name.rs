@@ -1,16 +1,13 @@
 //! C509 Alternative Name uses for Subject Alternative Name extension and
 //! Issuer Alternative Name extension.
 
-// FIXME - revisit visibility
-
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 
-use crate::c509_general_name::GeneralNames;
-
+use crate::c509_general_names::GeneralNames;
 
 /// Enum for type that can be a `GeneralNames` or a text.
 #[derive(Debug, Clone, PartialEq)]
-pub(crate) enum GeneralNamesOrText {
+pub enum GeneralNamesOrText {
     GeneralNames(GeneralNames),
     Text(String),
 }
@@ -21,13 +18,13 @@ pub(crate) enum GeneralNamesOrText {
 /// # Fields
 /// * value - A value of alternative name that can be either a `GeneralNames` or a text.
 #[derive(Debug, Clone, PartialEq)]
-pub(crate) struct AltName {
+pub struct AltName {
     value: GeneralNamesOrText,
 }
 
 impl AltName {
     /// Create a new instance of AltName given value.
-    fn new(value: GeneralNamesOrText) -> Self {
+    pub fn new(value: GeneralNamesOrText) -> Self {
         Self { value }
     }
 }
@@ -70,14 +67,18 @@ impl Decode<'_, ()> for AltName {
     }
 }
 
+// ------------------Test----------------------
+
 #[cfg(test)]
 mod test_alt_name {
-    use crate::c509_general_name::{GeneralName, GeneralNameRegistry, GeneralNameValue};
+    use crate::c509_general_names::general_name::{
+        GeneralName, GeneralNameRegistry, GeneralNameValue,
+    };
 
     use super::*;
 
     #[test]
-    fn test_encode_alt_name_only_dns() {
+    fn encode_only_dns() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
         let mut gns = GeneralNames::new();
@@ -94,7 +95,7 @@ mod test_alt_name {
     }
 
     #[test]
-    fn test_encode_decode_alt_name_text() {
+    fn encode_decode_text() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 

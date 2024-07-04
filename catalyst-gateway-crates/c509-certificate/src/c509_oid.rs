@@ -49,7 +49,7 @@ impl C509oidRegistered {
     }
 
     /// Get the registration table.
-    pub fn get_table(&self) -> &'static IntegerToOidTable {
+    pub(crate) fn get_table(&self) -> &'static IntegerToOidTable {
         self.registration_table
     }
 }
@@ -67,11 +67,10 @@ pub struct C509oid {
     pen_supported: bool,
 }
 
-#[allow(dead_code)]
 impl C509oid {
     /// Create an new instance of `C509oid`.
     /// Default value of PEN flag is false
-    pub(crate) fn new(oid: Oid<'static>) -> Self {
+    pub fn new(oid: Oid<'static>) -> Self {
         C509oid {
             oid,
             pen_supported: false,
@@ -79,13 +78,13 @@ impl C509oid {
     }
 
     /// Is PEN Encoding supported for this OID
-    pub(crate) fn pen_encoded(mut self) -> Self {
+    pub fn pen_encoded(mut self) -> Self {
         self.pen_supported = true;
         self
     }
 
     /// Get the underlying OID of the `C509oid`
-    pub(crate) fn get_oid(self) -> Oid<'static> {
+    pub fn get_oid(self) -> Oid<'static> {
         self.oid.clone()
     }
 }
@@ -169,7 +168,7 @@ mod test_c509_oid {
     // Test reference 3.1. Encoding of the SHA-256 OID
     // https://datatracker.ietf.org/doc/rfc9090/
     #[test]
-    fn test_encode_decode_unwrapped() {
+    fn encode_decode_unwrapped() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
         let oid = C509oid::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1));
@@ -183,7 +182,7 @@ mod test_c509_oid {
     }
 
     #[test]
-    fn test_encode_decode_pen() {
+    fn encode_decode_pen() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
         let oid = C509oid::new(oid!(1.3.6 .1 .4 .1 .1 .1 .29)).pen_encoded();
@@ -197,7 +196,7 @@ mod test_c509_oid {
     }
 
     #[test]
-    fn test_partial_equal() {
+    fn partial_equal() {
         let oid1 = C509oid::new(oid_registry::OID_HASH_SHA1);
         let oid2 = C509oid::new(oid!(1.3.14 .3 .2 .26));
         assert_eq!(oid1, oid2);

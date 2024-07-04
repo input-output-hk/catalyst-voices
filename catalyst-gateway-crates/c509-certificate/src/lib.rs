@@ -8,7 +8,7 @@
 use wasm_bindgen::prelude::wasm_bindgen;
 mod c509_oid;
 mod c509_extensions;
-mod c509_general_name;
+mod c509_general_names;
 mod tables;
 
 /// Generates an unsigned C509 certificate from the provided `TbsCertificate`.
