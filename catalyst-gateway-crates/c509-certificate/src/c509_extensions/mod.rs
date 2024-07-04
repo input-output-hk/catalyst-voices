@@ -35,9 +35,7 @@ pub struct Extensions(Vec<Extension>);
 impl Extensions {
     /// Create a new instance of `Extensions` as empty vector.
     pub fn new() -> Self {
-        Extensions {
-            extensions: Vec::new(),
-        }
+        Self(Vec::new())
     }
 
     /// Add an `Extension` to the `Extensions`.
