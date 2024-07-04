@@ -1,5 +1,5 @@
 name: catalyst_cardano_web
-description: Web platform implementation of catalyst_cardano
+description: Web platform implementation of catalyst_cardano. Allows to communicate with the Cardano Wallet Extension via js_interop integration.
 repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices_packages/catalyst_cardano/catalyst_cardano_web
 issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
 topics: [blockchain, cardano, cryptocurrency, wallet]
