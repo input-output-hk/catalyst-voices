@@ -30,9 +30,7 @@ static KEY_USAGE_OID: Oid<'static> = oid!(2.5.29 .15);
 /// # Fields
 /// * `extensions` - A vector of `Extension`.
 #[derive(Debug, Clone, PartialEq)]
-pub struct Extensions {
-    extensions: Vec<Extension>,
-}
+pub struct Extensions(Vec<Extension>);
 
 impl Extensions {
     /// Create a new instance of `Extensions` as empty vector.
