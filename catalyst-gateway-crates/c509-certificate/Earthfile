@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.1.13 AS rust-ci
+IMPORT ./../../../catalyst-ci/earthly/rust AS rust-ci
 
 # builder : Set up our target toolchains, and copy our files.
 builder:
