@@ -1,4 +1,4 @@
-//! C509 Extension use to contruct an Extensions messsage field for C509 Certificate.
+//! C509 Extension use to construct an Extensions message field for C509 Certificate.
 
 mod data;
 use asn1_rs::Oid;
@@ -139,7 +139,7 @@ impl Decode<'_, ()> for Extension {
             _ => {
                 // Handle unwrapped CBOR OID or CBOR PEN
                 let c509_oid = C509oid::decode(d, ctx)?;
-                // Citical flag is optional, so if exist, this mean we have to decode it
+                // Critical flag is optional, so if exist, this mean we have to decode it
                 let critical = if d.datatype()? == minicbor::data::Type::Bool {
                     d.bool()?
                 } else {

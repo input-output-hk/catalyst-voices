@@ -66,7 +66,7 @@ const GENERAL_NAME_DATA: [GeneralNameDataTuple; 10] = [
 /// A struct of data that contains lookup table for `GeneralName`.
 ///
 /// # Fields
-/// * `int_to_name_table` - A table of ineger to `GeneralNameRegistry`, provide a bidirectional lookup.
+/// * `int_to_name_table` - A table of integer to `GeneralNameRegistry`, provide a bidirectional lookup.
 /// * `int_to_type_table` - A table of integer to `GeneralNameValueType`, provide a lookup for the type of `GeneralName` value.
 pub(crate) struct GeneralNameData {
     int_to_name_table: IntegerToGNTable,

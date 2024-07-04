@@ -165,7 +165,7 @@ const EXTENSION_DATA: [ExtensionDataTuple; 25] = [
 /// A struct of data that contains lookup tables for `Extension`.
 ///
 /// # Fields
-/// * `int_to_oid_table` - A table of integer to OID, provide a bidrectional lookup.
+/// * `int_to_oid_table` - A table of integer to OID, provide a bidirectional lookup.
 /// * `int_to_type_table` - A table of integer to `ExtensionValueType`, provide a lookup for `Extension` value type.
 pub(crate) struct ExtensionData {
     int_to_oid_table: IntegerToOidTable,

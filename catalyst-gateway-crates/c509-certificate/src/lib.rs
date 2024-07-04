@@ -13,7 +13,7 @@ mod tables;
 
 /// Generates an unsigned C509 certificate from the provided `TbsCertificate`.
 ///
-/// C509 certicate contains 2 parts
+/// C509 certificate contains 2 parts
 /// 1. TBSCertificate
 /// 2. issuerSignatureValue
 /// In order to generate an unsigned C509 certificate, the TBS Certificate must be
@@ -22,7 +22,7 @@ mod tables;
 ///
 /// # Arguments
 ///
-/// * `tbs_cert` - The `TbsCertificate` is the TBS Certifate containing
+/// * `tbs_cert` - The `TbsCertificate` is the TBS Certificate containing
 ///    * c509CertificateType: A certificate type, whether 0 a natively signed C509
 ///      certificate following X.509 v3 or 1 a CBOR re-encoded X.509 v3 DER certificate.
 ///    * certificateSerialNumber: A unique serial number for the certificate.
