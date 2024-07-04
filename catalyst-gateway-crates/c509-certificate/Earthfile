@@ -1,13 +1,12 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.1.7 AS rust-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.1.13 AS rust-ci
 
 # builder : Set up our target toolchains, and copy our files.
 builder:
     DO rust-ci+SETUP
 
-    COPY --dir Cargo.* clippy.toml deny.toml rustfmt.toml rust-toolchain.toml src .
-
+    COPY --dir .cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml src .
 
 
 check:
