@@ -2,35 +2,27 @@ VERSION 0.8
 
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.1.7 AS rust-ci
 
-# Set up our target toolchains, and copy our files.
+# builder : Set up our target toolchains, and copy our files.
 builder:
     DO rust-ci+SETUP
-    COPY --dir src .cargo .config .
-    COPY Cargo.toml clippy.toml deny.toml rustfmt.toml .
 
-## -----------------------------------------------------------------------------
-##
-## Standard CI targets.
-##
-## These targets are discovered and executed automatically by CI.
+    COPY --dir .cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin crates .
 
-# Run check using the most efficient host tooling
-# CI Automated Entry point.
+
+
 check:
     FROM +builder
 
     DO rust-ci+EXECUTE --cmd="/scripts/std_checks.py"
 
-# Run build using the most efficient host tooling
-# CI Automated Entry point.
-build:
-    FROM +builder
+# build:
+#     FROM +builder
 
-    RUN wasm-pack build --target web
-    # AS LOCAL is for local testing only, will be removed in the future
-    SAVE ARTIFACT ./pkg c509-certificate-binding
+#     RUN wasm-pack build --target web
+#     # AS LOCAL is for local testing only, will be removed in the future
+#     SAVE ARTIFACT ./pkg c509-certificate-binding
 
-# local-build: Build the service and save it locally
-local-build:
-    FROM +build
-    SAVE ARTIFACT c509-certificate-binding AS LOCAL ./pkg
+# # local-build: Build the service and save it locally
+# local-build:
+#     FROM +build
+#     SAVE ARTIFACT c509-certificate-binding AS LOCAL ./pkg
