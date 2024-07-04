@@ -1,0 +1,31 @@
+name: Pub.dev release of flutter/dart packages.
+
+on: workflow_dispatch
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  publish-packages:
+    name: Pub.dev release of flutter/dart packages.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.22.1
+      - uses: bluefireteam/melos-action@v3
+        with:
+          run-versioning: true
+          publish-dry-run: true
+          publish: true
+          create-pr: true
+          git-email: melos-action@users.noreply.github.com
+          git-name: "Melos Action"
