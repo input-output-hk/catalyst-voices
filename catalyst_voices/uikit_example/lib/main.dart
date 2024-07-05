@@ -1,17 +1,22 @@
-import 'dart:async';
-
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/generated/catalyst_voices_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
-import 'package:uikit_example/examples/voices_app_bar_example.dart';
+import 'package:uikit_example/examples_list.dart';
 
 void main() {
   runApp(const UIKitExampleApp());
 }
 
-class UIKitExampleApp extends StatelessWidget {
+class UIKitExampleApp extends StatefulWidget {
   const UIKitExampleApp({super.key});
+
+  @override
+  State<UIKitExampleApp> createState() => _UIKitExampleAppState();
+}
+
+class _UIKitExampleAppState extends State<UIKitExampleApp> {
+  ThemeMode _themeMode = ThemeMode.system;
 
   @override
   Widget build(BuildContext context) {
@@ -25,60 +30,76 @@ class UIKitExampleApp extends StatelessWidget {
       localeListResolutionCallback: basicLocaleListResolution,
       theme: ThemeBuilder.buildTheme(BrandKey.catalyst),
       darkTheme: ThemeBuilder.buildDarkTheme(BrandKey.catalyst),
-      home: const _ExamplesList(),
-    );
-  }
-}
-
-class _ExamplesList extends StatelessWidget {
-  const _ExamplesList();
-
-  @override
-  Widget build(BuildContext context) {
-    final examples = _examples;
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('UI kit examples'),
-      ),
-      body: ListView.separated(
-        padding: const EdgeInsets.symmetric(vertical: 32),
-        itemCount: examples.length,
-        itemBuilder: (context, index) => examples[index],
-        separatorBuilder: (context, index) => const Divider(),
-      ),
+      themeMode: _themeMode,
+      onGenerateRoute: _onGenerateRoute,
     );
   }
 
-  List<_Example> get _examples {
-    return const [
-      _Example(
-        title: 'VoicesAppBar',
-        example: VoicesAppBarExample(),
-      ),
-    ];
+  Route<dynamic> _onGenerateRoute(RouteSettings settings) {
+    final page = ExamplesListPage.examples
+            .where((e) => e.route == settings.name)
+            .map((e) => e.page)
+            .firstOrNull ??
+        const ExamplesListPage();
+
+    return MaterialPageRoute(
+      settings: settings,
+      builder: (_) {
+        return _ThemeModeSwitcherWrapper(
+          onChanged: _onThemeModeChanged,
+          child: page,
+        );
+      },
+    );
+  }
+
+  void _onThemeModeChanged(ThemeMode themeMode) {
+    setState(() {
+      _themeMode = themeMode;
+    });
   }
 }
 
-class _Example extends StatelessWidget {
-  final String title;
-  final Widget example;
+class _ThemeModeSwitcherWrapper extends StatelessWidget {
+  final ValueChanged<ThemeMode> onChanged;
+  final Widget child;
 
-  const _Example({
-    required this.title,
-    required this.example,
+  const _ThemeModeSwitcherWrapper({
+    required this.onChanged,
+    required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(title),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: () {
-        unawaited(
-          Navigator.of(context)
-              .push(MaterialPageRoute(builder: (_) => example)),
-        );
-      },
+    return Column(
+      children: [
+        Expanded(
+          child: child,
+        ),
+        Material(
+          color: Theme.of(context).colorScheme.surface,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                const Text('Light / Dark'),
+                Padding(
+                  padding: const EdgeInsets.only(left: 8),
+                  child: Switch(
+                    value: Theme.of(context).brightness == Brightness.dark,
+                    onChanged: (value) {
+                      onChanged(
+                        value ? ThemeMode.dark : ThemeMode.light,
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

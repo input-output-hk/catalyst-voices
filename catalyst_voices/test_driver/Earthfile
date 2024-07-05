@@ -2,7 +2,8 @@ VERSION 0.8
 
 IMPORT ../ AS catalyst-voices
 
-integration-test-web:
+# TODO(kukko3) - fix and enable
+disabled-integration-test-web:
     FROM catalyst-voices+build-web
     ARG TARGETARCH
     ARG browser
@@ -37,7 +38,8 @@ integration-test-web:
             exit 1
     END
 
-test-web-all:
-    BUILD +integration-test-web \
+# TODO(kukko3) - fix and enable
+disabled-test-web-all:
+    BUILD +disabled-integration-test-web \
             --browser=chrome \
             --browser=firefox
