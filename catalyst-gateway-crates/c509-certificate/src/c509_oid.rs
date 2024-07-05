@@ -1,6 +1,7 @@
 //! C509 OID provides an encoding and decoding of C509 Object Identifier (OID).
 //! Please refer to [RFC9090](https://datatracker.ietf.org/doc/rfc9090/) for OID encoding
-//! Please refer to [CDDL Wrapping](https://datatracker.ietf.org/doc/html/rfc8610#section-3.7) for unwrapped types.
+//! Please refer to [CDDL Wrapping](https://datatracker.ietf.org/doc/html/rfc8610#section-3.7)
+//! for unwrapped types.
 
 use anyhow::Result;
 use asn1_rs::oid;

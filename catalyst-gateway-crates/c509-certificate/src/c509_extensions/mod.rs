@@ -11,7 +11,8 @@
 //! ( extensionID: pen, ? critical: true,
 //!   extensionValue: bytes )
 //!
-//! For more information about Extensions, visit [C509](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
+//! For more information about Extensions,
+//! visit [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
 
 pub mod alt_name;
 pub mod extension;
@@ -30,12 +31,16 @@ static KEY_USAGE_OID: Oid<'static> = oid!(2.5.29 .15);
 /// # Fields
 /// * `extensions` - A vector of `Extension`.
 #[derive(Debug, Clone, PartialEq)]
-pub struct Extensions(Vec<Extension>);
+pub struct Extensions {
+    extensions: Vec<Extension>,
+}
 
 impl Extensions {
     /// Create a new instance of `Extensions` as empty vector.
     pub fn new() -> Self {
-        Self(Vec::new())
+        Self {
+            extensions: Vec::new(),
+        }
     }
 
     /// Add an `Extension` to the `Extensions`.

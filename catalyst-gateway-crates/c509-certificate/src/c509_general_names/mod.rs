@@ -1,4 +1,7 @@
 //! C509 Certificate GeneralNames
+//!
+//! For more information about GeneralNames,
+//! visit [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
 
 mod data;
 pub mod general_name;

@@ -1,6 +1,6 @@
 //! Extension data provides a necessary information for encoding and decoding of C509
-//! Extension. See [RFC9090](https://datatracker.ietf.org/doc/rfc9090/) Section 9.4 C509 Extensions Registry
-//! for more information.
+//! Extension. See [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
+//! Section 9.4 C509 Extensions Registry for more information.
 
 use std::collections::HashMap;
 

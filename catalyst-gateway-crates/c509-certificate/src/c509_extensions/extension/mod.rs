@@ -170,14 +170,18 @@ trait ExtensionValueTypeTrait {
     fn get_type(&self) -> ExtensionValueType;
 }
 
+/// An enum of possible value types for `Extension`.
 #[allow(dead_code)]
 #[derive(Debug, Clone, PartialEq, EnumDiscriminants)]
 #[strum_discriminants(name(ExtensionValueType))]
 pub enum ExtensionValue {
-    // integer in the range [-2^64, 2^64-1]
+    /// An Integer in the range [-2^64, 2^64-1]
     Int(i64),
+    /// A bytes.
     Bytes(Vec<u8>),
+    /// An Alternative Name.
     AltName(AltName),
+    /// An unsupported value.
     Unsupported,
 }
 

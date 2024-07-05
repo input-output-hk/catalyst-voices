@@ -3,12 +3,12 @@
 //! This crate provides a library for generating C509 Certificates.
 //! The function is exposed to Javascript through wasm-bindgen.
 //!
-//! Please refer to the [c509-certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/) for more information.
+//! Please refer to the [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/) for more information.
 
 use wasm_bindgen::prelude::wasm_bindgen;
-mod c509_extensions;
-mod c509_general_names;
-mod c509_oid;
+pub mod c509_extensions;
+pub mod c509_general_names;
+pub mod c509_oid;
 mod tables;
 
 /// Generates an unsigned C509 certificate from the provided `TbsCertificate`.

@@ -1,6 +1,7 @@
 //! OtherNameHardwareModuleName, special type for hardwareModuleName type of otherName.
 //!  When 'otherName + hardwareModuleName' is used, then [ ~oid, bytes ] is
-//! used to contain the pair ( hwType, hwSerialNum ) directly as specified in [RFC4108]
+//! used to contain the pair ( hwType, hwSerialNum ) directly as specified in
+//! [RFC4108](https://datatracker.ietf.org/doc/rfc4108/)
 
 use asn1_rs::Oid;
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
@@ -15,7 +16,7 @@ use crate::c509_oid::C509oid;
 /// * `hw_type` - The hardware type OID.
 /// * `hw_serial_num` - The hardware serial number represent in bytes.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub(crate) struct OtherNameHardwareModuleName {
+pub struct OtherNameHardwareModuleName {
     hw_type: C509oid,
     hw_serial_num: Vec<u8>,
 }

@@ -1,4 +1,4 @@
-//! GeneralName in C509 Certificate
+//! C509 GeneralName åin C509 Certificate
 //! GeneralName = ( GeneralNameType : int, GeneralNameValue : any )
 
 use std::fmt::Debug;
@@ -93,15 +93,25 @@ impl Decode<'_, ()> for GeneralName {
 /// Enum of `GeneralName` registered in table Section 9.9 C509.
 #[derive(Debug, Copy, PartialEq, Clone, Eq, Hash, EnumIs)]
 pub enum GeneralNameRegistry {
+    /// An otherName with BundleEID.
     OtherNameBundleEID, // EID
+    /// An otherName with SmtpUTF8Mailbox.
     OtherNameSmtpUTF8Mailbox,
+    /// An otherName with HardwareModuleName.
     OtherNameHardwareModuleName,
+    /// An otherName.
     OtherName,
+    /// A rfc822Name.
     Rfc822Name,
+    /// A dNSName.
     DNSName,
+    /// A directoryName.
     DirectoryName, // Name
+    /// A uniformResourceIdentifier.
     UniformResourceIdentifier,
+    /// An iPAddress.
     IPAddress,
+    /// A registeredID.
     RegisteredID,
 }
 
@@ -121,14 +131,20 @@ impl GeneralNameRegistry {
 
 // -------------------GeneralNameValue----------------------
 
+/// An enum of possible value types for `GeneralName`.
 #[allow(dead_code)]
 #[derive(Debug, PartialEq, Clone, Eq, Hash, EnumDiscriminants)]
 #[strum_discriminants(name(GeneralNameValueType))]
 pub enum GeneralNameValue {
+    /// A text string.
     Text(String),
+    /// A otherName + hardwareModuleName.
     OtherNameHWModuleName(OtherNameHardwareModuleName),
+    /// A bytes.
     Bytes(Vec<u8>),
+    /// An OID
     Oid(C509oid),
+    /// An unsupported value.
     Unsupported,
 }
 
@@ -171,7 +187,8 @@ impl Encode<()> for GeneralNameValue {
     }
 }
 impl<C> Decode<'_, C> for GeneralNameValue
-where C: GeneralNameValueTrait + Debug
+where
+    C: GeneralNameValueTrait + Debug,
 {
     fn decode(d: &mut Decoder<'_>, ctx: &mut C) -> Result<Self, minicbor::decode::Error> {
         match ctx.get_type() {
@@ -191,11 +208,9 @@ where C: GeneralNameValueTrait + Debug
                 let value = OtherNameHardwareModuleName::decode(d, &mut ())?;
                 Ok(GeneralNameValue::OtherNameHWModuleName(value))
             },
-            GeneralNameValueType::Unsupported => {
-                Err(minicbor::decode::Error::message(
-                    "Cannot decode Unsupported GeneralName value",
-                ))
-            },
+            GeneralNameValueType::Unsupported => Err(minicbor::decode::Error::message(
+                "Cannot decode Unsupported GeneralName value",
+            )),
         }
     }
 }
@@ -236,9 +251,10 @@ mod test_general_name {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
-        let hw = OtherNameHardwareModuleName::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1), vec![
-            0x01, 0x02, 0x03, 0x04,
-        ]);
+        let hw = OtherNameHardwareModuleName::new(
+            oid!(2.16.840 .1 .101 .3 .4 .2 .1),
+            vec![0x01, 0x02, 0x03, 0x04],
+        );
         let gn = GeneralName::new(
             GeneralNameRegistry::OtherNameHardwareModuleName,
             GeneralNameValue::OtherNameHWModuleName(hw),

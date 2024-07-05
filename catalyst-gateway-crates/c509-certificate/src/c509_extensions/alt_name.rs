@@ -8,7 +8,9 @@ use crate::c509_general_names::GeneralNames;
 /// Enum for type that can be a `GeneralNames` or a text.
 #[derive(Debug, Clone, PartialEq)]
 pub enum GeneralNamesOrText {
+    /// A value of GeneralNames.
     GeneralNames(GeneralNames),
+    /// A text string.
     Text(String),
 }
 

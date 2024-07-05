@@ -1,6 +1,6 @@
 //! General Name data provides a necessary information for encoding and decoding of C509
-//! GeneralName. See [C509 Certificate]https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/) Section 9.9 C509 General Names Registry
-//! for more information.
+//! GeneralName. See [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
+//! Section 9.9 C509 General Names Registry for more information.
 
 use std::collections::HashMap;
 
