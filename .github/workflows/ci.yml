@@ -1,6 +1,8 @@
 name: CI
 
 on:
+  schedule:
+    - cron: "0 0 * * *"
   push:
 
 permissions:
@@ -15,8 +17,20 @@ jobs:
       aws_ecr_registry: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
       aws_role_arn: arn:aws:iam::332405224602:role/ci
       aws_region: eu-central-1
+      nightly: true
     secrets:
       dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
       dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
       earthly_runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
       earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
+
+  nightly:
+    runs-on: ubuntu-latest
+    if: ${{ inputs.nightly == true }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Run example test
+      run: ./tests/schemathesis_tests/hooks/hooks.py
