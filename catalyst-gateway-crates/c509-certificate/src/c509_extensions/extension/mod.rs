@@ -11,27 +11,25 @@ use strum_macros::EnumDiscriminants;
 use super::alt_name::AltName;
 use crate::c509_oid::{C509oid, C509oidRegistered};
 
-/// A struct of C509 Extension
-///
-/// # Fields
-/// * `registered_oid` - The registered OID of the `Extension`.
-/// * `critical` - The critical flag of the `Extension` negative if critical is true,
-///   otherwise positive.
-/// * `value` - The value of the `Extension` in `ExtensionValue`.
+/// A struct of C509 `Extension`
 #[derive(Debug, Clone, PartialEq)]
 pub struct Extension {
+    /// The registered OID of the `Extension`.
     registered_oid: C509oidRegistered,
+    /// The critical flag of the `Extension` negative if critical is true, otherwise
+    /// positive.
     critical: bool,
+    /// The value of the `Extension` in `ExtensionValue`.
     value: ExtensionValue,
 }
 
-#[allow(dead_code)]
 impl Extension {
     /// Create a new instance of `Extension` using `OID` and value.
     /// Critical flag is originally set to false.
+    #[must_use]
     pub fn new(oid: Oid<'static>, value: ExtensionValue) -> Self {
         Extension {
-            registered_oid: C509oidRegistered::new(oid, &EXTENSIONS_TABLES.get_int_to_oid_table())
+            registered_oid: C509oidRegistered::new(oid, EXTENSIONS_TABLES.get_int_to_oid_table())
                 .pen_encoded(),
             critical: false,
             value,
@@ -39,21 +37,25 @@ impl Extension {
     }
 
     /// Get the value of the `Extension` in `ExtensionValue`.
+    #[must_use]
     pub fn get_value(&self) -> &ExtensionValue {
         &self.value
     }
 
     /// Get the critical flag of the `Extension`.
+    #[must_use]
     pub fn get_critical(&self) -> bool {
         self.critical
     }
 
     /// Get the registered OID of the `Extension`.
+    #[must_use]
     pub fn get_registered_oid(&self) -> &C509oidRegistered {
         &self.registered_oid
     }
 
     /// Set the critical flag of the `Extension`.
+    #[must_use]
     pub fn set_critical(mut self) -> Self {
         self.critical = true;
         self
@@ -61,10 +63,10 @@ impl Extension {
 }
 
 impl Encode<()> for Extension {
-    /// Extension can be encoded as:
-    /// - (extensionID: int, extensionValue: any)
-    /// - (extensionID: ~oid, ? critical: true, extensionValue: bytes)
-    /// - (extensionID: pen, ? critical: true, extensionValue: bytes)
+    // Extension can be encoded as:
+    // - (extensionID: int, extensionValue: any)
+    // - (extensionID: ~oid, ? critical: true, extensionValue: bytes)
+    // - (extensionID: pen, ? critical: true, extensionValue: bytes)
     fn encode<W: Write>(
         &self, e: &mut Encoder<W>, ctx: &mut (),
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
@@ -171,7 +173,7 @@ trait ExtensionValueTypeTrait {
 }
 
 /// An enum of possible value types for `Extension`.
-#[allow(dead_code)]
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, EnumDiscriminants)]
 #[strum_discriminants(name(ExtensionValueType))]
 pub enum ExtensionValue {
@@ -187,7 +189,7 @@ pub enum ExtensionValue {
 
 impl ExtensionValueTypeTrait for ExtensionValueType {
     fn get_type(&self) -> ExtensionValueType {
-        self.clone()
+        *self
     }
 }
 

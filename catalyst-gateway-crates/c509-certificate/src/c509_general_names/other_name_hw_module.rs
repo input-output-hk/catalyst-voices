@@ -1,5 +1,5 @@
-//! OtherNameHardwareModuleName, special type for hardwareModuleName type of otherName.
-//!  When 'otherName + hardwareModuleName' is used, then [ ~oid, bytes ] is
+//! `OtherNameHardwareModuleName`, special type for `hardwareModuleName` type of
+//! otherName. When 'otherName + hardwareModuleName' is used, then `[ ~oid, bytes ]` is
 //! used to contain the pair ( hwType, hwSerialNum ) directly as specified in
 //! [RFC4108](https://datatracker.ietf.org/doc/rfc4108/)
 
@@ -11,18 +11,16 @@ use crate::c509_oid::C509oid;
 /// A struct represents the hardwareModuleName type of otherName.
 /// Containing a pair of ( hwType, hwSerialNum ) as mentioned in
 /// [RFC4108](https://datatracker.ietf.org/doc/rfc4108/)
-///
-/// # Fields
-/// * `hw_type` - The hardware type OID.
-/// * `hw_serial_num` - The hardware serial number represent in bytes.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OtherNameHardwareModuleName {
+    /// The hardware type OID.
     hw_type: C509oid,
+    /// The hardware serial number represent in bytes.
     hw_serial_num: Vec<u8>,
 }
 
 impl OtherNameHardwareModuleName {
-    /// Create a new instance of OtherNameHardwareModuleName.
+    /// Create a new instance of `OtherNameHardwareModuleName`.
     pub fn new(hw_type: Oid<'static>, hw_serial_num: Vec<u8>) -> Self {
         Self {
             hw_type: C509oid::new(hw_type),

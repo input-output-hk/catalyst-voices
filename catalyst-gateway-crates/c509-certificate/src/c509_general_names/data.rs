@@ -1,5 +1,5 @@
 //! General Name data provides a necessary information for encoding and decoding of C509
-//! GeneralName. See [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
+//! General Name. See [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
 //! Section 9.9 C509 General Names Registry for more information.
 
 use std::collections::HashMap;
@@ -10,9 +10,11 @@ use once_cell::sync::Lazy;
 use super::general_name::{GeneralNameRegistry, GeneralNameValueType};
 use crate::tables::{IntTable, TableTrait};
 
-/// Type of GeneralName data.
+/// Type of `GeneralName` data.
 /// Int | Name | Type
 type GeneralNameDataTuple = (i16, GeneralNameRegistry, GeneralNameValueType);
+
+/// `GeneralName` data table.
 const GENERAL_NAME_DATA: [GeneralNameDataTuple; 10] = [
     (
         -3,
@@ -63,14 +65,11 @@ const GENERAL_NAME_DATA: [GeneralNameDataTuple; 10] = [
 ];
 
 /// A struct of data that contains lookup table for `GeneralName`.
-///
-/// # Fields
-/// * `int_to_name_table` - A table of integer to `GeneralNameRegistry`, provide a
-///   bidirectional lookup.
-/// * `int_to_type_table` - A table of integer to `GeneralNameValueType`, provide a lookup
-///   for the type of `GeneralName` value.
 pub(crate) struct GeneralNameData {
+    /// A table of integer to `GeneralNameRegistry`, provide a bidirectional lookup.
     int_to_name_table: IntegerToGNTable,
+    /// A table of integer to `GeneralNameValueType`, provide a lookup for the type of
+    /// `GeneralName` value.
     int_to_type_table: HashMap<i16, GeneralNameValueType>,
 }
 
@@ -89,21 +88,24 @@ impl GeneralNameData {
 /// A struct of integer to `GeneralNameRegistry` table.
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct IntegerToGNTable {
+    /// Table of integer to `GeneralNameRegistry`.
     table: IntTable<GeneralNameRegistry>,
 }
 
-#[allow(dead_code)]
 impl IntegerToGNTable {
+    /// Create a new instance of `IntegerToGNTable`.
     pub(crate) fn new() -> Self {
         Self {
             table: IntTable::<GeneralNameRegistry>::new(),
         }
     }
 
+    /// Add a new integer to `GeneralNameRegistry` map table.
     pub(crate) fn add(&mut self, k: i16, v: GeneralNameRegistry) {
         self.table.add(k, v);
     }
 
+    /// Get the map table of integer to `GeneralNameRegistry`.
     pub(crate) fn get_map(&self) -> &BiMap<i16, GeneralNameRegistry> {
         self.table.get_map()
     }
@@ -119,8 +121,8 @@ pub(crate) static GENERAL_NAME_TABLES: Lazy<GeneralNameData> = Lazy::new(|| {
         int_to_type_table.insert(data.0, data.2);
     }
 
-    return GeneralNameData {
+    GeneralNameData {
         int_to_name_table,
         int_to_type_table,
-    };
+    }
 });

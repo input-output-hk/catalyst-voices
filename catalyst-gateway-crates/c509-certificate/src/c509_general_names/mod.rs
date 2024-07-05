@@ -1,6 +1,6 @@
-//! C509 Certificate GeneralNames
+//! C509 General Names
 //!
-//! For more information about GeneralNames,
+//! For more information about `GeneralNames`,
 //! visit [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
 
 mod data;
@@ -10,18 +10,26 @@ mod other_name_hw_module;
 use general_name::GeneralName;
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 
-/// A struct represents an array of GeneralName.
-/// GeneralNames = [ + GeneralName ]
+/// A struct represents an array of `GeneralName`.
 ///
-/// # Fields
-/// * `general_names` - The array of GeneralName.
+/// ```cddl
+/// GeneralNames = [ + GeneralName ]
+/// ```
 #[derive(Debug, Clone, PartialEq)]
 pub struct GeneralNames {
+    /// The array of `GeneralName`.
     general_names: Vec<GeneralName>,
+}
+
+impl Default for GeneralNames {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl GeneralNames {
     /// Create a new instance of `GeneralNames` as empty vector.
+    #[must_use]
     pub fn new() -> Self {
         Self {
             general_names: Vec::new(),
@@ -33,7 +41,7 @@ impl GeneralNames {
         self.general_names.push(gn);
     }
 
-    /// Get the a list of GeneralName.
+    /// Get the a vector of `GeneralName`.
     pub(crate) fn get_gns(&self) -> &Vec<GeneralName> {
         &self.general_names
     }
@@ -43,7 +51,7 @@ impl Encode<()> for GeneralNames {
     fn encode<W: Write>(
         &self, e: &mut Encoder<W>, ctx: &mut (),
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
-        if self.general_names.len() == 0 {
+        if self.general_names.is_empty() {
             return Err(minicbor::encode::Error::message(
                 "GeneralNames should not be empty",
             ));

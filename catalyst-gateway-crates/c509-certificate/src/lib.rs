@@ -52,6 +52,7 @@ mod tables;
 /// This function relies on the `c509_cert` module's `generate_unsigned_c509_cert`
 /// function for the actual generation process.
 #[wasm_bindgen]
+#[must_use]
 pub fn generate_unsigned_c509_cert() -> Vec<u8> {
     // c509_cert::generate_unsigned_c509_cert(tbs_cert)
     todo!()

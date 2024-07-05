@@ -10,10 +10,11 @@ use once_cell::sync::Lazy;
 use super::ExtensionValueType;
 use crate::tables::IntegerToOidTable;
 
-/// Type of Extension data
+/// Type of `Extension` data
 /// Int | OID | Type | Name
 type ExtensionDataTuple = (i16, Oid<'static>, ExtensionValueType, &'static str);
 
+/// `Extension` data table
 const EXTENSION_DATA: [ExtensionDataTuple; 25] = [
     (
         1,
@@ -163,13 +164,11 @@ const EXTENSION_DATA: [ExtensionDataTuple; 25] = [
 ];
 
 /// A struct of data that contains lookup tables for `Extension`.
-///
-/// # Fields
-/// * `int_to_oid_table` - A table of integer to OID, provide a bidirectional lookup.
-/// * `int_to_type_table` - A table of integer to `ExtensionValueType`, provide a lookup
-///   for `Extension` value type.
 pub(crate) struct ExtensionData {
+    /// A table of integer to OID, provide a bidirectional lookup.
     int_to_oid_table: IntegerToOidTable,
+    /// A table of integer to `ExtensionValueType`, provide a lookup for `Extension` value
+    /// type.
     int_to_type_table: HashMap<i16, ExtensionValueType>,
 }
 
@@ -195,8 +194,8 @@ pub(crate) static EXTENSIONS_TABLES: Lazy<ExtensionData> = Lazy::new(|| {
         int_to_type_table.insert(data.0, data.2);
     }
 
-    return ExtensionData {
+    ExtensionData {
         int_to_oid_table,
         int_to_type_table,
-    };
+    }
 });

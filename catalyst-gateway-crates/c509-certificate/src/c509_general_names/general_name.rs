@@ -1,5 +1,7 @@
-//! C509 GeneralName åin C509 Certificate
-//! GeneralName = ( GeneralNameType : int, GeneralNameValue : any )
+//! C509 General Name
+//!
+//! For more information about `GeneralName`,
+//! visit [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
 
 use std::fmt::Debug;
 
@@ -10,31 +12,34 @@ use strum_macros::{EnumDiscriminants, EnumIs};
 use super::{data::GENERAL_NAME_TABLES, other_name_hw_module::OtherNameHardwareModuleName};
 use crate::c509_oid::C509oid;
 
-/// A struct represents a GeneralName.
+/// A struct represents a `GeneralName`.
+/// ```cddl
 /// GeneralName = ( GeneralNameType : int, GeneralNameValue : any )
-///
-/// # Fields
-/// * `gn` - An enum of registered `GeneralName`.
-/// * `value` - The value of the `GeneralName` in `GeneralNameValue`.
+/// ```
 #[derive(Debug, Clone, PartialEq)]
 pub struct GeneralName {
+    /// An enum of registered `GeneralName`.
     gn: GeneralNameRegistry,
+    /// The value of the `GeneralName` in `GeneralNameValue`.
     value: GeneralNameValue,
 }
 
 #[allow(dead_code)]
 impl GeneralName {
     /// Create a new instance of `GeneralName`.
+    #[must_use]
     pub fn new(gn: GeneralNameRegistry, value: GeneralNameValue) -> Self {
         Self { gn, value }
     }
 
     /// Get the `GeneralName` type.
+    #[must_use]
     pub fn get_gn(&self) -> &GeneralNameRegistry {
         &self.gn
     }
 
     /// Get the value of the `GeneralName` in `GeneralNameValue`.
+    #[must_use]
     pub fn get_gn_value(&self) -> &GeneralNameValue {
         &self.value
     }
@@ -48,7 +53,7 @@ impl Encode<()> for GeneralName {
         let i = self
             .gn
             .get_int()
-            .map_err(|e| minicbor::encode::Error::message(e))?;
+            .map_err(minicbor::encode::Error::message)?;
         e.i16(i)?;
         // Encode GeneralNameValue as its type
         self.value.encode(e, ctx)?;
@@ -91,13 +96,14 @@ impl Decode<'_, ()> for GeneralName {
 // -----------------GeneralNameRegistry------------------------
 
 /// Enum of `GeneralName` registered in table Section 9.9 C509.
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Copy, PartialEq, Clone, Eq, Hash, EnumIs)]
 pub enum GeneralNameRegistry {
-    /// An otherName with BundleEID.
+    /// An otherName with `BundleEID`.
     OtherNameBundleEID, // EID
-    /// An otherName with SmtpUTF8Mailbox.
+    /// An otherName with `SmtpUTF8Mailbox`.
     OtherNameSmtpUTF8Mailbox,
-    /// An otherName with HardwareModuleName.
+    /// An otherName with `HardwareModuleName`.
     OtherNameHardwareModuleName,
     /// An otherName.
     OtherName,
@@ -117,7 +123,7 @@ pub enum GeneralNameRegistry {
 
 impl GeneralNameRegistry {
     /// Get the integer value associated with the `GeneralNameRegistry`.
-    pub(crate) fn get_int(&self) -> Result<i16, Error> {
+    pub(crate) fn get_int(self) -> Result<i16, Error> {
         let i = GENERAL_NAME_TABLES
             .get_int_to_name_table()
             .get_map()
@@ -132,7 +138,7 @@ impl GeneralNameRegistry {
 // -------------------GeneralNameValue----------------------
 
 /// An enum of possible value types for `GeneralName`.
-#[allow(dead_code)]
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, PartialEq, Clone, Eq, Hash, EnumDiscriminants)]
 #[strum_discriminants(name(GeneralNameValueType))]
 pub enum GeneralNameValue {
@@ -156,7 +162,7 @@ trait GeneralNameValueTrait {
 
 impl GeneralNameValueTrait for GeneralNameValueType {
     fn get_type(&self) -> GeneralNameValueType {
-        self.clone()
+        *self
     }
 }
 

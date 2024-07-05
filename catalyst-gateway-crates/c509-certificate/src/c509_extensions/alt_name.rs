@@ -8,24 +8,23 @@ use crate::c509_general_names::GeneralNames;
 /// Enum for type that can be a `GeneralNames` or a text.
 #[derive(Debug, Clone, PartialEq)]
 pub enum GeneralNamesOrText {
-    /// A value of GeneralNames.
+    /// A value of `GeneralNames`.
     GeneralNames(GeneralNames),
     /// A text string.
     Text(String),
 }
 
 /// Alternative Name extension.
-/// Can be interpreted as a GeneralNames / text
-///
-/// # Fields
-/// * value - A value of alternative name that can be either a `GeneralNames` or a text.
+/// Can be interpreted as a `GeneralNames / text`
 #[derive(Debug, Clone, PartialEq)]
 pub struct AltName {
+    /// A value of alternative name that can be either a `GeneralNames` or a text.
     value: GeneralNamesOrText,
 }
 
 impl AltName {
-    /// Create a new instance of AltName given value.
+    /// Create a new instance of `AltName` given value.
+    #[must_use]
     pub fn new(value: GeneralNamesOrText) -> Self {
         Self { value }
     }
@@ -37,15 +36,19 @@ impl Encode<()> for AltName {
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
         match &self.value {
             GeneralNamesOrText::GeneralNames(gns) => {
+                let gn = gns
+                    .get_gns()
+                    .first()
+                    .ok_or(minicbor::encode::Error::message("GeneralNames is empty"))?;
                 // Check whether there is only 1 item in the array which is a DNSName
-                if gns.get_gns().len() == 1 && gns.get_gns()[0].get_gn().is_dns_name() {
-                    gns.get_gns()[0].get_gn_value().encode(e, ctx)?
+                if gns.get_gns().len() == 1 && gn.get_gn().is_dns_name() {
+                    gn.get_gn_value().encode(e, ctx)?;
                 } else {
-                    gns.encode(e, ctx)?
+                    gns.encode(e, ctx)?;
                 }
             },
             GeneralNamesOrText::Text(text) => {
-                e.str(&text)?;
+                e.str(text)?;
             },
         }
         Ok(())

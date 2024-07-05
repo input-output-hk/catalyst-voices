@@ -10,22 +10,18 @@ use oid_registry::Oid;
 
 use crate::tables::IntegerToOidTable;
 
-// FIXME - Revisit visibility
-
 /// IANA Private Enterprise Number (PEN) OID prefix.
 const PEN_PREFIX: Oid<'static> = oid!(1.3.6 .1 .4 .1);
 
 /// Tag number representing IANA Private Enterprise Number (PEN) OID.
 const OID_PEN_TAG: u64 = 112;
 
-#[derive(Debug, Clone, PartialEq)]
 /// A strut of C509 OID with Registered Integer Encoding/Decoding.
-///
-/// # Fields
-/// * oid - The `C509oid`.
-/// * registration_table - The registration table.
+#[derive(Debug, Clone, PartialEq)]
 pub struct C509oidRegistered {
+    /// The `C509oid`.
     oid: C509oid,
+    /// The registration table.
     registration_table: &'static IntegerToOidTable,
 }
 
@@ -33,7 +29,7 @@ impl C509oidRegistered {
     /// Create a new instance of `C509oidRegistered`.
     pub(crate) fn new(oid: Oid<'static>, table: &'static IntegerToOidTable) -> Self {
         C509oidRegistered {
-            oid: C509oid::new(oid).to_owned(),
+            oid: C509oid::new(oid),
             registration_table: table,
         }
     }
@@ -59,19 +55,18 @@ impl C509oidRegistered {
 // -----------------------------------------
 
 /// A struct represent an instance of `C509oid`.
-///
-/// # Fields
-/// * oid - The OID.
-/// * pen_supported - The flag to indicate whether PEN encoding is supported.
 #[derive(Debug, PartialEq, Clone, Eq, Hash)]
 pub struct C509oid {
+    /// The OID.
     oid: Oid<'static>,
+    /// The flag to indicate whether PEN encoding is supported.
     pen_supported: bool,
 }
 
 impl C509oid {
     /// Create an new instance of `C509oid`.
     /// Default value of PEN flag is false
+    #[must_use]
     pub fn new(oid: Oid<'static>) -> Self {
         C509oid {
             oid,
@@ -80,12 +75,14 @@ impl C509oid {
     }
 
     /// Is PEN Encoding supported for this OID
+    #[must_use]
     pub fn pen_encoded(mut self) -> Self {
         self.pen_supported = true;
         self
     }
 
     /// Get the underlying OID of the `C509oid`
+    #[must_use]
     pub fn get_oid(self) -> Oid<'static> {
         self.oid.clone()
     }
@@ -115,15 +112,25 @@ impl Encode<()> for C509oid {
             // The first 2 integer has a special encoding formula where,
             // values is computed using X * 40 + Y (See RFC9090 for more info)
             // The number 999 exceed the 225 limit (max of u8), so it will be encoded as 2 bytes
-            let raw_oid: Vec<u64> = self.oid.iter().map(|iter| iter.collect()).ok_or(
-                minicbor::encode::Error::message("Failed to collect OID components from iterator"),
-            )?;
-            let raw_pen_prefix: Vec<u64> = PEN_PREFIX.iter().map(|iter| iter.collect()).ok_or(
+            let raw_oid: Vec<u64> =
+                self.oid
+                    .iter()
+                    .map(Iterator::collect)
+                    .ok_or(minicbor::encode::Error::message(
+                        "Failed to collect OID components from iterator",
+                    ))?;
+            let raw_pen_prefix: Vec<u64> = PEN_PREFIX.iter().map(Iterator::collect).ok_or(
                 minicbor::encode::Error::message("Failed to collect OID components from iterator"),
             )?;
             // relative_oid is OID that follows PEN_PREFIX (relative to PEN_PREFIX)
             // Use the [u64] PEN prefix length to extract the relative OID
-            let relative_oid = Oid::from_relative(&raw_oid[raw_pen_prefix.len()..])
+            let oid_slice =
+                raw_oid
+                    .get(raw_pen_prefix.len()..)
+                    .ok_or(minicbor::encode::Error::message(
+                        "Failed to get a OID slice",
+                    ))?;
+            let relative_oid = Oid::from_relative(oid_slice)
                 .map_err(|_| minicbor::encode::Error::message("Failed to get a relative OID"))?;
             return e.bytes(relative_oid.as_bytes())?.ok();
         }
@@ -148,15 +155,15 @@ impl Decode<'_, ()> for C509oid {
             // raw_oid contains the whole OID which stored in bytes
             let mut raw_oid = Vec::new();
             raw_oid.extend_from_slice(PEN_PREFIX.as_bytes());
-            raw_oid.extend_from_slice(&oid_bytes);
+            raw_oid.extend_from_slice(oid_bytes);
             // Convert the raw_oid to Oid
             let oid = Oid::new(raw_oid.into());
-            return Ok(C509oid::new(oid.into()).pen_encoded());
+            return Ok(C509oid::new(oid).pen_encoded());
         }
         // Not a PEN Relative OID, so treat as a normal OID
         let oid_bytes = d.bytes()?;
         let oid = Oid::new(oid_bytes.to_owned().into());
-        Ok(C509oid::new(oid.into()))
+        Ok(C509oid::new(oid))
     }
 }
 
