@@ -1,9 +1,9 @@
 name: catalyst_cardano
-description: A Flutter plugin exposing the CIP-30 and CIP-95 APIs.
+description: A Flutter plugin exposing the CIP-30 and CIP-95 APIs. Allows to communicate with the Cardano Wallet Extension via js_interop integration.
 repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices_packages/catalyst_cardano/catalyst_cardano
 issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
 topics: [blockchain, cardano, cryptocurrency, wallet]
-version: 0.1.1+1
+version: 0.1.2
 
 environment:
   sdk: ">=3.3.4 <4.0.0"
@@ -16,9 +16,9 @@ flutter:
         default_package: catalyst_cardano_web
 
 dependencies:
-  catalyst_cardano_platform_interface: ^0.1.1+1
-  catalyst_cardano_serialization: ^0.1.1+1
-  catalyst_cardano_web: ^0.1.1+1
+  catalyst_cardano_platform_interface: ^0.1.2
+  catalyst_cardano_serialization: ^0.1.2
+  catalyst_cardano_web: ^0.1.2
   flutter:
     sdk: flutter
 
