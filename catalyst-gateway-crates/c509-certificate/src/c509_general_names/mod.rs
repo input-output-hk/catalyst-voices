@@ -4,6 +4,7 @@
 //! visit [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
 
 mod data;
+mod eid;
 pub mod general_name;
 mod other_name_hw_module;
 
