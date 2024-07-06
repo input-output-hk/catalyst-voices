@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "node scripts/start.js",
     "e2e": "jest --detectOpenHandles"
   },
   "dependencies": {
@@ -12,6 +11,10 @@
     "jest-circus": "^29.7.0",
     "jest-resolve": "^29.7.0",
     "jest-watch-typeahead": "^2.2.2",
-    "puppeteer": "^22.12.1"
+    "selenium-webdriver": "^4.22.0",
+    "assert": "2.1.0"
+  },
+  "devDependencies": {
+    "mocha": "10.6.0"
   }
 }
