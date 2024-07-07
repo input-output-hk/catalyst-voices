@@ -45,58 +45,9 @@ impl Encode<()> for Name {
                 if attr.len() == 1
                     && attr[0].get_registered_oid().get_c509_oid().get_oid() == COMMON_NAME_OID
                 {
-                    let hex_regex = Regex::new(r"^[0-9a-fA-F]+$")
-                        .map_err(|e| minicbor::encode::Error::message(format!("{e}")))?;
-                    let eui64_regex = Regex::new(r"^([0-9A-Fa-f]{2}-){7}[0-9A-Fa-f]{2}$")
-                        .map_err(|e| minicbor::encode::Error::message(format!("{e}")))?;
+                    let cn_value = &attr[0].get_value();
 
-                    let mac_eui64_regex = Regex::new(
-                        r"^([0-9A-Fa-f]{2}-){3}FF-FE-([0-9A-Fa-f]{2}-){2}[0-9A-Fa-f]{2}$",
-                    )
-                    .map_err(|e| minicbor::encode::Error::message(format!("{e}")))?;
-
-                    let cn_value = attr[0].get_value();
-                    match cn_value {
-                        TextOrBytes::Text(s) => {
-                            if s.contains('-') {
-                                let clean_name = s.replace("-", "");
-                                let decoded_bytes = hex::decode(&clean_name).map_err(|e| {
-                                    minicbor::encode::Error::message(format!("{e}"))
-                                })?;
-
-                                //  If the text string has an even length ≥ 2 and contains only the
-                                //  symbols '0'–'9' or 'a'–'f', it is encoded as a CBOR byte
-                                //  string, prefixed with an initial byte set to '00'.
-                                if hex_regex.is_match(s) && s.len() % 2 == 0 {
-                                    let data = [&[0x00], &decoded_bytes[..]].concat();
-                                    e.bytes(&data)?;
-
-                                // An EUI-64 mapped from a 48-bit MAC address (i.e., of the
-                                // form "HH-HH-HH-FF-FE-HH-HH-HH) is encoded as a CBOR byte
-                                // string prefixed with an initial byte set to '01', len total 7.
-                                } else if mac_eui64_regex.is_match(s) {
-                                    let data: Vec<u8> =
-                                        [&[0x01], &decoded_bytes[..3], &decoded_bytes[5..]]
-                                            .concat(); // Skip FF-FE bytes
-                                    e.bytes(&data)?;
-                                // If the text string contains an EUI-64 of the form "HH-HH-HH-HH-
-                                // HH-HH-HH-HH" where 'H' is one of the symbols '0'–'9' or 'A'–'F'
-                                // it is encoded as a CBOR byte string prefixed with an initial
-                                // byte set to '01', len total 9.
-                                } else if eui64_regex.is_match(s) {
-                                    let data = [&[0x01], &decoded_bytes[..]].concat();
-                                    e.bytes(&data)?;
-                                }
-                            } else {
-                                e.str(s)?;
-                            }
-                        },
-                        TextOrBytes::Bytes(_) => {
-                            return Err(minicbor::encode::Error::message(
-                                "CommonName attribute value must be a text string",
-                            ));
-                        },
-                    }
+                    encode_cn_value(e, cn_value)?;
                 } else {
                     rdn.encode(e, ctx)?;
                 }
@@ -110,6 +61,45 @@ impl Encode<()> for Name {
         }
         Ok(())
     }
+}
+
+fn encode_cn_value<W: Write>(
+    e: &mut Encoder<W>, cn_value: &TextOrBytes,
+) -> Result<(), minicbor::encode::Error<W::Error>> {
+    let hex_regex = Regex::new(r"^[0-9a-fA-F]+$")
+        .map_err(|e| minicbor::encode::Error::message(format!("{e}")))?;
+    let eui64_regex = Regex::new(r"^([0-9A-Fa-f]{2}-){7}[0-9A-Fa-f]{2}$")
+        .map_err(|e| minicbor::encode::Error::message(format!("{e}")))?;
+
+    let mac_eui64_regex =
+        Regex::new(r"^([0-9A-Fa-f]{2}-){3}FF-FE-([0-9A-Fa-f]{2}-){2}[0-9A-Fa-f]{2}$")
+            .map_err(|e| minicbor::encode::Error::message(format!("{e}")))?;
+
+    match cn_value {
+        TextOrBytes::Text(s) => {
+            if s.contains('-') {
+                let clean_name = s.replace("-", "");
+                let decoded_bytes = hex::decode(&clean_name)
+                    .map_err(|e| minicbor::encode::Error::message(format!("{e}")))?;
+
+                if hex_regex.is_match(s) && s.len() % 2 == 0 {
+                    e.bytes(&[&[0x00], &decoded_bytes[..]].concat())?;
+                } else if mac_eui64_regex.is_match(s) {
+                    e.bytes(&[&[0x01], &decoded_bytes[..3], &decoded_bytes[5..]].concat())?;
+                } else if eui64_regex.is_match(s) {
+                    e.bytes(&[&[0x01], &decoded_bytes[..]].concat())?;
+                }
+            } else {
+                e.str(s)?;
+            }
+        },
+        TextOrBytes::Bytes(_) => {
+            return Err(minicbor::encode::Error::message(
+                "CommonName attribute value must be a text string",
+            ));
+        },
+    }
+    Ok(())
 }
 
 fn formatted_eui_bytes(data: &[u8]) -> String {
@@ -133,40 +123,51 @@ impl Decode<'_, ()> for Name {
                 RelativeDistinguishedName::decode(d, ctx)?,
             ))),
             minicbor::data::Type::String => Ok(Name::new(NameValue::Text(d.str()?.to_string()))),
-            minicbor::data::Type::Bytes => {
-                let mut p = d.probe();
-                let bytes = p.bytes()?;
-                if bytes[0] == 0 {
-                    let text = hex::encode(&bytes[1..]);
-                    return Ok(Name::new(NameValue::Text(text)));
-                } else if bytes[0] == 1 {
-                    let b = d.bytes()?;
-                    match b.len() {
-                        7 => {
-                            let data = [&b[1..4], &[0xFF], &[0xFE], &b[4..]].concat();
-                            let text = formatted_eui_bytes(&data);
-                            return create_rdn(text);
-                        },
-                        9 => {
-                            let text = formatted_eui_bytes(&b[1..]);
-                            return create_rdn(text);
-                        },
-                        _ => {
-                            return Err(minicbor::decode::Error::message(
-                                "EUI-64 or MAC address must be 7 or 9 bytes",
-                            ))
-                        },
-                    }
-                } else {
-                    return Ok(Name::new(NameValue::Bytes(d.bytes()?.to_vec())));
-                }
-            },
+            minicbor::data::Type::Bytes => decode_bytes(d),
             _ => {
                 return Err(minicbor::decode::Error::message(
                     "Name must be an array, text or bytes",
                 ))
             },
         }
+    }
+}
+
+fn decode_bytes(d: &mut Decoder<'_>) -> Result<Name, minicbor::decode::Error> {
+    let bytes = d.bytes()?;
+
+    // Bytes prefix
+    match bytes[0] {
+        // 0x00 for hex
+        0 => decode_hex_cn_bytes(bytes),
+        // 0x01 for EUI
+        1 => decode_eui_cn_bytes(bytes),
+        _ => Ok(Name::new(NameValue::Bytes(bytes.to_vec()))),
+    }
+}
+
+fn decode_hex_cn_bytes(bytes: &[u8]) -> Result<Name, minicbor::decode::Error> {
+    let text = hex::encode(&bytes[1..]);
+    Ok(Name::new(NameValue::Text(text)))
+}
+
+fn decode_eui_cn_bytes(bytes: &[u8]) -> Result<Name, minicbor::decode::Error> {
+    // Check the lenght of the bytes to determine what EUI type it is
+    match bytes.len() {
+        // EUI-64 mapped from a 48-bit MAC address
+        7 => {
+            let data = [&bytes[1..4], &[0xFF], &[0xFE], &bytes[4..]].concat();
+            let text = formatted_eui_bytes(&data);
+            create_rdn(text)
+        },
+        // EUI-64
+        9 => {
+            let text = formatted_eui_bytes(&bytes[1..]);
+            create_rdn(text)
+        },
+        _ => Err(minicbor::decode::Error::message(
+            "EUI-64 or MAC address must be 7 or 9 bytes",
+        )),
     }
 }
 
