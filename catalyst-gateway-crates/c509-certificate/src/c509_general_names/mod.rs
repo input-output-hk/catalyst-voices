@@ -37,8 +37,9 @@ impl GeneralNames {
     }
 
     /// Add a new `GeneralName` to the `GeneralNames`.
-    pub fn add(&mut self, gn: GeneralName) {
+    pub fn add(mut self, gn: GeneralName) -> Self {
         self.general_names.push(gn);
+        self
     }
 
     /// Get the a vector of `GeneralName`.
@@ -71,7 +72,7 @@ impl Decode<'_, ()> for GeneralNames {
         ))?;
         let mut gn = GeneralNames::new();
         for _ in 0..len {
-            gn.add(GeneralName::decode(d, ctx)?);
+            gn = gn.add(GeneralName::decode(d, ctx)?);
         }
         Ok(gn)
     }
@@ -96,26 +97,26 @@ mod test_general_names {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
-        let mut gns = GeneralNames::new();
-        gns.add(GeneralName::new(
-            GeneralNameRegistry::DNSName,
-            GeneralNameValue::Text("example.com".to_string()),
-        ));
-        gns.add(GeneralName::new(
-            GeneralNameRegistry::OtherNameHardwareModuleName,
-            GeneralNameValue::OtherNameHWModuleName(OtherNameHardwareModuleName::new(
-                oid!(2.16.840 .1 .101 .3 .4 .2 .1),
-                vec![0x01, 0x02, 0x03, 0x04],
-            )),
-        ));
-        gns.add(GeneralName::new(
-            GeneralNameRegistry::IPAddress,
-            GeneralNameValue::Bytes(Ipv4Addr::new(192, 168, 1, 1).octets().to_vec()),
-        ));
-        gns.add(GeneralName::new(
-            GeneralNameRegistry::RegisteredID,
-            GeneralNameValue::Oid(C509oid::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1))),
-        ));
+        let gns = GeneralNames::new()
+            .add(GeneralName::new(
+                GeneralNameRegistry::DNSName,
+                GeneralNameValue::Text("example.com".to_string()),
+            ))
+            .add(GeneralName::new(
+                GeneralNameRegistry::OtherNameHardwareModuleName,
+                GeneralNameValue::OtherNameHWModuleName(OtherNameHardwareModuleName::new(
+                    oid!(2.16.840 .1 .101 .3 .4 .2 .1),
+                    vec![0x01, 0x02, 0x03, 0x04],
+                )),
+            ))
+            .add(GeneralName::new(
+                GeneralNameRegistry::IPAddress,
+                GeneralNameValue::Bytes(Ipv4Addr::new(192, 168, 1, 1).octets().to_vec()),
+            ))
+            .add(GeneralName::new(
+                GeneralNameRegistry::RegisteredID,
+                GeneralNameValue::Oid(C509oid::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1))),
+            ));
         gns.encode(&mut encoder, &mut ())
             .expect("Failed to encode GeneralNames");
         assert_eq!(hex::encode(buffer.clone()), "84026b6578616d706c652e636f6d20824960864801650304020144010203040744c0a801010849608648016503040201");
