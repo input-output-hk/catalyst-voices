@@ -37,7 +37,8 @@ impl GeneralNames {
     }
 
     /// Add a new `GeneralName` to the `GeneralNames`.
-    pub fn add(mut self, gn: GeneralName) -> Self {
+    #[must_use]
+    pub fn add_gn(mut self, gn: GeneralName) -> Self {
         self.general_names.push(gn);
         self
     }
@@ -72,7 +73,7 @@ impl Decode<'_, ()> for GeneralNames {
         ))?;
         let mut gn = GeneralNames::new();
         for _ in 0..len {
-            gn = gn.add(GeneralName::decode(d, ctx)?);
+            gn = gn.add_gn(GeneralName::decode(d, ctx)?);
         }
         Ok(gn)
     }
@@ -98,22 +99,22 @@ mod test_general_names {
         let mut encoder = Encoder::new(&mut buffer);
 
         let gns = GeneralNames::new()
-            .add(GeneralName::new(
+            .add_gn(GeneralName::new(
                 GeneralNameRegistry::DNSName,
                 GeneralNameValue::Text("example.com".to_string()),
             ))
-            .add(GeneralName::new(
+            .add_gn(GeneralName::new(
                 GeneralNameRegistry::OtherNameHardwareModuleName,
                 GeneralNameValue::OtherNameHWModuleName(OtherNameHardwareModuleName::new(
                     oid!(2.16.840 .1 .101 .3 .4 .2 .1),
                     vec![0x01, 0x02, 0x03, 0x04],
                 )),
             ))
-            .add(GeneralName::new(
+            .add_gn(GeneralName::new(
                 GeneralNameRegistry::IPAddress,
                 GeneralNameValue::Bytes(Ipv4Addr::new(192, 168, 1, 1).octets().to_vec()),
             ))
-            .add(GeneralName::new(
+            .add_gn(GeneralName::new(
                 GeneralNameRegistry::RegisteredID,
                 GeneralNameValue::Oid(C509oid::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1))),
             ));
