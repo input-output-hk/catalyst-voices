@@ -51,8 +51,9 @@ impl Extensions {
     }
 
     /// Add an `Extension` to the `Extensions`.
-    pub fn add(&mut self, extension: Extension) {
+    pub fn add(mut self, extension: Extension) -> Self {
         self.extensions.push(extension);
+        self
     }
 }
 
@@ -111,19 +112,16 @@ impl Decode<'_, ()> for Extensions {
             } else {
                 decoded_extension
             };
-            let mut extensions = Extensions::new();
-            let () = extensions.add(extension);
-            return Ok(extensions);
+            return Ok(Extensions::new().add(extension));
         }
         // Handle array of extensions
         let len = d
             .array()?
             .ok_or_else(|| minicbor::decode::Error::message("Failed to get array length"))?;
         let mut extensions = Extensions::new();
-
         for _ in 0..len {
             let extension = Extension::decode(d, &mut ())?;
-            let () = extensions.add(extension);
+            extensions = extensions.add(extension);
         }
 
         Ok(extensions)
@@ -141,8 +139,7 @@ mod test_extensions {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
-        let mut exts = Extensions::new();
-        let () = exts.add(Extension::new(oid!(2.5.29 .15), ExtensionValue::Int(2)));
+        let exts = Extensions::new().add(Extension::new(oid!(2.5.29 .15), ExtensionValue::Int(2)));
         exts.encode(&mut encoder, &mut ())
             .expect("Failed to encode Extensions");
         // 1 extension
@@ -160,8 +157,8 @@ mod test_extensions {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
-        let mut exts = Extensions::new();
-        let () = exts.add(Extension::new(oid!(2.5.29 .15), ExtensionValue::Int(2)).set_critical());
+        let exts = Extensions::new()
+            .add(Extension::new(oid!(2.5.29 .15), ExtensionValue::Int(2)).set_critical());
         exts.encode(&mut encoder, &mut ())
             .expect("Failed to encode Extensions");
         // 1 extension
@@ -179,12 +176,12 @@ mod test_extensions {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
-        let mut exts = Extensions::new();
-        let () = exts.add(Extension::new(oid!(2.5.29 .15), ExtensionValue::Int(2)));
-        let () = exts.add(Extension::new(
-            oid!(2.5.29 .14),
-            ExtensionValue::Bytes([1, 2, 3, 4].to_vec()),
-        ));
+        let exts = Extensions::new()
+            .add(Extension::new(oid!(2.5.29 .15), ExtensionValue::Int(2)))
+            .add(Extension::new(
+                oid!(2.5.29 .14),
+                ExtensionValue::Bytes([1, 2, 3, 4].to_vec()),
+            ));
         exts.encode(&mut encoder, &mut ())
             .expect("Failed to encode Extensions");
 
