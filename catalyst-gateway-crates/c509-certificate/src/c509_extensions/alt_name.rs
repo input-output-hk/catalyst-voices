@@ -85,7 +85,7 @@ mod test_alt_name {
     fn encode_only_dns() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
-        let gns = GeneralNames::new().add(GeneralName::new(
+        let gns = GeneralNames::new().add_gn(GeneralName::new(
             GeneralNameRegistry::DNSName,
             GeneralNameValue::Text("example.com".to_string()),
         ));

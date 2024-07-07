@@ -51,7 +51,8 @@ impl Extensions {
     }
 
     /// Add an `Extension` to the `Extensions`.
-    pub fn add(mut self, extension: Extension) -> Self {
+    #[must_use]
+    pub fn add_ext(mut self, extension: Extension) -> Self {
         self.extensions.push(extension);
         self
     }
@@ -112,7 +113,7 @@ impl Decode<'_, ()> for Extensions {
             } else {
                 decoded_extension
             };
-            return Ok(Extensions::new().add(extension));
+            return Ok(Extensions::new().add_ext(extension));
         }
         // Handle array of extensions
         let len = d
@@ -121,7 +122,7 @@ impl Decode<'_, ()> for Extensions {
         let mut extensions = Extensions::new();
         for _ in 0..len {
             let extension = Extension::decode(d, &mut ())?;
-            extensions = extensions.add(extension);
+            extensions = extensions.add_ext(extension);
         }
 
         Ok(extensions)
@@ -139,7 +140,8 @@ mod test_extensions {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
-        let exts = Extensions::new().add(Extension::new(oid!(2.5.29 .15), ExtensionValue::Int(2)));
+        let exts =
+            Extensions::new().add_ext(Extension::new(oid!(2.5.29 .15), ExtensionValue::Int(2)));
         exts.encode(&mut encoder, &mut ())
             .expect("Failed to encode Extensions");
         // 1 extension
@@ -158,7 +160,7 @@ mod test_extensions {
         let mut encoder = Encoder::new(&mut buffer);
 
         let exts = Extensions::new()
-            .add(Extension::new(oid!(2.5.29 .15), ExtensionValue::Int(2)).set_critical());
+            .add_ext(Extension::new(oid!(2.5.29 .15), ExtensionValue::Int(2)).set_critical());
         exts.encode(&mut encoder, &mut ())
             .expect("Failed to encode Extensions");
         // 1 extension
@@ -177,8 +179,8 @@ mod test_extensions {
         let mut encoder = Encoder::new(&mut buffer);
 
         let exts = Extensions::new()
-            .add(Extension::new(oid!(2.5.29 .15), ExtensionValue::Int(2)))
-            .add(Extension::new(
+            .add_ext(Extension::new(oid!(2.5.29 .15), ExtensionValue::Int(2)))
+            .add_ext(Extension::new(
                 oid!(2.5.29 .14),
                 ExtensionValue::Bytes([1, 2, 3, 4].to_vec()),
             ));
