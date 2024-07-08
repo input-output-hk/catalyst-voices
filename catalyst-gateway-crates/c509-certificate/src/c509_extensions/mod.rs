@@ -208,7 +208,7 @@ mod test_extensions {
 
         let exts = Extensions::new();
         exts.encode(&mut encoder, &mut ())
-        .expect("Failed to encode Extensions");
+            .expect("Failed to encode Extensions");
         assert_eq!(hex::encode(buffer.clone()), "80");
 
         let mut decoder = Decoder::new(&buffer);
