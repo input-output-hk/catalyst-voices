@@ -28,6 +28,7 @@ pub struct Attribute {
 
 impl Attribute {
     /// Create a new instance of `Attribute`.
+    #[must_use]
     pub fn new(oid: Oid<'static>) -> Self {
         Self {
             registered_oid: C509oidRegistered::new(oid, ATTRIBUTES_TABLES.get_int_to_oid_table()),
@@ -42,12 +43,12 @@ impl Attribute {
     }
 
     /// Get the registered OID of `Attribute`.
-    pub fn get_registered_oid(&self) -> &C509oidRegistered {
+    pub(crate) fn get_registered_oid(&self) -> &C509oidRegistered {
         &self.registered_oid
     }
 
     /// Get the value of `Attribute`.
-    pub fn get_value(&self) -> &Vec<TextOrBytes> {
+    pub(crate) fn get_value(&self) -> &Vec<TextOrBytes> {
         &self.value
     }
 

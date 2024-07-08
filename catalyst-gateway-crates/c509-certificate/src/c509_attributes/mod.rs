@@ -27,6 +27,7 @@ impl Default for Attributes {
 
 impl Attributes {
     /// Create a new instance of `Attributes` as empty vector.
+    #[must_use]
     pub fn new() -> Self {
         Self(Vec::new())
     }
