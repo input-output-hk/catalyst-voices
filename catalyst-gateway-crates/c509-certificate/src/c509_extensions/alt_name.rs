@@ -93,7 +93,7 @@ impl Decode<'_, ()> for GeneralNamesOrText {
 mod test_alt_name {
     use super::*;
     use crate::c509_general_names::general_name::{
-        GeneralName, GeneralNameRegistry, GeneralNameValue,
+        GeneralName, GeneralNameTypeRegistry, GeneralNameValue,
     };
 
     #[test]
@@ -102,7 +102,7 @@ mod test_alt_name {
         let mut encoder = Encoder::new(&mut buffer);
         let mut gns = GeneralNames::new();
         gns.add_gn(GeneralName::new(
-            GeneralNameRegistry::DNSName,
+            GeneralNameTypeRegistry::DNSName,
             GeneralNameValue::Text("example.com".to_string()),
         ));
         let alt_name = AlternativeName::new(GeneralNamesOrText::GeneralNames(gns));

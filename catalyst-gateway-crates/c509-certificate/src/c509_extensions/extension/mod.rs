@@ -52,13 +52,6 @@ impl Extension {
     pub fn get_registered_oid(&self) -> &C509oidRegistered {
         &self.registered_oid
     }
-
-    /// Set the critical flag of the `Extension`.
-    #[must_use]
-    pub fn set_critical(mut self) -> Self {
-        self.critical = true;
-        self
-    }
 }
 
 impl Encode<()> for Extension {

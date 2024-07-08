@@ -80,7 +80,7 @@ mod test_general_names {
     use std::net::Ipv4Addr;
 
     use asn1_rs::oid;
-    use general_name::{GeneralNameRegistry, GeneralNameValue};
+    use general_name::{GeneralNameTypeRegistry, GeneralNameValue};
     use other_name_hw_module::OtherNameHardwareModuleName;
 
     use super::*;
@@ -93,22 +93,22 @@ mod test_general_names {
 
         let mut gns = GeneralNames::new();
         gns.add_gn(GeneralName::new(
-            GeneralNameRegistry::DNSName,
+            GeneralNameTypeRegistry::DNSName,
             GeneralNameValue::Text("example.com".to_string()),
         ));
         gns.add_gn(GeneralName::new(
-            GeneralNameRegistry::OtherNameHardwareModuleName,
+            GeneralNameTypeRegistry::OtherNameHardwareModuleName,
             GeneralNameValue::OtherNameHWModuleName(OtherNameHardwareModuleName::new(
                 oid!(2.16.840 .1 .101 .3 .4 .2 .1),
                 vec![0x01, 0x02, 0x03, 0x04],
             )),
         ));
         gns.add_gn(GeneralName::new(
-            GeneralNameRegistry::IPAddress,
+            GeneralNameTypeRegistry::IPAddress,
             GeneralNameValue::Bytes(Ipv4Addr::new(192, 168, 1, 1).octets().to_vec()),
         ));
         gns.add_gn(GeneralName::new(
-            GeneralNameRegistry::RegisteredID,
+            GeneralNameTypeRegistry::RegisteredID,
             GeneralNameValue::Oid(C509oid::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1))),
         ));
         gns.encode(&mut encoder, &mut ())

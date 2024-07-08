@@ -18,9 +18,9 @@ use crate::c509_oid::C509oid;
 /// ```
 #[derive(Debug, Clone, PartialEq)]
 pub struct GeneralName {
-    /// An enum of registered `GeneralName`.
-    gn: GeneralNameRegistry,
-    /// The value of the `GeneralName` in `GeneralNameValue`.
+    /// A registered general name type.
+    gn: GeneralNameTypeRegistry,
+    /// A general name value.
     value: GeneralNameValue,
 }
 
@@ -28,13 +28,13 @@ pub struct GeneralName {
 impl GeneralName {
     /// Create a new instance of `GeneralName`.
     #[must_use]
-    pub fn new(gn: GeneralNameRegistry, value: GeneralNameValue) -> Self {
+    pub fn new(gn: GeneralNameTypeRegistry, value: GeneralNameValue) -> Self {
         Self { gn, value }
     }
 
     /// Get the `GeneralName` type.
     #[must_use]
-    pub fn get_gn(&self) -> &GeneralNameRegistry {
+    pub fn get_gn(&self) -> &GeneralNameTypeRegistry {
         &self.gn
     }
 
@@ -93,12 +93,12 @@ impl Decode<'_, ()> for GeneralName {
     }
 }
 
-// -----------------GeneralNameRegistry------------------------
+// -----------------GeneralNameTypeRegistry------------------------
 
 /// Enum of `GeneralName` registered in table Section 9.9 C509.
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Copy, PartialEq, Clone, Eq, Hash, EnumIs)]
-pub enum GeneralNameRegistry {
+pub enum GeneralNameTypeRegistry {
     /// An otherName with `BundleEID`.
     OtherNameBundleEID, // EID
     /// An otherName with `SmtpUTF8Mailbox`.
@@ -121,8 +121,8 @@ pub enum GeneralNameRegistry {
     RegisteredID,
 }
 
-impl GeneralNameRegistry {
-    /// Get the integer value associated with the `GeneralNameRegistry`.
+impl GeneralNameTypeRegistry {
+    /// Get the integer value associated with the `GeneralNameTypeRegistry`.
     pub(crate) fn get_int(self) -> Result<i16, Error> {
         let i = GENERAL_NAME_TABLES
             .get_int_to_name_table()
@@ -238,7 +238,7 @@ mod test_general_name {
         let mut encoder = Encoder::new(&mut buffer);
 
         let gn = GeneralName::new(
-            GeneralNameRegistry::DNSName,
+            GeneralNameTypeRegistry::DNSName,
             GeneralNameValue::Text("example.com".to_string()),
         );
         gn.encode(&mut encoder, &mut ())
@@ -262,7 +262,7 @@ mod test_general_name {
             0x01, 0x02, 0x03, 0x04,
         ]);
         let gn = GeneralName::new(
-            GeneralNameRegistry::OtherNameHardwareModuleName,
+            GeneralNameTypeRegistry::OtherNameHardwareModuleName,
             GeneralNameValue::OtherNameHWModuleName(hw),
         );
         gn.encode(&mut encoder, &mut ())
@@ -287,7 +287,7 @@ mod test_general_name {
 
         let ipv4 = Ipv4Addr::new(192, 168, 1, 1);
         let gn = GeneralName::new(
-            GeneralNameRegistry::IPAddress,
+            GeneralNameTypeRegistry::IPAddress,
             GeneralNameValue::Bytes(ipv4.octets().to_vec()),
         );
 
@@ -309,7 +309,7 @@ mod test_general_name {
         let mut encoder = Encoder::new(&mut buffer);
 
         let gn = GeneralName::new(
-            GeneralNameRegistry::RegisteredID,
+            GeneralNameTypeRegistry::RegisteredID,
             GeneralNameValue::Oid(C509oid::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1))),
         );
         gn.encode(&mut encoder, &mut ())
@@ -330,7 +330,7 @@ mod test_general_name {
         let mut encoder = Encoder::new(&mut buffer);
 
         let gn = GeneralName::new(
-            GeneralNameRegistry::OtherNameSmtpUTF8Mailbox,
+            GeneralNameTypeRegistry::OtherNameSmtpUTF8Mailbox,
             GeneralNameValue::Oid(C509oid::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1))),
         );
         gn.encode(&mut encoder, &mut ())

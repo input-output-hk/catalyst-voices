@@ -7,66 +7,66 @@ use std::collections::HashMap;
 use bimap::BiMap;
 use once_cell::sync::Lazy;
 
-use super::general_name::{GeneralNameRegistry, GeneralNameValueType};
+use super::general_name::{GeneralNameTypeRegistry, GeneralNameValueType};
 use crate::tables::{IntTable, TableTrait};
 
 /// Type of `GeneralName` data.
 /// Int | Name | Type
-type GeneralNameDataTuple = (i16, GeneralNameRegistry, GeneralNameValueType);
+type GeneralNameDataTuple = (i16, GeneralNameTypeRegistry, GeneralNameValueType);
 
 /// `GeneralName` data table.
 const GENERAL_NAME_DATA: [GeneralNameDataTuple; 10] = [
     (
         -3,
-        GeneralNameRegistry::OtherNameBundleEID,
+        GeneralNameTypeRegistry::OtherNameBundleEID,
         GeneralNameValueType::Unsupported,
     ),
     (
         -2,
-        GeneralNameRegistry::OtherNameSmtpUTF8Mailbox,
+        GeneralNameTypeRegistry::OtherNameSmtpUTF8Mailbox,
         GeneralNameValueType::Text,
     ),
     (
         -1,
-        GeneralNameRegistry::OtherNameHardwareModuleName,
+        GeneralNameTypeRegistry::OtherNameHardwareModuleName,
         GeneralNameValueType::OtherNameHWModuleName,
     ),
     (
         0,
-        GeneralNameRegistry::OtherName,
+        GeneralNameTypeRegistry::OtherName,
         GeneralNameValueType::OtherNameHWModuleName,
     ),
     (
         1,
-        GeneralNameRegistry::Rfc822Name,
+        GeneralNameTypeRegistry::Rfc822Name,
         GeneralNameValueType::Text,
     ),
-    (2, GeneralNameRegistry::DNSName, GeneralNameValueType::Text),
+    (2, GeneralNameTypeRegistry::DNSName, GeneralNameValueType::Text),
     (
         4,
-        GeneralNameRegistry::DirectoryName,
+        GeneralNameTypeRegistry::DirectoryName,
         GeneralNameValueType::Unsupported,
     ),
     (
         6,
-        GeneralNameRegistry::UniformResourceIdentifier,
+        GeneralNameTypeRegistry::UniformResourceIdentifier,
         GeneralNameValueType::Text,
     ),
     (
         7,
-        GeneralNameRegistry::IPAddress,
+        GeneralNameTypeRegistry::IPAddress,
         GeneralNameValueType::Bytes,
     ),
     (
         8,
-        GeneralNameRegistry::RegisteredID,
+        GeneralNameTypeRegistry::RegisteredID,
         GeneralNameValueType::Oid,
     ),
 ];
 
 /// A struct of data that contains lookup table for `GeneralName`.
 pub(crate) struct GeneralNameData {
-    /// A table of integer to `GeneralNameRegistry`, provide a bidirectional lookup.
+    /// A table of integer to `GeneralNameTypeRegistry`, provide a bidirectional lookup.
     int_to_name_table: IntegerToGNTable,
     /// A table of integer to `GeneralNameValueType`, provide a lookup for the type of
     /// `GeneralName` value.
@@ -85,23 +85,23 @@ impl GeneralNameData {
     }
 }
 
-/// A struct of integer to `GeneralNameRegistry` table.
+/// A struct of integer to `GeneralNameTypeRegistry` table.
 #[derive(Debug, Clone, PartialEq)]
-pub(crate) struct IntegerToGNTable(IntTable<GeneralNameRegistry>);
+pub(crate) struct IntegerToGNTable(IntTable<GeneralNameTypeRegistry>);
 
 impl IntegerToGNTable {
     /// Create a new instance of `IntegerToGNTable`.
     pub(crate) fn new() -> Self {
-        Self(IntTable::<GeneralNameRegistry>::new())
+        Self(IntTable::<GeneralNameTypeRegistry>::new())
     }
 
-    /// Add a new integer to `GeneralNameRegistry` map table.
-    pub(crate) fn add(&mut self, k: i16, v: GeneralNameRegistry) {
+    /// Add a new integer to `GeneralNameTypeRegistry` map table.
+    pub(crate) fn add(&mut self, k: i16, v: GeneralNameTypeRegistry) {
         self.0.add(k, v);
     }
 
-    /// Get the map table of integer to `GeneralNameRegistry`.
-    pub(crate) fn get_map(&self) -> &BiMap<i16, GeneralNameRegistry> {
+    /// Get the map table of integer to `GeneralNameTypeRegistry`.
+    pub(crate) fn get_map(&self) -> &BiMap<i16, GeneralNameTypeRegistry> {
         self.0.get_map()
     }
 }
