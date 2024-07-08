@@ -19,7 +19,7 @@ use crate::c509_oid::C509oid;
 #[derive(Debug, Clone, PartialEq)]
 pub struct GeneralName {
     /// A registered general name type.
-    gn: GeneralNameTypeRegistry,
+    gn_type: GeneralNameTypeRegistry,
     /// A general name value.
     value: GeneralNameValue,
 }
@@ -28,14 +28,14 @@ pub struct GeneralName {
 impl GeneralName {
     /// Create a new instance of `GeneralName`.
     #[must_use]
-    pub fn new(gn: GeneralNameTypeRegistry, value: GeneralNameValue) -> Self {
-        Self { gn, value }
+    pub fn new(gn_type: GeneralNameTypeRegistry, value: GeneralNameValue) -> Self {
+        Self { gn_type, value }
     }
 
     /// Get the `GeneralName` type.
     #[must_use]
-    pub fn get_gn(&self) -> &GeneralNameTypeRegistry {
-        &self.gn
+    pub fn get_gn_type(&self) -> &GeneralNameTypeRegistry {
+        &self.gn_type
     }
 
     /// Get the value of the `GeneralName` in `GeneralNameValue`.
@@ -51,7 +51,7 @@ impl Encode<()> for GeneralName {
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
         // Encode GeneralNameType as int
         let i = self
-            .gn
+            .gn_type
             .get_int()
             .map_err(minicbor::encode::Error::message)?;
         e.i16(i)?;

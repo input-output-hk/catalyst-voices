@@ -54,7 +54,7 @@ impl Encode<()> for GeneralNamesOrText {
                     .first()
                     .ok_or(minicbor::encode::Error::message("GeneralNames is empty"))?;
                 // Check whether there is only 1 item in the array which is a DNSName
-                if gns.get_gns().len() == 1 && gn.get_gn().is_dns_name() {
+                if gns.get_gns().len() == 1 && gn.get_gn_type().is_dns_name() {
                     gn.get_gn_value().encode(e, ctx)?;
                 } else {
                     gns.encode(e, ctx)?;
