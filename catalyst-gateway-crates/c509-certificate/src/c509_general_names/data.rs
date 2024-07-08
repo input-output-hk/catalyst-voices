@@ -41,7 +41,11 @@ const GENERAL_NAME_DATA: [GeneralNameDataTuple; 10] = [
         GeneralNameTypeRegistry::Rfc822Name,
         GeneralNameValueType::Text,
     ),
-    (2, GeneralNameTypeRegistry::DNSName, GeneralNameValueType::Text),
+    (
+        2,
+        GeneralNameTypeRegistry::DNSName,
+        GeneralNameValueType::Text,
+    ),
     (
         4,
         GeneralNameTypeRegistry::DirectoryName,
