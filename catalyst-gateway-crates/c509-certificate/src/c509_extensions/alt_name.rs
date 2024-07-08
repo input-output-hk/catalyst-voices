@@ -5,6 +5,35 @@ use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 
 use crate::c509_general_names::GeneralNames;
 
+/// Alternative Name extension.
+/// Can be interpreted as a `GeneralNames / text`
+#[derive(Debug, Clone, PartialEq)]
+pub struct AlternativeName(GeneralNamesOrText);
+
+impl AlternativeName {
+    /// Create a new instance of `AlternativeName` given value.
+    #[must_use]
+    pub fn new(value: GeneralNamesOrText) -> Self {
+        Self(value)
+    }
+}
+
+impl Encode<()> for AlternativeName {
+    fn encode<W: Write>(
+        &self, e: &mut Encoder<W>, ctx: &mut (),
+    ) -> Result<(), minicbor::encode::Error<W::Error>> {
+        self.0.encode(e, ctx)
+    }
+}
+
+impl Decode<'_, ()> for AlternativeName {
+    fn decode(d: &mut Decoder<'_>, ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
+        GeneralNamesOrText::decode(d, ctx).map(AlternativeName::new)
+    }
+}
+
+// ------------------GeneralNamesOrText--------------------
+
 /// Enum for type that can be a `GeneralNames` or a text use in `AlternativeName`.
 #[derive(Debug, Clone, PartialEq)]
 pub enum GeneralNamesOrText {
@@ -55,35 +84,6 @@ impl Decode<'_, ()> for GeneralNamesOrText {
                 ))
             },
         }
-    }
-}
-
-// ------------------AlternativeName--------------------
-
-/// Alternative Name extension.
-/// Can be interpreted as a `GeneralNames / text`
-#[derive(Debug, Clone, PartialEq)]
-pub struct AlternativeName(GeneralNamesOrText);
-
-impl AlternativeName {
-    /// Create a new instance of `AlternativeName` given value.
-    #[must_use]
-    pub fn new(value: GeneralNamesOrText) -> Self {
-        Self(value)
-    }
-}
-
-impl Encode<()> for AlternativeName {
-    fn encode<W: Write>(
-        &self, e: &mut Encoder<W>, ctx: &mut (),
-    ) -> Result<(), minicbor::encode::Error<W::Error>> {
-        self.0.encode(e, ctx)
-    }
-}
-
-impl Decode<'_, ()> for AlternativeName {
-    fn decode(d: &mut Decoder<'_>, ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
-        GeneralNamesOrText::decode(d, ctx).map(AlternativeName::new)
     }
 }
 
