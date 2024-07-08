@@ -8,7 +8,7 @@ use data::EXTENSIONS_TABLES;
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 use strum_macros::EnumDiscriminants;
 
-use super::alt_name::AltName;
+use super::alt_name::AlternativeName;
 use crate::c509_oid::{C509oid, C509oidRegistered};
 
 /// A struct of C509 `Extension`
@@ -25,13 +25,12 @@ pub struct Extension {
 
 impl Extension {
     /// Create a new instance of `Extension` using `OID` and value.
-    /// Critical flag is originally set to false.
     #[must_use]
-    pub fn new(oid: Oid<'static>, value: ExtensionValue) -> Self {
-        Extension {
+    pub fn new(oid: Oid<'static>, value: ExtensionValue, critical: bool) -> Self {
+        Self {
             registered_oid: C509oidRegistered::new(oid, EXTENSIONS_TABLES.get_int_to_oid_table())
                 .pen_encoded(),
-            critical: false,
+            critical,
             value,
         }
     }
@@ -131,13 +130,11 @@ impl Decode<'_, ()> for Extension {
                     })?;
 
                 let extension_value = ExtensionValue::decode(d, &mut value_type.get_type())?;
-                // Set the critical flag to true if the OID is negative
-                let extension = if int_value.is_positive() {
-                    Extension::new(oid.to_owned(), extension_value)
-                } else {
-                    Extension::new(oid.to_owned(), extension_value).set_critical()
-                };
-                Ok(extension)
+                Ok(Extension::new(
+                    oid.to_owned(),
+                    extension_value,
+                    int_value.is_negative(),
+                ))
             },
             _ => {
                 // Handle unwrapped CBOR OID or CBOR PEN
@@ -152,13 +149,11 @@ impl Decode<'_, ()> for Extension {
                 // Decode bytes for extension value
                 let extension_value = ExtensionValue::Bytes(d.bytes()?.to_vec());
 
-                // Create extension with or without critical flag
-                let extension = if critical {
-                    Extension::new(c509_oid.get_oid(), extension_value).set_critical()
-                } else {
-                    Extension::new(c509_oid.get_oid(), extension_value)
-                };
-                Ok(extension)
+                Ok(Extension::new(
+                    c509_oid.get_oid(),
+                    extension_value,
+                    critical,
+                ))
             },
         }
     }
@@ -182,7 +177,7 @@ pub enum ExtensionValue {
     /// A bytes.
     Bytes(Vec<u8>),
     /// An Alternative Name.
-    AltName(AltName),
+    AlternativeName(AlternativeName),
     /// An unsupported value.
     Unsupported,
 }
@@ -204,7 +199,7 @@ impl Encode<()> for ExtensionValue {
             ExtensionValue::Bytes(value) => {
                 e.bytes(value)?;
             },
-            ExtensionValue::AltName(value) => {
+            ExtensionValue::AlternativeName(value) => {
                 value.encode(e, ctx)?;
             },
             ExtensionValue::Unsupported => {
@@ -230,9 +225,9 @@ where C: ExtensionValueTypeTrait + Debug
                 let value = d.bytes()?.to_vec();
                 Ok(ExtensionValue::Bytes(value))
             },
-            ExtensionValueType::AltName => {
-                let value = AltName::decode(d, &mut ())?;
-                Ok(ExtensionValue::AltName(value))
+            ExtensionValueType::AlternativeName => {
+                let value = AlternativeName::decode(d, &mut ())?;
+                Ok(ExtensionValue::AlternativeName(value))
             },
             ExtensionValueType::Unsupported => {
                 Err(minicbor::decode::Error::message(
@@ -256,7 +251,7 @@ mod test_extension {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
-        let ext = Extension::new(oid!(2.5.29 .54), ExtensionValue::Int(2));
+        let ext = Extension::new(oid!(2.5.29 .54), ExtensionValue::Int(2), false);
         ext.encode(&mut encoder, &mut ())
             .expect("Failed to encode Extension");
         // Inhibit anyPolicy : 0x181e
@@ -274,7 +269,7 @@ mod test_extension {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
-        let ext = Extension::new(oid!(2.5.29 .15), ExtensionValue::Int(-1)).set_critical();
+        let ext = Extension::new(oid!(2.5.29 .15), ExtensionValue::Int(-1), true);
         ext.encode(&mut encoder, &mut ())
             .expect("Failed to encode Extension");
         // Key Usage with critical true: 0x21
@@ -297,6 +292,7 @@ mod test_extension {
         let ext = Extension::new(
             oid!(2.16.840 .1 .101 .3 .4 .2 .1),
             ExtensionValue::Bytes("test".as_bytes().to_vec()),
+            false,
         );
         ext.encode(&mut encoder, &mut ())
             .expect("Failed to encode Extension");
@@ -319,7 +315,7 @@ mod test_extension {
         let mut encoder = Encoder::new(&mut buffer);
 
         // Subject Key Identifier should be bytes
-        let ext = Extension::new(oid!(2.5.29 .14), ExtensionValue::Int(2));
+        let ext = Extension::new(oid!(2.5.29 .14), ExtensionValue::Int(2), false);
         ext.encode(&mut encoder, &mut ())
             .expect("Failed to encode Extension");
         // Key Usage : 0x15

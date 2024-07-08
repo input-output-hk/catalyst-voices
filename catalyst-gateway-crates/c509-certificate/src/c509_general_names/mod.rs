@@ -16,10 +16,7 @@ use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 /// GeneralNames = [ + GeneralName ]
 /// ```
 #[derive(Debug, Clone, PartialEq)]
-pub struct GeneralNames {
-    /// The array of `GeneralName`.
-    general_names: Vec<GeneralName>,
-}
+pub struct GeneralNames(Vec<GeneralName>);
 
 impl Default for GeneralNames {
     fn default() -> Self {
@@ -31,21 +28,17 @@ impl GeneralNames {
     /// Create a new instance of `GeneralNames` as empty vector.
     #[must_use]
     pub fn new() -> Self {
-        Self {
-            general_names: Vec::new(),
-        }
+        Self(Vec::new())
     }
 
     /// Add a new `GeneralName` to the `GeneralNames`.
-    #[must_use]
-    pub fn add_gn(mut self, gn: GeneralName) -> Self {
-        self.general_names.push(gn);
-        self
+    pub fn add_gn(&mut self, gn: GeneralName) {
+        self.0.push(gn);
     }
 
     /// Get the a vector of `GeneralName`.
     pub(crate) fn get_gns(&self) -> &Vec<GeneralName> {
-        &self.general_names
+        &self.0
     }
 }
 
@@ -53,13 +46,13 @@ impl Encode<()> for GeneralNames {
     fn encode<W: Write>(
         &self, e: &mut Encoder<W>, ctx: &mut (),
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
-        if self.general_names.is_empty() {
+        if self.0.is_empty() {
             return Err(minicbor::encode::Error::message(
                 "GeneralNames should not be empty",
             ));
         }
-        e.array(self.general_names.len() as u64)?;
-        for gn in &self.general_names {
+        e.array(self.0.len() as u64)?;
+        for gn in &self.0 {
             gn.encode(e, ctx)?;
         }
         Ok(())
@@ -73,7 +66,7 @@ impl Decode<'_, ()> for GeneralNames {
         ))?;
         let mut gn = GeneralNames::new();
         for _ in 0..len {
-            gn = gn.add_gn(GeneralName::decode(d, ctx)?);
+            gn.add_gn(GeneralName::decode(d, ctx)?);
         }
         Ok(gn)
     }
@@ -98,26 +91,26 @@ mod test_general_names {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
-        let gns = GeneralNames::new()
-            .add_gn(GeneralName::new(
-                GeneralNameRegistry::DNSName,
-                GeneralNameValue::Text("example.com".to_string()),
-            ))
-            .add_gn(GeneralName::new(
-                GeneralNameRegistry::OtherNameHardwareModuleName,
-                GeneralNameValue::OtherNameHWModuleName(OtherNameHardwareModuleName::new(
-                    oid!(2.16.840 .1 .101 .3 .4 .2 .1),
-                    vec![0x01, 0x02, 0x03, 0x04],
-                )),
-            ))
-            .add_gn(GeneralName::new(
-                GeneralNameRegistry::IPAddress,
-                GeneralNameValue::Bytes(Ipv4Addr::new(192, 168, 1, 1).octets().to_vec()),
-            ))
-            .add_gn(GeneralName::new(
-                GeneralNameRegistry::RegisteredID,
-                GeneralNameValue::Oid(C509oid::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1))),
-            ));
+        let mut gns = GeneralNames::new();
+        gns.add_gn(GeneralName::new(
+            GeneralNameRegistry::DNSName,
+            GeneralNameValue::Text("example.com".to_string()),
+        ));
+        gns.add_gn(GeneralName::new(
+            GeneralNameRegistry::OtherNameHardwareModuleName,
+            GeneralNameValue::OtherNameHWModuleName(OtherNameHardwareModuleName::new(
+                oid!(2.16.840 .1 .101 .3 .4 .2 .1),
+                vec![0x01, 0x02, 0x03, 0x04],
+            )),
+        ));
+        gns.add_gn(GeneralName::new(
+            GeneralNameRegistry::IPAddress,
+            GeneralNameValue::Bytes(Ipv4Addr::new(192, 168, 1, 1).octets().to_vec()),
+        ));
+        gns.add_gn(GeneralName::new(
+            GeneralNameRegistry::RegisteredID,
+            GeneralNameValue::Oid(C509oid::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1))),
+        ));
         gns.encode(&mut encoder, &mut ())
             .expect("Failed to encode GeneralNames");
         assert_eq!(hex::encode(buffer.clone()), "84026b6578616d706c652e636f6d20824960864801650304020144010203040744c0a801010849608648016503040201");

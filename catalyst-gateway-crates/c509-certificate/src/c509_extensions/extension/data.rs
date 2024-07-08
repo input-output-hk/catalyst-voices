@@ -26,7 +26,7 @@ const EXTENSION_DATA: [ExtensionDataTuple; 25] = [
     (
         3,
         oid!(2.5.29 .17),
-        ExtensionValueType::AltName,
+        ExtensionValueType::AlternativeName,
         "Subject Alternative Name",
     ),
     (
@@ -80,7 +80,7 @@ const EXTENSION_DATA: [ExtensionDataTuple; 25] = [
     (
         25,
         oid!(2.5.29 .18),
-        ExtensionValueType::AltName,
+        ExtensionValueType::AlternativeName,
         "Issuer Alternative Name",
     ),
     (

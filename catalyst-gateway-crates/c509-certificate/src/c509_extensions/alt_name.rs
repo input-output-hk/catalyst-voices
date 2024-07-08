@@ -5,7 +5,7 @@ use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 
 use crate::c509_general_names::GeneralNames;
 
-/// Enum for type that can be a `GeneralNames` or a text.
+/// Enum for type that can be a `GeneralNames` or a text use in `AlternativeName`.
 #[derive(Debug, Clone, PartialEq)]
 pub enum GeneralNamesOrText {
     /// A value of `GeneralNames`.
@@ -14,27 +14,11 @@ pub enum GeneralNamesOrText {
     Text(String),
 }
 
-/// Alternative Name extension.
-/// Can be interpreted as a `GeneralNames / text`
-#[derive(Debug, Clone, PartialEq)]
-pub struct AltName {
-    /// A value of alternative name that can be either a `GeneralNames` or a text.
-    value: GeneralNamesOrText,
-}
-
-impl AltName {
-    /// Create a new instance of `AltName` given value.
-    #[must_use]
-    pub fn new(value: GeneralNamesOrText) -> Self {
-        Self { value }
-    }
-}
-
-impl Encode<()> for AltName {
+impl Encode<()> for GeneralNamesOrText {
     fn encode<W: Write>(
         &self, e: &mut Encoder<W>, ctx: &mut (),
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
-        match &self.value {
+        match self {
             GeneralNamesOrText::GeneralNames(gns) => {
                 let gn = gns
                     .get_gns()
@@ -55,20 +39,51 @@ impl Encode<()> for AltName {
     }
 }
 
-impl Decode<'_, ()> for AltName {
+impl Decode<'_, ()> for GeneralNamesOrText {
     fn decode(d: &mut Decoder<'_>, ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
         // FIXME - can't distinguish between GeneralNames(only DNSName) and Text
         match d.datatype()? {
-            minicbor::data::Type::String => {
-                let text = d.str()?;
-                Ok(AltName::new(GeneralNamesOrText::Text(text.to_string())))
-            },
+            minicbor::data::Type::String => Ok(GeneralNamesOrText::Text(d.str()?.to_string())),
             minicbor::data::Type::Array => {
-                let gns = GeneralNames::decode(d, ctx)?;
-                Ok(AltName::new(GeneralNamesOrText::GeneralNames(gns)))
+                Ok(GeneralNamesOrText::GeneralNames(GeneralNames::decode(
+                    d, ctx,
+                )?))
             },
-            _ => Err(minicbor::decode::Error::message("Invalid type for AltName")),
+            _ => {
+                Err(minicbor::decode::Error::message(
+                    "Invalid type for AlternativeName",
+                ))
+            },
         }
+    }
+}
+
+// ------------------AlternativeName--------------------
+
+/// Alternative Name extension.
+/// Can be interpreted as a `GeneralNames / text`
+#[derive(Debug, Clone, PartialEq)]
+pub struct AlternativeName(GeneralNamesOrText);
+
+impl AlternativeName {
+    /// Create a new instance of `AlternativeName` given value.
+    #[must_use]
+    pub fn new(value: GeneralNamesOrText) -> Self {
+        Self(value)
+    }
+}
+
+impl Encode<()> for AlternativeName {
+    fn encode<W: Write>(
+        &self, e: &mut Encoder<W>, ctx: &mut (),
+    ) -> Result<(), minicbor::encode::Error<W::Error>> {
+        self.0.encode(e, ctx)
+    }
+}
+
+impl Decode<'_, ()> for AlternativeName {
+    fn decode(d: &mut Decoder<'_>, ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
+        GeneralNamesOrText::decode(d, ctx).map(AlternativeName::new)
     }
 }
 
@@ -85,14 +100,15 @@ mod test_alt_name {
     fn encode_only_dns() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
-        let gns = GeneralNames::new().add_gn(GeneralName::new(
+        let mut gns = GeneralNames::new();
+        gns.add_gn(GeneralName::new(
             GeneralNameRegistry::DNSName,
             GeneralNameValue::Text("example.com".to_string()),
         ));
-        let alt_name = AltName::new(GeneralNamesOrText::GeneralNames(gns));
+        let alt_name = AlternativeName::new(GeneralNamesOrText::GeneralNames(gns));
         alt_name
             .encode(&mut encoder, &mut ())
-            .expect("Failed to encode AltName");
+            .expect("Failed to encode AlternativeName");
         // "example.com": 0x6b6578616d706c652e636f6d
         assert_eq!(hex::encode(buffer.clone()), "6b6578616d706c652e636f6d");
     }
@@ -102,16 +118,16 @@ mod test_alt_name {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
-        let alt_name = AltName::new(GeneralNamesOrText::Text("example.com".to_string()));
+        let alt_name = AlternativeName::new(GeneralNamesOrText::Text("example.com".to_string()));
         alt_name
             .encode(&mut encoder, &mut ())
-            .expect("Failed to encode AltName");
+            .expect("Failed to encode AlternativeName");
         // "example.com": 0x6b6578616d706c652e636f6d
         assert_eq!(hex::encode(buffer.clone()), "6b6578616d706c652e636f6d");
 
         let mut decoder = Decoder::new(&buffer);
-        let decoded_alt_name =
-            AltName::decode(&mut decoder, &mut ()).expect("Failed to decode Alternative Name");
+        let decoded_alt_name = AlternativeName::decode(&mut decoder, &mut ())
+            .expect("Failed to decode Alternative Name");
         assert_eq!(decoded_alt_name, alt_name);
     }
 }

@@ -87,27 +87,22 @@ impl GeneralNameData {
 
 /// A struct of integer to `GeneralNameRegistry` table.
 #[derive(Debug, Clone, PartialEq)]
-pub(crate) struct IntegerToGNTable {
-    /// Table of integer to `GeneralNameRegistry`.
-    table: IntTable<GeneralNameRegistry>,
-}
+pub(crate) struct IntegerToGNTable(IntTable<GeneralNameRegistry>);
 
 impl IntegerToGNTable {
     /// Create a new instance of `IntegerToGNTable`.
     pub(crate) fn new() -> Self {
-        Self {
-            table: IntTable::<GeneralNameRegistry>::new(),
-        }
+        Self(IntTable::<GeneralNameRegistry>::new())
     }
 
     /// Add a new integer to `GeneralNameRegistry` map table.
     pub(crate) fn add(&mut self, k: i16, v: GeneralNameRegistry) {
-        self.table.add(k, v);
+        self.0.add(k, v);
     }
 
     /// Get the map table of integer to `GeneralNameRegistry`.
     pub(crate) fn get_map(&self) -> &BiMap<i16, GeneralNameRegistry> {
-        self.table.get_map()
+        self.0.get_map()
     }
 }
 
