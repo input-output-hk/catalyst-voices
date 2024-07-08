@@ -28,7 +28,7 @@ pub struct C509oidRegistered {
 impl C509oidRegistered {
     /// Create a new instance of `C509oidRegistered`.
     pub(crate) fn new(oid: Oid<'static>, table: &'static IntegerToOidTable) -> Self {
-        C509oidRegistered {
+        Self {
             oid: C509oid::new(oid),
             registration_table: table,
         }
@@ -68,15 +68,14 @@ impl C509oid {
     /// Default value of PEN flag is false
     #[must_use]
     pub fn new(oid: Oid<'static>) -> Self {
-        C509oid {
+        Self {
             oid,
             pen_supported: false,
         }
     }
 
     /// Is PEN Encoding supported for this OID
-    #[must_use]
-    pub fn pen_encoded(mut self) -> Self {
+    pub(crate) fn pen_encoded(mut self) -> Self {
         self.pen_supported = true;
         self
     }
