@@ -141,9 +141,18 @@ mod test_alt_name {
         // "example.com": 0x6b6578616d706c652e636f6d
         assert_eq!(hex::encode(buffer.clone()), "6b6578616d706c652e636f6d");
 
+        let mut gns = GeneralNames::new();
+        gns.add_gn(GeneralName::new(
+            GeneralNameTypeRegistry::DNSName,
+            GeneralNameValue::Text("example.com".to_string()),
+        ));
+
         let mut decoder = Decoder::new(&buffer);
         let decoded_alt_name = AlternativeName::decode(&mut decoder, &mut ())
             .expect("Failed to decode Alternative Name");
-        assert_eq!(decoded_alt_name, alt_name);
+        assert_eq!(
+            decoded_alt_name,
+            AlternativeName::new(GeneralNamesOrText::GeneralNames(gns))
+        );
     }
 }
