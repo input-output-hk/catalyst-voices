@@ -2,7 +2,7 @@ name: CI nightly
 
 on:
   schedule:
-    - cron: '*/2 * * * *' # Runs every 2 mins
+    - cron: '0 0 * * *' # Runs every day at 00:00
 
 permissions:
   id-token: write
