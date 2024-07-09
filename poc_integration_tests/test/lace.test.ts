@@ -18,8 +18,6 @@ describe('Lace Wallet Integration Tests', () => {
       .forBrowser(Browser.CHROME)
       .setChromeOptions(chromeOptions)
       .build();
-
-
   });
 
   afterAll(async () => {
@@ -33,9 +31,8 @@ describe('Lace Wallet Integration Tests', () => {
 
 
   test('should click on "Enable wallet" button and open Lace extension', async () => {
-
     const clickMeButtonXPath = '//flt-semantics[(@id="flt-semantic-node-9")]';
-    let clickMeButton = await driver.wait(until.elementLocated(By.xpath(clickMeButtonXPath)), 30000);
+    let clickMeButton = await driver.wait(until.elementLocated(By.xpath(clickMeButtonXPath)), 10000);
 
     await new Promise(resolve => setTimeout(resolve, 5000));
 
