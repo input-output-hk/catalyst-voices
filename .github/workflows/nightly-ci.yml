@@ -2,7 +2,7 @@ name: Nightly CI
 
 on:
   schedule:
-    - cron: '* /5 * * *' # Run every 5 mins
+    - cron: '*/5 * * * *' # Run every 5 mins
 
 permissions:
   id-token: write
