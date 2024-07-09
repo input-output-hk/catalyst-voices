@@ -9,16 +9,19 @@
 - flutter
 - node
 - npm
+- typescript
 
 ## Run
 
 ```bash
-flutter run --web-renderer html -d chrome --web-port 3333
-
-npm run e2e
+npm run test
 ```
 
 ## Links
 
 - [selenium.dev](https://www.selenium.dev/documentation/webdriver/getting_started/)
-- []()
+- [Full accessibility tree in Chrome DevTools](https://developer.chrome.com/blog/full-accessibility-tree/)
+- [Accessibility in Flutter](https://docs.flutter.dev/ui/accessibility-and-internationalization/accessibility)
+- [Accessibility in Flutter on the Web](https://medium.com/flutter/accessibility-in-flutter-on-the-web-51bfc558b7d3)
+- [Building Accessible Flutter Web Apps](https://medium.com/@aaronreddixx/building-accessible-flutter-web-apps-343b452401a0)
+- [Semantics ](https://api.flutter.dev/flutter/widgets/Semantics-class.html)

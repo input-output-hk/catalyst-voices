@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+      "target": "es2016",
+      "types": ["jest"],
+      "esModuleInterop": true,
+      "forceConsistentCasingInFileNames": true,
+      "skipLibCheck": true,
+      "module": "commonjs",
+    }
+}

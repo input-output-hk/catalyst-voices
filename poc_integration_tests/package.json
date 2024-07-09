@@ -1,20 +1,26 @@
 {
-  "name": "cardano-wallet-interface",
+  "name": "cardano-wallet-interface-tests-example",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "e2e": "jest --detectOpenHandles"
+    "build": "cd example && flutter build web --dart-define=FLUTTER_WEB_DEBUG_SHOW_SEMANTICS=true && cp -r build/web* ../web_example",
+    "test": "concurrently --kill-others --success first \"http-server ./web_example -p 3333\" \"wait-on http://127.0.0.1:3333 && jest\"",
+    "stop-server": "lsof -ti tcp:3333 | grep -q . && lsof -ti tcp:3333 | xargs kill || echo 'No process to kill on port 3333'"
   },
-  "dependencies": {
-    "@rentready/flutter-selenium-bridge": "^1.0.5",
-    "jest": "^29.7.0",
-    "jest-circus": "^29.7.0",
-    "jest-resolve": "^29.7.0",
-    "jest-watch-typeahead": "^2.2.2",
-    "selenium-webdriver": "^4.22.0",
-    "assert": "2.1.0"
+  "peerDependencies": {
+    "selenium-webdriver": "^4.18.1"
   },
   "devDependencies": {
-    "mocha": "10.6.0"
+    "@rentready/flutter-selenium-bridge": "^1.0.5",
+    "@types/jest": "^29.5.12",
+    "@types/selenium-webdriver": "^4.1.22",
+    "concurrently": "^8.2.2",
+    "http-server": "^14.1.1",
+    "jest": "^29.7.0",
+    "selenium-webdriver": "^4.18.1",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.2",
+    "wait-on": "^7.2.0"
   }
 }

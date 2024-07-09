@@ -5,9 +5,11 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 
 void main() {
   runApp(const MyApp());
+  SemanticsBinding.instance.ensureSemantics();
 }
 
 class MyApp extends StatelessWidget {
@@ -171,8 +173,6 @@ class _WalletItem extends StatelessWidget {
   final CardanoWallet wallet;
   final VoidCallback onEnable;
 
-  static const enableWalletButtonKey = Key('EnableWalletButton');
-
   const _WalletItem({
     required this.wallet,
     required this.onEnable,
@@ -199,13 +199,9 @@ class _WalletItem extends StatelessWidget {
               '${_formatExtensions(wallet.supportedExtensions)}',
             ),
             const SizedBox(height: 16),
-            Semantics(
-              label: 'EnableWalletButton',
-              child: ElevatedButton(
-                key: enableWalletButtonKey,
-                onPressed: onEnable,
-                child: const Text('Enable wallet'),
-              ),
+            ElevatedButton(
+              onPressed: onEnable,
+              child: const Text('Enable wallet'),
             ),
           ],
         ),
