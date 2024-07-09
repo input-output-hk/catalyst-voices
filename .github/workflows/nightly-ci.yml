@@ -3,6 +3,7 @@ name: CI nightly
 on:
   schedule:
     - cron: '0 0 * * *' # Runs every day at 00:00
+    - cron: '0 * * * *' # Run every hour, for testing purpose
 
 permissions:
   id-token: write
