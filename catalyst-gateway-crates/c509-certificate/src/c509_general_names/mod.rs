@@ -141,7 +141,10 @@ mod test_general_names {
         ));
         gns.encode(&mut encoder, &mut ())
             .expect("Failed to encode GeneralNames");
-        assert_eq!(hex::encode(buffer.clone()), "83026b6578616d706c652e636f6d026b6578616d706c652e636f6d026b6578616d706c652e636f6d");
+        assert_eq!(
+            hex::encode(buffer.clone()),
+            "83026b6578616d706c652e636f6d026b6578616d706c652e636f6d026b6578616d706c652e636f6d"
+        );
 
         let mut decoder = Decoder::new(&buffer);
         let gns_decoded =
