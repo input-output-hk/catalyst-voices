@@ -1,8 +1,8 @@
-name: CI
+name: Nightly CI
 
 on:
   schedule:
-    - cron: "* 10 * * *" //test - run every 10 mins
+    - cron: '* 10 * * *' # Run every 10 mins
 
 permissions:
   id-token: write
