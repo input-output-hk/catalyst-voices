@@ -3,7 +3,10 @@
 
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 
-use crate::c509_general_names::GeneralNames;
+use crate::c509_general_names::{
+    general_name::{GeneralName, GeneralNameTypeRegistry, GeneralNameValue},
+    GeneralNames,
+};
 
 /// Alternative Name extension.
 /// Can be interpreted as a `GeneralNames / text`
@@ -70,9 +73,17 @@ impl Encode<()> for GeneralNamesOrText {
 
 impl Decode<'_, ()> for GeneralNamesOrText {
     fn decode(d: &mut Decoder<'_>, ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
-        // FIXME - can't distinguish between GeneralNames(only DNSName) and Text
         match d.datatype()? {
-            minicbor::data::Type::String => Ok(GeneralNamesOrText::Text(d.str()?.to_string())),
+            // If it is a string it is a GeneralNames with only 1 DNSName
+            minicbor::data::Type::String => {
+                let gn_dns = GeneralName::new(
+                    GeneralNameTypeRegistry::DNSName,
+                    GeneralNameValue::Text(d.str()?.to_string()),
+                );
+                let mut gns = GeneralNames::new();
+                gns.add_gn(gn_dns);
+                Ok(GeneralNamesOrText::GeneralNames(gns))
+            },
             minicbor::data::Type::Array => {
                 Ok(GeneralNamesOrText::GeneralNames(GeneralNames::decode(
                     d, ctx,
@@ -111,6 +122,11 @@ mod test_alt_name {
             .expect("Failed to encode AlternativeName");
         // "example.com": 0x6b6578616d706c652e636f6d
         assert_eq!(hex::encode(buffer.clone()), "6b6578616d706c652e636f6d");
+
+        let mut decoder = Decoder::new(&buffer);
+        let decoded_alt_name = AlternativeName::decode(&mut decoder, &mut ())
+            .expect("Failed to decode Alternative Name");
+        assert_eq!(decoded_alt_name, alt_name);
     }
 
     #[test]
