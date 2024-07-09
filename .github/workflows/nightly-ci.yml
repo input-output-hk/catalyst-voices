@@ -1,8 +1,9 @@
-name: Nightly CI
+name: CI nightly
 
 on:
   schedule:
-    - cron: '*/5 * * * *' # Run every 5 mins
+    - cron: '*/5 * * * *' # Runs every 5 mins
+  push:
 
 permissions:
   id-token: write
@@ -12,6 +13,19 @@ permissions:
 jobs:
   ci:
     uses: input-output-hk/catalyst-ci/.github/workflows/ci.yml@master
+    with:
+      aws_ecr_registry: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
+      aws_role_arn: arn:aws:iam::332405224602:role/ci
+      aws_region: eu-central-1
+    secrets:
+      dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
+      dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
+      earthly_runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+      earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
+
+  nightly:
+    uses: input-output-hk/catalyst-ci/.github/workflows/ci.yml@master
+    if: ${{ github.event_name == 'schedule' }}
     with:
       aws_ecr_registry: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
       aws_role_arn: arn:aws:iam::332405224602:role/ci
