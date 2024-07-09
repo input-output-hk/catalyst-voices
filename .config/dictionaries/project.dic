@@ -176,6 +176,7 @@ rustc
 rustdoc
 rustdocflags
 rustflags
+rustfmt
 rustls
 rxdart
 saibatizoku

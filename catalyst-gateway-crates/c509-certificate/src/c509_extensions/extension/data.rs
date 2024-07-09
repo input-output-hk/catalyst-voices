@@ -2,6 +2,8 @@
 //! Extension. See [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
 //! Section 9.4 C509 Extensions Registry for more information.
 
+// cspell: words Evt
+
 use std::collections::HashMap;
 
 use asn1_rs::{oid, Oid};

@@ -2,6 +2,8 @@
 //! General Name. See [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
 //! Section 9.9 C509 General Names Registry for more information.
 
+// cspell: words Gntr Gnvt
+
 use std::collections::HashMap;
 
 use bimap::BiMap;
