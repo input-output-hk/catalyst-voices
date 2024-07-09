@@ -14,58 +14,25 @@ use crate::tables::{IntTable, TableTrait};
 /// Int | Name | Type
 type GeneralNameDataTuple = (i16, GeneralNameTypeRegistry, GeneralNameValueType);
 
+/// Create a type alias for `GeneralNameTypeRegistry`
+type Gntr = GeneralNameTypeRegistry;
+/// Create a type alias for `GeneralNameValueType`
+type Gnvt = GeneralNameValueType;
+
 /// `GeneralName` data table.
+#[rustfmt::skip]
 const GENERAL_NAME_DATA: [GeneralNameDataTuple; 10] = [
-    (
-        -3,
-        GeneralNameTypeRegistry::OtherNameBundleEID,
-        GeneralNameValueType::Unsupported,
-    ),
-    (
-        -2,
-        GeneralNameTypeRegistry::OtherNameSmtpUTF8Mailbox,
-        GeneralNameValueType::Text,
-    ),
-    (
-        -1,
-        GeneralNameTypeRegistry::OtherNameHardwareModuleName,
-        GeneralNameValueType::OtherNameHWModuleName,
-    ),
-    (
-        0,
-        GeneralNameTypeRegistry::OtherName,
-        GeneralNameValueType::OtherNameHWModuleName,
-    ),
-    (
-        1,
-        GeneralNameTypeRegistry::Rfc822Name,
-        GeneralNameValueType::Text,
-    ),
-    (
-        2,
-        GeneralNameTypeRegistry::DNSName,
-        GeneralNameValueType::Text,
-    ),
-    (
-        4,
-        GeneralNameTypeRegistry::DirectoryName,
-        GeneralNameValueType::Unsupported,
-    ),
-    (
-        6,
-        GeneralNameTypeRegistry::UniformResourceIdentifier,
-        GeneralNameValueType::Text,
-    ),
-    (
-        7,
-        GeneralNameTypeRegistry::IPAddress,
-        GeneralNameValueType::Bytes,
-    ),
-    (
-        8,
-        GeneralNameTypeRegistry::RegisteredID,
-        GeneralNameValueType::Oid,
-    ),
+    // Int |              Name              |       Type
+    (-3,    Gntr::OtherNameBundleEID,           Gnvt::Unsupported),
+    (-2,    Gntr::OtherNameSmtpUTF8Mailbox,     Gnvt::Text),
+    (-1,    Gntr::OtherNameHardwareModuleName,  Gnvt::OtherNameHWModuleName),
+    (0,     Gntr::OtherName,                    Gnvt::OtherNameHWModuleName),
+    (1,     Gntr::Rfc822Name,                   Gnvt::Text),
+    (2,     Gntr::DNSName,                      Gnvt::Text),
+    (4,     Gntr::DirectoryName,                Gnvt::Unsupported),
+    (6,     Gntr::UniformResourceIdentifier,    Gnvt::Text),
+    (7,     Gntr::IPAddress,                    Gnvt::Bytes),
+    (8,     Gntr::RegisteredID,                 Gnvt::Oid),
 ];
 
 /// A struct of data that contains lookup table for `GeneralName`.
@@ -111,7 +78,7 @@ impl IntegerToGNTable {
 }
 
 /// Define static lookup for general names table
-pub(crate) static GENERAL_NAME_TABLES: Lazy<GeneralNameData> = Lazy::new(|| {
+pub(super) static GENERAL_NAME_TABLES: Lazy<GeneralNameData> = Lazy::new(|| {
     let mut int_to_name_table = IntegerToGNTable::new();
     let mut int_to_type_table = HashMap::new();
 
