@@ -122,6 +122,34 @@ mod test_general_names {
     }
 
     #[test]
+    fn encode_decode_gns_with_same_gn_type() {
+        let mut buffer = Vec::new();
+        let mut encoder = Encoder::new(&mut buffer);
+
+        let mut gns = GeneralNames::new();
+        gns.add_gn(GeneralName::new(
+            GeneralNameTypeRegistry::DNSName,
+            GeneralNameValue::Text("example.com".to_string()),
+        ));
+        gns.add_gn(GeneralName::new(
+            GeneralNameTypeRegistry::DNSName,
+            GeneralNameValue::Text("example.com".to_string()),
+        ));
+        gns.add_gn(GeneralName::new(
+            GeneralNameTypeRegistry::DNSName,
+            GeneralNameValue::Text("example.com".to_string()),
+        ));
+        gns.encode(&mut encoder, &mut ())
+            .expect("Failed to encode GeneralNames");
+        assert_eq!(hex::encode(buffer.clone()), "83026b6578616d706c652e636f6d026b6578616d706c652e636f6d026b6578616d706c652e636f6d");
+
+        let mut decoder = Decoder::new(&buffer);
+        let gns_decoded =
+            GeneralNames::decode(&mut decoder, &mut ()).expect("Failed to decode GeneralName");
+        assert_eq!(gns_decoded, gns);
+    }
+
+    #[test]
     fn encode_decode_gns_empty() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
