@@ -21,7 +21,7 @@ To use the lints, add as a dev dependency in your `pubspec.yaml`:
 
 ```yaml
 dev_dependencies:
-  catalyst_analysis: ^1.0.0
+  catalyst_analysis: any # or the latest version on Pub
 ```
 
 Then, add an include in `analysis_options.yaml`:

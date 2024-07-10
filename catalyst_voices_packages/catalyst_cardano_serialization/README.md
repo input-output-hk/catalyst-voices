@@ -30,7 +30,7 @@ and submission are outside of scope of this package.
 
 ```yaml
 dependencies:
-  catalyst_cardano_serialization: ^0.1.0
+  catalyst_cardano_serialization: any # or the latest version on Pub
 ```
 
 ## Example

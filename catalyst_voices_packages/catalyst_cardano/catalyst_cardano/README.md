@@ -29,9 +29,9 @@ away all the complexities of using js_interop.
 
 ```yaml
 dependencies:
-    catalyst_cardano_serialization: ^0.1.0
-    catalyst_cardano: ^0.1.0
-    catalyst_cardano_web: ^0.1.0
+    catalyst_cardano_serialization: any # or the latest version on Pub
+    catalyst_cardano: any # or the latest version on Pub
+    catalyst_cardano_web: any # or the latest version on Pub
 ```
 
 ## Web setup
