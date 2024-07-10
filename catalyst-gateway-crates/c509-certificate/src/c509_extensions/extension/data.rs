@@ -6,6 +6,7 @@
 
 use std::collections::HashMap;
 
+use anyhow::Error;
 use asn1_rs::{oid, Oid};
 use once_cell::sync::Lazy;
 
@@ -72,7 +73,7 @@ impl ExtensionData {
 }
 
 /// Define static lookup for extensions table
-pub(super) static EXTENSIONS_TABLES: Lazy<ExtensionData> = Lazy::new(|| {
+static EXTENSIONS_TABLES: Lazy<ExtensionData> = Lazy::new(|| {
     let mut int_to_oid_table = IntegerToOidTable::new();
     let mut int_to_type_table = HashMap::<i16, ExtensionValueType>::new();
 
@@ -86,3 +87,29 @@ pub(super) static EXTENSIONS_TABLES: Lazy<ExtensionData> = Lazy::new(|| {
         int_to_type_table,
     }
 });
+
+/// Static reference to the `ExtensionData` lookup table.
+pub(crate) static EXTENSIONS_LOOKUP: &Lazy<ExtensionData> = &EXTENSIONS_TABLES;
+
+/// Get the OID from the int value.
+pub(crate) fn get_oid_from_int(i: i16) -> Result<Oid<'static>, Error> {
+    EXTENSIONS_TABLES
+        .get_int_to_oid_table()
+        .get_map()
+        .get_by_left(&i)
+        .ok_or(Error::msg(format!(
+            "OID not found in the extension registry table given int {i}"
+        )))
+        .cloned()
+}
+
+/// Get the extension value type from the int value.
+pub(crate) fn get_extension_type_from_int(i: i16) -> Result<ExtensionValueType, Error> {
+    EXTENSIONS_TABLES
+        .get_int_to_type_table()
+        .get(&i)
+        .ok_or(Error::msg(format!(
+            "Extension value type not found in the extension registry table given int {i}"
+        )))
+        .cloned()
+}

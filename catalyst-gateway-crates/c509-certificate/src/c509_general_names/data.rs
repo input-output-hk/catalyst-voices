@@ -6,6 +6,7 @@
 
 use std::collections::HashMap;
 
+use anyhow::Error;
 use bimap::BiMap;
 use once_cell::sync::Lazy;
 
@@ -80,7 +81,7 @@ impl IntegerToGNTable {
 }
 
 /// Define static lookup for general names table
-pub(super) static GENERAL_NAME_TABLES: Lazy<GeneralNameData> = Lazy::new(|| {
+static GENERAL_NAME_TABLES: Lazy<GeneralNameData> = Lazy::new(|| {
     let mut int_to_name_table = IntegerToGNTable::new();
     let mut int_to_type_table = HashMap::new();
 
@@ -94,3 +95,38 @@ pub(super) static GENERAL_NAME_TABLES: Lazy<GeneralNameData> = Lazy::new(|| {
         int_to_type_table,
     }
 });
+
+/// Get the general name from the int value.
+pub(crate) fn get_gn_from_int(i: i16) -> Result<GeneralNameTypeRegistry, Error> {
+    GENERAL_NAME_TABLES
+        .get_int_to_name_table()
+        .get_map()
+        .get_by_left(&i)
+        .ok_or(Error::msg(format!(
+            "GeneralName not found in the general name registry table given int {i}"
+        )))
+        .cloned()
+}
+
+/// Get the int value from the general name.
+pub(crate) fn get_int_from_gn(gn: GeneralNameTypeRegistry) -> Result<i16, Error> {
+    GENERAL_NAME_TABLES
+        .get_int_to_name_table()
+        .get_map()
+        .get_by_right(&gn)
+        .ok_or(Error::msg(format!(
+            "Int value not found in the general name registry table given GeneralName {gn:?}"
+        )))
+        .cloned()
+}
+
+/// Get the general name value type from the int value.
+pub(crate) fn get_gn_value_type_from_int(i: i16) -> Result<GeneralNameValueType, Error> {
+    GENERAL_NAME_TABLES
+        .get_int_to_type_table()
+        .get(&i)
+        .ok_or(Error::msg(format!(
+            "General name value type not found in the general name registry table given {i}"
+        )))
+        .cloned()
+}

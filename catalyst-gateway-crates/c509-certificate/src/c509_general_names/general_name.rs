@@ -5,11 +5,13 @@
 
 use std::fmt::Debug;
 
-use anyhow::Error;
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 use strum_macros::{EnumDiscriminants, EnumIs};
 
-use super::{data::GENERAL_NAME_TABLES, other_name_hw_module::OtherNameHardwareModuleName};
+use super::{
+    data::{get_gn_from_int, get_gn_value_type_from_int, get_int_from_gn},
+    other_name_hw_module::OtherNameHardwareModuleName,
+};
 use crate::c509_oid::C509oid;
 
 /// A struct represents a `GeneralName`.
@@ -50,10 +52,7 @@ impl Encode<()> for GeneralName {
         &self, e: &mut Encoder<W>, ctx: &mut (),
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
         // Encode GeneralNameType as int
-        let i = self
-            .gn_type
-            .get_int()
-            .map_err(minicbor::encode::Error::message)?;
+        let i = get_int_from_gn(self.gn_type).map_err(minicbor::encode::Error::message)?;
         e.i16(i)?;
         // Encode GeneralNameValue as its type
         self.value.encode(e, ctx)?;
@@ -65,21 +64,9 @@ impl Decode<'_, ()> for GeneralName {
     fn decode(d: &mut Decoder<'_>, _ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
         if minicbor::data::Type::U8 == d.datatype()? || minicbor::data::Type::I8 == d.datatype()? {
             let i = d.i16()?;
-            // Get the name from the int value
-            let gn = *GENERAL_NAME_TABLES
-                .get_int_to_name_table()
-                .get_map()
-                .get_by_left(&i)
-                .ok_or(minicbor::decode::Error::message(
-                    "GeneralName int value not found in the table",
-                ))?;
-            // Get the value type from the int value
-            let value_type = *GENERAL_NAME_TABLES
-                .get_int_to_type_table()
-                .get(&i)
-                .ok_or_else(|| {
-                    minicbor::decode::Error::message("Extension value type not found")
-                })?;
+            let gn = get_gn_from_int(i).map_err(minicbor::decode::Error::message)?;
+            let value_type =
+                get_gn_value_type_from_int(i).map_err(minicbor::decode::Error::message)?;
             Ok(GeneralName::new(
                 gn,
                 GeneralNameValue::decode(d, &mut value_type.get_type())?,
@@ -119,20 +106,6 @@ pub enum GeneralNameTypeRegistry {
     IPAddress,
     /// A registeredID.
     RegisteredID,
-}
-
-impl GeneralNameTypeRegistry {
-    /// Get the integer value associated with the `GeneralNameTypeRegistry`.
-    pub(crate) fn get_int(self) -> Result<i16, Error> {
-        let i = GENERAL_NAME_TABLES
-            .get_int_to_name_table()
-            .get_map()
-            .get_by_right(&self);
-        match i {
-            Some(i) => Ok(*i),
-            None => Err(Error::msg("Int value of GeneralName not found")),
-        }
-    }
 }
 
 // -------------------GeneralNameValue----------------------
@@ -193,7 +166,8 @@ impl Encode<()> for GeneralNameValue {
     }
 }
 impl<C> Decode<'_, C> for GeneralNameValue
-where C: GeneralNameValueTrait + Debug
+where
+    C: GeneralNameValueTrait + Debug,
 {
     fn decode(d: &mut Decoder<'_>, ctx: &mut C) -> Result<Self, minicbor::decode::Error> {
         match ctx.get_type() {
@@ -213,11 +187,9 @@ where C: GeneralNameValueTrait + Debug
                 let value = OtherNameHardwareModuleName::decode(d, &mut ())?;
                 Ok(GeneralNameValue::OtherNameHWModuleName(value))
             },
-            GeneralNameValueType::Unsupported => {
-                Err(minicbor::decode::Error::message(
-                    "Cannot decode Unsupported GeneralName value",
-                ))
-            },
+            GeneralNameValueType::Unsupported => Err(minicbor::decode::Error::message(
+                "Cannot decode Unsupported GeneralName value",
+            )),
         }
     }
 }
@@ -258,9 +230,10 @@ mod test_general_name {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
-        let hw = OtherNameHardwareModuleName::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1), vec![
-            0x01, 0x02, 0x03, 0x04,
-        ]);
+        let hw = OtherNameHardwareModuleName::new(
+            oid!(2.16.840 .1 .101 .3 .4 .2 .1),
+            vec![0x01, 0x02, 0x03, 0x04],
+        );
         let gn = GeneralName::new(
             GeneralNameTypeRegistry::OtherNameHardwareModuleName,
             GeneralNameValue::OtherNameHWModuleName(hw),
