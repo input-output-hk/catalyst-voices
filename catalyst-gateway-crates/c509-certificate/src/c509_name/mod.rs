@@ -11,6 +11,8 @@
 //! For more information about Name,
 //! visit [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
 
+// cspell: words rdns
+
 mod rdn;
 use asn1_rs::{oid, Oid};
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
@@ -25,9 +27,9 @@ const COMMON_NAME_OID: Oid<'static> = oid!(2.5.4 .3);
 const EUI64_PREFIX: u8 = 0x01;
 /// Hex prefix.
 const HEX_PREFIX: u8 = 0x00;
-/// Total lenght of CBOR byte for EUI-64.
+/// Total length of CBOR byte for EUI-64.
 const EUI64_LEN: usize = 9;
-/// Total lenght of CBOR byte for EUI-64 mapped from a 48-bit MAC address.
+/// Total length of CBOR byte for EUI-64 mapped from a 48-bit MAC address.
 const EUI64_MAC_LEN: usize = 7;
 
 // ------------------Name----------------------
@@ -113,19 +115,15 @@ impl Encode<()> for NameValue {
 impl Decode<'_, ()> for NameValue {
     fn decode(d: &mut Decoder<'_>, ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
         match d.datatype()? {
-            minicbor::data::Type::Array => {
-                Ok(NameValue::RelativeDistinguishedName(
-                    RelativeDistinguishedName::decode(d, ctx)?,
-                ))
-            },
+            minicbor::data::Type::Array => Ok(NameValue::RelativeDistinguishedName(
+                RelativeDistinguishedName::decode(d, ctx)?,
+            )),
             // If Name is a text string, the attribute is a CommonName
             minicbor::data::Type::String => Ok(create_rdn_with_cn_attr(d.str()?.to_string())),
             minicbor::data::Type::Bytes => decode_bytes(d),
-            _ => {
-                Err(minicbor::decode::Error::message(
-                    "Name must be an array, text or bytes",
-                ))
-            },
+            _ => Err(minicbor::decode::Error::message(
+                "Name must be an array, text or bytes",
+            )),
         }
     }
 }
@@ -226,7 +224,7 @@ fn decode_hex_cn_bytes(bytes: &[u8]) -> Result<NameValue, minicbor::decode::Erro
 
 /// Decode common name EUI-64 bytes.
 fn decode_eui_cn_bytes(bytes: &[u8]) -> Result<NameValue, minicbor::decode::Error> {
-    // Check the lenght of the bytes to determine what EUI type it is
+    // Check the length of the bytes to determine what EUI type it is
     match bytes.len() {
         // EUI-64 mapped from a 48-bit MAC address
         EUI64_MAC_LEN => {
@@ -248,11 +246,9 @@ fn decode_eui_cn_bytes(bytes: &[u8]) -> Result<NameValue, minicbor::decode::Erro
             )?);
             Ok(create_rdn_with_cn_attr(text))
         },
-        _ => {
-            Err(minicbor::decode::Error::message(
-                "EUI-64 or MAC address must be 7 or 9 bytes",
-            ))
-        },
+        _ => Err(minicbor::decode::Error::message(
+            "EUI-64 or MAC address must be 7 or 9 bytes",
+        )),
     }
 }
 

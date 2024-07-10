@@ -3,6 +3,8 @@
 //! For more information about `RelativeDistinguishedName`,
 //! visit [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
 
+// cspell: words rdns
+
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 
 use crate::c509_attributes::attribute::Attribute;
