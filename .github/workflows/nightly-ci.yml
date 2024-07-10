@@ -34,7 +34,6 @@ jobs:
   nightly_tests:
     name: Generate test reports
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'schedule' && github.event.schedule == '0 0 * * *'}}
 
     steps:
       - uses: actions/checkout@v4
