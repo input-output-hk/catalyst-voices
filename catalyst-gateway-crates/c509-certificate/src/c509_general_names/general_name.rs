@@ -166,8 +166,7 @@ impl Encode<()> for GeneralNameValue {
     }
 }
 impl<C> Decode<'_, C> for GeneralNameValue
-where
-    C: GeneralNameValueTrait + Debug,
+where C: GeneralNameValueTrait + Debug
 {
     fn decode(d: &mut Decoder<'_>, ctx: &mut C) -> Result<Self, minicbor::decode::Error> {
         match ctx.get_type() {
@@ -187,9 +186,11 @@ where
                 let value = OtherNameHardwareModuleName::decode(d, &mut ())?;
                 Ok(GeneralNameValue::OtherNameHWModuleName(value))
             },
-            GeneralNameValueType::Unsupported => Err(minicbor::decode::Error::message(
-                "Cannot decode Unsupported GeneralName value",
-            )),
+            GeneralNameValueType::Unsupported => {
+                Err(minicbor::decode::Error::message(
+                    "Cannot decode Unsupported GeneralName value",
+                ))
+            },
         }
     }
 }
@@ -230,10 +231,9 @@ mod test_general_name {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
-        let hw = OtherNameHardwareModuleName::new(
-            oid!(2.16.840 .1 .101 .3 .4 .2 .1),
-            vec![0x01, 0x02, 0x03, 0x04],
-        );
+        let hw = OtherNameHardwareModuleName::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1), vec![
+            0x01, 0x02, 0x03, 0x04,
+        ]);
         let gn = GeneralName::new(
             GeneralNameTypeRegistry::OtherNameHardwareModuleName,
             GeneralNameValue::OtherNameHWModuleName(hw),
