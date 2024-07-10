@@ -29,6 +29,7 @@ impl RelativeDistinguishedName {
 
     /// Add an `Attribute` to the `RelativeDistinguishedName`.
     pub fn add_attr(&mut self, attribute: Attribute) {
+        // RelativeDistinguishedName support pen encoding
         self.0.push(attribute.set_pen_supported());
     }
 
@@ -45,11 +46,13 @@ impl Encode<()> for RelativeDistinguishedName {
     fn encode<W: Write>(
         &self, e: &mut Encoder<W>, ctx: &mut (),
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
+        // Should contain >= 1 attribute
         if self.0.is_empty() {
             return Err(minicbor::encode::Error::message(
                 "RelativeDistinguishedName should not be empty",
             ));
         }
+
         if self.0.len() == 1 {
             self.0.first().encode(e, ctx)?;
         } else {
@@ -72,6 +75,7 @@ impl Decode<'_, ()> for RelativeDistinguishedName {
                 let len = d.array()?.ok_or(minicbor::decode::Error::message(
                     "Failed to get array length for relative distinguished name",
                 ))?;
+                // Should contain >= 1 attribute
                 if len == 0 {
                     return Err(minicbor::decode::Error::message(
                         "RelativeDistinguishedName should not be empty",
@@ -110,6 +114,8 @@ mod test_relative_distinguished_name {
         rdn.add_attr(attr);
         rdn.encode(&mut encoder, &mut ())
             .expect("Failed to encode RDN");
+        // Email Address: 0x00
+        // "example@example.como": 736578616d706c65406578616d706c652e636f6d
         assert_eq!(
             hex::encode(buffer.clone()),
             "00736578616d706c65406578616d706c652e636f6d"
@@ -137,6 +143,9 @@ mod test_relative_distinguished_name {
 
         rdns.encode(&mut encoder, &mut ())
             .expect("Failed to encode RDN");
+        // Array of 2 attributes: 0x84
+        // Email Address example@example.com: 0x00736578616d706c65406578616d706c652e636f6d
+        // Common Name example: 0x01676578616d706c65
         assert_eq!(
             hex::encode(buffer.clone()),
             "8400736578616d706c65406578616d706c652e636f6d01676578616d706c65"

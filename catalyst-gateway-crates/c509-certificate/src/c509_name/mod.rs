@@ -85,12 +85,13 @@ impl Encode<()> for NameValue {
                 if attr.len() == 1
                     && attr_first.get_registered_oid().get_c509_oid().get_oid() == COMMON_NAME_OID
                 {
+                    // Get the value of the attribute
                     let cn_value =
                         attr_first
                             .get_value()
                             .first()
                             .ok_or(minicbor::encode::Error::message(
-                                "Cannot get the first Attribute",
+                                "Cannot get the first Attribute value",
                             ))?;
 
                     encode_cn_value(e, cn_value)?;
@@ -109,17 +110,35 @@ impl Encode<()> for NameValue {
     }
 }
 
+impl Decode<'_, ()> for NameValue {
+    fn decode(d: &mut Decoder<'_>, ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
+        match d.datatype()? {
+            minicbor::data::Type::Array => {
+                Ok(NameValue::RelativeDistinguishedName(
+                    RelativeDistinguishedName::decode(d, ctx)?,
+                ))
+            },
+            // If Name is a text string, the attribute is a CommonName
+            minicbor::data::Type::String => Ok(create_rdn_with_cn_attr(d.str()?.to_string())),
+            minicbor::data::Type::Bytes => decode_bytes(d),
+            _ => {
+                Err(minicbor::decode::Error::message(
+                    "Name must be an array, text or bytes",
+                ))
+            },
+        }
+    }
+}
+
 /// Encode common name value.
 fn encode_cn_value<W: Write>(
     e: &mut Encoder<W>, cn_value: &TextOrBytes,
 ) -> Result<(), minicbor::encode::Error<W::Error>> {
-    let hex_regex =
-        Regex::new(r"^[0-9a-f]+$").map_err(|e| minicbor::encode::Error::message(format!("{e}")))?;
-    let eui64_regex = Regex::new(r"^([0-9A-F]{2}-){7}[0-9A-F]{2}$")
-        .map_err(|e| minicbor::encode::Error::message(format!("{e}")))?;
-
+    let hex_regex = Regex::new(r"^[0-9a-f]+$").map_err(minicbor::encode::Error::message)?;
+    let eui64_regex =
+        Regex::new(r"^([0-9A-F]{2}-){7}[0-9A-F]{2}$").map_err(minicbor::encode::Error::message)?;
     let mac_eui64_regex = Regex::new(r"^([0-9A-F]{2}-){3}FF-FE-([0-9A-F]{2}-){2}[0-9A-F]{2}$")
-        .map_err(|e| minicbor::encode::Error::message(format!("{e}")))?;
+        .map_err(minicbor::encode::Error::message)?;
 
     match cn_value {
         TextOrBytes::Text(s) => {
@@ -127,8 +146,7 @@ fn encode_cn_value<W: Write>(
             // symbols '0'–'9' or 'a'–'f', it is encoded as a CBOR byte
             // string, prefixed with an initial byte set to '00'
             if hex_regex.is_match(s) && s.len() % 2 == 0 {
-                let decoded_bytes =
-                    hex::decode(s).map_err(|e| minicbor::encode::Error::message(format!("{e}")))?;
+                let decoded_bytes = hex::decode(s).map_err(minicbor::encode::Error::message)?;
                 e.bytes(&[&[HEX_PREFIX], &decoded_bytes[..]].concat())?;
 
             // An EUI-64 mapped from a 48-bit MAC address (i.e., of the form
@@ -141,12 +159,12 @@ fn encode_cn_value<W: Write>(
                 let chunk2 = decoded_bytes
                     .get(..3)
                     .ok_or(minicbor::encode::Error::message(
-                        "Failed to get EUI-64 bytes index 0 to 2",
+                        "Failed to get MAC EUI-64 bytes index 0 to 2",
                     ))?;
                 let chunk3 = decoded_bytes
                     .get(5..)
                     .ok_or(minicbor::encode::Error::message(
-                        "Failed to get EUI-64 bytes index 5 to 6",
+                        "Failed to get MAC EUI-64 bytes index 5 to 6",
                     ))?;
                 e.bytes(&[&[EUI64_PREFIX], chunk2, chunk3].concat())?;
 
@@ -178,22 +196,6 @@ fn formatted_eui_bytes(data: &[u8]) -> String {
         .map(|b| format!("{b:02X}"))
         .collect::<Vec<_>>()
         .join("-")
-}
-
-impl Decode<'_, ()> for NameValue {
-    fn decode(d: &mut Decoder<'_>, ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
-        match d.datatype()? {
-            minicbor::data::Type::Array => Ok(NameValue::RelativeDistinguishedName(
-                RelativeDistinguishedName::decode(d, ctx)?,
-            )),
-            // If Name is a text string, the attribute is a CommonName
-            minicbor::data::Type::String => Ok(create_rdn_with_cn_attr(d.str()?.to_string())),
-            minicbor::data::Type::Bytes => decode_bytes(d),
-            _ => Err(minicbor::decode::Error::message(
-                "Name must be an array, text or bytes",
-            )),
-        }
-    }
 }
 
 /// Decode bytes.
@@ -246,9 +248,11 @@ fn decode_eui_cn_bytes(bytes: &[u8]) -> Result<NameValue, minicbor::decode::Erro
             )?);
             Ok(create_rdn_with_cn_attr(text))
         },
-        _ => Err(minicbor::decode::Error::message(
-            "EUI-64 or MAC address must be 7 or 9 bytes",
-        )),
+        _ => {
+            Err(minicbor::decode::Error::message(
+                "EUI-64 or MAC address must be 7 or 9 bytes",
+            ))
+        },
     }
 }
 
@@ -305,7 +309,33 @@ mod test_name {
         name.encode(&mut encoder, &mut ())
             .expect("Failed to encode Name");
 
+        // Bytes of length 6: 0x46
+        // Prefix of CommonName hex: 0x00
+        // Bytes 000123abcd: 0x000123abcd
         assert_eq!(hex::encode(buffer.clone()), "4600000123abcd");
+
+        let mut decoder = Decoder::new(&buffer);
+        let name_decoded = Name::decode(&mut decoder, &mut ()).expect("Failed to decode Name");
+        assert_eq!(name_decoded, name);
+    }
+
+    #[test]
+    fn encode_decode_type_name_hex_cap() {
+        let mut buffer = Vec::new();
+        let mut encoder = Encoder::new(&mut buffer);
+
+        let mut attr = Attribute::new(oid!(2.5.4 .3));
+        attr.add_value(TextOrBytes::Text("000123ABCD".to_string()));
+        let mut rdn = RelativeDistinguishedName::new();
+        rdn.add_attr(attr);
+
+        let name = Name::new(NameValue::RelativeDistinguishedName(rdn));
+        name.encode(&mut encoder, &mut ())
+            .expect("Failed to encode Name");
+
+        // String of len 10: 0x6a
+        // String 000123abcd: 30303031323341424344
+        assert_eq!(hex::encode(buffer.clone()), "6a30303031323341424344");
 
         let mut decoder = Decoder::new(&buffer);
         let name_decoded = Name::decode(&mut decoder, &mut ()).expect("Failed to decode Name");
@@ -336,6 +366,32 @@ mod test_name {
     }
 
     #[test]
+    fn encode_decode_type_name_cn_eui_mac_un_cap() {
+        let mut buffer = Vec::new();
+        let mut encoder = Encoder::new(&mut buffer);
+
+        let mut attr = Attribute::new(oid!(2.5.4 .3));
+        attr.add_value(TextOrBytes::Text("01-23-45-ff-fe-67-89-AB".to_string()));
+        let mut rdn = RelativeDistinguishedName::new();
+        rdn.add_attr(attr);
+        let name = Name::new(NameValue::RelativeDistinguishedName(rdn));
+
+        name.encode(&mut encoder, &mut ())
+            .expect("Failed to encode Name");
+
+        // String of len 23: 0x77
+        // "01-23-45-ff-fe-67-89-AB": 0x7730312d32332d34352d66662d66652d36372d38392d4142
+        assert_eq!(
+            hex::encode(buffer.clone()),
+            "7730312d32332d34352d66662d66652d36372d38392d4142"
+        );
+
+        let mut decoder = Decoder::new(&buffer);
+        let name_decoded = Name::decode(&mut decoder, &mut ()).expect("Failed to decode Name");
+        assert_eq!(name_decoded, name);
+    }
+
+    #[test]
     fn encode_decode_type_name_cn_eui() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
@@ -351,6 +407,33 @@ mod test_name {
             .expect("Failed to encode Name");
 
         assert_eq!(hex::encode(buffer.clone()), "49010123456789ab0001");
+
+        let mut decoder = Decoder::new(&buffer);
+        let name_decoded = Name::decode(&mut decoder, &mut ()).expect("Failed to decode Name");
+        assert_eq!(name_decoded, name);
+    }
+
+    #[test]
+    fn encode_decode_type_name_cn_eui_un_cap() {
+        let mut buffer = Vec::new();
+        let mut encoder = Encoder::new(&mut buffer);
+
+        let mut attr = Attribute::new(oid!(2.5.4 .3));
+        attr.add_value(TextOrBytes::Text("01-23-45-67-89-ab-00-01".to_string()));
+        let mut rdn = RelativeDistinguishedName::new();
+        rdn.add_attr(attr);
+
+        let name = Name::new(NameValue::RelativeDistinguishedName(rdn));
+
+        name.encode(&mut encoder, &mut ())
+            .expect("Failed to encode Name");
+
+        // String of len 23: 0x77
+        // "01-23-45-67-89-ab-00-01": 0x7730312d32332d34352d36372d38392d61622d30302d3031
+        assert_eq!(
+            hex::encode(buffer.clone()),
+            "7730312d32332d34352d36372d38392d61622d30302d3031"
+        );
 
         let mut decoder = Decoder::new(&buffer);
         let name_decoded = Name::decode(&mut decoder, &mut ()).expect("Failed to decode Name");

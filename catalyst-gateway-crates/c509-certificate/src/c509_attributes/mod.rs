@@ -8,6 +8,9 @@
 //! ```cddl
 //! SubjectDirectoryAttributes = [+Attributes]
 //! ```
+//! 
+//! For more information about `Atributes`,
+//! visit [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
 
 use attribute::Attribute;
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
@@ -61,6 +64,10 @@ impl Decode<'_, ()> for Attributes {
         let len = d
             .array()?
             .ok_or_else(|| minicbor::decode::Error::message("Failed to get array length"))?;
+        if len == 0 {
+            return Err(minicbor::decode::Error::message("Attributes is empty"));
+        }
+
         let mut attributes = Attributes::new();
 
         for _ in 0..len {
@@ -93,6 +100,10 @@ mod test_attributes {
         attributes
             .encode(&mut encoder, &mut ())
             .expect("Failed to encode Attributes");
+        // 1 Attribute value (array len 1): 0x81
+        // Email Address: 0x00
+        // Attribute value (array len 2): 0x82
+        // example@example.com: 0x736578616d706c65406578616d706c652e636f6d
         assert_eq!(
             hex::encode(buffer.clone()),
             "810082736578616d706c65406578616d706c652e636f6d736578616d706c65406578616d706c652e636f6d"

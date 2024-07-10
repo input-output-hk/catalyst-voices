@@ -12,7 +12,7 @@
 use asn1_rs::Oid;
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 
-use super::data::ATTRIBUTES_TABLES;
+use super::data::{get_oid_from_int, ATTRIBUTES_LOOKUP};
 use crate::c509_oid::{C509oid, C509oidRegistered};
 
 /// A struct of C509 `Attribute`
@@ -20,7 +20,7 @@ use crate::c509_oid::{C509oid, C509oidRegistered};
 pub struct Attribute {
     /// A registered OID of C509 `Attribute`.
     registered_oid: C509oidRegistered,
-    /// A flag to indicate whether the value can be has multiple value.
+    /// A flag to indicate whether the value can have multiple value.
     multi_value: bool,
     /// A value of C509 `Attribute` can be a vector of text or bytes.
     value: Vec<TextOrBytes>,
@@ -31,7 +31,7 @@ impl Attribute {
     #[must_use]
     pub fn new(oid: Oid<'static>) -> Self {
         Self {
-            registered_oid: C509oidRegistered::new(oid, ATTRIBUTES_TABLES.get_int_to_oid_table()),
+            registered_oid: C509oidRegistered::new(oid, ATTRIBUTES_LOOKUP.get_int_to_oid_table()),
             multi_value: false,
             value: Vec::new(),
         }
@@ -109,14 +109,8 @@ impl Decode<'_, ()> for Attribute {
     fn decode(d: &mut Decoder<'_>, ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
         // Handle CBOR int
         let mut attr = if d.datatype()? == minicbor::data::Type::U8 {
-            let oid_value = d.i16()?;
-            let oid = ATTRIBUTES_TABLES
-                .get_int_to_oid_table()
-                .get_map()
-                .get_by_left(&oid_value)
-                .ok_or_else(|| {
-                    minicbor::decode::Error::message(format!("OID int not found given {oid_value}"))
-                })?;
+            let i = d.i16()?;
+            let oid = get_oid_from_int(i).map_err(minicbor::decode::Error::message)?;
             Attribute::new(oid.clone())
         } else {
             // Handle unwrapped CBOR OID or CBOR PEN
@@ -126,6 +120,7 @@ impl Decode<'_, ()> for Attribute {
 
         // Handle attribute value
         if d.datatype()? == minicbor::data::Type::Array {
+            // When multi-value attribute
             let len = d.array()?.ok_or_else(|| {
                 minicbor::decode::Error::message("Failed to get array length for attribute value")
             })?;
@@ -200,6 +195,7 @@ mod test_attribute {
         attribute
             .encode(&mut encoder, &mut ())
             .expect("Failed to encode Attribute");
+        // Email Address example@example.com: 0x00736578616d706c65406578616d706c652e636f6d
         assert_eq!(
             hex::encode(buffer.clone()),
             "00736578616d706c65406578616d706c652e636f6d"
