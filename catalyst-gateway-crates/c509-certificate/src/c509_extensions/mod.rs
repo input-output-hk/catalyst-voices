@@ -193,6 +193,9 @@ mod test_extensions {
         exts.encode(&mut encoder, &mut ())
             .expect("Failed to encode Extensions");
 
+        // 2 extensions (array of 2): 0x82
+        // KeyUsage with value 2: 0x0202
+        // SubjectKeyIdentifier with value [1,2,3,4]: 0x0401020304
         assert_eq!(hex::encode(buffer.clone()), "820202014401020304");
 
         let mut decoder = Decoder::new(&buffer);
@@ -212,6 +215,7 @@ mod test_extensions {
         assert_eq!(hex::encode(buffer.clone()), "80");
 
         let mut decoder = Decoder::new(&buffer);
+        // Extensions can have 0 length
         let decoded_exts =
             Extensions::decode(&mut decoder, &mut ()).expect("Failed to decode Extensions");
         assert_eq!(decoded_exts, exts);

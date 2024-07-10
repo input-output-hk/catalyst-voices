@@ -297,7 +297,7 @@ mod test_extension {
         let ext = Extension::new(oid!(2.5.29 .14), ExtensionValue::Int(2), false);
         ext.encode(&mut encoder, &mut ())
             .expect("Failed to encode Extension");
-        // Key Usage : 0x15
+        // SubjectKeyIdentifier : 0x01
         // 2 : 0x02
         assert_eq!(hex::encode(buffer.clone()), "0102");
 

@@ -141,6 +141,7 @@ mod test_alt_name {
         // "example.com": 0x6b6578616d706c652e636f6d
         assert_eq!(hex::encode(buffer.clone()), "6b6578616d706c652e636f6d");
 
+        // If only text, it should be GeneralNames with only 1 DNSName
         let mut gns = GeneralNames::new();
         gns.add_gn(GeneralName::new(
             GeneralNameTypeRegistry::DNSName,
