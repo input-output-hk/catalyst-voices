@@ -38,6 +38,10 @@ final class TransactionBuilder extends Equatable {
   /// The transaction metadata as a list of key-value pairs (a map).
   final AuxiliaryData? auxiliaryData;
 
+  /// The list of public key hashes of addresses
+  /// that are required to sign the transaction.
+  final Set<Vkey>? requiredSigners;
+
   /// Specifies on which network the code will run.
   final NetworkId? networkId;
 
@@ -56,6 +60,7 @@ final class TransactionBuilder extends Equatable {
     this.fee,
     this.ttl,
     this.auxiliaryData,
+    this.requiredSigners,
     this.networkId,
     this.witnessBuilder = const TransactionWitnessSetBuilder(
       vkeys: {},
@@ -224,6 +229,7 @@ final class TransactionBuilder extends Equatable {
         fee,
         ttl,
         auxiliaryData,
+        requiredSigners,
         networkId,
         witnessBuilder,
       ];
@@ -467,6 +473,7 @@ final class TransactionBuilder extends Equatable {
       auxiliaryDataHash: auxiliaryData != null
           ? AuxiliaryDataHash.fromAuxiliaryData(auxiliaryData!)
           : null,
+      requiredSigners: requiredSigners,
       networkId: networkId,
     );
   }
@@ -483,6 +490,7 @@ final class TransactionBuilder extends Equatable {
       fee: fee ?? this.fee,
       ttl: ttl,
       auxiliaryData: auxiliaryData,
+      requiredSigners: requiredSigners,
       networkId: networkId,
       witnessBuilder: witnessBuilder ?? this.witnessBuilder,
     );

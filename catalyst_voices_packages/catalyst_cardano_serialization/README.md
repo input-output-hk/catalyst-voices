@@ -198,7 +198,7 @@ Byron era addresses are not supported.
 | 9 = mint | ❌️ |
 | 11 = script_data_hash | ❌️ |
 | 13 = collateral inputs | ❌️ |
-| 14 = required signers | ❌️ |
+| 14 = required signers | ✔️ |
 | 15 = network_id | ✔️ |
 | 16 = collateral return | ❌️ |
 | 17 = total collateral | ❌️ |
