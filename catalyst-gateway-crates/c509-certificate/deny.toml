@@ -94,6 +94,7 @@ license-files = [{ path = "../LICENSE-MIT", hash = 0x001c7e6c }]
 crate = "ring"
 expression = "MIT"
 license-files = [{ path = "LICENSE", hash = 0xbd0eed23 }]
+
 # SPDX considers OpenSSL to encompass both the OpenSSL and SSLeay licenses
 # https://spdx.org/licenses/OpenSSL.html
 # ISC - Both BoringSSL and ring use this for their new files
