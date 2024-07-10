@@ -54,7 +54,6 @@ impl Attribute {
 
     /// Set whether `Attribute` can be PEN encoded.
     pub(crate) fn set_pen_supported(self) -> Self {
-        // FIXME - ugly
         Self {
             registered_oid: self.registered_oid.pen_encoded(),
             multi_value: self.multi_value,
@@ -144,7 +143,7 @@ impl Decode<'_, ()> for Attribute {
 // ------------------TextOrBytes----------------------
 
 /// An enum of possible value types for `Attribute`.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TextOrBytes {
     /// A text string.
     Text(String),

@@ -12,7 +12,7 @@ use super::{
     data::{get_gn_from_int, get_gn_value_type_from_int, get_int_from_gn},
     other_name_hw_module::OtherNameHardwareModuleName,
 };
-use crate::c509_oid::C509oid;
+use crate::{c509_name::Name, c509_oid::C509oid};
 
 /// A struct represents a `GeneralName`.
 /// ```cddl
@@ -99,7 +99,7 @@ pub enum GeneralNameTypeRegistry {
     /// A dNSName.
     DNSName,
     /// A directoryName.
-    DirectoryName, // Name
+    DirectoryName,
     /// A uniformResourceIdentifier.
     UniformResourceIdentifier,
     /// An iPAddress.
@@ -112,7 +112,7 @@ pub enum GeneralNameTypeRegistry {
 
 /// An enum of possible value types for `GeneralName`.
 #[allow(clippy::module_name_repetitions)]
-#[derive(Debug, PartialEq, Clone, Eq, Hash, EnumDiscriminants)]
+#[derive(Debug, PartialEq, Clone, EnumDiscriminants)]
 #[strum_discriminants(name(GeneralNameValueType))]
 pub enum GeneralNameValue {
     /// A text string.
@@ -123,6 +123,8 @@ pub enum GeneralNameValue {
     Bytes(Vec<u8>),
     /// An OID
     Oid(C509oid),
+    /// Name
+    Name(Name),
     /// An unsupported value.
     Unsupported,
 }
@@ -156,6 +158,9 @@ impl Encode<()> for GeneralNameValue {
             GeneralNameValue::OtherNameHWModuleName(value) => {
                 value.encode(e, ctx)?;
             },
+            GeneralNameValue::Name(value) => {
+                Name::encode(value, e, ctx)?;
+            },
             GeneralNameValue::Unsupported => {
                 return Err(minicbor::encode::Error::message(
                     "Cannot encode unsupported GeneralName value",
@@ -185,6 +190,10 @@ where C: GeneralNameValueTrait + Debug
             GeneralNameValueType::OtherNameHWModuleName => {
                 let value = OtherNameHardwareModuleName::decode(d, &mut ())?;
                 Ok(GeneralNameValue::OtherNameHWModuleName(value))
+            },
+            GeneralNameValueType::Name => {
+                let value = Name::decode(d, &mut ())?;
+                Ok(GeneralNameValue::Name(value))
             },
             GeneralNameValueType::Unsupported => {
                 Err(minicbor::decode::Error::message(

@@ -115,15 +115,19 @@ impl Encode<()> for NameValue {
 impl Decode<'_, ()> for NameValue {
     fn decode(d: &mut Decoder<'_>, ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
         match d.datatype()? {
-            minicbor::data::Type::Array => Ok(NameValue::RelativeDistinguishedName(
-                RelativeDistinguishedName::decode(d, ctx)?,
-            )),
+            minicbor::data::Type::Array => {
+                Ok(NameValue::RelativeDistinguishedName(
+                    RelativeDistinguishedName::decode(d, ctx)?,
+                ))
+            },
             // If Name is a text string, the attribute is a CommonName
             minicbor::data::Type::String => Ok(create_rdn_with_cn_attr(d.str()?.to_string())),
             minicbor::data::Type::Bytes => decode_bytes(d),
-            _ => Err(minicbor::decode::Error::message(
-                "Name must be an array, text or bytes",
-            )),
+            _ => {
+                Err(minicbor::decode::Error::message(
+                    "Name must be an array, text or bytes",
+                ))
+            },
         }
     }
 }
@@ -246,9 +250,11 @@ fn decode_eui_cn_bytes(bytes: &[u8]) -> Result<NameValue, minicbor::decode::Erro
             )?);
             Ok(create_rdn_with_cn_attr(text))
         },
-        _ => Err(minicbor::decode::Error::message(
-            "EUI-64 or MAC address must be 7 or 9 bytes",
-        )),
+        _ => {
+            Err(minicbor::decode::Error::message(
+                "EUI-64 or MAC address must be 7 or 9 bytes",
+            ))
+        },
     }
 }
 
