@@ -10,6 +10,13 @@ permissions:
   contents: write
   packages: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+env:
+    REPORT_EXT: .junit-report.xml
+
 jobs:
   ci_nightly:
     uses: input-output-hk/catalyst-ci/.github/workflows/ci.yml@master
@@ -23,3 +30,29 @@ jobs:
       dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
       earthly_runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
       earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
+
+  nightly_tests:
+    name: Generate test reports
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'schedule' && github.event.schedule == '0 0 * * *'}}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get test reports
+        uses: input-output-hk/catalyst-ci/actions/run@master
+        with:
+          earthfile: ./catalyst_voices/
+          flags:
+          targets: test-unit
+          target_flags:
+          runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+          artifact: "false"
+      
+      - name: Collect and upload test reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+            path: '**/*${{ env.REPORT_EXT }}'
+            if-no-files-found: error
+            retention-days: 1
