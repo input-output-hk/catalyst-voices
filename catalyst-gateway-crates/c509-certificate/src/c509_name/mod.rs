@@ -1,4 +1,4 @@
-//! C509 Name
+//! C509 type Name
 //!
 //! ```cddl
 //!  Name = [ * RelativeDistinguishedName ] / text / bytes
@@ -7,6 +7,9 @@
 //!             ( attributeType: ~oid, attributeValue: bytes ) //
 //!             ( attributeType: pen, attributeValue: bytes )
 //! ```
+//!
+//! For more information about Name,
+//! visit [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
 
 mod rdn;
 use asn1_rs::{oid, Oid};
@@ -121,19 +124,20 @@ fn encode_cn_value<W: Write>(
     match cn_value {
         TextOrBytes::Text(s) => {
             // If the text string has an even length ≥ 2 and contains only the
-            //  symbols '0'–'9' or 'a'–'f', it is encoded as a CBOR byte
-            //  string, prefixed with an initial byte set to '00'
+            // symbols '0'–'9' or 'a'–'f', it is encoded as a CBOR byte
+            // string, prefixed with an initial byte set to '00'
             if hex_regex.is_match(s) && s.len() % 2 == 0 {
                 let decoded_bytes =
                     hex::decode(s).map_err(|e| minicbor::encode::Error::message(format!("{e}")))?;
                 e.bytes(&[&[HEX_PREFIX], &decoded_bytes[..]].concat())?;
+
             // An EUI-64 mapped from a 48-bit MAC address (i.e., of the form
             // "HH-HH-HH-FF-FE-HH-HH-HH) is encoded as a CBOR byte string prefixed with an
             // initial byte set to '01', for a total length of 7.
             } else if mac_eui64_regex.is_match(s) {
                 let clean_name = s.replace('-', "");
-                let decoded_bytes = hex::decode(clean_name)
-                    .map_err(|e| minicbor::encode::Error::message(format!("{e}")))?;
+                let decoded_bytes =
+                    hex::decode(clean_name).map_err(minicbor::encode::Error::message)?;
                 let chunk2 = decoded_bytes
                     .get(..3)
                     .ok_or(minicbor::encode::Error::message(
@@ -145,15 +149,15 @@ fn encode_cn_value<W: Write>(
                         "Failed to get EUI-64 bytes index 5 to 6",
                     ))?;
                 e.bytes(&[&[EUI64_PREFIX], chunk2, chunk3].concat())?;
+
             // an EUI-64 of the form "HH-HH-HH-HH-HH-HH-HH-HH" where 'H'
             // is one of the symbols '0'–'9' or 'A'–'F' it is encoded as a
             // CBOR byte string prefixed with an initial byte set to '01', for a total
             // length of 9.
             } else if eui64_regex.is_match(s) {
                 let clean_name = s.replace('-', "");
-                let decoded_bytes = hex::decode(clean_name)
-                    .map_err(|e| minicbor::encode::Error::message(format!("{e}")))?;
-
+                let decoded_bytes =
+                    hex::decode(clean_name).map_err(minicbor::encode::Error::message)?;
                 e.bytes(&[&[EUI64_PREFIX], &decoded_bytes[..]].concat())?;
             } else {
                 e.str(s)?;
@@ -178,20 +182,16 @@ fn formatted_eui_bytes(data: &[u8]) -> String {
 
 impl Decode<'_, ()> for NameValue {
     fn decode(d: &mut Decoder<'_>, ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
-        // FIXME - can't distinguish between Name CommonName and Text
         match d.datatype()? {
-            minicbor::data::Type::Array => {
-                Ok(NameValue::RelativeDistinguishedName(
-                    RelativeDistinguishedName::decode(d, ctx)?,
-                ))
-            },
-            minicbor::data::Type::String => Ok(NameValue::Text(d.str()?.to_string())),
+            minicbor::data::Type::Array => Ok(NameValue::RelativeDistinguishedName(
+                RelativeDistinguishedName::decode(d, ctx)?,
+            )),
+            // If Name is a text string, the attribute is a CommonName
+            minicbor::data::Type::String => Ok(create_rdn_with_cn_attr(d.str()?.to_string())),
             minicbor::data::Type::Bytes => decode_bytes(d),
-            _ => {
-                Err(minicbor::decode::Error::message(
-                    "Name must be an array, text or bytes",
-                ))
-            },
+            _ => Err(minicbor::decode::Error::message(
+                "Name must be an array, text or bytes",
+            )),
         }
     }
 }
@@ -219,7 +219,7 @@ fn decode_hex_cn_bytes(bytes: &[u8]) -> Result<NameValue, minicbor::decode::Erro
     let text = hex::encode(bytes.get(1..).ok_or(minicbor::decode::Error::message(
         "Failed to get hex bytes index",
     ))?);
-    Ok(create_rdn(text))
+    Ok(create_rdn_with_cn_attr(text))
 }
 
 /// Decode common name EUI-64 bytes.
@@ -234,27 +234,26 @@ fn decode_eui_cn_bytes(bytes: &[u8]) -> Result<NameValue, minicbor::decode::Erro
             let chunk4 = bytes.get(4..).ok_or(minicbor::decode::Error::message(
                 "Failed to get EUI-64 bytes index 4 to 7",
             ))?;
+            // Turn it into HH-HH-HH-FF-FE-HH-HH-HH
             let data = [chunk1, &[0xFF], &[0xFE], chunk4].concat();
             let text = formatted_eui_bytes(&data);
-            Ok(create_rdn(text))
+            Ok(create_rdn_with_cn_attr(text))
         },
         // EUI-64
         EUI64_LEN => {
             let text = formatted_eui_bytes(bytes.get(1..).ok_or(
                 minicbor::decode::Error::message("Failed to get EUI-64 bytes index"),
             )?);
-            Ok(create_rdn(text))
+            Ok(create_rdn_with_cn_attr(text))
         },
-        _ => {
-            Err(minicbor::decode::Error::message(
-                "EUI-64 or MAC address must be 7 or 9 bytes",
-            ))
-        },
+        _ => Err(minicbor::decode::Error::message(
+            "EUI-64 or MAC address must be 7 or 9 bytes",
+        )),
     }
 }
 
-/// Create a relative distinguished name from string.
-fn create_rdn(text: String) -> NameValue {
+/// Create a relative distinguished name with attribute common name from string.
+fn create_rdn_with_cn_attr(text: String) -> NameValue {
     let mut attr = Attribute::new(COMMON_NAME_OID);
     attr.add_value(TextOrBytes::Text(text));
     let mut rdn = RelativeDistinguishedName::new();
@@ -270,7 +269,7 @@ mod test_name {
     use crate::c509_attributes::attribute::Attribute;
 
     #[test]
-    fn encode_type_name_cn() {
+    fn encode_decode_type_name_cn() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
@@ -285,7 +284,11 @@ mod test_name {
 
         // Test data from https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/
         // A.1.1.  Example C509 Certificate Encoding
-        assert_eq!(hex::encode(buffer), "6b5246432074657374204341");
+        assert_eq!(hex::encode(buffer.clone()), "6b5246432074657374204341");
+
+        let mut decoder = Decoder::new(&buffer);
+        let name_decoded = Name::decode(&mut decoder, &mut ()).expect("Failed to decode Name");
+        assert_eq!(name_decoded, name);
     }
 
     #[test]
