@@ -52,43 +52,7 @@ jobs:
         with:
             earthfile: ./catalyst-gateway/
             flags:
-            targets: build
-            target_flags:
-            runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-            artifact: "false"
-
-      - name: Get schemathesis test report
-        uses: input-output-hk/catalyst-ci/actions/run@master
-        if: always()
-        continue-on-error: true
-        with:
-          earthfile: ./catalyst-gateway/tests/schemathesis_tests
-          flags: --allow-privileged
-          targets: test-fuzzer-api
-          target_flags:
-          runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-          artifact: "false"
-
-      - name: Get flutter unit test report
-        uses: input-output-hk/catalyst-ci/actions/run@master
-        if: always()
-        continue-on-error: true
-        with:
-            earthfile: ./catalyst_voices/
-            flags:
-            targets: test-unit
-            target_flags:
-            runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-            artifact: "false"
-      
-      - name: Get backend python test report
-        uses: input-output-hk/catalyst-ci/actions/run@master
-        if: always()
-        continue-on-error: true
-        with:
-            earthfile: ./catalyst-gateway/tests/api_tests/
-            flags: --allow-privileged
-            targets: test
+            targets: nightly
             target_flags:
             runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
             artifact: "false"
@@ -137,12 +101,3 @@ jobs:
           repository: gh-pages-dir
           branch: gh-pages
           pull_args: --rebase -X ours
-
-      - name: Comment PR with Allure report link
-        if: ${{ always() && github.event_name == 'pull_request' && steps.allure.outputs.report_url }}
-        uses: thollander/actions-comment-pull-request@v2
-        with:
-          message: |
-            ${{ steps.allure.outputs.test_result_icon }} [Test Report](${{ steps.allure.outputs.report_url }}) | ${\color{lightgreen}Pass: ${{ steps.allure.outputs.test_result_passed }}/${{ steps.allure.outputs.test_result_total }}}$ | ${\color{red}Fail: ${{ steps.allure.outputs.test_result_failed }}/${{ steps.allure.outputs.test_result_total }}}$ |
-          comment_tag: allure_report
-          mode: upsert
