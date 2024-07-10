@@ -19,7 +19,7 @@ env:
     AWS_ROLE_ARN: arn:aws:iam::332405224602:role/ci
     EARTHLY_TARGET: docker
     ECR_REGISTRY: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
-    ALLURE_REPORT_PATH: allure-action-nightly
+    ALLURE_REPORT_PATH: allure-report
     REPORT_EXT: .junit-report.xml
 
 jobs:

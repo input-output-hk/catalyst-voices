@@ -16,6 +16,7 @@ concurrency:
 
 env:
     REPORT_EXT: .junit-report.xml
+    ALLURE_REPORT_PATH: nightly-allure-report
 
 jobs:
   ci_nightly:
@@ -31,23 +32,67 @@ jobs:
       earthly_runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
       earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
 
-  nightly_tests:
+  generate-test-reports:
     name: Generate test reports
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
 
-      - name: Get test reports
-        uses: input-output-hk/catalyst-ci/actions/run@master
+      - name: Setup CI
+        uses: input-output-hk/catalyst-ci/actions/setup@master
         with:
-          earthfile: ./catalyst_voices/
-          flags:
-          targets: test-unit
+            aws_role_arn: ${{ env.AWS_ROLE_ARN }}
+            aws_region: ${{ env.AWS_REGION }}
+            earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
+
+      - name: Get catalyst gateway unit test report
+        uses: input-output-hk/catalyst-ci/actions/run@master
+        if: always()
+        continue-on-error: true
+        with:
+            earthfile: ./catalyst-gateway/
+            flags:
+            targets: build
+            target_flags:
+            runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+            artifact: "false"
+
+      - name: Get schemathesis test report
+        uses: input-output-hk/catalyst-ci/actions/run@master
+        if: always()
+        continue-on-error: true
+        with:
+          earthfile: ./catalyst-gateway/tests/schemathesis_tests
+          flags: --allow-privileged
+          targets: test-fuzzer-api
           target_flags:
           runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
           artifact: "false"
+
+      - name: Get flutter unit test report
+        uses: input-output-hk/catalyst-ci/actions/run@master
+        if: always()
+        continue-on-error: true
+        with:
+            earthfile: ./catalyst_voices/
+            flags:
+            targets: test-unit
+            target_flags:
+            runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+            artifact: "false"
       
+      - name: Get backend python test report
+        uses: input-output-hk/catalyst-ci/actions/run@master
+        if: always()
+        continue-on-error: true
+        with:
+            earthfile: ./catalyst-gateway/tests/api_tests/
+            flags: --allow-privileged
+            targets: test
+            target_flags:
+            runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+            artifact: "false"
+
       - name: Collect and upload test reports
         uses: actions/upload-artifact@v4
         if: always()
@@ -55,3 +100,49 @@ jobs:
             path: '**/*${{ env.REPORT_EXT }}'
             if-no-files-found: error
             retention-days: 1
+
+  generate-allure-report:
+    name: Generate allure report
+    runs-on: ubuntu-latest
+    needs: [generate-test-reports]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+
+      - name: Setup Allure report
+        run: |
+              mkdir -p ${{ env.ALLURE_REPORT_PATH }}
+              shopt -s globstar
+              cp **/*${{ env.REPORT_EXT }} ${{ env.ALLURE_REPORT_PATH }}
+              ls ${{ env.ALLURE_REPORT_PATH }}
+
+      - name: Checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages-dir
+
+      - name: Build Allure report
+        uses: mgrybyk/allure-report-branch-action@v1
+        id: allure
+        with:
+          report_id: 'test-report'
+          gh_pages: 'gh-pages-dir'
+          report_dir: ${{ env.ALLURE_REPORT_PATH }}
+
+      - name: Git push to gh-pages
+        uses: mgrybyk/git-commit-pull-push-action@v1
+        with:
+          repository: gh-pages-dir
+          branch: gh-pages
+          pull_args: --rebase -X ours
+
+      - name: Comment PR with Allure report link
+        if: ${{ always() && github.event_name == 'pull_request' && steps.allure.outputs.report_url }}
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            ${{ steps.allure.outputs.test_result_icon }} [Test Report](${{ steps.allure.outputs.report_url }}) | ${\color{lightgreen}Pass: ${{ steps.allure.outputs.test_result_passed }}/${{ steps.allure.outputs.test_result_total }}}$ | ${\color{red}Fail: ${{ steps.allure.outputs.test_result_failed }}/${{ steps.allure.outputs.test_result_total }}}$ |
+          comment_tag: allure_report
+          mode: upsert
