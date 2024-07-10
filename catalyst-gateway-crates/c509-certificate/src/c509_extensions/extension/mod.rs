@@ -4,7 +4,7 @@ mod data;
 use std::fmt::Debug;
 
 use asn1_rs::Oid;
-use data::EXTENSIONS_TABLES;
+use data::{get_extension_type_from_int, get_oid_from_int, EXTENSIONS_LOOKUP};
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 use strum_macros::EnumDiscriminants;
 
@@ -28,7 +28,7 @@ impl Extension {
     #[must_use]
     pub fn new(oid: Oid<'static>, value: ExtensionValue, critical: bool) -> Self {
         Self {
-            registered_oid: C509oidRegistered::new(oid, EXTENSIONS_TABLES.get_int_to_oid_table())
+            registered_oid: C509oidRegistered::new(oid, EXTENSIONS_LOOKUP.get_int_to_oid_table())
                 .pen_encoded(),
             critical,
             value,
@@ -102,26 +102,12 @@ impl Decode<'_, ()> for Extension {
                 let int_value = d.i16()?;
                 // OID can be negative due to critical flag, so need absolute the value
                 let abs_int_value = int_value.abs();
-                // Get the OID associated with the int value
-                let oid = EXTENSIONS_TABLES
-                    .get_int_to_oid_table()
-                    .get_map()
-                    .get_by_left(&abs_int_value)
-                    .ok_or_else(|| {
-                        minicbor::decode::Error::message(format!(
-                            "OID not found given int {abs_int_value}"
-                        ))
-                    })?;
-                // Decode extension value
-                let value_type = EXTENSIONS_TABLES
-                    .get_int_to_type_table()
-                    .get(&abs_int_value)
-                    .ok_or_else(|| {
-                        minicbor::decode::Error::message(format!(
-                            "Extension value type not found given int {abs_int_value}"
-                        ))
-                    })?;
+                let oid =
+                    get_oid_from_int(abs_int_value).map_err(minicbor::decode::Error::message)?;
+                let value_type = get_extension_type_from_int(abs_int_value)
+                    .map_err(minicbor::decode::Error::message)?;
 
+                // Decode extension value
                 let extension_value = ExtensionValue::decode(d, &mut value_type.get_type())?;
                 Ok(Extension::new(
                     oid.to_owned(),

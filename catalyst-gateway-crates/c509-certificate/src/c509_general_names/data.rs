@@ -2,8 +2,11 @@
 //! General Name. See [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
 //! Section 9.9 C509 General Names Registry for more information.
 
+// cspell: words Gntr Gnvt
+
 use std::collections::HashMap;
 
+use anyhow::Error;
 use bimap::BiMap;
 use once_cell::sync::Lazy;
 
@@ -14,58 +17,25 @@ use crate::tables::{IntTable, TableTrait};
 /// Int | Name | Type
 type GeneralNameDataTuple = (i16, GeneralNameTypeRegistry, GeneralNameValueType);
 
+/// Create a type alias for `GeneralNameTypeRegistry`
+type Gntr = GeneralNameTypeRegistry;
+/// Create a type alias for `GeneralNameValueType`
+type Gnvt = GeneralNameValueType;
+
 /// `GeneralName` data table.
+#[rustfmt::skip]
 const GENERAL_NAME_DATA: [GeneralNameDataTuple; 10] = [
-    (
-        -3,
-        GeneralNameTypeRegistry::OtherNameBundleEID,
-        GeneralNameValueType::Unsupported,
-    ),
-    (
-        -2,
-        GeneralNameTypeRegistry::OtherNameSmtpUTF8Mailbox,
-        GeneralNameValueType::Text,
-    ),
-    (
-        -1,
-        GeneralNameTypeRegistry::OtherNameHardwareModuleName,
-        GeneralNameValueType::OtherNameHWModuleName,
-    ),
-    (
-        0,
-        GeneralNameTypeRegistry::OtherName,
-        GeneralNameValueType::OtherNameHWModuleName,
-    ),
-    (
-        1,
-        GeneralNameTypeRegistry::Rfc822Name,
-        GeneralNameValueType::Text,
-    ),
-    (
-        2,
-        GeneralNameTypeRegistry::DNSName,
-        GeneralNameValueType::Text,
-    ),
-    (
-        4,
-        GeneralNameTypeRegistry::DirectoryName,
-        GeneralNameValueType::Unsupported,
-    ),
-    (
-        6,
-        GeneralNameTypeRegistry::UniformResourceIdentifier,
-        GeneralNameValueType::Text,
-    ),
-    (
-        7,
-        GeneralNameTypeRegistry::IPAddress,
-        GeneralNameValueType::Bytes,
-    ),
-    (
-        8,
-        GeneralNameTypeRegistry::RegisteredID,
-        GeneralNameValueType::Oid,
-    ),
+    // Int |              Name              |       Type
+    (-3,    Gntr::OtherNameBundleEID,           Gnvt::Unsupported),
+    (-2,    Gntr::OtherNameSmtpUTF8Mailbox,     Gnvt::Text),
+    (-1,    Gntr::OtherNameHardwareModuleName,  Gnvt::OtherNameHWModuleName),
+    (0,     Gntr::OtherName,                    Gnvt::OtherNameHWModuleName),
+    (1,     Gntr::Rfc822Name,                   Gnvt::Text),
+    (2,     Gntr::DNSName,                      Gnvt::Text),
+    (4,     Gntr::DirectoryName,                Gnvt::Unsupported),
+    (6,     Gntr::UniformResourceIdentifier,    Gnvt::Text),
+    (7,     Gntr::IPAddress,                    Gnvt::Bytes),
+    (8,     Gntr::RegisteredID,                 Gnvt::Oid),
 ];
 
 /// A struct of data that contains lookup table for `GeneralName`.
@@ -111,7 +81,7 @@ impl IntegerToGNTable {
 }
 
 /// Define static lookup for general names table
-pub(crate) static GENERAL_NAME_TABLES: Lazy<GeneralNameData> = Lazy::new(|| {
+static GENERAL_NAME_TABLES: Lazy<GeneralNameData> = Lazy::new(|| {
     let mut int_to_name_table = IntegerToGNTable::new();
     let mut int_to_type_table = HashMap::new();
 
@@ -125,3 +95,38 @@ pub(crate) static GENERAL_NAME_TABLES: Lazy<GeneralNameData> = Lazy::new(|| {
         int_to_type_table,
     }
 });
+
+/// Get the general name from the int value.
+pub(crate) fn get_gn_from_int(i: i16) -> Result<GeneralNameTypeRegistry, Error> {
+    GENERAL_NAME_TABLES
+        .get_int_to_name_table()
+        .get_map()
+        .get_by_left(&i)
+        .ok_or(Error::msg(format!(
+            "GeneralName not found in the general name registry table given int {i}"
+        )))
+        .cloned()
+}
+
+/// Get the int value from the general name.
+pub(crate) fn get_int_from_gn(gn: GeneralNameTypeRegistry) -> Result<i16, Error> {
+    GENERAL_NAME_TABLES
+        .get_int_to_name_table()
+        .get_map()
+        .get_by_right(&gn)
+        .ok_or(Error::msg(format!(
+            "Int value not found in the general name registry table given GeneralName {gn:?}"
+        )))
+        .cloned()
+}
+
+/// Get the general name value type from the int value.
+pub(crate) fn get_gn_value_type_from_int(i: i16) -> Result<GeneralNameValueType, Error> {
+    GENERAL_NAME_TABLES
+        .get_int_to_type_table()
+        .get(&i)
+        .ok_or(Error::msg(format!(
+            "General name value type not found in the general name registry table given {i}"
+        )))
+        .cloned()
+}

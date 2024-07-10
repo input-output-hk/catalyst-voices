@@ -200,4 +200,20 @@ mod test_extensions {
             Extensions::decode(&mut decoder, &mut ()).expect("Failed to decode Extensions");
         assert_eq!(decoded_exts, exts);
     }
+
+    #[test]
+    fn zero_extensions() {
+        let mut buffer = Vec::new();
+        let mut encoder = Encoder::new(&mut buffer);
+
+        let exts = Extensions::new();
+        exts.encode(&mut encoder, &mut ())
+            .expect("Failed to encode Extensions");
+        assert_eq!(hex::encode(buffer.clone()), "80");
+
+        let mut decoder = Decoder::new(&buffer);
+        let decoded_exts =
+            Extensions::decode(&mut decoder, &mut ()).expect("Failed to decode Extensions");
+        assert_eq!(decoded_exts, exts);
+    }
 }
