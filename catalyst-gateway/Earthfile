@@ -49,6 +49,10 @@ build:
     SAVE ARTIFACT target/doc doc
     SAVE ARTIFACT target/release/cat-gateway cat-gateway
 
+# build : Build the catalyst-gateway service. Used for nightly setup
+nightly:
+    FROM +build
+
 # all-hosts-build : Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
 all-hosts-build:
