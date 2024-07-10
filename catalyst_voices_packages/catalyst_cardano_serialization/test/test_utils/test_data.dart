@@ -127,6 +127,14 @@ Transaction fullUnsignedTestTransaction() {
       fee: const Coin(167173),
       ttl: const SlotBigNum(41193),
       auxiliaryDataHash: AuxiliaryDataHash.fromAuxiliaryData(auxiliaryData),
+      requiredSigners: {
+        Vkey.fromBytes(
+          hex.decode(
+            '3311ca404fcf22c91d607ace285d70e2'
+            '263a1b81745c39673080329bd1a3f56e',
+          ),
+        ),
+      },
       networkId: NetworkId.testnet,
     ),
     isValid: true,
@@ -157,6 +165,14 @@ Transaction fullSignedTestTransaction() {
       fee: const Coin(167173),
       ttl: const SlotBigNum(41193),
       auxiliaryDataHash: AuxiliaryDataHash.fromAuxiliaryData(auxiliaryData),
+      requiredSigners: {
+        Vkey.fromBytes(
+          hex.decode(
+            '3311ca404fcf22c91d607ace285d70e2'
+            '263a1b81745c39673080329bd1a3f56e',
+          ),
+        ),
+      },
       networkId: NetworkId.testnet,
     ),
     isValid: true,

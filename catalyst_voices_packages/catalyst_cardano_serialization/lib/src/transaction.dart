@@ -81,6 +81,10 @@ final class TransactionBody extends Equatable {
   /// which is the metadata of the transaction.
   final AuxiliaryDataHash? auxiliaryDataHash;
 
+  /// The list of public key hashes of addresses
+  /// that are required to sign the transaction.
+  final Set<Vkey>? requiredSigners;
+
   /// Specifies on which network the code will run.
   final NetworkId? networkId;
 
@@ -91,6 +95,7 @@ final class TransactionBody extends Equatable {
     required this.fee,
     this.ttl,
     this.auxiliaryDataHash,
+    this.requiredSigners,
     this.networkId,
   });
 
@@ -102,6 +107,7 @@ final class TransactionBody extends Equatable {
     final fee = map[const CborSmallInt(2)]!;
     final ttl = map[const CborSmallInt(3)];
     final auxiliaryDataHash = map[const CborSmallInt(7)];
+    final requiredSigners = map[const CborSmallInt(14)] as CborList?;
     final networkId = map[const CborSmallInt(15)] as CborSmallInt?;
 
     return TransactionBody(
@@ -112,6 +118,7 @@ final class TransactionBody extends Equatable {
       auxiliaryDataHash: auxiliaryDataHash != null
           ? AuxiliaryDataHash.fromCbor(auxiliaryDataHash)
           : null,
+      requiredSigners: requiredSigners?.map(Vkey.fromCbor).toSet(),
       networkId: networkId != null ? NetworkId.fromId(networkId.value) : null,
     );
   }
@@ -129,14 +136,25 @@ final class TransactionBody extends Equatable {
       if (ttl != null) const CborSmallInt(3): ttl!.toCbor(),
       if (auxiliaryDataHash != null)
         const CborSmallInt(7): auxiliaryDataHash!.toCbor(),
+      if (requiredSigners != null && requiredSigners!.isNotEmpty)
+        const CborSmallInt(14): CborList([
+          for (final signer in requiredSigners!) signer.toCbor(),
+        ]),
       if (networkId != null)
         const CborSmallInt(15): CborSmallInt(networkId!.id),
     });
   }
 
   @override
-  List<Object?> get props =>
-      [inputs, outputs, fee, ttl, auxiliaryDataHash, networkId];
+  List<Object?> get props => [
+        inputs,
+        outputs,
+        fee,
+        ttl,
+        auxiliaryDataHash,
+        requiredSigners,
+        networkId,
+      ];
 }
 
 /// The transaction output of a previous transaction,
