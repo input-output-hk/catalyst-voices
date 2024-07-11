@@ -10,7 +10,7 @@ use asn1_rs::Oid;
 use data::{get_oid_from_int, SUBJECT_PUB_KEY_ALGO_LOOKUP};
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 
-use crate::{c509_algo_iden::AlgorithmIdentifier, c509_oid::C509oidRegistered};
+use crate::{c509_algo_identifier::AlgorithmIdentifier, c509_oid::C509oidRegistered};
 
 /// A struct represents the `SubjectPubKeyAlgorithm`
 #[derive(Debug, Clone, PartialEq)]
@@ -18,7 +18,7 @@ pub struct SubjectPubKeyAlgorithm {
     /// The registered OID of the `SubjectPubKeyAlgorithm`.
     registered_oid: C509oidRegistered,
     /// An `AlgorithmIdentifier` type
-    algo_iden: AlgorithmIdentifier,
+    algo_identifier: AlgorithmIdentifier,
 }
 
 impl SubjectPubKeyAlgorithm {
@@ -30,7 +30,7 @@ impl SubjectPubKeyAlgorithm {
                 oid.clone(),
                 SUBJECT_PUB_KEY_ALGO_LOOKUP.get_int_to_oid_table(),
             ),
-            algo_iden: AlgorithmIdentifier::new(oid, param),
+            algo_identifier: AlgorithmIdentifier::new(oid, param),
         }
     }
 }
@@ -47,7 +47,7 @@ impl Encode<()> for SubjectPubKeyAlgorithm {
         {
             e.i16(i)?;
         } else {
-            AlgorithmIdentifier::encode(&self.algo_iden, e, ctx)?;
+            AlgorithmIdentifier::encode(&self.algo_identifier, e, ctx)?;
         }
         Ok(())
     }
@@ -61,10 +61,10 @@ impl Decode<'_, ()> for SubjectPubKeyAlgorithm {
             let oid = get_oid_from_int(i).map_err(minicbor::decode::Error::message)?;
             Ok(Self::new(oid, None))
         } else {
-            let algo_iden = AlgorithmIdentifier::decode(d, ctx)?;
+            let algo_identifier = AlgorithmIdentifier::decode(d, ctx)?;
             Ok(SubjectPubKeyAlgorithm::new(
-                algo_iden.get_oid(),
-                algo_iden.get_param(),
+                algo_identifier.get_oid(),
+                algo_identifier.get_param(),
             ))
         }
     }

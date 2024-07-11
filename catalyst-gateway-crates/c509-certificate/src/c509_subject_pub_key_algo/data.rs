@@ -2,6 +2,8 @@
 //! of C509 `subjectPublicKeyAlgorithm`. See [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
 //! Section 9.11 C509 Public Key Algorithms Registry for more information.
 
+// cspell: words Weierstraß secp XMSS brainpool
+
 use anyhow::Error;
 use asn1_rs::{oid, Oid};
 use once_cell::sync::Lazy;

@@ -6,7 +6,7 @@
 //! Please refer to the [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/) for more information.
 
 use wasm_bindgen::prelude::wasm_bindgen;
-pub mod c509_algo_iden;
+pub mod c509_algo_identifier;
 pub mod c509_extensions;
 pub mod c509_general_names;
 pub mod c509_issuer_sig_algo;

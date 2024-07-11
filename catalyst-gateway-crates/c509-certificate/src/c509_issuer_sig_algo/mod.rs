@@ -10,7 +10,7 @@ use asn1_rs::Oid;
 use data::{get_oid_from_int, ISSUER_SIG_ALGO_LOOKUP};
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 
-use crate::{c509_algo_iden::AlgorithmIdentifier, c509_oid::C509oidRegistered};
+use crate::{c509_algo_identifier::AlgorithmIdentifier, c509_oid::C509oidRegistered};
 
 /// A struct represents the `IssuerSignatureAlgorithm`
 #[derive(Debug, Clone, PartialEq)]
@@ -18,7 +18,7 @@ pub struct IssuerSignatureAlgorithm {
     /// The registered OID of the `IssuerSignatureAlgorithm`.
     registered_oid: C509oidRegistered,
     /// An `AlgorithmIdentifier` type
-    algo_iden: AlgorithmIdentifier,
+    algo_identifier: AlgorithmIdentifier,
 }
 
 impl IssuerSignatureAlgorithm {
@@ -30,7 +30,7 @@ impl IssuerSignatureAlgorithm {
                 oid.clone(),
                 ISSUER_SIG_ALGO_LOOKUP.get_int_to_oid_table(),
             ),
-            algo_iden: AlgorithmIdentifier::new(oid, param),
+            algo_identifier: AlgorithmIdentifier::new(oid, param),
         }
     }
 }
@@ -47,7 +47,7 @@ impl Encode<()> for IssuerSignatureAlgorithm {
         {
             e.i16(i)?;
         } else {
-            AlgorithmIdentifier::encode(&self.algo_iden, e, ctx)?;
+            AlgorithmIdentifier::encode(&self.algo_identifier, e, ctx)?;
         }
         Ok(())
     }
@@ -63,10 +63,10 @@ impl Decode<'_, ()> for IssuerSignatureAlgorithm {
                 Ok(Self::new(oid, None))
             },
             _ => {
-                let algo_iden = AlgorithmIdentifier::decode(d, ctx)?;
+                let algo_identifier = AlgorithmIdentifier::decode(d, ctx)?;
                 Ok(IssuerSignatureAlgorithm::new(
-                    algo_iden.get_oid(),
-                    algo_iden.get_param(),
+                    algo_identifier.get_oid(),
+                    algo_identifier.get_param(),
                 ))
             },
         }

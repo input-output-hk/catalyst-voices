@@ -2,6 +2,8 @@
 //! C509 `issuerSignatureAlgorithm`. See [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
 //! Section 9.10 C509 Signature Algorithms Registry for more information.
 
+// cspell: words RSASSA XMSS
+
 use anyhow::Error;
 use asn1_rs::{oid, Oid};
 use once_cell::sync::Lazy;
