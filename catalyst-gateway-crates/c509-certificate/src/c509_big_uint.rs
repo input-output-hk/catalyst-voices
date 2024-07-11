@@ -2,7 +2,7 @@
 //! Please refer to [CDDL Wrapping](https://datatracker.ietf.org/doc/html/rfc8610#section-3.7)
 //! for unwrapped types.
 
-// cspell: words Bignum bignum
+// cspell: words Bignum bignum biguint
 
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 
