@@ -45,9 +45,7 @@ impl EventDB {
     pub(crate) async fn get_events(
         &self, limit: Option<i64>, offset: Option<i64>,
     ) -> anyhow::Result<Vec<EventSummary>> {
-        let rows = self
-            .query(Self::EVENTS_QUERY, &[&limit, &offset.unwrap_or(0)])
-            .await?;
+        let rows = Self::query(Self::EVENTS_QUERY, &[&limit, &offset.unwrap_or(0)]).await?;
 
         let mut events = Vec::new();
         for row in rows {
@@ -74,8 +72,8 @@ impl EventDB {
 
     /// Get event query
     #[allow(dead_code)]
-    pub(crate) async fn get_event(&self, event: EventId) -> anyhow::Result<Event> {
-        let rows = self.query(Self::EVENT_QUERY, &[&event.0]).await?;
+    pub(crate) async fn get_event(event: EventId) -> anyhow::Result<Event> {
+        let rows = Self::query(Self::EVENT_QUERY, &[&event.0]).await?;
         let row = rows.first().ok_or(NotFoundError)?;
 
         let ends = row
@@ -129,7 +127,7 @@ impl EventDB {
                 .map(|val| val.and_local_timezone(Utc).unwrap()),
         };
 
-        let rows = self.query(Self::EVENT_GOALS_QUERY, &[&event.0]).await?;
+        let rows = Self::query(Self::EVENT_GOALS_QUERY, &[&event.0]).await?;
         let mut goals = Vec::new();
         for row in rows {
             goals.push(EventGoal {

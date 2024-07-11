@@ -1,16 +1,9 @@
 //! Implementation of the `GET /v1/votes/plan/account-votes/:account_id` endpoint
-
-use std::sync::Arc;
-
-use poem::web::Data;
 use poem_openapi::{param::Path, payload::Json, ApiResponse};
 
-use crate::{
-    service::common::{
-        objects::legacy::account_votes::{AccountId, AccountVote},
-        responses::WithErrorResponses,
-    },
-    state::State,
+use crate::service::common::{
+    objects::legacy::account_votes::{AccountId, AccountVote},
+    responses::WithErrorResponses,
 };
 
 /// Endpoint responses
@@ -31,8 +24,6 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// For each active vote plan, this endpoint returns an array
 /// with the proposal index number that the account voted for.
 #[allow(clippy::unused_async)]
-pub(crate) async fn endpoint(
-    _state: Data<&Arc<State>>, _account_id: Path<AccountId>,
-) -> AllResponses {
+pub(crate) async fn endpoint(_account_id: Path<AccountId>) -> AllResponses {
     Responses::Ok(Json(Vec::new())).into()
 }

@@ -18,7 +18,7 @@ use tracing::{error, field, Instrument, Level, Span};
 use ulid::Ulid;
 use uuid::Uuid;
 
-use crate::settings::CLIENT_ID_KEY;
+use crate::settings::Settings;
 
 /// Labels for the metrics
 const METRIC_LABELS: [&str; 3] = ["endpoint", "method", "status_code"];
@@ -117,6 +117,24 @@ pub(crate) struct TracingEndpoint<E> {
     inner: E,
 }
 
+/// Given a Clients IP Address, return the anonymized version of it.
+fn anonymize_ip_address(remote_addr: &str) -> String {
+    // We are going to represent it as a UUID.
+    let mut b2b = Blake2b::new_keyed(16, Settings::client_id_key().as_bytes());
+    let mut out = [0; 16];
+
+    b2b.input_str(Settings::client_id_key());
+    b2b.input_str(remote_addr);
+    b2b.result(&mut out);
+
+    uuid::Builder::from_bytes(out)
+        .with_version(uuid::Version::Random)
+        .with_variant(uuid::Variant::RFC4122)
+        .into_uuid()
+        .hyphenated()
+        .to_string()
+}
+
 /// Get an anonymized client ID from the request.
 ///
 /// This simply takes the clients IP address,
@@ -125,31 +143,13 @@ pub(crate) struct TracingEndpoint<E> {
 /// The Hash is unique per client IP, but not able to
 /// be reversed or analyzed without both the client IP and the key.
 async fn anonymous_client_id(req: &Request) -> String {
-    let mut b2b = Blake2b::new(16); // We are going to represent it as a UUID.
-    let mut out = [0; 16];
-
     let remote_addr = RealIp::from_request_without_body(req)
         .await
         .ok()
         .and_then(|real_ip| real_ip.0)
         .map_or_else(|| req.remote_addr().to_string(), |addr| addr.to_string());
 
-    b2b.input_str(CLIENT_ID_KEY.as_str());
-    b2b.input_str(&remote_addr);
-    b2b.result(&mut out);
-
-    // Note: This will only panic if the `out` is not 16 bytes long.
-    // Which it is.
-    // Therefore the `unwrap()` is safe and will not cause a panic here under any
-    // circumstances.
-    #[allow(clippy::unwrap_used)]
-    uuid::Builder::from_slice(&out)
-        .unwrap()
-        .with_version(uuid::Version::Random)
-        .with_variant(uuid::Variant::RFC4122)
-        .into_uuid()
-        .hyphenated()
-        .to_string()
+    anonymize_ip_address(&remote_addr)
 }
 
 /// Data we collected about the response

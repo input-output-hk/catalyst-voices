@@ -31,15 +31,13 @@ impl EventDB {
     /// Get objectives query
     #[allow(dead_code)]
     pub(crate) async fn get_objectives(
-        &self, event: EventId, limit: Option<i64>, offset: Option<i64>,
+        event: EventId, limit: Option<i64>, offset: Option<i64>,
     ) -> anyhow::Result<Vec<Objective>> {
-        let rows = self
-            .query(Self::OBJECTIVES_QUERY, &[
-                &event.0,
-                &limit,
-                &offset.unwrap_or(0),
-            ])
-            .await?;
+        let rows = Self::query(
+            Self::OBJECTIVES_QUERY,
+            &[&event.0, &limit, &offset.unwrap_or(0)],
+        )
+        .await?;
 
         let mut objectives = Vec::new();
         for row in rows {
@@ -62,7 +60,7 @@ impl EventDB {
             };
 
             let mut groups = Vec::new();
-            let rows = self.query(Self::VOTING_GROUPS_QUERY, &[&row_id]).await?;
+            let rows = Self::query(Self::VOTING_GROUPS_QUERY, &[&row_id]).await?;
             for row in rows {
                 let group = row.try_get::<_, Option<String>>("group")?.map(VoterGroupId);
                 let voting_token: Option<_> = row.try_get("voting_token")?;

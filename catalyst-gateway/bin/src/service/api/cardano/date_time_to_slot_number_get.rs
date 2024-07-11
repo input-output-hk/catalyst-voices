@@ -6,6 +6,7 @@ use crate::{
     event_db::{
         cardano::chain_state::{BlockHash, DateTime, SlotInfoQueryType, SlotNumber},
         error::NotFoundError,
+        EventDB,
     },
     service::common::{
         objects::cardano::{
@@ -14,7 +15,6 @@ use crate::{
         },
         responses::WithErrorResponses,
     },
-    state::State,
 };
 
 /// Endpoint responses.
@@ -31,41 +31,40 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// # GET `/date_time_to_slot_number`
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint(
-    state: &State, date_time: Option<DateTime>, network: Option<Network>,
+    date_time: Option<DateTime>, network: Option<Network>,
 ) -> AllResponses {
-    let event_db = state.event_db();
-
     let date_time = date_time.unwrap_or_else(chrono::Utc::now);
     let network = network.unwrap_or(Network::Mainnet);
 
     let (previous, current, next) = tokio::join!(
-        event_db.get_slot_info(
+        EventDB::get_slot_info(
             date_time,
             network.clone().into(),
             SlotInfoQueryType::Previous
         ),
-        event_db.get_slot_info(
+        EventDB::get_slot_info(
             date_time,
             network.clone().into(),
             SlotInfoQueryType::Current
         ),
-        event_db.get_slot_info(date_time, network.into(), SlotInfoQueryType::Next)
+        EventDB::get_slot_info(date_time, network.into(), SlotInfoQueryType::Next)
     );
 
-    let process_slot_info_result =
-        |slot_info_result: anyhow::Result<(SlotNumber, BlockHash, DateTime)>| {
-            match slot_info_result {
-                Ok((slot_number, block_hash, block_time)) => {
-                    Ok(Some(Slot {
-                        slot_number,
-                        block_hash: From::from(block_hash),
-                        block_time,
-                    }))
-                },
-                Err(err) if err.is::<NotFoundError>() => Ok(None),
-                Err(err) => Err(err),
-            }
-        };
+    let process_slot_info_result = |slot_info_result: anyhow::Result<(
+        SlotNumber,
+        BlockHash,
+        DateTime,
+    )>| {
+        match slot_info_result {
+            Ok((slot_number, block_hash, block_time)) => Ok(Some(Slot {
+                slot_number,
+                block_hash: From::from(block_hash),
+                block_time,
+            })),
+            Err(err) if err.is::<NotFoundError>() => Ok(None),
+            Err(err) => Err(err),
+        }
+    };
 
     let current = match process_slot_info_result(current) {
         Ok(current) => current,

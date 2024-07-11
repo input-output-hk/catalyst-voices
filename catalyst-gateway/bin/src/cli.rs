@@ -1,15 +1,12 @@
 //! CLI interpreter for the service
-use std::{io::Write, sync::Arc};
+use std::io::Write;
 
 use clap::Parser;
 use tracing::{error, info};
 
 use crate::{
-    cardano::start_followers,
-    logger,
     service::{self, started},
-    settings::{DocsSettings, ServiceSettings},
-    state::State,
+    settings::{DocsSettings, ServiceSettings, Settings},
 };
 
 #[derive(Parser)]
@@ -35,22 +32,13 @@ impl Cli {
     /// - Failed to initialize the logger with the specified log level.
     /// - Failed to create a new `State` with the provided database URL.
     /// - Failed to run the service on the specified address.
-    pub(crate) async fn exec(self) -> anyhow::Result<()> {
+    pub(crate) fn exec(self) -> anyhow::Result<()> {
         match self {
             Self::Run(settings) => {
-                let logger_handle = logger::init(settings.log_level);
-
-                // Unique machine id
-                let machine_id = settings.follower_settings.machine_uid;
-
-                let state = Arc::new(State::new(Some(settings.database_url), logger_handle).await?);
-                let event_db = state.event_db();
-                event_db
-                    .modify_deep_query(settings.deep_query_inspection.into())
-                    .await;
+                Settings::init(settings)?;
 
                 tokio::spawn(async move {
-                    match service::run(&settings.docs_settings, state.clone()).await {
+                    match service::run().await {
                         Ok(()) => info!("Endpoints started ok"),
                         Err(err) => {
                             error!("Error starting endpoints {err}");
@@ -58,19 +46,19 @@ impl Cli {
                     }
                 });
 
+                /*
+
                 let followers_fut = start_followers(
                     event_db.clone(),
                     settings.follower_settings.check_config_tick,
                     settings.follower_settings.data_refresh_tick,
                     machine_id,
-                );
+                );*/
                 started();
-                followers_fut.await?;
-
-                Ok(())
+                /*followers_fut.await?;*/
             },
             Self::Docs(settings) => {
-                let docs = service::get_app_docs(&settings);
+                let docs = service::get_app_docs();
                 match settings.output {
                     Some(path) => {
                         let mut docs_file = std::fs::File::create(path)?;
@@ -78,8 +66,9 @@ impl Cli {
                     },
                     None => println!("{docs}"),
                 }
-                Ok(())
             },
         }
+
+        Ok(())
     }
 }

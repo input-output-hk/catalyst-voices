@@ -54,11 +54,11 @@ const SELECT_CONFIG_SQL: &str = include_str!("select_config.sql");
 
 impl EventDB {
     /// Config query
-    pub(crate) async fn get_follower_config(&self) -> anyhow::Result<Vec<FollowerConfig>> {
+    pub(crate) async fn get_follower_config() -> anyhow::Result<Vec<FollowerConfig>> {
         let id = "cardano";
         let id2 = "follower";
 
-        let rows = self.query(SELECT_CONFIG_SQL, &[&id, &id2]).await?;
+        let rows = Self::query(SELECT_CONFIG_SQL, &[&id, &id2]).await?;
 
         let mut follower_configs = Vec::new();
         for row in rows {

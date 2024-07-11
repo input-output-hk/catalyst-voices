@@ -3,7 +3,7 @@
 use poem_openapi::{payload::Json, ApiResponse};
 
 use crate::{
-    event_db::{cardano::chain_state::SlotNumber, error::NotFoundError},
+    event_db::{cardano::chain_state::SlotNumber, error::NotFoundError, EventDB},
     service::{
         common::{
             objects::cardano::{
@@ -13,7 +13,6 @@ use crate::{
         },
         utilities::check_network,
     },
-    state::State,
 };
 
 /// Endpoint responses.
@@ -32,11 +31,8 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # GET `/staked_ada`
 pub(crate) async fn endpoint(
-    state: &State, stake_address: StakeAddress, provided_network: Option<Network>,
-    slot_num: Option<SlotNumber>,
+    stake_address: StakeAddress, provided_network: Option<Network>, slot_num: Option<SlotNumber>,
 ) -> AllResponses {
-    let event_db = state.event_db();
-
     let date_time = slot_num.unwrap_or(SlotNumber::MAX);
     let stake_credential = stake_address.payload().as_hash().to_vec();
 
@@ -46,17 +42,12 @@ pub(crate) async fn endpoint(
     };
 
     // get the total utxo amount from the database
-    match event_db
-        .total_utxo_amount(stake_credential, network.into(), date_time)
-        .await
-    {
-        Ok((amount, slot_number)) => {
-            Responses::Ok(Json(StakeInfo {
-                amount,
-                slot_number,
-            }))
-            .into()
-        },
+    match EventDB::total_utxo_amount(stake_credential, network.into(), date_time).await {
+        Ok((amount, slot_number)) => Responses::Ok(Json(StakeInfo {
+            amount,
+            slot_number,
+        }))
+        .into(),
         Err(err) if err.is::<NotFoundError>() => Responses::NotFound.into(),
         Err(err) => AllResponses::handle_error(&err),
     }

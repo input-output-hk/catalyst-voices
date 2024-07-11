@@ -1,13 +1,19 @@
 //! Catalyst Election Database crate
-use std::{str::FromStr, sync::Arc};
+use std::{
+    str::FromStr,
+    sync::{
+        atomic::{AtomicBool, Ordering},
+        Arc, OnceLock,
+    },
+};
 
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
-use dotenvy::dotenv;
 use stringzilla::StringZilla;
-use tokio::sync::RwLock;
 use tokio_postgres::{types::ToSql, NoTls, Row};
-use tracing::{debug, debug_span, Instrument};
+use tracing::{debug, debug_span, error, Instrument};
+
+use crate::settings::Settings;
 
 pub(crate) mod cardano;
 pub(crate) mod error;
@@ -22,36 +28,17 @@ const DATABASE_URL_ENVVAR: &str = "EVENT_DB_URL";
 /// Must equal the last Migrations Version Number.
 pub(crate) const DATABASE_SCHEMA_VERSION: i32 = 9;
 
-#[derive(Clone, Copy, Default, Debug, PartialEq, Eq)]
-/// Settings for deep query inspection
-pub(crate) enum DeepQueryInspectionFlag {
-    /// Enable deep query inspection
-    Enabled,
-    /// Disable deep query inspection
-    #[default]
-    Disabled,
-}
+/// Postgres Connection Manager DB Pool
+type SqlDbPool = Arc<Pool<PostgresConnectionManager<NoTls>>>;
 
-impl From<bool> for DeepQueryInspectionFlag {
-    fn from(b: bool) -> Self {
-        if b {
-            Self::Enabled
-        } else {
-            Self::Disabled
-        }
-    }
-}
+/// Postgres Connection Manager DB Pool Instance
+static EVENT_DB_POOL: OnceLock<SqlDbPool> = OnceLock::new();
 
-#[allow(unused)]
-/// Connection to the Election Database
-pub(crate) struct EventDB {
-    /// Internal database connection.  DO NOT MAKE PUBLIC.
-    /// All database operations (queries, inserts, etc) should be constrained
-    /// to this crate and should be exported with a clean data access api.
-    pool: Pool<PostgresConnectionManager<NoTls>>,
-    /// Deep query inspection flag.
-    deep_query_inspection_flag: Arc<RwLock<DeepQueryInspectionFlag>>,
-}
+/// Is Deep Query Analysis enabled or not?
+static DEEP_QUERY_INSPECT: AtomicBool = AtomicBool::new(false);
+
+/// The Catalyst Event SQL Database
+pub(crate) struct EventDB {}
 
 /// `EventDB` Errors
 #[derive(thiserror::Error, Debug, PartialEq, Eq)]
@@ -65,12 +52,15 @@ pub(crate) enum Error {
     /// No DB URL was provided
     #[error("DB URL is undefined")]
     NoDatabaseUrl,
+    /// Failed to get a DB Pool
+    #[error("DB Pool uninitialized")]
+    DbPoolUninitialized,
 }
 
 impl EventDB {
     /// Determine if deep query inspection is enabled.
-    pub(crate) async fn is_deep_query_enabled(&self) -> bool {
-        *self.deep_query_inspection_flag.read().await == DeepQueryInspectionFlag::Enabled
+    pub(crate) fn is_deep_query_enabled() -> bool {
+        DEEP_QUERY_INSPECT.load(Ordering::SeqCst)
     }
 
     /// Modify the deep query inspection setting.
@@ -78,11 +68,8 @@ impl EventDB {
     /// # Arguments
     ///
     /// * `deep_query` - `DeepQueryInspection` setting.
-    pub(crate) async fn modify_deep_query(
-        &self, deep_query_inspection_flag: DeepQueryInspectionFlag,
-    ) {
-        let mut flag = self.deep_query_inspection_flag.write().await;
-        *flag = deep_query_inspection_flag;
+    pub(crate) fn modify_deep_query(enable: bool) {
+        DEEP_QUERY_INSPECT.store(enable, Ordering::SeqCst);
     }
 
     /// Query the database.
@@ -100,18 +87,14 @@ impl EventDB {
     /// `Result<Vec<Row>, anyhow::Error>`
     #[must_use = "ONLY use this function for SELECT type operations which return row data, otherwise use `modify()`"]
     pub(crate) async fn query(
-        &self, stmt: &str, params: &[&(dyn ToSql + Sync)],
+        stmt: &str, params: &[&(dyn ToSql + Sync)],
     ) -> Result<Vec<Row>, anyhow::Error> {
-        if self.is_deep_query_enabled().await {
-            // Check if this is a query statement
-            // if is_query_stmt(stmt) {
-            //     self.explain_analyze_rollback(stmt, params).await?;
-            // } else {
-            //     return Err(Error::InvalidQueryStatement.into());
-            // }
-            self.explain_analyze_rollback(stmt, params).await?;
+        if Self::is_deep_query_enabled() {
+            Self::explain_analyze_rollback(stmt, params).await?;
         }
-        let rows = self.pool.get().await?.query(stmt, params).await?;
+        let pool = EVENT_DB_POOL.get().ok_or(Error::DbPoolUninitialized)?;
+        let conn = pool.get().await?;
+        let rows = conn.query(stmt, params).await?;
         Ok(rows)
     }
 
@@ -127,18 +110,14 @@ impl EventDB {
     /// `Result<Row, anyhow::Error>`
     #[must_use = "ONLY use this function for SELECT type operations which return row data, otherwise use `modify()`"]
     pub(crate) async fn query_one(
-        &self, stmt: &str, params: &[&(dyn ToSql + Sync)],
+        stmt: &str, params: &[&(dyn ToSql + Sync)],
     ) -> Result<Row, anyhow::Error> {
-        if self.is_deep_query_enabled().await {
-            // Check if this is a query statement
-            // if is_query_stmt(stmt) {
-            //     self.explain_analyze_rollback(stmt, params).await?;
-            // } else {
-            //     return Err(Error::InvalidQueryStatement.into());
-            // }
-            self.explain_analyze_rollback(stmt, params).await?;
+        if Self::is_deep_query_enabled() {
+            Self::explain_analyze_rollback(stmt, params).await?;
         }
-        let row = self.pool.get().await?.query_one(stmt, params).await?;
+        let pool = EVENT_DB_POOL.get().ok_or(Error::DbPoolUninitialized)?;
+        let conn = pool.get().await?;
+        let row = conn.query_one(stmt, params).await?;
         Ok(row)
     }
 
@@ -155,33 +134,29 @@ impl EventDB {
     /// # Returns
     ///
     /// `anyhow::Result<()>`
-    pub(crate) async fn modify(
-        &self, stmt: &str, params: &[&(dyn ToSql + Sync)],
-    ) -> anyhow::Result<()> {
-        if self.is_deep_query_enabled().await {
-            // Check if this is a query statement
-            // if is_query_stmt(stmt) {
-            //     return Err(Error::InvalidModifyStatement.into());
-            // }
-            self.explain_analyze_commit(stmt, params).await?;
+    pub(crate) async fn modify(stmt: &str, params: &[&(dyn ToSql + Sync)]) -> anyhow::Result<()> {
+        if Self::is_deep_query_enabled() {
+            Self::explain_analyze_commit(stmt, params).await?;
         } else {
-            self.pool.get().await?.query(stmt, params).await?;
+            let pool = EVENT_DB_POOL.get().ok_or(Error::DbPoolUninitialized)?;
+            let conn = pool.get().await?;
+            conn.query(stmt, params).await?;
         }
         Ok(())
     }
 
     /// Prepend `EXPLAIN ANALYZE` to the query, and rollback the transaction.
     async fn explain_analyze_rollback(
-        &self, stmt: &str, params: &[&(dyn ToSql + Sync)],
+        stmt: &str, params: &[&(dyn ToSql + Sync)],
     ) -> anyhow::Result<()> {
-        self.explain_analyze(stmt, params, true).await
+        Self::explain_analyze(stmt, params, true).await
     }
 
     /// Prepend `EXPLAIN ANALYZE` to the query, and commit the transaction.
     async fn explain_analyze_commit(
-        &self, stmt: &str, params: &[&(dyn ToSql + Sync)],
+        stmt: &str, params: &[&(dyn ToSql + Sync)],
     ) -> anyhow::Result<()> {
-        self.explain_analyze(stmt, params, false).await
+        Self::explain_analyze(stmt, params, false).await
     }
 
     /// Prepend `EXPLAIN ANALYZE` to the query.
@@ -194,7 +169,7 @@ impl EventDB {
     /// * `params` - `&[&(dyn ToSql + Sync)]` SQL parameters.
     /// * `rollback` - `bool` whether to roll back the transaction or not.
     async fn explain_analyze(
-        &self, stmt: &str, params: &[&(dyn ToSql + Sync)], rollback: bool,
+        stmt: &str, params: &[&(dyn ToSql + Sync)], rollback: bool,
     ) -> anyhow::Result<()> {
         let span = debug_span!(
             "query_plan",
@@ -204,7 +179,8 @@ impl EventDB {
         );
 
         async move {
-            let mut conn = self.pool.get().await?;
+            let pool = EVENT_DB_POOL.get().ok_or(Error::DbPoolUninitialized)?;
+            let mut conn = pool.get().await?;
             let transaction = conn.transaction().await?;
             let explain_stmt = transaction
                 .prepare(format!("EXPLAIN ANALYZE {stmt}").as_str())
@@ -248,26 +224,26 @@ impl EventDB {
 ///
 /// The env var "`DATABASE_URL`" can be set directly as an anv var, or in a
 /// `.env` file.
-pub(crate) async fn establish_connection(url: Option<String>) -> anyhow::Result<EventDB> {
-    // Support env vars in a `.env` file,  doesn't need to exist.
-    dotenv().ok();
+pub(crate) fn establish_connection() -> anyhow::Result<()> {
+    let (url, user, pass) = Settings::event_db_settings();
 
-    let database_url = match url {
-        Some(url) => url,
-        // If the Database connection URL is not supplied, try and get from the env var.
-        None => std::env::var(DATABASE_URL_ENVVAR).map_err(|_| Error::NoDatabaseUrl)?,
-    };
-
-    let config = tokio_postgres::config::Config::from_str(&database_url)?;
+    let mut config = tokio_postgres::config::Config::from_str(url)?;
+    if let Some(user) = user {
+        config.user(user);
+    }
+    if let Some(pass) = pass {
+        config.password(pass);
+    }
 
     let pg_mgr = PostgresConnectionManager::new(config, tokio_postgres::NoTls);
 
-    let pool = Pool::builder().build(pg_mgr).await?;
+    let pool = Pool::builder().build_unchecked(pg_mgr);
 
-    Ok(EventDB {
-        pool,
-        deep_query_inspection_flag: Arc::default(),
-    })
+    if EVENT_DB_POOL.set(Arc::new(pool)).is_err() {
+        error!("Failed to set event db pool. Called Twice?");
+    }
+
+    Ok(())
 }
 
 /// Determine if the statement is a query statement.

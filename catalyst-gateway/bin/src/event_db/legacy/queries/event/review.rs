@@ -38,18 +38,20 @@ impl EventDB {
     /// Get reviews query
     #[allow(dead_code)]
     pub(crate) async fn get_reviews(
-        &self, event: EventId, objective: ObjectiveId, proposal: ProposalId, limit: Option<i64>,
+        event: EventId, objective: ObjectiveId, proposal: ProposalId, limit: Option<i64>,
         offset: Option<i64>,
     ) -> anyhow::Result<Vec<AdvisorReview>> {
-        let rows = self
-            .query(Self::REVIEWS_QUERY, &[
+        let rows = Self::query(
+            Self::REVIEWS_QUERY,
+            &[
                 &event.0,
                 &objective.0,
                 &proposal.0,
                 &limit,
                 &offset.unwrap_or(0),
-            ])
-            .await?;
+            ],
+        )
+        .await?;
 
         let mut reviews = Vec::new();
         for row in rows {
@@ -57,9 +59,7 @@ impl EventDB {
             let review_id: i32 = row.try_get("row_id")?;
 
             let mut ratings = Vec::new();
-            let rows = self
-                .query(Self::RATINGS_PER_REVIEW_QUERY, &[&review_id])
-                .await?;
+            let rows = Self::query(Self::RATINGS_PER_REVIEW_QUERY, &[&review_id]).await?;
             for row in rows {
                 ratings.push(Rating {
                     review_type: row.try_get("metric")?,
@@ -79,14 +79,11 @@ impl EventDB {
     pub(crate) async fn get_review_types(
         &self, event: EventId, objective: ObjectiveId, limit: Option<i64>, offset: Option<i64>,
     ) -> anyhow::Result<Vec<ReviewType>> {
-        let rows = self
-            .query(Self::REVIEW_TYPES_QUERY, &[
-                &event.0,
-                &objective.0,
-                &limit,
-                &offset.unwrap_or(0),
-            ])
-            .await?;
+        let rows = Self::query(
+            Self::REVIEW_TYPES_QUERY,
+            &[&event.0, &objective.0, &limit, &offset.unwrap_or(0)],
+        )
+        .await?;
         let mut review_types = Vec::new();
         for row in rows {
             let map = row

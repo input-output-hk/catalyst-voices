@@ -108,8 +108,8 @@ impl EventDB {
     /// Get fund query
     // TODO(stevenj): https://github.com/input-output-hk/catalyst-voices/issues/68
     #[allow(dead_code, clippy::too_many_lines)]
-    pub(crate) async fn get_fund(&self) -> anyhow::Result<FundWithNext> {
-        let rows = self.query(Self::FUND_QUERY, &[]).await?;
+    pub(crate) async fn get_fund() -> anyhow::Result<FundWithNext> {
+        let rows = Self::query(Self::FUND_QUERY, &[]).await?;
         let row = rows.first().ok_or(NotFoundError)?;
 
         let fund_id = row.try_get("id")?;
@@ -130,7 +130,7 @@ impl EventDB {
             .and_local_timezone(Utc)
             .unwrap();
 
-        let rows = self.query(Self::FUND_VOTE_PLANS_QUERY, &[&fund_id]).await?;
+        let rows = Self::query(Self::FUND_VOTE_PLANS_QUERY, &[&fund_id]).await?;
         let mut chain_vote_plans = Vec::new();
         for row in rows {
             chain_vote_plans.push(Voteplan {
@@ -150,7 +150,7 @@ impl EventDB {
             });
         }
 
-        let rows = self.query(Self::FUND_CHALLENGES_QUERY, &[&fund_id]).await?;
+        let rows = Self::query(Self::FUND_CHALLENGES_QUERY, &[&fund_id]).await?;
         let mut challenges = Vec::new();
         for row in rows {
             challenges.push(Challenge {
@@ -175,7 +175,7 @@ impl EventDB {
             });
         }
 
-        let rows = self.query(Self::FUND_GOALS_QUERY, &[&fund_id]).await?;
+        let rows = Self::query(Self::FUND_GOALS_QUERY, &[&fund_id]).await?;
         let mut goals = Vec::new();
         for row in rows {
             goals.push(Goal {
@@ -185,7 +185,7 @@ impl EventDB {
             });
         }
 
-        let rows = self.query(Self::FUND_GROUPS_QUERY, &[&fund_id]).await?;
+        let rows = Self::query(Self::FUND_GROUPS_QUERY, &[&fund_id]).await?;
         let mut groups = Vec::new();
         for row in rows {
             groups.push(Group {
@@ -276,64 +276,62 @@ impl EventDB {
         };
 
         let next = match row.try_get::<_, Option<i32>>("next_id")? {
-            Some(id) => {
-                Some(FundNextInfo {
-                    id,
-                    fund_name: row.try_get("next_fund_name")?,
-                    stage_dates: FundStageDates {
-                        insight_sharing_start: row
-                            .try_get::<_, Option<NaiveDateTime>>("next_insight_sharing_start")?
-                            .unwrap_or_default()
-                            .and_local_timezone(Utc)
-                            .unwrap(),
-                        proposal_submission_start: row
-                            .try_get::<_, Option<NaiveDateTime>>("next_proposal_submission_start")?
-                            .unwrap_or_default()
-                            .and_local_timezone(Utc)
-                            .unwrap(),
-                        refine_proposals_start: row
-                            .try_get::<_, Option<NaiveDateTime>>("next_refine_proposals_start")?
-                            .unwrap_or_default()
-                            .and_local_timezone(Utc)
-                            .unwrap(),
-                        finalize_proposals_start: row
-                            .try_get::<_, Option<NaiveDateTime>>("next_finalize_proposals_start")?
-                            .unwrap_or_default()
-                            .and_local_timezone(Utc)
-                            .unwrap(),
-                        proposal_assessment_start: row
-                            .try_get::<_, Option<NaiveDateTime>>("next_proposal_assessment_start")?
-                            .unwrap_or_default()
-                            .and_local_timezone(Utc)
-                            .unwrap(),
-                        assessment_qa_start: row
-                            .try_get::<_, Option<NaiveDateTime>>("next_assessment_qa_start")?
-                            .unwrap_or_default()
-                            .and_local_timezone(Utc)
-                            .unwrap(),
-                        snapshot_start: row
-                            .try_get::<_, Option<NaiveDateTime>>("next_snapshot_start")?
-                            .unwrap_or_default()
-                            .and_local_timezone(Utc)
-                            .unwrap(),
-                        voting_start: row
-                            .try_get::<_, Option<NaiveDateTime>>("next_voting_start")?
-                            .unwrap_or_default()
-                            .and_local_timezone(Utc)
-                            .unwrap(),
-                        voting_end: row
-                            .try_get::<_, Option<NaiveDateTime>>("next_voting_end")?
-                            .unwrap_or_default()
-                            .and_local_timezone(Utc)
-                            .unwrap(),
-                        tallying_end: row
-                            .try_get::<_, Option<NaiveDateTime>>("next_tallying_end")?
-                            .unwrap_or_default()
-                            .and_local_timezone(Utc)
-                            .unwrap(),
-                    },
-                })
-            },
+            Some(id) => Some(FundNextInfo {
+                id,
+                fund_name: row.try_get("next_fund_name")?,
+                stage_dates: FundStageDates {
+                    insight_sharing_start: row
+                        .try_get::<_, Option<NaiveDateTime>>("next_insight_sharing_start")?
+                        .unwrap_or_default()
+                        .and_local_timezone(Utc)
+                        .unwrap(),
+                    proposal_submission_start: row
+                        .try_get::<_, Option<NaiveDateTime>>("next_proposal_submission_start")?
+                        .unwrap_or_default()
+                        .and_local_timezone(Utc)
+                        .unwrap(),
+                    refine_proposals_start: row
+                        .try_get::<_, Option<NaiveDateTime>>("next_refine_proposals_start")?
+                        .unwrap_or_default()
+                        .and_local_timezone(Utc)
+                        .unwrap(),
+                    finalize_proposals_start: row
+                        .try_get::<_, Option<NaiveDateTime>>("next_finalize_proposals_start")?
+                        .unwrap_or_default()
+                        .and_local_timezone(Utc)
+                        .unwrap(),
+                    proposal_assessment_start: row
+                        .try_get::<_, Option<NaiveDateTime>>("next_proposal_assessment_start")?
+                        .unwrap_or_default()
+                        .and_local_timezone(Utc)
+                        .unwrap(),
+                    assessment_qa_start: row
+                        .try_get::<_, Option<NaiveDateTime>>("next_assessment_qa_start")?
+                        .unwrap_or_default()
+                        .and_local_timezone(Utc)
+                        .unwrap(),
+                    snapshot_start: row
+                        .try_get::<_, Option<NaiveDateTime>>("next_snapshot_start")?
+                        .unwrap_or_default()
+                        .and_local_timezone(Utc)
+                        .unwrap(),
+                    voting_start: row
+                        .try_get::<_, Option<NaiveDateTime>>("next_voting_start")?
+                        .unwrap_or_default()
+                        .and_local_timezone(Utc)
+                        .unwrap(),
+                    voting_end: row
+                        .try_get::<_, Option<NaiveDateTime>>("next_voting_end")?
+                        .unwrap_or_default()
+                        .and_local_timezone(Utc)
+                        .unwrap(),
+                    tallying_end: row
+                        .try_get::<_, Option<NaiveDateTime>>("next_tallying_end")?
+                        .unwrap_or_default()
+                        .and_local_timezone(Utc)
+                        .unwrap(),
+                },
+            }),
             None => None,
         };
 

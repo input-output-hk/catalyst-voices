@@ -69,3 +69,5 @@ cddl = { workspace = true }
 ciborium = { workspace = true }
 ed25519-dalek = "2.1.1"
 stringzilla = { workspace = true }
+duration-string.workspace = true
+once_cell.workspace = true

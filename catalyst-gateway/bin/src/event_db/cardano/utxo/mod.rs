@@ -8,7 +8,7 @@ use tracing::error;
 use super::{chain_state::SlotNumber, cip36_registration::StakeCredential};
 use crate::{
     cardano::util::parse_policy_assets,
-    event_db::{error::NotFoundError, EventDB},
+    event_db::{error::NotFoundError, Error, EventDB, EVENT_DB_POOL},
 };
 
 /// Stake amount.
@@ -125,13 +125,14 @@ impl IndexedTxnInputParams {
 impl EventDB {
     /// Batch writes transaction output indexing data.
     pub(crate) async fn index_many_txn_output_data(
-        &self, values: &[IndexedTxnOutputParams],
+        values: &[IndexedTxnOutputParams],
     ) -> anyhow::Result<()> {
         if values.is_empty() {
             return Ok(());
         }
 
-        let mut conn = self.pool.get().await?;
+        let pool = EVENT_DB_POOL.get().ok_or(Error::DbPoolUninitialized)?;
+        let mut conn = pool.get().await?;
         let tx = conn.transaction().await?;
 
         tx.execute(
@@ -144,13 +145,16 @@ impl EventDB {
             let sink = tx
             .copy_in("COPY tmp_cardano_utxo (tx_id, index, asset, stake_credential, value) FROM STDIN BINARY")
             .await?;
-            let writer = BinaryCopyInWriter::new(sink, &[
-                Type::BYTEA,
-                Type::INT4,
-                Type::JSONB,
-                Type::BYTEA,
-                Type::INT8,
-            ]);
+            let writer = BinaryCopyInWriter::new(
+                sink,
+                &[
+                    Type::BYTEA,
+                    Type::INT4,
+                    Type::JSONB,
+                    Type::BYTEA,
+                    Type::INT8,
+                ],
+            );
             tokio::pin!(writer);
 
             for params in values {
@@ -178,13 +182,14 @@ impl EventDB {
 
     /// Batch writes transaction input indexing data.
     pub(crate) async fn index_many_txn_input_data(
-        &self, values: &[IndexedTxnInputParams],
+        values: &[IndexedTxnInputParams],
     ) -> anyhow::Result<()> {
         if values.is_empty() {
             return Ok(());
         }
 
-        let mut conn = self.pool.get().await?;
+        let pool = EVENT_DB_POOL.get().ok_or(Error::DbPoolUninitialized)?;
+        let mut conn = pool.get().await?;
         let tx = conn.transaction().await?;
 
         tx.execute(
@@ -224,14 +229,13 @@ impl EventDB {
     }
 
     /// Batch writes transaction indexing data.
-    pub(crate) async fn index_many_txn_data(
-        &self, values: &[IndexedTxnParams<'_>],
-    ) -> anyhow::Result<()> {
+    pub(crate) async fn index_many_txn_data(values: &[IndexedTxnParams<'_>]) -> anyhow::Result<()> {
         if values.is_empty() {
             return Ok(());
         }
 
-        let mut conn = self.pool.get().await?;
+        let pool = EVENT_DB_POOL.get().ok_or(Error::DbPoolUninitialized)?;
+        let mut conn = pool.get().await?;
         let tx = conn.transaction().await?;
 
         tx.execute(
@@ -270,15 +274,13 @@ impl EventDB {
 
     /// Get total utxo amount
     pub(crate) async fn total_utxo_amount(
-        &self, stake_credential: StakeCredential, network: Network, slot_num: SlotNumber,
+        stake_credential: StakeCredential, network: Network, slot_num: SlotNumber,
     ) -> anyhow::Result<(StakeAmount, SlotNumber)> {
-        let row = self
-            .query_one(SELECT_TOTAL_UTXO_AMOUNT_SQL, &[
-                &stake_credential,
-                &network.to_string(),
-                &slot_num,
-            ])
-            .await?;
+        let row = Self::query_one(
+            SELECT_TOTAL_UTXO_AMOUNT_SQL,
+            &[&stake_credential, &network.to_string(), &slot_num],
+        )
+        .await?;
 
         // Aggregate functions as SUM and MAX return NULL if there are no rows, so we need to
         // check for it.

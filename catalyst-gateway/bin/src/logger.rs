@@ -47,8 +47,11 @@ impl From<LogLevel> for tracing::log::LevelFilter {
     }
 }
 
+/// Handle to our Logger
+pub(crate) type LoggerHandle = Handle<LevelFilter, Registry>;
+
 /// Initialize the tracing subscriber
-pub(crate) fn init(log_level: LogLevel) -> Handle<LevelFilter, Registry> {
+pub(crate) fn init(log_level: LogLevel) -> LoggerHandle {
     // Create the formatting layer
     let layer = fmt::layer()
         .json()

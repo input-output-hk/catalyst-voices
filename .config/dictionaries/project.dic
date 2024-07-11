@@ -6,9 +6,9 @@ afinet
 androidx
 anypolicy
 appspot
-Arissara
 Arbritrary
 ARGB
+Arissara
 asmjs
 asyncio
 asyncpg
@@ -28,8 +28,8 @@ cardano
 Catalyst
 CBOR
 cborg
-CEST
 cdylib
+CEST
 cfbundle
 Chotivichit
 chromedriver
@@ -188,6 +188,7 @@ seckey
 sendfile
 slotno
 sqlfluff
+sslmode
 Stefano
 stevenj
 stringzilla

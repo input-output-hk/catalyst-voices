@@ -9,7 +9,9 @@ use crate::{
         cip36_registration::{Cip36Metadata, VotingInfo},
         util::valid_era,
     },
-    event_db::{cardano::chain_state::SlotNumber, error::NotFoundError, EventDB},
+    event_db::{
+        cardano::chain_state::SlotNumber, error::NotFoundError, Error, EventDB, EVENT_DB_POOL,
+    },
 };
 
 /// Transaction id
@@ -135,13 +137,14 @@ impl IndexedVoterRegistrationParams {
 impl EventDB {
     /// Batch writes voter registration data.
     pub(crate) async fn index_many_voter_registration_data(
-        &self, values: &[IndexedVoterRegistrationParams],
+        values: &[IndexedVoterRegistrationParams],
     ) -> anyhow::Result<()> {
         if values.is_empty() {
             return Ok(());
         }
 
-        let mut conn = self.pool.get().await?;
+        let pool = EVENT_DB_POOL.get().ok_or(Error::DbPoolUninitialized)?;
+        let mut conn = pool.get().await?;
         let tx = conn.transaction().await?;
 
         tx.execute(
@@ -154,16 +157,19 @@ impl EventDB {
             let sink = tx
             .copy_in("COPY  tmp_cardano_voter_registration (tx_id, stake_credential, public_voting_key, payment_address, nonce, metadata_cip36, stats, valid) FROM STDIN BINARY")
             .await?;
-            let writer = BinaryCopyInWriter::new(sink, &[
-                Type::BYTEA,
-                Type::BYTEA,
-                Type::BYTEA,
-                Type::BYTEA,
-                Type::INT8,
-                Type::BYTEA,
-                Type::JSONB,
-                Type::BOOL,
-            ]);
+            let writer = BinaryCopyInWriter::new(
+                sink,
+                &[
+                    Type::BYTEA,
+                    Type::BYTEA,
+                    Type::BYTEA,
+                    Type::BYTEA,
+                    Type::INT8,
+                    Type::BYTEA,
+                    Type::JSONB,
+                    Type::BOOL,
+                ],
+            );
             tokio::pin!(writer);
 
             for params in values {
@@ -197,15 +203,13 @@ impl EventDB {
 
     /// Get registration info
     pub(crate) async fn get_registration_info(
-        &self, stake_credential: StakeCredential, network: Network, slot_num: SlotNumber,
+        stake_credential: StakeCredential, network: Network, slot_num: SlotNumber,
     ) -> anyhow::Result<(TxId, PaymentAddress, PublicVotingInfo, Nonce)> {
-        let rows = self
-            .query(SELECT_VOTER_REGISTRATION_SQL, &[
-                &stake_credential,
-                &network.to_string(),
-                &slot_num,
-            ])
-            .await?;
+        let rows = Self::query(
+            SELECT_VOTER_REGISTRATION_SQL,
+            &[&stake_credential, &network.to_string(), &slot_num],
+        )
+        .await?;
 
         let row = rows.first().ok_or(NotFoundError)?;
 

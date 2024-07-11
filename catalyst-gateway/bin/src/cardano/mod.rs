@@ -1,5 +1,5 @@
 //! Logic for orchestrating followers
-use std::{path::PathBuf, sync::Arc, time::Duration};
+use std::{path::PathBuf, time::Duration};
 
 /// Handler for follower tasks, allows for control over spawned follower threads
 pub type ManageTasks = JoinHandle<()>;
@@ -12,15 +12,18 @@ use pallas::ledger::traverse::{wellknown::GenesisValues, MultiEraBlock, MultiEra
 use tokio::{sync::mpsc, task::JoinHandle, time};
 use tracing::{error, info};
 
-use crate::event_db::{
-    cardano::{
-        chain_state::{IndexedFollowerDataParams, MachineId},
-        cip36_registration::IndexedVoterRegistrationParams,
-        config::FollowerConfig,
-        utxo::{IndexedTxnInputParams, IndexedTxnOutputParams, IndexedTxnParams},
+use crate::{
+    event_db::{
+        cardano::{
+            chain_state::{IndexedFollowerDataParams, MachineId},
+            cip36_registration::IndexedVoterRegistrationParams,
+            config::FollowerConfig,
+            utxo::{IndexedTxnInputParams, IndexedTxnOutputParams, IndexedTxnParams},
+        },
+        error::NotFoundError,
+        EventDB,
     },
-    error::NotFoundError,
-    EventDB,
+    settings::Settings,
 };
 
 pub(crate) mod cip36_registration;
@@ -30,15 +33,13 @@ pub(crate) mod util;
 const MAX_BLOCKS_BATCH_LEN: usize = 1024;
 
 /// Returns a follower configs, waits until they present inside the db
-async fn get_follower_config(
-    check_config_tick: u64, db: Arc<EventDB>,
-) -> anyhow::Result<Vec<FollowerConfig>> {
+async fn get_follower_config(check_config_tick: u64) -> anyhow::Result<Vec<FollowerConfig>> {
     let mut interval = time::interval(time::Duration::from_secs(check_config_tick));
     loop {
         // tick until config exists
         interval.tick().await;
 
-        match db.get_follower_config().await {
+        match EventDB::get_follower_config().await {
             Ok(configs) => break Ok(configs),
             Err(err) if err.is::<NotFoundError>() => {
                 error!("No follower config found");
@@ -51,22 +52,21 @@ async fn get_follower_config(
 
 /// Start followers as per defined in the config
 pub(crate) async fn start_followers(
-    db: Arc<EventDB>, check_config_tick: u64, data_refresh_tick: u64, machine_id: String,
+    check_config_tick: u64, data_refresh_tick: u64,
 ) -> anyhow::Result<()> {
-    let mut current_config = get_follower_config(check_config_tick, db.clone()).await?;
+    let mut current_config = get_follower_config(check_config_tick).await?;
     loop {
         // spawn followers and obtain thread handlers for control and future cancellation
         let follower_tasks = spawn_followers(
             current_config.clone(),
-            db.clone(),
             data_refresh_tick,
-            machine_id.clone(),
+            Settings::service_id().to_string(),
         )
         .await?;
 
         // Followers should continue indexing until config has changed
         current_config = loop {
-            let new_config = get_follower_config(check_config_tick, db.clone()).await?;
+            let new_config = get_follower_config(check_config_tick).await?;
             if new_config != current_config {
                 info!("Config has changed! restarting");
                 break new_config;
@@ -83,7 +83,7 @@ pub(crate) async fn start_followers(
 
 /// Spawn follower threads and return associated handlers
 async fn spawn_followers(
-    configs: Vec<FollowerConfig>, db: Arc<EventDB>, _data_refresh_tick: u64, machine_id: String,
+    configs: Vec<FollowerConfig>, _data_refresh_tick: u64, machine_id: String,
 ) -> anyhow::Result<Vec<ManageTasks>> {
     let mut follower_tasks = Vec::new();
 
@@ -91,7 +91,6 @@ async fn spawn_followers(
         let follower_handler = spawn_follower(
             config.network,
             &config.relay,
-            db.clone(),
             machine_id.clone(),
             &config.mithril_snapshot.path,
         )
@@ -106,12 +105,12 @@ async fn spawn_followers(
 /// Initiate single follower and returns associated task handler
 /// which facilitates future control over spawned threads.
 async fn spawn_follower(
-    network: Network, relay: &str, db: Arc<EventDB>, machine_id: MachineId, snapshot: &str,
+    network: Network, relay: &str, machine_id: MachineId, snapshot: &str,
 ) -> anyhow::Result<ManageTasks> {
     // Establish point at which the last follower stopped updating in order to pick up
     // where it left off. If there was no previous follower, start indexing from
     // genesis point.
-    let start_from = match db.last_updated_state(network).await {
+    let start_from = match EventDB::last_updated_state(network).await {
         Ok((slot_no, block_hash, _)) => Point::new(slot_no.try_into()?, block_hash),
         Err(err) if err.is::<NotFoundError>() => Point::Origin,
         Err(err) => return Err(err),
@@ -125,7 +124,7 @@ async fn spawn_follower(
         .ok_or(anyhow::anyhow!("Obtaining genesis values failed"))?;
 
     let task = tokio::spawn(async move {
-        process_blocks(&mut follower, db, network, machine_id, &genesis_values).await;
+        process_blocks(&mut follower, network, machine_id, &genesis_values).await;
     });
 
     Ok(task)
@@ -133,7 +132,7 @@ async fn spawn_follower(
 
 /// Process next block from the follower
 async fn process_blocks(
-    follower: &mut Follower, db: Arc<EventDB>, network: Network, machine_id: MachineId,
+    follower: &mut Follower, network: Network, machine_id: MachineId,
     genesis_values: &GenesisValues,
 ) {
     info!("Follower started processing blocks");
@@ -157,7 +156,7 @@ async fn process_blocks(
                                 blocks_buffer.push(block_data);
 
                                 if blocks_buffer.len() >= MAX_BLOCKS_BATCH_LEN {
-                                    index_block_buffer(db.clone(), &genesis_values, network, &machine_id, std::mem::take(&mut blocks_buffer)).await;
+                                    index_block_buffer(&genesis_values, network, &machine_id, std::mem::take(&mut blocks_buffer)).await;
 
                                     // Reset batch ticker since we just indexed the blocks buffer
                                     ticker.reset();
@@ -184,7 +183,7 @@ async fn process_blocks(
                         }
 
                         let current_buffer = std::mem::take(&mut blocks_buffer);
-                        index_block_buffer(db.clone(), &genesis_values, network, &machine_id, current_buffer).await;
+                        index_block_buffer(&genesis_values, network, &machine_id, current_buffer).await;
 
                         // Reset the ticker so it counts the interval as starting after we wrote everything
                         // to the database.
@@ -197,31 +196,29 @@ async fn process_blocks(
 
     loop {
         match follower.next().await {
-            Ok(chain_update) => {
-                match chain_update {
-                    ChainUpdate::Block(data) => {
-                        if blocks_tx.send(data).await.is_err() {
-                            error!("Block indexing task not running");
-                            break;
-                        };
-                    },
-                    ChainUpdate::Rollback(data) => {
-                        let block = match data.decode() {
-                            Ok(block) => block,
-                            Err(err) => {
-                                error!("Unable to decode {network:?} block {err} - skip..");
-                                continue;
-                            },
-                        };
+            Ok(chain_update) => match chain_update {
+                ChainUpdate::Block(data) => {
+                    if blocks_tx.send(data).await.is_err() {
+                        error!("Block indexing task not running");
+                        break;
+                    };
+                },
+                ChainUpdate::Rollback(data) => {
+                    let block = match data.decode() {
+                        Ok(block) => block,
+                        Err(err) => {
+                            error!("Unable to decode {network:?} block {err} - skip..");
+                            continue;
+                        },
+                    };
 
-                        info!(
-                            "Rollback block NUMBER={} SLOT={} HASH={}",
-                            block.number(),
-                            block.slot(),
-                            hex::encode(block.hash()),
-                        );
-                    },
-                }
+                    info!(
+                        "Rollback block NUMBER={} SLOT={} HASH={}",
+                        block.number(),
+                        block.slot(),
+                        hex::encode(block.hash()),
+                    );
+                },
             },
             Err(err) => {
                 error!(
@@ -235,7 +232,7 @@ async fn process_blocks(
 
 /// Consumes a block buffer and indexes its data.
 async fn index_block_buffer(
-    db: Arc<EventDB>, genesis_values: &GenesisValues, network: Network, machine_id: &MachineId,
+    genesis_values: &GenesisValues, network: Network, machine_id: &MachineId,
     buffer: Vec<cardano_chain_follower::MultiEraBlockData>,
 ) {
     info!("Starting data batch indexing");
@@ -251,7 +248,7 @@ async fn index_block_buffer(
         }
     }
 
-    match index_many_blocks(db.clone(), genesis_values, network, machine_id, &blocks).await {
+    match index_many_blocks(genesis_values, network, machine_id, &blocks).await {
         Ok(()) => {
             info!("Finished indexing data batch");
         },
@@ -263,7 +260,7 @@ async fn index_block_buffer(
 
 /// Index a slice of blocks.
 async fn index_many_blocks(
-    db: Arc<EventDB>, genesis_values: &GenesisValues, network: Network, machine_id: &MachineId,
+    genesis_values: &GenesisValues, network: Network, machine_id: &MachineId,
     blocks: &[MultiEraBlock<'_>],
 ) -> anyhow::Result<()> {
     let Some(last_block) = blocks.last() else {
@@ -272,19 +269,18 @@ async fn index_many_blocks(
 
     let network_str = network.to_string();
 
-    index_blocks(&db, genesis_values, &network_str, blocks).await?;
-    index_transactions(&db, blocks, &network_str).await?;
-    index_voter_registrations(&db, blocks, network).await?;
+    index_blocks(genesis_values, &network_str, blocks).await?;
+    index_transactions(blocks, &network_str).await?;
+    index_voter_registrations(blocks, network).await?;
 
-    match db
-        .refresh_last_updated(
-            chrono::offset::Utc::now(),
-            last_block.slot().try_into()?,
-            last_block.hash().to_vec(),
-            network,
-            machine_id,
-        )
-        .await
+    match EventDB::refresh_last_updated(
+        chrono::offset::Utc::now(),
+        last_block.slot().try_into()?,
+        last_block.hash().to_vec(),
+        network,
+        machine_id,
+    )
+    .await
     {
         Ok(()) => {},
         Err(err) => {
@@ -297,7 +293,7 @@ async fn index_many_blocks(
 
 /// Index the data from the given blocks.
 async fn index_blocks(
-    db: &EventDB, genesis_values: &GenesisValues, network_str: &str, blocks: &[MultiEraBlock<'_>],
+    genesis_values: &GenesisValues, network_str: &str, blocks: &[MultiEraBlock<'_>],
 ) -> anyhow::Result<usize> {
     let values: Vec<_> = blocks
         .iter()
@@ -306,7 +302,7 @@ async fn index_blocks(
         })
         .collect();
 
-    db.index_many_follower_data(&values)
+    EventDB::index_many_follower_data(&values)
         .await
         .context("Indexing block data")?;
 
@@ -314,24 +310,22 @@ async fn index_blocks(
 }
 
 /// Index transactions (and its inputs and outputs) from a slice of blocks.
-async fn index_transactions(
-    db: &EventDB, blocks: &[MultiEraBlock<'_>], network_str: &str,
-) -> anyhow::Result<()> {
+async fn index_transactions(blocks: &[MultiEraBlock<'_>], network_str: &str) -> anyhow::Result<()> {
     let blocks_txs: Vec<_> = blocks
         .iter()
         .flat_map(|b| b.txs().into_iter().map(|tx| (b.slot(), tx)))
         .collect();
 
-    index_transactions_data(db, network_str, &blocks_txs).await?;
-    index_transaction_outputs_data(db, &blocks_txs).await?;
-    index_transaction_inputs_data(db, &blocks_txs).await?;
+    index_transactions_data(network_str, &blocks_txs).await?;
+    index_transaction_outputs_data(&blocks_txs).await?;
+    index_transaction_inputs_data(&blocks_txs).await?;
 
     Ok(())
 }
 
 /// Index transactions data.
 async fn index_transactions_data(
-    db: &EventDB, network_str: &str, blocks_txs: &[(u64, MultiEraTx<'_>)],
+    network_str: &str, blocks_txs: &[(u64, MultiEraTx<'_>)],
 ) -> anyhow::Result<usize> {
     let values: Vec<_> = blocks_txs
         .iter()
@@ -344,7 +338,7 @@ async fn index_transactions_data(
         })
         .collect::<anyhow::Result<Vec<_>>>()?;
 
-    db.index_many_txn_data(&values)
+    EventDB::index_many_txn_data(&values)
         .await
         .context("Indexing transaction data")?;
 
@@ -353,14 +347,14 @@ async fn index_transactions_data(
 
 /// Index transaction outputs data.
 async fn index_transaction_outputs_data(
-    db: &EventDB, blocks_txs: &[(u64, MultiEraTx<'_>)],
+    blocks_txs: &[(u64, MultiEraTx<'_>)],
 ) -> anyhow::Result<usize> {
     let values: Vec<_> = blocks_txs
         .iter()
         .flat_map(|(_, tx)| IndexedTxnOutputParams::from_txn_data(tx))
         .collect();
 
-    db.index_many_txn_output_data(&values)
+    EventDB::index_many_txn_output_data(&values)
         .await
         .context("Indexing transaction outputs")?;
 
@@ -369,14 +363,14 @@ async fn index_transaction_outputs_data(
 
 /// Index transaction inputs data.
 async fn index_transaction_inputs_data(
-    db: &EventDB, blocks_txs: &[(u64, MultiEraTx<'_>)],
+    blocks_txs: &[(u64, MultiEraTx<'_>)],
 ) -> anyhow::Result<usize> {
     let values: Vec<_> = blocks_txs
         .iter()
         .flat_map(|(_, tx)| IndexedTxnInputParams::from_txn_data(tx))
         .collect();
 
-    db.index_many_txn_input_data(&values)
+    EventDB::index_many_txn_input_data(&values)
         .await
         .context("Indexing transaction inputs")?;
 
@@ -385,7 +379,7 @@ async fn index_transaction_inputs_data(
 
 /// Index voter registrations from a slice of blocks.
 async fn index_voter_registrations(
-    db: &EventDB, blocks: &[MultiEraBlock<'_>], network: Network,
+    blocks: &[MultiEraBlock<'_>], network: Network,
 ) -> anyhow::Result<usize> {
     let values: Vec<_> = blocks
         .iter()
@@ -393,7 +387,7 @@ async fn index_voter_registrations(
         .flatten()
         .collect();
 
-    db.index_many_voter_registration_data(&values)
+    EventDB::index_many_voter_registration_data(&values)
         .await
         .context("Indexing voter registration")?;
 

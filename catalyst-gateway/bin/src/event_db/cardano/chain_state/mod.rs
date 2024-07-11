@@ -6,7 +6,7 @@ use pallas::ledger::traverse::{wellknown::GenesisValues, MultiEraBlock};
 use tokio_postgres::{binary_copy::BinaryCopyInWriter, types::Type};
 use tracing::error;
 
-use crate::event_db::{error::NotFoundError, EventDB};
+use crate::event_db::{error::NotFoundError, Error, EventDB, EVENT_DB_POOL};
 
 /// Block time
 pub type DateTime = chrono::DateTime<chrono::offset::Utc>;
@@ -58,23 +58,17 @@ impl SlotInfoQueryType {
     /// Get SQL query
     fn get_sql_query(&self) -> anyhow::Result<String> {
         let tmpl_fields = match self {
-            SlotInfoQueryType::Previous => {
-                SlotInfoQueryTmplFields {
-                    sign: "<",
-                    ordering: Some("DESC"),
-                }
+            SlotInfoQueryType::Previous => SlotInfoQueryTmplFields {
+                sign: "<",
+                ordering: Some("DESC"),
             },
-            SlotInfoQueryType::Current => {
-                SlotInfoQueryTmplFields {
-                    sign: "=",
-                    ordering: None,
-                }
+            SlotInfoQueryType::Current => SlotInfoQueryTmplFields {
+                sign: "=",
+                ordering: None,
             },
-            SlotInfoQueryType::Next => {
-                SlotInfoQueryTmplFields {
-                    sign: ">",
-                    ordering: None,
-                }
+            SlotInfoQueryType::Next => SlotInfoQueryTmplFields {
+                sign: ">",
+                ordering: None,
             },
         };
 
@@ -142,13 +136,14 @@ impl<'a> IndexedFollowerDataParams<'a> {
 impl EventDB {
     /// Batch writes follower data.
     pub(crate) async fn index_many_follower_data(
-        &self, values: &[IndexedFollowerDataParams<'_>],
+        values: &[IndexedFollowerDataParams<'_>],
     ) -> anyhow::Result<()> {
         if values.is_empty() {
             return Ok(());
         }
 
-        let mut conn = self.pool.get().await?;
+        let pool = EVENT_DB_POOL.get().ok_or(Error::DbPoolUninitialized)?;
+        let mut conn = pool.get().await?;
         let tx = conn.transaction().await?;
 
         tx.execute(
@@ -161,13 +156,16 @@ impl EventDB {
             let sink = tx
                 .copy_in("COPY tmp_cardano_slot_index (slot_no, network, epoch_no, block_time, block_hash) FROM STDIN BINARY")
                 .await?;
-            let writer = BinaryCopyInWriter::new(sink, &[
-                Type::INT8,
-                Type::TEXT,
-                Type::INT8,
-                Type::TIMESTAMPTZ,
-                Type::BYTEA,
-            ]);
+            let writer = BinaryCopyInWriter::new(
+                sink,
+                &[
+                    Type::INT8,
+                    Type::TEXT,
+                    Type::INT8,
+                    Type::TIMESTAMPTZ,
+                    Type::BYTEA,
+                ],
+            );
             tokio::pin!(writer);
 
             for params in values {
@@ -195,14 +193,13 @@ impl EventDB {
 
     /// Get slot info for the provided date-time and network and query type
     pub(crate) async fn get_slot_info(
-        &self, date_time: DateTime, network: Network, query_type: SlotInfoQueryType,
+        date_time: DateTime, network: Network, query_type: SlotInfoQueryType,
     ) -> anyhow::Result<(SlotNumber, BlockHash, DateTime)> {
-        let rows = self
-            .query(&query_type.get_sql_query()?, &[
-                &network.to_string(),
-                &date_time,
-            ])
-            .await?;
+        let rows = Self::query(
+            &query_type.get_sql_query()?,
+            &[&network.to_string(), &date_time],
+        )
+        .await?;
 
         let row = rows.first().ok_or(NotFoundError)?;
 
@@ -214,11 +211,9 @@ impl EventDB {
 
     /// Check when last update chain state occurred.
     pub(crate) async fn last_updated_state(
-        &self, network: Network,
+        network: Network,
     ) -> anyhow::Result<(SlotNumber, BlockHash, DateTime)> {
-        let rows = self
-            .query(SELECT_UPDATE_STATE_SQL, &[&network.to_string()])
-            .await?;
+        let rows = Self::query(SELECT_UPDATE_STATE_SQL, &[&network.to_string()]).await?;
 
         let row = rows.first().ok_or(NotFoundError)?;
 
@@ -232,8 +227,8 @@ impl EventDB {
     /// Mark point in time where the last follower finished indexing in order for future
     /// followers to pick up from this point
     pub(crate) async fn refresh_last_updated(
-        &self, last_updated: DateTime, slot_no: SlotNumber, block_hash: BlockHash,
-        network: Network, machine_id: &MachineId,
+        last_updated: DateTime, slot_no: SlotNumber, block_hash: BlockHash, network: Network,
+        machine_id: &MachineId,
     ) -> anyhow::Result<()> {
         // Rollback or update
         let update = true;
@@ -242,16 +237,19 @@ impl EventDB {
 
         // An insert only happens once when there is no update metadata available
         // All future additions are just updates on ended, slot_no and block_hash
-        self.modify(INSERT_UPDATE_STATE_SQL, &[
-            &i64::try_from(network_id)?,
-            &last_updated,
-            &last_updated,
-            &machine_id,
-            &slot_no,
-            &network.to_string(),
-            &block_hash,
-            &update,
-        ])
+        Self::modify(
+            INSERT_UPDATE_STATE_SQL,
+            &[
+                &i64::try_from(network_id)?,
+                &last_updated,
+                &last_updated,
+                &machine_id,
+                &slot_no,
+                &network.to_string(),
+                &block_hash,
+                &update,
+            ],
+        )
         .await?;
 
         Ok(())
