@@ -5,6 +5,8 @@
 //! subjectPublicKeyAlgorithm: AlgorithmIdentifier
 //! ```
 
+// cspell: words spka
+
 mod data;
 use asn1_rs::Oid;
 use data::{get_oid_from_int, SUBJECT_PUB_KEY_ALGO_LOOKUP};
