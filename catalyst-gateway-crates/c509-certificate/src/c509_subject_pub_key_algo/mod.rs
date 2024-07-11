@@ -12,6 +12,7 @@ use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 use crate::{c509_algo_iden::AlgorithmIdentifier, c509_oid::C509oidRegistered};
 
 /// A struct represents the `SubjectPubKeyAlgorithm`
+#[derive(Debug, Clone, PartialEq)]
 pub struct SubjectPubKeyAlgorithm {
     /// The registered OID of the `SubjectPubKeyAlgorithm`.
     registered_oid: C509oidRegistered,
@@ -67,5 +68,75 @@ impl Decode<'_, ()> for SubjectPubKeyAlgorithm {
                 ))
             },
         }
+    }
+}
+
+// ------------------Test----------------------
+
+#[cfg(test)]
+mod test_subject_public_key_algorithm {
+    use asn1_rs::oid;
+
+    use super::*;
+
+    #[test]
+    fn test_registered_oid() {
+        let mut buffer = Vec::new();
+        let mut encoder = Encoder::new(&mut buffer);
+
+        let spka = SubjectPubKeyAlgorithm::new(oid!(1.3.101 .112), None);
+        spka.encode(&mut encoder, &mut ())
+            .expect("Failed to encode SubjectPubKeyAlgorithm");
+
+        // Ed25519 - int 10: 0x0a
+        assert_eq!(hex::encode(buffer.clone()), "0a");
+
+        let mut decoder = Decoder::new(&buffer);
+        let decoded_spka = SubjectPubKeyAlgorithm::decode(&mut decoder, &mut ())
+            .expect("Failed to decode SubjectPubKeyAlgorithm");
+        assert_eq!(decoded_spka, spka);
+    }
+
+    #[test]
+    fn test_unregistered_oid() {
+        let mut buffer = Vec::new();
+        let mut encoder = Encoder::new(&mut buffer);
+
+        let spka = SubjectPubKeyAlgorithm::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1), None);
+        spka.encode(&mut encoder, &mut ())
+            .expect("Failed to encode SubjectPubKeyAlgorithm");
+
+        // 2.16.840 .1 .101 .3 .4 .2 .1 - int 12: 0x49608648016503040201
+        assert_eq!(hex::encode(buffer.clone()), "49608648016503040201");
+
+        let mut decoder = Decoder::new(&buffer);
+        let decoded_spka = SubjectPubKeyAlgorithm::decode(&mut decoder, &mut ())
+            .expect("Failed to decode SubjectPubKeyAlgorithm");
+        assert_eq!(decoded_spka, spka);
+    }
+
+    #[test]
+    fn test_unregistered_oid_with_param() {
+        let mut buffer = Vec::new();
+        let mut encoder = Encoder::new(&mut buffer);
+
+        let spka = SubjectPubKeyAlgorithm::new(
+            oid!(2.16.840 .1 .101 .3 .4 .2 .1),
+            Some("example".to_string()),
+        );
+        spka.encode(&mut encoder, &mut ())
+            .expect("Failed to encode SubjectPubKeyAlgorithm");
+        // Array of 2 items: 0x82
+        // 2.16.840 .1 .101 .3 .4 .2 .1 - int 12: 0x49608648016503040201
+        // bytes "example": 0x476578616d706c65
+        assert_eq!(
+            hex::encode(buffer.clone()),
+            "8249608648016503040201476578616d706c65"
+        );
+
+        let mut decoder = Decoder::new(&buffer);
+        let decoded_spka = SubjectPubKeyAlgorithm::decode(&mut decoder, &mut ())
+            .expect("Failed to decode SubjectPubKeyAlgorithm");
+        assert_eq!(decoded_spka, spka);
     }
 }

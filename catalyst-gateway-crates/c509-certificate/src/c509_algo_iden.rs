@@ -14,6 +14,7 @@ use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 use crate::c509_oid::C509oid;
 
 /// A struct represents the `AlgorithmIdentifier` type.
+#[derive(Debug, Clone, PartialEq)]
 pub struct AlgorithmIdentifier {
     // A `C509oid`
     oid: C509oid,

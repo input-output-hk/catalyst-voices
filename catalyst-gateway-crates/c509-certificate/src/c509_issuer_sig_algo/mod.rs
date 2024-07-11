@@ -12,6 +12,7 @@ use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 use crate::{c509_algo_iden::AlgorithmIdentifier, c509_oid::C509oidRegistered};
 
 /// A struct represents the `IssuerSignatureAlgorithm`
+#[derive(Debug, Clone, PartialEq)]
 pub struct IssuerSignatureAlgorithm {
     /// The registered OID of the `Extension`.
     registered_oid: C509oidRegistered,
@@ -67,5 +68,72 @@ impl Decode<'_, ()> for IssuerSignatureAlgorithm {
                 ))
             },
         }
+    }
+}
+
+// ------------------Test----------------------
+
+#[cfg(test)]
+mod test_issuer_signature_algorithm {
+    use asn1_rs::oid;
+
+    use super::*;
+
+    #[test]
+    fn test_registered_oid() {
+        let mut buffer = Vec::new();
+        let mut encoder = Encoder::new(&mut buffer);
+
+        let isa = IssuerSignatureAlgorithm::new(oid!(1.3.101 .112), None);
+        isa.encode(&mut encoder, &mut ())
+            .expect("Failed to encode IssuerSignatureAlgorithm");
+
+        // Ed25519 - int 12: 0x0c
+        assert_eq!(hex::encode(buffer.clone()), "0c");
+
+        let mut decoder = Decoder::new(&buffer);
+        let decoded_isa = IssuerSignatureAlgorithm::decode(&mut decoder, &mut ())
+            .expect("Failed to decode IssuerSignatureAlgorithm");
+        assert_eq!(decoded_isa, isa);
+    }
+
+    #[test]
+    fn test_unregistered_oid() {
+        let mut buffer = Vec::new();
+        let mut encoder = Encoder::new(&mut buffer);
+
+        let isa = IssuerSignatureAlgorithm::new(oid!(2.16.840 .1 .101 .3 .4 .2 .1), None);
+        isa.encode(&mut encoder, &mut ())
+            .expect("Failed to encode IssuerSignatureAlgorithm");
+
+        // 2.16.840 .1 .101 .3 .4 .2 .1 - int 12: 0x49608648016503040201
+        assert_eq!(hex::encode(buffer.clone()), "49608648016503040201");
+
+        let mut decoder = Decoder::new(&buffer);
+        let decoded_isa = IssuerSignatureAlgorithm::decode(&mut decoder, &mut ())
+            .expect("Failed to decode IssuerSignatureAlgorithm");
+        assert_eq!(decoded_isa, isa);
+    }
+
+    #[test]
+    fn test_unregistered_oid_with_param() {
+        let mut buffer = Vec::new();
+        let mut encoder = Encoder::new(&mut buffer);
+
+        let isa = IssuerSignatureAlgorithm::new(
+            oid!(2.16.840 .1 .101 .3 .4 .2 .1),
+            Some("example".to_string()),
+        );
+        isa.encode(&mut encoder, &mut ())
+            .expect("Failed to encode IssuerSignatureAlgorithm");
+        // Array of 2 items: 0x82
+        // 2.16.840 .1 .101 .3 .4 .2 .1 - int 12: 0x49608648016503040201
+        // bytes "example": 0x476578616d706c65
+        assert_eq!(hex::encode(buffer.clone()), "8249608648016503040201476578616d706c65");
+
+        let mut decoder = Decoder::new(&buffer);
+        let decoded_isa = IssuerSignatureAlgorithm::decode(&mut decoder, &mut ())
+            .expect("Failed to decode IssuerSignatureAlgorithm");
+        assert_eq!(decoded_isa, isa);
     }
 }
