@@ -9,6 +9,8 @@ use wasm_bindgen::prelude::wasm_bindgen;
 pub mod c509_extensions;
 pub mod c509_general_names;
 pub mod c509_oid;
+pub mod c509_big_uint;
+pub mod c509_time;
 mod tables;
 
 /// Generates an unsigned C509 certificate from the provided `TbsCertificate`.
