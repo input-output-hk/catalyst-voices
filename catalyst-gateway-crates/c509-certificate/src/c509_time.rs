@@ -7,10 +7,11 @@ use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 pub struct Time(i64);
 
 /// No expiration date in seconds since the Unix epoch.
-const NO_EXP_DATE: i64 = 253402300799;
+const NO_EXP_DATE: i64 = 253_402_300_799;
 
 impl Time {
     /// Create a new instance of `Time`.
+    #[must_use]
     pub fn new(time: i64) -> Self {
         Self(time)
     }
@@ -76,7 +77,7 @@ mod test_time {
     fn test_encode_decode() {
         let mut buffer = Vec::new();
         let mut encoder = minicbor::Encoder::new(&mut buffer);
-        let time = Time::new(1672531200);
+        let time = Time::new(1_672_531_200);
         time.encode(&mut encoder, &mut ())
             .expect("Failed to encode Time");
         assert_eq!(hex::encode(buffer.clone()), "1a63b0cd00");
