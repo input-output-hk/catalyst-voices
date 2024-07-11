@@ -51,7 +51,7 @@ build:
 
 # build : Build the catalyst-gateway service. Used for nightly setup
 nightly:
-    FROM +build
+    BUILD +build
 
 # all-hosts-build : Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
