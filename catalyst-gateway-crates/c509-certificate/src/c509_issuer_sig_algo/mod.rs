@@ -1,4 +1,5 @@
-//! C509 Issuer Signature Algorithm as a part of `TBSCertificate` used in C509 Certificate.
+//! C509 Issuer Signature Algorithm as a part of `TBSCertificate` used in C509
+//! Certificate.
 //!
 //! ```cddl
 //! issuerSignatureAlgorithm: AlgorithmIdentifier
@@ -14,7 +15,7 @@ use crate::{c509_algo_iden::AlgorithmIdentifier, c509_oid::C509oidRegistered};
 /// A struct represents the `IssuerSignatureAlgorithm`
 #[derive(Debug, Clone, PartialEq)]
 pub struct IssuerSignatureAlgorithm {
-    /// The registered OID of the `Extension`.
+    /// The registered OID of the `IssuerSignatureAlgorithm`.
     registered_oid: C509oidRegistered,
     /// An `AlgorithmIdentifier` type
     algo_iden: AlgorithmIdentifier,
@@ -55,6 +56,7 @@ impl Encode<()> for IssuerSignatureAlgorithm {
 impl Decode<'_, ()> for IssuerSignatureAlgorithm {
     fn decode(d: &mut Decoder<'_>, ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
         match d.datatype()? {
+            // Check i16 for -256 and -256
             minicbor::data::Type::U8 | minicbor::data::Type::I16 => {
                 let i = d.i16()?;
                 let oid = get_oid_from_int(i).map_err(minicbor::decode::Error::message)?;
@@ -106,7 +108,7 @@ mod test_issuer_signature_algorithm {
         isa.encode(&mut encoder, &mut ())
             .expect("Failed to encode IssuerSignatureAlgorithm");
 
-        // 2.16.840 .1 .101 .3 .4 .2 .1 - int 12: 0x49608648016503040201
+        // 2.16.840 .1 .101 .3 .4 .2 .1: 0x49608648016503040201
         assert_eq!(hex::encode(buffer.clone()), "49608648016503040201");
 
         let mut decoder = Decoder::new(&buffer);
@@ -127,9 +129,12 @@ mod test_issuer_signature_algorithm {
         isa.encode(&mut encoder, &mut ())
             .expect("Failed to encode IssuerSignatureAlgorithm");
         // Array of 2 items: 0x82
-        // 2.16.840 .1 .101 .3 .4 .2 .1 - int 12: 0x49608648016503040201
+        // 2.16.840 .1 .101 .3 .4 .2 .1: 0x49608648016503040201
         // bytes "example": 0x476578616d706c65
-        assert_eq!(hex::encode(buffer.clone()), "8249608648016503040201476578616d706c65");
+        assert_eq!(
+            hex::encode(buffer.clone()),
+            "8249608648016503040201476578616d706c65"
+        );
 
         let mut decoder = Decoder::new(&buffer);
         let decoded_isa = IssuerSignatureAlgorithm::decode(&mut decoder, &mut ())

@@ -1,5 +1,5 @@
-//! Public key algorithm data provides a necessary information for encoding and decoding of C509
-//! `subjectPublicKeyAlgorithm`. See [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
+//! Public key algorithm data provides a necessary information for encoding and decoding
+//! of C509 `subjectPublicKeyAlgorithm`. See [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
 //! Section 9.11 C509 Public Key Algorithms Registry for more information.
 
 use anyhow::Error;
@@ -8,10 +8,14 @@ use once_cell::sync::Lazy;
 
 use crate::tables::IntegerToOidTable;
 
+/// Type of algorithm data
+/// INT | OID | Name
 type AlgorithmDataTuple = (i16, Oid<'static>, &'static str);
 
+/// Public key algorithm data table.
 #[rustfmt::skip]
 const PUB_KEY_ALGO_DATA: [AlgorithmDataTuple; 16] = [
+    // Int  |               OID                |            Name    
     (0, oid!(1.2.840.113549.1.1.1),         "RSA"),
     (1, oid!(1.2.840.10045.2.1),            "EC Public Key (Weierstraß) with secp256r1"),
     (2, oid!(1.2.840.10045.2.1),            "EC Public Key (Weierstraß) with secp384r1"),
@@ -30,17 +34,20 @@ const PUB_KEY_ALGO_DATA: [AlgorithmDataTuple; 16] = [
     (28, oid!(1.2.840.10045.2.1),           "EC Public Key (Weierstraß) with sm2p256v1"),
 ];
 
+/// A struct of data that contains lookup tables for `SubjectPublickeyAlgorithm`.
 pub(crate) struct SubjectPubKeyAlgoData {
+    /// A table of integer to OID, provide a bidirectional lookup.
     int_to_oid_table: IntegerToOidTable,
 }
 
 impl SubjectPubKeyAlgoData {
+    /// Get the `IntegerToOidTable`
     pub(crate) fn get_int_to_oid_table(&self) -> &IntegerToOidTable {
         &self.int_to_oid_table
     }
 }
 
-/// Define static lookup for extensions table
+/// Define static lookup for subject publickey table
 static SUBJECT_PUB_KEY_ALGO_TABLE: Lazy<SubjectPubKeyAlgoData> = Lazy::new(|| {
     let mut int_to_oid_table = IntegerToOidTable::new();
 
@@ -51,6 +58,7 @@ static SUBJECT_PUB_KEY_ALGO_TABLE: Lazy<SubjectPubKeyAlgoData> = Lazy::new(|| {
     SubjectPubKeyAlgoData { int_to_oid_table }
 });
 
+/// Static reference to the `SubjectPubKeyAlgoData` lookup table.
 pub(crate) static SUBJECT_PUB_KEY_ALGO_LOOKUP: &Lazy<SubjectPubKeyAlgoData> =
     &SUBJECT_PUB_KEY_ALGO_TABLE;
 

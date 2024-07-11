@@ -1,5 +1,5 @@
-//! Signature algorithm data provides a necessary information for encoding and decoding of C509
-//! `issuerSignatureAlgorithm`. See [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
+//! Signature algorithm data provides a necessary information for encoding and decoding of
+//! C509 `issuerSignatureAlgorithm`. See [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
 //! Section 9.10 C509 Signature Algorithms Registry for more information.
 
 use anyhow::Error;
@@ -8,10 +8,14 @@ use once_cell::sync::Lazy;
 
 use crate::tables::IntegerToOidTable;
 
+/// Type of algorithm data
+/// INT | OID | Name
 type AlgorithmDataTuple = (i16, Oid<'static>, &'static str);
 
+/// Signature algorithm data table.
 #[rustfmt::skip]
 const SIG_ALGO_DATA: [AlgorithmDataTuple; 24] = [
+    // Int  |               OID                |            Name    
     (-256,  oid!(1.2.840.113549.1.1.5),          "RSASSA-PKCS1-v1_5 with SHA-1"),
     (-255,  oid!(1.2.840.10045.4.1),             "ECDSA with SHA-1"),
     (0,     oid!(1.2.840.10045.4.3.2),           "ECDSA with SHA-256"),
@@ -38,17 +42,20 @@ const SIG_ALGO_DATA: [AlgorithmDataTuple; 24] = [
     (45,    oid!(1.2.156.10197.1.501),           "SM2 with SM3"),    
 ];
 
+/// A struct of data that contains lookup tables for `IssuerSignatureAlgorithm`.
 pub(crate) struct IssuerSigAlgoData {
+    /// A table of integer to OID, provide a bidirectional lookup.
     int_to_oid_table: IntegerToOidTable,
 }
 
 impl IssuerSigAlgoData {
+    /// Get the `IntegerToOidTable`
     pub(crate) fn get_int_to_oid_table(&self) -> &IntegerToOidTable {
         &self.int_to_oid_table
     }
 }
 
-/// Define static lookup for extensions table
+/// Define static lookup for issuer signature algorithm table
 static ISSUER_SIG_ALGO_TABLE: Lazy<IssuerSigAlgoData> = Lazy::new(|| {
     let mut int_to_oid_table = IntegerToOidTable::new();
 
@@ -59,6 +66,7 @@ static ISSUER_SIG_ALGO_TABLE: Lazy<IssuerSigAlgoData> = Lazy::new(|| {
     IssuerSigAlgoData { int_to_oid_table }
 });
 
+/// Static reference to the `IssuerSigAlgoData` lookup table.
 pub(crate) static ISSUER_SIG_ALGO_LOOKUP: &Lazy<IssuerSigAlgoData> = &ISSUER_SIG_ALGO_TABLE;
 
 /// Get the OID from the int value.
