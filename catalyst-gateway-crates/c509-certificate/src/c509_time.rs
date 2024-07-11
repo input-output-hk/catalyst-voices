@@ -77,6 +77,7 @@ mod test_time {
     fn test_encode_decode() {
         let mut buffer = Vec::new();
         let mut encoder = minicbor::Encoder::new(&mut buffer);
+        // Jan 1 00:00:00 2023 GMT
         let time = Time::new(1_672_531_200);
         time.encode(&mut encoder, &mut ())
             .expect("Failed to encode Time");

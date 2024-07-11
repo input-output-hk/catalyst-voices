@@ -1,4 +1,6 @@
-//! C509 Unwrapped CBOR Unsigned Bignum
+//! C509 Unwrapped CBOR Unsigned Bignum (~biguint)
+//! Please refer to [CDDL Wrapping](https://datatracker.ietf.org/doc/html/rfc8610#section-3.7)
+//! for unwrapped types.
 
 // cspell: words Bignum bignum
 
@@ -35,9 +37,11 @@ impl Encode<()> for UnwrappedBigUint {
 
 impl Decode<'_, ()> for UnwrappedBigUint {
     fn decode(d: &mut Decoder<'_>, _ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
-        let bytes = d.bytes()?;
         // Turn bytes into u64
-        let b = bytes.iter().fold(0, |acc, &b| (acc << 8) | u64::from(b));
+        let b = d
+            .bytes()?
+            .iter()
+            .fold(0, |acc, &b| (acc << 8) | u64::from(b));
         Ok(UnwrappedBigUint::new(b))
     }
 }
@@ -53,6 +57,7 @@ mod test_big_uint {
     fn test_encode_decode() {
         let mut buffer = Vec::new();
         let mut encoder = minicbor::Encoder::new(&mut buffer);
+        // Serial Number: 128269 (0x1f50d)
         let b_uint = UnwrappedBigUint::new(128_269);
         b_uint
             .encode(&mut encoder, &mut ())
@@ -72,6 +77,7 @@ mod test_big_uint {
     fn test_encode_decode_2() {
         let mut buffer = Vec::new();
         let mut encoder = minicbor::Encoder::new(&mut buffer);
+        // Serial Number: 9112578475118446130 (0x7e7661d7b54e4632)
         let b_uint = UnwrappedBigUint::new(9_112_578_475_118_446_130);
         b_uint
             .encode(&mut encoder, &mut ())
