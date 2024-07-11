@@ -102,7 +102,7 @@ mod test_relative_distinguished_name {
     use asn1_rs::oid;
 
     use super::*;
-    use crate::c509_attributes::attribute::TextOrBytes;
+    use crate::c509_attributes::attribute::AttributeValue;
 
     #[test]
     fn encode_decode_rdn() {
@@ -110,7 +110,7 @@ mod test_relative_distinguished_name {
         let mut encoder = Encoder::new(&mut buffer);
 
         let mut attr = Attribute::new(oid!(1.2.840 .113549 .1 .9 .1));
-        attr.add_value(TextOrBytes::Text("example@example.com".to_string()));
+        attr.add_value(AttributeValue::Text("example@example.com".to_string()));
 
         let mut rdn = RelativeDistinguishedName::new();
         rdn.add_attr(attr);
@@ -135,9 +135,9 @@ mod test_relative_distinguished_name {
         let mut encoder = Encoder::new(&mut buffer);
 
         let mut attr1 = Attribute::new(oid!(1.2.840 .113549 .1 .9 .1));
-        attr1.add_value(TextOrBytes::Text("example@example.com".to_string()));
+        attr1.add_value(AttributeValue::Text("example@example.com".to_string()));
         let mut attr2 = Attribute::new(oid!(2.5.4 .3));
-        attr2.add_value(TextOrBytes::Text("example".to_string()));
+        attr2.add_value(AttributeValue::Text("example".to_string()));
 
         let mut rdns = RelativeDistinguishedName::new();
         rdns.add_attr(attr1);

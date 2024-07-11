@@ -23,7 +23,7 @@ pub struct Attribute {
     /// A flag to indicate whether the value can have multiple value.
     multi_value: bool,
     /// A value of C509 `Attribute` can be a vector of text or bytes.
-    value: Vec<TextOrBytes>,
+    value: Vec<AttributeValue>,
 }
 
 impl Attribute {
@@ -38,7 +38,7 @@ impl Attribute {
     }
 
     /// Add a value to `Attribute`.
-    pub fn add_value(&mut self, value: TextOrBytes) {
+    pub fn add_value(&mut self, value: AttributeValue) {
         self.value.push(value);
     }
 
@@ -48,7 +48,7 @@ impl Attribute {
     }
 
     /// Get the value of `Attribute`.
-    pub(crate) fn get_value(&self) -> &Vec<TextOrBytes> {
+    pub(crate) fn get_value(&self) -> &Vec<AttributeValue> {
         &self.value
     }
 
@@ -129,48 +129,49 @@ impl Decode<'_, ()> for Attribute {
             }
 
             for _ in 0..len {
-                attr.add_value(TextOrBytes::decode(d, ctx)?);
+                attr.add_value(AttributeValue::decode(d, ctx)?);
             }
             attr = attr.set_multi_value();
         } else {
-            let value = TextOrBytes::decode(d, ctx)?;
+            let value = AttributeValue::decode(d, ctx)?;
             attr.add_value(value);
         }
         Ok(attr)
     }
 }
 
-// ------------------TextOrBytes----------------------
+// ------------------AttributeValue----------------------
 
 /// An enum of possible value types for `Attribute`.
+#[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum TextOrBytes {
+pub enum AttributeValue {
     /// A text string.
     Text(String),
     /// A byte vector.
     Bytes(Vec<u8>),
 }
 
-impl Encode<()> for TextOrBytes {
+impl Encode<()> for AttributeValue {
     fn encode<W: Write>(
         &self, e: &mut Encoder<W>, _ctx: &mut (),
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
         match self {
-            TextOrBytes::Text(text) => e.str(text)?,
-            TextOrBytes::Bytes(bytes) => e.bytes(bytes)?,
+            AttributeValue::Text(text) => e.str(text)?,
+            AttributeValue::Bytes(bytes) => e.bytes(bytes)?,
         };
         Ok(())
     }
 }
 
-impl Decode<'_, ()> for TextOrBytes {
+impl Decode<'_, ()> for AttributeValue {
     fn decode(d: &mut Decoder<'_>, _ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
         match d.datatype()? {
-            minicbor::data::Type::String => Ok(TextOrBytes::Text(d.str()?.to_string())),
-            minicbor::data::Type::Bytes => Ok(TextOrBytes::Bytes(d.bytes()?.to_vec())),
+            minicbor::data::Type::String => Ok(AttributeValue::Text(d.str()?.to_string())),
+            minicbor::data::Type::Bytes => Ok(AttributeValue::Bytes(d.bytes()?.to_vec())),
             _ => {
                 Err(minicbor::decode::Error::message(
-                    "Invalid TextOrBytes, value should be either String or Bytes",
+                    "Invalid AttributeValue, value should be either String or Bytes",
                 ))
             },
         }
@@ -190,7 +191,7 @@ mod test_attribute {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
         let mut attribute = Attribute::new(oid!(1.2.840 .113549 .1 .9 .1));
-        attribute.add_value(TextOrBytes::Text("example@example.com".to_string()));
+        attribute.add_value(AttributeValue::Text("example@example.com".to_string()));
         attribute
             .encode(&mut encoder, &mut ())
             .expect("Failed to encode Attribute");

@@ -19,7 +19,7 @@ use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 use rdn::RelativeDistinguishedName;
 use regex::Regex;
 
-use crate::c509_attributes::attribute::{Attribute, TextOrBytes};
+use crate::c509_attributes::attribute::{Attribute, AttributeValue};
 
 /// OID of `CommonName` attribute.
 const COMMON_NAME_OID: Oid<'static> = oid!(2.5.4 .3);
@@ -134,7 +134,7 @@ impl Decode<'_, ()> for NameValue {
 
 /// Encode common name value.
 fn encode_cn_value<W: Write>(
-    e: &mut Encoder<W>, cn_value: &TextOrBytes,
+    e: &mut Encoder<W>, cn_value: &AttributeValue,
 ) -> Result<(), minicbor::encode::Error<W::Error>> {
     let hex_regex = Regex::new(r"^[0-9a-f]+$").map_err(minicbor::encode::Error::message)?;
     let eui64_regex =
@@ -143,7 +143,7 @@ fn encode_cn_value<W: Write>(
         .map_err(minicbor::encode::Error::message)?;
 
     match cn_value {
-        TextOrBytes::Text(s) => {
+        AttributeValue::Text(s) => {
             // If the text string has an even length ≥ 2 and contains only the
             // symbols '0'–'9' or 'a'–'f', it is encoded as a CBOR byte
             // string, prefixed with an initial byte set to '00'
@@ -183,7 +183,7 @@ fn encode_cn_value<W: Write>(
                 e.str(s)?;
             }
         },
-        TextOrBytes::Bytes(_) => {
+        AttributeValue::Bytes(_) => {
             return Err(minicbor::encode::Error::message(
                 "CommonName attribute value must be a text string",
             ));
@@ -261,7 +261,7 @@ fn decode_eui_cn_bytes(bytes: &[u8]) -> Result<NameValue, minicbor::decode::Erro
 /// Create a relative distinguished name with attribute common name from string.
 fn create_rdn_with_cn_attr(text: String) -> NameValue {
     let mut attr = Attribute::new(COMMON_NAME_OID);
-    attr.add_value(TextOrBytes::Text(text));
+    attr.add_value(AttributeValue::Text(text));
     let mut rdn = RelativeDistinguishedName::new();
     rdn.add_attr(attr);
     NameValue::RelativeDistinguishedName(rdn)
@@ -280,7 +280,7 @@ mod test_name {
         let mut encoder = Encoder::new(&mut buffer);
 
         let mut attr = Attribute::new(oid!(2.5.4 .3));
-        attr.add_value(TextOrBytes::Text("RFC test CA".to_string()));
+        attr.add_value(AttributeValue::Text("RFC test CA".to_string()));
         let mut rdn = RelativeDistinguishedName::new();
         rdn.add_attr(attr);
 
@@ -303,7 +303,7 @@ mod test_name {
         let mut encoder = Encoder::new(&mut buffer);
 
         let mut attr = Attribute::new(oid!(2.5.4 .3));
-        attr.add_value(TextOrBytes::Text("000123abcd".to_string()));
+        attr.add_value(AttributeValue::Text("000123abcd".to_string()));
         let mut rdn = RelativeDistinguishedName::new();
         rdn.add_attr(attr);
 
@@ -327,7 +327,7 @@ mod test_name {
         let mut encoder = Encoder::new(&mut buffer);
 
         let mut attr = Attribute::new(oid!(2.5.4 .3));
-        attr.add_value(TextOrBytes::Text("000123ABCD".to_string()));
+        attr.add_value(AttributeValue::Text("000123ABCD".to_string()));
         let mut rdn = RelativeDistinguishedName::new();
         rdn.add_attr(attr);
 
@@ -350,7 +350,7 @@ mod test_name {
         let mut encoder = Encoder::new(&mut buffer);
 
         let mut attr = Attribute::new(oid!(2.5.4 .3));
-        attr.add_value(TextOrBytes::Text("01-23-45-FF-FE-67-89-AB".to_string()));
+        attr.add_value(AttributeValue::Text("01-23-45-FF-FE-67-89-AB".to_string()));
         let mut rdn = RelativeDistinguishedName::new();
         rdn.add_attr(attr);
         let name = Name::new(NameValue::RelativeDistinguishedName(rdn));
@@ -373,7 +373,7 @@ mod test_name {
         let mut encoder = Encoder::new(&mut buffer);
 
         let mut attr = Attribute::new(oid!(2.5.4 .3));
-        attr.add_value(TextOrBytes::Text("01-23-45-ff-fe-67-89-AB".to_string()));
+        attr.add_value(AttributeValue::Text("01-23-45-ff-fe-67-89-AB".to_string()));
         let mut rdn = RelativeDistinguishedName::new();
         rdn.add_attr(attr);
         let name = Name::new(NameValue::RelativeDistinguishedName(rdn));
@@ -399,7 +399,7 @@ mod test_name {
         let mut encoder = Encoder::new(&mut buffer);
 
         let mut attr = Attribute::new(oid!(2.5.4 .3));
-        attr.add_value(TextOrBytes::Text("01-23-45-67-89-AB-00-01".to_string()));
+        attr.add_value(AttributeValue::Text("01-23-45-67-89-AB-00-01".to_string()));
         let mut rdn = RelativeDistinguishedName::new();
         rdn.add_attr(attr);
 
@@ -421,7 +421,7 @@ mod test_name {
         let mut encoder = Encoder::new(&mut buffer);
 
         let mut attr = Attribute::new(oid!(2.5.4 .3));
-        attr.add_value(TextOrBytes::Text("01-23-45-67-89-ab-00-01".to_string()));
+        attr.add_value(AttributeValue::Text("01-23-45-67-89-ab-00-01".to_string()));
         let mut rdn = RelativeDistinguishedName::new();
         rdn.add_attr(attr);
 
@@ -451,15 +451,15 @@ mod test_name {
         // A.2.  Example IEEE 802.1AR profiled X.509 Certificate
         // Issuer: C=US, ST=CA, O=Example Inc, OU=certification, CN=802.1AR CA
         let mut attr1 = Attribute::new(oid!(2.5.4 .6));
-        attr1.add_value(TextOrBytes::Text("US".to_string()));
+        attr1.add_value(AttributeValue::Text("US".to_string()));
         let mut attr2 = Attribute::new(oid!(2.5.4 .8));
-        attr2.add_value(TextOrBytes::Text("CA".to_string()));
+        attr2.add_value(AttributeValue::Text("CA".to_string()));
         let mut attr3 = Attribute::new(oid!(2.5.4 .10));
-        attr3.add_value(TextOrBytes::Text("Example Inc".to_string()));
+        attr3.add_value(AttributeValue::Text("Example Inc".to_string()));
         let mut attr4 = Attribute::new(oid!(2.5.4 .11));
-        attr4.add_value(TextOrBytes::Text("certification".to_string()));
+        attr4.add_value(AttributeValue::Text("certification".to_string()));
         let mut attr5 = Attribute::new(oid!(2.5.4 .3));
-        attr5.add_value(TextOrBytes::Text("802.1AR CA".to_string()));
+        attr5.add_value(AttributeValue::Text("802.1AR CA".to_string()));
 
         let mut rdn = RelativeDistinguishedName::new();
         rdn.add_attr(attr1);

@@ -84,7 +84,7 @@ impl Decode<'_, ()> for Attributes {
 #[cfg(test)]
 mod test_attributes {
     use asn1_rs::oid;
-    use attribute::TextOrBytes;
+    use attribute::AttributeValue;
 
     use super::*;
 
@@ -93,8 +93,8 @@ mod test_attributes {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
         let mut attr = Attribute::new(oid!(1.2.840 .113549 .1 .9 .1));
-        attr.add_value(TextOrBytes::Text("example@example.com".to_string()));
-        attr.add_value(TextOrBytes::Text("example@example.com".to_string()));
+        attr.add_value(AttributeValue::Text("example@example.com".to_string()));
+        attr.add_value(AttributeValue::Text("example@example.com".to_string()));
         let mut attributes = Attributes::new();
         attributes.add_attr(attr);
         attributes
