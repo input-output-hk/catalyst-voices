@@ -272,27 +272,34 @@ fn create_rdn_with_cn_attr(text: String) -> NameValue {
 // ------------------Test----------------------
 
 #[cfg(test)]
-mod test_name {
+pub(crate) mod test_name {
     use super::*;
     use crate::c509_attributes::attribute::Attribute;
+
+    // Test data from https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/
+    // A.1.1.  Example C509 Certificate Encoding
+    pub(crate) fn name_cn_text() -> (Name, String) {
+        let mut attr = Attribute::new(oid!(2.5.4 .3));
+        attr.add_value(AttributeValue::Text("RFC test CA".to_string()));
+        let mut rdn = RelativeDistinguishedName::new();
+        rdn.add_attr(attr);
+
+        (
+            Name::new(NameValue::RelativeDistinguishedName(rdn)),
+            "6b5246432074657374204341".to_string(),
+        )
+    }
 
     #[test]
     fn encode_decode_type_name_cn() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
-        let mut attr = Attribute::new(oid!(2.5.4 .3));
-        attr.add_value(AttributeValue::Text("RFC test CA".to_string()));
-        let mut rdn = RelativeDistinguishedName::new();
-        rdn.add_attr(attr);
-
-        let name = Name::new(NameValue::RelativeDistinguishedName(rdn));
+        let name = name_cn_text().0;
         name.encode(&mut encoder, &mut ())
             .expect("Failed to encode Name");
 
-        // Test data from https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/
-        // A.1.1.  Example C509 Certificate Encoding
-        assert_eq!(hex::encode(buffer.clone()), "6b5246432074657374204341");
+        assert_eq!(hex::encode(buffer.clone()), name_cn_text().1);
 
         let mut decoder = Decoder::new(&buffer);
         let name_decoded = Name::decode(&mut decoder, &mut ()).expect("Failed to decode Name");
@@ -346,23 +353,30 @@ mod test_name {
         assert_eq!(name_decoded, name);
     }
 
+    // Test data from https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/
+    // A.1.  Example RFC 7925 profiled X.509 Certificate
+    pub(crate) fn name_cn_eui_mac() -> (Name, String) {
+        let mut attr = Attribute::new(oid!(2.5.4 .3));
+        attr.add_value(AttributeValue::Text("01-23-45-FF-FE-67-89-AB".to_string()));
+        let mut rdn = RelativeDistinguishedName::new();
+        rdn.add_attr(attr);
+
+        (
+            Name::new(NameValue::RelativeDistinguishedName(rdn)),
+            "47010123456789ab".to_string(),
+        )
+    }
+
     #[test]
     fn encode_decode_type_name_cn_eui_mac() {
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
 
-        let mut attr = Attribute::new(oid!(2.5.4 .3));
-        attr.add_value(AttributeValue::Text("01-23-45-FF-FE-67-89-AB".to_string()));
-        let mut rdn = RelativeDistinguishedName::new();
-        rdn.add_attr(attr);
-        let name = Name::new(NameValue::RelativeDistinguishedName(rdn));
+        let name = name_cn_eui_mac().0;
 
         name.encode(&mut encoder, &mut ())
             .expect("Failed to encode Name");
-
-        // Test data from https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/
-        // A.1.  Example RFC 7925 profiled X.509 Certificate
-        assert_eq!(hex::encode(buffer.clone()), "47010123456789ab");
+        assert_eq!(hex::encode(buffer.clone()), name_cn_eui_mac().1);
 
         let mut decoder = Decoder::new(&buffer);
         let name_decoded = Name::decode(&mut decoder, &mut ()).expect("Failed to decode Name");
@@ -444,14 +458,10 @@ mod test_name {
         assert_eq!(name_decoded, name);
     }
 
-    #[test]
-    fn encode_decode_type_name_rdns() {
-        let mut buffer = Vec::new();
-        let mut encoder = Encoder::new(&mut buffer);
-
-        // Test data from https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/
-        // A.2.  Example IEEE 802.1AR profiled X.509 Certificate
-        // Issuer: C=US, ST=CA, O=Example Inc, OU=certification, CN=802.1AR CA
+    // Test data from https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/
+    // A.2.  Example IEEE 802.1AR profiled X.509 Certificate
+    // Issuer: C=US, ST=CA, O=Example Inc, OU=certification, CN=802.1AR CA
+    pub(crate) fn names() -> (Name, String) {
         let mut attr1 = Attribute::new(oid!(2.5.4 .6));
         attr1.add_value(AttributeValue::Text("US".to_string()));
         let mut attr2 = Attribute::new(oid!(2.5.4 .8));
@@ -470,14 +480,21 @@ mod test_name {
         rdn.add_attr(attr4);
         rdn.add_attr(attr5);
 
-        let name = Name::new(NameValue::RelativeDistinguishedName(rdn));
+        (
+            Name::new(NameValue::RelativeDistinguishedName(rdn)),
+            "8a0462555306624341086b4578616d706c6520496e63096d63657274696669636174696f6e016a3830322e314152204341".to_string(),
+        )
+    }
+    #[test]
+    fn encode_decode_type_name_rdns() {
+        let mut buffer = Vec::new();
+        let mut encoder = Encoder::new(&mut buffer);
+
+        let name = names().0;
 
         name.encode(&mut encoder, &mut ())
             .expect("Failed to encode Name");
-        assert_eq!(
-            hex::encode(buffer.clone()),
-            "8a0462555306624341086b4578616d706c6520496e63096d63657274696669636174696f6e016a3830322e314152204341"
-        );
+        assert_eq!(hex::encode(buffer.clone()), names().1);
 
         let mut decoder = Decoder::new(&buffer);
         let name_decoded = Name::decode(&mut decoder, &mut ()).expect("Failed to decode Name");
