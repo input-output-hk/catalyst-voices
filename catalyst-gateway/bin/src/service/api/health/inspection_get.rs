@@ -2,9 +2,7 @@
 use poem_openapi::{ApiResponse, Enum};
 use tracing::debug;
 
-use crate::{
-    event_db::EventDB, logger, service::common::responses::WithErrorResponses, settings::Settings,
-};
+use crate::{event_db::EventDB, logger, service::common::responses::WithErrorResponses};
 
 /// `LogLevel` Open API definition.
 #[derive(Debug, Clone, Copy, Enum)]
@@ -69,7 +67,7 @@ pub(crate) async fn endpoint(
     log_level: Option<LogLevel>, query_inspection: Option<DeepQueryInspectionFlag>,
 ) -> AllResponses {
     if let Some(level) = log_level {
-        Settings::modify_logger_level(level.into());
+        logger::modify_logger_level(level.into());
     }
 
     if let Some(inspection_mode) = query_inspection {

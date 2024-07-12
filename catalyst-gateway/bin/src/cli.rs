@@ -32,12 +32,16 @@ impl Cli {
     /// - Failed to initialize the logger with the specified log level.
     /// - Failed to create a new `State` with the provided database URL.
     /// - Failed to run the service on the specified address.
-    pub(crate) fn exec(self) -> anyhow::Result<()> {
+    pub(crate) async fn exec(self) -> anyhow::Result<()> {
         match self {
             Self::Run(settings) => {
                 Settings::init(settings)?;
 
-                tokio::spawn(async move {
+                let mut tasks = Vec::new();
+
+                info!("Catalyst Gateway - Starting");
+
+                let handle = tokio::spawn(async move {
                     match service::run().await {
                         Ok(()) => info!("Endpoints started ok"),
                         Err(err) => {
@@ -45,6 +49,15 @@ impl Cli {
                         },
                     }
                 });
+                tasks.push(handle);
+
+                started();
+
+                for task in tasks {
+                    task.await?;
+                }
+
+                info!("Catalyst Gateway - Shut Down");
 
                 /*
 
@@ -54,7 +67,6 @@ impl Cli {
                     settings.follower_settings.data_refresh_tick,
                     machine_id,
                 );*/
-                started();
                 /*followers_fut.await?;*/
             },
             Self::Docs(settings) => {

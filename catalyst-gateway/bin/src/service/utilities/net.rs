@@ -12,7 +12,7 @@ pub(crate) fn get_public_ipv4() -> IpAddr {
         if let Err(error) = socket.connect("8.8.8.8:53") {
             error!("Failed to connect IPv4 to Google DNS : {}", error);
         } else if let Ok(local_addr) = socket.local_addr() {
-            return local_addr.ip();
+            return local_addr.ip().to_canonical();
         } else {
             error!("Failed to get local address");
         }
@@ -31,7 +31,7 @@ pub(crate) fn get_public_ipv6() -> IpAddr {
         if let Err(error) = socket.connect("[2001:4860:4860::8888]:53") {
             error!("Failed to connect IPv6 to Google DNS : {}", error);
         } else if let Ok(local_addr) = socket.local_addr() {
-            return local_addr.ip();
+            return local_addr.ip().to_canonical();
         } else {
             error!("Failed to get local IPv6 address");
         }

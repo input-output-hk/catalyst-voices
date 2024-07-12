@@ -51,6 +51,7 @@ async fn get_follower_config(check_config_tick: u64) -> anyhow::Result<Vec<Follo
 }
 
 /// Start followers as per defined in the config
+#[allow(unused)]
 pub(crate) async fn start_followers(
     check_config_tick: u64, data_refresh_tick: u64,
 ) -> anyhow::Result<()> {

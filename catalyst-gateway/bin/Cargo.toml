@@ -3,7 +3,7 @@ name = "cat-gateway"
 description = "The Catalyst Data Gateway"
 keywords = ["cardano", "catalyst", "gateway"]
 categories = ["command-line-utilities"]
-version.workspace = true
+version = "0.1.0"
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -15,6 +15,7 @@ repository.workspace = true
 workspace = true
 
 [dependencies]
+build-info.workspace = true
 bb8 = { workspace = true }
 bb8-postgres = { workspace = true }
 tokio-postgres = { workspace = true, features = [
@@ -67,7 +68,10 @@ anyhow = { workspace = true }
 handlebars = { workspace = true }
 cddl = { workspace = true }
 ciborium = { workspace = true }
-ed25519-dalek = "2.1.1"
+ed25519-dalek.workspace = true
 stringzilla = { workspace = true }
 duration-string.workspace = true
 once_cell.workspace = true
+
+[build-dependencies]
+build-info-build = { workspace = true }

@@ -12,12 +12,13 @@ use cryptoxide::{blake2b::Blake2b, mac::Mac};
 use dotenvy::dotenv;
 use duration_string::DurationString;
 use once_cell::sync::Lazy;
-use tracing::{level_filters::LevelFilter, log::error};
+use tracing::log::error;
 use url::Url;
 
 use crate::{
+    build_info::{log_build_info, BUILD_INFO},
     event_db,
-    logger::{self, LogLevel, LoggerHandle, LOG_LEVEL_DEFAULT},
+    logger::{self, LogLevel, LOG_LEVEL_DEFAULT},
 };
 
 use crate::service::utilities::net::{get_public_ipv4, get_public_ipv6};
@@ -47,9 +48,6 @@ const API_URL_PREFIX_DEFAULT: &str = "/api";
 /// Default `CHECK_CONFIG_TICK` used in development.
 const CHECK_CONFIG_TICK_DEFAULT: &str = "5s";
 
-/// Default `DATA_REFRESH_TICK` used in development
-const DATA_REFRESH_TICK_DEFAULT: &str = "5s";
-
 /// Default `MACHINE_UID` used in development
 const MACHINE_UID_DEFAULT: &str = "UID";
 
@@ -61,8 +59,8 @@ const EVENT_DB_URL_DEFAULT: &str =
 fn calculate_service_uuid() -> String {
     let mut hasher = Blake2b::new_keyed(16, "Catalyst-Gateway-Machine-UID".as_bytes());
 
-    let ipv4 = get_public_ipv4().to_canonical().to_string();
-    let ipv6 = get_public_ipv6().to_canonical().to_string();
+    let ipv4 = get_public_ipv4().to_string();
+    let ipv6 = get_public_ipv6().to_string();
 
     hasher.input(ipv4.as_bytes());
     hasher.input(ipv6.as_bytes());
@@ -83,10 +81,11 @@ fn calculate_service_uuid() -> String {
 /// the URL to the `PostgreSQL` event database,
 /// and the logging level.
 #[derive(Args, Clone)]
+#[clap(version = BUILD_INFO)]
 pub(crate) struct ServiceSettings {
     /// Url to the postgres event db
     #[clap(long, env)]
-    pub(crate) database_url: String,
+    pub(crate) event_db_url: Option<String>,
 
     /// Logging level
     #[clap(long, default_value = LOG_LEVEL_DEFAULT)]
@@ -99,10 +98,6 @@ pub(crate) struct ServiceSettings {
     /// Follower settings.
     #[clap(flatten)]
     pub(crate) follower_settings: FollowerSettings,
-
-    /// Enable deep query inspection.
-    #[clap(long, action = clap::ArgAction::SetTrue)]
-    pub(crate) deep_query_inspection: bool,
 }
 
 /// Settings specifies `OpenAPI` docs generation.
@@ -123,14 +118,6 @@ pub(crate) struct DocsSettings {
 /// Settings for follower mechanics.
 #[derive(Args, Clone)]
 pub(crate) struct FollowerSettings {
-    /// Check config tick
-    #[clap(long, default_value = CHECK_CONFIG_TICK_DEFAULT, env = "CHECK_CONFIG_TICK")]
-    pub(crate) check_config_tick: u64,
-
-    /// Data Refresh tick
-    #[clap(long, default_value = DATA_REFRESH_TICK_DEFAULT, env = "DATA_REFRESH_TICK")]
-    pub(crate) data_refresh_tick: u64,
-
     /// Machine UID
     #[clap(long, default_value = MACHINE_UID_DEFAULT, env = "MACHINE_UID")]
     pub(crate) machine_uid: String,
@@ -226,6 +213,7 @@ struct EnvVars {
     event_db_password: Option<StringEnvVar>,
 
     /// Tick every N seconds until config exists in db
+    #[allow(unused)]
     check_config_tick: Duration,
 }
 
@@ -274,21 +262,24 @@ static ENV_VARS: Lazy<EnvVars> = Lazy::new(|| {
 /// All Settings/Options for the Service.
 static SERVICE_SETTINGS: OnceLock<ServiceSettings> = OnceLock::new();
 
-/// Logger Handle for the Service.
-static LOGGER_HANDLE: OnceLock<LoggerHandle> = OnceLock::new();
-
 /// Our Global Settings for this running service.
 pub(crate) struct Settings();
 
 impl Settings {
     /// Initialize the settings data.
     pub(crate) fn init(settings: ServiceSettings) -> anyhow::Result<()> {
-        if LOGGER_HANDLE.set(logger::init(settings.log_level)).is_err() {
-            error!("Failed to initialize logger handle. Called multiple times?");
-        }
+        let log_level = settings.log_level;
+
         if SERVICE_SETTINGS.set(settings).is_err() {
-            error!("Failed to initialize service settings. Called multiple times?");
+            // We use println here, because logger not yet configured.
+            println!("Failed to initialize service settings. Called multiple times?");
         }
+
+        // Init the logger.
+        logger::init(log_level);
+
+        log_build_info();
+
         event_db::establish_connection()
     }
 
@@ -319,6 +310,7 @@ impl Settings {
     }
 
     /// The Service UUID
+    #[allow(unused)]
     pub(crate) fn service_id() -> &'static str {
         ENV_VARS.service_id.as_str()
     }
@@ -356,23 +348,6 @@ impl Settings {
             settings.docs_settings.server_name.clone()
         } else {
             None
-        }
-    }
-
-    /// Modify the logger level setting.
-    /// This will reload the logger.
-    pub(crate) fn modify_logger_level(level: LogLevel) {
-        if let Some(logger_handle) = LOGGER_HANDLE.get() {
-            if let Err(error) = logger_handle.modify(|f| *f = LevelFilter::from_level(level.into()))
-            {
-                error!("Failed to modify log level to {:?} : {}", level, error);
-            }
-        } else {
-            // This should never happen.
-            error!(
-                "Failed to modify log level to {:?} : Logger handle not available.",
-                level
-            );
         }
     }
 

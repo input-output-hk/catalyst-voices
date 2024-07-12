@@ -67,8 +67,10 @@ pub(crate) fn get_app_docs() -> String {
 /// * `Error::IoError` - An IO error has occurred.
 pub(crate) async fn run() -> anyhow::Result<()> {
     // The address to listen on
-    tracing::info!("Starting Cat-Gateway Service ...");
-    tracing::info!("Listening on {}", Settings::bound_address());
+    tracing::info!(
+        ServiceAddr = Settings::bound_address().to_string(),
+        "Starting Cat-Gateway API Service ..."
+    );
 
     // Set a custom panic hook, so we can catch panics and not crash the service.
     // And also get data from the panic so we can log it.
