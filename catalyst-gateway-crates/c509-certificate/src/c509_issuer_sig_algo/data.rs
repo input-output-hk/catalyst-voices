@@ -44,16 +44,14 @@ const SIG_ALGO_DATA: [AlgorithmDataTuple; 24] = [
     (45,    oid!(1.2.156.10197.1.501),           "SM2 with SM3"),    
 ];
 
-/// A struct of data that contains lookup tables for `IssuerSignatureAlgorithm`.
-pub(crate) struct IssuerSigAlgoData {
-    /// A table of integer to OID, provide a bidirectional lookup.
-    int_to_oid_table: IntegerToOidTable,
-}
+/// A struct of data that contains lookup table of integer to OID in
+/// bidirectional way for `IssuerSignatureAlgorithm`.
+pub(crate) struct IssuerSigAlgoData(IntegerToOidTable);
 
 impl IssuerSigAlgoData {
     /// Get the `IntegerToOidTable`
     pub(crate) fn get_int_to_oid_table(&self) -> &IntegerToOidTable {
-        &self.int_to_oid_table
+        &self.0
     }
 }
 
@@ -65,7 +63,7 @@ static ISSUER_SIG_ALGO_TABLE: Lazy<IssuerSigAlgoData> = Lazy::new(|| {
         int_to_oid_table.add(data.0, data.1);
     }
 
-    IssuerSigAlgoData { int_to_oid_table }
+    IssuerSigAlgoData(int_to_oid_table)
 });
 
 /// Static reference to the `IssuerSigAlgoData` lookup table.

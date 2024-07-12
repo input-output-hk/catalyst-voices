@@ -36,16 +36,14 @@ const PUB_KEY_ALGO_DATA: [AlgorithmDataTuple; 16] = [
     (28, oid!(1.2.840.10045.2.1),           "EC Public Key (Weierstraß) with sm2p256v1"),
 ];
 
-/// A struct of data that contains lookup tables for `SubjectPublickeyAlgorithm`.
-pub(crate) struct SubjectPubKeyAlgoData {
-    /// A table of integer to OID, provide a bidirectional lookup.
-    int_to_oid_table: IntegerToOidTable,
-}
+/// A struct of data that contains lookup table of integer to OID in
+/// bidirectional way for `SubjectPublicKeyAlgorithm`.
+pub(crate) struct SubjectPubKeyAlgoData(IntegerToOidTable);
 
 impl SubjectPubKeyAlgoData {
     /// Get the `IntegerToOidTable`
     pub(crate) fn get_int_to_oid_table(&self) -> &IntegerToOidTable {
-        &self.int_to_oid_table
+        &self.0
     }
 }
 
@@ -57,7 +55,7 @@ static SUBJECT_PUB_KEY_ALGO_TABLE: Lazy<SubjectPubKeyAlgoData> = Lazy::new(|| {
         int_to_oid_table.add(data.0, data.1);
     }
 
-    SubjectPubKeyAlgoData { int_to_oid_table }
+    SubjectPubKeyAlgoData(int_to_oid_table)
 });
 
 /// Static reference to the `SubjectPubKeyAlgoData` lookup table.
