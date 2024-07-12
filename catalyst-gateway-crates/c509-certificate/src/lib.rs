@@ -24,8 +24,6 @@ pub mod signing;
 mod tables;
 pub mod tbs_cert;
 
-/// Generates an unsigned C509 certificate from the provided `TbsCertificate`.
-///
 /// C509 certificate contains 2 parts
 /// 1. `TBSCertificate`
 /// 2. `issuerSignatureValue`
@@ -33,7 +31,7 @@ pub mod tbs_cert;
 /// provided. Then the unsigned C509 certificate will then be used to calculate the
 /// issuerSignatureValue.
 ///
-/// # Arguments
+/// # TBS Certificate
 ///
 /// * `tbs_cert` - The `TbsCertificate` is the TBS Certificate containing
 ///    * c509CertificateType: A certificate type, whether 0 a natively signed C509
@@ -55,22 +53,41 @@ pub mod tbs_cert;
 ///      between Certificate Authorities (CAs).
 ///    * issuerSignatureAlgorithm: The algorithm used to sign the certificate (must be the
 ///      algorithm uses to create `IssuerSignatureValue`).
+
+/// Generate a signed C509 certificate.
+///
+/// # Arguments
+/// `tbs_cert` - A cbor encoded TBS certificate.
+/// `private_key` - The private key used to sign the certificate.
 ///
 /// # Returns
+/// Returns a signed C509 certificate.
 ///
-/// A `Vec<u8>` containing the generated unsigned C509 certificate.
+/// # Errors
 ///
-/// # Remarks
-///
-/// This function relies on the `c509_cert` module's `generate_unsigned_c509_cert`
-/// function for the actual generation process.
+/// Returns an error if tne sign data cannot be converted to CBOR bytes.
 // #[wasm_bindgen]
-#[must_use]
-pub fn generate_signed_c509_cert(tbs_cert: Vec<u8>, private_key: &PrivateKey) -> C509 {
+pub fn generate_signed_c509_cert(
+    tbs_cert: Vec<u8>, private_key: &PrivateKey,
+) -> Result<C509, Error> {
+    let mut buffer = Vec::new();
+    let mut encoder = minicbor::Encoder::new(&mut buffer);
     let sign_data = private_key.sign(&tbs_cert);
-    C509::new(tbs_cert, sign_data)
+    encoder.bytes(&sign_data)?;
+    Ok(C509::new(tbs_cert, buffer))
 }
 
+/// Verify the signature of a C509 certificate.
+///
+/// # Arguments
+/// `c509` - The C509 certificate to verify.
+/// `public_key` - The public key used to verify the certificate.
+///
+/// # Errors
+/// Returns an error if the `issuer_signature_value` is invalid or the signature cannot be
+/// verified.
 pub fn verify_c509_signature(c509: &C509, public_key: &PublicKey) -> Result<(), Error> {
-    public_key.verify(c509.get_tbs_cert(), c509.get_issuer_signature_value())
+    let mut decoder = minicbor::Decoder::new(c509.get_issuer_signature_value());
+    let signature = decoder.bytes()?;
+    public_key.verify(c509.get_tbs_cert(), signature)
 }
