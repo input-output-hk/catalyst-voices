@@ -89,3 +89,31 @@ pub fn verify_c509_signature(c509: &C509, public_key: &PublicKey) -> Result<(), 
     let signature = decoder.bytes()?;
     public_key.verify(c509.get_tbs_cert(), signature)
 }
+
+#[cfg(test)]
+mod test {
+    use minicbor::Encode;
+    use signing::tests::private_key_str;
+    use tbs_cert::test_tbs_cert::tbs;
+
+    use super::*;
+
+    #[test]
+    fn test_generate_and_verify_signed_c509_cert() {
+        let tbs_cert = tbs();
+        let mut buffer = Vec::new();
+        let mut encoder = minicbor::Encoder::new(&mut buffer);
+
+        tbs_cert
+            .encode(&mut encoder, &mut ())
+            .expect("Failed to encode TbsCertificate");
+
+        let private_key =
+            PrivateKey::from_str(&private_key_str()).expect("Cannot create private key");
+
+        let c509 = generate_signed_c509_cert(buffer, &private_key)
+            .expect("Failed to generate signed C509 certificate");
+
+        assert!(verify_c509_signature(&c509, &private_key.public_key()).is_ok());
+    }
+}
