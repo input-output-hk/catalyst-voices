@@ -16,12 +16,12 @@ type AlgorithmDataTuple = (i16, Oid<'static>, &'static str);
 
 /// Public key algorithm data table.
 #[rustfmt::skip]
-const PUB_KEY_ALGO_DATA: [AlgorithmDataTuple; 16] = [
+const PUB_KEY_ALGO_DATA: [AlgorithmDataTuple; 9] = [
     // Int  |               OID                |            Name    
     (0, oid!(1.2.840.113549.1.1.1),         "RSA"),
     (1, oid!(1.2.840.10045.2.1),            "EC Public Key (Weierstraß) with secp256r1"),
-    (2, oid!(1.2.840.10045.2.1),            "EC Public Key (Weierstraß) with secp384r1"),
-    (3, oid!(1.2.840.10045.2.1),            "EC Public Key (Weierstraß) with secp521r1"),
+    // (2, oid!(1.2.840.10045.2.1),            "EC Public Key (Weierstraß) with secp384r1"),
+    // (3, oid!(1.2.840.10045.2.1),            "EC Public Key (Weierstraß) with secp521r1"),
     (8, oid!(1.3.101.110),                  "X25519 (Montgomery)"),
     (9, oid!(1.3.101.111),                  "X448 (Montgomery)"),
     (10, oid!(1.3.101.112),                 "Ed25519 (Twisted Edwards)"),
@@ -29,11 +29,11 @@ const PUB_KEY_ALGO_DATA: [AlgorithmDataTuple; 16] = [
     (16, oid!(1.2.840.113549.1.9.16.3.17),  "HSS / LMS"),
     (17, oid!(0.4.0.127.0.15.1.1.13.0),     "XMSS"),
     (18, oid!(0.4.0.127.0.15.1.1.14.0),     "XMSS^MT"),
-    (24, oid!(1.2.840.10045.2.1),           "EC Public Key (Weierstraß) with brainpoolP256r1"),
-    (25, oid!(1.2.840.10045.2.1),           "EC Public Key (Weierstraß) with brainpoolP384r1"),
-    (26, oid!(1.2.840.10045.2.1),           "EC Public Key (Weierstraß) with brainpoolP512r1"),
-    (27, oid!(1.2.840.10045.2.1),           "EC Public Key (Weierstraß) with FRP256v1"),
-    (28, oid!(1.2.840.10045.2.1),           "EC Public Key (Weierstraß) with sm2p256v1"),
+    // (24, oid!(1.2.840.10045.2.1),           "EC Public Key (Weierstraß) with brainpoolP256r1"),
+    // (25, oid!(1.2.840.10045.2.1),           "EC Public Key (Weierstraß) with brainpoolP384r1"),
+    // (26, oid!(1.2.840.10045.2.1),           "EC Public Key (Weierstraß) with brainpoolP512r1"),
+    // (27, oid!(1.2.840.10045.2.1),           "EC Public Key (Weierstraß) with FRP256v1"),
+    // (28, oid!(1.2.840.10045.2.1),           "EC Public Key (Weierstraß) with sm2p256v1"),
 ];
 
 /// A struct of data that contains lookup table of integer to OID in
