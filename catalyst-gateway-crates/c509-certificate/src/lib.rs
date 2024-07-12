@@ -11,6 +11,7 @@ pub mod c509_extensions;
 pub mod c509_general_names;
 pub mod c509_name;
 pub mod c509_oid;
+pub mod tbs_cert;
 mod tables;
 
 /// Generates an unsigned C509 certificate from the provided `TbsCertificate`.
