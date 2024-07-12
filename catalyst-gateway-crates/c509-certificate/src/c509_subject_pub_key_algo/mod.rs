@@ -65,7 +65,7 @@ impl Decode<'_, ()> for SubjectPubKeyAlgorithm {
         } else {
             let algo_identifier = AlgorithmIdentifier::decode(d, ctx)?;
             Ok(SubjectPubKeyAlgorithm::new(
-                algo_identifier.clone().get_oid(),
+                algo_identifier.get_oid(),
                 algo_identifier.get_param().clone(),
             ))
         }
