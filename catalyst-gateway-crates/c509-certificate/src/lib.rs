@@ -7,9 +7,11 @@
 
 use wasm_bindgen::prelude::wasm_bindgen;
 pub mod c509_algo_identifier;
+pub mod c509_attributes;
 pub mod c509_extensions;
 pub mod c509_general_names;
 pub mod c509_issuer_sig_algo;
+pub mod c509_name;
 pub mod c509_oid;
 pub mod c509_subject_pub_key_algo;
 mod tables;

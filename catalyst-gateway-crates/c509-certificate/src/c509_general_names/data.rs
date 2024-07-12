@@ -32,7 +32,7 @@ const GENERAL_NAME_DATA: [GeneralNameDataTuple; 10] = [
     (0,     Gntr::OtherName,                    Gnvt::OtherNameHWModuleName),
     (1,     Gntr::Rfc822Name,                   Gnvt::Text),
     (2,     Gntr::DNSName,                      Gnvt::Text),
-    (4,     Gntr::DirectoryName,                Gnvt::Unsupported),
+    (4,     Gntr::DirectoryName,                Gnvt::Name),
     (6,     Gntr::UniformResourceIdentifier,    Gnvt::Text),
     (7,     Gntr::IPAddress,                    Gnvt::Bytes),
     (8,     Gntr::RegisteredID,                 Gnvt::Oid),
