@@ -5,7 +5,7 @@
 
 mod data;
 pub mod general_name;
-mod other_name_hw_module;
+pub mod other_name_hw_module;
 
 use general_name::GeneralName;
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
@@ -51,7 +51,8 @@ impl Encode<()> for GeneralNames {
                 "GeneralNames should not be empty",
             ));
         }
-        e.array(self.0.len() as u64)?;
+        // The general name type should be included in array too
+        e.array(self.0.len() as u64 * 2)?;
         for gn in &self.0 {
             gn.encode(e, ctx)?;
         }
@@ -65,7 +66,7 @@ impl Decode<'_, ()> for GeneralNames {
             "GeneralNames should be an array",
         ))?;
         let mut gn = GeneralNames::new();
-        for _ in 0..len {
+        for _ in 0..len / 2 {
             gn.add_gn(GeneralName::decode(d, ctx)?);
         }
         Ok(gn)

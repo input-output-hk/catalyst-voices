@@ -1,5 +1,7 @@
 //! C509 type Name
-//!
+//! Currently only support natively signed c509 certificate, so all text strings
+//! are UTF-8 encoded and all attributeType SHALL be non-negative.
+//! 
 //! ```cddl
 //!  Name = [ * RelativeDistinguishedName ] / text / bytes
 //! RelativeDistinguishedName = Attribute / [ 2* Attribute ]
@@ -13,7 +15,7 @@
 
 // cspell: words rdns
 
-mod rdn;
+pub mod rdn;
 use asn1_rs::{oid, Oid};
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 use rdn::RelativeDistinguishedName;
