@@ -1,47 +1,59 @@
+//! To Be Sign Certificate (TBS Certificate) module use to construct a C509 certificate.
+
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 
-use crate::{c509_extensions::Extensions, c509_name::Name};
+use crate::{
+    c509_big_uint::UnwrappedBigUint, c509_extensions::Extensions,
+    c509_issuer_sig_algo::IssuerSignatureAlgorithm, c509_name::Name,
+    c509_subject_pub_key_algo::SubjectPubKeyAlgorithm, c509_time::Time,
+};
 
 /// A struct represents a To Be Signed Certificate (TBS Certificate).
 #[derive(Debug, Clone, PartialEq)]
 pub struct TbsCert {
+    /// Certificate type.
     c509_certificate_type: u8,
-    // certificate_serial_number: u64,
+    /// Serial number of the certificate.
+    certificate_serial_number: UnwrappedBigUint,
+    /// Issuer
     issuer: Name,
-    // validity_not_before: u64,
-    // validity_not_after: u64,
+    /// Validity not before.
+    validity_not_before: Time,
+    /// Validity not after.
+    validity_not_after: Time,
+    /// Subject
     subject: Name,
-    // subject_public_key_algorithm: C509oid,
+    /// Subject Public Key Algorithm
+    subject_public_key_algorithm: SubjectPubKeyAlgorithm,
+    /// Subject Public Key value
     subject_public_key: Vec<u8>,
+    /// Extensions
     extensions: Extensions,
-    // issuer_signature_algorithm: C509oid,
+    /// Issuer Signature Algorithm
+    issuer_signature_algorithm: IssuerSignatureAlgorithm,
 }
 
 impl TbsCert {
     /// Create a new instance of TBS Certificate.
+    #[must_use]
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
-        c509_certificate_type: u8,
-        // certificate_serial_number: u64,
-        issuer: Name,
-        // validity_not_before: u64,
-        // validity_not_after: u64,
-        subject: Name,
-        // subject_public_key_algorithm: C509oid,
-        subject_public_key: Vec<u8>,
-        extensions: Extensions,
-        // issuer_signature_algorithm: C509oid,
+        c509_certificate_type: u8, certificate_serial_number: UnwrappedBigUint, issuer: Name,
+        validity_not_before: Time, validity_not_after: Time, subject: Name,
+        subject_public_key_algorithm: SubjectPubKeyAlgorithm, subject_public_key: Vec<u8>,
+        extensions: Extensions, issuer_signature_algorithm: IssuerSignatureAlgorithm,
     ) -> Self {
         Self {
             c509_certificate_type,
-            // certificate_serial_number,
+            certificate_serial_number,
             issuer,
-            // validity_not_before,
-            // validity_not_after,
+            validity_not_before,
+            validity_not_after,
             subject,
-            // subject_public_key_algorithm,
+            subject_public_key_algorithm,
             subject_public_key,
             extensions,
-            // issuer_signature_algorithm,
+            issuer_signature_algorithm,
         }
     }
 }
@@ -51,53 +63,43 @@ impl Encode<()> for TbsCert {
         &self, e: &mut Encoder<W>, ctx: &mut (),
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
         e.u8(self.c509_certificate_type)?;
-        // self.certificate_serial_number.encode(e, ctx)?;
+        self.certificate_serial_number.encode(e, ctx)?;
         self.issuer.encode(e, ctx)?;
-        // self.validity_not_before.encode(e, ctx)?;
-        // self.validity_not_after.encode(e, ctx)?;
+        self.validity_not_before.encode(e, ctx)?;
+        self.validity_not_after.encode(e, ctx)?;
         self.subject.encode(e, ctx)?;
-        // self.subject_public_key_algorithm.encode(e, ctx)?;
+        self.subject_public_key_algorithm.encode(e, ctx)?;
         e.bytes(&self.subject_public_key)?;
         self.extensions.encode(e, ctx)?;
-        // self.issuer_signature_algorithm.encode(e, ctx)?;
+        self.issuer_signature_algorithm.encode(e, ctx)?;
         Ok(())
     }
 }
 
 impl Decode<'_, ()> for TbsCert {
     fn decode(d: &mut Decoder<'_>, ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
-        // C509 Certificate Type
         let cert_type = d.u8()?;
-        // Certificate Serial Number
-        // let serial_number = d.u64()?;
-        // Issuer
+        let serial_number = UnwrappedBigUint::decode(d, ctx)?;
         let issuer = Name::decode(d, ctx)?;
-        // Not before
-        // let not_before = d.u64()?;
-        // Not after
-        // let not_after = d.u64()?;
-        // Subject
+        let not_before = Time::decode(d, ctx)?;
+        let not_after = Time::decode(d, ctx)?;
         let subject = Name::decode(d, ctx)?;
-        // Subject Public Key Algorithm
-        // let subject_public_key_algorithm = C509oid::decode(d, ctx)?;
-        // Subject Public Key
+        let subject_public_key_algorithm = SubjectPubKeyAlgorithm::decode(d, ctx)?;
         let subject_public_key = d.bytes()?;
-        // Extensions
         let extensions = Extensions::decode(d, ctx)?;
-        // Issuer Signature Algorithm
-        // let issuer_signature_algorithm = C509oid::decode(d, ctx)?;
+        let issuer_signature_algorithm = IssuerSignatureAlgorithm::decode(d, ctx)?;
 
         Ok(TbsCert::new(
             cert_type,
-            // serial_number,
+            serial_number,
             issuer,
-            // not_before,
-            // not_after,
+            not_before,
+            not_after,
             subject,
-            // subject_public_key_algorithm,
+            subject_public_key_algorithm,
             subject_public_key.to_vec(),
             extensions,
-            // issuer_signature_algorithm,
+            issuer_signature_algorithm,
         ))
     }
 }
@@ -113,7 +115,7 @@ impl Decode<'_, ()> for TbsCert {
 // - Some Extension values are not supported yet.
 
 #[cfg(test)]
-mod test_tbs_cert {
+pub(crate) mod test_tbs_cert {
     use asn1_rs::oid;
 
     use super::*;
@@ -128,7 +130,11 @@ mod test_tbs_cert {
             other_name_hw_module::OtherNameHardwareModuleName,
             GeneralNames,
         },
-        c509_name::{rdn::RelativeDistinguishedName, NameValue},
+        c509_name::{
+            rdn::RelativeDistinguishedName,
+            test_name::{name_cn_eui_mac, name_cn_text, names},
+            NameValue,
+        },
     };
 
     // Mnemonic: match mad promote group rival case
@@ -183,21 +189,41 @@ mod test_tbs_cert {
     // DA E7 6C CE EA 55 05 3C 10 8E 90 D5 51 F6 D6 01 06 F1 AB B4 84 CF BE
     // 62 56 C1 78 E4 AC 33 14 EA 19 19 1E 8B 60 7D A5 AE 3B DA 16
 
-    #[test]
-    fn encode_decode_tbs_cert() {
-        let tbs_cert = TbsCert::new(
+    pub(crate) fn tbs() -> TbsCert {
+        fn extensions() -> Extensions {
+            let mut exts = Extensions::new();
+            exts.add_ext(Extension::new(
+                oid!(2.5.29 .15),
+                ExtensionValue::Int(1),
+                false,
+            ));
+            exts
+        }
+
+        TbsCert::new(
             1,
-            name("RFC test CA".to_string()),
-            name("01-23-45-FF-FE-67-89-AB".to_string()),
+            UnwrappedBigUint::new(128_269),
+            name_cn_text().0,
+            Time::new(1_672_531_200),
+            Time::new(1_767_225_600),
+            name_cn_eui_mac().0,
+            SubjectPubKeyAlgorithm::new(oid!(1.2.840 .10045 .2 .1), None),
             PUBKEY.to_vec(),
             extensions(),
-        );
+            IssuerSignatureAlgorithm::new(oid!(1.2.840 .10045 .4 .3 .2), None),
+        )
+    }
+
+    #[test]
+    fn encode_decode_tbs_cert() {
+        let tbs_cert = tbs();
 
         let mut buffer = Vec::new();
         let mut encoder = Encoder::new(&mut buffer);
         tbs_cert
             .encode(&mut encoder, &mut ())
             .expect("Failed to encode TBS Certificate");
+
         // c509_certificate_type: 0x01
         // certificate_serial_number: 0x4301f50d
         // issuer: 0x6b5246432074657374204341
@@ -211,35 +237,13 @@ mod test_tbs_cert {
 
         assert_eq!(
             hex::encode(buffer.clone()),
-            "016b524643207465737420434147010123456789ab4888d0b6b0b37baa4601"
+            "014301f50d6b52464320746573742043411a63b0cd001a6955b90047010123456789ab014888d0b6b0b37baa460100"
         );
 
         let mut decoder = Decoder::new(&buffer);
         let decoded_tbs =
             TbsCert::decode(&mut decoder, &mut ()).expect("Failed to decode TBS Certificate");
         assert_eq!(decoded_tbs, tbs_cert);
-
-        // ---------helper----------
-        fn name(attr_str: String) -> Name {
-            // Attribute
-            let mut attr = Attribute::new(oid!(2.5.4 .3));
-            attr.add_value(AttributeValue::Text(attr_str));
-            // RDN
-            let mut rdn = RelativeDistinguishedName::new();
-            rdn.add_attr(attr);
-            // Name
-            Name::new(NameValue::RelativeDistinguishedName(rdn))
-        }
-
-        fn extensions() -> Extensions {
-            let mut exts = Extensions::new();
-            exts.add_ext(Extension::new(
-                oid!(2.5.29 .15),
-                ExtensionValue::Int(1),
-                false,
-            ));
-            exts
-        }
     }
 
     // Test reference https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/
@@ -303,55 +307,7 @@ mod test_tbs_cert {
 
     #[test]
     fn tbs_cert2() {
-        let tbs_cert = TbsCert::new(1, issuer(), subject(), PUBKEY.to_vec(), extensions());
-
-        let mut buffer = Vec::new();
-        let mut encoder = Encoder::new(&mut buffer);
-        tbs_cert
-            .encode(&mut encoder, &mut ())
-            .expect("Failed to encode TBS Certificate");
-        // c509_certificate_type: 0x01
-        // certificate_serial_number: 0x487e7661d7b54e4632
-        // issuer: 0x8a0462555306624341086b4578616d706c6520496e63096d63657274696669636174696f6e016a3830322e314152204341
-        // validity_not_before: 0x1a5c52dc0c
-        // validity_not_after: 0xf6
-        // subject: 0x8c046255530662434105624c41086b6578616d706c6520496e630963496f540366577431323334
-        // subject_public_key_algorithm: 0x01
-        // subject_public_key: 0x4888d0b6b0b37baa46
-        // extensions:
-        // 0x840421015496600d8716bf7fd0e752d0ac760777ad665d02a0210503822082492b06010401b01f0a014401020304
-        // issuer_signature_algorithm: 0x00
-        assert_eq!(hex::encode(buffer.clone()), "018a0462555306624341086b4578616d706c6520496e63096d63657274696669636174696f6e016a3830322e3141522043418c046255530662434105624c41086b6578616d706c6520496e630963496f5403665774313233344888d0b6b0b37baa46840421015496600d8716bf7fd0e752d0ac760777ad665d02a0210503822082492b06010401b01f0a014401020304");
-
-        let mut decoder = Decoder::new(&buffer);
-        let decoded_tbs =
-            TbsCert::decode(&mut decoder, &mut ()).expect("Failed to decode TBS Certificate");
-        assert_eq!(decoded_tbs, tbs_cert);
-
         // ---------helper----------
-        // C=US, ST=CA, O=Example Inc, OU=certification, CN=802.1AR CA
-        fn issuer() -> Name {
-            let mut attr1 = Attribute::new(oid!(2.5.4 .6));
-            attr1.add_value(AttributeValue::Text("US".to_string()));
-            let mut attr2 = Attribute::new(oid!(2.5.4 .8));
-            attr2.add_value(AttributeValue::Text("CA".to_string()));
-            let mut attr3 = Attribute::new(oid!(2.5.4 .10));
-            attr3.add_value(AttributeValue::Text("Example Inc".to_string()));
-            let mut attr4 = Attribute::new(oid!(2.5.4 .11));
-            attr4.add_value(AttributeValue::Text("certification".to_string()));
-            let mut attr5 = Attribute::new(oid!(2.5.4 .3));
-            attr5.add_value(AttributeValue::Text("802.1AR CA".to_string()));
-
-            let mut rdn = RelativeDistinguishedName::new();
-            rdn.add_attr(attr1);
-            rdn.add_attr(attr2);
-            rdn.add_attr(attr3);
-            rdn.add_attr(attr4);
-            rdn.add_attr(attr5);
-
-            Name::new(NameValue::RelativeDistinguishedName(rdn))
-        }
-
         // C=US, ST=CA, L=LA, O=example Inc, OU=IoT/serialNumber=Wt1234
         fn subject() -> Name {
             let mut attr1 = Attribute::new(oid!(2.5.4 .6));
@@ -420,5 +376,40 @@ mod test_tbs_cert {
 
             exts
         }
+
+        let tbs_cert = TbsCert::new(
+            1,
+            UnwrappedBigUint::new(9_112_578_475_118_446_130),
+            names().0,
+            Time::new(1_548_934_156),
+            Time::new(253_402_300_799),
+            subject(),
+            SubjectPubKeyAlgorithm::new(oid!(1.2.840 .10045 .2 .1), None),
+            PUBKEY.to_vec(),
+            extensions(),
+            IssuerSignatureAlgorithm::new(oid!(1.2.840 .10045 .4 .3 .2), None),
+        );
+
+        let mut buffer = Vec::new();
+        let mut encoder = Encoder::new(&mut buffer);
+        tbs_cert
+            .encode(&mut encoder, &mut ())
+            .expect("Failed to encode TBS Certificate");
+        // c509_certificate_type: 0x01
+        // certificate_serial_number: 0x487e7661d7b54e4632
+        // issuer: 0x8a0462555306624341086b4578616d706c6520496e63096d63657274696669636174696f6e016a3830322e314152204341
+        // validity_not_before: 0x1a5c52dc0c
+        // validity_not_after: 0xf6
+        // subject: 0x8c046255530662434105624c41086b6578616d706c6520496e630963496f540366577431323334
+        // subject_public_key_algorithm: 0x01
+        // subject_public_key: 0x4888d0b6b0b37baa46
+        // extensions:
+        // 0x840421015496600d8716bf7fd0e752d0ac760777ad665d02a0210503822082492b06010401b01f0a014401020304
+        // issuer_signature_algorithm: 0x00
+        assert_eq!(hex::encode(buffer.clone()), "01487e7661d7b54e46328a0462555306624341086b4578616d706c6520496e63096d63657274696669636174696f6e016a3830322e3141522043411a5c52dc0cf68c046255530662434105624c41086b6578616d706c6520496e630963496f540366577431323334014888d0b6b0b37baa46840421015496600d8716bf7fd0e752d0ac760777ad665d02a0210503822082492b06010401b01f0a01440102030400");
+        let mut decoder = Decoder::new(&buffer);
+        let decoded_tbs =
+            TbsCert::decode(&mut decoder, &mut ()).expect("Failed to decode TBS Certificate");
+        assert_eq!(decoded_tbs, tbs_cert);
     }
 }
