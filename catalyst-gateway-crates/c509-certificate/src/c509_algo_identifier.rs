@@ -34,13 +34,13 @@ impl AlgorithmIdentifier {
     }
 
     /// Get the OID.
-    pub(crate) fn get_oid(&self) -> Oid<'static> {
-        self.oid.clone().get_oid()
+    pub(crate) fn get_oid(self) -> Oid<'static> {
+        self.oid.get_oid()
     }
 
     /// Get the parameter.
-    pub(crate) fn get_param(&self) -> Option<String> {
-        self.param.clone()
+    pub(crate) fn get_param(self) -> Option<String> {
+        self.param
     }
 }
 
