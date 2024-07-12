@@ -1,4 +1,4 @@
-//! To Be Sign Certificate (TBS Certificate) module use to construct a C509 certificate.
+//! To Be Sign Certificate (TBS Certificate) use to construct a C509 certificate.
 
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 
