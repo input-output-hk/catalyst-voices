@@ -66,7 +66,7 @@ impl Decode<'_, ()> for IssuerSignatureAlgorithm {
                 let algo_identifier = AlgorithmIdentifier::decode(d, ctx)?;
                 Ok(IssuerSignatureAlgorithm::new(
                     algo_identifier.clone().get_oid(),
-                    algo_identifier.get_param(),
+                    algo_identifier.get_param().clone(),
                 ))
             },
         }

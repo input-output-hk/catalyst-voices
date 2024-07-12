@@ -39,8 +39,8 @@ impl AlgorithmIdentifier {
     }
 
     /// Get the parameter.
-    pub(crate) fn get_param(self) -> Option<String> {
-        self.param
+    pub(crate) fn get_param(&self) -> &Option<String> {
+        &self.param
     }
 }
 
