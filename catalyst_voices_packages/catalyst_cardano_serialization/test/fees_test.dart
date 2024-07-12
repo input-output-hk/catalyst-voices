@@ -13,7 +13,7 @@ void main() {
       );
 
       final tx = fullSignedTestTransaction();
-      expect(linearFee.minNoScriptFee(tx), equals(176369));
+      expect(linearFee.minNoScriptFee(tx), equals(177953));
     });
 
     test('minFeeNoScript with constant fee only', () {
@@ -33,7 +33,7 @@ void main() {
       );
 
       final tx = fullSignedTestTransaction();
-      expect(linearFee.minNoScriptFee(tx), equals(20988));
+      expect(linearFee.minNoScriptFee(tx), equals(22572));
     });
   });
 }

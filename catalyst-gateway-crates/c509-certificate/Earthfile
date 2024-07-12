@@ -1,0 +1,35 @@
+VERSION 0.8
+
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.1.15 AS rust-ci
+
+# builder : Set up our target toolchains, and copy our files.
+builder:
+    DO rust-ci+SETUP
+
+    COPY --dir .cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml src .
+
+
+check:
+    FROM +builder
+
+    DO rust-ci+EXECUTE --cmd="/scripts/std_checks.py"
+
+build:
+    FROM +builder
+
+    DO rust-ci+EXECUTE \
+        --cmd="/scripts/std_build.py" \
+        --args1="--libs=c509-certificate"
+     
+    # RUN wasm-pack build --target web
+
+package:
+    FROM +build
+
+    # AS LOCAL is for local testing only, will be removed in the future
+    SAVE ARTIFACT ./pkg c509-certificate-binding
+
+# # local-build: Build the service and save it locally
+# local-build:
+#     FROM +build
+#     SAVE ARTIFACT c509-certificate-binding AS LOCAL ./pkg
