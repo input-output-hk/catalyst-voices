@@ -8,7 +8,6 @@
 use anyhow::Error;
 use c509::C509;
 use signing::{PrivateKey, PublicKey};
-// use wasm_bindgen::prelude::wasm_bindgen;
 pub mod c509;
 pub mod c509_algo_identifier;
 pub mod c509_attributes;
@@ -66,7 +65,6 @@ pub mod tbs_cert;
 /// # Errors
 ///
 /// Returns an error if tne sign data cannot be converted to CBOR bytes.
-// #[wasm_bindgen]
 pub fn generate_signed_c509_cert(
     tbs_cert: Vec<u8>, private_key: &PrivateKey,
 ) -> Result<C509, Error> {

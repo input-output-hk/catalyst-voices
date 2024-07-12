@@ -46,7 +46,6 @@ unreachable = "deny"
 missing_docs_in_private_items = "deny"
 
 [dependencies]
-wasm-bindgen = "0.2"
 minicbor = { version = "0.24", features = ["std"] }
 hex = "0.4.3"
 oid = "0.2.1"
