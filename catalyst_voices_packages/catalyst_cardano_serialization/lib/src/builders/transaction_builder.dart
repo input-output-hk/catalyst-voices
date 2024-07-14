@@ -40,7 +40,7 @@ final class TransactionBuilder extends Equatable {
 
   /// The list of public key hashes of addresses
   /// that are required to sign the transaction.
-  final Set<Vkey>? requiredSigners;
+  final Set<Ed25519PublicKey>? requiredSigners;
 
   /// Specifies on which network the code will run.
   final NetworkId? networkId;

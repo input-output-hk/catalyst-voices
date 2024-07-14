@@ -89,7 +89,7 @@ Transaction minimalSignedTestTransaction() {
     witnessSet: TransactionWitnessSet(
       vkeyWitnesses: {
         VkeyWitness(
-          vkey: Vkey.fromBytes(
+          vkey: Ed25519PublicKey.fromBytes(
             hex.decode(
               '3311ca404fcf22c91d607ace285d70e2'
               '263a1b81745c39673080329bd1a3f56e',
@@ -128,7 +128,7 @@ Transaction fullUnsignedTestTransaction() {
       ttl: const SlotBigNum(41193),
       auxiliaryDataHash: AuxiliaryDataHash.fromAuxiliaryData(auxiliaryData),
       requiredSigners: {
-        Vkey.fromBytes(
+        Ed25519PublicKey.fromBytes(
           hex.decode(
             '3311ca404fcf22c91d607ace285d70e2'
             '263a1b81745c39673080329bd1a3f56e',
@@ -166,7 +166,7 @@ Transaction fullSignedTestTransaction() {
       ttl: const SlotBigNum(41193),
       auxiliaryDataHash: AuxiliaryDataHash.fromAuxiliaryData(auxiliaryData),
       requiredSigners: {
-        Vkey.fromBytes(
+        Ed25519PublicKey.fromBytes(
           hex.decode(
             '3311ca404fcf22c91d607ace285d70e2'
             '263a1b81745c39673080329bd1a3f56e',
@@ -179,7 +179,7 @@ Transaction fullSignedTestTransaction() {
     witnessSet: TransactionWitnessSet(
       vkeyWitnesses: {
         VkeyWitness(
-          vkey: Vkey.fromBytes(
+          vkey: Ed25519PublicKey.fromBytes(
             hex.decode(
               '3311ca404fcf22c91d607ace285d70e2'
               '263a1b81745c39673080329bd1a3f56e',

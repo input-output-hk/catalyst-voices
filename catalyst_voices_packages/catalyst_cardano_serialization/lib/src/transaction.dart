@@ -83,7 +83,7 @@ final class TransactionBody extends Equatable {
 
   /// The list of public key hashes of addresses
   /// that are required to sign the transaction.
-  final Set<Vkey>? requiredSigners;
+  final Set<Ed25519PublicKey>? requiredSigners;
 
   /// Specifies on which network the code will run.
   final NetworkId? networkId;
@@ -118,7 +118,7 @@ final class TransactionBody extends Equatable {
       auxiliaryDataHash: auxiliaryDataHash != null
           ? AuxiliaryDataHash.fromCbor(auxiliaryDataHash)
           : null,
-      requiredSigners: requiredSigners?.map(Vkey.fromCbor).toSet(),
+      requiredSigners: requiredSigners?.map(Ed25519PublicKey.fromCbor).toSet(),
       networkId: networkId != null ? NetworkId.fromId(networkId.value) : null,
     );
   }

@@ -1,0 +1,353 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_cardano_serialization/src/certificate.dart';
+import 'package:cbor/cbor.dart';
+import 'package:equatable/equatable.dart';
+
+/// Defines the X509 Role Based Access Control transaction metadata.
+final class RbacMetadata extends Equatable {
+  /// Un-ordered List of DER encoded x509 certificates.
+  final List<X509DerCertificate>? derCerts;
+
+  /// Un-ordered List of CBOR encoded C509 certificates
+  /// (or metadatum references).
+  //
+  // TODO(dtscalac): support C509CertInMetadatumReference
+  final List<C509Certificate>? cborCerts;
+
+  /// Ordered list of simple public keys that are registered.
+  final List<Ed25519PublicKey>? publicKeys;
+
+  /// Revocation list of certs being revoked by an issuer.
+  final List<CertificateHash>? revocationSet;
+
+  /// Set of role registration data
+  final Set<RoleDataSet>? roleDataSet;
+
+  /// The default constructor for [RbacMetadata].
+  const RbacMetadata({
+    this.derCerts,
+    this.cborCerts,
+    this.publicKeys,
+    this.revocationSet,
+    this.roleDataSet,
+  });
+
+  /// Deserializes the type from cbor.
+  factory RbacMetadata.fromCbor(CborValue value) {
+    final map = value as CborMap;
+    final derCerts = map[const CborSmallInt(10)] as CborList?;
+    final cborCerts = map[const CborSmallInt(20)] as CborList?;
+    final publicKeys = map[const CborSmallInt(30)] as CborList?;
+    final revocationSet = map[const CborSmallInt(40)] as CborList?;
+    final roleDataSet = map[const CborSmallInt(50)] as CborList?;
+
+    return RbacMetadata(
+      derCerts: derCerts?.map(X509DerCertificate.fromCbor).toList(),
+      cborCerts: cborCerts?.map(C509Certificate.fromCbor).toList(),
+      publicKeys: publicKeys?.map(Ed25519PublicKey.fromCbor).toList(),
+      revocationSet: revocationSet?.map(CertificateHash.fromCbor).toList(),
+      roleDataSet: roleDataSet?.map(RoleDataSet.fromCbor).toSet(),
+    );
+  }
+
+  /// Serializes the type as cbor.
+  CborValue toCbor() {
+    return CborMap({
+      if (derCerts != null && derCerts!.isNotEmpty)
+        const CborSmallInt(10): CborList([
+          for (final cert in derCerts!) cert.toCbor(),
+        ]),
+      if (cborCerts != null && cborCerts!.isNotEmpty)
+        const CborSmallInt(20): CborList([
+          for (final cert in cborCerts!) cert.toCbor(),
+        ]),
+      if (publicKeys != null && publicKeys!.isNotEmpty)
+        const CborSmallInt(30): CborList([
+          for (final key in publicKeys!) key.toCbor(),
+        ]),
+      if (revocationSet != null && revocationSet!.isNotEmpty)
+        const CborSmallInt(40): CborList([
+          for (final revocation in revocationSet!) revocation.toCbor(),
+        ]),
+      if (roleDataSet != null && roleDataSet!.isNotEmpty)
+        const CborSmallInt(50): CborList([
+          for (final roleData in roleDataSet!) roleData.toCbor(),
+        ]),
+    });
+  }
+
+  @override
+  List<Object?> get props =>
+      [derCerts, cborCerts, publicKeys, revocationSet, roleDataSet];
+}
+
+/// Roles are defined in a list.
+/// A user can register for any available role, and they can enrol in more
+/// than one role in a single registration transaction.
+///
+/// The validity of the registration is as per the rules for roles defined
+/// by the dApp itself.
+class RoleDataSet extends Equatable {
+  /// All roles, except for Role 0, are defined by the dApp.
+  ///
+  /// Role 0 is the primary role and is used to sign the metadata and declare on-chain/off-chain identity linkage.
+  /// All compliant implementations of this specification use Role 0
+  /// in this way.
+  ///
+  /// dApps can extend what other use cases Role 0 has, but it will always
+  /// be used to secure the Role registrations.
+  ///
+  /// For example, in Catalyst Role 0 is a basic voters role.
+  /// Voters do not need to register for any other role to have basic
+  /// interaction with project Catalyst.
+  ///
+  /// The recommendation is that Role 0 be used by dApps to give the minimum
+  /// level of access the dApp requires and other extended roles are defined
+  /// as Role 1+.
+  final int roleNumber;
+
+  /// Each role can optionally be used to sign data.
+  /// If the role is intended to sign data, the key it uses to sign must be
+  /// declared in this field.
+  /// This is a reference to either a registered certificate for the identity
+  /// posting the registration, or one of the defined simple public keys.
+  ///
+  /// A dApp can define is roles allow the use of certificates, or simple
+  /// public keys, or both.
+  ///
+  /// Role 0 MUST have a signing key, and it must be a certificate.
+  /// Simple keys can not be used for signing against Role 0.
+  ///
+  /// The reason for this is the Role 0 certificate MUST include a reference
+  /// to the on-chain identity/s to be bound to the registration.
+  /// Simple public keys can not contain this reference, which is why they are
+  /// not permissible for Role 0 keys.
+  ///
+  /// A reference to a key/certificate can be a cert in the same registration,
+  /// or any previous registration.
+  ///
+  /// If the certificate is revoked, the role is unusable for signing unless
+  /// and until a new signing certificate is registered for the role.
+  final KeyReference? roleSigningKey;
+
+  /// A Role may require the ability to transfer encrypted data.
+  /// The registration can include the Public key use by the role to encrypt
+  /// the roles data.
+  /// Due to the way public key encryption works, this key can only be used to
+  /// send encrypted data to the holder of the public key.
+  /// However, when two users have registered public keys,
+  /// they can use them off-chain to perform key exchange and communicate
+  /// privately between themselves.
+  ///
+  /// The Role encryption key must be a reference to a key that supports public
+  /// key encryption, and not just a signing key.
+  /// If the key referenced does not support public key encryption,
+  /// the registration is invalid.
+  final KeyReference? roleEncryptionKey;
+
+  /// Reference to a transaction input/output as the payment key to use for a role.
+  /// Payment key (n) >= 0 = Use Transaction Input Key offset (n)
+  /// as the payment key.
+  /// Payment key (n) < 0 = Use Transaction Output Key offset -(n+1)
+  /// as the payment key.
+  ///
+  /// If a transaction output payment key is defined the payment address must
+  /// also be in the required_signers of the transaction to ensure the payment
+  /// address is owned and controlled by the entity posting the registration.
+  ///
+  /// If the referenced payment key does not exist in the transaction,
+  /// or is not witnessed the entire registration is to be considered invalid.
+  final int? paymentKey;
+
+  /// Each dApp can declare that roles can have either mandatory or optional
+  /// data items that can be posted with any role registration.
+  ///
+  /// Each role can have a different set of defined role registration data.
+  /// It is not required that all roles have the same data.
+  ///
+  /// As the role data is dApp specific, it is not detailed here.
+  /// Each dApp will need to produce a specification of what role specific data
+  /// it requires, and how it is validated.
+  final Map<int, CborValue>? roleSpecificData;
+
+  /// The default constructor for [RoleDataSet].
+  const RoleDataSet({
+    required this.roleNumber,
+    this.roleSigningKey,
+    this.roleEncryptionKey,
+    this.paymentKey,
+    this.roleSpecificData,
+  });
+
+  /// Deserializes the type from cbor.
+  factory RoleDataSet.fromCbor(CborValue value) {
+    final map = value as CborMap;
+
+    final roleNumber = map[const CborSmallInt(0)]! as CborSmallInt;
+    final roleSigningKey = map[const CborSmallInt(1)];
+    final roleEncryptionKey = map[const CborSmallInt(2)];
+    final paymentKey = map[const CborSmallInt(3)] as CborSmallInt?;
+    final roleSpecificData = Map.of(map)
+      ..remove(const CborSmallInt(0))
+      ..remove(const CborSmallInt(1))
+      ..remove(const CborSmallInt(2))
+      ..remove(const CborSmallInt(3));
+
+    return RoleDataSet(
+      roleNumber: roleNumber.value,
+      roleSigningKey:
+          roleSigningKey != null ? KeyReference.fromCbor(roleSigningKey) : null,
+      roleEncryptionKey: roleEncryptionKey != null
+          ? KeyReference.fromCbor(roleEncryptionKey)
+          : null,
+      paymentKey: paymentKey?.value,
+      roleSpecificData: roleSpecificData.isNotEmpty
+          ? roleSpecificData
+              .map((key, value) => MapEntry((key as CborSmallInt).value, value))
+          : null,
+    );
+  }
+
+  /// Serializes the type as cbor.
+  CborValue toCbor() {
+    return CborMap({
+      const CborSmallInt(0): CborSmallInt(roleNumber),
+      if (roleSigningKey != null)
+        const CborSmallInt(1): roleSigningKey!.toCbor(),
+      if (roleEncryptionKey != null)
+        const CborSmallInt(2): roleEncryptionKey!.toCbor(),
+      if (paymentKey != null) const CborSmallInt(3): CborSmallInt(paymentKey!),
+      if (roleSpecificData != null)
+        for (final entry in roleSpecificData!.entries)
+          CborSmallInt(entry.key): entry.value,
+    });
+  }
+
+  @override
+  List<Object?> get props => [
+        roleNumber,
+        roleSigningKey,
+        roleEncryptionKey,
+        paymentKey,
+        roleSpecificData,
+      ];
+}
+
+/// References a local key in this registration or
+/// a given key in an earlier registration.
+///
+/// Either [localRef] or [hash] must be set, but not both and not none.
+class KeyReference extends Equatable {
+  /// Offset reference to a key defined in this registration.
+  /// More efficient than a key hash.
+  final LocalKeyReference? localRef;
+
+  /// Reference to a key defined in an earlier registration.
+  final CertificateHash? hash;
+
+  /// The default constructor for [KeyReference].
+  const KeyReference({this.localRef, this.hash})
+      : assert(
+          (localRef == null) ^ (hash == null),
+          'Either localRef or hash must be set, but not both and not none.',
+        );
+
+  /// Deserializes the type from cbor.
+  factory KeyReference.fromCbor(CborValue value) {
+    return KeyReference(
+      localRef: _tryParseLocalRef(value),
+      hash: _tryParseHash(value),
+    );
+  }
+
+  static LocalKeyReference? _tryParseLocalRef(CborValue value) {
+    try {
+      return LocalKeyReference.fromCbor(value);
+    } catch (ignored) {
+      return null;
+    }
+  }
+
+  static CertificateHash? _tryParseHash(CborValue value) {
+    try {
+      return CertificateHash.fromCbor(value);
+    } catch (ignored) {
+      return null;
+    }
+  }
+
+  /// Serializes the type as cbor.
+  CborValue toCbor() {
+    return localRef?.toCbor() ?? hash!.toCbor();
+  }
+
+  @override
+  List<Object?> get props => [localRef, hash];
+}
+
+/// Offset reference to a key defined in this registration.
+///
+/// More efficient than a key hash.
+class LocalKeyReference extends Equatable {
+  /// A type of referenced key.
+  final LocalKeyReferenceType keyType;
+
+  /// Offset of the key in the specified set. 0 = first entry.
+  final int keyOffset;
+
+  /// The default constructor for [LocalKeyReference].
+  const LocalKeyReference({
+    required this.keyType,
+    required this.keyOffset,
+  });
+
+  /// Deserializes the type from cbor.
+  factory LocalKeyReference.fromCbor(CborValue value) {
+    final list = value as CborList;
+    final keyType = list[0] as CborSmallInt;
+    final keyOffset = list[1] as CborSmallInt;
+
+    return LocalKeyReference(
+      keyType: LocalKeyReferenceType.fromTag(keyType.value),
+      keyOffset: keyOffset.value,
+    );
+  }
+
+  /// Serializes the type as cbor.
+  CborValue toCbor() {
+    return CborList([
+      CborSmallInt(keyType.tag),
+      CborSmallInt(keyOffset),
+    ]);
+  }
+
+  @override
+  List<Object?> get props => [keyType, keyOffset];
+}
+
+/// Defines the type of the referenced local key.
+enum LocalKeyReferenceType {
+  /// The DER encoded X509 certificate.
+  x509Certs(tag: 10),
+
+  /// The C509 encoded certificate.
+  c509Certs(tag: 20),
+
+  /// The public key.
+  pubKeys(tag: 30);
+
+  /// The magic number defining the certificate type.
+  final int tag;
+
+  /// The default constructor for [LocalKeyReferenceType].
+  const LocalKeyReferenceType({required this.tag});
+
+  /// Returns a [LocalKeyReferenceType] by a [tag].
+  factory LocalKeyReferenceType.fromTag(int tag) {
+    for (final value in values) {
+      if (value.tag == tag) return value;
+    }
+
+    throw ArgumentError('Undefined LocalKeyReferenceType with tag: $tag');
+  }
+}

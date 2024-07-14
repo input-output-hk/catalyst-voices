@@ -2,6 +2,7 @@
 
 import 'dart:typed_data';
 
+import 'package:catalyst_cardano_serialization/src/certificate.dart';
 import 'package:catalyst_cardano_serialization/src/exceptions.dart';
 import 'package:catalyst_cardano_serialization/src/transaction.dart';
 import 'package:cbor/cbor.dart';
@@ -63,7 +64,7 @@ abstract base class BaseHash {
   }
 }
 
-/// Describes the hash of the transaction which serves as proof
+/// Describes the Blake2b-256 hash of the transaction which serves as proof
 /// of transaction validation.
 final class TransactionHash extends BaseHash {
   static const int _length = 32;
@@ -91,7 +92,7 @@ final class TransactionHash extends BaseHash {
   int get length => _length;
 }
 
-/// Describes the hash of auxiliary data which is included
+/// Describes the Blake2b-256 hash of auxiliary data which is included
 /// in the transaction body.
 final class AuxiliaryDataHash extends BaseHash {
   static const int _length = 32;
@@ -114,6 +115,42 @@ final class AuxiliaryDataHash extends BaseHash {
 
   /// Deserializes the type from cbor.
   AuxiliaryDataHash.fromCbor(super.value) : super.fromCbor();
+
+  @override
+  int get length => _length;
+}
+
+/// Describes the Blake2b-128 hash of a certificate.
+final class CertificateHash extends BaseHash {
+  static const int _length = 16;
+
+  /// Constructs the [CertificateHash] from raw [bytes].
+  CertificateHash.fromBytes({required super.bytes}) : super.fromBytes();
+
+  /// Constructs the [CertificateHash] from a hex string representation
+  /// of [bytes].
+  CertificateHash.fromHex(super.string) : super.fromHex();
+
+  /// Constructs the [CertificateHash] from a [X509DerCertificate].
+  CertificateHash.fromX509DerCertificate(X509DerCertificate certificate)
+      : super.fromBytes(
+          bytes: Hash.blake2b(
+            Uint8List.fromList(cbor.encode(certificate.toCbor())),
+            digestSize: _length,
+          ),
+        );
+
+  /// Constructs the [CertificateHash] from a [C509Certificate].
+  CertificateHash.fromC509Certificate(C509Certificate certificate)
+      : super.fromBytes(
+          bytes: Hash.blake2b(
+            Uint8List.fromList(cbor.encode(certificate.toCbor())),
+            digestSize: _length,
+          ),
+        );
+
+  /// Deserializes the type from cbor.
+  CertificateHash.fromCbor(super.value) : super.fromCbor();
 
   @override
   int get length => _length;
