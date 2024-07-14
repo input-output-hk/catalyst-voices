@@ -21,7 +21,7 @@ final class RbacMetadata extends Equatable {
   final List<CertificateHash>? revocationSet;
 
   /// Set of role registration data
-  final Set<RoleDataSet>? roleDataSet;
+  final Set<RoleData>? roleDataSet;
 
   /// The default constructor for [RbacMetadata].
   const RbacMetadata({
@@ -46,7 +46,7 @@ final class RbacMetadata extends Equatable {
       cborCerts: cborCerts?.map(C509Certificate.fromCbor).toList(),
       publicKeys: publicKeys?.map(Ed25519PublicKey.fromCbor).toList(),
       revocationSet: revocationSet?.map(CertificateHash.fromCbor).toList(),
-      roleDataSet: roleDataSet?.map(RoleDataSet.fromCbor).toSet(),
+      roleDataSet: roleDataSet?.map(RoleData.fromCbor).toSet(),
     );
   }
 
@@ -87,7 +87,7 @@ final class RbacMetadata extends Equatable {
 ///
 /// The validity of the registration is as per the rules for roles defined
 /// by the dApp itself.
-class RoleDataSet extends Equatable {
+class RoleData extends Equatable {
   /// All roles, except for Role 0, are defined by the dApp.
   ///
   /// Role 0 is the primary role and is used to sign the metadata and declare on-chain/off-chain identity linkage.
@@ -170,8 +170,8 @@ class RoleDataSet extends Equatable {
   /// it requires, and how it is validated.
   final Map<int, CborValue>? roleSpecificData;
 
-  /// The default constructor for [RoleDataSet].
-  const RoleDataSet({
+  /// The default constructor for [RoleData].
+  const RoleData({
     required this.roleNumber,
     this.roleSigningKey,
     this.roleEncryptionKey,
@@ -180,7 +180,7 @@ class RoleDataSet extends Equatable {
   });
 
   /// Deserializes the type from cbor.
-  factory RoleDataSet.fromCbor(CborValue value) {
+  factory RoleData.fromCbor(CborValue value) {
     final map = value as CborMap;
 
     final roleNumber = map[const CborSmallInt(0)]! as CborSmallInt;
@@ -193,7 +193,7 @@ class RoleDataSet extends Equatable {
       ..remove(const CborSmallInt(2))
       ..remove(const CborSmallInt(3));
 
-    return RoleDataSet(
+    return RoleData(
       roleNumber: roleNumber.value,
       roleSigningKey:
           roleSigningKey != null ? KeyReference.fromCbor(roleSigningKey) : null,

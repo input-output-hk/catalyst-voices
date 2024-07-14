@@ -1,9 +1,12 @@
+import 'package:catalyst_cardano_serialization/src/certificate.dart';
 import 'package:catalyst_cardano_serialization/src/hashes.dart';
 import 'package:catalyst_cardano_serialization/src/transaction.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 import 'package:test/test.dart';
+
+import 'test_utils/test_data.dart';
 
 void main() {
   group(TransactionHash, () {
@@ -83,6 +86,51 @@ void main() {
 
     test('toCbor returns bytes', () {
       final hash = AuxiliaryDataHash.fromBytes(bytes: bytes);
+      final encodedCbor = cbor.encode(hash.toCbor());
+      final decodedCbor = cbor.decode(encodedCbor);
+      expect(decodedCbor, isA<CborBytes>());
+      expect((decodedCbor as CborBytes).bytes, equals(bytes));
+    });
+  });
+
+  group(CertificateHash, () {
+    const hexString = '4d3f576f26db29139981a69443c2325d';
+    final bytes = hex.decode(hexString);
+
+    test('from and to hex', () {
+      final hash = CertificateHash.fromHex(hexString);
+      expect(hash.toHex(), equals(hexString));
+    });
+
+    test('from and to bytes', () {
+      final hash = CertificateHash.fromBytes(bytes: bytes);
+      expect(hash.bytes, equals(bytes));
+    });
+
+    test('from X509 der certificate', () {
+      final derCert = X509DerCertificate.fromHex(derCertHex);
+
+      expect(
+        CertificateHash.fromX509DerCertificate(derCert),
+        equals(
+          CertificateHash.fromHex('c13a67ee9608dc5966aaa91fe3b1f021'),
+        ),
+      );
+    });
+
+    test('from X509 der certificate', () {
+      final c509Cert = C509Certificate.fromHex(c509CertHex);
+
+      expect(
+        CertificateHash.fromC509Certificate(c509Cert),
+        equals(
+          CertificateHash.fromHex('e783006fcc3a46a097a409d37d9998ee'),
+        ),
+      );
+    });
+
+    test('toCbor returns bytes', () {
+      final hash = CertificateHash.fromBytes(bytes: bytes);
       final encodedCbor = cbor.encode(hash.toCbor());
       final decodedCbor = cbor.decode(encodedCbor);
       expect(decodedCbor, isA<CborBytes>());
