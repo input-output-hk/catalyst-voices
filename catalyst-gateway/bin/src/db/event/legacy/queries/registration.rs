@@ -1,7 +1,7 @@
 //! Registration Queries
 use chrono::{NaiveDateTime, Utc};
 
-use crate::event_db::{
+use crate::db::event::{
     error::NotFoundError,
     legacy::types::{
         event::EventId,
@@ -209,7 +209,6 @@ impl EventDB {
         #[allow(clippy::indexing_slicing)] // delegation_rows already checked to be not empty.
         let reward_address = RewardAddress::new(delegation_rows[0].try_get("reward_address")?);
 
-        
         Ok(Delegator {
             raw_power: delegations.iter().map(|delegation| delegation.value).sum(),
             reward_address,

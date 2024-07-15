@@ -5,7 +5,7 @@ use poem_openapi::{
 };
 
 use crate::{
-    event_db::cardano::chain_state::{DateTime, SlotNumber},
+    db::event::cardano::chain_state::{DateTime, SlotNumber},
     service::{
         common::{
             objects::cardano::{network::Network, stake_address::StakeAddress},

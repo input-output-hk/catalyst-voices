@@ -4,7 +4,7 @@ use std::str::FromStr;
 use cardano_chain_follower::Network;
 use serde::{Deserialize, Serialize};
 
-use crate::event_db::{error::NotFoundError, EventDB};
+use crate::db::event::{error::NotFoundError, EventDB};
 
 /// Representation of the `config` table id fields `id`, `id2`, `id3`
 enum ConfigId {

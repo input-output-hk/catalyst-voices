@@ -35,7 +35,7 @@ impl Cli {
     pub(crate) async fn exec(self) -> anyhow::Result<()> {
         match self {
             Self::Run(settings) => {
-                Settings::init(settings)?;
+                Settings::init(settings).await?;
 
                 let mut tasks = Vec::new();
 

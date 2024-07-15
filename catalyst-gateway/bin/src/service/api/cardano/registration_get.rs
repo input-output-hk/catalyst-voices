@@ -3,7 +3,7 @@
 use poem_openapi::{payload::Json, ApiResponse};
 
 use crate::{
-    event_db::{cardano::chain_state::SlotNumber, error::NotFoundError, EventDB},
+    db::event::{cardano::chain_state::SlotNumber, error::NotFoundError, EventDB},
     service::{
         common::{
             objects::cardano::{

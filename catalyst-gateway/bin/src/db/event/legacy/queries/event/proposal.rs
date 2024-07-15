@@ -1,5 +1,5 @@
 //! Proposal Queries
-use crate::event_db::{
+use crate::db::event::{
     error::NotFoundError,
     legacy::types::{
         event::EventId,

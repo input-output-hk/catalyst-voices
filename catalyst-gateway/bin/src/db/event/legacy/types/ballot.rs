@@ -1,6 +1,6 @@
 //! Ballot types
 use super::{objective::ObjectiveId, proposal::ProposalId};
-use crate::event_db::legacy::types::registration::VoterGroupId;
+use crate::db::event::legacy::types::registration::VoterGroupId;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 /// Objective Choices

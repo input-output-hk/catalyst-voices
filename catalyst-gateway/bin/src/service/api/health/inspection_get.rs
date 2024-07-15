@@ -2,7 +2,7 @@
 use poem_openapi::{ApiResponse, Enum};
 use tracing::debug;
 
-use crate::{event_db::EventDB, logger, service::common::responses::WithErrorResponses};
+use crate::{db::event::EventDB, logger, service::common::responses::WithErrorResponses};
 
 /// `LogLevel` Open API definition.
 #[derive(Debug, Clone, Copy, Enum)]

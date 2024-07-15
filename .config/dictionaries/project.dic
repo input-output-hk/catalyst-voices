@@ -28,7 +28,9 @@ cardano
 Catalyst
 CBOR
 cborg
+cdrs
 cdylib
+certdir
 CEST
 cfbundle
 Chotivichit
@@ -102,6 +104,7 @@ junitreport
 junitxml
 Keyhash
 keyserver
+keyspace
 KUBECONFIG
 kubernetescrd
 kubetail

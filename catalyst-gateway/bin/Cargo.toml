@@ -72,6 +72,10 @@ ed25519-dalek.workspace = true
 stringzilla = { workspace = true }
 duration-string.workspace = true
 once_cell.workspace = true
+scylla.workspace  = true
+strum.workspace = true
+strum_macros.workspace = true
+openssl.workspace = true
 
 [build-dependencies]
 build-info-build = { workspace = true }

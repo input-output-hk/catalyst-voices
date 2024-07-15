@@ -1,6 +1,6 @@
 //! Check if the schema is up-to-date.
 
-use crate::event_db::{EventDB, DATABASE_SCHEMA_VERSION};
+use crate::db::event::{EventDB, DATABASE_SCHEMA_VERSION};
 
 /// Schema in database does not match schema supported by the Crate.
 #[derive(thiserror::Error, Debug, PartialEq, Eq)]

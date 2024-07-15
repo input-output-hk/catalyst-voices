@@ -9,7 +9,7 @@
 
 use poem::{http::StatusCode, Endpoint, EndpointExt, Middleware, Request, Result};
 
-use crate::event_db::EventDB;
+use crate::db::event::EventDB;
 
 /// A middleware that raises an error  with `ServiceUnavailable` and 503 status code
 /// if a DB schema version mismatch is found the existing `State`.

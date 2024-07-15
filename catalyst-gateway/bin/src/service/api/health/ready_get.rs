@@ -2,7 +2,7 @@
 use poem_openapi::ApiResponse;
 
 use crate::{
-    event_db::{schema_check::MismatchedSchemaError, EventDB},
+    db::event::{schema_check::MismatchedSchemaError, EventDB},
     service::common::responses::WithErrorResponses,
 };
 

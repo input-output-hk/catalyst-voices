@@ -6,7 +6,7 @@ use pallas::ledger::traverse::{wellknown::GenesisValues, MultiEraBlock};
 use tokio_postgres::{binary_copy::BinaryCopyInWriter, types::Type};
 use tracing::error;
 
-use crate::event_db::{error::NotFoundError, Error, EventDB, EVENT_DB_POOL};
+use crate::db::event::{error::NotFoundError, Error, EventDB, EVENT_DB_POOL};
 
 /// Block time
 pub type DateTime = chrono::DateTime<chrono::offset::Utc>;

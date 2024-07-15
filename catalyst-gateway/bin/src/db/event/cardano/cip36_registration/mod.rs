@@ -9,7 +9,7 @@ use crate::{
         cip36_registration::{Cip36Metadata, VotingInfo},
         util::valid_era,
     },
-    event_db::{
+    db::event::{
         cardano::chain_state::SlotNumber, error::NotFoundError, Error, EventDB, EVENT_DB_POOL,
     },
 };

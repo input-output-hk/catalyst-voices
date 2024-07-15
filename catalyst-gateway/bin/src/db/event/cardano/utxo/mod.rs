@@ -8,7 +8,7 @@ use tracing::error;
 use super::{chain_state::SlotNumber, cip36_registration::StakeCredential};
 use crate::{
     cardano::util::parse_policy_assets,
-    event_db::{error::NotFoundError, Error, EventDB, EVENT_DB_POOL},
+    db::event::{error::NotFoundError, Error, EventDB, EVENT_DB_POOL},
 };
 
 /// Stake amount.

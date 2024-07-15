@@ -1,7 +1,7 @@
 //! Objective Types
 use serde_json::Value;
 
-use crate::event_db::legacy::types::registration::VoterGroupId;
+use crate::db::event::legacy::types::registration::VoterGroupId;
 
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

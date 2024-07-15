@@ -1,7 +1,7 @@
 //! Ballot Queries
 use std::collections::HashMap;
 
-use crate::event_db::{
+use crate::db::event::{
     error::NotFoundError,
     legacy::types::{
         ballot::{

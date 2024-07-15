@@ -3,6 +3,7 @@ use std::{
     env,
     net::{IpAddr, Ipv4Addr, SocketAddr},
     path::PathBuf,
+    str::FromStr,
     sync::OnceLock,
     time::Duration,
 };
@@ -17,7 +18,10 @@ use url::Url;
 
 use crate::{
     build_info::{log_build_info, BUILD_INFO},
-    event_db,
+    db::{
+        self,
+        index::session::{CompressionChoice, TlsChoice},
+    },
     logger::{self, LogLevel, LOG_LEVEL_DEFAULT},
 };
 
@@ -54,6 +58,18 @@ const MACHINE_UID_DEFAULT: &str = "UID";
 /// Default Event DB URL.
 const EVENT_DB_URL_DEFAULT: &str =
     "postgresql://postgres:postgres@localhost/catalyst_events?sslmode=disable";
+
+/// Default Cassandra DB URL for the Persistent DB.
+const CASSANDRA_PERSISTENT_DB_URL_DEFAULT: &str = "127.0.0.1:9042";
+
+/// Default Cassandra DB URL for the Persistent DB.
+const CASSANDRA_PERSISTENT_DB_NAMESPACE_DEFAULT: &str = "immutable";
+
+/// Default Cassandra DB URL for the Persistent DB.
+const CASSANDRA_VOLATILE_DB_URL_DEFAULT: &str = "127.0.0.1:9042";
+
+/// Default Cassandra DB URL for the Persistent DB.
+const CASSANDRA_VOLATILE_DB_NAMESPACE_DEFAULT: &str = "volatile";
 
 /// Hash the Public IPv4 and IPv6 address of the machine, and convert to a 128 bit V4 UUID.
 fn calculate_service_uuid() -> String {
@@ -124,6 +140,7 @@ pub(crate) struct FollowerSettings {
 }
 
 /// An environment variable read as a string.
+#[derive(Clone)]
 pub(crate) struct StringEnvVar(String);
 
 /// An environment variable read as a string.
@@ -180,6 +197,31 @@ impl StringEnvVar {
     }
 }
 
+/// Configuration for an individual cassandra cluster.
+#[derive(Clone)]
+pub(crate) struct CassandraEnvVars {
+    /// The Address/s of the DB.
+    pub(crate) url: StringEnvVar,
+
+    /// The Namespace of Cassandra DB.
+    pub(crate) namespace: StringEnvVar,
+
+    /// The UserName to use for the Cassandra DB.
+    pub(crate) username: Option<StringEnvVar>,
+
+    /// The Password to use for the Cassandra DB..
+    pub(crate) password: Option<StringEnvVar>,
+
+    /// Use TLS for the connection?
+    pub(crate) tls: TlsChoice,
+
+    /// Use TLS for the connection?
+    pub(crate) tls_cert: Option<StringEnvVar>,
+
+    /// Compression to use.
+    pub(crate) compression: CompressionChoice,
+}
+
 /// All the `EnvVars` used by the service.
 struct EnvVars {
     /// The github repo owner
@@ -212,6 +254,12 @@ struct EnvVars {
     /// The Address of the Event DB.
     event_db_password: Option<StringEnvVar>,
 
+    /// The Config of the Persistent Cassandra DB.
+    cassandra_persistent_db: CassandraEnvVars,
+
+    /// The Config of the Volatile Cassandra DB.
+    cassandra_volatile_db: CassandraEnvVars,
+
     /// Tick every N seconds until config exists in db
     #[allow(unused)]
     check_config_tick: Duration,
@@ -222,6 +270,34 @@ struct EnvVars {
 // default. The default for all NON Secret values should be suitable for Production, and
 // NOT development. Secrets however should only be used with the default value in
 // development
+
+/// Create a config for a cassandra cluster, identified by a default namespace.
+fn cassandra_cfg(url: &str, namespace: &str) -> CassandraEnvVars {
+    let name = namespace.to_uppercase();
+
+    // We can actually change the namespace, but can't change the name used for env vars.
+    let namespace = StringEnvVar::new(&format!("CASSANDRA_{name}_NAMESPACE"), namespace);
+
+    let tls = TlsChoice::from_str(
+        StringEnvVar::new(&format!("CASSANDRA_{name}_TLS"), "Verified").as_str(),
+    )
+    .unwrap_or(TlsChoice::Verified);
+
+    let compression = CompressionChoice::from_str(
+        StringEnvVar::new(&format!("CASSANDRA_{name}_COMPRESSION"), "Lz4").as_str(),
+    )
+    .unwrap_or(CompressionChoice::Lz4);
+
+    CassandraEnvVars {
+        url: StringEnvVar::new(&format!("CASSANDRA_{name}_URL"), url),
+        namespace,
+        username: StringEnvVar::new_optional(&format!("CASSANDRA_{name}_USERNAME")),
+        password: StringEnvVar::new_optional(&format!("CASSANDRA_{name}_PASSWORD")),
+        tls,
+        tls_cert: StringEnvVar::new_optional(&format!("CASSANDRA_{name}_TLS_CERT")),
+        compression,
+    }
+}
 
 /// Handle to the mithril sync thread. One for each Network ONLY.
 static ENV_VARS: Lazy<EnvVars> = Lazy::new(|| {
@@ -255,6 +331,14 @@ static ENV_VARS: Lazy<EnvVars> = Lazy::new(|| {
         event_db_url: StringEnvVar::new("EVENT_DB_URL", EVENT_DB_URL_DEFAULT),
         event_db_username: StringEnvVar::new_optional("EVENT_DB_USERNAME"),
         event_db_password: StringEnvVar::new_optional("EVENT_DB_PASSWORD"),
+        cassandra_persistent_db: cassandra_cfg(
+            CASSANDRA_PERSISTENT_DB_URL_DEFAULT,
+            CASSANDRA_PERSISTENT_DB_NAMESPACE_DEFAULT,
+        ),
+        cassandra_volatile_db: cassandra_cfg(
+            CASSANDRA_VOLATILE_DB_URL_DEFAULT,
+            CASSANDRA_VOLATILE_DB_NAMESPACE_DEFAULT,
+        ),
         check_config_tick,
     }
 });
@@ -267,7 +351,7 @@ pub(crate) struct Settings();
 
 impl Settings {
     /// Initialize the settings data.
-    pub(crate) fn init(settings: ServiceSettings) -> anyhow::Result<()> {
+    pub(crate) async fn init(settings: ServiceSettings) -> anyhow::Result<()> {
         let log_level = settings.log_level;
 
         if SERVICE_SETTINGS.set(settings).is_err() {
@@ -280,7 +364,9 @@ impl Settings {
 
         log_build_info();
 
-        event_db::establish_connection()
+        Box::pin(db::index::session::init()).await?;
+
+        db::event::establish_connection()
     }
 
     /// Get the current Event DB settings for this service.
@@ -297,6 +383,14 @@ impl Settings {
             .map(StringEnvVar::as_str);
 
         (url, user, pass)
+    }
+
+    /// Get the Persistent & Volatile Cassandra DB config for this service.
+    pub(crate) fn cassandra_db_cfg() -> (CassandraEnvVars, CassandraEnvVars) {
+        (
+            ENV_VARS.cassandra_persistent_db.clone(),
+            ENV_VARS.cassandra_volatile_db.clone(),
+        )
     }
 
     /// The API Url prefix

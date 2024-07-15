@@ -4,8 +4,7 @@ use clap::Parser;
 mod build_info;
 mod cardano;
 mod cli;
-#[allow(dead_code)]
-mod event_db;
+mod db;
 mod logger;
 mod service;
 mod settings;

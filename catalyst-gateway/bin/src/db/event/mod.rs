@@ -9,7 +9,6 @@ use std::{
 
 use bb8::Pool;
 use bb8_postgres::PostgresConnectionManager;
-use stringzilla::StringZilla;
 use tokio_postgres::{types::ToSql, NoTls, Row};
 use tracing::{debug, debug_span, error, Instrument};
 
@@ -19,10 +18,6 @@ pub(crate) mod cardano;
 pub(crate) mod error;
 pub(crate) mod legacy;
 pub(crate) mod schema_check;
-
-/// Database URL Environment Variable name.
-/// eg: "`postgres://catalyst-dev:CHANGE_ME@localhost/CatalystDev`"
-const DATABASE_URL_ENVVAR: &str = "EVENT_DB_URL";
 
 /// Database version this crate matches.
 /// Must equal the last Migrations Version Number.
@@ -43,15 +38,6 @@ pub(crate) struct EventDB {}
 /// `EventDB` Errors
 #[derive(thiserror::Error, Debug, PartialEq, Eq)]
 pub(crate) enum Error {
-    /// Database statement is not a valid modify statement
-    #[error("Invalid Modify Statement")]
-    InvalidModifyStatement,
-    /// Database statement is not a valid query statement
-    #[error("Invalid Query Statement")]
-    InvalidQueryStatement,
-    /// No DB URL was provided
-    #[error("DB URL is undefined")]
-    NoDatabaseUrl,
     /// Failed to get a DB Pool
     #[error("DB Pool uninitialized")]
     DbPoolUninitialized,
@@ -244,39 +230,4 @@ pub(crate) fn establish_connection() -> anyhow::Result<()> {
     }
 
     Ok(())
-}
-
-/// Determine if the statement is a query statement.
-///
-/// Returns true f the query statement starts with `SELECT` or contains `RETURNING`.
-fn is_query_stmt(stmt: &str) -> bool {
-    // First, determine if the statement is a `SELECT` operation
-    if let Some(stmt) = &stmt.get(..6) {
-        if *stmt == "SELECT" {
-            return true;
-        }
-    }
-    // Otherwise, determine if the statement contains `RETURNING`
-    stmt.sz_rfind("RETURNING").is_some()
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_is_query_statement() {
-        let stmt = "SELECT * FROM dummy";
-        assert!(is_query_stmt(stmt));
-        let stmt = "UPDATE dummy SET foo = $1 WHERE bar = $2 RETURNING *";
-        assert!(is_query_stmt(stmt));
-    }
-
-    #[test]
-    fn test_is_not_query_statement() {
-        let stmt = "UPDATE dummy SET foo_count = foo_count + 1 WHERE bar = (SELECT bar_id FROM foo WHERE name = 'FooBar')";
-        assert!(!is_query_stmt(stmt));
-        let stmt = "UPDATE dummy SET foo = $1 WHERE bar = $2";
-        assert!(!is_query_stmt(stmt));
-    }
 }

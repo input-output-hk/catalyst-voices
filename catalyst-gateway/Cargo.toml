@@ -56,6 +56,10 @@ once_cell = "1.19.0"
 build-info = "0.0.37"
 build-info-build = "0.0.37"
 ed25519-dalek = "2.1.1"
+scylla = { version = "0.13.1", features = ["ssl", "full-serialization"]}
+strum = { version = "0.26.3", features = ["derive"] }
+strum_macros = "0.26.4"
+openssl = { version = "0.10.64", features = ["vendored"] }
 
 [workspace.lints.rust]
 warnings = "deny"

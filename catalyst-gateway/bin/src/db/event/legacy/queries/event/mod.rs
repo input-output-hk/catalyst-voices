@@ -1,7 +1,7 @@
 //! Event Queries
 use chrono::{NaiveDateTime, Utc};
 
-use crate::event_db::{
+use crate::db::event::{
     error::NotFoundError,
     legacy::types::event::{
         Event, EventDetails, EventGoal, EventId, EventRegistration, EventSchedule, EventSummary,

@@ -1,5 +1,5 @@
 //! Review Queries
-use crate::event_db::{
+use crate::db::event::{
     legacy::types::{
         event::EventId,
         objective::ObjectiveId,

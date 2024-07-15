@@ -13,7 +13,7 @@ use tokio::{sync::mpsc, task::JoinHandle, time};
 use tracing::{error, info};
 
 use crate::{
-    event_db::{
+    db::event::{
         cardano::{
             chain_state::{IndexedFollowerDataParams, MachineId},
             cip36_registration::IndexedVoterRegistrationParams,

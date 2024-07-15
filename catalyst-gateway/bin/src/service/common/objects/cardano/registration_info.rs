@@ -3,7 +3,7 @@
 use poem_openapi::{types::Example, Object, Union};
 
 use crate::{
-    event_db::cardano::cip36_registration::{Nonce, PaymentAddress, PublicVotingInfo, TxId},
+    db::event::cardano::cip36_registration::{Nonce, PaymentAddress, PublicVotingInfo, TxId},
     service::{common::objects::cardano::hash::Hash, utilities::to_hex_with_prefix},
 };
 
@@ -73,24 +73,18 @@ impl RegistrationInfo {
         nonce: Nonce,
     ) -> Self {
         let voting_info = match voting_info {
-            PublicVotingInfo::Direct(voting_key) => {
-                VotingInfo::Direct(DirectVoter {
-                    voting_key: to_hex_with_prefix(voting_key.bytes()),
-                })
-            },
-            PublicVotingInfo::Delegated(delegations) => {
-                VotingInfo::Delegated(Delegations {
-                    delegations: delegations
-                        .into_iter()
-                        .map(|(voting_key, power)| {
-                            Delegation {
-                                voting_key: to_hex_with_prefix(voting_key.bytes()),
-                                power,
-                            }
-                        })
-                        .collect(),
-                })
-            },
+            PublicVotingInfo::Direct(voting_key) => VotingInfo::Direct(DirectVoter {
+                voting_key: to_hex_with_prefix(voting_key.bytes()),
+            }),
+            PublicVotingInfo::Delegated(delegations) => VotingInfo::Delegated(Delegations {
+                delegations: delegations
+                    .into_iter()
+                    .map(|(voting_key, power)| Delegation {
+                        voting_key: to_hex_with_prefix(voting_key.bytes()),
+                        power,
+                    })
+                    .collect(),
+            }),
         };
         Self {
             tx_hash: tx_hash.into(),
