@@ -178,6 +178,8 @@ jobs:
              #     coveralls report cat-gateway.coverage.info
               - run: |
                    cat api-tests.coverage.info
+              - run: |
+                   ls
               - name: Coveralls
                 env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
