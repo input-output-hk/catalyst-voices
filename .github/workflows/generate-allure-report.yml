@@ -93,23 +93,12 @@ jobs:
             if-no-files-found: error
             retention-days: 1
 
-     # - name: Collect and upload test coverage
-     #   uses: actions/upload-artifact@v4
-     ##   if: always()
-     #   with:
-     #       name: coverage-reports
-     #       path: 'catalyst-gateway/cat-gateway.coverage.info'
-     #       if-no-files-found: error
-     #       retention-days: 1
-
-      - run: ls catalyst-gateway/tests/api_tests/
-
       - name: Collect and upload test coverage
         uses: actions/upload-artifact@v4
         if: always()
         with:
             name: coverage-reports
-            path: '/catalyst-gateway/tests/api_tests/api-tests.coverage.info'
+            path: 'catalyst-gateway/cat-gateway.coverage.info'
             if-no-files-found: error
             retention-days: 1
 
@@ -177,7 +166,7 @@ jobs:
              #     ls
              #     coveralls report cat-gateway.coverage.info
               - run: |
-                   cat api-tests.coverage.info
+                   cat cat-gateway.coverage.info
               - run: |
                    ls
               - name: Coveralls
@@ -185,5 +174,5 @@ jobs:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                 uses: coverallsapp/github-action@v2
                 with:
-                  file: "api-tests.coverage.info"
+                  file: "cat-gateway.coverage.info"
                   allow-empty: true
