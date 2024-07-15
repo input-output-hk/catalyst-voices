@@ -246,11 +246,13 @@ class KeyReference extends Equatable {
   final CertificateHash? hash;
 
   /// The default constructor for [KeyReference].
-  const KeyReference({this.localRef, this.hash})
-      : assert(
-          (localRef == null) ^ (hash == null),
-          'Either localRef or hash must be set, but not both and not none.',
-        );
+  KeyReference({this.localRef, this.hash}) {
+    if (!((localRef == null) ^ (hash == null))) {
+      throw ArgumentError(
+        'Either localRef or hash must be set, but not both and not none.',
+      );
+    }
+  }
 
   /// Deserializes the type from cbor.
   factory KeyReference.fromCbor(CborValue value) {

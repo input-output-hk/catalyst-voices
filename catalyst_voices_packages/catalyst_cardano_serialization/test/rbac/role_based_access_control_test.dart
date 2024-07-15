@@ -8,8 +8,6 @@ import '../test_utils/test_data.dart';
 
 void main() {
   group(RbacMetadata, () {
-
-
     test('from and to cbor', () {
       final derCert = X509DerCertificate.fromHex(derCertHex);
       final c509Cert = C509Certificate.fromHex(c509CertHex);
@@ -25,8 +23,8 @@ void main() {
         roleDataSet: {
           RoleData(
             roleNumber: 0,
-            roleSigningKey: const KeyReference(
-              localRef: LocalKeyReference(
+            roleSigningKey: KeyReference(
+              localRef: const LocalKeyReference(
                 keyType: LocalKeyReferenceType.x509Certs,
                 keyOffset: 0,
               ),

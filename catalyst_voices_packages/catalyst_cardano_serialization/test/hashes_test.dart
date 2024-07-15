@@ -118,13 +118,13 @@ void main() {
       );
     });
 
-    test('from X509 der certificate', () {
+    test('from C509 certificate', () {
       final c509Cert = C509Certificate.fromHex(c509CertHex);
 
       expect(
         CertificateHash.fromC509Certificate(c509Cert),
         equals(
-          CertificateHash.fromHex('e783006fcc3a46a097a409d37d9998ee'),
+          CertificateHash.fromHex('312517d13f3a63da8f487f56ded10618'),
         ),
       );
     });
