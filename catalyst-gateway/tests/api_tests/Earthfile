@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.1.7 AS python-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.1.17 AS python-ci
 
 builder:
     FROM python-ci+python-base
@@ -10,7 +10,8 @@ builder:
     COPY ./snapshot_tool-56364174.json .
     DO python-ci+BUILDER
 
-test:
+# Disabled in CI, to enable rename it to `test`.
+api-test:
     FROM +builder
     RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
 

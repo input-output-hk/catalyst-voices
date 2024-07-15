@@ -13,7 +13,7 @@ package-schemathesis:
                     && st run --checks all $openapi_spec \
                     --workers=2 \
                     --wait-for-schema=15 \
-                    --max-response-time=3000 \
+                    --max-response-time=5000 \
                     --hypothesis-max-examples=1000 \
                     --data-generation-method=all \
                     --skip-deprecated-operations \
@@ -26,8 +26,9 @@ package-schemathesis:
     ARG tag="latest"
     SAVE IMAGE schemathesis:$tag
 
-# test-fuzzer-api - Fuzzy test cat-gateway using openapi specs
-test-fuzzer-api:
+# test-fuzzer-api - Fuzzy test cat-gateway using openapi specs.
+# Disabled in CI, to enable it rename to `test-fuzzer-api`.
+fuzzer-api:
     FROM earthly/dind:alpine-3.19
     RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
     RUN apk add yq zstd

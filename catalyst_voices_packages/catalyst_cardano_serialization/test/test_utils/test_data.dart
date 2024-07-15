@@ -40,7 +40,7 @@ TransactionUnspentOutput testUtxo() {
         'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5'
         'ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w',
       ),
-      amount: const Coin(100000000),
+      amount: const Balance(coin: Coin(100000000)),
     ),
   );
 }
@@ -52,11 +52,11 @@ Transaction minimalUnsignedTestTransaction() {
       outputs: [
         TransactionOutput(
           address: testnetAddr,
-          amount: const Coin(1000000),
+          amount: const Balance(coin: Coin(1000000)),
         ),
         TransactionOutput(
           address: testnetChangeAddr,
-          amount: const Coin(9998833003),
+          amount: const Balance(coin: Coin(9998833003)),
         ),
       ],
       fee: const Coin(166997),
@@ -76,11 +76,11 @@ Transaction minimalSignedTestTransaction() {
       outputs: [
         TransactionOutput(
           address: testnetAddr,
-          amount: const Coin(1000000),
+          amount: const Balance(coin: Coin(1000000)),
         ),
         TransactionOutput(
           address: testnetChangeAddr,
-          amount: const Coin(9998833003),
+          amount: const Balance(coin: Coin(9998833003)),
         ),
       ],
       fee: const Coin(166997),
@@ -117,16 +117,24 @@ Transaction fullUnsignedTestTransaction() {
       outputs: [
         TransactionOutput(
           address: testnetAddr,
-          amount: const Coin(1000000),
+          amount: const Balance(coin: Coin(1000000)),
         ),
         TransactionOutput(
           address: testnetChangeAddr,
-          amount: const Coin(9998832827),
+          amount: const Balance(coin: Coin(9998832827)),
         ),
       ],
       fee: const Coin(167173),
       ttl: const SlotBigNum(41193),
       auxiliaryDataHash: AuxiliaryDataHash.fromAuxiliaryData(auxiliaryData),
+      requiredSigners: {
+        Vkey.fromBytes(
+          hex.decode(
+            '3311ca404fcf22c91d607ace285d70e2'
+            '263a1b81745c39673080329bd1a3f56e',
+          ),
+        ),
+      },
       networkId: NetworkId.testnet,
     ),
     isValid: true,
@@ -147,16 +155,24 @@ Transaction fullSignedTestTransaction() {
       outputs: [
         TransactionOutput(
           address: testnetAddr,
-          amount: const Coin(1000000),
+          amount: const Balance(coin: Coin(1000000)),
         ),
         TransactionOutput(
           address: testnetChangeAddr,
-          amount: const Coin(9998832827),
+          amount: const Balance(coin: Coin(9998832827)),
         ),
       ],
       fee: const Coin(167173),
       ttl: const SlotBigNum(41193),
       auxiliaryDataHash: AuxiliaryDataHash.fromAuxiliaryData(auxiliaryData),
+      requiredSigners: {
+        Vkey.fromBytes(
+          hex.decode(
+            '3311ca404fcf22c91d607ace285d70e2'
+            '263a1b81745c39673080329bd1a3f56e',
+          ),
+        ),
+      },
       networkId: NetworkId.testnet,
     ),
     isValid: true,

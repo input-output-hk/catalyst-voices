@@ -1,0 +1,30 @@
+name: uikit_example
+description: Demonstrates usage of UIKit.
+publish_to: "none"
+
+environment:
+  sdk: ">=3.3.4 <4.0.0"
+  flutter: ">=3.22.1"
+
+dependencies:
+  catalyst_voices:
+    path: ../
+  catalyst_voices_assets:
+    path: ../packages/catalyst_voices_assets
+  catalyst_voices_brands:
+    path: ../packages/catalyst_voices_brands
+  catalyst_voices_localization:
+    path: ../packages/catalyst_voices_localization
+  cupertino_icons: ^1.0.6
+  flutter:
+    sdk: flutter
+  flutter_localized_locales: ^2.0.5
+
+dev_dependencies:
+  catalyst_analysis:
+    path: ../../catalyst_voices_packages/catalyst_analysis
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true

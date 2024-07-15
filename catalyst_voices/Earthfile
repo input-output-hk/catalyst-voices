@@ -1,35 +1,34 @@
 VERSION 0.8
 
 IMPORT ../catalyst-gateway AS catalyst-gateway
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.1.7 AS flutter-ci 
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.1.17 AS flutter-ci
 
-# builder - Copy all the necessary files and running bootstrap
+# Copy all the necessary files and running bootstrap
 builder:
     DO flutter-ci+SETUP
     COPY ../+repo-catalyst-voices-all/repo .
     DO flutter-ci+BOOTSTRAP
 
-# code-generator - Generates flutter code.
+# Generates flutter code.
 # Based on Catalyst Gateway OpenAPI specifications generates models, clients
 # and serialization logic.
 # It accepts [save_locally] ARG that when true place the artifacts in the
 # proper folder of `catalyst_voices_services` local code.
 code-generator:
     ARG save_locally=false
-    
+
     LET gen_code_path  = lib/generated/catalyst_gateway
     LET local_gen_code_path = packages/catalyst_voices_services/lib/generated/catalyst_gateway/
-    
+
     FROM +builder
     WORKDIR catalyst_voices/packages/catalyst_voices_services
     COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
     DO flutter-ci+OPENAPI_CODE_GEN \
         --SAVE_LOCALLY=$save_locally \
-        --GEN_CODE_PATH=$gen_code_path \ 
+        --GEN_CODE_PATH=$gen_code_path \
         --LOCAL_GEN_CODE_PATH=$local_gen_code_path
 
-
-# check-flutter-code-generator - Checks that the code generation is consistent
+# Checks that the code generation is consistent
 # with the generated code currently in the repo.
 check-flutter-code-generator:
     FROM +code-generator
@@ -38,39 +37,70 @@ check-flutter-code-generator:
     # Check diff between local code and earthly artifacts
     RUN diff /tmp/repo_generated lib/generated/catalyst_gateway
 
-# check-static-analysis - Runs static analysis on the code
+# Runs static analysis on the code.
 check-static-analysis:
     FROM +builder
     DO flutter-ci+ANALYZE
 
-# check-code-formatting - Runs code formatting checks
+# Runs code formatting checks.
 check-code-formatting:
     FROM +builder
     DO flutter-ci+FORMAT
 
-# build-web - Build web version of Catalyst Voices
-build-web:
+# Runs dry-run publish to verify that publishable packages can be published.
+check-package-publishing:
     FROM +builder
+    DO flutter-ci+PUBLISH_DRY_RUN
+
+# Build web version of Catalyst Voices without arguments.
+# This is used for development purposes to validate build on PRs.
+build-web-on-pr:
+    FROM +builder
+
     ARG WORKDIR=/frontend/catalyst_voices
     DO flutter-ci+BUILD_WEB --TARGET=lib/configs/main_web.dart --WORKDIR=$WORKDIR
-    SAVE ARTIFACT web
 
-# test-unit - Run unit tests
+# Run unit tests
 test-unit:
     FROM +builder
     DO flutter-ci+UNIT_TESTS
 
+# Build web version of Catalyst Voices
+build-web:
+    FROM +builder
+    ARG SECRETS_ARE_AVAILABLE=false
+    ARG SENTRY_DSN
+
+    IF [$SECRETS_ARE_AVAILABLE]
+        ARG WORKDIR=/frontend/catalyst_voices
+        DO flutter-ci+BUILD_WEB --TARGET=lib/configs/main_web.dart --dart-define SENTRY_DSN=$SENTRY_DSN --WORKDIR=$WORKDIR
+        SAVE ARTIFACT web
+    ELSE
+        RUN echo "No secrets are available in Earthly yet."
+    END
+
 package:
     FROM nginx:alpine3.18
+    ARG SECRETS_ARE_AVAILABLE=false
     ARG tag='latest'
-    COPY +build-web/web /app
-    COPY ./nginx.conf /etc/nginx/nginx.conf
-    EXPOSE 80
 
-    SAVE IMAGE voices-frontend:$tag
+    IF [$SECRETS_ARE_AVAILABLE]
+        COPY +build-web/web /app
+        COPY ./nginx.conf /etc/nginx/nginx.conf
+        EXPOSE 80
+
+        SAVE IMAGE voices-frontend:$tag
+    ELSE
+        RUN echo "No secrets are available in Earthly yet."
+    END
 
 publish:
     FROM +package
+    ARG SECRETS_ARE_AVAILABLE=false
     ARG tag='latest'
 
-    SAVE IMAGE voices-frontend:$tag
+    IF [$SECRETS_ARE_AVAILABLE]
+        SAVE IMAGE voices-frontend:$tag
+    ELSE
+        RUN echo "No secrets are available in Earthly yet."
+    END
