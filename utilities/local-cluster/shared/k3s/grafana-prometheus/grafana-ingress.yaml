@@ -1,0 +1,25 @@
+# cspell: words kubernetescrd
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grafana-ingress
+  namespace: monitoring
+  annotations:
+    spec.ingressClassName: traefik
+    cert-manager.io/cluster-issuer: selfsigned-cluster-issuer
+spec:
+  rules:
+    - host: grafana.cluster.test
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: prometheus-stack-grafana
+                port:
+                  number: 80
+  tls:
+    - secretName: grafana-tls
+      hosts:
+        - grafana.cluster.test

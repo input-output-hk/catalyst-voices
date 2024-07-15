@@ -29,6 +29,9 @@
     <color name="light_on_surface_neutral_08">#14212A3D</color>
     <color name="light_on_surface_neutral_012">#1F212A3D</color>
     <color name="light_on_surface_neutral_016">#29212A3D</color>
+    <color name="light_on_surface_neutral_opaque_lv0">#FFFFFF</color>
+    <color name="light_on_surface_neutral_opaque_lv1">#F2F4F8</color>
+    <color name="light_on_surface_neutral_opaque_lv2">#E6E9F0</color>
     <color name="light_on_surface_primary_container">#A1B4F7</color>
     <color name="light_on_surface_primary_08">#14123CD3</color>
     <color name="light_on_surface_primary_012">#1F123CD3</color>
@@ -47,6 +50,14 @@
     <color name="light_icons_success">#218230</color>
     <color name="light_icons_warning">#E76309</color>
     <color name="light_icons_error">#CC0000</color>
+    <color name="light_avatars_primary">#D0D9FB</color>
+    <color name="light_avatars_secondary">#F2D0FB</color>
+    <color name="light_avatars_success">#CEF3D4</color>
+    <color name="light_avatars_warning">#FDE1CE</color>
+    <color name="light_avatars_error">#FFD1D1</color>
+    <color name="light_elevations_on_surface_neutral_lv0">#FFFFFF</color>
+    <color name="light_outline_border_outline">#FFD9DEE8</color>
+    <color name="light_outline_border_outline_variant">#61BFC8D9</color>
     <color name="dark_text_primary">#FFFFFF</color>
     <color name="dark_text_on_primary">#E6E9F0</color>
     <color name="dark_text_on_primary_container">#0C288D</color>
@@ -76,6 +87,9 @@
     <color name="dark_on_surface_neutral_08">#1FBFC8D9</color>
     <color name="dark_on_surface_neutral_012">#1FBFC8D9</color>
     <color name="dark_on_surface_neutral_016">#29212A3D</color>
+    <color name="dark_on_surface_neutral_opaque_lv0">#000000</color>
+    <color name="dark_on_surface_neutral_opaque_lv1">#212A3D</color>
+    <color name="dark_on_surface_neutral_opaque_lv2">#212A3D</color>
     <color name="dark_on_surface_primary_container">#0C288D</color>
     <color name="dark_on_surface_primary_08">#1F123CD3</color>
     <color name="dark_on_surface_primary_012">#1F123CD3</color>
@@ -94,4 +108,12 @@
     <color name="dark_icons_success">#85E093</color>
     <color name="dark_icons_warning">#FAB484</color>
     <color name="dark_icons_error">#FF9999</color>
+    <color name="dark_avatars_primary">#1035BC</color>
+    <color name="dark_avatars_secondary">#9910BC</color>
+    <color name="dark_avatars_success">#1D722A</color>
+    <color name="dark_avatars_warning">#B64E07</color>
+    <color name="dark_avatars_error">#AD0000</color>
+    <color name="dark_elevations_on_surface_neutral_lv0">#121721</color>
+    <color name="dark_outline_border_outline">#FF7F90B3</color>
+    <color name="dark_outline_border_outline_variant">#FF364463</color>
 </resources>
