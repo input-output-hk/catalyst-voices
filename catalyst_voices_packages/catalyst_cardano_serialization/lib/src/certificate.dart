@@ -6,7 +6,7 @@ import 'package:convert/convert.dart';
 /// Implements a common base of certificate that holds
 /// binary [bytes].
 abstract base class BaseCertificate {
-  /// The raw [bytes] of a hash.
+  /// The raw [bytes] of a certificate.
   final List<int> bytes;
 
   /// Constructs the [BaseCertificate] from raw [bytes].

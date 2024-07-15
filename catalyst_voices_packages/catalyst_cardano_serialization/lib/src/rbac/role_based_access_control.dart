@@ -20,7 +20,7 @@ final class RbacMetadata extends Equatable {
   /// Revocation list of certs being revoked by an issuer.
   final List<CertificateHash>? revocationSet;
 
-  /// Set of role registration data
+  /// Set of role registration data.
   final Set<RoleData>? roleDataSet;
 
   /// The default constructor for [RbacMetadata].
