@@ -1,6 +1,4 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_cardano_serialization/src/certificate.dart';
-import 'package:catalyst_cardano_serialization/src/rbac/role_based_access_control.dart';
 import 'package:cbor/cbor.dart';
 import 'package:test/test.dart';
 
