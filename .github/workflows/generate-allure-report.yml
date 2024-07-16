@@ -177,3 +177,4 @@ jobs:
                   path-to-lcov: "/home/runner/work/catalyst-voices/catalyst-voices/cat-gateway.coverage.info"
                   allow-empty: true
                   debug: true
+                  base-path: "/home/runner/work/catalyst-voices/catalyst-voices/catalyst-gateway/
