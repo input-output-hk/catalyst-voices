@@ -50,29 +50,39 @@ final class RbacMetadata extends Equatable {
   }
 
   /// Serializes the type as cbor.
-  CborValue toCbor() {
-    return CborMap({
-      if (derCerts != null && derCerts!.isNotEmpty)
-        const CborSmallInt(10): CborList([
-          for (final cert in derCerts!) cert.toCbor(),
-        ]),
-      if (cborCerts != null && cborCerts!.isNotEmpty)
-        const CborSmallInt(20): CborList([
-          for (final cert in cborCerts!) cert.toCbor(),
-        ]),
-      if (publicKeys != null && publicKeys!.isNotEmpty)
-        const CborSmallInt(30): CborList([
-          for (final key in publicKeys!) key.toCbor(),
-        ]),
-      if (revocationSet != null && revocationSet!.isNotEmpty)
-        const CborSmallInt(40): CborList([
-          for (final revocation in revocationSet!) revocation.toCbor(),
-        ]),
-      if (roleDataSet != null && roleDataSet!.isNotEmpty)
-        const CborSmallInt(50): CborList([
-          for (final roleData in roleDataSet!) roleData.toCbor(),
-        ]),
-    });
+  CborValue toCbor() => CborMap(_buildCborMap());
+
+  /// Builds a CborMap from the class properties.
+  Map<CborSmallInt, CborValue> _buildCborMap() {
+    final entries = <CborSmallInt, CborValue?>{
+      const CborSmallInt(10): _createCborList<X509DerCertificate>(
+        derCerts,
+        (item) => item.toCbor(),
+      ),
+      const CborSmallInt(20): _createCborList<C509Certificate>(
+        cborCerts,
+        (item) => item.toCbor(),
+      ),
+      const CborSmallInt(30): _createCborList<Ed25519PublicKey>(
+        publicKeys,
+        (item) => item.toCbor(),
+      ),
+      const CborSmallInt(40): _createCborList<CertificateHash>(
+        revocationSet,
+        (item) => item.toCbor(),
+      ),
+      const CborSmallInt(50): _createCborList<RoleData>(
+        roleDataSet?.toList(),
+        (item) => item.toCbor(),
+      ),
+    }..removeWhere((key, value) => value == null);
+
+    return entries.cast();
+  }
+
+  CborList? _createCborList<T>(List<T>? items, CborValue Function(T) toCbor) {
+    if (items == null || items.isEmpty) return null;
+    return CborList(items.map(toCbor).toList());
   }
 
   @override
