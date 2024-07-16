@@ -3,7 +3,9 @@ name: CI nightly
 on:
   schedule:
     - cron: '0 0 * * *' # Runs every day at 00:00
-    - cron: '0 * * * *' # Run every hour, for testing purpose
+  workflow_dispatch:
+    branches:
+      - main
 
 permissions:
   id-token: write
@@ -95,7 +97,7 @@ jobs:
         uses: mgrybyk/allure-report-branch-action@v1
         id: allure
         with:
-          report_id: 'test-report'
+          report_id: 'nightly-test-report'
           gh_pages: 'gh-pages-dir'
           report_dir: ${{ env.ALLURE_REPORT_PATH }}
 
