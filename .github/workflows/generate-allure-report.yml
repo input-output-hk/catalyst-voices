@@ -174,7 +174,7 @@ jobs:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                 uses: coverallsapp/github-action@v2
                 with:
-                  path-to-lcov: "/home/runner/work/catalyst-voices/catalyst-voices/cat-gateway.coverage.info"
+                  path-to-lcov: "/home/runner/work/catalyst-voices/catalyst-voices/cat-gateway.coverage.test.info"
                   allow-empty: true
                   debug: true
                   base-path: "/home/runner/work/catalyst-voices/catalyst-voices/catalyst-gateway/"
