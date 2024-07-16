@@ -174,5 +174,5 @@ jobs:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
                 uses: coverallsapp/github-action@v2
                 with:
-                  path-to-lcov: "cat-gateway.coverage.info"
+                  path-to-lcov: "./cat-gateway.coverage.info"
                   allow-empty: true
