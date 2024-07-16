@@ -7,7 +7,7 @@ import 'package:equatable/equatable.dart';
 /// Holds transaction witnesses that sign the transaction and prove it is valid.
 final class TransactionWitnessSetBuilder extends Equatable {
   /// The map of transaction witnesses.
-  final Map<Vkey, VkeyWitness> vkeys;
+  final Map<Ed25519PublicKey, VkeyWitness> vkeys;
 
   /// The expected amount of [vkeys] that should be added via [addVkey]
   /// before it is possible to call [build] method.
@@ -34,7 +34,7 @@ final class TransactionWitnessSetBuilder extends Equatable {
   }
 
   /// Removes the witness with [vkey] from the set.
-  TransactionWitnessSetBuilder removeVkey(Vkey vkey) {
+  TransactionWitnessSetBuilder removeVkey(Ed25519PublicKey vkey) {
     final map = Map.of(vkeys)..remove(vkey);
     return TransactionWitnessSetBuilder(
       vkeys: map,
