@@ -1,10 +1,12 @@
 export 'src/address.dart';
 export 'src/builders/transaction_builder.dart';
 export 'src/builders/witness_builder.dart';
+export 'src/certificate.dart';
 export 'src/cip95/drep.dart';
 export 'src/exceptions.dart';
 export 'src/fees.dart';
 export 'src/hashes.dart';
+export 'src/rbac/role_based_access_control.dart';
 export 'src/transaction.dart';
 export 'src/types.dart';
 export 'src/witness.dart';
