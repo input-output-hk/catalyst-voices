@@ -166,7 +166,7 @@ jobs:
              #     ls
              #     coveralls report cat-gateway.coverage.info
               - run: |
-                   pwd
+                   cat cat-gateway.coverage.info
               - run: |
                    ls
               - name: Coveralls
