@@ -287,6 +287,7 @@ pub(crate) mod test_name {
 
         (
             Name::new(NameValue::RelativeDistinguishedName(rdn)),
+            // "RFC test CA" Text string: 6b5246432074657374204341
             "6b5246432074657374204341".to_string(),
         )
     }
@@ -364,6 +365,8 @@ pub(crate) mod test_name {
 
         (
             Name::new(NameValue::RelativeDistinguishedName(rdn)),
+            // Bytes of length 7: 0x47
+            // "01-23-45-FF-FE-67-89-AB" special encode: 0x010123456789AB
             "47010123456789ab".to_string(),
         )
     }
@@ -483,6 +486,12 @@ pub(crate) mod test_name {
 
         (
             Name::new(NameValue::RelativeDistinguishedName(rdn)),
+            // Array of 10 items [4, "US", 6, "CA", 8, "Example Inc", 9, "certification", 1, "802.1AR CA"] : 0x8a
+            // attr1: 0x04625553
+            // attr2: 0x06624341
+            // attr3: 0x086b4578616d706c6520496e63
+            // attr4: 0x096d63657274696669636174696f6e
+            // attr5: 0x016a3830322e314152204341
             "8a0462555306624341086b4578616d706c6520496e63096d63657274696669636174696f6e016a3830322e314152204341".to_string(),
         )
     }
