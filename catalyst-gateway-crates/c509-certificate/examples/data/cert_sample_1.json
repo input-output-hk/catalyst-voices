@@ -1,0 +1,29 @@
+{
+	"self_signed": true,
+	"c509_certificate_type": 0,
+	"certificate_serial_number": 128269,
+	"issuer": [
+		{
+			"oid": "2.5.4.3",
+			"value": [{ "Text": "RFC test CA" }]
+		}
+	],
+	"validity_not_before": null,
+	"validity_not_after": null,
+	"subject": [
+		{
+			"oid": "2.5.4.3",
+			"value": [{ "Text": "01-23-45-FF-FE-67-89-AB" }]
+		}
+	],
+	"subject_public_key_algorithm": null,
+	"subject_public_key": "examples/key/public_key.pem",
+	"extensions": [
+		{
+			"oid": "2.5.29.15",
+			"value": { "Int": 1 },
+			"critical": false
+		}
+	],
+	"issuer_signature_algorithm": null
+}
