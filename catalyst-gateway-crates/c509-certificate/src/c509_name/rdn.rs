@@ -25,6 +25,7 @@ impl Default for RelativeDistinguishedName {
 
 impl RelativeDistinguishedName {
     /// Create a new instance of `RelativeDistinguishedName` as empty vector.
+    #[must_use]
     pub fn new() -> Self {
         Self(Vec::new())
     }
@@ -36,7 +37,7 @@ impl RelativeDistinguishedName {
     }
 
     /// Get the a vector of `Attribute`.
-    pub fn get_attributes(&self) -> &Vec<Attribute> {
+    pub(crate) fn get_attributes(&self) -> &Vec<Attribute> {
         &self.0
     }
 }

@@ -5,7 +5,7 @@
 
 mod data;
 pub mod general_name;
-mod other_name_hw_module;
+pub mod other_name_hw_module;
 
 use general_name::GeneralName;
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
@@ -51,7 +51,8 @@ impl Encode<()> for GeneralNames {
                 "GeneralNames should not be empty",
             ));
         }
-        e.array(self.0.len() as u64)?;
+        // The general name type should be included in array too
+        e.array(self.0.len() as u64 * 2)?;
         for gn in &self.0 {
             gn.encode(e, ctx)?;
         }
@@ -65,7 +66,7 @@ impl Decode<'_, ()> for GeneralNames {
             "GeneralNames should be an array",
         ))?;
         let mut gn = GeneralNames::new();
-        for _ in 0..len {
+        for _ in 0..len / 2 {
             gn.add_gn(GeneralName::decode(d, ctx)?);
         }
         Ok(gn)
@@ -113,8 +114,8 @@ mod test_general_names {
         ));
         gns.encode(&mut encoder, &mut ())
             .expect("Failed to encode GeneralNames");
-        // Array of 4 GeneralName: 0x84
-        assert_eq!(hex::encode(buffer.clone()), "84026b6578616d706c652e636f6d20824960864801650304020144010203040744c0a801010849608648016503040201");
+        // Array of 4 GeneralName (type, value) so 8 items: 0x88
+        assert_eq!(hex::encode(buffer.clone()), "88026b6578616d706c652e636f6d20824960864801650304020144010203040744c0a801010849608648016503040201");
 
         let mut decoder = Decoder::new(&buffer);
         let gns_decoded =
@@ -142,11 +143,11 @@ mod test_general_names {
         ));
         gns.encode(&mut encoder, &mut ())
             .expect("Failed to encode GeneralNames");
-        // Array of 3 GeneralName: 0x83
+        // Array of 3 GeneralName (type, value) so 6 items: 0x86
         // DNSName with "example.com": 0x026b6578616d706c652e636f6d
         assert_eq!(
             hex::encode(buffer.clone()),
-            "83026b6578616d706c652e636f6d026b6578616d706c652e636f6d026b6578616d706c652e636f6d"
+            "86026b6578616d706c652e636f6d026b6578616d706c652e636f6d026b6578616d706c652e636f6d"
         );
 
         let mut decoder = Decoder::new(&buffer);

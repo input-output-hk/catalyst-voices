@@ -44,7 +44,10 @@ impl Decode<'_, ()> for Time {
                 let time = d.i64()?;
                 Ok(Time::new(time))
             },
-            minicbor::data::Type::Null => Ok(Time::new(NO_EXP_DATE)),
+            minicbor::data::Type::Null => {
+                d.null()?;
+                Ok(Time::new(NO_EXP_DATE))
+            },
             _ => Err(minicbor::decode::Error::message("Invalid type for Time")),
         }
     }

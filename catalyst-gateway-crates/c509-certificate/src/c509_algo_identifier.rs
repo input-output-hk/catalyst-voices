@@ -1,10 +1,14 @@
 //! C509 Algorithm Identifier
+//!
 //! This module handle the `AlgorithmIdentifier` type where OID does not fall into the
 //! table.
 //!
 //! ```cddl
 //!    AlgorithmIdentifier = int / ~oid / [ algorithm: ~oid, parameters: bytes ]
 //! ```
+//!
+//! **Note** `AlgorithmIdentifier` that have the same OID with different parameters are
+//! not implemented yet.
 //!
 //! For more information about `AlgorithmIdentifier`,
 //! visit [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
