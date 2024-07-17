@@ -217,10 +217,12 @@ TXNZD
 Typer
 unawaited
 unmanaged
+Unstaked
 utxo
 UTXO
 utxos
 Utxos
+varint
 vite
 vitss
 vkey

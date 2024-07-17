@@ -1,6 +1,7 @@
 //! Command line and environment variable settings for the service
 use std::{
-    env,
+    env::{self, VarError},
+    fmt::{self, Display},
     net::{IpAddr, Ipv4Addr, SocketAddr},
     path::PathBuf,
     str::FromStr,
@@ -13,7 +14,8 @@ use cryptoxide::{blake2b::Blake2b, mac::Mac};
 use dotenvy::dotenv;
 use duration_string::DurationString;
 use once_cell::sync::Lazy;
-use tracing::log::error;
+use strum::VariantNames;
+use tracing::{error, info};
 use url::Url;
 
 use crate::{
@@ -63,7 +65,7 @@ const EVENT_DB_URL_DEFAULT: &str =
 const CASSANDRA_PERSISTENT_DB_URL_DEFAULT: &str = "127.0.0.1:9042";
 
 /// Default Cassandra DB URL for the Persistent DB.
-const CASSANDRA_PERSISTENT_DB_NAMESPACE_DEFAULT: &str = "immutable";
+const CASSANDRA_PERSISTENT_DB_NAMESPACE_DEFAULT: &str = "persistent";
 
 /// Default Cassandra DB URL for the Persistent DB.
 const CASSANDRA_VOLATILE_DB_URL_DEFAULT: &str = "127.0.0.1:9042";
@@ -141,7 +143,52 @@ pub(crate) struct FollowerSettings {
 
 /// An environment variable read as a string.
 #[derive(Clone)]
-pub(crate) struct StringEnvVar(String);
+pub(crate) struct StringEnvVar {
+    /// Value of the env var.
+    value: String,
+    /// Whether the env var is displayed redacted or not.
+    redacted: bool,
+}
+
+/// Ergonomic way of specifying if a env var needs to be redacted or not.
+enum StringEnvVarParams {
+    /// The env var is plain and should not be redacted.
+    Plain(String, Option<String>),
+    /// The env var is redacted and should be redacted.
+    Redacted(String, Option<String>),
+}
+
+impl From<&str> for StringEnvVarParams {
+    fn from(s: &str) -> Self {
+        StringEnvVarParams::Plain(String::from(s), None)
+    }
+}
+
+impl From<String> for StringEnvVarParams {
+    fn from(s: String) -> Self {
+        StringEnvVarParams::Plain(s, None)
+    }
+}
+
+impl From<(&str, bool)> for StringEnvVarParams {
+    fn from((s, r): (&str, bool)) -> Self {
+        if r {
+            StringEnvVarParams::Redacted(String::from(s), None)
+        } else {
+            StringEnvVarParams::Plain(String::from(s), None)
+        }
+    }
+}
+
+impl From<(&str, bool, &str)> for StringEnvVarParams {
+    fn from((s, r, c): (&str, bool, &str)) -> Self {
+        if r {
+            StringEnvVarParams::Redacted(String::from(s), Some(String::from(c)))
+        } else {
+            StringEnvVarParams::Plain(String::from(s), Some(String::from(c)))
+        }
+    }
+}
 
 /// An environment variable read as a string.
 impl StringEnvVar {
@@ -167,15 +214,127 @@ impl StringEnvVar {
     /// let var = StringEnvVar::new("MY_VAR", "default");
     /// assert_eq!(var.as_str(), "default");
     /// ```
-    fn new(var_name: &str, default_value: &str) -> Self {
-        let value = env::var(var_name).unwrap_or_else(|_| default_value.to_owned());
-        Self(value)
+    fn new(var_name: &str, param: StringEnvVarParams) -> Self {
+        let (default_value, redacted, choices) = match param {
+            StringEnvVarParams::Plain(s, c) => (s, false, c),
+            StringEnvVarParams::Redacted(s, c) => (s, true, c),
+        };
+
+        match env::var(var_name) {
+            Ok(value) => {
+                if redacted {
+                    info!(env = var_name, value = "Redacted", "Env Var Defined");
+                } else {
+                    info!(env = var_name, value = value, "Env Var Defined");
+                }
+                Self { value, redacted }
+            },
+            Err(VarError::NotPresent) => {
+                if let Some(choices) = choices {
+                    if redacted {
+                        info!(
+                            env = var_name,
+                            default = "Default Redacted",
+                            choices = choices,
+                            "Env Var Defaulted"
+                        );
+                    } else {
+                        info!(
+                            env = var_name,
+                            default = default_value,
+                            choices = choices,
+                            "Env Var Defaulted"
+                        );
+                    };
+                } else if redacted {
+                    info!(
+                        env = var_name,
+                        default = "Default Redacted",
+                        "Env Var Defined"
+                    );
+                } else {
+                    info!(env = var_name, default = default_value, "Env Var Defaulted");
+                }
+
+                Self {
+                    value: default_value,
+                    redacted,
+                }
+            },
+            Err(error) => {
+                error!(
+                    env = var_name,
+                    default = default_value,
+                    error = ?error,
+                    "Env Var Error"
+                );
+                Self {
+                    value: default_value,
+                    redacted,
+                }
+            },
+        }
     }
 
     /// New Env Var that is optional.
-    fn new_optional(var_name: &str) -> Option<Self> {
-        let value = env::var(var_name).ok()?;
-        Some(Self(value))
+    fn new_optional(var_name: &str, redacted: bool) -> Option<Self> {
+        match env::var(var_name) {
+            Ok(value) => {
+                if redacted {
+                    info!(env = var_name, value = "Redacted", "Env Var Defined");
+                } else {
+                    info!(env = var_name, value = value, "Env Var Defined");
+                }
+                Some(Self { value, redacted })
+            },
+            Err(VarError::NotPresent) => {
+                info!(env = var_name, "Env Var Not Set");
+                None
+            },
+            Err(error) => {
+                error!(
+                    env = var_name,
+                    error = ?error,
+                    "Env Var Error"
+                );
+                None
+            },
+        }
+    }
+
+    /// Convert an Envvar into the required Enum Type.
+    fn new_as_enum<T: FromStr + Display + VariantNames>(
+        var_name: &str, default: T, redacted: bool,
+    ) -> T
+    where
+        <T as std::str::FromStr>::Err: std::fmt::Display,
+    {
+        let mut choices = String::new();
+        for name in T::VARIANTS {
+            if choices.is_empty() {
+                choices.push('[');
+            } else {
+                choices.push(',');
+            }
+            choices.push_str(name);
+        }
+        choices.push(']');
+
+        let tls = match T::from_str(
+            StringEnvVar::new(
+                var_name,
+                (default.to_string().as_str(), redacted, choices.as_str()).into(),
+            )
+            .as_str(),
+        ) {
+            Ok(var) => var,
+            Err(error) => {
+                error!(error=%error, default=%default, choices=choices, "Invalid choice. Using Default.");
+                default
+            },
+        };
+
+        tls
     }
 
     /// Get the read env var as a str.
@@ -184,7 +343,7 @@ impl StringEnvVar {
     ///
     /// * &str - the value
     pub(crate) fn as_str(&self) -> &str {
-        &self.0
+        &self.value
     }
 
     /// Get the read env var as a str.
@@ -193,7 +352,25 @@ impl StringEnvVar {
     ///
     /// * &str - the value
     pub(crate) fn as_string(&self) -> String {
-        self.0.clone()
+        self.value.clone()
+    }
+}
+
+impl fmt::Display for StringEnvVar {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if self.redacted {
+            return write!(f, "REDACTED");
+        }
+        write!(f, "{}", self.value)
+    }
+}
+
+impl fmt::Debug for StringEnvVar {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        if self.redacted {
+            return write!(f, "REDACTED");
+        }
+        write!(f, "env: {}", self.value)
     }
 }
 
@@ -220,6 +397,77 @@ pub(crate) struct CassandraEnvVars {
 
     /// Compression to use.
     pub(crate) compression: CompressionChoice,
+}
+
+impl CassandraEnvVars {
+    /// Create a config for a cassandra cluster, identified by a default namespace.
+    fn new(url: &str, namespace: &str) -> Self {
+        let name = namespace.to_uppercase();
+
+        // We can actually change the namespace, but can't change the name used for env vars.
+        let namespace = StringEnvVar::new(&format!("CASSANDRA_{name}_NAMESPACE"), namespace.into());
+
+        let tls =
+            StringEnvVar::new_as_enum(&format!("CASSANDRA_{name}_TLS"), TlsChoice::Disabled, false);
+        let compression = StringEnvVar::new_as_enum(
+            &format!("CASSANDRA_{name}_COMPRESSION"),
+            CompressionChoice::Lz4,
+            false,
+        );
+
+        /*
+        let tls = match TlsChoice::from_str(
+            StringEnvVar::new(&format!("CASSANDRA_{name}_TLS"), "Disabled".into()).as_str(),
+        ) {
+            Ok(tls) => tls,
+            Err(error) => {
+                error!(error=%error, default=%TlsChoice::Disabled, "Invalid TLS choice. Using Default.");
+                TlsChoice::Disabled
+            },
+        };*/
+
+        /*
+        let compression = CompressionChoice::from_str(
+            StringEnvVar::new(&format!("CASSANDRA_{name}_COMPRESSION"), "Lz4".into()).as_str(),
+        )
+        .unwrap_or(CompressionChoice::Lz4);
+        */
+
+        Self {
+            url: StringEnvVar::new(&format!("CASSANDRA_{name}_URL"), url.into()),
+            namespace,
+            username: StringEnvVar::new_optional(&format!("CASSANDRA_{name}_USERNAME"), false),
+            password: StringEnvVar::new_optional(&format!("CASSANDRA_{name}_PASSWORD"), true),
+            tls,
+            tls_cert: StringEnvVar::new_optional(&format!("CASSANDRA_{name}_TLS_CERT"), false),
+            compression,
+        }
+    }
+
+    /// Log the configuration of this Cassandra DB
+    pub(crate) fn log(&self, persistent: bool) {
+        let db_type = if persistent { "Persistent" } else { "Volatile" };
+
+        let auth = match (&self.username, &self.password) {
+            (Some(u), Some(_)) => format!("Username: {} Password: REDACTED", u.as_str()),
+            _ => "No Authentication".to_string(),
+        };
+
+        let tls_cert = match &self.tls_cert {
+            None => "No TLS Certificate Defined".to_string(),
+            Some(cert) => cert.as_string(),
+        };
+
+        info!(
+            url = self.url.as_str(),
+            namespace = db::index::schema::namespace(self),
+            auth = auth,
+            tls = self.tls.to_string(),
+            cert = tls_cert,
+            compression = self.compression.to_string(),
+            "Cassandra {db_type} DB Configuration"
+        );
+    }
 }
 
 /// All the `EnvVars` used by the service.
@@ -271,40 +519,12 @@ struct EnvVars {
 // NOT development. Secrets however should only be used with the default value in
 // development
 
-/// Create a config for a cassandra cluster, identified by a default namespace.
-fn cassandra_cfg(url: &str, namespace: &str) -> CassandraEnvVars {
-    let name = namespace.to_uppercase();
-
-    // We can actually change the namespace, but can't change the name used for env vars.
-    let namespace = StringEnvVar::new(&format!("CASSANDRA_{name}_NAMESPACE"), namespace);
-
-    let tls = TlsChoice::from_str(
-        StringEnvVar::new(&format!("CASSANDRA_{name}_TLS"), "Verified").as_str(),
-    )
-    .unwrap_or(TlsChoice::Verified);
-
-    let compression = CompressionChoice::from_str(
-        StringEnvVar::new(&format!("CASSANDRA_{name}_COMPRESSION"), "Lz4").as_str(),
-    )
-    .unwrap_or(CompressionChoice::Lz4);
-
-    CassandraEnvVars {
-        url: StringEnvVar::new(&format!("CASSANDRA_{name}_URL"), url),
-        namespace,
-        username: StringEnvVar::new_optional(&format!("CASSANDRA_{name}_USERNAME")),
-        password: StringEnvVar::new_optional(&format!("CASSANDRA_{name}_PASSWORD")),
-        tls,
-        tls_cert: StringEnvVar::new_optional(&format!("CASSANDRA_{name}_TLS_CERT")),
-        compression,
-    }
-}
-
 /// Handle to the mithril sync thread. One for each Network ONLY.
 static ENV_VARS: Lazy<EnvVars> = Lazy::new(|| {
     // Support env vars in a `.env` file,  doesn't need to exist.
     dotenv().ok();
 
-    let check_interval = StringEnvVar::new("CHECK_CONFIG_TICK", CHECK_CONFIG_TICK_DEFAULT);
+    let check_interval = StringEnvVar::new("CHECK_CONFIG_TICK", CHECK_CONFIG_TICK_DEFAULT.into());
     let check_config_tick = match DurationString::try_from(check_interval.as_string()) {
         Ok(duration) => duration.into(),
         Err(error) => {
@@ -318,24 +538,24 @@ static ENV_VARS: Lazy<EnvVars> = Lazy::new(|| {
     };
 
     EnvVars {
-        github_repo_owner: StringEnvVar::new("GITHUB_REPO_OWNER", GITHUB_REPO_OWNER_DEFAULT),
-        github_repo_name: StringEnvVar::new("GITHUB_REPO_NAME", GITHUB_REPO_NAME_DEFAULT),
+        github_repo_owner: StringEnvVar::new("GITHUB_REPO_OWNER", GITHUB_REPO_OWNER_DEFAULT.into()),
+        github_repo_name: StringEnvVar::new("GITHUB_REPO_NAME", GITHUB_REPO_NAME_DEFAULT.into()),
         github_issue_template: StringEnvVar::new(
             "GITHUB_ISSUE_TEMPLATE",
-            GITHUB_ISSUE_TEMPLATE_DEFAULT,
+            GITHUB_ISSUE_TEMPLATE_DEFAULT.into(),
         ),
-        service_id: StringEnvVar::new("SERVICE_ID", &calculate_service_uuid()),
-        client_id_key: StringEnvVar::new("CLIENT_ID_KEY", CLIENT_ID_KEY_DEFAULT),
-        api_host_names: StringEnvVar::new("API_HOST_NAMES", API_HOST_NAMES_DEFAULT),
-        api_url_prefix: StringEnvVar::new("API_URL_PREFIX", API_URL_PREFIX_DEFAULT),
-        event_db_url: StringEnvVar::new("EVENT_DB_URL", EVENT_DB_URL_DEFAULT),
-        event_db_username: StringEnvVar::new_optional("EVENT_DB_USERNAME"),
-        event_db_password: StringEnvVar::new_optional("EVENT_DB_PASSWORD"),
-        cassandra_persistent_db: cassandra_cfg(
+        service_id: StringEnvVar::new("SERVICE_ID", calculate_service_uuid().into()),
+        client_id_key: StringEnvVar::new("CLIENT_ID_KEY", CLIENT_ID_KEY_DEFAULT.into()),
+        api_host_names: StringEnvVar::new("API_HOST_NAMES", API_HOST_NAMES_DEFAULT.into()),
+        api_url_prefix: StringEnvVar::new("API_URL_PREFIX", API_URL_PREFIX_DEFAULT.into()),
+        event_db_url: StringEnvVar::new("EVENT_DB_URL", EVENT_DB_URL_DEFAULT.into()),
+        event_db_username: StringEnvVar::new_optional("EVENT_DB_USERNAME", false),
+        event_db_password: StringEnvVar::new_optional("EVENT_DB_PASSWORD", true),
+        cassandra_persistent_db: CassandraEnvVars::new(
             CASSANDRA_PERSISTENT_DB_URL_DEFAULT,
             CASSANDRA_PERSISTENT_DB_NAMESPACE_DEFAULT,
         ),
-        cassandra_volatile_db: cassandra_cfg(
+        cassandra_volatile_db: CassandraEnvVars::new(
             CASSANDRA_VOLATILE_DB_URL_DEFAULT,
             CASSANDRA_VOLATILE_DB_NAMESPACE_DEFAULT,
         ),
@@ -351,7 +571,7 @@ pub(crate) struct Settings();
 
 impl Settings {
     /// Initialize the settings data.
-    pub(crate) async fn init(settings: ServiceSettings) -> anyhow::Result<()> {
+    pub(crate) fn init(settings: ServiceSettings) -> anyhow::Result<()> {
         let log_level = settings.log_level;
 
         if SERVICE_SETTINGS.set(settings).is_err() {
@@ -364,7 +584,7 @@ impl Settings {
 
         log_build_info();
 
-        Box::pin(db::index::session::init()).await?;
+        db::index::session::init();
 
         db::event::establish_connection()
     }
