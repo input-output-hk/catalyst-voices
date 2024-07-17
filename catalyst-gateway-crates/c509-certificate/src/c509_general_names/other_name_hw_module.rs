@@ -21,6 +21,7 @@ pub struct OtherNameHardwareModuleName {
 
 impl OtherNameHardwareModuleName {
     /// Create a new instance of `OtherNameHardwareModuleName`.
+    #[must_use]
     pub fn new(hw_type: Oid<'static>, hw_serial_num: Vec<u8>) -> Self {
         Self {
             hw_type: C509oid::new(hw_type),

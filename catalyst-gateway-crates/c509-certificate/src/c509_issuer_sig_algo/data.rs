@@ -16,7 +16,7 @@ type AlgorithmDataTuple = (i16, Oid<'static>, &'static str);
 
 /// Signature algorithm data table.
 #[rustfmt::skip]
-const SIG_ALGO_DATA: [AlgorithmDataTuple; 24] = [
+const SIG_ALGO_DATA: [AlgorithmDataTuple; 22] = [
     // Int  |               OID                |            Name    
     (-256,  oid!(1.2.840.113549.1.1.5),          "RSASSA-PKCS1-v1_5 with SHA-1"),
     (-255,  oid!(1.2.840.10045.4.1),             "ECDSA with SHA-1"),
@@ -34,8 +34,8 @@ const SIG_ALGO_DATA: [AlgorithmDataTuple; 24] = [
     (24,    oid!(1.2.840.113549.1.1.12),         "RSASSA-PKCS1-v1_5 with SHA-384"),
     (25,    oid!(1.2.840.113549.1.1.13),         "RSASSA-PKCS1-v1_5 with SHA-512"),
     (26,    oid!(1.2.840.113549.1.1.10),         "RSASSA-PSS with SHA-256"),
-    (27,    oid!(1.2.840.113549.1.1.10),         "RSASSA-PSS with SHA-384"),
-    (28,    oid!(1.2.840.113549.1.1.10),         "RSASSA-PSS with SHA-512"),
+    // (27,    oid!(1.2.840.113549.1.1.10),         "RSASSA-PSS with SHA-384"),
+    // (28,    oid!(1.2.840.113549.1.1.10),         "RSASSA-PSS with SHA-512"),
     (29,    oid!(1.3.6.1.5.5.7.6.30),            "RSASSA-PSS with SHAKE128"),
     (30,    oid!(1.3.6.1.5.5.7.6.3),             "RSASSA-PSS with SHAKE256"),
     (42,    oid!(1.2.840.113549.1.9.16.3.17),    "HSS / LMS"),

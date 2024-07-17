@@ -1,4 +1,5 @@
 //! C509 Extension as a part of `TBSCertificate` used in C509 Certificate.
+//!
 //! Extension fallback of C509 OID extension
 //! Given OID if not found in the registered OID table, it will be encoded as a PEN OID.
 //! If the OID is not a PEN OID, it will be encoded as an unwrapped OID.
