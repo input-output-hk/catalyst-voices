@@ -9,8 +9,11 @@
 //! For more information about Attribute,
 //! visit [C509 Certificate](https://datatracker.ietf.org/doc/draft-ietf-cose-cbor-encoded-cert/09/)
 
+use std::str::FromStr;
+
 use asn1_rs::Oid;
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
+use serde::{Deserialize, Deserializer, Serialize};
 
 use super::data::{get_oid_from_int, ATTRIBUTES_LOOKUP};
 use crate::c509_oid::{C509oid, C509oidRegistered};
@@ -65,6 +68,48 @@ impl Attribute {
     pub(crate) fn set_multi_value(mut self) -> Self {
         self.multi_value = true;
         self
+    }
+}
+
+impl<'de> Deserialize<'de> for Attribute {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where D: Deserializer<'de> {
+        /// A helper struct for deserialize `Attribute`.
+        #[derive(Debug, Deserialize)]
+        struct Helper {
+            /// An OID value in string.
+            oid: String,
+            /// A value of C509 `Attribute` can be a vector of text or bytes.
+            value: Vec<AttributeValue>,
+        }
+
+        let helper = Helper::deserialize(deserializer)?;
+        let oid =
+            Oid::from_str(&helper.oid).map_err(|e| serde::de::Error::custom(format!("{e:?}")))?;
+        let mut attr = Attribute::new(oid);
+        for value in helper.value {
+            attr.add_value(value);
+        }
+        Ok(attr)
+    }
+}
+
+impl Serialize for Attribute {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where S: serde::Serializer {
+        /// Helper struct for serialization.
+        #[derive(Serialize)]
+        struct Helper {
+            /// OID string.
+            oid: String,
+            /// A value of C509 `Attribute` can be a vector of text or bytes.
+            value: Vec<AttributeValue>,
+        }
+        let helper = Helper {
+            oid: self.registered_oid.get_c509_oid().get_oid().to_string(),
+            value: self.value.clone(),
+        };
+        helper.serialize(serializer)
     }
 }
 
@@ -144,7 +189,7 @@ impl Decode<'_, ()> for Attribute {
 
 /// An enum of possible value types for `Attribute`.
 #[allow(clippy::module_name_repetitions)]
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Deserialize, Serialize)]
 pub enum AttributeValue {
     /// A text string.
     Text(String),

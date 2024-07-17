@@ -1,6 +1,7 @@
 //! To Be Sign Certificate (TBS Certificate) use to construct a C509 certificate.
 
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
+use serde::{Deserialize, Serialize};
 
 use crate::{
     c509_big_uint::UnwrappedBigUint, c509_extensions::Extensions,
@@ -9,7 +10,7 @@ use crate::{
 };
 
 /// A struct represents a To Be Signed Certificate (TBS Certificate).
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct TbsCert {
     /// Certificate type.
     c509_certificate_type: u8,
@@ -55,6 +56,66 @@ impl TbsCert {
             extensions,
             issuer_signature_algorithm,
         }
+    }
+
+    /// Get the certificate type.
+    #[must_use]
+    pub fn get_c509_certificate_type(&self) -> u8 {
+        self.c509_certificate_type
+    }
+
+    /// Get the certificate serial number.
+    #[must_use]
+    pub fn get_certificate_serial_number(&self) -> &UnwrappedBigUint {
+        &self.certificate_serial_number
+    }
+
+    /// Get the issuer.
+    #[must_use]
+    pub fn get_issuer(&self) -> &Name {
+        &self.issuer
+    }
+
+    /// Get the validity not before.
+    #[must_use]
+    pub fn get_validity_not_before(&self) -> &Time {
+        &self.validity_not_before
+    }
+
+    /// Get the validity not after.
+    #[must_use]
+    pub fn get_validity_not_after(&self) -> &Time {
+        &self.validity_not_after
+    }
+
+    /// Get the subject.
+    #[must_use]
+    pub fn get_subject(&self) -> &Name {
+        &self.subject
+    }
+
+    /// Get the subject public key algorithm.
+    #[must_use]
+    pub fn get_subject_public_key_algorithm(&self) -> &SubjectPubKeyAlgorithm {
+        &self.subject_public_key_algorithm
+    }
+
+    /// Get the subject public key.
+    #[must_use]
+    pub fn get_subject_public_key(&self) -> &[u8] {
+        &self.subject_public_key
+    }
+
+    /// Get the extensions.
+    #[must_use]
+    pub fn get_extensions(&self) -> &Extensions {
+        &self.extensions
+    }
+
+    /// Get the issuer signature algorithm.
+    #[must_use]
+    pub fn get_issuer_signature_algorithm(&self) -> &IssuerSignatureAlgorithm {
+        &self.issuer_signature_algorithm
     }
 }
 
