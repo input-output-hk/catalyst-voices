@@ -164,10 +164,6 @@ jobs:
               - run: |
                    sed -i -e 's/root/catalyst-gateway/g' cat-gateway.coverage.info
 
-              - run: |
-                   cat cat-gateway.coverage.info
-              - run: |
-                   ls
               - name: Coveralls
                 env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
