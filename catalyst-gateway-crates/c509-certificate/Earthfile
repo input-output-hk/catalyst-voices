@@ -12,7 +12,7 @@ builder:
 check:
     FROM +builder
 
-    DO rust-ci+EXECUTE --cmd="/scripts/std_checks.py"
+    DO --no-cache rust-ci+EXECUTE --cmd="/scripts/std_checks.py"
 
 build:
     FROM +builder
