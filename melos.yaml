@@ -21,6 +21,7 @@ command:
       bloc_concurrency: ^0.2.2
       bloc: ^8.1.2
       collection: ^1.17.1
+      cryptography: ^2.7.0
       equatable: ^2.0.5
       flutter_localized_locales: ^2.0.5
       formz: ^0.7.0

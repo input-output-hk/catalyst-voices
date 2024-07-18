@@ -1,6 +1,6 @@
 import 'package:catalyst_cardano_serialization/src/hashes.dart';
 import 'package:catalyst_cardano_serialization/src/rbac/registration_data.dart';
-import 'package:catalyst_cardano_serialization/src/witness.dart';
+import 'package:catalyst_cardano_serialization/src/signature.dart';
 import 'package:catalyst_compression/catalyst_compression.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
