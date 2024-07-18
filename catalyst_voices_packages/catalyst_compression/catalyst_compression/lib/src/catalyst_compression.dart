@@ -14,6 +14,13 @@ class CatalystCompression {
   }
 
   /// Returns the zstd compressor.
+  ///
+  /// Compressing more than 100 bytes is recommended,
+  /// otherwise the algorithm might provide larger results
+  /// than before the compression.
+  ///
+  /// [CompressionNotSupportedException] is thrown when trying to compress
+  /// less than 101 bytes.
   CatalystCompressor get zstd {
     return CatalystCompressionPlatform.instance.zstd;
   }
