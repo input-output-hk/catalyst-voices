@@ -14,8 +14,8 @@
 
 This package exposes a JS wrapper around Brotli and zstd compression/decompression algorithms.
 
-- Brotli: https://www.npmjs.com/package/brotli-wasm
-- zstd: https://www.npmjs.com/package/@oneidentity/zstd-js
+* [brotli-wasm](https://www.npmjs.com/package/brotli-wasm)
+* [zstd-js](https://www.npmjs.com/package/@oneidentity/zstd-js)
 
 ## Requirements
 
