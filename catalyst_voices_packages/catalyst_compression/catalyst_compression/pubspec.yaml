@@ -18,6 +18,7 @@ flutter:
 dependencies:
   catalyst_compression_platform_interface: ^0.1.2
   catalyst_compression_web: ^0.1.2
+  convert: ^3.1.1
   flutter:
     sdk: flutter
 
