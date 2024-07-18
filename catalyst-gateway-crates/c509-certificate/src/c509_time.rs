@@ -2,14 +2,17 @@
 
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 use serde::{Deserialize, Serialize};
+use wasm_bindgen::prelude::wasm_bindgen;
 
 /// A struct representing a time where it accept seconds since the Unix epoch.
+#[wasm_bindgen]
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Time(i64);
 
 /// No expiration date in seconds since the Unix epoch.
 const NO_EXP_DATE: i64 = 253_402_300_799;
 
+#[wasm_bindgen]
 impl Time {
     /// Create a new instance of `Time`.
     #[must_use]

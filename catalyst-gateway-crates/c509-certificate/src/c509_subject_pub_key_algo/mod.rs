@@ -15,10 +15,12 @@ use asn1_rs::Oid;
 use data::{get_oid_from_int, SUBJECT_PUB_KEY_ALGO_LOOKUP};
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 use serde::{Deserialize, Deserializer, Serialize};
+use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::{c509_algo_identifier::AlgorithmIdentifier, c509_oid::C509oidRegistered};
 
 /// A struct represents the `SubjectPubKeyAlgorithm`
+#[wasm_bindgen]
 #[derive(Debug, Clone, PartialEq)]
 pub struct SubjectPubKeyAlgorithm {
     /// The registered OID of the `SubjectPubKeyAlgorithm`.

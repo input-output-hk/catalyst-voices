@@ -7,6 +7,7 @@
 
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 use serde::{Deserialize, Serialize};
+use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::c509_attributes::attribute::Attribute;
 
@@ -15,6 +16,7 @@ use crate::c509_attributes::attribute::Attribute;
 /// ```cddl
 /// RelativeDistinguishedName = Attribute / [ 2* Attribute ]
 /// ```
+#[wasm_bindgen]
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct RelativeDistinguishedName(Vec<Attribute>);
 

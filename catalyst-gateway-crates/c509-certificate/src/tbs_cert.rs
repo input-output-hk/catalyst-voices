@@ -2,6 +2,7 @@
 
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 use serde::{Deserialize, Serialize};
+use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::{
     c509_big_uint::UnwrappedBigUint, c509_extensions::Extensions,
@@ -10,6 +11,7 @@ use crate::{
 };
 
 /// A struct represents a To Be Signed Certificate (TBS Certificate).
+#[wasm_bindgen]
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct TbsCert {
     /// Certificate type.
@@ -34,10 +36,12 @@ pub struct TbsCert {
     issuer_signature_algorithm: IssuerSignatureAlgorithm,
 }
 
+#[wasm_bindgen]
 impl TbsCert {
     /// Create a new instance of TBS Certificate.
     #[must_use]
     #[allow(clippy::too_many_arguments)]
+    #[wasm_bindgen(constructor)]
     pub fn new(
         c509_certificate_type: u8, certificate_serial_number: UnwrappedBigUint, issuer: Name,
         validity_not_before: Time, validity_not_after: Time, subject: Name,
@@ -57,6 +61,9 @@ impl TbsCert {
             issuer_signature_algorithm,
         }
     }
+}
+
+impl TbsCert {
 
     /// Get the certificate type.
     #[must_use]

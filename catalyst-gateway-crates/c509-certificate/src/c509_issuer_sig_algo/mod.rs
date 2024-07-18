@@ -13,10 +13,12 @@ use asn1_rs::Oid;
 use data::{get_oid_from_int, ISSUER_SIG_ALGO_LOOKUP};
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 use serde::{Deserialize, Deserializer, Serialize};
+use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::{c509_algo_identifier::AlgorithmIdentifier, c509_oid::C509oidRegistered};
 
 /// A struct represents the `IssuerSignatureAlgorithm`
+#[wasm_bindgen]
 #[derive(Debug, Clone, PartialEq)]
 pub struct IssuerSignatureAlgorithm {
     /// The registered OID of the `IssuerSignatureAlgorithm`.

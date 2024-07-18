@@ -54,6 +54,7 @@ pub mod c509_time;
 pub mod signing;
 mod tables;
 pub mod tbs_cert;
+pub mod wasm_binding;
 
 /// Generate a signed or unsigned C509 certificate.
 ///

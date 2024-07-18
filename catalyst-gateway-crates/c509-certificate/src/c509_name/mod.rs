@@ -22,6 +22,7 @@ use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 use rdn::RelativeDistinguishedName;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
+use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::c509_attributes::attribute::{Attribute, AttributeValue};
 
@@ -40,6 +41,7 @@ const EUI64_MAC_LEN: usize = 7;
 
 /// A struct of C509 Name with `NameValue`.
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[wasm_bindgen]
 pub struct Name(NameValue);
 
 impl Name {

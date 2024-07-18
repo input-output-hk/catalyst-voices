@@ -7,14 +7,18 @@
 
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 use serde::{Deserialize, Serialize};
+use wasm_bindgen::prelude::wasm_bindgen;
 
 /// A struct representing an unwrapped CBOR unsigned bignum.
+#[wasm_bindgen]
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct UnwrappedBigUint(u64);
 
+#[wasm_bindgen]
 impl UnwrappedBigUint {
     /// Create a new instance of `UnwrappedBigUint`.
     #[must_use]
+    #[wasm_bindgen(constructor)]
     pub fn new(uint: u64) -> Self {
         Self(uint)
     }
