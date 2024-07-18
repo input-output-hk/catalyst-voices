@@ -11,6 +11,8 @@ environment:
 dependencies:
   bech32: ^0.2.2
   bip32_ed25519: ^0.6.0
+  catalyst_compression: ^0.1.0
+  catalyst_compression_web: ^0.1.0
   cbor: ^6.2.0
   convert: ^3.1.1
   equatable: ^2.0.5

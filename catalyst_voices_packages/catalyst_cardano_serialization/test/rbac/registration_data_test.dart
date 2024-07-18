@@ -5,12 +5,12 @@ import 'package:test/test.dart';
 import '../test_utils/test_data.dart';
 
 void main() {
-  group(RbacMetadata, () {
+  group(RegistrationData, () {
     test('from and to cbor', () {
       final derCert = X509DerCertificate.fromHex(derCertHex);
       final c509Cert = C509Certificate.fromHex(c509CertHex);
 
-      final original = RbacMetadata(
+      final original = RegistrationData(
         derCerts: [derCert],
         cborCerts: [c509Cert],
         publicKeys: [Ed25519PublicKey.seeded(0)],
@@ -39,7 +39,7 @@ void main() {
       );
 
       final encoded = original.toCbor();
-      final decoded = RbacMetadata.fromCbor(encoded);
+      final decoded = RegistrationData.fromCbor(encoded);
       expect(original, equals(decoded));
     });
   });
