@@ -27,6 +27,11 @@ void main() {
       );
     });
 
+    test('KeyPair from seed equals private key', () async {
+      final keyPair = await Ed25519KeyPair.fromSeed(privateKey.bytes);
+      expect(keyPair.privateKey, equals(privateKey));
+    });
+
     test('sign and verify', () async {
       final signature = await privateKey.sign(message);
       final keyPair = await Ed25519KeyPair.fromSeed(privateKey.bytes);
