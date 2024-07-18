@@ -54,11 +54,24 @@ class JSBrotliCompressor implements CatalystCompressor {
 
 /// The JS implementation of zstd compressor.
 class JSZstdCompressor implements CatalystCompressor {
+  /// The minimum length of bytes for which the compression
+  /// algorithm works correctly.
+  ///
+  /// Trying to compress bytes fewer than this might yield bigger
+  /// results than before the compression.
+  static const int _minLength = 101;
+
   /// The default constructor for [JSZstdCompressor].
   const JSZstdCompressor();
 
   @override
   List<int> compress(List<int> bytes) {
+    if (bytes.length < _minLength) {
+      throw CompressionNotSupportedException(
+        'Bytes too short, actual: ${bytes.length}, required: $_minLength',
+      );
+    }
+
     final data = zstdCompress(hex.encode(bytes).toJS).toDart;
     return hex.decode(data);
   }

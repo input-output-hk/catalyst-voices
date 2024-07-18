@@ -15,3 +15,16 @@ abstract class CatalystCompressor {
   /// should yield the original [bytes].
   List<int> decompress(List<int> bytes);
 }
+
+/// Exception thrown when [CatalystCompressor.compress] can't compress
+/// given data, usually due to the data being too short.
+final class CompressionNotSupportedException implements Exception {
+  /// The error details.
+  final String? message;
+
+  /// The default constructor for [CompressionNotSupportedException].
+  const CompressionNotSupportedException([this.message]);
+
+  @override
+  String toString() => 'CompressionNotSupportedException(message=$message)';
+}
