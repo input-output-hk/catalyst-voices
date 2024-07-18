@@ -6,13 +6,12 @@ IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.1.17 AS rust-ci
 builder:
     DO rust-ci+SETUP
 
-    COPY --dir .cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml src .
+    COPY --dir .cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml src examples .
 
 
 check:
     FROM +builder
 
-    RUN --no-cache
     DO rust-ci+EXECUTE --cmd="/scripts/std_checks.py"
 
 build:
