@@ -133,12 +133,13 @@ class X509MetadataEnvelope<T> extends Equatable {
     CborValue value, {
     required ChunkedDataDeserializer<T> deserializer,
   }) {
-    final map = value as CborMap;
-    final purpose = map[const CborSmallInt(0)]! as CborString;
-    final txInputsHash = map[const CborSmallInt(1)]!;
-    final previousTransactionId = map[const CborSmallInt(2)];
-    final chunkedData = _deserializeChunkedData(map);
-    final validationSignature = map[const CborSmallInt(99)]!;
+    final metadata = value as CborMap;
+    final envelope = metadata[const CborSmallInt(509)]! as CborMap;
+    final purpose = envelope[const CborSmallInt(0)]! as CborString;
+    final txInputsHash = envelope[const CborSmallInt(1)]!;
+    final previousTransactionId = envelope[const CborSmallInt(2)];
+    final chunkedData = _deserializeChunkedData(envelope);
+    final validationSignature = envelope[const CborSmallInt(99)]!;
 
     return X509MetadataEnvelope(
       purpose: purpose.toString(),
@@ -161,12 +162,14 @@ class X509MetadataEnvelope<T> extends Equatable {
         : null;
 
     return CborMap({
-      const CborSmallInt(0): CborString(purpose),
-      const CborSmallInt(1): txInputsHash.toCbor(),
-      if (previousTransactionId != null)
-        const CborSmallInt(2): previousTransactionId!.toCbor(),
-      if (metadata != null) metadata.key: metadata.value,
-      const CborSmallInt(99): validationSignature.toCbor(),
+      const CborSmallInt(509): CborMap({
+        const CborSmallInt(0): CborString(purpose),
+        const CborSmallInt(1): txInputsHash.toCbor(),
+        if (previousTransactionId != null)
+          const CborSmallInt(2): previousTransactionId!.toCbor(),
+        if (metadata != null) metadata.key: metadata.value,
+        const CborSmallInt(99): validationSignature.toCbor(),
+      }),
     });
   }
 
