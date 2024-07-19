@@ -13,7 +13,7 @@ typedef ChunkedDataSerializer<T> = CborValue Function(T value);
 /// In most cases the [T] type is going to be [RegistrationData].
 typedef ChunkedDataDeserializer<T> = T Function(CborValue value);
 
-/// x509 Certificate metadata and related metadata within
+/// X509 Certificate metadata and related metadata within
 /// a x509 Registration/Update transaction must be protected
 /// against replayability.
 ///
@@ -30,7 +30,7 @@ class X509MetadataEnvelope<T> extends Equatable {
 
   /// Purpose is defined by the consuming dApp. It allows a dApp to have
   /// their own privately named and managed namespace for certificates.
-  /// The x509 specifications presented here do not define how certificates
+  /// The X509 specifications presented here do not define how certificates
   /// must be created. Nor the purpose they are used for, that is within control
   /// of each dApp. These specifications define a universal framework
   /// to implement such systems from.
@@ -66,7 +66,7 @@ class X509MetadataEnvelope<T> extends Equatable {
   /// data to a transaction, there does not need to be any actual role
   /// or certificate updates.
   ///
-  /// Due to the potential size of x509 certificates, compression is mandatory
+  /// Due to the potential size of X509 certificates, compression is mandatory
   /// where it will reduce the space of the encoded data. Any dApp can, if it
   /// chooses, only support either Brotli or ZSTD and not trial compress the
   /// data. A conformant dApp MUST NOT store Raw data if it can be compressed.
@@ -83,7 +83,7 @@ class X509MetadataEnvelope<T> extends Equatable {
   ///
   /// The specification reserves keys 13-17 for future compression schemes.
   /// Even though there are multiple keys defined, ONLY 1 may be used at a time.
-  /// There is only a single list of x509 chunks, and the key is used to define
+  /// There is only a single list of X509 chunks, and the key is used to define
   /// the compression used only.
   final T? chunkedData;
 
@@ -186,6 +186,8 @@ class X509MetadataEnvelope<T> extends Equatable {
 
   /// Returns true if given [signature] belongs to a given [publicKey]
   /// for this [X509MetadataEnvelope], false otherwise.
+  ///
+  /// The [serializer] in most cases is going to be [RegistrationData.toCbor].
   Future<bool> verifySignature({
     required Ed25519Signature signature,
     required Ed25519PublicKey publicKey,
