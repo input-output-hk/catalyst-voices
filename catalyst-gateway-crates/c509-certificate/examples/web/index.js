@@ -6,7 +6,7 @@ import init, {
 	decode,
 	PublicKey,
 	PrivateKey,
-} from "./pkg/c509_certificate.js";
+} from "../../pkg/c509_certificate.js";
 
 const pem_sk = `
 -----BEGIN PRIVATE KEY-----
