@@ -71,5 +71,5 @@ rand = "0.8.5"
 chrono = "0.4.38"
 
 [[example]]
-name = "cli"
+name = "c509"
 path = "examples/cli/main.rs"
