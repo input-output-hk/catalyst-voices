@@ -162,10 +162,8 @@ jobs:
         with:
           name: coverage-reports
 
-      - run: ls
-
       - run: |
-            sed -i -e 's/root/catalyst-gateway/g' cat-gateway.coverage.info
+            sed -i -e 's/root/catalyst-gateway/g' **/cat-gateway.coverage.info
 
       - name: Coveralls
         env:
