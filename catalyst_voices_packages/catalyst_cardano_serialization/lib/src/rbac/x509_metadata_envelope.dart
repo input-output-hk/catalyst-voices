@@ -45,7 +45,7 @@ class X509MetadataEnvelope<T> extends Equatable {
   /// This is a key to preventing replayability of the metadata,
   /// but is not enough by itself as it needs to be able to be made immutable,
   /// such that any change to this field can be detected.
-  final TransactionHash txInputsHash;
+  final TransactionInputsHash txInputsHash;
 
   /// This is a 32 byte hash of the previous transaction in a chain
   /// of registration updates made by the same user. The only registration
@@ -142,7 +142,7 @@ class X509MetadataEnvelope<T> extends Equatable {
 
     return X509MetadataEnvelope(
       purpose: purpose.toString(),
-      txInputsHash: TransactionHash.fromCbor(txInputsHash),
+      txInputsHash: TransactionInputsHash.fromCbor(txInputsHash),
       previousTransactionId: previousTransactionId != null
           ? TransactionHash.fromCbor(previousTransactionId)
           : null,

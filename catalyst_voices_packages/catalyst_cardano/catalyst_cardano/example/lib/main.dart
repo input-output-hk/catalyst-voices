@@ -359,7 +359,7 @@ class _WalletDetailsState extends State<_WalletDetails> {
                         api: widget.api,
                       ),
                     ),
-                    child: const Text('Sign & submit Role registration'),
+                    child: const Text('Sign & submit RBAC tx'),
                   ),
                 ],
               ),

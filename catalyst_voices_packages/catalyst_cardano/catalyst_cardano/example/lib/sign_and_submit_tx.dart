@@ -44,16 +44,6 @@ Transaction _buildUnsignedTx({
   required List<TransactionUnspentOutput> utxos,
   required ShelleyAddress changeAddress,
 }) {
-  const txBuilderConfig = TransactionBuilderConfig(
-    feeAlgo: LinearFee(
-      constant: Coin(155381),
-      coefficient: Coin(44),
-    ),
-    maxTxSize: 16384,
-    maxValueSize: 5000,
-    coinsPerUtxoByte: Coin(4310),
-  );
-
   /* cSpell:disable */
   final preprodFaucetAddress = ShelleyAddress.fromBech32(
     'addr_test1vzpwq95z3xyum8vqndgdd9mdnmafh3djcxnc6jemlgdmswcve6tkw',
@@ -66,7 +56,7 @@ Transaction _buildUnsignedTx({
   );
 
   final txBuilder = TransactionBuilder(
-    config: txBuilderConfig,
+    config: _buildTransactionBuilderConfig(),
     inputs: utxos,
     networkId: NetworkId.testnet,
   );
@@ -80,5 +70,17 @@ Transaction _buildUnsignedTx({
     body: txBody,
     isValid: true,
     witnessSet: const TransactionWitnessSet(vkeyWitnesses: {}),
+  );
+}
+
+TransactionBuilderConfig _buildTransactionBuilderConfig() {
+  return const TransactionBuilderConfig(
+    feeAlgo: LinearFee(
+      constant: Coin(155381),
+      coefficient: Coin(44),
+    ),
+    maxTxSize: 16384,
+    maxValueSize: 5000,
+    coinsPerUtxoByte: Coin(4310),
   );
 }

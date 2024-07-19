@@ -70,12 +70,61 @@ Future<void> _signAndSubmitRbacTx({
   required BuildContext context,
   required CardanoWalletApi api,
 }) async {
+  var result = '';
+  try {
+    final changeAddress = await api.getChangeAddress();
+
+    final utxos = await api.getUtxos(
+      amount: const Coin(1000000),
+    );
+
+    final x509Envelope = await _buildMetadataEnvelope(
+      inputs: utxos,
+    );
+
+    final auxiliaryData = AuxiliaryData.fromCbor(
+      x509Envelope.toCbor(serializer: (e) => e.toCbor()),
+    );
+
+    final unsignedTx = _buildUnsignedRbacTx(
+      inputs: utxos,
+      changeAddress: changeAddress,
+      auxiliaryData: auxiliaryData,
+    );
+
+    final witnessSet = await api.signTx(transaction: unsignedTx);
+
+    final signedTx = Transaction(
+      body: unsignedTx.body,
+      isValid: true,
+      witnessSet: witnessSet,
+      auxiliaryData: unsignedTx.auxiliaryData,
+    );
+
+    final txHash = await api.submitTx(transaction: signedTx);
+    result = 'Tx hash: ${txHash.toHex()}';
+  } catch (error) {
+    result = error.toString();
+  }
+
+  if (context.mounted) {
+    await _showDialog(
+      context: context,
+      title: 'Sign & submit RBAC tx',
+      message: result,
+    );
+  }
+}
+
+Future<X509MetadataEnvelope<RegistrationData>> _buildMetadataEnvelope({
+  required List<TransactionUnspentOutput> inputs,
+}) async {
   final keyPair =
       await Ed25519KeyPair.fromSeed(Ed25519PrivateKey.seeded(0).bytes);
 
   final x509Envelope = X509MetadataEnvelope.unsigned(
     purpose: _catalystUserRoleRegistrationPurpose,
-    txInputsHash: _transactionHash,
+    txInputsHash: TransactionInputsHash.fromTransactionInputs(inputs),
     previousTransactionId: _transactionHash,
     chunkedData: RegistrationData(
       derCerts: [_derCert],
@@ -133,4 +182,28 @@ Future<void> _signAndSubmitRbacTx({
   print('public key: ${keyPair.publicKey.toHex()}');
   print('private key: ${keyPair.privateKey.toHex()}');
   print('signature: ${signedX509Envelope.validationSignature.toHex()}');
+
+  return signedX509Envelope;
+}
+
+Transaction _buildUnsignedRbacTx({
+  required List<TransactionUnspentOutput> inputs,
+  required ShelleyAddress changeAddress,
+  required AuxiliaryData auxiliaryData,
+}) {
+  final txBuilder = TransactionBuilder(
+    config: _buildTransactionBuilderConfig(),
+    inputs: inputs,
+    networkId: NetworkId.testnet,
+    auxiliaryData: auxiliaryData,
+  );
+
+  final txBody = txBuilder.withChangeAddressIfNeeded(changeAddress).buildBody();
+
+  return Transaction(
+    body: txBody,
+    isValid: true,
+    witnessSet: const TransactionWitnessSet(vkeyWitnesses: {}),
+    auxiliaryData: auxiliaryData,
+  );
 }
