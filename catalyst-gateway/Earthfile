@@ -40,7 +40,7 @@ build:
         --args2="--cov_report=$HOME/coverage-report.info" \
         --output="release/cat-gateway" \
         --junit="cat-gateway.junit-report.xml" \
-        --coverage="cat-gateway.coverage-report.info" \
+        --coverage="cat-gateway.coverage.info" \
         --docs="true"
 
     # Generate the OpenAPI doc from the cat-gateway executable itself.

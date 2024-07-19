@@ -22,6 +22,7 @@ package-schemathesis:
                     --force-color  \
                     --junit-xml=/results/junit-report.xml \
                     --cassette-path=/results/cassette.yaml
+
     ARG tag="latest"
     SAVE IMAGE schemathesis:$tag
 
@@ -41,6 +42,7 @@ fuzzer-api:
         --service event-db \
         --service cat-gateway \
         --allow-privileged
+
         RUN docker run --net=host --name=st schemathesis:latest && \
             docker cp st:/results/junit-report.xml junit-report.xml && \
             docker cp st:/results/cassette.yaml cassette.yaml
