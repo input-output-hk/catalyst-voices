@@ -21,7 +21,7 @@ env:
     ECR_REGISTRY: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
     ALLURE_REPORT_PATH: allure-report
     REPORT_EXT: .junit-report.xml
-    COVERAGE_EXT: .coverage.info
+    COVERAGE_EXT: .info
 
 jobs:
   generate-test-reports:
@@ -161,6 +161,8 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: coverage-reports
+
+      - run: ls
 
       - run: |
             sed -i -e 's/root/catalyst-gateway/g' cat-gateway.coverage.info
