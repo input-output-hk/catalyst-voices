@@ -26,13 +26,11 @@ use asn1_rs::{oid, Oid};
 use extension::{Extension, ExtensionValue};
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 use serde::{Deserialize, Serialize};
-use wasm_bindgen::prelude::wasm_bindgen;
 
 /// OID of `KeyUsage` extension
 static KEY_USAGE_OID: Oid<'static> = oid!(2.5.29 .15);
 
 /// A struct of C509 Extensions containing a vector of `Extension`.
-#[wasm_bindgen]
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Extensions(Vec<Extension>);
 
