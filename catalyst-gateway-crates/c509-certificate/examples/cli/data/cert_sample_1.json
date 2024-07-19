@@ -17,7 +17,7 @@
 		}
 	],
 	"subject_public_key_algorithm": null,
-	"subject_public_key": "examples/key/public_key.pem",
+	"subject_public_key": "examples/cli/key/public_key.pem",
 	"extensions": [
 		{
 			"oid": "2.5.29.15",

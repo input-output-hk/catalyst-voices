@@ -77,4 +77,4 @@ chrono = "0.4.38"
 
 [[example]]
 name = "cli"
-path = "examples/main.rs"
+path = "examples/cli/main.rs"
