@@ -21,6 +21,7 @@ env:
     ECR_REGISTRY: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
     ALLURE_REPORT_PATH: allure-report
     REPORT_EXT: .junit-report.xml
+    COVERAGE_EXT: .coverage.info
 
 jobs:
   generate-test-reports:
@@ -98,7 +99,7 @@ jobs:
         if: always()
         with:
             name: coverage-reports
-            path: 'catalyst-gateway/cat-gateway.coverage.info'
+            path: '**/*${{ env.COVERAGE_EXT }}'
             if-no-files-found: error
             retention-days: 1
 
@@ -151,39 +152,51 @@ jobs:
           mode: upsert
 
   generate-coverage-report:
-            name: Generate coverage report
-            runs-on: ubuntu-latest
-            needs: [generate-test-reports]
-            steps:
-              - uses: actions/checkout@v4
+    name: Generate coverage report
+    runs-on: ubuntu-latest
+    needs: [generate-test-reports]
+    steps:
+      - uses: actions/checkout@v4
 
-              - uses: actions/download-artifact@v4
-                with:
-                  name: coverage-reports
+      - uses: actions/download-artifact@v4
+        with:
+          name: coverage-reports
 
-              - run: |
-                   sed -i -e 's/root/catalyst-gateway/g' cat-gateway.coverage.info
+      - run: |
+            sed -i -e 's/root/catalyst-gateway/g' cat-gateway.coverage.info
 
-              - name: Coveralls
-                env:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                uses: coverallsapp/github-action@v2
-                with:
-                  path-to-lcov: "cat-gateway.coverage.info"
-                  allow-empty: true
-                  debug: true
-                  flag-name: rust-unit-test
-                  base-path: "/home/runner/work/catalyst-voices/catalyst-voices/"
-                  parallel: true
+      - name: Coveralls
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: coverallsapp/github-action@v2
+        with:
+          path-to-lcov: "cat-gateway.coverage.info"
+          allow-empty: true
+          debug: true
+          flag-name: rust-unit-test
+          base-path: "/home/runner/work/catalyst-voices/catalyst-voices/"
+          parallel: true
+
+      - name: Coveralls
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: coverallsapp/github-action@v2
+        with:
+          path-to-lcov: "lcov.info"
+          allow-empty: true
+          debug: true
+          flag-name: flutter-test
+          base-path: "/home/runner/work/catalyst-voices/catalyst-voices/catalyst_voices"
+          parallel: true
 
   upload-coverage-report:
-              name: Upload coverage report
-              needs: [generate-coverage-report]
-              if: ${{ always() }}
-              runs-on: ubuntu-latest
-              steps:
-              - name: Coveralls Finished
-                uses: coverallsapp/github-action@v2
-                with:
-                  parallel-finished: true
-                  carryforward: "rust-unit-test"
+    name: Upload coverage report
+    needs: [generate-coverage-report]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+    - name: Coveralls Finished
+      uses: coverallsapp/github-action@v2
+      with:
+        parallel-finished: true
+        carryforward: "rust-unit-test,flutter-test"
