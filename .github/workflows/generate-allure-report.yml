@@ -20,6 +20,7 @@ env:
     EARTHLY_TARGET: docker
     ECR_REGISTRY: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
     ALLURE_REPORT_PATH: allure-report
+    COVERAGE_REPORT_PATH: coverage-report
     REPORT_EXT: .junit-report.xml
     COVERAGE_EXT: .info
 
@@ -162,15 +163,22 @@ jobs:
         with:
           name: coverage-reports
 
+      - name: Collect coverage report
+        run: |
+            mkdir -p ${{ env.COVERAGE_REPORT_PATH }}
+            shopt -s globstar
+            cp **/*${{ env.COVERAGE_EXT }} ${{ env.COVERAGE_REPORT_PATH }}
+            ls ${{ env.COVERAGE_REPORT_PATH }}
+
       - run: |
-            sed -i -e 's/root/catalyst-gateway/g' **/cat-gateway.coverage.info
+            sed -i -e 's/root/catalyst-gateway/g' ${{ env.COVERAGE_REPORT_PATH }}/cat-gateway.coverage.info
 
       - name: Coveralls
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: coverallsapp/github-action@v2
         with:
-          path-to-lcov: "cat-gateway.coverage.info"
+          path-to-lcov: "${{ env.COVERAGE_REPORT_PATH }}/cat-gateway.coverage.info"
           allow-empty: true
           debug: true
           flag-name: rust-unit-test
@@ -182,7 +190,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: coverallsapp/github-action@v2
         with:
-          path-to-lcov: "lcov.info"
+          path-to-lcov: "${{ env.COVERAGE_REPORT_PATH }}/lcov.info"
           allow-empty: true
           debug: true
           flag-name: flutter-test
