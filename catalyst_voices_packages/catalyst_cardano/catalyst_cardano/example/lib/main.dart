@@ -6,6 +6,10 @@ import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 import 'package:flutter/material.dart';
 
+part 'sign_and_submit_rbac_tx.dart';
+part 'sign_and_submit_tx.dart';
+part 'sign_data.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -284,10 +288,13 @@ class _WalletDetailsState extends State<_WalletDetails> {
         }
       }
     } catch (error) {
-      await _showDialog(
-        title: 'Load data',
-        message: 'Error: $error',
-      );
+      if (mounted) {
+        await _showDialog(
+          context: context,
+          title: 'Load data',
+          message: 'Error: $error',
+        );
+      }
     }
   }
 
@@ -326,13 +333,33 @@ class _WalletDetailsState extends State<_WalletDetails> {
               Row(
                 children: [
                   ElevatedButton(
-                    onPressed: _signData,
+                    onPressed: () => unawaited(
+                      _signData(
+                        context: context,
+                        api: widget.api,
+                      ),
+                    ),
                     child: const Text('Sign data'),
                   ),
                   const SizedBox(width: 16),
                   ElevatedButton(
-                    onPressed: _signAndSubmitTx,
+                    onPressed: () => unawaited(
+                      _signAndSubmitTx(
+                        context: context,
+                        api: widget.api,
+                      ),
+                    ),
                     child: const Text('Sign & submit tx'),
+                  ),
+                  const SizedBox(width: 16),
+                  ElevatedButton(
+                    onPressed: () => unawaited(
+                      _signAndSubmitRbacTx(
+                        context: context,
+                        api: widget.api,
+                      ),
+                    ),
+                    child: const Text('Sign & submit Role registration'),
                   ),
                 ],
               ),
@@ -342,85 +369,28 @@ class _WalletDetailsState extends State<_WalletDetails> {
       ),
     );
   }
+}
 
-  Future<void> _signData() async {
-    var result = '';
-
-    try {
-      final rewardAddress = await widget.api.getRewardAddresses();
-      final signer = await widget.api.signData(
-        address: rewardAddress.first,
-        payload: [1, 2, 3],
-      );
-
-      result = 'Signature: ${hex.encode(cbor.encode(signer.toCbor()))}';
-    } catch (error) {
-      result = error.toString();
-    }
-
-    await _showDialog(
-      title: 'Sign data',
-      message: result,
-    );
-  }
-
-  Future<void> _signAndSubmitTx() async {
-    var result = '';
-    try {
-      final api = widget.api;
-      final changeAddress = await api.getChangeAddress();
-
-      final utxos = await api.getUtxos(
-        amount: const Coin(1000000),
-      );
-
-      final unsignedTx = _buildUnsignedTx(
-        utxos: utxos,
-        changeAddress: changeAddress,
-      );
-
-      final witnessSet = await api.signTx(transaction: unsignedTx);
-
-      final signedTx = Transaction(
-        body: unsignedTx.body,
-        isValid: true,
-        witnessSet: witnessSet,
-      );
-
-      final txHash = await api.submitTx(transaction: signedTx);
-      result = 'Tx hash: ${txHash.toHex()}';
-    } catch (error) {
-      result = error.toString();
-    }
-
-    await _showDialog(
-      title: 'Sign & submit tx',
-      message: result,
-    );
-  }
-
-  Future<void> _showDialog({
-    required String title,
-    required String message,
-  }) async {
-    if (mounted) {
-      await showDialog<void>(
-        context: context,
-        builder: (context) => SelectionArea(
-          child: AlertDialog(
-            title: Text(title),
-            content: Text(message),
-            actions: [
-              ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Close'),
-              ),
-            ],
+Future<void> _showDialog({
+  required BuildContext context,
+  required String title,
+  required String message,
+}) async {
+  await showDialog<void>(
+    context: context,
+    builder: (context) => SelectionArea(
+      child: AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Close'),
           ),
-        ),
-      );
-    }
-  }
+        ],
+      ),
+    ),
+  );
 }
 
 String _formatExtensions(List<CipExtension>? extensions) {
@@ -470,47 +440,4 @@ String _formatUtxo(TransactionUnspentOutput utxo) {
   return 'Tx: ${utxo.input.transactionId}'
       '\nIndex: ${utxo.input.index}'
       '\nAmount: ${_formatBalance(utxo.output.amount)}\n';
-}
-
-Transaction _buildUnsignedTx({
-  required List<TransactionUnspentOutput> utxos,
-  required ShelleyAddress changeAddress,
-}) {
-  const txBuilderConfig = TransactionBuilderConfig(
-    feeAlgo: LinearFee(
-      constant: Coin(155381),
-      coefficient: Coin(44),
-    ),
-    maxTxSize: 16384,
-    maxValueSize: 5000,
-    coinsPerUtxoByte: Coin(4310),
-  );
-
-  /* cSpell:disable */
-  final preprodFaucetAddress = ShelleyAddress.fromBech32(
-    'addr_test1vzpwq95z3xyum8vqndgdd9mdnmafh3djcxnc6jemlgdmswcve6tkw',
-  );
-  /* cSpell:enable */
-
-  final txOutput = TransactionOutput(
-    address: preprodFaucetAddress,
-    amount: const Balance(coin: Coin(1000000)),
-  );
-
-  final txBuilder = TransactionBuilder(
-    config: txBuilderConfig,
-    inputs: utxos,
-    networkId: NetworkId.testnet,
-  );
-
-  final txBody = txBuilder
-      .withOutput(txOutput)
-      .withChangeAddressIfNeeded(changeAddress)
-      .buildBody();
-
-  return Transaction(
-    body: txBody,
-    isValid: true,
-    witnessSet: const TransactionWitnessSet(vkeyWitnesses: {}),
-  );
 }
