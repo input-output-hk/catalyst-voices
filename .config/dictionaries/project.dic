@@ -6,9 +6,9 @@ afinet
 androidx
 anypolicy
 appspot
-Arissara
 Arbritrary
 ARGB
+Arissara
 asmjs
 asyncio
 asyncpg
@@ -25,11 +25,12 @@ bluefireteam
 BROTLI
 canvaskit
 cardano
+carryforward
 Catalyst
 CBOR
 cborg
-CEST
 cdylib
+CEST
 cfbundle
 Chotivichit
 chromedriver
@@ -40,6 +41,7 @@ COCOAPODS
 codegen
 codepoints
 coti
+coverallsapp
 cryptoxide
 Cunego
 Cupertino

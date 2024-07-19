@@ -75,10 +75,10 @@ scripts:
       # cleanup from previous build and create new folders
       rm -fR $MELOS_ROOT_PATH/test_reports
       mkdir $MELOS_ROOT_PATH/test_reports
-
+      
       # run tests, generate junit reports in /test_reports/ & code coverage report
       melos exec -c 1 --dir-exists="test" -- \
-       "flutter test --reporter expanded --coverage --machine | tojunit --output MELOS_ROOT_PATH/test_reports/MELOS_PACKAGE_NAME.junit-report.xml"
+       "flutter test --reporter expanded --coverage --machine | tojunit --output $MELOS_ROOT_PATH/test_reports/MELOS_PACKAGE_NAME.junit-report.xml"
 
       # removes code coverage for generated code
       melos exec -c 1 --dir-exists="test" -- \
@@ -89,9 +89,7 @@ scripts:
         '*.freezed.dart' \
         'lib/generated/**'
 
-      # converts coverage to a HTML report
-      melos exec -c 1 --dir-exists="test" -- \
-        "genhtml coverage/lcov.info --output-directory=coverage/"
+      mv ./catalyst_voices/coverage .
     description: |
       Run `flutter test` for all packages and generate junit and coverage reports.
       The test reports are saved in /test_reports folder.
