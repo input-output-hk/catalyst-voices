@@ -170,8 +170,10 @@ jobs:
             cp **/*${{ env.COVERAGE_EXT }} ${{ env.COVERAGE_REPORT_PATH }}
             ls ${{ env.COVERAGE_REPORT_PATH }}
 
-      - run: |
-            sed -i -e 's/root/catalyst-gateway/g' ${{ env.COVERAGE_REPORT_PATH }}/cat-gateway.coverage.info
+      - name: Normalize coverage report paths
+        run: |
+            sed -i -e 's/SF:root/SF:catalyst-gateway/g' ${{ env.COVERAGE_REPORT_PATH }}/cat-gateway.coverage.info
+            sed -i -e 's/SF:lib/SF:catalyst_voices\/lib/g' ${{ env.COVERAGE_REPORT_PATH }}/lcov.info
 
       - name: Coveralls
         env:
