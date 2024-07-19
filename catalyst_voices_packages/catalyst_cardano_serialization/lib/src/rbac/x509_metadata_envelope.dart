@@ -1,19 +1,17 @@
-import 'package:catalyst_cardano_serialization/src/hashes.dart';
-import 'package:catalyst_cardano_serialization/src/rbac/registration_data.dart';
-import 'package:catalyst_cardano_serialization/src/signature.dart';
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_compression/catalyst_compression.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
-
-/// Deserializes the type [T] from cbor.
-///
-/// In most cases the [T] type is going to be [RegistrationData].
-typedef ChunkedDataDeserializer<T> = T Function(CborValue value);
 
 /// Serializes the type [T] into cbor.
 ///
 /// In most cases the [T] type is going to be [RegistrationData].
 typedef ChunkedDataSerializer<T> = CborValue Function(T value);
+
+/// Deserializes the type [T] from cbor.
+///
+/// In most cases the [T] type is going to be [RegistrationData].
+typedef ChunkedDataDeserializer<T> = T Function(CborValue value);
 
 /// x509 Certificate metadata and related metadata within
 /// a x509 Registration/Update transaction must be protected
@@ -113,9 +111,19 @@ class X509MetadataEnvelope<T> extends Equatable {
     required this.purpose,
     required this.txInputsHash,
     this.previousTransactionId,
-    required this.chunkedData,
+    this.chunkedData,
     required this.validationSignature,
   });
+
+  /// Constructs a [X509MetadataEnvelope] that is not signed yet.
+  ///
+  /// A [Ed25519PrivateKey] can be used to sign the envelope with [sign] method.
+  X509MetadataEnvelope.unsigned({
+    required this.purpose,
+    required this.txInputsHash,
+    this.previousTransactionId,
+    this.chunkedData,
+  }) : validationSignature = Ed25519Signature.seeded(0);
 
   /// Deserializes the type from cbor.
   ///
@@ -160,6 +168,46 @@ class X509MetadataEnvelope<T> extends Equatable {
       if (metadata != null) metadata.key: metadata.value,
       const CborSmallInt(99): validationSignature.toCbor(),
     });
+  }
+
+  /// Serializes the envelope into bytes, signs it with the [privateKey]
+  /// and returns a copy of the [X509MetadataEnvelope]
+  /// with the resulting [validationSignature].
+  ///
+  /// The [serializer] in most cases is going to be [RegistrationData.toCbor].
+  Future<X509MetadataEnvelope<T>> sign({
+    required Ed25519PrivateKey privateKey,
+    required ChunkedDataSerializer<T> serializer,
+  }) async {
+    final bytes = cbor.encode(toCbor(serializer: serializer));
+    final signature = await privateKey.sign(bytes);
+    return withValidationSignature(signature);
+  }
+
+  /// Returns true if given [signature] belongs to a given [publicKey]
+  /// for this [X509MetadataEnvelope], false otherwise.
+  Future<bool> verifySignature({
+    required Ed25519Signature signature,
+    required Ed25519PublicKey publicKey,
+    required ChunkedDataSerializer<T> serializer,
+  }) async {
+    final envelope = withValidationSignature(Ed25519Signature.seeded(0));
+    final bytes = cbor.encode(envelope.toCbor(serializer: serializer));
+    return signature.verify(bytes, publicKey: publicKey);
+  }
+
+  /// Returns a copy of this [X509MetadataEnvelope]
+  /// with given [validationSignature].
+  X509MetadataEnvelope<T> withValidationSignature(
+    Ed25519Signature validationSignature,
+  ) {
+    return X509MetadataEnvelope(
+      purpose: purpose,
+      txInputsHash: txInputsHash,
+      previousTransactionId: previousTransactionId,
+      chunkedData: chunkedData,
+      validationSignature: validationSignature,
+    );
   }
 
   static CborValue? _deserializeChunkedData(CborMap map) {

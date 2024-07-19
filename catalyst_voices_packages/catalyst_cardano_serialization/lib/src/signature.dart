@@ -77,7 +77,7 @@ extension type Ed25519PublicKey._(List<int> bytes) {
 }
 
 /// The Ed25519 private key that is 256 bits long.
-/// 
+///
 /// The [bytes] are the seed required by the Ed25519 algorithm.
 extension type Ed25519PrivateKey._(List<int> bytes) {
   /// The length of the [Ed25519PrivateKey] in bytes.
@@ -165,8 +165,8 @@ extension type Ed25519Signature._(List<int> bytes) {
   /// Returns a hex representation of the [Ed25519Signature].
   String toHex() => hex.encode(bytes);
 
-  /// Returns if this signature belongs to a given [publicKey]
-  /// for given [message].
+  /// Returns true if this signature belongs to a given [publicKey]
+  /// for given [message], false otherwise.
   Future<bool> verify(
     List<int> message, {
     required Ed25519PublicKey publicKey,
