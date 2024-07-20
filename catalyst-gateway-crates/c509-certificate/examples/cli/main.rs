@@ -43,7 +43,7 @@ enum Commands {
         /// JSON file with information to create C509 certificate.
         #[clap(short = 'f', long)]
         json_file: PathBuf,
-        /// Optionsl output path that the generated C509 will be written to.
+        /// Optional output path that the generated C509 will be written to.
         #[clap(short, long)]
         output: Option<PathBuf>,
         /// Optional private key file, if provided, self-signed certificate will be

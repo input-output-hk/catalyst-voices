@@ -55,7 +55,7 @@ impl Extension {
     }
 }
 
-/// A helper struct to deserialize and serailize `Extension`.
+/// A helper struct to deserialize and serialize `Extension`.
 #[derive(Debug, Deserialize, Serialize)]
 struct Helper {
     /// OID string value
