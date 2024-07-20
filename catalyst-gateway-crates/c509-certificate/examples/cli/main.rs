@@ -43,9 +43,9 @@ enum Commands {
         /// JSON file with information to create C509 certificate.
         #[clap(short = 'f', long)]
         json_file: PathBuf,
-        /// Output of C509 certificate file.
+        /// Optionsl output path that the generated C509 will be written to.
         #[clap(short, long)]
-        output: PathBuf,
+        output: Option<PathBuf>,
         /// Optional private key file, if provided, self-signed certificate will be
         /// generated. Currently support only PEM format.
         #[clap(long)]
@@ -67,17 +67,17 @@ enum Commands {
 
     /// Decode C509 certificate back to JSON.
     Decode {
-        /// C509 certificate file
+        /// C509 certificate file.
         #[clap(short, long)]
         file: PathBuf,
-        /// Optional output path of C509 certificate information in JSON.
+        /// Optional output path of C509 certificate information in JSON format.
         #[clap(short, long)]
         output: Option<PathBuf>,
     },
 }
 
 impl Cli {
-    /// Execute the command.
+    /// Function to execute the commands.
     pub(crate) fn exec(self) -> anyhow::Result<()> {
         match self.command {
             Some(Commands::Generate {
@@ -105,7 +105,7 @@ impl Cli {
 struct C509Json {
     /// Indicate whether the certificate is self-signed.
     self_signed: bool,
-    /// Certificate type, if not provided, set to 0 as self-signed.
+    /// Optional certificate type, if not provided, set to 0 as self-signed.
     certificate_type: Option<u8>,
     /// Optional serial number of the certificate,
     /// if not provided, a random number will be generated.
@@ -146,7 +146,8 @@ const SELF_SIGNED_INT: u8 = 0;
 
 /// A function to generate C509 certificate.
 fn generate(
-    file: &PathBuf, output: PathBuf, private_key: Option<&PrivateKey>, key_type: &Option<String>,
+    file: &PathBuf, output: Option<PathBuf>, private_key: Option<&PrivateKey>,
+    key_type: &Option<String>,
 ) -> anyhow::Result<()> {
     let data = fs::read_to_string(file)?;
     let c509_json: C509Json = serde_json::from_str(&data)?;
@@ -195,8 +196,10 @@ fn generate(
 
     let cert = c509_certificate::generate(&tbs, private_key)?;
 
-    // Write signed certificate to output file
-    write_to_output_file(output, &cert)?;
+    // If the output path is provided, write to the file
+    if let Some(output) = output {
+        write_to_output_file(output, &cert)?;
+    };
 
     println!("Hex: {:?}", hex::encode(&cert));
     println!("Bytes: {:?}", &cert);
