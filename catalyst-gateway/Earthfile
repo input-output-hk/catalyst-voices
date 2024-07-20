@@ -1,7 +1,7 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.1.17 AS rust-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:v3.1.17 AS mithril-snapshot-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.1.18 AS rust-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:v3.1.18 AS mithril-snapshot-ci
 
 #cspell: words rustfmt toolsets USERARCH
 
@@ -40,7 +40,7 @@ build:
         --args2="--cov_report=$HOME/coverage-report.info" \
         --output="release/cat-gateway" \
         --junit="cat-gateway.junit-report.xml" \
-        --coverage="cat-gateway.coverage-report.info" \
+        --coverage="cat-gateway.coverage.info" \
         --docs="true"
 
     # Generate the OpenAPI doc from the cat-gateway executable itself.

@@ -11,6 +11,6 @@ target/
 *.pdb
 
 # Build artifacts
-cat-gateway.coverage-report.info
+cat-gateway.coverage.info
 cat-gateway.junit-report.xml
 cat-gateway-api.*
