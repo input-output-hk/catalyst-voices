@@ -3,7 +3,7 @@ import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 
 /// Defines the X509 Role Based Access Control transaction metadata.
-final class RbacMetadata extends Equatable {
+final class RegistrationData extends Equatable {
   /// Un-ordered List of DER encoded x509 certificates.
   final List<X509DerCertificate>? derCerts;
 
@@ -22,8 +22,8 @@ final class RbacMetadata extends Equatable {
   /// Set of role registration data.
   final Set<RoleData>? roleDataSet;
 
-  /// The default constructor for [RbacMetadata].
-  const RbacMetadata({
+  /// The default constructor for [RegistrationData].
+  const RegistrationData({
     this.derCerts,
     this.cborCerts,
     this.publicKeys,
@@ -32,7 +32,7 @@ final class RbacMetadata extends Equatable {
   });
 
   /// Deserializes the type from cbor.
-  factory RbacMetadata.fromCbor(CborValue value) {
+  factory RegistrationData.fromCbor(CborValue value) {
     final map = value as CborMap;
     final derCerts = map[const CborSmallInt(10)] as CborList?;
     final cborCerts = map[const CborSmallInt(20)] as CborList?;
@@ -40,7 +40,7 @@ final class RbacMetadata extends Equatable {
     final revocationSet = map[const CborSmallInt(40)] as CborList?;
     final roleDataSet = map[const CborSmallInt(50)] as CborList?;
 
-    return RbacMetadata(
+    return RegistrationData(
       derCerts: derCerts?.map(X509DerCertificate.fromCbor).toList(),
       cborCerts: cborCerts?.map(C509Certificate.fromCbor).toList(),
       publicKeys: publicKeys?.map(Ed25519PublicKey.fromCbor).toList(),
