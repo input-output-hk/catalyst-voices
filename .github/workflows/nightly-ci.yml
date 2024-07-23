@@ -51,13 +51,13 @@ jobs:
             aws_region: ${{ env.AWS_REGION }}
             earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
 
-      - name: Get catalyst gateway unit test report
+      - name: Get python api test report
         uses: input-output-hk/catalyst-ci/actions/run@master
         if: always()
         continue-on-error: true
         with:
-            earthfile: ./catalyst-gateway/tests/api_tests
-            flags:
+            earthfile: ./catalyst-gateway/tests/api_tests/
+            flags: --allow-privileged
             targets: nightly-test
             target_flags:
             runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
