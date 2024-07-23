@@ -264,9 +264,11 @@ fn get_key_type(key_type: &Option<String>) -> anyhow::Result<(Oid<'static>, Opti
 /// Parse date string to i64.
 fn parse_or_default_date(date_option: Option<String>, default: i64) -> Result<i64, anyhow::Error> {
     match date_option {
-        Some(date) => DateTime::parse_from_rfc3339(&date)
-            .map(|dt| dt.timestamp())
-            .map_err(|e| anyhow::anyhow!(format!("Failed to parse date {date}: {e}",))),
+        Some(date) => {
+            DateTime::parse_from_rfc3339(&date)
+                .map(|dt| dt.timestamp())
+                .map_err(|e| anyhow::anyhow!(format!("Failed to parse date {date}: {e}",)))
+        },
         None => Ok(default),
     }
 }
