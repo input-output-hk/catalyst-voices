@@ -1,5 +1,7 @@
 import json
 from loguru import logger
+import pytest
+
 from api_tests import (
     check_is_live,
     check_is_ready,
@@ -8,7 +10,7 @@ from api_tests import (
     utils,
 )
 
-
+@pytest.mark.nightly
 def test_staked_ada_endpoint():
     check_is_live()
     check_is_ready()

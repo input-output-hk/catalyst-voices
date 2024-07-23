@@ -1,4 +1,6 @@
 from loguru import logger
+import pytest
+
 from api_tests import (
     check_is_live,
     check_is_ready,
@@ -7,7 +9,7 @@ from api_tests import (
 )
 from datetime import datetime, timezone
 
-
+@pytest.mark.nightly
 def test_date_time_to_slot_number_endpoint():
     check_is_live()
     check_is_ready()
