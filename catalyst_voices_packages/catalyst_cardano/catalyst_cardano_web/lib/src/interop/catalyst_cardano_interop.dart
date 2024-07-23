@@ -46,7 +46,7 @@ extension type JSCardanoWalletApi(JSObject _) implements JSObject {
   external JSPromise<JSString> getBalance();
 
   /// See [CardanoWalletApi.getExtensions].
-  external JSPromise<JSArray<JSCipExtension>> getExtensions();
+  external JSPromise<JSArray<JSCipExtension>>? getExtensions();
 
   /// See [CardanoWalletApi.getNetworkId].
   external JSPromise<JSNumber> getNetworkId();

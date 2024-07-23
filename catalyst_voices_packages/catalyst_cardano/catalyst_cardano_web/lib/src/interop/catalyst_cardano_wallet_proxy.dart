@@ -78,10 +78,10 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   @override
   Future<List<CipExtension>> getExtensions() async {
     try {
-      return await _delegate
-          .getExtensions()
-          .toDart
-          .then((array) => array.toDart.map((item) => item.toDart).toList());
+      return await _delegate.getExtensions()?.toDart.then(
+                (array) => array.toDart.map((item) => item.toDart).toList(),
+              ) ??
+          const [CipExtension(cip: 30)];
     } catch (ex) {
       throw _mapApiException(ex) ?? _fallbackApiException(ex);
     }
