@@ -12,7 +12,7 @@ function _getWallets() {
 }
 
 // Returns an instance of `undefined` to dart layer as `undefined`
-// cannot be constructed in dart layer. Dart nulls are translated
+// cannot be constructed directly in dart layer. Dart nulls are translated
 // to JS nulls and JS distinguishes between undefined and null.
 function _makeUndefined() {
     return undefined;
