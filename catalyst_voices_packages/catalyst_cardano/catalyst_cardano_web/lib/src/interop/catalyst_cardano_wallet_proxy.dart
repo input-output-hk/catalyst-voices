@@ -7,12 +7,12 @@ import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 
 /// Error message in exception thrown when trying
-/// to execute which doesn't exist in JS layer.
+/// to execute a method which doesn't exist in JS layer.
 ///
 /// Notably some wallet extensions decided not to implement
 /// some method even if they are required by the CIP-30 standard.
 ///
-/// We need to detect that.
+/// Checking for this error messages allows to detect unimplemented method.
 const _noSuchMethodError = 'NoSuchMethodError';
 
 /// The minimal set of wallet extensions that
