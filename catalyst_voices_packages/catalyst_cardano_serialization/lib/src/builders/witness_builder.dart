@@ -1,4 +1,5 @@
 import 'package:catalyst_cardano_serialization/src/exceptions.dart';
+import 'package:catalyst_cardano_serialization/src/signature.dart';
 import 'package:catalyst_cardano_serialization/src/witness.dart';
 import 'package:equatable/equatable.dart';
 
