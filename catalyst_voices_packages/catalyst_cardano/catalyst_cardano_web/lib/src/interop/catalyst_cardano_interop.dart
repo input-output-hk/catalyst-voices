@@ -6,6 +6,13 @@ import 'dart:js_interop';
 import 'package:catalyst_cardano_platform_interface/catalyst_cardano_platform_interface.dart';
 import 'package:catalyst_cardano_web/src/interop/catalyst_cardano_wallet_proxy.dart';
 
+/// Returns a JS undefined object.
+///
+/// Use this function to obtain an instance of `undefined`
+/// when you need to distinguish between `null` and `undefined`.
+@JS()
+external JSAny? makeUndefined();
+
 /// Lists all injected Cardano wallet extensions that are reachable
 /// via window.cardano.{walletName} in javascript.
 @JS()
@@ -23,7 +30,7 @@ extension type JSCardanoWallet(JSObject _) implements JSObject {
   external JSString get apiVersion;
 
   /// See [CardanoWallet.supportedExtensions].
-  external JSArray<JSCipExtension> get supportedExtensions;
+  external JSArray<JSCipExtension>? get supportedExtensions;
 
   /// See [CardanoWallet.isEnabled].
   external JSPromise<JSBoolean> isEnabled();
@@ -62,13 +69,13 @@ extension type JSCardanoWalletApi(JSObject _) implements JSObject {
 
   /// See [CardanoWalletApi.getUsedAddresses].
   external JSPromise<JSArray<JSString>> getUsedAddresses([
-    JSPaginate? paginate,
+    JSAny? paginate,
   ]);
 
   /// See [CardanoWalletApi.getUtxos].
   external JSPromise<JSArray<JSString>> getUtxos([
-    JSNumber? amount,
-    JSPaginate? paginate,
+    JSAny? amount,
+    JSAny? paginate,
   ]);
 
   /// See [CardanoWalletApi.signData].

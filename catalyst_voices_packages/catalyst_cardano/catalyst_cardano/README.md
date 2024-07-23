@@ -83,7 +83,11 @@ Future<void> main() async {
   print(await api.getUsedAddresses());
 
   final unsignedTx = _buildUnsignedTx(
-    utxos: await api.getUtxos(amount: const Coin(1000000)),
+    utxos: await api.getUtxos(
+      amount: const Balance(
+        coin: Coin(1000000),
+      ),
+    ),
     changeAddress: await api.getChangeAddress(),
   );
 
