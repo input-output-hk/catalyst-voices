@@ -132,6 +132,9 @@ struct C509Json {
     /// Optional issuer signature algorithm of the certificate,
     /// if not provided, set to Ed25519.
     issuer_signature_algorithm: Option<IssuerSignatureAlgorithm>,
+    /// Optional issuer signature value of the certificate.
+    #[serde(skip_deserializing)]
+    issuer_signature_value: Option<Vec<u8>>,
 }
 
 /// Ed25519 oid and parameter - default algorithm.
@@ -261,11 +264,9 @@ fn get_key_type(key_type: &Option<String>) -> anyhow::Result<(Oid<'static>, Opti
 /// Parse date string to i64.
 fn parse_or_default_date(date_option: Option<String>, default: i64) -> Result<i64, anyhow::Error> {
     match date_option {
-        Some(date) => {
-            DateTime::parse_from_rfc3339(&date)
-                .map(|dt| dt.timestamp())
-                .map_err(|e| anyhow::anyhow!(format!("Failed to parse date {date}: {e}",)))
-        },
+        Some(date) => DateTime::parse_from_rfc3339(&date)
+            .map(|dt| dt.timestamp())
+            .map_err(|e| anyhow::anyhow!(format!("Failed to parse date {date}: {e}",))),
         None => Ok(default),
     }
 }
@@ -311,6 +312,7 @@ fn decode(file: &PathBuf, output: Option<PathBuf>) -> anyhow::Result<()> {
         subject_public_key: tbs_cert.get_subject_public_key().encode_hex(),
         extensions: tbs_cert.get_extensions().clone(),
         issuer_signature_algorithm: Some(tbs_cert.get_issuer_signature_algorithm().clone()),
+        issuer_signature_value: c509.get_issuer_signature_value().clone(),
     };
 
     let data = serde_json::to_string(&c509_json)?;
