@@ -20,11 +20,12 @@ class JSCardanoWalletProxy implements CardanoWallet {
   String get icon => _delegate.icon.toDart;
 
   @override
-  String? get apiVersion => _delegate.apiVersion?.toDart;
+  String get apiVersion => _delegate.apiVersion?.toDart ?? '0.1.0';
 
   @override
   List<CipExtension> get supportedExtensions =>
-      _delegate.supportedExtensions.toDart.map((e) => e.toDart).toList();
+      _delegate.supportedExtensions?.toDart.map((e) => e.toDart).toList() ??
+      const [CipExtension(cip: 30)];
 
   @override
   Future<bool> isEnabled() async {

@@ -23,7 +23,7 @@ abstract interface class CardanoWallet {
   String get icon;
 
   /// The version number of the API that the wallet supports.
-  String? get apiVersion;
+  String get apiVersion;
 
   /// A list of extensions supported by the wallet.
   ///

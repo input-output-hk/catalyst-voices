@@ -5,7 +5,7 @@ function _getWallets() {
     if (cardano) {
         const keys = Object.keys(window.cardano);
         const possibleWallets = keys.map((k) => cardano[k]);
-        return possibleWallets.filter((w) => typeof w === "object" && "enable" in w);
+        return possibleWallets.filter((w) => typeof w === "object" && "enable" in w && "apiVersion" in w);
     }
 
     return [];
