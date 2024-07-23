@@ -75,7 +75,9 @@ Future<void> _signAndSubmitRbacTx({
     final changeAddress = await api.getChangeAddress();
 
     final utxos = await api.getUtxos(
-      amount: const Coin(1000000),
+      amount: const Balance(
+        coin: Coin(1000000),
+      ),
     );
 
     final x509Envelope = await _buildMetadataEnvelope(
