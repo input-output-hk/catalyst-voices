@@ -185,6 +185,7 @@ trait ExtensionValueTypeTrait {
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, EnumDiscriminants, Deserialize, Serialize)]
 #[strum_discriminants(name(ExtensionValueType))]
+#[serde(rename_all = "snake_case")]
 pub enum ExtensionValue {
     /// An Integer in the range [-2^64, 2^64-1]
     Int(i64),

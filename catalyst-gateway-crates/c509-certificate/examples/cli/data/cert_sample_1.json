@@ -5,7 +5,7 @@
 	"issuer": [
 		{
 			"oid": "2.5.4.3",
-			"value": [{ "Text": "RFC test CA" }]
+			"value": [{ "text": "RFC test CA" }]
 		}
 	],
 	"validity_not_before": null,
@@ -13,7 +13,7 @@
 	"subject": [
 		{
 			"oid": "2.5.4.3",
-			"value": [{ "Text": "01-23-45-FF-FE-67-89-AB" }]
+			"value": [{ "text": "01-23-45-FF-FE-67-89-AB" }]
 		}
 	],
 	"subject_public_key_algorithm": null,
@@ -21,7 +21,7 @@
 	"extensions": [
 		{
 			"oid": "2.5.29.15",
-			"value": { "Int": 1 },
+			"value": { "int": 1 },
 			"critical": false
 		}
 	],

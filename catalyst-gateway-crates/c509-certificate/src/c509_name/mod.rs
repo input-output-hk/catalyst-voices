@@ -74,6 +74,7 @@ impl Decode<'_, ()> for Name {
 
 /// An enum of possible value types for `Name`.
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
 pub enum NameValue {
     /// A relative distinguished name.
     RelativeDistinguishedName(RelativeDistinguishedName),

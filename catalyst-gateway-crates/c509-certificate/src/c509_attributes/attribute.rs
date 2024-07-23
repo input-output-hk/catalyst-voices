@@ -182,6 +182,7 @@ impl Decode<'_, ()> for Attribute {
 /// An enum of possible value types for `Attribute`.
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
 pub enum AttributeValue {
     /// A text string.
     Text(String),

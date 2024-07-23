@@ -11,6 +11,7 @@ use crate::{
 
 /// A struct represents a To Be Signed Certificate (TBS Certificate).
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
 pub struct TbsCert {
     /// Certificate type.
     c509_certificate_type: u8,
