@@ -97,7 +97,11 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       setState(() => _isLoading = true);
       final api = await wallet.enable(
-        extensions: const [CipExtension(cip: 95)],
+        extensions: [
+          const CipExtension(cip: 30),
+          if (wallet.supportedExtensions.contains(const CipExtension(cip: 95)))
+            const CipExtension(cip: 95),
+        ],
       );
       setState(() => _api = api);
     } catch (error) {
@@ -272,21 +276,21 @@ class _WalletDetailsState extends State<_WalletDetails> {
         });
       }
 
-      if (extensions.contains(const CipExtension(cip: 95))) {
-        final pubDRepKey = await widget.api.cip95.getPubDRepKey();
-        final registeredPubStakeKeys =
-            await widget.api.cip95.getRegisteredPubStakeKeys();
-        final unregisteredPubStakeKeys =
-            await widget.api.cip95.getUnregisteredPubStakeKeys();
+      // if (extensions.contains(const CipExtension(cip: 95))) {
+      //   final pubDRepKey = await widget.api.cip95.getPubDRepKey();
+      //   final registeredPubStakeKeys =
+      //       await widget.api.cip95.getRegisteredPubStakeKeys();
+      //   final unregisteredPubStakeKeys =
+      //       await widget.api.cip95.getUnregisteredPubStakeKeys();
 
-        if (mounted) {
-          setState(() {
-            _pubDRepKey = pubDRepKey;
-            _registeredPubStakeKeys = registeredPubStakeKeys;
-            _unregisteredPubStakeKeys = unregisteredPubStakeKeys;
-          });
-        }
-      }
+      //   if (mounted) {
+      //     setState(() {
+      //       _pubDRepKey = pubDRepKey;
+      //       _registeredPubStakeKeys = registeredPubStakeKeys;
+      //       _unregisteredPubStakeKeys = unregisteredPubStakeKeys;
+      //     });
+      //   }
+      // }
     } catch (error) {
       if (mounted) {
         await _showDialog(
