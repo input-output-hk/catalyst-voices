@@ -14,7 +14,11 @@ A collection of Catalyst packages and plugins for Flutter and Dart.
 
 | Name | Pub | Documentation | Android | iOS | Web | macOS | Windows | Linux |
 |--------|-----|---------------| ------- |-----|-------|-----|---------|-------|
-| [catalyst_analysis](packages/catalyst_analysis) | ![pub package](https://img.shields.io/pub/v/catalyst_analysis.svg) | TODO |✔️| ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ |
+| [`catalyst_cardano_serialization`](packages/catalyst_cardano_serialization) | ![pub package](https://img.shields.io/pub/v/catalyst_cardano_serialization.svg) | [📖](https://pub.dev/documentation/catalyst_cardano_serialization/latest/catalyst_cardano_serialization/catalyst_cardano_serialization-library.html) |✔️| ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ |
+| [`catalyst_analysis`](packages/catalyst_analysis) | ![pub package](https://img.shields.io/pub/v/catalyst_analysis.svg) | [📖](https://pub.dev/documentation/catalyst_analysis/latest/) |✔️| ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ |
+| [`catalyst_cardano`](packages/catalyst_cardano) | ![pub package](https://img.shields.io/pub/v/catalyst_cardano.svg) | [📖](https://pub.dev/documentation/catalyst_cardano/latest/catalyst_cardano/catalyst_cardano-library.html) |✔️| ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ |
+| [`catalyst_cardano_platform_interface`](packages/catalyst_cardano_platform_interface) | ![pub package](https://img.shields.io/pub/v/catalyst_cardano_platform_interface.svg) | [📖](https://pub.dev/documentation/catalyst_cardano_platform_interface/latest/catalyst_cardano_platform_interface/catalyst_cardano_platform_interface-library.html) |✔️| ✔️ | ✔️ | ✔️ | ✔️ | ✔️ | ✔️ |
+| [`catalyst_cardano_web`](packages/catalyst_cardano_web) | ![pub package](https://img.shields.io/pub/v/catalyst_cardano_web.svg) | [📖](https://pub.dev/documentation/catalyst_cardano_web/latest/catalyst_cardano_web/catalyst_cardano_web-library.html) |N/A| N/A | ✔️ | N/A | N/A | N/A | N/A |
 
 ## Requirements
 
