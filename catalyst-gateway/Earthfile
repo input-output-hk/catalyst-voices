@@ -75,7 +75,7 @@ package-cat-gateway:
 
 # package-cat-gateway : Create a deployable container for catalyst-gateway
 # And bundle a Mithril snapshot of cardano preprod
-package-cat-gateway-with-preprod:
+nightly-package-cat-gateway-with-preprod:
     ARG tag="latest"
 
     FROM +package-cat-gateway
