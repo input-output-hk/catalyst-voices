@@ -4,7 +4,6 @@ use std::{
     fs::{self, File},
     io::Write,
     path::PathBuf,
-    str::FromStr,
 };
 
 use asn1_rs::{oid, Oid};
@@ -19,24 +18,16 @@ use c509_certificate::{
     tbs_cert::TbsCert,
 };
 use chrono::{DateTime, Utc};
-use clap::{Parser, Subcommand};
+use clap::Parser;
 use hex::ToHex;
 use minicbor::Decode;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 
-/// A struct for CLI.
+/// Commands for C509 certificate generation, verification and decoding
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
-struct Cli {
-    /// Optional subcommands.
-    #[command(subcommand)]
-    command: Option<Commands>,
-}
-
-/// Commands for C509 certificate generation, verification and decoding
-#[derive(Subcommand)]
-enum Commands {
+enum Cli {
     /// Generate C509 certificate, if private key is provided, self-signed certificate
     /// will be generated.
     Generate {
@@ -78,14 +69,16 @@ enum Commands {
 
 impl Cli {
     /// Function to execute the commands.
-    pub(crate) fn exec(self) -> anyhow::Result<()> {
-        match self.command {
-            Some(Commands::Generate {
+    pub(crate) fn exec() -> anyhow::Result<()> {
+        let cli = Cli::parse();
+
+        match cli {
+            Cli::Generate {
                 json_file,
                 output,
                 private_key,
                 key_type,
-            }) => {
+            } => {
                 let sk = match private_key {
                     Some(key) => Some(PrivateKey::from_file(key)?),
                     None => None,
@@ -93,9 +86,8 @@ impl Cli {
 
                 generate(&json_file, output, sk.as_ref(), &key_type)
             },
-            Some(Commands::Verify { file, public_key }) => verify(&file, public_key),
-            Some(Commands::Decode { file, output }) => decode(&file, output),
-            None => Err(anyhow::anyhow!("No command provided")),
+            Cli::Verify { file, public_key } => verify(&file, public_key),
+            Cli::Decode { file, output } => decode(&file, output),
         }
     }
 }
@@ -124,7 +116,7 @@ struct C509Json {
     /// Optional subject public key algorithm of the certificate,
     /// if not provided, set to Ed25519.
     subject_public_key_algorithm: Option<SubjectPubKeyAlgorithm>,
-    /// A public key string or path to the public key file.
+    /// A path to the public key file.
     /// Currently support only PEM format.
     subject_public_key: String,
     /// Extensions of the certificate.
@@ -243,14 +235,10 @@ fn validate_certificate_type(
     Ok(())
 }
 
-/// Parse public key from file path or string.
+/// Parse public key from file path.
 fn parse_public_key(public_key: &str) -> anyhow::Result<PublicKey> {
     let pk_path = PathBuf::from(public_key);
-    if pk_path.is_file() {
-        PublicKey::from_file(pk_path)
-    } else {
-        FromStr::from_str(public_key)
-    }
+    PublicKey::from_file(pk_path)
 }
 
 /// Get the key type. Currently support only Ed25519.
@@ -311,6 +299,7 @@ fn decode(file: &PathBuf, output: Option<PathBuf>) -> anyhow::Result<()> {
         validity_not_after: Some(time_to_string(tbs_cert.get_validity_not_after().to_i64())?),
         subject: extract_relative_distinguished_name(tbs_cert.get_subject())?,
         subject_public_key_algorithm: Some(tbs_cert.get_subject_public_key_algorithm().clone()),
+        // Return a hex formation of the public key
         subject_public_key: tbs_cert.get_subject_public_key().encode_hex(),
         extensions: tbs_cert.get_extensions().clone(),
         issuer_signature_algorithm: Some(tbs_cert.get_issuer_signature_algorithm().clone()),
@@ -345,6 +334,5 @@ fn time_to_string(time: i64) -> anyhow::Result<String> {
 // -------------------main-----------------------
 
 fn main() -> anyhow::Result<()> {
-    let cli = Cli::parse();
-    cli.exec()
+    Cli::exec()
 }
