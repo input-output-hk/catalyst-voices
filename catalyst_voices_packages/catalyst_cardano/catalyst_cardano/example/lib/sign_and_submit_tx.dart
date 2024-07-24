@@ -9,7 +9,9 @@ Future<void> _signAndSubmitTx({
     final changeAddress = await api.getChangeAddress();
 
     final utxos = await api.getUtxos(
-      amount: const Coin(1000000),
+      amount: const Balance(
+        coin: Coin(1000000),
+      ),
     );
 
     final unsignedTx = _buildUnsignedTx(

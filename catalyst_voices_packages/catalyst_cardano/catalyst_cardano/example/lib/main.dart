@@ -97,7 +97,11 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       setState(() => _isLoading = true);
       final api = await wallet.enable(
-        extensions: const [CipExtension(cip: 95)],
+        extensions: [
+          const CipExtension(cip: 30),
+          if (wallet.supportedExtensions.contains(const CipExtension(cip: 95)))
+            const CipExtension(cip: 95),
+        ],
       );
       setState(() => _api = api);
     } catch (error) {
