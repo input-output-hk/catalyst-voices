@@ -3,6 +3,65 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-07-24
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - There are no breaking changes in this release.
+
+Packages with other changes:
+
+ - [`catalyst_cardano` - `v0.1.3`](#catalyst_cardano---v013)
+ - [`catalyst_cardano_platform_interface` - `v0.1.3`](#catalyst_cardano_platform_interface---v013)
+ - [`catalyst_cardano_serialization` - `v0.1.3`](#catalyst_cardano_serialization---v013)
+ - [`catalyst_cardano_web` - `v0.1.3`](#catalyst_cardano_web---v013)
+ - [`catalyst_compression` - `v0.1.1`](#catalyst_compression---v011)
+ - [`catalyst_compression_platform_interface` - `v0.1.1`](#catalyst_compression_platform_interface---v011)
+ - [`catalyst_compression_web` - `v0.1.1`](#catalyst_compression_web---v011)
+
+---
+
+#### `catalyst_cardano` - `v0.1.3`
+
+ - **FIX**: catalyst cardano integration with Typhoon wallet ([#636](https://github.com/input-output-hk/catalyst-voices/issues/636)). ([2c6e270d](https://github.com/input-output-hk/catalyst-voices/commit/2c6e270ddcb95389ac417ffe5f60ccabc04b5931))
+ - **FEAT**: rbac metadata envelope ([#630](https://github.com/input-output-hk/catalyst-voices/issues/630)). ([150d5676](https://github.com/input-output-hk/catalyst-voices/commit/150d567636c4281c092d020d51882e638b16beb5))
+ - **FEAT**: catalyst compression - brotli/zstd ([#626](https://github.com/input-output-hk/catalyst-voices/issues/626)). ([2b8e7d72](https://github.com/input-output-hk/catalyst-voices/commit/2b8e7d7239f9982aa7144a676a86d21b97f912fb))
+ - **FEAT**: automate melos release ([#593](https://github.com/input-output-hk/catalyst-voices/issues/593)). ([7e4bf294](https://github.com/input-output-hk/catalyst-voices/commit/7e4bf294a81c8aa73a91170969d2189201869aa0))
+
+#### `catalyst_cardano_platform_interface` - `v0.1.3`
+
+ - **FIX**: catalyst cardano integration with Typhoon wallet ([#636](https://github.com/input-output-hk/catalyst-voices/issues/636)). ([2c6e270d](https://github.com/input-output-hk/catalyst-voices/commit/2c6e270ddcb95389ac417ffe5f60ccabc04b5931))
+ - **FEAT**: automate melos release ([#593](https://github.com/input-output-hk/catalyst-voices/issues/593)). ([7e4bf294](https://github.com/input-output-hk/catalyst-voices/commit/7e4bf294a81c8aa73a91170969d2189201869aa0))
+
+#### `catalyst_cardano_serialization` - `v0.1.3`
+
+ - **FEAT**: rbac metadata envelope ([#630](https://github.com/input-output-hk/catalyst-voices/issues/630)). ([150d5676](https://github.com/input-output-hk/catalyst-voices/commit/150d567636c4281c092d020d51882e638b16beb5))
+ - **FEAT**: rbac metadata ([#619](https://github.com/input-output-hk/catalyst-voices/issues/619)). ([daf24a15](https://github.com/input-output-hk/catalyst-voices/commit/daf24a15a0b8d6345131ca8e3ec33c92865af4f8))
+ - **FEAT**: add required signers ([#605](https://github.com/input-output-hk/catalyst-voices/issues/605)). ([bebc0fbd](https://github.com/input-output-hk/catalyst-voices/commit/bebc0fbd241b6370b31b91e5a60b1d5d30cec403))
+ - **FEAT**: automate melos release ([#593](https://github.com/input-output-hk/catalyst-voices/issues/593)). ([7e4bf294](https://github.com/input-output-hk/catalyst-voices/commit/7e4bf294a81c8aa73a91170969d2189201869aa0))
+
+#### `catalyst_cardano_web` - `v0.1.3`
+
+ - **FIX**: catalyst cardano integration with Typhoon wallet ([#636](https://github.com/input-output-hk/catalyst-voices/issues/636)). ([2c6e270d](https://github.com/input-output-hk/catalyst-voices/commit/2c6e270ddcb95389ac417ffe5f60ccabc04b5931))
+ - **FEAT**: automate melos release ([#593](https://github.com/input-output-hk/catalyst-voices/issues/593)). ([7e4bf294](https://github.com/input-output-hk/catalyst-voices/commit/7e4bf294a81c8aa73a91170969d2189201869aa0))
+
+#### `catalyst_compression` - `v0.1.1`
+
+ - **FEAT**: catalyst compression - brotli/zstd ([#626](https://github.com/input-output-hk/catalyst-voices/issues/626)). ([2b8e7d72](https://github.com/input-output-hk/catalyst-voices/commit/2b8e7d7239f9982aa7144a676a86d21b97f912fb))
+
+#### `catalyst_compression_platform_interface` - `v0.1.1`
+
+ - **FEAT**: catalyst compression - brotli/zstd ([#626](https://github.com/input-output-hk/catalyst-voices/issues/626)). ([2b8e7d72](https://github.com/input-output-hk/catalyst-voices/commit/2b8e7d7239f9982aa7144a676a86d21b97f912fb))
+
+#### `catalyst_compression_web` - `v0.1.1`
+
+ - **FEAT**: catalyst compression - brotli/zstd ([#626](https://github.com/input-output-hk/catalyst-voices/issues/626)). ([2b8e7d72](https://github.com/input-output-hk/catalyst-voices/commit/2b8e7d7239f9982aa7144a676a86d21b97f912fb))
+
+
 ## 2024-07-04
 
 ### Changes

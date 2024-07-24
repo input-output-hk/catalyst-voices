@@ -3,7 +3,7 @@ description: A common platform interface for the catalyst_compression plugin.
 repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices_packages/catalyst_compression/catalyst_compression_platform_interface
 issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
 topics: [compression, codec]
-version: 0.1.0
+version: 0.1.1
 
 environment:
   sdk: ">=3.3.4 <4.0.0"
