@@ -6,6 +6,19 @@ import 'package:catalyst_cardano_web/src/interop/catalyst_cardano_interop.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 
+/// Error message in exception thrown when trying
+/// to execute a method which doesn't exist in JS layer.
+///
+/// Notably some wallet extensions decided not to implement
+/// some method even if they are required by the CIP-30 standard.
+///
+/// Checking for this error messages allows to detect unimplemented method.
+const _noSuchMethodError = 'NoSuchMethodError';
+
+/// The minimal set of wallet extensions that
+/// must be supported by every wallet extension.
+const _fallbackExtensions = [CipExtension(cip: 30)];
+
 /// A wrapper around [JSCardanoWallet] that translates between JS/dart layers.
 class JSCardanoWalletProxy implements CardanoWallet {
   final JSCardanoWallet _delegate;
@@ -24,7 +37,8 @@ class JSCardanoWalletProxy implements CardanoWallet {
 
   @override
   List<CipExtension> get supportedExtensions =>
-      _delegate.supportedExtensions.toDart.map((e) => e.toDart).toList();
+      _delegate.supportedExtensions?.toDart.map((e) => e.toDart).toList() ??
+      _fallbackExtensions;
 
   @override
   Future<bool> isEnabled() async {
@@ -77,11 +91,14 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   @override
   Future<List<CipExtension>> getExtensions() async {
     try {
-      return await _delegate
-          .getExtensions()
-          .toDart
-          .then((array) => array.toDart.map((item) => item.toDart).toList());
+      return await _delegate.getExtensions().toDart.then(
+            (array) => array.toDart.map((item) => item.toDart).toList(),
+          );
     } catch (ex) {
+      if (ex.toString().contains(_noSuchMethodError)) {
+        return _fallbackExtensions;
+      }
+
       throw _mapApiException(ex) ?? _fallbackApiException(ex);
     }
   }
@@ -139,7 +156,7 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   Future<List<ShelleyAddress>> getUsedAddresses({Paginate? paginate}) async {
     try {
       final jsPaginate =
-          paginate != null ? JSPaginate.fromDart(paginate) : null;
+          paginate != null ? JSPaginate.fromDart(paginate) : makeUndefined();
 
       return await _delegate.getUsedAddresses(jsPaginate).toDart.then(
             (array) => array.toDart
@@ -155,14 +172,16 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
 
   @override
   Future<List<TransactionUnspentOutput>> getUtxos({
-    Coin? amount,
+    Balance? amount,
     Paginate? paginate,
   }) async {
     try {
       return await _delegate
           .getUtxos(
-            amount?.value.toJS,
-            paginate != null ? JSPaginate.fromDart(paginate) : null,
+            amount != null
+                ? hex.encode(cbor.encode(amount.toCbor())).toJS
+                : makeUndefined(),
+            paginate != null ? JSPaginate.fromDart(paginate) : makeUndefined(),
           )
           .toDart
           .then(

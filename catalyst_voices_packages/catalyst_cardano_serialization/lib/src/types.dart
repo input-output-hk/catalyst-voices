@@ -88,6 +88,11 @@ final class Balance extends Equatable {
     this.multiAsset,
   });
 
+  /// Returns a zero [Balance] with no [coin] or [multiAsset].
+  const Balance.zero()
+      : coin = const Coin(0),
+        multiAsset = null;
+
   /// Deserializes the type from cbor.
   factory Balance.fromCbor(CborValue value) {
     final CborValue coin;

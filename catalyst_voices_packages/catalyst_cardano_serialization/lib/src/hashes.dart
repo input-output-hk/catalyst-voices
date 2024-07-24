@@ -92,6 +92,42 @@ final class TransactionHash extends BaseHash {
   int get length => _length;
 }
 
+/// Describes the Blake2b-256 hash of the transaction inputs (UTXOs)
+/// which can be used as a link to a certain transaction
+/// (as UTXOs can only be spent once).
+final class TransactionInputsHash extends BaseHash {
+  static const int _length = 32;
+
+  /// Constructs the [TransactionInputsHash] from raw [bytes].
+  TransactionInputsHash.fromBytes({required super.bytes}) : super.fromBytes();
+
+  /// Constructs the [TransactionInputsHash] from a hex string representation
+  /// of [bytes].
+  TransactionInputsHash.fromHex(super.string) : super.fromHex();
+
+  /// Constructs the [TransactionInputsHash] from a [TransactionBody].
+  TransactionInputsHash.fromTransactionInputs(
+    List<TransactionUnspentOutput> inputs,
+  ) : super.fromBytes(
+          bytes: Hash.blake2b(
+            Uint8List.fromList(
+              cbor.encode(
+                CborList([
+                  for (final input in inputs) input.toCbor(),
+                ]),
+              ),
+            ),
+            digestSize: _length,
+          ),
+        );
+
+  /// Deserializes the type from cbor.
+  TransactionInputsHash.fromCbor(super.value) : super.fromCbor();
+
+  @override
+  int get length => _length;
+}
+
 /// Describes the Blake2b-256 hash of auxiliary data which is included
 /// in the transaction body.
 final class AuxiliaryDataHash extends BaseHash {
