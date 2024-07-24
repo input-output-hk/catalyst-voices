@@ -107,12 +107,13 @@ impl EventDB {
     async fn search_total(
         search_query: SearchQuery, limit: Option<i64>, offset: Option<i64>,
     ) -> anyhow::Result<SearchResult> {
-        let rows: Vec<tokio_postgres::Row> = Self::query(
-            &Self::construct_count_query(&search_query),
-            &[&limit, &offset.unwrap_or(0)],
-        )
-        .await
-        .map_err(|_| NotFoundError)?;
+        let rows: Vec<tokio_postgres::Row> =
+            Self::query(&Self::construct_count_query(&search_query), &[
+                &limit,
+                &offset.unwrap_or(0),
+            ])
+            .await
+            .map_err(|_| NotFoundError)?;
         let row = rows.first().ok_or(NotFoundError)?;
 
         Ok(SearchResult {
@@ -125,10 +126,10 @@ impl EventDB {
     async fn search_events(
         search_query: SearchQuery, limit: Option<i64>, offset: Option<i64>,
     ) -> anyhow::Result<SearchResult> {
-        let rows: Vec<tokio_postgres::Row> = Self::query(
-            &Self::construct_query(&search_query),
-            &[&limit, &offset.unwrap_or(0)],
-        )
+        let rows: Vec<tokio_postgres::Row> = Self::query(&Self::construct_query(&search_query), &[
+            &limit,
+            &offset.unwrap_or(0),
+        ])
         .await
         .map_err(|_| NotFoundError)?;
 
@@ -164,10 +165,10 @@ impl EventDB {
     async fn search_objectives(
         &self, search_query: SearchQuery, limit: Option<i64>, offset: Option<i64>,
     ) -> anyhow::Result<SearchResult> {
-        let rows: Vec<tokio_postgres::Row> = Self::query(
-            &Self::construct_query(&search_query),
-            &[&limit, &offset.unwrap_or(0)],
-        )
+        let rows: Vec<tokio_postgres::Row> = Self::query(&Self::construct_query(&search_query), &[
+            &limit,
+            &offset.unwrap_or(0),
+        ])
         .await
         .map_err(|_| NotFoundError)?;
 
@@ -198,10 +199,10 @@ impl EventDB {
     async fn search_proposals(
         &self, search_query: SearchQuery, limit: Option<i64>, offset: Option<i64>,
     ) -> anyhow::Result<SearchResult> {
-        let rows: Vec<tokio_postgres::Row> = Self::query(
-            &Self::construct_query(&search_query),
-            &[&limit, &offset.unwrap_or(0)],
-        )
+        let rows: Vec<tokio_postgres::Row> = Self::query(&Self::construct_query(&search_query), &[
+            &limit,
+            &offset.unwrap_or(0),
+        ])
         .await
         .map_err(|_| NotFoundError)?;
 

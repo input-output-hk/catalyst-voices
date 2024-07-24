@@ -197,29 +197,31 @@ async fn process_blocks(
 
     loop {
         match follower.next().await {
-            Ok(chain_update) => match chain_update {
-                ChainUpdate::Block(data) => {
-                    if blocks_tx.send(data).await.is_err() {
-                        error!("Block indexing task not running");
-                        break;
-                    };
-                },
-                ChainUpdate::Rollback(data) => {
-                    let block = match data.decode() {
-                        Ok(block) => block,
-                        Err(err) => {
-                            error!("Unable to decode {network:?} block {err} - skip..");
-                            continue;
-                        },
-                    };
+            Ok(chain_update) => {
+                match chain_update {
+                    ChainUpdate::Block(data) => {
+                        if blocks_tx.send(data).await.is_err() {
+                            error!("Block indexing task not running");
+                            break;
+                        };
+                    },
+                    ChainUpdate::Rollback(data) => {
+                        let block = match data.decode() {
+                            Ok(block) => block,
+                            Err(err) => {
+                                error!("Unable to decode {network:?} block {err} - skip..");
+                                continue;
+                            },
+                        };
 
-                    info!(
-                        "Rollback block NUMBER={} SLOT={} HASH={}",
-                        block.number(),
-                        block.slot(),
-                        hex::encode(block.hash()),
-                    );
-                },
+                        info!(
+                            "Rollback block NUMBER={} SLOT={} HASH={}",
+                            block.number(),
+                            block.slot(),
+                            hex::encode(block.hash()),
+                        );
+                    },
+                }
             },
             Err(err) => {
                 error!(

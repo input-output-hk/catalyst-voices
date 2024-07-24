@@ -30,12 +30,14 @@ pub(crate) async fn endpoint(network: Option<Network>) -> AllResponses {
     let network = network.unwrap_or(Network::Mainnet);
 
     match EventDB::last_updated_state(network.into()).await {
-        Ok((slot_number, block_hash, last_updated)) => Responses::Ok(Json(SyncState {
-            slot_number,
-            block_hash: block_hash.into(),
-            last_updated,
-        }))
-        .into(),
+        Ok((slot_number, block_hash, last_updated)) => {
+            Responses::Ok(Json(SyncState {
+                slot_number,
+                block_hash: block_hash.into(),
+                last_updated,
+            }))
+            .into()
+        },
         Err(err) if err.is::<NotFoundError>() => Responses::NotFound.into(),
         Err(err) => AllResponses::handle_error(&err),
     }

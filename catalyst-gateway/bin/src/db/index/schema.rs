@@ -5,9 +5,8 @@ use handlebars::Handlebars;
 use serde_json::json;
 use tracing::error;
 
-use crate::settings::CassandraEnvVars;
-
 use super::session::CassandraSession;
+use crate::settings::CassandraEnvVars;
 
 /// Keyspace Create (Templated)
 const CREATE_NAMESPACE_CQL: &str = include_str!("./schema/namespace.cql");

@@ -3,8 +3,7 @@
 use std::sync::OnceLock;
 
 use clap::ValueEnum;
-use tracing::level_filters::LevelFilter;
-use tracing::log::error;
+use tracing::{level_filters::LevelFilter, log::error};
 use tracing_subscriber::{
     fmt::{self, format::FmtSpan, time},
     prelude::*,

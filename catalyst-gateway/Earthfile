@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.1.15 AS rust-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:feat/faster-rust-tool-install AS rust-ci
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:v3.1.15 AS mithril-snapshot-ci
 
 #cspell: words rustfmt toolsets USERARCH

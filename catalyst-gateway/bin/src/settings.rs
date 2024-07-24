@@ -25,9 +25,8 @@ use crate::{
         index::session::{CompressionChoice, TlsChoice},
     },
     logger::{self, LogLevel, LOG_LEVEL_DEFAULT},
+    service::utilities::net::{get_public_ipv4, get_public_ipv6},
 };
-
-use crate::service::utilities::net::{get_public_ipv4, get_public_ipv6};
 
 /// Default address to start service on.
 const ADDRESS_DEFAULT: &str = "0.0.0.0:3030";
@@ -73,7 +72,8 @@ const CASSANDRA_VOLATILE_DB_URL_DEFAULT: &str = "127.0.0.1:9042";
 /// Default Cassandra DB URL for the Persistent DB.
 const CASSANDRA_VOLATILE_DB_NAMESPACE_DEFAULT: &str = "volatile";
 
-/// Hash the Public IPv4 and IPv6 address of the machine, and convert to a 128 bit V4 UUID.
+/// Hash the Public IPv4 and IPv6 address of the machine, and convert to a 128 bit V4
+/// UUID.
 fn calculate_service_uuid() -> String {
     let mut hasher = Blake2b::new_keyed(16, "Catalyst-Gateway-Machine-UID".as_bytes());
 
@@ -306,9 +306,7 @@ impl StringEnvVar {
     fn new_as_enum<T: FromStr + Display + VariantNames>(
         var_name: &str, default: T, redacted: bool,
     ) -> T
-    where
-        <T as std::str::FromStr>::Err: std::fmt::Display,
-    {
+    where <T as std::str::FromStr>::Err: std::fmt::Display {
         let mut choices = String::new();
         for name in T::VARIANTS {
             if choices.is_empty() {
@@ -415,23 +413,20 @@ impl CassandraEnvVars {
             false,
         );
 
-        /*
-        let tls = match TlsChoice::from_str(
-            StringEnvVar::new(&format!("CASSANDRA_{name}_TLS"), "Disabled".into()).as_str(),
-        ) {
-            Ok(tls) => tls,
-            Err(error) => {
-                error!(error=%error, default=%TlsChoice::Disabled, "Invalid TLS choice. Using Default.");
-                TlsChoice::Disabled
-            },
-        };*/
+        // let tls = match TlsChoice::from_str(
+        // StringEnvVar::new(&format!("CASSANDRA_{name}_TLS"), "Disabled".into()).as_str(),
+        // ) {
+        // Ok(tls) => tls,
+        // Err(error) => {
+        // error!(error=%error, default=%TlsChoice::Disabled, "Invalid TLS choice. Using
+        // Default."); TlsChoice::Disabled
+        // },
+        // };
 
-        /*
-        let compression = CompressionChoice::from_str(
-            StringEnvVar::new(&format!("CASSANDRA_{name}_COMPRESSION"), "Lz4".into()).as_str(),
-        )
-        .unwrap_or(CompressionChoice::Lz4);
-        */
+        // let compression = CompressionChoice::from_str(
+        // StringEnvVar::new(&format!("CASSANDRA_{name}_COMPRESSION"), "Lz4".into()).as_str(),
+        // )
+        // .unwrap_or(CompressionChoice::Lz4);
 
         Self {
             url: StringEnvVar::new(&format!("CASSANDRA_{name}_URL"), url.into()),
@@ -691,13 +686,10 @@ impl Settings {
             ENV_VARS.github_repo_name.as_str()
         );
 
-        match Url::parse_with_params(
-            &path,
-            &[
-                ("template", ENV_VARS.github_issue_template.as_str()),
-                ("title", title),
-            ],
-        ) {
+        match Url::parse_with_params(&path, &[
+            ("template", ENV_VARS.github_issue_template.as_str()),
+            ("title", title),
+        ]) {
             Ok(url) => Some(url),
             Err(e) => {
                 error!("Failed to generate github issue url {:?}", e.to_string());
@@ -788,10 +780,9 @@ mod tests {
     #[test]
     fn configured_hosts_default() {
         let configured_hosts = Settings::api_host_names();
-        assert_eq!(
-            configured_hosts,
-            vec!["https://api.prod.projectcatalyst.io"]
-        );
+        assert_eq!(configured_hosts, vec![
+            "https://api.prod.projectcatalyst.io"
+        ]);
     }
 
     #[test]
@@ -800,13 +791,10 @@ mod tests {
             &SocketAddr::from(([127, 0, 0, 1], 8080)),
             "http://api.prod.projectcatalyst.io , https://api.dev.projectcatalyst.io:1234",
         );
-        assert_eq!(
-            configured_hosts,
-            vec![
-                "http://api.prod.projectcatalyst.io",
-                "https://api.dev.projectcatalyst.io:1234"
-            ]
-        );
+        assert_eq!(configured_hosts, vec![
+            "http://api.prod.projectcatalyst.io",
+            "https://api.dev.projectcatalyst.io:1234"
+        ]);
     }
 
     #[test]
@@ -815,10 +803,9 @@ mod tests {
             &SocketAddr::from(([127, 0, 0, 1], 8080)),
             "not a hostname , https://api.dev.projectcatalyst.io:1234",
         );
-        assert_eq!(
-            configured_hosts,
-            vec!["https://api.dev.projectcatalyst.io:1234"]
-        );
+        assert_eq!(configured_hosts, vec![
+            "https://api.dev.projectcatalyst.io:1234"
+        ]);
     }
 
     #[test]

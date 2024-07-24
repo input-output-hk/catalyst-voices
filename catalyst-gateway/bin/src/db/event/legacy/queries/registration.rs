@@ -87,10 +87,10 @@ impl EventDB {
         let voting_power = voter.try_get("voting_power")?;
 
         let rows = if let Some(event) = event {
-            Self::query(
-                Self::TOTAL_BY_EVENT_VOTING_QUERY,
-                &[&voting_group.0, &event.0],
-            )
+            Self::query(Self::TOTAL_BY_EVENT_VOTING_QUERY, &[
+                &voting_group.0,
+                &event.0,
+            ])
             .await?
         } else {
             Self::query(Self::TOTAL_BY_LAST_EVENT_VOTING_QUERY, &[&voting_group.0]).await?
@@ -117,10 +117,10 @@ impl EventDB {
             let rows = if let Some(event) = event {
                 Self::query(Self::VOTER_DELEGATORS_LIST_QUERY, &[&voting_key, &event.0]).await?
             } else {
-                Self::query(
-                    Self::VOTER_DELEGATORS_LIST_QUERY,
-                    &[&voting_key, &voter.try_get::<_, i32>("event")?],
-                )
+                Self::query(Self::VOTER_DELEGATORS_LIST_QUERY, &[
+                    &voting_key,
+                    &voter.try_get::<_, i32>("event")?,
+                ])
                 .await?
             };
 
@@ -167,19 +167,16 @@ impl EventDB {
         let delegator_snapshot_info = rows.first().ok_or(NotFoundError)?;
 
         let delegation_rows = if let Some(event) = event {
-            Self::query(
-                Self::DELEGATIONS_BY_EVENT_QUERY,
-                &[&stake_public_key, &event.0],
-            )
+            Self::query(Self::DELEGATIONS_BY_EVENT_QUERY, &[
+                &stake_public_key,
+                &event.0,
+            ])
             .await?
         } else {
-            Self::query(
-                Self::DELEGATIONS_BY_EVENT_QUERY,
-                &[
-                    &stake_public_key,
-                    &delegator_snapshot_info.try_get::<_, i32>("event")?,
-                ],
-            )
+            Self::query(Self::DELEGATIONS_BY_EVENT_QUERY, &[
+                &stake_public_key,
+                &delegator_snapshot_info.try_get::<_, i32>("event")?,
+            ])
             .await?
         };
         if delegation_rows.is_empty() {

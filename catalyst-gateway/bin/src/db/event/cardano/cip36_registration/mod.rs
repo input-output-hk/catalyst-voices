@@ -157,19 +157,16 @@ impl EventDB {
             let sink = tx
             .copy_in("COPY  tmp_cardano_voter_registration (tx_id, stake_credential, public_voting_key, payment_address, nonce, metadata_cip36, stats, valid) FROM STDIN BINARY")
             .await?;
-            let writer = BinaryCopyInWriter::new(
-                sink,
-                &[
-                    Type::BYTEA,
-                    Type::BYTEA,
-                    Type::BYTEA,
-                    Type::BYTEA,
-                    Type::INT8,
-                    Type::BYTEA,
-                    Type::JSONB,
-                    Type::BOOL,
-                ],
-            );
+            let writer = BinaryCopyInWriter::new(sink, &[
+                Type::BYTEA,
+                Type::BYTEA,
+                Type::BYTEA,
+                Type::BYTEA,
+                Type::INT8,
+                Type::BYTEA,
+                Type::JSONB,
+                Type::BOOL,
+            ]);
             tokio::pin!(writer);
 
             for params in values {
@@ -205,10 +202,11 @@ impl EventDB {
     pub(crate) async fn get_registration_info(
         stake_credential: StakeCredential, network: Network, slot_num: SlotNumber,
     ) -> anyhow::Result<(TxId, PaymentAddress, PublicVotingInfo, Nonce)> {
-        let rows = Self::query(
-            SELECT_VOTER_REGISTRATION_SQL,
-            &[&stake_credential, &network.to_string(), &slot_num],
-        )
+        let rows = Self::query(SELECT_VOTER_REGISTRATION_SQL, &[
+            &stake_credential,
+            &network.to_string(),
+            &slot_num,
+        ])
         .await?;
 
         let row = rows.first().ok_or(NotFoundError)?;

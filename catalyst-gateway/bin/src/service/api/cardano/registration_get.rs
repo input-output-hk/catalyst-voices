@@ -43,10 +43,15 @@ pub(crate) async fn endpoint(
 
     // get the total utxo amount from the database
     match EventDB::get_registration_info(stake_credential, network.into(), date_time).await {
-        Ok((tx_id, payment_address, voting_info, nonce)) => Responses::Ok(Json(
-            RegistrationInfo::new(tx_id, &payment_address, voting_info, nonce),
-        ))
-        .into(),
+        Ok((tx_id, payment_address, voting_info, nonce)) => {
+            Responses::Ok(Json(RegistrationInfo::new(
+                tx_id,
+                &payment_address,
+                voting_info,
+                nonce,
+            )))
+            .into()
+        },
         Err(err) if err.is::<NotFoundError>() => Responses::NotFound.into(),
         Err(err) => AllResponses::handle_error(&err),
     }

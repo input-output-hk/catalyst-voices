@@ -67,10 +67,12 @@ impl EventDB {
     pub(crate) async fn get_proposals(
         &self, event: EventId, objective: ObjectiveId, limit: Option<i64>, offset: Option<i64>,
     ) -> anyhow::Result<Vec<ProposalSummary>> {
-        let rows = Self::query(
-            Self::PROPOSALS_QUERY,
-            &[&event.0, &objective.0, &limit, &offset.unwrap_or(0)],
-        )
+        let rows = Self::query(Self::PROPOSALS_QUERY, &[
+            &event.0,
+            &objective.0,
+            &limit,
+            &offset.unwrap_or(0),
+        ])
         .await?;
 
         let mut proposals = Vec::new();

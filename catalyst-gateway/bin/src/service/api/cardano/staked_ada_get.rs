@@ -43,11 +43,13 @@ pub(crate) async fn endpoint(
 
     // get the total utxo amount from the database
     match EventDB::total_utxo_amount(stake_credential, network.into(), date_time).await {
-        Ok((amount, slot_number)) => Responses::Ok(Json(StakeInfo {
-            amount,
-            slot_number,
-        }))
-        .into(),
+        Ok((amount, slot_number)) => {
+            Responses::Ok(Json(StakeInfo {
+                amount,
+                slot_number,
+            }))
+            .into()
+        },
         Err(err) if err.is::<NotFoundError>() => Responses::NotFound.into(),
         Err(err) => AllResponses::handle_error(&err),
     }

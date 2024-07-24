@@ -145,16 +145,13 @@ impl EventDB {
             let sink = tx
             .copy_in("COPY tmp_cardano_utxo (tx_id, index, asset, stake_credential, value) FROM STDIN BINARY")
             .await?;
-            let writer = BinaryCopyInWriter::new(
-                sink,
-                &[
-                    Type::BYTEA,
-                    Type::INT4,
-                    Type::JSONB,
-                    Type::BYTEA,
-                    Type::INT8,
-                ],
-            );
+            let writer = BinaryCopyInWriter::new(sink, &[
+                Type::BYTEA,
+                Type::INT4,
+                Type::JSONB,
+                Type::BYTEA,
+                Type::INT8,
+            ]);
             tokio::pin!(writer);
 
             for params in values {
@@ -276,10 +273,11 @@ impl EventDB {
     pub(crate) async fn total_utxo_amount(
         stake_credential: StakeCredential, network: Network, slot_num: SlotNumber,
     ) -> anyhow::Result<(StakeAmount, SlotNumber)> {
-        let row = Self::query_one(
-            SELECT_TOTAL_UTXO_AMOUNT_SQL,
-            &[&stake_credential, &network.to_string(), &slot_num],
-        )
+        let row = Self::query_one(SELECT_TOTAL_UTXO_AMOUNT_SQL, &[
+            &stake_credential,
+            &network.to_string(),
+            &slot_num,
+        ])
         .await?;
 
         // Aggregate functions as SUM and MAX return NULL if there are no rows, so we need to

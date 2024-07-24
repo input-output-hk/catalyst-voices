@@ -33,10 +33,11 @@ impl EventDB {
     pub(crate) async fn get_objectives(
         event: EventId, limit: Option<i64>, offset: Option<i64>,
     ) -> anyhow::Result<Vec<Objective>> {
-        let rows = Self::query(
-            Self::OBJECTIVES_QUERY,
-            &[&event.0, &limit, &offset.unwrap_or(0)],
-        )
+        let rows = Self::query(Self::OBJECTIVES_QUERY, &[
+            &event.0,
+            &limit,
+            &offset.unwrap_or(0),
+        ])
         .await?;
 
         let mut objectives = Vec::new();

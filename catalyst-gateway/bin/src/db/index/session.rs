@@ -1,17 +1,18 @@
 //! Session creation and storage
 
-use crate::settings::{CassandraEnvVars, Settings};
-use openssl::ssl::{SslContextBuilder, SslFiletype, SslMethod, SslVerifyMode};
-use scylla::{frame::Compression, ExecutionProfile, Session, SessionBuilder};
 use std::{
     path::PathBuf,
     sync::{Arc, OnceLock},
     time::Duration,
 };
+
+use openssl::ssl::{SslContextBuilder, SslFiletype, SslMethod, SslVerifyMode};
+use scylla::{frame::Compression, ExecutionProfile, Session, SessionBuilder};
 use tokio::fs;
 use tracing::{error, info};
 
 use super::schema::create_schema;
+use crate::settings::{CassandraEnvVars, Settings};
 
 /// Configuration Choices for compression
 #[derive(Clone, strum::EnumString, strum::Display, strum::VariantNames)]

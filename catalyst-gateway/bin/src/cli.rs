@@ -59,15 +59,13 @@ impl Cli {
 
                 info!("Catalyst Gateway - Shut Down");
 
-                /*
-
-                let followers_fut = start_followers(
-                    event_db.clone(),
-                    settings.follower_settings.check_config_tick,
-                    settings.follower_settings.data_refresh_tick,
-                    machine_id,
-                );*/
-                /*followers_fut.await?;*/
+                // let followers_fut = start_followers(
+                // event_db.clone(),
+                // settings.follower_settings.check_config_tick,
+                // settings.follower_settings.data_refresh_tick,
+                // machine_id,
+                // );
+                // followers_fut.await?;
             },
             Self::Docs(settings) => {
                 let docs = service::get_app_docs();
