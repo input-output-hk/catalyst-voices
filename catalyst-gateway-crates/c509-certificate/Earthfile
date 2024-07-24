@@ -20,7 +20,7 @@ build:
     DO rust-ci+EXECUTE \
         --cmd="/scripts/std_build.py" \
         --args1="--libs=c509-certificate"
-     
+
     # RUN wasm-pack build --target web
 
 package:

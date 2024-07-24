@@ -25,6 +25,7 @@ bluefireteam
 BROTLI
 canvaskit
 cardano
+carryforward
 Catalyst
 CBOR
 cborg
@@ -42,6 +43,7 @@ COCOAPODS
 codegen
 codepoints
 coti
+coverallsapp
 cryptoxide
 Cunego
 Cupertino
@@ -246,3 +248,4 @@ xctest
 xctestrun
 xcworkspace
 yoroi
+unchunk
