@@ -48,7 +48,7 @@ pub(crate) fn log_build_info() {
 
     if let Some(ref vc) = info.version_control {
         if let Some(git) = vc.git() {
-            commit_id = git.commit_short_id.clone();
+            commit_id.clone_from(&git.commit_short_id);
             commit_timestamp = git.commit_timestamp.to_rfc3339();
             if let Some(git_branch) = git.branch.clone() {
                 branch = git_branch;

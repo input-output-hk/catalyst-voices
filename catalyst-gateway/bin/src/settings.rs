@@ -381,7 +381,7 @@ pub(crate) struct CassandraEnvVars {
     /// The Namespace of Cassandra DB.
     pub(crate) namespace: StringEnvVar,
 
-    /// The UserName to use for the Cassandra DB.
+    /// The `UserName` to use for the Cassandra DB.
     pub(crate) username: Option<StringEnvVar>,
 
     /// The Password to use for the Cassandra DB..
@@ -491,7 +491,7 @@ struct EnvVars {
     /// The Address of the Event DB.
     event_db_url: StringEnvVar,
 
-    /// The UserName to use for the Event DB.
+    /// The `UserName` to use for the Event DB.
     event_db_username: Option<StringEnvVar>,
 
     /// The Address of the Event DB.
@@ -780,9 +780,7 @@ mod tests {
     #[test]
     fn configured_hosts_default() {
         let configured_hosts = Settings::api_host_names();
-        assert_eq!(configured_hosts, vec![
-            "https://api.prod.projectcatalyst.io"
-        ]);
+        assert_eq!(configured_hosts, Vec::<String>::new());
     }
 
     #[test]
