@@ -211,7 +211,7 @@ fn write_to_output_file(output: PathBuf, data: &[u8]) -> anyhow::Result<()> {
 
 /// Determine issuer of the certificate.
 /// If self-signed is true, issuer is the same as subject.
-/// Otherwise, issuer should be present.
+/// Otherwise, issuer must be present.
 fn determine_issuer(
     self_signed: bool, issuer: Option<RelativeDistinguishedName>,
     subject: RelativeDistinguishedName,
@@ -219,7 +219,7 @@ fn determine_issuer(
     if self_signed {
         Ok(subject)
     } else {
-        issuer.ok_or_else(|| anyhow::anyhow!("Issuer should be present if self-signed is false"))
+        issuer.ok_or_else(|| anyhow::anyhow!("Issuer must be present if self-signed is false"))
     }
 }
 
@@ -229,7 +229,7 @@ fn validate_certificate_type(
 ) -> anyhow::Result<()> {
     if self_signed && certificate_type.unwrap_or(SELF_SIGNED_INT) != SELF_SIGNED_INT {
         return Err(anyhow::anyhow!(
-            "Certificate type should be 0 if self-signed is true"
+            "Certificate type must be 0 if self-signed is true"
         ));
     }
     Ok(())
