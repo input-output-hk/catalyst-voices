@@ -19,6 +19,7 @@
         "terrastruct.d2",
         "bbenoist.vagrant",
         "ms-kubernetes-tools.vscode-kubernetes-tools",
-        "fill-labs.dependi"
+        "fill-labs.dependi",
+        "lawrencegrant.cql"
     ]
 }

@@ -149,7 +149,7 @@ async fn retry_init(cfg: CassandraEnvVars, persistent: bool) {
         };
 
         // Set up the Schema for it.
-        if let Err(error) = create_schema(&mut session.clone(), &cfg, persistent).await {
+        if let Err(error) = create_schema(&mut session.clone(), &cfg).await {
             let error = format!("{error:?}");
             error!(
                 db_type = db_type,

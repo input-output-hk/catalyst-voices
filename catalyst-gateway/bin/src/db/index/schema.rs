@@ -17,7 +17,7 @@ const CREATE_TABLE_TXO_BY_STAKE_ADDRESS_CQL: &str = include_str!("./schema/txo_b
 const CREATE_TABLE_TXO_ASSETS_BY_STAKE_ADDRESS_CQL: &str =
     include_str!("./schema/txo_assets_by_stake_table.cql");
 /// TXI by Stake Address Table Schema
-const CREATE_TABLE_TXI_BY_STAKE_ADDRESS_CQL: &str = include_str!("./schema/txi_by_stake_table.cql");
+const CREATE_TABLE_TXI_BY_TXN_HASH_CQL: &str = include_str!("./schema/txi_by_txn_hash_table.cql");
 
 /// The version of the Schema we are using.
 /// Must be incremented if there is a breaking change in any schema tables below.
@@ -83,7 +83,7 @@ async fn create_txo_tables(session: &mut CassandraSession) -> anyhow::Result<()>
 /// Create tables for holding volatile TXI data
 async fn create_txi_tables(session: &mut CassandraSession) -> anyhow::Result<()> {
     let stmt = session
-        .prepare(CREATE_TABLE_TXI_BY_STAKE_ADDRESS_CQL)
+        .prepare(CREATE_TABLE_TXI_BY_TXN_HASH_CQL)
         .await
         .context("Create Table TXI By Stake Address: Prepared")?;
 
@@ -97,16 +97,13 @@ async fn create_txi_tables(session: &mut CassandraSession) -> anyhow::Result<()>
 
 /// Create the Schema on the connected Cassandra DB
 pub(crate) async fn create_schema(
-    session: &mut CassandraSession, cfg: &CassandraEnvVars, persistent: bool,
+    session: &mut CassandraSession, cfg: &CassandraEnvVars,
 ) -> anyhow::Result<()> {
     create_namespace(session, cfg).await?;
 
     create_txo_tables(session).await?;
 
-    if !persistent {
-        create_txi_tables(session).await?;
-    }
-
+    create_txi_tables(session).await?;
     // Wait for the Schema to be ready.
     session.await_schema_agreement().await?;
 

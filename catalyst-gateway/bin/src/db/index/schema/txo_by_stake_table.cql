@@ -5,19 +5,19 @@ CREATE TABLE IF NOT EXISTS txo_by_stake (
     stake_address   ascii,      -- stake address (CIP19 Formatted Text)
     slot_no         bigint,     -- slot number the txo was created in.
     txn             smallint,   -- Which Transaction in the Slot is the TXO.
-    ofs             smallint,   -- offset in the txo list of the transaction the txo is in.
-
-    -- stake_address should be unique, this is for the unlikely case we need disambiguation only.
-    chain           ascii,      -- chain the txo was created in.
+    txo_index       smallint,   -- offset in the txo list of the transaction the txo is in.
 
     -- Transaction Output Data
     address         ascii,      -- TXO address (CIP19 Formatted Text).
     value           varint,     -- Lovelace value of the TXO (u64).
     
-    -- Transaction Spend details. Only ever present in the persistent data.
-    spend_slot      bigint,     -- slot number the txo was spent in.
-    spend_txn       smallint,   -- transaction number the txo was spent in.
-    spend_ofs       smallint,   -- offset in the transaction inputs the txo was spent in.
+    -- Data needed to correlate a spent TXO.
+    txn_hash        blob,       -- 32 byte hash of this transaction.
+
+    spent_slot      varint,     -- Slot this TXO was spent in.
+                                -- This is ONLY calculated/stored 
+                                -- when first detected in a query lookup.
+                                -- It serves as an optimization on subsequnt queries. 
 
     PRIMARY KEY (stake_address, slot_no, txn, ofs)
 );
