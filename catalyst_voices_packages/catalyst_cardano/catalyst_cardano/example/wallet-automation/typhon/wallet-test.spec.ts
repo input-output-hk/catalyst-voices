@@ -22,6 +22,16 @@ test('Wallet Extension Test', async () => {
             console.log('Wallet extension was installed');
         }
 
+        // const enableWalletXPath = '//div[class()="web-electable-region-context-menu"] and contains(text(), "Enable wallet")]';
+        const enableWalletXPath = '//div[contains(@class, "web-electable-region-context-menu") and contains(text(), "Enable wallet")]';
+        const enableWalletLocator = newPage.locator(enableWalletXPath);
+        if (await enableWalletLocator.isVisible()) {
+            await enableWalletLocator.click();
+            console.log('Enable wallet');
+        } else {
+            console.log('Failure enable wallet');
+        }
+
     } catch (error) {
         console.error('An error occurred when get the element:', error.message);
         throw new Error('An error occurred when get the element.');
@@ -29,4 +39,6 @@ test('Wallet Extension Test', async () => {
         await browserContext.close();
 
     }
+
+
 });
