@@ -3,9 +3,9 @@
 CREATE TABLE IF NOT EXISTS txo_by_stake (
     -- Priamry Key Fields
     stake_address   ascii,      -- stake address (CIP19 Formatted Text)
-    slot_no         bigint,     -- slot number the txo was created in.
+    slot_no         varint,     -- slot number the txo was created in.
     txn             smallint,   -- Which Transaction in the Slot is the TXO.
-    txo_index       smallint,   -- offset in the txo list of the transaction the txo is in.
+    txo             smallint,   -- offset in the txo list of the transaction the txo is in.
 
     -- Transaction Output Data
     address         ascii,      -- TXO address (CIP19 Formatted Text).

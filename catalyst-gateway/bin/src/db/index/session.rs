@@ -186,3 +186,13 @@ pub(crate) fn init() {
 pub(crate) fn is_ready() -> bool {
     PERSISTENT_SESSION.get().is_some() && VOLATILE_SESSION.get().is_some()
 }
+
+
+/// Get the session needed to perform a query.
+pub(crate) fn session(persistent: bool) -> Option<CassandraSession> {
+    if persistent {
+        PERSISTENT_SESSION.get().cloned()
+    } else {
+        VOLATILE_SESSION.get().cloned()
+    }
+}

@@ -76,6 +76,7 @@ scylla.workspace  = true
 strum.workspace = true
 strum_macros.workspace = true
 openssl.workspace = true
+num-bigint.workspace = true
 
 [build-dependencies]
 build-info-build = { workspace = true }
