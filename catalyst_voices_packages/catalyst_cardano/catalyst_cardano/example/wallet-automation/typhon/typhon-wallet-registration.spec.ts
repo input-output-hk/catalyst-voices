@@ -204,4 +204,14 @@ test('import wallet', async ({ }) => {
     await newTab.waitForSelector(addNew, { state: 'visible' });
     await newTab.click(addNew);
     
+    await newTab.goto('http://localhost:8000/');
+
+    // test.setTimeout(50000000);
+    
+    const enableWallet = await newTab.locator('//*[text()="Enable wallet"]');
+    await enableWallet.click();
+    // await newTab.waitForTimeout(100000); 
+
+    const addNew1 = '//*[@id="app"]/div/div/div[3]/div/div[2]/div/div/div[4]';
+    await newTab.waitForSelector(addNew1, { state: 'visible'});
 });
