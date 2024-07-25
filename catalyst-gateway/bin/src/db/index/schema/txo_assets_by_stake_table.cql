@@ -19,6 +19,8 @@ CREATE TABLE IF NOT EXISTS txo_assets_by_stake (
                                 -- This is ONLY calculated/stored 
                                 -- when first detected in a query lookup.
                                 -- It serves as an optimization on subsequnt queries. 
+                                -- It is also only updated when the refenc is the same type
+                                -- ie, an immutable txo can only record an immutable spend.
 
     PRIMARY KEY (stake_address, slot_no, txn, ofs, policy_hash, policy_id)
 );
