@@ -1,15 +1,15 @@
-import { test, chromium } from '@playwright/test';
+import { test, chromium, expect } from '@playwright/test';
 import { getWalletCredentials, getRegistrationPin } from './credentials';
 import { getSeedPhrase } from './seed-phrase';
 import { waitForDebugger } from 'inspector';
 const path = require('path');
+import fs from 'fs-extra';
+
 // extension ID for Typhon: kfdniefadaanbjodldohaedphafoffoh
 
 test('import wallet', async ({ }) => {
     const extensionPath: string = path.resolve(__dirname, 'extensions/KFDNIEFADAANBJODLDOHAEDPHAFOFFOH_unzipped');
-    const userDataDir = path.resolve(__dirname, 'usrdatadir');
-
-    const browser = await chromium.launchPersistentContext(userDataDir, {
+    const browser = await chromium.launchPersistentContext('', {
         headless: false, // extensions only work in headful mode
         args: [
             `--disable-extensions-except=${extensionPath}`,
@@ -17,45 +17,27 @@ test('import wallet', async ({ }) => {
         ],
     });
 
-    const page = await browser.newPage();
-    await page.waitForTimeout(1000); // adjust the timeout as needed
-
+    await expect.poll(async () => {
+        return browser.pages().length;
+    }, { timeout: 5000 }).toBe(2);
     const pages = browser.pages();
-
     const newTab = pages[pages.length - 1];
     await newTab.bringToFront();
 
     // interact with elements on the background page
-    const firstButtonSelector = '//*[@id="headlessui-menu-button-1"]';
-    await newTab.waitForSelector(firstButtonSelector, { state: 'visible' });
-    await newTab.click(firstButtonSelector);
+    await newTab.locator('button#headlessui-menu-button-1').click();
 
-    const secondButtonSelector = '#headlessui-menu-item-6';
-    await newTab.waitForSelector(secondButtonSelector, { state: 'visible' });
-    await newTab.click(secondButtonSelector);
+    await newTab.locator('button#headlessui-menu-item-6').click();
 
-    const thirdButtonSelector = '//*[text()="Import"]';
-    await newTab.waitForSelector(thirdButtonSelector, { state: 'visible' });
-    await newTab.click(thirdButtonSelector);
+    await newTab.getByRole('button', { name: 'Import' }).click();
 
+    // Login
     const WalletCredentials = getWalletCredentials('WALLET1');
-    const usernameInput = '#app > div > div > div.flex-grow.overflow-auto > div > div.my-5.flex.justify-center.py-16 > div > div > div > div:nth-child(2) > div > input';
-    const passwordInput = '#app > div > div > div.flex-grow.overflow-auto > div > div.my-5.flex.justify-center.py-16 > div > div > div > div:nth-child(2) > div > div:nth-child(2) > input';
-    const cfpwInput = '#app > div > div > div.flex-grow.overflow-auto > div > div.my-5.flex.justify-center.py-16 > div > div > div > div:nth-child(2) > div > div:nth-child(3) > input';
-    await newTab.waitForSelector(usernameInput, { state: 'visible' });
-    await newTab.waitForSelector(passwordInput, { state: 'visible' });
-    await newTab.waitForSelector(cfpwInput, { state: 'visible' });
-    await newTab.fill(usernameInput, WalletCredentials.username);
-    await newTab.fill(passwordInput, WalletCredentials.password);
-    await newTab.fill(cfpwInput, WalletCredentials.password);
-
-    const agreeToTC = '#termsAndConditions'
-    await newTab.waitForSelector(agreeToTC, { state: 'visible' });
-    await newTab.click(agreeToTC);
-
-    const continueButton = '#app > div > div > div.flex-grow.overflow-auto > div > div.my-5.flex.justify-center.py-16 > div > div > div > div:nth-child(2) > div > button';
-    await newTab.waitForSelector(continueButton, { state: 'visible' });
-    await newTab.click(continueButton);
+    await newTab.getByPlaceholder('Wallet Name').fill(WalletCredentials.username);
+    await newTab.getByPlaceholder('Password', { exact: true }).fill(WalletCredentials.password);
+    await newTab.getByPlaceholder('Confirm Password', { exact: true }).fill(WalletCredentials.password);
+    await newTab.locator('input#termsAndConditions').click();
+    await newTab.getByRole('button', { name: 'Continue' }).click();
 
     async function clickBlankSpace(newTab) {
         const blankSpace = '#app > div > div > div.flex-grow.overflow-auto > div > div.my-5.flex.justify-center.py-16 > div > div > div > div:nth-child(1) > div.flex.justify-between.items-start > div.flex-initial.flex.flex-col.mr-2 > span.text-primary.font-medium.text-xl';
@@ -63,12 +45,11 @@ test('import wallet', async ({ }) => {
         await newTab.click(blankSpace);
     }
 
+    // Input seed phrase
     const seedPhrase = getSeedPhrase();
-
     for (let i = 0; i < seedPhrase.length; i++) {
-        const ftSeedPhraseSelector = `#app > div > div > div.flex-grow.overflow-auto > div > div.my-5.flex.justify-center.py-16 > div > div > div > div:nth-child(1) > div:nth-child(2) > div > div > div > div > div:nth-child(${i + 1}) > div > input`;
-        await newTab.waitForSelector(ftSeedPhraseSelector, { state: 'visible' });
-        await newTab.fill(ftSeedPhraseSelector, seedPhrase[i]);
+        const ftSeedPhraseSelector = `(//input[@type='text'])[${i + 1}]`;
+        await newTab.locator(ftSeedPhraseSelector).fill(seedPhrase[i]);
     }
 
     const unlockWallet = '#app > div > div > div.flex-grow.overflow-auto > div > div.my-5.flex.justify-center.py-16 > div > div > div > div.mt-6.text-center.flex.justify-center > button';
@@ -177,41 +158,44 @@ test('import wallet', async ({ }) => {
         if (textContent) {
             console.log("registered for voting successfully!");
         } else {
-            console.log('text content not found'); 
+            console.log('text content not found');
         }
     } catch (error) {
         console.error('an error occurred:', error.toString());
         console.log('an error occurred');
     }
 
-    const logOut = '//*[@id="app"]/div/div/div[3]/div/div/div[1]/div/div/div[2]/div[11]/div[2]';
-    await newTab.waitForSelector(logOut, { state: 'visible' });
-    await newTab.click(logOut);
+    // const logOut = '//*[@id="app"]/div/div/div[3]/div/div/div[1]/div/div/div[2]/div[11]/div[2]';
+    // await newTab.waitForSelector(logOut, { state: 'visible' });
+    // await newTab.click(logOut);
 
-    const chooseAccount = '//*[@id="app"]/div/div/div[3]/div/div[2]/div/div/div[2]/div';
-    await newTab.waitForSelector(chooseAccount, { state: 'visible' });
-    await newTab.click(chooseAccount);
+    // const chooseAccount = '//*[@id="app"]/div/div/div[3]/div/div[2]/div/div/div[2]/div';
+    // await newTab.waitForSelector(chooseAccount, { state: 'visible' });
+    // await newTab.click(chooseAccount);
 
-    const removeAccount = '//*[@id="app"]/div/div/div[3]/div/div[2]/div/div/div[2]/div[4]/button';
-    await newTab.waitForSelector(removeAccount, { state: 'visible' });
-    await newTab.click(removeAccount);
+    // const removeAccount = '//*[@id="app"]/div/div/div[3]/div/div[2]/div/div/div[2]/div[4]/button';
+    // await newTab.waitForSelector(removeAccount, { state: 'visible' });
+    // await newTab.click(removeAccount);
 
-    const confirmRemove = 'button.btn.bg-primary';
-    await newTab.waitForSelector(confirmRemove, { state: 'visible' });
-    await newTab.click(confirmRemove)
+    // const confirmRemove = 'button.btn.bg-primary';
+    // await newTab.waitForSelector(confirmRemove, { state: 'visible' });
+    // await newTab.click(confirmRemove)
 
-    const addNew = '//*[@id="app"]/div/div/div[3]/div/div[2]/div/div/div[4]';
-    await newTab.waitForSelector(addNew, { state: 'visible' });
-    await newTab.click(addNew);
-    
+    // const addNew = '//*[@id="app"]/div/div/div[3]/div/div[2]/div/div/div[4]';
+    // await newTab.waitForSelector(addNew, { state: 'visible' });
+    // await newTab.click(addNew);
+
     await newTab.goto('http://localhost:8000/');
 
-    // test.setTimeout(50000000);
-    
-    const enableWallet = await newTab.locator('//*[text()="Enable wallet"]');
-    await enableWallet.click();
-    // await newTab.waitForTimeout(100000); 
+    await newTab.locator('//*[text()="Enable wallet"]').click();
 
-    const addNew1 = '//*[@id="app"]/div/div/div[3]/div/div[2]/div/div/div[4]';
-    await newTab.waitForSelector(addNew1, { state: 'visible'});
+    await expect.poll(async () => {
+        return browser.pages().length;
+    }, { timeout: 5000 }).toBe(3);
+
+    const updatedPages = browser.pages();
+    const allowTab = updatedPages[updatedPages.length - 1];
+    await allowTab.bringToFront();
+
+    await allowTab.getByRole('button', { name: 'Allow' }).click();
 });

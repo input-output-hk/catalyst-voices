@@ -14,21 +14,24 @@ export default defineConfig({
     /* Base URL to use in actions like `await page.goto('/')`. */
     // baseURL: 'http://127.0.0.1:3000',
     trace: 'on-first-retry',
-    
-  },    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
 
+  },    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+  expect: {
+    timeout: 30 * 1000,
+  },
 
   /* Configure projects for major browsers */
   projects: [
     {
       name: 'setup',
       testMatch: [
-      /global\-setup\.ts/,
+        /global\-setup\.ts/,
       ],
     },
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
       dependencies: ['setup'],
-    }, 
-]});
+    },
+  ]
+});
