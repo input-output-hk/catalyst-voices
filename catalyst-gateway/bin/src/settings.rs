@@ -9,6 +9,8 @@ use std::{
     time::Duration,
 };
 
+use anyhow::anyhow;
+use cardano_chain_follower::Network;
 use clap::Args;
 use cryptoxide::{blake2b::Blake2b, mac::Mac};
 use dotenvy::dotenv;
@@ -53,9 +55,6 @@ const API_URL_PREFIX_DEFAULT: &str = "/api";
 /// Default `CHECK_CONFIG_TICK` used in development.
 const CHECK_CONFIG_TICK_DEFAULT: &str = "5s";
 
-/// Default `MACHINE_UID` used in development
-const MACHINE_UID_DEFAULT: &str = "UID";
-
 /// Default Event DB URL.
 const EVENT_DB_URL_DEFAULT: &str =
     "postgresql://postgres:postgres@localhost/catalyst_events?sslmode=disable";
@@ -71,6 +70,12 @@ const CASSANDRA_VOLATILE_DB_URL_DEFAULT: &str = "127.0.0.1:9042";
 
 /// Default Cassandra DB URL for the Persistent DB.
 const CASSANDRA_VOLATILE_DB_NAMESPACE_DEFAULT: &str = "volatile";
+
+/// Default chain to follow.
+const CHAIN_FOLLOWER_DEFAULT: Network = Network::Preprod;
+
+/// Default number of sync tasks (must be in the range 1 to 255 inclusive.)
+const CHAIN_FOLLOWER_SYNC_TASKS_DEFAULT: i64 = 16;
 
 /// Hash the Public IPv4 and IPv6 address of the machine, and convert to a 128 bit V4
 /// UUID.
@@ -112,10 +117,6 @@ pub(crate) struct ServiceSettings {
     /// Docs settings.
     #[clap(flatten)]
     pub(crate) docs_settings: DocsSettings,
-
-    /// Follower settings.
-    #[clap(flatten)]
-    pub(crate) follower_settings: FollowerSettings,
 }
 
 /// Settings specifies `OpenAPI` docs generation.
@@ -131,14 +132,6 @@ pub(crate) struct DocsSettings {
     /// Server name
     #[clap(long, env = "SERVER_NAME")]
     pub(crate) server_name: Option<String>,
-}
-
-/// Settings for follower mechanics.
-#[derive(Args, Clone)]
-pub(crate) struct FollowerSettings {
-    /// Machine UID
-    #[clap(long, default_value = MACHINE_UID_DEFAULT, env = "MACHINE_UID")]
-    pub(crate) machine_uid: String,
 }
 
 /// An environment variable read as a string.
@@ -318,7 +311,7 @@ impl StringEnvVar {
         }
         choices.push(']');
 
-        let tls = match T::from_str(
+        let value = match T::from_str(
             StringEnvVar::new(
                 var_name,
                 (default.to_string().as_str(), redacted, choices.as_str()).into(),
@@ -332,7 +325,39 @@ impl StringEnvVar {
             },
         };
 
-        tls
+        value
+    }
+
+    /// Convert an Envvar into an integer in the bounded range.
+    fn new_as_i64(var_name: &str, default: i64, min: i64, max: i64) -> i64
+where {
+        let choices = format!("A value in the range {min} to {max} inclusive");
+
+        let raw_value = StringEnvVar::new(
+            var_name,
+            (default.to_string().as_str(), false, choices.as_str()).into(),
+        )
+        .as_string();
+
+        let value = match raw_value.parse::<i64>() {
+            Ok(value) => {
+                if value < min {
+                    error!("{var_name} out of range. Range = {min} to {max} inclusive. Clamped to {min}");
+                    min
+                } else if value > max {
+                    error!("{var_name} out of range. Range = {min} to {max} inclusive. Clamped to {max}");
+                    max
+                } else {
+                    value
+                }
+            },
+            Err(error) => {
+                error!(error=%error, default=default, "{var_name} not an integer. Range = {min} to {max} inclusive. Defaulted");
+                default
+            },
+        };
+
+        value
     }
 
     /// Get the read env var as a str.
@@ -413,21 +438,6 @@ impl CassandraEnvVars {
             false,
         );
 
-        // let tls = match TlsChoice::from_str(
-        // StringEnvVar::new(&format!("CASSANDRA_{name}_TLS"), "Disabled".into()).as_str(),
-        // ) {
-        // Ok(tls) => tls,
-        // Err(error) => {
-        // error!(error=%error, default=%TlsChoice::Disabled, "Invalid TLS choice. Using
-        // Default."); TlsChoice::Disabled
-        // },
-        // };
-
-        // let compression = CompressionChoice::from_str(
-        // StringEnvVar::new(&format!("CASSANDRA_{name}_COMPRESSION"), "Lz4".into()).as_str(),
-        // )
-        // .unwrap_or(CompressionChoice::Lz4);
-
         Self {
             url: StringEnvVar::new(&format!("CASSANDRA_{name}_URL"), url.into()),
             namespace,
@@ -461,6 +471,43 @@ impl CassandraEnvVars {
             cert = tls_cert,
             compression = self.compression.to_string(),
             "Cassandra {db_type} DB Configuration"
+        );
+    }
+}
+
+/// Configuration for the chain follower.
+#[derive(Clone)]
+pub(crate) struct ChainFollowerEnvVars {
+    /// The Blockchain we sync from.
+    pub(crate) chain: Network,
+
+    /// Yje maximum number of sync tasks.
+    pub(crate) sync_tasks: u8,
+}
+
+impl ChainFollowerEnvVars {
+    /// Create a config for a cassandra cluster, identified by a default namespace.
+    fn new() -> Self {
+        let chain =
+            StringEnvVar::new_as_enum(&format!("CHAIN_NETWORK"), CHAIN_FOLLOWER_DEFAULT, false);
+        let sync_tasks: u8 = StringEnvVar::new_as_i64(
+            &format!("CHAIN_FOLLOWER_SYNC_TASKS"),
+            CHAIN_FOLLOWER_SYNC_TASKS_DEFAULT,
+            1,
+            255,
+        )
+        .try_into()
+        .unwrap_or(CHAIN_FOLLOWER_SYNC_TASKS_DEFAULT as u8);
+
+        Self { chain, sync_tasks }
+    }
+
+    /// Log the configuration of this Chain Follower
+    pub(crate) fn log(&self) {
+        info!(
+            chain = self.chain.to_string(),
+            sync_tasks = self.sync_tasks,
+            "Chain Follower Configuration"
         );
     }
 }
@@ -502,6 +549,9 @@ struct EnvVars {
 
     /// The Config of the Volatile Cassandra DB.
     cassandra_volatile_db: CassandraEnvVars,
+
+    /// The Chain Follower configuration
+    chain_follower: ChainFollowerEnvVars,
 
     /// Tick every N seconds until config exists in db
     #[allow(unused)]
@@ -554,9 +604,25 @@ static ENV_VARS: Lazy<EnvVars> = Lazy::new(|| {
             CASSANDRA_VOLATILE_DB_URL_DEFAULT,
             CASSANDRA_VOLATILE_DB_NAMESPACE_DEFAULT,
         ),
+        chain_follower: ChainFollowerEnvVars::new(),
         check_config_tick,
     }
 });
+
+impl EnvVars {
+    /// Validate env vars in ways we couldn't when they were first loaded.
+    pub(crate) fn validate() -> anyhow::Result<()> {
+        let mut status = Ok(());
+
+        let url = ENV_VARS.event_db_url.as_str();
+        if let Err(error) = tokio_postgres::config::Config::from_str(url) {
+            error!(error=%error, url=url, "Invalid Postgres DB URL.");
+            status = Err(anyhow!("Environment Variable Validation Error."));
+        }
+
+        status
+    }
+}
 
 /// All Settings/Options for the Service.
 static SERVICE_SETTINGS: OnceLock<ServiceSettings> = OnceLock::new();
@@ -579,9 +645,8 @@ impl Settings {
 
         log_build_info();
 
-        db::index::session::init();
-
-        db::event::establish_connection()
+        // Validate any settings we couldn't validate when loaded.
+        EnvVars::validate()
     }
 
     /// Get the current Event DB settings for this service.
@@ -606,6 +671,11 @@ impl Settings {
             ENV_VARS.cassandra_persistent_db.clone(),
             ENV_VARS.cassandra_volatile_db.clone(),
         )
+    }
+
+    /// Get the configuration of the chain follower.
+    pub(crate) fn follower_cfg() -> ChainFollowerEnvVars {
+        ENV_VARS.chain_follower.clone()
     }
 
     /// The API Url prefix

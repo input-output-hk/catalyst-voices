@@ -47,10 +47,7 @@ pub(crate) fn check_network(
             // one, and if not - we return an error.
             // if the `provided_network` omitted - we return the `testnet` network type
             if let Some(network) = provided_network {
-                if !matches!(
-                    network,
-                    Network::Testnet | Network::Preprod | Network::Preview
-                ) {
+                if !matches!(network, Network::Preprod | Network::Preview) {
                     return Err(NetworkValidationError::NetworkMismatch(
                         network.to_json_string(),
                         "Testnet".to_string(),
@@ -59,7 +56,7 @@ pub(crate) fn check_network(
                 }
                 Ok(network)
             } else {
-                Ok(Network::Testnet)
+                Ok(Network::Preprod)
             }
         },
         PallasNetwork::Other(x) => Err(NetworkValidationError::UnknownNetwork(x).into()),

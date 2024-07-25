@@ -43,6 +43,7 @@ pub(crate) struct IndexedTxnOutputParams {
 
 impl IndexedTxnOutputParams {
     /// Creates transaction indexing data from transaction data.
+    #[allow(dead_code)]
     pub(crate) fn from_txn_data(tx: &MultiEraTx) -> Vec<IndexedTxnOutputParams> {
         tx.outputs()
             .into_iter()
@@ -100,6 +101,7 @@ pub(crate) struct IndexedTxnInputParams {
 
 impl IndexedTxnInputParams {
     /// Creates transaction indexing data from transaction data.
+    #[allow(dead_code)]
     pub(crate) fn from_txn_data(tx: &MultiEraTx) -> Vec<IndexedTxnInputParams> {
         tx.inputs()
             .into_iter()
@@ -124,6 +126,7 @@ impl IndexedTxnInputParams {
 
 impl EventDB {
     /// Batch writes transaction output indexing data.
+    #[allow(dead_code)]
     pub(crate) async fn index_many_txn_output_data(
         values: &[IndexedTxnOutputParams],
     ) -> anyhow::Result<()> {
@@ -178,6 +181,7 @@ impl EventDB {
     }
 
     /// Batch writes transaction input indexing data.
+    #[allow(dead_code)]
     pub(crate) async fn index_many_txn_input_data(
         values: &[IndexedTxnInputParams],
     ) -> anyhow::Result<()> {
@@ -226,6 +230,7 @@ impl EventDB {
     }
 
     /// Batch writes transaction indexing data.
+    #[allow(dead_code)]
     pub(crate) async fn index_many_txn_data(values: &[IndexedTxnParams<'_>]) -> anyhow::Result<()> {
         if values.is_empty() {
             return Ok(());

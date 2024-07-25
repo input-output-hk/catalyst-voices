@@ -226,12 +226,11 @@ fn is_valid_rewards_address(rewards_address_prefix: u8, network: Network) -> boo
                 return false;
             }
         },
-        Network::Testnet => {
+        _ => {
             if addr_net != 0 {
                 return false;
             }
         },
-        _ => (),
     }
 
     // Valid addrs: 0x0?, 0x1?, 0x2?, 0x3?, 0x4?, 0x5?, 0x6?, 0x7?, 0xE?, 0xF?.
@@ -477,11 +476,11 @@ fn test_rewards_addr_permutations() {
 
     for addr_type in valid_addr_types {
         let test_addr = addr_type << 4;
-        assert!(is_valid_rewards_address(test_addr, Network::Testnet));
+        assert!(is_valid_rewards_address(test_addr, Network::Preprod));
         assert!(!is_valid_rewards_address(test_addr, Network::Mainnet));
 
         let test_addr = addr_type << 4 | 1;
-        assert!(!is_valid_rewards_address(test_addr, Network::Testnet));
+        assert!(!is_valid_rewards_address(test_addr, Network::Preprod));
         assert!(is_valid_rewards_address(test_addr, Network::Mainnet));
     }
 
@@ -489,11 +488,11 @@ fn test_rewards_addr_permutations() {
 
     for addr_type in invalid_addr_types {
         let test_addr = addr_type << 4;
-        assert!(!is_valid_rewards_address(test_addr, Network::Testnet));
+        assert!(!is_valid_rewards_address(test_addr, Network::Preprod));
         assert!(!is_valid_rewards_address(test_addr, Network::Mainnet));
 
         let test_addr = addr_type << 4 | 1;
-        assert!(!is_valid_rewards_address(test_addr, Network::Testnet));
+        assert!(!is_valid_rewards_address(test_addr, Network::Preprod));
         assert!(!is_valid_rewards_address(test_addr, Network::Mainnet));
     }
 }

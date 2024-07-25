@@ -54,6 +54,7 @@ const SELECT_CONFIG_SQL: &str = include_str!("select_config.sql");
 
 impl EventDB {
     /// Config query
+    #[allow(dead_code)]
     pub(crate) async fn get_follower_config() -> anyhow::Result<Vec<FollowerConfig>> {
         let id = "cardano";
         let id2 = "follower";

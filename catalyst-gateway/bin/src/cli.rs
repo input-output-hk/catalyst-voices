@@ -5,6 +5,8 @@ use clap::Parser;
 use tracing::{error, info};
 
 use crate::{
+    cardano::start_followers,
+    db,
     service::{self, started},
     settings::{DocsSettings, ServiceSettings, Settings},
 };
@@ -41,6 +43,13 @@ impl Cli {
 
                 info!("Catalyst Gateway - Starting");
 
+                // Start the DB's
+                db::index::session::init();
+                db::event::establish_connection();
+
+                // Start the chain indexing follower.
+                start_followers().await?;
+
                 let handle = tokio::spawn(async move {
                     match service::run().await {
                         Ok(()) => info!("Endpoints started ok"),
@@ -58,14 +67,6 @@ impl Cli {
                 }
 
                 info!("Catalyst Gateway - Shut Down");
-
-                // let followers_fut = start_followers(
-                // event_db.clone(),
-                // settings.follower_settings.check_config_tick,
-                // settings.follower_settings.data_refresh_tick,
-                // machine_id,
-                // );
-                // followers_fut.await?;
             },
             Self::Docs(settings) => {
                 let docs = service::get_app_docs();

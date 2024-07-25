@@ -120,6 +120,7 @@ impl EventDB {
     /// # Returns
     ///
     /// `anyhow::Result<()>`
+    #[allow(dead_code)]
     pub(crate) async fn modify(stmt: &str, params: &[&(dyn ToSql + Sync)]) -> anyhow::Result<()> {
         if Self::is_deep_query_enabled() {
             Self::explain_analyze_commit(stmt, params).await?;
@@ -139,6 +140,7 @@ impl EventDB {
     }
 
     /// Prepend `EXPLAIN ANALYZE` to the query, and commit the transaction.
+    #[allow(dead_code)]
     async fn explain_analyze_commit(
         stmt: &str, params: &[&(dyn ToSql + Sync)],
     ) -> anyhow::Result<()> {
@@ -210,10 +212,15 @@ impl EventDB {
 ///
 /// The env var "`DATABASE_URL`" can be set directly as an anv var, or in a
 /// `.env` file.
-pub(crate) fn establish_connection() -> anyhow::Result<()> {
+pub(crate) fn establish_connection() {
     let (url, user, pass) = Settings::event_db_settings();
 
-    let mut config = tokio_postgres::config::Config::from_str(url)?;
+    // This was pre-validated and can't fail, but provide default in the impossible case it
+    // does.
+    let mut config = tokio_postgres::config::Config::from_str(url).unwrap_or_else(|_| {
+        error!(url = url, "Postgres URL Pre Validation has failed.");
+        tokio_postgres::config::Config::default()
+    });
     if let Some(user) = user {
         config.user(user);
     }
@@ -228,6 +235,4 @@ pub(crate) fn establish_connection() -> anyhow::Result<()> {
     if EVENT_DB_POOL.set(Arc::new(pool)).is_err() {
         error!("Failed to set event db pool. Called Twice?");
     }
-
-    Ok(())
 }

@@ -63,6 +63,7 @@ pub(crate) struct IndexedVoterRegistrationParams {
 
 impl IndexedVoterRegistrationParams {
     /// Creates voter registration indexing data from block data.
+    #[allow(dead_code)]
     pub(crate) fn from_block_data(
         block: &MultiEraBlock, network: Network,
     ) -> Option<Vec<IndexedVoterRegistrationParams>> {
@@ -136,6 +137,7 @@ impl IndexedVoterRegistrationParams {
 
 impl EventDB {
     /// Batch writes voter registration data.
+    #[allow(dead_code)]
     pub(crate) async fn index_many_voter_registration_data(
         values: &[IndexedVoterRegistrationParams],
     ) -> anyhow::Result<()> {

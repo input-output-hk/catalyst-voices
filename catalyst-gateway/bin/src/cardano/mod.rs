@@ -1,86 +1,68 @@
 //! Logic for orchestrating followers
-use std::{path::PathBuf, time::Duration};
 
-/// Handler for follower tasks, allows for control over spawned follower threads
-pub type ManageTasks = JoinHandle<()>;
+use cardano_chain_follower::{ChainFollower, ChainSyncConfig, Network, ORIGIN_POINT, TIP_POINT};
+use tracing::{error, info, warn};
 
-use anyhow::Context;
-use cardano_chain_follower::{
-    network_genesis_values, ChainUpdate, Follower, FollowerConfigBuilder, Network, Point,
-};
-use pallas::ledger::traverse::{wellknown::GenesisValues, MultiEraBlock, MultiEraTx};
-use tokio::{sync::mpsc, task::JoinHandle, time};
-use tracing::{error, info};
-
-use crate::{
-    db::event::{
-        cardano::{
-            chain_state::{IndexedFollowerDataParams, MachineId},
-            cip36_registration::IndexedVoterRegistrationParams,
-            config::FollowerConfig,
-            utxo::{IndexedTxnInputParams, IndexedTxnOutputParams, IndexedTxnParams},
-        },
-        error::NotFoundError,
-        EventDB,
-    },
-    settings::Settings,
-};
+use crate::settings::Settings;
 
 pub(crate) mod cip36_registration;
 pub(crate) mod util;
 
 /// Blocks batch length that will trigger the blocks buffer to be written to the database.
+#[allow(dead_code)]
 const MAX_BLOCKS_BATCH_LEN: usize = 1024;
 
-/// Returns a follower configs, waits until they present inside the db
-async fn get_follower_config(check_config_tick: u64) -> anyhow::Result<Vec<FollowerConfig>> {
-    let mut interval = time::interval(time::Duration::from_secs(check_config_tick));
-    loop {
-        // tick until config exists
-        interval.tick().await;
+/// Start syncing a particular network
+async fn start_sync_for(chain: Network) -> anyhow::Result<()> {
+    let cfg = ChainSyncConfig::default_for(chain);
+    info!(chain = cfg.chain.to_string(), "Starting Sync");
 
-        match EventDB::get_follower_config().await {
-            Ok(configs) => break Ok(configs),
-            Err(err) if err.is::<NotFoundError>() => {
-                error!("No follower config found");
-                continue;
-            },
-            Err(err) => break Err(err),
-        }
+    if let Err(error) = cfg.run().await {
+        error!(chain=%chain, error=%error, "Failed to start chain sync task");
+        Err(error)?;
     }
+
+    Ok(())
 }
 
 /// Start followers as per defined in the config
 #[allow(unused)]
-pub(crate) async fn start_followers(
-    check_config_tick: u64, data_refresh_tick: u64,
-) -> anyhow::Result<()> {
-    let mut current_config = get_follower_config(check_config_tick).await?;
-    loop {
-        // spawn followers and obtain thread handlers for control and future cancellation
-        let follower_tasks = spawn_followers(
-            current_config.clone(),
-            data_refresh_tick,
-            Settings::service_id().to_string(),
-        )
-        .await?;
+pub(crate) async fn start_followers() -> anyhow::Result<()> {
+    let cfg = Settings::follower_cfg();
 
-        // Followers should continue indexing until config has changed
-        current_config = loop {
-            let new_config = get_follower_config(check_config_tick).await?;
-            if new_config != current_config {
-                info!("Config has changed! restarting");
-                break new_config;
+    cfg.log();
+
+    start_sync_for(cfg.chain).await?;
+
+    tokio::spawn(async move {
+        // We can't sync until the local chain data is synced.
+        // This call will wait until we sync.
+
+        // Initially simple pure follower.
+        // TODO, break the initial sync follower into multiple followers syncing the chain
+        // to the index DB in parallel.
+        info!(chain = %cfg.chain, "Following");
+        let mut follower = ChainFollower::new(cfg.chain, ORIGIN_POINT, TIP_POINT).await;
+
+        while let Some(chain_update) = follower.next().await {
+            match chain_update.kind {
+                cardano_chain_follower::Kind::ImmutableBlockRollForward => {
+                    warn!("TODO: Immutable Chain roll forward");
+                },
+                cardano_chain_follower::Kind::Block => {
+                    let block = chain_update.block_data().decode();
+                },
+                cardano_chain_follower::Kind::Rollback => {
+                    warn!("TODO: Immutable Chain rollback");
+                },
             }
-        };
-
-        // Config has changed, terminate all followers and restart with new config.
-        info!("Terminating followers");
-        for task in follower_tasks {
-            task.abort();
         }
-    }
+    });
+
+    Ok(())
 }
+
+const _UNUSED_CODE: &str = r#"
 
 /// Spawn follower threads and return associated handlers
 async fn spawn_followers(
@@ -421,3 +403,5 @@ async fn instantiate_follower(
 
     Ok(follower)
 }
+
+"#;
