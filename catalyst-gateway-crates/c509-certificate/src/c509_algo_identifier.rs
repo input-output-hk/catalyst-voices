@@ -15,11 +15,12 @@
 
 use asn1_rs::Oid;
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
+use serde::{Deserialize, Serialize};
 
 use crate::c509_oid::C509oid;
 
 /// A struct represents the `AlgorithmIdentifier` type.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct AlgorithmIdentifier {
     /// A `C509oid`
     oid: C509oid,

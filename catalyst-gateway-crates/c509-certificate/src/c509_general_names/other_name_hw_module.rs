@@ -5,13 +5,14 @@
 
 use asn1_rs::Oid;
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
+use serde::{Deserialize, Serialize};
 
 use crate::c509_oid::C509oid;
 
 /// A struct represents the hardwareModuleName type of otherName.
 /// Containing a pair of ( hwType, hwSerialNum ) as mentioned in
 /// [RFC4108](https://datatracker.ietf.org/doc/rfc4108/)
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Deserialize, Serialize)]
 pub struct OtherNameHardwareModuleName {
     /// The hardware type OID.
     hw_type: C509oid,

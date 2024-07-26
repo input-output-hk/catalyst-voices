@@ -6,9 +6,13 @@
 //! ```
 
 mod data;
+
+use std::str::FromStr;
+
 use asn1_rs::Oid;
 use data::{get_oid_from_int, ISSUER_SIG_ALGO_LOOKUP};
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
+use serde::{Deserialize, Deserializer, Serialize};
 
 use crate::{c509_algo_identifier::AlgorithmIdentifier, c509_oid::C509oidRegistered};
 
@@ -32,6 +36,36 @@ impl IssuerSignatureAlgorithm {
             ),
             algo_identifier: AlgorithmIdentifier::new(oid, param),
         }
+    }
+}
+/// Helper struct for deserialize and serialize `IssuerSignatureAlgorithm`.
+#[derive(Debug, Deserialize, Serialize)]
+struct Helper {
+    /// OID as string.
+    oid: String,
+    /// Optional parameter.
+    param: Option<String>,
+}
+
+impl<'de> Deserialize<'de> for IssuerSignatureAlgorithm {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where D: Deserializer<'de> {
+        let helper = Helper::deserialize(deserializer)?;
+        let oid =
+            Oid::from_str(&helper.oid).map_err(|e| serde::de::Error::custom(format!("{e:?}")))?;
+
+        Ok(IssuerSignatureAlgorithm::new(oid, helper.param))
+    }
+}
+
+impl Serialize for IssuerSignatureAlgorithm {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where S: serde::Serializer {
+        let helper = Helper {
+            oid: self.registered_oid.get_c509_oid().get_oid().to_string(),
+            param: self.algo_identifier.get_param().clone(),
+        };
+        helper.serialize(serializer)
     }
 }
 
