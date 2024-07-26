@@ -67,15 +67,16 @@ pub struct C509oid {
     pen_supported: bool,
 }
 
+/// A helper struct for deserialize and serialize `C509oid`.
+#[derive(Debug, Deserialize, Serialize)]
+struct Helper {
+    /// OID value in string.
+    oid: String,
+}
+
 impl<'de> Deserialize<'de> for C509oid {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where D: Deserializer<'de> {
-        /// A helper struct for deserialization.
-        #[derive(Deserialize)]
-        struct Helper {
-            /// OID value in string.
-            oid: String,
-        }
         let helper = Helper::deserialize(deserializer)?;
         let oid =
             Oid::from_str(&helper.oid).map_err(|e| serde::de::Error::custom(format!("{e:?}")))?;
@@ -86,12 +87,6 @@ impl<'de> Deserialize<'de> for C509oid {
 impl Serialize for C509oid {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where S: serde::Serializer {
-        /// Helper struct for serialization.
-        #[derive(Serialize)]
-        struct Helper {
-            /// OID as string.
-            oid: String,
-        }
         let helper = Helper {
             oid: self.oid.to_string(),
         };

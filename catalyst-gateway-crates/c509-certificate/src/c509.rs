@@ -41,7 +41,6 @@ impl Encode<()> for C509 {
     fn encode<W: Write>(
         &self, e: &mut Encoder<W>, ctx: &mut (),
     ) -> Result<(), minicbor::encode::Error<W::Error>> {
-        e.array(2)?;
         self.tbs_cert.encode(e, ctx)?;
         match self.issuer_signature_value {
             Some(ref value) => e.bytes(value)?,
@@ -53,14 +52,6 @@ impl Encode<()> for C509 {
 
 impl Decode<'_, ()> for C509 {
     fn decode(d: &mut Decoder<'_>, ctx: &mut ()) -> Result<Self, minicbor::decode::Error> {
-        let len = d.array()?.ok_or(minicbor::decode::Error::message(
-            "C509 Certificate should be an array",
-        ))?;
-        if len != 2 {
-            return Err(minicbor::decode::Error::message(
-                "C509 Certificate should contain 2 items",
-            ));
-        }
         let tbs_cert = TbsCert::decode(d, ctx)?;
         let issuer_signature_value = match d.datatype()? {
             minicbor::data::Type::Bytes => Some(d.bytes()?.to_vec()),

@@ -94,7 +94,9 @@ final class TransactionBuilder extends Equatable {
 
     final inputTotal =
         inputs.map((e) => e.output.amount).reduce((a, b) => a + b);
-    final outputTotal = outputs.map((e) => e.amount).reduce((a, b) => a + b);
+    final outputTotal = outputs.isNotEmpty
+        ? outputs.map((e) => e.amount).reduce((a, b) => a + b)
+        : const Balance.zero();
     final outputTotalPlusFee = outputTotal + Balance(coin: fee);
 
     if (outputTotalPlusFee.coin == inputTotal.coin) {
@@ -390,7 +392,7 @@ final class TransactionBuilder extends Equatable {
 
     for (final policy in baseMultiAsset.bundle.entries) {
       var oldAmount = output.amount;
-      var val = const Balance(coin: Coin(0));
+      var val = const Balance.zero();
       var nextNft = const MultiAsset(bundle: {});
       var rebuiltAssets = <AssetName, Coin>{};
 
@@ -416,7 +418,7 @@ final class TransactionBuilder extends Equatable {
           changeAssets.add(output.amount.multiAsset!);
 
           // 2. create a new output with the base coin value as zero
-          baseCoin = const Balance(coin: Coin(0));
+          baseCoin = const Balance.zero();
           output = TransactionOutput(
             address: changeAddress,
             amount: baseCoin,
@@ -424,7 +426,7 @@ final class TransactionBuilder extends Equatable {
 
           // 3. continue building the new output from the asset we stopped
           oldAmount = output.amount;
-          val = const Balance(coin: Coin(0));
+          val = const Balance.zero();
           nextNft = const MultiAsset(bundle: {});
           rebuiltAssets = {};
         }
@@ -550,7 +552,7 @@ final class TransactionOutputBuilder {
   }) {
     final minOutput = TransactionOutput(
       address: address,
-      amount: const Balance(coin: Coin(0)),
+      amount: const Balance.zero(),
     );
 
     final minPossibleCoin = minimumAdaForOutput(minOutput, coinsPerUtxoByte);

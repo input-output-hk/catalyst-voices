@@ -55,20 +55,20 @@ impl Extension {
     }
 }
 
+/// A helper struct to deserialize and serialize `Extension`.
+#[derive(Debug, Deserialize, Serialize)]
+struct Helper {
+    /// OID string value
+    oid: String,
+    /// Extension value
+    value: ExtensionValue,
+    /// Flag to indicate whether the extension is critical
+    critical: bool,
+}
+
 impl<'de> Deserialize<'de> for Extension {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where D: Deserializer<'de> {
-        /// A helper struct to deserialize.
-        #[derive(Debug, Deserialize)]
-        struct Helper {
-            /// OID string value
-            oid: String,
-            /// Extension value
-            value: ExtensionValue,
-            /// Flag to indicate whether the extension is critical
-            critical: bool,
-        }
-
         let helper = Helper::deserialize(deserializer)?;
         let oid =
             Oid::from_str(&helper.oid).map_err(|e| serde::de::Error::custom(format!("{e:?}")))?;
@@ -80,17 +80,6 @@ impl<'de> Deserialize<'de> for Extension {
 impl Serialize for Extension {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where S: serde::Serializer {
-        /// Helper struct for serialization.
-        #[derive(Serialize)]
-        struct Helper {
-            /// OID string.
-            oid: String,
-            /// Extension value.
-            value: ExtensionValue,
-            /// Flag to indicate whether the extension is critical.
-            critical: bool,
-        }
-
         let helper = Helper {
             oid: self.registered_oid.get_c509_oid().get_oid().to_string(),
             value: self.value.clone(),
@@ -196,6 +185,7 @@ trait ExtensionValueTypeTrait {
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, EnumDiscriminants, Deserialize, Serialize)]
 #[strum_discriminants(name(ExtensionValueType))]
+#[serde(rename_all = "snake_case")]
 pub enum ExtensionValue {
     /// An Integer in the range [-2^64, 2^64-1]
     Int(i64),

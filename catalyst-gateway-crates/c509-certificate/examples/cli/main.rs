@@ -4,7 +4,6 @@ use std::{
     fs::{self, File},
     io::Write,
     path::PathBuf,
-    str::FromStr,
 };
 
 use asn1_rs::{oid, Oid};
@@ -19,33 +18,25 @@ use c509_certificate::{
     tbs_cert::TbsCert,
 };
 use chrono::{DateTime, Utc};
-use clap::{Parser, Subcommand};
+use clap::Parser;
 use hex::ToHex;
 use minicbor::Decode;
 use rand::Rng;
 use serde::{Deserialize, Serialize};
 
-/// A struct for CLI.
+/// Commands for C509 certificate generation, verification and decoding
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
-struct Cli {
-    /// Optional subcommands.
-    #[command(subcommand)]
-    command: Option<Commands>,
-}
-
-/// Commands for C509 certificate generation, verification and decoding
-#[derive(Subcommand)]
-enum Commands {
+enum Cli {
     /// Generate C509 certificate, if private key is provided, self-signed certificate
     /// will be generated.
     Generate {
         /// JSON file with information to create C509 certificate.
         #[clap(short = 'f', long)]
         json_file: PathBuf,
-        /// Output of C509 certificate file.
+        /// Optional output path that the generated C509 will be written to.
         #[clap(short, long)]
-        output: PathBuf,
+        output: Option<PathBuf>,
         /// Optional private key file, if provided, self-signed certificate will be
         /// generated. Currently support only PEM format.
         #[clap(long)]
@@ -67,25 +58,27 @@ enum Commands {
 
     /// Decode C509 certificate back to JSON.
     Decode {
-        /// C509 certificate file
+        /// C509 certificate file.
         #[clap(short, long)]
         file: PathBuf,
-        /// Optional output path of C509 certificate information in JSON.
+        /// Optional output path of C509 certificate information in JSON format.
         #[clap(short, long)]
         output: Option<PathBuf>,
     },
 }
 
 impl Cli {
-    /// Execute the command.
-    pub(crate) fn exec(self) -> anyhow::Result<()> {
-        match self.command {
-            Some(Commands::Generate {
+    /// Function to execute the commands.
+    pub(crate) fn exec() -> anyhow::Result<()> {
+        let cli = Cli::parse();
+
+        match cli {
+            Cli::Generate {
                 json_file,
                 output,
                 private_key,
                 key_type,
-            }) => {
+            } => {
                 let sk = match private_key {
                     Some(key) => Some(PrivateKey::from_file(key)?),
                     None => None,
@@ -93,9 +86,8 @@ impl Cli {
 
                 generate(&json_file, output, sk.as_ref(), &key_type)
             },
-            Some(Commands::Verify { file, public_key }) => verify(&file, public_key),
-            Some(Commands::Decode { file, output }) => decode(&file, output),
-            None => Err(anyhow::anyhow!("No command provided")),
+            Cli::Verify { file, public_key } => verify(&file, public_key),
+            Cli::Decode { file, output } => decode(&file, output),
         }
     }
 }
@@ -105,7 +97,7 @@ impl Cli {
 struct C509Json {
     /// Indicate whether the certificate is self-signed.
     self_signed: bool,
-    /// Certificate type, if not provided, set to 0 as self-signed.
+    /// Optional certificate type, if not provided, set to 0 as self-signed.
     certificate_type: Option<u8>,
     /// Optional serial number of the certificate,
     /// if not provided, a random number will be generated.
@@ -124,7 +116,7 @@ struct C509Json {
     /// Optional subject public key algorithm of the certificate,
     /// if not provided, set to Ed25519.
     subject_public_key_algorithm: Option<SubjectPubKeyAlgorithm>,
-    /// A public key string or path to the public key file.
+    /// A path to the public key file.
     /// Currently support only PEM format.
     subject_public_key: String,
     /// Extensions of the certificate.
@@ -132,6 +124,9 @@ struct C509Json {
     /// Optional issuer signature algorithm of the certificate,
     /// if not provided, set to Ed25519.
     issuer_signature_algorithm: Option<IssuerSignatureAlgorithm>,
+    /// Optional issuer signature value of the certificate.
+    #[serde(skip_deserializing)]
+    issuer_signature_value: Option<Vec<u8>>,
 }
 
 /// Ed25519 oid and parameter - default algorithm.
@@ -146,7 +141,8 @@ const SELF_SIGNED_INT: u8 = 0;
 
 /// A function to generate C509 certificate.
 fn generate(
-    file: &PathBuf, output: PathBuf, private_key: Option<&PrivateKey>, key_type: &Option<String>,
+    file: &PathBuf, output: Option<PathBuf>, private_key: Option<&PrivateKey>,
+    key_type: &Option<String>,
 ) -> anyhow::Result<()> {
     let data = fs::read_to_string(file)?;
     let c509_json: C509Json = serde_json::from_str(&data)?;
@@ -195,8 +191,10 @@ fn generate(
 
     let cert = c509_certificate::generate(&tbs, private_key)?;
 
-    // Write signed certificate to output file
-    write_to_output_file(output, &cert)?;
+    // If the output path is provided, write to the file
+    if let Some(output) = output {
+        write_to_output_file(output, &cert)?;
+    };
 
     println!("Hex: {:?}", hex::encode(&cert));
     println!("Bytes: {:?}", &cert);
@@ -213,7 +211,7 @@ fn write_to_output_file(output: PathBuf, data: &[u8]) -> anyhow::Result<()> {
 
 /// Determine issuer of the certificate.
 /// If self-signed is true, issuer is the same as subject.
-/// Otherwise, issuer should be present.
+/// Otherwise, issuer must be present.
 fn determine_issuer(
     self_signed: bool, issuer: Option<RelativeDistinguishedName>,
     subject: RelativeDistinguishedName,
@@ -221,7 +219,7 @@ fn determine_issuer(
     if self_signed {
         Ok(subject)
     } else {
-        issuer.ok_or_else(|| anyhow::anyhow!("Issuer should be present if self-signed is false"))
+        issuer.ok_or_else(|| anyhow::anyhow!("Issuer must be present if self-signed is false"))
     }
 }
 
@@ -231,20 +229,16 @@ fn validate_certificate_type(
 ) -> anyhow::Result<()> {
     if self_signed && certificate_type.unwrap_or(SELF_SIGNED_INT) != SELF_SIGNED_INT {
         return Err(anyhow::anyhow!(
-            "Certificate type should be 0 if self-signed is true"
+            "Certificate type must be 0 if self-signed is true"
         ));
     }
     Ok(())
 }
 
-/// Parse public key from file path or string.
+/// Parse public key from file path.
 fn parse_public_key(public_key: &str) -> anyhow::Result<PublicKey> {
     let pk_path = PathBuf::from(public_key);
-    if pk_path.is_file() {
-        PublicKey::from_file(pk_path)
-    } else {
-        FromStr::from_str(public_key)
-    }
+    PublicKey::from_file(pk_path)
 }
 
 /// Get the key type. Currently support only Ed25519.
@@ -305,9 +299,11 @@ fn decode(file: &PathBuf, output: Option<PathBuf>) -> anyhow::Result<()> {
         validity_not_after: Some(time_to_string(tbs_cert.get_validity_not_after().to_i64())?),
         subject: extract_relative_distinguished_name(tbs_cert.get_subject())?,
         subject_public_key_algorithm: Some(tbs_cert.get_subject_public_key_algorithm().clone()),
+        // Return a hex formation of the public key
         subject_public_key: tbs_cert.get_subject_public_key().encode_hex(),
         extensions: tbs_cert.get_extensions().clone(),
         issuer_signature_algorithm: Some(tbs_cert.get_issuer_signature_algorithm().clone()),
+        issuer_signature_value: c509.get_issuer_signature_value().clone(),
     };
 
     let data = serde_json::to_string(&c509_json)?;
@@ -338,6 +334,5 @@ fn time_to_string(time: i64) -> anyhow::Result<String> {
 // -------------------main-----------------------
 
 fn main() -> anyhow::Result<()> {
-    let cli = Cli::parse();
-    cli.exec()
+    Cli::exec()
 }

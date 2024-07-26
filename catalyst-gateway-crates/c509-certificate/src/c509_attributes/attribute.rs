@@ -71,18 +71,18 @@ impl Attribute {
     }
 }
 
+/// A helper struct for deserialize and serialize `Attribute`.
+#[derive(Debug, Deserialize, Serialize)]
+struct Helper {
+    /// An OID value in string.
+    oid: String,
+    /// A value of C509 `Attribute` can be a vector of text or bytes.
+    value: Vec<AttributeValue>,
+}
+
 impl<'de> Deserialize<'de> for Attribute {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where D: Deserializer<'de> {
-        /// A helper struct for deserialize `Attribute`.
-        #[derive(Debug, Deserialize)]
-        struct Helper {
-            /// An OID value in string.
-            oid: String,
-            /// A value of C509 `Attribute` can be a vector of text or bytes.
-            value: Vec<AttributeValue>,
-        }
-
         let helper = Helper::deserialize(deserializer)?;
         let oid =
             Oid::from_str(&helper.oid).map_err(|e| serde::de::Error::custom(format!("{e:?}")))?;
@@ -97,14 +97,6 @@ impl<'de> Deserialize<'de> for Attribute {
 impl Serialize for Attribute {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where S: serde::Serializer {
-        /// Helper struct for serialization.
-        #[derive(Serialize)]
-        struct Helper {
-            /// OID string.
-            oid: String,
-            /// A value of C509 `Attribute` can be a vector of text or bytes.
-            value: Vec<AttributeValue>,
-        }
         let helper = Helper {
             oid: self.registered_oid.get_c509_oid().get_oid().to_string(),
             value: self.value.clone(),
@@ -190,6 +182,7 @@ impl Decode<'_, ()> for Attribute {
 /// An enum of possible value types for `Attribute`.
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, serde::Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
 pub enum AttributeValue {
     /// A text string.
     Text(String),

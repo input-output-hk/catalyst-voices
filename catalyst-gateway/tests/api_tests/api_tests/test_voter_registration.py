@@ -1,5 +1,7 @@
 import json
 from loguru import logger
+import pytest
+
 from api_tests import (
     check_is_live,
     check_is_ready,
@@ -7,7 +9,6 @@ from api_tests import (
     sync_to,
     utils,
 )
-
 
 def check_delegations(provided, expected):
     if type(expected) is list:
@@ -24,7 +25,7 @@ def check_delegations(provided, expected):
     else:
         assert provided["voting_key"] == expected
 
-
+@pytest.mark.nightly
 def test_voter_registration_endpoint():
     check_is_live()
     check_is_ready()

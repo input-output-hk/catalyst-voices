@@ -115,6 +115,7 @@ pub enum GeneralNameTypeRegistry {
 #[allow(clippy::module_name_repetitions)]
 #[derive(Debug, PartialEq, Clone, EnumDiscriminants, Deserialize, Serialize)]
 #[strum_discriminants(name(GeneralNameValueType))]
+#[serde(rename_all = "snake_case")]
 pub enum GeneralNameValue {
     /// A text string.
     Text(String),

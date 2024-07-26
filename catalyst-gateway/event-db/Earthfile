@@ -3,7 +3,7 @@
 # the database and its associated software.
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.1.17 AS postgresql-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.1.19 AS postgresql-ci
 
 # cspell: words
 
@@ -23,7 +23,7 @@ build:
     FROM +builder
 
     DO postgresql-ci+BUILD --image_name=event-db
-    DO postgresql-ci+DOCS 
+    DO postgresql-ci+DOCS
 
 # local : Make a locally run-able container that can serve the db.
 #   --push will cause this image to be pushed to the local development cluster
@@ -36,7 +36,7 @@ local:
 
     FROM +build
 
-    # Publish to the local development cluster 
+    # Publish to the local development cluster
     IF [ "$local_registry" != "" ]
         SAVE IMAGE --push --insecure $local_registry/event-db:latest
     END

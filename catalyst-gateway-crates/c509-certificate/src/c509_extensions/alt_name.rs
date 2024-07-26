@@ -40,6 +40,7 @@ impl Decode<'_, ()> for AlternativeName {
 
 /// Enum for type that can be a `GeneralNames` or a text use in `AlternativeName`.
 #[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
 pub enum GeneralNamesOrText {
     /// A value of `GeneralNames`.
     GeneralNames(GeneralNames),

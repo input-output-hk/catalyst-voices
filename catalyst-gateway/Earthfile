@@ -1,7 +1,7 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.1.17 AS rust-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:v3.1.17 AS mithril-snapshot-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.1.19 AS rust-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:v3.1.19 AS mithril-snapshot-ci
 
 #cspell: words rustfmt toolsets USERARCH
 
@@ -40,7 +40,7 @@ build:
         --args2="--cov_report=$HOME/coverage-report.info" \
         --output="release/cat-gateway" \
         --junit="cat-gateway.junit-report.xml" \
-        --coverage="cat-gateway.coverage-report.info" \
+        --coverage="cat-gateway.coverage.info" \
         --docs="true"
 
     # Generate the OpenAPI doc from the cat-gateway executable itself.
@@ -48,10 +48,6 @@ build:
 
     SAVE ARTIFACT target/doc doc
     SAVE ARTIFACT target/release/cat-gateway cat-gateway
-
-# build : Build the catalyst-gateway service. Used for nightly setup
-nightly:
-    BUILD +build
 
 # all-hosts-build : Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
@@ -75,7 +71,7 @@ package-cat-gateway:
 
 # package-cat-gateway : Create a deployable container for catalyst-gateway
 # And bundle a Mithril snapshot of cardano preprod
-package-cat-gateway-with-preprod:
+nightly-package-cat-gateway-with-preprod:
     ARG tag="latest"
 
     FROM +package-cat-gateway

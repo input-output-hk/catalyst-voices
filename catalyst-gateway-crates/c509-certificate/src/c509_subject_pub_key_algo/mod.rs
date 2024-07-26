@@ -41,17 +41,18 @@ impl SubjectPubKeyAlgorithm {
     }
 }
 
+/// Helper struct for deserialize and serialize `SubjectPubKeyAlgorithm`.
+#[derive(Debug, Deserialize, Serialize)]
+struct Helper {
+    /// OID as string.
+    oid: String,
+    /// Optional parameter.
+    param: Option<String>,
+}
+
 impl<'de> Deserialize<'de> for SubjectPubKeyAlgorithm {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where D: Deserializer<'de> {
-        /// Helper struct for deserialization.
-        #[derive(Debug, Deserialize)]
-        struct Helper {
-            /// OID as string.
-            oid: String,
-            /// Optional parameter.
-            param: Option<String>,
-        }
         let helper = Helper::deserialize(deserializer)?;
         let oid =
             Oid::from_str(&helper.oid).map_err(|e| serde::de::Error::custom(format!("{e:?}")))?;
@@ -63,14 +64,6 @@ impl<'de> Deserialize<'de> for SubjectPubKeyAlgorithm {
 impl Serialize for SubjectPubKeyAlgorithm {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where S: serde::Serializer {
-        /// Helper struct for serialization.
-        #[derive(Serialize)]
-        struct Helper {
-            /// OID as string.
-            oid: String,
-            /// Optional parameter.
-            param: Option<String>,
-        }
         let helper = Helper {
             oid: self.registered_oid.get_c509_oid().get_oid().to_string(),
             param: self.algo_identifier.get_param().clone(),
