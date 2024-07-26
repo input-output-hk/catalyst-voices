@@ -1,3 +1,10 @@
+## 0.1.3
+
+ - **FEAT**: rbac metadata envelope ([#630](https://github.com/input-output-hk/catalyst-voices/issues/630)). ([150d5676](https://github.com/input-output-hk/catalyst-voices/commit/150d567636c4281c092d020d51882e638b16beb5))
+ - **FEAT**: rbac metadata ([#619](https://github.com/input-output-hk/catalyst-voices/issues/619)). ([daf24a15](https://github.com/input-output-hk/catalyst-voices/commit/daf24a15a0b8d6345131ca8e3ec33c92865af4f8))
+ - **FEAT**: add required signers ([#605](https://github.com/input-output-hk/catalyst-voices/issues/605)). ([bebc0fbd](https://github.com/input-output-hk/catalyst-voices/commit/bebc0fbd241b6370b31b91e5a60b1d5d30cec403))
+ - **FEAT**: automate melos release ([#593](https://github.com/input-output-hk/catalyst-voices/issues/593)). ([7e4bf294](https://github.com/input-output-hk/catalyst-voices/commit/7e4bf294a81c8aa73a91170969d2189201869aa0))
+
 ## 0.1.2
 
  - **FIX**: readme versioning for catalyst packages ([#585](https://github.com/input-output-hk/catalyst-voices/issues/585)). ([e433b2db](https://github.com/input-output-hk/catalyst-voices/commit/e433b2dbba7a43c50f4411ea5279a623c221b66b))

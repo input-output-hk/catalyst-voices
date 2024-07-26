@@ -4,9 +4,11 @@ addrr
 adminer
 afinet
 androidx
+anypolicy
 appspot
 Arbritrary
 ARGB
+Arissara
 asmjs
 asyncio
 asyncpg
@@ -16,16 +18,21 @@ autorecalculates
 autoresizing
 backendpython
 bech
+bimap
+bindgen
 bkioshn
 bluefireteam
 BROTLI
 canvaskit
 cardano
+carryforward
 Catalyst
 CBOR
 cborg
+cdylib
 CEST
 cfbundle
+Chotivichit
 chromedriver
 chrono
 ciphertext
@@ -34,6 +41,7 @@ COCOAPODS
 codegen
 codepoints
 coti
+coverallsapp
 cryptoxide
 Cunego
 Cupertino
@@ -116,6 +124,7 @@ metadatums
 metamap
 mgrybyk
 miniaturizable
+minicbor
 mithril
 mitigations
 moderations
@@ -130,6 +139,7 @@ NDEBUG
 netifas
 netkey
 nextest
+OCSP
 Oleksandr
 onboarded
 oneshot
@@ -144,6 +154,7 @@ plpgsql
 podfile
 podhelper
 postcss
+Precertificate
 preprod
 projectcatalyst
 Prokhorenko
@@ -167,6 +178,7 @@ rustc
 rustdoc
 rustdocflags
 rustflags
+rustfmt
 rustls
 rxdart
 saibatizoku
@@ -230,3 +242,4 @@ xctest
 xctestrun
 xcworkspace
 yoroi
+unchunk

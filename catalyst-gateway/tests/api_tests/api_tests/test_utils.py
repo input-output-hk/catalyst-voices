@@ -1,6 +1,7 @@
 from api_tests import utils
+import pytest
 
-
+@pytest.mark.ci
 def test_bech32_encoding():
     addr = utils.stake_public_key_to_address(
         # cspell: disable

@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano_serialization/src/signature.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 
@@ -32,7 +33,7 @@ final class TransactionWitnessSet extends Equatable {
 /// The transaction witness with a [signature] of the transaction.
 final class VkeyWitness extends Equatable {
   /// The public key of the witness.
-  final Vkey vkey;
+  final Ed25519PublicKey vkey;
 
   /// The witness signature of the transaction.
   final Ed25519Signature signature;
@@ -47,7 +48,7 @@ final class VkeyWitness extends Equatable {
   /// size when the transaction hasn't been signed yet.
   factory VkeyWitness.seeded(int byte) {
     return VkeyWitness(
-      vkey: Vkey.seeded(byte),
+      vkey: Ed25519PublicKey.seeded(byte),
       signature: Ed25519Signature.seeded(byte),
     );
   }
@@ -60,7 +61,7 @@ final class VkeyWitness extends Equatable {
     final signature = innerList[1];
 
     return VkeyWitness(
-      vkey: Vkey.fromCbor(vkey),
+      vkey: Ed25519PublicKey.fromCbor(vkey),
       signature: Ed25519Signature.fromCbor(signature),
     );
   }
@@ -77,57 +78,4 @@ final class VkeyWitness extends Equatable {
 
   @override
   List<Object?> get props => [vkey, signature];
-}
-
-/// The public key of the witness.
-extension type Vkey._(List<int> bytes) {
-  /// The length of the [Vkey].
-  static const int length = 32;
-
-  /// The default constructor for [Vkey].
-  Vkey.fromBytes(this.bytes) {
-    if (bytes.length != length) {
-      throw ArgumentError('Vkey length does not match: ${bytes.length}');
-    }
-  }
-
-  /// Returns the [Vkey] filled with [byte] that can be
-  /// used to reserve size to calculate the final transaction bytes size.
-  factory Vkey.seeded(int byte) => Vkey.fromBytes(List.filled(length, byte));
-
-  /// Deserializes the type from cbor.
-  factory Vkey.fromCbor(CborValue value) {
-    return Vkey.fromBytes((value as CborBytes).bytes);
-  }
-
-  /// Serializes the type as cbor.
-  CborValue toCbor() => CborBytes(bytes);
-}
-
-/// The witness signature of the transaction.
-extension type Ed25519Signature._(List<int> bytes) {
-  /// The length of the [Ed25519Signature].
-  static const int length = 64;
-
-  /// The default constructor for [Ed25519Signature].
-  Ed25519Signature.fromBytes(this.bytes) {
-    if (bytes.length != length) {
-      throw ArgumentError(
-        'Ed25519Signature length does not match: ${bytes.length}',
-      );
-    }
-  }
-
-  /// Returns the [Ed25519Signature] filled with [byte] that can be
-  /// used to reserve size to calculate the final transaction bytes size.
-  factory Ed25519Signature.seeded(int byte) =>
-      Ed25519Signature.fromBytes(List.filled(length, byte));
-
-  /// Deserializes the type from cbor.
-  factory Ed25519Signature.fromCbor(CborValue value) {
-    return Ed25519Signature.fromBytes((value as CborBytes).bytes);
-  }
-
-  /// Serializes the type as cbor.
-  CborValue toCbor() => CborBytes(bytes);
 }

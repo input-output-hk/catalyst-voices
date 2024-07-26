@@ -1,3 +1,8 @@
+## 0.1.3
+
+ - **FIX**: catalyst cardano integration with Typhoon wallet ([#636](https://github.com/input-output-hk/catalyst-voices/issues/636)). ([2c6e270d](https://github.com/input-output-hk/catalyst-voices/commit/2c6e270ddcb95389ac417ffe5f60ccabc04b5931))
+ - **FEAT**: automate melos release ([#593](https://github.com/input-output-hk/catalyst-voices/issues/593)). ([7e4bf294](https://github.com/input-output-hk/catalyst-voices/commit/7e4bf294a81c8aa73a91170969d2189201869aa0))
+
 ## 0.1.2
 
  - **FIX**: issues before publishing catalyst-cardano ([#581](https://github.com/input-output-hk/catalyst-voices/issues/581)). ([7b5338b3](https://github.com/input-output-hk/catalyst-voices/commit/7b5338b3dd6ab028e56c958a3664b6bf20b24d65))
