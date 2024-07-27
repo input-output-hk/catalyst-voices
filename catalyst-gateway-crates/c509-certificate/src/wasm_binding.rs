@@ -57,7 +57,7 @@ impl PrivateKey {
     #[wasm_bindgen]
     pub fn str_to_sk(str: &str) -> Result<PrivateKey, JsValue> {
         FromStr::from_str(str)
-            .map_err(|_| JsValue::from("Cannot decode key from string. Invalid PEM format."))
+            .map_err(|_| JsValue::from("Cannot decode private key from string. Invalid PEM format."))
     }
 }
 
@@ -70,6 +70,6 @@ impl PublicKey {
     #[wasm_bindgen]
     pub fn str_to_pk(str: &str) -> Result<PublicKey, JsValue> {
         FromStr::from_str(str)
-            .map_err(|_| JsValue::from("Cannot decode key from string. Invalid PEM format."))
+            .map_err(|_| JsValue::from("Cannot decode public key from string. Invalid PEM format."))
     }
 }
