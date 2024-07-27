@@ -56,8 +56,9 @@ impl PrivateKey {
     /// Returns an error if the provided string is not a valid private key.
     #[wasm_bindgen]
     pub fn str_to_sk(str: &str) -> Result<PrivateKey, JsValue> {
-        FromStr::from_str(str)
-            .map_err(|_| JsValue::from("Cannot decode private key from string. Invalid PEM format."))
+        FromStr::from_str(str).map_err(|_| {
+            JsValue::from("Cannot decode private key from string. Invalid PEM format.")
+        })
     }
 }
 
