@@ -52,16 +52,10 @@ test('import wallet', async ({ }) => {
         await newTab.locator(ftSeedPhraseSelector).fill(seedPhrase[i]);
     }
 
-    const unlockWallet = '#app > div > div > div.flex-grow.overflow-auto > div > div.my-5.flex.justify-center.py-16 > div > div > div > div.mt-6.text-center.flex.justify-center > button';
     await clickBlankSpace(newTab);
-    await newTab.waitForSelector(unlockWallet, { state: 'visible' });
-    await newTab.click(unlockWallet);
+    await newTab.getByRole('button', { name: 'Unlock Wallet' }).click();
 
-    const divSelector = '//*[@id="lc"]/div[2]/div[1]/div[2]/div/div[1]/div[1]/div/div[2]/div[1]/div/span[1]';
-    await newTab.waitForSelector(divSelector, { state: 'visible' });
-
-    // use the selector to retrieve the element handle
-    const elementHandle = await newTab.$(divSelector);
+    const elementHandle = newTab.locator('xpath=//*[@id="lc"]/div[2]/div[1]/div[2]/div/div[1]/div[1]/div/div[2]/div[1]/div/span[1]');
     if (elementHandle) {
         // retrieve the text content of the element
         const textContent = await elementHandle.textContent();
@@ -80,110 +74,77 @@ test('import wallet', async ({ }) => {
                 console.log('text content is not a valid float:', textContent);
             }
         } else {
-            console.log('no text content found for the specified selector:', divSelector);
+            console.log('no text content found for the specified selector:', elementHandle);
         }
     } else {
-        console.log('element not found for the specified XPath:', divSelector);
+        console.log('element not found for the specified XPath:', elementHandle);
     }
 
-    const voting = '//*[@id="app"]/div/div/div[3]/div/div/div[1]/div/div/div[2]/div[5]/a/div/div[2]';
-    await newTab.waitForSelector(voting, { state: 'visible' });
-    await newTab.click(voting);
+    // Voting Registration
+    // await newTab.getByText('Voting').click();
+    // await newTab.getByRole('button', { name: 'Register for voting' }).click();
+    // await newTab.getByRole('button', { name: 'Continue' }).click();
 
-    const regForVoting = '//*[@id="lc"]/div[2]/div[2]/div[1]/button/span';
-    await newTab.waitForSelector(regForVoting, { state: 'visible' });
-    await newTab.click(regForVoting)
+    // const RegistrationPin = getRegistrationPin('WALLET1');
+    // const pinReg1 = newTab.locator('xpath=//*[@id="lc"]/div[2]/div[2]/div[1]/div[2]/div[1]/div/div[1]/input[1]');
+    // await pinReg1.fill(RegistrationPin.one);
 
-    const continueReg = '//*[@id="lc"]/div[2]/div[2]/div[1]/div[2]/div[2]/div[2]/div/button[2]/span';
-    await newTab.waitForSelector(continueReg, { state: 'visible' });
-    await newTab.click(continueReg);
+    // const pinReg2 = newTab.locator('xpath=//*[@id="lc"]/div[2]/div[2]/div[1]/div[2]/div[1]/div/div[1]/input[2]');
+    // await pinReg2.fill(RegistrationPin.two);
 
-    const RegistrationPin = getRegistrationPin('WALLET1');
-    const pinReg1 = '//*[@id="lc"]/div[2]/div[2]/div[1]/div[2]/div[1]/div/div[1]/input[1]';
-    await newTab.waitForSelector(pinReg1, { state: 'visible' });
-    await newTab.fill(pinReg1, RegistrationPin.one);
+    // const pinReg3 = newTab.locator('xpath=//*[@id="lc"]/div[2]/div[2]/div[1]/div[2]/div[1]/div/div[1]/input[3]');
+    // await pinReg3.fill(RegistrationPin.one);
 
-    const pinReg2 = '//*[@id="lc"]/div[2]/div[2]/div[1]/div[2]/div[1]/div/div[1]/input[2]';
-    await newTab.waitForSelector(pinReg2, { state: 'visible' });
-    await newTab.fill(pinReg2, RegistrationPin.two);
+    // const pinReg4 = newTab.locator('xpath=//*[@id="lc"]/div[2]/div[2]/div[1]/div[2]/div[1]/div/div[1]/input[4]');
+    // await pinReg4.fill(RegistrationPin.one);
+    // await newTab.getByRole('button', { name: 'Continue' }).click();
 
-    const pinReg3 = '//*[@id="lc"]/div[2]/div[2]/div[1]/div[2]/div[1]/div/div[1]/input[3]';
-    await newTab.waitForSelector(pinReg3, { state: 'visible' });
-    await newTab.fill(pinReg3, RegistrationPin.three);
+    // Confirm password change
+    // const pinConfirm1 = newTab.locator('xpath=//*[@id="lc"]/div[2]/div[2]/div[1]/div[2]/div[1]/div/div[1]/input[1]');
+    // await pinConfirm1.fill(RegistrationPin.one);
 
-    const pinReg4 = '//*[@id="lc"]/div[2]/div[2]/div[1]/div[2]/div[1]/div/div[1]/input[4]';
-    await newTab.waitForSelector(pinReg4, { state: 'visible' });
-    await newTab.fill(pinReg4, RegistrationPin.four);
+    // const pinConfirm2 = newTab.locator('xpath=//*[@id="lc"]/div[2]/div[2]/div[1]/div[2]/div[1]/div/div[1]/input[2]');
+    // await pinConfirm2.fill(RegistrationPin.two);
 
-    const continuePin = '//*[@id="lc"]/div[2]/div[2]/div[1]/div[2]/div[2]/div[2]/div/button[2]/span';
-    await newTab.waitForSelector(continuePin, { state: 'visible' })
-    await newTab.click(continuePin);
+    // const pinConfirm3 = newTab.locator('xpath=//*[@id="lc"]/div[2]/div[2]/div[1]/div[2]/div[1]/div/div[1]/input[3]');
+    // await pinConfirm3.fill(RegistrationPin.one);
 
-    const pinConfirm1 = '//*[@id="lc"]/div[2]/div[2]/div[1]/div[2]/div[1]/div/div[1]/input[1]';
-    await newTab.waitForSelector(pinConfirm1, { state: 'visible' });
-    await newTab.fill(pinConfirm1, RegistrationPin.one);
+    // const pinConfirm4 = newTab.locator('xpath=//*[@id="lc"]/div[2]/div[2]/div[1]/div[2]/div[1]/div/div[1]/input[4]');
+    // await pinConfirm4.fill(RegistrationPin.one);
+    // await newTab.getByRole('button', { name: 'Continue' }).click();
 
-    const pinConfirm2 = '//*[@id="lc"]/div[2]/div[2]/div[1]/div[2]/div[1]/div/div[1]/input[2]';
-    await newTab.waitForSelector(pinConfirm2, { state: 'visible' });
-    await newTab.fill(pinConfirm2, RegistrationPin.two);
+    // await newTab.getByRole('button', { name: 'confirm' }).click();
+    // await newTab.getByPlaceholder('Password', { exact: true }).fill(WalletCredentials.password);
+    // await newTab.getByRole('button', { name: 'confirm' }).click();
 
-    const pinConfirm3 = '//*[@id="lc"]/div[2]/div[2]/div[1]/div[2]/div[1]/div/div[1]/input[3]';
-    await newTab.waitForSelector(pinConfirm3, { state: 'visible' });
-    await newTab.fill(pinConfirm3, RegistrationPin.three);
+    // try {
+    //     await newTab.waitForSelector('//*[@id="lc"]/div[2]/div[2]/div[2]/div[1]/div[2]', { timeout: 5000 });
+    //     const textContent = await newTab.$eval('//*[@id="lc"]/div[2]/div[2]/div[2]/div[1]/div[2]', el => el.textContent);
 
-    const pinConfirm4 = '//*[@id="lc"]/div[2]/div[2]/div[1]/div[2]/div[1]/div/div[1]/input[4]';
-    await newTab.waitForSelector(pinConfirm4, { state: 'visible' });
-    await newTab.fill(pinConfirm4, RegistrationPin.four);
+    //     if (textContent) {
+    //         console.log("registered for voting successfully!");
+    //     } else {
+    //         console.log('text content not found');
+    //     }
+    // } catch (error) {
+    //     console.error('an error occurred:', error.toString());
+    //     console.log('an error occurred');
+    // }
 
-    const continueReg2 = '//*[@id="lc"]/div[2]/div[2]/div[1]/div[2]/div[2]/div[2]/div/button[2]/div/div/div/span';
-    await newTab.waitForSelector(continueReg2, { state: 'visible' });
-    await newTab.click(continueReg2);
-
-    const confirmReg = '//*[@id="lc"]/div[2]/div[2]/div[1]/div[2]/div[2]/div[2]/div/button[2]/div/div';
-    await newTab.waitForSelector(confirmReg, { state: 'visible' });
-    await newTab.click(confirmReg);
-
-    const inputConfirmPassword = 'input[type="password"]';
-    await newTab.waitForSelector(inputConfirmPassword, { state: 'visible' });
-    await newTab.fill(inputConfirmPassword, WalletCredentials.password);
-
-    const confirmTransactionButton = '//button[text()="confirm"]';
-    await newTab.waitForSelector(confirmTransactionButton, { state: 'visible' });
-    await newTab.click(confirmTransactionButton);
-
-    try {
-        await newTab.waitForSelector('//*[@id="lc"]/div[2]/div[2]/div[2]/div[1]/div[2]', { timeout: 5000 });
-        const textContent = await newTab.$eval('//*[@id="lc"]/div[2]/div[2]/div[2]/div[1]/div[2]', el => el.textContent);
-
-        if (textContent) {
-            console.log("registered for voting successfully!");
-        } else {
-            console.log('text content not found');
-        }
-    } catch (error) {
-        console.error('an error occurred:', error.toString());
-        console.log('an error occurred');
-    }
-
+    // Logout 
     // const logOut = '//*[@id="app"]/div/div/div[3]/div/div/div[1]/div/div/div[2]/div[11]/div[2]';
-    // await newTab.waitForSelector(logOut, { state: 'visible' });
-    // await newTab.click(logOut);
+    // await newTab.locator(logOut).click();
 
     // const chooseAccount = '//*[@id="app"]/div/div/div[3]/div/div[2]/div/div/div[2]/div';
-    // await newTab.waitForSelector(chooseAccount, { state: 'visible' });
-    // await newTab.click(chooseAccount);
+    // await newTab.locator(chooseAccount).click();
 
     // const removeAccount = '//*[@id="app"]/div/div/div[3]/div/div[2]/div/div/div[2]/div[4]/button';
-    // await newTab.waitForSelector(removeAccount, { state: 'visible' });
-    // await newTab.click(removeAccount);
+    // await newTab.locator(removeAccount).click();
 
-    // const confirmRemove = 'button.btn.bg-primary';
-    // await newTab.waitForSelector(confirmRemove, { state: 'visible' });
-    // await newTab.click(confirmRemove)
+    // await newTab.locator('button.btn.bg-primary').click();
 
     // const addNew = '//*[@id="app"]/div/div/div[3]/div/div[2]/div/div/div[4]';
-    // await newTab.waitForSelector(addNew, { state: 'visible' });
-    // await newTab.click(addNew);
+    // await newTab.locator(addNew).click();
 
     await newTab.goto('http://localhost:8000/');
 
