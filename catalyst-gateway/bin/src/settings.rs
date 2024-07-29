@@ -75,7 +75,7 @@ const CASSANDRA_VOLATILE_DB_NAMESPACE_DEFAULT: &str = "volatile";
 const CHAIN_FOLLOWER_DEFAULT: Network = Network::Preprod;
 
 /// Default number of sync tasks (must be in the range 1 to 255 inclusive.)
-const CHAIN_FOLLOWER_SYNC_TASKS_DEFAULT: i64 = 16;
+const CHAIN_FOLLOWER_SYNC_TASKS_DEFAULT: u8 = 16;
 
 /// Hash the Public IPv4 and IPv6 address of the machine, and convert to a 128 bit V4
 /// UUID.
@@ -339,7 +339,7 @@ where {
         )
         .as_string();
 
-        let value = match raw_value.parse::<i64>() {
+        match raw_value.parse::<i64>() {
             Ok(value) => {
                 if value < min {
                     error!("{var_name} out of range. Range = {min} to {max} inclusive. Clamped to {min}");
@@ -355,9 +355,7 @@ where {
                 error!(error=%error, default=default, "{var_name} not an integer. Range = {min} to {max} inclusive. Defaulted");
                 default
             },
-        };
-
-        value
+        }
     }
 
     /// Get the read env var as a str.
@@ -488,16 +486,15 @@ pub(crate) struct ChainFollowerEnvVars {
 impl ChainFollowerEnvVars {
     /// Create a config for a cassandra cluster, identified by a default namespace.
     fn new() -> Self {
-        let chain =
-            StringEnvVar::new_as_enum(&format!("CHAIN_NETWORK"), CHAIN_FOLLOWER_DEFAULT, false);
+        let chain = StringEnvVar::new_as_enum("CHAIN_NETWORK", CHAIN_FOLLOWER_DEFAULT, false);
         let sync_tasks: u8 = StringEnvVar::new_as_i64(
-            &format!("CHAIN_FOLLOWER_SYNC_TASKS"),
-            CHAIN_FOLLOWER_SYNC_TASKS_DEFAULT,
+            "CHAIN_FOLLOWER_SYNC_TASKS",
+            CHAIN_FOLLOWER_SYNC_TASKS_DEFAULT.into(),
             1,
             255,
         )
         .try_into()
-        .unwrap_or(CHAIN_FOLLOWER_SYNC_TASKS_DEFAULT as u8);
+        .unwrap_or(CHAIN_FOLLOWER_SYNC_TASKS_DEFAULT);
 
         Self { chain, sync_tasks }
     }
