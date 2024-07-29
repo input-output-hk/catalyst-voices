@@ -70,7 +70,9 @@ extension type Ed25519PublicKey._(List<int> bytes) {
   }
 
   /// Serializes the type as cbor.
-  CborValue toCbor() => CborBytes(bytes);
+  CborValue toCbor({List<int> tags = const []}) {
+    return CborBytes(bytes, tags: tags);
+  }
 
   /// Returns a hex representation of the [Ed25519PublicKey].
   String toHex() => hex.encode(bytes);

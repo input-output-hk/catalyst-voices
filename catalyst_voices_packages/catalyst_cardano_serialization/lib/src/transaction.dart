@@ -214,14 +214,43 @@ final class TransactionOutput extends Equatable {
 
   /// Deserializes the type from cbor.
   factory TransactionOutput.fromCbor(CborValue value) {
-    final list = value as CborList;
-    final address = list[0];
-    final amount = list[1];
+    return _tryFromCborMap(value) ?? _tryFromCborList(value)!;
+  }
 
-    return TransactionOutput(
-      address: ShelleyAddress.fromCbor(address),
-      amount: Balance.fromCbor(amount),
-    );
+  /// This format is simpler and does not utilize the advanced features
+  /// of the Alonzo era (e.g., datum, native assets, or smart contract scripts).
+  /// It is consistent with basic transactions that could exist in earlier eras
+  /// or basic Alonzo-era transactions.
+  static TransactionOutput? _tryFromCborMap(CborValue value) {
+    try {
+      final map = value as CborMap;
+      final address = map[const CborSmallInt(0)]!;
+      final amount = map[const CborSmallInt(1)]!;
+
+      return TransactionOutput(
+        address: ShelleyAddress.fromCbor(address),
+        amount: Balance.fromCbor(amount),
+      );
+    } catch (error) {
+      return null;
+    }
+  }
+
+  /// This format shows the use of the EUTXO model introduced in the Alonzo era,
+  /// with support for native assets and possibly other advanced features.
+  static TransactionOutput? _tryFromCborList(CborValue value) {
+    try {
+      final list = value as CborList;
+      final address = list[0];
+      final amount = list[1];
+
+      return TransactionOutput(
+        address: ShelleyAddress.fromCbor(address),
+        amount: Balance.fromCbor(amount),
+      );
+    } catch (error) {
+      return null;
+    }
   }
 
   /// Serializes the type as cbor.
