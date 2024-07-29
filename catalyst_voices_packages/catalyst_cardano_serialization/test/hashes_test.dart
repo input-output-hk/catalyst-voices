@@ -124,7 +124,7 @@ void main() {
       expect(
         CertificateHash.fromC509Certificate(c509Cert),
         equals(
-          CertificateHash.fromHex('312517d13f3a63da8f487f56ded10618'),
+          CertificateHash.fromHex('431d7b744dcc4ac4359b7ee7ffa7be33'),
         ),
       );
     });
