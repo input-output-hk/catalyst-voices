@@ -1,4 +1,5 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_cardano_serialization/src/utils/cbor.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 
@@ -38,7 +39,7 @@ final class RegistrationData extends Equatable {
     final cborCerts = map[const CborSmallInt(20)] as CborList?;
     final publicKeys = map[const CborSmallInt(30)] as CborList?;
     final revocationSet = map[const CborSmallInt(40)] as CborList?;
-    final roleDataSet = map[const CborSmallInt(50)] as CborList?;
+    final roleDataSet = map[const CborSmallInt(100)] as CborList?;
 
     return RegistrationData(
       derCerts: derCerts?.map(X509DerCertificate.fromCbor).toList(),
@@ -65,13 +66,13 @@ final class RegistrationData extends Equatable {
       ),
       const CborSmallInt(30): _createCborList<Ed25519PublicKey>(
         publicKeys,
-        (item) => item.toCbor(),
+        (item) => item.toCbor(tags: [CborCustomTags.ed25519Bip32PublicKey]),
       ),
       const CborSmallInt(40): _createCborList<CertificateHash>(
         revocationSet,
         (item) => item.toCbor(),
       ),
-      const CborSmallInt(50): _createCborList<RoleData>(
+      const CborSmallInt(100): _createCborList<RoleData>(
         roleDataSet?.toList(),
         (item) => item.toCbor(),
       ),

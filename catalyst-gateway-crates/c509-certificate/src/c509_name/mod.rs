@@ -21,6 +21,7 @@ use asn1_rs::{oid, Oid};
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
 use rdn::RelativeDistinguishedName;
 use regex::Regex;
+use serde::{Deserialize, Serialize};
 
 use crate::c509_attributes::attribute::{Attribute, AttributeValue};
 
@@ -38,7 +39,7 @@ const EUI64_MAC_LEN: usize = 7;
 // ------------------Name----------------------
 
 /// A struct of C509 Name with `NameValue`.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Name(NameValue);
 
 impl Name {
@@ -46,6 +47,12 @@ impl Name {
     #[must_use]
     pub fn new(value: NameValue) -> Self {
         Self(value)
+    }
+
+    /// Get the value of the `Name`.
+    #[must_use]
+    pub fn get_value(&self) -> &NameValue {
+        &self.0
     }
 }
 
@@ -66,7 +73,8 @@ impl Decode<'_, ()> for Name {
 // ------------------NameValue----------------------
 
 /// An enum of possible value types for `Name`.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
 pub enum NameValue {
     /// A relative distinguished name.
     RelativeDistinguishedName(RelativeDistinguishedName),

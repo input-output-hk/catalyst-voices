@@ -6,6 +6,7 @@
 // cspell: words rdns
 
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
+use serde::{Deserialize, Serialize};
 
 use crate::c509_attributes::attribute::Attribute;
 
@@ -14,7 +15,7 @@ use crate::c509_attributes::attribute::Attribute;
 /// ```cddl
 /// RelativeDistinguishedName = Attribute / [ 2* Attribute ]
 /// ```
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct RelativeDistinguishedName(Vec<Attribute>);
 
 impl Default for RelativeDistinguishedName {

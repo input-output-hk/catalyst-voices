@@ -6,9 +6,10 @@
 // cspell: words Bignum bignum biguint
 
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
+use serde::{Deserialize, Serialize};
 
 /// A struct representing an unwrapped CBOR unsigned bignum.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct UnwrappedBigUint(u64);
 
 impl UnwrappedBigUint {
