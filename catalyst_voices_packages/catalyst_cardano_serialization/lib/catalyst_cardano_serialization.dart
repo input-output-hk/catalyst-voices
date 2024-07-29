@@ -11,4 +11,5 @@ export 'src/rbac/x509_metadata_envelope.dart';
 export 'src/signature.dart';
 export 'src/transaction.dart';
 export 'src/types.dart';
+export 'src/utils/uuid.dart';
 export 'src/witness.dart';
