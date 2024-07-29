@@ -3,7 +3,7 @@
 use cardano_chain_follower::{ChainFollower, ChainSyncConfig, Network, ORIGIN_POINT, TIP_POINT};
 use tracing::{error, info, warn};
 
-use crate::settings::Settings;
+use crate::{db::index::block::index_block, settings::Settings};
 
 pub(crate) mod cip36_registration;
 pub(crate) mod util;
@@ -50,7 +50,11 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
                     warn!("TODO: Immutable Chain roll forward");
                 },
                 cardano_chain_follower::Kind::Block => {
-                    let block = chain_update.block_data().decode();
+                    let block = chain_update.block_data();
+                    if let Err(error) = index_block(block).await {
+                        error!(chain=%cfg.chain, error=%error, "Failed to index block");
+                        return;
+                    }
                 },
                 cardano_chain_follower::Kind::Rollback => {
                     warn!("TODO: Immutable Chain rollback");

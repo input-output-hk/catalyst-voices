@@ -2,7 +2,7 @@
 -- Unstaked ADA address is an empty string.
 CREATE TABLE IF NOT EXISTS txo_by_stake (
     -- Priamry Key Fields
-    stake_address   ascii,      -- stake address (CIP19 Formatted Text)
+    stake_address   blob,       -- stake address hash (28 bytes stake address hash, zero length if not staked.)
     slot_no         varint,     -- slot number the txo was created in.
     txn             smallint,   -- Which Transaction in the Slot is the TXO.
     txo             smallint,   -- offset in the txo list of the transaction the txo is in.

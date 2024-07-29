@@ -2,13 +2,11 @@
 -- Unstaked ADA address is an empty string.
 CREATE TABLE IF NOT EXISTS txo_assets_by_stake (
     -- Priamry Key Fields
-    stake_address   ascii,    -- stake address (CIP19 Formatted Text)
+    stake_address   blob,     -- stake address hash (28 bytes stake address hash, zero length if not staked.)
     slot_no         bigint,   -- slot number the txo was created in.
     txn             smallint, -- Which Transaction in the Slot is the TXO.
-    txo_index       smallint, -- offset in the txo list of the transaction the txo is in.
-    policy_hash     ascii,    -- asset policy hash (Hex Encoded Hash)
-    policy_id       ascii,    -- id of the policy
-
+    txo             smallint, -- offset in the txo list of the transaction the txo is in.
+    policy_id       blob,     -- asset policy hash (id) (28 byte binary hash)
     policy_name     text,     -- name of the policy (UTF8)
     value           varint,   -- Value of the asset (u64)
 
@@ -22,5 +20,5 @@ CREATE TABLE IF NOT EXISTS txo_assets_by_stake (
                                 -- It is also only updated when the refenc is the same type
                                 -- ie, an immutable txo can only record an immutable spend.
 
-    PRIMARY KEY (stake_address, slot_no, txn, ofs, policy_hash, policy_id)
+    PRIMARY KEY (stake_address, slot_no, txn, txo, policy_id, policy_name)
 );
