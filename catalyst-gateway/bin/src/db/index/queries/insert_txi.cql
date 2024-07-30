@@ -1,8 +1,6 @@
 -- Create the TXI Record for a transaction hash, 
--- But only if it does not already exist.
-INSERT INTO txi_by_txn_hash (
-    txn_hash, 
-    txo, 
-    slot_no) 
-VALUES(?, ?, ?) 
-IF NOT EXISTS;
+UPDATE txi_by_txn_hash SET
+    slot_no = :slot_no
+WHERE    
+    txn_hash = :txn_hash AND 
+    txo = :txo ;

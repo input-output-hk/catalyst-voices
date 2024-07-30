@@ -218,6 +218,8 @@ trailings
 TXNZD
 Typer
 unawaited
+unchunk
+Unlogged
 unmanaged
 Unstaked
 utxo
@@ -248,4 +250,3 @@ xctest
 xctestrun
 xcworkspace
 yoroi
-unchunk

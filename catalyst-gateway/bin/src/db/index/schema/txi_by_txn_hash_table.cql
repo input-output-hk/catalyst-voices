@@ -3,7 +3,9 @@
 CREATE TABLE IF NOT EXISTS txi_by_txn_hash (
     txn_hash        blob,     -- 32 Bytes Transaction Hash that was spent.
     txo             smallint, -- Index of the TXO which was spent
+
+    -- Non key data, we can only spend a transaction hash/txo once, so this should be unique in any event.
     slot_no         varint,   -- slot number when the spend occured. 
                 
-    PRIMARY KEY (txn_hash, txo_index, slot_no)
+    PRIMARY KEY (txn_hash, txo)
 );

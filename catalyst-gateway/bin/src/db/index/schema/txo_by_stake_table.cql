@@ -19,5 +19,5 @@ CREATE TABLE IF NOT EXISTS txo_by_stake (
                                 -- when first detected in a query lookup.
                                 -- It serves as an optimization on subsequnt queries. 
 
-    PRIMARY KEY (stake_address, slot_no, txn, ofs)
+    PRIMARY KEY (stake_address, slot_no, txn, txo)
 );

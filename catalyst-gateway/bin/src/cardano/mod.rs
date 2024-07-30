@@ -44,6 +44,9 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
         info!(chain = %cfg.chain, "Following");
         let mut follower = ChainFollower::new(cfg.chain, ORIGIN_POINT, TIP_POINT).await;
 
+        let mut blocks: u64 = 0;
+        let mut hit_tip: bool = false;
+
         while let Some(chain_update) = follower.next().await {
             match chain_update.kind {
                 cardano_chain_follower::Kind::ImmutableBlockRollForward => {
@@ -51,6 +54,16 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
                 },
                 cardano_chain_follower::Kind::Block => {
                     let block = chain_update.block_data();
+                    if blocks == 0 {
+                        info!("Indexing first block.");
+                    }
+                    blocks += 1;
+
+                    if chain_update.tip && !hit_tip {
+                        hit_tip = true;
+                        info!("Hit tip after {blocks} blocks.");
+                    }
+
                     if let Err(error) = index_block(block).await {
                         error!(chain=%cfg.chain, error=%error, "Failed to index block");
                         return;
