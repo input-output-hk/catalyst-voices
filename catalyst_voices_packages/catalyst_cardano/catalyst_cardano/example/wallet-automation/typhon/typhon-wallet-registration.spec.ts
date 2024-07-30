@@ -41,12 +41,6 @@ test.beforeAll(async () => {
     await newTab.locator('input#termsAndConditions').click();
     await newTab.getByRole('button', { name: 'Continue' }).click();
 
-    async function clickBlankSpace(newTab) {
-        const blankSpace = '#app > div > div > div.flex-grow.overflow-auto > div > div.my-5.flex.justify-center.py-16 > div > div > div > div:nth-child(1) > div.flex.justify-between.items-start > div.flex-initial.flex.flex-col.mr-2 > span.text-primary.font-medium.text-xl';
-        await newTab.waitForSelector(blankSpace, { state: 'visible' });
-        await newTab.click(blankSpace);
-    }
-
     // Input seed phrase
     const seedPhrase = getSeedPhrase();
     for (let i = 0; i < seedPhrase.length; i++) {
@@ -54,7 +48,7 @@ test.beforeAll(async () => {
         await newTab.locator(ftSeedPhraseSelector).fill(seedPhrase[i]);
     }
 
-    await clickBlankSpace(newTab);
+    await newTab.locator('//*[@id="app"]/div/div/div[3]/div/div[2]/div/div/div/div[1]/div[1]/div[1]/span[1]').click();
     await newTab.getByRole('button', { name: 'Unlock Wallet' }).click();
     
     try {
@@ -84,38 +78,20 @@ test.beforeAll(async () => {
     await allowTab.bringToFront();
 
     await allowTab.getByRole('button', { name: 'Allow' }).click();
-    await newTab.waitForTimeout(10000);
+    await newTab.waitForTimeout(5000);
 });
 
 
-test('get wallet balance', async ({ }) => {
-    const elementHandle = await newTab.waitForSelector('#flt-semantic-node-13', { timeout: 5000 });
+test('get wallet balance', async () => {
+    const textContent = await newTab.locator('#flt-semantic-node-13').textContent({ timeout: 5000 });
+    expect(textContent).not.toBeNull();
 
-    if (elementHandle) {
-        // Retrieve the text content of the element
-        const textContent = await elementHandle.textContent();
+    const match = textContent!.match(/Balance: Ada \(lovelaces\): (\d+)/);
+    expect(match).not.toBeNull();
 
-        if (textContent !== null) {
-            // Extract the balance from the text content
-            const match = textContent.match(/Balance: Ada \(lovelaces\): (\d+)/);
-            if (match && match[1]) {
-                const balance = ((parseInt(match[1], 10))/1_000_000).toFixed(2);
-                console.log('ADA (lovelaces):', balance);
-
-                if (parseInt(balance) < 500) {
-                    console.log('not eligible for voting ☹️');
-                } else {
-                    console.log('eligible for voting ☺');
-                }
-            } else {
-                console.log('balance not found in text content:', textContent);
-            }
-        } else {
-            console.log('no text content found for the specified selector:', elementHandle);
-        }
-    } else {
-        console.log('element not found for the specified selector');
-    }
+    const balanceAda = ((parseInt(match![1], 10))/1_000_000).toFixed(2);
+    expect(parseInt(balanceAda)).toBeGreaterThan(500);
+    console.log('ADA (lovelaces):', balanceAda);
 });
 
     // Logout 
