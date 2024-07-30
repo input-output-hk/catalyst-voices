@@ -8,9 +8,13 @@
 // cspell: words spka
 
 mod data;
+
+use std::str::FromStr;
+
 use asn1_rs::Oid;
 use data::{get_oid_from_int, SUBJECT_PUB_KEY_ALGO_LOOKUP};
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
+use serde::{Deserialize, Deserializer, Serialize};
 
 use crate::{c509_algo_identifier::AlgorithmIdentifier, c509_oid::C509oidRegistered};
 
@@ -34,6 +38,37 @@ impl SubjectPubKeyAlgorithm {
             ),
             algo_identifier: AlgorithmIdentifier::new(oid, param),
         }
+    }
+}
+
+/// Helper struct for deserialize and serialize `SubjectPubKeyAlgorithm`.
+#[derive(Debug, Deserialize, Serialize)]
+struct Helper {
+    /// OID as string.
+    oid: String,
+    /// Optional parameter.
+    param: Option<String>,
+}
+
+impl<'de> Deserialize<'de> for SubjectPubKeyAlgorithm {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where D: Deserializer<'de> {
+        let helper = Helper::deserialize(deserializer)?;
+        let oid =
+            Oid::from_str(&helper.oid).map_err(|e| serde::de::Error::custom(format!("{e:?}")))?;
+
+        Ok(SubjectPubKeyAlgorithm::new(oid, helper.param))
+    }
+}
+
+impl Serialize for SubjectPubKeyAlgorithm {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where S: serde::Serializer {
+        let helper = Helper {
+            oid: self.registered_oid.get_c509_oid().get_oid().to_string(),
+            param: self.algo_identifier.get_param().clone(),
+        };
+        helper.serialize(serializer)
     }
 }
 

@@ -6,6 +6,7 @@
 use std::fmt::Debug;
 
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
+use serde::{Deserialize, Serialize};
 use strum_macros::{EnumDiscriminants, EnumIs};
 
 use super::{
@@ -18,7 +19,7 @@ use crate::{c509_name::Name, c509_oid::C509oid};
 /// ```cddl
 /// GeneralName = ( GeneralNameType : int, GeneralNameValue : any )
 /// ```
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct GeneralName {
     /// A registered general name type.
     gn_type: GeneralNameTypeRegistry,
@@ -84,7 +85,7 @@ impl Decode<'_, ()> for GeneralName {
 
 /// Enum of `GeneralName` registered in table Section 9.9 C509.
 #[allow(clippy::module_name_repetitions)]
-#[derive(Debug, Copy, PartialEq, Clone, Eq, Hash, EnumIs)]
+#[derive(Debug, Copy, PartialEq, Clone, Eq, Hash, EnumIs, Deserialize, Serialize)]
 pub enum GeneralNameTypeRegistry {
     /// An otherName with `BundleEID`.
     OtherNameBundleEID, // EID
@@ -112,8 +113,9 @@ pub enum GeneralNameTypeRegistry {
 
 /// An enum of possible value types for `GeneralName`.
 #[allow(clippy::module_name_repetitions)]
-#[derive(Debug, PartialEq, Clone, EnumDiscriminants)]
+#[derive(Debug, PartialEq, Clone, EnumDiscriminants, Deserialize, Serialize)]
 #[strum_discriminants(name(GeneralNameValueType))]
+#[serde(rename_all = "snake_case")]
 pub enum GeneralNameValue {
     /// A text string.
     Text(String),

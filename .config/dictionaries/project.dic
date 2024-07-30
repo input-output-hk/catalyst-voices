@@ -173,6 +173,7 @@ reqwest
 rfwtxt
 rgloader
 ripgrep
+rlib
 RPATH
 rustc
 rustdoc
@@ -243,3 +244,4 @@ xctestrun
 xcworkspace
 yoroi
 unchunk
+EUTXO

@@ -1,11 +1,12 @@
 //! C509 Extension use to construct an Extensions message field for C509 Certificate.
 
 mod data;
-use std::fmt::Debug;
+use std::{fmt::Debug, str::FromStr};
 
 use asn1_rs::Oid;
 use data::{get_extension_type_from_int, get_oid_from_int, EXTENSIONS_LOOKUP};
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
+use serde::{Deserialize, Deserializer, Serialize};
 use strum_macros::EnumDiscriminants;
 
 use super::alt_name::AlternativeName;
@@ -51,6 +52,40 @@ impl Extension {
     #[must_use]
     pub fn get_registered_oid(&self) -> &C509oidRegistered {
         &self.registered_oid
+    }
+}
+
+/// A helper struct to deserialize and serialize `Extension`.
+#[derive(Debug, Deserialize, Serialize)]
+struct Helper {
+    /// OID string value
+    oid: String,
+    /// Extension value
+    value: ExtensionValue,
+    /// Flag to indicate whether the extension is critical
+    critical: bool,
+}
+
+impl<'de> Deserialize<'de> for Extension {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where D: Deserializer<'de> {
+        let helper = Helper::deserialize(deserializer)?;
+        let oid =
+            Oid::from_str(&helper.oid).map_err(|e| serde::de::Error::custom(format!("{e:?}")))?;
+
+        Ok(Extension::new(oid, helper.value, helper.critical))
+    }
+}
+
+impl Serialize for Extension {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where S: serde::Serializer {
+        let helper = Helper {
+            oid: self.registered_oid.get_c509_oid().get_oid().to_string(),
+            value: self.value.clone(),
+            critical: self.critical,
+        };
+        helper.serialize(serializer)
     }
 }
 
@@ -148,8 +183,9 @@ trait ExtensionValueTypeTrait {
 
 /// An enum of possible value types for `Extension`.
 #[allow(clippy::module_name_repetitions)]
-#[derive(Debug, Clone, PartialEq, EnumDiscriminants)]
+#[derive(Debug, Clone, PartialEq, EnumDiscriminants, Deserialize, Serialize)]
 #[strum_discriminants(name(ExtensionValueType))]
+#[serde(rename_all = "snake_case")]
 pub enum ExtensionValue {
     /// An Integer in the range [-2^64, 2^64-1]
     Int(i64),
