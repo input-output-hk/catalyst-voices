@@ -173,6 +173,7 @@ reqwest
 rfwtxt
 rgloader
 ripgrep
+rlib
 RPATH
 rustc
 rustdoc

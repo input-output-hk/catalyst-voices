@@ -9,6 +9,7 @@ use ed25519_dalek::{
     pkcs8::{DecodePrivateKey, DecodePublicKey},
     SigningKey, VerifyingKey,
 };
+use wasm_bindgen::prelude::wasm_bindgen;
 
 /// Public or private key decoding from string error.
 #[derive(thiserror::Error, Debug)]
@@ -18,6 +19,7 @@ struct KeyPemDecodingError;
 /// Ed25519 private key instance.
 /// Wrapper over `ed25519_dalek::SigningKey`.
 #[allow(dead_code)]
+#[wasm_bindgen]
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PrivateKey(SigningKey);
 
@@ -95,6 +97,7 @@ impl FromStr for PrivateKey {
 /// Ed25519 public key instance.
 /// Wrapper over `ed25519_dalek::VerifyingKey`.
 #[derive(Clone, Debug, PartialEq, Eq)]
+#[wasm_bindgen]
 pub struct PublicKey(VerifyingKey);
 
 #[allow(dead_code)]
