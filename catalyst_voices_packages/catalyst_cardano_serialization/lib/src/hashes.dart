@@ -171,7 +171,7 @@ final class CertificateHash extends BaseHash {
   CertificateHash.fromX509DerCertificate(X509DerCertificate certificate)
       : super.fromBytes(
           bytes: Hash.blake2b(
-            Uint8List.fromList(cbor.encode(certificate.toCbor())),
+            Uint8List.fromList(certificate.bytes),
             digestSize: _length,
           ),
         );
@@ -180,7 +180,7 @@ final class CertificateHash extends BaseHash {
   CertificateHash.fromC509Certificate(C509Certificate certificate)
       : super.fromBytes(
           bytes: Hash.blake2b(
-            Uint8List.fromList(cbor.encode(certificate.toCbor())),
+            Uint8List.fromList(certificate.bytes),
             digestSize: _length,
           ),
         );
