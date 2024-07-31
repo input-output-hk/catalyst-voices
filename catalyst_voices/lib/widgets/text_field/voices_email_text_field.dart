@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -13,7 +14,7 @@ final class VoicesEmailTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    return TextField(
+    return VoicesTextField(
       keyboardType: TextInputType.emailAddress,
       textInputAction: TextInputAction.next,
       onChanged: onChanged,
