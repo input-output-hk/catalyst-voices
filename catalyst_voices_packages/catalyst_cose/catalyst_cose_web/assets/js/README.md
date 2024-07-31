@@ -10,8 +10,8 @@ which transforms the JS code to be browser runnable.
 
 To make changes in JS layer take the following steps:
 
-1. run `cd assets/js` # enter the directory
-2. run `npm install` to init the node environment
+1. run `cd assets/js` # enter the directory.
+2. run `npm install` to init the node environment.
 3. Apply your changes in `main.js`.
 This is the source file that will get transformed into a browser runnable version later.
 4. Run `npx browserify main.js -o catalyst_cose.js` to make the module runnable in a browser.
