@@ -130,7 +130,7 @@ abstract interface class CardanoWalletApi {
   /// reward addresses.
   ///
   /// Throws [WalletDataSignException].
-  Future<VkeyWitness> signData({
+  Future<DataSignature> signData({
     required ShelleyAddress address,
     required List<int> payload,
   });
@@ -242,4 +242,22 @@ final class Paginate extends Equatable {
 
   @override
   List<Object?> get props => [page, limit];
+}
+
+/// The data signature as returned by CIP-30 signData.
+final class DataSignature extends Equatable {
+  /// The public key.
+  final String key;
+
+  /// The signature.
+  final String signature;
+
+  /// The default constructor for [DataSignature].
+  const DataSignature({
+    required this.key,
+    required this.signature,
+  });
+
+  @override
+  List<Object?> get props => [key, signature];
 }

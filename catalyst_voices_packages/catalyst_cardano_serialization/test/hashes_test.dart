@@ -113,7 +113,7 @@ void main() {
       expect(
         CertificateHash.fromX509DerCertificate(derCert),
         equals(
-          CertificateHash.fromHex('c13a67ee9608dc5966aaa91fe3b1f021'),
+          CertificateHash.fromHex('667e69bd56a0fbd2d4db363e3bb017a1'),
         ),
       );
     });

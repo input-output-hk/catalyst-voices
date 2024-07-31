@@ -79,7 +79,7 @@ extension type JSCardanoWalletApi(JSObject _) implements JSObject {
   ]);
 
   /// See [CardanoWalletApi.signData].
-  external JSPromise<JSString> signData(
+  external JSPromise<JSDataSignature> signData(
     JSString address,
     JSString payload,
   );
@@ -173,4 +173,22 @@ extension type JSPaginate._(JSObject _) implements JSObject {
 
   /// See [JSPaginate.limit].
   external JSNumber get limit;
+}
+
+/// The JS representation of the [DataSignature].
+extension type JSDataSignature._(JSObject _) implements JSObject {
+  /// The default constructor for [JSDataSignature].
+  external factory JSDataSignature({JSString key, JSString signature});
+
+  /// See [DataSignature.key].
+  external JSString get key;
+
+  /// See [DataSignature.signature].
+  external JSString get signature;
+
+  /// Converts JS representation to pure dart representation.
+  DataSignature get toDart => DataSignature(
+        key: key.toDart,
+        signature: signature.toDart,
+      );
 }
