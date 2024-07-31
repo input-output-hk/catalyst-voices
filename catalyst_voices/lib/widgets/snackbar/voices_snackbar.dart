@@ -2,12 +2,12 @@ import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:flutter/material.dart';
 
 class VoicesSnackBar extends StatelessWidget {
-  final CatalystSnackBarType snackBarType;
+  final VoicesSnackBarType snackBarType;
   final List<SnackBarAction> actions;
 
   factory VoicesSnackBar.show(
     BuildContext context, {
-    required CatalystSnackBarType snackBarType,
+    required VoicesSnackBarType snackBarType,
     VoidCallback? onRefresh,
     VoidCallback? onLearnMore,
     List<SnackBarAction>? customActions,
