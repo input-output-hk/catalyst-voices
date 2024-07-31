@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/voices_app_bar/actions/voices_app_bar_actions.dart';
+import 'package:catalyst_voices/widgets/app_bar/actions/voices_app_bar_actions.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
