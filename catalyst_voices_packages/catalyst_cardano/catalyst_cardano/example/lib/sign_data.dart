@@ -7,13 +7,13 @@ Future<void> _signData({
   var result = '';
 
   try {
-    final rewardAddress = await api.getRewardAddresses();
-    final signer = await api.signData(
-      address: rewardAddress.first,
-      payload: [1, 2, 3],
+    final addresses = await api.getUsedAddresses();
+    final signature = await api.signData(
+      address: addresses.first,
+      payload: 'hello world!'.codeUnits,
     );
 
-    result = 'Signature: ${hex.encode(cbor.encode(signer.toCbor()))}';
+    result = 'Signature: $signature';
   } catch (error) {
     result = error.toString();
   }
