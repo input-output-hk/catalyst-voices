@@ -23,7 +23,7 @@ typedef ChunkedDataDeserializer<T> = T Function(CborValue value);
 /// between those references being altered and closes a potential attack vector
 /// where an unrelated registration update is attached to a different
 /// transaction.
-class X509MetadataEnvelope<T> extends Equatable {
+final class X509MetadataEnvelope<T> extends Equatable {
   /// The size of a chunk of data that is used to overcome
   /// the field size limitation.
   static const int metadataChunkSize = 64;

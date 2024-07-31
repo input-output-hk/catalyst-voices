@@ -51,6 +51,39 @@ void main() {
     });
   });
 
+  group(TransactionInputsHash, () {
+    const hexString = '4d3f576f26db29139981a69443c2325d';
+    final bytes = hex.decode(hexString);
+
+    test('from and to hex', () {
+      final hash = TransactionInputsHash.fromHex(hexString);
+      expect(hash.toHex(), equals(hexString));
+    });
+
+    test('from and to bytes', () {
+      final hash = TransactionInputsHash.fromBytes(bytes: bytes);
+      expect(hash.bytes, equals(bytes));
+    });
+
+    test('from transaction inputs', () {
+      final hash = TransactionInputsHash.fromTransactionInputs([testUtxo()]);
+      expect(
+        hash,
+        equals(
+          TransactionInputsHash.fromHex('26497de5e0c8fe2e4b0c85651f96b3c9'),
+        ),
+      );
+    });
+
+    test('toCbor returns bytes', () {
+      final hash = TransactionInputsHash.fromBytes(bytes: bytes);
+      final encodedCbor = cbor.encode(hash.toCbor());
+      final decodedCbor = cbor.decode(encodedCbor);
+      expect(decodedCbor, isA<CborBytes>());
+      expect((decodedCbor as CborBytes).bytes, equals(bytes));
+    });
+  });
+
   group(AuxiliaryDataHash, () {
     const hexString =
         '4d3f576f26db29139981a69443c2325daa812cc353a31b5a4db794a5bcbb06c2';

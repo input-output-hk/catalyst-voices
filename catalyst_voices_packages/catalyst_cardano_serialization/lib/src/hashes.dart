@@ -92,11 +92,11 @@ final class TransactionHash extends BaseHash {
   int get length => _length;
 }
 
-/// Describes the Blake2b-256 hash of the transaction inputs (UTXOs)
+/// Describes the Blake2b-128 hash of the transaction inputs (UTXOs)
 /// which can be used as a link to a certain transaction
 /// (as UTXOs can only be spent once).
 final class TransactionInputsHash extends BaseHash {
-  static const int _length = 32;
+  static const int _length = 16;
 
   /// Constructs the [TransactionInputsHash] from raw [bytes].
   TransactionInputsHash.fromBytes({required super.bytes}) : super.fromBytes();
