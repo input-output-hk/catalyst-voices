@@ -12,13 +12,13 @@ enum VoicesSnackBarType {
   Color? backgroundColor(BuildContext context) {
     switch (this) {
       case VoicesSnackBarType.info:
-        return Theme.of(context).colors.successContainer;
+        return Theme.of(context).colors.primaryContainer;
       case VoicesSnackBarType.success:
         return Theme.of(context).colors.successContainer;
       case VoicesSnackBarType.warning:
         return Theme.of(context).colors.warningContainer;
       case VoicesSnackBarType.error:
-        return Theme.of(context).colors.successContainer;
+        return Theme.of(context).colors.errorContainer;
     }
   }
 
@@ -27,11 +27,11 @@ enum VoicesSnackBarType {
       case VoicesSnackBarType.info:
         return CatalystVoicesIcons.information_circle;
       case VoicesSnackBarType.success:
-        return CatalystVoicesIcons.badge_check;
+        return CatalystVoicesIcons.check_circle;
       case VoicesSnackBarType.warning:
-        return CatalystVoicesIcons.badge_check;
+        return CatalystVoicesIcons.exclamation;
       case VoicesSnackBarType.error:
-        return CatalystVoicesIcons.refresh;
+        return CatalystVoicesIcons.exclamation_circle;
     }
   }
 
@@ -71,6 +71,19 @@ enum VoicesSnackBarType {
         return context.l10n.snackbarWarningLabelText;
       case VoicesSnackBarType.error:
         return context.l10n.snackbarErrorLabelText;
+    }
+  }
+
+  Color? titleColor(BuildContext context) {
+    switch (this) {
+      case VoicesSnackBarType.info:
+        return Theme.of(context).colors.onSuccess;
+      case VoicesSnackBarType.success:
+        return Theme.of(context).colors.onSuccess;
+      case VoicesSnackBarType.warning:
+        return Theme.of(context).colors.onWarning;
+      case VoicesSnackBarType.error:
+        return Theme.of(context).colors.onErrorContainer;
     }
   }
 }

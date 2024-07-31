@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
@@ -40,12 +41,19 @@ class VoicesSnackBar extends StatelessWidget {
                 const SizedBox(width: 16),
                 Text(
                   snackBarType.title(context),
-                  style: Theme.of(context).textTheme.titleMedium,
+                  style: TextStyle(
+                    color: snackBarType.titleColor(context),
+                    fontSize: Theme.of(context).textTheme.titleMedium?.fontSize,
+                    fontWeight:
+                        Theme.of(context).textTheme.titleMedium?.fontWeight,
+                    fontFamily:
+                        Theme.of(context).textTheme.titleMedium?.fontFamily,
+                  ),
                 ),
                 IconButton(
                   icon: Icon(
                     size: 24,
-                    Icons.close,
+                    CatalystVoicesIcons.x,
                     color: Theme.of(context).colors.iconsForeground,
                   ),
                   onPressed: () {
@@ -63,7 +71,7 @@ class VoicesSnackBar extends StatelessWidget {
               children: [
                 Text(
                   snackBarType.message(context),
-                  style: TextStyle(color: Theme.of(context).colors.textPrimary),
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
             ),

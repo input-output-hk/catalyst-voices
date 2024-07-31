@@ -9,6 +9,8 @@ class VoicesSnackbarExample extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(32),
@@ -21,6 +23,11 @@ class VoicesSnackbarExample extends StatelessWidget {
                 onPressed: () {
                   VoicesSnackBar(
                     snackBarType: type,
+                    padding: EdgeInsets.only(
+                      left: screenWidth / 4,
+                      right: screenWidth / 4,
+                      bottom: screenWidth / 2,
+                    ),
                     onLearnMorePressed: () {},
                     onRefreshPressed: () {},
                     onOkPressed: () {},
