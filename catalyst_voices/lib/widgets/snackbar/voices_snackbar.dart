@@ -27,90 +27,100 @@ class VoicesSnackBar extends StatelessWidget {
         color: snackBarType.backgroundColor(context),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Column(
+      child: Stack(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              children: [
-                Icon(
-                  size: 20,
-                  snackBarType.icon(context),
-                  color: snackBarType.iconColor(context),
-                ),
-                const SizedBox(width: 16),
-                Text(
-                  snackBarType.title(context),
-                  style: TextStyle(
-                    color: snackBarType.titleColor(context),
-                    fontSize: Theme.of(context).textTheme.titleMedium?.fontSize,
-                    fontWeight:
-                        Theme.of(context).textTheme.titleMedium?.fontWeight,
-                    fontFamily:
-                        Theme.of(context).textTheme.titleMedium?.fontFamily,
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(
-                    size: 24,
-                    CatalystVoicesIcons.x,
-                    color: Theme.of(context).colors.iconsForeground,
-                  ),
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                  },
-                ),
-              ],
+          Positioned(
+            top: 12,
+            right: 12,
+            child: IconButton(
+              icon: Icon(
+                size: 24,
+                CatalystVoicesIcons.x,
+                color: Theme.of(context).colors.iconsForeground,
+              ),
+              onPressed: () {
+                ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              },
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(
-              left: 48,
-            ),
-            child: Row(
-              children: [
-                Text(
-                  snackBarType.message(context),
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 18),
-          Padding(
-            padding: const EdgeInsets.only(
-              left: 36,
-            ),
-            child: Row(
-              children: [
-                TextButton(
-                  onPressed: snackBarType == VoicesSnackBarType.success
-                      ? onOkPressed
-                      : onRefreshPressed,
-                  child: Text(
-                    snackBarType == VoicesSnackBarType.success
-                        ? context.l10n.snackbarOkButtonText
-                        : context.l10n.snackbarRefreshButtonText,
-                    style: TextStyle(
-                      color: Theme.of(context).colors.textPrimary,
+          Column(
+            children: [
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: Row(
+                  children: [
+                    Icon(
+                      size: 20,
+                      snackBarType.icon(context),
+                      color: snackBarType.iconColor(context),
                     ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                TextButton(
-                  onPressed: onLearnMorePressed,
-                  child: Text(
-                    context.l10n.snackbarMoreButtonText,
-                    style: TextStyle(
-                      color: Theme.of(context).colors.textPrimary,
-                      decoration: TextDecoration.underline,
+                    const SizedBox(width: 16),
+                    Text(
+                      snackBarType.title(context),
+                      style: TextStyle(
+                        color: snackBarType.titleColor(context),
+                        fontSize:
+                            Theme.of(context).textTheme.titleMedium?.fontSize,
+                        fontWeight:
+                            Theme.of(context).textTheme.titleMedium?.fontWeight,
+                        fontFamily:
+                            Theme.of(context).textTheme.titleMedium?.fontFamily,
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 48,
+                ),
+                child: Row(
+                  children: [
+                    Text(
+                      snackBarType.message(context),
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 18),
+              Padding(
+                padding: const EdgeInsets.only(
+                  left: 36,
+                ),
+                child: Row(
+                  children: [
+                    TextButton(
+                      onPressed: snackBarType == VoicesSnackBarType.success
+                          ? onOkPressed
+                          : onRefreshPressed,
+                      child: Text(
+                        snackBarType == VoicesSnackBarType.success
+                            ? context.l10n.snackbarOkButtonText
+                            : context.l10n.snackbarRefreshButtonText,
+                        style: TextStyle(
+                          color: Theme.of(context).colors.textPrimary,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    TextButton(
+                      onPressed: onLearnMorePressed,
+                      child: Text(
+                        context.l10n.snackbarMoreButtonText,
+                        style: TextStyle(
+                          color: Theme.of(context).colors.textPrimary,
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 18),
+            ],
           ),
-          const SizedBox(height: 18),
         ],
       ),
     );
