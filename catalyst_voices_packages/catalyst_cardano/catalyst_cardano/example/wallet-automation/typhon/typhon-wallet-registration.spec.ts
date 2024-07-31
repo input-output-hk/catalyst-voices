@@ -81,19 +81,64 @@ test.beforeAll(async () => {
     await newTab.waitForTimeout(5000);
 });
 
+test('get wallet details', async () => {
+    // Get and match text content
+    const matchTextContent = async (selector: string, regex: RegExp) => {
+        const textContent = await newTab.locator(selector).textContent({ timeout: 5000 });
+        expect(textContent).not.toBeNull();
 
-test('get wallet balance', async () => {
-    const textContent = await newTab.locator('#flt-semantic-node-13').textContent({ timeout: 5000 });
-    expect(textContent).not.toBeNull();
+        const match = textContent!.match(regex);
+        expect(match).not.toBeNull();
+        return match![1].trim();
+    };
 
-    const match = textContent!.match(/Balance: Ada \(lovelaces\): (\d+)/);
-    expect(match).not.toBeNull();
-
-    const balanceAda = ((parseInt(match![1], 10))/1_000_000).toFixed(2);
+    // Get wallet balance
+    const balanceTextContent = await matchTextContent('#flt-semantic-node-13', /Balance: Ada \(lovelaces\): (\d+)/);
+    const balanceAda = (parseInt(balanceTextContent, 10) / 1_000_000).toFixed(2);
     expect(parseInt(balanceAda)).toBeGreaterThan(500);
-    console.log('ADA (lovelaces):', balanceAda);
-});
 
+    // Get extension info
+    const cleanedExtensionInfo = await matchTextContent('#flt-semantic-node-14', /Extensions:\s*(.+)/);
+    expect(cleanedExtensionInfo).toMatch('cip-30');
+
+    // Get network ID
+    const networkId = await matchTextContent('#flt-semantic-node-15', /Network ID: (.+)/);
+
+    // Get reward addresses
+    const rewardAddresses = await matchTextContent('#flt-semantic-node-17', /Reward addresses:\s*(\S+)/);
+
+    // Get used addresses
+    const usedAddresses = await matchTextContent('#flt-semantic-node-19', /Used addresses:\s*(\S+)/);
+
+    // Get UTXOs info
+    const utxoTextContent = await newTab.locator('#flt-semantic-node-20').textContent({ timeout: 5000 });
+    expect(utxoTextContent).not.toBeNull();
+    
+    const utxoLines = utxoTextContent!.split('\n').map(line => line.trim());
+    expect(utxoLines.length).toBeGreaterThanOrEqual(4); 
+
+    const tx = utxoLines[1].split(':')[1].trim();
+    const index = utxoLines[2].split(':')[1].trim();
+    const amount = utxoLines[3].split(':')[2].trim();
+
+    const amountAda = (parseInt(amount, 10) / 1_000_000).toFixed(2);
+
+    expect(tx).not.toBeUndefined();
+    expect(index).not.toBeUndefined();
+    expect(amount).not.toBeNaN();
+
+    expect(parseInt(amountAda)).toBeGreaterThan(500);
+
+    // Display wallet details
+    console.table([
+        { Detail: 'ADA (lovelaces)', Value: balanceAda },
+        { Detail: 'Extension info', Value: cleanedExtensionInfo },
+        { Detail: 'Network ID', Value: networkId },
+        { Detail: 'Reward addresses', Value: rewardAddresses },
+        { Detail: 'Used addresses', Value: usedAddresses },
+        { Detail: 'UTXOs', Value: `Tx: ${tx}, Index: ${index}, Amount (ADA): ${amountAda}` }
+    ]);
+});
     // Logout 
     // const logOut = '//*[@id="app"]/div/div/div[3]/div/div/div[1]/div/div/div[2]/div[11]/div[2]';
     // await newTab.locator(logOut).click();
