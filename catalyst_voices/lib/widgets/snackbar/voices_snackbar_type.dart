@@ -10,15 +10,17 @@ enum VoicesSnackBarType {
   error;
 
   Color? backgroundColor(BuildContext context) {
+    final colors = Theme.of(context).colors;
+
     switch (this) {
       case VoicesSnackBarType.info:
-        return Theme.of(context).colors.primaryContainer;
+        return colors.primaryContainer;
       case VoicesSnackBarType.success:
-        return Theme.of(context).colors.successContainer;
+        return colors.successContainer;
       case VoicesSnackBarType.warning:
-        return Theme.of(context).colors.warningContainer;
+        return colors.warningContainer;
       case VoicesSnackBarType.error:
-        return Theme.of(context).colors.errorContainer;
+        return colors.errorContainer;
     }
   }
 
@@ -36,54 +38,62 @@ enum VoicesSnackBarType {
   }
 
   Color? iconColor(BuildContext context) {
+    final colors = Theme.of(context).colors;
+
     switch (this) {
       case VoicesSnackBarType.info:
-        return Theme.of(context).colors.iconsPrimary;
+        return colors.iconsPrimary;
       case VoicesSnackBarType.success:
-        return Theme.of(context).colors.iconsSuccess;
+        return colors.iconsSuccess;
       case VoicesSnackBarType.warning:
-        return Theme.of(context).colors.iconsWarning;
+        return colors.iconsWarning;
       case VoicesSnackBarType.error:
-        return Theme.of(context).colors.iconsError;
+        return colors.iconsError;
     }
   }
 
   String message(BuildContext context) {
+    final l10n = context.l10n;
+
     switch (this) {
       case VoicesSnackBarType.info:
-        return context.l10n.snackbarInfoMessageText;
+        return l10n.snackbarInfoMessageText;
       case VoicesSnackBarType.success:
-        return context.l10n.snackbarSuccessMessageText;
+        return l10n.snackbarSuccessMessageText;
       case VoicesSnackBarType.warning:
-        return context.l10n.snackbarWarningMessageText;
+        return l10n.snackbarWarningMessageText;
       case VoicesSnackBarType.error:
-        return context.l10n.snackbarErrorMessageText;
+        return l10n.snackbarErrorMessageText;
     }
   }
 
   String title(BuildContext context) {
+    final l10n = context.l10n;
+
     switch (this) {
       case VoicesSnackBarType.info:
-        return context.l10n.snackbarInfoLabelText;
+        return l10n.snackbarInfoLabelText;
       case VoicesSnackBarType.success:
-        return context.l10n.snackbarSuccessLabelText;
+        return l10n.snackbarSuccessLabelText;
       case VoicesSnackBarType.warning:
-        return context.l10n.snackbarWarningLabelText;
+        return l10n.snackbarWarningLabelText;
       case VoicesSnackBarType.error:
-        return context.l10n.snackbarErrorLabelText;
+        return l10n.snackbarErrorLabelText;
     }
   }
 
   Color? titleColor(BuildContext context) {
+    final colors = Theme.of(context).colors;
+
     switch (this) {
       case VoicesSnackBarType.info:
-        return Theme.of(context).colors.onSuccess;
+        return colors.onSuccess;
       case VoicesSnackBarType.success:
-        return Theme.of(context).colors.onSuccess;
+        return colors.onSuccess;
       case VoicesSnackBarType.warning:
-        return Theme.of(context).colors.onWarning;
+        return colors.onWarning;
       case VoicesSnackBarType.error:
-        return Theme.of(context).colors.onErrorContainer;
+        return colors.onErrorContainer;
     }
   }
 }

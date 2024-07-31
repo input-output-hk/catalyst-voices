@@ -24,13 +24,16 @@ class VoicesSnackbarExample extends StatelessWidget {
                   VoicesSnackBar(
                     snackBarType: type,
                     padding: EdgeInsets.only(
-                      left: screenWidth / 4,
-                      right: screenWidth / 4,
+                      left: screenWidth / 5,
+                      right: screenWidth / 5,
                       bottom: screenWidth / 2,
                     ),
                     onLearnMorePressed: () {},
                     onRefreshPressed: () {},
                     onOkPressed: () {},
+                    onClosePressed: () {
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                    },
                   ).showSnackBar(context);
                 },
                 child: Text(

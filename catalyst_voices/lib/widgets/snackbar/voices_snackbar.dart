@@ -9,6 +9,7 @@ class VoicesSnackBar extends StatelessWidget {
   final VoidCallback? onRefreshPressed;
   final VoidCallback? onLearnMorePressed;
   final VoidCallback? onOkPressed;
+  final VoidCallback? onClosePressed;
   final EdgeInsetsGeometry? padding;
 
   const VoicesSnackBar({
@@ -17,11 +18,14 @@ class VoicesSnackBar extends StatelessWidget {
     this.onRefreshPressed,
     this.onLearnMorePressed,
     this.onOkPressed,
+    this.onClosePressed,
     this.padding,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return DecoratedBox(
       decoration: BoxDecoration(
         color: snackBarType.backgroundColor(context),
@@ -36,11 +40,9 @@ class VoicesSnackBar extends StatelessWidget {
               icon: Icon(
                 size: 24,
                 CatalystVoicesIcons.x,
-                color: Theme.of(context).colors.iconsForeground,
+                color: theme.colors.iconsForeground,
               ),
-              onPressed: () {
-                ScaffoldMessenger.of(context).hideCurrentSnackBar();
-              },
+              onPressed: onClosePressed,
             ),
           ),
           Column(
@@ -60,12 +62,9 @@ class VoicesSnackBar extends StatelessWidget {
                       snackBarType.title(context),
                       style: TextStyle(
                         color: snackBarType.titleColor(context),
-                        fontSize:
-                            Theme.of(context).textTheme.titleMedium?.fontSize,
-                        fontWeight:
-                            Theme.of(context).textTheme.titleMedium?.fontWeight,
-                        fontFamily:
-                            Theme.of(context).textTheme.titleMedium?.fontFamily,
+                        fontSize: theme.textTheme.titleMedium?.fontSize,
+                        fontWeight: theme.textTheme.titleMedium?.fontWeight,
+                        fontFamily: theme.textTheme.titleMedium?.fontFamily,
                       ),
                     ),
                   ],
@@ -79,7 +78,7 @@ class VoicesSnackBar extends StatelessWidget {
                   children: [
                     Text(
                       snackBarType.message(context),
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      style: theme.textTheme.bodyMedium,
                     ),
                   ],
                 ),
@@ -100,7 +99,7 @@ class VoicesSnackBar extends StatelessWidget {
                             ? context.l10n.snackbarOkButtonText
                             : context.l10n.snackbarRefreshButtonText,
                         style: TextStyle(
-                          color: Theme.of(context).colors.textPrimary,
+                          color: theme.colors.textPrimary,
                         ),
                       ),
                     ),
@@ -110,7 +109,7 @@ class VoicesSnackBar extends StatelessWidget {
                       child: Text(
                         context.l10n.snackbarMoreButtonText,
                         style: TextStyle(
-                          color: Theme.of(context).colors.textPrimary,
+                          color: theme.colors.textPrimary,
                           decoration: TextDecoration.underline,
                         ),
                       ),
