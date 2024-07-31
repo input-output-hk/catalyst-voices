@@ -175,6 +175,7 @@
         "web-components.min.js",
         "**/generated/**",
         "utilities/catalyst_voices_remote_widgets/example/**/**",
+        "catalyst_voices_packages/catalyst_cose/catalyst_cose_web/assets/js/catalyst_cose.js",
         "**/*.svg"
     ],
     "enableFiletypes": [
