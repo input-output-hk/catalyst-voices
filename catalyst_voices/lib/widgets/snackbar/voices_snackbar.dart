@@ -10,7 +10,9 @@ class VoicesSnackBar extends StatelessWidget {
   final VoidCallback? onLearnMorePressed;
   final VoidCallback? onOkPressed;
   final VoidCallback? onClosePressed;
+  final SnackBarBehavior? behavior;
   final EdgeInsetsGeometry? padding;
+  final double? width;
 
   const VoicesSnackBar({
     super.key,
@@ -19,7 +21,9 @@ class VoicesSnackBar extends StatelessWidget {
     this.onLearnMorePressed,
     this.onOkPressed,
     this.onClosePressed,
+    this.behavior,
     this.padding,
+    this.width,
   });
 
   @override
@@ -129,9 +133,10 @@ class VoicesSnackBar extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: this,
+        behavior: behavior,
+        width: behavior == SnackBarBehavior.floating ? width : null,
         padding: padding,
         elevation: 0,
-        behavior: SnackBarBehavior.fixed,
         backgroundColor: Colors.transparent,
       ),
     );

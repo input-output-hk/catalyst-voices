@@ -23,10 +23,11 @@ class VoicesSnackbarExample extends StatelessWidget {
                 onPressed: () {
                   VoicesSnackBar(
                     snackBarType: type,
+                    width: 300,
                     padding: EdgeInsets.only(
-                      left: screenWidth / 5,
-                      right: screenWidth / 5,
                       bottom: screenWidth / 2,
+                      left: screenWidth / 3,
+                      right: screenWidth / 3,
                     ),
                     onLearnMorePressed: () {},
                     onRefreshPressed: () {},
