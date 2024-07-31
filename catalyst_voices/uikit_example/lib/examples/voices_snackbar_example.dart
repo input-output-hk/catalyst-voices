@@ -16,22 +16,23 @@ class VoicesSnackbarExample extends StatelessWidget {
           spacing: 16,
           runSpacing: 16,
           children: [
-            VoicesSnackBar.show(
-              context,
-              snackBarType: VoicesSnackBarType.info,
-            ),
-            VoicesSnackBar.show(
-              context,
-              snackBarType: VoicesSnackBarType.success,
-            ),
-            VoicesSnackBar.show(
-              context,
-              snackBarType: VoicesSnackBarType.warning,
-            ),
-            VoicesSnackBar.show(
-              context,
-              snackBarType: VoicesSnackBarType.error,
-            ),
+            for (final type in VoicesSnackBarType.values)
+              OutlinedButton(
+                onPressed: () {
+                  VoicesSnackBar(
+                    snackBarType: type,
+                    onLearnMorePressed: () {},
+                    onRefreshPressed: () {},
+                    onOkPressed: () {},
+                  ).showSnackBar(context);
+                },
+                child: Text(
+                  type.toString().split('.').last,
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                ),
+              ),
           ],
         ),
       ),
