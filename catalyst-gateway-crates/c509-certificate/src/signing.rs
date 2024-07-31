@@ -2,66 +2,135 @@
 
 // cspell: words outpubkey genpkey
 
+use std::{fmt::Display, path::Path, str::FromStr};
+
 use ed25519_dalek::{
     ed25519::signature::Signer,
     pkcs8::{DecodePrivateKey, DecodePublicKey},
     SigningKey, VerifyingKey,
 };
+use wasm_bindgen::prelude::wasm_bindgen;
 
 /// Public or private key decoding from string error.
 #[derive(thiserror::Error, Debug)]
 #[error("Cannot decode key from string. Invalid PEM format.")]
-pub(crate) struct KeyPemDecodingError;
+struct KeyPemDecodingError;
 
 /// Ed25519 private key instance.
 /// Wrapper over `ed25519_dalek::SigningKey`.
 #[allow(dead_code)]
+#[wasm_bindgen]
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PrivateKey(SigningKey);
 
+/// File open and read error.
+#[derive(thiserror::Error, Debug)]
+struct FileError {
+    /// File location.
+    location: String,
+    /// File open and read error.
+    msg: Option<anyhow::Error>,
+}
+
+#[allow(dead_code)]
+impl FileError {
+    /// Create a new `FileError` instance from a string location.
+    fn from_string(location: String, msg: Option<anyhow::Error>) -> Self {
+        Self { location, msg }
+    }
+
+    /// Create a new `FileError` instance from a path location.
+    fn from_path<P: AsRef<Path>>(path: P, msg: Option<anyhow::Error>) -> Self {
+        Self {
+            location: path.as_ref().display().to_string(),
+            msg,
+        }
+    }
+}
+
+impl Display for FileError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let msg = format!("Cannot open or read file at {0}", self.location);
+        let err = self
+            .msg
+            .as_ref()
+            .map(|msg| format!(":\n{msg}"))
+            .unwrap_or_default();
+        writeln!(f, "{msg}{err}",)
+    }
+}
+
 #[allow(dead_code)]
 impl PrivateKey {
-    /// Create new private key from string decoded in PEM format
-    pub(crate) fn from_str(str: &str) -> anyhow::Result<Self> {
-        let key = SigningKey::from_pkcs8_pem(str).map_err(|_| KeyPemDecodingError)?;
-        Ok(Self(key))
+    /// Create new public key from file decoded in PEM format.
+    ///
+    /// # Errors
+    /// Returns an error if the file cannot be opened or read.
+    pub fn from_file<P: AsRef<Path>>(path: P) -> anyhow::Result<Self> {
+        let str = std::fs::read_to_string(&path).map_err(|_| FileError::from_path(&path, None))?;
+        Ok(Self::from_str(&str).map_err(|err| FileError::from_path(&path, Some(err)))?)
     }
 
     /// Get associated public key.
-    pub(crate) fn public_key(&self) -> PublicKey {
+    #[must_use]
+    pub fn public_key(&self) -> PublicKey {
         PublicKey(self.0.verifying_key())
     }
 
     /// Sign the message with the current private key.
     /// Returns the signature bytes.
-    pub(crate) fn sign(&self, msg: &[u8]) -> Vec<u8> {
+    #[must_use]
+    pub fn sign(&self, msg: &[u8]) -> Vec<u8> {
         self.0.sign(msg).to_vec()
+    }
+}
+
+impl FromStr for PrivateKey {
+    type Err = anyhow::Error;
+
+    fn from_str(str: &str) -> Result<Self, Self::Err> {
+        let key = SigningKey::from_pkcs8_pem(str).map_err(|_| KeyPemDecodingError)?;
+        Ok(Self(key))
     }
 }
 
 /// Ed25519 public key instance.
 /// Wrapper over `ed25519_dalek::VerifyingKey`.
 #[derive(Clone, Debug, PartialEq, Eq)]
+#[wasm_bindgen]
 pub struct PublicKey(VerifyingKey);
 
 #[allow(dead_code)]
 impl PublicKey {
-    /// Create new public key from string decoded in PEM format.
-    #[allow(dead_code)]
-    pub(crate) fn from_str(str: &str) -> anyhow::Result<Self> {
-        let key = VerifyingKey::from_public_key_pem(str).map_err(|_| KeyPemDecodingError)?;
-        Ok(Self(key))
+    /// Create new public key from file decoded in PEM format.
+    ///
+    /// # Errors
+    /// Returns an error if the file cannot be opened or read.
+    pub fn from_file<P: AsRef<Path>>(path: P) -> anyhow::Result<Self> {
+        let str = std::fs::read_to_string(&path).map_err(|_| FileError::from_path(&path, None))?;
+        Ok(Self::from_str(&str).map_err(|err| FileError::from_path(&path, Some(err)))?)
     }
 
     /// Create new public key from raw bytes.
-    pub(crate) fn from_bytes(bytes: &[u8]) -> anyhow::Result<Self> {
+    ///
+    /// # Errors
+    /// Returns an error if the provided bytes are not a valid public key.
+    pub fn from_bytes(bytes: &[u8]) -> anyhow::Result<Self> {
         let key = VerifyingKey::from_bytes(bytes.try_into()?)?;
         Ok(Self(key))
     }
 
+    /// Convert public key to raw bytes.
+    #[must_use]
+    pub fn to_bytes(&self) -> Vec<u8> {
+        self.0.to_bytes().to_vec()
+    }
+
     /// Verify signature of the message with the current public key.
-    /// Returns `Ok(())` if the signature is valid, `Err` otherwise.
-    pub(crate) fn verify(&self, msg: &[u8], signature_bytes: &[u8]) -> anyhow::Result<()> {
+    ///
+    /// # Errors
+    /// Returns an error if the signature is invalid.
+    pub fn verify(&self, msg: &[u8], signature_bytes: &[u8]) -> anyhow::Result<()> {
         let signature_bytes = signature_bytes.try_into().map_err(|_| {
             anyhow::anyhow!(
                 "Invalid signature bytes size: expected {}, provided {}.",
@@ -75,8 +144,18 @@ impl PublicKey {
     }
 }
 
+impl FromStr for PublicKey {
+    type Err = anyhow::Error;
+
+    fn from_str(str: &str) -> Result<Self, Self::Err> {
+        let key = VerifyingKey::from_public_key_pem(str).map_err(|_| KeyPemDecodingError)?;
+        Ok(Self(key))
+    }
+}
+
 #[cfg(test)]
 pub(crate) mod tests {
+    use std::env::temp_dir;
 
     use super::*;
 
@@ -107,6 +186,18 @@ pub(crate) mod tests {
             "MCowBQYDK2VwAyEAtFuCleJwHS28jUCT+ulLl5c1+MXhehhDz2SimOhmWaI=",
             "-----END PUBLIC KEY-----"
         )
+    }
+
+    #[test]
+    fn private_key_from_file_test() {
+        let dir = temp_dir();
+
+        let private_key_path = dir.as_path().join("private.pem");
+        std::fs::write(&private_key_path, private_key_str())
+            .expect("Cannot create private.pem file");
+
+        let _key =
+            PrivateKey::from_file(private_key_path).expect("Cannot create private key from file");
     }
 
     #[test]

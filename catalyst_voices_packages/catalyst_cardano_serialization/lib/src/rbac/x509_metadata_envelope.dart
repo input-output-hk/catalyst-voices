@@ -23,7 +23,7 @@ typedef ChunkedDataDeserializer<T> = T Function(CborValue value);
 /// between those references being altered and closes a potential attack vector
 /// where an unrelated registration update is attached to a different
 /// transaction.
-class X509MetadataEnvelope<T> extends Equatable {
+final class X509MetadataEnvelope<T> extends Equatable {
   /// The size of a chunk of data that is used to overcome
   /// the field size limitation.
   static const int metadataChunkSize = 64;
@@ -34,7 +34,7 @@ class X509MetadataEnvelope<T> extends Equatable {
   /// must be created. Nor the purpose they are used for, that is within control
   /// of each dApp. These specifications define a universal framework
   /// to implement such systems from.
-  final String purpose;
+  final UuidV4 purpose;
 
   /// This is a hash of the transaction inputs field from the transaction this
   /// auxiliary data was originally attached to. This hash anchors the auxiliary
@@ -135,14 +135,14 @@ class X509MetadataEnvelope<T> extends Equatable {
   }) {
     final metadata = value as CborMap;
     final envelope = metadata[const CborSmallInt(509)]! as CborMap;
-    final purpose = envelope[const CborSmallInt(0)]! as CborString;
+    final purpose = envelope[const CborSmallInt(0)]! as CborBytes;
     final txInputsHash = envelope[const CborSmallInt(1)]!;
     final previousTransactionId = envelope[const CborSmallInt(2)];
     final chunkedData = _deserializeChunkedData(envelope);
     final validationSignature = envelope[const CborSmallInt(99)]!;
 
     return X509MetadataEnvelope(
-      purpose: purpose.toString(),
+      purpose: UuidV4.fromCbor(purpose),
       txInputsHash: TransactionInputsHash.fromCbor(txInputsHash),
       previousTransactionId: previousTransactionId != null
           ? TransactionHash.fromCbor(previousTransactionId)
@@ -163,7 +163,7 @@ class X509MetadataEnvelope<T> extends Equatable {
 
     return CborMap({
       const CborSmallInt(509): CborMap({
-        const CborSmallInt(0): CborString(purpose),
+        const CborSmallInt(0): purpose.toCbor(),
         const CborSmallInt(1): txInputsHash.toCbor(),
         if (previousTransactionId != null)
           const CborSmallInt(2): previousTransactionId!.toCbor(),

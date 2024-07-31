@@ -4,10 +4,13 @@
 //! Please refer to [CDDL Wrapping](https://datatracker.ietf.org/doc/html/rfc8610#section-3.7)
 //! for unwrapped types.
 
+use std::str::FromStr;
+
 use anyhow::Result;
 use asn1_rs::oid;
 use minicbor::{data::Tag, decode, encode::Write, Decode, Decoder, Encode, Encoder};
 use oid_registry::Oid;
+use serde::{Deserialize, Deserializer, Serialize};
 
 use crate::tables::IntegerToOidTable;
 
@@ -62,6 +65,33 @@ pub struct C509oid {
     oid: Oid<'static>,
     /// The flag to indicate whether PEN encoding is supported.
     pen_supported: bool,
+}
+
+/// A helper struct for deserialize and serialize `C509oid`.
+#[derive(Debug, Deserialize, Serialize)]
+struct Helper {
+    /// OID value in string.
+    oid: String,
+}
+
+impl<'de> Deserialize<'de> for C509oid {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where D: Deserializer<'de> {
+        let helper = Helper::deserialize(deserializer)?;
+        let oid =
+            Oid::from_str(&helper.oid).map_err(|e| serde::de::Error::custom(format!("{e:?}")))?;
+        Ok(C509oid::new(oid))
+    }
+}
+
+impl Serialize for C509oid {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where S: serde::Serializer {
+        let helper = Helper {
+            oid: self.oid.to_string(),
+        };
+        helper.serialize(serializer)
+    }
 }
 
 impl C509oid {

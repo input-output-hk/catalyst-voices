@@ -4,6 +4,9 @@ final class CborCustomTags {
 
   /// A cbor tag describing a key-value pairs data.
   static const int map = 259;
+
+  /// A cbor tag describing a ED25519-BIP32 Public Key.
+  static const int ed25519Bip32PublicKey = 32773;
 }
 
 /// How many bytes are used in cbor encoding for a major type/length.

@@ -125,7 +125,7 @@ Future<X509MetadataEnvelope<RegistrationData>> _buildMetadataEnvelope({
       await Ed25519KeyPair.fromSeed(Ed25519PrivateKey.seeded(0).bytes);
 
   final x509Envelope = X509MetadataEnvelope.unsigned(
-    purpose: _catalystUserRoleRegistrationPurpose,
+    purpose: UuidV4.fromString(_catalystUserRoleRegistrationPurpose),
     txInputsHash: TransactionInputsHash.fromTransactionInputs(inputs),
     previousTransactionId: _transactionHash,
     chunkedData: RegistrationData(
