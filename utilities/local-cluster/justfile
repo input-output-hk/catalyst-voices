@@ -59,7 +59,8 @@ get-all-logs:
 # TODO: Get the cluster scylla DB exposed on port 9042 of the cluster.
 temp-scylla-dev-db:
     mkdir -p /var/lib/scylla/data /var/lib/scylla/commitlog /var/lib/scylla/hints /var/lib/scylla/view_hints
-    docker run --privileged -p 9042:9042  --name scylla-dev --volume /var/lib/scylla:/var/lib/scylla -d scylladb/scylla --developer-mode=1  --smp 8
+    # docker run --privileged -p 9042:9042  --name scylla-dev --volume /var/lib/scylla:/var/lib/scylla -d scylladb/scylla:latest --developer-mode=1  --smp 8
+    docker run --rm --privileged -p 9042:9042  --name scylla-dev --volume /var/lib/scylla:/var/lib/scylla -d scylladb/scylla:latest --smp 8 --io-setup 1 --developer-mode=0 
     docker logs scylla-dev -f    
 
 stop-temp-scylla-dev-db:

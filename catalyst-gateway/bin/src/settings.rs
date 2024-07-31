@@ -5,7 +5,7 @@ use std::{
     net::{IpAddr, Ipv4Addr, SocketAddr},
     path::PathBuf,
     str::FromStr,
-    sync::OnceLock,
+    sync::{LazyLock, OnceLock},
     time::Duration,
 };
 
@@ -15,7 +15,6 @@ use clap::Args;
 use cryptoxide::{blake2b::Blake2b, mac::Mac};
 use dotenvy::dotenv;
 use duration_string::DurationString;
-use once_cell::sync::Lazy;
 use strum::VariantNames;
 use tracing::{error, info};
 use url::Url;
@@ -562,7 +561,7 @@ struct EnvVars {
 // development
 
 /// Handle to the mithril sync thread. One for each Network ONLY.
-static ENV_VARS: Lazy<EnvVars> = Lazy::new(|| {
+static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
     // Support env vars in a `.env` file,  doesn't need to exist.
     dotenv().ok();
 

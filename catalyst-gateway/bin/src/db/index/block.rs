@@ -4,17 +4,10 @@ use std::sync::Arc;
 
 use cardano_chain_follower::MultiEraBlock;
 use scylla::SerializeRow;
-use tokio::join;
 use tracing::{debug, error, warn};
 
 use super::session::session;
 
-/// TXO by Stake Address Indexing query
-const INSERT_TXO_QUERY: &str = include_str!("./queries/insert_txo.cql");
-/// TXO Asset by Stake Address Indexing Query
-const INSERT_TXO_ASSET_QUERY: &str = include_str!("./queries/insert_txo_asset.cql");
-/// TXI by Txn hash Index
-const INSERT_TXI_QUERY: &str = include_str!("./queries/insert_txi.cql");
 /// This is used to indicate that there is no stake address, and still meet the
 /// requirement for the index primary key to be non empty.
 const NO_STAKE_ADDRESS: &[u8] = &[0; 1];
@@ -238,7 +231,7 @@ fn index_txo(
 #[allow(clippy::similar_names)]
 pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
     // Get the session.  This should never fail.
-    let Some(session) = session(block.immutable()) else {
+    let Some((session, queries)) = session(block.immutable()) else {
         anyhow::bail!("Failed to get Index DB Session.  Can not index block.");
     };
 
@@ -248,26 +241,9 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
         tokio::task::JoinHandle<Result<scylla::QueryResult, scylla::transport::errors::QueryError>>,
     > = Vec::new();
 
-    // Pre-prepare our queries.
-    let (txo_query, txo_asset_query, txi_query) = join!(
-        session.prepare(INSERT_TXO_QUERY),
-        session.prepare(INSERT_TXO_ASSET_QUERY),
-        session.prepare(INSERT_TXI_QUERY),
-    );
-
-    if let Err(ref error) = txo_query {
-        error!(error=%error,"Failed to prepare Insert TXO Query.");
-    };
-    if let Err(ref error) = txo_asset_query {
-        error!(error=%error,"Failed to prepare Insert TXO Asset Query.");
-    };
-    if let Err(ref error) = txi_query {
-        error!(error=%error,"Failed to prepare Insert TXI Query.");
-    };
-
-    let mut txo_query = txo_query?;
-    let mut txo_asset_query = txo_asset_query?;
-    let mut txi_query = txi_query?;
+    let mut txo_query = queries.txo_insert_query.clone();
+    let mut txo_asset_query = queries.txo_asset_insert_query.clone();
+    let mut txi_query = queries.txi_insert_query.clone();
 
     // We just want to write as fast as possible, consistency at this stage isn't required.
     txo_query.set_consistency(scylla::statement::Consistency::Any);

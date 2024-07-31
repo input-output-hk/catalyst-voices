@@ -70,7 +70,7 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
                     }
                 },
                 cardano_chain_follower::Kind::Rollback => {
-                    warn!("TODO: Immutable Chain rollback");
+                    warn!("TODO: Live Chain rollback");
                 },
             }
         }

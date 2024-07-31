@@ -11,8 +11,11 @@ use scylla::{frame::Compression, ExecutionProfile, Session, SessionBuilder};
 use tokio::fs;
 use tracing::{error, info};
 
-use super::schema::create_schema;
-use crate::settings::{CassandraEnvVars, Settings};
+use super::{queries::PreparedQueries, schema::create_schema};
+use crate::{
+    db::index::queries,
+    settings::{CassandraEnvVars, Settings},
+};
 
 /// Configuration Choices for compression
 #[derive(Clone, strum::EnumString, strum::Display, strum::VariantNames)]
@@ -110,9 +113,10 @@ async fn make_session(cfg: &CassandraEnvVars) -> anyhow::Result<CassandraSession
 }
 
 /// Persistent DB Session.
-static PERSISTENT_SESSION: OnceLock<CassandraSession> = OnceLock::new();
+static PERSISTENT_SESSION: OnceLock<(CassandraSession, Arc<PreparedQueries>)> = OnceLock::new();
+
 /// Volatile DB Session.
-static VOLATILE_SESSION: OnceLock<CassandraSession> = OnceLock::new();
+static VOLATILE_SESSION: OnceLock<(CassandraSession, Arc<PreparedQueries>)> = OnceLock::new();
 
 /// Continuously try and init the DB, if it fails, backoff.
 ///
@@ -156,14 +160,27 @@ async fn retry_init(cfg: CassandraEnvVars, persistent: bool) {
                 error = error,
                 "Failed to Create Cassandra DB Schema"
             );
+            continue;
         }
+
+        let queries = match queries::PreparedQueries::new(&session).await {
+            Ok(queries) => Arc::new(queries),
+            Err(error) => {
+                error!(
+                    db_type = db_type,
+                    error = %error,
+                    "Failed to Create Cassandra Prepared Queries"
+                );
+                continue;
+            },
+        };
 
         // Save the session so we can execute queries on the DB
         if persistent {
-            if PERSISTENT_SESSION.set(session).is_err() {
+            if PERSISTENT_SESSION.set((session, queries)).is_err() {
                 error!("Persistent Session already set.  This should not happen.");
             };
-        } else if VOLATILE_SESSION.set(session).is_err() {
+        } else if VOLATILE_SESSION.set((session, queries)).is_err() {
             error!("Volatile Session already set.  This should not happen.");
         };
 
@@ -188,7 +205,7 @@ pub(crate) fn is_ready() -> bool {
 }
 
 /// Get the session needed to perform a query.
-pub(crate) fn session(persistent: bool) -> Option<CassandraSession> {
+pub(crate) fn session(persistent: bool) -> Option<(CassandraSession, Arc<PreparedQueries>)> {
     if persistent {
         PERSISTENT_SESSION.get().cloned()
     } else {

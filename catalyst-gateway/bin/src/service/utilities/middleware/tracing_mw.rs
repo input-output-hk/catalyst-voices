@@ -1,9 +1,8 @@
 //! Full Tracing and metrics middleware.
-use std::time::Instant;
+use std::{sync::LazyLock, time::Instant};
 
 use cpu_time::ProcessTime; // ThreadTime doesn't work.
 use cryptoxide::{blake2b::Blake2b, digest::Digest};
-use lazy_static::lazy_static;
 use poem::{
     http::{header, HeaderMap},
     web::RealIp,
@@ -26,78 +25,84 @@ const METRIC_LABELS: [&str; 3] = ["endpoint", "method", "status_code"];
 const CLIENT_METRIC_LABELS: [&str; 2] = ["client", "status_code"];
 
 // Prometheus Metrics maintained by the service
-lazy_static! {
-    static ref HTTP_REQ_DURATION_MS: HistogramVec =
+
+/// HTTP Request duration histogram.
+static HTTP_REQ_DURATION_MS: LazyLock<HistogramVec> = LazyLock::new(|| {
     #[allow(clippy::ignored_unit_patterns)]
     register_histogram_vec!(
         "http_request_duration_ms",
         "Duration of HTTP requests in milliseconds",
         &METRIC_LABELS
     )
-    .unwrap();
+    .unwrap()
+});
 
-    static ref HTTP_REQ_CPU_TIME_MS: HistogramVec =
+/// HTTP Request CPU Time histogram.
+static HTTP_REQ_CPU_TIME_MS: LazyLock<HistogramVec> = LazyLock::new(|| {
     #[allow(clippy::ignored_unit_patterns)]
     register_histogram_vec!(
         "http_request_cpu_time_ms",
         "CPU Time of HTTP requests in milliseconds",
         &METRIC_LABELS
     )
-    .unwrap();
+    .unwrap()
+});
 
-    // No Tacho implemented to enable this.
-    /*
-    static ref HTTP_REQUEST_RATE: GaugeVec = register_gauge_vec!(
-        "http_request_rate",
-        "Rate of HTTP requests per second",
-        &METRIC_LABELS
-    )
-    .unwrap();
-    */
+// No Tacho implemented to enable this.
+// static ref HTTP_REQUEST_RATE: GaugeVec = register_gauge_vec!(
+// "http_request_rate",
+// "Rate of HTTP requests per second",
+// &METRIC_LABELS
+// )
+// .unwrap();
 
-    static ref HTTP_REQUEST_COUNT: IntCounterVec =
+/// HTTP Request count histogram.
+static HTTP_REQUEST_COUNT: LazyLock<IntCounterVec> = LazyLock::new(|| {
     #[allow(clippy::ignored_unit_patterns)]
     register_int_counter_vec!(
         "http_request_count",
         "Number of HTTP requests",
         &METRIC_LABELS
     )
-    .unwrap();
+    .unwrap()
+});
 
-    static ref CLIENT_REQUEST_COUNT: IntCounterVec =
+/// Client Request Count histogram.
+static CLIENT_REQUEST_COUNT: LazyLock<IntCounterVec> = LazyLock::new(|| {
     #[allow(clippy::ignored_unit_patterns)]
     register_int_counter_vec!(
         "client_request_count",
         "Number of HTTP requests per client",
         &CLIENT_METRIC_LABELS
     )
-    .unwrap();
+    .unwrap()
+});
 
-    static ref PANIC_REQUEST_COUNT: IntCounterVec =
-    #[allow(clippy::ignored_unit_patterns)]
-    register_int_counter_vec!(
-        "panic_request_count",
-        "Number of HTTP requests that panicked",
-        &METRIC_LABELS
-    )
-    .unwrap();
+// Currently no way to get these values. TODO.
+// Panic Request Count histogram.
+// static PANIC_REQUEST_COUNT: LazyLock<IntCounterVec> = LazyLock::new(|| {
+// #[allow(clippy::ignored_unit_patterns)]
+// register_int_counter_vec!(
+// "panic_request_count",
+// "Number of HTTP requests that panicked",
+// &METRIC_LABELS
+// )
+// .unwrap()
+// });
 
-    // Currently no way to get these values without reading the whole response which is BAD.
-    /*
-    static ref HTTP_REQUEST_SIZE_BYTES: HistogramVec = register_histogram_vec!(
-        "http_request_size_bytes",
-        "Size of HTTP requests in bytes",
-        &METRIC_LABELS
-    )
-    .unwrap();
-    static ref HTTP_RESPONSE_SIZE_BYTES: HistogramVec = register_histogram_vec!(
-        "http_response_size_bytes",
-        "Size of HTTP responses in bytes",
-        &METRIC_LABELS
-    )
-    .unwrap();
-    */
-}
+// Currently no way to get these values without reading the whole response which is BAD.
+// static ref HTTP_REQUEST_SIZE_BYTES: HistogramVec = register_histogram_vec!(
+// "http_request_size_bytes",
+// "Size of HTTP requests in bytes",
+// &METRIC_LABELS
+// )
+// .unwrap();
+// static ref HTTP_RESPONSE_SIZE_BYTES: HistogramVec = register_histogram_vec!(
+// "http_response_size_bytes",
+// "Size of HTTP responses in bytes",
+// &METRIC_LABELS
+// )
+// .unwrap();
 
 /// Middleware for [`tracing`](https://crates.io/crates/tracing).
 #[derive(Default)]
