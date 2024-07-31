@@ -1,14 +1,13 @@
+import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:flutter/material.dart';
 
-class CatalystSnackBar extends StatelessWidget {
-  final String message;
-  final SnackBarType type;
+class VoicesSnackBar extends StatelessWidget {
+  final CatalystSnackBarType snackBarType;
   final List<SnackBarAction> actions;
 
-  factory CatalystSnackBar.show(
+  factory VoicesSnackBar.show(
     BuildContext context, {
-    required String message,
-    required SnackBarType type,
+    required CatalystSnackBarType snackBarType,
     VoidCallback? onRefresh,
     VoidCallback? onLearnMore,
     List<SnackBarAction>? customActions,
@@ -28,9 +27,8 @@ class CatalystSnackBar extends StatelessWidget {
 
     final actions = customActions ?? defaultActions;
 
-    final snackBar = CatalystSnackBar._(
-      message: message,
-      type: type,
+    final snackBar = VoicesSnackBar._(
+      snackBarType: snackBarType,
       actions: actions,
     );
 
@@ -46,9 +44,8 @@ class CatalystSnackBar extends StatelessWidget {
     return snackBar;
   }
 
-  const CatalystSnackBar._({
-    required this.message,
-    required this.type,
+  const VoicesSnackBar._({
+    required this.snackBarType,
     required this.actions,
   });
 
@@ -57,12 +54,15 @@ class CatalystSnackBar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: _getColorForType(type),
+        color: snackBarType.backgroundColor(context),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         children: [
-          Icon(_getIconForType(type), color: Colors.white),
+          Icon(
+            snackBarType.icon(context),
+            color: Colors.white,
+          ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -70,7 +70,7 @@ class CatalystSnackBar extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  _getTitleForType(type),
+                  snackBarType.title(context),
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -78,7 +78,7 @@ class CatalystSnackBar extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  message,
+                  snackBarType.message(context),
                   style: const TextStyle(color: Colors.white),
                 ),
                 if (actions.isNotEmpty) const SizedBox(height: 8),
@@ -108,45 +108,4 @@ class CatalystSnackBar extends StatelessWidget {
       ),
     );
   }
-
-  Color _getColorForType(SnackBarType type) {
-    switch (type) {
-      case SnackBarType.info:
-        return Colors.blue;
-      case SnackBarType.success:
-        return Colors.green;
-      case SnackBarType.warning:
-        return Colors.orange;
-      case SnackBarType.error:
-        return Colors.red;
-    }
-  }
-
-  IconData _getIconForType(SnackBarType type) {
-    switch (type) {
-      case SnackBarType.info:
-        return Icons.info_outline;
-      case SnackBarType.success:
-        return Icons.check_circle_outline;
-      case SnackBarType.warning:
-        return Icons.warning_amber_rounded;
-      case SnackBarType.error:
-        return Icons.error_outline;
-    }
-  }
-
-  String _getTitleForType(SnackBarType type) {
-    switch (type) {
-      case SnackBarType.info:
-        return 'Info';
-      case SnackBarType.success:
-        return 'Success';
-      case SnackBarType.warning:
-        return 'Warning';
-      case SnackBarType.error:
-        return 'Error';
-    }
-  }
 }
-
-enum SnackBarType { info, success, warning, error }
