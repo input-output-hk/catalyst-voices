@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/pages/login/login.dart';
-import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices/pages/login/login_email_text_filed.dart';
+import 'package:catalyst_voices/pages/login/login_password_text_field.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
@@ -51,9 +52,9 @@ final class LoginForm extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 30),
-                    const EmailInput(),
+                    const LoginEmailTextFiled(),
                     const SizedBox(height: 20),
-                    const PasswordInput(),
+                    const LoginPasswordTextField(),
                     const SizedBox(height: 20),
                     const SizedBox(
                       width: double.infinity,
