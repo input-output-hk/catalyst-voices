@@ -29,6 +29,8 @@ class VoicesSnackBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final l10n = context.l10n;
 
     return DecoratedBox(
       decoration: BoxDecoration(
@@ -66,9 +68,9 @@ class VoicesSnackBar extends StatelessWidget {
                       snackBarType.title(context),
                       style: TextStyle(
                         color: snackBarType.titleColor(context),
-                        fontSize: theme.textTheme.titleMedium?.fontSize,
-                        fontWeight: theme.textTheme.titleMedium?.fontWeight,
-                        fontFamily: theme.textTheme.titleMedium?.fontFamily,
+                        fontSize: textTheme.titleMedium?.fontSize,
+                        fontWeight: textTheme.titleMedium?.fontWeight,
+                        fontFamily: textTheme.titleMedium?.fontFamily,
                       ),
                     ),
                   ],
@@ -82,7 +84,7 @@ class VoicesSnackBar extends StatelessWidget {
                   children: [
                     Text(
                       snackBarType.message(context),
-                      style: theme.textTheme.bodyMedium,
+                      style: textTheme.bodyMedium,
                     ),
                   ],
                 ),
@@ -100,8 +102,8 @@ class VoicesSnackBar extends StatelessWidget {
                           : onRefreshPressed,
                       child: Text(
                         snackBarType == VoicesSnackBarType.success
-                            ? context.l10n.snackbarOkButtonText
-                            : context.l10n.snackbarRefreshButtonText,
+                            ? l10n.snackbarOkButtonText
+                            : l10n.snackbarRefreshButtonText,
                         style: TextStyle(
                           color: theme.colors.textPrimary,
                         ),
@@ -111,7 +113,7 @@ class VoicesSnackBar extends StatelessWidget {
                     TextButton(
                       onPressed: onLearnMorePressed,
                       child: Text(
-                        context.l10n.snackbarMoreButtonText,
+                        l10n.snackbarMoreButtonText,
                         style: TextStyle(
                           color: theme.colors.textPrimary,
                           decoration: TextDecoration.underline,
