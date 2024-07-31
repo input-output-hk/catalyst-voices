@@ -201,18 +201,18 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   }
 
   @override
-  Future<VkeyWitness> signData({
+  Future<DataSignature> signData({
     required ShelleyAddress address,
     required List<int> payload,
   }) async {
     try {
       return await _delegate
           .signData(
-            hex.encode(cbor.encode(address.toCbor())).toJS,
+            address.toBech32().toJS,
             hex.encode(payload).toJS,
           )
           .toDart
-          .then((e) => VkeyWitness.fromCbor(cbor.decode(hex.decode(e.toDart))));
+          .then((e) => e.toDart);
     } catch (ex) {
       throw _mapApiException(ex) ??
           _mapDataSignException(ex) ??
