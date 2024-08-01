@@ -159,4 +159,7 @@ class VoicesSnackBar extends StatelessWidget {
       ),
     );
   }
+
+  static void hideCurrent(BuildContext context) =>
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
 }

@@ -30,9 +30,7 @@ class VoicesSnackbarExample extends StatelessWidget {
                     ),
                     onPrimaryPressed: () {},
                     onSecondaryPressed: () {},
-                    onClosePressed: () {
-                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                    },
+                    onClosePressed: () => VoicesSnackBar.hideCurrent(context),
                   ).show(context);
                 },
                 child: Text(
