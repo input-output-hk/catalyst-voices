@@ -71,10 +71,10 @@ const CASSANDRA_VOLATILE_DB_URL_DEFAULT: &str = "127.0.0.1:9042";
 const CASSANDRA_VOLATILE_DB_NAMESPACE_DEFAULT: &str = "volatile";
 
 /// Default chain to follow.
-const CHAIN_FOLLOWER_DEFAULT: Network = Network::Preprod;
+const CHAIN_FOLLOWER_DEFAULT: Network = Network::Mainnet;
 
 /// Default number of sync tasks (must be in the range 1 to 255 inclusive.)
-const CHAIN_FOLLOWER_SYNC_TASKS_DEFAULT: u8 = 16;
+const CHAIN_FOLLOWER_SYNC_TASKS_DEFAULT: u16 = 16;
 
 /// Hash the Public IPv4 and IPv6 address of the machine, and convert to a 128 bit V4
 /// UUID.
@@ -478,19 +478,19 @@ pub(crate) struct ChainFollowerEnvVars {
     /// The Blockchain we sync from.
     pub(crate) chain: Network,
 
-    /// Yje maximum number of sync tasks.
-    pub(crate) sync_tasks: u8,
+    /// The maximum number of sync tasks.
+    pub(crate) sync_tasks: u16,
 }
 
 impl ChainFollowerEnvVars {
     /// Create a config for a cassandra cluster, identified by a default namespace.
     fn new() -> Self {
         let chain = StringEnvVar::new_as_enum("CHAIN_NETWORK", CHAIN_FOLLOWER_DEFAULT, false);
-        let sync_tasks: u8 = StringEnvVar::new_as_i64(
+        let sync_tasks: u16 = StringEnvVar::new_as_i64(
             "CHAIN_FOLLOWER_SYNC_TASKS",
             CHAIN_FOLLOWER_SYNC_TASKS_DEFAULT.into(),
             1,
-            255,
+            u16::MAX.into(),
         )
         .try_into()
         .unwrap_or(CHAIN_FOLLOWER_SYNC_TASKS_DEFAULT);

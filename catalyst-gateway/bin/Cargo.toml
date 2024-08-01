@@ -75,6 +75,9 @@ strum.workspace = true
 strum_macros.workspace = true
 openssl.workspace = true
 num-bigint.workspace = true
+futures.workspace = true
+rand.workspace = true
+moka.workspace = true
 
 [build-dependencies]
 build-info-build = { workspace = true }

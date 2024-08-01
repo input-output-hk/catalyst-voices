@@ -1,9 +1,19 @@
 //! Logic for orchestrating followers
 
-use cardano_chain_follower::{ChainFollower, ChainSyncConfig, Network, ORIGIN_POINT, TIP_POINT};
+use std::{fmt::Display, time::Duration};
+
+use cardano_chain_follower::{
+    ChainFollower, ChainSyncConfig, Network, Point, ORIGIN_POINT, TIP_POINT,
+};
+use duration_string::DurationString;
+use futures::{stream::FuturesUnordered, StreamExt};
+use rand::{Rng, SeedableRng};
 use tracing::{error, info, warn};
 
-use crate::{db::index::block::index_block, settings::Settings};
+use crate::{
+    db::index::{block::index_block, session::wait_is_ready},
+    settings::Settings,
+};
 
 pub(crate) mod cip36_registration;
 pub(crate) mod util;
@@ -12,10 +22,13 @@ pub(crate) mod util;
 #[allow(dead_code)]
 const MAX_BLOCKS_BATCH_LEN: usize = 1024;
 
+/// How long we wait between checks for connection to the indexing DB to be ready.
+const INDEXING_DB_READY_WAIT_INTERVAL: Duration = Duration::from_secs(1);
+
 /// Start syncing a particular network
 async fn start_sync_for(chain: Network) -> anyhow::Result<()> {
     let cfg = ChainSyncConfig::default_for(chain);
-    info!(chain = cfg.chain.to_string(), "Starting Sync");
+    info!(chain = %cfg.chain, "Starting Blockchain Sync");
 
     if let Err(error) = cfg.run().await {
         error!(chain=%chain, error=%error, "Failed to start chain sync task");
@@ -25,55 +38,343 @@ async fn start_sync_for(chain: Network) -> anyhow::Result<()> {
     Ok(())
 }
 
-/// Start followers as per defined in the config
-#[allow(unused)]
-pub(crate) async fn start_followers() -> anyhow::Result<()> {
-    let cfg = Settings::follower_cfg();
+/// Data we return from a sync task.
+struct SyncParams {
+    /// What blockchain are we syncing.
+    chain: Network,
+    /// The starting point of this sync.
+    start: Point,
+    /// The ending point of this sync.
+    end: Point,
+    /// The first block we successfully synced.
+    first_indexed_block: Option<Point>,
+    /// The last block we successfully synced.
+    last_indexed_block: Option<Point>,
+    /// The number of blocks we successfully synced.
+    total_blocks_synced: u64,
+    /// The number of blocks we successfully synced.
+    last_blocks_synced: u64,
+    /// The number of retries so far on this sync task.
+    retries: u64,
+    /// The number of retries so far on this sync task.
+    backoff_delay: Option<Duration>,
+    /// If the sync completed without error or not.
+    result: Option<anyhow::Result<()>>,
+}
 
-    cfg.log();
+impl Display for SyncParams {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if self.result.is_none() {
+            write!(f, "Sync_Params {{ ")?;
+        } else {
+            write!(f, "Sync_Result {{ ")?;
+        }
 
-    start_sync_for(cfg.chain).await?;
+        write!(f, "start: {}, end: {}", self.start, self.end)?;
 
+        if let Some(first) = self.first_indexed_block.as_ref() {
+            write!(f, ", first_indexed_block: {first}")?;
+        }
+
+        if let Some(last) = self.last_indexed_block.as_ref() {
+            write!(f, ", last_indexed_block: {last}")?;
+        }
+
+        if self.retries > 0 {
+            write!(f, ", retries: {}", self.retries)?;
+        }
+
+        if self.retries > 0 || self.result.is_some() {
+            write!(f, ", synced_blocks: {}", self.total_blocks_synced)?;
+        }
+
+        if self.result.is_some() {
+            write!(f, ", last_sync: {}", self.last_blocks_synced)?;
+        }
+
+        if let Some(backoff) = self.backoff_delay.as_ref() {
+            write!(f, ", backoff: {}", DurationString::from(*backoff))?;
+        }
+
+        if let Some(result) = self.result.as_ref() {
+            match result {
+                Ok(()) => write!(f, ", Success")?,
+                Err(error) => write!(f, ", {error}")?,
+            };
+        }
+
+        f.write_str(" }")
+    }
+}
+
+/// The range we generate random backoffs within given a base backoff value.
+const BACKOFF_RANGE_MULTIPLIER: u32 = 3;
+
+impl SyncParams {
+    /// Create a new `SyncParams`.
+    fn new(chain: Network, start: Point, end: Point) -> Self {
+        Self {
+            chain,
+            start,
+            end,
+            first_indexed_block: None,
+            last_indexed_block: None,
+            total_blocks_synced: 0,
+            last_blocks_synced: 0,
+            retries: 0,
+            backoff_delay: None,
+            result: None,
+        }
+    }
+
+    /// Convert a result back into parameters for a retry.
+    fn retry(&self) -> Self {
+        let retry_count = self.retries + 1;
+
+        let mut backoff = None;
+
+        // If we did sync any blocks last time, first retry is immediate.
+        // Otherwise we backoff progressively more as we do more retries.
+        if self.last_blocks_synced == 0 {
+            // Calculate backoff based on number of retries so far.
+            backoff = match retry_count {
+                1 => Some(Duration::from_secs(1)),     // 1-3 seconds
+                2..5 => Some(Duration::from_secs(10)), // 10-30 seconds
+                _ => Some(Duration::from_secs(30)),    // 30-90 seconds.
+            };
+        }
+
+        Self {
+            chain: self.chain,
+            start: self.start.clone(),
+            end: self.end.clone(),
+            first_indexed_block: self.first_indexed_block.clone(),
+            last_indexed_block: self.last_indexed_block.clone(),
+            total_blocks_synced: self.total_blocks_synced,
+            last_blocks_synced: 0,
+            retries: retry_count,
+            backoff_delay: backoff,
+            result: None,
+        }
+    }
+
+    /// Convert Params into the result of the sync.
+    fn done(
+        &self, first: Option<Point>, last: Option<Point>, synced: u64, result: anyhow::Result<()>,
+    ) -> Self {
+        Self {
+            chain: self.chain,
+            start: self.start.clone(),
+            end: self.end.clone(),
+            first_indexed_block: first,
+            last_indexed_block: last,
+            total_blocks_synced: synced + self.total_blocks_synced,
+            last_blocks_synced: synced,
+            retries: self.retries,
+            backoff_delay: self.backoff_delay,
+            result: Some(result),
+        }
+    }
+
+    /// Get where this sync run actually needs to start from.
+    fn actual_start(&self) -> Point {
+        self.last_indexed_block
+            .as_ref()
+            .unwrap_or(&self.start)
+            .clone()
+    }
+
+    /// Do the backoff delay processing.
+    ///
+    /// The actual delay is a random time from the Delay itself to
+    /// `BACKOFF_RANGE_MULTIPLIER` times the delay. This is to prevent hammering the
+    /// service at regular intervals.
+    async fn backoff(&self) {
+        if let Some(backoff) = self.backoff_delay {
+            let mut rng = rand::rngs::StdRng::from_entropy();
+            let actual_backoff =
+                rng.gen_range(backoff..backoff.saturating_mul(BACKOFF_RANGE_MULTIPLIER));
+
+            tokio::time::sleep(actual_backoff).await;
+        }
+    }
+}
+
+/// Sync a portion of the blockchain.
+/// Set end to `TIP_POINT` to sync the tip continuously.
+fn sync_subchain(params: SyncParams) -> tokio::task::JoinHandle<SyncParams> {
     tokio::spawn(async move {
-        // We can't sync until the local chain data is synced.
-        // This call will wait until we sync.
+        info!(chain = %params.chain, params=%params, "Indexing Blockchain");
 
-        // Initially simple pure follower.
-        // TODO, break the initial sync follower into multiple followers syncing the chain
-        // to the index DB in parallel.
-        info!(chain = %cfg.chain, "Following");
-        let mut follower = ChainFollower::new(cfg.chain, ORIGIN_POINT, TIP_POINT).await;
+        // Backoff hitting the database if we need to.
+        params.backoff().await;
 
-        let mut blocks: u64 = 0;
-        let mut hit_tip: bool = false;
+        // Wait for indexing DB to be ready before continuing.
+        wait_is_ready(INDEXING_DB_READY_WAIT_INTERVAL).await;
+        info!(chain=%params.chain, params=%params,"Indexing DB is ready");
 
+        let mut first_indexed_block = params.first_indexed_block.clone();
+        let mut last_indexed_block = params.last_indexed_block.clone();
+        let mut blocks_synced = 0u64;
+
+        let mut follower =
+            ChainFollower::new(params.chain, params.actual_start(), params.end.clone()).await;
         while let Some(chain_update) = follower.next().await {
             match chain_update.kind {
                 cardano_chain_follower::Kind::ImmutableBlockRollForward => {
-                    warn!("TODO: Immutable Chain roll forward");
+                    // We only process these on the follower tracking the TIP.
+                    if params.end == TIP_POINT {
+                        warn!("TODO: Immutable Chain roll forward");
+                    };
                 },
                 cardano_chain_follower::Kind::Block => {
                     let block = chain_update.block_data();
-                    if blocks == 0 {
-                        info!("Indexing first block.");
-                    }
-                    blocks += 1;
-
-                    if chain_update.tip && !hit_tip {
-                        hit_tip = true;
-                        info!("Hit tip after {blocks} blocks.");
-                    }
 
                     if let Err(error) = index_block(block).await {
-                        error!(chain=%cfg.chain, error=%error, "Failed to index block");
-                        return;
+                        let error_msg = format!("Failed to index block {}", block.point());
+                        error!(chain=%params.chain, error=%error, params=%params, error_msg);
+                        return params.done(
+                            first_indexed_block,
+                            last_indexed_block,
+                            blocks_synced,
+                            Err(error.context(error_msg)),
+                        );
                     }
+
+                    if first_indexed_block.is_none() {
+                        first_indexed_block = Some(block.point());
+                    }
+                    last_indexed_block = Some(block.point());
+                    blocks_synced += 1;
                 },
                 cardano_chain_follower::Kind::Rollback => {
                     warn!("TODO: Live Chain rollback");
                 },
             }
         }
+
+        let result = params.done(
+            first_indexed_block,
+            last_indexed_block,
+            blocks_synced,
+            Ok(()),
+        );
+
+        info!(chain = %params.chain, result=%result, "Indexing Blockchain Completed: OK");
+
+        result
+    })
+}
+
+/// Start followers as per defined in the config
+#[allow(unused)]
+pub(crate) async fn start_followers() -> anyhow::Result<()> {
+    let cfg = Settings::follower_cfg();
+
+    // Log the chain follower configuration.
+    cfg.log();
+
+    // Start Syncing the blockchain, so we can consume its data as required.
+    start_sync_for(cfg.chain).await?;
+    info!(chain=%cfg.chain,"Chain Sync is started.");
+
+    tokio::spawn(async move {
+        // We can't sync until the local chain data is synced.
+        // This call will wait until we sync.
+        let tips = cardano_chain_follower::ChainFollower::get_tips(cfg.chain).await;
+        let immutable_tip_slot = tips.0.slot_or_default();
+        let live_tip_slot = tips.1.slot_or_default();
+        info!(chain=%cfg.chain, immutable_tip=immutable_tip_slot, live_tip=live_tip_slot, "Blockchain ready to sync from.");
+
+        let mut sync_tasks: FuturesUnordered<tokio::task::JoinHandle<SyncParams>> =
+            FuturesUnordered::new();
+
+        // Start the Immutable Chain sync tasks.
+        // If the number of sync tasks is zero, just have one.
+        //   Note: this shouldn't be possible, but easy to handle if it is.
+        let sub_chain_slots = immutable_tip_slot
+            .checked_div(cfg.sync_tasks.into())
+            .unwrap_or(immutable_tip_slot);
+        // Need steps in a usize, in the highly unlikely event the steps are > max usize, make
+        // them max usize.
+        let sub_chain_steps: usize = sub_chain_slots.try_into().unwrap_or(usize::MAX);
+
+        let mut start_point = ORIGIN_POINT;
+        for slot_end in (sub_chain_slots..immutable_tip_slot).step_by(sub_chain_steps) {
+            let next_point = cardano_chain_follower::Point::fuzzy(slot_end);
+
+            sync_tasks.push(sync_subchain(SyncParams::new(
+                cfg.chain,
+                start_point,
+                next_point.clone(),
+            )));
+
+            // Next start == last end.
+            start_point = next_point;
+        }
+
+        // Start the Live Chain sync task - This never stops syncing.
+        sync_tasks.push(sync_subchain(SyncParams::new(
+            cfg.chain,
+            start_point,
+            TIP_POINT,
+        )));
+
+        // Wait Sync tasks to complete.  If they fail and have not completed, reschedule them.
+        // They will return from this iterator in the order they complete.
+        while let Some(completed) = sync_tasks.next().await {
+            let remaining_followers = sync_tasks.len();
+
+            match completed {
+                Ok(finished) => {
+                    // Sync task finished.  Check if it completed OK or had an error.
+                    // If it failed, we need to reschedule it.
+
+                    let last_block = finished
+                        .last_indexed_block
+                        .clone()
+                        .map_or("None".to_string(), |v| v.to_string());
+
+                    let first_block = finished
+                        .first_indexed_block
+                        .clone()
+                        .map_or("None".to_string(), |v| v.to_string());
+
+                    // The TIP follower should NEVER end, even without error, so report that as an
+                    // error. It can fail if the index DB goes down in some way.
+                    // Restart it always.
+                    if finished.end == TIP_POINT {
+                        error!(chain=%cfg.chain, report=%finished, 
+                            "The TIP follower failed, restarting it.");
+
+                        // Start the Live Chain sync task again from where it left off.
+                        sync_tasks.push(sync_subchain(finished.retry()));
+                    } else if let Some(result) = finished.result.as_ref() {
+                        match result {
+                            Ok(()) => {
+                                info!(chain=%cfg.chain, report=%finished, 
+                                    "The Immutable follower completed successfully.");
+                            },
+                            Err(error) => {
+                                // let report = &finished.to_string();
+                                error!(chain=%cfg.chain, report=%finished,
+                                    "An Immutable follower failed, restarting it.");
+                                // Start the Live Chain sync task again from where it left off.
+                                sync_tasks.push(sync_subchain(finished.retry()));
+                            },
+                        }
+                    } else {
+                        error!(chain=%cfg.chain, report=%finished,
+                                 "The Immutable follower completed, but without a proper result.");
+                    }
+                },
+                Err(error) => {
+                    error!(error=%error, "Sync task failed. Can not restart it, not enough information.  Sync is probably failed at this point.");
+                },
+            }
+        }
+
+        error!("Sync tasks have all stopped.  This is an unexpected error!");
     });
 
     Ok(())

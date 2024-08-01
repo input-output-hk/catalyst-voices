@@ -176,6 +176,7 @@ reqwest
 rfwtxt
 rgloader
 ripgrep
+rngs
 RPATH
 rustc
 rustdoc
@@ -190,6 +191,7 @@ Schemathesis
 Scripthash
 ScyllaDB
 seckey
+Seedable
 sendfile
 slotno
 sqlfluff

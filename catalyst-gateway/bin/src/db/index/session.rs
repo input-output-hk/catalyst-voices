@@ -204,6 +204,17 @@ pub(crate) fn is_ready() -> bool {
     PERSISTENT_SESSION.get().is_some() && VOLATILE_SESSION.get().is_some()
 }
 
+/// Wait for the Cassandra Indexing DB to be ready before continuing
+pub(crate) async fn wait_is_ready(interval: Duration) {
+    loop {
+        if is_ready() {
+            break;
+        }
+
+        tokio::time::sleep(interval).await;
+    }
+}
+
 /// Get the session needed to perform a query.
 pub(crate) fn session(persistent: bool) -> Option<(CassandraSession, Arc<PreparedQueries>)> {
     if persistent {

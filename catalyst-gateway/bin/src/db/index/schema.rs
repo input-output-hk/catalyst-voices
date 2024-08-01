@@ -19,6 +19,17 @@ const CREATE_TABLE_TXO_ASSETS_BY_STAKE_ADDRESS_CQL: &str =
 /// TXI by Stake Address Table Schema
 const CREATE_TABLE_TXI_BY_TXN_HASH_CQL: &str = include_str!("./schema/txi_by_txn_hash_table.cql");
 
+/// TXO by Stake Address Table Schema
+const CREATE_TABLE_UNSTAKED_TXO_BY_TXN_HASH_CQL: &str =
+    include_str!("./schema/unstaked_txo_by_txn_hash.cql");
+/// TXO Assets by Stake Address Table Schema
+const CREATE_TABLE_UNSTAKED_TXO_ASSETS_BY_TXN_HASH_CQL: &str =
+    include_str!("./schema/unstaked_txo_assets_by_txn_hash.cql");
+
+/// Stake Address/Registration Table Schema
+const CREATE_TABLE_STAKE_HASH_TO_STAKE_ADDRESS_CQL: &str =
+    include_str!("./schema/stake_hash_to_stake_address.cql");
+
 /// The version of the Schema we are using.
 /// Must be incremented if there is a breaking change in any schema tables below.
 pub(crate) const SCHEMA_VERSION: u64 = 1;
@@ -80,6 +91,29 @@ async fn create_txo_tables(session: &mut CassandraSession) -> anyhow::Result<()>
     Ok(())
 }
 
+/// Create tables for holding unstaked TXO data.
+async fn create_unstaked_txo_tables(session: &mut CassandraSession) -> anyhow::Result<()> {
+    let stmt = session
+        .prepare(CREATE_TABLE_UNSTAKED_TXO_BY_TXN_HASH_CQL)
+        .await
+        .context("Create Table Unstaked TXO By Txn Hash: Prepared")?;
+    session
+        .execute(&stmt, ())
+        .await
+        .context("Create Table Unstaked TXO By Txn Hash: Executed")?;
+
+    let stmt = session
+        .prepare(CREATE_TABLE_UNSTAKED_TXO_ASSETS_BY_TXN_HASH_CQL)
+        .await
+        .context("Create Table Unstaked TXO Assets By Txn Hash: Prepared")?;
+    session
+        .execute(&stmt, ())
+        .await
+        .context("Create Table Unstaked TXO Assets By Txn Hash: Executed")?;
+
+    Ok(())
+}
+
 /// Create tables for holding volatile TXI data
 async fn create_txi_tables(session: &mut CassandraSession) -> anyhow::Result<()> {
     let stmt = session
@@ -95,6 +129,21 @@ async fn create_txi_tables(session: &mut CassandraSession) -> anyhow::Result<()>
     Ok(())
 }
 
+/// Create tables for holding volatile TXI data
+async fn create_stake_tables(session: &mut CassandraSession) -> anyhow::Result<()> {
+    let stmt = session
+        .prepare(CREATE_TABLE_STAKE_HASH_TO_STAKE_ADDRESS_CQL)
+        .await
+        .context("Create Table Stake Hash to Stake Address: Prepared")?;
+
+    session
+        .execute(&stmt, ())
+        .await
+        .context("Create Table Stake Hash to Stake Address: Executed")?;
+
+    Ok(())
+}
+
 /// Create the Schema on the connected Cassandra DB
 pub(crate) async fn create_schema(
     session: &mut CassandraSession, cfg: &CassandraEnvVars,
@@ -103,7 +152,12 @@ pub(crate) async fn create_schema(
 
     create_txo_tables(session).await?;
 
+    create_unstaked_txo_tables(session).await?;
+
     create_txi_tables(session).await?;
+
+    create_stake_tables(session).await?;
+
     // Wait for the Schema to be ready.
     session.await_schema_agreement().await?;
 
