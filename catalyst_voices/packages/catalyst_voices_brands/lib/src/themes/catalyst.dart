@@ -46,6 +46,29 @@ ThemeData _buildThemeData(
     dividerTheme: DividerThemeData(
       color: colorScheme.outlineVariant,
     ),
+    segmentedButtonTheme: SegmentedButtonThemeData(
+      style: SegmentedButton.styleFrom(
+        foregroundColor: voicesColorScheme.textOnPrimary,
+        backgroundColor: Colors.transparent,
+        selectedForegroundColor: voicesColorScheme.textOnPrimary,
+        selectedBackgroundColor: voicesColorScheme.onSurfacePrimary012,
+        disabledForegroundColor: voicesColorScheme.iconsDisabled,
+        disabledBackgroundColor: Colors.transparent,
+        textStyle: textTheme.labelLarge,
+      ).copyWith(
+        side: WidgetStateProperty.resolveWith(
+          (states) {
+            if (states.contains(WidgetState.disabled)) {
+              return BorderSide(color: voicesColorScheme.iconsDisabled!);
+            }
+
+            return BorderSide(color: voicesColorScheme.outlineBorder!);
+          },
+        ),
+        iconSize: const WidgetStatePropertyAll(18),
+      ),
+      selectedIcon: const Icon(Icons.check),
+    ),
     textTheme: textTheme,
     colorScheme: colorScheme,
     extensions: <ThemeExtension<dynamic>>[

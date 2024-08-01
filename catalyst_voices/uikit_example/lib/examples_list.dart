@@ -4,6 +4,7 @@ import 'package:catalyst_voices/widgets/menu/voices_list_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:uikit_example/examples/voices_chip_example.dart';
 import 'package:uikit_example/examples/voices_navigation_example.dart';
+import 'package:uikit_example/examples/voices_widgets_example.dart';
 
 class ExamplesListPage extends StatelessWidget {
   const ExamplesListPage({super.key});
@@ -34,6 +35,11 @@ class ExamplesListPage extends StatelessWidget {
         title: 'Voices Chips',
         route: VoicesChipExample.route,
         page: VoicesChipExample(),
+      ),
+      ExampleTile(
+        title: 'Voices Widgets',
+        route: VoicesWidgetsExample.route,
+        page: VoicesWidgetsExample(),
       ),
     ];
   }
