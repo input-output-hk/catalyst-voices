@@ -211,6 +211,72 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'[cmd=K]'**
   String get searchButtonLabelText;
+
+  /// Label text shown in the Snackbar widget when the message is an info message.
+  ///
+  /// In en, this message translates to:
+  /// **'Info'**
+  String get snackbarInfoLabelText;
+
+  /// Text shown in the Snackbar widget when the message is an info message.
+  ///
+  /// In en, this message translates to:
+  /// **'This is an info message!'**
+  String get snackbarInfoMessageText;
+
+  /// Label text shown in the Snackbar widget when the message is an success message.
+  ///
+  /// In en, this message translates to:
+  /// **'Success'**
+  String get snackbarSuccessLabelText;
+
+  /// Text shown in the Snackbar widget when the message is an success message.
+  ///
+  /// In en, this message translates to:
+  /// **'This is a success message!'**
+  String get snackbarSuccessMessageText;
+
+  /// Label text shown in the Snackbar widget when the message is an warning message.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning'**
+  String get snackbarWarningLabelText;
+
+  /// Text shown in the Snackbar widget when the message is an warning message.
+  ///
+  /// In en, this message translates to:
+  /// **'This is a warning message!'**
+  String get snackbarWarningMessageText;
+
+  /// Label text shown in the Snackbar widget when the message is an error message.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get snackbarErrorLabelText;
+
+  /// Text shown in the Snackbar widget when the message is an error message.
+  ///
+  /// In en, this message translates to:
+  /// **'This is an error message!'**
+  String get snackbarErrorMessageText;
+
+  /// Text shown in the Snackbar widget for the refresh button.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get snackbarRefreshButtonText;
+
+  /// Text shown in the Snackbar widget for the more button.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn more'**
+  String get snackbarMoreButtonText;
+
+  /// Text shown in the Snackbar widget for the ok button.
+  ///
+  /// In en, this message translates to:
+  /// **'Ok'**
+  String get snackbarOkButtonText;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

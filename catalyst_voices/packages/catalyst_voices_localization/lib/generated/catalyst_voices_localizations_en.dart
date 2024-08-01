@@ -63,4 +63,37 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get searchButtonLabelText => '[cmd=K]';
+
+  @override
+  String get snackbarInfoLabelText => 'Info';
+
+  @override
+  String get snackbarInfoMessageText => 'This is an info message!';
+
+  @override
+  String get snackbarSuccessLabelText => 'Success';
+
+  @override
+  String get snackbarSuccessMessageText => 'This is a success message!';
+
+  @override
+  String get snackbarWarningLabelText => 'Warning';
+
+  @override
+  String get snackbarWarningMessageText => 'This is a warning message!';
+
+  @override
+  String get snackbarErrorLabelText => 'Error';
+
+  @override
+  String get snackbarErrorMessageText => 'This is an error message!';
+
+  @override
+  String get snackbarRefreshButtonText => 'Refresh';
+
+  @override
+  String get snackbarMoreButtonText => 'Learn more';
+
+  @override
+  String get snackbarOkButtonText => 'Ok';
 }
