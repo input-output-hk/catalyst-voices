@@ -22,15 +22,14 @@ class VoicesSnackbarExample extends StatelessWidget {
               OutlinedButton(
                 onPressed: () {
                   VoicesSnackBar(
-                    snackBarType: type,
+                    type: type,
                     padding: EdgeInsets.only(
                       bottom: screenWidth / 2,
                       left: screenWidth / 3,
                       right: screenWidth / 3,
                     ),
-                    onLearnMorePressed: () {},
-                    onRefreshPressed: () {},
-                    onOkPressed: () {},
+                    onPrimaryPressed: () {},
+                    onSecondaryPressed: () {},
                     onClosePressed: () {
                       ScaffoldMessenger.of(context).hideCurrentSnackBar();
                     },

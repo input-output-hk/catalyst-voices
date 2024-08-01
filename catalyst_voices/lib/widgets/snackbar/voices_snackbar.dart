@@ -4,22 +4,40 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
+/// [VoicesSnackBar] is a custom [SnackBar] widget that displays messages with
+/// different types and actions.
+///
+/// [VoicesSnackBar] comes with different types (info, success, warning, error)
+/// and optional actions such as primary, secondary, and close buttons.
 class VoicesSnackBar extends StatelessWidget {
-  final VoicesSnackBarType snackBarType;
-  final VoidCallback? onRefreshPressed;
-  final VoidCallback? onLearnMorePressed;
-  final VoidCallback? onOkPressed;
+  /// The type of the [VoicesSnackBar],
+  /// which determines its appearance and behavior.
+  final VoicesSnackBarType type;
+
+  /// Function to be executed when the primary action button is pressed.
+  final VoidCallback? onPrimaryPressed;
+
+  /// Callback function to be executed when the secondary action button is
+  /// pressed.
+  final VoidCallback? onSecondaryPressed;
+
+  /// Callback function to be executed when the close button is pressed.
   final VoidCallback? onClosePressed;
+
+  /// The behavior of the [VoicesSnackBar], which can be fixed or floating.
   final SnackBarBehavior? behavior;
+
+  /// The padding around the content of the [VoicesSnackBar].
   final EdgeInsetsGeometry? padding;
+
+  /// The width of the [VoicesSnackBar].
   final double? width;
 
   const VoicesSnackBar({
     super.key,
-    required this.snackBarType,
-    this.onRefreshPressed,
-    this.onLearnMorePressed,
-    this.onOkPressed,
+    required this.type,
+    this.onPrimaryPressed,
+    this.onSecondaryPressed,
     this.onClosePressed,
     this.width,
     this.behavior = SnackBarBehavior.fixed,
@@ -34,7 +52,7 @@ class VoicesSnackBar extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: snackBarType.backgroundColor(context),
+        color: type.backgroundColor(context),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Stack(
@@ -60,14 +78,14 @@ class VoicesSnackBar extends StatelessWidget {
                   children: [
                     Icon(
                       size: 20,
-                      snackBarType.icon(context),
-                      color: snackBarType.iconColor(context),
+                      type.icon(context),
+                      color: type.iconColor(context),
                     ),
                     const SizedBox(width: 16),
                     Text(
-                      snackBarType.title(context),
+                      type.title(context),
                       style: TextStyle(
-                        color: snackBarType.titleColor(context),
+                        color: type.titleColor(context),
                         fontSize: textTheme.titleMedium?.fontSize,
                         fontWeight: textTheme.titleMedium?.fontWeight,
                         fontFamily: textTheme.titleMedium?.fontFamily,
@@ -83,7 +101,7 @@ class VoicesSnackBar extends StatelessWidget {
                 child: Row(
                   children: [
                     Text(
-                      snackBarType.message(context),
+                      type.message(context),
                       style: textTheme.bodyMedium,
                     ),
                   ],
@@ -97,11 +115,9 @@ class VoicesSnackBar extends StatelessWidget {
                 child: Row(
                   children: [
                     TextButton(
-                      onPressed: snackBarType == VoicesSnackBarType.success
-                          ? onOkPressed
-                          : onRefreshPressed,
+                      onPressed: onPrimaryPressed,
                       child: Text(
-                        snackBarType == VoicesSnackBarType.success
+                        type == VoicesSnackBarType.success
                             ? l10n.snackbarOkButtonText
                             : l10n.snackbarRefreshButtonText,
                         style: TextStyle(
@@ -111,7 +127,7 @@ class VoicesSnackBar extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     TextButton(
-                      onPressed: onLearnMorePressed,
+                      onPressed: onSecondaryPressed,
                       child: Text(
                         l10n.snackbarMoreButtonText,
                         style: TextStyle(
