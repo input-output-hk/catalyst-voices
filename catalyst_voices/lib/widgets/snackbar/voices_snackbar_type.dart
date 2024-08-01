@@ -12,11 +12,11 @@ enum VoicesSnackBarType { info, success, warning, error }
 
 class _SnackBarData {
   final IconData icon;
-  final Color? Function(VoicesColorScheme) iconColor;
-  final Color? Function(VoicesColorScheme) titleColor;
-  final Color? Function(VoicesColorScheme) backgroundColor;
-  final String Function(VoicesLocalizations) message;
-  final String Function(VoicesLocalizations) title;
+  final ColorResolver iconColor;
+  final ColorResolver titleColor;
+  final ColorResolver backgroundColor;
+  final L10nResolver message;
+  final L10nResolver title;
 
   const _SnackBarData({
     required this.icon,
