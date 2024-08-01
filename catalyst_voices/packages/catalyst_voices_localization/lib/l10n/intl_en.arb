@@ -79,5 +79,49 @@
   "searchButtonLabelText": "[cmd=K]",
   "@searchButtonLabelText": {
     "description": "Label text shown in the Search widget."
+  },
+  "snackbarInfoLabelText": "Info",
+  "@snackbarInfoLabelText": {
+    "description": "Label text shown in the Snackbar widget when the message is an info message."
+  },
+  "snackbarInfoMessageText": "This is an info message!",
+  "@snackbarInfoMessageText": {
+    "description": "Text shown in the Snackbar widget when the message is an info message."
+  },
+  "snackbarSuccessLabelText": "Success",
+  "@snackbarSuccessLabelText": {
+    "description": "Label text shown in the Snackbar widget when the message is an success message."
+  },
+  "snackbarSuccessMessageText": "This is a success message!",
+  "@snackbarSuccessMessageText": {
+    "description": "Text shown in the Snackbar widget when the message is an success message."
+  },
+  "snackbarWarningLabelText": "Warning",
+  "@snackbarWarningLabelText": {
+    "description": "Label text shown in the Snackbar widget when the message is an warning message."
+  },
+  "snackbarWarningMessageText": "This is a warning message!",
+  "@snackbarWarningMessageText": {
+    "description": "Text shown in the Snackbar widget when the message is an warning message."
+  },
+  "snackbarErrorLabelText": "Error",
+  "@snackbarErrorLabelText": {
+    "description": "Label text shown in the Snackbar widget when the message is an error message."
+  },
+  "snackbarErrorMessageText": "This is an error message!",
+  "@snackbarErrorMessageText": {
+    "description": "Text shown in the Snackbar widget when the message is an error message."
+  },
+  "snackbarRefreshButtonText": "Refresh",
+  "@snackbarRefreshButtonText": {
+    "description": "Text shown in the Snackbar widget for the refresh button."
+  },
+  "snackbarMoreButtonText": "Learn more",
+  "@snackbarMoreButtonText": {
+    "description": "Text shown in the Snackbar widget for the more button."
+  },
+  "snackbarOkButtonText": "Ok",
+  "@snackbarOkButtonText": {
+    "description": "Text shown in the Snackbar widget for the ok button."
   }
 }
