@@ -21,9 +21,9 @@ class VoicesSnackBar extends StatelessWidget {
     this.onLearnMorePressed,
     this.onOkPressed,
     this.onClosePressed,
-    this.behavior,
-    this.padding,
     this.width,
+    this.behavior = SnackBarBehavior.fixed,
+    this.padding = const EdgeInsets.all(16),
   });
 
   @override
@@ -131,7 +131,7 @@ class VoicesSnackBar extends StatelessWidget {
     );
   }
 
-  void showSnackBar(BuildContext context) {
+  void show(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: this,

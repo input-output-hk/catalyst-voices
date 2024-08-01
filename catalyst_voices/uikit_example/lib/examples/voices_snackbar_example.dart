@@ -34,7 +34,7 @@ class VoicesSnackbarExample extends StatelessWidget {
                     onClosePressed: () {
                       ScaffoldMessenger.of(context).hideCurrentSnackBar();
                     },
-                  ).showSnackBar(context);
+                  ).show(context);
                 },
                 child: Text(
                   type.toString().split('.').last,
