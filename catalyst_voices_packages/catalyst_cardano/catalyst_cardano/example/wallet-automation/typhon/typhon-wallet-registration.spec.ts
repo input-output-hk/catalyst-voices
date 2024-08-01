@@ -1,4 +1,4 @@
-import { test, chromium, expect, Page } from '@playwright/test';
+import { test, chromium, expect, Page, BrowserContext } from '@playwright/test';
 import { getWalletCredentials, getRegistrationPin } from './credentials';
 import { getSeedPhrase } from './seed-phrase';
 import { waitForDebugger } from 'inspector';
@@ -8,10 +8,11 @@ import fs from 'fs-extra';
 // extension ID for Typhon: kfdniefadaanbjodldohaedphafoffoh
 
 let newTab: Page
+let browser: BrowserContext;
 
 test.beforeAll(async () => {
     const extensionPath: string = path.resolve(__dirname, 'extensions/KFDNIEFADAANBJODLDOHAEDPHAFOFFOH_unzipped');
-    const browser = await chromium.launchPersistentContext('', {
+    browser = await chromium.launchPersistentContext('', {
         headless: false, // extensions only work in headful mode
         args: [
             `--disable-extensions-except=${extensionPath}`,
@@ -50,20 +51,6 @@ test.beforeAll(async () => {
 
     await newTab.locator('//*[@id="app"]/div/div/div[3]/div/div[2]/div/div/div/div[1]/div[1]/div[1]/span[1]').click();
     await newTab.getByRole('button', { name: 'Unlock Wallet' }).click();
-    
-    try {
-        await newTab.waitForSelector('//*[@id="lc"]/div[2]/div[2]/div[2]/div[1]/div[2]', { timeout: 5000 });
-        const textContent = await newTab.$eval('//*[@id="lc"]/div[2]/div[2]/div[2]/div[1]/div[2]', el => el.textContent);
-
-        if (textContent) {
-            console.log("registered for voting successfully!");
-        } else {
-            console.log('text content not found');
-        }
-    } catch (error) {
-        console.error('an error occurred:', error.toString());
-        console.log('an error occurred');
-    }
 
     await newTab.waitForTimeout(5000);
     await newTab.goto('http://localhost:8000/');
@@ -102,13 +89,13 @@ test('get wallet details', async () => {
     expect(cleanedExtensionInfo).toMatch('cip-30');
 
     // Get network ID
-    const networkId = await matchTextContent('#flt-semantic-node-15', /Network ID: (.+)/);
+    expect(matchTextContent('#flt-semantic-node-15', /Network ID: (.+)/)).not.toBeNaN();
 
     // Get reward addresses
-    const rewardAddresses = await matchTextContent('#flt-semantic-node-17', /Reward addresses:\s*(\S+)/);
+    expect(await matchTextContent('#flt-semantic-node-17', /Reward addresses:\s*(\S+)/)).not.toBeNaN();
 
     // Get used addresses
-    const usedAddresses = await matchTextContent('#flt-semantic-node-19', /Used addresses:\s*(\S+)/);
+    expect(matchTextContent('#flt-semantic-node-19', /Used addresses:\s*(\S+)/)).not.toBeNaN();
 
     // Get UTXOs info
     const utxoTextContent = await newTab.locator('#flt-semantic-node-20').textContent({ timeout: 5000 });
@@ -128,16 +115,29 @@ test('get wallet details', async () => {
     expect(amount).not.toBeNaN();
 
     expect(parseInt(amountAda)).toBeGreaterThan(500);
+    await newTab.waitForTimeout(5000);
 
-    // Display wallet details
-    console.table([
-        { Detail: 'ADA (lovelaces)', Value: balanceAda },
-        { Detail: 'Extension info', Value: cleanedExtensionInfo },
-        { Detail: 'Network ID', Value: networkId },
-        { Detail: 'Reward addresses', Value: rewardAddresses },
-        { Detail: 'Used addresses', Value: usedAddresses },
-        { Detail: 'UTXOs', Value: `Tx: ${tx}, Index: ${index}, Amount (ADA): ${amountAda}` }
-    ]);
+    
+});
+
+test('Sign data', async () => {
+    await newTab.getByRole('button', { name: 'Sign data' }).click();
+    
+    await expect.poll(async () => {
+        return browser.pages().length;
+    }, { timeout: 5000 }).toBe(3);
+
+    const signPage = browser.pages();
+    const signTab = signPage[signPage.length - 1];
+    await signTab.bringToFront();
+
+    const WalletCredentials = getWalletCredentials('WALLET1');
+    await signTab.getByRole('button', { name: 'Sign' }).click();
+    await signTab.getByPlaceholder('Password', { exact: true }).fill(WalletCredentials.password);
+    await signTab.getByRole('button', { name: 'confirm' }).click();
+
+    await newTab.bringToFront();
+    await expect(newTab.getByText('DataSignature')).toBeVisible();
 });
     // Logout 
     // const logOut = '//*[@id="app"]/div/div/div[3]/div/div/div[1]/div/div/div[2]/div[11]/div[2]';
