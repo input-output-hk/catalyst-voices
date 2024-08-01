@@ -23,7 +23,6 @@ class VoicesSnackbarExample extends StatelessWidget {
                 onPressed: () {
                   VoicesSnackBar(
                     snackBarType: type,
-                    width: 300,
                     padding: EdgeInsets.only(
                       bottom: screenWidth / 2,
                       left: screenWidth / 3,

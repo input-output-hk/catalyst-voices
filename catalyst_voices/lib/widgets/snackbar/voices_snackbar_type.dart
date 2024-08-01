@@ -87,11 +87,11 @@ enum VoicesSnackBarType {
 
     switch (this) {
       case VoicesSnackBarType.info:
-        return colors.onSuccess;
+        return colors.onPrimaryContainer;
       case VoicesSnackBarType.success:
-        return colors.onSuccess;
+        return colors.onSuccessContainer;
       case VoicesSnackBarType.warning:
-        return colors.onWarning;
+        return colors.onWarningContainer;
       case VoicesSnackBarType.error:
         return colors.onErrorContainer;
     }
