@@ -23,7 +23,7 @@ class _VoicesSegmentedButtonExampleState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Widgets')),
+      appBar: AppBar(title: const Text('VoicesSegmentedButton')),
       body: SizedBox.expand(
         child: SingleChildScrollView(
           child: Padding(
