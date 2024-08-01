@@ -31,14 +31,14 @@ import 'package:flutter/material.dart';
 ///         ),
 /// ```
 class VoicesSegmentedButton<T extends Object> extends StatelessWidget {
-  /// List of segments that will be shown in button
+  /// List of segments that will be shown in button.
   final List<ButtonSegment<T>> segments;
 
   /// Set of currently selected [segments]. Value corresponds should match
-  /// [ButtonSegment.value]
+  /// [ButtonSegment.value].
   final Set<T> selected;
 
-  /// Selection change callback
+  /// Selection change callback.
   final ValueChanged<Set<T>>? onChanged;
 
   /// Whether user should be allowed to select more then one [segments].
@@ -54,7 +54,7 @@ class VoicesSegmentedButton<T extends Object> extends StatelessWidget {
   /// Should insert leading check icon into selected [segments].
   final bool showSelectedIcon;
 
-  /// Default constructor
+  /// Default constructor.
   const VoicesSegmentedButton({
     super.key,
     required this.segments,
