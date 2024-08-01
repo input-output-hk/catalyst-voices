@@ -4,8 +4,8 @@ import 'package:catalyst_voices/widgets/menu/voices_list_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:uikit_example/examples/voices_chip_example.dart';
 import 'package:uikit_example/examples/voices_navigation_example.dart';
+import 'package:uikit_example/examples/voices_segmented_button_example.dart';
 import 'package:uikit_example/examples/voices_snackbar_example.dart';
-import 'package:uikit_example/examples/voices_widgets_example.dart';
 
 class ExamplesListPage extends StatelessWidget {
   static List<ExampleTile> get examples {
@@ -26,9 +26,9 @@ class ExamplesListPage extends StatelessWidget {
         page: VoicesSnackbarExample(),
       ),
       ExampleTile(
-        title: 'Voices Widgets',
-        route: VoicesWidgetsExample.route,
-        page: VoicesWidgetsExample(),
+        title: 'Voices SegmentedButton',
+        route: VoicesSegmentedButtonExample.route,
+        page: VoicesSegmentedButtonExample(),
       ),
     ];
   }
