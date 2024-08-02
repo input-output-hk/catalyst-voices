@@ -51,6 +51,10 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
   final Color? elevationsOnSurfaceNeutralLv0;
   final Color? outlineBorder;
   final Color? outlineBorderVariant;
+  final Color? primaryContainer;
+  final Color? onPrimaryContainer;
+  final Color? errorContainer;
+  final Color? onErrorContainer;
 
   const VoicesColorScheme({
     required this.textPrimary,
@@ -97,6 +101,10 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     required this.elevationsOnSurfaceNeutralLv0,
     required this.outlineBorder,
     required this.outlineBorderVariant,
+    required this.primaryContainer,
+    required this.onPrimaryContainer,
+    required this.errorContainer,
+    required this.onErrorContainer,
   });
 
   @override
@@ -145,6 +153,10 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     Color? elevationsOnSurfaceNeutralLv0,
     Color? outlineBorder,
     Color? outlineBorderVariant,
+    Color? primaryContainer,
+    Color? onPrimaryContainer,
+    Color? errorContainer,
+    Color? onErrorContainer,
   }) {
     return VoicesColorScheme(
       textPrimary: textPrimary ?? this.textPrimary,
@@ -199,6 +211,10 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
           elevationsOnSurfaceNeutralLv0 ?? this.elevationsOnSurfaceNeutralLv0,
       outlineBorder: outlineBorder ?? this.outlineBorder,
       outlineBorderVariant: outlineBorderVariant ?? this.outlineBorderVariant,
+      primaryContainer: primaryContainer ?? this.primaryContainer,
+      onPrimaryContainer: onPrimaryContainer ?? this.onPrimaryContainer,
+      errorContainer: errorContainer ?? this.errorContainer,
+      onErrorContainer: onErrorContainer ?? this.onErrorContainer,
     );
   }
 
@@ -290,6 +306,11 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       outlineBorder: Color.lerp(outlineBorder, other.outlineBorder, t),
       outlineBorderVariant:
           Color.lerp(outlineBorderVariant, other.outlineBorderVariant, t),
+      primaryContainer: Color.lerp(primaryContainer, other.primaryContainer, t),
+      onPrimaryContainer:
+          Color.lerp(onPrimaryContainer, other.onPrimaryContainer, t),
+      errorContainer: Color.lerp(errorContainer, other.errorContainer, t),
+      onErrorContainer: Color.lerp(onErrorContainer, other.onErrorContainer, t),
     );
   }
 }
