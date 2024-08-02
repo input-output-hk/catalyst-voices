@@ -116,8 +116,6 @@ test('get wallet details', async () => {
 
     expect(parseInt(amountAda)).toBeGreaterThan(500);
     await newTab.waitForTimeout(5000);
-
-    
 });
 
 test('Sign data', async () => {
@@ -136,9 +134,74 @@ test('Sign data', async () => {
     await signTab.getByPlaceholder('Password', { exact: true }).fill(WalletCredentials.password);
     await signTab.getByRole('button', { name: 'confirm' }).click();
 
-    await newTab.bringToFront();
     await expect(newTab.getByText('DataSignature')).toBeVisible();
 });
+
+test('Sign and submit tx', async () => {
+
+    await newTab.goBack();
+    await newTab.getByRole('button', { name: 'Sign & submit tx' }).click();
+    
+    await expect.poll(async () => {
+        return browser.pages().length;
+    }, { timeout: 5000 }).toBe(3);
+
+    const signPage = browser.pages();
+    const signTab = signPage[signPage.length - 1];
+    await signTab.bringToFront();
+
+    const WalletCredentials = getWalletCredentials('WALLET1');
+    await signTab.getByRole('button', { name: 'Sign' }).click();
+    await signTab.getByPlaceholder('Password', { exact: true }).fill(WalletCredentials.password);
+    await signTab.getByRole('button', { name: 'confirm' }).click();
+
+    await expect(newTab.getByText('Tx hash')).toBeVisible();
+});
+
+test('Sign and submit RBAC tx', async () => {
+
+    await newTab.goBack();
+    await newTab.getByRole('button', { name: 'Sign & submit RBAC tx' }).click();
+    
+    await expect.poll(async () => {
+        return browser.pages().length;
+    }, { timeout: 5000 }).toBe(3);
+
+    const signPage = browser.pages();
+    const signTab = signPage[signPage.length - 1];
+    await signTab.bringToFront();
+
+    const WalletCredentials = getWalletCredentials('WALLET1');
+    await signTab.getByRole('button', { name: 'Sign' }).click();
+    await signTab.getByPlaceholder('Password', { exact: true }).fill(WalletCredentials.password);
+    await signTab.getByRole('button', { name: 'confirm' }).click();
+    await newTab.waitForTimeout(5000);
+
+    await expect(newTab.getByText('Tx hash')).toBeVisible();
+    await newTab.waitForTimeout(5000);
+});
+
+test('Fail to Sign data with incorrect password', async () => {
+
+    await newTab.goBack();
+    await newTab.getByRole('button', { name: 'Sign data' }).click();
+    
+    await expect.poll(async () => {
+        return browser.pages().length;
+    }, { timeout: 5000 }).toBe(3);
+
+    const signPage = browser.pages();
+    const signTab = signPage[signPage.length - 1];
+    await signTab.bringToFront();
+
+    const wrongPassword = 'wrongPassword';
+    await signTab.getByRole('button', { name: 'Sign' }).click();
+    await signTab.getByPlaceholder('Password', { exact: true }).fill(wrongPassword);
+    await signTab.getByRole('button', { name: 'confirm' }).click();
+
+    await expect(signTab.getByText('Wrong password')).toBeVisible();
+});
+
     // Logout 
     // const logOut = '//*[@id="app"]/div/div/div[3]/div/div/div[1]/div/div/div[2]/div[11]/div[2]';
     // await newTab.locator(logOut).click();
