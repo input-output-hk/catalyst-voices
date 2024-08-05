@@ -174,8 +174,8 @@ jobs:
         run: |
             sed -i -e 's/SF:\/root/SF:catalyst-gateway/g' ${{ env.COVERAGE_REPORT_PATH }}/cat-gateway.coverage.info
             sed -i -e 's/SF:/SF:catalyst_voices/g' ${{ env.COVERAGE_REPORT_PATH }}/lcov.info
-            cat ${{ env.COVERAGE_REPORT_PATH }}/api-tests.coverage.info
-            
+            sed -i -e 's/SF:/SF:catalyst-gateway/\tests/g' ${{ env.COVERAGE_REPORT_PATH }}/api-tests.coverage.info
+
       - name: Coveralls
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
