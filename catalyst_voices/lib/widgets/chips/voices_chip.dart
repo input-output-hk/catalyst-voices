@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/common/prefix_suffix_decorator.dart';
+import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
@@ -82,8 +82,8 @@ class VoicesChip extends StatelessWidget {
           onTap: onTap,
           child: Padding(
             padding: padding,
-            child: PrefixSuffixDecorator(
-              affixIconTheme: iconTheme,
+            child: AffixDecorator(
+              iconTheme: iconTheme,
               prefix: leading,
               suffix: trailing,
               child: DefaultTextStyle(

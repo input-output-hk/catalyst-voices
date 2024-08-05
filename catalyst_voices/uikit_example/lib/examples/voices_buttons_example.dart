@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 enum _ButtonType {
   filled,
   outlined,
-  // text,
+  text,
   // textNeutral,
   // textSecondary,
   // icon,
@@ -100,6 +100,12 @@ class _ButtonRow extends StatelessWidget {
           child: const Text('Label'),
         ),
       _ButtonType.outlined => VoicesOutlinedButton(
+          onTap: state == _ButtonState.disabled ? null : () {},
+          leading: addLeadingIcon ? const Icon(Icons.add) : null,
+          trailing: addTrailingIcon ? const Icon(Icons.add) : null,
+          child: const Text('Label'),
+        ),
+      _ButtonType.text => VoicesTextButton(
           onTap: state == _ButtonState.disabled ? null : () {},
           leading: addLeadingIcon ? const Icon(Icons.add) : null,
           trailing: addTrailingIcon ? const Icon(Icons.add) : null,

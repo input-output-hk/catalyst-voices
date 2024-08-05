@@ -7,8 +7,8 @@ import 'package:flutter/material.dart';
 ///
 /// Example
 /// ```dart
-///     PrefixSuffixDecorator(
-///       affixIconTheme: IconTheme.of(context).copyWith(size: 18),
+///     AffixDecorator(
+///       iconTheme: IconTheme.of(context).copyWith(size: 18),
 ///       prefix: leading,
 ///       suffix: trailing,
 ///       child: DefaultTextStyle(
@@ -17,13 +17,13 @@ import 'package:flutter/material.dart';
 ///       ),
 ///     )
 /// ```
-class PrefixSuffixDecorator extends StatelessWidget {
+class AffixDecorator extends StatelessWidget {
   /// The spacing between the child widget and the prefix/suffix icons.
   final double gap;
 
   /// An optional theme to apply to both prefix and suffix icons.
   /// If not provided, inherits the theme from the context.
-  final IconThemeData? affixIconTheme;
+  final IconThemeData? iconTheme;
 
   /// The widget to be displayed before the child widget.
   final Widget? prefix;
@@ -38,10 +38,10 @@ class PrefixSuffixDecorator extends StatelessWidget {
   ///
   /// At least one of `prefix` or `suffix` should be non-null for the decoration
   /// to be visible.
-  const PrefixSuffixDecorator({
+  const AffixDecorator({
     super.key,
     this.gap = 8,
-    this.affixIconTheme,
+    this.iconTheme,
     this.prefix,
     this.suffix,
     required this.child,
@@ -57,7 +57,7 @@ class PrefixSuffixDecorator extends StatelessWidget {
       children: [
         if (prefix != null) ...[
           IconTheme(
-            data: affixIconTheme ?? IconTheme.of(context),
+            data: iconTheme ?? IconTheme.of(context),
             child: prefix,
           ),
           SizedBox(width: gap),
@@ -66,7 +66,7 @@ class PrefixSuffixDecorator extends StatelessWidget {
         if (suffix != null) ...[
           SizedBox(width: gap),
           IconTheme(
-            data: affixIconTheme ?? IconTheme.of(context),
+            data: iconTheme ?? IconTheme.of(context),
             child: suffix,
           ),
         ],

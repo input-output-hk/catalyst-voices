@@ -1,12 +1,14 @@
 import 'package:catalyst_voices/widgets/buttons/voices_button_affix_decoration.dart';
 import 'package:flutter/material.dart';
 
-/// A button that combines a `FilledButton` with optional leading and trailing
+enum _Type { primary, neutral, secondary }
+
+/// A button that combines a `TextButton` with optional leading and trailing
 /// elements.
 ///
 /// This widget provides a convenient way to add icons or other widgets before
 /// or after the button's child.
-class VoicesFilledButton extends StatelessWidget {
+class VoicesTextButton extends StatelessWidget {
   /// The callback function invoked when the button is pressed.
   final VoidCallback? onTap;
 
@@ -19,7 +21,7 @@ class VoicesFilledButton extends StatelessWidget {
   /// The main content of the button.
   final Widget child;
 
-  const VoicesFilledButton({
+  const VoicesTextButton({
     super.key,
     this.onTap,
     this.leading,
@@ -29,7 +31,7 @@ class VoicesFilledButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FilledButton(
+    return TextButton(
       onPressed: onTap,
       child: VoicesButtonAffixDecoration(
         leading: leading,

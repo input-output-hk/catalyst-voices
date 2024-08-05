@@ -350,7 +350,12 @@ ThemeData _buildThemeData(
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(
+        foregroundColor: colorScheme.primary,
+        backgroundColor: Colors.transparent,
+        disabledForegroundColor: voicesColorScheme.textDisabled,
+        disabledBackgroundColor: Colors.transparent,
         minimumSize: const Size(60, 40),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
       ).merge(_buildBaseButtonStyle(textTheme)),
     ),
     iconButtonTheme: IconButtonThemeData(
