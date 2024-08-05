@@ -39,10 +39,18 @@ class VoicesButtonsExample extends StatelessWidget {
                 _SectionText(type.name, key: ObjectKey(type)),
                 const SizedBox(height: 16),
                 _ButtonRow(type: type),
-                const SizedBox(height: 16),
-                _ButtonRow(type: type, addLeadingIcon: true),
-                const SizedBox(height: 16),
-                _ButtonRow(type: type, addTrailingIcon: true),
+                if (!type.name.startsWith('icon')) ...[
+                  const SizedBox(height: 16),
+                  _ButtonRow(type: type, addLeadingIcon: true),
+                  const SizedBox(height: 16),
+                  _ButtonRow(type: type, addTrailingIcon: true),
+                  const SizedBox(height: 16),
+                  _ButtonRow(
+                    type: type,
+                    addLeadingIcon: true,
+                    addTrailingText: true,
+                  ),
+                ],
               ],
             );
           },
@@ -80,22 +88,28 @@ class _ButtonRow extends StatelessWidget {
     required this.type,
     this.addLeadingIcon = false,
     this.addTrailingIcon = false,
+    this.addTrailingText = false,
   });
 
   final _ButtonType type;
   final bool addLeadingIcon;
   final bool addTrailingIcon;
+  final bool addTrailingText;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: _ButtonState.values
-          .map((state) {
+          .map<Widget>((state) {
             return _buildButton(
               type,
               state,
-              addLeadingIcon: addLeadingIcon,
-              addTrailingIcon: addTrailingIcon,
+              leading: addLeadingIcon ? const Icon(Icons.add) : null,
+              trailing: addTrailingIcon
+                  ? const Icon(Icons.add)
+                  : addTrailingText
+                      ? const Text(r'$4.44')
+                      : null,
             );
           })
           .expandIndexed(
@@ -111,38 +125,38 @@ class _ButtonRow extends StatelessWidget {
   Widget _buildButton(
     _ButtonType type,
     _ButtonState state, {
-    bool addLeadingIcon = false,
-    bool addTrailingIcon = false,
+    Widget? leading,
+    Widget? trailing,
   }) {
     return switch (type) {
       _ButtonType.filled => VoicesFilledButton(
           onTap: state == _ButtonState.disabled ? null : () {},
-          leading: addLeadingIcon ? const Icon(Icons.add) : null,
-          trailing: addTrailingIcon ? const Icon(Icons.add) : null,
+          leading: leading,
+          trailing: trailing,
           child: const Text('Label'),
         ),
       _ButtonType.outlined => VoicesOutlinedButton(
           onTap: state == _ButtonState.disabled ? null : () {},
-          leading: addLeadingIcon ? const Icon(Icons.add) : null,
-          trailing: addTrailingIcon ? const Icon(Icons.add) : null,
+          leading: leading,
+          trailing: trailing,
           child: const Text('Label'),
         ),
       _ButtonType.text => VoicesTextButton(
           onTap: state == _ButtonState.disabled ? null : () {},
-          leading: addLeadingIcon ? const Icon(Icons.add) : null,
-          trailing: addTrailingIcon ? const Icon(Icons.add) : null,
+          leading: leading,
+          trailing: trailing,
           child: const Text('Label'),
         ),
       _ButtonType.textNeutral => VoicesTextButton.neutral(
           onTap: state == _ButtonState.disabled ? null : () {},
-          leading: addLeadingIcon ? const Icon(Icons.add) : null,
-          trailing: addTrailingIcon ? const Icon(Icons.add) : null,
+          leading: leading,
+          trailing: trailing,
           child: const Text('Label'),
         ),
       _ButtonType.textSecondary => VoicesTextButton.secondary(
           onTap: state == _ButtonState.disabled ? null : () {},
-          leading: addLeadingIcon ? const Icon(Icons.add) : null,
-          trailing: addTrailingIcon ? const Icon(Icons.add) : null,
+          leading: leading,
+          trailing: trailing,
           child: const Text('Label'),
         ),
       _ButtonType.icon => VoicesIconButton(
