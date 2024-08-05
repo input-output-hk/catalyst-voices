@@ -25,7 +25,7 @@ class VoicesButtonsExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Buttons')),
+      appBar: AppBar(title: const Text('Voices Buttons')),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: ListView(
