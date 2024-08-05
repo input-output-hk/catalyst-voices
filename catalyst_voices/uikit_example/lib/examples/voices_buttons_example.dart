@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
@@ -28,31 +29,48 @@ class VoicesButtonsExample extends StatelessWidget {
       appBar: AppBar(title: const Text('Voices Buttons')),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: ListView(
-          children: _ButtonType.values
-              .map(
-                (type) {
-                  return [
-                    Text(
-                      type.name,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    _ButtonRow(type: type),
-                    _ButtonRow(type: type, addLeadingIcon: true),
-                    _ButtonRow(type: type, addTrailingIcon: true),
-                  ];
-                },
-              )
-              .flattened
-              .expandIndexed(
-                (index, element) => [
-                  if (index != 0) const SizedBox(height: 16),
-                  element,
-                ],
-              )
-              .toList(),
+        child: ListView.separated(
+          itemBuilder: (context, index) {
+            final type = _ButtonType.values[index];
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _SectionText(type.name, key: ObjectKey(type)),
+                const SizedBox(height: 16),
+                _ButtonRow(type: type),
+                const SizedBox(height: 16),
+                _ButtonRow(type: type, addLeadingIcon: true),
+                const SizedBox(height: 16),
+                _ButtonRow(type: type, addTrailingIcon: true),
+              ],
+            );
+          },
+          separatorBuilder: (_, __) => const SizedBox(height: 16),
+          itemCount: _ButtonType.values.length,
         ),
       ),
+    );
+  }
+}
+
+class _SectionText extends StatelessWidget {
+  const _SectionText(
+    this.data, {
+    super.key,
+  });
+
+  final String data;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Text(
+      data,
+      style: theme.textTheme.titleMedium?.copyWith(
+        color: theme.colors.textPrimary,
+      ),
+      textAlign: TextAlign.start,
     );
   }
 }
