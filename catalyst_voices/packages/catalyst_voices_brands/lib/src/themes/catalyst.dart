@@ -272,7 +272,7 @@ TextTheme _buildTextTheme(VoicesColorScheme voicesColorScheme) {
 /// few properties that's why we're extracting what's shared.
 ///
 /// ButtonStyle returned by this function is not final and is meant to
-/// be served as further adjustment via .copyWith or .merge
+/// be served as further adjustment via .copyWith or `.merge`.
 ButtonStyle _buildBaseButtonStyle(TextTheme textTheme) {
   return ButtonStyle(
     textStyle: WidgetStatePropertyAll(textTheme.labelLarge),
@@ -288,7 +288,7 @@ ButtonStyle _buildBaseButtonStyle(TextTheme textTheme) {
 /// Note:
 ///
 /// If we're going to introduce other themes then catalyst this method
-/// should be extracted
+/// should be extracted.
 ThemeData _buildThemeData(
   ColorScheme colorScheme,
   VoicesColorScheme voicesColorScheme,

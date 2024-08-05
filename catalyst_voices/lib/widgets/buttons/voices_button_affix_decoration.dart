@@ -1,12 +1,12 @@
 import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:flutter/material.dart';
 
-/// Adding SizedBox.shrink because we want spacing on both sites
+/// Adding SizedBox.shrink because we want spacing on both sites.
 ///
-/// See [AffixDecorator] for more context
+/// See [AffixDecorator] for more context.
 ///
 /// Note:
-/// This widget should not be exported outside of this package
+/// This widget should not be exported outside of this package.
 class VoicesButtonAffixDecoration extends StatelessWidget {
   final Widget? leading;
   final Widget? trailing;

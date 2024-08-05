@@ -64,7 +64,7 @@ class VoicesTextButton extends StatelessWidget {
   /// Majority of configuration takes takes places in theme builder
   /// so we need to override only new properties.
   ///
-  /// See `catalyst.dart` file in `brands` package
+  /// See `catalyst.dart` file in `brands` package.
   ButtonStyle? _buildVariantStyle(BuildContext context) {
     return switch (_variant) {
       /// Default theme configuration corresponds with this variant

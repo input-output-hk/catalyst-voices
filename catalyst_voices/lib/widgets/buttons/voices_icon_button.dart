@@ -7,7 +7,7 @@ class VoicesIconButton extends StatelessWidget {
   /// The callback function invoked when the button is pressed.
   final VoidCallback? onTap;
 
-  /// Icon widget for this button
+  /// Icon widget for this button.
   final Widget child;
 
   final _Variant _variant;
@@ -54,14 +54,14 @@ class VoicesIconButton extends StatelessWidget {
   /// Majority of configuration takes takes places in theme builder
   /// so we need to override only new properties.
   ///
-  /// See `catalyst.dart` file in `brands` package
+  /// See `catalyst.dart` file in `brands` package.
   ButtonStyle? _buildVariantStyle(BuildContext context) {
     final themeData = Theme.of(context);
     final colors = themeData.colors;
     final colorScheme = themeData.colorScheme;
 
     return switch (_variant) {
-      /// Default themeData configuration corresponds with this variant
+      /// Default themeData configuration corresponds with this variant.
       _Variant.standard => null,
       _Variant.primary => IconButton.styleFrom(
           foregroundColor: colors.iconsPrimary,
