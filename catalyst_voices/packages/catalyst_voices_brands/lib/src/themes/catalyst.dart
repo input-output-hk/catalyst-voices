@@ -314,7 +314,6 @@ ThemeData _buildThemeData(
     ),
 
     //#region Buttons Themes
-    // TODO(damian): Delete buttonBarTheme. ButtonBar is replaced by OverflowBar
     buttonBarTheme: const ButtonBarThemeData(
       buttonHeight: 40,
     ),
