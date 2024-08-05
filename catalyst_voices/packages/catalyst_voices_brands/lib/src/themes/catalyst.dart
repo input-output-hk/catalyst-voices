@@ -361,8 +361,12 @@ ThemeData _buildThemeData(
     iconButtonTheme: IconButtonThemeData(
       style: IconButton.styleFrom(
         foregroundColor: voicesColorScheme.iconsForeground,
-        minimumSize: const Size.square(48),
+        backgroundColor: Colors.transparent,
+        disabledForegroundColor: voicesColorScheme.iconsDisabled,
+        disabledBackgroundColor: Colors.transparent,
+        minimumSize: const Size.square(40),
         iconSize: 24,
+        shape: const CircleBorder(),
       ).merge(_buildBaseButtonStyle(textTheme)),
     ),
     segmentedButtonTheme: SegmentedButtonThemeData(

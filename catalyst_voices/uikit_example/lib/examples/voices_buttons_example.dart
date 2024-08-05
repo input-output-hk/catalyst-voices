@@ -8,11 +8,11 @@ enum _ButtonType {
   text,
   textNeutral,
   textSecondary,
-  // icon,
-  // iconPrimary,
-  // iconFilled,
-  // iconTonal,
-  // iconOutlined;
+  icon,
+  iconPrimary,
+  iconFilled,
+  iconTonal,
+  iconOutlined;
 }
 
 enum _ButtonState { normal, disabled }
@@ -126,6 +126,26 @@ class _ButtonRow extends StatelessWidget {
           leading: addLeadingIcon ? const Icon(Icons.add) : null,
           trailing: addTrailingIcon ? const Icon(Icons.add) : null,
           child: const Text('Label'),
+        ),
+      _ButtonType.icon => VoicesIconButton(
+          onTap: state == _ButtonState.disabled ? null : () {},
+          child: const Icon(Icons.close),
+        ),
+      _ButtonType.iconPrimary => VoicesIconButton.primary(
+          onTap: state == _ButtonState.disabled ? null : () {},
+          child: const Icon(Icons.close),
+        ),
+      _ButtonType.iconFilled => VoicesIconButton.filled(
+          onTap: state == _ButtonState.disabled ? null : () {},
+          child: const Icon(Icons.close),
+        ),
+      _ButtonType.iconTonal => VoicesIconButton.tonal(
+          onTap: state == _ButtonState.disabled ? null : () {},
+          child: const Icon(Icons.close),
+        ),
+      _ButtonType.iconOutlined => VoicesIconButton.outlined(
+          onTap: state == _ButtonState.disabled ? null : () {},
+          child: const Icon(Icons.close),
         ),
     };
   }
