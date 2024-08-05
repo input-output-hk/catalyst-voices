@@ -6,8 +6,8 @@ enum _ButtonType {
   filled,
   outlined,
   text,
-  // textNeutral,
-  // textSecondary,
+  textNeutral,
+  textSecondary,
   // icon,
   // iconPrimary,
   // iconFilled,
@@ -28,11 +28,15 @@ class VoicesButtonsExample extends StatelessWidget {
       appBar: AppBar(title: const Text('Buttons')),
       body: Padding(
         padding: const EdgeInsets.all(16),
-        child: Column(
+        child: ListView(
           children: _ButtonType.values
               .map(
                 (type) {
                   return [
+                    Text(
+                      type.name,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                     _ButtonRow(type: type),
                     _ButtonRow(type: type, addLeadingIcon: true),
                     _ButtonRow(type: type, addTrailingIcon: true),
@@ -106,6 +110,18 @@ class _ButtonRow extends StatelessWidget {
           child: const Text('Label'),
         ),
       _ButtonType.text => VoicesTextButton(
+          onTap: state == _ButtonState.disabled ? null : () {},
+          leading: addLeadingIcon ? const Icon(Icons.add) : null,
+          trailing: addTrailingIcon ? const Icon(Icons.add) : null,
+          child: const Text('Label'),
+        ),
+      _ButtonType.textNeutral => VoicesTextButton.neutral(
+          onTap: state == _ButtonState.disabled ? null : () {},
+          leading: addLeadingIcon ? const Icon(Icons.add) : null,
+          trailing: addTrailingIcon ? const Icon(Icons.add) : null,
+          child: const Text('Label'),
+        ),
+      _ButtonType.textSecondary => VoicesTextButton.secondary(
           onTap: state == _ButtonState.disabled ? null : () {},
           leading: addLeadingIcon ? const Icon(Icons.add) : null,
           trailing: addTrailingIcon ? const Icon(Icons.add) : null,
