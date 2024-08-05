@@ -327,7 +327,26 @@ ThemeData _buildThemeData(
       ).merge(_buildBaseButtonStyle(textTheme)),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom().merge(_buildBaseButtonStyle(textTheme)),
+      style: OutlinedButton.styleFrom(
+        foregroundColor: colorScheme.primary,
+        backgroundColor: Colors.transparent,
+        disabledForegroundColor: voicesColorScheme.textDisabled,
+        disabledBackgroundColor: Colors.transparent,
+      ).copyWith(
+        side: WidgetStateProperty.resolveWith(
+          (states) {
+            if (states.contains(WidgetState.disabled)) {
+              return BorderSide(color: voicesColorScheme.onSurfaceNeutral012!);
+            }
+
+            if (states.contains(WidgetState.focused)) {
+              return BorderSide(color: colorScheme.primary);
+            }
+
+            return BorderSide(color: voicesColorScheme.outlineBorder!);
+          },
+        ),
+      ).merge(_buildBaseButtonStyle(textTheme)),
     ),
     textButtonTheme: TextButtonThemeData(
       style: TextButton.styleFrom(

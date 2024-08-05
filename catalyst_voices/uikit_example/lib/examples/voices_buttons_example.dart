@@ -1,10 +1,10 @@
-import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 enum _ButtonType {
   filled,
-  // outlined,
+  outlined,
   // text,
   // textNeutral,
   // textSecondary,
@@ -98,7 +98,13 @@ class _ButtonRow extends StatelessWidget {
           leading: addLeadingIcon ? const Icon(Icons.add) : null,
           trailing: addTrailingIcon ? const Icon(Icons.add) : null,
           child: const Text('Label'),
-        )
+        ),
+      _ButtonType.outlined => VoicesOutlinedButton(
+          onTap: state == _ButtonState.disabled ? null : () {},
+          leading: addLeadingIcon ? const Icon(Icons.add) : null,
+          trailing: addTrailingIcon ? const Icon(Icons.add) : null,
+          child: const Text('Label'),
+        ),
     };
   }
 }
