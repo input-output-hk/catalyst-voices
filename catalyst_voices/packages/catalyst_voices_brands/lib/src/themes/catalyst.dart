@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 const ColorScheme darkColorScheme = ColorScheme.dark(
   primary: VoicesColors.darkPrimary,
+  onPrimary: VoicesColors.darkOnPrimary,
   primaryContainer: VoicesColors.darkPrimaryContainer,
   onPrimaryContainer: VoicesColors.darkOnPrimaryContainer,
   secondary: VoicesColors.darkSecondary,
@@ -72,6 +73,8 @@ const VoicesColorScheme darkVoicesColorScheme = VoicesColorScheme(
 
 const ColorScheme lightColorScheme = ColorScheme.light(
   primary: VoicesColors.lightPrimary,
+  // ignore: avoid_redundant_argument_values
+  onPrimary: VoicesColors.lightOnPrimary,
   primaryContainer: VoicesColors.lightPrimaryContainer,
   onPrimaryContainer: VoicesColors.lightOnPrimaryContainer,
   secondary: VoicesColors.lightSecondary,
@@ -265,6 +268,27 @@ TextTheme _buildTextTheme(VoicesColorScheme voicesColorScheme) {
   );
 }
 
+/// Most of buttons share same configuration and differ in just a
+/// few properties that's why we're extracting what's shared.
+///
+/// ButtonStyle returned by this function is not final and is meant to
+/// be served as further adjustment via .copyWith or .merge
+ButtonStyle _buildBaseButtonStyle(TextTheme textTheme) {
+  return ButtonStyle(
+    textStyle: WidgetStatePropertyAll(textTheme.labelLarge),
+    minimumSize: const WidgetStatePropertyAll(Size(85, 40)),
+    iconSize: const WidgetStatePropertyAll(16),
+    shape: const WidgetStatePropertyAll(StadiumBorder()),
+    padding: const WidgetStatePropertyAll(
+      EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+    ),
+  );
+}
+
+/// Note:
+///
+/// If we're going to introduce other themes then catalyst this method
+/// should be extracted
 ThemeData _buildThemeData(
   ColorScheme colorScheme,
   VoicesColorScheme voicesColorScheme,
@@ -275,25 +299,6 @@ ThemeData _buildThemeData(
   return ThemeData(
     appBarTheme: AppBarTheme(
       backgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv1,
-    ),
-    filledButtonTheme: FilledButtonThemeData(
-      style: FilledButton.styleFrom(
-        minimumSize: const Size(48, 48),
-      ),
-    ),
-    outlinedButtonTheme: OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        minimumSize: const Size(48, 48),
-      ),
-    ),
-    buttonBarTheme: const ButtonBarThemeData(
-      buttonHeight: 40,
-    ),
-    iconButtonTheme: IconButtonThemeData(
-      style: IconButton.styleFrom(
-        foregroundColor: voicesColorScheme.iconsForeground,
-        iconSize: 24,
-      ),
     ),
     drawerTheme: DrawerThemeData(
       backgroundColor: voicesColorScheme.elevationsOnSurfaceNeutralLv0,
@@ -306,6 +311,35 @@ ThemeData _buildThemeData(
     ),
     dividerTheme: DividerThemeData(
       color: colorScheme.outlineVariant,
+    ),
+
+    //#region Buttons Themes
+    // TODO(damian): Delete buttonBarTheme. ButtonBar is replaced by OverflowBar
+    buttonBarTheme: const ButtonBarThemeData(
+      buttonHeight: 40,
+    ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: FilledButton.styleFrom(
+        foregroundColor: colorScheme.onPrimary,
+        backgroundColor: colorScheme.primary,
+        disabledForegroundColor: voicesColorScheme.textDisabled,
+        disabledBackgroundColor: voicesColorScheme.onSurfaceNeutral012,
+      ).merge(_buildBaseButtonStyle(textTheme)),
+    ),
+    outlinedButtonTheme: OutlinedButtonThemeData(
+      style: OutlinedButton.styleFrom().merge(_buildBaseButtonStyle(textTheme)),
+    ),
+    textButtonTheme: TextButtonThemeData(
+      style: TextButton.styleFrom(
+        minimumSize: const Size(60, 40),
+      ).merge(_buildBaseButtonStyle(textTheme)),
+    ),
+    iconButtonTheme: IconButtonThemeData(
+      style: IconButton.styleFrom(
+        foregroundColor: voicesColorScheme.iconsForeground,
+        minimumSize: const Size.square(48),
+        iconSize: 24,
+      ).merge(_buildBaseButtonStyle(textTheme)),
     ),
     segmentedButtonTheme: SegmentedButtonThemeData(
       style: SegmentedButton.styleFrom(
@@ -330,6 +364,8 @@ ThemeData _buildThemeData(
       ),
       selectedIcon: const Icon(Icons.check),
     ),
+    //#endregion
+
     textTheme: textTheme,
     colorScheme: colorScheme,
     extensions: <ThemeExtension<dynamic>>[
