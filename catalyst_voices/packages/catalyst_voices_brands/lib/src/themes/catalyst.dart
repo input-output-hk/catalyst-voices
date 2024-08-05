@@ -1,6 +1,7 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/src/theme_extensions/brand_assets.dart';
 import 'package:catalyst_voices_brands/src/theme_extensions/voices_color_scheme.dart';
+import 'package:catalyst_voices_brands/src/themes/widgets/buttons_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -268,23 +269,6 @@ TextTheme _buildTextTheme(VoicesColorScheme voicesColorScheme) {
   );
 }
 
-/// Most of buttons share same configuration and differ in just a
-/// few properties that's why we're extracting what's shared.
-///
-/// ButtonStyle returned by this function is not final and is meant to
-/// be served as further adjustment via .copyWith or `.merge`.
-ButtonStyle _buildBaseButtonStyle(TextTheme textTheme) {
-  return ButtonStyle(
-    textStyle: WidgetStatePropertyAll(textTheme.labelLarge),
-    minimumSize: const WidgetStatePropertyAll(Size(85, 40)),
-    iconSize: const WidgetStatePropertyAll(16),
-    shape: const WidgetStatePropertyAll(StadiumBorder()),
-    padding: const WidgetStatePropertyAll(
-      EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-    ),
-  );
-}
-
 /// Note:
 ///
 /// If we're going to introduce other themes then catalyst this method
@@ -312,92 +296,11 @@ ThemeData _buildThemeData(
     dividerTheme: DividerThemeData(
       color: colorScheme.outlineVariant,
     ),
-
-    //#region Buttons Themes
-    buttonBarTheme: const ButtonBarThemeData(
-      buttonHeight: 40,
-    ),
-    filledButtonTheme: FilledButtonThemeData(
-      style: FilledButton.styleFrom(
-        foregroundColor: colorScheme.onPrimary,
-        backgroundColor: colorScheme.primary,
-        disabledForegroundColor: voicesColorScheme.textDisabled,
-        disabledBackgroundColor: voicesColorScheme.onSurfaceNeutral012,
-      ).merge(_buildBaseButtonStyle(textTheme)),
-    ),
-    outlinedButtonTheme: OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        foregroundColor: colorScheme.primary,
-        backgroundColor: Colors.transparent,
-        disabledForegroundColor: voicesColorScheme.textDisabled,
-        disabledBackgroundColor: Colors.transparent,
-      ).copyWith(
-        side: WidgetStateProperty.resolveWith(
-          (states) {
-            if (states.contains(WidgetState.disabled)) {
-              return BorderSide(color: voicesColorScheme.onSurfaceNeutral012!);
-            }
-
-            if (states.contains(WidgetState.focused)) {
-              return BorderSide(color: colorScheme.primary);
-            }
-
-            return BorderSide(color: voicesColorScheme.outlineBorder!);
-          },
-        ),
-      ).merge(_buildBaseButtonStyle(textTheme)),
-    ),
-    textButtonTheme: TextButtonThemeData(
-      style: TextButton.styleFrom(
-        foregroundColor: colorScheme.primary,
-        backgroundColor: Colors.transparent,
-        disabledForegroundColor: voicesColorScheme.textDisabled,
-        disabledBackgroundColor: Colors.transparent,
-        minimumSize: const Size(60, 40),
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-      ).merge(_buildBaseButtonStyle(textTheme)),
-    ),
-    iconButtonTheme: IconButtonThemeData(
-      style: IconButton.styleFrom(
-        foregroundColor: voicesColorScheme.iconsForeground,
-        backgroundColor: Colors.transparent,
-        disabledForegroundColor: voicesColorScheme.iconsDisabled,
-        disabledBackgroundColor: Colors.transparent,
-        minimumSize: const Size.square(40),
-        iconSize: 24,
-        shape: const CircleBorder(),
-      ).merge(_buildBaseButtonStyle(textTheme)),
-    ),
-    segmentedButtonTheme: SegmentedButtonThemeData(
-      style: SegmentedButton.styleFrom(
-        foregroundColor: voicesColorScheme.textOnPrimary,
-        backgroundColor: Colors.transparent,
-        selectedForegroundColor: voicesColorScheme.textOnPrimary,
-        selectedBackgroundColor: voicesColorScheme.onSurfacePrimary012,
-        disabledForegroundColor: voicesColorScheme.iconsDisabled,
-        disabledBackgroundColor: Colors.transparent,
-        textStyle: textTheme.labelLarge,
-      ).copyWith(
-        side: WidgetStateProperty.resolveWith(
-          (states) {
-            if (states.contains(WidgetState.disabled)) {
-              return BorderSide(color: voicesColorScheme.iconsDisabled!);
-            }
-
-            return BorderSide(color: voicesColorScheme.outlineBorder!);
-          },
-        ),
-        iconSize: const WidgetStatePropertyAll(18),
-      ),
-      selectedIcon: const Icon(Icons.check),
-    ),
-    //#endregion
-
     textTheme: textTheme,
     colorScheme: colorScheme,
     extensions: <ThemeExtension<dynamic>>[
       voicesColorScheme,
       brandAssets,
     ],
-  );
+  ).copyWithButtonsTheme();
 }
