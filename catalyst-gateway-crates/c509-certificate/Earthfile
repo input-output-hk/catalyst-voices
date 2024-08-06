@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.1.20 AS rust-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.1.21 AS rust-ci
 
 # builder : Set up our target toolchains, and copy our files.
 builder:
@@ -23,9 +23,9 @@ build:
         --args1="--libs=c509-certificate"
 
     RUN cargo install wasm-pack --version=0.12.1 --locked
-     
+
 # js-wasm-package-locally : Generate the wasm package and save it locally
-js-wasm-package-locally: 
+js-wasm-package-locally:
     FROM +build
     RUN wasm-pack build --target web
     SAVE ARTIFACT ./pkg AS LOCAL ./pkg
