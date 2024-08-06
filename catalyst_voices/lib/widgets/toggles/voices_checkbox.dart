@@ -48,7 +48,7 @@ class VoicesCheckbox extends StatelessWidget {
         child: Checkbox(
           value: value,
           // forcing null unwrapping because we're not allowing null value
-          onChanged: onChanged != null ? (value) => onChanged!(value!) : null,
+          onChanged: onChanged != null ? (value) => onChanged(value!) : null,
           isError: isError,
         ),
       ),
