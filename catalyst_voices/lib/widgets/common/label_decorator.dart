@@ -3,8 +3,13 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 class LabelDecorator extends StatelessWidget {
+  /// An optional widget to display the label text next to the child.
   final Widget? label;
+
+  /// An optional widget to display the note text next to the child.
   final Widget? note;
+
+  /// The main content of the decorator.
   final Widget child;
 
   const LabelDecorator({
