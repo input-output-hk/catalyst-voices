@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:uikit_example/examples/voices_buttons_example.dart';
 import 'package:uikit_example/examples/voices_chip_example.dart';
 import 'package:uikit_example/examples/voices_navigation_example.dart';
+import 'package:uikit_example/examples/voices_radio_example.dart';
 import 'package:uikit_example/examples/voices_segmented_button_example.dart';
 import 'package:uikit_example/examples/voices_snackbar_example.dart';
 
@@ -35,6 +36,11 @@ class ExamplesListPage extends StatelessWidget {
         title: 'Voices Buttons',
         route: VoicesButtonsExample.route,
         page: VoicesButtonsExample(),
+      ),
+      ExampleTile(
+        title: 'Voices Radio',
+        route: VoicesRadioExample.route,
+        page: VoicesRadioExample(),
       ),
     ];
   }
