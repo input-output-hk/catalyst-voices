@@ -90,8 +90,7 @@ scripts:
         '*.freezed.dart' \
         'lib/generated/**'
 
-      dart pub global run combine_coverage --repo-path=./catalyst_voices
-      mv ./catalyst_voices/coverage .
+      dart pub global run combine_coverage --repo-path=.
 
     description: |
       Run `flutter test` for all packages and generate junit and coverage reports.
