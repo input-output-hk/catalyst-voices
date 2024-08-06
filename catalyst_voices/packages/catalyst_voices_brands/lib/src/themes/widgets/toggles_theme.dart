@@ -53,6 +53,57 @@ extension TogglesTheme on ThemeData {
           },
         ),
       ),
+      checkboxTheme: CheckboxThemeData(
+        fillColor: WidgetStateProperty.resolveWith(
+          (states) {
+            if (states.contains(WidgetState.disabled)) {
+              return colors.onSurfaceNeutral012;
+            }
+
+            if (states.contains(WidgetState.selected)) {
+              return states.contains(WidgetState.error)
+                  ? colorScheme.error
+                  : colorScheme.primary;
+            }
+
+            return null;
+          },
+        ),
+        checkColor: WidgetStateProperty.resolveWith(
+          (states) {
+            return colors.iconsBackground;
+          },
+        ),
+        side: WidgetStateBorderSide.resolveWith(
+          (states) {
+            if (states.contains(WidgetState.disabled)) {
+              return BorderSide(
+                color: colors.onSurfaceNeutral012!,
+                width: 2,
+              );
+            }
+
+            if (states.contains(WidgetState.error)) {
+              return BorderSide(
+                color: colorScheme.error,
+                width: 2,
+              );
+            }
+
+            if (states.contains(WidgetState.selected)) {
+              return BorderSide(
+                color: colorScheme.primary,
+                width: 2,
+              );
+            }
+
+            return BorderSide(
+              color: colors.outlineBorder!,
+              width: 2,
+            );
+          },
+        ),
+      ),
     );
   }
 }

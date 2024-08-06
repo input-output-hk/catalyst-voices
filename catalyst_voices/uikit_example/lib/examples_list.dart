@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices/widgets/menu/voices_list_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:uikit_example/examples/voices_buttons_example.dart';
+import 'package:uikit_example/examples/voices_checkbox_example.dart';
 import 'package:uikit_example/examples/voices_chip_example.dart';
 import 'package:uikit_example/examples/voices_navigation_example.dart';
 import 'package:uikit_example/examples/voices_radio_example.dart';
@@ -41,6 +42,11 @@ class ExamplesListPage extends StatelessWidget {
         title: 'Voices Radio',
         route: VoicesRadioExample.route,
         page: VoicesRadioExample(),
+      ),
+      ExampleTile(
+        title: 'Voices Checkbox',
+        route: VoicesCheckboxExample.route,
+        page: VoicesCheckboxExample(),
       ),
     ];
   }
