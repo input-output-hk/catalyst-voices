@@ -1,5 +1,4 @@
-import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
-import 'package:collection/collection.dart';
+import 'package:catalyst_voices/widgets/common/label_decorator.dart';
 import 'package:flutter/material.dart';
 
 /// A Voices Radio widget that combines a Radio button with optional
@@ -24,6 +23,8 @@ class VoicesRadio<T extends Object> extends StatelessWidget {
   final bool toggleable;
 
   /// A callback function that is called when the radio button value changes.
+  ///
+  /// When null widget is disabled
   final ValueChanged<T?>? onChanged;
 
   const VoicesRadio({
@@ -38,44 +39,18 @@ class VoicesRadio<T extends Object> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final label = this.label;
-    final note = this.note;
-
-    final theme = Theme.of(context);
-
     return GestureDetector(
       onTap: onChanged != null ? _changeGroupValue : null,
       behavior: HitTestBehavior.opaque,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Radio(
-            value: value,
-            groupValue: groupValue,
-            onChanged: onChanged,
-            toggleable: toggleable,
-          ),
-          if (label != null)
-            DefaultTextStyle(
-              style: (theme.textTheme.bodyLarge ?? const TextStyle())
-                  .copyWith(color: theme.colors.textPrimary),
-              child: label,
-            ),
-          if (note != null)
-            DefaultTextStyle(
-              style: (theme.textTheme.bodySmall ?? const TextStyle())
-                  .copyWith(color: theme.colors.textOnPrimary),
-              child: note,
-            ),
-        ].expandIndexed(
-          (index, element) {
-            return [
-              if (index == 1) const SizedBox(width: 4),
-              if (index == 2) const SizedBox(width: 8),
-              element,
-            ];
-          },
-        ).toList(),
+      child: LabelDecorator(
+        label: label,
+        note: note,
+        child: Radio(
+          value: value,
+          groupValue: groupValue,
+          onChanged: onChanged,
+          toggleable: toggleable,
+        ),
       ),
     );
   }

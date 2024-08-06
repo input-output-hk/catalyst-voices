@@ -11,9 +11,7 @@ class VoicesCheckboxExample extends StatefulWidget {
 }
 
 class _VoicesCheckboxExampleState extends State<VoicesCheckboxExample> {
-  bool _first = false;
-  final bool _second = false;
-  bool _third = false;
+  final _checkboxesStates = <int, bool>{};
 
   @override
   Widget build(BuildContext context) {
@@ -23,27 +21,49 @@ class _VoicesCheckboxExampleState extends State<VoicesCheckboxExample> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         children: [
           VoicesCheckbox(
-            value: _first,
+            value: _checkboxesStates[0] ?? false,
             onChanged: (value) {
               setState(() {
-                _first = value;
+                _checkboxesStates[0] = value;
               });
             },
           ),
           const SizedBox(height: 8),
-          VoicesCheckbox(
-            value: _second,
+          const VoicesCheckbox(
+            value: false,
             onChanged: null,
           ),
           const SizedBox(height: 8),
           VoicesCheckbox(
-            value: _third,
+            value: _checkboxesStates[2] ?? false,
             onChanged: (value) {
               setState(() {
-                _third = value;
+                _checkboxesStates[2] = value;
               });
             },
             isError: true,
+          ),
+          const SizedBox(height: 8),
+          VoicesCheckbox(
+            value: _checkboxesStates[3] ?? false,
+            onChanged: (value) {
+              setState(() {
+                _checkboxesStates[3] = value;
+              });
+            },
+            label: const Text('Label'),
+            note: const Text('Note'),
+          ),
+          const SizedBox(height: 8),
+          VoicesCheckbox(
+            value: _checkboxesStates[4] ?? false,
+            onChanged: (value) {
+              setState(() {
+                _checkboxesStates[4] = value;
+              });
+            },
+            isError: true,
+            label: const Text('Error label'),
           ),
         ],
       ),
