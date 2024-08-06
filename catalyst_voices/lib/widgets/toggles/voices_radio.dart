@@ -24,7 +24,7 @@ class VoicesRadio<T extends Object> extends StatelessWidget {
 
   /// A callback function that is called when the radio button value changes.
   ///
-  /// When null widget is disabled
+  /// When null widget is disabled.
   final ValueChanged<T?>? onChanged;
 
   const VoicesRadio({

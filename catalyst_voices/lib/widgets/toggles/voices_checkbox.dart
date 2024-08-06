@@ -14,7 +14,7 @@ class VoicesCheckbox extends StatelessWidget {
   ///
   /// The function receives the new value as a parameter.
   ///
-  /// When null widget is disabled
+  /// When null widget is disabled.
   final ValueChanged<bool>? onChanged;
 
   /// Indicates whether the checkbox is in an error state.
