@@ -6,7 +6,7 @@ use tracing::{error, info};
 
 use crate::{
     cardano::start_followers,
-    db,
+    db::{self, index::session::CassandraSession},
     service::{self, started},
     settings::{DocsSettings, ServiceSettings, Settings},
 };
@@ -44,7 +44,7 @@ impl Cli {
                 info!("Catalyst Gateway - Starting");
 
                 // Start the DB's
-                db::index::session::init();
+                CassandraSession::init();
                 db::event::establish_connection();
 
                 // Start the chain indexing follower.

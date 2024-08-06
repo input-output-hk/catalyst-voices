@@ -78,6 +78,8 @@ num-bigint.workspace = true
 futures.workspace = true
 rand.workspace = true
 moka.workspace = true
+crossbeam-skiplist.workspace = true
+
 
 [build-dependencies]
 build-info-build = { workspace = true }

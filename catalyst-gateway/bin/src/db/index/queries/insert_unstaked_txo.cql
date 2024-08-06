@@ -1,11 +1,16 @@
--- Create the TXO Record for a stake address, 
--- But nlyif it does not already exist.
-UPDATE txo_by_stake SET
-    address = :address,
-    value = :value,
-    txn_hash = :txn_hash
-WHERE 
-    stake_address = :stake_address AND 
-    slot_no = :slot_no AND 
-    txn = :txn and 
-    txo = :txo ;
+-- Create the TXO Record for when its not staked. 
+INSERT INTO unstaked_txo_by_txn_hash (
+    txn_hash,
+    txo,
+    slot_no,
+    txn,
+    address,
+    value
+) VALUES (
+    :txn_hash,
+    :txo,
+    :slot_no,
+    :txn,
+    :address,
+    :value
+);

@@ -11,7 +11,7 @@ use rand::{Rng, SeedableRng};
 use tracing::{error, info, warn};
 
 use crate::{
-    db::index::{block::index_block, session::wait_is_ready},
+    db::index::{block::index_block, session::CassandraSession},
     settings::Settings,
 };
 
@@ -210,7 +210,7 @@ fn sync_subchain(params: SyncParams) -> tokio::task::JoinHandle<SyncParams> {
         params.backoff().await;
 
         // Wait for indexing DB to be ready before continuing.
-        wait_is_ready(INDEXING_DB_READY_WAIT_INTERVAL).await;
+        CassandraSession::wait_is_ready(INDEXING_DB_READY_WAIT_INTERVAL).await;
         info!(chain=%params.chain, params=%params,"Indexing DB is ready");
 
         let mut first_indexed_block = params.first_indexed_block.clone();

@@ -70,8 +70,21 @@ const CASSANDRA_VOLATILE_DB_URL_DEFAULT: &str = "127.0.0.1:9042";
 /// Default Cassandra DB URL for the Persistent DB.
 const CASSANDRA_VOLATILE_DB_NAMESPACE_DEFAULT: &str = "volatile";
 
+/// Default maximum batch size.
+/// This comes from:
+/// <https://docs.aws.amazon.com/keyspaces/latest/devguide/functional-differences.html#functional-differences.batch>
+/// Scylla may support larger batches for better performance.
+/// Larger batches will incur more memory overhead to store the prepared batches.
+const CASSANDRA_MAX_BATCH_SIZE_DEFAULT: i64 = 30;
+
+/// Minimum possible batch size.
+pub(crate) const CASSANDRA_MIN_BATCH_SIZE: i64 = 1;
+
+/// Maximum possible batch size.
+const CASSANDRA_MAX_BATCH_SIZE: i64 = 256;
+
 /// Default chain to follow.
-const CHAIN_FOLLOWER_DEFAULT: Network = Network::Mainnet;
+const CHAIN_FOLLOWER_DEFAULT: Network = Network::Preprod;
 
 /// Default number of sync tasks (must be in the range 1 to 255 inclusive.)
 const CHAIN_FOLLOWER_SYNC_TASKS_DEFAULT: u16 = 16;
@@ -417,6 +430,9 @@ pub(crate) struct CassandraEnvVars {
 
     /// Compression to use.
     pub(crate) compression: CompressionChoice,
+
+    /// Maximum Configured Batch size.
+    pub(crate) max_batch_size: i64,
 }
 
 impl CassandraEnvVars {
@@ -443,6 +459,12 @@ impl CassandraEnvVars {
             tls,
             tls_cert: StringEnvVar::new_optional(&format!("CASSANDRA_{name}_TLS_CERT"), false),
             compression,
+            max_batch_size: StringEnvVar::new_as_i64(
+                &format!("CASSANDRA_{name}_BATCH_SIZE"),
+                CASSANDRA_MAX_BATCH_SIZE_DEFAULT,
+                CASSANDRA_MIN_BATCH_SIZE,
+                CASSANDRA_MAX_BATCH_SIZE,
+            ),
         }
     }
 

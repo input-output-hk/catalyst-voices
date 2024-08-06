@@ -1,5 +1,7 @@
 //! Block stream parsing and filtering utils
 
+use std::collections::HashMap;
+
 use cryptoxide::{blake2b::Blake2b, digest::Digest};
 use pallas::ledger::{
     primitives::conway::{StakeCredential, VKeyWitness},
@@ -127,27 +129,31 @@ pub fn extract_stake_credentials_from_certs(
     stake_credentials
 }
 
+/// Get a Blake2b-224 (28 byte) hash of some bytes
+pub(crate) fn blake2b_224(value: &[u8]) -> [u8; 28] {
+    let mut digest = [0u8; 28];
+    let mut context = Blake2b::new(28);
+    context.input(value);
+    context.result(&mut digest);
+    digest
+}
+
+/// A map of hashed witnesses.
+pub(crate) type HashedWitnesses = HashMap<[u8; 28], Vec<u8>>;
+
 /// Extract witness pub keys and pair with blake2b hash of the pub key.
-/// Hashes are generally 32-byte long on Cardano (or 256 bits),
-/// except for credentials (i.e. keys or scripts) which are 28-byte long (or 224 bits)
-#[allow(dead_code)]
-pub fn extract_hashed_witnesses(
-    witnesses: &[VKeyWitness],
-) -> anyhow::Result<Vec<(WitnessPubKey, WitnessHash)>> {
-    let mut hashed_witnesses = Vec::new();
+/// This converts raw Addresses to their hashes as used on Cardano (Blake2b-224).
+/// And allows them to be easily cross referenced.
+pub(crate) fn extract_hashed_witnesses(witnesses: &[VKeyWitness]) -> HashedWitnesses {
+    let mut hashed_witnesses = HashMap::new();
     for witness in witnesses {
-        let pub_key_bytes: [u8; 32] = witness.vkey.as_slice().try_into()?;
+        let pub_key = witness.vkey.to_vec();
+        let hash = blake2b_224(&pub_key);
 
-        let pub_key_hex = hex::encode(pub_key_bytes);
-
-        let mut digest = [0u8; 28];
-        let mut context = Blake2b::new(28);
-        context.input(&pub_key_bytes);
-        context.result(&mut digest);
-        hashed_witnesses.push((pub_key_hex, hex::encode(digest)));
+        hashed_witnesses.insert(hash, pub_key);
     }
 
-    Ok(hashed_witnesses)
+    hashed_witnesses
 }
 
 /// Match hashed witness pub keys with hashed stake credentials from the TX certificates

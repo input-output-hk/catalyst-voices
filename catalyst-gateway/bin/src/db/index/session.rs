@@ -7,11 +7,16 @@ use std::{
 };
 
 use openssl::ssl::{SslContextBuilder, SslFiletype, SslMethod, SslVerifyMode};
-use scylla::{frame::Compression, ExecutionProfile, Session, SessionBuilder};
+use scylla::{
+    frame::Compression, serialize::row::SerializeRow, ExecutionProfile, Session, SessionBuilder,
+};
 use tokio::fs;
 use tracing::{error, info};
 
-use super::{queries::PreparedQueries, schema::create_schema};
+use super::{
+    queries::{FallibleQueryResults, PreparedQueries, PreparedQuery},
+    schema::create_schema,
+};
 use crate::{
     db::index::queries,
     settings::{CassandraEnvVars, Settings},
@@ -41,10 +46,82 @@ pub(crate) enum TlsChoice {
     Unverified,
 }
 
-/// A Session on the cassandra database
-pub(crate) type CassandraSession = Arc<Session>;
+/// All interaction with cassandra goes through this struct.
+#[derive(Clone)]
+pub(crate) struct CassandraSession {
+    /// Is the session to the persistent or volatile DB?
+    #[allow(dead_code)]
+    persistent: bool,
+    /// Configuration for this session.
+    cfg: Arc<CassandraEnvVars>,
+    /// The actual session.
+    session: Arc<Session>,
+    /// All prepared queries we can use on this session.
+    queries: Arc<PreparedQueries>,
+}
+
+/// Persistent DB Session.
+static PERSISTENT_SESSION: OnceLock<Arc<CassandraSession>> = OnceLock::new();
+
+/// Volatile DB Session.
+static VOLATILE_SESSION: OnceLock<Arc<CassandraSession>> = OnceLock::new();
+
+impl CassandraSession {
+    /// Initialise the Cassandra Cluster Connections.
+    pub(crate) fn init() {
+        let (persistent, volatile) = Settings::cassandra_db_cfg();
+
+        let _join_handle = tokio::task::spawn(async move { retry_init(persistent, true).await });
+        let _join_handle = tokio::task::spawn(async move { retry_init(volatile, false).await });
+    }
+
+    /// Check to see if the Cassandra Indexing DB is ready for use
+    pub(crate) fn is_ready() -> bool {
+        PERSISTENT_SESSION.get().is_some() && VOLATILE_SESSION.get().is_some()
+    }
+
+    /// Wait for the Cassandra Indexing DB to be ready before continuing
+    pub(crate) async fn wait_is_ready(interval: Duration) {
+        loop {
+            if Self::is_ready() {
+                break;
+            }
+
+            tokio::time::sleep(interval).await;
+        }
+    }
+
+    /// Get the session needed to perform a query.
+    pub(crate) fn get(persistent: bool) -> Option<Arc<CassandraSession>> {
+        if persistent {
+            PERSISTENT_SESSION.get().cloned()
+        } else {
+            VOLATILE_SESSION.get().cloned()
+        }
+    }
+
+    /// Execute a Batch query with the given parameters.
+    ///
+    /// Values should be a Vec of values which implement `SerializeRow` and they MUST be
+    /// the same, and must match the query being executed.
+    ///
+    /// This will divide the batch into optimal sized chunks and execute them until all
+    /// values have been executed or the first error is encountered.
+    pub(crate) async fn execute_batch<T: SerializeRow>(
+        &self, query: PreparedQuery, values: Vec<T>,
+    ) -> FallibleQueryResults {
+        let session = self.session.clone();
+        let cfg = self.cfg.clone();
+        let queries = self.queries.clone();
+
+        queries.execute_batch(session, cfg, query, values).await
+    }
+}
 
 /// Create a new execution profile based on the given configuration.
+///
+/// The intention here is that we should be able to tune this based on configuration,
+/// but for now we don't so the `cfg` is not used yet.
 fn make_execution_profile(_cfg: &CassandraEnvVars) -> ExecutionProfile {
     ExecutionProfile::builder()
         .consistency(scylla::statement::Consistency::LocalQuorum)
@@ -65,7 +142,7 @@ fn make_execution_profile(_cfg: &CassandraEnvVars) -> ExecutionProfile {
 }
 
 /// Construct a session based on the given configuration.
-async fn make_session(cfg: &CassandraEnvVars) -> anyhow::Result<CassandraSession> {
+async fn make_session(cfg: &CassandraEnvVars) -> anyhow::Result<Arc<Session>> {
     let cluster_urls: Vec<&str> = cfg.url.as_str().split(',').collect();
 
     let mut sb = SessionBuilder::new()
@@ -112,12 +189,6 @@ async fn make_session(cfg: &CassandraEnvVars) -> anyhow::Result<CassandraSession
     Ok(Arc::new(session))
 }
 
-/// Persistent DB Session.
-static PERSISTENT_SESSION: OnceLock<(CassandraSession, Arc<PreparedQueries>)> = OnceLock::new();
-
-/// Volatile DB Session.
-static VOLATILE_SESSION: OnceLock<(CassandraSession, Arc<PreparedQueries>)> = OnceLock::new();
-
 /// Continuously try and init the DB, if it fails, backoff.
 ///
 /// Display reasonable logs to help diagnose DB connection issues.
@@ -163,7 +234,7 @@ async fn retry_init(cfg: CassandraEnvVars, persistent: bool) {
             continue;
         }
 
-        let queries = match queries::PreparedQueries::new(&session).await {
+        let queries = match queries::PreparedQueries::new(session.clone(), &cfg).await {
             Ok(queries) => Arc::new(queries),
             Err(error) => {
                 error!(
@@ -175,12 +246,19 @@ async fn retry_init(cfg: CassandraEnvVars, persistent: bool) {
             },
         };
 
+        let cassandra_session = CassandraSession {
+            persistent,
+            cfg: Arc::new(cfg),
+            session,
+            queries,
+        };
+
         // Save the session so we can execute queries on the DB
         if persistent {
-            if PERSISTENT_SESSION.set((session, queries)).is_err() {
+            if PERSISTENT_SESSION.set(Arc::new(cassandra_session)).is_err() {
                 error!("Persistent Session already set.  This should not happen.");
             };
-        } else if VOLATILE_SESSION.set((session, queries)).is_err() {
+        } else if VOLATILE_SESSION.set(Arc::new(cassandra_session)).is_err() {
             error!("Volatile Session already set.  This should not happen.");
         };
 
@@ -189,37 +267,4 @@ async fn retry_init(cfg: CassandraEnvVars, persistent: bool) {
     }
 
     info!(db_type = db_type, "Index DB Session Creation: OK.");
-}
-
-/// Initialise the Cassandra Cluster Connections.
-pub(crate) fn init() {
-    let (persistent, volatile) = Settings::cassandra_db_cfg();
-
-    let _join_handle = tokio::task::spawn(async move { retry_init(persistent, true).await });
-    let _join_handle = tokio::task::spawn(async move { retry_init(volatile, false).await });
-}
-
-/// Check to see if the Cassandra Indexing DB is ready for use
-pub(crate) fn is_ready() -> bool {
-    PERSISTENT_SESSION.get().is_some() && VOLATILE_SESSION.get().is_some()
-}
-
-/// Wait for the Cassandra Indexing DB to be ready before continuing
-pub(crate) async fn wait_is_ready(interval: Duration) {
-    loop {
-        if is_ready() {
-            break;
-        }
-
-        tokio::time::sleep(interval).await;
-    }
-}
-
-/// Get the session needed to perform a query.
-pub(crate) fn session(persistent: bool) -> Option<(CassandraSession, Arc<PreparedQueries>)> {
-    if persistent {
-        PERSISTENT_SESSION.get().cloned()
-    } else {
-        VOLATILE_SESSION.get().cloned()
-    }
 }

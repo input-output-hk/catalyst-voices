@@ -1,38 +1,55 @@
 //! Index Schema
 
+use std::sync::Arc;
+
 use anyhow::Context;
 use handlebars::Handlebars;
+use scylla::Session;
 use serde_json::json;
 use tracing::error;
 
-use super::session::CassandraSession;
 use crate::settings::CassandraEnvVars;
 
 /// Keyspace Create (Templated)
 const CREATE_NAMESPACE_CQL: &str = include_str!("./schema/namespace.cql");
 
-/// TXO by Stake Address Table Schema
-const CREATE_TABLE_TXO_BY_STAKE_ADDRESS_CQL: &str = include_str!("./schema/txo_by_stake_table.cql");
-/// TXO Assets by Stake Address Table Schema
-const CREATE_TABLE_TXO_ASSETS_BY_STAKE_ADDRESS_CQL: &str =
-    include_str!("./schema/txo_assets_by_stake_table.cql");
-/// TXI by Stake Address Table Schema
-const CREATE_TABLE_TXI_BY_TXN_HASH_CQL: &str = include_str!("./schema/txi_by_txn_hash_table.cql");
-
-/// TXO by Stake Address Table Schema
-const CREATE_TABLE_UNSTAKED_TXO_BY_TXN_HASH_CQL: &str =
-    include_str!("./schema/unstaked_txo_by_txn_hash.cql");
-/// TXO Assets by Stake Address Table Schema
-const CREATE_TABLE_UNSTAKED_TXO_ASSETS_BY_TXN_HASH_CQL: &str =
-    include_str!("./schema/unstaked_txo_assets_by_txn_hash.cql");
-
-/// Stake Address/Registration Table Schema
-const CREATE_TABLE_STAKE_HASH_TO_STAKE_ADDRESS_CQL: &str =
-    include_str!("./schema/stake_hash_to_stake_address.cql");
-
 /// The version of the Schema we are using.
 /// Must be incremented if there is a breaking change in any schema tables below.
 pub(crate) const SCHEMA_VERSION: u64 = 1;
+
+/// All Schema Creation Statements
+const SCHEMAS: &[(&str, &str)] = &[
+    (
+        // TXO by Stake Address Table Schema
+        include_str!("./schema/txo_by_stake_table.cql"),
+        "Create Table TXO By Stake Address",
+    ),
+    (
+        // TXO Assets by Stake Address Table Schema
+        include_str!("./schema/txo_assets_by_stake_table.cql"),
+        "Create Table TXO Assets By Stake Address",
+    ),
+    (
+        // TXO Unstaked Table Schema
+        include_str!("./schema/unstaked_txo_by_txn_hash.cql"),
+        "Create Table Unstaked TXO By Txn Hash",
+    ),
+    (
+        // TXO Unstaked Assets Table Schema
+        include_str!("./schema/unstaked_txo_assets_by_txn_hash.cql"),
+        "Create Table Unstaked TXO Assets By Txn Hash",
+    ),
+    (
+        // TXI by Stake Address Table Schema
+        include_str!("./schema/txi_by_txn_hash_table.cql"),
+        "Create Table TXI By Stake Address",
+    ),
+    (
+        // Stake Address/Registration Table Schema
+        include_str!("./schema/stake_registration.cql"),
+        "Create Table Stake Registration",
+    ),
+];
 
 /// Get the namespace for a particular db configuration
 pub(crate) fn namespace(cfg: &CassandraEnvVars) -> String {
@@ -43,7 +60,7 @@ pub(crate) fn namespace(cfg: &CassandraEnvVars) -> String {
 /// Create the namespace we will use for this session
 /// Ok to run this if the namespace already exists.
 async fn create_namespace(
-    session: &mut CassandraSession, cfg: &CassandraEnvVars,
+    session: &mut Arc<Session>, cfg: &CassandraEnvVars,
 ) -> anyhow::Result<()> {
     let keyspace = namespace(cfg);
 
@@ -68,95 +85,23 @@ async fn create_namespace(
     Ok(())
 }
 
-/// Create tables for holding TXO data.
-async fn create_txo_tables(session: &mut CassandraSession) -> anyhow::Result<()> {
-    let stmt = session
-        .prepare(CREATE_TABLE_TXO_BY_STAKE_ADDRESS_CQL)
-        .await
-        .context("Create Table TXO By Stake Address: Prepared")?;
-    session
-        .execute(&stmt, ())
-        .await
-        .context("Create Table TXO By Stake Address: Executed")?;
-
-    let stmt = session
-        .prepare(CREATE_TABLE_TXO_ASSETS_BY_STAKE_ADDRESS_CQL)
-        .await
-        .context("Create Table TXO Assets By Stake Address: Prepared")?;
-    session
-        .execute(&stmt, ())
-        .await
-        .context("Create Table TXO Assets By Stake Address: Executed")?;
-
-    Ok(())
-}
-
-/// Create tables for holding unstaked TXO data.
-async fn create_unstaked_txo_tables(session: &mut CassandraSession) -> anyhow::Result<()> {
-    let stmt = session
-        .prepare(CREATE_TABLE_UNSTAKED_TXO_BY_TXN_HASH_CQL)
-        .await
-        .context("Create Table Unstaked TXO By Txn Hash: Prepared")?;
-    session
-        .execute(&stmt, ())
-        .await
-        .context("Create Table Unstaked TXO By Txn Hash: Executed")?;
-
-    let stmt = session
-        .prepare(CREATE_TABLE_UNSTAKED_TXO_ASSETS_BY_TXN_HASH_CQL)
-        .await
-        .context("Create Table Unstaked TXO Assets By Txn Hash: Prepared")?;
-    session
-        .execute(&stmt, ())
-        .await
-        .context("Create Table Unstaked TXO Assets By Txn Hash: Executed")?;
-
-    Ok(())
-}
-
-/// Create tables for holding volatile TXI data
-async fn create_txi_tables(session: &mut CassandraSession) -> anyhow::Result<()> {
-    let stmt = session
-        .prepare(CREATE_TABLE_TXI_BY_TXN_HASH_CQL)
-        .await
-        .context("Create Table TXI By Stake Address: Prepared")?;
-
-    session
-        .execute(&stmt, ())
-        .await
-        .context("Create Table TXI By Stake Address: Executed")?;
-
-    Ok(())
-}
-
-/// Create tables for holding volatile TXI data
-async fn create_stake_tables(session: &mut CassandraSession) -> anyhow::Result<()> {
-    let stmt = session
-        .prepare(CREATE_TABLE_STAKE_HASH_TO_STAKE_ADDRESS_CQL)
-        .await
-        .context("Create Table Stake Hash to Stake Address: Prepared")?;
-
-    session
-        .execute(&stmt, ())
-        .await
-        .context("Create Table Stake Hash to Stake Address: Executed")?;
-
-    Ok(())
-}
-
 /// Create the Schema on the connected Cassandra DB
 pub(crate) async fn create_schema(
-    session: &mut CassandraSession, cfg: &CassandraEnvVars,
+    session: &mut Arc<Session>, cfg: &CassandraEnvVars,
 ) -> anyhow::Result<()> {
     create_namespace(session, cfg).await?;
 
-    create_txo_tables(session).await?;
+    for schema in SCHEMAS {
+        let stmt = session
+            .prepare(schema.0)
+            .await
+            .context(format!("{} : Prepared", schema.1))?;
 
-    create_unstaked_txo_tables(session).await?;
-
-    create_txi_tables(session).await?;
-
-    create_stake_tables(session).await?;
+        session
+            .execute(&stmt, ())
+            .await
+            .context(format!("{} : Executed", schema.1))?;
+    }
 
     // Wait for the Schema to be ready.
     session.await_schema_agreement().await?;
