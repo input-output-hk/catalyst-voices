@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/toggles/voices_checkbox.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
 class VoicesCheckboxExample extends StatefulWidget {
@@ -64,6 +64,14 @@ class _VoicesCheckboxExampleState extends State<VoicesCheckboxExample> {
             },
             isError: true,
             label: const Text('Error label'),
+          ),
+          const SizedBox(height: 8),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              border:
+                  Border.all(color: Theme.of(context).colorScheme.onSurface),
+            ),
+            child: VoicesCheckboxGroup(),
           ),
         ],
       ),
