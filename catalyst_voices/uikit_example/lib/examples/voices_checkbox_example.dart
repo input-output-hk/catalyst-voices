@@ -12,6 +12,7 @@ class VoicesCheckboxExample extends StatefulWidget {
 
 class _VoicesCheckboxExampleState extends State<VoicesCheckboxExample> {
   final _checkboxesStates = <int, bool>{};
+  final _checkboxGroupSelection = <int>{};
 
   @override
   Widget build(BuildContext context) {
@@ -28,12 +29,12 @@ class _VoicesCheckboxExampleState extends State<VoicesCheckboxExample> {
               });
             },
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
           const VoicesCheckbox(
             value: false,
             onChanged: null,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
           VoicesCheckbox(
             value: _checkboxesStates[2] ?? false,
             onChanged: (value) {
@@ -43,7 +44,7 @@ class _VoicesCheckboxExampleState extends State<VoicesCheckboxExample> {
             },
             isError: true,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
           VoicesCheckbox(
             value: _checkboxesStates[3] ?? false,
             onChanged: (value) {
@@ -54,7 +55,7 @@ class _VoicesCheckboxExampleState extends State<VoicesCheckboxExample> {
             label: const Text('Label'),
             note: const Text('Note'),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 16),
           VoicesCheckbox(
             value: _checkboxesStates[4] ?? false,
             onChanged: (value) {
@@ -65,13 +66,41 @@ class _VoicesCheckboxExampleState extends State<VoicesCheckboxExample> {
             isError: true,
             label: const Text('Error label'),
           ),
-          const SizedBox(height: 8),
-          DecoratedBox(
-            decoration: BoxDecoration(
-              border:
-                  Border.all(color: Theme.of(context).colorScheme.onSurface),
-            ),
-            child: VoicesCheckboxGroup(),
+          const SizedBox(height: 16),
+          VoicesCheckboxGroup(
+            name: 'Select all',
+            elements: [
+              VoicesCheckboxGroupElement(
+                value: 1,
+                label: const Text('Founded'),
+              ),
+              VoicesCheckboxGroupElement(
+                value: 2,
+                label: const Text('Not founded'),
+              ),
+              VoicesCheckboxGroupElement(
+                value: 3,
+                label: const Text('Not founded'),
+              ),
+              VoicesCheckboxGroupElement(
+                value: 4,
+                label: const Text('In progress'),
+              ),
+              VoicesCheckboxGroupElement(
+                value: 5,
+                label: const Text('Not founded'),
+                note: const Text('Danger'),
+                isError: true,
+              ),
+            ],
+            selected: _checkboxGroupSelection,
+            onChanged: (value) {
+              setState(() {
+                _checkboxGroupSelection
+                  ..clear()
+                  ..addAll(value);
+              });
+            },
           ),
         ],
       ),

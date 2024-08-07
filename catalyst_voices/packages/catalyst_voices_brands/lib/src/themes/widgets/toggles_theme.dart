@@ -103,6 +103,8 @@ extension TogglesTheme on ThemeData {
             );
           },
         ),
+        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
       ),
     );
   }
