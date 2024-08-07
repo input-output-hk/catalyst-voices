@@ -74,9 +74,11 @@ This package supports only a subset of COSE features and algorithms.
 More features and algorithms are supposed to be added in the feature.
 
 Supported features:
+
 * COSE_SIGN_1: signature + verification
 
 Supported algorithms:
+
 * EdDSA: Ed25519
 
 ## Support
