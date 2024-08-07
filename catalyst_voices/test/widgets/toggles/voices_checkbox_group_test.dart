@@ -118,7 +118,7 @@ void main() {
       );
 
       testWidgets(
-        'evey element has gap',
+        'every element has gap',
         (tester) async {
           // Given
           const elements = [
