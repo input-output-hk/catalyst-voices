@@ -39,10 +39,10 @@ final class VoicesCheckboxGroupElement<T> {
 /// A widget that groups a list of checkboxes in a column with a name
 /// and the ability to toggle all elements at once.
 ///
-/// This widget displays a group of checkboxes with a shared name. It allows users
-/// to select individual checkboxes and provides a master checkbox to toggle all
-/// elements on/off simultaneously. You can also optionally specify a callback
-/// function to be notified when the selection changes.
+/// This widget displays a group of checkboxes with a shared name. It allows
+/// users to select individual checkboxes and provides a master checkbox to
+/// toggle all elements on/off simultaneously. You can also optionally specify
+/// a callback function to be notified when the selection changes.
 ///
 /// Type Parameters:
 ///
