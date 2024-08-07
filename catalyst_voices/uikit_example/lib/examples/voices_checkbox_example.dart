@@ -68,28 +68,28 @@ class _VoicesCheckboxExampleState extends State<VoicesCheckboxExample> {
           ),
           const SizedBox(height: 16),
           VoicesCheckboxGroup(
-            name: 'Select all',
-            elements: [
+            name: const Text('Select all'),
+            elements: const [
               VoicesCheckboxGroupElement(
                 value: 1,
-                label: const Text('Founded'),
+                label: Text('Founded'),
               ),
               VoicesCheckboxGroupElement(
                 value: 2,
-                label: const Text('Not founded'),
+                label: Text('Not founded'),
               ),
               VoicesCheckboxGroupElement(
                 value: 3,
-                label: const Text('Not founded'),
+                label: Text('Not founded'),
               ),
               VoicesCheckboxGroupElement(
                 value: 4,
-                label: const Text('In progress'),
+                label: Text('In progress'),
               ),
               VoicesCheckboxGroupElement(
                 value: 5,
-                label: const Text('Not founded'),
-                note: const Text('Danger'),
+                label: Text('Not founded'),
+                note: Text('Danger'),
                 isError: true,
               ),
             ],

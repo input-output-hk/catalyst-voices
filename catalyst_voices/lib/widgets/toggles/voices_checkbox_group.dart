@@ -25,7 +25,7 @@ final class VoicesCheckboxGroupElement<T> {
   /// Default constructor for [VoicesCheckboxGroupElement].
   ///
   /// Should have at least [label] or [note].
-  VoicesCheckboxGroupElement({
+  const VoicesCheckboxGroupElement({
     required this.value,
     this.label,
     this.note,
@@ -49,7 +49,7 @@ final class VoicesCheckboxGroupElement<T> {
 /// * T: The type of the value associated with each checkbox element.
 class VoicesCheckboxGroup<T extends Object> extends StatelessWidget {
   /// The name displayed for the checkbox group.
-  final String name;
+  final Widget name;
 
   /// A list of [VoicesCheckboxGroupElement] objects defining each checkbox.
   final List<VoicesCheckboxGroupElement<T>> elements;
@@ -87,7 +87,7 @@ class VoicesCheckboxGroup<T extends Object> extends StatelessWidget {
       children: [
         VoicesCheckbox(
           value: _isGroupSelected,
-          label: Text(name),
+          label: name,
           onChanged: _isGroupEnabled ? _toggleAll : null,
         ),
         Padding(
