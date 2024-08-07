@@ -9,7 +9,7 @@ import 'package:cryptography/cryptography.dart';
 
 Future<void> main() async {
   final algorithm = Ed25519();
-  final keyPair = await algorithm.newKeyPair();
+  final keyPair = await algorithm.newKeyPairFromSeed(List.filled(32, 0));
   final privateKey = await keyPair.extractPrivateKeyBytes();
   final publicKey = await keyPair.extractPublicKey().then((e) => e.bytes);
 

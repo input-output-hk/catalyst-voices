@@ -15,7 +15,7 @@ void main() {
     setUp(() async {
       // Initialize the Ed25519 algorithm and generate a key pair
       algorithm = Ed25519();
-      keyPair = await algorithm.newKeyPair();
+      keyPair = await algorithm.newKeyPairFromSeed(List.filled(32, 0));
       privateKey = await keyPair.extractPrivateKeyBytes();
       publicKey = await keyPair.extractPublicKey();
     });
