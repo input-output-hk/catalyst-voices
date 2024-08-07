@@ -107,6 +107,58 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     required this.onErrorContainer,
   });
 
+  @visibleForTesting
+  const VoicesColorScheme.optional({
+    this.textPrimary,
+    this.textOnPrimary,
+    this.textOnPrimaryContainer,
+    this.textDisabled,
+    this.success,
+    this.onSuccess,
+    this.successContainer,
+    this.onSuccessContainer,
+    this.warning,
+    this.onWarning,
+    this.warningContainer,
+    this.onWarningContainer,
+    this.onSurfaceNeutral08,
+    this.onSurfaceNeutral012,
+    this.onSurfaceNeutral016,
+    this.onSurfacePrimaryContainer,
+    this.onSurfacePrimary08,
+    this.onSurfacePrimary012,
+    this.onSurfacePrimary016,
+    this.onSurfaceNeutralOpaqueLv0,
+    this.onSurfaceNeutralOpaqueLv1,
+    this.onSurfaceNeutralOpaqueLv2,
+    this.onSurfaceSecondary08,
+    this.onSurfaceSecondary012,
+    this.onSurfaceSecondary016,
+    this.onSurfaceError08,
+    this.onSurfaceError012,
+    this.onSurfaceError016,
+    this.iconsForeground,
+    this.iconsBackground,
+    this.iconsDisabled,
+    this.iconsPrimary,
+    this.iconsSecondary,
+    this.iconsSuccess,
+    this.iconsWarning,
+    this.iconsError,
+    this.avatarsPrimary,
+    this.avatarsSecondary,
+    this.avatarsSuccess,
+    this.avatarsWarning,
+    this.avatarsError,
+    this.elevationsOnSurfaceNeutralLv0,
+    this.outlineBorder,
+    this.outlineBorderVariant,
+    this.primaryContainer,
+    this.onPrimaryContainer,
+    this.errorContainer,
+    this.onErrorContainer,
+  });
+
   @override
   ThemeExtension<VoicesColorScheme> copyWith({
     Color? textPrimary,
@@ -317,5 +369,6 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
 
 extension VoicesColorSchemeExtension on ThemeData {
   VoicesColorScheme get colors => extension<VoicesColorScheme>()!;
+
   Color get linksPrimary => primaryColor;
 }

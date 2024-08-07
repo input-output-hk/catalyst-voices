@@ -2,6 +2,7 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/src/theme_extensions/brand_assets.dart';
 import 'package:catalyst_voices_brands/src/theme_extensions/voices_color_scheme.dart';
 import 'package:catalyst_voices_brands/src/themes/widgets/buttons_theme.dart';
+import 'package:catalyst_voices_brands/src/themes/widgets/toggles_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -302,5 +303,5 @@ ThemeData _buildThemeData(
       voicesColorScheme,
       brandAssets,
     ],
-  ).copyWithButtonsTheme();
+  ).copyWithButtonsTheme().copyWithTogglesTheme();
 }
