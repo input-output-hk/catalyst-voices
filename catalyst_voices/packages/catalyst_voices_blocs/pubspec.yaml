@@ -20,7 +20,7 @@ dependencies:
      path: ../catalyst_voices_services
     catalyst_voices_view_models:
      path: ../catalyst_voices_view_models
-    collection: ^1.17.1
+    collection: ^1.18.0
     equatable: ^2.0.5
     flutter:
       sdk: flutter
