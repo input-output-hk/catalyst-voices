@@ -49,7 +49,8 @@ void main() {
       ); // Check that the payload is as expected
 
       final signature = cborList[3];
-      // The actual signature bytes are not known in advance; just verify the type
+      // The actual signature bytes are not known in advance;
+      // just verify the type
       expect(signature, isA<CborBytes>());
     });
 
