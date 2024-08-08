@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_cardano_serialization/src/rbac/auth_token.dart';
 import 'package:cbor/cbor.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:test/test.dart';
