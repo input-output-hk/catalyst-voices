@@ -68,16 +68,11 @@ test-unit:
 # Build web version of Catalyst Voices
 build-web:
     FROM +builder
-    ARG SECRETS_ARE_AVAILABLE=false
     ARG SENTRY_DSN
 
-    IF [$SECRETS_ARE_AVAILABLE]
-        ARG WORKDIR=/frontend/catalyst_voices
-        DO flutter-ci+BUILD_WEB --TARGET=lib/configs/main_web.dart --dart-define SENTRY_DSN=$SENTRY_DSN --WORKDIR=$WORKDIR
-        SAVE ARTIFACT web
-    ELSE
-        RUN echo "No secrets are available in Earthly yet."
-    END
+    ARG WORKDIR=/frontend/catalyst_voices
+    DO flutter-ci+BUILD_WEB --TARGET=lib/configs/main_web.dart --dart-define SENTRY_DSN=$SENTRY_DSN --WORKDIR=$WORKDIR
+    SAVE ARTIFACT web
 
 package:
     FROM nginx:alpine3.18
