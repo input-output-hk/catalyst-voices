@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:uikit_example/examples/voices_buttons_example.dart';
 import 'package:uikit_example/examples/voices_checkbox_example.dart';
 import 'package:uikit_example/examples/voices_chip_example.dart';
+import 'package:uikit_example/examples/voices_indicators_example.dart';
 import 'package:uikit_example/examples/voices_navigation_example.dart';
 import 'package:uikit_example/examples/voices_radio_example.dart';
 import 'package:uikit_example/examples/voices_segmented_button_example.dart';
@@ -59,6 +60,11 @@ class ExamplesListPage extends StatelessWidget {
         title: 'Voices Separators',
         route: VoicesSeparatorsExample.route,
         page: VoicesSeparatorsExample(),
+      ),
+      ExampleTile(
+        title: 'Voices Indicators',
+        route: VoicesIndicatorsExample.route,
+        page: VoicesIndicatorsExample(),
       ),
     ];
   }
