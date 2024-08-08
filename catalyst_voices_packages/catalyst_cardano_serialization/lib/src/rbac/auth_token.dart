@@ -22,13 +22,14 @@ import 'package:ulid/ulid.dart';
 /// The Encoded Binary Token is a [CBOR sequence] that consists of 3 fields.
 ///
 /// * `kid` : The key identifier.
-/// * `ulid` : A ULID which defines when the token was issued, and a random nonce.
+/// * `ulid` : A ULID which defines when the token was issued,
+/// and a random nonce.
 /// * `signature` : The signature over the `kid` and `ulid` fields.
 final class AuthToken {
   /// The token prefix which distinguishes this auth token from other
   /// auth tokens and allows version via the v{} part.
   static const String prefix = 'catv1';
-  
+
   /// Prevent creating instances.
   const AuthToken._();
 
