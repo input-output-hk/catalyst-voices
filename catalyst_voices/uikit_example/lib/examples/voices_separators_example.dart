@@ -1,0 +1,46 @@
+import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:flutter/material.dart';
+
+class VoicesSeparatorsExample extends StatelessWidget {
+  static const String route = '/separators-example';
+
+  const VoicesSeparatorsExample({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Voices Switch')),
+      body: Column(
+        children: [
+          ColoredBox(
+            color: Theme.of(context).colorScheme.primaryContainer,
+            child: const Padding(
+              padding: EdgeInsets.all(32),
+              child: Text('Paragraph'),
+            ),
+          ),
+          const VoicesDivider(),
+          ColoredBox(
+            color: Theme.of(context).colorScheme.primaryContainer,
+            child: const Padding(
+              padding: EdgeInsets.all(32),
+              child: Text('Paragraph'),
+            ),
+          ),
+          const VoicesNamedDivider(
+            name: Text('Your account creation progress'),
+          ),
+          ColoredBox(
+            color: Theme.of(context).colorScheme.primaryContainer,
+            child: const Padding(
+              padding: EdgeInsets.all(32),
+              child: Text('Paragraph'),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

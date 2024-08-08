@@ -296,6 +296,8 @@ ThemeData _buildThemeData(
     ),
     dividerTheme: DividerThemeData(
       color: colorScheme.outlineVariant,
+      space: 16,
+      thickness: 1,
     ),
     textTheme: textTheme,
     colorScheme: colorScheme,
