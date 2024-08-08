@@ -7,6 +7,7 @@ import 'package:cryptography/cryptography.dart';
 final class CatalystCose {
   static const int _coseSign1Tag = 18;
   static const int _algKey = 1;
+  static const int _kidKey = 4;
   static const int _eddsaAlg = 3;
 
   CatalystCose._();
@@ -14,10 +15,14 @@ final class CatalystCose {
   /// Signs the [payload] and returns a [CborValue] representing
   /// a COSE_SIGN1 structure.
   ///
+  /// This [kid] parameter identifies one piece of data that can be
+  /// used as input to find the needed cryptographic key.
+  ///
   /// Limited to EdDSA algorithm with Ed25519 curve.
   static Future<CborValue> sign1({
     required List<int> privateKey,
     required List<int> payload,
+    CborValue? kid,
   }) async {
     final algorithm = Ed25519();
     final keyPair = await algorithm.newKeyPairFromSeed(privateKey);
@@ -26,6 +31,7 @@ final class CatalystCose {
       cbor.encode(
         CborMap({
           const CborSmallInt(_algKey): const CborSmallInt(_eddsaAlg),
+          if (kid != null) const CborSmallInt(_kidKey): kid,
         }),
       ),
     );

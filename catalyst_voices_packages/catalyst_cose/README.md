@@ -34,7 +34,7 @@ dependencies:
 import 'dart:convert';
 
 import 'package:catalyst_cose/catalyst_cose.dart';
-import 'package:cbor/simple.dart';
+import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 import 'package:cryptography/cryptography.dart';
 
@@ -49,6 +49,7 @@ Future<void> main() async {
   final coseSign1 = await CatalystCose.sign1(
     privateKey: privateKey,
     payload: payload,
+    kid: CborBytes(publicKey),
   );
 
   final verified = await CatalystCose.verifyCoseSign1(

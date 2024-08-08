@@ -27,6 +27,7 @@ void main() {
       final coseSign1 = await CatalystCose.sign1(
         privateKey: privateKey,
         payload: payload,
+        kid: CborBytes(publicKey.bytes),
       );
 
       // Verify that the COSE_SIGN1 structure is a valid CborList
@@ -61,6 +62,7 @@ void main() {
       final coseSign1 = await CatalystCose.sign1(
         privateKey: privateKey,
         payload: payload,
+        kid: CborBytes(publicKey.bytes),
       );
 
       // Verify the signature
@@ -79,6 +81,7 @@ void main() {
       final coseSign1 = await CatalystCose.sign1(
         privateKey: privateKey,
         payload: payload,
+        kid: CborBytes(publicKey.bytes),
       );
 
       // Tamper with the signature to invalidate it
