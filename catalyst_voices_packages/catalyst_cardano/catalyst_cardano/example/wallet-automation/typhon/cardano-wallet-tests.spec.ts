@@ -1,20 +1,24 @@
 import { test, chromium, expect, Page, BrowserContext } from '@playwright/test';
 import { getWalletCredentials, getRegistrationPin } from './credentials';
 import { getSeedPhrase } from './seed-phrase';
-import { waitForDebugger } from 'inspector';
-const path = require('path');
-import fs from 'fs-extra';
+import path from 'path';
 
 // extension ID for Typhon: kfdniefadaanbjodldohaedphafoffoh
 
 let newTab: Page
 let browser: BrowserContext;
 
-test.afterEach(async ({ page }) => {
+test.afterEach(async ({ }, testInfo) => {
+    if (testInfo.title == 'Empty wallet') {
+        return;
+    }
     browser.close();
 });
 
-test.beforeEach(async () => {
+test.beforeEach(async ({ }, testInfo) => {
+    if (testInfo.title == 'Empty wallet') {
+        return;
+    }
     const extensionPath: string = path.resolve(__dirname, 'extensions/KFDNIEFADAANBJODLDOHAEDPHAFOFFOH_unzipped');
     browser = await chromium.launchPersistentContext('', {
         headless: false, // extensions only work in headful mode
@@ -190,4 +194,9 @@ test('Fail to Sign & submit RBAC tx with incorrect password', async () => {
     const wrongPassword = 'wrongPassword';
     await signData(signTab, wrongPassword);
     await expect(signTab.getByText('Wrong password')).toBeVisible();
+});
+
+test('Empty wallet', async ({ page }) => {
+    await page.goto('http://localhost:8000/', { waitUntil: 'load' });
+    await expect(page.getByText('There are no active wallet extensions')).toBeVisible();
 });
