@@ -1,0 +1,31 @@
+name: catalyst_cose
+description: A Flutter plugin implementing CBOR Object Signing and Encryption (RFC 8152).
+repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices_packages/catalyst_cose/catalyst_cose
+issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
+topics: [cryptography, encryption, codec]
+version: 0.1.0
+
+environment:
+  sdk: ">=3.3.4 <4.0.0"
+  flutter: ">=3.22.1"
+
+flutter:
+  plugin:
+    platforms:
+      web:
+        default_package: catalyst_cose_web
+
+dependencies:
+  catalyst_cose_platform_interface: ^0.1.1
+  catalyst_cose_web: ^0.1.1
+  cbor: ^6.2.0
+  convert: ^3.1.1
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  catalyst_analysis:
+    path: ../../catalyst_analysis
+  flutter_test:
+    sdk: flutter
+  plugin_platform_interface: ^2.1.7

@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/pages/login/login.dart';
-import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices/pages/login/login_email_text_filed.dart';
+import 'package:catalyst_voices/pages/login/login_password_text_field.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 final class LoginRobot {
@@ -16,14 +17,16 @@ final class LoginRobot {
   }
 
   Future<void> enterEmail(String email) async {
-    final emailTextField = find.byKey(EmailInput.emailInputKey);
+    final emailTextField = find.byKey(LoginEmailTextFiled.emailInputKey);
     expect(emailTextField, findsOneWidget);
     await widgetTester.enterText(emailTextField, email);
     await widgetTester.pump();
   }
 
   Future<void> enterPassword(String password) async {
-    final passwordTextField = find.byKey(PasswordInput.passwordInputKey);
+    final passwordTextField = find.byKey(
+      LoginPasswordTextField.passwordInputKey,
+    );
     expect(passwordTextField, findsOneWidget);
     await widgetTester.enterText(passwordTextField, password);
     await widgetTester.pump();

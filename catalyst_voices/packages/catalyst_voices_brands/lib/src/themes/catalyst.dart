@@ -1,59 +1,170 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/src/theme_extensions/brand_assets.dart';
 import 'package:catalyst_voices_brands/src/theme_extensions/voices_color_scheme.dart';
+import 'package:catalyst_voices_brands/src/themes/widgets/buttons_theme.dart';
+import 'package:catalyst_voices_brands/src/themes/widgets/toggles_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-ThemeData _buildThemeData(
-  ColorScheme colorScheme,
-  VoicesColorScheme voicesColorScheme,
-  BrandAssets brandAssets,
-) {
-  final textTheme = _buildTextTheme(voicesColorScheme);
+const ColorScheme darkColorScheme = ColorScheme.dark(
+  primary: VoicesColors.darkPrimary,
+  onPrimary: VoicesColors.darkOnPrimary,
+  primaryContainer: VoicesColors.darkPrimaryContainer,
+  onPrimaryContainer: VoicesColors.darkOnPrimaryContainer,
+  secondary: VoicesColors.darkSecondary,
+  onSecondary: VoicesColors.darkOnSecondary,
+  secondaryContainer: VoicesColors.darkSecondaryContainer,
+  onSecondaryContainer: VoicesColors.darkOnSecondaryContainer,
+  error: VoicesColors.darkError,
+  errorContainer: VoicesColors.darkErrorContainer,
+  onErrorContainer: VoicesColors.darkOnErrorContainer,
+  outline: VoicesColors.darkOutline,
+  outlineVariant: VoicesColors.darkOutlineVariant,
+);
 
-  return ThemeData(
-    appBarTheme: AppBarTheme(
-      backgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv1,
-    ),
-    filledButtonTheme: FilledButtonThemeData(
-      style: FilledButton.styleFrom(
-        minimumSize: const Size(48, 48),
-      ),
-    ),
-    outlinedButtonTheme: OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        minimumSize: const Size(48, 48),
-      ),
-    ),
-    buttonBarTheme: const ButtonBarThemeData(
-      buttonHeight: 40,
-    ),
-    iconButtonTheme: IconButtonThemeData(
-      style: IconButton.styleFrom(
-        foregroundColor: voicesColorScheme.iconsForeground,
-        iconSize: 24,
-      ),
-    ),
-    drawerTheme: DrawerThemeData(
-      backgroundColor: voicesColorScheme.elevationsOnSurfaceNeutralLv0,
-    ),
-    listTileTheme: ListTileThemeData(
-      shape: const StadiumBorder(),
-      minTileHeight: 56,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-      titleTextStyle: textTheme.labelLarge,
-    ),
-    dividerTheme: DividerThemeData(
-      color: colorScheme.outlineVariant,
-    ),
-    textTheme: textTheme,
-    colorScheme: colorScheme,
-    extensions: <ThemeExtension<dynamic>>[
-      voicesColorScheme,
-      brandAssets,
-    ],
-  );
-}
+const VoicesColorScheme darkVoicesColorScheme = VoicesColorScheme(
+  textPrimary: VoicesColors.darkTextPrimary,
+  textOnPrimary: VoicesColors.darkTextOnPrimary,
+  textOnPrimaryContainer: VoicesColors.darkTextOnPrimaryContainer,
+  textDisabled: VoicesColors.darkTextDisabled,
+  success: VoicesColors.darkSuccess,
+  onSuccess: VoicesColors.darkOnSuccess,
+  successContainer: VoicesColors.darkSuccessContainer,
+  onSuccessContainer: VoicesColors.darkOnSuccessContainer,
+  warning: VoicesColors.darkWarning,
+  onWarning: VoicesColors.darkOnWarning,
+  warningContainer: VoicesColors.darkWarningContainer,
+  onWarningContainer: VoicesColors.darkOnWarningContainer,
+  onSurfaceNeutral08: VoicesColors.darkOnSurfaceNeutral08,
+  onSurfaceNeutral012: VoicesColors.darkOnSurfaceNeutral012,
+  onSurfaceNeutral016: VoicesColors.darkOnSurfaceNeutral016,
+  onSurfaceNeutralOpaqueLv0: VoicesColors.darkOnSurfaceNeutralOpaqueLv0,
+  onSurfaceNeutralOpaqueLv1: VoicesColors.darkOnSurfaceNeutralOpaqueLv1,
+  onSurfaceNeutralOpaqueLv2: VoicesColors.darkOnSurfaceNeutralOpaqueLv2,
+  onSurfacePrimaryContainer: VoicesColors.darkOnSurfacePrimaryContainer,
+  onSurfacePrimary08: VoicesColors.darkOnSurfacePrimary08,
+  onSurfacePrimary012: VoicesColors.darkOnSurfacePrimary012,
+  onSurfacePrimary016: VoicesColors.darkOnSurfacePrimary016,
+  onSurfaceSecondary08: VoicesColors.darkOnSurfaceSecondary08,
+  onSurfaceSecondary012: VoicesColors.darkOnSurfaceSecondary012,
+  onSurfaceSecondary016: VoicesColors.darkOnSurfaceSecondary016,
+  onSurfaceError08: VoicesColors.darkOnSurfaceError08,
+  onSurfaceError012: VoicesColors.darkOnSurfaceError012,
+  onSurfaceError016: VoicesColors.darkOnSurfaceError016,
+  iconsForeground: VoicesColors.darkIconsForeground,
+  iconsBackground: VoicesColors.darkIconsBackground,
+  iconsDisabled: VoicesColors.darkIconsDisabled,
+  iconsPrimary: VoicesColors.darkIconsPrimary,
+  iconsSecondary: VoicesColors.darkIconsSecondary,
+  iconsSuccess: VoicesColors.darkIconsSuccess,
+  iconsWarning: VoicesColors.darkIconsWarning,
+  iconsError: VoicesColors.darkIconsError,
+  avatarsPrimary: VoicesColors.darkAvatarsPrimary,
+  avatarsSecondary: VoicesColors.darkAvatarsSecondary,
+  avatarsSuccess: VoicesColors.darkAvatarsSuccess,
+  avatarsWarning: VoicesColors.darkAvatarsWarning,
+  avatarsError: VoicesColors.darkAvatarsError,
+  elevationsOnSurfaceNeutralLv0: VoicesColors.darkElevationsOnSurfaceNeutralLv0,
+  outlineBorder: VoicesColors.darkOutlineBorderOutline,
+  outlineBorderVariant: VoicesColors.darkOutlineBorderOutlineVariant,
+  primaryContainer: VoicesColors.darkPrimaryContainer,
+  onPrimaryContainer: VoicesColors.darkOnPrimaryContainer,
+  errorContainer: VoicesColors.darkErrorContainer,
+  onErrorContainer: VoicesColors.darkOnErrorContainer,
+);
+
+const ColorScheme lightColorScheme = ColorScheme.light(
+  primary: VoicesColors.lightPrimary,
+  // ignore: avoid_redundant_argument_values
+  onPrimary: VoicesColors.lightOnPrimary,
+  primaryContainer: VoicesColors.lightPrimaryContainer,
+  onPrimaryContainer: VoicesColors.lightOnPrimaryContainer,
+  secondary: VoicesColors.lightSecondary,
+  onSecondary: VoicesColors.lightOnSecondary,
+  secondaryContainer: VoicesColors.lightSecondaryContainer,
+  onSecondaryContainer: VoicesColors.lightOnSecondaryContainer,
+  error: VoicesColors.lightError,
+  errorContainer: VoicesColors.lightErrorContainer,
+  onErrorContainer: VoicesColors.lightOnErrorContainer,
+  outline: VoicesColors.lightOutline,
+  outlineVariant: VoicesColors.lightOutlineVariant,
+);
+
+const VoicesColorScheme lightVoicesColorScheme = VoicesColorScheme(
+  textPrimary: VoicesColors.lightTextPrimary,
+  textOnPrimary: VoicesColors.lightTextOnPrimary,
+  textOnPrimaryContainer: VoicesColors.lightTextOnPrimaryContainer,
+  textDisabled: VoicesColors.lightTextDisabled,
+  success: VoicesColors.lightSuccess,
+  onSuccess: VoicesColors.lightOnSuccess,
+  successContainer: VoicesColors.lightSuccessContainer,
+  onSuccessContainer: VoicesColors.lightOnSuccessContainer,
+  warning: VoicesColors.lightWarning,
+  onWarning: VoicesColors.lightOnWarning,
+  warningContainer: VoicesColors.lightWarningContainer,
+  onWarningContainer: VoicesColors.lightOnWarningContainer,
+  onSurfaceNeutral08: VoicesColors.lightOnSurfaceNeutral08,
+  onSurfaceNeutral012: VoicesColors.lightOnSurfaceNeutral012,
+  onSurfaceNeutral016: VoicesColors.lightOnSurfaceNeutral016,
+  onSurfaceNeutralOpaqueLv0: VoicesColors.lightOnSurfaceNeutralOpaqueLv0,
+  onSurfaceNeutralOpaqueLv1: VoicesColors.lightOnSurfaceNeutralOpaqueLv1,
+  onSurfaceNeutralOpaqueLv2: VoicesColors.lightOnSurfaceNeutralOpaqueLv2,
+  onSurfacePrimaryContainer: VoicesColors.lightOnSurfacePrimaryContainer,
+  onSurfacePrimary08: VoicesColors.lightOnSurfacePrimary08,
+  onSurfacePrimary012: VoicesColors.lightOnSurfacePrimary012,
+  onSurfacePrimary016: VoicesColors.lightOnSurfacePrimary016,
+  onSurfaceSecondary08: VoicesColors.lightOnSurfaceSecondary08,
+  onSurfaceSecondary012: VoicesColors.lightOnSurfaceSecondary012,
+  onSurfaceSecondary016: VoicesColors.lightOnSurfaceSecondary016,
+  onSurfaceError08: VoicesColors.lightOnSurfaceError08,
+  onSurfaceError012: VoicesColors.lightOnSurfaceError012,
+  onSurfaceError016: VoicesColors.lightOnSurfaceError016,
+  iconsForeground: VoicesColors.lightIconsForeground,
+  iconsBackground: VoicesColors.lightIconsBackground,
+  iconsDisabled: VoicesColors.lightIconsDisabled,
+  iconsPrimary: VoicesColors.lightIconsPrimary,
+  iconsSecondary: VoicesColors.lightIconsSecondary,
+  iconsSuccess: VoicesColors.lightIconsSuccess,
+  iconsWarning: VoicesColors.lightIconsWarning,
+  iconsError: VoicesColors.lightIconsError,
+  avatarsPrimary: VoicesColors.lightAvatarsPrimary,
+  avatarsSecondary: VoicesColors.lightAvatarsSecondary,
+  avatarsSuccess: VoicesColors.lightAvatarsSuccess,
+  avatarsWarning: VoicesColors.lightAvatarsWarning,
+  avatarsError: VoicesColors.lightAvatarsError,
+  elevationsOnSurfaceNeutralLv0:
+      VoicesColors.lightElevationsOnSurfaceNeutralLv0,
+  outlineBorder: VoicesColors.lightOutlineBorderOutline,
+  outlineBorderVariant: VoicesColors.lightOutlineBorderOutlineVariant,
+  primaryContainer: VoicesColors.lightPrimaryContainer,
+  onPrimaryContainer: VoicesColors.lightOnPrimaryContainer,
+  errorContainer: VoicesColors.lightErrorContainer,
+  onErrorContainer: VoicesColors.lightOnErrorContainer,
+);
+
+/// [ThemeData] for the `catalyst` brand.
+final ThemeData catalyst = _buildThemeData(
+  lightColorScheme,
+  lightVoicesColorScheme,
+  lightBrandAssets,
+);
+
+final BrandAssets darkBrandAssets = BrandAssets(
+  logo: VoicesAssets.images.catalystLogoWhite,
+  logoIcon: VoicesAssets.images.catalystLogoIconWhite,
+);
+
+/// Dark [ThemeData] for the `catalyst` brand.
+final ThemeData darkCatalyst = _buildThemeData(
+  darkColorScheme,
+  darkVoicesColorScheme,
+  darkBrandAssets,
+);
+
+final BrandAssets lightBrandAssets = BrandAssets(
+  logo: VoicesAssets.images.catalystLogo,
+  logoIcon: VoicesAssets.images.catalystLogoIcon,
+);
 
 TextTheme _buildTextTheme(VoicesColorScheme voicesColorScheme) {
   return TextTheme(
@@ -159,151 +270,38 @@ TextTheme _buildTextTheme(VoicesColorScheme voicesColorScheme) {
   );
 }
 
-const ColorScheme lightColorScheme = ColorScheme.light(
-  primary: VoicesColors.lightPrimary,
-  primaryContainer: VoicesColors.lightPrimaryContainer,
-  onPrimaryContainer: VoicesColors.lightOnPrimaryContainer,
-  secondary: VoicesColors.lightSecondary,
-  onSecondary: VoicesColors.lightOnSecondary,
-  secondaryContainer: VoicesColors.lightSecondaryContainer,
-  onSecondaryContainer: VoicesColors.lightOnSecondaryContainer,
-  error: VoicesColors.lightError,
-  errorContainer: VoicesColors.lightErrorContainer,
-  onErrorContainer: VoicesColors.lightOnErrorContainer,
-  outline: VoicesColors.lightOutline,
-  outlineVariant: VoicesColors.lightOutlineVariant,
-);
+/// Note:
+///
+/// If we're going to introduce other themes then catalyst this method
+/// should be extracted.
+ThemeData _buildThemeData(
+  ColorScheme colorScheme,
+  VoicesColorScheme voicesColorScheme,
+  BrandAssets brandAssets,
+) {
+  final textTheme = _buildTextTheme(voicesColorScheme);
 
-const VoicesColorScheme lightVoicesColorScheme = VoicesColorScheme(
-  textPrimary: VoicesColors.lightTextPrimary,
-  textOnPrimary: VoicesColors.lightTextOnPrimary,
-  textOnPrimaryContainer: VoicesColors.lightTextOnPrimaryContainer,
-  textDisabled: VoicesColors.lightTextDisabled,
-  success: VoicesColors.lightSuccess,
-  onSuccess: VoicesColors.lightOnSuccess,
-  successContainer: VoicesColors.lightSuccessContainer,
-  onSuccessContainer: VoicesColors.lightOnSuccessContainer,
-  warning: VoicesColors.lightWarning,
-  onWarning: VoicesColors.lightOnWarning,
-  warningContainer: VoicesColors.lightWarningContainer,
-  onWarningContainer: VoicesColors.lightOnWarningContainer,
-  onSurfaceNeutral08: VoicesColors.lightOnSurfaceNeutral08,
-  onSurfaceNeutral012: VoicesColors.lightOnSurfaceNeutral012,
-  onSurfaceNeutral016: VoicesColors.lightOnSurfaceNeutral016,
-  onSurfaceNeutralOpaqueLv0: VoicesColors.lightOnSurfaceNeutralOpaqueLv0,
-  onSurfaceNeutralOpaqueLv1: VoicesColors.lightOnSurfaceNeutralOpaqueLv1,
-  onSurfaceNeutralOpaqueLv2: VoicesColors.lightOnSurfaceNeutralOpaqueLv2,
-  onSurfacePrimaryContainer: VoicesColors.lightOnSurfacePrimaryContainer,
-  onSurfacePrimary08: VoicesColors.lightOnSurfacePrimary08,
-  onSurfacePrimary012: VoicesColors.lightOnSurfacePrimary012,
-  onSurfacePrimary016: VoicesColors.lightOnSurfacePrimary016,
-  onSurfaceSecondary08: VoicesColors.lightOnSurfaceSecondary08,
-  onSurfaceSecondary012: VoicesColors.lightOnSurfaceSecondary012,
-  onSurfaceSecondary016: VoicesColors.lightOnSurfaceSecondary016,
-  onSurfaceError08: VoicesColors.lightOnSurfaceError08,
-  onSurfaceError012: VoicesColors.lightOnSurfaceError012,
-  onSurfaceError016: VoicesColors.lightOnSurfaceError016,
-  iconsForeground: VoicesColors.lightIconsForeground,
-  iconsBackground: VoicesColors.lightIconsBackground,
-  iconsDisabled: VoicesColors.lightIconsDisabled,
-  iconsPrimary: VoicesColors.lightIconsPrimary,
-  iconsSecondary: VoicesColors.lightIconsSecondary,
-  iconsSuccess: VoicesColors.lightIconsSuccess,
-  iconsWarning: VoicesColors.lightIconsWarning,
-  iconsError: VoicesColors.lightIconsError,
-  avatarsPrimary: VoicesColors.lightAvatarsPrimary,
-  avatarsSecondary: VoicesColors.lightAvatarsSecondary,
-  avatarsSuccess: VoicesColors.lightAvatarsSuccess,
-  avatarsWarning: VoicesColors.lightAvatarsWarning,
-  avatarsError: VoicesColors.lightAvatarsError,
-  elevationsOnSurfaceNeutralLv0:
-      VoicesColors.lightElevationsOnSurfaceNeutralLv0,
-  outlineBorder: VoicesColors.lightOutlineBorderOutline,
-  outlineBorderVariant: VoicesColors.lightOutlineBorderOutlineVariant,
-);
-
-const ColorScheme darkColorScheme = ColorScheme.dark(
-  primary: VoicesColors.darkPrimary,
-  primaryContainer: VoicesColors.darkPrimaryContainer,
-  onPrimaryContainer: VoicesColors.darkOnPrimaryContainer,
-  secondary: VoicesColors.darkSecondary,
-  onSecondary: VoicesColors.darkOnSecondary,
-  secondaryContainer: VoicesColors.darkSecondaryContainer,
-  onSecondaryContainer: VoicesColors.darkOnSecondaryContainer,
-  error: VoicesColors.darkError,
-  errorContainer: VoicesColors.darkErrorContainer,
-  onErrorContainer: VoicesColors.darkOnErrorContainer,
-  outline: VoicesColors.darkOutline,
-  outlineVariant: VoicesColors.darkOutlineVariant,
-);
-
-const VoicesColorScheme darkVoicesColorScheme = VoicesColorScheme(
-  textPrimary: VoicesColors.darkTextPrimary,
-  textOnPrimary: VoicesColors.darkTextOnPrimary,
-  textOnPrimaryContainer: VoicesColors.darkTextOnPrimaryContainer,
-  textDisabled: VoicesColors.darkTextDisabled,
-  success: VoicesColors.darkSuccess,
-  onSuccess: VoicesColors.darkOnSuccess,
-  successContainer: VoicesColors.darkSuccessContainer,
-  onSuccessContainer: VoicesColors.darkOnSuccessContainer,
-  warning: VoicesColors.darkWarning,
-  onWarning: VoicesColors.darkOnWarning,
-  warningContainer: VoicesColors.darkWarningContainer,
-  onWarningContainer: VoicesColors.darkOnWarningContainer,
-  onSurfaceNeutral08: VoicesColors.darkOnSurfaceNeutral08,
-  onSurfaceNeutral012: VoicesColors.darkOnSurfaceNeutral012,
-  onSurfaceNeutral016: VoicesColors.darkOnSurfaceNeutral016,
-  onSurfaceNeutralOpaqueLv0: VoicesColors.darkOnSurfaceNeutralOpaqueLv0,
-  onSurfaceNeutralOpaqueLv1: VoicesColors.darkOnSurfaceNeutralOpaqueLv1,
-  onSurfaceNeutralOpaqueLv2: VoicesColors.darkOnSurfaceNeutralOpaqueLv2,
-  onSurfacePrimaryContainer: VoicesColors.darkOnSurfacePrimaryContainer,
-  onSurfacePrimary08: VoicesColors.darkOnSurfacePrimary08,
-  onSurfacePrimary012: VoicesColors.darkOnSurfacePrimary012,
-  onSurfacePrimary016: VoicesColors.darkOnSurfacePrimary016,
-  onSurfaceSecondary08: VoicesColors.darkOnSurfaceSecondary08,
-  onSurfaceSecondary012: VoicesColors.darkOnSurfaceSecondary012,
-  onSurfaceSecondary016: VoicesColors.darkOnSurfaceSecondary016,
-  onSurfaceError08: VoicesColors.darkOnSurfaceError08,
-  onSurfaceError012: VoicesColors.darkOnSurfaceError012,
-  onSurfaceError016: VoicesColors.darkOnSurfaceError016,
-  iconsForeground: VoicesColors.darkIconsForeground,
-  iconsBackground: VoicesColors.darkIconsBackground,
-  iconsDisabled: VoicesColors.darkIconsDisabled,
-  iconsPrimary: VoicesColors.darkIconsPrimary,
-  iconsSecondary: VoicesColors.darkIconsSecondary,
-  iconsSuccess: VoicesColors.darkIconsSuccess,
-  iconsWarning: VoicesColors.darkIconsWarning,
-  iconsError: VoicesColors.darkIconsError,
-  avatarsPrimary: VoicesColors.darkAvatarsPrimary,
-  avatarsSecondary: VoicesColors.darkAvatarsSecondary,
-  avatarsSuccess: VoicesColors.darkAvatarsSuccess,
-  avatarsWarning: VoicesColors.darkAvatarsWarning,
-  avatarsError: VoicesColors.darkAvatarsError,
-  elevationsOnSurfaceNeutralLv0: VoicesColors.darkElevationsOnSurfaceNeutralLv0,
-  outlineBorder: VoicesColors.darkOutlineBorderOutline,
-  outlineBorderVariant: VoicesColors.darkOutlineBorderOutlineVariant,
-);
-
-final BrandAssets lightBrandAssets = BrandAssets(
-  logo: VoicesAssets.images.catalystLogo,
-  logoIcon: VoicesAssets.images.catalystLogoIcon,
-);
-
-final BrandAssets darkBrandAssets = BrandAssets(
-  logo: VoicesAssets.images.catalystLogoWhite,
-  logoIcon: VoicesAssets.images.catalystLogoIconWhite,
-);
-
-/// [ThemeData] for the `catalyst` brand.
-final ThemeData catalyst = _buildThemeData(
-  lightColorScheme,
-  lightVoicesColorScheme,
-  lightBrandAssets,
-);
-
-/// Dark [ThemeData] for the `catalyst` brand.
-final ThemeData darkCatalyst = _buildThemeData(
-  darkColorScheme,
-  darkVoicesColorScheme,
-  darkBrandAssets,
-);
+  return ThemeData(
+    appBarTheme: AppBarTheme(
+      backgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv1,
+    ),
+    drawerTheme: DrawerThemeData(
+      backgroundColor: voicesColorScheme.elevationsOnSurfaceNeutralLv0,
+    ),
+    listTileTheme: ListTileThemeData(
+      shape: const StadiumBorder(),
+      minTileHeight: 56,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+      titleTextStyle: textTheme.labelLarge,
+    ),
+    dividerTheme: DividerThemeData(
+      color: colorScheme.outlineVariant,
+    ),
+    textTheme: textTheme,
+    colorScheme: colorScheme,
+    extensions: <ThemeExtension<dynamic>>[
+      voicesColorScheme,
+      brandAssets,
+    ],
+  ).copyWithButtonsTheme().copyWithTogglesTheme();
+}

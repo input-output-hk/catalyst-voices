@@ -12,7 +12,8 @@
     "catalyst-gateway/target/**",
     "CHANGELOG.md",
     "catalyst_voices_packages/**/CHANGELOG.md",
-    "catalyst_voices/macos/Pods/**"
+    "catalyst_voices/macos/Pods/**",
+    "**/node_modules/**"
   ],
   // Set standard config options in `/.markdownlint.jsonc`
   "config": {
