@@ -1,5 +1,6 @@
 import 'package:catalyst_cose/catalyst_cose.dart';
 import 'package:cbor/cbor.dart';
+import 'package:convert/convert.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:test/test.dart';
 
@@ -53,6 +54,28 @@ void main() {
       // The actual signature bytes are not known in advance;
       // just verify the type
       expect(signature, isA<CborBytes>());
+    });
+
+    test('sign1 generates a valid cbor', () async {
+      final payload = List<int>.generate(10, (i) => i); // Example payload
+
+      // Call the sign1 method
+      final coseSign1 = await CatalystCose.sign1(
+        privateKey: privateKey,
+        payload: payload,
+        kid: CborBytes(publicKey.bytes),
+      );
+
+      expect(
+        hex.encode(cbor.encode(coseSign1)),
+        equals(
+          'd2845826a201030458203b6a27bcceb6a42d62a3a8d02a6f0d736532157'
+          '71de243a63ac048a18b59da29a04a00010203040506070809584007ed6c'
+          '8a0b9bad9c375329a1d2de50d777f7f348c5597e3d963b80b9fd3488715'
+          '1dc8f0b2a4690f10f3256a7c883b6bd559be4195ca78fccc694f986ed45'
+          'b80e',
+        ),
+      );
     });
 
     test('verifyCoseSign1 validates correct signature', () async {
