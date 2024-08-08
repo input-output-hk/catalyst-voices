@@ -48,7 +48,7 @@ class VoicesIndicatorsExample extends StatelessWidget {
                 SizedBox(width: 16),
                 VoicesCircularProgressIndicator(value: 0.75, showTrack: false),
               ],
-            )
+            ),
           ],
         ),
       ),
