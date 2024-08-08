@@ -94,10 +94,11 @@ UAARIjNEVWZ3iJmqu8zd7v9QAZEs7HHPLEwUpV1VhdlNe1hAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 ```
 
 The full token header would then be:
-
+<!-- markdownlint-disable MD013-->
 ```http
 Authorization: Bearer catv1.UAARIjNEVWZ3iJmqu8zd7v9QAZEs7HHPLEwUpV1VhdlNe1hAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 ```
+<!-- markdownlint-enable MD013-->
 
 * [base64-url] <https://base64.guru/standards/base64url>
 * [CBOR sequence] <https://www.rfc-editor.org/rfc/rfc8742.html>

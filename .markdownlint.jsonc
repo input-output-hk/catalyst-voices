@@ -211,7 +211,7 @@
     "MD045": true,
     // MD046/code-block-style - Code block style
     // Code Blocks are used by Admonitions and need to be indented.
-    // Actual code should be fenced, this can;t be enforced by mdlint.
+    // Actual code should be fenced, this can't be enforced by mdlint.
     "MD046": {
         // Block style
         "style": "consistent"
