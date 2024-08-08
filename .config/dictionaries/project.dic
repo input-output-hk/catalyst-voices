@@ -177,6 +177,7 @@ rfwtxt
 rgloader
 ripgrep
 rngs
+rlib
 RPATH
 rustc
 rustdoc
@@ -252,3 +253,6 @@ xctest
 xctestrun
 xcworkspace
 yoroi
+unchunk
+EUTXO
+toggleable

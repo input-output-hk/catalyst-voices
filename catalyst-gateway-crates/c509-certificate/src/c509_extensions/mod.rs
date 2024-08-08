@@ -25,12 +25,13 @@ use std::fmt::Debug;
 use asn1_rs::{oid, Oid};
 use extension::{Extension, ExtensionValue};
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
+use serde::{Deserialize, Serialize};
 
 /// OID of `KeyUsage` extension
 static KEY_USAGE_OID: Oid<'static> = oid!(2.5.29 .15);
 
 /// A struct of C509 Extensions containing a vector of `Extension`.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Extensions(Vec<Extension>);
 
 impl Default for Extensions {

@@ -51,6 +51,39 @@ void main() {
     });
   });
 
+  group(TransactionInputsHash, () {
+    const hexString = '4d3f576f26db29139981a69443c2325d';
+    final bytes = hex.decode(hexString);
+
+    test('from and to hex', () {
+      final hash = TransactionInputsHash.fromHex(hexString);
+      expect(hash.toHex(), equals(hexString));
+    });
+
+    test('from and to bytes', () {
+      final hash = TransactionInputsHash.fromBytes(bytes: bytes);
+      expect(hash.bytes, equals(bytes));
+    });
+
+    test('from transaction inputs', () {
+      final hash = TransactionInputsHash.fromTransactionInputs([testUtxo()]);
+      expect(
+        hash,
+        equals(
+          TransactionInputsHash.fromHex('26497de5e0c8fe2e4b0c85651f96b3c9'),
+        ),
+      );
+    });
+
+    test('toCbor returns bytes', () {
+      final hash = TransactionInputsHash.fromBytes(bytes: bytes);
+      final encodedCbor = cbor.encode(hash.toCbor());
+      final decodedCbor = cbor.decode(encodedCbor);
+      expect(decodedCbor, isA<CborBytes>());
+      expect((decodedCbor as CborBytes).bytes, equals(bytes));
+    });
+  });
+
   group(AuxiliaryDataHash, () {
     const hexString =
         '4d3f576f26db29139981a69443c2325daa812cc353a31b5a4db794a5bcbb06c2';
@@ -113,7 +146,7 @@ void main() {
       expect(
         CertificateHash.fromX509DerCertificate(derCert),
         equals(
-          CertificateHash.fromHex('c13a67ee9608dc5966aaa91fe3b1f021'),
+          CertificateHash.fromHex('667e69bd56a0fbd2d4db363e3bb017a1'),
         ),
       );
     });
@@ -124,7 +157,7 @@ void main() {
       expect(
         CertificateHash.fromC509Certificate(c509Cert),
         equals(
-          CertificateHash.fromHex('312517d13f3a63da8f487f56ded10618'),
+          CertificateHash.fromHex('431d7b744dcc4ac4359b7ee7ffa7be33'),
         ),
       );
     });

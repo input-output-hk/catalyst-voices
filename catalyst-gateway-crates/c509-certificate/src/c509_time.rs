@@ -1,9 +1,10 @@
 //! C509 Time
 
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
+use serde::{Deserialize, Serialize};
 
 /// A struct representing a time where it accept seconds since the Unix epoch.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct Time(i64);
 
 /// No expiration date in seconds since the Unix epoch.
@@ -14,6 +15,12 @@ impl Time {
     #[must_use]
     pub fn new(time: i64) -> Self {
         Self(time)
+    }
+
+    /// Get the time in i64.
+    #[must_use]
+    pub fn to_i64(&self) -> i64 {
+        self.0
     }
 }
 

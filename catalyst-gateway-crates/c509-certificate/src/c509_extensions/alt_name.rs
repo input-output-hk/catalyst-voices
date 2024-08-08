@@ -2,6 +2,7 @@
 //! Issuer Alternative Name extension.
 
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
+use serde::{Deserialize, Serialize};
 
 use crate::c509_general_names::{
     general_name::{GeneralName, GeneralNameTypeRegistry, GeneralNameValue},
@@ -10,7 +11,7 @@ use crate::c509_general_names::{
 
 /// Alternative Name extension.
 /// Can be interpreted as a `GeneralNames / text`
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct AlternativeName(GeneralNamesOrText);
 
 impl AlternativeName {
@@ -38,7 +39,8 @@ impl Decode<'_, ()> for AlternativeName {
 // ------------------GeneralNamesOrText--------------------
 
 /// Enum for type that can be a `GeneralNames` or a text use in `AlternativeName`.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
+#[serde(rename_all = "snake_case")]
 pub enum GeneralNamesOrText {
     /// A value of `GeneralNames`.
     GeneralNames(GeneralNames),

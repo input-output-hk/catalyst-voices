@@ -6,16 +6,16 @@
 mod data;
 pub mod general_name;
 pub mod other_name_hw_module;
-
 use general_name::GeneralName;
 use minicbor::{encode::Write, Decode, Decoder, Encode, Encoder};
+use serde::{Deserialize, Serialize};
 
 /// A struct represents an array of `GeneralName`.
 ///
 /// ```cddl
 /// GeneralNames = [ + GeneralName ]
 /// ```
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Deserialize, Serialize)]
 pub struct GeneralNames(Vec<GeneralName>);
 
 impl Default for GeneralNames {
