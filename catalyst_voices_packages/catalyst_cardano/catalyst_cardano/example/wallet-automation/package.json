@@ -1,7 +1,7 @@
 {
     "name": "catalyst-voices",
     "version": "1.0.0",
-    "description": "<!-- markdownlint-disable no-inline-html --> <h1 align=\"center\">Catalyst Core</h1>",
+    "description": "<!-- markdownlint-disable no-inline-html --> <h1 align=\"center\">Catalyst Voices</h1>",
     "main": "index.js",
     "directories": {
         "test": "tests"
