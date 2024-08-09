@@ -103,25 +103,55 @@ class _StepsState extends State<_Steps> {
           current: currentStep,
         ),
         const SizedBox(height: 12),
-        VoicesFilledButton(
-          onTap: completedSteps.containsAll(_OnboardingStep.values)
-              ? null
-              : () {
-                  setState(() {
-                    final currentStep = this.currentStep;
-                    if (currentStep != null) {
-                      completedSteps.add(currentStep);
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            VoicesFilledButton(
+              onTap: completedSteps.isEmpty
+                  ? null
+                  : () {
+                      setState(() {
+                        final currentStep = this.currentStep;
+                        if (currentStep != null) {
+                          completedSteps.remove(currentStep);
 
-                      final index = _OnboardingStep.values.indexOf(currentStep);
-                      if (index < _OnboardingStep.values.length - 1) {
-                        this.currentStep = _OnboardingStep.values[index + 1];
-                      }
-                    } else {
-                      this.currentStep = _OnboardingStep.values.first;
-                    }
-                  });
-                },
-          child: const Text('Next'),
+                          final index =
+                              _OnboardingStep.values.indexOf(currentStep);
+                          if (index > 0) {
+                            final newStep = _OnboardingStep.values[index - 1];
+
+                            completedSteps.remove(newStep);
+                            this.currentStep = newStep;
+                          }
+                        }
+                      });
+                    },
+              child: const Text('Previous'),
+            ),
+            const SizedBox(width: 16),
+            VoicesFilledButton(
+              onTap: completedSteps.containsAll(_OnboardingStep.values)
+                  ? null
+                  : () {
+                      setState(() {
+                        final currentStep = this.currentStep;
+                        if (currentStep != null) {
+                          completedSteps.add(currentStep);
+
+                          final index =
+                              _OnboardingStep.values.indexOf(currentStep);
+                          if (index < _OnboardingStep.values.length - 1) {
+                            this.currentStep =
+                                _OnboardingStep.values[index + 1];
+                          }
+                        } else {
+                          this.currentStep = _OnboardingStep.values.first;
+                        }
+                      });
+                    },
+              child: const Text('Next'),
+            ),
+          ],
         ),
       ],
     );
