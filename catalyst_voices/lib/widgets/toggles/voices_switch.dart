@@ -6,8 +6,6 @@ import 'package:flutter/material.dart';
 ///
 /// This widget provides a basic switch functionality with the ability to
 /// display a custom icon on the thumb.
-///
-/// {@category Widgets}
 class VoicesSwitch extends StatelessWidget {
   /// The current state of the switch.
   final bool value;
