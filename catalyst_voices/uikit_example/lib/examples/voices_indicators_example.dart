@@ -76,7 +76,7 @@ enum _OnboardingStep {
 
   String get stepName {
     return switch (this) {
-      _OnboardingStep.one => 'Step 2',
+      _OnboardingStep.one => 'Step 1',
       _OnboardingStep.two => 'Step 2',
       _OnboardingStep.three => 'Step 3',
       _OnboardingStep.four => 'Step 4',
@@ -113,51 +113,48 @@ class _StepsState extends State<_Steps> {
             VoicesFilledButton(
               onTap: completedSteps.isEmpty
                   ? null
-                  : () {
-                      setState(() {
-                        final currentStep = this.currentStep;
-                        if (currentStep != null) {
-                          completedSteps.remove(currentStep);
-
-                          final index =
-                              _OnboardingStep.values.indexOf(currentStep);
-                          if (index > 0) {
-                            final newStep = _OnboardingStep.values[index - 1];
-
-                            completedSteps.remove(newStep);
-                            this.currentStep = newStep;
-                          }
-                        }
-                      });
-                    },
+                  : () => setState(_goToPreviousStep),
               child: const Text('Previous'),
             ),
             const SizedBox(width: 16),
             VoicesFilledButton(
               onTap: completedSteps.containsAll(_OnboardingStep.values)
                   ? null
-                  : () {
-                      setState(() {
-                        final currentStep = this.currentStep;
-                        if (currentStep != null) {
-                          completedSteps.add(currentStep);
-
-                          final index =
-                              _OnboardingStep.values.indexOf(currentStep);
-                          if (index < _OnboardingStep.values.length - 1) {
-                            this.currentStep =
-                                _OnboardingStep.values[index + 1];
-                          }
-                        } else {
-                          this.currentStep = _OnboardingStep.values.first;
-                        }
-                      });
-                    },
+                  : () => setState(_goToNextStep),
               child: const Text('Next'),
             ),
           ],
         ),
       ],
     );
+  }
+
+  void _goToNextStep() {
+    final currentStep = this.currentStep;
+    if (currentStep != null) {
+      completedSteps.add(currentStep);
+
+      final index = _OnboardingStep.values.indexOf(currentStep);
+      if (index < _OnboardingStep.values.length - 1) {
+        this.currentStep = _OnboardingStep.values[index + 1];
+      }
+    } else {
+      this.currentStep = _OnboardingStep.values.first;
+    }
+  }
+
+  void _goToPreviousStep() {
+    final currentStep = this.currentStep;
+    if (currentStep != null) {
+      completedSteps.remove(currentStep);
+
+      final index = _OnboardingStep.values.indexOf(currentStep);
+      if (index > 0) {
+        final newStep = _OnboardingStep.values[index - 1];
+
+        completedSteps.remove(newStep);
+        this.currentStep = newStep;
+      }
+    }
   }
 }
