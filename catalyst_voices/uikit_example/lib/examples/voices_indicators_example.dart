@@ -54,7 +54,7 @@ class _Steps extends StatefulWidget {
 
 class _StepsState extends State<_Steps> {
   final completedSteps = <_OnboardingStep>{};
-  _OnboardingStep? currentStep;
+  _OnboardingStep? currentStep = _OnboardingStep.one;
 
   @override
   Widget build(BuildContext context) {

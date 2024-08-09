@@ -66,8 +66,6 @@ class ProcessProgressIndicator<T extends Object> extends StatelessWidget {
                   ? _StepIndicatorStatus.current
                   : _StepIndicatorStatus.upcoming;
 
-          // print('step[${step.value}] type[$type] status[$status]');
-
           return _StepRow(
             key: ValueKey('Step${step.value}RowKey'),
             name: step.name,
@@ -113,15 +111,59 @@ class _StepRow extends StatelessWidget {
               status: status,
             ),
           ),
-          const SizedBox(width: 10),
-          Center(
-            child: Text(
-              name,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
+          _StepNameText(
+            name,
+            type: type,
+            status: status,
+            neighborhood: neighborhood,
           ),
           const SizedBox(width: 10),
         ],
+      ),
+    );
+  }
+}
+
+class _StepNameText extends StatelessWidget {
+  const _StepNameText(
+    this.data, {
+    required this.type,
+    required this.status,
+    required this.neighborhood,
+  });
+
+  final String data;
+  final _StepIndicatorType type;
+  final _StepIndicatorStatus status;
+  final ({bool previous, bool next}) neighborhood;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: !neighborhood.previous
+          ? const EdgeInsets.only(top: 14)
+          : !neighborhood.next
+              ? const EdgeInsets.only(bottom: 10)
+              : null,
+      alignment: !neighborhood.previous
+          ? Alignment.topCenter
+          : !neighborhood.next
+              ? Alignment.bottomCenter
+              : Alignment.center,
+      child: Text(
+        data,
+        style: switch (status) {
+          _StepIndicatorStatus.current => theme.textTheme.titleSmall
+              ?.copyWith(color: theme.colors.textOnPrimary),
+          _StepIndicatorStatus.completed when type.isCompleted =>
+            theme.textTheme.titleSmall?.copyWith(color: theme.colors.success),
+          _StepIndicatorStatus.completed ||
+          _StepIndicatorStatus.upcoming =>
+            theme.textTheme.bodyMedium
+                ?.copyWith(color: theme.colors.textOnPrimary),
+        },
       ),
     );
   }
@@ -181,7 +223,7 @@ class _StepStatusIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnimatedContainer(
       constraints: BoxConstraints.tight(_buildSize()),
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 300),
       decoration: BoxDecoration(
         color: status.isCompleted
             ? Theme.of(context).colors.successContainer
@@ -224,7 +266,7 @@ class _StepStatusIndicator extends StatelessWidget {
         ),
       _StepIndicatorType.completes => Border.all(
           color: Theme.of(context).colorScheme.onSurface,
-          width: 2,
+          width: status.isCurrent ? 2 : 1,
         ),
     };
   }
