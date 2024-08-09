@@ -16,7 +16,7 @@ use crate::{
                 event_id::EventId, voter_registration::VoterRegistration,
                 voting_public_key::VotingPublicKey,
             },
-            responses::WithErrorResponses,
+            responses::WithAllErrorResponse,
             tags::ApiTags,
         },
         utilities::middleware::schema_validation::schema_version_validation,
@@ -36,7 +36,7 @@ enum Responses {
 }
 
 /// All responses
-type AllResponses = WithErrorResponses<Responses>;
+type AllResponses = WithAllErrorResponse<Responses>;
 
 #[OpenApi(prefix_path = "/registration", tag = "ApiTags::Registration")]
 impl RegistrationApi {

@@ -4,7 +4,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 use poem_openapi::ApiResponse;
 
-use crate::service::common::responses::WithErrorResponses;
+use crate::service::common::responses::WithBadRequestAndInternalServerErrorResponse;
 
 /// Flag to determine if the service has started
 static IS_LIVE: AtomicBool = AtomicBool::new(true);
@@ -15,7 +15,6 @@ pub(crate) fn set_live(flag: bool) {
     IS_LIVE.store(flag, Ordering::Release);
 }
 /// Get the started flag
-#[allow(dead_code)]
 fn is_live() -> bool {
     IS_LIVE.load(Ordering::Acquire)
 }
@@ -32,7 +31,7 @@ pub(crate) enum Responses {
 }
 
 /// All responses.
-pub(crate) type AllResponses = WithErrorResponses<Responses>;
+pub(crate) type AllResponses = WithBadRequestAndInternalServerErrorResponse<Responses>;
 
 /// # GET /health/live
 ///

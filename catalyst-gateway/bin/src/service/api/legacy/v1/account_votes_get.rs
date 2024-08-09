@@ -8,7 +8,7 @@ use poem_openapi::{param::Path, payload::Json, ApiResponse};
 use crate::{
     service::common::{
         objects::legacy::account_votes::{AccountId, AccountVote},
-        responses::WithErrorResponses,
+        responses::WithAllErrorResponse,
     },
     state::State,
 };
@@ -22,7 +22,7 @@ pub(crate) enum Responses {
 }
 
 /// All responses
-pub(crate) type AllResponses = WithErrorResponses<Responses>;
+pub(crate) type AllResponses = WithAllErrorResponse<Responses>;
 
 /// GET /v1/votes/plans/account-votes/:account_id
 ///
