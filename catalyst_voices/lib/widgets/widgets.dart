@@ -7,6 +7,7 @@ export 'indicators/voices_circular_progress_indicator.dart';
 export 'indicators/voices_linear_progress_indicator.dart';
 export 'separators/voices_divider.dart';
 export 'separators/voices_text_divider.dart';
+export 'separators/voices_vertical_divider.dart';
 export 'text_field/voices_email_text_field.dart';
 export 'text_field/voices_password_text_field.dart';
 export 'text_field/voices_text_field.dart';

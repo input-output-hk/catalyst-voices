@@ -39,6 +39,29 @@ class VoicesSeparatorsExample extends StatelessWidget {
               child: Text('Paragraph'),
             ),
           ),
+          const SizedBox(height: 28),
+          SizedBox(
+            height: 48,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  constraints: BoxConstraints.tight(const Size.square(48)),
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                ),
+                const VoicesVerticalDivider(),
+                Container(
+                  constraints: BoxConstraints.tight(const Size.square(48)),
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                ),
+                const VoicesVerticalDivider(),
+                Container(
+                  constraints: BoxConstraints.tight(const Size.square(48)),
+                  color: Theme.of(context).colorScheme.primaryContainer,
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
