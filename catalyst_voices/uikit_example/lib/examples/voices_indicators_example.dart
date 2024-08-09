@@ -76,7 +76,11 @@ enum _OnboardingStep {
 
   String get stepName {
     return switch (this) {
-      _ => 'Catalyst Onboarding questions',
+      _OnboardingStep.one => 'Step 2',
+      _OnboardingStep.two => 'Step 2',
+      _OnboardingStep.three => 'Step 3',
+      _OnboardingStep.four => 'Step 4',
+      _OnboardingStep.five => 'Step 5',
     };
   }
 }

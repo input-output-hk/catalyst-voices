@@ -1,9 +1,16 @@
+import 'package:catalyst_voices/widgets/separators/voices_vertical_divider.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
+/// A class representing a step in a progress indicator.
+///
+/// Generic type [T] represents the value associated with the step.
 class ProcessProgressStep<T extends Object> {
+  /// The value associated with the step.
   final T value;
+
+  /// The name of the step.
   final String name;
 
   ProcessProgressStep({
@@ -12,30 +19,30 @@ class ProcessProgressStep<T extends Object> {
   });
 }
 
-enum _StepIndicatorType {
-  standard,
-  completes;
-
-  bool get isStandard => this == _StepIndicatorType.standard;
-
-  bool get isCompleted => this == _StepIndicatorType.completes;
-}
-
-enum _StepIndicatorStatus {
-  completed,
-  current,
-  upcoming;
-
-  bool get isCompleted => this == _StepIndicatorStatus.completed;
-
-  bool get isCurrent => this == _StepIndicatorStatus.current;
-
-  bool get isUpcoming => this == _StepIndicatorStatus.upcoming;
-}
-
+/// A widget that displays a progress indicator for a series of steps.
+///
+/// Generic type [T] represents the value associated with each step.
+///
+/// Example usage:
+/// ```dart
+/// ProcessProgressIndicator<int>(
+///   steps: [
+///     ProcessProgressStep(value: 1, name: 'Step 1'),
+///     ProcessProgressStep(value: 2, name: 'Step 2'),
+///     ProcessProgressStep(value: 3, name: 'Step 3'),
+///   ],
+///   completed: {1, 2},
+///   current: 2,
+/// )
+/// ```
 class ProcessProgressIndicator<T extends Object> extends StatelessWidget {
+  /// The list of steps in the indicator.
   final List<ProcessProgressStep<T>> steps;
+
+  /// The set of completed steps.
   final Set<T> completed;
+
+  /// The current step.
   final T? current;
 
   const ProcessProgressIndicator({
@@ -79,6 +86,27 @@ class ProcessProgressIndicator<T extends Object> extends StatelessWidget {
   }
 }
 
+enum _StepIndicatorType {
+  standard,
+  completes;
+
+  bool get isStandard => this == _StepIndicatorType.standard;
+
+  bool get doesCompletes => this == _StepIndicatorType.completes;
+}
+
+enum _StepIndicatorStatus {
+  completed,
+  current,
+  upcoming;
+
+  bool get isCompleted => this == _StepIndicatorStatus.completed;
+
+  bool get isCurrent => this == _StepIndicatorStatus.current;
+
+  bool get isUpcoming => this == _StepIndicatorStatus.upcoming;
+}
+
 class _StepRow extends StatelessWidget {
   const _StepRow({
     super.key,
@@ -96,22 +124,22 @@ class _StepRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: BoxConstraints.tightFor(
-        height: !neighborhood.previous || !neighborhood.next ? 60 : 50,
-      ),
+      constraints: !neighborhood.previous || !neighborhood.next
+          ? const BoxConstraints.tightFor(height: 60)
+          : const BoxConstraints.tightFor(height: 50),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _StepStatusIndicatorContainer(
-            isExpanded: type == _StepIndicatorType.completes,
+            isExpanded: type.doesCompletes,
             neighborhood: neighborhood,
             child: _StepStatusIndicator(
               type: type,
               status: status,
             ),
           ),
-          _StepNameText(
+          _StepNameTextContainer(
             name,
             type: type,
             status: status,
@@ -124,8 +152,8 @@ class _StepRow extends StatelessWidget {
   }
 }
 
-class _StepNameText extends StatelessWidget {
-  const _StepNameText(
+class _StepNameTextContainer extends StatelessWidget {
+  const _StepNameTextContainer(
     this.data, {
     required this.type,
     required this.status,
@@ -140,6 +168,8 @@ class _StepNameText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final colors = theme.colors;
 
     return Container(
       padding: !neighborhood.previous
@@ -155,14 +185,13 @@ class _StepNameText extends StatelessWidget {
       child: Text(
         data,
         style: switch (status) {
-          _StepIndicatorStatus.current => theme.textTheme.titleSmall
-              ?.copyWith(color: theme.colors.textOnPrimary),
-          _StepIndicatorStatus.completed when type.isCompleted =>
-            theme.textTheme.titleSmall?.copyWith(color: theme.colors.success),
+          _StepIndicatorStatus.current =>
+            textTheme.titleSmall?.copyWith(color: colors.textOnPrimary),
+          _StepIndicatorStatus.completed when type.doesCompletes =>
+            textTheme.titleSmall?.copyWith(color: colors.success),
           _StepIndicatorStatus.completed ||
           _StepIndicatorStatus.upcoming =>
-            theme.textTheme.bodyMedium
-                ?.copyWith(color: theme.colors.textOnPrimary),
+            textTheme.bodyMedium?.copyWith(color: colors.textOnPrimary),
         },
       ),
     );
@@ -196,14 +225,13 @@ class _StepStatusIndicatorContainer extends StatelessWidget {
       alignment: Alignment.center,
       child: Column(
         children: [
-          // TODO(damian): Use VoicesDivider when available
-          if (neighborhood.previous) const Expanded(child: VerticalDivider()),
-
+          if (neighborhood.previous)
+            const Expanded(child: VoicesVerticalDivider()),
           ConstrainedBox(
             constraints: const BoxConstraints(minWidth: 50, maxWidth: 60),
             child: child,
           ),
-          if (neighborhood.next) const Expanded(child: VerticalDivider()),
+          if (neighborhood.next) const Expanded(child: VoicesVerticalDivider()),
         ],
       ),
     );
