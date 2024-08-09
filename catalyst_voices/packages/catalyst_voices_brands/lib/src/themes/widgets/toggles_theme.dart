@@ -106,6 +106,63 @@ extension TogglesTheme on ThemeData {
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
       ),
+      // Out of the box configuration is correct
+      switchTheme: SwitchThemeData(
+        trackColor: WidgetStateProperty.resolveWith(
+          (states) {
+            if (states.contains(WidgetState.selected) &&
+                !states.contains(WidgetState.disabled)) {
+              return colorScheme.primary;
+            }
+
+            return colors.outlineBorderVariant?.withOpacity(0.38);
+          },
+        ),
+        trackOutlineColor: WidgetStateProperty.resolveWith(
+          (states) {
+            if (states.contains(WidgetState.selected) &&
+                !states.contains(WidgetState.disabled)) {
+              return colorScheme.primary;
+            }
+
+            return colors.outlineBorder;
+          },
+        ),
+        trackOutlineWidth: WidgetStateProperty.resolveWith(
+          (states) {
+            if (states.contains(WidgetState.selected)) {
+              return states.contains(WidgetState.disabled) ? 1.0 : null;
+            }
+
+            return 2.0;
+          },
+        ),
+        thumbColor: WidgetStateProperty.resolveWith(
+          (states) {
+            // Selected states
+            if (states.contains(WidgetState.selected)) {
+              if (states.contains(WidgetState.disabled)) {
+                return colorScheme.surface;
+              }
+              if (states.contains(WidgetState.pressed) ||
+                  states.contains(WidgetState.hovered)) {
+                return colorScheme.primaryContainer;
+              }
+
+              return colorScheme.onPrimary;
+            }
+
+            // Not disabled and pressed or hovered
+            if (!states.contains(WidgetState.disabled) &&
+                (states.contains(WidgetState.pressed) ||
+                    states.contains(WidgetState.hovered))) {
+              return colors.iconsForeground;
+            }
+
+            return colors.outlineBorder;
+          },
+        ),
+      ),
     );
   }
 }
