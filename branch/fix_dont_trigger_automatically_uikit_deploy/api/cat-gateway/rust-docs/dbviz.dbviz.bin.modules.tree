@@ -1,0 +1,15 @@
+
+crate dbviz
+├── mod opts: pub(crate)
+│   ├── struct Cli: pub(crate)
+│   └── struct Pg: pub(crate)
+├── mod postgresql: pub(crate)
+│   └── struct Conn: pub
+└── mod schema: pub(crate)
+    ├── type FieldName: pub(crate)
+    ├── struct Index: pub(crate)
+    ├── struct Relation: pub(crate)
+    ├── struct Schema: pub(crate)
+    ├── struct Table: pub(crate)
+    ├── struct TableColumn: pub(crate)
+    └── type TableName: pub(crate)

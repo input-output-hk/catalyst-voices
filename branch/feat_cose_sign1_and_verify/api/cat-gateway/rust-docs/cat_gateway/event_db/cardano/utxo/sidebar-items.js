@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["SELECT_TOTAL_UTXO_AMOUNT_SQL"],"struct":["IndexedTxnInputParams","IndexedTxnOutputParams","IndexedTxnParams"],"type":["StakeAmount"]};

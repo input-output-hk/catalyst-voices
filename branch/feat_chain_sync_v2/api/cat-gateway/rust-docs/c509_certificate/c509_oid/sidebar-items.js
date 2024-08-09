@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["OID_PEN_TAG","PEN_PREFIX"],"struct":["C509oid","C509oidRegistered"]};

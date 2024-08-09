@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Errno"],"fn":["add_to_linker"],"trait":["Host"],"type":["Bstr"]};

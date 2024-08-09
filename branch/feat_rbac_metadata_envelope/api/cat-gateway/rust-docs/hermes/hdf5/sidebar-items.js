@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["compression","dir","file","path","resources"]};

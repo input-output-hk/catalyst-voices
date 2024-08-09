@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["validate_and_write_component","validate_and_write_config","validate_and_write_metadata","validate_and_write_settings","write_share_dir"],"mod":["config","manifest","settings","signature_payload"],"struct":["WasmModulePackage"]};

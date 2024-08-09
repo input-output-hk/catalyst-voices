@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["fetch_field","index_query","is_primary_key","relations_query","tables_query"],"struct":["Conn"]};

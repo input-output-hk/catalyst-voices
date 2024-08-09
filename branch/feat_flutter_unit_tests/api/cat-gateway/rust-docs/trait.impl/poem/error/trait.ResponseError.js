@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"cat_gateway":[["impl ResponseError for <a class=\"struct\" href=\"cat_gateway/service/common/responses/resp_5xx/struct.ServiceUnavailable.html\" title=\"struct cat_gateway::service::common::responses::resp_5xx::ServiceUnavailable\">ServiceUnavailable</a>"],["impl ResponseError for <a class=\"struct\" href=\"cat_gateway/service/common/responses/resp_5xx/struct.ServerError.html\" title=\"struct cat_gateway::service::common::responses::resp_5xx::ServerError\">ServerError</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

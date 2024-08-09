@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["AddIpfsFile","DhtMode","Ipld"],"struct":["GetIpfsFile","HermesIpfs","Ipfs","IpfsPath","Multiaddr","PeerId","PeerInfo"],"type":["Cid","IpfsBuilder"]};

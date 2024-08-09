@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["SIG_ALGO_DATA"],"fn":["get_oid_from_int"],"static":["ISSUER_SIG_ALGO_LOOKUP","ISSUER_SIG_ALGO_TABLE"],"struct":["IssuerSigAlgoData"],"type":["AlgorithmDataTuple"]};

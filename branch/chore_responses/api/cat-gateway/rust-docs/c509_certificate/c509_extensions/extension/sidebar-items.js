@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["ExtensionValue","ExtensionValueType"],"mod":["data"],"struct":["Extension","Helper"],"trait":["ExtensionValueTypeTrait"]};

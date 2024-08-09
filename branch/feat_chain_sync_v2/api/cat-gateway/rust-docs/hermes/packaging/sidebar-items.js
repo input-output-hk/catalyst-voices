@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["app","hash","metadata","package","resources","schema_validation","sign","wasm_module"],"struct":["FileError","MissingPackageFileError"]};

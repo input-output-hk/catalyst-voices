@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["config","manifest","metadata","settings","signature_payload"],"struct":["CreatePackageError","InvalidFileError","WasmModulePackage"]};

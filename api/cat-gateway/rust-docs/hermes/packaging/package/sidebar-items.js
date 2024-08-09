@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["BUFFER_SIZE"],"fn":["calculate_dir_hash","calculate_file_hash"],"struct":["Package"]};

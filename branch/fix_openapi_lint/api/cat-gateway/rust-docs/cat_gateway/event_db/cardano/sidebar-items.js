@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["config","follower","utxo","voter_registration"]};

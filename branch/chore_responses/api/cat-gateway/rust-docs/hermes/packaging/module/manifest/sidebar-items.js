@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["serde_def"],"struct":["Manifest","ManifestConfig","ManifestSettings"]};

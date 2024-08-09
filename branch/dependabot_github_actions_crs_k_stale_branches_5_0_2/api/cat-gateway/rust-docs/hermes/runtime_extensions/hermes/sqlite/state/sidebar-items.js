@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"static":["SQLITE_INTERNAL_STATE"],"struct":["InternalState","ResourceObjectState","ResourceState"],"type":["ObjectPointer","State"]};

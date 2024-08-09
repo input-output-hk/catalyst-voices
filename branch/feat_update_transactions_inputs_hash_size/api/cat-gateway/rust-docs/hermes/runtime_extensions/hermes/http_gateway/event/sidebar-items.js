@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["HTTPEventMsg"],"struct":["HTTPEvent"],"type":["Body","Code","HeadersKV","Method","Path"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["NONCE_COLUMN","PAYMENT_ADDRESS_COLUMN","PUBLIC_VOTING_KEY_COLUMN","SELECT_VOTER_REGISTRATION_SQL","TX_ID_COLUMN"],"struct":["IndexedVoterRegistrationParams"],"type":["MetadataCip36","Nonce","PaymentAddress","PublicVotingInfo","StakeCredential","TxId","_Stats"]};

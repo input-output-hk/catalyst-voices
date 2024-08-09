@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Command"],"fn":["executor","follower_connect_address","read_block","spawn","spawn_follower"],"struct":["Handle"],"type":["CommandReceiver","CommandSender"]};

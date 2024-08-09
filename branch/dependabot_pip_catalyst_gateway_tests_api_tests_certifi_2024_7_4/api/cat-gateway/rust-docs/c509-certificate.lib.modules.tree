@@ -1,0 +1,34 @@
+
+crate c509_certificate
+├── mod c509_extensions: pub
+│   ├── struct Extensions: pub
+│   ├── mod alt_name: pub
+│   │   ├── struct AltName: pub
+│   │   └── enum GeneralNamesOrText: pub
+│   └── mod extension: pub
+│       ├── struct Extension: pub
+│       ├── enum ExtensionValue: pub
+│       ├── trait ExtensionValueTypeTrait: pub(self)
+│       └── mod data: pub(self)
+│           ├── struct ExtensionData: pub(crate)
+│           └── type ExtensionDataTuple: pub(self)
+├── mod c509_general_names: pub
+│   ├── struct GeneralNames: pub
+│   ├── mod data: pub(self)
+│   │   ├── struct GeneralNameData: pub(crate)
+│   │   ├── type GeneralNameDataTuple: pub(self)
+│   │   └── struct IntegerToGNTable: pub(crate)
+│   ├── mod general_name: pub
+│   │   ├── struct GeneralName: pub
+│   │   ├── enum GeneralNameRegistry: pub
+│   │   ├── enum GeneralNameValue: pub
+│   │   └── trait GeneralNameValueTrait: pub(self)
+│   └── mod other_name_hw_module: pub(self)
+│       └── struct OtherNameHardwareModuleName: pub
+├── mod c509_oid: pub
+│   ├── struct C509oid: pub
+│   └── struct C509oidRegistered: pub
+└── mod tables: pub(crate)
+    ├── struct IntTable: pub(crate)
+    ├── struct IntegerToOidTable: pub(crate)
+    └── trait TableTrait: pub(crate)

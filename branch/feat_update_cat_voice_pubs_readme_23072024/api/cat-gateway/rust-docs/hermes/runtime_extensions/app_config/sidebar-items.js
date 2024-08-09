@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["MAX_CONFIG_DB_SIZE"],"fn":["get_app_in_memory_sqlite_db_cfg","get_app_persistent_sqlite_db_cfg"],"struct":["SqliteConfig"]};

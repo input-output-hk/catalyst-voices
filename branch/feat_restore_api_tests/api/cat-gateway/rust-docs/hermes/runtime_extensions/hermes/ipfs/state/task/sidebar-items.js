@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["IpfsCommand"],"fn":["ipfs_task","send_response"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["GENERAL_NAME_DATA"],"static":["GENERAL_NAME_TABLES"],"struct":["GeneralNameData","IntegerToGNTable"],"type":["GeneralNameDataTuple"]};

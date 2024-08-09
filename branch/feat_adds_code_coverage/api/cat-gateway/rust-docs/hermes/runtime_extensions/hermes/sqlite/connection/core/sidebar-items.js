@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["close","errcode","execute","prepare","validate_sql"]};

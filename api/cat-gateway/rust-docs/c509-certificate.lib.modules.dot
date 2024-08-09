@@ -1,0 +1,85 @@
+digraph {
+
+    graph [
+        label="c509_certificate",
+        labelloc=t,
+
+        pad=0.4,
+
+        // Consider rendering the graph using a different layout algorithm, such as:
+        // [dot, neato, twopi, circo, fdp, sfdp]
+        layout=neato,
+        overlap=false,
+        splines="line",
+        rankdir=LR,
+
+        fontname="Helvetica", 
+        fontsize="36",
+    ];
+
+    node [
+        fontname="monospace",
+        fontsize="10",
+        shape="record",
+        style="filled",
+    ];
+
+    edge [
+        fontname="monospace",
+        fontsize="10",
+    ];
+
+    "c509_certificate" [label="crate|c509_certificate", fillcolor="#5397c8"]; // "crate" node
+    "c509_certificate::c509" [label="pub mod|c509", fillcolor="#81c169"]; // "mod" node
+    "c509_certificate::c509_algo_identifier" [label="pub mod|c509_algo_identifier", fillcolor="#81c169"]; // "mod" node
+    "c509_certificate::c509_attributes" [label="pub mod|c509_attributes", fillcolor="#81c169"]; // "mod" node
+    "c509_certificate::c509_attributes::attribute" [label="pub mod|c509_attributes::attribute", fillcolor="#81c169"]; // "mod" node
+    "c509_certificate::c509_attributes::data" [label="pub(self) mod|c509_attributes::data", fillcolor="#db5367"]; // "mod" node
+    "c509_certificate::c509_big_uint" [label="pub mod|c509_big_uint", fillcolor="#81c169"]; // "mod" node
+    "c509_certificate::c509_extensions" [label="pub mod|c509_extensions", fillcolor="#81c169"]; // "mod" node
+    "c509_certificate::c509_extensions::alt_name" [label="pub mod|c509_extensions::alt_name", fillcolor="#81c169"]; // "mod" node
+    "c509_certificate::c509_extensions::extension" [label="pub mod|c509_extensions::extension", fillcolor="#81c169"]; // "mod" node
+    "c509_certificate::c509_extensions::extension::data" [label="pub(self) mod|c509_extensions::extension::data", fillcolor="#db5367"]; // "mod" node
+    "c509_certificate::c509_general_names" [label="pub mod|c509_general_names", fillcolor="#81c169"]; // "mod" node
+    "c509_certificate::c509_general_names::data" [label="pub(self) mod|c509_general_names::data", fillcolor="#db5367"]; // "mod" node
+    "c509_certificate::c509_general_names::general_name" [label="pub mod|c509_general_names::general_name", fillcolor="#81c169"]; // "mod" node
+    "c509_certificate::c509_general_names::other_name_hw_module" [label="pub mod|c509_general_names::other_name_hw_module", fillcolor="#81c169"]; // "mod" node
+    "c509_certificate::c509_issuer_sig_algo" [label="pub mod|c509_issuer_sig_algo", fillcolor="#81c169"]; // "mod" node
+    "c509_certificate::c509_issuer_sig_algo::data" [label="pub(self) mod|c509_issuer_sig_algo::data", fillcolor="#db5367"]; // "mod" node
+    "c509_certificate::c509_name" [label="pub mod|c509_name", fillcolor="#81c169"]; // "mod" node
+    "c509_certificate::c509_name::rdn" [label="pub mod|c509_name::rdn", fillcolor="#81c169"]; // "mod" node
+    "c509_certificate::c509_oid" [label="pub mod|c509_oid", fillcolor="#81c169"]; // "mod" node
+    "c509_certificate::c509_subject_pub_key_algo" [label="pub mod|c509_subject_pub_key_algo", fillcolor="#81c169"]; // "mod" node
+    "c509_certificate::c509_subject_pub_key_algo::data" [label="pub(self) mod|c509_subject_pub_key_algo::data", fillcolor="#db5367"]; // "mod" node
+    "c509_certificate::c509_time" [label="pub mod|c509_time", fillcolor="#81c169"]; // "mod" node
+    "c509_certificate::signing" [label="pub mod|signing", fillcolor="#81c169"]; // "mod" node
+    "c509_certificate::tables" [label="pub(crate) mod|tables", fillcolor="#f8c04c"]; // "mod" node
+    "c509_certificate::tbs_cert" [label="pub mod|tbs_cert", fillcolor="#81c169"]; // "mod" node
+
+    "c509_certificate" -> "c509_certificate::c509" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate" -> "c509_certificate::c509_algo_identifier" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate" -> "c509_certificate::c509_attributes" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate" -> "c509_certificate::c509_big_uint" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate" -> "c509_certificate::c509_extensions" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate" -> "c509_certificate::c509_general_names" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate" -> "c509_certificate::c509_issuer_sig_algo" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate" -> "c509_certificate::c509_name" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate" -> "c509_certificate::c509_oid" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate" -> "c509_certificate::c509_subject_pub_key_algo" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate" -> "c509_certificate::c509_time" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate" -> "c509_certificate::signing" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate" -> "c509_certificate::tables" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate" -> "c509_certificate::tbs_cert" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate::c509_attributes" -> "c509_certificate::c509_attributes::attribute" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate::c509_attributes" -> "c509_certificate::c509_attributes::data" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate::c509_extensions" -> "c509_certificate::c509_extensions::alt_name" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate::c509_extensions" -> "c509_certificate::c509_extensions::extension" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate::c509_extensions::extension" -> "c509_certificate::c509_extensions::extension::data" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate::c509_general_names" -> "c509_certificate::c509_general_names::data" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate::c509_general_names" -> "c509_certificate::c509_general_names::general_name" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate::c509_general_names" -> "c509_certificate::c509_general_names::other_name_hw_module" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate::c509_issuer_sig_algo" -> "c509_certificate::c509_issuer_sig_algo::data" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate::c509_name" -> "c509_certificate::c509_name::rdn" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate::c509_subject_pub_key_algo" -> "c509_certificate::c509_subject_pub_key_algo::data" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+
+}

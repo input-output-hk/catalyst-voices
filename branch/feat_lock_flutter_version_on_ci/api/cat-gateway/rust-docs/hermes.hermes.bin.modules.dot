@@ -1,0 +1,197 @@
+digraph {
+
+    graph [
+        label="hermes",
+        labelloc=t,
+
+        pad=0.4,
+
+        // Consider rendering the graph using a different layout algorithm, such as:
+        // [dot, neato, twopi, circo, fdp, sfdp]
+        layout=neato,
+        overlap=false,
+        splines="line",
+        rankdir=LR,
+
+        fontname="Helvetica", 
+        fontsize="36",
+    ];
+
+    node [
+        fontname="monospace",
+        fontsize="10",
+        shape="record",
+        style="filled",
+    ];
+
+    edge [
+        fontname="monospace",
+        fontsize="10",
+    ];
+
+    "hermes" [label="crate|hermes", fillcolor="#5397c8"]; // "crate" node
+    "hermes::app" [label="pub(crate) mod|app", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::event" [label="pub(crate) mod|event", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::event::queue" [label="pub(crate) mod|event::queue", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::logger" [label="pub(crate) mod|logger", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::reactor" [label="pub(crate) mod|reactor", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_context" [label="pub(crate) mod|runtime_context", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions" [label="pub(crate) mod|runtime_extensions", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::bindings" [label="pub(crate) mod|runtime_extensions::bindings", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::hermes" [label="pub mod|runtime_extensions::hermes", fillcolor="#81c169"]; // "mod" node
+    "hermes::runtime_extensions::hermes::binary" [label="pub(crate) mod|runtime_extensions::hermes::binary", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::hermes::binary::host" [label="pub(self) mod|runtime_extensions::hermes::binary::host", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::cardano" [label="pub(crate) mod|runtime_extensions::hermes::cardano", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::hermes::cardano::chain_follower_task" [label="pub(self) mod|runtime_extensions::hermes::cardano::chain_follower_task", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::cardano::event" [label="pub(self) mod|runtime_extensions::hermes::cardano::event", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::cardano::host" [label="pub(self) mod|runtime_extensions::hermes::cardano::host", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::cardano::tokio_runtime_task" [label="pub(self) mod|runtime_extensions::hermes::cardano::tokio_runtime_task", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::cbor" [label="pub(crate) mod|runtime_extensions::hermes::cbor", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::hermes::cbor::host" [label="pub(self) mod|runtime_extensions::hermes::cbor::host", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::cron" [label="pub(crate) mod|runtime_extensions::hermes::cron", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::hermes::cron::event" [label="pub(self) mod|runtime_extensions::hermes::cron::event", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::cron::host" [label="pub(self) mod|runtime_extensions::hermes::cron::host", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::cron::queue" [label="pub(self) mod|runtime_extensions::hermes::cron::queue", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::cron::state" [label="pub(self) mod|runtime_extensions::hermes::cron::state", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::crypto" [label="pub(crate) mod|runtime_extensions::hermes::crypto", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::hermes::crypto::bip32_ed25519" [label="pub(self) mod|runtime_extensions::hermes::crypto::bip32_ed25519", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::crypto::bip39" [label="pub(self) mod|runtime_extensions::hermes::crypto::bip39", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::crypto::host" [label="pub(self) mod|runtime_extensions::hermes::crypto::host", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::crypto::state" [label="pub(self) mod|runtime_extensions::hermes::crypto::state", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::hash" [label="pub(crate) mod|runtime_extensions::hermes::hash", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::hermes::hash::blake2b" [label="pub(self) mod|runtime_extensions::hermes::hash::blake2b", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::hash::host" [label="pub(self) mod|runtime_extensions::hermes::hash::host", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::init" [label="pub(crate) mod|runtime_extensions::hermes::init", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::hermes::init::event" [label="pub(self) mod|runtime_extensions::hermes::init::event", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::integration_test" [label="pub mod|runtime_extensions::hermes::integration_test", fillcolor="#81c169"]; // "mod" node
+    "hermes::runtime_extensions::hermes::integration_test::event" [label="pub mod|runtime_extensions::hermes::integration_test::event", fillcolor="#81c169"]; // "mod" node
+    "hermes::runtime_extensions::hermes::json" [label="pub(crate) mod|runtime_extensions::hermes::json", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::hermes::json::host" [label="pub(self) mod|runtime_extensions::hermes::json::host", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::kv_store" [label="pub(crate) mod|runtime_extensions::hermes::kv_store", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::hermes::kv_store::event" [label="pub(self) mod|runtime_extensions::hermes::kv_store::event", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::kv_store::host" [label="pub(self) mod|runtime_extensions::hermes::kv_store::host", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::localtime" [label="pub(crate) mod|runtime_extensions::hermes::localtime", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::hermes::localtime::host" [label="pub(self) mod|runtime_extensions::hermes::localtime::host", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::localtime::time" [label="pub(self) mod|runtime_extensions::hermes::localtime::time", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::logging" [label="pub(crate) mod|runtime_extensions::hermes::logging", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::hermes::logging::host" [label="pub(self) mod|runtime_extensions::hermes::logging::host", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::logging::log_msg" [label="pub(self) mod|runtime_extensions::hermes::logging::log_msg", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::sqlite" [label="pub(crate) mod|runtime_extensions::hermes::sqlite", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::hermes::sqlite::connection" [label="pub(self) mod|runtime_extensions::hermes::sqlite::connection", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::sqlite::connection::host" [label="pub(self) mod|runtime_extensions::hermes::sqlite::connection::host", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::sqlite::host" [label="pub(self) mod|runtime_extensions::hermes::sqlite::host", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::sqlite::statement" [label="pub(self) mod|runtime_extensions::hermes::sqlite::statement", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::hermes::sqlite::statement::host" [label="pub(self) mod|runtime_extensions::hermes::sqlite::statement::host", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::wasi" [label="pub(crate) mod|runtime_extensions::wasi", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::wasi::cli" [label="pub(crate) mod|runtime_extensions::wasi::cli", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::wasi::cli::host" [label="pub(self) mod|runtime_extensions::wasi::cli::host", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::wasi::clocks" [label="pub(crate) mod|runtime_extensions::wasi::clocks", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::wasi::clocks::monotonic" [label="pub(self) mod|runtime_extensions::wasi::clocks::monotonic", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::wasi::clocks::monotonic::host" [label="pub(self) mod|runtime_extensions::wasi::clocks::monotonic::host", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::wasi::clocks::state" [label="pub(self) mod|runtime_extensions::wasi::clocks::state", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::wasi::clocks::wall" [label="pub(self) mod|runtime_extensions::wasi::clocks::wall", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::wasi::clocks::wall::host" [label="pub(self) mod|runtime_extensions::wasi::clocks::wall::host", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::wasi::filesystem" [label="pub(crate) mod|runtime_extensions::wasi::filesystem", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::wasi::filesystem::host" [label="pub(self) mod|runtime_extensions::wasi::filesystem::host", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::wasi::http" [label="pub(crate) mod|runtime_extensions::wasi::http", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::wasi::http::host" [label="pub(self) mod|runtime_extensions::wasi::http::host", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::wasi::io" [label="pub(crate) mod|runtime_extensions::wasi::io", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::wasi::io::error" [label="pub(crate) mod|runtime_extensions::wasi::io::error", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::wasi::io::error::host" [label="pub(self) mod|runtime_extensions::wasi::io::error::host", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::wasi::io::streams" [label="pub(crate) mod|runtime_extensions::wasi::io::streams", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::wasi::io::streams::host" [label="pub(self) mod|runtime_extensions::wasi::io::streams::host", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::wasi::random" [label="pub(crate) mod|runtime_extensions::wasi::random", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::wasi::random::insecure" [label="pub(crate) mod|runtime_extensions::wasi::random::insecure", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::wasi::random::insecure::host" [label="pub(self) mod|runtime_extensions::wasi::random::insecure::host", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::wasi::random::insecure_seed" [label="pub(crate) mod|runtime_extensions::wasi::random::insecure_seed", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::wasi::random::insecure_seed::host" [label="pub(self) mod|runtime_extensions::wasi::random::insecure_seed::host", fillcolor="#db5367"]; // "mod" node
+    "hermes::runtime_extensions::wasi::random::secure" [label="pub(crate) mod|runtime_extensions::wasi::random::secure", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::runtime_extensions::wasi::random::secure::host" [label="pub(self) mod|runtime_extensions::wasi::random::secure::host", fillcolor="#db5367"]; // "mod" node
+    "hermes::wasm" [label="pub(crate) mod|wasm", fillcolor="#f8c04c"]; // "mod" node
+    "hermes::wasm::engine" [label="pub(self) mod|wasm::engine", fillcolor="#db5367"]; // "mod" node
+    "hermes::wasm::module" [label="pub mod|wasm::module", fillcolor="#81c169"]; // "mod" node
+    "hermes::wasm::module::bench" [label="pub mod|wasm::module::bench", fillcolor="#81c169"]; // "mod" node
+
+    "hermes" -> "hermes::app" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes" -> "hermes::event" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes" -> "hermes::logger" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes" -> "hermes::reactor" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes" -> "hermes::runtime_context" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes" -> "hermes::runtime_extensions" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes" -> "hermes::wasm" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::event" -> "hermes::event::queue" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions" -> "hermes::runtime_extensions::bindings" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions" -> "hermes::runtime_extensions::hermes" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions" -> "hermes::runtime_extensions::wasi" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes" -> "hermes::runtime_extensions::hermes::binary" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes" -> "hermes::runtime_extensions::hermes::cardano" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes" -> "hermes::runtime_extensions::hermes::cbor" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes" -> "hermes::runtime_extensions::hermes::cron" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes" -> "hermes::runtime_extensions::hermes::crypto" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes" -> "hermes::runtime_extensions::hermes::hash" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes" -> "hermes::runtime_extensions::hermes::init" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes" -> "hermes::runtime_extensions::hermes::integration_test" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes" -> "hermes::runtime_extensions::hermes::json" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes" -> "hermes::runtime_extensions::hermes::kv_store" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes" -> "hermes::runtime_extensions::hermes::localtime" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes" -> "hermes::runtime_extensions::hermes::logging" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes" -> "hermes::runtime_extensions::hermes::sqlite" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::binary" -> "hermes::runtime_extensions::hermes::binary::host" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::cardano" -> "hermes::runtime_extensions::hermes::cardano::chain_follower_task" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::cardano" -> "hermes::runtime_extensions::hermes::cardano::event" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::cardano" -> "hermes::runtime_extensions::hermes::cardano::host" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::cardano" -> "hermes::runtime_extensions::hermes::cardano::tokio_runtime_task" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::cbor" -> "hermes::runtime_extensions::hermes::cbor::host" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::cron" -> "hermes::runtime_extensions::hermes::cron::event" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::cron" -> "hermes::runtime_extensions::hermes::cron::host" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::cron" -> "hermes::runtime_extensions::hermes::cron::queue" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::cron" -> "hermes::runtime_extensions::hermes::cron::state" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::crypto" -> "hermes::runtime_extensions::hermes::crypto::bip32_ed25519" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::crypto" -> "hermes::runtime_extensions::hermes::crypto::bip39" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::crypto" -> "hermes::runtime_extensions::hermes::crypto::host" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::crypto" -> "hermes::runtime_extensions::hermes::crypto::state" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::hash" -> "hermes::runtime_extensions::hermes::hash::blake2b" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::hash" -> "hermes::runtime_extensions::hermes::hash::host" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::init" -> "hermes::runtime_extensions::hermes::init::event" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::integration_test" -> "hermes::runtime_extensions::hermes::integration_test::event" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::json" -> "hermes::runtime_extensions::hermes::json::host" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::kv_store" -> "hermes::runtime_extensions::hermes::kv_store::event" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::kv_store" -> "hermes::runtime_extensions::hermes::kv_store::host" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::localtime" -> "hermes::runtime_extensions::hermes::localtime::host" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::localtime" -> "hermes::runtime_extensions::hermes::localtime::time" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::logging" -> "hermes::runtime_extensions::hermes::logging::host" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::logging" -> "hermes::runtime_extensions::hermes::logging::log_msg" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::sqlite" -> "hermes::runtime_extensions::hermes::sqlite::connection" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::sqlite" -> "hermes::runtime_extensions::hermes::sqlite::host" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::sqlite" -> "hermes::runtime_extensions::hermes::sqlite::statement" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::sqlite::connection" -> "hermes::runtime_extensions::hermes::sqlite::connection::host" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::hermes::sqlite::statement" -> "hermes::runtime_extensions::hermes::sqlite::statement::host" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::wasi" -> "hermes::runtime_extensions::wasi::cli" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::wasi" -> "hermes::runtime_extensions::wasi::clocks" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::wasi" -> "hermes::runtime_extensions::wasi::filesystem" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::wasi" -> "hermes::runtime_extensions::wasi::http" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::wasi" -> "hermes::runtime_extensions::wasi::io" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::wasi" -> "hermes::runtime_extensions::wasi::random" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::wasi::cli" -> "hermes::runtime_extensions::wasi::cli::host" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::wasi::clocks" -> "hermes::runtime_extensions::wasi::clocks::monotonic" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::wasi::clocks" -> "hermes::runtime_extensions::wasi::clocks::state" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::wasi::clocks" -> "hermes::runtime_extensions::wasi::clocks::wall" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::wasi::clocks::monotonic" -> "hermes::runtime_extensions::wasi::clocks::monotonic::host" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::wasi::clocks::wall" -> "hermes::runtime_extensions::wasi::clocks::wall::host" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::wasi::filesystem" -> "hermes::runtime_extensions::wasi::filesystem::host" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::wasi::http" -> "hermes::runtime_extensions::wasi::http::host" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::wasi::io" -> "hermes::runtime_extensions::wasi::io::error" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::wasi::io" -> "hermes::runtime_extensions::wasi::io::streams" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::wasi::io::error" -> "hermes::runtime_extensions::wasi::io::error::host" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::wasi::io::streams" -> "hermes::runtime_extensions::wasi::io::streams::host" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::wasi::random" -> "hermes::runtime_extensions::wasi::random::insecure" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::wasi::random" -> "hermes::runtime_extensions::wasi::random::insecure_seed" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::wasi::random" -> "hermes::runtime_extensions::wasi::random::secure" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::wasi::random::insecure" -> "hermes::runtime_extensions::wasi::random::insecure::host" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::wasi::random::insecure_seed" -> "hermes::runtime_extensions::wasi::random::insecure_seed::host" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::runtime_extensions::wasi::random::secure" -> "hermes::runtime_extensions::wasi::random::secure::host" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::wasm" -> "hermes::wasm::engine" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::wasm" -> "hermes::wasm::module" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "hermes::wasm::module" -> "hermes::wasm::module::bench" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+
+}

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["SELECT_CONFIG_SQL"],"enum":["ConfigId"],"struct":["FollowerConfig","MithrilSnapshotConfig"]};

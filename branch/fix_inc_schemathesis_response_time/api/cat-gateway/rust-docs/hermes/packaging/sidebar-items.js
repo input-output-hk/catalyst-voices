@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["copy_dir_recursively_to_package","copy_resource_to_package"],"mod":["compression","resources","schema_validation","wasm_module"]};

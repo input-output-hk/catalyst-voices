@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["COMPRESSION_ALGORITHM","COMPRESSION_LEVEL","MIN_BLOSC_THREADS","MIN_CHUNK_SIZE"],"fn":["blosc_init","enable_compression"],"static":["BLOSC_THREADS_INIT"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["data","general_name","other_name_hw_module"],"struct":["GeneralNames"]};

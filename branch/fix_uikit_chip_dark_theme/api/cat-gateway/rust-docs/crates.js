@@ -1,0 +1,1 @@
+window.ALL_CRATES = ["bar","cat_gateway","dbviz","foo"];

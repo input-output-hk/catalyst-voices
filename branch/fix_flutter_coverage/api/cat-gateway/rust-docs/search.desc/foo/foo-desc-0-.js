@@ -1,0 +1,1 @@
+searchState.loadedDescShard("foo", 0, "Simple program to greet a person. Used as a test of the …\nSimple program to greet a person\nNumber of times to greet\nReturns the argument unchanged.\nCalls <code>U::from(self)</code>.\nThe main entrypoint of this program.\nName of the person to greet")

@@ -1,0 +1,1 @@
+searchState.loadedDescShard("bar", 0, "This is the bar crate\nAdds two numbers")

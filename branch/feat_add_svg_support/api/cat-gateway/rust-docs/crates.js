@@ -1,0 +1,1 @@
+window.ALL_CRATES = ["abnf_parser","bar","cardano_chain_follower","cat_gateway","cddl_parser","concurrent_reads","dbviz","follow_chain_updates","follow_chain_updates_mithril","foo","hermes","read_block","read_block_mithril","read_block_range","read_block_range_mithril","set_read_pointer"];

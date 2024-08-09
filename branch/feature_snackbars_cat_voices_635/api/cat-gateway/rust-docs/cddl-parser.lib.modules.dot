@@ -1,0 +1,43 @@
+digraph {
+
+    graph [
+        label="cddl_parser",
+        labelloc=t,
+
+        pad=0.4,
+
+        // Consider rendering the graph using a different layout algorithm, such as:
+        // [dot, neato, twopi, circo, fdp, sfdp]
+        layout=neato,
+        overlap=false,
+        splines="line",
+        rankdir=LR,
+
+        fontname="Helvetica", 
+        fontsize="36",
+    ];
+
+    node [
+        fontname="monospace",
+        fontsize="10",
+        shape="record",
+        style="filled",
+    ];
+
+    edge [
+        fontname="monospace",
+        fontsize="10",
+    ];
+
+    "cddl_parser" [label="crate|cddl_parser", fillcolor="#5397c8"]; // "crate" node
+    "cddl_parser::cddl" [label="pub mod|cddl", fillcolor="#81c169"]; // "mod" node
+    "cddl_parser::cddl_test" [label="pub mod|cddl_test", fillcolor="#81c169"]; // "mod" node
+    "cddl_parser::rfc_8610" [label="pub mod|rfc_8610", fillcolor="#81c169"]; // "mod" node
+    "cddl_parser::rfc_9165" [label="pub mod|rfc_9165", fillcolor="#81c169"]; // "mod" node
+
+    "cddl_parser" -> "cddl_parser::cddl" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cddl_parser" -> "cddl_parser::cddl_test" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cddl_parser" -> "cddl_parser::rfc_8610" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cddl_parser" -> "cddl_parser::rfc_9165" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+
+}

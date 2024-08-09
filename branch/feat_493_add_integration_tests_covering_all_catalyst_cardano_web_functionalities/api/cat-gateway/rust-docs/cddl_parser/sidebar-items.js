@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["POSTLUDE"],"enum":["AST","CDDLErrorType","Extension"],"fn":["parse_cddl"],"mod":["cddl","cddl_test","rfc_8610","rfc_9165"],"struct":["CDDLError"],"trait":["Parser"]};

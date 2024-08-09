@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["event","registration","search","vit_ss"]};

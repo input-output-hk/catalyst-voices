@@ -1,0 +1,74 @@
+
+crate c509_certificate
+├── mod c509: pub
+│   └── struct C509: pub
+├── mod c509_algo_identifier: pub
+│   └── struct AlgorithmIdentifier: pub
+├── mod c509_attributes: pub
+│   ├── struct Attributes: pub
+│   ├── mod attribute: pub
+│   │   ├── struct Attribute: pub
+│   │   └── enum AttributeValue: pub
+│   └── mod data: pub(self)
+│       ├── struct AttributeData: pub(crate)
+│       └── type AttributeDataTuple: pub(self)
+├── mod c509_big_uint: pub
+│   └── struct UnwrappedBigUint: pub
+├── mod c509_extensions: pub
+│   ├── struct Extensions: pub
+│   ├── mod alt_name: pub
+│   │   ├── struct AlternativeName: pub
+│   │   └── enum GeneralNamesOrText: pub
+│   └── mod extension: pub
+│       ├── struct Extension: pub
+│       ├── enum ExtensionValue: pub
+│       ├── trait ExtensionValueTypeTrait: pub(self)
+│       └── mod data: pub(self)
+│           ├── type Evt: pub(self)
+│           ├── struct ExtensionData: pub(crate)
+│           └── type ExtensionDataTuple: pub(self)
+├── mod c509_general_names: pub
+│   ├── struct GeneralNames: pub
+│   ├── mod data: pub(self)
+│   │   ├── struct GeneralNameData: pub(crate)
+│   │   ├── type GeneralNameDataTuple: pub(self)
+│   │   ├── type Gntr: pub(self)
+│   │   ├── type Gnvt: pub(self)
+│   │   └── struct IntegerToGNTable: pub(crate)
+│   ├── mod general_name: pub
+│   │   ├── struct GeneralName: pub
+│   │   ├── enum GeneralNameTypeRegistry: pub
+│   │   ├── enum GeneralNameValue: pub
+│   │   └── trait GeneralNameValueTrait: pub(self)
+│   └── mod other_name_hw_module: pub
+│       └── struct OtherNameHardwareModuleName: pub
+├── mod c509_issuer_sig_algo: pub
+│   ├── struct IssuerSignatureAlgorithm: pub
+│   └── mod data: pub(self)
+│       ├── type AlgorithmDataTuple: pub(self)
+│       └── struct IssuerSigAlgoData: pub(crate)
+├── mod c509_name: pub
+│   ├── struct Name: pub
+│   ├── enum NameValue: pub
+│   └── mod rdn: pub
+│       └── struct RelativeDistinguishedName: pub
+├── mod c509_oid: pub
+│   ├── struct C509oid: pub
+│   └── struct C509oidRegistered: pub
+├── mod c509_subject_pub_key_algo: pub
+│   ├── struct SubjectPubKeyAlgorithm: pub
+│   └── mod data: pub(self)
+│       ├── type AlgorithmDataTuple: pub(self)
+│       └── struct SubjectPubKeyAlgoData: pub(crate)
+├── mod c509_time: pub
+│   └── struct Time: pub
+├── mod signing: pub
+│   ├── struct KeyPemDecodingError: pub(crate)
+│   ├── struct PrivateKey: pub
+│   └── struct PublicKey: pub
+├── mod tables: pub(crate)
+│   ├── struct IntTable: pub(crate)
+│   ├── struct IntegerToOidTable: pub(crate)
+│   └── trait TableTrait: pub(crate)
+└── mod tbs_cert: pub
+    └── struct TbsCert: pub

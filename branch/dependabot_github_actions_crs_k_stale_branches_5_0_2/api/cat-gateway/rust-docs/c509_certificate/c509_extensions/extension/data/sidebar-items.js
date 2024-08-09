@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["EXTENSION_DATA"],"fn":["get_extension_type_from_int","get_oid_from_int"],"static":["EXTENSIONS_LOOKUP","EXTENSIONS_TABLES"],"struct":["ExtensionData"],"type":["Evt","ExtensionDataTuple"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["Index","Relation","Schema","Table","TableColumn"],"type":["FieldName","TableName"]};

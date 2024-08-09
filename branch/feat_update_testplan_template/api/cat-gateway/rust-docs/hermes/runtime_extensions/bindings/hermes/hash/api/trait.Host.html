@@ -1,0 +1,179 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `Host` trait in crate `hermes`."><title>Host in hermes::runtime_extensions::bindings::hermes::hash::api - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../../../../" data-static-root-path="../../../../../../static.files/" data-current-crate="hermes" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0-nightly (f8e566053 2024-06-14)" data-channel="nightly" data-search-js="search-0fe7219eb170c82e.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="sidebar-items.js"></script><script defer src="../../../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc trait"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../../../../hermes/index.html">hermes</a><span class="version">0.0.1</span></h2></div><h2 class="location"><a href="#">Host</a></h2><div class="sidebar-elems"><section><h3><a href="#required-methods">Required Methods</a></h3><ul class="block"><li><a href="#tymethod.blake2b">blake2b</a></li><li><a href="#tymethod.blake2bmac">blake2bmac</a></li><li><a href="#tymethod.blake2s">blake2s</a></li><li><a href="#tymethod.blake2smac">blake2smac</a></li><li><a href="#tymethod.blake3">blake3</a></li></ul><h3><a href="#implementors">Implementors</a></h3></section><h2><a href="index.html">In hermes::runtime_extensions::bindings::hermes::hash::api</a></h2></div></nav><div class="sidebar-resizer"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1>Trait <a href="../../../../../index.html">hermes</a>::<wbr><a href="../../../../index.html">runtime_extensions</a>::<wbr><a href="../../../index.html">bindings</a>::<wbr><a href="../../index.html">hermes</a>::<wbr><a href="../index.html">hash</a>::<wbr><a href="index.html">api</a>::<wbr><a class="trait" href="#">Host</a><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><span class="out-of-band"><a class="src" href="../../../../../../src/hermes/runtime_extensions/bindings.rs.html#13-16">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><pre class="rust item-decl"><code>pub trait Host {
+    // Required methods
+    fn <a href="#tymethod.blake2s" class="fn">blake2s</a>(
+        &amp;mut self,
+        buf: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+        outlen: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+    ) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;, <a class="enum" href="enum.Errno.html" title="enum hermes::runtime_extensions::bindings::hermes::hash::api::Errno">Errno</a>&gt;&gt;;
+<span class="item-spacer"></span>    fn <a href="#tymethod.blake2smac" class="fn">blake2smac</a>(
+        &amp;mut self,
+        buf: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+        outlen: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+        key: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+        salt: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;&gt;,
+        personal: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;&gt;,
+    ) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;, <a class="enum" href="enum.Errno.html" title="enum hermes::runtime_extensions::bindings::hermes::hash::api::Errno">Errno</a>&gt;&gt;;
+<span class="item-spacer"></span>    fn <a href="#tymethod.blake2b" class="fn">blake2b</a>(
+        &amp;mut self,
+        buf: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+        outlen: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+    ) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;, <a class="enum" href="enum.Errno.html" title="enum hermes::runtime_extensions::bindings::hermes::hash::api::Errno">Errno</a>&gt;&gt;;
+<span class="item-spacer"></span>    fn <a href="#tymethod.blake2bmac" class="fn">blake2bmac</a>(
+        &amp;mut self,
+        buf: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+        outlen: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+        key: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+        salt: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;&gt;,
+        personal: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;&gt;,
+    ) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;, <a class="enum" href="enum.Errno.html" title="enum hermes::runtime_extensions::bindings::hermes::hash::api::Errno">Errno</a>&gt;&gt;;
+<span class="item-spacer"></span>    fn <a href="#tymethod.blake3" class="fn">blake3</a>(
+        &amp;mut self,
+        buf: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+        outlen: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+        key: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;&gt;,
+    ) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;, <a class="enum" href="enum.Errno.html" title="enum hermes::runtime_extensions::bindings::hermes::hash::api::Errno">Errno</a>&gt;&gt;;
+}</code></pre><h2 id="required-methods" class="section-header">Required Methods<a href="#required-methods" class="anchor">§</a></h2><div class="methods"><details class="toggle method-toggle" open><summary><section id="tymethod.blake2s" class="method"><a class="src rightside" href="../../../../../../src/hermes/runtime_extensions/bindings.rs.html#13-16">source</a><h4 class="code-header">fn <a href="#tymethod.blake2s" class="fn">blake2s</a>(
+    &amp;mut self,
+    buf: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+    outlen: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;, <a class="enum" href="enum.Errno.html" title="enum hermes::runtime_extensions::bindings::hermes::hash::api::Errno">Errno</a>&gt;&gt;</h4></section></summary><div class="docblock"><h5 id="blake2s-hash-function"><a class="doc-anchor" href="#blake2s-hash-function">§</a>BLAKE2s Hash Function</h5>
+<p>Hash a binary buffer with BLAKE2s.</p>
+<h6 id="parameters"><a class="doc-anchor" href="#parameters">§</a>Parameters</h6>
+<ul>
+<li><code>buf</code>: The binary data buffer to hash.</li>
+<li><code>outlen</code>: Optional.  The size of the digest.
+If the outlen is not defined, it defaults to 32.</li>
+</ul>
+<h6 id="returns"><a class="doc-anchor" href="#returns">§</a>Returns</h6>
+<ul>
+<li>Either a buffer the size requested, with the hash.</li>
+<li>Or an error:</li>
+<li><code>hash_too_big</code> if <code>outlen</code> is specified and is &gt; 32 bytes.</li>
+<li><code>invalid_digest_byte_length</code> if <code>outlen</code> is specified and is = 0.</li>
+</ul>
+</div></details><details class="toggle method-toggle" open><summary><section id="tymethod.blake2smac" class="method"><a class="src rightside" href="../../../../../../src/hermes/runtime_extensions/bindings.rs.html#13-16">source</a><h4 class="code-header">fn <a href="#tymethod.blake2smac" class="fn">blake2smac</a>(
+    &amp;mut self,
+    buf: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+    outlen: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+    key: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+    salt: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;&gt;,
+    personal: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;&gt;,
+) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;, <a class="enum" href="enum.Errno.html" title="enum hermes::runtime_extensions::bindings::hermes::hash::api::Errno">Errno</a>&gt;&gt;</h4></section></summary><div class="docblock"><h5 id="blake2smac-hash-function"><a class="doc-anchor" href="#blake2smac-hash-function">§</a>BLAKE2sMac Hash Function</h5>
+<p>Hash a binary buffer with BLAKE2s with MAC (Message Authentication Code) mode.</p>
+<h6 id="parameters-1"><a class="doc-anchor" href="#parameters-1">§</a>Parameters</h6>
+<ul>
+<li><code>buf</code>: The binary data buffer to hash.</li>
+<li><code>outlen</code>: Optional.  The size of the digest.
+If the outlen is not defined, it defaults to 32.</li>
+<li><code>key</code>: The key to use with the hash.
+With MAC mode, key is needed to be defined
+Should not be &gt; 32 bytes.</li>
+<li><code>salt</code>: Optional. Salt uses to increase the randomness and
+uniqueness of the hash output
+Should not be &gt; 8 bytes.
+If not defined, salt is not used.</li>
+<li><code>personal</code>: Optional. Personal allows to
+add customization to the hash function behavior.
+Should not be &gt; 8 bytes.
+If not defined, personal is not used.</li>
+</ul>
+<h6 id="returns-1"><a class="doc-anchor" href="#returns-1">§</a>Returns</h6>
+<ul>
+<li>Either a buffer the size requested, with the hash.</li>
+<li>Or an error:</li>
+<li><code>key_too_big</code> if <code>key</code> is &gt; 32 bytes.</li>
+<li><code>hash_too_big</code> if <code>outlen</code> is specified and is &gt; 32 bytes.</li>
+<li><code>salt_too_big</code> if <code>salt</code> is specified and is &gt; 8 bytes.</li>
+<li><code>personal_too_big</code> if <code>personal</code> is specified and is &gt; 8 bytes.</li>
+</ul>
+<h6 id="note"><a class="doc-anchor" href="#note">§</a>Note:</h6>
+<p><code>key</code> length is checked before <code>outlen</code> so if both sizes are invalid, only
+<code>key_too_big</code> will be returned.
+If <code>salt</code> length exceeds 8 bytes, <code>salt_too_big</code> will be returned.
+if <code>personal</code> length exceeds 8 bytes, <code>personal_too_big</code> will be returned.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="tymethod.blake2b" class="method"><a class="src rightside" href="../../../../../../src/hermes/runtime_extensions/bindings.rs.html#13-16">source</a><h4 class="code-header">fn <a href="#tymethod.blake2b" class="fn">blake2b</a>(
+    &amp;mut self,
+    buf: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+    outlen: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;, <a class="enum" href="enum.Errno.html" title="enum hermes::runtime_extensions::bindings::hermes::hash::api::Errno">Errno</a>&gt;&gt;</h4></section></summary><div class="docblock"><h5 id="blake2b-hash-function"><a class="doc-anchor" href="#blake2b-hash-function">§</a>BLAKE2b Hash Function</h5>
+<p>Hash a binary buffer with BLAKE2b.</p>
+<h6 id="parameters-2"><a class="doc-anchor" href="#parameters-2">§</a>Parameters</h6>
+<ul>
+<li><code>buf</code>: The binary data buffer to hash.</li>
+<li><code>outlen</code>: Optional. The size of the digest.
+If the outlen is not defined, it defaults to 64.</li>
+</ul>
+<h6 id="returns-2"><a class="doc-anchor" href="#returns-2">§</a>Returns</h6>
+<ul>
+<li>Either a buffer the size requested, with the hash.</li>
+<li>Or an error:</li>
+<li><code>hash_too_big</code> if <code>outlen</code> is specified and is &gt; 64 bytes.</li>
+<li><code>invalid_digest_byte_length</code> if <code>outlen</code> is specified and is = 0.</li>
+</ul>
+</div></details><details class="toggle method-toggle" open><summary><section id="tymethod.blake2bmac" class="method"><a class="src rightside" href="../../../../../../src/hermes/runtime_extensions/bindings.rs.html#13-16">source</a><h4 class="code-header">fn <a href="#tymethod.blake2bmac" class="fn">blake2bmac</a>(
+    &amp;mut self,
+    buf: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+    outlen: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+    key: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+    salt: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;&gt;,
+    personal: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;&gt;,
+) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;, <a class="enum" href="enum.Errno.html" title="enum hermes::runtime_extensions::bindings::hermes::hash::api::Errno">Errno</a>&gt;&gt;</h4></section></summary><div class="docblock"><h5 id="blake2bmac-hash-function"><a class="doc-anchor" href="#blake2bmac-hash-function">§</a>BLAKE2bMac Hash Function</h5>
+<p>Hash a binary buffer with BLAKE2b with MAC (Message Authentication Code) mode.</p>
+<h6 id="parameters-3"><a class="doc-anchor" href="#parameters-3">§</a>Parameters</h6>
+<ul>
+<li><code>buf</code>: The binary data buffer to hash.</li>
+<li><code>outlen</code>: Optional.  The size of the digest.
+If the outlen is not defined, it defaults to 64.</li>
+<li><code>key</code>: The key to use with the hash.
+With MAC mode, key is needed to be defined
+Should not be &gt; 64 bytes.</li>
+<li><code>salt</code>: Optional. Salt uses to increase the randomness and
+uniqueness of the hash output
+Should not be &gt; 16 bytes.
+If not defined, salt is not used.</li>
+<li><code>personal</code>: Optional. Personal allows to
+add customization to the hash function behavior.
+Should not be &gt; 16 bytes.
+If not defined, personal is not used.</li>
+</ul>
+<h6 id="returns-3"><a class="doc-anchor" href="#returns-3">§</a>Returns</h6>
+<ul>
+<li>Either a buffer the size requested, with the hash.</li>
+<li>Or an error:</li>
+<li><code>key_too_big</code> if <code>key</code> is specified and is &gt; 64 bytes.</li>
+<li><code>hash_too_big</code> if <code>outlen</code> is specified and is &gt; 64 bytes.</li>
+<li><code>salt_too_big</code> if <code>salt</code> is specified and is &gt; 16 bytes.</li>
+<li><code>personal_too_big</code> if <code>personal</code> is specified and is &gt; 16 bytes.</li>
+</ul>
+<h6 id="note-1"><a class="doc-anchor" href="#note-1">§</a>Note:</h6>
+<p><code>key</code> length is checked before <code>outlen</code> so if both sizes are invalid, only
+<code>key_too_big</code> will be returned.
+If <code>salt</code> length exceeds 16 bytes, <code>salt_too_big</code> will be returned.
+if <code>personal</code> length exceeds 16 bytes, <code>personal_too_big</code> will be returned.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="tymethod.blake3" class="method"><a class="src rightside" href="../../../../../../src/hermes/runtime_extensions/bindings.rs.html#13-16">source</a><h4 class="code-header">fn <a href="#tymethod.blake3" class="fn">blake3</a>(
+    &amp;mut self,
+    buf: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+    outlen: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+    key: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;&gt;,
+) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;, <a class="enum" href="enum.Errno.html" title="enum hermes::runtime_extensions::bindings::hermes::hash::api::Errno">Errno</a>&gt;&gt;</h4></section></summary><div class="docblock"><h5 id="blake3-hash-function"><a class="doc-anchor" href="#blake3-hash-function">§</a>BLAKE3 Hash Function</h5>
+<p>Hash a binary buffer with BLAKE3.</p>
+<h6 id="parameters-4"><a class="doc-anchor" href="#parameters-4">§</a>Parameters</h6>
+<ul>
+<li><code>buf</code>: The binary data buffer to hash.</li>
+<li><code>outlen</code>: Optional.  The size of the digest.
+If the outlen is not defined, it defaults to 32.</li>
+<li><code>key</code>: Optional. The key to use with the hash.
+If not defined, the hash is not keyed.
+Should not be &gt; 32 bytes.</li>
+</ul>
+<h6 id="returns-4"><a class="doc-anchor" href="#returns-4">§</a>Returns</h6>
+<ul>
+<li>Either a buffer the size requested, with the hash.</li>
+<li>Or an error:</li>
+<li><code>key_too_big</code> if <code>key</code> is specified and is &gt; 32 bytes.</li>
+<li><code>hash_too_big</code> if <code>outlen</code> is specified and is &gt; 32 bytes.</li>
+</ul>
+<h6 id="note-2"><a class="doc-anchor" href="#note-2">§</a>Note:</h6>
+<p><code>key</code> length is checked before <code>outlen</code> so if both sizes are invalid, only
+<code>key_too_big</code> will be returned.</p>
+</div></details></div><h2 id="implementors" class="section-header">Implementors<a href="#implementors" class="anchor">§</a></h2><div id="implementors-list"><section id="impl-Host-for-HermesRuntimeContext" class="impl"><a class="src rightside" href="../../../../../../src/hermes/runtime_extensions/hermes/hash/host.rs.html#12-47">source</a><a href="#impl-Host-for-HermesRuntimeContext" class="anchor">§</a><h3 class="code-header">impl <a class="trait" href="trait.Host.html" title="trait hermes::runtime_extensions::bindings::hermes::hash::api::Host">Host</a> for <a class="struct" href="../../../../../runtime_context/struct.HermesRuntimeContext.html" title="struct hermes::runtime_context::HermesRuntimeContext">HermesRuntimeContext</a></h3></section></div><script src="../../../../../../trait.impl/hermes/runtime_extensions/bindings/hermes/hash/api/trait.Host.js" async></script></section></div></main></body></html>

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Resource"],"mod":["bytes_resource","fs_resource","uri"],"trait":["ResourceTrait"]};

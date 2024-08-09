@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["ATTRIBUTE_DATA"],"fn":["get_oid_from_int"],"static":["ATTRIBUTES_LOOKUP","ATTRIBUTES_TABLES"],"struct":["AttributeData"],"type":["AttributeDataTuple"]};

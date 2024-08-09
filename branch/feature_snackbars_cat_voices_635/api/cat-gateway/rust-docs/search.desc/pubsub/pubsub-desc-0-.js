@@ -1,0 +1,1 @@
+searchState.loadedDescShard("pubsub", 0, "<code>PubSub</code> example\nNode A\nNode B\nHelpful enum for toggling which peer reads lines from stdin\nReturns the argument unchanged.\nCalls <code>U::from(self)</code>.\nMain function\nConnect Node A, upload file and provide CID by adding to …\nToggle peers")

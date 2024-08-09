@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["BLOCK_HASH_COLUMN","BLOCK_TIME_COLUMN","ENDED_COLUMN","INSERT_UPDATE_STATE_SQL","SELECT_UPDATE_STATE_SQL","SLOT_INFO_SQL_HBS","SLOT_NO_COLUMN"],"enum":["SlotInfoQueryType"],"struct":["IndexedFollowerDataParams","SlotInfoQueryTmplFields"],"type":["BlockHash","DateTime","EpochNumber","MachineId","SlotNumber"]};

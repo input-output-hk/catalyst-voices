@@ -1,0 +1,4 @@
+(function() {var implementors = {
+"hermes":[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/ops/deref/trait.DerefMut.html\" title=\"trait core::ops::deref::DerefMut\">DerefMut</a> for <a class=\"struct\" href=\"hermes/wasm/engine/struct.Engine.html\" title=\"struct hermes::wasm::engine::Engine\">Engine</a>"]],
+"hermes_ipfs":[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/ops/deref/trait.DerefMut.html\" title=\"trait core::ops::deref::DerefMut\">DerefMut</a> for <a class=\"struct\" href=\"hermes_ipfs/struct.Node.html\" title=\"struct hermes_ipfs::Node\">Node</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

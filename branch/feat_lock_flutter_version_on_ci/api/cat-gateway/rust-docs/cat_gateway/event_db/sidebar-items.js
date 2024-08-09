@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["DATABASE_SCHEMA_VERSION","DATABASE_URL_ENVVAR"],"fn":["establish_connection"],"mod":["cardano","error","legacy","schema_check"],"struct":["EventDB","NoDatabaseUrlError"]};

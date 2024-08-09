@@ -1,0 +1,1 @@
+searchState.loadedDescShard("add_file_with_pinning", 0, "Hermes IPFS File Publishing and Pinning\nExample application.\nPrint helper")

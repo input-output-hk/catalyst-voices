@@ -1,0 +1,233 @@
+digraph {
+
+    graph [
+        label="cat_gateway",
+        labelloc=t,
+
+        pad=0.4,
+
+        // Consider rendering the graph using a different layout algorithm, such as:
+        // [dot, neato, twopi, circo, fdp, sfdp]
+        layout=neato,
+        overlap=false,
+        splines="line",
+        rankdir=LR,
+
+        fontname="Helvetica", 
+        fontsize="36",
+    ];
+
+    node [
+        fontname="monospace",
+        fontsize="10",
+        shape="record",
+        style="filled",
+    ];
+
+    edge [
+        fontname="monospace",
+        fontsize="10",
+    ];
+
+    "cat_gateway" [label="crate|cat_gateway", fillcolor="#5397c8"]; // "crate" node
+    "cat_gateway::cardano" [label="pub(crate) mod|cardano", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::cardano::cip36_registration" [label="pub(crate) mod|cardano::cip36_registration", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::cardano::util" [label="pub(crate) mod|cardano::util", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::cli" [label="pub(crate) mod|cli", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db" [label="pub(crate) mod|event_db", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::cardano" [label="pub(crate) mod|event_db::cardano", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::cardano::chain_state" [label="pub(crate) mod|event_db::cardano::chain_state", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::cardano::cip36_registration" [label="pub(crate) mod|event_db::cardano::cip36_registration", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::cardano::config" [label="pub(crate) mod|event_db::cardano::config", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::cardano::utxo" [label="pub(crate) mod|event_db::cardano::utxo", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::error" [label="pub(crate) mod|event_db::error", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy" [label="pub(crate) mod|event_db::legacy", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy::queries" [label="pub(crate) mod|event_db::legacy::queries", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy::queries::event" [label="pub(crate) mod|event_db::legacy::queries::event", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy::queries::event::ballot" [label="pub(crate) mod|event_db::legacy::queries::event::ballot", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy::queries::event::objective" [label="pub(crate) mod|event_db::legacy::queries::event::objective", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy::queries::event::proposal" [label="pub(crate) mod|event_db::legacy::queries::event::proposal", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy::queries::event::review" [label="pub(crate) mod|event_db::legacy::queries::event::review", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy::queries::registration" [label="pub(crate) mod|event_db::legacy::queries::registration", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy::queries::search" [label="pub(crate) mod|event_db::legacy::queries::search", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy::queries::vit_ss" [label="pub(crate) mod|event_db::legacy::queries::vit_ss", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy::queries::vit_ss::fund" [label="pub(crate) mod|event_db::legacy::queries::vit_ss::fund", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy::types" [label="pub(crate) mod|event_db::legacy::types", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy::types::ballot" [label="pub(crate) mod|event_db::legacy::types::ballot", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy::types::event" [label="pub(crate) mod|event_db::legacy::types::event", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy::types::objective" [label="pub(crate) mod|event_db::legacy::types::objective", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy::types::proposal" [label="pub(crate) mod|event_db::legacy::types::proposal", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy::types::registration" [label="pub(crate) mod|event_db::legacy::types::registration", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy::types::review" [label="pub(crate) mod|event_db::legacy::types::review", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy::types::search" [label="pub(crate) mod|event_db::legacy::types::search", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy::types::vit_ss" [label="pub(crate) mod|event_db::legacy::types::vit_ss", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy::types::vit_ss::challenge" [label="pub(crate) mod|event_db::legacy::types::vit_ss::challenge", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy::types::vit_ss::fund" [label="pub(crate) mod|event_db::legacy::types::vit_ss::fund", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy::types::vit_ss::goal" [label="pub(crate) mod|event_db::legacy::types::vit_ss::goal", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy::types::vit_ss::group" [label="pub(crate) mod|event_db::legacy::types::vit_ss::group", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy::types::vit_ss::vote_plan" [label="pub(crate) mod|event_db::legacy::types::vit_ss::vote_plan", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::legacy::types::voting_status" [label="pub(crate) mod|event_db::legacy::types::voting_status", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::event_db::schema_check" [label="pub(crate) mod|event_db::schema_check", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::logger" [label="pub(crate) mod|logger", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service" [label="pub(crate) mod|service", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::api" [label="pub(self) mod|service::api", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::cardano" [label="pub(self) mod|service::api::cardano", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::cardano::date_time_to_slot_number_get" [label="pub(self) mod|service::api::cardano::date_time_to_slot_number_get", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::cardano::registration_get" [label="pub(self) mod|service::api::cardano::registration_get", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::cardano::staked_ada_get" [label="pub(self) mod|service::api::cardano::staked_ada_get", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::cardano::sync_state_get" [label="pub(self) mod|service::api::cardano::sync_state_get", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::health" [label="pub(self) mod|service::api::health", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::health::inspection_get" [label="pub(self) mod|service::api::health::inspection_get", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::health::live_get" [label="pub(self) mod|service::api::health::live_get", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::health::ready_get" [label="pub(self) mod|service::api::health::ready_get", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::health::started_get" [label="pub(self) mod|service::api::health::started_get", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::legacy" [label="pub(self) mod|service::api::legacy", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::legacy::registration" [label="pub(self) mod|service::api::legacy::registration", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::legacy::v0" [label="pub(self) mod|service::api::legacy::v0", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::legacy::v0::message_post" [label="pub(self) mod|service::api::legacy::v0::message_post", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::legacy::v0::plans_get" [label="pub(self) mod|service::api::legacy::v0::plans_get", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::legacy::v1" [label="pub(self) mod|service::api::legacy::v1", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::legacy::v1::account_votes_get" [label="pub(self) mod|service::api::legacy::v1::account_votes_get", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::legacy::v1::fragments_post" [label="pub(self) mod|service::api::legacy::v1::fragments_post", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::api::legacy::v1::fragments_statuses" [label="pub(self) mod|service::api::legacy::v1::fragments_statuses", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::common" [label="pub(self) mod|service::common", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::common::objects" [label="pub(crate) mod|service::common::objects", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::cardano" [label="pub(crate) mod|service::common::objects::cardano", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::cardano::hash" [label="pub(crate) mod|service::common::objects::cardano::hash", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::cardano::network" [label="pub(crate) mod|service::common::objects::cardano::network", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::cardano::registration_info" [label="pub(crate) mod|service::common::objects::cardano::registration_info", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::cardano::slot_info" [label="pub(crate) mod|service::common::objects::cardano::slot_info", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::cardano::stake_address" [label="pub(crate) mod|service::common::objects::cardano::stake_address", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::cardano::stake_info" [label="pub(crate) mod|service::common::objects::cardano::stake_info", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::cardano::sync_state" [label="pub(crate) mod|service::common::objects::cardano::sync_state", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::legacy" [label="pub(crate) mod|service::common::objects::legacy", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::legacy::account_votes" [label="pub(crate) mod|service::common::objects::legacy::account_votes", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::legacy::block" [label="pub(crate) mod|service::common::objects::legacy::block", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::legacy::delegate_public_key" [label="pub(crate) mod|service::common::objects::legacy::delegate_public_key", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::legacy::event_id" [label="pub(crate) mod|service::common::objects::legacy::event_id", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::legacy::fragment_status" [label="pub(crate) mod|service::common::objects::legacy::fragment_status", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::legacy::fragments_batch" [label="pub(crate) mod|service::common::objects::legacy::fragments_batch", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::legacy::fragments_processing_summary" [label="pub(crate) mod|service::common::objects::legacy::fragments_processing_summary", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::legacy::hash" [label="pub(crate) mod|service::common::objects::legacy::hash", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::legacy::stake_public_key" [label="pub(crate) mod|service::common::objects::legacy::stake_public_key", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::legacy::vote_plan" [label="pub(crate) mod|service::common::objects::legacy::vote_plan", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::legacy::voter_group_id" [label="pub(crate) mod|service::common::objects::legacy::voter_group_id", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::legacy::voter_info" [label="pub(crate) mod|service::common::objects::legacy::voter_info", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::legacy::voter_registration" [label="pub(crate) mod|service::common::objects::legacy::voter_registration", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::legacy::voting_public_key" [label="pub(crate) mod|service::common::objects::legacy::voting_public_key", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::server_error" [label="pub(crate) mod|service::common::objects::server_error", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::objects::validation_error" [label="pub(crate) mod|service::common::objects::validation_error", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::responses" [label="pub(crate) mod|service::common::responses", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::common::tags" [label="pub(crate) mod|service::common::tags", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::docs" [label="pub(self) mod|service::docs", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::docs::stoplight_elements" [label="pub(self) mod|service::docs::stoplight_elements", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::poem_service" [label="pub(self) mod|service::poem_service", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::utilities" [label="pub(self) mod|service::utilities", fillcolor="#db5367"]; // "mod" node
+    "cat_gateway::service::utilities::catch_panic" [label="pub(crate) mod|service::utilities::catch_panic", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::utilities::middleware" [label="pub(crate) mod|service::utilities::middleware", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::utilities::middleware::schema_validation" [label="pub(crate) mod|service::utilities::middleware::schema_validation", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::service::utilities::middleware::tracing_mw" [label="pub(crate) mod|service::utilities::middleware::tracing_mw", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::settings" [label="pub(crate) mod|settings", fillcolor="#f8c04c"]; // "mod" node
+    "cat_gateway::state" [label="pub(crate) mod|state", fillcolor="#f8c04c"]; // "mod" node
+
+    "cat_gateway" -> "cat_gateway::cardano" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway" -> "cat_gateway::cli" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway" -> "cat_gateway::event_db" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway" -> "cat_gateway::logger" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway" -> "cat_gateway::service" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway" -> "cat_gateway::settings" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway" -> "cat_gateway::state" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::cardano" -> "cat_gateway::cardano::cip36_registration" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::cardano" -> "cat_gateway::cardano::util" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db" -> "cat_gateway::event_db::cardano" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db" -> "cat_gateway::event_db::error" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db" -> "cat_gateway::event_db::legacy" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db" -> "cat_gateway::event_db::schema_check" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::cardano" -> "cat_gateway::event_db::cardano::chain_state" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::cardano" -> "cat_gateway::event_db::cardano::cip36_registration" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::cardano" -> "cat_gateway::event_db::cardano::config" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::cardano" -> "cat_gateway::event_db::cardano::utxo" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::legacy" -> "cat_gateway::event_db::legacy::queries" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::legacy" -> "cat_gateway::event_db::legacy::types" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::legacy::queries" -> "cat_gateway::event_db::legacy::queries::event" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::legacy::queries" -> "cat_gateway::event_db::legacy::queries::registration" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::legacy::queries" -> "cat_gateway::event_db::legacy::queries::search" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::legacy::queries" -> "cat_gateway::event_db::legacy::queries::vit_ss" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::legacy::queries::event" -> "cat_gateway::event_db::legacy::queries::event::ballot" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::legacy::queries::event" -> "cat_gateway::event_db::legacy::queries::event::objective" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::legacy::queries::event" -> "cat_gateway::event_db::legacy::queries::event::proposal" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::legacy::queries::event" -> "cat_gateway::event_db::legacy::queries::event::review" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::legacy::queries::vit_ss" -> "cat_gateway::event_db::legacy::queries::vit_ss::fund" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::legacy::types" -> "cat_gateway::event_db::legacy::types::ballot" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::legacy::types" -> "cat_gateway::event_db::legacy::types::event" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::legacy::types" -> "cat_gateway::event_db::legacy::types::objective" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::legacy::types" -> "cat_gateway::event_db::legacy::types::proposal" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::legacy::types" -> "cat_gateway::event_db::legacy::types::registration" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::legacy::types" -> "cat_gateway::event_db::legacy::types::review" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::legacy::types" -> "cat_gateway::event_db::legacy::types::search" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::legacy::types" -> "cat_gateway::event_db::legacy::types::vit_ss" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::legacy::types" -> "cat_gateway::event_db::legacy::types::voting_status" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::legacy::types::vit_ss" -> "cat_gateway::event_db::legacy::types::vit_ss::challenge" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::legacy::types::vit_ss" -> "cat_gateway::event_db::legacy::types::vit_ss::fund" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::legacy::types::vit_ss" -> "cat_gateway::event_db::legacy::types::vit_ss::goal" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::legacy::types::vit_ss" -> "cat_gateway::event_db::legacy::types::vit_ss::group" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::event_db::legacy::types::vit_ss" -> "cat_gateway::event_db::legacy::types::vit_ss::vote_plan" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service" -> "cat_gateway::service::api" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service" -> "cat_gateway::service::common" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service" -> "cat_gateway::service::docs" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service" -> "cat_gateway::service::poem_service" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service" -> "cat_gateway::service::utilities" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api" -> "cat_gateway::service::api::cardano" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api" -> "cat_gateway::service::api::health" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api" -> "cat_gateway::service::api::legacy" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano" -> "cat_gateway::service::api::cardano::date_time_to_slot_number_get" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano" -> "cat_gateway::service::api::cardano::registration_get" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano" -> "cat_gateway::service::api::cardano::staked_ada_get" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::cardano" -> "cat_gateway::service::api::cardano::sync_state_get" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::health" -> "cat_gateway::service::api::health::inspection_get" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::health" -> "cat_gateway::service::api::health::live_get" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::health" -> "cat_gateway::service::api::health::ready_get" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::health" -> "cat_gateway::service::api::health::started_get" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::legacy" -> "cat_gateway::service::api::legacy::registration" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::legacy" -> "cat_gateway::service::api::legacy::v0" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::legacy" -> "cat_gateway::service::api::legacy::v1" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::legacy::v0" -> "cat_gateway::service::api::legacy::v0::message_post" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::legacy::v0" -> "cat_gateway::service::api::legacy::v0::plans_get" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::legacy::v1" -> "cat_gateway::service::api::legacy::v1::account_votes_get" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::legacy::v1" -> "cat_gateway::service::api::legacy::v1::fragments_post" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::api::legacy::v1" -> "cat_gateway::service::api::legacy::v1::fragments_statuses" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common" -> "cat_gateway::service::common::objects" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common" -> "cat_gateway::service::common::responses" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common" -> "cat_gateway::service::common::tags" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects" -> "cat_gateway::service::common::objects::cardano" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects" -> "cat_gateway::service::common::objects::legacy" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects" -> "cat_gateway::service::common::objects::server_error" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects" -> "cat_gateway::service::common::objects::validation_error" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::cardano" -> "cat_gateway::service::common::objects::cardano::hash" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::cardano" -> "cat_gateway::service::common::objects::cardano::network" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::cardano" -> "cat_gateway::service::common::objects::cardano::registration_info" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::cardano" -> "cat_gateway::service::common::objects::cardano::slot_info" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::cardano" -> "cat_gateway::service::common::objects::cardano::stake_address" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::cardano" -> "cat_gateway::service::common::objects::cardano::stake_info" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::cardano" -> "cat_gateway::service::common::objects::cardano::sync_state" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::legacy" -> "cat_gateway::service::common::objects::legacy::account_votes" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::legacy" -> "cat_gateway::service::common::objects::legacy::block" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::legacy" -> "cat_gateway::service::common::objects::legacy::delegate_public_key" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::legacy" -> "cat_gateway::service::common::objects::legacy::event_id" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::legacy" -> "cat_gateway::service::common::objects::legacy::fragment_status" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::legacy" -> "cat_gateway::service::common::objects::legacy::fragments_batch" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::legacy" -> "cat_gateway::service::common::objects::legacy::fragments_processing_summary" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::legacy" -> "cat_gateway::service::common::objects::legacy::hash" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::legacy" -> "cat_gateway::service::common::objects::legacy::stake_public_key" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::legacy" -> "cat_gateway::service::common::objects::legacy::vote_plan" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::legacy" -> "cat_gateway::service::common::objects::legacy::voter_group_id" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::legacy" -> "cat_gateway::service::common::objects::legacy::voter_info" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::legacy" -> "cat_gateway::service::common::objects::legacy::voter_registration" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::common::objects::legacy" -> "cat_gateway::service::common::objects::legacy::voting_public_key" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::docs" -> "cat_gateway::service::docs::stoplight_elements" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::utilities" -> "cat_gateway::service::utilities::catch_panic" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::utilities" -> "cat_gateway::service::utilities::middleware" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::utilities::middleware" -> "cat_gateway::service::utilities::middleware::schema_validation" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cat_gateway::service::utilities::middleware" -> "cat_gateway::service::utilities::middleware::tracing_mw" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+
+}

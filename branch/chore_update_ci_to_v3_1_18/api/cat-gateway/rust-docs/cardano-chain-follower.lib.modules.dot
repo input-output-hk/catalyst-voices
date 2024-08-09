@@ -1,0 +1,41 @@
+digraph {
+
+    graph [
+        label="cardano_chain_follower",
+        labelloc=t,
+
+        pad=0.4,
+
+        // Consider rendering the graph using a different layout algorithm, such as:
+        // [dot, neato, twopi, circo, fdp, sfdp]
+        layout=neato,
+        overlap=false,
+        splines="line",
+        rankdir=LR,
+
+        fontname="Helvetica", 
+        fontsize="36",
+    ];
+
+    node [
+        fontname="monospace",
+        fontsize="10",
+        shape="record",
+        style="filled",
+    ];
+
+    edge [
+        fontname="monospace",
+        fontsize="10",
+    ];
+
+    "cardano_chain_follower" [label="crate|cardano_chain_follower", fillcolor="#5397c8"]; // "crate" node
+    "cardano_chain_follower::follow" [label="pub(crate) mod|follow", fillcolor="#f8c04c"]; // "mod" node
+    "cardano_chain_follower::follow::task" [label="pub(self) mod|follow::task", fillcolor="#db5367"]; // "mod" node
+    "cardano_chain_follower::mithril_snapshot" [label="pub(crate) mod|mithril_snapshot", fillcolor="#f8c04c"]; // "mod" node
+
+    "cardano_chain_follower" -> "cardano_chain_follower::follow" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cardano_chain_follower" -> "cardano_chain_follower::mithril_snapshot" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "cardano_chain_follower::follow" -> "cardano_chain_follower::follow::task" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+
+}

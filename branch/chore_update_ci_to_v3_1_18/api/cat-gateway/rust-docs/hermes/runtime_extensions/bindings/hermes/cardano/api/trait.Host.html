@@ -1,0 +1,130 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `Host` trait in crate `hermes`."><title>Host in hermes::runtime_extensions::bindings::hermes::cardano::api - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../../../../" data-static-root-path="../../../../../../static.files/" data-current-crate="hermes" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0-nightly (f8e566053 2024-06-14)" data-channel="nightly" data-search-js="search-0fe7219eb170c82e.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="sidebar-items.js"></script><script defer src="../../../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc trait"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../../../../hermes/index.html">hermes</a><span class="version">0.0.1</span></h2></div><h2 class="location"><a href="#">Host</a></h2><div class="sidebar-elems"><section><h3><a href="#required-methods">Required Methods</a></h3><ul class="block"><li><a href="#tymethod.fetch_block">fetch_block</a></li><li><a href="#tymethod.get_txns">get_txns</a></li><li><a href="#tymethod.post_txn">post_txn</a></li><li><a href="#tymethod.subscribe_blocks">subscribe_blocks</a></li><li><a href="#tymethod.subscribe_rollback">subscribe_rollback</a></li><li><a href="#tymethod.subscribe_txn">subscribe_txn</a></li><li><a href="#tymethod.unsubscribe">unsubscribe</a></li></ul><h3><a href="#implementors">Implementors</a></h3></section><h2><a href="index.html">In hermes::runtime_extensions::bindings::hermes::cardano::api</a></h2></div></nav><div class="sidebar-resizer"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1>Trait <a href="../../../../../index.html">hermes</a>::<wbr><a href="../../../../index.html">runtime_extensions</a>::<wbr><a href="../../../index.html">bindings</a>::<wbr><a href="../../index.html">hermes</a>::<wbr><a href="../index.html">cardano</a>::<wbr><a href="index.html">api</a>::<wbr><a class="trait" href="#">Host</a><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><span class="out-of-band"><a class="src" href="../../../../../../src/hermes/runtime_extensions/bindings.rs.html#13-16">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><pre class="rust item-decl"><code>pub trait Host {
+    // Required methods
+    fn <a href="#tymethod.subscribe_blocks" class="fn">subscribe_blocks</a>(
+        &amp;mut self,
+        net: <a class="enum" href="enum.CardanoBlockchainId.html" title="enum hermes::runtime_extensions::bindings::hermes::cardano::api::CardanoBlockchainId">CardanoBlockchainId</a>,
+        whence: <a class="enum" href="enum.Slot.html" title="enum hermes::runtime_extensions::bindings::hermes::cardano::api::Slot">Slot</a>,
+    ) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>, <a class="enum" href="enum.FetchError.html" title="enum hermes::runtime_extensions::bindings::hermes::cardano::api::FetchError">FetchError</a>&gt;&gt;;
+<span class="item-spacer"></span>    fn <a href="#tymethod.unsubscribe" class="fn">unsubscribe</a>(
+        &amp;mut self,
+        net: <a class="enum" href="enum.CardanoBlockchainId.html" title="enum hermes::runtime_extensions::bindings::hermes::cardano::api::CardanoBlockchainId">CardanoBlockchainId</a>,
+        opts: <a class="struct" href="struct.UnsubscribeOptions.html" title="struct hermes::runtime_extensions::bindings::hermes::cardano::api::UnsubscribeOptions">UnsubscribeOptions</a>,
+    ) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;;
+<span class="item-spacer"></span>    fn <a href="#tymethod.subscribe_txn" class="fn">subscribe_txn</a>(&amp;mut self, net: <a class="enum" href="enum.CardanoBlockchainId.html" title="enum hermes::runtime_extensions::bindings::hermes::cardano::api::CardanoBlockchainId">CardanoBlockchainId</a>) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;;
+<span class="item-spacer"></span>    fn <a href="#tymethod.subscribe_rollback" class="fn">subscribe_rollback</a>(&amp;mut self, net: <a class="enum" href="enum.CardanoBlockchainId.html" title="enum hermes::runtime_extensions::bindings::hermes::cardano::api::CardanoBlockchainId">CardanoBlockchainId</a>) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;;
+<span class="item-spacer"></span>    fn <a href="#tymethod.fetch_block" class="fn">fetch_block</a>(
+        &amp;mut self,
+        net: <a class="enum" href="enum.CardanoBlockchainId.html" title="enum hermes::runtime_extensions::bindings::hermes::cardano::api::CardanoBlockchainId">CardanoBlockchainId</a>,
+        whence: <a class="enum" href="enum.Slot.html" title="enum hermes::runtime_extensions::bindings::hermes::cardano::api::Slot">Slot</a>,
+    ) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;, <a class="enum" href="enum.FetchError.html" title="enum hermes::runtime_extensions::bindings::hermes::cardano::api::FetchError">FetchError</a>&gt;&gt;;
+<span class="item-spacer"></span>    fn <a href="#tymethod.get_txns" class="fn">get_txns</a>(&amp;mut self, block: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;&gt;&gt;;
+<span class="item-spacer"></span>    fn <a href="#tymethod.post_txn" class="fn">post_txn</a>(
+        &amp;mut self,
+        net: <a class="enum" href="enum.CardanoBlockchainId.html" title="enum hermes::runtime_extensions::bindings::hermes::cardano::api::CardanoBlockchainId">CardanoBlockchainId</a>,
+        txn: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+    ) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>, <a class="enum" href="enum.TxnError.html" title="enum hermes::runtime_extensions::bindings::hermes::cardano::api::TxnError">TxnError</a>&gt;&gt;;
+}</code></pre><h2 id="required-methods" class="section-header">Required Methods<a href="#required-methods" class="anchor">§</a></h2><div class="methods"><details class="toggle method-toggle" open><summary><section id="tymethod.subscribe_blocks" class="method"><a class="src rightside" href="../../../../../../src/hermes/runtime_extensions/bindings.rs.html#13-16">source</a><h4 class="code-header">fn <a href="#tymethod.subscribe_blocks" class="fn">subscribe_blocks</a>(
+    &amp;mut self,
+    net: <a class="enum" href="enum.CardanoBlockchainId.html" title="enum hermes::runtime_extensions::bindings::hermes::cardano::api::CardanoBlockchainId">CardanoBlockchainId</a>,
+    whence: <a class="enum" href="enum.Slot.html" title="enum hermes::runtime_extensions::bindings::hermes::cardano::api::Slot">Slot</a>,
+) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>, <a class="enum" href="enum.FetchError.html" title="enum hermes::runtime_extensions::bindings::hermes::cardano::api::FetchError">FetchError</a>&gt;&gt;</h4></section></summary><div class="docblock"><p>Subscribe to the Blockchain block data.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>net</code> : The blockchain network to fetch block from, and subscribe to.</li>
+<li><code>whence</code>: Where to start fetching blocks from.</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>ok(u64)</code> : The slot we are synching from now.</li>
+<li><code>error(fetch-error)</code> : If an error occured.</li>
+</ul>
+<p><strong>Notes</strong></p>
+<p>If the blockchain is not yet syncing, it will start, from the requested slot.
+If the blockchain is not yet syncing, and <code>whence</code> == <code>continue</code> then the blockchain will
+not be synced from, the calling module will only be subscribed for block events.</p>
+<p>If the blockchain is already syncing, the sync will stop and restart, unless <code>whence</code> == <code>continue</code>.
+When <code>whence</code> == <code>continue</code> the blockchain will keep syncing from where it is at, and this module
+will be subscribed to block updates.</p>
+<p><code>whence</code> == <code>stop</code> will prevent the blockchain syncing, and the caller will be unsubscribed.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="tymethod.unsubscribe" class="method"><a class="src rightside" href="../../../../../../src/hermes/runtime_extensions/bindings.rs.html#13-16">source</a><h4 class="code-header">fn <a href="#tymethod.unsubscribe" class="fn">unsubscribe</a>(
+    &amp;mut self,
+    net: <a class="enum" href="enum.CardanoBlockchainId.html" title="enum hermes::runtime_extensions::bindings::hermes::cardano::api::CardanoBlockchainId">CardanoBlockchainId</a>,
+    opts: <a class="struct" href="struct.UnsubscribeOptions.html" title="struct hermes::runtime_extensions::bindings::hermes::cardano::api::UnsubscribeOptions">UnsubscribeOptions</a>,
+) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></section></summary><div class="docblock"><p>Unsubscribe from the blockchain events listed.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>opts</code> : The events to unsubscribe from (and optionally stop the blockchain follower).</li>
+</ul>
+<p><strong>Notes</strong></p>
+<p>This only unsubscribes from the events.
+The option <code>stop</code> MUST be set to actually stop fetching data from the blockchain once started.</p>
+<p><code>stop</code> can be set without unsubscribing, and this will interrupt the flow of blockchain data.
+After <code>stop</code>,  <code>subscribe-blocks(?, continue)</code> would cause blockchain sync to continue from
+the last block received.  This would result in the last block being sent as an event twice,
+once before the <code>stop</code> and once after the <code>continue</code>.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="tymethod.subscribe_txn" class="method"><a class="src rightside" href="../../../../../../src/hermes/runtime_extensions/bindings.rs.html#13-16">source</a><h4 class="code-header">fn <a href="#tymethod.subscribe_txn" class="fn">subscribe_txn</a>(&amp;mut self, net: <a class="enum" href="enum.CardanoBlockchainId.html" title="enum hermes::runtime_extensions::bindings::hermes::cardano::api::CardanoBlockchainId">CardanoBlockchainId</a>) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></section></summary><div class="docblock"><p>Subscribe to transaction data events, does not alter the blockchain sync in anyway.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>net</code> : The blockchain network to subscribe to txn events from.</li>
+</ul>
+</div></details><details class="toggle method-toggle" open><summary><section id="tymethod.subscribe_rollback" class="method"><a class="src rightside" href="../../../../../../src/hermes/runtime_extensions/bindings.rs.html#13-16">source</a><h4 class="code-header">fn <a href="#tymethod.subscribe_rollback" class="fn">subscribe_rollback</a>(&amp;mut self, net: <a class="enum" href="enum.CardanoBlockchainId.html" title="enum hermes::runtime_extensions::bindings::hermes::cardano::api::CardanoBlockchainId">CardanoBlockchainId</a>) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></section></summary><div class="docblock"><p>Subscribe to blockchain rollback events, does not alter the blockchain sync in anyway.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>net</code> : The blockchain network to subscribe to txn events from.</li>
+</ul>
+<p><strong>Notes</strong></p>
+<p>After a rollback event, the blockchain sync will AUTOMATICALLY start sending block
+data from the rollback point.  No action is required to actually follow the rollback, unless the
+default behavior is not desired.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="tymethod.fetch_block" class="method"><a class="src rightside" href="../../../../../../src/hermes/runtime_extensions/bindings.rs.html#13-16">source</a><h4 class="code-header">fn <a href="#tymethod.fetch_block" class="fn">fetch_block</a>(
+    &amp;mut self,
+    net: <a class="enum" href="enum.CardanoBlockchainId.html" title="enum hermes::runtime_extensions::bindings::hermes::cardano::api::CardanoBlockchainId">CardanoBlockchainId</a>,
+    whence: <a class="enum" href="enum.Slot.html" title="enum hermes::runtime_extensions::bindings::hermes::cardano::api::Slot">Slot</a>,
+) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;, <a class="enum" href="enum.FetchError.html" title="enum hermes::runtime_extensions::bindings::hermes::cardano::api::FetchError">FetchError</a>&gt;&gt;</h4></section></summary><div class="docblock"><p>Fetch a block from the requested blockchain at the requested slot.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>net</code>    : The blockchain network to get a block from.</li>
+<li><code>whence</code> : Which block to get.</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li><code>cardano-block</code> : The block requested.</li>
+<li><code>fetch-error</code> : An error if the block can not be fetched.</li>
+</ul>
+<p><strong>Notes</strong></p>
+<p>Fetching a block does not require the blockchain to be subscribed, or for blocks to be
+being followed and generating events.
+It also will not alter the automatic fetching of blocks in any way, and happens in parallel
+to automated block fetch.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="tymethod.get_txns" class="method"><a class="src rightside" href="../../../../../../src/hermes/runtime_extensions/bindings.rs.html#13-16">source</a><h4 class="code-header">fn <a href="#tymethod.get_txns" class="fn">get_txns</a>(&amp;mut self, block: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;&gt;&gt;</h4></section></summary><div class="docblock"><p>Get transactions from a block.</p>
+<p>This can be used to easily extract all transactions from a complete block.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>block</code> : The blockchain data to extract transactions from.</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li>a list of all transactions in the block, in the order they appear in the block.</li>
+</ul>
+<p><strong>Notes</strong></p>
+<p>This function exists to support <code>fetch-block</code>.
+Transactions from subscribed block events, should be processed as transaction events.</p>
+</div></details><details class="toggle method-toggle" open><summary><section id="tymethod.post_txn" class="method"><a class="src rightside" href="../../../../../../src/hermes/runtime_extensions/bindings.rs.html#13-16">source</a><h4 class="code-header">fn <a href="#tymethod.post_txn" class="fn">post_txn</a>(
+    &amp;mut self,
+    net: <a class="enum" href="enum.CardanoBlockchainId.html" title="enum hermes::runtime_extensions::bindings::hermes::cardano::api::CardanoBlockchainId">CardanoBlockchainId</a>,
+    txn: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;,
+) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>, <a class="enum" href="enum.TxnError.html" title="enum hermes::runtime_extensions::bindings::hermes::cardano::api::TxnError">TxnError</a>&gt;&gt;</h4></section></summary><div class="docblock"><p>Post a transactions to the blockchain.</p>
+<p>This can be used to post a pre-formed transaction to the required blockchain.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>net</code> : The blockchain to post the transaction to.</li>
+<li><code>txn</code> : The transaction data, ready to submit.</li>
+</ul>
+<p><strong>Returns</strong></p>
+<ul>
+<li>An error if the transaction can not be posted.</li>
+</ul>
+<p><strong>Notes</strong></p>
+<p>This is proposed functionality, and is not yet active.
+All calls to this function will return <code>post-txn-not-allowed</code> error.</p>
+</div></details></div><h2 id="implementors" class="section-header">Implementors<a href="#implementors" class="anchor">§</a></h2><div id="implementors-list"><section id="impl-Host-for-HermesRuntimeContext" class="impl"><a class="src rightside" href="../../../../../../src/hermes/runtime_extensions/hermes/cardano/host.rs.html#11-217">source</a><a href="#impl-Host-for-HermesRuntimeContext" class="anchor">§</a><h3 class="code-header">impl <a class="trait" href="trait.Host.html" title="trait hermes::runtime_extensions::bindings::hermes::cardano::api::Host">Host</a> for <a class="struct" href="../../../../../runtime_context/struct.HermesRuntimeContext.html" title="struct hermes::runtime_context::HermesRuntimeContext">HermesRuntimeContext</a></h3></section></div><script src="../../../../../../trait.impl/hermes/runtime_extensions/bindings/hermes/cardano/api/trait.Host.js" async></script></section></div></main></body></html>

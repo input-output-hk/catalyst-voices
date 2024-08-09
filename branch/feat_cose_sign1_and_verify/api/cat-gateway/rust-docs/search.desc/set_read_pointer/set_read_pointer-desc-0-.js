@@ -1,0 +1,1 @@
+searchState.loadedDescShard("set_read_pointer", 0, "This example shows how to set the follower’s read …")

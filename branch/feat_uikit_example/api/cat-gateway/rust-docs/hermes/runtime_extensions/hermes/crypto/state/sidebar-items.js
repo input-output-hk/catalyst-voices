@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["add_resource","delete_resource","get_resource","get_state","set_state"],"static":["CRYPTO_INTERNAL_STATE"],"struct":["ResourceHolder","WrappedXPrv"],"type":["State"]};

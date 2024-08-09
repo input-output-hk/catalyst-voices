@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"mod":["event_on_block","event_on_rollback","event_on_txn"]};

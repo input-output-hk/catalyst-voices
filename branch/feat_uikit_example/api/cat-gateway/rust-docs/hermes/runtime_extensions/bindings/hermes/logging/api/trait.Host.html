@@ -1,0 +1,59 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `Host` trait in crate `hermes`."><title>Host in hermes::runtime_extensions::bindings::hermes::logging::api - Rust</title><script>if(window.location.protocol!=="file:")document.head.insertAdjacentHTML("beforeend","SourceSerif4-Regular-46f98efaafac5295.ttf.woff2,FiraSans-Regular-018c141bf0843ffd.woff2,FiraSans-Medium-8f9a781e4970d388.woff2,SourceCodePro-Regular-562dcc5011b6de7d.ttf.woff2,SourceCodePro-Semibold-d899c5a5c4aeb14a.ttf.woff2".split(",").map(f=>`<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../../static.files/${f}">`).join(""))</script><link rel="stylesheet" href="../../../../../../static.files/normalize-76eba96aa4d2e634.css"><link rel="stylesheet" href="../../../../../../static.files/rustdoc-dd39b87e5fcfba68.css"><meta name="rustdoc-vars" data-root-path="../../../../../../" data-static-root-path="../../../../../../static.files/" data-current-crate="hermes" data-themes="" data-resource-suffix="" data-rustdoc-version="1.81.0-nightly (f8e566053 2024-06-14)" data-channel="nightly" data-search-js="search-0fe7219eb170c82e.js" data-settings-js="settings-4313503d2e1961c2.js" ><script src="../../../../../../static.files/storage-118b08c4c78b968e.js"></script><script defer src="sidebar-items.js"></script><script defer src="../../../../../../static.files/main-20a3ad099b048cf2.js"></script><noscript><link rel="stylesheet" href="../../../../../../static.files/noscript-df360f571f6edeae.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../../static.files/favicon-32x32-422f7d1d52889060.png"><link rel="icon" type="image/svg+xml" href="../../../../../../static.files/favicon-2c020d218678b618.svg"></head><body class="rustdoc trait"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle" title="show sidebar"></button></nav><nav class="sidebar"><div class="sidebar-crate"><h2><a href="../../../../../../hermes/index.html">hermes</a><span class="version">0.0.1</span></h2></div><h2 class="location"><a href="#">Host</a></h2><div class="sidebar-elems"><section><h3><a href="#required-methods">Required Methods</a></h3><ul class="block"><li><a href="#tymethod.log">log</a></li></ul><h3><a href="#implementors">Implementors</a></h3></section><h2><a href="index.html">In hermes::runtime_extensions::bindings::hermes::logging::api</a></h2></div></nav><div class="sidebar-resizer"></div><main><div class="width-limiter"><rustdoc-search></rustdoc-search><section id="main-content" class="content"><div class="main-heading"><h1>Trait <a href="../../../../../index.html">hermes</a>::<wbr><a href="../../../../index.html">runtime_extensions</a>::<wbr><a href="../../../index.html">bindings</a>::<wbr><a href="../../index.html">hermes</a>::<wbr><a href="../index.html">logging</a>::<wbr><a href="index.html">api</a>::<wbr><a class="trait" href="#">Host</a><button id="copy-path" title="Copy item path to clipboard">Copy item path</button></h1><span class="out-of-band"><a class="src" href="../../../../../../src/hermes/runtime_extensions/bindings.rs.html#13-16">source</a> · <button id="toggle-all-docs" title="collapse all docs">[<span>&#x2212;</span>]</button></span></div><pre class="rust item-decl"><code>pub trait Host {
+    // Required method
+    fn <a href="#tymethod.log" class="fn">log</a>(
+        &amp;mut self,
+        level: <a class="enum" href="enum.Level.html" title="enum hermes::runtime_extensions::bindings::hermes::logging::api::Level">Level</a>,
+        file: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;,
+        function: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;,
+        line: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>&gt;,
+        col: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>&gt;,
+        ctx: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;,
+        msg: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>,
+        data: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;,
+    ) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;;
+}</code></pre><h2 id="required-methods" class="section-header">Required Methods<a href="#required-methods" class="anchor">§</a></h2><div class="methods"><details class="toggle method-toggle" open><summary><section id="tymethod.log" class="method"><a class="src rightside" href="../../../../../../src/hermes/runtime_extensions/bindings.rs.html#13-16">source</a><h4 class="code-header">fn <a href="#tymethod.log" class="fn">log</a>(
+    &amp;mut self,
+    level: <a class="enum" href="enum.Level.html" title="enum hermes::runtime_extensions::bindings::hermes::logging::api::Level">Level</a>,
+    file: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;,
+    function: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;,
+    line: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>&gt;,
+    col: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u32.html">u32</a>&gt;,
+    ctx: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;,
+    msg: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>,
+    data: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/string/struct.String.html" title="struct alloc::string::String">String</a>&gt;,
+) -&gt; <a class="type" href="https://docs.rs/anyhow/1.0.85/anyhow/type.Result.html" title="type anyhow::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</h4></section></summary><div class="docblock"><p>Generate a Log</p>
+<p>The Hermes API will add extra information to the log, such as the instance of the webasm
+module being logged.
+The Webasm module does not need to concern itself with this kind of information, and should
+log as if it is the only instance.
+It also should not log any webasm shared context, except where it is relevant to the log message itself.
+The log level will be forced to INFO level.</p>
+<p><strong>Parameters</strong></p>
+<ul>
+<li><code>level</code> : The log level this message is for.</li>
+<li><code>file</code>  : The name of the src file being logged from. (Optional)</li>
+<li><code>function</code>    : The function within the file being logged from. (Optional)</li>
+<li><code>line</code>  : The line of code the log was generated from. (Optional)</li>
+<li><code>col</code>   : The column of code the log was generated from. (Optional)</li>
+<li><code>ctx</code>   : The logging context.  (Should have no newlines or formatting).</li>
+<li><code>msg</code>   : A Single line message to be logged. (Should have no newlines or formatting).</li>
+<li><code>data</code>  : A Free form json payload that will be logged with the msg.  This must be valid JSON.</li>
+</ul>
+<p><em>Notes</em></p>
+<p>The <code>data</code> parameter may contain a record of the format:</p>
+<div class="example-wrap"><pre class="language-json"><code>{
+&quot;bt&quot; : [ &lt;string&gt; , &lt;string&gt; ]
+}
+</code></pre></div>
+<p>The logger will interpret this as a backtrace where each entry in the array is one line of the backtrace.
+The format of the backtrace lines is up to the webasm module generating the log.
+The individual backtrace entries may contain line breaks if the backtrace entry is
+multiline.</p>
+<ul>
+<li>Multiline backtrace entries should be de-dented, relative to the first line.</li>
+<li>This is to allow the display to properly format multiline entries.
+This format is designed to keep the broadest flexibility for multiple languages capabilities.
+The backtrace must be sorted with most recent lines of the backtrace occurring first in the array.
+Backtrace must be contained in a single <code>log</code> call.  Multiple log calls will be considered independent logs.</li>
+</ul>
+</div></details></div><h2 id="implementors" class="section-header">Implementors<a href="#implementors" class="anchor">§</a></h2><div id="implementors-list"><section id="impl-Host-for-HermesRuntimeContext" class="impl"><a class="src rightside" href="../../../../../../src/hermes/runtime_extensions/hermes/logging/host.rs.html#12-65">source</a><a href="#impl-Host-for-HermesRuntimeContext" class="anchor">§</a><h3 class="code-header">impl <a class="trait" href="trait.Host.html" title="trait hermes::runtime_extensions::bindings::hermes::logging::api::Host">Host</a> for <a class="struct" href="../../../../../runtime_context/struct.HermesRuntimeContext.html" title="struct hermes::runtime_context::HermesRuntimeContext">HermesRuntimeContext</a></h3></section></div><script src="../../../../../../trait.impl/hermes/runtime_extensions/bindings/hermes/logging/api/trait.Host.js" async></script></section></div></main></body></html>

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["BUFFER_SIZE"],"fn":["calculate_package_dir_hash","calculate_package_file_hash","copy_dir_recursively_to_package","copy_file_to_package","create_dir_to_package","get_dir_from_package","get_package_file_reader"],"mod":["compression","path"],"struct":["Package"]};

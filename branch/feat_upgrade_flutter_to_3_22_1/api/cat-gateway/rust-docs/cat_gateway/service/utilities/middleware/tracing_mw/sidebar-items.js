@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["CLIENT_METRIC_LABELS","METRIC_LABELS"],"fn":["add_interesting_headers_to_span","anonymous_client_id","init_prometheus","mk_request_span"],"struct":["CLIENT_REQUEST_COUNT","HTTP_REQUEST_COUNT","HTTP_REQ_CPU_TIME_MS","HTTP_REQ_DURATION_MS","PANIC_REQUEST_COUNT","ResponseData","Tracing","TracingEndpoint"]};

@@ -1,0 +1,4 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","60114","test_date_time_to_slot_number_endpoint","","Thu Aug 08 00:21:34 GMT 2024","passed","Thu Aug 08 00:22:34 GMT 2024","","pytest","api_tests.test_slot_info",""
+"","1177","test_voter_registration_endpoint","","Thu Aug 08 00:21:34 GMT 2024","passed","Thu Aug 08 00:21:35 GMT 2024","","pytest","api_tests.test_voter_registration",""
+"","692509","test_staked_ada_endpoint","","Thu Aug 08 00:21:34 GMT 2024","passed","Thu Aug 08 00:33:06 GMT 2024","","pytest","api_tests.test_utxo",""

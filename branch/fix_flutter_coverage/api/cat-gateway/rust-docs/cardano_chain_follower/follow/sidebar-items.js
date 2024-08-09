@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"constant":["DEFAULT_CHAIN_UPDATE_BUFFER_SIZE"],"enum":["ChainUpdate"],"fn":["read_block_from_network","read_block_range_from_network","resolve_tip","set_client_read_pointer"],"mod":["task"],"struct":["ClientConnectInfo","Follower","FollowerConfig","FollowerConfigBuilder","ReadBlock","ReadBlockRange"]};

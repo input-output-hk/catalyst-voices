@@ -1,0 +1,55 @@
+digraph {
+
+    graph [
+        label="c509_certificate",
+        labelloc=t,
+
+        pad=0.4,
+
+        // Consider rendering the graph using a different layout algorithm, such as:
+        // [dot, neato, twopi, circo, fdp, sfdp]
+        layout=neato,
+        overlap=false,
+        splines="line",
+        rankdir=LR,
+
+        fontname="Helvetica", 
+        fontsize="36",
+    ];
+
+    node [
+        fontname="monospace",
+        fontsize="10",
+        shape="record",
+        style="filled",
+    ];
+
+    edge [
+        fontname="monospace",
+        fontsize="10",
+    ];
+
+    "c509_certificate" [label="crate|c509_certificate", fillcolor="#5397c8"]; // "crate" node
+    "c509_certificate::c509_extensions" [label="pub mod|c509_extensions", fillcolor="#81c169"]; // "mod" node
+    "c509_certificate::c509_extensions::alt_name" [label="pub mod|c509_extensions::alt_name", fillcolor="#81c169"]; // "mod" node
+    "c509_certificate::c509_extensions::extension" [label="pub mod|c509_extensions::extension", fillcolor="#81c169"]; // "mod" node
+    "c509_certificate::c509_extensions::extension::data" [label="pub(self) mod|c509_extensions::extension::data", fillcolor="#db5367"]; // "mod" node
+    "c509_certificate::c509_general_names" [label="pub mod|c509_general_names", fillcolor="#81c169"]; // "mod" node
+    "c509_certificate::c509_general_names::data" [label="pub(self) mod|c509_general_names::data", fillcolor="#db5367"]; // "mod" node
+    "c509_certificate::c509_general_names::general_name" [label="pub mod|c509_general_names::general_name", fillcolor="#81c169"]; // "mod" node
+    "c509_certificate::c509_general_names::other_name_hw_module" [label="pub(self) mod|c509_general_names::other_name_hw_module", fillcolor="#db5367"]; // "mod" node
+    "c509_certificate::c509_oid" [label="pub mod|c509_oid", fillcolor="#81c169"]; // "mod" node
+    "c509_certificate::tables" [label="pub(crate) mod|tables", fillcolor="#f8c04c"]; // "mod" node
+
+    "c509_certificate" -> "c509_certificate::c509_extensions" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate" -> "c509_certificate::c509_general_names" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate" -> "c509_certificate::c509_oid" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate" -> "c509_certificate::tables" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate::c509_extensions" -> "c509_certificate::c509_extensions::alt_name" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate::c509_extensions" -> "c509_certificate::c509_extensions::extension" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate::c509_extensions::extension" -> "c509_certificate::c509_extensions::extension::data" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate::c509_general_names" -> "c509_certificate::c509_general_names::data" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate::c509_general_names" -> "c509_certificate::c509_general_names::general_name" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+    "c509_certificate::c509_general_names" -> "c509_certificate::c509_general_names::other_name_hw_module" [label="owns", color="#000000", style="solid"] [constraint=true]; // "owns" edge
+
+}
