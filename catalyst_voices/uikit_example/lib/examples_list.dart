@@ -5,10 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:uikit_example/examples/voices_buttons_example.dart';
 import 'package:uikit_example/examples/voices_checkbox_example.dart';
 import 'package:uikit_example/examples/voices_chip_example.dart';
+import 'package:uikit_example/examples/voices_indicators_example.dart';
 import 'package:uikit_example/examples/voices_navigation_example.dart';
 import 'package:uikit_example/examples/voices_radio_example.dart';
 import 'package:uikit_example/examples/voices_segmented_button_example.dart';
+import 'package:uikit_example/examples/voices_separators_example.dart';
 import 'package:uikit_example/examples/voices_snackbar_example.dart';
+import 'package:uikit_example/examples/voices_switch_example.dart';
 
 class ExamplesListPage extends StatelessWidget {
   static List<ExampleTile> get examples {
@@ -47,6 +50,21 @@ class ExamplesListPage extends StatelessWidget {
         title: 'Voices Checkbox',
         route: VoicesCheckboxExample.route,
         page: VoicesCheckboxExample(),
+      ),
+      ExampleTile(
+        title: 'Voices Switch',
+        route: VoicesSwitchExample.route,
+        page: VoicesSwitchExample(),
+      ),
+      ExampleTile(
+        title: 'Voices Separators',
+        route: VoicesSeparatorsExample.route,
+        page: VoicesSeparatorsExample(),
+      ),
+      ExampleTile(
+        title: 'Voices Indicators',
+        route: VoicesIndicatorsExample.route,
+        page: VoicesIndicatorsExample(),
       ),
     ];
   }
