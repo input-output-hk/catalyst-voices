@@ -296,6 +296,14 @@ ThemeData _buildThemeData(
     ),
     dividerTheme: DividerThemeData(
       color: colorScheme.outlineVariant,
+      space: 16,
+      thickness: 1,
+    ),
+    progressIndicatorTheme: ProgressIndicatorThemeData(
+      color: colorScheme.primary,
+      linearTrackColor: colorScheme.secondaryContainer,
+      circularTrackColor: colorScheme.secondaryContainer,
+      refreshBackgroundColor: colorScheme.secondaryContainer,
     ),
     textTheme: textTheme,
     colorScheme: colorScheme,
