@@ -29,8 +29,8 @@ class VoicesSeparatorsExample extends StatelessWidget {
               child: Text('Paragraph'),
             ),
           ),
-          const VoicesNamedDivider(
-            name: Text('Your account creation progress'),
+          const VoicesTextDivider(
+            child: Text('Your account creation progress'),
           ),
           ColoredBox(
             color: Theme.of(context).colorScheme.primaryContainer,

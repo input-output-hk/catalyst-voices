@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 ///
 /// This widget provides a circular progress indicator with customization
 /// options for the progress value and track visibility.
-///
-/// {@category Widgets}
 class VoicesCircularProgressIndicator extends StatelessWidget {
   /// The current progress value, from 0.0 to 1.0. If null,
   /// the indicator will be indeterminate.

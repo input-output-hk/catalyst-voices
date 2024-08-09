@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 ///
 /// This widget provides a linear progress indicator with customization
 /// options for the progress value, track visibility, and rounded corners.
-///
-/// {@category Widgets}
 class VoicesLinearProgressIndicator extends StatelessWidget {
   /// The current progress value, from 0.0 to 1.0. If null, the indicator will
   /// be indeterminate.
