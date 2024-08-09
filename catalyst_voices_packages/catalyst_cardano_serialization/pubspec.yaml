@@ -18,6 +18,7 @@ dependencies:
   cryptography: ^2.7.0
   equatable: ^2.0.5
   pinenacl: ^0.6.0
+  ulid: ^2.0.0
 
 dev_dependencies:
   catalyst_analysis:
