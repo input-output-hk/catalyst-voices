@@ -1,0 +1,31 @@
+VERSION 0.7
+
+# Define a base target for dependencies
+deps:
+    FROM mcr.microsoft.com/playwright:v1.45.2-jammy
+    WORKDIR /wallet-automation
+
+    # Consolidate RUN commands to reduce layers and ensure cleaner installation
+    RUN apt-get update && apt-get install -y \
+        libnss3 libatk-bridge2.0-0 libdrm-dev libxkbcommon-dev libgbm-dev libasound-dev libatspi2.0-0 libxshmfence-dev postgresql-client xvfb python3.11 python3-pip && \
+        apt-get clean && \
+        rm -rf /var/lib/apt/lists/*
+
+    COPY package.json .
+    COPY package-lock.json .
+
+    RUN npm install
+    ENV PATH "/wallet-automation/node_modules/.bin:$PATH"
+
+# Define a source target that builds upon deps
+src:
+    FROM +deps
+
+    COPY --dir typhon .
+    COPY playwright.config.ts .
+    COPY global-setup.ts .
+
+# Define a test target that builds upon deps
+wallet-test:
+    FROM +src
+    RUN xvfb-run -a npx playwright test

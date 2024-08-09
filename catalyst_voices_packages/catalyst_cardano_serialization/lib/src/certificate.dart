@@ -73,5 +73,12 @@ final class C509Certificate extends BaseCertificate {
   C509Certificate.fromHex(super.string) : super.fromHex();
 
   /// Deserializes the type from cbor.
-  C509Certificate.fromCbor(super.value) : super.fromCbor();
+  C509Certificate.fromCbor(CborValue value)
+      : super.fromBytes(bytes: cbor.encode(value));
+
+  /// Serializes the type as cbor.
+  ///
+  /// The bytes are already cbor encoded so we override the default behavior.
+  @override
+  CborValue toCbor() => cbor.decode(bytes);
 }
