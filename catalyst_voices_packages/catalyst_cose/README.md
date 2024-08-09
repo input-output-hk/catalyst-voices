@@ -4,7 +4,6 @@
   * [Features](#features)
   * [Requirements](#requirements)
   * [Install](#install)
-  * [Web setup](#web-setup)
   * [Example](#example)
   * [Limitations](#limitations)
   * [Support](#support)
@@ -13,29 +12,18 @@
 ## Features
 
 This package exposes a CBOR Object Signing and Encryption
-[RFC-8152](https://datatracker.ietf.org/doc/html/rfc8152) implementation of cose-js npm module.
-
-* [cose-js](https://www.npmjs.com/package/cose-js)
+[RFC-9052](https://datatracker.ietf.org/doc/html/rfc9052),
+[RFC-9053](https://datatracker.ietf.org/doc/html/rfc9053) implementation.
 
 ## Requirements
 
 * Dart: 3.3.4+
-* Flutter: 3.22.1+
 
 ## Install
 
 ```yaml
 dependencies:
     catalyst_cose: any # or the latest version on Pub
-    catalyst_cose_web: any # or the latest version on Pub
-```
-
-## Web setup
-
-Add the following line at the end of `<head>` section in web/index.html:
-
-```html
-<script type="module" src="/assets/packages/catalyst_cose_web/assets/js/catalyst_cose.js"></script>
 ```
 
 ## Example
@@ -43,22 +31,56 @@ Add the following line at the end of `<head>` section in web/index.html:
 ```dart
 // ignore_for_file: avoid_print
 
+import 'dart:convert';
+
 import 'package:catalyst_cose/catalyst_cose.dart';
+import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
+import 'package:cryptography/cryptography.dart';
 
 Future<void> main() async {
-  final message = hex.decode(
-    '6c1382765aec5358f117733d281c1c7bdc39884d04a45a1e6c67c858bc206c19',
+  final algorithm = Ed25519();
+  final keyPair = await algorithm.newKeyPairFromSeed(List.filled(32, 0));
+  final privateKey = await keyPair.extractPrivateKeyBytes();
+  final publicKey = await keyPair.extractPublicKey().then((e) => e.bytes);
+
+  final payload = utf8.encode('This is the content.');
+
+  final coseSign1 = await CatalystCose.sign1(
+    privateKey: privateKey,
+    payload: payload,
+    kid: CborBytes(publicKey),
   );
 
-  final coseSignature = await CatalystCose.instance.signMessage(message);
-  print(coseSignature);
+  final verified = await CatalystCose.verifyCoseSign1(
+    coseSign1: coseSign1,
+    publicKey: publicKey,
+  );
+
+  print('COSE_SIGN1:');
+  print(hex.encode(cbor.encode(coseSign1)));
+  print('verified: $verified');
+
+  assert(
+    verified,
+    'The signature proves that given COSE_SIGN1 structure has been '
+    'signed by the owner of the given public key',
+  );
 }
 ```
 
 ## Limitations
 
-This package supports only web platform at the moment but it's intended that other platforms are supported in the future.
+This package supports only a subset of COSE features and algorithms.
+More features and algorithms are supposed to be added in the feature.
+
+Supported features:
+
+* COSE_SIGN_1: signature + verification
+
+Supported algorithms:
+
+* EdDSA: Ed25519
 
 ## Support
 

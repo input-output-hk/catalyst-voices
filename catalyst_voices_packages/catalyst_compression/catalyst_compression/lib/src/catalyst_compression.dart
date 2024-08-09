@@ -2,7 +2,7 @@ import 'package:catalyst_compression/catalyst_compression.dart';
 import 'package:catalyst_compression_platform_interface/catalyst_compression_platform_interface.dart';
 
 /// A Flutter plugin exposing brotli and zstd compression/decompression algorithms.
-class CatalystCompression {
+final class CatalystCompression {
   /// The default instance of [CatalystCompression] to use.
   static final CatalystCompression instance = CatalystCompression._();
 

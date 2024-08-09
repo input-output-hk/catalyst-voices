@@ -10,7 +10,7 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart' show Registrar;
 ///
 /// This class implements the `package:catalyst_cardano` functionality
 /// for the web.
-class CatalystCardanoWeb extends CatalystCardanoPlatform {
+final class CatalystCardanoWeb extends CatalystCardanoPlatform {
   /// A constructor that allows tests to override the window object used by the
   /// plugin.
   CatalystCardanoWeb();
