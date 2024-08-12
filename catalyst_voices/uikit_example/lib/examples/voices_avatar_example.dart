@@ -22,8 +22,9 @@ class VoicesAvatarExample extends StatelessWidget {
             const VoicesAvatar(
               icon: Icon(CatalystVoicesIcons.check),
             ),
-            const VoicesAvatar(
-              icon: Text('A'),
+            VoicesAvatar(
+              icon: const Text('A'),
+              onTap: () {},
             ),
             VoicesAvatar(
               icon: const Icon(CatalystVoicesIcons.light_bulb),
