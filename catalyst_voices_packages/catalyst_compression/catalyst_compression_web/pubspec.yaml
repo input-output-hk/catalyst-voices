@@ -3,7 +3,7 @@ description: Web platform implementation of catalyst_compression. Exposes a JS w
 repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices_packages/catalyst_compression/catalyst_compression_web
 issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
 topics: [compression, codec]
-version: 0.1.1
+version: 0.2.0
 
 environment:
   sdk: ">=3.3.4 <4.0.0"
