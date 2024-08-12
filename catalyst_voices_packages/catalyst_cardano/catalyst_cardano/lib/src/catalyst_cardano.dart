@@ -2,7 +2,7 @@ import 'package:catalyst_cardano_platform_interface/catalyst_cardano_platform_in
 
 /// A Flutter plugin exposing the [CIP-30](https://cips.cardano.org/cip/CIP-30)
 /// and [CIP-95](https://cips.cardano.org/cip/CIP-95) APIs.
-class CatalystCardano {
+final class CatalystCardano {
   /// The default instance of [CatalystCardano] to use.
   static final CatalystCardano instance = CatalystCardano._();
 
