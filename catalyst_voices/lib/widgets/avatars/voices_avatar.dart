@@ -43,23 +43,28 @@ class VoicesAvatar extends StatelessWidget {
           backgroundColor ?? Theme.of(context).colorScheme.primaryContainer,
       child: Material(
         type: MaterialType.transparency,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(radius * 2),
-          onTap: onTap,
-          child: Padding(
-            padding: padding,
-            child: IconTheme(
-              data: IconTheme.of(context).copyWith(
-                size: 24,
-                color: foregroundColor ?? Theme.of(context).colorScheme.primary,
-              ),
-              child: DefaultTextStyle(
-                style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                      fontSize: 18,
-                      color: foregroundColor ??
-                          Theme.of(context).colorScheme.primary,
-                    ),
-                child: icon,
+        child: SizedBox.expand(
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(radius * 2),
+            child: Center(
+              child: Padding(
+                padding: padding,
+                child: IconTheme(
+                  data: IconTheme.of(context).copyWith(
+                    size: 24,
+                    color: foregroundColor ??
+                        Theme.of(context).colorScheme.primary,
+                  ),
+                  child: DefaultTextStyle(
+                    style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+                          fontSize: 18,
+                          color: foregroundColor ??
+                              Theme.of(context).colorScheme.primary,
+                        ),
+                    child: icon,
+                  ),
+                ),
               ),
             ),
           ),
