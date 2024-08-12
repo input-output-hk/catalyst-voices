@@ -3,7 +3,7 @@ description: A Flutter plugin exposing Brotli and zstd compression algorithms.
 repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices_packages/catalyst_compression/catalyst_compression
 issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
 topics: [compression, codec]
-version: 0.1.1
+version: 0.2.0
 
 environment:
   sdk: ">=3.3.4 <4.0.0"
@@ -17,7 +17,7 @@ flutter:
 
 dependencies:
   catalyst_compression_platform_interface: ^0.1.1
-  catalyst_compression_web: ^0.1.1
+  catalyst_compression_web: ^0.2.0
   convert: ^3.1.1
   flutter:
     sdk: flutter
