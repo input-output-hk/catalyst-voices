@@ -1,15 +1,16 @@
 name: poc_local_storage
 description: "A new Flutter project."
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.4.3 <4.0.0'
+  sdk: ">=3.4.3 <4.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
+  file_picker: ^8.0.7
   flutter_secure_storage: ^9.2.2
 
 dev_dependencies:
