@@ -26,8 +26,8 @@ A collection of Catalyst packages and plugins for Flutter and Dart.
 
 ## Requirements
 
-* Flutter: 3.13.9+
-* Dart: 3.1.5+
+* Flutter: 3.22.1+
+* Dart: 3.3.4+
 * Xcode: 15.0+
 * Android Studio: Android Studio Electric Eel | 2022.1.1 +
 * [Melos](https://melos.invertase.dev)
