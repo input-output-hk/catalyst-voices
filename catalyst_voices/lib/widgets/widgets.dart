@@ -1,8 +1,10 @@
+export 'avatars/voices_avatar.dart';
 export 'buttons/voices_filled_button.dart';
 export 'buttons/voices_icon_button.dart';
 export 'buttons/voices_outlined_button.dart';
 export 'buttons/voices_segmented_button.dart';
 export 'buttons/voices_text_button.dart';
+export 'chips/voices_chip.dart';
 export 'indicators/process_progress_indicator.dart';
 export 'indicators/voices_circular_progress_indicator.dart';
 export 'indicators/voices_linear_progress_indicator.dart';
