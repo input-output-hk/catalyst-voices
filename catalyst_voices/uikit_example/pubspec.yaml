@@ -22,10 +22,24 @@ dependencies:
   flutter_localized_locales: ^2.0.5
 
 dev_dependencies:
+  build_runner: ^2.3.3
   catalyst_analysis:
     path: ../../catalyst_voices_packages/catalyst_analysis
+  flutter_gen_runner: ^5.3.2
   flutter_test:
     sdk: flutter
 
 flutter:
   uses-material-design: true
+  generate: true
+  assets:
+    - assets/images/
+
+flutter_gen:
+  output: lib/generated/
+  assets:
+    enabled: true
+    outputs:
+      class_name: UiKitAssets
+      package_parameter_enabled: false
+      style: dot-delimiter
