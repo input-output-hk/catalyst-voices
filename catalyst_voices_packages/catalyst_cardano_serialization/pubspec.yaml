@@ -3,7 +3,7 @@ description: Dart package providing serialization/deserialization for common str
 repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices_packages/catalyst_cardano_serialization
 issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
 topics: [blockchain, cardano, cryptocurrency, wallet]
-version: 0.2.0
+version: 0.3.0
 
 environment:
   sdk: ">=3.3.4 <4.0.0"
@@ -12,8 +12,8 @@ environment:
 dependencies:
   bech32: ^0.2.2
   bip32_ed25519: ^0.6.0
-  catalyst_compression: ^0.2.0
-  catalyst_compression_web: ^0.2.0
+  catalyst_compression: ^0.3.0
+  catalyst_compression_web: ^0.3.0
   cbor: ^6.2.0
   convert: ^3.1.1
   cryptography: ^2.7.0
