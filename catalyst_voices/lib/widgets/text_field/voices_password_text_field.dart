@@ -19,13 +19,11 @@ final class VoicesPasswordTextField extends StatelessWidget {
       obscureText: true,
       textInputAction: TextInputAction.done,
       onChanged: onChanged,
-      decoration: InputDecoration(
-        filled: true,
+      decoration: VoicesTextFieldDecoration(
         errorMaxLines: 2,
         labelText: l10n.passwordLabelText,
         hintText: l10n.passwordHintText,
         errorText: l10n.passwordErrorText,
-        border: const OutlineInputBorder(),
       ),
       style: const TextStyle(
         fontWeight: FontWeight.w500,
