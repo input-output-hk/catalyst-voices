@@ -1,3 +1,9 @@
+## 0.3.0
+
+> Note: This release has breaking changes.
+
+ - **BREAKING** **FIX**: cardano serialization must depend on flutter ([#679](https://github.com/input-output-hk/catalyst-voices/issues/679)). ([b7d5276b](https://github.com/input-output-hk/catalyst-voices/commit/b7d5276b238b4c7273997b004465e2ffb29f8436))
+
 ## 0.2.0
 
 > Note: This release has breaking changes.
