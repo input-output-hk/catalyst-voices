@@ -3,7 +3,6 @@ import { getWalletCredentials, getRegistrationPin } from './credentials';
 import { getSeedPhrase } from './seed-phrase';
 import path from 'path';
 
-// extension ID for Typhon: kfdniefadaanbjodldohaedphafoffoh
 
 let newTab: Page
 let browser: BrowserContext;

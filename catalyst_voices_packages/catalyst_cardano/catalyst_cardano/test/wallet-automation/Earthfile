@@ -1,11 +1,11 @@
-VERSION 0.7
+VERSION 0.8
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.1.21 AS flutter-ci
 
-# Define a base target for dependencies
+
 deps:
     FROM mcr.microsoft.com/playwright:v1.45.2-jammy
     WORKDIR /wallet-automation
 
-    # Consolidate RUN commands to reduce layers and ensure cleaner installation
     RUN apt-get update && apt-get install -y \
         libnss3 libatk-bridge2.0-0 libdrm-dev libxkbcommon-dev libgbm-dev libasound-dev libatspi2.0-0 libxshmfence-dev postgresql-client xvfb python3.11 python3-pip && \
         apt-get clean && \
@@ -17,15 +17,30 @@ deps:
     RUN npm install
     ENV PATH "/wallet-automation/node_modules/.bin:$PATH"
 
-# Define a source target that builds upon deps
 src:
     FROM +deps
-
     COPY --dir typhon .
     COPY playwright.config.ts .
     COPY global-setup.ts .
 
-# Define a test target that builds upon deps
-wallet-test:
+test:
     FROM +src
     RUN xvfb-run -a npx playwright test
+
+builder:
+    DO flutter-ci+SETUP
+    COPY ../../../../../+repo-catalyst-voices-all/repo .
+    DO flutter-ci+BOOTSTRAP
+
+build-web:
+    FROM +builder
+    ARG WORKDIR=/frontend/catalyst_voices_packages/catalyst_cardano/catalyst_cardano/example
+    DO flutter-ci+BUILD_WEB --TARGET=lib/main.dart --WORKDIR=$WORKDIR
+    SAVE ARTIFACT web
+
+package:
+    FROM nginx:alpine3.18
+    ARG tag='latest'
+    COPY +build-web/web /usr/share/nginx/html/
+    EXPOSE 80
+    SAVE IMAGE test_app:$tag
