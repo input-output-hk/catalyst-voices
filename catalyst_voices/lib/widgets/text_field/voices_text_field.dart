@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -78,6 +79,13 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
       const VoicesTextFieldValidationResult(status: VoicesTextFieldStatus.none);
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    _validate(_obtainController().text);
+  }
+
+  @override
   void didUpdateWidget(VoicesTextField oldWidget) {
     super.didUpdateWidget(oldWidget);
 
@@ -126,17 +134,20 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
           controller: _obtainController(),
           focusNode: widget.focusNode,
           decoration: InputDecoration(
-            // TODO: udpate border depending on validation result
             border: widget.decoration?.border ??
-                OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: theme.colorScheme.outlineVariant,
+                _getBorder(
+                  orDefault: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: theme.colorScheme.outlineVariant,
+                    ),
                   ),
                 ),
             enabledBorder: widget.decoration?.enabledBorder ??
-                OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: theme.colorScheme.outlineVariant,
+                _getBorder(
+                  orDefault: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: theme.colorScheme.outlineVariant,
+                    ),
                   ),
                 ),
             disabledBorder: widget.decoration?.disabledBorder ??
@@ -149,20 +160,28 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
                 OutlineInputBorder(
                   borderSide: BorderSide(
                     width: 2,
-                    color: theme.colorScheme.error,
+                    color: _getStatusColor(
+                      orDefault: theme.colorScheme.error,
+                    ),
                   ),
                 ),
             focusedBorder: widget.decoration?.focusedBorder ??
-                OutlineInputBorder(
-                  borderSide: BorderSide(
-                    width: 2,
-                    color: theme.colorScheme.primary,
+                _getBorder(
+                  orDefault: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      width: 2,
+                      color: theme.colorScheme.primary,
+                    ),
                   ),
                 ),
             focusedErrorBorder: widget.decoration?.focusedErrorBorder ??
-                OutlineInputBorder(
-                  borderSide:
-                      BorderSide(width: 2, color: theme.colorScheme.error),
+                _getBorder(
+                  orDefault: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      width: 2,
+                      color: theme.colorScheme.error,
+                    ),
+                  ),
                 ),
             helperText: widget.decoration?.helperText,
             helperStyle: widget.enabled
@@ -171,7 +190,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
                     .copyWith(color: theme.colors.textDisabled),
             hintText: widget.decoration?.hintText,
             hintStyle: textTheme.bodyLarge,
-            errorText: widget.decoration?.errorText,
+            errorText: widget.decoration?.errorText ?? _validation.errorMessage,
             errorMaxLines: widget.decoration?.errorMaxLines,
             errorStyle: widget.enabled
                 ? textTheme.bodySmall
@@ -179,7 +198,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
                     .copyWith(color: theme.colors.textDisabled),
             prefixIcon: widget.decoration?.prefixIcon,
             prefixText: widget.decoration?.prefixText,
-            suffixIcon: widget.decoration?.suffixIcon,
+            suffixIcon: widget.decoration?.suffixIcon ?? _getStatusSuffixIcon(),
             suffixText: widget.decoration?.suffixText,
             counterText: widget.decoration?.counterText,
             counterStyle: widget.enabled
@@ -200,6 +219,61 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
         ),
       ],
     );
+  }
+
+  InputBorder _getBorder({required InputBorder orDefault}) {
+    switch (_validation.status) {
+      case VoicesTextFieldStatus.none:
+        return orDefault;
+      case VoicesTextFieldStatus.success:
+      case VoicesTextFieldStatus.warning:
+      case VoicesTextFieldStatus.error:
+        return OutlineInputBorder(
+          borderSide: BorderSide(
+            width: 2,
+            color: _getStatusColor(
+              orDefault: Colors.transparent,
+            ),
+          ),
+        );
+    }
+  }
+
+  Widget? _getStatusSuffixIcon() {
+    switch (_validation.status) {
+      case VoicesTextFieldStatus.none:
+        return null;
+      case VoicesTextFieldStatus.success:
+        return Icon(
+          CatalystVoicesIcons.check_circle,
+          color: _getStatusColor(orDefault: Colors.transparent),
+        );
+      case VoicesTextFieldStatus.warning:
+        return Icon(
+          // TODO(dtscalac): this is not the right icon, it should be outlined
+          // & rounded, ask designers to provide it and update it
+          Icons.warning_outlined,
+          color: _getStatusColor(orDefault: Colors.transparent),
+        );
+      case VoicesTextFieldStatus.error:
+        return Icon(
+          Icons.error_outline,
+          color: _getStatusColor(orDefault: Colors.transparent),
+        );
+    }
+  }
+
+  Color _getStatusColor({required Color orDefault}) {
+    switch (_validation.status) {
+      case VoicesTextFieldStatus.none:
+        return orDefault;
+      case VoicesTextFieldStatus.success:
+        return Theme.of(context).colors.success!;
+      case VoicesTextFieldStatus.warning:
+        return Theme.of(context).colors.warning!;
+      case VoicesTextFieldStatus.error:
+        return Theme.of(context).colorScheme.error;
+    }
   }
 
   TextEditingController _obtainController() {
@@ -428,23 +502,4 @@ class VoicesTextFieldDecoration {
     this.suffixText,
     this.counterText,
   });
-
-  /// Creates a text field decoration where all borders are the same.
-  const VoicesTextFieldDecoration.singleBorder({
-    required this.border,
-    this.labelText,
-    this.helperText,
-    this.hintText,
-    this.errorText,
-    this.errorMaxLines,
-    this.prefixIcon,
-    this.prefixText,
-    this.suffixIcon,
-    this.suffixText,
-    this.counterText,
-  })  : enabledBorder = border,
-        disabledBorder = border,
-        errorBorder = border,
-        focusedBorder = border,
-        focusedErrorBorder = border;
 }

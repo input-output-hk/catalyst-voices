@@ -1,6 +1,5 @@
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
-import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
 class VoicesTextFieldExample extends StatefulWidget {
@@ -36,7 +35,7 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
               child: VoicesTextField(
                 controller: _controller,
                 decoration: const VoicesTextFieldDecoration(
-                  labelText: 'Field label',
+                  labelText: 'Regular',
                   helperText: 'Supporting text',
                   hintText: 'Hint text',
                   suffixIcon: Icon(CatalystVoicesIcons.chevron_down),
@@ -49,7 +48,7 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
               child: VoicesTextField(
                 controller: _controller,
                 decoration: const VoicesTextFieldDecoration(
-                  labelText: 'Field label',
+                  labelText: 'Disabled',
                   helperText: 'Supporting text',
                   hintText: 'Hint text',
                   suffixIcon: Icon(CatalystVoicesIcons.chevron_down),
@@ -63,7 +62,7 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
               child: VoicesTextField(
                 controller: _controller,
                 decoration: const VoicesTextFieldDecoration(
-                  labelText: 'Field label',
+                  labelText: 'Error text',
                   helperText: 'Supporting text',
                   hintText: 'Hint text',
                   errorText: 'Error text',
@@ -77,13 +76,53 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
               child: VoicesTextField(
                 controller: _controller,
                 decoration: const VoicesTextFieldDecoration(
-                  labelText: 'Field label',
+                  labelText: 'Success',
                   helperText: 'Supporting text',
                   hintText: 'Hint text',
-                  errorText: 'Error text',
-                  suffixIcon: Icon(Icons.error_outline),
                 ),
                 maxLength: 200,
+                validator: VoicesTextFieldValidationResult.success(),
+              ),
+            ),
+            SizedBox(
+              width: 200,
+              child: VoicesTextField(
+                controller: _controller,
+                decoration: const VoicesTextFieldDecoration(
+                  labelText: 'Warning',
+                  helperText: 'Supporting text',
+                  hintText: 'Hint text',
+                ),
+                maxLength: 200,
+                validator:
+                    VoicesTextFieldValidationResult.warning('Warning message'),
+              ),
+            ),
+            SizedBox(
+              width: 200,
+              child: VoicesTextField(
+                controller: _controller,
+                decoration: const VoicesTextFieldDecoration(
+                  labelText: 'Error',
+                  helperText: 'Supporting text',
+                  hintText: 'Hint text',
+                ),
+                maxLength: 200,
+                validator:
+                    VoicesTextFieldValidationResult.error('Error message'),
+              ),
+            ),
+            SizedBox(
+              width: 200,
+              child: VoicesTextField(
+                controller: _controller,
+                decoration: const VoicesTextFieldDecoration(
+                  labelText: 'Success / disabled',
+                  helperText: 'Supporting text',
+                  hintText: 'Hint text',
+                ),
+                maxLength: 200,
+                validator: VoicesTextFieldValidationResult.success(),
                 enabled: false,
               ),
             ),
@@ -91,21 +130,62 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
               width: 200,
               child: VoicesTextField(
                 controller: _controller,
-                decoration: VoicesTextFieldDecoration.singleBorder(
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      width: 2,
-                      color: Theme.of(context).colors.iconsSuccess!,
-                    ),
-                  ),
-                  labelText: 'Field label',
+                decoration: const VoicesTextFieldDecoration(
+                  labelText: 'Warning / disabled',
                   helperText: 'Supporting text',
                   hintText: 'Hint text',
-                  suffixIcon: Icon(
-                    CatalystVoicesIcons.check_circle,
-                    color: Theme.of(context).colors.iconsSuccess,
-                  ),
                 ),
+                maxLength: 200,
+                validator:
+                    VoicesTextFieldValidationResult.warning('Warning message'),
+                enabled: false,
+              ),
+            ),
+            SizedBox(
+              width: 200,
+              child: VoicesTextField(
+                controller: _controller,
+                decoration: const VoicesTextFieldDecoration(
+                  labelText: 'Error / disabled',
+                  helperText: 'Supporting text',
+                  hintText: 'Hint text',
+                ),
+                maxLength: 200,
+                validator:
+                    VoicesTextFieldValidationResult.error('Error message'),
+                enabled: false,
+              ),
+            ),
+            SizedBox(
+              width: 200,
+              child: VoicesTextField(
+                controller: _controller,
+                decoration: const VoicesTextFieldDecoration(
+                  labelText: 'success / warning / error',
+                  helperText: 'Supporting text',
+                  hintText: 'Hint text',
+                ),
+                validator: (value) {
+                  if (value == 'success') {
+                    return const VoicesTextFieldValidationResult(
+                      status: VoicesTextFieldStatus.success,
+                    );
+                  } else if (value == 'warning') {
+                    return const VoicesTextFieldValidationResult(
+                      status: VoicesTextFieldStatus.warning,
+                      errorMessage: 'Warning message',
+                    );
+                  } else if (value == 'error') {
+                    return const VoicesTextFieldValidationResult(
+                      status: VoicesTextFieldStatus.error,
+                      errorMessage: 'Error message',
+                    );
+                  } else {
+                    return const VoicesTextFieldValidationResult(
+                      status: VoicesTextFieldStatus.none,
+                    );
+                  }
+                },
                 maxLength: 200,
               ),
             ),
