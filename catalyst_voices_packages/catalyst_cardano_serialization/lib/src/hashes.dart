@@ -107,13 +107,13 @@ final class TransactionInputsHash extends BaseHash {
 
   /// Constructs the [TransactionInputsHash] from a [TransactionBody].
   TransactionInputsHash.fromTransactionInputs(
-    List<TransactionUnspentOutput> inputs,
+    List<TransactionUnspentOutput> utxos,
   ) : super.fromBytes(
           bytes: Hash.blake2b(
             Uint8List.fromList(
               cbor.encode(
                 CborList([
-                  for (final input in inputs) input.toCbor(),
+                  for (final utxo in utxos) utxo.input.toCbor(),
                 ]),
               ),
             ),
