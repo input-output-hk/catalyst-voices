@@ -134,6 +134,10 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
           controller: _obtainController(),
           focusNode: widget.focusNode,
           decoration: InputDecoration(
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 12,
+            ),
             border: widget.decoration?.border ??
                 _getBorder(
                   orDefault: OutlineInputBorder(
@@ -240,27 +244,28 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
   }
 
   Widget? _getStatusSuffixIcon() {
+    IconData? icon;
+
     switch (_validation.status) {
       case VoicesTextFieldStatus.none:
         return null;
       case VoicesTextFieldStatus.success:
-        return Icon(
-          CatalystVoicesIcons.check_circle,
-          color: _getStatusColor(orDefault: Colors.transparent),
-        );
+        icon = CatalystVoicesIcons.check_circle;
       case VoicesTextFieldStatus.warning:
-        return Icon(
-          // TODO(dtscalac): this is not the right icon, it should be outlined
-          // & rounded, ask designers to provide it and update it
-          Icons.warning_outlined,
-          color: _getStatusColor(orDefault: Colors.transparent),
-        );
+        // TODO(dtscalac): this is not the right icon, it should be outlined
+        // & rounded, ask designers to provide it and update it
+        icon = Icons.warning_outlined;
       case VoicesTextFieldStatus.error:
-        return Icon(
-          Icons.error_outline,
-          color: _getStatusColor(orDefault: Colors.transparent),
-        );
+        icon = Icons.error_outline;
     }
+
+    return Padding(
+      padding: const EdgeInsetsDirectional.only(start: 4, end: 8),
+      child: Icon(
+        icon,
+        color: _getStatusColor(orDefault: Colors.transparent),
+      ),
+    );
   }
 
   Color _getStatusColor({required Color orDefault}) {
