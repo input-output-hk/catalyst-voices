@@ -202,7 +202,8 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
                     .copyWith(color: theme.colors.textDisabled),
             prefixIcon: widget.decoration?.prefixIcon,
             prefixText: widget.decoration?.prefixText,
-            suffixIcon: widget.decoration?.suffixIcon ?? _getStatusSuffixIcon(),
+            suffixIcon:
+                widget.decoration?.suffixIcon ?? _getStatusSuffixWidget(),
             suffixText: widget.decoration?.suffixText,
             counterText: widget.decoration?.counterText,
             counterStyle: widget.enabled
@@ -243,29 +244,34 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
     }
   }
 
-  Widget? _getStatusSuffixIcon() {
-    IconData? icon;
-
-    switch (_validation.status) {
-      case VoicesTextFieldStatus.none:
-        return null;
-      case VoicesTextFieldStatus.success:
-        icon = CatalystVoicesIcons.check_circle;
-      case VoicesTextFieldStatus.warning:
-        // TODO(dtscalac): this is not the right icon, it should be outlined
-        // & rounded, ask designers to provide it and update it
-        icon = Icons.warning_outlined;
-      case VoicesTextFieldStatus.error:
-        icon = Icons.error_outline;
+  Widget? _getStatusSuffixWidget() {
+    final showStatusIcon = widget.decoration?.showStatusSuffixIcon ?? true;
+    if (!showStatusIcon) {
+      return null;
     }
 
     return Padding(
       padding: const EdgeInsetsDirectional.only(start: 4, end: 8),
       child: Icon(
-        icon,
+        getStatusSuffixIcon(),
         color: _getStatusColor(orDefault: Colors.transparent),
       ),
     );
+  }
+
+  IconData? getStatusSuffixIcon() {
+    switch (_validation.status) {
+      case VoicesTextFieldStatus.none:
+        return null;
+      case VoicesTextFieldStatus.success:
+        return CatalystVoicesIcons.check_circle;
+      case VoicesTextFieldStatus.warning:
+        // TODO(dtscalac): this is not the right icon, it should be outlined
+        // & rounded, ask designers to provide it and update it
+        return Icons.warning_outlined;
+      case VoicesTextFieldStatus.error:
+        return Icons.error_outline;
+    }
   }
 
   Color _getStatusColor({required Color orDefault}) {
@@ -488,6 +494,10 @@ class VoicesTextFieldDecoration {
   /// [InputDecoration.counterText].
   final String? counterText;
 
+  /// Whether the [VoicesTextField] will automatically
+  /// add a status [suffixIcon] based on the results of the validation.
+  final bool showStatusSuffixIcon;
+
   /// Creates a new text field decoration.
   const VoicesTextFieldDecoration({
     this.border,
@@ -506,5 +516,6 @@ class VoicesTextFieldDecoration {
     this.suffixIcon,
     this.suffixText,
     this.counterText,
+    this.showStatusSuffixIcon = true,
   });
 }
