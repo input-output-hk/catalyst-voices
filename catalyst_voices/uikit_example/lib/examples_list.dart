@@ -13,6 +13,7 @@ import 'package:uikit_example/examples/voices_segmented_button_example.dart';
 import 'package:uikit_example/examples/voices_separators_example.dart';
 import 'package:uikit_example/examples/voices_snackbar_example.dart';
 import 'package:uikit_example/examples/voices_switch_example.dart';
+import 'package:uikit_example/examples/voices_text_field_example.dart';
 
 class ExamplesListPage extends StatelessWidget {
   static List<ExampleTile> get examples {
@@ -71,6 +72,11 @@ class ExamplesListPage extends StatelessWidget {
         title: 'Voices Avatars',
         route: VoicesAvatarExample.route,
         page: VoicesAvatarExample(),
+      ),
+      ExampleTile(
+        title: 'Voices Text Field',
+        route: VoicesTextFieldExample.route,
+        page: VoicesTextFieldExample(),
       ),
     ];
   }
