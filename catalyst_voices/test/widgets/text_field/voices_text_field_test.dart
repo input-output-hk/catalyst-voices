@@ -1,0 +1,255 @@
+import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  group('VoicesTextField Widget Tests', () {
+    testWidgets('renders correctly with default parameters',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const _MaterialApp(
+          child: VoicesTextField(),
+        ),
+      );
+
+      // Verify the TextField is rendered
+      expect(find.byType(TextFormField), findsOneWidget);
+    });
+
+    testWidgets('displays label text when provided',
+        (WidgetTester tester) async {
+      const labelText = 'Test Label';
+
+      await tester.pumpWidget(
+        const _MaterialApp(
+          child: VoicesTextField(
+            decoration: VoicesTextFieldDecoration(labelText: labelText),
+          ),
+        ),
+      );
+
+      // Verify the label text is rendered
+      expect(find.text(labelText), findsOneWidget);
+    });
+
+    testWidgets('handles text input and updates controller',
+        (WidgetTester tester) async {
+      final controller = TextEditingController();
+
+      await tester.pumpWidget(
+        _MaterialApp(
+          child: VoicesTextField(
+            controller: controller,
+          ),
+        ),
+      );
+
+      // Enter text into the TextField
+      await tester.enterText(find.byType(TextFormField), 'Hello World');
+
+      // Verify that the controller's text is updated
+      expect(controller.text, 'Hello World');
+    });
+
+    testWidgets('applies custom decorations correctly',
+        (WidgetTester tester) async {
+      const hintText = 'Enter your text here';
+      const errorText = 'Error message';
+
+      await tester.pumpWidget(
+        const _MaterialApp(
+          child: VoicesTextField(
+            decoration: VoicesTextFieldDecoration(
+              hintText: hintText,
+              errorText: errorText,
+            ),
+          ),
+        ),
+      );
+
+      // Verify that hint, helper, and error texts are applied
+      expect(find.text(hintText), findsOneWidget);
+      expect(find.text(errorText), findsOneWidget);
+    });
+
+    testWidgets('validates input and displays error correctly',
+        (WidgetTester tester) async {
+      const errorText = 'Invalid input';
+
+      await tester.pumpWidget(
+        _MaterialApp(
+          child: VoicesTextField(
+            validator: (value) => const VoicesTextFieldValidationResult(
+              status: VoicesTextFieldStatus.error,
+              errorMessage: errorText,
+            ),
+          ),
+        ),
+      );
+
+      // Enter invalid text into the TextField
+      await tester.enterText(find.byType(TextFormField), 'Invalid');
+
+      // Trigger validation by losing focus
+      await tester.tap(find.byType(TextFormField));
+      await tester.pump();
+
+      // Verify that the error message is displayed
+      expect(find.text(errorText), findsOneWidget);
+    });
+
+    testWidgets('displays correct suffix icon based on validation result',
+        (WidgetTester tester) async {
+      await tester.pumpWidget(
+        _MaterialApp(
+          child: VoicesTextField(
+            validator: VoicesTextFieldValidationResult.success(),
+          ),
+        ),
+      );
+
+      // Enter valid text into the TextField
+      await tester.enterText(find.byType(TextFormField), 'Valid');
+      await tester.pump();
+
+      // Verify that the success icon is displayed
+      expect(find.byIcon(CatalystVoicesIcons.check_circle), findsOneWidget);
+    });
+
+    testWidgets('renders correctly when disabled', (WidgetTester tester) async {
+      await tester.pumpWidget(
+        const _MaterialApp(
+          child: VoicesTextField(
+            enabled: false,
+            decoration:
+                VoicesTextFieldDecoration(labelText: 'Disabled TextField'),
+          ),
+        ),
+      );
+
+      // Verify that the TextField is rendered as disabled
+      final textField =
+          tester.widget<TextFormField>(find.byType(TextFormField));
+      expect(textField.enabled, isFalse);
+    });
+  });
+
+  group('VoicesTextField Validator Logic Tests', () {
+    testWidgets('displays error when validation fails',
+        (WidgetTester tester) async {
+      const errorMessage = 'This field is required';
+
+      // Define a validator that returns an error if the input is empty
+      VoicesTextFieldValidationResult validator(String value) {
+        if (value.isEmpty) {
+          return const VoicesTextFieldValidationResult(
+            status: VoicesTextFieldStatus.error,
+            errorMessage: errorMessage,
+          );
+        }
+        return const VoicesTextFieldValidationResult(
+          status: VoicesTextFieldStatus.none,
+        );
+      }
+
+      await tester.pumpWidget(
+        _MaterialApp(
+          child: VoicesTextField(
+            validator: validator,
+          ),
+        ),
+      );
+
+      // Enter empty text into the TextField to trigger validation
+      await tester.enterText(find.byType(TextFormField), '');
+      await tester.pump();
+
+      // Verify that the error message is displayed
+      expect(find.text(errorMessage), findsOneWidget);
+
+      // Enter valid text into the TextField
+      await tester.enterText(find.byType(TextFormField), 'Valid input');
+      await tester.pump();
+
+      // Verify that the error message is no longer displayed
+      expect(find.text(errorMessage), findsNothing);
+    });
+
+    testWidgets('displays success when validation passes',
+        (WidgetTester tester) async {
+      // Define a validator that always returns success
+      VoicesTextFieldValidationResult validator(value) {
+        return const VoicesTextFieldValidationResult(
+          status: VoicesTextFieldStatus.success,
+        );
+      }
+
+      await tester.pumpWidget(
+        _MaterialApp(
+          child: VoicesTextField(
+            validator: validator,
+          ),
+        ),
+      );
+
+      // Enter text into the TextField to trigger validation
+      await tester.enterText(find.byType(TextFormField), 'Valid input');
+      await tester.pump();
+
+      // Verify that the success icon is displayed
+      expect(find.byIcon(CatalystVoicesIcons.check_circle), findsOneWidget);
+    });
+
+    testWidgets('displays warning when validation returns warning',
+        (WidgetTester tester) async {
+      const warningMessage = 'This is a warning';
+
+      // Define a validator that returns a warning for specific input
+      VoicesTextFieldValidationResult validator(String value) {
+        if (value == 'warning') {
+          return const VoicesTextFieldValidationResult(
+            status: VoicesTextFieldStatus.warning,
+            errorMessage: warningMessage,
+          );
+        }
+        return const VoicesTextFieldValidationResult(
+          status: VoicesTextFieldStatus.none,
+        );
+      }
+
+      await tester.pumpWidget(
+        _MaterialApp(
+          child: VoicesTextField(
+            validator: validator,
+          ),
+        ),
+      );
+
+      // Enter the text that triggers a warning
+      await tester.enterText(find.byType(TextFormField), 'warning');
+      await tester.pump();
+
+      // Verify that the warning message is displayed
+      expect(find.text(warningMessage), findsOneWidget);
+
+      // Verify that the warning icon is displayed
+      expect(find.byIcon(Icons.warning_outlined), findsOneWidget);
+    });
+  });
+}
+
+class _MaterialApp extends StatelessWidget {
+  final Widget child;
+
+  const _MaterialApp({required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      theme: ThemeBuilder.buildTheme(BrandKey.catalyst),
+      home: Scaffold(body: child),
+    );
+  }
+}
