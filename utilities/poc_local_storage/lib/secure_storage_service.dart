@@ -12,14 +12,21 @@ class SecureStorageService {
 
   SecureStorageService._() : _secureStorage = const FlutterSecureStorage();
 
+  Future<void> get deleteAll async {
+    await _secureStorage.deleteAll();
+  }
+
+  Future<bool> get hasPassword async {
+    final storedPassword = await _secureStorage.read(key: 'user_password');
+    return storedPassword != null;
+  }
+
   bool get isAuthenticated => _isAuthenticated;
+
+  void get logout => _isAuthenticated = false;
 
   Future<void> delete(String key) async {
     await _secureStorage.delete(key: key);
-  }
-
-  Future<void> deleteAll() async {
-    await _secureStorage.deleteAll();
   }
 
   Future<void> deletePassword() async {
@@ -47,11 +54,6 @@ class SecureStorageService {
     return await _secureStorage.read(key: key);
   }
 
-  Future<bool> hasPassword() async {
-    final storedPassword = await _secureStorage.read(key: 'user_password');
-    return storedPassword != null;
-  }
-
   Future<bool> login(String password) async {
     final storedPassword = await _secureStorage.read(key: 'user_password');
     if (password == storedPassword) {
@@ -61,17 +63,14 @@ class SecureStorageService {
     return false;
   }
 
-  void logout() {
-    _isAuthenticated = false;
-  }
-
   Future<void> saveBool(String key, bool value) async {
     await _secureStorage.write(key: key, value: value.toString());
   }
 
   Future<void> saveBytes(String key, Uint8List bytes) async {
     final String base64String = base64Encode(bytes);
-    print('Saving bytes: $base64String');
+    print('base64String: $base64String');
+    print('key: $key');
     await _secureStorage.write(key: key, value: base64String);
   }
 

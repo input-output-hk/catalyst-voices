@@ -17,6 +17,10 @@ class SecureCertificateRepository {
   })  : _storageService = storageService ?? SecureStorageService(),
         _filePickerService = filePickerService ?? FilePickerService();
 
+  Future<bool> get hasPassword async => _storageService.hasPassword;
+
+  bool get isAuthenticated => _storageService.isAuthenticated;
+
   Future<void> deleteAllCertificates() async {
     final allKeys = await _getAllKeys();
     for (final key in allKeys) {
@@ -43,10 +47,14 @@ class SecureCertificateRepository {
   Future<List<String>> getStoredCertificateNames() async {
     final allKeys = await _getAllKeys();
     print('All keys: $allKeys');
-    return allKeys
+    final ddd = allKeys
         .where((key) => key.startsWith(_certificateKeyPrefix))
         .map((key) => key.substring(_certificateKeyPrefix.length))
         .toList();
+
+    print('DDDD keys: $ddd');
+
+    return ddd;
   }
 
   Future<List<String>> pickAndStoreCertificates() async {
@@ -69,6 +77,10 @@ class SecureCertificateRepository {
 
     print('Stored certificates: $storedCertificates');
     return storedCertificates;
+  }
+
+  Future<void> setPassword(String password) async {
+    await _storageService.setPassword(password);
   }
 
   String _generateCertificateKey(String certificateName) {

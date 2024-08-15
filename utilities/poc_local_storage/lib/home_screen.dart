@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:poc_local_storage/secure_storage_service.dart';
+import 'package:poc_local_storage/app.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -10,7 +10,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final _authService = SecureStorageService();
   bool _hasPassword = false;
 
   @override
@@ -41,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _checkPassword() async {
-    final hasPassword = await _authService.hasPassword();
+    final hasPassword = await certificateRepo.hasPassword;
     setState(() {
       _hasPassword = hasPassword;
     });
@@ -64,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
             decoration:
                 const InputDecoration(hintText: "Enter your new password"),
           ),
-          actions: <Widget>[
+          actions: [
             TextButton(
               child: const Text('Cancel'),
               onPressed: () {
@@ -75,8 +74,9 @@ class _HomeScreenState extends State<HomeScreen> {
               child: const Text('Save'),
               onPressed: () async {
                 Navigator.of(context).pop();
-                await _authService.setPassword(tempPassword);
+                await certificateRepo.setPassword(tempPassword);
                 await _checkPassword();
+                tempPassword = '';
               },
             ),
           ],

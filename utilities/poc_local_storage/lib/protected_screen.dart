@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-import 'secure_certificate_repository.dart';
+import 'package:poc_local_storage/app.dart';
 
 class ProtectedScreen extends StatefulWidget {
   const ProtectedScreen({super.key});
@@ -11,7 +10,6 @@ class ProtectedScreen extends StatefulWidget {
 }
 
 class _ProtectedScreenState extends State<ProtectedScreen> {
-  final _certificateRepo = SecureCertificateRepository();
   List<String> _certificates = [];
   bool _isLoading = true;
 
@@ -84,7 +82,7 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
   }
 
   Future<void> _deleteCertificate(String certificateName) async {
-    await _certificateRepo.deleteCertificate(certificateName);
+    await certificateRepo.deleteCertificate(certificateName);
     _loadCertificates();
   }
 
@@ -92,7 +90,7 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
     setState(() {
       _isLoading = true;
     });
-    final certificates = await _certificateRepo.getStoredCertificateNames();
+    final certificates = await certificateRepo.getStoredCertificateNames();
     setState(() {
       _certificates = certificates;
       print('Loaded certificates: $_certificates');
@@ -101,8 +99,7 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
   }
 
   Future<void> _pickAndStoreCertificates() async {
-    final storedCertificates =
-        await _certificateRepo.pickAndStoreCertificates();
+    final storedCertificates = await certificateRepo.pickAndStoreCertificates();
     if (storedCertificates.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -114,7 +111,7 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
   }
 
   Future<void> _resetPassword() async {
-    await _certificateRepo.deletePassword();
+    await certificateRepo.deletePassword();
     if (mounted) {
       context.go('/');
     }
