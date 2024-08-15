@@ -1,3 +1,15 @@
+## 0.2.0+1
+
+ - Update a dependency to the latest release.
+
+## 0.2.0
+
+> Note: This release has breaking changes.
+
+ - **BREAKING** **FIX**: signData return type should be DataSignature, not VkeyWitness ([#647](https://github.com/input-output-hk/catalyst-voices/issues/647)). ([69dba1d2](https://github.com/input-output-hk/catalyst-voices/commit/69dba1d24022eb77cc03ac670dda0da047304766))
+ - **BREAKING** **FIX**: X509 registration metadata encoding ([#640](https://github.com/input-output-hk/catalyst-voices/issues/640)). ([c45a2ac9](https://github.com/input-output-hk/catalyst-voices/commit/c45a2ac96b34c4215352ece5ef9bd2fa73b591e8))
+ - **BREAKING** **FEAT**: COSE_SIGN1 signatures and verification ([#669](https://github.com/input-output-hk/catalyst-voices/issues/669)). ([f5a910ef](https://github.com/input-output-hk/catalyst-voices/commit/f5a910efe36442171521b9ec429aed4a46e05b83))
+
 ## 0.1.3
 
  - **FIX**: catalyst cardano integration with Typhoon wallet ([#636](https://github.com/input-output-hk/catalyst-voices/issues/636)). ([2c6e270d](https://github.com/input-output-hk/catalyst-voices/commit/2c6e270ddcb95389ac417ffe5f60ccabc04b5931))

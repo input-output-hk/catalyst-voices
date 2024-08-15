@@ -1,11 +1,14 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/src/theme_extensions/brand_assets.dart';
 import 'package:catalyst_voices_brands/src/theme_extensions/voices_color_scheme.dart';
+import 'package:catalyst_voices_brands/src/themes/widgets/buttons_theme.dart';
+import 'package:catalyst_voices_brands/src/themes/widgets/toggles_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 const ColorScheme darkColorScheme = ColorScheme.dark(
   primary: VoicesColors.darkPrimary,
+  onPrimary: VoicesColors.darkOnPrimary,
   primaryContainer: VoicesColors.darkPrimaryContainer,
   onPrimaryContainer: VoicesColors.darkOnPrimaryContainer,
   secondary: VoicesColors.darkSecondary,
@@ -72,6 +75,8 @@ const VoicesColorScheme darkVoicesColorScheme = VoicesColorScheme(
 
 const ColorScheme lightColorScheme = ColorScheme.light(
   primary: VoicesColors.lightPrimary,
+  // ignore: avoid_redundant_argument_values
+  onPrimary: VoicesColors.lightOnPrimary,
   primaryContainer: VoicesColors.lightPrimaryContainer,
   onPrimaryContainer: VoicesColors.lightOnPrimaryContainer,
   secondary: VoicesColors.lightSecondary,
@@ -265,6 +270,10 @@ TextTheme _buildTextTheme(VoicesColorScheme voicesColorScheme) {
   );
 }
 
+/// Note:
+///
+/// If we're going to introduce other themes then catalyst this method
+/// should be extracted.
 ThemeData _buildThemeData(
   ColorScheme colorScheme,
   VoicesColorScheme voicesColorScheme,
@@ -275,25 +284,6 @@ ThemeData _buildThemeData(
   return ThemeData(
     appBarTheme: AppBarTheme(
       backgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv1,
-    ),
-    filledButtonTheme: FilledButtonThemeData(
-      style: FilledButton.styleFrom(
-        minimumSize: const Size(48, 48),
-      ),
-    ),
-    outlinedButtonTheme: OutlinedButtonThemeData(
-      style: OutlinedButton.styleFrom(
-        minimumSize: const Size(48, 48),
-      ),
-    ),
-    buttonBarTheme: const ButtonBarThemeData(
-      buttonHeight: 40,
-    ),
-    iconButtonTheme: IconButtonThemeData(
-      style: IconButton.styleFrom(
-        foregroundColor: voicesColorScheme.iconsForeground,
-        iconSize: 24,
-      ),
     ),
     drawerTheme: DrawerThemeData(
       backgroundColor: voicesColorScheme.elevationsOnSurfaceNeutralLv0,
@@ -306,6 +296,14 @@ ThemeData _buildThemeData(
     ),
     dividerTheme: DividerThemeData(
       color: colorScheme.outlineVariant,
+      space: 16,
+      thickness: 1,
+    ),
+    progressIndicatorTheme: ProgressIndicatorThemeData(
+      color: colorScheme.primary,
+      linearTrackColor: colorScheme.secondaryContainer,
+      circularTrackColor: colorScheme.secondaryContainer,
+      refreshBackgroundColor: colorScheme.secondaryContainer,
     ),
     textTheme: textTheme,
     colorScheme: colorScheme,
@@ -313,5 +311,5 @@ ThemeData _buildThemeData(
       voicesColorScheme,
       brandAssets,
     ],
-  );
+  ).copyWithButtonsTheme().copyWithTogglesTheme();
 }

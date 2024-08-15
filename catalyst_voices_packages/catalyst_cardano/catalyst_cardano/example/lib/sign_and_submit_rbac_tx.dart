@@ -46,7 +46,7 @@ E61E8EE7D77E9F7F9804E03EBC31B458
 
 final _c509Cert = C509Certificate.fromHex(
   '''
-8B004301F50D6B524643207465737420
+004301F50D6B524643207465737420
 43411A63B0CD001A6955B90047010123
 456789AB01582102B1216AB96E5B3B33
 40F5BDF02E693F16213A04525ED44450
@@ -81,7 +81,7 @@ Future<void> _signAndSubmitRbacTx({
     );
 
     final x509Envelope = await _buildMetadataEnvelope(
-      inputs: utxos,
+      utxos: utxos,
     );
 
     final auxiliaryData = AuxiliaryData.fromCbor(
@@ -119,14 +119,14 @@ Future<void> _signAndSubmitRbacTx({
 }
 
 Future<X509MetadataEnvelope<RegistrationData>> _buildMetadataEnvelope({
-  required List<TransactionUnspentOutput> inputs,
+  required List<TransactionUnspentOutput> utxos,
 }) async {
   final keyPair =
       await Ed25519KeyPair.fromSeed(Ed25519PrivateKey.seeded(0).bytes);
 
   final x509Envelope = X509MetadataEnvelope.unsigned(
     purpose: UuidV4.fromString(_catalystUserRoleRegistrationPurpose),
-    txInputsHash: TransactionInputsHash.fromTransactionInputs(inputs),
+    txInputsHash: TransactionInputsHash.fromTransactionInputs(utxos),
     previousTransactionId: _transactionHash,
     chunkedData: RegistrationData(
       derCerts: [_derCert],

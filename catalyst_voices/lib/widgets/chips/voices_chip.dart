@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
@@ -81,30 +82,14 @@ class VoicesChip extends StatelessWidget {
           onTap: onTap,
           child: Padding(
             padding: padding,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (leading != null)
-                  Padding(
-                    padding: const EdgeInsetsDirectional.only(end: 8),
-                    child: IconTheme(
-                      data: iconTheme,
-                      child: leading!,
-                    ),
-                  ),
-                DefaultTextStyle(
-                  style: Theme.of(context).textTheme.labelLarge!,
-                  child: content,
-                ),
-                if (trailing != null)
-                  Padding(
-                    padding: const EdgeInsetsDirectional.only(start: 8),
-                    child: IconTheme(
-                      data: iconTheme,
-                      child: trailing!,
-                    ),
-                  ),
-              ],
+            child: AffixDecorator(
+              iconTheme: iconTheme,
+              prefix: leading,
+              suffix: trailing,
+              child: DefaultTextStyle(
+                style: Theme.of(context).textTheme.labelLarge!,
+                child: content,
+              ),
             ),
           ),
         ),
