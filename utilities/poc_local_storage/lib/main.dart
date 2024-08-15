@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:go_router/go_router.dart';
 
-import 'auth_service.dart';
 import 'home_screen.dart';
 import 'password_entry_screen.dart';
 import 'protected_screen.dart';
+import 'secure_storage_service.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,7 +13,7 @@ void main() {
   runApp(const MyApp());
 }
 
-final authService = AuthService();
+final secureStorageService = SecureStorageService();
 
 final GoRouter _router = GoRouter(
   routes: [
@@ -31,24 +31,17 @@ final GoRouter _router = GoRouter(
       path: '/protected',
       builder: (context, state) => const ProtectedScreen(),
       redirect: (context, state) async {
-        if (!authService.isAuthenticated) {
-          // Check if a password is set
-          bool hasPassword = await authService.hasPassword();
+        if (!secureStorageService.isAuthenticated) {
+          final hasPassword = await secureStorageService.hasPassword();
           if (!hasPassword) {
-            return '/'; // Redirect to home if no password is set
+            return '/';
           }
-          return '/password'; // Redirect to password screen if not authenticated
+          return '/password';
         }
-        return null; // Allow access to protected screen if authenticated
+        return null;
       },
     ),
   ],
-  redirect: (context, state) {
-    if (state.matchedLocation != '/protected' && authService.isAuthenticated) {
-      authService.logout();
-    }
-    return null;
-  },
 );
 
 class MyApp extends StatelessWidget {

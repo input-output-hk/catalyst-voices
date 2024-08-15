@@ -3,10 +3,16 @@ import 'dart:typed_data';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-final class LocalStorageService {
+class SecureStorageService {
+  static final _instance = SecureStorageService._();
   final FlutterSecureStorage _secureStorage;
 
-  LocalStorageService() : _secureStorage = const FlutterSecureStorage();
+  bool _isAuthenticated = false;
+  factory SecureStorageService() => _instance;
+
+  SecureStorageService._() : _secureStorage = const FlutterSecureStorage();
+
+  bool get isAuthenticated => _isAuthenticated;
 
   Future<void> delete(String key) async {
     await _secureStorage.delete(key: key);
@@ -14,6 +20,11 @@ final class LocalStorageService {
 
   Future<void> deleteAll() async {
     await _secureStorage.deleteAll();
+  }
+
+  Future<void> deletePassword() async {
+    await _secureStorage.delete(key: 'user_password');
+    _isAuthenticated = false;
   }
 
   Future<bool?> getBool(String key) async {
@@ -36,12 +47,31 @@ final class LocalStorageService {
     return await _secureStorage.read(key: key);
   }
 
+  Future<bool> hasPassword() async {
+    final storedPassword = await _secureStorage.read(key: 'user_password');
+    return storedPassword != null;
+  }
+
+  Future<bool> login(String password) async {
+    final storedPassword = await _secureStorage.read(key: 'user_password');
+    if (password == storedPassword) {
+      _isAuthenticated = true;
+      return true;
+    }
+    return false;
+  }
+
+  void logout() {
+    _isAuthenticated = false;
+  }
+
   Future<void> saveBool(String key, bool value) async {
     await _secureStorage.write(key: key, value: value.toString());
   }
 
   Future<void> saveBytes(String key, Uint8List bytes) async {
     final String base64String = base64Encode(bytes);
+    print('Saving bytes: $base64String');
     await _secureStorage.write(key: key, value: base64String);
   }
 
@@ -51,5 +81,9 @@ final class LocalStorageService {
 
   Future<void> saveString(String key, String value) async {
     await _secureStorage.write(key: key, value: value);
+  }
+
+  Future<void> setPassword(String password) async {
+    await _secureStorage.write(key: 'user_password', value: password);
   }
 }

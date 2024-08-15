@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-import 'auth_service.dart';
+import 'package:poc_local_storage/secure_storage_service.dart';
 
 class PasswordEntryScreen extends StatefulWidget {
   final String then;
@@ -13,8 +12,8 @@ class PasswordEntryScreen extends StatefulWidget {
 }
 
 class _PasswordEntryScreenState extends State<PasswordEntryScreen> {
-  final AuthService _authService = AuthService();
-  final TextEditingController _passwordController = TextEditingController();
+  final _authService = SecureStorageService();
+  final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
 
   @override
