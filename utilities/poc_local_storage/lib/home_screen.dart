@@ -60,8 +60,9 @@ class _HomeScreenState extends State<HomeScreen> {
           content: TextField(
             obscureText: true,
             onChanged: (value) => tempPassword = value,
-            decoration:
-                const InputDecoration(hintText: "Enter your new password"),
+            decoration: const InputDecoration(
+              hintText: "Enter your new password",
+            ),
           ),
           actions: [
             TextButton(

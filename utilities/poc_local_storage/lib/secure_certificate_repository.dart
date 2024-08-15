@@ -7,6 +7,7 @@ import 'secure_storage_service.dart';
 
 class SecureCertificateRepository {
   static const String _certificateKeyPrefix = 'certificate_';
+  static const String _certificateListKey = 'certificate_list';
 
   final SecureStorageService _storageService;
   final FilePickerService _filePickerService;
@@ -22,17 +23,19 @@ class SecureCertificateRepository {
   bool get isAuthenticated => _storageService.isAuthenticated;
 
   Future<void> deleteAllCertificates() async {
-    final allKeys = await _getAllKeys();
-    for (final key in allKeys) {
-      if (key.startsWith(_certificateKeyPrefix)) {
-        await _storageService.delete(key);
-      }
+    final certificateNames = await getStoredCertificateNames();
+    for (final name in certificateNames) {
+      await deleteCertificate(name);
     }
+    await _storageService.delete(_certificateListKey);
   }
 
   Future<void> deleteCertificate(String certificateName) async {
     final certificateKey = _generateCertificateKey(certificateName);
     await _storageService.delete(certificateKey);
+    final certificateList = await getStoredCertificateNames();
+    certificateList.remove(certificateName);
+    await _storeCertificateList(certificateList);
   }
 
   Future<void> deletePassword() async {
@@ -45,16 +48,11 @@ class SecureCertificateRepository {
   }
 
   Future<List<String>> getStoredCertificateNames() async {
-    final allKeys = await _getAllKeys();
-    print('All keys: $allKeys');
-    final ddd = allKeys
-        .where((key) => key.startsWith(_certificateKeyPrefix))
-        .map((key) => key.substring(_certificateKeyPrefix.length))
-        .toList();
-
-    print('DDDD keys: $ddd');
-
-    return ddd;
+    final storedList = await _storageService.getString(_certificateListKey);
+    if (storedList != null) {
+      return storedList.split(',');
+    }
+    return [];
   }
 
   Future<List<String>> pickAndStoreCertificates() async {
@@ -76,6 +74,7 @@ class SecureCertificateRepository {
     }
 
     print('Stored certificates: $storedCertificates');
+    await _addToCertificateList(storedCertificates);
     return storedCertificates;
   }
 
@@ -83,32 +82,18 @@ class SecureCertificateRepository {
     await _storageService.setPassword(password);
   }
 
+  Future<void> _addToCertificateList(List<String> newCertificates) async {
+    final existingList = await getStoredCertificateNames();
+    existingList.addAll(newCertificates);
+    await _storeCertificateList(existingList);
+  }
+
   String _generateCertificateKey(String certificateName) {
     return '$_certificateKeyPrefix$certificateName';
   }
 
-  Future<List<String>> _getAllKeys() async {
-    // This is a workaround since we can't directly access all keys
-    // We'll try to read a non-existent key to get all keys
-    final dummyKey = 'dummy_key_${DateTime.now().millisecondsSinceEpoch}';
-    await _storageService.getString(dummyKey);
-
-    print('Dummy key: $dummyKey');
-    // Now, we'll read all certificate keys by checking for their prefix
-    final allKeys = <String>[];
-    var i = 0;
-    while (true) {
-      final key = '${_certificateKeyPrefix}$i';
-      final value = await _storageService.getString(key);
-      if (value == null) break;
-      allKeys.add(key);
-      i++;
-    }
-    return allKeys;
-  }
-
   bool _isCertificate(PlatformFile file) {
-    return ['pem'].contains(file.extension?.toLowerCase());
+    return ['pem', 'crt', 'cer', 'der'].contains(file.extension?.toLowerCase());
   }
 
   Future<List<int>> _readFileAsBytes(PlatformFile file) async {
@@ -117,5 +102,10 @@ class SecureCertificateRepository {
     } else {
       throw Exception('No data available for file: ${file.name}');
     }
+  }
+
+  Future<void> _storeCertificateList(List<String> certificateList) async {
+    await _storageService.saveString(
+        _certificateListKey, certificateList.join(','));
   }
 }
