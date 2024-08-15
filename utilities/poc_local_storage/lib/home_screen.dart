@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:go_router/go_router.dart';
 
-import 'password_entry_screen.dart';
+import 'auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,7 +11,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final storage = const FlutterSecureStorage();
+  final AuthService _authService = AuthService();
   bool _hasPassword = false;
 
   @override
@@ -24,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Center(
         child: _hasPassword
             ? ElevatedButton(
-                onPressed: _navigateToProtectedScreen,
+                onPressed: () => _navigateToPasswordScreen(context),
                 child: const Text('Go to Protected Screen'),
               )
             : ElevatedButton(
@@ -42,23 +42,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _checkPassword() async {
-    final storedPassword = await storage.read(key: 'user_password');
+    final hasPassword = await _authService.hasPassword();
     setState(() {
-      _hasPassword = storedPassword != null;
+      _hasPassword = hasPassword;
     });
   }
 
-  Future<void> _createPassword(String newPassword) async {
-    if (newPassword.isNotEmpty) {
-      await storage.write(key: 'user_password', value: newPassword);
-      await _checkPassword();
-    }
-  }
-
-  void _navigateToProtectedScreen() {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (context) => const PasswordEntryScreen()),
-    );
+  void _navigateToPasswordScreen(BuildContext context) {
+    context.go('/password');
   }
 
   Future<void> _showCreatePasswordDialog(BuildContext context) {
@@ -83,9 +74,10 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             TextButton(
               child: const Text('Save'),
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop();
-                _createPassword(tempPassword);
+                await _authService.setPassword(tempPassword);
+                await _checkPassword();
               },
             ),
           ],

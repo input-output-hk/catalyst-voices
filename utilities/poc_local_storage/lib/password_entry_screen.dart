@@ -1,45 +1,99 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:go_router/go_router.dart';
 
-import 'protected_screen.dart';
+import 'auth_service.dart';
 
 class PasswordEntryScreen extends StatefulWidget {
-  const PasswordEntryScreen({super.key});
+  final String then;
+
+  const PasswordEntryScreen({super.key, required this.then});
 
   @override
   State<PasswordEntryScreen> createState() => _PasswordEntryScreenState();
 }
 
 class _PasswordEntryScreenState extends State<PasswordEntryScreen> {
-  final storage = const FlutterSecureStorage();
+  final AuthService _authService = AuthService();
   final TextEditingController _passwordController = TextEditingController();
+  bool _isPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Enter Password'),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Password',
-                border: OutlineInputBorder(),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 500),
+              child: Card(
+                elevation: 8,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(32.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.lock_outline,
+                        size: 64,
+                        color: Colors.blue,
+                      ),
+                      const SizedBox(height: 32),
+                      const Text(
+                        'Enter Password',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      TextField(
+                        controller: _passwordController,
+                        obscureText: !_isPasswordVisible,
+                        decoration: InputDecoration(
+                          labelText: 'Password',
+                          hintText: 'Enter your password',
+                          prefixIcon: const Icon(Icons.vpn_key),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isPasswordVisible
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordVisible = !_isPasswordVisible;
+                              });
+                            },
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      ElevatedButton(
+                        onPressed: _verifyPassword,
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size.fromHeight(50),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Enter',
+                          style: TextStyle(fontSize: 18),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _verifyPassword,
-              child: const Text('Enter'),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -52,19 +106,16 @@ class _PasswordEntryScreenState extends State<PasswordEntryScreen> {
   }
 
   Future<void> _verifyPassword() async {
-    final storedPassword = await storage.read(key: 'user_password');
-    if (_passwordController.text == storedPassword) {
+    final isAuthenticated = await _authService.login(_passwordController.text);
+    if (isAuthenticated) {
       if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const ProtectedScreen()),
-        );
+        context.go(widget.then);
       }
     } else {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Incorrect password. Please try again.'),
-          ),
+              content: Text('Incorrect password. Please try again.')),
         );
       }
     }
