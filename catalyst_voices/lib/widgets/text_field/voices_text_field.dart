@@ -79,6 +79,12 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
       const VoicesTextFieldValidationResult(status: VoicesTextFieldStatus.none);
 
   @override
+  void initState() {
+    super.initState();
+    _obtainController().addListener(_onChanged);
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
@@ -89,13 +95,21 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
   void didUpdateWidget(VoicesTextField oldWidget) {
     super.didUpdateWidget(oldWidget);
 
+    final newController = _obtainController();
+
+    // unregister listener from potentially old controllers
+    _customController?.removeListener(_onChanged);
+    oldWidget.controller?.removeListener(_onChanged);
+
     // the widget got controller from the parent, lets dispose our own
     if (widget.controller != null) {
       _customController?.dispose();
       _customController = null;
     }
 
-    final newController = _obtainController();
+    // register for a new one
+    newController.addListener(_onChanged);
+
     if (oldWidget.decoration?.errorText != widget.decoration?.errorText ||
         oldWidget.validator != widget.validator ||
         oldWidget.controller?.text != newController.text) {
@@ -107,6 +121,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
   void dispose() {
     _customController?.dispose();
     _customController = null;
+    widget.controller?.removeListener(_onChanged);
     super.dispose();
   }
 
@@ -220,7 +235,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
           minLines: widget.minLines,
           maxLength: widget.maxLength,
           enabled: widget.enabled,
-          onChanged: _onChanged,
+          onChanged: widget.onChanged,
         ),
       ],
     );
@@ -302,9 +317,8 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
     return customController;
   }
 
-  void _onChanged(String value) {
-    _validate(value);
-    widget.onChanged?.call(value);
+  void _onChanged() {
+    _validate(_obtainController().text);
   }
 
   void _validate(String value) {
