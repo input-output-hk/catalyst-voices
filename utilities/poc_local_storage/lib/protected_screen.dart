@@ -12,6 +12,7 @@ class ProtectedScreen extends StatefulWidget {
 class _ProtectedScreenState extends State<ProtectedScreen> {
   List<String> _certificates = [];
   bool _isLoading = true;
+  final _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -85,6 +86,12 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
   }
 
   @override
+  void dispose() {
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     _loadCertificates();
@@ -145,14 +152,13 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
   }
 
   Future<String?> _promptForPassword(String message) async {
-    final TextEditingController passwordController = TextEditingController();
     return showDialog<String>(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: Text(message),
           content: TextField(
-            controller: passwordController,
+            controller: _passwordController,
             obscureText: true,
             decoration: const InputDecoration(hintText: "Enter password"),
           ),
@@ -163,8 +169,7 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
             ),
             TextButton(
               child: const Text('OK'),
-              onPressed: () =>
-                  Navigator.of(context).pop(passwordController.text),
+              onPressed: () => Navigator.of(context).pop(),
             ),
           ],
         );
@@ -180,7 +185,6 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
         context.go('/');
       }
     } catch (e) {
-      print('Error resetting password and deleting certificates: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Failed to reset password and delete certificates'),
@@ -191,7 +195,8 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
 
   void _showCertificateDetails(String certificateName) async {
     final password = await _promptForPassword(
-        'Enter the password to view certificate details');
+      'Enter the password to view certificate details',
+    );
     if (password != null) {
       try {
         if (certificateRepo.isAuthenticated) {
@@ -208,7 +213,7 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
                   content: SingleChildScrollView(
                     child: Text(certificateContent),
                   ),
-                  actions: <Widget>[
+                  actions: [
                     TextButton(
                       child: const Text('Close'),
                       onPressed: () {
