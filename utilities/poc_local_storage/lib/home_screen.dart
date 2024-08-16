@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:poc_local_storage/app.dart';
+import 'package:poc_local_storage/main.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -76,8 +76,8 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () async {
                 Navigator.of(context).pop();
                 await certificateRepo.setPassword(tempPassword);
-                await _checkPassword();
                 tempPassword = '';
+                await _checkPassword();
               },
             ),
           ],

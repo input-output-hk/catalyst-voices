@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_local_storage/home_screen.dart';
+import 'package:poc_local_storage/main.dart';
 import 'package:poc_local_storage/password_entry_screen.dart';
 import 'package:poc_local_storage/protected_screen.dart';
-import 'package:poc_local_storage/secure_certificate_repository.dart';
-
-final SecureCertificateRepository certificateRepo =
-    SecureCertificateRepository();
 
 final GoRouter _router = GoRouter(
   routes: [
