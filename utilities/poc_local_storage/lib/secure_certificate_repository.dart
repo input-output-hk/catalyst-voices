@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 
+import 'crypto_service.dart';
 import 'file_picker_service.dart';
 import 'secure_storage_service.dart';
 
@@ -11,12 +13,15 @@ class SecureCertificateRepository {
 
   final SecureStorageService _storageService;
   final FilePickerService _filePickerService;
+  final CryptoService _cryptoService;
 
   SecureCertificateRepository({
     SecureStorageService? storageService,
     FilePickerService? filePickerService,
+    CryptoService? cryptoService,
   })  : _storageService = storageService ?? SecureStorageService(),
-        _filePickerService = filePickerService ?? FilePickerService();
+        _filePickerService = filePickerService ?? FilePickerService(),
+        _cryptoService = cryptoService ?? CryptoService();
 
   Future<bool> get hasPassword async => _storageService.hasPassword;
 
@@ -42,9 +47,21 @@ class SecureCertificateRepository {
     _storageService.deletePassword();
   }
 
-  Future<Uint8List?> getCertificate(String certificateName) async {
+  Future<String?> getCertificate(
+      String certificateName, String password) async {
     final certificateKey = _generateCertificateKey(certificateName);
-    return await _storageService.getBytes(certificateKey);
+    final encryptedCertificate = await _storageService.getBytes(certificateKey);
+    if (encryptedCertificate != null) {
+      try {
+        final decryptedBytes =
+            _cryptoService.decrypt(encryptedCertificate, password);
+        return utf8.decode(decryptedBytes);
+      } catch (e) {
+        print('Error decrypting certificate: $e');
+        return null;
+      }
+    }
+    return null;
   }
 
   Future<List<String>> getStoredCertificateNames() async {
@@ -55,7 +72,7 @@ class SecureCertificateRepository {
     return [];
   }
 
-  Future<List<String>> pickAndStoreCertificates() async {
+  Future<List<String>> pickAndStoreCertificates(String password) async {
     final files = await _filePickerService.pickMultipleFiles();
     print('Picked files: ${files.map((file) => file.name).toList()}');
     final storedCertificates = <String>[];
@@ -63,12 +80,13 @@ class SecureCertificateRepository {
     for (final file in files) {
       if (_isCertificate(file)) {
         final certificateBytes = await _readFileAsBytes(file);
+        final encryptedBytes =
+            _cryptoService.encrypt(certificateBytes, password);
         final certificateKey = _generateCertificateKey(file.name);
 
-        await _storageService.saveBytes(
-          certificateKey,
-          Uint8List.fromList(certificateBytes),
-        );
+        // Store the encrypted certificate
+        await _storageService.saveBytes(certificateKey, encryptedBytes);
+
         storedCertificates.add(file.name);
       }
     }
@@ -96,7 +114,7 @@ class SecureCertificateRepository {
     return ['pem', 'crt', 'cer', 'der'].contains(file.extension?.toLowerCase());
   }
 
-  Future<List<int>> _readFileAsBytes(PlatformFile file) async {
+  Future<Uint8List> _readFileAsBytes(PlatformFile file) async {
     if (file.bytes != null) {
       return file.bytes!;
     } else {

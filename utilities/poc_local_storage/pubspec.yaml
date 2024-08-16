@@ -13,6 +13,9 @@ dependencies:
   go_router: ^14.2.3
   file_picker: ^8.0.7
   flutter_secure_storage: ^9.2.2
+  pointycastle: ^3.9.1
+  crypto: ^3.0.5
+  asn1lib: ^1.5.3
 
 dev_dependencies:
   catalyst_analysis: ^1.2.0
