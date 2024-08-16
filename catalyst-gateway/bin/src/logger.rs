@@ -104,6 +104,11 @@ pub(crate) fn init(log_level: LogLevel) {
     tracing_subscriber::registry()
         .with(filter)
         .with(layer)
+        .with(
+            tracing_subscriber::EnvFilter::builder()
+                .with_default_directive(LevelFilter::INFO.into())
+                .from_env_lossy(),
+        )
         .init();
 
     // Logging is globally disabled by default, so globally enable it to the required level.

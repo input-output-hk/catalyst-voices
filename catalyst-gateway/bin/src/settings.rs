@@ -84,7 +84,7 @@ pub(crate) const CASSANDRA_MIN_BATCH_SIZE: i64 = 1;
 const CASSANDRA_MAX_BATCH_SIZE: i64 = 256;
 
 /// Default chain to follow.
-const CHAIN_FOLLOWER_DEFAULT: Network = Network::Preprod;
+const CHAIN_FOLLOWER_DEFAULT: Network = Network::Mainnet;
 
 /// Default number of sync tasks (must be in the range 1 to 255 inclusive.)
 const CHAIN_FOLLOWER_SYNC_TASKS_DEFAULT: u16 = 16;
@@ -323,16 +323,15 @@ impl StringEnvVar {
         }
         choices.push(']');
 
-        let value = match T::from_str(
-            StringEnvVar::new(
-                var_name,
-                (default.to_string().as_str(), redacted, choices.as_str()).into(),
-            )
-            .as_str(),
-        ) {
+        let choice = StringEnvVar::new(
+            var_name,
+            (default.to_string().as_str(), redacted, choices.as_str()).into(),
+        );
+
+        let value = match T::from_str(choice.as_str()) {
             Ok(var) => var,
             Err(error) => {
-                error!(error=%error, default=%default, choices=choices, "Invalid choice. Using Default.");
+                error!(error=%error, default=%default, choices=choices, choice=%choice, "Invalid choice. Using Default.");
                 default
             },
         };

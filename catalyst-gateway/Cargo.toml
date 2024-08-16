@@ -18,7 +18,7 @@ license = "MIT OR Apache-2.0"
 [workspace.dependencies]
 clap = "4.5.13"
 tracing = "0.1.40"
-tracing-subscriber = "0.3.18"
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
 serde = "1.0.204"
 serde_json = "1.0.121"
 poem = "3.0.4"
@@ -51,8 +51,8 @@ pallas = "0.29.0"
 cardano-chain-follower = { git = "https://github.com/input-output-hk/hermes.git", branch = "feat/auto-sync-mithril", version="0.2.0" }
 stringzilla = "3.8.4"
 duration-string = "0.4.0"
-build-info = "0.0.37"
-build-info-build = "0.0.37"
+build-info = "0.0.38"
+build-info-build = "0.0.38"
 ed25519-dalek = "2.1.1"
 scylla = { version = "0.13.1", features = ["ssl", "full-serialization"]}
 strum = { version = "0.26.3", features = ["derive"] }
