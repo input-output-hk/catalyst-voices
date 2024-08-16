@@ -3,21 +3,30 @@ import 'dart:typed_data';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class SecureStorageService {
+import 'crypto_service.dart';
+
+/// A service for securely storing and retrieving data.
+final class SecureStorageService {
   static final _instance = SecureStorageService._();
+
+  static const String _passwordKey = 'user_password';
   final FlutterSecureStorage _secureStorage;
 
+  final CryptoService _cryptoService;
   bool _isAuthenticated = false;
+
   factory SecureStorageService() => _instance;
 
-  SecureStorageService._() : _secureStorage = const FlutterSecureStorage();
+  SecureStorageService._()
+      : _secureStorage = const FlutterSecureStorage(),
+        _cryptoService = CryptoService();
 
   Future<void> get deleteAll async {
     await _secureStorage.deleteAll();
   }
 
   Future<bool> get hasPassword async {
-    final storedPassword = await _secureStorage.read(key: 'user_password');
+    final storedPassword = await _secureStorage.read(key: _passwordKey);
     return storedPassword != null;
   }
 
@@ -30,7 +39,7 @@ class SecureStorageService {
   }
 
   Future<void> deletePassword() async {
-    await _secureStorage.delete(key: 'user_password');
+    await _secureStorage.delete(key: _passwordKey);
     _isAuthenticated = false;
   }
 
@@ -55,10 +64,14 @@ class SecureStorageService {
   }
 
   Future<bool> login(String password) async {
-    final storedPassword = await _secureStorage.read(key: 'user_password');
-    if (password == storedPassword) {
-      _isAuthenticated = true;
-      return true;
+    final storedHashedPassword = await _secureStorage.read(key: _passwordKey);
+    if (storedHashedPassword != null) {
+      final storedHash = base64Decode(storedHashedPassword);
+      final isValid = _cryptoService.verifyPassword(password, storedHash);
+      if (isValid) {
+        _isAuthenticated = true;
+        return true;
+      }
     }
     return false;
   }
@@ -69,8 +82,6 @@ class SecureStorageService {
 
   Future<void> saveBytes(String key, Uint8List bytes) async {
     final String base64String = base64Encode(bytes);
-    print('base64String: $base64String');
-    print('key: $key');
     await _secureStorage.write(key: key, value: base64String);
   }
 
@@ -83,6 +94,10 @@ class SecureStorageService {
   }
 
   Future<void> setPassword(String password) async {
-    await _secureStorage.write(key: 'user_password', value: password);
+    final hashedPassword = _cryptoService.hashPassword(password);
+    await _secureStorage.write(
+      key: _passwordKey,
+      value: base64Encode(hashedPassword),
+    );
   }
 }

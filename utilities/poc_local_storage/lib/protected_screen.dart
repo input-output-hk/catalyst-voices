@@ -95,7 +95,6 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
       await certificateRepo.deleteCertificate(certificateName);
       await _loadCertificates();
     } catch (e) {
-      print('Error deleting certificate: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to delete certificate')),
       );
@@ -195,39 +194,52 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
         'Enter the password to view certificate details');
     if (password != null) {
       try {
-        final certificateContent =
-            await certificateRepo.getCertificate(certificateName, password);
-        if (certificateContent != null) {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text('Certificate Details: $certificateName'),
-                content: SingleChildScrollView(
-                  child: Text(certificateContent),
-                ),
-                actions: [
-                  TextButton(
-                    child: const Text('Close'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              );
-            },
+        if (certificateRepo.isAuthenticated) {
+          final certificateContent = await certificateRepo.getCertificate(
+            certificateName,
+            password,
           );
+          if (certificateContent != null) {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Certificate Details: $certificateName'),
+                  content: SingleChildScrollView(
+                    child: Text(certificateContent),
+                  ),
+                  actions: <Widget>[
+                    TextButton(
+                      child: const Text('Close'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                );
+              },
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                    'Failed to load certificate. Certificate might be corrupted.'),
+              ),
+            );
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Failed to load certificate. Incorrect password?'),
+              content: Text('Incorrect password'),
             ),
           );
         }
       } catch (e) {
         print('Error loading certificate: $e');
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to load certificate')),
+          const SnackBar(
+            content: Text('Failed to load certificate'),
+          ),
         );
       }
     }

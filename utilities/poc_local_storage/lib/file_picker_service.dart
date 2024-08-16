@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:file_picker/file_picker.dart';
 
+/// A service for picking files from the device.
 final class FilePickerService {
   static final FilePickerService _instance = FilePickerService._();
 

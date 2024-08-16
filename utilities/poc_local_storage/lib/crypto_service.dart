@@ -2,19 +2,32 @@ import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:collection/collection.dart';
 import 'package:pointycastle/export.dart';
 
+/// A service for encrypting and decrypting data using AES-GCM.
 final class CryptoService {
-  static const int _ivLength = 12; // GCM standard IV length is 12 bytes
+  /// GCM standard IV length is 12 bytes
+  static const int _ivLength = 12;
+
+  /// Salt length for Argon2 key derivation
   static const int _saltLength = 16;
-  static const int _keyLength = 32; // AES-256
-  static const int _iterations = 100000; // Increased iterations for PBKDF2
-  static const int _version = 1; // Versioning for future improvements
 
-  final Random _random;
+  /// AES-256 key length
+  static const int _keyLength = 32;
 
-  CryptoService() : _random = Random.secure();
+  /// Versioning for future improvements
+  static const int _version = 1;
 
+  final SecureRandom _secureRandom;
+
+  factory CryptoService({SecureRandom? secureRandom}) {
+    return CryptoService._(secureRandom ?? _initSecureRandom());
+  }
+
+  CryptoService._(this._secureRandom);
+
+  /// Decrypts the [encryptedData] using the provided [password].
   Uint8List decrypt(
     Uint8List encryptedData,
     String password, {
@@ -48,7 +61,23 @@ final class CryptoService {
     cipher.init(false, aeadParams);
 
     try {
-      return cipher.process(data);
+      final decryptedData = cipher.process(data);
+
+      // Verify checksum/marker
+      final checksum = utf8.encode('CHK'); // 3-byte marker
+      final originalData = decryptedData.sublist(
+        0,
+        decryptedData.length - checksum.length,
+      );
+      final extractedChecksum = decryptedData.sublist(
+        decryptedData.length - checksum.length,
+      );
+
+      if (!ListEquality().equals(checksum, extractedChecksum)) {
+        throw Exception('Decryption failed: Checksum mismatch');
+      }
+
+      return originalData;
     } catch (e) {
       throw Exception('Decryption failed: $e');
     } finally {
@@ -57,6 +86,7 @@ final class CryptoService {
     }
   }
 
+  /// Encrypts the [data] using the provided [password].
   Uint8List encrypt(
     Uint8List data,
     String password, {
@@ -76,17 +106,83 @@ final class CryptoService {
 
     cipher.init(true, aeadParams);
 
-    final encryptedData = cipher.process(data);
+    // Add a known marker or checksum at the end of the plaintext before encryption
+    final checksum = utf8.encode('CHK'); // 3-byte marker
+    final combinedData = Uint8List.fromList([...data, ...checksum]);
+
+    final encryptedData = cipher.process(combinedData);
 
     // Combine version, salt, IV, and encrypted data
-    return Uint8List.fromList([_version, ...salt, ...iv, ...encryptedData]);
+    // Version 1, Algorithm ID 1 (AES-GCM)
+    final metadata = Uint8List.fromList([_version, 0x01]);
+    return Uint8List.fromList([
+      ...metadata,
+      ...salt,
+      ...iv,
+      ...encryptedData,
+    ]);
   }
 
+  /// Hashes a password using Argon2id
+  Uint8List hashPassword(String password, {Uint8List? salt}) {
+    salt ??= _generateSalt();
+    final argon2 = Argon2BytesGenerator();
+    final params = Argon2Parameters(
+      Argon2Parameters.ARGON2_id,
+      salt,
+      memoryPowerOf2: 12, // 12 MiB
+      desiredKeyLength: _keyLength,
+    );
+
+    argon2.init(params);
+
+    final passwordBytes = Uint8List.fromList(utf8.encode(password));
+    final hashedPassword = argon2.process(passwordBytes);
+
+    // Combine salt and hashed password for storage
+    return Uint8List.fromList([...salt, ...hashedPassword]);
+  }
+
+  /// Re-encrypts the [encryptedData] using the provided [oldPassword] and [newPassword].
+  Uint8List reEncrypt(
+    Uint8List encryptedData,
+    String oldPassword,
+    String newPassword, {
+    Uint8List? aad,
+  }) {
+    // Decrypt using the old password
+    final decryptedData = decrypt(encryptedData, oldPassword, aad: aad);
+
+    // Encrypt using the new password
+    return encrypt(decryptedData, newPassword, aad: aad);
+  }
+
+  /// Verifies a password against a stored hash
+  bool verifyPassword(String password, Uint8List storedHash) {
+    final salt = storedHash.sublist(0, _saltLength);
+    final hashedPassword = hashPassword(password, salt: salt);
+    return ListEquality().equals(hashedPassword, storedHash);
+  }
+
+  /// Derives a key from the [password] and [salt] using Argon2.
+  /// Argon2 is a modern, secure key derivation function designed to resist
+  /// brute-force attacks and side-channel attacks.
   Uint8List _deriveKey(String password, Uint8List salt) {
-    final pbkdf2 = PBKDF2KeyDerivator(HMac(SHA256Digest(), 64));
-    final params = Pbkdf2Parameters(salt, _iterations, _keyLength);
-    pbkdf2.init(params);
-    final key = pbkdf2.process(utf8.encode(password));
+    final argon2 = Argon2BytesGenerator();
+    final params = Argon2Parameters(
+      Argon2Parameters.ARGON2_id,
+      salt,
+      memoryPowerOf2: 12, // 12 MiB
+      desiredKeyLength: _keyLength,
+    );
+
+    argon2.init(params);
+
+    // Convert the password to Uint8List
+    final passwordBytes = Uint8List.fromList(utf8.encode(password));
+
+    // Derive the key using the password and salt
+    final key = argon2.process(passwordBytes);
 
     // Securely erase password from memory
     _securelyErase(Uint8List.fromList(utf8.encode(password)));
@@ -94,28 +190,33 @@ final class CryptoService {
     return key;
   }
 
+  /// Generates a random IV for AES-GCM.
   Uint8List _generateIV() {
-    return Uint8List.fromList(
-      List.generate(
-        _ivLength,
-        (_) => _random.nextInt(256),
-      ),
-    );
+    final iv = Uint8List(_ivLength);
+    _secureRandom.nextBytes(iv.length);
+    return iv;
   }
 
+  /// Generates a random salt for Argon2.
   Uint8List _generateSalt() {
-    return Uint8List.fromList(
-      List.generate(
-        _saltLength,
-        (_) => _random.nextInt(256),
-      ),
-    );
+    final salt = Uint8List(_saltLength);
+    _secureRandom.nextBytes(salt.length);
+    return salt;
   }
 
-  // Attempt to securely erase sensitive data from memory
-  void _securelyErase(Uint8List data) {
-    for (var i = 0; i < data.length; i++) {
-      data[i] = 0;
+  /// Attempts to securely erase sensitive data from memory.
+  void _securelyErase(Uint8List data) => data.fillRange(0, data.length, 0);
+
+  /// Initializes a secure random number generator.
+  static SecureRandom _initSecureRandom() {
+    final secureRandom = SecureRandom("Fortuna");
+    final seed = Uint8List(32);
+
+    for (int i = 0; i < seed.length; i++) {
+      seed[i] = Random.secure().nextInt(256);
     }
+
+    secureRandom.seed(KeyParameter(seed));
+    return secureRandom;
   }
 }

@@ -114,7 +114,8 @@ class _PasswordEntryScreenState extends State<PasswordEntryScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-              content: Text('Incorrect password. Please try again.')),
+            content: Text('Incorrect password. Please try again.'),
+          ),
         );
       }
     }

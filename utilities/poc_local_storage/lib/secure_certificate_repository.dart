@@ -44,11 +44,17 @@ class SecureCertificateRepository {
   }
 
   Future<void> deletePassword() async {
-    _storageService.deletePassword();
+    await _storageService.deletePassword();
   }
 
   Future<String?> getCertificate(
-      String certificateName, String password) async {
+    String certificateName,
+    String password,
+  ) async {
+    if (!isAuthenticated) {
+      throw Exception('Invalid password');
+    }
+
     final certificateKey = _generateCertificateKey(certificateName);
     final encryptedCertificate = await _storageService.getBytes(certificateKey);
     if (encryptedCertificate != null) {
@@ -66,13 +72,19 @@ class SecureCertificateRepository {
 
   Future<List<String>> getStoredCertificateNames() async {
     final storedList = await _storageService.getString(_certificateListKey);
-    if (storedList != null) {
+    if (storedList != null && storedList.isNotEmpty) {
       return storedList.split(',');
     }
     return [];
   }
 
+
+
   Future<List<String>> pickAndStoreCertificates(String password) async {
+    if (isAuthenticated) {
+      throw Exception('Invalid password');
+    }
+
     final files = await _filePickerService.pickMultipleFiles();
     print('Picked files: ${files.map((file) => file.name).toList()}');
     final storedCertificates = <String>[];
