@@ -27,15 +27,23 @@ final class CryptoService {
     }
 
     final salt = encryptedData.sublist(1, 1 + _saltLength);
-    final iv =
-        encryptedData.sublist(1 + _saltLength, 1 + _saltLength + _ivLength);
-    final data = encryptedData.sublist(1 + _saltLength + _ivLength);
+    final iv = encryptedData.sublist(
+      1 + _saltLength,
+      1 + _saltLength + _ivLength,
+    );
+    final data = encryptedData.sublist(
+      1 + _saltLength + _ivLength,
+    );
 
     final key = _deriveKey(password, salt);
 
     final cipher = GCMBlockCipher(AESEngine());
-    final aeadParams =
-        AEADParameters(KeyParameter(key), 128, iv, aad ?? Uint8List(0));
+    final aeadParams = AEADParameters(
+      KeyParameter(key),
+      128,
+      iv,
+      aad ?? Uint8List(0),
+    );
 
     cipher.init(false, aeadParams);
 
