@@ -7,10 +7,9 @@ import 'package:bip32_ed25519/bip32_ed25519.dart';
 import 'package:catalyst_cardano_serialization/src/exceptions.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:cbor/cbor.dart';
-import 'package:equatable/equatable.dart';
 
 /// [ShelleyAddress] supports bech32 encoded addresses as defined in CIP-19.
-class ShelleyAddress extends Equatable {
+class ShelleyAddress extends CborEncodable {
   /// The prefix of a base address.
   static const String defaultAddrHrp = 'addr';
 
@@ -72,6 +71,7 @@ class ShelleyAddress extends Equatable {
   }
 
   /// Serializes the type as cbor.
+  @override
   CborValue toCbor() => CborBytes(bytes);
 
   /// Returns the [NetworkId] related to this address.

@@ -3,6 +3,15 @@ import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 import 'package:equatable/equatable.dart';
 
+/// An interface for classes that support CBOR serialization.
+abstract class CborEncodable extends Equatable {
+  /// Creates a new instance of [CborEncodable].
+  const CborEncodable();
+
+  /// Converts this instance to its CBOR representation.
+  CborValue toCbor();
+}
+
 /// Specifies on which network the code will run.
 enum NetworkId {
   /// The production network
@@ -75,7 +84,7 @@ extension type const SlotBigNum(int value) {
 }
 
 /// Represents the balance of the wallet in terms of [Coin].
-final class Balance extends Equatable {
+final class Balance extends CborEncodable {
   /// The amount of [Coin] that the wallet holds.
   final Coin coin;
 
@@ -116,6 +125,7 @@ final class Balance extends Equatable {
   }
 
   /// Serializes the type as cbor.
+  @override
   CborValue toCbor() {
     final multiAsset = this.multiAsset;
     if (multiAsset == null) {
@@ -198,7 +208,7 @@ final class Balance extends Equatable {
 }
 
 /// Holds native assets minted with [PolicyId].
-final class MultiAsset extends Equatable {
+final class MultiAsset extends CborEncodable {
   /// The map of native assets.
   ///
   /// The [Coin] is used to describe the amount of native assets
@@ -237,6 +247,7 @@ final class MultiAsset extends Equatable {
   }
 
   /// Serializes the type as cbor.
+  @override
   CborValue toCbor() {
     return CborMap({
       for (final policy in bundle.entries)
