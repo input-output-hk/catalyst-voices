@@ -13,6 +13,7 @@ use poem_openapi::{ContactObject, LicenseObject, OpenApiService, ServerObject};
 use self::cardano::CardanoApi;
 use crate::settings::Settings;
 
+mod auth;
 mod cardano;
 mod health;
 mod legacy;

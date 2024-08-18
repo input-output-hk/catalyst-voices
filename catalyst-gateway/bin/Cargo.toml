@@ -79,7 +79,7 @@ futures.workspace = true
 rand.workspace = true
 moka.workspace = true
 crossbeam-skiplist.workspace = true
-
+base64 = "0.22.1"
 
 [build-dependencies]
 build-info-build = { workspace = true }
