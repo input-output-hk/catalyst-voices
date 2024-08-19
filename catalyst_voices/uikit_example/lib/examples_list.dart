@@ -7,6 +7,7 @@ import 'package:uikit_example/examples/voices_badge_example.dart';
 import 'package:uikit_example/examples/voices_buttons_example.dart';
 import 'package:uikit_example/examples/voices_checkbox_example.dart';
 import 'package:uikit_example/examples/voices_chip_example.dart';
+import 'package:uikit_example/examples/voices_fab_example.dart';
 import 'package:uikit_example/examples/voices_indicators_example.dart';
 import 'package:uikit_example/examples/voices_navigation_example.dart';
 import 'package:uikit_example/examples/voices_radio_example.dart';
@@ -83,6 +84,11 @@ class ExamplesListPage extends StatelessWidget {
         title: 'Voices Badges',
         route: VoicesBadgeExample.route,
         page: VoicesBadgeExample(),
+      ),
+      ExampleTile(
+        title: 'Voices Floating Action Button',
+        route: VoicesFabExample.route,
+        page: VoicesFabExample(),
       ),
     ];
   }
