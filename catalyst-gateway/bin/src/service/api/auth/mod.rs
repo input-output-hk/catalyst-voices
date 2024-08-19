@@ -93,6 +93,7 @@ pub fn decode_auth_token_ed25519(
 mod tests {
 
     use ed25519_dalek::{Signature, SECRET_KEY_LENGTH};
+    use ulid::Ulid;
 
     use super::{encode_auth_token_ed25519, Kid, UlidBytes};
     use crate::service::api::auth::decode_auth_token_ed25519;
@@ -115,13 +116,31 @@ mod tests {
 
         assert_eq!(auth_token,"catv1.UAARIjNEVWZ3iJmqu8zd7v9QAZEs7HHPLEwUpV1VhdlNe1hAm8DrLsNgd7vEwuCx1g6kxmBsaZVG6l+I5FSP6ie/fF/wp4+NBn/mDtdq6a9xQLczyLkyixXR7mxZIx3+5ahzBQ==");
 
-        let decoded_token = decode_auth_token_ed25519(auth_token).unwrap();
+        let (decoded_kid, decoded_ulid, decoded_sig) =
+            decode_auth_token_ed25519(auth_token).unwrap();
 
-        assert_eq!(decoded_token.0 .0, kid);
-        assert_eq!(decoded_token.1 .0, ulid);
+        assert_eq!(decoded_kid.0, kid);
+        assert_eq!(decoded_ulid.0, ulid);
 
-        let sig = Signature::from_bytes(&decoded_token.2 .0);
+        let sig = Signature::from_bytes(&decoded_sig.0);
 
         println!("signature {:?}", hex::encode(sig.to_vec()));
+    }
+
+    #[test]
+    fn test_token_decode() {
+        // tokens generated from frontend
+        let auth_token="catv1.UARn3mvZRbkge/oJ2Ea3fvVQAADErjOAvTBnWVpkevVkXFhAbZzcNJv+wrcRQcHJoYzdbjQARHAfijprYapZ/X1u+B5fLHqhZfHafFr3YJc2WHOodorZc56vPK02YXiKisicAw==";
+        let (kid, ulid, _sig) = decode_auth_token_ed25519(auth_token.to_owned()).unwrap();
+
+        // preceding token generated from the following kid + ulid
+        let kid_frontend: [u8; 16] = hex::decode("0467de6bd945b9207bfa09d846b77ef5".to_string())
+            .unwrap()
+            .try_into()
+            .unwrap();
+
+        assert_eq!(kid.0, kid_frontend);
+
+        let _ulid_frontend: Ulid = Ulid::from_bytes(ulid.0).into();
     }
 }
