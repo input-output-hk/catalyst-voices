@@ -93,13 +93,13 @@ pub fn decode_auth_token_ed25519(
 mod tests {
 
     use ed25519_dalek::{
-        ed25519::signature::SignerMut, Signature, SigningKey, VerifyingKey, SECRET_KEY_LENGTH,
+        ed25519::signature::SignerMut, Signature, SigningKey, Verifier, VerifyingKey,
+        SECRET_KEY_LENGTH,
     };
     use rand::rngs::OsRng;
 
     use super::{encode_auth_token_ed25519, Kid, UlidBytes};
     use crate::service::api::auth::decode_auth_token_ed25519;
-    use ed25519_dalek::Verifier;
 
     #[test]
     fn test_token_generation() {
