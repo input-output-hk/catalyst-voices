@@ -92,11 +92,14 @@ pub fn decode_auth_token_ed25519(
 #[cfg(test)]
 mod tests {
 
-    use ed25519_dalek::{Signature, SECRET_KEY_LENGTH};
-    use ulid::Ulid;
+    use ed25519_dalek::{
+        ed25519::signature::SignerMut, Signature, SigningKey, VerifyingKey, SECRET_KEY_LENGTH,
+    };
+    use rand::rngs::OsRng;
 
     use super::{encode_auth_token_ed25519, Kid, UlidBytes};
     use crate::service::api::auth::decode_auth_token_ed25519;
+    use ed25519_dalek::Verifier;
 
     #[test]
     fn test_token_generation() {
@@ -109,12 +112,13 @@ mod tests {
             .try_into()
             .unwrap();
 
-        let secret_key_bytes: [u8; SECRET_KEY_LENGTH] = [0; 32];
+        let mut csprng = OsRng;
+        let signing_key: SigningKey = SigningKey::generate(&mut csprng);
+
+        let secret_key_bytes: [u8; SECRET_KEY_LENGTH] = *signing_key.as_bytes();
 
         let auth_token =
             encode_auth_token_ed25519(Kid(kid), UlidBytes(ulid), secret_key_bytes).unwrap();
-
-        assert_eq!(auth_token,"catv1.UAARIjNEVWZ3iJmqu8zd7v9QAZEs7HHPLEwUpV1VhdlNe1hAm8DrLsNgd7vEwuCx1g6kxmBsaZVG6l+I5FSP6ie/fF/wp4+NBn/mDtdq6a9xQLczyLkyixXR7mxZIx3+5ahzBQ==");
 
         let (decoded_kid, decoded_ulid, decoded_sig) =
             decode_auth_token_ed25519(auth_token).unwrap();
@@ -125,6 +129,13 @@ mod tests {
         let sig = Signature::from_bytes(&decoded_sig.0);
 
         println!("signature {:?}", hex::encode(sig.to_vec()));
+
+        let verifiying_key =
+            VerifyingKey::from_bytes(&signing_key.verifying_key().as_bytes()).unwrap();
+
+        let message = &[decoded_kid.0, decoded_ulid.0].concat();
+
+        verifiying_key.verify(message, &sig).unwrap();
     }
 
     #[test]
@@ -141,6 +152,28 @@ mod tests {
 
         assert_eq!(kid.0, kid_frontend);
 
-        let _ulid_frontend: Ulid = Ulid::from_bytes(ulid.0).into();
+        let sk: [u8; 32] =
+            hex::decode("fd622372c5ee1f3dc98e90666843a786391664d0e286ac6f3da51226aaa93cd5")
+                .unwrap()
+                .try_into()
+                .unwrap();
+
+        let pub_key: [u8; 32] =
+            hex::decode("b45b8295e2701d2dbc8d4093fae94b979735f8c5e17a1843cf64a298e86659a2")
+                .unwrap()
+                .try_into()
+                .unwrap();
+
+        let mut sk = SigningKey::from_bytes(&sk);
+
+        println!("{:?}", pub_key.len());
+
+        let verifiying_key = VerifyingKey::from_bytes(&pub_key).unwrap();
+
+        let message = &[kid.0, ulid.0].concat();
+
+        let signed = sk.sign(message);
+
+        verifiying_key.verify(message, &signed).unwrap();
     }
 }
