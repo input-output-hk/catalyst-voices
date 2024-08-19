@@ -9,6 +9,8 @@ export 'indicators/process_progress_indicator.dart';
 export 'indicators/voices_circular_progress_indicator.dart';
 export 'indicators/voices_linear_progress_indicator.dart';
 export 'indicators/voices_status_indicator.dart';
+export 'seed_phrase/seed_phrase_viewer.dart';
+export 'seed_phrase/seed_phrases_viewer.dart';
 export 'separators/voices_divider.dart';
 export 'separators/voices_text_divider.dart';
 export 'separators/voices_vertical_divider.dart';
