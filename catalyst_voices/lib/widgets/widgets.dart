@@ -8,6 +8,7 @@ export 'chips/voices_chip.dart';
 export 'indicators/process_progress_indicator.dart';
 export 'indicators/voices_circular_progress_indicator.dart';
 export 'indicators/voices_linear_progress_indicator.dart';
+export 'indicators/voices_status_indicator.dart';
 export 'separators/voices_divider.dart';
 export 'separators/voices_text_divider.dart';
 export 'separators/voices_vertical_divider.dart';

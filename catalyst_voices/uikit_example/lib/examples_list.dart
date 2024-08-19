@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:catalyst_voices/widgets/menu/voices_list_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:uikit_example/examples/voices_avatar_example.dart';
+import 'package:uikit_example/examples/voices_badge_example.dart';
 import 'package:uikit_example/examples/voices_buttons_example.dart';
 import 'package:uikit_example/examples/voices_checkbox_example.dart';
 import 'package:uikit_example/examples/voices_chip_example.dart';
+import 'package:uikit_example/examples/voices_fab_example.dart';
 import 'package:uikit_example/examples/voices_indicators_example.dart';
 import 'package:uikit_example/examples/voices_navigation_example.dart';
 import 'package:uikit_example/examples/voices_radio_example.dart';
@@ -77,6 +79,16 @@ class ExamplesListPage extends StatelessWidget {
         title: 'Voices Text Field',
         route: VoicesTextFieldExample.route,
         page: VoicesTextFieldExample(),
+      ),
+      ExampleTile(
+        title: 'Voices Badges',
+        route: VoicesBadgeExample.route,
+        page: VoicesBadgeExample(),
+      ),
+      ExampleTile(
+        title: 'Voices Floating Action Button',
+        route: VoicesFabExample.route,
+        page: VoicesFabExample(),
       ),
     ];
   }

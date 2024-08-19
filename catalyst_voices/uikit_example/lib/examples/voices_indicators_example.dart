@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
@@ -12,49 +13,85 @@ class VoicesIndicatorsExample extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Voices Indicators')),
-      body: const Padding(
-        padding: EdgeInsets.symmetric(horizontal: 42, vertical: 24),
-        child: Column(
-          children: [
-            Text('Process Stepper Indicator'),
-            SizedBox(height: 8),
-            _Steps(),
-            SizedBox(height: 22),
-            Text('Linear - Indeterminate'),
-            SizedBox(height: 8),
-            VoicesLinearProgressIndicator(),
-            SizedBox(height: 16),
-            VoicesLinearProgressIndicator(showTrack: false),
-            SizedBox(height: 22),
-            Text('Linear - Fixed'),
-            SizedBox(height: 8),
-            VoicesLinearProgressIndicator(value: 0.25),
-            SizedBox(height: 16),
-            VoicesLinearProgressIndicator(value: 0.25, showTrack: false),
-            SizedBox(height: 22),
-            Text('Circular - Indeterminate'),
-            SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                VoicesCircularProgressIndicator(),
-                SizedBox(width: 16),
-                VoicesCircularProgressIndicator(showTrack: false),
-              ],
-            ),
-            SizedBox(height: 22),
-            Text('Circular - Fixed'),
-            SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                VoicesCircularProgressIndicator(value: 0.75),
-                SizedBox(width: 16),
-                VoicesCircularProgressIndicator(value: 0.75, showTrack: false),
-              ],
-            ),
-          ],
-        ),
+      body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 42, vertical: 24),
+        children: const [
+          Text('Status Indicator'),
+          SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: VoicesStatusIndicator(
+                  status: AffixDecorator(
+                    prefix: Icon(Icons.check),
+                    child: Text('QR VERIFIED'),
+                  ),
+                  title: Text('Your QR code verified successfully'),
+                  body: Text(
+                    'You can now use your QR-code  to login into Catalyst.',
+                  ),
+                  type: VoicesStatusIndicatorType.success,
+                ),
+              ),
+              SizedBox(width: 50),
+              Expanded(
+                child: VoicesStatusIndicator(
+                  status: AffixDecorator(
+                    prefix: Icon(Icons.close),
+                    child: Text('QR FAILED'),
+                  ),
+                  title: Text('Upload failed or QR code not recognized!'),
+                  body: Text(
+                    'Are you sure your upload didn’t get interrupted or that '
+                    'you provided  a Catalyst QR code? '
+                    '  Please try again.',
+                  ),
+                  type: VoicesStatusIndicatorType.error,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 22),
+          Text('Process Stepper Indicator'),
+          SizedBox(height: 8),
+          _Steps(),
+          SizedBox(height: 22),
+          Text('Linear - Indeterminate'),
+          SizedBox(height: 8),
+          VoicesLinearProgressIndicator(),
+          SizedBox(height: 16),
+          VoicesLinearProgressIndicator(showTrack: false),
+          SizedBox(height: 22),
+          Text('Linear - Fixed'),
+          SizedBox(height: 8),
+          VoicesLinearProgressIndicator(value: 0.25),
+          SizedBox(height: 16),
+          VoicesLinearProgressIndicator(value: 0.25, showTrack: false),
+          SizedBox(height: 22),
+          Text('Circular - Indeterminate'),
+          SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              VoicesCircularProgressIndicator(),
+              SizedBox(width: 16),
+              VoicesCircularProgressIndicator(showTrack: false),
+            ],
+          ),
+          SizedBox(height: 22),
+          Text('Circular - Fixed'),
+          SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              VoicesCircularProgressIndicator(value: 0.75),
+              SizedBox(width: 16),
+              VoicesCircularProgressIndicator(value: 0.75, showTrack: false),
+            ],
+          ),
+        ],
       ),
     );
   }
