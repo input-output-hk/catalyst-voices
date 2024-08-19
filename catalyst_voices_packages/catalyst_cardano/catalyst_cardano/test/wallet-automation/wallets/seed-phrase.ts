@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 // Read the contents of the .txt fileon-wallet-storage.txt'), 'utf8');
-const txtContent = fs.readFileSync(path.resolve(__dirname,'typhon-wallet-storage.txt'), 'utf8');
+const txtContent = fs.readFileSync(path.resolve(__dirname,'wallet-keys.txt'), 'utf8');
 
 // Parse the contents and set them to process.env
 txtContent.split('\n').forEach(line => {
@@ -14,7 +14,7 @@ txtContent.split('\n').forEach(line => {
 
 interface SeedPhrase {
 
-  seedPhrase: string[]; 
+  seedPhrase: string[];
 }
 
 // function to get the seed phrase from environment variables

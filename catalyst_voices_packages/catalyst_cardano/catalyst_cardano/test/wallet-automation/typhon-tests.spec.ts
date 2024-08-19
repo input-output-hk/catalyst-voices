@@ -1,8 +1,7 @@
 import { test, chromium, expect, Page, BrowserContext } from '@playwright/test';
-import { getWalletCredentials, getRegistrationPin } from './credentials';
-import { getSeedPhrase } from './seed-phrase';
+import { getWalletCredentials, getRegistrationPin } from './wallets/credentials';
+import { getSeedPhrase } from './wallets/seed-phrase';
 import path from 'path';
-
 
 let newTab: Page
 let browser: BrowserContext;

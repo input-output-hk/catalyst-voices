@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const txtContent = fs.readFileSync(path.resolve(__dirname,'typhon-wallet-storage.txt'), 'utf8');;
+const txtContent = fs.readFileSync(path.resolve(__dirname,'wallet-keys.txt'), 'utf8');
 
 // parse the contents and set them to process.env
 txtContent.split('\n').forEach(line => {

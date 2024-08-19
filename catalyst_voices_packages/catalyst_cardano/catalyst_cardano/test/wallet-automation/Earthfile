@@ -1,7 +1,6 @@
 VERSION 0.8
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.1.21 AS flutter-ci
 
-
 deps:
     FROM mcr.microsoft.com/playwright:v1.45.2-jammy
     WORKDIR /wallet-automation
@@ -23,9 +22,11 @@ src:
     COPY playwright.config.ts .
     COPY global-setup.ts .
 
-test:
+package-test:
     FROM +src
-    RUN xvfb-run -a npx playwright test
+    ENTRYPOINT ["/bin/sh", "-c", "/usr/bin/xvfb-run npm test", ""]
+    ARG tag='latest'
+    SAVE IMAGE test:$tag
 
 builder:
     DO flutter-ci+SETUP
@@ -38,9 +39,21 @@ build-web:
     DO flutter-ci+BUILD_WEB --TARGET=lib/main.dart --WORKDIR=$WORKDIR
     SAVE ARTIFACT web
 
-package:
+package-app:
     FROM nginx:alpine3.18
     ARG tag='latest'
     COPY +build-web/web /usr/share/nginx/html/
-    EXPOSE 80
-    SAVE IMAGE test_app:$tag
+    SAVE IMAGE test-app:$tag
+
+test:
+    FROM earthly/dind:alpine-3.19
+    COPY compose.yml .
+    WITH DOCKER \
+        --compose compose.yml \
+        --load test-app:latest=(+package-app) \
+        --load test:latest=(+package-test) \
+        --service test-app \
+        --allow-privileged
+
+        RUN docker run --network=default_default test:latest
+    END
