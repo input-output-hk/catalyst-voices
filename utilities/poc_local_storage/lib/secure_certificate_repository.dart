@@ -59,8 +59,10 @@ class SecureCertificateRepository {
     final encryptedCertificate = await _storageService.getBytes(certificateKey);
     if (encryptedCertificate != null) {
       try {
-        final decryptedBytes =
-            _cryptoService.decrypt(encryptedCertificate, password);
+        final decryptedBytes = _cryptoService.decrypt(
+          encryptedCertificate,
+          password,
+        );
         return utf8.decode(decryptedBytes);
       } catch (e) {
         print('Error decrypting certificate: $e');
@@ -77,8 +79,6 @@ class SecureCertificateRepository {
     }
     return [];
   }
-
-
 
   Future<List<String>> pickAndStoreCertificates(String password) async {
     if (isAuthenticated) {
@@ -136,6 +136,8 @@ class SecureCertificateRepository {
 
   Future<void> _storeCertificateList(List<String> certificateList) async {
     await _storageService.saveString(
-        _certificateListKey, certificateList.join(','));
+      _certificateListKey,
+      certificateList.join(','),
+    );
   }
 }

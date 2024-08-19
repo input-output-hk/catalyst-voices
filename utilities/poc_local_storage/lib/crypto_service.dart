@@ -81,7 +81,7 @@ final class CryptoService {
     } catch (e) {
       throw Exception('Decryption failed: $e');
     } finally {
-      // Securely erase key from memory (if possible, platform dependent)
+      //Erase key from memory
       _securelyErase(key);
     }
   }
