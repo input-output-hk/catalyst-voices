@@ -33,19 +33,20 @@ final class CryptoService {
     String password, {
     Uint8List? aad,
   }) {
-    // Extract the version, salt, and IV
+    // Extract the version, algorithm ID, salt, and IV
     final version = encryptedData[0];
-    if (version != _version) {
-      throw Exception('Unsupported version: $version');
+    final algorithmId = encryptedData[1];
+    if (version != _version || algorithmId != 0x01) {
+      throw Exception('Unsupported version or algorithm');
     }
 
-    final salt = encryptedData.sublist(1, 1 + _saltLength);
+    final salt = encryptedData.sublist(2, 2 + _saltLength);
     final iv = encryptedData.sublist(
-      1 + _saltLength,
-      1 + _saltLength + _ivLength,
+      2 + _saltLength,
+      2 + _saltLength + _ivLength,
     );
     final data = encryptedData.sublist(
-      1 + _saltLength + _ivLength,
+      2 + _saltLength + _ivLength,
     );
 
     final key = _deriveKey(password, salt);
@@ -65,6 +66,9 @@ final class CryptoService {
 
       // Verify checksum/marker
       final checksum = utf8.encode('CHK'); // 3-byte marker
+      if (decryptedData.length < checksum.length) {
+        throw Exception('Decrypted data is too short');
+      }
       final originalData = decryptedData.sublist(
         0,
         decryptedData.length - checksum.length,
@@ -81,7 +85,7 @@ final class CryptoService {
     } catch (e) {
       throw Exception('Decryption failed: $e');
     } finally {
-      //Erase key from memory
+      // Erase the key from memory
       _securelyErase(key);
     }
   }
@@ -115,12 +119,17 @@ final class CryptoService {
     // Combine version, salt, IV, and encrypted data
     // Version 1, Algorithm ID 1 (AES-GCM)
     final metadata = Uint8List.fromList([_version, 0x01]);
-    return Uint8List.fromList([
+    final result = Uint8List.fromList([
       ...metadata,
       ...salt,
       ...iv,
       ...encryptedData,
     ]);
+
+    // Erase the key from memory
+    _securelyErase(key);
+
+    return result;
   }
 
   /// Hashes a password using Argon2id

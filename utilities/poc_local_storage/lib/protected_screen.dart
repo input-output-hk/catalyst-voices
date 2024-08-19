@@ -129,29 +129,51 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
   Future<void> _pickAndStoreCertificates() async {
     final password = await _promptForPassword(
         'Enter a password to encrypt the certificates');
-    if (password != null) {
+    if (password != null && password.isNotEmpty) {
       try {
-        final storedCertificates =
-            await certificateRepo.pickAndStoreCertificates(password);
-        if (storedCertificates.isNotEmpty) {
+        if (await certificateRepo.verifyPassword(password)) {
+          final storedCertificates =
+              await certificateRepo.pickAndStoreCertificates(password);
+          if (storedCertificates.isNotEmpty) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  '${storedCertificates.length} certificate(s) stored',
+                ),
+              ),
+            );
+            await _loadCertificates();
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text(
+                  'No certificates were selected or stored',
+                ),
+              ),
+            );
+          }
+        } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content:
-                  Text('${storedCertificates.length} certificate(s) stored'),
-            ),
+            const SnackBar(
+                content: Text('Authentication failed. Incorrect password.')),
           );
-          await _loadCertificates();
         }
       } catch (e) {
         print('Error picking and storing certificates: $e');
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to store certificates')),
+          SnackBar(content: Text('Error: ${e.toString()}')),
         );
       }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Password is required to store certificates')),
+      );
     }
   }
 
   Future<String?> _promptForPassword(String message) async {
+    _passwordController.clear();
     return showDialog<String>(
       context: context,
       builder: (context) {
@@ -165,11 +187,12 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
           actions: [
             TextButton(
               child: const Text('Cancel'),
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () => Navigator.of(context).pop(null),
             ),
             TextButton(
               child: const Text('OK'),
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: () =>
+                  Navigator.of(context).pop(_passwordController.text),
             ),
           ],
         );
@@ -195,30 +218,26 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
 
   void _showCertificateDetails(String certificateName) async {
     final password = await _promptForPassword(
-      'Enter the password to view certificate details',
-    );
+        'Enter the password to view certificate details');
     if (password != null) {
       try {
-        if (certificateRepo.isAuthenticated) {
+        if (await certificateRepo.verifyPassword(password)) {
           final certificateContent = await certificateRepo.getCertificate(
             certificateName,
             password,
           );
-          if (certificateContent != null) {
+          if (certificateContent != null && certificateContent.isNotEmpty) {
             showDialog(
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
                   title: Text('Certificate Details: $certificateName'),
-                  content: SingleChildScrollView(
-                    child: Text(certificateContent),
-                  ),
+                  content:
+                      SingleChildScrollView(child: Text(certificateContent)),
                   actions: [
                     TextButton(
                       child: const Text('Close'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
+                      onPressed: () => Navigator.of(context).pop(),
                     ),
                   ],
                 );
@@ -227,24 +246,21 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text(
-                    'Failed to load certificate. Certificate might be corrupted.'),
-              ),
+                  content: Text(
+                      'Failed to load certificate. Certificate might be empty or not found.')),
             );
           }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Incorrect password'),
-            ),
+            const SnackBar(content: Text('Incorrect password')),
           );
         }
       } catch (e) {
         print('Error loading certificate: $e');
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to load certificate'),
-          ),
+          SnackBar(
+              content:
+                  Text('Failed to load certificate. Error: ${e.toString()}')),
         );
       }
     }

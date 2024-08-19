@@ -48,28 +48,28 @@ class SecureCertificateRepository {
   }
 
   Future<String?> getCertificate(
-    String certificateName,
-    String password,
-  ) async {
-    if (!isAuthenticated) {
-      throw Exception('Invalid password');
+      String certificateName, String password) async {
+    if (!_storageService.isAuthenticated) {
+      throw Exception('Not authenticated');
     }
 
     final certificateKey = _generateCertificateKey(certificateName);
     final encryptedCertificate = await _storageService.getBytes(certificateKey);
     if (encryptedCertificate != null) {
       try {
-        final decryptedBytes = _cryptoService.decrypt(
-          encryptedCertificate,
-          password,
-        );
-        return utf8.decode(decryptedBytes);
+        final decryptedBytes =
+            _cryptoService.decrypt(encryptedCertificate, password);
+        final decodedCertificate = utf8.decode(decryptedBytes);
+        print('Decrypted certificate: $decodedCertificate'); // Debug print
+        return decodedCertificate;
       } catch (e) {
         print('Error decrypting certificate: $e');
-        return null;
+        rethrow;
       }
+    } else {
+      print('No encrypted certificate found for key: $certificateKey');
+      return null;
     }
-    return null;
   }
 
   Future<List<String>> getStoredCertificateNames() async {
@@ -81,8 +81,8 @@ class SecureCertificateRepository {
   }
 
   Future<List<String>> pickAndStoreCertificates(String password) async {
-    if (isAuthenticated) {
-      throw Exception('Invalid password');
+    if (!_storageService.isAuthenticated) {
+      throw Exception('Not authenticated');
     }
 
     final files = await _filePickerService.pickMultipleFiles();
@@ -92,14 +92,20 @@ class SecureCertificateRepository {
     for (final file in files) {
       if (_isCertificate(file)) {
         final certificateBytes = await _readFileAsBytes(file);
+        print(
+            'Original certificate content: ${utf8.decode(certificateBytes)}'); // Debug print
         final encryptedBytes =
             _cryptoService.encrypt(certificateBytes, password);
         final certificateKey = _generateCertificateKey(file.name);
 
-        // Store the encrypted certificate
         await _storageService.saveBytes(certificateKey, encryptedBytes);
-
         storedCertificates.add(file.name);
+
+        // Verify storage
+        final storedEncryptedBytes =
+            await _storageService.getBytes(certificateKey);
+        print(
+            'Stored encrypted bytes length: ${storedEncryptedBytes?.length}'); // Debug print
       }
     }
 
@@ -110,6 +116,10 @@ class SecureCertificateRepository {
 
   Future<void> setPassword(String password) async {
     await _storageService.setPassword(password);
+  }
+
+  Future<bool> verifyPassword(String password) async {
+    return await _storageService.login(password);
   }
 
   Future<void> _addToCertificateList(List<String> newCertificates) async {
