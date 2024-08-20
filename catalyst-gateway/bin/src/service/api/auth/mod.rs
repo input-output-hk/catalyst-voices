@@ -14,15 +14,12 @@ pub struct Kid([u8; 16]);
 pub struct UlidBytes([u8; 16]);
 
 // Ed25519 signatures are (64 bytes)
+// The signature over the cbor encoded `kid` and `ulid` fields.
 #[allow(dead_code)]
 pub struct SignatureEd25519([u8; 64]);
 
-/// The Encoded Binary Auth Token is a [CBOR sequence] that consists of 3 fields.
-/// A CBOR Sequence consists of any number of encoded CBOR data items, simply concatenated
-/// in sequence. `kid` : The key identifier - 16 bytes .
-/// `ulid` : A ULID which defines when the token was issued, and a random nonce - 16
-/// bytes. `signature` : The signature over the `kid` and `ulid` fields - 64 bytes.
-/// kid + ulid + sig = 96 bytes
+/// The Encoded Binary Auth Token is a [CBOR sequence] that consists of 3 fields [ kid, ulid, signature ].
+/// ED25519 Signature over the preceding two fields - sig(cbor(kid), cbor(ulid))
 #[allow(dead_code)]
 pub fn encode_auth_token_ed25519(
     kid: Kid, ulid: UlidBytes, secret_key_bytes: [u8; SECRET_KEY_LENGTH],
@@ -48,7 +45,7 @@ pub fn encode_auth_token_ed25519(
     ))
 }
 
-/// Decode base64 auth token into constituent parts of (kid, ulid, signature)
+/// Decode base64 cbor encoded auth token into constituent parts of (kid, ulid, signature)
 /// e.g catv1.UAARIjNEVWZ3iJmqu8zd7v9QAZEs7HHPLEwUpV1VhdlNe1hAAAAAAAAAAAAA...
 #[allow(dead_code)]
 pub fn decode_auth_token_ed25519(
