@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:catalyst_cardano_serialization/src/certificate.dart';
 import 'package:catalyst_cardano_serialization/src/exceptions.dart';
+import 'package:catalyst_cardano_serialization/src/signature.dart';
 import 'package:catalyst_cardano_serialization/src/transaction.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
@@ -187,6 +188,33 @@ final class CertificateHash extends BaseHash {
 
   /// Deserializes the type from cbor.
   CertificateHash.fromCbor(super.value) : super.fromCbor();
+
+  @override
+  int get length => _length;
+}
+
+/// Describes the Blake2b-224 hash of a [Ed25519PublicKey].
+final class Ed25519PublicKeyHash extends BaseHash {
+  static const int _length = 28;
+
+  /// Constructs the [Ed25519PublicKeyHash] from raw [bytes].
+  Ed25519PublicKeyHash.fromBytes({required super.bytes}) : super.fromBytes();
+
+  /// Constructs the [Ed25519PublicKeyHash] from a hex string representation
+  /// of [bytes].
+  Ed25519PublicKeyHash.fromHex(super.string) : super.fromHex();
+
+  /// Constructs the [Ed25519PublicKeyHash] from a [Ed25519PublicKey].
+  Ed25519PublicKeyHash.fromPublicKey(Ed25519PublicKey key)
+      : super.fromBytes(
+          bytes: Hash.blake2b(
+            Uint8List.fromList(key.bytes),
+            digestSize: _length,
+          ),
+        );
+
+  /// Deserializes the type from cbor.
+  Ed25519PublicKeyHash.fromCbor(super.value) : super.fromCbor();
 
   @override
   int get length => _length;

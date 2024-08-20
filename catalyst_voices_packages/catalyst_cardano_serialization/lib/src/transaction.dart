@@ -1,6 +1,5 @@
 import 'package:catalyst_cardano_serialization/src/address.dart';
 import 'package:catalyst_cardano_serialization/src/hashes.dart';
-import 'package:catalyst_cardano_serialization/src/signature.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:catalyst_cardano_serialization/src/utils/cbor.dart';
 import 'package:catalyst_cardano_serialization/src/witness.dart';
@@ -84,7 +83,7 @@ final class TransactionBody extends Equatable {
 
   /// The list of public key hashes of addresses
   /// that are required to sign the transaction.
-  final Set<Ed25519PublicKey>? requiredSigners;
+  final Set<Ed25519PublicKeyHash>? requiredSigners;
 
   /// Specifies on which network the code will run.
   final NetworkId? networkId;
@@ -119,7 +118,8 @@ final class TransactionBody extends Equatable {
       auxiliaryDataHash: auxiliaryDataHash != null
           ? AuxiliaryDataHash.fromCbor(auxiliaryDataHash)
           : null,
-      requiredSigners: requiredSigners?.map(Ed25519PublicKey.fromCbor).toSet(),
+      requiredSigners:
+          requiredSigners?.map(Ed25519PublicKeyHash.fromCbor).toSet(),
       networkId: networkId != null ? NetworkId.fromId(networkId.value) : null,
     );
   }
