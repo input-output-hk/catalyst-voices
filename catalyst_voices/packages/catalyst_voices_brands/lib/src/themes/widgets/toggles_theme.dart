@@ -106,7 +106,6 @@ extension TogglesTheme on ThemeData {
         materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
         visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
       ),
-      // Out of the box configuration is correct
       switchTheme: SwitchThemeData(
         trackColor: WidgetStateProperty.resolveWith(
           (states) {
