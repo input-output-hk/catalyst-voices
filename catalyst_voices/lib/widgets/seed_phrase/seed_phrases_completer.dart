@@ -1,15 +1,29 @@
 import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:catalyst_voices/widgets/common/columns_row.dart';
+import 'package:catalyst_voices/widgets/seed_phrase/seed_phrases_picker.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
+/// A widget that displays slots for selecting seed phrases and filling them up.
+///
+/// Typically used together with a [SeedPhrasesPicker].
 class SeedPhrasesCompleter extends StatelessWidget {
+  /// The number of columns to use for displaying the slots.
+  /// Defaults to 2.
   final int columnsCount;
+
+  /// The total number of slots available for seed phrases.
   final int slotsCount;
+
+  /// A set of currently selected seed phrases. Defaults to an empty set.
   final Set<String> words;
+
+  /// A callback function triggered when a non-filled slot or a filled but only
+  /// for previous selection.
   final ValueChanged<String>? onWordTap;
 
+  /// Creates a [SeedPhrasesCompleter] widget.
   const SeedPhrasesCompleter({
     super.key,
     this.columnsCount = 2,
@@ -23,8 +37,8 @@ class SeedPhrasesCompleter extends StatelessWidget {
     final slots = List.generate(slotsCount, words.elementAtOrNull);
     final onWordTap = this.onWordTap;
 
-    // If has less words then slots then next empty slot is "current".
-    // Null when has all words completed
+    // Identify the currently active slot (being filled) and the
+    // previous slot (deletable).
     final currentIndex = words.length < slotsCount ? words.length : null;
 
     return MediaQuery.withNoTextScaling(
@@ -48,9 +62,7 @@ class SeedPhrasesCompleter extends StatelessWidget {
             showDelete: canDelete,
             onTap: !canDelete || onWordTap == null
                 ? null
-                : () {
-                    onWordTap(element);
-                  },
+                : () => onWordTap(element),
           );
         }).toList(),
       ),
@@ -58,11 +70,22 @@ class SeedPhrasesCompleter extends StatelessWidget {
   }
 }
 
+/// A widget representing a single slot for selecting a seed phrase
+/// within the [SeedPhrasesCompleter].
 class _WordSlotCell extends StatelessWidget {
+  /// The currently selected seed phrase for this slot (can be null).
   final String? data;
+
+  /// The slot number (1-based).
   final int slotNr;
+
+  /// Whether the slot is currently being filled (active).
   final bool isActive;
+
+  /// Whether the slot shows a delete icon when filled.
   final bool showDelete;
+
+  /// A callback function triggered when the slot is tapped (if allowed).
   final VoidCallback? onTap;
 
   Set<WidgetState> get states => {

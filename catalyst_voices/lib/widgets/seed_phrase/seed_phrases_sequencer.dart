@@ -4,10 +4,22 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+/// A widget that allows users to sequence a set of seed phrases.
+///
+/// It provides a two-section interface:
+///  - A completer section where users can fill slots with selected phrases.
+///  - A picker section where users can select available phrases.
+///
+/// The selected phrases are managed internally and updated through the
+/// [onChanged] callback.
 class SeedPhrasesSequencer extends StatefulWidget {
+  /// The list of available seed phrases.
   final List<String> words;
+
+  /// A callback function triggered when the set of selected phrases changes.
   final ValueChanged<Set<String>> onChanged;
 
+  /// Creates a [SeedPhrasesSequencer] widget.
   const SeedPhrasesSequencer({
     super.key,
     required this.words,

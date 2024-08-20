@@ -1,10 +1,22 @@
 import 'package:catalyst_voices/widgets/common/columns_row.dart';
+import 'package:catalyst_voices/widgets/seed_phrase/seed_phrases_completer.dart';
 import 'package:flutter/material.dart';
 
+/// A widget that displays a grid of seed phrases with selection functionality.
+///
+/// Typically used together with a [SeedPhrasesCompleter].
 class SeedPhrasesPicker extends StatelessWidget {
+  /// The number of columns to use for displaying the seed phrases.
+  /// Defaults to 2.
   final int columnsCount;
+
+  /// The list of seed phrases to be displayed.
   final List<String> words;
+
+  /// A set of currently selected seed phrases. Defaults to an empty set.
   final Set<String> selectedWords;
+
+  /// A callback function triggered when a non-selected seed phrase is tapped.
   final ValueChanged<String>? onWordTap;
 
   const SeedPhrasesPicker({
@@ -43,9 +55,16 @@ class SeedPhrasesPicker extends StatelessWidget {
   }
 }
 
+/// A widget representing a single seed phrase cell within the
+/// [SeedPhrasesPicker].
 class _WordCell extends StatelessWidget {
+  /// The seed phrase word to be displayed.
   final String data;
+
+  /// Whether the seed phrase is currently selected.
   final bool isSelected;
+
+  /// A callback function triggered when the cell is tapped (if not selected).
   final VoidCallback? onTap;
 
   Set<WidgetState> get states => {

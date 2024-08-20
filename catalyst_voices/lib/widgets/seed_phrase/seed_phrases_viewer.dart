@@ -3,8 +3,14 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
+/// Displays a list of seed phrases in a grid-like layout with
+/// customizable columns.
 class SeedPhrasesViewer extends StatelessWidget {
+  /// The number of columns to use for displaying the seed phrases.
+  /// Defaults to 2.
   final int columnsCount;
+
+  /// The list of seed phrases to be displayed.
   final List<String> words;
 
   const SeedPhrasesViewer({
@@ -32,9 +38,14 @@ class SeedPhrasesViewer extends StatelessWidget {
   }
 }
 
+/// A widget representing a single seed phrase cell within the
+/// [SeedPhrasesViewer].
 class _WordCell extends StatelessWidget {
-  final int number;
+  /// The seed phrase word to be displayed.
   final String data;
+
+  /// The sequential number associated with the seed phrase.
+  final int number;
 
   const _WordCell(
     this.data, {
