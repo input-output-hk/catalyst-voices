@@ -18,8 +18,9 @@ pub struct UlidBytes([u8; 16]);
 #[allow(dead_code)]
 pub struct SignatureEd25519([u8; 64]);
 
-/// The Encoded Binary Auth Token is a [CBOR sequence] that consists of 3 fields [ kid, ulid, signature ].
-/// ED25519 Signature over the preceding two fields - sig(cbor(kid), cbor(ulid))
+/// The Encoded Binary Auth Token is a [CBOR sequence] that consists of 3 fields [ kid,
+/// ulid, signature ]. ED25519 Signature over the preceding two fields - sig(cbor(kid),
+/// cbor(ulid))
 #[allow(dead_code)]
 pub fn encode_auth_token_ed25519(
     kid: Kid, ulid: UlidBytes, secret_key_bytes: [u8; SECRET_KEY_LENGTH],
