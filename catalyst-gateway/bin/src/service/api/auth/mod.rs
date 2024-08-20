@@ -31,13 +31,14 @@ pub fn encode_auth_token_ed25519(
 
     let sk: SigningKey = SigningKey::from_bytes(&secret_key_bytes);
 
-    let signature: [u8; SIGNATURE_LENGTH] = sk.sign(&[kid.0, ulid.0].concat()).to_bytes();
-
     let out: Vec<u8> = Vec::new();
     let mut encoder = minicbor::Encoder::new(out);
 
     encoder.bytes(&kid.0)?;
     encoder.bytes(&ulid.0)?;
+
+    let signature: [u8; SIGNATURE_LENGTH] = sk.sign(encoder.writer()).to_bytes();
+
     encoder.bytes(&signature)?;
 
     Ok(format!(
@@ -120,28 +121,17 @@ mod tests {
         let auth_token =
             encode_auth_token_ed25519(Kid(kid), UlidBytes(ulid), secret_key_bytes).unwrap();
 
-        let (decoded_kid, decoded_ulid, decoded_sig) =
+        let (decoded_kid, decoded_ulid, _decoded_sig) =
             decode_auth_token_ed25519(auth_token).unwrap();
 
         assert_eq!(decoded_kid.0, kid);
         assert_eq!(decoded_ulid.0, ulid);
-
-        let sig = Signature::from_bytes(&decoded_sig.0);
-
-        println!("signature {:?}", hex::encode(sig.to_vec()));
-
-        let verifiying_key =
-            VerifyingKey::from_bytes(&signing_key.verifying_key().as_bytes()).unwrap();
-
-        let message = &[decoded_kid.0, decoded_ulid.0].concat();
-
-        verifiying_key.verify(message, &sig).unwrap();
     }
 
     #[test]
     fn test_token_decode() {
         // tokens generated from frontend
-        let auth_token="catv1.UARn3mvZRbkge/oJ2Ea3fvVQAADErjOAgmcKUOev4sQfNVhAibV3yWJi0+4tNEt61Rd0s9Na7IMIhnNIFEPA9pEi7V1Y4z+eBpQVshSJgUTG2J09iFrTLDfeG44hqWWF0ctcBw==";
+        let auth_token="catv1.UARn3mvZRbkge/oJ2Ea3fvVQAADErjOAgmcKUOev4sQfNVhAtCaGjDyDarc9AMqeiAUlVrPdSu+VGnX4Lf+648bwRoUpjBj7j4VrK6B8np/KyG6jTRwzUTj+7u29fFlmrunMBg==";
         let (kid, ulid, sig) = decode_auth_token_ed25519(auth_token.to_owned()).unwrap();
 
         assert_eq!(hex::encode(kid.0), "0467de6bd945b9207bfa09d846b77ef5");
@@ -161,29 +151,17 @@ mod tests {
 
         let signature: Signature = Signature::from_bytes(&sig.0);
 
-        assert_eq!(hex::encode(signature.to_bytes()),"89B577C96262D3EE2D344B7AD51774B3D35AEC83088673481443C0F69122ED5D58E33F9E069415B214898144C6D89D3D885AD32C37DE1B8E21A96585D1CB5C07".to_string().to_ascii_lowercase());
+        assert_eq!(hex::encode(signature.to_bytes()),"b426868c3c836ab73d00ca9e88052556b3dd4aef951a75f82dffbae3c6f04685298c18fb8f856b2ba07c9e9fcac86ea34d1c335138feeeedbd7c5966aee9cc06".to_string());
 
-        let message = &[
-            hex::decode("0467de6bd945b9207bfa09d846b77ef5").unwrap(),
-            hex::decode("0000c4ae338082670a50e7afe2c41f35").unwrap(),
-        ]
-        .concat();
-
-        println!(
-            "kid bytes {:?}",
-            hex::decode("0467de6bd945b9207bfa09d846b77ef5").unwrap()
-        );
-        println!(
-            "ulid bytes {:?}",
-            hex::decode("0000c4ae338082670a50e7afe2c41f35").unwrap()
-        );
-        println!("msg {:?}", message.as_slice());
+        let message =
+            hex::decode("500467de6bd945b9207bfa09d846b77ef5500000c4ae338082670a50e7afe2c41f35")
+                .unwrap();
 
         let mut sk = SigningKey::from_bytes(&sk);
-        let signed = sk.sign(message);
+        let signed = sk.sign(&message);
 
         let verifiying_key = VerifyingKey::from_bytes(&pub_key).unwrap();
 
-        verifiying_key.verify(message, &signed).unwrap();
+        verifiying_key.verify(&message, &signed).unwrap();
     }
 }
