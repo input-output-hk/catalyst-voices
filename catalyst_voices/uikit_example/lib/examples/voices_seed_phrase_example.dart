@@ -1,7 +1,7 @@
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
-class VoicesSeedPhraseExample extends StatefulWidget {
+class VoicesSeedPhraseExample extends StatelessWidget {
   static const String route = '/seed-phrase-example';
 
   static const _words = [
@@ -13,20 +13,19 @@ class VoicesSeedPhraseExample extends StatefulWidget {
     'audit',
     'right',
     'gas',
+    'key',
+    'secure',
+    'win',
+    'review',
+    'car',
+    'sand',
+    'real',
+    'house',
   ];
 
   const VoicesSeedPhraseExample({
     super.key,
   });
-
-  @override
-  State<VoicesSeedPhraseExample> createState() {
-    return _VoicesSeedPhraseExampleState();
-  }
-}
-
-class _VoicesSeedPhraseExampleState extends State<VoicesSeedPhraseExample> {
-  final _selectedWords = <String>{};
 
   @override
   Widget build(BuildContext context) {
@@ -37,37 +36,13 @@ class _VoicesSeedPhraseExampleState extends State<VoicesSeedPhraseExample> {
         children: [
           const Text('SeedPhrasesViewer'),
           const SizedBox(height: 12),
-          const SeedPhrasesViewer(words: VoicesSeedPhraseExample._words),
+          const SeedPhrasesViewer(words: _words),
           const SizedBox(height: 24),
-          const Text('SeedPhrasesEditor'),
+          const Text('SeedPhrasesSequencer'),
           const SizedBox(height: 12),
-          SeedPhrasesEditor(
-            words: VoicesSeedPhraseExample._words,
+          SeedPhrasesSequencer(
+            words: _words,
             onChanged: (value) {},
-          ),
-          const SizedBox(height: 24),
-          const Text('SeedPhrasesPicker'),
-          const SizedBox(height: 12),
-          SeedPhrasesPicker(
-            words: VoicesSeedPhraseExample._words,
-            selectedWords: _selectedWords,
-            onWordTap: (value) {
-              setState(() {
-                _selectedWords.add(value);
-              });
-            },
-          ),
-          const SizedBox(height: 24),
-          const Text('SeedPhrasesCompleter'),
-          const SizedBox(height: 12),
-          SeedPhrasesCompleter(
-            slotsCount: VoicesSeedPhraseExample._words.length,
-            words: _selectedWords,
-            onWordTap: (value) {
-              setState(() {
-                _selectedWords.remove(value);
-              });
-            },
           ),
         ],
       ),

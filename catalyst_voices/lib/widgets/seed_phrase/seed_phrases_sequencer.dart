@@ -4,25 +4,25 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class SeedPhrasesEditor extends StatefulWidget {
+class SeedPhrasesSequencer extends StatefulWidget {
   final List<String> words;
   final ValueChanged<Set<String>> onChanged;
 
-  const SeedPhrasesEditor({
+  const SeedPhrasesSequencer({
     super.key,
     required this.words,
     required this.onChanged,
   });
 
   @override
-  State<SeedPhrasesEditor> createState() => _SeedPhrasesEditorState();
+  State<SeedPhrasesSequencer> createState() => _SeedPhrasesSequencerState();
 }
 
-class _SeedPhrasesEditorState extends State<SeedPhrasesEditor> {
+class _SeedPhrasesSequencerState extends State<SeedPhrasesSequencer> {
   final _selected = <String>{};
 
   @override
-  void didUpdateWidget(covariant SeedPhrasesEditor oldWidget) {
+  void didUpdateWidget(covariant SeedPhrasesSequencer oldWidget) {
     super.didUpdateWidget(oldWidget);
 
     if (!listEquals(widget.words, oldWidget.words)) {
