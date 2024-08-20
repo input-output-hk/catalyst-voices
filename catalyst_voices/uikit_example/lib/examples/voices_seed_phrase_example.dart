@@ -39,6 +39,13 @@ class _VoicesSeedPhraseExampleState extends State<VoicesSeedPhraseExample> {
           const SizedBox(height: 12),
           const SeedPhrasesViewer(words: VoicesSeedPhraseExample._words),
           const SizedBox(height: 24),
+          const Text('SeedPhrasesEditor'),
+          const SizedBox(height: 12),
+          SeedPhrasesEditor(
+            words: VoicesSeedPhraseExample._words,
+            onChanged: (value) {},
+          ),
+          const SizedBox(height: 24),
           const Text('SeedPhrasesPicker'),
           const SizedBox(height: 12),
           SeedPhrasesPicker(
@@ -56,7 +63,7 @@ class _VoicesSeedPhraseExampleState extends State<VoicesSeedPhraseExample> {
           SeedPhrasesCompleter(
             slotsCount: VoicesSeedPhraseExample._words.length,
             words: _selectedWords,
-            onWordDeleteTap: (value) {
+            onWordTap: (value) {
               setState(() {
                 _selectedWords.remove(value);
               });

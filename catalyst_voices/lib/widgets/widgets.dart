@@ -10,6 +10,7 @@ export 'indicators/voices_circular_progress_indicator.dart';
 export 'indicators/voices_linear_progress_indicator.dart';
 export 'indicators/voices_status_indicator.dart';
 export 'seed_phrase/seed_phrases_completer.dart';
+export 'seed_phrase/seed_phrases_editor.dart';
 export 'seed_phrase/seed_phrases_picker.dart';
 export 'seed_phrase/seed_phrases_viewer.dart';
 export 'separators/voices_divider.dart';

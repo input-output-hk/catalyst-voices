@@ -8,20 +8,20 @@ class SeedPhrasesCompleter extends StatelessWidget {
   final int columnsCount;
   final int slotsCount;
   final Set<String> words;
-  final ValueChanged<String>? onWordDeleteTap;
+  final ValueChanged<String>? onWordTap;
 
   const SeedPhrasesCompleter({
     super.key,
     this.columnsCount = 2,
     required this.slotsCount,
     this.words = const <String>{},
-    this.onWordDeleteTap,
+    this.onWordTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final slots = List.generate(slotsCount, words.elementAtOrNull);
-    final onWordDeleteTap = this.onWordDeleteTap;
+    final onWordTap = this.onWordTap;
 
     // If has less words then slots then next empty slot is "current".
     // Null when has all words completed
@@ -46,10 +46,10 @@ class SeedPhrasesCompleter extends StatelessWidget {
             slotNr: index + 1,
             isActive: isCurrent,
             showDelete: canDelete,
-            onTap: !canDelete || onWordDeleteTap == null
+            onTap: !canDelete || onWordTap == null
                 ? null
                 : () {
-                    onWordDeleteTap(element);
+                    onWordTap(element);
                   },
           );
         }).toList(),
