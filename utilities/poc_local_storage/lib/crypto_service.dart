@@ -1,3 +1,5 @@
+// ignore_for_file: inference_failure_on_instance_creation
+
 import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
@@ -77,7 +79,7 @@ final class CryptoService {
         decryptedData.length - checksum.length,
       );
 
-      if (!ListEquality().equals(checksum, extractedChecksum)) {
+      if (!const ListEquality().equals(checksum, extractedChecksum)) {
         throw Exception('Decryption failed: Checksum mismatch');
       }
 
@@ -110,7 +112,8 @@ final class CryptoService {
 
     cipher.init(true, aeadParams);
 
-    // Add a known marker or checksum at the end of the plaintext before encryption
+    // Add a known marker or checksum at the end of the plaintext
+    // before encryption
     final checksum = utf8.encode('CHK'); // 3-byte marker
     final combinedData = Uint8List.fromList([...data, ...checksum]);
 
@@ -152,7 +155,8 @@ final class CryptoService {
     return Uint8List.fromList([...salt, ...hashedPassword]);
   }
 
-  /// Re-encrypts the [encryptedData] using the provided [oldPassword] and [newPassword].
+  /// Re-encrypts the [encryptedData] using the provided [oldPassword]
+  /// and [newPassword].
   Uint8List reEncrypt(
     Uint8List encryptedData,
     String oldPassword,
@@ -170,7 +174,7 @@ final class CryptoService {
   bool verifyPassword(String password, Uint8List storedHash) {
     final salt = storedHash.sublist(0, _saltLength);
     final hashedPassword = hashPassword(password, salt: salt);
-    return ListEquality().equals(hashedPassword, storedHash);
+    return const ListEquality().equals(hashedPassword, storedHash);
   }
 
   /// Derives a key from the [password] and [salt] using Argon2.
@@ -218,10 +222,10 @@ final class CryptoService {
 
   /// Initializes a secure random number generator.
   static SecureRandom _initSecureRandom() {
-    final secureRandom = SecureRandom("Fortuna");
+    final secureRandom = SecureRandom('Fortuna');
     final seed = Uint8List(32);
 
-    for (int i = 0; i < seed.length; i++) {
+    for (var i = 0; i < seed.length; i++) {
       seed[i] = Random.secure().nextInt(256);
     }
 

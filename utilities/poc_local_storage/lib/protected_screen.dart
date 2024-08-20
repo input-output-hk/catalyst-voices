@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, discarded_futures
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_local_storage/main.dart';
@@ -30,7 +32,7 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -65,13 +67,16 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
                                 children: [
                                   IconButton(
                                     icon: const Icon(Icons.info),
-                                    onPressed: () => _showCertificateDetails(
-                                        _certificates[index]),
+                                    onPressed: () async =>
+                                        _showCertificateDetails(
+                                      _certificates[index],
+                                    ),
                                   ),
                                   IconButton(
                                     icon: const Icon(Icons.delete),
-                                    onPressed: () => _deleteCertificate(
-                                        _certificates[index]),
+                                    onPressed: () async => _deleteCertificate(
+                                      _certificates[index],
+                                    ),
                                   ),
                                 ],
                               ),
@@ -119,7 +124,6 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
         _isLoading = false;
       });
     } catch (e) {
-      print('Error loading certificates: $e');
       setState(() {
         _isLoading = false;
       });
@@ -128,7 +132,8 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
 
   Future<void> _pickAndStoreCertificates() async {
     final password = await _promptForPassword(
-        'Enter a password to encrypt the certificates');
+      'Enter a password to encrypt the certificates',
+    );
     if (password != null && password.isNotEmpty) {
       try {
         if (await certificateRepo.verifyPassword(password)) {
@@ -155,19 +160,20 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-                content: Text('Authentication failed. Incorrect password.')),
+              content: Text('Authentication failed. Incorrect password.'),
+            ),
           );
         }
       } catch (e) {
-        print('Error picking and storing certificates: $e');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
+          SnackBar(content: Text('Error: $e')),
         );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text('Password is required to store certificates')),
+          content: Text('Password is required to store certificates'),
+        ),
       );
     }
   }
@@ -182,12 +188,12 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
           content: TextField(
             controller: _passwordController,
             obscureText: true,
-            decoration: const InputDecoration(hintText: "Enter password"),
+            decoration: const InputDecoration(hintText: 'Enter password'),
           ),
           actions: [
             TextButton(
               child: const Text('Cancel'),
-              onPressed: () => Navigator.of(context).pop(null),
+              onPressed: () => Navigator.of(context).pop(),
             ),
             TextButton(
               child: const Text('OK'),
@@ -216,9 +222,10 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
     }
   }
 
-  void _showCertificateDetails(String certificateName) async {
+  Future<void> _showCertificateDetails(String certificateName) async {
     final password = await _promptForPassword(
-        'Enter the password to view certificate details');
+      'Enter the password to view certificate details',
+    );
     if (password != null) {
       try {
         if (await certificateRepo.verifyPassword(password)) {
@@ -227,7 +234,7 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
             password,
           );
           if (certificateContent != null && certificateContent.isNotEmpty) {
-            showDialog(
+            await showDialog<void>(
               context: context,
               builder: (BuildContext context) {
                 return AlertDialog(
@@ -246,8 +253,10 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                  content: Text(
-                      'Failed to load certificate. Certificate might be empty or not found.')),
+                content: Text(
+                  '''Failed to load certificate. Certificate might be empty or not found.''',
+                ),
+              ),
             );
           }
         } else {
@@ -256,11 +265,10 @@ class _ProtectedScreenState extends State<ProtectedScreen> {
           );
         }
       } catch (e) {
-        print('Error loading certificate: $e');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content:
-                  Text('Failed to load certificate. Error: ${e.toString()}')),
+            content: Text('Failed to load certificate. Error: $e'),
+          ),
         );
       }
     }

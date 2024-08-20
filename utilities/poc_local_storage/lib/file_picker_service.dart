@@ -1,3 +1,5 @@
+// ignore_for_file: inference_failure_on_untyped_parameter
+
 import 'dart:async';
 
 import 'package:file_picker/file_picker.dart';
@@ -11,8 +13,7 @@ final class FilePickerService {
   FilePickerService._();
 
   Future<List<PlatformFile>> pickMultipleFiles() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.any,
+    final result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
       withData: true,
     );
@@ -21,8 +22,7 @@ final class FilePickerService {
   }
 
   Future<List<List<int>>> pickMultipleFilesAsBytes() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.any,
+    final result = await FilePicker.platform.pickFiles(
       allowMultiple: true,
       withData: true,
     );
@@ -36,9 +36,7 @@ final class FilePickerService {
   }
 
   Future<List<int>?> pickSingleFileAsBytes() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-      type: FileType.any,
-      allowMultiple: false,
+    final result = await FilePicker.platform.pickFiles(
       withData: true,
     );
 
@@ -60,11 +58,9 @@ extension PlatformFileExtension on PlatformFile {
       final chunks = <int>[];
 
       readStream!.listen(
-        (List<int> chunk) {
-          chunks.addAll(chunk);
-        },
+        chunks.addAll,
         onError: (error) {
-          completer.completeError(error);
+          completer.completeError(error as Object);
         },
         onDone: () {
           completer.complete(chunks);

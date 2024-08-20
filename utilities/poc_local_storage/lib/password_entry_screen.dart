@@ -22,7 +22,7 @@ class _PasswordEntryScreenState extends State<PasswordEntryScreen> {
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(24),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 500),
               child: Card(
@@ -31,7 +31,7 @@ class _PasswordEntryScreenState extends State<PasswordEntryScreen> {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(32.0),
+                  padding: const EdgeInsets.all(32),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [

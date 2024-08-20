@@ -1,9 +1,10 @@
+// ignore_for_file: avoid_positional_boolean_parameters
+
 import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
-import 'crypto_service.dart';
+import 'package:poc_local_storage/crypto_service.dart';
 
 /// A service for securely storing and retrieving data.
 final class SecureStorageService {
@@ -49,7 +50,7 @@ final class SecureStorageService {
   }
 
   Future<Uint8List?> getBytes(String key) async {
-    final String? base64String = await _secureStorage.read(key: key);
+    final base64String = await _secureStorage.read(key: key);
     if (base64String == null) return null;
     return Uint8List.fromList(base64Decode(base64String));
   }
@@ -60,7 +61,7 @@ final class SecureStorageService {
   }
 
   Future<String?> getString(String key) async {
-    return await _secureStorage.read(key: key);
+    return _secureStorage.read(key: key);
   }
 
   Future<bool> login(String password) async {
@@ -81,7 +82,7 @@ final class SecureStorageService {
   }
 
   Future<void> saveBytes(String key, Uint8List bytes) async {
-    final String base64String = base64Encode(bytes);
+    final base64String = base64Encode(bytes);
     await _secureStorage.write(key: key, value: base64String);
   }
 

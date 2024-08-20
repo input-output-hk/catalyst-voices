@@ -1,3 +1,5 @@
+// ignore_for_file: discarded_futures
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:poc_local_storage/main.dart';
@@ -26,7 +28,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: const Text('Go to Protected Screen'),
               )
             : ElevatedButton(
-                onPressed: () => _showCreatePasswordDialog(context),
+                onPressed: () async => _showCreatePasswordDialog(context),
                 child: const Text('Create Your Password'),
               ),
       ),
@@ -51,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _showCreatePasswordDialog(BuildContext context) {
-    String tempPassword = '';
+    var tempPassword = '';
     return showDialog<void>(
       context: context,
       builder: (BuildContext context) {
@@ -61,7 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
             obscureText: true,
             onChanged: (value) => tempPassword = value,
             decoration: const InputDecoration(
-              hintText: "Enter your new password",
+              hintText: 'Enter your new password',
             ),
           ),
           actions: [
