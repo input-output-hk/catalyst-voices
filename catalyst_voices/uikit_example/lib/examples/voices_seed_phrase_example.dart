@@ -15,15 +15,23 @@ class VoicesSeedPhraseExample extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
         children: [
+          Text('SeedPhrasesViewer'),
+          SizedBox(height: 12),
           SeedPhrasesViewer(
             words: [
               'real',
               'mission',
               'secure',
               'renew',
-              'renew renew renew',
+              'key',
+              'audit',
+              'right',
+              'gas',
             ],
           ),
+          SizedBox(height: 24),
+          Text('SeedPhrasesEditor'),
+          SizedBox(height: 12),
         ],
       ),
     );

@@ -32,11 +32,13 @@ class SeedPhraseViewer extends StatelessWidget {
               style: TextStyle(color: theme.colors.textOnPrimary),
             ),
             const SizedBox(width: 6),
-            Text(
-              word,
-              style: TextStyle(color: theme.colors.textPrimary),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
+            Flexible(
+              child: Text(
+                word,
+                style: TextStyle(color: theme.colors.textPrimary),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ],
         ),
