@@ -13,14 +13,10 @@ class VoicesSeedPhraseExample extends StatelessWidget {
     'audit',
     'right',
     'gas',
-    'key',
-    'secure',
-    'win',
-    'review',
+    'house',
+    'plant',
     'car',
     'sand',
-    'real',
-    'house',
   ];
 
   const VoicesSeedPhraseExample({
