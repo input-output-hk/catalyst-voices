@@ -1,7 +1,8 @@
 import 'package:catalyst_voices/widgets/seed_phrase/seed_phrases_sequencer.dart';
-import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
+import '../../helpers/helpers.dart';
 
 void main() {
   group('SeedPhrasesSequencer', () {
@@ -23,18 +24,11 @@ void main() {
               ..addAll(value);
           },
         );
-        final widget = MaterialApp(
-          theme: ThemeData(
-            extensions: const [
-              VoicesColorScheme.optional(),
-            ],
-          ),
-          home: sequencer,
-        );
         final wordPickerKey = ValueKey('PickerSeedPhrase${word}CellKey');
 
         // When
-        await tester.pumpWidget(widget);
+        await tester.pumpApp(sequencer);
+        await tester.pumpAndSettle();
         await tester.tap(find.byKey(wordPickerKey));
 
         // Then
@@ -57,14 +51,6 @@ void main() {
               ..addAll(value);
           },
         );
-        final widget = MaterialApp(
-          theme: ThemeData(
-            extensions: const [
-              VoicesColorScheme.optional(),
-            ],
-          ),
-          home: sequencer,
-        );
 
         final pickerKeys = <ValueKey<String>>[
           ValueKey('PickerSeedPhrase${words[0]}CellKey'),
@@ -75,7 +61,8 @@ void main() {
         ];
 
         // When
-        await tester.pumpWidget(widget);
+        await tester.pumpApp(sequencer);
+        await tester.pumpAndSettle();
 
         // Adds items to selectedWords
         for (final key in pickerKeys) {
