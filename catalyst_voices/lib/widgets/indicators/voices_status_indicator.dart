@@ -1,5 +1,5 @@
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
-import 'package:collection/collection.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 /// Enum representing the two possible types of status indicators:
@@ -52,21 +52,14 @@ class VoicesStatusIndicator extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        children: [
+        children: <Widget>[
           _StatusContainer(
             type: type,
             child: status,
           ),
           _TitleContainer(child: title),
           _BodyContainer(child: body),
-        ]
-            .expandIndexed(
-              (index, element) => [
-                if (index != 0) const SizedBox(height: 16),
-                element,
-              ],
-            )
-            .toList(),
+        ].separatedBy(const SizedBox(height: 16)).toList(),
       ),
     );
   }

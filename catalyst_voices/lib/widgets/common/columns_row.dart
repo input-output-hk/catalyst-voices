@@ -71,14 +71,7 @@ class _Column extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: children
-          .expandIndexed(
-            (index, element) => [
-              if (index != 0) SizedBox(height: spacing),
-              element,
-            ],
-          )
-          .toList(),
+      children: children.separatedBy(SizedBox(height: spacing)).toList(),
     );
   }
 }
