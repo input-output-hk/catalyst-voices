@@ -38,7 +38,6 @@ class SeedPhrasesPicker extends StatelessWidget {
         crossAxisSpacing: 6,
         children: words.map((word) {
           final isSelected = selectedWords.contains(word);
-
           return _WordCell(
             word,
             key: ValueKey('PickerSeedPhrase${word}CellKey'),
