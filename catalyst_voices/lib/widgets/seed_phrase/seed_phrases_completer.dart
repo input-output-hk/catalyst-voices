@@ -2,6 +2,7 @@ import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:catalyst_voices/widgets/common/columns_row.dart';
 import 'package:catalyst_voices/widgets/seed_phrase/seed_phrases_picker.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
@@ -137,8 +138,7 @@ class _WordSlotCell extends StatelessWidget {
                 color: foregroundColor.resolve(states),
                 size: 18,
               ),
-              // TODO(damian): loc
-              child: Text(data ?? 'Slot $slotNr'),
+              child: Text(data ?? context.l10n.seedPhraseSlotNr(slotNr)),
             ),
           ),
         ),
