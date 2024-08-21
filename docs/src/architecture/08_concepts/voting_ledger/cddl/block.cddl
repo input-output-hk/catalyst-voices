@@ -1,0 +1,24 @@
+block = [
+    block_header,
+    block_data,
+    validator_signature: bytes ; signature of the `block_header` and `block_data` hash
+]
+
+block_header = [
+    tree_id: #6.32780(bytes), ; ULID type
+    chain_id: #6.32780(bytes), ; ULID type
+    timestamp: ~#6.1(uint .ge 1722470400),
+    validator_id: kid,
+    prev_block_id: hash_bytes, ; Hash of the previous block
+]
+
+block_data = ~#6.24(bytes)
+
+kid = bytes .size 16 ; 128 bites hash of the x509/c509 certificate
+
+hash_bytes = (
+  #6.???(bytes .size 32) \ ; Blake3-256
+  #6.???(bytes .size 28) \ ; Blake3-224
+  #6.???(bytes .size 16) \ ; Blake3-128
+  #6.18300(bytes /size 32) ; SHA-256
+)
