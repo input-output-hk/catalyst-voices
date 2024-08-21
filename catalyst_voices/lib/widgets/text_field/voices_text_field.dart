@@ -208,7 +208,10 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
                 : textTheme.bodySmall!
                     .copyWith(color: theme.colors.textDisabled),
             hintText: widget.decoration?.hintText,
-            hintStyle: textTheme.bodyLarge,
+            hintStyle: widget.enabled
+                ? textTheme.bodyLarge
+                : textTheme.bodyLarge!
+                    .copyWith(color: theme.colors.textDisabled),
             errorText: widget.decoration?.errorText ?? _validation.errorMessage,
             errorMaxLines: widget.decoration?.errorMaxLines,
             errorStyle: widget.enabled
