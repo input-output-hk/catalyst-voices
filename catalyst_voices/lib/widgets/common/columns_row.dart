@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/widgets/seed_phrase/seed_phrases_completer.dart';
 import 'package:catalyst_voices/widgets/seed_phrase/seed_phrases_picker.dart';
 import 'package:catalyst_voices/widgets/seed_phrase/seed_phrases_viewer.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
@@ -49,13 +50,8 @@ class ColumnsRow extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: columns
           .map((e) => _Column(spacing: crossAxisSpacing, children: e))
-          .map((e) => Expanded(child: e))
-          .expandIndexed(
-            (index, element) => [
-              if (index != 0) SizedBox(width: mainAxisSpacing),
-              element,
-            ],
-          )
+          .map<Widget>((e) => Expanded(child: e))
+          .separatedBy(SizedBox(width: mainAxisSpacing))
           .toList(),
     );
   }
@@ -75,14 +71,7 @@ class _Column extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: children
-          .expandIndexed(
-            (index, element) => [
-              if (index != 0) SizedBox(height: spacing),
-              element,
-            ],
-          )
-          .toList(),
+      children: children.separatedBy(SizedBox(height: spacing)).toList(),
     );
   }
 }
