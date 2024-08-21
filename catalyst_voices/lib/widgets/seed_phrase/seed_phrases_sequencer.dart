@@ -93,7 +93,8 @@ class _BorderDecorator extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         border: Border.all(
-          color: Theme.of(context).colors.outlineBorderVariant!,
+          color: Theme.of(context).colors.outlineBorderVariant ??
+              Theme.of(context).colorScheme.outlineVariant,
           width: 1.5,
         ),
         borderRadius: BorderRadius.circular(12),
