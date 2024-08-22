@@ -1,4 +1,4 @@
-<!-- cspell: words Aumasson Neves Zooko O'Hearn Winnerlein-->
+<!-- cspell: words Aumasson Neves Zooko O'Hearn Winnerlein -->
 
 # BLAKE2 and BLAKE3 for COSE Algorithms registry
 
