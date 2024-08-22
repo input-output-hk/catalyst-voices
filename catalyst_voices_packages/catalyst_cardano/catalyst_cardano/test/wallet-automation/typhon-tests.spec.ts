@@ -1,17 +1,17 @@
 import { test, chromium, expect, Page, BrowserContext } from '@playwright/test';
-import { downloadExtension, getSeedPhrase, getWalletCredentials } from './utils';
+import { downloadExtension, getSeedPhrase, getWalletCredentials, typhonImportWallet } from './utils';
 
 let newTab: Page
 let browser: BrowserContext;
 let extensionPath: string;
 let extID : string = 'KFDNIEFADAANBJODLDOHAEDPHAFOFFOH';
 
-test.afterEach(async ({ }, testInfo) => {
+/*test.afterEach(async ({ }, testInfo) => {
     if (testInfo.title == 'Empty wallet') {
         return;
     }
     browser.close();
-});
+});*/
 
 test.beforeAll(async () => {
     console.log("before all");
@@ -35,36 +35,11 @@ test.beforeEach(async ({},testInfo) => {
     await expect.poll(async () => {
         return browser.pages().length;
     }, { timeout: 5000 }).toBe(2);
-    const pages = browser.pages();
-    newTab = pages[pages.length - 1];
+    const newTab = browser.pages()[1];
     await newTab.bringToFront();
-
-    await newTab.locator('button#headlessui-menu-button-1').click();
-
-    await newTab.locator('button#headlessui-menu-item-6').click();
-
-    await newTab.getByRole('button', { name: 'Import' }).click();
-
-    // Login
-    const WalletCredentials = await getWalletCredentials('WALLET1');
-    await newTab.getByPlaceholder('Wallet Name').fill(WalletCredentials.username);
-    await newTab.getByPlaceholder('Password', { exact: true }).fill(WalletCredentials.password);
-    await newTab.getByPlaceholder('Confirm Password', { exact: true }).fill(WalletCredentials.password);
-    await newTab.locator('input#termsAndConditions').click();
-    await newTab.getByRole('button', { name: 'Continue' }).click();
-
-    // Input seed phrase
-    const seedPhrase = await getSeedPhrase();
-    for (let i = 0; i < seedPhrase.length; i++) {
-        const ftSeedPhraseSelector = `(//input[@type='text'])[${i + 1}]`;
-        await newTab.locator(ftSeedPhraseSelector).fill(seedPhrase[i]);
-    }
-
-    await newTab.locator('//*[@id="app"]/div/div/div[3]/div/div[2]/div/div/div/div[1]/div[1]/div[1]/span[1]').click();
-    await newTab.getByRole('button', { name: 'Unlock Wallet' }).click();
-
+    await typhonImportWallet(newTab);
     await newTab.waitForTimeout(5000);
-    await newTab.goto('http://localhost:8000/');
+    await newTab.goto('/')
     await newTab.locator('//*[text()="Enable wallet"]').click();
 
     await expect.poll(async () => {

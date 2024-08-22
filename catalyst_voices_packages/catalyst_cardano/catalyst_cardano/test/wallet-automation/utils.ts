@@ -2,6 +2,7 @@ import * as fs from 'fs/promises';
 import * as fsi from 'fs';
 import path from 'path';
 import nodeFetch from "node-fetch";
+import { Page } from '@playwright/test';
 
 interface WalletCredentials {
   username: string;
@@ -69,3 +70,30 @@ const downloadExtension = async (extID: string): Promise<string> => {
   };
 
   export { downloadExtension };
+
+  const typhonImportWallet = async (tab: Page): Promise<void> => {
+
+    //switch to preprod network
+    await tab.locator('button#headlessui-menu-button-1').click();
+    await tab.locator('button#headlessui-menu-item-6').click();
+    //import wallet
+    await tab.getByRole('button', { name: 'Import' }).click();
+    const WalletCredentials = await getWalletCredentials('WALLET1');
+    await tab.getByPlaceholder('Wallet Name').fill(WalletCredentials.username);
+    await tab.getByPlaceholder('Password', { exact: true }).fill(WalletCredentials.password);
+    await tab.getByPlaceholder('Confirm Password', { exact: true }).fill(WalletCredentials.password);
+    await tab.locator('input#termsAndConditions').click();
+    await tab.getByRole('button', { name: 'Continue' }).click();
+
+    // Input seed phrase
+    const seedPhrase = await getSeedPhrase();
+    for (let i = 0; i < seedPhrase.length; i++) {
+        const ftSeedPhraseSelector = `(//input[@type='text'])[${i + 1}]`;
+        await tab.locator(ftSeedPhraseSelector).fill(seedPhrase[i]);
+    }
+
+    await tab.locator('//*[@id="app"]/div/div/div[3]/div/div[2]/div/div/div/div[1]/div[1]/div[1]/span[1]').click();
+    await tab.getByRole('button', { name: 'Unlock Wallet' }).click();
+};
+
+export { typhonImportWallet };
