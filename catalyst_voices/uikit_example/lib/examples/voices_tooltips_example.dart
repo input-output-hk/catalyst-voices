@@ -68,7 +68,6 @@ class VoicesTooltipsExample extends StatelessWidget {
                 VoicesRichTooltipActionData(
                   name: 'Action',
                   onTap: () {
-                    print('Tap Tap');
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Tooltip action clicked!')),
                     );
@@ -77,7 +76,6 @@ class VoicesTooltipsExample extends StatelessWidget {
                 VoicesRichTooltipActionData(
                   name: 'Action',
                   onTap: () {
-                    print('Tap');
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Tooltip action clicked!')),
                     );
