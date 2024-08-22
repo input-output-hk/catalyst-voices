@@ -3,9 +3,12 @@
 ---
 
 Title: Voting Ledger Chain Structure
+
 Status: Proposed
+
 Authors:
     - Alex Pozhylenkov <alex.pozhylenkov@iohk.io>
+
 Created: 2024-08-19
 
 ---
@@ -22,6 +25,8 @@ in a transparent, verifiable, scalable and immutable way.
 ## Specification
 
 ### Ledger structure
+
+![Ledger schema](images/ledger_schema.svg){ align=right }
 
 Voting ledger will be represented as a collection of different, non-connected chains,
 processed and run in parallel.
@@ -42,8 +47,6 @@ which are cryptographically protected by hashing.
 
 The described approach allows to easily scale and increase throughput of the network on demand at any time,
 just by starting to process new chains.
-
-![Ledger schema](images/ledger_schema.svg)
 
 ### Temporary chains
 
