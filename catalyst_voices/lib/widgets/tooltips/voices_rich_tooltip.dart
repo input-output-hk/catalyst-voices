@@ -30,6 +30,7 @@ class VoicesRichTooltip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isLightTheme = theme.brightness == Brightness.light;
 
     return Tooltip(
       richMessage: WidgetSpan(
@@ -52,6 +53,7 @@ class VoicesRichTooltip extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colors.onSurfaceNeutralOpaqueLv2,
         borderRadius: BorderRadius.circular(12),
+        boxShadow: isLightTheme ? kElevationToShadow[2] : null,
       ),
       enableTapToDismiss: actions.isEmpty,
       child: child,
