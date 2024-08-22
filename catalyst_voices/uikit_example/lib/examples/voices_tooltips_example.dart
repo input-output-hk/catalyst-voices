@@ -31,9 +31,10 @@ class VoicesTooltipsExample extends StatelessWidget {
           ),
           Center(
             child: VoicesPlainTooltip(
-              message: 'Supporting text Body text string goes here psum dolor '
-                  'sit amet, consectetur adipiscing elit, sed do eiusmod '
-                  'tempor incididunt',
+              message: 'This is very long supporting text. '
+                  'This is very long supporting text. '
+                  'This is very long supporting text. '
+                  'This is very long supporting text.',
               child: Container(
                 color: Colors.blue,
                 padding: const EdgeInsets.all(8),
@@ -47,8 +48,7 @@ class VoicesTooltipsExample extends StatelessWidget {
           Center(
             child: VoicesRichTooltip(
               title: 'Title',
-              message: 'Supporting line text lorem ipsum dolor '
-                  'sit amet, consectetur',
+              message: 'This is supporting text. This is supporting text.',
               child: Container(
                 color: Colors.blue,
                 padding: const EdgeInsets.all(8),
@@ -62,8 +62,7 @@ class VoicesTooltipsExample extends StatelessWidget {
           Center(
             child: VoicesRichTooltip(
               title: 'Title',
-              message: 'Supporting line text lorem ipsum dolor '
-                  'sit amet, consectetur',
+              message: 'This is supporting text. This is supporting text.',
               actions: [
                 VoicesRichTooltipActionData(
                   name: 'Action',
