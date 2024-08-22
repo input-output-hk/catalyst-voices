@@ -17,8 +17,7 @@ block_data = ~#6.24(bytes)
 kid = bytes .size 16 ; 128 bites hash of the x509/c509 certificate
 
 hash_bytes = (
-  #6.???(bytes .size 32) \ ; Blake3-256
-  #6.???(bytes .size 28) \ ; Blake3-224
-  #6.???(bytes .size 16) \ ; Blake3-128
-  #6.18300(bytes /size 32) ; SHA-256
+  #6.18556([2525, bytes]) \ ; Blake3 hash
+  #6.18556([2526, bytes]) \ ; Blake2b hash
+  #6.18556([2527, bytes]) ; Blake2s hash
 )
