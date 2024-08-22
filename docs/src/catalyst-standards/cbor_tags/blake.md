@@ -1,6 +1,6 @@
-# BLAKE2 and BLAKE3 hash functions for COSE Algorithms registry
+# BLAKE2 and BLAKE3 for COSE Algorithms registry
 
-This document specifies [BLAKE2] and [BLAKE3] hash functions [COSE] Algorithm value types.
+This document specifies [COSE] Algorithm value types for [BLAKE2] and [BLAKE3] hash functions.
 
 ## BLAKE3
 
