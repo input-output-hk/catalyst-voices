@@ -1,11 +1,13 @@
 # Voting Ledger Structure
 
 ---
+
 Title: Voting Ledger Chain Structure
 Status: Proposed
 Authors:
     - Alex Pozhylenkov <alex.pozhylenkov@iohk.io>
 Created: 2024-08-19
+
 ---
 
 ## Abstract
@@ -78,19 +80,18 @@ And this data also should be reflected in each chain.
 
 * `metadata` field allowed **ONLY** for genesis and final block types.
 
-* `validator_signature` **MUST** be a signature of the hashed `block_header` bytes with the `block_data` bytes,
-signed by the validator's keys defined in the corresponding certificates referenced by the `validator_id`.
-Signature algorithm is defined by the certificate.
+* `validator_signature` **MUST** be a signature of the hashed `block_header` bytes with the `block_data`
+  bytes,
+  signed by the validator's keys defined in the corresponding certificates referenced by the `validator_id`.
+  Signature algorithm is defined by the certificate.
 
-* `prev_block_id` and `validator_signature` **MUST** use the same hash function, defined with the `hash_bytes`.
+* `prev_block_id` and `validator_signature` **MUST** use the same hash function, defined with the
+  `hash_bytes`.
 
-* `prev_block_id` for the genesis block **MUST** be a hash of the defined `chain_id`, `tree_id`, `validator_id` fields and publicly announced voting terms message bytes.
+* `prev_block_id` for the genesis block **MUST** be a hash of the defined `chain_id`, `tree_id`,
+  `validator_id` fields and publicly announced voting terms message bytes.
 
 ## Rationale
-<!-- The rationale fleshes out the specification by describing what motivated the design and what led to particular design decisions. It should describe alternate designs considered and related work. The rationale should provide evidence of consensus within the community and discuss significant objections or concerns raised during the discussion.
-
-It must also explain how the proposal affects the backward compatibility of existing solutions when applicable. If the proposal responds to a CPS, the 'Rationale' section should explain how it addresses the CPS, and answer any questions that the CPS poses for potential solutions.
--->
 
 ## Path to Active
 
