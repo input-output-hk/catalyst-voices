@@ -13,8 +13,6 @@ final class VoicesRichTooltipActionData {
   });
 }
 
-/// [VoicesRichTooltip]
-///
 /// A tooltip widget with a rich text message (title and message) and
 /// optional actions displayed at the bottom.
 ///

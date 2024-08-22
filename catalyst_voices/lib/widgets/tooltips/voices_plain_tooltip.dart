@@ -1,8 +1,6 @@
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
-/// [VoicesPlainTooltip]
-///
 /// A simple tooltip widget with a plain text message and a child widget.
 ///
 /// **Notes:**
