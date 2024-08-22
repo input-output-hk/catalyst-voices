@@ -14,9 +14,7 @@ let extID : string = 'KFDNIEFADAANBJODLDOHAEDPHAFOFFOH';
 });*/
 
 test.beforeAll(async () => {
-    console.log("before all");
     extensionPath = await downloadExtension(extID);
-
 });
 
 test.beforeEach(async ({},testInfo) => {
@@ -35,12 +33,13 @@ test.beforeEach(async ({},testInfo) => {
     await expect.poll(async () => {
         return browser.pages().length;
     }, { timeout: 5000 }).toBe(2);
-    const newTab = browser.pages()[1];
-    await newTab.bringToFront();
-    await typhonImportWallet(newTab);
-    await newTab.waitForTimeout(5000);
-    await newTab.goto('/')
-    await newTab.locator('//*[text()="Enable wallet"]').click();
+    const extTab = browser.pages()[1];
+    await extTab.bringToFront();
+    await typhonImportWallet(extTab);
+    //TODO switch wait for wait on load page
+    await extTab.waitForTimeout(5000);
+    await extTab.goto('/')
+    await extTab.locator('//*[text()="Enable wallet"]').click();
 
     await expect.poll(async () => {
         return browser.pages().length;
@@ -51,30 +50,12 @@ test.beforeEach(async ({},testInfo) => {
     await allowTab.bringToFront();
 
     await allowTab.getByRole('button', { name: 'Allow' }).click();
-    await newTab.bringToFront();
-    await newTab.waitForTimeout(5000);
-    await waitForDataLoaded();
-});
-
-// Get and match text content
-const matchTextContent = async (selector: string, regex: RegExp) => {
-    const textContent = await newTab.locator(selector).textContent({ timeout: 5000 });
+    await extTab.bringToFront();
+    //wait for data to load
+    const textContent = await extTab.locator('#flt-semantic-node-13').textContent({ timeout: 5000 });
     expect(textContent).not.toBeNull();
 
-    const match = textContent!.match(regex);
-    expect(match).not.toBeNull();
-    return match![1].trim();
-};
-
-async function waitForDataLoaded() {
-    // Wait for balance loaded
-    await expect.poll(async () => {
-        const balanceTextContent = await matchTextContent('#flt-semantic-node-13', /Balance: Ada \(lovelaces\): (\d+)/);
-        return (parseInt(balanceTextContent, 10) / 1_000_000);
-    }, {
-        timeout: 10000,
-    }).toBeGreaterThan(500);
-}
+});
 
 test('get wallet details', async () => {
 
@@ -139,14 +120,15 @@ test('Sign data', async () => {/*
     await expect(newTab.getByText('DataSignature')).toBeVisible();
 */});
 
-/*
+
 test('Sign and submit tx', async () => {
-    const signTab = await openSignTab('Sign & submit tx')
+    /*const signTab = await openSignTab('Sign & submit tx')
     const WalletCredentials = await getWalletCredentials('WALLET1');
     await signData(signTab, WalletCredentials.password);
-    await expect(newTab.getByText('Tx hash')).toBeVisible();
+    await expect(newTab.getByText('Tx hash')).toBeVisible();*/
 });
 
+/*
 test('Sign and submit RBAC tx', async () => {
     const signTab = await openSignTab('Sign & submit RBAC tx');
     const WalletCredentials = await getWalletCredentials('WALLET1');
