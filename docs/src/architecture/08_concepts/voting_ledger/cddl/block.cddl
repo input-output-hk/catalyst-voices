@@ -7,14 +7,19 @@ block = [
 block_header = [
     tree_id: #6.32780(bytes), ; ULID type
     chain_id: #6.32780(bytes), ; ULID type
+    ?type: block_type, ;
     timestamp: ~#6.1(uint .ge 1722470400),
     validator_id: kid,
+    ?metadata,
     prev_block_id: hash_bytes, ; Hash of the previous block
 ]
 
 block_data = ~#6.24(bytes)
+metadata = ~#6.24(bytes)
 
 kid = bytes .size 16 ; 128 bites hash of the x509/c509 certificate
+
+block_type = &("Genesis": 0, "Final": 1)
 
 hash_bytes = (
   #6.18556([2525, bytes]) \ ; Blake3 hash
