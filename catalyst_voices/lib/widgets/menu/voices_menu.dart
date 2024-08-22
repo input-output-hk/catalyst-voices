@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 
 class VoicesMenu extends StatelessWidget {
@@ -57,29 +58,49 @@ class _MenuButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final children = menuChildren;
-    if (children == null) {
-      return Wrap(
-        children: [
-          MenuItemButton(
-            leadingIcon: icon,
-            onPressed: enabled ? (() => onSelected?.call(label)) : null,
-            child: Text(label),
-          ),
-          if (showDivider) const Divider(),
-        ],
-      );
-    } else {
-      return Wrap(
-        children: [
-          SubmenuButton(
-            leadingIcon: icon,
-            menuChildren: children,
-            child: Text(label),
-          ),
-          if (showDivider) const Divider(),
-        ],
-      );
-    }
+    return Wrap(
+      children: [
+        Stack(
+          children: [
+            if (icon != null)
+              Positioned.fill(
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: icon,
+                  ),
+                ),
+              ),
+            if (children != null)
+              const Positioned.fill(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: EdgeInsets.only(right: 8.0),
+                    child: Icon(CatalystVoicesIcons.chevron_right, size: 20),
+                  ),
+                ),
+              ),
+            if (children == null)
+              MenuItemButton(
+                leadingIcon: icon,
+                onPressed: enabled ? (() => onSelected?.call(label)) : null,
+                style: MenuItemButton.styleFrom(iconColor: Colors.transparent),
+                child: Text(label),
+              )
+            else
+              SubmenuButton(
+                leadingIcon: icon,
+                menuChildren: children,
+                style: MenuItemButton.styleFrom(iconColor: Colors.transparent),
+                child: Text(label),
+              ),
+          ],
+        ),
+        if (showDivider) const Divider(),
+      ],
+    );
   }
 }
 

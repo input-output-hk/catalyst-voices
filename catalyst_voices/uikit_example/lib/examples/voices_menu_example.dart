@@ -25,7 +25,7 @@ class VoicesMenuExample extends StatelessWidget {
                     ),
                     SubMenuItem(
                       label: 'Move Private Team',
-                      icon: const Icon(CatalystVoicesIcons.cube, size: 20),
+                      icon: const Icon(CatalystVoicesIcons.switch_horizontal, size: 20),
                       children: [
                         MenuItem(label: 'Team 1: The Vikings'),
                         MenuItem(label: 'Team 2: Pure Hearts'),
@@ -33,7 +33,7 @@ class VoicesMenuExample extends StatelessWidget {
                     ),
                     MenuItem(
                       label: 'Move to public',
-                      icon: const Icon(CatalystVoicesIcons.cube, size: 20),
+                      icon: const Icon(CatalystVoicesIcons.switch_horizontal, size: 20),
                       showDivider: true,
                       enabled: false,
                     ),
@@ -58,7 +58,7 @@ class VoicesMenuExample extends StatelessWidget {
                     ),
                     SubMenuItem(
                       label: 'Move Private Team',
-                      icon: const Icon(CatalystVoicesIcons.cube, size: 20),
+                      icon: const Icon(CatalystVoicesIcons.switch_horizontal, size: 20),
                       children: [
                         MenuItem(label: 'Team 1: The Vikings'),
                         MenuItem(label: 'Team 2: Pure Hearts'),
@@ -66,7 +66,8 @@ class VoicesMenuExample extends StatelessWidget {
                     ),
                     MenuItem(
                       label: 'Move to public',
-                      icon: const Icon(CatalystVoicesIcons.cube, size: 20),
+                      icon: const Icon(CatalystVoicesIcons.switch_horizontal, size: 20),
+                      showDivider: true,
                     ),
                     MenuItem(
                       label: 'Delete',
