@@ -98,7 +98,12 @@ class _MenuButton extends StatelessWidget {
               ),
           ],
         ),
-        if (showDivider) const Divider(),
+        if (showDivider)
+          const Divider(
+            height: 0,
+            indent: 0,
+            thickness: 1,
+          ),
       ],
     );
   }
