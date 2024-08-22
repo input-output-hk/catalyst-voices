@@ -75,6 +75,7 @@ class VoicesRichTooltip extends StatelessWidget {
     return Tooltip(
       richMessage: WidgetSpan(
         child: ConstrainedBox(
+          key: const ValueKey('VoicesRichTooltipContentKey'),
           constraints: const BoxConstraints(maxWidth: 312),
           child: Column(
             mainAxisSize: MainAxisSize.min,

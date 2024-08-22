@@ -36,6 +36,7 @@ class VoicesPlainTooltip extends StatelessWidget {
     return Tooltip(
       richMessage: WidgetSpan(
         child: ConstrainedBox(
+          key: const ValueKey('VoicesPlainTooltipContentKey'),
           constraints: const BoxConstraints(maxWidth: 200),
           child: Text(
             message,
