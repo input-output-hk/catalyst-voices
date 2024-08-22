@@ -9,6 +9,7 @@ import 'package:uikit_example/examples/voices_checkbox_example.dart';
 import 'package:uikit_example/examples/voices_chip_example.dart';
 import 'package:uikit_example/examples/voices_fab_example.dart';
 import 'package:uikit_example/examples/voices_indicators_example.dart';
+import 'package:uikit_example/examples/voices_menu_example.dart';
 import 'package:uikit_example/examples/voices_navigation_example.dart';
 import 'package:uikit_example/examples/voices_radio_example.dart';
 import 'package:uikit_example/examples/voices_segmented_button_example.dart';
@@ -89,6 +90,11 @@ class ExamplesListPage extends StatelessWidget {
         title: 'Voices Floating Action Button',
         route: VoicesFabExample.route,
         page: VoicesFabExample(),
+      ),
+      ExampleTile(
+        title: 'Voices Menu',
+        route: VoicesMenuExample.route,
+        page: VoicesMenuExample(),
       ),
     ];
   }
