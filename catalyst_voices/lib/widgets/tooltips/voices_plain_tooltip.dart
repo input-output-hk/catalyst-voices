@@ -1,10 +1,26 @@
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
-/// Note. Colors were not defined well in figma so we may need to change
-/// them later.
+/// [VoicesPlainTooltip]
+///
+/// A simple tooltip widget with a plain text message and a child widget.
+///
+/// **Notes:**
+/// - The tooltip's colors might need to be adjusted based on the final design.
+/// - The tooltip's text is constrained to a maximum width of 200 pixels.
+///
+/// **Usage:**
+/// ```dart
+/// VoicesPlainTooltip(
+///   message: "This is a tooltip message.",
+///   child: Icon(Icons.info),
+/// )
+/// ```
 class VoicesPlainTooltip extends StatelessWidget {
+  /// The text message to display in the tooltip.
   final String message;
+
+  /// The widget that triggers tooltip visibility.
   final Widget child;
 
   const VoicesPlainTooltip({

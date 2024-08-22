@@ -13,10 +13,50 @@ final class VoicesRichTooltipActionData {
   });
 }
 
+/// [VoicesRichTooltip]
+///
+/// A tooltip widget with a rich text message (title and message) and
+/// optional actions displayed at the bottom.
+///
+/// **Notes:**
+/// - The tooltip's maximum width is constrained to 312 pixels.
+/// - The tooltip's background color and shadow are theme-dependent.
+/// - If no actions are provided, the tooltip can be dismissed by tapping
+///   anywhere on it. Otherwise, tapping will only trigger the action button
+///   taps which will dismiss all tooltips see [Tooltip.dismissAllToolTips].
+///
+/// **Example Usage:**
+/// ```dart
+/// final actions = [
+///   VoicesRichTooltipActionData(
+///     name: "Edit",
+///     onTap: () => print("Edit tapped"),
+///   ),
+///   VoicesRichTooltipActionData(
+///     name: "Delete",
+///     onTap: () => print("Delete tapped"),
+///   ),
+/// ];
+///
+/// VoicesRichTooltip(
+///   title: "Tooltip Title",
+///   message: "This is a tooltip with a descriptive message.",
+///   actions: actions,
+///   child: Icon(Icons.info),
+/// )
+/// ```
 class VoicesRichTooltip extends StatelessWidget {
+  /// The main title displayed at the top of the tooltip.
   final String title;
+
+  /// The descriptive message displayed below the title.
   final String message;
+
+  /// (Optional) A list of action buttons displayed at the
+  /// bottom of the tooltip. Each action has a `name` and an `onTap` callback.
   final List<VoicesRichTooltipActionData> actions;
+
+  /// The widget that triggers tooltip visibility.
   final Widget child;
 
   const VoicesRichTooltip({
