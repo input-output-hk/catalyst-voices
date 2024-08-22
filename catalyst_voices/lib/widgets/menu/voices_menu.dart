@@ -28,6 +28,7 @@ class VoicesMenu extends StatelessWidget {
       label: item.label,
       icon: item.icon,
       showDivider: item.showDivider,
+      enabled: item.enabled,
       menuChildren: (item is SubMenuItem)
           ? item.children.map(_mapItemToButton).toList()
           : null,
@@ -40,6 +41,7 @@ class _MenuButton extends StatelessWidget {
   final String label;
   final Icon? icon;
   final bool showDivider;
+  final bool enabled;
   final List<Widget>? menuChildren;
   final ValueChanged<String>? onSelected;
 
@@ -47,6 +49,7 @@ class _MenuButton extends StatelessWidget {
     required this.label,
     this.icon,
     this.showDivider = false,
+    this.enabled = true,
     this.menuChildren,
     this.onSelected,
   });
@@ -55,16 +58,26 @@ class _MenuButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final children = menuChildren;
     if (children == null) {
-      return MenuItemButton(
-        leadingIcon: icon,
-        child: Text(label),
-        onPressed: () => onSelected?.call(label),
+      return Wrap(
+        children: [
+          MenuItemButton(
+            leadingIcon: icon,
+            onPressed: enabled ? (() => onSelected?.call(label)) : null,
+            child: Text(label),
+          ),
+          if (showDivider) const Divider(),
+        ],
       );
     } else {
-      return SubmenuButton(
-        leadingIcon: icon,
-        menuChildren: children,
-        child: Text(label),
+      return Wrap(
+        children: [
+          SubmenuButton(
+            leadingIcon: icon,
+            menuChildren: children,
+            child: Text(label),
+          ),
+          if (showDivider) const Divider(),
+        ],
       );
     }
   }
@@ -74,11 +87,13 @@ class MenuItem {
   final String label;
   final Icon? icon;
   final bool showDivider;
+  final bool enabled;
 
   MenuItem({
     required this.label,
     this.icon,
     this.showDivider = false,
+    this.enabled = true,
   });
 }
 

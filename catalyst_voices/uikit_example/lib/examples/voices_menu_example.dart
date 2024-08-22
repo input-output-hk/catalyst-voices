@@ -34,6 +34,8 @@ class VoicesMenuExample extends StatelessWidget {
                     MenuItem(
                       label: 'Move to public',
                       icon: const Icon(CatalystVoicesIcons.cube, size: 20),
+                      showDivider: true,
+                      enabled: false,
                     ),
                     MenuItem(
                       label: 'Delete',
