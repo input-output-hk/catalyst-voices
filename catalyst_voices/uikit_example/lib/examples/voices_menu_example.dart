@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/menu/voices_list_tile.dart';
 import 'package:catalyst_voices/widgets/menu/voices_menu.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -45,7 +46,7 @@ class VoicesMenuExample extends StatelessWidget {
                   child: const SizedBox(
                     height: 56,
                     width: 200,
-                    child: ListTile(
+                    child: VoicesListTile(
                       title: Text('My first proposal'),
                     ),
                   )),
@@ -77,7 +78,7 @@ class VoicesMenuExample extends StatelessWidget {
                   child: const SizedBox(
                     height: 56,
                     width: 200,
-                    child: ListTile(
+                    child: VoicesListTile(
                       title: Text('My second proposal'),
                     ),
                   )),

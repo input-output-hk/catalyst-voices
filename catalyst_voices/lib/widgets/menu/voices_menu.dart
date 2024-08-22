@@ -57,6 +57,15 @@ class _MenuButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+
+    final textStyle = textTheme.bodyMedium?.copyWith(
+      color: enabled
+          ? textTheme.bodySmall?.color
+          : theme.disabledColor,
+    );
+
     final children = menuChildren;
     return Wrap(
       children: [
@@ -68,7 +77,12 @@ class _MenuButton extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: Padding(
                     padding: const EdgeInsets.only(left: 8.0),
-                    child: icon,
+                    child: Icon(
+                      icon!.icon,
+                      color: enabled
+                          ? textTheme.bodySmall?.color
+                          : theme.disabledColor,
+                    ),
                   ),
                 ),
               ),
@@ -87,14 +101,20 @@ class _MenuButton extends StatelessWidget {
                 leadingIcon: icon,
                 onPressed: enabled ? (() => onSelected?.call(label)) : null,
                 style: MenuItemButton.styleFrom(iconColor: Colors.transparent),
-                child: Text(label),
+                child: Text(
+                  label,
+                  style: textStyle,
+                ),
               )
             else
               SubmenuButton(
                 leadingIcon: icon,
                 menuChildren: children,
                 style: MenuItemButton.styleFrom(iconColor: Colors.transparent),
-                child: Text(label),
+                child: Text(
+                  label,
+                  style: textStyle
+                ),
               ),
           ],
         ),
