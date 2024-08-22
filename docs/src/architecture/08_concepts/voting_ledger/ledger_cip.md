@@ -73,7 +73,7 @@ And this data also should be reflected in each chain.
 
 * `tree_id` **MUST** be the same as for the previous block (except for genesis).
 * `chain_id` **MUST** be the same as for the previous block (except for genesis).
-* `validator_id` **MUST** be the same as for the previous block (except for genesis).
+* `validator` **MUST** be the same as for the previous block (except for genesis).
 * `prev_block_id` **MUST** be a hash of the previous block header bytes (except for genesis).
 * `timestamp` **MUST** be higher than the `timestamp` of the previous block (except for genesis).
 
@@ -85,14 +85,14 @@ And this data also should be reflected in each chain.
 
 * `validator_signature` **MUST** be a signature of the hashed `block_header` bytes with the `block_data`
   bytes,
-  signed by the validator's keys defined in the corresponding certificates referenced by the `validator_id`.
+  signed by the validator's keys defined in the corresponding certificates referenced by the `validator`.
   Signature algorithm is defined by the certificate.
 
 * `prev_block_id` and `validator_signature` **MUST** use the same hash function, defined with the
   `hash_bytes`.
 
 * `prev_block_id` for the genesis block **MUST** be a hash of the defined `chain_id`, `tree_id`,
-  `validator_id` fields and publicly announced voting terms message bytes.
+  `validator` fields and publicly announced voting terms message bytes.
 
 ## Rationale
 
