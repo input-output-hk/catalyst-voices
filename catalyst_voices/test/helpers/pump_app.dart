@@ -7,8 +7,15 @@ import 'package:flutter_test/flutter_test.dart';
 extension PumpApp on WidgetTester {
   Future<void> pumpApp(
     Widget widget, {
+    ThemeData? theme,
     VoicesColorScheme voicesColors = const VoicesColorScheme.optional(),
   }) {
+    final effectiveTheme = (theme ?? ThemeData()).copyWith(
+      extensions: [
+        voicesColors,
+      ],
+    );
+
     return pumpWidget(
       MaterialApp(
         localizationsDelegates: const [
@@ -17,11 +24,7 @@ extension PumpApp on WidgetTester {
         ],
         supportedLocales: VoicesLocalizations.supportedLocales,
         localeListResolutionCallback: basicLocaleListResolution,
-        theme: ThemeData(
-          extensions: [
-            voicesColors,
-          ],
-        ),
+        theme: effectiveTheme,
         home: widget,
       ),
     );

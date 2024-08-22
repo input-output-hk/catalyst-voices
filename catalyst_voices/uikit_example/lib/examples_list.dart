@@ -17,6 +17,7 @@ import 'package:uikit_example/examples/voices_separators_example.dart';
 import 'package:uikit_example/examples/voices_snackbar_example.dart';
 import 'package:uikit_example/examples/voices_switch_example.dart';
 import 'package:uikit_example/examples/voices_text_field_example.dart';
+import 'package:uikit_example/examples/voices_tooltips_example.dart';
 
 class ExamplesListPage extends StatelessWidget {
   static List<ExampleTile> get examples {
@@ -95,6 +96,11 @@ class ExamplesListPage extends StatelessWidget {
         title: 'Voices Seed Phrase',
         route: VoicesSeedPhraseExample.route,
         page: VoicesSeedPhraseExample(),
+      ),
+      ExampleTile(
+        title: 'Voices Tooltips',
+        route: VoicesTooltipsExample.route,
+        page: VoicesTooltipsExample(),
       ),
     ];
   }
