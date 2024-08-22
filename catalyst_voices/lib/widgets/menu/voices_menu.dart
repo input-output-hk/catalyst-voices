@@ -1,25 +1,24 @@
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 
 class VoicesMenu extends StatelessWidget {
-  final List<MenuItem> items;
+  final List<MenuItem> menuItems;
+  final Widget child;
   final ValueChanged<String>? onSelected;
 
   const VoicesMenu({
     super.key,
-    required this.items,
+    required this.menuItems,
+    required this.child,
     this.onSelected,
   });
 
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: SizedBox(
-        width: 200,
-        child: _MenuButton(
-          label: 'Menu',
-          menuChildren: [...items.map(_mapItemToButton)],
-        ),
+      child: SubmenuButton(
+        menuChildren: [...menuItems.map(_mapItemToButton)],
+        menuStyle: const MenuStyle(alignment: Alignment.centerRight),
+        child: child,
       ),
     );
   }
@@ -29,8 +28,9 @@ class VoicesMenu extends StatelessWidget {
       label: item.label,
       icon: item.icon,
       showDivider: item.showDivider,
-      menuChildren:
-      (item is SubMenuItem) ? item.children.map(_mapItemToButton).toList() : null,
+      menuChildren: (item is SubMenuItem)
+          ? item.children.map(_mapItemToButton).toList()
+          : null,
       onSelected: (item is SubMenuItem) ? null : onSelected,
     );
   }
@@ -64,7 +64,6 @@ class _MenuButton extends StatelessWidget {
       return SubmenuButton(
         leadingIcon: icon,
         menuChildren: children,
-        trailingIcon: const Icon(CatalystVoicesIcons.chevron_right, size: 20),
         child: Text(label),
       );
     }
