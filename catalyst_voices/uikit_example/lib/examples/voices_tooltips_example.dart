@@ -44,6 +44,56 @@ class VoicesTooltipsExample extends StatelessWidget {
               ),
             ),
           ),
+          Center(
+            child: VoicesRichTooltip(
+              title: 'Title',
+              message: 'Supporting line text lorem ipsum dolor '
+                  'sit amet, consectetur',
+              child: Container(
+                color: Colors.blue,
+                padding: const EdgeInsets.all(8),
+                child: const Text(
+                  'Rich Tooltip trigger',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
+          ),
+          Center(
+            child: VoicesRichTooltip(
+              title: 'Title',
+              message: 'Supporting line text lorem ipsum dolor '
+                  'sit amet, consectetur',
+              actions: [
+                VoicesRichTooltipActionData(
+                  name: 'Action',
+                  onTap: () {
+                    print('Tap Tap');
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Tooltip action clicked!')),
+                    );
+                  },
+                ),
+                VoicesRichTooltipActionData(
+                  name: 'Action',
+                  onTap: () {
+                    print('Tap');
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Tooltip action clicked!')),
+                    );
+                  },
+                ),
+              ],
+              child: Container(
+                color: Colors.blue,
+                padding: const EdgeInsets.all(8),
+                child: const Text(
+                  'Rich Tooltip [Actions] trigger',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
+          ),
         ].separatedBy(const SizedBox(height: 16)).toList(),
       ),
     );
