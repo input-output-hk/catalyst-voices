@@ -23,3 +23,5 @@ export 'toggles/voices_checkbox.dart';
 export 'toggles/voices_checkbox_group.dart';
 export 'toggles/voices_radio.dart';
 export 'toggles/voices_switch.dart';
+export 'tooltips/voices_plain_tooltip.dart';
+export 'tooltips/voices_rich_tooltip.dart';
