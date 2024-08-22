@@ -18,9 +18,10 @@ deps:
 
 src:
     FROM +deps
-    COPY --dir typhon .
+    COPY --dir wallet .
     COPY playwright.config.ts .
     COPY global-setup.ts .
+    COPY typhon-tests.spec.ts .
 
 package-test:
     FROM +src

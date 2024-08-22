@@ -21,14 +21,12 @@ export default defineConfig({
   projects: [
     {
       name: 'setup',
-      testMatch: [
-        /global\-setup\.ts/,
-      ],
+      testMatch: /global-setup\.ts/,
     },
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
-      dependencies: ['setup'],
+      dependencies: ['setup']
     },
   ]
 });

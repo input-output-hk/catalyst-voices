@@ -1,10 +1,10 @@
 import { test, chromium, expect, Page, BrowserContext } from '@playwright/test';
-import { downloadExtension, getSeedPhrase, getWalletCredentials } from './utils';
+import { getWalletCredentials } from './wallet/utils';
+import { getSeedPhrase } from './wallet/utils';
+import path from 'path';
 
 let newTab: Page
 let browser: BrowserContext;
-let extensionPath: string;
-let extID : string = 'KFDNIEFADAANBJODLDOHAEDPHAFOFFOH';
 
 test.afterEach(async ({ }, testInfo) => {
     if (testInfo.title == 'Empty wallet') {
@@ -13,17 +13,11 @@ test.afterEach(async ({ }, testInfo) => {
     browser.close();
 });
 
-test.beforeAll(async () => {
-    console.log("before all");
-    extensionPath = await downloadExtension(extID);
-
-});
-
-test.beforeEach(async ({},testInfo) => {
+test.beforeEach(async ({ }, testInfo) => {
     if (testInfo.title == 'Empty wallet') {
         return;
     }
-
+    const extensionPath: string = path.resolve(__dirname, 'extensions/gafhhkghbfjjkeiendhlofajokpaflmk_unzipped');
     browser = await chromium.launchPersistentContext('', {
         headless: false, // extensions only work in headful mode
         args: [
@@ -39,6 +33,7 @@ test.beforeEach(async ({},testInfo) => {
     newTab = pages[pages.length - 1];
     await newTab.bringToFront();
 
+    // interact with elements on the background page
     await newTab.locator('button#headlessui-menu-button-1').click();
 
     await newTab.locator('button#headlessui-menu-item-6').click();
@@ -46,7 +41,7 @@ test.beforeEach(async ({},testInfo) => {
     await newTab.getByRole('button', { name: 'Import' }).click();
 
     // Login
-    const WalletCredentials = await getWalletCredentials('WALLET1');
+    const WalletCredentials = getWalletCredentials('WALLET1');
     await newTab.getByPlaceholder('Wallet Name').fill(WalletCredentials.username);
     await newTab.getByPlaceholder('Password', { exact: true }).fill(WalletCredentials.password);
     await newTab.getByPlaceholder('Confirm Password', { exact: true }).fill(WalletCredentials.password);
@@ -54,7 +49,7 @@ test.beforeEach(async ({},testInfo) => {
     await newTab.getByRole('button', { name: 'Continue' }).click();
 
     // Input seed phrase
-    const seedPhrase = await getSeedPhrase();
+    const seedPhrase = getSeedPhrase();
     for (let i = 0; i < seedPhrase.length; i++) {
         const ftSeedPhraseSelector = `(//input[@type='text'])[${i + 1}]`;
         await newTab.locator(ftSeedPhraseSelector).fill(seedPhrase[i]);
@@ -103,7 +98,7 @@ async function waitForDataLoaded() {
 
 test('get wallet details', async () => {
 
-   /* // Get wallet balance
+    // Get wallet balance
     const balanceTextContent = await matchTextContent('#flt-semantic-node-13', /Balance: Ada \(lovelaces\): (\d+)/);
     const balanceAda = (parseInt(balanceTextContent, 10) / 1_000_000).toFixed(2);
     expect(parseInt(balanceAda)).toBeGreaterThan(500);
@@ -140,7 +135,7 @@ test('get wallet details', async () => {
 
     expect(parseInt(amountAda)).toBeGreaterThan(500);
     await newTab.waitForTimeout(5000);
-*/});
+});
 
 async function openSignTab(buttonName: string) {
     await newTab.getByRole('button', { name: buttonName }).click();
@@ -157,24 +152,23 @@ async function signData(signTab: Page, password: string) {
     await signTab.getByRole('button', { name: 'confirm' }).click();
 }
 
-test('Sign data', async () => {/*
+test('Sign data', async () => {
     const signTab = await openSignTab('Sign data');
-    const WalletCredentials = await getWalletCredentials('WALLET1');
+    const WalletCredentials = getWalletCredentials('WALLET1');
     await signData(signTab, WalletCredentials.password);
     await expect(newTab.getByText('DataSignature')).toBeVisible();
-*/});
+});
 
-/*
 test('Sign and submit tx', async () => {
     const signTab = await openSignTab('Sign & submit tx')
-    const WalletCredentials = await getWalletCredentials('WALLET1');
+    const WalletCredentials = getWalletCredentials('WALLET1');
     await signData(signTab, WalletCredentials.password);
     await expect(newTab.getByText('Tx hash')).toBeVisible();
 });
 
 test('Sign and submit RBAC tx', async () => {
     const signTab = await openSignTab('Sign & submit RBAC tx');
-    const WalletCredentials = await getWalletCredentials('WALLET1');
+    const WalletCredentials = getWalletCredentials('WALLET1');
     await signData(signTab, WalletCredentials.password);
     await expect(newTab.getByText('Tx hash')).toBeVisible();
 });
@@ -203,4 +197,4 @@ test('Fail to Sign & submit RBAC tx with incorrect password', async () => {
 test('Empty wallet', async ({ page }) => {
     await page.goto('http://localhost:8000/', { waitUntil: 'load' });
     await expect(page.getByText('There are no active wallet extensions')).toBeVisible();
-});*/
+});
