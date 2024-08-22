@@ -1,3 +1,5 @@
+<!-- cspell: words Aumasson Neves Zooko O'Hearn Winnerlein-->
+
 # BLAKE2 and BLAKE3 for COSE Algorithms registry
 
 This document specifies [COSE] Algorithm value types for [BLAKE2] and [BLAKE3] hash functions.
@@ -6,7 +8,7 @@ This document specifies [COSE] Algorithm value types for [BLAKE2] and [BLAKE3] h
 
 [BLAKE3] is a cryptographic hash function which was designed by
 Jack O'Connor, Jean-Philippe Aumasson, Samuel Neves, Zooko Wilcox-O'Hearn.
-It is an evolution of the BLAKE2 cryptograhic hash functions
+It is an evolution of the BLAKE2 cryptographic hash functions
 
 |  Name   | Value | Description | Capabilities | Reference | Recommended |
 | - | - | - | - | - | - |
