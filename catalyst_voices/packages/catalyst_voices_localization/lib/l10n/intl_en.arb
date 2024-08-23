@@ -123,5 +123,14 @@
   "snackbarOkButtonText": "Ok",
   "@snackbarOkButtonText": {
     "description": "Text shown in the Snackbar widget for the ok button."
+  },
+  "seedPhraseSlotNr": "Slot {nr}",
+  "@seedPhraseSlotNr": {
+    "description": "When user arranges seed phrases this text is shown when phrase was not selected",
+    "placeholders": {
+      "nr": {
+        "type": "int"
+      }
+    }
   }
 }

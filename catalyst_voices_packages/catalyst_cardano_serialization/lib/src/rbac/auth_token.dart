@@ -48,16 +48,12 @@ final class AuthToken {
       Ulid(millis: timestamp.millisecondsSinceEpoch).toBytes(),
     );
 
-    final toBeSigned = CborBytes(
-      cbor.encode(
-        CborList([
-          kid.toCbor(),
-          ulid,
-        ]),
-      ),
-    );
+    final toBeSigned = [
+      ...cbor.encode(kid.toCbor()),
+      ...cbor.encode(ulid),
+    ];
 
-    final signature = await privateKey.sign(cbor.encode(toBeSigned));
+    final signature = await privateKey.sign(toBeSigned);
 
     final cborToken = [
       ...cbor.encode(kid.toCbor()),
