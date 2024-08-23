@@ -10,9 +10,9 @@ environment:
 dependencies:
   animated_text_kit: ^4.2.2
   animations: ^2.0.11
-  catalyst_cardano: ^0.2.0
-  catalyst_cardano_serialization: ^0.2.0
-  catalyst_cardano_web: ^0.2.0
+  catalyst_cardano: ^0.2.0+1
+  catalyst_cardano_serialization: ^0.3.0
+  catalyst_cardano_web: ^0.2.0+1
   catalyst_voices_assets:
     path: ./packages/catalyst_voices_assets
   catalyst_voices_blocs:
@@ -32,6 +32,7 @@ dependencies:
   catalyst_voices_view_models:
     path: ./packages/catalyst_voices_view_models
   collection: ^1.18.0
+  equatable: ^2.0.5
   flutter:
     sdk: flutter
   flutter_adaptive_scaffold: ^0.1.11

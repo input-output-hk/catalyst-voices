@@ -3,6 +3,37 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-08-13
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - [`catalyst_cardano_serialization` - `v0.3.0`](#catalyst_cardano_serialization---v030)
+
+Packages with other changes:
+
+ - [`catalyst_cardano_web` - `v0.2.0+1`](#catalyst_cardano_web---v0201)
+ - [`catalyst_cardano` - `v0.2.0+1`](#catalyst_cardano---v0201)
+ - [`catalyst_cardano_platform_interface` - `v0.2.0+1`](#catalyst_cardano_platform_interface---v0201)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `catalyst_cardano_web` - `v0.2.0+1`
+ - `catalyst_cardano` - `v0.2.0+1`
+ - `catalyst_cardano_platform_interface` - `v0.2.0+1`
+
+---
+
+#### `catalyst_cardano_serialization` - `v0.3.0`
+
+ - **BREAKING** **FIX**: cardano serialization must depend on flutter ([#679](https://github.com/input-output-hk/catalyst-voices/issues/679)). ([b7d5276b](https://github.com/input-output-hk/catalyst-voices/commit/b7d5276b238b4c7273997b004465e2ffb29f8436))
+
+
 ## 2024-08-12
 
 ### Changes

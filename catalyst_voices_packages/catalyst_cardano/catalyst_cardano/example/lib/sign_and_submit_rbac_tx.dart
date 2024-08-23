@@ -81,7 +81,7 @@ Future<void> _signAndSubmitRbacTx({
     );
 
     final x509Envelope = await _buildMetadataEnvelope(
-      inputs: utxos,
+      utxos: utxos,
     );
 
     final auxiliaryData = AuxiliaryData.fromCbor(
@@ -119,14 +119,14 @@ Future<void> _signAndSubmitRbacTx({
 }
 
 Future<X509MetadataEnvelope<RegistrationData>> _buildMetadataEnvelope({
-  required List<TransactionUnspentOutput> inputs,
+  required List<TransactionUnspentOutput> utxos,
 }) async {
   final keyPair =
       await Ed25519KeyPair.fromSeed(Ed25519PrivateKey.seeded(0).bytes);
 
   final x509Envelope = X509MetadataEnvelope.unsigned(
     purpose: UuidV4.fromString(_catalystUserRoleRegistrationPurpose),
-    txInputsHash: TransactionInputsHash.fromTransactionInputs(inputs),
+    txInputsHash: TransactionInputsHash.fromTransactionInputs(utxos),
     previousTransactionId: _transactionHash,
     chunkedData: RegistrationData(
       derCerts: [_derCert],

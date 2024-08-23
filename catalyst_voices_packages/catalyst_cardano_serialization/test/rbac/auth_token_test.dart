@@ -64,20 +64,15 @@ void main() {
       );
 
       // Verify the signature
-      final toBeSigned = CborBytes(
-        cbor.encode(
-          CborList([
-            kid.toCbor(),
-            decodedUlid,
-          ]),
-        ),
-      );
+      final toBeSigned = [
+        ...cbor.encode(kid.toCbor()),
+        ...cbor.encode(decodedUlid),
+      ];
 
-      final toBeSignedEncoded = cbor.encode(toBeSigned);
       final publicKey = await privateKey.derivePublicKey();
 
       final isValid = await Ed25519().verify(
-        toBeSignedEncoded,
+        toBeSigned,
         signature: Signature(
           decodedSignature.bytes,
           publicKey: SimplePublicKey(
