@@ -176,6 +176,7 @@
         "web-components.min.js",
         "**/generated/**",
         "utilities/catalyst_voices_remote_widgets/example/**/**",
+        "utilities/poc_local_storage/**/**",
         "**/*.svg"
     ],
     "enableFiletypes": [

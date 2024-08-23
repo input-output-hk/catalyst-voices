@@ -96,4 +96,9 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get snackbarOkButtonText => 'Ok';
+
+  @override
+  String seedPhraseSlotNr(int nr) {
+    return 'Slot $nr';
+  }
 }
