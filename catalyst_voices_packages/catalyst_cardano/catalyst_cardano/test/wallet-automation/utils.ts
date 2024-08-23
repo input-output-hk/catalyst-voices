@@ -72,7 +72,6 @@ const downloadExtension = async (extID: string): Promise<string> => {
   export { downloadExtension };
 
   const typhonImportWallet = async (tab: Page): Promise<void> => {
-
     //switch to preprod network
     await tab.locator('button#headlessui-menu-button-1').click();
     await tab.locator('button#headlessui-menu-item-6').click();
@@ -97,3 +96,44 @@ const downloadExtension = async (extID: string): Promise<string> => {
 };
 
 export { typhonImportWallet };
+
+
+const laceImportWallet = async (tab: Page): Promise<void> => {
+
+};
+
+export { laceImportWallet };
+
+
+const importWallet = async (tab: Page, wallet: string): Promise<void> => {
+  switch (wallet) {
+    case 'Typhon':
+      await typhonImportWallet(tab);
+      break;
+    case 'Lace':
+      await laceImportWallet(tab);
+      break;
+    default:
+      throw new Error('Wallet not in use')
+  }
+
+}
+
+export { importWallet };
+
+
+const allowExtension = async (tab: Page, wallet: string): Promise<void> => {
+  switch (wallet) {
+    case 'Typhon':
+      await tab.getByRole('button', { name: 'Allow' }).click();
+      break;
+    case 'Lace':
+      console.log('Not implemented yet');
+      break;
+    default:
+      throw new Error('Wallet not in use')
+  }
+
+}
+
+export { allowExtension };
