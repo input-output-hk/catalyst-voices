@@ -63,11 +63,13 @@ Which is well suited where it comes to process some temporary event e.g. voting.
 
 ### Block structure
 
-```CDDL
-{{ include_file('src/architecture/08_concepts/immutable_ledger/cddl/block.cddl') }}
-```
+<!-- markdownlint-disable max-one-sentence-per-line code-block-style -->
+??? note "Block CDDL definition: `block.cddl`"
 
-#### Block fields description
+    ```CDDL
+    {{ include_file('src/architecture/08_concepts/immutable_ledger/cddl/block.cddl', indent=4) }}
+    ```
+<!-- markdownlint-enable max-one-sentence-per-line code-block-style -->
 
 Header:
 
@@ -120,9 +122,13 @@ Block:
 
 * `block_data` **MUST** be a [deterministically](https://datatracker.ietf.org/doc/html/rfc8949#name-deterministically-encoded-c) encoded CBOR.
 
-```CDDL
-{{ include_file('src/architecture/08_concepts/immutable_ledger/cddl/genesis_to_prev_hash.cddl') }}
-```
+<!-- markdownlint-disable max-one-sentence-per-line code-block-style -->
+??? note "Genesis to previous block hash CDDL definition: `genesis_to_prev_hash.cddl`"
+
+    ```CDDL
+    {{ include_file('src/architecture/08_concepts/immutable_ledger/cddl/genesis_to_prev_hash.cddl',indent=4) }}
+    ```
+<!-- markdownlint-enable max-one-sentence-per-line code-block-style -->
 
 #### Signature rules
 
