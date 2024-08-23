@@ -126,8 +126,10 @@ Block:
 
 #### Signature rules
 
-`validator_signature` **MUST** be a signature of the hashed `block_header` bytes with the `block_data` bytes,
-signed by the validator's keys defined in the corresponding certificates referenced by the `validator`.
+`validator_signature`
+**MUST** be a signature of the hashed `block_header` bytes and the `block_data` bytes
+(with the order the same as defined for `block`).
+Signed by the validator's keys defined in the corresponding certificates referenced by the `validator`.
 Signature algorithm is defined by the certificate.
 The format and size of this field **MUST** be totally the same as `validator` field:
 
