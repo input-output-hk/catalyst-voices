@@ -1,9 +1,10 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_cardano_serialization/src/utils/cbor.dart';
 import 'package:cbor/cbor.dart';
+import 'package:equatable/equatable.dart';
 
 /// Defines the X509 Role Based Access Control transaction metadata.
-final class RegistrationData extends CborEncodable {
+final class RegistrationData extends Equatable implements CborEncodable {
   /// Un-ordered List of DER encoded x509 certificates.
   final List<X509DerCertificate>? derCerts;
 
@@ -97,7 +98,7 @@ final class RegistrationData extends CborEncodable {
 ///
 /// The validity of the registration is as per the rules for roles defined
 /// by the dApp itself.
-class RoleData extends CborEncodable {
+class RoleData extends Equatable implements CborEncodable {
   /// All roles, except for Role 0, are defined by the dApp.
   ///
   /// Role 0 is the primary role and is used to sign the metadata and declare on-chain/off-chain identity linkage.
@@ -248,7 +249,7 @@ class RoleData extends CborEncodable {
 /// a given key in an earlier registration.
 ///
 /// Either [localRef] or [hash] must be set, but not both and not none.
-class KeyReference extends CborEncodable {
+class KeyReference extends Equatable implements CborEncodable {
   /// Offset reference to a key defined in this registration.
   /// More efficient than a key hash.
   final LocalKeyReference? localRef;
@@ -302,7 +303,7 @@ class KeyReference extends CborEncodable {
 /// Offset reference to a key defined in this registration.
 ///
 /// More efficient than a key hash.
-class LocalKeyReference extends CborEncodable {
+class LocalKeyReference extends Equatable implements CborEncodable {
   /// A type of referenced key.
   final LocalKeyReferenceType keyType;
 

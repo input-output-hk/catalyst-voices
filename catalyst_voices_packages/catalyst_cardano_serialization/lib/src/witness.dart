@@ -1,9 +1,10 @@
 import 'package:catalyst_cardano_serialization/src/signature.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:cbor/cbor.dart';
+import 'package:equatable/equatable.dart';
 
 /// A set of witnesses that sign the transaction.
-final class TransactionWitnessSet extends CborEncodable {
+final class TransactionWitnessSet extends Equatable implements CborEncodable {
   /// The witnesses that sign the transaction.
   final Set<VkeyWitness> vkeyWitnesses;
 
@@ -32,7 +33,7 @@ final class TransactionWitnessSet extends CborEncodable {
 }
 
 /// The transaction witness with a [signature] of the transaction.
-final class VkeyWitness extends CborEncodable {
+final class VkeyWitness extends Equatable implements CborEncodable {
   /// The public key of the witness.
   final Ed25519PublicKey vkey;
 

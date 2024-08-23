@@ -1,10 +1,9 @@
 import 'package:catalyst_cardano_serialization/src/exceptions.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
-import 'package:equatable/equatable.dart';
 
 /// An interface for classes that support CBOR serialization.
-abstract class CborEncodable extends Equatable {
+abstract interface class CborEncodable {
   /// Creates a new instance of [CborEncodable].
   const CborEncodable();
 
