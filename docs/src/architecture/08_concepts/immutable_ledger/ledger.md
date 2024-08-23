@@ -116,15 +116,6 @@ Block:
 * `prev_block_id` and `validator_signature` **MUST** use the same hash function, defined with the
   `hash_bytes`.
 
-
-* `validator_signature` **MUST** be a signature of the hashed `block_header` bytes with the `block_data` bytes,
-  signed by the validator's keys defined in the corresponding certificates referenced by the `validator`.
-  The format and size of this field **MUST** be totally the same as `validator` field:
-  if `validator` is only one id => `validator_signature` contains only 1 signature;
-  if `validator` is array => `validator_signature` contains an array with the same length;
-  order of signatures from the `validator_signature`'s array corresponds to the validators order of `validator`'s array.
-  Signature algorithm is defined by the certificate.
-
 * `prev_block_id` for the *Genesis* block **MUST** be a hash of the `genesis_to_prev_hash` bytes.
 
 * `block_data` **MUST** be a [deterministically](https://datatracker.ietf.org/doc/html/rfc8949#name-deterministically-encoded-c) encoded CBOR.
@@ -132,6 +123,17 @@ Block:
 ```CDDL
 {{ include_file('src/architecture/08_concepts/immutable_ledger/cddl/genesis_to_prev_hash.cddl') }}
 ```
+
+#### Signature rules
+
+`validator_signature` **MUST** be a signature of the hashed `block_header` bytes with the `block_data` bytes,
+signed by the validator's keys defined in the corresponding certificates referenced by the `validator`.
+Signature algorithm is defined by the certificate.
+The format and size of this field **MUST** be totally the same as `validator` field:
+
+* if `validator` is only one id => `validator_signature` contains only 1 signature;
+* if `validator` is array => `validator_signature` contains an array with the same length;
+* order of signatures from the `validator_signature`'s array corresponds to the validators order of `validator`'s array.
 
 ## Rationale
 
