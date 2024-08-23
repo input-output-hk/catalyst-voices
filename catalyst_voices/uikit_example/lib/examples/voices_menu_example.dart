@@ -11,6 +11,9 @@ class VoicesMenuExample extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    const iconSize = 24.0;
+
     return Scaffold(
       appBar: AppBar(title: const Text('Voices Menu')),
       body: Row(
@@ -24,14 +27,14 @@ class VoicesMenuExample extends StatelessWidget {
                     label: 'Rename',
                     icon: const Icon(
                       CatalystVoicesIcons.pencil,
-                      size: 20,
+                      size: iconSize,
                     ),
                   ),
                   SubMenuItem(
                     label: 'Move Private Team',
                     icon: const Icon(
                       CatalystVoicesIcons.switch_horizontal,
-                      size: 20,
+                      size: iconSize,
                     ),
                     children: [
                       MenuItem(label: 'Team 1: The Vikings'),
@@ -42,7 +45,7 @@ class VoicesMenuExample extends StatelessWidget {
                     label: 'Move to public',
                     icon: const Icon(
                       CatalystVoicesIcons.switch_horizontal,
-                      size: 20,
+                      size: iconSize,
                     ),
                     showDivider: true,
                     enabled: false,
@@ -51,7 +54,7 @@ class VoicesMenuExample extends StatelessWidget {
                     label: 'Delete',
                     icon: const Icon(
                       CatalystVoicesIcons.trash,
-                      size: 20,
+                      size: iconSize,
                     ),
                   ),
                 ],
@@ -70,14 +73,14 @@ class VoicesMenuExample extends StatelessWidget {
                     label: 'Rename',
                     icon: const Icon(
                       CatalystVoicesIcons.pencil,
-                      size: 20,
+                      size: iconSize,
                     ),
                   ),
                   SubMenuItem(
                     label: 'Move Private Team',
                     icon: const Icon(
                       CatalystVoicesIcons.switch_horizontal,
-                      size: 20,
+                      size: iconSize,
                     ),
                     children: [
                       MenuItem(label: 'Team 1: The Vikings'),
@@ -88,7 +91,7 @@ class VoicesMenuExample extends StatelessWidget {
                     label: 'Move to public',
                     icon: const Icon(
                       CatalystVoicesIcons.switch_horizontal,
-                      size: 20,
+                      size: iconSize,
                     ),
                     showDivider: true,
                   ),
@@ -96,7 +99,7 @@ class VoicesMenuExample extends StatelessWidget {
                     label: 'Delete',
                     icon: const Icon(
                       CatalystVoicesIcons.trash,
-                      size: 20,
+                      size: iconSize,
                     ),
                   ),
                 ],

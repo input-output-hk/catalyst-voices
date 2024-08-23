@@ -74,7 +74,7 @@ class _MenuButton extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 8),
+                    padding: const EdgeInsets.only(left: 10),
                     child: Icon(
                       icon!.icon,
                       color: enabled
@@ -89,7 +89,7 @@ class _MenuButton extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerRight,
                   child: Padding(
-                    padding: EdgeInsets.only(right: 8),
+                    padding: EdgeInsets.only(right: 6),
                     child: Icon(CatalystVoicesIcons.chevron_right, size: 20),
                   ),
                 ),
