@@ -61,9 +61,7 @@ class _MenuButton extends StatelessWidget {
     final textTheme = theme.textTheme;
 
     final textStyle = textTheme.bodyMedium?.copyWith(
-      color: enabled
-          ? textTheme.bodySmall?.color
-          : theme.disabledColor,
+      color: enabled ? textTheme.bodySmall?.color : theme.disabledColor,
     );
 
     final children = menuChildren;
@@ -76,7 +74,7 @@ class _MenuButton extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerLeft,
                   child: Padding(
-                    padding: const EdgeInsets.only(left: 8.0),
+                    padding: const EdgeInsets.only(left: 8),
                     child: Icon(
                       icon!.icon,
                       color: enabled
@@ -91,7 +89,7 @@ class _MenuButton extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerRight,
                   child: Padding(
-                    padding: EdgeInsets.only(right: 8.0),
+                    padding: EdgeInsets.only(right: 8),
                     child: Icon(CatalystVoicesIcons.chevron_right, size: 20),
                   ),
                 ),
@@ -113,7 +111,7 @@ class _MenuButton extends StatelessWidget {
                 style: MenuItemButton.styleFrom(iconColor: Colors.transparent),
                 child: Text(
                   label,
-                  style: textStyle
+                  style: textStyle,
                 ),
               ),
           ],

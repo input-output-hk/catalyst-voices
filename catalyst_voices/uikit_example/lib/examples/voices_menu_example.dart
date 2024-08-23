@@ -18,75 +18,101 @@ class VoicesMenuExample extends StatelessWidget {
           Column(
             children: [
               VoicesMenu(
-                  onSelected: (label) => debugPrint('Selected label: $label'),
-                  menuItems: [
-                    MenuItem(
-                      label: 'Rename',
-                      icon: const Icon(CatalystVoicesIcons.pencil, size: 20),
+                onSelected: (label) => debugPrint('Selected label: $label'),
+                menuItems: [
+                  MenuItem(
+                    label: 'Rename',
+                    icon: const Icon(
+                      CatalystVoicesIcons.pencil,
+                      size: 20,
                     ),
-                    SubMenuItem(
-                      label: 'Move Private Team',
-                      icon: const Icon(CatalystVoicesIcons.switch_horizontal, size: 20),
-                      children: [
-                        MenuItem(label: 'Team 1: The Vikings'),
-                        MenuItem(label: 'Team 2: Pure Hearts'),
-                      ],
+                  ),
+                  SubMenuItem(
+                    label: 'Move Private Team',
+                    icon: const Icon(
+                      CatalystVoicesIcons.switch_horizontal,
+                      size: 20,
                     ),
-                    MenuItem(
-                      label: 'Move to public',
-                      icon: const Icon(CatalystVoicesIcons.switch_horizontal, size: 20),
-                      showDivider: true,
-                      enabled: false,
+                    children: [
+                      MenuItem(label: 'Team 1: The Vikings'),
+                      MenuItem(label: 'Team 2: Pure Hearts'),
+                    ],
+                  ),
+                  MenuItem(
+                    label: 'Move to public',
+                    icon: const Icon(
+                      CatalystVoicesIcons.switch_horizontal,
+                      size: 20,
                     ),
-                    MenuItem(
-                      label: 'Delete',
-                      icon: const Icon(CatalystVoicesIcons.trash, size: 20),
+                    showDivider: true,
+                    enabled: false,
+                  ),
+                  MenuItem(
+                    label: 'Delete',
+                    icon: const Icon(
+                      CatalystVoicesIcons.trash,
+                      size: 20,
                     ),
-                  ],
-                  child: const SizedBox(
-                    height: 56,
-                    width: 200,
-                    child: VoicesListTile(
-                      title: Text('My first proposal'),
-                    ),
-                  )),
+                  ),
+                ],
+                child: const SizedBox(
+                  height: 56,
+                  width: 200,
+                  child: VoicesListTile(
+                    title: Text('My first proposal'),
+                  ),
+                ),
+              ),
               VoicesMenu(
-                  onSelected: (label) => debugPrint('Selected label: $label'),
-                  menuItems: [
-                    MenuItem(
-                      label: 'Rename',
-                      icon: const Icon(CatalystVoicesIcons.pencil, size: 20),
+                onSelected: (label) => debugPrint('Selected label: $label'),
+                menuItems: [
+                  MenuItem(
+                    label: 'Rename',
+                    icon: const Icon(
+                      CatalystVoicesIcons.pencil,
+                      size: 20,
                     ),
-                    SubMenuItem(
-                      label: 'Move Private Team',
-                      icon: const Icon(CatalystVoicesIcons.switch_horizontal, size: 20),
-                      children: [
-                        MenuItem(label: 'Team 1: The Vikings'),
-                        MenuItem(label: 'Team 2: Pure Hearts'),
-                      ],
+                  ),
+                  SubMenuItem(
+                    label: 'Move Private Team',
+                    icon: const Icon(
+                      CatalystVoicesIcons.switch_horizontal,
+                      size: 20,
                     ),
-                    MenuItem(
-                      label: 'Move to public',
-                      icon: const Icon(CatalystVoicesIcons.switch_horizontal, size: 20),
-                      showDivider: true,
+                    children: [
+                      MenuItem(label: 'Team 1: The Vikings'),
+                      MenuItem(label: 'Team 2: Pure Hearts'),
+                    ],
+                  ),
+                  MenuItem(
+                    label: 'Move to public',
+                    icon: const Icon(
+                      CatalystVoicesIcons.switch_horizontal,
+                      size: 20,
                     ),
-                    MenuItem(
-                      label: 'Delete',
-                      icon: const Icon(CatalystVoicesIcons.trash, size: 20),
+                    showDivider: true,
+                  ),
+                  MenuItem(
+                    label: 'Delete',
+                    icon: const Icon(
+                      CatalystVoicesIcons.trash,
+                      size: 20,
                     ),
-                  ],
-                  child: const SizedBox(
-                    height: 56,
-                    width: 200,
-                    child: VoicesListTile(
-                      title: Text('My second proposal'),
-                    ),
-                  )),
+                  ),
+                ],
+                child: const SizedBox(
+                  height: 56,
+                  width: 200,
+                  child: VoicesListTile(
+                    title: Text('My second proposal'),
+                  ),
+                ),
+              ),
             ],
           ),
           Expanded(
             child: Container(),
-          )
+          ),
         ],
       ),
     );
