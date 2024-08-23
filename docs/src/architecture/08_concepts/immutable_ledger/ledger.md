@@ -44,6 +44,7 @@ which are cryptographically protected by hashing.
 
 The described approach allows to easily scale and increase throughput of the network on demand at any time,
 just by starting to process new chains.
+<br clear="right"/>
 
 ### Temporary chains
 
@@ -58,11 +59,12 @@ it has a final block.
 
 So any chain will be bounded by some period of time.
 Which is well suited where it comes to process some temporary event e.g. voting.
+<br clear="right"/>
 
 ### Block structure
 
 ```CDDL
- {{ include_file('src/architecture/08_concepts/immutable_ledger/cddl/block.cddl') }}
+{{ include_file('src/architecture/08_concepts/immutable_ledger/cddl/block.cddl') }}
 ```
 
 #### Block fields description
@@ -124,7 +126,7 @@ Block:
 * `prev_block_id` for the *Genesis* block **MUST** be a hash of the `genesis_to_prev_hash` bytes.
 
 ```CDDL
- {{ include_file('src/architecture/08_concepts/immutable_ledger/cddl/genesis_to_prev_hash.cddl') }}
+{{ include_file('src/architecture/08_concepts/immutable_ledger/cddl/genesis_to_prev_hash.cddl') }}
 ```
 
 ## Rationale
