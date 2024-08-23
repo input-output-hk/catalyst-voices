@@ -111,9 +111,11 @@ Block:
   **MANDATORY** field for *Genesis* and *Final* blocks.
 * `validator` **MUST** be the same as for the previous block if present (except for genesis).
   **MANDATORY** field for *Genesis* and *Final* blocks.
-
+* `prev_block_id`'s CBOR tag value and `bstr` size **MUST** be the same as for the previous block (except for genesis).
+  Means that the hash function type and hash size itself must be the same.
 * `prev_block_id` and `validator_signature` **MUST** use the same hash function, defined with the
   `hash_bytes`.
+
 
 * `validator_signature` **MUST** be a signature of the hashed `block_header` bytes with the `block_data` bytes,
   signed by the validator's keys defined in the corresponding certificates referenced by the `validator`.
@@ -124,6 +126,8 @@ Block:
   Signature algorithm is defined by the certificate.
 
 * `prev_block_id` for the *Genesis* block **MUST** be a hash of the `genesis_to_prev_hash` bytes.
+
+* `block_data` **MUST** be a [deterministically](https://datatracker.ietf.org/doc/html/rfc8949#name-deterministically-encoded-c) encoded CBOR.
 
 ```CDDL
 {{ include_file('src/architecture/08_concepts/immutable_ledger/cddl/genesis_to_prev_hash.cddl') }}

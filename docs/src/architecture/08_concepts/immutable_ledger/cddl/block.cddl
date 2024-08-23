@@ -1,6 +1,6 @@
 block = [
     block_header,
-    block_data,
+    block_data: ~encoded-cbor, ; deterministically encoded CBOR
     validator_signature,
 ]
 
@@ -8,7 +8,7 @@ block_header = [
     chain_id: ULID,
     height: int,
     timestamp: ~#6.1(uint .ge 1722470400), ; Epoch-based date/time
-    prev_block_id: hash_bytes, ; Hash of the previous block
+    prev_block_id: hash_bytes, ; hash of the previous block
     ?ledger_type: UUID,
     ?purpose_id: ULID / UUID,
     ?validator,
