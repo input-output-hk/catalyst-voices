@@ -12,6 +12,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:vector_graphics/vector_graphics.dart';
 
+class $InternalResourcesGen {
+  const $InternalResourcesGen();
+
+  /// Directory path: internal_resources/icons
+  $InternalResourcesIconsGen get icons => const $InternalResourcesIconsGen();
+}
+
 class $AssetsImagesGen {
   const $AssetsImagesGen();
 
@@ -60,18 +67,59 @@ class $AssetsImagesGen {
       ];
 }
 
+class $InternalResourcesIconsGen {
+  const $InternalResourcesIconsGen();
+
+  /// File path: internal_resources/icons/.gitkeep
+  String get aGitkeep => 'internal_resources/icons/.gitkeep';
+
+  /// File path: internal_resources/icons/facebook.svg
+  SvgGenImage get facebook =>
+      const SvgGenImage('internal_resources/icons/facebook.svg');
+
+  /// File path: internal_resources/icons/facebook_mono.svg
+  SvgGenImage get facebookMono =>
+      const SvgGenImage('internal_resources/icons/facebook_mono.svg');
+
+  /// File path: internal_resources/icons/linkedin.svg
+  SvgGenImage get linkedin =>
+      const SvgGenImage('internal_resources/icons/linkedin.svg');
+
+  /// File path: internal_resources/icons/linkedin_mono.svg
+  SvgGenImage get linkedinMono =>
+      const SvgGenImage('internal_resources/icons/linkedin_mono.svg');
+
+  /// File path: internal_resources/icons/x.svg
+  SvgGenImage get x => const SvgGenImage('internal_resources/icons/x.svg');
+
+  /// File path: internal_resources/icons/x_mono.svg
+  SvgGenImage get xMono =>
+      const SvgGenImage('internal_resources/icons/x_mono.svg');
+
+  /// List of all assets
+  List<dynamic> get values =>
+      [aGitkeep, facebook, facebookMono, linkedin, linkedinMono, x, xMono];
+}
+
 class VoicesAssets {
   VoicesAssets._();
 
   static const $AssetsImagesGen images = $AssetsImagesGen();
+  static const $InternalResourcesGen internalResources =
+      $InternalResourcesGen();
 }
 
 class AssetGenImage {
-  const AssetGenImage(this._assetName, {this.size = null});
+  const AssetGenImage(
+    this._assetName, {
+    this.size,
+    this.flavors = const {},
+  });
 
   final String _assetName;
 
   final Size? size;
+  final Set<String> flavors;
 
   Image image({
     Key? key,
@@ -145,17 +193,19 @@ class AssetGenImage {
 class SvgGenImage {
   const SvgGenImage(
     this._assetName, {
-    this.size = null,
+    this.size,
+    this.flavors = const {},
   }) : _isVecFormat = false;
 
   const SvgGenImage.vec(
     this._assetName, {
-    this.size = null,
+    this.size,
+    this.flavors = const {},
   }) : _isVecFormat = true;
 
   final String _assetName;
-
   final Size? size;
+  final Set<String> flavors;
   final bool _isVecFormat;
 
   SvgPicture svg({
@@ -178,12 +228,23 @@ class SvgGenImage {
     @deprecated BlendMode colorBlendMode = BlendMode.srcIn,
     @deprecated bool cacheColorFilter = false,
   }) {
+    final BytesLoader loader;
+    if (_isVecFormat) {
+      loader = AssetBytesLoader(
+        _assetName,
+        assetBundle: bundle,
+        packageName: package,
+      );
+    } else {
+      loader = SvgAssetLoader(
+        _assetName,
+        assetBundle: bundle,
+        packageName: package,
+        theme: theme,
+      );
+    }
     return SvgPicture(
-      _isVecFormat
-          ? AssetBytesLoader(_assetName,
-              assetBundle: bundle, packageName: package)
-          : SvgAssetLoader(_assetName,
-              assetBundle: bundle, packageName: package),
+      loader,
       key: key,
       matchTextDirection: matchTextDirection,
       width: width,
@@ -194,7 +255,6 @@ class SvgGenImage {
       placeholderBuilder: placeholderBuilder,
       semanticsLabel: semanticsLabel,
       excludeFromSemantics: excludeFromSemantics,
-      theme: theme,
       colorFilter: colorFilter ??
           (color == null ? null : ColorFilter.mode(color, colorBlendMode)),
       clipBehavior: clipBehavior,

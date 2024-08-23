@@ -20,6 +20,7 @@ flutter:
   generate: true
   assets:
     - assets/images/
+    - internal_resources/icons/
   fonts:
     - family: SF-Pro
       fonts:
