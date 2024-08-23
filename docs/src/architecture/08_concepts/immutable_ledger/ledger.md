@@ -99,18 +99,18 @@ Block:
 * `height` **MUST** be incremented by `1` from the previous block height value (except for genesis and final block).
   *Genesis* block **MUST** have `0` value.
   *Final* block **MUST** hash be incremented by `1` from the previous block height and changed the sign to negative.
-  E.g. previous block height is `9` and the *Final* block heigh is `-10`.
+  E.g. previous block height is `9` and the *Final* block height is `-10`.
 * *Final* block is the last one for the specific chain and any other block could not be refenced to the *Final* one.
 
 * `timestamp` **MUST** be greater or equals than the `timestamp` of the previous block (except for genesis).
 * `prev_block_id` **MUST** be a hash of the previous block bytes (except for genesis).
 
 * `ledger_type` **MUST** be the same as for the previous block if present (except for genesis).
-  **MANDATORY** field for *Genesis* block and *Final* blocks.
+  **MANDATORY** field for *Genesis* and *Final* blocks.
 * `purpose_id` **MUST** be the same as for the previous block if present (except for genesis).
-  **MANDATORY** field for *Genesis* block and *Final* blocks.
+  **MANDATORY** field for *Genesis* and *Final* blocks.
 * `validator` **MUST** be the same as for the previous block if present (except for genesis).
-  **MANDATORY** field for *Genesis* block and *Final* blocks.
+  **MANDATORY** field for *Genesis* and *Final* blocks.
 
 * `prev_block_id` and `validator_signature` **MUST** use the same hash function, defined with the
   `hash_bytes`.
