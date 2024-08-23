@@ -1,16 +1,24 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 
+/// A menu of the app that
+/// can be also us as a cascade.
 class VoicesMenu extends StatelessWidget {
+  /// Menu items passed as models, can be nested.
   final List<MenuItem> menuItems;
-  final Widget child;
-  final ValueChanged<String>? onSelected;
 
+  /// The widget that is clicked to open menu.
+  final Widget child;
+
+  /// The callback called when the menu item is tapped.
+  final ValueChanged<String>? onTap;
+
+  /// The default constructor for the [VoicesMenu].
   const VoicesMenu({
     super.key,
     required this.menuItems,
     required this.child,
-    this.onSelected,
+    this.onTap,
   });
 
   @override
@@ -33,7 +41,7 @@ class VoicesMenu extends StatelessWidget {
       menuChildren: (item is SubMenuItem)
           ? item.children.map(_mapItemToButton).toList()
           : null,
-      onSelected: (item is SubMenuItem) ? null : onSelected,
+      onSelected: (item is SubMenuItem) ? null : onTap,
     );
   }
 }
@@ -127,6 +135,7 @@ class _MenuButton extends StatelessWidget {
   }
 }
 
+/// Model representing Menu Item
 class MenuItem {
   final String label;
   final Icon? icon;
@@ -141,6 +150,8 @@ class MenuItem {
   });
 }
 
+/// Model representing Submenu Item
+/// and extending from MenuItem
 class SubMenuItem extends MenuItem {
   List<MenuItem> children;
 

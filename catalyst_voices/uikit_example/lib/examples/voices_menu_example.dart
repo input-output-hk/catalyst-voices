@@ -21,7 +21,7 @@ class VoicesMenuExample extends StatelessWidget {
           Column(
             children: [
               VoicesMenu(
-                onSelected: (label) => debugPrint('Selected label: $label'),
+                onTap: (label) => debugPrint('Selected label: $label'),
                 menuItems: [
                   MenuItem(
                     label: 'Rename',
@@ -67,7 +67,7 @@ class VoicesMenuExample extends StatelessWidget {
                 ),
               ),
               VoicesMenu(
-                onSelected: (label) => debugPrint('Selected label: $label'),
+                onTap: (label) => debugPrint('Selected label: $label'),
                 menuItems: [
                   MenuItem(
                     label: 'Rename',
