@@ -12,11 +12,13 @@ import 'package:uikit_example/examples/voices_indicators_example.dart';
 import 'package:uikit_example/examples/voices_menu_example.dart';
 import 'package:uikit_example/examples/voices_navigation_example.dart';
 import 'package:uikit_example/examples/voices_radio_example.dart';
+import 'package:uikit_example/examples/voices_seed_phrase_example.dart';
 import 'package:uikit_example/examples/voices_segmented_button_example.dart';
 import 'package:uikit_example/examples/voices_separators_example.dart';
 import 'package:uikit_example/examples/voices_snackbar_example.dart';
 import 'package:uikit_example/examples/voices_switch_example.dart';
 import 'package:uikit_example/examples/voices_text_field_example.dart';
+import 'package:uikit_example/examples/voices_tooltips_example.dart';
 
 class ExamplesListPage extends StatelessWidget {
   static List<ExampleTile> get examples {
@@ -90,6 +92,16 @@ class ExamplesListPage extends StatelessWidget {
         title: 'Voices Floating Action Button',
         route: VoicesFabExample.route,
         page: VoicesFabExample(),
+      ),
+      ExampleTile(
+        title: 'Voices Seed Phrase',
+        route: VoicesSeedPhraseExample.route,
+        page: VoicesSeedPhraseExample(),
+      ),
+      ExampleTile(
+        title: 'Voices Tooltips',
+        route: VoicesTooltipsExample.route,
+        page: VoicesTooltipsExample(),
       ),
       ExampleTile(
         title: 'Voices Menu',

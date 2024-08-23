@@ -277,6 +277,12 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Ok'**
   String get snackbarOkButtonText;
+
+  /// When user arranges seed phrases this text is shown when phrase was not selected
+  ///
+  /// In en, this message translates to:
+  /// **'Slot {nr}'**
+  String seedPhraseSlotNr(int nr);
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
