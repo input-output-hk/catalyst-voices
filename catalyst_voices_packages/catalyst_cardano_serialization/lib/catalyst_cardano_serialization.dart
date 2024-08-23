@@ -10,6 +10,7 @@ export 'src/rbac/auth_token.dart';
 export 'src/rbac/registration_data.dart';
 export 'src/rbac/x509_metadata_envelope.dart';
 export 'src/signature.dart';
+export 'src/scripts.dart';
 export 'src/transaction.dart';
 export 'src/types.dart';
 export 'src/utils/uuid.dart';
