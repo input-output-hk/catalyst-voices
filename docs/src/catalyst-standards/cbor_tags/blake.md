@@ -16,7 +16,7 @@ This document specifies a CBOR [1] tags for BLAKE2 [2] and BLAKE3 [3] hash funct
 ### Semantics
 
 Tag 32781 can be applied to a byte string (major type 2) to indicate that the byte string
-is a binary [BLAKE3] hash value encoded in big-endian.
+is a binary BLAKE3 [2] hash value encoded in big-endian.
 The length of the byte string will charactarize the size of the hash function to be used e.g. BLAKE3-256, BLAKE3-512 etc.
 
 ## BLAKE2b
@@ -31,7 +31,7 @@ The length of the byte string will charactarize the size of the hash function to
 ### Semantics
 
 Tag 32782 can be applied to a byte string (major type 2) to indicate that the byte string
-is a binary [BLAKE2b][BLAKE2] hash value encoded in big-endian.
+is a binary BLAKE2b [3] hash value encoded in big-endian.
 The length of the byte string will charactarize the size of the hash function to be used e.g. BLAKE2b-256, BLAKE2b-512 etc.
 
 ## BLAKE2s
@@ -46,7 +46,7 @@ The length of the byte string will charactarize the size of the hash function to
 ### Semantics
 
 Tag 32783 can be applied to a byte string (major type 2) to indicate that the byte string
-is a binary [BLAKE2s][BLAKE2] hash value encoded in big-endian.
+is a binary BLAKE2s [3] hash value encoded in big-endian.
 The length of the byte string will charactarize the size of the hash function to be used e.g. BLAKE2s-256, BLAKE2s-512 etc.
 
 ## BLAKE2bp
@@ -61,7 +61,7 @@ The length of the byte string will charactarize the size of the hash function to
 ### Semantics
 
 Tag 32784 can be applied to a byte string (major type 2) to indicate that the byte string
-is a binary [BLAKE2bp][BLAKE2] hash value encoded in big-endian.
+is a binary BLAKE2bp [3] hash value encoded in big-endian.
 The length of the byte string will charactarize the size of the hash function to be used e.g. BLAKE2bp-256, BLAKE2bp-512 etc.
 
 ## BLAKE2sp
@@ -76,7 +76,7 @@ The length of the byte string will charactarize the size of the hash function to
 ### Semantics
 
 Tag 32785 can be applied to a byte string (major type 2) to indicate that the byte string
-is a binary [BLAKE2sp][BLAKE2] hash value encoded in big-endian.
+is a binary BLAKE2sp [3] hash value encoded in big-endian.
 The length of the byte string will charactarize the size of the hash function to be used e.g. BLAKE2sp-256, BLAKE2sp-512 etc.
 
 ## References
