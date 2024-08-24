@@ -11,7 +11,7 @@ This document specifies a CBOR [1] tags for BLAKE2 [2] and BLAKE3 [3] hash funct
     Semantics: Binary BLAKE3 hash value (https://github.com/BLAKE3-team/BLAKE3-specs/blob/master/blake3.pdf)
     Point of contact: Steven Johnson <steven.johnson@iohk.io>, Alex Pozhylenkov <alex.pozhylenkov@iohk.io>
     Description of semantics:
-    https://github.com/input-output-hk/catalyst-voices/tree/main/docs/src/catalyst-standards/cbor_tags/blake.md
+    https://github.com/input-output-hk/catalyst-voices/tree/main/docs/src/catalyst-standards/cbor_tags/blake.md#BLAKE3
 
 ### Semantics
 
@@ -26,7 +26,7 @@ The length of the byte string will charactarize the size of the hash function to
     Semantics: Binary BLAKE2b hash value (https://www.blake2.net/blake2.pdf)
     Point of contact: Steven Johnson <steven.johnson@iohk.io>, Alex Pozhylenkov <alex.pozhylenkov@iohk.io>
     Description of semantics:
-    https://github.com/input-output-hk/catalyst-voices/tree/main/docs/src/catalyst-standards/cbor_tags/blake.md
+    https://github.com/input-output-hk/catalyst-voices/tree/main/docs/src/catalyst-standards/cbor_tags/blake.md#BLAKE2b
 
 ### Semantics
 
@@ -41,7 +41,7 @@ The length of the byte string will charactarize the size of the hash function to
     Semantics: Binary BLAKE2s hash value (https://www.blake2.net/blake2.pdf)
     Point of contact: Steven Johnson <steven.johnson@iohk.io>, Alex Pozhylenkov <alex.pozhylenkov@iohk.io>
     Description of semantics:
-    https://github.com/input-output-hk/catalyst-voices/tree/main/docs/src/catalyst-standards/cbor_tags/blake.md
+    https://github.com/input-output-hk/catalyst-voices/tree/main/docs/src/catalyst-standards/cbor_tags/blake.md#BLAKE2s
 
 ### Semantics
 
@@ -56,7 +56,7 @@ The length of the byte string will charactarize the size of the hash function to
     Semantics: Binary BLAKE2bp hash value (https://www.blake2.net/blake2.pdf)
     Point of contact: Steven Johnson <steven.johnson@iohk.io>, Alex Pozhylenkov <alex.pozhylenkov@iohk.io>
     Description of semantics:
-    https://github.com/input-output-hk/catalyst-voices/tree/main/docs/src/catalyst-standards/cbor_tags/blake.md
+    https://github.com/input-output-hk/catalyst-voices/tree/main/docs/src/catalyst-standards/cbor_tags/blake.md#BLAKE2bp
 
 ### Semantics
 
@@ -71,7 +71,7 @@ The length of the byte string will charactarize the size of the hash function to
     Semantics: Binary BLAKE2sp hash value (https://www.blake2.net/blake2.pdf)
     Point of contact: Steven Johnson <steven.johnson@iohk.io>, Alex Pozhylenkov <alex.pozhylenkov@iohk.io>
     Description of semantics:
-    https://github.com/input-output-hk/catalyst-voices/tree/main/docs/src/catalyst-standards/cbor_tags/blake.md
+    https://github.com/input-output-hk/catalyst-voices/tree/main/docs/src/catalyst-standards/cbor_tags/blake.md#BLAKE2s
 
 ### Semantics
 
