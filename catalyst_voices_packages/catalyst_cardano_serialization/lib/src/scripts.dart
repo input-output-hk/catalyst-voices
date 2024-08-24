@@ -35,9 +35,6 @@ enum RefScriptType {
 sealed class Script extends Equatable implements CborEncodable {
   const Script();
 
-  // Define an abstract method for converting a script to CBOR
-  CborValue toCbor();
-
   /// Computes the hash of the script.
   ///
   /// This method converts the script to its CBOR representation,
@@ -53,26 +50,24 @@ sealed class Script extends Equatable implements CborEncodable {
           this, 'script', 'Invalid script type to hash.'),
     };
 
-    // Handle double-decoded CBOR for Plutus scripts, which may contain nested
-    // CBOR.
-    final cborToDecode = this.toCbor();
+    final cborValue = this.toCbor();
+    final bytesToHash = cborValue is CborBytes
+        ? _handleDoubleDecodedCbor(cborValue.bytes)
+        : cborValue;
 
-    final cborValue = cborToDecode is CborBytes
-        ? () {
-              try {
-                return cbor
-                    .decode(cborToDecode.bytes); // Attempt to decode again
-              } catch (_) {
-                return null; // If decoding fails, use the original CBOR value
-              }
-            }() ??
-            cborToDecode
-        : cborToDecode;
-
-    final cborBytes = cbor.encode(cborValue);
-
+    final cborBytes = cbor.encode(bytesToHash);
     final bytes = Uint8List.fromList([tag, ...cborBytes]);
     return Hash.blake2b(bytes, digestSize: scriptHashSize);
+  }
+
+  CborValue _handleDoubleDecodedCbor(List<int> bytes) {
+    final decoded = cbor.decode(bytes);
+    if (decoded is CborBytes) {
+      try {
+        return cbor.decode(decoded.bytes);
+      } catch (_) {}
+    }
+    return decoded;
   }
 }
 
@@ -349,7 +344,7 @@ sealed class PlutusScript extends Script {
   /// Converts the [PlutusScript] to its CBOR format.
   /// All Plutus scripts are serialized CBOR bytes.
   @override
-  CborValue toCbor() => cbor.decode(bytes);
+  CborValue toCbor() => CborBytes(bytes);
 
   /// Validates if the CBOR value is a valid Plutus script.
   static void _plutusScriptValidity(CborValue value) {
@@ -431,155 +426,4 @@ class ScriptRef extends Script {
   /// Equatable props for value comparison.
   @override
   List<Object?> get props => [script];
-}
-
-void main() {
-  final script = ScriptPubkey(Uint8List.fromList([1, 2, 3, 4]));
-  final cborValue = script.toCbor();
-  print(cborValue);
-
-  final decodedScript = NativeScript.fromCbor(cborValue as CborList);
-  print(decodedScript);
-
-  // Example: Creating and encoding a PlutusV1Script
-  Uint8List plutusBytes = Uint8List.fromList([0x42, 0x01, 0x02]);
-  PlutusV1Script plutusV1Script = PlutusV1Script(plutusBytes);
-  final encodedPlutusV1 = plutusV1Script.toCbor();
-  print("Encoded PlutusV1Script: $encodedPlutusV1");
-
-  // Example: Decoding back to PlutusV1Script
-  Script decodedScript1 = PlutusV1Script.fromCbor(encodedPlutusV1);
-  print("Decoded Script: ${(decodedScript1 as PlutusV1Script).bytes}");
-
-  // Example: Creating and encoding a ScriptAll with multiple native scripts
-  ScriptAll scriptAll = ScriptAll([
-    ScriptPubkey(Uint8List.fromList([1, 2, 3])),
-    InvalidBefore(123456789),
-  ]);
-  final encodedScriptAll = scriptAll.toCbor();
-  print("Encoded ScriptAll: $encodedScriptAll");
-
-  // Example: Decoding back to ScriptAll
-  NativeScript decodedNativeScript = NativeScript.fromCbor(encodedScriptAll);
-  print("Decoded NativeScript: ${decodedNativeScript.runtimeType}");
-
-  final scriptRef = CborList([CborSmallInt(0), encodedScriptAll]);
-  final scriptRef0 = ScriptRef.fromCbor(scriptRef);
-  final scriptRef1 = ScriptRef(scriptAll);
-
-  print("All eq: ${scriptAll == NativeScript.fromCbor(encodedScriptAll)}");
-  print("Encoded ScriptRef/1: ${scriptRef0 == scriptRef1}");
-
-  final decodedScriptRef = ScriptRef.fromCbor(scriptRef);
-  print("Decoded Script: $decodedScriptRef");
-  print("IS Native? Script   : ${decodedScriptRef.runtimeType}");
-  print("IsNative? ${decodedScriptRef is NativeScript}");
-  print("isAll? ${decodedScriptRef is ScriptAll}");
-  //final decodedScriptAll = ScriptRef.fromCbor(encodedScriptAll);
-
-  /*
-    Set tests: scripts should be value types
-
-  */
-  final nSet = Set<NativeScript>();
-  final p1Set = Set<PlutusV1Script>();
-  final p2Set = Set<PlutusV2Script>();
-  final p3Set = Set<PlutusV3Script>();
-
-  nSet.add(NativeScript.fromCbor(encodedScriptAll));
-  nSet.add(NativeScript.fromCbor(encodedScriptAll));
-  print("nSet:  ${nSet.length == 1}");
-
-  p1Set.add(PlutusV1Script(plutusBytes));
-  p1Set.add(PlutusV1Script(plutusBytes));
-  print("p1Set: ${p1Set.length == 1}");
-
-  p2Set.add(PlutusV2Script(plutusBytes));
-  p2Set.add(PlutusV2Script(plutusBytes));
-  print("p2Set: ${p2Set.length == 1}");
-
-  p3Set.add(PlutusV3Script(plutusBytes));
-  p3Set.add(PlutusV3Script(plutusBytes));
-  print("p3Set: ${p3Set.length == 1}");
-
-  // Example: Creating and encoding a ScriptRef with a PlutusV1Script
-  final compiledCode = "4401020304";
-  // XXXX "589101000032323232323232232253330054a22930a9980324811856616c696461746f722072657475726e65642066616c736500136565333333008001153330033370e900018029baa00115333007300637540022930a998020010b0a998020010b0a998020010b0a998020010b0a998020010b0a998020010b2481085f723a20566f6964005734ae7155ceaab9e5573eae91";
-  /// final hash = "12b96851f48bac3b2758f3e221208d584d043ec4e6715a9955d5209d";
-  final hash = "2e02f6baf97d236e0ec15280989048af22de7b72a9119a594103f0b2";
-  final plutusBytes1 = hex.decode(compiledCode);
-  final plutusV2Script1 = PlutusV2Script(Uint8List.fromList(plutusBytes1));
-  final e = plutusV2Script1.hash;
-  print("e: ${hex.encode(e)}");
-
-  print("@@: ${hex.encode(Hash.blake2b(Uint8List.fromList([
-            02,
-            ...plutusBytes1
-          ]), digestSize: 28))}");
-
-  final bytes =
-      hex.decode("e09d36c79dec9bd1b3d9e152247701cd0bb860b5ebfd1de8abb6735a");
-  final expected = "208bdcaf2d83ae026964e23659c703a377473168a39cbdc2b0241115";
-  final ns = ScriptPubkey(Uint8List.fromList(bytes));
-  print("ns: $ns");
-  print("ns: ${hex.encode(ns.hash)}");
-  print("ns: ${hex.encode(ns.hash) == expected}");
-
-  final n1 = ScriptPubkey(Uint8List.fromList(
-      hex.decode("2f3d4cf10d0471a1db9f2d2907de867968c27bca6272f062cd1c2413")));
-  final n2 = ScriptPubkey(Uint8List.fromList(
-      hex.decode("f856c0c5839bab22673747d53f1ae9eed84afafb085f086e8e988614")));
-  final n3 = ScriptPubkey(Uint8List.fromList(
-      hex.decode("b275b08c999097247f7c17e77007c7010cd19f20cc086ad99d398538")));
-  final any = ScriptNOfK(2, [n1, n2, n3]);
-
-  const expexted = "1e3e60975af4971f7cc02ed4d90c87abaafd2dd070a42eafa6f5e939";
-  print("any: $any");
-  print("any: ${hex.encode(any.hash)}");
-  print("any: ${hex.encode(any.hash) == expexted}");
-
-  final nn1 = ScriptPubkey(Uint8List.fromList(
-      hex.decode("b275b08c999097247f7c17e77007c7010cd19f20cc086ad99d398538")));
-  final nn2 = InvalidAfter(3000);
-  final nn3 = ScriptPubkey(Uint8List.fromList(
-      hex.decode("966e394a544f242081e41d1965137b1bb412ac230d40ed5407821c37")));
-
-  final all = ScriptAll([nn2, nn3]);
-
-  final any1 = ScriptAny([nn1, all]);
-  final any1h = any1.hash;
-  const expexted1 = "6519f942518b8761f4b02e1403365b7d7befae1eb488b7fffcbab33f";
-  print("any: $any1");
-  print("any: ${hex.encode(any1h)}");
-  print("any: ${hex.encode(any1h) == expexted1}");
-
-  //final type = NativeScriptType.values[199];
-  //print("type: $type");
-
-  const json = {
-    "type": "atLeast",
-    "required": 2,
-    "scripts": [
-      {
-        "type": "sig",
-        "keyHash": "2f3d4cf10d0471a1db9f2d2907de867968c27bca6272f062cd1c2413"
-      },
-      {
-        "type": "sig",
-        "keyHash": "f856c0c5839bab22673747d53f1ae9eed84afafb085f086e8e988614"
-      },
-      {
-        "type": "sig",
-        "keyHash": "b275b08c999097247f7c17e77007c7010cd19f20cc086ad99d398538"
-      },
-    ]
-  };
-  final njs = NativeScript.fromJSON(json);
-  print("njs: $njs");
-
-  final doubleEncoded =
-      PlutusV3Script(Uint8List.fromList([0x45, 0x44, 0x01, 0x02, 0x03, 0x04]));
-  print("doubleEncoded: $doubleEncoded");
-  print("doubleEncoded: ${hex.encode(doubleEncoded.hash)}");
-  //print("doubleEncoded: ${doubleEncoded.toHex() == "e09d36c79dec9bd1b3d9e152247701cd0bb860b5ebfd1de8abb6735a"}");
 }
