@@ -44,7 +44,9 @@ which are cryptographically protected by hashing.
 
 The described approach allows to easily scale and increase throughput of the network on demand at any time,
 just by starting to process new chains.
+<!-- markdownlint-disable no-inline-html -->
 <br clear="right"/>
+<!-- markdownlint-enable no-inline-html -->
 
 ### Temporary chains
 
@@ -59,7 +61,9 @@ it has a final block.
 
 So any chain will be bounded by some period of time.
 Which is well suited where it comes to process some temporary event e.g. voting.
+<!-- markdownlint-disable no-inline-html -->
 <br clear="right"/>
+<!-- markdownlint-enable no-inline-html -->
 
 ### Block structure
 
@@ -120,7 +124,7 @@ Block:
 
 * `prev_block_id` for the *Genesis* block **MUST** be a hash of the `genesis_to_prev_hash` bytes.
 
-* `block_data` **MUST** be a [deterministically](https://datatracker.ietf.org/doc/html/rfc8949#name-deterministically-encoded-c) encoded CBOR.
+* `block_data` **MUST** be a [deterministically][CBOR-deterministically-encoded] encoded CBOR.
 
 <!-- markdownlint-disable max-one-sentence-per-line code-block-style -->
 ??? note "Genesis to previous block hash CDDL definition: `genesis_to_prev_hash.cddl`"
@@ -154,3 +158,5 @@ The format and size of this field **MUST** be totally the same as `validator` fi
 <!-- A plan to meet those criteria or `N/A` if an implementation plan is not applicable. -->
 
 <!-- OPTIONAL SECTIONS: see CIP-0001 > Document > Structure table -->
+
+[CBOR-deterministically-encoded]: https://datatracker.ietf.org/doc/html/rfc8949#name-deterministically-encoded-c
