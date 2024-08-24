@@ -19,9 +19,9 @@ UUID = #6.37(bytes) ; UUID type
 ULID = #6.32780(bytes) ; ULID type
 
 hash_bytes = (
-  #6.18556([2525, bytes]) \ ; Blake3 hash
-  #6.18556([2526, bytes]) \ ; Blake2b hash
-  #6.18556([2527, bytes]) ; Blake2s hash
+  #6.32781(bytes) \ ; Blake3 hash
+  #6.32782(bytes) \ ; Blake2b hash
+  #6.32783(bytes) ; Blake2s hash
 )
 kid = hash_bytes ; hash of the x509/c509 certificate
 
