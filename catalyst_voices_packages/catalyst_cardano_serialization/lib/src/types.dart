@@ -4,6 +4,7 @@ import 'package:convert/convert.dart';
 import 'package:equatable/equatable.dart';
 
 /// An interface for classes that support CBOR serialization.
+// ignore: one_member_abstracts
 abstract interface class CborEncodable {
   /// Creates a new instance of [CborEncodable].
   const CborEncodable();

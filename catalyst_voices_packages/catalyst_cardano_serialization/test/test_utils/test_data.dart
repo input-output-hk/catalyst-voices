@@ -2,6 +2,7 @@ import 'package:catalyst_cardano_serialization/src/address.dart';
 import 'package:catalyst_cardano_serialization/src/hashes.dart';
 import 'package:catalyst_cardano_serialization/src/signature.dart';
 import 'package:catalyst_cardano_serialization/src/transaction.dart';
+import 'package:catalyst_cardano_serialization/src/transaction_output.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:catalyst_cardano_serialization/src/witness.dart';
 import 'package:cbor/cbor.dart';
@@ -36,7 +37,7 @@ TransactionUnspentOutput testUtxo() {
       transactionId: testTransactionHash,
       index: 0,
     ),
-    output: TransactionOutput(
+    output: PreBabbageTransactionOutput(
       address: ShelleyAddress.fromBech32(
         'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5'
         'ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w',
@@ -51,11 +52,11 @@ Transaction minimalUnsignedTestTransaction() {
     body: TransactionBody(
       inputs: {testUtxo().input},
       outputs: [
-        TransactionOutput(
+        PreBabbageTransactionOutput(
           address: testnetAddr,
           amount: const Balance(coin: Coin(1000000)),
         ),
-        TransactionOutput(
+        PreBabbageTransactionOutput(
           address: testnetChangeAddr,
           amount: const Balance(coin: Coin(9998833003)),
         ),
@@ -75,11 +76,11 @@ Transaction minimalSignedTestTransaction() {
     body: TransactionBody(
       inputs: {testUtxo().input},
       outputs: [
-        TransactionOutput(
+        PreBabbageTransactionOutput(
           address: testnetAddr,
           amount: const Balance(coin: Coin(1000000)),
         ),
-        TransactionOutput(
+        PreBabbageTransactionOutput(
           address: testnetChangeAddr,
           amount: const Balance(coin: Coin(9998833003)),
         ),
@@ -116,11 +117,11 @@ Transaction fullUnsignedTestTransaction() {
     body: TransactionBody(
       inputs: {testUtxo().input},
       outputs: [
-        TransactionOutput(
+        PreBabbageTransactionOutput(
           address: testnetAddr,
           amount: const Balance(coin: Coin(1000000)),
         ),
-        TransactionOutput(
+        PreBabbageTransactionOutput(
           address: testnetChangeAddr,
           amount: const Balance(coin: Coin(9998832827)),
         ),
@@ -156,11 +157,11 @@ Transaction fullSignedTestTransaction() {
     body: TransactionBody(
       inputs: {testUtxo().input},
       outputs: [
-        TransactionOutput(
+        PreBabbageTransactionOutput(
           address: testnetAddr,
           amount: const Balance(coin: Coin(1000000)),
         ),
-        TransactionOutput(
+        PreBabbageTransactionOutput(
           address: testnetChangeAddr,
           amount: const Balance(coin: Coin(9998832827)),
         ),

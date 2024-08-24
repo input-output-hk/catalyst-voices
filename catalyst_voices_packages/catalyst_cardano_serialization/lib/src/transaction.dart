@@ -1,5 +1,6 @@
-import 'package:catalyst_cardano_serialization/src/address.dart';
+//import 'package:catalyst_cardano_serialization/src/address.dart';
 import 'package:catalyst_cardano_serialization/src/hashes.dart';
+import 'package:catalyst_cardano_serialization/src/transaction_output.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:catalyst_cardano_serialization/src/utils/cbor.dart';
 import 'package:catalyst_cardano_serialization/src/witness.dart';
@@ -70,7 +71,7 @@ final class TransactionBody extends Equatable implements CborEncodable {
   final Set<TransactionInput> inputs;
 
   /// The transaction outputs.
-  final List<TransactionOutput> outputs;
+  final List<ShelleyMultiAssetTransactionOutput> outputs;
 
   /// The fee for the transaction.
   final Coin fee;
@@ -200,86 +201,6 @@ final class TransactionInput extends Equatable implements CborEncodable {
   List<Object?> get props => [transactionId, index];
 }
 
-/// The transaction output which describes which [address]
-/// will receive what [amount] of [Coin].
-final class TransactionOutput extends Equatable implements CborEncodable {
-  /// The address associated with the transaction.
-  final ShelleyAddress address;
-
-  /// The leftover change from the previous transaction that can be spent.
-  final Balance amount;
-
-  /// The default constructor for [TransactionOutput].
-  const TransactionOutput({
-    required this.address,
-    required this.amount,
-  });
-
-  /// Deserializes the type from cbor.
-  factory TransactionOutput.fromCbor(CborValue value) {
-    return _tryFromCborMap(value) ?? _tryFromCborList(value)!;
-  }
-
-  /// This format is simpler and does not utilize the advanced features
-  /// of the Alonzo era (e.g., datum, native assets, or smart contract scripts).
-  /// It is consistent with basic transactions that could exist in earlier eras
-  /// or basic Alonzo-era transactions.
-  static TransactionOutput? _tryFromCborMap(CborValue value) {
-    try {
-      final map = value as CborMap;
-      final address = map[const CborSmallInt(0)]!;
-      final amount = map[const CborSmallInt(1)]!;
-
-      return TransactionOutput(
-        address: ShelleyAddress.fromCbor(address),
-        amount: Balance.fromCbor(amount),
-      );
-    } catch (error) {
-      return null;
-    }
-  }
-
-  /// This format shows the use of the EUTXO model introduced in the Alonzo era,
-  /// with support for native assets and possibly other advanced features.
-  static TransactionOutput? _tryFromCborList(CborValue value) {
-    try {
-      final list = value as CborList;
-      final address = list[0];
-      final amount = list[1];
-
-      return TransactionOutput(
-        address: ShelleyAddress.fromCbor(address),
-        amount: Balance.fromCbor(amount),
-      );
-    } catch (error) {
-      return null;
-    }
-  }
-
-  /// Serializes the type as cbor.
-  @override
-  CborValue toCbor() {
-    return CborList([
-      address.toCbor(),
-      amount.toCbor(),
-    ]);
-  }
-
-  /// Return a copy of this output with [address] and [amount] if present.
-  TransactionOutput copyWith({
-    ShelleyAddress? address,
-    Balance? amount,
-  }) {
-    return TransactionOutput(
-      address: address ?? this.address,
-      amount: amount ?? this.amount,
-    );
-  }
-
-  @override
-  List<Object?> get props => [address, amount];
-}
-
 /// The UTXO that can be used as an input in a new transaction.
 final class TransactionUnspentOutput extends Equatable
     implements CborEncodable {
@@ -289,7 +210,7 @@ final class TransactionUnspentOutput extends Equatable
 
   /// The transaction output which assigns the owner of given address
   /// with leftover change from previous transaction.
-  final TransactionOutput output;
+  final ShelleyMultiAssetTransactionOutput output;
 
   /// The default constructor for [TransactionUnspentOutput].
   const TransactionUnspentOutput({

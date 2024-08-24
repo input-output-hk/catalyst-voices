@@ -40,7 +40,7 @@ void main() {
       ),
       index: 0,
     ),
-    output: TransactionOutput(
+    output: PreBabbageTransactionOutput(
       address: ShelleyAddress.fromBech32(
         'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5ewvxwdrt70'
         'qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w',
@@ -49,7 +49,7 @@ void main() {
     ),
   );
 
-  final txOutput = TransactionOutput(
+  final txOutput = PreBabbageTransactionOutput(
     address: ShelleyAddress.fromBech32(
       'addr_test1vzpwq95z3xyum8vqndgdd9mdnmafh3djcxnc6jemlgdmswcve6tkw',
     ),

@@ -52,7 +52,7 @@ Transaction _buildUnsignedTx({
   );
   /* cSpell:enable */
 
-  final txOutput = TransactionOutput(
+  final txOutput = PreBabbageTransactionOutput(
     address: preprodFaucetAddress,
     amount: const Balance(coin: Coin(1000000)),
   );
