@@ -31,7 +31,7 @@ The length of the byte string will charactarize the size of the hash function to
 ### Semantics
 
 Tag 32782 can be applied to a byte string (major type 2) to indicate that the byte string
-is a binary [BLAKE2] hash value encoded in big-endian.
+is a binary [BLAKE2b][BLAKE2] hash value encoded in big-endian.
 The length of the byte string will charactarize the size of the hash function to be used e.g. BLAKE2b-256, BLAKE2b-512 etc.
 
 ## BLAKE2s
@@ -60,7 +60,7 @@ The length of the byte string will charactarize the size of the hash function to
 
 ### Semantics
 
-Tag 32782 can be applied to a byte string (major type 2) to indicate that the byte string
+Tag 32784 can be applied to a byte string (major type 2) to indicate that the byte string
 is a binary [BLAKE2bp][BLAKE2] hash value encoded in big-endian.
 The length of the byte string will charactarize the size of the hash function to be used e.g. BLAKE2bp-256, BLAKE2bp-512 etc.
 
@@ -75,7 +75,7 @@ The length of the byte string will charactarize the size of the hash function to
 
 ### Semantics
 
-Tag 32782 can be applied to a byte string (major type 2) to indicate that the byte string
+Tag 32785 can be applied to a byte string (major type 2) to indicate that the byte string
 is a binary [BLAKE2sp][BLAKE2] hash value encoded in big-endian.
 The length of the byte string will charactarize the size of the hash function to be used e.g. BLAKE2sp-256, BLAKE2sp-512 etc.
 
