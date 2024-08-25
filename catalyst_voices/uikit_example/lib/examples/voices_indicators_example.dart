@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class VoicesIndicatorsExample extends StatelessWidget {
@@ -17,7 +18,6 @@ class VoicesIndicatorsExample extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 42, vertical: 24),
         children: const [
           Text('Status Indicator'),
-          SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,25 +53,15 @@ class VoicesIndicatorsExample extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 22),
           Text('Process Stepper Indicator'),
-          SizedBox(height: 8),
           _Steps(),
-          SizedBox(height: 22),
           Text('Linear - Indeterminate'),
-          SizedBox(height: 8),
           VoicesLinearProgressIndicator(),
-          SizedBox(height: 16),
           VoicesLinearProgressIndicator(showTrack: false),
-          SizedBox(height: 22),
           Text('Linear - Fixed'),
-          SizedBox(height: 8),
           VoicesLinearProgressIndicator(value: 0.25),
-          SizedBox(height: 16),
           VoicesLinearProgressIndicator(value: 0.25, showTrack: false),
-          SizedBox(height: 22),
           Text('Circular - Indeterminate'),
-          SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -80,9 +70,7 @@ class VoicesIndicatorsExample extends StatelessWidget {
               VoicesCircularProgressIndicator(showTrack: false),
             ],
           ),
-          SizedBox(height: 22),
           Text('Circular - Fixed'),
-          SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -91,7 +79,15 @@ class VoicesIndicatorsExample extends StatelessWidget {
               VoicesCircularProgressIndicator(value: 0.75, showTrack: false),
             ],
           ),
-        ],
+        ].separatedByIndexed(
+          (index, value) {
+            return switch (value.runtimeType) {
+              Text => const SizedBox(height: 8),
+              VoicesLinearProgressIndicator => const SizedBox(height: 16),
+              _ => const SizedBox(height: 22),
+            };
+          },
+        ).toList(),
       ),
     );
   }

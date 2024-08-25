@@ -1,9 +1,10 @@
 import 'package:catalyst_cardano_serialization/src/signature.dart';
+import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 
 /// A set of witnesses that sign the transaction.
-final class TransactionWitnessSet extends Equatable {
+final class TransactionWitnessSet extends Equatable implements CborEncodable {
   /// The witnesses that sign the transaction.
   final Set<VkeyWitness> vkeyWitnesses;
 
@@ -19,6 +20,7 @@ final class TransactionWitnessSet extends Equatable {
   }
 
   /// Serializes the type as cbor.
+  @override
   CborValue toCbor() {
     return CborMap({
       for (final vkey in vkeyWitnesses.indexed)
@@ -31,7 +33,7 @@ final class TransactionWitnessSet extends Equatable {
 }
 
 /// The transaction witness with a [signature] of the transaction.
-final class VkeyWitness extends Equatable {
+final class VkeyWitness extends Equatable implements CborEncodable {
   /// The public key of the witness.
   final Ed25519PublicKey vkey;
 
@@ -67,6 +69,7 @@ final class VkeyWitness extends Equatable {
   }
 
   /// Serializes the type as cbor.
+  @override
   CborValue toCbor() {
     return CborList([
       CborList([
