@@ -7,8 +7,9 @@ mod inspection_get;
 mod live_get;
 mod ready_get;
 mod started_get;
-
 pub(crate) use started_get::started;
+
+use super::auth::endpoint::CatalystSecurityScheme;
 
 /// Health API Endpoints
 pub(crate) struct HealthApi;
@@ -52,7 +53,8 @@ impl HealthApi {
     ///
     /// *This endpoint is for internal use of the service deployment infrastructure.
     /// It may not be exposed publicly. Refer to []*
-    async fn live_get(&self) -> live_get::AllResponses {
+    async fn live_get(&self, auth: CatalystSecurityScheme) -> live_get::AllResponses {
+        let (_kid, _ulid, _sig) = auth.0;
         live_get::endpoint().await
     }
 
