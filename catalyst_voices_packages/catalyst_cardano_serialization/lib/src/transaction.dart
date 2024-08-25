@@ -1,4 +1,3 @@
-//import 'package:catalyst_cardano_serialization/src/address.dart';
 import 'package:catalyst_cardano_serialization/src/hashes.dart';
 import 'package:catalyst_cardano_serialization/src/transaction_output.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
@@ -67,38 +66,80 @@ final class Transaction extends Equatable implements CborEncodable {
 ///
 /// Does not contain the witnesses which are used to verify the transaction.
 final class TransactionBody extends Equatable implements CborEncodable {
-  /// The transaction inputs.
+  /// The transaction inputs. tag: 0
   final Set<TransactionInput> inputs;
 
-  /// The transaction outputs.
+  /// The transaction outputs. tag: 1
   final List<ShelleyMultiAssetTransactionOutput> outputs;
 
-  /// The fee for the transaction.
+  /// The fee for the transaction. tag: 2
   final Coin fee;
 
-  /// The absolute slot value before the tx becomes invalid.
+  // > Note: All properties below are optional.
+  /// The absolute slot value before the tx becomes invalid. tag: 3
   final SlotBigNum? ttl;
 
+  /// Certificates in an ordered set. tag: 4
+  /// Withdrawals map of stake addres, coin. tag: 5
+
   /// The hash of the optional [AuxiliaryData]
-  /// which is the metadata of the transaction.
+  /// which is the metadata of the transaction. tag: 7
   final AuxiliaryDataHash? auxiliaryDataHash;
+
+  /// Validity interval start as integer. tag: 8
+  final SlotBigNum? validityStart;
+
+  /// Mint as a non-zero uint64 multiasset. tag: 9
+  final MultiAsset? mint;
+
+  /// Tag 10 is unimplemented.
+  /// Script data hash28. tag: 11
+  final ScriptDataHash? scriptDataHash;
+
+  /// Tag 12 is unimplemented.
+  /// Collateral inputs as nonempty set. tag: 13
+  final Set<TransactionInput>? collateralInputs;
 
   /// The list of public key hashes of addresses
   /// that are required to sign the transaction.
+  /// Nonempty set of addr keyhash. tag: 14
   final Set<Ed25519PublicKeyHash>? requiredSigners;
 
-  /// Specifies on which network the code will run.
+  /// Specifies on which network the code will run. Network ID 0/1. tag: 15
   final NetworkId? networkId;
+
+  /// Collateral return's transaction output. tag: 16
+  final ShelleyMultiAssetTransactionOutput? collateralReturn;
+
+  /// Total collateral as coin (uint64). tag: 17
+  final Coin? totalCollateral;
+
+  /// Reference inputs as nonempty set of transaction inputs. tag: 18
+  final Set<TransactionInput>? referenceInputs;
+
+  /// Voting procedures as complex Map of voter, gov action id and voting
+  /// procedure. tag: 19
+
+  /// Proposal procedures ordered non-empty set of proposal procedures. tag: 20
+  /// Current treasury value as coiun (uint64). tag: 21
+  /// Donation as positive (>0) coin (uint64). tag: 22
 
   /// The default constructor for [TransactionBody].
   const TransactionBody({
-    required this.inputs,
-    required this.outputs,
-    required this.fee,
-    this.ttl,
-    this.auxiliaryDataHash,
-    this.requiredSigners,
-    this.networkId,
+    required this.inputs, // tag: 0
+    required this.outputs, // tag: 1
+    required this.fee, // tag: 2
+    this.ttl, // tag: 3
+    this.auxiliaryDataHash, // tag: 7
+    this.validityStart, // tag: 8
+    this.mint, // tag: 9
+    this.scriptDataHash, // tag: 11
+    this.collateralInputs, // tag: 13
+    this.requiredSigners, // tag: 14
+    this.networkId, // tag: 15
+    this.collateralReturn, // tag: 16
+    this.totalCollateral, // tag: 17
+    this.referenceInputs, // tag: 18
   });
 
   /// Deserializes the type from cbor.
@@ -109,8 +150,15 @@ final class TransactionBody extends Equatable implements CborEncodable {
     final fee = map[const CborSmallInt(2)]!;
     final ttl = map[const CborSmallInt(3)];
     final auxiliaryDataHash = map[const CborSmallInt(7)];
+    final validityStart = map[const CborSmallInt(8)];
+    final mint = map[const CborSmallInt(9)];
+    final scriptDataHash = map[const CborSmallInt(11)];
+    final collateralInputs = map[const CborSmallInt(13)] as CborList?;
     final requiredSigners = map[const CborSmallInt(14)] as CborList?;
     final networkId = map[const CborSmallInt(15)] as CborSmallInt?;
+    final collateralReturn = map[const CborSmallInt(16)] as CborList?;
+    final totalCollateral = map[const CborSmallInt(17)];
+    final referenceInputs = map[const CborSmallInt(18)] as CborList?;
 
     return TransactionBody(
       inputs: inputs.map(TransactionInput.fromCbor).toSet(),
@@ -120,9 +168,23 @@ final class TransactionBody extends Equatable implements CborEncodable {
       auxiliaryDataHash: auxiliaryDataHash != null
           ? AuxiliaryDataHash.fromCbor(auxiliaryDataHash)
           : null,
+      validityStart:
+          validityStart != null ? SlotBigNum.fromCbor(validityStart) : null,
+      mint: mint != null ? MultiAsset.fromCbor(mint) : null,
+      scriptDataHash: scriptDataHash != null
+          ? ScriptDataHash.fromCbor(scriptDataHash)
+          : null,
+      collateralInputs:
+          collateralInputs?.map(TransactionInput.fromCbor).toSet(),
       requiredSigners:
           requiredSigners?.map(Ed25519PublicKeyHash.fromCbor).toSet(),
       networkId: networkId != null ? NetworkId.fromId(networkId.value) : null,
+      collateralReturn: collateralReturn != null
+          ? TransactionOutput.fromCbor(collateralReturn)
+          : null,
+      totalCollateral:
+          totalCollateral != null ? Coin.fromCbor(totalCollateral) : null,
+      referenceInputs: referenceInputs?.map(TransactionInput.fromCbor).toSet(),
     );
   }
 
@@ -140,12 +202,28 @@ final class TransactionBody extends Equatable implements CborEncodable {
       if (ttl != null) const CborSmallInt(3): ttl!.toCbor(),
       if (auxiliaryDataHash != null)
         const CborSmallInt(7): auxiliaryDataHash!.toCbor(),
+      if (validityStart != null) const CborSmallInt(8): validityStart!.toCbor(),
+      if (mint != null) const CborSmallInt(9): mint!.toCbor(),
+      if (scriptDataHash != null)
+        const CborSmallInt(11): scriptDataHash!.toCbor(),
+      if (collateralInputs != null && collateralInputs!.isNotEmpty)
+        const CborSmallInt(13): CborList([
+          for (final input in collateralInputs!) input.toCbor(),
+        ]),
       if (requiredSigners != null && requiredSigners!.isNotEmpty)
         const CborSmallInt(14): CborList([
           for (final signer in requiredSigners!) signer.toCbor(),
         ]),
       if (networkId != null)
         const CborSmallInt(15): CborSmallInt(networkId!.id),
+      if (collateralReturn != null)
+        const CborSmallInt(16): collateralReturn!.toCbor(),
+      if (totalCollateral != null)
+        const CborSmallInt(17): totalCollateral!.toCbor(),
+      if (referenceInputs != null && referenceInputs!.isNotEmpty)
+        const CborSmallInt(18): CborList([
+          for (final input in referenceInputs!) input.toCbor(),
+        ]),
     });
   }
 
@@ -156,8 +234,15 @@ final class TransactionBody extends Equatable implements CborEncodable {
         fee,
         ttl,
         auxiliaryDataHash,
+        validityStart,
+        mint,
+        scriptDataHash,
+        collateralInputs,
         requiredSigners,
         networkId,
+        collateralReturn,
+        totalCollateral,
+        referenceInputs,
       ];
 }
 

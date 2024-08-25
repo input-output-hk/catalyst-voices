@@ -219,3 +219,31 @@ final class Ed25519PublicKeyHash extends BaseHash {
   @override
   int get length => _length;
 }
+
+/// Describes the Blake2b-256 hash of script data which is included
+/// in the transaction body.
+final class ScriptDataHash extends BaseHash {
+  static const int _length = 32;
+
+  /// Constructs the [ScriptDataHash] from raw [bytes].
+  ScriptDataHash.fromBytes({required super.bytes}) : super.fromBytes();
+
+  /// Constructs the [ScriptDataHash] from a hex string representation
+  /// of [bytes].
+  ScriptDataHash.fromHex(super.string) : super.fromHex();
+
+  /// Constructs the [ScriptDataHash] from a [AuxiliaryData].
+  ScriptDataHash.fromScriptData(ScriptDataHash dataHash)
+      : super.fromBytes(
+          bytes: Hash.blake2b(
+            Uint8List.fromList(cbor.encode(dataHash.toCbor())),
+            digestSize: _length,
+          ),
+        );
+
+  /// Deserializes the type from cbor.
+  ScriptDataHash.fromCbor(super.value) : super.fromCbor();
+
+  @override
+  int get length => _length;
+}

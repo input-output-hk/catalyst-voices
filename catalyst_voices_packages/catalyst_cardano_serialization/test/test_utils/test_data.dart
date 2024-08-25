@@ -64,9 +64,7 @@ Transaction minimalUnsignedTestTransaction() {
       fee: const Coin(166997),
     ),
     isValid: true,
-    witnessSet: const TransactionWitnessSet(
-      vkeyWitnesses: {},
-    ),
+    witnessSet: const TransactionWitnessSet(),
   );
 }
 
@@ -142,9 +140,7 @@ Transaction fullUnsignedTestTransaction() {
       networkId: NetworkId.testnet,
     ),
     isValid: true,
-    witnessSet: const TransactionWitnessSet(
-      vkeyWitnesses: {},
-    ),
+    witnessSet: const TransactionWitnessSet(),
     auxiliaryData: auxiliaryData,
   );
 }
