@@ -133,8 +133,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
     final textTheme = theme.textTheme;
 
     final labelText = widget.decoration?.labelText ?? '';
-    final resizable = (widget.maxLines == null || widget.maxLines! > 1) &&
-        widget.minLines == null;
+    final resizable = widget.maxLines == null && widget.minLines == null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
