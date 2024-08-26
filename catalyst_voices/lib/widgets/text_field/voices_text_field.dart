@@ -625,13 +625,13 @@ class _ResizableBoxState extends State<_ResizableBox> {
             child: GestureDetector(
               onPanUpdate: (details) {
                 setState(() {
-                  _width = min(
-                    max(_width + details.delta.dx, _minWidth),
+                  _width = (_width + details.delta.dx).clamp(
+                    _minWidth,
                     widget.constraints.maxWidth,
                   );
 
-                  _height = min(
-                    max(_height + details.delta.dy, _minHeight),
+                  _height = (_height + details.delta.dy).clamp(
+                    _minHeight,
                     widget.constraints.maxHeight,
                   );
                 });
