@@ -28,5 +28,4 @@ kid = hash_bytes ; hash of the x509/c509 certificate
 validator = (kid / [2* kid])
 metadata = [ *Any ]
 
-block_data = ~encoded-cbor
 validator_signature = (bytes / [2* bytes])
