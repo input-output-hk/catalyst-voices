@@ -11,7 +11,7 @@ class VoicesMenu extends StatelessWidget {
   final Widget child;
 
   /// The callback called when the menu item is tapped.
-  final ValueChanged<String>? onTap;
+  final ValueChanged<MenuItem>? onTap;
 
   /// The default constructor for the [VoicesMenu].
   const VoicesMenu({
@@ -42,10 +42,7 @@ class VoicesMenu extends StatelessWidget {
 
   _MenuButton _mapItemToButton(MenuItem item) {
     return _MenuButton(
-      label: item.label,
-      iconData: item.icon,
-      showDivider: item.showDivider,
-      enabled: item.enabled,
+      menuItem: item,
       menuChildren: (item is SubMenuItem)
           ? item.children.map(_mapItemToButton).toList()
           : null,
@@ -55,18 +52,12 @@ class VoicesMenu extends StatelessWidget {
 }
 
 class _MenuButton extends StatelessWidget {
-  final String label;
-  final IconData? iconData;
-  final bool showDivider;
-  final bool enabled;
+  final MenuItem menuItem;
   final List<Widget>? menuChildren;
-  final ValueChanged<String>? onSelected;
+  final ValueChanged<MenuItem>? onSelected;
 
   const _MenuButton({
-    required this.label,
-    this.iconData,
-    this.showDivider = false,
-    this.enabled = true,
+    required this.menuItem,
     this.menuChildren,
     this.onSelected,
   });
@@ -75,10 +66,11 @@ class _MenuButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    final icon = (iconData != null) ? Icon(iconData, size: 24) : null;
+    final icon = (menuItem.icon != null) ? Icon(menuItem.icon, size: 24) : null;
 
     final textStyle = textTheme.bodyMedium?.copyWith(
-      color: enabled ? textTheme.bodySmall?.color : theme.disabledColor,
+      color:
+          menuItem.enabled ? textTheme.bodySmall?.color : theme.disabledColor,
     );
 
     final children = menuChildren;
@@ -95,7 +87,7 @@ class _MenuButton extends StatelessWidget {
                     child: Icon(
                       icon.icon,
                       size: icon.size,
-                      color: enabled
+                      color: menuItem.enabled
                           ? textTheme.bodySmall?.color
                           : theme.disabledColor,
                     ),
@@ -115,10 +107,10 @@ class _MenuButton extends StatelessWidget {
             if (children == null)
               MenuItemButton(
                 leadingIcon: icon,
-                onPressed: enabled ? (() => onSelected?.call(label)) : null,
+                onPressed: () => onSelected?.call(menuItem),
                 style: MenuItemButton.styleFrom(iconColor: Colors.transparent),
                 child: Text(
-                  label,
+                  menuItem.label,
                   style: textStyle,
                 ),
               )
@@ -128,13 +120,13 @@ class _MenuButton extends StatelessWidget {
                 menuChildren: children,
                 style: MenuItemButton.styleFrom(iconColor: Colors.transparent),
                 child: Text(
-                  label,
+                  menuItem.label,
                   style: textStyle,
                 ),
               ),
           ],
         ),
-        if (showDivider)
+        if (menuItem.showDivider)
           const Divider(
             height: 0,
             indent: 0,
@@ -147,12 +139,14 @@ class _MenuButton extends StatelessWidget {
 
 /// Model representing Menu Item
 class MenuItem {
+  final int id;
   final String label;
   final IconData? icon;
   final bool showDivider;
   final bool enabled;
 
   MenuItem({
+    required this.id,
     required this.label,
     this.icon,
     this.showDivider = false,
@@ -166,6 +160,7 @@ class SubMenuItem extends MenuItem {
   List<MenuItem> children;
 
   SubMenuItem({
+    required super.id,
     required super.label,
     required this.children,
     super.icon,

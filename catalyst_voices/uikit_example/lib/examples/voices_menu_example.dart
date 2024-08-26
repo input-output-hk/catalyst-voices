@@ -17,27 +17,31 @@ class VoicesMenuExample extends StatelessWidget {
           Column(
             children: [
               VoicesMenu(
-                onTap: (label) => debugPrint('Selected label: $label'),
-                menuItems: [
+                onTap: (menuItem) =>
+                    debugPrint('Selected label: ${menuItem.label}'),                menuItems: [
                   MenuItem(
+                    id: 1,
                     label: 'Rename',
                     icon: CatalystVoicesIcons.pencil,
                   ),
                   SubMenuItem(
+                    id: 4,
                     label: 'Move Private Team',
                     icon: CatalystVoicesIcons.switch_horizontal,
                     children: [
-                      MenuItem(label: 'Team 1: The Vikings'),
-                      MenuItem(label: 'Team 2: Pure Hearts'),
+                      MenuItem(id: 5, label: 'Team 1: The Vikings'),
+                      MenuItem(id: 6, label: 'Team 2: Pure Hearts'),
                     ],
                   ),
                   MenuItem(
+                    id: 2,
                     label: 'Move to public',
                     icon: CatalystVoicesIcons.switch_horizontal,
                     showDivider: true,
                     enabled: false,
                   ),
                   MenuItem(
+                    id: 3,
                     label: 'Delete',
                     icon: CatalystVoicesIcons.trash,
                   ),
@@ -52,26 +56,31 @@ class VoicesMenuExample extends StatelessWidget {
                 ),
               ),
               VoicesMenu(
-                onTap: (label) => debugPrint('Selected label: $label'),
+                onTap: (menuItem) =>
+                    debugPrint('Selected label: ${menuItem.label}'),
                 menuItems: [
                   MenuItem(
+                    id: 1,
                     label: 'Rename',
                     icon: CatalystVoicesIcons.pencil,
                   ),
                   SubMenuItem(
+                    id: 4,
                     label: 'Move Private Team',
                     icon: CatalystVoicesIcons.switch_horizontal,
                     children: [
-                      MenuItem(label: 'Team 1: The Vikings'),
-                      MenuItem(label: 'Team 2: Pure Hearts'),
+                      MenuItem(id: 5, label: 'Team 1: The Vikings'),
+                      MenuItem(id: 6, label: 'Team 2: Pure Hearts'),
                     ],
                   ),
                   MenuItem(
+                    id: 2,
                     label: 'Move to public',
                     icon: CatalystVoicesIcons.switch_horizontal,
                     showDivider: true,
                   ),
                   MenuItem(
+                    id: 3,
                     label: 'Delete',
                     icon: CatalystVoicesIcons.trash,
                   ),
