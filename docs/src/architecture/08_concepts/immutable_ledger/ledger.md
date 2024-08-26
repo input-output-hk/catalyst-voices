@@ -54,7 +54,7 @@ just by starting to process new chains.
 
 It is a common thing for blockchains to have a starting block (genesis),
 but it's unusual to have a final block for a chain.
-After which one no any block could be produced.
+After which no any block could be produced.
 
 And that's a main distinguish for this Immutable Ledger Structure design,
 it has a final block.
