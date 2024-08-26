@@ -28,7 +28,7 @@ in a transparent, verifiable, scalable and immutable way.
 
 ![Ledger schema](images/ledger_schema.svg){ align=right }
 
-Ledger will be represented as a collection of different, non-connected chains,
+Ledger will be represented as a collection of distinct, unconnected chains,
 processed and run in parallel.
 The only common thing for all these chains will be a "tree" identifier,
 so these chains will serve and form an overall ledger state.
