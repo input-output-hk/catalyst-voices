@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
@@ -46,6 +47,12 @@ class VoicesTextField extends StatefulWidget {
   /// [TextField.enabled].
   final bool enabled;
 
+  /// Whether the text field can be resized by the user
+  /// in HTML's text area fashion.
+  ///
+  /// Defaults to true on web and desktop, false otherwise.
+  final bool? resizable;
+
   /// [TextFormField.validator]
   final VoicesTextFieldValidator? validator;
 
@@ -68,6 +75,7 @@ class VoicesTextField extends StatefulWidget {
     this.enabled = true,
     this.validator,
     this.onChanged,
+    this.resizable,
   });
 
   @override
@@ -133,7 +141,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
     final textTheme = theme.textTheme;
 
     final labelText = widget.decoration?.labelText ?? '';
-    final resizable = widget.maxLines == null && widget.minLines == null;
+    final resizable = _isResizable;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -251,6 +259,18 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
         ),
       ],
     );
+  }
+
+  bool get _isResizable {
+    final resizable = widget.resizable ??
+        (CatalystPlatform.isWebDesktop || CatalystPlatform.isDesktop);
+
+    // expands property is not supported if any of these are specified,
+    // both must be null
+    final hasNoLineConstraints =
+        widget.maxLines == null && widget.minLines == null;
+
+    return resizable && hasNoLineConstraints;
   }
 
   InputBorder _getBorder({required InputBorder orDefault}) {
