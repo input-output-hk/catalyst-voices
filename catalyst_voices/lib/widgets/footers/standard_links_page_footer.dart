@@ -9,8 +9,6 @@ class StandardLinksPageFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final icons = VoicesAssets.internalResources.icons;
-
     // TODO(damian): implement proper routing actions once we have them
     return LinksPageFooter(
       upperChildren: [
@@ -45,21 +43,21 @@ class StandardLinksPageFooter extends StatelessWidget {
       ],
       lowerChildren: [
         VoicesIconButton(
-          child: icons.facebookMono.buildIcon(),
+          child: VoicesAssets.images.facebookMono.buildIcon(),
           onTap: () {
             ScaffoldMessenger.of(context)
                 .showSnackBar(const SnackBar(content: Text('Facebook')));
           },
         ),
         VoicesIconButton(
-          child: icons.linkedinMono.buildIcon(),
+          child: VoicesAssets.images.linkedinMono.buildIcon(),
           onTap: () {
             ScaffoldMessenger.of(context)
                 .showSnackBar(const SnackBar(content: Text('LinkedIn')));
           },
         ),
         VoicesIconButton(
-          child: icons.xMono.buildIcon(),
+          child: VoicesAssets.images.xMono.buildIcon(),
           onTap: () {
             ScaffoldMessenger.of(context)
                 .showSnackBar(const SnackBar(content: Text('X')));

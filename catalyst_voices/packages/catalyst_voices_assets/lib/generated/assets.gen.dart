@@ -12,13 +12,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:vector_graphics/vector_graphics.dart';
 
-class $InternalResourcesGen {
-  const $InternalResourcesGen();
-
-  /// Directory path: internal_resources/icons
-  $InternalResourcesIconsGen get icons => const $InternalResourcesIconsGen();
-}
-
 class $AssetsImagesGen {
   const $AssetsImagesGen();
 
@@ -49,6 +42,13 @@ class $AssetsImagesGen {
   AssetGenImage get dummyCatalystVoices =>
       const AssetGenImage('assets/images/dummy_catalyst_voices.webp');
 
+  /// File path: assets/images/facebook.svg
+  SvgGenImage get facebook => const SvgGenImage('assets/images/facebook.svg');
+
+  /// File path: assets/images/facebook_mono.svg
+  SvgGenImage get facebookMono =>
+      const SvgGenImage('assets/images/facebook_mono.svg');
+
   /// File path: assets/images/fallback_logo.svg
   SvgGenImage get fallbackLogo =>
       const SvgGenImage('assets/images/fallback_logo.svg');
@@ -56,6 +56,19 @@ class $AssetsImagesGen {
   /// File path: assets/images/fallback_logo_icon.svg
   SvgGenImage get fallbackLogoIcon =>
       const SvgGenImage('assets/images/fallback_logo_icon.svg');
+
+  /// File path: assets/images/linkedin.svg
+  SvgGenImage get linkedin => const SvgGenImage('assets/images/linkedin.svg');
+
+  /// File path: assets/images/linkedin_mono.svg
+  SvgGenImage get linkedinMono =>
+      const SvgGenImage('assets/images/linkedin_mono.svg');
+
+  /// File path: assets/images/x.svg
+  SvgGenImage get x => const SvgGenImage('assets/images/x.svg');
+
+  /// File path: assets/images/x_mono.svg
+  SvgGenImage get xMono => const SvgGenImage('assets/images/x_mono.svg');
 
   /// List of all assets
   List<dynamic> get values => [
@@ -66,51 +79,21 @@ class $AssetsImagesGen {
         comingSoonBkg,
         dragger,
         dummyCatalystVoices,
+        facebook,
+        facebookMono,
         fallbackLogo,
-        fallbackLogoIcon
+        fallbackLogoIcon,
+        linkedin,
+        linkedinMono,
+        x,
+        xMono
       ];
-}
-
-class $InternalResourcesIconsGen {
-  const $InternalResourcesIconsGen();
-
-  /// File path: internal_resources/icons/.gitkeep
-  String get aGitkeep => 'internal_resources/icons/.gitkeep';
-
-  /// File path: internal_resources/icons/facebook.svg
-  SvgGenImage get facebook =>
-      const SvgGenImage('internal_resources/icons/facebook.svg');
-
-  /// File path: internal_resources/icons/facebook_mono.svg
-  SvgGenImage get facebookMono =>
-      const SvgGenImage('internal_resources/icons/facebook_mono.svg');
-
-  /// File path: internal_resources/icons/linkedin.svg
-  SvgGenImage get linkedin =>
-      const SvgGenImage('internal_resources/icons/linkedin.svg');
-
-  /// File path: internal_resources/icons/linkedin_mono.svg
-  SvgGenImage get linkedinMono =>
-      const SvgGenImage('internal_resources/icons/linkedin_mono.svg');
-
-  /// File path: internal_resources/icons/x.svg
-  SvgGenImage get x => const SvgGenImage('internal_resources/icons/x.svg');
-
-  /// File path: internal_resources/icons/x_mono.svg
-  SvgGenImage get xMono =>
-      const SvgGenImage('internal_resources/icons/x_mono.svg');
-
-  /// List of all assets
-  List<dynamic> get values =>
-      [aGitkeep, facebook, facebookMono, linkedin, linkedinMono, x, xMono];
 }
 
 class VoicesAssets {
   VoicesAssets._();
 
   static const $AssetsImagesGen images = $AssetsImagesGen();
-  static const $InternalResourcesGen internalResources =
-      $InternalResourcesGen();
 }
 
 class AssetGenImage {
