@@ -100,7 +100,7 @@ class _Segment extends StatelessWidget {
             VoicesFilledButton(
               child: const Text('CTA to Model'),
               onTap: () {},
-            )
+            ),
           ],
         ),
       ),
