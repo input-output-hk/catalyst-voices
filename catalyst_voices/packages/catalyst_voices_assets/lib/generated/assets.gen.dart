@@ -35,6 +35,9 @@ class $AssetsImagesGen {
   AssetGenImage get comingSoonBkg =>
       const AssetGenImage('assets/images/coming_soon_bkg.webp');
 
+  /// File path: assets/images/dragger.svg
+  SvgGenImage get dragger => const SvgGenImage('assets/images/dragger.svg');
+
   /// File path: assets/images/dummy_catalyst_voices.webp
   AssetGenImage get dummyCatalystVoices =>
       const AssetGenImage('assets/images/dummy_catalyst_voices.webp');
@@ -54,6 +57,7 @@ class $AssetsImagesGen {
         catalystLogoIconWhite,
         catalystLogoWhite,
         comingSoonBkg,
+        dragger,
         dummyCatalystVoices,
         fallbackLogo,
         fallbackLogoIcon
