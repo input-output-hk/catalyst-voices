@@ -12,7 +12,7 @@ part 'sign_and_submit_tx.dart';
 part 'sign_data.dart';
 
 void main() {
-  // EquatableConfig.stringify = true;
+  EquatableConfig.stringify = true;
   runApp(const MyApp());
 }
 
