@@ -81,7 +81,7 @@ class _Header extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Theme.of(context).brandAssets.logo.build(useColorFilter: false),
+          Theme.of(context).brandAssets.logo.buildPicture(),
           IconButton(
             onPressed: Navigator.of(context).pop,
             icon: const Icon(CatalystVoicesIcons.x, size: 22),

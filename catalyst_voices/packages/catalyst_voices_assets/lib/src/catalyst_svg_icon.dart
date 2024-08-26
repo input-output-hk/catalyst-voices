@@ -5,7 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 /// Builds and svg icon using [SvgPicture] via [CatalystSvgPicture] but on
 /// top of that extracts configuration from [IconTheme] like
 /// [IconThemeData.size] or [IconThemeData.color] and applies those if not
-/// specified directly via [size] or [colorFilter].
+/// specified directly in [size] or [colorFilter].
 class CatalystSvgIcon extends StatelessWidget {
   /// See [SvgPicture.width] and [SvgPicture.height]
   final double? size;
@@ -41,7 +41,7 @@ class CatalystSvgIcon extends StatelessWidget {
   final ColorFilter? colorFilter;
 
   /// Whether to use [colorFilter] or not. Some icons don't need that
-  final bool useColorFilter;
+  final bool allowColorFilter;
 
   const CatalystSvgIcon(
     this.bytesLoader, {
@@ -56,7 +56,7 @@ class CatalystSvgIcon extends StatelessWidget {
     this.semanticsLabel,
     this.excludeFromSemantics = false,
     this.clipBehavior = Clip.hardEdge,
-    this.useColorFilter = true,
+    this.allowColorFilter = true,
   });
 
   CatalystSvgIcon.asset(
@@ -75,7 +75,7 @@ class CatalystSvgIcon extends StatelessWidget {
     this.semanticsLabel,
     this.excludeFromSemantics = false,
     this.clipBehavior = Clip.hardEdge,
-    this.useColorFilter = true,
+    this.allowColorFilter = true,
   }) : bytesLoader = SvgAssetLoader(
           assetName,
           packageName: package,
@@ -86,7 +86,7 @@ class CatalystSvgIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final effectiveSize = size ?? IconTheme.of(context).size;
-    final effectiveColorFilter = useColorFilter
+    final effectiveColorFilter = allowColorFilter
         ? colorFilter ?? IconTheme.of(context).asColorFilter()
         : null;
 

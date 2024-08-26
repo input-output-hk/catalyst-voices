@@ -126,15 +126,15 @@ class _Footer extends StatelessWidget {
       ],
       lowerChildren: [
         VoicesIconButton(
-          child: icons.facebookMono.build(),
+          child: icons.facebookMono.buildIcon(),
           onTap: () {},
         ),
         VoicesIconButton(
-          child: icons.linkedinMono.build(),
+          child: icons.linkedinMono.buildIcon(),
           onTap: () {},
         ),
         VoicesIconButton(
-          child: icons.xMono.build(),
+          child: icons.xMono.buildIcon(),
           onTap: () {},
         ),
       ],
