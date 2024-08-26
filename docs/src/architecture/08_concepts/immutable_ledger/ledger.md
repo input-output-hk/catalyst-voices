@@ -52,7 +52,7 @@ just by starting to process new chains.
 
 ![Temporary chain schema](images/temporary_chain.svg){ align=right }
 
-It is a common thing for blockchains to have a starting block (genesis),
+It's a common thing for blockchains to have a starting block (genesis),
 but it's unusual to have a final block for a chain.
 After which no any block could be produced.
 
