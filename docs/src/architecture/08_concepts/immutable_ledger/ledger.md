@@ -39,7 +39,7 @@ And it also requires that the overall ledger state,
 could be deterministically defined at any point of time,
 considering potential transaction overlapping or duplication.
 
-Each particular chain, will be as a common sequence of blocks,
+Each particular chain, will be a common sequence of blocks,
 which are cryptographically protected by hashing.
 
 The described approach allows to easily scale and increase throughput of the network on demand at any time,
