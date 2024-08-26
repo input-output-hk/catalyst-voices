@@ -6,21 +6,14 @@ import 'package:flutter_test/flutter_test.dart';
 import '../../helpers/helpers.dart';
 
 void main() {
-  const iconSize = 20.0;
   final menu = [
     MenuItem(
       label: 'Rename',
-      icon: const Icon(
-        CatalystVoicesIcons.pencil,
-        size: iconSize,
-      ),
+      icon: CatalystVoicesIcons.pencil,
     ),
     SubMenuItem(
       label: 'Move Private Team',
-      icon: const Icon(
-        CatalystVoicesIcons.switch_horizontal,
-        size: iconSize,
-      ),
+      icon: CatalystVoicesIcons.switch_horizontal,
       children: [
         MenuItem(label: 'Team 1: The Vikings'),
         MenuItem(label: 'Team 2: Pure Hearts'),
@@ -28,19 +21,13 @@ void main() {
     ),
     MenuItem(
       label: 'Move to public',
-      icon: const Icon(
-        CatalystVoicesIcons.switch_horizontal,
-        size: iconSize,
-      ),
+      icon: CatalystVoicesIcons.switch_horizontal,
       showDivider: true,
       enabled: false,
     ),
     MenuItem(
       label: 'Delete',
-      icon: const Icon(
-        CatalystVoicesIcons.trash,
-        size: iconSize,
-      ),
+      icon: CatalystVoicesIcons.trash,
     ),
   ];
 

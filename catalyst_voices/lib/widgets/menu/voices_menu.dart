@@ -56,7 +56,7 @@ class VoicesMenu extends StatelessWidget {
 
 class _MenuButton extends StatelessWidget {
   final String label;
-  final Icon? icon;
+  final IconData? icon;
   final bool showDivider;
   final bool enabled;
   final List<Widget>? menuChildren;
@@ -75,6 +75,7 @@ class _MenuButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
+    const iconSize = 24.0;
 
     final textStyle = textTheme.bodyMedium?.copyWith(
       color: enabled ? textTheme.bodySmall?.color : theme.disabledColor,
@@ -92,7 +93,8 @@ class _MenuButton extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.only(left: 10),
                     child: Icon(
-                      icon!.icon,
+                      icon,
+                      size: iconSize,
                       color: enabled
                           ? textTheme.bodySmall?.color
                           : theme.disabledColor,
@@ -112,7 +114,7 @@ class _MenuButton extends StatelessWidget {
               ),
             if (children == null)
               MenuItemButton(
-                leadingIcon: icon,
+                leadingIcon: (icon != null) ? Icon(icon, size: iconSize) : null,
                 onPressed: enabled ? (() => onSelected?.call(label)) : null,
                 style: MenuItemButton.styleFrom(iconColor: Colors.transparent),
                 child: Text(
@@ -122,7 +124,7 @@ class _MenuButton extends StatelessWidget {
               )
             else
               SubmenuButton(
-                leadingIcon: icon,
+                leadingIcon: (icon != null) ? Icon(icon, size: iconSize) : null,
                 menuChildren: children,
                 style: MenuItemButton.styleFrom(iconColor: Colors.transparent),
                 child: Text(
@@ -146,7 +148,7 @@ class _MenuButton extends StatelessWidget {
 /// Model representing Menu Item
 class MenuItem {
   final String label;
-  final Icon? icon;
+  final IconData? icon;
   final bool showDivider;
   final bool enabled;
 
