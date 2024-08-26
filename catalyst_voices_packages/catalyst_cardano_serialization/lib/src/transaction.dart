@@ -8,7 +8,7 @@ import 'package:equatable/equatable.dart';
 
 /// Represents the signed transaction with a list of witnesses
 /// which are used to verify the validity of a transaction.
-final class Transaction extends Equatable {
+final class Transaction extends Equatable implements CborEncodable {
   /// The transaction body containing the inputs, outputs, fees, etc.
   final TransactionBody body;
 
@@ -48,6 +48,7 @@ final class Transaction extends Equatable {
   }
 
   /// Serializes the type as cbor.
+  @override
   CborValue toCbor() {
     return CborList([
       body.toCbor(),
@@ -64,7 +65,7 @@ final class Transaction extends Equatable {
 /// Represents the details of a transaction including inputs, outputs, fee, etc.
 ///
 /// Does not contain the witnesses which are used to verify the transaction.
-final class TransactionBody extends Equatable {
+final class TransactionBody extends Equatable implements CborEncodable {
   /// The transaction inputs.
   final Set<TransactionInput> inputs;
 
@@ -125,6 +126,7 @@ final class TransactionBody extends Equatable {
   }
 
   /// Serializes the type as cbor.
+  @override
   CborValue toCbor() {
     return CborMap({
       const CborSmallInt(0): CborList([
@@ -160,7 +162,7 @@ final class TransactionBody extends Equatable {
 
 /// The transaction output of a previous transaction,
 /// acts as input for the next transaction.
-final class TransactionInput extends Equatable {
+final class TransactionInput extends Equatable implements CborEncodable {
   /// The hash of the given transaction.
   final TransactionHash transactionId;
 
@@ -186,6 +188,7 @@ final class TransactionInput extends Equatable {
   }
 
   /// Serializes the type as cbor.
+  @override
   CborValue toCbor() {
     return CborList([
       transactionId.toCbor(),
@@ -199,7 +202,7 @@ final class TransactionInput extends Equatable {
 
 /// The transaction output which describes which [address]
 /// will receive what [amount] of [Coin].
-final class TransactionOutput extends Equatable {
+final class TransactionOutput extends Equatable implements CborEncodable {
   /// The address associated with the transaction.
   final ShelleyAddress address;
 
@@ -254,6 +257,7 @@ final class TransactionOutput extends Equatable {
   }
 
   /// Serializes the type as cbor.
+  @override
   CborValue toCbor() {
     return CborList([
       address.toCbor(),
@@ -277,7 +281,8 @@ final class TransactionOutput extends Equatable {
 }
 
 /// The UTXO that can be used as an input in a new transaction.
-final class TransactionUnspentOutput extends Equatable {
+final class TransactionUnspentOutput extends Equatable
+    implements CborEncodable {
   /// The transaction output of a previous transaction,
   /// acts as input for the next transaction.
   final TransactionInput input;
@@ -305,6 +310,7 @@ final class TransactionUnspentOutput extends Equatable {
   }
 
   /// Serializes the type as cbor.
+  @override
   CborValue toCbor() {
     return CborList([
       input.toCbor(),
@@ -317,7 +323,7 @@ final class TransactionUnspentOutput extends Equatable {
 }
 
 /// The transaction metadata as a list of key-value pairs (a map).
-final class AuxiliaryData extends Equatable {
+final class AuxiliaryData extends Equatable implements CborEncodable {
   /// The transaction metadata map.
   final Map<CborValue, CborValue> map;
 
@@ -331,6 +337,7 @@ final class AuxiliaryData extends Equatable {
   }
 
   /// Serializes the type as cbor.
+  @override
   CborValue toCbor() {
     return CborMap(
       map,

@@ -4,6 +4,7 @@ import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 
@@ -12,6 +13,7 @@ part 'sign_and_submit_tx.dart';
 part 'sign_data.dart';
 
 void main() {
+  EquatableConfig.stringify = true;
   runApp(const MyApp());
   SemanticsBinding.instance.ensureSemantics();
 }
