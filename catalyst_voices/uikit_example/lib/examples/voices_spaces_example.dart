@@ -1,7 +1,6 @@
 import 'package:catalyst_voices/widgets/app_bar/voices_app_bar.dart';
 import 'package:catalyst_voices/widgets/drawer/voices_drawer.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
@@ -23,58 +22,49 @@ class VoicesSpacesExample extends StatelessWidget {
       drawer: const VoicesDrawer(children: []),
       body: CustomScrollView(
         slivers: [
-          const SliverToBoxAdapter(child: _NavigationLocation()),
+          const SliverToBoxAdapter(child: SpacesNavigationLocation()),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 32)
                 .add(const EdgeInsets.only(bottom: 32)),
             sliver: SliverList(
               delegate: SliverChildListDelegate(
                 [
-                  const _Segment(),
+                  const _Segment(name: 'Segment 1'),
                   const SizedBox(height: 24),
-                  const _Segment(),
+                  const _Segment(name: 'Segment 2'),
                   const SizedBox(height: 24),
-                  const _Segment(),
+                  const _Segment(name: 'Segment 3'),
                 ],
               ),
             ),
           ),
-          const SliverToBoxAdapter(child: _Footer()),
+          const SliverToBoxAdapter(child: StandardLinksPageFooter()),
         ],
       ),
     );
   }
 }
 
-class _NavigationLocation extends StatelessWidget {
-  const _NavigationLocation();
+class SpacesNavigationLocation extends StatelessWidget {
+  const SpacesNavigationLocation({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 56,
-      padding: const EdgeInsets.symmetric(horizontal: 40),
-      alignment: Alignment.centerLeft,
-      child: RichText(
-        text: TextSpan(
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colors.textOnPrimary,
-                ),
-            children: const [
-              TextSpan(
-                text: 'Discovery Space',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              TextSpan(text: ' / '),
-              TextSpan(text: 'Homepage'),
-            ]),
-      ),
+    return const NavigationLocation(
+      parts: [
+        'Discovery Space',
+        'Homepage',
+      ],
     );
   }
 }
 
 class _Segment extends StatelessWidget {
-  const _Segment();
+  const _Segment({
+    required this.name,
+  });
+
+  final String name;
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +83,7 @@ class _Segment extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Segment',
+              name,
               style: theme.textTheme.titleLarge?.copyWith(
                 color: theme.colors.textOnPrimary,
               ),
@@ -106,38 +96,6 @@ class _Segment extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _Footer extends StatelessWidget {
-  const _Footer();
-
-  @override
-  Widget build(BuildContext context) {
-    final icons = VoicesAssets.internalResources.icons;
-
-    return LinksPageFooter(
-      upperChildren: [
-        LinkText('About us', onTap: () {}),
-        LinkText('Funds', onTap: () {}),
-        LinkText('Documentation', onTap: () {}),
-        LinkText('Contact us', onTap: () {}),
-      ],
-      lowerChildren: [
-        VoicesIconButton(
-          child: icons.facebookMono.buildIcon(),
-          onTap: () {},
-        ),
-        VoicesIconButton(
-          child: icons.linkedinMono.buildIcon(),
-          onTap: () {},
-        ),
-        VoicesIconButton(
-          child: icons.xMono.buildIcon(),
-          onTap: () {},
-        ),
-      ],
     );
   }
 }
