@@ -38,7 +38,15 @@ class VoicesSpacesExample extends StatelessWidget {
               ),
             ),
           ),
-          const SliverToBoxAdapter(child: StandardLinksPageFooter()),
+          const SliverFillRemaining(
+            hasScrollBody: false,
+            child: Column(
+              children: [
+                Spacer(),
+                StandardLinksPageFooter(),
+              ],
+            ),
+          ),
         ],
       ),
     );
