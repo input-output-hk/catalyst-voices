@@ -61,7 +61,7 @@ class NavigationLocation extends StatelessWidget {
                   );
                 },
               )
-              .separatedBy(const TextSpan(text: '/'))
+              .separatedBy(const TextSpan(text: ' / '))
               .toList(),
         ),
       ),
