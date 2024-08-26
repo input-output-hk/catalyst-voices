@@ -203,6 +203,16 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
                 maxLines: 10,
               ),
             ),
+            SizedBox(
+              width: 200,
+              child: VoicesTextField(
+                controller: _controller,
+                decoration: const VoicesTextFieldDecoration(
+                  labelText: 'Resizable',
+                ),
+                maxLines: null,
+              ),
+            ),
           ],
         ),
       ),
