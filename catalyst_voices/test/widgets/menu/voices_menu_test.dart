@@ -69,9 +69,7 @@ void main() {
       expect(find.byType(MenuItemButton), findsExactly(3));
       expect(find.text('Rename'), findsOne);
     });
-  });
 
-  group('VoicesMenu', () {
     testWidgets('displays nested menu correctly', (tester) async {
       // Given
       final widget = VoicesMenu(
