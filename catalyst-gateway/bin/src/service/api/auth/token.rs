@@ -1,21 +1,25 @@
 use anyhow::Ok;
 use base64::{prelude::BASE64_STANDARD, Engine};
-use ed25519_dalek::{Signer, SigningKey, SECRET_KEY_LENGTH, SIGNATURE_LENGTH};
+use ed25519_dalek::{
+    Signature, Signer, SigningKey, VerifyingKey, PUBLIC_KEY_LENGTH, SECRET_KEY_LENGTH,
+    SIGNATURE_LENGTH,
+};
 use pallas::codec::minicbor;
 
 /// Key ID - Blake2b-128 hash of the Role 0 Certificate defining the Session public key.
 /// BLAKE2b-128 produces digest side of 16 bytes.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Kid([u8; 16]);
 
 /// Identifier for this token, encodes both the time the token was issued and a random
 /// nonce.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UlidBytes([u8; 16]);
 
 // Ed25519 signatures are (64 bytes)
 // The signature over the cbor encoded `kid` and `ulid` fields.
 #[allow(dead_code)]
+#[derive(Debug, Clone)]
 pub struct SignatureEd25519([u8; 64]);
 
 /// The Encoded Binary Auth Token is a [CBOR sequence] that consists of 3 fields [ kid,
@@ -50,8 +54,12 @@ pub fn encode_auth_token_ed25519(
 /// e.g catv1.UAARIjNEVWZ3iJmqu8zd7v9QAZEs7HHPLEwUpV1VhdlNe1hAAAAAAAAAAAAA...
 #[allow(dead_code)]
 pub fn decode_auth_token_ed25519(
-    auth_token: String,
+    auth_token: String, pub_key_bytes: [u8; PUBLIC_KEY_LENGTH],
 ) -> anyhow::Result<(Kid, UlidBytes, SignatureEd25519)> {
+    // The message is a Cbor sequence (cbor(kid) + cbor(ulid)):
+    // kid + ulid are 16 bytes a piece, with 1 byte extra due to cbor encoding,
+    // The two fields include their encoding resulting in 17 bytes each.
+    const KID_ULID_CBOR_ENCODED_BYTES: u8 = 34;
     const AUTH_TOKEN_PREFIX: &str = "catv1";
 
     let token = auth_token.split(".").collect::<Vec<&str>>();
@@ -63,13 +71,18 @@ pub fn decode_auth_token_ed25519(
         let token_base64 = token.get(1).ok_or(anyhow::anyhow!("No valid token"))?;
         let decoded_token = BASE64_STANDARD.decode(token_base64)?;
 
+        let message = &decoded_token[0..KID_ULID_CBOR_ENCODED_BYTES.try_into()?];
+
+        // Decode cbor to bytes
         let mut cbor_decoder = minicbor::Decoder::new(&decoded_token);
 
+        // Raw kid bytes
         let kid = Kid(cbor_decoder
             .bytes()
             .map_err(|e| anyhow::anyhow!(format!("Invalid cbor for kid : {e}")))?
             .try_into()?);
 
+        // Raw ulid bytes
         let ulid = UlidBytes(
             cbor_decoder
                 .bytes()
@@ -77,12 +90,17 @@ pub fn decode_auth_token_ed25519(
                 .try_into()?,
         );
 
+        // Raw signature
         let signature = SignatureEd25519(
             cbor_decoder
                 .bytes()
                 .map_err(|e| anyhow::anyhow!(format!("Invalid cbor for sig : {e}")))?
                 .try_into()?,
         );
+
+        // Verify message and signature
+        let public_key = VerifyingKey::from_bytes(&pub_key_bytes)?;
+        public_key.verify_strict(&message, &Signature::from_bytes(&signature.0))?;
 
         Ok((kid, ulid, signature))
     }
@@ -113,6 +131,7 @@ mod tests {
 
         let mut csprng = OsRng;
         let signing_key: SigningKey = SigningKey::generate(&mut csprng);
+        let verifying_key: VerifyingKey = signing_key.verifying_key();
 
         let secret_key_bytes: [u8; SECRET_KEY_LENGTH] = *signing_key.as_bytes();
 
@@ -120,7 +139,7 @@ mod tests {
             encode_auth_token_ed25519(Kid(kid), UlidBytes(ulid), secret_key_bytes).unwrap();
 
         let (decoded_kid, decoded_ulid, _decoded_sig) =
-            decode_auth_token_ed25519(auth_token).unwrap();
+            decode_auth_token_ed25519(auth_token, verifying_key.to_bytes()).unwrap();
 
         assert_eq!(decoded_kid.0, kid);
         assert_eq!(decoded_ulid.0, ulid);
@@ -128,13 +147,6 @@ mod tests {
 
     #[test]
     fn test_token_decode() {
-        // tokens generated from frontend
-        let auth_token="catv1.UARn3mvZRbkge/oJ2Ea3fvVQAADErjOAgmcKUOev4sQfNVhAtCaGjDyDarc9AMqeiAUlVrPdSu+VGnX4Lf+648bwRoUpjBj7j4VrK6B8np/KyG6jTRwzUTj+7u29fFlmrunMBg==";
-        let (kid, ulid, sig) = decode_auth_token_ed25519(auth_token.to_owned()).unwrap();
-
-        assert_eq!(hex::encode(kid.0), "0467de6bd945b9207bfa09d846b77ef5");
-        assert_eq!(hex::encode(ulid.0), "0000c4ae338082670a50e7afe2c41f35");
-
         let sk: [u8; 32] =
             hex::decode("fd622372c5ee1f3dc98e90666843a786391664d0e286ac6f3da51226aaa93cd5")
                 .unwrap()
@@ -146,6 +158,13 @@ mod tests {
                 .unwrap()
                 .try_into()
                 .unwrap();
+
+        // tokens generated from frontend
+        let auth_token="catv1.UARn3mvZRbkge/oJ2Ea3fvVQAADErjOAgmcKUOev4sQfNVhAtCaGjDyDarc9AMqeiAUlVrPdSu+VGnX4Lf+648bwRoUpjBj7j4VrK6B8np/KyG6jTRwzUTj+7u29fFlmrunMBg==";
+        let (kid, ulid, sig) = decode_auth_token_ed25519(auth_token.to_owned(), pub_key).unwrap();
+
+        assert_eq!(hex::encode(kid.0), "0467de6bd945b9207bfa09d846b77ef5");
+        assert_eq!(hex::encode(ulid.0), "0000c4ae338082670a50e7afe2c41f35");
 
         let signature: Signature = Signature::from_bytes(&sig.0);
 
