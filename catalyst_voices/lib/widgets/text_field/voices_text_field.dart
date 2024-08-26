@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
@@ -44,6 +47,12 @@ class VoicesTextField extends StatefulWidget {
   /// [TextField.enabled].
   final bool enabled;
 
+  /// Whether the text field can be resized by the user
+  /// in HTML's text area fashion.
+  ///
+  /// Defaults to true on web and desktop, false otherwise.
+  final bool? resizable;
+
   /// [TextFormField.validator]
   final VoicesTextFieldValidator? validator;
 
@@ -66,6 +75,7 @@ class VoicesTextField extends StatefulWidget {
     this.enabled = true,
     this.validator,
     this.onChanged,
+    this.resizable,
   });
 
   @override
@@ -131,6 +141,7 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
     final textTheme = theme.textTheme;
 
     final labelText = widget.decoration?.labelText ?? '';
+    final resizable = _isResizable;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,100 +156,121 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
           ),
           const SizedBox(height: 4),
         ],
-        TextFormField(
-          controller: _obtainController(),
-          focusNode: widget.focusNode,
-          decoration: InputDecoration(
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 12,
+        _ResizableBoxParent(
+          resizable: resizable,
+          child: TextFormField(
+            textAlignVertical: TextAlignVertical.top,
+            expands: resizable,
+            controller: _obtainController(),
+            focusNode: widget.focusNode,
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
+              ),
+              border: widget.decoration?.border ??
+                  _getBorder(
+                    orDefault: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: theme.colorScheme.outlineVariant,
+                      ),
+                    ),
+                  ),
+              enabledBorder: widget.decoration?.enabledBorder ??
+                  _getBorder(
+                    orDefault: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: theme.colorScheme.outlineVariant,
+                      ),
+                    ),
+                  ),
+              disabledBorder: widget.decoration?.disabledBorder ??
+                  OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: theme.colorScheme.outline,
+                    ),
+                  ),
+              errorBorder: widget.decoration?.errorBorder ??
+                  OutlineInputBorder(
+                    borderSide: BorderSide(
+                      width: 2,
+                      color: _getStatusColor(
+                        orDefault: theme.colorScheme.error,
+                      ),
+                    ),
+                  ),
+              focusedBorder: widget.decoration?.focusedBorder ??
+                  _getBorder(
+                    orDefault: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        width: 2,
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ),
+              focusedErrorBorder: widget.decoration?.focusedErrorBorder ??
+                  _getBorder(
+                    orDefault: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        width: 2,
+                        color: theme.colorScheme.error,
+                      ),
+                    ),
+                  ),
+              helperText: widget.decoration?.helperText,
+              helperStyle: widget.enabled
+                  ? textTheme.bodySmall
+                  : textTheme.bodySmall!
+                      .copyWith(color: theme.colors.textDisabled),
+              hintText: widget.decoration?.hintText,
+              hintStyle: widget.enabled
+                  ? textTheme.bodyLarge
+                  : textTheme.bodyLarge!
+                      .copyWith(color: theme.colors.textDisabled),
+              errorText:
+                  widget.decoration?.errorText ?? _validation.errorMessage,
+              errorMaxLines: widget.decoration?.errorMaxLines,
+              errorStyle: widget.enabled
+                  ? textTheme.bodySmall
+                  : textTheme.bodySmall!
+                      .copyWith(color: theme.colors.textDisabled),
+              prefixIcon: widget.decoration?.prefixIcon,
+              prefixText: widget.decoration?.prefixText,
+              suffixIcon:
+                  widget.decoration?.suffixIcon ?? _getStatusSuffixWidget(),
+              suffixText: widget.decoration?.suffixText,
+              counterText: widget.decoration?.counterText,
+              counterStyle: widget.enabled
+                  ? textTheme.bodySmall
+                  : textTheme.bodySmall!
+                      .copyWith(color: theme.colors.textDisabled),
             ),
-            border: widget.decoration?.border ??
-                _getBorder(
-                  orDefault: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: theme.colorScheme.outlineVariant,
-                    ),
-                  ),
-                ),
-            enabledBorder: widget.decoration?.enabledBorder ??
-                _getBorder(
-                  orDefault: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: theme.colorScheme.outlineVariant,
-                    ),
-                  ),
-                ),
-            disabledBorder: widget.decoration?.disabledBorder ??
-                OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: theme.colorScheme.outline,
-                  ),
-                ),
-            errorBorder: widget.decoration?.errorBorder ??
-                OutlineInputBorder(
-                  borderSide: BorderSide(
-                    width: 2,
-                    color: _getStatusColor(
-                      orDefault: theme.colorScheme.error,
-                    ),
-                  ),
-                ),
-            focusedBorder: widget.decoration?.focusedBorder ??
-                _getBorder(
-                  orDefault: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      width: 2,
-                      color: theme.colorScheme.primary,
-                    ),
-                  ),
-                ),
-            focusedErrorBorder: widget.decoration?.focusedErrorBorder ??
-                _getBorder(
-                  orDefault: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      width: 2,
-                      color: theme.colorScheme.error,
-                    ),
-                  ),
-                ),
-            helperText: widget.decoration?.helperText,
-            helperStyle: widget.enabled
-                ? textTheme.bodySmall
-                : textTheme.bodySmall!
-                    .copyWith(color: theme.colors.textDisabled),
-            hintText: widget.decoration?.hintText,
-            hintStyle: textTheme.bodyLarge,
-            errorText: widget.decoration?.errorText ?? _validation.errorMessage,
-            errorMaxLines: widget.decoration?.errorMaxLines,
-            errorStyle: widget.enabled
-                ? textTheme.bodySmall
-                : textTheme.bodySmall!
-                    .copyWith(color: theme.colors.textDisabled),
-            prefixIcon: widget.decoration?.prefixIcon,
-            prefixText: widget.decoration?.prefixText,
-            suffixIcon:
-                widget.decoration?.suffixIcon ?? _getStatusSuffixWidget(),
-            suffixText: widget.decoration?.suffixText,
-            counterText: widget.decoration?.counterText,
-            counterStyle: widget.enabled
-                ? textTheme.bodySmall
-                : textTheme.bodySmall!
-                    .copyWith(color: theme.colors.textDisabled),
+            keyboardType: widget.keyboardType,
+            textInputAction: widget.textInputAction,
+            textCapitalization: widget.textCapitalization,
+            style: widget.style,
+            obscureText: widget.obscureText,
+            maxLines: widget.maxLines,
+            minLines: widget.minLines,
+            maxLength: widget.maxLength,
+            enabled: widget.enabled,
+            onChanged: widget.onChanged,
           ),
-          keyboardType: widget.keyboardType,
-          textInputAction: widget.textInputAction,
-          textCapitalization: widget.textCapitalization,
-          style: widget.style,
-          obscureText: widget.obscureText,
-          maxLines: widget.maxLines,
-          minLines: widget.minLines,
-          maxLength: widget.maxLength,
-          enabled: widget.enabled,
-          onChanged: widget.onChanged,
         ),
       ],
     );
+  }
+
+  bool get _isResizable {
+    final resizable = widget.resizable ??
+        (CatalystPlatform.isWebDesktop || CatalystPlatform.isDesktop);
+
+    // expands property is not supported if any of these are specified,
+    // both must be null
+    final hasNoLineConstraints =
+        widget.maxLines == null && widget.minLines == null;
+
+    return resizable && hasNoLineConstraints;
   }
 
   InputBorder _getBorder({required InputBorder orDefault}) {
@@ -262,6 +294,11 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
   Widget? _getStatusSuffixWidget() {
     final showStatusIcon = widget.decoration?.showStatusSuffixIcon ?? true;
     if (!showStatusIcon) {
+      return null;
+    }
+
+    final icon = getStatusSuffixIcon();
+    if (icon == null) {
       return null;
     }
 
@@ -532,4 +569,102 @@ class VoicesTextFieldDecoration {
     this.counterText,
     this.showStatusSuffixIcon = true,
   });
+}
+
+class _ResizableBoxParent extends StatelessWidget {
+  final bool resizable;
+  final Widget child;
+
+  const _ResizableBoxParent({
+    required this.resizable,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (!resizable) {
+      return child;
+    }
+
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        return _ResizableBox(
+          constraints: constraints,
+          child: child,
+        );
+      },
+    );
+  }
+}
+
+class _ResizableBox extends StatefulWidget {
+  final BoxConstraints constraints;
+  final Widget child;
+
+  const _ResizableBox({
+    required this.constraints,
+    required this.child,
+  });
+
+  @override
+  State<_ResizableBox> createState() => _ResizableBoxState();
+}
+
+class _ResizableBoxState extends State<_ResizableBox> {
+  static const double _minWidth = 40;
+  static const double _minHeight = 40;
+
+  late double _width;
+  late double _height;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _width = widget.constraints.maxWidth != double.infinity
+        ? widget.constraints.maxWidth
+        : widget.constraints.constrainWidth(_minWidth);
+
+    _height = max(widget.constraints.minHeight, _minHeight);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        SizedBox(
+          width: _width,
+          height: _height,
+          child: widget.child,
+        ),
+        Positioned(
+          bottom: 0,
+          right: 0,
+          child: MouseRegion(
+            cursor: SystemMouseCursors.resizeDownRight,
+            child: GestureDetector(
+              onPanUpdate: (details) {
+                setState(() {
+                  _width = (_width + details.delta.dx).clamp(
+                    _minWidth,
+                    widget.constraints.maxWidth,
+                  );
+
+                  _height = (_height + details.delta.dy).clamp(
+                    _minHeight,
+                    widget.constraints.maxHeight,
+                  );
+                });
+              },
+              child: CatalystSvgPicture.asset(
+                VoicesAssets.images.dragger.path,
+                width: 15,
+                height: 15,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
