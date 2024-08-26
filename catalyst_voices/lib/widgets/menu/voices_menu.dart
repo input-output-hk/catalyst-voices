@@ -43,7 +43,7 @@ class VoicesMenu extends StatelessWidget {
   _MenuButton _mapItemToButton(MenuItem item) {
     return _MenuButton(
       label: item.label,
-      icon: item.icon,
+      iconData: item.icon,
       showDivider: item.showDivider,
       enabled: item.enabled,
       menuChildren: (item is SubMenuItem)
@@ -56,7 +56,7 @@ class VoicesMenu extends StatelessWidget {
 
 class _MenuButton extends StatelessWidget {
   final String label;
-  final IconData? icon;
+  final IconData? iconData;
   final bool showDivider;
   final bool enabled;
   final List<Widget>? menuChildren;
@@ -64,7 +64,7 @@ class _MenuButton extends StatelessWidget {
 
   const _MenuButton({
     required this.label,
-    this.icon,
+    this.iconData,
     this.showDivider = false,
     this.enabled = true,
     this.menuChildren,
@@ -75,7 +75,7 @@ class _MenuButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    const iconSize = 24.0;
+    final icon = (iconData != null) ? Icon(iconData, size: 24) : null;
 
     final textStyle = textTheme.bodyMedium?.copyWith(
       color: enabled ? textTheme.bodySmall?.color : theme.disabledColor,
@@ -93,8 +93,8 @@ class _MenuButton extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.only(left: 10),
                     child: Icon(
-                      icon,
-                      size: iconSize,
+                      icon.icon,
+                      size: icon.size,
                       color: enabled
                           ? textTheme.bodySmall?.color
                           : theme.disabledColor,
@@ -114,7 +114,7 @@ class _MenuButton extends StatelessWidget {
               ),
             if (children == null)
               MenuItemButton(
-                leadingIcon: (icon != null) ? Icon(icon, size: iconSize) : null,
+                leadingIcon: icon,
                 onPressed: enabled ? (() => onSelected?.call(label)) : null,
                 style: MenuItemButton.styleFrom(iconColor: Colors.transparent),
                 child: Text(
@@ -124,7 +124,7 @@ class _MenuButton extends StatelessWidget {
               )
             else
               SubmenuButton(
-                leadingIcon: (icon != null) ? Icon(icon, size: iconSize) : null,
+                leadingIcon: icon,
                 menuChildren: children,
                 style: MenuItemButton.styleFrom(iconColor: Colors.transparent),
                 child: Text(
