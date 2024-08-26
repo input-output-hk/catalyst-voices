@@ -44,7 +44,7 @@ void main() {
     ),
   ];
 
-  group('VoicesMenu', () {
+  group(VoicesMenu, () {
     testWidgets('displays first level menu correctly', (tester) async {
       // Given
       final widget = VoicesMenu(
