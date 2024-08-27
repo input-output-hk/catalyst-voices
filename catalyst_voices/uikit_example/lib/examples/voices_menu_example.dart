@@ -18,7 +18,8 @@ class VoicesMenuExample extends StatelessWidget {
             children: [
               VoicesMenu(
                 onTap: (menuItem) =>
-                    debugPrint('Selected label: ${menuItem.label}'),                menuItems: [
+                    debugPrint('Selected label: ${menuItem.label}'),
+                menuItems: [
                   MenuItem(
                     id: 1,
                     label: 'Rename',
