@@ -44,11 +44,10 @@ final class TransactionWitnessSet extends Equatable implements CborEncodable {
   /// The native scripts.
   final Set<NativeScript> nativeScripts;
   // TODO(ilap): implement bootstrap witnesses.
-  // final Set<BootstrapWitness> bootstrapWitnesses;
+
   /// The Plutus V1 scripts.
   final Set<PlutusV1Script> plutusV1Scripts;
   // TODO(ilap): implement plutus data.
-  // final Set<PlutusData> plutusDatas;
 
   /// Redeemers for Plutus scripts.
   // FIXME(ilap): implement proper redeemers type.
@@ -79,22 +78,43 @@ final class TransactionWitnessSet extends Equatable implements CborEncodable {
     //vkeyWitnesses: map.values.map(VkeyWitness.fromCbor).toSet();
     return TransactionWitnessSet(
       vkeyWitnesses: _getWitnesses<VkeyWitness>(
-          map, WitnessType.vkeyWitness, VkeyWitness.fromCbor,),
+        map,
+        WitnessType.vkeyWitness,
+        VkeyWitness.fromCbor,
+      ),
       nativeScripts: _getWitnesses<NativeScript>(
-          map, WitnessType.nativeScript, NativeScript.fromCbor,),
+        map,
+        WitnessType.nativeScript,
+        NativeScript.fromCbor,
+      ),
       plutusV1Scripts: _getWitnesses<PlutusV1Script>(
-          map, WitnessType.plutusV1Script, PlutusV1Script.fromCbor,),
-          // TODO(ilap): implement proper redeemer class.
+        map,
+        WitnessType.plutusV1Script,
+        PlutusV1Script.fromCbor,
+      ),
+      // TODO(ilap): implement proper redeemer class.
       redeemers: _getWitnesses<Redeemer>(
-          map, WitnessType.redeemers, Redeemer.fromCbor,),
+        map,
+        WitnessType.redeemers,
+        Redeemer.fromCbor,
+      ),
       plutusV2Scripts: _getWitnesses<PlutusV2Script>(
-          map, WitnessType.plutusV2Script, PlutusV2Script.fromCbor,),
+        map,
+        WitnessType.plutusV2Script,
+        PlutusV2Script.fromCbor,
+      ),
       plutusV3Scripts: _getWitnesses<PlutusV3Script>(
-          map, WitnessType.plutusV3Script, PlutusV3Script.fromCbor,),
+        map,
+        WitnessType.plutusV3Script,
+        PlutusV3Script.fromCbor,
+      ),
     );
   }
   static Set<T> _getWitnesses<T>(
-      CborMap map, WitnessType type, T Function(CborValue) fromCbor,) {
+    CborMap map,
+    WitnessType type,
+    T Function(CborValue) fromCbor,
+  ) {
     final value = map[CborSmallInt(type.value)];
     return value != null ? (value as CborList).map(fromCbor).toSet() : {};
   }

@@ -10,10 +10,10 @@ import 'package:pinenacl/api.dart';
 /// A DatumOption can either be a datum hash or inline Plutus data.
 enum DatumOptionType {
   /// [datumHash]: Represents a hash of the datum, typically used to refer to
-  ///   data that exists off-chain.
+  /// data that exists off-chain.
   datumHash(0),
 
-  /// [data]:Represents actual inline datum stored on-chain.
+  /// [data]: Represents actual inline datum stored on-chain.
   data(1);
 
   /// The value of the enum.

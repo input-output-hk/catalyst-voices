@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:catalyst_cardano_serialization/src/certificate.dart';
 import 'package:catalyst_cardano_serialization/src/exceptions.dart';
+import 'package:catalyst_cardano_serialization/src/redeemer.dart';
 import 'package:catalyst_cardano_serialization/src/signature.dart';
 import 'package:catalyst_cardano_serialization/src/transaction.dart';
 import 'package:cbor/cbor.dart';
@@ -233,10 +234,10 @@ final class ScriptDataHash extends BaseHash {
   ScriptDataHash.fromHex(super.string) : super.fromHex();
 
   /// Constructs the [ScriptDataHash] from a [AuxiliaryData].
-  ScriptDataHash.fromScriptData(ScriptDataHash dataHash)
+  ScriptDataHash.fromScriptData(ScriptData data)
       : super.fromBytes(
           bytes: Hash.blake2b(
-            Uint8List.fromList(cbor.encode(dataHash.toCbor())),
+            Uint8List.fromList(cbor.encode(data.toCbor())),
             digestSize: _length,
           ),
         );
