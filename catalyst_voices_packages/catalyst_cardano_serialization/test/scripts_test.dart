@@ -216,14 +216,12 @@ void main() {
         final hash = json['hash']! as String;
         final type = script['type'] as String;
         final cborHex = script['cborHex'] as String;
+        final cborBytes = Uint8List.fromList(hex.decode(cborHex));
 
         final plutusScript = switch (type) {
-          'PlutusScriptV1' =>
-            PlutusV1Script(Uint8List.fromList(hex.decode(cborHex))),
-          'PlutusScriptV2' =>
-            PlutusV2Script(Uint8List.fromList(hex.decode(cborHex))),
-          'PlutusScriptV3' =>
-            PlutusV3Script(Uint8List.fromList(hex.decode(cborHex))),
+          'PlutusScriptV1' => PlutusV1Script(cborBytes),
+          'PlutusScriptV2' => PlutusV2Script(cborBytes),
+          'PlutusScriptV3' => PlutusV3Script(cborBytes),
           _ => throw Exception('Unknown script type: $type'),
         };
 

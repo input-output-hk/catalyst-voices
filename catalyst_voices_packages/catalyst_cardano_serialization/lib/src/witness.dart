@@ -43,11 +43,9 @@ final class TransactionWitnessSet extends Equatable implements CborEncodable {
 
   /// The native scripts.
   final Set<NativeScript> nativeScripts;
-  // TODO(ilap): implement bootstrap witnesses.
 
   /// The Plutus V1 scripts.
   final Set<PlutusV1Script> plutusV1Scripts;
-  // TODO(ilap): implement plutus data.
 
   /// Redeemers for Plutus scripts.
   // FIXME(ilap): implement proper redeemers type.
@@ -63,9 +61,7 @@ final class TransactionWitnessSet extends Equatable implements CborEncodable {
   const TransactionWitnessSet({
     this.vkeyWitnesses = const {},
     this.nativeScripts = const {},
-    // this.bootstrapWitnesses = const {},
     this.plutusV1Scripts = const {},
-    // this.plutusDatas = const {},
     this.redeemers = const {},
     this.plutusV2Scripts = const {},
     this.plutusV3Scripts = const {},
@@ -74,8 +70,6 @@ final class TransactionWitnessSet extends Equatable implements CborEncodable {
   /// Deserializes the type from cbor.
   factory TransactionWitnessSet.fromCbor(CborValue value) {
     final map = value as CborMap;
-
-    //vkeyWitnesses: map.values.map(VkeyWitness.fromCbor).toSet();
     return TransactionWitnessSet(
       vkeyWitnesses: _getWitnesses<VkeyWitness>(
         map,
@@ -92,7 +86,6 @@ final class TransactionWitnessSet extends Equatable implements CborEncodable {
         WitnessType.plutusV1Script,
         PlutusV1Script.fromCbor,
       ),
-      // TODO(ilap): implement proper redeemer class.
       redeemers: _getWitnesses<Redeemer>(
         map,
         WitnessType.redeemers,
@@ -110,6 +103,7 @@ final class TransactionWitnessSet extends Equatable implements CborEncodable {
       ),
     );
   }
+
   static Set<T> _getWitnesses<T>(
     CborMap map,
     WitnessType type,
@@ -120,7 +114,6 @@ final class TransactionWitnessSet extends Equatable implements CborEncodable {
   }
 
   /// Serializes the type as cbor.
-
   @override
   CborValue toCbor() {
     return CborMap({
@@ -158,9 +151,7 @@ final class TransactionWitnessSet extends Equatable implements CborEncodable {
   List<Object?> get props => [
         vkeyWitnesses,
         nativeScripts,
-        // bootstrapWitnesses,
         plutusV1Scripts,
-        // plutusDatas,
         redeemers,
         plutusV2Scripts,
         plutusV3Scripts,

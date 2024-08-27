@@ -233,7 +233,7 @@ final class ScriptDataHash extends BaseHash {
   /// of [bytes].
   ScriptDataHash.fromHex(super.string) : super.fromHex();
 
-  /// Constructs the [ScriptDataHash] from a [AuxiliaryData].
+  /// Constructs the [ScriptDataHash] from a [ScriptData].
   ScriptDataHash.fromScriptData(ScriptData data)
       : super.fromBytes(
           bytes: Hash.blake2b(

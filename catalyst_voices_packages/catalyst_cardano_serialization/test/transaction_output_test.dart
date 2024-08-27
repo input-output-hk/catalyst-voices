@@ -1,17 +1,14 @@
 import 'dart:typed_data';
 
-import 'package:catalyst_cardano_serialization/src/address.dart';
 import 'package:catalyst_cardano_serialization/src/scripts.dart';
 import 'package:catalyst_cardano_serialization/src/transaction_output.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:cbor/cbor.dart';
 import 'package:test/test.dart';
 
+import 'test_utils/test_data.dart';
+
 void main() {
-  // Create test instances for reuse
-  final address = ShelleyAddress.fromBech32(
-    'addr_test1vzpwq95z3xyum8vqndgdd9mdnmafh3djcxnc6jemlgdmswcve6tkw',
-  );
   const value = Balance(coin: Coin(1000000));
   final datumHash = DatumHash(Uint8List.fromList([1, 2, 3, 4, 5, 6]));
   final datumData = Data(CborBytes(Uint8List.fromList([1, 2, 3, 4, 5, 6])));
@@ -22,7 +19,7 @@ void main() {
 
   group('TransactionOutput encoding/decoding Tests', () {
     test('Shelley-Ma era transaction output', () {
-      final output = TransactionOutput(address: address, amount: value);
+      final output = TransactionOutput(address: testnetAddr, amount: value);
       final cbor = output.toCbor();
       final decoded = TransactionOutput.fromCbor(cbor);
       expect(decoded, equals(output));
@@ -31,7 +28,7 @@ void main() {
 
     test('Alonzo era transaction output with datum hash', () {
       final output = PreBabbageTransactionOutput(
-        address: address,
+        address: testnetAddr,
         amount: value,
         datumHash: datumHash,
       );
@@ -43,7 +40,7 @@ void main() {
 
     test('Babbage era transaction output with datum option hash', () {
       final output = TransactionOutput(
-        address: address,
+        address: testnetAddr,
         amount: value,
         datumOption: datumOptionHash,
       );
@@ -55,7 +52,7 @@ void main() {
 
     test('Babbage era transaction output with datum option data', () {
       final output = TransactionOutput(
-        address: address,
+        address: testnetAddr,
         amount: value,
         datumOption: datumOptionData,
       );
@@ -68,7 +65,7 @@ void main() {
     test('Babbage era transaction output with datum option data and script ref',
         () {
       final output = TransactionOutput(
-        address: address,
+        address: testnetAddr,
         amount: value,
         datumOption: datumOptionData,
         scriptRef: scriptRef,
@@ -82,7 +79,7 @@ void main() {
     test('Babbage era transaction output with datum option hash and script ref',
         () {
       final output = TransactionOutput(
-        address: address,
+        address: testnetAddr,
         amount: value,
         datumOption: datumOptionHash,
         scriptRef: scriptRef,
@@ -95,7 +92,7 @@ void main() {
 
     test('Babbage era transaction output only with script ref', () {
       final output = TransactionOutput(
-        address: address,
+        address: testnetAddr,
         amount: value,
         scriptRef: scriptRef,
       );
@@ -128,11 +125,11 @@ void main() {
       );
     });
 
-    test('Equality and hashcode', () {
+    test('Equality and hashCode', () {
       final output1 =
-          PreBabbageTransactionOutput(address: address, amount: value);
+          PreBabbageTransactionOutput(address: testnetAddr, amount: value);
       final output2 =
-          PreBabbageTransactionOutput(address: address, amount: value);
+          PreBabbageTransactionOutput(address: testnetAddr, amount: value);
 
       expect(output1, equals(output2));
       expect(output1.hashCode, equals(output2.hashCode));
@@ -140,7 +137,7 @@ void main() {
 
     test('CopyWith functionality', () {
       final original = TransactionOutput(
-        address: address,
+        address: testnetAddr,
         amount: value,
         datumOption: datumOptionHash,
       );
@@ -152,7 +149,7 @@ void main() {
 
       expect(modified.datumOption, equals(datumOptionData));
       expect(modified.scriptRef, equals(scriptRef));
-      expect(modified.address, equals(address));
+      expect(modified.address, equals(testnetAddr));
       expect(modified.amount, equals(value));
       expect(modified.datumOption, isNot(equals(datumOptionHash)));
     });

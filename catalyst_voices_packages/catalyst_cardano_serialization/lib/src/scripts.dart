@@ -120,7 +120,7 @@ sealed class NativeScript extends Script {
         throw ArgumentError.value(
           value,
           'type',
-          'Invalid NativScript type value $e.',
+          'Invalid NativeScript type value $e.',
         );
       }
     } else {
@@ -210,7 +210,7 @@ sealed class NativeScript extends Script {
   }
 }
 
-/// Class representing a publickey based native script.
+/// Class representing a public key based native script.
 class ScriptPubkey extends NativeScript {
   /// Public key hash.
   final Uint8List addrKeyhash;

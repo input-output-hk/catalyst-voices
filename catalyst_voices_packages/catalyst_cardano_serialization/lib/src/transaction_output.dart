@@ -120,7 +120,7 @@ final class DatumHash extends Datum {
 /// This is useful when you want to include data directly in the transaction
 /// output.
 final class Data extends Datum {
-  // TODO(ilap): Requires a proper plutus data type imlementation.
+  // TODO(ilap): Requires a proper plutus data type implementation.
   /// CBOR-encoded data associated with this [Data] object.
   final CborValue data;
 

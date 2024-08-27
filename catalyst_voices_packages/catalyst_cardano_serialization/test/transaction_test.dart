@@ -130,8 +130,8 @@ void main() {
           'b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855ffffff'
           'ff821a000b0a3d1a106ae424f5f6';
 
-      final serialised = cbor.decode(hex.decode(hex1));
-      final tx = Transaction.fromCbor(serialised);
+      final serialized = cbor.decode(hex.decode(hex1));
+      final tx = Transaction.fromCbor(serialized);
       final hex2 = hex.encode(cbor.encode(tx.toCbor()));
       expect(hex1, equals(hex2));
     });

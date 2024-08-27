@@ -80,7 +80,7 @@ final class TransactionBody extends Equatable implements CborEncodable {
   final SlotBigNum? ttl;
 
   /// Certificates in an ordered set. tag: 4
-  /// Withdrawals map of stake addres, coin. tag: 5
+  /// Withdrawals map of stake address, coin. tag: 5
 
   /// The hash of the optional [AuxiliaryData]
   /// which is the metadata of the transaction. tag: 7
@@ -116,13 +116,6 @@ final class TransactionBody extends Equatable implements CborEncodable {
 
   /// Reference inputs as nonempty set of transaction inputs. tag: 18
   final Set<TransactionInput>? referenceInputs;
-
-  /// Voting procedures as complex Map of voter, gov action id and voting
-  /// procedure. tag: 19
-
-  /// Proposal procedures ordered non-empty set of proposal procedures. tag: 20
-  /// Current treasury value as coiun (uint64). tag: 21
-  /// Donation as positive (>0) coin (uint64). tag: 22
 
   /// The default constructor for [TransactionBody].
   const TransactionBody({
