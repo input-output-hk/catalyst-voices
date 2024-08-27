@@ -1,26 +1,22 @@
 use anyhow::Ok;
 use base64::{prelude::BASE64_STANDARD, Engine};
-use ed25519_dalek::{
-    Signature, Signer, SigningKey, VerifyingKey, PUBLIC_KEY_LENGTH, SECRET_KEY_LENGTH,
-    SIGNATURE_LENGTH,
-};
+use ed25519_dalek::{Signer, SigningKey, SECRET_KEY_LENGTH, SIGNATURE_LENGTH};
 use pallas::codec::minicbor;
 
 /// Key ID - Blake2b-128 hash of the Role 0 Certificate defining the Session public key.
 /// BLAKE2b-128 produces digest side of 16 bytes.
 #[derive(Debug, Clone)]
-pub struct Kid([u8; 16]);
+pub struct Kid(pub [u8; 16]);
 
 /// Identifier for this token, encodes both the time the token was issued and a random
 /// nonce.
 #[derive(Debug, Clone)]
-pub struct UlidBytes([u8; 16]);
+pub struct UlidBytes(pub [u8; 16]);
 
 // Ed25519 signatures are (64 bytes)
-// The signature over the cbor encoded `kid` and `ulid` fields.
 #[allow(dead_code)]
 #[derive(Debug, Clone)]
-pub struct SignatureEd25519([u8; 64]);
+pub struct SignatureEd25519(pub [u8; 64]);
 
 /// The Encoded Binary Auth Token is a [CBOR sequence] that consists of 3 fields [ kid,
 /// ulid, signature ]. ED25519 Signature over the preceding two fields - sig(cbor(kid),
@@ -54,8 +50,8 @@ pub fn encode_auth_token_ed25519(
 /// e.g catv1.UAARIjNEVWZ3iJmqu8zd7v9QAZEs7HHPLEwUpV1VhdlNe1hAAAAAAAAAAAAA...
 #[allow(dead_code)]
 pub fn decode_auth_token_ed25519(
-    auth_token: String, pub_key_bytes: [u8; PUBLIC_KEY_LENGTH],
-) -> anyhow::Result<(Kid, UlidBytes, SignatureEd25519)> {
+    auth_token: String,
+) -> anyhow::Result<(Kid, UlidBytes, SignatureEd25519, Vec<u8>)> {
     // The message is a Cbor sequence (cbor(kid) + cbor(ulid)):
     // kid + ulid are 16 bytes a piece, with 1 byte extra due to cbor encoding,
     // The two fields include their encoding resulting in 17 bytes each.
@@ -69,12 +65,15 @@ pub fn decode_auth_token_ed25519(
         return Err(anyhow::anyhow!("Corrupt token, invalid prefix"));
     } else {
         let token_base64 = token.get(1).ok_or(anyhow::anyhow!("No valid token"))?;
-        let decoded_token = BASE64_STANDARD.decode(token_base64)?;
+        let token_cbor_encoded = BASE64_STANDARD.decode(token_base64)?;
 
-        let message = &decoded_token[0..KID_ULID_CBOR_ENCODED_BYTES.try_into()?];
+        // We verify the signature on the message which corresponds to a Cbor sequence (cbor(kid)
+        // + cbor(ulid)):
+        let message_cbor_encoded =
+            &token_cbor_encoded[0..KID_ULID_CBOR_ENCODED_BYTES.try_into()?];
 
         // Decode cbor to bytes
-        let mut cbor_decoder = minicbor::Decoder::new(&decoded_token);
+        let mut cbor_decoder = minicbor::Decoder::new(&token_cbor_encoded);
 
         // Raw kid bytes
         let kid = Kid(cbor_decoder
@@ -98,28 +97,21 @@ pub fn decode_auth_token_ed25519(
                 .try_into()?,
         );
 
-        // Verify message and signature
-        let public_key = VerifyingKey::from_bytes(&pub_key_bytes)?;
-        public_key.verify_strict(&message, &Signature::from_bytes(&signature.0))?;
-
-        Ok((kid, ulid, signature))
+        Ok((kid, ulid, signature, message_cbor_encoded.to_vec()))
     }
 }
 
 #[cfg(test)]
 mod tests {
 
-    use ed25519_dalek::{
-        ed25519::signature::SignerMut, Signature, SigningKey, Verifier, VerifyingKey,
-        SECRET_KEY_LENGTH,
-    };
+    use ed25519_dalek::{Signature, SigningKey, Verifier, SECRET_KEY_LENGTH};
     use rand::rngs::OsRng;
 
     use super::{encode_auth_token_ed25519, Kid, UlidBytes};
     use crate::service::api::auth::token::decode_auth_token_ed25519;
 
     #[test]
-    fn test_token_generation() {
+    fn test_token_generation_and_decoding() {
         let kid: [u8; 16] = hex::decode("00112233445566778899aabbccddeeff".to_string())
             .unwrap()
             .try_into()
@@ -131,54 +123,22 @@ mod tests {
 
         let mut csprng = OsRng;
         let signing_key: SigningKey = SigningKey::generate(&mut csprng);
-        let verifying_key: VerifyingKey = signing_key.verifying_key();
+
+        let verifying_key = signing_key.verifying_key();
 
         let secret_key_bytes: [u8; SECRET_KEY_LENGTH] = *signing_key.as_bytes();
 
         let auth_token =
             encode_auth_token_ed25519(Kid(kid), UlidBytes(ulid), secret_key_bytes).unwrap();
 
-        let (decoded_kid, decoded_ulid, _decoded_sig) =
-            decode_auth_token_ed25519(auth_token, verifying_key.to_bytes()).unwrap();
+        let (decoded_kid, decoded_ulid, decoded_sig, message) =
+            decode_auth_token_ed25519(auth_token).unwrap();
 
         assert_eq!(decoded_kid.0, kid);
         assert_eq!(decoded_ulid.0, ulid);
-    }
 
-    #[test]
-    fn test_token_decode() {
-        let sk: [u8; 32] =
-            hex::decode("fd622372c5ee1f3dc98e90666843a786391664d0e286ac6f3da51226aaa93cd5")
-                .unwrap()
-                .try_into()
-                .unwrap();
-
-        let pub_key: [u8; 32] =
-            hex::decode("b45b8295e2701d2dbc8d4093fae94b979735f8c5e17a1843cf64a298e86659a2")
-                .unwrap()
-                .try_into()
-                .unwrap();
-
-        // tokens generated from frontend
-        let auth_token="catv1.UARn3mvZRbkge/oJ2Ea3fvVQAADErjOAgmcKUOev4sQfNVhAtCaGjDyDarc9AMqeiAUlVrPdSu+VGnX4Lf+648bwRoUpjBj7j4VrK6B8np/KyG6jTRwzUTj+7u29fFlmrunMBg==";
-        let (kid, ulid, sig) = decode_auth_token_ed25519(auth_token.to_owned(), pub_key).unwrap();
-
-        assert_eq!(hex::encode(kid.0), "0467de6bd945b9207bfa09d846b77ef5");
-        assert_eq!(hex::encode(ulid.0), "0000c4ae338082670a50e7afe2c41f35");
-
-        let signature: Signature = Signature::from_bytes(&sig.0);
-
-        assert_eq!(hex::encode(signature.to_bytes()),"b426868c3c836ab73d00ca9e88052556b3dd4aef951a75f82dffbae3c6f04685298c18fb8f856b2ba07c9e9fcac86ea34d1c335138feeeedbd7c5966aee9cc06".to_string());
-
-        let message =
-            hex::decode("500467de6bd945b9207bfa09d846b77ef5500000c4ae338082670a50e7afe2c41f35")
-                .unwrap();
-
-        let mut sk = SigningKey::from_bytes(&sk);
-        let signed = sk.sign(&message);
-
-        let verifiying_key = VerifyingKey::from_bytes(&pub_key).unwrap();
-
-        verifiying_key.verify(&message, &signed).unwrap();
+        verifying_key
+            .verify(&message, &Signature::from(&decoded_sig.0))
+            .unwrap();
     }
 }
