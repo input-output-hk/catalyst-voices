@@ -67,7 +67,8 @@ impl ResponseError for AuthTokenError {
     }
 }
 
-/// When added to an endpoint, this hook is called per request to verify the bearer token is valid.
+/// When added to an endpoint, this hook is called per request to verify the bearer token
+/// is valid.
 async fn checker_api_catalyst_auth(
     _req: &Request, bearer: Bearer,
 ) -> poem::Result<DecodedAuthToken> {
