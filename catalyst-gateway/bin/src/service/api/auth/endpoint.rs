@@ -10,7 +10,7 @@ use tracing::error;
 use super::token::{Kid, SignatureEd25519, UlidBytes};
 use crate::service::api::auth::token::decode_auth_token_ed25519;
 
-/// Decoded token consists ok Kid, Ulid and Signature
+/// Decoded token consists of a Kid, Ulid and Signature
 pub type DecodedAuthToken = (Kid, UlidBytes, SignatureEd25519);
 
 /// Auth token in the form of catv1..
