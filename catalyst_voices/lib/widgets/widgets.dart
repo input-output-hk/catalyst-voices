@@ -13,6 +13,7 @@ export 'indicators/process_progress_indicator.dart';
 export 'indicators/voices_circular_progress_indicator.dart';
 export 'indicators/voices_linear_progress_indicator.dart';
 export 'indicators/voices_status_indicator.dart';
+export 'menu/voices_menu.dart';
 export 'seed_phrase/seed_phrases_completer.dart';
 export 'seed_phrase/seed_phrases_picker.dart';
 export 'seed_phrase/seed_phrases_sequencer.dart';

@@ -11,6 +11,7 @@ import 'package:uikit_example/examples/voices_checkbox_example.dart';
 import 'package:uikit_example/examples/voices_chip_example.dart';
 import 'package:uikit_example/examples/voices_fab_example.dart';
 import 'package:uikit_example/examples/voices_indicators_example.dart';
+import 'package:uikit_example/examples/voices_menu_example.dart';
 import 'package:uikit_example/examples/voices_navigation_example.dart';
 import 'package:uikit_example/examples/voices_radio_example.dart';
 import 'package:uikit_example/examples/voices_seed_phrase_example.dart';
@@ -121,6 +122,11 @@ class ExamplesListPage extends StatelessWidget {
         title: 'Voices Tooltips',
         route: VoicesTooltipsExample.route,
         page: VoicesTooltipsExample(),
+      ),
+      ExampleTile(
+        title: 'Voices Menu',
+        route: VoicesMenuExample.route,
+        page: VoicesMenuExample(),
       ),
     ];
   }
