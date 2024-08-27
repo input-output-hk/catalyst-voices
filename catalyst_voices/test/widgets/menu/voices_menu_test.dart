@@ -8,24 +8,34 @@ import '../../helpers/helpers.dart';
 void main() {
   final menu = [
     MenuItem(
+      id: 1,
       label: 'Rename',
       icon: CatalystVoicesIcons.pencil,
     ),
     SubMenuItem(
+      id: 2,
       label: 'Move Private Team',
       icon: CatalystVoicesIcons.switch_horizontal,
       children: [
-        MenuItem(label: 'Team 1: The Vikings'),
-        MenuItem(label: 'Team 2: Pure Hearts'),
+        MenuItem(
+          id: 3,
+          label: 'Team 1: The Vikings',
+        ),
+        MenuItem(
+          id: 4,
+          label: 'Team 2: Pure Hearts',
+        ),
       ],
     ),
     MenuItem(
+      id: 5,
       label: 'Move to public',
       icon: CatalystVoicesIcons.switch_horizontal,
       showDivider: true,
       enabled: false,
     ),
     MenuItem(
+      id: 6,
       label: 'Delete',
       icon: CatalystVoicesIcons.trash,
     ),
