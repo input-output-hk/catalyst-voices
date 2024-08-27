@@ -18,15 +18,13 @@ pub type EncodedAuthToken = String;
 
 /// Cached auth tokens
 static CACHE: LazyLock<Cache<EncodedAuthToken, DecodedAuthToken>> = LazyLock::new(|| {
-    let cache = Cache::builder()
+    Cache::builder()
         // Time to live (TTL): 30 minutes
         .time_to_live(Duration::from_secs(30 * 60))
         // Time to idle (TTI):  5 minutes
         .time_to_idle(Duration::from_secs(5 * 60))
         // Create the cache.
-        .build();
-
-    cache
+        .build()
 });
 
 /// Mocked Valid certificates
