@@ -298,7 +298,7 @@ final class TransactionBuilder extends Equatable {
     required Balance changeEstimator,
   }) {
     final minAda = TransactionOutputBuilder.minimumAdaForOutput(
-      PreBabbageTransactionOutput(
+      TransactionOutput(
         address: address,
         amount: changeEstimator,
       ),
@@ -312,7 +312,7 @@ final class TransactionBuilder extends Equatable {
       case true:
         final feeForChange = TransactionOutputBuilder.feeForOutput(
           this,
-          PreBabbageTransactionOutput(
+          TransactionOutput(
             address: address,
             amount: changeEstimator,
           ),
@@ -326,7 +326,7 @@ final class TransactionBuilder extends Equatable {
             return withFee(changeEstimator.coin);
           case true:
             return withFee(newFee).withOutput(
-              PreBabbageTransactionOutput(
+              TransactionOutput(
                 address: address,
                 amount: changeEstimator - Balance(coin: newFee),
               ),
@@ -359,7 +359,7 @@ final class TransactionBuilder extends Equatable {
       ),
     );
 
-    final outputWithExtraMultiAssets = PreBabbageTransactionOutput(
+    final outputWithExtraMultiAssets = TransactionOutput(
       address: output.address,
       amount: output.amount + valueWithExtraMultiAssets,
     );
@@ -389,8 +389,7 @@ final class TransactionBuilder extends Equatable {
 
     final changeAssets = <MultiAsset>[];
     var baseCoin = Balance(coin: changeEstimator.coin);
-    var output =
-        PreBabbageTransactionOutput(address: changeAddress, amount: baseCoin);
+    var output = TransactionOutput(address: changeAddress, amount: baseCoin);
 
     for (final policy in baseMultiAsset.bundle.entries) {
       var oldAmount = output.amount;
@@ -421,7 +420,7 @@ final class TransactionBuilder extends Equatable {
 
           // 2. create a new output with the base coin value as zero
           baseCoin = const Balance.zero();
-          output = PreBabbageTransactionOutput(
+          output = TransactionOutput(
             address: changeAddress,
             amount: baseCoin,
           );
@@ -552,7 +551,7 @@ final class TransactionOutputBuilder {
     required MultiAsset multiAsset,
     required Coin coinsPerUtxoByte,
   }) {
-    final minOutput = PreBabbageTransactionOutput(
+    final minOutput = TransactionOutput(
       address: address,
       amount: const Balance.zero(),
     );
@@ -567,7 +566,7 @@ final class TransactionOutputBuilder {
     );
 
     final requiredCoin = minimumAdaForOutput(checkOutput, coinsPerUtxoByte);
-    return PreBabbageTransactionOutput(
+    return TransactionOutput(
       address: address,
       amount: Balance(coin: requiredCoin, multiAsset: multiAsset),
     );
