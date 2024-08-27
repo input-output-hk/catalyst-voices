@@ -6,7 +6,7 @@ packages:
   - catalyst_voices/uikit_example
   - catalyst_voices/packages/**
   - catalyst_voices_packages/**
-  - utilities/*
+  - utilities/**
 
 command:
   version:

@@ -50,8 +50,7 @@ dependencies:
 dev_dependencies:
   build_runner: ^2.3.3
   build_verify: ^3.1.0
-  catalyst_analysis:
-    path: ../catalyst_voices_packages/catalyst_analysis
+  catalyst_analysis: ^1.2.0
   flutter_test:
     sdk: flutter
   go_router_builder: ^2.4.1
