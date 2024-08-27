@@ -25,7 +25,7 @@ flutter:
       fonts:
         - asset: assets/fonts/SF-Pro-Rounded-Regular.ttf
           weight: 600
-    - family:  CatalystVoicesIcons
+    - family: CatalystVoicesIcons
       fonts:
         - asset: internal_resources/fonts/CatalystVoicesIcons.ttf
 
