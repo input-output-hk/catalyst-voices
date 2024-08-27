@@ -6,7 +6,7 @@ topics: [cryptography, encryption, codec]
 version: 0.2.0
 
 environment:
-  sdk: ">=3.3.4 <4.0.0"
+  sdk: ">=3.5.0 <4.0.0"
 
 dependencies:
   cbor: ^6.2.0

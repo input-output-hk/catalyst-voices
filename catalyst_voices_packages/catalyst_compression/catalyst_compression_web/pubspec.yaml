@@ -6,8 +6,8 @@ topics: [compression, codec]
 version: 0.2.0
 
 environment:
-  sdk: ">=3.3.4 <4.0.0"
-  flutter: ">=3.22.1"
+  sdk: ">=3.5.0 <4.0.0"
+  flutter: ">=3.24.1"
 
 flutter:
   plugin:
