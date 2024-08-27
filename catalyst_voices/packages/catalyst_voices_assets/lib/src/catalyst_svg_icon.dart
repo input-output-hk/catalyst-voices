@@ -2,7 +2,7 @@ import 'package:catalyst_voices_assets/src/catalyst_svg_picture.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-/// Builds and svg icon using [SvgPicture] via [CatalystSvgPicture] but on
+/// Builds an svg icon using [SvgPicture] via [CatalystSvgPicture] but on
 /// top of that extracts configuration from [IconTheme] like
 /// [IconThemeData.size] or [IconThemeData.color] and applies those if not
 /// specified directly in [size] or [colorFilter].
