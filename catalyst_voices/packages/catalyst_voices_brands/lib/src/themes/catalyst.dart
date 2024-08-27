@@ -307,6 +307,12 @@ ThemeData _buildThemeData(
     ),
     textTheme: textTheme,
     colorScheme: colorScheme,
+    iconTheme: IconThemeData(
+      color: voicesColorScheme.iconsForeground,
+    ),
+    primaryIconTheme: IconThemeData(
+      color: colorScheme.onPrimary,
+    ),
     extensions: <ThemeExtension<dynamic>>[
       voicesColorScheme,
       brandAssets,
