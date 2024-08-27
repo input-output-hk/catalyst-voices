@@ -121,8 +121,8 @@ mod tests {
             .try_into()
             .unwrap();
 
-        let mut csprng = OsRng;
-        let signing_key: SigningKey = SigningKey::generate(&mut csprng);
+        let mut random_seed = OsRng;
+        let signing_key: SigningKey = SigningKey::generate(&mut random_seed);
 
         let verifying_key = signing_key.verifying_key();
 

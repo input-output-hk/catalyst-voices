@@ -99,7 +99,7 @@ async fn checker_api_catalyst_auth(
             },
         };
 
-        // Strictly verify a signature on a message with this keypair's public key.
+        // Strictly verify a signature on a message with this keypair public key.
         match public_key.verify_strict(&msg, &Signature::from_bytes(&sig.0)) {
             Ok(_) => (),
             Err(err) => {
