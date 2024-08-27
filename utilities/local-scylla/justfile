@@ -11,6 +11,11 @@ scylla-dev-db:
     HOST_IP="{{host_ip}}" \
     docker compose up
 
+# Stop the scylla development DB
+scylla-dev-db-stop:
+    HOST_IP="{{host_ip}}" \
+    docker compose down
+
 # Reset the cluster storage and start a new dev scylla cluster
 scylla-dev-db-reset: scylla-dev-db-purge scylla-dev-db
 
