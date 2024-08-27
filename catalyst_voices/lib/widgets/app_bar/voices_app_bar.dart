@@ -24,6 +24,7 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.isNavVisible = true,
     this.actions = const [],
   });
+
   @override
   Widget build(BuildContext context) {
     return ResponsiveBuilder<double>(
@@ -38,11 +39,7 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
                 padding: EdgeInsets.only(top: 8, bottom: 8, left: data),
                 child: IconButton(
                   color: Theme.of(context).colors.iconsForeground,
-                  onPressed: () {
-                    context
-                        .findAncestorStateOfType<ScaffoldState>()
-                        ?.openDrawer();
-                  },
+                  onPressed: () => Scaffold.of(context).openDrawer(),
                   icon: const Icon(CatalystVoicesIcons.menu),
                 ),
               )
