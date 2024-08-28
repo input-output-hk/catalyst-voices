@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 
+/// A component for rich text writing
+/// using Quill under the hood
+/// https://pub.dev/packages/flutter_quill
 class VoicesRichText extends StatefulWidget {
   const VoicesRichText({super.key});
 
