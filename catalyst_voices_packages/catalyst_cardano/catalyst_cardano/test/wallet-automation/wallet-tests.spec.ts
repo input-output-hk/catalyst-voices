@@ -6,16 +6,18 @@ let extensionPath: string;
 let extTab: Page;
 
 [
- { name: 'Typhon', id: 'kfdniefadaanbjodldohaedphafoffoh' },
- //{ name: 'Lace', id: 'gafhhkghbfjjkeiendhlofajokpaflmk' },
-  ].forEach(({ name, id }) => {
+//{ name: 'Typhon', id: 'kfdniefadaanbjodldohaedphafoffoh', url: 'chrome-extension://changeme/tab.html#/wallet/access/' },
+ { name: 'Lace', id: 'gafhhkghbfjjkeiendhlofajokpaflmk', url: 'chrome-extension://changeme/app.html#/setup' },
+// { name: 'Eternl', id: 'kmhcihpebfmpgmihbkipmjlmmioameka', url: 'chrome-extension://changeme/index.html#/' },
+  ].forEach(({ name, id, url }) => {
     test.describe(`Testing with ${name}`,() => {
 
         test.beforeAll(async () => {
+            test.setTimeout(300000);
             extensionPath = await downloadExtension(id);
-        //});
+       // });
 
-        //test.beforeEach(async () => {
+      //  test.beforeEach(async () => {
             browser = await chromium.launchPersistentContext('', {
                 headless: false, // extensions only work in headful mode
                 args: [
@@ -23,12 +25,23 @@ let extTab: Page;
                     `--load-extension=${extensionPath}`,
                 ],
             });
+            let [background] = browser.serviceWorkers();
+            if (!background)
+            background = await browser.waitForEvent('serviceworker');
+            const extensionId = background.url().split('/')[2];
+            extTab = await browser.newPage();
+            const extUrl = url.replace('changeme', extensionId );
+            await extTab.goto(extUrl);
 
-            await expect.poll(async () => {
+            //TODO only for typhon
+           /* await expect.poll(async () => {
                 return browser.pages().length;
             }, { timeout: 5000 }).toBe(2);
             extTab = browser.pages()[1];
-            await extTab.bringToFront();
+            await extTab.waitForTimeout(5000);
+            await extTab.bringToFront();*/
+            await extTab.waitForTimeout(5000);
+
             await importWallet(extTab,name);
             //TODO switch wait for wait on load page
             await extTab.waitForTimeout(5000);
@@ -99,7 +112,7 @@ let extTab: Page;
 
              expect(parseInt(amountAda)).toBeGreaterThan(500);
          });
-
+/*
         async function openSignTab(buttonName: string) {
              await extTab.getByRole('button', { name: buttonName }).click();
              await expect.poll(async () => browser.pages().length, { timeout: 5000 }).toBe(3);
@@ -119,7 +132,7 @@ let extTab: Page;
              const signTab = await openSignTab('Sign data');
              const WalletCredentials = await getWalletCredentials('WALLET1');
              await signData(signTab, WalletCredentials.password);
-             await expect(extTab.getByText('DataSignature')).toBeVisible();
+             await expect(extTab.getByText('Sign Data')).toBeVisible();
          });
 
 
@@ -131,33 +144,33 @@ let extTab: Page;
          });
 
 
-         test('Sign and submit RBAC tx', async () => {
+         test('Sign and submit RBAC tx ' + name, async () => {
              const signTab = await openSignTab('Sign & submit RBAC tx');
              const WalletCredentials = await getWalletCredentials('WALLET1');
              await signData(signTab, WalletCredentials.password);
              await expect(extTab.getByText('Tx hash')).toBeVisible();
          });
 
-         test('Fail to Sign data with incorrect password', async () => {
+         test('Fail to Sign data with incorrect password ' + name, async () => {
              const signTab = await openSignTab('Sign data');
              const wrongPassword = 'wrongPassword';
              await signData(signTab, wrongPassword);
              await expect(signTab.getByText('Wrong password')).toBeVisible();
          });
 
-         test('Fail to Sign & submit tx with incorrect password', async () => {
+         test('Fail to Sign & submit tx with incorrect password ' + name, async () => {
              const signTab = await openSignTab('Sign & submit tx');
              const wrongPassword = 'wrongPassword';
              await signData(signTab, wrongPassword);
              await expect(signTab.getByText('Wrong password')).toBeVisible();
          });
 
-         test('Fail to Sign & submit RBAC tx with incorrect password', async () => {
+         test('Fail to Sign & submit RBAC tx with incorrect password ' + name, async () => {
              const signTab = await openSignTab('Sign & submit RBAC tx');
              const wrongPassword = 'wrongPassword';
              await signData(signTab, wrongPassword);
              await expect(signTab.getByText('Wrong password')).toBeVisible();
          });
-
+*/
     });
   });

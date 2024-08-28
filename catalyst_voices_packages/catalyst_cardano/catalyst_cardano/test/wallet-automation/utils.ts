@@ -2,7 +2,7 @@ import * as fs from 'fs/promises';
 import * as fsi from 'fs';
 import path from 'path';
 import nodeFetch from "node-fetch";
-import { Page } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 
 interface WalletCredentials {
   username: string;
@@ -99,11 +99,34 @@ export { typhonImportWallet };
 
 
 const laceImportWallet = async (tab: Page): Promise<void> => {
+  await tab.getByRole('button', { name: 'Agree' }).click();
+  await tab.getByRole('button', { name: 'Restore' }).click();
+  await tab.getByRole('button', { name: 'Next' }).click();
+  await tab.getByTestId('recovery-phrase-15').click();
+  const seedPhrase = await getSeedPhrase();
+    for (let i = 0; i < seedPhrase.length; i++) {
+        const ftSeedPhraseSelector = `//*[@id="mnemonic-word-${i + 1}"]`;
+        await tab.locator(ftSeedPhraseSelector).fill(seedPhrase[i]);
+    }
+  await tab.getByRole('button', { name: 'Next' }).click();
+  const WalletCredentials = await getWalletCredentials('WALLET1');
+  await tab.getByTestId('wallet-name-input').fill(WalletCredentials.username);
+  await tab.getByTestId('wallet-password-verification-input').fill(WalletCredentials.password);
+  await tab.getByTestId('wallet-password-confirmation-input').fill(WalletCredentials.password);
+  await tab.getByRole('button', { name: 'Open wallet' }).click();
+  //Lace is very slow at loading
+  await tab.getByTestId('profile-dropdown-trigger-menu').click({timeout: 300000});
+  await tab.getByTestId('header-menu-network-choice-label').click();
+  await tab.getByTestId('network-preprod-radio-button').click();
 
 };
 
 export { laceImportWallet };
 
+const eternlImportWallet = async (tab: Page): Promise<void> => {
+};
+
+export { eternlImportWallet };
 
 const importWallet = async (tab: Page, wallet: string): Promise<void> => {
   switch (wallet) {
@@ -113,6 +136,9 @@ const importWallet = async (tab: Page, wallet: string): Promise<void> => {
     case 'Lace':
       await laceImportWallet(tab);
       break;
+    case 'Eternl':
+      await eternlImportWallet(tab);
+      break;
     default:
       throw new Error('Wallet not in use')
   }
@@ -120,7 +146,6 @@ const importWallet = async (tab: Page, wallet: string): Promise<void> => {
 }
 
 export { importWallet };
-
 
 const allowExtension = async (tab: Page, wallet: string): Promise<void> => {
   switch (wallet) {
@@ -130,6 +155,9 @@ const allowExtension = async (tab: Page, wallet: string): Promise<void> => {
     case 'Lace':
       console.log('Not implemented yet');
       break;
+    case 'Eternl':
+        console.log('Not implemented yet');
+        break;
     default:
       throw new Error('Wallet not in use')
   }
