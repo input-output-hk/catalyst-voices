@@ -93,7 +93,7 @@ async fn checker_api_catalyst_auth(
 
         // Get pub key from CERTS state given decoded KID from decoded bearer token
         let pub_key_bytes = if let Some(cert) = CERTS.get(&hex::encode(kid.0)) {
-            cert.clone()
+            *cert
         } else {
             error!("Invalid KID {:?}", kid);
             Err(AuthTokenError)?
@@ -108,23 +108,20 @@ async fn checker_api_catalyst_auth(
         };
 
         // Strictly verify a signature on a message with this keypair public key.
-        match public_key.verify_strict(&msg, &Signature::from_bytes(&sig.0)) {
-            Ok(_) => (),
-            Err(err) => {
-                error!(
-                    "Message {:?} was not signed by this keypair {:?} {:?}",
-                    hex::encode(msg),
-                    public_key,
-                    err
-                );
-                Err(AuthTokenError)?
-            },
-        };
+        if public_key
+            .verify_strict(&msg, &Signature::from_bytes(&sig.0))
+            .is_err()
+        {
+            error!(
+                "Message {:?} was not signed by this keypair {:?}",
+                hex::encode(msg),
+                public_key,
+            );
+            Err(AuthTokenError)?;
+        }
 
         // This entry will expire after 5 minutes (TTI) if there is no get().
-        CACHE
-            .insert(bearer.token, (kid.clone(), ulid.clone(), sig.clone()))
-            .await;
+        CACHE.insert(bearer.token, (kid, ulid, sig.clone())).await;
 
         Ok((kid, ulid, sig))
     }

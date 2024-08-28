@@ -5,16 +5,15 @@ use pallas::codec::minicbor;
 
 /// Key ID - Blake2b-128 hash of the Role 0 Certificate defining the Session public key.
 /// BLAKE2b-128 produces digest side of 16 bytes.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Kid(pub [u8; 16]);
 
 /// Identifier for this token, encodes both the time the token was issued and a random
 /// nonce.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct UlidBytes(pub [u8; 16]);
 
-// Ed25519 signatures are (64 bytes)
-#[allow(dead_code)]
+/// Ed25519 signatures are (64 bytes)
 #[derive(Debug, Clone)]
 pub struct SignatureEd25519(pub [u8; 64]);
 
@@ -23,7 +22,7 @@ pub struct SignatureEd25519(pub [u8; 64]);
 /// cbor(ulid))
 #[allow(dead_code)]
 pub fn encode_auth_token_ed25519(
-    kid: Kid, ulid: UlidBytes, secret_key_bytes: [u8; SECRET_KEY_LENGTH],
+    kid: &Kid, ulid: &UlidBytes, secret_key_bytes: [u8; SECRET_KEY_LENGTH],
 ) -> anyhow::Result<String> {
     /// Auth token prefix as per spec
     const AUTH_TOKEN_PREFIX: &str = "catv1";
@@ -53,14 +52,14 @@ pub fn encode_auth_token_ed25519(
 pub fn decode_auth_token_ed25519(
     auth_token: &str,
 ) -> anyhow::Result<(Kid, UlidBytes, SignatureEd25519, Vec<u8>)> {
-    // The message is a Cbor sequence (cbor(kid) + cbor(ulid)):
-    // kid + ulid are 16 bytes a piece, with 1 byte extra due to cbor encoding,
-    // The two fields include their encoding resulting in 17 bytes each.
+    /// The message is a Cbor sequence (cbor(kid) + cbor(ulid)):
+    /// kid + ulid are 16 bytes a piece, with 1 byte extra due to cbor encoding,
+    /// The two fields include their encoding resulting in 17 bytes each.
     const KID_ULID_CBOR_ENCODED_BYTES: u8 = 34;
-    // Auth token prefix
+    /// Auth token prefix
     const AUTH_TOKEN_PREFIX: &str = "catv1";
 
-    let token = auth_token.split(".").collect::<Vec<&str>>();
+    let token = auth_token.split('.').collect::<Vec<&str>>();
 
     let prefix = token.first().ok_or(anyhow::anyhow!("No valid prefix"))?;
     if *prefix != AUTH_TOKEN_PREFIX {
@@ -131,7 +130,7 @@ mod tests {
         let secret_key_bytes: [u8; SECRET_KEY_LENGTH] = *signing_key.as_bytes();
 
         let auth_token =
-            encode_auth_token_ed25519(Kid(kid), UlidBytes(ulid), secret_key_bytes).unwrap();
+            encode_auth_token_ed25519(&Kid(kid), &UlidBytes(ulid), secret_key_bytes).unwrap();
 
         let (decoded_kid, decoded_ulid, decoded_sig, message) =
             decode_auth_token_ed25519(&auth_token).unwrap();
