@@ -100,14 +100,18 @@ pub(crate) fn mk_api() -> OpenApiService<(HealthApi, CardanoApi, LegacyApi), ()>
         for (name, ip) in &network_interfaces {
             if *name == "en0" {
                 let (address, desc) = match ip {
-                    IpAddr::V4(_) => (
-                        format!("http://{ip}:{port}"),
-                        "Server at local IPv4 address",
-                    ),
-                    IpAddr::V6(_) => (
-                        format!("http://[{ip}]:{port}"),
-                        "Server at local IPv6 address",
-                    ),
+                    IpAddr::V4(_) => {
+                        (
+                            format!("http://{ip}:{port}"),
+                            "Server at local IPv4 address",
+                        )
+                    },
+                    IpAddr::V6(_) => {
+                        (
+                            format!("http://[{ip}]:{port}"),
+                            "Server at local IPv6 address",
+                        )
+                    },
                 };
                 service = service.server(ServerObject::new(address).description(desc));
             }
