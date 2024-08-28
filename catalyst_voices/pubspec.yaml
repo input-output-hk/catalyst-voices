@@ -48,7 +48,7 @@ dependencies:
   url_strategy: ^0.2.0
 
 dev_dependencies:
-  build_runner: ^2.3.3
+  build_runner: ^2.4.12
   build_verify: ^3.1.0
   catalyst_analysis: ^1.2.0
   flutter_test:
