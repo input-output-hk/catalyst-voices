@@ -102,7 +102,7 @@ async fn checker_api_catalyst_auth(
             Ok(_) => (),
             Err(err) => {
                 error!(
-                    "Message {:?} was not signed by this pub key {:?} {:?}",
+                    "Message {:?} was not signed by this keypair {:?} {:?}",
                     hex::encode(msg),
                     public_key,
                     err
