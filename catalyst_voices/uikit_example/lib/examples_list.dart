@@ -14,6 +14,7 @@ import 'package:uikit_example/examples/voices_indicators_example.dart';
 import 'package:uikit_example/examples/voices_menu_example.dart';
 import 'package:uikit_example/examples/voices_navigation_example.dart';
 import 'package:uikit_example/examples/voices_radio_example.dart';
+import 'package:uikit_example/examples/voices_rich_text_example.dart';
 import 'package:uikit_example/examples/voices_seed_phrase_example.dart';
 import 'package:uikit_example/examples/voices_segmented_button_example.dart';
 import 'package:uikit_example/examples/voices_separators_example.dart';
@@ -22,7 +23,6 @@ import 'package:uikit_example/examples/voices_spaces_example.dart';
 import 'package:uikit_example/examples/voices_switch_example.dart';
 import 'package:uikit_example/examples/voices_text_field_example.dart';
 import 'package:uikit_example/examples/voices_tooltips_example.dart';
-import 'package:uikit_example/examples/voices_rich_text_example.dart';
 
 class ExamplesListPage extends StatelessWidget {
   static List<ExampleTile> get examples {
