@@ -32,7 +32,9 @@ linter:
     - avoid_positional_boolean_parameters
     - avoid_print
     - avoid_private_typedef_functions
-    - avoid_redundant_argument_values
+    # TODO(dtscalac) below lint rule crashes in dart 3.5.0+,
+    # disabled until https://github.com/dart-lang/sdk/issues/56561 is addressed
+    - avoid_redundant_argument_values: false
     - avoid_relative_lib_imports
     - avoid_renaming_method_parameters
     - avoid_return_types_on_setters
