@@ -29,12 +29,11 @@ class _VoicesRichTextState extends State<VoicesRichText> {
           child: QuillEditor.basic(
             configurations: QuillEditorConfigurations(
               controller: _controller,
-
               padding: const EdgeInsets.all(16),
-              placeholder: 'Start writing your text...'
+              placeholder: 'Start writing your text...',
             ),
           ),
-        )
+        ),
       ],
     );
   }
