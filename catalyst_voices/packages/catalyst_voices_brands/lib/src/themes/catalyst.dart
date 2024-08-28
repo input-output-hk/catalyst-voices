@@ -284,6 +284,7 @@ ThemeData _buildThemeData(
   return ThemeData(
     appBarTheme: AppBarTheme(
       backgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv1,
+      scrolledUnderElevation: 0,
     ),
     drawerTheme: DrawerThemeData(
       backgroundColor: voicesColorScheme.elevationsOnSurfaceNeutralLv0,
@@ -313,6 +314,7 @@ ThemeData _buildThemeData(
     primaryIconTheme: IconThemeData(
       color: colorScheme.onPrimary,
     ),
+    scaffoldBackgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv1,
     extensions: <ThemeExtension<dynamic>>[
       voicesColorScheme,
       brandAssets,

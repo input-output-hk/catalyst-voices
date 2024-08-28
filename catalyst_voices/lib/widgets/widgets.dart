@@ -8,6 +8,8 @@ export 'buttons/voices_text_button.dart';
 export 'chips/voices_chip.dart';
 export 'common/link_text.dart';
 export 'common/navigation_location.dart';
+export 'containers/space_container.dart';
+export 'containers/tracks_container.dart';
 export 'footers/links_page_footer.dart';
 export 'footers/standard_links_page_footer.dart';
 export 'indicators/process_progress_indicator.dart';

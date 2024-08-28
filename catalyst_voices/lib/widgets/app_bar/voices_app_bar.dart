@@ -20,12 +20,14 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? leading;
   final List<Widget> actions;
   final bool automaticallyImplyLeading;
+  final Color? backgroundColor;
 
   const VoicesAppBar({
     super.key,
     this.leading,
     this.actions = const [],
     this.automaticallyImplyLeading = true,
+    this.backgroundColor,
   });
 
   @override
@@ -41,6 +43,7 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
             leading: buildLeading(context),
             leadingWidth: 48.0 + spacing,
             automaticallyImplyLeading: false,
+            backgroundColor: backgroundColor,
             title: const _Title(),
             actions: [
               _Actions(children: actions),

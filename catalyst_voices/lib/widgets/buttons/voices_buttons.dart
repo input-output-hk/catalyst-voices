@@ -23,7 +23,7 @@ class NavigationPopButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesIconButton(
       onTap: () => unawaited(Navigator.maybeOf(context)?.maybePop()),
-      child: const Icon(CatalystVoicesIcons.arrow_left),
+      child: const Icon(CatalystVoicesIcons.arrow_narrow_left),
     );
   }
 }
