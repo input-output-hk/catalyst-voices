@@ -16,7 +16,77 @@ class VoicesTreasurySpace extends StatelessWidget {
         backgroundColor: Theme.of(context).colors.onSurfaceNeutralOpaqueLv0,
       ),
       drawer: const VoicesDrawer(children: []),
-      body: SpaceContainer(),
+      body: const SpaceContainer(
+        left: _CampaignBuilderPanel(),
+        right: _CampaignCommentsPanel(),
+        child: _ContentBody(),
+      ),
+    );
+  }
+}
+
+class _CampaignBuilderPanel extends StatelessWidget {
+  const _CampaignBuilderPanel();
+
+  @override
+  Widget build(BuildContext context) {
+    return SpaceSidePanel(
+      isLeft: true,
+      name: 'Campaign builder',
+      onCollapseTap: () {},
+      tabs: [
+        SpaceSidePanelTab(
+          name: 'Segments',
+          body: const Text('TODO_1'),
+        ),
+        SpaceSidePanelTab(
+          name: 'Tab',
+          body: const Text('TODO_2'),
+        ),
+      ],
+    );
+  }
+}
+
+class _CampaignCommentsPanel extends StatelessWidget {
+  const _CampaignCommentsPanel();
+
+  @override
+  Widget build(BuildContext context) {
+    return SpaceSidePanel(
+      isLeft: false,
+      name: 'Campaign comments',
+      onCollapseTap: () {},
+      tabs: [
+        SpaceSidePanelTab(
+          name: 'Comments',
+          body: const Text('TODO'),
+        ),
+      ],
+    );
+  }
+}
+
+class _ContentBody extends StatelessWidget {
+  const _ContentBody();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      padding: const EdgeInsets.only(top: 10),
+      itemBuilder: (context, index) {
+        if (index.isOdd) return const SizedBox(height: 16);
+
+        return Container(
+          height: 128,
+          decoration: BoxDecoration(
+            color: Theme.of(context).colors.onSurfaceNeutralOpaqueLv0,
+            borderRadius: BorderRadius.circular(28),
+          ),
+          alignment: Alignment.center,
+          child: Text(index.toString()),
+        );
+      },
     );
   }
 }

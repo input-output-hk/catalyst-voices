@@ -16,14 +16,47 @@ class DrawerToggleButton extends StatelessWidget {
   }
 }
 
+class LeftArrowButton extends StatelessWidget {
+  final VoidCallback? onTap;
+
+  const LeftArrowButton({
+    super.key,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesIconButton(
+      onTap: onTap,
+      child: const Icon(CatalystVoicesIcons.arrow_narrow_left),
+    );
+  }
+}
+
+class RightArrowButton extends StatelessWidget {
+  final VoidCallback? onTap;
+
+  const RightArrowButton({
+    super.key,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesIconButton(
+      onTap: onTap,
+      child: const Icon(CatalystVoicesIcons.arrow_narrow_right),
+    );
+  }
+}
+
 class NavigationPopButton extends StatelessWidget {
   const NavigationPopButton({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return VoicesIconButton(
+    return LeftArrowButton(
       onTap: () => unawaited(Navigator.maybeOf(context)?.maybePop()),
-      child: const Icon(CatalystVoicesIcons.arrow_narrow_left),
     );
   }
 }

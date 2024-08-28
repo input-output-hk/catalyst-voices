@@ -28,14 +28,7 @@ class TracksContainer extends StatelessWidget {
           child: leftRail,
         ),
         SizedBox(width: railsGap),
-        Expanded(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: childMaxWidth),
-              child: child,
-            ),
-          ),
-        ),
+        Expanded(child: child),
         SizedBox(width: railsGap),
         ConstrainedBox(
           constraints: BoxConstraints.tightFor(width: railWidth),

@@ -300,6 +300,10 @@ ThemeData _buildThemeData(
       space: 16,
       thickness: 1,
     ),
+    tabBarTheme: TabBarTheme(
+      dividerColor: colorScheme.primaryContainer,
+      tabAlignment: TabAlignment.start,
+    ),
     progressIndicatorTheme: ProgressIndicatorThemeData(
       color: colorScheme.primary,
       linearTrackColor: colorScheme.secondaryContainer,
