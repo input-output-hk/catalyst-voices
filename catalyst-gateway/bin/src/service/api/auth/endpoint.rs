@@ -53,7 +53,7 @@ static CERTS: LazyLock<DashMap<String, [u8; PUBLIC_KEY_LENGTH]>> = LazyLock::new
 )]
 #[allow(dead_code)]
 /// Auth token security scheme
-/// Add to endpoint params e.g async fn endpoint(&self, auth: CatalystSecurityScheme)
+/// Add to endpoint params e.g async fn endpoint(&self, auth: `CatalystSecurityScheme`)
 pub struct CatalystSecurityScheme(pub DecodedAuthToken);
 
 #[derive(Debug, thiserror::Error)]
@@ -71,9 +71,19 @@ impl ResponseError for AuthTokenError {
 async fn checker_api_catalyst_auth(
     _req: &Request, bearer: Bearer,
 ) -> poem::Result<DecodedAuthToken> {
-    if !CACHE.contains_key(&bearer.token) {
+    if CACHE.contains_key(&bearer.token) {
+        // This get() will extend the entry life for another 5 minutes.
+        // Even though we keep calling get(), the entry will expire
+        // after 30 minutes (TTL) from the origin insert().
+        if let Some((kid, ulid, sig)) = CACHE.get(&bearer.token).await {
+            Ok((kid, ulid, sig))
+        } else {
+            error!("Auth token is not in the cache: {:?}", bearer.token);
+            Err(AuthTokenError)?
+        }
+    } else {
         // Decode bearer token
-        let (kid, ulid, sig, msg) = match decode_auth_token_ed25519(bearer.token.clone()) {
+        let (kid, ulid, sig, msg) = match decode_auth_token_ed25519(&bearer.token.clone()) {
             Ok((kid, ulid, sig, msg)) => (kid, ulid, sig, msg),
             Err(err) => {
                 error!("Corrupt auth token: {:?}", err);
@@ -117,15 +127,5 @@ async fn checker_api_catalyst_auth(
             .await;
 
         Ok((kid, ulid, sig))
-    } else {
-        // This get() will extend the entry life for another 5 minutes.
-        // Even though we keep calling get(), the entry will expire
-        // after 30 minutes (TTL) from the origin insert().
-        if let Some((kid, ulid, sig)) = CACHE.get(&bearer.token).await {
-            Ok((kid, ulid, sig))
-        } else {
-            error!("Auth token is not in the cache: {:?}", bearer.token);
-            Err(AuthTokenError)?
-        }
     }
 }

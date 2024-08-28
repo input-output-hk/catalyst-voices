@@ -25,6 +25,7 @@ pub struct SignatureEd25519(pub [u8; 64]);
 pub fn encode_auth_token_ed25519(
     kid: Kid, ulid: UlidBytes, secret_key_bytes: [u8; SECRET_KEY_LENGTH],
 ) -> anyhow::Result<String> {
+    /// Auth token prefix as per spec
     const AUTH_TOKEN_PREFIX: &str = "catv1";
 
     let sk: SigningKey = SigningKey::from_bytes(&secret_key_bytes);
@@ -42,7 +43,7 @@ pub fn encode_auth_token_ed25519(
     Ok(format!(
         "{}.{}",
         AUTH_TOKEN_PREFIX,
-        BASE64_STANDARD.encode(&encoder.writer())
+        BASE64_STANDARD.encode(encoder.writer())
     ))
 }
 
@@ -50,7 +51,7 @@ pub fn encode_auth_token_ed25519(
 /// e.g catv1.UAARIjNEVWZ3iJmqu8zd7v9QAZEs7HHPLEwUpV1VhdlNe1hAAAAAAAAAAAAA...
 #[allow(dead_code)]
 pub fn decode_auth_token_ed25519(
-    auth_token: String,
+    auth_token: &str,
 ) -> anyhow::Result<(Kid, UlidBytes, SignatureEd25519, Vec<u8>)> {
     // The message is a Cbor sequence (cbor(kid) + cbor(ulid)):
     // kid + ulid are 16 bytes a piece, with 1 byte extra due to cbor encoding,
@@ -133,7 +134,7 @@ mod tests {
             encode_auth_token_ed25519(Kid(kid), UlidBytes(ulid), secret_key_bytes).unwrap();
 
         let (decoded_kid, decoded_ulid, decoded_sig, message) =
-            decode_auth_token_ed25519(auth_token).unwrap();
+            decode_auth_token_ed25519(&auth_token).unwrap();
 
         assert_eq!(decoded_kid.0, kid);
         assert_eq!(decoded_ulid.0, ulid);
