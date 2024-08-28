@@ -56,49 +56,50 @@ pub fn decode_auth_token_ed25519(
     // kid + ulid are 16 bytes a piece, with 1 byte extra due to cbor encoding,
     // The two fields include their encoding resulting in 17 bytes each.
     const KID_ULID_CBOR_ENCODED_BYTES: u8 = 34;
+    // Auth token prefix
     const AUTH_TOKEN_PREFIX: &str = "catv1";
 
     let token = auth_token.split(".").collect::<Vec<&str>>();
 
-    let prefix = token.get(0).ok_or(anyhow::anyhow!("No valid prefix"))?;
+    let prefix = token.first().ok_or(anyhow::anyhow!("No valid prefix"))?;
     if *prefix != AUTH_TOKEN_PREFIX {
         return Err(anyhow::anyhow!("Corrupt token, invalid prefix"));
-    } else {
-        let token_base64 = token.get(1).ok_or(anyhow::anyhow!("No valid token"))?;
-        let token_cbor_encoded = BASE64_STANDARD.decode(token_base64)?;
-
-        // We verify the signature on the message which corresponds to a Cbor sequence (cbor(kid)
-        // + cbor(ulid)):
-        let message_cbor_encoded =
-            &token_cbor_encoded[0..KID_ULID_CBOR_ENCODED_BYTES.try_into()?];
-
-        // Decode cbor to bytes
-        let mut cbor_decoder = minicbor::Decoder::new(&token_cbor_encoded);
-
-        // Raw kid bytes
-        let kid = Kid(cbor_decoder
-            .bytes()
-            .map_err(|e| anyhow::anyhow!(format!("Invalid cbor for kid : {e}")))?
-            .try_into()?);
-
-        // Raw ulid bytes
-        let ulid = UlidBytes(
-            cbor_decoder
-                .bytes()
-                .map_err(|e| anyhow::anyhow!(format!("Invalid cbor for ulid : {e}")))?
-                .try_into()?,
-        );
-
-        // Raw signature
-        let signature = SignatureEd25519(
-            cbor_decoder
-                .bytes()
-                .map_err(|e| anyhow::anyhow!(format!("Invalid cbor for sig : {e}")))?
-                .try_into()?,
-        );
-
-        Ok((kid, ulid, signature, message_cbor_encoded.to_vec()))
     }
+    let token_base64 = token.get(1).ok_or(anyhow::anyhow!("No valid token"))?;
+    let token_cbor_encoded = BASE64_STANDARD.decode(token_base64)?;
+
+    // We verify the signature on the message which corresponds to a Cbor sequence (cbor(kid)
+    // + cbor(ulid)):
+    let message_cbor_encoded = &token_cbor_encoded
+        .get(0..KID_ULID_CBOR_ENCODED_BYTES.into())
+        .ok_or(anyhow::anyhow!("No valid token"))?;
+
+    // Decode cbor to bytes
+    let mut cbor_decoder = minicbor::Decoder::new(&token_cbor_encoded);
+
+    // Raw kid bytes
+    let kid = Kid(cbor_decoder
+        .bytes()
+        .map_err(|e| anyhow::anyhow!(format!("Invalid cbor for kid : {e}")))?
+        .try_into()?);
+
+    // Raw ulid bytes
+    let ulid = UlidBytes(
+        cbor_decoder
+            .bytes()
+            .map_err(|e| anyhow::anyhow!(format!("Invalid cbor for ulid : {e}")))?
+            .try_into()?,
+    );
+
+    // Raw signature
+    let signature = SignatureEd25519(
+        cbor_decoder
+            .bytes()
+            .map_err(|e| anyhow::anyhow!(format!("Invalid cbor for sig : {e}")))?
+            .try_into()?,
+    );
+
+    Ok((kid, ulid, signature, message_cbor_encoded.to_vec()))
 }
 
 #[cfg(test)]

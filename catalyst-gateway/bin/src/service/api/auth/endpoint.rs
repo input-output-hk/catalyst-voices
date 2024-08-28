@@ -30,6 +30,7 @@ static CACHE: LazyLock<Cache<EncodedAuthToken, DecodedAuthToken>> = LazyLock::ne
 /// Mocked Valid certificates
 /// TODO: the following is temporary state for POC until RBAC database is complete.
 static CERTS: LazyLock<DashMap<String, [u8; PUBLIC_KEY_LENGTH]>> = LazyLock::new(|| {
+    /// Mock KID
     const KID: &str = "0467de6bd945b9207bfa09d846b77ef5";
 
     let public_key_bytes: [u8; PUBLIC_KEY_LENGTH] = [
@@ -81,12 +82,11 @@ async fn checker_api_catalyst_auth(
         };
 
         // Get pub key from CERTS state given decoded KID from decoded bearer token
-        let pub_key_bytes = match CERTS.get(&hex::encode(kid.0)) {
-            Some(cert) => cert.clone(),
-            None => {
-                error!("Invalid KID {:?}", kid);
-                Err(AuthTokenError)?
-            },
+        let pub_key_bytes = if let Some(cert) = CERTS.get(&hex::encode(kid.0)) {
+            cert.clone()
+        } else {
+            error!("Invalid KID {:?}", kid);
+            Err(AuthTokenError)?
         };
 
         let public_key = match VerifyingKey::from_bytes(&pub_key_bytes) {
@@ -121,12 +121,11 @@ async fn checker_api_catalyst_auth(
         // This get() will extend the entry life for another 5 minutes.
         // Even though we keep calling get(), the entry will expire
         // after 30 minutes (TTL) from the origin insert().
-        match CACHE.get(&bearer.token).await {
-            Some((kid, ulid, sig)) => Ok((kid, ulid, sig)),
-            None => {
-                error!("Auth token is not in the cache: {:?}", bearer.token);
-                Err(AuthTokenError)?
-            },
+        if let Some((kid, ulid, sig)) = CACHE.get(&bearer.token).await {
+            Ok((kid, ulid, sig))
+        } else {
+            error!("Auth token is not in the cache: {:?}", bearer.token);
+            Err(AuthTokenError)?
         }
     }
 }
