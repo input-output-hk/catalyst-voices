@@ -35,6 +35,10 @@ command:
       pinenacl: ^0.6.0
       ulid: ^2.0.0
       sentry_flutter: ^8.8.0
+      # TODO(dtscalac): win32 dependency is just a transitive dependency and shouldn't be imported
+      # but here we import it explicitly to make sure the latest version is used which addresses
+      # the problem from here: https://github.com/jonataslaw/get_cli/issues/263
+      win32: ^5.5.4
     dev_dependencies:
       test: ^1.24.9
       build_runner: ^2.4.12
