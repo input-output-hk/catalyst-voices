@@ -38,7 +38,7 @@ void main() {
               key: const ValueKey('SettingsIconButtonKey'),
               onPressed: () {},
               icon: const Icon(Icons.settings),
-            )
+            ),
           ],
         );
 
