@@ -41,7 +41,7 @@ extension SvgGenImageExt on SvgGenImage {
     );
   }
 
-  /// See [CatalystVoicesIcon]. See class for more context.
+  /// See [CatalystSvgIcon]. See class for more context.
   Widget buildIcon({
     Key? key,
     AssetBundle? bundle,
