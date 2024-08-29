@@ -89,13 +89,8 @@ package:
         RUN echo "No secrets are available in Earthly yet."
     END
 
-#publish:
-#    FROM +package
-#    ARG SECRETS_ARE_AVAILABLE=false
-#    ARG tag='latest'
+publish:
+   FROM +package
+   ARG tag='latest'
 
-#    IF [$SECRETS_ARE_AVAILABLE]
-#        SAVE IMAGE voices-frontend:$tag
-#    ELSE
-#        RUN echo "No secrets are available in Earthly yet."
-#    END
+   SAVE IMAGE voices-frontend:$tag
