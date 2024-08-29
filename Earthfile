@@ -1,8 +1,8 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:feat/upgrade_flutter_to_3_24_1 AS mdlint-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:feat/upgrade_flutter_to_3_24_1 AS cspell-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:feat/upgrade_flutter_to_3_24_1 AS postgresql-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:v3.1.25 AS mdlint-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:v3.1.25 AS cspell-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.1.25 AS postgresql-ci
 
 FROM debian:stable-slim
 
