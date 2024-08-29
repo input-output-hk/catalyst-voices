@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
@@ -52,10 +51,11 @@ class SpaceSidePanel extends StatelessWidget {
               controller: tabController,
             ),
             const SizedBox(height: 12),
-            TabBarStackView(
+            // TODO(damian): uncomment when merged
+            /*TabBarStackView(
               controller: tabController,
               children: tabs.map((e) => e.body).toList(),
-            ),
+            ),*/
             const SizedBox(height: 12),
           ],
         ),
@@ -102,13 +102,16 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SectionHeader(
+    // TODO(damian): uncomment when merged
+    /*return SectionHeader(
       leading: isLeft ? LeftArrowButton(onTap: onCollapseTap) : null,
       title: Text(name),
       trailing: [
         if (!isLeft) RightArrowButton(onTap: onCollapseTap),
       ],
-    );
+    );*/
+
+    return Offstage();
   }
 }
 
