@@ -1,5 +1,42 @@
 # Local Cluster
 
+* [Local Cluster](#local-cluster)
+  * [Requirements](#requirements)
+    * [macOS](#macos)
+  * [Cluster Architecture](#cluster-architecture)
+  * [Default Services](#default-services)
+    * [Scylla DB](#scylla-db)
+  * [Deploying the Cluster](#deploying-the-cluster)
+    * [Setup hosts on windows](#setup-hosts-on-windows)
+    * [Startup](#startup)
+      * [Linux/Windows](#linuxwindows)
+      * [MacOS](#macos-1)
+    * [Getting Basic Cluster details](#getting-basic-cluster-details)
+    * [Suspending the Cluster](#suspending-the-cluster)
+    * [Resuming a suspended the Cluster](#resuming-a-suspended-the-cluster)
+    * [Stopping the Cluster](#stopping-the-cluster)
+  * [Catalyst Voices Services](#catalyst-voices-services)
+    * [Deploying Catalyst Voices Frontend and Backend Services](#deploying-catalyst-voices-frontend-and-backend-services)
+    * [Deploying Catalyst Voices Documentation Service](#deploying-catalyst-voices-documentation-service)
+  * [Debugging the cluster](#debugging-the-cluster)
+    * [SSH into a running VM](#ssh-into-a-running-vm)
+  * [Local UI to access ScyllaDB](#local-ui-to-access-scylladb)
+
+
+
+
+## Requirements
+
+https://github.com/casey/just
+
+
+### macOS
+
+
+
+
+https://www.virtualbox.org/wiki/Testbuilds
+
 Integration Tests and local testing will require a running local cluster.
 To eliminate variability and simplify local deployment, we have standardized the local cluster around:
 
@@ -10,6 +47,8 @@ To eliminate variability and simplify local deployment, we have standardized the
 
 These tools allow us to define VMs that are consistent and provide a uniform Kubernetes environment
 for local testing.
+
+
 
 ## Cluster Architecture
 
@@ -56,14 +95,14 @@ For testing purposes, the ScyllaDB is accessible on the Cluster IP Address: `192
 
 ### Setup hosts on windows
 
-On Windows you need to setup the hosts before starting the cluster  
-From Windows terminal open the hosts file:  
+On Windows you need to setup the hosts before starting the cluster
+From Windows terminal open the hosts file:
 
 ```sh
-notepad %SystemRoot%\System32\drivers\etc\hosts  
-```  
+notepad %SystemRoot%\System32\drivers\etc\hosts
+```
 
-and copy the hosts from `./shared/extra.hosts` into the Windows host file  
+and copy the hosts from `./shared/extra.hosts` into the Windows host file
 
 ### Startup
 
@@ -176,7 +215,7 @@ vagrant ssh agent99
 
 Found (and tested) description how to connect using only open-source via DBeaver:
 
-1. Download dbeaver (Community Edition)
+1. Download dbeaver (Community Edition) https://dbeaver.io/download/
 2. Download cassandra jdbc jar files: <http://www.dbschema.com/cassandra-jdbc-driver.html>
    (Downloading and Testing the Driver Binaries section have links to binary and source)
 3. extract cassandra jdbc zip
