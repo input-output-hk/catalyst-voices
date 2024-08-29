@@ -1,4 +1,4 @@
--- Create the TXO Record for a stake address, 
+-- Create the TXO Record for a stake address,
 INSERT INTO txo_by_stake (
     stake_address,
     slot_no,
@@ -6,7 +6,8 @@ INSERT INTO txo_by_stake (
     txo,
     address,
     value,
-    txn_hash
+    txn_hash,
+    spent_slot
 ) VALUES (
     :stake_address,
     :slot_no,
@@ -14,5 +15,6 @@ INSERT INTO txo_by_stake (
     :txo,
     :address,
     :value,
-    :txn_hash
+    :txn_hash,
+    :spent_slot
 );

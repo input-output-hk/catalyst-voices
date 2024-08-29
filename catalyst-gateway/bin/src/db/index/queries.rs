@@ -6,9 +6,17 @@ use std::sync::Arc;
 
 use anyhow::bail;
 use crossbeam_skiplist::SkipMap;
-use scylla::{batch::Batch, serialize::row::SerializeRow, QueryResult, Session};
+use scylla::{
+    batch::Batch, prepared_statement::PreparedStatement, serialize::row::SerializeRow,
+    transport::iterator::RowIterator, QueryResult, Session,
+};
 
-use super::{index_certs::CertInsertQuery, index_txi::TxiInsertQuery, index_txo::TxoInsertQuery};
+use super::{
+    index_certs::CertInsertQuery,
+    index_txi::TxiInsertQuery,
+    index_txo::TxoInsertQuery,
+    staked_ada::{GetTxiByTxnHashesQuery, GetTxoByStakeAddressQuery, UpdateTxoSpentQuery},
+};
 use crate::settings::{CassandraEnvVars, CASSANDRA_MIN_BATCH_SIZE};
 
 /// Batches of different sizes, prepared and ready for use.
@@ -29,6 +37,16 @@ pub(crate) enum PreparedQuery {
     TxiInsertQuery,
     /// Stake Registration Insert query.
     StakeRegistrationInsertQuery,
+    /// TXO spent Update query.
+    TxoSpentUpdateQuery,
+}
+
+/// All prepared SELECT query statements.
+pub(crate) enum PreparedSelectQuery {
+    /// Get TXO by stake address query.
+    GetTxoByStakeAddress,
+    /// Get TXI by transaction hash query.
+    GetTxiByTransactionHash,
 }
 
 /// All prepared queries for a session.
@@ -46,6 +64,12 @@ pub(crate) struct PreparedQueries {
     txi_insert_queries: SizedBatch,
     /// TXI Insert query.
     stake_registration_insert_queries: SizedBatch,
+    /// Update TXO spent query.
+    txo_spent_update_queries: SizedBatch,
+    /// Get TXO by stake address query.
+    txo_by_stake_address_query: PreparedStatement,
+    /// Get TXI by transaction hash.
+    txi_by_txn_hash_query: PreparedStatement,
 }
 
 /// An individual query response that can fail
@@ -63,6 +87,10 @@ impl PreparedQueries {
         let txi_insert_queries = TxiInsertQuery::prepare_batch(&session, cfg).await;
         let all_txo_queries = TxoInsertQuery::prepare_batch(&session, cfg).await;
         let stake_registration_insert_queries = CertInsertQuery::prepare_batch(&session, cfg).await;
+        let txo_spent_update_queries =
+            UpdateTxoSpentQuery::prepare_batch(session.clone(), cfg).await;
+        let txo_by_stake_address_query = GetTxoByStakeAddressQuery::prepare(session.clone()).await;
+        let txi_by_txn_hash_query = GetTxiByTxnHashesQuery::prepare(session.clone()).await;
 
         let (
             txo_insert_queries,
@@ -78,7 +106,22 @@ impl PreparedQueries {
             unstaked_txo_asset_insert_queries,
             txi_insert_queries: txi_insert_queries?,
             stake_registration_insert_queries: stake_registration_insert_queries?,
+            txo_spent_update_queries: txo_spent_update_queries?,
+            txo_by_stake_address_query: txo_by_stake_address_query?,
+            txi_by_txn_hash_query: txi_by_txn_hash_query?,
         })
+    }
+
+    /// Prepares a statement.
+    pub(crate) async fn prepare(
+        session: Arc<Session>, query: &str, consistency: scylla::statement::Consistency,
+        idempotent: bool,
+    ) -> anyhow::Result<PreparedStatement> {
+        let mut prepared = session.prepare(query).await?;
+        prepared.set_consistency(consistency);
+        prepared.set_is_idempotent(idempotent);
+
+        Ok(prepared)
     }
 
     /// Prepares all permutations of the batch from 1 to max.
@@ -92,9 +135,7 @@ impl PreparedQueries {
 
         // First prepare the query. Only needs to be done once, all queries on a batch are the
         // same.
-        let mut prepared = session.prepare(query).await?;
-        prepared.set_consistency(consistency);
-        prepared.set_is_idempotent(idempotent);
+        let prepared = Self::prepare(session, query, consistency, idempotent).await?;
 
         for batch_size in CASSANDRA_MIN_BATCH_SIZE..=cfg.max_batch_size {
             let mut batch: Batch = Batch::new(if logged {
@@ -112,6 +153,25 @@ impl PreparedQueries {
         }
 
         Ok(sized_batches)
+    }
+
+    /// Executes a select query with the given parameters.
+    ///
+    /// Returns an iterator that iterates over all the result pages that the query
+    /// returns.
+    pub(crate) async fn execute_iter<P>(
+        &self, session: Arc<Session>, select_query: PreparedSelectQuery, params: P,
+    ) -> anyhow::Result<RowIterator>
+    where P: SerializeRow {
+        let prepared_stmt = match select_query {
+            PreparedSelectQuery::GetTxoByStakeAddress => &self.txo_by_stake_address_query,
+            PreparedSelectQuery::GetTxiByTransactionHash => &self.txi_by_txn_hash_query,
+        };
+
+        session
+            .execute_iter(prepared_stmt.clone(), params)
+            .await
+            .map_err(|e| anyhow::anyhow!(e))
     }
 
     /// Execute a Batch query with the given parameters.
@@ -132,6 +192,7 @@ impl PreparedQueries {
             PreparedQuery::UnstakedTxoAssetInsertQuery => &self.unstaked_txo_asset_insert_queries,
             PreparedQuery::TxiInsertQuery => &self.txi_insert_queries,
             PreparedQuery::StakeRegistrationInsertQuery => &self.stake_registration_insert_queries,
+            PreparedQuery::TxoSpentUpdateQuery => &self.txo_spent_update_queries,
         };
 
         let mut results: Vec<QueryResult> = Vec::new();
