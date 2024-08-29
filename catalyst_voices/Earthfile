@@ -71,7 +71,7 @@ build-web:
     ARG SENTRY_DSN
 
     ARG WORKDIR=/frontend/catalyst_voices
-    DO flutter-ci+BUILD_WEB --TARGET=lib/configs/main_web.dart --dart-define --SENTRY_DSN=$SENTRY_DSN --WORKDIR=$WORKDIR
+    DO flutter-ci+BUILD_WEB --TARGET=lib/configs/main_web.dart --SENTRY_DSN=$SENTRY_DSN --WORKDIR=$WORKDIR
     SAVE ARTIFACT web
 
 package:
