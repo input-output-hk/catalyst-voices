@@ -71,7 +71,7 @@ build-web:
     ARG SENTRY_DSN
 
     ARG WORKDIR=/frontend/catalyst_voices
-    DO flutter-ci+BUILD_WEB --TARGET=lib/configs/main_web.dart --dart-define SENTRY_DSN=$SENTRY_DSN --WORKDIR=$WORKDIR
+    DO flutter-ci+BUILD_WEB --TARGET=lib/configs/main_web.dart --dart-define --SENTRY_DSN=$SENTRY_DSN --WORKDIR=$WORKDIR
     SAVE ARTIFACT web
 
 package:
@@ -79,15 +79,11 @@ package:
     ARG SECRETS_ARE_AVAILABLE=false
     ARG tag='latest'
 
-    IF [$SECRETS_ARE_AVAILABLE]
-        COPY +build-web/web /app
-        COPY ./nginx.conf /etc/nginx/nginx.conf
-        EXPOSE 80
+    COPY +build-web/web /app
+    COPY ./nginx.conf /etc/nginx/nginx.conf
+    EXPOSE 80
 
-        SAVE IMAGE voices-frontend:$tag
-    ELSE
-        RUN echo "No secrets are available in Earthly yet."
-    END
+    SAVE IMAGE voices-frontend:$tag
 
 publish:
    FROM +package
