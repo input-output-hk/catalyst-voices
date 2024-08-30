@@ -53,14 +53,6 @@ check-package-publishing:
     FROM +builder
     DO flutter-ci+PUBLISH_DRY_RUN
 
-# Build web version of Catalyst Voices without arguments.
-# This is used for development purposes to validate build on PRs.
-build-web-on-pr:
-    FROM +builder
-
-    ARG WORKDIR=/frontend/catalyst_voices
-    DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --BUILD_MODE='--profile' --TARGET=lib/configs/main_web.dart
-
 # Run unit tests
 test-unit:
     FROM +builder
@@ -69,11 +61,16 @@ test-unit:
 # Build web version of Catalyst Voices
 build-web:
     FROM +builder
+    ARG RUN_ON_PR=true
     ARG SENTRY_DSN
 
     ARG WORKDIR=/frontend/catalyst_voices
-    DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --TARGET=lib/configs/main_web.dart --SENTRY_DSN=$SENTRY_DSN
-    SAVE ARTIFACT web
+    IF [ $RUN_ON_PR = true ]
+        DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --BUILD_MODE='--profile' --TARGET=lib/configs/main_web.dart
+    ELSE
+        DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --TARGET=lib/configs/main_web.dart --SENTRY_DSN=$SENTRY_DSN
+        SAVE ARTIFACT web
+    END
 
 package:
     FROM nginx:alpine3.18
