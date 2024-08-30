@@ -1,4 +1,4 @@
-include: package:catalyst_analysis/analysis_options.1.0.0.yaml
+include: package:catalyst_analysis/analysis_options.yaml
 
 analyzer:
   exclude: [
