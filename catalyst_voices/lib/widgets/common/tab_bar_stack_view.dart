@@ -1,7 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
-/// This widget is every similar to [TabBarView], and is meant to be used
+/// This widget is very similar to [TabBarView], and is meant to be used
 /// together with [TabBar], but displays children in non scrollable faction
 /// thanks to [IndexedStack].
 class TabBarStackView extends StatefulWidget {
