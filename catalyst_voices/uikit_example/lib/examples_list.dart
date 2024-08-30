@@ -22,6 +22,7 @@ import 'package:uikit_example/examples/voices_spaces_example.dart';
 import 'package:uikit_example/examples/voices_switch_example.dart';
 import 'package:uikit_example/examples/voices_text_field_example.dart';
 import 'package:uikit_example/examples/voices_tooltips_example.dart';
+import 'package:uikit_example/examples/voices_tree_view_example.dart';
 
 class ExamplesListPage extends StatelessWidget {
   static List<ExampleTile> get examples {
@@ -127,6 +128,11 @@ class ExamplesListPage extends StatelessWidget {
         title: 'Voices Menu',
         route: VoicesMenuExample.route,
         page: VoicesMenuExample(),
+      ),
+      ExampleTile(
+        title: 'Voices TreeView',
+        route: VoicesTreeViewExample.route,
+        page: VoicesTreeViewExample(),
       ),
     ];
   }
