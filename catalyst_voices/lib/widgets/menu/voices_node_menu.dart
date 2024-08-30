@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -84,8 +85,11 @@ class _NodeIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return isOpen
-        ? VoicesAssets.images.nodeOpen.buildIcon()
-        : VoicesAssets.images.nodeClosed.buildIcon();
+    return IconTheme(
+      data: IconThemeData(color: Theme.of(context).colors.iconsForeground),
+      child: isOpen
+          ? VoicesAssets.images.nodeOpen.buildIcon()
+          : VoicesAssets.images.nodeClosed.buildIcon(),
+    );
   }
 }
