@@ -6,7 +6,12 @@ import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 /// using Quill under the hood
 /// https://pub.dev/packages/flutter_quill
 class VoicesRichText extends StatefulWidget {
-  const VoicesRichText({super.key});
+  const VoicesRichText({
+    super.key,
+    this.charsLimit
+  });
+
+  final int? charsLimit;
 
   @override
   State<VoicesRichText> createState() => _VoicesRichTextState();
@@ -14,6 +19,29 @@ class VoicesRichText extends StatefulWidget {
 
 class _VoicesRichTextState extends State<VoicesRichText> {
   final QuillController _controller = QuillController.basic();
+
+  void _onDocumentChange(DocChange docChange) {
+    final documentLength = _controller.document.length;
+    final limit = widget.charsLimit;
+
+    if (limit == null) return;
+
+    if (documentLength > limit) {
+      final latestIndex = limit - 1;
+      _controller.replaceText(
+        latestIndex,
+        documentLength - limit,
+        '',
+        TextSelection.collapsed(offset: latestIndex),
+      );
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.document.changes.listen(_onDocumentChange);
+  }
 
   @override
   void dispose() {
