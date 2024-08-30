@@ -23,16 +23,12 @@
   * [Local UI to access ScyllaDB](#local-ui-to-access-scylladb)
 
 
-
-
 ## Requirements
 
 https://github.com/casey/just
 
 
 ### macOS
-
-
 
 
 https://www.virtualbox.org/wiki/Testbuilds
@@ -47,8 +43,6 @@ To eliminate variability and simplify local deployment, we have standardized the
 
 These tools allow us to define VMs that are consistent and provide a uniform Kubernetes environment
 for local testing.
-
-
 
 ## Cluster Architecture
 
