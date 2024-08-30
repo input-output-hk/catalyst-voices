@@ -72,6 +72,7 @@ class _TabBarStackViewState extends State<TabBarStackView> {
   }
 
   void _updateTabController() {
+    final oldController = _controller;
     final newController =
         widget.controller ?? DefaultTabController.maybeOf(context);
 
@@ -87,16 +88,19 @@ class _TabBarStackViewState extends State<TabBarStackView> {
       'controller.',
     );
 
-    if (newController == _controller) {
+    if (newController == oldController) {
       return;
     }
 
     if (_controllerIsValid) {
-      _controller!.animation!.removeListener(_handleTabControllerAnimationTick);
+      oldController!.animation!
+          .removeListener(_handleTabControllerAnimationTick);
     }
+
     _controller = newController;
-    if (_controller != null) {
-      _controller!.animation!.addListener(_handleTabControllerAnimationTick);
+
+    if (newController != null) {
+      newController.animation!.addListener(_handleTabControllerAnimationTick);
     }
   }
 
