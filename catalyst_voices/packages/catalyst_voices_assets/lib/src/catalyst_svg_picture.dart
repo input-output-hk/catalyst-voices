@@ -6,7 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 /// every time.
 /// For more information, see [SvgPicture.asset].
 final class CatalystSvgPicture extends SvgPicture {
-  CatalystSvgPicture(
+  const CatalystSvgPicture(
     super.bytesLoader, {
     super.key,
     super.width,
@@ -27,7 +27,7 @@ final class CatalystSvgPicture extends SvgPicture {
     super.key,
     super.matchTextDirection,
     super.bundle,
-    String? super.package = 'catalyst_voices_assets',
+    super.package = 'catalyst_voices_assets',
     super.width,
     super.height,
     super.fit,
