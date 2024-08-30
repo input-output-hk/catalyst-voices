@@ -105,7 +105,9 @@ Future<void> _signAndSubmitRbacTx({
 
     final txHash = await api.submitTx(transaction: signedTx);
     result = 'Tx hash: ${txHash.toHex()}';
-  } catch (error) {
+   } catch (error, stackTrace) {
+    FlutterError.presentError(
+        FlutterErrorDetails(exception: error, stack: stackTrace));
     result = error.toString();
   }
 

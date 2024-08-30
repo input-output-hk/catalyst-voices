@@ -2,7 +2,7 @@ import * as fs from 'fs/promises';
 import * as fsi from 'fs';
 import path from 'path';
 import nodeFetch from "node-fetch";
-import { expect, Page } from '@playwright/test';
+import { Page } from '@playwright/test';
 
 interface WalletCredentials {
   username: string;
@@ -95,8 +95,6 @@ const downloadExtension = async (extID: string): Promise<string> => {
     await tab.getByRole('button', { name: 'Unlock Wallet' }).click();
 };
 
-export { typhonImportWallet };
-
 
 const laceImportWallet = async (tab: Page): Promise<void> => {
   await tab.getByRole('button', { name: 'Agree' }).click();
@@ -116,17 +114,15 @@ const laceImportWallet = async (tab: Page): Promise<void> => {
   await tab.getByRole('button', { name: 'Open wallet' }).click();
   //Lace is very slow at loading
   await tab.getByTestId('profile-dropdown-trigger-menu').click({timeout: 300000});
-  await tab.getByTestId('header-menu-network-choice-label').click();
-  await tab.getByTestId('network-preprod-radio-button').click();
+  await tab.getByTestId('header-menu').getByTestId('header-menu-network-choice-container').click();
+  await tab.getByTestId('header-menu').getByTestId('network-preprod-radio-button').click();
 
 };
 
-export { laceImportWallet };
 
 const eternlImportWallet = async (tab: Page): Promise<void> => {
 };
 
-export { eternlImportWallet };
 
 const importWallet = async (tab: Page, wallet: string): Promise<void> => {
   switch (wallet) {
@@ -142,9 +138,7 @@ const importWallet = async (tab: Page, wallet: string): Promise<void> => {
     default:
       throw new Error('Wallet not in use')
   }
-
 }
-
 export { importWallet };
 
 const allowExtension = async (tab: Page, wallet: string): Promise<void> => {
@@ -153,7 +147,8 @@ const allowExtension = async (tab: Page, wallet: string): Promise<void> => {
       await tab.getByRole('button', { name: 'Allow' }).click();
       break;
     case 'Lace':
-      console.log('Not implemented yet');
+      await tab.getByTestId('connect-authorize-button').click();
+      await tab.getByRole('button', { name: 'Always' }).click();
       break;
     case 'Eternl':
         console.log('Not implemented yet');
@@ -163,5 +158,30 @@ const allowExtension = async (tab: Page, wallet: string): Promise<void> => {
   }
 
 }
-
 export { allowExtension };
+
+async function signTyphonData(signTab: Page, password: string) {
+  await signTab.getByRole('button', { name: 'Sign' }).click();
+  await signTab.getByPlaceholder('Password', { exact: true }).fill(password);
+  await signTab.getByRole('button', { name: 'confirm' }).click();
+}
+
+async function signLaceData(signTab: Page, password: string) {
+ await signTab.getByRole('button', { name: 'Confirm' }).click();
+ await signTab.getByTestId('password-input').fill(password);
+ await signTab.getByRole('button', { name: 'Confirm' }).click();
+}
+
+const signData = async (wallet: string, tab: Page, password: string): Promise<void> => {
+  switch (wallet) {
+    case 'Typhon':
+      await signTyphonData(tab, password);
+      break;
+    case 'Lace':
+      await signLaceData(tab, password);
+      break;
+    default:
+      throw new Error('Wallet not in use')
+  }
+}
+export { signData };
