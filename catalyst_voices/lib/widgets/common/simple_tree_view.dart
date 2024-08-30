@@ -70,7 +70,7 @@ class SimpleTreeViewRootRow extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
-                  children: <Widget>[
+                  children: [
                     ...leading,
                     Flexible(child: child),
                   ].separatedBy(const SizedBox(width: 4)).toList(),
@@ -190,7 +190,7 @@ class _SimpleTreeViewIndentJoint extends StatelessWidget {
         ),
         const Row(
           children: [
-            Expanded(child: SizedBox()),
+            Spacer(),
             Expanded(child: Divider(endIndent: 3)),
           ],
         ),
