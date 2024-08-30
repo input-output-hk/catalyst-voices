@@ -46,7 +46,7 @@ class VoicesNodeMenu extends StatelessWidget {
       root: SimpleTreeViewRootRow(
         onTap: _canToggleExpand ? _onRootTap : null,
         leading: [
-          NodeIcon(isOpen: isExpanded),
+          _NodeIcon(isOpen: isExpanded),
           VoicesAssets.images.viewGrid.buildIcon(),
         ],
         child: Text(name),
@@ -72,5 +72,20 @@ class VoicesNodeMenu extends StatelessWidget {
   void _onMenuItemTap(VoicesNodeMenuItem item) {
     final id = item.id != selected ? item.id : null;
     onSelectionChanged?.call(id);
+  }
+}
+
+class _NodeIcon extends StatelessWidget {
+  final bool isOpen;
+
+  const _NodeIcon({
+    this.isOpen = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return isOpen
+        ? VoicesAssets.images.nodeOpen.buildIcon()
+        : VoicesAssets.images.nodeClosed.buildIcon();
   }
 }

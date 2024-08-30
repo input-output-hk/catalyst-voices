@@ -10,7 +10,6 @@ export 'common/navigation_location.dart';
 export 'common/simple_tree_view.dart';
 export 'footers/links_page_footer.dart';
 export 'footers/standard_links_page_footer.dart';
-export 'icons/svg_icons.dart';
 export 'indicators/process_progress_indicator.dart';
 export 'indicators/voices_circular_progress_indicator.dart';
 export 'indicators/voices_linear_progress_indicator.dart';
