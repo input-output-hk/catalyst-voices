@@ -46,7 +46,7 @@ class VoicesNodeMenu extends StatelessWidget {
       root: SimpleTreeViewRootRow(
         onTap: _canToggleExpand ? _onRootTap : null,
         leading: [
-          VoicesAssets.images.nodeOpen.buildIcon(),
+          NodeIcon(isOpen: isExpanded),
           VoicesAssets.images.viewGrid.buildIcon(),
         ],
         child: Text(name),

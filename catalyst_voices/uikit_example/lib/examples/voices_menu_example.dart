@@ -24,6 +24,7 @@ class _VoicesMenuExampleState extends State<VoicesMenuExample> {
         children: [
           Expanded(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 const _MenuExample1(),
                 const _MenuExample2(),
