@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -44,9 +45,9 @@ class VoicesNodeMenu extends StatelessWidget {
       isExpanded: isExpanded,
       root: SimpleTreeViewRootRow(
         onTap: _canToggleExpand ? _onRootTap : null,
-        leading: const [
-          Icon(Icons.check_box_outline_blank_rounded),
-          Icon(Icons.grid_view),
+        leading: [
+          VoicesAssets.images.nodeOpen.buildIcon(),
+          VoicesAssets.images.viewGrid.buildIcon(),
         ],
         child: Text(name),
       ),

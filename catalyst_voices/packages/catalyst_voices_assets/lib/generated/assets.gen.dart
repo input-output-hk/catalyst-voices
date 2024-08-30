@@ -64,6 +64,12 @@ class $AssetsImagesGen {
   SvgGenImage get linkedinMono =>
       const SvgGenImage('assets/images/linkedin_mono.svg');
 
+  /// File path: assets/images/node_open.svg
+  SvgGenImage get nodeOpen => const SvgGenImage('assets/images/node_open.svg');
+
+  /// File path: assets/images/view_grid.svg
+  SvgGenImage get viewGrid => const SvgGenImage('assets/images/view_grid.svg');
+
   /// File path: assets/images/x.svg
   SvgGenImage get x => const SvgGenImage('assets/images/x.svg');
 
@@ -85,6 +91,8 @@ class $AssetsImagesGen {
         fallbackLogoIcon,
         linkedin,
         linkedinMono,
+        nodeOpen,
+        viewGrid,
         x,
         xMono
       ];
