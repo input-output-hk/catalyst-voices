@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-const _kDefaultIntent = 24.0;
+const _kDefaultIndent = 24.0;
 
 /// The [VoicesDivider] widget is a simple wrapper around Material's [Divider]
 /// widget that provides additional customization options for indentation.
@@ -11,26 +11,31 @@ class VoicesDivider extends StatelessWidget {
   /// A double value representing the indentation of the divider from the
   /// start of the parent container.
   ///
-  /// Defaults to [_kDefaultIntent] (24.0).
+  /// Defaults to [_kDefaultIndent] (24.0).
   final double indent;
 
   /// A double value representing the indentation of the divider from the
   /// end of the parent container.
   ///
-  /// Defaults to [_kDefaultIntent] (24.0).
-  final double endIntent;
+  /// Defaults to [_kDefaultIndent] (24.0).
+  final double endIndent;
+
+  /// Optional color of divider.
+  final Color? color;
 
   const VoicesDivider({
     super.key,
-    this.indent = _kDefaultIntent,
-    this.endIntent = _kDefaultIntent,
+    this.indent = _kDefaultIndent,
+    this.endIndent = _kDefaultIndent,
+    this.color,
   });
 
   @override
   Widget build(BuildContext context) {
     return Divider(
       indent: indent,
-      endIndent: endIntent,
+      endIndent: endIndent,
+      color: color,
     );
   }
 }

@@ -52,8 +52,8 @@ class VoicesAvatar extends StatelessWidget {
               child: IconTheme(
                 data: IconTheme.of(context).copyWith(
                   size: 24,
-                  color: foregroundColor ??
-                      Theme.of(context).colorScheme.primary,
+                  color:
+                      foregroundColor ?? Theme.of(context).colorScheme.primary,
                 ),
                 child: DefaultTextStyle(
                   style: Theme.of(context).textTheme.bodyLarge!.copyWith(

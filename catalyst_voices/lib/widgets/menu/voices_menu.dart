@@ -23,20 +23,18 @@ class VoicesMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: MenuBar(
-        style: const MenuStyle(
-          elevation: WidgetStatePropertyAll<double>(0),
-        ),
-        children: [
-          SubmenuButton(
-            menuChildren: [...menuItems.map(_mapItemToButton)],
-            menuStyle: const MenuStyle(alignment: Alignment.centerRight),
-            style: MenuItemButton.styleFrom(shadowColor: Colors.transparent),
-            child: child,
-          ),
-        ],
+    return MenuBar(
+      style: const MenuStyle(
+        elevation: WidgetStatePropertyAll<double>(0),
       ),
+      children: [
+        SubmenuButton(
+          menuChildren: [...menuItems.map(_mapItemToButton)],
+          menuStyle: const MenuStyle(alignment: Alignment.centerRight),
+          style: MenuItemButton.styleFrom(shadowColor: Colors.transparent),
+          child: child,
+        ),
+      ],
     );
   }
 
@@ -74,7 +72,7 @@ class _MenuButton extends StatelessWidget {
     );
 
     final children = menuChildren;
-    return Wrap(
+    return Column(
       children: [
         Stack(
           children: [
