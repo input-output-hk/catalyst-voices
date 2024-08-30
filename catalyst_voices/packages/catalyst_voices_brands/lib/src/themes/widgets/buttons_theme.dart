@@ -8,9 +8,6 @@ extension ButtonsThemeExt on ThemeData {
   /// reusability if we're going to have more brands.
   ThemeData copyWithButtonsTheme() {
     return copyWith(
-      buttonBarTheme: const ButtonBarThemeData(
-        buttonHeight: 40,
-      ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           foregroundColor: colorScheme.onPrimary,
