@@ -1,5 +1,5 @@
 VERSION 0.8
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.1.21 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.1.25 AS flutter-ci
 
 deps:
     FROM mcr.microsoft.com/playwright:v1.45.2-jammy
@@ -43,6 +43,7 @@ build-web:
 package-app:
     FROM nginx:alpine3.18
     ARG tag='latest'
+    #TODO disable cache
     COPY +build-web/web /usr/share/nginx/html/
     SAVE IMAGE test-app:$tag
 
