@@ -66,6 +66,13 @@ test-unit:
     FROM +builder
     DO flutter-ci+UNIT_TESTS
 
+
+build-web-on-pr:
+    FROM +builder
+
+    ARG WORKDIR=/frontend/catalyst_voices
+    DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --BUILD_MODE='--profile' --TARGET=lib/configs/main_web.dart
+
 # Build web version of Catalyst Voices
 build-web:
     FROM +builder
@@ -77,7 +84,6 @@ build-web:
 
 package:
     FROM nginx:alpine3.18
-    ARG SECRETS_ARE_AVAILABLE=false
     ARG tag='latest'
 
     COPY +build-web/web /app
