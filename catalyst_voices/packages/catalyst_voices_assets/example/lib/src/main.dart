@@ -1,7 +1,7 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 
-void main() => runApp(Example());
+void main() => runApp(const Example());
 
 final class Example extends StatelessWidget {
   const Example({super.key});

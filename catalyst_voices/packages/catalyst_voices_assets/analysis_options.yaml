@@ -1,0 +1,14 @@
+include: package:catalyst_analysis/analysis_options.yaml
+
+analyzer:
+  exclude:
+    [
+      build/**,
+      lib/*.g.dart,
+      lib/generated/**,
+      lib/src/catalyst_voices_icons.dart,
+    ]
+
+linter:
+  rules:
+    public_member_api_docs: false

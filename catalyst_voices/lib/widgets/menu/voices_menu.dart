@@ -74,7 +74,7 @@ class _MenuButton extends StatelessWidget {
     );
 
     final children = menuChildren;
-    return Wrap(
+    return Column(
       children: [
         Stack(
           children: [
