@@ -71,6 +71,7 @@ class _VoicesRichTextState extends State<VoicesRichText> {
             configurations: QuillEditorConfigurations(
               padding: const EdgeInsets.all(16),
               placeholder: 'Start writing your text...',
+              embedBuilders: FlutterQuillEmbeds.editorWebBuilders(),
             ),
           ),
         ),
