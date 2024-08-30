@@ -73,7 +73,7 @@ extension type JSCardanoWalletApi(JSObject _) implements JSObject {
   ]);
 
   /// See [CardanoWalletApi.getUtxos].
-  external JSPromise<JSArray<JSString>> getUtxos([
+  external JSPromise<JSArray<JSString>>? getUtxos([
     JSAny? amount,
     JSAny? paginate,
   ]);
