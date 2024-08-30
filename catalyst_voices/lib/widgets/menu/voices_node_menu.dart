@@ -36,8 +36,8 @@ class VoicesNodeMenu extends StatelessWidget {
     this.isExpanded = true,
     this.selected,
     required this.items,
-    required this.onSelectionChanged,
-    required this.onExpandChanged,
+    this.onSelectionChanged,
+    this.onExpandChanged,
   });
 
   @override

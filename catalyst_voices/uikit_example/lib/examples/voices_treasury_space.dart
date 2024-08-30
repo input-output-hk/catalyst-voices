@@ -37,11 +37,24 @@ class _CampaignBuilderPanel extends StatelessWidget {
       tabs: [
         SpaceSidePanelTab(
           name: 'Segments',
-          body: const Text('TODO_1'),
-        ),
-        SpaceSidePanelTab(
-          name: 'Tab',
-          body: const Text('TODO_2'),
+          body: Column(
+            children: [
+              DecoratedBox(
+                decoration: BoxDecoration(border: Border.all()),
+                position: DecorationPosition.foreground,
+                child: VoicesNodeMenu(
+                  name: 'Setup Campaign',
+                  selected: 0,
+                  items: [
+                    VoicesNodeMenuItem(id: 0, label: 'Other topic 1'),
+                    VoicesNodeMenuItem(id: 1, label: 'Other topic 2'),
+                    VoicesNodeMenuItem(id: 2, label: 'Other topic 3'),
+                  ],
+                  onSelectionChanged: (value) {},
+                ),
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -60,7 +73,7 @@ class _CampaignCommentsPanel extends StatelessWidget {
       tabs: [
         SpaceSidePanelTab(
           name: 'Comments',
-          body: const Text('TODO'),
+          body: Offstage(),
         ),
       ],
     );
