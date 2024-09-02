@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/common/resizable_box_parent.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/extensions.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 
@@ -10,13 +11,13 @@ import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 class VoicesRichText extends StatefulWidget {
   const VoicesRichText({
     super.key,
-    required this.document,
+    this.document,
     this.onSave,
     this.onCancel,
     this.charsLimit,
   });
 
-  final Document document;
+  final Document? document;
   final ValueChanged<Document>? onSave;
   final VoidCallback? onCancel;
   final int? charsLimit;
@@ -53,7 +54,7 @@ class _VoicesRichTextState extends State<VoicesRichText> {
   @override
   void initState() {
     super.initState();
-    _controller.document = widget.document;
+    if (widget.document != null) _controller.document = widget.document!;
     _controller.document.changes.listen(_onDocumentChange);
 
     setState(() {
@@ -154,7 +155,9 @@ class _VoicesRichTextState extends State<VoicesRichText> {
                 configurations: QuillEditorConfigurations(
                   padding: const EdgeInsets.all(16),
                   placeholder: 'Start writing your text...',
-                  embedBuilders: FlutterQuillEmbeds.editorWebBuilders(),
+                  embedBuilders: isWeb()
+                      ? FlutterQuillEmbeds.editorWebBuilders()
+                      : FlutterQuillEmbeds.editorBuilders(),
                 ),
               ),
             ),
