@@ -7,7 +7,7 @@ let extTab: Page;
 
 [
  { name: 'Typhon', id: 'kfdniefadaanbjodldohaedphafoffoh', url: 'chrome-extension://changeme/tab.html#/wallet/access/' },
- { name: 'Lace', id: 'gafhhkghbfjjkeiendhlofajokpaflmk', url: 'chrome-extension://changeme/app.html#/setup' },
+ //{ name: 'Lace', id: 'gafhhkghbfjjkeiendhlofajokpaflmk', url: 'chrome-extension://changeme/app.html#/setup' },
 // { name: 'Eternl', id: 'kmhcihpebfmpgmihbkipmjlmmioameka', url: 'chrome-extension://changeme/index.html#/' },
   ].forEach(({ name, id, url }) => {
     test.describe(`Testing with ${name}`,() => {

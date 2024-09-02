@@ -170,6 +170,7 @@ async function signLaceData(signTab: Page, password: string) {
  await signTab.getByRole('button', { name: 'Confirm' }).click();
  await signTab.getByTestId('password-input').fill(password);
  await signTab.getByRole('button', { name: 'Confirm' }).click();
+ await signTab.getByRole('button', { name: 'Close' }).click();
 }
 
 const signData = async (wallet: string, tab: Page, password: string): Promise<void> => {
