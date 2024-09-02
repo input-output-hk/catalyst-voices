@@ -6,10 +6,14 @@ import 'package:flutter/widgets.dart';
 class ResizableBoxParent extends StatelessWidget {
   final bool resizable;
   final Widget child;
+  final double minWidth;
+  final double minHeight;
 
   const ResizableBoxParent({
     required this.resizable,
     required this.child,
+    this.minWidth = 40,
+    this.minHeight = 40,
   });
 
   @override
@@ -23,6 +27,8 @@ class ResizableBoxParent extends StatelessWidget {
         return _ResizableBox(
           constraints: constraints,
           child: child,
+          minWidth: minWidth,
+          minHeight: minHeight,
         );
       },
     );
@@ -32,10 +38,14 @@ class ResizableBoxParent extends StatelessWidget {
 class _ResizableBox extends StatefulWidget {
   final BoxConstraints constraints;
   final Widget child;
+  final double minWidth;
+  final double minHeight;
 
   const _ResizableBox({
     required this.constraints,
     required this.child,
+    required this.minWidth,
+    required this.minHeight,
   });
 
   @override
@@ -43,9 +53,6 @@ class _ResizableBox extends StatefulWidget {
 }
 
 class _ResizableBoxState extends State<_ResizableBox> {
-  static const double _minWidth = 40;
-  static const double _minHeight = 40;
-
   late double _width;
   late double _height;
 
@@ -55,9 +62,9 @@ class _ResizableBoxState extends State<_ResizableBox> {
 
     _width = widget.constraints.maxWidth != double.infinity
         ? widget.constraints.maxWidth
-        : widget.constraints.constrainWidth(_minWidth);
+        : widget.constraints.constrainWidth(widget.minWidth);
 
-    _height = max(widget.constraints.minHeight, _minHeight);
+    _height = max(widget.constraints.minHeight, widget.minHeight);
   }
 
   @override
@@ -78,12 +85,12 @@ class _ResizableBoxState extends State<_ResizableBox> {
               onPanUpdate: (details) {
                 setState(() {
                   _width = (_width + details.delta.dx).clamp(
-                    _minWidth,
+                    widget.minWidth,
                     widget.constraints.maxWidth,
                   );
 
                   _height = (_height + details.delta.dy).clamp(
-                    _minHeight,
+                    widget.minHeight,
                     widget.constraints.maxHeight,
                   );
                 });

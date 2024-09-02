@@ -113,6 +113,7 @@ class _VoicesRichTextState extends State<VoicesRichText> {
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: ResizableBoxParent(
+            minHeight: 400,
             resizable: true,
             child: Container(
               decoration: BoxDecoration(
