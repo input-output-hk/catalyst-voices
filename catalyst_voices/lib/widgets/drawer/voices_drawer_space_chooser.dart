@@ -33,10 +33,12 @@ class VoicesDrawerSpaceChooser extends StatelessWidget {
     required bool isSelected,
   }) {
     if (isSelected) {
+      final config = item._config(context);
+
       return VoicesDrawerChooserItem(
-        icon: item.icon(),
-        foregroundColor: item.foregroundColor(context),
-        backgroundColor: item.backgroundColor(context),
+        icon: config.iconData,
+        foregroundColor: config.foregroundColor,
+        backgroundColor: config.backgroundColor,
       );
     } else {
       return const VoicesDrawerChooserItemPlaceholder();
@@ -44,43 +46,41 @@ class VoicesDrawerSpaceChooser extends StatelessWidget {
   }
 }
 
+final class _VoicesDrawerSpaceChooserConfig {
+  final IconData iconData;
+  final Color backgroundColor;
+  final Color foregroundColor;
+
+  _VoicesDrawerSpaceChooserConfig({
+    required this.iconData,
+    required this.backgroundColor,
+    required this.foregroundColor,
+  });
+}
+
 extension _SpaceExt on Space {
-  IconData icon() {
-    switch (this) {
-      case Space.ideas:
-        return CatalystVoicesIcons.light_bulb;
-      case Space.discovery:
-        return CatalystVoicesIcons.shopping_cart;
-      case Space.proposals:
-        return CatalystVoicesIcons.fund;
-      case Space.settings:
-        return CatalystVoicesIcons.cog_gear;
-    }
-  }
-
-  Color foregroundColor(BuildContext context) {
-    switch (this) {
-      case Space.ideas:
-        return Theme.of(context).colorScheme.primary;
-      case Space.discovery:
-        return Theme.of(context).colorScheme.secondary;
-      case Space.proposals:
-        return Colors.white;
-      case Space.settings:
-        return Colors.white;
-    }
-  }
-
-  Color backgroundColor(BuildContext context) {
-    switch (this) {
-      case Space.ideas:
-        return Theme.of(context).colorScheme.primaryContainer;
-      case Space.discovery:
-        return Theme.of(context).colorScheme.secondaryContainer;
-      case Space.proposals:
-        return Colors.orange;
-      case Space.settings:
-        return Colors.green;
-    }
+  _VoicesDrawerSpaceChooserConfig _config(BuildContext context) {
+    return switch (this) {
+      Space.ideas => _VoicesDrawerSpaceChooserConfig(
+          iconData: CatalystVoicesIcons.light_bulb,
+          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
+          foregroundColor: Theme.of(context).colorScheme.primary,
+        ),
+      Space.discovery => _VoicesDrawerSpaceChooserConfig(
+          iconData: CatalystVoicesIcons.shopping_cart,
+          backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
+          foregroundColor: Theme.of(context).colorScheme.secondary,
+        ),
+      Space.proposals => _VoicesDrawerSpaceChooserConfig(
+          iconData: CatalystVoicesIcons.fund,
+          backgroundColor: Colors.orange,
+          foregroundColor: Colors.white,
+        ),
+      Space.settings => _VoicesDrawerSpaceChooserConfig(
+          iconData: CatalystVoicesIcons.cog_gear,
+          backgroundColor: Colors.green,
+          foregroundColor: Colors.white,
+        ),
+    };
   }
 }
