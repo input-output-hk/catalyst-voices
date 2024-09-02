@@ -31,10 +31,10 @@ include: package:catalyst_analysis/analysis_options.yaml
 ```
 
 This will ensure you always use the latest version of the lints.
-If you wish to restrict the lint version, specify a version of `analysis_options.yaml` instead:
+If you wish to restrict the lint version, specify a version of `catalyst_analysis` in pubspec.yaml instead:
 
 ```yaml
-include: package:catalyst_analysis/analysis_options.1.0.0.yaml
+catalyst_analysis: ^1.0.0
 ```
 
 ## Suppressing Lints
