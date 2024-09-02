@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:catalyst_voices/widgets/common/resizable_box_parent.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
