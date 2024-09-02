@@ -10,7 +10,9 @@ class VoicesRichTextExample extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Voices Rich Text')),
-      body: const VoicesRichText(),
+      body: SingleChildScrollView(
+        child: const VoicesRichText(),
+      ),
     );
   }
 }

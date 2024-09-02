@@ -1,3 +1,7 @@
+import 'dart:math';
+
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_assets/generated/assets.gen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
@@ -8,7 +12,7 @@ import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 class VoicesRichText extends StatefulWidget {
   const VoicesRichText({
     super.key,
-    this.charsLimit
+    this.charsLimit,
   });
 
   final int? charsLimit;
@@ -60,14 +64,17 @@ class _VoicesRichTextState extends State<VoicesRichText> {
               QuillToolbarIconButton(
                 tooltip: 'Header',
                 onPressed: () {
-                  if(_controller.getSelectionStyle().attributes['header'] == null) {
+                  if (_controller.getSelectionStyle().attributes['header'] ==
+                      null) {
                     _controller.formatSelection(Attribute.h1);
                   } else {
                     _controller.formatSelection(Attribute.header);
                   }
                 },
                 icon: Text('H'),
-                isSelected: _controller.getSelectionStyle().attributes['header'] != null,
+                isSelected:
+                    _controller.getSelectionStyle().attributes['header'] !=
+                        null,
                 iconTheme: null,
               ),
               QuillToolbarSelectHeaderStyleDropdownButton(
@@ -106,13 +113,117 @@ class _VoicesRichTextState extends State<VoicesRichText> {
             ],
           ),
         ),
-        Expanded(
-          child: QuillEditor.basic(
-            controller: _controller,
-            configurations: QuillEditorConfigurations(
-              padding: const EdgeInsets.all(16),
-              placeholder: 'Start writing your text...',
-              embedBuilders: FlutterQuillEmbeds.editorWebBuilders(),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: _ResizableBoxParent(
+            resizable: true,
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black12),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: QuillEditor.basic(
+                controller: _controller,
+                configurations: QuillEditorConfigurations(
+                  padding: const EdgeInsets.all(16),
+                  placeholder: 'Start writing your text...',
+                  embedBuilders: FlutterQuillEmbeds.editorWebBuilders(),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ResizableBoxParent extends StatelessWidget {
+  final bool resizable;
+  final Widget child;
+
+  const _ResizableBoxParent({
+    required this.resizable,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (!resizable) {
+      return child;
+    }
+
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        return _ResizableBox(
+          constraints: constraints,
+          child: child,
+        );
+      },
+    );
+  }
+}
+
+class _ResizableBox extends StatefulWidget {
+  final BoxConstraints constraints;
+  final Widget child;
+
+  const _ResizableBox({
+    required this.constraints,
+    required this.child,
+  });
+
+  @override
+  State<_ResizableBox> createState() => _ResizableBoxState();
+}
+
+class _ResizableBoxState extends State<_ResizableBox> {
+  static const double _minWidth = 40;
+  static const double _minHeight = 320;
+
+  late double _width;
+  late double _height;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _width = widget.constraints.maxWidth != double.infinity
+        ? widget.constraints.maxWidth
+        : widget.constraints.constrainWidth(_minWidth);
+
+    _height = max(widget.constraints.minHeight, _minHeight);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        SizedBox(
+          width: _width,
+          height: _height,
+          child: widget.child,
+        ),
+        Positioned(
+          bottom: 0,
+          right: 0,
+          child: MouseRegion(
+            cursor: SystemMouseCursors.resizeDownRight,
+            child: GestureDetector(
+              onPanUpdate: (details) {
+                setState(() {
+                  _width = (_width + details.delta.dx).clamp(
+                    _minWidth,
+                    widget.constraints.maxWidth,
+                  );
+
+                  _height = (_height + details.delta.dy).clamp(
+                    _minHeight,
+                    widget.constraints.maxHeight,
+                  );
+                });
+              },
+              child: VoicesAssets.images.dragger.buildIcon(size: 15),
             ),
           ),
         ),
