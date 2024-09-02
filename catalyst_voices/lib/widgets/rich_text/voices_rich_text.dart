@@ -57,6 +57,19 @@ class _VoicesRichTextState extends State<VoicesRichText> {
           configurations: const QuillToolbarConfigurations(),
           child: Row(
             children: [
+              QuillToolbarIconButton(
+                tooltip: 'Header',
+                onPressed: () {
+                  if(_controller.getSelectionStyle().attributes['header'] == null) {
+                    _controller.formatSelection(Attribute.h1);
+                  } else {
+                    _controller.formatSelection(Attribute.header);
+                  }
+                },
+                icon: Text('H'),
+                isSelected: _controller.getSelectionStyle().attributes['header'] != null,
+                iconTheme: null,
+              ),
               QuillToolbarSelectHeaderStyleDropdownButton(
                 controller: _controller,
               ),
