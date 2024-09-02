@@ -14,6 +14,10 @@ Future<void> _signAndSubmitTx({
       ),
     );
 
+    if (utxos.isEmpty) {
+      throw Exception('Insufficient balance, please top up your wallet');
+    }
+
     final unsignedTx = _buildUnsignedTx(
       utxos: utxos,
       changeAddress: changeAddress,
