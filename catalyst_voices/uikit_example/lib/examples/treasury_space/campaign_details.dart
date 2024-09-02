@@ -76,7 +76,7 @@ class _CampaignSetupDetails extends StatelessWidget {
         SegmentHeader(
           leading: ChevronExpandButton(
             onTap: onChevronTap,
-            isOpen: isExpanded,
+            isExpanded: isExpanded,
           ),
           name: 'Setup Campaign',
           isHighlighted: isExpanded,

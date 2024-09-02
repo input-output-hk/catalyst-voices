@@ -1,11 +1,11 @@
 import 'package:catalyst_voices/widgets/app_bar/voices_app_bar.dart';
-import 'package:catalyst_voices/widgets/drawer/voices_drawer.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 import 'package:uikit_example/examples/treasury_space/campaign_builder_panel.dart';
 import 'package:uikit_example/examples/treasury_space/campaign_comments_panel.dart';
 import 'package:uikit_example/examples/treasury_space/campaign_details.dart';
+import 'package:uikit_example/examples/treasury_space/voices_treasury_drawer.dart';
 
 final class CampaignSetupStep extends VoicesNodeMenuItem {
   final String desc;
@@ -74,7 +74,7 @@ class _VoicesTreasurySpaceState extends State<VoicesTreasurySpace> {
       appBar: VoicesAppBar(
         backgroundColor: Theme.of(context).colors.onSurfaceNeutralOpaqueLv0,
       ),
-      drawer: const VoicesDrawer(children: []),
+      drawer: VoicesTreasuryDrawer(),
       body: SpaceContainer(
         left: CampaignBuilderPanel(
           setupCampaignController: _setupCampaignController,

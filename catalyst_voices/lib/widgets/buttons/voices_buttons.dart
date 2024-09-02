@@ -85,18 +85,18 @@ class ChevronRightButton extends StatelessWidget {
 }
 
 class ChevronExpandButton extends StatelessWidget {
-  final bool isOpen;
+  final bool isExpanded;
   final VoidCallback? onTap;
 
   const ChevronExpandButton({
     super.key,
-    this.isOpen = true,
+    this.isExpanded = true,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return isOpen
+    return isExpanded
         ? ChevronDownButton(onTap: onTap)
         : ChevronRightButton(onTap: onTap);
   }
