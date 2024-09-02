@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/common/resizable_box_parent.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -9,9 +10,13 @@ import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 class VoicesRichText extends StatefulWidget {
   const VoicesRichText({
     super.key,
+    required this.document,
+    this.onSave,
     this.charsLimit,
   });
 
+  final Document document;
+  final ValueChanged<Document>? onSave;
   final int? charsLimit;
 
   @override
@@ -41,6 +46,7 @@ class _VoicesRichTextState extends State<VoicesRichText> {
   @override
   void initState() {
     super.initState();
+    _controller.document = widget.document;
     _controller.document.changes.listen(_onDocumentChange);
   }
 
@@ -130,6 +136,10 @@ class _VoicesRichTextState extends State<VoicesRichText> {
               ),
             ),
           ),
+        ),
+        VoicesFilledButton(
+          child: Text('Save'),
+          onTap: () => widget.onSave?.call(_controller.document),
         ),
       ],
     );

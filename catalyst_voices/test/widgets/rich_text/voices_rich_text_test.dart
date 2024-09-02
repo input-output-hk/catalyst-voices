@@ -7,7 +7,7 @@ void main() {
   group(VoicesRichText, () {
     testWidgets('renders correctly', (tester) async {
       // Given
-      const widget = MaterialApp(home: VoicesRichText());
+      final widget = MaterialApp(home: VoicesRichText(document: Document.fromJson([]),));
 
       // When
       await tester.pumpWidget(widget);
