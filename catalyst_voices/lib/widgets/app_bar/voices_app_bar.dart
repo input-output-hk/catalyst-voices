@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/app_bar/actions/voices_app_bar_actions.dart';
+import 'package:catalyst_voices/widgets/app_bar/actions/search_button.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -19,6 +19,7 @@ import 'package:flutter/material.dart';
 class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? leading;
   final List<Widget> actions;
+  final bool showSearch;
   final bool automaticallyImplyLeading;
   final Color? backgroundColor;
 
@@ -26,6 +27,7 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
     super.key,
     this.leading,
     this.actions = const [],
+    this.showSearch = false,
     this.automaticallyImplyLeading = true,
     this.backgroundColor,
   });
@@ -44,7 +46,7 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
             leadingWidth: 48.0 + spacing,
             automaticallyImplyLeading: false,
             backgroundColor: backgroundColor,
-            title: const _Title(),
+            title: _Title(showSearch),
             actions: [
               _Actions(children: actions),
             ],
@@ -101,7 +103,9 @@ class _Theme extends StatelessWidget {
 }
 
 class _Title extends StatelessWidget {
-  const _Title();
+  final bool showSearch;
+
+  const _Title(this.showSearch);
 
   @override
   Widget build(BuildContext context) {
@@ -127,18 +131,20 @@ class _Title extends StatelessWidget {
         sm: (
           widgets: [
             Theme.of(context).brandAssets.logo.buildPicture(),
-            SearchButton(
-              onPressed: () {},
-            ),
+            if (showSearch)
+              SearchButton(
+                onPressed: () {},
+              ),
           ],
           itemGap: 16
         ),
         other: (
           widgets: [
             Theme.of(context).brandAssets.logo.buildPicture(),
-            SearchButton(
-              onPressed: () {},
-            ),
+            if (showSearch)
+              SearchButton(
+                onPressed: () {},
+              ),
           ],
           itemGap: 24
         ),

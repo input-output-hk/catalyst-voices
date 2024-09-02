@@ -18,10 +18,39 @@ final class VoicesNodeMenuItem extends Equatable {
   List<Object?> get props => [id, label];
 }
 
+final class VoicesNodeMenuController extends ChangeNotifier {
+  int? get selected => _selected;
+  int? _selected;
+
+  set selected(int? newValue) {
+    if (_selected == newValue) {
+      return;
+    }
+    _selected = newValue;
+    notifyListeners();
+  }
+
+  bool get isExpanded => _isExpanded;
+  bool _isExpanded;
+
+  set isExpanded(bool newValue) {
+    if (_isExpanded == newValue) {
+      return;
+    }
+    _isExpanded = newValue;
+    notifyListeners();
+  }
+
+  VoicesNodeMenuController({
+    int? selected,
+    bool expanded = true,
+  })  : _selected = selected,
+        _isExpanded = expanded;
+}
+
 class VoicesNodeMenu extends StatelessWidget {
   final String name;
-  final bool isExpanded;
-  final int? selected;
+  final VoicesNodeMenuController controller;
   final List<VoicesNodeMenuItem> items;
   final ValueChanged<int?>? onSelectionChanged;
   final ValueChanged<bool>? onExpandChanged;
@@ -33,8 +62,7 @@ class VoicesNodeMenu extends StatelessWidget {
   const VoicesNodeMenu({
     super.key,
     required this.name,
-    this.isExpanded = true,
-    this.selected,
+    required this.controller,
     required this.items,
     this.onSelectionChanged,
     this.onExpandChanged,
@@ -42,36 +70,41 @@ class VoicesNodeMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SimpleTreeView(
-      isExpanded: isExpanded,
-      root: SimpleTreeViewRootRow(
-        onTap: _canToggleExpand ? _onRootTap : null,
-        leading: [
-          _NodeIcon(isOpen: isExpanded),
-          VoicesAssets.images.viewGrid.buildIcon(),
-        ],
-        child: Text(name),
-      ),
-      children: items.mapIndexed(
-        (index, item) {
-          return SimpleTreeViewChildRow(
-            key: ValueKey('NodeMenu${item.id}RowKey'),
-            hasNext: index < items.length - 1,
-            isSelected: item.id == selected,
-            onTap: _canTapItem ? () => _onMenuItemTap(item) : null,
-            child: Text(item.label),
-          );
-        },
-      ).toList(),
+    return ListenableBuilder(
+      listenable: controller,
+      builder: (context, child) {
+        return SimpleTreeView(
+          isExpanded: controller.isExpanded,
+          root: SimpleTreeViewRootRow(
+            onTap: _canToggleExpand ? _onRootTap : null,
+            leading: [
+              _NodeIcon(isOpen: controller.isExpanded),
+              VoicesAssets.images.viewGrid.buildIcon(),
+            ],
+            child: Text(name),
+          ),
+          children: items.mapIndexed(
+            (index, item) {
+              return SimpleTreeViewChildRow(
+                key: ValueKey('NodeMenu${item.id}RowKey'),
+                hasNext: index < items.length - 1,
+                isSelected: item.id == controller.selected,
+                onTap: _canTapItem ? () => _onMenuItemTap(item) : null,
+                child: Text(item.label),
+              );
+            },
+          ).toList(),
+        );
+      },
     );
   }
 
   void _onRootTap() {
-    onExpandChanged?.call(!isExpanded);
+    onExpandChanged?.call(!controller.isExpanded);
   }
 
   void _onMenuItemTap(VoicesNodeMenuItem item) {
-    final id = item.id != selected ? item.id : null;
+    final id = item.id != controller.selected ? item.id : null;
     onSelectionChanged?.call(id);
   }
 }
