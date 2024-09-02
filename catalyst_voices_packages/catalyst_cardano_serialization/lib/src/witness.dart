@@ -109,8 +109,8 @@ final class TransactionWitnessSet extends Equatable implements CborEncodable {
     WitnessType type,
     T Function(CborValue) fromCbor,
   ) {
-    final value = map[CborSmallInt(type.value)];
-    return value != null ? (value as CborList).map(fromCbor).toSet() : {};
+    final value = map[CborSmallInt(type.value)] as CborList?;
+    return value?.map(fromCbor).toSet() ?? {};
   }
 
   /// Serializes the type as cbor.
@@ -128,17 +128,14 @@ final class TransactionWitnessSet extends Equatable implements CborEncodable {
 
   Map<CborValue, CborValue> _generateCborPair(
     WitnessType witnessType,
-    Set<dynamic> witnesses,
+    Set<CborEncodable> witnesses,
   ) {
     if (witnesses.isNotEmpty) {
       return {
         CborSmallInt(witnessType.value): CborList(
           witnesses
-              // FIXME(ilap): Use  proper redeemer type.
               .map(
-                (value) => value is CborEncodable
-                    ? value.toCbor()
-                    : value as CborValue,
+                (value) => value.toCbor(),
               )
               .toList(),
         ),

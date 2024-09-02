@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:catalyst_cardano_serialization/src/datum.dart';
 import 'package:catalyst_cardano_serialization/src/scripts.dart';
 import 'package:catalyst_cardano_serialization/src/transaction_output.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';

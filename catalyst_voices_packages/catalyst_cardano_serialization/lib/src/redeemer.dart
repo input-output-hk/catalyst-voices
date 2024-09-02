@@ -38,10 +38,10 @@ class ScriptData extends Equatable implements CborEncodable {
   /// The CBOR value is expected to be a list or a map.
   factory ScriptData.fromCbor(CborValue data) => ScriptData(data: data);
 
-  @override
-  List<Object?> get props => [data];
-
   /// Converts the [ScriptData] to a CBOR-encoded value.
   @override
   CborValue toCbor() => data;
+
+  @override
+  List<Object?> get props => [data];
 }

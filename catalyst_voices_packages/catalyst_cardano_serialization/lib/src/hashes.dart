@@ -7,13 +7,15 @@ import 'package:catalyst_cardano_serialization/src/exceptions.dart';
 import 'package:catalyst_cardano_serialization/src/redeemer.dart';
 import 'package:catalyst_cardano_serialization/src/signature.dart';
 import 'package:catalyst_cardano_serialization/src/transaction.dart';
+import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
+import 'package:equatable/equatable.dart';
 import 'package:pinenacl/digests.dart';
 
 /// Implements a common base of hash types that holds
 /// binary [bytes] of exact [length].
-abstract base class BaseHash {
+abstract base class BaseHash extends Equatable implements CborEncodable {
   /// The raw [bytes] of a hash.
   final List<int> bytes;
 
@@ -29,6 +31,7 @@ abstract base class BaseHash {
       : this.fromBytes(bytes: (value as CborBytes).bytes);
 
   /// Serializes the type as cbor.
+  @override
   CborValue toCbor() => CborBytes(bytes);
 
   /// Constructs the [BaseHash] from a hex string representation
@@ -45,25 +48,7 @@ abstract base class BaseHash {
   String toString() => toHex();
 
   @override
-  int get hashCode => Object.hash(bytes, length);
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    if (other is! BaseHash) return false;
-
-    // prevent subclasses of different types to be equal to each other,
-    // even if they hold the same bytes they represent different kinds
-    if (other.runtimeType != runtimeType) return false;
-
-    if (length != other.length) return false;
-
-    for (var i = 0; i < bytes.length; i++) {
-      if (bytes[i] != other.bytes[i]) return false;
-    }
-
-    return true;
-  }
+  List<Object?> get props => [bytes];
 }
 
 /// Describes the Blake2b-256 hash of the transaction which serves as proof

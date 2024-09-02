@@ -1,7 +1,7 @@
 import 'dart:typed_data';
+import 'package:catalyst_cardano_serialization/src/hashes.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:cbor/cbor.dart';
-import 'package:convert/convert.dart';
 import 'package:equatable/equatable.dart';
 import 'package:pinenacl/digests.dart';
 
@@ -30,6 +30,7 @@ enum NativeScriptType {
 
   /// The value of the enum
   final int value;
+
   const NativeScriptType(this.value);
 }
 
@@ -49,6 +50,7 @@ enum RefScriptType {
 
   /// The value of the enum
   final int value;
+
   const RefScriptType(this.value);
 }
 
@@ -56,27 +58,39 @@ enum RefScriptType {
 sealed class Script extends Equatable implements CborEncodable {
   const Script();
 
+  /// Gets the tag for the script type.
+  ///
+  /// This tag helps identify different script types:
+  /// - `0` for `NativeScript`
+  /// - `1` for `PlutusV1Script`
+  /// - `2` for `PlutusV2Script`
+  /// - `3` for `PlutusV3Script`
+  ///
+  /// Throws an `ArgumentError` if the script type is not recognized.
+  ///
+  /// Returns:
+  /// - An integer representing the script type tag.
+  int get tag => switch (this) {
+        NativeScript _ => 0,
+        PlutusV1Script _ => 1,
+        PlutusV2Script _ => 2,
+        PlutusV3Script _ => 3,
+        _ => throw ArgumentError.value(
+            this,
+            'script',
+            'Invalid script type to hash.',
+          ),
+      };
+
   /// Computes the hash of the script.
   ///
   /// This method converts the script to its CBOR representation,
   /// adds a tag based on the script type, and then computes the
   /// Blake2b hash of the resulting bytes.
   Uint8List get hash {
-    final tag = switch (this) {
-      NativeScript _ => 0,
-      PlutusV1Script _ => 1,
-      PlutusV2Script _ => 2,
-      PlutusV3Script _ => 3,
-      _ => throw ArgumentError.value(
-          this,
-          'script',
-          'Invalid script type to hash.',
-        ),
-    };
-
     final cborValue = toCbor();
     final bytesToHash = cborValue is CborBytes
-        ? _handleDoubleDecodedCbor(cborValue.bytes)
+        ? _handleDoubleEncodedCbor(cborValue.bytes)
         : cborValue;
 
     final cborBytes = cbor.encode(bytesToHash);
@@ -84,7 +98,7 @@ sealed class Script extends Equatable implements CborEncodable {
     return Hash.blake2b(bytes, digestSize: scriptHashSize);
   }
 
-  CborValue _handleDoubleDecodedCbor(List<int> bytes) {
+  CborValue _handleDoubleEncodedCbor(List<int> bytes) {
     final decoded = cbor.decode(bytes);
     if (decoded is CborBytes) {
       try {
@@ -162,7 +176,7 @@ sealed class NativeScript extends Script {
   static NativeScript fromJSON(Map<String, dynamic> json) {
     return switch (json['type']) {
       'sig' =>
-        ScriptPubkey(Uint8List.fromList(hex.decode(json['keyHash'] as String))),
+        ScriptPubkey(Ed25519PublicKeyHash.fromHex(json['keyHash'] as String)),
       'all' => ScriptAll(
           (json['scripts'] as List<Map<String, dynamic>>)
               .map<NativeScript>(fromJSON)
@@ -213,26 +227,30 @@ sealed class NativeScript extends Script {
 /// Class representing a public key based native script.
 class ScriptPubkey extends NativeScript {
   /// Public key hash.
-  final Uint8List addrKeyhash;
+  final Ed25519PublicKeyHash addrKeyHash;
 
   /// Constructor for the [ScriptPubkey] class.
-  const ScriptPubkey(this.addrKeyhash);
-
-  /// Converts the [ScriptPubkey] to its CBOR format.
-  @override
-  CborValue toCbor() => CborList(
-        [CborSmallInt(NativeScriptType.pubkey.value), CborBytes(addrKeyhash)],
-      );
+  const ScriptPubkey(this.addrKeyHash);
 
   /// Factory constructor to create a [ScriptPubkey] from a CBOR list.
   factory ScriptPubkey.fromCbor(CborList value) {
     NativeScript._checkGenericNativeScriptValidity(value);
-    return ScriptPubkey(Uint8List.fromList((value[1] as CborBytes).bytes));
+
+    return ScriptPubkey(Ed25519PublicKeyHash.fromCbor(value[1]));
   }
+
+  /// Converts the [ScriptPubkey] to its CBOR format.
+  @override
+  CborValue toCbor() => CborList(
+        [
+          CborSmallInt(NativeScriptType.pubkey.value),
+          CborBytes(addrKeyHash.bytes),
+        ],
+      );
 
   /// Equatable props for value comparison.
   @override
-  List<Object?> get props => [addrKeyhash];
+  List<Object?> get props => [addrKeyHash];
 }
 
 /// Class representing an "all" native script (AND operation).
@@ -243,13 +261,6 @@ class ScriptAll extends NativeScript {
   /// Constructor for the [ScriptAll] class.
   const ScriptAll(this.nativeScripts);
 
-  /// Converts the [ScriptAll] to its CBOR format.
-  @override
-  CborValue toCbor() => CborList([
-        CborSmallInt(NativeScriptType.all.value),
-        CborList(nativeScripts.map((s) => s.toCbor()).toList()),
-      ]);
-
   /// Factory constructor to create a [ScriptAll] from a CBOR list.
   factory ScriptAll.fromCbor(CborList value) {
     NativeScript._checkListNativeScriptValidity(value);
@@ -258,6 +269,13 @@ class ScriptAll extends NativeScript {
         .toList();
     return ScriptAll(scripts);
   }
+
+  /// Converts the [ScriptAll] to its CBOR format.
+  @override
+  CborValue toCbor() => CborList([
+        CborSmallInt(NativeScriptType.all.value),
+        CborList(nativeScripts.map((s) => s.toCbor()).toList()),
+      ]);
 
   /// Equatable props for value comparison.
   @override
@@ -272,13 +290,6 @@ class ScriptAny extends NativeScript {
   /// Constructor for the [ScriptAny] class.
   const ScriptAny(this.nativeScripts);
 
-  /// Converts the [ScriptAny] to its CBOR format.
-  @override
-  CborValue toCbor() => CborList([
-        CborSmallInt(NativeScriptType.any.value),
-        CborList(nativeScripts.map((s) => s.toCbor()).toList()),
-      ]);
-
   /// Factory constructor to create a [ScriptAny] from a CBOR value.
   factory ScriptAny.fromCbor(CborValue value) {
     NativeScript._checkListNativeScriptValidity(value);
@@ -287,6 +298,13 @@ class ScriptAny extends NativeScript {
         .toList();
     return ScriptAny(scripts);
   }
+
+  /// Converts the [ScriptAny] to its CBOR format.
+  @override
+  CborValue toCbor() => CborList([
+        CborSmallInt(NativeScriptType.any.value),
+        CborList(nativeScripts.map((s) => s.toCbor()).toList()),
+      ]);
 
   /// Equatable props for value comparison.
   @override
@@ -304,14 +322,6 @@ class ScriptNOfK extends NativeScript {
   /// Creates a new [ScriptNOfK] with the given [n] and [nativeScripts].
   const ScriptNOfK(this.n, this.nativeScripts);
 
-  /// Converts the [ScriptNOfK] to its CBOR format.
-  @override
-  CborValue toCbor() => CborList([
-        CborSmallInt(NativeScriptType.nOfK.value),
-        CborSmallInt(n),
-        CborList(nativeScripts.map((s) => s.toCbor()).toList()),
-      ]);
-
   /// Factory constructor to create a [ScriptNOfK] from a CBOR value.
   factory ScriptNOfK.fromCbor(CborValue value) {
     if (value is! CborList ||
@@ -327,6 +337,14 @@ class ScriptNOfK extends NativeScript {
     return ScriptNOfK(n, scripts);
   }
 
+  /// Converts the [ScriptNOfK] to its CBOR format.
+  @override
+  CborValue toCbor() => CborList([
+        CborSmallInt(NativeScriptType.nOfK.value),
+        CborSmallInt(n),
+        CborList(nativeScripts.map((s) => s.toCbor()).toList()),
+      ]);
+
   /// Equatable props for value comparison.
   @override
   List<Object?> get props => [n, nativeScripts];
@@ -340,18 +358,18 @@ class InvalidBefore extends NativeScript {
   /// Factory constructor to create an [InvalidBefore] from a CBOR list.
   const InvalidBefore(this.timestamp);
 
+  /// Factory constructor to create an [InvalidBefore] from a CBOR list.
+  factory InvalidBefore.fromCbor(CborList value) {
+    NativeScript._checkBoundedNativeScriptValidity(value);
+    return InvalidBefore((value[1] as CborSmallInt).value);
+  }
+
   /// Converts the [InvalidBefore] to its CBOR format.
   @override
   CborValue toCbor() => CborList([
         CborSmallInt(NativeScriptType.invalidBefore.value),
         CborSmallInt(timestamp),
       ]);
-
-  /// Factory constructor to create an [InvalidBefore] from a CBOR list.
-  factory InvalidBefore.fromCbor(CborList value) {
-    NativeScript._checkBoundedNativeScriptValidity(value);
-    return InvalidBefore((value[1] as CborSmallInt).value);
-  }
 
   /// Equatable props for value comparison.
   @override
@@ -366,18 +384,18 @@ class InvalidAfter extends NativeScript {
   /// Factory constructor to create an [InvalidAfter] from a CBOR list.
   const InvalidAfter(this.timestamp);
 
+  /// Factory constructor to create an [InvalidAfter] from a CBOR list.
+  factory InvalidAfter.fromCbor(CborList value) {
+    NativeScript._checkBoundedNativeScriptValidity(value);
+    return InvalidAfter((value[1] as CborSmallInt).value);
+  }
+
   /// Converts the [InvalidAfter] to its CBOR format.
   @override
   CborValue toCbor() => CborList([
         CborSmallInt(NativeScriptType.invalidAfter.value),
         CborSmallInt(timestamp),
       ]);
-
-  /// Factory constructor to create an [InvalidAfter] from a CBOR list.
-  factory InvalidAfter.fromCbor(CborList value) {
-    NativeScript._checkBoundedNativeScriptValidity(value);
-    return InvalidAfter((value[1] as CborSmallInt).value);
-  }
 
   /// Equatable props for value comparison.
   @override

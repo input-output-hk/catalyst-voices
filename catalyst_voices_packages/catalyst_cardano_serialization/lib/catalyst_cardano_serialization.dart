@@ -3,6 +3,7 @@ export 'src/builders/transaction_builder.dart';
 export 'src/builders/witness_builder.dart';
 export 'src/certificate.dart';
 export 'src/cip95/drep.dart';
+export 'src/datum.dart';
 export 'src/exceptions.dart';
 export 'src/fees.dart';
 export 'src/hashes.dart';
