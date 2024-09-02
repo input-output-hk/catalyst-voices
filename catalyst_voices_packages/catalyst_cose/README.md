@@ -17,7 +17,7 @@ This package exposes a CBOR Object Signing and Encryption
 
 ## Requirements
 
-* Dart: 3.3.4+
+* Dart: 3.5.0+
 
 ## Install
 

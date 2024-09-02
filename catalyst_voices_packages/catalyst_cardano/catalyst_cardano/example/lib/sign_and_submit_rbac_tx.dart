@@ -80,6 +80,10 @@ Future<void> _signAndSubmitRbacTx({
       ),
     );
 
+    if (utxos.isEmpty) {
+      throw Exception('Insufficient balance, please top up your wallet');
+    }
+
     final x509Envelope = await _buildMetadataEnvelope(
       utxos: utxos,
     );

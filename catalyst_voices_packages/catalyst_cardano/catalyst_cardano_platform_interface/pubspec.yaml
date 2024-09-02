@@ -6,8 +6,8 @@ topics: [blockchain, cardano, cryptocurrency, wallet]
 version: 0.2.0+1
 
 environment:
-  sdk: ">=3.3.4 <4.0.0"
-  flutter: ">=3.22.1"
+  sdk: ">=3.5.0 <4.0.0"
+  flutter: ">=3.24.1"
 
 dependencies:
   catalyst_cardano_serialization: ^0.3.0
@@ -17,7 +17,6 @@ dependencies:
   plugin_platform_interface: ^2.1.7
 
 dev_dependencies:
-  catalyst_analysis:
-    path: ../../catalyst_analysis
+  catalyst_analysis: ^1.2.0
   flutter_test:
     sdk: flutter
