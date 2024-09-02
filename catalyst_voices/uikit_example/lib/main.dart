@@ -16,7 +16,7 @@ class UIKitExampleApp extends StatefulWidget {
 }
 
 class _UIKitExampleAppState extends State<UIKitExampleApp> {
-  ThemeMode _themeMode = ThemeMode.light;
+  ThemeMode _themeMode = ThemeMode.system;
 
   @override
   Widget build(BuildContext context) {

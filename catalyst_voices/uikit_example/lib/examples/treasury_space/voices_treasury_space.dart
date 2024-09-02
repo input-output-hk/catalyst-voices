@@ -70,21 +70,29 @@ class _VoicesTreasurySpaceState extends State<VoicesTreasurySpace> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: VoicesAppBar(
-        backgroundColor: Theme.of(context).colors.onSurfaceNeutralOpaqueLv0,
-      ),
-      drawer: VoicesTreasuryDrawer(),
-      body: SpaceContainer(
-        left: CampaignBuilderPanel(
-          setupCampaignController: _setupCampaignController,
-          setupCampaignItems: _campaignSetupSteps,
-        ),
-        right: CampaignCommentsPanel(),
-        child: CampaignDetails(
-          campaignSetupController: _setupCampaignController,
-          steps: _campaignSetupSteps,
-        ),
+    return Theme(
+      data: ThemeBuilder.buildTheme(BrandKey.catalyst),
+      child: Builder(
+        builder: (context) {
+          return Scaffold(
+            appBar: VoicesAppBar(
+              backgroundColor:
+                  Theme.of(context).colors.onSurfaceNeutralOpaqueLv0,
+            ),
+            drawer: VoicesTreasuryDrawer(),
+            body: SpaceContainer(
+              left: CampaignBuilderPanel(
+                setupCampaignController: _setupCampaignController,
+                setupCampaignItems: _campaignSetupSteps,
+              ),
+              right: CampaignCommentsPanel(),
+              child: CampaignDetails(
+                campaignSetupController: _setupCampaignController,
+                steps: _campaignSetupSteps,
+              ),
+            ),
+          );
+        },
       ),
     );
   }
