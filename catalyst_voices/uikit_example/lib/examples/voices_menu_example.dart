@@ -36,7 +36,7 @@ class _VoicesMenuExampleState extends State<VoicesMenuExample> {
                 VoicesNodeMenu(
                   name: 'Problem-sensing stage',
                   controller: _problemSensingController,
-                  items: const [
+                  items: [
                     VoicesNodeMenuItem(id: 0, label: 'Start'),
                     VoicesNodeMenuItem(id: 1, label: 'Vote'),
                     VoicesNodeMenuItem(id: 2, label: 'Results'),

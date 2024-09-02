@@ -50,6 +50,58 @@ class RightArrowButton extends StatelessWidget {
   }
 }
 
+class ChevronDownButton extends StatelessWidget {
+  final VoidCallback? onTap;
+
+  const ChevronDownButton({
+    super.key,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesIconButton(
+      onTap: onTap,
+      child: const Icon(CatalystVoicesIcons.chevron_down),
+    );
+  }
+}
+
+class ChevronRightButton extends StatelessWidget {
+  final VoidCallback? onTap;
+
+  const ChevronRightButton({
+    super.key,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesIconButton(
+      onTap: onTap,
+      child: const Icon(CatalystVoicesIcons.chevron_right),
+    );
+  }
+}
+
+class ChevronExpandButton extends StatelessWidget {
+  final bool isOpen;
+  final VoidCallback? onTap;
+
+  const ChevronExpandButton({
+    super.key,
+    this.isOpen = true,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return isOpen
+        ? ChevronDownButton(onTap: onTap)
+        : ChevronRightButton(onTap: onTap);
+  }
+}
+
 class NavigationPopButton extends StatelessWidget {
   const NavigationPopButton({super.key});
 

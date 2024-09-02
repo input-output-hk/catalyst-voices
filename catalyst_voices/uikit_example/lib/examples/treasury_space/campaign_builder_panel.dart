@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 
 class CampaignBuilderPanel extends StatelessWidget {
   final VoicesNodeMenuController setupCampaignController;
+  final List<VoicesNodeMenuItem> setupCampaignItems;
 
   const CampaignBuilderPanel({
     required this.setupCampaignController,
+    required this.setupCampaignItems,
   });
 
   @override
@@ -22,11 +24,7 @@ class CampaignBuilderPanel extends StatelessWidget {
               VoicesNodeMenu(
                 name: 'Setup Campaign',
                 controller: setupCampaignController,
-                items: [
-                  VoicesNodeMenuItem(id: 0, label: 'Other topic 1'),
-                  VoicesNodeMenuItem(id: 1, label: 'Other topic 2'),
-                  VoicesNodeMenuItem(id: 2, label: 'Other topic 3'),
-                ],
+                items: setupCampaignItems,
                 onSelectionChanged: _updateSetupMenuSelection,
                 onExpandChanged: _updateSetupMenuExpand,
               ),
