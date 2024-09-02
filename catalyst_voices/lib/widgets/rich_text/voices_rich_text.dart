@@ -25,9 +25,14 @@ class VoicesRichText extends StatefulWidget {
 
 class _VoicesRichTextState extends State<VoicesRichText> {
   final QuillController _controller = QuillController.basic();
+  int _documentLength = 0;
+  FocusNode _focusNode = FocusNode();
 
   void _onDocumentChange(DocChange docChange) {
     final documentLength = _controller.document.length;
+    setState(() {
+      _documentLength = documentLength;
+    });
     final limit = widget.charsLimit;
 
     if (limit == null) return;
@@ -128,6 +133,7 @@ class _VoicesRichTextState extends State<VoicesRichText> {
               ),
               child: QuillEditor.basic(
                 controller: _controller,
+                focusNode: _focusNode,
                 configurations: QuillEditorConfigurations(
                   padding: const EdgeInsets.all(16),
                   placeholder: 'Start writing your text...',
@@ -137,9 +143,17 @@ class _VoicesRichTextState extends State<VoicesRichText> {
             ),
           ),
         ),
-        VoicesFilledButton(
-          child: Text('Save'),
-          onTap: () => widget.onSave?.call(_controller.document),
+        if (widget.charsLimit != null)
+          Align(
+            alignment: Alignment.centerRight,
+            child: Text('${_documentLength}/${widget.charsLimit!}'),
+          ),
+        Align(
+          alignment: Alignment.centerRight,
+          child: VoicesFilledButton(
+            child: Text('Save'),
+            onTap: () => widget.onSave?.call(_controller.document),
+          ),
         ),
       ],
     );

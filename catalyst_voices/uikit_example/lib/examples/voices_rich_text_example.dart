@@ -14,6 +14,7 @@ class VoicesRichTextExample extends StatelessWidget {
       body: SingleChildScrollView(
         child: VoicesRichText(
           document: Document.fromJson(_textSample),
+          charsLimit: 800,
           onSave: (document) => print('Saved document: $document'),
         ),
       ),
