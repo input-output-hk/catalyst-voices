@@ -12,11 +12,13 @@ class VoicesRichText extends StatefulWidget {
     super.key,
     required this.document,
     this.onSave,
+    this.onCancel,
     this.charsLimit,
   });
 
   final Document document;
   final ValueChanged<Document>? onSave;
+  final VoidCallback? onCancel;
   final int? charsLimit;
 
   @override
@@ -53,6 +55,10 @@ class _VoicesRichTextState extends State<VoicesRichText> {
     super.initState();
     _controller.document = widget.document;
     _controller.document.changes.listen(_onDocumentChange);
+
+    setState(() {
+      _documentLength = _controller.document.length;
+    });
   }
 
   @override
@@ -85,9 +91,6 @@ class _VoicesRichTextState extends State<VoicesRichText> {
                         null,
                 iconTheme: null,
               ),
-              QuillToolbarSelectHeaderStyleDropdownButton(
-                controller: _controller,
-              ),
               QuillToolbarToggleStyleButton(
                 options: const QuillToolbarToggleStyleButtonOptions(),
                 controller: _controller,
@@ -118,17 +121,31 @@ class _VoicesRichTextState extends State<VoicesRichText> {
               QuillToolbarImageButton(
                 controller: _controller,
               ),
+              Expanded(
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: TextButton(
+                      onPressed: widget.onCancel,
+                      child: Text('Cancel'),
+                    ),
+                  ),
+                ),
+              )
             ],
           ),
         ),
         Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: ResizableBoxParent(
             minHeight: 400,
             resizable: true,
             child: Container(
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.black12),
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.outlineVariant,
+                ),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: QuillEditor.basic(
@@ -146,13 +163,22 @@ class _VoicesRichTextState extends State<VoicesRichText> {
         if (widget.charsLimit != null)
           Align(
             alignment: Alignment.centerRight,
-            child: Text('${_documentLength}/${widget.charsLimit!}'),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+              child: Text('${_documentLength}/${widget.charsLimit!}'),
+            ),
           ),
         Align(
           alignment: Alignment.centerRight,
-          child: VoicesFilledButton(
-            child: Text('Save'),
-            onTap: () => widget.onSave?.call(_controller.document),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 12.0,
+            ),
+            child: VoicesFilledButton(
+              child: Text('Save'.toUpperCase()),
+              onTap: () => widget.onSave?.call(_controller.document),
+            ),
           ),
         ),
       ],
