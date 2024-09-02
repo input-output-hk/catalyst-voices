@@ -656,11 +656,7 @@ class _ResizableBoxState extends State<_ResizableBox> {
                   );
                 });
               },
-              child: CatalystSvgPicture.asset(
-                VoicesAssets.images.dragger.path,
-                width: 15,
-                height: 15,
-              ),
+              child: VoicesAssets.images.dragger.buildIcon(size: 15),
             ),
           ),
         ),

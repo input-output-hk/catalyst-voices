@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 /// [CatalystSvgPicture] extends [SvgPicture] to have an asset constructor
@@ -7,37 +6,38 @@ import 'package:flutter_svg/flutter_svg.dart';
 /// every time.
 /// For more information, see [SvgPicture.asset].
 final class CatalystSvgPicture extends SvgPicture {
+  const CatalystSvgPicture(
+    super.bytesLoader, {
+    super.key,
+    super.width,
+    super.height,
+    super.fit,
+    super.alignment,
+    super.matchTextDirection,
+    super.allowDrawingOutsideViewBox,
+    super.placeholderBuilder,
+    super.colorFilter,
+    super.semanticsLabel,
+    super.excludeFromSemantics,
+    super.clipBehavior,
+  }) : super();
+
   CatalystSvgPicture.asset(
-    String name, {
-    AssetBundle? bundle,
-    String? semanticsLabel,
-    bool excludeFromSemantics = false,
-    double? width,
-    double? height,
-    BoxFit fit = BoxFit.contain,
-    Alignment alignment = Alignment.center,
-    bool matchTextDirection = false,
-    String package = 'catalyst_voices_assets',
-    bool allowDrawingOutsideViewBox = false,
-    Widget Function(BuildContext)? placeholderBuilder,
-    Clip clipBehavior = Clip.hardEdge,
-    SvgTheme? theme,
-    ColorFilter? colorFilter,
-  }) : super.asset(
-          name,
-          bundle: bundle,
-          semanticsLabel: semanticsLabel,
-          excludeFromSemantics: excludeFromSemantics,
-          width: width,
-          height: height,
-          fit: fit,
-          alignment: alignment,
-          matchTextDirection: matchTextDirection,
-          package: package,
-          allowDrawingOutsideViewBox: allowDrawingOutsideViewBox,
-          placeholderBuilder: placeholderBuilder,
-          clipBehavior: clipBehavior,
-          theme: theme,
-          colorFilter: colorFilter,
-        );
+    super.name, {
+    super.key,
+    super.matchTextDirection,
+    super.bundle,
+    super.package = 'catalyst_voices_assets',
+    super.width,
+    super.height,
+    super.fit,
+    super.alignment,
+    super.allowDrawingOutsideViewBox,
+    super.placeholderBuilder,
+    super.semanticsLabel,
+    super.excludeFromSemantics,
+    super.clipBehavior,
+    super.theme,
+    super.colorFilter,
+  }) : super.asset();
 }
