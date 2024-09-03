@@ -12,7 +12,7 @@ void main() {
       await tester.pumpApp(
         Scaffold(
           body: VoicesWalletTile(
-            icon: _testIcon,
+            iconSrc: _testIcon,
             name: testName,
           ),
         ),
@@ -41,7 +41,7 @@ void main() {
       await tester.pumpApp(
         Scaffold(
           body: VoicesWalletTile(
-            icon: _testIcon,
+            iconSrc: _testIcon,
           ),
         ),
       );
@@ -56,7 +56,7 @@ void main() {
       await tester.pumpApp(
         Scaffold(
           body: VoicesWalletTile(
-            icon: _testIcon,
+            iconSrc: _testIcon,
             name: const Text('Test Wallet'),
             onTap: () {
               tapped = true;
@@ -76,7 +76,7 @@ void main() {
       await tester.pumpApp(
         Scaffold(
           body: VoicesWalletTile(
-            icon: 'https://example.com/non_existent_icon.png',
+            iconSrc: 'https://example.com/non_existent_icon.png',
             name: const Text('Test Wallet'),
           ),
         ),

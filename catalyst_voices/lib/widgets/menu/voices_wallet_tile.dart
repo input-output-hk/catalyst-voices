@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 /// A replacement for the [ListTile] with customized
 /// styling that displays a [CardanoWallet].
 class VoicesWalletTile extends StatelessWidget {
-  /// base64 encoded image representing the wallet extension.
-  final String? icon;
+  /// URI or base64 encoded icon of the wallet extension.
+  final String? iconSrc;
 
   /// The name of the wallet extension.
   final Widget? name;
@@ -17,14 +17,14 @@ class VoicesWalletTile extends StatelessWidget {
   /// The default constructor for the [VoicesWalletTile].
   const VoicesWalletTile({
     super.key,
-    this.icon,
+    this.iconSrc,
     this.name,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final icon = this.icon;
+    final icon = this.iconSrc;
     final name = this.name;
 
     return ListTile(

@@ -113,7 +113,7 @@ class VoicesListTileExample extends StatelessWidget {
               onTap: () {},
             ),
             VoicesWalletTile(
-              icon: _base64Icon,
+              iconSrc: _base64Icon,
               name: const Text('Wallet Extension'),
               onTap: () {},
             ),
