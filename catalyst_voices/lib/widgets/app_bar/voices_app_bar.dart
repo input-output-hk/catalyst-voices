@@ -42,7 +42,7 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
           return AppBar(
             titleSpacing: spacing,
             toolbarHeight: preferredSize.height,
-            leading: buildLeading(context),
+            leading: _buildLeading(context),
             leadingWidth: 48.0 + spacing,
             automaticallyImplyLeading: false,
             backgroundColor: backgroundColor,
@@ -57,7 +57,7 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   // Has to be nullable, that's why this is a function.
-  Widget? buildLeading(BuildContext context) {
+  Widget? _buildLeading(BuildContext context) {
     final canImplyDrawerToggleButton = automaticallyImplyLeading &&
         (Scaffold.maybeOf(context)?.hasDrawer ?? false);
 
