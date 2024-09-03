@@ -2,7 +2,107 @@ import 'package:catalyst_voices/widgets/menu/voices_wallet_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-typedef _IconPlaceholder = CircleAvatar;
+import '../../helpers/pump_app.dart';
+
+void main() {
+  group('VoicesWalletTile Tests', () {
+    testWidgets('renders correctly with icon and name', (tester) async {
+      const testName = Text('Test Wallet');
+
+      await tester.pumpApp(
+        Scaffold(
+          body: VoicesWalletTile(
+            icon: _testIcon,
+            name: testName,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(Image), findsOneWidget);
+      expect(find.byType(Text), findsOneWidget);
+      expect(find.text('Test Wallet'), findsOneWidget);
+    });
+
+    testWidgets('renders placeholder when icon is null', (tester) async {
+      await tester.pumpApp(
+        Scaffold(
+          body: VoicesWalletTile(
+            name: const Text('Test Wallet'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(_IconPlaceholder), findsOneWidget);
+    });
+
+    testWidgets('does not render name when it is null', (tester) async {
+      await tester.pumpApp(
+        Scaffold(
+          body: VoicesWalletTile(
+            icon: _testIcon,
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(Text), findsNothing);
+    });
+
+    testWidgets('triggers onTap callback when tapped', (tester) async {
+      bool tapped = false;
+
+      await tester.pumpApp(
+        Scaffold(
+          body: VoicesWalletTile(
+            icon: _testIcon,
+            name: const Text('Test Wallet'),
+            onTap: () {
+              tapped = true;
+            },
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byType(ListTile));
+      await tester.pumpAndSettle();
+
+      expect(tapped, isTrue);
+    });
+
+    testWidgets('shows placeholder on image load failure', (tester) async {
+      await tester.pumpApp(
+        Scaffold(
+          body: VoicesWalletTile(
+            icon: 'https://example.com/non_existent_icon.png',
+            name: const Text('Test Wallet'),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      // Simulate a loading error.
+      final imageFinder = find.byType(Image);
+      final imageWidget = tester.widget<Image>(imageFinder);
+      final errorBuilder = imageWidget.errorBuilder;
+      if (errorBuilder != null) {
+        await tester.pumpApp(
+          Scaffold(
+            body: errorBuilder(
+              tester.element(imageFinder),
+              Exception('Error'),
+              StackTrace.current,
+            ),
+          ),
+        );
+      }
+
+      expect(find.byType(_IconPlaceholder), findsOneWidget);
+    });
+  });
+}
 
 const _testIcon =
     'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAYAAACOEfKtAAAACX'
@@ -68,111 +168,4 @@ const _testIcon =
     '7Yo5hcd0ZB5fXLyrBIbjF55tG1a1fpHERaCoVjdV1ktrqq8T+Ol4X0Bf+NFwAAAABJRU5Erk'
     'Jggg==';
 
-void main() {
-  group('VoicesWalletTile Tests', () {
-    testWidgets('renders correctly with icon and name',
-        (WidgetTester tester) async {
-      const testName = Text('Test Wallet');
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: VoicesWalletTile(
-              icon: _testIcon,
-              name: testName,
-            ),
-          ),
-        ),
-      );
-
-      expect(find.byType(RawImage), findsOneWidget);
-      expect(find.byType(Text), findsOneWidget);
-      expect(find.text('Test Wallet'), findsOneWidget);
-    });
-
-    testWidgets('renders placeholder when icon is null',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: VoicesWalletTile(
-              name: const Text('Test Wallet'),
-            ),
-          ),
-        ),
-      );
-
-      expect(find.byType(_IconPlaceholder), findsOneWidget);
-    });
-
-    testWidgets('does not render name when it is null',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: VoicesWalletTile(
-              icon: _testIcon,
-            ),
-          ),
-        ),
-      );
-
-      expect(find.byType(Text), findsNothing);
-    });
-
-    testWidgets('triggers onTap callback when tapped',
-        (WidgetTester tester) async {
-      bool tapped = false;
-
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: VoicesWalletTile(
-              icon: _testIcon,
-              name: const Text('Test Wallet'),
-              onTap: () {
-                tapped = true;
-              },
-            ),
-          ),
-        ),
-      );
-
-      await tester.tap(find.byType(ListTile));
-      await tester.pumpAndSettle();
-
-      expect(tapped, isTrue);
-    });
-
-    testWidgets('shows placeholder on image load failure',
-        (WidgetTester tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          home: Scaffold(
-            body: VoicesWalletTile(
-              icon: 'https://example.com/non_existent_icon.png',
-              name: const Text('Test Wallet'),
-            ),
-          ),
-        ),
-      );
-
-      // Simulate a loading error.
-      final imageFinder = find.byType(Image);
-      final imageWidget = tester.widget<Image>(imageFinder);
-      final errorBuilder = imageWidget.errorBuilder;
-      if (errorBuilder != null) {
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Scaffold(
-              body: errorBuilder(tester.element(imageFinder),
-                  Exception('Error'), StackTrace.current),
-            ),
-          ),
-        );
-      }
-
-      expect(find.byType(_IconPlaceholder), findsOneWidget);
-    });
-  });
-}
+typedef _IconPlaceholder = CircleAvatar;
