@@ -92,7 +92,7 @@ class _DrawerChooser extends StatefulWidget {
 }
 
 class _DrawerChooserState extends State<_DrawerChooser> {
-  Space _selectedSpace = Space.ideas;
+  Space _selectedSpace = Space.discovery;
 
   @override
   Widget build(BuildContext context) {

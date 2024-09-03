@@ -1,5 +1,5 @@
 import 'package:catalyst_voices/widgets/app_bar/actions/search_button.dart';
-import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -42,7 +42,7 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
           return AppBar(
             titleSpacing: spacing,
             toolbarHeight: preferredSize.height,
-            leading: buildLeading(context),
+            leading: _buildLeading(context),
             leadingWidth: 48.0 + spacing,
             automaticallyImplyLeading: false,
             backgroundColor: backgroundColor,
@@ -57,7 +57,7 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   // Has to be nullable, that's why this is a function.
-  Widget? buildLeading(BuildContext context) {
+  Widget? _buildLeading(BuildContext context) {
     final canImplyDrawerToggleButton = automaticallyImplyLeading &&
         (Scaffold.maybeOf(context)?.hasDrawer ?? false);
 

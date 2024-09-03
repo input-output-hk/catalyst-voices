@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/drawer/voices_drawer.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
@@ -60,26 +61,28 @@ final class _VoicesDrawerSpaceChooserConfig {
 
 extension _SpaceExt on Space {
   _VoicesDrawerSpaceChooserConfig _config(BuildContext context) {
+    final theme = Theme.of(context);
+
     return switch (this) {
-      Space.ideas => _VoicesDrawerSpaceChooserConfig(
-          iconData: CatalystVoicesIcons.light_bulb,
-          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-          foregroundColor: Theme.of(context).colorScheme.primary,
-        ),
       Space.discovery => _VoicesDrawerSpaceChooserConfig(
-          iconData: CatalystVoicesIcons.shopping_cart,
-          backgroundColor: Theme.of(context).colorScheme.secondaryContainer,
-          foregroundColor: Theme.of(context).colorScheme.secondary,
+          iconData: CatalystVoicesIcons.light_bulb,
+          backgroundColor: theme.colors.iconsSecondary!.withOpacity(0.16),
+          foregroundColor: theme.colors.iconsSecondary!,
         ),
-      Space.proposals => _VoicesDrawerSpaceChooserConfig(
+      Space.workspace => _VoicesDrawerSpaceChooserConfig(
+          iconData: CatalystVoicesIcons.briefcase,
+          backgroundColor: theme.colorScheme.primaryContainer,
+          foregroundColor: theme.colorScheme.primary,
+        ),
+      Space.voting => _VoicesDrawerSpaceChooserConfig(
+          iconData: CatalystVoicesIcons.vote,
+          backgroundColor: theme.colors.warningContainer!,
+          foregroundColor: theme.colors.iconsWarning!,
+        ),
+      Space.treasury => _VoicesDrawerSpaceChooserConfig(
           iconData: CatalystVoicesIcons.fund,
-          backgroundColor: Colors.orange,
-          foregroundColor: Colors.white,
-        ),
-      Space.settings => _VoicesDrawerSpaceChooserConfig(
-          iconData: CatalystVoicesIcons.cog_gear,
-          backgroundColor: Colors.green,
-          foregroundColor: Colors.white,
+          backgroundColor: theme.colors.successContainer!,
+          foregroundColor: theme.colors.iconsSuccess!,
         ),
     };
   }

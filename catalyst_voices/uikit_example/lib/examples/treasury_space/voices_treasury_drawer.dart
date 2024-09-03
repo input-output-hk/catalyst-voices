@@ -16,7 +16,7 @@ class VoicesTreasuryDrawer extends StatelessWidget {
         _Treasury(),
       ],
       bottom: VoicesDrawerSpaceChooser(
-        currentSpace: Space.proposals,
+        currentSpace: Space.treasury,
         onChanged: (value) {},
       ),
     );

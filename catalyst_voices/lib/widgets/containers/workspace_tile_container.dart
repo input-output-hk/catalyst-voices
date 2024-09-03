@@ -2,6 +2,7 @@ import 'package:catalyst_voices/widgets/headers/segment_header.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
+/// Opinionated container usual used inside space main body.
 class WorkspaceTileContainer extends StatelessWidget {
   final bool isSelected;
   final String name;

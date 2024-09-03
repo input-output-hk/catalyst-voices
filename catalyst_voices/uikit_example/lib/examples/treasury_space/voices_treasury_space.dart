@@ -80,7 +80,7 @@ class _VoicesTreasurySpaceState extends State<VoicesTreasurySpace> {
                   Theme.of(context).colors.onSurfaceNeutralOpaqueLv0,
             ),
             drawer: VoicesTreasuryDrawer(),
-            body: SpaceContainer(
+            body: SpaceScaffold(
               left: CampaignBuilderPanel(
                 setupCampaignController: _setupCampaignController,
                 setupCampaignItems: _campaignSetupSteps,

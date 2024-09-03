@@ -1,6 +1,7 @@
+/// Main spaces between which user can navigate.
 enum Space {
-  ideas,
   discovery,
-  proposals,
-  settings;
+  workspace,
+  voting,
+  treasury,
 }
