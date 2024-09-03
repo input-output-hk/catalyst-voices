@@ -16,7 +16,6 @@ class VoicesRichTextExample extends StatelessWidget {
           document: Document.fromJson(_textSample),
           charsLimit: 800,
           onSave: (document) => print('Saved document: $document'),
-          onCancel: () => Navigator.pop(context),
         ),
       ),
     );
