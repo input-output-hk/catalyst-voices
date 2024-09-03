@@ -49,7 +49,7 @@ class ResponsivePadding extends StatelessWidget {
   Widget build(BuildContext context) {
     return ResponsiveBuilder<EdgeInsets>(
       builder: (context, padding) => Padding(
-        padding: padding!,
+        padding: padding,
         child: child,
       ),
       xs: _paddings[ResponsiveBreakpointKey.xs],
