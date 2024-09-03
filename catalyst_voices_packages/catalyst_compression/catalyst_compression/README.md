@@ -19,8 +19,8 @@ This package exposes a JS wrapper around Brotli and zstd compression/decompressi
 
 ## Requirements
 
-* Dart: 3.3.4+
-* Flutter: 3.22.1+
+* Dart: 3.5.0+
+* Flutter: 3.24.1+
 
 ## Install
 

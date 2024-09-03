@@ -4,6 +4,8 @@ import 'package:convert/convert.dart';
 import 'package:equatable/equatable.dart';
 
 /// An interface for classes that support CBOR serialization.
+///
+// ignore: one_member_abstracts
 abstract interface class CborEncodable {
   /// Creates a new instance of [CborEncodable].
   const CborEncodable();
@@ -318,7 +320,8 @@ extension type AssetName(String name) {
   /// Deserializes the type from cbor.
   factory AssetName.fromCbor(CborValue value) {
     final bytes = (value as CborBytes).bytes;
-    return AssetName(CborString.fromUtf8(bytes).toString());
+    // FIXME(ilap): Handle non ASCII/UTF-8 characters.
+    return AssetName(CborString.fromUtf8(bytes).toString(allowMalformed: true));
   }
 
   /// Serializes the type as cbor.
