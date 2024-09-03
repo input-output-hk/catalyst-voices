@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/widgets/containers/rails_container.dart';
+import 'package:catalyst_voices/widgets/containers/sidebar_scaffold.dart';
 import 'package:catalyst_voices/widgets/containers/space_side_panel.dart';
 import 'package:flutter/material.dart';
 
@@ -6,15 +6,15 @@ import 'package:flutter/material.dart';
 /// does not require any specific child types but
 /// is common to use [SpaceSidePanel] as [left] and [right].
 ///
-/// Only difference from [RailsContainer] is that main content, [child],
+/// Only difference from [SidebarScaffold] is that main content, [child],
 /// has [maxWidth] so it does not expand indefinitely but spacing
 /// between [child] and [left],[right] does.
-class SpaceContainer extends StatelessWidget {
+class SpaceScaffold extends StatelessWidget {
   final Widget left;
   final Widget right;
   final Widget child;
 
-  const SpaceContainer({
+  const SpaceScaffold({
     super.key,
     required this.left,
     required this.right,
@@ -23,7 +23,7 @@ class SpaceContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RailsContainer(
+    return SidebarScaffold(
       leftRail: left,
       rightRail: right,
       child: Center(

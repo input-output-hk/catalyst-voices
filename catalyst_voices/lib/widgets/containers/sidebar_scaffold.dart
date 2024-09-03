@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 /// At the moment we do not have defined behaviour when we don't have
 /// sufficient screen width for all content. Medium and small screens behaviour
 /// will be implemented later. Right now only desktops are focused.
-class RailsContainer extends StatelessWidget {
+class SidebarScaffold extends StatelessWidget {
   final Widget leftRail;
   final Widget rightRail;
   final double railWidth;
@@ -19,7 +19,7 @@ class RailsContainer extends StatelessWidget {
   final double childMaxWidth;
   final Widget child;
 
-  const RailsContainer({
+  const SidebarScaffold({
     super.key,
     this.leftRail = const SizedBox(),
     this.rightRail = const SizedBox(),

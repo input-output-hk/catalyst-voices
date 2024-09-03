@@ -1,6 +1,6 @@
 import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
 import 'package:catalyst_voices/widgets/common/tab_bar_stack_view.dart';
-import 'package:catalyst_voices/widgets/containers/space_container.dart';
+import 'package:catalyst_voices/widgets/containers/space_scaffold.dart';
 import 'package:catalyst_voices/widgets/headers/section_header.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +21,7 @@ class SpaceSidePanelTab {
 }
 
 /// Defines usual space panel. This widget is opinionated and should
-/// be used together with [SpaceContainer].
+/// be used together with [SpaceScaffold].
 ///
 /// Always have [name], [tabs] and tabs content [SpaceSidePanelTab.body].
 class SpaceSidePanel extends StatelessWidget {
