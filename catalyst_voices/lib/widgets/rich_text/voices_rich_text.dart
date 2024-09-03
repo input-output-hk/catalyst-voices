@@ -71,6 +71,8 @@ class _VoicesRichTextState extends State<VoicesRichText> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return ExcludeFocus(
       excluding: !_editMode,
       child: Column(
@@ -81,7 +83,7 @@ class _VoicesRichTextState extends State<VoicesRichText> {
               children: [
                 Text(
                   'Rich text',
-                  style: Theme.of(context).textTheme.titleMedium,
+                  style: theme.textTheme.titleMedium,
                 ),
                 Expanded(
                   child: Align(
@@ -96,7 +98,7 @@ class _VoicesRichTextState extends State<VoicesRichText> {
                         },
                         child: Text(
                           _editMode ? 'Cancel' : 'Edit',
-                          style: Theme.of(context).textTheme.labelSmall,
+                          style: theme.textTheme.labelSmall,
                         ),
                       ),
                     ),
@@ -109,7 +111,7 @@ class _VoicesRichTextState extends State<VoicesRichText> {
             Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
               child: Container(
-                color: Theme.of(context).colors.onSurfaceNeutralOpaqueLv1,
+                color: theme.colors.onSurfaceNeutralOpaqueLv1,
                 child: QuillToolbar(
                   configurations: const QuillToolbarConfigurations(),
                   child: Row(
@@ -195,10 +197,10 @@ class _VoicesRichTextState extends State<VoicesRichText> {
               child: Container(
                 decoration: BoxDecoration(
                   color: _editMode
-                      ? Theme.of(context).colors.onSurfaceNeutralOpaqueLv1
-                      : Theme.of(context).scaffoldBackgroundColor,
+                      ? theme.colors.onSurfaceNeutralOpaqueLv1
+                      : theme.scaffoldBackgroundColor,
                   border: Border.all(
-                    color: Theme.of(context).colorScheme.outlineVariant,
+                    color: theme.colorScheme.outlineVariant,
                   ),
                   borderRadius: BorderRadius.circular(8),
                 ),
@@ -224,12 +226,12 @@ class _VoicesRichTextState extends State<VoicesRichText> {
                   Expanded(
                     child: Text(
                       'Supporting text',
-                      style: Theme.of(context).textTheme.bodySmall,
+                      style: theme.textTheme.bodySmall,
                     ),
                   ),
                   Text(
                     '${_documentLength}/${widget.charsLimit!}',
-                    style: Theme.of(context).textTheme.bodySmall,
+                    style: theme.textTheme.bodySmall,
                   ),
                 ],
               ),
@@ -241,7 +243,7 @@ class _VoicesRichTextState extends State<VoicesRichText> {
               vertical: 12.0,
             ),
             alignment: Alignment.centerRight,
-            color: Theme.of(context).colors.onSurfaceNeutralOpaqueLv1,
+            color: theme.colors.onSurfaceNeutralOpaqueLv1,
             child: VoicesFilledButton(
               child: Text('Save'.toUpperCase()),
               onTap: () => widget.onSave?.call(_controller.document),
