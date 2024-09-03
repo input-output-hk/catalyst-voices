@@ -3,6 +3,76 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-09-03
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - [`catalyst_analysis` - `v2.0.0`](#catalyst_analysis---v200)
+ - [`catalyst_cardano` - `v0.3.0`](#catalyst_cardano---v030)
+ - [`catalyst_cardano_platform_interface` - `v0.3.0`](#catalyst_cardano_platform_interface---v030)
+ - [`catalyst_cardano_serialization` - `v0.4.0`](#catalyst_cardano_serialization---v040)
+ - [`catalyst_cardano_web` - `v0.3.0`](#catalyst_cardano_web---v030)
+ - [`catalyst_compression` - `v0.3.0`](#catalyst_compression---v030)
+ - [`catalyst_compression_platform_interface` - `v0.2.0`](#catalyst_compression_platform_interface---v020)
+ - [`catalyst_compression_web` - `v0.3.0`](#catalyst_compression_web---v030)
+ - [`catalyst_cose` - `v0.3.0`](#catalyst_cose---v030)
+
+Packages with other changes:
+
+ - There are no other changes in this release.
+
+---
+
+#### `catalyst_analysis` - `v2.0.0`
+
+ - **BREAKING** **CHORE**: upgrade flutter to 3.24.1 and dart to 3.5.0 ([#725](https://github.com/input-output-hk/catalyst-voices/issues/725)). ([eb8a516e](https://github.com/input-output-hk/catalyst-voices/commit/eb8a516edbd25386c0fbe41501285870abf82543))
+
+#### `catalyst_cardano` - `v0.3.0`
+
+ - **FIX**: catalyst cardano null utxos ([#746](https://github.com/input-output-hk/catalyst-voices/issues/746)). ([3f2f5925](https://github.com/input-output-hk/catalyst-voices/commit/3f2f592593efe306f85fb0e81ce07aa1ea90b7b6))
+ - **FIX**: rbac txn inputs hash ([#688](https://github.com/input-output-hk/catalyst-voices/issues/688)). ([b644026f](https://github.com/input-output-hk/catalyst-voices/commit/b644026fa3b675591d071819eda185365257f0d1))
+ - **BREAKING** **FEAT**: add initial support for Cardano Native scripts, Plutus scripts, advanced transaction outputs, and additional transaction body fields and witnesses ([#713](https://github.com/input-output-hk/catalyst-voices/issues/713)). ([74fcb725](https://github.com/input-output-hk/catalyst-voices/commit/74fcb725f221bb3acf3824a3dd18a073d0a321e0))
+ - **BREAKING** **CHORE**: upgrade flutter to 3.24.1 and dart to 3.5.0 ([#725](https://github.com/input-output-hk/catalyst-voices/issues/725)). ([eb8a516e](https://github.com/input-output-hk/catalyst-voices/commit/eb8a516edbd25386c0fbe41501285870abf82543))
+
+#### `catalyst_cardano_platform_interface` - `v0.3.0`
+
+ - **BREAKING** **CHORE**: upgrade flutter to 3.24.1 and dart to 3.5.0 ([#725](https://github.com/input-output-hk/catalyst-voices/issues/725)). ([eb8a516e](https://github.com/input-output-hk/catalyst-voices/commit/eb8a516edbd25386c0fbe41501285870abf82543))
+
+#### `catalyst_cardano_serialization` - `v0.4.0`
+
+ - **FIX**: to be signed message should be a plain cbor sequence ([#701](https://github.com/input-output-hk/catalyst-voices/issues/701)). ([7c2dec6e](https://github.com/input-output-hk/catalyst-voices/commit/7c2dec6e2f91c1f18a39e7646ee3a5ca6a6e7249))
+ - **FIX**: rbac txn inputs hash ([#688](https://github.com/input-output-hk/catalyst-voices/issues/688)). ([b644026f](https://github.com/input-output-hk/catalyst-voices/commit/b644026fa3b675591d071819eda185365257f0d1))
+ - **FEAT**(catalyst_cardano_serialization): add CborEncodable interface for standardized CBOR handling ([#696](https://github.com/input-output-hk/catalyst-voices/issues/696)). ([4222926f](https://github.com/input-output-hk/catalyst-voices/commit/4222926f028460ddb100008806fe39a38ac3511c))
+ - **BREAKING** **FIX**: required signers are the hash of the public key, not the public key itself ([#703](https://github.com/input-output-hk/catalyst-voices/issues/703)). ([a63c4686](https://github.com/input-output-hk/catalyst-voices/commit/a63c4686ee6e79aa65ace0cb4ed9b0c91e994320))
+ - **BREAKING** **FEAT**: add initial support for Cardano Native scripts, Plutus scripts, advanced transaction outputs, and additional transaction body fields and witnesses ([#713](https://github.com/input-output-hk/catalyst-voices/issues/713)). ([74fcb725](https://github.com/input-output-hk/catalyst-voices/commit/74fcb725f221bb3acf3824a3dd18a073d0a321e0))
+ - **BREAKING** **CHORE**: upgrade flutter to 3.24.1 and dart to 3.5.0 ([#725](https://github.com/input-output-hk/catalyst-voices/issues/725)). ([eb8a516e](https://github.com/input-output-hk/catalyst-voices/commit/eb8a516edbd25386c0fbe41501285870abf82543))
+
+#### `catalyst_cardano_web` - `v0.3.0`
+
+ - **FIX**: catalyst cardano null utxos ([#746](https://github.com/input-output-hk/catalyst-voices/issues/746)). ([3f2f5925](https://github.com/input-output-hk/catalyst-voices/commit/3f2f592593efe306f85fb0e81ce07aa1ea90b7b6))
+ - **BREAKING** **CHORE**: upgrade flutter to 3.24.1 and dart to 3.5.0 ([#725](https://github.com/input-output-hk/catalyst-voices/issues/725)). ([eb8a516e](https://github.com/input-output-hk/catalyst-voices/commit/eb8a516edbd25386c0fbe41501285870abf82543))
+
+#### `catalyst_compression` - `v0.3.0`
+
+ - **BREAKING** **CHORE**: upgrade flutter to 3.24.1 and dart to 3.5.0 ([#725](https://github.com/input-output-hk/catalyst-voices/issues/725)). ([eb8a516e](https://github.com/input-output-hk/catalyst-voices/commit/eb8a516edbd25386c0fbe41501285870abf82543))
+
+#### `catalyst_compression_platform_interface` - `v0.2.0`
+
+ - **BREAKING** **CHORE**: upgrade flutter to 3.24.1 and dart to 3.5.0 ([#725](https://github.com/input-output-hk/catalyst-voices/issues/725)). ([eb8a516e](https://github.com/input-output-hk/catalyst-voices/commit/eb8a516edbd25386c0fbe41501285870abf82543))
+
+#### `catalyst_compression_web` - `v0.3.0`
+
+ - **BREAKING** **CHORE**: upgrade flutter to 3.24.1 and dart to 3.5.0 ([#725](https://github.com/input-output-hk/catalyst-voices/issues/725)). ([eb8a516e](https://github.com/input-output-hk/catalyst-voices/commit/eb8a516edbd25386c0fbe41501285870abf82543))
+
+#### `catalyst_cose` - `v0.3.0`
+
+ - **BREAKING** **CHORE**: upgrade flutter to 3.24.1 and dart to 3.5.0 ([#725](https://github.com/input-output-hk/catalyst-voices/issues/725)). ([eb8a516e](https://github.com/input-output-hk/catalyst-voices/commit/eb8a516edbd25386c0fbe41501285870abf82543))
+
+
 ## 2024-08-13
 
 ### Changes

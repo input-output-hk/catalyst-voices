@@ -320,7 +320,8 @@ extension type AssetName(String name) {
   /// Deserializes the type from cbor.
   factory AssetName.fromCbor(CborValue value) {
     final bytes = (value as CborBytes).bytes;
-    return AssetName(CborString.fromUtf8(bytes).toString());
+    // FIXME(ilap): Handle non ASCII/UTF-8 characters.
+    return AssetName(CborString.fromUtf8(bytes).toString(allowMalformed: true));
   }
 
   /// Serializes the type as cbor.

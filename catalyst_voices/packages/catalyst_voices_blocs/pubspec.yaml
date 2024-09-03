@@ -30,7 +30,7 @@ dependencies:
 
 dev_dependencies:
    bloc_test: ^9.1.4
-   catalyst_analysis: ^1.2.0
+   catalyst_analysis: ^2.0.0
    flutter_bloc: ^8.1.5
    flutter_test:
       sdk: flutter
