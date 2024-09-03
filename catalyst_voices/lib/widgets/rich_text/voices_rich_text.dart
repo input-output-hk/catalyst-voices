@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/common/resizable_box_parent.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/extensions.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -86,40 +87,59 @@ class _VoicesRichTextState extends State<VoicesRichText> {
                     _controller.formatSelection(Attribute.header);
                   }
                 },
-                icon: Text('H'),
+                icon: const Icon(CatalystVoicesIcons.rt_heading),
                 isSelected:
                     _controller.getSelectionStyle().attributes['header'] !=
                         null,
                 iconTheme: null,
               ),
               QuillToolbarToggleStyleButton(
-                options: const QuillToolbarToggleStyleButtonOptions(),
+                options: const QuillToolbarToggleStyleButtonOptions(
+                  iconData: CatalystVoicesIcons.rt_bold,
+                ),
                 controller: _controller,
                 attribute: Attribute.bold,
               ),
               QuillToolbarToggleStyleButton(
-                options: const QuillToolbarToggleStyleButtonOptions(),
+                options: const QuillToolbarToggleStyleButtonOptions(
+                  iconData: CatalystVoicesIcons.rt_italic,
+                ),
                 controller: _controller,
                 attribute: Attribute.italic,
               ),
               QuillToolbarToggleStyleButton(
+                options: const QuillToolbarToggleStyleButtonOptions(
+                  iconData: CatalystVoicesIcons.rt_ordered_list,
+                ),
                 controller: _controller,
                 attribute: Attribute.ol,
               ),
               QuillToolbarToggleStyleButton(
+                options: const QuillToolbarToggleStyleButtonOptions(
+                  iconData: CatalystVoicesIcons.rt_unordered_list,
+                ),
                 controller: _controller,
                 attribute: Attribute.ul,
                 //options: QuillToolbarToggleStyleButtonOptions(iconData: Icons.abc),
               ),
               QuillToolbarIndentButton(
+                options: QuillToolbarIndentButtonOptions(
+                  iconData: CatalystVoicesIcons.rt_increase_indent,
+                ),
                 controller: _controller,
                 isIncrease: true,
               ),
               QuillToolbarIndentButton(
+                options: QuillToolbarIndentButtonOptions(
+                  iconData: CatalystVoicesIcons.rt_decrease_indent,
+                ),
                 controller: _controller,
                 isIncrease: false,
               ),
               QuillToolbarImageButton(
+                options: const QuillToolbarImageButtonOptions(
+                  iconData: CatalystVoicesIcons.photograph,
+                ),
                 controller: _controller,
               ),
               Expanded(
