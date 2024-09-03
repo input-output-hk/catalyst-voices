@@ -12,6 +12,7 @@ import 'package:uikit_example/examples/voices_chip_example.dart';
 import 'package:uikit_example/examples/voices_fab_example.dart';
 import 'package:uikit_example/examples/voices_headers_examples.dart';
 import 'package:uikit_example/examples/voices_indicators_example.dart';
+import 'package:uikit_example/examples/voices_list_tile_example.dart';
 import 'package:uikit_example/examples/voices_menu_example.dart';
 import 'package:uikit_example/examples/voices_navigation_example.dart';
 import 'package:uikit_example/examples/voices_radio_example.dart';
@@ -95,6 +96,11 @@ class ExamplesListPage extends StatelessWidget {
         title: 'Voices Indicators',
         route: VoicesIndicatorsExample.route,
         page: VoicesIndicatorsExample(),
+      ),
+      ExampleTile(
+        title: 'Voices List Tile',
+        route: VoicesListTileExample.route,
+        page: VoicesListTileExample(),
       ),
       ExampleTile(
         title: 'Voices Avatars',
