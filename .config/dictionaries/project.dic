@@ -94,6 +94,7 @@ HIDPI
 icudtl
 ideascale
 idents
+ilap
 Instantitation
 integ
 Intellij
@@ -264,3 +265,5 @@ xctestrun
 xcworkspace
 xvfb
 yoroi
+vsync
+damian-molinski

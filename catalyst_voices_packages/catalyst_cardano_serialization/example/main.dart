@@ -81,9 +81,7 @@ void main() {
   final unsignedTx = Transaction(
     body: txBody,
     isValid: true,
-    witnessSet: const TransactionWitnessSet(
-      vkeyWitnesses: {},
-    ),
+    witnessSet: const TransactionWitnessSet(),
   );
 
   final witnessSet = _signTransaction(unsignedTx);

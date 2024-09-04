@@ -16,18 +16,22 @@ class VoicesFabExample extends StatelessWidget {
           runSpacing: 16,
           children: [
             FloatingActionButton.small(
+              heroTag: 'small',
               child: const Icon(Icons.edit),
               onPressed: () {},
             ),
             FloatingActionButton(
+              heroTag: 'regular',
               child: const Icon(Icons.edit),
               onPressed: () {},
             ),
             FloatingActionButton.large(
+              heroTag: 'large',
               child: const Icon(Icons.edit),
               onPressed: () {},
             ),
             FloatingActionButton.extended(
+              heroTag: 'extended',
               icon: const Icon(Icons.edit),
               label: const Text('Label'),
               onPressed: () {},

@@ -1,9 +1,9 @@
 import 'package:catalyst_voices/widgets/app_bar/actions/voices_app_bar_actions.dart';
 import 'package:catalyst_voices/widgets/app_bar/voices_app_bar.dart';
-import 'package:catalyst_voices/widgets/drawer/voices_drawer.dart';
 import 'package:catalyst_voices/widgets/menu/voices_expandable_list_tile.dart';
-import 'package:catalyst_voices/widgets/menu/voices_list_tile.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class VoicesNavigationExample extends StatelessWidget {
@@ -91,87 +91,19 @@ class _DrawerChooser extends StatefulWidget {
 }
 
 class _DrawerChooserState extends State<_DrawerChooser> {
-  _Space _selectedSpace = _Space.ideas;
+  Space _selectedSpace = Space.discovery;
 
   @override
   Widget build(BuildContext context) {
-    return VoicesDrawerChooser<_Space>(
-      items: _Space.values,
-      selectedItem: _selectedSpace,
-      onSelected: _onSpaceSelected,
-      itemBuilder: _itemBuilder,
-      leading: IconButton(
-        icon: const Icon(CatalystVoicesIcons.all_spaces_menu, size: 20),
-        onPressed: () {},
-      ),
+    return VoicesDrawerSpaceChooser(
+      onChanged: _onSpaceSelected,
+      currentSpace: _selectedSpace,
     );
   }
 
-  void _onSpaceSelected(_Space space) {
+  void _onSpaceSelected(Space space) {
     setState(() {
       _selectedSpace = space;
     });
-  }
-
-  Widget _itemBuilder({
-    required BuildContext context,
-    required _Space item,
-    required bool isSelected,
-  }) {
-    if (isSelected) {
-      return VoicesDrawerChooserItem(
-        icon: item.icon(),
-        foregroundColor: item.foregroundColor(context),
-        backgroundColor: item.backgroundColor(context),
-      );
-    } else {
-      return const VoicesDrawerChooserItemPlaceholder();
-    }
-  }
-}
-
-enum _Space {
-  ideas,
-  discovery,
-  proposals,
-  settings;
-
-  IconData icon() {
-    switch (this) {
-      case _Space.ideas:
-        return CatalystVoicesIcons.light_bulb;
-      case _Space.discovery:
-        return CatalystVoicesIcons.shopping_cart;
-      case _Space.proposals:
-        return CatalystVoicesIcons.fund;
-      case _Space.settings:
-        return CatalystVoicesIcons.cog_gear;
-    }
-  }
-
-  Color foregroundColor(BuildContext context) {
-    switch (this) {
-      case _Space.ideas:
-        return Theme.of(context).colorScheme.primary;
-      case _Space.discovery:
-        return Theme.of(context).colorScheme.secondary;
-      case _Space.proposals:
-        return Colors.white;
-      case _Space.settings:
-        return Colors.white;
-    }
-  }
-
-  Color backgroundColor(BuildContext context) {
-    switch (this) {
-      case _Space.ideas:
-        return Theme.of(context).colorScheme.primaryContainer;
-      case _Space.discovery:
-        return Theme.of(context).colorScheme.secondaryContainer;
-      case _Space.proposals:
-        return Colors.orange;
-      case _Space.settings:
-        return Colors.green;
-    }
   }
 }

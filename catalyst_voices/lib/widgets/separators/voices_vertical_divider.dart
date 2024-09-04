@@ -19,10 +19,14 @@ class VoicesVerticalDivider extends StatelessWidget {
   /// See [VerticalDivider.endIndent] for more details.
   final double? endIndent;
 
+  /// Optional color of divider.
+  final Color? color;
+
   const VoicesVerticalDivider({
     super.key,
     this.indent,
     this.endIndent,
+    this.color,
   });
 
   @override
@@ -32,7 +36,7 @@ class VoicesVerticalDivider extends StatelessWidget {
       endIndent: endIndent,
       // M3 will override it and use outline color that's why setting
       // it explicitly.
-      color: DividerTheme.of(context).color,
+      color: color ?? DividerTheme.of(context).color,
     );
   }
 }

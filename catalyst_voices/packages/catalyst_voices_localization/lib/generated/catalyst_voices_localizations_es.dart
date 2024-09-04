@@ -1,5 +1,7 @@
 import 'catalyst_voices_localizations.dart';
 
+// ignore_for_file: type=lint
+
 /// The translations for Spanish Castilian (`es`).
 class VoicesLocalizationsEs extends VoicesLocalizations {
   VoicesLocalizationsEs([String locale = 'es']) : super(locale);
@@ -101,4 +103,10 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String seedPhraseSlotNr(int nr) {
     return 'Slot $nr';
   }
+
+  @override
+  String get proposalStatusReady => 'Ready';
+
+  @override
+  String get proposalStatusDraft => 'Draft';
 }
