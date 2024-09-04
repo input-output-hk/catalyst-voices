@@ -19,10 +19,10 @@ command:
       flutter: ">=3.24.1"
     dependencies:
       bloc_concurrency: ^0.2.2
-      bloc: ^8.1.2
       collection: ^1.18.0
       cryptography: ^2.7.0
       equatable: ^2.0.5
+      flutter_bloc: ^8.1.5
       flutter_localized_locales: ^2.0.5
       formz: ^0.7.0
       meta: ^1.10.0
