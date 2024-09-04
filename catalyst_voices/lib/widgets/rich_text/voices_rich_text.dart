@@ -69,8 +69,6 @@ class _VoicesRichTextState extends State<VoicesRichText> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return ExcludeFocus(
       excluding: !_editMode,
       child: Column(
@@ -81,178 +79,262 @@ class _VoicesRichTextState extends State<VoicesRichText> {
               top: 20,
               bottom: 20,
             ),
-            child: Row(
-              children: [
-                Text(
-                  'Rich text',
-                  style: theme.textTheme.titleMedium,
-                ),
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: TextButton(
-                        onPressed: () {
-                          setState(() {
-                            _editMode = !_editMode;
-                          });
-                        },
-                        child: Text(
-                          _editMode ? 'Cancel' : 'Edit', //TODO localize
-                          style: theme.textTheme.labelSmall,
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-              ],
+            child: _TopBar(
+              editMode: _editMode,
+              onToggleEditMode: () {
+                setState(() {
+                  _editMode = !_editMode;
+                });
+              },
             ),
           ),
           if (_editMode)
             Padding(
               padding: const EdgeInsets.only(bottom: 16.0),
-              child: Container(
-                color: theme.colors.onSurfaceNeutralOpaqueLv1,
-                child: QuillToolbar(
-                  configurations: const QuillToolbarConfigurations(),
-                  child: Row(
-                    children: [
-                      QuillToolbarIconButton(
-                        tooltip: 'Header',
-                        //TODO localize
-                        onPressed: () {
-                          if (_controller
-                                  .getSelectionStyle()
-                                  .attributes['header'] ==
-                              null) {
-                            _controller.formatSelection(Attribute.h1);
-                          } else {
-                            _controller.formatSelection(Attribute.header);
-                          }
-                        },
-                        icon: const Icon(CatalystVoicesIcons.rt_heading),
-                        isSelected: _controller
-                                .getSelectionStyle()
-                                .attributes['header'] !=
-                            null,
-                        iconTheme: null,
-                      ),
-                      QuillToolbarToggleStyleButton(
-                        options: const QuillToolbarToggleStyleButtonOptions(
-                          iconData: CatalystVoicesIcons.rt_bold,
-                        ),
-                        controller: _controller,
-                        attribute: Attribute.bold,
-                      ),
-                      QuillToolbarToggleStyleButton(
-                        options: const QuillToolbarToggleStyleButtonOptions(
-                          iconData: CatalystVoicesIcons.rt_italic,
-                        ),
-                        controller: _controller,
-                        attribute: Attribute.italic,
-                      ),
-                      QuillToolbarToggleStyleButton(
-                        options: const QuillToolbarToggleStyleButtonOptions(
-                          iconData: CatalystVoicesIcons.rt_ordered_list,
-                        ),
-                        controller: _controller,
-                        attribute: Attribute.ol,
-                      ),
-                      QuillToolbarToggleStyleButton(
-                        options: const QuillToolbarToggleStyleButtonOptions(
-                          iconData: CatalystVoicesIcons.rt_unordered_list,
-                        ),
-                        controller: _controller,
-                        attribute: Attribute.ul,
-                        //options: QuillToolbarToggleStyleButtonOptions(iconData: Icons.abc),
-                      ),
-                      QuillToolbarIndentButton(
-                        options: QuillToolbarIndentButtonOptions(
-                          iconData: CatalystVoicesIcons.rt_increase_indent,
-                        ),
-                        controller: _controller,
-                        isIncrease: true,
-                      ),
-                      QuillToolbarIndentButton(
-                        options: QuillToolbarIndentButtonOptions(
-                          iconData: CatalystVoicesIcons.rt_decrease_indent,
-                        ),
-                        controller: _controller,
-                        isIncrease: false,
-                      ),
-                      QuillToolbarImageButton(
-                        options: const QuillToolbarImageButtonOptions(
-                          iconData: CatalystVoicesIcons.photograph,
-                        ),
-                        controller: _controller,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              child: _Toolbar(controller: _controller),
             ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: ResizableBoxParent(
-              minHeight: 400,
-              resizable: true,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: _editMode
-                      ? theme.colors.onSurfaceNeutralOpaqueLv1
-                      : theme.scaffoldBackgroundColor,
-                  border: Border.all(
-                    color: theme.colorScheme.outlineVariant,
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: QuillEditor.basic(
-                  controller: _controller,
-                  focusNode: _focusNode,
-                  configurations: QuillEditorConfigurations(
-                    padding: const EdgeInsets.all(16),
-                    placeholder: 'Start writing your text...', //TODO localize
-                    embedBuilders: isWeb()
-                        ? FlutterQuillEmbeds.editorWebBuilders()
-                        : FlutterQuillEmbeds.editorBuilders(),
-                  ),
-                ),
-              ),
-            ),
+          _Editor(
+            editMode: _editMode,
+            controller: _controller,
+            focusNode: _focusNode,
           ),
           if (widget.charsLimit != null)
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      'Supporting text', //TODO localize
-                      style: theme.textTheme.bodySmall,
-                    ),
-                  ),
-                  Text(
-                    '${_documentLength}/${widget.charsLimit!}',
-                    style: theme.textTheme.bodySmall,
-                  ),
-                ],
-              ),
+            _Limit(
+              documentLength: _documentLength,
+              charsLimit: widget.charsLimit!,
             ),
           SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 12.0,
-            ),
-            alignment: Alignment.centerRight,
-            color: theme.colors.onSurfaceNeutralOpaqueLv1,
-            child: VoicesFilledButton(
-              child: Text('Save'.toUpperCase()), //TODO localize
-              onTap: () => widget.onSave?.call(_controller.document),
-            ),
+          _Footer(
+            controller: _controller,
+            onSave: widget.onSave,
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _TopBar extends StatelessWidget {
+  const _TopBar({
+    required this.editMode,
+    this.onToggleEditMode,
+  });
+
+  final bool editMode;
+  final VoidCallback? onToggleEditMode;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          'Rich text',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+        Expanded(
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: TextButton(
+                onPressed: onToggleEditMode,
+                child: Text(
+                  editMode ? 'Cancel' : 'Edit', //TODO localize
+                  style: Theme.of(context).textTheme.labelSmall,
+                ),
+              ),
+            ),
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class _Toolbar extends StatelessWidget {
+  const _Toolbar({
+    required this.controller,
+  });
+
+  final QuillController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Theme.of(context).colors.onSurfaceNeutralOpaqueLv1,
+      child: QuillToolbar(
+        configurations: const QuillToolbarConfigurations(),
+        child: Row(
+          children: [
+            QuillToolbarIconButton(
+              tooltip: 'Header',
+              //TODO localize
+              onPressed: () {
+                if (controller.getSelectionStyle().attributes['header'] ==
+                    null) {
+                  controller.formatSelection(Attribute.h1);
+                } else {
+                  controller.formatSelection(Attribute.header);
+                }
+              },
+              icon: const Icon(CatalystVoicesIcons.rt_heading),
+              isSelected:
+                  controller.getSelectionStyle().attributes['header'] != null,
+              iconTheme: null,
+            ),
+            QuillToolbarToggleStyleButton(
+              options: const QuillToolbarToggleStyleButtonOptions(
+                iconData: CatalystVoicesIcons.rt_bold,
+              ),
+              controller: controller,
+              attribute: Attribute.bold,
+            ),
+            QuillToolbarToggleStyleButton(
+              options: const QuillToolbarToggleStyleButtonOptions(
+                iconData: CatalystVoicesIcons.rt_italic,
+              ),
+              controller: controller,
+              attribute: Attribute.italic,
+            ),
+            QuillToolbarToggleStyleButton(
+              options: const QuillToolbarToggleStyleButtonOptions(
+                iconData: CatalystVoicesIcons.rt_ordered_list,
+              ),
+              controller: controller,
+              attribute: Attribute.ol,
+            ),
+            QuillToolbarToggleStyleButton(
+              options: const QuillToolbarToggleStyleButtonOptions(
+                iconData: CatalystVoicesIcons.rt_unordered_list,
+              ),
+              controller: controller,
+              attribute: Attribute.ul,
+              //options: QuillToolbarToggleStyleButtonOptions(iconData: Icons.abc),
+            ),
+            QuillToolbarIndentButton(
+              options: QuillToolbarIndentButtonOptions(
+                iconData: CatalystVoicesIcons.rt_increase_indent,
+              ),
+              controller: controller,
+              isIncrease: true,
+            ),
+            QuillToolbarIndentButton(
+              options: QuillToolbarIndentButtonOptions(
+                iconData: CatalystVoicesIcons.rt_decrease_indent,
+              ),
+              controller: controller,
+              isIncrease: false,
+            ),
+            QuillToolbarImageButton(
+              options: const QuillToolbarImageButtonOptions(
+                iconData: CatalystVoicesIcons.photograph,
+              ),
+              controller: controller,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Editor extends StatelessWidget {
+  const _Editor({
+    required this.editMode,
+    required this.controller,
+    required this.focusNode,
+  });
+
+  final bool editMode;
+  final QuillController controller;
+  final FocusNode focusNode;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: ResizableBoxParent(
+        minHeight: 400,
+        resizable: true,
+        child: Container(
+          decoration: BoxDecoration(
+            color: editMode
+                ? Theme.of(context).colors.onSurfaceNeutralOpaqueLv1
+                : Theme.of(context).scaffoldBackgroundColor,
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: QuillEditor.basic(
+            controller: controller,
+            focusNode: focusNode,
+            configurations: QuillEditorConfigurations(
+              padding: const EdgeInsets.all(16),
+              placeholder: 'Start writing your text...', //TODO localize
+              embedBuilders: isWeb()
+                  ? FlutterQuillEmbeds.editorWebBuilders()
+                  : FlutterQuillEmbeds.editorBuilders(),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _Limit extends StatelessWidget {
+  const _Limit({
+    required this.documentLength,
+    required this.charsLimit,
+  });
+
+  final int documentLength;
+  final int charsLimit;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 32.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              'Supporting text', //TODO localize
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ),
+          Text(
+            '${documentLength}/${charsLimit}',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Footer extends StatelessWidget {
+  const _Footer({
+    required this.controller,
+    this.onSave,
+  });
+
+  final QuillController controller;
+  final ValueChanged<Document>? onSave;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16.0,
+        vertical: 12.0,
+      ),
+      alignment: Alignment.centerRight,
+      color: Theme.of(context).colors.onSurfaceNeutralOpaqueLv1,
+      child: VoicesFilledButton(
+        child: Text('Save'.toUpperCase()), //TODO localize
+        onTap: () => onSave?.call(controller.document),
       ),
     );
   }
