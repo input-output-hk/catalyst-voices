@@ -295,6 +295,7 @@ ThemeData _buildThemeData(
   return ThemeData(
     appBarTheme: AppBarTheme(
       backgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv1,
+      scrolledUnderElevation: 0,
     ),
     drawerTheme: DrawerThemeData(
       backgroundColor: voicesColorScheme.elevationsOnSurfaceNeutralLv0,
@@ -317,6 +318,10 @@ ThemeData _buildThemeData(
       space: 16,
       thickness: 1,
     ),
+    tabBarTheme: TabBarTheme(
+      dividerColor: colorScheme.primaryContainer,
+      tabAlignment: TabAlignment.start,
+    ),
     progressIndicatorTheme: ProgressIndicatorThemeData(
       color: colorScheme.primary,
       linearTrackColor: colorScheme.secondaryContainer,
@@ -325,6 +330,13 @@ ThemeData _buildThemeData(
     ),
     textTheme: textTheme,
     colorScheme: colorScheme,
+    iconTheme: IconThemeData(
+      color: voicesColorScheme.iconsForeground,
+    ),
+    primaryIconTheme: IconThemeData(
+      color: colorScheme.onPrimary,
+    ),
+    scaffoldBackgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv1,
     extensions: <ThemeExtension<dynamic>>[
       voicesColorScheme,
       brandAssets,

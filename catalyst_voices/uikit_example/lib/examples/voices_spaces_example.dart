@@ -1,5 +1,4 @@
 import 'package:catalyst_voices/widgets/app_bar/voices_app_bar.dart';
-import 'package:catalyst_voices/widgets/drawer/voices_drawer.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';

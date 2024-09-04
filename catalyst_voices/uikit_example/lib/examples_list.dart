@@ -4,6 +4,7 @@ import 'package:catalyst_voices/widgets/menu/voices_list_tile.dart';
 import 'package:catalyst_voices/widgets/separators/voices_divider.dart';
 import 'package:catalyst_voices/widgets/separators/voices_text_divider.dart';
 import 'package:flutter/material.dart';
+import 'package:uikit_example/examples/treasury_space/voices_treasury_space.dart';
 import 'package:uikit_example/examples/voices_avatar_example.dart';
 import 'package:uikit_example/examples/voices_badge_example.dart';
 import 'package:uikit_example/examples/voices_buttons_example.dart';
@@ -42,6 +43,11 @@ class ExamplesListPage extends StatelessWidget {
         title: 'VoicesDiscoverySpaces',
         route: VoicesSpacesExample.route,
         page: VoicesSpacesExample(),
+      ),
+      ExampleTile(
+        title: 'VoicesTreasurySpace',
+        route: VoicesTreasurySpace.route,
+        page: VoicesTreasurySpace(),
       ),
     ];
   }
