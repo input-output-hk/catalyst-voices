@@ -11,6 +11,8 @@ dependencies:
     path: ../
   catalyst_voices_assets:
     path: ../packages/catalyst_voices_assets
+  catalyst_voices_blocs:
+    path: ../packages/catalyst_voices_blocs
   catalyst_voices_brands:
     path: ../packages/catalyst_voices_brands
   catalyst_voices_localization:
@@ -23,6 +25,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   flutter:
     sdk: flutter
+  flutter_bloc: ^8.1.5
   flutter_localized_locales: ^2.0.5
 
 dev_dependencies:

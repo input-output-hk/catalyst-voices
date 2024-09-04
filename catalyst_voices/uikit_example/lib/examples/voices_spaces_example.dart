@@ -2,6 +2,7 @@ import 'package:catalyst_voices/widgets/app_bar/voices_app_bar.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
+import 'package:uikit_example/widgets/session_header.dart';
 
 class VoicesSpacesExample extends StatelessWidget {
   static const String route = '/spaces-example';
@@ -15,13 +16,13 @@ class VoicesSpacesExample extends StatelessWidget {
     return Scaffold(
       appBar: const VoicesAppBar(
         actions: [
-          VoicesAvatar(icon: Text('L')),
+          SessionHeader(),
         ],
       ),
       drawer: const VoicesDrawer(children: []),
       body: CustomScrollView(
         slivers: [
-          const SliverToBoxAdapter(child: SpacesNavigationLocation()),
+          const SliverToBoxAdapter(child: _SpacesNavigationLocation()),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 32)
                 .add(const EdgeInsets.only(bottom: 32)),
@@ -52,8 +53,8 @@ class VoicesSpacesExample extends StatelessWidget {
   }
 }
 
-class SpacesNavigationLocation extends StatelessWidget {
-  const SpacesNavigationLocation({super.key});
+class _SpacesNavigationLocation extends StatelessWidget {
+  const _SpacesNavigationLocation();
 
   @override
   Widget build(BuildContext context) {
