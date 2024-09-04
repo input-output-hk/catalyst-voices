@@ -1,8 +1,8 @@
-# Immutable Ledger Structure
+# Immutable Ledger Design
 
 ---
 
-Title: Immutable Ledger Structure Design
+Title: Immutable Ledger Design
 
 Status: Proposed
 
@@ -15,7 +15,7 @@ Created: 2024-08-19
 
 ## Abstract
 
-This document describes a specification of the immutable ledger structure for various purposes of project "Catalyst".
+This document describes a specification of the immutable ledger for various purposes of project "Catalyst".
 
 ## Motivation
 
@@ -56,7 +56,7 @@ It's a common thing for blockchains to have a starting block (genesis),
 but it's unusual to have a final block for a chain.
 After which no any block could be produced.
 
-And that's a main distinguish for this Immutable Ledger Structure design,
+And that's a main distinguish for this Immutable Ledger design,
 it has a final block.
 
 So any chain will be bounded by some period of time.
