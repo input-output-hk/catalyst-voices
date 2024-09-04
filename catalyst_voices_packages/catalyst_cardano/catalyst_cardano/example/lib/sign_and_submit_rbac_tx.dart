@@ -209,7 +209,7 @@ Transaction _buildUnsignedRbacTx({
   return Transaction(
     body: txBody,
     isValid: true,
-    witnessSet: const TransactionWitnessSet(vkeyWitnesses: {}),
+    witnessSet: const TransactionWitnessSet(),
     auxiliaryData: auxiliaryData,
   );
 }

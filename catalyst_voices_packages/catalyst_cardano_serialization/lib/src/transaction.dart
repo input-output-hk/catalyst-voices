@@ -1,5 +1,5 @@
-import 'package:catalyst_cardano_serialization/src/address.dart';
 import 'package:catalyst_cardano_serialization/src/hashes.dart';
+import 'package:catalyst_cardano_serialization/src/transaction_output.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:catalyst_cardano_serialization/src/utils/cbor.dart';
 import 'package:catalyst_cardano_serialization/src/witness.dart';
@@ -66,28 +66,56 @@ final class Transaction extends Equatable implements CborEncodable {
 ///
 /// Does not contain the witnesses which are used to verify the transaction.
 final class TransactionBody extends Equatable implements CborEncodable {
-  /// The transaction inputs.
+  /// The transaction inputs. tag: 0
   final Set<TransactionInput> inputs;
 
-  /// The transaction outputs.
-  final List<TransactionOutput> outputs;
+  /// The transaction outputs. tag: 1
+  final List<ShelleyMultiAssetTransactionOutput> outputs;
 
-  /// The fee for the transaction.
+  /// The fee for the transaction. tag: 2
   final Coin fee;
 
-  /// The absolute slot value before the tx becomes invalid.
+  // > Note: All properties below are optional.
+  /// The absolute slot value before the tx becomes invalid. tag: 3
   final SlotBigNum? ttl;
 
+  /// Certificates in an ordered set. tag: 4
+  /// Withdrawals map of stake address, coin. tag: 5
+
   /// The hash of the optional [AuxiliaryData]
-  /// which is the metadata of the transaction.
+  /// which is the metadata of the transaction. tag: 7
   final AuxiliaryDataHash? auxiliaryDataHash;
+
+  /// Validity interval start as integer. tag: 8
+  final SlotBigNum? validityStart;
+
+  /// Mint as a non-zero uint64 multiasset. tag: 9
+  final MultiAsset? mint;
+
+  /// Tag 10 is unimplemented.
+  /// Script data hash28. tag: 11
+  final ScriptDataHash? scriptDataHash;
+
+  /// Tag 12 is unimplemented.
+  /// Collateral inputs as nonempty set. tag: 13
+  final Set<TransactionInput>? collateralInputs;
 
   /// The list of public key hashes of addresses
   /// that are required to sign the transaction.
+  /// Nonempty set of addr keyhash. tag: 14
   final Set<Ed25519PublicKeyHash>? requiredSigners;
 
-  /// Specifies on which network the code will run.
+  /// Specifies on which network the code will run. Network ID 0/1. tag: 15
   final NetworkId? networkId;
+
+  /// Collateral return's transaction output. tag: 16
+  final ShelleyMultiAssetTransactionOutput? collateralReturn;
+
+  /// Total collateral as coin (uint64). tag: 17
+  final Coin? totalCollateral;
+
+  /// Reference inputs as nonempty set of transaction inputs. tag: 18
+  final Set<TransactionInput>? referenceInputs;
 
   /// The default constructor for [TransactionBody].
   const TransactionBody({
@@ -96,56 +124,101 @@ final class TransactionBody extends Equatable implements CborEncodable {
     required this.fee,
     this.ttl,
     this.auxiliaryDataHash,
+    this.validityStart,
+    this.mint,
+    this.scriptDataHash,
+    this.collateralInputs,
     this.requiredSigners,
     this.networkId,
+    this.collateralReturn,
+    this.totalCollateral,
+    this.referenceInputs,
   });
 
   /// Deserializes the type from cbor.
   factory TransactionBody.fromCbor(CborValue value) {
-    final map = value as CborMap;
-    final inputs = map[const CborSmallInt(0)]! as CborList;
-    final outputs = map[const CborSmallInt(1)]! as CborList;
-    final fee = map[const CborSmallInt(2)]!;
-    final ttl = map[const CborSmallInt(3)];
-    final auxiliaryDataHash = map[const CborSmallInt(7)];
-    final requiredSigners = map[const CborSmallInt(14)] as CborList?;
-    final networkId = map[const CborSmallInt(15)] as CborSmallInt?;
+    try {
+      final map = value as CborMap;
 
-    return TransactionBody(
-      inputs: inputs.map(TransactionInput.fromCbor).toSet(),
-      outputs: outputs.map(TransactionOutput.fromCbor).toList(),
-      fee: Coin.fromCbor(fee),
-      ttl: ttl != null ? SlotBigNum.fromCbor(ttl) : null,
-      auxiliaryDataHash: auxiliaryDataHash != null
-          ? AuxiliaryDataHash.fromCbor(auxiliaryDataHash)
-          : null,
-      requiredSigners:
-          requiredSigners?.map(Ed25519PublicKeyHash.fromCbor).toSet(),
-      networkId: networkId != null ? NetworkId.fromId(networkId.value) : null,
-    );
+      return TransactionBody(
+        inputs: _extractList(map, 0, TransactionInput.fromCbor)!.toSet(),
+        outputs: _extractList(map, 1, TransactionOutput.fromCbor)!,
+        fee: _extractValue(map, 2, Coin.fromCbor)!,
+        ttl: _extractValue(map, 3, SlotBigNum.fromCbor),
+        auxiliaryDataHash: _extractValue(map, 7, AuxiliaryDataHash.fromCbor),
+        validityStart: _extractValue(map, 8, SlotBigNum.fromCbor),
+        mint: _extractValue(map, 9, MultiAsset.fromCbor),
+        scriptDataHash: _extractValue(map, 11, ScriptDataHash.fromCbor),
+        collateralInputs:
+            _extractList(map, 13, TransactionInput.fromCbor)?.toSet(),
+        requiredSigners:
+            _extractList(map, 14, Ed25519PublicKeyHash.fromCbor)?.toSet(),
+        networkId: _extractValue(
+          map,
+          15,
+          (value) => NetworkId.fromId((value as CborSmallInt).value),
+        ),
+        collateralReturn: _extractValue(map, 16, TransactionOutput.fromCbor),
+        totalCollateral: _extractValue(map, 17, Coin.fromCbor),
+        referenceInputs:
+            _extractList(map, 18, TransactionInput.fromCbor)?.toSet(),
+      );
+    } catch (e) {
+      throw ArgumentError('Invalid CBOR input: $e');
+    }
+  }
+
+  static List<T>? _extractList<T>(
+    CborMap map,
+    int key,
+    T Function(CborValue) fromCbor,
+  ) {
+    final list = map[CborSmallInt(key)] as CborList?;
+    return list?.map(fromCbor).toList();
+  }
+
+  static T? _extractValue<T>(
+    CborMap map,
+    int key,
+    T Function(CborValue) fromCbor,
+  ) {
+    final value = map[CborSmallInt(key)];
+    return value != null ? fromCbor(value) : null;
   }
 
   /// Serializes the type as cbor.
   @override
   CborValue toCbor() {
     return CborMap({
-      const CborSmallInt(0): CborList([
-        for (final input in inputs) input.toCbor(),
-      ]),
-      const CborSmallInt(1): CborList([
-        for (final output in outputs) output.toCbor(),
-      ]),
+      const CborSmallInt(0): _toCborList(inputs),
+      const CborSmallInt(1): _toCborList(outputs),
       const CborSmallInt(2): fee.toCbor(),
       if (ttl != null) const CborSmallInt(3): ttl!.toCbor(),
       if (auxiliaryDataHash != null)
         const CborSmallInt(7): auxiliaryDataHash!.toCbor(),
+      if (validityStart != null) const CborSmallInt(8): validityStart!.toCbor(),
+      if (mint != null) const CborSmallInt(9): mint!.toCbor(),
+      if (scriptDataHash != null)
+        const CborSmallInt(11): scriptDataHash!.toCbor(),
+      if (collateralInputs != null && collateralInputs!.isNotEmpty)
+        const CborSmallInt(13): _toCborList(collateralInputs!),
       if (requiredSigners != null && requiredSigners!.isNotEmpty)
-        const CborSmallInt(14): CborList([
-          for (final signer in requiredSigners!) signer.toCbor(),
-        ]),
+        const CborSmallInt(14): _toCborList(requiredSigners!),
       if (networkId != null)
         const CborSmallInt(15): CborSmallInt(networkId!.id),
+      if (collateralReturn != null)
+        const CborSmallInt(16): collateralReturn!.toCbor(),
+      if (totalCollateral != null)
+        const CborSmallInt(17): totalCollateral!.toCbor(),
+      if (referenceInputs != null && referenceInputs!.isNotEmpty)
+        const CborSmallInt(18): _toCborList(referenceInputs!),
     });
+  }
+
+  CborList _toCborList(Iterable<CborEncodable> iterable) {
+    return CborList([
+      for (final item in iterable) item.toCbor(),
+    ]);
   }
 
   @override
@@ -155,8 +228,15 @@ final class TransactionBody extends Equatable implements CborEncodable {
         fee,
         ttl,
         auxiliaryDataHash,
+        validityStart,
+        mint,
+        scriptDataHash,
+        collateralInputs,
         requiredSigners,
         networkId,
+        collateralReturn,
+        totalCollateral,
+        referenceInputs,
       ];
 }
 
@@ -200,86 +280,6 @@ final class TransactionInput extends Equatable implements CborEncodable {
   List<Object?> get props => [transactionId, index];
 }
 
-/// The transaction output which describes which [address]
-/// will receive what [amount] of [Coin].
-final class TransactionOutput extends Equatable implements CborEncodable {
-  /// The address associated with the transaction.
-  final ShelleyAddress address;
-
-  /// The leftover change from the previous transaction that can be spent.
-  final Balance amount;
-
-  /// The default constructor for [TransactionOutput].
-  const TransactionOutput({
-    required this.address,
-    required this.amount,
-  });
-
-  /// Deserializes the type from cbor.
-  factory TransactionOutput.fromCbor(CborValue value) {
-    return _tryFromCborMap(value) ?? _tryFromCborList(value)!;
-  }
-
-  /// This format is simpler and does not utilize the advanced features
-  /// of the Alonzo era (e.g., datum, native assets, or smart contract scripts).
-  /// It is consistent with basic transactions that could exist in earlier eras
-  /// or basic Alonzo-era transactions.
-  static TransactionOutput? _tryFromCborMap(CborValue value) {
-    try {
-      final map = value as CborMap;
-      final address = map[const CborSmallInt(0)]!;
-      final amount = map[const CborSmallInt(1)]!;
-
-      return TransactionOutput(
-        address: ShelleyAddress.fromCbor(address),
-        amount: Balance.fromCbor(amount),
-      );
-    } catch (error) {
-      return null;
-    }
-  }
-
-  /// This format shows the use of the EUTXO model introduced in the Alonzo era,
-  /// with support for native assets and possibly other advanced features.
-  static TransactionOutput? _tryFromCborList(CborValue value) {
-    try {
-      final list = value as CborList;
-      final address = list[0];
-      final amount = list[1];
-
-      return TransactionOutput(
-        address: ShelleyAddress.fromCbor(address),
-        amount: Balance.fromCbor(amount),
-      );
-    } catch (error) {
-      return null;
-    }
-  }
-
-  /// Serializes the type as cbor.
-  @override
-  CborValue toCbor() {
-    return CborList([
-      address.toCbor(),
-      amount.toCbor(),
-    ]);
-  }
-
-  /// Return a copy of this output with [address] and [amount] if present.
-  TransactionOutput copyWith({
-    ShelleyAddress? address,
-    Balance? amount,
-  }) {
-    return TransactionOutput(
-      address: address ?? this.address,
-      amount: amount ?? this.amount,
-    );
-  }
-
-  @override
-  List<Object?> get props => [address, amount];
-}
-
 /// The UTXO that can be used as an input in a new transaction.
 final class TransactionUnspentOutput extends Equatable
     implements CborEncodable {
@@ -289,7 +289,7 @@ final class TransactionUnspentOutput extends Equatable
 
   /// The transaction output which assigns the owner of given address
   /// with leftover change from previous transaction.
-  final TransactionOutput output;
+  final ShelleyMultiAssetTransactionOutput output;
 
   /// The default constructor for [TransactionUnspentOutput].
   const TransactionUnspentOutput({
