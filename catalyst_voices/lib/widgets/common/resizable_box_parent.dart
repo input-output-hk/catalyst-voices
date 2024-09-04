@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/widgets.dart';
 
+/// A parent component that adds ability to resize its child
 class ResizableBoxParent extends StatelessWidget {
   final bool resizable;
   final Widget child;

@@ -30,7 +30,18 @@ class _VoicesRichTextState extends State<VoicesRichText> {
   final QuillController _controller = QuillController.basic();
   int _documentLength = 0;
   bool _editMode = false;
-  FocusNode _focusNode = FocusNode();
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.document != null) _controller.document = widget.document!;
+    _controller.document.changes.listen(_onDocumentChange);
+
+    setState(() {
+      _documentLength = _controller.document.length;
+    });
+  }
 
   void _onDocumentChange(DocChange docChange) {
     final documentLength = _controller.document.length;
@@ -53,19 +64,9 @@ class _VoicesRichTextState extends State<VoicesRichText> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    if (widget.document != null) _controller.document = widget.document!;
-    _controller.document.changes.listen(_onDocumentChange);
-
-    setState(() {
-      _documentLength = _controller.document.length;
-    });
-  }
-
-  @override
   void dispose() {
     _controller.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
