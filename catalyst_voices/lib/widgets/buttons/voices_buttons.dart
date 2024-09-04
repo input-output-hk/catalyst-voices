@@ -112,3 +112,20 @@ class NavigationPopButton extends StatelessWidget {
     );
   }
 }
+
+class XButton extends StatelessWidget {
+  final VoidCallback? onTap;
+
+  const XButton({
+    super.key,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesIconButton(
+      onTap: onTap,
+      child: const Icon(CatalystVoicesIcons.x),
+    );
+  }
+}

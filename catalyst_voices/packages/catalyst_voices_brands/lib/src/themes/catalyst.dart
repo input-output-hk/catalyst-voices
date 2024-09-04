@@ -65,6 +65,11 @@ const VoicesColorScheme darkVoicesColorScheme = VoicesColorScheme(
   avatarsWarning: VoicesColors.darkAvatarsWarning,
   avatarsError: VoicesColors.darkAvatarsError,
   elevationsOnSurfaceNeutralLv0: VoicesColors.darkElevationsOnSurfaceNeutralLv0,
+  elevationsOnSurfaceNeutralLv1Grey:
+      VoicesColors.darkElevationsOnSurfaceNeutralLv1Grey,
+  elevationsOnSurfaceNeutralLv1White:
+      VoicesColors.darkElevationsOnSurfaceNeutralLv1White,
+  elevationsOnSurfaceNeutralLv2: VoicesColors.darkElevationsOnSurfaceNeutralLv2,
   outlineBorder: VoicesColors.darkOutlineBorderOutline,
   outlineBorderVariant: VoicesColors.darkOutlineBorderOutlineVariant,
   primaryContainer: VoicesColors.darkPrimaryContainer,
@@ -134,6 +139,12 @@ const VoicesColorScheme lightVoicesColorScheme = VoicesColorScheme(
   avatarsError: VoicesColors.lightAvatarsError,
   elevationsOnSurfaceNeutralLv0:
       VoicesColors.lightElevationsOnSurfaceNeutralLv0,
+  elevationsOnSurfaceNeutralLv1Grey:
+      VoicesColors.lightElevationsOnSurfaceNeutralLv1Grey,
+  elevationsOnSurfaceNeutralLv1White:
+      VoicesColors.lightElevationsOnSurfaceNeutralLv1White,
+  elevationsOnSurfaceNeutralLv2:
+      VoicesColors.lightElevationsOnSurfaceNeutralLv2,
   outlineBorder: VoicesColors.lightOutlineBorderOutline,
   outlineBorderVariant: VoicesColors.lightOutlineBorderOutlineVariant,
   primaryContainer: VoicesColors.lightPrimaryContainer,
