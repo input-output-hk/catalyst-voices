@@ -6,7 +6,6 @@ import 'package:uikit_example/examples/treasury_space/campaign_builder_panel.dar
 import 'package:uikit_example/examples/treasury_space/campaign_comments_panel.dart';
 import 'package:uikit_example/examples/treasury_space/campaign_details.dart';
 import 'package:uikit_example/examples/treasury_space/voices_treasury_drawer.dart';
-import 'package:uikit_example/widgets/session_header.dart';
 
 final class CampaignSetupStep extends VoicesNodeMenuItem {
   final String desc;
@@ -80,9 +79,6 @@ class _VoicesTreasurySpaceState extends State<VoicesTreasurySpace> {
             appBar: VoicesAppBar(
               backgroundColor:
                   Theme.of(context).colors.onSurfaceNeutralOpaqueLv0,
-              actions: [
-                SessionHeader(),
-              ],
             ),
             drawer: VoicesTreasuryDrawer(),
             body: SpaceScaffold(
