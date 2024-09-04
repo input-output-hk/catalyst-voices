@@ -301,7 +301,7 @@ ThemeData _buildThemeData(
       backgroundColor: voicesColorScheme.elevationsOnSurfaceNeutralLv0,
     ),
     dialogTheme: DialogTheme(
-      // TODO(damian): themed value needed. We don't have it defined yet.
+      // TODO(damian-molinski): themed value needed. We don't have it defined yet.
       barrierColor: Color(0x612A3D61),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       clipBehavior: Clip.hardEdge,
