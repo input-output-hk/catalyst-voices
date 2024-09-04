@@ -37,10 +37,7 @@ class _VoicesRichTextState extends State<VoicesRichText> {
     super.initState();
     if (widget.document != null) _controller.document = widget.document!;
     _controller.document.changes.listen(_onDocumentChange);
-
-    setState(() {
-      _documentLength = _controller.document.length;
-    });
+    _documentLength = _controller.document.length;
   }
 
   void _onDocumentChange(DocChange docChange) {
@@ -79,7 +76,11 @@ class _VoicesRichTextState extends State<VoicesRichText> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 16.0, top: 20, bottom: 20),
+            padding: const EdgeInsets.only(
+              left: 16,
+              top: 20,
+              bottom: 20,
+            ),
             child: Row(
               children: [
                 Text(
@@ -98,7 +99,7 @@ class _VoicesRichTextState extends State<VoicesRichText> {
                           });
                         },
                         child: Text(
-                          _editMode ? 'Cancel' : 'Edit',
+                          _editMode ? 'Cancel' : 'Edit', //TODO localize
                           style: theme.textTheme.labelSmall,
                         ),
                       ),
@@ -119,6 +120,7 @@ class _VoicesRichTextState extends State<VoicesRichText> {
                     children: [
                       QuillToolbarIconButton(
                         tooltip: 'Header',
+                        //TODO localize
                         onPressed: () {
                           if (_controller
                                   .getSelectionStyle()
@@ -210,7 +212,7 @@ class _VoicesRichTextState extends State<VoicesRichText> {
                   focusNode: _focusNode,
                   configurations: QuillEditorConfigurations(
                     padding: const EdgeInsets.all(16),
-                    placeholder: 'Start writing your text...',
+                    placeholder: 'Start writing your text...', //TODO localize
                     embedBuilders: isWeb()
                         ? FlutterQuillEmbeds.editorWebBuilders()
                         : FlutterQuillEmbeds.editorBuilders(),
@@ -226,7 +228,7 @@ class _VoicesRichTextState extends State<VoicesRichText> {
                 children: [
                   Expanded(
                     child: Text(
-                      'Supporting text',
+                      'Supporting text', //TODO localize
                       style: theme.textTheme.bodySmall,
                     ),
                   ),
@@ -246,7 +248,7 @@ class _VoicesRichTextState extends State<VoicesRichText> {
             alignment: Alignment.centerRight,
             color: theme.colors.onSurfaceNeutralOpaqueLv1,
             child: VoicesFilledButton(
-              child: Text('Save'.toUpperCase()),
+              child: Text('Save'.toUpperCase()), //TODO localize
               onTap: () => widget.onSave?.call(_controller.document),
             ),
           ),
