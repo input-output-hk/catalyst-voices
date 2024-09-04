@@ -19,7 +19,6 @@ const getWalletCredentials = async (walletID: string): Promise<WalletCredentials
 
   return { username, password };
 };
-
 export { getWalletCredentials };
 
 const getSeedPhrase = async (): Promise<string[]> => {
@@ -33,7 +32,6 @@ const getSeedPhrase = async (): Promise<string[]> => {
   }
   return seedPhraseArray;
 };
-
 export { getSeedPhrase };
 
 const downloadExtension = async (extID: string): Promise<string> => {
@@ -68,7 +66,6 @@ const downloadExtension = async (extID: string): Promise<string> => {
         throw new Error('Failed to unzip the CRX file.');
     }
   };
-
   export { downloadExtension };
 
   const typhonImportWallet = async (tab: Page): Promise<void> => {
@@ -95,7 +92,6 @@ const downloadExtension = async (extID: string): Promise<string> => {
     await tab.getByRole('button', { name: 'Unlock Wallet' }).click();
 };
 
-
 const laceImportWallet = async (tab: Page): Promise<void> => {
   await tab.getByRole('button', { name: 'Agree' }).click();
   await tab.getByRole('button', { name: 'Restore' }).click();
@@ -116,13 +112,7 @@ const laceImportWallet = async (tab: Page): Promise<void> => {
   await tab.getByTestId('profile-dropdown-trigger-menu').click({timeout: 300000});
   await tab.getByTestId('header-menu').getByTestId('header-menu-network-choice-container').click();
   await tab.getByTestId('header-menu').getByTestId('network-preprod-radio-button').click();
-
 };
-
-
-const eternlImportWallet = async (tab: Page): Promise<void> => {
-};
-
 
 const importWallet = async (tab: Page, wallet: string): Promise<void> => {
   switch (wallet) {
@@ -131,9 +121,6 @@ const importWallet = async (tab: Page, wallet: string): Promise<void> => {
       break;
     case 'Lace':
       await laceImportWallet(tab);
-      break;
-    case 'Eternl':
-      await eternlImportWallet(tab);
       break;
     default:
       throw new Error('Wallet not in use')
@@ -150,9 +137,6 @@ const allowExtension = async (tab: Page, wallet: string): Promise<void> => {
       await tab.getByTestId('connect-authorize-button').click();
       await tab.getByRole('button', { name: 'Always' }).click();
       break;
-    case 'Eternl':
-        console.log('Not implemented yet');
-        break;
     default:
       throw new Error('Wallet not in use')
   }

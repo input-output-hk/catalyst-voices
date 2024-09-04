@@ -32,6 +32,7 @@ cborg
 cdylib
 CEST
 cfbundle
+changeme
 Chotivichit
 chromedriver
 chrono
@@ -62,11 +63,13 @@ dreps
 dtscalac
 earthfile
 Easterling
+eddsa
 Edgedriver
 emurgo
 encryptor
 endfunction
 Eternl
+EUTXO
 fetchval
 fluttericon
 fmtchk
@@ -76,6 +79,7 @@ fontello
 formz
 Formz
 fuzzer
+gafhhkghbfjjkeiendhlofajokpaflmk
 gapless
 gcloud
 geckodriver
@@ -84,6 +88,7 @@ gethostname
 Gitbook
 gmtime
 gradlew
+headful
 headlessui
 HIDPI
 icudtl
@@ -92,6 +97,7 @@ idents
 Instantitation
 integ
 Intellij
+interps
 iohk
 iphoneos
 jdbc
@@ -104,6 +110,7 @@ junitreport
 junitxml
 Keyhash
 keyserver
+kfdniefadaanbjodldohaedphafoffoh
 KUBECONFIG
 kubernetescrd
 kubetail
@@ -111,8 +118,16 @@ lcov
 lerp
 Leshiy
 libapp
+libasound
+libatk
+libatspi
 libavcodec
+libdrm
 libflutter
+libgbm
+libnss
+libxkbcommon
+libxshmfence
 lintfix
 localizable
 loguru
@@ -189,6 +204,8 @@ Scripthash
 ScyllaDB
 seckey
 sendfile
+servernum
+serviceworker
 slotno
 sqlfluff
 Stefano
@@ -208,6 +225,8 @@ thollander
 timelike
 toastify
 Toastify
+todos
+toggleable
 tojunit
 Traceback
 traefik
@@ -215,6 +234,7 @@ trailings
 TXNZD
 Typer
 unawaited
+unchunk
 unmanaged
 utxo
 UTXO
@@ -242,10 +262,5 @@ xcodeproj
 xctest
 xctestrun
 xcworkspace
+xvfb
 yoroi
-unchunk
-EUTXO
-eddsa
-toggleable
-interps
-todos
