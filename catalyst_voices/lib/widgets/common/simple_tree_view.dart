@@ -125,6 +125,9 @@ class SimpleTreeViewChildRow extends StatelessWidget {
         child: ConstrainedBox(
           constraints: const BoxConstraints.tightFor(height: 40),
           child: Material(
+            type: backgroundColor != null
+                ? MaterialType.canvas
+                : MaterialType.transparency,
             color: backgroundColor,
             child: InkWell(
               onTap: onTap,
