@@ -10,13 +10,14 @@ import 'package:uikit_example/examples/treasury_space/voices_treasury_drawer.dar
 final class CampaignSetupStep extends VoicesNodeMenuItem {
   final String desc;
 
-  String get name => label;
-
   const CampaignSetupStep({
     required super.id,
     required String name,
     required this.desc,
   }) : super(label: name);
+
+  /// Just syntax sugar. Semantically it makes more sense to have `name`.
+  String get name => label;
 }
 
 const _campaignSetupSteps = [

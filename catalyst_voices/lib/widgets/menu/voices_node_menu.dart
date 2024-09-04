@@ -6,13 +6,13 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 base class VoicesNodeMenuItem extends Equatable {
+  final int id;
+  final String label;
+
   const VoicesNodeMenuItem({
     required this.id,
     required this.label,
   });
-
-  final int id;
-  final String label;
 
   @override
   List<Object?> get props => [id, label];
@@ -52,6 +52,10 @@ final class VoicesNodeMenuData extends Equatable {
 }
 
 final class VoicesNodeMenuController extends ValueNotifier<VoicesNodeMenuData> {
+  VoicesNodeMenuController([
+    super._value = const VoicesNodeMenuData(),
+  ]);
+
   set selected(int? newValue) {
     value = newValue != null
         ? value.copyWith(selectedItemId: newValue)
@@ -61,10 +65,6 @@ final class VoicesNodeMenuController extends ValueNotifier<VoicesNodeMenuData> {
   set isExpanded(bool newValue) {
     value = value.copyWith(isExpanded: newValue);
   }
-
-  VoicesNodeMenuController([
-    super._value = const VoicesNodeMenuData(),
-  ]);
 }
 
 class VoicesNodeMenu extends StatelessWidget {

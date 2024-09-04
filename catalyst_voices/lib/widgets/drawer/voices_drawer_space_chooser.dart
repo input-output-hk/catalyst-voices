@@ -19,7 +19,7 @@ class VoicesDrawerSpaceChooser extends StatelessWidget {
     return VoicesDrawerChooser<Space>(
       items: Space.values,
       selectedItem: currentSpace,
-      onSelected: (value) => onChanged(value),
+      onSelected: onChanged,
       itemBuilder: _itemBuilder,
       leading: IconButton(
         icon: const Icon(CatalystVoicesIcons.all_spaces_menu, size: 20),
