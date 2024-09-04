@@ -49,6 +49,9 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
   final Color? avatarsWarning;
   final Color? avatarsError;
   final Color? elevationsOnSurfaceNeutralLv0;
+  final Color? elevationsOnSurfaceNeutralLv1Grey;
+  final Color? elevationsOnSurfaceNeutralLv1White;
+  final Color? elevationsOnSurfaceNeutralLv2;
   final Color? outlineBorder;
   final Color? outlineBorderVariant;
   final Color? primaryContainer;
@@ -99,6 +102,9 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     required this.avatarsWarning,
     required this.avatarsError,
     required this.elevationsOnSurfaceNeutralLv0,
+    required this.elevationsOnSurfaceNeutralLv1Grey,
+    required this.elevationsOnSurfaceNeutralLv1White,
+    required this.elevationsOnSurfaceNeutralLv2,
     required this.outlineBorder,
     required this.outlineBorderVariant,
     required this.primaryContainer,
@@ -151,6 +157,9 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     this.avatarsWarning,
     this.avatarsError,
     this.elevationsOnSurfaceNeutralLv0,
+    this.elevationsOnSurfaceNeutralLv1Grey,
+    this.elevationsOnSurfaceNeutralLv1White,
+    this.elevationsOnSurfaceNeutralLv2,
     this.outlineBorder,
     this.outlineBorderVariant,
     this.primaryContainer,
@@ -203,6 +212,9 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     Color? avatarsWarning,
     Color? avatarsError,
     Color? elevationsOnSurfaceNeutralLv0,
+    Color? elevationsOnSurfaceNeutralLv1Grey,
+    Color? elevationsOnSurfaceNeutralLv1White,
+    Color? elevationsOnSurfaceNeutralLv2,
     Color? outlineBorder,
     Color? outlineBorderVariant,
     Color? primaryContainer,
@@ -261,6 +273,12 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       avatarsError: avatarsError ?? this.avatarsError,
       elevationsOnSurfaceNeutralLv0:
           elevationsOnSurfaceNeutralLv0 ?? this.elevationsOnSurfaceNeutralLv0,
+      elevationsOnSurfaceNeutralLv1Grey: elevationsOnSurfaceNeutralLv1Grey ??
+          this.elevationsOnSurfaceNeutralLv1Grey,
+      elevationsOnSurfaceNeutralLv1White: elevationsOnSurfaceNeutralLv1White ??
+          this.elevationsOnSurfaceNeutralLv1White,
+      elevationsOnSurfaceNeutralLv2:
+          elevationsOnSurfaceNeutralLv2 ?? this.elevationsOnSurfaceNeutralLv2,
       outlineBorder: outlineBorder ?? this.outlineBorder,
       outlineBorderVariant: outlineBorderVariant ?? this.outlineBorderVariant,
       primaryContainer: primaryContainer ?? this.primaryContainer,
@@ -353,6 +371,21 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       elevationsOnSurfaceNeutralLv0: Color.lerp(
         elevationsOnSurfaceNeutralLv0,
         other.elevationsOnSurfaceNeutralLv0,
+        t,
+      ),
+      elevationsOnSurfaceNeutralLv1Grey: Color.lerp(
+        elevationsOnSurfaceNeutralLv1Grey,
+        other.elevationsOnSurfaceNeutralLv1Grey,
+        t,
+      ),
+      elevationsOnSurfaceNeutralLv1White: Color.lerp(
+        elevationsOnSurfaceNeutralLv1White,
+        other.elevationsOnSurfaceNeutralLv1White,
+        t,
+      ),
+      elevationsOnSurfaceNeutralLv2: Color.lerp(
+        elevationsOnSurfaceNeutralLv2,
+        other.elevationsOnSurfaceNeutralLv2,
         t,
       ),
       outlineBorder: Color.lerp(outlineBorder, other.outlineBorder, t),

@@ -31,6 +31,15 @@ class VoicesColors {
   /// Color: #121721
   static const Color darkElevationsOnSurfaceNeutralLv0 = Color(0xFF121721);
 
+  /// Color: #212A3D
+  static const Color darkElevationsOnSurfaceNeutralLv1Grey = Color(0xFF212A3D);
+
+  /// Color: #2D3953
+  static const Color darkElevationsOnSurfaceNeutralLv1White = Color(0xFF2D3953);
+
+  /// Color: #212A3D
+  static const Color darkElevationsOnSurfaceNeutralLv2 = Color(0xFF212A3D);
+
   /// Color: #FF9999
   static const Color darkError = Color(0xFFFF9999);
 
@@ -204,6 +213,16 @@ class VoicesColors {
 
   /// Color: #FFFFFF
   static const Color lightElevationsOnSurfaceNeutralLv0 = Color(0xFFFFFFFF);
+
+  /// Color: #F2F4F8
+  static const Color lightElevationsOnSurfaceNeutralLv1Grey = Color(0xFFF2F4F8);
+
+  /// Color: #FFFFFF
+  static const Color lightElevationsOnSurfaceNeutralLv1White =
+      Color(0xFFFFFFFF);
+
+  /// Color: #E6E9F0
+  static const Color lightElevationsOnSurfaceNeutralLv2 = Color(0xFFE6E9F0);
 
   /// Color: #CC0000
   static const Color lightError = Color(0xFFCC0000);
