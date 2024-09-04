@@ -1,3 +1,5 @@
+; cspell: words CYPHERTEXT ACNT ristretto
+
 VOTE-TX           = SIZE-BYTES-32BIT %x00 %x0b VOTE-PAYLOAD
 
 VOTE-PAYLOAD      = CAST-CERT IOW
