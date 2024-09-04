@@ -14,12 +14,7 @@ class VoicesDesktopDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Dialog(
-      backgroundColor: theme.colors.onSurfaceNeutralOpaqueLv0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      clipBehavior: Clip.hardEdge,
       alignment: Alignment.topCenter,
       insetPadding: EdgeInsets.symmetric(horizontal: 40, vertical: 90),
       child: ConstrainedBox(

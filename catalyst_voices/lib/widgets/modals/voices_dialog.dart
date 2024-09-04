@@ -10,8 +10,6 @@ abstract final class VoicesDialog {
   }) {
     return showDialog<T>(
       context: context,
-      // TODO(damian): themed value needed. We don't have it defined yet.
-      barrierColor: Color(0x212A3D61),
       builder: builder,
     );
   }
