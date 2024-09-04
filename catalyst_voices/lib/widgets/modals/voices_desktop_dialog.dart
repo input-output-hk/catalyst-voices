@@ -30,6 +30,10 @@ class VoicesDesktopDialog extends StatelessWidget {
   }
 }
 
+/// Commonly used structure for desktop dialogs.
+///
+/// Keep in mind that this dialog has fixed size of 900x600 and
+/// is always adding close button in top right corner.
 class VoicesDesktopPanelsDialog extends StatelessWidget {
   final Widget left;
   final Widget right;

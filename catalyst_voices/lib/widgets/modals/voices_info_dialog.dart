@@ -1,26 +1,19 @@
 import 'package:catalyst_voices/widgets/modals/voices_desktop_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
-class VoicesInfoDialog extends StatelessWidget {
+/// Opinionated, two panels, dialog that is tailored for desktop
+/// form factors.
+///
+/// Uses [VoicesDesktopPanelsDialog] for base structure.
+///
+/// Call [VoicesDialog.show] with [VoicesDesktopInfoDialog] in order
+/// to show it.
+class VoicesDesktopInfoDialog extends StatelessWidget {
   final String title;
 
-  const VoicesInfoDialog({
-    super.key,
-    required this.title,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    // Note. It will be good place to switch to mobile widget.
-    return _VoicesDesktopInfoDialog(title: title);
-  }
-}
-
-class _VoicesDesktopInfoDialog extends StatelessWidget {
-  final String title;
-
-  const _VoicesDesktopInfoDialog({
+  const VoicesDesktopInfoDialog({
     required this.title,
   });
 

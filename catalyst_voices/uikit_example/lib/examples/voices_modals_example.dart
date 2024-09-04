@@ -20,7 +20,7 @@ class VoicesModalsExample extends StatelessWidget {
                 VoicesDialog.show<void>(
                   context,
                   builder: (context) {
-                    return VoicesInfoDialog(title: 'Desktop modal');
+                    return VoicesDesktopInfoDialog(title: 'Desktop modal');
                   },
                 );
               },
