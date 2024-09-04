@@ -124,6 +124,11 @@ async fn get_txo_by_txn(
     while let Some(row_res) = txos_iter.next().await {
         let row = row_res?;
 
+        // Filter out already known spent TXOs.
+        if row.spent_slot.is_some() {
+            continue;
+        }
+
         let txn_map = txos_by_txn.entry(row.txn_hash).or_insert(HashMap::new());
         txn_map.insert(row.txo, TxoInfo {
             value: row.value,

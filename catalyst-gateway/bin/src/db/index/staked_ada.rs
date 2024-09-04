@@ -54,6 +54,8 @@ pub(crate) struct GetTxoByStakeAddressQueryResult {
     pub slot_no: num_bigint::BigInt,
     /// TXO value.
     pub value: num_bigint::BigInt,
+    /// TXO spent slot.
+    pub spent_slot: Option<num_bigint::BigInt>,
 }
 
 /// Get staked ADA query.

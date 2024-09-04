@@ -38,16 +38,13 @@ struct TxoInsertParams {
     value: num_bigint::BigInt,
     /// Transactions hash.
     txn_hash: Vec<u8>,
-    /// Spent slot.
-    spent_slot: num_bigint::BigInt,
 }
 
 impl TxoInsertParams {
     /// Create a new record for this transaction.
-    #[allow(clippy::too_many_arguments)]
     pub(crate) fn new(
         stake_address: &[u8], slot_no: u64, txn: i16, txo: i16, address: &str, value: u64,
-        txn_hash: &[u8], spent_slot: num_bigint::BigInt,
+        txn_hash: &[u8],
     ) -> Self {
         Self {
             stake_address: stake_address.to_vec(),
@@ -57,7 +54,6 @@ impl TxoInsertParams {
             address: address.to_string(),
             value: value.into(),
             txn_hash: txn_hash.to_vec(),
-            spent_slot,
         }
     }
 
@@ -409,7 +405,6 @@ impl TxoInsertQuery {
                     &address,
                     txo.lovelace_amount(),
                     txn_hash,
-                    (-1).into(),
                 );
 
                 self.staked_txo.push(params);
