@@ -1,6 +1,7 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 # cspell: words vcpu, noninteractive, iscsi, preconfiguration, inotify, jetstack
+
 control_ip = "192.168.58.10"
 
 # Determine the maximum number of agents, and set their IP addresses
@@ -9,11 +10,11 @@ agents = { "agent86" => "192.168.58.86",
 
 # This is sized so that a machine with 16 threads and 16GB will allocate at most 
 # ~3/4 of its resources to the cluster.
-control_vcpu = "4" # Number of vCPUs in the VM
-control_memory = "5192" # 5G of Memory (An extra gig because its the control-plane node)
+control_vcpu = "2" # Reduced from 4 to 2 for ARM compatibility
+control_memory = "4096" # Reduced from 5192 to 4096 for ARM compatibility
 
-agent_vcpu = "4" # Number of vCPUs in the VM
-agent_memory = "4096" # 4G of Memory
+agent_vcpu = "2" # Reduced from 4 to 2 for ARM compatibility
+agent_memory = "4096"
 
 is_darwin_arm64 = Vagrant::Util::Platform.architecture == "arm64" && Vagrant::Util::Platform.darwin?
 
@@ -42,7 +43,7 @@ helm_install_script = <<-SHELL
     curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list
     apt-get update
-    apt-get install helm    
+    apt-get install helm
     SHELL
 
 control_plane_script = <<-SHELL
@@ -53,9 +54,6 @@ control_plane_script = <<-SHELL
     cp /vagrant_shared/k3s/server/manifests/* /var/lib/rancher/k3s/server/manifests/
     cp /vagrant_shared/k3s/registries.yaml /etc/rancher/k3s/
     # Install and start k3s server node
-    # Extra parameters in INSTALL_K3S_EXEC variable because of
-    # K3s picking up the wrong interface when starting the control-plane and agents
-    # https://github.com/alexellis/k3sup/issues/306
     export INSTALL_K3S_EXEC="--bind-address=#{control_ip} --node-external-ip=#{control_ip} --flannel-iface=eth1"
     curl -sfL https://get.k3s.io | sh -
     echo "Sleeping for 5 seconds to wait for k3s to start"
@@ -82,8 +80,7 @@ agent_script = <<-SHELL
     SHELL
 
 cert_manager_install_script = <<-SHELL
-    # See: https://cert-manager.io/docs/installation/helm/
-    sudo  -i
+    sudo -i
     export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
     helm repo add jetstack https://charts.jetstack.io
     helm repo update
@@ -92,16 +89,13 @@ cert_manager_install_script = <<-SHELL
     SHELL
 
 longhorn_install_script = <<-SHELL
-    # See: https://docs.k3s.io/storage
-    #      https://longhorn.io/docs/1.6.2/deploy/install/install-with-kubectl
-    #      https://longhorn.io/docs/1.6.2/deploy/install/install-with-helm/
-    sudo  -i
+    sudo -i
     export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
     helm repo add longhorn https://charts.longhorn.io
     helm repo update
     helm install longhorn longhorn/longhorn --namespace longhorn-system --create-namespace --version 1.6.2
     kubectl apply -f /vagrant_shared/k3s/longhorn/storage-classes.yaml
-    kubectl apply -f /vagrant_shared/k3s/longhorn/ingress.yaml     
+    kubectl apply -f /vagrant_shared/k3s/longhorn/ingress.yaml
     SHELL
 
 local_path_provisioner_script = <<-SHELL
@@ -118,12 +112,11 @@ registry_script = <<-SHELL
     SHELL
 
 monitoring_install_script = <<-SHELL
-    # See: https://k3s.rocks/metrics/
     sudo -i
     export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
     helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
     helm repo add grafana https://grafana.github.io/helm-charts
-    helm repo update    
+    helm repo update
     helm install prometheus-stack --version 58.6.0 -f /vagrant_shared/k3s/grafana-prometheus/prometheus-values.yaml prometheus-community/kube-prometheus-stack --create-namespace --namespace monitoring --wait
     kubectl apply -f /vagrant_shared/k3s/grafana-prometheus/alert-manager-ingress.yaml
     kubectl apply -f /vagrant_shared/k3s/grafana-prometheus/prometheus-ingress.yaml
@@ -134,16 +127,12 @@ monitoring_install_script = <<-SHELL
     SHELL
 
 scylladb_install_script = <<-SHELL
-    # See: https://github.com/scylladb/scylla-operator/blob/master/docs/source/helm.md
     sudo -i
     export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
     helm repo add scylla https://scylla-operator-charts.storage.googleapis.com/stable
     helm repo update
     helm install scylla-operator scylla/scylla-operator --values /vagrant_shared/k3s/scylladb/values.operator.yaml  --create-namespace --namespace scylla-operator --wait
-    # Disable the Scylla Manager for now, consumes resources and we aren't using it.
-    # helm install scylla-manager scylla/scylla-manager --values /vagrant_shared/k3s/scylladb/values.manager.yaml --create-namespace --namespace scylla-manager
     helm install scylla scylla/scylla --values /vagrant_shared/k3s/scylladb/values.cluster.yaml --create-namespace --namespace scylla
-    # kubectl apply -f /vagrant_shared/k3s/scylladb/load-balancer.yaml
     SHELL
 
 update_sysctl_limits = <<-SHELL
@@ -155,33 +144,34 @@ update_sysctl_limits = <<-SHELL
 Vagrant.configure("2") do |config|
   config.vm.box = "generic/debian12"
 
+  config.vm.provider "virtualbox" do |vb|
+    vb.gui = true
+    vb.memory = "4096"
+    vb.cpus = 2
+
+    # Disable USB 2.0, 3.0 controllers and audio.
+    vb.customize ["modifyvm", :id, "--usb", "off"]
+    vb.customize ["modifyvm", :id, "--usbehci", "off"]
+    vb.customize ["modifyvm", :id, "--usbxhci", "off"]
+    vb.customize ["modifyvm", :id, "--audio", "none"]
+  end
+
   config.vm.define "control", primary: true do |control|
     control.vm.network "private_network", ip: control_ip
     control.vm.hostname = "control"
+    control.vm.synced_folder "./shared", "/vagrant_shared", type: "rsync"
 
-    if !is_darwin_arm64
-      # x86 anything should work with this
-      control.vm.synced_folder "./shared", "/vagrant_shared"
-      control.vm.provider "virtualbox" do |vb|
-        vb.memory = control_memory
-        vb.cpus = control_vcpu
-      end
-    else
-      # Specific config just for Arm Macs.
-      control.vm.synced_folder "./shared", "/vagrant_shared", type: "smb"
-      control.vm.provider "qemu" do |qe|
-        qe.memory = control_memory
-        qe.smp = control_vcpu
-      end
+    control.vm.provider "virtualbox" do |vb|
+      vb.memory = control_memory
+      vb.cpus = control_vcpu
     end
+
     control.vm.provision "shell", inline: update_sysctl_limits
     control.vm.provision "shell", inline: static_ips
     control.vm.provision "shell", inline: debian_packages
     control.vm.provision "shell", inline: helm_install_script
     control.vm.provision "shell", inline: control_plane_script
     control.vm.provision "shell", inline: cert_manager_install_script
-    # We use longhorn, so don;t setup the local-path-provisioner
-    # control.vm.provision "shell", inline: local_path_provisioner_script
     control.vm.provision "shell", inline: longhorn_install_script
     control.vm.provision "shell", inline: monitoring_install_script
     control.vm.provision "shell", inline: registry_script
@@ -192,19 +182,13 @@ Vagrant.configure("2") do |config|
     config.vm.define agent_name do |agent|
       agent.vm.network "private_network", ip: agent_ip
       agent.vm.hostname = agent_name
-      if !is_darwin_arm64
-        agent.vm.synced_folder "./shared", "/vagrant_shared"
-        agent.vm.provider "virtualbox" do |vb|
-          vb.memory = agent_memory
-          vb.cpus = agent_vcpu
-        end
-      else
-        agent.vm.synced_folder "./shared", "/vagrant_shared", type: "smb"
-        agent.vm.provider "qemu" do |qe|
-          qe.memory = agent_memory
-          qe.smp = agent_vcpu
-        end
+      agent.vm.synced_folder "./shared", "/vagrant_shared", type: "rsync"
+
+      agent.vm.provider "virtualbox" do |vb|
+        vb.memory = agent_memory
+        vb.cpus = agent_vcpu
       end
+
       agent.vm.provision "shell", inline: update_sysctl_limits
       agent.vm.provision "shell", inline: static_ips
       agent.vm.provision "shell", inline: debian_packages
