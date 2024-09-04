@@ -18,14 +18,18 @@ deps:
 
 src:
     FROM +deps
-    COPY --dir wallet .
+    COPY keys.txt .
     COPY playwright.config.ts .
     COPY global-setup.ts .
-    COPY typhon-tests.spec.ts .
+    COPY wallet-tests.spec.ts .
+    COPY utils.ts .
 
 package-test:
     FROM +src
-    ENTRYPOINT ["/bin/sh", "-c", "/usr/bin/xvfb-run npm test", ""]
+    ENV APP_URL http://app:80
+    RUN mkdir /results
+    VOLUME /results
+    ENTRYPOINT ["/bin/sh", "-c", "/usr/bin/xvfb-run --auto-servernum npm test", ""]
     ARG tag='latest'
     SAVE IMAGE test:$tag
 
@@ -43,7 +47,6 @@ build-web:
 package-app:
     FROM nginx:alpine3.18
     ARG tag='latest'
-    #TODO disable cache
     COPY +build-web/web /usr/share/nginx/html/
     SAVE IMAGE test-app:$tag
 
@@ -54,8 +57,12 @@ test:
         --compose compose.yml \
         --load test-app:latest=(+package-app) \
         --load test:latest=(+package-test) \
-        --service test-app \
+        --service app \
         --allow-privileged
 
-        RUN docker run --network=default_default test:latest
+        RUN docker run --network=default_default --name=test test:latest && \
+            docker cp test:/results/cardano-wallet.junit-report.xml cardano-wallet.junit-report.xml
+    END
+    WAIT
+        SAVE ARTIFACT cardano-wallet.junit-report.xml AS LOCAL cardano-wallet.junit-report.xml
     END

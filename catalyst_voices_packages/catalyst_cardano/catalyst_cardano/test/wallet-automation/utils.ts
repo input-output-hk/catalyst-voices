@@ -2,7 +2,7 @@ import * as fs from 'fs/promises';
 import * as fsi from 'fs';
 import path from 'path';
 import nodeFetch from "node-fetch";
-import { Page } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
 
 interface WalletCredentials {
   username: string;
@@ -186,3 +186,36 @@ const signData = async (wallet: string, tab: Page, password: string): Promise<vo
   }
 }
 export { signData };
+
+async function signTyphonBadPwd(signTab: Page, password: string) {
+  await signTab.getByRole('button', { name: 'Sign' }).click();
+  await signTab.getByPlaceholder('Password', { exact: true }).fill(password);
+  await signTab.getByRole('button', { name: 'confirm' }).click();
+  await expect(signTab.getByText('Wrong password')).toBeVisible();
+  await signTab.locator('//*[@id="headlessui-dialog-2"]/div/div[2]/div[1]/button').click()
+  await signTab.getByRole('button', { name: 'Reject' }).click();
+}
+
+async function signLaceBadPwd(signTab: Page, password: string) {
+ await signTab.getByRole('button', { name: 'Confirm' }).click();
+ await signTab.getByTestId('password-input').fill(password);
+ await signTab.getByRole('button', { name: 'Confirm' }).click();
+ await expect(signTab.getByTestId('password-input-error')).toBeVisible();
+ await signTab.getByRole('button', { name: 'Cancel' }).click();
+ await signTab.getByRole('button', { name: 'Cancel' }).click();
+}
+
+const signDataBadPwd = async (wallet: string, tab: Page): Promise<void> => {
+  const password = 'BadPassword'
+  switch (wallet) {
+    case 'Typhon':
+      await signTyphonBadPwd(tab, password);
+      break;
+    case 'Lace':
+      await signLaceBadPwd(tab, password);
+      break;
+    default:
+      throw new Error('Wallet not in use')
+  }
+}
+export { signDataBadPwd };
