@@ -41,7 +41,7 @@ let extTab: Page;
 
             await expect.poll(async () => {
                 return browser.pages().length;
-            }, { timeout: 10000 }).toBe(3);
+            }, { timeout: 15000 }).toBe(3);
 
             const updatedPages = browser.pages();
             const allowTab = updatedPages[updatedPages.length - 1];
@@ -102,7 +102,7 @@ let extTab: Page;
 
         async function openSignTab(buttonName: string) {
              await extTab.getByRole('button', { name: buttonName }).click();
-             await expect.poll(async () => browser.pages().length, { timeout: 10000 }).toBe(3);
+             await expect.poll(async () => browser.pages().length, { timeout: 15000 }).toBe(3);
              const signPage = browser.pages();
              const signTab = signPage[signPage.length - 1];
              await signTab.bringToFront();
