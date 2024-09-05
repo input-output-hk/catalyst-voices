@@ -50,7 +50,7 @@ package-app:
     COPY +build-web/web /usr/share/nginx/html/
     SAVE IMAGE test-app:$tag
 
-test:
+nightly-test:
     FROM earthly/dind:alpine-3.19
     COPY compose.yml .
     WITH DOCKER \
