@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 
 class TreasuryPage extends StatelessWidget {
-  const TreasuryPage({super.key});
+  const TreasuryPage({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(child: Text('Treasury')),
+    return Container(
+      color: Colors.yellow,
+      alignment: Alignment.center,
+      child: Text(
+        'Treasury',
+        style: Theme.of(context).textTheme.titleLarge,
+      ),
     );
   }
 }

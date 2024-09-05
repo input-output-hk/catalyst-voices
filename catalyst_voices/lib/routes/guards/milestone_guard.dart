@@ -13,7 +13,7 @@ final class MilestoneGuard implements RouteGuard {
   @override
   FutureOr<String?> redirect(BuildContext context, GoRouterState state) {
     // allow milestone sub pages
-    if (state.uri.toString().startsWith(milestonePathPrefix)) {
+    if (state.uri.toString().startsWith('/$currentMilestone')) {
       return null;
     }
 

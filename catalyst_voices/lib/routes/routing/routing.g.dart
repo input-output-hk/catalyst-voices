@@ -8,8 +8,7 @@ part of 'routing.dart';
 
 List<RouteBase> get $appRoutes => [
       $comingSoonRoute,
-      $discoveryRoute,
-      $treasuryRoute,
+      $spacesShellRouteData,
       $loginRoute,
     ];
 
@@ -36,10 +35,24 @@ extension $ComingSoonRouteExtension on ComingSoonRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
-RouteBase get $discoveryRoute => GoRouteData.$route(
-      path: '/m4/discovery',
-      factory: $DiscoveryRouteExtension._fromState,
+RouteBase get $spacesShellRouteData => ShellRouteData.$route(
+      factory: $SpacesShellRouteDataExtension._fromState,
+      routes: [
+        GoRouteData.$route(
+          path: '/m4/discovery',
+          factory: $DiscoveryRouteExtension._fromState,
+        ),
+        GoRouteData.$route(
+          path: '/m4/treasury',
+          factory: $TreasuryRouteExtension._fromState,
+        ),
+      ],
     );
+
+extension $SpacesShellRouteDataExtension on SpacesShellRouteData {
+  static SpacesShellRouteData _fromState(GoRouterState state) =>
+      const SpacesShellRouteData();
+}
 
 extension $DiscoveryRouteExtension on DiscoveryRoute {
   static DiscoveryRoute _fromState(GoRouterState state) =>
@@ -58,11 +71,6 @@ extension $DiscoveryRouteExtension on DiscoveryRoute {
 
   void replace(BuildContext context) => context.replace(location);
 }
-
-RouteBase get $treasuryRoute => GoRouteData.$route(
-      path: '/m4/treasury',
-      factory: $TreasuryRouteExtension._fromState,
-    );
 
 extension $TreasuryRouteExtension on TreasuryRoute {
   static TreasuryRoute _fromState(GoRouterState state) => const TreasuryRoute();

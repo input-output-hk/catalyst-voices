@@ -1,13 +1,15 @@
 import 'package:catalyst_voices/pages/coming_soon/coming_soon.dart';
 import 'package:catalyst_voices/pages/discovery/discovery.dart';
 import 'package:catalyst_voices/pages/login/login.dart';
+import 'package:catalyst_voices/pages/spaces/spaces.dart';
 import 'package:catalyst_voices/pages/treasury/treasury.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 part 'routing.g.dart';
 
-const milestonePathPrefix = '/m4';
+const currentMilestone = 'm4';
 
 @TypedGoRoute<ComingSoonRoute>(path: '/')
 final class ComingSoonRoute extends GoRouteData {
@@ -15,33 +17,52 @@ final class ComingSoonRoute extends GoRouteData {
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return ComingSoonPage(
-      key: state.pageKey,
+    return const ComingSoonPage();
+  }
+}
+
+@TypedShellRoute<SpacesShellRouteData>(
+  routes: <TypedRoute<RouteData>>[
+    TypedGoRoute<DiscoveryRoute>(path: '/$currentMilestone/discovery'),
+    TypedGoRoute<TreasuryRoute>(path: '/$currentMilestone/treasury'),
+  ],
+)
+final class SpacesShellRouteData extends ShellRouteData {
+  const SpacesShellRouteData();
+
+  @override
+  Widget builder(
+    BuildContext context,
+    GoRouterState state,
+    Widget navigator,
+  ) {
+    final spaceName = state.uri.pathSegments
+        .where((element) => element != currentMilestone)
+        .first;
+    final space = Space.values.byName(spaceName);
+
+    return SpacesShellPage(
+      space: space,
+      child: navigator,
     );
   }
 }
 
-@TypedGoRoute<DiscoveryRoute>(path: '$milestonePathPrefix/discovery')
 final class DiscoveryRoute extends GoRouteData {
   const DiscoveryRoute();
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return DiscoveryPage(
-      key: state.pageKey,
-    );
+    return const DiscoveryPage();
   }
 }
 
-@TypedGoRoute<TreasuryRoute>(path: '$milestonePathPrefix/treasury')
 final class TreasuryRoute extends GoRouteData {
   const TreasuryRoute();
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return TreasuryPage(
-      key: state.pageKey,
-    );
+    return const TreasuryPage();
   }
 }
 
@@ -51,8 +72,6 @@ final class LoginRoute extends GoRouteData {
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return LoginPage(
-      key: state.pageKey,
-    );
+    return const LoginPage();
   }
 }
