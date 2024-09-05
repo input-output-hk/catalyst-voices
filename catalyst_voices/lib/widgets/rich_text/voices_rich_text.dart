@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
+import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
 import 'package:catalyst_voices/widgets/common/resizable_box_parent.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -137,23 +138,17 @@ class _TopBar extends StatelessWidget {
           title,
           style: Theme.of(context).textTheme.titleMedium,
         ),
-        Expanded(
-          child: Align(
-            alignment: Alignment.centerRight,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: TextButton(
-                onPressed: onToggleEditMode,
-                child: Text(
-                  editMode
-                      ? context.l10n.cancelButtonText
-                      : context.l10n.editButtonText,
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-              ),
-            ),
+        Spacer(),
+        VoicesTextButton(
+          onTap: onToggleEditMode,
+          child: Text(
+            editMode
+                ? context.l10n.cancelButtonText
+                : context.l10n.editButtonText,
+            style: Theme.of(context).textTheme.labelSmall,
           ),
-        )
+        ),
+        SizedBox(width: 8),
       ],
     );
   }
