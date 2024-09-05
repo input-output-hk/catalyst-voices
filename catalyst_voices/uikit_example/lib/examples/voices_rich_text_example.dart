@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 
@@ -10,6 +11,7 @@ class VoicesRichTextExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colors.onSurfaceNeutralOpaqueLv0,
       appBar: AppBar(title: const Text('Voices Rich Text')),
       body: SingleChildScrollView(
         child: VoicesRichText(
