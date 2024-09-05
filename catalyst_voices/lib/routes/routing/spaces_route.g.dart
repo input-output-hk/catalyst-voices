@@ -1,39 +1,14 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'routing.dart';
+part of 'spaces_route.dart';
 
 // **************************************************************************
 // GoRouterGenerator
 // **************************************************************************
 
 List<RouteBase> get $appRoutes => [
-      $comingSoonRoute,
       $spacesShellRouteData,
-      $loginRoute,
     ];
-
-RouteBase get $comingSoonRoute => GoRouteData.$route(
-      path: '/',
-      factory: $ComingSoonRouteExtension._fromState,
-    );
-
-extension $ComingSoonRouteExtension on ComingSoonRoute {
-  static ComingSoonRoute _fromState(GoRouterState state) =>
-      const ComingSoonRoute();
-
-  String get location => GoRouteData.$location(
-        '/',
-      );
-
-  void go(BuildContext context) => context.go(location);
-
-  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
-
-  void pushReplacement(BuildContext context) =>
-      context.pushReplacement(location);
-
-  void replace(BuildContext context) => context.replace(location);
-}
 
 RouteBase get $spacesShellRouteData => ShellRouteData.$route(
       factory: $SpacesShellRouteDataExtension._fromState,
@@ -142,28 +117,6 @@ extension $FundedProjectsRouteExtension on FundedProjectsRoute {
 
   String get location => GoRouteData.$location(
         '/m4/funded_projects',
-      );
-
-  void go(BuildContext context) => context.go(location);
-
-  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
-
-  void pushReplacement(BuildContext context) =>
-      context.pushReplacement(location);
-
-  void replace(BuildContext context) => context.replace(location);
-}
-
-RouteBase get $loginRoute => GoRouteData.$route(
-      path: '/login',
-      factory: $LoginRouteExtension._fromState,
-    );
-
-extension $LoginRouteExtension on LoginRoute {
-  static LoginRoute _fromState(GoRouterState state) => const LoginRoute();
-
-  String get location => GoRouteData.$location(
-        '/login',
       );
 
   void go(BuildContext context) => context.go(location);
