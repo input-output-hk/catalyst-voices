@@ -156,7 +156,8 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
           const SizedBox(height: 4),
         ],
         ResizableBoxParent(
-          resizable: resizable,
+          resizableHorizontally: resizable,
+          resizableVertically: resizable,
           child: TextFormField(
             textAlignVertical: TextAlignVertical.top,
             expands: resizable,

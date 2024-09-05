@@ -5,13 +5,15 @@ import 'package:flutter/widgets.dart';
 
 /// A parent component that adds ability to resize its child
 class ResizableBoxParent extends StatelessWidget {
-  final bool resizable;
+  final bool resizableVertically;
+  final bool resizableHorizontally;
   final Widget child;
   final double minWidth;
   final double minHeight;
 
   const ResizableBoxParent({
-    required this.resizable,
+    required this.resizableVertically,
+    required this.resizableHorizontally,
     required this.child,
     this.minWidth = 40,
     this.minHeight = 40,
@@ -19,7 +21,7 @@ class ResizableBoxParent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!resizable) {
+    if (!resizableVertically && !resizableHorizontally) {
       return child;
     }
 
@@ -30,6 +32,8 @@ class ResizableBoxParent extends StatelessWidget {
           child: child,
           minWidth: minWidth,
           minHeight: minHeight,
+          resizableHorizontally: resizableHorizontally,
+          resizableVertically: resizableVertically,
         );
       },
     );
@@ -41,12 +45,16 @@ class _ResizableBox extends StatefulWidget {
   final Widget child;
   final double minWidth;
   final double minHeight;
+  final bool resizableVertically;
+  final bool resizableHorizontally;
 
   const _ResizableBox({
     required this.constraints,
     required this.child,
     required this.minWidth,
     required this.minHeight,
+    required this.resizableVertically,
+    required this.resizableHorizontally,
   });
 
   @override
@@ -85,15 +93,19 @@ class _ResizableBoxState extends State<_ResizableBox> {
             child: GestureDetector(
               onPanUpdate: (details) {
                 setState(() {
-                  _width = (_width + details.delta.dx).clamp(
-                    widget.minWidth,
-                    widget.constraints.maxWidth,
-                  );
+                  if (widget.resizableHorizontally) {
+                    _width = (_width + details.delta.dx).clamp(
+                      widget.minWidth,
+                      widget.constraints.maxWidth,
+                    );
+                  }
 
-                  _height = (_height + details.delta.dy).clamp(
-                    widget.minHeight,
-                    widget.constraints.maxHeight,
-                  );
+                  if (widget.resizableVertically) {
+                    _height = (_height + details.delta.dy).clamp(
+                      widget.minHeight,
+                      widget.constraints.maxHeight,
+                    );
+                  }
                 });
               },
               child: VoicesAssets.images.dragger.buildIcon(size: 15),
