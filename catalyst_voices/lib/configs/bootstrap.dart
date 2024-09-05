@@ -1,24 +1,47 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:catalyst_voices/app/app.dart';
 import 'package:catalyst_voices/configs/app_bloc_observer.dart';
 import 'package:catalyst_voices/configs/sentry_service.dart';
+import 'package:catalyst_voices/dependency/dependencies.dart';
+import 'package:catalyst_voices/routes/guards/milestone_guard.dart';
+import 'package:catalyst_voices/routes/routes.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_strategy/url_strategy.dart';
 
-Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
+typedef BootstrapWidgetBuilder = FutureOr<Widget> Function(BootstrapArgs args);
+
+final class BootstrapArgs {
+  BootstrapArgs({
+    required this.routerConfig,
+  });
+
+  final RouterConfig<Object> routerConfig;
+}
+
+Widget _appWidgetBuilder(BootstrapArgs args) {
+  return App(
+    routerConfig: args.routerConfig,
+  );
+}
+
+// TODO(damian-molinski): Add PlatformDispatcher.instance.onError
+// TODO(damian-molinski): Add Isolate.current.addErrorListener
+// TODO(damian-molinski): Add runZonedGuarded
+// TODO(damian-molinski): Add Global try-catch
+Future<void> bootstrap([
+  BootstrapWidgetBuilder builder = _appWidgetBuilder,
+]) async {
   // There's no need to call WidgetsFlutterBinding.ensureInitialized()
   // since this is already done internally by SentryFlutter.init()
   // More info here: https://github.com/getsentry/sentry-dart/issues/2063
   if (!kReleaseMode) {
     WidgetsFlutterBinding.ensureInitialized();
   }
-
-  GoRouter.optionURLReflectsImperativeAPIs = true;
-  setPathUrlStrategy();
 
   FlutterError.onError = (details) {
     log(
@@ -27,9 +50,22 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
     );
   };
 
+  GoRouter.optionURLReflectsImperativeAPIs = true;
+  setPathUrlStrategy();
+
+  final router = AppRouter.init(
+    guards: const [
+      MilestoneGuard(),
+    ],
+  );
+
   Bloc.observer = AppBlocObserver();
 
-  await _runApp(await builder());
+  await Dependencies.instance.init();
+
+  final args = BootstrapArgs(routerConfig: router);
+
+  await _runApp(await builder(args));
 }
 
 Future<void> _runApp(Widget app) async {
