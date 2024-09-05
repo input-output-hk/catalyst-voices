@@ -23,7 +23,7 @@ final class BootstrapArgs {
   final RouterConfig<Object> routerConfig;
 }
 
-Widget _appWidgetBuilder(BootstrapArgs args) {
+Widget _appBuilder(BootstrapArgs args) {
   return App(
     routerConfig: args.routerConfig,
   );
@@ -34,7 +34,7 @@ Widget _appWidgetBuilder(BootstrapArgs args) {
 // TODO(damian-molinski): Add runZonedGuarded
 // TODO(damian-molinski): Add Global try-catch
 Future<void> bootstrap([
-  BootstrapWidgetBuilder builder = _appWidgetBuilder,
+  BootstrapWidgetBuilder builder = _appBuilder,
 ]) async {
   // There's no need to call WidgetsFlutterBinding.ensureInitialized()
   // since this is already done internally by SentryFlutter.init()
