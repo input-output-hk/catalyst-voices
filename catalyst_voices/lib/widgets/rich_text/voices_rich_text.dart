@@ -177,16 +177,14 @@ class _Toolbar extends StatelessWidget {
             QuillToolbarIconButton(
               tooltip: context.l10n.headerTooltipText,
               onPressed: () {
-                if (controller.getSelectionStyle().attributes['header'] ==
-                    null) {
-                  controller.formatSelection(Attribute.h1);
-                } else {
+                if (controller.isHeaderSelected) {
                   controller.formatSelection(Attribute.header);
+                } else {
+                  controller.formatSelection(Attribute.h1);
                 }
               },
               icon: const Icon(CatalystVoicesIcons.rt_heading),
-              isSelected:
-                  controller.getSelectionStyle().attributes['header'] != null,
+              isSelected: controller.isHeaderSelected,
               iconTheme: null,
             ),
             QuillToolbarToggleStyleButton(
@@ -216,7 +214,6 @@ class _Toolbar extends StatelessWidget {
               ),
               controller: controller,
               attribute: Attribute.ul,
-              //options: QuillToolbarToggleStyleButtonOptions(iconData: Icons.abc),
             ),
             QuillToolbarIndentButton(
               options: QuillToolbarIndentButtonOptions(
@@ -345,5 +342,11 @@ class _Footer extends StatelessWidget {
         onTap: () => onSave?.call(controller.document),
       ),
     );
+  }
+}
+
+extension on QuillController {
+  bool get isHeaderSelected {
+    return getSelectionStyle().attributes.containsKey('header');
   }
 }
