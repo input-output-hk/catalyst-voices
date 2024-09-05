@@ -4,8 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group(VoicesAvatar, () {
-    testWidgets('VoicesAvatar renders with default properties',
-        (WidgetTester tester) async {
+    testWidgets('VoicesAvatar renders with default properties', (tester) async {
       // Create the widget by wrapping it in a MaterialApp for theme access.
       await tester.pumpWidget(
         const MaterialApp(
@@ -28,7 +27,7 @@ void main() {
     });
 
     testWidgets('VoicesAvatar applies custom radius and padding',
-        (WidgetTester tester) async {
+        (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -57,7 +56,7 @@ void main() {
     });
 
     testWidgets('VoicesAvatar uses custom foreground and background colors',
-        (WidgetTester tester) async {
+        (tester) async {
       const foregroundColor = Colors.red;
       const backgroundColor = Colors.green;
 
@@ -89,8 +88,7 @@ void main() {
       expect(iconThemeWidget.data.color, foregroundColor);
     });
 
-    testWidgets('VoicesAvatar calls onTap when tapped',
-        (WidgetTester tester) async {
+    testWidgets('VoicesAvatar calls onTap when tapped', (tester) async {
       var tapped = false;
 
       await tester.pumpWidget(
@@ -114,8 +112,7 @@ void main() {
       expect(tapped, true);
     });
 
-    testWidgets('VoicesAvatar applies theme colors by default',
-        (WidgetTester tester) async {
+    testWidgets('VoicesAvatar applies theme colors by default', (tester) async {
       final customTheme = ThemeData(
         colorScheme: const ColorScheme.light(
           primary: Colors.blue,

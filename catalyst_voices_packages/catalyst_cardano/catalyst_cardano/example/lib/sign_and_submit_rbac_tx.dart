@@ -80,6 +80,10 @@ Future<void> _signAndSubmitRbacTx({
       ),
     );
 
+    if (utxos.isEmpty) {
+      throw Exception('Insufficient balance, please top up your wallet');
+    }
+
     final x509Envelope = await _buildMetadataEnvelope(
       utxos: utxos,
     );
@@ -205,7 +209,7 @@ Transaction _buildUnsignedRbacTx({
   return Transaction(
     body: txBody,
     isValid: true,
-    witnessSet: const TransactionWitnessSet(vkeyWitnesses: {}),
+    witnessSet: const TransactionWitnessSet(),
     auxiliaryData: auxiliaryData,
   );
 }

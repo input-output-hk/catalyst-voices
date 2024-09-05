@@ -156,5 +156,13 @@
         "type": "int"
       }
     }
+  },
+  "proposalStatusReady": "Ready",
+  "@proposalStatusReady": {
+    "description": "Indicates to user that status is in ready mode"
+  },
+  "proposalStatusDraft": "Draft",
+  "@proposalStatusDraft": {
+    "description": "Indicates to user that status is in draft mode"
   }
 }
