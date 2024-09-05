@@ -3,6 +3,7 @@ import 'package:catalyst_voices/pages/discovery/discovery.dart';
 import 'package:catalyst_voices/pages/login/login.dart';
 import 'package:catalyst_voices/pages/spaces/spaces.dart';
 import 'package:catalyst_voices/pages/treasury/treasury.dart';
+import 'package:catalyst_voices/routes/routing/transitions/transitions.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -48,7 +49,7 @@ final class SpacesShellRouteData extends ShellRouteData {
   }
 }
 
-final class DiscoveryRoute extends GoRouteData {
+final class DiscoveryRoute extends GoRouteData with FadePageTransitionMixin {
   const DiscoveryRoute();
 
   @override
@@ -57,7 +58,7 @@ final class DiscoveryRoute extends GoRouteData {
   }
 }
 
-final class TreasuryRoute extends GoRouteData {
+final class TreasuryRoute extends GoRouteData with FadePageTransitionMixin {
   const TreasuryRoute();
 
   @override
