@@ -69,9 +69,13 @@ class _ResizableBoxState extends State<_ResizableBox> {
   void initState() {
     super.initState();
 
-    _width = widget.constraints.maxWidth != double.infinity
-        ? widget.constraints.maxWidth
-        : widget.constraints.constrainWidth(widget.minWidth);
+    if (widget.resizableHorizontally) {
+      _width = widget.constraints.maxWidth != double.infinity
+          ? widget.constraints.maxWidth
+          : widget.constraints.constrainWidth(widget.minWidth);
+    } else {
+      _width = double.infinity;
+    }
 
     _height = max(widget.constraints.minHeight, widget.minHeight);
   }
