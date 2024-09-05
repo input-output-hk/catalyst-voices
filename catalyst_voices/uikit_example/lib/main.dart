@@ -19,6 +19,7 @@ class UIKitExampleApp extends StatefulWidget {
 
 class _UIKitExampleAppState extends State<UIKitExampleApp> {
   final SessionBloc _sessionBloc = SessionBloc();
+  final UserProfileBloc _userProfileBloc = UserProfileBloc();
 
   ThemeMode _themeMode = ThemeMode.system;
 
@@ -27,6 +28,7 @@ class _UIKitExampleAppState extends State<UIKitExampleApp> {
     return MultiBlocProvider(
       providers: [
         BlocProvider.value(value: _sessionBloc),
+        BlocProvider.value(value: _userProfileBloc),
       ],
       child: MaterialApp(
         title: 'UI kit examples',

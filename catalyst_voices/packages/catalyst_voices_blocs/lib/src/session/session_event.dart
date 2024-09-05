@@ -7,7 +7,7 @@ sealed class SessionEvent extends Equatable {
 
 /// Dummy implementation of session management,
 /// just toggles the next session state or reset to the initial one.
-class NextStateSessionEvent extends SessionEvent {
+final class NextStateSessionEvent extends SessionEvent {
   const NextStateSessionEvent();
 
   @override
