@@ -17,31 +17,48 @@ class SpacesShellPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: VoicesAppBar(),
-      drawer: Builder(
-        builder: (context) {
-          return VoicesDrawer(
-            children: [],
-            bottom: VoicesDrawerSpaceChooser(
-              currentSpace: space,
-              onChanged: (space) {
-                Scaffold.of(context).closeDrawer();
-
-                switch (space) {
-                  case Space.treasury:
-                    TreasuryRoute().go(context);
-                  case Space.discovery:
-                    DiscoveryRoute().go(context);
-                  case Space.workspace:
-                    TreasuryRoute().go(context);
-                  case Space.voting:
-                    TreasuryRoute().go(context);
-                }
-              },
-            ),
-          );
-        },
-      ),
+      drawer: _SpacesDrawer(space: space),
       body: child,
     );
+  }
+}
+
+class _SpacesDrawer extends StatelessWidget {
+  final Space space;
+
+  const _SpacesDrawer({
+    required this.space,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesDrawer(
+      children: [],
+      bottom: VoicesDrawerSpaceChooser(
+        currentSpace: space,
+        onChanged: (space) {
+          Scaffold.of(context).closeDrawer();
+          _goTo(context, space: space);
+        },
+      ),
+    );
+  }
+
+  void _goTo(
+    BuildContext context, {
+    required Space space,
+  }) {
+    switch (space) {
+      case Space.treasury:
+        TreasuryRoute().go(context);
+      case Space.discovery:
+        DiscoveryRoute().go(context);
+      case Space.workspace:
+        WorkspaceRoute().go(context);
+      case Space.voting:
+        VotingRoute().go(context);
+      case Space.fundedProjects:
+        FundedProjectsRoute().go(context);
+    }
   }
 }

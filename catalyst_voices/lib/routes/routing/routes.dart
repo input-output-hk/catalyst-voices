@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 /// Semantic anchor for generated routes so only this class
 /// knows how to work with them.
 abstract final class Routes {
-  static String get initialLocation => const DiscoveryRoute().location;
+  static String get initialLocation => const TreasuryRoute().location;
 
   static List<RouteBase> get routes => $appRoutes;
 }

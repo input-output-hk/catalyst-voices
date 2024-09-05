@@ -4,4 +4,5 @@ enum Space {
   discovery,
   workspace,
   voting,
+  fundedProjects;
 }
