@@ -1,1 +1,0 @@
-let port=chrome.runtime.connect({name:"trezor-connect"});port.onMessage.addListener((e=>{window.postMessage(e,window.location.origin)})),port.onDisconnect.addListener((()=>{port=null})),window.addEventListener("message",(e=>{port&&e.source===window&&e.data&&port.postMessage({data:e.data})}));
