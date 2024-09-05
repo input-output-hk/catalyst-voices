@@ -1,5 +1,7 @@
 import 'catalyst_voices_localizations.dart';
 
+// ignore_for_file: type=lint
+
 /// The translations for English (`en`).
 class VoicesLocalizationsEn extends VoicesLocalizations {
   VoicesLocalizationsEn([String locale = 'en']) : super(locale);
@@ -96,4 +98,15 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get snackbarOkButtonText => 'Ok';
+
+  @override
+  String seedPhraseSlotNr(int nr) {
+    return 'Slot $nr';
+  }
+
+  @override
+  String get proposalStatusReady => 'Ready';
+
+  @override
+  String get proposalStatusDraft => 'Draft';
 }

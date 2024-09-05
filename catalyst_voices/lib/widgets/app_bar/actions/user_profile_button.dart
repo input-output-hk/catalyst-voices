@@ -22,8 +22,8 @@ class UserProfileButton extends StatelessWidget {
     } else {
       return Chip(
         shape: const RoundedRectangleBorder(
-        // This is a custom chip that simulates a button look&feel, so visual 
-        // property are specified.
+          // This is a custom chip that simulates a button look&feel, so visual
+          // property are specified.
           borderRadius: BorderRadius.all(Radius.circular(30)),
         ),
         label: Text(context.l10n.userProfileGuestLabelText),

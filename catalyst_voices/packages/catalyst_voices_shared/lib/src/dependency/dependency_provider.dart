@@ -17,7 +17,7 @@ abstract class DependencyProvider {
   }
 
   /// Sets an instance of [DependencyProvider].
-  /// 
+  ///
   /// Must be called before the instance could be accessed.
   static set instance(DependencyProvider instance) {
     _instance = instance;

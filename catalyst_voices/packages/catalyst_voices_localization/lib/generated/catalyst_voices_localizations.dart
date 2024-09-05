@@ -7,6 +7,8 @@ import 'package:intl/intl.dart' as intl;
 import 'catalyst_voices_localizations_en.dart' deferred as catalyst_voices_localizations_en;
 import 'catalyst_voices_localizations_es.dart' deferred as catalyst_voices_localizations_es;
 
+// ignore_for_file: type=lint
+
 /// Callers can lookup localized strings with an instance of VoicesLocalizations
 /// returned by `VoicesLocalizations.of(context)`.
 ///
@@ -277,6 +279,24 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Ok'**
   String get snackbarOkButtonText;
+
+  /// When user arranges seed phrases this text is shown when phrase was not selected
+  ///
+  /// In en, this message translates to:
+  /// **'Slot {nr}'**
+  String seedPhraseSlotNr(int nr);
+
+  /// Indicates to user that status is in ready mode
+  ///
+  /// In en, this message translates to:
+  /// **'Ready'**
+  String get proposalStatusReady;
+
+  /// Indicates to user that status is in draft mode
+  ///
+  /// In en, this message translates to:
+  /// **'Draft'**
+  String get proposalStatusDraft;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

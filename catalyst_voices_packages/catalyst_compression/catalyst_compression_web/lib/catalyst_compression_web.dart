@@ -6,7 +6,7 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart' show Registrar;
 ///
 /// This class implements the `package:catalyst_compression` functionality
 /// for the web.
-class CatalystCompressionWeb extends CatalystCompressionPlatform {
+final class CatalystCompressionWeb extends CatalystCompressionPlatform {
   /// A constructor that allows tests to override the window object used by the
   /// plugin.
   CatalystCompressionWeb();

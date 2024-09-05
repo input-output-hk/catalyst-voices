@@ -4,14 +4,18 @@ import 'dart:typed_data';
 
 import 'package:catalyst_cardano_serialization/src/certificate.dart';
 import 'package:catalyst_cardano_serialization/src/exceptions.dart';
+import 'package:catalyst_cardano_serialization/src/redeemer.dart';
+import 'package:catalyst_cardano_serialization/src/signature.dart';
 import 'package:catalyst_cardano_serialization/src/transaction.dart';
+import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
+import 'package:equatable/equatable.dart';
 import 'package:pinenacl/digests.dart';
 
 /// Implements a common base of hash types that holds
 /// binary [bytes] of exact [length].
-abstract base class BaseHash {
+abstract base class BaseHash extends Equatable implements CborEncodable {
   /// The raw [bytes] of a hash.
   final List<int> bytes;
 
@@ -27,6 +31,7 @@ abstract base class BaseHash {
       : this.fromBytes(bytes: (value as CborBytes).bytes);
 
   /// Serializes the type as cbor.
+  @override
   CborValue toCbor() => CborBytes(bytes);
 
   /// Constructs the [BaseHash] from a hex string representation
@@ -43,25 +48,7 @@ abstract base class BaseHash {
   String toString() => toHex();
 
   @override
-  int get hashCode => Object.hash(bytes, length);
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    if (other is! BaseHash) return false;
-
-    // prevent subclasses of different types to be equal to each other,
-    // even if they hold the same bytes they represent different kinds
-    if (other.runtimeType != runtimeType) return false;
-
-    if (length != other.length) return false;
-
-    for (var i = 0; i < bytes.length; i++) {
-      if (bytes[i] != other.bytes[i]) return false;
-    }
-
-    return true;
-  }
+  List<Object?> get props => [bytes];
 }
 
 /// Describes the Blake2b-256 hash of the transaction which serves as proof
@@ -107,13 +94,13 @@ final class TransactionInputsHash extends BaseHash {
 
   /// Constructs the [TransactionInputsHash] from a [TransactionBody].
   TransactionInputsHash.fromTransactionInputs(
-    List<TransactionUnspentOutput> inputs,
+    List<TransactionUnspentOutput> utxos,
   ) : super.fromBytes(
           bytes: Hash.blake2b(
             Uint8List.fromList(
               cbor.encode(
                 CborList([
-                  for (final input in inputs) input.toCbor(),
+                  for (final utxo in utxos) utxo.input.toCbor(),
                 ]),
               ),
             ),
@@ -187,6 +174,61 @@ final class CertificateHash extends BaseHash {
 
   /// Deserializes the type from cbor.
   CertificateHash.fromCbor(super.value) : super.fromCbor();
+
+  @override
+  int get length => _length;
+}
+
+/// Describes the Blake2b-224 hash of a [Ed25519PublicKey].
+final class Ed25519PublicKeyHash extends BaseHash {
+  static const int _length = 28;
+
+  /// Constructs the [Ed25519PublicKeyHash] from raw [bytes].
+  Ed25519PublicKeyHash.fromBytes({required super.bytes}) : super.fromBytes();
+
+  /// Constructs the [Ed25519PublicKeyHash] from a hex string representation
+  /// of [bytes].
+  Ed25519PublicKeyHash.fromHex(super.string) : super.fromHex();
+
+  /// Constructs the [Ed25519PublicKeyHash] from a [Ed25519PublicKey].
+  Ed25519PublicKeyHash.fromPublicKey(Ed25519PublicKey key)
+      : super.fromBytes(
+          bytes: Hash.blake2b(
+            Uint8List.fromList(key.bytes),
+            digestSize: _length,
+          ),
+        );
+
+  /// Deserializes the type from cbor.
+  Ed25519PublicKeyHash.fromCbor(super.value) : super.fromCbor();
+
+  @override
+  int get length => _length;
+}
+
+/// Describes the Blake2b-256 hash of script data which is included
+/// in the transaction body.
+final class ScriptDataHash extends BaseHash {
+  static const int _length = 32;
+
+  /// Constructs the [ScriptDataHash] from raw [bytes].
+  ScriptDataHash.fromBytes({required super.bytes}) : super.fromBytes();
+
+  /// Constructs the [ScriptDataHash] from a hex string representation
+  /// of [bytes].
+  ScriptDataHash.fromHex(super.string) : super.fromHex();
+
+  /// Constructs the [ScriptDataHash] from a [ScriptData].
+  ScriptDataHash.fromScriptData(ScriptData data)
+      : super.fromBytes(
+          bytes: Hash.blake2b(
+            Uint8List.fromList(cbor.encode(data.toCbor())),
+            digestSize: _length,
+          ),
+        );
+
+  /// Deserializes the type from cbor.
+  ScriptDataHash.fromCbor(super.value) : super.fromCbor();
 
   @override
   int get length => _length;
