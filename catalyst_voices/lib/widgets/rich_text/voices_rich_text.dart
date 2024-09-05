@@ -2,6 +2,7 @@ import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/common/resizable_box_parent.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/extensions.dart';
 import 'package:flutter_quill/flutter_quill.dart';
@@ -139,7 +140,7 @@ class _TopBar extends StatelessWidget {
               child: TextButton(
                 onPressed: onToggleEditMode,
                 child: Text(
-                  editMode ? 'Cancel' : 'Edit', //TODO localize
+                  editMode ? context.l10n.cancelButtonText : context.l10n.editButtonText,
                   style: Theme.of(context).textTheme.labelSmall,
                 ),
               ),
@@ -167,8 +168,7 @@ class _Toolbar extends StatelessWidget {
         child: Row(
           children: [
             QuillToolbarIconButton(
-              tooltip: 'Header',
-              //TODO localize
+              tooltip: context.l10n.headerTooltipText,
               onPressed: () {
                 if (controller.getSelectionStyle().attributes['header'] ==
                     null) {
@@ -271,7 +271,7 @@ class _Editor extends StatelessWidget {
             focusNode: focusNode,
             configurations: QuillEditorConfigurations(
               padding: const EdgeInsets.all(16),
-              placeholder: 'Start writing your text...', //TODO localize
+              placeholder: context.l10n.placeholderRichText,
               embedBuilders: isWeb()
                   ? FlutterQuillEmbeds.editorWebBuilders()
                   : FlutterQuillEmbeds.editorBuilders(),
@@ -300,7 +300,7 @@ class _Limit extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              'Supporting text', //TODO localize
+              context.l10n.supportingTextLabelText,
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ),
@@ -333,7 +333,7 @@ class _Footer extends StatelessWidget {
       alignment: Alignment.centerRight,
       color: Theme.of(context).colors.onSurfaceNeutralOpaqueLv1,
       child: VoicesFilledButton(
-        child: Text('Save'.toUpperCase()), //TODO localize
+        child: Text(context.l10n.saveButtonText.toUpperCase()),
         onTap: () => onSave?.call(controller.document),
       ),
     );
