@@ -14,11 +14,13 @@ import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 class VoicesRichText extends StatefulWidget {
   const VoicesRichText({
     super.key,
+    this.title = '',
     this.document,
     this.onSave,
     this.charsLimit,
   });
 
+  final String title;
   final Document? document;
   final ValueChanged<Document>? onSave;
   final int? charsLimit;
@@ -81,6 +83,7 @@ class _VoicesRichTextState extends State<VoicesRichText> {
               bottom: 20,
             ),
             child: _TopBar(
+              title: widget.title,
               editMode: _editMode,
               onToggleEditMode: () {
                 setState(() {
@@ -117,10 +120,12 @@ class _VoicesRichTextState extends State<VoicesRichText> {
 
 class _TopBar extends StatelessWidget {
   const _TopBar({
+    required this.title,
     required this.editMode,
     this.onToggleEditMode,
   });
 
+  final String title;
   final bool editMode;
   final VoidCallback? onToggleEditMode;
 
@@ -129,7 +134,7 @@ class _TopBar extends StatelessWidget {
     return Row(
       children: [
         Text(
-          'Rich text',
+          title,
           style: Theme.of(context).textTheme.titleMedium,
         ),
         Expanded(
@@ -140,7 +145,9 @@ class _TopBar extends StatelessWidget {
               child: TextButton(
                 onPressed: onToggleEditMode,
                 child: Text(
-                  editMode ? context.l10n.cancelButtonText : context.l10n.editButtonText,
+                  editMode
+                      ? context.l10n.cancelButtonText
+                      : context.l10n.editButtonText,
                   style: Theme.of(context).textTheme.labelSmall,
                 ),
               ),

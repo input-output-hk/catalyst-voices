@@ -13,6 +13,7 @@ class VoicesRichTextExample extends StatelessWidget {
       appBar: AppBar(title: const Text('Voices Rich Text')),
       body: SingleChildScrollView(
         child: VoicesRichText(
+          title: 'Rich text',
           document: Document.fromJson(_textSample),
           charsLimit: 800,
           onSave: (document) => print('Saved document: $document'),
