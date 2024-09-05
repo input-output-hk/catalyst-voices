@@ -6,7 +6,7 @@ sealed class SessionState extends Equatable {
 }
 
 /// The user hasn't registered yet nor setup the keychain.
-class VisitorSessionState extends SessionState {
+final class VisitorSessionState extends SessionState {
   const VisitorSessionState();
 
   @override
@@ -14,7 +14,7 @@ class VisitorSessionState extends SessionState {
 }
 
 /// The user has registered the keychain but it's locked.
-class GuestSessionState extends SessionState {
+final class GuestSessionState extends SessionState {
   const GuestSessionState();
 
   @override
@@ -22,7 +22,7 @@ class GuestSessionState extends SessionState {
 }
 
 /// The user has registered and unlocked the keychain.
-class ActiveUserSessionState extends SessionState {
+final class ActiveUserSessionState extends SessionState {
   const ActiveUserSessionState();
 
   @override
