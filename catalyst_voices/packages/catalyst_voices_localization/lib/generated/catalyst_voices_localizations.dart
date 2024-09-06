@@ -112,6 +112,42 @@ abstract class VoicesLocalizations {
   /// **'mail@example.com'**
   String get emailErrorText;
 
+  /// Text shown in cancel button
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancelButtonText;
+
+  /// Text shown in edit button
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get editButtonText;
+
+  /// Text shown in header tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Header'**
+  String get headerTooltipText;
+
+  /// Text shown as placeholder in rich text editor
+  ///
+  /// In en, this message translates to:
+  /// **'Start writing your text...'**
+  String get placeholderRichText;
+
+  /// Text shown as placeholder in rich text editor
+  ///
+  /// In en, this message translates to:
+  /// **'Supporting text'**
+  String get supportingTextLabelText;
+
+  /// Text shown in save button
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get saveButtonText;
+
   /// Text shown in password field
   ///
   /// In en, this message translates to:
