@@ -130,12 +130,16 @@ monitoring_install_script = <<-SHELL
     SHELL
 
 scylladb_install_script = <<-SHELL
+    # See: https://github.com/scylladb/scylla-operator/blob/master/docs/source/helm.md
     sudo -i
     export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
     helm repo add scylla https://scylla-operator-charts.storage.googleapis.com/stable
     helm repo update
     helm install scylla-operator scylla/scylla-operator --values /vagrant_shared/k3s/scylladb/values.operator.yaml  --create-namespace --namespace scylla-operator --wait
+    # Disable the Scylla Manager for now, consumes resources and we aren't using it.
+    # helm install scylla-manager scylla/scylla-manager --values /vagrant_shared/k3s/scylladb/values.manager.yaml --create-namespace --namespace scylla-manager
     helm install scylla scylla/scylla --values /vagrant_shared/k3s/scylladb/values.cluster.yaml --create-namespace --namespace scylla
+    # kubectl apply -f /vagrant_shared/k3s/scylladb/load-balancer.yaml
     SHELL
 
 update_sysctl_limits = <<-SHELL
