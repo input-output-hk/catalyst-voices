@@ -5,7 +5,7 @@ import 'package:collection/collection.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
-base class VoicesNodeMenuItem extends Equatable {
+final class VoicesNodeMenuItem extends Equatable {
   final int id;
   final String label;
 

@@ -1,7 +1,6 @@
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
-import 'package:uikit_example/examples/treasury_space/voices_treasury_space.dart';
 
 class CampaignDetails extends StatelessWidget {
   final VoicesNodeMenuController campaignSetupController;
