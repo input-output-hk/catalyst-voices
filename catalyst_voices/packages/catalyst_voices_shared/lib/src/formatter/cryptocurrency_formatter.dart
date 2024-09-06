@@ -10,7 +10,7 @@ abstract class CryptocurrencyFormatter {
 
   /// Formats the [amount] of ADA cryptocurrency.
   ///
-  /// Uses K (thousands) or M (multipliers).
+  /// Uses K (thousands) or M (millions) multipliers.
   /// Examples:
   /// - ₳123 = ₳123
   /// - ₳1000 = ₳1K
