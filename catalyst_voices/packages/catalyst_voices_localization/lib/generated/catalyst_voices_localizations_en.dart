@@ -16,6 +16,24 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get emailErrorText => 'mail@example.com';
 
   @override
+  String get cancelButtonText => 'Cancel';
+
+  @override
+  String get editButtonText => 'Edit';
+
+  @override
+  String get headerTooltipText => 'Header';
+
+  @override
+  String get placeholderRichText => 'Start writing your text...';
+
+  @override
+  String get supportingTextLabelText => 'Supporting text';
+
+  @override
+  String get saveButtonText => 'Save';
+
+  @override
   String get passwordLabelText => 'Password';
 
   @override
