@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/app/view/app_precache_image_assets.dart';
 import 'package:catalyst_voices/routes/routes.dart' show AppRouter;
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -31,6 +32,11 @@ final class AppContent extends StatelessWidget {
         routerConfig: _routeConfig(context),
         theme: ThemeBuilder.buildTheme(BrandKey.catalyst),
         darkTheme: ThemeBuilder.buildDarkTheme(BrandKey.catalyst),
+        builder: (context, child) {
+          return AppPrecacheImageAssets(
+            child: child ?? SizedBox.shrink(),
+          );
+        },
       ),
     );
   }
