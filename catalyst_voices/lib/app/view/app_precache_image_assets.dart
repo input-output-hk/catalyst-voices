@@ -4,7 +4,20 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+/// A widget that pre-caches SVG and image assets before displaying its
+/// child widget.
+///
+/// This widget is useful for improving the perceived performance of your
+/// app by pre-loading any necessary image assets before they are displayed on
+/// the screen.
+/// This can help to avoid stuttering or delays when the user navigates to a
+/// new screen that requires those images.
+///
+/// [AppPrecacheImageAssets] depends on [Theme] and is trying to make
+/// as little work as possible when [Theme] is changing by caching
+/// previously loaded assets.
 class AppPrecacheImageAssets extends StatefulWidget {
+  /// The child widget to be displayed once the images have been pre-cached.
   final Widget child;
 
   const AppPrecacheImageAssets({
