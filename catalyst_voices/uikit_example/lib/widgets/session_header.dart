@@ -27,18 +27,10 @@ class _VisitorSessionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        VoicesFilledButton(
-          child: Text('Get Started'),
-          onTap: () =>
-              context.read<SessionBloc>().add(const NextStateSessionEvent()),
-        ),
-        const SizedBox(width: 12),
-        VoicesFilledButton(
-          child: Text('Visitor'),
-        ),
-      ],
+    return VoicesFilledButton(
+      child: Text('Get Started'),
+      onTap: () =>
+          context.read<SessionBloc>().add(const NextStateSessionEvent()),
     );
   }
 }
@@ -48,19 +40,11 @@ class _GuestSessionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        VoicesFilledButton(
-          trailing: Icon(CatalystVoicesIcons.lock_open),
-          child: Text('Unlock'),
-          onTap: () =>
-              context.read<SessionBloc>().add(const NextStateSessionEvent()),
-        ),
-        const SizedBox(width: 12),
-        VoicesFilledButton(
-          child: Text('Guest'),
-        ),
-      ],
+    return VoicesFilledButton(
+      trailing: Icon(CatalystVoicesIcons.lock_open),
+      child: Text('Unlock'),
+      onTap: () =>
+          context.read<SessionBloc>().add(const NextStateSessionEvent()),
     );
   }
 }
@@ -70,19 +54,11 @@ class _ActiveUserSessionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        VoicesFilledButton(
-          trailing: Icon(CatalystVoicesIcons.lock_closed),
-          child: Text('Lock'),
-          onTap: () =>
-              context.read<SessionBloc>().add(const NextStateSessionEvent()),
-        ),
-        const SizedBox(width: 12),
-        VoicesFilledButton(
-          child: Text('John Smith'),
-        ),
-      ],
+    return VoicesFilledButton(
+      trailing: Icon(CatalystVoicesIcons.lock_closed),
+      child: Text('Lock'),
+      onTap: () =>
+          context.read<SessionBloc>().add(const NextStateSessionEvent()),
     );
   }
 }
