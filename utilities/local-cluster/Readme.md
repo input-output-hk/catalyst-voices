@@ -21,28 +21,26 @@
   * [Debugging the cluster](#debugging-the-cluster)
     * [SSH into a running VM](#ssh-into-a-running-vm)
   * [Local UI to access ScyllaDB](#local-ui-to-access-scylladb)
+  * [Troubleshooting](#troubleshooting)
 
 
 ## Requirements
 
-https://github.com/casey/just
-
-config.vm.forward_port 80, 5656
+* [Vagrant](https://developer.hashicorp.com/vagrant/install?product_intent=vagrant)
+* [kubectl](https://kubernetes.io/docs/tasks/tools/)
+* [helm](https://helm.sh/docs/intro/install/)
+* [just](https://github.com/casey/just)
 
 
 ### macOS
 
-
-https://www.virtualbox.org/wiki/Testbuilds
 https://www.virtualbox.org/wiki/Testbuilds
 
 Integration Tests and local testing will require a running local cluster.
 To eliminate variability and simplify local deployment, we have standardized the local cluster around:
 
 * [VirtualBox](https://www.virtualbox.org/)
-* [Vagrant](https://developer.hashicorp.com/vagrant/install?product_intent=vagrant)
-* [kubectl](https://kubernetes.io/docs/tasks/tools/)
-* [helm](https://helm.sh/docs/intro/install/)
+
 
 These tools allow us to define VMs that are consistent and provide a uniform Kubernetes environment
 for local testing.
@@ -54,12 +52,12 @@ The Cluster is based on [K3s](https://k3s.io/), which is a lightweight version o
 We set up 1 server node which hosts the control-plane and is the master node.
 Configured with:
 
-* 4 Cores
+* 4(2) Cores
 * 5 GB of RAM
 
 It has 3 Internal nodes, configured as:
-
-* 4 Cores
+db
+* 4(2) Cores
 * 4 GB of RAM
 
 ## Default Services
@@ -212,23 +210,27 @@ vagrant ssh agent99
 
 Found (and tested) description how to connect using only open-source via DBeaver:
 
-1. Download dbeaver (Community Edition) https://dbeaver.io/download/
-2. Download cassandra jdbc jar files: <http://www.dbschema.com/cassandra-jdbc-driver.html>
+1. Download [dbeaver (Community Edition)](https://dbeaver.io/download)
+2. Download cassandra [jdbc jar files](http://www.dbschema.com/cassandra-jdbc-driver.html)
    (Downloading and Testing the Driver Binaries section have links to binary and source)
-3. extract cassandra jdbc zip
-4. run dbeaver
-5. go to Database > Driver Manager
-6. click New
+3. Extract cassandra jdbc zip
+4. Run dbeaver
+5. Ho to `Database` > `Driver Manager`
+6. Click `New`
 7. Fill in details as follows:
    * Driver Name: `Cassandra` (or whatever you want it to say)
    * Driver Type: `Generic`
-   * Class Name: `com.dbschema.CassandraJdbcDriver`
+   * Class Name: `com.dbschema.CassandraJdbcDriver` or `com.wisecoders.dbschema.cassandra.JdbcDriver`
+    (depending on the class name in step 9)
    * URL Template: `jdbc:cassandra://{host}[:{port}][/{database}]`
    * Default Port: `9042`
    * Embedded: `no`
    * Category:
    * Description: `Cassandra` (or whatever you want it to say)
-8. click Add File and add all the jars in the cassandra jdbc zip file.
-9. click Find Class to make sure the Class Name is found okay
-10. click OK
+8. Click `Add File` and add all the jars in the cassandra jdbc zip file.
+9. Click `Find Class` to make sure the Class Name is found okay.
+10. Click OK
 11. Create New Connection, selecting the database driver you just added
+
+
+## Troubleshooting

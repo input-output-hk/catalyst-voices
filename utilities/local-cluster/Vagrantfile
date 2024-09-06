@@ -1,6 +1,5 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-# cspell: words vcpu, noninteractive, iscsi, preconfiguration, inotify, jetstack
 
 # These variables are kept for reference in scripts, but we're not using them for network configuration
 control_ip = "192.168.58.10"
@@ -8,7 +7,7 @@ agents = { "agent86" => "192.168.58.86",
            "agent99" => "192.168.58.99" }
 
 control_vcpu = "2" # Number of vCPUs in the VM
-control_memory = "5192" # 4G of Memory (An extra gig because its the control-plane node)
+control_memory = "5192" # 5G of Memory (An extra gig because its the control-plane node)
 agent_vcpu = "2" # Number of vCPUs in the VM
 agent_memory = "4096" # 4G of Memory
 
@@ -44,6 +43,8 @@ helm_install_script = <<-SHELL
 
 control_plane_script = <<-SHELL
     sudo -i
+    # Get the IP of the default interface
+    DEFAULT_IP=$(ip route get 1 | awk '{print $7;exit}')
     # Read preconfiguration from shared directory and install it
     mkdir -p /etc/rancher/k3s/
     mkdir -p /var/lib/rancher/k3s/server/manifests/
@@ -53,7 +54,8 @@ control_plane_script = <<-SHELL
     # Extra parameters in INSTALL_K3S_EXEC variable because of
     # K3s picking up the wrong interface when starting the control-plane and agents
     # https://github.com/alexellis/k3sup/issues/306
-    export INSTALL_K3S_EXEC="--bind-address=#{control_ip} --node-external-ip=#{control_ip} --flannel-iface=eth1"
+    # export INSTALL_K3S_EXEC="--bind-address=#{control_ip} --node-external-ip=#{control_ip} --flannel-iface=eth1"
+    export INSTALL_K3S_EXEC="--bind-address=$DEFAULT_IP --node-external-ip=$DEFAULT_IP"
     curl -sfL https://get.k3s.io | sh -
     echo "Sleeping for 5 seconds to wait for k3s to start"
     sleep 5
@@ -75,6 +77,8 @@ agent_script = <<-SHELL
     cp /vagrant_shared/k3s/registries.yaml /etc/rancher/k3s/
     # Install and start k3s agent nodes
     export K3S_TOKEN_FILE=/vagrant_shared/token
+    # export K3S_URL=https://#{control_ip}:6443
+    # export INSTALL_K3S_EXEC="--flannel-iface=eth1"
     export K3S_URL=https://$CONTROL_IP:6443
     curl -sfL https://get.k3s.io | sh -
     SHELL
