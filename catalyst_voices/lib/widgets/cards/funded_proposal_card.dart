@@ -123,7 +123,7 @@ class _FundCategory extends StatelessWidget {
     return Text.rich(
       TextSpan(
         text: fund + ' / ',
-        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Theme.of(context).colors.textDisabled,
             ),
         children: [
@@ -181,7 +181,7 @@ class _FundsAndComments extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
-        color: Theme.of(context).colors.success!.withOpacity(0.08),
+        color: Theme.of(context).colors.success?.withOpacity(0.08),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -223,7 +223,7 @@ class _Description extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       text,
-      style: Theme.of(context).textTheme.bodyLarge!.copyWith(
+      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
             color: Theme.of(context).colors.textOnPrimary,
           ),
       maxLines: 4,
