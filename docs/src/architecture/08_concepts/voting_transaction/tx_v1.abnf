@@ -1,5 +1,3 @@
-; cspell: words CYPHERTEXT
-
 VOTE-TX           = SIZE-BYTES-32BIT %x00 %x0b VOTE-PAYLOAD
 
 VOTE-PAYLOAD      = CAST-CERT IOW
@@ -11,10 +9,10 @@ CAST-PAYLOAD      = %x01 CHOICE                     ; Public payload
                    / %x02 ENCRYPTED-VOTE PROOF-VOTE ; Private payload
 
 CHOICE            = U8
-ENCRYPTED-VOTE    = SIZE-BYTES-8BIT *CYPHERTEXT
-PROOF-VOTE        = SIZE-BYTES-8BIT *ANNOUNCEMENT *CYPHERTEXT *R-RESPONSE SCALAR ; size of the *ANNOUNCEMENT, *CYPHERTEXT, *R-RESPONSE are equal to SIZE-BYTES-8BIT value
+ENCRYPTED-VOTE    = SIZE-BYTES-8BIT *CIPHERTEXT
+PROOF-VOTE        = SIZE-BYTES-8BIT *ANNOUNCEMENT *CIPHERTEXT *R-RESPONSE SCALAR ; size of the *ANNOUNCEMENT, *CIPHERTEXT, *R-RESPONSE are equal to SIZE-BYTES-8BIT value
 
-CYPHERTEXT        = E1 E2
+CIPHERTEXT        = E1 E2
 ANNOUNCEMENT      = I A B
 R-RESPONSE        = 3 * SCALAR
 I                 = GROUP-ELEMENT
@@ -41,9 +39,9 @@ WITNESS           = %x02
                     NONCE
                     ED25519-SIGNATURE
 
-VALUE                = U64 ; could be anything, not processed anymore, recomended set to zero
-NONCE                = U32 ; could be anything, not processed anymore, recomended set to zero
-BLOCK-DATE           = BLOCK-EPOCH BLOCK-SLOT ; expiration date, could be anything, not processed anymore, recomeded set to zeros
+VALUE                = U64 ; could be anything, not processed anymore, recommended set to zero
+NONCE                = U32 ; could be anything, not processed anymore, recommended set to zero
+BLOCK-DATE           = BLOCK-EPOCH BLOCK-SLOT ; expiration date, could be anything, not processed anymore, recommended set to zeros
 BLOCK-EPOCH          = U32
 BLOCK-SLOT           = U32
 

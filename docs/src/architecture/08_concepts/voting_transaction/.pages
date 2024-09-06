@@ -1,3 +1,4 @@
-title: Voting Transaction
+title: Voting
 arrange:
   - transaction.md
+  - crypto.md

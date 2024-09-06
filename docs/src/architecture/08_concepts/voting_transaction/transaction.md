@@ -1,4 +1,4 @@
-# Voting Transaction
+# Transaction
 
 ---
 
