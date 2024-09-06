@@ -7,3 +7,4 @@ export 'responsive/responsive_builder.dart';
 export 'responsive/responsive_child.dart';
 export 'responsive/responsive_padding.dart';
 export 'utils/iterable_ext.dart';
+export 'utils/typedefs.dart';
