@@ -7,10 +7,10 @@ control_ip = "192.168.58.10"
 agents = { "agent86" => "192.168.58.86",
            "agent99" => "192.168.58.99" }
 
-control_vcpu = "2"
-control_memory = "4096"
-agent_vcpu = "2"
-agent_memory = "4096"
+control_vcpu = "2" # Number of vCPUs in the VM
+control_memory = "5192" # 4G of Memory (An extra gig because its the control-plane node)
+agent_vcpu = "2" # Number of vCPUs in the VM
+agent_memory = "4096" # 4G of Memory
 
 is_darwin_arm64 = Vagrant::Util::Platform.architecture == "arm64" && Vagrant::Util::Platform.darwin?
 
@@ -44,15 +44,16 @@ helm_install_script = <<-SHELL
 
 control_plane_script = <<-SHELL
     sudo -i
-    # Get the IP of the default interface
-    DEFAULT_IP=$(ip route get 1 | awk '{print $7;exit}')
     # Read preconfiguration from shared directory and install it
     mkdir -p /etc/rancher/k3s/
     mkdir -p /var/lib/rancher/k3s/server/manifests/
     cp /vagrant_shared/k3s/server/manifests/* /var/lib/rancher/k3s/server/manifests/
     cp /vagrant_shared/k3s/registries.yaml /etc/rancher/k3s/
     # Install and start k3s server node
-    export INSTALL_K3S_EXEC="--bind-address=$DEFAULT_IP --node-external-ip=$DEFAULT_IP"
+    # Extra parameters in INSTALL_K3S_EXEC variable because of
+    # K3s picking up the wrong interface when starting the control-plane and agents
+    # https://github.com/alexellis/k3sup/issues/306
+    export INSTALL_K3S_EXEC="--bind-address=#{control_ip} --node-external-ip=#{control_ip} --flannel-iface=eth1"
     curl -sfL https://get.k3s.io | sh -
     echo "Sleeping for 5 seconds to wait for k3s to start"
     sleep 5
@@ -97,7 +98,7 @@ cert_manager_install_script = <<-SHELL
     helm repo update
     helm install longhorn longhorn/longhorn --namespace longhorn-system --create-namespace --version 1.6.2
     kubectl apply -f /vagrant_shared/k3s/longhorn/storage-classes.yaml
-    kubectl apply -f /vagrant_shared/k3s/longhorn/ingress.yaml     
+    kubectl apply -f /vagrant_shared/k3s/longhorn/ingress.yaml
     SHELL
 
 local_path_provisioner_script = <<-SHELL
