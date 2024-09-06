@@ -97,6 +97,11 @@ longhorn_install_script = <<-SHELL
     kubectl apply -f /vagrant_shared/k3s/longhorn/ingress.yaml
     SHELL
 
+local_path_provisioner_script = <<-SHELL
+    # See: https://github.com/rancher/local-path-provisioner/blob/master/README.md
+    sudo   -i
+    kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.26/deploy/local-path-storage.yaml
+
 registry_script = <<-SHELL
     sudo -i
     kubectl create namespace registry
