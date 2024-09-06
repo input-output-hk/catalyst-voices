@@ -6,7 +6,7 @@ import 'package:catalyst_voices/routes/routing/routing.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:go_router/src/state.dart';
 
-/// Always redirects to [ComingSoonPage] expect for milestone sub pages.
+/// Always redirects to [ComingSoonPage] except for milestone sub pages.
 final class MilestoneGuard implements RouteGuard {
   const MilestoneGuard();
 

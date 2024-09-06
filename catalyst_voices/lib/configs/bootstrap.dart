@@ -16,17 +16,11 @@ import 'package:url_strategy/url_strategy.dart';
 typedef BootstrapWidgetBuilder = FutureOr<Widget> Function(BootstrapArgs args);
 
 final class BootstrapArgs {
+  final RouterConfig<Object> routerConfig;
+
   BootstrapArgs({
     required this.routerConfig,
   });
-
-  final RouterConfig<Object> routerConfig;
-}
-
-Widget _appBuilder(BootstrapArgs args) {
-  return App(
-    routerConfig: args.routerConfig,
-  );
 }
 
 // TODO(damian-molinski): Add PlatformDispatcher.instance.onError
@@ -74,4 +68,10 @@ Future<void> _runApp(Widget app) async {
   } else {
     runApp(app);
   }
+}
+
+Widget _appBuilder(BootstrapArgs args) {
+  return App(
+    routerConfig: args.routerConfig,
+  );
 }
