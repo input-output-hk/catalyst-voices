@@ -40,6 +40,14 @@ enum NetworkId {
 
 /// Specifies an amount of ADA in terms of lovelace.
 extension type const Coin(int value) {
+  /// The amount of lovelaces in one ADA.
+  static const int adaInLovelaces = 1000000;
+
+  /// Creates a [Coin] from [amount] specified in ADAs.
+  factory Coin.fromAda(double amount) {
+    return Coin((amount * adaInLovelaces).toInt());
+  }
+
   /// Deserializes the type from cbor.
   factory Coin.fromCbor(CborValue value) {
     return Coin((value as CborSmallInt).value);
@@ -47,6 +55,9 @@ extension type const Coin(int value) {
 
   /// Serializes the type as cbor.
   CborValue toCbor() => CborSmallInt(value);
+
+  /// Converts lovelaces to ADAs
+  double get ada => value / adaInLovelaces;
 
   /// Adds [other] value to this value and returns a new [Coin].
   Coin operator +(Coin other) => Coin(value + other.value);

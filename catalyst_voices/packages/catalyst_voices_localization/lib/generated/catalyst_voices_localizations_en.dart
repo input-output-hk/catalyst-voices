@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart' as intl;
+
 import 'catalyst_voices_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -127,4 +129,36 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get proposalStatusDraft => 'Draft';
+
+  @override
+  String get fundedProposal => 'Funded Proposal';
+
+  @override
+  String fundedProposalDate(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Funded $dateString';
+  }
+
+  @override
+  String get fundsRequested => 'Funds requested';
+
+  @override
+  String noOfComments(num count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.compact(
+      locale: localeName,
+      
+    );
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'comments',
+      one: 'comment',
+      zero: 'comments',
+    );
+    return '$countString $_temp0';
+  }
 }

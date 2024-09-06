@@ -333,6 +333,30 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Draft'**
   String get proposalStatusDraft;
+
+  /// Label shown on a proposal card indicating that the proposal is funded.
+  ///
+  /// In en, this message translates to:
+  /// **'Funded Proposal'**
+  String get fundedProposal;
+
+  /// Indicates when a proposal has been funded on a proposal card.
+  ///
+  /// In en, this message translates to:
+  /// **'Funded {date}'**
+  String fundedProposalDate(DateTime date);
+
+  /// Indicates the amount of ADA requested in a fund on a proposal card.
+  ///
+  /// In en, this message translates to:
+  /// **'Funds requested'**
+  String get fundsRequested;
+
+  /// Indicates the amount of comments on a proposal card.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} {count, plural, =0{comments} =1{comment} other{comments}}'**
+  String noOfComments(num count);
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

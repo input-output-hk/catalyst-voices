@@ -5,6 +5,11 @@ import 'package:test/test.dart';
 
 void main() {
   group(Coin, () {
+    test('fromAda constructor', () {
+      final coin = Coin.fromAda(123);
+      expect(coin.ada, equals(123));
+    });
+
     test('addition', () {
       expect(const Coin(3) + const Coin(100), equals(const Coin(103)));
       expect(const Coin(-100) + const Coin(100), equals(const Coin(0)));
