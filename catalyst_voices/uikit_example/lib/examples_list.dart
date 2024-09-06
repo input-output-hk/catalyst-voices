@@ -30,6 +30,8 @@ import 'package:uikit_example/examples/voices_text_field_example.dart';
 import 'package:uikit_example/examples/voices_tooltips_example.dart';
 import 'package:uikit_example/examples/voices_tree_view_example.dart';
 
+import 'examples/workspace/voices_workspace.dart';
+
 class ExamplesListPage extends StatelessWidget {
   static List<ExampleTile> get examples {
     return [
@@ -49,6 +51,11 @@ class ExamplesListPage extends StatelessWidget {
         title: 'VoicesTreasurySpace',
         route: VoicesTreasurySpace.route,
         page: VoicesTreasurySpace(),
+      ),
+      ExampleTile(
+        title: 'VoicesWorkspace',
+        route: VoicesWorkspace.route,
+        page: VoicesWorkspace(),
       ),
     ];
   }

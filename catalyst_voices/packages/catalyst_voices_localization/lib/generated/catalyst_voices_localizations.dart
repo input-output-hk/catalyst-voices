@@ -328,6 +328,12 @@ abstract class VoicesLocalizations {
   /// **'Ready'**
   String get proposalStatusReady;
 
+  /// Indicates to user that status is in progress mode
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get proposalStatusInProgress;
+
   /// Indicates to user that status is in draft mode
   ///
   /// In en, this message translates to:

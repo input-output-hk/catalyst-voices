@@ -161,6 +161,10 @@
   "@proposalStatusReady": {
     "description": "Indicates to user that status is in ready mode"
   },
+  "proposalStatusInProgress": "In progress",
+  "@proposalStatusInProgress": {
+    "description": "Indicates to user that status is in progress mode"
+  },
   "proposalStatusDraft": "Draft",
   "@proposalStatusDraft": {
     "description": "Indicates to user that status is in draft mode"

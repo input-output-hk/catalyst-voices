@@ -78,6 +78,13 @@ extension _ProposalStatusExt on ProposalStatus {
           textColor: colors.textPrimary,
           backgroundColor: colors.successContainer,
         ),
+      ProposalStatus.inProgress => _ProposalStatusContainerConfig(
+        iconData: CatalystVoicesIcons.check,
+        iconColor: colors.iconsForeground,
+        text: context.l10n.proposalStatusInProgress,
+        textColor: colors.textPrimary,
+        backgroundColor: colors.onSurfaceNeutralOpaqueLv1,
+      ),
       ProposalStatus.draft => _ProposalStatusContainerConfig(
           iconData: CatalystVoicesIcons.pencil_alt,
           iconColor: colors.iconsForeground,

@@ -126,5 +126,8 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get proposalStatusReady => 'Ready';
 
   @override
+  String get proposalStatusInProgress => 'In progress';
+
+  @override
   String get proposalStatusDraft => 'Draft';
 }
