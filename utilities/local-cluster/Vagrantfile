@@ -87,20 +87,24 @@ cert_manager_install_script = <<-SHELL
     kubectl apply -f /vagrant_shared/k3s/cert-manager/self-signed-issuer.yaml
     SHELL
 
-longhorn_install_script = <<-SHELL
-    sudo -i
+    longhorn_install_script = <<-SHELL
+    # See: https://docs.k3s.io/storage
+    #      https://longhorn.io/docs/1.6.2/deploy/install/install-with-kubectl
+    #      https://longhorn.io/docs/1.6.2/deploy/install/install-with-helm/
+    sudo  -i
     export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
     helm repo add longhorn https://charts.longhorn.io
     helm repo update
     helm install longhorn longhorn/longhorn --namespace longhorn-system --create-namespace --version 1.6.2
     kubectl apply -f /vagrant_shared/k3s/longhorn/storage-classes.yaml
-    kubectl apply -f /vagrant_shared/k3s/longhorn/ingress.yaml
+    kubectl apply -f /vagrant_shared/k3s/longhorn/ingress.yaml     
     SHELL
 
 local_path_provisioner_script = <<-SHELL
     # See: https://github.com/rancher/local-path-provisioner/blob/master/README.md
     sudo   -i
     kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/v0.0.26/deploy/local-path-storage.yaml
+    SHELL
 
 registry_script = <<-SHELL
     sudo -i
