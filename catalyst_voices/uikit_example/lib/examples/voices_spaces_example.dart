@@ -1,8 +1,8 @@
-import 'package:catalyst_voices/widgets/app_bar/voices_app_bar.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 import 'package:uikit_example/widgets/session_header.dart';
+import 'package:uikit_example/widgets/user_header.dart';
 
 class VoicesSpacesExample extends StatelessWidget {
   static const String route = '/spaces-example';
@@ -17,6 +17,7 @@ class VoicesSpacesExample extends StatelessWidget {
       appBar: const VoicesAppBar(
         actions: [
           SessionHeader(),
+          UserHeader(),
         ],
       ),
       drawer: const VoicesDrawer(children: []),

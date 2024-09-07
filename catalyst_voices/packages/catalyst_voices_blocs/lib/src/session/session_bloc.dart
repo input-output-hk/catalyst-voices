@@ -3,7 +3,7 @@ import 'package:catalyst_voices_blocs/src/session/session_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Manages the user session.
-class SessionBloc extends Bloc<SessionEvent, SessionState> {
+final class SessionBloc extends Bloc<SessionEvent, SessionState> {
   SessionBloc() : super(const VisitorSessionState()) {
     on<NextStateSessionEvent>(_handleNextState);
   }
@@ -13,9 +13,9 @@ class SessionBloc extends Bloc<SessionEvent, SessionState> {
     Emitter<SessionState> emit,
   ) {
     final nextState = switch (state) {
-      VisitorSessionState() => GuestSessionState(),
-      GuestSessionState() => ActiveUserSessionState(),
-      ActiveUserSessionState() => VisitorSessionState(),
+      VisitorSessionState() => const GuestSessionState(),
+      GuestSessionState() => const ActiveUserSessionState(),
+      ActiveUserSessionState() => const VisitorSessionState(),
     };
 
     emit(nextState);
