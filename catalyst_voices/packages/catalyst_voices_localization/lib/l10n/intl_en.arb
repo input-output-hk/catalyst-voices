@@ -12,6 +12,30 @@
   "@emailErrorText": {
     "description": "Text shown in email field when input is invalid"
   },
+  "cancelButtonText": "Cancel",
+  "@cancelButtonText": {
+    "description": "Text shown in cancel button"
+  },
+  "editButtonText": "Edit",
+  "@editButtonText": {
+    "description": "Text shown in edit button"
+  },
+  "headerTooltipText": "Header",
+  "@headerTooltipText": {
+    "description": "Text shown in header tooltip"
+  },
+  "placeholderRichText": "Start writing your text...",
+  "@placeholderRichText": {
+    "description": "Text shown as placeholder in rich text editor"
+  },
+  "supportingTextLabelText": "Supporting text",
+  "@supportingTextLabelText": {
+    "description": "Text shown as placeholder in rich text editor"
+  },
+  "saveButtonText": "Save",
+  "@saveButtonText": {
+    "description": "Text shown in save button"
+  },
   "passwordLabelText": "Password",
   "@passwordLabelText": {
     "description": "Text shown in password field"

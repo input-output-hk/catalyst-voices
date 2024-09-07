@@ -64,6 +64,11 @@ extension _SpaceExt on Space {
     final theme = Theme.of(context);
 
     return switch (this) {
+      Space.treasury => _VoicesDrawerSpaceChooserConfig(
+          iconData: CatalystVoicesIcons.fund,
+          backgroundColor: theme.colors.successContainer!,
+          foregroundColor: theme.colors.iconsSuccess!,
+        ),
       Space.discovery => _VoicesDrawerSpaceChooserConfig(
           iconData: CatalystVoicesIcons.light_bulb,
           backgroundColor: theme.colors.iconsSecondary!.withOpacity(0.16),
@@ -79,10 +84,10 @@ extension _SpaceExt on Space {
           backgroundColor: theme.colors.warningContainer!,
           foregroundColor: theme.colors.iconsWarning!,
         ),
-      Space.treasury => _VoicesDrawerSpaceChooserConfig(
-          iconData: CatalystVoicesIcons.fund,
-          backgroundColor: theme.colors.successContainer!,
-          foregroundColor: theme.colors.iconsSuccess!,
+      Space.fundedProjects => _VoicesDrawerSpaceChooserConfig(
+          iconData: CatalystVoicesIcons.flag,
+          backgroundColor: theme.colors.iconsSecondary!.withOpacity(0.16),
+          foregroundColor: theme.colors.iconsSecondary!,
         ),
     };
   }
