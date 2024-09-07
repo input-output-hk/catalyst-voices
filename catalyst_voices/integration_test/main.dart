@@ -1,3 +1,1 @@
-// void main() {
-//   login_scenario.main();
-// }
+void main() {}
