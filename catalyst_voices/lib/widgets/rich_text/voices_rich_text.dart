@@ -14,10 +14,10 @@ import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 /// https://pub.dev/packages/flutter_quill
 class VoicesRichText extends StatefulWidget {
   final String title;
-
   final Document? document;
   final ValueChanged<Document>? onSave;
   final int? charsLimit;
+
   const VoicesRichText({
     super.key,
     this.title = '',
@@ -32,9 +32,9 @@ class VoicesRichText extends StatefulWidget {
 
 class _Editor extends StatelessWidget {
   final bool editMode;
-
   final QuillController controller;
   final FocusNode focusNode;
+
   const _Editor({
     required this.editMode,
     required this.controller,
@@ -78,8 +78,8 @@ class _Editor extends StatelessWidget {
 
 class _Footer extends StatelessWidget {
   final QuillController controller;
-
   final ValueChanged<Document>? onSave;
+
   const _Footer({
     required this.controller,
     this.onSave,
@@ -104,8 +104,8 @@ class _Footer extends StatelessWidget {
 
 class _Limit extends StatelessWidget {
   final int documentLength;
-
   final int charsLimit;
+
   const _Limit({
     required this.documentLength,
     required this.charsLimit,
@@ -218,9 +218,9 @@ class _Toolbar extends StatelessWidget {
 
 class _TopBar extends StatelessWidget {
   final String title;
-
   final bool editMode;
   final VoidCallback? onToggleEditMode;
+
   const _TopBar({
     required this.title,
     required this.editMode,
@@ -321,9 +321,11 @@ class _VoicesRichTextState extends State<VoicesRichText> {
 
   void _onDocumentChange(DocChange docChange) {
     final documentLength = _controller.document.length;
+
     setState(() {
       _documentLength = documentLength;
     });
+
     final limit = widget.charsLimit;
 
     if (limit == null) return;
