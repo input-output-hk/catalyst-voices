@@ -113,7 +113,7 @@ class _VoicesNodeMenuState extends State<VoicesNodeMenu> {
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: _effectiveController,
-      builder: (context, value, child) {
+      builder: (context, value, _) {
         return SimpleTreeView(
           isExpanded: value.isExpanded,
           root: SimpleTreeViewRootRow(

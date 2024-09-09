@@ -47,7 +47,7 @@ class _ListenableSegmentDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: controller,
-      builder: (context, value, child) {
+      builder: (context, value, _) {
         return _SegmentDetails(
           key: ValueKey('Segment${segment.id}DetailsKey'),
           name: segment.localizedName(context.l10n),
