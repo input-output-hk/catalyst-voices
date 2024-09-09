@@ -165,17 +165,30 @@
   "@proposalStatusDraft": {
     "description": "Indicates to user that status is in draft mode"
   },
-  "fundedProposal": "Funded Proposal",
+  "fundedProposal": "Funded proposal",
   "@fundedProposal": {
     "description": "Label shown on a proposal card indicating that the proposal is funded."
   },
+  "publishedProposal": "Published proposal",
+  "@publishedProposal": {
+    "description": "Label shown on a proposal card indicating that the proposal is not yet funded."
+  },
   "fundedProposalDate": "Funded {date}",
   "@fundedProposalDate": {
-    "description": "Indicates when a proposal has been funded on a proposal card.",
+    "description": "Indicates date of funding (a proposal).",
     "placeholders": {
       "date": {
         "type": "DateTime",
         "format": "yMMMMd"
+      }
+    }
+  },
+  "lastUpdateDate": "Last update: {date}.",
+  "@lastUpdateDate": {
+    "description": "Indicates a last update date.",
+    "placeholders": {
+      "date": {
+        "type": "String"
       }
     }
   },
@@ -192,5 +205,56 @@
         "format": "compact"
       }
     }
+  },
+  "noOfSegmentsCompleted": "{completed} of {total} ({percentage}%) {total, plural, =0{segments} =1{segment} other{segments}} completed",
+  "@noOfSegmentsCompleted": {
+    "description": "Indicates the amount of comments on a proposal card.",
+    "placeholders": {
+      "completed": {
+        "type": "num",
+        "format": "compact"
+      },
+      "total": {
+        "type": "num",
+        "format": "compact"
+      },
+      "percentage": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "today": "Today",
+  "@today": {
+    "description": "Refers to date which is today."
+  },
+  "yesterday": "Yesterday",
+  "@yesterday": {
+    "description": "Refers to date which is yesterday."
+  },
+  "twoDaysAgo": "2 days ago",
+  "@twoDaysAgo": {
+    "description": "Refers to date which is two days ago."
+  },
+  "tomorrow": "Tomorrow",
+  "@tomorrow": {
+    "description": "Refers to date which is tomorrow."
+  },
+  "activeVotingRound": "Active voting round 14",
+  "@activeVotingRound": {
+    "description": "Title of the voting space."
+  },
+  "noOfAllProposals": "All proposals ({count})",
+  "@noOfAllProposals": {
+    "description": "Tab label for all proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "favorites": "Favorites",
+  "@favorites": {
+    "description": "Refers to a list of favorites."
   }
 }
