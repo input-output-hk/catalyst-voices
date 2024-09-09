@@ -61,19 +61,17 @@ class VotingPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 32),
-      child: ListView(
-        children: [
-          const SizedBox(height: 44),
-          Text(
-            context.l10n.activeVotingRound,
-            style: Theme.of(context).textTheme.headlineLarge,
-          ),
-          const SizedBox(height: 44),
-          _Tabs(),
-        ],
-      ),
+      children: [
+        const SizedBox(height: 44),
+        Text(
+          context.l10n.activeVotingRound,
+          style: Theme.of(context).textTheme.headlineLarge,
+        ),
+        const SizedBox(height: 44),
+        _Tabs(),
+      ],
     );
   }
 }
