@@ -1,3 +1,5 @@
+<!-- cspell: words mathbf Gamal homomorphically ipfs -->
+
 # Cryptography Schema
 
 ---
@@ -17,7 +19,8 @@ Created: 2024-09-06
 
 This voting protocol is based on this [paper][treasury_system_paper] and on this [specification][treasury_system_spec],
 so all formal definitions described in this document you can find there.
-It provides a fully anonymous, secured, verifiable schema of casting votes and performing tally process for executing "Catalyst" fund events.
+It provides a fully anonymous, secured, verifiable schema of casting votes
+and performing tally process for executing "Catalyst" fund events.
 
 ## Motivation
 
@@ -33,7 +36,7 @@ Through this paper we will use the following notations to refer to some entities
 * **Voting committee set** $\mathcal{C}:=\{c_1,\ldots, c_l \}$ -
   a special **trusted** entity, which perform tally process and revealing the results of the tallying.
   It has a capability to de anonymize each vote.
-  Where $l$ - a number of voting commitee members in the committee set.
+  Where $l$ - a number of voting committee members in the committee set.
 * **Voters set** $\mathcal{V}:=\{v_1,\ldots, v_n \}$.
   Where $n$ - a number of voter members in the voters set.
 * **Election public key** $pk$ - a committee's generated public key,
@@ -41,7 +44,7 @@ Through this paper we will use the following notations to refer to some entities
   and used for vote's encryption and tallying processes.
 
 The generation of the proposals set or proposal submission procedure
-aswell as voting committee definition and voters registration
+as well as voting committee definition and voters registration
 are not subjects of this paper.
 
 ### Initial setup
@@ -66,7 +69,6 @@ that he has done everything correctly and according to the protocol,
 and everyone would be able to verify it.
 So we will preserve anonymity without lacking transparency and correctness.
 
-
 #### Voting choice
 
 For a specific proposal  voter generates a unit vector $\mathbf{e}_t$, $t \in [1, \ldots, m_j]$.
@@ -81,10 +83,11 @@ E.g. proposal has 3 voting options ("Yes", "No", "Abstain"), so $m_j$ would be e
 
 Lets $e_{t,f}$, $f \in [1, \ldots, m_j]$
 denote as an each component value of the unit vector $e_t$.
-
+<!-- markdownlint-disable emphasis-style -->
 \begin{equation}
 \mathbf{e}_t = (e_{t,1}, \ldots, e_{t,m_j})
 \end{equation}
+<!-- markdownlint-enable emphasis-style -->
 
 #### Vote encrypting procedure
 
@@ -129,7 +132,7 @@ it is not restricted for encryption only $0$ and $1$ values
 $e_{t,f}$ vector components only could be $0$ or $1$).
 
 To generate such a proof a ZK (Zero Knowledge) proof is generated,
-which allows by not revealing an actuall value of $\mathbf{e}_t$
+which allows by not revealing an actual value of $\mathbf{e}_t$
 still transparently verify the correctness of data of $\mathbf{e}_t$.
 
 #### Vote publishing
@@ -138,7 +141,7 @@ After all these procedures are done,
 a final step is to publish an encrypted voting choice $\mathbf{c}$
 and voter's proof corresponded to this choice.
 It could be published using any public channel, e.g. blockchain, ipfs, on any p2p network,
-but this is not a topic of this document.
+but this is not a topic of current document.
 
 ### Tally
 
@@ -154,11 +157,7 @@ but this is not a topic of this document.
 
 <!-- OPTIONAL SECTIONS: see CIP-0001 > Document > Structure table -->
 
-### A Lifted ElGamal
-
-### B
-
+### A: Lifted ElGamal
 
 [treasury_system_paper]: https://eprint.iacr.org/2018/435.pdf
 [treasury_system_spec]: https://github.com/input-output-hk/treasury-crypto/blob/master/docs/voting_protocol_spec/Treasury_voting_protocol_spec.pdf
-[BLAKE2b-256]: https://www.blake2.net/blake2.pdf

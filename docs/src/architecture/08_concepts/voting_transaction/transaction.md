@@ -89,7 +89,6 @@ Signature generated from the [BLAKE2b-256] hashed  `VOTE-PAYLOAD` bytes except o
 4. `%x00`
 5. `INPUT` bytes
 
-
 Based on the on the transaction example, data to sign:
 
 <!-- markdownlint-disable code-block-style -->
