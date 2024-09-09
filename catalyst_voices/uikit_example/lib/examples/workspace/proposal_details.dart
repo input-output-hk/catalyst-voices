@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/rich_text/voices_rich_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
@@ -87,11 +88,7 @@ class _ProposalSetupDetails extends StatelessWidget {
               return WorkspaceTileContainer(
                 key: ValueKey('WorkspaceStep${step.id}TileKey'),
                 isSelected: step.id == selected,
-                name: step.name,
-                headerActions: [
-                  VoicesTextButton(child: Text('Edit')),
-                ],
-                content: Text(step.desc),
+                content: VoicesRichText(),
               );
             },
           )

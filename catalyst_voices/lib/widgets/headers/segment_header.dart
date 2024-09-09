@@ -30,26 +30,29 @@ class SegmentHeader extends StatelessWidget {
     final textStyle = (theme.textTheme.titleMedium ?? TextStyle())
         .copyWith(color: foregroundColor);
 
-    return IconButtonTheme(
-      data: IconButtonThemeData(style: iconButtonStyle),
-      child: AnimatedDefaultTextStyle(
-        duration: kThemeChangeDuration,
-        style: textStyle,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        child: AnimatedContainer(
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: IconButtonTheme(
+        data: IconButtonThemeData(style: iconButtonStyle),
+        child: AnimatedDefaultTextStyle(
           duration: kThemeChangeDuration,
-          constraints: BoxConstraints(minHeight: 52),
-          decoration: BoxDecoration(color: backgroundColor),
-          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              if (leading != null) leading!,
-              Expanded(child: Text(name)),
-              if (actions.isNotEmpty) ...actions
-            ],
+          style: textStyle,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          child: AnimatedContainer(
+            duration: kThemeChangeDuration,
+            constraints: BoxConstraints(minHeight: 52),
+            decoration: BoxDecoration(color: backgroundColor),
+            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                if (leading != null) leading!,
+                Expanded(child: Text(name)),
+                if (actions.isNotEmpty) ...actions
+              ],
+            ),
           ),
         ),
       ),

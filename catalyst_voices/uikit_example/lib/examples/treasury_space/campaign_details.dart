@@ -84,7 +84,7 @@ class _CampaignSetupDetails extends StatelessWidget {
         if (isExpanded)
           ...campaignSetupSteps.map(
             (step) {
-              return WorkspaceTileContainer(
+              return WorkspaceTextTileContainer(
                 key: ValueKey('WorkspaceStep${step.id}TileKey'),
                 isSelected: step.id == selected,
                 name: step.name,
