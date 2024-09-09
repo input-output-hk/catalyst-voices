@@ -109,7 +109,7 @@ Future<void> _signAndSubmitRbacTx({
 
     final txHash = await api.submitTx(transaction: signedTx);
     result = 'Tx hash: ${txHash.toHex()}';
-   } catch (error) {
+  } catch (error) {
     result = error.toString();
   }
 
