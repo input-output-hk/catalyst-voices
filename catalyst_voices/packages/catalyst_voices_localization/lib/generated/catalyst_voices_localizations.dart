@@ -112,6 +112,42 @@ abstract class VoicesLocalizations {
   /// **'mail@example.com'**
   String get emailErrorText;
 
+  /// Text shown in cancel button
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancelButtonText;
+
+  /// Text shown in edit button
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get editButtonText;
+
+  /// Text shown in header tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Header'**
+  String get headerTooltipText;
+
+  /// Text shown as placeholder in rich text editor
+  ///
+  /// In en, this message translates to:
+  /// **'Start writing your text...'**
+  String get placeholderRichText;
+
+  /// Text shown as placeholder in rich text editor
+  ///
+  /// In en, this message translates to:
+  /// **'Supporting text'**
+  String get supportingTextLabelText;
+
+  /// Text shown in save button
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get saveButtonText;
+
   /// Text shown in password field
   ///
   /// In en, this message translates to:
@@ -297,6 +333,90 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Draft'**
   String get proposalStatusDraft;
+
+  /// Label shown on a proposal card indicating that the proposal is funded.
+  ///
+  /// In en, this message translates to:
+  /// **'Funded proposal'**
+  String get fundedProposal;
+
+  /// Label shown on a proposal card indicating that the proposal is not yet funded.
+  ///
+  /// In en, this message translates to:
+  /// **'Published proposal'**
+  String get publishedProposal;
+
+  /// Indicates date of funding (a proposal).
+  ///
+  /// In en, this message translates to:
+  /// **'Funded {date}'**
+  String fundedProposalDate(DateTime date);
+
+  /// Indicates a last update date.
+  ///
+  /// In en, this message translates to:
+  /// **'Last update: {date}.'**
+  String lastUpdateDate(String date);
+
+  /// Indicates the amount of ADA requested in a fund on a proposal card.
+  ///
+  /// In en, this message translates to:
+  /// **'Funds requested'**
+  String get fundsRequested;
+
+  /// Indicates the amount of comments on a proposal card.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} {count, plural, =0{comments} =1{comment} other{comments}}'**
+  String noOfComments(num count);
+
+  /// Indicates the amount of comments on a proposal card.
+  ///
+  /// In en, this message translates to:
+  /// **'{completed} of {total} ({percentage}%) {total, plural, =0{segments} =1{segment} other{segments}} completed'**
+  String noOfSegmentsCompleted(num completed, num total, num percentage);
+
+  /// Refers to date which is today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// Refers to date which is yesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get yesterday;
+
+  /// Refers to date which is two days ago.
+  ///
+  /// In en, this message translates to:
+  /// **'2 days ago'**
+  String get twoDaysAgo;
+
+  /// Refers to date which is tomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow'**
+  String get tomorrow;
+
+  /// Title of the voting space.
+  ///
+  /// In en, this message translates to:
+  /// **'Active voting round 14'**
+  String get activeVotingRound;
+
+  /// Tab label for all proposals in voting space
+  ///
+  /// In en, this message translates to:
+  /// **'All proposals ({count})'**
+  String noOfAllProposals(int count);
+
+  /// Refers to a list of favorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites'**
+  String get favorites;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
