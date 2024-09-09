@@ -22,14 +22,8 @@ const getWalletCredentials = async (walletID: string): Promise<WalletCredentials
 export { getWalletCredentials };
 
 const getSeedPhrase = async (): Promise<string[]> => {
-  const seedPhraseArray: string[] = [];
-  for (let i = 1; i <= 15; i++) {
-    const word = process.env[`WALLET1_SEED_WORD_${i}`];
-    if (!word) {
-      throw new Error(`seed word ${i} is missing`);
-    }
-    seedPhraseArray.push(word);
-  }
+  let  seedPhraseArray: string[];
+  seedPhraseArray = process.env[`WALLET1_SEED_WORD`].split(",");
   return seedPhraseArray;
 };
 export { getSeedPhrase };
