@@ -90,9 +90,9 @@ class _WorkspaceHeader extends StatelessWidget {
         child: Row(
           children: [
             VoicesAvatar(
-              icon: Icon(CatalystVoicesIcons.cash),
-              foregroundColor: theme.colors.iconsSuccess,
-              backgroundColor: theme.colors.successContainer,
+              icon: Icon(CatalystVoicesIcons.briefcase),
+              foregroundColor: theme.colors.iconsPrimary,
+              backgroundColor: theme.colors.onSurfaceNeutral08,
             ),
             SizedBox(width: 12),
             Expanded(

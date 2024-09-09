@@ -79,7 +79,7 @@ extension _ProposalStatusExt on ProposalStatus {
           backgroundColor: colors.successContainer,
         ),
       ProposalStatus.inProgress => _ProposalStatusContainerConfig(
-        iconData: CatalystVoicesIcons.check,
+        iconData: CatalystVoicesIcons.annotation,
         iconColor: colors.iconsForeground,
         text: context.l10n.proposalStatusInProgress,
         textColor: colors.textPrimary,
