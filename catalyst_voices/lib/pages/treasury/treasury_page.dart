@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/pages/treasury/campaign_builder_panel.dart';
 import 'package:catalyst_voices/pages/treasury/campaign_comments_panel.dart';
 import 'package:catalyst_voices/pages/treasury/campaign_details.dart';
+import 'package:catalyst_voices/pages/treasury/campaign_segment_controller.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
@@ -31,37 +32,31 @@ class TreasuryPage extends StatefulWidget {
 }
 
 class _TreasuryPageState extends State<TreasuryPage> {
-  // TODO(damian-molinski): Build VoicesNodeMenuControllerScope widget
-  final _controllers = <String, VoicesNodeMenuController>{
-    _setupSegmentId: VoicesNodeMenuController(
-      VoicesNodeMenuStateData(
-        selectedItemId: 0,
-        isExpanded: true,
-      ),
-    ),
-  };
-
-  @override
-  void dispose() {
-    for (final controller in _controllers.values) {
-      controller.dispose();
-    }
-    _controllers.clear();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
-    return SpaceScaffold(
-      left: CampaignBuilderPanel(
-        builder: _campaignBuilder,
-        stepsControllers: _controllers,
-      ),
-      right: CampaignCommentsPanel(),
-      child: CampaignDetails(
-        builder: _campaignBuilder,
-        stepsControllers: _controllers,
+    return CampaignControllerScope(
+      builder: _buildSegmentController,
+      child: SpaceScaffold(
+        left: CampaignBuilderPanel(
+          builder: _campaignBuilder,
+        ),
+        right: CampaignCommentsPanel(),
+        child: CampaignDetails(
+          builder: _campaignBuilder,
+        ),
       ),
     );
+  }
+
+  // Only creates initial controller one time
+  CampaignController _buildSegmentController(Object segmentId) {
+    final value = segmentId == _setupSegmentId
+        ? CampaignControllerStateData(
+            selectedItemId: 0,
+            isExpanded: true,
+          )
+        : CampaignControllerStateData();
+
+    return CampaignController(value);
   }
 }

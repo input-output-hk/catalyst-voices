@@ -24,7 +24,7 @@ final class VoicesNodeMenuItem extends Equatable {
       ];
 }
 
-final class VoicesNodeMenuStateData extends Equatable {
+class VoicesNodeMenuStateData extends Equatable {
   final int? selectedItemId;
   final bool isExpanded;
 
@@ -57,8 +57,7 @@ final class VoicesNodeMenuStateData extends Equatable {
       ];
 }
 
-final class VoicesNodeMenuController
-    extends ValueNotifier<VoicesNodeMenuStateData> {
+class VoicesNodeMenuController extends ValueNotifier<VoicesNodeMenuStateData> {
   VoicesNodeMenuController([
     super._value = const VoicesNodeMenuStateData(),
   ]);

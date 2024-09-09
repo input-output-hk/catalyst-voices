@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/treasury/campaign_segment_controller.dart';
 import 'package:catalyst_voices/pages/treasury/treasury_campaign_builder_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -6,11 +7,9 @@ import 'package:flutter/material.dart';
 
 class CampaignBuilderPanel extends StatelessWidget {
   final TreasuryCampaignBuilder builder;
-  final Map<Object, VoicesNodeMenuController> stepsControllers;
 
   const CampaignBuilderPanel({
     required this.builder,
-    required this.stepsControllers,
   });
 
   @override
@@ -29,7 +28,10 @@ class CampaignBuilderPanel extends StatelessWidget {
                   return _CampaignSegmentBody(
                     key: ValueKey('CampaignSegment${segment.id}Key'),
                     segment: segment,
-                    controller: stepsControllers[segment.id],
+                    controller: CampaignControllerScope.of(
+                      context,
+                      id: segment.id,
+                    ),
                   );
                 },
               ).toList(),

@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/treasury/campaign_segment_controller.dart';
 import 'package:catalyst_voices/pages/treasury/treasury_campaign_builder_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -7,12 +8,10 @@ import 'package:flutter/material.dart';
 
 class CampaignDetails extends StatelessWidget {
   final TreasuryCampaignBuilder builder;
-  final Map<Object, VoicesNodeMenuController> stepsControllers;
 
   const CampaignDetails({
     super.key,
     required this.builder,
-    required this.stepsControllers,
   });
 
   @override
@@ -26,7 +25,10 @@ class CampaignDetails extends StatelessWidget {
         return _ListenableSegmentDetails(
           key: ValueKey('ListenableSegment${segment.id}DetailsKey'),
           segment: segment,
-          controller: stepsControllers[segment.id]!,
+          controller: CampaignControllerScope.of(
+            context,
+            id: segment.id,
+          ),
         );
       },
     );
