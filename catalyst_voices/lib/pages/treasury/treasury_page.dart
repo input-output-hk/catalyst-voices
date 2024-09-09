@@ -33,7 +33,12 @@ class TreasuryPage extends StatefulWidget {
 class _TreasuryPageState extends State<TreasuryPage> {
   // TODO(damian-molinski): Build VoicesNodeMenuControllerScope widget
   final _controllers = <String, VoicesNodeMenuController>{
-    _setupSegmentId: VoicesNodeMenuController(),
+    _setupSegmentId: VoicesNodeMenuController(
+      VoicesNodeMenuStateData(
+        selectedItemId: 0,
+        isExpanded: true,
+      ),
+    ),
   };
 
   @override
