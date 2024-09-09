@@ -11,7 +11,7 @@ abstract class DateFormatter {
   /// - 2 days ago
   /// - Other cases: yMMMMd date format.
   static String formatRecentDate(VoicesLocalizations l10n, DateTime dateTime) {
-    final now = DateTime.now();
+    final now = DateTimeExt.now();
 
     final today = DateTime(now.year, now.month, now.day, 12);
     if (dateTime.isSameDateAs(today)) return l10n.today;

@@ -167,7 +167,8 @@ class _LastUpdateDate extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       context.l10n.lastUpdateDate(
-          DateFormatter.formatRecentDate(context.l10n, dateTime)),
+        DateFormatter.formatRecentDate(context.l10n, dateTime),
+      ),
       style: Theme.of(context).textTheme.bodySmall,
     );
   }

@@ -1,4 +1,31 @@
+import 'package:flutter/foundation.dart';
+
 extension DateTimeExt on DateTime {
+  static DateTime? _mockedDateTime;
+
+  /// Overrides the dateTime returned by [now].
+  /// Useful for unit testing.
+  @visibleForTesting
+  static set mockedDateTime(DateTime? customTime) {
+    _mockedDateTime = customTime;
+  }
+
+  /// Testable [DateTime] factory method which returns:
+  /// - mocked value, if not null, set with [mockedDateTime]
+  /// - if[utc] current utc [DateTime.timestamp]
+  /// - else current local [DateTime.now]
+  static DateTime now({bool utc = false}) {
+    DateTime? getMockedDateTime() {
+      return utc ? _mockedDateTime?.toUtc() : _mockedDateTime;
+    }
+
+    DateTime getDateTime() {
+      return utc ? DateTime.timestamp() : DateTime.now();
+    }
+
+    return getMockedDateTime() ?? getDateTime();
+  }
+
   /// Returns whether two date times have the same year, month and day.
   bool isSameDateAs(DateTime other) {
     return year == other.year && month == other.month && day == other.day;

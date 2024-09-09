@@ -4,7 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 void main() {
   group('DateTimeExt', () {
     test('isSameDateAs', () {
-      final DateTime today = DateTime.now();
+      final DateTime today = DateTimeExt.now();
       expect(today.isSameDateAs(today), isTrue);
       expect(today.isSameDateAs(today.plusDays(1)), isFalse);
       expect(today.isSameDateAs(today.minusDays(1)), isFalse);
