@@ -58,6 +58,14 @@ Before any voting will start an initial setup procedure should be performed.
 ### Vote
 
 Each voter $v_i$, $i \in [1, n]$ could cast a vote for some proposal $p_j$, $j \in [1, \ldots, k]$.
+To do that, obviously, a voting choice should be made and decoded in specific format.
+Next step to achieve the anonymity this voting choice must be encrypted,
+using the specific election public key, so later voting committee could perform tally.
+It is also important for the voter generate a cryptographically secured proof,
+that he has done everything correctly and according to the protocol,
+and everyone would be able to verify it.
+So we will preserve anonymity without lacking transparency and correctness.
+
 
 #### Voting choice
 
@@ -109,6 +117,30 @@ This is a first part of the published vote for a specific proposal.
 
 #### Voter's proof
 
+Since tally is calculated homomorphically by summing up encrypted unit vectors $\mathbf{c}$
+(which will be shown in next section),
+it is crucial to verify that encryptions are formed correctly
+(i.e., that they indeed encrypt unit vectors).
+
+Because by the definition of the encryption algorithm $Enc_{pk}(message \; ; \; randomness)$
+it is possible to encrypt an any message value,
+it is not restricted for encryption only $0$ and $1$ values
+(as was stated in the previous section,
+$e_{t,f}$ vector components only could be $0$ or $1$).
+
+To generate such a proof a ZK (Zero Knowledge) proof is generated,
+which allows by not revealing an actuall value of $\mathbf{e}_t$
+still transparently verify the correctness of data of $\mathbf{e}_t$.
+
+#### Vote publishing
+
+After all these procedures are done,
+a final step is to publish an encrypted voting choice $\mathbf{c}$
+and voter's proof corresponded to this choice.
+It could be published using any public channel, e.g. blockchain, ipfs, on any p2p network,
+but this is not a topic of this document.
+
+### Tally
 
 ## Rationale
 
