@@ -399,6 +399,24 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Tomorrow'**
   String get tomorrow;
+
+  /// Title of the voting space.
+  ///
+  /// In en, this message translates to:
+  /// **'Active voting round 14'**
+  String get activeVotingRound;
+
+  /// Tab label for all proposals in voting space
+  ///
+  /// In en, this message translates to:
+  /// **'All proposals ({count})'**
+  String noOfAllProposals(int count);
+
+  /// Refers to a list of favorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites'**
+  String get favorites;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

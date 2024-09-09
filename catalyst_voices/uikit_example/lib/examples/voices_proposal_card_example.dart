@@ -32,6 +32,7 @@ class VoicesProposalCardExample extends StatelessWidget {
             FundedProposalCard(
               image: VoicesAssets.images.proposalBackground1,
               proposal: FundedProposal(
+                id: 'f14/1',
                 fund: 'F14',
                 category: 'Cardano Use Cases / MVP',
                 title: 'Proposal Title that rocks the world',
@@ -44,6 +45,7 @@ class VoicesProposalCardExample extends StatelessWidget {
             PendingProposalCard(
               image: VoicesAssets.images.proposalBackground2,
               proposal: PendingProposal(
+                id: 'f14/2',
                 fund: 'F14',
                 category: 'Cardano Use Cases / MVP',
                 title: 'Proposal Title that rocks the world',
