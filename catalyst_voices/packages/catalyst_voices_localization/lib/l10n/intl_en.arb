@@ -164,5 +164,33 @@
   "proposalStatusDraft": "Draft",
   "@proposalStatusDraft": {
     "description": "Indicates to user that status is in draft mode"
+  },
+  "fundedProposal": "Funded Proposal",
+  "@fundedProposal": {
+    "description": "Label shown on a proposal card indicating that the proposal is funded."
+  },
+  "fundedProposalDate": "Funded {date}",
+  "@fundedProposalDate": {
+    "description": "Indicates when a proposal has been funded on a proposal card.",
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMMd"
+      }
+    }
+  },
+  "fundsRequested": "Funds requested",
+  "@fundsRequested": {
+    "description": "Indicates the amount of ADA requested in a fund on a proposal card."
+  },
+  "noOfComments": "{count} {count, plural, =0{comments} =1{comment} other{comments}}",
+  "@noOfComments": {
+    "description": "Indicates the amount of comments on a proposal card.",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
   }
 }
