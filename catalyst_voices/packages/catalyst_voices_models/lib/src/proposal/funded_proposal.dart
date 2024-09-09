@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 
 /// Defines the already funded proposal.
 final class FundedProposal extends Equatable {
+  final String id;
   final String fund;
   final String category;
   final String title;
@@ -12,6 +13,7 @@ final class FundedProposal extends Equatable {
   final String description;
 
   const FundedProposal({
+    required this.id,
     required this.fund,
     required this.category,
     required this.title,
@@ -23,6 +25,7 @@ final class FundedProposal extends Equatable {
 
   @override
   List<Object?> get props => [
+        id,
         fund,
         category,
         title,

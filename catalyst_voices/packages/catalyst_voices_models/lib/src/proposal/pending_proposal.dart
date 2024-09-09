@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 
 /// Defines the pending proposal that is not funded yet.
 final class PendingProposal extends Equatable {
+  final String id;
   final String fund;
   final String category;
   final String title;
@@ -14,6 +15,7 @@ final class PendingProposal extends Equatable {
   final int totalSegments;
 
   const PendingProposal({
+    required this.id,
     required this.fund,
     required this.category,
     required this.title,
@@ -27,6 +29,7 @@ final class PendingProposal extends Equatable {
 
   @override
   List<Object?> get props => [
+        id,
         fund,
         category,
         title,
