@@ -4,11 +4,13 @@ import { allowExtension, downloadExtension, getWalletCredentials, importWallet, 
 let browser: BrowserContext;
 let extensionPath: string;
 let extTab: Page;
+/* cSpell:disable */
+let wallets =
+            [{ name: 'Typhon', id: 'kfdniefadaanbjodldohaedphafoffoh', url: 'chrome-extension://changeme/tab.html#/wallet/access/' },
+            { name: 'Lace', id: 'gafhhkghbfjjkeiendhlofajokpaflmk', url: 'chrome-extension://changeme/app.html#/setup' },]
+/* cSpell:enable */
 
-[
- { name: 'Typhon', id: 'kfdniefadaanbjodldohaedphafoffoh', url: 'chrome-extension://changeme/tab.html#/wallet/access/' },
- { name: 'Lace', id: 'gafhhkghbfjjkeiendhlofajokpaflmk', url: 'chrome-extension://changeme/app.html#/setup' },
-  ].forEach(({ name, id, url }) => {
+wallets.forEach(({ name, id, url }) => {
     test.describe(`Testing with ${name}`,() => {
         test.skip(name === 'Typhon', 'https://github.com/input-output-hk/catalyst-voices/issues/753');
         test.afterAll(async () => {
