@@ -337,14 +337,26 @@ abstract class VoicesLocalizations {
   /// Label shown on a proposal card indicating that the proposal is funded.
   ///
   /// In en, this message translates to:
-  /// **'Funded Proposal'**
+  /// **'Funded proposal'**
   String get fundedProposal;
 
-  /// Indicates when a proposal has been funded on a proposal card.
+  /// Label shown on a proposal card indicating that the proposal is not yet funded.
+  ///
+  /// In en, this message translates to:
+  /// **'Published proposal'**
+  String get publishedProposal;
+
+  /// Indicates date of funding (a proposal).
   ///
   /// In en, this message translates to:
   /// **'Funded {date}'**
   String fundedProposalDate(DateTime date);
+
+  /// Indicates a last update date.
+  ///
+  /// In en, this message translates to:
+  /// **'Last update: {date}.'**
+  String lastUpdateDate(String date);
 
   /// Indicates the amount of ADA requested in a fund on a proposal card.
   ///
@@ -357,6 +369,36 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'{count} {count, plural, =0{comments} =1{comment} other{comments}}'**
   String noOfComments(num count);
+
+  /// Indicates the amount of comments on a proposal card.
+  ///
+  /// In en, this message translates to:
+  /// **'{completed} of {total} ({percentage}%) {total, plural, =0{segments} =1{segment} other{segments}} completed'**
+  String noOfSegmentsCompleted(num completed, num total, num percentage);
+
+  /// Refers to date which is today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// Refers to date which is yesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get yesterday;
+
+  /// Refers to date which is two days ago.
+  ///
+  /// In en, this message translates to:
+  /// **'2 days ago'**
+  String get twoDaysAgo;
+
+  /// Refers to date which is tomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow'**
+  String get tomorrow;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
