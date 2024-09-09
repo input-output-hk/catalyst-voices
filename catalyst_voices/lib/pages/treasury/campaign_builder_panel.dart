@@ -17,14 +17,12 @@ class CampaignBuilderPanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return SpaceSidePanel(
       isLeft: true,
-      // TODO: loc
-      name: 'Campaign builder',
+      name: context.l10n.treasuryCampaignBuilder,
       onCollapseTap: () {},
       tabs: [
         if (builder.segments.isNotEmpty)
           SpaceSidePanelTab(
-            // TODO: loc
-            name: 'Segments',
+            name: context.l10n.treasuryCampaignBuilderSegments,
             body: Column(
               children: builder.segments.map(
                 (segment) {

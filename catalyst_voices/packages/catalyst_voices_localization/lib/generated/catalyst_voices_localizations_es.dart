@@ -220,4 +220,19 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get favorites => 'Favorites';
+
+  @override
+  String get treasuryCampaignBuilder => 'Campaign builder';
+
+  @override
+  String get treasuryCampaignBuilderSegments => 'Segments';
+
+  @override
+  String get treasuryCampaignSetup => 'Setup Campaign';
+
+  @override
+  String get treasuryCampaignTitle => 'Campaign title';
+
+  @override
+  String get treasuryStepEdit => 'Edit';
 }

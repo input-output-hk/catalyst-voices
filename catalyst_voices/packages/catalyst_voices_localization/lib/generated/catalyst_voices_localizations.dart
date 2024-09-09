@@ -417,6 +417,36 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Favorites'**
   String get favorites;
+
+  /// Left panel name in treasury space
+  ///
+  /// In en, this message translates to:
+  /// **'Campaign builder'**
+  String get treasuryCampaignBuilder;
+
+  /// Tab name in campaign builder panel
+  ///
+  /// In en, this message translates to:
+  /// **'Segments'**
+  String get treasuryCampaignBuilderSegments;
+
+  /// Segment name
+  ///
+  /// In en, this message translates to:
+  /// **'Setup Campaign'**
+  String get treasuryCampaignSetup;
+
+  /// Campaign title
+  ///
+  /// In en, this message translates to:
+  /// **'Campaign title'**
+  String get treasuryCampaignTitle;
+
+  /// Button name in treasury step
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get treasuryStepEdit;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

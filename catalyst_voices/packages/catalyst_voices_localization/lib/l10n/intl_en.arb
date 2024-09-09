@@ -256,5 +256,25 @@
   "favorites": "Favorites",
   "@favorites": {
     "description": "Refers to a list of favorites."
+  },
+  "treasuryCampaignBuilder": "Campaign builder",
+  "@treasuryCampaignBuilder": {
+    "description": "Left panel name in treasury space"
+  },
+  "treasuryCampaignBuilderSegments": "Segments",
+  "@treasuryCampaignBuilderSegments": {
+    "description": "Tab name in campaign builder panel"
+  },
+  "treasuryCampaignSetup": "Setup Campaign",
+  "@treasuryCampaignSetup": {
+    "description": "Segment name"
+  },
+  "treasuryCampaignTitle": "Campaign title",
+  "@treasuryCampaignTitle": {
+    "description": "Campaign title"
+  },
+  "treasuryStepEdit": "Edit",
+  "@treasuryStepEdit": {
+    "description": "Button name in treasury step"
   }
 }

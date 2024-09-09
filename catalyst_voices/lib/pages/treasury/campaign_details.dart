@@ -131,9 +131,8 @@ class _StepDetails extends StatelessWidget {
       name: name,
       isSelected: isSelected,
       headerActions: [
-        // TODO: loc
         VoicesTextButton(
-          child: Text('Edit'),
+          child: Text(context.l10n.treasuryStepEdit),
           onTap: isEditable ? () {} : null,
         ),
       ],
