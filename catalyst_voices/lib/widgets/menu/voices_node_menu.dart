@@ -8,37 +8,43 @@ import 'package:flutter/material.dart';
 final class VoicesNodeMenuItem extends Equatable {
   final int id;
   final String label;
+  final bool isEnabled;
 
   const VoicesNodeMenuItem({
     required this.id,
     required this.label,
+    this.isEnabled = true,
   });
 
   @override
-  List<Object?> get props => [id, label];
+  List<Object?> get props => [
+        id,
+        label,
+        isEnabled,
+      ];
 }
 
-final class VoicesNodeMenuData extends Equatable {
+final class VoicesNodeMenuStateData extends Equatable {
   final int? selectedItemId;
   final bool isExpanded;
 
-  const VoicesNodeMenuData({
+  const VoicesNodeMenuStateData({
     this.selectedItemId,
     this.isExpanded = false,
   });
 
-  VoicesNodeMenuData copyWith({
+  VoicesNodeMenuStateData copyWith({
     int? selectedItemId,
     bool? isExpanded,
   }) {
-    return VoicesNodeMenuData(
+    return VoicesNodeMenuStateData(
       selectedItemId: selectedItemId ?? this.selectedItemId,
       isExpanded: isExpanded ?? this.isExpanded,
     );
   }
 
-  VoicesNodeMenuData clearSelection() {
-    return VoicesNodeMenuData(
+  VoicesNodeMenuStateData clearSelection() {
+    return VoicesNodeMenuStateData(
       selectedItemId: null,
       isExpanded: isExpanded,
     );
@@ -51,10 +57,13 @@ final class VoicesNodeMenuData extends Equatable {
       ];
 }
 
-final class VoicesNodeMenuController extends ValueNotifier<VoicesNodeMenuData> {
+final class VoicesNodeMenuController
+    extends ValueNotifier<VoicesNodeMenuStateData> {
   VoicesNodeMenuController([
-    super._value = const VoicesNodeMenuData(),
+    super._value = const VoicesNodeMenuStateData(),
   ]);
+
+  int? get selected => value.selectedItemId;
 
   set selected(int? newValue) {
     value = newValue != null
@@ -62,53 +71,66 @@ final class VoicesNodeMenuController extends ValueNotifier<VoicesNodeMenuData> {
         : value.clearSelection();
   }
 
+  bool get isExpanded => value.isExpanded;
+
   set isExpanded(bool newValue) {
     value = value.copyWith(isExpanded: newValue);
   }
 }
 
-class VoicesNodeMenu extends StatelessWidget {
+class VoicesNodeMenu extends StatefulWidget {
   final String name;
-  final VoicesNodeMenuController controller;
+  final VoicesNodeMenuController? controller;
   final List<VoicesNodeMenuItem> items;
-  final ValueChanged<int?>? onSelectionChanged;
-  final ValueChanged<bool>? onExpandChanged;
-
-  bool get _canTapItem => onSelectionChanged != null;
-
-  bool get _canToggleExpand => onExpandChanged != null;
+  final bool isExpandable;
 
   const VoicesNodeMenu({
     super.key,
     required this.name,
-    required this.controller,
+    this.controller,
     required this.items,
-    this.onSelectionChanged,
-    this.onExpandChanged,
+    this.isExpandable = true,
   });
+
+  @override
+  State<VoicesNodeMenu> createState() => _VoicesNodeMenuState();
+}
+
+class _VoicesNodeMenuState extends State<VoicesNodeMenu> {
+  VoicesNodeMenuController? _controller;
+
+  VoicesNodeMenuController get _effectiveController =>
+      widget.controller ?? (_controller ??= VoicesNodeMenuController());
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    _controller = null;
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
-      valueListenable: controller,
+      valueListenable: _effectiveController,
       builder: (context, value, child) {
         return SimpleTreeView(
           isExpanded: value.isExpanded,
           root: SimpleTreeViewRootRow(
-            onTap: _canToggleExpand ? _onRootTap : null,
+            onTap: widget.isExpandable ? _onRootTap : null,
             leading: [
               _NodeIcon(isOpen: value.isExpanded),
               VoicesAssets.images.viewGrid.buildIcon(),
             ],
-            child: Text(name),
+            child: Text(widget.name),
           ),
-          children: items.mapIndexed(
+          children: widget.items.mapIndexed(
             (index, item) {
               return SimpleTreeViewChildRow(
                 key: ValueKey('NodeMenu${item.id}RowKey'),
-                hasNext: index < items.length - 1,
+                hasNext: index < widget.items.length - 1,
                 isSelected: item.id == value.selectedItemId,
-                onTap: _canTapItem ? () => _onMenuItemTap(item) : null,
+                onTap: item.isEnabled ? () => _onMenuItemTap(item) : null,
                 child: Text(item.label),
               );
             },
@@ -119,12 +141,13 @@ class VoicesNodeMenu extends StatelessWidget {
   }
 
   void _onRootTap() {
-    onExpandChanged?.call(!controller.value.isExpanded);
+    _effectiveController.isExpanded = !_effectiveController.isExpanded;
   }
 
   void _onMenuItemTap(VoicesNodeMenuItem item) {
-    final id = item.id != controller.value.selectedItemId ? item.id : null;
-    onSelectionChanged?.call(id);
+    final id = item.id != _effectiveController.selected ? item.id : null;
+
+    _effectiveController.selected = id;
   }
 }
 

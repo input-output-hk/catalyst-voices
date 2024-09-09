@@ -1,40 +1,46 @@
+import 'package:catalyst_voices/pages/treasury/treasury_campaign_builder_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class CampaignDetails extends StatelessWidget {
-  final VoicesNodeMenuController campaignSetupController;
-  final List<CampaignSetupStep> steps;
+  final TreasuryCampaignBuilder builder;
+  final Map<Object, VoicesNodeMenuController> stepsControllers;
 
   const CampaignDetails({
     super.key,
-    required this.campaignSetupController,
-    required this.steps,
+    required this.builder,
+    required this.stepsControllers,
   });
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
+    return ListView.builder(
       padding: const EdgeInsets.only(top: 10),
-      children: [
-        _ListenableCampaignSetupDetails(
-          key: ValueKey('CampaignSetupDetailsKey'),
-          controller: campaignSetupController,
-          steps: steps,
-        ),
-      ],
+      itemCount: builder.segments.length,
+      itemBuilder: (context, index) {
+        final segment = builder.segments[index];
+
+        return _ListenableSegmentDetails(
+          key: ValueKey('ListenableSegment${segment.id}DetailsKey'),
+          segment: segment,
+          controller: stepsControllers[segment.id]!,
+        );
+      },
     );
   }
 }
 
-class _ListenableCampaignSetupDetails extends StatelessWidget {
+class _ListenableSegmentDetails extends StatelessWidget {
+  final TreasuryCampaignSegment segment;
   final VoicesNodeMenuController controller;
-  final List<CampaignSetupStep> steps;
 
-  const _ListenableCampaignSetupDetails({
+  const _ListenableSegmentDetails({
     super.key,
+    required this.segment,
     required this.controller,
-    required this.steps,
   });
 
   @override
@@ -42,12 +48,14 @@ class _ListenableCampaignSetupDetails extends StatelessWidget {
     return ValueListenableBuilder(
       valueListenable: controller,
       builder: (context, value, child) {
-        return _CampaignSetupDetails(
-          campaignSetupSteps: steps,
-          selected: controller.value.selectedItemId,
-          isExpanded: controller.value.isExpanded,
+        return _SegmentDetails(
+          key: ValueKey('Segment${segment.id}DetailsKey'),
+          name: segment.localizedName(context.l10n),
+          steps: segment.steps,
+          selected: controller.selected,
+          isExpanded: controller.isExpanded,
           onChevronTap: () {
-            controller.isExpanded = !controller.value.isExpanded;
+            controller.isExpanded = !controller.isExpanded;
           },
         );
       },
@@ -55,14 +63,17 @@ class _ListenableCampaignSetupDetails extends StatelessWidget {
   }
 }
 
-class _CampaignSetupDetails extends StatelessWidget {
-  final List<CampaignSetupStep> campaignSetupSteps;
+class _SegmentDetails extends StatelessWidget {
+  final String name;
+  final List<TreasuryCampaignSegmentStep> steps;
   final int? selected;
   final bool isExpanded;
   final VoidCallback? onChevronTap;
 
-  const _CampaignSetupDetails({
-    required this.campaignSetupSteps,
+  const _SegmentDetails({
+    super.key,
+    required this.name,
+    required this.steps,
     this.selected,
     this.isExpanded = false,
     this.onChevronTap,
@@ -77,24 +88,56 @@ class _CampaignSetupDetails extends StatelessWidget {
             onTap: onChevronTap,
             isExpanded: isExpanded,
           ),
-          name: 'Setup Campaign',
+          name: name,
           isHighlighted: isExpanded,
         ),
         if (isExpanded)
-          ...campaignSetupSteps.map(
+          ...steps.map(
             (step) {
-              return WorkspaceTileContainer(
+              return _StepDetails(
                 key: ValueKey('WorkspaceStep${step.id}TileKey'),
+                id: step.id,
+                name: step.localizedName(context.l10n),
+                desc: step.tempDescription(),
                 isSelected: step.id == selected,
-                name: step.name,
-                headerActions: [
-                  VoicesTextButton(child: Text('Edit')),
-                ],
-                content: Text(step.desc),
+                isEditable: step.isEditable,
               );
             },
           )
       ].separatedBy(SizedBox(height: 12)).toList(),
+    );
+  }
+}
+
+class _StepDetails extends StatelessWidget {
+  const _StepDetails({
+    super.key,
+    required this.id,
+    required this.name,
+    required this.desc,
+    this.isSelected = false,
+    this.isEditable = false,
+  });
+
+  final int id;
+  final String name;
+  final String desc;
+  final bool isSelected;
+  final bool isEditable;
+
+  @override
+  Widget build(BuildContext context) {
+    return WorkspaceTileContainer(
+      name: name,
+      isSelected: isSelected,
+      headerActions: [
+        // TODO: loc
+        VoicesTextButton(
+          child: Text('Edit'),
+          onTap: isEditable ? () {} : null,
+        ),
+      ],
+      content: Text(desc),
     );
   }
 }
