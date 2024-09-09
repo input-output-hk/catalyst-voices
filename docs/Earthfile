@@ -1,6 +1,7 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/docs:v3.1.21 AS docs-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/docs:v3.2.00 AS docs-ci
+# IMPORT /Users/alexeypoghilenkov/Work/catalyst-ci/earthly/docs AS docs-ci
 
 IMPORT .. AS repo
 IMPORT ../catalyst-gateway AS catalyst-gateway
