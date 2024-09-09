@@ -175,7 +175,7 @@
   },
   "fundedProposalDate": "Funded {date}",
   "@fundedProposalDate": {
-    "description": "Indicates when a proposal has been funded on a proposal card.",
+    "description": "Indicates date of funding (a proposal).",
     "placeholders": {
       "date": {
         "type": "DateTime",
@@ -185,7 +185,7 @@
   },
   "lastUpdateDate": "Last update: {date}.",
   "@lastUpdateDate": {
-    "description": "Indicates when a proposal has been last updated on a proposal card.",
+    "description": "Indicates a last update date.",
     "placeholders": {
       "date": {
         "type": "String"

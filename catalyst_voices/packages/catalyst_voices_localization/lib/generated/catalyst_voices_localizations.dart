@@ -346,13 +346,13 @@ abstract class VoicesLocalizations {
   /// **'Published proposal'**
   String get publishedProposal;
 
-  /// Indicates when a proposal has been funded on a proposal card.
+  /// Indicates date of funding (a proposal).
   ///
   /// In en, this message translates to:
   /// **'Funded {date}'**
   String fundedProposalDate(DateTime date);
 
-  /// Indicates when a proposal has been last updated on a proposal card.
+  /// Indicates a last update date.
   ///
   /// In en, this message translates to:
   /// **'Last update: {date}.'**
