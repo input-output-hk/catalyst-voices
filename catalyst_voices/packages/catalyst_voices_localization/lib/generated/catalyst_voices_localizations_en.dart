@@ -209,4 +209,15 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get tomorrow => 'Tomorrow';
+
+  @override
+  String get activeVotingRound => 'Active voting round 14';
+
+  @override
+  String noOfAllProposals(int count) {
+    return 'All proposals ($count)';
+  }
+
+  @override
+  String get favorites => 'Favorites';
 }
