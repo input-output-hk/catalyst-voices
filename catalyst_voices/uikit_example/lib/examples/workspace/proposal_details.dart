@@ -88,7 +88,9 @@ class _ProposalSetupDetails extends StatelessWidget {
               return WorkspaceTileContainer(
                 key: ValueKey('WorkspaceStep${step.id}TileKey'),
                 isSelected: step.id == selected,
-                content: VoicesRichText(),
+                content: VoicesRichText(
+                  title: step.name,
+                ),
               );
             },
           )

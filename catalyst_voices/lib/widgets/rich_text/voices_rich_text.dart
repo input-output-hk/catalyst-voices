@@ -109,10 +109,17 @@ class _VoicesRichTextState extends State<VoicesRichText> {
               charsLimit: widget.charsLimit!,
             ),
           SizedBox(height: 16),
-          _Footer(
-            controller: _controller,
-            onSave: widget.onSave,
-          ),
+          (_editMode)
+              ? _Footer(
+                  controller: _controller,
+                  onSave: (document) {
+                    widget.onSave?.call(document);
+                    setState(() {
+                      _editMode = false;
+                    });
+                  },
+                )
+              : SizedBox(height: 24),
         ],
       ),
     );
@@ -253,7 +260,7 @@ class _Editor extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: ResizableBoxParent(
-        minHeight: 400,
+        minHeight: 240,
         resizableVertically: true,
         resizableHorizontally: false,
         child: Container(
