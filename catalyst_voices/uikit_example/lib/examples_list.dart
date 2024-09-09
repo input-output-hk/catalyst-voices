@@ -16,6 +16,7 @@ import 'package:uikit_example/examples/voices_list_tile_example.dart';
 import 'package:uikit_example/examples/voices_menu_example.dart';
 import 'package:uikit_example/examples/voices_modals_example.dart';
 import 'package:uikit_example/examples/voices_navigation_example.dart';
+import 'package:uikit_example/examples/voices_proposal_card_example.dart';
 import 'package:uikit_example/examples/voices_radio_example.dart';
 import 'package:uikit_example/examples/voices_rich_text_example.dart';
 import 'package:uikit_example/examples/voices_seed_phrase_example.dart';
@@ -163,6 +164,11 @@ class ExamplesListPage extends StatelessWidget {
         title: 'Voices Rich Text',
         route: VoicesRichTextExample.route,
         page: VoicesRichTextExample(),
+      ),
+      ExampleTile(
+        title: 'Voices Proposal Card',
+        route: VoicesProposalCardExample.route,
+        page: VoicesProposalCardExample(),
       ),
     ];
   }
