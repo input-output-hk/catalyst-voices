@@ -1,7 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:feat/faster-rust-tool-install AS rust-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:v3.1.21 AS mithril-snapshot-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:feat/cardano-chain-follower-changes AS rust-ci
 
 #cspell: words rustfmt toolsets USERARCH
 
@@ -67,18 +66,6 @@ package-cat-gateway:
     COPY ./scripts/entry.sh .
 
     ENTRYPOINT ./entry.sh
-    SAVE IMAGE cat-gateway:$tag
-
-# package-cat-gateway : Create a deployable container for catalyst-gateway
-# And bundle a Mithril snapshot of cardano preprod
-nightly-package-cat-gateway-with-preprod:
-    ARG tag="latest"
-
-    FROM +package-cat-gateway
-
-    # copy preprod mithril snapshot to /tmp/preprod dir
-    COPY mithril-snapshot-ci+preprod/snapshot /tmp/preprod
-
     SAVE IMAGE cat-gateway:$tag
 
 # Publish packages if all integration tests have passed. (Failure to pass tests will prevent packages being published.)

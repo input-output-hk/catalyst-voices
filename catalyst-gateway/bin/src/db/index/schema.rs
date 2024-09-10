@@ -72,7 +72,7 @@ async fn create_namespace(
 
     // Create the Keyspace if it doesn't exist already.
     let stmt = session.prepare(query).await?;
-    session.execute(&stmt, ()).await?;
+    session.execute_unpaged(&stmt, ()).await?;
 
     // Wait for the Schema to be ready.
     session.await_schema_agreement().await?;
@@ -98,7 +98,7 @@ pub(crate) async fn create_schema(
             .context(format!("{} : Prepared", schema.1))?;
 
         session
-            .execute(&stmt, ())
+            .execute_unpaged(&stmt, ())
             .await
             .context(format!("{} : Executed", schema.1))?;
     }

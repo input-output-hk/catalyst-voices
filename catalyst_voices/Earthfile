@@ -1,7 +1,7 @@
 VERSION 0.8
 
 IMPORT ../catalyst-gateway AS catalyst-gateway
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.1.21 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.1.26 AS flutter-ci
 
 # Copy all the necessary files and running bootstrap
 builder:
@@ -52,14 +52,6 @@ check-package-publishing:
     FROM +builder
     DO flutter-ci+PUBLISH_DRY_RUN
 
-# Build web version of Catalyst Voices without arguments.
-# This is used for development purposes to validate build on PRs.
-build-web-on-pr:
-    FROM +builder
-
-    ARG WORKDIR=/frontend/catalyst_voices
-    DO flutter-ci+BUILD_WEB --TARGET=lib/configs/main_web.dart --WORKDIR=$WORKDIR
-
 # Run unit tests
 test-unit:
     FROM +builder
@@ -68,39 +60,29 @@ test-unit:
 # Build web version of Catalyst Voices
 build-web:
     FROM +builder
-    ARG SECRETS_ARE_AVAILABLE=false
+    ARG RUN_ON_PR=true
     ARG SENTRY_DSN
 
-    IF [$SECRETS_ARE_AVAILABLE]
-        ARG WORKDIR=/frontend/catalyst_voices
-        DO flutter-ci+BUILD_WEB --TARGET=lib/configs/main_web.dart --dart-define SENTRY_DSN=$SENTRY_DSN --WORKDIR=$WORKDIR
-        SAVE ARTIFACT web
+    ARG WORKDIR=/frontend/catalyst_voices
+    IF [ $RUN_ON_PR = true ]
+        DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --BUILD_MODE='--profile' --TARGET=lib/configs/main_web.dart
     ELSE
-        RUN echo "No secrets are available in Earthly yet."
+        DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --TARGET=lib/configs/main_web.dart --SENTRY_DSN=$SENTRY_DSN
+        SAVE ARTIFACT web
     END
 
 package:
     FROM nginx:alpine3.18
-    ARG SECRETS_ARE_AVAILABLE=false
     ARG tag='latest'
 
-    IF [$SECRETS_ARE_AVAILABLE]
-        COPY +build-web/web /app
-        COPY ./nginx.conf /etc/nginx/nginx.conf
-        EXPOSE 80
+    COPY +build-web/web /app
+    COPY ./nginx.conf /etc/nginx/nginx.conf
+    EXPOSE 80
 
-        SAVE IMAGE voices-frontend:$tag
-    ELSE
-        RUN echo "No secrets are available in Earthly yet."
-    END
+    SAVE IMAGE voices-frontend:$tag
 
-#publish:
-#    FROM +package
-#    ARG SECRETS_ARE_AVAILABLE=false
-#    ARG tag='latest'
+publish:
+   FROM +package
+   ARG tag='latest'
 
-#    IF [$SECRETS_ARE_AVAILABLE]
-#        SAVE IMAGE voices-frontend:$tag
-#    ELSE
-#        RUN echo "No secrets are available in Earthly yet."
-#    END
+   SAVE IMAGE voices-frontend:$tag

@@ -12,6 +12,7 @@ class VoicesSnackbarExample extends StatelessWidget {
     final screenWidth = MediaQuery.sizeOf(context).width;
 
     return Scaffold(
+      appBar: AppBar(title: const Text('Voices Snackbar')),
       body: Padding(
         padding: const EdgeInsets.all(32),
         child: Wrap(
