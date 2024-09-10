@@ -276,5 +276,25 @@
   "treasuryStepEdit": "Edit",
   "@treasuryStepEdit": {
     "description": "Button name in treasury step"
+  },
+  "drawerSpaceTreasury": "Treasury",
+  "@drawerSpaceTreasury": {
+    "description": "Name shown in spaces shell drawer"
+  },
+  "drawerSpaceDiscovery": "Discovery",
+  "@drawerSpaceDiscovery": {
+    "description": "Name shown in spaces shell drawer"
+  },
+  "drawerSpaceWorkspace": "Workspace",
+  "@drawerSpaceWorkspace": {
+    "description": "Name shown in spaces shell drawer"
+  },
+  "drawerSpaceVoting": "Voting",
+  "@drawerSpaceVoting": {
+    "description": "Name shown in spaces shell drawer"
+  },
+  "drawerSpaceFundedProjects": "Funded projects",
+  "@drawerSpaceFundedProjects": {
+    "description": "Name shown in spaces shell drawer"
   }
 }

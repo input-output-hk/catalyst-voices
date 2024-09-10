@@ -2,11 +2,11 @@ import 'package:catalyst_voices_models/src/treasury/treasury_campaign_segment.da
 import 'package:equatable/equatable.dart';
 
 final class TreasuryCampaignBuilder extends Equatable {
+  final List<TreasuryCampaignSegment> segments;
+
   TreasuryCampaignBuilder({
     required this.segments,
   });
-
-  final List<TreasuryCampaignSegment> segments;
 
   @override
   List<Object?> get props => [

@@ -447,6 +447,36 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Edit'**
   String get treasuryStepEdit;
+
+  /// Name shown in spaces shell drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Treasury'**
+  String get drawerSpaceTreasury;
+
+  /// Name shown in spaces shell drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Discovery'**
+  String get drawerSpaceDiscovery;
+
+  /// Name shown in spaces shell drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Workspace'**
+  String get drawerSpaceWorkspace;
+
+  /// Name shown in spaces shell drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Voting'**
+  String get drawerSpaceVoting;
+
+  /// Name shown in spaces shell drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Funded projects'**
+  String get drawerSpaceFundedProjects;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

@@ -235,4 +235,19 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get treasuryStepEdit => 'Edit';
+
+  @override
+  String get drawerSpaceTreasury => 'Treasury';
+
+  @override
+  String get drawerSpaceDiscovery => 'Discovery';
+
+  @override
+  String get drawerSpaceWorkspace => 'Workspace';
+
+  @override
+  String get drawerSpaceVoting => 'Voting';
+
+  @override
+  String get drawerSpaceFundedProjects => 'Funded projects';
 }
