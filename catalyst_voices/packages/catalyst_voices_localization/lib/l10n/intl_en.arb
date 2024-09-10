@@ -239,5 +239,22 @@
   "tomorrow": "Tomorrow",
   "@tomorrow": {
     "description": "Refers to date which is tomorrow."
+  },
+  "activeVotingRound": "Active voting round 14",
+  "@activeVotingRound": {
+    "description": "Title of the voting space."
+  },
+  "noOfAllProposals": "All proposals ({count})",
+  "@noOfAllProposals": {
+    "description": "Tab label for all proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "favorites": "Favorites",
+  "@favorites": {
+    "description": "Refers to a list of favorites."
   }
 }

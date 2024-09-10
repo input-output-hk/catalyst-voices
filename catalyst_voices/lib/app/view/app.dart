@@ -30,6 +30,12 @@ final class App extends StatelessWidget {
       BlocProvider<LoginBloc>(
         create: (_) => Dependencies.instance.get<LoginBloc>(),
       ),
+      BlocProvider<SessionBloc>(
+        create: (_) => Dependencies.instance.get<SessionBloc>(),
+      ),
+      BlocProvider<UserProfileBloc>(
+        create: (_) => Dependencies.instance.get<UserProfileBloc>(),
+      ),
     ];
   }
 }
