@@ -1,6 +1,6 @@
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
-import 'package:collection/collection.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 enum _ButtonType {
@@ -100,7 +100,7 @@ class _ButtonRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: _ButtonState.values
-          .map<Widget>((state) {
+          .map((state) {
             return _buildButton(
               type,
               state,
@@ -112,12 +112,7 @@ class _ButtonRow extends StatelessWidget {
                       : null,
             );
           })
-          .expandIndexed(
-            (index, element) => [
-              if (index != 0) const SizedBox(width: 16),
-              element,
-            ],
-          )
+          .separatedBy(const SizedBox(width: 16))
           .toList(),
     );
   }

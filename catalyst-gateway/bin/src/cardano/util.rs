@@ -1,10 +1,7 @@
 //! Block stream parsing and filtering utils
-
-use std::collections::HashMap;
-
 use cryptoxide::{blake2b::Blake2b, digest::Digest};
 use pallas::ledger::{
-    primitives::conway::{StakeCredential, VKeyWitness},
+    primitives::conway::StakeCredential,
     traverse::{Era, MultiEraAsset, MultiEraCert, MultiEraPolicyAssets},
 };
 use serde::Serialize;
@@ -58,11 +55,9 @@ pub struct PolicyAsset {
 pub(crate) fn parse_policy_assets(assets: &[MultiEraPolicyAssets<'_>]) -> Vec<PolicyAsset> {
     assets
         .iter()
-        .map(|asset| {
-            PolicyAsset {
-                policy_hash: asset.policy().to_string(),
-                assets: parse_child_assets(&asset.assets()),
-            }
+        .map(|asset| PolicyAsset {
+            policy_hash: asset.policy().to_string(),
+            assets: parse_child_assets(&asset.assets()),
         })
         .collect()
 }
@@ -71,25 +66,21 @@ pub(crate) fn parse_policy_assets(assets: &[MultiEraPolicyAssets<'_>]) -> Vec<Po
 fn parse_child_assets(assets: &[MultiEraAsset]) -> Vec<Asset> {
     assets
         .iter()
-        .filter_map(|asset| {
-            match asset {
-                MultiEraAsset::AlonzoCompatibleOutput(id, name, amount) => {
-                    Some(Asset {
-                        policy_id: id.to_string(),
-                        name: name.to_string(),
-                        amount: *amount,
-                    })
-                },
-                MultiEraAsset::AlonzoCompatibleMint(id, name, amount) => {
-                    let amount = u64::try_from(*amount).ok()?;
-                    Some(Asset {
-                        policy_id: id.to_string(),
-                        name: name.to_string(),
-                        amount,
-                    })
-                },
-                _ => Some(Asset::default()),
-            }
+        .filter_map(|asset| match asset {
+            MultiEraAsset::AlonzoCompatibleOutput(id, name, amount) => Some(Asset {
+                policy_id: id.to_string(),
+                name: name.to_string(),
+                amount: *amount,
+            }),
+            MultiEraAsset::AlonzoCompatibleMint(id, name, amount) => {
+                let amount = u64::try_from(*amount).ok()?;
+                Some(Asset {
+                    policy_id: id.to_string(),
+                    name: name.to_string(),
+                    amount,
+                })
+            },
+            _ => Some(Asset::default()),
         })
         .collect()
 }
@@ -113,13 +104,11 @@ pub fn extract_stake_credentials_from_certs(
                 pallas::ledger::primitives::alonzo::Certificate::StakeDelegation(
                     stake_credential,
                     _,
-                ) => {
-                    match stake_credential {
-                        StakeCredential::AddrKeyhash(stake_credential) => {
-                            stake_credentials.push(hex::encode(stake_credential.as_slice()));
-                        },
-                        StakeCredential::Scripthash(_) => (),
-                    }
+                ) => match stake_credential {
+                    StakeCredential::AddrKeyhash(stake_credential) => {
+                        stake_credentials.push(hex::encode(stake_credential.as_slice()));
+                    },
+                    StakeCredential::Scripthash(_) => (),
                 },
                 _ => continue,
             }
@@ -127,33 +116,6 @@ pub fn extract_stake_credentials_from_certs(
     }
 
     stake_credentials
-}
-
-/// Get a Blake2b-224 (28 byte) hash of some bytes
-pub(crate) fn blake2b_224(value: &[u8]) -> [u8; 28] {
-    let mut digest = [0u8; 28];
-    let mut context = Blake2b::new(28);
-    context.input(value);
-    context.result(&mut digest);
-    digest
-}
-
-/// A map of hashed witnesses.
-pub(crate) type HashedWitnesses = HashMap<[u8; 28], Vec<u8>>;
-
-/// Extract witness pub keys and pair with blake2b hash of the pub key.
-/// This converts raw Addresses to their hashes as used on Cardano (Blake2b-224).
-/// And allows them to be easily cross referenced.
-pub(crate) fn extract_hashed_witnesses(witnesses: &[VKeyWitness]) -> HashedWitnesses {
-    let mut hashed_witnesses = HashMap::new();
-    for witness in witnesses {
-        let pub_key = witness.vkey.to_vec();
-        let hash = blake2b_224(&pub_key);
-
-        hashed_witnesses.insert(hash, pub_key);
-    }
-
-    hashed_witnesses
 }
 
 /// Match hashed witness pub keys with hashed stake credentials from the TX certificates

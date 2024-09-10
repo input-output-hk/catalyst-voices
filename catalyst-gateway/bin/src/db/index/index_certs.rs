@@ -2,6 +2,7 @@
 
 use std::sync::Arc;
 
+use cardano_chain_follower::MultiEraBlock;
 use pallas::ledger::primitives::{alonzo, conway};
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
 use tracing::error;
@@ -10,7 +11,7 @@ use super::{
     queries::{FallibleQueryTasks, PreparedQueries, PreparedQuery, SizedBatch},
     session::CassandraSession,
 };
-use crate::{cardano::util::HashedWitnesses, settings::CassandraEnvVars};
+use crate::{service::utilities::convert::u16_from_saturating, settings::CassandraEnvVars};
 
 /// Insert TXI Query and Parameters
 #[derive(SerializeRow)]
@@ -121,12 +122,15 @@ impl CertInsertQuery {
     #[allow(clippy::too_many_arguments)]
     fn stake_address(
         &mut self, cred: &alonzo::StakeCredential, slot_no: u64, txn: i16, register: bool,
-        deregister: bool, delegation: Option<Vec<u8>>, witnesses: &HashedWitnesses,
+        deregister: bool, delegation: Option<Vec<u8>>, block: &MultiEraBlock,
     ) {
         let default_addr = Vec::new();
         let (key_hash, pubkey, script) = match cred {
             pallas::ledger::primitives::conway::StakeCredential::AddrKeyhash(cred) => {
-                let addr = witnesses.get(cred.as_ref()).unwrap_or(&default_addr);
+                let addr = block
+                    .witness_for_tx(cred, u16_from_saturating(txn))
+                    .unwrap_or(default_addr);
+                //let addr = witnesses.get(cred.as_ref()).unwrap_or(&default_addr);
                 // Note: it is totally possible for the Registration Certificate to not be
                 // witnessed.
                 (cred.to_vec(), addr.clone(), false)
@@ -158,27 +162,19 @@ impl CertInsertQuery {
 
     /// Index an Alonzo Era certificate into the database.
     fn index_alonzo_cert(
-        &mut self, cert: &alonzo::Certificate, slot_no: u64, txn: i16, witnesses: &HashedWitnesses,
+        &mut self, cert: &alonzo::Certificate, slot_no: u64, txn: i16, block: &MultiEraBlock,
     ) {
         #[allow(clippy::match_same_arms)]
         match cert {
             pallas::ledger::primitives::alonzo::Certificate::StakeRegistration(cred) => {
                 // This may not be witnessed, its normal but disappointing.
-                self.stake_address(cred, slot_no, txn, true, false, None, witnesses);
+                self.stake_address(cred, slot_no, txn, true, false, None, block);
             },
             pallas::ledger::primitives::alonzo::Certificate::StakeDeregistration(cred) => {
-                self.stake_address(cred, slot_no, txn, false, true, None, witnesses);
+                self.stake_address(cred, slot_no, txn, false, true, None, block);
             },
             pallas::ledger::primitives::alonzo::Certificate::StakeDelegation(cred, pool) => {
-                self.stake_address(
-                    cred,
-                    slot_no,
-                    txn,
-                    false,
-                    false,
-                    Some(pool.to_vec()),
-                    witnesses,
-                );
+                self.stake_address(cred, slot_no, txn, false, false, Some(pool.to_vec()), block);
             },
             pallas::ledger::primitives::alonzo::Certificate::PoolRegistration { .. } => {},
             pallas::ledger::primitives::alonzo::Certificate::PoolRetirement(..) => {},
@@ -189,27 +185,19 @@ impl CertInsertQuery {
 
     /// Index a certificate from a conway transaction.
     fn index_conway_cert(
-        &mut self, cert: &conway::Certificate, slot_no: u64, txn: i16, witnesses: &HashedWitnesses,
+        &mut self, cert: &conway::Certificate, slot_no: u64, txn: i16, block: &MultiEraBlock,
     ) {
         #[allow(clippy::match_same_arms)]
         match cert {
             pallas::ledger::primitives::conway::Certificate::StakeRegistration(cred) => {
                 // This may not be witnessed, its normal but disappointing.
-                self.stake_address(cred, slot_no, txn, true, false, None, witnesses);
+                self.stake_address(cred, slot_no, txn, true, false, None, block);
             },
             pallas::ledger::primitives::conway::Certificate::StakeDeregistration(cred) => {
-                self.stake_address(cred, slot_no, txn, false, true, None, witnesses);
+                self.stake_address(cred, slot_no, txn, false, true, None, block);
             },
             pallas::ledger::primitives::conway::Certificate::StakeDelegation(cred, pool) => {
-                self.stake_address(
-                    cred,
-                    slot_no,
-                    txn,
-                    false,
-                    false,
-                    Some(pool.to_vec()),
-                    witnesses,
-                );
+                self.stake_address(cred, slot_no, txn, false, false, Some(pool.to_vec()), block);
             },
             pallas::ledger::primitives::conway::Certificate::PoolRegistration { .. } => {},
             pallas::ledger::primitives::conway::Certificate::PoolRetirement(..) => {},
@@ -231,20 +219,18 @@ impl CertInsertQuery {
     /// Index the certificates in a transaction.
     pub(crate) fn index(
         &mut self, txs: &pallas::ledger::traverse::MultiEraTx<'_>, slot_no: u64, txn: i16,
-        witnesses: &HashedWitnesses,
+        block: &MultiEraBlock,
     ) {
         #[allow(clippy::match_same_arms)]
-        txs.certs().iter().for_each(|cert| {
-            match cert {
-                pallas::ledger::traverse::MultiEraCert::NotApplicable => {},
-                pallas::ledger::traverse::MultiEraCert::AlonzoCompatible(cert) => {
-                    self.index_alonzo_cert(cert, slot_no, txn, witnesses);
-                },
-                pallas::ledger::traverse::MultiEraCert::Conway(cert) => {
-                    self.index_conway_cert(cert, slot_no, txn, witnesses);
-                },
-                _ => {},
-            }
+        txs.certs().iter().for_each(|cert| match cert {
+            pallas::ledger::traverse::MultiEraCert::NotApplicable => {},
+            pallas::ledger::traverse::MultiEraCert::AlonzoCompatible(cert) => {
+                self.index_alonzo_cert(cert, slot_no, txn, block);
+            },
+            pallas::ledger::traverse::MultiEraCert::Conway(cert) => {
+                self.index_conway_cert(cert, slot_no, txn, block);
+            },
+            _ => {},
         });
     }
 

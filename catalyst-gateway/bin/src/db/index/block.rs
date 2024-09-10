@@ -7,7 +7,6 @@ use super::{
     index_certs::CertInsertQuery, index_txi::TxiInsertQuery, index_txo::TxoInsertQuery,
     queries::FallibleQueryTasks, session::CassandraSession,
 };
-use crate::cardano::util::extract_hashed_witnesses;
 
 /// Convert a usize to an i16 and saturate at `i16::MAX`
 pub(crate) fn usize_to_i16(value: usize) -> i16 {
@@ -35,9 +34,6 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
 
         let txn_hash = txs.hash().to_vec();
 
-        // Hash all the witnesses for easy lookup.
-        let witnesses = extract_hashed_witnesses(txs.vkey_witnesses());
-
         // Index the TXIs.
         txi_index.index(txs, slot_no);
 
@@ -47,7 +43,7 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
         // TODO: Index Metadata.
 
         // Index Certificates inside the transaction.
-        cert_index.index(txs, slot_no, txn, &witnesses);
+        cert_index.index(txs, slot_no, txn, block);
 
         // Index the TXOs.
         txo_index.index(txs, slot_no, &txn_hash, txn);

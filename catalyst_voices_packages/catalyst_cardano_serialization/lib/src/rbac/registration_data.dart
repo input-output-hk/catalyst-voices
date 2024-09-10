@@ -4,7 +4,7 @@ import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
 
 /// Defines the X509 Role Based Access Control transaction metadata.
-final class RegistrationData extends Equatable {
+final class RegistrationData extends Equatable implements CborEncodable {
   /// Un-ordered List of DER encoded x509 certificates.
   final List<X509DerCertificate>? derCerts;
 
@@ -51,6 +51,7 @@ final class RegistrationData extends Equatable {
   }
 
   /// Serializes the type as cbor.
+  @override
   CborValue toCbor() => CborMap(_buildCborMap());
 
   /// Builds a CborMap from the class properties.
@@ -97,7 +98,7 @@ final class RegistrationData extends Equatable {
 ///
 /// The validity of the registration is as per the rules for roles defined
 /// by the dApp itself.
-class RoleData extends Equatable {
+class RoleData extends Equatable implements CborEncodable {
   /// All roles, except for Role 0, are defined by the dApp.
   ///
   /// Role 0 is the primary role and is used to sign the metadata and declare on-chain/off-chain identity linkage.
@@ -219,6 +220,7 @@ class RoleData extends Equatable {
   }
 
   /// Serializes the type as cbor.
+  @override
   CborValue toCbor() {
     return CborMap({
       const CborSmallInt(0): CborSmallInt(roleNumber),
@@ -247,7 +249,7 @@ class RoleData extends Equatable {
 /// a given key in an earlier registration.
 ///
 /// Either [localRef] or [hash] must be set, but not both and not none.
-class KeyReference extends Equatable {
+class KeyReference extends Equatable implements CborEncodable {
   /// Offset reference to a key defined in this registration.
   /// More efficient than a key hash.
   final LocalKeyReference? localRef;
@@ -289,6 +291,7 @@ class KeyReference extends Equatable {
   }
 
   /// Serializes the type as cbor.
+  @override
   CborValue toCbor() {
     return localRef?.toCbor() ?? hash!.toCbor();
   }
@@ -300,7 +303,7 @@ class KeyReference extends Equatable {
 /// Offset reference to a key defined in this registration.
 ///
 /// More efficient than a key hash.
-class LocalKeyReference extends Equatable {
+class LocalKeyReference extends Equatable implements CborEncodable {
   /// A type of referenced key.
   final LocalKeyReferenceType keyType;
 
@@ -326,6 +329,7 @@ class LocalKeyReference extends Equatable {
   }
 
   /// Serializes the type as cbor.
+  @override
   CborValue toCbor() {
     return CborList([
       CborSmallInt(keyType.tag),

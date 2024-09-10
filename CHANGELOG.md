@@ -3,6 +3,165 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 2024-09-03
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - [`catalyst_analysis` - `v2.0.0`](#catalyst_analysis---v200)
+ - [`catalyst_cardano` - `v0.3.0`](#catalyst_cardano---v030)
+ - [`catalyst_cardano_platform_interface` - `v0.3.0`](#catalyst_cardano_platform_interface---v030)
+ - [`catalyst_cardano_serialization` - `v0.4.0`](#catalyst_cardano_serialization---v040)
+ - [`catalyst_cardano_web` - `v0.3.0`](#catalyst_cardano_web---v030)
+ - [`catalyst_compression` - `v0.3.0`](#catalyst_compression---v030)
+ - [`catalyst_compression_platform_interface` - `v0.2.0`](#catalyst_compression_platform_interface---v020)
+ - [`catalyst_compression_web` - `v0.3.0`](#catalyst_compression_web---v030)
+ - [`catalyst_cose` - `v0.3.0`](#catalyst_cose---v030)
+
+Packages with other changes:
+
+ - There are no other changes in this release.
+
+---
+
+#### `catalyst_analysis` - `v2.0.0`
+
+ - **BREAKING** **CHORE**: upgrade flutter to 3.24.1 and dart to 3.5.0 ([#725](https://github.com/input-output-hk/catalyst-voices/issues/725)). ([eb8a516e](https://github.com/input-output-hk/catalyst-voices/commit/eb8a516edbd25386c0fbe41501285870abf82543))
+
+#### `catalyst_cardano` - `v0.3.0`
+
+ - **FIX**: catalyst cardano null utxos ([#746](https://github.com/input-output-hk/catalyst-voices/issues/746)). ([3f2f5925](https://github.com/input-output-hk/catalyst-voices/commit/3f2f592593efe306f85fb0e81ce07aa1ea90b7b6))
+ - **FIX**: rbac txn inputs hash ([#688](https://github.com/input-output-hk/catalyst-voices/issues/688)). ([b644026f](https://github.com/input-output-hk/catalyst-voices/commit/b644026fa3b675591d071819eda185365257f0d1))
+ - **BREAKING** **FEAT**: add initial support for Cardano Native scripts, Plutus scripts, advanced transaction outputs, and additional transaction body fields and witnesses ([#713](https://github.com/input-output-hk/catalyst-voices/issues/713)). ([74fcb725](https://github.com/input-output-hk/catalyst-voices/commit/74fcb725f221bb3acf3824a3dd18a073d0a321e0))
+ - **BREAKING** **CHORE**: upgrade flutter to 3.24.1 and dart to 3.5.0 ([#725](https://github.com/input-output-hk/catalyst-voices/issues/725)). ([eb8a516e](https://github.com/input-output-hk/catalyst-voices/commit/eb8a516edbd25386c0fbe41501285870abf82543))
+
+#### `catalyst_cardano_platform_interface` - `v0.3.0`
+
+ - **BREAKING** **CHORE**: upgrade flutter to 3.24.1 and dart to 3.5.0 ([#725](https://github.com/input-output-hk/catalyst-voices/issues/725)). ([eb8a516e](https://github.com/input-output-hk/catalyst-voices/commit/eb8a516edbd25386c0fbe41501285870abf82543))
+
+#### `catalyst_cardano_serialization` - `v0.4.0`
+
+ - **FIX**: to be signed message should be a plain cbor sequence ([#701](https://github.com/input-output-hk/catalyst-voices/issues/701)). ([7c2dec6e](https://github.com/input-output-hk/catalyst-voices/commit/7c2dec6e2f91c1f18a39e7646ee3a5ca6a6e7249))
+ - **FIX**: rbac txn inputs hash ([#688](https://github.com/input-output-hk/catalyst-voices/issues/688)). ([b644026f](https://github.com/input-output-hk/catalyst-voices/commit/b644026fa3b675591d071819eda185365257f0d1))
+ - **FEAT**(catalyst_cardano_serialization): add CborEncodable interface for standardized CBOR handling ([#696](https://github.com/input-output-hk/catalyst-voices/issues/696)). ([4222926f](https://github.com/input-output-hk/catalyst-voices/commit/4222926f028460ddb100008806fe39a38ac3511c))
+ - **BREAKING** **FIX**: required signers are the hash of the public key, not the public key itself ([#703](https://github.com/input-output-hk/catalyst-voices/issues/703)). ([a63c4686](https://github.com/input-output-hk/catalyst-voices/commit/a63c4686ee6e79aa65ace0cb4ed9b0c91e994320))
+ - **BREAKING** **FEAT**: add initial support for Cardano Native scripts, Plutus scripts, advanced transaction outputs, and additional transaction body fields and witnesses ([#713](https://github.com/input-output-hk/catalyst-voices/issues/713)). ([74fcb725](https://github.com/input-output-hk/catalyst-voices/commit/74fcb725f221bb3acf3824a3dd18a073d0a321e0))
+ - **BREAKING** **CHORE**: upgrade flutter to 3.24.1 and dart to 3.5.0 ([#725](https://github.com/input-output-hk/catalyst-voices/issues/725)). ([eb8a516e](https://github.com/input-output-hk/catalyst-voices/commit/eb8a516edbd25386c0fbe41501285870abf82543))
+
+#### `catalyst_cardano_web` - `v0.3.0`
+
+ - **FIX**: catalyst cardano null utxos ([#746](https://github.com/input-output-hk/catalyst-voices/issues/746)). ([3f2f5925](https://github.com/input-output-hk/catalyst-voices/commit/3f2f592593efe306f85fb0e81ce07aa1ea90b7b6))
+ - **BREAKING** **CHORE**: upgrade flutter to 3.24.1 and dart to 3.5.0 ([#725](https://github.com/input-output-hk/catalyst-voices/issues/725)). ([eb8a516e](https://github.com/input-output-hk/catalyst-voices/commit/eb8a516edbd25386c0fbe41501285870abf82543))
+
+#### `catalyst_compression` - `v0.3.0`
+
+ - **BREAKING** **CHORE**: upgrade flutter to 3.24.1 and dart to 3.5.0 ([#725](https://github.com/input-output-hk/catalyst-voices/issues/725)). ([eb8a516e](https://github.com/input-output-hk/catalyst-voices/commit/eb8a516edbd25386c0fbe41501285870abf82543))
+
+#### `catalyst_compression_platform_interface` - `v0.2.0`
+
+ - **BREAKING** **CHORE**: upgrade flutter to 3.24.1 and dart to 3.5.0 ([#725](https://github.com/input-output-hk/catalyst-voices/issues/725)). ([eb8a516e](https://github.com/input-output-hk/catalyst-voices/commit/eb8a516edbd25386c0fbe41501285870abf82543))
+
+#### `catalyst_compression_web` - `v0.3.0`
+
+ - **BREAKING** **CHORE**: upgrade flutter to 3.24.1 and dart to 3.5.0 ([#725](https://github.com/input-output-hk/catalyst-voices/issues/725)). ([eb8a516e](https://github.com/input-output-hk/catalyst-voices/commit/eb8a516edbd25386c0fbe41501285870abf82543))
+
+#### `catalyst_cose` - `v0.3.0`
+
+ - **BREAKING** **CHORE**: upgrade flutter to 3.24.1 and dart to 3.5.0 ([#725](https://github.com/input-output-hk/catalyst-voices/issues/725)). ([eb8a516e](https://github.com/input-output-hk/catalyst-voices/commit/eb8a516edbd25386c0fbe41501285870abf82543))
+
+
+## 2024-08-13
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - [`catalyst_cardano_serialization` - `v0.3.0`](#catalyst_cardano_serialization---v030)
+
+Packages with other changes:
+
+ - [`catalyst_cardano_web` - `v0.2.0+1`](#catalyst_cardano_web---v0201)
+ - [`catalyst_cardano` - `v0.2.0+1`](#catalyst_cardano---v0201)
+ - [`catalyst_cardano_platform_interface` - `v0.2.0+1`](#catalyst_cardano_platform_interface---v0201)
+
+Packages with dependency updates only:
+
+> Packages listed below depend on other packages in this workspace that have had changes. Their versions have been incremented to bump the minimum dependency versions of the packages they depend upon in this project.
+
+ - `catalyst_cardano_web` - `v0.2.0+1`
+ - `catalyst_cardano` - `v0.2.0+1`
+ - `catalyst_cardano_platform_interface` - `v0.2.0+1`
+
+---
+
+#### `catalyst_cardano_serialization` - `v0.3.0`
+
+ - **BREAKING** **FIX**: cardano serialization must depend on flutter ([#679](https://github.com/input-output-hk/catalyst-voices/issues/679)). ([b7d5276b](https://github.com/input-output-hk/catalyst-voices/commit/b7d5276b238b4c7273997b004465e2ffb29f8436))
+
+
+## 2024-08-12
+
+### Changes
+
+---
+
+Packages with breaking changes:
+
+ - [`catalyst_cardano` - `v0.2.0`](#catalyst_cardano---v020)
+ - [`catalyst_cardano_platform_interface` - `v0.2.0`](#catalyst_cardano_platform_interface---v020)
+ - [`catalyst_cardano_serialization` - `v0.2.0`](#catalyst_cardano_serialization---v020)
+ - [`catalyst_cardano_web` - `v0.2.0`](#catalyst_cardano_web---v020)
+ - [`catalyst_compression` - `v0.2.0`](#catalyst_compression---v020)
+ - [`catalyst_compression_web` - `v0.2.0`](#catalyst_compression_web---v020)
+ - [`catalyst_cose` - `v0.2.0`](#catalyst_cose---v020)
+
+Packages with other changes:
+
+ - There are no other changes in this release.
+
+---
+
+#### `catalyst_cardano` - `v0.2.0`
+
+ - **BREAKING** **FIX**: signData return type should be DataSignature, not VkeyWitness ([#647](https://github.com/input-output-hk/catalyst-voices/issues/647)). ([69dba1d2](https://github.com/input-output-hk/catalyst-voices/commit/69dba1d24022eb77cc03ac670dda0da047304766))
+ - **BREAKING** **FIX**: X509 registration metadata encoding ([#640](https://github.com/input-output-hk/catalyst-voices/issues/640)). ([c45a2ac9](https://github.com/input-output-hk/catalyst-voices/commit/c45a2ac96b34c4215352ece5ef9bd2fa73b591e8))
+ - **BREAKING** **FEAT**: COSE_SIGN1 signatures and verification ([#669](https://github.com/input-output-hk/catalyst-voices/issues/669)). ([f5a910ef](https://github.com/input-output-hk/catalyst-voices/commit/f5a910efe36442171521b9ec429aed4a46e05b83))
+
+#### `catalyst_cardano_platform_interface` - `v0.2.0`
+
+ - **BREAKING** **FIX**: signData return type should be DataSignature, not VkeyWitness ([#647](https://github.com/input-output-hk/catalyst-voices/issues/647)). ([69dba1d2](https://github.com/input-output-hk/catalyst-voices/commit/69dba1d24022eb77cc03ac670dda0da047304766))
+
+#### `catalyst_cardano_serialization` - `v0.2.0`
+
+ - **FEAT**: add catv1 auth token generator ([#671](https://github.com/input-output-hk/catalyst-voices/issues/671)). ([79efc828](https://github.com/input-output-hk/catalyst-voices/commit/79efc82800a7e6aca3e8516bbb4866bd502e2f36))
+ - **BREAKING** **FIX**: X509 registration metadata encoding ([#640](https://github.com/input-output-hk/catalyst-voices/issues/640)). ([c45a2ac9](https://github.com/input-output-hk/catalyst-voices/commit/c45a2ac96b34c4215352ece5ef9bd2fa73b591e8))
+ - **BREAKING** **FEAT**: update transactions inputs hash size ([#643](https://github.com/input-output-hk/catalyst-voices/issues/643)). ([a729823d](https://github.com/input-output-hk/catalyst-voices/commit/a729823d9b2e0c369456f8e99f5b776f046e6d1f))
+
+#### `catalyst_cardano_web` - `v0.2.0`
+
+ - **BREAKING** **FIX**: signData return type should be DataSignature, not VkeyWitness ([#647](https://github.com/input-output-hk/catalyst-voices/issues/647)). ([69dba1d2](https://github.com/input-output-hk/catalyst-voices/commit/69dba1d24022eb77cc03ac670dda0da047304766))
+ - **BREAKING** **FEAT**: COSE_SIGN1 signatures and verification ([#669](https://github.com/input-output-hk/catalyst-voices/issues/669)). ([f5a910ef](https://github.com/input-output-hk/catalyst-voices/commit/f5a910efe36442171521b9ec429aed4a46e05b83))
+
+#### `catalyst_compression` - `v0.2.0`
+
+ - **BREAKING** **FEAT**: COSE_SIGN1 signatures and verification ([#669](https://github.com/input-output-hk/catalyst-voices/issues/669)). ([f5a910ef](https://github.com/input-output-hk/catalyst-voices/commit/f5a910efe36442171521b9ec429aed4a46e05b83))
+
+#### `catalyst_compression_web` - `v0.2.0`
+
+ - **FEAT**: cose flutter package structure ([#649](https://github.com/input-output-hk/catalyst-voices/issues/649)). ([1875849c](https://github.com/input-output-hk/catalyst-voices/commit/1875849c530babbd69dce3882423cc7d9ffdbfa4))
+ - **BREAKING** **FEAT**: COSE_SIGN1 signatures and verification ([#669](https://github.com/input-output-hk/catalyst-voices/issues/669)). ([f5a910ef](https://github.com/input-output-hk/catalyst-voices/commit/f5a910efe36442171521b9ec429aed4a46e05b83))
+
+#### `catalyst_cose` - `v0.2.0`
+
+ - **FEAT**: cose flutter package structure ([#649](https://github.com/input-output-hk/catalyst-voices/issues/649)). ([1875849c](https://github.com/input-output-hk/catalyst-voices/commit/1875849c530babbd69dce3882423cc7d9ffdbfa4))
+ - **BREAKING** **FEAT**: COSE_SIGN1 signatures and verification ([#669](https://github.com/input-output-hk/catalyst-voices/issues/669)). ([f5a910ef](https://github.com/input-output-hk/catalyst-voices/commit/f5a910efe36442171521b9ec429aed4a46e05b83))
+
+
 ## 2024-07-24
 
 ### Changes

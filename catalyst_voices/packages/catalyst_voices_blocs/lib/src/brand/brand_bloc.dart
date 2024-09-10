@@ -7,19 +7,19 @@ part 'brand_event.dart';
 part 'brand_state.dart';
 
 /// [BrandBloc] is a Bloc responsible for managing the brand state.
-/// 
+///
 /// This Bloc listens for [BrandEvent]s and updates the [BrandState]
 /// accordingly.
-/// The [BrandState] can be consumed by the [MaterialApp] to build the 
+/// The [BrandState] can be consumed by the [MaterialApp] to build the
 /// appropriate [ThemeData] based on the [BrandKey] stored in the state.
-/// 
+///
 /// To build the appropriate [ThemeData] based on the [BrandKey] is
 /// possible to use the [ThemeBuilder] utility form the `catalyst_voices_brands`
 /// package.
 ///
 /// The [BrandChangedEvent] accepts a [BrandKey] a simple enum that
 /// contains all possible brands/themes.
-/// 
+///
 /// To trigger the theme change is just necessary to dispatch the
 /// [BrandChangedEvent] with the appropriate key:
 ///
@@ -71,5 +71,4 @@ final class BrandBloc extends Bloc<BrandEvent, BrandState> {
   ) {
     emit(BrandState(brandKey: event.brand));
   }
-
 }

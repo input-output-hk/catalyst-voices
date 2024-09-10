@@ -23,7 +23,7 @@ final class TransactionBuilder extends Equatable {
 
   /// The list of transaction outputs which describes which address
   /// will receive what amount of [Coin].
-  final List<TransactionOutput> outputs;
+  final List<ShelleyMultiAssetTransactionOutput> outputs;
 
   /// The amount of lovelaces that will be charged as the fee
   /// for adding the transaction to the blockchain.
@@ -40,7 +40,7 @@ final class TransactionBuilder extends Equatable {
 
   /// The list of public key hashes of addresses
   /// that are required to sign the transaction.
-  final Set<Ed25519PublicKey>? requiredSigners;
+  final Set<Ed25519PublicKeyHash>? requiredSigners;
 
   /// Specifies on which network the code will run.
   final NetworkId? networkId;
@@ -74,14 +74,15 @@ final class TransactionBuilder extends Equatable {
   /// Since in a Cardano transaction the input amount must match the output
   /// amount plus fee, the method must ensure that there are no unspent utxos.
   ///
-  /// The algorithm first tries to create a [TransactionOutput] which will
-  /// transfer any remaining [Coin] back to the [address]. The [address]
-  /// should be the change address of the wallet initiating the transaction.
+  /// The algorithm first tries to create a [ShelleyMultiAssetTransactionOutput]
+  /// which will transfer any remaining [Coin] back to the [address].
+  /// The [address] should be the change address of the wallet initiating the
+  /// transaction.
   ///
-  /// If creating an extra [TransactionOutput] is not possible because
-  /// i.e. the remaining change is too small to cover for extra fee that such
-  /// extra output would generate then the transaction fee is increased to burn
-  /// any remaining change.
+  /// If creating an extra [ShelleyMultiAssetTransactionOutput] is not possible
+  /// because i.e. the remaining change is too small to cover for extra fee that
+  /// such extra output would generate then the transaction fee is increased to
+  ///  burn any remaining change.
   ///
   /// Follows code style of Cardano Multiplatform Lib to make patching easy.
   TransactionBuilder withChangeAddressIfNeeded(ShelleyAddress address) {
@@ -135,7 +136,7 @@ final class TransactionBuilder extends Equatable {
   /// The [output] must reach a minimum [Coin] value as calculated
   /// by [TransactionOutputBuilder.minimumAdaForOutput],
   /// otherwise [TxValueBelowMinUtxoValueException] is thrown.
-  TransactionBuilder withOutput(TransactionOutput output) {
+  TransactionBuilder withOutput(ShelleyMultiAssetTransactionOutput output) {
     final valueSize = cbor.encode(output.amount.toCbor()).length;
     if (valueSize > config.maxValueSize) {
       throw TxValueSizeExceededException(
@@ -340,7 +341,7 @@ final class TransactionBuilder extends Equatable {
   /// The function is used to split native assets into
   /// multiple outputs if they don't fit in one output.
   bool _willAddingAssetMakeOutputOverflow({
-    required TransactionOutput output,
+    required ShelleyMultiAssetTransactionOutput output,
     required Map<AssetName, Coin> currentAssets,
     required (PolicyId, AssetName, Coin) assetToAdd,
   }) {
@@ -481,7 +482,7 @@ final class TransactionBuilder extends Equatable {
   }
 
   TransactionBuilder _copyWith({
-    List<TransactionOutput>? outputs,
+    List<ShelleyMultiAssetTransactionOutput>? outputs,
     Coin? fee,
     TransactionWitnessSetBuilder? witnessBuilder,
   }) {
@@ -531,7 +532,7 @@ final class TransactionBuilderConfig extends Equatable {
       [feeAlgo, maxTxSize, maxValueSize, coinsPerUtxoByte];
 }
 
-/// Builder and utils around [TransactionOutput].
+/// Builder and utils around [ShelleyMultiAssetTransactionOutput].
 final class TransactionOutputBuilder {
   /// Constant from figure 5 in Babbage spec meant to represent
   /// the size of the input in a UTXO.
@@ -540,12 +541,12 @@ final class TransactionOutputBuilder {
   /// Prevents creating instances of [TransactionOutputBuilder].
   const TransactionOutputBuilder._();
 
-  /// Creates a new [TransactionOutput] that transfers
+  /// Creates a new [ShelleyMultiAssetTransactionOutput] that transfers
   /// the [multiAsset] to the address.
   ///
   /// Adds a minimum amount of [Coin] to the transaction to pass
   /// the [minimumAdaForOutput] validation.
-  static TransactionOutput withAssetAndMinRequiredCoin({
+  static ShelleyMultiAssetTransactionOutput withAssetAndMinRequiredCoin({
     required ShelleyAddress address,
     required MultiAsset multiAsset,
     required Coin coinsPerUtxoByte,
@@ -574,7 +575,7 @@ final class TransactionOutputBuilder {
   /// Calculates the additional fee for adding the [output] to the [builder].
   static Coin feeForOutput(
     TransactionBuilder builder,
-    TransactionOutput output,
+    ShelleyMultiAssetTransactionOutput output,
   ) {
     final prev = builder.withFee(const Coin(0));
     final prevFee = prev.minFee();
@@ -591,7 +592,7 @@ final class TransactionOutputBuilder {
   ///
   /// The algorithm considers all of above cases.
   static Coin minimumAdaForOutput(
-    TransactionOutput output,
+    ShelleyMultiAssetTransactionOutput output,
     Coin coinsPerUtxoByte,
   ) {
     final outputSize = cbor.encode(output.toCbor()).length;
