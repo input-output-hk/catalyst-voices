@@ -53,7 +53,7 @@ Through this paper we will use the following notations to refer to some entities
 Important to note that current protocol defined to work with the one specific proposal,
 so all definitions and procedures would be applied for some proposal $\mathcal{P}$.
 Obviously, it could be easily scaled for a set of proposals,
-performing all these steps in paralel.
+performing all these steps in parallel.
 
 The voting committee definition and voters registration
 are not subjects of this paper.
