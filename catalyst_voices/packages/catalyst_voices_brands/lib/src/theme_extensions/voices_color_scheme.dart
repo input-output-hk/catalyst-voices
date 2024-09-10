@@ -37,6 +37,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
   final Color? onSurfaceError016;
   final Color? iconsForeground;
   final Color? iconsBackground;
+  final Color? iconsOnImage;
   final Color? iconsDisabled;
   final Color? iconsPrimary;
   final Color? iconsSecondary;
@@ -49,8 +50,12 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
   final Color? avatarsWarning;
   final Color? avatarsError;
   final Color? elevationsOnSurfaceNeutralLv0;
+  final Color? elevationsOnSurfaceNeutralLv1Grey;
+  final Color? elevationsOnSurfaceNeutralLv1White;
+  final Color? elevationsOnSurfaceNeutralLv2;
   final Color? outlineBorder;
   final Color? outlineBorderVariant;
+  final Color? primary98;
   final Color? primaryContainer;
   final Color? onPrimaryContainer;
   final Color? errorContainer;
@@ -87,6 +92,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     required this.onSurfaceError016,
     required this.iconsForeground,
     required this.iconsBackground,
+    required this.iconsOnImage,
     required this.iconsDisabled,
     required this.iconsPrimary,
     required this.iconsSecondary,
@@ -99,8 +105,12 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     required this.avatarsWarning,
     required this.avatarsError,
     required this.elevationsOnSurfaceNeutralLv0,
+    required this.elevationsOnSurfaceNeutralLv1Grey,
+    required this.elevationsOnSurfaceNeutralLv1White,
+    required this.elevationsOnSurfaceNeutralLv2,
     required this.outlineBorder,
     required this.outlineBorderVariant,
+    required this.primary98,
     required this.primaryContainer,
     required this.onPrimaryContainer,
     required this.errorContainer,
@@ -139,6 +149,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     this.onSurfaceError016,
     this.iconsForeground,
     this.iconsBackground,
+    this.iconsOnImage,
     this.iconsDisabled,
     this.iconsPrimary,
     this.iconsSecondary,
@@ -151,8 +162,12 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     this.avatarsWarning,
     this.avatarsError,
     this.elevationsOnSurfaceNeutralLv0,
+    this.elevationsOnSurfaceNeutralLv1Grey,
+    this.elevationsOnSurfaceNeutralLv1White,
+    this.elevationsOnSurfaceNeutralLv2,
     this.outlineBorder,
     this.outlineBorderVariant,
+    this.primary98,
     this.primaryContainer,
     this.onPrimaryContainer,
     this.errorContainer,
@@ -191,6 +206,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     Color? onSurfaceError016,
     Color? iconsForeground,
     Color? iconsBackground,
+    Color? iconsOnImage,
     Color? iconsDisabled,
     Color? iconsPrimary,
     Color? iconsSecondary,
@@ -203,8 +219,12 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     Color? avatarsWarning,
     Color? avatarsError,
     Color? elevationsOnSurfaceNeutralLv0,
+    Color? elevationsOnSurfaceNeutralLv1Grey,
+    Color? elevationsOnSurfaceNeutralLv1White,
+    Color? elevationsOnSurfaceNeutralLv2,
     Color? outlineBorder,
     Color? outlineBorderVariant,
+    Color? primary98,
     Color? primaryContainer,
     Color? onPrimaryContainer,
     Color? errorContainer,
@@ -248,6 +268,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       onSurfaceError016: onSurfaceError016 ?? this.onSurfaceError016,
       iconsForeground: iconsForeground ?? this.iconsForeground,
       iconsBackground: iconsBackground ?? this.iconsBackground,
+      iconsOnImage: iconsOnImage ?? this.iconsOnImage,
       iconsDisabled: iconsDisabled ?? this.iconsDisabled,
       iconsPrimary: iconsPrimary ?? this.iconsPrimary,
       iconsSecondary: iconsSecondary ?? this.iconsSecondary,
@@ -261,8 +282,15 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       avatarsError: avatarsError ?? this.avatarsError,
       elevationsOnSurfaceNeutralLv0:
           elevationsOnSurfaceNeutralLv0 ?? this.elevationsOnSurfaceNeutralLv0,
+      elevationsOnSurfaceNeutralLv1Grey: elevationsOnSurfaceNeutralLv1Grey ??
+          this.elevationsOnSurfaceNeutralLv1Grey,
+      elevationsOnSurfaceNeutralLv1White: elevationsOnSurfaceNeutralLv1White ??
+          this.elevationsOnSurfaceNeutralLv1White,
+      elevationsOnSurfaceNeutralLv2:
+          elevationsOnSurfaceNeutralLv2 ?? this.elevationsOnSurfaceNeutralLv2,
       outlineBorder: outlineBorder ?? this.outlineBorder,
       outlineBorderVariant: outlineBorderVariant ?? this.outlineBorderVariant,
+      primary98: primary98 ?? this.primary98,
       primaryContainer: primaryContainer ?? this.primaryContainer,
       onPrimaryContainer: onPrimaryContainer ?? this.onPrimaryContainer,
       errorContainer: errorContainer ?? this.errorContainer,
@@ -339,6 +367,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
           Color.lerp(onSurfaceError016, other.onSurfaceError016, t),
       iconsForeground: Color.lerp(iconsForeground, other.iconsForeground, t),
       iconsBackground: Color.lerp(iconsBackground, other.iconsBackground, t),
+      iconsOnImage: Color.lerp(iconsOnImage, other.iconsOnImage, t),
       iconsDisabled: Color.lerp(iconsDisabled, other.iconsDisabled, t),
       iconsPrimary: Color.lerp(iconsPrimary, other.iconsPrimary, t),
       iconsSecondary: Color.lerp(iconsSecondary, other.iconsSecondary, t),
@@ -355,9 +384,25 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
         other.elevationsOnSurfaceNeutralLv0,
         t,
       ),
+      elevationsOnSurfaceNeutralLv1Grey: Color.lerp(
+        elevationsOnSurfaceNeutralLv1Grey,
+        other.elevationsOnSurfaceNeutralLv1Grey,
+        t,
+      ),
+      elevationsOnSurfaceNeutralLv1White: Color.lerp(
+        elevationsOnSurfaceNeutralLv1White,
+        other.elevationsOnSurfaceNeutralLv1White,
+        t,
+      ),
+      elevationsOnSurfaceNeutralLv2: Color.lerp(
+        elevationsOnSurfaceNeutralLv2,
+        other.elevationsOnSurfaceNeutralLv2,
+        t,
+      ),
       outlineBorder: Color.lerp(outlineBorder, other.outlineBorder, t),
       outlineBorderVariant:
           Color.lerp(outlineBorderVariant, other.outlineBorderVariant, t),
+      primary98: Color.lerp(primary98, other.primary98, t),
       primaryContainer: Color.lerp(primaryContainer, other.primaryContainer, t),
       onPrimaryContainer:
           Color.lerp(onPrimaryContainer, other.onPrimaryContainer, t),

@@ -7,10 +7,10 @@
 // ignore_for_file: type=lint
 // ignore_for_file: directives_ordering,unnecessary_import,implicit_dynamic_list_literal,deprecated_member_use
 
-import 'package:flutter/widgets.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:vector_graphics/vector_graphics.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_svg/flutter_svg.dart' as _svg;
+import 'package:vector_graphics/vector_graphics.dart' as _vg;
 
 class $AssetsImagesGen {
   const $AssetsImagesGen();
@@ -35,9 +35,19 @@ class $AssetsImagesGen {
   AssetGenImage get comingSoonBkg =>
       const AssetGenImage('assets/images/coming_soon_bkg.webp');
 
+  /// File path: assets/images/dragger.svg
+  SvgGenImage get dragger => const SvgGenImage('assets/images/dragger.svg');
+
   /// File path: assets/images/dummy_catalyst_voices.webp
   AssetGenImage get dummyCatalystVoices =>
       const AssetGenImage('assets/images/dummy_catalyst_voices.webp');
+
+  /// File path: assets/images/facebook.svg
+  SvgGenImage get facebook => const SvgGenImage('assets/images/facebook.svg');
+
+  /// File path: assets/images/facebook_mono.svg
+  SvgGenImage get facebookMono =>
+      const SvgGenImage('assets/images/facebook_mono.svg');
 
   /// File path: assets/images/fallback_logo.svg
   SvgGenImage get fallbackLogo =>
@@ -47,6 +57,37 @@ class $AssetsImagesGen {
   SvgGenImage get fallbackLogoIcon =>
       const SvgGenImage('assets/images/fallback_logo_icon.svg');
 
+  /// File path: assets/images/linkedin.svg
+  SvgGenImage get linkedin => const SvgGenImage('assets/images/linkedin.svg');
+
+  /// File path: assets/images/linkedin_mono.svg
+  SvgGenImage get linkedinMono =>
+      const SvgGenImage('assets/images/linkedin_mono.svg');
+
+  /// File path: assets/images/node-closed.svg
+  SvgGenImage get nodeClosed =>
+      const SvgGenImage('assets/images/node-closed.svg');
+
+  /// File path: assets/images/node_open.svg
+  SvgGenImage get nodeOpen => const SvgGenImage('assets/images/node_open.svg');
+
+  /// File path: assets/images/proposal_background_1.webp
+  AssetGenImage get proposalBackground1 =>
+      const AssetGenImage('assets/images/proposal_background_1.webp');
+
+  /// File path: assets/images/proposal_background_2.webp
+  AssetGenImage get proposalBackground2 =>
+      const AssetGenImage('assets/images/proposal_background_2.webp');
+
+  /// File path: assets/images/view_grid.svg
+  SvgGenImage get viewGrid => const SvgGenImage('assets/images/view_grid.svg');
+
+  /// File path: assets/images/x.svg
+  SvgGenImage get x => const SvgGenImage('assets/images/x.svg');
+
+  /// File path: assets/images/x_mono.svg
+  SvgGenImage get xMono => const SvgGenImage('assets/images/x_mono.svg');
+
   /// List of all assets
   List<dynamic> get values => [
         catalystLogo,
@@ -54,9 +95,21 @@ class $AssetsImagesGen {
         catalystLogoIconWhite,
         catalystLogoWhite,
         comingSoonBkg,
+        dragger,
         dummyCatalystVoices,
+        facebook,
+        facebookMono,
         fallbackLogo,
-        fallbackLogoIcon
+        fallbackLogoIcon,
+        linkedin,
+        linkedinMono,
+        nodeClosed,
+        nodeOpen,
+        proposalBackground1,
+        proposalBackground2,
+        viewGrid,
+        x,
+        xMono
       ];
 }
 
@@ -67,11 +120,16 @@ class VoicesAssets {
 }
 
 class AssetGenImage {
-  const AssetGenImage(this._assetName, {this.size = null});
+  const AssetGenImage(
+    this._assetName, {
+    this.size,
+    this.flavors = const {},
+  });
 
   final String _assetName;
 
   final Size? size;
+  final Set<String> flavors;
 
   Image image({
     Key? key,
@@ -145,20 +203,22 @@ class AssetGenImage {
 class SvgGenImage {
   const SvgGenImage(
     this._assetName, {
-    this.size = null,
+    this.size,
+    this.flavors = const {},
   }) : _isVecFormat = false;
 
   const SvgGenImage.vec(
     this._assetName, {
-    this.size = null,
+    this.size,
+    this.flavors = const {},
   }) : _isVecFormat = true;
 
   final String _assetName;
-
   final Size? size;
+  final Set<String> flavors;
   final bool _isVecFormat;
 
-  SvgPicture svg({
+  _svg.SvgPicture svg({
     Key? key,
     bool matchTextDirection = false,
     AssetBundle? bundle,
@@ -171,19 +231,30 @@ class SvgGenImage {
     WidgetBuilder? placeholderBuilder,
     String? semanticsLabel,
     bool excludeFromSemantics = false,
-    SvgTheme? theme,
+    _svg.SvgTheme? theme,
     ColorFilter? colorFilter,
     Clip clipBehavior = Clip.hardEdge,
     @deprecated Color? color,
     @deprecated BlendMode colorBlendMode = BlendMode.srcIn,
     @deprecated bool cacheColorFilter = false,
   }) {
-    return SvgPicture(
-      _isVecFormat
-          ? AssetBytesLoader(_assetName,
-              assetBundle: bundle, packageName: package)
-          : SvgAssetLoader(_assetName,
-              assetBundle: bundle, packageName: package),
+    final _svg.BytesLoader loader;
+    if (_isVecFormat) {
+      loader = _vg.AssetBytesLoader(
+        _assetName,
+        assetBundle: bundle,
+        packageName: package,
+      );
+    } else {
+      loader = _svg.SvgAssetLoader(
+        _assetName,
+        assetBundle: bundle,
+        packageName: package,
+        theme: theme,
+      );
+    }
+    return _svg.SvgPicture(
+      loader,
       key: key,
       matchTextDirection: matchTextDirection,
       width: width,
@@ -194,7 +265,6 @@ class SvgGenImage {
       placeholderBuilder: placeholderBuilder,
       semanticsLabel: semanticsLabel,
       excludeFromSemantics: excludeFromSemantics,
-      theme: theme,
       colorFilter: colorFilter ??
           (color == null ? null : ColorFilter.mode(color, colorBlendMode)),
       clipBehavior: clipBehavior,

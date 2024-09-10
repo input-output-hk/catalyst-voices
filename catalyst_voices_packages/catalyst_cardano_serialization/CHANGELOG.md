@@ -1,3 +1,28 @@
+## 0.4.0
+
+> Note: This release has breaking changes.
+
+ - **FIX**: to be signed message should be a plain cbor sequence ([#701](https://github.com/input-output-hk/catalyst-voices/issues/701)). ([7c2dec6e](https://github.com/input-output-hk/catalyst-voices/commit/7c2dec6e2f91c1f18a39e7646ee3a5ca6a6e7249))
+ - **FIX**: rbac txn inputs hash ([#688](https://github.com/input-output-hk/catalyst-voices/issues/688)). ([b644026f](https://github.com/input-output-hk/catalyst-voices/commit/b644026fa3b675591d071819eda185365257f0d1))
+ - **FEAT**(catalyst_cardano_serialization): add CborEncodable interface for standardized CBOR handling ([#696](https://github.com/input-output-hk/catalyst-voices/issues/696)). ([4222926f](https://github.com/input-output-hk/catalyst-voices/commit/4222926f028460ddb100008806fe39a38ac3511c))
+ - **BREAKING** **FIX**: required signers are the hash of the public key, not the public key itself ([#703](https://github.com/input-output-hk/catalyst-voices/issues/703)). ([a63c4686](https://github.com/input-output-hk/catalyst-voices/commit/a63c4686ee6e79aa65ace0cb4ed9b0c91e994320))
+ - **BREAKING** **FEAT**: add initial support for Cardano Native scripts, Plutus scripts, advanced transaction outputs, and additional transaction body fields and witnesses ([#713](https://github.com/input-output-hk/catalyst-voices/issues/713)). ([74fcb725](https://github.com/input-output-hk/catalyst-voices/commit/74fcb725f221bb3acf3824a3dd18a073d0a321e0))
+ - **BREAKING** **CHORE**: upgrade flutter to 3.24.1 and dart to 3.5.0 ([#725](https://github.com/input-output-hk/catalyst-voices/issues/725)). ([eb8a516e](https://github.com/input-output-hk/catalyst-voices/commit/eb8a516edbd25386c0fbe41501285870abf82543))
+
+## 0.3.0
+
+> Note: This release has breaking changes.
+
+ - **BREAKING** **FIX**: cardano serialization must depend on flutter ([#679](https://github.com/input-output-hk/catalyst-voices/issues/679)). ([b7d5276b](https://github.com/input-output-hk/catalyst-voices/commit/b7d5276b238b4c7273997b004465e2ffb29f8436))
+
+## 0.2.0
+
+> Note: This release has breaking changes.
+
+ - **FEAT**: add catv1 auth token generator ([#671](https://github.com/input-output-hk/catalyst-voices/issues/671)). ([79efc828](https://github.com/input-output-hk/catalyst-voices/commit/79efc82800a7e6aca3e8516bbb4866bd502e2f36))
+ - **BREAKING** **FIX**: X509 registration metadata encoding ([#640](https://github.com/input-output-hk/catalyst-voices/issues/640)). ([c45a2ac9](https://github.com/input-output-hk/catalyst-voices/commit/c45a2ac96b34c4215352ece5ef9bd2fa73b591e8))
+ - **BREAKING** **FEAT**: update transactions inputs hash size ([#643](https://github.com/input-output-hk/catalyst-voices/issues/643)). ([a729823d](https://github.com/input-output-hk/catalyst-voices/commit/a729823d9b2e0c369456f8e99f5b776f046e6d1f))
+
 ## 0.1.3
 
  - **FEAT**: rbac metadata envelope ([#630](https://github.com/input-output-hk/catalyst-voices/issues/630)). ([150d5676](https://github.com/input-output-hk/catalyst-voices/commit/150d567636c4281c092d020d51882e638b16beb5))

@@ -70,7 +70,7 @@ void main() {
       expect(
         hash,
         equals(
-          TransactionInputsHash.fromHex('26497de5e0c8fe2e4b0c85651f96b3c9'),
+          TransactionInputsHash.fromHex('7336167445e63489f9c477367fd7a529'),
         ),
       );
     });

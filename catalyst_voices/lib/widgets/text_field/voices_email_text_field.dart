@@ -18,12 +18,10 @@ final class VoicesEmailTextField extends StatelessWidget {
       keyboardType: TextInputType.emailAddress,
       textInputAction: TextInputAction.next,
       onChanged: onChanged,
-      decoration: InputDecoration(
-        filled: true,
+      decoration: VoicesTextFieldDecoration(
         labelText: l10n.emailLabelText,
         hintText: l10n.emailHintText,
         errorText: l10n.emailErrorText,
-        border: const OutlineInputBorder(),
       ),
       style: const TextStyle(
         fontWeight: FontWeight.w500,
