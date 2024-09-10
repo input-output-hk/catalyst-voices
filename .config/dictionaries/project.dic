@@ -46,6 +46,7 @@ cryptoxide
 Cunego
 Cupertino
 dalek
+damian-molinski
 DAPPLICATION
 dbeaver
 dbschema
@@ -62,11 +63,13 @@ dreps
 dtscalac
 earthfile
 Easterling
+eddsa
 Edgedriver
 emurgo
 encryptor
 endfunction
 Eternl
+EUTXO
 fetchval
 fluttericon
 fmtchk
@@ -86,6 +89,7 @@ gmtime
 gradlew
 headlessui
 HIDPI
+hotspots
 icudtl
 ideascale
 idents
@@ -93,6 +97,7 @@ ilap
 Instantitation
 integ
 Intellij
+interps
 iohk
 iphoneos
 jdbc
@@ -119,6 +124,7 @@ localizable
 loguru
 lovelace
 lovelaces
+LTRB
 mdlint
 metadatum
 metadatums
@@ -135,6 +141,7 @@ multidex
 multiplatform
 Multiplatform
 myproject
+Nami
 nanos
 NDEBUG
 netifas
@@ -209,6 +216,8 @@ thollander
 timelike
 toastify
 Toastify
+todos
+toggleable
 tojunit
 Traceback
 traefik
@@ -216,11 +225,13 @@ trailings
 TXNZD
 Typer
 unawaited
+unchunk
 unmanaged
 utxo
 UTXO
 utxos
 Utxos
+Vespr
 vite
 vitss
 vkey
@@ -228,6 +239,7 @@ vkeys
 vkeywitness
 voteplan
 voteplans
+vsync
 wallclock
 wasmtime
 Wconditional
