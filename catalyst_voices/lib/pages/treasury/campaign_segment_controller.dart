@@ -1,9 +1,7 @@
 import 'package:catalyst_voices/widgets/menu/voices_node_menu.dart';
 import 'package:flutter/material.dart';
 
-typedef ControllerBuilder = CampaignController Function(
-  Object segmentId,
-);
+typedef CampaignControllerBuilder = CampaignController Function(Object id);
 
 final class CampaignControllerStateData extends VoicesNodeMenuStateData {
   const CampaignControllerStateData({
@@ -20,7 +18,7 @@ final class CampaignController extends VoicesNodeMenuController {
 
 /// Keeps together [CampaignControllerStateData] tied to ids.
 class CampaignControllerScope extends StatefulWidget {
-  final ControllerBuilder builder;
+  final CampaignControllerBuilder builder;
   final Widget child;
 
   const CampaignControllerScope({
