@@ -1,8 +1,29 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart' show SvgTheme;
+import 'package:flutter_svg/flutter_svg.dart'
+    show SvgTheme, svg, SvgAssetLoader, ColorMapper;
 
 extension SvgGenImageExt on SvgGenImage {
+  /// Pre caching this svg if not already cached.
+  Future<ByteData> cache({
+    BuildContext? context,
+    String package = 'catalyst_voices_assets',
+    AssetBundle? bundle,
+    ColorMapper? colorMapper,
+  }) {
+    final loader = SvgAssetLoader(
+      path,
+      packageName: package,
+      assetBundle: bundle,
+      colorMapper: colorMapper,
+    );
+    return svg.cache.putIfAbsent(
+      loader.cacheKey(context),
+      () => loader.loadBytes(context),
+    );
+  }
+
   /// Builds [CatalystSvgPicture]. See class for more context.
   Widget buildPicture({
     Key? key,
@@ -76,6 +97,29 @@ extension SvgGenImageExt on SvgGenImage {
       theme: theme,
       colorFilter: colorFilter,
       allowColorFilter: allowColorFilter,
+    );
+  }
+}
+
+extension AssetGenImageExt on AssetGenImage {
+  Future<void> cache({
+    required BuildContext context,
+    AssetBundle? bundle,
+    String package = 'catalyst_voices_assets',
+    Size? size,
+    ImageErrorListener? onError,
+  }) {
+    final loader = AssetImage(
+      path,
+      bundle: bundle,
+      package: package,
+    );
+
+    return precacheImage(
+      loader,
+      context,
+      size: size,
+      onError: onError,
     );
   }
 }
