@@ -11,11 +11,15 @@ import 'package:flutter/material.dart';
 class FundedProposalCard extends StatelessWidget {
   final AssetGenImage image;
   final FundedProposal proposal;
+  final bool isFavorite;
+  final ValueChanged<bool>? onFavoriteChanged;
 
   const FundedProposalCard({
     super.key,
     required this.image,
     required this.proposal,
+    this.isFavorite = false,
+    this.onFavoriteChanged,
   });
 
   @override
@@ -30,7 +34,11 @@ class FundedProposalCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _Header(image: image),
+          _Header(
+            image: image,
+            isFavorite: isFavorite,
+            onFavoriteChanged: onFavoriteChanged,
+          ),
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -62,8 +70,14 @@ class FundedProposalCard extends StatelessWidget {
 
 class _Header extends StatelessWidget {
   final AssetGenImage image;
+  final bool isFavorite;
+  final ValueChanged<bool>? onFavoriteChanged;
 
-  const _Header({required this.image});
+  const _Header({
+    required this.image,
+    required this.isFavorite,
+    required this.onFavoriteChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -77,19 +91,20 @@ class _Header extends StatelessWidget {
               fit: BoxFit.cover,
             ),
           ),
-          Positioned(
-            top: 2,
-            right: 2,
-            child: IconButton(
-              padding: EdgeInsets.zero,
-              onPressed: () {},
-              icon: Icon(
-                CatalystVoicesIcons.star,
-                size: 20,
-                color: Theme.of(context).colors.iconsOnImage,
+          if (onFavoriteChanged != null)
+            Positioned(
+              top: 2,
+              right: 2,
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                onPressed: () => onFavoriteChanged?.call(!isFavorite),
+                icon: Icon(
+                  isFavorite ? Icons.favorite : CatalystVoicesIcons.star,
+                  size: 20,
+                  color: Theme.of(context).colors.iconsOnImage,
+                ),
               ),
             ),
-          ),
           Positioned(
             left: 12,
             bottom: 12,
