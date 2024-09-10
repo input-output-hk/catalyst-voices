@@ -42,6 +42,12 @@ Through this paper we will use the following notations to refer to some entities
 * **Election public key** $pk$ - a committee's generated public key,
   which is shared across all voters
   and used for vote's encryption and tallying processes.
+* **Voter's voting power** $\alpha_i$, $i \in [1, \ldots, n]$ -
+  an integer value which defines a voting power for a voter $v_i$.
+  This value could be equals to $1$ for every voter,
+  so everyone would be equal in their voting rights.
+  Or it could be defined based on their stake in the blockchain,
+  which is more appropriate for web3 systems.
 
 The generation of the proposals set or proposal submission procedure
 as well as voting committee definition and voters registration
@@ -57,6 +63,8 @@ Before any voting will start an initial setup procedure should be performed.
   If committee consists from more than 1 member,
   it is possible to use some distributed key generation algorithms,
   which is not a topic of the current document.
+* Define for each voter their own voting power.
+  Basically this step could be done at any point of time, but before the tally.
 
 ### Vote
 
@@ -144,6 +152,20 @@ It could be published using any public channel, e.g. blockchain, ipfs, on any p2
 but this is not a topic of current document.
 
 ### Tally
+
+After the every voter done the choice and published it,
+voter committee could perform tally.
+It is performed for each proposal independently,
+so above description would be applied for some proposal $p$ with the amount of voting choices $m$.
+
+Lets denote $C := {\mathbf{c}_{v_1}, \mathbf{c}_{v_2}, \ldots, \mathbf{c}_{v_n}}$
+as a voter ballots for the specific proposal,
+where $\mathbf{c}_{v_i}$, $i \in [1, \ldots, n]$ is an encrypted unit vector with the choice of a voter $v_i$ ($n$ - number of voters),
+which was generated on this [step](#vote-encrypting-procedure).
+
+
+Each qualified committee member $c_j$ firstly computes the following
+
 
 ## Rationale
 
