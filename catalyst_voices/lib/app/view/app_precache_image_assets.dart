@@ -4,6 +4,31 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+class GlobalPrecacheImages extends StatelessWidget {
+  final Widget child;
+
+  const GlobalPrecacheImages({
+    super.key,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return AppPrecacheImageAssets(
+      svgs: [
+        theme.brandAssets.logo,
+        theme.brandAssets.logoIcon,
+      ],
+      assets: [
+        VoicesAssets.images.comingSoonBkg,
+      ],
+      child: child,
+    );
+  }
+}
+
 /// A widget that pre-caches SVG and image assets before displaying its
 /// child widget.
 ///
@@ -17,11 +42,19 @@ import 'package:flutter/material.dart';
 /// as little work as possible when [Theme] is changing by caching
 /// previously loaded assets.
 class AppPrecacheImageAssets extends StatefulWidget {
+  /// List of [SvgGenImage] which should be cached.
+  final List<SvgGenImage> svgs;
+
+  /// List of [AssetGenImage] which should be cached.
+  final List<AssetGenImage> assets;
+
   /// The child widget to be displayed once the images have been pre-cached.
   final Widget child;
 
   const AppPrecacheImageAssets({
     super.key,
+    this.svgs = const [],
+    this.assets = const [],
     required this.child,
   });
 
@@ -38,45 +71,22 @@ class _AppPrecacheImageAssetsState extends State<AppPrecacheImageAssets> {
   late Future<void> _cacheFuture;
 
   @override
+  void didUpdateWidget(covariant AppPrecacheImageAssets oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (_areImagesDifferent()) {
+      print('didUpdateWidget. _updateImagesCache');
+      _updateImagesCache();
+    }
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final theme = Theme.of(context);
-
-    final svgs = [
-      theme.brandAssets.logo,
-      theme.brandAssets.logoIcon,
-    ];
-
-    final assets = [
-      VoicesAssets.images.comingSoonBkg,
-    ];
-
-    final paths = [
-      ...svgs.map((e) => e.path),
-      ...assets.map((e) => e.path),
-    ];
-    final currentPaths = [
-      ..._svgs.map((e) => e.path),
-      ..._assets.map((e) => e.path),
-    ];
-
-    if (!listEquals(paths, currentPaths)) {
-      _hadImages = _svgs.isNotEmpty || _assets.isNotEmpty;
-
-      _svgs
-        ..clear()
-        ..addAll(svgs);
-      _assets
-        ..clear()
-        ..addAll(assets);
-
-      final futures = <Future<void>>[
-        ...svgs.map((e) => e.cache(context: context)),
-        ...assets.map((e) => e.cache(context: context)),
-      ];
-
-      _cacheFuture = Future.wait(futures);
+    if (_areImagesDifferent()) {
+      print('didChangeDependencies. _updateImagesCache');
+      _updateImagesCache();
     }
   }
 
@@ -100,6 +110,44 @@ class _AppPrecacheImageAssetsState extends State<AppPrecacheImageAssets> {
         };
       },
     );
+  }
+
+  void _updateImagesCache() {
+    _hadImages = _svgs.isNotEmpty || _assets.isNotEmpty;
+
+    _svgs
+      ..clear()
+      ..addAll(widget.svgs);
+    _assets
+      ..clear()
+      ..addAll(widget.assets);
+
+    _cacheFuture = _buildCacheFuture(svgs: _svgs, assets: _assets);
+  }
+
+  bool _areImagesDifferent() {
+    final old = [
+      ..._svgs.map((e) => e.path),
+      ..._assets.map((e) => e.path),
+    ];
+    final current = [
+      ...widget.svgs.map((e) => e.path),
+      ...widget.assets.map((e) => e.path),
+    ];
+
+    return !listEquals(old, current);
+  }
+
+  Future<void> _buildCacheFuture({
+    List<SvgGenImage> svgs = const [],
+    List<AssetGenImage> assets = const [],
+  }) {
+    final futures = <Future<void>>[
+      ...svgs.map((e) => e.cache(context: context)),
+      ...assets.map((e) => e.cache(context: context)),
+    ];
+
+    return Future.wait(futures);
   }
 }
 
