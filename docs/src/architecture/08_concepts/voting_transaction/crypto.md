@@ -30,9 +30,10 @@ and performing tally process for executing "Catalyst" fund events.
 
 Through this paper we will use the following notations to refer to some entities of this protocol:
 
-* **Proposals set** $\mathcal{P}:=\{p_1,\ldots, p_k \}$ -
-  voting subjects on which each voter will be cast their votes.
-  Where $k$ - a number of proposals in the proposals set.
+* **Proposal** $\mathcal{P}$ -
+  voting subject on which each voter will be cast their votes.
+* **Proposal voting options** $M$ -
+  an amount of different proposal options, e.g. "Yes", "No", "Abstain", $M := 3$.
 * **Voting committee set** $\mathcal{C}:=\{c_1,\ldots, c_l \}$ -
   a special **trusted** entity, which perform tally process and revealing the results of the tallying.
   It has a capability to de anonymize each vote.
@@ -49,16 +50,20 @@ Through this paper we will use the following notations to refer to some entities
   Or it could be defined based on their stake in the blockchain,
   which is more appropriate for web3 systems.
 
-The generation of the proposals set or proposal submission procedure
-as well as voting committee definition and voters registration
+Important to note that current protocol defined to work with the one specific proposal,
+so all definitions and procedures would be applied for some proposal $\mathcal{P}$.
+Obviously, it could be easily scaled for a set of proposals,
+performing all these steps in paralel.
+
+The voting committee definition and voters registration
 are not subjects of this paper.
 
 ### Initial setup
 
 Before any voting will start an initial setup procedure should be performed.
 
-* Define a number of voting options/choices for each proposal,
-  e.g. "Yes", "No", "Abstain" - 3 voting options.
+* Define a number of voting options/choices $M$ for a proposal $\mathcal{P}$,
+  e.g. "Yes", "No", "Abstain" - 3 voting options, so $M$ equals to 3.
 * Voting committee must generate a shared election public key.
   If committee consists from more than 1 member,
   it is possible to use some distributed key generation algorithms,
@@ -68,7 +73,7 @@ Before any voting will start an initial setup procedure should be performed.
 
 ### Vote
 
-Each voter $v_i$, $i \in [1, n]$ could cast a vote for some proposal $p_j$, $j \in [1, \ldots, k]$.
+Each voter $v_i$, $i \in [1, n]$ could cast a vote for the proposal $\mathcal{P}$.
 To do that, obviously, a voting choice should be made and decoded in specific format.
 Next step to achieve the anonymity this voting choice must be encrypted,
 using the specific election public key, so later voting committee could perform tally.
@@ -79,21 +84,22 @@ So we will preserve anonymity without lacking transparency and correctness.
 
 #### Voting choice
 
-For a specific proposal  voter generates a unit vector $\mathbf{e}_t$, $t \in [1, \ldots, m_j]$.
+For a specific proposal $\mathcal{P}$
+voter generates a unit vector $\mathbf{e}_t$, $t \in [1, \ldots, M]$.
 Where $t$-th component is $1$ and the rest components are $0$,
-$m_j$ - proposal's $p_j$ voting options number.
+$M$ - proposal's voting options number.
 
-E.g. proposal has 3 voting options ("Yes", "No", "Abstain"), so $m_j$ would be equals to $3$:
+E.g. proposal has 3 voting options ("Yes", "No", "Abstain"):
 
 * $\mathbf{e}_1$ equals to $100$,
 * $\mathbf{e}_2$ equals to $010$,
 * $\mathbf{e}_3$ equals to $001$
 
-Lets $e_{t,f}$, $f \in [1, \ldots, m_j]$
+Lets $e_{t,f}$, $f \in [1, \ldots, M]$
 denote as an each component value of the unit vector $e_t$.
 <!-- markdownlint-disable emphasis-style -->
 \begin{equation}
-\mathbf{e}_t = (e_{t,1}, \ldots, e_{t,m_j})
+\mathbf{e}_t = (e_{t,1}, \ldots, e_{t,M})
 \end{equation}
 <!-- markdownlint-enable emphasis-style -->
 
@@ -121,7 +127,7 @@ As a result getting a vector $\mathbf{c}$ of ciphertext values $c_f$,
 with the size equals of the size $\mathbf{e}_t$ unit vector.
 Lets denote this vector as:
 \begin{equation}
-\mathbf{c} = (c_1, \ldots, c_{m_j})
+\mathbf{c} = (c_1, \ldots, c_{M})
 \end{equation}
 
 This is a first part of the published vote for a specific proposal.
@@ -154,9 +160,8 @@ but this is not a topic of current document.
 ### Tally
 
 After the every voter done the choice and published it,
-voter committee could perform tally.
-It is performed for each proposal independently,
-so above description would be applied for some proposal $p$ with the amount of voting choices $m$.
+voter committee could perform tally,
+for some proposal $\mathcal{P}$ with the amount of voting choices $M$.
 
 Lets denote $C := {\mathbf{c}_{v_1}, \mathbf{c}_{v_2}, \ldots, \mathbf{c}_{v_n}}$
 as a voter ballots for the specific proposal,
