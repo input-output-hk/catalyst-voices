@@ -13,8 +13,13 @@ class VoicesMenuExample extends StatefulWidget {
 }
 
 class _VoicesMenuExampleState extends State<VoicesMenuExample> {
-  int? _selected = 0;
-  bool _isExpanded = true;
+  final _problemSensingController = VoicesNodeMenuController();
+
+  @override
+  void dispose() {
+    _problemSensingController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,22 +35,17 @@ class _VoicesMenuExampleState extends State<VoicesMenuExample> {
                 const _MenuExample2(),
                 VoicesNodeMenu(
                   name: 'Problem-sensing stage',
-                  isExpanded: _isExpanded,
-                  selected: _selected,
-                  items: const [
+                  controller: _problemSensingController,
+                  items: [
                     VoicesNodeMenuItem(id: 0, label: 'Start'),
                     VoicesNodeMenuItem(id: 1, label: 'Vote'),
                     VoicesNodeMenuItem(id: 2, label: 'Results'),
                   ],
                   onSelectionChanged: (value) {
-                    setState(() {
-                      _selected = value;
-                    });
+                    _problemSensingController.selected = value;
                   },
                   onExpandChanged: (value) {
-                    setState(() {
-                      _isExpanded = value;
-                    });
+                    _problemSensingController.isExpanded = value;
                   },
                 ),
               ].separatedBy(const SizedBox(height: 12)).toList(),
