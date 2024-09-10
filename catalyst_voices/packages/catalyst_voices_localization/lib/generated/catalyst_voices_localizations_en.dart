@@ -131,7 +131,10 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get proposalStatusDraft => 'Draft';
 
   @override
-  String get fundedProposal => 'Funded Proposal';
+  String get fundedProposal => 'Funded proposal';
+
+  @override
+  String get publishedProposal => 'Published proposal';
 
   @override
   String fundedProposalDate(DateTime date) {
@@ -139,6 +142,11 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
     final String dateString = dateDateFormat.format(date);
 
     return 'Funded $dateString';
+  }
+
+  @override
+  String lastUpdateDate(String date) {
+    return 'Last update: $date.';
   }
 
   @override
@@ -161,4 +169,55 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
     );
     return '$countString $_temp0';
   }
+
+  @override
+  String noOfSegmentsCompleted(num completed, num total, num percentage) {
+    final intl.NumberFormat completedNumberFormat = intl.NumberFormat.compact(
+      locale: localeName,
+      
+    );
+    final String completedString = completedNumberFormat.format(completed);
+    final intl.NumberFormat totalNumberFormat = intl.NumberFormat.compact(
+      locale: localeName,
+      
+    );
+    final String totalString = totalNumberFormat.format(total);
+    final intl.NumberFormat percentageNumberFormat = intl.NumberFormat.compact(
+      locale: localeName,
+      
+    );
+    final String percentageString = percentageNumberFormat.format(percentage);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other: 'segments',
+      one: 'segment',
+      zero: 'segments',
+    );
+    return '$completedString of $totalString ($percentageString%) $_temp0 completed';
+  }
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get yesterday => 'Yesterday';
+
+  @override
+  String get twoDaysAgo => '2 days ago';
+
+  @override
+  String get tomorrow => 'Tomorrow';
+
+  @override
+  String get activeVotingRound => 'Active voting round 14';
+
+  @override
+  String noOfAllProposals(int count) {
+    return 'All proposals ($count)';
+  }
+
+  @override
+  String get favorites => 'Favorites';
 }

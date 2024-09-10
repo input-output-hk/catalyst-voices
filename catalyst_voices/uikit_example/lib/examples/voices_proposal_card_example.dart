@@ -1,7 +1,9 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_voices/widgets/cards/pending_proposal_card.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 final _description = """
@@ -30,6 +32,7 @@ class VoicesProposalCardExample extends StatelessWidget {
             FundedProposalCard(
               image: VoicesAssets.images.proposalBackground1,
               proposal: FundedProposal(
+                id: 'f14/1',
                 fund: 'F14',
                 category: 'Cardano Use Cases / MVP',
                 title: 'Proposal Title that rocks the world',
@@ -39,16 +42,19 @@ class VoicesProposalCardExample extends StatelessWidget {
                 description: _description,
               ),
             ),
-            FundedProposalCard(
+            PendingProposalCard(
               image: VoicesAssets.images.proposalBackground2,
-              proposal: FundedProposal(
+              proposal: PendingProposal(
+                id: 'f14/2',
                 fund: 'F14',
                 category: 'Cardano Use Cases / MVP',
                 title: 'Proposal Title that rocks the world',
-                fundedDate: DateTime(2025, 1, 28),
+                lastUpdateDate: DateTime.now().minusDays(2),
                 fundsRequested: Coin.fromAda(100000),
                 commentsCount: 0,
                 description: _description,
+                completedSegments: 7,
+                totalSegments: 13,
               ),
             ),
           ],

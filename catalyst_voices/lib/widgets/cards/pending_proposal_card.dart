@@ -1,4 +1,5 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_voices/common/formatters/date_formatter.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -7,14 +8,14 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
-/// Displays a proposal in funded state on a card.
-class FundedProposalCard extends StatelessWidget {
+/// Displays a proposal in pending state on a card.
+class PendingProposalCard extends StatelessWidget {
   final AssetGenImage image;
-  final FundedProposal proposal;
+  final PendingProposal proposal;
   final bool isFavorite;
   final ValueChanged<bool>? onFavoriteChanged;
 
-  const FundedProposalCard({
+  const PendingProposalCard({
     super.key,
     required this.image,
     required this.proposal,
@@ -51,7 +52,7 @@ class FundedProposalCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 _Title(text: proposal.title),
                 const SizedBox(height: 4),
-                _FundedDate(dateTime: proposal.fundedDate),
+                _LastUpdateDate(dateTime: proposal.lastUpdateDate),
                 const SizedBox(height: 24),
                 _FundsAndComments(
                   funds: proposal.fundsRequested,
@@ -61,6 +62,10 @@ class FundedProposalCard extends StatelessWidget {
                 _Description(text: proposal.description),
               ],
             ),
+          ),
+          _CompletedSegments(
+            completed: proposal.completedSegments,
+            total: proposal.totalSegments,
           ),
         ],
       ),
@@ -114,7 +119,7 @@ class _Header extends StatelessWidget {
                 CatalystVoicesIcons.briefcase,
                 color: Theme.of(context).colorScheme.primary,
               ),
-              content: Text(context.l10n.fundedProposal),
+              content: Text(context.l10n.publishedProposal),
               backgroundColor: Theme.of(context).colors.primary98,
             ),
           ),
@@ -168,15 +173,17 @@ class _Title extends StatelessWidget {
   }
 }
 
-class _FundedDate extends StatelessWidget {
+class _LastUpdateDate extends StatelessWidget {
   final DateTime dateTime;
 
-  const _FundedDate({required this.dateTime});
+  const _LastUpdateDate({required this.dateTime});
 
   @override
   Widget build(BuildContext context) {
     return Text(
-      context.l10n.fundedProposalDate(dateTime),
+      context.l10n.lastUpdateDate(
+        DateFormatter.formatRecentDate(context.l10n, dateTime),
+      ),
       style: Theme.of(context).textTheme.bodySmall,
     );
   }
@@ -196,7 +203,7 @@ class _FundsAndComments extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
-        color: Theme.of(context).colors.success?.withOpacity(0.08),
+        color: Theme.of(context).colorScheme.primary.withOpacity(0.12),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -218,10 +225,15 @@ class _FundsAndComments extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
             leading: Icon(
               CatalystVoicesIcons.check_circle,
-              color: Theme.of(context).colors.success,
+              color: Theme.of(context).colorScheme.primary,
             ),
-            content: Text(context.l10n.noOfComments(commentsCount)),
-            backgroundColor: Theme.of(context).colors.successContainer,
+            content: Text(
+              context.l10n.noOfComments(commentsCount),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+            backgroundColor: Theme.of(context).colors.onSurfaceNeutralOpaqueLv1,
           ),
         ],
       ),
@@ -243,6 +255,43 @@ class _Description extends StatelessWidget {
           ),
       maxLines: 4,
       overflow: TextOverflow.ellipsis,
+    );
+  }
+}
+
+class _CompletedSegments extends StatelessWidget {
+  final int completed;
+  final int total;
+
+  const _CompletedSegments({
+    required this.completed,
+    required this.total,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Theme.of(context).colorScheme.primary.withOpacity(0.12),
+      padding: EdgeInsets.all(16),
+      child: Row(
+        children: [
+          Icon(
+            CatalystVoicesIcons.clipboard_check,
+            size: 18,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              context.l10n.noOfSegmentsCompleted(
+                completed,
+                total,
+                (completed / total * 100).round(),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
