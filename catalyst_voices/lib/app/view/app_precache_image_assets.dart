@@ -75,7 +75,6 @@ class _AppPrecacheImageAssetsState extends State<AppPrecacheImageAssets> {
     super.didUpdateWidget(oldWidget);
 
     if (_areImagesDifferent()) {
-      print('didUpdateWidget. _updateImagesCache');
       _updateImagesCache();
     }
   }
@@ -84,10 +83,8 @@ class _AppPrecacheImageAssetsState extends State<AppPrecacheImageAssets> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    if (_areImagesDifferent()) {
-      print('didChangeDependencies. _updateImagesCache');
-      _updateImagesCache();
-    }
+    // Caching depends on context. Rebuild when changes.
+    _updateImagesCache();
   }
 
   @override
