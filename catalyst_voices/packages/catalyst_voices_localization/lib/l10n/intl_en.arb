@@ -256,5 +256,45 @@
   "favorites": "Favorites",
   "@favorites": {
     "description": "Refers to a list of favorites."
+  },
+  "treasuryCampaignBuilder": "Campaign builder",
+  "@treasuryCampaignBuilder": {
+    "description": "Left panel name in treasury space"
+  },
+  "treasuryCampaignBuilderSegments": "Segments",
+  "@treasuryCampaignBuilderSegments": {
+    "description": "Tab name in campaign builder panel"
+  },
+  "treasuryCampaignSetup": "Setup Campaign",
+  "@treasuryCampaignSetup": {
+    "description": "Segment name"
+  },
+  "treasuryCampaignTitle": "Campaign title",
+  "@treasuryCampaignTitle": {
+    "description": "Campaign title"
+  },
+  "treasuryStepEdit": "Edit",
+  "@treasuryStepEdit": {
+    "description": "Button name in treasury step"
+  },
+  "drawerSpaceTreasury": "Treasury",
+  "@drawerSpaceTreasury": {
+    "description": "Name shown in spaces shell drawer"
+  },
+  "drawerSpaceDiscovery": "Discovery",
+  "@drawerSpaceDiscovery": {
+    "description": "Name shown in spaces shell drawer"
+  },
+  "drawerSpaceWorkspace": "Workspace",
+  "@drawerSpaceWorkspace": {
+    "description": "Name shown in spaces shell drawer"
+  },
+  "drawerSpaceVoting": "Voting",
+  "@drawerSpaceVoting": {
+    "description": "Name shown in spaces shell drawer"
+  },
+  "drawerSpaceFundedProjects": "Funded projects",
+  "@drawerSpaceFundedProjects": {
+    "description": "Name shown in spaces shell drawer"
   }
 }
