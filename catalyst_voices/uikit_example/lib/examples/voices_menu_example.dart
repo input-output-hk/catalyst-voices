@@ -41,12 +41,6 @@ class _VoicesMenuExampleState extends State<VoicesMenuExample> {
                     VoicesNodeMenuItem(id: 1, label: 'Vote'),
                     VoicesNodeMenuItem(id: 2, label: 'Results'),
                   ],
-                  onSelectionChanged: (value) {
-                    _problemSensingController.selected = value;
-                  },
-                  onExpandChanged: (value) {
-                    _problemSensingController.isExpanded = value;
-                  },
                 ),
               ].separatedBy(const SizedBox(height: 12)).toList(),
             ),
