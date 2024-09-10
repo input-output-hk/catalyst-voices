@@ -160,12 +160,11 @@ so above description would be applied for some proposal $p$ with the amount of v
 
 Lets denote $C := {\mathbf{c}_{v_1}, \mathbf{c}_{v_2}, \ldots, \mathbf{c}_{v_n}}$
 as a voter ballots for the specific proposal,
-where $\mathbf{c}_{v_i}$, $i \in [1, \ldots, n]$ is an encrypted unit vector with the choice of a voter $v_i$ ($n$ - number of voters),
+where $\mathbf{c}_{v_i}$, $i \in [1, \ldots, n]$
+is an encrypted unit vector with the choice of a voter $v_i$ ($n$ - number of voters),
 which was generated on this [step](#vote-encrypting-procedure).
 
-
 Each qualified committee member $c_j$ firstly computes the following
-
 
 ## Rationale
 
