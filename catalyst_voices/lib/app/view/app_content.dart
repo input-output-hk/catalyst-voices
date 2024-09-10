@@ -6,7 +6,7 @@ import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 
 const _restorationScopeId = 'rootVoices';
 
-final class AppContent extends StatefulWidget {
+final class AppContent extends StatelessWidget {
   final RouterConfig<Object> routerConfig;
 
   const AppContent({
@@ -14,19 +14,12 @@ final class AppContent extends StatefulWidget {
     required this.routerConfig,
   });
 
-  @override
-  State<AppContent> createState() => _AppContentState();
-}
-
-class _AppContentState extends State<AppContent> {
   List<LocalizationsDelegate<dynamic>> get _localizationsDelegates {
     return const [
       ...VoicesLocalizations.localizationsDelegates,
       LocaleNamesLocalizationsDelegate(),
     ];
   }
-
-  ThemeMode _mode = ThemeMode.light;
 
   @override
   Widget build(BuildContext context) {
@@ -35,24 +28,12 @@ class _AppContentState extends State<AppContent> {
       localizationsDelegates: _localizationsDelegates,
       supportedLocales: VoicesLocalizations.supportedLocales,
       localeListResolutionCallback: basicLocaleListResolution,
-      routerConfig: widget.routerConfig,
-      themeMode: _mode,
+      routerConfig: routerConfig,
       theme: ThemeBuilder.buildTheme(BrandKey.catalyst),
       darkTheme: ThemeBuilder.buildDarkTheme(BrandKey.catalyst),
       builder: (context, child) {
-        return GestureDetector(
-          onTap: () {
-            setState(() {
-              _mode = switch (_mode) {
-                ThemeMode.system => ThemeMode.light,
-                ThemeMode.light => ThemeMode.dark,
-                ThemeMode.dark => ThemeMode.light,
-              };
-            });
-          },
-          child: GlobalPrecacheImages(
-            child: child ?? SizedBox.shrink(),
-          ),
+        return GlobalPrecacheImages(
+          child: child ?? SizedBox.shrink(),
         );
       },
     );
