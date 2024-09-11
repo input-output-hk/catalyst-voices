@@ -18,7 +18,7 @@ final _loggingService = LoggingService();
 final _bootstrapLogger = Logger('Bootstrap');
 final _flutterLogger = Logger('Flutter');
 final _platformDispatcherLogger = Logger('PlatformDispatcher');
-final _uncouthZoneLogger = Logger('UncouthZone');
+final _uncaughtZoneLogger = Logger('UncaughtZone');
 
 typedef BootstrapWidgetBuilder = FutureOr<Widget> Function(BootstrapArgs args);
 
@@ -36,7 +36,7 @@ Future<void> bootstrap([
 ]) async {
   runZonedGuarded(
     () => _safeBootstrap(builder),
-    _reportUncouthZoneError,
+    _reportUncaughtZoneError,
   );
 }
 
@@ -116,6 +116,6 @@ bool _reportPlatformDispatcherError(Object error, StackTrace stack) {
 }
 
 /// Uncaught Errors reporting
-void _reportUncouthZoneError(Object error, StackTrace stack) {
-  _uncouthZoneLogger.severe('Uncouth Error', error, stack);
+void _reportUncaughtZoneError(Object error, StackTrace stack) {
+  _uncaughtZoneLogger.severe('Uncaught Error', error, stack);
 }
