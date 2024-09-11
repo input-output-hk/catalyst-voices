@@ -5,6 +5,7 @@ import 'package:catalyst_voices/pages/workspace/proposal_setup_panel.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 
 const _setupSegmentId = 'setup';
 
@@ -14,7 +15,9 @@ final _proposalNavigation = WorkspaceProposalNavigation(
       id: _setupSegmentId,
       steps: [
         WorkspaceProposalSegmentStep(id: 0, title: 'Title', description: 'd', isEditable: true),
-        WorkspaceProposalSegmentStep(id: 1, title: 'Title 2', description: 'd', isEditable: true),
+        WorkspaceProposalSegmentStep(id: 1, title: 'Rich text', document: Document(), isEditable: true),
+        WorkspaceProposalSegmentStep(id: 2, title: 'Other topic', description: 'Other topic', isEditable: false),
+        WorkspaceProposalSegmentStep(id: 3, title: 'Other topic', description: 'Other topic', isEditable: false),
       ],
     ),
   ],

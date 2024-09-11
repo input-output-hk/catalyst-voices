@@ -9,6 +9,7 @@ environment:
 dependencies:
   catalyst_cardano_serialization: ^0.4.0
   equatable: ^2.0.5
+  flutter_quill: ^10.5.0
   meta: ^1.10.0
 
 dev_dependencies:

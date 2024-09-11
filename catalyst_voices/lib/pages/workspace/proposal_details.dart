@@ -1,10 +1,12 @@
 import 'package:catalyst_voices/pages/workspace/proposal_segment_controller.dart';
 import 'package:catalyst_voices/pages/workspace/workspace_proposal_navigation_ext.dart';
+import 'package:catalyst_voices/widgets/rich_text/voices_rich_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 
 class ProposalDetails extends StatelessWidget {
   final WorkspaceProposalNavigation navigation;
@@ -101,6 +103,7 @@ class _SegmentDetails extends StatelessWidget {
                 id: step.id,
                 name: step.title,
                 desc: step.description,
+                doc: step.document,
                 isSelected: step.id == selected,
                 isEditable: step.isEditable,
               );
@@ -116,29 +119,38 @@ class _StepDetails extends StatelessWidget {
     super.key,
     required this.id,
     required this.name,
-    required this.desc,
+    this.desc,
+    this.doc,
     this.isSelected = false,
     this.isEditable = false,
   });
 
   final int id;
   final String name;
-  final String desc;
+  final String? desc;
+  final Document? doc;
   final bool isSelected;
   final bool isEditable;
 
   @override
   Widget build(BuildContext context) {
-    return WorkspaceTileContainer(
-      name: name,
+    return (desc != null)
+        ? WorkspaceTextTileContainer(
+            name: name,
+            isSelected: isSelected,
+            headerActions: [
+              VoicesTextButton(
+                child: Text(context.l10n.stepEdit),
+                onTap: isEditable ? () {} : null,
+              ),
+            ],
+            content: desc!,
+          )
+        : WorkspaceTileContainer(
       isSelected: isSelected,
-      headerActions: [
-        VoicesTextButton(
-          child: Text(context.l10n.stepEdit),
-          onTap: isEditable ? () {} : null,
-        ),
-      ],
-      content: Text(desc),
-    );
+            content: VoicesRichText(
+              title: name,
+            ),
+          );
   }
 }

@@ -129,7 +129,7 @@ class _StepDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WorkspaceTileContainer(
+    return WorkspaceTextTileContainer(
       name: name,
       isSelected: isSelected,
       headerActions: [
@@ -138,7 +138,7 @@ class _StepDetails extends StatelessWidget {
           onTap: isEditable ? () {} : null,
         ),
       ],
-      content: Text(desc),
+      content: desc,
     );
   }
 }
