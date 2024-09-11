@@ -13,7 +13,7 @@ sync-cfg:
 builder:
     DO rust-ci+SETUP
 
-    COPY --dir .cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin crates .
+    COPY --dir .cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin .
 
 ## -----------------------------------------------------------------------------
 ##
