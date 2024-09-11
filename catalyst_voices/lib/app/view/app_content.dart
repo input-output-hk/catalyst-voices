@@ -29,6 +29,8 @@ final class AppContent extends StatelessWidget {
       supportedLocales: VoicesLocalizations.supportedLocales,
       localeListResolutionCallback: basicLocaleListResolution,
       routerConfig: routerConfig,
+      // Light mode is "go to" for now.
+      themeMode: ThemeMode.light,
       theme: ThemeBuilder.buildTheme(BrandKey.catalyst),
       darkTheme: ThemeBuilder.buildDarkTheme(BrandKey.catalyst),
       builder: (context, child) {
