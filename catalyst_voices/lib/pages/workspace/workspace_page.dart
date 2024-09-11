@@ -14,10 +14,29 @@ final _proposalNavigation = WorkspaceProposalNavigation(
     WorkspaceProposalSetup(
       id: _setupSegmentId,
       steps: [
-        WorkspaceProposalSegmentStep(id: 0, title: 'Title', description: 'd', isEditable: true),
-        WorkspaceProposalSegmentStep(id: 1, title: 'Rich text', document: Document(), isEditable: true),
-        WorkspaceProposalSegmentStep(id: 2, title: 'Other topic', description: 'Other topic', isEditable: false),
-        WorkspaceProposalSegmentStep(id: 3, title: 'Other topic', description: 'Other topic', isEditable: false),
+        WorkspaceProposalSegmentStep(
+          id: 0,
+          title: 'Title',
+          description: 'F14 / Promote Social Entrepreneurs and a '
+              'longer title up-to 60 characters',
+          isEditable: true,
+        ),
+        WorkspaceProposalSegmentStep(
+          id: 1,
+          title: 'Rich text',
+          document: Document.fromJson(_textSample),
+          isEditable: true,
+        ),
+        WorkspaceProposalSegmentStep(
+            id: 2,
+            title: 'Other topic',
+            description: 'Other topic',
+            isEditable: false),
+        WorkspaceProposalSegmentStep(
+            id: 3,
+            title: 'Other topic',
+            description: 'Other topic',
+            isEditable: false),
       ],
     ),
   ],
@@ -53,11 +72,22 @@ class _WorkspacePageState extends State<WorkspacePage> {
   ProposalController _buildSegmentController(Object segmentId) {
     final value = segmentId == _setupSegmentId
         ? ProposalControllerStateData(
-      selectedItemId: 0,
-      isExpanded: true,
-    )
+            selectedItemId: 0,
+            isExpanded: true,
+          )
         : ProposalControllerStateData();
 
     return ProposalController(value);
   }
 }
+
+const _textSample = [
+  {'insert': 'Sample Rich Text Editor'},
+  {
+    'attributes': {'header': 1},
+    'insert': '\n'
+  },
+  {'insert': '\n'},
+  {'insert': 'We will be able to create content now!'},
+  {'insert': '\n'}
+];

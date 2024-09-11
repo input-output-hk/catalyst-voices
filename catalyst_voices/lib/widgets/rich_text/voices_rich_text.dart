@@ -44,7 +44,7 @@ class _Editor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 24.0),
       child: ResizableBoxParent(
         minHeight: 400,
         resizableVertically: true,
@@ -245,7 +245,7 @@ class _TopBar extends StatelessWidget {
             style: Theme.of(context).textTheme.labelSmall,
           ),
         ),
-        SizedBox(width: 8),
+        SizedBox(width: 24),
       ],
     );
   }
@@ -265,7 +265,7 @@ class _VoicesRichTextState extends State<VoicesRichText> {
         children: [
           Padding(
             padding: const EdgeInsets.only(
-              left: 16,
+              left: 24,
               top: 20,
               bottom: 20,
             ),

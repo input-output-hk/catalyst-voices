@@ -139,17 +139,21 @@ class _StepDetails extends StatelessWidget {
             name: name,
             isSelected: isSelected,
             headerActions: [
-              VoicesTextButton(
-                child: Text(context.l10n.stepEdit),
-                onTap: isEditable ? () {} : null,
+              TextButton(
+                child: Text(
+                  context.l10n.stepEdit,
+                  style: Theme.of(context).textTheme.labelSmall,
+                ),
+                onPressed: isEditable ? () {} : null,
               ),
             ],
             content: desc!,
           )
         : WorkspaceTileContainer(
-      isSelected: isSelected,
+            isSelected: isSelected,
             content: VoicesRichText(
               title: name,
+              document: doc,
             ),
           );
   }
