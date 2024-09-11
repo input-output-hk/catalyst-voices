@@ -30,44 +30,41 @@ and performing tally process for executing "Catalyst" fund events.
 
 Through this paper we will use the following notations to refer to some entities of this protocol:
 
-* **Proposal** $\mathcal{P}$ -
+* **Proposal** -
   voting subject on which each voter will be cast their votes.
-* **Proposal voting options** $M$ -
-  an amount of different proposal options, e.g. "Yes", "No", "Abstain", $M := 3$.
-* **Voting committee set** $\mathcal{C}:=\{c_1,\ldots, c_l \}$ -
+* **Proposal voting options** -
+  an amount of different proposal options, e.g. "Yes", "No", "Abstain".
+* **Voting committee** -
   a special **trusted** entity, which perform tally process and revealing the results of the tallying.
-  It has a capability to de anonymize each vote.
-  Where $l$ - a number of voting committee members in the committee set.
-* **Voters set** $\mathcal{V}:=\{v_1,\ldots, v_n \}$.
-  Where $n$ - a number of voter members in the voters set.
+  Such committee consists of the 1 person.
+* **Voters** -
+  actors who actually performing the voting by posting ballots with their voting choices.
 * **Election public key** $pk$ - a committee's generated public key,
   which is shared across all voters
   and used for vote's encryption and tallying processes.
-* **Voter's voting power** $\alpha_i$, $i \in [1, \ldots, n]$ -
-  an integer value which defines a voting power for a voter $v_i$.
+* **Voter's voting power** -
+  an integer value which defines a voting power for a specific voter.
   This value could be equals to $1$ for every voter,
   so everyone would be equal in their voting rights.
   Or it could be defined based on their stake in the blockchain,
   which is more appropriate for web3 systems.
 
 Important to note that current protocol defined to work with the one specific proposal,
-so all definitions and procedures would be applied for some proposal $\mathcal{P}$.
+so all definitions and procedures would be applied for some proposal.
 Obviously, it could be easily scaled for a set of proposals,
-performing all these steps in parallel.
+performing all this protocol in parallel.
 
-The voting committee definition and voters registration
+The voting committee and voters registration/definition
 are not subjects of this paper.
 
 ### Initial setup
 
 Before any voting will start an initial setup procedure should be performed.
 
-* Define a number of voting options/choices $M$ for a proposal $\mathcal{P}$,
-  e.g. "Yes", "No", "Abstain" - 3 voting options, so $M$ equals to 3.
-* Voting committee must generate a shared election public key.
-  If committee consists from more than 1 member,
-  it is possible to use some distributed key generation algorithms,
-  which is not a topic of the current document.
+* Define a number of voting options/choices for a proposal,
+  e.g. "Yes", "No", "Abstain" - 3 voting options.
+* Voting committee must generate a shared election public key $pk$ and distribute it among voters.
+  A corresponding private key (secret share) $sk$ will be used to perform tally.
 * Define for each voter their own voting power.
   Basically this step could be done at any point of time, but before the tally.
 
@@ -161,7 +158,7 @@ but this is not a topic of current document.
 
 After the every voter done the choice and published it,
 voter committee could perform tally,
-for some proposal $\mathcal{P}$ with the amount of voting choices $M$.
+for some proposal $\mathcal{P}$.
 
 Lets denote $C := {\mathbf{c}_{v_1}, \mathbf{c}_{v_2}, \ldots, \mathbf{c}_{v_n}}$
 as a voter ballots for the specific proposal,
@@ -169,7 +166,28 @@ where $\mathbf{c}_{v_i}$, $i \in [1, \ldots, n]$
 is an encrypted unit vector with the choice of a voter $v_i$ ($n$ - number of voters),
 which was generated on this [step](#vote-encrypting-procedure).
 
-Each qualified committee member $c_j$ firstly computes the following
+The first step is to take a
+voter's choice $\mathbf{c}_{v_i}$ with the corresponding voter's voting power $\alpha_i$.
+Expand $\mathbf{c}_{v_i}$ unit vector into the vector components
+$\mathbf{c}_{v_i} = (e_{v_i,1}, \ldots, e_{v_i,M})$,
+where $M$ number of voting options defined for the proposal.
+And for each corresponding unit vector component
+:
+\begin{equation}
+\mathbf{c}_{v_i, j}^{\alpha_i}
+\end{equation}
+
+And it must be performed for every voter's ballot $\mathbf{c}_{v_i}$ and all these results shoud be multiplied with each other.
+So at the end we will have a new value $r_j$ corresponded to the specific voting option $j$,
+which is accumulated homomorphically all voting results with its voting powers for this voting option:
+\begin{equation}
+r_j := \mathbf{c}_{v_1, j}^{\alpha_1} * \mathbf{c}_{v_2, j}^{\alpha_2} * \ldots * \mathbf{c}_{v_n, j}^{\alpha_n}
+\end{equation}
+
+where $n$ is a number of voters.
+
+
+
 
 ## Rationale
 
@@ -182,8 +200,6 @@ Each qualified committee member $c_j$ firstly computes the following
 <!-- A plan to meet those criteria or `N/A` if an implementation plan is not applicable. -->
 
 <!-- OPTIONAL SECTIONS: see CIP-0001 > Document > Structure table -->
-
-### A: Lifted ElGamal
 
 [treasury_system_paper]: https://eprint.iacr.org/2018/435.pdf
 [treasury_system_spec]: https://github.com/input-output-hk/treasury-crypto/blob/master/docs/voting_protocol_spec/Treasury_voting_protocol_spec.pdf
