@@ -6,18 +6,33 @@ host_ip := `hostname -i | cut -d " " -f 1`
 default:
     @just --list --unsorted
 
-# Local scylla dev DB - Starts with pre-existing data.
+# Local scylla dev DB (Developer Mode) - Starts with pre-existing data.
 scylla-dev-db:
+    docker run --name scylla-node1 --volume /var/lib/scylla/1:/var/lib/scylla -d scylladb/scylla --developer-mode=1  --smp 1
+
+# Local scylla dev DB Logs (Developer Mode) - Follow the running scylla DB logs.
+scylla-dev-db-logs:
+    docker logs scylla-node1 -f
+
+# Local scylla dev DB Logs (Developer Mode) - Follow the running scylla DB logs.
+scylla-dev-db-stop:
+    docker stop scylla-node1
+
+# Local scylla dev DB CLUSTER - Starts with pre-existing data.
+scylla-dev-db-cluster:
     HOST_IP="{{host_ip}}" \
     docker compose up
 
-# Stop the scylla development DB
-scylla-dev-db-stop:
+# Stop the scylla development DB CLUSTER
+scylla-dev-db-stop-cluster:
     HOST_IP="{{host_ip}}" \
     docker compose down
 
-# Reset the cluster storage and start a new dev scylla cluster
+# Reset the dev mode scylla instance and start a new dev scylla dev instance
 scylla-dev-db-reset: scylla-dev-db-purge scylla-dev-db
+
+# Reset the cluster storage and start a new dev scylla cluster
+scylla-dev-db-reset-cluster: scylla-dev-db-purge scylla-dev-db-cluster
 
 # Run CQLSH on the dev Scylla cluster
 scylla-dev-db-cqlsh:
