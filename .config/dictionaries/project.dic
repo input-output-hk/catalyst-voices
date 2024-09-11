@@ -32,6 +32,7 @@ cborg
 cdylib
 CEST
 cfbundle
+changeme
 Chotivichit
 chromedriver
 chrono
@@ -87,6 +88,7 @@ gethostname
 Gitbook
 gmtime
 gradlew
+headful
 headlessui
 HIDPI
 hotspots
@@ -117,8 +119,16 @@ lcov
 lerp
 Leshiy
 libapp
+libasound
+libatk
+libatspi
 libavcodec
+libdrm
 libflutter
+libgbm
+libnss
+libxkbcommon
+libxshmfence
 lintfix
 localizable
 loguru
@@ -197,6 +207,8 @@ Scripthash
 ScyllaDB
 seckey
 sendfile
+servernum
+serviceworker
 slotno
 sqlfluff
 Stefano
@@ -255,13 +267,8 @@ xcodeproj
 xctest
 xctestrun
 xcworkspace
+xvfb
 yoroi
-unchunk
-EUTXO
-eddsa
-toggleable
-interps
-todos
 vsync
 damian-molinski
 LTRB
