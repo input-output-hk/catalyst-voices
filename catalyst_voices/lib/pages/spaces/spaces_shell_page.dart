@@ -6,17 +6,19 @@ import 'package:flutter/material.dart';
 class SpacesShellPage extends StatelessWidget {
   final Space space;
   final Widget child;
+  final bool showSearch;
 
   const SpacesShellPage({
     super.key,
     required this.space,
     required this.child,
+    this.showSearch = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: VoicesAppBar(),
+      appBar: VoicesAppBar(showSearch: showSearch),
       drawer: SpacesDrawer(space: space),
       body: child,
     );

@@ -32,6 +32,8 @@ final class SpacesShellRouteData extends ShellRouteData {
     'funded_projects': Space.fundedProjects,
   };
 
+  static const _searchableSpaces = [Space.workspace];
+
   const SpacesShellRouteData();
 
   @override
@@ -55,6 +57,7 @@ final class SpacesShellRouteData extends ShellRouteData {
     return SpacesShellPage(
       space: space!,
       child: navigator,
+      showSearch: _searchableSpaces.contains(space),
     );
   }
 }
