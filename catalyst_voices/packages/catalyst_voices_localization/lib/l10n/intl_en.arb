@@ -273,9 +273,21 @@
   "@treasuryCampaignTitle": {
     "description": "Campaign title"
   },
-  "treasuryStepEdit": "Edit",
-  "@treasuryStepEdit": {
-    "description": "Button name in treasury step"
+  "stepEdit": "Edit",
+  "@stepEdit": {
+    "description": "Button name in step"
+  },
+  "workspaceProposalNavigation": "Proposal navigation",
+  "@workspaceProposalNavigation": {
+    "description": "Left panel name in workspace"
+  },
+  "workspaceProposalNavigationSegments": "Segments",
+  "@workspaceProposalNavigationSegments": {
+    "description": "Tab name in proposal setup panel"
+  },
+  "workspaceProposalSetup": "Proposal setup",
+  "@workspaceProposalSetup": {
+    "description": "Segment name"
   },
   "drawerSpaceTreasury": "Treasury",
   "@drawerSpaceTreasury": {

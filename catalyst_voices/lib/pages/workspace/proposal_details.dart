@@ -1,31 +1,31 @@
-import 'package:catalyst_voices/pages/treasury/campaign_segment_controller.dart';
-import 'package:catalyst_voices/pages/treasury/treasury_campaign_builder_ext.dart';
+import 'package:catalyst_voices/pages/workspace/proposal_segment_controller.dart';
+import 'package:catalyst_voices/pages/workspace/workspace_proposal_navigation_ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
-class CampaignDetails extends StatelessWidget {
-  final TreasuryCampaignBuilder builder;
+class ProposalDetails extends StatelessWidget {
+  final WorkspaceProposalNavigation navigation;
 
-  const CampaignDetails({
+  const ProposalDetails({
     super.key,
-    required this.builder,
+    required this.navigation,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
       padding: const EdgeInsets.only(top: 10),
-      itemCount: builder.segments.length,
+      itemCount: navigation.segments.length,
       itemBuilder: (context, index) {
-        final segment = builder.segments[index];
+        final segment = navigation.segments[index];
 
         return _ListenableSegmentDetails(
           key: ValueKey('ListenableSegment${segment.id}DetailsKey'),
           segment: segment,
-          controller: CampaignControllerScope.of(
+          controller: ProposalControllerScope.of(
             context,
             id: segment.id,
           ),
@@ -36,7 +36,7 @@ class CampaignDetails extends StatelessWidget {
 }
 
 class _ListenableSegmentDetails extends StatelessWidget {
-  final TreasuryCampaignSegment segment;
+  final WorkspaceProposalSegment segment;
   final VoicesNodeMenuController controller;
 
   const _ListenableSegmentDetails({
@@ -67,7 +67,7 @@ class _ListenableSegmentDetails extends StatelessWidget {
 
 class _SegmentDetails extends StatelessWidget {
   final String name;
-  final List<TreasuryCampaignSegmentStep> steps;
+  final List<WorkspaceProposalSegmentStep> steps;
   final int? selected;
   final bool isExpanded;
   final VoidCallback? onChevronTap;
