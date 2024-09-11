@@ -1,6 +1,6 @@
 -- Transaction Outputs (ADA) that are not staked, by their transaction hash.
 CREATE TABLE IF NOT EXISTS unstaked_txo_by_txn_hash (
-    -- Priamry Key Fields
+    -- Primary Key Fields
     txn_hash        blob,       -- 32 byte hash of this transaction.
     txo             smallint,   -- offset in the txo list of the transaction the txo is in.
 
@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS unstaked_txo_by_txn_hash (
     spent_slot      varint,     -- Slot this TXO was spent in.
                                 -- This is ONLY calculated/stored 
                                 -- when first detected in a query lookup.
-                                -- It serves as an optimization on subsequnt queries. 
+                                -- It serves as an optimization on subsequent queries. 
 
     PRIMARY KEY (txn_hash, txo)
 );

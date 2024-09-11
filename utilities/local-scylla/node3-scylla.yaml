@@ -1,5 +1,7 @@
 # Scylla storage config YAML
 
+# cspell: words fsyncs rackdc partitioner mbean certficate degraade defragment
+
 #######################################
 # This file is split to two sections:
 # 1. Supported parameters

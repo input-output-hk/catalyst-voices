@@ -1,6 +1,6 @@
 -- Transaction Outputs (Native Assets) per stake address.
 CREATE TABLE IF NOT EXISTS unstaked_txo_assets_by_txn_hash (
-    -- Priamry Key Fields
+    -- Primary Key Fields
     txn_hash        blob,     -- 32 byte hash of this transaction.
     txo             smallint, -- offset in the txo list of the transaction the txo is in.
     policy_id       blob,     -- asset policy hash (id) (28 byte binary hash)
