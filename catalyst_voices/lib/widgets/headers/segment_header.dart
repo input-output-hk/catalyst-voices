@@ -6,8 +6,6 @@ class SegmentHeader extends StatelessWidget {
   final Widget? leading;
   final List<Widget> actions;
   final bool isSelected;
-  final WidgetStateProperty<Color?>? backgroundColor;
-  final WidgetStateProperty<Color?>? foregroundColor;
 
   const SegmentHeader({
     super.key,
@@ -15,8 +13,6 @@ class SegmentHeader extends StatelessWidget {
     this.leading,
     this.actions = const [],
     this.isSelected = false,
-    this.backgroundColor,
-    this.foregroundColor,
   });
 
   Set<WidgetState> get states => {
@@ -27,29 +23,20 @@ class SegmentHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final effectiveBackgroundColor = backgroundColor ??
-        _DefaultBackgroundColor(
-          theme.colorScheme,
-          theme.colors,
-        );
-    final effectiveForegroundColor = backgroundColor ??
-        _DefaultForegroundColor(
-          theme.colorScheme,
-          theme.colors,
-        );
+    final backgroundColor = _DefaultBackgroundColor(theme.colorScheme);
+    final foregroundColor = _DefaultForegroundColor(theme.colors);
 
     final iconButtonStyle = ButtonStyle(
       fixedSize: WidgetStatePropertyAll(Size.square(48)),
-      iconColor: WidgetStatePropertyAll(
-        effectiveForegroundColor.resolve(states),
-      ),
+      // resolving colors because IconButton does not have WidgetState.selected
+      iconColor: WidgetStatePropertyAll(foregroundColor.resolve(states)),
     );
     final textButtonStyle = ButtonStyle(
-      foregroundColor: effectiveForegroundColor,
+      foregroundColor: foregroundColor,
     );
 
     final textStyle = (theme.textTheme.titleMedium ?? TextStyle())
-        .copyWith(color: effectiveForegroundColor.resolve(states));
+        .copyWith(color: foregroundColor.resolve(states));
 
     return IconButtonTheme(
       data: IconButtonThemeData(style: iconButtonStyle),
@@ -64,7 +51,7 @@ class SegmentHeader extends StatelessWidget {
             duration: kThemeChangeDuration,
             constraints: BoxConstraints(minHeight: 52),
             decoration: BoxDecoration(
-              color: effectiveBackgroundColor.resolve(states),
+              color: backgroundColor.resolve(states),
             ),
             padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             child: Row(
@@ -85,12 +72,8 @@ class SegmentHeader extends StatelessWidget {
 
 final class _DefaultBackgroundColor implements WidgetStateProperty<Color?> {
   final ColorScheme colorScheme;
-  final VoicesColorScheme colors;
 
-  _DefaultBackgroundColor(
-    this.colorScheme,
-    this.colors,
-  );
+  _DefaultBackgroundColor(this.colorScheme);
 
   @override
   Color? resolve(Set<WidgetState> states) {
@@ -103,13 +86,9 @@ final class _DefaultBackgroundColor implements WidgetStateProperty<Color?> {
 }
 
 final class _DefaultForegroundColor implements WidgetStateProperty<Color?> {
-  final ColorScheme colorScheme;
   final VoicesColorScheme colors;
 
-  _DefaultForegroundColor(
-    this.colorScheme,
-    this.colors,
-  );
+  _DefaultForegroundColor(this.colors);
 
   @override
   Color? resolve(Set<WidgetState> states) {
