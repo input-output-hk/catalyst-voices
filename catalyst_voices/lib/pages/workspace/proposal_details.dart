@@ -108,7 +108,8 @@ class _SegmentDetails extends StatelessWidget {
                 isEditable: step.isEditable,
               );
             },
-          )
+          ),
+        SizedBox(height: 24),
       ].separatedBy(SizedBox(height: 12)).toList(),
     );
   }
