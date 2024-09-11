@@ -63,7 +63,7 @@ class _ProposalSegmentBody extends StatelessWidget {
         (step) {
           return VoicesNodeMenuItem(
             id: step.id,
-            label: step.localizedName(l10n),
+            label: step.title,
           );
         },
       ).toList(),

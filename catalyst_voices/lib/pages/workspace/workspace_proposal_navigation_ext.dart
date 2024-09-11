@@ -8,20 +8,3 @@ extension WorkspaceProposalSegmentExt on WorkspaceProposalSegment {
     };
   }
 }
-
-extension WorkspaceProposalSegmentStepExt on WorkspaceProposalSegmentStep {
-  String localizedName(VoicesLocalizations localizations) {
-    return switch (this) {
-      WorkspaceProposalTitle() => localizations.treasuryCampaignTitle,
-      WorkspaceProposalTopicX(:final nr) => 'Other topic $nr',
-    };
-  }
-
-  String tempDescription() {
-    return switch (this) {
-      WorkspaceProposalTitle() => 'F14 / Promote Social Entrepreneurs and a '
-          'longer title up-to 60 characters',
-      WorkspaceProposalTopicX(:final nr) => 'Other topic $nr',
-    };
-  }
-}

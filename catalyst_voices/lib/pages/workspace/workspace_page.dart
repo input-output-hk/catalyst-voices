@@ -13,10 +13,8 @@ final _proposalNavigation = WorkspaceProposalNavigation(
     WorkspaceProposalSetup(
       id: _setupSegmentId,
       steps: [
-        WorkspaceProposalTitle(id: 0, isEditable: true),
-        WorkspaceProposalTopicX(id: 1, nr: 1),
-        WorkspaceProposalTopicX(id: 2, nr: 2),
-        WorkspaceProposalTopicX(id: 3, nr: 2),
+        WorkspaceProposalSegmentStep(id: 0, title: 'Title', description: 'd', isEditable: true),
+        WorkspaceProposalSegmentStep(id: 1, title: 'Title 2', description: 'd', isEditable: true),
       ],
     ),
   ],

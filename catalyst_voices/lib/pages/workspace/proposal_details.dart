@@ -99,8 +99,8 @@ class _SegmentDetails extends StatelessWidget {
               return _StepDetails(
                 key: ValueKey('WorkspaceStep${step.id}TileKey'),
                 id: step.id,
-                name: step.localizedName(context.l10n),
-                desc: step.tempDescription(),
+                name: step.title,
+                desc: step.description,
                 isSelected: step.id == selected,
                 isEditable: step.isEditable,
               );
