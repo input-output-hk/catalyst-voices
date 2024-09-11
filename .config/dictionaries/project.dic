@@ -82,7 +82,6 @@ fmtfix
 fontawesome
 fontello
 Formz
-formz
 fuzzer
 gapless
 gcloud
@@ -146,7 +145,6 @@ msedgedriver
 multiasset
 multidex
 Multiplatform
-multiplatform
 myproject
 nanos
 NDEBUG
@@ -170,6 +168,7 @@ plpgsql
 podfile
 podhelper
 postcss
+Precache
 Precertificate
 preprod
 projectcatalyst
@@ -201,7 +200,6 @@ rustls
 rxdart
 saibatizoku
 Schemathesis
-schemathesis
 Scripthash
 ScyllaDB
 seckey
@@ -218,6 +216,7 @@ subchain
 Subkey
 submiting
 subosito
+svgs
 SYSROOT
 tablestats
 tacho
@@ -229,7 +228,6 @@ thiserror
 thollander
 timelike
 Toastify
-toastify
 todos
 toggleable
 tojunit
@@ -240,14 +238,11 @@ TXNZD
 Typer
 unawaited
 unchunk
-unchunk
 Unlogged
 unmanaged
 Unstaked
 UTXO
-utxo
 Utxos
-utxos
 varint
 vite
 vitss
@@ -273,16 +268,3 @@ xctest
 xctestrun
 xcworkspace
 yoroi
-unchunk
-EUTXO
-eddsa
-toggleable
-interps
-todos
-vsync
-damian-molinski
-LTRB
-hotspots
-precache
-Precache
-svgs
