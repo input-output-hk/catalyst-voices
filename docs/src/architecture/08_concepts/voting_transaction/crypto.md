@@ -39,7 +39,7 @@ Through this paper we will use the following notations to refer to some entities
   Such committee consists of the 1 person.
 * **Voters** -
   actors who actually performing the voting by posting ballots with their voting choices.
-* **Election public key** $pk$ - a committee's generated public key,
+* **Election public key** $pk$ - committees generated public key,
   which is shared across all voters
   and used for vote's encryption and tallying processes.
 * **Voter's voting power** -
@@ -61,7 +61,7 @@ are not subjects of this paper.
 
 Before any voting will start an initial setup procedure should be performed.
 
-* Define a number of voting options/choices for a proposal,
+* Define an amount of voting options/choices for a proposal,
   e.g. "Yes", "No", "Abstain" - 3 voting options.
 * Voting committee must generate a shared election public key $pk$ and distribute it among voters.
   A corresponding private key (secret share) $sk$ will be used to perform tally.
@@ -70,46 +70,78 @@ Before any voting will start an initial setup procedure should be performed.
 
 ### Vote
 
-Each voter $v_i$, $i \in [1, n]$ could cast a vote for the proposal $\mathcal{P}$.
-To do that, obviously, a voting choice should be made and decoded in specific format.
-Next step to achieve the anonymity this voting choice must be encrypted,
-using the specific election public key, so later voting committee could perform tally.
-It is also important for the voter generate a cryptographically secured proof,
-that he has done everything correctly and according to the protocol,
+A voter could cast a vote for some proposal.
+To do that, obviously, a voting choice should be made and encoded in specific format.
+For achieving anonymity this voting choice must be homomorphically encrypted,
+using the specific election public key $pk$, so afterwards voting committee could perform tally.
+It is also important for the voter to generate a cryptographically secured proof,
+that he has generated and encrypted a vote correctly and according to the protocol,
 and everyone would be able to verify it.
 So we will preserve anonymity without lacking transparency and correctness.
 
 #### Voting choice
 
-For a specific proposal $\mathcal{P}$
-voter generates a unit vector $\mathbf{e}_t$, $t \in [1, \ldots, M]$.
-Where $t$-th component is $1$ and the rest components are $0$,
-$M$ - proposal's voting options number.
-
+For some proposal, voter generates a unit vector $\mathbf{e}_t$,
+the length of such vector **must** be equal to the amount of the voting options,
+corresponded to the proposal.
+<br/>
+$i$ is the identifier of the unit vector and varies $1 \le i \le M$, $M$ - amount of the voting options.
+This identifier defines that the $i$-th component is equal $1$
+and the rest components are equals $0$.
+<br/>
 E.g. proposal has 3 voting options ("Yes", "No", "Abstain"):
 
-* $\mathbf{e}_1$ equals to $100$,
-* $\mathbf{e}_2$ equals to $010$,
-* $\mathbf{e}_3$ equals to $001$
+* $\mathbf{e}_1$ equals to $(1,0,0)$,
+* $\mathbf{e}_2$ equals to $(0,1,0)$,
+* $\mathbf{e}_3$ equals to $(0,0,1)$
 
-Lets $e_{t,f}$, $f \in [1, \ldots, M]$
-denote as an each component value of the unit vector $e_t$.
+Lets $e_{i,j}$ denote as an each component value of the unit vector $\mathbf{e}_i$.
+Where $i$ is an identifier of the vector as was described before,
+$j$ index of the vector's component, which could varies $1 \le j \le M$,
+$M$ - amount of the voting options and equals to the length of the vector.
+<br/>
+Using such notation unit vector $\mathbf{e}_i$ could be defined as
 <!-- markdownlint-disable emphasis-style -->
 \begin{equation}
-\mathbf{e}_t = (e_{t,1}, \ldots, e_{t,M})
+\mathbf{e}_i = (e_{i,1}, \ldots, e_{i,M})
 \end{equation}
 <!-- markdownlint-enable emphasis-style -->
+
+E.g. for the unit vector
+$\mathbf{e}_1 = (1,0,0)$
+components would be defined as follows:
+
+* $e_{1, 1}$ equals to $1$
+* $e_{1, 2}$ equals to $0$
+* $e_{1, 3}$ equals to $0$
 
 #### Vote encrypting procedure
 
 After the choice is done,
-vote **must** be encrypted using shared voting committee public key $pk$.
-It is done by using lifted ElGamal encryption algorithm noted as $Enc_{pk}(message; randomness)$.
+vote **must** be encrypted using shared shared election public key $pk$.
 
-$Enc_{pk}(message \; ; \; randomness)$ algorithm produces a ciphertext $c$ as a result.
+Lifted ElGamal encryption algorithm is used, noted as $Enc(message; randomness, public \, key)$.
+More detailed description of the lifted ElGamal algorithm
+you can find in the section `2.1.2` of this [paper][treasury_system_spec].
+<br/>
+$Enc_{pk}(message ; randomness; public_key)$ algorithm produces a ciphertext $c$ as a result.
 \begin{equation}
-c = Enc_{pk}(message \; ; \; randomness)
+c = Enc_{pk}(message \; ; \; randomness \; public_key)
 \end{equation}
+
+To encode previously generated unit vector $\mathbf{e}_i$ ($i$ - voting choice identifier),
+in more details you can read in this [section](#voting-choice),
+for each vector component value $e_{i,j}$ generate a corresponding randomness.
+<br/>
+Lets denote randomness value as $r_j$,
+where $j$ states as the same identifier of the vector component $e_{i,j}$.
+
+Then, for each vector component $e_{i,j}$ with the corresponding randomness,
+perform encryption algorithm applying shared election public key $pk$.
+\begin{equation}
+c_j = Enc(e_{i,j} \; ; \; r_j \; ; pk)
+\end{equation}
+
 
 To do that, by the provided unit vector $\mathbf{e}_t$
 for each vector component value $e_{t,f}$ generate a corresponding $r_f$ randomness.
@@ -121,11 +153,14 @@ c_f = Enc_{pk}(e_{t,f} \; ; \; r_f)
 \end{equation}
 
 As a result getting a vector $\mathbf{c}$ of ciphertext values $c_f$,
-with the size equals of the size $\mathbf{e}_t$ unit vector.
+with the size equals of the size $\mathbf{e}_t$ unit vector,
+equals to the amount of the voting options.
 Lets denote this vector as:
 \begin{equation}
 \mathbf{c} = (c_1, \ldots, c_{M})
 \end{equation}
+
+where $M$ is the voting options amount.
 
 This is a first part of the published vote for a specific proposal.
 
