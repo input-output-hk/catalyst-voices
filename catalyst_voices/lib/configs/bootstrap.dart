@@ -117,7 +117,7 @@ bool _reportPlatformDispatcherError(Object error, StackTrace stack) {
   return true;
 }
 
-/// Uncouth Errors reporting
+/// Uncaught Errors reporting
 void _reportUncouthZoneError(Object error, StackTrace stack) {
   if (kDebugMode) {
     debugPrint('UncouthZoneError Error');
