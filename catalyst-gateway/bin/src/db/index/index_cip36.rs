@@ -12,8 +12,8 @@ use super::{
 };
 use crate::settings::CassandraEnvVars;
 
-/// Insert TXI Query and Parameters
-#[derive(SerializeRow)]
+/// Insert CIP-36 Registration Query Parameters
+#[derive(SerializeRow, Clone)]
 pub(crate) struct Cip36RegistrationInsertQuery {
     /// Stake key hash
     stake_address: MaybeUnset<Vec<u8>>,
@@ -31,7 +31,7 @@ pub(crate) struct Cip36RegistrationInsertQuery {
     raw_nonce: MaybeUnset<num_bigint::BigInt>,
     /// Nonce value after normalization.
     nonce: MaybeUnset<num_bigint::BigInt>,
-    /// Is the Certificate Deregistered?
+    /// Purpose. Always `0` for Catalyst.
     purpose: MaybeUnset<num_bigint::BigInt>,
     /// Signature validates.
     signed: MaybeUnset<bool>,
@@ -44,6 +44,10 @@ pub(crate) struct Cip36RegistrationInsertQuery {
 /// Index Registration by Stake Address
 const INSERT_CIP36_REGISTRATION_QUERY: &str =
     include_str!("./queries/insert_cip36_registration.cql");
+
+/// Index Registration by Vote Key
+const INSERT_CIP36_REGISTRATION_BY_VOTE_KEY_QUERY: &str =
+    include_str!("./queries/insert_cip36_vote_key.cql");
 
 impl Cip36RegistrationInsertQuery {
     /// Create a new Insert Query.
@@ -99,7 +103,7 @@ impl Cip36RegistrationInsertQuery {
         }
     }
 
-    /// Prepare Batch of Insert TXI Index Data Queries
+    /// Prepare Batch of Insert CIP-36 Registration Index Data Queries
     pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &CassandraEnvVars,
     ) -> anyhow::Result<SizedBatch> {
@@ -114,21 +118,42 @@ impl Cip36RegistrationInsertQuery {
         .await;
 
         if let Err(ref error) = insert_queries {
-            error!(error=%error,"Failed to prepare Insert Stake Registration Query.");
+            error!(error=%error,"Failed to prepare Insert CIP-36 Registration Query.");
+        };
+
+        insert_queries
+    }
+
+    /// Prepare Batch of Insert CIP-36 Registration by Vote Key Index Data Queries
+    pub(crate) async fn prepare_batch_by_vote_key(
+        session: &Arc<Session>, cfg: &CassandraEnvVars,
+    ) -> anyhow::Result<SizedBatch> {
+        let insert_queries = PreparedQueries::prepare_batch(
+            session.clone(),
+            INSERT_CIP36_REGISTRATION_BY_VOTE_KEY_QUERY,
+            cfg,
+            scylla::statement::Consistency::Any,
+            true,
+            false,
+        )
+        .await;
+
+        if let Err(ref error) = insert_queries {
+            error!(error=%error,"Failed to prepare Insert CIP-36 Registration By Vote Key Query.");
         };
 
         insert_queries
     }
 }
 
-/// Insert Cert Queries
+/// Insert CIP-36 Registration Queries
 pub(crate) struct Cip36InsertQuery {
     /// Stake Registration Data captured during indexing.
     cip36_reg_data: Vec<Cip36RegistrationInsertQuery>,
 }
 
 impl Cip36InsertQuery {
-    /// Create new data set for Cert Insert Query Batch.
+    /// Create new data set for CIP-36 Registrations Insert Query Batch.
     #[allow(dead_code)]
     pub(crate) fn new() -> Self {
         Cip36InsertQuery {
@@ -136,25 +161,26 @@ impl Cip36InsertQuery {
         }
     }
 
-    /// Prepare Batch of Insert TXI Index Data Queries
+    /// Prepare Batch of Insert CIP-36 Registrations Index Data Queries
     pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &CassandraEnvVars,
     ) -> anyhow::Result<SizedBatch> {
-        // Note: for now we have one query, but there are many certs, and later we may have more
-        // to add here.
         Cip36RegistrationInsertQuery::prepare_batch(session, cfg).await
     }
 
-    /// Index the certificates in a transaction.
+    /// Prepare Batch of Insert CIP-36 Registrations Index Data Queries
+    pub(crate) async fn prepare_batch_by_vote_key(
+        session: &Arc<Session>, cfg: &CassandraEnvVars,
+    ) -> anyhow::Result<SizedBatch> {
+        Cip36RegistrationInsertQuery::prepare_batch_by_vote_key(session, cfg).await
+    }
+
+    /// Index the CIP-36 registrations in a transaction.
     #[allow(dead_code)]
     pub(crate) fn index(
         &mut self, txn: usize, txn_index: i16, slot_no: u64, block: &MultiEraBlock,
     ) {
         if let Some(decoded_metadata) = block.txn_metadata(txn, Metadata::cip36::LABEL) {
-            let _raw_size = match block.txn_raw_metadata(txn, Metadata::cip36::LABEL) {
-                Some(raw) => raw.len(),
-                None => 0,
-            };
             #[allow(irrefutable_let_patterns)]
             if let Metadata::DecodedMetadataValues::Cip36(cip36) = &decoded_metadata.value {
                 for vote_key in &cip36.voting_keys {
@@ -187,7 +213,7 @@ impl Cip36InsertQuery {
         }
     }
 
-    /// Execute the Certificate Indexing Queries.
+    /// Execute the CIP-36 Registration Indexing Queries.
     ///
     /// Consumes the `self` and returns a vector of futures.
     #[allow(dead_code)]
@@ -196,10 +222,18 @@ impl Cip36InsertQuery {
 
         let inner_session = session.clone();
 
+        let data = self.cip36_reg_data.clone();
+
+        query_handles.push(tokio::spawn(async move {
+            inner_session
+                .execute_batch(PreparedQuery::Cip36RegistrationInsertQuery, data)
+                .await
+        }));
+        let inner_session = session.clone();
         query_handles.push(tokio::spawn(async move {
             inner_session
                 .execute_batch(
-                    PreparedQuery::Cip36RegistrationInsertQuery,
+                    PreparedQuery::Cip36RegistrationByVoteKeyInsertQuery,
                     self.cip36_reg_data,
                 )
                 .await

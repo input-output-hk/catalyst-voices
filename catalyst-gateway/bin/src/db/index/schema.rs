@@ -55,7 +55,7 @@ const SCHEMAS: &[(&str, &str)] = &[
         "Create Table CIP-36 Registration",
     ),
     (
-        // CIP-36 Registration Materialzed View Schema
+        // CIP-36 Registration Table Schema
         include_str!("./schema/cip36_registration_by_vote_key.cql"),
         "Create Table CIP-36 Registration by Vote Key",
     ),

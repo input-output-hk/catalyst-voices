@@ -34,6 +34,8 @@ pub(crate) enum PreparedQuery {
     StakeRegistrationInsertQuery,
     /// CIP 36 Registration by Stake Address Insert query.
     Cip36RegistrationInsertQuery,
+    /// CIP 36 Registration by Vote Key Insert query.
+    Cip36RegistrationByVoteKeyInsertQuery,
 }
 
 /// All prepared queries for a session.
@@ -53,6 +55,8 @@ pub(crate) struct PreparedQueries {
     stake_registration_insert_queries: SizedBatch,
     /// CIP36 Registration by Stake Address Insert query.
     cip36_registration_insert_queries: SizedBatch,
+    /// CIP36 Registration by Stake Address Insert query.
+    cip36_registration_by_vote_key_insert_queries: SizedBatch,
 }
 
 /// An individual query response that can fail
@@ -72,6 +76,8 @@ impl PreparedQueries {
         let stake_registration_insert_queries = CertInsertQuery::prepare_batch(&session, cfg).await;
         let cip36_registration_insert_queries =
             Cip36InsertQuery::prepare_batch(&session, cfg).await;
+        let cip36_registration_by_vote_key_insert_queries =
+            Cip36InsertQuery::prepare_batch_by_vote_key(&session, cfg).await;
 
         let (
             txo_insert_queries,
@@ -88,6 +94,8 @@ impl PreparedQueries {
             txi_insert_queries: txi_insert_queries?,
             stake_registration_insert_queries: stake_registration_insert_queries?,
             cip36_registration_insert_queries: cip36_registration_insert_queries?,
+            cip36_registration_by_vote_key_insert_queries:
+                cip36_registration_by_vote_key_insert_queries?,
         })
     }
 
@@ -143,6 +151,9 @@ impl PreparedQueries {
             PreparedQuery::TxiInsertQuery => &self.txi_insert_queries,
             PreparedQuery::StakeRegistrationInsertQuery => &self.stake_registration_insert_queries,
             PreparedQuery::Cip36RegistrationInsertQuery => &self.cip36_registration_insert_queries,
+            PreparedQuery::Cip36RegistrationByVoteKeyInsertQuery => {
+                &self.cip36_registration_by_vote_key_insert_queries
+            },
         };
 
         let mut results: Vec<QueryResult> = Vec::new();
