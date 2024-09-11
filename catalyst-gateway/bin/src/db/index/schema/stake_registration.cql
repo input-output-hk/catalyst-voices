@@ -9,10 +9,10 @@ CREATE TABLE IF NOT EXISTS stake_registration (
     -- Non-Key Data
     stake_address   blob,     -- 32 Bytes Stake address - not present for scripts and may not be present for `register`.
 
-    -- Stake key licecycle data, shows what happened with the stake key at this slot#.
+    -- Stake key lifecycle data, shows what happened with the stake key at this slot#.
     script          boolean,  -- Is the address a script address.
     register        boolean,  -- True if the stake was registered in this transaction.
-    deregister      boolean,  -- True if the stake key was deregisterd in this transaction.
+    deregister      boolean,  -- True if the stake key was deregistered in this transaction.
     pool_delegation blob,     -- Stake was delegated to this Pool address. 
                               -- Not present if delegation did not change.
 
