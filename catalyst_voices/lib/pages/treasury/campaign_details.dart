@@ -91,7 +91,7 @@ class _SegmentDetails extends StatelessWidget {
             isExpanded: isExpanded,
           ),
           name: name,
-          isHighlighted: isExpanded,
+          isSelected: isExpanded,
         ),
         if (isExpanded)
           ...steps.map(

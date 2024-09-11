@@ -25,6 +25,9 @@ const ColorScheme darkColorScheme = ColorScheme.dark(
 const VoicesColorScheme darkVoicesColorScheme = VoicesColorScheme(
   textPrimary: VoicesColors.darkTextPrimary,
   textOnPrimary: VoicesColors.darkTextOnPrimary,
+  textOnPrimaryLevel0: VoicesColors.darkTextOnPrimaryLevel0,
+  textOnPrimaryLevel1: VoicesColors.darkTextOnPrimaryLevel1,
+  textOnPrimaryWhite: VoicesColors.darkTextOnPrimaryWhite,
   textOnPrimaryContainer: VoicesColors.darkTextOnPrimaryContainer,
   textDisabled: VoicesColors.darkTextDisabled,
   success: VoicesColors.darkSuccess,
@@ -100,6 +103,9 @@ const ColorScheme lightColorScheme = ColorScheme.light(
 const VoicesColorScheme lightVoicesColorScheme = VoicesColorScheme(
   textPrimary: VoicesColors.lightTextPrimary,
   textOnPrimary: VoicesColors.lightTextOnPrimary,
+  textOnPrimaryLevel0: VoicesColors.lightTextOnPrimaryLevel0,
+  textOnPrimaryLevel1: VoicesColors.lightTextOnPrimaryLevel1,
+  textOnPrimaryWhite: VoicesColors.lightTextOnPrimaryWhite,
   textOnPrimaryContainer: VoicesColors.lightTextOnPrimaryContainer,
   textDisabled: VoicesColors.lightTextDisabled,
   success: VoicesColors.lightSuccess,
