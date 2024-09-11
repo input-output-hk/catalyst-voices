@@ -73,6 +73,7 @@ Future<void> _signAndSubmitRbacTx({
   var result = '';
   try {
     final changeAddress = await api.getChangeAddress();
+    final rewardAddresses = await api.getRewardAddresses();
 
     final utxos = await api.getUtxos(
       amount: const Balance(
@@ -95,10 +96,15 @@ Future<void> _signAndSubmitRbacTx({
     final unsignedTx = _buildUnsignedRbacTx(
       inputs: utxos,
       changeAddress: changeAddress,
+      rewardAddresses: rewardAddresses,
       auxiliaryData: auxiliaryData,
     );
 
+    print('unsigned tx: ${hex.encode(cbor.encode(unsignedTx.toCbor()))}');
+
     final witnessSet = await api.signTx(transaction: unsignedTx);
+
+    print('Witness set: $witnessSet');
 
     final signedTx = Transaction(
       body: unsignedTx.body,
@@ -106,6 +112,8 @@ Future<void> _signAndSubmitRbacTx({
       witnessSet: witnessSet,
       auxiliaryData: unsignedTx.auxiliaryData,
     );
+
+    print('signed tx: ${hex.encode(cbor.encode(signedTx.toCbor()))}');
 
     final txHash = await api.submitTx(transaction: signedTx);
     result = 'Tx hash: ${txHash.toHex()}';
@@ -195,13 +203,23 @@ Future<X509MetadataEnvelope<RegistrationData>> _buildMetadataEnvelope({
 Transaction _buildUnsignedRbacTx({
   required List<TransactionUnspentOutput> inputs,
   required ShelleyAddress changeAddress,
+  required List<ShelleyAddress> rewardAddresses,
   required AuxiliaryData auxiliaryData,
 }) {
   final txBuilder = TransactionBuilder(
+    requiredSigners: {
+      for (final address in rewardAddresses) address.publicKeyHash,
+    },
     config: _buildTransactionBuilderConfig(),
     inputs: inputs,
     networkId: NetworkId.testnet,
     auxiliaryData: auxiliaryData,
+    witnessBuilder: TransactionWitnessSetBuilder(
+      vkeys: {},
+      // TODO(dtscalac): investigate if vkeyCount can be found out in a better way
+      // count = reward addresses vkeys + payment address vkey
+      vkeysCount: rewardAddresses.length + 1,
+    ),
   );
 
   final txBody = txBuilder.withChangeAddressIfNeeded(changeAddress).buildBody();
