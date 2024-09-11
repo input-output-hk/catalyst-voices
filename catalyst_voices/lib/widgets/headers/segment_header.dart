@@ -15,7 +15,7 @@ class SegmentHeader extends StatelessWidget {
     this.isSelected = false,
   });
 
-  Set<WidgetState> get states => {
+  Set<WidgetState> get _states => {
         if (isSelected) WidgetState.selected,
       };
 
@@ -29,14 +29,14 @@ class SegmentHeader extends StatelessWidget {
     final iconButtonStyle = ButtonStyle(
       fixedSize: WidgetStatePropertyAll(Size.square(48)),
       // resolving colors because IconButton does not have WidgetState.selected
-      iconColor: WidgetStatePropertyAll(foregroundColor.resolve(states)),
+      iconColor: WidgetStatePropertyAll(foregroundColor.resolve(_states)),
     );
     final textButtonStyle = ButtonStyle(
       foregroundColor: foregroundColor,
     );
 
     final textStyle = (theme.textTheme.titleMedium ?? TextStyle())
-        .copyWith(color: foregroundColor.resolve(states));
+        .copyWith(color: foregroundColor.resolve(_states));
 
     return IconButtonTheme(
       data: IconButtonThemeData(style: iconButtonStyle),
@@ -51,7 +51,7 @@ class SegmentHeader extends StatelessWidget {
             duration: kThemeChangeDuration,
             constraints: BoxConstraints(minHeight: 52),
             decoration: BoxDecoration(
-              color: backgroundColor.resolve(states),
+              color: backgroundColor.resolve(_states),
             ),
             padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             child: Row(
