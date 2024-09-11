@@ -329,7 +329,6 @@ ThemeData _buildThemeData(
       thickness: 1,
     ),
     tabBarTheme: TabBarTheme(
-      dividerColor: colorScheme.primaryContainer,
       tabAlignment: TabAlignment.start,
     ),
     progressIndicatorTheme: ProgressIndicatorThemeData(

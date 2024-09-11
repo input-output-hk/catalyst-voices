@@ -31,13 +31,6 @@ class WorkspaceTileContainer extends StatelessWidget {
           left: isSelected ? Radius.zero : Radius.circular(28),
           right: Radius.circular(28),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: theme.colors.elevationsOnSurfaceNeutralLv0!,
-            offset: Offset(0, 1),
-            blurRadius: 8,
-          ),
-        ],
       ),
       foregroundDecoration: BoxDecoration(
         border: Border(
