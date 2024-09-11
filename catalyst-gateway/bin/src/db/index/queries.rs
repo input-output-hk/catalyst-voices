@@ -8,7 +8,10 @@ use anyhow::bail;
 use crossbeam_skiplist::SkipMap;
 use scylla::{batch::Batch, serialize::row::SerializeRow, QueryResult, Session};
 
-use super::{index_certs::CertInsertQuery, index_txi::TxiInsertQuery, index_txo::TxoInsertQuery};
+use super::{
+    index_certs::CertInsertQuery, index_cip36::Cip36InsertQuery, index_txi::TxiInsertQuery,
+    index_txo::TxoInsertQuery,
+};
 use crate::settings::{CassandraEnvVars, CASSANDRA_MIN_BATCH_SIZE};
 
 /// Batches of different sizes, prepared and ready for use.
@@ -29,6 +32,8 @@ pub(crate) enum PreparedQuery {
     TxiInsertQuery,
     /// Stake Registration Insert query.
     StakeRegistrationInsertQuery,
+    /// CIP 36 Registration by Stake Address Insert query.
+    Cip36RegistrationInsertQuery,
 }
 
 /// All prepared queries for a session.
@@ -46,6 +51,8 @@ pub(crate) struct PreparedQueries {
     txi_insert_queries: SizedBatch,
     /// TXI Insert query.
     stake_registration_insert_queries: SizedBatch,
+    /// CIP36 Registration by Stake Address Insert query.
+    cip36_registration_insert_queries: SizedBatch,
 }
 
 /// An individual query response that can fail
@@ -63,6 +70,8 @@ impl PreparedQueries {
         let txi_insert_queries = TxiInsertQuery::prepare_batch(&session, cfg).await;
         let all_txo_queries = TxoInsertQuery::prepare_batch(&session, cfg).await;
         let stake_registration_insert_queries = CertInsertQuery::prepare_batch(&session, cfg).await;
+        let cip36_registration_insert_queries =
+            Cip36InsertQuery::prepare_batch(&session, cfg).await;
 
         let (
             txo_insert_queries,
@@ -78,6 +87,7 @@ impl PreparedQueries {
             unstaked_txo_asset_insert_queries,
             txi_insert_queries: txi_insert_queries?,
             stake_registration_insert_queries: stake_registration_insert_queries?,
+            cip36_registration_insert_queries: cip36_registration_insert_queries?,
         })
     }
 
@@ -132,6 +142,7 @@ impl PreparedQueries {
             PreparedQuery::UnstakedTxoAssetInsertQuery => &self.unstaked_txo_asset_insert_queries,
             PreparedQuery::TxiInsertQuery => &self.txi_insert_queries,
             PreparedQuery::StakeRegistrationInsertQuery => &self.stake_registration_insert_queries,
+            PreparedQuery::Cip36RegistrationInsertQuery => &self.cip36_registration_insert_queries,
         };
 
         let mut results: Vec<QueryResult> = Vec::new();

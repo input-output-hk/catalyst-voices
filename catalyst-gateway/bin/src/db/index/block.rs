@@ -4,8 +4,8 @@ use cardano_chain_follower::MultiEraBlock;
 use tracing::{debug, error};
 
 use super::{
-    index_certs::CertInsertQuery, index_txi::TxiInsertQuery, index_txo::TxoInsertQuery,
-    queries::FallibleQueryTasks, session::CassandraSession,
+    index_certs::CertInsertQuery, index_cip36::Cip36InsertQuery, index_txi::TxiInsertQuery,
+    index_txo::TxoInsertQuery, queries::FallibleQueryTasks, session::CassandraSession,
 };
 
 /// Convert a usize to an i16 and saturate at `i16::MAX`
@@ -22,6 +22,7 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
     };
 
     let mut cert_index = CertInsertQuery::new();
+    let mut cip36_index = Cip36InsertQuery::new();
     let mut txi_index = TxiInsertQuery::new();
     let mut txo_index = TxoInsertQuery::new();
 
@@ -41,6 +42,7 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
         // let mint = txs.mints().iter() {};
 
         // TODO: Index Metadata.
+        cip36_index.index(txn_index, txn, slot_no, block);
 
         // Index Certificates inside the transaction.
         cert_index.index(txs, slot_no, txn, block);
@@ -56,6 +58,7 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
     query_handles.extend(txo_index.execute(&session));
     query_handles.extend(txi_index.execute(&session));
     query_handles.extend(cert_index.execute(&session));
+    query_handles.extend(cip36_index.execute(&session));
 
     let mut result: anyhow::Result<()> = Ok(());
 
