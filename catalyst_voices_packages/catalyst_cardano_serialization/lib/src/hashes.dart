@@ -22,7 +22,7 @@ abstract base class BaseHash extends Equatable implements CborEncodable {
   /// Constructs the [BaseHash] from raw [bytes].
   BaseHash.fromBytes({required this.bytes}) {
     if (bytes.length != length) {
-      throw const HashFormatException();
+      throw HashFormatException('Expected $length bytes, got: ${bytes.length}');
     }
   }
 
