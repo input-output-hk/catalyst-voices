@@ -56,8 +56,6 @@ final class _LoggingServiceImpl implements LoggingService {
   void dispose() {
     _recordsSub?.cancel();
     _recordsSub = null;
-
-    root.clearListeners();
   }
 
   void _onLogRecord(LogRecord log) {
@@ -76,17 +74,18 @@ final class _LoggingServiceImpl implements LoggingService {
         context: ErrorDescription(log.message),
       );
       FlutterError.dumpErrorToConsole(errorDetails);
-    } else {
-      developer.log(
-        log.message,
-        time: log.time,
-        sequenceNumber: log.sequenceNumber,
-        level: log.level.value,
-        name: log.loggerName,
-        zone: log.zone,
-        error: log.error,
-        stackTrace: log.stackTrace,
-      );
+      return;
     }
+
+    developer.log(
+      log.message,
+      time: log.time,
+      sequenceNumber: log.sequenceNumber,
+      level: log.level.value,
+      name: log.loggerName,
+      zone: log.zone,
+      error: log.error,
+      stackTrace: log.stackTrace,
+    );
   }
 }

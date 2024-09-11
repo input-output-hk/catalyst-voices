@@ -42,13 +42,8 @@ final class Dependencies extends DependencyProvider {
   }
 
   void _registerServices() {
-    this
-      ..registerSingleton<SecureStorageService>(
-        SecureStorageService(),
-      )
-      ..registerLazySingleton(
-        () => LoggingService(),
-        dispose: (manager) => manager.dispose(),
-      );
+    registerSingleton<SecureStorageService>(
+      SecureStorageService(),
+    );
   }
 }

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:catalyst_voices/app/app.dart';
 import 'package:catalyst_voices/configs/app_bloc_observer.dart';
@@ -13,6 +12,13 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_strategy/url_strategy.dart';
+
+final _loggingService = LoggingService();
+
+final _bootstrapLogger = Logger('Bootstrap');
+final _flutterLogger = Logger('Flutter');
+final _platformDispatcherLogger = Logger('PlatformDispatcher');
+final _uncouthZoneLogger = Logger('UncouthZone');
 
 typedef BootstrapWidgetBuilder = FutureOr<Widget> Function(BootstrapArgs args);
 
@@ -50,14 +56,14 @@ Future<void> _doBootstrap(BootstrapWidgetBuilder builder) async {
     WidgetsFlutterBinding.ensureInitialized();
   }
 
+  _loggingService
+    ..level = kDebugMode ? Level.ALL : Level.OFF
+    ..printLogs = kDebugMode;
+
   FlutterError.onError = _reportFlutterError;
   PlatformDispatcher.instance.onError = _reportPlatformDispatcherError;
 
   await Dependencies.instance.init();
-
-  final loggingService = Dependencies.instance.get<LoggingService>();
-  loggingService.level = kDebugMode ? Level.ALL : Level.OFF;
-  loggingService.printLogs = kDebugMode;
 
   GoRouter.optionURLReflectsImperativeAPIs = true;
   setPathUrlStrategy();
@@ -91,37 +97,25 @@ Widget _defaultBuilder(BootstrapArgs args) {
 }
 
 Future<void> _reportBootstrapError(Object error, StackTrace stack) async {
-  if (kDebugMode) {
-    debugPrint('Bootstrap Error');
-    debugPrint(error.toString());
-    debugPrintStack(stackTrace: stack, label: 'Bootstrap');
-  }
+  _bootstrapLogger.severe('Error while bootstrapping', error, stack);
 }
 
 /// Flutter-specific assertion failures and contract violations.
 Future<void> _reportFlutterError(FlutterErrorDetails details) async {
-  if (kDebugMode) FlutterError.presentError(details);
-
-  // Crashes app.
-  if (kReleaseMode) exit(1);
+  _flutterLogger.severe(
+    details.context?.toStringDeep(),
+    details.exception,
+    details.stack,
+  );
 }
 
 /// Platform Dispatcher Errors reporting
 bool _reportPlatformDispatcherError(Object error, StackTrace stack) {
-  if (kDebugMode) {
-    debugPrint('PlatformDispatcher Error');
-    debugPrint(error.toString());
-    debugPrintStack(stackTrace: stack, label: 'PlatformDispatcher');
-  }
-
+  _platformDispatcherLogger.severe('Platform Error', error, stack);
   return true;
 }
 
 /// Uncaught Errors reporting
 void _reportUncouthZoneError(Object error, StackTrace stack) {
-  if (kDebugMode) {
-    debugPrint('UncouthZoneError Error');
-    debugPrint(error.toString());
-    debugPrintStack(stackTrace: stack, label: 'UncouthZoneError');
-  }
+  _uncouthZoneLogger.severe('Uncouth Error', error, stack);
 }
