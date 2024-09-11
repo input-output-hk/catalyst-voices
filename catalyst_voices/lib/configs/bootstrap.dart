@@ -55,9 +55,9 @@ Future<void> _doBootstrap(BootstrapWidgetBuilder builder) async {
 
   await Dependencies.instance.init();
 
-  final loggerManager = Dependencies.instance.get<LoggingManager>();
-  loggerManager.level = kDebugMode ? Level.ALL : Level.OFF;
-  loggerManager.printLogs = kDebugMode;
+  final loggingService = Dependencies.instance.get<LoggingService>();
+  loggingService.level = kDebugMode ? Level.ALL : Level.OFF;
+  loggingService.printLogs = kDebugMode;
 
   GoRouter.optionURLReflectsImperativeAPIs = true;
   setPathUrlStrategy();

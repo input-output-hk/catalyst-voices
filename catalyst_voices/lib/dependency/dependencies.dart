@@ -11,7 +11,6 @@ final class Dependencies extends DependencyProvider {
   Future<void> init() async {
     DependencyProvider.instance = this;
     _registerServices();
-    _registerManagers();
     _registerRepositories();
     _registerBlocsWithDependencies();
   }
@@ -43,15 +42,13 @@ final class Dependencies extends DependencyProvider {
   }
 
   void _registerServices() {
-    registerSingleton<SecureStorageService>(
-      SecureStorageService(),
-    );
-  }
-
-  void _registerManagers() {
-    registerLazySingleton(
-      () => LoggingManager(),
-      dispose: (manager) => manager.dispose(),
-    );
+    this
+      ..registerSingleton<SecureStorageService>(
+        SecureStorageService(),
+      )
+      ..registerLazySingleton(
+        () => LoggingService(),
+        dispose: (manager) => manager.dispose(),
+      );
   }
 }

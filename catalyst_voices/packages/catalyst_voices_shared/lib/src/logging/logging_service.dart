@@ -6,9 +6,9 @@ import 'package:logging/logging.dart';
 
 export 'package:logging/logging.dart' show Level, Logger;
 
-abstract interface class LoggingManager {
-  factory LoggingManager() {
-    return _LoggingManagerImpl(root: Logger.root);
+abstract interface class LoggingService {
+  factory LoggingService() {
+    return _LoggingServiceImpl(root: Logger.root);
   }
 
   set level(Level newValue);
@@ -18,12 +18,12 @@ abstract interface class LoggingManager {
   void dispose();
 }
 
-final class _LoggingManagerImpl implements LoggingManager {
+final class _LoggingServiceImpl implements LoggingService {
   final Logger root;
 
   StreamSubscription<LogRecord>? _recordsSub;
 
-  _LoggingManagerImpl({
+  _LoggingServiceImpl({
     required this.root,
   }) : _printLogs = false {
     hierarchicalLoggingEnabled = true;
