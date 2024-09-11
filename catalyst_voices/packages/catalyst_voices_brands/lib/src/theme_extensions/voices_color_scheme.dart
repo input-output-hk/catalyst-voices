@@ -9,6 +9,9 @@ import 'package:flutter/material.dart';
 class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
   final Color? textPrimary;
   final Color? textOnPrimary;
+  final Color? textOnPrimaryLevel0;
+  final Color? textOnPrimaryLevel1;
+  final Color? textOnPrimaryWhite;
   final Color? textOnPrimaryContainer;
   final Color? textDisabled;
   final Color? success;
@@ -64,6 +67,9 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
   const VoicesColorScheme({
     required this.textPrimary,
     required this.textOnPrimary,
+    required this.textOnPrimaryLevel0,
+    required this.textOnPrimaryLevel1,
+    required this.textOnPrimaryWhite,
     required this.textOnPrimaryContainer,
     required this.textDisabled,
     required this.success,
@@ -121,6 +127,9 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
   const VoicesColorScheme.optional({
     this.textPrimary,
     this.textOnPrimary,
+    this.textOnPrimaryLevel0,
+    this.textOnPrimaryLevel1,
+    this.textOnPrimaryWhite,
     this.textOnPrimaryContainer,
     this.textDisabled,
     this.success,
@@ -178,6 +187,9 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
   ThemeExtension<VoicesColorScheme> copyWith({
     Color? textPrimary,
     Color? textOnPrimary,
+    Color? textOnPrimaryLevel0,
+    Color? textOnPrimaryLevel1,
+    Color? textOnPrimaryWhite,
     Color? textOnPrimaryContainer,
     Color? textDisabled,
     Color? success,
@@ -233,6 +245,9 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     return VoicesColorScheme(
       textPrimary: textPrimary ?? this.textPrimary,
       textOnPrimary: textOnPrimary ?? this.textOnPrimary,
+      textOnPrimaryLevel0: textOnPrimaryLevel0 ?? this.textOnPrimaryLevel0,
+      textOnPrimaryLevel1: textOnPrimaryLevel1 ?? this.textOnPrimaryLevel1,
+      textOnPrimaryWhite: textOnPrimaryWhite ?? this.textOnPrimaryWhite,
       textOnPrimaryContainer:
           textOnPrimaryContainer ?? this.textOnPrimaryContainer,
       textDisabled: textDisabled ?? this.textDisabled,
@@ -309,8 +324,26 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     return VoicesColorScheme(
       textPrimary: Color.lerp(textPrimary, other.textPrimary, t),
       textOnPrimary: Color.lerp(textOnPrimary, other.textOnPrimary, t),
-      textOnPrimaryContainer:
-          Color.lerp(textOnPrimaryContainer, other.textOnPrimaryContainer, t),
+      textOnPrimaryLevel0: Color.lerp(
+        textOnPrimaryLevel0,
+        other.textOnPrimaryLevel0,
+        t,
+      ),
+      textOnPrimaryLevel1: Color.lerp(
+        textOnPrimaryLevel1,
+        other.textOnPrimaryLevel1,
+        t,
+      ),
+      textOnPrimaryWhite: Color.lerp(
+        textOnPrimaryWhite,
+        other.textOnPrimaryWhite,
+        t,
+      ),
+      textOnPrimaryContainer: Color.lerp(
+        textOnPrimaryContainer,
+        other.textOnPrimaryContainer,
+        t,
+      ),
       textDisabled: Color.lerp(textDisabled, other.textDisabled, t),
       success: Color.lerp(success, other.success, t),
       onSuccess: Color.lerp(onSuccess, other.onSuccess, t),
