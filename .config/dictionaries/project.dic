@@ -47,6 +47,7 @@ cryptoxide
 Cunego
 Cupertino
 dalek
+damian-molinski
 DAPPLICATION
 dbeaver
 dbschema
@@ -90,6 +91,7 @@ gradlew
 headful
 headlessui
 HIDPI
+hotspots
 icudtl
 ideascale
 idents
@@ -132,6 +134,7 @@ localizable
 loguru
 lovelace
 lovelaces
+LTRB
 mdlint
 metadatum
 metadatums
@@ -148,6 +151,7 @@ multidex
 multiplatform
 Multiplatform
 myproject
+Nami
 nanos
 NDEBUG
 netifas
@@ -239,6 +243,7 @@ utxo
 UTXO
 utxos
 Utxos
+Vespr
 vite
 vitss
 vkey
@@ -246,6 +251,7 @@ vkeys
 vkeywitness
 voteplan
 voteplans
+vsync
 wallclock
 wasmtime
 Wconditional
@@ -267,3 +273,6 @@ vsync
 damian-molinski
 LTRB
 hotspots
+precache
+Precache
+svgs

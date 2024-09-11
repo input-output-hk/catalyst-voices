@@ -1,4 +1,5 @@
 export 'app_bar/voices_app_bar.dart';
+export 'avatars/space_avatar.dart';
 export 'avatars/voices_avatar.dart';
 export 'buttons/voices_buttons.dart';
 export 'buttons/voices_filled_button.dart';
