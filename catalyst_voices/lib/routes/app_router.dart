@@ -23,7 +23,7 @@ abstract final class AppRouter {
       ],
       routes: Routes.routes,
       // always true. We're deciding whether to print
-      // them or not in LoggingManager
+      // them or not in LoggingService
       debugLogDiagnostics: true,
     );
   }
