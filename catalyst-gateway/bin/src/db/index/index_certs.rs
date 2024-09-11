@@ -130,7 +130,6 @@ impl CertInsertQuery {
                 let addr = block
                     .witness_for_tx(cred, u16_from_saturating(txn))
                     .unwrap_or(default_addr);
-                //let addr = witnesses.get(cred.as_ref()).unwrap_or(&default_addr);
                 // Note: it is totally possible for the Registration Certificate to not be
                 // witnessed.
                 (cred.to_vec(), addr.clone(), false)
@@ -222,15 +221,17 @@ impl CertInsertQuery {
         block: &MultiEraBlock,
     ) {
         #[allow(clippy::match_same_arms)]
-        txs.certs().iter().for_each(|cert| match cert {
-            pallas::ledger::traverse::MultiEraCert::NotApplicable => {},
-            pallas::ledger::traverse::MultiEraCert::AlonzoCompatible(cert) => {
-                self.index_alonzo_cert(cert, slot_no, txn, block);
-            },
-            pallas::ledger::traverse::MultiEraCert::Conway(cert) => {
-                self.index_conway_cert(cert, slot_no, txn, block);
-            },
-            _ => {},
+        txs.certs().iter().for_each(|cert| {
+            match cert {
+                pallas::ledger::traverse::MultiEraCert::NotApplicable => {},
+                pallas::ledger::traverse::MultiEraCert::AlonzoCompatible(cert) => {
+                    self.index_alonzo_cert(cert, slot_no, txn, block);
+                },
+                pallas::ledger::traverse::MultiEraCert::Conway(cert) => {
+                    self.index_conway_cert(cert, slot_no, txn, block);
+                },
+                _ => {},
+            }
         });
     }
 
