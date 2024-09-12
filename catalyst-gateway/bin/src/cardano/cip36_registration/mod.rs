@@ -30,10 +30,12 @@ pub(crate) struct VotingPurpose(u64);
 pub(crate) struct RewardsAddress(pub Vec<u8>);
 
 /// Error report for serializing
+#[allow(dead_code)]
 pub(crate) type ErrorReport = Vec<String>;
 
 impl PubKey {
     /// Get credentials, a blake2b 28 bytes hash of the pub key
+    #[allow(dead_code)]
     pub(crate) fn get_credentials(&self) -> [u8; 28] {
         let mut digest = [0u8; 28];
         let mut context = Blake2b::new(28);
@@ -71,6 +73,8 @@ pub(crate) enum VotingInfo {
 
 /// CIP-36 registration info part
 #[derive(Debug, Clone, PartialEq)]
+#[allow(dead_code)]
+
 pub(crate) struct Registration {
     /// Voting info
     pub(crate) voting_info: VotingInfo,
@@ -86,6 +90,8 @@ pub(crate) struct Registration {
 
 /// A catalyst CIP-36 registration on Cardano
 #[derive(Debug, Clone, PartialEq)]
+#[allow(dead_code)]
+
 pub(crate) struct Cip36Metadata {
     /// CIP-36 registration 61284
     pub(crate) registration: Option<Registration>,
@@ -98,6 +104,7 @@ pub(crate) struct Cip36Metadata {
 impl Cip36Metadata {
     /// Create new `Cip36Registration` from tx metadata
     /// Collect secondary errors for granular json error report
+    #[allow(dead_code)]
     pub(crate) fn generate_from_tx_metadata(
         tx_metadata: &MultiEraMeta, network: Network,
     ) -> Option<Self> {

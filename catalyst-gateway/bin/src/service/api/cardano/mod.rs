@@ -3,22 +3,21 @@ use poem_openapi::{
     param::{Path, Query},
     OpenApi,
 };
+use types::{DateTime, SlotNumber};
 
-use crate::{
-    db::event::cardano::chain_state::{DateTime, SlotNumber},
-    service::{
-        common::{
-            objects::cardano::{network::Network, stake_address::StakeAddress},
-            tags::ApiTags,
-        },
-        utilities::middleware::schema_validation::schema_version_validation,
+use crate::service::{
+    common::{
+        objects::cardano::{network::Network, stake_address::StakeAddress},
+        tags::ApiTags,
     },
+    utilities::middleware::schema_validation::schema_version_validation,
 };
 
 mod date_time_to_slot_number_get;
 mod registration_get;
 mod staked_ada_get;
 mod sync_state_get;
+pub(crate) mod types;
 
 /// Cardano Follower API Endpoints
 pub(crate) struct CardanoApi;

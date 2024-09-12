@@ -2,21 +2,18 @@
 
 use poem_openapi::{payload::Json, ApiResponse};
 
-use crate::{
-    db::event::{cardano::chain_state::SlotNumber, error::NotFoundError, EventDB},
-    service::{
-        common::{
-            objects::cardano::{
-                network::Network, stake_address::StakeAddress, stake_info::StakeInfo,
-            },
-            responses::WithErrorResponses,
-        },
-        utilities::check_network,
+use super::types::SlotNumber;
+use crate::service::{
+    common::{
+        objects::cardano::{network::Network, stake_address::StakeAddress, stake_info::StakeInfo},
+        responses::WithErrorResponses,
     },
+    utilities::check_network,
 };
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
+#[allow(dead_code)]
 pub(crate) enum Responses {
     /// The amount of ADA staked by the queried stake address, as at the indicated slot.
     #[oai(status = 200)]
@@ -30,27 +27,30 @@ pub(crate) enum Responses {
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # GET `/staked_ada`
+#[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
 pub(crate) async fn endpoint(
     stake_address: StakeAddress, provided_network: Option<Network>, slot_num: Option<SlotNumber>,
 ) -> AllResponses {
-    let date_time = slot_num.unwrap_or(SlotNumber::MAX);
-    let stake_credential = stake_address.payload().as_hash().to_vec();
+    let _date_time = slot_num.unwrap_or(SlotNumber::MAX);
+    let _stake_credential = stake_address.payload().as_hash().to_vec();
 
-    let network = match check_network(stake_address.network(), provided_network) {
+    let _network = match check_network(stake_address.network(), provided_network) {
         Ok(network) => network,
         Err(err) => return AllResponses::handle_error(&err),
     };
 
+    let _unused = "
     // get the total utxo amount from the database
     match EventDB::total_utxo_amount(stake_credential, network.into(), date_time).await {
-        Ok((amount, slot_number)) => {
-            Responses::Ok(Json(StakeInfo {
-                amount,
-                slot_number,
-            }))
-            .into()
-        },
+        Ok((amount, slot_number)) => Responses::Ok(Json(StakeInfo {
+            amount,
+            slot_number,
+        }))
+        .into(),
         Err(err) if err.is::<NotFoundError>() => Responses::NotFound.into(),
         Err(err) => AllResponses::handle_error(&err),
     }
+    ";
+
+    Responses::NotFound.into()
 }

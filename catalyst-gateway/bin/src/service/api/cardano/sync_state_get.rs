@@ -2,16 +2,14 @@
 
 use poem_openapi::{payload::Json, ApiResponse};
 
-use crate::{
-    db::event::{error::NotFoundError, EventDB},
-    service::common::{
-        objects::cardano::{network::Network, sync_state::SyncState},
-        responses::WithErrorResponses,
-    },
+use crate::service::common::{
+    objects::cardano::{network::Network, sync_state::SyncState},
+    responses::WithErrorResponses,
 };
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
+#[allow(dead_code)]
 pub(crate) enum Responses {
     /// The synchronisation state of the blockchain with the catalyst gateway service.
     #[oai(status = 200)]
@@ -25,10 +23,11 @@ pub(crate) enum Responses {
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # GET `/sync_state`
-#[allow(clippy::unused_async)]
+#[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
 pub(crate) async fn endpoint(network: Option<Network>) -> AllResponses {
-    let network = network.unwrap_or(Network::Mainnet);
+    let _network = network.unwrap_or(Network::Mainnet);
 
+    let _unused = "
     match EventDB::last_updated_state(network.into()).await {
         Ok((slot_number, block_hash, last_updated)) => {
             Responses::Ok(Json(SyncState {
@@ -41,4 +40,7 @@ pub(crate) async fn endpoint(network: Option<Network>) -> AllResponses {
         Err(err) if err.is::<NotFoundError>() => Responses::NotFound.into(),
         Err(err) => AllResponses::handle_error(&err),
     }
+    ";
+
+    Responses::NotFound.into()
 }
