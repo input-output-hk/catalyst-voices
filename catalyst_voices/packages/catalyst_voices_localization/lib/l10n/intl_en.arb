@@ -312,5 +312,22 @@
   "drawerSpaceFundedProjects": "Funded projects",
   "@drawerSpaceFundedProjects": {
     "description": "Name shown in spaces shell drawer"
+  },
+  "fundedProjectSpace": "Funded project space",
+  "@fundedProjectSpace": {
+    "description": "Title of the funded project space"
+  },
+  "noOfFundedProposals": "Funded proposals ({count})",
+  "@noOfFundedProposals": {
+    "description": "Tab label for funded proposals in funded projects space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "followed": "Followed",
+  "@followed": {
+    "description": "Refers to a list of followed items."
   }
 }
