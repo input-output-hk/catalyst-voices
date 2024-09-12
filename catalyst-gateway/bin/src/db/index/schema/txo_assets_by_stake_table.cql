@@ -1,7 +1,7 @@
 -- Transaction Outputs (Native Assets) per stake address.
 -- Unstaked Assets are not present in this table.
 CREATE TABLE IF NOT EXISTS txo_assets_by_stake (
-    -- Priamry Key Fields
+    -- Primary Key Fields
     stake_address   blob,     -- stake address hash (28 bytes stake address hash, zero length if not staked.)
     slot_no         varint,   -- slot number the txo was created in.
     txn             smallint, -- Which Transaction in the Slot is the TXO.

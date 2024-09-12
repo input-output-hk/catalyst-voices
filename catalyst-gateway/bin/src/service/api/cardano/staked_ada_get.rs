@@ -5,15 +5,13 @@ use anyhow::anyhow;
 use futures::StreamExt;
 use poem_openapi::{payload::Json, ApiResponse};
 
+use super::types::SlotNumber;
 use crate::{
-    db::{
-        event::cardano::chain_state::SlotNumber,
-        index::{
-            session::CassandraSession,
-            staked_ada::{
-                GetTxiByTxnHashesQuery, GetTxiByTxnHashesQueryParams, GetTxoByStakeAddressQuery,
-                GetTxoByStakeAddressQueryParams, UpdateTxoSpentQuery, UpdateTxoSpentQueryParams,
-            },
+    db::index::{
+        session::CassandraSession,
+        staked_ada::{
+            GetTxiByTxnHashesQuery, GetTxiByTxnHashesQueryParams, GetTxoByStakeAddressQuery,
+            GetTxoByStakeAddressQueryParams, UpdateTxoSpentQuery, UpdateTxoSpentQueryParams,
         },
     },
     service::common::{
@@ -28,6 +26,7 @@ use crate::{
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
+#[allow(dead_code)]
 pub(crate) enum Responses {
     /// The amount of ADA staked by the queried stake address, as at the indicated slot.
     #[oai(status = 200)]
@@ -41,6 +40,7 @@ pub(crate) enum Responses {
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// # GET `/staked_ada`
+#[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
 pub(crate) async fn endpoint(
     stake_address: StakeAddress, _provided_network: Option<Network>, slot_num: Option<SlotNumber>,
 ) -> AllResponses {

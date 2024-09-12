@@ -7,4 +7,7 @@ export 'proposal/pending_proposal.dart';
 export 'proposal/proposal_status.dart';
 export 'session_data.dart';
 export 'space.dart';
+export 'treasury/treasury_campaign_builder.dart';
+export 'treasury/treasury_campaign_segment.dart';
+export 'treasury/treasury_campaign_segment_step.dart';
 export 'user/user.dart';

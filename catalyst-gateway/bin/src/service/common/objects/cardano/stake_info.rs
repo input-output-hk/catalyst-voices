@@ -2,7 +2,7 @@
 
 use poem_openapi::{types::Example, Object};
 
-use crate::db::event::cardano::{chain_state::SlotNumber, utxo::StakeAmount};
+use crate::service::api::cardano::types::{SlotNumber, StakeAmount};
 
 /// User's cardano stake info.
 #[derive(Object, Default)]

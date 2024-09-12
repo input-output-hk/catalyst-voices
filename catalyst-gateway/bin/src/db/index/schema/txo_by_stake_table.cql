@@ -1,7 +1,7 @@
 -- Transaction Outputs (ADA) per stake address.
 -- Unstaked ADA is not present in this table.
 CREATE TABLE IF NOT EXISTS txo_by_stake (
-    -- Priamry Key Fields
+    -- Primary Key Fields
     stake_address   blob,       -- stake address hash (28 bytes stake address hash, zero length if not staked.)
     slot_no         varint,     -- slot number the txo was created in.
     txn             smallint,   -- Which Transaction in the Slot is the TXO.
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS txo_by_stake (
     spent_slot      varint,     -- Slot this TXO was spent in.
                                 -- This is ONLY calculated/stored 
                                 -- when first detected in a query lookup.
-                                -- It serves as an optimization on subsequnt queries. 
+                                -- It serves as an optimization on subsequent queries. 
 
     PRIMARY KEY (stake_address, slot_no, txn, txo)
 );

@@ -1,0 +1,68 @@
+VERSION 0.8
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.1.25 AS flutter-ci
+
+deps:
+    FROM mcr.microsoft.com/playwright:v1.45.2-jammy
+    WORKDIR /wallet-automation
+
+    RUN apt-get update && apt-get install -y \
+        libnss3 libatk-bridge2.0-0 libdrm-dev libxkbcommon-dev libgbm-dev libasound-dev libatspi2.0-0 libxshmfence-dev postgresql-client xvfb python3.11 python3-pip && \
+        apt-get clean && \
+        rm -rf /var/lib/apt/lists/*
+
+    COPY package.json .
+    COPY package-lock.json .
+
+    RUN npm install
+    ENV PATH "/wallet-automation/node_modules/.bin:$PATH"
+
+src:
+    FROM +deps
+    COPY keys.txt .
+    COPY playwright.config.ts .
+    COPY global-setup.ts .
+    COPY wallet-tests.spec.ts .
+    COPY utils.ts .
+
+package-test:
+    FROM +src
+    ENV APP_URL http://app:80
+    RUN mkdir /results
+    VOLUME /results
+    ENTRYPOINT ["/bin/sh", "-c", "/usr/bin/xvfb-run --auto-servernum npm test", ""]
+    ARG tag='latest'
+    SAVE IMAGE test:$tag
+
+builder:
+    DO flutter-ci+SETUP
+    COPY ../../../../../+repo-catalyst-voices-all/repo .
+    DO flutter-ci+BOOTSTRAP
+
+build-web:
+    FROM +builder
+    ARG WORKDIR=/frontend/catalyst_voices_packages/catalyst_cardano/catalyst_cardano/example
+    DO flutter-ci+BUILD_WEB --TARGET=lib/main.dart --WORKDIR=$WORKDIR
+    SAVE ARTIFACT web
+
+package-app:
+    FROM nginx:alpine3.18
+    ARG tag='latest'
+    COPY +build-web/web /usr/share/nginx/html/
+    SAVE IMAGE test-app:$tag
+
+nightly-test:
+    FROM earthly/dind:alpine-3.19
+    COPY compose.yml .
+    WITH DOCKER \
+        --compose compose.yml \
+        --load test-app:latest=(+package-app) \
+        --load test:latest=(+package-test) \
+        --service app \
+        --allow-privileged
+
+        RUN docker run --network=default_default --name=test test:latest && \
+            docker cp test:/results/cardano-wallet.junit-report.xml cardano-wallet.junit-report.xml
+    END
+    WAIT
+        SAVE ARTIFACT cardano-wallet.junit-report.xml AS LOCAL cardano-wallet.junit-report.xml
+    END

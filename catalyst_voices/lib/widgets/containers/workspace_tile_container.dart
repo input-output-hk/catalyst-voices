@@ -26,25 +26,19 @@ class WorkspaceTileContainer extends StatelessWidget {
     return AnimatedContainer(
       duration: kThemeChangeDuration,
       decoration: BoxDecoration(
-        color: theme.colorScheme.onPrimary,
+        color: theme.colors.elevationsOnSurfaceNeutralLv1White,
         borderRadius: BorderRadius.horizontal(
           left: isSelected ? Radius.zero : Radius.circular(28),
           right: Radius.circular(28),
         ),
-        boxShadow: theme.brightness == Brightness.light
-            ? [
-                BoxShadow(
-                  color: Color(0x1F123CD3),
-                  offset: Offset(0, 1),
-                  blurRadius: 8,
-                ),
-              ]
-            : null,
       ),
       foregroundDecoration: BoxDecoration(
         border: Border(
           left: isSelected
-              ? BorderSide(color: theme.colorScheme.primary, width: 5)
+              ? BorderSide(
+                  color: theme.colorScheme.primary,
+                  width: 5,
+                )
               : BorderSide.none,
         ),
       ),
