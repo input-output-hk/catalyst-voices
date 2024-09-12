@@ -2,6 +2,9 @@
 <resources>
     <color name="light_text_primary">#212A3D</color>
     <color name="light_text_on_primary">#506288</color>
+    <color name="light_text_on_primary_level_0">#212A3D</color>
+    <color name="light_text_on_primary_level_1">#506288</color>
+    <color name="light_text_on_primary_white">#FFFFFF</color>
     <color name="light_text_on_primary_container">#FFFFFF</color>
     <color name="light_text_disabled">#61212A3D</color>
     <color name="light_primary">#123CD3</color>
@@ -65,6 +68,9 @@
     <color name="light_outline_border_outline_variant">#61BFC8D9</color>
     <color name="dark_text_primary">#FFFFFF</color>
     <color name="dark_text_on_primary">#E6E9F0</color>
+    <color name="dark_text_on_primary_level_0">#FFFFFF</color>
+    <color name="dark_text_on_primary_level_1">#E6E9F0</color>
+    <color name="dark_text_on_primary_white">#0C288D</color>
     <color name="dark_text_on_primary_container">#0C288D</color>
     <color name="dark_text_disabled">#61D9DEE8</color>
     <color name="dark_primary">#728EF3</color>
