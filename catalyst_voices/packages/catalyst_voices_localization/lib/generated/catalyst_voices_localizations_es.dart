@@ -256,4 +256,10 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get overallSpacesTasks => 'Tasks';
+
+  @override
+  String get voicesUpdateReady => 'Voices update ready';
+
+  @override
+  String get clickToRestart => 'Click to restart';
 }

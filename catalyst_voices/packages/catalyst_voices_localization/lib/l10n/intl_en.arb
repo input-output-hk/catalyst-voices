@@ -304,5 +304,13 @@
   "overallSpacesTasks": "Tasks",
   "@overallSpacesTasks": {
     "description": "Overall spaces tasks tile name"
+  },
+  "voicesUpdateReady": "Voices update ready",
+  "@voicesUpdateReady": {
+    "description": "In different places update popup title"
+  },
+  "clickToRestart": "Click to restart",
+  "@clickToRestart": {
+    "description": "In different places update popup body"
   }
 }

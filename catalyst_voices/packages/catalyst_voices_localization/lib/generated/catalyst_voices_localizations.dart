@@ -489,6 +489,18 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Tasks'**
   String get overallSpacesTasks;
+
+  /// In different places update popup title
+  ///
+  /// In en, this message translates to:
+  /// **'Voices update ready'**
+  String get voicesUpdateReady;
+
+  /// In different places update popup body
+  ///
+  /// In en, this message translates to:
+  /// **'Click to restart'**
+  String get clickToRestart;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

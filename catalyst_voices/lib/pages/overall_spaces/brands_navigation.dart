@@ -13,7 +13,6 @@ class BrandsNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: BoxConstraints.tightFor(width: 200),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(4),
         color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
