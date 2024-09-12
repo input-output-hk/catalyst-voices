@@ -3,7 +3,6 @@ import 'package:catalyst_voices/widgets/common/proposal_status_container.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class VoicesDrawerNavItem extends StatelessWidget {
@@ -24,7 +23,7 @@ class VoicesDrawerNavItem extends StatelessWidget {
       fixedSize: WidgetStatePropertyAll(Size.square(48)),
     );
 
-    final nameTextStyle = theme.textTheme.labelLarge?.copyWith(
+    final nameTextStyle = theme.textTheme.labelMedium?.copyWith(
       color: theme.colors.textPrimary,
     );
 
@@ -45,11 +44,12 @@ class VoicesDrawerNavItem extends StatelessWidget {
               ),
             ),
             ProposalStatusContainer(type: status),
+            SizedBox(width: 8),
             VoicesIconButton(
               child: Icon(CatalystVoicesIcons.dots_vertical),
               onTap: () {},
             ),
-          ].separatedBy(SizedBox(width: 12)).toList(),
+          ],
         ),
       ),
     );

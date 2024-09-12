@@ -18,7 +18,7 @@ class ProposalStatusContainer extends StatelessWidget {
     final config = type._config(context);
 
     final iconTheme = IconThemeData(
-      size: 18,
+      size: 16,
       color: config.iconColor,
     );
 
