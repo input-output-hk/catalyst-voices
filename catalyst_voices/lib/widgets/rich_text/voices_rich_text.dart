@@ -59,15 +59,18 @@ class _Editor extends StatelessWidget {
             ),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: QuillEditor.basic(
-            controller: controller,
-            focusNode: focusNode,
-            configurations: QuillEditorConfigurations(
-              padding: const EdgeInsets.all(16),
-              placeholder: context.l10n.placeholderRichText,
-              embedBuilders: CatalystPlatform.isWeb
-                  ? FlutterQuillEmbeds.editorWebBuilders()
-                  : FlutterQuillEmbeds.editorBuilders(),
+          child: IgnorePointer(
+            ignoring: !editMode,
+            child: QuillEditor.basic(
+              controller: controller,
+              focusNode: focusNode,
+              configurations: QuillEditorConfigurations(
+                padding: const EdgeInsets.all(16),
+                placeholder: context.l10n.placeholderRichText,
+                embedBuilders: CatalystPlatform.isWeb
+                    ? FlutterQuillEmbeds.editorWebBuilders()
+                    : FlutterQuillEmbeds.editorBuilders(),
+              ),
             ),
           ),
         ),
@@ -259,55 +262,52 @@ class _VoicesRichTextState extends State<VoicesRichText> {
 
   @override
   Widget build(BuildContext context) {
-    return ExcludeFocus(
-      excluding: !_editMode,
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(
-              left: 24,
-              top: 20,
-              bottom: 20,
-            ),
-            child: _TopBar(
-              title: widget.title,
-              editMode: _editMode,
-              onToggleEditMode: () {
-                setState(() {
-                  _editMode = !_editMode;
-                });
-              },
-            ),
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(
+            left: 24,
+            top: 20,
+            bottom: 20,
           ),
-          if (_editMode)
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16.0),
-              child: _Toolbar(controller: _controller),
-            ),
-          _Editor(
+          child: _TopBar(
+            title: widget.title,
             editMode: _editMode,
-            controller: _controller,
-            focusNode: _focusNode,
+            onToggleEditMode: () {
+              setState(() {
+                _editMode = !_editMode;
+              });
+            },
           ),
-          if (widget.charsLimit != null)
-            _Limit(
-              documentLength: _documentLength,
-              charsLimit: widget.charsLimit!,
-            ),
-          SizedBox(height: 16),
-          (_editMode)
-              ? _Footer(
-                  controller: _controller,
-                  onSave: (document) {
-                    widget.onSave?.call(document);
-                    setState(() {
-                      _editMode = false;
-                    });
-                  },
-                )
-              : SizedBox(height: 24),
-        ],
-      ),
+        ),
+        if (_editMode)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: _Toolbar(controller: _controller),
+          ),
+        _Editor(
+          editMode: _editMode,
+          controller: _controller,
+          focusNode: _focusNode,
+        ),
+        if (widget.charsLimit != null)
+          _Limit(
+            documentLength: _documentLength,
+            charsLimit: widget.charsLimit!,
+          ),
+        SizedBox(height: 16),
+        (_editMode)
+            ? _Footer(
+                controller: _controller,
+                onSave: (document) {
+                  widget.onSave?.call(document);
+                  setState(() {
+                    _editMode = false;
+                  });
+                },
+              )
+            : SizedBox(height: 24),
+      ],
     );
   }
 
