@@ -258,6 +258,7 @@ class _VoicesRichTextState extends State<VoicesRichText> {
   final QuillController _controller = QuillController.basic();
   int _documentLength = 0;
   bool _editMode = false;
+  Document _preEditDocument = Document();
   final FocusNode _focusNode = FocusNode();
 
   @override
@@ -275,6 +276,13 @@ class _VoicesRichTextState extends State<VoicesRichText> {
             editMode: _editMode,
             onToggleEditMode: () {
               setState(() {
+                if (_editMode) {
+                  _controller.document =
+                      Document.fromDelta(_preEditDocument.toDelta());
+                } else {
+                  _preEditDocument =
+                      Document.fromDelta(_controller.document.toDelta());
+                }
                 _editMode = !_editMode;
               });
             },
