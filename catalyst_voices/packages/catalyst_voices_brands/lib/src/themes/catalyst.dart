@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_brands/src/brands/brand.dart';
 import 'package:catalyst_voices_brands/src/theme_extensions/brand_assets.dart';
 import 'package:catalyst_voices_brands/src/theme_extensions/voices_color_scheme.dart';
 import 'package:catalyst_voices_brands/src/themes/widgets/buttons_theme.dart';
@@ -171,6 +172,7 @@ final ThemeData catalyst = _buildThemeData(
 );
 
 final BrandAssets darkBrandAssets = BrandAssets(
+  brand: Brand.catalyst,
   logo: VoicesAssets.images.catalystLogoWhite,
   logoIcon: VoicesAssets.images.catalystLogoIconWhite,
 );
@@ -183,6 +185,7 @@ final ThemeData darkCatalyst = _buildThemeData(
 );
 
 final BrandAssets lightBrandAssets = BrandAssets(
+  brand: Brand.catalyst,
   logo: VoicesAssets.images.catalystLogo,
   logoIcon: VoicesAssets.images.catalystLogoIcon,
 );

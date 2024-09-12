@@ -21,8 +21,8 @@ class BrandsNavigation extends StatelessWidget {
         mainAxisSize: MainAxisSize.max,
         children: [
           _BrandTile(
-            BrandKey.catalyst,
-            key: ObjectKey(BrandKey.catalyst),
+            Brand.catalyst,
+            key: ObjectKey(Brand.catalyst),
             isCurrent: true,
             onTap: () {},
           ),
@@ -40,7 +40,7 @@ class BrandsNavigation extends StatelessWidget {
 }
 
 class _BrandTile extends StatelessWidget {
-  final BrandKey brandKey;
+  final Brand brandKey;
   final bool isCurrent;
   final VoidCallback? onTap;
 
