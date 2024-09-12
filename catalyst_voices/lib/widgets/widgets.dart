@@ -35,6 +35,7 @@ export 'menu/voices_wallet_tile.dart';
 export 'modals/voices_desktop_dialog.dart';
 export 'modals/voices_dialog.dart';
 export 'modals/voices_info_dialog.dart';
+export 'scrollbar/voices_scrollbar.dart';
 export 'seed_phrase/seed_phrases_completer.dart';
 export 'seed_phrase/seed_phrases_picker.dart';
 export 'seed_phrase/seed_phrases_sequencer.dart';
