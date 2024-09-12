@@ -20,6 +20,7 @@ class VoicesScrollbar extends StatelessWidget {
     final theme = Theme.of(context);
 
     return RawScrollbar(
+      controller: controller,
       thumbVisibility: alwaysVisible,
       trackVisibility: alwaysVisible,
       thickness: 8.0,

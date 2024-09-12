@@ -34,7 +34,7 @@ class _SpacesListViewState extends State<SpacesListView> {
       child: ListView.separated(
         controller: _scrollController,
         scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.only(right: 16, bottom: 16 + 8),
+        padding: EdgeInsets.only(right: 16, bottom: 24),
         itemBuilder: (context, index) {
           final space = Space.values[index];
           return switch (space) {
