@@ -2,6 +2,7 @@ import 'package:catalyst_voices/pages/workspace/proposal_details.dart';
 import 'package:catalyst_voices/pages/workspace/proposal_navigation_panel.dart';
 import 'package:catalyst_voices/pages/workspace/proposal_segment_controller.dart';
 import 'package:catalyst_voices/pages/workspace/proposal_setup_panel.dart';
+import 'package:catalyst_voices/pages/workspace/sample_rich_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +25,7 @@ final _proposalNavigation = WorkspaceProposalNavigation(
         WorkspaceProposalSegmentStep(
           id: 1,
           title: 'Rich text',
-          document: Document.fromJson(_textSample),
+          document: Document.fromJson(sampleRichText),
           isEditable: true,
         ),
         WorkspaceProposalSegmentStep(
@@ -80,78 +81,3 @@ class _WorkspacePageState extends State<WorkspacePage> {
     return ProposalController(value);
   }
 }
-
-const _textSample = [
-  {
-    "insert": {
-      "image":
-          'https://upload.wikimedia.org/wikipedia/commons/b/b6/Image_created_with_a_mobile_phone.png'
-    },
-    "attributes": {"style": "width: 181.764; height: 140; "}
-  },
-  {"insert": "\n\n"},
-  {
-    "insert": "Legend Tells About Amakuni The Great Smith",
-    "attributes": {"bold": true}
-  },
-  {"insert": "\n\nAn ancient legend confirms "},
-  {
-    "insert": "Amakuni as the Father of the Samurai Sword. Amakuni",
-    "attributes": {"bold": true}
-  },
-  {"insert": " and his son, "},
-  {
-    "insert": "Amakura",
-    "attributes": {"italic": true}
-  },
-  {
-    "insert":
-        ", were the prominent smiths who led a team of armorers, employed by Emperor Mommu (683-707) to make swords for his army of warriors. Later his son, Amakura continued his father's "
-  },
-  {
-    "insert": "great work",
-    "attributes": {"italic": true}
-  },
-  {"insert": ".\n\n"},
-  {
-    "insert": "Amakura",
-    "attributes": {"italic": true}
-  },
-  {
-    "insert": "\n",
-    "attributes": {"list": "bullet"}
-  },
-  {
-    "insert": "Amakuro",
-    "attributes": {"italic": true}
-  },
-  {
-    "insert": "\n",
-    "attributes": {"list": "bullet"}
-  },
-  {
-    "insert": "Amakuri",
-    "attributes": {"italic": true}
-  },
-  {
-    "insert": "\n",
-    "attributes": {"list": "bullet"}
-  },
-  {"insert": "\n"},
-  {
-    "insert": "Sword 1",
-    "attributes": {"italic": true}
-  },
-  {
-    "insert": "\n",
-    "attributes": {"list": "ordered"}
-  },
-  {
-    "insert": "Sword 2",
-    "attributes": {"italic": true}
-  },
-  {
-    "insert": "\n",
-    "attributes": {"list": "ordered"}
-  }
-];
