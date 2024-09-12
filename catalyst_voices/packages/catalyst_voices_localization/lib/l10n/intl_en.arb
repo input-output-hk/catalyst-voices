@@ -165,6 +165,10 @@
   "@proposalStatusDraft": {
     "description": "Indicates to user that status is in draft mode"
   },
+  "proposalStatusInProgress": "In progress",
+  "@proposalStatusInProgress": {
+    "description": "Indicates to user that status is in progress"
+  },
   "fundedProposal": "Funded proposal",
   "@fundedProposal": {
     "description": "Label shown on a proposal card indicating that the proposal is funded."

@@ -20,11 +20,11 @@ class MyPrivateProposals extends StatelessWidget {
         ),
         VoicesDrawerNavItem(
           name: 'My second proposal',
-          status: ProposalStatus.draft,
+          status: ProposalStatus.inProgress,
         ),
         VoicesDrawerNavItem(
           name: 'My third proposal',
-          status: ProposalStatus.draft,
+          status: ProposalStatus.inProgress,
         ),
       ],
     );

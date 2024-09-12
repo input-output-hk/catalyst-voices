@@ -334,6 +334,12 @@ abstract class VoicesLocalizations {
   /// **'Draft'**
   String get proposalStatusDraft;
 
+  /// Indicates to user that status is in progress
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get proposalStatusInProgress;
+
   /// Label shown on a proposal card indicating that the proposal is funded.
   ///
   /// In en, this message translates to:
