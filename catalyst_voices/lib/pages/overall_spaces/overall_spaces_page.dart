@@ -1,4 +1,6 @@
-import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices/pages/overall_spaces/brands_navigation.dart';
+import 'package:catalyst_voices/pages/overall_spaces/spaces_overview_list_view.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 
 class OverallSpacesPage extends StatelessWidget {
@@ -9,8 +11,37 @@ class OverallSpacesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: VoicesAppBar(),
-      body: Center(child: Text('Overall spaces')),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16)
+            .add(EdgeInsets.only(bottom: 12, left: 16)),
+        child: Row(
+          children: [
+            _Navigation(),
+            SizedBox(width: 16),
+            Expanded(child: SpacesListView()),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Navigation extends StatelessWidget {
+  const _Navigation();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        BrandsNavigation(),
+        Spacer(),
+        FloatingActionButton(
+          onPressed: () {},
+          shape: CircleBorder(),
+          child: Icon(CatalystVoicesIcons.arrow_left),
+        )
+      ],
     );
   }
 }

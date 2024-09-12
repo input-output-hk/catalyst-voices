@@ -30,7 +30,7 @@ final class AppContent extends StatelessWidget {
       localeListResolutionCallback: basicLocaleListResolution,
       routerConfig: routerConfig,
       // Light mode is "go to" for now.
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.dark,
       theme: ThemeBuilder.buildTheme(BrandKey.catalyst),
       darkTheme: ThemeBuilder.buildDarkTheme(BrandKey.catalyst),
       builder: (context, child) {
