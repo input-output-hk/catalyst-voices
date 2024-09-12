@@ -28,7 +28,7 @@ class WorkspaceTileContainer extends StatelessWidget {
           ),
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).colors.onSurfacePrimary08!,
+              color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv0!,
               offset: Offset(0, 1),
               blurRadius: 4,
             ),
