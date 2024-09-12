@@ -53,7 +53,7 @@ class _Editor extends StatelessWidget {
           decoration: BoxDecoration(
             color: editMode
                 ? Theme.of(context).colors.onSurfaceNeutralOpaqueLv1
-                : Theme.of(context).colors.onSurfaceNeutralOpaqueLv0,
+                : Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
             border: Border.all(
               color: Theme.of(context).colorScheme.outlineVariant,
             ),
