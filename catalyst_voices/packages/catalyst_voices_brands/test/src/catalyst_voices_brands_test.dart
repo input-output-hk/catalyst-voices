@@ -18,7 +18,7 @@ void main() {
                   body: Row(
                     children: [
                       CatalystSvgPicture.asset(
-                        Theme.of(context).brandAssets.logo.path,
+                        Theme.of(context).brandAssets.brand.logo(context).path,
                       ),
                       MaterialButton(
                         key: catalystKey,

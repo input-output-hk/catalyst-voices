@@ -61,7 +61,7 @@ class _BrandTile extends StatelessWidget {
     return _BrandsNavigationTile(
       onTap: onTap,
       isSelected: isCurrent,
-      leading: theme.brandAssets.logoIcon.buildIcon(allowColorFilter: false),
+      leading: brand.logoIcon(context).buildIcon(allowColorFilter: false),
       content: Text(brand.localizedName(context.l10n)),
     );
   }

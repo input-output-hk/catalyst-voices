@@ -1,4 +1,3 @@
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/src/brands/brand.dart';
 import 'package:flutter/material.dart';
 
@@ -10,31 +9,23 @@ import 'package:flutter/material.dart';
 ///
 /// Example usage:
 /// ```dart
-/// final logo = Theme.of(context).brandAssets.logo;
-/// final logoIcon = Theme.of(context).brandAssets.logoIcon;
+/// final logo = Theme.of(context).brandAssets.brand.logo(context);
+/// final logoIcon = Theme.of(context).brandAssets.brand.logoIcon(context);
 /// ```
 @immutable
 class BrandAssets extends ThemeExtension<BrandAssets> {
   final Brand brand;
-  final SvgGenImage logo;
-  final SvgGenImage logoIcon;
 
   const BrandAssets({
     required this.brand,
-    required this.logo,
-    required this.logoIcon,
   });
 
   @override
   ThemeExtension<BrandAssets> copyWith({
     Brand? brand,
-    SvgGenImage? logo,
-    SvgGenImage? logoIcon,
   }) {
     return BrandAssets(
       brand: brand ?? this.brand,
-      logo: logo ?? this.logo,
-      logoIcon: logo ?? this.logoIcon,
     );
   }
 

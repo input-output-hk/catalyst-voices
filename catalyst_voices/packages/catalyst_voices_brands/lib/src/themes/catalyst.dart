@@ -173,8 +173,6 @@ final ThemeData catalyst = _buildThemeData(
 
 final BrandAssets darkBrandAssets = BrandAssets(
   brand: Brand.catalyst,
-  logo: VoicesAssets.images.catalystLogoWhite,
-  logoIcon: VoicesAssets.images.catalystLogoIconWhite,
 );
 
 /// Dark [ThemeData] for the `catalyst` brand.
@@ -186,8 +184,6 @@ final ThemeData darkCatalyst = _buildThemeData(
 
 final BrandAssets lightBrandAssets = BrandAssets(
   brand: Brand.catalyst,
-  logo: VoicesAssets.images.catalystLogo,
-  logoIcon: VoicesAssets.images.catalystLogoIcon,
 );
 
 TextTheme _buildTextTheme(VoicesColorScheme voicesColorScheme) {
