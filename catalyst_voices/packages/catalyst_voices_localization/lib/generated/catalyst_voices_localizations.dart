@@ -477,6 +477,24 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Funded projects'**
   String get drawerSpaceFundedProjects;
+
+  /// Title of the funded project space
+  ///
+  /// In en, this message translates to:
+  /// **'Funded project space'**
+  String get fundedProjectSpace;
+
+  /// Tab label for funded proposals in funded projects space
+  ///
+  /// In en, this message translates to:
+  /// **'Funded proposals ({count})'**
+  String noOfFundedProposals(int count);
+
+  /// Refers to a list of followed items.
+  ///
+  /// In en, this message translates to:
+  /// **'Followed'**
+  String get followed;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
