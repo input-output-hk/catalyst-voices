@@ -296,5 +296,13 @@
   "drawerSpaceFundedProjects": "Funded projects",
   "@drawerSpaceFundedProjects": {
     "description": "Name shown in spaces shell drawer"
+  },
+  "overallSpacesSearchBrands": "Search Brands",
+  "@overallSpacesSearchBrands": {
+    "description": "Overall spaces search brands tile name"
+  },
+  "overallSpacesTasks": "Tasks",
+  "@overallSpacesTasks": {
+    "description": "Overall spaces tasks tile name"
   }
 }

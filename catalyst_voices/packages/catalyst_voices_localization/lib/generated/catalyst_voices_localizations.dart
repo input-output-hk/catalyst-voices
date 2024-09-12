@@ -477,6 +477,18 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Funded projects'**
   String get drawerSpaceFundedProjects;
+
+  /// Overall spaces search brands tile name
+  ///
+  /// In en, this message translates to:
+  /// **'Search Brands'**
+  String get overallSpacesSearchBrands;
+
+  /// Overall spaces tasks tile name
+  ///
+  /// In en, this message translates to:
+  /// **'Tasks'**
+  String get overallSpacesTasks;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

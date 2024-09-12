@@ -1,6 +1,8 @@
+import 'package:catalyst_voices/common/ext/ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class BrandsNavigation extends StatelessWidget {
@@ -20,11 +22,14 @@ class BrandsNavigation extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
-          _BrandTile(
-            Brand.catalyst,
-            key: ObjectKey(Brand.catalyst),
-            isCurrent: true,
-            onTap: () {},
+          ...Brand.values.map(
+            (brand) {
+              return _BrandTile(
+                brand,
+                key: ObjectKey(brand),
+                onTap: () {},
+              );
+            },
           ),
           VoicesDivider(
             height: 16,
@@ -40,60 +45,49 @@ class BrandsNavigation extends StatelessWidget {
 }
 
 class _BrandTile extends StatelessWidget {
-  final Brand brandKey;
-  final bool isCurrent;
+  final Brand brand;
   final VoidCallback? onTap;
 
   const _BrandTile(
-    this.brandKey, {
+    this.brand, {
     super.key,
-    this.isCurrent = false,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isCurrent = theme.brandAssets.brand == brand;
+
     return _BrandsNavigationTile(
       onTap: onTap,
       isSelected: isCurrent,
-      leading: Icon(CatalystVoicesIcons.search),
-      content: Text('Search Brands'),
+      leading: theme.brandAssets.logoIcon.buildIcon(allowColorFilter: false),
+      content: Text(brand.localizedName(context.l10n)),
     );
   }
 }
 
 class _SearchTile extends StatelessWidget {
-  final VoidCallback? onTap;
-
-  const _SearchTile({
-    // ignore: unused_element
-    this.onTap,
-  });
+  const _SearchTile();
 
   @override
   Widget build(BuildContext context) {
     return _BrandsNavigationTile(
-      onTap: onTap,
       leading: Icon(CatalystVoicesIcons.search),
-      content: Text('Search Brands'),
+      content: Text(context.l10n.overallSpacesSearchBrands),
     );
   }
 }
 
 class _TasksTile extends StatelessWidget {
-  final VoidCallback? onTap;
-
-  const _TasksTile({
-    // ignore: unused_element
-    this.onTap,
-  });
+  const _TasksTile();
 
   @override
   Widget build(BuildContext context) {
     return _BrandsNavigationTile(
-      onTap: onTap,
       leading: Icon(CatalystVoicesIcons.collection),
-      content: Text('Tasks'),
+      content: Text(context.l10n.overallSpacesTasks),
     );
   }
 }

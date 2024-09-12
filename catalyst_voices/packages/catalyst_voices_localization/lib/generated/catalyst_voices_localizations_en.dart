@@ -250,4 +250,10 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get drawerSpaceFundedProjects => 'Funded projects';
+
+  @override
+  String get overallSpacesSearchBrands => 'Search Brands';
+
+  @override
+  String get overallSpacesTasks => 'Tasks';
 }
