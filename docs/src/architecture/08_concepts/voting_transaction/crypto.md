@@ -33,7 +33,7 @@ Through this paper we will use the following notations to refer to some entities
 * **Proposal** -
   voting subject on which each voter will be cast their votes.
 * **Proposal voting options** -
-  an amount of different proposal options, e.g. "Yes", "No", "Abstain".
+  a proposal options array, e.g. $[Yes, No, Abstain]$.
 * **Voting committee** -
   a special **trusted** entity, which perform tally process and revealing the results of the tallying.
   Such committee consists of the 1 person.
@@ -61,8 +61,8 @@ are not subjects of this paper.
 
 Before any voting will start an initial setup procedure should be performed.
 
-* Define an amount of voting options/choices for a proposal,
-  e.g. "Yes", "No", "Abstain" - 3 voting options.
+* Define an array of voting options/choices for a proposal,
+  e.g. $[Yes, No, Abstain]$ - 3 voting options.
 * Voting committee must generate a shared election public key $pk$ and distribute it among voters.
   A corresponding private key (secret share) $sk$ will be used to perform tally.
 * Define for each voter their own voting power.
@@ -81,24 +81,25 @@ So we will preserve anonymity without lacking transparency and correctness.
 
 #### Voting choice
 
-For some proposal, voter generates a unit vector $\mathbf{e}_t$,
-the length of such vector **must** be equal to the amount of the voting options,
-corresponded to the proposal.
+For some proposal, voter generates a unit vector $\mathbf{e}_i$,
+the length of such vector **must** be equal to the amount of the voting options of the proposal.
 <br/>
-$i$ is the identifier of the unit vector and varies $1 \le i \le M$, $M$ - amount of the voting options.
-This identifier defines that the $i$-th component is equal $1$
-and the rest components are equals $0$.
+$i$ correponds to the proposal voting choice and
+defines that the $i$-th component of the unit vector equals to $1$
+and the rest components are equals to $0$.
+And it stands as an identifier of the unit vector and could varies $1 \le i \le M$,
+$M$ - amount of the voting options.
 <br/>
-E.g. proposal has 3 voting options ("Yes", "No", "Abstain"):
+E.g. proposal has 3 voting options $[Yes, No, Abstain]$:
 
-* $\mathbf{e}_1$ equals to $(1,0,0)$,
-* $\mathbf{e}_2$ equals to $(0,1,0)$,
-* $\mathbf{e}_3$ equals to $(0,0,1)$
+* $\mathbf{e}_1$ equals to $(1,0,0)$ corresponds to $Yes$
+* $\mathbf{e}_2$ equals to $(0,1,0)$ corresponds to $No$
+* $\mathbf{e}_3$ equals to $(0,0,1)$ corresponds to $Abstain$
 
 Lets $e_{i,j}$ denote as an each component value of the unit vector $\mathbf{e}_i$.
-Where $i$ is an identifier of the vector as was described before,
-$j$ index of the vector's component, which could varies $1 \le j \le M$,
-$M$ - amount of the voting options and equals to the length of the vector.
+Where $i$ is a unit vector's identifier as it was described before,
+$j$ index of the unit vector's component, which could varies $1 \le j \le M$,
+$M$ - amount of the voting options and equals to the length of the unit vector.
 <br/>
 Using such notation unit vector $\mathbf{e}_i$ could be defined as
 <!-- markdownlint-disable emphasis-style -->
@@ -115,18 +116,18 @@ components would be defined as follows:
 * $e_{1, 2}$ equals to $0$
 * $e_{1, 3}$ equals to $0$
 
-#### Vote encrypting procedure
+#### Vote encrypting
 
 After the choice is done,
 vote **must** be encrypted using shared shared election public key $pk$.
 
-Lifted ElGamal encryption algorithm is used, noted as $Enc(message; randomness, public \, key)$.
+Lifted ElGamal encryption algorithm is used, noted as $Enc(message, randomness, public \; key)$.
 More detailed description of the lifted ElGamal algorithm
-you can find in the section `2.1.2` of this [paper][treasury_system_spec].
+you can find in the section *2.1.2* of this [paper][treasury_system_spec].
 <br/>
-$Enc_{pk}(message ; randomness; public_key)$ algorithm produces a ciphertext $c$ as a result.
+$Enc(message, randomness, public_key)$ algorithm produces a ciphertext $c$ as a result.
 \begin{equation}
-c = Enc_{pk}(message \; ; \; randomness \; public_key)
+c = Enc(message, randomness, public \; key)
 \end{equation}
 
 To encode previously generated unit vector $\mathbf{e}_i$ ($i$ - voting choice identifier),
@@ -139,17 +140,7 @@ where $j$ states as the same identifier of the vector component $e_{i,j}$.
 Then, for each vector component $e_{i,j}$ with the corresponding randomness,
 perform encryption algorithm applying shared election public key $pk$.
 \begin{equation}
-c_j = Enc(e_{i,j} \; ; \; r_j \; ; pk)
-\end{equation}
-
-
-To do that, by the provided unit vector $\mathbf{e}_t$
-for each vector component value $e_{t,f}$ generate a corresponding $r_f$ randomness.
-Therefore for each corresponding $r_f$ and component of the unit vector $e_{t,f}$
-apply encryption algorithm and get ciphertext values $c_f$.
-Encryption is done using the shared election public key $pk$.
-\begin{equation}
-c_f = Enc_{pk}(e_{t,f} \; ; \; r_f)
+c_j = Enc(e_{i,j}, r_j, pk)
 \end{equation}
 
 As a result getting a vector $\mathbf{c}$ of ciphertext values $c_f$,
@@ -166,63 +157,90 @@ This is a first part of the published vote for a specific proposal.
 
 #### Voter's proof
 
-Since tally is calculated homomorphically by summing up encrypted unit vectors $\mathbf{c}$
-(which will be shown in next section),
-it is crucial to verify that encryptions are formed correctly
-(i.e., that they indeed encrypt unit vectors).
+After the voter's choice is generated and encrypted,
+it is crucial to prove that [encoding](#voting-choice) and [encryptions](#vote-encrypting-procedure) are formed correctly
+(i.e. that the voter indeed encrypt a unit vector).
 
-Because by the definition of the encryption algorithm $Enc_{pk}(message \; ; \; randomness)$
+Because by the definition of the encryption algorithm $Enc(message, randomness, public \; key)$
 it is possible to encrypt an any message value,
 it is not restricted for encryption only $0$ and $1$ values
-(as was stated in the previous section,
-$e_{t,f}$ vector components only could be $0$ or $1$).
+(as it was stated in the previous [section](#voting-choice),
+unit vector components only could be $0$ or $1$).
+That's why it is needed to generate such a proof,
+so everyone could validate a correctness of the encrypted vote data,
+without reveilling a voting choice itself.
 
-To generate such a proof a ZK (Zero Knowledge) proof is generated,
-which allows by not revealing an actual value of $\mathbf{e}_t$
-still transparently verify the correctness of data of $\mathbf{e}_t$.
+To achive that a some sophisticated ZK (Zero Knowledge) algorithm is used,
+noted as $VotingChoiceProof(\mathbf{c})$.
+It takes an encrypted vote vector $\mathbf{c}$ and generates a proof value $\pi$.
+\begin{equation}
+\pi = VotingChoiceProof(\mathbf{c})
+\end{equation}
+
+So to validate a $VotingChoiceCheck(\mathbf{c}, \pi)$ procedure should be used,
+which takes an encrypted vote $\mathbf{c}$ and corresponded proof $\pi$
+as arguments and returns `true` or `false`,
+is it valid or not.
+\begin{equation}
+true | false = VotingChoiceCheck(\mathbf{c}, \pi)
+\end{equation}
+
+A more detailed description of how $VotingChoiceProof$, $VotingChoiceCheck$ work
+you can find in the section *2.4* of this [paper][treasury_system_spec].
 
 #### Vote publishing
 
 After all these procedures are done,
-a final step is to publish an encrypted voting choice $\mathbf{c}$
-and voter's proof corresponded to this choice.
-It could be published using any public channel, e.g. blockchain, ipfs, on any p2p network,
-but this is not a topic of current document.
+a final step is to publish an encrypted vote $\mathbf{c}$
+and voter's proof $\pi$ corresponded to this choice.
+It could be published using any public channel, e.g. blockchain, ipfs or through p2p network.
 
 ### Tally
 
-After the every voter done the choice and published it,
-voter committee could perform tally,
-for some proposal $\mathcal{P}$.
+After voters performed voting procedure and encrypted votes are published,
+tally could be executed by the voting committee.
+Important to note, voting committee doing tally does not reveiling personal voting choices.
 
-Lets denote $C := {\mathbf{c}_{v_1}, \mathbf{c}_{v_2}, \ldots, \mathbf{c}_{v_n}}$
-as a voter ballots for the specific proposal,
-where $\mathbf{c}_{v_i}$, $i \in [1, \ldots, n]$
-is an encrypted unit vector with the choice of a voter $v_i$ ($n$ - number of voters),
-which was generated on this [step](#vote-encrypting-procedure).
+By the result of tally procedure means
+an accumulated sum of voting power for each voting option of the proposal,
+based on published votes.
+<br/>
+E.g.:
 
-The first step is to take a
-voter's choice $\mathbf{c}_{v_i}$ with the corresponding voter's voting power $\alpha_i$.
-Expand $\mathbf{c}_{v_i}$ unit vector into the vector components
-$\mathbf{c}_{v_i} = (e_{v_i,1}, \ldots, e_{v_i,M})$,
-where $M$ number of voting options defined for the proposal.
-And for each corresponding unit vector component
-:
+* proposal with voting options $[Yes, No, Abstain]$
+* two different voters with their voting power:
+    * "Alice" with voting power $10$
+    *  "Bob" with voting power $30$
+* these voter's published their choices on this proposal:
+    * "Alice" voted $Yes$
+    * "Bob" voted $No$
+* final result would be the following:
+    * $Yes$ accumulated $10$
+    * $No$ accumulated $30$
+    * $Abstain$ accumulated $0$
+
+So to replicate the same process but securely,
+based on the set of encrypted votes $\mathbf{c}$,
+a special $Tally$ and $TallyProof$ algorithms are used.
+
+$Tally$ algorithm takes as an input following:
+* $sk$ - an election private key holded by voting committee.
+* $[\mathbf{c}_{1, i}, \mathbf{c}_{2, i}, \ldots \mathbf{c}_{N, i}]$ -
+  an array of encrypted vote vector's components corresponded to the considered voting choice.
+  Where $N$ - votes amount,
+  $i$ - vectors component index,
+  which is also corresponds to the voting choice.
+
 \begin{equation}
-\mathbf{c}_{v_i, j}^{\alpha_i}
-\end{equation}
-
-And it must be performed for every voter's ballot $\mathbf{c}_{v_i}$ and all these results shoud be multiplied with each other.
-So at the end we will have a new value $r_j$ corresponded to the specific voting option $j$,
-which is accumulated homomorphically all voting results with its voting powers for this voting option:
+ r_i = Tally([\mathbf{c}_{1, i}, \mathbf{c}_{2, i}, \ldots \mathbf{c}_{M, i}], sk)
 \begin{equation}
-r_j := \mathbf{c}_{v_1, j}^{\alpha_1} * \mathbf{c}_{v_2, j}^{\alpha_2} * \ldots * \mathbf{c}_{v_n, j}^{\alpha_n}
-\end{equation}
-
-where $n$ is a number of voters.
 
 
+E.g. a proposal with voting choices $[Yes, No]$ and votes $[\mathbf{c}_1, \mathbf{c}_2]$
+and election secret key $sk$.
 
+* Result for option $Yes$: $r_1 = Tally([\mathbf{c}_{1, 1}, \mathbf{c}_{2, 1}], sk)$.
+* Result for option $No$: $r_2 = Tally([\mathbf{c}_{1, 2}, \mathbf{c}_{2, 2}], sk)$
 
 ## Rationale
 
