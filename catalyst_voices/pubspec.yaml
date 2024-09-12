@@ -39,7 +39,7 @@ dependencies:
   flutter_bloc: ^8.1.5
   flutter_localized_locales: ^2.0.5
   flutter_quill: ^10.5.0
-  flutter_quill_extensions: ^10.5.0
+  flutter_quill_extensions: ^10.5.13
   flutter_web_plugins:
     sdk: flutter
   formz: ^0.7.0
