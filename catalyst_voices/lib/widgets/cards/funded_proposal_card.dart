@@ -99,7 +99,7 @@ class _Header extends StatelessWidget {
                 padding: EdgeInsets.zero,
                 onPressed: () => onFavoriteChanged?.call(!isFavorite),
                 icon: Icon(
-                  isFavorite ? Icons.favorite : CatalystVoicesIcons.star,
+                  isFavorite ? Icons.favorite : CatalystVoicesIcons.plus_circle,
                   size: 20,
                   color: Theme.of(context).colors.iconsOnImage,
                 ),
