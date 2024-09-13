@@ -1,4 +1,5 @@
 enum ProposalStatus {
   ready,
-  draft;
+  draft,
+  inProgress;
 }

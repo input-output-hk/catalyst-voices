@@ -1,31 +1,33 @@
-import 'package:catalyst_voices/pages/treasury/campaign_segment_controller.dart';
-import 'package:catalyst_voices/pages/treasury/treasury_campaign_builder_ext.dart';
+import 'package:catalyst_voices/pages/workspace/proposal_segment_controller.dart';
+import 'package:catalyst_voices/pages/workspace/workspace_proposal_navigation_ext.dart';
+import 'package:catalyst_voices/widgets/rich_text/voices_rich_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 
-class CampaignDetails extends StatelessWidget {
-  final TreasuryCampaignBuilder builder;
+class ProposalDetails extends StatelessWidget {
+  final WorkspaceProposalNavigation navigation;
 
-  const CampaignDetails({
+  const ProposalDetails({
     super.key,
-    required this.builder,
+    required this.navigation,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
       padding: const EdgeInsets.only(top: 10),
-      itemCount: builder.segments.length,
+      itemCount: navigation.segments.length,
       itemBuilder: (context, index) {
-        final segment = builder.segments[index];
+        final segment = navigation.segments[index];
 
         return _ListenableSegmentDetails(
           key: ValueKey('ListenableSegment${segment.id}DetailsKey'),
           segment: segment,
-          controller: CampaignControllerScope.of(
+          controller: ProposalControllerScope.of(
             context,
             id: segment.id,
           ),
@@ -36,7 +38,7 @@ class CampaignDetails extends StatelessWidget {
 }
 
 class _ListenableSegmentDetails extends StatelessWidget {
-  final TreasuryCampaignSegment segment;
+  final WorkspaceProposalSegment segment;
   final VoicesNodeMenuController controller;
 
   const _ListenableSegmentDetails({
@@ -67,7 +69,7 @@ class _ListenableSegmentDetails extends StatelessWidget {
 
 class _SegmentDetails extends StatelessWidget {
   final String name;
-  final List<TreasuryCampaignSegmentStep> steps;
+  final List<WorkspaceProposalSegmentStep> steps;
   final int? selected;
   final bool isExpanded;
   final VoidCallback? onChevronTap;
@@ -99,13 +101,15 @@ class _SegmentDetails extends StatelessWidget {
               return _StepDetails(
                 key: ValueKey('WorkspaceStep${step.id}TileKey'),
                 id: step.id,
-                name: step.localizedName(context.l10n),
-                desc: step.tempDescription(),
+                name: step.title,
+                desc: step.description,
+                doc: step.document,
                 isSelected: step.id == selected,
                 isEditable: step.isEditable,
               );
             },
-          )
+          ),
+        SizedBox(height: 24),
       ].separatedBy(SizedBox(height: 12)).toList(),
     );
   }
@@ -116,29 +120,42 @@ class _StepDetails extends StatelessWidget {
     super.key,
     required this.id,
     required this.name,
-    required this.desc,
+    this.desc,
+    this.doc,
     this.isSelected = false,
     this.isEditable = false,
   });
 
   final int id;
   final String name;
-  final String desc;
+  final String? desc;
+  final Document? doc;
   final bool isSelected;
   final bool isEditable;
 
   @override
   Widget build(BuildContext context) {
-    return WorkspaceTextTileContainer(
-      name: name,
-      isSelected: isSelected,
-      headerActions: [
-        VoicesTextButton(
-          child: Text(context.l10n.stepEdit),
-          onTap: isEditable ? () {} : null,
-        ),
-      ],
-      content: desc,
-    );
+    return (desc != null)
+        ? WorkspaceTextTileContainer(
+            name: name,
+            isSelected: isSelected,
+            headerActions: [
+              TextButton(
+                child: Text(
+                  context.l10n.stepEdit,
+                  style: Theme.of(context).textTheme.labelSmall,
+                ),
+                onPressed: isEditable ? () {} : null,
+              ),
+            ],
+            content: desc!,
+          )
+        : WorkspaceTileContainer(
+            isSelected: isSelected,
+            content: VoicesRichText(
+              title: name,
+              document: doc,
+            ),
+          );
   }
 }

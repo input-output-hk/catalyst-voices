@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/pages/spaces/individual_private_campaigns.dart';
+import 'package:catalyst_voices/pages/spaces/my_private_proposals.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -18,7 +19,7 @@ class SpacesDrawer extends StatelessWidget {
     return VoicesDrawer(
       children: [
         _SpaceHeader(space),
-        if (space == Space.treasury) IndividualPrivateCampaigns(),
+        _space(),
       ],
       bottom: VoicesDrawerSpaceChooser(
         currentSpace: space,
@@ -28,6 +29,17 @@ class SpacesDrawer extends StatelessWidget {
         },
       ),
     );
+  }
+
+  Widget _space() {
+    switch (space) {
+      case Space.treasury:
+        return IndividualPrivateCampaigns();
+      case Space.workspace:
+        return MyPrivateProposals();
+      default:
+        return SizedBox();
+    }
   }
 
   void _goTo(

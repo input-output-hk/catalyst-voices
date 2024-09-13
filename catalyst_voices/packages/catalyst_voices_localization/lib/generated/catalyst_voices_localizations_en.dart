@@ -131,6 +131,9 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get proposalStatusDraft => 'Draft';
 
   @override
+  String get proposalStatusInProgress => 'In progress';
+
+  @override
   String get fundedProposal => 'Funded proposal';
 
   @override
@@ -234,7 +237,16 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get treasuryCampaignTitle => 'Campaign title';
 
   @override
-  String get treasuryStepEdit => 'Edit';
+  String get stepEdit => 'Edit';
+
+  @override
+  String get workspaceProposalNavigation => 'Proposal navigation';
+
+  @override
+  String get workspaceProposalNavigationSegments => 'Segments';
+
+  @override
+  String get workspaceProposalSetup => 'Proposal setup';
 
   @override
   String get drawerSpaceTreasury => 'Treasury';
