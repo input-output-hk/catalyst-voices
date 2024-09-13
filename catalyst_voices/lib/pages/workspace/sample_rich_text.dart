@@ -1,3 +1,5 @@
+// ignore_for_file: all
+
 const sampleRichText = [
   {
     "insert": {
