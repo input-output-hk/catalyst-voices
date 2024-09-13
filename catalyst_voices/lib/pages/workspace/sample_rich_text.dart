@@ -1,5 +1,3 @@
-// ignore_for_file: all
-
 const sampleRichText = [
   {
     "insert": {
@@ -10,22 +8,22 @@ const sampleRichText = [
   },
   {"insert": "\n\n"},
   {
-    "insert": "Legend Tells About Amakuni The Great Smith",
+    "insert": "Legend Tells About Amazonian The Great Smith",
     "attributes": {"bold": true}
   },
   {"insert": "\n\nAn ancient legend confirms "},
   {
-    "insert": "Amakuni as the Father of the Samurai Sword. Amakuni",
+    "insert": "Amazonian as the Father of the Samurai Sword. Amazonian",
     "attributes": {"bold": true}
   },
   {"insert": " and his son, "},
   {
-    "insert": "Amakura",
+    "insert": "Amateur",
     "attributes": {"italic": true}
   },
   {
     "insert":
-    ", were the prominent smiths who led a team of armorers, employed by Emperor Mommu (683-707) to make swords for his army of warriors. Later his son, Amakura continued his father's "
+    ", were the prominent smiths who led a team of armorers, employed by Emperor Mommy (683-707) to make swords for his army of warriors. Later his son, Amateur continued his father's "
   },
   {
     "insert": "great work",
@@ -33,7 +31,7 @@ const sampleRichText = [
   },
   {"insert": ".\n\n"},
   {
-    "insert": "Amakura",
+    "insert": "Amateur",
     "attributes": {"italic": true}
   },
   {
@@ -41,7 +39,7 @@ const sampleRichText = [
     "attributes": {"list": "bullet"}
   },
   {
-    "insert": "Amakuro",
+    "insert": "Amauroses",
     "attributes": {"italic": true}
   },
   {
