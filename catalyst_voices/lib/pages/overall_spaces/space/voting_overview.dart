@@ -16,7 +16,7 @@ class VotingOverview extends StatelessWidget {
         children: [
           SpaceOverviewHeader(Space.voting),
           SectionHeader(title: Text('Active funding rounds')),
-          VoicesDrawerNavItem(
+          VoicesNavTile(
             leading: Icon(CatalystVoicesIcons.vote),
             name: 'Voting round 14',
             status: ProposalStatus.open,

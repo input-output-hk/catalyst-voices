@@ -4,13 +4,13 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
-class VoicesDrawerNavItem extends StatelessWidget {
+class VoicesNavTile extends StatelessWidget {
   final Widget? leading;
   final Widget? trailing;
   final String name;
   final ProposalStatus status;
 
-  const VoicesDrawerNavItem({
+  const VoicesNavTile({
     super.key,
     this.leading,
     this.trailing,

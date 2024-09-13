@@ -14,17 +14,17 @@ class WorkspaceOverview extends StatelessWidget {
         children: [
           SpaceOverviewHeader(Space.workspace),
           SectionHeader(title: Text('My private proposals (3/5)')),
-          VoicesDrawerNavItem(
+          VoicesNavTile(
             name: 'My first proposal',
             status: ProposalStatus.draft,
             trailing: MoreOptionsButton(),
           ),
-          VoicesDrawerNavItem(
+          VoicesNavTile(
             name: 'My second proposal',
             status: ProposalStatus.ready,
             trailing: MoreOptionsButton(),
           ),
-          VoicesDrawerNavItem(
+          VoicesNavTile(
             name: 'My third proposal',
             status: ProposalStatus.ready,
             trailing: MoreOptionsButton(),

@@ -14,38 +14,38 @@ class TreasuryOverview extends StatelessWidget {
         children: [
           SpaceOverviewHeader(Space.treasury),
           SectionHeader(title: Text('Individual private campaigns')),
-          VoicesDrawerNavItem(
+          VoicesNavTile(
             name: 'Fund name 1',
             status: ProposalStatus.ready,
             trailing: MoreOptionsButton(),
           ),
-          VoicesDrawerNavItem(
+          VoicesNavTile(
             name: 'Fund name 2',
             status: ProposalStatus.draft,
             trailing: MoreOptionsButton(),
           ),
-          VoicesDrawerNavItem(
+          VoicesNavTile(
             name: 'Fund name 3',
             status: ProposalStatus.draft,
             trailing: MoreOptionsButton(),
           ),
           VoicesDivider(indent: 0, endIndent: 0, height: 16),
           SectionHeader(title: Text('Team private campaigns')),
-          VoicesDrawerNavItem(
+          VoicesNavTile(
             name: 'Fund name',
             status: ProposalStatus.private,
             trailing: MoreOptionsButton(),
           ),
           VoicesDivider(indent: 0, endIndent: 0, height: 16),
           SectionHeader(title: Text('Public campaigns')),
-          VoicesDrawerNavItem(
+          VoicesNavTile(
             name: 'Fund 14',
             status: ProposalStatus.live,
             trailing: MoreOptionsButton(),
           ),
           VoicesDivider(indent: 0, endIndent: 0, height: 16),
           SectionHeader(title: Text('Completed campaigns')),
-          VoicesDrawerNavItem(
+          VoicesNavTile(
             name: 'Fund 15',
             status: ProposalStatus.completed,
             trailing: MoreOptionsButton(),
