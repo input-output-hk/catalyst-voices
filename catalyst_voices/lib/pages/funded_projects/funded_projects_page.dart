@@ -97,7 +97,7 @@ class _Tabs extends StatelessWidget {
               Tab(
                 child: Row(
                   children: [
-                    Icon(CatalystVoicesIcons.plus_circle),
+                    Icon(CatalystVoicesIcons.plus_circle_outlined),
                     const SizedBox(width: 8),
                     Text(context.l10n.followed),
                   ],
