@@ -132,7 +132,7 @@ const VoicesColorScheme lightVoicesColorScheme = VoicesColorScheme(
   onSurfaceError08: VoicesColors.lightOnSurfaceError08,
   onSurfaceError012: VoicesColors.lightOnSurfaceError012,
   onSurfaceError016: VoicesColors.lightOnSurfaceError016,
-  iconsForeground: Color.fromARGB(255, 151, 164, 193),
+  iconsForeground: VoicesColors.lightIconsForeground,
   iconsBackground: VoicesColors.lightIconsBackground,
   iconsOnImage: VoicesColors.lightIconsOnImage,
   iconsDisabled: VoicesColors.lightIconsDisabled,
