@@ -57,11 +57,11 @@ scripts:
       Run `dart_code_metrics` in all packages.
       - Note: you can also rely on your IDEs Dart Analysis / Issues window.
 
-  format:
+  format_apply:
     run: |
-      melos exec -c 1 --dir-exists="lib" -- dart format lib --fix
-      melos exec -c 1 --dir-exists="test" -- dart format test --fix
-      melos exec -c 1 --dir-exists="integration_test" -- dart format integration_test --fix
+      melos exec -c 1 --dir-exists="lib" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --fix" &&
+      melos exec -c 1 --dir-exists="test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --fix" &&
+      melos exec -c 1 --dir-exists="integration_test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --fix"
     description: Run `dart format` for all packages.
 
   format-check:
