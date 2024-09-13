@@ -24,7 +24,6 @@ class SpacesDrawer extends StatelessWidget {
       bottom: VoicesDrawerSpaceChooser(
         currentSpace: space,
         onChanged: (space) {
-          Scaffold.of(context).closeDrawer();
           _goTo(context, space: space);
         },
         onOverallTap: () {
