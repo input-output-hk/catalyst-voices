@@ -25,6 +25,9 @@ const ColorScheme darkColorScheme = ColorScheme.dark(
 const VoicesColorScheme darkVoicesColorScheme = VoicesColorScheme(
   textPrimary: VoicesColors.darkTextPrimary,
   textOnPrimary: VoicesColors.darkTextOnPrimary,
+  textOnPrimaryLevel0: VoicesColors.darkTextOnPrimaryLevel0,
+  textOnPrimaryLevel1: VoicesColors.darkTextOnPrimaryLevel1,
+  textOnPrimaryWhite: VoicesColors.darkTextOnPrimaryWhite,
   textOnPrimaryContainer: VoicesColors.darkTextOnPrimaryContainer,
   textDisabled: VoicesColors.darkTextDisabled,
   success: VoicesColors.darkSuccess,
@@ -53,6 +56,7 @@ const VoicesColorScheme darkVoicesColorScheme = VoicesColorScheme(
   onSurfaceError016: VoicesColors.darkOnSurfaceError016,
   iconsForeground: VoicesColors.darkIconsForeground,
   iconsBackground: VoicesColors.darkIconsBackground,
+  iconsOnImage: VoicesColors.darkIconsOnImage,
   iconsDisabled: VoicesColors.darkIconsDisabled,
   iconsPrimary: VoicesColors.darkIconsPrimary,
   iconsSecondary: VoicesColors.darkIconsSecondary,
@@ -65,8 +69,14 @@ const VoicesColorScheme darkVoicesColorScheme = VoicesColorScheme(
   avatarsWarning: VoicesColors.darkAvatarsWarning,
   avatarsError: VoicesColors.darkAvatarsError,
   elevationsOnSurfaceNeutralLv0: VoicesColors.darkElevationsOnSurfaceNeutralLv0,
+  elevationsOnSurfaceNeutralLv1Grey:
+      VoicesColors.darkElevationsOnSurfaceNeutralLv1Grey,
+  elevationsOnSurfaceNeutralLv1White:
+      VoicesColors.darkElevationsOnSurfaceNeutralLv1White,
+  elevationsOnSurfaceNeutralLv2: VoicesColors.darkElevationsOnSurfaceNeutralLv2,
   outlineBorder: VoicesColors.darkOutlineBorderOutline,
   outlineBorderVariant: VoicesColors.darkOutlineBorderOutlineVariant,
+  primary98: VoicesColors.darkPrimary98,
   primaryContainer: VoicesColors.darkPrimaryContainer,
   onPrimaryContainer: VoicesColors.darkOnPrimaryContainer,
   errorContainer: VoicesColors.darkErrorContainer,
@@ -93,6 +103,9 @@ const ColorScheme lightColorScheme = ColorScheme.light(
 const VoicesColorScheme lightVoicesColorScheme = VoicesColorScheme(
   textPrimary: VoicesColors.lightTextPrimary,
   textOnPrimary: VoicesColors.lightTextOnPrimary,
+  textOnPrimaryLevel0: VoicesColors.lightTextOnPrimaryLevel0,
+  textOnPrimaryLevel1: VoicesColors.lightTextOnPrimaryLevel1,
+  textOnPrimaryWhite: VoicesColors.lightTextOnPrimaryWhite,
   textOnPrimaryContainer: VoicesColors.lightTextOnPrimaryContainer,
   textDisabled: VoicesColors.lightTextDisabled,
   success: VoicesColors.lightSuccess,
@@ -121,6 +134,7 @@ const VoicesColorScheme lightVoicesColorScheme = VoicesColorScheme(
   onSurfaceError016: VoicesColors.lightOnSurfaceError016,
   iconsForeground: VoicesColors.lightIconsForeground,
   iconsBackground: VoicesColors.lightIconsBackground,
+  iconsOnImage: VoicesColors.lightIconsOnImage,
   iconsDisabled: VoicesColors.lightIconsDisabled,
   iconsPrimary: VoicesColors.lightIconsPrimary,
   iconsSecondary: VoicesColors.lightIconsSecondary,
@@ -134,8 +148,15 @@ const VoicesColorScheme lightVoicesColorScheme = VoicesColorScheme(
   avatarsError: VoicesColors.lightAvatarsError,
   elevationsOnSurfaceNeutralLv0:
       VoicesColors.lightElevationsOnSurfaceNeutralLv0,
+  elevationsOnSurfaceNeutralLv1Grey:
+      VoicesColors.lightElevationsOnSurfaceNeutralLv1Grey,
+  elevationsOnSurfaceNeutralLv1White:
+      VoicesColors.lightElevationsOnSurfaceNeutralLv1White,
+  elevationsOnSurfaceNeutralLv2:
+      VoicesColors.lightElevationsOnSurfaceNeutralLv2,
   outlineBorder: VoicesColors.lightOutlineBorderOutline,
   outlineBorderVariant: VoicesColors.lightOutlineBorderOutlineVariant,
+  primary98: VoicesColors.lightPrimary98,
   primaryContainer: VoicesColors.lightPrimaryContainer,
   onPrimaryContainer: VoicesColors.lightOnPrimaryContainer,
   errorContainer: VoicesColors.lightErrorContainer,
@@ -284,9 +305,17 @@ ThemeData _buildThemeData(
   return ThemeData(
     appBarTheme: AppBarTheme(
       backgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv1,
+      scrolledUnderElevation: 0,
     ),
     drawerTheme: DrawerThemeData(
       backgroundColor: voicesColorScheme.elevationsOnSurfaceNeutralLv0,
+    ),
+    dialogTheme: DialogTheme(
+      // TODO(damian-molinski): themed value needed. We don't have it defined yet.
+      barrierColor: Color(0x612A3D61),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      clipBehavior: Clip.hardEdge,
+      backgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv0,
     ),
     listTileTheme: ListTileThemeData(
       shape: const StadiumBorder(),
@@ -296,9 +325,27 @@ ThemeData _buildThemeData(
     ),
     dividerTheme: DividerThemeData(
       color: colorScheme.outlineVariant,
+      space: 16,
+      thickness: 1,
+    ),
+    tabBarTheme: TabBarTheme(
+      tabAlignment: TabAlignment.start,
+    ),
+    progressIndicatorTheme: ProgressIndicatorThemeData(
+      color: colorScheme.primary,
+      linearTrackColor: colorScheme.secondaryContainer,
+      circularTrackColor: colorScheme.secondaryContainer,
+      refreshBackgroundColor: colorScheme.secondaryContainer,
     ),
     textTheme: textTheme,
     colorScheme: colorScheme,
+    iconTheme: IconThemeData(
+      color: voicesColorScheme.iconsForeground,
+    ),
+    primaryIconTheme: IconThemeData(
+      color: colorScheme.onPrimary,
+    ),
+    scaffoldBackgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv1,
     extensions: <ThemeExtension<dynamic>>[
       voicesColorScheme,
       brandAssets,

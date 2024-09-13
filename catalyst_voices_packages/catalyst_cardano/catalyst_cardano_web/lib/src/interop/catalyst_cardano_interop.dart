@@ -27,7 +27,7 @@ extension type JSCardanoWallet(JSObject _) implements JSObject {
   external JSString get icon;
 
   /// See [CardanoWallet.apiVersion].
-  external JSString get apiVersion;
+  external JSString? get apiVersion;
 
   /// See [CardanoWallet.supportedExtensions].
   external JSArray<JSCipExtension>? get supportedExtensions;
@@ -73,7 +73,7 @@ extension type JSCardanoWalletApi(JSObject _) implements JSObject {
   ]);
 
   /// See [CardanoWalletApi.getUtxos].
-  external JSPromise<JSArray<JSString>> getUtxos([
+  external JSPromise<JSArray<JSString>>? getUtxos([
     JSAny? amount,
     JSAny? paginate,
   ]);

@@ -33,7 +33,7 @@ import 'package:flutter/material.dart';
 // ```
 
 class ResponsiveChild extends StatelessWidget {
-  final Map<ResponsiveBreakpointKey, WidgetBuilder?> _widgets;
+  final Map<ResponsiveBreakpointKey, WidgetBuilder> _widgets;
 
   ResponsiveChild({
     super.key,
@@ -43,17 +43,17 @@ class ResponsiveChild extends StatelessWidget {
     WidgetBuilder? lg,
     required WidgetBuilder other,
   }) : _widgets = {
-          ResponsiveBreakpointKey.xs: xs,
-          ResponsiveBreakpointKey.sm: sm,
-          ResponsiveBreakpointKey.md: md,
-          ResponsiveBreakpointKey.lg: lg,
+          if (xs != null) ResponsiveBreakpointKey.xs: xs,
+          if (sm != null) ResponsiveBreakpointKey.sm: sm,
+          if (md != null) ResponsiveBreakpointKey.md: md,
+          if (lg != null) ResponsiveBreakpointKey.lg: lg,
           ResponsiveBreakpointKey.other: other,
         };
 
   @override
   Widget build(BuildContext context) {
     return ResponsiveBuilder<WidgetBuilder>(
-      builder: (context, childBuilder) => childBuilder!(context),
+      builder: (context, childBuilder) => childBuilder(context),
       xs: _widgets[ResponsiveBreakpointKey.xs],
       sm: _widgets[ResponsiveBreakpointKey.sm],
       md: _widgets[ResponsiveBreakpointKey.md],

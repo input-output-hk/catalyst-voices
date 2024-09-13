@@ -6,7 +6,7 @@ packages:
   - catalyst_voices/uikit_example
   - catalyst_voices/packages/**
   - catalyst_voices_packages/**
-  - utilities/*
+  - utilities/**
 
 command:
   version:
@@ -15,16 +15,19 @@ command:
   bootstrap:
     runPubGetInParallel: true
     environment:
-      sdk: ">=3.3.4 <4.0.0"
-      flutter: ">=3.22.1"
+      sdk: ">=3.5.0 <4.0.0"
+      flutter: ">=3.24.1"
     dependencies:
       bloc_concurrency: ^0.2.2
-      bloc: ^8.1.2
       collection: ^1.18.0
       cryptography: ^2.7.0
       equatable: ^2.0.5
+      flutter_bloc: ^8.1.5
       flutter_localized_locales: ^2.0.5
+      flutter_quill: ^10.5.0
+      flutter_quill_extensions: ^10.5.13
       formz: ^0.7.0
+      logging: ^1.2.0
       meta: ^1.10.0
       result_type: ^0.2.0
       plugin_platform_interface: ^2.1.7
@@ -33,9 +36,16 @@ command:
       cbor: ^6.2.0
       convert: ^3.1.1
       pinenacl: ^0.6.0
+      ulid: ^2.0.0
+      sentry_flutter: ^8.8.0
+      # TODO(dtscalac): win32 dependency is just a transitive dependency and shouldn't be imported
+      # but here we import it explicitly to make sure the latest version is used which addresses
+      # the problem from here: https://github.com/jonataslaw/get_cli/issues/263
+      win32: ^5.5.4
+      web: ^1.0.0
     dev_dependencies:
       test: ^1.24.9
-      build_runner: ^2.3.3
+      build_runner: ^2.4.12
       mocktail: ^1.0.1
 
 scripts:

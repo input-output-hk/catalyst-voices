@@ -2,6 +2,7 @@ import 'package:catalyst_cardano_serialization/src/address.dart';
 import 'package:catalyst_cardano_serialization/src/hashes.dart';
 import 'package:catalyst_cardano_serialization/src/signature.dart';
 import 'package:catalyst_cardano_serialization/src/transaction.dart';
+import 'package:catalyst_cardano_serialization/src/transaction_output.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:catalyst_cardano_serialization/src/witness.dart';
 import 'package:cbor/cbor.dart';
@@ -36,7 +37,7 @@ TransactionUnspentOutput testUtxo() {
       transactionId: testTransactionHash,
       index: 0,
     ),
-    output: TransactionOutput(
+    output: PreBabbageTransactionOutput(
       address: ShelleyAddress.fromBech32(
         'addr_test1qpu5vlrf4xkxv2qpwngf6cjhtw542ayty80v8dyr49rf5'
         'ewvxwdrt70qlcpeeagscasafhffqsxy36t90ldv06wqrk2qum8x5w',
@@ -51,11 +52,11 @@ Transaction minimalUnsignedTestTransaction() {
     body: TransactionBody(
       inputs: {testUtxo().input},
       outputs: [
-        TransactionOutput(
+        PreBabbageTransactionOutput(
           address: testnetAddr,
           amount: const Balance(coin: Coin(1000000)),
         ),
-        TransactionOutput(
+        PreBabbageTransactionOutput(
           address: testnetChangeAddr,
           amount: const Balance(coin: Coin(9998833003)),
         ),
@@ -63,9 +64,7 @@ Transaction minimalUnsignedTestTransaction() {
       fee: const Coin(166997),
     ),
     isValid: true,
-    witnessSet: const TransactionWitnessSet(
-      vkeyWitnesses: {},
-    ),
+    witnessSet: const TransactionWitnessSet(),
   );
 }
 
@@ -75,11 +74,11 @@ Transaction minimalSignedTestTransaction() {
     body: TransactionBody(
       inputs: {testUtxo().input},
       outputs: [
-        TransactionOutput(
+        PreBabbageTransactionOutput(
           address: testnetAddr,
           amount: const Balance(coin: Coin(1000000)),
         ),
-        TransactionOutput(
+        PreBabbageTransactionOutput(
           address: testnetChangeAddr,
           amount: const Balance(coin: Coin(9998833003)),
         ),
@@ -116,11 +115,11 @@ Transaction fullUnsignedTestTransaction() {
     body: TransactionBody(
       inputs: {testUtxo().input},
       outputs: [
-        TransactionOutput(
+        PreBabbageTransactionOutput(
           address: testnetAddr,
           amount: const Balance(coin: Coin(1000000)),
         ),
-        TransactionOutput(
+        PreBabbageTransactionOutput(
           address: testnetChangeAddr,
           amount: const Balance(coin: Coin(9998832827)),
         ),
@@ -129,19 +128,19 @@ Transaction fullUnsignedTestTransaction() {
       ttl: const SlotBigNum(41193),
       auxiliaryDataHash: AuxiliaryDataHash.fromAuxiliaryData(auxiliaryData),
       requiredSigners: {
-        Ed25519PublicKey.fromBytes(
-          hex.decode(
-            '3311ca404fcf22c91d607ace285d70e2'
-            '263a1b81745c39673080329bd1a3f56e',
+        Ed25519PublicKeyHash.fromPublicKey(
+          Ed25519PublicKey.fromBytes(
+            hex.decode(
+              '3311ca404fcf22c91d607ace285d70e2'
+              '263a1b81745c39673080329bd1a3f56e',
+            ),
           ),
         ),
       },
       networkId: NetworkId.testnet,
     ),
     isValid: true,
-    witnessSet: const TransactionWitnessSet(
-      vkeyWitnesses: {},
-    ),
+    witnessSet: const TransactionWitnessSet(),
     auxiliaryData: auxiliaryData,
   );
 }
@@ -154,11 +153,11 @@ Transaction fullSignedTestTransaction() {
     body: TransactionBody(
       inputs: {testUtxo().input},
       outputs: [
-        TransactionOutput(
+        PreBabbageTransactionOutput(
           address: testnetAddr,
           amount: const Balance(coin: Coin(1000000)),
         ),
-        TransactionOutput(
+        PreBabbageTransactionOutput(
           address: testnetChangeAddr,
           amount: const Balance(coin: Coin(9998832827)),
         ),
@@ -167,10 +166,12 @@ Transaction fullSignedTestTransaction() {
       ttl: const SlotBigNum(41193),
       auxiliaryDataHash: AuxiliaryDataHash.fromAuxiliaryData(auxiliaryData),
       requiredSigners: {
-        Ed25519PublicKey.fromBytes(
-          hex.decode(
-            '3311ca404fcf22c91d607ace285d70e2'
-            '263a1b81745c39673080329bd1a3f56e',
+        Ed25519PublicKeyHash.fromPublicKey(
+          Ed25519PublicKey.fromBytes(
+            hex.decode(
+              '3311ca404fcf22c91d607ace285d70e2'
+              '263a1b81745c39673080329bd1a3f56e',
+            ),
           ),
         ),
       },

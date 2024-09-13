@@ -4,8 +4,8 @@ version: 0.1.0+1
 publish_to: none
 
 environment:
-  sdk: ">=3.3.4 <4.0.0"
-  flutter: ">=3.22.1"
+  sdk: ">=3.5.0 <4.0.0"
+  flutter: ">=3.24.1"
 
 dependencies:
   flutter:
@@ -13,7 +13,8 @@ dependencies:
   flutter_svg: ^2.0.10+1
 
 dev_dependencies:
-  build_runner: ^2.3.3
+  build_runner: ^2.4.12
+  catalyst_analysis: ^2.0.0
   flutter_gen_runner: ^5.3.2
 
 flutter:
@@ -25,7 +26,7 @@ flutter:
       fonts:
         - asset: assets/fonts/SF-Pro-Rounded-Regular.ttf
           weight: 600
-    - family:  CatalystVoicesIcons
+    - family: CatalystVoicesIcons
       fonts:
         - asset: internal_resources/fonts/CatalystVoicesIcons.ttf
 

@@ -12,6 +12,30 @@
   "@emailErrorText": {
     "description": "Text shown in email field when input is invalid"
   },
+  "cancelButtonText": "Cancel",
+  "@cancelButtonText": {
+    "description": "Text shown in cancel button"
+  },
+  "editButtonText": "Edit",
+  "@editButtonText": {
+    "description": "Text shown in edit button"
+  },
+  "headerTooltipText": "Header",
+  "@headerTooltipText": {
+    "description": "Text shown in header tooltip"
+  },
+  "placeholderRichText": "Start writing your text...",
+  "@placeholderRichText": {
+    "description": "Text shown as placeholder in rich text editor"
+  },
+  "supportingTextLabelText": "Supporting text",
+  "@supportingTextLabelText": {
+    "description": "Text shown as placeholder in rich text editor"
+  },
+  "saveButtonText": "Save",
+  "@saveButtonText": {
+    "description": "Text shown in save button"
+  },
   "passwordLabelText": "Password",
   "@passwordLabelText": {
     "description": "Text shown in password field"
@@ -123,5 +147,171 @@
   "snackbarOkButtonText": "Ok",
   "@snackbarOkButtonText": {
     "description": "Text shown in the Snackbar widget for the ok button."
+  },
+  "seedPhraseSlotNr": "Slot {nr}",
+  "@seedPhraseSlotNr": {
+    "description": "When user arranges seed phrases this text is shown when phrase was not selected",
+    "placeholders": {
+      "nr": {
+        "type": "int"
+      }
+    }
+  },
+  "proposalStatusReady": "Ready",
+  "@proposalStatusReady": {
+    "description": "Indicates to user that status is in ready mode"
+  },
+  "proposalStatusDraft": "Draft",
+  "@proposalStatusDraft": {
+    "description": "Indicates to user that status is in draft mode"
+  },
+  "fundedProposal": "Funded proposal",
+  "@fundedProposal": {
+    "description": "Label shown on a proposal card indicating that the proposal is funded."
+  },
+  "publishedProposal": "Published proposal",
+  "@publishedProposal": {
+    "description": "Label shown on a proposal card indicating that the proposal is not yet funded."
+  },
+  "fundedProposalDate": "Funded {date}",
+  "@fundedProposalDate": {
+    "description": "Indicates date of funding (a proposal).",
+    "placeholders": {
+      "date": {
+        "type": "DateTime",
+        "format": "yMMMMd"
+      }
+    }
+  },
+  "lastUpdateDate": "Last update: {date}.",
+  "@lastUpdateDate": {
+    "description": "Indicates a last update date.",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "fundsRequested": "Funds requested",
+  "@fundsRequested": {
+    "description": "Indicates the amount of ADA requested in a fund on a proposal card."
+  },
+  "noOfComments": "{count} {count, plural, =0{comments} =1{comment} other{comments}}",
+  "@noOfComments": {
+    "description": "Indicates the amount of comments on a proposal card.",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "noOfSegmentsCompleted": "{completed} of {total} ({percentage}%) {total, plural, =0{segments} =1{segment} other{segments}} completed",
+  "@noOfSegmentsCompleted": {
+    "description": "Indicates the amount of comments on a proposal card.",
+    "placeholders": {
+      "completed": {
+        "type": "num",
+        "format": "compact"
+      },
+      "total": {
+        "type": "num",
+        "format": "compact"
+      },
+      "percentage": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "today": "Today",
+  "@today": {
+    "description": "Refers to date which is today."
+  },
+  "yesterday": "Yesterday",
+  "@yesterday": {
+    "description": "Refers to date which is yesterday."
+  },
+  "twoDaysAgo": "2 days ago",
+  "@twoDaysAgo": {
+    "description": "Refers to date which is two days ago."
+  },
+  "tomorrow": "Tomorrow",
+  "@tomorrow": {
+    "description": "Refers to date which is tomorrow."
+  },
+  "activeVotingRound": "Active voting round 14",
+  "@activeVotingRound": {
+    "description": "Title of the voting space."
+  },
+  "noOfAllProposals": "All proposals ({count})",
+  "@noOfAllProposals": {
+    "description": "Tab label for all proposals in voting space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "favorites": "Favorites",
+  "@favorites": {
+    "description": "Refers to a list of favorites."
+  },
+  "treasuryCampaignBuilder": "Campaign builder",
+  "@treasuryCampaignBuilder": {
+    "description": "Left panel name in treasury space"
+  },
+  "treasuryCampaignBuilderSegments": "Segments",
+  "@treasuryCampaignBuilderSegments": {
+    "description": "Tab name in campaign builder panel"
+  },
+  "treasuryCampaignSetup": "Setup Campaign",
+  "@treasuryCampaignSetup": {
+    "description": "Segment name"
+  },
+  "treasuryCampaignTitle": "Campaign title",
+  "@treasuryCampaignTitle": {
+    "description": "Campaign title"
+  },
+  "treasuryStepEdit": "Edit",
+  "@treasuryStepEdit": {
+    "description": "Button name in treasury step"
+  },
+  "drawerSpaceTreasury": "Treasury",
+  "@drawerSpaceTreasury": {
+    "description": "Name shown in spaces shell drawer"
+  },
+  "drawerSpaceDiscovery": "Discovery",
+  "@drawerSpaceDiscovery": {
+    "description": "Name shown in spaces shell drawer"
+  },
+  "drawerSpaceWorkspace": "Workspace",
+  "@drawerSpaceWorkspace": {
+    "description": "Name shown in spaces shell drawer"
+  },
+  "drawerSpaceVoting": "Voting",
+  "@drawerSpaceVoting": {
+    "description": "Name shown in spaces shell drawer"
+  },
+  "drawerSpaceFundedProjects": "Funded projects",
+  "@drawerSpaceFundedProjects": {
+    "description": "Name shown in spaces shell drawer"
+  },
+  "fundedProjectSpace": "Funded project space",
+  "@fundedProjectSpace": {
+    "description": "Title of the funded project space"
+  },
+  "noOfFundedProposals": "Funded proposals ({count})",
+  "@noOfFundedProposals": {
+    "description": "Tab label for funded proposals in funded projects space",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "followed": "Followed",
+  "@followed": {
+    "description": "Refers to a list of followed items."
   }
 }

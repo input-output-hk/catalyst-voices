@@ -12,3 +12,18 @@ jobs:
   build:
     name: Validate PR title
     uses: input-output-hk/catalyst-ci/.github/workflows/semantic_pull_request.yml@master
+    with:
+      requireScope: false
+      scopes: |
+        cat-voices
+        cat-gateway
+        dart
+        dart/catalyst_analysis
+        dart/catalyst_cardano_serialization
+        dart/catalyst_cose
+        flutter
+        flutter/catalyst_cardano
+        flutter/catalyst_compression
+        utils
+        docs
+        general

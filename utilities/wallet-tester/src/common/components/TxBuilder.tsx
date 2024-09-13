@@ -200,8 +200,8 @@ function TxBuilder({ utxos, addresses, onSubmit: onPropSubmit = noop }: Props) {
                 certificateFields.fields[i]?.type === value
                   ? null
                   : certificateFields.replace({
-                      type: value as any /* TODO: support default values for each type */,
-                    })
+                    type: value as any /* TODO: support default values for each type */,
+                  })
               }
             />
             {certificateFields.fields[i]?.type === CertificateType.StakeDelegation ? (
@@ -212,7 +212,7 @@ function TxBuilder({ utxos, addresses, onSubmit: onPropSubmit = noop }: Props) {
                     className={twMerge(
                       "w-full rounded px-1 border border-solid border-black",
                       (certificateFields.fields[i] as any)?.hashType === "addr_keyhash" &&
-                        "bg-black text-white"
+                      "bg-black text-white"
                     )}
                     onClick={() =>
                       certificateFields.update(i, {
@@ -228,7 +228,7 @@ function TxBuilder({ utxos, addresses, onSubmit: onPropSubmit = noop }: Props) {
                     className={twMerge(
                       "w-full rounded px-1 border border-solid border-black",
                       (certificateFields.fields[i] as any)?.hashType === "scripthash" &&
-                        "bg-black text-white"
+                      "bg-black text-white"
                     )}
                     onClick={() =>
                       certificateFields.update(i, {
@@ -409,7 +409,7 @@ function TxBuilder({ utxos, addresses, onSubmit: onPropSubmit = noop }: Props) {
           {({ open }) => (
             <>
               <div className="w-[16px]">{open ? <ArrowDropUpIcon /> : <ArrowDropDownIcon />}</div>
-              <p>Auxillary Metadata</p>
+              <p>Auxiliary Metadata</p>
             </>
           )}
         </Disclosure.Button>

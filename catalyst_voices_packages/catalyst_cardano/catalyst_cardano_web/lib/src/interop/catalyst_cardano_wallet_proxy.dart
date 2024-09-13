@@ -33,7 +33,7 @@ class JSCardanoWalletProxy implements CardanoWallet {
   String get icon => _delegate.icon.toDart;
 
   @override
-  String get apiVersion => _delegate.apiVersion.toDart;
+  String? get apiVersion => _delegate.apiVersion?.toDart;
 
   @override
   List<CipExtension> get supportedExtensions =>
@@ -176,23 +176,24 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
     Paginate? paginate,
   }) async {
     try {
-      return await _delegate
-          .getUtxos(
-            amount != null
-                ? hex.encode(cbor.encode(amount.toCbor())).toJS
-                : makeUndefined(),
-            paginate != null ? JSPaginate.fromDart(paginate) : makeUndefined(),
-          )
-          .toDart
-          .then(
-            (array) => array.toDart
-                .map(
-                  (item) => TransactionUnspentOutput.fromCbor(
-                    cbor.decode(hex.decode(item.toDart)),
-                  ),
-                )
-                .toList(),
-          );
+      final utxos = _delegate.getUtxos(
+        amount != null
+            ? hex.encode(cbor.encode(amount.toCbor())).toJS
+            : makeUndefined(),
+        paginate != null ? JSPaginate.fromDart(paginate) : makeUndefined(),
+      );
+
+      if (utxos == null) return [];
+
+      return await utxos.toDart.then(
+        (array) => array.toDart
+            .map(
+              (item) => TransactionUnspentOutput.fromCbor(
+                cbor.decode(hex.decode(item.toDart)),
+              ),
+            )
+            .toList(),
+      );
     } catch (ex) {
       throw _mapApiException(ex) ??
           _mapPaginateException(ex) ??

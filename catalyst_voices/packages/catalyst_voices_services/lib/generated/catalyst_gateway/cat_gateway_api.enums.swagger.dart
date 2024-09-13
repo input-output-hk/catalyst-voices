@@ -39,8 +39,6 @@ enum Network {
 
   @JsonValue('mainnet')
   mainnet('mainnet'),
-  @JsonValue('testnet')
-  testnet('testnet'),
   @JsonValue('preprod')
   preprod('preprod'),
   @JsonValue('preview')

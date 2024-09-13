@@ -14,6 +14,10 @@ Future<void> _signAndSubmitTx({
       ),
     );
 
+    if (utxos.isEmpty) {
+      throw Exception('Insufficient balance, please top up your wallet');
+    }
+
     final unsignedTx = _buildUnsignedTx(
       utxos: utxos,
       changeAddress: changeAddress,
@@ -71,7 +75,7 @@ Transaction _buildUnsignedTx({
   return Transaction(
     body: txBody,
     isValid: true,
-    witnessSet: const TransactionWitnessSet(vkeyWitnesses: {}),
+    witnessSet: const TransactionWitnessSet(),
   );
 }
 

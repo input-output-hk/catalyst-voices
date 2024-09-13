@@ -30,10 +30,12 @@ pub(crate) struct VotingPurpose(u64);
 pub(crate) struct RewardsAddress(pub Vec<u8>);
 
 /// Error report for serializing
+#[allow(dead_code)]
 pub(crate) type ErrorReport = Vec<String>;
 
 impl PubKey {
     /// Get credentials, a blake2b 28 bytes hash of the pub key
+    #[allow(dead_code)]
     pub(crate) fn get_credentials(&self) -> [u8; 28] {
         let mut digest = [0u8; 28];
         let mut context = Blake2b::new(28);
@@ -71,6 +73,8 @@ pub(crate) enum VotingInfo {
 
 /// CIP-36 registration info part
 #[derive(Debug, Clone, PartialEq)]
+#[allow(dead_code)]
+
 pub(crate) struct Registration {
     /// Voting info
     pub(crate) voting_info: VotingInfo,
@@ -86,6 +90,8 @@ pub(crate) struct Registration {
 
 /// A catalyst CIP-36 registration on Cardano
 #[derive(Debug, Clone, PartialEq)]
+#[allow(dead_code)]
+
 pub(crate) struct Cip36Metadata {
     /// CIP-36 registration 61284
     pub(crate) registration: Option<Registration>,
@@ -98,6 +104,7 @@ pub(crate) struct Cip36Metadata {
 impl Cip36Metadata {
     /// Create new `Cip36Registration` from tx metadata
     /// Collect secondary errors for granular json error report
+    #[allow(dead_code)]
     pub(crate) fn generate_from_tx_metadata(
         tx_metadata: &MultiEraMeta, network: Network,
     ) -> Option<Self> {
@@ -226,12 +233,11 @@ fn is_valid_rewards_address(rewards_address_prefix: u8, network: Network) -> boo
                 return false;
             }
         },
-        Network::Testnet => {
+        _ => {
             if addr_net != 0 {
                 return false;
             }
         },
-        _ => (),
     }
 
     // Valid addrs: 0x0?, 0x1?, 0x2?, 0x3?, 0x4?, 0x5?, 0x6?, 0x7?, 0xE?, 0xF?.
@@ -477,11 +483,11 @@ fn test_rewards_addr_permutations() {
 
     for addr_type in valid_addr_types {
         let test_addr = addr_type << 4;
-        assert!(is_valid_rewards_address(test_addr, Network::Testnet));
+        assert!(is_valid_rewards_address(test_addr, Network::Preprod));
         assert!(!is_valid_rewards_address(test_addr, Network::Mainnet));
 
         let test_addr = addr_type << 4 | 1;
-        assert!(!is_valid_rewards_address(test_addr, Network::Testnet));
+        assert!(!is_valid_rewards_address(test_addr, Network::Preprod));
         assert!(is_valid_rewards_address(test_addr, Network::Mainnet));
     }
 
@@ -489,11 +495,11 @@ fn test_rewards_addr_permutations() {
 
     for addr_type in invalid_addr_types {
         let test_addr = addr_type << 4;
-        assert!(!is_valid_rewards_address(test_addr, Network::Testnet));
+        assert!(!is_valid_rewards_address(test_addr, Network::Preprod));
         assert!(!is_valid_rewards_address(test_addr, Network::Mainnet));
 
         let test_addr = addr_type << 4 | 1;
-        assert!(!is_valid_rewards_address(test_addr, Network::Testnet));
+        assert!(!is_valid_rewards_address(test_addr, Network::Preprod));
         assert!(!is_valid_rewards_address(test_addr, Network::Mainnet));
     }
 }

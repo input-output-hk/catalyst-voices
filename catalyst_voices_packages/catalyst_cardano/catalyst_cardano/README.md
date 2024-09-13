@@ -22,8 +22,8 @@ away all the complexities of using js_interop.
 
 ## Requirements
 
-* Dart: 3.3.4+
-* Flutter: 3.22.1+
+* Dart: 3.5.0+
+* Flutter: 3.24.1+
 
 ## Install
 
