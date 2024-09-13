@@ -131,6 +131,18 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get proposalStatusDraft => 'Draft';
 
   @override
+  String get proposalStatusPrivate => 'Private';
+
+  @override
+  String get proposalStatusLive => 'LIVE';
+
+  @override
+  String get proposalStatusCompleted => 'Completed';
+
+  @override
+  String get proposalStatusOpen => 'Open';
+
+  @override
   String get fundedProposal => 'Funded proposal';
 
   @override
@@ -262,4 +274,19 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get clickToRestart => 'Click to restart';
+
+  @override
+  String get spaceTreasuryName => 'Treasury';
+
+  @override
+  String get spaceDiscoveryName => 'Discovery space';
+
+  @override
+  String get spaceWorkspaceName => 'Workspace';
+
+  @override
+  String get spaceVotingName => 'Treasury';
+
+  @override
+  String get spaceFundedProjects => 'Funded Projects';
 }

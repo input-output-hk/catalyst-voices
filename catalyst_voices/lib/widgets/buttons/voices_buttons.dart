@@ -129,3 +129,20 @@ class XButton extends StatelessWidget {
     );
   }
 }
+
+class MoreOptionsButton extends StatelessWidget {
+  final VoidCallback? onTap;
+
+  const MoreOptionsButton({
+    super.key,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesIconButton(
+      child: Icon(CatalystVoicesIcons.dots_vertical),
+      onTap: onTap,
+    );
+  }
+}

@@ -334,6 +334,30 @@ abstract class VoicesLocalizations {
   /// **'Draft'**
   String get proposalStatusDraft;
 
+  /// Indicates to user that status is in private mode
+  ///
+  /// In en, this message translates to:
+  /// **'Private'**
+  String get proposalStatusPrivate;
+
+  /// Indicates to user that status is in live mode
+  ///
+  /// In en, this message translates to:
+  /// **'LIVE'**
+  String get proposalStatusLive;
+
+  /// Indicates to user that status is completed
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get proposalStatusCompleted;
+
+  /// Indicates to user that status is in open mode
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get proposalStatusOpen;
+
   /// Label shown on a proposal card indicating that the proposal is funded.
   ///
   /// In en, this message translates to:
@@ -501,6 +525,36 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Click to restart'**
   String get clickToRestart;
+
+  /// Name of space shown in different spaces that indicates its origin
+  ///
+  /// In en, this message translates to:
+  /// **'Treasury'**
+  String get spaceTreasuryName;
+
+  /// Name of space shown in different spaces that indicates its origin
+  ///
+  /// In en, this message translates to:
+  /// **'Discovery space'**
+  String get spaceDiscoveryName;
+
+  /// Name of space shown in different spaces that indicates its origin
+  ///
+  /// In en, this message translates to:
+  /// **'Workspace'**
+  String get spaceWorkspaceName;
+
+  /// Name of space shown in different spaces that indicates its origin
+  ///
+  /// In en, this message translates to:
+  /// **'Treasury'**
+  String get spaceVotingName;
+
+  /// Name of space shown in different spaces that indicates its origin
+  ///
+  /// In en, this message translates to:
+  /// **'Funded Projects'**
+  String get spaceFundedProjects;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

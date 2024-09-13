@@ -85,6 +85,34 @@ extension _ProposalStatusExt on ProposalStatus {
           textColor: colors.textPrimary,
           backgroundColor: colors.onSurfaceNeutralOpaqueLv1,
         ),
+      ProposalStatus.private => _ProposalStatusContainerConfig(
+          iconData: CatalystVoicesIcons.eye_off,
+          iconColor: colors.iconsForeground,
+          text: context.l10n.proposalStatusPrivate,
+          textColor: colors.textPrimary,
+          backgroundColor: colors.onSurfaceNeutralOpaqueLv1,
+        ),
+      ProposalStatus.open => _ProposalStatusContainerConfig(
+          iconData: CatalystVoicesIcons.check_circle,
+          iconColor: colors.iconsSuccess,
+          text: context.l10n.proposalStatusOpen,
+          textColor: colors.textPrimary,
+          backgroundColor: colors.onSurfaceNeutralOpaqueLv1,
+        ),
+      ProposalStatus.live => _ProposalStatusContainerConfig(
+          iconData: CatalystVoicesIcons.play,
+          iconColor: colors.iconsForeground,
+          text: context.l10n.proposalStatusLive,
+          textColor: colors.textPrimary,
+          backgroundColor: colors.successContainer,
+        ),
+      ProposalStatus.completed => _ProposalStatusContainerConfig(
+          iconData: CatalystVoicesIcons.flag,
+          iconColor: colors.iconsForeground,
+          text: context.l10n.proposalStatusCompleted,
+          textColor: colors.textPrimary,
+          backgroundColor: colors.onSurfaceNeutralOpaqueLv1,
+        ),
     };
   }
 }

@@ -1,4 +1,9 @@
+import 'package:catalyst_voices/pages/overall_spaces/space/space_overview_header.dart';
+import 'package:catalyst_voices/pages/overall_spaces/space/space_overview_nav_tile.dart';
 import 'package:catalyst_voices/pages/overall_spaces/space_overview_container.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class VotingOverview extends StatelessWidget {
@@ -6,6 +11,37 @@ class VotingOverview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SpaceOverviewContainer(child: Text('voting'));
+    return SpaceOverviewContainer(
+      child: Column(
+        children: [
+          SpaceOverviewHeader(Space.voting),
+          SectionHeader(title: Text('Active funding rounds')),
+          VoicesDrawerNavItem(
+            leading: Icon(CatalystVoicesIcons.vote),
+            name: 'Voting round 14',
+            status: ProposalStatus.open,
+          ),
+          VoicesDivider(indent: 0, endIndent: 0, height: 16),
+          SectionHeader(title: Text('Funding tracks / Categories')),
+          SpaceOverviewNavTile(
+            leading: Icon(CatalystVoicesIcons.document),
+            title: Text(
+              'My fund 14 proposal',
+              style: Theme.of(context).textTheme.labelMedium,
+            ),
+          ),
+          VoicesDivider(indent: 0, endIndent: 0, height: 16),
+          SectionHeader(title: Text('Dreps')),
+          SpaceOverviewNavTile(
+            leading: Icon(CatalystVoicesIcons.user),
+            title: Text('Drep signup'),
+          ),
+          SpaceOverviewNavTile(
+            leading: Icon(CatalystVoicesIcons.user),
+            title: Text('Drep delegation'),
+          ),
+        ],
+      ),
+    );
   }
 }

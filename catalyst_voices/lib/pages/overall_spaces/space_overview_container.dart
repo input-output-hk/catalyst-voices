@@ -17,6 +17,7 @@ class SpaceOverviewContainer extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
       ),
+      padding: EdgeInsets.all(12),
       child: child,
     );
   }

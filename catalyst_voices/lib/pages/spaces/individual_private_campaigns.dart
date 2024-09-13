@@ -17,14 +17,17 @@ class IndividualPrivateCampaigns extends StatelessWidget {
         VoicesDrawerNavItem(
           name: 'Fund name 1',
           status: ProposalStatus.ready,
+          trailing: MoreOptionsButton(),
         ),
         VoicesDrawerNavItem(
           name: 'Campaign 1',
           status: ProposalStatus.draft,
+          trailing: MoreOptionsButton(),
         ),
         VoicesDrawerNavItem(
           name: 'What happens with a campaign title that is longer that',
           status: ProposalStatus.draft,
+          trailing: MoreOptionsButton(),
         ),
       ],
     );

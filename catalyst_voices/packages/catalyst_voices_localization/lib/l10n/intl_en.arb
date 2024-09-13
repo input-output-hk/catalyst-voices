@@ -165,6 +165,22 @@
   "@proposalStatusDraft": {
     "description": "Indicates to user that status is in draft mode"
   },
+  "proposalStatusPrivate": "Private",
+  "@proposalStatusPrivate": {
+    "description": "Indicates to user that status is in private mode"
+  },
+  "proposalStatusLive": "LIVE",
+  "@proposalStatusLive": {
+    "description": "Indicates to user that status is in live mode"
+  },
+  "proposalStatusCompleted": "Completed",
+  "@proposalStatusCompleted": {
+    "description": "Indicates to user that status is completed"
+  },
+  "proposalStatusOpen": "Open",
+  "@proposalStatusOpen": {
+    "description": "Indicates to user that status is in open mode"
+  },
   "fundedProposal": "Funded proposal",
   "@fundedProposal": {
     "description": "Label shown on a proposal card indicating that the proposal is funded."
@@ -312,5 +328,25 @@
   "clickToRestart": "Click to restart",
   "@clickToRestart": {
     "description": "In different places update popup body"
+  },
+  "spaceTreasuryName": "Treasury",
+  "@spaceTreasuryName": {
+    "description": "Name of space shown in different spaces that indicates its origin"
+  },
+  "spaceDiscoveryName": "Discovery space",
+  "@spaceDiscoveryName": {
+    "description": "Name of space shown in different spaces that indicates its origin"
+  },
+  "spaceWorkspaceName": "Workspace",
+  "@spaceWorkspaceName": {
+    "description": "Name of space shown in different spaces that indicates its origin"
+  },
+  "spaceVotingName": "Treasury",
+  "@spaceVotingName": {
+    "description": "Name of space shown in different spaces that indicates its origin"
+  },
+  "spaceFundedProjects": "Funded Projects",
+  "@spaceFundedProjects": {
+    "description": "Name of space shown in different spaces that indicates its origin"
   }
 }
