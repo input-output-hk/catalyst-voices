@@ -220,4 +220,45 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get favorites => 'Favorites';
+
+  @override
+  String get treasuryCampaignBuilder => 'Campaign builder';
+
+  @override
+  String get treasuryCampaignBuilderSegments => 'Segments';
+
+  @override
+  String get treasuryCampaignSetup => 'Setup Campaign';
+
+  @override
+  String get treasuryCampaignTitle => 'Campaign title';
+
+  @override
+  String get treasuryStepEdit => 'Edit';
+
+  @override
+  String get drawerSpaceTreasury => 'Treasury';
+
+  @override
+  String get drawerSpaceDiscovery => 'Discovery';
+
+  @override
+  String get drawerSpaceWorkspace => 'Workspace';
+
+  @override
+  String get drawerSpaceVoting => 'Voting';
+
+  @override
+  String get drawerSpaceFundedProjects => 'Funded projects';
+
+  @override
+  String get fundedProjectSpace => 'Funded project space';
+
+  @override
+  String noOfFundedProposals(int count) {
+    return 'Funded proposals ($count)';
+  }
+
+  @override
+  String get followed => 'Followed';
 }

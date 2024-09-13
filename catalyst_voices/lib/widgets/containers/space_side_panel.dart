@@ -92,7 +92,7 @@ class _Container extends StatelessWidget {
     return Container(
       margin: margin,
       decoration: BoxDecoration(
-        color: Theme.of(context).colors.onSurfaceNeutralOpaqueLv0,
+        color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
         borderRadius: borderRadius,
       ),
       padding: const EdgeInsets.all(12),

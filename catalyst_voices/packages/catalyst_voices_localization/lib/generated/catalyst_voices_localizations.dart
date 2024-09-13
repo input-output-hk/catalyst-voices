@@ -417,6 +417,84 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Favorites'**
   String get favorites;
+
+  /// Left panel name in treasury space
+  ///
+  /// In en, this message translates to:
+  /// **'Campaign builder'**
+  String get treasuryCampaignBuilder;
+
+  /// Tab name in campaign builder panel
+  ///
+  /// In en, this message translates to:
+  /// **'Segments'**
+  String get treasuryCampaignBuilderSegments;
+
+  /// Segment name
+  ///
+  /// In en, this message translates to:
+  /// **'Setup Campaign'**
+  String get treasuryCampaignSetup;
+
+  /// Campaign title
+  ///
+  /// In en, this message translates to:
+  /// **'Campaign title'**
+  String get treasuryCampaignTitle;
+
+  /// Button name in treasury step
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get treasuryStepEdit;
+
+  /// Name shown in spaces shell drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Treasury'**
+  String get drawerSpaceTreasury;
+
+  /// Name shown in spaces shell drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Discovery'**
+  String get drawerSpaceDiscovery;
+
+  /// Name shown in spaces shell drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Workspace'**
+  String get drawerSpaceWorkspace;
+
+  /// Name shown in spaces shell drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Voting'**
+  String get drawerSpaceVoting;
+
+  /// Name shown in spaces shell drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Funded projects'**
+  String get drawerSpaceFundedProjects;
+
+  /// Title of the funded project space
+  ///
+  /// In en, this message translates to:
+  /// **'Funded project space'**
+  String get fundedProjectSpace;
+
+  /// Tab label for funded proposals in funded projects space
+  ///
+  /// In en, this message translates to:
+  /// **'Funded proposals ({count})'**
+  String noOfFundedProposals(int count);
+
+  /// Refers to a list of followed items.
+  ///
+  /// In en, this message translates to:
+  /// **'Followed'**
+  String get followed;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
