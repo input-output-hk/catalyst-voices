@@ -47,7 +47,7 @@ const sampleRichText = [
     "attributes": {"list": "bullet"}
   },
   {
-    "insert": "Amakuri",
+    "insert": "Amateurism",
     "attributes": {"italic": true}
   },
   {
