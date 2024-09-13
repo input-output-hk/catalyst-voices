@@ -241,7 +241,7 @@ class _MaterialApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeBuilder.buildTheme(BrandKey.catalyst),
+      theme: ThemeBuilder.buildTheme(brand: Brand.catalyst),
       home: Scaffold(body: child),
     );
   }
