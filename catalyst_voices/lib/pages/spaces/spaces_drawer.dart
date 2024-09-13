@@ -26,6 +26,10 @@ class SpacesDrawer extends StatelessWidget {
         onChanged: (space) {
           _goTo(context, space: space);
         },
+        onOverallTap: () {
+          Scaffold.of(context).closeDrawer();
+          OverallSpacesRoute().push<void>(context);
+        },
       ),
     );
   }
