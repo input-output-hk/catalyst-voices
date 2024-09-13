@@ -25,7 +25,7 @@ command:
       flutter_bloc: ^8.1.5
       flutter_localized_locales: ^2.0.5
       flutter_quill: ^10.5.0
-      flutter_quill_extensions: ^10.5.0
+      flutter_quill_extensions: ^10.5.13
       formz: ^0.7.0
       logging: ^1.2.0
       meta: ^1.10.0
@@ -42,6 +42,7 @@ command:
       # but here we import it explicitly to make sure the latest version is used which addresses
       # the problem from here: https://github.com/jonataslaw/get_cli/issues/263
       win32: ^5.5.4
+      web: ^1.0.0
     dev_dependencies:
       test: ^1.24.9
       build_runner: ^2.4.12
