@@ -227,7 +227,7 @@ class VoicesColors {
   static const Color lightAvatarsWarning = Color(0xFFFDE1CE);
 
   /// Color: #FFFFFF
-  static const Color lightElevationsOnSurfaceNeutralLv0 = Color(0xFFFFFFFF);
+  static const Color lightElevationsOnSurfaceNeutralLv0 = Color(0x16123CD3);
 
   /// Color: #F2F4F8
   static const Color lightElevationsOnSurfaceNeutralLv1Grey = Color(0xFFF2F4F8);

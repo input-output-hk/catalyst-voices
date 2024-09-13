@@ -18,7 +18,7 @@ class ProposalStatusContainer extends StatelessWidget {
     final config = type._config(context);
 
     final iconTheme = IconThemeData(
-      size: 18,
+      size: 16,
       color: config.iconColor,
     );
 
@@ -82,6 +82,13 @@ extension _ProposalStatusExt on ProposalStatus {
           iconData: CatalystVoicesIcons.pencil_alt,
           iconColor: colors.iconsForeground,
           text: context.l10n.proposalStatusDraft,
+          textColor: colors.textPrimary,
+          backgroundColor: colors.onSurfaceNeutralOpaqueLv1,
+        ),
+      ProposalStatus.inProgress => _ProposalStatusContainerConfig(
+          iconData: CatalystVoicesIcons.annotation,
+          iconColor: colors.iconsPrimary,
+          text: context.l10n.proposalStatusInProgress,
           textColor: colors.textPrimary,
           backgroundColor: colors.onSurfaceNeutralOpaqueLv1,
         ),

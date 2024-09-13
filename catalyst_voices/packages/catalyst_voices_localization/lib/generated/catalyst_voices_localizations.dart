@@ -334,6 +334,12 @@ abstract class VoicesLocalizations {
   /// **'Draft'**
   String get proposalStatusDraft;
 
+  /// Indicates to user that status is in progress
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get proposalStatusInProgress;
+
   /// Indicates to user that status is in private mode
   ///
   /// In en, this message translates to:
@@ -466,11 +472,29 @@ abstract class VoicesLocalizations {
   /// **'Campaign title'**
   String get treasuryCampaignTitle;
 
-  /// Button name in treasury step
+  /// Button name in step
   ///
   /// In en, this message translates to:
   /// **'Edit'**
-  String get treasuryStepEdit;
+  String get stepEdit;
+
+  /// Left panel name in workspace
+  ///
+  /// In en, this message translates to:
+  /// **'Proposal navigation'**
+  String get workspaceProposalNavigation;
+
+  /// Tab name in proposal setup panel
+  ///
+  /// In en, this message translates to:
+  /// **'Segments'**
+  String get workspaceProposalNavigationSegments;
+
+  /// Segment name
+  ///
+  /// In en, this message translates to:
+  /// **'Proposal setup'**
+  String get workspaceProposalSetup;
 
   /// Name shown in spaces shell drawer
   ///

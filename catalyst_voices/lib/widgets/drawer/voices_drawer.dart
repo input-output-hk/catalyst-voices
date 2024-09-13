@@ -41,6 +41,7 @@ class VoicesDrawer extends StatelessWidget {
         ),
       ),
       child: Drawer(
+        width: 350,
         shape: const RoundedRectangleBorder(),
         child: Column(
           children: [

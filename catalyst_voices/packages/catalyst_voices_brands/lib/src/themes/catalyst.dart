@@ -307,7 +307,7 @@ ThemeData _buildThemeData(
       scrolledUnderElevation: 0,
     ),
     drawerTheme: DrawerThemeData(
-      backgroundColor: voicesColorScheme.elevationsOnSurfaceNeutralLv0,
+      backgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv0,
     ),
     dialogTheme: DialogTheme(
       // TODO(damian-molinski): themed value needed. We don't have it defined yet.
