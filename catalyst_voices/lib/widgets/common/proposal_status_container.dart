@@ -86,12 +86,12 @@ extension _ProposalStatusExt on ProposalStatus {
           backgroundColor: colors.onSurfaceNeutralOpaqueLv1,
         ),
       ProposalStatus.inProgress => _ProposalStatusContainerConfig(
-        iconData: CatalystVoicesIcons.annotation,
-        iconColor: colors.iconsPrimary,
-        text: context.l10n.proposalStatusInProgress,
-        textColor: colors.textPrimary,
-        backgroundColor: colors.onSurfaceNeutralOpaqueLv1,
-      ),
+          iconData: CatalystVoicesIcons.annotation,
+          iconColor: colors.iconsPrimary,
+          text: context.l10n.proposalStatusInProgress,
+          textColor: colors.textPrimary,
+          backgroundColor: colors.onSurfaceNeutralOpaqueLv1,
+        ),
     };
   }
 }

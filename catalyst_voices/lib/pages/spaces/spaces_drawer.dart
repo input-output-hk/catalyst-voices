@@ -32,7 +32,7 @@ class SpacesDrawer extends StatelessWidget {
   }
 
   Widget _space() {
-    switch(space) {
+    switch (space) {
       case Space.treasury:
         return IndividualPrivateCampaigns();
       case Space.workspace:

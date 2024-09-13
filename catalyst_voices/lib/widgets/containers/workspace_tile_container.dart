@@ -48,8 +48,6 @@ class WorkspaceTileContainer extends StatelessWidget {
 }
 
 BorderRadius _borderRadius(bool isSelected) => BorderRadius.horizontal(
-  left: isSelected ? Radius.zero : Radius.circular(28),
-  right: Radius.circular(28),
-);
-
-
+      left: isSelected ? Radius.zero : Radius.circular(28),
+      right: Radius.circular(28),
+    );
