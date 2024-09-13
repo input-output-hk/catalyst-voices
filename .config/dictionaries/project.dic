@@ -29,6 +29,7 @@ carryforward
 Catalyst
 CBOR
 cborg
+cborseq
 cdrs
 cdylib
 certdir

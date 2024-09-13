@@ -16,7 +16,7 @@ kid = (bstr .size 16)
 ulid = (bstr .size 16)
 
 ; Signature - ED25519 Signature over the preceding two fields.
-; Must be signed using the Private Key of the Role 0 Certificate identifed by the Kid field.
+; Must be signed using the Private Key of the Role 0 Certificate identified by the Kid field.
 signature = (bstr .size 64)
 
 ; Example Signed Token
