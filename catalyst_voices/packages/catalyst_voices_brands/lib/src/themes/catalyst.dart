@@ -349,5 +349,8 @@ ThemeData _buildThemeData(
       voicesColorScheme,
       brandAssets,
     ],
+    textSelectionTheme: TextSelectionThemeData(
+      cursorColor: voicesColorScheme.textPrimary,
+    ),
   ).copyWithButtonsTheme().copyWithTogglesTheme();
 }
