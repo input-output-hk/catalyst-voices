@@ -250,4 +250,15 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get drawerSpaceFundedProjects => 'Funded projects';
+
+  @override
+  String get fundedProjectSpace => 'Funded project space';
+
+  @override
+  String noOfFundedProposals(int count) {
+    return 'Funded proposals ($count)';
+  }
+
+  @override
+  String get followed => 'Followed';
 }

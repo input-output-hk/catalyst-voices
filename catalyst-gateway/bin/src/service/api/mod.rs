@@ -14,7 +14,7 @@ use self::cardano::CardanoApi;
 use crate::settings::Settings;
 /// Auth
 mod auth;
-mod cardano;
+pub(crate) mod cardano;
 mod health;
 mod legacy;
 

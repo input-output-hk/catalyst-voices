@@ -52,6 +52,7 @@ pub struct PolicyAsset {
 }
 
 /// Extract assets
+#[allow(dead_code)]
 pub(crate) fn parse_policy_assets(assets: &[MultiEraPolicyAssets<'_>]) -> Vec<PolicyAsset> {
     assets
         .iter()
@@ -65,6 +66,7 @@ pub(crate) fn parse_policy_assets(assets: &[MultiEraPolicyAssets<'_>]) -> Vec<Po
 }
 
 /// Parse child assets
+#[allow(dead_code)]
 fn parse_child_assets(assets: &[MultiEraAsset]) -> Vec<Asset> {
     assets
         .iter()
@@ -92,6 +94,7 @@ fn parse_child_assets(assets: &[MultiEraAsset]) -> Vec<Asset> {
 }
 
 /// Eras before staking should be ignored
+#[allow(dead_code)]
 pub fn valid_era(era: Era) -> bool {
     !matches!(era, Era::Byron)
 }
