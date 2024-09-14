@@ -30,7 +30,7 @@ class SpaceAvatar extends StatelessWidget {
     final config = data._config(context);
 
     return VoicesAvatar(
-      icon: Icon(config.iconData),
+      icon: config.icon.buildIcon(),
       backgroundColor: config.backgroundColor,
       foregroundColor: config.foregroundColor,
       padding: padding,
@@ -40,12 +40,12 @@ class SpaceAvatar extends StatelessWidget {
 }
 
 final class _SpaceAvatarConfig {
-  final IconData iconData;
+  final SvgGenImage icon;
   final Color backgroundColor;
   final Color foregroundColor;
 
   _SpaceAvatarConfig({
-    required this.iconData,
+    required this.icon,
     required this.backgroundColor,
     required this.foregroundColor,
   });
@@ -57,27 +57,27 @@ extension _SpaceExt on Space {
 
     return switch (this) {
       Space.treasury => _SpaceAvatarConfig(
-          iconData: CatalystVoicesIcons.fund,
+          icon: VoicesAssets.icons.fund,
           backgroundColor: theme.colors.successContainer!,
           foregroundColor: theme.colors.iconsSuccess!,
         ),
       Space.discovery => _SpaceAvatarConfig(
-          iconData: CatalystVoicesIcons.light_bulb,
+          icon: VoicesAssets.icons.lightBulb,
           backgroundColor: theme.colors.iconsSecondary!.withOpacity(0.16),
           foregroundColor: theme.colors.iconsSecondary!,
         ),
       Space.workspace => _SpaceAvatarConfig(
-          iconData: CatalystVoicesIcons.briefcase,
+          icon: VoicesAssets.icons.briefcase,
           backgroundColor: theme.colorScheme.primaryContainer,
           foregroundColor: theme.colorScheme.primary,
         ),
       Space.voting => _SpaceAvatarConfig(
-          iconData: CatalystVoicesIcons.vote,
+          icon: VoicesAssets.icons.vote,
           backgroundColor: theme.colors.warningContainer!,
           foregroundColor: theme.colors.iconsWarning!,
         ),
       Space.fundedProjects => _SpaceAvatarConfig(
-          iconData: CatalystVoicesIcons.flag,
+          icon: VoicesAssets.icons.flag,
           backgroundColor: theme.colors.iconsSecondary!.withOpacity(0.16),
           foregroundColor: theme.colors.iconsSecondary!,
         ),

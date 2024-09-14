@@ -110,7 +110,10 @@ void main() {
       await tester.pump();
 
       // Verify that the success icon is displayed
-      expect(find.byIcon(CatalystVoicesIcons.check_circle), findsOneWidget);
+      expect(
+        find.byWidget(VoicesAssets.icons.checkCircle.buildIcon()),
+        findsOneWidget,
+      );
     });
 
     testWidgets('renders correctly when disabled', (tester) async {
@@ -192,7 +195,10 @@ void main() {
       await tester.pump();
 
       // Verify that the success icon is displayed
-      expect(find.byIcon(CatalystVoicesIcons.check_circle), findsOneWidget);
+      expect(
+        find.byWidget(VoicesAssets.icons.checkCircle.buildIcon()),
+        findsOneWidget,
+      );
     });
 
     testWidgets('displays warning when validation returns warning',

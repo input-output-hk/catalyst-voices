@@ -157,55 +157,62 @@ class _Toolbar extends StatelessWidget {
                   controller.formatSelection(Attribute.h1);
                 }
               },
-              icon: const Icon(CatalystVoicesIcons.rt_heading),
+              icon: VoicesAssets.icons.rtHeading.buildIcon(),
               isSelected: controller.isHeaderSelected,
               iconTheme: null,
             ),
             QuillToolbarToggleStyleButton(
-              options: const QuillToolbarToggleStyleButtonOptions(
-                iconData: CatalystVoicesIcons.rt_bold,
+              options: QuillToolbarToggleStyleButtonOptions(
+                childBuilder: (options, extraOptions) =>
+                    VoicesAssets.icons.rtBold.buildIcon(),
               ),
               controller: controller,
               attribute: Attribute.bold,
             ),
             QuillToolbarToggleStyleButton(
-              options: const QuillToolbarToggleStyleButtonOptions(
-                iconData: CatalystVoicesIcons.rt_italic,
+              options: QuillToolbarToggleStyleButtonOptions(
+                childBuilder: (options, extraOptions) =>
+                    VoicesAssets.icons.rtItalic.buildIcon(),
               ),
               controller: controller,
               attribute: Attribute.italic,
             ),
             QuillToolbarToggleStyleButton(
-              options: const QuillToolbarToggleStyleButtonOptions(
-                iconData: CatalystVoicesIcons.rt_ordered_list,
+              options: QuillToolbarToggleStyleButtonOptions(
+                childBuilder: (options, extraOptions) =>
+                    VoicesAssets.icons.rtOrderedList.buildIcon(),
               ),
               controller: controller,
               attribute: Attribute.ol,
             ),
             QuillToolbarToggleStyleButton(
-              options: const QuillToolbarToggleStyleButtonOptions(
-                iconData: CatalystVoicesIcons.rt_unordered_list,
+              options: QuillToolbarToggleStyleButtonOptions(
+                childBuilder: (options, extraOptions) =>
+                    VoicesAssets.icons.rtUnorderedList.buildIcon(),
               ),
               controller: controller,
               attribute: Attribute.ul,
             ),
             QuillToolbarIndentButton(
               options: QuillToolbarIndentButtonOptions(
-                iconData: CatalystVoicesIcons.rt_increase_indent,
+                childBuilder: (options, extraOptions) =>
+                    VoicesAssets.icons.rtIncreaseIndent.buildIcon(),
               ),
               controller: controller,
               isIncrease: true,
             ),
             QuillToolbarIndentButton(
               options: QuillToolbarIndentButtonOptions(
-                iconData: CatalystVoicesIcons.rt_decrease_indent,
+                childBuilder: (options, extraOptions) =>
+                    VoicesAssets.icons.rtDecreaseIndent.buildIcon(),
               ),
               controller: controller,
               isIncrease: false,
             ),
             QuillToolbarImageButton(
-              options: const QuillToolbarImageButtonOptions(
-                iconData: CatalystVoicesIcons.photograph,
+              options: QuillToolbarImageButtonOptions(
+                childBuilder: (options, extraOptions) =>
+                    VoicesAssets.icons.photograph.buildIcon(),
               ),
               controller: controller,
             ),

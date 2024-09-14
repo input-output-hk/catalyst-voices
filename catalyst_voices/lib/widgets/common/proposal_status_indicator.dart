@@ -39,7 +39,7 @@ class ProposalStatusIndicator extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(config.iconData),
+              config.icon.buildIcon(),
               SizedBox(width: 8),
               Text(config.text)
             ],
@@ -51,14 +51,14 @@ class ProposalStatusIndicator extends StatelessWidget {
 }
 
 final class _ProposalStatusIndicatorConfig {
-  final IconData iconData;
+  final SvgGenImage icon;
   final Color? iconColor;
   final String text;
   final Color? textColor;
   final Color? backgroundColor;
 
   _ProposalStatusIndicatorConfig({
-    required this.iconData,
+    required this.icon,
     this.iconColor,
     required this.text,
     this.textColor,
@@ -72,14 +72,14 @@ extension _ProposalStatusExt on ProposalStatus {
 
     return switch (this) {
       ProposalStatus.ready => _ProposalStatusIndicatorConfig(
-          iconData: CatalystVoicesIcons.check,
+          icon: VoicesAssets.icons.check,
           iconColor: colors.iconsSuccess,
           text: context.l10n.proposalStatusReady,
           textColor: colors.textPrimary,
           backgroundColor: colors.successContainer,
         ),
       ProposalStatus.draft => _ProposalStatusIndicatorConfig(
-          iconData: CatalystVoicesIcons.pencil_alt,
+          icon: VoicesAssets.icons.pencilAlt,
           iconColor: colors.iconsForeground,
           text: context.l10n.proposalStatusDraft,
           textColor: colors.textPrimary,

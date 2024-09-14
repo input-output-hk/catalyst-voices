@@ -14,10 +14,7 @@ class ConnectingStatus extends StatelessWidget {
   Widget build(BuildContext context) {
     return OutlinedButton.icon(
       onPressed: null,
-      icon: const Icon(
-        CatalystVoicesIcons.refresh,
-        size: 18,
-      ),
+      icon: VoicesAssets.icons.refresh.buildIcon(size: 18),
       label: Text(context.l10n.connectingStatusLabelText),
     );
   }

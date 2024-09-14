@@ -46,7 +46,7 @@ class VoicesDrawerNavItem extends StatelessWidget {
             ),
             ProposalStatusContainer(type: status),
             VoicesIconButton(
-              child: Icon(CatalystVoicesIcons.dots_vertical),
+              child: VoicesAssets.icons.dotsVertical.buildIcon(),
               onTap: () {},
             ),
           ].separatedBy(SizedBox(width: 12)).toList(),
