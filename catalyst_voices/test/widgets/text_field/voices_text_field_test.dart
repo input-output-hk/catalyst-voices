@@ -111,7 +111,7 @@ void main() {
 
       // Verify that the success icon is displayed
       expect(
-        find.byWidget(VoicesAssets.icons.checkCircle.buildIcon()),
+        find.byType(CatalystSvgIcon),
         findsOneWidget,
       );
     });
@@ -196,7 +196,7 @@ void main() {
 
       // Verify that the success icon is displayed
       expect(
-        find.byWidget(VoicesAssets.icons.checkCircle.buildIcon()),
+        find.byType(CatalystSvgIcon),
         findsOneWidget,
       );
     });
