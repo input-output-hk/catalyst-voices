@@ -18,7 +18,7 @@ class ProposalStatusContainer extends StatelessWidget {
     final config = type._config(context);
 
     final iconTheme = IconThemeData(
-      size: 18,
+      size: 16,
       color: config.iconColor,
     );
 
@@ -82,6 +82,41 @@ extension _ProposalStatusExt on ProposalStatus {
           icon: VoicesAssets.icons.pencilAlt,
           iconColor: colors.iconsForeground,
           text: context.l10n.proposalStatusDraft,
+          textColor: colors.textPrimary,
+          backgroundColor: colors.onSurfaceNeutralOpaqueLv1,
+        ),
+      ProposalStatus.inProgress => _ProposalStatusContainerConfig(
+          icon: VoicesAssets.icons.annotation,
+          iconColor: colors.iconsPrimary,
+          text: context.l10n.proposalStatusInProgress,
+          textColor: colors.textPrimary,
+          backgroundColor: colors.onSurfaceNeutralOpaqueLv1,
+        ),
+      ProposalStatus.private => _ProposalStatusContainerConfig(
+          icon: VoicesAssets.icons.eyeOff,
+          iconColor: colors.iconsForeground,
+          text: context.l10n.proposalStatusPrivate,
+          textColor: colors.textPrimary,
+          backgroundColor: colors.onSurfaceNeutralOpaqueLv1,
+        ),
+      ProposalStatus.open => _ProposalStatusContainerConfig(
+          icon: VoicesAssets.icons.checkCircle,
+          iconColor: colors.iconsSuccess,
+          text: context.l10n.proposalStatusOpen,
+          textColor: colors.textPrimary,
+          backgroundColor: colors.onSurfaceNeutralOpaqueLv1,
+        ),
+      ProposalStatus.live => _ProposalStatusContainerConfig(
+          icon: VoicesAssets.icons.play,
+          iconColor: colors.iconsForeground,
+          text: context.l10n.proposalStatusLive,
+          textColor: colors.textPrimary,
+          backgroundColor: colors.successContainer,
+        ),
+      ProposalStatus.completed => _ProposalStatusContainerConfig(
+          icon: VoicesAssets.icons.flag,
+          iconColor: colors.iconsForeground,
+          text: context.l10n.proposalStatusCompleted,
           textColor: colors.textPrimary,
           backgroundColor: colors.onSurfaceNeutralOpaqueLv1,
         ),

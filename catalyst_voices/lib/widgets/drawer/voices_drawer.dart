@@ -41,6 +41,7 @@ class VoicesDrawer extends StatelessWidget {
         ),
       ),
       child: Drawer(
+        width: 350,
         shape: const RoundedRectangleBorder(),
         child: Column(
           children: [
@@ -81,7 +82,7 @@ class _Header extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Theme.of(context).brandAssets.logo.buildPicture(),
+          Theme.of(context).brandAssets.brand.logo(context).buildPicture(),
           IconButton(
             onPressed: Navigator.of(context).pop,
             icon: VoicesAssets.icons.x.buildIcon(size: 22),

@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_brands/src/brands/brand.dart';
 import 'package:catalyst_voices_brands/src/theme_extensions/brand_assets.dart';
 import 'package:catalyst_voices_brands/src/theme_extensions/voices_color_scheme.dart';
 import 'package:catalyst_voices_brands/src/themes/widgets/buttons_theme.dart';
@@ -171,8 +172,7 @@ final ThemeData catalyst = _buildThemeData(
 );
 
 final BrandAssets darkBrandAssets = BrandAssets(
-  logo: VoicesAssets.images.catalystLogoWhite,
-  logoIcon: VoicesAssets.images.catalystLogoIconWhite,
+  brand: Brand.catalyst,
 );
 
 /// Dark [ThemeData] for the `catalyst` brand.
@@ -183,8 +183,7 @@ final ThemeData darkCatalyst = _buildThemeData(
 );
 
 final BrandAssets lightBrandAssets = BrandAssets(
-  logo: VoicesAssets.images.catalystLogo,
-  logoIcon: VoicesAssets.images.catalystLogoIcon,
+  brand: Brand.catalyst,
 );
 
 TextTheme _buildTextTheme(VoicesColorScheme voicesColorScheme) {
@@ -308,7 +307,7 @@ ThemeData _buildThemeData(
       scrolledUnderElevation: 0,
     ),
     drawerTheme: DrawerThemeData(
-      backgroundColor: voicesColorScheme.elevationsOnSurfaceNeutralLv0,
+      backgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv0,
     ),
     dialogTheme: DialogTheme(
       // TODO(damian-molinski): themed value needed. We don't have it defined yet.

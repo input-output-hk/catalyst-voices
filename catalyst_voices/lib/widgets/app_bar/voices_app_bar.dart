@@ -124,13 +124,17 @@ class _Title extends StatelessWidget {
         ),
         xs: (
           widgets: [
-            Theme.of(context).brandAssets.logoIcon.buildPicture(),
+            Theme.of(context)
+                .brandAssets
+                .brand
+                .logoIcon(context)
+                .buildPicture(),
           ],
           itemGap: 8
         ),
         sm: (
           widgets: [
-            Theme.of(context).brandAssets.logo.buildPicture(),
+            Theme.of(context).brandAssets.brand.logo(context).buildPicture(),
             if (showSearch)
               SearchButton(
                 onPressed: () {},
@@ -140,7 +144,7 @@ class _Title extends StatelessWidget {
         ),
         other: (
           widgets: [
-            Theme.of(context).brandAssets.logo.buildPicture(),
+            Theme.of(context).brandAssets.brand.logo(context).buildPicture(),
             if (showSearch)
               SearchButton(
                 onPressed: () {},
