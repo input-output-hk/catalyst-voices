@@ -19,7 +19,7 @@ class VoicesHeadersExamples extends StatelessWidget {
             const SectionHeader(title: Text('Proposal stages')),
             SectionHeader(
               leading: VoicesIconButton(
-                child: const Icon(CatalystVoicesIcons.arrow_narrow_left),
+                child: VoicesAssets.icons.arrowNarrowLeft.buildIcon(),
                 onTap: () {},
               ),
               title: const Text('Proposal stages'),
@@ -28,11 +28,11 @@ class VoicesHeadersExamples extends StatelessWidget {
               title: const Text('Proposal stages'),
               trailing: [
                 VoicesIconButton(
-                  child: const Icon(CatalystVoicesIcons.cake),
+                  child: VoicesAssets.icons.cake.buildIcon(),
                   onTap: () {},
                 ),
                 VoicesIconButton(
-                  child: const Icon(CatalystVoicesIcons.arrow_narrow_right),
+                  child: VoicesAssets.icons.arrowNarrowRight.buildIcon(),
                   onTap: () {},
                 ),
               ],

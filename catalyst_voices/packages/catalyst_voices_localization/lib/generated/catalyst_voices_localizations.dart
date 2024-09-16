@@ -112,6 +112,42 @@ abstract class VoicesLocalizations {
   /// **'mail@example.com'**
   String get emailErrorText;
 
+  /// Text shown in cancel button
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancelButtonText;
+
+  /// Text shown in edit button
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get editButtonText;
+
+  /// Text shown in header tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Header'**
+  String get headerTooltipText;
+
+  /// Text shown as placeholder in rich text editor
+  ///
+  /// In en, this message translates to:
+  /// **'Start writing your text...'**
+  String get placeholderRichText;
+
+  /// Text shown as placeholder in rich text editor
+  ///
+  /// In en, this message translates to:
+  /// **'Supporting text'**
+  String get supportingTextLabelText;
+
+  /// Text shown in save button
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get saveButtonText;
+
   /// Text shown in password field
   ///
   /// In en, this message translates to:
@@ -297,6 +333,270 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Draft'**
   String get proposalStatusDraft;
+
+  /// Indicates to user that status is in progress
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get proposalStatusInProgress;
+
+  /// Indicates to user that status is in private mode
+  ///
+  /// In en, this message translates to:
+  /// **'Private'**
+  String get proposalStatusPrivate;
+
+  /// Indicates to user that status is in live mode
+  ///
+  /// In en, this message translates to:
+  /// **'LIVE'**
+  String get proposalStatusLive;
+
+  /// Indicates to user that status is completed
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get proposalStatusCompleted;
+
+  /// Indicates to user that status is in open mode
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get proposalStatusOpen;
+
+  /// Label shown on a proposal card indicating that the proposal is funded.
+  ///
+  /// In en, this message translates to:
+  /// **'Funded proposal'**
+  String get fundedProposal;
+
+  /// Label shown on a proposal card indicating that the proposal is not yet funded.
+  ///
+  /// In en, this message translates to:
+  /// **'Published proposal'**
+  String get publishedProposal;
+
+  /// Indicates date of funding (a proposal).
+  ///
+  /// In en, this message translates to:
+  /// **'Funded {date}'**
+  String fundedProposalDate(DateTime date);
+
+  /// Indicates a last update date.
+  ///
+  /// In en, this message translates to:
+  /// **'Last update: {date}.'**
+  String lastUpdateDate(String date);
+
+  /// Indicates the amount of ADA requested in a fund on a proposal card.
+  ///
+  /// In en, this message translates to:
+  /// **'Funds requested'**
+  String get fundsRequested;
+
+  /// Indicates the amount of comments on a proposal card.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} {count, plural, =0{comments} =1{comment} other{comments}}'**
+  String noOfComments(num count);
+
+  /// Indicates the amount of comments on a proposal card.
+  ///
+  /// In en, this message translates to:
+  /// **'{completed} of {total} ({percentage}%) {total, plural, =0{segments} =1{segment} other{segments}} completed'**
+  String noOfSegmentsCompleted(num completed, num total, num percentage);
+
+  /// Refers to date which is today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// Refers to date which is yesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get yesterday;
+
+  /// Refers to date which is two days ago.
+  ///
+  /// In en, this message translates to:
+  /// **'2 days ago'**
+  String get twoDaysAgo;
+
+  /// Refers to date which is tomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow'**
+  String get tomorrow;
+
+  /// Title of the voting space.
+  ///
+  /// In en, this message translates to:
+  /// **'Active voting round 14'**
+  String get activeVotingRound;
+
+  /// Tab label for all proposals in voting space
+  ///
+  /// In en, this message translates to:
+  /// **'All proposals ({count})'**
+  String noOfAllProposals(int count);
+
+  /// Refers to a list of favorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites'**
+  String get favorites;
+
+  /// Left panel name in treasury space
+  ///
+  /// In en, this message translates to:
+  /// **'Campaign builder'**
+  String get treasuryCampaignBuilder;
+
+  /// Tab name in campaign builder panel
+  ///
+  /// In en, this message translates to:
+  /// **'Segments'**
+  String get treasuryCampaignBuilderSegments;
+
+  /// Segment name
+  ///
+  /// In en, this message translates to:
+  /// **'Setup Campaign'**
+  String get treasuryCampaignSetup;
+
+  /// Campaign title
+  ///
+  /// In en, this message translates to:
+  /// **'Campaign title'**
+  String get treasuryCampaignTitle;
+
+  /// Button name in step
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get stepEdit;
+
+  /// Left panel name in workspace
+  ///
+  /// In en, this message translates to:
+  /// **'Proposal navigation'**
+  String get workspaceProposalNavigation;
+
+  /// Tab name in proposal setup panel
+  ///
+  /// In en, this message translates to:
+  /// **'Segments'**
+  String get workspaceProposalNavigationSegments;
+
+  /// Segment name
+  ///
+  /// In en, this message translates to:
+  /// **'Proposal setup'**
+  String get workspaceProposalSetup;
+
+  /// Name shown in spaces shell drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Treasury'**
+  String get drawerSpaceTreasury;
+
+  /// Name shown in spaces shell drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Discovery'**
+  String get drawerSpaceDiscovery;
+
+  /// Name shown in spaces shell drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Workspace'**
+  String get drawerSpaceWorkspace;
+
+  /// Name shown in spaces shell drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Voting'**
+  String get drawerSpaceVoting;
+
+  /// Name shown in spaces shell drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Funded projects'**
+  String get drawerSpaceFundedProjects;
+
+  /// Title of the funded project space
+  ///
+  /// In en, this message translates to:
+  /// **'Funded project space'**
+  String get fundedProjectSpace;
+
+  /// Tab label for funded proposals in funded projects space
+  ///
+  /// In en, this message translates to:
+  /// **'Funded proposals ({count})'**
+  String noOfFundedProposals(int count);
+
+  /// Refers to a list of followed items.
+  ///
+  /// In en, this message translates to:
+  /// **'Followed'**
+  String get followed;
+
+  /// Overall spaces search brands tile name
+  ///
+  /// In en, this message translates to:
+  /// **'Search Brands'**
+  String get overallSpacesSearchBrands;
+
+  /// Overall spaces tasks tile name
+  ///
+  /// In en, this message translates to:
+  /// **'Tasks'**
+  String get overallSpacesTasks;
+
+  /// In different places update popup title
+  ///
+  /// In en, this message translates to:
+  /// **'Voices update ready'**
+  String get voicesUpdateReady;
+
+  /// In different places update popup body
+  ///
+  /// In en, this message translates to:
+  /// **'Click to restart'**
+  String get clickToRestart;
+
+  /// Name of space shown in different spaces that indicates its origin
+  ///
+  /// In en, this message translates to:
+  /// **'Treasury'**
+  String get spaceTreasuryName;
+
+  /// Name of space shown in different spaces that indicates its origin
+  ///
+  /// In en, this message translates to:
+  /// **'Discovery space'**
+  String get spaceDiscoveryName;
+
+  /// Name of space shown in different spaces that indicates its origin
+  ///
+  /// In en, this message translates to:
+  /// **'Workspace'**
+  String get spaceWorkspaceName;
+
+  /// Name of space shown in different spaces that indicates its origin
+  ///
+  /// In en, this message translates to:
+  /// **'Treasury'**
+  String get spaceVotingName;
+
+  /// Name of space shown in different spaces that indicates its origin
+  ///
+  /// In en, this message translates to:
+  /// **'Funded Projects'**
+  String get spaceFundedProjects;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

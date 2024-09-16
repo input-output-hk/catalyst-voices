@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart' as intl;
+
 import 'catalyst_voices_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -14,6 +16,24 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get emailErrorText => 'mail@example.com';
+
+  @override
+  String get cancelButtonText => 'Cancel';
+
+  @override
+  String get editButtonText => 'Edit';
+
+  @override
+  String get headerTooltipText => 'Header';
+
+  @override
+  String get placeholderRichText => 'Start writing your text...';
+
+  @override
+  String get supportingTextLabelText => 'Supporting text';
+
+  @override
+  String get saveButtonText => 'Save';
 
   @override
   String get passwordLabelText => 'Password';
@@ -109,4 +129,187 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get proposalStatusDraft => 'Draft';
+
+  @override
+  String get proposalStatusInProgress => 'In progress';
+
+  @override
+  String get proposalStatusPrivate => 'Private';
+
+  @override
+  String get proposalStatusLive => 'LIVE';
+
+  @override
+  String get proposalStatusCompleted => 'Completed';
+
+  @override
+  String get proposalStatusOpen => 'Open';
+
+  @override
+  String get fundedProposal => 'Funded proposal';
+
+  @override
+  String get publishedProposal => 'Published proposal';
+
+  @override
+  String fundedProposalDate(DateTime date) {
+    final intl.DateFormat dateDateFormat = intl.DateFormat.yMMMMd(localeName);
+    final String dateString = dateDateFormat.format(date);
+
+    return 'Funded $dateString';
+  }
+
+  @override
+  String lastUpdateDate(String date) {
+    return 'Last update: $date.';
+  }
+
+  @override
+  String get fundsRequested => 'Funds requested';
+
+  @override
+  String noOfComments(num count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.compact(
+      locale: localeName,
+      
+    );
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'comments',
+      one: 'comment',
+      zero: 'comments',
+    );
+    return '$countString $_temp0';
+  }
+
+  @override
+  String noOfSegmentsCompleted(num completed, num total, num percentage) {
+    final intl.NumberFormat completedNumberFormat = intl.NumberFormat.compact(
+      locale: localeName,
+      
+    );
+    final String completedString = completedNumberFormat.format(completed);
+    final intl.NumberFormat totalNumberFormat = intl.NumberFormat.compact(
+      locale: localeName,
+      
+    );
+    final String totalString = totalNumberFormat.format(total);
+    final intl.NumberFormat percentageNumberFormat = intl.NumberFormat.compact(
+      locale: localeName,
+      
+    );
+    final String percentageString = percentageNumberFormat.format(percentage);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      total,
+      locale: localeName,
+      other: 'segments',
+      one: 'segment',
+      zero: 'segments',
+    );
+    return '$completedString of $totalString ($percentageString%) $_temp0 completed';
+  }
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get yesterday => 'Yesterday';
+
+  @override
+  String get twoDaysAgo => '2 days ago';
+
+  @override
+  String get tomorrow => 'Tomorrow';
+
+  @override
+  String get activeVotingRound => 'Active voting round 14';
+
+  @override
+  String noOfAllProposals(int count) {
+    return 'All proposals ($count)';
+  }
+
+  @override
+  String get favorites => 'Favorites';
+
+  @override
+  String get treasuryCampaignBuilder => 'Campaign builder';
+
+  @override
+  String get treasuryCampaignBuilderSegments => 'Segments';
+
+  @override
+  String get treasuryCampaignSetup => 'Setup Campaign';
+
+  @override
+  String get treasuryCampaignTitle => 'Campaign title';
+
+  @override
+  String get stepEdit => 'Edit';
+
+  @override
+  String get workspaceProposalNavigation => 'Proposal navigation';
+
+  @override
+  String get workspaceProposalNavigationSegments => 'Segments';
+
+  @override
+  String get workspaceProposalSetup => 'Proposal setup';
+
+  @override
+  String get drawerSpaceTreasury => 'Treasury';
+
+  @override
+  String get drawerSpaceDiscovery => 'Discovery';
+
+  @override
+  String get drawerSpaceWorkspace => 'Workspace';
+
+  @override
+  String get drawerSpaceVoting => 'Voting';
+
+  @override
+  String get drawerSpaceFundedProjects => 'Funded projects';
+
+  @override
+  String get fundedProjectSpace => 'Funded project space';
+
+  @override
+  String noOfFundedProposals(int count) {
+    return 'Funded proposals ($count)';
+  }
+
+  @override
+  String get followed => 'Followed';
+
+  @override
+  String get overallSpacesSearchBrands => 'Search Brands';
+
+  @override
+  String get overallSpacesTasks => 'Tasks';
+
+  @override
+  String get voicesUpdateReady => 'Voices update ready';
+
+  @override
+  String get clickToRestart => 'Click to restart';
+
+  @override
+  String get spaceTreasuryName => 'Treasury';
+
+  @override
+  String get spaceDiscoveryName => 'Discovery space';
+
+  @override
+  String get spaceWorkspaceName => 'Workspace';
+
+  @override
+  String get spaceVotingName => 'Treasury';
+
+  @override
+  String get spaceFundedProjects => 'Funded Projects';
 }

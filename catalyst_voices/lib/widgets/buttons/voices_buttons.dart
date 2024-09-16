@@ -11,7 +11,7 @@ class DrawerToggleButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesIconButton(
       onTap: () => Scaffold.maybeOf(context)?.openDrawer(),
-      child: const Icon(CatalystVoicesIcons.menu),
+      child: VoicesAssets.icons.menu.buildIcon(),
     );
   }
 }
@@ -28,7 +28,7 @@ class LeftArrowButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesIconButton(
       onTap: onTap,
-      child: const Icon(CatalystVoicesIcons.arrow_narrow_left),
+      child: VoicesAssets.icons.arrowNarrowLeft.buildIcon(),
     );
   }
 }
@@ -45,7 +45,7 @@ class RightArrowButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesIconButton(
       onTap: onTap,
-      child: const Icon(CatalystVoicesIcons.arrow_narrow_right),
+      child: VoicesAssets.icons.arrowNarrowRight.buildIcon(),
     );
   }
 }
@@ -62,7 +62,7 @@ class ChevronDownButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesIconButton(
       onTap: onTap,
-      child: const Icon(CatalystVoicesIcons.chevron_down),
+      child: VoicesAssets.icons.chevronDown.buildIcon(),
     );
   }
 }
@@ -79,7 +79,7 @@ class ChevronRightButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesIconButton(
       onTap: onTap,
-      child: const Icon(CatalystVoicesIcons.chevron_right),
+      child: VoicesAssets.icons.chevronRight.buildIcon(),
     );
   }
 }
@@ -109,6 +109,40 @@ class NavigationPopButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return LeftArrowButton(
       onTap: () => unawaited(Navigator.maybeOf(context)?.maybePop()),
+    );
+  }
+}
+
+class XButton extends StatelessWidget {
+  final VoidCallback? onTap;
+
+  const XButton({
+    super.key,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesIconButton(
+      onTap: onTap,
+      child: VoicesAssets.icons.x.buildIcon(),
+    );
+  }
+}
+
+class MoreOptionsButton extends StatelessWidget {
+  final VoidCallback? onTap;
+
+  const MoreOptionsButton({
+    super.key,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesIconButton(
+      child: VoicesAssets.icons.dotsVertical.buildIcon(),
+      onTap: onTap,
     );
   }
 }

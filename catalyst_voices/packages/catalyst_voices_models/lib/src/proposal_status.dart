@@ -1,4 +1,0 @@
-enum ProposalStatus {
-  ready,
-  draft;
-}

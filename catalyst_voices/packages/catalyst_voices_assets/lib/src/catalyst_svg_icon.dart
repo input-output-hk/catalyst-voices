@@ -37,10 +37,17 @@ class CatalystSvgIcon extends StatelessWidget {
   /// See [SvgPicture.clipBehavior]
   final Clip clipBehavior;
 
-  /// See [SvgPicture.colorFilter]
+  /// A color that is used as [ColorFilter].
+  ///
+  /// Mutually exclusive with [colorFilter], only one is supported.
+  final Color? color;
+
+  /// See [SvgPicture.colorFilter].
+  ///
+  /// Mutually exclusive with [color], only one is supported.
   final ColorFilter? colorFilter;
 
-  /// Whether to use [colorFilter] or not. Some icons don't need that
+  /// Whether to use [colorFilter] or not. Some icons don't need that.
   final bool allowColorFilter;
 
   const CatalystSvgIcon(
@@ -52,12 +59,16 @@ class CatalystSvgIcon extends StatelessWidget {
     this.matchTextDirection = false,
     this.allowDrawingOutsideViewBox = false,
     this.placeholderBuilder,
+    this.color,
     this.colorFilter,
     this.semanticsLabel,
     this.excludeFromSemantics = false,
     this.clipBehavior = Clip.hardEdge,
     this.allowColorFilter = true,
-  });
+  }) : assert(
+          color == null || colorFilter == null,
+          'Either color or colorFilter is supported but not both',
+        );
 
   CatalystSvgIcon.asset(
     String assetName, {
@@ -71,12 +82,17 @@ class CatalystSvgIcon extends StatelessWidget {
     this.matchTextDirection = false,
     this.allowDrawingOutsideViewBox = false,
     this.placeholderBuilder,
+    this.color,
     this.colorFilter,
     this.semanticsLabel,
     this.excludeFromSemantics = false,
     this.clipBehavior = Clip.hardEdge,
     this.allowColorFilter = true,
-  }) : bytesLoader = SvgAssetLoader(
+  })  : assert(
+          color == null || colorFilter == null,
+          'Either color or colorFilter is supported but not both',
+        ),
+        bytesLoader = SvgAssetLoader(
           assetName,
           packageName: package,
           assetBundle: bundle,
@@ -87,7 +103,7 @@ class CatalystSvgIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     final effectiveSize = size ?? IconTheme.of(context).size;
     final effectiveColorFilter = allowColorFilter
-        ? colorFilter ?? IconTheme.of(context).asColorFilter()
+        ? _colorFilter ?? IconTheme.of(context).asColorFilter()
         : null;
 
     return CatalystSvgPicture(
@@ -104,6 +120,15 @@ class CatalystSvgIcon extends StatelessWidget {
       excludeFromSemantics: excludeFromSemantics,
       clipBehavior: clipBehavior,
     );
+  }
+
+  ColorFilter? get _colorFilter {
+    return colorFilter ?? _colorFilterFromColor;
+  }
+
+  ColorFilter? get _colorFilterFromColor {
+    final color = this.color;
+    return color == null ? null : ColorFilter.mode(color, BlendMode.srcIn);
   }
 }
 
