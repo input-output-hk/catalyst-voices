@@ -374,7 +374,7 @@
   "@spaceWorkspaceName": {
     "description": "Name of space shown in different spaces that indicates its origin"
   },
-  "spaceVotingName": "Treasury",
+  "spaceVotingName": "Voting space",
   "@spaceVotingName": {
     "description": "Name of space shown in different spaces that indicates its origin"
   },

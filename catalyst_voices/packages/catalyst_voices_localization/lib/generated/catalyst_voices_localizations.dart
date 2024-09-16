@@ -589,7 +589,7 @@ abstract class VoicesLocalizations {
   /// Name of space shown in different spaces that indicates its origin
   ///
   /// In en, this message translates to:
-  /// **'Treasury'**
+  /// **'Voting space'**
   String get spaceVotingName;
 
   /// Name of space shown in different spaces that indicates its origin

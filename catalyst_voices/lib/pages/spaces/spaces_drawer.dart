@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/pages/spaces/individual_private_campaigns.dart';
 import 'package:catalyst_voices/pages/spaces/my_private_proposals.dart';
+import 'package:catalyst_voices/pages/spaces/voting_rounds.dart';
 import 'package:catalyst_voices/routes/routes.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -40,6 +41,8 @@ class SpacesDrawer extends StatelessWidget {
         return IndividualPrivateCampaigns();
       case Space.workspace:
         return MyPrivateProposals();
+      case Space.voting:
+        return VotingRounds();
       default:
         return SizedBox();
     }
