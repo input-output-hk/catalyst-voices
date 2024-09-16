@@ -39,8 +39,13 @@ And it also requires that the overall ledger state,
 could be deterministically defined at any point of time,
 considering potential transaction overlapping or duplication.
 
-Each particular chain, will be a common sequence of blocks,
-which are cryptographically protected by hashing.
+To achieve an immutability of data inside each chain
+Each particular chain, will be a common sequence of blocks.
+To achieve an immutability of data inside each chain,
+cryptographic hashing is applied.
+So each block from the chain reference to the hash of previous one.
+It is a widely used technic to prevent a modification of some data from previous blocks,
+without affecting structure of the current one.
 
 The described approach allows to easily scale and increase throughput of the network on demand at any time,
 just by starting to process new chains.
@@ -79,6 +84,8 @@ Header:
 
 * `chain_id` - unique identifier of the chain.
 * `height` - block's height.
+  Also is used to identify the block type: *genesis*, *regular*, *final*
+  (in more details described in [validation section](#block-validation-rules)).
 * `timestamp` - block's timestamp.
 * `prev_block_id` - previous block hash.
 * `ledger_type` - unique identifier of the ledger type.
