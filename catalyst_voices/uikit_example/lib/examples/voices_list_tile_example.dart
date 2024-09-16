@@ -77,7 +77,7 @@ class VoicesListTileExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: VoicesAppBar(),
+      appBar: const VoicesAppBar(),
       body: SizedBox(
         width: 300,
         child: ListView(

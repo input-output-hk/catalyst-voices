@@ -69,9 +69,10 @@ To suppress a specific lint rule for an entire project, modify `analysis_options
 
 ```yaml
 include: package:very_good_analysis/analysis_options.yaml
-linter:
-  rules:
-    public_member_api_docs: false
+
+analyzer:
+  errors:
+    public_member_api_docs: ignore
 ```
 
 ## Evolving the lint sets

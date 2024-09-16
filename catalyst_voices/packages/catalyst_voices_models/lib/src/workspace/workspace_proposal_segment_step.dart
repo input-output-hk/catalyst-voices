@@ -8,7 +8,7 @@ class WorkspaceProposalSegmentStep extends Equatable {
   final Document? document;
   final bool isEditable;
 
-  WorkspaceProposalSegmentStep({
+  const WorkspaceProposalSegmentStep({
     required this.id,
     required this.title,
     this.description,

@@ -24,7 +24,7 @@ class VoicesWalletTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final icon = this.iconSrc;
+    final icon = iconSrc;
     final name = this.name;
 
     return ListTile(
@@ -32,11 +32,11 @@ class VoicesWalletTile extends StatelessWidget {
         width: 40,
         height: 40,
         child: icon == null
-            ? _IconPlaceholder()
+            ? const _IconPlaceholder()
             : Image.network(
                 icon,
                 errorBuilder: (context, error, stackTrace) {
-                  return _IconPlaceholder();
+                  return const _IconPlaceholder();
                 },
               ),
       ),

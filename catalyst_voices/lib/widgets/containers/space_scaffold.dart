@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 /// is common to use [SpaceSidePanel] as [left] and [right].
 ///
 /// Only difference from [SidebarScaffold] is that main content, [child],
-/// has [maxWidth] so it does not expand indefinitely but spacing
+/// has maxWidth so it does not expand indefinitely but spacing
 /// between [child] and [left],[right] does.
 class SpaceScaffold extends StatelessWidget {
   final Widget left;

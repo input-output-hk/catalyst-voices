@@ -28,13 +28,13 @@ class WorkspaceTextTileContainer extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colors.elevationsOnSurfaceNeutralLv1White,
         borderRadius: BorderRadius.horizontal(
-          left: isSelected ? Radius.zero : Radius.circular(28),
-          right: Radius.circular(28),
+          left: isSelected ? Radius.zero : const Radius.circular(28),
+          right: const Radius.circular(28),
         ),
         boxShadow: [
           BoxShadow(
             color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv0!,
-            offset: Offset(0, 1),
+            offset: const Offset(0, 1),
             blurRadius: 4,
           ),
         ],
@@ -66,7 +66,7 @@ class _Header extends StatelessWidget {
   final String name;
   final List<Widget> actions;
 
-  _Header(this.name, this.actions);
+  const _Header(this.name, this.actions);
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +91,7 @@ class _Content extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final style = (theme.textTheme.bodyMedium ?? TextStyle()).copyWith(
+    final style = (theme.textTheme.bodyMedium ?? const TextStyle()).copyWith(
       color: theme.colors.textOnPrimary,
     );
 
@@ -115,7 +115,7 @@ class _Footer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
-      constraints: BoxConstraints(minHeight: 16),
+      constraints: const BoxConstraints(minHeight: 16),
       child: child,
     );
   }

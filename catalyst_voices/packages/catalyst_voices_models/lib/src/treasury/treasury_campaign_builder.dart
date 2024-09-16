@@ -4,7 +4,7 @@ import 'package:equatable/equatable.dart';
 final class TreasuryCampaignBuilder extends Equatable {
   final List<TreasuryCampaignSegment> segments;
 
-  TreasuryCampaignBuilder({
+  const TreasuryCampaignBuilder({
     required this.segments,
   });
 

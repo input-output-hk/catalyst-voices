@@ -9,7 +9,7 @@ mixin FadePageTransitionMixin on GoRouteData {
       name: state.name ?? state.path,
       arguments: <String, String>{
         ...state.pathParameters,
-        ...state.uri.queryParameters
+        ...state.uri.queryParameters,
       },
       restorationId: state.pageKey.value,
       child: build(context, state),
