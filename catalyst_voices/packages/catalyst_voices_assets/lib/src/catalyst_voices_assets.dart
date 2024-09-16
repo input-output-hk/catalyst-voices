@@ -1,5 +1,4 @@
 export 'package:catalyst_voices_assets/generated/assets.gen.dart';
-export 'package:catalyst_voices_assets/generated/catalyst_voices_icons.dart';
 export 'package:catalyst_voices_assets/generated/colors.gen.dart';
 export 'package:catalyst_voices_assets/generated/fonts.gen.dart';
 export 'package:catalyst_voices_assets/src/assets_ext.dart';

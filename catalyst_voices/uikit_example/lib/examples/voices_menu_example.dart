@@ -65,12 +65,12 @@ class _MenuExample1 extends StatelessWidget {
         MenuItem(
           id: 1,
           label: 'Rename',
-          icon: CatalystVoicesIcons.pencil,
+          icon: VoicesAssets.icons.pencil.buildIcon(),
         ),
         SubMenuItem(
           id: 4,
           label: 'Move Private Team',
-          icon: CatalystVoicesIcons.switch_horizontal,
+          icon: VoicesAssets.icons.switchHorizontal.buildIcon(),
           children: [
             MenuItem(id: 5, label: 'Team 1: The Vikings'),
             MenuItem(id: 6, label: 'Team 2: Pure Hearts'),
@@ -79,14 +79,14 @@ class _MenuExample1 extends StatelessWidget {
         MenuItem(
           id: 2,
           label: 'Move to public',
-          icon: CatalystVoicesIcons.switch_horizontal,
+          icon: VoicesAssets.icons.switchHorizontal.buildIcon(),
           showDivider: true,
           enabled: false,
         ),
         MenuItem(
           id: 3,
           label: 'Delete',
-          icon: CatalystVoicesIcons.trash,
+          icon: VoicesAssets.icons.trash.buildIcon(),
         ),
       ],
       child: const SizedBox(
@@ -112,12 +112,12 @@ class _MenuExample2 extends StatelessWidget {
         MenuItem(
           id: 1,
           label: 'Rename',
-          icon: CatalystVoicesIcons.pencil,
+          icon: VoicesAssets.icons.pencil.buildIcon(),
         ),
         SubMenuItem(
           id: 4,
           label: 'Move Private Team',
-          icon: CatalystVoicesIcons.switch_horizontal,
+          icon: VoicesAssets.icons.switchHorizontal.buildIcon(),
           children: [
             MenuItem(id: 5, label: 'Team 1: The Vikings'),
             MenuItem(id: 6, label: 'Team 2: Pure Hearts'),
@@ -126,13 +126,13 @@ class _MenuExample2 extends StatelessWidget {
         MenuItem(
           id: 2,
           label: 'Move to public',
-          icon: CatalystVoicesIcons.switch_horizontal,
+          icon: VoicesAssets.icons.switchHorizontal.buildIcon(),
           showDivider: true,
         ),
         MenuItem(
           id: 3,
           label: 'Delete',
-          icon: CatalystVoicesIcons.trash,
+          icon: VoicesAssets.icons.trash.buildIcon(),
         ),
       ],
       child: const SizedBox(

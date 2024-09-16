@@ -34,7 +34,7 @@ class _DiscoveryDashboardTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SpaceOverviewNavTile(
-      leading: Icon(CatalystVoicesIcons.home),
+      leading: VoicesAssets.icons.home.buildIcon(),
       title: Text(
         'Discovery Dashboard',
         style: Theme.of(context).textTheme.bodyLarge,
@@ -50,7 +50,7 @@ class _RolesTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SpaceOverviewNavTile(
-      leading: Icon(CatalystVoicesIcons.user),
+      leading: VoicesAssets.icons.user.buildIcon(),
       title: Text('Catalyst Roles'),
     );
   }
@@ -62,7 +62,7 @@ class _FeedbackTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SpaceOverviewNavTile(
-      leading: Icon(CatalystVoicesIcons.annotation),
+      leading: VoicesAssets.icons.annotation.buildIcon(),
       title: Text('Feedback'),
     );
   }
@@ -74,7 +74,7 @@ class _DocumentationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SpaceOverviewNavTile(
-      leading: Icon(CatalystVoicesIcons.arrow_right),
+      leading: VoicesAssets.icons.arrowRight.buildIcon(),
       title: Text('Catalyst Gitbook documentation'),
     );
   }

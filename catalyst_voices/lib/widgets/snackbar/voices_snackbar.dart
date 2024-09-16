@@ -61,9 +61,8 @@ class VoicesSnackBar extends StatelessWidget {
             top: 12,
             right: 12,
             child: IconButton(
-              icon: Icon(
+              icon: VoicesAssets.icons.x.buildIcon(
                 size: 24,
-                CatalystVoicesIcons.x,
                 color: theme.colors.iconsForeground,
               ),
               onPressed: onClosePressed,
@@ -76,11 +75,10 @@ class VoicesSnackBar extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   children: [
-                    Icon(
-                      size: 20,
-                      type.icon(context),
-                      color: type.iconColor(context),
-                    ),
+                    type.icon().buildIcon(
+                          size: 20,
+                          color: type.iconColor(context),
+                        ),
                     const SizedBox(width: 16),
                     Text(
                       type.title(context),

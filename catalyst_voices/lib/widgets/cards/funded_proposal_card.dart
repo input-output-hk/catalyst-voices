@@ -98,8 +98,10 @@ class _Header extends StatelessWidget {
               child: IconButton(
                 padding: EdgeInsets.zero,
                 onPressed: () => onFavoriteChanged?.call(!isFavorite),
-                icon: Icon(
-                  isFavorite ? Icons.favorite : CatalystVoicesIcons.plus_circle,
+                icon: CatalystSvgIcon.asset(
+                  isFavorite
+                      ? VoicesAssets.icons.plusCircleFilled.path
+                      : VoicesAssets.icons.plusCircleOutlined.path,
                   size: 20,
                   color: Theme.of(context).colors.iconsOnImage,
                 ),
@@ -110,8 +112,7 @@ class _Header extends StatelessWidget {
             bottom: 12,
             child: VoicesChip.rectangular(
               padding: const EdgeInsets.fromLTRB(10, 6, 10, 4),
-              leading: Icon(
-                CatalystVoicesIcons.briefcase,
+              leading: VoicesAssets.icons.briefcase.buildIcon(
                 color: Theme.of(context).colorScheme.primary,
               ),
               content: Text(context.l10n.fundedProposal),
@@ -216,8 +217,7 @@ class _FundsAndComments extends StatelessWidget {
           ),
           VoicesChip.rectangular(
             padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
-            leading: Icon(
-              CatalystVoicesIcons.check_circle,
+            leading: VoicesAssets.icons.checkCircle.buildIcon(
               color: Theme.of(context).colors.success,
             ),
             content: Text(context.l10n.noOfComments(commentsCount)),

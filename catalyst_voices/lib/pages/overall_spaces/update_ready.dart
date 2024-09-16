@@ -88,6 +88,6 @@ class _DownloadIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Icon(CatalystVoicesIcons.cloud_download);
+    return VoicesAssets.icons.cloudDownload.buildIcon();
   }
 }

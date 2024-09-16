@@ -21,14 +21,12 @@ flutter:
   generate: true
   assets:
     - assets/images/
+    - assets/icons/
   fonts:
     - family: SF-Pro
       fonts:
         - asset: assets/fonts/SF-Pro-Rounded-Regular.ttf
           weight: 600
-    - family: CatalystVoicesIcons
-      fonts:
-        - asset: internal_resources/fonts/CatalystVoicesIcons.ttf
 
 flutter_gen:
   output: lib/generated/
