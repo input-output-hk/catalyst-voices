@@ -194,6 +194,15 @@ class VoicesColors {
   static const Color darkTextOnPrimaryContainer = Color(0xFF0C288D);
 
   /// Color: #FFFFFF
+  static const Color darkTextOnPrimaryLevel0 = Color(0xFFFFFFFF);
+
+  /// Color: #E6E9F0
+  static const Color darkTextOnPrimaryLevel1 = Color(0xFFE6E9F0);
+
+  /// Color: #0C288D
+  static const Color darkTextOnPrimaryWhite = Color(0xFF0C288D);
+
+  /// Color: #FFFFFF
   static const Color darkTextPrimary = Color(0xFFFFFFFF);
 
   /// Color: #FBC9A7
@@ -218,7 +227,7 @@ class VoicesColors {
   static const Color lightAvatarsWarning = Color(0xFFFDE1CE);
 
   /// Color: #FFFFFF
-  static const Color lightElevationsOnSurfaceNeutralLv0 = Color(0xFFFFFFFF);
+  static const Color lightElevationsOnSurfaceNeutralLv0 = Color(0x16123CD3);
 
   /// Color: #F2F4F8
   static const Color lightElevationsOnSurfaceNeutralLv1Grey = Color(0xFFF2F4F8);
@@ -382,6 +391,15 @@ class VoicesColors {
 
   /// Color: #FFFFFF
   static const Color lightTextOnPrimaryContainer = Color(0xFFFFFFFF);
+
+  /// Color: #212A3D
+  static const Color lightTextOnPrimaryLevel0 = Color(0xFF212A3D);
+
+  /// Color: #506288
+  static const Color lightTextOnPrimaryLevel1 = Color(0xFF506288);
+
+  /// Color: #FFFFFF
+  static const Color lightTextOnPrimaryWhite = Color(0xFFFFFFFF);
 
   /// Color: #212A3D
   static const Color lightTextPrimary = Color(0xFF212A3D);

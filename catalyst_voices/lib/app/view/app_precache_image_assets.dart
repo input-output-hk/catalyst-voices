@@ -18,8 +18,8 @@ class GlobalPrecacheImages extends StatelessWidget {
 
     return AppPrecacheImageAssets(
       svgs: [
-        theme.brandAssets.logo,
-        theme.brandAssets.logoIcon,
+        theme.brandAssets.brand.logo(context),
+        theme.brandAssets.brand.logoIcon(context),
       ],
       assets: [
         VoicesAssets.images.comingSoonBkg,

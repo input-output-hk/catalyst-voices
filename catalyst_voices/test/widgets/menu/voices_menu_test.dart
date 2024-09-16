@@ -3,6 +3,7 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+
 import '../../helpers/helpers.dart';
 
 void main() {
@@ -10,12 +11,12 @@ void main() {
     MenuItem(
       id: 1,
       label: 'Rename',
-      icon: CatalystVoicesIcons.pencil,
+      icon: VoicesAssets.icons.pencil.buildIcon(),
     ),
     SubMenuItem(
       id: 2,
       label: 'Move Private Team',
-      icon: CatalystVoicesIcons.switch_horizontal,
+      icon: VoicesAssets.icons.switchHorizontal.buildIcon(),
       children: [
         MenuItem(
           id: 3,
@@ -30,14 +31,14 @@ void main() {
     MenuItem(
       id: 5,
       label: 'Move to public',
-      icon: CatalystVoicesIcons.switch_horizontal,
+      icon: VoicesAssets.icons.switchHorizontal.buildIcon(),
       showDivider: true,
       enabled: false,
     ),
     MenuItem(
       id: 6,
       label: 'Delete',
-      icon: CatalystVoicesIcons.trash,
+      icon: VoicesAssets.icons.trash.buildIcon(),
     ),
   ];
 

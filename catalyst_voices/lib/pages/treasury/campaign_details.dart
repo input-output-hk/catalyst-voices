@@ -91,7 +91,7 @@ class _SegmentDetails extends StatelessWidget {
             isExpanded: isExpanded,
           ),
           name: name,
-          isHighlighted: isExpanded,
+          isSelected: isExpanded,
         ),
         if (isExpanded)
           ...steps.map(
@@ -129,16 +129,16 @@ class _StepDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WorkspaceTileContainer(
+    return WorkspaceTextTileContainer(
       name: name,
       isSelected: isSelected,
       headerActions: [
         VoicesTextButton(
-          child: Text(context.l10n.treasuryStepEdit),
+          child: Text(context.l10n.stepEdit),
           onTap: isEditable ? () {} : null,
         ),
       ],
-      content: Text(desc),
+      content: desc,
     );
   }
 }

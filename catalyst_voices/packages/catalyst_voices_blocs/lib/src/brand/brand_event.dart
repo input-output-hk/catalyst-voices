@@ -8,7 +8,7 @@ sealed class BrandEvent extends Equatable {
 }
 
 final class BrandChangedEvent extends BrandEvent {
-  final BrandKey brand;
+  final Brand brand;
 
   const BrandChangedEvent(this.brand);
 

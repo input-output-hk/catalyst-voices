@@ -15,7 +15,6 @@ abstract final class AppRouter {
     List<RouteGuard> guards = const [],
   }) {
     return GoRouter(
-      debugLogDiagnostics: true,
       navigatorKey: _rootNavigatorKey,
       initialLocation: Routes.initialLocation,
       redirect: (context, state) => _guard(context, state, guards),
@@ -23,6 +22,9 @@ abstract final class AppRouter {
         SentryNavigatorObserver(),
       ],
       routes: Routes.routes,
+      // always true. We're deciding whether to print
+      // them or not in LoggingService
+      debugLogDiagnostics: true,
     );
   }
 

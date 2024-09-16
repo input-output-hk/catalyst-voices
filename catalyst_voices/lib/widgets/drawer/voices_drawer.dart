@@ -41,6 +41,7 @@ class VoicesDrawer extends StatelessWidget {
         ),
       ),
       child: Drawer(
+        width: 350,
         shape: const RoundedRectangleBorder(),
         child: Column(
           children: [
@@ -81,10 +82,10 @@ class _Header extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Theme.of(context).brandAssets.logo.buildPicture(),
+          Theme.of(context).brandAssets.brand.logo(context).buildPicture(),
           IconButton(
             onPressed: Navigator.of(context).pop,
-            icon: const Icon(CatalystVoicesIcons.x, size: 22),
+            icon: VoicesAssets.icons.x.buildIcon(size: 22),
           ),
         ],
       ),
@@ -148,7 +149,7 @@ class VoicesDrawerChooser<T> extends StatelessWidget {
           if (leading != null) leading!,
           IconButton(
             onPressed: _selectedIndex > 0 ? _onSelectPrevious : null,
-            icon: const Icon(CatalystVoicesIcons.chevron_left, size: 20),
+            icon: VoicesAssets.icons.chevronLeft.buildIcon(size: 20),
           ),
           for (final item in items)
             MouseRegion(
@@ -166,7 +167,7 @@ class VoicesDrawerChooser<T> extends StatelessWidget {
           IconButton(
             onPressed:
                 _selectedIndex < (items.length - 1) ? _onSelectNext : null,
-            icon: const Icon(CatalystVoicesIcons.chevron_right, size: 20),
+            icon: VoicesAssets.icons.chevronRight.buildIcon(size: 20),
           ),
         ],
       ),

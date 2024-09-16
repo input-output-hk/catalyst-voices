@@ -103,8 +103,10 @@ class _Header extends StatelessWidget {
               child: IconButton(
                 padding: EdgeInsets.zero,
                 onPressed: () => onFavoriteChanged?.call(!isFavorite),
-                icon: Icon(
-                  isFavorite ? Icons.favorite : CatalystVoicesIcons.star,
+                icon: CatalystSvgIcon.asset(
+                  isFavorite
+                      ? VoicesAssets.icons.starFilled.path
+                      : VoicesAssets.icons.starOutlined.path,
                   size: 20,
                   color: Theme.of(context).colors.iconsOnImage,
                 ),
@@ -115,8 +117,7 @@ class _Header extends StatelessWidget {
             bottom: 12,
             child: VoicesChip.rectangular(
               padding: const EdgeInsets.fromLTRB(10, 6, 10, 4),
-              leading: Icon(
-                CatalystVoicesIcons.briefcase,
+              leading: VoicesAssets.icons.briefcase.buildIcon(
                 color: Theme.of(context).colorScheme.primary,
               ),
               content: Text(context.l10n.publishedProposal),
@@ -223,8 +224,7 @@ class _FundsAndComments extends StatelessWidget {
           ),
           VoicesChip.rectangular(
             padding: const EdgeInsets.fromLTRB(8, 6, 12, 6),
-            leading: Icon(
-              CatalystVoicesIcons.check_circle,
+            leading: VoicesAssets.icons.checkCircle.buildIcon(
               color: Theme.of(context).colorScheme.primary,
             ),
             content: Text(
@@ -275,8 +275,7 @@ class _CompletedSegments extends StatelessWidget {
       padding: EdgeInsets.all(16),
       child: Row(
         children: [
-          Icon(
-            CatalystVoicesIcons.clipboard_check,
+          VoicesAssets.icons.clipboardCheck.buildIcon(
             size: 18,
             color: Theme.of(context).colorScheme.primary,
           ),
