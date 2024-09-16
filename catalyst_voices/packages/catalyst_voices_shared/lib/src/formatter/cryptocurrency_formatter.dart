@@ -20,10 +20,10 @@ abstract class CryptocurrencyFormatter {
     final ada = amount.ada;
     if (ada >= _million) {
       final millions = ada / _million;
-      return adaSymbol + numberFormat.format(millions) + 'M';
+      return '$adaSymbol${numberFormat.format(millions)}M';
     } else if (ada >= _thousand) {
       final thousands = ada / _thousand;
-      return adaSymbol + numberFormat.format(thousands) + 'K';
+      return '$adaSymbol${numberFormat.format(thousands)}K';
     } else {
       return adaSymbol + numberFormat.format(ada);
     }

@@ -15,6 +15,6 @@ final class OverallSpacesRoute extends GoRouteData
 
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return OverallSpacesPage();
+    return const OverallSpacesPage();
   }
 }

@@ -12,12 +12,12 @@ class SpaceOverviewContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      constraints: BoxConstraints.tightFor(width: 360),
+      constraints: const BoxConstraints.tightFor(width: 360),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
       ),
-      padding: EdgeInsets.all(12),
+      padding: const EdgeInsets.all(12),
       child: child,
     );
   }

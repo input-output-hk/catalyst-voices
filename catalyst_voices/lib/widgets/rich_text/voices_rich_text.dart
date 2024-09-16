@@ -66,7 +66,7 @@ class _VoicesRichTextState extends State<VoicesRichText> {
         ),
         if (_editMode)
           Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
+            padding: const EdgeInsets.only(bottom: 16),
             child: _Toolbar(controller: _controller),
           ),
         _Editor(
@@ -79,18 +79,19 @@ class _VoicesRichTextState extends State<VoicesRichText> {
             documentLength: _documentLength,
             charsLimit: widget.charsLimit!,
           ),
-        SizedBox(height: 16),
-        (_editMode)
-            ? _Footer(
-                controller: _controller,
-                onSave: (document) {
-                  widget.onSave?.call(document);
-                  setState(() {
-                    _editMode = false;
-                  });
-                },
-              )
-            : SizedBox(height: 24),
+        const SizedBox(height: 16),
+        if (_editMode)
+          _Footer(
+            controller: _controller,
+            onSave: (document) {
+              widget.onSave?.call(document);
+              setState(() {
+                _editMode = false;
+              });
+            },
+          )
+        else
+          const SizedBox(height: 24),
       ],
     );
   }
@@ -147,12 +148,12 @@ class _Editor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      padding: const EdgeInsets.symmetric(horizontal: 24),
       child: ResizableBoxParent(
         minHeight: 320,
         resizableVertically: true,
         resizableHorizontally: false,
-        child: Container(
+        child: DecoratedBox(
           decoration: BoxDecoration(
             color: editMode
                 ? Theme.of(context).colors.onSurfaceNeutralOpaqueLv1
@@ -195,8 +196,8 @@ class _Footer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(
-        horizontal: 16.0,
-        vertical: 12.0,
+        horizontal: 16,
+        vertical: 12,
       ),
       alignment: Alignment.centerRight,
       color: Theme.of(context).colors.onSurfaceNeutralOpaqueLv1,
@@ -220,7 +221,7 @@ class _Limit extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32.0),
+      padding: const EdgeInsets.symmetric(horizontal: 32),
       child: Row(
         children: [
           Expanded(
@@ -230,7 +231,7 @@ class _Limit extends StatelessWidget {
             ),
           ),
           Text(
-            '${documentLength}/${charsLimit}',
+            '$documentLength/$charsLimit',
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ],
@@ -380,7 +381,7 @@ class _TopBar extends StatelessWidget {
           title,
           style: Theme.of(context).textTheme.titleMedium,
         ),
-        Spacer(),
+        const Spacer(),
         VoicesTextButton(
           onTap: onToggleEditMode,
           child: Text(
@@ -390,7 +391,7 @@ class _TopBar extends StatelessWidget {
             style: Theme.of(context).textTheme.labelSmall,
           ),
         ),
-        SizedBox(width: 24),
+        const SizedBox(width: 24),
       ],
     );
   }

@@ -11,7 +11,7 @@ class VotingRounds extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        SectionHeader(
+        const SectionHeader(
           leading: SizedBox(width: 12),
           title: Text('Active funding rounds'),
         ),
@@ -20,16 +20,16 @@ class VotingRounds extends StatelessWidget {
           status: ProposalStatus.open,
           leading: VoicesAssets.icons.vote.buildIcon(),
         ),
-        SectionHeader(
+        const SectionHeader(
           leading: SizedBox(width: 12),
           title: Text('Funding tracks / Categories'),
         ),
-        VoicesNavTile(
+        const VoicesNavTile(
           name: 'My first proposal',
           trailing: MoreOptionsButton(),
         ),
-        VoicesDivider(),
-        SectionHeader(
+        const VoicesDivider(),
+        const SectionHeader(
           leading: SizedBox(width: 12),
           title: Text('Dreps'),
         ),
@@ -41,7 +41,7 @@ class VotingRounds extends StatelessWidget {
           name: 'Drep delegation',
           leading: VoicesAssets.icons.user.buildIcon(),
         ),
-        VoicesDivider(),
+        const VoicesDivider(),
       ],
     );
   }

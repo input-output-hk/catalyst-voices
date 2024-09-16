@@ -35,7 +35,7 @@ class UpdateReady extends StatelessWidget {
           child: InkWell(
             onTap: onTap,
             borderRadius: BorderRadius.circular(12),
-            child: Padding(
+            child: const Padding(
               padding: EdgeInsets.symmetric(horizontal: 10, vertical: 12),
               child: Row(
                 children: [

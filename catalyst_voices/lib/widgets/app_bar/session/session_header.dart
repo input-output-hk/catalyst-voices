@@ -7,7 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Displays current session state and a button to toggle it to a next state.
 class SessionHeader extends StatelessWidget {
-  const SessionHeader();
+  const SessionHeader({super.key});
 
   @override
   Widget build(BuildContext context) {

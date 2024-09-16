@@ -17,7 +17,7 @@ final _proposalNavigation = WorkspaceProposalNavigation(
     WorkspaceProposalSetup(
       id: _setupSegmentId,
       steps: [
-        WorkspaceProposalSegmentStep(
+        const WorkspaceProposalSegmentStep(
           id: 0,
           title: 'Title',
           description: 'F14 / Promote Social Entrepreneurs and a '
@@ -65,7 +65,7 @@ class _WorkspacePageState extends State<WorkspacePage> {
         left: ProposalNavigationPanel(
           navigation: _proposalNavigation,
         ),
-        right: ProposalSetupPanel(),
+        right: const ProposalSetupPanel(),
         child: ProposalDetails(
           navigation: _proposalNavigation,
         ),
@@ -76,11 +76,11 @@ class _WorkspacePageState extends State<WorkspacePage> {
   // Only creates initial controller one time
   ProposalController _buildSegmentController(Object segmentId) {
     final value = segmentId == _setupSegmentId
-        ? ProposalControllerStateData(
+        ? const ProposalControllerStateData(
             selectedItemId: 0,
             isExpanded: true,
           )
-        : ProposalControllerStateData();
+        : const ProposalControllerStateData();
 
     return ProposalController(value);
   }

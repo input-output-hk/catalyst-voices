@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:catalyst_voices/pages/coming_soon/coming_soon.dart';
 import 'package:catalyst_voices/routes/guards/route_guard.dart';
 import 'package:catalyst_voices/routes/routing/routing.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:go_router/src/state.dart';
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 /// Always redirects to [ComingSoonPage] except for milestone sub pages.
 final class MilestoneGuard implements RouteGuard {

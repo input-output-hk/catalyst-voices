@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_asserts_with_message
+
 import 'package:catalyst_voices/widgets/menu/voices_node_menu.dart';
 import 'package:flutter/material.dart';
 

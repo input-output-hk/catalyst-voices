@@ -14,8 +14,8 @@ class OverallSpacesPage extends StatelessWidget {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 16)
-            .add(EdgeInsets.only(bottom: 12, left: 16)),
-        child: Row(
+            .add(const EdgeInsets.only(bottom: 12, left: 16)),
+        child: const Row(
           children: [
             _Navigation(),
             SizedBox(width: 16),
@@ -33,8 +33,8 @@ class _Navigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ConstrainedBox(
-      constraints: BoxConstraints.tightFor(width: 200),
-      child: Column(
+      constraints: const BoxConstraints.tightFor(width: 200),
+      child: const Column(
         children: [
           BrandsNavigation(),
           Spacer(),
