@@ -312,4 +312,16 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get spaceFundedProjects => 'Funded Projects';
+
+  @override
+  String get lock => 'Lock';
+
+  @override
+  String get unlock => 'Unlock';
+
+  @override
+  String get getStarted => 'Get Started';
+
+  @override
+  String get guest => 'Guest';
 }

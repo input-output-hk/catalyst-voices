@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -28,7 +29,7 @@ class _VisitorSessionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesFilledButton(
-      child: Text('Get Started'),
+      child: Text(context.l10n.getStarted),
       onTap: () =>
           context.read<SessionBloc>().add(const NextStateSessionEvent()),
     );
@@ -42,7 +43,7 @@ class _GuestSessionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesFilledButton(
       trailing: VoicesAssets.icons.lockOpen.buildIcon(),
-      child: Text('Unlock'),
+      child: Text(context.l10n.unlock),
       onTap: () =>
           context.read<SessionBloc>().add(const NextStateSessionEvent()),
     );
@@ -56,7 +57,7 @@ class _ActiveUserSessionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesFilledButton(
       trailing: VoicesAssets.icons.lockClosed.buildIcon(),
-      child: Text('Lock'),
+      child: Text(context.l10n.lock),
       onTap: () =>
           context.read<SessionBloc>().add(const NextStateSessionEvent()),
     );
