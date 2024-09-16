@@ -17,7 +17,7 @@ abstract final class AppRouter {
     return GoRouter(
       navigatorKey: _rootNavigatorKey,
       initialLocation: Routes.initialLocation,
-      redirect: (context, state) => _guard(context, state, guards),
+      redirect: (context, state) async => _guard(context, state, guards),
       observers: [
         SentryNavigatorObserver(),
       ],

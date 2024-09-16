@@ -171,7 +171,7 @@ final ThemeData catalyst = _buildThemeData(
   lightBrandAssets,
 );
 
-final BrandAssets darkBrandAssets = BrandAssets(
+const BrandAssets darkBrandAssets = BrandAssets(
   brand: Brand.catalyst,
 );
 
@@ -182,7 +182,7 @@ final ThemeData darkCatalyst = _buildThemeData(
   darkBrandAssets,
 );
 
-final BrandAssets lightBrandAssets = BrandAssets(
+const BrandAssets lightBrandAssets = BrandAssets(
   brand: Brand.catalyst,
 );
 
@@ -310,8 +310,9 @@ ThemeData _buildThemeData(
       backgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv0,
     ),
     dialogTheme: DialogTheme(
-      // TODO(damian-molinski): themed value needed. We don't have it defined yet.
-      barrierColor: Color(0x612A3D61),
+      // TODO(damian-molinski): themed value needed.
+      // We don't have it defined yet.
+      barrierColor: const Color(0x612A3D61),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       clipBehavior: Clip.hardEdge,
       backgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv0,
@@ -327,7 +328,7 @@ ThemeData _buildThemeData(
       space: 16,
       thickness: 1,
     ),
-    tabBarTheme: TabBarTheme(
+    tabBarTheme: const TabBarTheme(
       tabAlignment: TabAlignment.start,
     ),
     progressIndicatorTheme: ProgressIndicatorThemeData(

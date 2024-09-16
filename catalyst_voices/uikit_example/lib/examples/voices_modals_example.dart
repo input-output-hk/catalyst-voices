@@ -9,18 +9,20 @@ class VoicesModalsExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Modals')),
+      appBar: AppBar(title: const Text('Modals')),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             VoicesFilledButton(
-              child: Text('Desktop info dialog'),
-              onTap: () {
-                VoicesDialog.show<void>(
+              child: const Text('Desktop info dialog'),
+              onTap: () async {
+                await VoicesDialog.show<void>(
                   context,
                   builder: (context) {
-                    return VoicesDesktopInfoDialog(title: 'Desktop modal');
+                    return const VoicesDesktopInfoDialog(
+                      title: 'Desktop modal',
+                    );
                   },
                 );
               },

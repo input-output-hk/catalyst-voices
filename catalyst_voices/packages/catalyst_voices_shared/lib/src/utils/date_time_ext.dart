@@ -38,14 +38,29 @@ extension DateTimeExt on DateTime {
   /// 25 hours and some 23 hours. Duration class is not aware of DST changes so
   /// `Duration(days: 1)` literally means `24 hours`.
   DateTime plusDays(int days) {
-    final DateTime temp =
-        DateTime(year, month, day, 12).add(Duration(days: days));
+    final temp = DateTime(year, month, day, 12).add(Duration(days: days));
     if (isUtc) {
-      return DateTime.utc(temp.year, temp.month, temp.day, hour, minute, second,
-          millisecond, microsecond);
+      return DateTime.utc(
+        temp.year,
+        temp.month,
+        temp.day,
+        hour,
+        minute,
+        second,
+        millisecond,
+        microsecond,
+      );
     }
-    return DateTime(temp.year, temp.month, temp.day, hour, minute, second,
-        millisecond, microsecond);
+    return DateTime(
+      temp.year,
+      temp.month,
+      temp.day,
+      hour,
+      minute,
+      second,
+      millisecond,
+      microsecond,
+    );
   }
 
   /// Subtracts [days] from the datetime, being aware of the DST.

@@ -16,7 +16,7 @@ class VoicesDesktopDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dialog(
       alignment: Alignment.topCenter,
-      insetPadding: EdgeInsets.symmetric(horizontal: 40, vertical: 90),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 90),
       child: ConstrainedBox(
         constraints: constraints,
         child: child,
@@ -44,7 +44,7 @@ class VoicesDesktopPanelsDialog extends StatelessWidget {
     final theme = Theme.of(context);
 
     return VoicesDesktopDialog(
-      constraints: BoxConstraints.tightFor(width: 900, height: 600),
+      constraints: const BoxConstraints.tightFor(width: 900, height: 600),
       child: Stack(
         children: [
           Row(
@@ -52,7 +52,7 @@ class VoicesDesktopPanelsDialog extends StatelessWidget {
             children: [
               Expanded(
                 child: Container(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: theme.colors.elevationsOnSurfaceNeutralLv1Grey,
                   ),
@@ -61,7 +61,7 @@ class VoicesDesktopPanelsDialog extends StatelessWidget {
               ),
               Expanded(
                 child: Container(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: theme.colors.elevationsOnSurfaceNeutralLv1White,
                   ),
@@ -70,7 +70,7 @@ class VoicesDesktopPanelsDialog extends StatelessWidget {
               ),
             ],
           ),
-          _DialogCloseButton(),
+          const _DialogCloseButton(),
         ],
       ),
     );
@@ -82,14 +82,14 @@ class _DialogCloseButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final buttonStyle = ButtonStyle(
+    const buttonStyle = ButtonStyle(
       fixedSize: WidgetStatePropertyAll(Size.square(48)),
     );
 
     return Align(
       alignment: Alignment.topRight,
       child: IconButtonTheme(
-        data: IconButtonThemeData(style: buttonStyle),
+        data: const IconButtonThemeData(style: buttonStyle),
         child: XButton(
           onTap: () => Navigator.of(context).pop(),
         ),

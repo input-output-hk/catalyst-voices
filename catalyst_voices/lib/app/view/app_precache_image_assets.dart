@@ -98,7 +98,7 @@ class _AppPrecacheImageAssetsState extends State<AppPrecacheImageAssets> {
           // cause blinking.
           ConnectionState.active ||
           ConnectionState.waiting when !_hadImages =>
-            _ProgressIndicator(),
+            const _ProgressIndicator(),
           ConnectionState.none ||
           ConnectionState.waiting ||
           ConnectionState.active ||
@@ -119,6 +119,7 @@ class _AppPrecacheImageAssetsState extends State<AppPrecacheImageAssets> {
       ..clear()
       ..addAll(widget.assets);
 
+    // ignore: discarded_futures
     _cacheFuture = _buildCacheFuture(svgs: _svgs, assets: _assets);
   }
 
@@ -153,6 +154,6 @@ class _ProgressIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(child: VoicesCircularProgressIndicator());
+    return const Center(child: VoicesCircularProgressIndicator());
   }
 }

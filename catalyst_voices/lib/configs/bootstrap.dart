@@ -34,7 +34,7 @@ final class BootstrapArgs {
 Future<void> bootstrap([
   BootstrapWidgetBuilder builder = _defaultBuilder,
 ]) async {
-  runZonedGuarded(
+  await runZonedGuarded(
     () => _safeBootstrap(builder),
     _reportUncaughtZoneError,
   );

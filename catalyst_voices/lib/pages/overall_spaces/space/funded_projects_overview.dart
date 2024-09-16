@@ -8,7 +8,7 @@ class FundedProjectsOverview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SpaceOverviewContainer(
+    return const SpaceOverviewContainer(
       child: Column(
         children: [
           SpaceOverviewHeader(Space.fundedProjects),

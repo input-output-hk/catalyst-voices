@@ -8,7 +8,7 @@ void main() {
   group(VoicesRichText, () {
     testWidgets('renders correctly', (tester) async {
       // Given
-      final widget = VoicesRichText();
+      const widget = VoicesRichText();
 
       // When
       await tester.pumpApp(widget);

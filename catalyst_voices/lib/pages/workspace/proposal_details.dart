@@ -109,8 +109,8 @@ class _SegmentDetails extends StatelessWidget {
               );
             },
           ),
-        SizedBox(height: 24),
-      ].separatedBy(SizedBox(height: 12)).toList(),
+        const SizedBox(height: 24),
+      ].separatedBy(const SizedBox(height: 12)).toList(),
     );
   }
 }
@@ -141,11 +141,11 @@ class _StepDetails extends StatelessWidget {
             isSelected: isSelected,
             headerActions: [
               TextButton(
+                onPressed: isEditable ? () {} : null,
                 child: Text(
                   context.l10n.stepEdit,
                   style: Theme.of(context).textTheme.labelSmall,
                 ),
-                onPressed: isEditable ? () {} : null,
               ),
             ],
             content: desc!,

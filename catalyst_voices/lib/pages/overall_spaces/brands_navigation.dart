@@ -17,7 +17,7 @@ class BrandsNavigation extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
         color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
       ),
-      padding: EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Column(
         mainAxisSize: MainAxisSize.max,
         children: [
@@ -30,13 +30,13 @@ class BrandsNavigation extends StatelessWidget {
               );
             },
           ),
-          VoicesDivider(
+          const VoicesDivider(
             height: 16,
             indent: 0,
             endIndent: 0,
           ),
-          _SearchTile(),
-          _TasksTile(),
+          const _SearchTile(),
+          const _TasksTile(),
         ],
       ),
     );
@@ -116,7 +116,7 @@ class _BrandsNavigationTile extends StatelessWidget {
     final backgroundColor = _BackgroundColor(theme.colors);
     final foregroundColor = _ForegroundColor(theme.colors);
 
-    final textStyle = (theme.textTheme.bodyLarge ?? TextStyle())
+    final textStyle = (theme.textTheme.bodyLarge ?? const TextStyle())
         .copyWith(color: foregroundColor.resolve(_states));
 
     final iconTheme = IconThemeData(
@@ -131,18 +131,21 @@ class _BrandsNavigationTile extends StatelessWidget {
       child: IconTheme(
         data: iconTheme,
         child: ConstrainedBox(
-          constraints: BoxConstraints.tightFor(height: 56),
+          constraints: const BoxConstraints.tightFor(height: 56),
           child: Material(
             textStyle: textStyle,
             color: backgroundColor.resolve(_states),
             child: InkWell(
               onTap: onTap,
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 child: Row(
                   children: [
                     leading,
-                    SizedBox(width: 12),
+                    const SizedBox(width: 12),
                     Expanded(child: content),
                   ],
                 ),

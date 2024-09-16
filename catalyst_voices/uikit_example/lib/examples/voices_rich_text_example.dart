@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:catalyst_voices/widgets/rich_text/voices_rich_text.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +20,7 @@ class VoicesRichTextExample extends StatelessWidget {
           title: 'Rich text',
           document: Document.fromJson(_textSample),
           charsLimit: 800,
-          onSave: (document) => print('Saved document: $document'),
+          onSave: (document) => log('Saved document: $document'),
         ),
       ),
     );
@@ -29,9 +31,9 @@ const _textSample = [
   {'insert': 'Sample Rich Text Editor'},
   {
     'attributes': {'header': 1},
-    'insert': '\n'
+    'insert': '\n',
   },
   {'insert': '\n'},
   {'insert': 'We will be able to create content now!'},
-  {'insert': '\n'}
+  {'insert': '\n'},
 ];

@@ -9,6 +9,7 @@ class ProposalNavigationPanel extends StatelessWidget {
   final WorkspaceProposalNavigation navigation;
 
   const ProposalNavigationPanel({
+    super.key,
     required this.navigation,
   });
 

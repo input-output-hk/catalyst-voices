@@ -24,7 +24,7 @@ class WorkspaceTileContainer extends StatelessWidget {
         boxShadow: [
           BoxShadow(
             color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv0!,
-            offset: Offset(0, 1),
+            offset: const Offset(0, 1),
             blurRadius: 4,
           ),
         ],
@@ -40,14 +40,14 @@ class WorkspaceTileContainer extends StatelessWidget {
         ),
       ),
       child: ClipRRect(
-        child: content,
         borderRadius: _borderRadius(isSelected),
+        child: content,
       ),
     );
   }
 }
 
 BorderRadius _borderRadius(bool isSelected) => BorderRadius.horizontal(
-      left: isSelected ? Radius.zero : Radius.circular(28),
-      right: Radius.circular(28),
+      left: isSelected ? Radius.zero : const Radius.circular(28),
+      right: const Radius.circular(28),
     );
