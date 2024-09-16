@@ -78,6 +78,13 @@ V1 transaction representation in hex:
         * legacy signature (64 byte): `e6c8aa48925e37fdab75db13aca7c4f39068e12eeb3af8fd1f342005cae5ab9a1ef5344fab2374e9436a67f57041899693d333610dfe785d329988736797950d`
 <!-- markdownlint-enable max-one-sentence-per-line code-block-style -->
 
+#### Transaction vote generation
+
+To generate a cryptographycally secured `ENCRYPTED-VOTE` and `PROOF-VOTE` parts you can follow this [spec](./crypto.md#vote).
+Important to note,
+that as part of [*initial setup*](./crypto.md#initial-setup) of the voting procedure
+a `3` voting choices was choosen and as a backend cryptographic group the [ristretto255] is used.
+
 #### Transaction signing (witness generation)
 
 Signature generated from the [BLAKE2b-256] hashed  `VOTE-PAYLOAD` bytes except of the `WITNESS` part
@@ -119,4 +126,6 @@ Expected witness (includes signature)
 
 <!-- OPTIONAL SECTIONS: see CIP-0001 > Document > Structure table -->
 
-[BLAKE2b-256]: https://www.blake2.net/blake2.pdf
+[BLAKE2b-256]: https://www.blake2.net/blake2.pdf\
+[ristretto255]: https://ristretto.group
+
