@@ -41,7 +41,7 @@ class _GuestSessionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesFilledButton(
-      trailing: Icon(CatalystVoicesIcons.lock_open),
+      trailing: VoicesAssets.icons.lockOpen.buildIcon(),
       child: Text('Unlock'),
       onTap: () =>
           context.read<SessionBloc>().add(const NextStateSessionEvent()),
@@ -55,7 +55,7 @@ class _ActiveUserSessionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesFilledButton(
-      trailing: Icon(CatalystVoicesIcons.lock_closed),
+      trailing: VoicesAssets.icons.lockClosed.buildIcon(),
       child: Text('Lock'),
       onTap: () =>
           context.read<SessionBloc>().add(const NextStateSessionEvent()),

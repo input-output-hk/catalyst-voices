@@ -119,7 +119,7 @@ class _VoicesNodeMenuState extends State<VoicesNodeMenu> {
             onTap: widget.isExpandable ? _onRootTap : null,
             leading: [
               _NodeIcon(isOpen: value.isExpanded),
-              VoicesAssets.images.viewGrid.buildIcon(),
+              VoicesAssets.icons.viewGrid.buildIcon(),
             ],
             child: Text(widget.name),
           ),
@@ -162,8 +162,8 @@ class _NodeIcon extends StatelessWidget {
     return IconTheme(
       data: IconThemeData(color: Theme.of(context).colors.iconsForeground),
       child: isOpen
-          ? VoicesAssets.images.nodeOpen.buildIcon()
-          : VoicesAssets.images.nodeClosed.buildIcon(),
+          ? VoicesAssets.icons.nodeOpen.buildIcon()
+          : VoicesAssets.icons.nodeClosed.buildIcon(),
     );
   }
 }

@@ -33,7 +33,7 @@ class JSCardanoWalletProxy implements CardanoWallet {
   String get icon => _delegate.icon.toDart;
 
   @override
-  String get apiVersion => _delegate.apiVersion.toDart;
+  String? get apiVersion => _delegate.apiVersion?.toDart;
 
   @override
   List<CipExtension> get supportedExtensions =>

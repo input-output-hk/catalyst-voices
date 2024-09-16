@@ -297,32 +297,32 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
       return null;
     }
 
-    final icon = getStatusSuffixIcon();
+    final icon = getStatusSuffixIcon(
+      color: _getStatusColor(orDefault: Colors.transparent),
+    );
+
     if (icon == null) {
       return null;
     }
 
     return Padding(
       padding: const EdgeInsetsDirectional.only(start: 4, end: 8),
-      child: Icon(
-        getStatusSuffixIcon(),
-        color: _getStatusColor(orDefault: Colors.transparent),
-      ),
+      child: icon,
     );
   }
 
-  IconData? getStatusSuffixIcon() {
+  Widget? getStatusSuffixIcon({required Color color}) {
     switch (_validation.status) {
       case VoicesTextFieldStatus.none:
         return null;
       case VoicesTextFieldStatus.success:
-        return CatalystVoicesIcons.check_circle;
+        return VoicesAssets.icons.checkCircle.buildIcon(color: color);
       case VoicesTextFieldStatus.warning:
         // TODO(dtscalac): this is not the right icon, it should be outlined
         // & rounded, ask designers to provide it and update it
-        return Icons.warning_outlined;
+        return Icon(Icons.warning_outlined, color: color);
       case VoicesTextFieldStatus.error:
-        return Icons.error_outline;
+        return Icon(Icons.error_outline, color: color);
     }
   }
 

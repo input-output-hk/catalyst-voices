@@ -334,6 +334,36 @@ abstract class VoicesLocalizations {
   /// **'Draft'**
   String get proposalStatusDraft;
 
+  /// Indicates to user that status is in progress
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get proposalStatusInProgress;
+
+  /// Indicates to user that status is in private mode
+  ///
+  /// In en, this message translates to:
+  /// **'Private'**
+  String get proposalStatusPrivate;
+
+  /// Indicates to user that status is in live mode
+  ///
+  /// In en, this message translates to:
+  /// **'LIVE'**
+  String get proposalStatusLive;
+
+  /// Indicates to user that status is completed
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get proposalStatusCompleted;
+
+  /// Indicates to user that status is in open mode
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get proposalStatusOpen;
+
   /// Label shown on a proposal card indicating that the proposal is funded.
   ///
   /// In en, this message translates to:
@@ -442,11 +472,29 @@ abstract class VoicesLocalizations {
   /// **'Campaign title'**
   String get treasuryCampaignTitle;
 
-  /// Button name in treasury step
+  /// Button name in step
   ///
   /// In en, this message translates to:
   /// **'Edit'**
-  String get treasuryStepEdit;
+  String get stepEdit;
+
+  /// Left panel name in workspace
+  ///
+  /// In en, this message translates to:
+  /// **'Proposal navigation'**
+  String get workspaceProposalNavigation;
+
+  /// Tab name in proposal setup panel
+  ///
+  /// In en, this message translates to:
+  /// **'Segments'**
+  String get workspaceProposalNavigationSegments;
+
+  /// Segment name
+  ///
+  /// In en, this message translates to:
+  /// **'Proposal setup'**
+  String get workspaceProposalSetup;
 
   /// Name shown in spaces shell drawer
   ///
@@ -477,6 +525,78 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Funded projects'**
   String get drawerSpaceFundedProjects;
+
+  /// Title of the funded project space
+  ///
+  /// In en, this message translates to:
+  /// **'Funded project space'**
+  String get fundedProjectSpace;
+
+  /// Tab label for funded proposals in funded projects space
+  ///
+  /// In en, this message translates to:
+  /// **'Funded proposals ({count})'**
+  String noOfFundedProposals(int count);
+
+  /// Refers to a list of followed items.
+  ///
+  /// In en, this message translates to:
+  /// **'Followed'**
+  String get followed;
+
+  /// Overall spaces search brands tile name
+  ///
+  /// In en, this message translates to:
+  /// **'Search Brands'**
+  String get overallSpacesSearchBrands;
+
+  /// Overall spaces tasks tile name
+  ///
+  /// In en, this message translates to:
+  /// **'Tasks'**
+  String get overallSpacesTasks;
+
+  /// In different places update popup title
+  ///
+  /// In en, this message translates to:
+  /// **'Voices update ready'**
+  String get voicesUpdateReady;
+
+  /// In different places update popup body
+  ///
+  /// In en, this message translates to:
+  /// **'Click to restart'**
+  String get clickToRestart;
+
+  /// Name of space shown in different spaces that indicates its origin
+  ///
+  /// In en, this message translates to:
+  /// **'Treasury'**
+  String get spaceTreasuryName;
+
+  /// Name of space shown in different spaces that indicates its origin
+  ///
+  /// In en, this message translates to:
+  /// **'Discovery space'**
+  String get spaceDiscoveryName;
+
+  /// Name of space shown in different spaces that indicates its origin
+  ///
+  /// In en, this message translates to:
+  /// **'Workspace'**
+  String get spaceWorkspaceName;
+
+  /// Name of space shown in different spaces that indicates its origin
+  ///
+  /// In en, this message translates to:
+  /// **'Treasury'**
+  String get spaceVotingName;
+
+  /// Name of space shown in different spaces that indicates its origin
+  ///
+  /// In en, this message translates to:
+  /// **'Funded Projects'**
+  String get spaceFundedProjects;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

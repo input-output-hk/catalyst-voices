@@ -54,6 +54,13 @@ final _proposals = [
   ),
 ];
 
+final _proposalImages = {
+  for (final (index, proposal) in _proposals.indexed)
+    proposal.id: index.isEven
+        ? VoicesAssets.images.proposalBackground1
+        : VoicesAssets.images.proposalBackground2,
+};
+
 final _favoriteProposals = ValueNotifier<List<PendingProposal>>([]);
 
 class VotingPage extends StatelessWidget {
@@ -97,7 +104,7 @@ class _Tabs extends StatelessWidget {
               Tab(
                 child: Row(
                   children: [
-                    Icon(CatalystVoicesIcons.star),
+                    VoicesAssets.icons.starOutlined.buildIcon(),
                     const SizedBox(width: 8),
                     Text(context.l10n.favorites),
                   ],
@@ -131,11 +138,9 @@ class _AllProposals extends StatelessWidget {
           spacing: 16,
           runSpacing: 16,
           children: [
-            for (final (index, proposal) in _proposals.indexed)
+            for (final proposal in _proposals)
               PendingProposalCard(
-                image: index.isEven
-                    ? VoicesAssets.images.proposalBackground1
-                    : VoicesAssets.images.proposalBackground2,
+                image: _proposalImages[proposal.id]!,
                 proposal: proposal,
                 isFavorite: favoriteProposals.contains(proposal),
                 onFavoriteChanged: (isFavorite) =>
@@ -160,11 +165,9 @@ class _FavoriteProposals extends StatelessWidget {
           spacing: 16,
           runSpacing: 16,
           children: [
-            for (final (index, proposal) in favoriteProposals.indexed)
+            for (final proposal in favoriteProposals)
               PendingProposalCard(
-                image: index.isEven
-                    ? VoicesAssets.images.proposalBackground1
-                    : VoicesAssets.images.proposalBackground2,
+                image: _proposalImages[proposal.id]!,
                 proposal: proposal,
                 isFavorite: true,
                 onFavoriteChanged: (isFavorite) =>

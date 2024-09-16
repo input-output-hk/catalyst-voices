@@ -31,8 +31,14 @@ final class AppContent extends StatelessWidget {
       routerConfig: routerConfig,
       // Light mode is "go to" for now.
       themeMode: ThemeMode.light,
-      theme: ThemeBuilder.buildTheme(BrandKey.catalyst),
-      darkTheme: ThemeBuilder.buildDarkTheme(BrandKey.catalyst),
+      theme: ThemeBuilder.buildTheme(
+        brand: Brand.catalyst,
+        brightness: Brightness.light,
+      ),
+      darkTheme: ThemeBuilder.buildTheme(
+        brand: Brand.catalyst,
+        brightness: Brightness.dark,
+      ),
       builder: (context, child) {
         return GlobalPrecacheImages(
           child: child ?? SizedBox.shrink(),

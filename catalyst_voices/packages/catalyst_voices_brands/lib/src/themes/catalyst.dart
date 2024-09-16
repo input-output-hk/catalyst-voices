@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_brands/src/brands/brand.dart';
 import 'package:catalyst_voices_brands/src/theme_extensions/brand_assets.dart';
 import 'package:catalyst_voices_brands/src/theme_extensions/voices_color_scheme.dart';
 import 'package:catalyst_voices_brands/src/themes/widgets/buttons_theme.dart';
@@ -25,6 +26,9 @@ const ColorScheme darkColorScheme = ColorScheme.dark(
 const VoicesColorScheme darkVoicesColorScheme = VoicesColorScheme(
   textPrimary: VoicesColors.darkTextPrimary,
   textOnPrimary: VoicesColors.darkTextOnPrimary,
+  textOnPrimaryLevel0: VoicesColors.darkTextOnPrimaryLevel0,
+  textOnPrimaryLevel1: VoicesColors.darkTextOnPrimaryLevel1,
+  textOnPrimaryWhite: VoicesColors.darkTextOnPrimaryWhite,
   textOnPrimaryContainer: VoicesColors.darkTextOnPrimaryContainer,
   textDisabled: VoicesColors.darkTextDisabled,
   success: VoicesColors.darkSuccess,
@@ -100,6 +104,9 @@ const ColorScheme lightColorScheme = ColorScheme.light(
 const VoicesColorScheme lightVoicesColorScheme = VoicesColorScheme(
   textPrimary: VoicesColors.lightTextPrimary,
   textOnPrimary: VoicesColors.lightTextOnPrimary,
+  textOnPrimaryLevel0: VoicesColors.lightTextOnPrimaryLevel0,
+  textOnPrimaryLevel1: VoicesColors.lightTextOnPrimaryLevel1,
+  textOnPrimaryWhite: VoicesColors.lightTextOnPrimaryWhite,
   textOnPrimaryContainer: VoicesColors.lightTextOnPrimaryContainer,
   textDisabled: VoicesColors.lightTextDisabled,
   success: VoicesColors.lightSuccess,
@@ -126,7 +133,7 @@ const VoicesColorScheme lightVoicesColorScheme = VoicesColorScheme(
   onSurfaceError08: VoicesColors.lightOnSurfaceError08,
   onSurfaceError012: VoicesColors.lightOnSurfaceError012,
   onSurfaceError016: VoicesColors.lightOnSurfaceError016,
-  iconsForeground: Color.fromARGB(255, 151, 164, 193),
+  iconsForeground: VoicesColors.lightIconsForeground,
   iconsBackground: VoicesColors.lightIconsBackground,
   iconsOnImage: VoicesColors.lightIconsOnImage,
   iconsDisabled: VoicesColors.lightIconsDisabled,
@@ -165,8 +172,7 @@ final ThemeData catalyst = _buildThemeData(
 );
 
 final BrandAssets darkBrandAssets = BrandAssets(
-  logo: VoicesAssets.images.catalystLogoWhite,
-  logoIcon: VoicesAssets.images.catalystLogoIconWhite,
+  brand: Brand.catalyst,
 );
 
 /// Dark [ThemeData] for the `catalyst` brand.
@@ -177,8 +183,7 @@ final ThemeData darkCatalyst = _buildThemeData(
 );
 
 final BrandAssets lightBrandAssets = BrandAssets(
-  logo: VoicesAssets.images.catalystLogo,
-  logoIcon: VoicesAssets.images.catalystLogoIcon,
+  brand: Brand.catalyst,
 );
 
 TextTheme _buildTextTheme(VoicesColorScheme voicesColorScheme) {
@@ -302,7 +307,7 @@ ThemeData _buildThemeData(
       scrolledUnderElevation: 0,
     ),
     drawerTheme: DrawerThemeData(
-      backgroundColor: voicesColorScheme.elevationsOnSurfaceNeutralLv0,
+      backgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv0,
     ),
     dialogTheme: DialogTheme(
       // TODO(damian-molinski): themed value needed. We don't have it defined yet.
@@ -323,7 +328,6 @@ ThemeData _buildThemeData(
       thickness: 1,
     ),
     tabBarTheme: TabBarTheme(
-      dividerColor: colorScheme.primaryContainer,
       tabAlignment: TabAlignment.start,
     ),
     progressIndicatorTheme: ProgressIndicatorThemeData(
@@ -345,5 +349,8 @@ ThemeData _buildThemeData(
       voicesColorScheme,
       brandAssets,
     ],
+    textSelectionTheme: TextSelectionThemeData(
+      cursorColor: voicesColorScheme.textPrimary,
+    ),
   ).copyWithButtonsTheme().copyWithTogglesTheme();
 }

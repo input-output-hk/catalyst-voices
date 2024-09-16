@@ -16,12 +16,12 @@ class VoicesChipExample extends StatelessWidget {
 
     final leadings = [
       null,
-      const Icon(CatalystVoicesIcons.library_icon),
+      VoicesAssets.icons.library.buildIcon(),
     ];
 
     final trailings = [
       null,
-      const Icon(CatalystVoicesIcons.x),
+      VoicesAssets.icons.x.buildIcon(),
     ];
 
     return Scaffold(
