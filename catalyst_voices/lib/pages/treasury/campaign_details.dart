@@ -105,8 +105,8 @@ class _SegmentDetails extends StatelessWidget {
                 isEditable: step.isEditable,
               );
             },
-          )
-      ].separatedBy(SizedBox(height: 12)).toList(),
+          ),
+      ].separatedBy(const SizedBox(height: 12)).toList(),
     );
   }
 }
@@ -134,8 +134,8 @@ class _StepDetails extends StatelessWidget {
       isSelected: isSelected,
       headerActions: [
         VoicesTextButton(
-          child: Text(context.l10n.stepEdit),
           onTap: isEditable ? () {} : null,
+          child: Text(context.l10n.stepEdit),
         ),
       ],
       content: desc,

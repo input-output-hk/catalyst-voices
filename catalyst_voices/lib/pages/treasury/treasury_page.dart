@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 
 const _setupSegmentId = 'setup';
 
-final _campaignBuilder = TreasuryCampaignBuilder(
+const _campaignBuilder = TreasuryCampaignBuilder(
   segments: [
     TreasuryCampaignSetup(
       id: _setupSegmentId,
@@ -36,7 +36,7 @@ class _TreasuryPageState extends State<TreasuryPage> {
   Widget build(BuildContext context) {
     return CampaignControllerScope(
       builder: _buildSegmentController,
-      child: SpaceScaffold(
+      child: const SpaceScaffold(
         left: CampaignBuilderPanel(
           builder: _campaignBuilder,
         ),
@@ -51,11 +51,11 @@ class _TreasuryPageState extends State<TreasuryPage> {
   // Only creates initial controller one time
   CampaignController _buildSegmentController(Object segmentId) {
     final value = segmentId == _setupSegmentId
-        ? CampaignControllerStateData(
+        ? const CampaignControllerStateData(
             selectedItemId: 0,
             isExpanded: true,
           )
-        : CampaignControllerStateData();
+        : const CampaignControllerStateData();
 
     return CampaignController(value);
   }

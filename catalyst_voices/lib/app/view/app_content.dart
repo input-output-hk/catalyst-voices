@@ -41,7 +41,7 @@ final class AppContent extends StatelessWidget {
       ),
       builder: (context, child) {
         return GlobalPrecacheImages(
-          child: child ?? SizedBox.shrink(),
+          child: child ?? const SizedBox.shrink(),
         );
       },
     );

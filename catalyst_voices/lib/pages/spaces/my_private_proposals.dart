@@ -7,7 +7,7 @@ class MyPrivateProposals extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         SectionHeader(

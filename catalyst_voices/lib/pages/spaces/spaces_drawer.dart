@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/pages/spaces/individual_private_campaigns.dart';
 import 'package:catalyst_voices/pages/spaces/my_private_proposals.dart';
 import 'package:catalyst_voices/routes/routes.dart';
@@ -11,16 +13,13 @@ class SpacesDrawer extends StatelessWidget {
   final Space space;
 
   const SpacesDrawer({
+    super.key,
     required this.space,
   });
 
   @override
   Widget build(BuildContext context) {
     return VoicesDrawer(
-      children: [
-        _SpaceHeader(space),
-        _space(),
-      ],
       bottom: VoicesDrawerSpaceChooser(
         currentSpace: space,
         onChanged: (space) {
@@ -28,20 +27,26 @@ class SpacesDrawer extends StatelessWidget {
         },
         onOverallTap: () {
           Scaffold.of(context).closeDrawer();
-          OverallSpacesRoute().push<void>(context);
+          unawaited(const OverallSpacesRoute().push<void>(context));
         },
       ),
+      children: [
+        _SpaceHeader(space),
+        _space(),
+      ],
     );
   }
 
   Widget _space() {
     switch (space) {
       case Space.treasury:
-        return IndividualPrivateCampaigns();
+        return const IndividualPrivateCampaigns();
       case Space.workspace:
-        return MyPrivateProposals();
-      default:
-        return SizedBox();
+        return const MyPrivateProposals();
+      case Space.discovery:
+      case Space.voting:
+      case Space.fundedProjects:
+        return const SizedBox.shrink();
     }
   }
 
@@ -51,15 +56,15 @@ class SpacesDrawer extends StatelessWidget {
   }) {
     switch (space) {
       case Space.treasury:
-        TreasuryRoute().go(context);
+        const TreasuryRoute().go(context);
       case Space.discovery:
-        DiscoveryRoute().go(context);
+        const DiscoveryRoute().go(context);
       case Space.workspace:
-        WorkspaceRoute().go(context);
+        const WorkspaceRoute().go(context);
       case Space.voting:
-        VotingRoute().go(context);
+        const VotingRoute().go(context);
       case Space.fundedProjects:
-        FundedProjectsRoute().go(context);
+        const FundedProjectsRoute().go(context);
     }
   }
 }
@@ -76,15 +81,15 @@ class _SpaceHeader extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
-      padding:
-          EdgeInsets.symmetric(vertical: 14).add(EdgeInsets.only(left: 16)),
+      padding: const EdgeInsets.symmetric(vertical: 14)
+          .add(const EdgeInsets.only(left: 16)),
       child: Row(
         children: [
           SpaceAvatar(
             data,
             key: ObjectKey(data),
           ),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Expanded(
             child: Text(
               data.localizedName(context.l10n),

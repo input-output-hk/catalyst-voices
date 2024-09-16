@@ -22,7 +22,8 @@ class ProposalStatusContainer extends StatelessWidget {
       color: config.iconColor,
     );
 
-    final textStyle = (theme.textTheme.labelLarge ?? TextStyle()).copyWith(
+    final textStyle =
+        (theme.textTheme.labelLarge ?? const TextStyle()).copyWith(
       color: config.textColor,
     );
 
@@ -31,7 +32,7 @@ class ProposalStatusContainer extends StatelessWidget {
       child: DefaultTextStyle(
         style: textStyle,
         child: Container(
-          padding: EdgeInsets.all(8).add(EdgeInsets.only(right: 4)),
+          padding: const EdgeInsets.all(8).add(const EdgeInsets.only(right: 4)),
           decoration: BoxDecoration(
             color: config.backgroundColor,
             borderRadius: BorderRadius.circular(8),
@@ -40,8 +41,8 @@ class ProposalStatusContainer extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               config.icon.buildIcon(),
-              SizedBox(width: 8),
-              Text(config.text)
+              const SizedBox(width: 8),
+              Text(config.text),
             ],
           ),
         ),

@@ -14,10 +14,12 @@ class UserHeader extends StatelessWidget {
           onTap: () => context
               .read<UserProfileBloc>()
               .add(const ToggleUserProfileEvent()),
-          child: Text(switch (state) {
-            VisitorUserProfileState() => 'Guest',
-            ActiveUserProfileState() => state.user.name,
-          }),
+          child: Text(
+            switch (state) {
+              VisitorUserProfileState() => 'Guest',
+              ActiveUserProfileState() => state.user.name,
+            },
+          ),
         );
       },
     );
