@@ -19,8 +19,7 @@ class NoInternetConnectionBanner extends StatelessWidget {
           const Text(
             'No internet connection',
             style: TextStyle(
-              color: Colors.white,   
-
+              color: Colors.white,
               fontSize: 18.0,
               fontWeight: FontWeight.bold,
             ),
