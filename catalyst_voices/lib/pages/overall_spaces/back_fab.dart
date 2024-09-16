@@ -14,7 +14,7 @@ class BackFab extends StatelessWidget {
       shape: CircleBorder(),
       backgroundColor: theme.colorScheme.primary,
       foregroundColor: theme.colors.iconsBackground,
-      child: Icon(CatalystVoicesIcons.arrow_left),
+      child: VoicesAssets.icons.arrowLeft.buildIcon(),
       onPressed: () {
         final goRouter = GoRouter.of(context);
 

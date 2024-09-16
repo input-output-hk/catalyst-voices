@@ -39,7 +39,7 @@ class ProposalStatusContainer extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(config.iconData),
+              config.icon.buildIcon(),
               SizedBox(width: 8),
               Text(config.text)
             ],
@@ -51,14 +51,14 @@ class ProposalStatusContainer extends StatelessWidget {
 }
 
 final class _ProposalStatusContainerConfig {
-  final IconData iconData;
+  final SvgGenImage icon;
   final Color? iconColor;
   final String text;
   final Color? textColor;
   final Color? backgroundColor;
 
   _ProposalStatusContainerConfig({
-    required this.iconData,
+    required this.icon,
     this.iconColor,
     required this.text,
     this.textColor,
@@ -72,49 +72,49 @@ extension _ProposalStatusExt on ProposalStatus {
 
     return switch (this) {
       ProposalStatus.ready => _ProposalStatusContainerConfig(
-          iconData: CatalystVoicesIcons.check,
+          icon: VoicesAssets.icons.check,
           iconColor: colors.iconsSuccess,
           text: context.l10n.proposalStatusReady,
           textColor: colors.textPrimary,
           backgroundColor: colors.successContainer,
         ),
       ProposalStatus.draft => _ProposalStatusContainerConfig(
-          iconData: CatalystVoicesIcons.pencil_alt,
+          icon: VoicesAssets.icons.pencilAlt,
           iconColor: colors.iconsForeground,
           text: context.l10n.proposalStatusDraft,
           textColor: colors.textPrimary,
           backgroundColor: colors.onSurfaceNeutralOpaqueLv1,
         ),
       ProposalStatus.inProgress => _ProposalStatusContainerConfig(
-          iconData: CatalystVoicesIcons.annotation,
+          icon: VoicesAssets.icons.annotation,
           iconColor: colors.iconsPrimary,
           text: context.l10n.proposalStatusInProgress,
           textColor: colors.textPrimary,
           backgroundColor: colors.onSurfaceNeutralOpaqueLv1,
         ),
       ProposalStatus.private => _ProposalStatusContainerConfig(
-          iconData: CatalystVoicesIcons.eye_off,
+          icon: VoicesAssets.icons.eyeOff,
           iconColor: colors.iconsForeground,
           text: context.l10n.proposalStatusPrivate,
           textColor: colors.textPrimary,
           backgroundColor: colors.onSurfaceNeutralOpaqueLv1,
         ),
       ProposalStatus.open => _ProposalStatusContainerConfig(
-          iconData: CatalystVoicesIcons.check_circle,
+          icon: VoicesAssets.icons.checkCircle,
           iconColor: colors.iconsSuccess,
           text: context.l10n.proposalStatusOpen,
           textColor: colors.textPrimary,
           backgroundColor: colors.onSurfaceNeutralOpaqueLv1,
         ),
       ProposalStatus.live => _ProposalStatusContainerConfig(
-          iconData: CatalystVoicesIcons.play,
+          icon: VoicesAssets.icons.play,
           iconColor: colors.iconsForeground,
           text: context.l10n.proposalStatusLive,
           textColor: colors.textPrimary,
           backgroundColor: colors.successContainer,
         ),
       ProposalStatus.completed => _ProposalStatusContainerConfig(
-          iconData: CatalystVoicesIcons.flag,
+          icon: VoicesAssets.icons.flag,
           iconColor: colors.iconsForeground,
           text: context.l10n.proposalStatusCompleted,
           textColor: colors.textPrimary,

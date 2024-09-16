@@ -49,10 +49,7 @@ class VoicesWalletTile extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               child: name,
             ),
-      trailing: Icon(
-        CatalystVoicesIcons.chevron_right,
-        size: 24,
-      ),
+      trailing: VoicesAssets.icons.chevronRight.buildIcon(size: 24),
       onTap: onTap,
     );
   }

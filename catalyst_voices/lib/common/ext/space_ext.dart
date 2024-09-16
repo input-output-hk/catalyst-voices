@@ -15,12 +15,12 @@ extension SpaceExt on Space {
     };
   }
 
-  IconData get icon => switch (this) {
-        Space.treasury => CatalystVoicesIcons.fund,
-        Space.discovery => CatalystVoicesIcons.light_bulb,
-        Space.workspace => CatalystVoicesIcons.briefcase,
-        Space.voting => CatalystVoicesIcons.vote,
-        Space.fundedProjects => CatalystVoicesIcons.flag,
+  SvgGenImage get icon => switch (this) {
+        Space.treasury => VoicesAssets.icons.fund,
+        Space.discovery => VoicesAssets.icons.lightBulb,
+        Space.workspace => VoicesAssets.icons.briefcase,
+        Space.voting => VoicesAssets.icons.vote,
+        Space.fundedProjects => VoicesAssets.icons.flag,
       };
 
   Color backgroundColor(BuildContext context) => switch (this) {

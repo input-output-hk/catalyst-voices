@@ -17,14 +17,14 @@ class VotingOverview extends StatelessWidget {
           SpaceOverviewHeader(Space.voting),
           SectionHeader(title: Text('Active funding rounds')),
           VoicesNavTile(
-            leading: Icon(CatalystVoicesIcons.vote),
+            leading: VoicesAssets.icons.vote.buildIcon(),
             name: 'Voting round 14',
             status: ProposalStatus.open,
           ),
           VoicesDivider(indent: 0, endIndent: 0, height: 16),
           SectionHeader(title: Text('Funding tracks / Categories')),
           SpaceOverviewNavTile(
-            leading: Icon(CatalystVoicesIcons.document),
+            leading: VoicesAssets.icons.document.buildIcon(),
             title: Text(
               'My fund 14 proposal',
               style: Theme.of(context).textTheme.labelMedium,
@@ -33,11 +33,11 @@ class VotingOverview extends StatelessWidget {
           VoicesDivider(indent: 0, endIndent: 0, height: 16),
           SectionHeader(title: Text('Dreps')),
           SpaceOverviewNavTile(
-            leading: Icon(CatalystVoicesIcons.user),
+            leading: VoicesAssets.icons.user.buildIcon(),
             title: Text('Drep signup'),
           ),
           SpaceOverviewNavTile(
-            leading: Icon(CatalystVoicesIcons.user),
+            leading: VoicesAssets.icons.user.buildIcon(),
             title: Text('Drep delegation'),
           ),
         ],

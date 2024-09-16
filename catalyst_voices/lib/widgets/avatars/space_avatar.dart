@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/common/ext/ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
@@ -27,7 +28,7 @@ class SpaceAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesAvatar(
-      icon: Icon(data.icon),
+      icon: data.icon.buildIcon(),
       backgroundColor: data.backgroundColor(context),
       foregroundColor: data.foregroundColor(context),
       padding: padding,

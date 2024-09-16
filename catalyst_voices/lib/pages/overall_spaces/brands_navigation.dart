@@ -73,7 +73,7 @@ class _SearchTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _BrandsNavigationTile(
-      leading: Icon(CatalystVoicesIcons.search),
+      leading: VoicesAssets.icons.search.buildIcon(),
       content: Text(context.l10n.overallSpacesSearchBrands),
     );
   }
@@ -85,7 +85,7 @@ class _TasksTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _BrandsNavigationTile(
-      leading: Icon(CatalystVoicesIcons.collection),
+      leading: VoicesAssets.icons.collection.buildIcon(),
       content: Text(context.l10n.overallSpacesTasks),
     );
   }

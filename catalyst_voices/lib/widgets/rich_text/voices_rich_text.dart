@@ -30,6 +30,109 @@ class VoicesRichText extends StatefulWidget {
   State<VoicesRichText> createState() => _VoicesRichTextState();
 }
 
+class _VoicesRichTextState extends State<VoicesRichText> {
+  final QuillController _controller = QuillController.basic();
+  int _documentLength = 0;
+  bool _editMode = false;
+  Document _preEditDocument = Document();
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(
+            left: 24,
+            top: 20,
+            bottom: 20,
+          ),
+          child: _TopBar(
+            title: widget.title,
+            editMode: _editMode,
+            onToggleEditMode: () {
+              setState(() {
+                if (_editMode) {
+                  _controller.document =
+                      Document.fromDelta(_preEditDocument.toDelta());
+                } else {
+                  _preEditDocument =
+                      Document.fromDelta(_controller.document.toDelta());
+                }
+                _editMode = !_editMode;
+              });
+            },
+          ),
+        ),
+        if (_editMode)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16.0),
+            child: _Toolbar(controller: _controller),
+          ),
+        _Editor(
+          editMode: _editMode,
+          controller: _controller,
+          focusNode: _focusNode,
+        ),
+        if (widget.charsLimit != null)
+          _Limit(
+            documentLength: _documentLength,
+            charsLimit: widget.charsLimit!,
+          ),
+        SizedBox(height: 16),
+        (_editMode)
+            ? _Footer(
+                controller: _controller,
+                onSave: (document) {
+                  widget.onSave?.call(document);
+                  setState(() {
+                    _editMode = false;
+                  });
+                },
+              )
+            : SizedBox(height: 24),
+      ],
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.document != null) _controller.document = widget.document!;
+    _controller.document.changes.listen(_onDocumentChange);
+    _documentLength = _controller.document.length;
+  }
+
+  void _onDocumentChange(DocChange docChange) {
+    final documentLength = _controller.document.length;
+
+    setState(() {
+      _documentLength = documentLength;
+    });
+
+    final limit = widget.charsLimit;
+
+    if (limit == null) return;
+
+    if (documentLength > limit) {
+      final latestIndex = limit - 1;
+      _controller.replaceText(
+        latestIndex,
+        documentLength - limit,
+        '',
+        TextSelection.collapsed(offset: latestIndex),
+      );
+    }
+  }
+}
+
 class _Editor extends StatelessWidget {
   final bool editMode;
   final QuillController controller;
@@ -160,61 +263,100 @@ class _Toolbar extends StatelessWidget {
                   controller.formatSelection(Attribute.h1);
                 }
               },
-              icon: const Icon(CatalystVoicesIcons.rt_heading),
+              icon: VoicesAssets.icons.rtHeading.buildIcon(),
               isSelected: controller.isHeaderSelected,
               iconTheme: null,
             ),
             QuillToolbarToggleStyleButton(
-              options: const QuillToolbarToggleStyleButtonOptions(
-                iconData: CatalystVoicesIcons.rt_bold,
+              options: QuillToolbarToggleStyleButtonOptions(
+                childBuilder: (options, extraOptions) => _ToolbarIconButton(
+                  icon: VoicesAssets.icons.rtBold,
+                  onPressed: extraOptions.onPressed,
+                ),
               ),
               controller: controller,
               attribute: Attribute.bold,
             ),
             QuillToolbarToggleStyleButton(
-              options: const QuillToolbarToggleStyleButtonOptions(
-                iconData: CatalystVoicesIcons.rt_italic,
+              options: QuillToolbarToggleStyleButtonOptions(
+                childBuilder: (options, extraOptions) => _ToolbarIconButton(
+                  icon: VoicesAssets.icons.rtItalic,
+                  onPressed: extraOptions.onPressed,
+                ),
               ),
               controller: controller,
               attribute: Attribute.italic,
             ),
             QuillToolbarToggleStyleButton(
-              options: const QuillToolbarToggleStyleButtonOptions(
-                iconData: CatalystVoicesIcons.rt_ordered_list,
+              options: QuillToolbarToggleStyleButtonOptions(
+                childBuilder: (options, extraOptions) => _ToolbarIconButton(
+                  icon: VoicesAssets.icons.rtOrderedList,
+                  onPressed: extraOptions.onPressed,
+                ),
               ),
               controller: controller,
               attribute: Attribute.ol,
             ),
             QuillToolbarToggleStyleButton(
-              options: const QuillToolbarToggleStyleButtonOptions(
-                iconData: CatalystVoicesIcons.rt_unordered_list,
+              options: QuillToolbarToggleStyleButtonOptions(
+                childBuilder: (options, extraOptions) => _ToolbarIconButton(
+                  icon: VoicesAssets.icons.rtUnorderedList,
+                  onPressed: extraOptions.onPressed,
+                ),
               ),
               controller: controller,
               attribute: Attribute.ul,
             ),
             QuillToolbarIndentButton(
               options: QuillToolbarIndentButtonOptions(
-                iconData: CatalystVoicesIcons.rt_increase_indent,
+                childBuilder: (options, extraOptions) => _ToolbarIconButton(
+                  icon: VoicesAssets.icons.rtIncreaseIndent,
+                  onPressed: extraOptions.onPressed,
+                ),
               ),
               controller: controller,
               isIncrease: true,
             ),
             QuillToolbarIndentButton(
               options: QuillToolbarIndentButtonOptions(
-                iconData: CatalystVoicesIcons.rt_decrease_indent,
+                childBuilder: (options, extraOptions) => _ToolbarIconButton(
+                  icon: VoicesAssets.icons.rtDecreaseIndent,
+                  onPressed: extraOptions.onPressed,
+                ),
               ),
               controller: controller,
               isIncrease: false,
             ),
             QuillToolbarImageButton(
-              options: const QuillToolbarImageButtonOptions(
-                iconData: CatalystVoicesIcons.photograph,
+              options: QuillToolbarImageButtonOptions(
+                childBuilder: (options, extraOptions) => _ToolbarIconButton(
+                  icon: VoicesAssets.icons.photograph,
+                  onPressed: extraOptions.onPressed,
+                ),
               ),
               controller: controller,
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _ToolbarIconButton extends StatelessWidget {
+  final SvgGenImage icon;
+  final VoidCallback? onPressed;
+
+  const _ToolbarIconButton({
+    required this.icon,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: onPressed,
+      icon: icon.buildIcon(),
     );
   }
 }
@@ -251,109 +393,6 @@ class _TopBar extends StatelessWidget {
         SizedBox(width: 24),
       ],
     );
-  }
-}
-
-class _VoicesRichTextState extends State<VoicesRichText> {
-  final QuillController _controller = QuillController.basic();
-  int _documentLength = 0;
-  bool _editMode = false;
-  Document _preEditDocument = Document();
-  final FocusNode _focusNode = FocusNode();
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(
-            left: 24,
-            top: 20,
-            bottom: 20,
-          ),
-          child: _TopBar(
-            title: widget.title,
-            editMode: _editMode,
-            onToggleEditMode: () {
-              setState(() {
-                if (_editMode) {
-                  _controller.document =
-                      Document.fromDelta(_preEditDocument.toDelta());
-                } else {
-                  _preEditDocument =
-                      Document.fromDelta(_controller.document.toDelta());
-                }
-                _editMode = !_editMode;
-              });
-            },
-          ),
-        ),
-        if (_editMode)
-          Padding(
-            padding: const EdgeInsets.only(bottom: 16.0),
-            child: _Toolbar(controller: _controller),
-          ),
-        _Editor(
-          editMode: _editMode,
-          controller: _controller,
-          focusNode: _focusNode,
-        ),
-        if (widget.charsLimit != null)
-          _Limit(
-            documentLength: _documentLength,
-            charsLimit: widget.charsLimit!,
-          ),
-        SizedBox(height: 16),
-        (_editMode)
-            ? _Footer(
-                controller: _controller,
-                onSave: (document) {
-                  widget.onSave?.call(document);
-                  setState(() {
-                    _editMode = false;
-                  });
-                },
-              )
-            : SizedBox(height: 24),
-      ],
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _focusNode.dispose();
-    super.dispose();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.document != null) _controller.document = widget.document!;
-    _controller.document.changes.listen(_onDocumentChange);
-    _documentLength = _controller.document.length;
-  }
-
-  void _onDocumentChange(DocChange docChange) {
-    final documentLength = _controller.document.length;
-
-    setState(() {
-      _documentLength = documentLength;
-    });
-
-    final limit = widget.charsLimit;
-
-    if (limit == null) return;
-
-    if (documentLength > limit) {
-      final latestIndex = limit - 1;
-      _controller.replaceText(
-        latestIndex,
-        documentLength - limit,
-        '',
-        TextSelection.collapsed(offset: latestIndex),
-      );
-    }
   }
 }
 
