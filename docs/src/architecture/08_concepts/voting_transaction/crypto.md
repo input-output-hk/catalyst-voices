@@ -66,6 +66,9 @@ Before any voting will start an initial setup procedure should be performed.
   A corresponding private key (secret share) $sk$ will be used to perform tally.
 * Define for each voter their own voting power.
   Basically this step could be done at any point of time, but before the tally.
+* As most of the crypto algorithms are group dependent
+  (more about this you can read in [appendix A](#a-group-definition)),
+  it is needed to specifically define which cryptographically secure group would be used.
 
 ### Vote
 
@@ -229,25 +232,25 @@ To perform homomorphic tally of the encrypted set of votes,
 $Tally$ algorithm is used which described in [appendix C](#c-homomorphic-tally).
 It takes as an input the following:
 
-* $[\mathbf{c}_{1, i}, \mathbf{c}_{2, i}, \ldots \mathbf{c}_{N, i}]$ -
-  an array of encrypted vote vector's components corresponded to the considered voting choice.
-  Where $N$ - votes amount,
-  $i$ - vectors component index,
-  which is also corresponds to the voting choice.
+* $[\mathbf{c_1}, \mathbf{c_2}, \ldots, \mathbf{c}_{N}]$ -
+  an array of all published encrypted vote's.
 * $[\alpha_1, \alpha_2, \ldots, \alpha_N]$ - an array of corresponded voter's voting power.
+* $i$ - voting option index.
 
-And produce an encrypted tally result for voting option.
+Where $N$ - votes amount.
+
+And produce an encrypted tally result for voting option $i$.
 \begin{equation}
-er_i = Tally([\mathbf{c}_{1, i}, \mathbf{c}_{2, i}, \ldots \mathbf{c}_{N, i}], [\alpha_1, \alpha_2, \ldots, \alpha_N])
+er_i = Tally(i, [\mathbf{c_1}, \mathbf{c_2}, \ldots, \mathbf{c_N}], [\alpha_1, \alpha_2, \ldots, \alpha_N])
 \end{equation}
 
 E.g. a proposal with voting choices $[Yes, No]$,
-votes $[\mathbf{c}_1, \mathbf{c}_2]$,
+votes $[\mathbf{c_1}, \mathbf{c_2}]$,
 voting powers $[\alpha_1, \alpha_2]$
 and election secret key $sk$.
 
-* Encrypted result for option $Yes$: $er_1 = Tally([\mathbf{c}_{1, 1}, \mathbf{c}_{2, 1}], [\alpha_1, \alpha_2])$.
-* Encrypted result for option $No$: $er_2 = Tally([\mathbf{c}_{1, 2}, \mathbf{c}_{2, 2}], [\alpha_1, \alpha_2])$
+* Encrypted result for option $Yes$: $er_1 = Tally(1, [\mathbf{c_1}, \mathbf{c_2}], [\alpha_1, \alpha_2])$.
+* Encrypted result for option $No$: $er_2 = Tally(2, [\mathbf{c_1}, \mathbf{c_2}], [\alpha_1, \alpha_2])$
 
 #### Tally decryption
 
@@ -261,7 +264,7 @@ It takes as an input the following:
 
 It produces a decrypted tally result for the voting option of a proposal.
 \begin{equation}
-r_i = ElGamalDec(r_i, sk) = TallyDec(er_i, sk)
+r_i = ElGamalDec(er_i, sk) = TallyDec(er_i, sk)
 \end{equation}
 
 This decrypted tally result is an exact result of the voting procedure,
@@ -279,16 +282,22 @@ and election secret key $sk$.
 An important step for bringing transparency and exclude misbehaving from the voting committee,
 a corresponded proof for each decrypted tally result **must** be generated.
 
+It is necessary to verify that encrypted tally was decrypted exactly by using committee secret key,
+and not any other.
+So the publicly published decrypted tally result (a final tally result) actually is correct and
+represents a proper election outcome.
+
 To do that, a sophisticated ZK (Zero Knowledge) $TallyProof$ algorithm is used.
 Which proofs that a provided encrypted tally result value $er$ was decrypted into tally result $r$
 using the exact secret key $sk$,
 which is correpsonded to the already known shared election public key $pk$.
 \begin{equation}
-\pi = TallyProof(er, r, pk, sk)
+\pi = TallyProof(er, r, sk)
 \end{equation}
 
-So to validate a $VotingChoiceCheck(\mathbf{c}, \pi)$ procedure should be used,
-which takes an encrypted vote $\mathbf{c}$ and corresponded proof $\pi$
+So to validate a $TallyCheck(er, r, pk, \pi)$ procedure should be used,
+which takes an encrypted tally result $er$, decrypted tally result $r$,
+election public key $pk$ and corresponded proof $\pi$
 as arguments and returns `true` or `false`,
 is it valid or not.
 \begin{equation}
@@ -315,8 +324,12 @@ More detailted detailed about groups you can find at section *8.2.1* section on 
 Therefore, the generalized notation of the group operation used - $\circ$.
 And defined as follows:
 
-* For all $a, b \in \mathbb{G}$, $a \circ b = c$, where $c \in G$.
-* For all $a \in G$, and $n \in \mathbb{Z}$, $a^n = a \circ a \ldots \circ a$ ($n$ - times).
+* For all $a, b \in \mathbb{G}$, $a \circ b = c$, where $c \in \mathbb{G}$.
+* For all $a \in \mathbb{G}$, and $n \in \mathbb{Z}$, $a^n = a \circ a \ldots \circ a$ ($n$ - times).
+* There is an element noted as $1$, called *neutral* element,
+  such that $a \circ 1 = a$, for all $a \in \mathbb{G}$.
+* For each element $a \in \mathbb{G}$ exists $a^{-1} \in \mathbb{G}$,
+  called the invers of $a$, such that $a \circ a^{-1} = a^{-1} \circ a = 1$.
 
 ## B: Lifted ElGamal encryption/decryption
 
@@ -327,10 +340,10 @@ More detailed how group operations are defined, described in [appdenix A](#a-gro
 
 ### Encryption
 
-Lifted ElGamal encryption algorithm,
-takes as an arguments $m$ - message ($m \in \mathbb{Z}_q^*$),
-$r$ - randomness ($r \in \mathbb{Z}_q^*$),
-$pk$ - public key ($pk \in \mathbb{G}$):
+Lifted ElGamal encryption algorithm
+takes as arguments $m$ message ($m \in \mathbb{Z}_q^*$),
+$r$ randomness ($r \in \mathbb{Z}_q^*$),
+$pk$ public key ($pk \in \mathbb{G}$):
 \begin{equation}
 ElGamalEnc(m, r, pk) = (c_1, c_2) = c,
 \end{equation}
@@ -342,8 +355,8 @@ $c$ - is a resulted ciphertext which consists of two elements $c_1, c_2 \in \mat
 
 ### Decryption
 
-Lifted ElGamal decryption algorithm, takes as an arguments $c$ - ciphertext,
-$sk$ - secret key ($sk \in \mathbb{Z}_q^*$):
+Lifted ElGamal decryption algorithm takes as arguments $c$ ciphertext,
+$sk$ secret key ($sk \in \mathbb{Z}_q^*$):
 \begin{equation}
 ElGamalDec(c, sk) = Dlog(c_2 \circ c_1^{-sk}) = m
 \end{equation}
@@ -355,6 +368,27 @@ the message space should be a small set,
 say $m \in {{0,1}}^{\xi}$, for $\xi \le 30$.
 
 ## C: Homomorphic tally
+
+Homomorphic tally schema is defined over any cyclic group $\mathbb{G}$ of order $q$ with group generator $g$ ($g \in \mathbb{G}$).
+<br/>
+More detailed how group operations are defined, described in [appdenix A](#a-group-definition).
+
+Homomorphic tally algorithm takes as arguments $i$ voting choice index,
+$[\mathbf{c_1}, \mathbf{c_2}, \ldots, \mathbf{c_N}]$
+an array of encrypted votes vector's,
+$[\alpha_1, \alpha_2, \ldots, \alpha_N]$ - an array of corresponded voter's voting power.
+Where $N$ - votes amount.
+\begin{equation}
+Tally(i, [\mathbf{c_1}, \mathbf{c_2}, \ldots, \mathbf{c_N}], [\alpha_1, \alpha_2, \ldots, \alpha_N]) = c_{1, i}^{\alpha_1} \circ c_{2, i}^{\alpha_2} \circ \ldots \circ c_{N, i}^{\alpha_N} = er_i
+\end{equation}
+
+Where $c_{j, i}$ - an encrypted corresponded $i$-th vector's component of the encrypted vote $\mathbf{c_j}$.
+As it was stated in this [section](#vote-encrypting) each ecnrypted vote is a vector
+$\mathbf{c_j} = (c_{j, 1}, \ldots, c_{j, M})$, $M$ - number of voting choices.
+
+$er_i$ noted as encrypted tally result for the provided $i$-th voting choice.
+As it is not an open decrypted value yet,
+it needs a decryption prodecure corresponded for which encryption one was made.
 
 ## Rationale
 
