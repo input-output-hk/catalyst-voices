@@ -3,6 +3,8 @@ import 'package:catalyst_voices/pages/workspace/proposal_navigation_panel.dart';
 import 'package:catalyst_voices/pages/workspace/proposal_segment_controller.dart';
 import 'package:catalyst_voices/pages/workspace/proposal_setup_panel.dart';
 import 'package:catalyst_voices/pages/workspace/sample_rich_text.dart';
+import 'package:catalyst_voices/pages/workspace/sample_rich_text2.dart';
+import 'package:catalyst_voices/pages/workspace/sample_rich_text3.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
@@ -31,13 +33,13 @@ final _proposalNavigation = WorkspaceProposalNavigation(
         WorkspaceProposalSegmentStep(
           id: 2,
           title: 'Other topic',
-          description: 'Other topic',
+          document: Document.fromJson(sampleRichText2),
           isEditable: false,
         ),
         WorkspaceProposalSegmentStep(
           id: 3,
           title: 'Other topic',
-          description: 'Other topic',
+          document: Document.fromJson(sampleRichText3),
           isEditable: false,
         ),
       ],

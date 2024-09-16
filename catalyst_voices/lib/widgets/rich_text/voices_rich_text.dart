@@ -149,7 +149,7 @@ class _Editor extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24.0),
       child: ResizableBoxParent(
-        minHeight: 400,
+        minHeight: 320,
         resizableVertically: true,
         resizableHorizontally: false,
         child: Container(
