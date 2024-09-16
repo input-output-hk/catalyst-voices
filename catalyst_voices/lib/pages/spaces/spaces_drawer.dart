@@ -48,7 +48,7 @@ class SpacesDrawer extends StatelessWidget {
         return const VotingRounds();
       case Space.discovery:
       case Space.fundedProjects:
-        return const SizedBox();
+        return const SizedBox.shrink();
     }
   }
 
