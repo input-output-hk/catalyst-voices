@@ -80,7 +80,7 @@ V1 transaction representation in hex:
 
 #### Transaction vote generation
 
-To generate a cryptographycally secured `ENCRYPTED-VOTE` and `PROOF-VOTE` parts you can follow this [spec](./crypto.md#vote).
+To generate a cryptographically secured `ENCRYPTED-VOTE` and `PROOF-VOTE` parts you can follow this [spec](./crypto.md#vote).
 Important to note,
 that as part of [*initial setup*](./crypto.md#initial-setup) of the voting procedure
 a `3` voting choices was choosen and as a backend cryptographic group the [ristretto255] is used.
@@ -128,4 +128,3 @@ Expected witness (includes signature)
 
 [BLAKE2b-256]: https://www.blake2.net/blake2.pdf\
 [ristretto255]: https://ristretto.group
-

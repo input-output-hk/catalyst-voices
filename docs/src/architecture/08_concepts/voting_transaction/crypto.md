@@ -1,4 +1,4 @@
-<!-- cspell: words mathbf Gamal homomorphically ipfs -->
+<!-- cspell: words mathbf mathbb Gamal homomorphically ipfs -->
 
 # Cryptography Schema
 
@@ -55,7 +55,7 @@ Obviously, it could be easily scaled for a set of proposals,
 performing all this protocol in parallel.
 
 The voting committee and voters registration/definition
-are not subjects of this paper.
+are not subjects of this document.
 
 ### Initial setup
 
@@ -83,10 +83,11 @@ So we will preserve anonymity without lacking transparency and correctness.
 
 #### Voting choice
 
+<!-- markdownlint-disable no-inline-html -->
 For some proposal, voter generates a unit vector $\mathbf{e}_i$,
 the length of such vector **must** be equal to the amount of the voting options of the proposal.
 <br/>
-$i$ correponds to the proposal voting choice and
+$i$ corresponds to the proposal voting choice and
 defines that the $i$-th component of the unit vector equals to $1$
 and the rest components are equals to $0$.
 And it stands as an identifier of the unit vector and could varies $1 \le i \le M$,
@@ -118,7 +119,11 @@ components would be defined as follows:
 * $e_{1, 2}$ equals to $0$
 * $e_{1, 3}$ equals to $0$
 
+<!-- markdownlint-enable no-inline-html -->
+
 #### Vote encrypting
+
+<!-- markdownlint-disable no-inline-html -->
 
 After the choice is done,
 vote **must** be encrypted using shared shared election public key $pk$.
@@ -158,10 +163,12 @@ where $M$ is the voting options amount.
 
 This is a first part of the published vote for a specific proposal.
 
+<!-- markdownlint-enable no-inline-html -->
+
 #### Voter's proof
 
 After the voter's choice is generated and encrypted,
-it is crucial to prove that [encoding](#voting-choice) and [encryptions](#vote-encrypting-procedure) are formed correctly
+it is crucial to prove that [encoding](#voting-choice) and [encryption](#vote-encrypting) are formed correctly
 (i.e. that the voter indeed encrypt a unit vector).
 
 Because by the definition of the encryption algorithm $Enc(message, randomness, public \; key)$
@@ -171,9 +178,9 @@ it is not restricted for encryption only $0$ and $1$ values
 unit vector components only could be $0$ or $1$).
 That's why it is needed to generate such a proof,
 so everyone could validate a correctness of the encrypted vote data,
-without reveilling a voting choice itself.
+without revealing a voting choice itself.
 
-To achive that a some sophisticated ZK (Zero Knowledge) algorithm is used,
+To achieve that a some sophisticated ZK (Zero Knowledge) algorithm is used,
 noted as $VotingChoiceProof(\mathbf{c})$.
 It takes an encrypted vote vector $\mathbf{c}$ and generates a proof value $\pi$.
 \begin{equation}
@@ -200,9 +207,11 @@ It could be published using any public channel, e.g. blockchain, ipfs or through
 
 ### Tally
 
+<!-- markdownlint-disable no-inline-html -->
+
 After voters performed voting procedure and encrypted votes are published,
 tally could be executed by the voting committee.
-Important to note, voting committee doing tally does not reveiling personal voting choices.
+Important to note, voting committee doing tally does not revealing personal voting choices.
 
 By the result of tally procedure means
 an accumulated sum of voting power for each voting option of the proposal,
@@ -210,10 +219,11 @@ based on published votes.
 <br/>
 E.g.:
 
+<!-- markdownlint-disable ul-indent -->
 * proposal with voting options $[Yes, No, Abstain]$
 * two different voters with their voting power:
     * "Alice" with voting power $10$
-    *  "Bob" with voting power $30$
+    * "Bob" with voting power $30$
 * these voter's published their choices on this proposal:
     * "Alice" voted $Yes$
     * "Bob" voted $No$
@@ -221,10 +231,13 @@ E.g.:
     * $Yes$ accumulated $10$
     * $No$ accumulated $30$
     * $Abstain$ accumulated $0$
+<!-- markdownlint-enable ul-indent -->
 
 So to replicate the same process but securely,
 based on the set of encrypted votes $\mathbf{c}$,
 a special $Tally$, $TallyDec$ and $TallyProof$ algorithms are used.
+
+<!-- markdownlint-enable no-inline-html -->
 
 #### Homomorphic tally
 
@@ -259,7 +272,7 @@ $TallyDec$ is used,
 which is technically a common $ElGamalDec$ algorithm described in [appendix B](#b-lifted-elgamal-encryptiondecryption).
 It takes as an input the following:
 
-* $sk$ - an election private key holded by voting committee.
+* $sk$ - an election private key held by voting committee.
 * $er_i$ - an encrypted tally result for the specific voting option defined for a proposal.
 
 It produces a decrypted tally result for the voting option of a proposal.
@@ -290,7 +303,7 @@ represents a proper election outcome.
 To do that, a sophisticated ZK (Zero Knowledge) $TallyProof$ algorithm is used.
 Which proofs that a provided encrypted tally result value $er$ was decrypted into tally result $r$
 using the exact secret key $sk$,
-which is correpsonded to the already known shared election public key $pk$.
+which is corresponded to the already known shared election public key $pk$.
 \begin{equation}
 \pi = TallyProof(er, r, sk)
 \end{equation}
@@ -304,8 +317,10 @@ is it valid or not.
 true | false = TallyCheck(er, r, pk, \pi)
 \end{equation}
 
+<!-- markdownlint-disable max-one-sentence-per-line -->
 A more detailed description of how $TallyProof$, $TallyCheck$ work
 you can find in the section *Fig. 10* of this [paper][treasury_system_spec].
+<!-- markdownlint-enable max-one-sentence-per-line -->
 
 #### Tally publishing
 
@@ -318,8 +333,10 @@ It could be published using any public channel, e.g. blockchain, ipfs or through
 
 ## A: Group definition
 
+<!-- markdownlint-disable no-inline-html -->
+
 Important to note that some crypto algorithms, which are described below, are group $\mathbb{G}$ dependant.
-More detailted detailed about groups you can find at section *8.2.1* section on this [book][crypto_book].
+More detailed about groups you can find at section *8.2.1* section on this [book][crypto_book].
 <br/>
 Therefore, the generalized notation of the group operation used - $\circ$.
 And defined as follows:
@@ -329,14 +346,19 @@ And defined as follows:
 * There is an element noted as $1$, called *neutral* element,
   such that $a \circ 1 = a$, for all $a \in \mathbb{G}$.
 * For each element $a \in \mathbb{G}$ exists $a^{-1} \in \mathbb{G}$,
-  called the invers of $a$, such that $a \circ a^{-1} = a^{-1} \circ a = 1$.
+  called the inversed of $a$, such that $a \circ a^{-1} = a^{-1} \circ a = 1$.
+
+<!-- markdownlint-enable no-inline-html -->
 
 ## B: Lifted ElGamal encryption/decryption
 
-Lifted ElGamal encryption schema is defined over any cyclic group $\mathbb{G}$ of order $q$ with group generator $g$ ($g \in \mathbb{G}$).
+<!-- markdownlint-disable no-inline-html -->
+
+Lifted ElGamal encryption schema is defined over
+any cyclic group $\mathbb{G}$ of order $q$ with group generator $g$ ($g \in \mathbb{G}$).
 It could be multiplicative group of integers modulo $n$ or some elliptic curve over the finite field group.
 <br/>
-More detailed how group operations are defined, described in [appdenix A](#a-group-definition).
+More detailed how group operations are defined, described in [appendix A](#a-group-definition).
 
 ### Encryption
 
@@ -367,11 +389,15 @@ Note that since $Dlog$ is not efficient,
 the message space should be a small set,
 say $m \in {{0,1}}^{\xi}$, for $\xi \le 30$.
 
+<!-- markdownlint-enable no-inline-html -->
+
 ## C: Homomorphic tally
+
+<!-- markdownlint-disable no-inline-html -->
 
 Homomorphic tally schema is defined over any cyclic group $\mathbb{G}$ of order $q$ with group generator $g$ ($g \in \mathbb{G}$).
 <br/>
-More detailed how group operations are defined, described in [appdenix A](#a-group-definition).
+More detailed how group operations are defined, described in [appendix A](#a-group-definition).
 
 Homomorphic tally algorithm takes as arguments $i$ voting choice index,
 $[\mathbf{c_1}, \mathbf{c_2}, \ldots, \mathbf{c_N}]$
@@ -379,16 +405,19 @@ an array of encrypted votes vector's,
 $[\alpha_1, \alpha_2, \ldots, \alpha_N]$ - an array of corresponded voter's voting power.
 Where $N$ - votes amount.
 \begin{equation}
-Tally(i, [\mathbf{c_1}, \mathbf{c_2}, \ldots, \mathbf{c_N}], [\alpha_1, \alpha_2, \ldots, \alpha_N]) = c_{1, i}^{\alpha_1} \circ c_{2, i}^{\alpha_2} \circ \ldots \circ c_{N, i}^{\alpha_N} = er_i
+Tally(i, [\mathbf{c_1}, \mathbf{c_2}, \ldots, \mathbf{c_N}], [\alpha_1, \alpha_2, \ldots, \alpha_N])
+= c_{1, i}^{\alpha_1} \circ c_{2, i}^{\alpha_2} \circ \ldots \circ c_{N, i}^{\alpha_N} = er_i
 \end{equation}
 
 Where $c_{j, i}$ - an encrypted corresponded $i$-th vector's component of the encrypted vote $\mathbf{c_j}$.
-As it was stated in this [section](#vote-encrypting) each ecnrypted vote is a vector
+As it was stated in this [section](#vote-encrypting) each encrypted vote is a vector
 $\mathbf{c_j} = (c_{j, 1}, \ldots, c_{j, M})$, $M$ - number of voting choices.
 
 $er_i$ noted as encrypted tally result for the provided $i$-th voting choice.
 As it is not an open decrypted value yet,
-it needs a decryption prodecure corresponded for which encryption one was made.
+it needs a decryption procedure corresponded for which encryption one was made.
+
+<!-- markdownlint-enable no-inline-html -->
 
 ## Rationale
 
