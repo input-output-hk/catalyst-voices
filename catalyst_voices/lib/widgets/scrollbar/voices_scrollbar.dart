@@ -23,10 +23,10 @@ class VoicesScrollbar extends StatelessWidget {
       controller: controller,
       thumbVisibility: alwaysVisible,
       trackVisibility: alwaysVisible,
-      thickness: 8.0,
+      thickness: 8,
       trackColor: theme.colors.onSurfaceNeutral012,
       thumbColor: theme.colorScheme.primary,
-      shape: StadiumBorder(),
+      shape: const StadiumBorder(),
       padding: padding,
       child: child,
     );

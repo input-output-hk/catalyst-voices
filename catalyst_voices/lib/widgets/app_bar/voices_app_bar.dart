@@ -46,7 +46,7 @@ class VoicesAppBar extends StatelessWidget implements PreferredSizeWidget {
             leadingWidth: 48.0 + spacing,
             automaticallyImplyLeading: false,
             backgroundColor: backgroundColor,
-            title: _Title(showSearch),
+            title: _Title(showSearch: showSearch),
             actions: [
               _Actions(children: actions),
             ],
@@ -105,7 +105,7 @@ class _Theme extends StatelessWidget {
 class _Title extends StatelessWidget {
   final bool showSearch;
 
-  const _Title(this.showSearch);
+  const _Title({required this.showSearch});
 
   @override
   Widget build(BuildContext context) {

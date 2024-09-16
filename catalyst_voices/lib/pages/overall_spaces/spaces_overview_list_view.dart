@@ -30,11 +30,11 @@ class _SpacesListViewState extends State<SpacesListView> {
     return VoicesScrollbar(
       controller: _scrollController,
       alwaysVisible: true,
-      padding: EdgeInsets.symmetric(horizontal: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 6),
       child: ListView.separated(
         controller: _scrollController,
         scrollDirection: Axis.horizontal,
-        padding: EdgeInsets.only(right: 16, bottom: 24),
+        padding: const EdgeInsets.only(right: 16, bottom: 24),
         itemBuilder: (context, index) {
           final space = Space.values[index];
           return switch (space) {
@@ -46,7 +46,7 @@ class _SpacesListViewState extends State<SpacesListView> {
               FundedProjectsOverview(key: ObjectKey(space)),
           };
         },
-        separatorBuilder: (context, index) => SizedBox(width: 16),
+        separatorBuilder: (context, index) => const SizedBox(width: 16),
         itemCount: Space.values.length,
       ),
     );

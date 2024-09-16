@@ -4,7 +4,7 @@ sealed class TreasuryCampaignSegmentStep extends Equatable {
   final int id;
   final bool isEditable;
 
-  TreasuryCampaignSegmentStep({
+  const TreasuryCampaignSegmentStep({
     required this.id,
     this.isEditable = false,
   });
@@ -17,7 +17,7 @@ sealed class TreasuryCampaignSegmentStep extends Equatable {
 }
 
 final class TreasuryCampaignTitle extends TreasuryCampaignSegmentStep {
-  TreasuryCampaignTitle({
+  const TreasuryCampaignTitle({
     required super.id,
     super.isEditable,
   });
@@ -27,7 +27,7 @@ final class TreasuryCampaignTitle extends TreasuryCampaignSegmentStep {
 final class TreasuryCampaignTopicX extends TreasuryCampaignSegmentStep {
   final int nr;
 
-  TreasuryCampaignTopicX({
+  const TreasuryCampaignTopicX({
     required super.id,
     required this.nr,
   });

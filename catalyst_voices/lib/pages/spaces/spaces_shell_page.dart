@@ -16,7 +16,7 @@ class SpacesShellPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: VoicesAppBar(),
+      appBar: const VoicesAppBar(),
       drawer: SpacesDrawer(space: space),
       body: child,
     );

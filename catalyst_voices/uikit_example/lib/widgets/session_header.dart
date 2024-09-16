@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Displays current session state and a button to toggle it to a next state.
 class SessionHeader extends StatelessWidget {
-  const SessionHeader();
+  const SessionHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class _VisitorSessionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesFilledButton(
-      child: Text('Get Started'),
+      child: const Text('Get Started'),
       onTap: () =>
           context.read<SessionBloc>().add(const NextStateSessionEvent()),
     );
@@ -42,7 +42,7 @@ class _GuestSessionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesFilledButton(
       trailing: VoicesAssets.icons.lockOpen.buildIcon(),
-      child: Text('Unlock'),
+      child: const Text('Unlock'),
       onTap: () =>
           context.read<SessionBloc>().add(const NextStateSessionEvent()),
     );
@@ -56,7 +56,7 @@ class _ActiveUserSessionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesFilledButton(
       trailing: VoicesAssets.icons.lockClosed.buildIcon(),
-      child: Text('Lock'),
+      child: const Text('Lock'),
       onTap: () =>
           context.read<SessionBloc>().add(const NextStateSessionEvent()),
     );
