@@ -43,18 +43,18 @@ class NoInternetConnectionBanner extends StatelessWidget {
                         const SizedBox(width: 8),
                         Text(
                           'No internet connection',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleLarge!
-                              .copyWith(
-                                  color: VoicesColors.darkTextOnPrimaryLevel0),
+                          style:
+                              Theme.of(context).textTheme.titleLarge!.copyWith(
+                                    color: VoicesColors.darkTextOnPrimaryLevel0,
+                                  ),
                         ),
                       ],
                     ),
                     Text(
                       'Your internet is playing hide and seek. Check your internet connection, or try again in a moment.',
                       style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                          color: VoicesColors.darkTextOnPrimaryLevel0),
+                            color: VoicesColors.darkTextOnPrimaryLevel0,
+                          ),
                       softWrap: true,
                     ),
                   ],
@@ -70,7 +70,8 @@ class NoInternetConnectionBanner extends StatelessWidget {
                       child: Text(
                         'Refresh',
                         style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                            color: VoicesColors.darkTextOnPrimaryLevel0),
+                              color: VoicesColors.darkTextOnPrimaryLevel0,
+                            ),
                       ),
                     ),
                   ],
