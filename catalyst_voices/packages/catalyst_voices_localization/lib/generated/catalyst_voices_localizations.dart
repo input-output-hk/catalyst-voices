@@ -622,6 +622,12 @@ abstract class VoicesLocalizations {
   /// **'Guest'**
   String get guest;
 
+  /// Refers to user that created keychain but is locked
+  ///
+  /// In en, this message translates to:
+  /// **'Visitor'**
+  String get visitor;
+
   /// Text shown in the No Internet Connection Banner widget for the refresh button.
   ///
   /// In en, this message translates to:
@@ -639,11 +645,6 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Your internet is playing hide and seek. Check your internet connection, or try again in a moment.'**
   String get noConnectionBannerDescription;
-  /// Refers to user that created keychain but is locked
-  ///
-  /// In en, this message translates to:
-  /// **'Visitor'**
-  String get visitor;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
