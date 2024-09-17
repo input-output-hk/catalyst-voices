@@ -19,9 +19,11 @@ pub type StakeCredentialHash = String;
 pub type StakeCredentialKey = String;
 
 /// Hash size
+#[allow(dead_code)]
 pub(crate) const BLAKE_2B_256_HASH_SIZE: usize = 256 / 8;
 
 /// Helper function to generate the `blake2b_256` hash of a byte slice
+#[allow(dead_code)]
 pub(crate) fn hash(bytes: &[u8]) -> [u8; BLAKE_2B_256_HASH_SIZE] {
     let mut digest = [0u8; BLAKE_2B_256_HASH_SIZE];
     let mut context = Blake2b::new(BLAKE_2B_256_HASH_SIZE);
