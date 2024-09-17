@@ -113,11 +113,11 @@ mod tests {
 
     #[test]
     fn test_token_generation_and_decoding() {
-        let kid: [u8; 16] = hex::decode("00112233445566778899aabbccddeeff".to_string())
+        let kid: [u8; 16] = hex::decode("00112233445566778899aabbccddeeff")
             .unwrap()
             .try_into()
             .unwrap();
-        let ulid: [u8; 16] = hex::decode("01912cec71cf2c4c14a55d5585d94d7b".to_string())
+        let ulid: [u8; 16] = hex::decode("01912cec71cf2c4c14a55d5585d94d7b")
             .unwrap()
             .try_into()
             .unwrap();
