@@ -23,7 +23,6 @@ import 'package:uikit_example/examples/voices_seed_phrase_example.dart';
 import 'package:uikit_example/examples/voices_segmented_button_example.dart';
 import 'package:uikit_example/examples/voices_separators_example.dart';
 import 'package:uikit_example/examples/voices_snackbar_example.dart';
-import 'package:uikit_example/examples/voices_spaces_example.dart';
 import 'package:uikit_example/examples/voices_switch_example.dart';
 import 'package:uikit_example/examples/voices_tabs_example.dart';
 import 'package:uikit_example/examples/voices_text_field_example.dart';
@@ -39,13 +38,7 @@ class ExamplesListPage extends StatelessWidget {
   }
 
   static List<ExampleTile> get screens {
-    return const [
-      ExampleTile(
-        title: 'VoicesDiscoverySpaces',
-        route: VoicesSpacesExample.route,
-        page: VoicesSpacesExample(),
-      ),
-    ];
+    return const [];
   }
 
   static List<ExampleTile> get uiKit {

@@ -1,32 +1,34 @@
+import 'package:catalyst_voices/pages/spaces/drawer/space_header.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
-class MyPrivateProposals extends StatelessWidget {
-  const MyPrivateProposals({super.key});
+class IndividualPrivateCampaigns extends StatelessWidget {
+  const IndividualPrivateCampaigns({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        SpaceHeader(Space.treasury),
         SectionHeader(
           leading: SizedBox(width: 12),
-          title: Text('My private proposals (3/5)'),
+          title: Text('Individual private campaigns'),
         ),
         VoicesNavTile(
-          name: 'My first proposal',
+          name: 'Fund name 1',
+          status: ProposalStatus.ready,
+          trailing: MoreOptionsButton(),
+        ),
+        VoicesNavTile(
+          name: 'Campaign 1',
           status: ProposalStatus.draft,
           trailing: MoreOptionsButton(),
         ),
         VoicesNavTile(
-          name: 'My second proposal',
-          status: ProposalStatus.inProgress,
-          trailing: MoreOptionsButton(),
-        ),
-        VoicesNavTile(
-          name: 'My third proposal',
-          status: ProposalStatus.inProgress,
+          name: 'What happens with a campaign title that is longer that',
+          status: ProposalStatus.draft,
           trailing: MoreOptionsButton(),
         ),
       ],
