@@ -1,4 +1,4 @@
--- Create the TXO Record for a stake address, 
+-- Create the TXO Record for a stake address,
 INSERT INTO txo_by_stake (
     stake_address,
     slot_no,

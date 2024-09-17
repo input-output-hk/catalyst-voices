@@ -5,7 +5,7 @@ use poem_openapi::{types::Example, Object};
 use crate::service::api::cardano::types::{SlotNumber, StakeAmount};
 
 /// User's cardano stake info.
-#[derive(Object)]
+#[derive(Object, Default)]
 #[oai(example = true)]
 pub(crate) struct StakeInfo {
     /// Total stake amount.
@@ -24,6 +24,25 @@ impl Example for StakeInfo {
         Self {
             amount: 1,
             slot_number: 5,
+        }
+    }
+}
+
+/// Full user's cardano stake info.
+#[derive(Object, Default)]
+#[oai(example = true)]
+pub(crate) struct FullStakeInfo {
+    /// Volatile stake information.
+    pub(crate) volatile: StakeInfo,
+    /// Persistent stake information.
+    pub(crate) persistent: StakeInfo,
+}
+
+impl Example for FullStakeInfo {
+    fn example() -> Self {
+        Self {
+            volatile: StakeInfo::example(),
+            persistent: StakeInfo::example(),
         }
     }
 }

@@ -1,21 +1,16 @@
 //! Utxo Queries
 
-use cardano_chain_follower::Network;
 use pallas::ledger::{addresses::Address, traverse::MultiEraTx};
 use tokio_postgres::{binary_copy::BinaryCopyInWriter, types::Type};
 use tracing::error;
 
-use super::{chain_state::SlotNumber, cip36_registration::StakeCredential};
 use crate::{
     cardano::util::parse_policy_assets,
-    db::event::{error::NotFoundError, Error, EventDB, EVENT_DB_POOL},
+    db::event::{Error, EventDB, EVENT_DB_POOL},
 };
 
 /// Stake amount.
 pub(crate) type StakeAmount = i64;
-
-/// `select_total_utxo_amount.sql`
-const SELECT_TOTAL_UTXO_AMOUNT_SQL: &str = include_str!("select_total_utxo_amount.sql");
 
 /// Data required to index transactions.
 pub(crate) struct IndexedTxnParams<'a> {
@@ -272,28 +267,5 @@ impl EventDB {
         tx.commit().await?;
 
         Ok(())
-    }
-
-    /// Get total utxo amount
-    pub(crate) async fn total_utxo_amount(
-        stake_credential: StakeCredential, network: Network, slot_num: SlotNumber,
-    ) -> anyhow::Result<(StakeAmount, SlotNumber)> {
-        let row = Self::query_one(SELECT_TOTAL_UTXO_AMOUNT_SQL, &[
-            &stake_credential,
-            &network.to_string(),
-            &slot_num,
-        ])
-        .await?;
-
-        // Aggregate functions as SUM and MAX return NULL if there are no rows, so we need to
-        // check for it.
-        // https://www.postgresql.org/docs/8.2/functions-aggregate.html
-        if let Some(amount) = row.try_get("total_utxo_amount")? {
-            let slot_number = row.try_get("slot_no")?;
-
-            Ok((amount, slot_number))
-        } else {
-            Err(NotFoundError.into())
-        }
     }
 }

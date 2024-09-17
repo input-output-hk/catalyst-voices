@@ -8,13 +8,14 @@ use std::{
 
 use openssl::ssl::{SslContextBuilder, SslFiletype, SslMethod, SslVerifyMode};
 use scylla::{
-    frame::Compression, serialize::row::SerializeRow, ExecutionProfile, Session, SessionBuilder,
+    frame::Compression, serialize::row::SerializeRow, transport::iterator::RowIterator,
+    ExecutionProfile, Session, SessionBuilder,
 };
 use tokio::fs;
 use tracing::{error, info};
 
 use super::{
-    queries::{FallibleQueryResults, PreparedQueries, PreparedQuery},
+    queries::{FallibleQueryResults, PreparedQueries, PreparedQuery, PreparedSelectQuery},
     schema::create_schema,
 };
 use crate::{
@@ -98,6 +99,20 @@ impl CassandraSession {
         } else {
             VOLATILE_SESSION.get().cloned()
         }
+    }
+
+    /// Executes a select query with the given parameters.
+    ///
+    /// Returns an iterator that iterates over all the result pages that the query
+    /// returns.
+    pub(crate) async fn execute_iter<P>(
+        &self, select_query: PreparedSelectQuery, params: P,
+    ) -> anyhow::Result<RowIterator>
+    where P: SerializeRow {
+        let session = self.session.clone();
+        let queries = self.queries.clone();
+
+        queries.execute_iter(session, select_query, params).await
     }
 
     /// Execute a Batch query with the given parameters.
