@@ -2,7 +2,13 @@
 
 use std::sync::Arc;
 
-use cardano_chain_follower::{Metadata, MultiEraBlock};
+use cardano_chain_follower::{
+    Metadata::{
+        self,
+        cip36::{Cip36, VotingPubKey},
+    },
+    MultiEraBlock,
+};
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
 use tracing::error;
 
@@ -51,13 +57,18 @@ const INSERT_CIP36_REGISTRATION_BY_VOTE_KEY_QUERY: &str =
 
 impl Cip36RegistrationInsertQuery {
     /// Create a new Insert Query.
-    #[allow(clippy::too_many_arguments)]
     pub fn new(
-        stake_address: Option<Vec<u8>>, vote_key: Vec<u8>, slot_no: u64, txn: i16,
-        payment_address: Option<Vec<u8>>, is_payable: Option<bool>, raw_nonce: Option<u64>,
-        nonce: Option<u64>, purpose: Option<u64>, signed: Option<bool>,
-        strict_catalyst: Option<bool>, error_report: Option<Vec<String>>,
+        vote_key: &VotingPubKey, txn: i16, slot_no: u64, cip36: &Cip36, error_report: Vec<String>,
     ) -> Self {
+        let vote_key = vote_key.voting_pk.to_bytes().to_vec();
+        let stake_address = cip36.stake_pk.map(|s| s.to_bytes().to_vec());
+        let payment_address = Some(cip36.payment_addr.clone());
+        let is_payable = Some(cip36.payable);
+        let raw_nonce = Some(cip36.raw_nonce);
+        let nonce = Some(cip36.nonce);
+        let purpose = Some(cip36.purpose);
+        let signed = Some(cip36.signed);
+        let strict_catalyst = cip36.cip36;
         Cip36RegistrationInsertQuery {
             stake_address: match stake_address {
                 Some(stake_address) if !stake_address.is_empty() => MaybeUnset::Set(stake_address),
@@ -96,9 +107,10 @@ impl Cip36RegistrationInsertQuery {
                 Some(strict_catalyst) if strict_catalyst => MaybeUnset::Set(strict_catalyst),
                 _ => MaybeUnset::Unset,
             },
-            error_report: match error_report {
-                Some(error_report) if !error_report.is_empty() => MaybeUnset::Set(error_report),
-                _ => MaybeUnset::Unset,
+            error_report: if error_report.is_empty() {
+                MaybeUnset::Unset
+            } else {
+                MaybeUnset::Set(error_report)
             },
         }
     }
@@ -182,28 +194,12 @@ impl Cip36InsertQuery {
             #[allow(irrefutable_let_patterns)]
             if let Metadata::DecodedMetadataValues::Cip36(cip36) = &decoded_metadata.value {
                 for vote_key in &cip36.voting_keys {
-                    let vote_key = vote_key.voting_pk.to_bytes().to_vec();
-                    let stake_address = cip36.stake_pk.map(|s| s.to_bytes().to_vec());
-                    let payment_address = Some(cip36.payment_addr.clone());
-                    let is_payable = Some(cip36.payable);
-                    let raw_nonce = Some(cip36.raw_nonce);
-                    let nonce = Some(cip36.nonce);
-                    let purpose = Some(cip36.purpose);
-                    let signed = Some(cip36.signed);
-                    let strict_catalyst = cip36.cip36;
-                    let error_report = Some(decoded_metadata.report.clone());
+                    let error_report = decoded_metadata.report.clone();
                     self.cip36_reg_data.push(Cip36RegistrationInsertQuery::new(
-                        stake_address,
                         vote_key,
-                        slot_no,
                         txn_index,
-                        payment_address,
-                        is_payable,
-                        raw_nonce,
-                        nonce,
-                        purpose,
-                        signed,
-                        strict_catalyst,
+                        slot_no,
+                        cip36,
                         error_report,
                     ));
                 }
