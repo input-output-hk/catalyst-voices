@@ -78,11 +78,8 @@ impl TxiInsertQuery {
             let txn_hash = txi.hash().to_vec();
             let txo: i16 = txi.index().try_into().unwrap_or(i16::MAX);
 
-            self.txi_data.push(TxiInsertParams {
-                txn_hash,
-                txo,
-                slot_no: slot_no.into(),
-            });
+            self.txi_data
+                .push(TxiInsertParams::new(&txn_hash, txo, slot_no));
         }
     }
 
