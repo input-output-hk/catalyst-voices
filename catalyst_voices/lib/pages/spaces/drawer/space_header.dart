@@ -37,10 +37,6 @@ class SpaceHeader extends StatelessWidget {
                   ?.copyWith(color: theme.colors.textPrimary),
             ),
           ),
-          ChevronExpandButton(
-            isExpanded: false,
-            onTap: () {},
-          ),
         ],
       ),
     );
