@@ -38,7 +38,7 @@ class NoInternetConnectionBanner extends StatelessWidget {
                       children: [
                         CatalystSvgIcon.asset(
                           VoicesAssets.icons.wifi.path,
-                          color: Colors.white,
+                          color: VoicesColors.darkIconsOnImage,
                         ),
                         SizedBox(width: 8),
                         Text(
@@ -46,16 +46,15 @@ class NoInternetConnectionBanner extends StatelessWidget {
                           style: Theme.of(context)
                               .textTheme
                               .titleLarge!
-                              .copyWith(color: Colors.white),
+                              .copyWith(
+                                  color: VoicesColors.darkTextOnPrimaryLevel0),
                         ),
                       ],
                     ),
                     Text(
                       'Your internet is playing hide and seek. Check your internet connection, or try again in a moment.',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodySmall!
-                          .copyWith(color: Colors.white),
+                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                          color: VoicesColors.darkTextOnPrimaryLevel0),
                     ),
                   ],
                 ),
@@ -71,7 +70,9 @@ class NoInternetConnectionBanner extends StatelessWidget {
                                 style: Theme.of(context)
                                     .textTheme
                                     .labelLarge!
-                                    .copyWith(color: Colors.white),
+                                    .copyWith(
+                                        color: VoicesColors
+                                            .darkTextOnPrimaryLevel0),
                               ))
                         ],
                       )
