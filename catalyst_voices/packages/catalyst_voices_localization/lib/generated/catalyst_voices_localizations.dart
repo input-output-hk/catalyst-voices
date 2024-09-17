@@ -639,6 +639,11 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Your internet is playing hide and seek. Check your internet connection, or try again in a moment.'**
   String get noConnectionBannerDescription;
+  /// Refers to user that created keychain but is locked
+  ///
+  /// In en, this message translates to:
+  /// **'Visitor'**
+  String get visitor;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
