@@ -17,8 +17,7 @@ class NoInternetConnectionBanner extends StatelessWidget {
     return Expanded(
       child: LayoutBuilder(
         builder: (context, constraints) {
-          double fontSize = constraints.maxWidth < 400 ? 16 : 20;
-          double buttonFontSize = constraints.maxWidth < 400 ? 14 : 16;
+          bool isButtonDisplay = constraints.maxWidth > 744;
 
           return Container(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -32,6 +31,7 @@ class NoInternetConnectionBanner extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       mainAxisSize: MainAxisSize.min,
@@ -42,7 +42,7 @@ class NoInternetConnectionBanner extends StatelessWidget {
                         ),
                         SizedBox(width: 8),
                         Text(
-                          'No internet connection',
+                          constraints.maxWidth.toString(),
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 22,
@@ -53,7 +53,6 @@ class NoInternetConnectionBanner extends StatelessWidget {
                     ),
                     Text(
                       'Your internet is playing hide and seek. Check your internet connection, or try again in a moment.',
-                      textAlign: TextAlign.center,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -61,18 +60,20 @@ class NoInternetConnectionBanner extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 16),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    VoicesTextButton(
-                        onTap: this.onRefresh,
-                        child: Text(
-                          'Refresh',
-                          style: TextStyle(color: Colors.white),
-                        ))
-                  ],
-                )
+                isButtonDisplay ? SizedBox(height: 16) : Container(),
+                isButtonDisplay
+                    ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          VoicesTextButton(
+                              onTap: this.onRefresh,
+                              child: Text(
+                                'Refresh',
+                                style: TextStyle(color: Colors.white),
+                              ))
+                        ],
+                      )
+                    : Container()
               ],
             ),
           );
