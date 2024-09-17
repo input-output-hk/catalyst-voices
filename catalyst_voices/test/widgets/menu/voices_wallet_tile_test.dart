@@ -10,7 +10,7 @@ void main() {
       const testName = Text('Test Wallet');
 
       await tester.pumpApp(
-        Scaffold(
+        const Scaffold(
           body: VoicesWalletTile(
             iconSrc: _testIcon,
             name: testName,
@@ -26,9 +26,9 @@ void main() {
 
     testWidgets('renders placeholder when icon is null', (tester) async {
       await tester.pumpApp(
-        Scaffold(
+        const Scaffold(
           body: VoicesWalletTile(
-            name: const Text('Test Wallet'),
+            name: Text('Test Wallet'),
           ),
         ),
       );
@@ -39,7 +39,7 @@ void main() {
 
     testWidgets('does not render name when it is null', (tester) async {
       await tester.pumpApp(
-        Scaffold(
+        const Scaffold(
           body: VoicesWalletTile(
             iconSrc: _testIcon,
           ),
@@ -51,7 +51,7 @@ void main() {
     });
 
     testWidgets('triggers onTap callback when tapped', (tester) async {
-      bool tapped = false;
+      var tapped = false;
 
       await tester.pumpApp(
         Scaffold(
@@ -74,10 +74,10 @@ void main() {
 
     testWidgets('shows placeholder on image load failure', (tester) async {
       await tester.pumpApp(
-        Scaffold(
+        const Scaffold(
           body: VoicesWalletTile(
             iconSrc: 'https://example.com/non_existent_icon.png',
-            name: const Text('Test Wallet'),
+            name: Text('Test Wallet'),
           ),
         ),
       );

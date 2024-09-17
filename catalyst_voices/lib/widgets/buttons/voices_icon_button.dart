@@ -7,6 +7,9 @@ class VoicesIconButton extends StatelessWidget {
   /// The callback function invoked when the button is pressed.
   final VoidCallback? onTap;
 
+  /// Allows for customization of style.
+  final ButtonStyle? style;
+
   /// Icon widget for this button.
   final Widget child;
 
@@ -15,30 +18,35 @@ class VoicesIconButton extends StatelessWidget {
   const VoicesIconButton({
     super.key,
     this.onTap,
+    this.style,
     required this.child,
   }) : _variant = _Variant.standard;
 
   const VoicesIconButton.primary({
     super.key,
     this.onTap,
+    this.style,
     required this.child,
   }) : _variant = _Variant.primary;
 
   const VoicesIconButton.filled({
     super.key,
     this.onTap,
+    this.style,
     required this.child,
   }) : _variant = _Variant.filled;
 
   const VoicesIconButton.tonal({
     super.key,
     this.onTap,
+    this.style,
     required this.child,
   }) : _variant = _Variant.tonal;
 
   const VoicesIconButton.outlined({
     super.key,
     this.onTap,
+    this.style,
     required this.child,
   }) : _variant = _Variant.outlined;
 
@@ -46,7 +54,7 @@ class VoicesIconButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       onPressed: onTap,
-      style: _buildVariantStyle(context),
+      style: (style ?? const ButtonStyle()).merge(_buildVariantStyle(context)),
       icon: child,
     );
   }

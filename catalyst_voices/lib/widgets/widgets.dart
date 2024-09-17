@@ -1,3 +1,5 @@
+export 'app_bar/session/session_action_header.dart';
+export 'app_bar/session/session_state_header.dart';
 export 'app_bar/voices_app_bar.dart';
 export 'avatars/space_avatar.dart';
 export 'avatars/voices_avatar.dart';
@@ -16,8 +18,8 @@ export 'common/tab_bar_stack_view.dart';
 export 'containers/sidebar_scaffold.dart';
 export 'containers/space_scaffold.dart';
 export 'containers/space_side_panel.dart';
-export 'containers/workspace_tile_container.dart';
 export 'containers/workspace_text_tile_container.dart';
+export 'containers/workspace_tile_container.dart';
 export 'drawer/voices_drawer.dart';
 export 'drawer/voices_drawer_space_chooser.dart';
 export 'footers/links_page_footer.dart';

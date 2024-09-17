@@ -12,6 +12,7 @@ class ResizableBoxParent extends StatelessWidget {
   final double minHeight;
 
   const ResizableBoxParent({
+    super.key,
     required this.resizableVertically,
     required this.resizableHorizontally,
     required this.child,
@@ -29,11 +30,11 @@ class ResizableBoxParent extends StatelessWidget {
       builder: (BuildContext context, BoxConstraints constraints) {
         return _ResizableBox(
           constraints: constraints,
-          child: child,
           minWidth: minWidth,
           minHeight: minHeight,
           resizableHorizontally: resizableHorizontally,
           resizableVertically: resizableVertically,
+          child: child,
         );
       },
     );

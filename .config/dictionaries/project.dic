@@ -1,5 +1,6 @@
 aapt
 aarch
+abnf
 addrr
 adminer
 afinet
@@ -99,6 +100,7 @@ Instantitation
 integ
 Intellij
 interps
+inversed
 iohk
 iphoneos
 jdbc
@@ -191,6 +193,7 @@ reqwest
 rfwtxt
 rgloader
 ripgrep
+ristretto
 rlib
 RPATH
 rustc

@@ -141,8 +141,8 @@ class MoreOptionsButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesIconButton(
-      child: VoicesAssets.icons.dotsVertical.buildIcon(),
       onTap: onTap,
+      child: VoicesAssets.icons.dotsVertical.buildIcon(),
     );
   }
 }

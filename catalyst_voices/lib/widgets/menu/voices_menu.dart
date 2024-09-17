@@ -99,7 +99,7 @@ class _MenuButton extends StatelessWidget {
                 child: Align(
                   alignment: Alignment.centerRight,
                   child: Padding(
-                    padding: EdgeInsets.only(right: 6),
+                    padding: const EdgeInsets.only(right: 6),
                     child: VoicesAssets.icons.chevronRight.buildIcon(size: 20),
                   ),
                 ),

@@ -374,12 +374,32 @@
   "@spaceWorkspaceName": {
     "description": "Name of space shown in different spaces that indicates its origin"
   },
-  "spaceVotingName": "Treasury",
+  "spaceVotingName": "Voting space",
   "@spaceVotingName": {
     "description": "Name of space shown in different spaces that indicates its origin"
   },
   "spaceFundedProjects": "Funded Projects",
   "@spaceFundedProjects": {
     "description": "Name of space shown in different spaces that indicates its origin"
+  },
+  "lock": "Lock",
+  "@lock": {
+    "description": "Refers to a lock action, i.e. to lock the session."
+  },
+  "unlock": "Unlock",
+  "@unlock": {
+    "description": "Refers to a unlock action, i.e. to unlock the session."
+  },
+  "getStarted": "Get Started",
+  "@getStarted": {
+    "description": "Refers to a get started action, i.e. to register."
+  },
+  "guest": "Guest",
+  "@guest": {
+    "description": "Refers to guest user."
+  },
+  "visitor": "Visitor",
+  "@visitor": {
+    "description": "Refers to user that created keychain but is locked"
   }
 }

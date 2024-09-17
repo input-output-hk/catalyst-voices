@@ -1,5 +1,5 @@
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_shared/src/utils/date_time_ext.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:intl/intl.dart';
 
 /// A [DateTime] formatter.

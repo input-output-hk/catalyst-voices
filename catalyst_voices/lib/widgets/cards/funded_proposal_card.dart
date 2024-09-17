@@ -138,7 +138,7 @@ class _FundCategory extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text.rich(
       TextSpan(
-        text: fund + ' / ',
+        text: '$fund / ',
         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: Theme.of(context).colors.textDisabled,
             ),
@@ -195,7 +195,7 @@ class _FundsAndComments extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
         color: Theme.of(context).colors.success?.withOpacity(0.08),
         borderRadius: BorderRadius.circular(8),

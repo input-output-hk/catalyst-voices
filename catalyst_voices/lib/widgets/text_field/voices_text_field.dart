@@ -234,10 +234,15 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
                   ? textTheme.bodySmall
                   : textTheme.bodySmall!
                       .copyWith(color: theme.colors.textDisabled),
-              prefixIcon: widget.decoration?.prefixIcon,
+              prefixIcon: _wrapIconIfExists(
+                widget.decoration?.prefixIcon,
+                const EdgeInsetsDirectional.only(start: 8, end: 4),
+              ),
               prefixText: widget.decoration?.prefixText,
-              suffixIcon:
-                  widget.decoration?.suffixIcon ?? _getStatusSuffixWidget(),
+              suffixIcon: _wrapIconIfExists(
+                widget.decoration?.suffixIcon ?? _getStatusSuffixWidget(),
+                const EdgeInsetsDirectional.only(start: 4, end: 8),
+              ),
               suffixText: widget.decoration?.suffixText,
               counterText: widget.decoration?.counterText,
               counterStyle: widget.enabled
@@ -297,17 +302,8 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
       return null;
     }
 
-    final icon = getStatusSuffixIcon(
+    return getStatusSuffixIcon(
       color: _getStatusColor(orDefault: Colors.transparent),
-    );
-
-    if (icon == null) {
-      return null;
-    }
-
-    return Padding(
-      padding: const EdgeInsetsDirectional.only(start: 4, end: 8),
-      child: icon,
     );
   }
 
@@ -324,6 +320,25 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
       case VoicesTextFieldStatus.error:
         return Icon(Icons.error_outline, color: color);
     }
+  }
+
+  Widget? _wrapIconIfExists(Widget? child, EdgeInsetsDirectional padding) {
+    if (child == null) return null;
+
+    return IconTheme(
+      data: IconThemeData(
+        size: 24,
+        color: Theme.of(context).colors.iconsForeground,
+      ),
+      child: Padding(
+        padding: padding,
+        child: Align(
+          widthFactor: 1,
+          heightFactor: 1,
+          child: child,
+        ),
+      ),
+    );
   }
 
   Color _getStatusColor({required Color orDefault}) {
