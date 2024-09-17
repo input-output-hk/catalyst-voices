@@ -17,7 +17,7 @@ class NoInternetConnectionBanner extends StatelessWidget {
     return Expanded(
       child: LayoutBuilder(
         builder: (context, constraints) {
-          bool isButtonDisplay = constraints.maxWidth > 744;
+          bool shouldButtonDisplay = constraints.maxWidth > 744;
 
           return Container(
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -58,8 +58,8 @@ class NoInternetConnectionBanner extends StatelessWidget {
                     ),
                   ],
                 ),
-                isButtonDisplay ? SizedBox(height: 16) : Container(),
-                isButtonDisplay
+                shouldButtonDisplay ? SizedBox(height: 16) : Container(),
+                shouldButtonDisplay
                     ? Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
