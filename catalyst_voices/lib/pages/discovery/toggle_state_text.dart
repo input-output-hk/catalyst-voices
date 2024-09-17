@@ -23,7 +23,6 @@ class _ToggleStateTextState extends State<ToggleStateText> {
   void initState() {
     _tapVisitor.onTap = () {
       context.read<SessionBloc>().add(const VisitorSessionEvent());
-      // context.read<UserProfileBloc>().add(const VisitorSessionEvent());
     };
     _tapGuest.onTap = () {
       context.read<SessionBloc>().add(const GuestSessionEvent());
