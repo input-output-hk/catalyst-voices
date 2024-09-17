@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -39,7 +40,7 @@ class NoInternetConnectionBanner extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           margin: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: VoicesColors.darkAvatarsError,
+            color: Theme.of(context).colors.avatarsError,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
@@ -55,27 +56,20 @@ class NoInternetConnectionBanner extends StatelessWidget {
                       children: [
                         CatalystSvgIcon.asset(
                           VoicesAssets.icons.wifi.path,
-                          color: VoicesColors.darkIconsOnImage,
+                          color: Theme.of(context).colors.iconsForeground,
                         ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             context.l10n.noConnectionBannerTitle,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge!
-                                .copyWith(
-                                  color: VoicesColors.darkTextOnPrimaryLevel0,
-                                ),
+                            style: Theme.of(context).textTheme.titleLarge,
                           ),
                         ),
                       ],
                     ),
                     Text(
                       context.l10n.noConnectionBannerDescription,
-                      style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                            color: VoicesColors.darkTextOnPrimaryLevel0,
-                          ),
+                      style: Theme.of(context).textTheme.bodySmall,
                       softWrap: true,
                     ),
                   ],
@@ -87,9 +81,7 @@ class NoInternetConnectionBanner extends StatelessWidget {
                   onTap: onRefresh,
                   child: Text(
                     context.l10n.noConnectionBannerRefreshButtonText,
-                    style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                          color: VoicesColors.darkTextOnPrimaryLevel0,
-                        ),
+                    style: Theme.of(context).textTheme.labelLarge,
                   ),
                 ),
               ],
