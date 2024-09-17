@@ -80,13 +80,7 @@ class VoicesIndicatorsExample extends StatelessWidget {
             ],
           ),
           Text('No Internet Connection Banner'),
-          Row(
-            children: [
-              Expanded(
-                child: NoInternetConnectionBanner(),
-              ),
-            ],
-          ),
+          NoInternetConnectionBanner(),
         ].separatedByIndexed(
           (index, value) {
             return switch (value.runtimeType) {
