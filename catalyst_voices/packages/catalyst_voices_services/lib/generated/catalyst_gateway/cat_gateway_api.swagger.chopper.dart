@@ -70,7 +70,7 @@ final class _$CatGatewayApi extends CatGatewayApi {
   }
 
   @override
-  Future<Response<StakeInfo>> _apiCardanoStakedAdaStakeAddressGet({
+  Future<Response<FullStakeInfo>> _apiCardanoStakedAdaStakeAddressGet({
     required String? stakeAddress,
     String? network,
     int? slotNumber,
@@ -86,7 +86,7 @@ final class _$CatGatewayApi extends CatGatewayApi {
       client.baseUrl,
       parameters: $params,
     );
-    return client.send<StakeInfo, StakeInfo>($request);
+    return client.send<FullStakeInfo, FullStakeInfo>($request);
   }
 
   @override
