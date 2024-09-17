@@ -1,7 +1,9 @@
 import 'package:catalyst_voices/pages/spaces/spaces_drawer.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SpacesShellPage extends StatelessWidget {
   final Space space;
@@ -15,14 +17,19 @@ class SpacesShellPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sessionBloc = context.watch<SessionBloc>();
+    final isVisitor = sessionBloc.state is VisitorSessionState;
+
     return Scaffold(
-      appBar: const VoicesAppBar(
-        actions: [
+      appBar: VoicesAppBar(
+        leading: isVisitor ? null : const DrawerToggleButton(),
+        automaticallyImplyLeading: false,
+        actions: const [
           SessionActionHeader(),
           SessionStateHeader(),
         ],
       ),
-      drawer: SpacesDrawer(space: space),
+      drawer: isVisitor ? null : SpacesDrawer(space: space),
       body: child,
     );
   }
