@@ -38,8 +38,11 @@ class _UIKitExampleAppState extends State<UIKitExampleApp> {
           LocaleNamesLocalizationsDelegate(),
         ],
         localeListResolutionCallback: basicLocaleListResolution,
-        theme: ThemeBuilder.buildTheme(BrandKey.catalyst),
-        darkTheme: ThemeBuilder.buildDarkTheme(BrandKey.catalyst),
+        theme: ThemeBuilder.buildTheme(brand: Brand.catalyst),
+        darkTheme: ThemeBuilder.buildTheme(
+          brand: Brand.catalyst,
+          brightness: Brightness.dark,
+        ),
         themeMode: _themeMode,
         onGenerateRoute: _onGenerateRoute,
       ),

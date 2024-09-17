@@ -11,11 +11,13 @@ abstract interface class LoggingService {
     return _LoggingServiceImpl(root: Logger.root);
   }
 
+  // ignore: avoid_setters_without_getters
   set level(Level newValue);
 
+  // ignore: avoid_setters_without_getters
   set printLogs(bool newValue);
 
-  void dispose();
+  Future<void> dispose();
 }
 
 final class _LoggingServiceImpl implements LoggingService {
@@ -33,6 +35,7 @@ final class _LoggingServiceImpl implements LoggingService {
   }
 
   @override
+  // ignore: avoid_setters_without_getters
   set level(Level newValue) {
     if (root.level == newValue) {
       return;
@@ -53,8 +56,8 @@ final class _LoggingServiceImpl implements LoggingService {
   }
 
   @override
-  void dispose() {
-    _recordsSub?.cancel();
+  Future<void> dispose() async {
+    await _recordsSub?.cancel();
     _recordsSub = null;
   }
 

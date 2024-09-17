@@ -7,24 +7,27 @@ class IndividualPrivateCampaigns extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         SectionHeader(
           leading: SizedBox(width: 12),
           title: Text('Individual private campaigns'),
         ),
-        VoicesDrawerNavItem(
+        VoicesNavTile(
           name: 'Fund name 1',
           status: ProposalStatus.ready,
+          trailing: MoreOptionsButton(),
         ),
-        VoicesDrawerNavItem(
+        VoicesNavTile(
           name: 'Campaign 1',
           status: ProposalStatus.draft,
+          trailing: MoreOptionsButton(),
         ),
-        VoicesDrawerNavItem(
+        VoicesNavTile(
           name: 'What happens with a campaign title that is longer that',
           status: ProposalStatus.draft,
+          trailing: MoreOptionsButton(),
         ),
       ],
     );

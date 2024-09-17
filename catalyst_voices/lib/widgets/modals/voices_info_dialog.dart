@@ -14,6 +14,7 @@ class VoicesDesktopInfoDialog extends StatelessWidget {
   final String title;
 
   const VoicesDesktopInfoDialog({
+    super.key,
     required this.title,
   });
 
@@ -32,7 +33,7 @@ class VoicesDesktopInfoDialog extends StatelessWidget {
           ),
         ],
       ),
-      right: Column(),
+      right: const Column(),
     );
   }
 }

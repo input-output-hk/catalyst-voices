@@ -40,8 +40,14 @@ extension SvgGenImageExt on SvgGenImage {
     WidgetBuilder? placeholderBuilder,
     Clip clipBehavior = Clip.hardEdge,
     SvgTheme? theme,
+    Color? color,
     ColorFilter? colorFilter,
   }) {
+    assert(
+      color == null || colorFilter == null,
+      'Either color or colorFilter is supported but not both',
+    );
+
     return CatalystSvgPicture.asset(
       path,
       key: key,
@@ -58,7 +64,13 @@ extension SvgGenImageExt on SvgGenImage {
       placeholderBuilder: placeholderBuilder,
       clipBehavior: clipBehavior,
       theme: theme,
-      colorFilter: colorFilter,
+      colorFilter: colorFilter ??
+          (color != null
+              ? ColorFilter.mode(
+                  color,
+                  BlendMode.srcIn,
+                )
+              : null),
     );
   }
 
@@ -77,9 +89,15 @@ extension SvgGenImageExt on SvgGenImage {
     WidgetBuilder? placeholderBuilder,
     Clip clipBehavior = Clip.hardEdge,
     SvgTheme? theme,
+    Color? color,
     ColorFilter? colorFilter,
     bool allowColorFilter = true,
   }) {
+    assert(
+      color == null || colorFilter == null,
+      'Either color or colorFilter is supported but not both',
+    );
+
     return CatalystSvgIcon.asset(
       path,
       key: key,
@@ -95,6 +113,7 @@ extension SvgGenImageExt on SvgGenImage {
       placeholderBuilder: placeholderBuilder,
       clipBehavior: clipBehavior,
       theme: theme,
+      color: color,
       colorFilter: colorFilter,
       allowColorFilter: allowColorFilter,
     );

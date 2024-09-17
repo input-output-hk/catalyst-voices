@@ -10,9 +10,6 @@
 class VoicesFonts {
   VoicesFonts._();
 
-  /// Font family: CatalystVoicesIcons
-  static const String catalystVoicesIcons = 'CatalystVoicesIcons';
-
   /// Font family: SF-Pro
   static const String sFPro = 'SF-Pro';
 }

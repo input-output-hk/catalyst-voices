@@ -1,5 +1,6 @@
 aapt
 aarch
+abnf
 addrr
 adminer
 afinet
@@ -72,7 +73,6 @@ endfunction
 Eternl
 EUTXO
 fetchval
-fluttericon
 fmtchk
 fmtfix
 fontawesome
@@ -100,6 +100,7 @@ Instantitation
 integ
 Intellij
 interps
+inversed
 iohk
 iphoneos
 jdbc
@@ -172,6 +173,7 @@ plpgsql
 podfile
 podhelper
 postcss
+Pozhylenkov
 Precertificate
 preprod
 projectcatalyst
@@ -191,6 +193,7 @@ reqwest
 rfwtxt
 rgloader
 ripgrep
+ristretto
 rlib
 RPATH
 rustc
@@ -276,3 +279,4 @@ hotspots
 precache
 Precache
 svgs
+Dreps

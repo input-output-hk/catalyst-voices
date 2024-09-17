@@ -70,7 +70,7 @@ class FundedProjectsPage extends StatelessWidget {
           style: Theme.of(context).textTheme.headlineLarge,
         ),
         const SizedBox(height: 44),
-        _Tabs(),
+        const _Tabs(),
       ],
     );
   }
@@ -97,7 +97,7 @@ class _Tabs extends StatelessWidget {
               Tab(
                 child: Row(
                   children: [
-                    Icon(CatalystVoicesIcons.plus_circle),
+                    VoicesAssets.icons.plusCircleOutlined.buildIcon(),
                     const SizedBox(width: 8),
                     Text(context.l10n.followed),
                   ],
@@ -106,7 +106,7 @@ class _Tabs extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
-          TabBarStackView(
+          const TabBarStackView(
             children: [
               _AllProposals(),
               _FavoriteProposals(),

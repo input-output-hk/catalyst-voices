@@ -30,21 +30,21 @@ class VoicesNavigationExample extends StatelessWidget {
         children: [
           VoicesExpandableListTile(
             title: const Text('My Dashboard'),
-            leading: const Icon(CatalystVoicesIcons.home),
-            trailing: const Icon(CatalystVoicesIcons.eye),
+            leading: VoicesAssets.icons.home.buildIcon(),
+            trailing: VoicesAssets.icons.eye.buildIcon(),
             expandedChildren: [
               VoicesListTile(
-                trailing: const Icon(CatalystVoicesIcons.eye),
+                trailing: VoicesAssets.icons.eye.buildIcon(),
                 title: const Text('My Catalyst Proposals'),
                 onTap: () {},
               ),
               VoicesListTile(
-                trailing: const Icon(CatalystVoicesIcons.eye),
+                trailing: VoicesAssets.icons.eye.buildIcon(),
                 title: const Text('My Actions'),
                 onTap: () {},
               ),
               VoicesListTile(
-                trailing: const Icon(CatalystVoicesIcons.eye),
+                trailing: VoicesAssets.icons.eye.buildIcon(),
                 title: const Text('Catalyst Campaign Timeline'),
                 onTap: () {},
               ),
@@ -52,27 +52,27 @@ class VoicesNavigationExample extends StatelessWidget {
           ),
           const Divider(),
           VoicesListTile(
-            leading: const Icon(CatalystVoicesIcons.user),
-            trailing: const Icon(CatalystVoicesIcons.eye),
+            leading: VoicesAssets.icons.user.buildIcon(),
+            trailing: VoicesAssets.icons.eye.buildIcon(),
             title: const Text('Catalyst Roles'),
             onTap: () => Navigator.pop(context),
           ),
           VoicesListTile(
-            leading: const Icon(CatalystVoicesIcons.annotation),
-            trailing: const Icon(CatalystVoicesIcons.eye),
+            leading: VoicesAssets.icons.annotation.buildIcon(),
+            trailing: VoicesAssets.icons.eye.buildIcon(),
             title: const Text('Feedback'),
             onTap: () => Navigator.pop(context),
           ),
           const Divider(),
           VoicesListTile(
-            leading: const Icon(CatalystVoicesIcons.arrow_right),
-            trailing: const Icon(CatalystVoicesIcons.eye),
+            leading: VoicesAssets.icons.arrowRight.buildIcon(),
+            trailing: VoicesAssets.icons.eye.buildIcon(),
             title: const Text('Catalyst Gitbook documentation'),
             onTap: () => Navigator.pop(context),
           ),
           VoicesListTile(
-            leading: const Icon(CatalystVoicesIcons.arrow_right),
-            trailing: const Icon(CatalystVoicesIcons.eye),
+            leading: VoicesAssets.icons.arrowRight.buildIcon(),
+            trailing: VoicesAssets.icons.eye.buildIcon(),
             title: const Text('Opportunity board'),
             onTap: () => Navigator.pop(context),
           ),

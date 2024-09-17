@@ -77,7 +77,7 @@ class VoicesListTileExample extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: VoicesAppBar(),
+      appBar: const VoicesAppBar(),
       body: SizedBox(
         width: 300,
         child: ListView(
@@ -85,21 +85,21 @@ class VoicesListTileExample extends StatelessWidget {
           children: [
             VoicesExpandableListTile(
               title: const Text('My Dashboard'),
-              leading: const Icon(CatalystVoicesIcons.home),
-              trailing: const Icon(CatalystVoicesIcons.eye),
+              leading: VoicesAssets.icons.home.buildIcon(),
+              trailing: VoicesAssets.icons.eye.buildIcon(),
               expandedChildren: [
                 VoicesListTile(
-                  trailing: const Icon(CatalystVoicesIcons.eye),
+                  trailing: VoicesAssets.icons.eye.buildIcon(),
                   title: const Text('My Catalyst Proposals'),
                   onTap: () {},
                 ),
                 VoicesListTile(
-                  trailing: const Icon(CatalystVoicesIcons.eye),
+                  trailing: VoicesAssets.icons.eye.buildIcon(),
                   title: const Text('My Actions'),
                   onTap: () {},
                 ),
                 VoicesListTile(
-                  trailing: const Icon(CatalystVoicesIcons.eye),
+                  trailing: VoicesAssets.icons.eye.buildIcon(),
                   title: const Text('Catalyst Campaign Timeline'),
                   onTap: () {},
                 ),
@@ -107,8 +107,8 @@ class VoicesListTileExample extends StatelessWidget {
             ),
             const Divider(),
             VoicesListTile(
-              leading: const Icon(CatalystVoicesIcons.user),
-              trailing: const Icon(CatalystVoicesIcons.eye),
+              leading: VoicesAssets.icons.user.buildIcon(),
+              trailing: VoicesAssets.icons.eye.buildIcon(),
               title: const Text('Catalyst Roles'),
               onTap: () {},
             ),

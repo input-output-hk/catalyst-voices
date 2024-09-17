@@ -234,10 +234,15 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
                   ? textTheme.bodySmall
                   : textTheme.bodySmall!
                       .copyWith(color: theme.colors.textDisabled),
-              prefixIcon: widget.decoration?.prefixIcon,
+              prefixIcon: _wrapIconIfExists(
+                widget.decoration?.prefixIcon,
+                const EdgeInsetsDirectional.only(start: 8, end: 4),
+              ),
               prefixText: widget.decoration?.prefixText,
-              suffixIcon:
-                  widget.decoration?.suffixIcon ?? _getStatusSuffixWidget(),
+              suffixIcon: _wrapIconIfExists(
+                widget.decoration?.suffixIcon ?? _getStatusSuffixWidget(),
+                const EdgeInsetsDirectional.only(start: 4, end: 8),
+              ),
               suffixText: widget.decoration?.suffixText,
               counterText: widget.decoration?.counterText,
               counterStyle: widget.enabled
@@ -297,33 +302,43 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
       return null;
     }
 
-    final icon = getStatusSuffixIcon();
-    if (icon == null) {
-      return null;
-    }
-
-    return Padding(
-      padding: const EdgeInsetsDirectional.only(start: 4, end: 8),
-      child: Icon(
-        getStatusSuffixIcon(),
-        color: _getStatusColor(orDefault: Colors.transparent),
-      ),
+    return getStatusSuffixIcon(
+      color: _getStatusColor(orDefault: Colors.transparent),
     );
   }
 
-  IconData? getStatusSuffixIcon() {
+  Widget? getStatusSuffixIcon({required Color color}) {
     switch (_validation.status) {
       case VoicesTextFieldStatus.none:
         return null;
       case VoicesTextFieldStatus.success:
-        return CatalystVoicesIcons.check_circle;
+        return VoicesAssets.icons.checkCircle.buildIcon(color: color);
       case VoicesTextFieldStatus.warning:
         // TODO(dtscalac): this is not the right icon, it should be outlined
         // & rounded, ask designers to provide it and update it
-        return Icons.warning_outlined;
+        return Icon(Icons.warning_outlined, color: color);
       case VoicesTextFieldStatus.error:
-        return Icons.error_outline;
+        return Icon(Icons.error_outline, color: color);
     }
+  }
+
+  Widget? _wrapIconIfExists(Widget? child, EdgeInsetsDirectional padding) {
+    if (child == null) return null;
+
+    return IconTheme(
+      data: IconThemeData(
+        size: 24,
+        color: Theme.of(context).colors.iconsForeground,
+      ),
+      child: Padding(
+        padding: padding,
+        child: Align(
+          widthFactor: 1,
+          heightFactor: 1,
+          child: child,
+        ),
+      ),
+    );
   }
 
   Color _getStatusColor({required Color orDefault}) {

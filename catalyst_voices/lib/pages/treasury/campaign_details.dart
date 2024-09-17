@@ -105,8 +105,8 @@ class _SegmentDetails extends StatelessWidget {
                 isEditable: step.isEditable,
               );
             },
-          )
-      ].separatedBy(SizedBox(height: 12)).toList(),
+          ),
+      ].separatedBy(const SizedBox(height: 12)).toList(),
     );
   }
 }
@@ -129,16 +129,16 @@ class _StepDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return WorkspaceTileContainer(
+    return WorkspaceTextTileContainer(
       name: name,
       isSelected: isSelected,
       headerActions: [
         VoicesTextButton(
-          child: Text(context.l10n.treasuryStepEdit),
           onTap: isEditable ? () {} : null,
+          child: Text(context.l10n.stepEdit),
         ),
       ],
-      content: Text(desc),
+      content: desc,
     );
   }
 }
