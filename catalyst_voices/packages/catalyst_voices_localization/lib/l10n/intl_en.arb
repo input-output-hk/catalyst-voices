@@ -397,5 +397,9 @@
   "guest": "Guest",
   "@guest": {
     "description": "Refers to guest user."
+  },
+  "visitor": "Visitor",
+  "@visitor": {
+    "description": "Refers to user that created keychain but is locked"
   }
 }

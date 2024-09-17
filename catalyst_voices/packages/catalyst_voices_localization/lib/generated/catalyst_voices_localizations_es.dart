@@ -324,4 +324,7 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get guest => 'Guest';
+
+  @override
+  String get visitor => 'Visitor';
 }
