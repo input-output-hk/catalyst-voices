@@ -107,13 +107,13 @@ async fn checker_api_catalyst_auth(
             },
         };
 
-        // Strictly verify a signature on a message with this keypair public key.
+        // Strictly verify a signature on a message with this key-pair public key.
         if public_key
             .verify_strict(&msg, &Signature::from_bytes(&sig.0))
             .is_err()
         {
             error!(
-                "Message {:?} was not signed by this keypair {:?}",
+                "Message {:?} was not signed by this key-pair {:?}",
                 hex::encode(msg),
                 public_key,
             );
