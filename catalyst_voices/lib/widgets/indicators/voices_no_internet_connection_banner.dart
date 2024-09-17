@@ -23,7 +23,7 @@ class NoInternetConnectionBanner extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             margin: EdgeInsets.symmetric(horizontal: 16),
             decoration: BoxDecoration(
-              color: const Color(0xEEAD0000),
+              color: VoicesColors.darkAvatarsError,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -42,21 +42,20 @@ class NoInternetConnectionBanner extends StatelessWidget {
                         ),
                         SizedBox(width: 8),
                         Text(
-                          constraints.maxWidth.toString(),
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          'No internet connection',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge!
+                              .copyWith(color: Colors.white),
                         ),
                       ],
                     ),
                     Text(
                       'Your internet is playing hide and seek. Check your internet connection, or try again in a moment.',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                      ),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall!
+                          .copyWith(color: Colors.white),
                     ),
                   ],
                 ),
@@ -69,7 +68,10 @@ class NoInternetConnectionBanner extends StatelessWidget {
                               onTap: this.onRefresh,
                               child: Text(
                                 'Refresh',
-                                style: TextStyle(color: Colors.white),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .labelLarge!
+                                    .copyWith(color: Colors.white),
                               ))
                         ],
                       )
