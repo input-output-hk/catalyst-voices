@@ -3,6 +3,24 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
+/// A banner that indicates a lack of internet connection.
+///
+/// Includes a refresh button, which is displayed only on desktop-sized screens.
+/// The [onRefresh] callback is triggered when the refresh button is pressed.
+/// If no [onRefresh] callback is provided, the button will appear disabled.
+/// 
+/// The banner is only visible when there is no internet connection and is 
+/// typically used in scenarios where users need to be alerted to connectivity
+/// issues.
+///
+/// **Example Usage:**
+/// ```dart
+/// NoInternetConnectionBanner(
+///   onRefresh: () {
+///     // Handle refresh logic here
+///   },
+/// )
+/// ```
 class NoInternetConnectionBanner extends StatelessWidget {
   final VoidCallback? onRefresh;
 
@@ -63,8 +81,8 @@ class NoInternetConnectionBanner extends StatelessWidget {
                   ],
                 ),
               ),
-              if (shouldButtonDisplay) const SizedBox(height: 16),
-              if (shouldButtonDisplay)
+              if (shouldButtonDisplay) ...[
+                const SizedBox(height: 16),
                 Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -79,6 +97,7 @@ class NoInternetConnectionBanner extends StatelessWidget {
                     ),
                   ],
                 ),
+              ],
             ],
           ),
         );
