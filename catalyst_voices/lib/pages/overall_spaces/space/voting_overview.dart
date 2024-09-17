@@ -14,15 +14,15 @@ class VotingOverview extends StatelessWidget {
     return SpaceOverviewContainer(
       child: Column(
         children: [
-          SpaceOverviewHeader(Space.voting),
-          SectionHeader(title: Text('Active funding rounds')),
+          const SpaceOverviewHeader(Space.voting),
+          const SectionHeader(title: Text('Active funding rounds')),
           VoicesNavTile(
             leading: VoicesAssets.icons.vote.buildIcon(),
             name: 'Voting round 14',
             status: ProposalStatus.open,
           ),
-          VoicesDivider(indent: 0, endIndent: 0, height: 16),
-          SectionHeader(title: Text('Funding tracks / Categories')),
+          const VoicesDivider(indent: 0, endIndent: 0, height: 16),
+          const SectionHeader(title: Text('Funding tracks / Categories')),
           SpaceOverviewNavTile(
             leading: VoicesAssets.icons.document.buildIcon(),
             title: Text(
@@ -30,15 +30,15 @@ class VotingOverview extends StatelessWidget {
               style: Theme.of(context).textTheme.labelMedium,
             ),
           ),
-          VoicesDivider(indent: 0, endIndent: 0, height: 16),
-          SectionHeader(title: Text('Dreps')),
+          const VoicesDivider(indent: 0, endIndent: 0, height: 16),
+          const SectionHeader(title: Text('Dreps')),
           SpaceOverviewNavTile(
             leading: VoicesAssets.icons.user.buildIcon(),
-            title: Text('Drep signup'),
+            title: const Text('Drep signup'),
           ),
           SpaceOverviewNavTile(
             leading: VoicesAssets.icons.user.buildIcon(),
-            title: Text('Drep delegation'),
+            title: const Text('Drep delegation'),
           ),
         ],
       ),

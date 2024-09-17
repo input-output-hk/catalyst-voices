@@ -589,7 +589,7 @@ abstract class VoicesLocalizations {
   /// Name of space shown in different spaces that indicates its origin
   ///
   /// In en, this message translates to:
-  /// **'Treasury'**
+  /// **'Voting space'**
   String get spaceVotingName;
 
   /// Name of space shown in different spaces that indicates its origin
@@ -597,6 +597,30 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Funded Projects'**
   String get spaceFundedProjects;
+
+  /// Refers to a lock action, i.e. to lock the session.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock'**
+  String get lock;
+
+  /// Refers to a unlock action, i.e. to unlock the session.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock'**
+  String get unlock;
+
+  /// Refers to a get started action, i.e. to register.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get getStarted;
+
+  /// Refers to guest user.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest'**
+  String get guest;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

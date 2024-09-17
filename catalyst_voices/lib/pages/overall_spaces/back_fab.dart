@@ -11,7 +11,7 @@ class BackFab extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return FloatingActionButton(
-      shape: CircleBorder(),
+      shape: const CircleBorder(),
       backgroundColor: theme.colorScheme.primary,
       foregroundColor: theme.colors.iconsBackground,
       child: VoicesAssets.icons.arrowLeft.buildIcon(),
@@ -23,7 +23,7 @@ class BackFab extends StatelessWidget {
         } else {
           // TODO(damian-molinski): should go to initial route later
           // goRouter.go(Routes.initialLocation);
-          TreasuryRoute().go(context);
+          const TreasuryRoute().go(context);
         }
       },
     );

@@ -12,7 +12,7 @@ class DiscoveryOverview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SpaceOverviewContainer(
+    return const SpaceOverviewContainer(
       child: Column(
         children: [
           SpaceOverviewHeader(Space.discovery),
@@ -51,7 +51,7 @@ class _RolesTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return SpaceOverviewNavTile(
       leading: VoicesAssets.icons.user.buildIcon(),
-      title: Text('Catalyst Roles'),
+      title: const Text('Catalyst Roles'),
     );
   }
 }
@@ -63,7 +63,7 @@ class _FeedbackTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return SpaceOverviewNavTile(
       leading: VoicesAssets.icons.annotation.buildIcon(),
-      title: Text('Feedback'),
+      title: const Text('Feedback'),
     );
   }
 }
@@ -75,7 +75,7 @@ class _DocumentationTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return SpaceOverviewNavTile(
       leading: VoicesAssets.icons.arrowRight.buildIcon(),
-      title: Text('Catalyst Gitbook documentation'),
+      title: const Text('Catalyst Gitbook documentation'),
     );
   }
 }

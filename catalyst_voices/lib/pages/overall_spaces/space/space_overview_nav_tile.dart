@@ -24,7 +24,8 @@ class SpaceOverviewNavTile extends StatelessWidget {
       color: theme.colors.iconsForeground,
     );
 
-    final textStyle = (theme.textTheme.labelLarge ?? TextStyle()).copyWith(
+    final textStyle =
+        (theme.textTheme.labelLarge ?? const TextStyle()).copyWith(
       color: theme.colors.textOnPrimaryLevel0,
     );
 
@@ -35,7 +36,7 @@ class SpaceOverviewNavTile extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         child: ConstrainedBox(
-          constraints: BoxConstraints.tightFor(height: 56),
+          constraints: const BoxConstraints.tightFor(height: 56),
           child: Material(
             color: backgroundColor ?? Colors.transparent,
             borderRadius: BorderRadius.circular(25),
@@ -43,11 +44,11 @@ class SpaceOverviewNavTile extends StatelessWidget {
             child: InkWell(
               onTap: onTap,
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   children: [
                     leading,
-                    SizedBox(width: 12),
+                    const SizedBox(width: 12),
                     Expanded(child: title),
                   ],
                 ),

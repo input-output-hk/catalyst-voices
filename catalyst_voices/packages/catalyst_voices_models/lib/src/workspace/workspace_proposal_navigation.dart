@@ -4,7 +4,7 @@ import 'package:equatable/equatable.dart';
 final class WorkspaceProposalNavigation extends Equatable {
   final List<WorkspaceProposalSegment> segments;
 
-  WorkspaceProposalNavigation({
+  const WorkspaceProposalNavigation({
     required this.segments,
   });
 

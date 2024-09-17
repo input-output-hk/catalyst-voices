@@ -2,7 +2,7 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 
 class CampaignCommentsPanel extends StatelessWidget {
-  const CampaignCommentsPanel();
+  const CampaignCommentsPanel({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +13,7 @@ class CampaignCommentsPanel extends StatelessWidget {
       tabs: [
         SpaceSidePanelTab(
           name: 'Comments',
-          body: Offstage(),
+          body: const Offstage(),
         ),
       ],
     );

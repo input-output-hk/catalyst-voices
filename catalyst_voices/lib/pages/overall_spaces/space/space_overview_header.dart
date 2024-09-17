@@ -18,11 +18,11 @@ class SpaceOverviewHeader extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
       child: Row(
         children: [
           SpaceAvatar(space),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Expanded(
             child: Text(
               space.localizedName(context.l10n),
@@ -32,7 +32,7 @@ class SpaceOverviewHeader extends StatelessWidget {
                 color: theme.colors.textOnPrimaryLevel0,
               ),
             ),
-          )
+          ),
         ],
       ),
     );

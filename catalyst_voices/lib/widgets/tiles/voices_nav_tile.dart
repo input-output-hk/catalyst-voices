@@ -8,21 +8,21 @@ class VoicesNavTile extends StatelessWidget {
   final Widget? leading;
   final Widget? trailing;
   final String name;
-  final ProposalStatus status;
+  final ProposalStatus? status;
 
   const VoicesNavTile({
     super.key,
     this.leading,
     this.trailing,
     required this.name,
-    required this.status,
+    this.status,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final iconButtonStyle = ButtonStyle(
+    const iconButtonStyle = ButtonStyle(
       fixedSize: WidgetStatePropertyAll(Size.square(48)),
     );
 
@@ -38,10 +38,10 @@ class VoicesNavTile extends StatelessWidget {
     return IconTheme(
       data: iconTheme,
       child: IconButtonTheme(
-        data: IconButtonThemeData(style: iconButtonStyle),
+        data: const IconButtonThemeData(style: iconButtonStyle),
         child: Container(
-          constraints: BoxConstraints(minHeight: 56),
-          padding: EdgeInsets.only(left: 16),
+          constraints: const BoxConstraints(minHeight: 56),
+          padding: const EdgeInsets.only(left: 16),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -54,9 +54,9 @@ class VoicesNavTile extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              ProposalStatusContainer(type: status),
+              if (status != null) ProposalStatusContainer(type: status!),
               if (trailing != null) trailing!,
-            ].separatedBy(SizedBox(width: 12)).toList(),
+            ].separatedBy(const SizedBox(width: 12)).toList(),
           ),
         ),
       ),
