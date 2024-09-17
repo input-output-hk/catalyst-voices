@@ -154,7 +154,6 @@ pub(crate) struct Cip36InsertQuery {
 
 impl Cip36InsertQuery {
     /// Create new data set for CIP-36 Registrations Insert Query Batch.
-    #[allow(dead_code)]
     pub(crate) fn new() -> Self {
         Cip36InsertQuery {
             cip36_reg_data: Vec::new(),
@@ -176,7 +175,6 @@ impl Cip36InsertQuery {
     }
 
     /// Index the CIP-36 registrations in a transaction.
-    #[allow(dead_code)]
     pub(crate) fn index(
         &mut self, txn: usize, txn_index: i16, slot_no: u64, block: &MultiEraBlock,
     ) {
@@ -216,7 +214,6 @@ impl Cip36InsertQuery {
     /// Execute the CIP-36 Registration Indexing Queries.
     ///
     /// Consumes the `self` and returns a vector of futures.
-    #[allow(dead_code)]
     pub(crate) fn execute(self, session: &Arc<CassandraSession>) -> FallibleQueryTasks {
         let mut query_handles: FallibleQueryTasks = Vec::new();
 
