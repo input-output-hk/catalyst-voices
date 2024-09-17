@@ -2,6 +2,7 @@
 
 // These Modules contain endpoints
 mod api;
+
 mod docs;
 // These modules are utility or common types/functions
 mod common;
