@@ -21,7 +21,7 @@ class NoInternetConnectionBanner extends StatelessWidget {
 
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          margin: const EdgeInsets.symmetric(horizontal: 16),
+          margin: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: VoicesColors.darkAvatarsError,
             borderRadius: BorderRadius.circular(8),
