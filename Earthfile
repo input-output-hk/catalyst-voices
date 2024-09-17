@@ -1,8 +1,8 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:feat/cat-gateway-changes AS mdlint-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:feat/cat-gateway-changes AS cspell-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:feat/cat-gateway-changes AS postgresql-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:v3.2.03 AS mdlint-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:v3.2.03 AS cspell-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.2.03 AS postgresql-ci
 
 FROM debian:stable-slim
 
@@ -18,7 +18,7 @@ markdown-check-fix:
 
     DO mdlint-ci+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
 
-# Make sure the project dictionary is properly sorted.
+# clean-spelling-list : Make sure the project dictionary is properly sorted.
 clean-spelling-list:
     DO cspell-ci+CLEAN
 

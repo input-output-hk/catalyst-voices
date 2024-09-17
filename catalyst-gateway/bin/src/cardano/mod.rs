@@ -15,7 +15,7 @@ use crate::{
     settings::Settings,
 };
 
-pub(crate) mod cip36_registration;
+// pub(crate) mod cip36_registration_obsolete;
 pub(crate) mod util;
 
 /// Blocks batch length that will trigger the blocks buffer to be written to the database.
