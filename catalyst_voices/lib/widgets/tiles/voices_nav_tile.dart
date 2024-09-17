@@ -9,6 +9,9 @@ class VoicesNavTile extends StatelessWidget {
   final Widget? trailing;
   final String name;
   final ProposalStatus? status;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
+  final VoidCallback? onTap;
 
   const VoicesNavTile({
     super.key,
@@ -16,6 +19,9 @@ class VoicesNavTile extends StatelessWidget {
     this.trailing,
     required this.name,
     this.status,
+    this.backgroundColor,
+    this.foregroundColor,
+    this.onTap,
   });
 
   @override
@@ -27,36 +33,49 @@ class VoicesNavTile extends StatelessWidget {
     );
 
     final nameTextStyle = theme.textTheme.labelLarge?.copyWith(
-      color: theme.colors.textPrimary,
+      color: foregroundColor ?? theme.colors.textPrimary,
     );
 
     final iconTheme = IconThemeData(
       size: 24,
-      color: theme.colors.iconsForeground,
+      color: foregroundColor ?? theme.colors.iconsForeground,
     );
 
     return IconTheme(
       data: iconTheme,
       child: IconButtonTheme(
         data: const IconButtonThemeData(style: iconButtonStyle),
-        child: Container(
+        child: ConstrainedBox(
           constraints: const BoxConstraints(minHeight: 56),
-          padding: const EdgeInsets.only(left: 16),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              if (leading != null) leading!,
-              Expanded(
-                child: Text(
-                  name,
-                  style: nameTextStyle,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+          child: Material(
+            type: backgroundColor != null
+                ? MaterialType.canvas
+                : MaterialType.transparency,
+            shape: const StadiumBorder(),
+            color: backgroundColor,
+            child: InkWell(
+              onTap: onTap,
+              customBorder: const StadiumBorder(),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 16),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    if (leading != null) leading!,
+                    Expanded(
+                      child: Text(
+                        name,
+                        style: nameTextStyle,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (status != null) ProposalStatusContainer(type: status!),
+                    if (trailing != null) trailing!,
+                  ].separatedBy(const SizedBox(width: 12)).toList(),
                 ),
               ),
-              if (status != null) ProposalStatusContainer(type: status!),
-              if (trailing != null) trailing!,
-            ].separatedBy(const SizedBox(width: 12)).toList(),
+            ),
           ),
         ),
       ),

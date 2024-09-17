@@ -43,12 +43,12 @@ class _LockButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesFilledButton(
-      trailing: VoicesAssets.icons.lockOpen.buildIcon(),
+    return VoicesIconButton.filled(
+      style: const ButtonStyle(shape: WidgetStatePropertyAll(CircleBorder())),
       onTap: () {
         context.read<SessionBloc>().add(const GuestSessionEvent());
       },
-      child: Text(context.l10n.unlock),
+      child: VoicesAssets.icons.lockClosed.buildIcon(),
     );
   }
 }
@@ -58,12 +58,12 @@ class _UnlockButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesIconButton.filled(
-      style: const ButtonStyle(shape: WidgetStatePropertyAll(CircleBorder())),
+    return VoicesFilledButton(
+      trailing: VoicesAssets.icons.lockOpen.buildIcon(),
       onTap: () {
         context.read<SessionBloc>().add(const ActiveUserSessionEvent());
       },
-      child: VoicesAssets.icons.lockClosed.buildIcon(),
+      child: Text(context.l10n.unlock),
     );
   }
 }
