@@ -15,7 +15,10 @@ use super::{
     index_certs::CertInsertQuery,
     index_txi::TxiInsertQuery,
     index_txo::TxoInsertQuery,
-    staked_ada::{get_txi_by_txn_hash::GetTxiByTxnHashesQuery, get_txo_by_stake_address::GetTxoByStakeAddressQuery, UpdateTxoSpentQuery},
+    staked_ada::{
+        get_txi_by_txn_hash::GetTxiByTxnHashesQuery,
+        get_txo_by_stake_address::GetTxoByStakeAddressQuery, UpdateTxoSpentQuery,
+    },
 };
 use crate::settings::{CassandraEnvVars, CASSANDRA_MIN_BATCH_SIZE};
 
@@ -162,9 +165,7 @@ impl PreparedQueries {
     pub(crate) async fn execute_iter<P>(
         &self, session: Arc<Session>, select_query: PreparedSelectQuery, params: P,
     ) -> anyhow::Result<RowIterator>
-    where
-        P: SerializeRow,
-    {
+    where P: SerializeRow {
         let prepared_stmt = match select_query {
             PreparedSelectQuery::GetTxoByStakeAddress => &self.txo_by_stake_address_query,
             PreparedSelectQuery::GetTxiByTransactionHash => &self.txi_by_txn_hash_query,
