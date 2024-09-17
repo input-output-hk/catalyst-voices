@@ -324,4 +324,13 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get guest => 'Guest';
+
+  @override
+  String get noConnectionBannerRefreshButtonText => 'Refresh';
+
+  @override
+  String get noConnectionBannerTitle => 'No internet connection';
+
+  @override
+  String get noConnectionBannerDescription => 'Your internet is playing hide and seek. Check your internet connection, or try again in a moment.';
 }

@@ -621,6 +621,24 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Guest'**
   String get guest;
+
+  /// Text shown in the No Internet Connection Banner widget for the refresh button.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get noConnectionBannerRefreshButtonText;
+
+  /// Text shown in the No Internet Connection Banner widget for the title.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection'**
+  String get noConnectionBannerTitle;
+
+  /// Text shown in the No Internet Connection Banner widget for the description below the title.
+  ///
+  /// In en, this message translates to:
+  /// **'Your internet is playing hide and seek. Check your internet connection, or try again in a moment.'**
+  String get noConnectionBannerDescription;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

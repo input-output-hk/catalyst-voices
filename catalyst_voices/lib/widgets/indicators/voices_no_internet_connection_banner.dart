@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class NoInternetConnectionBanner extends StatelessWidget {
@@ -41,17 +42,21 @@ class NoInternetConnectionBanner extends StatelessWidget {
                           color: VoicesColors.darkIconsOnImage,
                         ),
                         const SizedBox(width: 8),
-                        Text(
-                          'No internet connection',
-                          style:
-                              Theme.of(context).textTheme.titleLarge!.copyWith(
-                                    color: VoicesColors.darkTextOnPrimaryLevel0,
-                                  ),
+                        Expanded(
+                          child: Text(
+                            context.l10n.noConnectionBannerTitle,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge!
+                                .copyWith(
+                                  color: VoicesColors.darkTextOnPrimaryLevel0,
+                                ),
+                          ),
                         ),
                       ],
                     ),
                     Text(
-                      'Your internet is playing hide and seek. Check your internet connection, or try again in a moment.',
+                      context.l10n.noConnectionBannerDescription,
                       style: Theme.of(context).textTheme.bodySmall!.copyWith(
                             color: VoicesColors.darkTextOnPrimaryLevel0,
                           ),
@@ -68,7 +73,7 @@ class NoInternetConnectionBanner extends StatelessWidget {
                     VoicesTextButton(
                       onTap: onRefresh,
                       child: Text(
-                        'Refresh',
+                        context.l10n.noConnectionBannerRefreshButtonText,
                         style: Theme.of(context).textTheme.labelLarge!.copyWith(
                               color: VoicesColors.darkTextOnPrimaryLevel0,
                             ),
