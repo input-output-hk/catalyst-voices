@@ -9,10 +9,7 @@ use super::types::SlotNumber;
 use crate::{
     db::index::{
         session::CassandraSession,
-        staked_ada::{
-            GetTxiByTxnHashesQuery, GetTxiByTxnHashesQueryParams, GetTxoByStakeAddressQuery,
-            GetTxoByStakeAddressQueryParams, UpdateTxoSpentQuery, UpdateTxoSpentQueryParams,
-        },
+        staked_ada::{get_txi_by_txn_hash::{GetTxiByTxnHashesQuery, GetTxiByTxnHashesQueryParams}, get_txo_by_stake_address::{GetTxoByStakeAddressQuery, GetTxoByStakeAddressQueryParams}, UpdateTxoSpentQuery, UpdateTxoSpentQueryParams},
     },
     service::common::{
         objects::cardano::{
@@ -130,13 +127,16 @@ async fn get_txo_by_txn(
         }
 
         let txn_map = txos_by_txn.entry(row.txn_hash).or_insert(HashMap::new());
-        txn_map.insert(row.txo, TxoInfo {
-            value: row.value,
-            txn: row.txn,
-            txo: row.txo,
-            slot_no: row.slot_no,
-            spent_slot_no: None,
-        });
+        txn_map.insert(
+            row.txo,
+            TxoInfo {
+                value: row.value,
+                txn: row.txn,
+                txo: row.txo,
+                slot_no: row.slot_no,
+                spent_slot_no: None,
+            },
+        );
     }
 
     Ok(txos_by_txn)
