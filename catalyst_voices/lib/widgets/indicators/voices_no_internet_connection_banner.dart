@@ -4,14 +4,12 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class NoInternetConnectionBanner extends StatelessWidget {
-  final VoidCallback onRefresh;
+  final VoidCallback? onRefresh;
 
   const NoInternetConnectionBanner({
     super.key,
-    this.onRefresh = _noop,
+    this.onRefresh,
   });
-
-  static void _noop() {}
 
   @override
   Widget build(BuildContext context) {
