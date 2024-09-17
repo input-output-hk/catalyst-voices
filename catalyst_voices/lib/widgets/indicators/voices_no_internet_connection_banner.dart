@@ -8,8 +8,8 @@ import 'package:flutter/material.dart';
 /// Includes a refresh button, which is displayed only on desktop-sized screens.
 /// The [onRefresh] callback is triggered when the refresh button is pressed.
 /// If no [onRefresh] callback is provided, the button will appear disabled.
-/// 
-/// The banner is only visible when there is no internet connection and is 
+///
+/// The banner is only visible when there is no internet connection and is
 /// typically used in scenarios where users need to be alerted to connectivity
 /// issues.
 ///
@@ -83,19 +83,14 @@ class NoInternetConnectionBanner extends StatelessWidget {
               ),
               if (shouldButtonDisplay) ...[
                 const SizedBox(height: 16),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    VoicesTextButton(
-                      onTap: onRefresh,
-                      child: Text(
-                        context.l10n.noConnectionBannerRefreshButtonText,
-                        style: Theme.of(context).textTheme.labelLarge!.copyWith(
-                              color: VoicesColors.darkTextOnPrimaryLevel0,
-                            ),
-                      ),
-                    ),
-                  ],
+                VoicesTextButton(
+                  onTap: onRefresh,
+                  child: Text(
+                    context.l10n.noConnectionBannerRefreshButtonText,
+                    style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                          color: VoicesColors.darkTextOnPrimaryLevel0,
+                        ),
+                  ),
                 ),
               ],
             ],
