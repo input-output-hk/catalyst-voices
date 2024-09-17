@@ -1,6 +1,4 @@
 import 'package:catalyst_voices/pages/spaces/spaces_drawer.dart';
-import 'package:catalyst_voices/widgets/app_bar/session/session_header.dart';
-import 'package:catalyst_voices/widgets/app_bar/session/user_header.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
@@ -20,8 +18,8 @@ class SpacesShellPage extends StatelessWidget {
     return Scaffold(
       appBar: const VoicesAppBar(
         actions: [
-          SessionHeader(),
-          UserHeader(),
+          SessionActionHeader(),
+          SessionStateHeader(),
         ],
       ),
       drawer: SpacesDrawer(space: space),

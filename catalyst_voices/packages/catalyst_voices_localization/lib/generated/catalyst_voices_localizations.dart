@@ -621,6 +621,12 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Guest'**
   String get guest;
+
+  /// Refers to user that created keychain but is locked
+  ///
+  /// In en, this message translates to:
+  /// **'Visitor'**
+  String get visitor;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

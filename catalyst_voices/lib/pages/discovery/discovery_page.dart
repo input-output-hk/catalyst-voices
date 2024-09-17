@@ -1,3 +1,5 @@
+import 'package:catalyst_voices/pages/discovery/current_status_text.dart';
+import 'package:catalyst_voices/pages/discovery/toggle_state_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
@@ -18,11 +20,11 @@ class DiscoveryPage extends StatelessWidget {
           sliver: SliverList(
             delegate: SliverChildListDelegate(
               [
-                const _Segment(name: 'Segment 1'),
+                const _Segment(key: ValueKey('Segment1Key')),
                 const SizedBox(height: 24),
-                const _Segment(name: 'Segment 2'),
+                const _Segment(key: ValueKey('Segment2Key')),
                 const SizedBox(height: 24),
-                const _Segment(name: 'Segment 3'),
+                const _Segment(key: ValueKey('Segment3Key')),
               ],
             ),
           ),
@@ -57,10 +59,8 @@ class _SpacesNavigationLocation extends StatelessWidget {
 
 class _Segment extends StatelessWidget {
   const _Segment({
-    required this.name,
+    super.key,
   });
-
-  final String name;
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +70,7 @@ class _Segment extends StatelessWidget {
       aspectRatio: 1376 / 673,
       child: Container(
         decoration: BoxDecoration(
-          color: theme.colors.onSurfaceNeutralOpaqueLv1,
+          color: theme.colors.elevationsOnSurfaceNeutralLv1White,
           border: Border.all(color: theme.colors.outlineBorderVariant!),
           borderRadius: BorderRadius.circular(12),
         ),
@@ -78,12 +78,9 @@ class _Segment extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              name,
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: theme.colors.textOnPrimary,
-              ),
-            ),
+            const CurrentUserStatusText(),
+            const SizedBox(height: 8),
+            const ToggleStateText(),
             const Spacer(),
             VoicesFilledButton(
               child: const Text('CTA to Model'),
