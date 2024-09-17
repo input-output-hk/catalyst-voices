@@ -401,5 +401,17 @@
   "visitor": "Visitor",
   "@visitor": {
     "description": "Refers to user that created keychain but is locked"
+  },
+  "noConnectionBannerRefreshButtonText": "Refresh",
+  "@noConnectionBannerRefreshButtonText": {
+    "description": "Text shown in the No Internet Connection Banner widget for the refresh button."
+  },
+  "noConnectionBannerTitle": "No internet connection",
+  "@noConnectionBannerTitle": {
+    "description": "Text shown in the No Internet Connection Banner widget for the title."
+  },
+  "noConnectionBannerDescription": "Your internet is playing hide and seek. Check your internet connection, or try again in a moment.",
+  "@noConnectionBannerDescription": {
+    "description": "Text shown in the No Internet Connection Banner widget for the description below the title."
   }
 }
