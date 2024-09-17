@@ -21,6 +21,7 @@ class _ToggleStateTextState extends State<ToggleStateText> {
 
   @override
   void initState() {
+    super.initState();
     _tapVisitor.onTap = () {
       context.read<SessionBloc>().add(const VisitorSessionEvent());
     };
@@ -30,7 +31,6 @@ class _ToggleStateTextState extends State<ToggleStateText> {
     _tapActiveUser.onTap = () {
       context.read<SessionBloc>().add(const ActiveUserSessionEvent());
     };
-    super.initState();
   }
 
   @override
