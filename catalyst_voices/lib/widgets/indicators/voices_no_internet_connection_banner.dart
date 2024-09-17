@@ -6,31 +6,31 @@ class NoInternetConnectionBanner extends StatelessWidget {
   final VoidCallback onRefresh;
 
   const NoInternetConnectionBanner({
-    Key? key,
+    super.key,
     this.onRefresh = _noop,
-  }) : super(key: key);
+  });
 
   static void _noop() {}
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          bool shouldButtonDisplay = constraints.maxWidth > 744;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final shouldButtonDisplay = constraints.maxWidth > 744;
 
-          return Container(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            margin: EdgeInsets.symmetric(horizontal: 16),
-            decoration: BoxDecoration(
-              color: VoicesColors.darkAvatarsError,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: VoicesColors.darkAvatarsError,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
@@ -40,7 +40,7 @@ class NoInternetConnectionBanner extends StatelessWidget {
                           VoicesAssets.icons.wifi.path,
                           color: VoicesColors.darkIconsOnImage,
                         ),
-                        SizedBox(width: 8),
+                        const SizedBox(width: 8),
                         Text(
                           'No internet connection',
                           style: Theme.of(context)
@@ -55,33 +55,30 @@ class NoInternetConnectionBanner extends StatelessWidget {
                       'Your internet is playing hide and seek. Check your internet connection, or try again in a moment.',
                       style: Theme.of(context).textTheme.bodySmall!.copyWith(
                           color: VoicesColors.darkTextOnPrimaryLevel0),
+                      softWrap: true,
                     ),
                   ],
                 ),
-                shouldButtonDisplay ? SizedBox(height: 16) : Container(),
-                shouldButtonDisplay
-                    ? Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          VoicesTextButton(
-                              onTap: this.onRefresh,
-                              child: Text(
-                                'Refresh',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelLarge!
-                                    .copyWith(
-                                        color: VoicesColors
-                                            .darkTextOnPrimaryLevel0),
-                              ))
-                        ],
-                      )
-                    : Container()
-              ],
-            ),
-          );
-        },
-      ),
+              ),
+              if (shouldButtonDisplay) const SizedBox(height: 16),
+              if (shouldButtonDisplay)
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    VoicesTextButton(
+                      onTap: onRefresh,
+                      child: Text(
+                        'Refresh',
+                        style: Theme.of(context).textTheme.labelLarge!.copyWith(
+                            color: VoicesColors.darkTextOnPrimaryLevel0),
+                      ),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
