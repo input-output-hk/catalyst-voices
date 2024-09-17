@@ -79,7 +79,7 @@ impl GetTxoByStakeAddressQuery {
         get_txo_by_stake_address_query
     }
 
-    /// Executes a get txo by stake adress query.
+    /// Executes a get txo by stake address query.
     pub(crate) async fn execute(
         session: &CassandraSession, params: GetTxoByStakeAddressQueryParams,
     ) -> anyhow::Result<TypedRowIterator<GetTxoByStakeAddressQueryResult>> {
@@ -100,7 +100,7 @@ pub(crate) struct GetTxiByTxnHashesQueryParams {
 }
 
 impl GetTxiByTxnHashesQueryParams {
-    /// Create a new instance of [`GetTxiQueryParams`]
+    /// Create a new instance of [`GetTxiByTxnHashesQueryParams`]
     pub(crate) fn new(txn_hashes: Vec<Vec<u8>>) -> Self {
         Self { txn_hashes }
     }
