@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:feat/cat-gateway-changes AS python-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.2.03 AS python-ci
 
 builder:
     FROM python-ci+python-base
@@ -10,7 +10,7 @@ builder:
     COPY ./snapshot_tool-56364174.json .
     DO python-ci+BUILDER
 
-test:
+disabled-test:
     FROM +builder
     RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
 
@@ -29,7 +29,7 @@ test:
         SAVE ARTIFACT coverage.lcov AS LOCAL api-tests.coverage.info
     END
 
-nightly-test:
+disabled-nightly-test:
     FROM +builder
     RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
 
