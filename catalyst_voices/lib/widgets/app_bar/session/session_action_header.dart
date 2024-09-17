@@ -30,10 +30,10 @@ class _GetStartedButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesFilledButton(
-      child: Text(context.l10n.getStarted),
       onTap: () {
         context.read<SessionBloc>().add(const ActiveUserSessionEvent());
       },
+      child: Text(context.l10n.getStarted),
     );
   }
 }
@@ -45,10 +45,10 @@ class _LockButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesFilledButton(
       trailing: VoicesAssets.icons.lockOpen.buildIcon(),
-      child: Text(context.l10n.unlock),
       onTap: () {
         context.read<SessionBloc>().add(const GuestSessionEvent());
       },
+      child: Text(context.l10n.unlock),
     );
   }
 }
@@ -59,10 +59,11 @@ class _UnlockButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesIconButton.filled(
-      child: VoicesAssets.icons.lockClosed.buildIcon(),
+      style: const ButtonStyle(shape: WidgetStatePropertyAll(CircleBorder())),
       onTap: () {
         context.read<SessionBloc>().add(const ActiveUserSessionEvent());
       },
+      child: VoicesAssets.icons.lockClosed.buildIcon(),
     );
   }
 }
