@@ -362,7 +362,7 @@
   "@clickToRestart": {
     "description": "In different places update popup body"
   },
-  "spaceTreasuryName": "Treasury",
+  "spaceTreasuryName": "Treasury space",
   "@spaceTreasuryName": {
     "description": "Name of space shown in different spaces that indicates its origin"
   },
@@ -378,7 +378,7 @@
   "@spaceVotingName": {
     "description": "Name of space shown in different spaces that indicates its origin"
   },
-  "spaceFundedProjects": "Funded Projects",
+  "spaceFundedProjects": "Funded project space",
   "@spaceFundedProjects": {
     "description": "Name of space shown in different spaces that indicates its origin"
   },
