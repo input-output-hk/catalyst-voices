@@ -8,14 +8,14 @@ class VoicesNavTile extends StatelessWidget {
   final Widget? leading;
   final Widget? trailing;
   final String name;
-  final ProposalStatus status;
+  final ProposalStatus? status;
 
   const VoicesNavTile({
     super.key,
     this.leading,
     this.trailing,
     required this.name,
-    required this.status,
+    this.status,
   });
 
   @override
@@ -54,7 +54,7 @@ class VoicesNavTile extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              ProposalStatusContainer(type: status),
+              if (status != null) ProposalStatusContainer(type: status!),
               if (trailing != null) trailing!,
             ].separatedBy(const SizedBox(width: 12)).toList(),
           ),

@@ -308,8 +308,20 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get spaceWorkspaceName => 'Workspace';
 
   @override
-  String get spaceVotingName => 'Treasury';
+  String get spaceVotingName => 'Voting space';
 
   @override
   String get spaceFundedProjects => 'Funded Projects';
+
+  @override
+  String get lock => 'Lock';
+
+  @override
+  String get unlock => 'Unlock';
+
+  @override
+  String get getStarted => 'Get Started';
+
+  @override
+  String get guest => 'Guest';
 }
