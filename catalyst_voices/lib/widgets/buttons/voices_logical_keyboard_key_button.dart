@@ -7,6 +7,14 @@ final Map<int, SvgGenImage> _keyIconMapping = {
   LogicalKeyboardKey.control.keyId: VoicesAssets.icons.chevronUp,
 };
 
+/// Wrapper for [VoicesKeyboardKeyButton] and [LogicalKeyboardKey].
+///
+/// This widget takes care or proper mapping of [data] to corresponding
+/// widget that should indicate given key.
+///
+/// See [_keyIconMapping] for list of icons with iconographic representation. If
+/// no icon is found for such [LogicalKeyboardKey] first letter
+/// of [LogicalKeyboardKey.keyLabel] will be used as fallback.
 class VoicesLogicalKeyboardKeyButton extends StatelessWidget {
   final LogicalKeyboardKey data;
 
