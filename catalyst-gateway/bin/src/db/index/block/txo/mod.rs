@@ -2,273 +2,27 @@
 //!
 //! Note, there are multiple ways TXO Data is indexed and they all happen in here.
 
+mod insert_txo;
+mod insert_txo_asset;
+mod insert_unstaked_txo;
+mod insert_unstaked_txo_asset;
+
 use std::sync::Arc;
 
-use scylla::{SerializeRow, Session};
+use scylla::Session;
 use tracing::{error, warn};
 
-use super::{
-    block::usize_to_i16,
-    queries::{FallibleQueryTasks, PreparedQueries, PreparedQuery, SizedBatch},
-    session::CassandraSession,
+use crate::{
+    db::index::{
+        queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
+        session::CassandraSession,
+    },
+    service::utilities::convert::i16_from_saturating,
+    settings::CassandraEnvVars,
 };
-use crate::settings::CassandraEnvVars;
 
 /// This is used to indicate that there is no stake address.
 const NO_STAKE_ADDRESS: &[u8] = &[];
-
-/// TXO by Stake Address Indexing query
-const INSERT_TXO_QUERY: &str = include_str!("./queries/insert_txo.cql");
-
-/// Insert TXO Query Parameters
-/// (Superset of data to support both Staked and Unstaked TXO records.)
-#[derive(SerializeRow)]
-struct TxoInsertParams {
-    /// Stake Address - Binary 28 bytes. 0 bytes = not staked.
-    stake_address: Vec<u8>,
-    /// Block Slot Number
-    slot_no: num_bigint::BigInt,
-    /// Transaction Offset inside the block.
-    txn: i16,
-    /// Transaction Output Offset inside the transaction.
-    txo: i16,
-    /// Actual full TXO Address
-    address: String,
-    /// Actual TXO Value in lovelace
-    value: num_bigint::BigInt,
-    /// Transactions hash.
-    txn_hash: Vec<u8>,
-}
-
-impl TxoInsertParams {
-    /// Create a new record for this transaction.
-    pub(crate) fn new(
-        stake_address: &[u8], slot_no: u64, txn: i16, txo: i16, address: &str, value: u64,
-        txn_hash: &[u8],
-    ) -> Self {
-        Self {
-            stake_address: stake_address.to_vec(),
-            slot_no: slot_no.into(),
-            txn,
-            txo,
-            address: address.to_string(),
-            value: value.into(),
-            txn_hash: txn_hash.to_vec(),
-        }
-    }
-
-    /// Prepare Batch of Staked Insert TXO Asset Index Data Queries
-    async fn prepare_batch(
-        session: &Arc<Session>, cfg: &CassandraEnvVars,
-    ) -> anyhow::Result<SizedBatch> {
-        let txo_insert_queries = PreparedQueries::prepare_batch(
-            session.clone(),
-            INSERT_TXO_QUERY,
-            cfg,
-            scylla::statement::Consistency::Any,
-            true,
-            false,
-        )
-        .await;
-
-        if let Err(ref error) = txo_insert_queries {
-            error!(error=%error,"Failed to prepare Insert TXO Asset Query.");
-        };
-
-        txo_insert_queries
-    }
-}
-
-/// Unstaked TXO by Stake Address Indexing query
-const INSERT_UNSTAKED_TXO_QUERY: &str = include_str!("./queries/insert_unstaked_txo.cql");
-
-/// Insert TXO Unstaked Query Parameters
-/// (Superset of data to support both Staked and Unstaked TXO records.)
-#[derive(SerializeRow)]
-struct TxoUnstakedInsertParams {
-    /// Transactions hash.
-    txn_hash: Vec<u8>,
-    /// Transaction Output Offset inside the transaction.
-    txo: i16,
-    /// Block Slot Number
-    slot_no: num_bigint::BigInt,
-    /// Transaction Offset inside the block.
-    txn: i16,
-    /// Actual full TXO Address
-    address: String,
-    /// Actual TXO Value in lovelace
-    value: num_bigint::BigInt,
-}
-
-impl TxoUnstakedInsertParams {
-    /// Create a new record for this transaction.
-    pub(crate) fn new(
-        txn_hash: &[u8], txo: i16, slot_no: u64, txn: i16, address: &str, value: u64,
-    ) -> Self {
-        Self {
-            txn_hash: txn_hash.to_vec(),
-            txo,
-            slot_no: slot_no.into(),
-            txn,
-            address: address.to_string(),
-            value: value.into(),
-        }
-    }
-
-    /// Prepare Batch of Staked Insert TXO Asset Index Data Queries
-    async fn prepare_batch(
-        session: &Arc<Session>, cfg: &CassandraEnvVars,
-    ) -> anyhow::Result<SizedBatch> {
-        let txo_insert_queries = PreparedQueries::prepare_batch(
-            session.clone(),
-            INSERT_UNSTAKED_TXO_QUERY,
-            cfg,
-            scylla::statement::Consistency::Any,
-            true,
-            false,
-        )
-        .await;
-
-        if let Err(ref error) = txo_insert_queries {
-            error!(error=%error,"Failed to prepare Insert TXO Asset Query.");
-        };
-
-        txo_insert_queries
-    }
-}
-
-/// TXO Asset by Stake Address Indexing Query
-const INSERT_TXO_ASSET_QUERY: &str = include_str!("./queries/insert_txo_asset.cql");
-
-/// Insert TXO Asset Query Parameters
-/// (Superset of data to support both Staked and Unstaked TXO records.)
-#[derive(SerializeRow)]
-struct TxoAssetInsertParams {
-    /// Stake Address - Binary 28 bytes. 0 bytes = not staked.
-    stake_address: Vec<u8>,
-    /// Block Slot Number
-    slot_no: num_bigint::BigInt,
-    /// Transaction Offset inside the block.
-    txn: i16,
-    /// Transaction Output Offset inside the transaction.
-    txo: i16,
-    /// Policy hash of the asset
-    policy_id: Vec<u8>,
-    /// Policy name of the asset
-    policy_name: String,
-    /// Value of the asset
-    value: num_bigint::BigInt,
-}
-
-impl TxoAssetInsertParams {
-    /// Create a new record for this transaction.
-    ///
-    /// Note Value can be either a u64 or an i64, so use a i128 to represent all possible
-    /// values.
-    #[allow(clippy::too_many_arguments)]
-    pub(crate) fn new(
-        stake_address: &[u8], slot_no: u64, txn: i16, txo: i16, policy_id: &[u8],
-        policy_name: &str, value: i128,
-    ) -> Self {
-        Self {
-            stake_address: stake_address.to_vec(),
-            slot_no: slot_no.into(),
-            txn,
-            txo,
-            policy_id: policy_id.to_vec(),
-            policy_name: policy_name.to_owned(),
-            value: value.into(),
-        }
-    }
-
-    /// Prepare Batch of Staked Insert TXO Asset Index Data Queries
-    async fn prepare_batch(
-        session: &Arc<Session>, cfg: &CassandraEnvVars,
-    ) -> anyhow::Result<SizedBatch> {
-        let txo_insert_queries = PreparedQueries::prepare_batch(
-            session.clone(),
-            INSERT_TXO_ASSET_QUERY,
-            cfg,
-            scylla::statement::Consistency::Any,
-            true,
-            false,
-        )
-        .await;
-
-        if let Err(ref error) = txo_insert_queries {
-            error!(error=%error,"Failed to prepare Insert TXO Asset Query.");
-        };
-
-        txo_insert_queries
-    }
-}
-
-/// Unstaked TXO Asset by Stake Address Indexing Query
-const INSERT_UNSTAKED_TXO_ASSET_QUERY: &str =
-    include_str!("./queries/insert_unstaked_txo_asset.cql");
-
-/// Insert TXO Asset Query Parameters
-/// (Superset of data to support both Staked and Unstaked TXO records.)
-#[derive(SerializeRow)]
-struct TxoUnstakedAssetInsertParams {
-    /// Transactions hash.
-    txn_hash: Vec<u8>,
-    /// Transaction Output Offset inside the transaction.
-    txo: i16,
-    /// Policy hash of the asset
-    policy_id: Vec<u8>,
-    /// Policy name of the asset
-    policy_name: String,
-    /// Block Slot Number
-    slot_no: num_bigint::BigInt,
-    /// Transaction Offset inside the block.
-    txn: i16,
-    /// Value of the asset
-    value: num_bigint::BigInt,
-}
-
-impl TxoUnstakedAssetInsertParams {
-    /// Create a new record for this transaction.
-    ///
-    /// Note Value can be either a u64 or an i64, so use a i128 to represent all possible
-    /// values.
-    #[allow(clippy::too_many_arguments)]
-    pub(crate) fn new(
-        txn_hash: &[u8], txo: i16, policy_id: &[u8], policy_name: &str, slot_no: u64, txn: i16,
-        value: i128,
-    ) -> Self {
-        Self {
-            txn_hash: txn_hash.to_vec(),
-            txo,
-            policy_id: policy_id.to_vec(),
-            policy_name: policy_name.to_owned(),
-            slot_no: slot_no.into(),
-            txn,
-            value: value.into(),
-        }
-    }
-
-    /// Prepare Batch of Staked Insert TXO Asset Index Data Queries
-    async fn prepare_batch(
-        session: &Arc<Session>, cfg: &CassandraEnvVars,
-    ) -> anyhow::Result<SizedBatch> {
-        let txo_insert_queries = PreparedQueries::prepare_batch(
-            session.clone(),
-            INSERT_UNSTAKED_TXO_ASSET_QUERY,
-            cfg,
-            scylla::statement::Consistency::Any,
-            true,
-            false,
-        )
-        .await;
-
-        if let Err(ref error) = txo_insert_queries {
-            error!(error=%error,"Failed to prepare Insert Unstaked TXO Asset Query.");
-        };
-
-        txo_insert_queries
-    }
-}
 
 /// Insert TXO Query and Parameters
 ///
@@ -276,13 +30,13 @@ impl TxoUnstakedAssetInsertParams {
 #[allow(dead_code)]
 pub(crate) struct TxoInsertQuery {
     /// Staked TXO Data Parameters
-    staked_txo: Vec<TxoInsertParams>,
+    staked_txo: Vec<insert_txo::Params>,
     /// Unstaked TXO Data Parameters
-    unstaked_txo: Vec<TxoUnstakedInsertParams>,
+    unstaked_txo: Vec<insert_unstaked_txo::Params>,
     /// Staked TXO Asset Data Parameters
-    staked_txo_asset: Vec<TxoAssetInsertParams>,
+    staked_txo_asset: Vec<insert_txo_asset::Params>,
     /// Unstaked TXO Asset Data Parameters
-    unstaked_txo_asset: Vec<TxoUnstakedAssetInsertParams>,
+    unstaked_txo_asset: Vec<insert_unstaked_txo_asset::Params>,
 }
 
 impl TxoInsertQuery {
@@ -300,11 +54,13 @@ impl TxoInsertQuery {
     pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &CassandraEnvVars,
     ) -> anyhow::Result<(SizedBatch, SizedBatch, SizedBatch, SizedBatch)> {
-        let txo_staked_insert_batch = TxoInsertParams::prepare_batch(session, cfg).await;
-        let txo_unstaked_insert_batch = TxoUnstakedInsertParams::prepare_batch(session, cfg).await;
-        let txo_staked_asset_insert_batch = TxoAssetInsertParams::prepare_batch(session, cfg).await;
+        let txo_staked_insert_batch = insert_txo::Params::prepare_batch(session, cfg).await;
+        let txo_unstaked_insert_batch =
+            insert_unstaked_txo::Params::prepare_batch(session, cfg).await;
+        let txo_staked_asset_insert_batch =
+            insert_txo_asset::Params::prepare_batch(session, cfg).await;
         let txo_unstaked_asset_insert_batch =
-            TxoUnstakedAssetInsertParams::prepare_batch(session, cfg).await;
+            insert_unstaked_txo_asset::Params::prepare_batch(session, cfg).await;
 
         Ok((
             txo_staked_insert_batch?,
@@ -394,10 +150,10 @@ impl TxoInsertQuery {
             };
 
             let staked = stake_address != NO_STAKE_ADDRESS;
-            let txo_index = usize_to_i16(txo_index);
+            let txo_index = i16_from_saturating(txo_index);
 
             if staked {
-                let params = TxoInsertParams::new(
+                let params = insert_txo::Params::new(
                     &stake_address,
                     slot_no,
                     txn,
@@ -409,7 +165,7 @@ impl TxoInsertQuery {
 
                 self.staked_txo.push(params);
             } else {
-                let params = TxoUnstakedInsertParams::new(
+                let params = insert_unstaked_txo::Params::new(
                     txn_hash,
                     txo_index,
                     slot_no,
@@ -429,7 +185,7 @@ impl TxoInsertQuery {
                         let value = policy_asset.any_coin();
 
                         if staked {
-                            let params = TxoAssetInsertParams::new(
+                            let params = insert_txo_asset::Params::new(
                                 &stake_address,
                                 slot_no,
                                 txn,
@@ -440,7 +196,7 @@ impl TxoInsertQuery {
                             );
                             self.staked_txo_asset.push(params);
                         } else {
-                            let params = TxoUnstakedAssetInsertParams::new(
+                            let params = insert_unstaked_txo_asset::Params::new(
                                 txn_hash,
                                 txo_index,
                                 &policy_id,

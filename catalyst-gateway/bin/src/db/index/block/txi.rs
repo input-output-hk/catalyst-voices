@@ -5,11 +5,13 @@ use std::sync::Arc;
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
-use super::{
-    queries::{FallibleQueryTasks, PreparedQueries, PreparedQuery, SizedBatch},
-    session::CassandraSession,
+use crate::{
+    db::index::{
+        queries::{FallibleQueryTasks, PreparedQueries, PreparedQuery, SizedBatch},
+        session::CassandraSession,
+    },
+    settings::CassandraEnvVars,
 };
-use crate::settings::CassandraEnvVars;
 
 /// Insert TXI Query and Parameters
 #[derive(SerializeRow)]
@@ -40,7 +42,7 @@ pub(crate) struct TxiInsertQuery {
 }
 
 /// TXI by Txn hash Index
-const INSERT_TXI_QUERY: &str = include_str!("./queries/insert_txi.cql");
+const INSERT_TXI_QUERY: &str = include_str!("./cql/insert_txi.cql");
 
 impl TxiInsertQuery {
     /// Create a new record for this transaction.

@@ -1,20 +1,20 @@
-//! Staked ADA related queries.
+//! Update the TXO Spent column to optimize future queries.
+
 use std::sync::Arc;
 
 use scylla::{SerializeRow, Session};
 use tracing::error;
 
-use super::{
-    queries::{FallibleQueryResults, PreparedQueries, PreparedQuery, SizedBatch},
-    session::CassandraSession,
+use crate::{
+    db::index::{
+        queries::{FallibleQueryResults, PreparedQueries, PreparedQuery, SizedBatch},
+        session::CassandraSession,
+    },
+    settings::CassandraEnvVars,
 };
-use crate::settings::CassandraEnvVars;
-
-pub(crate) mod get_txi_by_txn_hash;
-pub(crate) mod get_txo_by_stake_address;
 
 /// Update TXO spent query string.
-const UPDATE_TXO_SPENT_QUERY: &str = include_str!("../queries/update_txo_spent.cql");
+const UPDATE_TXO_SPENT_QUERY: &str = include_str!("../cql/update_txo_spent.cql");
 
 /// Update TXO spent query params.
 #[derive(SerializeRow)]

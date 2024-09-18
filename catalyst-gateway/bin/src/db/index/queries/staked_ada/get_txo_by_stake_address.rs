@@ -13,8 +13,7 @@ use crate::db::index::{
 };
 
 /// Get txo by stake address query string.
-const GET_TXO_BY_STAKE_ADDRESS_QUERY: &str =
-    include_str!("../queries/get_txo_by_stake_address.cql");
+const GET_TXO_BY_STAKE_ADDRESS_QUERY: &str = include_str!("../cql/get_txo_by_stake_address.cql");
 
 /// Get txo by stake address query parameters.
 #[derive(SerializeRow)]

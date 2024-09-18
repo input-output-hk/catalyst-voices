@@ -1,28 +1,26 @@
--- Index CIP-36 Registrations by Stake Address
-INSERT INTO cip36_registration_by_stake_address (
-    stake_address,
+-- Index CIP-36 Registrations by Vote Key
+INSERT INTO cip36_registration_invalid (
     vote_key,
     slot_no,
     txn,
+    stake_address,
     payment_address,
     is_payable,
     raw_nonce,
     nonce,
-    purpose,
+    cip36,
     signed,
-    strict_catalyst,
-    error_report
+    error_report,
 ) VALUES (
-    :stake_address,
     :vote_key,
     :slot_no,
     :txn,
+    :stake_address,
     :payment_address,
     :is_payable,
     :raw_nonce,
     :nonce,
-    :purpose,
+    :cip36,
     :signed,
-    :strict_catalyst,
     :error_report
 );
