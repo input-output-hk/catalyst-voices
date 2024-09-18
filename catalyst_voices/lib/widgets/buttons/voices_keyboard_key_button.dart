@@ -22,7 +22,7 @@ class VoicesKeyboardKeyButton extends StatelessWidget {
       fontSize: 14,
       fontWeight: FontWeight.w700,
       height: 1,
-      color: theme.colors.textOnPrimary,
+      color: theme.colors.textPrimary,
     );
 
     return IconTheme(
