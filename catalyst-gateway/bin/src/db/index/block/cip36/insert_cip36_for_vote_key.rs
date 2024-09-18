@@ -12,8 +12,8 @@ use crate::{
 };
 
 /// Index Registration by Vote Key
-const INSERT_CIP36_REGISTRATION_FOR_STAKE_ADDR_QUERY: &str =
-    include_str!("./cql/insert_cip36_for_stake_addr.cql");
+const INSERT_CIP36_REGISTRATION_FOR_VOTE_KEY_QUERY: &str =
+    include_str!("./cql/insert_cip36_for_vote_key.cql");
 
 /// Insert CIP-36 Registration Invalid Query Parameters
 #[derive(SerializeRow, Clone)]
@@ -59,7 +59,7 @@ impl Params {
     ) -> anyhow::Result<SizedBatch> {
         let insert_queries = PreparedQueries::prepare_batch(
             session.clone(),
-            INSERT_CIP36_REGISTRATION_FOR_STAKE_ADDR_QUERY,
+            INSERT_CIP36_REGISTRATION_FOR_VOTE_KEY_QUERY,
             cfg,
             scylla::statement::Consistency::Any,
             true,

@@ -18,8 +18,6 @@ const INSERT_CIP36_REGISTRATION_QUERY: &str = include_str!("./cql/insert_cip36.c
 #[derive(SerializeRow, Clone)]
 pub(super) struct Params {
     /// Stake key hash
-    vote_key: Vec<u8>,
-    /// Stake key hash
     stake_address: Vec<u8>,
     /// Nonce value after normalization.
     nonce: num_bigint::BigInt,
@@ -27,6 +25,8 @@ pub(super) struct Params {
     slot_no: num_bigint::BigInt,
     /// Transaction Index.
     txn: i16,
+    /// Voting Public Key
+    vote_key: Vec<u8>,
     /// Full Payment Address (not hashed, 32 byte ED25519 Public key).
     payment_address: MaybeUnset<Vec<u8>>,
     /// Is the stake address a script or not.
@@ -41,7 +41,6 @@ impl Params {
     /// Create a new Insert Query.
     pub fn new(vote_key: &VotingPubKey, slot_no: u64, txn: i16, cip36: &Cip36) -> Self {
         Params {
-            vote_key: vote_key.voting_pk.to_bytes().to_vec(),
             stake_address: cip36
                 .stake_pk
                 .map(|s| s.to_bytes().to_vec())
@@ -49,6 +48,7 @@ impl Params {
             nonce: cip36.nonce.into(),
             slot_no: slot_no.into(),
             txn,
+            vote_key: vote_key.voting_pk.to_bytes().to_vec(),
             payment_address: if cip36.payment_addr.is_empty() {
                 MaybeUnset::Unset
             } else {

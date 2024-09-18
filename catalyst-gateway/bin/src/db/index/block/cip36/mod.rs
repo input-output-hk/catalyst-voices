@@ -1,7 +1,7 @@
 //! Index CIP-36 Registrations.
 
 mod insert_cip36;
-mod insert_cip36_for_stake_addr;
+mod insert_cip36_for_vote_key;
 mod insert_cip36_invalid;
 
 use std::sync::Arc;
@@ -24,7 +24,7 @@ pub(crate) struct Cip36InsertQuery {
     /// Stake Registration Data captured during indexing.
     invalid: Vec<insert_cip36_invalid::Params>,
     /// Stake Registration Data captured during indexing.
-    for_stake: Vec<insert_cip36_for_stake_addr::Params>,
+    for_stake: Vec<insert_cip36_for_vote_key::Params>,
 }
 
 impl Cip36InsertQuery {
@@ -45,7 +45,7 @@ impl Cip36InsertQuery {
         let insert_cip36_invalid_batch =
             insert_cip36_invalid::Params::prepare_batch(session, cfg).await;
         let insert_cip36_for_stake_addr_batch =
-            insert_cip36_for_stake_addr::Params::prepare_batch(session, cfg).await;
+            insert_cip36_for_vote_key::Params::prepare_batch(session, cfg).await;
 
         Ok((
             insert_cip36_batch?,
@@ -71,7 +71,7 @@ impl Cip36InsertQuery {
                             vote_key, slot_no, txn_index, cip36,
                         ));
                         self.for_stake
-                            .push(insert_cip36_for_stake_addr::Params::new(
+                            .push(insert_cip36_for_vote_key::Params::new(
                                 Some(vote_key),
                                 slot_no,
                                 txn_index,
@@ -89,7 +89,7 @@ impl Cip36InsertQuery {
                             decoded_metadata.report.clone(),
                         ));
                         self.for_stake
-                            .push(insert_cip36_for_stake_addr::Params::new(
+                            .push(insert_cip36_for_vote_key::Params::new(
                                 None, slot_no, txn_index, cip36, false,
                             ));
                     }
@@ -102,7 +102,7 @@ impl Cip36InsertQuery {
                             decoded_metadata.report.clone(),
                         ));
                         self.for_stake
-                            .push(insert_cip36_for_stake_addr::Params::new(
+                            .push(insert_cip36_for_vote_key::Params::new(
                                 Some(vote_key),
                                 slot_no,
                                 txn_index,

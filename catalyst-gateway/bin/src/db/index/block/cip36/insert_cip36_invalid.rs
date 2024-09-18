@@ -19,13 +19,13 @@ const INSERT_CIP36_REGISTRATION_INVALID_QUERY: &str =
 #[derive(SerializeRow, Clone)]
 pub(super) struct Params {
     /// Stake key hash
-    vote_key: Vec<u8>,
+    stake_address: Vec<u8>,
     /// Slot Number the cert is in.
     slot_no: num_bigint::BigInt,
     /// Transaction Index.
     txn: i16,
     /// Stake key hash
-    stake_address: Vec<u8>,
+    vote_key: Vec<u8>,
     /// Full Payment Address (not hashed, 32 byte ED25519 Public key).
     payment_address: Vec<u8>,
     /// Is the stake address a script or not.
@@ -54,13 +54,13 @@ impl Params {
             Vec::new()
         };
         Params {
-            vote_key,
-            slot_no: slot_no.into(),
-            txn,
             stake_address: cip36
                 .stake_pk
                 .map(|s| s.to_bytes().to_vec())
                 .unwrap_or_default(),
+            slot_no: slot_no.into(),
+            txn,
+            vote_key,
             payment_address: cip36.payment_addr.clone(),
             is_payable: cip36.payable,
             raw_nonce: cip36.raw_nonce.into(),

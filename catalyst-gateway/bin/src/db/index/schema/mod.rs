@@ -61,7 +61,7 @@ const SCHEMAS: &[(&str, &str)] = &[
     ),
     (
         // CIP-36 Registration Table Schema
-        include_str!("./cql/cip36_registration_for_stake_addr.cql"),
+        include_str!("./cql/cip36_registration_for_vote_key.cql"),
         "Create Table CIP-36 Registration For a stake address",
     ),
 ];
