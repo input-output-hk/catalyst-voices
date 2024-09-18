@@ -70,14 +70,13 @@ impl Cip36InsertQuery {
                         self.registrations.push(insert_cip36::Params::new(
                             vote_key, slot_no, txn_index, cip36,
                         ));
-                        self.for_stake
-                            .push(insert_cip36_for_vote_key::Params::new(
-                                Some(vote_key),
-                                slot_no,
-                                txn_index,
-                                cip36,
-                                true,
-                            ));
+                        self.for_stake.push(insert_cip36_for_vote_key::Params::new(
+                            Some(vote_key),
+                            slot_no,
+                            txn_index,
+                            cip36,
+                            true,
+                        ));
                     }
                 } else {
                     if cip36.voting_keys.is_empty() {
@@ -88,10 +87,9 @@ impl Cip36InsertQuery {
                             cip36,
                             decoded_metadata.report.clone(),
                         ));
-                        self.for_stake
-                            .push(insert_cip36_for_vote_key::Params::new(
-                                None, slot_no, txn_index, cip36, false,
-                            ));
+                        self.for_stake.push(insert_cip36_for_vote_key::Params::new(
+                            None, slot_no, txn_index, cip36, false,
+                        ));
                     }
                     for vote_key in &cip36.voting_keys {
                         self.invalid.push(insert_cip36_invalid::Params::new(
@@ -101,14 +99,13 @@ impl Cip36InsertQuery {
                             cip36,
                             decoded_metadata.report.clone(),
                         ));
-                        self.for_stake
-                            .push(insert_cip36_for_vote_key::Params::new(
-                                Some(vote_key),
-                                slot_no,
-                                txn_index,
-                                cip36,
-                                false,
-                            ));
+                        self.for_stake.push(insert_cip36_for_vote_key::Params::new(
+                            Some(vote_key),
+                            slot_no,
+                            txn_index,
+                            cip36,
+                            false,
+                        ));
                     }
                 }
             }
