@@ -6,6 +6,7 @@ export 'avatars/voices_avatar.dart';
 export 'buttons/voices_buttons.dart';
 export 'buttons/voices_filled_button.dart';
 export 'buttons/voices_icon_button.dart';
+export 'buttons/voices_keyboard_key_button.dart';
 export 'buttons/voices_outlined_button.dart';
 export 'buttons/voices_segmented_button.dart';
 export 'buttons/voices_text_button.dart';
