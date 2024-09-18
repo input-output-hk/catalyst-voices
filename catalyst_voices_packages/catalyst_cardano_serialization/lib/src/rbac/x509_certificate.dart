@@ -7,6 +7,10 @@ import 'package:equatable/equatable.dart';
 
 bool _registeredASN1Names = false;
 
+/// Before we can interact with the asn1lib we must register frequent names,
+/// however there's no single entry point to catalyst_cardano_serialization
+/// and we must expect different starting points. Therefore we call the method
+/// to register these names each time we need to interact with the asn1lib.
 void _registerASN1FrequentNames() {
   if (!_registeredASN1Names) {
     _registeredASN1Names = true;
