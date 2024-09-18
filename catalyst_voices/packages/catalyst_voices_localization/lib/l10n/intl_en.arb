@@ -165,6 +165,26 @@
   "@proposalStatusDraft": {
     "description": "Indicates to user that status is in draft mode"
   },
+  "proposalStatusInProgress": "In progress",
+  "@proposalStatusInProgress": {
+    "description": "Indicates to user that status is in progress"
+  },
+  "proposalStatusPrivate": "Private",
+  "@proposalStatusPrivate": {
+    "description": "Indicates to user that status is in private mode"
+  },
+  "proposalStatusLive": "LIVE",
+  "@proposalStatusLive": {
+    "description": "Indicates to user that status is in live mode"
+  },
+  "proposalStatusCompleted": "Completed",
+  "@proposalStatusCompleted": {
+    "description": "Indicates to user that status is completed"
+  },
+  "proposalStatusOpen": "Open",
+  "@proposalStatusOpen": {
+    "description": "Indicates to user that status is in open mode"
+  },
   "fundedProposal": "Funded proposal",
   "@fundedProposal": {
     "description": "Label shown on a proposal card indicating that the proposal is funded."
@@ -273,9 +293,21 @@
   "@treasuryCampaignTitle": {
     "description": "Campaign title"
   },
-  "treasuryStepEdit": "Edit",
-  "@treasuryStepEdit": {
-    "description": "Button name in treasury step"
+  "stepEdit": "Edit",
+  "@stepEdit": {
+    "description": "Button name in step"
+  },
+  "workspaceProposalNavigation": "Proposal navigation",
+  "@workspaceProposalNavigation": {
+    "description": "Left panel name in workspace"
+  },
+  "workspaceProposalNavigationSegments": "Segments",
+  "@workspaceProposalNavigationSegments": {
+    "description": "Tab name in proposal setup panel"
+  },
+  "workspaceProposalSetup": "Proposal setup",
+  "@workspaceProposalSetup": {
+    "description": "Segment name"
   },
   "drawerSpaceTreasury": "Treasury",
   "@drawerSpaceTreasury": {
@@ -313,5 +345,73 @@
   "followed": "Followed",
   "@followed": {
     "description": "Refers to a list of followed items."
+  },
+  "overallSpacesSearchBrands": "Search Brands",
+  "@overallSpacesSearchBrands": {
+    "description": "Overall spaces search brands tile name"
+  },
+  "overallSpacesTasks": "Tasks",
+  "@overallSpacesTasks": {
+    "description": "Overall spaces tasks tile name"
+  },
+  "voicesUpdateReady": "Voices update ready",
+  "@voicesUpdateReady": {
+    "description": "In different places update popup title"
+  },
+  "clickToRestart": "Click to restart",
+  "@clickToRestart": {
+    "description": "In different places update popup body"
+  },
+  "spaceTreasuryName": "Treasury",
+  "@spaceTreasuryName": {
+    "description": "Name of space shown in different spaces that indicates its origin"
+  },
+  "spaceDiscoveryName": "Discovery space",
+  "@spaceDiscoveryName": {
+    "description": "Name of space shown in different spaces that indicates its origin"
+  },
+  "spaceWorkspaceName": "Workspace",
+  "@spaceWorkspaceName": {
+    "description": "Name of space shown in different spaces that indicates its origin"
+  },
+  "spaceVotingName": "Voting space",
+  "@spaceVotingName": {
+    "description": "Name of space shown in different spaces that indicates its origin"
+  },
+  "spaceFundedProjects": "Funded Projects",
+  "@spaceFundedProjects": {
+    "description": "Name of space shown in different spaces that indicates its origin"
+  },
+  "lock": "Lock",
+  "@lock": {
+    "description": "Refers to a lock action, i.e. to lock the session."
+  },
+  "unlock": "Unlock",
+  "@unlock": {
+    "description": "Refers to a unlock action, i.e. to unlock the session."
+  },
+  "getStarted": "Get Started",
+  "@getStarted": {
+    "description": "Refers to a get started action, i.e. to register."
+  },
+  "guest": "Guest",
+  "@guest": {
+    "description": "Refers to guest user."
+  },
+  "visitor": "Visitor",
+  "@visitor": {
+    "description": "Refers to user that created keychain but is locked"
+  },
+  "noConnectionBannerRefreshButtonText": "Refresh",
+  "@noConnectionBannerRefreshButtonText": {
+    "description": "Text shown in the No Internet Connection Banner widget for the refresh button."
+  },
+  "noConnectionBannerTitle": "No internet connection",
+  "@noConnectionBannerTitle": {
+    "description": "Text shown in the No Internet Connection Banner widget for the title."
+  },
+  "noConnectionBannerDescription": "Your internet is playing hide and seek. Check your internet connection, or try again in a moment.",
+  "@noConnectionBannerDescription": {
+    "description": "Text shown in the No Internet Connection Banner widget for the description below the title."
   }
 }

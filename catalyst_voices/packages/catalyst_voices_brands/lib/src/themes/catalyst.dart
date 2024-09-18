@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_brands/src/brands/brand.dart';
 import 'package:catalyst_voices_brands/src/theme_extensions/brand_assets.dart';
 import 'package:catalyst_voices_brands/src/theme_extensions/voices_color_scheme.dart';
 import 'package:catalyst_voices_brands/src/themes/widgets/buttons_theme.dart';
@@ -170,9 +171,8 @@ final ThemeData catalyst = _buildThemeData(
   lightBrandAssets,
 );
 
-final BrandAssets darkBrandAssets = BrandAssets(
-  logo: VoicesAssets.images.catalystLogoWhite,
-  logoIcon: VoicesAssets.images.catalystLogoIconWhite,
+const BrandAssets darkBrandAssets = BrandAssets(
+  brand: Brand.catalyst,
 );
 
 /// Dark [ThemeData] for the `catalyst` brand.
@@ -182,9 +182,8 @@ final ThemeData darkCatalyst = _buildThemeData(
   darkBrandAssets,
 );
 
-final BrandAssets lightBrandAssets = BrandAssets(
-  logo: VoicesAssets.images.catalystLogo,
-  logoIcon: VoicesAssets.images.catalystLogoIcon,
+const BrandAssets lightBrandAssets = BrandAssets(
+  brand: Brand.catalyst,
 );
 
 TextTheme _buildTextTheme(VoicesColorScheme voicesColorScheme) {
@@ -308,11 +307,12 @@ ThemeData _buildThemeData(
       scrolledUnderElevation: 0,
     ),
     drawerTheme: DrawerThemeData(
-      backgroundColor: voicesColorScheme.elevationsOnSurfaceNeutralLv0,
+      backgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv0,
     ),
     dialogTheme: DialogTheme(
-      // TODO(damian-molinski): themed value needed. We don't have it defined yet.
-      barrierColor: Color(0x612A3D61),
+      // TODO(damian-molinski): themed value needed.
+      // We don't have it defined yet.
+      barrierColor: const Color(0x612A3D61),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       clipBehavior: Clip.hardEdge,
       backgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv0,
@@ -328,7 +328,7 @@ ThemeData _buildThemeData(
       space: 16,
       thickness: 1,
     ),
-    tabBarTheme: TabBarTheme(
+    tabBarTheme: const TabBarTheme(
       tabAlignment: TabAlignment.start,
     ),
     progressIndicatorTheme: ProgressIndicatorThemeData(
@@ -350,5 +350,8 @@ ThemeData _buildThemeData(
       voicesColorScheme,
       brandAssets,
     ],
+    textSelectionTheme: TextSelectionThemeData(
+      cursorColor: voicesColorScheme.textPrimary,
+    ),
   ).copyWithButtonsTheme().copyWithTogglesTheme();
 }

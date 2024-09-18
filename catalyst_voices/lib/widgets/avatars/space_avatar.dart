@@ -1,6 +1,6 @@
+import 'package:catalyst_voices/common/ext/ext.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
-import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
@@ -27,60 +27,12 @@ class SpaceAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final config = data._config(context);
-
     return VoicesAvatar(
-      icon: Icon(config.iconData),
-      backgroundColor: config.backgroundColor,
-      foregroundColor: config.foregroundColor,
+      icon: data.icon.buildIcon(),
+      backgroundColor: data.backgroundColor(context),
+      foregroundColor: data.foregroundColor(context),
       padding: padding,
       radius: radius,
     );
-  }
-}
-
-final class _SpaceAvatarConfig {
-  final IconData iconData;
-  final Color backgroundColor;
-  final Color foregroundColor;
-
-  _SpaceAvatarConfig({
-    required this.iconData,
-    required this.backgroundColor,
-    required this.foregroundColor,
-  });
-}
-
-extension _SpaceExt on Space {
-  _SpaceAvatarConfig _config(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return switch (this) {
-      Space.treasury => _SpaceAvatarConfig(
-          iconData: CatalystVoicesIcons.fund,
-          backgroundColor: theme.colors.successContainer!,
-          foregroundColor: theme.colors.iconsSuccess!,
-        ),
-      Space.discovery => _SpaceAvatarConfig(
-          iconData: CatalystVoicesIcons.light_bulb,
-          backgroundColor: theme.colors.iconsSecondary!.withOpacity(0.16),
-          foregroundColor: theme.colors.iconsSecondary!,
-        ),
-      Space.workspace => _SpaceAvatarConfig(
-          iconData: CatalystVoicesIcons.briefcase,
-          backgroundColor: theme.colorScheme.primaryContainer,
-          foregroundColor: theme.colorScheme.primary,
-        ),
-      Space.voting => _SpaceAvatarConfig(
-          iconData: CatalystVoicesIcons.vote,
-          backgroundColor: theme.colors.warningContainer!,
-          foregroundColor: theme.colors.iconsWarning!,
-        ),
-      Space.fundedProjects => _SpaceAvatarConfig(
-          iconData: CatalystVoicesIcons.flag,
-          backgroundColor: theme.colors.iconsSecondary!.withOpacity(0.16),
-          foregroundColor: theme.colors.iconsSecondary!,
-        ),
-    };
   }
 }

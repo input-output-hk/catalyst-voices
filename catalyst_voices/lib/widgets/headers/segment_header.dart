@@ -27,7 +27,7 @@ class SegmentHeader extends StatelessWidget {
     final foregroundColor = _DefaultForegroundColor(theme.colors);
 
     final iconButtonStyle = ButtonStyle(
-      fixedSize: WidgetStatePropertyAll(Size.square(48)),
+      fixedSize: const WidgetStatePropertyAll(Size.square(48)),
       // resolving colors because IconButton does not have WidgetState.selected
       iconColor: WidgetStatePropertyAll(foregroundColor.resolve(_states)),
     );
@@ -35,7 +35,7 @@ class SegmentHeader extends StatelessWidget {
       foregroundColor: foregroundColor,
     );
 
-    final textStyle = (theme.textTheme.titleMedium ?? TextStyle())
+    final textStyle = (theme.textTheme.titleMedium ?? const TextStyle())
         .copyWith(color: foregroundColor.resolve(_states));
 
     return IconButtonTheme(
@@ -49,18 +49,18 @@ class SegmentHeader extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           child: AnimatedContainer(
             duration: kThemeChangeDuration,
-            constraints: BoxConstraints(minHeight: 52),
+            constraints: const BoxConstraints(minHeight: 52),
             decoration: BoxDecoration(
               color: backgroundColor.resolve(_states),
             ),
-            padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 if (leading != null) leading!,
                 Expanded(child: Text(name)),
-                if (actions.isNotEmpty) ...actions
+                if (actions.isNotEmpty) ...actions,
               ],
             ),
           ),

@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_brands/src/brands/brand.dart';
 import 'package:flutter/material.dart';
 
 /// A `ThemeExtension` that holds brand-specific assets for theming purposes.
@@ -9,27 +9,23 @@ import 'package:flutter/material.dart';
 ///
 /// Example usage:
 /// ```dart
-/// final logo = Theme.of(context).brandAssets.logo;
-/// final logoIcon = Theme.of(context).brandAssets.logoIcon;
+/// final logo = Theme.of(context).brandAssets.brand.logo(context);
+/// final logoIcon = Theme.of(context).brandAssets.brand.logoIcon(context);
 /// ```
 @immutable
 class BrandAssets extends ThemeExtension<BrandAssets> {
-  final SvgGenImage logo;
-  final SvgGenImage logoIcon;
+  final Brand brand;
 
   const BrandAssets({
-    required this.logo,
-    required this.logoIcon,
+    required this.brand,
   });
 
   @override
   ThemeExtension<BrandAssets> copyWith({
-    SvgGenImage? logo,
-    SvgGenImage? logoIcon,
+    Brand? brand,
   }) {
     return BrandAssets(
-      logo: logo ?? this.logo,
-      logoIcon: logo ?? this.logoIcon,
+      brand: brand ?? this.brand,
     );
   }
 
