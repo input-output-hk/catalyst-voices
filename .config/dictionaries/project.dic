@@ -182,8 +182,8 @@ plpgsql
 podfile
 podhelper
 postcss
-Precache
 Pozhylenkov
+Precache
 Precertificate
 preprod
 projectcatalyst
@@ -289,11 +289,3 @@ xctestrun
 xcworkspace
 xvfb
 yoroi
-vsync
-damian-molinski
-LTRB
-hotspots
-precache
-Precache
-svgs
-Dreps
