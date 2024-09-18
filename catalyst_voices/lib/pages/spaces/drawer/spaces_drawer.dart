@@ -62,22 +62,4 @@ class SpacesDrawer extends StatelessWidget {
       Space.fundedProjects => const SizedBox.shrink(),
     };
   }
-
-  void _goTo(
-    BuildContext context, {
-    required Space space,
-  }) {
-    switch (space) {
-      case Space.treasury:
-        const TreasuryRoute().go(context);
-      case Space.discovery:
-        const DiscoveryRoute().go(context);
-      case Space.workspace:
-        const WorkspaceRoute().go(context);
-      case Space.voting:
-        const VotingRoute().go(context);
-      case Space.fundedProjects:
-        const FundedProjectsRoute().go(context);
-    }
-  }
 }
