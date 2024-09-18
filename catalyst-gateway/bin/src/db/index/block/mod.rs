@@ -17,7 +17,6 @@ use super::{queries::FallibleQueryTasks, session::CassandraSession};
 use crate::service::utilities::convert::i16_from_saturating;
 
 /// Add all data needed from the block into the indexes.
-#[allow(clippy::similar_names)]
 pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
     // Get the session.  This should never fail.
     let Some(session) = CassandraSession::get(block.immutable()) else {
