@@ -9,12 +9,14 @@ class VoicesDrawerSpaceChooser extends StatelessWidget {
   final Space currentSpace;
   final ValueChanged<Space> onChanged;
   final VoidCallback? onOverallTap;
+  final ValueWidgetBuilder<Space>? builder;
 
   const VoicesDrawerSpaceChooser({
     super.key,
     required this.currentSpace,
     required this.onChanged,
     this.onOverallTap,
+    this.builder,
   });
 
   @override
@@ -36,13 +38,18 @@ class VoicesDrawerSpaceChooser extends StatelessWidget {
     required Space item,
     required bool isSelected,
   }) {
-    if (isSelected) {
-      return SpaceAvatar(
-        item,
-        key: ValueKey('DrawerChooser${item}AvatarKey'),
-      );
-    } else {
-      return const VoicesDrawerChooserItemPlaceholder();
+    Widget child = isSelected
+        ? SpaceAvatar(
+            item,
+            key: ValueKey('DrawerChooser${item}AvatarKey'),
+          )
+        : const VoicesDrawerChooserItemPlaceholder();
+
+    final builder = this.builder;
+    if (builder != null) {
+      child = builder(context, item, child);
     }
+
+    return child;
   }
 }
