@@ -50,9 +50,9 @@ struct SyncParams {
     first_indexed_block: Option<Point>,
     /// The last block we successfully synced.
     last_indexed_block: Option<Point>,
-    /// The number of blocks we successfully synced.
+    /// The number of blocks we successfully synced overall.
     total_blocks_synced: u64,
-    /// The number of blocks we successfully synced.
+    /// The number of blocks we successfully synced, in the last attempt.
     last_blocks_synced: u64,
     /// The number of retries so far on this sync task.
     retries: u64,
