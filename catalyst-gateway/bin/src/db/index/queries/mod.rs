@@ -2,6 +2,8 @@
 //!
 //! This improves query execution time.
 
+pub(crate) mod staked_ada;
+
 use std::sync::Arc;
 
 use anyhow::bail;
@@ -10,15 +12,13 @@ use scylla::{
     batch::Batch, prepared_statement::PreparedStatement, serialize::row::SerializeRow,
     transport::iterator::RowIterator, QueryResult, Session,
 };
+use staked_ada::{
+    get_txi_by_txn_hash::GetTxiByTxnHashesQuery,
+    get_txo_by_stake_address::GetTxoByStakeAddressQuery, update_txo_spent::UpdateTxoSpentQuery,
+};
 
-use super::{
-    index_certs::CertInsertQuery,
-    index_txi::TxiInsertQuery,
-    index_txo::TxoInsertQuery,
-    staked_ada::{
-        get_txi_by_txn_hash::GetTxiByTxnHashesQuery,
-        get_txo_by_stake_address::GetTxoByStakeAddressQuery, UpdateTxoSpentQuery,
-    },
+use super::block::{
+    certs::CertInsertQuery, cip36::Cip36InsertQuery, txi::TxiInsertQuery, txo::TxoInsertQuery,
 };
 use crate::settings::{CassandraEnvVars, CASSANDRA_MIN_BATCH_SIZE};
 
@@ -40,6 +40,12 @@ pub(crate) enum PreparedQuery {
     TxiInsertQuery,
     /// Stake Registration Insert query.
     StakeRegistrationInsertQuery,
+    /// CIP 36 Registration Insert Query.
+    Cip36RegistrationInsertQuery,
+    /// CIP 36 Registration Error Insert query.
+    Cip36RegistrationInsertErrorQuery,
+    /// CIP 36 Registration for stake address Insert query.
+    Cip36RegistrationForStakeAddrInsertQuery,
     /// TXO spent Update query.
     TxoSpentUpdateQuery,
 }
@@ -67,6 +73,12 @@ pub(crate) struct PreparedQueries {
     txi_insert_queries: SizedBatch,
     /// TXI Insert query.
     stake_registration_insert_queries: SizedBatch,
+    /// CIP36 Registrations.
+    cip36_registration_insert_queries: SizedBatch,
+    /// CIP36 Registration errors.
+    cip36_registration_error_insert_queries: SizedBatch,
+    /// CIP36 Registration for Stake Address Insert query.
+    cip36_registration_for_stake_address_insert_queries: SizedBatch,
     /// Update TXO spent query.
     txo_spent_update_queries: SizedBatch,
     /// Get TXO by stake address query.
@@ -90,6 +102,7 @@ impl PreparedQueries {
         let txi_insert_queries = TxiInsertQuery::prepare_batch(&session, cfg).await;
         let all_txo_queries = TxoInsertQuery::prepare_batch(&session, cfg).await;
         let stake_registration_insert_queries = CertInsertQuery::prepare_batch(&session, cfg).await;
+        let all_cip36_queries = Cip36InsertQuery::prepare_batch(&session, cfg).await;
         let txo_spent_update_queries =
             UpdateTxoSpentQuery::prepare_batch(session.clone(), cfg).await;
         let txo_by_stake_address_query = GetTxoByStakeAddressQuery::prepare(session.clone()).await;
@@ -102,6 +115,12 @@ impl PreparedQueries {
             unstaked_txo_asset_insert_queries,
         ) = all_txo_queries?;
 
+        let (
+            cip36_registration_insert_queries,
+            cip36_registration_error_insert_queries,
+            cip36_registration_for_stake_address_insert_queries,
+        ) = all_cip36_queries?;
+
         Ok(Self {
             txo_insert_queries,
             txo_asset_insert_queries,
@@ -109,6 +128,9 @@ impl PreparedQueries {
             unstaked_txo_asset_insert_queries,
             txi_insert_queries: txi_insert_queries?,
             stake_registration_insert_queries: stake_registration_insert_queries?,
+            cip36_registration_insert_queries,
+            cip36_registration_error_insert_queries,
+            cip36_registration_for_stake_address_insert_queries,
             txo_spent_update_queries: txo_spent_update_queries?,
             txo_by_stake_address_query: txo_by_stake_address_query?,
             txi_by_txn_hash_query: txi_by_txn_hash_query?,
@@ -195,6 +217,13 @@ impl PreparedQueries {
             PreparedQuery::UnstakedTxoAssetInsertQuery => &self.unstaked_txo_asset_insert_queries,
             PreparedQuery::TxiInsertQuery => &self.txi_insert_queries,
             PreparedQuery::StakeRegistrationInsertQuery => &self.stake_registration_insert_queries,
+            PreparedQuery::Cip36RegistrationInsertQuery => &self.cip36_registration_insert_queries,
+            PreparedQuery::Cip36RegistrationInsertErrorQuery => {
+                &self.cip36_registration_error_insert_queries
+            },
+            PreparedQuery::Cip36RegistrationForStakeAddrInsertQuery => {
+                &self.cip36_registration_for_stake_address_insert_queries
+            },
             PreparedQuery::TxoSpentUpdateQuery => &self.txo_spent_update_queries,
         };
 

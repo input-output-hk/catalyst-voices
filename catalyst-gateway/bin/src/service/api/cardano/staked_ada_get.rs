@@ -8,14 +8,14 @@ use poem_openapi::{payload::Json, ApiResponse};
 use super::types::SlotNumber;
 use crate::{
     db::index::{
-        session::CassandraSession,
-        staked_ada::{
+        queries::staked_ada::{
             get_txi_by_txn_hash::{GetTxiByTxnHashesQuery, GetTxiByTxnHashesQueryParams},
             get_txo_by_stake_address::{
                 GetTxoByStakeAddressQuery, GetTxoByStakeAddressQueryParams,
             },
-            UpdateTxoSpentQuery, UpdateTxoSpentQueryParams,
+            update_txo_spent::{UpdateTxoSpentQuery, UpdateTxoSpentQueryParams},
         },
+        session::CassandraSession,
     },
     service::common::{
         objects::cardano::{

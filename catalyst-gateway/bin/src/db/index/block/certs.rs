@@ -7,11 +7,14 @@ use pallas::ledger::primitives::{alonzo, conway};
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
 use tracing::error;
 
-use super::{
-    queries::{FallibleQueryTasks, PreparedQueries, PreparedQuery, SizedBatch},
-    session::CassandraSession,
+use crate::{
+    db::index::{
+        queries::{FallibleQueryTasks, PreparedQueries, PreparedQuery, SizedBatch},
+        session::CassandraSession,
+    },
+    service::utilities::convert::u16_from_saturating,
+    settings::CassandraEnvVars,
 };
-use crate::{service::utilities::convert::u16_from_saturating, settings::CassandraEnvVars};
 
 /// Insert TXI Query and Parameters
 #[derive(SerializeRow)]
@@ -35,8 +38,7 @@ pub(crate) struct StakeRegistrationInsertQuery {
 }
 
 /// TXI by Txn hash Index
-const INSERT_STAKE_REGISTRATION_QUERY: &str =
-    include_str!("./queries/insert_stake_registration.cql");
+const INSERT_STAKE_REGISTRATION_QUERY: &str = include_str!("./cql/insert_stake_registration.cql");
 
 impl StakeRegistrationInsertQuery {
     /// Create a new Insert Query.

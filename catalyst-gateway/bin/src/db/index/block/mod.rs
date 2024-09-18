@@ -1,17 +1,20 @@
 //! Index a block
+//! Primary Data Indexing - Upsert operations
+
+pub(crate) mod certs;
+pub(crate) mod cip36;
+pub(crate) mod txi;
+pub(crate) mod txo;
 
 use cardano_chain_follower::MultiEraBlock;
+use certs::CertInsertQuery;
+use cip36::Cip36InsertQuery;
 use tracing::{debug, error};
+use txi::TxiInsertQuery;
+use txo::TxoInsertQuery;
 
-use super::{
-    index_certs::CertInsertQuery, index_txi::TxiInsertQuery, index_txo::TxoInsertQuery,
-    queries::FallibleQueryTasks, session::CassandraSession,
-};
-
-/// Convert a usize to an i16 and saturate at `i16::MAX`
-pub(crate) fn usize_to_i16(value: usize) -> i16 {
-    value.try_into().unwrap_or(i16::MAX)
-}
+use super::{queries::FallibleQueryTasks, session::CassandraSession};
+use crate::service::utilities::convert::i16_from_saturating;
 
 /// Add all data needed from the block into the indexes.
 #[allow(clippy::similar_names)]
@@ -22,6 +25,8 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
     };
 
     let mut cert_index = CertInsertQuery::new();
+    let mut cip36_index = Cip36InsertQuery::new();
+
     let mut txi_index = TxiInsertQuery::new();
     let mut txo_index = TxoInsertQuery::new();
 
@@ -30,7 +35,7 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
 
     // We add all transactions in the block to their respective index data sets.
     for (txn_index, txs) in block_data.txs().iter().enumerate() {
-        let txn = usize_to_i16(txn_index);
+        let txn = i16_from_saturating(txn_index);
 
         let txn_hash = txs.hash().to_vec();
 
@@ -41,6 +46,7 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
         // let mint = txs.mints().iter() {};
 
         // TODO: Index Metadata.
+        cip36_index.index(txn_index, txn, slot_no, block);
 
         // Index Certificates inside the transaction.
         cert_index.index(txs, slot_no, txn, block);
@@ -56,6 +62,7 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
     query_handles.extend(txo_index.execute(&session));
     query_handles.extend(txi_index.execute(&session));
     query_handles.extend(cert_index.execute(&session));
+    query_handles.extend(cip36_index.execute(&session));
 
     let mut result: anyhow::Result<()> = Ok(());
 
