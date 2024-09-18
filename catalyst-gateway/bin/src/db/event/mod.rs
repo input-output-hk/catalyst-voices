@@ -52,7 +52,7 @@ impl EventDB {
     ///
     /// # Arguments
     ///
-    /// * `deep_query` - `DeepQueryInspection` setting.
+    /// * `enable` - Set the `DeepQueryInspection` setting to this value.
     pub(crate) fn modify_deep_query(enable: bool) {
         DEEP_QUERY_INSPECT.store(enable, Ordering::SeqCst);
     }
