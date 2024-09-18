@@ -10,7 +10,7 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
-class SpacesDrawer extends StatelessWidget {
+class SpacesDrawer extends StatefulWidget {
   final Space space;
   final bool isUnlocked;
 
@@ -21,10 +21,47 @@ class SpacesDrawer extends StatelessWidget {
   });
 
   @override
+  State<SpacesDrawer> createState() => _SpacesDrawerState();
+}
+
+class _SpacesDrawerState extends State<SpacesDrawer> {
+  late final PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final initialPage = Space.values.indexOf(widget.space);
+    _pageController = PageController(initialPage: initialPage);
+  }
+
+  @override
+  void didUpdateWidget(covariant SpacesDrawer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.space != oldWidget.space) {
+      final page = Space.values.indexOf(widget.space);
+      unawaited(
+        _pageController.animateToPage(
+          page,
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeIn,
+        ),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return VoicesDrawer(
       bottom: VoicesDrawerSpaceChooser(
-        currentSpace: space,
+        currentSpace: widget.space,
         onChanged: (space) {
           _goTo(context, space: space);
         },
@@ -33,15 +70,41 @@ class SpacesDrawer extends StatelessWidget {
           unawaited(const OverallSpacesRoute().push<void>(context));
         },
       ),
-      children: [
-        _menuBuilder(),
-      ],
+      child: Column(
+        children: [
+          const SizedBox(height: 12),
+          const BrandHeader(),
+          Expanded(
+            child: PageView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              controller: _pageController,
+              itemCount: Space.values.length,
+              itemBuilder: (context, index) {
+                final space = Space.values[index];
+
+                return Padding(
+                  key: ValueKey('Drawer${space}MenuKey'),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: _menuBuilder(
+                    context,
+                    space: space,
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+      ),
     );
   }
 
-  Widget _menuBuilder() {
+  Widget _menuBuilder(
+    BuildContext context, {
+    required Space space,
+  }) {
     return switch (space) {
-      _ when !isUnlocked => GuestMenu(space: space),
+      _ when !widget.isUnlocked => GuestMenu(space: space),
       Space.treasury => const IndividualPrivateCampaigns(),
       Space.workspace => const MyPrivateProposals(),
       Space.voting => const VotingRounds(),
