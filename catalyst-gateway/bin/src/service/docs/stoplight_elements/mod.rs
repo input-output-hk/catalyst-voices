@@ -43,7 +43,7 @@ fn create_html(document: &str) -> String {
         .replace("{:spec}", document)
 }
 
-/// Create an endpoint to return teh Stoplight documentation for our API.
+/// Create an endpoint to return the Stoplight documentation for our API.
 pub(crate) fn create_endpoint(document: &str) -> impl Endpoint {
     let ui_html = create_html(document);
     poem::Route::new().at("/", make_sync(move |_| Html(ui_html.clone())))

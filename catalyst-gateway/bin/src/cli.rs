@@ -1,15 +1,14 @@
 //! CLI interpreter for the service
-use std::{io::Write, sync::Arc};
+use std::io::Write;
 
 use clap::Parser;
 use tracing::{error, info};
 
 use crate::{
     cardano::start_followers,
-    logger,
+    db::{self, index::session::CassandraSession},
     service::{self, started},
-    settings::{DocsSettings, ServiceSettings},
-    state::State,
+    settings::{DocsSettings, ServiceSettings, Settings},
 };
 
 #[derive(Parser)]
@@ -38,39 +37,39 @@ impl Cli {
     pub(crate) async fn exec(self) -> anyhow::Result<()> {
         match self {
             Self::Run(settings) => {
-                let logger_handle = logger::init(settings.log_level);
+                Settings::init(settings)?;
 
-                // Unique machine id
-                let machine_id = settings.follower_settings.machine_uid;
+                let mut tasks = Vec::new();
 
-                let state = Arc::new(State::new(Some(settings.database_url), logger_handle).await?);
-                let event_db = state.event_db();
-                event_db
-                    .modify_deep_query(settings.deep_query_inspection.into())
-                    .await;
+                info!("Catalyst Gateway - Starting");
 
-                tokio::spawn(async move {
-                    match service::run(&settings.docs_settings, state.clone()).await {
+                // Start the DB's
+                CassandraSession::init();
+                db::event::establish_connection();
+
+                // Start the chain indexing follower.
+                start_followers().await?;
+
+                let handle = tokio::spawn(async move {
+                    match service::run().await {
                         Ok(()) => info!("Endpoints started ok"),
                         Err(err) => {
                             error!("Error starting endpoints {err}");
                         },
                     }
                 });
+                tasks.push(handle);
 
-                let followers_fut = start_followers(
-                    event_db.clone(),
-                    settings.follower_settings.check_config_tick,
-                    settings.follower_settings.data_refresh_tick,
-                    machine_id,
-                );
                 started();
-                followers_fut.await?;
 
-                Ok(())
+                for task in tasks {
+                    task.await?;
+                }
+
+                info!("Catalyst Gateway - Shut Down");
             },
             Self::Docs(settings) => {
-                let docs = service::get_app_docs(&settings);
+                let docs = service::get_app_docs();
                 match settings.output {
                     Some(path) => {
                         let mut docs_file = std::fs::File::create(path)?;
@@ -78,8 +77,9 @@ impl Cli {
                     },
                     None => println!("{docs}"),
                 }
-                Ok(())
             },
         }
+
+        Ok(())
     }
 }

@@ -54,10 +54,10 @@ For testing purposes, the ScyllaDB is accessible on the Cluster IP Address: `192
 
 ## Deploying the Cluster
 
-### Setup hosts on windows
+### Setup hosts on Windows
 
-On Windows you need to setup the hosts before starting the cluster  
-From Windows terminal open the hosts file:  
+On Windows, you need to set up the hosts before starting the cluster  
+From the Windows terminal to open the hosts file:  
 
 ```sh
 notepad %SystemRoot%\System32\drivers\etc\hosts  
@@ -75,7 +75,7 @@ From the root of the repo:
 just start-cluster
 ```
 
-#### MacOS
+#### macOS
 
 From the root of the repo:
 
@@ -176,11 +176,11 @@ vagrant ssh agent99
 
 Found (and tested) description how to connect using only open-source via DBeaver:
 
-1. Download dbeaver (Community Edition)
-2. Download cassandra jdbc jar files: <http://www.dbschema.com/cassandra-jdbc-driver.html>
+1. Download DBeaver (Community Edition)
+2. Download Cassandra JDBC jar files: <http://www.dbschema.com/cassandra-jdbc-driver.html>
    (Downloading and Testing the Driver Binaries section have links to binary and source)
-3. extract cassandra jdbc zip
-4. run dbeaver
+3. extract Cassandra JDBC zip
+4. run DBeaver
 5. go to Database > Driver Manager
 6. click New
 7. Fill in details as follows:
@@ -192,7 +192,7 @@ Found (and tested) description how to connect using only open-source via DBeaver
    * Embedded: `no`
    * Category:
    * Description: `Cassandra` (or whatever you want it to say)
-8. click Add File and add all the jars in the cassandra jdbc zip file.
+8. click Add File and add all the jars in the Cassandra JDBC zip file.
 9. click Find Class to make sure the Class Name is found okay
 10. click OK
 11. Create New Connection, selecting the database driver you just added

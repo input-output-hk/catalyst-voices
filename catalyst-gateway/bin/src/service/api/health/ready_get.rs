@@ -1,13 +1,9 @@
 //! Implementation of the GET /health/ready endpoint
-
-use std::sync::Arc;
-
-use poem::web::Data;
 use poem_openapi::ApiResponse;
 
 use crate::{
-    event_db::schema_check::MismatchedSchemaError, service::common::responses::WithErrorResponses,
-    state::State,
+    db::event::{schema_check::MismatchedSchemaError, EventDB},
+    service::common::responses::WithErrorResponses,
 };
 
 /// Endpoint responses.
@@ -41,8 +37,8 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// and is not able to properly service requests while it is occurring.
 /// This would let the load balancer shift traffic to other instances of this
 /// service that are ready.
-pub(crate) async fn endpoint(state: Data<&Arc<State>>) -> AllResponses {
-    match state.event_db().schema_version_check().await {
+pub(crate) async fn endpoint() -> AllResponses {
+    match EventDB::schema_version_check().await {
         Ok(_) => {
             tracing::debug!("DB schema version status ok");
             Responses::NoContent.into()

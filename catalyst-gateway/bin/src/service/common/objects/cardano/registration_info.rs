@@ -2,9 +2,10 @@
 
 use poem_openapi::{types::Example, Object, Union};
 
-use crate::{
-    event_db::cardano::cip36_registration::{Nonce, PaymentAddress, PublicVotingInfo, TxId},
-    service::{common::objects::cardano::hash::Hash, utilities::to_hex_with_prefix},
+use crate::service::{
+    api::cardano::types::{Nonce, PaymentAddress, PublicVotingInfo, TxId},
+    common::objects::cardano::hash::Hash,
+    utilities::to_hex_with_prefix,
 };
 
 /// Delegation type
@@ -68,6 +69,7 @@ pub(crate) struct RegistrationInfo {
 
 impl RegistrationInfo {
     /// Creates a new `RegistrationInfo`
+    #[allow(dead_code)]
     pub(crate) fn new(
         tx_hash: TxId, rewards_address: &PaymentAddress, voting_info: PublicVotingInfo,
         nonce: Nonce,
