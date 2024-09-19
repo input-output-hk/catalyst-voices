@@ -10,6 +10,7 @@ environment:
   flutter: ">=3.24.1"
 
 dependencies:
+  asn1lib: ^1.5.3
   bech32: ^0.2.2
   bip32_ed25519: ^0.6.0
   catalyst_compression: ^0.3.0
