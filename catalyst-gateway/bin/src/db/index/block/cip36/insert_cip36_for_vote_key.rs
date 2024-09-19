@@ -18,10 +18,10 @@ const INSERT_CIP36_REGISTRATION_FOR_VOTE_KEY_QUERY: &str =
 /// Insert CIP-36 Registration Invalid Query Parameters
 #[derive(SerializeRow, Clone)]
 pub(super) struct Params {
-    /// Stake key hash
-    stake_address: Vec<u8>,
-    /// Stake key hash
+    /// Voting Public Key
     vote_key: Vec<u8>,
+    /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
+    stake_address: Vec<u8>,
     /// Slot Number the cert is in.
     slot_no: num_bigint::BigInt,
     /// Transaction Index.
@@ -33,20 +33,14 @@ pub(super) struct Params {
 impl Params {
     /// Create a new Insert Query.
     pub fn new(
-        vote_key: Option<&VotingPubKey>, slot_no: u64, txn: i16, cip36: &Cip36, valid: bool,
+        vote_key: &VotingPubKey, slot_no: u64, txn: i16, cip36: &Cip36, valid: bool,
     ) -> Self {
-        let vote_key = if let Some(vote_key) = vote_key {
-            vote_key.voting_pk.to_bytes().to_vec()
-        } else {
-            Vec::new()
-        };
-
         Params {
+            vote_key: vote_key.voting_pk.to_bytes().to_vec(),
             stake_address: cip36
                 .stake_pk
                 .map(|s| s.to_bytes().to_vec())
                 .unwrap_or_default(),
-            vote_key,
             slot_no: slot_no.into(),
             txn,
             valid,

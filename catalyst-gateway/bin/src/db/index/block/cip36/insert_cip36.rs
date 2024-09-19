@@ -17,7 +17,7 @@ const INSERT_CIP36_REGISTRATION_QUERY: &str = include_str!("./cql/insert_cip36.c
 /// Insert CIP-36 Registration Query Parameters
 #[derive(SerializeRow, Clone)]
 pub(super) struct Params {
-    /// Stake key hash
+    /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
     stake_address: Vec<u8>,
     /// Nonce value after normalization.
     nonce: num_bigint::BigInt,

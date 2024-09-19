@@ -18,13 +18,13 @@ const INSERT_CIP36_REGISTRATION_INVALID_QUERY: &str =
 /// Insert CIP-36 Registration Invalid Query Parameters
 #[derive(SerializeRow, Clone)]
 pub(super) struct Params {
-    /// Stake key hash
+    /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
     stake_address: Vec<u8>,
     /// Slot Number the cert is in.
     slot_no: num_bigint::BigInt,
     /// Transaction Index.
     txn: i16,
-    /// Stake key hash
+    /// Voting Public Key
     vote_key: Vec<u8>,
     /// Full Payment Address (not hashed, 32 byte ED25519 Public key).
     payment_address: Vec<u8>,

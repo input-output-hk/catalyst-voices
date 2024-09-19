@@ -24,7 +24,7 @@ pub(crate) struct Cip36InsertQuery {
     /// Stake Registration Data captured during indexing.
     invalid: Vec<insert_cip36_invalid::Params>,
     /// Stake Registration Data captured during indexing.
-    for_stake: Vec<insert_cip36_for_vote_key::Params>,
+    for_vote_key: Vec<insert_cip36_for_vote_key::Params>,
 }
 
 impl Cip36InsertQuery {
@@ -33,7 +33,7 @@ impl Cip36InsertQuery {
         Cip36InsertQuery {
             registrations: Vec::new(),
             invalid: Vec::new(),
-            for_stake: Vec::new(),
+            for_vote_key: Vec::new(),
         }
     }
 
@@ -44,13 +44,13 @@ impl Cip36InsertQuery {
         let insert_cip36_batch = insert_cip36::Params::prepare_batch(session, cfg).await;
         let insert_cip36_invalid_batch =
             insert_cip36_invalid::Params::prepare_batch(session, cfg).await;
-        let insert_cip36_for_stake_addr_batch =
+        let insert_cip36_for_vote_key_addr_batch =
             insert_cip36_for_vote_key::Params::prepare_batch(session, cfg).await;
 
         Ok((
             insert_cip36_batch?,
             insert_cip36_invalid_batch?,
-            insert_cip36_for_stake_addr_batch?,
+            insert_cip36_for_vote_key_addr_batch?,
         ))
     }
 
@@ -70,13 +70,10 @@ impl Cip36InsertQuery {
                         self.registrations.push(insert_cip36::Params::new(
                             vote_key, slot_no, txn_index, cip36,
                         ));
-                        self.for_stake.push(insert_cip36_for_vote_key::Params::new(
-                            Some(vote_key),
-                            slot_no,
-                            txn_index,
-                            cip36,
-                            true,
-                        ));
+                        self.for_vote_key
+                            .push(insert_cip36_for_vote_key::Params::new(
+                                vote_key, slot_no, txn_index, cip36, true,
+                            ));
                     }
                 } else {
                     if cip36.voting_keys.is_empty() {
@@ -87,9 +84,6 @@ impl Cip36InsertQuery {
                             cip36,
                             decoded_metadata.report.clone(),
                         ));
-                        self.for_stake.push(insert_cip36_for_vote_key::Params::new(
-                            None, slot_no, txn_index, cip36, false,
-                        ));
                     }
                     for vote_key in &cip36.voting_keys {
                         self.invalid.push(insert_cip36_invalid::Params::new(
@@ -99,13 +93,10 @@ impl Cip36InsertQuery {
                             cip36,
                             decoded_metadata.report.clone(),
                         ));
-                        self.for_stake.push(insert_cip36_for_vote_key::Params::new(
-                            Some(vote_key),
-                            slot_no,
-                            txn_index,
-                            cip36,
-                            false,
-                        ));
+                        self.for_vote_key
+                            .push(insert_cip36_for_vote_key::Params::new(
+                                vote_key, slot_no, txn_index, cip36, false,
+                            ));
                     }
                 }
             }
@@ -142,13 +133,13 @@ impl Cip36InsertQuery {
             }));
         }
 
-        if !self.for_stake.is_empty() {
+        if !self.for_vote_key.is_empty() {
             let inner_session = session.clone();
             query_handles.push(tokio::spawn(async move {
                 inner_session
                     .execute_batch(
                         PreparedQuery::Cip36RegistrationForStakeAddrInsertQuery,
-                        self.for_stake,
+                        self.for_vote_key,
                     )
                     .await
             }));
