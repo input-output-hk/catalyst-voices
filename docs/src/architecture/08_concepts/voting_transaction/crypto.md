@@ -121,7 +121,7 @@ components would be defined as follows:
 
 <!-- markdownlint-disable no-inline-html -->
 
-After the choice is done (described in [sectio](#voting-choice)),
+After the choice is done (described in [section](#voting-choice)),
 vote **must** be encrypted using shared election public key $pk$.
 
 To achieve that, Lifted ElGamal encryption algorithm is used,
@@ -427,7 +427,7 @@ it needs a decryption procedure corresponded for which encryption one was made.
 ## E: Non-Interactive ZK Tally Proof
 
 Non-Interactive ZK (Zero Knowledge) Tally Proof algorithm helps to solve only one problem,
-to proove that the specific encrypted message was decrypted into the specific resulted value,
+to prove that the specific encrypted message was decrypted into the specific resulted value,
 using exactly that secret key,
 which is corresponds to the some shared public key.
 
@@ -473,7 +473,7 @@ The verifier algorithm takes as arguments:
 * $dec$ - a decrypted message from the encrypted ciphertext $enc$,
 * $pk$ - a public key corresponded to the $sk$
   which was supposedly used to decrypt a message $enc$
-* $\pi$ - a proover's proof generated on the [previous step](#prover)
+* $\pi$ - a prover's proof generated on the [previous step](#prover)
 
 \begin{equation}
 TallyCheck(enc, dec, pk, \pi) = true | false
