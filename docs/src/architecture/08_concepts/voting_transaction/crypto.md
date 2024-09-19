@@ -28,7 +28,7 @@ and performing tally process for executing "Catalyst" fund events.
 
 ### Preliminaries
 
-Through this paper we will use the following notations to refer to some entities of this protocol:
+The protocol is based around the following entities:
 
 * **Proposal** -
   voting subject on which each voter will be cast their votes.
@@ -49,13 +49,9 @@ Through this paper we will use the following notations to refer to some entities
   Or it could be defined based on their stake in the blockchain,
   which is more appropriate for web3 systems.
 
-Important to note that current protocol defined to work with the one specific proposal,
-so all definitions and procedures would be applied for some proposal.
+Important to note that the protocol defined for some **one** proposal.
 Obviously, it could be easily scaled for a set of proposals,
-performing all this protocol in parallel.
-
-The voting committee and voters registration/definition
-are not subjects of this document.
+performing protocol steps in parallel.
 
 ### Initial setup
 
@@ -125,10 +121,10 @@ components would be defined as follows:
 
 <!-- markdownlint-disable no-inline-html -->
 
-After the choice is done,
-vote **must** be encrypted using shared shared election public key $pk$.
+After the choice is done (described in [sectio](#voting-choice)),
+vote **must** be encrypted using shared election public key $pk$.
 
-Lifted ElGamal encryption algorithm is used,
+To achieve that, Lifted ElGamal encryption algorithm is used,
 noted as $ElGamalEnc(message, randomness, public \; key)$.
 More detailed description of the lifted ElGamal algorithm
 you can find in the [appendix B](#b-lifted-elgamal-encryptiondecryption).
@@ -138,17 +134,16 @@ $ElGamalEnc(message, randomness, public \; key)$ algorithm produces a ciphertext
 c = ElGamalEnc(message, randomness, public \; key)
 \end{equation}
 
-To encode previously generated unit vector $\mathbf{e}_i$ ($i$ - voting choice identifier),
-in more details you can read in this [section](#voting-choice),
+To encrypt previously generated unit vector $\mathbf{e}_i$ ($i$ - voting choice identifier),
 for each vector component value $e_{i,j}$ generate a corresponding randomness.
 <br/>
 Lets denote randomness value as $r_j$,
-where $j$ states as the same identifier of the vector component $e_{i,j}$.
+where $j$ is the same vector component's index $j$ value, $e_{i, j} => r_j$.
 
-Then, for each vector component $e_{i,j}$ with the corresponding randomness,
+Then, for each vector component $e_{i,j}$ with the corresponding randomness $r_j$,
 perform encryption algorithm applying shared election public key $pk$.
 \begin{equation}
-c_j = Enc(e_{i,j}, r_j, pk)
+c_j = ElGamalEnc(e_{i,j}, r_j, pk)
 \end{equation}
 
 As a result getting a vector $\mathbf{c}$ of ciphertext values $c_f$,
@@ -156,7 +151,7 @@ with the size equals of the size $\mathbf{e}_t$ unit vector,
 equals to the amount of the voting options.
 Lets denote this vector as:
 \begin{equation}
-\mathbf{c} = (c_1, \ldots, c_{M})
+\mathbf{c} = (c_1, \ldots, c_{M}) = (ElGamalEnc(e_{i,j}, r_j, pk), \ldots,  ElGamalEnc(e_{i,M}, r_M, pk))
 \end{equation}
 
 where $M$ is the voting options amount.
@@ -171,7 +166,7 @@ After the voter's choice is generated and encrypted,
 it is crucial to prove that [encoding](#voting-choice) and [encryption](#vote-encrypting) are formed correctly
 (i.e. that the voter indeed encrypt a unit vector).
 
-Because by the definition of the encryption algorithm $Enc(message, randomness, public \; key)$
+Because by the definition of the encryption algorithm $ElGamalEnc(message, randomness, public \; key)$
 it is possible to encrypt an any message value,
 it is not restricted for encryption only $0$ and $1$ values
 (as it was stated in the previous [section](#voting-choice),
@@ -305,7 +300,7 @@ Which proofs that a provided encrypted tally result value $er$ was decrypted int
 using the exact secret key $sk$,
 which is corresponded to the already known shared election public key $pk$.
 \begin{equation}
-\pi = TallyProof(er, r, sk)
+\pi = TallyProof(er, sk)
 \end{equation}
 
 So to validate a $TallyCheck(er, r, pk, \pi)$ procedure should be used,
@@ -317,10 +312,8 @@ is it valid or not.
 true | false = TallyCheck(er, r, pk, \pi)
 \end{equation}
 
-<!-- markdownlint-disable max-one-sentence-per-line -->
 A more detailed description of how $TallyProof$, $TallyCheck$ work
-you can find in the section *Fig. 10* of this [paper][treasury_system_spec].
-<!-- markdownlint-enable max-one-sentence-per-line -->
+you can find in the [appendix E](#e-non-interactive-zk-tally-proof).
 
 #### Tally publishing
 
@@ -331,7 +324,7 @@ and tally proofs $\pi_i$
 corresponded for each voting option of some proposal.
 It could be published using any public channel, e.g. blockchain, ipfs or through p2p network.
 
-## A: Group definition
+## A: Group Definition
 
 <!-- markdownlint-disable no-inline-html -->
 
@@ -350,7 +343,7 @@ And defined as follows:
 
 <!-- markdownlint-enable no-inline-html -->
 
-## B: Lifted ElGamal encryption/decryption
+## B: Lifted ElGamal Encryption/Decryption
 
 <!-- markdownlint-disable no-inline-html -->
 
@@ -391,7 +384,7 @@ say $m \in {{0,1}}^{\xi}$, for $\xi \le 30$.
 
 <!-- markdownlint-enable no-inline-html -->
 
-## C: Homomorphic tally
+## C: Homomorphic Tally
 
 <!-- markdownlint-disable no-inline-html -->
 
@@ -418,6 +411,77 @@ As it is not an open decrypted value yet,
 it needs a decryption procedure corresponded for which encryption one was made.
 
 <!-- markdownlint-enable no-inline-html -->
+
+## D: Non-Interactive ZK Vote Proof
+
+## E: Non-Interactive ZK Tally Proof
+
+Non-Interactive ZK (Zero Knowledge) Tally Proof algorithm helps to solve only one problem,
+to proove that the specific encrypted message was decrypted into the specific resulted value,
+using exactly that secret key,
+which is corresponds to the some shared public key.
+
+<!-- markdownlint-disable max-one-sentence-per-line -->
+A more detailed and formal description
+you can find in the sections *Fig. 10* and *2.1.5* of this [paper][treasury_system_spec].
+<!-- markdownlint-enable max-one-sentence-per-line -->
+
+It is assumed that the original encryption and decryption is performing by ElGamal scheme.
+It means that all described operations is also group dependent
+(more about groups described in [appendix A](#a-group-definition)).
+
+### Prover
+
+The prover algorithm takes as arguments:
+
+* $enc$ - an encrypted message (ciphertext)
+* $sk$ - a secret key which was used to decrypt a message $enc$
+
+\begin{equation}
+TallyProof(enc, sk) = \pi
+\end{equation}
+
+$\pi$ is the final proof.
+To compute it, prover needs to perform the next steps:
+
+1. Take the first element of the ciphertext $enc = (enc_1, enc_2)$
+  and calculate $d = enc_1^{sk}$.
+3. Generate a random value $\mu, \quad \mu \in \mathbb{Z}_q^*$.
+4. Compute $A_1 = g^{\mu}$, where $g$ is the group generator ($A_1 \in \mathbb{G}$).
+5. Compute $A_2 = (enc_1)^{\mu}$  ($A_2 \in \mathbb{G}$).
+6. Compute $e = H(pk | d | g | enc_1 | A_1 | A_2 )$,
+  where $pk$ is a corresponding public key of $sk$, $H$ is a hash function.
+7. Compute $z = sk * e + \mu, \quad z \in \mathbb{Z}_q^*$.
+
+Finally the proof $\pi = (A_1, A_2, z)$.
+
+### Verifier
+
+The verifier algorithm takes as arguments:
+
+* $enc$ - an encrypted message (ciphertext),
+* $dec$ - a decrypted message from the encrypted ciphertext $enc$,
+* $pk$ - a public key corresponded to the $sk$
+  which was supposedly used to decrypt a message $enc$
+* $\pi$ - a proover's proof generated on the [previous step](#prover)
+
+\begin{equation}
+TallyCheck(enc, dec, pk, \pi) = true | false
+\end{equation}
+
+As a result algorithm will return `true` or `false`,
+is the verification was succeeded or not respectively.
+
+Knowing that $\pi$ equals to $(A_1, A_2, z)$,
+verifier needs to perform the next steps:
+
+1. Take the first element $enc_1$ of the ciphertext $enc = (enc_1, enc_2)$.
+2. Calculate $d = g^{dec} \circ (-enc_2), \quad d \in \mathbb{G}$.
+3. Compute $e = H(pk | d | g | enc_1 | A_1 | A_2 )$, where $g$ is the group generator.
+4. Verify $g^z == pk^e \circ A_1$
+5. Verify $enc_1^z == d^e \circ A_2$
+
+If step `3` and `4` returns `true` so the final result is `true` otherwise return `false`.
 
 ## Rationale
 
