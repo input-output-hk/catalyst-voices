@@ -27,14 +27,14 @@ code-lint:
 
 # Synchronize Rust Configs
 sync-cfg:
-    earthly +sync-cfg
+    cd .. && earthly ./catalyst-gateway+sync-cfg
 
 # Pre Push Checks
 pre-push: sync-cfg code-format code-lint license-check
     # Make sure we can actually build inside Earthly which needs to happen in CI.
-    earthly +check
-    earthly +build
-    earthly +package-cat-gateway
+    cd .. && earthly ./catalyst-gateway+check
+    cd .. && earthly ./catalyst-gateway+build
+    cd .. && earthly ./catalyst-gateway+package-cat-gateway
 
 # Build Local release build of catalyst gateway
 build-cat-gateway: code-format code-lint
