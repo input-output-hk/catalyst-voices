@@ -456,12 +456,12 @@ To compute it, prover needs to perform the next steps:
 
 1. Take the first element of the ciphertext $enc = (enc_1, enc_2)$
   and calculate $d = enc_1^{sk}$.
-3. Generate a random value $\mu, \quad \mu \in \mathbb{Z}_q^*$.
-4. Compute $A_1 = g^{\mu}$, where $g$ is the group generator ($A_1 \in \mathbb{G}$).
-5. Compute $A_2 = (enc_1)^{\mu}, \quad A_2 \in \mathbb{G}$.
-6. Compute $e = H(pk | d | g | enc_1 | A_1 | A_2 )$,
+2. Generate a random value $\mu, \quad \mu \in \mathbb{Z}_q^*$.
+3. Compute $A_1 = g^{\mu}$, where $g$ is the group generator ($A_1 \in \mathbb{G}$).
+4. Compute $A_2 = (enc_1)^{\mu}, \quad A_2 \in \mathbb{G}$.
+5. Compute $e = H(pk | d | g | enc_1 | A_1 | A_2 )$,
   where $pk$ is a corresponding public key of $sk$, $H$ is a hash function.
-7. Compute $z = sk * e + \mu, \quad z \in \mathbb{Z}_q^*$.
+6. Compute $z = sk * e + \mu, \quad z \in \mathbb{Z}_q^*$.
 
 Finally the proof $\pi = (A_1, A_2, z)$.
 
