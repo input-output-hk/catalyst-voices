@@ -27,7 +27,7 @@ final class BootstrapArgs {
 // TODO(damian-molinski): Add Isolate.current.addErrorListener
 // TODO(damian-molinski): Add runZonedGuarded
 // TODO(damian-molinski): Add Global try-catch
-Future<void> bootstrap([
+Future<void> bootstrapAndRun([
   BootstrapWidgetBuilder builder = _appBuilder,
 ]) async {
   // There's no need to call WidgetsFlutterBinding.ensureInitialized()
@@ -44,25 +44,12 @@ Future<void> bootstrap([
     );
   };
 
-  GoRouter.optionURLReflectsImperativeAPIs = true;
-  setPathUrlStrategy();
-
-  final router = AppRouter.init(
-    guards: const [
-      MilestoneGuard(),
-    ],
-  );
-
-  Bloc.observer = AppBlocObserver();
-
-  await Dependencies.instance.init();
-
-  final args = BootstrapArgs(routerConfig: router);
+  final args = await bootstrap();
 
   await _runApp(await builder(args));
 }
 
-Future<BootstrapArgs> bootstrapTest() async {
+Future<BootstrapArgs> bootstrap() async {
   GoRouter.optionURLReflectsImperativeAPIs = true;
   setPathUrlStrategy();
 
