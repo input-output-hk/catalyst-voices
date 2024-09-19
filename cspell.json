@@ -157,6 +157,7 @@
         ".config/dictionaries/cspell/markdown/cspell-ext.json"
     ],
     "ignorePaths": [
+        "*.excalidraw",
         ".config/dictionaries/**",
         "tmp/**",
         "cspell.json",
