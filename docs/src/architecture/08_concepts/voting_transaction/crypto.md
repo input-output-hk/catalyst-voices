@@ -356,12 +356,16 @@ More detailed how group operations are defined, described in [appendix A](#a-gro
 ### Encryption
 
 Lifted ElGamal encryption algorithm
-takes as arguments $m$ message ($m \in \mathbb{Z}_q^*$),
-$r$ randomness ($r \in \mathbb{Z}_q^*$),
-$pk$ public key ($pk \in \mathbb{G}$):
+takes as arguments:
+
+* $m$ - message ($m \in \mathbb{Z}_q^*$)
+* $r$ - randomness ($r \in \mathbb{Z}_q^*$)
+* $pk$ - public key ($pk \in \mathbb{G}$)
+
 \begin{equation}
 ElGamalEnc(m, r, pk) = (c_1, c_2) = c,
 \end{equation}
+
 \begin{equation}
 c_1 = g^r, \quad c_2 = g^m \circ pk^r
 \end{equation}
@@ -370,8 +374,11 @@ $c$ - is a resulted ciphertext which consists of two elements $c_1, c_2 \in \mat
 
 ### Decryption
 
-Lifted ElGamal decryption algorithm takes as arguments $c$ ciphertext,
-$sk$ secret key ($sk \in \mathbb{Z}_q^*$):
+Lifted ElGamal decryption algorithm takes as arguments:
+
+* $c$ -  ciphertext,
+* $sk$ - secret key ($sk \in \mathbb{Z}_q^*$)
+
 \begin{equation}
 ElGamalDec(c, sk) = Dlog(c_2 \circ c_1^{-sk}) = m
 \end{equation}
@@ -392,11 +399,14 @@ Homomorphic tally schema is defined over any cyclic group $\mathbb{G}$ of order 
 <br/>
 More detailed how group operations are defined, described in [appendix A](#a-group-definition).
 
-Homomorphic tally algorithm takes as arguments $i$ voting choice index,
-$[\mathbf{c_1}, \mathbf{c_2}, \ldots, \mathbf{c_N}]$
-an array of encrypted votes vector's,
-$[\alpha_1, \alpha_2, \ldots, \alpha_N]$ - an array of corresponded voter's voting power.
-Where $N$ - votes amount.
+Homomorphic tally algorithm takes as arguments:
+
+* $i$ - voting choice index
+* $[\mathbf{c_1}, \mathbf{c_2}, \ldots, \mathbf{c_N}]$ - an array of encrypted votes vector's,
+  where $N$ - votes amount
+* $[\alpha_1, \alpha_2, \ldots, \alpha_N]$ - an array of corresponded voter's voting power,
+  where $N$ - votes amount
+
 \begin{equation}
 Tally(i, [\mathbf{c_1}, \mathbf{c_2}, \ldots, \mathbf{c_N}], [\alpha_1, \alpha_2, \ldots, \alpha_N])
 = c_{1, i}^{\alpha_1} \circ c_{2, i}^{\alpha_2} \circ \ldots \circ c_{N, i}^{\alpha_N} = er_i
@@ -448,7 +458,7 @@ To compute it, prover needs to perform the next steps:
   and calculate $d = enc_1^{sk}$.
 3. Generate a random value $\mu, \quad \mu \in \mathbb{Z}_q^*$.
 4. Compute $A_1 = g^{\mu}$, where $g$ is the group generator ($A_1 \in \mathbb{G}$).
-5. Compute $A_2 = (enc_1)^{\mu}$  ($A_2 \in \mathbb{G}$).
+5. Compute $A_2 = (enc_1)^{\mu}, \quad A_2 \in \mathbb{G}$.
 6. Compute $e = H(pk | d | g | enc_1 | A_1 | A_2 )$,
   where $pk$ is a corresponding public key of $sk$, $H$ is a hash function.
 7. Compute $z = sk * e + \mu, \quad z \in \mathbb{Z}_q^*$.
