@@ -1,12 +1,12 @@
 import 'dart:typed_data';
 import 'package:bip39/bip39.dart' as bip39;
 
-/// Represents a seed phrase consisting of a mnemonic and its associated seed.
-/// This class provides methods for generating a new seed phrase and creating
-/// one from an existing mnemonic.
+/// Represents a seed phrase consisting of a mnemonic and provides methods for
+/// generating and deriving cryptographic data from the mnemonic.
 ///
-/// The seed phrase is used for cryptographic purposes, such as generating
-/// cryptocurrency wallets or secure key management.
+/// The `SeedPhrase` class allows creation of a seed phrase either randomly,
+/// from a given mnemonic, or from entropy data. It supports converting between
+/// different formats, including Uint8List and hex strings.
 class SeedPhrase {
   final String mnemonic;
 
@@ -14,9 +14,15 @@ class SeedPhrase {
   /// and its corresponding seed.
   SeedPhrase() : this.fromMnemonic(bip39.generateMnemonic());
 
+  /// Creates a SeedPhrase from an existing [Uint8List] entropy.
+  ///
+  /// [encodedData]: The entropy data as a Uint8List.
   SeedPhrase.fromUint8ListEntropy(Uint8List encodedData)
       : this.fromHexEntropy(_uint8ListToHex(encodedData));
 
+  /// Creates a SeedPhrase from an existing hex-encoded entropy.
+  ///
+  /// [encodedData]: The entropy data as a hex string.
   SeedPhrase.fromHexEntropy(String encodedData)
       : this.fromMnemonic(bip39.entropyToMnemonic(encodedData));
 
@@ -28,26 +34,29 @@ class SeedPhrase {
   SeedPhrase.fromMnemonic(this.mnemonic)
       : assert(bip39.validateMnemonic(mnemonic), 'Invalid mnemonic phrase');
 
-  /// Returns the seed hex string associated with the mnemonic.
+  /// Returns the seed derived from the mnemonic as a Uint8List.
   Uint8List getUint8ListSeed() {
     return bip39.mnemonicToSeed(mnemonic);
   }
 
+  /// Returns the seed derived from the mnemonic as a hex-encoded string.
   String getHexSeed() {
     return bip39.mnemonicToSeedHex(mnemonic);
+  }
+
+  /// Returns the entropy derived from the mnemonic as a Uint8List.
+  Uint8List toUint8ListEntropy() {
+    return _hexStringToUint8List(toHexEntropy());
+  }
+
+  /// Returns the entropy derived from the mnemonic as a hex-encoded string.
+  String toHexEntropy() {
+    return bip39.mnemonicToEntropy(mnemonic);
   }
 
   /// Returns the mnemonic phrase.
   String getMnemonic() {
     return mnemonic;
-  }
-
-  Uint8List toUint8ListEntropy() {
-    return _hexStringToUint8List(toHexEntropy());
-  }
-
-  String toHexEntropy() {
-    return bip39.mnemonicToEntropy(mnemonic);
   }
 }
 
