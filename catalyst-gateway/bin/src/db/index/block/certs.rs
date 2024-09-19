@@ -12,7 +12,7 @@ use crate::{
         queries::{FallibleQueryTasks, PreparedQueries, PreparedQuery, SizedBatch},
         session::CassandraSession,
     },
-    service::utilities::convert::u16_from_saturating,
+    service::utilities::convert::from_saturating,
     settings::CassandraEnvVars,
 };
 
@@ -130,7 +130,7 @@ impl CertInsertQuery {
         let (key_hash, pubkey, script) = match cred {
             pallas::ledger::primitives::conway::StakeCredential::AddrKeyhash(cred) => {
                 let addr = block
-                    .witness_for_tx(cred, u16_from_saturating(txn))
+                    .witness_for_tx(cred, from_saturating(txn))
                     .unwrap_or(default_addr);
                 // Note: it is totally possible for the Registration Certificate to not be
                 // witnessed.
