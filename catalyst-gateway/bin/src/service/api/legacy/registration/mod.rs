@@ -1,7 +1,4 @@
 //! Registration Endpoints
-use std::sync::Arc;
-
-use poem::web::Data;
 use poem_openapi::{
     param::{Path, Query},
     payload::Json,
@@ -9,19 +6,16 @@ use poem_openapi::{
     ApiResponse, OpenApi,
 };
 
-use crate::{
-    service::{
-        common::{
-            objects::legacy::{
-                event_id::EventId, voter_registration::VoterRegistration,
-                voting_public_key::VotingPublicKey,
-            },
-            responses::WithErrorResponses,
-            tags::ApiTags,
+use crate::service::{
+    common::{
+        objects::legacy::{
+            event_id::EventId, voter_registration::VoterRegistration,
+            voting_public_key::VotingPublicKey,
         },
-        utilities::middleware::schema_validation::schema_version_validation,
+        responses::WithErrorResponses,
+        tags::ApiTags,
     },
-    state::State,
+    utilities::middleware::schema_validation::schema_version_validation,
 };
 
 /// Registration API Endpoints
@@ -58,7 +52,7 @@ impl RegistrationApi {
     #[allow(clippy::unused_async)]
     #[allow(unused_variables)]
     async fn get_voter_info(
-        &self, pool: Data<&Arc<State>>,
+        &self,
         /// A Voters Public ED25519 Key (as registered in their most recent valid
         /// [CIP-15](https://cips.cardano.org/cips/cip15) or [CIP-36](https://cips.cardano.org/cips/cip36) registration).
         #[oai(validator(max_length = 66, min_length = 66, pattern = "0x[0-9a-f]{64}"))]
