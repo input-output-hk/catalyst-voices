@@ -3,6 +3,11 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+/// Grouping all [LogicalKeyboardKey] that correspond with given [activator]
+/// and shows them in a [Row] as [VoicesLogicalKeyboardKeyButton].
+///
+/// This widget also uses [LogicalKeyboardKey.collapseSynonyms] to remove
+/// any synonyms key activator such as left Control and right Control.
 class ShortcutActivatorView extends StatelessWidget {
   final ShortcutActivator activator;
 

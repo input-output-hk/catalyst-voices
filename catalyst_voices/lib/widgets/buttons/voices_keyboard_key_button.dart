@@ -1,7 +1,17 @@
+import 'package:catalyst_voices/widgets/tooltips/voices_plain_tooltip.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
+/// Widget that is meant to be used as singular keyboard key indication.
+///
+/// Common use case is to show list of such keys that together means
+/// shortcut of some sorts.
+///
+/// See:
+///   * [VoicesPlainTooltip] as good starting points for used of this button.
 class VoicesKeyboardKeyButton extends StatelessWidget {
+  /// Usually [Icon], [CatalystSvgIcon] or [Text].
   final Widget child;
 
   const VoicesKeyboardKeyButton({

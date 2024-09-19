@@ -11,12 +11,6 @@ class SpacesShellPage extends StatelessWidget {
   final Space space;
   final Widget child;
 
-  const SpacesShellPage({
-    super.key,
-    required this.space,
-    required this.child,
-  });
-
   static final Map<Space, ShortcutActivator> _spacesShortcutsActivators = {
     Space.discovery: LogicalKeySet(
       LogicalKeyboardKey.control,
@@ -39,6 +33,12 @@ class SpacesShellPage extends StatelessWidget {
       LogicalKeyboardKey.keyT,
     ),
   };
+
+  const SpacesShellPage({
+    super.key,
+    required this.space,
+    required this.child,
+  });
 
   @override
   Widget build(BuildContext context) {

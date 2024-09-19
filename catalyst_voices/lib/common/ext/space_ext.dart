@@ -8,8 +8,6 @@ import 'package:flutter/material.dart';
 extension SpaceExt on Space {
   void go(BuildContext context) {
     switch (this) {
-      case Space.treasury:
-        const TreasuryRoute().go(context);
       case Space.discovery:
         const DiscoveryRoute().go(context);
       case Space.workspace:
@@ -18,6 +16,8 @@ extension SpaceExt on Space {
         const VotingRoute().go(context);
       case Space.fundedProjects:
         const FundedProjectsRoute().go(context);
+      case Space.treasury:
+        const TreasuryRoute().go(context);
     }
   }
 
