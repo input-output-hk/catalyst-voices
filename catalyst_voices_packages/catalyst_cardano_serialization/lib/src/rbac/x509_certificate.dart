@@ -11,11 +11,15 @@ bool _registeredASN1Names = false;
 /// however there's no single entry point to catalyst_cardano_serialization
 /// and we must expect different starting points. Therefore we call the method
 /// to register these names each time we need to interact with the asn1lib.
-void _registerASN1FrequentNames() {
+void _ensureASN1FrequentNamesRegistered() {
   if (!_registeredASN1Names) {
-    _registeredASN1Names = true;
-    ASN1ObjectIdentifier.registerFrequentNames();
+    _registerASN1FrequentNames();
   }
+}
+
+void _registerASN1FrequentNames() {
+  ASN1ObjectIdentifier.registerFrequentNames();
+  _registeredASN1Names = true;
 }
 
 /// Represents the X509 encoded certificate.
@@ -50,7 +54,7 @@ class X509Certificate with EquatableMixin {
 
   /// Encodes the data in ASN1 format.
   ASN1Object toASN1() {
-    _registerASN1FrequentNames();
+    _ensureASN1FrequentNamesRegistered();
 
     return ASN1Sequence()
       ..add(tbsCertificate.toASN1())
@@ -133,7 +137,7 @@ class X509TBSCertificate with EquatableMixin {
 
   /// Encodes the data in ASN1 format.
   ASN1Object toASN1() {
-    _registerASN1FrequentNames();
+    _ensureASN1FrequentNamesRegistered();
 
     final sequence = ASN1Sequence()
       ..add(_createVersion(version))
@@ -234,7 +238,7 @@ class X509DistinguishedName with EquatableMixin {
 
   /// Encodes the data in ASN1 format.
   ASN1Object toASN1() {
-    _registerASN1FrequentNames();
+    _ensureASN1FrequentNamesRegistered();
 
     final sequence = ASN1Sequence();
 
@@ -316,7 +320,7 @@ class X509CertificateExtensions with EquatableMixin {
 
   /// Encodes the data in ASN1 format.
   ASN1Object toASN1() {
-    _registerASN1FrequentNames();
+    _ensureASN1FrequentNamesRegistered();
 
     final sequence = ASN1Sequence(tag: 0xA3);
     final extensionsSequence = ASN1Sequence();
