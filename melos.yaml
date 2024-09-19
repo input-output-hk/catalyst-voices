@@ -27,6 +27,7 @@ command:
       flutter_localized_locales: ^2.0.5
       flutter_quill: ^10.5.13
       flutter_quill_extensions: ^10.5.13
+      flutter_secure_storage: ^9.2.2
       formz: ^0.7.0
       intl: ^0.19.0
       logging: ^1.2.0
