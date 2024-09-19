@@ -299,7 +299,7 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get clickToRestart => 'Click to restart';
 
   @override
-  String get spaceTreasuryName => 'Treasury';
+  String get spaceTreasuryName => 'Treasury space';
 
   @override
   String get spaceDiscoveryName => 'Discovery space';
@@ -311,7 +311,7 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get spaceVotingName => 'Voting space';
 
   @override
-  String get spaceFundedProjects => 'Funded Projects';
+  String get spaceFundedProjects => 'Funded project space';
 
   @override
   String get lock => 'Lock';
