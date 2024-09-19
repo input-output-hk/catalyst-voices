@@ -63,20 +63,6 @@ Future<void> bootstrap([
 }
 
 Future<BootstrapArgs> bootstrapTest() async {
-  // There's no need to call WidgetsFlutterBinding.ensureInitialized()
-  // since this is already done internally by SentryFlutter.init()
-  // More info here: https://github.com/getsentry/sentry-dart/issues/2063
-  if (!kReleaseMode) {
-    WidgetsFlutterBinding.ensureInitialized();
-  }
-
-  FlutterError.onError = (details) {
-    log(
-      details.exceptionAsString(),
-      stackTrace: details.stack,
-    );
-  };
-
   GoRouter.optionURLReflectsImperativeAPIs = true;
   setPathUrlStrategy();
 
@@ -90,9 +76,7 @@ Future<BootstrapArgs> bootstrapTest() async {
 
   await Dependencies.instance.init();
 
-  final args = BootstrapArgs(routerConfig: router);
-
-  return args;
+  return BootstrapArgs(routerConfig: router);
 }
 
 Future<void> _runApp(Widget app) async {
