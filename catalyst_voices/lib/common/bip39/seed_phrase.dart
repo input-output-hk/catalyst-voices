@@ -1,25 +1,30 @@
 import 'dart:convert';
 import 'package:bip39/bip39.dart' as bip39;
 
+/// Represents a seed phrase consisting of a mnemonic and its associated seed.
+/// This class provides methods for generating a new seed phrase and creating
+/// one from an existing mnemonic.
+///
+/// The seed phrase is used for cryptographic purposes, such as generating
+/// cryptocurrency wallets or secure key management.
 class SeedPhrase {
   final String mnemonic;
   final String seed;
 
-  /// Constructor to generate a new seed phrase.
-  SeedPhrase()
-      : mnemonic = bip39.generateMnemonic(),
-        seed = bip39.mnemonicToSeedHex(bip39.generateMnemonic());
+  /// Generates a new seed phrase with a random mnemonic
+  /// and its corresponding seed.
+  SeedPhrase() : this.fromMnemonic(bip39.generateMnemonic());
 
-  /// Constructor to create a SeedPhrase from an existing mnemonic.
+  /// Creates a SeedPhrase from an existing [mnemonic].
   SeedPhrase.fromMnemonic(this.mnemonic)
       : seed = bip39.mnemonicToSeedHex(mnemonic);
 
-  /// Gets the seed hex.
+  /// Returns the seed hex string associated with the mnemonic.
   String getSeed() {
     return seed;
   }
 
-  /// Gets the mnemonic.
+  /// Returns the mnemonic phrase.
   String getMnemonic() {
     return mnemonic;
   }
