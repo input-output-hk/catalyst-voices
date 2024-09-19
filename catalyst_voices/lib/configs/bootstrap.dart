@@ -62,6 +62,39 @@ Future<void> bootstrap([
   await _runApp(await builder(args));
 }
 
+Future<BootstrapArgs> bootstrapTest() async {
+  // There's no need to call WidgetsFlutterBinding.ensureInitialized()
+  // since this is already done internally by SentryFlutter.init()
+  // More info here: https://github.com/getsentry/sentry-dart/issues/2063
+  if (!kReleaseMode) {
+    WidgetsFlutterBinding.ensureInitialized();
+  }
+
+  FlutterError.onError = (details) {
+    log(
+      details.exceptionAsString(),
+      stackTrace: details.stack,
+    );
+  };
+
+  GoRouter.optionURLReflectsImperativeAPIs = true;
+  setPathUrlStrategy();
+
+  final router = AppRouter.init(
+    guards: const [
+      MilestoneGuard(),
+    ],
+  );
+
+  Bloc.observer = AppBlocObserver();
+
+  await Dependencies.instance.init();
+
+  final args = BootstrapArgs(routerConfig: router);
+
+  return args;
+}
+
 Future<void> _runApp(Widget app) async {
   if (kReleaseMode) {
     await SentryService.init(app);
