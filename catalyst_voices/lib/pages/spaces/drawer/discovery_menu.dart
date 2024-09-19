@@ -18,20 +18,24 @@ class DiscoveryDrawerMenu extends StatelessWidget {
           leading: VoicesAssets.icons.home.buildIcon(),
           name: 'Discovery Dashboard',
           backgroundColor: Space.discovery.backgroundColor(context),
+          onTap: () => Scaffold.of(context).closeDrawer(),
         ),
         const VoicesDivider(),
         VoicesNavTile(
           leading: VoicesAssets.icons.user.buildIcon(),
           name: 'Catalyst Roles',
+          onTap: () => Scaffold.of(context).closeDrawer(),
         ),
         VoicesNavTile(
           leading: VoicesAssets.icons.annotation.buildIcon(),
           name: 'Feedback',
+          onTap: () => Scaffold.of(context).closeDrawer(),
         ),
         const VoicesDivider(),
         VoicesNavTile(
           leading: VoicesAssets.icons.arrowRight.buildIcon(),
           name: 'Catalyst Gitbook documentation',
+          onTap: () => Scaffold.of(context).closeDrawer(),
         ),
       ],
     );

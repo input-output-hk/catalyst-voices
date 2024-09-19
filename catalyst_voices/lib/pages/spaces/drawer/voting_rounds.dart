@@ -21,14 +21,16 @@ class VotingRounds extends StatelessWidget {
           name: 'Voting round 14',
           status: ProposalStatus.open,
           leading: VoicesAssets.icons.vote.buildIcon(),
+          onTap: () => Scaffold.of(context).closeDrawer(),
         ),
         const SectionHeader(
           leading: SizedBox(width: 12),
           title: Text('Funding tracks / Categories'),
         ),
-        const VoicesNavTile(
+        VoicesNavTile(
           name: 'My first proposal',
-          trailing: MoreOptionsButton(),
+          trailing: const MoreOptionsButton(),
+          onTap: () => Scaffold.of(context).closeDrawer(),
         ),
         const VoicesDivider(),
         const SectionHeader(
@@ -38,10 +40,12 @@ class VotingRounds extends StatelessWidget {
         VoicesNavTile(
           name: 'Drep signup',
           leading: VoicesAssets.icons.user.buildIcon(),
+          onTap: () => Scaffold.of(context).closeDrawer(),
         ),
         VoicesNavTile(
           name: 'Drep delegation',
           leading: VoicesAssets.icons.user.buildIcon(),
+          onTap: () => Scaffold.of(context).closeDrawer(),
         ),
         const VoicesDivider(),
       ],

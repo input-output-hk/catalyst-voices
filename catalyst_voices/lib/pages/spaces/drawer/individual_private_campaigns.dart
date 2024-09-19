@@ -8,28 +8,31 @@ class IndividualPrivateCampaigns extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        SpaceHeader(Space.treasury),
-        SectionHeader(
+        const SpaceHeader(Space.treasury),
+        const SectionHeader(
           leading: SizedBox(width: 12),
           title: Text('Individual private campaigns'),
         ),
         VoicesNavTile(
           name: 'Fund name 1',
           status: ProposalStatus.ready,
-          trailing: MoreOptionsButton(),
+          trailing: const MoreOptionsButton(),
+          onTap: () => Scaffold.of(context).closeDrawer(),
         ),
         VoicesNavTile(
           name: 'Campaign 1',
           status: ProposalStatus.draft,
-          trailing: MoreOptionsButton(),
+          trailing: const MoreOptionsButton(),
+          onTap: () => Scaffold.of(context).closeDrawer(),
         ),
         VoicesNavTile(
           name: 'What happens with a campaign title that is longer that',
           status: ProposalStatus.draft,
-          trailing: MoreOptionsButton(),
+          trailing: const MoreOptionsButton(),
+          onTap: () => Scaffold.of(context).closeDrawer(),
         ),
       ],
     );

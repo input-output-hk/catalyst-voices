@@ -571,7 +571,7 @@ abstract class VoicesLocalizations {
   /// Name of space shown in different spaces that indicates its origin
   ///
   /// In en, this message translates to:
-  /// **'Treasury'**
+  /// **'Treasury space'**
   String get spaceTreasuryName;
 
   /// Name of space shown in different spaces that indicates its origin
@@ -595,7 +595,7 @@ abstract class VoicesLocalizations {
   /// Name of space shown in different spaces that indicates its origin
   ///
   /// In en, this message translates to:
-  /// **'Funded Projects'**
+  /// **'Funded project space'**
   String get spaceFundedProjects;
 
   /// Refers to a lock action, i.e. to lock the session.
