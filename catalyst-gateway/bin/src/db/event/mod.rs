@@ -19,7 +19,7 @@ pub(crate) mod legacy;
 pub(crate) mod schema_check;
 
 /// Database version this crate matches.
-/// Must equal the last Migrations Version Number.
+/// Must equal the last Migrations Version Number from `event-db/migrations`.
 pub(crate) const DATABASE_SCHEMA_VERSION: i32 = 9;
 
 /// Postgres Connection Manager DB Pool
