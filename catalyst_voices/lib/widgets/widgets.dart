@@ -27,6 +27,7 @@ export 'drawer/voices_drawer.dart';
 export 'drawer/voices_drawer_space_chooser.dart';
 export 'footers/links_page_footer.dart';
 export 'footers/standard_links_page_footer.dart';
+export 'headers/brand_header.dart';
 export 'headers/section_header.dart';
 export 'headers/segment_header.dart';
 export 'indicators/process_progress_indicator.dart';

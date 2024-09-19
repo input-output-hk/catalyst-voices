@@ -6,24 +6,22 @@ import 'package:flutter/material.dart';
 /// A custom [Drawer] component that implements the Voices style
 /// navigation drawer.
 ///
-/// By default it has a header with a logo and a close button.
-/// To provide menu items fill in the [children] list.
 /// To add a sticky bottom menu item provide [bottom] widget.
 ///
 /// The [VoicesDrawer] is indented to be used as the [Scaffold.drawer].
 /// Menu items should primarily be constructed as [VoicesListTile]s.
 class VoicesDrawer extends StatelessWidget {
-  /// The menu items displayed from the top to the bottom in a vertical list.
-  final List<Widget> children;
-
   /// The sticky menu item at the bottom.
   final Widget? bottom;
+
+  /// This widget is main "body" of [VoicesDrawer].
+  final Widget child;
 
   /// The default constructor for the [VoicesDrawer].
   const VoicesDrawer({
     super.key,
-    required this.children,
     this.bottom,
+    required this.child,
   });
 
   @override
@@ -45,16 +43,7 @@ class VoicesDrawer extends StatelessWidget {
         shape: const RoundedRectangleBorder(),
         child: Column(
           children: [
-            Expanded(
-              child: ListView(
-                physics: const ClampingScrollPhysics(),
-                padding: const EdgeInsets.all(12),
-                children: [
-                  const _Header(),
-                  ...children,
-                ],
-              ),
-            ),
+            Expanded(child: child),
             if (bottom != null)
               Padding(
                 padding: const EdgeInsets.only(
@@ -67,27 +56,6 @@ class VoicesDrawer extends StatelessWidget {
               ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  const _Header();
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Theme.of(context).brandAssets.brand.logo(context).buildPicture(),
-          IconButton(
-            onPressed: Navigator.of(context).pop,
-            icon: VoicesAssets.icons.x.buildIcon(size: 22),
-          ),
-        ],
       ),
     );
   }

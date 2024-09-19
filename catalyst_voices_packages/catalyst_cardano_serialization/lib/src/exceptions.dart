@@ -116,14 +116,17 @@ final class TxValueSizeExceededException extends Equatable
 
 /// Exception thrown when parsing a hash that has incorrect length.
 final class HashFormatException extends Equatable implements Exception {
+  /// Exception details.
+  final String? message;
+
   /// The default constructor for [HashFormatException].
-  const HashFormatException();
+  const HashFormatException([this.message]);
 
   @override
-  String toString() => 'HashFormatException';
+  String toString() => 'HashFormatException: $message';
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [message];
 }
 
 /// Exception thrown if the address doesn't match the bech32 specification
