@@ -5,6 +5,7 @@
 
 import 'package:bip32_ed25519/bip32_ed25519.dart';
 import 'package:catalyst_cardano_serialization/src/exceptions.dart';
+import 'package:catalyst_cardano_serialization/src/hashes.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:cbor/cbor.dart';
 import 'package:equatable/equatable.dart';
@@ -78,6 +79,11 @@ class ShelleyAddress extends Equatable implements CborEncodable {
   /// Returns the [NetworkId] related to this address.
   NetworkId get network => _extractNetworkId(bytes);
 
+  /// Returns the [Ed25519PublicKeyHash] contained in this address.
+  ///
+  /// Practically it's the address without the header byte.
+  Ed25519PublicKeyHash get publicKeyHash => _extractPublicKeyHash(bytes);
+
   /// Encodes the address in bech32 format.
   String toBech32() {
     final prefix = _computeHrp(network, hrp);
@@ -149,5 +155,12 @@ class ShelleyAddress extends Equatable implements CborEncodable {
     return NetworkId.testnet.id == (bytes[0] & 0x0f)
         ? NetworkId.testnet
         : NetworkId.mainnet;
+  }
+
+  /// Extracts the payload from [bytes].
+  ///
+  /// Format [ 8 bit header | payload ]
+  static Ed25519PublicKeyHash _extractPublicKeyHash(List<int> bytes) {
+    return Ed25519PublicKeyHash.fromBytes(bytes: bytes.sublist(1));
   }
 }

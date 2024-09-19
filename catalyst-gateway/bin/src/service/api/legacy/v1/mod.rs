@@ -1,26 +1,19 @@
 //! `v1` Endpoints
-
-use std::sync::Arc;
-
-use poem::web::Data;
 use poem_openapi::{
     param::{Path, Query},
     payload::Json,
     OpenApi,
 };
 
-use crate::{
-    service::{
-        common::{
-            objects::legacy::{
-                account_votes::AccountId, fragments_batch::FragmentsBatch,
-                fragments_processing_summary::FragmentId,
-            },
-            tags::ApiTags,
+use crate::service::{
+    common::{
+        objects::legacy::{
+            account_votes::AccountId, fragments_batch::FragmentsBatch,
+            fragments_processing_summary::FragmentId,
         },
-        utilities::middleware::schema_validation::schema_version_validation,
+        tags::ApiTags,
     },
-    state::State,
+    utilities::middleware::schema_validation::schema_version_validation,
 };
 
 mod account_votes_get;
@@ -45,11 +38,10 @@ impl V1Api {
     /// Get from all active vote plans, the index of the voted proposals
     /// by the given account ID.
     async fn get_account_votes(
-        &self, state: Data<&Arc<State>>,
-        /// A account ID to get the votes for.
+        &self, /// A account ID to get the votes for.
         account_id: Path<AccountId>,
     ) -> account_votes_get::AllResponses {
-        account_votes_get::endpoint(state, account_id).await
+        account_votes_get::endpoint(account_id).await
     }
 
     /// Process fragments

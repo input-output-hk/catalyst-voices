@@ -1,89 +1,390 @@
 //! Logic for orchestrating followers
-use std::{path::PathBuf, sync::Arc, time::Duration};
 
-/// Handler for follower tasks, allows for control over spawned follower threads
-pub type ManageTasks = JoinHandle<()>;
+use std::{fmt::Display, time::Duration};
 
-use anyhow::Context;
 use cardano_chain_follower::{
-    network_genesis_values, ChainUpdate, Follower, FollowerConfigBuilder, Network, Point,
+    ChainFollower, ChainSyncConfig, Network, Point, ORIGIN_POINT, TIP_POINT,
 };
-use pallas::ledger::traverse::{wellknown::GenesisValues, MultiEraBlock, MultiEraTx};
-use tokio::{sync::mpsc, task::JoinHandle, time};
-use tracing::{error, info};
+use duration_string::DurationString;
+use futures::{stream::FuturesUnordered, StreamExt};
+use rand::{Rng, SeedableRng};
+use tracing::{error, info, warn};
 
-use crate::event_db::{
-    cardano::{
-        chain_state::{IndexedFollowerDataParams, MachineId},
-        cip36_registration::IndexedVoterRegistrationParams,
-        config::FollowerConfig,
-        utxo::{IndexedTxnInputParams, IndexedTxnOutputParams, IndexedTxnParams},
-    },
-    error::NotFoundError,
-    EventDB,
+use crate::{
+    db::index::{block::index_block, session::CassandraSession},
+    settings::Settings,
 };
 
-pub(crate) mod cip36_registration;
+// pub(crate) mod cip36_registration_obsolete;
 pub(crate) mod util;
 
 /// Blocks batch length that will trigger the blocks buffer to be written to the database.
+#[allow(dead_code)]
 const MAX_BLOCKS_BATCH_LEN: usize = 1024;
 
-/// Returns a follower configs, waits until they present inside the db
-async fn get_follower_config(
-    check_config_tick: u64, db: Arc<EventDB>,
-) -> anyhow::Result<Vec<FollowerConfig>> {
-    let mut interval = time::interval(time::Duration::from_secs(check_config_tick));
-    loop {
-        // tick until config exists
-        interval.tick().await;
+/// How long we wait between checks for connection to the indexing DB to be ready.
+const INDEXING_DB_READY_WAIT_INTERVAL: Duration = Duration::from_secs(1);
 
-        match db.get_follower_config().await {
-            Ok(configs) => break Ok(configs),
-            Err(err) if err.is::<NotFoundError>() => {
-                error!("No follower config found");
-                continue;
-            },
-            Err(err) => break Err(err),
+/// Start syncing a particular network
+async fn start_sync_for(chain: Network) -> anyhow::Result<()> {
+    let cfg = ChainSyncConfig::default_for(chain);
+    info!(chain = %cfg.chain, "Starting Blockchain Sync");
+
+    if let Err(error) = cfg.run().await {
+        error!(chain=%chain, error=%error, "Failed to start chain sync task");
+        Err(error)?;
+    }
+
+    Ok(())
+}
+
+/// Data we return from a sync task.
+struct SyncParams {
+    /// What blockchain are we syncing.
+    chain: Network,
+    /// The starting point of this sync.
+    start: Point,
+    /// The ending point of this sync.
+    end: Point,
+    /// The first block we successfully synced.
+    first_indexed_block: Option<Point>,
+    /// The last block we successfully synced.
+    last_indexed_block: Option<Point>,
+    /// The number of blocks we successfully synced overall.
+    total_blocks_synced: u64,
+    /// The number of blocks we successfully synced, in the last attempt.
+    last_blocks_synced: u64,
+    /// The number of retries so far on this sync task.
+    retries: u64,
+    /// The number of retries so far on this sync task.
+    backoff_delay: Option<Duration>,
+    /// If the sync completed without error or not.
+    result: Option<anyhow::Result<()>>,
+}
+
+impl Display for SyncParams {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if self.result.is_none() {
+            write!(f, "Sync_Params {{ ")?;
+        } else {
+            write!(f, "Sync_Result {{ ")?;
+        }
+
+        write!(f, "start: {}, end: {}", self.start, self.end)?;
+
+        if let Some(first) = self.first_indexed_block.as_ref() {
+            write!(f, ", first_indexed_block: {first}")?;
+        }
+
+        if let Some(last) = self.last_indexed_block.as_ref() {
+            write!(f, ", last_indexed_block: {last}")?;
+        }
+
+        if self.retries > 0 {
+            write!(f, ", retries: {}", self.retries)?;
+        }
+
+        if self.retries > 0 || self.result.is_some() {
+            write!(f, ", synced_blocks: {}", self.total_blocks_synced)?;
+        }
+
+        if self.result.is_some() {
+            write!(f, ", last_sync: {}", self.last_blocks_synced)?;
+        }
+
+        if let Some(backoff) = self.backoff_delay.as_ref() {
+            write!(f, ", backoff: {}", DurationString::from(*backoff))?;
+        }
+
+        if let Some(result) = self.result.as_ref() {
+            match result {
+                Ok(()) => write!(f, ", Success")?,
+                Err(error) => write!(f, ", {error}")?,
+            };
+        }
+
+        f.write_str(" }")
+    }
+}
+
+/// The range we generate random backoffs within given a base backoff value.
+const BACKOFF_RANGE_MULTIPLIER: u32 = 3;
+
+impl SyncParams {
+    /// Create a new `SyncParams`.
+    fn new(chain: Network, start: Point, end: Point) -> Self {
+        Self {
+            chain,
+            start,
+            end,
+            first_indexed_block: None,
+            last_indexed_block: None,
+            total_blocks_synced: 0,
+            last_blocks_synced: 0,
+            retries: 0,
+            backoff_delay: None,
+            result: None,
         }
     }
+
+    /// Convert a result back into parameters for a retry.
+    fn retry(&self) -> Self {
+        let retry_count = self.retries + 1;
+
+        let mut backoff = None;
+
+        // If we did sync any blocks last time, first retry is immediate.
+        // Otherwise we backoff progressively more as we do more retries.
+        if self.last_blocks_synced == 0 {
+            // Calculate backoff based on number of retries so far.
+            backoff = match retry_count {
+                1 => Some(Duration::from_secs(1)),     // 1-3 seconds
+                2..5 => Some(Duration::from_secs(10)), // 10-30 seconds
+                _ => Some(Duration::from_secs(30)),    // 30-90 seconds.
+            };
+        }
+
+        Self {
+            chain: self.chain,
+            start: self.start.clone(),
+            end: self.end.clone(),
+            first_indexed_block: self.first_indexed_block.clone(),
+            last_indexed_block: self.last_indexed_block.clone(),
+            total_blocks_synced: self.total_blocks_synced,
+            last_blocks_synced: 0,
+            retries: retry_count,
+            backoff_delay: backoff,
+            result: None,
+        }
+    }
+
+    /// Convert Params into the result of the sync.
+    fn done(
+        &self, first: Option<Point>, last: Option<Point>, synced: u64, result: anyhow::Result<()>,
+    ) -> Self {
+        Self {
+            chain: self.chain,
+            start: self.start.clone(),
+            end: self.end.clone(),
+            first_indexed_block: first,
+            last_indexed_block: last,
+            total_blocks_synced: synced + self.total_blocks_synced,
+            last_blocks_synced: synced,
+            retries: self.retries,
+            backoff_delay: self.backoff_delay,
+            result: Some(result),
+        }
+    }
+
+    /// Get where this sync run actually needs to start from.
+    fn actual_start(&self) -> Point {
+        self.last_indexed_block
+            .as_ref()
+            .unwrap_or(&self.start)
+            .clone()
+    }
+
+    /// Do the backoff delay processing.
+    ///
+    /// The actual delay is a random time from the Delay itself to
+    /// `BACKOFF_RANGE_MULTIPLIER` times the delay. This is to prevent hammering the
+    /// service at regular intervals.
+    async fn backoff(&self) {
+        if let Some(backoff) = self.backoff_delay {
+            let mut rng = rand::rngs::StdRng::from_entropy();
+            let actual_backoff =
+                rng.gen_range(backoff..backoff.saturating_mul(BACKOFF_RANGE_MULTIPLIER));
+
+            tokio::time::sleep(actual_backoff).await;
+        }
+    }
+}
+
+/// Sync a portion of the blockchain.
+/// Set end to `TIP_POINT` to sync the tip continuously.
+fn sync_subchain(params: SyncParams) -> tokio::task::JoinHandle<SyncParams> {
+    tokio::spawn(async move {
+        info!(chain = %params.chain, params=%params, "Indexing Blockchain");
+
+        // Backoff hitting the database if we need to.
+        params.backoff().await;
+
+        // Wait for indexing DB to be ready before continuing.
+        CassandraSession::wait_is_ready(INDEXING_DB_READY_WAIT_INTERVAL).await;
+        info!(chain=%params.chain, params=%params,"Indexing DB is ready");
+
+        let mut first_indexed_block = params.first_indexed_block.clone();
+        let mut last_indexed_block = params.last_indexed_block.clone();
+        let mut blocks_synced = 0u64;
+
+        let mut follower =
+            ChainFollower::new(params.chain, params.actual_start(), params.end.clone()).await;
+        while let Some(chain_update) = follower.next().await {
+            match chain_update.kind {
+                cardano_chain_follower::Kind::ImmutableBlockRollForward => {
+                    // We only process these on the follower tracking the TIP.
+                    if params.end == TIP_POINT {
+                        warn!("TODO: Immutable Chain roll forward");
+                    };
+                },
+                cardano_chain_follower::Kind::Block => {
+                    let block = chain_update.block_data();
+
+                    if let Err(error) = index_block(block).await {
+                        let error_msg = format!("Failed to index block {}", block.point());
+                        error!(chain=%params.chain, error=%error, params=%params, error_msg);
+                        return params.done(
+                            first_indexed_block,
+                            last_indexed_block,
+                            blocks_synced,
+                            Err(error.context(error_msg)),
+                        );
+                    }
+
+                    if first_indexed_block.is_none() {
+                        first_indexed_block = Some(block.point());
+                    }
+                    last_indexed_block = Some(block.point());
+                    blocks_synced += 1;
+                },
+                cardano_chain_follower::Kind::Rollback => {
+                    warn!("TODO: Live Chain rollback");
+                },
+            }
+        }
+
+        let result = params.done(
+            first_indexed_block,
+            last_indexed_block,
+            blocks_synced,
+            Ok(()),
+        );
+
+        info!(chain = %params.chain, result=%result, "Indexing Blockchain Completed: OK");
+
+        result
+    })
 }
 
 /// Start followers as per defined in the config
-pub(crate) async fn start_followers(
-    db: Arc<EventDB>, check_config_tick: u64, data_refresh_tick: u64, machine_id: String,
-) -> anyhow::Result<()> {
-    let mut current_config = get_follower_config(check_config_tick, db.clone()).await?;
-    loop {
-        // spawn followers and obtain thread handlers for control and future cancellation
-        let follower_tasks = spawn_followers(
-            current_config.clone(),
-            db.clone(),
-            data_refresh_tick,
-            machine_id.clone(),
-        )
-        .await?;
+#[allow(unused)]
+pub(crate) async fn start_followers() -> anyhow::Result<()> {
+    let cfg = Settings::follower_cfg();
 
-        // Followers should continue indexing until config has changed
-        current_config = loop {
-            let new_config = get_follower_config(check_config_tick, db.clone()).await?;
-            if new_config != current_config {
-                info!("Config has changed! restarting");
-                break new_config;
-            }
-        };
+    // Log the chain follower configuration.
+    cfg.log();
 
-        // Config has changed, terminate all followers and restart with new config.
-        info!("Terminating followers");
-        for task in follower_tasks {
-            task.abort();
+    // Start Syncing the blockchain, so we can consume its data as required.
+    start_sync_for(cfg.chain).await?;
+    info!(chain=%cfg.chain,"Chain Sync is started.");
+
+    tokio::spawn(async move {
+        // We can't sync until the local chain data is synced.
+        // This call will wait until we sync.
+        let tips = cardano_chain_follower::ChainFollower::get_tips(cfg.chain).await;
+        let immutable_tip_slot = tips.0.slot_or_default();
+        let live_tip_slot = tips.1.slot_or_default();
+        info!(chain=%cfg.chain, immutable_tip=immutable_tip_slot, live_tip=live_tip_slot, "Blockchain ready to sync from.");
+
+        let mut sync_tasks: FuturesUnordered<tokio::task::JoinHandle<SyncParams>> =
+            FuturesUnordered::new();
+
+        // Start the Immutable Chain sync tasks.
+        // If the number of sync tasks is zero, just have one.
+        //   Note: this shouldn't be possible, but easy to handle if it is.
+        let sub_chain_slots = immutable_tip_slot
+            .checked_div(cfg.sync_tasks.into())
+            .unwrap_or(immutable_tip_slot);
+        // Need steps in a usize, in the highly unlikely event the steps are > max usize, make
+        // them max usize.
+        let sub_chain_steps: usize = sub_chain_slots.try_into().unwrap_or(usize::MAX);
+
+        let mut start_point = ORIGIN_POINT;
+        for slot_end in (sub_chain_slots..immutable_tip_slot).step_by(sub_chain_steps) {
+            let next_point = cardano_chain_follower::Point::fuzzy(slot_end);
+
+            sync_tasks.push(sync_subchain(SyncParams::new(
+                cfg.chain,
+                start_point,
+                next_point.clone(),
+            )));
+
+            // Next start == last end.
+            start_point = next_point;
         }
-    }
+
+        // Start the Live Chain sync task - This never stops syncing.
+        sync_tasks.push(sync_subchain(SyncParams::new(
+            cfg.chain,
+            start_point,
+            TIP_POINT,
+        )));
+
+        // Wait Sync tasks to complete.  If they fail and have not completed, reschedule them.
+        // They will return from this iterator in the order they complete.
+        while let Some(completed) = sync_tasks.next().await {
+            let remaining_followers = sync_tasks.len();
+
+            match completed {
+                Ok(finished) => {
+                    // Sync task finished.  Check if it completed OK or had an error.
+                    // If it failed, we need to reschedule it.
+
+                    let last_block = finished
+                        .last_indexed_block
+                        .clone()
+                        .map_or("None".to_string(), |v| v.to_string());
+
+                    let first_block = finished
+                        .first_indexed_block
+                        .clone()
+                        .map_or("None".to_string(), |v| v.to_string());
+
+                    // The TIP follower should NEVER end, even without error, so report that as an
+                    // error. It can fail if the index DB goes down in some way.
+                    // Restart it always.
+                    if finished.end == TIP_POINT {
+                        error!(chain=%cfg.chain, report=%finished, 
+                            "The TIP follower failed, restarting it.");
+
+                        // Start the Live Chain sync task again from where it left off.
+                        sync_tasks.push(sync_subchain(finished.retry()));
+                    } else if let Some(result) = finished.result.as_ref() {
+                        match result {
+                            Ok(()) => {
+                                info!(chain=%cfg.chain, report=%finished, 
+                                    "The Immutable follower completed successfully.");
+                            },
+                            Err(error) => {
+                                // let report = &finished.to_string();
+                                error!(chain=%cfg.chain, report=%finished,
+                                    "An Immutable follower failed, restarting it.");
+                                // Start the Live Chain sync task again from where it left off.
+                                sync_tasks.push(sync_subchain(finished.retry()));
+                            },
+                        }
+                    } else {
+                        error!(chain=%cfg.chain, report=%finished,
+                                 "The Immutable follower completed, but without a proper result.");
+                    }
+                },
+                Err(error) => {
+                    error!(error=%error, "Sync task failed. Can not restart it, not enough information.  Sync is probably failed at this point.");
+                },
+            }
+        }
+
+        error!("Sync tasks have all stopped.  This is an unexpected error!");
+    });
+
+    Ok(())
 }
+
+const _UNUSED_CODE: &str = r#"
 
 /// Spawn follower threads and return associated handlers
 async fn spawn_followers(
-    configs: Vec<FollowerConfig>, db: Arc<EventDB>, _data_refresh_tick: u64, machine_id: String,
+    configs: Vec<FollowerConfig>, _data_refresh_tick: u64, machine_id: String,
 ) -> anyhow::Result<Vec<ManageTasks>> {
     let mut follower_tasks = Vec::new();
 
@@ -91,7 +392,6 @@ async fn spawn_followers(
         let follower_handler = spawn_follower(
             config.network,
             &config.relay,
-            db.clone(),
             machine_id.clone(),
             &config.mithril_snapshot.path,
         )
@@ -106,12 +406,12 @@ async fn spawn_followers(
 /// Initiate single follower and returns associated task handler
 /// which facilitates future control over spawned threads.
 async fn spawn_follower(
-    network: Network, relay: &str, db: Arc<EventDB>, machine_id: MachineId, snapshot: &str,
+    network: Network, relay: &str, machine_id: MachineId, snapshot: &str,
 ) -> anyhow::Result<ManageTasks> {
     // Establish point at which the last follower stopped updating in order to pick up
     // where it left off. If there was no previous follower, start indexing from
     // genesis point.
-    let start_from = match db.last_updated_state(network).await {
+    let start_from = match EventDB::last_updated_state(network).await {
         Ok((slot_no, block_hash, _)) => Point::new(slot_no.try_into()?, block_hash),
         Err(err) if err.is::<NotFoundError>() => Point::Origin,
         Err(err) => return Err(err),
@@ -125,7 +425,7 @@ async fn spawn_follower(
         .ok_or(anyhow::anyhow!("Obtaining genesis values failed"))?;
 
     let task = tokio::spawn(async move {
-        process_blocks(&mut follower, db, network, machine_id, &genesis_values).await;
+        process_blocks(&mut follower, network, machine_id, &genesis_values).await;
     });
 
     Ok(task)
@@ -133,7 +433,7 @@ async fn spawn_follower(
 
 /// Process next block from the follower
 async fn process_blocks(
-    follower: &mut Follower, db: Arc<EventDB>, network: Network, machine_id: MachineId,
+    follower: &mut Follower, network: Network, machine_id: MachineId,
     genesis_values: &GenesisValues,
 ) {
     info!("Follower started processing blocks");
@@ -157,7 +457,7 @@ async fn process_blocks(
                                 blocks_buffer.push(block_data);
 
                                 if blocks_buffer.len() >= MAX_BLOCKS_BATCH_LEN {
-                                    index_block_buffer(db.clone(), &genesis_values, network, &machine_id, std::mem::take(&mut blocks_buffer)).await;
+                                    index_block_buffer(&genesis_values, network, &machine_id, std::mem::take(&mut blocks_buffer)).await;
 
                                     // Reset batch ticker since we just indexed the blocks buffer
                                     ticker.reset();
@@ -184,7 +484,7 @@ async fn process_blocks(
                         }
 
                         let current_buffer = std::mem::take(&mut blocks_buffer);
-                        index_block_buffer(db.clone(), &genesis_values, network, &machine_id, current_buffer).await;
+                        index_block_buffer(&genesis_values, network, &machine_id, current_buffer).await;
 
                         // Reset the ticker so it counts the interval as starting after we wrote everything
                         // to the database.
@@ -235,7 +535,7 @@ async fn process_blocks(
 
 /// Consumes a block buffer and indexes its data.
 async fn index_block_buffer(
-    db: Arc<EventDB>, genesis_values: &GenesisValues, network: Network, machine_id: &MachineId,
+    genesis_values: &GenesisValues, network: Network, machine_id: &MachineId,
     buffer: Vec<cardano_chain_follower::MultiEraBlockData>,
 ) {
     info!("Starting data batch indexing");
@@ -251,7 +551,7 @@ async fn index_block_buffer(
         }
     }
 
-    match index_many_blocks(db.clone(), genesis_values, network, machine_id, &blocks).await {
+    match index_many_blocks(genesis_values, network, machine_id, &blocks).await {
         Ok(()) => {
             info!("Finished indexing data batch");
         },
@@ -263,7 +563,7 @@ async fn index_block_buffer(
 
 /// Index a slice of blocks.
 async fn index_many_blocks(
-    db: Arc<EventDB>, genesis_values: &GenesisValues, network: Network, machine_id: &MachineId,
+    genesis_values: &GenesisValues, network: Network, machine_id: &MachineId,
     blocks: &[MultiEraBlock<'_>],
 ) -> anyhow::Result<()> {
     let Some(last_block) = blocks.last() else {
@@ -272,19 +572,18 @@ async fn index_many_blocks(
 
     let network_str = network.to_string();
 
-    index_blocks(&db, genesis_values, &network_str, blocks).await?;
-    index_transactions(&db, blocks, &network_str).await?;
-    index_voter_registrations(&db, blocks, network).await?;
+    index_blocks(genesis_values, &network_str, blocks).await?;
+    index_transactions(blocks, &network_str).await?;
+    index_voter_registrations(blocks, network).await?;
 
-    match db
-        .refresh_last_updated(
-            chrono::offset::Utc::now(),
-            last_block.slot().try_into()?,
-            last_block.hash().to_vec(),
-            network,
-            machine_id,
-        )
-        .await
+    match EventDB::refresh_last_updated(
+        chrono::offset::Utc::now(),
+        last_block.slot().try_into()?,
+        last_block.hash().to_vec(),
+        network,
+        machine_id,
+    )
+    .await
     {
         Ok(()) => {},
         Err(err) => {
@@ -297,7 +596,7 @@ async fn index_many_blocks(
 
 /// Index the data from the given blocks.
 async fn index_blocks(
-    db: &EventDB, genesis_values: &GenesisValues, network_str: &str, blocks: &[MultiEraBlock<'_>],
+    genesis_values: &GenesisValues, network_str: &str, blocks: &[MultiEraBlock<'_>],
 ) -> anyhow::Result<usize> {
     let values: Vec<_> = blocks
         .iter()
@@ -306,7 +605,7 @@ async fn index_blocks(
         })
         .collect();
 
-    db.index_many_follower_data(&values)
+    EventDB::index_many_follower_data(&values)
         .await
         .context("Indexing block data")?;
 
@@ -314,24 +613,22 @@ async fn index_blocks(
 }
 
 /// Index transactions (and its inputs and outputs) from a slice of blocks.
-async fn index_transactions(
-    db: &EventDB, blocks: &[MultiEraBlock<'_>], network_str: &str,
-) -> anyhow::Result<()> {
+async fn index_transactions(blocks: &[MultiEraBlock<'_>], network_str: &str) -> anyhow::Result<()> {
     let blocks_txs: Vec<_> = blocks
         .iter()
         .flat_map(|b| b.txs().into_iter().map(|tx| (b.slot(), tx)))
         .collect();
 
-    index_transactions_data(db, network_str, &blocks_txs).await?;
-    index_transaction_outputs_data(db, &blocks_txs).await?;
-    index_transaction_inputs_data(db, &blocks_txs).await?;
+    index_transactions_data(network_str, &blocks_txs).await?;
+    index_transaction_outputs_data(&blocks_txs).await?;
+    index_transaction_inputs_data(&blocks_txs).await?;
 
     Ok(())
 }
 
 /// Index transactions data.
 async fn index_transactions_data(
-    db: &EventDB, network_str: &str, blocks_txs: &[(u64, MultiEraTx<'_>)],
+    network_str: &str, blocks_txs: &[(u64, MultiEraTx<'_>)],
 ) -> anyhow::Result<usize> {
     let values: Vec<_> = blocks_txs
         .iter()
@@ -344,7 +641,7 @@ async fn index_transactions_data(
         })
         .collect::<anyhow::Result<Vec<_>>>()?;
 
-    db.index_many_txn_data(&values)
+    EventDB::index_many_txn_data(&values)
         .await
         .context("Indexing transaction data")?;
 
@@ -353,14 +650,14 @@ async fn index_transactions_data(
 
 /// Index transaction outputs data.
 async fn index_transaction_outputs_data(
-    db: &EventDB, blocks_txs: &[(u64, MultiEraTx<'_>)],
+    blocks_txs: &[(u64, MultiEraTx<'_>)],
 ) -> anyhow::Result<usize> {
     let values: Vec<_> = blocks_txs
         .iter()
         .flat_map(|(_, tx)| IndexedTxnOutputParams::from_txn_data(tx))
         .collect();
 
-    db.index_many_txn_output_data(&values)
+    EventDB::index_many_txn_output_data(&values)
         .await
         .context("Indexing transaction outputs")?;
 
@@ -369,14 +666,14 @@ async fn index_transaction_outputs_data(
 
 /// Index transaction inputs data.
 async fn index_transaction_inputs_data(
-    db: &EventDB, blocks_txs: &[(u64, MultiEraTx<'_>)],
+    blocks_txs: &[(u64, MultiEraTx<'_>)],
 ) -> anyhow::Result<usize> {
     let values: Vec<_> = blocks_txs
         .iter()
         .flat_map(|(_, tx)| IndexedTxnInputParams::from_txn_data(tx))
         .collect();
 
-    db.index_many_txn_input_data(&values)
+    EventDB::index_many_txn_input_data(&values)
         .await
         .context("Indexing transaction inputs")?;
 
@@ -385,7 +682,7 @@ async fn index_transaction_inputs_data(
 
 /// Index voter registrations from a slice of blocks.
 async fn index_voter_registrations(
-    db: &EventDB, blocks: &[MultiEraBlock<'_>], network: Network,
+    blocks: &[MultiEraBlock<'_>], network: Network,
 ) -> anyhow::Result<usize> {
     let values: Vec<_> = blocks
         .iter()
@@ -393,7 +690,7 @@ async fn index_voter_registrations(
         .flatten()
         .collect();
 
-    db.index_many_voter_registration_data(&values)
+    EventDB::index_many_voter_registration_data(&values)
         .await
         .context("Indexing voter registration")?;
 
@@ -424,3 +721,5 @@ async fn instantiate_follower(
 
     Ok(follower)
 }
+
+"#;

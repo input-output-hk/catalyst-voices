@@ -149,7 +149,7 @@ export default async function buildUnsignedTx(
 
   // #7 add auxiliary data hash
   if (builder.auxiliaryDataHash) {
-    // note: the hash will be set after building auxillary data
+    // note: the hash will be set after building auxiliary data
   }
 
   // #8 add validity interval start
@@ -219,7 +219,7 @@ export default async function buildUnsignedTx(
 
   // build a full transaction, passing in empty witness set
   const txBody = txBuilder.build();
-  
+
   // #15 add network id
   if (builder.networkId && [0, 1].includes(Number(builder.networkId))) {
     const networkId = Number(builder.networkId) === 0 ? NetworkId.testnet() : NetworkId.mainnet()

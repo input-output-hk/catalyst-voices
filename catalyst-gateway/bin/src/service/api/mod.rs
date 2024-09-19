@@ -11,9 +11,10 @@ use local_ip_address::list_afinet_netifas;
 use poem_openapi::{ContactObject, LicenseObject, OpenApiService, ServerObject};
 
 use self::cardano::CardanoApi;
-use crate::settings::{DocsSettings, API_URL_PREFIX};
-
-mod cardano;
+use crate::settings::Settings;
+/// Auth
+mod auth;
+pub(crate) mod cardano;
 mod health;
 mod legacy;
 
@@ -58,9 +59,7 @@ const TERMS_OF_SERVICE: &str =
     "https://github.com/input-output-hk/catalyst-voices/blob/main/CODE_OF_CONDUCT.md";
 
 /// Create the `OpenAPI` definition
-pub(crate) fn mk_api(
-    hosts: Vec<String>, settings: &DocsSettings,
-) -> OpenApiService<(HealthApi, CardanoApi, LegacyApi), ()> {
+pub(crate) fn mk_api() -> OpenApiService<(HealthApi, CardanoApi, LegacyApi), ()> {
     let mut service = OpenApiService::new(
         (
             HealthApi,
@@ -74,25 +73,24 @@ pub(crate) fn mk_api(
     .description(API_DESCRIPTION)
     .license(get_api_license())
     .terms_of_service(TERMS_OF_SERVICE)
-    .url_prefix(API_URL_PREFIX.as_str());
+    .url_prefix(Settings::api_url_prefix());
 
-    // Retrieve the port from the socket address
-    let port = settings.address.port().to_string();
-
-    let server_name = &settings.server_name;
+    let hosts = Settings::api_host_names();
 
     for host in hosts {
         service = service.server(ServerObject::new(host).description("API Host"));
     }
 
     // Add server name if it is set
-    if let Some(name) = server_name {
+    if let Some(name) = Settings::server_name() {
         service = service.server(ServerObject::new(name).description("Server at server name"));
     }
 
+    let port = Settings::bound_address().port();
+
     // Get localhost name
     if let Ok(hostname) = gethostname().into_string() {
-        let hostname_address = format!("http://{hostname}:{port}");
+        let hostname_address = format!("http://{hostname}:{port}",);
         service = service
             .server(ServerObject::new(hostname_address).description("Server at localhost name"));
     }

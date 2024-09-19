@@ -2,8 +2,6 @@
 //!
 //! This provides only the primary entrypoint to the service.
 
-use std::sync::Arc;
-
 use poem::{
     endpoint::PrometheusExporter,
     listener::TcpListener,
@@ -21,27 +19,24 @@ use crate::{
             middleware::tracing_mw::{init_prometheus, Tracing},
         },
     },
-    settings::{get_api_host_names, DocsSettings, API_URL_PREFIX},
-    state::State,
+    settings::Settings,
 };
 
 /// This exists to allow us to add extra routes to the service for testing purposes.
-fn mk_app(
-    hosts: Vec<String>, base_route: Option<Route>, state: &Arc<State>, settings: &DocsSettings,
-) -> impl Endpoint {
+fn mk_app(base_route: Option<Route>) -> impl Endpoint {
     // Get the base route if defined, or a new route if not.
     let base_route = match base_route {
         Some(route) => route,
         None => Route::new(),
     };
 
-    let api_service = mk_api(hosts, settings);
+    let api_service = mk_api();
     let docs = docs(&api_service);
 
     let prometheus_registry = init_prometheus();
 
     base_route
-        .nest(API_URL_PREFIX.as_str(), api_service)
+        .nest(Settings::api_url_prefix(), api_service)
         .nest("/docs", docs)
         .nest("/metrics", PrometheusExporter::new(prometheus_registry))
         .nest("/favicon.ico", favicon())
@@ -49,12 +44,11 @@ fn mk_app(
         .with(Compression::new().with_quality(CompressionLevel::Fastest))
         .with(CatchPanic::new().with_handler(ServicePanicHandler))
         .with(Tracing)
-        .data(state.clone())
 }
 
 /// Get the API docs as a string in the JSON format.
-pub(crate) fn get_app_docs(setting: &DocsSettings) -> String {
-    let api_service = mk_api(vec![], setting);
+pub(crate) fn get_app_docs() -> String {
+    let api_service = mk_api();
     api_service.spec()
 }
 
@@ -71,11 +65,12 @@ pub(crate) fn get_app_docs(setting: &DocsSettings) -> String {
 /// * `Error::CannotRunService` - cannot run the service
 /// * `Error::EventDbError` - cannot connect to the event db
 /// * `Error::IoError` - An IO error has occurred.
-pub(crate) async fn run(settings: &DocsSettings, state: Arc<State>) -> anyhow::Result<()> {
+pub(crate) async fn run() -> anyhow::Result<()> {
     // The address to listen on
-    let addr = settings.address;
-    tracing::info!("Starting Poem Service ...");
-    tracing::info!("Listening on {addr}");
+    tracing::info!(
+        ServiceAddr = Settings::bound_address().to_string(),
+        "Starting Cat-Gateway API Service ..."
+    );
 
     // Set a custom panic hook, so we can catch panics and not crash the service.
     // And also get data from the panic so we can log it.
@@ -83,11 +78,13 @@ pub(crate) async fn run(settings: &DocsSettings, state: Arc<State>) -> anyhow::R
     // help find them in the logs if they happen in production.
     set_panic_hook();
 
-    let hosts = get_api_host_names(&addr);
+    let app = mk_app(None);
 
-    let app = mk_app(hosts, None, &state, settings);
-
-    Ok(poem::Server::new(TcpListener::bind(addr)).run(app).await?)
+    Ok(
+        poem::Server::new(TcpListener::bind(Settings::bound_address()))
+            .run(app)
+            .await?,
+    )
 }
 
 #[cfg(test)]
