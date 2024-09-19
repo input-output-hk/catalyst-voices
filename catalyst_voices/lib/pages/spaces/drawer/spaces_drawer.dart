@@ -12,7 +12,7 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
-class SpacesDrawer extends StatelessWidget {
+class SpacesDrawer extends StatefulWidget {
   final Space space;
   final Map<Space, ShortcutActivator> spacesShortcutsActivators;
   final bool isUnlocked;
@@ -25,17 +25,54 @@ class SpacesDrawer extends StatelessWidget {
   });
 
   @override
+  State<SpacesDrawer> createState() => _SpacesDrawerState();
+}
+
+class _SpacesDrawerState extends State<SpacesDrawer> {
+  late final PageController _pageController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    final initialPage = Space.values.indexOf(widget.space);
+    _pageController = PageController(initialPage: initialPage);
+  }
+
+  @override
+  void didUpdateWidget(covariant SpacesDrawer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.space != oldWidget.space) {
+      final page = Space.values.indexOf(widget.space);
+      unawaited(
+        _pageController.animateToPage(
+          page,
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeIn,
+        ),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return VoicesDrawer(
       bottom: VoicesDrawerSpaceChooser(
-        currentSpace: space,
+        currentSpace: widget.space,
         onChanged: (space) => space.go(context),
         onOverallTap: () {
           Scaffold.of(context).closeDrawer();
           unawaited(const OverallSpacesRoute().push<void>(context));
         },
         builder: (context, value, child) {
-          final shortcutActivator = spacesShortcutsActivators[value];
+          final shortcutActivator = widget.spacesShortcutsActivators[value];
 
           return VoicesPlainTooltip(
             message: value.localizedName(context.l10n),
@@ -46,15 +83,41 @@ class SpacesDrawer extends StatelessWidget {
           );
         },
       ),
-      children: [
-        _menuBuilder(),
-      ],
+      child: Column(
+        children: [
+          const SizedBox(height: 12),
+          const BrandHeader(),
+          Expanded(
+            child: PageView.builder(
+              physics: const NeverScrollableScrollPhysics(),
+              controller: _pageController,
+              itemCount: Space.values.length,
+              itemBuilder: (context, index) {
+                final space = Space.values[index];
+
+                return Padding(
+                  key: ValueKey('Drawer${space}MenuKey'),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: _menuBuilder(
+                    context,
+                    space: space,
+                  ),
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+      ),
     );
   }
 
-  Widget _menuBuilder() {
+  Widget _menuBuilder(
+    BuildContext context, {
+    required Space space,
+  }) {
     return switch (space) {
-      _ when !isUnlocked => GuestMenu(space: space),
+      _ when !widget.isUnlocked => GuestMenu(space: space),
       Space.treasury => const IndividualPrivateCampaigns(),
       Space.workspace => const MyPrivateProposals(),
       Space.voting => const VotingRounds(),
