@@ -1,9 +1,17 @@
+import 'package:catalyst_voices_services/src/storage/vault/vault.dart';
+
 enum _LockFactorType { voidFactor, password }
 
-/// May want to add bio unlock so need more "factors"
+// Note.
+// In future we may add MultiLockFactor for bio and password unlock factors
+
+/// Abstract representation of different factors that can lock [Vault] with.
 ///
-/// In future we may add MultiLockFactor for bio and password unlock factors
+/// Most common is [PasswordLockFactor] which can be use as standalone factor.
+///
+/// This class is serializable to/from json.
 sealed class LockFactor {
+  /// Use [LockFactor.toJson] as parameter for this factory.
   factory LockFactor.fromJson(Map<String, dynamic> json) {
     final typeName = json['type'];
     final type = _LockFactorType.values.asNameMap()[typeName];
@@ -15,11 +23,20 @@ sealed class LockFactor {
     };
   }
 
+  /// Returns true when this [LockFactor] can be used to unlock
+  /// other [LockFactor].
   bool unlocks(LockFactor factor);
 
+  /// Returns json representation on this [LockFactor].
+  ///
+  /// Should be used with [LockFactor.fromJson].
   Map<String, dynamic> toJson();
 }
 
+/// Can not be used to unlock anything. Useful as default value for [LockFactor]
+/// variables.
+///
+/// [unlocks] always returns false.
 final class VoidLockFactor implements LockFactor {
   const VoidLockFactor();
 
@@ -37,10 +54,14 @@ final class VoidLockFactor implements LockFactor {
   String toString() => 'VoidLockFactor';
 }
 
+/// Password matching [LockFactor].
+///
+/// Only unlocks other [PasswordLockFactor] with matching
+/// [PasswordLockFactor._data].
 final class PasswordLockFactor implements LockFactor {
-  final String data;
+  final String _data;
 
-  const PasswordLockFactor(this.data);
+  const PasswordLockFactor(this._data);
 
   factory PasswordLockFactor.fromJson(Map<String, dynamic> json) {
     return PasswordLockFactor(
@@ -50,14 +71,14 @@ final class PasswordLockFactor implements LockFactor {
 
   @override
   bool unlocks(LockFactor factor) {
-    return factor is PasswordLockFactor && data == factor.data;
+    return factor is PasswordLockFactor && _data == factor._data;
   }
 
   @override
   Map<String, dynamic> toJson() {
     return {
       'type': _LockFactorType.password.name,
-      'data': data,
+      'data': _data,
     };
   }
 

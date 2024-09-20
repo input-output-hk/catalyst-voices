@@ -6,6 +6,8 @@ abstract class LockFactorCodec extends Codec<LockFactor, String> {
   const LockFactorCodec();
 }
 
+/// Uses [LockFactor.toJson] and [LockFactor.fromJson] to serialize to
+/// [String] using [json].
 class DefaultLockFactorCodec extends LockFactorCodec {
   const DefaultLockFactorCodec();
 

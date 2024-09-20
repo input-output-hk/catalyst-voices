@@ -1,10 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
 
+import 'package:catalyst_voices_services/src/storage/storage_string_mixin.dart';
 import 'package:catalyst_voices_services/src/storage/vault/lock_factor.dart';
 import 'package:catalyst_voices_services/src/storage/vault/lock_factor_codec.dart';
 import 'package:catalyst_voices_services/src/storage/vault/vault.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 const _keyPrefix = 'SecureStorageVault';
@@ -12,7 +11,9 @@ const _lockFactorKey = 'LockFactorKey';
 const _unlockFactorKey = 'UnlockFactorKey';
 
 // TODO(damian): Logger
-final class SecureStorageVault implements Vault {
+/// Implementation of [Vault] that uses [FlutterSecureStorage] as
+/// facade for read/write operations.
+final class SecureStorageVault with StorageStringMixin implements Vault {
   final FlutterSecureStorage _secureStorage;
   final LockFactorCodec _lockFactorCodec;
 
@@ -22,15 +23,13 @@ final class SecureStorageVault implements Vault {
   })  : _secureStorage = secureStorage,
         _lockFactorCodec = lockFactorCodec;
 
-  Future<LockFactor> get _lockFactor => _secureStorage
-      .read(key: _lockFactorKey)
-      .then((value) => value != null ? _lockFactorCodec.decode(value) : null)
-      .then((value) => value ?? const VoidLockFactor());
+  /// If storage does not have [LockFactor] this getter will
+  /// return [VoidLockFactor] as fallback.
+  Future<LockFactor> get _lockFactor => _readLockFactor(_lockFactorKey);
 
-  Future<LockFactor> get _unlockFactor => _secureStorage
-      .read(key: _unlockFactorKey)
-      .then((value) => value != null ? _lockFactorCodec.decode(value) : null)
-      .then((value) => value ?? const VoidLockFactor());
+  /// If storage does not have [LockFactor] this getter will
+  /// return [VoidLockFactor] as fallback.
+  Future<LockFactor> get _unlockFactor => _readLockFactor(_unlockFactorKey);
 
   @override
   Future<bool> get isUnlocked async {
@@ -41,13 +40,7 @@ final class SecureStorageVault implements Vault {
   }
 
   @override
-  Future<void> lock() {
-    return _guardedWrite(
-      null,
-      key: _unlockFactorKey,
-      requireUnlocked: false,
-    );
-  }
+  Future<void> lock() => _writeLockFactor(null, key: _unlockFactorKey);
 
   @override
   Future<String?> readString({required String key}) => _guardedRead(key: key);
@@ -61,71 +54,9 @@ final class SecureStorageVault implements Vault {
   }
 
   @override
-  Future<int?> readInt({required String key}) async {
-    final value = await _guardedRead(key: key);
-    return value != null ? int.parse(value) : null;
-  }
-
-  @override
-  Future<void> writeInt(
-    int? value, {
-    required String key,
-  }) {
-    return _guardedWrite(value?.toString(), key: key);
-  }
-
-  @override
-  Future<bool?> readBool({required String key}) async {
-    final value = await readInt(key: key);
-
-    return switch (value) {
-      0 => false,
-      1 => true,
-      _ => null,
-    };
-  }
-
-  @override
-  Future<void> writeBool(
-    bool? value, {
-    required String key,
-  }) {
-    final asInt = value != null
-        ? value
-            ? 1
-            : 0
-        : null;
-
-    return writeInt(asInt, key: key);
-  }
-
-  @override
-  Future<Uint8List?> readBytes({required String key}) async {
-    final base64String = await _guardedRead(key: key);
-    final bytes = base64String != null
-        ? Uint8List.fromList(base64Decode(base64String))
-        : null;
-
-    return bytes;
-  }
-
-  @override
-  Future<void> writeBytes(
-    Uint8List? value, {
-    required String key,
-  }) {
-    final base64String = value != null ? base64Encode(value) : null;
-
-    return _guardedWrite(base64String, key: key);
-  }
-
-  @override
-  Future<void> delete({required String key}) => _guardedWrite(null, key: key);
-
-  @override
   Future<void> clear() async {
     final all = await _secureStorage.readAll();
-    final vaultKeys = all.keys.where((e) => e.startsWith(_keyPrefix)).toList();
+    final vaultKeys = all.keys.where((e) => e.startsWith(_keyPrefix));
 
     for (final key in vaultKeys) {
       await _guardedWrite(
@@ -144,21 +75,30 @@ final class SecureStorageVault implements Vault {
   }
 
   @override
-  Future<void> updateLockFactor(LockFactor lockFactor) {
+  Future<void> setLockFactor(LockFactor lockFactor) {
     return _writeLockFactor(lockFactor, key: _lockFactorKey);
   }
 
   Future<void> _writeLockFactor(
-    LockFactor lockFactor, {
+    LockFactor? lockFactor, {
     required String key,
   }) {
-    final encodedLockFactor = _lockFactorCodec.encode(lockFactor);
+    final encodedLockFactor =
+        lockFactor != null ? _lockFactorCodec.encode(lockFactor) : null;
 
     return _guardedWrite(
       encodedLockFactor,
       key: key,
       requireUnlocked: false,
     );
+  }
+
+  Future<LockFactor> _readLockFactor(String key) async {
+    final value = await _guardedRead(key: key, requireUnlocked: false);
+
+    return value != null
+        ? _lockFactorCodec.decode(value)
+        : const VoidLockFactor();
   }
 
   /// Allows operation only when [isUnlocked] it true, otherwise non op.
