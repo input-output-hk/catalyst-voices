@@ -1,5 +1,5 @@
 import 'package:bip39/bip39.dart' as bip39;
-import 'package:catalyst_voices/common/bip39/seed_phrase.dart';
+import 'package:catalyst_voices_models/src/seed_phrase.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
