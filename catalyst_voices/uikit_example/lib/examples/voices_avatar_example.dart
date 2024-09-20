@@ -23,6 +23,14 @@ class VoicesAvatarExample extends StatelessWidget {
               icon: VoicesAssets.icons.check.buildIcon(),
             ),
             VoicesAvatar(
+              backgroundColor: Colors.transparent,
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary,
+                width: 2,
+              ),
+              icon: VoicesAssets.icons.check.buildIcon(),
+            ),
+            VoicesAvatar(
               icon: const Text('A'),
               onTap: () {},
             ),
