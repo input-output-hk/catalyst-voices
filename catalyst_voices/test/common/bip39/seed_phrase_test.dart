@@ -9,6 +9,25 @@ void main() {
       expect(seedPhrase.mnemonic, isNotEmpty);
       expect(seedPhrase.uint8ListSeed, isNotEmpty);
       expect(seedPhrase.hexSeed, isNotEmpty);
+      expect(seedPhrase.mnemonicWords.length, 12);
+    });
+
+    test('should generate a seed phrase with 12 words', () {
+      final seedPhrase = SeedPhrase(wordCount: 12);
+
+      expect(seedPhrase.mnemonicWords.length, 12);
+      expect(bip39.validateMnemonic(seedPhrase.mnemonic), isTrue);
+    });
+
+    test('should generate a seed phrase with 24 words', () {
+      final seedPhrase = SeedPhrase(wordCount: 24);
+
+      expect(seedPhrase.mnemonicWords.length, 24);
+      expect(bip39.validateMnemonic(seedPhrase.mnemonic), isTrue);
+    });
+
+    test('should throw an error for an invalid word count', () {
+      expect(() => SeedPhrase(wordCount: 13), throwsA(isA<ArgumentError>()));
     });
 
     test('should create SeedPhrase from a valid mnemonic', () {

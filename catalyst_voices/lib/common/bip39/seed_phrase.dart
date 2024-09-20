@@ -13,7 +13,18 @@ class SeedPhrase {
   final String mnemonic;
 
   /// Generates a new seed phrase with a random mnemonic.
-  SeedPhrase() : this.fromMnemonic(bip39.generateMnemonic());
+  ///
+  /// Throws an [ArgumentError] if the word count is invalid.
+  ///
+  /// [wordCount]: The number of words in the mnemonic.
+  /// The default word count is 12, but can specify 12, 15, 18, 21, or 24 words.
+  /// with a higher word count providing greater entropy and security.
+  SeedPhrase({int wordCount = 12})
+      : this.fromMnemonic(
+          bip39.generateMnemonic(
+            strength: _calculateEntropyBits(wordCount),
+          ),
+        );
 
   /// Creates a SeedPhrase from an existing [Uint8List] entropy.
   ///
@@ -49,4 +60,12 @@ class SeedPhrase {
 
   /// The mnemonic phrase as a list of individual words.
   List<String> get mnemonicWords => mnemonic.split(' ');
+}
+
+int _calculateEntropyBits(int wordCount) {
+  if (wordCount <= 0 || wordCount % 3 != 0) {
+    throw ArgumentError('Word count must be divisible by 3 and greater than 0');
+  }
+
+  return (wordCount * 32) ~/ 3;
 }
