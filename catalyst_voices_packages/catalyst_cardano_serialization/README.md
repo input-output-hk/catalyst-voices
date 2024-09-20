@@ -194,15 +194,15 @@ Byron era addresses are not supported.
 | 5 = reward withdrawals | ❌️ |
 | 6 = protocol parameter update | ❌️ |
 | 7 = auxiliary_data_hash | ✔️ |
-| 8 = validity interval start | ❌️ |
-| 9 = mint | ❌️ |
-| 11 = script_data_hash | ❌️ |
-| 13 = collateral inputs | ❌️ |
+| 8 = validity interval start | ✔️ |
+| 9 = mint | ✔️ |
+| 11 = script_data_hash | ✔️ |
+| 13 = collateral inputs | ✔️ |
 | 14 = required signers | ✔️ |
 | 15 = network_id | ✔️ |
-| 16 = collateral return | ❌️ |
-| 17 = total collateral | ❌️ |
-| 18 = reference inputs | ❌️ |
+| 16 = collateral return | ✔️ |
+| 17 = total collateral | ✔️ |
+| 18 = reference inputs | ✔️ |
 
 ## Reference documentation
 
