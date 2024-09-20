@@ -21,7 +21,7 @@ class AccountPopup extends StatelessWidget {
     return PopupMenuButton(
       color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
       onSelected: (String? value) {
-        switch(value) {
+        switch (value) {
           case _profileAndKeychain:
             onProfileKeychainTap?.call();
             break;
@@ -164,7 +164,7 @@ class _Header extends StatelessWidget {
         Container(
           height: 1,
           color: Theme.of(context).colors.outlineBorder,
-        )
+        ),
       ],
     );
   }
