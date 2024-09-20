@@ -15,4 +15,4 @@ CREATE TABLE IF NOT EXISTS cip36_registration (
 
     PRIMARY KEY (stake_address, nonce, slot_no, txn)
 )
-WITH CLUSTERING ORDER BY (nonce, DESC, slot_no DESC, txn DESC);
+WITH CLUSTERING ORDER BY (nonce DESC, slot_no DESC, txn DESC);
