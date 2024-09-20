@@ -26,7 +26,7 @@ void main() {
       expect(seedPhrase.toHexEntropy(), entropy);
     });
 
-    test('expect invalid mnemonic throws an error', () {
+    test('should throw an error for invalid mnemonic', () {
       const invalidMnemonic = 'invalid mnemonic phrase';
       expect(
         () => SeedPhrase.fromMnemonic(invalidMnemonic),
@@ -40,7 +40,7 @@ void main() {
       );
     });
 
-    test('should generated SeedPhrase contains consistent mnemonic and seed',
+    test('should contain consistent mnemonic and seed in generated SeedPhrase',
         () {
       final seedPhrase = SeedPhrase();
       final mnemonic = seedPhrase.getMnemonic();
