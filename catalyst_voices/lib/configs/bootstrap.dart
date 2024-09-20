@@ -79,7 +79,7 @@ Future<void> _doBootstrapAndRun(BootstrapWidgetBuilder builder) async {
 /// integration tests.
 ///
 /// Initialization logic that is relevant for [runApp] scenario
-/// only should be added to [bootstrapAndRun], not here.
+/// only should be added to [_doBootstrapAndRun], not here.
 Future<BootstrapArgs> bootstrap() async {
   _loggingService
     ..level = kDebugMode ? Level.ALL : Level.OFF
