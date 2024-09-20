@@ -9,8 +9,7 @@ import 'package:flutter/material.dart';
 /// on larger screens it will take [_width] amount
 /// of horizontal space and be centered.
 ///
-/// The close (x) button will appear conditionally
-/// if the current route is dismissible.
+/// The close (x) button will appear if the dialog [isDismissible].
 class VoicesAlertDialog extends StatelessWidget {
   static const double _width = 360;
 
@@ -37,6 +36,9 @@ class VoicesAlertDialog extends StatelessWidget {
   /// so you don't need to add your own padding.
   final List<Widget> buttons;
 
+  /// Whether to show a (x) close button.
+  final bool isDismissible;
+
   const VoicesAlertDialog({
     super.key,
     this.title,
@@ -44,6 +46,7 @@ class VoicesAlertDialog extends StatelessWidget {
     this.subtitle,
     this.content,
     this.buttons = const [],
+    this.isDismissible = true,
   });
 
   @override
@@ -52,7 +55,6 @@ class VoicesAlertDialog extends StatelessWidget {
     final icon = this.icon;
     final subtitle = this.subtitle;
     final content = this.content;
-    final isDismissible = Navigator.of(context).canPop();
 
     return ResponsiveBuilder<double>(
       xs: double.infinity,
