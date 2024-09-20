@@ -1,6 +1,8 @@
 //! Simple general purpose utility functions.
 
 /// Convert an `<T>` to `<R>`. (saturate if out of range.)
+/// Note can convert any int to float, or f32 to f64 as well.
+/// can not convert from float to int, or f64 to f32.
 pub(crate) fn from_saturating<
     R: Copy + num_traits::identities::Zero + num_traits::Bounded,
     T: Copy
@@ -28,9 +30,11 @@ pub(crate) fn from_saturating<
 
 #[cfg(test)]
 mod tests {
+
     use super::*;
 
     #[test]
+    #[allow(clippy::float_cmp)]
     fn from_saturating_tests() {
         let x: u32 = from_saturating(0_u8);
         assert!(x == 0);
@@ -44,5 +48,13 @@ mod tests {
         assert!(x == -128);
         let x: u16 = from_saturating(-512_i32);
         assert!(x == 0);
+        let x: f64 = from_saturating(0.0_f32);
+        assert!(x == 0.0);
+        let x: f64 = from_saturating(0_u32);
+        assert!(x == 0.0);
+        let x: f64 = from_saturating(65536_u32);
+        assert!(x == 65536.0_f64);
+        let x: f64 = from_saturating(i32::MIN);
+        assert!(x == -2_147_483_648.0_f64);
     }
 }
