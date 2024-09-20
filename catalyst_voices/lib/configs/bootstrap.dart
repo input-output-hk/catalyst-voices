@@ -131,6 +131,8 @@ Future<void> _reportFlutterError(FlutterErrorDetails details) async {
 /// Platform Dispatcher Errors reporting
 bool _reportPlatformDispatcherError(Object error, StackTrace stack) {
   _platformDispatcherLogger.severe('Platform Error', error, stack);
+
+  // return true to prevent default error handling
   return true;
 }
 
