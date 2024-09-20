@@ -10,7 +10,6 @@ const _keyPrefix = 'SecureStorageVault';
 const _lockFactorKey = 'LockFactorKey';
 const _unlockFactorKey = 'UnlockFactorKey';
 
-// TODO(damian): Logger
 /// Implementation of [Vault] that uses [FlutterSecureStorage] as
 /// facade for read/write operations.
 final class SecureStorageVault with StorageStringMixin implements Vault {
@@ -18,7 +17,7 @@ final class SecureStorageVault with StorageStringMixin implements Vault {
   final LockFactorCodec _lockFactorCodec;
 
   SecureStorageVault({
-    required FlutterSecureStorage secureStorage,
+    FlutterSecureStorage secureStorage = const FlutterSecureStorage(),
     LockFactorCodec lockFactorCodec = const DefaultLockFactorCodec(),
   })  : _secureStorage = secureStorage,
         _lockFactorCodec = lockFactorCodec;
