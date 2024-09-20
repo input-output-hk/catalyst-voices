@@ -1,0 +1,226 @@
+import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+class AccountPopup extends StatelessWidget {
+  final String letter;
+
+  const AccountPopup({
+    super.key,
+    required this.letter,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton(
+      color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
+      itemBuilder: (BuildContext bc) {
+        return [
+          PopupMenuItem(
+            padding: EdgeInsets.zero,
+            enabled: false,
+            value: null,
+            child: _Header(
+              accountLetter: letter,
+              walletName: 'Wallet name',
+              walletBalance: '₳ 1,750,000',
+              accountType: 'Basis',
+              walletAddress: 'addr1_H4543...45GH',
+            ),
+          ),
+          const PopupMenuItem(
+            height: 48,
+            padding: EdgeInsets.zero,
+            enabled: false,
+            value: null,
+            child: _Section('My account'),
+          ),
+          PopupMenuItem(
+            padding: EdgeInsets.zero,
+            value: '/contact',
+            child: _MenuItem(
+              'Profile & Keychain',
+              VoicesAssets.icons.userCircle,
+            ),
+          ),
+          PopupMenuItem(
+            padding: EdgeInsets.zero,
+            value: '/contact',
+            child: _MenuItem(
+              'Lock account',
+              VoicesAssets.icons.lockClosed,
+              showDivider: false,
+            ),
+          ),
+        ];
+      },
+      offset: const Offset(0, kToolbarHeight),
+      child: VoicesAvatar(
+        icon: Text(letter),
+      ),
+    );
+  }
+}
+
+class _Header extends StatelessWidget {
+  const _Header({
+    required this.accountLetter,
+    required this.walletName,
+    required this.walletBalance,
+    required this.accountType,
+    required this.walletAddress,
+  });
+
+  final String accountLetter;
+  final String walletName;
+  final String walletBalance;
+  final String accountType;
+  final String walletAddress;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: _padding),
+          child: Row(
+            children: [
+              VoicesAvatar(
+                icon: Text(accountLetter),
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(_padding),
+                  child: Wrap(
+                    children: [
+                      Text(
+                        walletName,
+                        style: Theme.of(context).textTheme.bodyLarge,
+                      ),
+                      Text(
+                        walletBalance,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              VoicesChip.rectangular(
+                content: Text(
+                  accountType,
+                  style: TextStyle(
+                    color: Theme.of(context).colors.successContainer,
+                  ),
+                ),
+                backgroundColor: Theme.of(context).colors.success,
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(
+            left: _padding,
+            right: _padding,
+            bottom: _padding,
+            top: 8,
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  walletAddress,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+              ),
+              InkWell(
+                onTap: () async {
+                  await Clipboard.setData(
+                    ClipboardData(text: walletAddress),
+                  );
+                },
+                child: VoicesAssets.icons.clipboardCopy.buildIcon(),
+              ),
+            ],
+          ),
+        ),
+        Container(
+          height: 1,
+          color: Theme.of(context).colors.outlineBorder,
+        )
+      ],
+    );
+  }
+}
+
+class _MenuItem extends StatelessWidget {
+  final String text;
+  final SvgGenImage icon;
+  final bool showDivider;
+
+  const _MenuItem(
+    this.text,
+    this.icon, {
+    this.showDivider = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          height: 47,
+          alignment: Alignment.centerLeft,
+          padding: const EdgeInsets.symmetric(horizontal: _padding),
+          child: Row(
+            children: [
+              icon.buildIcon(),
+              const SizedBox(width: _padding),
+              Text(
+                text,
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ],
+          ),
+        ),
+        if (showDivider)
+          Container(
+            height: 1,
+            color: Theme.of(context).colors.outlineBorderVariant,
+          ),
+      ],
+    );
+  }
+}
+
+class _Section extends StatelessWidget {
+  final String text;
+
+  const _Section(
+    this.text,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          height: 47,
+          alignment: Alignment.centerLeft,
+          padding: const EdgeInsets.symmetric(horizontal: _padding),
+          child: Text(
+            text,
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+        ),
+        Container(
+          height: 1,
+          color: Theme.of(context).colors.outlineBorderVariant,
+        ),
+      ],
+    );
+  }
+}
+
+const _padding = 12.0;
