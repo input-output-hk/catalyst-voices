@@ -71,8 +71,10 @@ class AccountPopup extends StatelessWidget {
         ];
       },
       offset: const Offset(0, kToolbarHeight),
-      child: VoicesAvatar(
-        icon: Text(avatarLetter),
+      child: IgnorePointer(
+        child: VoicesAvatar(
+          icon: Text(avatarLetter),
+        ),
       ),
     );
   }
