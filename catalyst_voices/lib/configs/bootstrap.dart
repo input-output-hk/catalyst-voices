@@ -27,6 +27,15 @@ final class BootstrapArgs {
 // TODO(damian-molinski): Add Isolate.current.addErrorListener
 // TODO(damian-molinski): Add runZonedGuarded
 // TODO(damian-molinski): Add Global try-catch
+//
+/// The entry point for Catalyst Voices,
+/// initializes and runs the application.
+///
+/// Should configure dependency injection, setup logger and do
+/// all the things which are necessary before the actual app is run.
+///
+/// You can customize the default app by providing
+/// your own instance via [builder].
 Future<void> bootstrapAndRun([
   BootstrapWidgetBuilder builder = _appBuilder,
 ]) async {
@@ -49,6 +58,13 @@ Future<void> bootstrapAndRun([
   await _runApp(await builder(args));
 }
 
+/// Initializes the application before it can be run. Should setup all
+/// the things which are necessary before the actual app is run,
+/// either via [runApp] or injected into a test environment during
+/// integration tests.
+///
+/// Initialization logic that is relevant for [runApp] scenario
+/// only should be added to [bootstrapAndRun], not here.
 Future<BootstrapArgs> bootstrap() async {
   GoRouter.optionURLReflectsImperativeAPIs = true;
   setPathUrlStrategy();
