@@ -31,7 +31,6 @@ final class BootstrapArgs {
 }
 
 // TODO(damian-molinski): Add Isolate.current.addErrorListener
-// TODO(damian-molinski): Add Global try-catch
 //
 /// The entry point for Catalyst Voices,
 /// initializes and runs the application.
@@ -45,12 +44,12 @@ Future<void> bootstrapAndRun([
   BootstrapWidgetBuilder builder = _defaultBuilder,
 ]) async {
   await runZonedGuarded(
-    () => _safeBootstrap(builder),
+    () => _tryBootstrapAndRun(builder),
     _reportUncaughtZoneError,
   );
 }
 
-Future<void> _safeBootstrap(BootstrapWidgetBuilder builder) async {
+Future<void> _tryBootstrapAndRun(BootstrapWidgetBuilder builder) async {
   try {
     await _doBootstrapAndRun(builder);
   } catch (error, stack) {
@@ -65,10 +64,6 @@ Future<void> _doBootstrapAndRun(BootstrapWidgetBuilder builder) async {
   if (!kReleaseMode) {
     WidgetsFlutterBinding.ensureInitialized();
   }
-
-  _loggingService
-    ..level = kDebugMode ? Level.ALL : Level.OFF
-    ..printLogs = kDebugMode;
 
   FlutterError.onError = _reportFlutterError;
   PlatformDispatcher.instance.onError = _reportPlatformDispatcherError;
@@ -86,6 +81,10 @@ Future<void> _doBootstrapAndRun(BootstrapWidgetBuilder builder) async {
 /// Initialization logic that is relevant for [runApp] scenario
 /// only should be added to [bootstrapAndRun], not here.
 Future<BootstrapArgs> bootstrap() async {
+  _loggingService
+    ..level = kDebugMode ? Level.ALL : Level.OFF
+    ..printLogs = kDebugMode;
+
   GoRouter.optionURLReflectsImperativeAPIs = true;
   setPathUrlStrategy();
 
