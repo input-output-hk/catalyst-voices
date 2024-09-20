@@ -1,6 +1,6 @@
 //! Index certs found in a transaction.
 
-use std::sync::Arc;
+use std::{fmt::Debug, sync::Arc};
 
 use cardano_chain_follower::MultiEraBlock;
 use pallas::ledger::primitives::{alonzo, conway};
@@ -35,6 +35,38 @@ pub(crate) struct StakeRegistrationInsertQuery {
     deregister: MaybeUnset<bool>,
     /// Pool Delegation Address
     pool_delegation: MaybeUnset<Vec<u8>>,
+}
+
+impl Debug for StakeRegistrationInsertQuery {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> {
+        let stake_address = match self.stake_address {
+            MaybeUnset::Unset => "UNSET",
+            MaybeUnset::Set(ref v) => &hex::encode(v),
+        };
+        let register = match self.register {
+            MaybeUnset::Unset => "UNSET",
+            MaybeUnset::Set(v) => &format!("{v:?}"),
+        };
+        let deregister = match self.deregister {
+            MaybeUnset::Unset => "UNSET",
+            MaybeUnset::Set(v) => &format!("{v:?}"),
+        };
+        let pool_delegation = match self.pool_delegation {
+            MaybeUnset::Unset => "UNSET",
+            MaybeUnset::Set(ref v) => &hex::encode(v),
+        };
+
+        f.debug_struct("StakeRegistrationInsertQuery")
+            .field("stake_hash", &hex::encode(hex::encode(&self.stake_hash)))
+            .field("slot_no", &self.slot_no)
+            .field("txn", &self.txn)
+            .field("stake_address", &stake_address)
+            .field("script", &self.script)
+            .field("register", &register)
+            .field("deregister", &deregister)
+            .field("pool_delegation", &pool_delegation)
+            .finish()
+    }
 }
 
 /// TXI by Txn hash Index
