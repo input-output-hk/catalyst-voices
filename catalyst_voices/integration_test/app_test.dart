@@ -12,10 +12,10 @@ void main() {
       final args = await bootstrap();
       await tester.pumpWidget(App(routerConfig: args.routerConfig));
       // let the application load
-      await tester.pump(Duration(seconds: 5));
+      await tester.pump(const Duration(seconds: 5));
 
       // pump and settle every 100ms to simulate almost production-like FPS
-      await tester.pumpAndSettle(Duration(milliseconds: 100));
+      await tester.pumpAndSettle(const Duration(milliseconds: 100));
 
       // wait 10s until the test is finished
       await Future<void>.delayed(const Duration(seconds: 10));
