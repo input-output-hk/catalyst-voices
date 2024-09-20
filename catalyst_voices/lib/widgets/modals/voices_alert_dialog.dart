@@ -129,17 +129,18 @@ class VoicesAlertDialog extends StatelessWidget {
                         child: content,
                       ),
                     ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        if (buttons.isNotEmpty) const SizedBox(height: 24),
-                        ...buttons.separatedBy(const SizedBox(height: 8)),
-                      ],
+                  if (buttons.isNotEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const SizedBox(height: 24),
+                          ...buttons.separatedBy(const SizedBox(height: 8)),
+                        ],
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
