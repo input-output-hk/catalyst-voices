@@ -44,12 +44,12 @@ Future<void> bootstrapAndRun([
   BootstrapWidgetBuilder builder = _defaultBuilder,
 ]) async {
   await runZonedGuarded(
-    () => _tryBootstrapAndRun(builder),
+    () => _safeBootstrapAndRun(builder),
     _reportUncaughtZoneError,
   );
 }
 
-Future<void> _tryBootstrapAndRun(BootstrapWidgetBuilder builder) async {
+Future<void> _safeBootstrapAndRun(BootstrapWidgetBuilder builder) async {
   try {
     await _doBootstrapAndRun(builder);
   } catch (error, stack) {
