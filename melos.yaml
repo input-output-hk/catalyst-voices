@@ -18,6 +18,7 @@ command:
       sdk: ">=3.5.0 <4.0.0"
       flutter: ">=3.24.1"
     dependencies:
+      asn1lib: ^1.5.3
       bloc_concurrency: ^0.2.2
       collection: ^1.18.0
       cryptography: ^2.7.0
