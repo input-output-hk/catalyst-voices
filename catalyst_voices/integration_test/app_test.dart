@@ -7,8 +7,7 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('end-to-end test', () {
-    testWidgets('tap on the floating action button, verify counter',
-        (tester) async {
+    testWidgets('run app', (tester) async {
       final args = await bootstrap();
       await tester.pumpWidget(App(routerConfig: args.routerConfig));
       // let the application load
