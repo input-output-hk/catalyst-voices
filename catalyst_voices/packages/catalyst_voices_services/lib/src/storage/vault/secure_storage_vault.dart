@@ -1,21 +1,21 @@
-import 'dart:convert';
-
-import 'package:catalyst_voices_shared/src/storage/lock_factor.dart';
-import 'package:catalyst_voices_shared/src/storage/vault.dart';
+import 'package:catalyst_voices_services/src/storage/vault/lock_factor.dart';
+import 'package:catalyst_voices_services/src/storage/vault/lock_factor_codec.dart';
+import 'package:catalyst_voices_services/src/storage/vault/vault.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 const _keyPrefix = 'SecureStorageVault';
 const _lockFactorKey = '${_keyPrefix}LockFactorKey';
 const _unlockFactorKey = '${_keyPrefix}UnlockFactorKey';
 
+// TODO(damian): Logger
+// TODO(damian): VersionedKeys
 final class SecureStorageVault implements Vault {
   final FlutterSecureStorage _secureStorage;
-  final Codec<LockFactor, String> _lockFactorCodec;
+  final LockFactorCodec _lockFactorCodec;
 
   SecureStorageVault({
     required FlutterSecureStorage secureStorage,
-    // TODO(damian): provide default implementation
-    required Codec<LockFactor, String> lockFactorCodec,
+    LockFactorCodec lockFactorCodec = const DefaultLockFactorCodec(),
   })  : _secureStorage = secureStorage,
         _lockFactorCodec = lockFactorCodec;
 
@@ -32,7 +32,7 @@ final class SecureStorageVault implements Vault {
       .then((value) => value ?? const VoidLockFactor());
 
   @override
-  Future<bool> get isLocked async {
+  Future<bool> get isUnlocked async {
     final lockFactor = await _lockFactor;
     final unlockFactor = await _unlockFactor;
 
@@ -45,16 +45,13 @@ final class SecureStorageVault implements Vault {
   }
 
   @override
-  Future<String?> readString(String key) {
-    return isLocked
-        .then((isLocked) => isLocked ? null : _secureStorage.read(key: key));
-  }
+  Future<String?> readString(String key) => _guardedRead(key: key);
 
   @override
   Future<bool> unlock(LockFactor lockFactor) async {
     await _writeLockFactor(lockFactor, key: _unlockFactorKey);
 
-    return isLocked.then((isLocked) => !isLocked);
+    return isUnlocked;
   }
 
   @override
@@ -68,5 +65,34 @@ final class SecureStorageVault implements Vault {
   }) {
     final encodedLockFactor = _lockFactorCodec.encode(lockFactor);
     return _secureStorage.write(key: key, value: encodedLockFactor);
+  }
+
+  ///
+  Future<void> _guardedWrite(
+    String? value, {
+    required String key,
+  }) async {
+    final isUnlocked = await this.isUnlocked;
+    if (!isUnlocked) {
+      return;
+    }
+
+    if (value != null) {
+      await _secureStorage.write(key: key, value: value);
+    } else {
+      await _secureStorage.delete(key: key);
+    }
+  }
+
+  ///
+  Future<String?> _guardedRead({
+    required String key,
+  }) async {
+    final isUnlocked = await this.isUnlocked;
+    if (!isUnlocked) {
+      return null;
+    }
+
+    return _secureStorage.read(key: key);
   }
 }
