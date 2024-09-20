@@ -31,24 +31,33 @@ final class BootstrapArgs {
 }
 
 // TODO(damian-molinski): Add Isolate.current.addErrorListener
-Future<void> bootstrap([
+//
+/// The entry point for Catalyst Voices,
+/// initializes and runs the application.
+///
+/// Should configure dependency injection, setup logger and do
+/// all the things which are necessary before the actual app is run.
+///
+/// You can customize the default app by providing
+/// your own instance via [builder].
+Future<void> bootstrapAndRun([
   BootstrapWidgetBuilder builder = _defaultBuilder,
 ]) async {
   await runZonedGuarded(
-    () => _safeBootstrap(builder),
+    () => _safeBootstrapAndRun(builder),
     _reportUncaughtZoneError,
   );
 }
 
-Future<void> _safeBootstrap(BootstrapWidgetBuilder builder) async {
+Future<void> _safeBootstrapAndRun(BootstrapWidgetBuilder builder) async {
   try {
-    await _doBootstrap(builder);
+    await _doBootstrapAndRun(builder);
   } catch (error, stack) {
     await _reportBootstrapError(error, stack);
   }
 }
 
-Future<void> _doBootstrap(BootstrapWidgetBuilder builder) async {
+Future<void> _doBootstrapAndRun(BootstrapWidgetBuilder builder) async {
   // There's no need to call WidgetsFlutterBinding.ensureInitialized()
   // since this is already done internally by SentryFlutter.init()
   // More info here: https://github.com/getsentry/sentry-dart/issues/2063
@@ -56,14 +65,25 @@ Future<void> _doBootstrap(BootstrapWidgetBuilder builder) async {
     WidgetsFlutterBinding.ensureInitialized();
   }
 
-  _loggingService
-    ..level = kDebugMode ? Level.ALL : Level.OFF
-    ..printLogs = kDebugMode;
-
   FlutterError.onError = _reportFlutterError;
   PlatformDispatcher.instance.onError = _reportPlatformDispatcherError;
 
-  await Dependencies.instance.init();
+  final args = await bootstrap();
+  final app = await builder(args);
+  await _runApp(app);
+}
+
+/// Initializes the application before it can be run. Should setup all
+/// the things which are necessary before the actual app is run,
+/// either via [runApp] or injected into a test environment during
+/// integration tests.
+///
+/// Initialization logic that is relevant for [runApp] scenario
+/// only should be added to [_doBootstrapAndRun], not here.
+Future<BootstrapArgs> bootstrap() async {
+  _loggingService
+    ..level = kDebugMode ? Level.ALL : Level.OFF
+    ..printLogs = kDebugMode;
 
   GoRouter.optionURLReflectsImperativeAPIs = true;
   setPathUrlStrategy();
@@ -76,10 +96,9 @@ Future<void> _doBootstrap(BootstrapWidgetBuilder builder) async {
 
   Bloc.observer = AppBlocObserver();
 
-  final args = BootstrapArgs(routerConfig: router);
-  final app = await builder(args);
+  await Dependencies.instance.init();
 
-  await _runApp(app);
+  return BootstrapArgs(routerConfig: router);
 }
 
 Future<void> _runApp(Widget app) async {
@@ -112,6 +131,8 @@ Future<void> _reportFlutterError(FlutterErrorDetails details) async {
 /// Platform Dispatcher Errors reporting
 bool _reportPlatformDispatcherError(Object error, StackTrace stack) {
   _platformDispatcherLogger.severe('Platform Error', error, stack);
+
+  // return true to prevent default error handling
   return true;
 }
 
