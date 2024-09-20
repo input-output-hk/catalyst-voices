@@ -1,3 +1,5 @@
+// cspell: words wordlists WORDLIST
+
 import 'dart:typed_data';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:bip39/src/wordlists/english.dart';
@@ -63,7 +65,7 @@ class SeedPhrase {
   List<String> get mnemonicWords => mnemonic.split(' ');
 
   /// The full list of BIP-39 mnemonic words in English.
-  static List<String> get wordlist => WORDLIST;
+  static List<String> get wordList => WORDLIST;
 }
 
 int _calculateEntropyBits(int wordCount) {
