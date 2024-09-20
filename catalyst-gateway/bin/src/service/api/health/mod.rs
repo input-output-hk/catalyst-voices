@@ -1,16 +1,12 @@
 //! Health Endpoints
-use std::sync::Arc;
-
-use poem::web::Data;
 use poem_openapi::{param::Query, OpenApi};
 
-use crate::{service::common::tags::ApiTags, state::State};
+use crate::service::common::tags::ApiTags;
 
 mod inspection_get;
 mod live_get;
 mod ready_get;
 mod started_get;
-
 pub(crate) use started_get::started;
 
 /// Health API Endpoints
@@ -42,8 +38,8 @@ impl HealthApi {
     ///
     /// *This endpoint is for internal use of the service deployment infrastructure.
     /// It may not be exposed publicly.*
-    async fn ready_get(&self, state: Data<&Arc<State>>) -> ready_get::AllResponses {
-        ready_get::endpoint(state).await
+    async fn ready_get(&self) -> ready_get::AllResponses {
+        ready_get::endpoint().await
     }
 
     #[oai(path = "/live", method = "get", operation_id = "healthLive")]
@@ -66,9 +62,9 @@ impl HealthApi {
     )]
     /// Options for service inspection.
     async fn inspection(
-        &self, state: Data<&Arc<State>>, log_level: Query<Option<inspection_get::LogLevel>>,
+        &self, log_level: Query<Option<inspection_get::LogLevel>>,
         query_inspection: Query<Option<inspection_get::DeepQueryInspectionFlag>>,
     ) -> inspection_get::AllResponses {
-        inspection_get::endpoint(state, log_level.0, query_inspection.0).await
+        inspection_get::endpoint(log_level.0, query_inspection.0).await
     }
 }

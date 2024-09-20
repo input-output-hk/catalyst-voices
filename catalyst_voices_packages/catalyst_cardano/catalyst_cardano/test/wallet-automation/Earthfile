@@ -1,5 +1,5 @@
 VERSION 0.8
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.1.25 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.04 AS flutter-ci
 
 deps:
     FROM mcr.microsoft.com/playwright:v1.45.2-jammy

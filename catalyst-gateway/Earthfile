@@ -1,15 +1,19 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.1.21 AS rust-ci
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/mithril_snapshot:v3.1.21 AS mithril-snapshot-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.2.03 AS rust-ci
 
-#cspell: words rustfmt toolsets USERARCH
+#cspell: words rustfmt toolsets USERARCH stdcfgs
+
+# sync-cfg: Synchronize local config with CI version.
+# Must be run by the developer manually.
+sync-cfg:
+    DO rust-ci+SYNC_STD_CFG
 
 # builder : Set up our target toolchains, and copy our files.
 builder:
     DO rust-ci+SETUP
 
-    COPY --dir .cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin crates .
+    COPY --dir .cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin .
 
 ## -----------------------------------------------------------------------------
 ##
@@ -67,18 +71,6 @@ package-cat-gateway:
     COPY ./scripts/entry.sh .
 
     ENTRYPOINT ./entry.sh
-    SAVE IMAGE cat-gateway:$tag
-
-# package-cat-gateway : Create a deployable container for catalyst-gateway
-# And bundle a Mithril snapshot of cardano preprod
-nightly-package-cat-gateway-with-preprod:
-    ARG tag="latest"
-
-    FROM +package-cat-gateway
-
-    # copy preprod mithril snapshot to /tmp/preprod dir
-    COPY mithril-snapshot-ci+preprod/snapshot /tmp/preprod
-
     SAVE IMAGE cat-gateway:$tag
 
 # Publish packages if all integration tests have passed. (Failure to pass tests will prevent packages being published.)

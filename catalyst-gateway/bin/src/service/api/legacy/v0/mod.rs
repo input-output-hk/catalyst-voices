@@ -1,15 +1,8 @@
 //! `v0` Endpoints
-
-use std::sync::Arc;
-
-use poem::web::Data;
 use poem_openapi::{payload::Binary, OpenApi};
 
-use crate::{
-    service::{
-        common::tags::ApiTags, utilities::middleware::schema_validation::schema_version_validation,
-    },
-    state::State,
+use crate::service::{
+    common::tags::ApiTags, utilities::middleware::schema_validation::schema_version_validation,
 };
 
 mod message_post;
@@ -43,7 +36,7 @@ impl V0Api {
         transform = "schema_version_validation",
         deprecated = true
     )]
-    async fn plans_get(&self, state: Data<&Arc<State>>) -> plans_get::AllResponses {
-        plans_get::endpoint(state).await
+    async fn plans_get(&self) -> plans_get::AllResponses {
+        plans_get::endpoint().await
     }
 }

@@ -1,11 +1,13 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/widgets/cards/pending_proposal_card.dart';
-import 'package:catalyst_voices/widgets/common/tab_bar_stack_view.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 final _proposalDescription = """
 Zanzibar is becoming one of the hotspots for DID's through
@@ -54,6 +56,13 @@ final _proposals = [
   ),
 ];
 
+final _proposalImages = {
+  for (final (index, proposal) in _proposals.indexed)
+    proposal.id: index.isEven
+        ? VoicesAssets.images.proposalBackground1
+        : VoicesAssets.images.proposalBackground2,
+};
+
 final _favoriteProposals = ValueNotifier<List<PendingProposal>>([]);
 
 class VotingPage extends StatelessWidget {
@@ -63,14 +72,71 @@ class VotingPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 32),
-      children: [
-        const SizedBox(height: 44),
-        Text(
-          context.l10n.activeVotingRound,
-          style: Theme.of(context).textTheme.headlineLarge,
-        ),
-        const SizedBox(height: 44),
+      children: const [
+        SizedBox(height: 44),
+        _Header(),
+        SizedBox(height: 44),
         _Tabs(),
+      ],
+    );
+  }
+}
+
+class _Header extends StatelessWidget {
+  const _Header();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<SessionBloc, SessionState>(
+      builder: (context, state) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              context.l10n.activeVotingRound,
+              style: Theme.of(context).textTheme.headlineLarge,
+            ),
+            if (state is ActiveUserSessionState) const _UnlockedHeaderActions(),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _UnlockedHeaderActions extends StatelessWidget {
+  const _UnlockedHeaderActions();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 256,
+          child: VoicesTextField(
+            decoration: VoicesTextFieldDecoration(
+              labelText: 'Show',
+              hintText: 'Fund 14',
+              suffixIcon:
+                  VoicesAssets.icons.arrowTriangleDown.buildIcon(size: 16),
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        SizedBox(
+          width: 256,
+          child: VoicesTextField(
+            decoration: VoicesTextFieldDecoration(
+              labelText: 'Field label',
+              hintText: 'Search proposals',
+              prefixIcon: VoicesAssets.icons.search.buildIcon(),
+            ),
+          ),
+        ),
+        IconButton(
+          onPressed: () {},
+          icon: VoicesAssets.icons.filter.buildIcon(),
+        ),
       ],
     );
   }
@@ -97,7 +163,7 @@ class _Tabs extends StatelessWidget {
               Tab(
                 child: Row(
                   children: [
-                    Icon(CatalystVoicesIcons.star),
+                    VoicesAssets.icons.starOutlined.buildIcon(),
                     const SizedBox(width: 8),
                     Text(context.l10n.favorites),
                   ],
@@ -106,7 +172,7 @@ class _Tabs extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 24),
-          TabBarStackView(
+          const TabBarStackView(
             children: [
               _AllProposals(),
               _FavoriteProposals(),
@@ -131,11 +197,9 @@ class _AllProposals extends StatelessWidget {
           spacing: 16,
           runSpacing: 16,
           children: [
-            for (final (index, proposal) in _proposals.indexed)
+            for (final proposal in _proposals)
               PendingProposalCard(
-                image: index.isEven
-                    ? VoicesAssets.images.proposalBackground1
-                    : VoicesAssets.images.proposalBackground2,
+                image: _proposalImages[proposal.id]!,
                 proposal: proposal,
                 isFavorite: favoriteProposals.contains(proposal),
                 onFavoriteChanged: (isFavorite) =>
@@ -160,11 +224,9 @@ class _FavoriteProposals extends StatelessWidget {
           spacing: 16,
           runSpacing: 16,
           children: [
-            for (final (index, proposal) in favoriteProposals.indexed)
+            for (final proposal in favoriteProposals)
               PendingProposalCard(
-                image: index.isEven
-                    ? VoicesAssets.images.proposalBackground1
-                    : VoicesAssets.images.proposalBackground2,
+                image: _proposalImages[proposal.id]!,
                 proposal: proposal,
                 isFavorite: true,
                 onFavoriteChanged: (isFavorite) =>

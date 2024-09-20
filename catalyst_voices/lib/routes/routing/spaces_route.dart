@@ -14,22 +14,22 @@ part 'spaces_route.g.dart';
 
 @TypedShellRoute<SpacesShellRouteData>(
   routes: <TypedRoute<RouteData>>[
-    TypedGoRoute<TreasuryRoute>(path: '/${Routes.currentMilestone}/treasury'),
     TypedGoRoute<DiscoveryRoute>(path: '/${Routes.currentMilestone}/discovery'),
     TypedGoRoute<WorkspaceRoute>(path: '/${Routes.currentMilestone}/workspace'),
     TypedGoRoute<VotingRoute>(path: '/${Routes.currentMilestone}/voting'),
     TypedGoRoute<FundedProjectsRoute>(
       path: '/${Routes.currentMilestone}/funded_projects',
     ),
+    TypedGoRoute<TreasuryRoute>(path: '/${Routes.currentMilestone}/treasury'),
   ],
 )
 final class SpacesShellRouteData extends ShellRouteData {
   static const _spacePathMapping = <String, Space>{
-    'treasury': Space.treasury,
     'discovery': Space.discovery,
     'workspace': Space.workspace,
     'voting': Space.voting,
     'funded_projects': Space.fundedProjects,
+    'treasury': Space.treasury,
   };
 
   const SpacesShellRouteData();
@@ -56,15 +56,6 @@ final class SpacesShellRouteData extends ShellRouteData {
       space: space!,
       child: navigator,
     );
-  }
-}
-
-final class TreasuryRoute extends GoRouteData with FadePageTransitionMixin {
-  const TreasuryRoute();
-
-  @override
-  Widget build(BuildContext context, GoRouterState state) {
-    return const TreasuryPage();
   }
 }
 
@@ -102,5 +93,14 @@ final class FundedProjectsRoute extends GoRouteData
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const FundedProjectsPage();
+  }
+}
+
+final class TreasuryRoute extends GoRouteData with FadePageTransitionMixin {
+  const TreasuryRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const TreasuryPage();
   }
 }

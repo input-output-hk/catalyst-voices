@@ -79,6 +79,8 @@ class VoicesIndicatorsExample extends StatelessWidget {
               VoicesCircularProgressIndicator(value: 0.75, showTrack: false),
             ],
           ),
+          Text('No Internet Connection Banner'),
+          NoInternetConnectionBanner(),
         ].separatedByIndexed(
           (index, value) {
             return switch (value.runtimeType) {

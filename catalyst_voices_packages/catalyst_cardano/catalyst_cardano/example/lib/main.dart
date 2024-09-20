@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
@@ -323,7 +324,8 @@ class _WalletDetailsState extends State<_WalletDetails> {
                 Text('Extensions: ${_formatExtensions(_extensions)}\n'),
                 Text('Network ID: $_networkId\n'),
                 Text(
-                    'Change address:\n${_changeAddress?.toBech32() ?? '---'}\n'),
+                  'Change address:\n${_changeAddress?.toBech32() ?? '---'}\n',
+                ),
                 Text(
                   'Reward addresses:\n${_formatAddresses(_rewardAddresses)}\n',
                 ),
@@ -335,11 +337,11 @@ class _WalletDetailsState extends State<_WalletDetails> {
                 Text('Public DRep Key: ${_pubDRepKey?.value ?? '---'}\n'),
                 Text(
                   'Registered Public Stake Keys: '
-                  '${_registeredPubStakeKeys?.map((e) => e.value) ?? '---'}\n',
+                  '${_formatPubStakeKeys(_registeredPubStakeKeys)}\n',
                 ),
                 Text(
                   'Unregistered Public Stake Keys: '
-                  '${_unregisteredPubStakeKeys?.map((e) => e.value) ?? '---'}\n',
+                  '${_formatPubStakeKeys(_unregisteredPubStakeKeys)}\n',
                 ),
                 Row(
                   children: [
@@ -419,6 +421,14 @@ String _formatAddresses(List<ShelleyAddress>? addresses) {
   }
 
   return addresses.map((e) => e.toBech32()).join('\n');
+}
+
+String _formatPubStakeKeys(List<PubStakeKey>? keys) {
+  if (keys == null) {
+    return '---';
+  }
+
+  return keys.map((e) => e.value).join(', ');
 }
 
 String _formatBalance(Balance? balance) {

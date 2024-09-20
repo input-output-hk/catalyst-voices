@@ -13,3 +13,27 @@ final class NextStateSessionEvent extends SessionEvent {
   @override
   List<Object?> get props => [];
 }
+
+/// Dummy implementation of session management.
+final class VisitorSessionEvent extends SessionEvent {
+  const VisitorSessionEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
+/// Dummy implementation of session management.
+final class GuestSessionEvent extends SessionEvent {
+  const GuestSessionEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
+/// Dummy implementation of session management.
+final class ActiveUserSessionEvent extends SessionEvent {
+  const ActiveUserSessionEvent();
+
+  @override
+  List<Object?> get props => [];
+}

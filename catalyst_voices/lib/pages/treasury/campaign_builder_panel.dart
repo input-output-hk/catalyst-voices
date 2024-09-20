@@ -9,6 +9,7 @@ class CampaignBuilderPanel extends StatelessWidget {
   final TreasuryCampaignBuilder builder;
 
   const CampaignBuilderPanel({
+    super.key,
     required this.builder,
   });
 

@@ -110,7 +110,10 @@ void main() {
       await tester.pump();
 
       // Verify that the success icon is displayed
-      expect(find.byIcon(CatalystVoicesIcons.check_circle), findsOneWidget);
+      expect(
+        find.byType(CatalystSvgIcon),
+        findsOneWidget,
+      );
     });
 
     testWidgets('renders correctly when disabled', (tester) async {
@@ -192,7 +195,10 @@ void main() {
       await tester.pump();
 
       // Verify that the success icon is displayed
-      expect(find.byIcon(CatalystVoicesIcons.check_circle), findsOneWidget);
+      expect(
+        find.byType(CatalystSvgIcon),
+        findsOneWidget,
+      );
     });
 
     testWidgets('displays warning when validation returns warning',
@@ -241,7 +247,7 @@ class _MaterialApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeBuilder.buildTheme(BrandKey.catalyst),
+      theme: ThemeBuilder.buildTheme(brand: Brand.catalyst),
       home: Scaffold(body: child),
     );
   }

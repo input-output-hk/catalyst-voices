@@ -1,15 +1,18 @@
-import 'dart:developer';
-
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 final class AppBlocObserver extends BlocObserver {
+  AppBlocObserver();
+
+  final _logger = Logger('AppBlocObserver');
+
   @override
   void onChange(
     BlocBase<dynamic> bloc,
     Change<dynamic> change,
   ) {
     super.onChange(bloc, change);
-    log('onChange(${bloc.runtimeType}, $change)');
+    _logger.info('onChange(${bloc.runtimeType}, $change)');
   }
 
   @override
@@ -18,7 +21,7 @@ final class AppBlocObserver extends BlocObserver {
     Object error,
     StackTrace stackTrace,
   ) {
-    log('onError(${bloc.runtimeType}, $error, $stackTrace)');
+    _logger.warning('onError(${bloc.runtimeType})', error, stackTrace);
     super.onError(bloc, error, stackTrace);
   }
 }

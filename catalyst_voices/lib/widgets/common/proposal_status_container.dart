@@ -18,11 +18,12 @@ class ProposalStatusContainer extends StatelessWidget {
     final config = type._config(context);
 
     final iconTheme = IconThemeData(
-      size: 18,
+      size: 16,
       color: config.iconColor,
     );
 
-    final textStyle = (theme.textTheme.labelLarge ?? TextStyle()).copyWith(
+    final textStyle =
+        (theme.textTheme.labelLarge ?? const TextStyle()).copyWith(
       color: config.textColor,
     );
 
@@ -31,7 +32,7 @@ class ProposalStatusContainer extends StatelessWidget {
       child: DefaultTextStyle(
         style: textStyle,
         child: Container(
-          padding: EdgeInsets.all(8).add(EdgeInsets.only(right: 4)),
+          padding: const EdgeInsets.all(8).add(const EdgeInsets.only(right: 4)),
           decoration: BoxDecoration(
             color: config.backgroundColor,
             borderRadius: BorderRadius.circular(8),
@@ -39,9 +40,9 @@ class ProposalStatusContainer extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(config.iconData),
-              SizedBox(width: 8),
-              Text(config.text)
+              config.icon.buildIcon(),
+              const SizedBox(width: 8),
+              Text(config.text),
             ],
           ),
         ),
@@ -51,14 +52,14 @@ class ProposalStatusContainer extends StatelessWidget {
 }
 
 final class _ProposalStatusContainerConfig {
-  final IconData iconData;
+  final SvgGenImage icon;
   final Color? iconColor;
   final String text;
   final Color? textColor;
   final Color? backgroundColor;
 
   _ProposalStatusContainerConfig({
-    required this.iconData,
+    required this.icon,
     this.iconColor,
     required this.text,
     this.textColor,
@@ -72,16 +73,51 @@ extension _ProposalStatusExt on ProposalStatus {
 
     return switch (this) {
       ProposalStatus.ready => _ProposalStatusContainerConfig(
-          iconData: CatalystVoicesIcons.check,
+          icon: VoicesAssets.icons.check,
           iconColor: colors.iconsSuccess,
           text: context.l10n.proposalStatusReady,
           textColor: colors.textPrimary,
           backgroundColor: colors.successContainer,
         ),
       ProposalStatus.draft => _ProposalStatusContainerConfig(
-          iconData: CatalystVoicesIcons.pencil_alt,
+          icon: VoicesAssets.icons.pencilAlt,
           iconColor: colors.iconsForeground,
           text: context.l10n.proposalStatusDraft,
+          textColor: colors.textPrimary,
+          backgroundColor: colors.onSurfaceNeutralOpaqueLv1,
+        ),
+      ProposalStatus.inProgress => _ProposalStatusContainerConfig(
+          icon: VoicesAssets.icons.annotation,
+          iconColor: colors.iconsPrimary,
+          text: context.l10n.proposalStatusInProgress,
+          textColor: colors.textPrimary,
+          backgroundColor: colors.onSurfaceNeutralOpaqueLv1,
+        ),
+      ProposalStatus.private => _ProposalStatusContainerConfig(
+          icon: VoicesAssets.icons.eyeOff,
+          iconColor: colors.iconsForeground,
+          text: context.l10n.proposalStatusPrivate,
+          textColor: colors.textPrimary,
+          backgroundColor: colors.onSurfaceNeutralOpaqueLv1,
+        ),
+      ProposalStatus.open => _ProposalStatusContainerConfig(
+          icon: VoicesAssets.icons.checkCircle,
+          iconColor: colors.iconsSuccess,
+          text: context.l10n.proposalStatusOpen,
+          textColor: colors.textPrimary,
+          backgroundColor: colors.onSurfaceNeutralOpaqueLv1,
+        ),
+      ProposalStatus.live => _ProposalStatusContainerConfig(
+          icon: VoicesAssets.icons.play,
+          iconColor: colors.iconsForeground,
+          text: context.l10n.proposalStatusLive,
+          textColor: colors.textPrimary,
+          backgroundColor: colors.successContainer,
+        ),
+      ProposalStatus.completed => _ProposalStatusContainerConfig(
+          icon: VoicesAssets.icons.flag,
+          iconColor: colors.iconsForeground,
+          text: context.l10n.proposalStatusCompleted,
           textColor: colors.textPrimary,
           backgroundColor: colors.onSurfaceNeutralOpaqueLv1,
         ),
