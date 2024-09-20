@@ -16,8 +16,11 @@ class SessionStateHeader extends StatelessWidget {
         return switch (state) {
           VisitorSessionState() => const _VisitorButton(),
           GuestSessionState() => const _GuestButton(),
-          ActiveUserSessionState(:final user) =>
-            AccountPopup(letter: user.acronym ?? 'A'),
+          ActiveUserSessionState(:final user) => AccountPopup(
+              avatarLetter: user.acronym ?? 'A',
+            onLockAccountTap: () => debugPrint('Lock account'),
+            onProfileKeychainTap: () => debugPrint('Open Profile screen'),
+            ),
         };
       },
     );

@@ -5,17 +5,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class AccountPopup extends StatelessWidget {
-  final String letter;
+  final String avatarLetter;
+  final VoidCallback? onProfileKeychainTap;
+  final VoidCallback? onLockAccountTap;
 
   const AccountPopup({
     super.key,
-    required this.letter,
+    required this.avatarLetter,
+    this.onProfileKeychainTap,
+    this.onLockAccountTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton(
       color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
+      onSelected: (String? value) {
+        switch(value) {
+          case _profileAndKeychain:
+            onProfileKeychainTap?.call();
+            break;
+          case _lock:
+            onLockAccountTap?.call();
+            break;
+        }
+      },
       itemBuilder: (BuildContext bc) {
         return [
           PopupMenuItem(
@@ -23,7 +37,7 @@ class AccountPopup extends StatelessWidget {
             enabled: false,
             value: null,
             child: _Header(
-              accountLetter: letter,
+              accountLetter: avatarLetter,
               walletName: 'Wallet name',
               walletBalance: '₳ 1,750,000',
               accountType: 'Basis',
@@ -39,7 +53,7 @@ class AccountPopup extends StatelessWidget {
           ),
           PopupMenuItem(
             padding: EdgeInsets.zero,
-            value: '/contact',
+            value: _profileAndKeychain,
             child: _MenuItem(
               'Profile & Keychain',
               VoicesAssets.icons.userCircle,
@@ -47,7 +61,7 @@ class AccountPopup extends StatelessWidget {
           ),
           PopupMenuItem(
             padding: EdgeInsets.zero,
-            value: '/contact',
+            value: _lock,
             child: _MenuItem(
               'Lock account',
               VoicesAssets.icons.lockClosed,
@@ -58,7 +72,7 @@ class AccountPopup extends StatelessWidget {
       },
       offset: const Offset(0, kToolbarHeight),
       child: VoicesAvatar(
-        icon: Text(letter),
+        icon: Text(avatarLetter),
       ),
     );
   }
@@ -224,3 +238,5 @@ class _Section extends StatelessWidget {
 }
 
 const _padding = 12.0;
+const _profileAndKeychain = 'profileAndKeychain';
+const _lock = 'lock';
