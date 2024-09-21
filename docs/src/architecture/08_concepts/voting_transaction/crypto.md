@@ -490,15 +490,17 @@ To compute it, prover needs to perform the next steps:
   where $H$ is a hash function,
   $j \in [0, \ldots, N-1]$
   and $l \in [0, \ldots, log_2(N)-1]$.
-7. For $j \in [0, \ldots, N-1]$ calculate polynomials $p_j(x) = \prod_{l=0}^{log_2(N)-1} z_l^{j_l}$:
+7. For $j \in [0, \ldots, N-1]$ calculate polynomials
+  in the following form $p_j(x) = e_{i, j}*x^{log_2(N)} + \sum_{l=0}^{log_2(N)-1} p_{j,l} * x^l$:
     * $j_l$ is a bit value of the $j$-th binary representation (same as was described in step `3`).
     * $z_l^{1} = i_l * x + \beta_l$.
     * $z_l^{0} = x - z_l^{1} = (1 - i_l)*x - \beta_l$.
+    * Calculate the polynomial itself $p_j(x) = \prod_{l=0}^{log_2(N)-1} z_l^{j_l}$
 8. For $l \in [0, \ldots, log_2(N)-1]$ generate a random $R_l \in \mathbb{Z}_q$.
 9. For $l \in [0, \ldots, log_2(N)-1]$ compute
   $D_l = ElGamalEnc(sum_l, R_l, pk)$,
   where $sum_l = \sum_{j=0}^{N-1}(p_{j,l} * com_1^j)$
-  and $p_{j,l}$ - corresponding coefficients of the polynomial $p_j(x)$.
+  and $p_{j,l}$ - corresponding coefficients of the polynomial $p_j(x)$ calculated on step `7`.
 10. Calculate a second verifier challenge
   $com_2 = H(com_1, \{D_l\})$,
   where $H$ is a hash function
@@ -531,7 +533,7 @@ VoteCheck(\mathbf{c}, \pi, pk) = true | false
 As a result algorithm will return `true` or `false`,
 is the verification was succeeded or not respectively.
 
-Knowing that $\pi$ equals to $\(ck, \{I_l\}, \{B_l\}, \{A_l\}, \{D_l\}, \{z_l\}, \{w_l\}, \{v_l\}, R)$,
+Knowing that $\pi$ equals to $(ck, \{I_l\}, \{B_l\}, \{A_l\}, \{D_l\}, \{z_l\}, \{w_l\}, \{v_l\}, R)$,
 verifier needs to perform the next steps:
 
 1. If the number of voting options $M$ is not a perfect power of $2$,
@@ -547,11 +549,37 @@ verifier needs to perform the next steps:
   $com_2 = H(com_1, \{D_l\})$,
   where $H$ is a hash function
   and $l \in [0, \ldots, log_2(N)-1]$.
-4. For $l \in [0, \ldots, log_2(N)-1]$ verify, where $g$ is the group generator:
-    * $(I_l)^{com_2} \circ B_l == g^{z_l} \circ ck^{w_l}$
-    * $(I_l)^{com_2 - z_l} \circ A_l == g^{0} \circ ck^{v_l}$
+4. For $l \in [0, \ldots, log_2(N)-1]$ verify that the following statements are `true`,
+  where $g$ is the group generator:
+    * $(I_l)^{com_2} \circ B_l == g^{z_l} \circ ck^{w_l}$.
+    * $(I_l)^{com_2 - z_l} \circ A_l == g^{0} \circ ck^{v_l}$.
+5. Calculate the following $Left = ElGamalEnc(0, R, pk)$.
+  Note that the $Left$ is a ciphertext, $Left = (Left_1, Left_2)$.
+6. Noted that $D_l$ is a ciphertext,
+  $D_l = (D_{l,1}, D_{l,2})$, for $l \in [0, \ldots, log_2(N)-1]$
+  calculate the following:
+    * $RightD_1 = (D_{0,1})^{0} \circ \ldots \circ (D_{log_2(N) - 1,1})^{log_2(N) - 1}$.
+    * $RightD_2 = (D_{0,2})^{0} \circ \ldots \circ (D_{log_2(N) - 1,2})^{log_2(N) - 1}$.
+7. For $j \in [0, \ldots, N-1]$ calculate the $p_j(com_2)$,
+  where $p_j$ is a proover's defined polynomial defined in step `7`:
+    * $j_l$ is a bit value of the $j$-th binary representation.
+    * $z_l^1 = z_j$.
+    * $z_l^0 = com_2 - z_j^1$.
+    * $p_j(com_2) = \prod_l^{log_2(N)-1} z_l^{j_l}$.
+8. For $j \in [0, \ldots, N-1]$ calculate the $RightP_j = ElGamalEnc(-p_j(com_2), 0, pk)$.
+  Note that the $RightP_j$ is a ciphertext, $RightP_j = (RightP_{j,1}, RightP_{j,2})$.
+9. Noted that $C_j$ is a ciphertext,
+  $C_j = (C_{j,1}, C_{j,2})$, for $j \in [0, \ldots, N-1]$
+  calculate:
+    * $RightA_{j,1} = (C_{j,1})^{com_2^{log_2(N)}} \circ (RightP_{j,1})^{com_1^{j}}$.
+    * $RightA_{j,2} = (C_{j,2})^{com_2^{log_2(N)}} \circ (RightP_{j,2})^{com_1^{j}}$.
+    * $RightA_{1} = RightA_{j,1} \circ \ldots \circ RightA_{N - 1, 1}$.
+    * $RightA_{2} = RightA_{j,2} \circ \ldots \circ RightA_{N - 1, 2}$.
+10. Verify that the following statements are `true`:
+    * $RightA_{1} \circ RightD_1 == Left_1$.
+    * $RightA_{2} \circ RightD_2 == Left_2$.
 
-If step `4` and `5` returns `true` so the final result is `true` otherwise return `false`.
+If step `4` and `10` returns `true` so the final result is `true` otherwise return `false`.
 
 ## E: Non-Interactive ZK Tally Proof
 
