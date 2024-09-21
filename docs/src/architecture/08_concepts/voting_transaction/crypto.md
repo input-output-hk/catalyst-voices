@@ -445,7 +445,7 @@ It means that all described operations is also group dependent
 
 The prover algorithm takes as arguments:
 
-* $\mathbf{c} = (c_0, \ldots, c_{M-1})$ - encrypted vote (a vector of ciphertexts),
+* $\mathbf{c} = (c_0, \ldots, c_{M-1})$ - encrypted vote (a vector of ciphertext),
   where $M$ is amount of voting options.
 * $\mathbf{e}_i = (e_{i,0},\ldots, e_{i,M-1})$ - original voting choice, a unit vector,
   where $M$ is amount of voting options
@@ -521,7 +521,7 @@ where $l \in [0, \ldots, log_2(N)-1]$.
 
 The verifier algorithm takes as arguments:
 
-* $\mathbf{c} = (c_0, \ldots, c_{M-1})$ - encrypted vote (a vector of ciphertexts),
+* $\mathbf{c} = (c_0, \ldots, c_{M-1})$ - encrypted vote (a vector of ciphertext),
   where $M$ is amount of voting options.
 * $\pi$ - a prover's proof generated on the [previous step](#prover)
 * $pk$ - is a public key, which was used to encrypt a unit vector.
@@ -561,7 +561,7 @@ verifier needs to perform the next steps:
     * $Right2_1 = (D_{0,1})^{0} \circ \ldots \circ (D_{log_2(N) - 1,1})^{log_2(N) - 1}$.
     * $Right2_2 = (D_{0,2})^{0} \circ \ldots \circ (D_{log_2(N) - 1,2})^{log_2(N) - 1}$.
 7. For $j \in [0, \ldots, N-1]$ calculate the $p_j(com_2)$,
-  where $p_j$ is a proover's defined polynomial defined in step `7`:
+  where $p_j$ is a prover's defined polynomial defined in step `7`:
     * $j_l$ is a bit value of the $j$-th binary representation.
     * $z_l^1 = z_j$.
     * $z_l^0 = com_2 - z_j^1$.
