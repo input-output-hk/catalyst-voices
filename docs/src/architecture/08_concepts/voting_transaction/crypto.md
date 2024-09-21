@@ -555,29 +555,29 @@ verifier needs to perform the next steps:
     * $(I_l)^{com_2 - z_l} \circ A_l == g^{0} \circ ck^{v_l}$.
 5. Calculate the following $Left = ElGamalEnc(0, R, pk)$.
   Note that the $Left$ is a ciphertext, $Left = (Left_1, Left_2)$.
-6. Noted that $D_l$ is a ciphertext,
+6. Note that $D_l$ is a ciphertext,
   $D_l = (D_{l,1}, D_{l,2})$, for $l \in [0, \ldots, log_2(N)-1]$
   calculate the following:
-    * $RightD_1 = (D_{0,1})^{0} \circ \ldots \circ (D_{log_2(N) - 1,1})^{log_2(N) - 1}$.
-    * $RightD_2 = (D_{0,2})^{0} \circ \ldots \circ (D_{log_2(N) - 1,2})^{log_2(N) - 1}$.
+    * $Right2_1 = (D_{0,1})^{0} \circ \ldots \circ (D_{log_2(N) - 1,1})^{log_2(N) - 1}$.
+    * $Right2_2 = (D_{0,2})^{0} \circ \ldots \circ (D_{log_2(N) - 1,2})^{log_2(N) - 1}$.
 7. For $j \in [0, \ldots, N-1]$ calculate the $p_j(com_2)$,
   where $p_j$ is a proover's defined polynomial defined in step `7`:
     * $j_l$ is a bit value of the $j$-th binary representation.
     * $z_l^1 = z_j$.
     * $z_l^0 = com_2 - z_j^1$.
     * $p_j(com_2) = \prod_l^{log_2(N)-1} z_l^{j_l}$.
-8. For $j \in [0, \ldots, N-1]$ calculate the $RightP_j = ElGamalEnc(-p_j(com_2), 0, pk)$.
-  Note that the $RightP_j$ is a ciphertext, $RightP_j = (RightP_{j,1}, RightP_{j,2})$.
-9. Noted that $C_j$ is a ciphertext,
+8. For $j \in [0, \ldots, N-1]$ calculate the $P_j = ElGamalEnc(-p_j(com_2), 0, pk)$.
+  Note that the $P_j$ is a ciphertext, $P_j = (P_{j,1}, P_{j,2})$.
+9. Note that $C_j$ is a ciphertext,
   $C_j = (C_{j,1}, C_{j,2})$, for $j \in [0, \ldots, N-1]$
   calculate:
-    * $RightA_{j,1} = (C_{j,1})^{com_2^{log_2(N)}} \circ (RightP_{j,1})^{com_1^{j}}$.
-    * $RightA_{j,2} = (C_{j,2})^{com_2^{log_2(N)}} \circ (RightP_{j,2})^{com_1^{j}}$.
-    * $RightA_{1} = RightA_{j,1} \circ \ldots \circ RightA_{N - 1, 1}$.
-    * $RightA_{2} = RightA_{j,2} \circ \ldots \circ RightA_{N - 1, 2}$.
+    * $Right1_{j,1} = (C_{j,1})^{com_2^{log_2(N)}} \circ (P_{j,1})^{com_1^{j}}$.
+    * $Right1_{j,2} = (C_{j,2})^{com_2^{log_2(N)}} \circ (P_{j,2})^{com_1^{j}}$.
+    * $Right1_{1} = Right1_{j,1} \circ \ldots \circ Right1_{N - 1, 1}$.
+    * $Right1_{2} = Right1_{j,2} \circ \ldots \circ Right1_{N - 1, 2}$.
 10. Verify that the following statements are `true`:
-    * $RightA_{1} \circ RightD_1 == Left_1$.
-    * $RightA_{2} \circ RightD_2 == Left_2$.
+    * $Right1_{1} \circ Right2_1 == Left_1$.
+    * $Right1_{2} \circ Right2_2 == Left_2$.
 
 If step `4` and `10` returns `true` so the final result is `true` otherwise return `false`.
 
