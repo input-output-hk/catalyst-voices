@@ -62,9 +62,6 @@ class VoicesDesktopPanelsDialog extends StatelessWidget {
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: theme.colors.elevationsOnSurfaceNeutralLv1White,
-                  ),
                   child: right,
                 ),
               ),

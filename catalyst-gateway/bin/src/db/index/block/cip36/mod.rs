@@ -75,7 +75,8 @@ impl Cip36InsertQuery {
                                 vote_key, slot_no, txn_index, cip36, true,
                             ));
                     }
-                } else {
+                } else if cip36.stake_pk.is_some() {
+                    // We can't index an error, if there is no stake public key.
                     if cip36.voting_keys.is_empty() {
                         self.invalid.push(insert_cip36_invalid::Params::new(
                             None,

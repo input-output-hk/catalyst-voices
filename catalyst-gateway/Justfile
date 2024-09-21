@@ -22,19 +22,19 @@ code-format:
 
 # Lint the rust code
 code-lint:
-    cargo lintfix
-    cargo lint
+    cargo lintfix -r
+    cargo lint -r
 
 # Synchronize Rust Configs
 sync-cfg:
-    earthly +sync-cfg
+    cd .. && earthly ./catalyst-gateway+sync-cfg
 
 # Pre Push Checks
 pre-push: sync-cfg code-format code-lint license-check
     # Make sure we can actually build inside Earthly which needs to happen in CI.
-    earthly +check
-    earthly +build
-    earthly +package-cat-gateway
+    cd .. && earthly ./catalyst-gateway+check
+    cd .. && earthly ./catalyst-gateway+build
+    cd .. && earthly ./catalyst-gateway+package-cat-gateway
 
 # Build Local release build of catalyst gateway
 build-cat-gateway: code-format code-lint
@@ -46,10 +46,10 @@ run-cat-gateway: build-cat-gateway
     CHAIN_FOLLOWER_SYNC_TASKS="16" \
     RUST_LOG="error,cat-gateway=debug,cardano_chain_follower=debug,mithril-client=debug" \
     CHAIN_NETWORK="Preprod" \
-    ./catalyst-gateway/target/release/cat-gateway run --log-level debug
+    ./target/release/cat-gateway run --log-level debug
 
 # Run cat-gateway natively on mainnet
 run-cat-gateway-mainnet: build-cat-gateway
     CHAIN_FOLLOWER_SYNC_TASKS="1" \
     RUST_LOG="error,cat-gateway=debug,cardano_chain_follower=debug,mithril-client=debug" \
-    ./catalyst-gateway/target/release/cat-gateway run --log-level debug
+    ./target/release/cat-gateway run --log-level debug

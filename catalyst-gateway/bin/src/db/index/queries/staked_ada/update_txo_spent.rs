@@ -17,7 +17,7 @@ use crate::{
 const UPDATE_TXO_SPENT_QUERY: &str = include_str!("../cql/update_txo_spent.cql");
 
 /// Update TXO spent query params.
-#[derive(SerializeRow)]
+#[derive(SerializeRow, Debug)]
 pub(crate) struct UpdateTxoSpentQueryParams {
     /// TXO stake address.
     pub stake_address: Vec<u8>,
