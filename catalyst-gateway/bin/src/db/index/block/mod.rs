@@ -14,7 +14,7 @@ use txi::TxiInsertQuery;
 use txo::TxoInsertQuery;
 
 use super::{queries::FallibleQueryTasks, session::CassandraSession};
-use crate::service::utilities::convert::i16_from_saturating;
+use crate::service::utilities::convert::from_saturating;
 
 /// Add all data needed from the block into the indexes.
 pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
@@ -34,7 +34,7 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
 
     // We add all transactions in the block to their respective index data sets.
     for (txn_index, txs) in block_data.txs().iter().enumerate() {
-        let txn = i16_from_saturating(txn_index);
+        let txn = from_saturating(txn_index);
 
         let txn_hash = txs.hash().to_vec();
 
