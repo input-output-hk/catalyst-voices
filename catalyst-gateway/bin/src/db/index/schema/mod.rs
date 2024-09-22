@@ -64,6 +64,11 @@ const SCHEMAS: &[(&str, &str)] = &[
         include_str!("./cql/cip36_registration_for_vote_key.cql"),
         "Create Table CIP-36 Registration For a stake address",
     ),
+    (
+        // CIP-509 Registration Table Schema
+        include_str!("./cql/cip509_registration.cql"),
+        "Create Table CIP-509 Registration",
+    ),
 ];
 
 /// Get the namespace for a particular db configuration
