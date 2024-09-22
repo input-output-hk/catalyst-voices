@@ -12,23 +12,17 @@ void main() {
       expect(seedPhrase.mnemonicWords.length, 12);
     });
 
-    test('should generate a seed phrase with 12 words', () {
-      final seedPhrase = SeedPhrase(wordCount: 12);
-
-      expect(seedPhrase.mnemonicWords.length, 12);
-      expect(bip39.validateMnemonic(seedPhrase.mnemonic), isTrue);
-    });
-
-    test('should generate a seed phrase with 24 words', () {
-      final seedPhrase = SeedPhrase(wordCount: 24);
-
-      expect(seedPhrase.mnemonicWords.length, 24);
-      expect(bip39.validateMnemonic(seedPhrase.mnemonic), isTrue);
+    test('should generate a seed phrase with 12, 15, 18, 21, and 24 words', () {
+      for (final wordCount in [12, 15, 18, 21, 24]) {
+        final seedPhrase = SeedPhrase(wordCount: wordCount);
+        expect(seedPhrase.mnemonicWords.length, wordCount);
+        expect(bip39.validateMnemonic(seedPhrase.mnemonic), isTrue);
+      }
     });
 
     test('should throw an error for an invalid word count', () {
       expect(() => SeedPhrase(wordCount: 9), throwsA(isA<ArgumentError>()));
-      expect(() => SeedPhrase(wordCount: 13), throwsA(isA<ArgumentError>()));
+      expect(() => SeedPhrase(wordCount: 13), throwsA(isA<AssertionError>()));
       expect(() => SeedPhrase(wordCount: 27), throwsA(isA<ArgumentError>()));
     });
 

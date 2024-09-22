@@ -25,7 +25,7 @@ class SeedPhrase {
   SeedPhrase({int wordCount = 12})
       : this.fromMnemonic(
           bip39.generateMnemonic(
-            strength: _calculateEntropyBits(wordCount),
+            strength: (wordCount * 32) ~/ 3,
           ),
         );
 
@@ -66,12 +66,4 @@ class SeedPhrase {
 
   /// The full list of BIP-39 mnemonic words in English.
   static List<String> get wordList => WORDLIST;
-}
-
-int _calculateEntropyBits(int wordCount) {
-  if (wordCount <= 0 || wordCount % 3 != 0) {
-    throw ArgumentError('Word count must be divisible by 3 and greater than 0');
-  }
-
-  return (wordCount * 32) ~/ 3;
 }
