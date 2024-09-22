@@ -27,7 +27,9 @@ void main() {
     });
 
     test('should throw an error for an invalid word count', () {
+      expect(() => SeedPhrase(wordCount: 9), throwsA(isA<ArgumentError>()));
       expect(() => SeedPhrase(wordCount: 13), throwsA(isA<ArgumentError>()));
+      expect(() => SeedPhrase(wordCount: 27), throwsA(isA<ArgumentError>()));
     });
 
     test('should create SeedPhrase from a valid mnemonic', () {
