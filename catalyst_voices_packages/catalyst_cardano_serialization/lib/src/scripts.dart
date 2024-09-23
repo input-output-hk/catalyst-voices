@@ -107,6 +107,11 @@ sealed class Script extends Equatable implements CborEncodable {
     }
     return decoded;
   }
+
+  /// The length of the script in bytes.
+  ///
+  /// This is an abstract getter that must be implemented by the child classes.
+  int get length;
 }
 
 /// Abstract base class for native scripts, extending [Script].
@@ -222,6 +227,10 @@ sealed class NativeScript extends Script {
       _invalidCborError(value);
     }
   }
+
+  /// Returns the length of the [NativeScript]'s in bytes.
+  @override
+  int get length => cbor.encode(toCbor()).length;
 }
 
 /// Class representing a public key based native script.
@@ -427,6 +436,10 @@ sealed class PlutusScript extends Script {
   /// Equatable props for value comparison of all Plutus scripts.
   @override
   List<Object?> get props => [bytes];
+
+  /// Returns the length of the [PlutusScript]'s in bytes.
+  @override
+  int get length => bytes.length;
 }
 
 /// Class representing a Plutus V1 script.
@@ -512,4 +525,8 @@ class ScriptRef extends Script {
   /// Equatable props for value comparison.
   @override
   List<Object?> get props => [script];
+
+  /// Returns the length of the [ScriptRef]'s script in bytes.
+  @override
+  int get length => script.length;
 }
