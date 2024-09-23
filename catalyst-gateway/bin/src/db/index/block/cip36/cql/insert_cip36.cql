@@ -8,7 +8,7 @@ INSERT INTO cip36_registration (
     payment_address,
     is_payable,
     raw_nonce,
-    cip36,
+    cip36
 ) VALUES (
     :stake_address,
     :nonce,
@@ -18,5 +18,5 @@ INSERT INTO cip36_registration (
     :payment_address,
     :is_payable,
     :raw_nonce,
-    :cip36,
+    :cip36
 );
