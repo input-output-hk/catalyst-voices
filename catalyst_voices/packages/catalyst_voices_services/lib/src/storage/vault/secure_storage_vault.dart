@@ -55,14 +55,10 @@ final class SecureStorageVault with StorageStringMixin implements Vault {
   @override
   Future<void> clear() async {
     final all = await _secureStorage.readAll();
-    final vaultKeys = all.keys.where((e) => e.startsWith(_keyPrefix));
+    final vaultKeys = List.of(all.keys).where((e) => e.startsWith(_keyPrefix));
 
     for (final key in vaultKeys) {
-      await _guardedWrite(
-        null,
-        key: key,
-        requireUnlocked: false,
-      );
+      await _secureStorage.delete(key: key);
     }
   }
 
