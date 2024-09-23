@@ -15,7 +15,7 @@ const INSERT_UNSTAKED_TXO_ASSET_QUERY: &str = include_str!("./cql/insert_unstake
 
 /// Insert TXO Asset Query Parameters
 /// (Superset of data to support both Staked and Unstaked TXO records.)
-#[derive(SerializeRow)]
+#[derive(SerializeRow, Debug)]
 pub(super) struct Params {
     /// Transactions hash.
     txn_hash: Vec<u8>,

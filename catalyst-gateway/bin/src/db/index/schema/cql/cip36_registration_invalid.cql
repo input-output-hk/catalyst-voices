@@ -15,6 +15,6 @@ CREATE TABLE IF NOT EXISTS cip36_registration_invalid (
     signed              boolean,    -- Signature validates.
     error_report        list<text>, -- List of serialization errors in the registration.
 
-    PRIMARY KEY (vote_key, slot_no, txn)
+    PRIMARY KEY (stake_address, slot_no, txn)
 )
 WITH CLUSTERING ORDER BY (slot_no DESC, txn DESC);

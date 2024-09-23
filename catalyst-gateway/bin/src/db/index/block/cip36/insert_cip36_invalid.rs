@@ -1,6 +1,6 @@
 //! Insert CIP36 Registration Query (Invalid Records)
 
-use std::sync::Arc;
+use std::{fmt::Debug, sync::Arc};
 
 use cardano_chain_follower::Metadata::cip36::{Cip36, VotingPubKey};
 use scylla::{frame::value::MaybeUnset, SerializeRow, Session};
@@ -40,6 +40,28 @@ pub(super) struct Params {
     signed: bool,
     /// List of serialization errors.
     error_report: Vec<String>,
+}
+
+impl Debug for Params {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let cip36 = match self.cip36 {
+            MaybeUnset::Unset => "UNSET",
+            MaybeUnset::Set(v) => &format!("{v:?}"),
+        };
+        f.debug_struct("Params")
+            .field("stake_address", &self.stake_address)
+            .field("slot_no", &self.slot_no)
+            .field("txn", &self.txn)
+            .field("vote_key", &self.vote_key)
+            .field("payment_address", &self.payment_address)
+            .field("is_payable", &self.is_payable)
+            .field("raw_nonce", &self.raw_nonce)
+            .field("nonce", &self.nonce)
+            .field("cip36", &cip36)
+            .field("signed", &self.signed)
+            .field("error_report", &self.error_report)
+            .finish()
+    }
 }
 
 impl Params {

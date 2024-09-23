@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/account/account_popup.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -15,8 +16,11 @@ class SessionStateHeader extends StatelessWidget {
         return switch (state) {
           VisitorSessionState() => const _VisitorButton(),
           GuestSessionState() => const _GuestButton(),
-          ActiveUserSessionState(:final user) =>
-            _ActiveUserAvatar(letter: user.acronym ?? 'A'),
+          ActiveUserSessionState(:final user) => AccountPopup(
+              avatarLetter: user.acronym ?? 'A',
+              onLockAccountTap: () => debugPrint('Lock account'),
+              onProfileKeychainTap: () => debugPrint('Open Profile screen'),
+            ),
         };
       },
     );
@@ -43,21 +47,6 @@ class _VisitorButton extends StatelessWidget {
     return VoicesOutlinedButton(
       child: Text(context.l10n.visitor),
       onTap: () {},
-    );
-  }
-}
-
-class _ActiveUserAvatar extends StatelessWidget {
-  final String letter;
-
-  const _ActiveUserAvatar({
-    required this.letter,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return VoicesAvatar(
-      icon: Text(letter),
     );
   }
 }

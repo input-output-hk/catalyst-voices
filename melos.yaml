@@ -19,6 +19,7 @@ command:
       flutter: ">=3.24.1"
     dependencies:
       asn1lib: ^1.5.3
+      bip39: ^1.0.6
       bloc_concurrency: ^0.2.2
       collection: ^1.18.0
       cryptography: ^2.7.0
@@ -32,6 +33,7 @@ command:
       logging: ^1.2.0
       meta: ^1.10.0
       result_type: ^0.2.0
+      password_strength: ^0.2.0
       plugin_platform_interface: ^2.1.7
       bech32: ^0.2.2
       bip32_ed25519: ^0.6.0

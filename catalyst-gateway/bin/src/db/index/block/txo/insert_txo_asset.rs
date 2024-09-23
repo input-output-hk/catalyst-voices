@@ -15,7 +15,7 @@ const INSERT_TXO_ASSET_QUERY: &str = include_str!("./cql/insert_txo_asset.cql");
 
 /// Insert TXO Asset Query Parameters
 /// (Superset of data to support both Staked and Unstaked TXO records.)
-#[derive(SerializeRow)]
+#[derive(SerializeRow, Debug)]
 pub(super) struct Params {
     /// Stake Address - Binary 28 bytes. 0 bytes = not staked.
     stake_address: Vec<u8>,
