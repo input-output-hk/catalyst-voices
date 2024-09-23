@@ -18,14 +18,14 @@ class AccountPopup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PopupMenuButton(
+    return PopupMenuButton<_MenuItemValue>(
       color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
-      onSelected: (String? value) {
+      onSelected: (_MenuItemValue value) {
         switch (value) {
-          case _profileAndKeychain:
+          case _MenuItemValue.profileAndKeychain:
             onProfileKeychainTap?.call();
             break;
-          case _lock:
+          case _MenuItemValue.lock:
             onLockAccountTap?.call();
             break;
         }
@@ -53,7 +53,7 @@ class AccountPopup extends StatelessWidget {
           ),
           PopupMenuItem(
             padding: EdgeInsets.zero,
-            value: _profileAndKeychain,
+            value: _MenuItemValue.profileAndKeychain,
             child: _MenuItem(
               'Profile & Keychain',
               VoicesAssets.icons.userCircle,
@@ -61,7 +61,7 @@ class AccountPopup extends StatelessWidget {
           ),
           PopupMenuItem(
             padding: EdgeInsets.zero,
-            value: _lock,
+            value: _MenuItemValue.lock,
             child: _MenuItem(
               'Lock account',
               VoicesAssets.icons.lockClosed,
@@ -240,5 +240,8 @@ class _Section extends StatelessWidget {
 }
 
 const _padding = 12.0;
-const _profileAndKeychain = 'profileAndKeychain';
-const _lock = 'lock';
+
+enum _MenuItemValue {
+  profileAndKeychain,
+  lock,
+}
