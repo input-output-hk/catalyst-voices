@@ -19,7 +19,7 @@ final class TransactionBuilder extends Equatable {
   ///
   /// Enough [inputs] must be provided to be greater or equal
   /// the amount of [outputs] + [fee].
-  final List<TransactionUnspentOutput> inputs;
+  final Set<TransactionUnspentOutput> inputs;
 
   /// The list of transaction outputs which describes which address
   /// will receive what amount of [Coin].
@@ -64,7 +64,7 @@ final class TransactionBuilder extends Equatable {
   final Coin? totalCollateral;
 
   /// Reference inputs as nonempty set of transaction inputs.
-  final Set<TransactionInput>? referenceInputs;
+  final Set<TransactionUnspentOutput>? referenceInputs;
 
   /// The builder that builds the witness set of the transaction.
   ///
