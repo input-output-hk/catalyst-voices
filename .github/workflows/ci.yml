@@ -10,6 +10,6 @@ permissions:
 
 jobs:
   ci:
-    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@fixes-setup-action
+    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@master
     with:
       forge_version: latest
