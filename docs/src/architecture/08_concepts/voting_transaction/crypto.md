@@ -432,7 +432,7 @@ it needs a decryption procedure corresponded for which encryption one was made.
 
 Non-Interactive ZK (Zero Knowledge) Vote Proof algorithm helps to solve only one problem,
 to prove that the encrypted voting choice is exactly a some unit vector,
-which consists of **only one** $1$ value and others are $0$.
+which consists of **only one** is $1$ value and others are $0$.
 
 A more detailed and formal description
 you can find in the section *2.4* of this [paper][treasury_system_spec].
@@ -454,7 +454,7 @@ The prover algorithm takes as arguments:
   which was used during encryption.
 * $pk$ - is a public key, which was used to encrypt a unit vector.
 
-So basically here is the relation between all these arguments:
+So basically here is the relation between all these values:
 \begin{equation}
 \mathbf{c} = (c_1, \ldots, c_M) = (ElGamalEnc(e_{i,1}, r_1, pk), \ldots, ElGamalEnc(e_{i,M}, r_M, pk))
 \end{equation}
@@ -601,8 +601,8 @@ It means that all described operations is also group dependent
 
 The prover algorithm takes as arguments:
 
-* $enc$ - an encrypted message (ciphertext)
-* $sk$ - a secret key which was used to decrypt a message $enc$
+* $enc$ - an encrypted message (ciphertext).
+* $sk$ - a secret key which was used to decrypt a message $enc$.
 
 \begin{equation}
 TallyProof(enc, sk) = \pi
@@ -626,11 +626,11 @@ Finally, the proof is $\pi = (A_1, A_2, z)$.
 
 The verifier algorithm takes as arguments:
 
-* $enc$ - an encrypted message (ciphertext),
-* $dec$ - a decrypted message from the encrypted ciphertext $enc$,
+* $enc$ - an encrypted message (ciphertext).
+* $dec$ - a decrypted message from the encrypted ciphertext $enc$.
 * $pk$ - a public key corresponded to the $sk$
-  which was supposedly used to decrypt a message $enc$
-* $\pi$ - a prover's proof generated on the [previous step](#prover-1)
+  which was supposedly used to decrypt a message $enc$.
+* $\pi$ - a prover's proof generated on the [previous step](#prover-1).
 
 \begin{equation}
 TallyCheck(enc, dec, pk, \pi) = true | false
@@ -646,8 +646,8 @@ verifier needs to perform the next steps:
   of the ciphertext $enc = (enc_1, enc_2)$.
 2. Calculate $d = g^{dec} \circ (-enc_2), \quad d \in \mathbb{G}$.
 3. Compute $e = H(pk, d, g, enc_1, A_1, A_2 )$, where $g$ is the group generator.
-4. Verify $g^z == pk^e \circ A_1$
-5. Verify $enc_1^z == d^e \circ A_2$
+4. Verify $g^z == pk^e \circ A_1$.
+5. Verify $enc_1^z == d^e \circ A_2$.
 
 If step `3` and `4` returns `true` so the final result is `true` otherwise return `false`.
 
