@@ -14,7 +14,7 @@ use crate::{
 };
 
 /// Insert TXI Query and Parameters
-#[derive(SerializeRow)]
+#[derive(SerializeRow, Debug)]
 pub(crate) struct TxiInsertParams {
     /// Spent Transactions Hash
     txn_hash: Vec<u8>,

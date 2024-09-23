@@ -38,12 +38,12 @@ class _SpacesListViewState extends State<SpacesListView> {
         itemBuilder: (context, index) {
           final space = Space.values[index];
           return switch (space) {
-            Space.treasury => TreasuryOverview(key: ObjectKey(space)),
             Space.discovery => DiscoveryOverview(key: ObjectKey(space)),
             Space.workspace => WorkspaceOverview(key: ObjectKey(space)),
             Space.voting => VotingOverview(key: ObjectKey(space)),
             Space.fundedProjects =>
               FundedProjectsOverview(key: ObjectKey(space)),
+            Space.treasury => TreasuryOverview(key: ObjectKey(space)),
           };
         },
         separatorBuilder: (context, index) => const SizedBox(width: 16),

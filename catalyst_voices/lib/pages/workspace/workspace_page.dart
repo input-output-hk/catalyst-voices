@@ -57,6 +57,12 @@ class WorkspacePage extends StatefulWidget {
 }
 
 class _WorkspacePageState extends State<WorkspacePage> {
+  // This future is here only because we're loading too much at once
+  // and drawer animation hangs for sec.
+  //
+  // Should be deleted later with normal data source
+  final _delayFuture = Future<void>.delayed(const Duration(milliseconds: 500));
+
   @override
   Widget build(BuildContext context) {
     return ProposalControllerScope(
@@ -66,8 +72,17 @@ class _WorkspacePageState extends State<WorkspacePage> {
           navigation: _proposalNavigation,
         ),
         right: const ProposalSetupPanel(),
-        child: ProposalDetails(
-          navigation: _proposalNavigation,
+        child: FutureBuilder(
+          future: _delayFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return const SizedBox.shrink();
+            }
+
+            return ProposalDetails(
+              navigation: _proposalNavigation,
+            );
+          },
         ),
       ),
     );

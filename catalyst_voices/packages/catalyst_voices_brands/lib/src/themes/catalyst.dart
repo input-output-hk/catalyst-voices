@@ -315,7 +315,7 @@ ThemeData _buildThemeData(
       barrierColor: const Color(0x612A3D61),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       clipBehavior: Clip.hardEdge,
-      backgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv0,
+      backgroundColor: voicesColorScheme.elevationsOnSurfaceNeutralLv1White,
     ),
     listTileTheme: ListTileThemeData(
       shape: const StadiumBorder(),

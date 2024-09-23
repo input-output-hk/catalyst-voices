@@ -4,9 +4,9 @@
 
 pub(crate) mod staked_ada;
 
-use std::sync::Arc;
+use std::{fmt::Debug, sync::Arc};
 
-use anyhow::bail;
+use anyhow::{bail, Context};
 use crossbeam_skiplist::SkipMap;
 use scylla::{
     batch::Batch, prepared_statement::PreparedStatement, serialize::row::SerializeRow,
@@ -26,7 +26,8 @@ use crate::settings::{CassandraEnvVars, CASSANDRA_MIN_BATCH_SIZE};
 pub(crate) type SizedBatch = SkipMap<u16, Arc<Batch>>;
 
 /// All Prepared Queries that we know about.
-#[allow(clippy::enum_variant_names, dead_code)]
+#[derive(strum_macros::Display)]
+#[allow(clippy::enum_variant_names)]
 pub(crate) enum PreparedQuery {
     /// TXO Insert query.
     TxoAdaInsertQuery,
@@ -206,7 +207,7 @@ impl PreparedQueries {
     ///
     /// This will divide the batch into optimal sized chunks and execute them until all
     /// values have been executed or the first error is encountered.
-    pub(crate) async fn execute_batch<T: SerializeRow>(
+    pub(crate) async fn execute_batch<T: SerializeRow + Debug>(
         &self, session: Arc<Session>, cfg: Arc<CassandraEnvVars>, query: PreparedQuery,
         values: Vec<T>,
     ) -> FallibleQueryResults {
@@ -238,7 +239,12 @@ impl PreparedQueries {
                 bail!("No batch query found for size {}", chunk_size);
             };
             let batch_query_statements = batch_query.value().clone();
-            results.push(session.batch(&batch_query_statements, chunk).await?);
+            results.push(
+                session
+                    .batch(&batch_query_statements, chunk)
+                    .await
+                    .context(format!("query={query}, chunk={chunk:?}"))?,
+            );
         }
 
         Ok(results)
