@@ -6,20 +6,16 @@ void main() {
   late final FlutterSecureStorage flutterSecureStorage;
   late final SecureStorage secureStorage;
 
-  setUpAll(
-    () {
-      FlutterSecureStorage.setMockInitialValues({});
+  setUpAll(() {
+    FlutterSecureStorage.setMockInitialValues({});
 
-      flutterSecureStorage = const FlutterSecureStorage();
-      secureStorage = SecureStorage(secureStorage: flutterSecureStorage);
-    },
-  );
+    flutterSecureStorage = const FlutterSecureStorage();
+    secureStorage = SecureStorage(secureStorage: flutterSecureStorage);
+  });
 
-  tearDown(
-    () async {
-      await secureStorage.clear();
-    },
-  );
+  tearDown(() async {
+    await secureStorage.clear();
+  });
 
   test('read returns null when no value found for key', () async {
     // Given
