@@ -52,6 +52,12 @@ check-package-publishing:
     FROM +builder
     DO flutter-ci+PUBLISH_DRY_RUN
 
+# Runs the license checks for Catalyst Voices.
+check-license:
+    FROM +builder
+    RUN dart pub global activate license_checker
+    RUN melos run license-check
+
 # Run unit tests
 test-unit:
     FROM +builder
