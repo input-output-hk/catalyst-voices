@@ -1,7 +1,7 @@
 VERSION 0.8
 
 IMPORT ../catalyst-gateway AS catalyst-gateway
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.04 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.06 AS flutter-ci
 
 # Copy all the necessary files and running bootstrap
 builder:
@@ -55,7 +55,6 @@ check-package-publishing:
 # Runs the license checks for Catalyst Voices.
 check-license:
     FROM +builder
-    RUN dart pub global activate license_checker
     RUN melos run license-check
 
 # Run unit tests
