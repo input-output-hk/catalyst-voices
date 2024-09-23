@@ -137,7 +137,7 @@ void main() {
   });
 }
 
-class _TestStorage with StorageStringMixin implements Storage {
+class _TestStorage with StorageAsStringMixin implements Storage {
   final _data = <String, String>{};
 
   @override

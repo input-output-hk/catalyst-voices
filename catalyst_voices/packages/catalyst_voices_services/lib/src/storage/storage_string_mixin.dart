@@ -11,7 +11,7 @@ import 'package:flutter/foundation.dart';
 /// interface. Every method is has its mapping to [readString]/[writeString].
 ///
 /// See [SecureStorageVault] as example.
-mixin StorageStringMixin implements Storage {
+mixin StorageAsStringMixin implements Storage {
   @override
   FutureOr<int?> readInt({required String key}) async {
     final value = await readString(key: key);
