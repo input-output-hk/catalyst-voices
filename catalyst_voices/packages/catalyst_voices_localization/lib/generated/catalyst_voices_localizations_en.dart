@@ -336,4 +336,13 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get noConnectionBannerDescription => 'Your internet is playing hide and seek. Check your internet connection, or try again in a moment.';
+
+  @override
+  String get weakPasswordStrength => 'Weak password strength';
+
+  @override
+  String get normalPasswordStrength => 'Normal password strength';
+
+  @override
+  String get goodPasswordStrength => 'Good password strength';
 }

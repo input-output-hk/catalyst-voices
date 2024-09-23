@@ -413,5 +413,17 @@
   "noConnectionBannerDescription": "Your internet is playing hide and seek. Check your internet connection, or try again in a moment.",
   "@noConnectionBannerDescription": {
     "description": "Text shown in the No Internet Connection Banner widget for the description below the title."
+  },
+  "weakPasswordStrength": "Weak password strength",
+  "@weakPasswordStrength": {
+    "description": "Describes a password that is weak"
+  },
+  "normalPasswordStrength": "Normal password strength",
+  "@normalPasswordStrength": {
+    "description": "Describes a password that has medium strength."
+  },
+  "goodPasswordStrength": "Good password strength",
+  "@goodPasswordStrength": {
+    "description": "Describes a password that is strong."
   }
 }
