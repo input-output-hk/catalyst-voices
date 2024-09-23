@@ -43,6 +43,18 @@ final class SecureStorageVault with StorageStringMixin implements Vault {
   Future<void> lock() => _writeLock(null, key: _unlockKey);
 
   @override
+  Future<bool> unlock(LockFactor unlock) async {
+    await _writeLock(unlock, key: _unlockKey);
+
+    return isUnlocked;
+  }
+
+  @override
+  Future<void> setLock(LockFactor lock) {
+    return _writeLock(lock, key: _lockKey);
+  }
+
+  @override
   Future<String?> readString({required String key}) => _guardedRead(key: key);
 
   @override
@@ -61,18 +73,6 @@ final class SecureStorageVault with StorageStringMixin implements Vault {
     for (final key in vaultKeys) {
       await _secureStorage.delete(key: key);
     }
-  }
-
-  @override
-  Future<bool> unlock(LockFactor unlock) async {
-    await _writeLock(unlock, key: _unlockKey);
-
-    return isUnlocked;
-  }
-
-  @override
-  Future<void> setLock(LockFactor lock) {
-    return _writeLock(lock, key: _lockKey);
   }
 
   Future<void> _writeLock(
