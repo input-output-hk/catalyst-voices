@@ -645,6 +645,24 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Your internet is playing hide and seek. Check your internet connection, or try again in a moment.'**
   String get noConnectionBannerDescription;
+
+  /// Describes a password that is weak
+  ///
+  /// In en, this message translates to:
+  /// **'Weak password strength'**
+  String get weakPasswordStrength;
+
+  /// Describes a password that has medium strength.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal password strength'**
+  String get normalPasswordStrength;
+
+  /// Describes a password that is strong.
+  ///
+  /// In en, this message translates to:
+  /// **'Good password strength'**
+  String get goodPasswordStrength;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

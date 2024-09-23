@@ -13,9 +13,9 @@ dependencies:
   equatable: ^2.0.5
   flutter_quill: ^10.5.13
   meta: ^1.10.0
+  password_strength: ^0.2.0
 
 dev_dependencies:
   catalyst_analysis: ^2.0.0
   flutter_test:
     sdk: flutter
-  test: ^1.24.9
