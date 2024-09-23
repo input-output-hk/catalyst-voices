@@ -310,7 +310,6 @@ ThemeData _buildThemeData(
       backgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv0,
     ),
     dialogTheme: DialogTheme(
-      // TODO(damian-molinski): themed value needed. We don't have it yet.
       // N10-38
       barrierColor: const Color(0x212A3D61),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
