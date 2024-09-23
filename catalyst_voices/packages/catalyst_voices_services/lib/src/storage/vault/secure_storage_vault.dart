@@ -7,40 +7,40 @@ import 'package:catalyst_voices_services/src/storage/vault/vault.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 const _keyPrefix = 'SecureStorageVault';
-const _lockFactorKey = 'LockFactorKey';
-const _unlockFactorKey = 'UnlockFactorKey';
+const _lockKey = 'LockFactorKey';
+const _unlockKey = 'UnlockFactorKey';
 
 // TODO(damian-molinski): Maybe we'll need to encrypt data with LockFactor
 /// Implementation of [Vault] that uses [FlutterSecureStorage] as
 /// facade for read/write operations.
 final class SecureStorageVault with StorageStringMixin implements Vault {
   final FlutterSecureStorage _secureStorage;
-  final LockFactorCodec _lockFactorCodec;
+  final LockFactorCodec _lockCodec;
 
   SecureStorageVault({
     FlutterSecureStorage secureStorage = const FlutterSecureStorage(),
-    LockFactorCodec lockFactorCodec = const DefaultLockFactorCodec(),
+    LockFactorCodec lockCodec = const DefaultLockFactorCodec(),
   })  : _secureStorage = secureStorage,
-        _lockFactorCodec = lockFactorCodec;
+        _lockCodec = lockCodec;
 
   /// If storage does not have [LockFactor] this getter will
   /// return [VoidLockFactor] as fallback.
-  Future<LockFactor> get _lockFactor => _readLockFactor(_lockFactorKey);
+  Future<LockFactor> get _lock => _readLock(_lockKey);
 
   /// If storage does not have [LockFactor] this getter will
   /// return [VoidLockFactor] as fallback.
-  Future<LockFactor> get _unlockFactor => _readLockFactor(_unlockFactorKey);
+  Future<LockFactor> get _unlock => _readLock(_unlockKey);
 
   @override
   Future<bool> get isUnlocked async {
-    final lockFactor = await _lockFactor;
-    final unlockFactor = await _unlockFactor;
+    final lock = await _lock;
+    final unlock = await _unlock;
 
-    return unlockFactor.unlocks(lockFactor);
+    return unlock.unlocks(lock);
   }
 
   @override
-  Future<void> lock() => _writeLockFactor(null, key: _unlockFactorKey);
+  Future<void> lock() => _writeLock(null, key: _unlockKey);
 
   @override
   Future<String?> readString({required String key}) => _guardedRead(key: key);
@@ -64,37 +64,34 @@ final class SecureStorageVault with StorageStringMixin implements Vault {
   }
 
   @override
-  Future<bool> unlock(LockFactor lockFactor) async {
-    await _writeLockFactor(lockFactor, key: _unlockFactorKey);
+  Future<bool> unlock(LockFactor unlock) async {
+    await _writeLock(unlock, key: _unlockKey);
 
     return isUnlocked;
   }
 
   @override
-  Future<void> setLockFactor(LockFactor lockFactor) {
-    return _writeLockFactor(lockFactor, key: _lockFactorKey);
+  Future<void> setLock(LockFactor lock) {
+    return _writeLock(lock, key: _lockKey);
   }
 
-  Future<void> _writeLockFactor(
-    LockFactor? lockFactor, {
+  Future<void> _writeLock(
+    LockFactor? lock, {
     required String key,
   }) {
-    final encodedLockFactor =
-        lockFactor != null ? _lockFactorCodec.encode(lockFactor) : null;
+    final encodedLock = lock != null ? _lockCodec.encode(lock) : null;
 
     return _guardedWrite(
-      encodedLockFactor,
+      encodedLock,
       key: key,
       requireUnlocked: false,
     );
   }
 
-  Future<LockFactor> _readLockFactor(String key) async {
+  Future<LockFactor> _readLock(String key) async {
     final value = await _guardedRead(key: key, requireUnlocked: false);
 
-    return value != null
-        ? _lockFactorCodec.decode(value)
-        : const VoidLockFactor();
+    return value != null ? _lockCodec.decode(value) : const VoidLockFactor();
   }
 
   /// Allows operation only when [isUnlocked] it true, otherwise non op.

@@ -62,7 +62,7 @@ void main() {
     const value = 'username';
 
     // When
-    await vault.setLockFactor(lock);
+    await vault.setLock(lock);
     final isUnlocked = await vault.unlock(lock);
     await vault.writeString(value, key: key);
     final readValue = await vault.readString(key: key);
@@ -77,7 +77,7 @@ void main() {
     const lock = PasswordLockFactor('pass1234');
 
     // When
-    await vault.setLockFactor(lock);
+    await vault.setLock(lock);
     await vault.unlock(lock);
     await vault.lock();
 
@@ -99,7 +99,7 @@ void main() {
     };
 
     // When
-    await vault.setLockFactor(lock);
+    await vault.setLock(lock);
     await vault.unlock(lock);
 
     for (final entity in vaultKeyValues.entries) {
