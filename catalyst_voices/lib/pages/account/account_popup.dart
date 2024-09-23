@@ -81,6 +81,12 @@ class AccountPopup extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
+  final String accountLetter;
+  final String walletName;
+  final String walletBalance;
+  final String accountType;
+  final String walletAddress;
+
   const _Header({
     required this.accountLetter,
     required this.walletName,
@@ -88,12 +94,6 @@ class _Header extends StatelessWidget {
     required this.accountType,
     required this.walletAddress,
   });
-
-  final String accountLetter;
-  final String walletName;
-  final String walletBalance;
-  final String accountType;
-  final String walletAddress;
 
   @override
   Widget build(BuildContext context) {
