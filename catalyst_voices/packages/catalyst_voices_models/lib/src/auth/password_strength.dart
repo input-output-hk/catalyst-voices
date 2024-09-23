@@ -1,7 +1,7 @@
 import 'package:password_strength/password_strength.dart' as ps;
 
 /// Describes strength of a password.
-/// 
+///
 /// The enum values must be sorted from the weakest to the strongest.
 enum PasswordStrength {
   /// A weak password. Simple, already exposed, commonly used, etc.
