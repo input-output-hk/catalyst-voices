@@ -1,4 +1,5 @@
 // cspell: words wordlists WORDLIST
+// ignore_for_file: implementation_imports
 
 import 'dart:typed_data';
 import 'package:bip39/bip39.dart' as bip39;
