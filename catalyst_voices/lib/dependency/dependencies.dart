@@ -33,7 +33,7 @@ final class Dependencies extends DependencyProvider {
   void _registerRepositories() {
     this
       ..registerSingleton<CredentialsStorageRepository>(
-        CredentialsStorageRepository(secureStorageService: get()),
+        CredentialsStorageRepository(storage: get()),
       )
       ..registerSingleton<AuthenticationRepository>(
         AuthenticationRepository(credentialsStorageRepository: get()),
@@ -41,8 +41,8 @@ final class Dependencies extends DependencyProvider {
   }
 
   void _registerServices() {
-    registerSingleton<SecureStorageService>(
-      SecureStorageService(),
-    );
+    registerSingleton<Storage>(const SecureStorage());
+    registerSingleton<Vault>(const SecureStorageVault());
+    registerSingleton<DummyAuthStorage>(const SecureDummyAuthStorage());
   }
 }
