@@ -161,9 +161,11 @@ class _Header extends StatelessWidget {
             ],
           ),
         ),
-        Container(
+        VoicesDivider(
           height: 1,
           color: Theme.of(context).colors.outlineBorder,
+          indent: 0,
+          endIndent: 0,
         ),
       ],
     );
@@ -201,9 +203,11 @@ class _MenuItem extends StatelessWidget {
           ),
         ),
         if (showDivider)
-          Container(
+          VoicesDivider(
             height: 1,
             color: Theme.of(context).colors.outlineBorderVariant,
+            indent: 0,
+            endIndent: 0,
           ),
       ],
     );
@@ -230,9 +234,11 @@ class _Section extends StatelessWidget {
             style: Theme.of(context).textTheme.titleSmall,
           ),
         ),
-        Container(
+        VoicesDivider(
           height: 1,
           color: Theme.of(context).colors.outlineBorderVariant,
+          indent: 0,
+          endIndent: 0,
         ),
       ],
     );
