@@ -21,6 +21,9 @@ class VoicesAvatar extends StatelessWidget {
   /// The size of the avatar, expressed as the radius (half the diameter).
   final double radius;
 
+  /// The border around the widget.
+  final Border? border;
+
   /// The callback called when the widget is tapped.
   final VoidCallback? onTap;
 
@@ -32,15 +35,21 @@ class VoicesAvatar extends StatelessWidget {
     this.backgroundColor,
     this.padding = const EdgeInsets.all(8),
     this.radius = 20,
+    this.border,
     this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return CircleAvatar(
-      radius: radius,
-      backgroundColor:
-          backgroundColor ?? Theme.of(context).colorScheme.primaryContainer,
+    return Container(
+      width: radius * 2,
+      height: radius * 2,
+      decoration: BoxDecoration(
+        color:
+            backgroundColor ?? Theme.of(context).colorScheme.primaryContainer,
+        borderRadius: BorderRadius.circular(radius),
+        border: border,
+      ),
       child: Material(
         type: MaterialType.transparency,
         child: InkWell(

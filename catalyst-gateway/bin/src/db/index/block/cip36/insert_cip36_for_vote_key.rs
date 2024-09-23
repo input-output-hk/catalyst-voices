@@ -16,7 +16,7 @@ const INSERT_CIP36_REGISTRATION_FOR_VOTE_KEY_QUERY: &str =
     include_str!("./cql/insert_cip36_for_vote_key.cql");
 
 /// Insert CIP-36 Registration Invalid Query Parameters
-#[derive(SerializeRow, Clone)]
+#[derive(SerializeRow, Debug)]
 pub(super) struct Params {
     /// Voting Public Key
     vote_key: Vec<u8>,

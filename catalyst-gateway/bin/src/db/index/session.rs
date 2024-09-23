@@ -1,6 +1,7 @@
 //! Session creation and storage
 
 use std::{
+    fmt::Debug,
     path::PathBuf,
     sync::{Arc, OnceLock},
     time::Duration,
@@ -122,7 +123,7 @@ impl CassandraSession {
     ///
     /// This will divide the batch into optimal sized chunks and execute them until all
     /// values have been executed or the first error is encountered.
-    pub(crate) async fn execute_batch<T: SerializeRow>(
+    pub(crate) async fn execute_batch<T: SerializeRow + Debug>(
         &self, query: PreparedQuery, values: Vec<T>,
     ) -> FallibleQueryResults {
         let session = self.session.clone();
