@@ -138,7 +138,7 @@ scripts:
 
   license-check:
     run: |
-      melos exec -- lic_ck check-licenses -c $MELOS_ROOT_PATH/melos.yaml
+      melos exec -- lic_ck check-licenses -c $MELOS_ROOT_PATH/melos.yaml -i
     description: Run `lic_ck` checks for all packages.
 
   test:select:
