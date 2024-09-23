@@ -51,7 +51,7 @@ final class TransactionBuilder extends Equatable {
   final Set<TransactionInput>? collateralInputs;
 
   /// The list of public key hashes of addresses that are required to sign the
-  /// transaction. A nonempty set of addr keyhashes.
+  /// transaction. A nonempty set of addr key hashes.
   final Set<Ed25519PublicKeyHash>? requiredSigners;
 
   /// Specifies on which network the code will run.
