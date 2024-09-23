@@ -34,6 +34,7 @@ export 'indicators/process_progress_indicator.dart';
 export 'indicators/voices_circular_progress_indicator.dart';
 export 'indicators/voices_linear_progress_indicator.dart';
 export 'indicators/voices_no_internet_connection_banner.dart';
+export 'indicators/voices_password_strength_indicator.dart';
 export 'indicators/voices_status_indicator.dart';
 export 'menu/voices_list_tile.dart';
 export 'menu/voices_menu.dart';

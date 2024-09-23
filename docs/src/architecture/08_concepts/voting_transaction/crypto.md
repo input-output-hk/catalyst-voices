@@ -28,7 +28,7 @@ and performing tally process for executing "Catalyst" fund events.
 
 ### Preliminaries
 
-Through this paper we will use the following notations to refer to some entities of this protocol:
+The protocol is based around the following entities:
 
 * **Proposal** -
   voting subject on which each voter will be cast their votes.
@@ -49,13 +49,9 @@ Through this paper we will use the following notations to refer to some entities
   Or it could be defined based on their stake in the blockchain,
   which is more appropriate for web3 systems.
 
-Important to note that current protocol defined to work with the one specific proposal,
-so all definitions and procedures would be applied for some proposal.
+Important to note that the protocol defined for some **one** proposal.
 Obviously, it could be easily scaled for a set of proposals,
-performing all this protocol in parallel.
-
-The voting committee and voters registration/definition
-are not subjects of this document.
+performing protocol steps in parallel.
 
 ### Initial setup
 
@@ -125,10 +121,10 @@ components would be defined as follows:
 
 <!-- markdownlint-disable no-inline-html -->
 
-After the choice is done,
-vote **must** be encrypted using shared shared election public key $pk$.
+After the choice is done (described in [section](#voting-choice)),
+vote **must** be encrypted using shared election public key $pk$.
 
-Lifted ElGamal encryption algorithm is used,
+To achieve that, Lifted ElGamal encryption algorithm is used,
 noted as $ElGamalEnc(message, randomness, public \; key)$.
 More detailed description of the lifted ElGamal algorithm
 you can find in the [appendix B](#b-lifted-elgamal-encryptiondecryption).
@@ -138,17 +134,16 @@ $ElGamalEnc(message, randomness, public \; key)$ algorithm produces a ciphertext
 c = ElGamalEnc(message, randomness, public \; key)
 \end{equation}
 
-To encode previously generated unit vector $\mathbf{e}_i$ ($i$ - voting choice identifier),
-in more details you can read in this [section](#voting-choice),
+To encrypt previously generated unit vector $\mathbf{e}_i$ ($i$ - voting choice identifier),
 for each vector component value $e_{i,j}$ generate a corresponding randomness.
 <br/>
 Lets denote randomness value as $r_j$,
-where $j$ states as the same identifier of the vector component $e_{i,j}$.
+where $j$ is the same vector component's index $j$ value, $e_{i, j} => r_j$.
 
-Then, for each vector component $e_{i,j}$ with the corresponding randomness,
+Then, for each vector component $e_{i,j}$ with the corresponding randomness $r_j$,
 perform encryption algorithm applying shared election public key $pk$.
 \begin{equation}
-c_j = Enc(e_{i,j}, r_j, pk)
+c_j = ElGamalEnc(e_{i,j}, r_j, pk)
 \end{equation}
 
 As a result getting a vector $\mathbf{c}$ of ciphertext values $c_f$,
@@ -156,10 +151,10 @@ with the size equals of the size $\mathbf{e}_t$ unit vector,
 equals to the amount of the voting options.
 Lets denote this vector as:
 \begin{equation}
-\mathbf{c} = (c_1, \ldots, c_{M})
+\mathbf{c} = (c_1, \ldots, c_{M}) = (ElGamalEnc(e_{i,j}, r_j, pk), \ldots,  ElGamalEnc(e_{i,M}, r_M, pk))
 \end{equation}
 
-where $M$ is the voting options amount.
+where $M$ is the voting options amount and $i$ is the index of the voting choice.
 
 This is a first part of the published vote for a specific proposal.
 
@@ -171,7 +166,7 @@ After the voter's choice is generated and encrypted,
 it is crucial to prove that [encoding](#voting-choice) and [encryption](#vote-encrypting) are formed correctly
 (i.e. that the voter indeed encrypt a unit vector).
 
-Because by the definition of the encryption algorithm $Enc(message, randomness, public \; key)$
+Because by the definition of the encryption algorithm $ElGamalEnc(message, randomness, public \; key)$
 it is possible to encrypt an any message value,
 it is not restricted for encryption only $0$ and $1$ values
 (as it was stated in the previous [section](#voting-choice),
@@ -181,22 +176,28 @@ so everyone could validate a correctness of the encrypted vote data,
 without revealing a voting choice itself.
 
 To achieve that a some sophisticated ZK (Zero Knowledge) algorithm is used,
-noted as $VotingChoiceProof(\mathbf{c})$.
-It takes an encrypted vote vector $\mathbf{c}$ and generates a proof value $\pi$.
+noted as $VoteProof(\mathbf{c}, \mathbf{e}_i, \mathbf{r}, pk)$.
+It takes an encrypted vote vector $\mathbf{c}$,
+an original vote unit vector $\mathbf{e}_i$,
+a randomness vector $\mathbf{r}$,
+which was used during encryption algorithm $ElGamalEnc$
+and an shared election public key $pk$.
+As a result it generates a proof value $\pi$.
 \begin{equation}
-\pi = VotingChoiceProof(\mathbf{c})
+\pi = VoteProof(\mathbf{c}, \mathbf{e}_i, \mathbf{r}, pk)
 \end{equation}
 
-So to validate a $VotingChoiceCheck(\mathbf{c}, \pi)$ procedure should be used,
-which takes an encrypted vote $\mathbf{c}$ and corresponded proof $\pi$
+So to validate a $VoteCheck(\mathbf{c}, \pi, pk)$ procedure should be used,
+which takes an encrypted vote $\mathbf{c}$, corresponded proof $\pi$
+and the same hared election public key $pk$
 as arguments and returns `true` or `false`,
 is it valid or not.
 \begin{equation}
-true | false = VotingChoiceCheck(\mathbf{c}, \pi)
+true | false = VoteCheck(\mathbf{c}, \pi, pk)
 \end{equation}
 
-A more detailed description of how $VotingChoiceProof$, $VotingChoiceCheck$ work
-you can find in the section *2.4* of this [paper][treasury_system_spec].
+A more detailed description of how $VoteProof$, $VoteCheck$ work
+you can find in the [appendix D](#d-non-interactive-zk-vote-proof).
 
 #### Vote publishing
 
@@ -305,7 +306,7 @@ Which proofs that a provided encrypted tally result value $er$ was decrypted int
 using the exact secret key $sk$,
 which is corresponded to the already known shared election public key $pk$.
 \begin{equation}
-\pi = TallyProof(er, r, sk)
+\pi = TallyProof(er, sk)
 \end{equation}
 
 So to validate a $TallyCheck(er, r, pk, \pi)$ procedure should be used,
@@ -317,10 +318,8 @@ is it valid or not.
 true | false = TallyCheck(er, r, pk, \pi)
 \end{equation}
 
-<!-- markdownlint-disable max-one-sentence-per-line -->
 A more detailed description of how $TallyProof$, $TallyCheck$ work
-you can find in the section *Fig. 10* of this [paper][treasury_system_spec].
-<!-- markdownlint-enable max-one-sentence-per-line -->
+you can find in the [appendix E](#e-non-interactive-zk-tally-proof).
 
 #### Tally publishing
 
@@ -331,7 +330,7 @@ and tally proofs $\pi_i$
 corresponded for each voting option of some proposal.
 It could be published using any public channel, e.g. blockchain, ipfs or through p2p network.
 
-## A: Group definition
+## A: Group Definition
 
 <!-- markdownlint-disable no-inline-html -->
 
@@ -350,7 +349,7 @@ And defined as follows:
 
 <!-- markdownlint-enable no-inline-html -->
 
-## B: Lifted ElGamal encryption/decryption
+## B: Lifted ElGamal Encryption/Decryption
 
 <!-- markdownlint-disable no-inline-html -->
 
@@ -363,12 +362,16 @@ More detailed how group operations are defined, described in [appendix A](#a-gro
 ### Encryption
 
 Lifted ElGamal encryption algorithm
-takes as arguments $m$ message ($m \in \mathbb{Z}_q^*$),
-$r$ randomness ($r \in \mathbb{Z}_q^*$),
-$pk$ public key ($pk \in \mathbb{G}$):
+takes as arguments:
+
+* $m$ - message ($m \in \mathbb{Z}_q$)
+* $r$ - randomness ($r \in \mathbb{Z}_q$)
+* $pk$ - public key ($pk \in \mathbb{G}$)
+
 \begin{equation}
 ElGamalEnc(m, r, pk) = (c_1, c_2) = c,
 \end{equation}
+
 \begin{equation}
 c_1 = g^r, \quad c_2 = g^m \circ pk^r
 \end{equation}
@@ -377,8 +380,11 @@ $c$ - is a resulted ciphertext which consists of two elements $c_1, c_2 \in \mat
 
 ### Decryption
 
-Lifted ElGamal decryption algorithm takes as arguments $c$ ciphertext,
-$sk$ secret key ($sk \in \mathbb{Z}_q^*$):
+Lifted ElGamal decryption algorithm takes as arguments:
+
+* $c$ -  ciphertext,
+* $sk$ - secret key ($sk \in \mathbb{Z}_q$)
+
 \begin{equation}
 ElGamalDec(c, sk) = Dlog(c_2 \circ c_1^{-sk}) = m
 \end{equation}
@@ -387,11 +393,11 @@ $m$ - an original message which was encrypted on the previous step,
 $Dlog(x)$ is a discrete logarithm of $x$.
 Note that since $Dlog$ is not efficient,
 the message space should be a small set,
-say $m \in {{0,1}}^{\xi}$, for $\xi \le 30$.
+say $m \in \{0,1\}^{\xi}$, for $\xi \le 30$.
 
 <!-- markdownlint-enable no-inline-html -->
 
-## C: Homomorphic tally
+## C: Homomorphic Tally
 
 <!-- markdownlint-disable no-inline-html -->
 
@@ -399,11 +405,14 @@ Homomorphic tally schema is defined over any cyclic group $\mathbb{G}$ of order 
 <br/>
 More detailed how group operations are defined, described in [appendix A](#a-group-definition).
 
-Homomorphic tally algorithm takes as arguments $i$ voting choice index,
-$[\mathbf{c_1}, \mathbf{c_2}, \ldots, \mathbf{c_N}]$
-an array of encrypted votes vector's,
-$[\alpha_1, \alpha_2, \ldots, \alpha_N]$ - an array of corresponded voter's voting power.
-Where $N$ - votes amount.
+Homomorphic tally algorithm takes as arguments:
+
+* $i$ - voting choice index
+* $[\mathbf{c_1}, \mathbf{c_2}, \ldots, \mathbf{c_N}]$ - an array of encrypted votes vector's,
+  where $N$ - votes amount
+* $[\alpha_1, \alpha_2, \ldots, \alpha_N]$ - an array of corresponded voter's voting power,
+  where $N$ - votes amount
+
 \begin{equation}
 Tally(i, [\mathbf{c_1}, \mathbf{c_2}, \ldots, \mathbf{c_N}], [\alpha_1, \alpha_2, \ldots, \alpha_N])
 = c_{1, i}^{\alpha_1} \circ c_{2, i}^{\alpha_2} \circ \ldots \circ c_{N, i}^{\alpha_N} = er_i
@@ -418,6 +427,229 @@ As it is not an open decrypted value yet,
 it needs a decryption procedure corresponded for which encryption one was made.
 
 <!-- markdownlint-enable no-inline-html -->
+
+## D: Non-Interactive ZK Vote Proof
+
+Non-Interactive ZK (Zero Knowledge) Vote Proof algorithm helps to solve only one problem,
+to prove that the encrypted voting choice is exactly a some unit vector,
+which consists of **only one** is $1$ value and others are $0$.
+
+A more detailed and formal description
+you can find in the section *2.4* of this [paper][treasury_system_spec].
+
+It is assumed that the original encryption and decryption is performing by ElGamal scheme.
+It means that all described operations is also group dependent
+(more about groups described in [appendix A](#a-group-definition)).
+
+### Prover
+
+The prover algorithm takes as arguments:
+
+* $\mathbf{c} = (c_0, \ldots, c_{M-1})$ - encrypted vote (a vector of ciphertext),
+  where $M$ is amount of voting options.
+* $\mathbf{e}_i = (e_{i,0},\ldots, e_{i,M-1})$ - original voting choice, a unit vector,
+  where $M$ is amount of voting options
+  and $i$ is an index of the voting choice.
+* $\mathbf{r} = (r_0, \ldots, r_{M-1})$ - a vector of randomnesses,
+  which was used during encryption.
+* $pk$ - is a public key, which was used to encrypt a unit vector.
+
+So basically here is the relation between all these values:
+\begin{equation}
+\mathbf{c} = (c_1, \ldots, c_M) = (ElGamalEnc(e_{i,1}, r_1, pk), \ldots, ElGamalEnc(e_{i,M}, r_M, pk))
+\end{equation}
+
+\begin{equation}
+VoteProof(\mathbf{c}, \mathbf{e}_i, \mathbf{r}, pk) = \pi
+\end{equation}
+
+Important to note that the following notation would be used
+$\{a_i\}$ - which is a set of some elements $a_i$.
+
+$\pi$ is the final proof.
+To compute it, prover needs to perform the next steps:
+
+1. If the number of voting options $M$ is not a perfect power of $2$,
+  extend the vector $\mathbf{c}$ with $c_j = ElGamalEnc(0, 0, pk)$,
+  where $N$ is a perfect power of $2$, $j \in [M, \ldots, N - 1]$.
+  So the resulted $\mathbf{c} = (c_1, \ldots, c_M, \{c_j\})$.
+2. Generate a commitment key $ck \in \mathbb{G}$.
+3. Let $i_k$ is a bit value of the $i$-th binary representation,
+   where $k \in [0, log_2(N) - 1]$.
+   E.g. $i=3$ and $N=8, log_2(N) = 3$,
+   its binary representation $i=011$,
+   $i_0=0, i_1=1, i_2=1$.
+4. For $l \in [0, \ldots, log_2(N)-1]$ generate a random values
+  $\alpha_l, \beta_l, \gamma_l, \delta_l, \in \mathbb{Z}_q$.
+5. For $l \in [0, \ldots, log_2(N)-1]$ calculate, where $g$ is the group generator:
+    * $I_l = g^{i_l} \circ ck^{\alpha_l}, I_l \in \mathbb{G}$.
+    * $B_l = g^{\beta_l} \circ ck^{\gamma_l}, B_l \in \mathbb{G}$.
+    * $A_l = g^{i_l * \beta_l} \circ ck^{\delta_l}, A_l \in \mathbb{G}$.
+6. Calculate a first verifier challenge
+  $com_1 = H(ck, pk, \{c_j\}, \{I_l\}, \{B_l\}, \{A_l\})$,
+  where $H$ is a hash function,
+  $j \in [0, \ldots, N-1]$
+  and $l \in [0, \ldots, log_2(N)-1]$.
+7. For $j \in [0, \ldots, N-1]$ calculate polynomials
+  in the following form $p_j(x) = e_{i, j}*x^{log_2(N)} + \sum_{l=0}^{log_2(N)-1} p_{j,l} * x^l$:
+    * $j_l$ is a bit value of the $j$-th binary representation (same as was described in step `3`).
+    * $z_l^{1} = i_l * x + \beta_l$.
+    * $z_l^{0} = x - z_l^{1} = (1 - i_l)*x - \beta_l$.
+    * Calculate the polynomial itself $p_j(x) = \prod_{l=0}^{log_2(N)-1} z_l^{j_l}$
+8. For $l \in [0, \ldots, log_2(N)-1]$ generate a random $R_l \in \mathbb{Z}_q$.
+9. For $l \in [0, \ldots, log_2(N)-1]$ compute
+  $D_l = ElGamalEnc(sum_l, R_l, pk)$,
+  where $sum_l = \sum_{j=0}^{N-1}(p_{j,l} * com_1^j)$
+  and $p_{j,l}$ - corresponding coefficients of the polynomial $p_j(x)$ calculated on step `7`.
+10. Calculate a second verifier challenge
+  $com_2 = H(com_1, \{D_l\})$,
+  where $H$ is a hash function
+  and $l \in [0, \ldots, log_2(N)-1]$.
+11. For $l \in [0, \ldots, log_2(N)-1]$ calculate:
+    * $z_l = i_l * com_2 + \beta_l, z_l \in \mathbb{Z}_q$.
+    * $w_l = \alpha_l * com_2 + \gamma_l, w_l \in \mathbb{Z}_q$.
+    * $v_l = \alpha_l * (com_2 - z_l) + \delta_l, v_l \in \mathbb{Z}_q$.
+12. Calculate
+  $R=\sum_{j=0}^{N-1}(r_j * (com_2)^{log_2(N)} * (com_1)^j) + \sum_{l=0}^{log_2(N)-1}(R_l * (com_2)^l)$,
+  where $r_j$ original random values which was used to encrypt $c_j$
+  and $R_l$ random values generated in step `8`.
+
+Finally, the proof is $\pi = (ck, \{I_l\}, \{B_l\}, \{A_l\}, \{D_l\}, \{z_l\}, \{w_l\}, \{v_l\}, R)$,
+where $l \in [0, \ldots, log_2(N)-1]$.
+
+### Verifier
+
+The verifier algorithm takes as arguments:
+
+* $\mathbf{c} = (c_0, \ldots, c_{M-1})$ - encrypted vote (a vector of ciphertext),
+  where $M$ is amount of voting options.
+* $\pi$ - a prover's proof generated on the [previous step](#prover)
+* $pk$ - is a public key, which was used to encrypt a unit vector.
+
+\begin{equation}
+VoteCheck(\mathbf{c}, \pi, pk) = true | false
+\end{equation}
+
+As a result algorithm will return `true` or `false`,
+is the verification was succeeded or not respectively.
+
+Knowing that $\pi$ equals to $(ck, \{I_l\}, \{B_l\}, \{A_l\}, \{D_l\}, \{z_l\}, \{w_l\}, \{v_l\}, R)$,
+verifier needs to perform the next steps:
+
+1. If the number of voting options $M$ is not a perfect power of $2$,
+  extend the vector $\mathbf{c}$ with $c_j = ElGamalEnc(0, 0, pk)$,
+  where $N$ is a perfect power of $2$, $j \in [M, \ldots, N - 1]$.
+  So the resulted $\mathbf{c} = (c_1, \ldots, c_M, \{c_j\})$.
+2. Calculate the first verifier challenge
+  $com_1 = H(ck, pk, \{c_j\}, \{I_l\}, \{B_l\}, \{A_l\})$,
+  where $H$ is a hash function,
+  $j \in [0, \ldots, N-1]$
+  and $l \in [0, \ldots, log_2(N)-1]$.
+3. Calculate a second verifier challenge
+  $com_2 = H(com_1, \{D_l\})$,
+  where $H$ is a hash function
+  and $l \in [0, \ldots, log_2(N)-1]$.
+4. For $l \in [0, \ldots, log_2(N)-1]$ verify that the following statements are `true`,
+  where $g$ is the group generator:
+    * $(I_l)^{com_2} \circ B_l == g^{z_l} \circ ck^{w_l}$.
+    * $(I_l)^{com_2 - z_l} \circ A_l == g^{0} \circ ck^{v_l}$.
+5. Calculate the following $Left = ElGamalEnc(0, R, pk)$.
+  Note that the $Left$ is a ciphertext, $Left = (Left_1, Left_2)$.
+6. Note that $D_l$ is a ciphertext,
+  $D_l = (D_{l,1}, D_{l,2})$, for $l \in [0, \ldots, log_2(N)-1]$
+  calculate the following:
+    * $Right2_1 = (D_{0,1})^{0} \circ \ldots \circ (D_{log_2(N) - 1,1})^{log_2(N) - 1}$.
+    * $Right2_2 = (D_{0,2})^{0} \circ \ldots \circ (D_{log_2(N) - 1,2})^{log_2(N) - 1}$.
+7. For $j \in [0, \ldots, N-1]$ calculate the $p_j(com_2)$,
+  where $p_j$ is a prover's defined polynomial defined in step `7`:
+    * $j_l$ is a bit value of the $j$-th binary representation.
+    * $z_l^1 = z_j$.
+    * $z_l^0 = com_2 - z_j^1$.
+    * $p_j(com_2) = \prod_l^{log_2(N)-1} z_l^{j_l}$.
+8. For $j \in [0, \ldots, N-1]$ calculate the $P_j = ElGamalEnc(-p_j(com_2), 0, pk)$.
+  Note that the $P_j$ is a ciphertext, $P_j = (P_{j,1}, P_{j,2})$.
+9. Note that $C_j$ is a ciphertext,
+  $C_j = (C_{j,1}, C_{j,2})$, for $j \in [0, \ldots, N-1]$
+  calculate:
+    * $Right1_{j,1} = (C_{j,1})^{com_2^{log_2(N)}} \circ (P_{j,1})^{com_1^{j}}$.
+    * $Right1_{j,2} = (C_{j,2})^{com_2^{log_2(N)}} \circ (P_{j,2})^{com_1^{j}}$.
+    * $Right1_{1} = Right1_{j,1} \circ \ldots \circ Right1_{N - 1, 1}$.
+    * $Right1_{2} = Right1_{j,2} \circ \ldots \circ Right1_{N - 1, 2}$.
+10. Verify that the following statements are `true`:
+    * $Right1_{1} \circ Right2_1 == Left_1$.
+    * $Right1_{2} \circ Right2_2 == Left_2$.
+
+If step `4` and `10` returns `true` so the final result is `true` otherwise return `false`.
+
+## E: Non-Interactive ZK Tally Proof
+
+Non-Interactive ZK (Zero Knowledge) Tally Proof algorithm helps to solve only one problem,
+to prove that the specific encrypted message was decrypted into the specific resulted value,
+using exactly that secret key,
+which is corresponds to the some shared public key.
+
+<!-- markdownlint-disable max-one-sentence-per-line -->
+A more detailed and formal description
+you can find in the sections *Fig. 10* and *2.1.5* of this [paper][treasury_system_spec].
+<!-- markdownlint-enable max-one-sentence-per-line -->
+
+It is assumed that the original encryption and decryption is performing by ElGamal scheme.
+It means that all described operations is also group dependent
+(more about groups described in [appendix A](#a-group-definition)).
+
+### Prover
+
+The prover algorithm takes as arguments:
+
+* $enc$ - an encrypted message (ciphertext).
+* $sk$ - a secret key which was used to decrypt a message $enc$.
+
+\begin{equation}
+TallyProof(enc, sk) = \pi
+\end{equation}
+
+$\pi$ is the final proof.
+To compute it, prover needs to perform the next steps:
+
+1. Take the first element of the ciphertext $enc = (enc_1, enc_2)$
+  and calculate $d = enc_1^{sk}$.
+2. Generate a random value $\mu, \quad \mu \in \mathbb{Z}_q$.
+3. Compute $A_1 = g^{\mu}$, where $g$ is the group generator ($A_1 \in \mathbb{G}$).
+4. Compute $A_2 = (enc_1)^{\mu}, \quad A_2 \in \mathbb{G}$.
+5. Compute $e = H(pk, d, g, enc_1, A_1, A_2 )$,
+  where $pk$ is a corresponding public key of $sk$, $H$ is a hash function.
+6. Compute $z = sk * e + \mu, \quad z \in \mathbb{Z}_q$.
+
+Finally, the proof is $\pi = (A_1, A_2, z)$.
+
+### Verifier
+
+The verifier algorithm takes as arguments:
+
+* $enc$ - an encrypted message (ciphertext).
+* $dec$ - a decrypted message from the encrypted ciphertext $enc$.
+* $pk$ - a public key corresponded to the $sk$
+  which was supposedly used to decrypt a message $enc$.
+* $\pi$ - a prover's proof generated on the [previous step](#prover-1).
+
+\begin{equation}
+TallyCheck(enc, dec, pk, \pi) = true | false
+\end{equation}
+
+As a result algorithm will return `true` or `false`,
+is the verification was succeeded or not respectively.
+
+Knowing that $\pi$ equals to $(A_1, A_2, z)$,
+verifier needs to perform the next steps:
+
+1. Take the first and second elements $enc_1, enc_2$
+  of the ciphertext $enc = (enc_1, enc_2)$.
+2. Calculate $d = g^{dec} \circ (-enc_2), \quad d \in \mathbb{G}$.
+3. Compute $e = H(pk, d, g, enc_1, A_1, A_2 )$, where $g$ is the group generator.
+4. Verify $g^z == pk^e \circ A_1$.
+5. Verify $enc_1^z == d^e \circ A_2$.
+
+If step `3` and `4` returns `true` so the final result is `true` otherwise return `false`.
 
 ## Rationale
 

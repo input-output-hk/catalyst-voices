@@ -11,14 +11,14 @@ import 'package:go_router/go_router.dart';
 abstract final class Routes {
   static const currentMilestone = 'm4';
 
+  static final List<RouteBase> routes = [
+    ...coming_soon.$appRoutes,
+    ...login.$appRoutes,
+    ...spaces.$appRoutes,
+    ...overall_spaces.$appRoutes,
+  ];
+
   static String get initialLocation {
     return const coming_soon.ComingSoonRoute().location;
   }
-
-  static List<RouteBase> get routes => [
-        ...coming_soon.$appRoutes,
-        ...login.$appRoutes,
-        ...spaces.$appRoutes,
-        ...overall_spaces.$appRoutes,
-      ];
 }

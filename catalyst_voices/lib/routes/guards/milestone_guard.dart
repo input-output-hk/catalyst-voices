@@ -12,13 +12,20 @@ final class MilestoneGuard implements RouteGuard {
 
   @override
   FutureOr<String?> redirect(BuildContext context, GoRouterState state) {
+    final location = state.uri.toString();
+
+    // redirects /m4 page to /m4/discovery
+    if (location == '/${Routes.currentMilestone}') {
+      return const DiscoveryRoute().location;
+    }
+
     // allow milestone sub pages
-    if (state.uri.toString().startsWith('/${Routes.currentMilestone}')) {
+    if (location.startsWith('/${Routes.currentMilestone}')) {
       return null;
     }
 
     // if already at destination skip redirect
-    if (state.uri.toString() == const ComingSoonRoute().location) {
+    if (location == const ComingSoonRoute().location) {
       return null;
     }
 
