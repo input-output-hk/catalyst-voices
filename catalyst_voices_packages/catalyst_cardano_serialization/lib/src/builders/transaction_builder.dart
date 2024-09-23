@@ -511,8 +511,17 @@ final class TransactionBuilder extends Equatable {
       auxiliaryDataHash: auxiliaryData != null
           ? AuxiliaryDataHash.fromAuxiliaryData(auxiliaryData!)
           : null,
+      validityStart: validityStart,
+      mint: mint,
+      scriptDataHash: scriptData != null
+          ? ScriptDataHash.fromScriptData(scriptData!)
+          : null,
+      collateralInputs: collateralInputs,
       requiredSigners: requiredSigners,
       networkId: networkId,
+      collateralReturn: collateralReturn,
+      totalCollateral: totalCollateral,
+      referenceInputs: referenceInputs,
     );
   }
 
