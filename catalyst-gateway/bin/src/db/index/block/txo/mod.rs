@@ -17,7 +17,7 @@ use crate::{
         queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
         session::CassandraSession,
     },
-    service::utilities::convert::i16_from_saturating,
+    service::utilities::convert::from_saturating,
     settings::CassandraEnvVars,
 };
 
@@ -150,7 +150,7 @@ impl TxoInsertQuery {
             };
 
             let staked = stake_address != NO_STAKE_ADDRESS;
-            let txo_index = i16_from_saturating(txo_index);
+            let txo_index = from_saturating(txo_index);
 
             if staked {
                 let params = insert_txo::Params::new(
