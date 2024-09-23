@@ -13,11 +13,11 @@ const _unlockKey = 'UnlockFactorKey';
 // TODO(damian-molinski): Maybe we'll need to encrypt data with LockFactor
 /// Implementation of [Vault] that uses [FlutterSecureStorage] as
 /// facade for read/write operations.
-final class SecureStorageVault with StorageAsStringMixin implements Vault {
+base class SecureStorageVault with StorageAsStringMixin implements Vault {
   final FlutterSecureStorage _secureStorage;
   final LockFactorCodec _lockCodec;
 
-  SecureStorageVault({
+  const SecureStorageVault({
     FlutterSecureStorage secureStorage = const FlutterSecureStorage(),
     LockFactorCodec lockCodec = const DefaultLockFactorCodec(),
   })  : _secureStorage = secureStorage,

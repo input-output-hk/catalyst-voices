@@ -6,10 +6,10 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 const _keyPrefix = 'SecureStorage';
 
-final class SecureStorage with StorageAsStringMixin implements Storage {
+base class SecureStorage with StorageAsStringMixin implements Storage {
   final FlutterSecureStorage _secureStorage;
 
-  SecureStorage({
+  const SecureStorage({
     FlutterSecureStorage secureStorage = const FlutterSecureStorage(),
   }) : _secureStorage = secureStorage;
 

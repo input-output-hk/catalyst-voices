@@ -41,7 +41,8 @@ final class Dependencies extends DependencyProvider {
   }
 
   void _registerServices() {
-    registerSingleton<Storage>(SecureStorage());
-    registerSingleton<Vault>(SecureStorageVault());
+    registerSingleton<Storage>(const SecureStorage());
+    registerSingleton<Vault>(const SecureStorageVault());
+    registerSingleton<DummyAuthStorage>(const SecureDummyAuthStorage());
   }
 }
