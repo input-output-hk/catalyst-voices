@@ -2,12 +2,11 @@
 
 use tracing::info;
 
+use super::str_env_var::StringEnvVar;
 use crate::db::{
     self,
     index::session::{CompressionChoice, TlsChoice},
 };
-
-use super::str_env_var::StringEnvVar;
 
 /// Default Cassandra DB URL for the Persistent DB.
 pub(super) const PERSISTENT_URL_DEFAULT: &str = "127.0.0.1:9042";

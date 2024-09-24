@@ -255,15 +255,17 @@ impl CertInsertQuery {
         block: &MultiEraBlock,
     ) {
         #[allow(clippy::match_same_arms)]
-        txs.certs().iter().for_each(|cert| match cert {
-            pallas::ledger::traverse::MultiEraCert::NotApplicable => {},
-            pallas::ledger::traverse::MultiEraCert::AlonzoCompatible(cert) => {
-                self.index_alonzo_cert(cert, slot_no, txn, block);
-            },
-            pallas::ledger::traverse::MultiEraCert::Conway(cert) => {
-                self.index_conway_cert(cert, slot_no, txn, block);
-            },
-            _ => {},
+        txs.certs().iter().for_each(|cert| {
+            match cert {
+                pallas::ledger::traverse::MultiEraCert::NotApplicable => {},
+                pallas::ledger::traverse::MultiEraCert::AlonzoCompatible(cert) => {
+                    self.index_alonzo_cert(cert, slot_no, txn, block);
+                },
+                pallas::ledger::traverse::MultiEraCert::Conway(cert) => {
+                    self.index_conway_cert(cert, slot_no, txn, block);
+                },
+                _ => {},
+            }
         });
     }
 

@@ -173,9 +173,7 @@ impl StringEnvVar {
     pub(super) fn new_as_enum<T: FromStr + Display + VariantNames>(
         var_name: &str, default: T, redacted: bool,
     ) -> T
-    where
-        <T as std::str::FromStr>::Err: std::fmt::Display,
-    {
+    where <T as std::str::FromStr>::Err: std::fmt::Display {
         let mut choices = String::new();
         for name in T::VARIANTS {
             if choices.is_empty() {
