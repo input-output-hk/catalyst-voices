@@ -1203,6 +1203,9 @@ class $AssetsImagesGen {
   SvgGenImage get fallbackLogoIcon =>
       const SvgGenImage('assets/images/fallback_logo_icon.svg');
 
+  /// File path: assets/images/keychain.svg
+  SvgGenImage get keychain => const SvgGenImage('assets/images/keychain.svg');
+
   /// File path: assets/images/linkedin.svg
   SvgGenImage get linkedin => const SvgGenImage('assets/images/linkedin.svg');
 
@@ -1217,6 +1220,10 @@ class $AssetsImagesGen {
   /// File path: assets/images/proposal_background_2.webp
   AssetGenImage get proposalBackground2 =>
       const AssetGenImage('assets/images/proposal_background_2.webp');
+
+  /// File path: assets/images/task_illustration.webp
+  AssetGenImage get taskIllustration =>
+      const AssetGenImage('assets/images/task_illustration.webp');
 
   /// File path: assets/images/x.svg
   SvgGenImage get x => const SvgGenImage('assets/images/x.svg');
@@ -1238,10 +1245,12 @@ class $AssetsImagesGen {
         facebookMono,
         fallbackLogo,
         fallbackLogoIcon,
+        keychain,
         linkedin,
         linkedinMono,
         proposalBackground1,
         proposalBackground2,
+        taskIllustration,
         x,
         xMono
       ];

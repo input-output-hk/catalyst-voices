@@ -116,7 +116,7 @@ abstract interface class CardanoWalletApi {
   /// specified in amount, and if this cannot be attained,
   /// null shall be returned. The results can be further paginated by
   /// [paginate] if it is not null.
-  Future<List<TransactionUnspentOutput>> getUtxos({
+  Future<Set<TransactionUnspentOutput>> getUtxos({
     Balance? amount,
     Paginate? paginate,
   });

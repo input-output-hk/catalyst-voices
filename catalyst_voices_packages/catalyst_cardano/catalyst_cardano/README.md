@@ -101,13 +101,14 @@ Future<void> main() async {
 }
 
 Transaction _buildUnsignedTx({
-  required List<TransactionUnspentOutput> utxos,
+  required Set<TransactionUnspentOutput> utxos,
   required ShelleyAddress changeAddress,
 }) {
   const txBuilderConfig = TransactionBuilderConfig(
-    feeAlgo: LinearFee(
-      constant: Coin(155381),
-      coefficient: Coin(44),
+    feeAlgo: TieredFee(
+      constant: 155381,
+      coefficient: 44,
+      refScriptByteCost: 15,
     ),
     maxTxSize: 16384,
     maxValueSize: 5000,
