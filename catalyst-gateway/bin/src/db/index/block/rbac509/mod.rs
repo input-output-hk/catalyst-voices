@@ -40,7 +40,7 @@ impl Rbac509InsertQuery {
     pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &CassandraEnvVars,
     ) -> anyhow::Result<SizedBatch> {
-        todo!();
+        insert_rbac509::Params::prepare_batch(session, cfg).await
     }
 
     /// Index the RBAC 509 registrations in a transaction.
@@ -59,7 +59,9 @@ impl Rbac509InsertQuery {
         if !self.registrations.is_empty() {
             let inner_session = session.clone();
             query_handles.push(tokio::spawn(async move {
-                todo!();
+                inner_session
+                    .execute_batch(PreparedQuery::Rbac509InsertQuery, self.registrations)
+                    .await
             }));
         }
 

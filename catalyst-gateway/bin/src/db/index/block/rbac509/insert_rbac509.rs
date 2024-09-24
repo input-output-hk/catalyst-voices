@@ -5,8 +5,12 @@
 use std::sync::Arc;
 
 use scylla::{SerializeRow, Session};
+use tracing::error;
 
-use crate::{db::index::queries::SizedBatch, settings::CassandraEnvVars};
+use crate::{
+    db::index::queries::{PreparedQueries, SizedBatch},
+    settings::CassandraEnvVars,
+};
 
 /// RBAC Registration Indexing query
 #[allow(dead_code)]
@@ -32,17 +36,38 @@ pub(super) struct Params {
 #[allow(clippy::todo, dead_code, clippy::unused_async)]
 impl Params {
     /// Create a new record for this transaction.
-    pub(super) fn new(//
-                      //stake_address: &[u8], slot_no: u64, txn: i16, txo: i16, address: &str, value: u64,
-                      // txn_hash: &[u8],
+    pub(super) fn new(
+        chain_root: Vec<u8>, transaction_id: Vec<u8>, purpose: Vec<u8>, slot_no: u64, txn: i16,
+        prv_txn_id: Option<Vec<u8>>,
     ) -> Self {
-        todo!();
+        Params {
+            chain_root,
+            transaction_id,
+            purpose,
+            slot_no: num_bigint::BigInt::from(slot_no),
+            txn,
+            prv_txn_id,
+        }
     }
 
     /// Prepare Batch of RBAC Registration Index Data Queries
     pub(super) async fn prepare_batch(
-        _session: &Arc<Session>, _cfg: &CassandraEnvVars,
+        session: &Arc<Session>, cfg: &CassandraEnvVars,
     ) -> anyhow::Result<SizedBatch> {
-        todo!();
+        let insert_queries = PreparedQueries::prepare_batch(
+            session.clone(),
+            INSERT_RBAC509_QUERY,
+            cfg,
+            scylla::statement::Consistency::Any,
+            true,
+            false,
+        )
+        .await;
+
+        if let Err(ref error) = insert_queries {
+            error!(error=%error,"Failed to prepare Insert RBAC 509 Registration Query.");
+        };
+
+        insert_queries
     }
 }
