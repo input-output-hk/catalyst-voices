@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/account/creation/task_picture.dart';
 import 'package:catalyst_voices/widgets/buttons/specialized/voices_learn_more_button.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -28,8 +29,8 @@ class LinkWalletIntroDialog extends StatelessWidget {
             context.l10n.walletLink_subheader,
             style: Theme.of(context).textTheme.titleMedium,
           ),
-          const SizedBox(height: 12),
-          const Placeholder(),
+          const SizedBox(height: 50),
+          const TaskKeychainPicture(),
           const Spacer(),
           VoicesLearnMoreButton(
             onTap: () {},
@@ -39,6 +40,7 @@ class LinkWalletIntroDialog extends StatelessWidget {
       right: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          const SizedBox(height: 24),
           Text(
             context.l10n.walletLink_intro_title,
             style: Theme.of(context).textTheme.titleMedium,
