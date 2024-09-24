@@ -1,5 +1,5 @@
--- Index CIP-509 Registrations (Valid)
-INSERT INTO cip509_registration (
+-- Index RBAC 509 Registrations (Valid)
+INSERT INTO RBAC509_registration (
     chain_root,
     transaction_id,
     purpose,

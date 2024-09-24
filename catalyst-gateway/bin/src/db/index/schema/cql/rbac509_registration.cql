@@ -1,5 +1,5 @@
 -- Index of RBAC 509 registrations. Valid. 
-CREATE TABLE IF NOT EXISTS rbac509_registration (
+CREATE TABLE IF NOT EXISTS RBAC509_registration (
     -- Primary Key Data
     chain_root          blob,           -- 32 Bytes of Chain Root.
     transaction_id      blob,           -- 32 Bytes of Transaction Hash.

@@ -10,7 +10,7 @@ use crate::{db::index::queries::SizedBatch, settings::CassandraEnvVars};
 
 /// RBAC Registration Indexing query
 #[allow(dead_code)]
-const INSERT_RBAC_QUERY: &str = include_str!("./cql/insert_rbac509.cql");
+const INSERT_RBAC509_QUERY: &str = include_str!("./cql/insert_rbac509.cql");
 
 /// Insert RBAC Registration Query Parameters
 #[derive(SerializeRow, Debug)]
