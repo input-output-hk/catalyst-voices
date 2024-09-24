@@ -25,13 +25,14 @@ final class AccountPage extends StatelessWidget {
                     const SizedBox(height: 32),
                     _Tab(),
                     const SizedBox(height: 48),
-                    const _KeychainCard(
+                    _KeychainCard(
                       connectedWallet: 'Lace',
-                      roles: [
+                      roles: const [
                         'Voter (Default)',
                         'Proposer',
                         'Drep',
                       ],
+                      onRemoveKeychain: () => debugPrint('Keychain removed'),
                     )
                   ],
                 ),
@@ -93,7 +94,7 @@ class _Header extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Set your base profile, wallet addresses and preferences',
+                  'Your Catalyst keychain & role registration',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: Colors.white,
                       ),
@@ -126,10 +127,12 @@ class _Tab extends StatelessWidget {
 class _KeychainCard extends StatelessWidget {
   final String? connectedWallet;
   final List<String> roles;
+  final VoidCallback? onRemoveKeychain;
 
   const _KeychainCard({
     this.connectedWallet,
     this.roles = const <String>[],
+    this.onRemoveKeychain,
   });
 
   @override
@@ -161,7 +164,7 @@ class _KeychainCard extends StatelessWidget {
               VoicesTextButton.customColor(
                 leading: VoicesAssets.icons.x.buildIcon(),
                 color: Theme.of(context).colors.iconsError,
-                onTap: () {},
+                onTap: onRemoveKeychain,
                 child: Text(
                   'Remove Keychain',
                 ),
