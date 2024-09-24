@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/pages/discovery/current_status_text.dart';
 import 'package:catalyst_voices/pages/discovery/toggle_state_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -84,7 +86,16 @@ class _Segment extends StatelessWidget {
             const Spacer(),
             VoicesFilledButton(
               child: const Text('CTA to Model'),
-              onTap: () {},
+              onTap: () {
+                unawaited(
+                  VoicesDialog.show<void>(
+                    context: context,
+                    builder: (context) {
+                      return const VoicesDesktopInfoDialog(title: Text(''));
+                    },
+                  ),
+                );
+              },
             ),
           ],
         ),

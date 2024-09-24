@@ -88,6 +88,8 @@ package:
 
 publish:
    FROM +package
-   ARG tag='latest'
 
-   SAVE IMAGE voices-frontend:$tag
+   ARG container="voices"
+   ARG tag="latest"
+
+   SAVE IMAGE ${container}:${tag}
