@@ -1,7 +1,5 @@
 //! Command line and environment variable settings for the service
 use std::{
-    env::{self, VarError},
-    fmt::{self, Display},
     net::{IpAddr, Ipv4Addr, SocketAddr},
     path::PathBuf,
     str::FromStr,
@@ -10,24 +8,23 @@ use std::{
 };
 
 use anyhow::anyhow;
-use cardano_chain_follower::Network;
 use clap::Args;
 use cryptoxide::{blake2b::Blake2b, mac::Mac};
 use dotenvy::dotenv;
 use duration_string::DurationString;
-use strum::VariantNames;
-use tracing::{error, info};
+use str_env_var::StringEnvVar;
+use tracing::error;
 use url::Url;
 
 use crate::{
     build_info::{log_build_info, BUILD_INFO},
-    db::{
-        self,
-        index::session::{CompressionChoice, TlsChoice},
-    },
     logger::{self, LogLevel, LOG_LEVEL_DEFAULT},
     service::utilities::net::{get_public_ipv4, get_public_ipv6},
 };
+
+pub(crate) mod cassandra_db;
+pub(crate) mod chain_follower;
+mod str_env_var;
 
 /// Default address to start service on.
 const ADDRESS_DEFAULT: &str = "0.0.0.0:3030";
@@ -57,37 +54,6 @@ const CHECK_CONFIG_TICK_DEFAULT: &str = "5s";
 /// Default Event DB URL.
 const EVENT_DB_URL_DEFAULT: &str =
     "postgresql://postgres:postgres@localhost/catalyst_events?sslmode=disable";
-
-/// Default Cassandra DB URL for the Persistent DB.
-const CASSANDRA_PERSISTENT_DB_URL_DEFAULT: &str = "127.0.0.1:9042";
-
-/// Default Cassandra DB URL for the Persistent DB.
-const CASSANDRA_PERSISTENT_DB_NAMESPACE_DEFAULT: &str = "persistent";
-
-/// Default Cassandra DB URL for the Persistent DB.
-const CASSANDRA_VOLATILE_DB_URL_DEFAULT: &str = "127.0.0.1:9042";
-
-/// Default Cassandra DB URL for the Persistent DB.
-const CASSANDRA_VOLATILE_DB_NAMESPACE_DEFAULT: &str = "volatile";
-
-/// Default maximum batch size.
-/// This comes from:
-/// <https://docs.aws.amazon.com/keyspaces/latest/devguide/functional-differences.html#functional-differences.batch>
-/// Scylla may support larger batches for better performance.
-/// Larger batches will incur more memory overhead to store the prepared batches.
-const CASSANDRA_MAX_BATCH_SIZE_DEFAULT: i64 = 30;
-
-/// Minimum possible batch size.
-pub(crate) const CASSANDRA_MIN_BATCH_SIZE: i64 = 1;
-
-/// Maximum possible batch size.
-const CASSANDRA_MAX_BATCH_SIZE: i64 = 256;
-
-/// Default chain to follow.
-const CHAIN_FOLLOWER_DEFAULT: Network = Network::Mainnet;
-
-/// Default number of sync tasks (must be in the range 1 to 255 inclusive.)
-const CHAIN_FOLLOWER_SYNC_TASKS_DEFAULT: u16 = 16;
 
 /// Hash the Public IPv4 and IPv6 address of the machine, and convert to a 128 bit V4
 /// UUID.
@@ -146,389 +112,6 @@ pub(crate) struct DocsSettings {
     pub(crate) server_name: Option<String>,
 }
 
-/// An environment variable read as a string.
-#[derive(Clone)]
-pub(crate) struct StringEnvVar {
-    /// Value of the env var.
-    value: String,
-    /// Whether the env var is displayed redacted or not.
-    redacted: bool,
-}
-
-/// Ergonomic way of specifying if a env var needs to be redacted or not.
-enum StringEnvVarParams {
-    /// The env var is plain and should not be redacted.
-    Plain(String, Option<String>),
-    /// The env var is redacted and should be redacted.
-    Redacted(String, Option<String>),
-}
-
-impl From<&str> for StringEnvVarParams {
-    fn from(s: &str) -> Self {
-        StringEnvVarParams::Plain(String::from(s), None)
-    }
-}
-
-impl From<String> for StringEnvVarParams {
-    fn from(s: String) -> Self {
-        StringEnvVarParams::Plain(s, None)
-    }
-}
-
-impl From<(&str, bool)> for StringEnvVarParams {
-    fn from((s, r): (&str, bool)) -> Self {
-        if r {
-            StringEnvVarParams::Redacted(String::from(s), None)
-        } else {
-            StringEnvVarParams::Plain(String::from(s), None)
-        }
-    }
-}
-
-impl From<(&str, bool, &str)> for StringEnvVarParams {
-    fn from((s, r, c): (&str, bool, &str)) -> Self {
-        if r {
-            StringEnvVarParams::Redacted(String::from(s), Some(String::from(c)))
-        } else {
-            StringEnvVarParams::Plain(String::from(s), Some(String::from(c)))
-        }
-    }
-}
-
-/// An environment variable read as a string.
-impl StringEnvVar {
-    /// Read the env var from the environment.
-    ///
-    /// If not defined, read from a .env file.
-    /// If still not defined, use the default.
-    ///
-    /// # Arguments
-    ///
-    /// * `var_name`: &str - the name of the env var
-    /// * `default_value`: &str - the default value
-    ///
-    /// # Returns
-    ///
-    /// * Self - the value
-    ///
-    /// # Example
-    ///
-    /// ```rust,no_run
-    /// #use cat_data_service::settings::StringEnvVar;
-    ///
-    /// let var = StringEnvVar::new("MY_VAR", "default");
-    /// assert_eq!(var.as_str(), "default");
-    /// ```
-    fn new(var_name: &str, param: StringEnvVarParams) -> Self {
-        let (default_value, redacted, choices) = match param {
-            StringEnvVarParams::Plain(s, c) => (s, false, c),
-            StringEnvVarParams::Redacted(s, c) => (s, true, c),
-        };
-
-        match env::var(var_name) {
-            Ok(value) => {
-                if redacted {
-                    info!(env = var_name, value = "Redacted", "Env Var Defined");
-                } else {
-                    info!(env = var_name, value = value, "Env Var Defined");
-                }
-                Self { value, redacted }
-            },
-            Err(VarError::NotPresent) => {
-                if let Some(choices) = choices {
-                    if redacted {
-                        info!(
-                            env = var_name,
-                            default = "Default Redacted",
-                            choices = choices,
-                            "Env Var Defaulted"
-                        );
-                    } else {
-                        info!(
-                            env = var_name,
-                            default = default_value,
-                            choices = choices,
-                            "Env Var Defaulted"
-                        );
-                    };
-                } else if redacted {
-                    info!(
-                        env = var_name,
-                        default = "Default Redacted",
-                        "Env Var Defined"
-                    );
-                } else {
-                    info!(env = var_name, default = default_value, "Env Var Defaulted");
-                }
-
-                Self {
-                    value: default_value,
-                    redacted,
-                }
-            },
-            Err(error) => {
-                error!(
-                    env = var_name,
-                    default = default_value,
-                    error = ?error,
-                    "Env Var Error"
-                );
-                Self {
-                    value: default_value,
-                    redacted,
-                }
-            },
-        }
-    }
-
-    /// New Env Var that is optional.
-    fn new_optional(var_name: &str, redacted: bool) -> Option<Self> {
-        match env::var(var_name) {
-            Ok(value) => {
-                if redacted {
-                    info!(env = var_name, value = "Redacted", "Env Var Defined");
-                } else {
-                    info!(env = var_name, value = value, "Env Var Defined");
-                }
-                Some(Self { value, redacted })
-            },
-            Err(VarError::NotPresent) => {
-                info!(env = var_name, "Env Var Not Set");
-                None
-            },
-            Err(error) => {
-                error!(
-                    env = var_name,
-                    error = ?error,
-                    "Env Var Error"
-                );
-                None
-            },
-        }
-    }
-
-    /// Convert an Envvar into the required Enum Type.
-    fn new_as_enum<T: FromStr + Display + VariantNames>(
-        var_name: &str, default: T, redacted: bool,
-    ) -> T
-    where <T as std::str::FromStr>::Err: std::fmt::Display {
-        let mut choices = String::new();
-        for name in T::VARIANTS {
-            if choices.is_empty() {
-                choices.push('[');
-            } else {
-                choices.push(',');
-            }
-            choices.push_str(name);
-        }
-        choices.push(']');
-
-        let choice = StringEnvVar::new(
-            var_name,
-            (default.to_string().as_str(), redacted, choices.as_str()).into(),
-        );
-
-        let value = match T::from_str(choice.as_str()) {
-            Ok(var) => var,
-            Err(error) => {
-                error!(error=%error, default=%default, choices=choices, choice=%choice, "Invalid choice. Using Default.");
-                default
-            },
-        };
-
-        value
-    }
-
-    /// Convert an Envvar into an integer in the bounded range.
-    fn new_as_i64(var_name: &str, default: i64, min: i64, max: i64) -> i64
-where {
-        let choices = format!("A value in the range {min} to {max} inclusive");
-
-        let raw_value = StringEnvVar::new(
-            var_name,
-            (default.to_string().as_str(), false, choices.as_str()).into(),
-        )
-        .as_string();
-
-        match raw_value.parse::<i64>() {
-            Ok(value) => {
-                if value < min {
-                    error!("{var_name} out of range. Range = {min} to {max} inclusive. Clamped to {min}");
-                    min
-                } else if value > max {
-                    error!("{var_name} out of range. Range = {min} to {max} inclusive. Clamped to {max}");
-                    max
-                } else {
-                    value
-                }
-            },
-            Err(error) => {
-                error!(error=%error, default=default, "{var_name} not an integer. Range = {min} to {max} inclusive. Defaulted");
-                default
-            },
-        }
-    }
-
-    /// Get the read env var as a str.
-    ///
-    /// # Returns
-    ///
-    /// * &str - the value
-    pub(crate) fn as_str(&self) -> &str {
-        &self.value
-    }
-
-    /// Get the read env var as a str.
-    ///
-    /// # Returns
-    ///
-    /// * &str - the value
-    pub(crate) fn as_string(&self) -> String {
-        self.value.clone()
-    }
-}
-
-impl fmt::Display for StringEnvVar {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        if self.redacted {
-            return write!(f, "REDACTED");
-        }
-        write!(f, "{}", self.value)
-    }
-}
-
-impl fmt::Debug for StringEnvVar {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        if self.redacted {
-            return write!(f, "REDACTED");
-        }
-        write!(f, "env: {}", self.value)
-    }
-}
-
-/// Configuration for an individual cassandra cluster.
-#[derive(Clone)]
-pub(crate) struct CassandraEnvVars {
-    /// The Address/s of the DB.
-    pub(crate) url: StringEnvVar,
-
-    /// The Namespace of Cassandra DB.
-    pub(crate) namespace: StringEnvVar,
-
-    /// The `UserName` to use for the Cassandra DB.
-    pub(crate) username: Option<StringEnvVar>,
-
-    /// The Password to use for the Cassandra DB..
-    pub(crate) password: Option<StringEnvVar>,
-
-    /// Use TLS for the connection?
-    pub(crate) tls: TlsChoice,
-
-    /// Use TLS for the connection?
-    pub(crate) tls_cert: Option<StringEnvVar>,
-
-    /// Compression to use.
-    pub(crate) compression: CompressionChoice,
-
-    /// Maximum Configured Batch size.
-    pub(crate) max_batch_size: i64,
-}
-
-impl CassandraEnvVars {
-    /// Create a config for a cassandra cluster, identified by a default namespace.
-    fn new(url: &str, namespace: &str) -> Self {
-        let name = namespace.to_uppercase();
-
-        // We can actually change the namespace, but can't change the name used for env vars.
-        let namespace = StringEnvVar::new(&format!("CASSANDRA_{name}_NAMESPACE"), namespace.into());
-
-        let tls =
-            StringEnvVar::new_as_enum(&format!("CASSANDRA_{name}_TLS"), TlsChoice::Disabled, false);
-        let compression = StringEnvVar::new_as_enum(
-            &format!("CASSANDRA_{name}_COMPRESSION"),
-            CompressionChoice::Lz4,
-            false,
-        );
-
-        Self {
-            url: StringEnvVar::new(&format!("CASSANDRA_{name}_URL"), url.into()),
-            namespace,
-            username: StringEnvVar::new_optional(&format!("CASSANDRA_{name}_USERNAME"), false),
-            password: StringEnvVar::new_optional(&format!("CASSANDRA_{name}_PASSWORD"), true),
-            tls,
-            tls_cert: StringEnvVar::new_optional(&format!("CASSANDRA_{name}_TLS_CERT"), false),
-            compression,
-            max_batch_size: StringEnvVar::new_as_i64(
-                &format!("CASSANDRA_{name}_BATCH_SIZE"),
-                CASSANDRA_MAX_BATCH_SIZE_DEFAULT,
-                CASSANDRA_MIN_BATCH_SIZE,
-                CASSANDRA_MAX_BATCH_SIZE,
-            ),
-        }
-    }
-
-    /// Log the configuration of this Cassandra DB
-    pub(crate) fn log(&self, persistent: bool) {
-        let db_type = if persistent { "Persistent" } else { "Volatile" };
-
-        let auth = match (&self.username, &self.password) {
-            (Some(u), Some(_)) => format!("Username: {} Password: REDACTED", u.as_str()),
-            _ => "No Authentication".to_string(),
-        };
-
-        let tls_cert = match &self.tls_cert {
-            None => "No TLS Certificate Defined".to_string(),
-            Some(cert) => cert.as_string(),
-        };
-
-        info!(
-            url = self.url.as_str(),
-            namespace = db::index::schema::namespace(self),
-            auth = auth,
-            tls = self.tls.to_string(),
-            cert = tls_cert,
-            compression = self.compression.to_string(),
-            "Cassandra {db_type} DB Configuration"
-        );
-    }
-}
-
-/// Configuration for the chain follower.
-#[derive(Clone)]
-pub(crate) struct ChainFollowerEnvVars {
-    /// The Blockchain we sync from.
-    pub(crate) chain: Network,
-
-    /// The maximum number of sync tasks.
-    pub(crate) sync_tasks: u16,
-}
-
-impl ChainFollowerEnvVars {
-    /// Create a config for a cassandra cluster, identified by a default namespace.
-    fn new() -> Self {
-        let chain = StringEnvVar::new_as_enum("CHAIN_NETWORK", CHAIN_FOLLOWER_DEFAULT, false);
-        let sync_tasks: u16 = StringEnvVar::new_as_i64(
-            "CHAIN_FOLLOWER_SYNC_TASKS",
-            CHAIN_FOLLOWER_SYNC_TASKS_DEFAULT.into(),
-            1,
-            u16::MAX.into(),
-        )
-        .try_into()
-        .unwrap_or(CHAIN_FOLLOWER_SYNC_TASKS_DEFAULT);
-
-        Self { chain, sync_tasks }
-    }
-
-    /// Log the configuration of this Chain Follower
-    pub(crate) fn log(&self) {
-        info!(
-            chain = self.chain.to_string(),
-            sync_tasks = self.sync_tasks,
-            "Chain Follower Configuration"
-        );
-    }
-}
-
 /// All the `EnvVars` used by the service.
 struct EnvVars {
     /// The github repo owner
@@ -562,13 +145,13 @@ struct EnvVars {
     event_db_password: Option<StringEnvVar>,
 
     /// The Config of the Persistent Cassandra DB.
-    cassandra_persistent_db: CassandraEnvVars,
+    cassandra_persistent_db: cassandra_db::EnvVars,
 
     /// The Config of the Volatile Cassandra DB.
-    cassandra_volatile_db: CassandraEnvVars,
+    cassandra_volatile_db: cassandra_db::EnvVars,
 
     /// The Chain Follower configuration
-    chain_follower: ChainFollowerEnvVars,
+    chain_follower: chain_follower::EnvVars,
 
     /// Tick every N seconds until config exists in db
     #[allow(unused)]
@@ -613,15 +196,15 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
         event_db_url: StringEnvVar::new("EVENT_DB_URL", EVENT_DB_URL_DEFAULT.into()),
         event_db_username: StringEnvVar::new_optional("EVENT_DB_USERNAME", false),
         event_db_password: StringEnvVar::new_optional("EVENT_DB_PASSWORD", true),
-        cassandra_persistent_db: CassandraEnvVars::new(
-            CASSANDRA_PERSISTENT_DB_URL_DEFAULT,
-            CASSANDRA_PERSISTENT_DB_NAMESPACE_DEFAULT,
+        cassandra_persistent_db: cassandra_db::EnvVars::new(
+            cassandra_db::PERSISTENT_URL_DEFAULT,
+            cassandra_db::PERSISTENT_NAMESPACE_DEFAULT,
         ),
-        cassandra_volatile_db: CassandraEnvVars::new(
-            CASSANDRA_VOLATILE_DB_URL_DEFAULT,
-            CASSANDRA_VOLATILE_DB_NAMESPACE_DEFAULT,
+        cassandra_volatile_db: cassandra_db::EnvVars::new(
+            cassandra_db::VOLATILE_URL_DEFAULT,
+            cassandra_db::VOLATILE_NAMESPACE_DEFAULT,
         ),
-        chain_follower: ChainFollowerEnvVars::new(),
+        chain_follower: chain_follower::EnvVars::new(),
         check_config_tick,
     }
 });
@@ -683,7 +266,7 @@ impl Settings {
     }
 
     /// Get the Persistent & Volatile Cassandra DB config for this service.
-    pub(crate) fn cassandra_db_cfg() -> (CassandraEnvVars, CassandraEnvVars) {
+    pub(crate) fn cassandra_db_cfg() -> (cassandra_db::EnvVars, cassandra_db::EnvVars) {
         (
             ENV_VARS.cassandra_persistent_db.clone(),
             ENV_VARS.cassandra_volatile_db.clone(),
@@ -691,7 +274,7 @@ impl Settings {
     }
 
     /// Get the configuration of the chain follower.
-    pub(crate) fn follower_cfg() -> ChainFollowerEnvVars {
+    pub(crate) fn follower_cfg() -> chain_follower::EnvVars {
         ENV_VARS.chain_follower.clone()
     }
 
@@ -773,10 +356,13 @@ impl Settings {
             ENV_VARS.github_repo_name.as_str()
         );
 
-        match Url::parse_with_params(&path, &[
-            ("template", ENV_VARS.github_issue_template.as_str()),
-            ("title", title),
-        ]) {
+        match Url::parse_with_params(
+            &path,
+            &[
+                ("template", ENV_VARS.github_issue_template.as_str()),
+                ("title", title),
+            ],
+        ) {
             Ok(url) => Some(url),
             Err(e) => {
                 error!("Failed to generate github issue url {:?}", e.to_string());
@@ -876,10 +462,13 @@ mod tests {
             &SocketAddr::from(([127, 0, 0, 1], 8080)),
             "http://api.prod.projectcatalyst.io , https://api.dev.projectcatalyst.io:1234",
         );
-        assert_eq!(configured_hosts, vec![
-            "http://api.prod.projectcatalyst.io",
-            "https://api.dev.projectcatalyst.io:1234"
-        ]);
+        assert_eq!(
+            configured_hosts,
+            vec![
+                "http://api.prod.projectcatalyst.io",
+                "https://api.dev.projectcatalyst.io:1234"
+            ]
+        );
     }
 
     #[test]
@@ -888,9 +477,10 @@ mod tests {
             &SocketAddr::from(([127, 0, 0, 1], 8080)),
             "not a hostname , https://api.dev.projectcatalyst.io:1234",
         );
-        assert_eq!(configured_hosts, vec![
-            "https://api.dev.projectcatalyst.io:1234"
-        ]);
+        assert_eq!(
+            configured_hosts,
+            vec!["https://api.dev.projectcatalyst.io:1234"]
+        );
     }
 
     #[test]

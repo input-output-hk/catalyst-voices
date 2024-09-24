@@ -13,7 +13,7 @@ use crate::{
         session::CassandraSession,
     },
     service::utilities::convert::from_saturating,
-    settings::CassandraEnvVars,
+    settings::cassandra_db,
 };
 
 /// Insert TXI Query and Parameters
@@ -109,7 +109,7 @@ impl StakeRegistrationInsertQuery {
 
     /// Prepare Batch of Insert TXI Index Data Queries
     pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &CassandraEnvVars,
+        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         let insert_queries = PreparedQueries::prepare_batch(
             session.clone(),
@@ -145,7 +145,7 @@ impl CertInsertQuery {
 
     /// Prepare Batch of Insert TXI Index Data Queries
     pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &CassandraEnvVars,
+        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         // Note: for now we have one query, but there are many certs, and later we may have more
         // to add here.
@@ -255,17 +255,15 @@ impl CertInsertQuery {
         block: &MultiEraBlock,
     ) {
         #[allow(clippy::match_same_arms)]
-        txs.certs().iter().for_each(|cert| {
-            match cert {
-                pallas::ledger::traverse::MultiEraCert::NotApplicable => {},
-                pallas::ledger::traverse::MultiEraCert::AlonzoCompatible(cert) => {
-                    self.index_alonzo_cert(cert, slot_no, txn, block);
-                },
-                pallas::ledger::traverse::MultiEraCert::Conway(cert) => {
-                    self.index_conway_cert(cert, slot_no, txn, block);
-                },
-                _ => {},
-            }
+        txs.certs().iter().for_each(|cert| match cert {
+            pallas::ledger::traverse::MultiEraCert::NotApplicable => {},
+            pallas::ledger::traverse::MultiEraCert::AlonzoCompatible(cert) => {
+                self.index_alonzo_cert(cert, slot_no, txn, block);
+            },
+            pallas::ledger::traverse::MultiEraCert::Conway(cert) => {
+                self.index_conway_cert(cert, slot_no, txn, block);
+            },
+            _ => {},
         });
     }
 

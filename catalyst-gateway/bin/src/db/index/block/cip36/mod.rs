@@ -14,7 +14,7 @@ use crate::{
         queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
         session::CassandraSession,
     },
-    settings::CassandraEnvVars,
+    settings::cassandra_db,
 };
 
 /// Insert CIP-36 Registration Queries
@@ -39,7 +39,7 @@ impl Cip36InsertQuery {
 
     /// Prepare Batch of Insert Cip36 Registration Data Queries
     pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &CassandraEnvVars,
+        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<(SizedBatch, SizedBatch, SizedBatch)> {
         let insert_cip36_batch = insert_cip36::Params::prepare_batch(session, cfg).await;
         let insert_cip36_invalid_batch =

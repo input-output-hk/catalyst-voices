@@ -20,7 +20,7 @@ use staked_ada::{
 use super::block::{
     certs::CertInsertQuery, cip36::Cip36InsertQuery, txi::TxiInsertQuery, txo::TxoInsertQuery,
 };
-use crate::settings::{CassandraEnvVars, CASSANDRA_MIN_BATCH_SIZE};
+use crate::settings::cassandra_db;
 
 /// Batches of different sizes, prepared and ready for use.
 pub(crate) type SizedBatch = SkipMap<u16, Arc<Batch>>;
@@ -98,7 +98,9 @@ pub(crate) type FallibleQueryTasks = Vec<tokio::task::JoinHandle<FallibleQueryRe
 
 impl PreparedQueries {
     /// Create new prepared queries for a given session.
-    pub(crate) async fn new(session: Arc<Session>, cfg: &CassandraEnvVars) -> anyhow::Result<Self> {
+    pub(crate) async fn new(
+        session: Arc<Session>, cfg: &cassandra_db::EnvVars,
+    ) -> anyhow::Result<Self> {
         // We initialize like this, so that all errors preparing querys get shown before aborting.
         let txi_insert_queries = TxiInsertQuery::prepare_batch(&session, cfg).await;
         let all_txo_queries = TxoInsertQuery::prepare_batch(&session, cfg).await;
@@ -154,7 +156,7 @@ impl PreparedQueries {
     /// It is necessary to do this because batches are pre-sized, they can not be dynamic.
     /// Preparing the batches in advance is a very larger performance increase.
     pub(crate) async fn prepare_batch(
-        session: Arc<Session>, query: &str, cfg: &CassandraEnvVars,
+        session: Arc<Session>, query: &str, cfg: &cassandra_db::EnvVars,
         consistency: scylla::statement::Consistency, idempotent: bool, logged: bool,
     ) -> anyhow::Result<SizedBatch> {
         let sized_batches: SizedBatch = SkipMap::new();
@@ -163,7 +165,7 @@ impl PreparedQueries {
         // same.
         let prepared = Self::prepare(session, query, consistency, idempotent).await?;
 
-        for batch_size in CASSANDRA_MIN_BATCH_SIZE..=cfg.max_batch_size {
+        for batch_size in cassandra_db::MIN_BATCH_SIZE..=cfg.max_batch_size {
             let mut batch: Batch = Batch::new(if logged {
                 scylla::batch::BatchType::Logged
             } else {
@@ -171,7 +173,7 @@ impl PreparedQueries {
             });
             batch.set_consistency(consistency);
             batch.set_is_idempotent(idempotent);
-            for _ in CASSANDRA_MIN_BATCH_SIZE..=batch_size {
+            for _ in cassandra_db::MIN_BATCH_SIZE..=batch_size {
                 batch.append_statement(prepared.clone());
             }
 
@@ -188,7 +190,9 @@ impl PreparedQueries {
     pub(crate) async fn execute_iter<P>(
         &self, session: Arc<Session>, select_query: PreparedSelectQuery, params: P,
     ) -> anyhow::Result<RowIterator>
-    where P: SerializeRow {
+    where
+        P: SerializeRow,
+    {
         let prepared_stmt = match select_query {
             PreparedSelectQuery::GetTxoByStakeAddress => &self.txo_by_stake_address_query,
             PreparedSelectQuery::GetTxiByTransactionHash => &self.txi_by_txn_hash_query,
@@ -208,7 +212,7 @@ impl PreparedQueries {
     /// This will divide the batch into optimal sized chunks and execute them until all
     /// values have been executed or the first error is encountered.
     pub(crate) async fn execute_batch<T: SerializeRow + Debug>(
-        &self, session: Arc<Session>, cfg: Arc<CassandraEnvVars>, query: PreparedQuery,
+        &self, session: Arc<Session>, cfg: Arc<cassandra_db::EnvVars>, query: PreparedQuery,
         values: Vec<T>,
     ) -> FallibleQueryResults {
         let query_map = match query {
