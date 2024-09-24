@@ -30,7 +30,7 @@ class _LinkWalletDialogState extends State<LinkWalletDialog> {
   Widget build(BuildContext context) {
     return switch (_stage) {
       LinkWalletStage.intro => LinkWalletIntroDialog(
-          onChooseCardanoWallet: _onChooseCardanoWallet,
+          onSelectWallet: _onSelectWallet,
         ),
       LinkWalletStage.selectWallet => SelectWalletDialog(
           onSelectedWallet: _onSelectedWallet,
@@ -38,7 +38,7 @@ class _LinkWalletDialogState extends State<LinkWalletDialog> {
     };
   }
 
-  void _onChooseCardanoWallet() {
+  void _onSelectWallet() {
     setState(() {
       _stage = LinkWalletStage.selectWallet;
     });

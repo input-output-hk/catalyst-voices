@@ -3,6 +3,7 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
+/// A "Learn More" button that redirects usually to an external content.
 class VoicesLearnMoreButton extends StatelessWidget {
   final VoidCallback onTap;
 
