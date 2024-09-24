@@ -350,6 +350,9 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get chooseCardanoWallet => 'Choose Cardano Wallet';
 
   @override
+  String get learnMore => 'Learn More';
+
+  @override
   String get walletLink_header => 'Link keys to your Catalyst Keychain';
 
   @override

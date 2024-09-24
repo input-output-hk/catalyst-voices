@@ -670,6 +670,12 @@ abstract class VoicesLocalizations {
   /// **'Choose Cardano Wallet'**
   String get chooseCardanoWallet;
 
+  /// A label on a clickable element that can show more content.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn More'**
+  String get learnMore;
+
   /// A header in link wallet flow in registration.
   ///
   /// In en, this message translates to:

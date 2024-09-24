@@ -430,6 +430,10 @@
   "@chooseCardanoWallet": {
     "description": "A button label to select a cardano wallet."
   },
+  "learnMore": "Learn More",
+  "@learnMore": {
+    "description": "A label on a clickable element that can show more content."
+  },
   "walletLink_header": "Link keys to your Catalyst Keychain",
   "@walletLink_header": {
     "description": "A header in link wallet flow in registration."
