@@ -65,9 +65,9 @@ const SCHEMAS: &[(&str, &str)] = &[
         "Create Table CIP-36 Registration For a stake address",
     ),
     (
-        // CIP-509 Registration Table Schema
-        include_str!("./cql/cip509_registration.cql"),
-        "Create Table CIP-509 Registration",
+        // RBAC 509 Registration Table Schema
+        include_str!("./cql/rbac509_registration.cql"),
+        "Create Table RBAC 509 Registration",
     ),
 ];
 
