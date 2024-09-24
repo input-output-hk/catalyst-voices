@@ -1,0 +1,197 @@
+import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
+import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:flutter/material.dart';
+
+final class AccountPage extends StatelessWidget {
+  const AccountPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            children: [
+              _Header(),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _Tab(),
+                    const SizedBox(height: 48),
+                    const _KeychainCard(
+                      connectedWallet: 'Lace',
+                      roles: [
+                        'Voter (Default)',
+                        'Proposer',
+                        'Drep',
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _KeychainCard extends StatelessWidget {
+  final String? connectedWallet;
+  final List<String> roles;
+
+  const _KeychainCard({
+    this.connectedWallet,
+    this.roles = const <String>[],
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      constraints: const BoxConstraints(maxWidth: 600),
+      decoration: BoxDecoration(
+        borderRadius: const BorderRadius.all(
+          Radius.circular(16),
+        ),
+        border: Border.all(
+          color: Theme.of(context).colors.outlineBorderVariant!,
+          width: 1,
+        ),
+        color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Catalyst Keychain',
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+              ),
+              VoicesTextButton(
+                leading: VoicesAssets.icons.x.buildIcon(),
+                child: Text('Remove Keychain'),
+                onTap: () {},
+              ),
+            ],
+          ),
+          if (connectedWallet != null)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              child: Text(
+                'Wallet connected',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+          if (connectedWallet != null)
+            Row(
+              children: [
+                VoicesIconButton.filled(
+                  style: ButtonStyle(
+                    padding: WidgetStateProperty.all(EdgeInsets.zero),
+                    foregroundColor: WidgetStateProperty.all(
+                      Theme.of(context).colors.successContainer,
+                    ),
+                    backgroundColor: WidgetStateProperty.all(
+                      Theme.of(context).colors.success,
+                    ),
+                  ),
+                  child: VoicesAssets.icons.check.buildIcon(),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  connectedWallet!,
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+              ],
+            ),
+          if (roles.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24),
+              child: Text(
+                'Current Role registrations',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+          if (roles.isNotEmpty)
+            Text(
+              roles.map((e) => ' • $e').join('\n'),
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Tab extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return const DefaultTabController(
+      length: 1,
+      child: TabBar(
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        isScrollable: true,
+        tabs: [
+          Tab(text: 'Profile & Keychain'),
+        ],
+      ),
+    );
+  }
+}
+
+class _Header extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 350,
+      child: Stack(
+        children: [
+          Positioned(
+            top: 16,
+            left: 8,
+            child: VoicesIconButton.filled(
+              onTap: () {},
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.all(
+                  Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
+                ),
+                foregroundColor: WidgetStateProperty.all(
+                  Theme.of(context).colors.iconsForeground,
+                ),
+              ),
+              child: VoicesAssets.icons.arrowNarrowLeft.buildIcon(),
+            ),
+          ),
+          Positioned(
+            bottom: 48,
+            left: 32,
+            child: Wrap(
+              direction: Axis.vertical,
+              children: [
+                Text(
+                  'My Account / Profile & Keychain',
+                  style: Theme.of(context).textTheme.displayMedium,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Set your base profile, wallet addresses and preferences',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
