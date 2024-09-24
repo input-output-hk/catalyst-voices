@@ -91,7 +91,7 @@ impl EnvVars {
         let dl_connect_timeout = StringEnvVar::new_as(
             "CHAIN_FOLLOWER_DL_CONNECT_TIMEOUT",
             default_dl_connect_timeout,
-            1,
+            0,
             MAX_DL_TIMEOUT,
         );
         if dl_connect_timeout == 0 {
@@ -107,7 +107,7 @@ impl EnvVars {
         let dl_data_timeout = StringEnvVar::new_as(
             "CHAIN_FOLLOWER_DL_DATA_TIMEOUT",
             default_dl_data_timeout,
-            1,
+            0,
             MAX_DL_TIMEOUT,
         );
         if dl_connect_timeout == 0 {
