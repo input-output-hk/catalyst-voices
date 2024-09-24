@@ -22,6 +22,7 @@ final class AccountPage extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const SizedBox(height: 32),
                     _Tab(),
                     const SizedBox(height: 48),
                     const _KeychainCard(
@@ -38,6 +39,85 @@ final class AccountPage extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _Header extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 350,
+      child: Stack(
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: CatalystImage.asset(
+                  VoicesAssets.images.accountBg.path,
+                ).image,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          Positioned(
+            top: 24,
+            left: 8,
+            child: VoicesIconButton.filled(
+              onTap: () {
+                GoRouter.of(context).pop();
+              },
+              style: ButtonStyle(
+                backgroundColor: WidgetStateProperty.all(
+                  Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
+                ),
+                foregroundColor: WidgetStateProperty.all(
+                  Theme.of(context).colors.iconsForeground,
+                ),
+              ),
+              child: VoicesAssets.icons.arrowNarrowLeft.buildIcon(),
+            ),
+          ),
+          Positioned(
+            bottom: 48,
+            left: 32,
+            child: Wrap(
+              direction: Axis.vertical,
+              children: [
+                Text(
+                  'My Account / Profile & Keychain',
+                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                        color: Colors.white,
+                      ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Set your base profile, wallet addresses and preferences',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: Colors.white,
+                      ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Tab extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return const DefaultTabController(
+      length: 1,
+      child: TabBar(
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        isScrollable: true,
+        tabs: [
+          Tab(text: 'Profile & Keychain'),
+        ],
       ),
     );
   }
@@ -120,7 +200,10 @@ class _KeychainCard extends StatelessWidget {
             ),
           if (roles.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24),
+              padding: const EdgeInsets.only(
+                top: 40,
+                bottom: 24,
+              ),
               child: Text(
                 'Current Role registrations',
                 style: Theme.of(context).textTheme.titleMedium,
@@ -131,71 +214,6 @@ class _KeychainCard extends StatelessWidget {
               roles.map((e) => ' • $e').join('\n'),
               style: Theme.of(context).textTheme.bodyLarge,
             ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Tab extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const DefaultTabController(
-      length: 1,
-      child: TabBar(
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        isScrollable: true,
-        tabs: [
-          Tab(text: 'Profile & Keychain'),
-        ],
-      ),
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 350,
-      child: Stack(
-        children: [
-          Positioned(
-            top: 16,
-            left: 8,
-            child: VoicesIconButton.filled(
-              onTap: () {
-                GoRouter.of(context).pop();
-              },
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all(
-                  Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
-                ),
-                foregroundColor: WidgetStateProperty.all(
-                  Theme.of(context).colors.iconsForeground,
-                ),
-              ),
-              child: VoicesAssets.icons.arrowNarrowLeft.buildIcon(),
-            ),
-          ),
-          Positioned(
-            bottom: 48,
-            left: 32,
-            child: Wrap(
-              direction: Axis.vertical,
-              children: [
-                Text(
-                  'My Account / Profile & Keychain',
-                  style: Theme.of(context).textTheme.displayMedium,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Set your base profile, wallet addresses and preferences',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );
