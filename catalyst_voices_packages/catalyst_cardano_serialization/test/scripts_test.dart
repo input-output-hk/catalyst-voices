@@ -1,5 +1,5 @@
-import 'dart:typed_data';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
 import 'package:test/test.dart';
 
@@ -189,6 +189,17 @@ void main() {
         final json = script['json']! as Map<String, dynamic>;
         final simpleScript = NativeScript.fromJSON(json);
 
+        final cborValue = simpleScript.toCbor();
+        final cborLen = cbor.encode(cborValue).length;
+        final fromCbor = NativeScript.fromCbor(cborValue);
+
+        // Length check
+        expect(cborLen, equals(simpleScript.length));
+
+        // from/toCbor check
+        expect(simpleScript, equals(fromCbor));
+
+        // Golden hash test.
         expect(
           simpleScript.hash,
           equals(hex.decode(script['hash']! as String)),
@@ -200,10 +211,21 @@ void main() {
   group(PlutusScript, () {
     test('hashes (V2 only)', () {
       for (final script in plutusV2ScriptsJSON) {
-        final scriptCborBytes =
-            Uint8List.fromList(hex.decode(script['compiledCode']!));
-        final plutusScript = PlutusV2Script(scriptCborBytes);
+        final compiledCode = script['compiledCode']!;
+        final scriptLength = compiledCode.length ~/ 2;
 
+        final decodedCode = cbor.decode(hex.decode(compiledCode));
+
+        final plutusScript = PlutusV2Script.fromHex(compiledCode);
+        final cborValue = plutusScript.toCbor();
+
+        // Length check
+        expect(scriptLength, equals(plutusScript.length));
+
+        // from/toCbor check
+        expect(cborValue, equals(decodedCode));
+
+        // Golden hash test
         expect(plutusScript.hash, equals(hex.decode(script['hash']!)));
       }
     });
@@ -216,15 +238,21 @@ void main() {
         final hash = json['hash']! as String;
         final type = script['type'] as String;
         final cborHex = script['cborHex'] as String;
-        final cborBytes = Uint8List.fromList(hex.decode(cborHex));
+
+        // The cborHex has a `45` prefix.
+        final scriptLength = cborHex.length ~/ 2 - 1;
 
         final plutusScript = switch (type) {
-          'PlutusScriptV1' => PlutusV1Script(cborBytes),
-          'PlutusScriptV2' => PlutusV2Script(cborBytes),
-          'PlutusScriptV3' => PlutusV3Script(cborBytes),
+          'PlutusScriptV1' => PlutusV1Script.fromHex(cborHex),
+          'PlutusScriptV2' => PlutusV2Script.fromHex(cborHex),
+          'PlutusScriptV3' => PlutusV3Script.fromHex(cborHex),
           _ => throw Exception('Unknown script type: $type'),
         };
 
+        // Length check
+        expect(scriptLength, equals(plutusScript.length));
+
+        // Golden hash test
         expect(plutusScript.hash, equals(hex.decode(hash)));
       }
     });

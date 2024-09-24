@@ -2,6 +2,7 @@ import 'dart:typed_data';
 import 'package:catalyst_cardano_serialization/src/hashes.dart';
 import 'package:catalyst_cardano_serialization/src/types.dart';
 import 'package:cbor/cbor.dart';
+import 'package:convert/convert.dart';
 import 'package:equatable/equatable.dart';
 import 'package:pinenacl/digests.dart';
 
@@ -89,24 +90,25 @@ sealed class Script extends Equatable implements CborEncodable {
   /// Blake2b hash of the resulting bytes.
   Uint8List get hash {
     final cborValue = toCbor();
-    final bytesToHash = cborValue is CborBytes
-        ? _handleDoubleEncodedCbor(cborValue.bytes)
-        : cborValue;
+    final cborBytes = cbor.encode(cborValue);
 
-    final cborBytes = cbor.encode(bytesToHash);
     final bytes = Uint8List.fromList([tag, ...cborBytes]);
     return Hash.blake2b(bytes, digestSize: scriptHashSize);
   }
 
-  CborValue _handleDoubleEncodedCbor(List<int> bytes) {
-    final decoded = cbor.decode(bytes);
-    if (decoded is CborBytes) {
+  static CborValue _handleDoubleEncodedCbor(CborValue cborValue) {
+    if (cborValue is CborBytes) {
       try {
-        return cbor.decode(decoded.bytes);
+        return cbor.decode(cborValue.bytes);
       } catch (_) {}
     }
-    return decoded;
+    return cborValue;
   }
+
+  /// The length of the script in bytes.
+  ///
+  /// This is an abstract getter that must be implemented by the child classes.
+  int get length;
 }
 
 /// Abstract base class for native scripts, extending [Script].
@@ -222,6 +224,10 @@ sealed class NativeScript extends Script {
       _invalidCborError(value);
     }
   }
+
+  /// Returns the length of the [NativeScript]'s in bytes.
+  @override
+  int get length => cbor.encode(toCbor()).length;
 }
 
 /// Class representing a public key based native script.
@@ -405,7 +411,7 @@ class InvalidAfter extends NativeScript {
 /// Abstract base class for Plutus scripts, extending [Script].
 sealed class PlutusScript extends Script {
   /// [PlutusScript] represented as encoded CBOR bytes.
-  final Uint8List bytes;
+  final List<int> bytes;
 
   // TODO(ilap): Check whether the Plutus script bytes are valid CBOR CborByte-s
   // and throw an error if does not.
@@ -418,50 +424,76 @@ sealed class PlutusScript extends Script {
   CborValue toCbor() => CborBytes(bytes);
 
   /// Validates if the CBOR value is a valid Plutus script.
-  static void _plutusScriptValidity(CborValue value) {
-    if (value is! CborBytes) {
-      throw ArgumentError.value(value, 'value', 'Invalid Plutus script cbor');
-    }
+  static CborValue _plutusScriptValidity(CborValue value) {
+    return value is CborBytes
+        ? Script._handleDoubleEncodedCbor(value)
+        : throw ArgumentError.value(
+            value,
+            'value',
+            'Invalid Plutus script cbor',
+          );
   }
 
   /// Equatable props for value comparison of all Plutus scripts.
   @override
   List<Object?> get props => [bytes];
+
+  /// Returns the length of the [PlutusScript]'s in bytes.
+  @override
+  int get length => cbor.encode(CborBytes(bytes)).length;
 }
 
 /// Class representing a Plutus V1 script.
 class PlutusV1Script extends PlutusScript {
   /// [PlutusV1Script] constructor.
-  const PlutusV1Script(super.bytes);
+  const PlutusV1Script._(super.bytes);
 
   /// Factory constructor to create an [PlutusV1Script] from a CBOR list.
   factory PlutusV1Script.fromCbor(CborValue value) {
-    PlutusScript._plutusScriptValidity(value);
-    return PlutusV1Script(Uint8List.fromList((value as CborBytes).bytes));
+    final validCbor = PlutusScript._plutusScriptValidity(value);
+    return PlutusV1Script._((validCbor as CborBytes).bytes);
+  }
+
+  /// Factory constructor to create an [PlutusV2Script] from a CBOR hex string.
+  factory PlutusV1Script.fromHex(String cborHex) {
+    final cborValue = cbor.decode(hex.decode(cborHex));
+    return PlutusV1Script.fromCbor(cborValue);
   }
 }
 
 /// Class representing a Plutus V2 script.
 class PlutusV2Script extends PlutusScript {
   /// [PlutusV2Script] constructor.
-  const PlutusV2Script(super.bytes);
+  const PlutusV2Script._(super.bytes);
 
   /// Factory constructor to create an [PlutusV2Script] from a CBOR list.
-  factory PlutusV2Script.fromCbor(CborValue value) {
-    PlutusScript._plutusScriptValidity(value);
-    return PlutusV2Script(Uint8List.fromList((value as CborBytes).bytes));
+  factory PlutusV2Script.fromCbor(CborValue cborValue) {
+    final validCbor = PlutusScript._plutusScriptValidity(cborValue);
+    return PlutusV2Script._((validCbor as CborBytes).bytes);
+  }
+
+  /// Factory constructor to create an [PlutusV2Script] from a CBOR hex string.
+  factory PlutusV2Script.fromHex(String cborHex) {
+    final cborValue = cbor.decode(hex.decode(cborHex));
+    return PlutusV2Script.fromCbor(cborValue);
   }
 }
 
 /// Class representing a Plutus V3 script.
 class PlutusV3Script extends PlutusScript {
   /// [PlutusV3Script] constructor.
-  const PlutusV3Script(super.bytes);
+  const PlutusV3Script._(super.bytes);
 
   /// Factory constructor to create an [PlutusV3Script] from a CBOR list.
-  factory PlutusV3Script.fromCbor(CborValue value) {
-    PlutusScript._plutusScriptValidity(value);
-    return PlutusV3Script(Uint8List.fromList((value as CborBytes).bytes));
+  factory PlutusV3Script.fromCbor(CborValue cborValue) {
+    final validCbor = PlutusScript._plutusScriptValidity(cborValue);
+    return PlutusV3Script._((validCbor as CborBytes).bytes);
+  }
+
+  /// Factory constructor to create an [PlutusV2Script] from a CBOR hex string.
+  factory PlutusV3Script.fromHex(String cborHex) {
+    final cborValue = cbor.decode(hex.decode(cborHex));
+    return PlutusV3Script.fromCbor(cborValue);
   }
 }
 
@@ -512,4 +544,8 @@ class ScriptRef extends Script {
   /// Equatable props for value comparison.
   @override
   List<Object?> get props => [script];
+
+  /// Returns the length of the [ScriptRef]'s script in bytes.
+  @override
+  int get length => script.length;
 }
