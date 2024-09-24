@@ -3,6 +3,7 @@ import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 final class AccountPage extends StatelessWidget {
   const AccountPage({super.key});
@@ -77,10 +78,13 @@ class _KeychainCard extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
               ),
-              VoicesTextButton(
+              VoicesTextButton.customColor(
                 leading: VoicesAssets.icons.x.buildIcon(),
-                child: Text('Remove Keychain'),
+                color: Theme.of(context).colors.iconsError,
                 onTap: () {},
+                child: Text(
+                  'Remove Keychain',
+                ),
               ),
             ],
           ),
@@ -160,7 +164,9 @@ class _Header extends StatelessWidget {
             top: 16,
             left: 8,
             child: VoicesIconButton.filled(
-              onTap: () {},
+              onTap: () {
+                GoRouter.of(context).pop();
+              },
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.all(
                   Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
