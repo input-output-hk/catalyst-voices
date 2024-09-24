@@ -345,4 +345,25 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get goodPasswordStrength => 'Good password strength';
+
+  @override
+  String get myAccountProfileKeychain => 'My Account / Profile & Keychain';
+
+  @override
+  String get yourCatalystKeychainAndRoleRegistration => 'Your Catalyst keychain & role registration';
+
+  @override
+  String get profileAndKeychain => 'Profile & Keychain';
+
+  @override
+  String get catalystKeychain => 'Catalyst Keychain';
+
+  @override
+  String get removeKeychain => 'Remove Keychain';
+
+  @override
+  String get walletConnected => 'Wallet connected';
+
+  @override
+  String get currentRoleRegistrations => 'Current Role registrations';
 }

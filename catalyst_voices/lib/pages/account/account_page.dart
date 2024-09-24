@@ -2,6 +2,7 @@ import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -87,14 +88,14 @@ class _Header extends StatelessWidget {
               direction: Axis.vertical,
               children: [
                 Text(
-                  'My Account / Profile & Keychain',
+                  context.l10n.myAccountProfileKeychain,
                   style: Theme.of(context).textTheme.displayMedium?.copyWith(
                         color: Colors.white,
                       ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Your Catalyst keychain & role registration',
+                  context.l10n.yourCatalystKeychainAndRoleRegistration,
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                         color: Colors.white,
                       ),
@@ -111,13 +112,13 @@ class _Header extends StatelessWidget {
 class _Tab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return const DefaultTabController(
+    return  DefaultTabController(
       length: 1,
       child: TabBar(
-        padding: EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: 20),
         isScrollable: true,
         tabs: [
-          Tab(text: 'Profile & Keychain'),
+          Tab(text: context.l10n.profileAndKeychain),
         ],
       ),
     );
@@ -157,7 +158,7 @@ class _KeychainCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  'Catalyst Keychain',
+                  context.l10n.catalystKeychain,
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
               ),
@@ -165,8 +166,8 @@ class _KeychainCard extends StatelessWidget {
                 leading: VoicesAssets.icons.x.buildIcon(),
                 color: Theme.of(context).colors.iconsError,
                 onTap: onRemoveKeychain,
-                child: const Text(
-                  'Remove Keychain',
+                child: Text(
+                  context.l10n.removeKeychain,
                 ),
               ),
             ],
@@ -175,7 +176,7 @@ class _KeychainCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 24),
               child: Text(
-                'Wallet connected',
+                context.l10n.walletConnected,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ),
@@ -208,7 +209,7 @@ class _KeychainCard extends StatelessWidget {
                 bottom: 24,
               ),
               child: Text(
-                'Current Role registrations',
+                context.l10n.currentRoleRegistrations,
                 style: Theme.of(context).textTheme.titleMedium,
               ),
             ),

@@ -663,6 +663,48 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Good password strength'**
   String get goodPasswordStrength;
+
+  /// Title of My Account page
+  ///
+  /// In en, this message translates to:
+  /// **'My Account / Profile & Keychain'**
+  String get myAccountProfileKeychain;
+
+  /// Subtitle of My Account page
+  ///
+  /// In en, this message translates to:
+  /// **'Your Catalyst keychain & role registration'**
+  String get yourCatalystKeychainAndRoleRegistration;
+
+  /// Tab on My Account page
+  ///
+  /// In en, this message translates to:
+  /// **'Profile & Keychain'**
+  String get profileAndKeychain;
+
+  /// Title of Catalyst Keychain card
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst Keychain'**
+  String get catalystKeychain;
+
+  /// Action on Catalyst Keychain card
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Keychain'**
+  String get removeKeychain;
+
+  /// Describes that wallet is connected on Catalyst Keychain card
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet connected'**
+  String get walletConnected;
+
+  /// Describes roles on Catalyst Keychain card
+  ///
+  /// In en, this message translates to:
+  /// **'Current Role registrations'**
+  String get currentRoleRegistrations;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

@@ -425,5 +425,33 @@
   "goodPasswordStrength": "Good password strength",
   "@goodPasswordStrength": {
     "description": "Describes a password that is strong."
+  },
+  "myAccountProfileKeychain": "My Account / Profile & Keychain",
+  "@myAccountProfileKeychain": {
+    "description": "Title of My Account page"
+  },
+  "yourCatalystKeychainAndRoleRegistration": "Your Catalyst keychain & role registration",
+  "@yourCatalystKeychainAndRoleRegistration": {
+    "description": "Subtitle of My Account page"
+  },
+  "profileAndKeychain": "Profile & Keychain",
+  "@profileAndKeychain": {
+    "description": "Tab on My Account page"
+  },
+  "catalystKeychain": "Catalyst Keychain",
+  "@catalystKeychain": {
+    "description": "Title of Catalyst Keychain card"
+  },
+  "removeKeychain": "Remove Keychain",
+  "@removeKeychain": {
+    "description": "Action on Catalyst Keychain card"
+  },
+  "walletConnected": "Wallet connected",
+  "@walletConnected": {
+    "description": "Describes that wallet is connected on Catalyst Keychain card"
+  },
+  "currentRoleRegistrations": "Current Role registrations",
+  "@currentRoleRegistrations": {
+    "description": "Describes roles on Catalyst Keychain card"
   }
 }
