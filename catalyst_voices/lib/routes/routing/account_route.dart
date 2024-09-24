@@ -9,8 +9,7 @@ part 'account_route.g.dart';
 @TypedGoRoute<AccountRoute>(
   path: '/${Routes.currentMilestone}/account',
 )
-final class AccountRoute extends GoRouteData
-    with FadePageTransitionMixin {
+final class AccountRoute extends GoRouteData with FadePageTransitionMixin {
   const AccountRoute();
 
   @override

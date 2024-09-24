@@ -33,7 +33,7 @@ final class AccountPage extends StatelessWidget {
                         'Drep',
                       ],
                       onRemoveKeychain: () => debugPrint('Keychain removed'),
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -165,7 +165,7 @@ class _KeychainCard extends StatelessWidget {
                 leading: VoicesAssets.icons.x.buildIcon(),
                 color: Theme.of(context).colors.iconsError,
                 onTap: onRemoveKeychain,
-                child: Text(
+                child: const Text(
                   'Remove Keychain',
                 ),
               ),
