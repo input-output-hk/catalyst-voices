@@ -238,7 +238,7 @@ class _WalletDetailsState extends State<_WalletDetails> {
   List<ShelleyAddress>? _rewardAddresses;
   List<ShelleyAddress>? _unusedAddresses;
   List<ShelleyAddress>? _usedAddresses;
-  List<TransactionUnspentOutput>? _utxos;
+  Set<TransactionUnspentOutput>? _utxos;
   PubDRepKey? _pubDRepKey;
   List<PubStakeKey>? _registeredPubStakeKeys;
   List<PubStakeKey>? _unregisteredPubStakeKeys;
@@ -450,7 +450,7 @@ String _formatBalance(Balance? balance) {
   return buffer.toString();
 }
 
-String _formatUtxos(List<TransactionUnspentOutput>? utxos) {
+String _formatUtxos(Set<TransactionUnspentOutput>? utxos) {
   if (utxos == null) {
     return '---';
   }
