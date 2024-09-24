@@ -29,28 +29,28 @@ pub(crate) struct Rbac509InsertQuery {
 }
 
 impl Rbac509InsertQuery {
-    /// Create new data set for CIP-36 Registrations Insert Query Batch.
+    /// Create new data set for RBAC 509 Registrations Insert Query Batch.
     pub(crate) fn new() -> Self {
         Rbac509InsertQuery {
             registrations: Vec::new(),
         }
     }
 
-    /// Prepare Batch of Insert Cip36 Registration Data Queries
+    /// Prepare Batch of Insert RBAC 509 Registration Data Queries
     pub(crate) async fn prepare_batch(
         session: &Arc<Session>, cfg: &CassandraEnvVars,
-    ) -> anyhow::Result<(SizedBatch, SizedBatch, SizedBatch)> {
+    ) -> anyhow::Result<SizedBatch> {
         todo!();
     }
 
-    /// Index the CIP-36 registrations in a transaction.
+    /// Index the RBAC 509 registrations in a transaction.
     pub(crate) fn index(
         &mut self, txn: usize, txn_index: i16, slot_no: u64, block: &MultiEraBlock,
     ) {
         todo!();
     }
 
-    /// Execute the CIP-36 Registration Indexing Queries.
+    /// Execute the RBAC 509 Registration Indexing Queries.
     ///
     /// Consumes the `self` and returns a vector of futures.
     pub(crate) fn execute(self, session: &Arc<CassandraSession>) -> FallibleQueryTasks {

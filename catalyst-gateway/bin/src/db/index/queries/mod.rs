@@ -18,7 +18,8 @@ use staked_ada::{
 };
 
 use super::block::{
-    certs::CertInsertQuery, cip36::Cip36InsertQuery, txi::TxiInsertQuery, txo::TxoInsertQuery,
+    certs::CertInsertQuery, cip36::Cip36InsertQuery, rbac509::Rbac509InsertQuery,
+    txi::TxiInsertQuery, txo::TxoInsertQuery,
 };
 use crate::settings::{CassandraEnvVars, CASSANDRA_MIN_BATCH_SIZE};
 
@@ -49,6 +50,8 @@ pub(crate) enum PreparedQuery {
     Cip36RegistrationForStakeAddrInsertQuery,
     /// TXO spent Update query.
     TxoSpentUpdateQuery,
+    /// RBAC 509 Registration Insert query.
+    Rbac509InsertQuery,
 }
 
 /// All prepared SELECT query statements.
@@ -86,6 +89,8 @@ pub(crate) struct PreparedQueries {
     txo_by_stake_address_query: PreparedStatement,
     /// Get TXI by transaction hash.
     txi_by_txn_hash_query: PreparedStatement,
+    /// RBAC 509 Registrations.
+    rbac509_registration_insert_queries: SizedBatch,
 }
 
 /// An individual query response that can fail
@@ -108,6 +113,7 @@ impl PreparedQueries {
             UpdateTxoSpentQuery::prepare_batch(session.clone(), cfg).await;
         let txo_by_stake_address_query = GetTxoByStakeAddressQuery::prepare(session.clone()).await;
         let txi_by_txn_hash_query = GetTxiByTxnHashesQuery::prepare(session.clone()).await;
+        let all_rbac_queries = Rbac509InsertQuery::prepare_batch(&session, cfg).await;
 
         let (
             txo_insert_queries,
@@ -122,6 +128,8 @@ impl PreparedQueries {
             cip36_registration_for_stake_address_insert_queries,
         ) = all_cip36_queries?;
 
+        let rbac509_registration_insert_queries = all_rbac_queries?;
+
         Ok(Self {
             txo_insert_queries,
             txo_asset_insert_queries,
@@ -135,6 +143,7 @@ impl PreparedQueries {
             txo_spent_update_queries: txo_spent_update_queries?,
             txo_by_stake_address_query: txo_by_stake_address_query?,
             txi_by_txn_hash_query: txi_by_txn_hash_query?,
+            rbac509_registration_insert_queries,
         })
     }
 
@@ -226,6 +235,7 @@ impl PreparedQueries {
                 &self.cip36_registration_for_stake_address_insert_queries
             },
             PreparedQuery::TxoSpentUpdateQuery => &self.txo_spent_update_queries,
+            PreparedQuery::Rbac509InsertQuery => &self.rbac509_registration_insert_queries,
         };
 
         let mut results: Vec<QueryResult> = Vec::new();
