@@ -1,4 +1,4 @@
-/// Describes the link wallet wallet during registration.
+/// Describes the link wallet flow during registration.
 enum LinkWalletStage {
   /// The welcome screen for the link wallet flow.
   intro,

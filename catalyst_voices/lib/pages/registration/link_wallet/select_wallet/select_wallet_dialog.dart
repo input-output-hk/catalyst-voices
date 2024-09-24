@@ -17,11 +17,11 @@ class SelectWalletDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesDesktopPanelsDialog(
       left: const Column(
-        children: [Text('Left')],
+        children: [Text('Left 2')],
       ),
       right: Column(
         children: [
-          const Text('Right'),
+          const Text('Right 2'),
           VoicesFilledButton(
             leading: VoicesAssets.icons.wallet.buildIcon(),
             onTap: () {
