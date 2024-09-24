@@ -190,3 +190,21 @@ final class InsufficientAdaForAssetsException extends Equatable
   @override
   List<Object?> get props => [];
 }
+
+/// Exception thrown when the total size of reference scripts exceeds the limit.
+final class ReferenceScriptSizeLimitExceededException extends Equatable
+    implements Exception {
+  /// The maximum size of reference scripts allowed per transaction.
+  final int maxRefScriptSize;
+
+  /// The default constructor for [ReferenceScriptSizeLimitExceededException].
+  const ReferenceScriptSizeLimitExceededException(this.maxRefScriptSize);
+
+  @override
+  String toString() =>
+      'Total size of reference scripts exceeds the limit of $maxRefScriptSize '
+      'bytes';
+
+  @override
+  List<Object?> get props => [maxRefScriptSize];
+}

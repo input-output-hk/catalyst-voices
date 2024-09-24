@@ -171,7 +171,7 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
   }
 
   @override
-  Future<List<TransactionUnspentOutput>> getUtxos({
+  Future<Set<TransactionUnspentOutput>> getUtxos({
     Balance? amount,
     Paginate? paginate,
   }) async {
@@ -183,7 +183,7 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
         paginate != null ? JSPaginate.fromDart(paginate) : makeUndefined(),
       );
 
-      if (utxos == null) return [];
+      if (utxos == null) return {};
 
       return await utxos.toDart.then(
         (array) => array.toDart
@@ -192,7 +192,7 @@ class JSCardanoWalletApiProxy implements CardanoWalletApi {
                 cbor.decode(hex.decode(item.toDart)),
               ),
             )
-            .toList(),
+            .toSet(),
       );
     } catch (ex) {
       throw _mapApiException(ex) ??

@@ -7,9 +7,10 @@ import 'package:convert/convert.dart';
 /* cSpell:disable */
 void main() {
   const txBuilderConfig = TransactionBuilderConfig(
-    feeAlgo: LinearFee(
-      constant: Coin(155381),
-      coefficient: Coin(44),
+    feeAlgo: TieredFee(
+      constant: 155381,
+      coefficient: 44,
+      refScriptByteCost: 15,
     ),
     maxTxSize: 16384,
     maxValueSize: 5000,
@@ -58,7 +59,7 @@ void main() {
 
   final txBuilder = TransactionBuilder(
     config: txBuilderConfig,
-    inputs: [utxo],
+    inputs: {utxo},
     // fee can be left empty so that it's auto calculated or can be hardcoded
     // fee: const Coin(1000000),
     ttl: const SlotBigNum(410021),
