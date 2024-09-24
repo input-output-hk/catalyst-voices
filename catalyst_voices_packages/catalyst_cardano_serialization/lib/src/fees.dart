@@ -161,5 +161,12 @@ final class TieredFee extends Equatable {
   }
 
   @override
-  List<Object?> get props => [constant, coefficient, refScriptByteCost];
+  List<Object?> get props => [
+        constant,
+        coefficient,
+        multiplier,
+        sizeIncrement,
+        refScriptByteCost,
+        maxRefScriptSize,
+      ];
 }
