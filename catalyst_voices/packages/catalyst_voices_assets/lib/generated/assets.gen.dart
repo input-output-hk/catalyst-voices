@@ -7,10 +7,10 @@
 // ignore_for_file: type=lint
 // ignore_for_file: directives_ordering,unnecessary_import,implicit_dynamic_list_literal,deprecated_member_use
 
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_svg/flutter_svg.dart' as _svg;
-import 'package:vector_graphics/vector_graphics.dart' as _vg;
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:vector_graphics/vector_graphics.dart';
 
 class $AssetsIconsGen {
   const $AssetsIconsGen();
@@ -1199,6 +1199,9 @@ class $AssetsImagesGen {
   SvgGenImage get fallbackLogoIcon =>
       const SvgGenImage('assets/images/fallback_logo_icon.svg');
 
+  /// File path: assets/images/keychain.svg
+  SvgGenImage get keychain => const SvgGenImage('assets/images/keychain.svg');
+
   /// File path: assets/images/linkedin.svg
   SvgGenImage get linkedin => const SvgGenImage('assets/images/linkedin.svg');
 
@@ -1213,6 +1216,10 @@ class $AssetsImagesGen {
   /// File path: assets/images/proposal_background_2.webp
   AssetGenImage get proposalBackground2 =>
       const AssetGenImage('assets/images/proposal_background_2.webp');
+
+  /// File path: assets/images/task_illustration.webp
+  AssetGenImage get taskIllustration =>
+      const AssetGenImage('assets/images/task_illustration.webp');
 
   /// File path: assets/images/x.svg
   SvgGenImage get x => const SvgGenImage('assets/images/x.svg');
@@ -1233,10 +1240,12 @@ class $AssetsImagesGen {
         facebookMono,
         fallbackLogo,
         fallbackLogoIcon,
+        keychain,
         linkedin,
         linkedinMono,
         proposalBackground1,
         proposalBackground2,
+        taskIllustration,
         x,
         xMono
       ];
@@ -1348,7 +1357,7 @@ class SvgGenImage {
   final Set<String> flavors;
   final bool _isVecFormat;
 
-  _svg.SvgPicture svg({
+  SvgPicture svg({
     Key? key,
     bool matchTextDirection = false,
     AssetBundle? bundle,
@@ -1361,29 +1370,29 @@ class SvgGenImage {
     WidgetBuilder? placeholderBuilder,
     String? semanticsLabel,
     bool excludeFromSemantics = false,
-    _svg.SvgTheme? theme,
+    SvgTheme? theme,
     ColorFilter? colorFilter,
     Clip clipBehavior = Clip.hardEdge,
     @deprecated Color? color,
     @deprecated BlendMode colorBlendMode = BlendMode.srcIn,
     @deprecated bool cacheColorFilter = false,
   }) {
-    final _svg.BytesLoader loader;
+    final BytesLoader loader;
     if (_isVecFormat) {
-      loader = _vg.AssetBytesLoader(
+      loader = AssetBytesLoader(
         _assetName,
         assetBundle: bundle,
         packageName: package,
       );
     } else {
-      loader = _svg.SvgAssetLoader(
+      loader = SvgAssetLoader(
         _assetName,
         assetBundle: bundle,
         packageName: package,
         theme: theme,
       );
     }
-    return _svg.SvgPicture(
+    return SvgPicture(
       loader,
       key: key,
       matchTextDirection: matchTextDirection,
