@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 /// Call [VoicesDialog.show] with [VoicesDesktopInfoDialog] in order
 /// to show it.
 class VoicesDesktopInfoDialog extends StatelessWidget {
-  final String title;
+  final Widget title;
 
   const VoicesDesktopInfoDialog({
     super.key,
@@ -26,10 +26,10 @@ class VoicesDesktopInfoDialog extends StatelessWidget {
       left: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: theme.textTheme.titleLarge
-                ?.copyWith(color: theme.colors.textOnPrimary),
+          DefaultTextStyle(
+            style: theme.textTheme.titleLarge!
+                .copyWith(color: theme.colors.textOnPrimary),
+            child: title,
           ),
         ],
       ),
