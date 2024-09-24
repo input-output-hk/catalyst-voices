@@ -9,21 +9,18 @@ import 'package:result_type/result_type.dart';
 /// It will be replaced by a proper implementation as soon as authentication
 /// flow will be defined.
 final class CredentialsStorageRepository {
-  final SecureStorageService secureStorageService;
+  final DummyAuthStorage _storage;
 
-  const CredentialsStorageRepository({required this.secureStorageService});
+  const CredentialsStorageRepository({
+    required DummyAuthStorage storage,
+  }) : _storage = storage;
 
-  void get clearSessionData => secureStorageService.deleteAll;
+  Future<void> get clearSessionData async => _storage.clear();
 
   Future<Result<SessionData?, SecureStorageError>> getSessionData() async {
     try {
-      final email = await secureStorageService.get(
-        SecureStorageKeysConst.dummyEmail,
-      );
-
-      final password = await secureStorageService.get(
-        SecureStorageKeysConst.dummyPassword,
-      );
+      final email = await _storage.readEmail();
+      final password = await _storage.readPassword();
 
       if (email == null || password == null) {
         return Success(null);
@@ -44,15 +41,8 @@ final class CredentialsStorageRepository {
     SessionData sessionData,
   ) async {
     try {
-      await secureStorageService.set(
-        SecureStorageKeysConst.dummyEmail,
-        sessionData.email,
-      );
-
-      await secureStorageService.set(
-        SecureStorageKeysConst.dummyPassword,
-        sessionData.password,
-      );
+      await _storage.writeEmail(sessionData.email);
+      await _storage.writePassword(sessionData.password);
       return Success(null);
     } on SecureStorageError catch (_) {
       return Failure(SecureStorageError.canNotSaveData);
