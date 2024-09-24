@@ -112,7 +112,7 @@ class _Header extends StatelessWidget {
 class _Tab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return  DefaultTabController(
+    return DefaultTabController(
       length: 1,
       child: TabBar(
         padding: const EdgeInsets.symmetric(horizontal: 20),
