@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS rbac509_registration (
     chain_root          blob,           -- 32 Bytes of Chain Root.
     transaction_id      blob,           -- 32 Bytes of Transaction Hash.
     purpose             blob,           -- 16 Bytes of UUIDv4 Purpose.
-    slot_no             varint,         -- slot number when the key_was_registered/re-registered.
+    slot_no             varint,         -- slot number when the key_was_registered.
     txn                 smallint,       -- Index of the TX which holds the registration data.
 
     -- Non-Key Data
