@@ -7,9 +7,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 final class SessionBloc extends Bloc<SessionEvent, SessionState> {
   SessionBloc()
       : super(
-          const ActiveUserSessionState(
-            user: User(name: 'Account'),
-          ),
+          const VisitorSessionState(),
+          // const ActiveUserSessionState(
+          //   user: User(name: 'Account'),
+          // ),
         ) {
     on<SessionEvent>(_handleSessionEvent);
   }
