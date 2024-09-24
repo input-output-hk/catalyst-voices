@@ -91,10 +91,6 @@ class _Segment extends StatelessWidget {
                   VoicesDialog.show<void>(
                     context: context,
                     builder: (context) {
-                      return VoicesDesktopPanelsDialog(
-                        left: Center(child: TaskKeychainPicture()),
-                        right: Column(),
-                      );
                       return const VoicesDesktopInfoDialog(title: Text(''));
                     },
                   ),
