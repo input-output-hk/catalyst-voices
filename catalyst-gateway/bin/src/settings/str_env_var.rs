@@ -89,56 +89,29 @@ impl StringEnvVar {
 
         match env::var(var_name) {
             Ok(value) => {
-                if redacted {
-                    info!(env = var_name, value = "Redacted", "Env Var Defined");
-                } else {
-                    info!(env = var_name, value = value, "Env Var Defined");
-                }
-                Self { value, redacted }
+                let value = Self { value, redacted };
+                info!(env=var_name, value=%value, "Env Var Defined");
+                value
             },
-            Err(VarError::NotPresent) => {
-                if let Some(choices) = choices {
-                    if redacted {
-                        info!(
-                            env = var_name,
-                            default = "Default Redacted",
-                            choices = choices,
-                            "Env Var Defaulted"
-                        );
+            Err(err) => {
+                let value = Self {
+                    value: default_value,
+                    redacted,
+                };
+                if err == VarError::NotPresent {
+                    if let Some(choices) = choices {
+                        info!(env=var_name, default=%value, choices=choices, "Env Var Defaulted");
                     } else {
-                        info!(
-                            env = var_name,
-                            default = default_value,
-                            choices = choices,
-                            "Env Var Defaulted"
-                        );
-                    };
-                } else if redacted {
-                    info!(
-                        env = var_name,
-                        default = "Default Redacted",
-                        "Env Var Defined"
-                    );
+                        info!(env=var_name, default=%value, "Env Var Defaulted");
+                    }
+                } else if let Some(choices) = choices {
+                    info!(env=var_name, default=%value, choices=choices, error=?err,
+                        "Env Var Error");
                 } else {
-                    info!(env = var_name, default = default_value, "Env Var Defaulted");
+                    info!(env=var_name, default=%value, error=?err, "Env Var Error");
                 }
 
-                Self {
-                    value: default_value,
-                    redacted,
-                }
-            },
-            Err(error) => {
-                error!(
-                    env = var_name,
-                    default = default_value,
-                    error = ?error,
-                    "Env Var Error"
-                );
-                Self {
-                    value: default_value,
-                    redacted,
-                }
+                value
             },
         }
     }
@@ -147,23 +120,16 @@ impl StringEnvVar {
     pub(super) fn new_optional(var_name: &str, redacted: bool) -> Option<Self> {
         match env::var(var_name) {
             Ok(value) => {
-                if redacted {
-                    info!(env = var_name, value = "Redacted", "Env Var Defined");
-                } else {
-                    info!(env = var_name, value = value, "Env Var Defined");
-                }
-                Some(Self { value, redacted })
+                let value = Self { value, redacted };
+                info!(env = var_name, value = %value, "Env Var Defined");
+                Some(value)
             },
             Err(VarError::NotPresent) => {
                 info!(env = var_name, "Env Var Not Set");
                 None
             },
             Err(error) => {
-                error!(
-                    env = var_name,
-                    error = ?error,
-                    "Env Var Error"
-                );
+                error!(env = var_name, error = ?error, "Env Var Error");
                 None
             },
         }
@@ -193,7 +159,8 @@ impl StringEnvVar {
         let value = match T::from_str(choice.as_str()) {
             Ok(var) => var,
             Err(error) => {
-                error!(error=%error, default=%default, choices=choices, choice=%choice, "Invalid choice. Using Default.");
+                error!(error=%error, default=%default, choices=choices, choice=%choice,
+                    "Invalid choice. Using Default.");
                 default
             },
         };
