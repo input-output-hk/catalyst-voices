@@ -75,7 +75,7 @@ Future<void> _signAndSubmitRbacTx({
 }
 
 Future<X509MetadataEnvelope<RegistrationData>> _buildMetadataEnvelope({
-  required List<TransactionUnspentOutput> utxos,
+  required Set<TransactionUnspentOutput> utxos,
   required ShelleyAddress rewardAddress,
 }) async {
   final seed = List.generate(
@@ -152,7 +152,7 @@ Future<X509MetadataEnvelope<RegistrationData>> _buildMetadataEnvelope({
 }
 
 Transaction _buildUnsignedRbacTx({
-  required List<TransactionUnspentOutput> inputs,
+  required Set<TransactionUnspentOutput> inputs,
   required ShelleyAddress changeAddress,
   required ShelleyAddress rewardAddress,
   required AuxiliaryData auxiliaryData,
