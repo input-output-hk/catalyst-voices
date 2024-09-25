@@ -17,14 +17,14 @@ final class AccountPage extends StatelessWidget {
           padding: const EdgeInsets.all(32),
           child: Column(
             children: [
-              _Header(),
+              const _Header(),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const SizedBox(height: 32),
-                    _Tab(),
+                    const _Tab(),
                     const SizedBox(height: 48),
                     _KeychainCard(
                       connectedWallet: 'Lace',
@@ -47,6 +47,8 @@ final class AccountPage extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
+  const _Header();
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -110,6 +112,8 @@ class _Header extends StatelessWidget {
 }
 
 class _Tab extends StatelessWidget {
+  const _Tab();
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
