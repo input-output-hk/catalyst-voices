@@ -381,4 +381,37 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get accountCreationGetStatedWhatNext => 'What do you want to do?';
+
+  @override
+  String get myAccountProfileKeychain => 'My Account / Profile & Keychain';
+
+  @override
+  String get yourCatalystKeychainAndRoleRegistration => 'Your Catalyst keychain & role registration';
+
+  @override
+  String get profileAndKeychain => 'Profile & Keychain';
+
+  @override
+  String get catalystKeychain => 'Catalyst Keychain';
+
+  @override
+  String get removeKeychain => 'Remove Keychain';
+
+  @override
+  String get walletConnected => 'Wallet connected';
+
+  @override
+  String get currentRoleRegistrations => 'Current Role registrations';
+
+  @override
+  String get voter => 'Voter';
+
+  @override
+  String get proposer => 'Proposer';
+
+  @override
+  String get drep => 'Drep';
+
+  @override
+  String get defaultRole => 'Default';
 }

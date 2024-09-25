@@ -239,8 +239,8 @@ class _KeychainCard extends StatelessWidget {
     BuildContext context,
   ) {
     String label;
-    if (role.name == defaultRole?.name) {
-      label = '${role.name} (${context.l10n.defaultRole})';
+    if (role == defaultRole) {
+      label = '${role.name(context)} (${context.l10n.defaultRole})';
     } else {
       label = role.name(context);
     }
