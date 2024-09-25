@@ -70,5 +70,26 @@ void main() {
       final expectedWords = mnemonic.split(' ');
       expect(seedPhrase.mnemonicWords, expectedWords);
     });
+
+    test('should generate key pair with default and different valid offsets',
+        () async {
+      for (final offset in [0, 4, 28, 32, 64]) {
+        final keyPair = await SeedPhrase().generateKeyPair(offset);
+
+        expect(keyPair, isNotNull);
+        expect(keyPair.publicKey.bytes.length, equals(32));
+        expect(keyPair.privateKey.bytes.length, equals(32));
+      }
+    });
+
+    test('should throw an error for key pair with out of range offset',
+        () async {
+      for (final offset in [-1, 65]) {
+        expect(
+          () async => SeedPhrase().generateKeyPair(offset),
+          throwsRangeError,
+        );
+      }
+    });
   });
 }

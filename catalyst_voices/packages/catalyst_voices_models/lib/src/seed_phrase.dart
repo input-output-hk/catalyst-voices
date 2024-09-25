@@ -68,9 +68,11 @@ class SeedPhrase {
   List<String> get mnemonicWords => mnemonic.split(' ');
 
   /// Generates an Ed25519 key pair from a seed.
-  ///
-  /// This derives the Ed25519 private and public keys using the provided
-  /// [uint8ListSeed] and the specified [offset]. The offset is applied
+  /// 
+  /// Throws an [RangeError] If the provided [offset] is negative or exceeds
+  /// the length of the seed (64).
+  /// 
+  /// [offset]: The offset is applied
   /// to the seed to adjust where key derivation starts. It defaults to 0.
   Future<Ed25519KeyPair> generateKeyPair([int offset = 0]) async {
     final modifiedSeed = uint8ListSeed.sublist(offset);
