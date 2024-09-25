@@ -50,61 +50,64 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 350,
-      child: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: CatalystImage.asset(
-                  VoicesAssets.images.accountBg.path,
-                ).image,
-                fit: BoxFit.cover,
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: CatalystImage.asset(
+            VoicesAssets.images.accountBg.path,
+          ).image,
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: SizedBox(
+        width: double.infinity,
+        height: 350,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(
+                top: 24,
+                left: 8,
+              ),
+              child: VoicesIconButton.filled(
+                onTap: () {
+                  GoRouter.of(context).pop();
+                },
+                style: ButtonStyle(
+                  backgroundColor: WidgetStateProperty.all(
+                    Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
+                  ),
+                  foregroundColor: WidgetStateProperty.all(
+                    Theme.of(context).colors.iconsForeground,
+                  ),
+                ),
+                child: VoicesAssets.icons.arrowNarrowLeft.buildIcon(),
               ),
             ),
-          ),
-          Positioned(
-            top: 24,
-            left: 8,
-            child: VoicesIconButton.filled(
-              onTap: () {
-                GoRouter.of(context).pop();
-              },
-              style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all(
-                  Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
-                ),
-                foregroundColor: WidgetStateProperty.all(
-                  Theme.of(context).colors.iconsForeground,
-                ),
+            const Spacer(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Text(
+                context.l10n.myAccountProfileKeychain,
+                style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                      color: Colors.white,
+                    ),
               ),
-              child: VoicesAssets.icons.arrowNarrowLeft.buildIcon(),
             ),
-          ),
-          Positioned(
-            bottom: 48,
-            left: 32,
-            child: Wrap(
-              direction: Axis.vertical,
-              children: [
-                Text(
-                  context.l10n.myAccountProfileKeychain,
-                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                        color: Colors.white,
-                      ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  context.l10n.yourCatalystKeychainAndRoleRegistration,
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Colors.white,
-                      ),
-                ),
-              ],
+            const SizedBox(height: 4),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Text(
+                context.l10n.yourCatalystKeychainAndRoleRegistration,
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: Colors.white,
+                    ),
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 48),
+          ],
+        ),
       ),
     );
   }
