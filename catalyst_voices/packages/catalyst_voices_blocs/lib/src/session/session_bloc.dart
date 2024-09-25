@@ -5,13 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Manages the user session.
 final class SessionBloc extends Bloc<SessionEvent, SessionState> {
-  SessionBloc()
-      : super(
-          const VisitorSessionState(),
-          // const ActiveUserSessionState(
-          //   user: User(name: 'Account'),
-          // ),
-        ) {
+  SessionBloc() : super(const VisitorSessionState()) {
     on<SessionEvent>(_handleSessionEvent);
   }
 

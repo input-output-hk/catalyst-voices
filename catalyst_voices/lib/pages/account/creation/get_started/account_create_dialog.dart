@@ -1,5 +1,5 @@
 import 'package:catalyst_voices/pages/account/creation/task_picture.dart';
-import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
+import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
 import 'package:catalyst_voices/widgets/modals/voices_desktop_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -65,15 +65,8 @@ class _LeftPanel extends StatelessWidget {
         const SizedBox(height: 12),
         const Expanded(child: Center(child: TaskKeychainPicture())),
         const SizedBox(height: 32),
-        Row(
-          children: [
-            VoicesTextButton(
-              onTap: () {},
-              trailing: VoicesAssets.icons.externalLink.buildIcon(),
-              child: Text(context.l10n.learnMore),
-            ),
-          ],
-        ),
+        // TODO(damian-molinski): External url redirect
+        LearnMoreButton(onTap: () {}),
       ],
     );
   }
