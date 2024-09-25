@@ -1,5 +1,4 @@
 import 'package:catalyst_voices/pages/account/creation/task_picture.dart';
-import 'package:catalyst_voices/widgets/buttons/specialized/voices_learn_more_button.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';

@@ -8,14 +8,14 @@ import 'package:flutter/material.dart';
 /// The link wallet flow consisting
 /// of [LinkWalletStage]'s during the registration.
 class LinkWalletDialog extends StatefulWidget {
-  const LinkWalletDialog({super.key});
+  const LinkWalletDialog._();
 
   /// Shows the [LinkWalletDialog] flow.
   static Future<void> show({required BuildContext context}) {
     return VoicesDialog.show(
       context: context,
       routeSettings: const RouteSettings(name: '/register/link-wallet'),
-      builder: (context) => const LinkWalletDialog(),
+      builder: (context) => const LinkWalletDialog._(),
     );
   }
 
