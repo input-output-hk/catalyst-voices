@@ -345,4 +345,22 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get goodPasswordStrength => 'Good password strength';
+
+  @override
+  String get chooseCardanoWallet => 'Choose Cardano Wallet';
+
+  @override
+  String get learnMore => 'Learn More';
+
+  @override
+  String get walletLink_header => 'Link keys to your Catalyst Keychain';
+
+  @override
+  String get walletLink_subheader => 'Link your Cardano wallet';
+
+  @override
+  String get walletLink_intro_title => 'Link Cardano Wallet & Catalyst Roles to you Catalyst Keychain.';
+
+  @override
+  String get walletLink_intro_content => 'You\'re almost there! This is the final and most important step in your account setup.\n\nWe\'re going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.\n\nRole Keys allow you to enter new spaces, discover new ways to participate, and unlock new ways to earn rewards.\n\nWe\'ll start with your Voter Key by default. You can decide to add a Proposer Key and Drep key if you want, or you can always add them later.';
 }

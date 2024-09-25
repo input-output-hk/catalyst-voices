@@ -663,6 +663,42 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Good password strength'**
   String get goodPasswordStrength;
+
+  /// A button label to select a cardano wallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Cardano Wallet'**
+  String get chooseCardanoWallet;
+
+  /// A label on a clickable element that can show more content.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn More'**
+  String get learnMore;
+
+  /// A header in link wallet flow in registration.
+  ///
+  /// In en, this message translates to:
+  /// **'Link keys to your Catalyst Keychain'**
+  String get walletLink_header;
+
+  /// A subheader in link wallet flow in registration.
+  ///
+  /// In en, this message translates to:
+  /// **'Link your Cardano wallet'**
+  String get walletLink_subheader;
+
+  /// A title in link wallet flow on intro screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Link Cardano Wallet & Catalyst Roles to you Catalyst Keychain.'**
+  String get walletLink_intro_title;
+
+  /// A message (content) in link wallet flow on intro screen.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re almost there! This is the final and most important step in your account setup.\n\nWe\'re going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.\n\nRole Keys allow you to enter new spaces, discover new ways to participate, and unlock new ways to earn rewards.\n\nWe\'ll start with your Voter Key by default. You can decide to add a Proposer Key and Drep key if you want, or you can always add them later.'**
+  String get walletLink_intro_content;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
