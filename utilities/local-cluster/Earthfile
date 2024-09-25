@@ -30,7 +30,7 @@ cluster-test:
 
 # kubernetes-base : base container with tooling set up for local access
 kubernetes-base:
-    FROM alpine:3.19
+    FROM alpine:3.20.3
     
     # Install kubectl
     RUN apk update && \

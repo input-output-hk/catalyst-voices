@@ -10,7 +10,7 @@ use crate::{
         queries::{FallibleQueryResults, PreparedQueries, PreparedQuery, SizedBatch},
         session::CassandraSession,
     },
-    settings::CassandraEnvVars,
+    settings::cassandra_db,
 };
 
 /// Update TXO spent query string.
@@ -37,7 +37,7 @@ pub(crate) struct UpdateTxoSpentQuery;
 impl UpdateTxoSpentQuery {
     /// Prepare a batch of update TXO spent queries.
     pub(crate) async fn prepare_batch(
-        session: Arc<Session>, cfg: &CassandraEnvVars,
+        session: Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         let update_txo_spent_queries = PreparedQueries::prepare_batch(
             session.clone(),
