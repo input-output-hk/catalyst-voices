@@ -2,7 +2,7 @@ import 'package:catalyst_voices/widgets/buttons/voices_button_affix_decoration.d
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
-enum _Variant { primary, neutral, secondary, customColor }
+enum _Variant { primary, neutral, secondary, custom }
 
 /// A button that combines a `TextButton` with optional leading and trailing
 /// elements.
@@ -54,14 +54,14 @@ class VoicesTextButton extends StatelessWidget {
     required this.child,
   }) : _variant = _Variant.secondary;
 
-  const VoicesTextButton.customColor({
+  const VoicesTextButton.custom({
     super.key,
     this.onTap,
     this.leading,
     this.trailing,
     required this.color,
     required this.child,
-  }) : _variant = _Variant.customColor;
+  }) : _variant = _Variant.custom;
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +90,7 @@ class VoicesTextButton extends StatelessWidget {
       _Variant.secondary => TextButton.styleFrom(
           foregroundColor: Theme.of(context).colorScheme.secondary,
         ),
-      _Variant.customColor => TextButton.styleFrom(
+      _Variant.custom => TextButton.styleFrom(
           foregroundColor: color,
         ),
     };

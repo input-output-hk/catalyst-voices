@@ -169,7 +169,7 @@ class _KeychainCard extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
               ),
-              VoicesTextButton.customColor(
+              VoicesTextButton.custom(
                 leading: VoicesAssets.icons.x.buildIcon(),
                 color: Theme.of(context).colors.iconsError,
                 onTap: onRemoveKeychain,
