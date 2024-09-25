@@ -1,5 +1,5 @@
+import 'package:catalyst_voices/pages/account/creation/information_panel.dart';
 import 'package:catalyst_voices/pages/account/creation/task_picture.dart';
-import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
 import 'package:catalyst_voices/widgets/modals/voices_desktop_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -39,35 +39,12 @@ class AccountCreateDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const VoicesDesktopPanelsDialog(
-      left: _LeftPanel(),
-      right: _RightPanel(),
-    );
-  }
-}
-
-class _LeftPanel extends StatelessWidget {
-  const _LeftPanel();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          context.l10n.getStarted,
-          style: theme.textTheme.titleLarge?.copyWith(
-            color: theme.colors.textOnPrimaryLevel0,
-          ),
-        ),
-        const SizedBox(height: 12),
-        const Expanded(child: Center(child: TaskKeychainPicture())),
-        const SizedBox(height: 32),
-        // TODO(damian-molinski): External url redirect
-        VoicesLearnMoreButton(onTap: () {}),
-      ],
+    return VoicesDesktopPanelsDialog(
+      left: InformationPanel(
+        title: context.l10n.getStarted,
+        picture: const TaskKeychainPicture(),
+      ),
+      right: const _RightPanel(),
     );
   }
 }

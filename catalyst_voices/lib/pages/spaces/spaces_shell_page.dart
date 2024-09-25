@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/ext.dart';
+import 'package:catalyst_voices/pages/account/creation/create_keychain/create_keychain_dialog.dart';
 import 'package:catalyst_voices/pages/account/creation/get_started/account_create_dialog.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/spaces_drawer.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -97,7 +98,9 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
     }
   }
 
-  Future<void> _showCreateAccountFlow() async {}
+  Future<void> _showCreateAccountFlow() async {
+    await CreateKeychainDialog.show(context);
+  }
 
   Future<void> _showRecoverAccountFlow() async {}
 }
