@@ -1157,6 +1157,10 @@ class $AssetsIconsGen {
 class $AssetsImagesGen {
   const $AssetsImagesGen();
 
+  /// File path: assets/images/account_bg.png
+  AssetGenImage get accountBg =>
+      const AssetGenImage('assets/images/account_bg.png');
+
   /// File path: assets/images/catalyst_logo.svg
   SvgGenImage get catalystLogo =>
       const SvgGenImage('assets/images/catalyst_logo.svg');
@@ -1229,6 +1233,7 @@ class $AssetsImagesGen {
 
   /// List of all assets
   List<dynamic> get values => [
+        accountBg,
         catalystLogo,
         catalystLogoIcon,
         catalystLogoIconWhite,
