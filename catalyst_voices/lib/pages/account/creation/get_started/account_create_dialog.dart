@@ -73,7 +73,7 @@ class _LeftPanel extends StatelessWidget {
               child: Text(context.l10n.learnMore),
             ),
           ],
-        )
+        ),
       ],
     );
   }
