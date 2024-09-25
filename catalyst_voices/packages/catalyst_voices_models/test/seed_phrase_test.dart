@@ -87,7 +87,7 @@ void main() {
       for (final offset in [-1, 65]) {
         expect(
           () async => SeedPhrase().generateKeyPair(offset),
-          throwsRangeError,
+          throwsA(isA<RangeError>()),
         );
       }
     });
