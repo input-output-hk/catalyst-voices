@@ -18,7 +18,7 @@ use crate::{
         session::CassandraSession,
     },
     service::utilities::convert::from_saturating,
-    settings::CassandraEnvVars,
+    settings::cassandra_db,
 };
 
 /// This is used to indicate that there is no stake address.
@@ -52,7 +52,7 @@ impl TxoInsertQuery {
 
     /// Prepare Batch of Insert TXI Index Data Queries
     pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &CassandraEnvVars,
+        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<(SizedBatch, SizedBatch, SizedBatch, SizedBatch)> {
         let txo_staked_insert_batch = insert_txo::Params::prepare_batch(session, cfg).await;
         let txo_unstaked_insert_batch =

@@ -21,7 +21,7 @@ use super::{
 };
 use crate::{
     db::index::queries,
-    settings::{CassandraEnvVars, Settings},
+    settings::{cassandra_db, Settings},
 };
 
 /// Configuration Choices for compression
@@ -55,7 +55,7 @@ pub(crate) struct CassandraSession {
     #[allow(dead_code)]
     persistent: bool,
     /// Configuration for this session.
-    cfg: Arc<CassandraEnvVars>,
+    cfg: Arc<cassandra_db::EnvVars>,
     /// The actual session.
     session: Arc<Session>,
     /// All prepared queries we can use on this session.
@@ -138,7 +138,7 @@ impl CassandraSession {
 ///
 /// The intention here is that we should be able to tune this based on configuration,
 /// but for now we don't so the `cfg` is not used yet.
-fn make_execution_profile(_cfg: &CassandraEnvVars) -> ExecutionProfile {
+fn make_execution_profile(_cfg: &cassandra_db::EnvVars) -> ExecutionProfile {
     ExecutionProfile::builder()
         .consistency(scylla::statement::Consistency::LocalQuorum)
         .serial_consistency(Some(scylla::statement::SerialConsistency::LocalSerial))
@@ -158,7 +158,7 @@ fn make_execution_profile(_cfg: &CassandraEnvVars) -> ExecutionProfile {
 }
 
 /// Construct a session based on the given configuration.
-async fn make_session(cfg: &CassandraEnvVars) -> anyhow::Result<Arc<Session>> {
+async fn make_session(cfg: &cassandra_db::EnvVars) -> anyhow::Result<Arc<Session>> {
     let cluster_urls: Vec<&str> = cfg.url.as_str().split(',').collect();
 
     let mut sb = SessionBuilder::new()
@@ -208,7 +208,7 @@ async fn make_session(cfg: &CassandraEnvVars) -> anyhow::Result<Arc<Session>> {
 /// Continuously try and init the DB, if it fails, backoff.
 ///
 /// Display reasonable logs to help diagnose DB connection issues.
-async fn retry_init(cfg: CassandraEnvVars, persistent: bool) {
+async fn retry_init(cfg: cassandra_db::EnvVars, persistent: bool) {
     let mut retry_delay = Duration::from_secs(0);
     let db_type = if persistent { "Persistent" } else { "Volatile" };
 
