@@ -46,21 +46,45 @@ class TaskKeychainPicture extends StatelessWidget {
 }
 
 class TaskPicture extends StatelessWidget {
+  final Size preferredSize;
   final Widget child;
+
+  // Original size is 125 but we want to have it scale with overall picture
+  static const _childSizeFactor = 125 / 354;
 
   const TaskPicture({
     super.key,
+    // Original asset sizes. "Magic number" from figma.
+    this.preferredSize = const Size(354, 340),
     required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.topRight,
-      children: [
-        CatalystImage.asset(VoicesAssets.images.taskIllustration.path),
-        child,
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final size = constraints
+            .constrainSizeAndAttemptToPreserveAspectRatio(preferredSize);
+        final childSize = Size.square(size.width * _childSizeFactor);
+
+        return SizedBox.fromSize(
+          size: size,
+          child: Stack(
+            alignment: Alignment.topRight,
+            children: [
+              CatalystImage.asset(
+                VoicesAssets.images.taskIllustration.path,
+                width: size.width,
+                height: size.height,
+              ),
+              ConstrainedBox(
+                constraints: BoxConstraints.tight(childSize),
+                child: child,
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
@@ -87,7 +111,6 @@ class TaskPictureIconBox extends StatelessWidget {
     return IconTheme(
       data: iconThemeData,
       child: Container(
-        constraints: BoxConstraints.tight(const Size.square(125)),
         decoration: BoxDecoration(
           color: backgroundColor,
           shape: BoxShape.circle,
