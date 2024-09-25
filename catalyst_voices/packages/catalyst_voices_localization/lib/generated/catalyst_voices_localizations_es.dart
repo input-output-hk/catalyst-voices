@@ -366,4 +366,16 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get currentRoleRegistrations => 'Current Role registrations';
+
+  @override
+  String get voter => 'Voter';
+
+  @override
+  String get proposer => 'Proposer';
+
+  @override
+  String get drep => 'Drep';
+
+  @override
+  String get defaultRole => 'Default';
 }

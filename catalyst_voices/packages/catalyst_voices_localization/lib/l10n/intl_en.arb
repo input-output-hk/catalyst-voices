@@ -453,5 +453,21 @@
   "currentRoleRegistrations": "Current Role registrations",
   "@currentRoleRegistrations": {
     "description": "Describes roles on Catalyst Keychain card"
+  },
+  "voter": "Voter",
+  "@voter": {
+    "description": "Account role"
+  },
+  "proposer": "Proposer",
+  "@proposer": {
+    "description": "Account role"
+  },
+  "drep": "Drep",
+  "@drep": {
+    "description": "Account role"
+  },
+  "defaultRole": "Default",
+  "@defaultRole": {
+    "description": "Related to account role"
   }
 }

@@ -222,7 +222,9 @@ class _KeychainCard extends StatelessWidget {
             ),
           if (roles.isNotEmpty)
             Text(
-              roles.map((e) => _formatRoleBullet(e, defaultRole)).join('\n'),
+              roles
+                  .map((e) => _formatRoleBullet(e, defaultRole, context))
+                  .join('\n'),
               style: Theme.of(context).textTheme.bodyLarge,
             ),
         ],
@@ -230,12 +232,16 @@ class _KeychainCard extends StatelessWidget {
     );
   }
 
-  String _formatRoleBullet(AccountRole role, AccountRole? defaultRole) {
+  String _formatRoleBullet(
+    AccountRole role,
+    AccountRole? defaultRole,
+    BuildContext context,
+  ) {
     String label;
     if (role.name == defaultRole?.name) {
-      label = '${role.name} (Default)';
+      label = '${role.name} (${context.l10n.defaultRole})';
     } else {
-      label = role.name;
+      label = role.name(context);
     }
     return ' • $label';
   }
@@ -248,14 +254,14 @@ enum AccountRole {
 }
 
 extension on AccountRole {
-  String get name {
+  String name(BuildContext context) {
     switch (this) {
       case AccountRole.voter:
-        return 'Voter';
+        return context.l10n.voter;
       case AccountRole.proposer:
-        return 'Proposer';
+        return context.l10n.proposer;
       case AccountRole.drep:
-        return 'Drep';
+        return context.l10n.drep;
     }
   }
 }

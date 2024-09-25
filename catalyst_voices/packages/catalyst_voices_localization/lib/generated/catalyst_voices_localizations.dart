@@ -705,6 +705,30 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Current Role registrations'**
   String get currentRoleRegistrations;
+
+  /// Account role
+  ///
+  /// In en, this message translates to:
+  /// **'Voter'**
+  String get voter;
+
+  /// Account role
+  ///
+  /// In en, this message translates to:
+  /// **'Proposer'**
+  String get proposer;
+
+  /// Account role
+  ///
+  /// In en, this message translates to:
+  /// **'Drep'**
+  String get drep;
+
+  /// Related to account role
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get defaultRole;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
