@@ -663,6 +663,48 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Good password strength'**
   String get goodPasswordStrength;
+
+  /// No description provided for @accountCreationCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a new  Catalyst Keychain'**
+  String get accountCreationCreate;
+
+  /// No description provided for @accountCreationRecover.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover your Catalyst Keychain'**
+  String get accountCreationRecover;
+
+  /// Indicates that created keychain will be stored in this device only
+  ///
+  /// In en, this message translates to:
+  /// **'On this device'**
+  String get accountCreationOnThisDevice;
+
+  /// General string used as external link text buttons
+  ///
+  /// In en, this message translates to:
+  /// **'Learn more'**
+  String get learnMore;
+
+  /// No description provided for @accountCreationGetStartedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Catalyst'**
+  String get accountCreationGetStartedTitle;
+
+  /// No description provided for @accountCreationGetStatedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'If you already have a Catalyst keychain you can restore it on this device, or you can create a new Catalyst Keychain.'**
+  String get accountCreationGetStatedDesc;
+
+  /// No description provided for @accountCreationGetStatedWhatNext.
+  ///
+  /// In en, this message translates to:
+  /// **'What do you want to do?'**
+  String get accountCreationGetStatedWhatNext;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

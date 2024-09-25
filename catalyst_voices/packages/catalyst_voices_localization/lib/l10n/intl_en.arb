@@ -425,5 +425,18 @@
   "goodPasswordStrength": "Good password strength",
   "@goodPasswordStrength": {
     "description": "Describes a password that is strong."
-  }
+  },
+  "accountCreationCreate": "Create a new \u2028Catalyst Keychain",
+  "accountCreationRecover": "Recover your\u2028Catalyst Keychain",
+  "accountCreationOnThisDevice": "On this device",
+  "@accountCreationOnThisDevice": {
+    "description": "Indicates that created keychain will be stored in this device only"
+  },
+  "learnMore": "Learn more",
+  "@learnMore": {
+    "description": "General string used as external link text buttons"
+  },
+  "accountCreationGetStartedTitle": "Welcome to Catalyst",
+  "accountCreationGetStatedDesc": "If you already have a Catalyst keychain you can restore it on this device, or you can create a new Catalyst Keychain.",
+  "accountCreationGetStatedWhatNext": "What do you want to do?"
 }

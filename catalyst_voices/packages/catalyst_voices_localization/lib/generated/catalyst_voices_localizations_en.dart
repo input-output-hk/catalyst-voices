@@ -345,4 +345,25 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get goodPasswordStrength => 'Good password strength';
+
+  @override
+  String get accountCreationCreate => 'Create a new  Catalyst Keychain';
+
+  @override
+  String get accountCreationRecover => 'Recover your Catalyst Keychain';
+
+  @override
+  String get accountCreationOnThisDevice => 'On this device';
+
+  @override
+  String get learnMore => 'Learn more';
+
+  @override
+  String get accountCreationGetStartedTitle => 'Welcome to Catalyst';
+
+  @override
+  String get accountCreationGetStatedDesc => 'If you already have a Catalyst keychain you can restore it on this device, or you can create a new Catalyst Keychain.';
+
+  @override
+  String get accountCreationGetStatedWhatNext => 'What do you want to do?';
 }
