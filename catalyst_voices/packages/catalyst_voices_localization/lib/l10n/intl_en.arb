@@ -459,6 +459,46 @@
   "accountCreationGetStartedTitle": "Welcome to Catalyst",
   "accountCreationGetStatedDesc": "If you already have a Catalyst keychain you can restore it on this device, or you can create a new Catalyst Keychain.",
   "accountCreationGetStatedWhatNext": "What do you want to do?",
+  "myAccountProfileKeychain": "My Account / Profile & Keychain",
+  "@myAccountProfileKeychain": {
+    "description": "Title of My Account page"
+  },
+  "yourCatalystKeychainAndRoleRegistration": "Your Catalyst keychain & role registration",
+  "@yourCatalystKeychainAndRoleRegistration": {
+    "description": "Subtitle of My Account page"
+  },
+  "profileAndKeychain": "Profile & Keychain",
+  "@profileAndKeychain": {
+    "description": "Tab on My Account page"
+  },
+  "removeKeychain": "Remove Keychain",
+  "@removeKeychain": {
+    "description": "Action on Catalyst Keychain card"
+  },
+  "walletConnected": "Wallet connected",
+  "@walletConnected": {
+    "description": "Describes that wallet is connected on Catalyst Keychain card"
+  },
+  "currentRoleRegistrations": "Current Role registrations",
+  "@currentRoleRegistrations": {
+    "description": "Describes roles on Catalyst Keychain card"
+  },
+  "voter": "Voter",
+  "@voter": {
+    "description": "Account role"
+  },
+  "proposer": "Proposer",
+  "@proposer": {
+    "description": "Account role"
+  },
+  "drep": "Drep",
+  "@drep": {
+    "description": "Account role"
+  },
+  "defaultRole": "Default",
+  "@defaultRole": {
+    "description": "Related to account role"
+  },
   "catalystKeychain": "Catalyst Keychain",
   "accountCreationSplashTitle": "Create your Catalyst Keychain",
   "accountCreationSplashMessage": "Your keychain is your ticket to participate in \u2028distributed innovation on the global stage.  \u2028\u2028Once you have it, you'll be able to enter different spaces, discover awesome ideas, and share your feedback to hep improve ideas.  \u2028\u2028As you add new keys to your keychain, you'll be able to enter new spaces, unlock new rewards opportunities, and have your voice heard in community decisions.",

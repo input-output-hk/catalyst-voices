@@ -736,6 +736,66 @@ abstract class VoicesLocalizations {
   /// **'What do you want to do?'**
   String get accountCreationGetStatedWhatNext;
 
+  /// Title of My Account page
+  ///
+  /// In en, this message translates to:
+  /// **'My Account / Profile & Keychain'**
+  String get myAccountProfileKeychain;
+
+  /// Subtitle of My Account page
+  ///
+  /// In en, this message translates to:
+  /// **'Your Catalyst keychain & role registration'**
+  String get yourCatalystKeychainAndRoleRegistration;
+
+  /// Tab on My Account page
+  ///
+  /// In en, this message translates to:
+  /// **'Profile & Keychain'**
+  String get profileAndKeychain;
+
+  /// Action on Catalyst Keychain card
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Keychain'**
+  String get removeKeychain;
+
+  /// Describes that wallet is connected on Catalyst Keychain card
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet connected'**
+  String get walletConnected;
+
+  /// Describes roles on Catalyst Keychain card
+  ///
+  /// In en, this message translates to:
+  /// **'Current Role registrations'**
+  String get currentRoleRegistrations;
+
+  /// Account role
+  ///
+  /// In en, this message translates to:
+  /// **'Voter'**
+  String get voter;
+
+  /// Account role
+  ///
+  /// In en, this message translates to:
+  /// **'Proposer'**
+  String get proposer;
+
+  /// Account role
+  ///
+  /// In en, this message translates to:
+  /// **'Drep'**
+  String get drep;
+
+  /// Related to account role
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get defaultRole;
+
   /// No description provided for @catalystKeychain.
   ///
   /// In en, this message translates to:
