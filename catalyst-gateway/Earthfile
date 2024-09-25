@@ -62,7 +62,7 @@ all-hosts-build:
 package-cat-gateway:
     ARG tag="latest"
 
-    FROM alpine:3.19
+    FROM alpine:3.20.3
     WORKDIR /cat-gateway
 
     RUN apk add --no-cache gcc bash

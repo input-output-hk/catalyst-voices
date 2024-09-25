@@ -77,7 +77,7 @@ build-web:
     END
 
 package:
-    FROM nginx:alpine3.18
+    FROM nginx:alpine3.20-slim
     ARG tag='latest'
 
     COPY +build-web/web /app
