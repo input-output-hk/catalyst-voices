@@ -13,34 +13,32 @@ final class AccountPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            children: [
-              const _Header(),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 32),
-                    const _Tab(),
-                    const SizedBox(height: 48),
-                    _KeychainCard(
-                      connectedWallet: 'Lace',
-                      roles: const [
-                        AccountRole.voter,
-                        AccountRole.proposer,
-                        AccountRole.drep,
-                      ],
-                      defaultRole: AccountRole.voter,
-                      onRemoveKeychain: () => debugPrint('Keychain removed'),
-                    ),
-                  ],
-                ),
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          children: [
+            const _Header(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 32),
+                  const _Tab(),
+                  const SizedBox(height: 48),
+                  _KeychainCard(
+                    connectedWallet: 'Lace',
+                    roles: const [
+                      AccountRole.voter,
+                      AccountRole.proposer,
+                      AccountRole.drep,
+                    ],
+                    defaultRole: AccountRole.voter,
+                    onRemoveKeychain: () => debugPrint('Keychain removed'),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
