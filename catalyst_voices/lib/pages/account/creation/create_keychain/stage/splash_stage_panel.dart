@@ -1,5 +1,7 @@
 import 'package:catalyst_voices/pages/account/creation/create_keychain/create_keychain_controller.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class SplashStagePanel extends StatelessWidget {
@@ -7,17 +9,24 @@ class SplashStagePanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colors.textOnPrimaryLevel0;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text('Create your Catalyst Keychain'),
-        SizedBox(height: 24),
         Text(
-          'Your keychain is your ticket to participate in  distributed innovation on the global stage.    Once you have it, you\'ll be able to enter different spaces, discover awesome ideas, and share your feedback to hep improve ideas.    As you add new keys to your keychain, you\'ll be able to enter new spaces, unlock new rewards opportunities, and have your voice heard in community decisions.',
+          context.l10n.accountCreationSplashTitle,
+          style: theme.textTheme.titleMedium?.copyWith(color: textColor),
         ),
-        Spacer(),
+        const SizedBox(height: 24),
+        Text(
+          context.l10n.accountCreationSplashMessage,
+          style: theme.textTheme.bodyMedium?.copyWith(color: textColor),
+        ),
+        const Spacer(),
         VoicesFilledButton(
-          child: Text('Create your Keychain now'),
+          child: Text(context.l10n.accountCreationSplashNextButton),
           onTap: () {
             CreateKeychainController.of(context).goToNextStage();
           },

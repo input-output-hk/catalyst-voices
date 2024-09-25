@@ -735,6 +735,30 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'What do you want to do?'**
   String get accountCreationGetStatedWhatNext;
+
+  /// No description provided for @catalystKeychain.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst Keychain'**
+  String get catalystKeychain;
+
+  /// No description provided for @accountCreationSplashTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your Catalyst Keychain'**
+  String get accountCreationSplashTitle;
+
+  /// No description provided for @accountCreationSplashMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your keychain is your ticket to participate in  distributed innovation on the global stage.    Once you have it, you\'ll be able to enter different spaces, discover awesome ideas, and share your feedback to hep improve ideas.    As you add new keys to your keychain, you\'ll be able to enter new spaces, unlock new rewards opportunities, and have your voice heard in community decisions.'**
+  String get accountCreationSplashMessage;
+
+  /// No description provided for @accountCreationSplashNextButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your Keychain now'**
+  String get accountCreationSplashNextButton;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

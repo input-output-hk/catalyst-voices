@@ -381,4 +381,16 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get accountCreationGetStatedWhatNext => 'What do you want to do?';
+
+  @override
+  String get catalystKeychain => 'Catalyst Keychain';
+
+  @override
+  String get accountCreationSplashTitle => 'Create your Catalyst Keychain';
+
+  @override
+  String get accountCreationSplashMessage => 'Your keychain is your ticket to participate in  distributed innovation on the global stage.    Once you have it, you\'ll be able to enter different spaces, discover awesome ideas, and share your feedback to hep improve ideas.    As you add new keys to your keychain, you\'ll be able to enter new spaces, unlock new rewards opportunities, and have your voice heard in community decisions.';
+
+  @override
+  String get accountCreationSplashNextButton => 'Create your Keychain now';
 }

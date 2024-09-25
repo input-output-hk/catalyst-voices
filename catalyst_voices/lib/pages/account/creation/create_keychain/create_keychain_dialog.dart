@@ -4,6 +4,7 @@ import 'package:catalyst_voices/pages/account/creation/create_keychain/stage/sta
 import 'package:catalyst_voices/pages/account/creation/information_panel.dart';
 import 'package:catalyst_voices/pages/account/creation/task_picture.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class CreateKeychainDialog extends StatefulWidget {
@@ -83,12 +84,12 @@ class _CreationStatusPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const InformationPanel(
-      title: 'Catalyst Keychain',
+    return InformationPanel(
+      title: context.l10n.catalystKeychain,
       subtitle: 'Write down your 12 Catalyst  security words',
       body: 'Make sure you create an offline backup '
           'of your recovery phrase as well.',
-      picture: TaskKeychainPicture(),
+      picture: const TaskKeychainPicture(),
       progress: 0.2,
     );
   }
