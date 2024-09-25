@@ -458,5 +458,49 @@
   },
   "accountCreationGetStartedTitle": "Welcome to Catalyst",
   "accountCreationGetStatedDesc": "If you already have a Catalyst keychain you can restore it on this device, or you can create a new Catalyst Keychain.",
-  "accountCreationGetStatedWhatNext": "What do you want to do?"
+  "accountCreationGetStatedWhatNext": "What do you want to do?",
+ "myAccountProfileKeychain": "My Account / Profile & Keychain",
+  "@myAccountProfileKeychain": {
+    "description": "Title of My Account page"
+  },
+  "yourCatalystKeychainAndRoleRegistration": "Your Catalyst keychain & role registration",
+  "@yourCatalystKeychainAndRoleRegistration": {
+    "description": "Subtitle of My Account page"
+  },
+  "profileAndKeychain": "Profile & Keychain",
+  "@profileAndKeychain": {
+    "description": "Tab on My Account page"
+  },
+  "catalystKeychain": "Catalyst Keychain",
+  "@catalystKeychain": {
+    "description": "Title of Catalyst Keychain card"
+  },
+  "removeKeychain": "Remove Keychain",
+  "@removeKeychain": {
+    "description": "Action on Catalyst Keychain card"
+  },
+  "walletConnected": "Wallet connected",
+  "@walletConnected": {
+    "description": "Describes that wallet is connected on Catalyst Keychain card"
+  },
+  "currentRoleRegistrations": "Current Role registrations",
+  "@currentRoleRegistrations": {
+    "description": "Describes roles on Catalyst Keychain card"
+  },
+  "voter": "Voter",
+  "@voter": {
+    "description": "Account role"
+  },
+  "proposer": "Proposer",
+  "@proposer": {
+    "description": "Account role"
+  },
+  "drep": "Drep",
+  "@drep": {
+    "description": "Account role"
+  },
+  "defaultRole": "Default",
+  "@defaultRole": {
+    "description": "Related to account role"
+  }
 }
