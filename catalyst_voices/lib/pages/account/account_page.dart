@@ -29,10 +29,11 @@ final class AccountPage extends StatelessWidget {
                     _KeychainCard(
                       connectedWallet: 'Lace',
                       roles: const [
-                        'Voter (Default)',
-                        'Proposer',
-                        'Drep',
+                        AccountRole.voter,
+                        AccountRole.proposer,
+                        AccountRole.drep,
                       ],
+                      defaultRole: AccountRole.voter,
                       onRemoveKeychain: () => debugPrint('Keychain removed'),
                     ),
                   ],
@@ -131,12 +132,14 @@ class _Tab extends StatelessWidget {
 
 class _KeychainCard extends StatelessWidget {
   final String? connectedWallet;
-  final List<String> roles;
+  final List<AccountRole> roles;
+  final AccountRole? defaultRole;
   final VoidCallback? onRemoveKeychain;
 
   const _KeychainCard({
     this.connectedWallet,
-    this.roles = const <String>[],
+    this.roles = const <AccountRole>[],
+    this.defaultRole,
     this.onRemoveKeychain,
   });
 
@@ -219,11 +222,40 @@ class _KeychainCard extends StatelessWidget {
             ),
           if (roles.isNotEmpty)
             Text(
-              roles.map((e) => ' • $e').join('\n'),
+              roles.map((e) => _formatRoleBullet(e, defaultRole)).join('\n'),
               style: Theme.of(context).textTheme.bodyLarge,
             ),
         ],
       ),
     );
+  }
+
+  String _formatRoleBullet(AccountRole role, AccountRole? defaultRole) {
+    String label;
+    if (role.name == defaultRole?.name) {
+      label = '${role.name} (Default)';
+    } else {
+      label = role.name;
+    }
+    return ' • $label';
+  }
+}
+
+enum AccountRole {
+  voter,
+  proposer,
+  drep,
+}
+
+extension on AccountRole {
+  String get name {
+    switch (this) {
+      case AccountRole.voter:
+        return 'Voter';
+      case AccountRole.proposer:
+        return 'Proposer';
+      case AccountRole.drep:
+        return 'Drep';
+    }
   }
 }
