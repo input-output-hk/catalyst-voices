@@ -1,8 +1,10 @@
+import 'package:catalyst_voices/common/ext/account_role_ext.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -240,29 +242,10 @@ class _KeychainCard extends StatelessWidget {
   ) {
     String label;
     if (role == defaultRole) {
-      label = '${role.name(context)} (${context.l10n.defaultRole})';
+      label = '${role.getName(context)} (${context.l10n.defaultRole})';
     } else {
-      label = role.name(context);
+      label = role.getName(context);
     }
     return ' • $label';
-  }
-}
-
-enum AccountRole {
-  voter,
-  proposer,
-  drep,
-}
-
-extension on AccountRole {
-  String name(BuildContext context) {
-    switch (this) {
-      case AccountRole.voter:
-        return context.l10n.voter;
-      case AccountRole.proposer:
-        return context.l10n.proposer;
-      case AccountRole.drep:
-        return context.l10n.drep;
-    }
   }
 }
