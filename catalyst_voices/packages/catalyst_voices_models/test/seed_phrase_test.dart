@@ -71,7 +71,7 @@ void main() {
       expect(seedPhrase.mnemonicWords, expectedWords);
     });
 
-    test('should generate key pair with default and different valid offsets',
+    test('should generate key pair with different valid offsets',
         () async {
       for (final offset in [0, 4, 28, 32, 64]) {
         final keyPair = await SeedPhrase().generateKeyPair(offset);
