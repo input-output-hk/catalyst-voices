@@ -4,7 +4,9 @@
 import 'dart:typed_data';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:bip39/src/wordlists/english.dart';
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:convert/convert.dart';
+import 'package:ed25519_hd_key/ed25519_hd_key.dart';
 
 /// Represents a seed phrase consisting of a mnemonic and provides methods for
 /// generating and deriving cryptographic data from the mnemonic.
@@ -64,6 +66,20 @@ class SeedPhrase {
 
   /// The mnemonic phrase as a list of individual words.
   List<String> get mnemonicWords => mnemonic.split(' ');
+
+  Future<Ed25519KeyPair> generateKeyPair() async {
+    // Derive the private key using the Ed25519 HD key derivation
+    final masterKey = await ED25519_HD_KEY.getMasterKeyFromSeed(uint8ListSeed);
+    final privateKey = masterKey.key;
+
+    // Generate the matching public key
+    final publicKey = await ED25519_HD_KEY.getPublicKey(privateKey, false);
+
+    return Ed25519KeyPair(
+      publicKey: Ed25519PublicKey.fromBytes(publicKey),
+      privateKey: Ed25519PrivateKey.fromBytes(privateKey),
+    );
+  }
 
   /// The full list of BIP-39 mnemonic words in English.
   static List<String> get wordList => WORDLIST;
