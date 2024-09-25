@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/pages/account/account_role_ext.dart';
+import 'package:catalyst_voices/common/ext/account_role_ext.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
