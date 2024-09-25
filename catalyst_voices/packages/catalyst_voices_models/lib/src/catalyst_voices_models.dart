@@ -1,5 +1,6 @@
 library catalyst_voices_models;
 
+export 'account/account_role.dart';
 export 'auth/authentication_status.dart';
 export 'auth/password_strength.dart';
 export 'errors/errors.dart';

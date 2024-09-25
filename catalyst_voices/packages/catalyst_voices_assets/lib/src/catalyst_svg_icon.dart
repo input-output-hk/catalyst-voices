@@ -10,6 +10,9 @@ class CatalystSvgIcon extends StatelessWidget {
   /// See [SvgPicture.width] and [SvgPicture.height]
   final double? size;
 
+  /// Whether [size] can be applied to final widget.
+  final bool allowSize;
+
   /// See [SvgPicture.fit]
   final BoxFit fit;
 
@@ -54,6 +57,7 @@ class CatalystSvgIcon extends StatelessWidget {
     this.bytesLoader, {
     super.key,
     this.size,
+    this.allowSize = true,
     this.fit = BoxFit.contain,
     this.alignment = Alignment.center,
     this.matchTextDirection = false,
@@ -77,6 +81,7 @@ class CatalystSvgIcon extends StatelessWidget {
     String? package = 'catalyst_voices_assets',
     SvgTheme? theme,
     this.size,
+    this.allowSize = true,
     this.fit = BoxFit.contain,
     this.alignment = Alignment.center,
     this.matchTextDirection = false,
@@ -101,7 +106,7 @@ class CatalystSvgIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveSize = size ?? IconTheme.of(context).size;
+    final effectiveSize = allowSize ? size ?? IconTheme.of(context).size : null;
     final effectiveColorFilter = allowColorFilter
         ? _colorFilter ?? IconTheme.of(context).asColorFilter()
         : null;

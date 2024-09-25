@@ -9,7 +9,7 @@ pub(crate) mod txo;
 use cardano_chain_follower::MultiEraBlock;
 use certs::CertInsertQuery;
 use cip36::Cip36InsertQuery;
-use tracing::{debug, error};
+use tracing::error;
 use txi::TxiInsertQuery;
 use txo::TxoInsertQuery;
 
@@ -75,7 +75,7 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
         match handle.await {
             Ok(join_res) => {
                 match join_res {
-                    Ok(res) => debug!(res=?res,"Query OK"),
+                    Ok(_res) => {}, // debug!(res=?res,"Query OK")
                     Err(error) => {
                         // IF a query fails, assume everything else is broken.
                         error!(error=%error,"Query Failed");

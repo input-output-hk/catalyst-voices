@@ -663,6 +663,144 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Good password strength'**
   String get goodPasswordStrength;
+
+  /// A button label to select a cardano wallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Cardano Wallet'**
+  String get chooseCardanoWallet;
+
+  /// A label on a clickable element that can show more content.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn More'**
+  String get learnMore;
+
+  /// A header in link wallet flow in registration.
+  ///
+  /// In en, this message translates to:
+  /// **'Link keys to your Catalyst Keychain'**
+  String get walletLink_header;
+
+  /// A subheader in link wallet flow in registration.
+  ///
+  /// In en, this message translates to:
+  /// **'Link your Cardano wallet'**
+  String get walletLink_subheader;
+
+  /// A title in link wallet flow on intro screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Link Cardano Wallet & Catalyst Roles to you Catalyst Keychain.'**
+  String get walletLink_intro_title;
+
+  /// A message (content) in link wallet flow on intro screen.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re almost there! This is the final and most important step in your account setup.\n\nWe\'re going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.\n\nRole Keys allow you to enter new spaces, discover new ways to participate, and unlock new ways to earn rewards.\n\nWe\'ll start with your Voter Key by default. You can decide to add a Proposer Key and Drep key if you want, or you can always add them later.'**
+  String get walletLink_intro_content;
+
+  /// No description provided for @accountCreationCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a new  Catalyst Keychain'**
+  String get accountCreationCreate;
+
+  /// No description provided for @accountCreationRecover.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover your Catalyst Keychain'**
+  String get accountCreationRecover;
+
+  /// Indicates that created keychain will be stored in this device only
+  ///
+  /// In en, this message translates to:
+  /// **'On this device'**
+  String get accountCreationOnThisDevice;
+
+  /// No description provided for @accountCreationGetStartedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Catalyst'**
+  String get accountCreationGetStartedTitle;
+
+  /// No description provided for @accountCreationGetStatedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'If you already have a Catalyst keychain you can restore it on this device, or you can create a new Catalyst Keychain.'**
+  String get accountCreationGetStatedDesc;
+
+  /// No description provided for @accountCreationGetStatedWhatNext.
+  ///
+  /// In en, this message translates to:
+  /// **'What do you want to do?'**
+  String get accountCreationGetStatedWhatNext;
+
+  /// Title of My Account page
+  ///
+  /// In en, this message translates to:
+  /// **'My Account / Profile & Keychain'**
+  String get myAccountProfileKeychain;
+
+  /// Subtitle of My Account page
+  ///
+  /// In en, this message translates to:
+  /// **'Your Catalyst keychain & role registration'**
+  String get yourCatalystKeychainAndRoleRegistration;
+
+  /// Tab on My Account page
+  ///
+  /// In en, this message translates to:
+  /// **'Profile & Keychain'**
+  String get profileAndKeychain;
+
+  /// Title of Catalyst Keychain card
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst Keychain'**
+  String get catalystKeychain;
+
+  /// Action on Catalyst Keychain card
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Keychain'**
+  String get removeKeychain;
+
+  /// Describes that wallet is connected on Catalyst Keychain card
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet connected'**
+  String get walletConnected;
+
+  /// Describes roles on Catalyst Keychain card
+  ///
+  /// In en, this message translates to:
+  /// **'Current Role registrations'**
+  String get currentRoleRegistrations;
+
+  /// Account role
+  ///
+  /// In en, this message translates to:
+  /// **'Voter'**
+  String get voter;
+
+  /// Account role
+  ///
+  /// In en, this message translates to:
+  /// **'Proposer'**
+  String get proposer;
+
+  /// Account role
+  ///
+  /// In en, this message translates to:
+  /// **'Drep'**
+  String get drep;
+
+  /// Related to account role
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get defaultRole;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

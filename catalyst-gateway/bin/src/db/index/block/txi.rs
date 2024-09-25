@@ -10,7 +10,7 @@ use crate::{
         queries::{FallibleQueryTasks, PreparedQueries, PreparedQuery, SizedBatch},
         session::CassandraSession,
     },
-    settings::CassandraEnvVars,
+    settings::cassandra_db,
 };
 
 /// Insert TXI Query and Parameters
@@ -54,7 +54,7 @@ impl TxiInsertQuery {
 
     /// Prepare Batch of Insert TXI Index Data Queries
     pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &CassandraEnvVars,
+        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         let txi_insert_queries = PreparedQueries::prepare_batch(
             session.clone(),
