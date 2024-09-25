@@ -699,6 +699,42 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'You\'re almost there! This is the final and most important step in your account setup.\n\nWe\'re going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.\n\nRole Keys allow you to enter new spaces, discover new ways to participate, and unlock new ways to earn rewards.\n\nWe\'ll start with your Voter Key by default. You can decide to add a Proposer Key and Drep key if you want, or you can always add them later.'**
   String get walletLink_intro_content;
+
+  /// No description provided for @accountCreationCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a new  Catalyst Keychain'**
+  String get accountCreationCreate;
+
+  /// No description provided for @accountCreationRecover.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover your Catalyst Keychain'**
+  String get accountCreationRecover;
+
+  /// Indicates that created keychain will be stored in this device only
+  ///
+  /// In en, this message translates to:
+  /// **'On this device'**
+  String get accountCreationOnThisDevice;
+
+  /// No description provided for @accountCreationGetStartedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Catalyst'**
+  String get accountCreationGetStartedTitle;
+
+  /// No description provided for @accountCreationGetStatedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'If you already have a Catalyst keychain you can restore it on this device, or you can create a new Catalyst Keychain.'**
+  String get accountCreationGetStatedDesc;
+
+  /// No description provided for @accountCreationGetStatedWhatNext.
+  ///
+  /// In en, this message translates to:
+  /// **'What do you want to do?'**
+  String get accountCreationGetStatedWhatNext;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
