@@ -10,7 +10,7 @@ use tracing::error;
 
 use crate::{
     db::index::queries::{PreparedQueries, SizedBatch},
-    settings::CassandraEnvVars,
+    settings::cassandra_db::EnvVars,
 };
 
 /// RBAC Registration Indexing query
@@ -73,7 +73,7 @@ impl Params {
 
     /// Prepare Batch of RBAC Registration Index Data Queries
     pub(super) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &CassandraEnvVars,
+        session: &Arc<Session>, cfg: &EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         let insert_queries = PreparedQueries::prepare_batch(
             session.clone(),

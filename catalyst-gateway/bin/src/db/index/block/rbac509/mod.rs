@@ -12,7 +12,7 @@ use crate::{
         queries::{FallibleQueryTasks, PreparedQuery, SizedBatch},
         session::CassandraSession,
     },
-    settings::CassandraEnvVars,
+    settings::cassandra_db::EnvVars,
 };
 
 /// Index RBAC 509 Registration Query Parameters
@@ -31,7 +31,7 @@ impl Rbac509InsertQuery {
 
     /// Prepare Batch of Insert RBAC 509 Registration Data Queries
     pub(crate) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &CassandraEnvVars,
+        session: &Arc<Session>, cfg: &EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         insert_rbac509::Params::prepare_batch(session, cfg).await
     }
