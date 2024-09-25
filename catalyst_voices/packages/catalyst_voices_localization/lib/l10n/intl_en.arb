@@ -426,7 +426,40 @@
   "@goodPasswordStrength": {
     "description": "Describes a password that is strong."
   },
-  "myAccountProfileKeychain": "My Account / Profile & Keychain",
+  "chooseCardanoWallet": "Choose Cardano Wallet",
+  "@chooseCardanoWallet": {
+    "description": "A button label to select a cardano wallet."
+  },
+  "learnMore": "Learn More",
+  "@learnMore": {
+    "description": "A label on a clickable element that can show more content."
+  },
+  "walletLink_header": "Link keys to your Catalyst Keychain",
+  "@walletLink_header": {
+    "description": "A header in link wallet flow in registration."
+  },
+  "walletLink_subheader": "Link your Cardano wallet",
+  "@walletLink_subheader": {
+    "description": "A subheader in link wallet flow in registration."
+  },
+  "walletLink_intro_title": "Link Cardano Wallet & Catalyst Roles to you Catalyst Keychain.",
+  "@walletLink_intro_title": {
+    "description": "A title in link wallet flow on intro screen."
+  },
+  "walletLink_intro_content": "You're almost there! This is the final and most important step in your account setup.\n\nWe're going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.\n\nRole Keys allow you to enter new spaces, discover new ways to participate, and unlock new ways to earn rewards.\n\nWe'll start with your Voter Key by default. You can decide to add a Proposer Key and Drep key if you want, or you can always add them later.",
+  "@walletLink_intro_content": {
+    "description": "A message (content) in link wallet flow on intro screen."
+  },
+  "accountCreationCreate": "Create a new \u2028Catalyst Keychain",
+  "accountCreationRecover": "Recover your\u2028Catalyst Keychain",
+  "accountCreationOnThisDevice": "On this device",
+  "@accountCreationOnThisDevice": {
+    "description": "Indicates that created keychain will be stored in this device only"
+  },
+  "accountCreationGetStartedTitle": "Welcome to Catalyst",
+  "accountCreationGetStatedDesc": "If you already have a Catalyst keychain you can restore it on this device, or you can create a new Catalyst Keychain.",
+  "accountCreationGetStatedWhatNext": "What do you want to do?",
+ "myAccountProfileKeychain": "My Account / Profile & Keychain",
   "@myAccountProfileKeychain": {
     "description": "Title of My Account page"
   },

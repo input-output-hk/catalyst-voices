@@ -8,7 +8,7 @@ use scylla::Session;
 use serde_json::json;
 use tracing::error;
 
-use crate::settings::CassandraEnvVars;
+use crate::settings::cassandra_db;
 
 /// Keyspace Create (Templated)
 const CREATE_NAMESPACE_CQL: &str = include_str!("./cql/namespace.cql");
@@ -67,7 +67,7 @@ const SCHEMAS: &[(&str, &str)] = &[
 ];
 
 /// Get the namespace for a particular db configuration
-pub(crate) fn namespace(cfg: &CassandraEnvVars) -> String {
+pub(crate) fn namespace(cfg: &cassandra_db::EnvVars) -> String {
     // Build and set the Keyspace to use.
     format!("{}_V{}", cfg.namespace.as_str(), SCHEMA_VERSION)
 }
@@ -75,7 +75,7 @@ pub(crate) fn namespace(cfg: &CassandraEnvVars) -> String {
 /// Create the namespace we will use for this session
 /// Ok to run this if the namespace already exists.
 async fn create_namespace(
-    session: &mut Arc<Session>, cfg: &CassandraEnvVars,
+    session: &mut Arc<Session>, cfg: &cassandra_db::EnvVars,
 ) -> anyhow::Result<()> {
     let keyspace = namespace(cfg);
 
@@ -102,7 +102,7 @@ async fn create_namespace(
 
 /// Create the Schema on the connected Cassandra DB
 pub(crate) async fn create_schema(
-    session: &mut Arc<Session>, cfg: &CassandraEnvVars,
+    session: &mut Arc<Session>, cfg: &cassandra_db::EnvVars,
 ) -> anyhow::Result<()> {
     create_namespace(session, cfg).await?;
 
