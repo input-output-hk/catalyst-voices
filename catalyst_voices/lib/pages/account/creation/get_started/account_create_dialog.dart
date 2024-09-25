@@ -66,7 +66,7 @@ class _LeftPanel extends StatelessWidget {
         const Expanded(child: Center(child: TaskKeychainPicture())),
         const SizedBox(height: 32),
         // TODO(damian-molinski): External url redirect
-        LearnMoreButton(onTap: () {}),
+        VoicesLearnMoreButton(onTap: () {}),
       ],
     );
   }

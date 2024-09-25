@@ -149,19 +149,20 @@ class MoreOptionsButton extends StatelessWidget {
   }
 }
 
-class LearnMoreButton extends StatelessWidget {
-  final VoidCallback? onTap;
+/// A "Learn More" button that redirects usually to an external content.
+class VoicesLearnMoreButton extends StatelessWidget {
+  final VoidCallback onTap;
 
-  const LearnMoreButton({
+  const VoicesLearnMoreButton({
     super.key,
-    this.onTap,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return VoicesTextButton(
-      onTap: onTap,
       trailing: VoicesAssets.icons.externalLink.buildIcon(),
+      onTap: onTap,
       child: Text(context.l10n.learnMore),
     );
   }

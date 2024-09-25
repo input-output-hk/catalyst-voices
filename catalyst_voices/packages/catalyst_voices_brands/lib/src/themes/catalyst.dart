@@ -302,6 +302,7 @@ ThemeData _buildThemeData(
   final textTheme = _buildTextTheme(voicesColorScheme);
 
   return ThemeData(
+    visualDensity: VisualDensity.standard,
     appBarTheme: AppBarTheme(
       backgroundColor: voicesColorScheme.onSurfaceNeutralOpaqueLv1,
       scrolledUnderElevation: 0,
