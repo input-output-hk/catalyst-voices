@@ -67,9 +67,11 @@ class SeedPhrase {
   /// The mnemonic phrase as a list of individual words.
   List<String> get mnemonicWords => mnemonic.split(' ');
 
-  Future<Ed25519KeyPair> generateKeyPair() async {
+  Future<Ed25519KeyPair> generateKeyPair({int offset = 0}) async {
+    final modifiedSeed = Uint8List.fromList(uint8ListSeed.sublist(offset));
+
     // Derive the private key using the Ed25519 HD key derivation
-    final masterKey = await ED25519_HD_KEY.getMasterKeyFromSeed(uint8ListSeed);
+    final masterKey = await ED25519_HD_KEY.getMasterKeyFromSeed(modifiedSeed);
     final privateKey = masterKey.key;
 
     // Generate the matching public key
