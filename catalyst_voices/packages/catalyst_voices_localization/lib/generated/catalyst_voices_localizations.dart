@@ -879,6 +879,18 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Retry'**
   String get retry;
+
+  /// Error description when something goes wrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong.'**
+  String get somethingWentWrong;
+
+  /// A description when no wallet extension was found.
+  ///
+  /// In en, this message translates to:
+  /// **'No wallet found.'**
+  String get noWalletFound;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

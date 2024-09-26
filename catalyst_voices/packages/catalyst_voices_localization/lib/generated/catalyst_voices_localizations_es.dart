@@ -453,4 +453,10 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get retry => 'Retry';
+
+  @override
+  String get somethingWentWrong => 'Something went wrong.';
+
+  @override
+  String get noWalletFound => 'No wallet found.';
 }

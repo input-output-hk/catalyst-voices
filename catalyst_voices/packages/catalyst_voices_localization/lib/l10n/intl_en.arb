@@ -536,5 +536,13 @@
   "retry": "Retry",
   "@retry": {
     "description": "Retry action when something goes wrong."
+  },
+  "somethingWentWrong": "Something went wrong.",
+  "@somethingWentWrong": {
+    "description": "Error description when something goes wrong."
+  },
+  "noWalletFound": "No wallet found.",
+  "@noWalletFound": {
+    "description": "A description when no wallet extension was found."
   }
 }
