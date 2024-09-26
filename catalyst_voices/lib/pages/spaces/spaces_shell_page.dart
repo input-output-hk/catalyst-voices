@@ -1,5 +1,5 @@
 import 'package:catalyst_voices/common/ext/ext.dart';
-import 'package:catalyst_voices/pages/account/setup/account_setup_dialog.dart';
+import 'package:catalyst_voices/pages/registration/registration_dialog.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/spaces_drawer.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -82,6 +82,6 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
   }
 
   Future<void> _showAccountSetup() async {
-    await AccountSetupDialog.show(context);
+    await RegistrationDialog.show(context);
   }
 }

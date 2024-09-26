@@ -1,3 +1,4 @@
+/// Describes the keychain creation flow during registration.
 enum CreateKeychainStage {
   splash,
   instructions,

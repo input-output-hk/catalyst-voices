@@ -1,0 +1,1 @@
+enum CreateAccountType { createNew, recover }
