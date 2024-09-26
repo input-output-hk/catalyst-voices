@@ -682,11 +682,23 @@ abstract class VoicesLocalizations {
   /// **'Link keys to your Catalyst Keychain'**
   String get walletLinkHeader;
 
-  /// A subheader in link wallet flow in registration.
+  /// A subheader in link wallet flow in registration for wallet connection.
   ///
   /// In en, this message translates to:
   /// **'Link your Cardano wallet'**
-  String get walletLinkSubheader;
+  String get walletLinkWalletSubheader;
+
+  /// A subheader in link wallet flow in registration for role chooser state.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your Catalyst roles'**
+  String get walletLinkRolesSubheader;
+
+  /// A subheader in link wallet flow in registration for RBAC transaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign your Catalyst roles to the\nCardano mainnet'**
+  String get walletLinkTransactionSubheader;
 
   /// A title in link wallet flow on intro screen.
   ///

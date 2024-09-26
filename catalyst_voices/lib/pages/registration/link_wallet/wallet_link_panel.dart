@@ -16,6 +16,11 @@ class WalletLinkPanel extends StatelessWidget {
     return switch (stage) {
       WalletLinkStage.intro => const IntroPanel(),
       WalletLinkStage.selectWallet => const SelectWalletPanel(),
+      // TODO(dtscalac): define panels
+      WalletLinkStage.walletDetails => const SelectWalletPanel(),
+      WalletLinkStage.rolesChooser => const SelectWalletPanel(),
+      WalletLinkStage.rolesSummary => const SelectWalletPanel(),
+      WalletLinkStage.rbacTransaction => const SelectWalletPanel(),
     };
   }
 }

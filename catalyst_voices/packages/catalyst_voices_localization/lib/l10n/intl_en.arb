@@ -438,9 +438,17 @@
   "@walletLinkHeader": {
     "description": "A header in link wallet flow in registration."
   },
-  "walletLinkSubheader": "Link your Cardano wallet",
-  "@walletLinkSubheader": {
-    "description": "A subheader in link wallet flow in registration."
+  "walletLinkWalletSubheader": "Link your Cardano wallet",
+  "@walletLinkWalletSubheader": {
+    "description": "A subheader in link wallet flow in registration for wallet connection."
+  },
+  "walletLinkRolesSubheader": "Select your Catalyst roles",
+  "@walletLinkRolesSubheader": {
+    "description": "A subheader in link wallet flow in registration for role chooser state."
+  },
+  "walletLinkTransactionSubheader": "Sign your Catalyst roles to the\nCardano mainnet",
+  "@walletLinkTransactionSubheader": {
+    "description": "A subheader in link wallet flow in registration for RBAC transaction."
   },
   "walletLinkIntroTitle": "Link Cardano Wallet & Catalyst Roles to you Catalyst Keychain.",
   "@walletLinkIntroTitle": {

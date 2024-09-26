@@ -356,7 +356,13 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get walletLinkHeader => 'Link keys to your Catalyst Keychain';
 
   @override
-  String get walletLinkSubheader => 'Link your Cardano wallet';
+  String get walletLinkWalletSubheader => 'Link your Cardano wallet';
+
+  @override
+  String get walletLinkRolesSubheader => 'Select your Catalyst roles';
+
+  @override
+  String get walletLinkTransactionSubheader => 'Sign your Catalyst roles to the\nCardano mainnet';
 
   @override
   String get walletLinkIntroTitle => 'Link Cardano Wallet & Catalyst Roles to you Catalyst Keychain.';
