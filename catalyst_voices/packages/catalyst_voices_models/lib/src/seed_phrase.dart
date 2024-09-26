@@ -67,14 +67,14 @@ class SeedPhrase {
   /// The mnemonic phrase as a list of individual words.
   List<String> get mnemonicWords => mnemonic.split(' ');
 
-  /// Generates an Ed25519 key pair from a seed.
+  /// Derives an Ed25519 key pair from a seed.
   ///
-  /// Throws an [RangeError] If the provided [offset] is negative or exceeds
+  /// Throws a [RangeError] If the provided [offset] is negative or exceeds
   /// the length of the seed (64).
   ///
   /// [offset]: The offset is applied
   /// to the seed to adjust where key derivation starts. It defaults to 0.
-  Future<Ed25519KeyPair> generateKeyPair([int offset = 0]) async {
+  Future<Ed25519KeyPair> deriveKeyPair([int offset = 0]) async {
     final modifiedSeed = uint8ListSeed.sublist(offset);
 
     final masterKey = await ED25519_HD_KEY.getMasterKeyFromSeed(modifiedSeed);
