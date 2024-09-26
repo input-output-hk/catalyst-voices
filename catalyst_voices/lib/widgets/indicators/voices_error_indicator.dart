@@ -23,7 +23,7 @@ class VoicesErrorIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
       decoration: BoxDecoration(
         border: Border.all(
           color: Theme.of(context).colors.outlineBorderVariant!,
