@@ -1,5 +1,4 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
-import 'package:catalyst_voices/pages/registration/link_wallet/link_wallet_dialog.dart';
 import 'package:catalyst_voices/widgets/cards/pending_proposal_card.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -203,10 +202,8 @@ class _AllProposals extends StatelessWidget {
                 image: _proposalImages[proposal.id]!,
                 proposal: proposal,
                 isFavorite: favoriteProposals.contains(proposal),
-                onFavoriteChanged: (isFavorite) {
-                  LinkWalletDialog.show(context: context);
-                  _onFavoriteChanged(proposal, isFavorite);
-                },
+                onFavoriteChanged: (isFavorite) =>
+                    _onFavoriteChanged(proposal, isFavorite),
               ),
           ],
         );
