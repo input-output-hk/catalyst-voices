@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/pages/account/creation/create_keychain/create_keychain_controller.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -27,9 +26,7 @@ class SplashPanel extends StatelessWidget {
         const Spacer(),
         VoicesFilledButton(
           child: Text(context.l10n.accountCreationSplashNextButton),
-          onTap: () {
-            CreateKeychainController.of(context).goToNextStage();
-          },
+          onTap: () {},
         ),
       ],
     );

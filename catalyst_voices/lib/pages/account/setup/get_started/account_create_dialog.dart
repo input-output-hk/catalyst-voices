@@ -1,7 +1,6 @@
-import 'package:catalyst_voices/pages/account/creation/information_panel.dart';
-import 'package:catalyst_voices/pages/account/creation/task_picture.dart';
+import 'package:catalyst_voices/pages/account/setup/information_panel.dart';
+import 'package:catalyst_voices/pages/account/setup/task_picture.dart';
 import 'package:catalyst_voices/widgets/modals/voices_desktop_dialog.dart';
-import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -28,14 +27,9 @@ enum AccountCreateType {
 }
 
 class AccountCreateDialog extends StatelessWidget {
-  const AccountCreateDialog._();
-
-  static Future<AccountCreateType?> show(BuildContext context) {
-    return VoicesDialog.show(
-      context: context,
-      builder: (context) => const AccountCreateDialog._(),
-    );
-  }
+  const AccountCreateDialog({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

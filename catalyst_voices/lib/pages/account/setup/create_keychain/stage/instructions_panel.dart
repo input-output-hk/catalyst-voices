@@ -1,4 +1,3 @@
-import 'package:catalyst_voices/pages/account/creation/create_keychain/create_keychain_controller.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -38,21 +37,9 @@ class _Navigation extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(
-          child: VoicesBackButton(
-            onTap: () {
-              CreateKeychainController.of(context).goToPreviousStage();
-            },
-          ),
-        ),
+        Expanded(child: VoicesBackButton(onTap: () {})),
         const SizedBox(width: 10),
-        Expanded(
-          child: VoicesNextButton(
-            onTap: () {
-              CreateKeychainController.of(context).goToNextStage();
-            },
-          ),
-        ),
+        Expanded(child: VoicesNextButton(onTap: () {})),
       ],
     );
   }
