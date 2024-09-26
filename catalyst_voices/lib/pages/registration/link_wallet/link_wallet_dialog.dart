@@ -34,6 +34,7 @@ class _LinkWalletDialogState extends State<LinkWalletDialog> {
         ),
       LinkWalletStage.selectWallet => SelectWalletDialog(
           onSelectedWallet: _onSelectedWallet,
+          onBack: _onBack,
         ),
     };
   }
@@ -46,5 +47,14 @@ class _LinkWalletDialogState extends State<LinkWalletDialog> {
 
   void _onSelectedWallet(CardanoWallet wallet) {
     // TODO(dtscalac): store selected wallet and proceed to next stage
+  }
+
+  void _onBack() {
+    final previousIndex = _stage.index - 1;
+    if (previousIndex >= 0) {
+      setState(() {
+        _stage = LinkWalletStage.values[previousIndex];
+      });
+    }
   }
 }
