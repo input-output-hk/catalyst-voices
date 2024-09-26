@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices_blocs/src/registration/controllers/keychain_creation_controller.dart';
 import 'package:catalyst_voices_blocs/src/registration/controllers/wallet_link_controller.dart';
 import 'package:catalyst_voices_blocs/src/registration/registration_event.dart';
@@ -30,6 +31,10 @@ final class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState>
   static RegistrationBloc watch(BuildContext context) {
     return context.watch<RegistrationBloc>();
   }
+
+  @override
+  Future<List<CardanoWallet>> getCardanoWallets() =>
+      _walletLinkController.getCardanoWallets();
 
   void _handleRegistrationEvent(
     RegistrationEvent event,

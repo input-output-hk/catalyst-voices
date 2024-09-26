@@ -1,10 +1,15 @@
+import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices_blocs/src/registration/registration_navigator.dart';
 import 'package:catalyst_voices_blocs/src/registration/registration_state.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:flutter/foundation.dart';
 
-abstract interface class WalletLinkController {}
+// ignore: one_member_abstracts
+abstract interface class WalletLinkController {
+  Future<List<CardanoWallet>> getCardanoWallets();
+}
 
-final class RegistrationWalletLinkController
+final class RegistrationWalletLinkController extends ChangeNotifier
     implements WalletLinkController, RegistrationNavigator<WalletLink> {
   WalletLinkStage _stage;
 
@@ -56,5 +61,10 @@ final class RegistrationWalletLinkController
     }
 
     return previousStep;
+  }
+
+  @override
+  Future<List<CardanoWallet>> getCardanoWallets() {
+    return CatalystCardano.instance.getWallets();
   }
 }
