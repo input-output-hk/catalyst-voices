@@ -19,7 +19,7 @@ use crate::{
     build_info::{log_build_info, BUILD_INFO},
     logger::{self, LogLevel, LOG_LEVEL_DEFAULT},
     service::utilities::net::{get_public_ipv4, get_public_ipv6},
-    utilities::blake2b_hash::generate_uuid_string_from_data,
+    utils::blake2b_hash::generate_uuid_string_from_data,
 };
 
 pub(crate) mod cassandra_db;

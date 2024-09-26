@@ -8,7 +8,7 @@ use scylla::Session;
 use serde_json::json;
 use tracing::error;
 
-use crate::{settings::cassandra_db, utilities::blake2b_hash::generate_uuid_string_from_data};
+use crate::{settings::cassandra_db, utils::blake2b_hash::generate_uuid_string_from_data};
 
 /// The version of the Index DB Schema we SHOULD BE using.
 /// DO NOT change this unless you are intentionally changing the Schema.

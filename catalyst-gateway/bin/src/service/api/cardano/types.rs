@@ -6,7 +6,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use crate::utilities::blake2b_hash::blake2b_224;
+use crate::utils::blake2b_hash::blake2b_224;
 
 /// Pub key
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]

@@ -16,7 +16,7 @@ use tracing::{error, field, Instrument, Level, Span};
 use ulid::Ulid;
 use uuid::Uuid;
 
-use crate::{settings::Settings, utilities::blake2b_hash::generate_uuid_string_from_data};
+use crate::{settings::Settings, utils::blake2b_hash::generate_uuid_string_from_data};
 
 /// Labels for the metrics
 const METRIC_LABELS: [&str; 3] = ["endpoint", "method", "status_code"];
