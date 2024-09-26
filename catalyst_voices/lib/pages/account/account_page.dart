@@ -1,6 +1,8 @@
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
+import 'package:catalyst_voices/pages/account/delete_keychain_dialog.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
+import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -35,7 +37,14 @@ final class AccountPage extends StatelessWidget {
                       AccountRole.drep,
                     ],
                     defaultRole: AccountRole.voter,
-                    onRemoveKeychain: () => debugPrint('Keychain removed'),
+                    onRemoveKeychain: () async {
+                      await VoicesDialog.show<void>(
+                        context: context,
+                        builder: (context) {
+                          return const DeleteKeychainDialog();
+                        },
+                      );
+                    },
                   ),
                 ],
               ),

@@ -164,6 +164,8 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
             controller: _obtainController(),
             focusNode: widget.focusNode,
             decoration: InputDecoration(
+              filled: widget.decoration?.filled,
+              fillColor: widget.decoration?.fillColor,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
@@ -564,6 +566,12 @@ class VoicesTextFieldDecoration {
   /// add a status [suffixIcon] based on the results of the validation.
   final bool showStatusSuffixIcon;
 
+  /// [InputDecoration.filled].
+  final bool? filled;
+
+  /// [InputDecoration.fillColor].
+  final Color? fillColor;
+
   /// Creates a new text field decoration.
   const VoicesTextFieldDecoration({
     this.border,
@@ -583,5 +591,7 @@ class VoicesTextFieldDecoration {
     this.suffixText,
     this.counterText,
     this.showStatusSuffixIcon = true,
+    this.filled = false,
+    this.fillColor,
   });
 }

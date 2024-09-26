@@ -67,15 +67,15 @@ class VoicesDesktopPanelsDialog extends StatelessWidget {
               ),
             ],
           ),
-          const _DialogCloseButton(),
+          const DialogCloseButton(),
         ],
       ),
     );
   }
 }
 
-class _DialogCloseButton extends StatelessWidget {
-  const _DialogCloseButton();
+class DialogCloseButton extends StatelessWidget {
+  const DialogCloseButton({super.key});
 
   @override
   Widget build(BuildContext context) {
