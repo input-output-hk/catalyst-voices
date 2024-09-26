@@ -1,7 +1,7 @@
 VERSION 0.8
 
 package-schemathesis:
-    FROM python:3.12-alpine3.19
+    FROM python:3.12-alpine3.20
     # TODO: https://github.com/input-output-hk/catalyst-voices/issues/465
     RUN apk add --no-cache gcc musl-dev
     RUN python -m pip install schemathesis==3.27.1
@@ -29,7 +29,7 @@ package-schemathesis:
 # test-fuzzer-api - Fuzzy test cat-gateway using openapi specs.
 # Disabled in CI, to enable it rename to `test-fuzzer-api`.
 fuzzer-api:
-    FROM earthly/dind:alpine-3.19
+    FROM earthly/dind:alpine-alpine-3.20-docker-26.1.5-r0
     RUN apk update && apk add iptables-legacy # workaround for https://github.com/earthly/earthly/issues/3784
     RUN apk add yq zstd
     COPY schemathesis-docker-compose.yml .

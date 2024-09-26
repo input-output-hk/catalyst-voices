@@ -1,5 +1,5 @@
 VERSION 0.8
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.04 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.07 AS flutter-ci
 
 deps:
     FROM mcr.microsoft.com/playwright:v1.45.2-jammy
@@ -45,13 +45,13 @@ build-web:
     SAVE ARTIFACT web
 
 package-app:
-    FROM nginx:alpine3.18
+    FROM nginx:alpine3.20-slim
     ARG tag='latest'
     COPY +build-web/web /usr/share/nginx/html/
     SAVE IMAGE test-app:$tag
 
 nightly-test:
-    FROM earthly/dind:alpine-3.19
+    FROM earthly/alpine-3.20-docker-26.1.5-r0
     COPY compose.yml .
     WITH DOCKER \
         --compose compose.yml \

@@ -15,6 +15,7 @@ class VoicesTabsExample extends StatelessWidget {
         child: Column(
           children: [
             const TabBar(
+              isScrollable: true,
               tabs: [
                 Tab(text: 'Sections'),
                 Tab(text: 'Comments'),

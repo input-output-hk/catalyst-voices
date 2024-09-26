@@ -8,14 +8,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Displays current session action and toggling to next when clicked.
 class SessionActionHeader extends StatelessWidget {
-  const SessionActionHeader({super.key});
+  final VoidCallback? onGetStartedTap;
+
+  const SessionActionHeader({
+    super.key,
+    this.onGetStartedTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SessionBloc, SessionState>(
       builder: (context, state) {
         return switch (state) {
-          VisitorSessionState() => const _GetStartedButton(),
+          VisitorSessionState() => _GetStartedButton(onTap: onGetStartedTap),
           GuestSessionState() => const _UnlockButton(),
           ActiveUserSessionState() => const _LockButton(),
         };
@@ -25,14 +30,16 @@ class SessionActionHeader extends StatelessWidget {
 }
 
 class _GetStartedButton extends StatelessWidget {
-  const _GetStartedButton();
+  final VoidCallback? onTap;
+
+  const _GetStartedButton({
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     return VoicesFilledButton(
-      onTap: () {
-        context.read<SessionBloc>().add(const ActiveUserSessionEvent());
-      },
+      onTap: onTap,
       child: Text(context.l10n.getStarted),
     );
   }

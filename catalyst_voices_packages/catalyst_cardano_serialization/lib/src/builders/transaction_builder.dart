@@ -19,7 +19,7 @@ final class TransactionBuilder extends Equatable {
   ///
   /// Enough [inputs] must be provided to be greater or equal
   /// the amount of [outputs] + [fee].
-  final List<TransactionUnspentOutput> inputs;
+  final Set<TransactionUnspentOutput> inputs;
 
   /// The list of transaction outputs which describes which address
   /// will receive what amount of [Coin].
@@ -64,7 +64,7 @@ final class TransactionBuilder extends Equatable {
   final Coin? totalCollateral;
 
   /// Reference inputs as nonempty set of transaction inputs.
-  final Set<TransactionInput>? referenceInputs;
+  final Set<TransactionUnspentOutput>? referenceInputs;
 
   /// The builder that builds the witness set of the transaction.
   ///
@@ -249,7 +249,7 @@ final class TransactionBuilder extends Equatable {
   Coin minFee() {
     final txBody = _copyWith(fee: const Coin(Numbers.intMaxValue)).buildBody();
     final fullTx = buildFakeTransaction(txBody);
-    return config.feeAlgo.minNoScriptFee(fullTx);
+    return config.feeAlgo.minFee(fullTx, {...inputs, ...?referenceInputs});
   }
 
   @override
@@ -521,7 +521,7 @@ final class TransactionBuilder extends Equatable {
       networkId: networkId,
       collateralReturn: collateralReturn,
       totalCollateral: totalCollateral,
-      referenceInputs: referenceInputs,
+      referenceInputs: referenceInputs?.map((utxo) => utxo.input).toSet(),
     );
   }
 
@@ -555,7 +555,7 @@ final class TransactionBuilder extends Equatable {
 /// protocol parameters and other constants.
 final class TransactionBuilderConfig extends Equatable {
   /// The protocol parameter which describes the transaction fee algorithm.
-  final LinearFee feeAlgo;
+  final TieredFee feeAlgo;
 
   /// The protocol parameter which limits the maximum transaction size in bytes.
   final int maxTxSize;

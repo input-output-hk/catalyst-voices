@@ -12,7 +12,7 @@ use tracing::{error, info, warn};
 
 use crate::{
     db::index::{block::index_block, session::CassandraSession},
-    settings::Settings,
+    settings::{chain_follower, Settings},
 };
 
 // pub(crate) mod cip36_registration_obsolete;
@@ -26,9 +26,13 @@ const MAX_BLOCKS_BATCH_LEN: usize = 1024;
 const INDEXING_DB_READY_WAIT_INTERVAL: Duration = Duration::from_secs(1);
 
 /// Start syncing a particular network
-async fn start_sync_for(chain: Network) -> anyhow::Result<()> {
-    let cfg = ChainSyncConfig::default_for(chain);
-    info!(chain = %cfg.chain, "Starting Blockchain Sync");
+async fn start_sync_for(cfg: &chain_follower::EnvVars) -> anyhow::Result<()> {
+    let chain = cfg.chain;
+    let dl_config = cfg.dl_config.clone();
+
+    let mut cfg = ChainSyncConfig::default_for(chain);
+    cfg.mithril_cfg = cfg.mithril_cfg.with_dl_config(dl_config);
+    info!(chain = %chain, "Starting Blockchain Sync");
 
     if let Err(error) = cfg.run().await {
         error!(chain=%chain, error=%error, "Failed to start chain sync task");
@@ -275,7 +279,7 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
     cfg.log();
 
     // Start Syncing the blockchain, so we can consume its data as required.
-    start_sync_for(cfg.chain).await?;
+    start_sync_for(&cfg).await?;
     info!(chain=%cfg.chain,"Chain Sync is started.");
 
     tokio::spawn(async move {

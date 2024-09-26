@@ -9,7 +9,7 @@ use tracing::error;
 
 use crate::{
     db::index::queries::{PreparedQueries, SizedBatch},
-    settings::CassandraEnvVars,
+    settings::cassandra_db,
 };
 
 /// TXO by Stake Address Indexing query
@@ -54,7 +54,7 @@ impl Params {
 
     /// Prepare Batch of Staked Insert TXO Asset Index Data Queries
     pub(super) async fn prepare_batch(
-        session: &Arc<Session>, cfg: &CassandraEnvVars,
+        session: &Arc<Session>, cfg: &cassandra_db::EnvVars,
     ) -> anyhow::Result<SizedBatch> {
         let txo_insert_queries = PreparedQueries::prepare_batch(
             session.clone(),

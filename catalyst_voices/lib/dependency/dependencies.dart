@@ -27,7 +27,9 @@ final class Dependencies extends DependencyProvider {
           authenticationRepository: get(),
         ),
       )
-      ..registerLazySingleton<SessionBloc>(SessionBloc.new);
+      ..registerLazySingleton<SessionBloc>(SessionBloc.new)
+      // Factory will rebuild it each time needed
+      ..registerFactory<RegistrationBloc>(RegistrationBloc.new);
   }
 
   void _registerRepositories() {
