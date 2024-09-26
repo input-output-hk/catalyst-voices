@@ -450,4 +450,7 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get back => 'Back';
+
+  @override
+  String get retry => 'Retry';
 }

@@ -532,5 +532,9 @@
   "back": "Back",
   "@back": {
     "description": "For example in button that goes to previous stage of registration"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry action when something goes wrong."
   }
 }

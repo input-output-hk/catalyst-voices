@@ -873,6 +873,12 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Back'**
   String get back;
+
+  /// Retry action when something goes wrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
