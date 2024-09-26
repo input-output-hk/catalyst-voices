@@ -680,25 +680,37 @@ abstract class VoicesLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Link keys to your Catalyst Keychain'**
-  String get walletLink_header;
+  String get walletLinkHeader;
 
-  /// A subheader in link wallet flow in registration.
+  /// A subheader in link wallet flow in registration for wallet connection.
   ///
   /// In en, this message translates to:
   /// **'Link your Cardano wallet'**
-  String get walletLink_subheader;
+  String get walletLinkWalletSubheader;
+
+  /// A subheader in link wallet flow in registration for role chooser state.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your Catalyst roles'**
+  String get walletLinkRolesSubheader;
+
+  /// A subheader in link wallet flow in registration for RBAC transaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign your Catalyst roles to the\nCardano mainnet'**
+  String get walletLinkTransactionSubheader;
 
   /// A title in link wallet flow on intro screen.
   ///
   /// In en, this message translates to:
   /// **'Link Cardano Wallet & Catalyst Roles to you Catalyst Keychain.'**
-  String get walletLink_intro_title;
+  String get walletLinkIntroTitle;
 
   /// A message (content) in link wallet flow on intro screen.
   ///
   /// In en, this message translates to:
   /// **'You\'re almost there! This is the final and most important step in your account setup.\n\nWe\'re going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.\n\nRole Keys allow you to enter new spaces, discover new ways to participate, and unlock new ways to earn rewards.\n\nWe\'ll start with your Voter Key by default. You can decide to add a Proposer Key and Drep key if you want, or you can always add them later.'**
-  String get walletLink_intro_content;
+  String get walletLinkIntroContent;
 
   /// No description provided for @accountCreationCreate.
   ///
@@ -754,12 +766,6 @@ abstract class VoicesLocalizations {
   /// **'Profile & Keychain'**
   String get profileAndKeychain;
 
-  /// Title of Catalyst Keychain card
-  ///
-  /// In en, this message translates to:
-  /// **'Catalyst Keychain'**
-  String get catalystKeychain;
-
   /// Action on Catalyst Keychain card
   ///
   /// In en, this message translates to:
@@ -801,6 +807,54 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Default'**
   String get defaultRole;
+
+  /// No description provided for @catalystKeychain.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst Keychain'**
+  String get catalystKeychain;
+
+  /// No description provided for @accountCreationSplashTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your Catalyst Keychain'**
+  String get accountCreationSplashTitle;
+
+  /// No description provided for @accountCreationSplashMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your keychain is your ticket to participate in  distributed innovation on the global stage.    Once you have it, you\'ll be able to enter different spaces, discover awesome ideas, and share your feedback to hep improve ideas.    As you add new keys to your keychain, you\'ll be able to enter new spaces, unlock new rewards opportunities, and have your voice heard in community decisions.'**
+  String get accountCreationSplashMessage;
+
+  /// No description provided for @accountCreationSplashNextButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your Keychain now'**
+  String get accountCreationSplashNextButton;
+
+  /// No description provided for @accountInstructionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Great! Your Catalyst Keychain  has been created.'**
+  String get accountInstructionsTitle;
+
+  /// No description provided for @accountInstructionsMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'On the next screen, you\'re going to see 12 words.  This is called your \"seed phrase\".     It\'s like a super secure password that only you know,  that allows you to prove ownership of your keychain.    You\'ll use it to login and recover your account on  different devices, so be sure to put it somewhere safe!\n\nYou need to write this seed phrase down with pen and paper, so get this ready.'**
+  String get accountInstructionsMessage;
+
+  /// For example in button that goes to next stage of registration
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get next;
+
+  /// For example in button that goes to previous stage of registration
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
