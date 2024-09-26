@@ -392,9 +392,6 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get profileAndKeychain => 'Profile & Keychain';
 
   @override
-  String get catalystKeychain => 'Catalyst Keychain';
-
-  @override
   String get removeKeychain => 'Remove Keychain';
 
   @override
@@ -414,4 +411,28 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get defaultRole => 'Default';
+
+  @override
+  String get catalystKeychain => 'Catalyst Keychain';
+
+  @override
+  String get accountCreationSplashTitle => 'Create your Catalyst Keychain';
+
+  @override
+  String get accountCreationSplashMessage => 'Your keychain is your ticket to participate in  distributed innovation on the global stage.    Once you have it, you\'ll be able to enter different spaces, discover awesome ideas, and share your feedback to hep improve ideas.    As you add new keys to your keychain, you\'ll be able to enter new spaces, unlock new rewards opportunities, and have your voice heard in community decisions.';
+
+  @override
+  String get accountCreationSplashNextButton => 'Create your Keychain now';
+
+  @override
+  String get accountInstructionsTitle => 'Great! Your Catalyst Keychain  has been created.';
+
+  @override
+  String get accountInstructionsMessage => 'On the next screen, you\'re going to see 12 words.  This is called your \"seed phrase\".     It\'s like a super secure password that only you know,  that allows you to prove ownership of your keychain.    You\'ll use it to login and recover your account on  different devices, so be sure to put it somewhere safe!\n\nYou need to write this seed phrase down with pen and paper, so get this ready.';
+
+  @override
+  String get next => 'Next';
+
+  @override
+  String get back => 'Back';
 }
