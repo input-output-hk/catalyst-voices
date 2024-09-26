@@ -49,7 +49,7 @@ class _Wallets extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesFutureBuilder(
-      future: () async => RegistrationBloc.of(context).getCardanoWallets(),
+      future: RegistrationBloc.of(context).getCardanoWallets,
       dataBuilder: (context, wallets, onRetry) {
         if (wallets.isNotEmpty) {
           return _WalletsList(wallets: wallets);
