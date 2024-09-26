@@ -8,17 +8,27 @@ use scylla::Session;
 use serde_json::json;
 use tracing::error;
 
-use crate::settings::cassandra_db;
+use crate::{settings::cassandra_db, utilities::blake2b_hash::generate_uuid_string_from_data};
+
+/// The version of the Index DB Schema we SHOULD BE using.
+/// DO NOT change this unless you are intentionally changing the Schema.
+///
+/// This constant is ONLY used by Unit tests to identify when the schema version will
+/// change accidentally, and is NOT to be used directly to set the schema version of the
+/// table namespaces.
+#[allow(dead_code)]
+const SCHEMA_VERSION: &str = "a0e54866-1f30-8ad2-9ac7-df1cfaf9c634";
 
 /// Keyspace Create (Templated)
 const CREATE_NAMESPACE_CQL: &str = include_str!("./cql/namespace.cql");
 
-/// The version of the Schema we are using.
-/// Must be incremented if there is a breaking change in any schema tables below.
-pub(crate) const SCHEMA_VERSION: u64 = 1;
-
 /// All Schema Creation Statements
 const SCHEMAS: &[(&str, &str)] = &[
+    (
+        // Sync Status Table Schema
+        include_str!("./cql/sync_status.cql"),
+        "Create Sync Status Table",
+    ),
     (
         // TXO by Stake Address Table Schema
         include_str!("./cql/txo_by_stake_table.cql"),
@@ -66,10 +76,72 @@ const SCHEMAS: &[(&str, &str)] = &[
     ),
 ];
 
+/// Removes all comments from each line in the input query text and joins the remaining
+/// lines into a single string, reducing consecutive whitespace characters to a single
+/// space. Comments are defined as any text following `--` on a line.
+///
+/// # Arguments
+///
+/// * `text`: A string slice that holds the query to be cleaned.
+///
+/// # Returns
+///
+/// A new string with comments removed and whitespace reduced, where each remaining line
+/// from the original text is separated by a newline character.
+fn remove_comments_and_join_query_lines(text: &str) -> String {
+    // Split the input text into lines, removing any trailing empty lines
+    let raw_lines: Vec<&str> = text.lines().collect();
+    let mut clean_lines: Vec<String> = Vec::new();
+
+    // Filter out comments from each line
+    for line in raw_lines {
+        let mut clean_line = line.to_string();
+        if let Some(no_comment) = line.split_once("--") {
+            clean_line = no_comment.0.to_string();
+        }
+        clean_line = clean_line
+            .split_whitespace()
+            .collect::<Vec<&str>>()
+            .join(" ")
+            .trim()
+            .to_string();
+        if !clean_line.is_empty() {
+            clean_lines.push(clean_line);
+        }
+    }
+    clean_lines.join("\n")
+}
+
+/// Comment
+fn generate_cql_schema_version() -> String {
+    // Where we will actually store the bytes we derive the UUID from.
+    let mut clean_schemas: Vec<String> = Vec::new();
+
+    // Iterate through each CQL schema and add it to the list of clean schemas documents.
+    for (schema, _) in SCHEMAS {
+        let schema = remove_comments_and_join_query_lines(schema);
+        if !schema.is_empty() {
+            clean_schemas.push(schema);
+        }
+    }
+
+    // make sure any re-ordering of the schemas in the list does not effect the generated
+    // schema version
+    clean_schemas.sort();
+
+    // Generate a unique hash of the clean schemas,
+    // and use it to form a UUID to identify the schema version.
+    generate_uuid_string_from_data("Catalyst-Gateway Index Database Schema", clean_schemas)
+}
+
 /// Get the namespace for a particular db configuration
 pub(crate) fn namespace(cfg: &cassandra_db::EnvVars) -> String {
     // Build and set the Keyspace to use.
-    format!("{}_V{}", cfg.namespace.as_str(), SCHEMA_VERSION)
+    format!(
+        "{}_V{}",
+        cfg.namespace.as_str(),
+        generate_cql_schema_version()
+    )
 }
 
 /// Create the namespace we will use for this session
@@ -122,4 +194,61 @@ pub(crate) async fn create_schema(
     session.await_schema_agreement().await?;
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    /// This test is designed to fail if the schema version has changed.
+    /// It is used to help detect inadvertent schema version changes.
+    /// If you did NOT intend to change the index db schema and this test fails,
+    /// then revert or fix your changes to the schema files.
+    fn check_schema_version_has_not_changed() {
+        let calculated_version = generate_cql_schema_version();
+        assert_eq!(SCHEMA_VERSION, calculated_version);
+    }
+
+    #[test]
+    fn test_no_comments() {
+        let input = "SELECT * FROM table1;";
+        let expected_output = "SELECT * FROM table1;";
+        assert_eq!(remove_comments_and_join_query_lines(input), expected_output);
+    }
+
+    #[test]
+    fn test_single_line_comment() {
+        let input = "SELECT -- some comment * FROM table1;";
+        let expected_output = "SELECT";
+        assert_eq!(remove_comments_and_join_query_lines(input), expected_output);
+    }
+
+    #[test]
+    fn test_multi_line_comment() {
+        let input = "SELECT -- some comment\n* FROM table1;";
+        let expected_output = "SELECT\n* FROM table1;";
+        assert_eq!(remove_comments_and_join_query_lines(input), expected_output);
+    }
+
+    #[test]
+    fn test_multiple_lines() {
+        let input = "SELECT * FROM table1;\n-- another comment\nSELECT * FROM table2;";
+        let expected_output = "SELECT * FROM table1;\nSELECT * FROM table2;";
+        assert_eq!(remove_comments_and_join_query_lines(input), expected_output);
+    }
+
+    #[test]
+    fn test_empty_lines() {
+        let input = "\n\nSELECT * FROM table1;\n-- comment here\n\n";
+        let expected_output = "SELECT * FROM table1;";
+        assert_eq!(remove_comments_and_join_query_lines(input), expected_output);
+    }
+
+    #[test]
+    fn test_whitespace_only() {
+        let input = "   \n  -- comment here\n   ";
+        let expected_output = "";
+        assert_eq!(remove_comments_and_join_query_lines(input), expected_output);
+    }
 }
