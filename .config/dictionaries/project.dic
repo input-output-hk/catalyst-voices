@@ -222,6 +222,7 @@ Scripthash
 ScyllaDB
 seckey
 Seedable
+seedphrase
 sendfile
 servernum
 serviceworker
