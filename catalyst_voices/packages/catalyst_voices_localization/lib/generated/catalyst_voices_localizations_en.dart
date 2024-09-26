@@ -363,4 +363,55 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get walletLink_intro_content => 'You\'re almost there! This is the final and most important step in your account setup.\n\nWe\'re going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.\n\nRole Keys allow you to enter new spaces, discover new ways to participate, and unlock new ways to earn rewards.\n\nWe\'ll start with your Voter Key by default. You can decide to add a Proposer Key and Drep key if you want, or you can always add them later.';
+
+  @override
+  String get accountCreationCreate => 'Create a new  Catalyst Keychain';
+
+  @override
+  String get accountCreationRecover => 'Recover your Catalyst Keychain';
+
+  @override
+  String get accountCreationOnThisDevice => 'On this device';
+
+  @override
+  String get accountCreationGetStartedTitle => 'Welcome to Catalyst';
+
+  @override
+  String get accountCreationGetStatedDesc => 'If you already have a Catalyst keychain you can restore it on this device, or you can create a new Catalyst Keychain.';
+
+  @override
+  String get accountCreationGetStatedWhatNext => 'What do you want to do?';
+
+  @override
+  String get myAccountProfileKeychain => 'My Account / Profile & Keychain';
+
+  @override
+  String get yourCatalystKeychainAndRoleRegistration => 'Your Catalyst keychain & role registration';
+
+  @override
+  String get profileAndKeychain => 'Profile & Keychain';
+
+  @override
+  String get catalystKeychain => 'Catalyst Keychain';
+
+  @override
+  String get removeKeychain => 'Remove Keychain';
+
+  @override
+  String get walletConnected => 'Wallet connected';
+
+  @override
+  String get currentRoleRegistrations => 'Current Role registrations';
+
+  @override
+  String get voter => 'Voter';
+
+  @override
+  String get proposer => 'Proposer';
+
+  @override
+  String get drep => 'Drep';
+
+  @override
+  String get defaultRole => 'Default';
 }
