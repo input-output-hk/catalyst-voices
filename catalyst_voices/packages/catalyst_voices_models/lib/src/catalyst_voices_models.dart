@@ -1,11 +1,13 @@
 library catalyst_voices_models;
 
+export 'account/account_role.dart';
 export 'auth/authentication_status.dart';
 export 'auth/password_strength.dart';
 export 'errors/errors.dart';
 export 'proposal/funded_proposal.dart';
 export 'proposal/pending_proposal.dart';
 export 'proposal/proposal_status.dart';
+export 'registration/registration.dart';
 export 'session_data.dart';
 export 'space.dart';
 export 'treasury/treasury_campaign_builder.dart';

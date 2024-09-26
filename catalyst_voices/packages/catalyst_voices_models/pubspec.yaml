@@ -7,7 +7,10 @@ environment:
   sdk: ">=3.5.0 <4.0.0"
 
 dependencies:
+  bip39: ^1.0.6
   catalyst_cardano_serialization: ^0.4.0
+  convert: ^3.1.1
+  ed25519_hd_key: ^2.3.0
   equatable: ^2.0.5
   flutter_quill: ^10.5.13
   meta: ^1.10.0

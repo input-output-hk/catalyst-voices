@@ -15,7 +15,7 @@ void main() {
   final datumData = Data(CborBytes(Uint8List.fromList([1, 2, 3, 4, 5, 6])));
   final datumOptionHash = DatumOption(datumHash);
   final datumOptionData = DatumOption(datumData);
-  final script = PlutusV2Script(Uint8List.fromList([0x43, 0x01, 0x02, 0x03]));
+  final script = PlutusV2Script.fromHex('43010203');
   final scriptRef = ScriptRef(script);
 
   group('TransactionOutput encoding/decoding Tests', () {
