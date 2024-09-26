@@ -43,7 +43,14 @@ class RegistrationInfoPanel extends StatelessWidget {
         CreateKeychainStage.splash ||
         CreateKeychainStage.instructions =>
           _HeaderStrings(title: context.l10n.catalystKeychain),
-        CreateKeychainStage.seedPhrase ||
+
+        // TODO(damian-molinski): Extract to l10n in next step
+        CreateKeychainStage.seedPhrase => _HeaderStrings(
+            title: 'Catalyst Keychain',
+            subtitle: 'Write down your 12 Catalyst  security words',
+            body: 'Make sure you create an offline backup '
+                'of your recovery phrase as well.',
+          ),
         CreateKeychainStage.checkSeedPhraseInstructions ||
         CreateKeychainStage.checkSeedPhrase ||
         CreateKeychainStage.checkSeedPhraseResult ||
