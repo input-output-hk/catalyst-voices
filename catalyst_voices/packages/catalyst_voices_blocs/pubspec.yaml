@@ -9,6 +9,9 @@ environment:
 
 dependencies:
   bloc_concurrency: ^0.2.2
+  catalyst_cardano: ^0.3.0
+  catalyst_cardano_serialization: ^0.4.0
+  catalyst_cardano_web: ^0.3.0
   catalyst_voices_brands:
     path: ../catalyst_voices_brands
   catalyst_voices_models:
