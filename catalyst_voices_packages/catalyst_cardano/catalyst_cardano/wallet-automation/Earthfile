@@ -1,14 +1,10 @@
 VERSION 0.8
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.07 AS flutter-ci
+
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.08 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:v3.2.08 AS playwright-ci
 
 deps:
-    FROM mcr.microsoft.com/playwright:v1.45.2-jammy
-    WORKDIR /wallet-automation
-
-    RUN apt-get update && apt-get install -y \
-        libnss3 libatk-bridge2.0-0 libdrm-dev libxkbcommon-dev libgbm-dev libasound-dev libatspi2.0-0 libxshmfence-dev postgresql-client xvfb python3.11 python3-pip && \
-        apt-get clean && \
-        rm -rf /var/lib/apt/lists/*
+    DO playwright-ci+SETUP --workdir=/wallet-automation
 
     COPY package.json .
     COPY package-lock.json .
@@ -51,7 +47,7 @@ package-app:
     SAVE IMAGE test-app:$tag
 
 nightly-test:
-    FROM earthly/alpine-3.20-docker-26.1.5-r0
+    FROM earthly/dind:alpine-3.20-docker-26.1.5-r0
     COPY compose.yml .
     WITH DOCKER \
         --compose compose.yml \
