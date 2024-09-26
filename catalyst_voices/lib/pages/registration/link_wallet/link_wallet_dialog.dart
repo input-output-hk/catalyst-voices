@@ -1,7 +1,7 @@
 import 'package:catalyst_cardano/catalyst_cardano.dart';
-import 'package:catalyst_voices/pages/account/creation/link_wallet/intro/link_wallet_intro_dialog.dart';
-import 'package:catalyst_voices/pages/account/creation/link_wallet/link_wallet_stage.dart';
-import 'package:catalyst_voices/pages/account/creation/link_wallet/select_wallet/select_wallet_dialog.dart';
+import 'package:catalyst_voices/pages/registration/link_wallet/intro/link_wallet_intro_dialog.dart';
+import 'package:catalyst_voices/pages/registration/link_wallet/link_wallet_stage.dart';
+import 'package:catalyst_voices/pages/registration/link_wallet/select_wallet/select_wallet_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
 import 'package:flutter/material.dart';
 
