@@ -24,7 +24,7 @@ class DeleteKeychainDialog extends StatelessWidget {
                 children: [
                   const SizedBox(height: 24),
                   Text(
-                    'Delete Category?',
+                    'Delete Keychain?',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 48),

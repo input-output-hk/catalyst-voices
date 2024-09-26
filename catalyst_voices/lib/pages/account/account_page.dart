@@ -1,5 +1,5 @@
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
-import 'package:catalyst_voices/pages/account/delete_keychain_dialog.dart';
+import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
 import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
@@ -41,7 +41,7 @@ final class AccountPage extends StatelessWidget {
                       await VoicesDialog.show<void>(
                         context: context,
                         builder: (context) {
-                          return const DeleteKeychainDialog();
+                          return const KeychainDeletedDialog();
                         },
                       );
                     },
