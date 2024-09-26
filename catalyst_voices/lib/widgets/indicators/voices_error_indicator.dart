@@ -24,7 +24,6 @@ class VoicesErrorIndicator extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-      alignment: Alignment.center,
       decoration: BoxDecoration(
         border: Border.all(
           color: Theme.of(context).colors.outlineBorderVariant!,
@@ -33,6 +32,8 @@ class VoicesErrorIndicator extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           VoicesAssets.icons.exclamation.buildIcon(
             color: Theme.of(context).colors.iconsError,
