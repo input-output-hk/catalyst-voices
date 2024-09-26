@@ -4,8 +4,8 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
-class SplashStagePanel extends StatelessWidget {
-  const SplashStagePanel({super.key});
+class InstructionsPanel extends StatelessWidget {
+  const InstructionsPanel({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,20 +16,42 @@ class SplashStagePanel extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          context.l10n.accountCreationSplashTitle,
+          context.l10n.accountInstructionsTitle,
           style: theme.textTheme.titleMedium?.copyWith(color: textColor),
         ),
         const SizedBox(height: 24),
         Text(
-          context.l10n.accountCreationSplashMessage,
+          context.l10n.accountInstructionsMessage,
           style: theme.textTheme.bodyMedium?.copyWith(color: textColor),
         ),
         const Spacer(),
-        VoicesFilledButton(
-          child: Text(context.l10n.accountCreationSplashNextButton),
-          onTap: () {
-            CreateKeychainController.of(context).goToNextStage();
-          },
+        const _Navigation(),
+      ],
+    );
+  }
+}
+
+class _Navigation extends StatelessWidget {
+  const _Navigation();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: VoicesBackButton(
+            onTap: () {
+              CreateKeychainController.of(context).goToPreviousStage();
+            },
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          child: VoicesNextButton(
+            onTap: () {
+              CreateKeychainController.of(context).goToNextStage();
+            },
+          ),
         ),
       ],
     );

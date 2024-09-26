@@ -1,1 +1,2 @@
-export 'splash_stage_panel.dart';
+export 'instructions_panel.dart';
+export 'splash_panel.dart';

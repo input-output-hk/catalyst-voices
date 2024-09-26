@@ -423,4 +423,16 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get accountCreationSplashNextButton => 'Create your Keychain now';
+
+  @override
+  String get accountInstructionsTitle => 'Great! Your Catalyst Keychain  has been created.';
+
+  @override
+  String get accountInstructionsMessage => 'On the next screen, you\'re going to see 12 words.  This is called your \"seed phrase\".     It\'s like a super secure password that only you know,  that allows you to prove ownership of your keychain.    You\'ll use it to login and recover your account on  different devices, so be sure to put it somewhere safe!\n\nYou need to write this seed phrase down with pen and paper, so get this ready.';
+
+  @override
+  String get next => 'Next';
+
+  @override
+  String get back => 'Back';
 }

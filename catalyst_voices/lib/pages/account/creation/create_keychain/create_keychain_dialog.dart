@@ -61,8 +61,8 @@ class _CreateKeychainDialogState extends State<CreateKeychainDialog> {
     required CreateKeychainStage stage,
   }) {
     return switch (stage) {
-      CreateKeychainStage.splash => const SplashStagePanel(),
-      CreateKeychainStage.instructions ||
+      CreateKeychainStage.splash => const SplashPanel(),
+      CreateKeychainStage.instructions => const InstructionsPanel(),
       CreateKeychainStage.seedPhrase ||
       CreateKeychainStage.checkSeedPhraseInstructions ||
       CreateKeychainStage.checkSeedPhrase ||
