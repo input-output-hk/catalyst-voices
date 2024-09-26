@@ -52,6 +52,12 @@ pub(crate) enum PreparedQuery {
     TxoSpentUpdateQuery,
     /// RBAC 509 Registration Insert query.
     Rbac509InsertQuery,
+    /// Chain Root For Transaction ID Insert query.
+    ChainRootForTxnIdInsertQuery,
+    /// Chain Root For Role0 Key Insert query.
+    ChainRootForRole0KeyInsertQuery,
+    /// Chain Root For Stake Address Insert query.
+    ChainRootForStakeAddressInsertQuery,
 }
 
 /// All prepared SELECT query statements.
@@ -91,6 +97,12 @@ pub(crate) struct PreparedQueries {
     txi_by_txn_hash_query: PreparedStatement,
     /// RBAC 509 Registrations.
     rbac509_registration_insert_queries: SizedBatch,
+    /// Chain Root for TX ID Insert Query..
+    chain_root_for_txn_id_insert_queries: SizedBatch,
+    /// Chain Root for Role 0 Key Insert Query..
+    chain_root_for_role0_key_insert_queries: SizedBatch,
+    /// Chain Root for Stake Address Insert Query..
+    chain_root_for_stake_address_insert_queries: SizedBatch,
 }
 
 /// An individual query response that can fail
@@ -130,7 +142,12 @@ impl PreparedQueries {
             cip36_registration_for_stake_address_insert_queries,
         ) = all_cip36_queries?;
 
-        let rbac509_registration_insert_queries = all_rbac_queries?;
+        let (
+            rbac509_registration_insert_queries,
+            chain_root_for_txn_id_insert_queries,
+            chain_root_for_role0_key_insert_queries,
+            chain_root_for_stake_address_insert_queries,
+        ) = all_rbac_queries?;
 
         Ok(Self {
             txo_insert_queries,
@@ -146,6 +163,9 @@ impl PreparedQueries {
             txo_by_stake_address_query: txo_by_stake_address_query?,
             txi_by_txn_hash_query: txi_by_txn_hash_query?,
             rbac509_registration_insert_queries,
+            chain_root_for_txn_id_insert_queries,
+            chain_root_for_role0_key_insert_queries,
+            chain_root_for_stake_address_insert_queries,
         })
     }
 
@@ -238,6 +258,15 @@ impl PreparedQueries {
             },
             PreparedQuery::TxoSpentUpdateQuery => &self.txo_spent_update_queries,
             PreparedQuery::Rbac509InsertQuery => &self.rbac509_registration_insert_queries,
+            PreparedQuery::ChainRootForTxnIdInsertQuery => {
+                &self.chain_root_for_txn_id_insert_queries
+            },
+            PreparedQuery::ChainRootForRole0KeyInsertQuery => {
+                &self.chain_root_for_role0_key_insert_queries
+            },
+            PreparedQuery::ChainRootForStakeAddressInsertQuery => {
+                &self.chain_root_for_stake_address_insert_queries
+            },
         };
 
         let mut results: Vec<QueryResult> = Vec::new();

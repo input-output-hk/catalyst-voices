@@ -1,6 +1,4 @@
-//! Insert RBAC 509 Indexed D
-//!
-//! Note, there are multiple ways TXO Data is indexed and they all happen in here.
+//! Insert RBAC 509 Registration Query.
 
 use std::{fmt::Debug, sync::Arc};
 
@@ -14,7 +12,6 @@ use crate::{
 };
 
 /// RBAC Registration Indexing query
-#[allow(dead_code)]
 const INSERT_RBAC509_QUERY: &str = include_str!("./cql/insert_rbac509.cql");
 
 /// Insert RBAC Registration Query Parameters
@@ -51,15 +48,14 @@ impl Debug for Params {
     }
 }
 
-#[allow(clippy::todo, dead_code, clippy::unused_async)]
 impl Params {
     /// Create a new record for this transaction.
     pub(super) fn new(
-        chain_root: Vec<u8>, transaction_id: Vec<u8>, slot_no: u64, txn: i16, cip509: &Cip509,
+        chain_root: &[u8], transaction_id: &[u8], slot_no: u64, txn: i16, cip509: &Cip509,
     ) -> Self {
         Params {
-            chain_root,
-            transaction_id,
+            chain_root: chain_root.to_vec(),
+            transaction_id: transaction_id.to_vec(),
             purpose: cip509.purpose.to_vec(),
             slot_no: num_bigint::BigInt::from(slot_no),
             txn,
