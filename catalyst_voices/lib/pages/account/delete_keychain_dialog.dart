@@ -1,13 +1,39 @@
+import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
 import 'package:catalyst_voices/widgets/modals/voices_desktop_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
-class DeleteKeychainDialog extends StatelessWidget {
+class DeleteKeychainDialog extends StatefulWidget {
   const DeleteKeychainDialog({super.key});
+
+  @override
+  State<DeleteKeychainDialog> createState() => _DeleteKeychainDialogState();
+}
+
+class _DeleteKeychainDialogState extends State<DeleteKeychainDialog> {
+  final _textEditingController = TextEditingController();
+  String? _errorText;
+
+  @override
+  void initState() {
+    super.initState();
+    _textEditingController.addListener(() {
+      setState(() {
+        _errorText = null;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _textEditingController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +100,9 @@ Your Catalyst account will be removed, this action cannot be undone!''',
                       SizedBox(
                         width: 300,
                         child: VoicesTextField(
+                          controller: _textEditingController,
                           decoration: VoicesTextFieldDecoration(
+                            errorText: _errorText,
                             filled: true,
                             fillColor: Theme.of(context)
                                 .colors
@@ -89,7 +117,23 @@ Your Catalyst account will be removed, this action cannot be undone!''',
                     children: [
                       VoicesFilledButton(
                         backgroundColor: Theme.of(context).colors.iconsError,
-                        onTap: () {},
+                        onTap: () async {
+                          if (_textEditingController.text ==
+                              'Remove Keychain') {
+                            // TODO(Jakub): remove keychain
+                            Navigator.of(context).pop();
+                            await VoicesDialog.show<void>(
+                              context: context,
+                              builder: (context) {
+                                return const KeychainDeletedDialog();
+                              },
+                            );
+                          } else {
+                            setState(() {
+                              _errorText = 'Text incorrect';
+                            });
+                          }
+                        },
                         child: const Text('Delete'),
                       ),
                       const SizedBox(width: 8),
