@@ -1,9 +1,11 @@
+import 'dart:async';
+
 import 'package:catalyst_cardano/catalyst_cardano.dart';
-import 'package:catalyst_voices/widgets/common/infrastructure/voices_future_builder.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class SelectWalletPanel extends StatelessWidget {
@@ -43,24 +45,43 @@ class SelectWalletPanel extends StatelessWidget {
   }
 }
 
-class _Wallets extends StatelessWidget {
+class _Wallets extends StatefulWidget {
   const _Wallets();
 
   @override
+  State<_Wallets> createState() => _WalletsState();
+}
+
+class _WalletsState extends State<_Wallets> {
+  @override
+  void initState() {
+    super.initState();
+
+    final bloc = RegistrationBloc.of(context);
+    if (bloc.cardanoWallets.value is UninitializedCardanoWallets) {
+      unawaited(bloc.refreshCardanoWallets());
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return VoicesFutureBuilder(
-      future: RegistrationBloc.of(context).getCardanoWallets,
-      dataBuilder: (context, wallets, onRetry) {
-        if (wallets.isNotEmpty) {
-          return _WalletsList(wallets: wallets);
-        } else {
-          return _WalletsEmpty(onRetry: onRetry);
-        }
-      },
-      errorBuilder: (context, error, onRetry) {
-        return _WalletsError(onRetry: onRetry);
+    return ValueListenableBuilder(
+      valueListenable: RegistrationBloc.of(context).cardanoWallets,
+      builder: (context, state, _) {
+        return switch (state) {
+          UninitializedCardanoWallets() =>
+            const Center(child: VoicesCircularProgressIndicator()),
+          CardanoWalletsList(:final wallets) => wallets.isNotEmpty
+              ? _WalletsList(wallets: wallets)
+              : _WalletsEmpty(onRetry: _onRetry),
+          CardanoWalletsError() => _WalletsError(onRetry: _onRetry),
+        };
       },
     );
+  }
+
+  void _onRetry() {
+    unawaited(RegistrationBloc.of(context).refreshCardanoWallets());
   }
 }
 
