@@ -12,6 +12,8 @@ class DeleteKeychainDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesDesktopDialog(
+      backgroundColor: Theme.of(context).colors.iconsBackground,
+      showBorder: true,
       constraints: const BoxConstraints(maxHeight: 500, maxWidth: 900),
       child: Stack(
         children: [

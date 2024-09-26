@@ -4,17 +4,30 @@ import 'package:flutter/material.dart';
 
 class VoicesDesktopDialog extends StatelessWidget {
   final BoxConstraints constraints;
+  final Color? backgroundColor;
+  final bool showBorder;
   final Widget child;
 
   const VoicesDesktopDialog({
     super.key,
     this.constraints = const BoxConstraints(minWidth: 900, minHeight: 600),
+    this.backgroundColor,
+    this.showBorder = false,
     required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
     return Dialog(
+      shape: showBorder
+          ? RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(
+                color: Theme.of(context).colors.outlineBorderVariant!,
+              ),
+            )
+          : Theme.of(context).dialogTheme.shape,
+      backgroundColor: backgroundColor,
       alignment: Alignment.topCenter,
       insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 90),
       child: ConstrainedBox(
