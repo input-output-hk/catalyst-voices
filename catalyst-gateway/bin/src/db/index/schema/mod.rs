@@ -69,6 +69,21 @@ const SCHEMAS: &[(&str, &str)] = &[
         include_str!("./cql/rbac509_registration.cql"),
         "Create Table RBAC 509 Registration",
     ),
+    (
+        // RBAC 509. Chain Root For TX ID Registration Table Schema
+        include_str!("./cql/chain_root_for_txn_id.cql"),
+        "Create Table Chain Root For TX ID Registration",
+    ),
+    (
+        // RBAC 509. Chain Root For Role 0 Key Registration Table Schema
+        include_str!("./cql/chain_root_for_role0_key.cql"),
+        "Create Table Chain Root For Role 0 Key Registration",
+    ),
+    (
+        // RBAC 509. Chain Root For Stake Address Registration Table Schema
+        include_str!("./cql/chain_root_for_stake_addr.cql"),
+        "Create Table Chain Root For Stake Address Registration",
+    ),
 ];
 
 /// Get the namespace for a particular db configuration
