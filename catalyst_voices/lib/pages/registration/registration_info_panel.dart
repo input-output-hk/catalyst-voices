@@ -1,5 +1,5 @@
 import 'package:catalyst_voices/pages/registration/information_panel.dart';
-import 'package:catalyst_voices/pages/registration/task_picture.dart';
+import 'package:catalyst_voices/pages/registration/pictures/keychain_picture.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -33,7 +33,8 @@ class RegistrationInfoPanel extends StatelessWidget {
       title: headerStrings.title,
       subtitle: headerStrings.subtitle,
       body: headerStrings.body,
-      picture: const TaskKeychainPicture(),
+      picture: _RegistrationPicture(state),
+      progress: state.progress,
     );
   }
 
@@ -89,6 +90,52 @@ class RegistrationInfoPanel extends StatelessWidget {
       Recover() => _HeaderStrings(title: 'TODO'),
       CreateKeychain(:final stage) => buildKeychainStageHeader(stage),
       WalletLink(:final stage) => buildWalletLinkStageHeader(stage),
+    };
+  }
+}
+
+class _RegistrationPicture extends StatelessWidget {
+  final RegistrationState state;
+
+  const _RegistrationPicture(this.state);
+
+  @override
+  Widget build(BuildContext context) {
+    Widget buildKeychainStagePicture(CreateKeychainStage stage) {
+      return switch (stage) {
+        CreateKeychainStage.splash ||
+        CreateKeychainStage.instructions =>
+          const KeychainPicture(),
+        CreateKeychainStage.seedPhrase ||
+        CreateKeychainStage.checkSeedPhraseInstructions ||
+        CreateKeychainStage.checkSeedPhrase ||
+        CreateKeychainStage.checkSeedPhraseResult =>
+          const KeychainPicture(),
+        CreateKeychainStage.unlockPasswordInstructions ||
+        CreateKeychainStage.unlockPasswordCreate ||
+        CreateKeychainStage.created =>
+          const KeychainPicture(),
+      };
+    }
+
+    Widget buildWalletLinkStagePicture(WalletLinkStage stage) {
+      return switch (stage) {
+        WalletLinkStage.intro ||
+        WalletLinkStage.selectWallet ||
+        WalletLinkStage.walletDetails ||
+        WalletLinkStage.rolesChooser ||
+        WalletLinkStage.rolesSummary ||
+        WalletLinkStage.rbacTransaction =>
+          const KeychainPicture(),
+      };
+    }
+
+    return switch (state) {
+      GetStarted() => const KeychainPicture(),
+      FinishAccountCreation() => const KeychainPicture(),
+      Recover() => const KeychainPicture(),
+      CreateKeychain(:final stage) => buildKeychainStagePicture(stage),
+      WalletLink(:final stage) => buildWalletLinkStagePicture(stage),
     };
   }
 }

@@ -12,30 +12,26 @@ import 'package:equatable/equatable.dart';
 ///     - [WalletLink] where user is linking Keychain with wallet.
 sealed class RegistrationState extends Equatable {
   const RegistrationState();
+
+  double? get progress => null;
+
+  @override
+  List<Object?> get props => [];
 }
 
 /// User decides where to go here [CreateNew] or [Recover] route.
 final class GetStarted extends RegistrationState {
   const GetStarted();
-
-  @override
-  List<Object?> get props => [];
 }
 
 /// When [CreateKeychain] is completed but [WalletLink] not.
 final class FinishAccountCreation extends RegistrationState {
   const FinishAccountCreation();
-
-  @override
-  List<Object?> get props => [];
 }
 
 /// User enters existing seed phrase here.
 final class Recover extends RegistrationState {
   const Recover();
-
-  @override
-  List<Object?> get props => [];
 }
 
 /// Encapsulates entire process of registration.
@@ -52,7 +48,14 @@ final class CreateKeychain extends CreateNew {
   });
 
   @override
-  List<Object?> get props => [stage];
+  double get progress {
+    final current = CreateKeychainStage.values.indexOf(stage);
+    final total = CreateKeychainStage.values.length;
+    return current / total;
+  }
+
+  @override
+  List<Object?> get props => super.props + [stage];
 }
 
 /// Linking existing keychain with wallet.
@@ -64,5 +67,12 @@ final class WalletLink extends CreateNew {
   });
 
   @override
-  List<Object?> get props => [stage];
+  double get progress {
+    final current = WalletLinkStage.values.indexOf(stage);
+    final total = WalletLinkStage.values.length;
+    return current / total;
+  }
+
+  @override
+  List<Object?> get props => super.props + [stage];
 }
