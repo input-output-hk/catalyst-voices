@@ -2,6 +2,7 @@ import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices_blocs/src/registration/registration_navigator.dart';
 import 'package:catalyst_voices_blocs/src/registration/registration_state.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/foundation.dart';
 
@@ -77,7 +78,10 @@ final class RegistrationWalletLinkController
   @override
   Future<void> refreshCardanoWallets() async {
     try {
-      final wallets = await CatalystCardano.instance.getWallets();
+      _wallets.value = const UninitializedCardanoWallets();
+
+      final wallets =
+          await CatalystCardano.instance.getWallets().withMinimumDelay();
       _wallets.value = CardanoWalletsList(wallets: wallets);
     } catch (error) {
       _wallets.value = CardanoWalletsError(error: error);

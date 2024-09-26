@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/widgets/indicators/voices_circular_progress_indicator.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_error_indicator.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 /// A callback that generates a new [Future] of type [T].
@@ -122,10 +123,7 @@ class _VoicesFutureBuilderState<T extends Object>
   }
 
   Future<T> _makeDelayedFuture() async {
-    final delay = Future<void>.delayed(widget.minimumDelay);
-    final result = widget.future();
-    await Future.wait([delay, result]);
-    return result;
+    return widget.future().withMinimumDelay();
   }
 }
 
