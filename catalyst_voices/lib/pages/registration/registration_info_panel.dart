@@ -76,8 +76,7 @@ class RegistrationInfoPanel extends StatelessWidget {
             title: context.l10n.walletLinkHeader,
             subtitle: context.l10n.walletLinkRolesSubheader,
           ),
-        WalletLinkStage.rbacTransaction =>
-          _HeaderStrings(
+        WalletLinkStage.rbacTransaction => _HeaderStrings(
             title: context.l10n.walletLinkHeader,
             subtitle: context.l10n.walletLinkTransactionSubheader,
           ),
