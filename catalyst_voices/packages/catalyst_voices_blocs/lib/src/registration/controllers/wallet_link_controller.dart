@@ -2,14 +2,13 @@ import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices_blocs/src/registration/registration_navigator.dart';
 import 'package:catalyst_voices_blocs/src/registration/registration_state.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:flutter/foundation.dart';
 
 // ignore: one_member_abstracts
 abstract interface class WalletLinkController {
   Future<List<CardanoWallet>> getCardanoWallets();
 }
 
-final class RegistrationWalletLinkController extends ChangeNotifier
+final class RegistrationWalletLinkController
     implements WalletLinkController, RegistrationNavigator<WalletLink> {
   WalletLinkStage _stage;
 
