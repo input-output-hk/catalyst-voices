@@ -434,20 +434,28 @@
   "@learnMore": {
     "description": "A label on a clickable element that can show more content."
   },
-  "walletLink_header": "Link keys to your Catalyst Keychain",
-  "@walletLink_header": {
+  "walletLinkHeader": "Link keys to your Catalyst Keychain",
+  "@walletLinkHeader": {
     "description": "A header in link wallet flow in registration."
   },
-  "walletLink_subheader": "Link your Cardano wallet",
-  "@walletLink_subheader": {
-    "description": "A subheader in link wallet flow in registration."
+  "walletLinkWalletSubheader": "Link your Cardano wallet",
+  "@walletLinkWalletSubheader": {
+    "description": "A subheader in link wallet flow in registration for wallet connection."
   },
-  "walletLink_intro_title": "Link Cardano Wallet & Catalyst Roles to you Catalyst Keychain.",
-  "@walletLink_intro_title": {
+  "walletLinkRolesSubheader": "Select your Catalyst roles",
+  "@walletLinkRolesSubheader": {
+    "description": "A subheader in link wallet flow in registration for role chooser state."
+  },
+  "walletLinkTransactionSubheader": "Sign your Catalyst roles to the\nCardano mainnet",
+  "@walletLinkTransactionSubheader": {
+    "description": "A subheader in link wallet flow in registration for RBAC transaction."
+  },
+  "walletLinkIntroTitle": "Link Cardano Wallet & Catalyst Roles to you Catalyst Keychain.",
+  "@walletLinkIntroTitle": {
     "description": "A title in link wallet flow on intro screen."
   },
-  "walletLink_intro_content": "You're almost there! This is the final and most important step in your account setup.\n\nWe're going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.\n\nRole Keys allow you to enter new spaces, discover new ways to participate, and unlock new ways to earn rewards.\n\nWe'll start with your Voter Key by default. You can decide to add a Proposer Key and Drep key if you want, or you can always add them later.",
-  "@walletLink_intro_content": {
+  "walletLinkIntroContent": "You're almost there! This is the final and most important step in your account setup.\n\nWe're going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.\n\nRole Keys allow you to enter new spaces, discover new ways to participate, and unlock new ways to earn rewards.\n\nWe'll start with your Voter Key by default. You can decide to add a Proposer Key and Drep key if you want, or you can always add them later.",
+  "@walletLinkIntroContent": {
     "description": "A message (content) in link wallet flow on intro screen."
   },
   "accountCreationCreate": "Create a new \u2028Catalyst Keychain",
