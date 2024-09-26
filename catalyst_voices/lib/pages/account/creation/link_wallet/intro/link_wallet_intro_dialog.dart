@@ -20,12 +20,12 @@ class LinkWalletIntroDialog extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            context.l10n.walletLink_header,
+            context.l10n.walletLinkHeader,
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 12),
           Text(
-            context.l10n.walletLink_subheader,
+            context.l10n.walletLinkSubheader,
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 50),
@@ -41,12 +41,12 @@ class LinkWalletIntroDialog extends StatelessWidget {
         children: [
           const SizedBox(height: 24),
           Text(
-            context.l10n.walletLink_intro_title,
+            context.l10n.walletLinkIntroTitle,
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: 24),
           Text(
-            context.l10n.walletLink_intro_content,
+            context.l10n.walletLinkIntroContent,
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const Spacer(),
