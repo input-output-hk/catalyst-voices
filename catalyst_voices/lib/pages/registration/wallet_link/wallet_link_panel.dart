@@ -1,9 +1,9 @@
-import 'package:catalyst_voices/pages/registration/link_wallet/intro/intro_panel.dart';
-import 'package:catalyst_voices/pages/registration/link_wallet/rbac_transaction/rbac_transaction_panel.dart';
-import 'package:catalyst_voices/pages/registration/link_wallet/roles_chooser/roles_chooser_panel.dart';
-import 'package:catalyst_voices/pages/registration/link_wallet/roles_summary/roles_summary_panel.dart';
-import 'package:catalyst_voices/pages/registration/link_wallet/select_wallet/select_wallet_panel.dart';
-import 'package:catalyst_voices/pages/registration/link_wallet/wallet_details/wallet_details_panel.dart';
+import 'package:catalyst_voices/pages/registration/wallet_link/intro/intro_panel.dart';
+import 'package:catalyst_voices/pages/registration/wallet_link/rbac_transaction/rbac_transaction_panel.dart';
+import 'package:catalyst_voices/pages/registration/wallet_link/roles_chooser/roles_chooser_panel.dart';
+import 'package:catalyst_voices/pages/registration/wallet_link/roles_summary/roles_summary_panel.dart';
+import 'package:catalyst_voices/pages/registration/wallet_link/select_wallet/select_wallet_panel.dart';
+import 'package:catalyst_voices/pages/registration/wallet_link/wallet_details/wallet_details_panel.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
