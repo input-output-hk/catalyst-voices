@@ -12,7 +12,7 @@ void main() {
       await tester.pumpApp(
         VoicesFutureBuilder<String>(
           future: () async => 'Test Data',
-          dataBuilder: (_, __) => const Text('Success'),
+          dataBuilder: (_, __, ___) => const Text('Success'),
         ),
       );
 
@@ -35,7 +35,7 @@ void main() {
       await tester.pumpApp(
         VoicesFutureBuilder<String>(
           future: () async => throw Exception('Error'),
-          dataBuilder: (_, __) => const SizedBox.shrink(),
+          dataBuilder: (_, __, ___) => const SizedBox.shrink(),
           errorBuilder: (_, __, ___) => const Text('Error Occurred'),
         ),
       );

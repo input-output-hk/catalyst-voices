@@ -50,10 +50,14 @@ class _Wallets extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesFutureBuilder(
       future: () async => RegistrationBloc.of(context).getCardanoWallets(),
-      dataBuilder: (context, wallets) {
-        return _WalletsList(wallets: wallets);
+      dataBuilder: (context, wallets, onRetry) {
+        if (wallets.isNotEmpty) {
+          return _WalletsList(wallets: wallets);
+        } else {
+          return _WalletsEmpty(onRetry: onRetry);
+        }
       },
-      errorBuilder: (context, onRetry, error) {
+      errorBuilder: (context, error, onRetry) {
         return _WalletsError(onRetry: onRetry);
       },
     );
@@ -79,6 +83,26 @@ class _WalletsList extends StatelessWidget {
           },
         );
       },
+    );
+  }
+}
+
+class _WalletsEmpty extends StatelessWidget {
+  final VoidCallback onRetry;
+
+  const _WalletsEmpty({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: SizedBox(
+        width: double.infinity,
+        child: VoicesErrorIndicator(
+          message: context.l10n.noWalletFound,
+          onRetry: onRetry,
+        ),
+      ),
     );
   }
 }

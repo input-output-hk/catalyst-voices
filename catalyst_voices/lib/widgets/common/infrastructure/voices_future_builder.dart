@@ -7,9 +7,13 @@ import 'package:flutter/material.dart';
 typedef VoicesFutureProvider<T extends Object> = Future<T> Function();
 
 /// A callback that builds a widget from a [T] value.
+///
+/// Call [onRetry] if your data state contains
+/// the retry button, it will reload the widget.
 typedef VoicesFutureDataBuilder<T> = Widget Function(
   BuildContext context,
   T value,
+  VoidCallback onRetry,
 );
 
 /// A callback that builds a widget in an error state.
@@ -18,8 +22,8 @@ typedef VoicesFutureDataBuilder<T> = Widget Function(
 /// the retry button, it will reload the widget.
 typedef VoicesFutureErrorBuilder = Widget Function(
   BuildContext context,
-  VoidCallback onRetry,
   Object? error,
+  VoidCallback onRetry,
 );
 
 /// A [FutureBuilder] which simplifies handling a [Future] gently.
@@ -96,7 +100,7 @@ class _VoicesFutureBuilderState<T extends Object>
       future: _future,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return widget.errorBuilder?.call(context, _onRetry, snapshot.error) ??
+          return widget.errorBuilder?.call(context, snapshot.error, _onRetry) ??
               _Error(onRetry: _onRetry);
         }
 
@@ -105,7 +109,7 @@ class _VoicesFutureBuilderState<T extends Object>
           return widget.loaderBuilder?.call(context) ?? const _Loader();
         }
 
-        return widget.dataBuilder(context, data);
+        return widget.dataBuilder(context, data, _onRetry);
       },
     );
   }
