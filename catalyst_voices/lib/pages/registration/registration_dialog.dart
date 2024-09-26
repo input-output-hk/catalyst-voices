@@ -1,8 +1,8 @@
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/pages/registration/create_keychain/create_keychain_panel.dart';
 import 'package:catalyst_voices/pages/registration/get_started/get_started_panel.dart';
-import 'package:catalyst_voices/pages/registration/link_wallet/wallet_link_panel.dart';
 import 'package:catalyst_voices/pages/registration/registration_info_panel.dart';
+import 'package:catalyst_voices/pages/registration/wallet_link/wallet_link_panel.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';

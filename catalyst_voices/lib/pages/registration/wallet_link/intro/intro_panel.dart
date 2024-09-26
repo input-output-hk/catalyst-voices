@@ -14,12 +14,12 @@ class IntroPanel extends StatelessWidget {
       children: [
         const SizedBox(height: 24),
         Text(
-          context.l10n.walletLink_intro_title,
+          context.l10n.walletLinkIntroTitle,
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: 24),
         Text(
-          context.l10n.walletLink_intro_content,
+          context.l10n.walletLinkIntroContent,
           style: Theme.of(context).textTheme.bodyMedium,
         ),
         const Spacer(),
