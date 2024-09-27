@@ -9,5 +9,6 @@ export 'responsive/responsive_builder.dart';
 export 'responsive/responsive_child.dart';
 export 'responsive/responsive_padding.dart';
 export 'utils/date_time_ext.dart';
+export 'utils/future_ext.dart';
 export 'utils/iterable_ext.dart';
 export 'utils/typedefs.dart';
