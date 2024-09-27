@@ -5,8 +5,8 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
+import 'package:result_type/result_type.dart';
 
 class SelectWalletPanel extends StatelessWidget {
   const SelectWalletPanel({super.key});
@@ -58,7 +58,7 @@ class _WalletsState extends State<_Wallets> {
     super.initState();
 
     final bloc = RegistrationBloc.of(context);
-    if (bloc.cardanoWallets.value is UninitializedCardanoWallets) {
+    if (bloc.cardanoWallets.value == null) {
       unawaited(bloc.refreshCardanoWallets());
     }
   }
@@ -67,14 +67,13 @@ class _WalletsState extends State<_Wallets> {
   Widget build(BuildContext context) {
     return ValueListenableBuilder(
       valueListenable: RegistrationBloc.of(context).cardanoWallets,
-      builder: (context, state, _) {
-        return switch (state) {
-          UninitializedCardanoWallets() =>
-            const Center(child: VoicesCircularProgressIndicator()),
-          CardanoWalletsList(:final wallets) => wallets.isNotEmpty
-              ? _WalletsList(wallets: wallets)
+      builder: (context, result, _) {
+        return switch (result) {
+          Success(:final value) => value.isNotEmpty
+              ? _WalletsList(wallets: value)
               : _WalletsEmpty(onRetry: _onRetry),
-          CardanoWalletsError() => _WalletsError(onRetry: _onRetry),
+          Failure() => _WalletsError(onRetry: _onRetry),
+          _ => const Center(child: VoicesCircularProgressIndicator()),
         };
       },
     );
