@@ -1,11 +1,25 @@
+import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices_blocs/src/registration/registration_navigator.dart';
 import 'package:catalyst_voices_blocs/src/registration/registration_state.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:flutter/foundation.dart';
+import 'package:result_type/result_type.dart';
 
-abstract interface class WalletLinkController {}
+// ignore: one_member_abstracts
+abstract interface class WalletLinkController {
+  /// A value listenable with available cardano wallets.
+  ValueListenable<Result<List<CardanoWallet>, Exception>?> get cardanoWallets;
+
+  /// Refreshes the [cardanoWallets].
+  Future<void> refreshCardanoWallets();
+}
 
 final class RegistrationWalletLinkController
     implements WalletLinkController, RegistrationNavigator<WalletLink> {
+  final ValueNotifier<Result<List<CardanoWallet>, Exception>?> _wallets =
+      ValueNotifier(null);
+
   WalletLinkStage _stage;
 
   RegistrationWalletLinkController({
@@ -56,5 +70,22 @@ final class RegistrationWalletLinkController
     }
 
     return previousStep;
+  }
+
+  @override
+  ValueListenable<Result<List<CardanoWallet>, Exception>?> get cardanoWallets =>
+      _wallets;
+
+  @override
+  Future<void> refreshCardanoWallets() async {
+    try {
+      _wallets.value = null;
+
+      final wallets =
+          await CatalystCardano.instance.getWallets().withMinimumDelay();
+      _wallets.value = Success(wallets);
+    } on Exception catch (error) {
+      _wallets.value = Failure(error);
+    }
   }
 }
