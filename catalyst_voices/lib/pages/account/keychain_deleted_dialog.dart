@@ -9,45 +9,40 @@ class KeychainDeletedDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesDesktopDialog(
+    return VoicesSinglePaneDialog(
       backgroundColor: Theme.of(context).colors.iconsBackground,
       showBorder: true,
       constraints: const BoxConstraints(maxHeight: 260, maxWidth: 900),
-      child: Stack(
-        children: [
-          SizedBox(
-            width: double.infinity,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  const SizedBox(height: 24),
-                  Text(
-                    context.l10n.keychainDeletedDialogTitle,
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 48),
-                  Text(
-                    context.l10n.keychainDeletedDialogSubtitle,
-                    style: Theme.of(context).textTheme.titleMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 32),
-                  Text(
-                    context.l10n.keychainDeletedDialogInfo,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                  VoicesFilledButton(
-                    onTap: () => Navigator.of(context).pop(),
-                    child: Text(context.l10n.close),
-                  ),
-                ],
+      child: SizedBox(
+        width: double.infinity,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 24),
+              Text(
+                context.l10n.keychainDeletedDialogTitle,
+                style: Theme.of(context).textTheme.titleLarge,
               ),
-            ),
+              const SizedBox(height: 48),
+              Text(
+                context.l10n.keychainDeletedDialogSubtitle,
+                style: Theme.of(context).textTheme.titleMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              Text(
+                context.l10n.keychainDeletedDialogInfo,
+                style: Theme.of(context).textTheme.bodyMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              VoicesFilledButton(
+                onTap: () => Navigator.of(context).pop(),
+                child: Text(context.l10n.close),
+              ),
+            ],
           ),
-          const DialogCloseButton(),
-        ],
+        ),
       ),
     );
   }

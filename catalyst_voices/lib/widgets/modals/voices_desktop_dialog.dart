@@ -2,14 +2,96 @@ import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
-class VoicesDesktopDialog extends StatelessWidget {
+/// Commonly used structure for desktop dialogs.
+///
+/// Keep in mind that this dialog has fixed size of 900x600 and
+/// is always adding close button in top right corner.
+class VoicesSinglePaneDialog extends StatelessWidget {
   final BoxConstraints constraints;
   final Color? backgroundColor;
   final bool showBorder;
   final Widget child;
 
-  const VoicesDesktopDialog({
+  const VoicesSinglePaneDialog({
     super.key,
+    this.constraints = const BoxConstraints(minWidth: 900, minHeight: 600),
+    this.backgroundColor,
+    this.showBorder = false,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return _VoicesDesktopDialog(
+      backgroundColor: Theme.of(context).colors.iconsBackground,
+      showBorder: true,
+      constraints: constraints,
+      child: Stack(
+        children: [
+          child,
+          const _DialogCloseButton(),
+        ],
+      ),
+    );
+  }
+}
+
+/// Commonly used structure for desktop dialogs.
+///
+/// Keep in mind that this dialog has fixed size of 900x600 and
+/// is always adding close button in top right corner.
+class VoicesTwoPaneDialog extends StatelessWidget {
+  final Widget left;
+  final Widget right;
+
+  const VoicesTwoPaneDialog({
+    super.key,
+    required this.left,
+    required this.right,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return _VoicesDesktopDialog(
+      constraints: const BoxConstraints.tightFor(width: 900, height: 600),
+      child: Stack(
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: theme.colors.elevationsOnSurfaceNeutralLv1Grey,
+                  ),
+                  child: left,
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  child: right,
+                ),
+              ),
+            ],
+          ),
+          const _DialogCloseButton(),
+        ],
+      ),
+    );
+  }
+}
+
+class _VoicesDesktopDialog extends StatelessWidget {
+  final BoxConstraints constraints;
+  final Color? backgroundColor;
+  final bool showBorder;
+  final Widget child;
+
+  const _VoicesDesktopDialog({
     this.constraints = const BoxConstraints(minWidth: 900, minHeight: 600),
     this.backgroundColor,
     this.showBorder = false,
@@ -38,57 +120,8 @@ class VoicesDesktopDialog extends StatelessWidget {
   }
 }
 
-/// Commonly used structure for desktop dialogs.
-///
-/// Keep in mind that this dialog has fixed size of 900x600 and
-/// is always adding close button in top right corner.
-class VoicesDesktopPanelsDialog extends StatelessWidget {
-  final Widget left;
-  final Widget right;
-
-  const VoicesDesktopPanelsDialog({
-    super.key,
-    required this.left,
-    required this.right,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return VoicesDesktopDialog(
-      constraints: const BoxConstraints.tightFor(width: 900, height: 600),
-      child: Stack(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: theme.colors.elevationsOnSurfaceNeutralLv1Grey,
-                  ),
-                  child: left,
-                ),
-              ),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  child: right,
-                ),
-              ),
-            ],
-          ),
-          const DialogCloseButton(),
-        ],
-      ),
-    );
-  }
-}
-
-class DialogCloseButton extends StatelessWidget {
-  const DialogCloseButton({super.key});
+class _DialogCloseButton extends StatelessWidget {
+  const _DialogCloseButton();
 
   @override
   Widget build(BuildContext context) {

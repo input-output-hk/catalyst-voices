@@ -41,101 +41,96 @@ class _DeleteKeychainDialogState extends State<DeleteKeychainDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesDesktopDialog(
+    return VoicesSinglePaneDialog(
       backgroundColor: Theme.of(context).colors.iconsBackground,
       showBorder: true,
       constraints: const BoxConstraints(maxHeight: 500, maxWidth: 900),
-      child: Stack(
-        children: [
-          SizedBox(
-            width: double.infinity,
-            child: SingleChildScrollView(
-              child: Column(
+      child: SizedBox(
+        width: double.infinity,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 24),
+              Text(
+                context.l10n.deleteKeychainDialogTitle,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              const SizedBox(height: 48),
+              Text(
+                context.l10n.deleteKeychainDialogSubtitle,
+                style: Theme.of(context).textTheme.titleMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 32),
+              Wrap(
                 children: [
-                  const SizedBox(height: 24),
-                  Text(
-                    context.l10n.deleteKeychainDialogTitle,
-                    style: Theme.of(context).textTheme.titleLarge,
+                  VoicesAssets.icons.exclamation.buildIcon(
+                    color: Theme.of(context).colors.iconsError,
                   ),
-                  const SizedBox(height: 48),
-                  Text(
-                    context.l10n.deleteKeychainDialogSubtitle,
-                    style: Theme.of(context).textTheme.titleMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 32),
-                  Wrap(
-                    children: [
-                      VoicesAssets.icons.exclamation.buildIcon(
-                        color: Theme.of(context).colors.iconsError,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 2, left: 8),
-                        child: Text(
-                          context.l10n.deleteKeychainDialogWarning,
-                          style: Theme.of(context).textTheme.titleSmall,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    context.l10n.deleteKeychainDialogWarningInfo,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 48),
-                  Text(
-                    context.l10n.deleteKeychainDialogTypingInfo,
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  const SizedBox(height: 24),
-                  Wrap(
-                    direction: Axis.vertical,
-                    children: [
-                      Text(
-                        context.l10n.deleteKeychainDialogInputLabel,
-                        style: Theme.of(context).textTheme.titleSmall,
-                      ),
-                      const SizedBox(height: 2),
-                      SizedBox(
-                        width: 300,
-                        child: VoicesTextField(
-                          controller: _textEditingController,
-                          decoration: VoicesTextFieldDecoration(
-                            errorText: _errorText,
-                            errorMaxLines: 2,
-                            filled: true,
-                            fillColor: Theme.of(context)
-                                .colors
-                                .elevationsOnSurfaceNeutralLv1White,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  Wrap(
-                    children: [
-                      VoicesFilledButton(
-                        backgroundColor: Theme.of(context).colors.iconsError,
-                        onTap: () async => _onRemoveKeychainTap(),
-                        child: Text(context.l10n.delete),
-                      ),
-                      const SizedBox(width: 8),
-                      VoicesTextButton.custom(
-                        color: Theme.of(context).colors.iconsError,
-                        onTap: () => Navigator.of(context).pop(),
-                        child: Text(context.l10n.cancelButtonText),
-                      ),
-                    ],
+                  Padding(
+                    padding: const EdgeInsets.only(top: 2, left: 8),
+                    child: Text(
+                      context.l10n.deleteKeychainDialogWarning,
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
                   ),
                 ],
               ),
-            ),
+              const SizedBox(height: 8),
+              Text(
+                context.l10n.deleteKeychainDialogWarningInfo,
+                style: Theme.of(context).textTheme.bodyMedium,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 48),
+              Text(
+                context.l10n.deleteKeychainDialogTypingInfo,
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              const SizedBox(height: 24),
+              Wrap(
+                direction: Axis.vertical,
+                children: [
+                  Text(
+                    context.l10n.deleteKeychainDialogInputLabel,
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                  const SizedBox(height: 2),
+                  SizedBox(
+                    width: 300,
+                    child: VoicesTextField(
+                      controller: _textEditingController,
+                      decoration: VoicesTextFieldDecoration(
+                        errorText: _errorText,
+                        errorMaxLines: 2,
+                        filled: true,
+                        fillColor: Theme.of(context)
+                            .colors
+                            .elevationsOnSurfaceNeutralLv1White,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Wrap(
+                children: [
+                  VoicesFilledButton(
+                    backgroundColor: Theme.of(context).colors.iconsError,
+                    onTap: () async => _onRemoveKeychainTap(),
+                    child: Text(context.l10n.delete),
+                  ),
+                  const SizedBox(width: 8),
+                  VoicesTextButton.custom(
+                    color: Theme.of(context).colors.iconsError,
+                    onTap: () => Navigator.of(context).pop(),
+                    child: Text(context.l10n.cancelButtonText),
+                  ),
+                ],
+              ),
+            ],
           ),
-          const DialogCloseButton(),
-        ],
+        ),
       ),
     );
   }
