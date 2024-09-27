@@ -1,5 +1,4 @@
 //! Index Role-Based Access Control (RBAC) Registration.
-#![allow(dead_code)]
 
 mod insert_chain_root_for_role0_key;
 mod insert_chain_root_for_stake_address;
@@ -25,16 +24,22 @@ type TransactionIdHash = Vec<u8>;
 /// Chain Root Hash
 type ChainRootHash = TransactionIdHash;
 /// Slot Number
+#[allow(dead_code)]
 type SlotNumber = u64;
 /// TX Index
+#[allow(dead_code)]
 type TxIndex = i16;
 /// Role 0 Key
+#[allow(dead_code)]
 type Role0Key = Vec<u8>;
 /// Stake Address
+#[allow(dead_code)]
 type StakeAddress = Vec<u8>;
 /// Cached Values for `Role0Key` lookups.
+#[allow(dead_code)]
 type Role0KeyValue = (ChainRootHash, SlotNumber, TxIndex);
 /// Cached Values for `StakeAddress` lookups.
+#[allow(dead_code)]
 type StakeAddressValue = (ChainRootHash, SlotNumber, TxIndex);
 
 /// Cached Chain Root By Transaction ID.
