@@ -8,11 +8,11 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class DeleteKeychainDialog extends StatefulWidget {
-  final VoidCallback? onDeleteKeychain;
+  final VoidCallback? onRemoveKeychainConfirmed;
 
   const DeleteKeychainDialog({
     super.key,
-    this.onDeleteKeychain,
+    this.onRemoveKeychainConfirmed,
   });
 
   @override
@@ -138,7 +138,7 @@ class _DeleteKeychainDialogState extends State<DeleteKeychainDialog> {
   Future<void> _onRemoveKeychainTap() async {
     if (_textEditingController.text ==
         context.l10n.deleteKeychainDialogRemovingPhrase) {
-      widget.onDeleteKeychain?.call();
+      widget.onRemoveKeychainConfirmed?.call();
     } else {
       setState(() {
         _errorText = context.l10n.deleteKeychainDialogErrorText;

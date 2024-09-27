@@ -43,7 +43,7 @@ final class AccountPage extends StatelessWidget {
                         context: context,
                         builder: (context) {
                           return DeleteKeychainDialog(
-                            onDeleteKeychain: () async {
+                            onRemoveKeychainConfirmed: () async {
                               // TODO(Jakub): remove keychain
                               Navigator.of(context).pop();
                               await VoicesDialog.show<void>(
