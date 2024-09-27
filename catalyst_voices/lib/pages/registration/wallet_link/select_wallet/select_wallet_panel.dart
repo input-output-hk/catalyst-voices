@@ -6,13 +6,24 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:result_type/result_type.dart';
 
-class SelectWalletPanel extends StatelessWidget {
+class SelectWalletPanel extends StatefulWidget {
   final Result<List<CardanoWallet>, Exception>? walletsResult;
 
   const SelectWalletPanel({
     super.key,
     this.walletsResult,
   });
+
+  @override
+  State<SelectWalletPanel> createState() => _SelectWalletPanelState();
+}
+
+class _SelectWalletPanelState extends State<SelectWalletPanel> {
+  @override
+  void initState() {
+    super.initState();
+    _sendRefreshEvent();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +41,12 @@ class SelectWalletPanel extends StatelessWidget {
           style: Theme.of(context).textTheme.bodyMedium,
         ),
         const SizedBox(height: 40),
-        Expanded(child: _Wallets(result: walletsResult)),
+        Expanded(
+          child: _Wallets(
+            result: widget.walletsResult,
+            onRefreshTap: _sendRefreshEvent,
+          ),
+        ),
         const SizedBox(height: 24),
         VoicesBackButton(
           onTap: () {
@@ -46,13 +62,20 @@ class SelectWalletPanel extends StatelessWidget {
       ],
     );
   }
+
+  void _sendRefreshEvent() {
+    const event = RefreshCardanoWalletsEvent();
+    RegistrationBloc.of(context).add(event);
+  }
 }
 
 class _Wallets extends StatelessWidget {
   final Result<List<CardanoWallet>, Exception>? result;
+  final VoidCallback onRefreshTap;
 
   const _Wallets({
     this.result,
+    required this.onRefreshTap,
   });
 
   @override
@@ -60,15 +83,10 @@ class _Wallets extends StatelessWidget {
     return switch (result) {
       Success(:final value) => value.isNotEmpty
           ? _WalletsList(wallets: value)
-          : _WalletsEmpty(onRetry: () => _sendRefreshEvent(context)),
-      Failure() => _WalletsError(onRetry: () => _sendRefreshEvent(context)),
+          : _WalletsEmpty(onRetry: onRefreshTap),
+      Failure() => _WalletsError(onRetry: onRefreshTap),
       _ => const Center(child: VoicesCircularProgressIndicator()),
     };
-  }
-
-  void _sendRefreshEvent(BuildContext context) {
-    const event = RefreshCardanoWalletsEvent();
-    RegistrationBloc.of(context).add(event);
   }
 }
 
