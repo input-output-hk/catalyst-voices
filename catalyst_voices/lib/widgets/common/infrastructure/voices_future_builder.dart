@@ -42,14 +42,14 @@ class VoicesFutureBuilder<T extends Object> extends StatefulWidget {
   /// when the [future] finishes with an error.
   ///
   /// If not provided then [VoicesErrorIndicator] is used instead.
-  final VoicesFutureErrorBuilder? errorBuilder;
+  final VoicesFutureErrorBuilder errorBuilder;
 
   /// The builder called to build a child
   /// when the [future] hasn't finished yet.
   ///
   /// If not provided then a centered [VoicesCircularProgressIndicator]
   /// is used instead.
-  final WidgetBuilder? loaderBuilder;
+  final WidgetBuilder loaderBuilder;
 
   /// The minimum duration during which the loader state is shown.
   ///
@@ -64,8 +64,8 @@ class VoicesFutureBuilder<T extends Object> extends StatefulWidget {
     super.key,
     required this.future,
     required this.dataBuilder,
-    this.errorBuilder,
-    this.loaderBuilder,
+    this.errorBuilder = _defaultErrorBuilder,
+    this.loaderBuilder = _defaultLoaderBuilder,
     this.minimumDelay = const Duration(milliseconds: 300),
   });
 
@@ -101,13 +101,12 @@ class _VoicesFutureBuilderState<T extends Object>
       future: _future,
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return widget.errorBuilder?.call(context, snapshot.error, _onRetry) ??
-              _Error(onRetry: _onRetry);
+          return widget.errorBuilder(context, snapshot.error, _onRetry);
         }
 
         final data = snapshot.data;
         if (data == null) {
-          return widget.loaderBuilder?.call(context) ?? const _Loader();
+          return widget.loaderBuilder(context);
         }
 
         return widget.dataBuilder(context, data, _onRetry);
@@ -123,8 +122,20 @@ class _VoicesFutureBuilderState<T extends Object>
   }
 
   Future<T> _makeDelayedFuture() async {
-    return widget.future().withMinimumDelay();
+    return widget.future().withMinimumDelay(widget.minimumDelay);
   }
+}
+
+Widget _defaultErrorBuilder(
+  BuildContext context,
+  Object? error,
+  VoidCallback onRetry,
+) {
+  return _Error(onRetry: onRetry);
+}
+
+Widget _defaultLoaderBuilder(BuildContext context) {
+  return const _Loader();
 }
 
 class _Error extends StatelessWidget {

@@ -6,11 +6,11 @@ extension FutureExt<T> on Future<T> {
   static const Duration minimumDelay = Duration(milliseconds: 300);
 
   /// Returns the result of awaiting the [Future]
-  /// but applies a [minimumDelay] to it.
-  Future<T> withMinimumDelay() async {
-    final delay = Future<void>.delayed(minimumDelay);
+  /// but applies [delay] to it or [minimumDelay] if [delay] is null.
+  Future<T> withMinimumDelay([Duration? delay]) async {
+    final delayed = Future<void>.delayed(delay ?? minimumDelay);
     final result = await this;
-    await delay;
+    await delayed;
     return result;
   }
 }
