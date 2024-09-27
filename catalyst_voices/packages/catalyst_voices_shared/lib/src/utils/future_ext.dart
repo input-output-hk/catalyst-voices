@@ -7,8 +7,8 @@ extension FutureExt<T> on Future<T> {
 
   /// Returns the result of awaiting the [Future]
   /// but applies [delay] to it or [minimumDelay] if [delay] is null.
-  Future<T> withMinimumDelay([Duration? delay]) async {
-    final delayed = Future<void>.delayed(delay ?? minimumDelay);
+  Future<T> withMinimumDelay([Duration delay = minimumDelay]) async {
+    final delayed = Future<void>.delayed(delay);
     final result = await this;
     await delayed;
     return result;

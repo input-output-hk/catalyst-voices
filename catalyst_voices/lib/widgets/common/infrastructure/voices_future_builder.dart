@@ -75,7 +75,7 @@ class VoicesFutureBuilder<T extends Object> extends StatefulWidget {
 
 class _VoicesFutureBuilderState<T extends Object>
     extends State<VoicesFutureBuilder<T>> {
-  late Future<T> _future;
+  Future<T>? _future;
 
   @override
   void initState() {
@@ -83,6 +83,12 @@ class _VoicesFutureBuilderState<T extends Object>
 
     // ignore: discarded_futures
     _future = _makeDelayedFuture();
+  }
+
+  @override
+  void dispose() {
+    _future = null;
+    super.dispose();
   }
 
   @override
