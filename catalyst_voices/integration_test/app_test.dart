@@ -12,7 +12,6 @@ void main() {
       await tester.pumpWidget(App(routerConfig: args.routerConfig));
       // let the application load
       await tester.pump(const Duration(seconds: 5));
-
       // pump and settle every 100ms to simulate almost production-like FPS
       await tester.pumpAndSettle(const Duration(milliseconds: 100));
       expect(find.text('Coming'), findsOneWidget);
