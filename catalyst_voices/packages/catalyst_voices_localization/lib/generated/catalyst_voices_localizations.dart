@@ -855,6 +855,30 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Back'**
   String get back;
+
+  /// No description provided for @createKeychainSeedPhraseSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Write down your 12 Catalyst  security words'**
+  String get createKeychainSeedPhraseSubtitle;
+
+  /// No description provided for @createKeychainSeedPhraseBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Make sure you create an offline backup of your recovery phrase as well.'**
+  String get createKeychainSeedPhraseBody;
+
+  /// No description provided for @createKeychainSeedPhraseDownload.
+  ///
+  /// In en, this message translates to:
+  /// **'Download Catalyst key'**
+  String get createKeychainSeedPhraseDownload;
+
+  /// No description provided for @createKeychainSeedPhraseStoreConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'I have written down/downloaded my 12 words'**
+  String get createKeychainSeedPhraseStoreConfirmation;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
