@@ -1,16 +1,20 @@
 //! Implementation of the GET `/registration` endpoint
 
-use poem_openapi::{payload::Json, ApiResponse};
+use poem_openapi::{payload::Json, types::Example, ApiResponse};
+use tracing::error;
 
 use super::types::SlotNumber;
-use crate::service::{
-    common::{
-        objects::cardano::{
-            network::Network, registration_info::RegistrationInfo, stake_address::StakeAddress,
+use crate::{
+    db::index::session::CassandraSession,
+    service::{
+        common::{
+            objects::cardano::{
+                network::Network, registration_info::RegistrationInfo, stake_address::StakeAddress,
+            },
+            responses::WithErrorResponses,
         },
-        responses::WithErrorResponses,
+        utilities::check_network,
     },
-    utilities::check_network,
 };
 
 /// Endpoint responses
@@ -41,22 +45,19 @@ pub(crate) async fn endpoint(
         Err(err) => return AllResponses::handle_error(&err),
     };
 
-    let _unused = "
-    // get the total utxo amount from the database
-    match EventDB::get_registration_info(stake_credential, network.into(), date_time).await {
-        Ok((tx_id, payment_address, voting_info, nonce)) => {
-            Responses::Ok(Json(RegistrationInfo::new(
-                tx_id,
-                &payment_address,
-                voting_info,
-                nonce,
-            )))
-            .into()
-        },
-        Err(err) if err.is::<NotFoundError>() => Responses::NotFound.into(),
-        Err(err) => AllResponses::handle_error(&err),
-    }
-    ";
-
     Responses::NotFound.into()
+}
+
+/// Get latest registration given a stake key hash or stake address
+pub(crate) fn latest_registration(persistent: bool) -> AllResponses {
+    let Some(_session) = CassandraSession::get(persistent) else {
+        error!("Failed to acquire db session");
+        return Responses::NotFound.into();
+    };
+
+    GetLatestRegistrationQuery::execute();
+
+    let r = RegistrationInfo::example();
+
+    Responses::Ok(Json(r)).into()
 }

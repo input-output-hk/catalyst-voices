@@ -133,4 +133,17 @@ impl CardanoApi {
     ) -> date_time_to_slot_number_get::AllResponses {
         date_time_to_slot_number_get::endpoint(date_time.0, network.0).await
     }
+
+    #[oai(
+        path = "/cip36/latest_registration",
+        method = "get",
+        operation_id = "latestRegistration"
+    )]
+    /// Cip36 registrations
+    ///
+    /// This endpoint gets the latest registraton
+    #[allow(clippy::unused_async)]
+    async fn latest_registration_cip36(&self) -> registration_get::AllResponses {
+        registration_get::latest_registration(true)
+    }
 }

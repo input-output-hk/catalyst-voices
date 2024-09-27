@@ -1,10 +1,11 @@
 //! Health Endpoints
 use poem_openapi::{param::Query, OpenApi};
+use tracing::info;
 
-use crate::service::common::tags::ApiTags;
+use crate::{db::index::session::CassandraSession, service::common::tags::ApiTags};
 
 mod inspection_get;
-mod live_get;
+pub mod live_get;
 mod ready_get;
 mod started_get;
 pub(crate) use started_get::started;
@@ -51,7 +52,7 @@ impl HealthApi {
     ///
     /// *This endpoint is for internal use of the service deployment infrastructure.
     /// It may not be exposed publicly. Refer to []*
-    async fn live_get(&self) -> live_get::AllResponses {
+    pub async fn live_get(&self) -> live_get::AllResponses {
         live_get::endpoint().await
     }
 
@@ -65,6 +66,14 @@ impl HealthApi {
         &self, log_level: Query<Option<inspection_get::LogLevel>>,
         query_inspection: Query<Option<inspection_get::DeepQueryInspectionFlag>>,
     ) -> inspection_get::AllResponses {
-        inspection_get::endpoint(log_level.0, query_inspection.0).await
+        info!("deep!");
+
+        match CassandraSession::get(true) {
+            Some(_s) => {
+                info!("it worked ");
+                inspection_get::endpoint(log_level.0, query_inspection.0).await
+            },
+            None => inspection_get::endpoint(log_level.0, query_inspection.0).await,
+        }
     }
 }

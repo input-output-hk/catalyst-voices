@@ -2,12 +2,14 @@
 //!
 //! This improves query execution time.
 
+mod registrations;
 pub(crate) mod staked_ada;
 
 use std::{fmt::Debug, sync::Arc};
 
 use anyhow::{bail, Context};
 use crossbeam_skiplist::SkipMap;
+use registrations::get_latest_registration_w_stake_addr::GetLatestRegistrationQuery;
 use scylla::{
     batch::Batch, prepared_statement::PreparedStatement, serialize::row::SerializeRow,
     transport::iterator::RowIterator, QueryResult, Session,
@@ -57,6 +59,8 @@ pub(crate) enum PreparedSelectQuery {
     GetTxoByStakeAddress,
     /// Get TXI by transaction hash query.
     GetTxiByTransactionHash,
+    /// Get latest Registration
+    GetLatestRegistration,
 }
 
 /// All prepared queries for a session.
@@ -86,6 +90,8 @@ pub(crate) struct PreparedQueries {
     txo_by_stake_address_query: PreparedStatement,
     /// Get TXI by transaction hash.
     txi_by_txn_hash_query: PreparedStatement,
+    /// Get latest registration
+    latest_registration_query: PreparedStatement,
 }
 
 /// An individual query response that can fail
@@ -110,6 +116,7 @@ impl PreparedQueries {
             UpdateTxoSpentQuery::prepare_batch(session.clone(), cfg).await;
         let txo_by_stake_address_query = GetTxoByStakeAddressQuery::prepare(session.clone()).await;
         let txi_by_txn_hash_query = GetTxiByTxnHashesQuery::prepare(session.clone()).await;
+        let latest_registration_query = GetLatestRegistrationQuery::prepare(session.clone()).await;
 
         let (
             txo_insert_queries,
@@ -137,6 +144,7 @@ impl PreparedQueries {
             txo_spent_update_queries: txo_spent_update_queries?,
             txo_by_stake_address_query: txo_by_stake_address_query?,
             txi_by_txn_hash_query: txi_by_txn_hash_query?,
+            latest_registration_query: latest_registration_query?,
         })
     }
 
@@ -190,10 +198,13 @@ impl PreparedQueries {
     pub(crate) async fn execute_iter<P>(
         &self, session: Arc<Session>, select_query: PreparedSelectQuery, params: P,
     ) -> anyhow::Result<RowIterator>
-    where P: SerializeRow {
+    where
+        P: SerializeRow,
+    {
         let prepared_stmt = match select_query {
             PreparedSelectQuery::GetTxoByStakeAddress => &self.txo_by_stake_address_query,
             PreparedSelectQuery::GetTxiByTransactionHash => &self.txi_by_txn_hash_query,
+            PreparedSelectQuery::GetLatestRegistration => &self.latest_registration_query,
         };
 
         session
