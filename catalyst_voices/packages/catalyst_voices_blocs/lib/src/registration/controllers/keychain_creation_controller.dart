@@ -16,48 +16,32 @@ final class RegistrationKeychainCreationController
 
   @override
   CreateKeychain? nextStep() {
-    final nextStep = switch (_stage) {
-      CreateKeychainStage.splash =>
-        const CreateKeychain(stage: CreateKeychainStage.instructions),
-      CreateKeychainStage.instructions => throw UnimplementedError(),
-      CreateKeychainStage.seedPhrase => throw UnimplementedError(),
-      CreateKeychainStage.checkSeedPhraseInstructions =>
-        throw UnimplementedError(),
-      CreateKeychainStage.checkSeedPhrase => throw UnimplementedError(),
-      CreateKeychainStage.checkSeedPhraseResult => throw UnimplementedError(),
-      CreateKeychainStage.unlockPasswordInstructions =>
-        throw UnimplementedError(),
-      CreateKeychainStage.unlockPasswordCreate => throw UnimplementedError(),
-      CreateKeychainStage.created => null,
-    };
-
-    if (nextStep != null) {
-      _stage = nextStep.stage;
+    final currentStageIndex = CreateKeychainStage.values.indexOf(_stage);
+    final isLast = currentStageIndex == CreateKeychainStage.values.length - 1;
+    if (isLast) {
+      return null;
     }
+
+    final nextStage = CreateKeychainStage.values[currentStageIndex + 1];
+    final nextStep = CreateKeychain(stage: nextStage);
+
+    _stage = nextStep.stage;
 
     return nextStep;
   }
 
   @override
   CreateKeychain? previousStep() {
-    final previousStep = switch (_stage) {
-      CreateKeychainStage.splash => null,
-      CreateKeychainStage.instructions =>
-        const CreateKeychain(stage: CreateKeychainStage.splash),
-      CreateKeychainStage.seedPhrase => throw UnimplementedError(),
-      CreateKeychainStage.checkSeedPhraseInstructions =>
-        throw UnimplementedError(),
-      CreateKeychainStage.checkSeedPhrase => throw UnimplementedError(),
-      CreateKeychainStage.checkSeedPhraseResult => throw UnimplementedError(),
-      CreateKeychainStage.unlockPasswordInstructions =>
-        throw UnimplementedError(),
-      CreateKeychainStage.unlockPasswordCreate => throw UnimplementedError(),
-      CreateKeychainStage.created => throw UnimplementedError(),
-    };
-
-    if (previousStep != null) {
-      _stage = previousStep.stage;
+    final currentStageIndex = CreateKeychainStage.values.indexOf(_stage);
+    final isFirst = currentStageIndex == 0;
+    if (isFirst) {
+      return null;
     }
+
+    final previousStage = CreateKeychainStage.values[currentStageIndex - 1];
+    final previousStep = CreateKeychain(stage: previousStage);
+
+    _stage = previousStep.stage;
 
     return previousStep;
   }
