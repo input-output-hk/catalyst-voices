@@ -50,7 +50,10 @@ class _RegistrationDialog extends StatelessWidget {
             stage: stage,
             seedPhraseState: seedPhraseState,
           ),
-        WalletLink(:final stage) => WalletLinkPanel(stage: stage),
+        WalletLink(:final stage, :final state) => WalletLinkPanel(
+            stage: stage,
+            state: state,
+          ),
         AccountCompleted() => const Placeholder(),
       },
     );

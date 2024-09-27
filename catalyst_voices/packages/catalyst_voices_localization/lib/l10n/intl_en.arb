@@ -458,6 +458,18 @@
   "@walletLinkIntroContent": {
     "description": "A message (content) in link wallet flow on intro screen."
   },
+  "walletLinkSelectWalletTitle": "Select the Cardano wallet to link\nto your Catalyst Keychain.",
+  "@walletLinkSelectWalletTitle": {
+    "description": "A title in link wallet flow on select wallet screen."
+  },
+  "walletLinkSelectWalletContent": "To complete this action, you'll submit a signed transaction to Cardano. There will be an ADA transaction fee.",
+  "@walletLinkSelectWalletContent": {
+    "description": "A message (content) in link wallet flow on select wallet screen."
+  },
+  "seeAllSupportedWallets": "See all supported wallets",
+  "@seeAllSupportedWallets": {
+    "description": "Message shown when redirecting to external content that describes which wallets are supported."
+  },
   "accountCreationCreate": "Create a new \u2028Catalyst Keychain",
   "accountCreationRecover": "Recover your\u2028Catalyst Keychain",
   "accountCreationOnThisDevice": "On this device",
@@ -520,6 +532,18 @@
   "back": "Back",
   "@back": {
     "description": "For example in button that goes to previous stage of registration"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry action when something goes wrong."
+  },
+  "somethingWentWrong": "Something went wrong.",
+  "@somethingWentWrong": {
+    "description": "Error description when something goes wrong."
+  },
+  "noWalletFound": "No wallet found.",
+  "@noWalletFound": {
+    "description": "A description when no wallet extension was found."
   },
   "createKeychainSeedPhraseSubtitle": "Write down your 12 Catalyst \u2028security words",
   "createKeychainSeedPhraseBody": "Make sure you create an offline backup of your recovery phrase as well.",

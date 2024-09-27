@@ -371,6 +371,15 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get walletLinkIntroContent => 'You\'re almost there! This is the final and most important step in your account setup.\n\nWe\'re going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.\n\nRole Keys allow you to enter new spaces, discover new ways to participate, and unlock new ways to earn rewards.\n\nWe\'ll start with your Voter Key by default. You can decide to add a Proposer Key and Drep key if you want, or you can always add them later.';
 
   @override
+  String get walletLinkSelectWalletTitle => 'Select the Cardano wallet to link\nto your Catalyst Keychain.';
+
+  @override
+  String get walletLinkSelectWalletContent => 'To complete this action, you\'ll submit a signed transaction to Cardano. There will be an ADA transaction fee.';
+
+  @override
+  String get seeAllSupportedWallets => 'See all supported wallets';
+
+  @override
   String get accountCreationCreate => 'Create a new  Catalyst Keychain';
 
   @override
@@ -441,6 +450,15 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get back => 'Back';
+
+  @override
+  String get retry => 'Retry';
+
+  @override
+  String get somethingWentWrong => 'Something went wrong.';
+
+  @override
+  String get noWalletFound => 'No wallet found.';
 
   @override
   String get createKeychainSeedPhraseSubtitle => 'Write down your 12 Catalyst  security words';

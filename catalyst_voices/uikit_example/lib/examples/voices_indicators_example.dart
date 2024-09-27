@@ -80,6 +80,19 @@ class VoicesIndicatorsExample extends StatelessWidget {
               VoicesCircularProgressIndicator(value: 0.75, showTrack: false),
             ],
           ),
+          const Text('Generic error indicator'),
+          Row(
+            children: [
+              VoicesErrorIndicator(
+                message: 'Something went wrong',
+                onRetry: () {},
+              ),
+              const SizedBox(width: 16),
+              const VoicesErrorIndicator(
+                message: 'Something went wrong',
+              ),
+            ],
+          ),
           const Text('No Internet Connection Banner'),
           const NoInternetConnectionBanner(),
           const Text('Password strength indicator'),

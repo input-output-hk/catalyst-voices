@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_blocs/src/registration/controllers/keychain_creation_controller.dart';
+import 'package:catalyst_voices_blocs/src/registration/controllers/wallet_link_controller.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
@@ -60,4 +61,16 @@ final class SeedPhraseStoreConfirmationEvent extends KeychainCreationEvent {
 
   @override
   List<Object?> get props => [value];
+}
+
+/// Wallet linking related events, handled by [WalletLinkController].
+sealed class WalletLinkEvent extends RegistrationEvent {
+  const WalletLinkEvent();
+}
+
+final class RefreshCardanoWalletsEvent extends WalletLinkEvent {
+  const RefreshCardanoWalletsEvent();
+
+  @override
+  List<Object?> get props => [];
 }

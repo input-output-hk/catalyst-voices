@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_blocs/src/registration/seed_phrase_state.dart';
+import 'package:catalyst_voices_blocs/src/registration/wallet_link_state_data.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
@@ -84,9 +85,11 @@ final class CreateKeychain extends CreateNew {
 /// Linking existing keychain with wallet.
 final class WalletLink extends CreateNew {
   final WalletLinkStage stage;
+  final WalletLinkStateData state;
 
   const WalletLink({
     this.stage = WalletLinkStage.intro,
+    this.state = const WalletLinkStateData(),
   });
 
   @override
@@ -100,7 +103,12 @@ final class WalletLink extends CreateNew {
   }
 
   @override
-  List<Object?> get props => super.props + [stage];
+  List<Object?> get props =>
+      super.props +
+      [
+        stage,
+        state,
+      ];
 }
 
 final class AccountCompleted extends RegistrationState {

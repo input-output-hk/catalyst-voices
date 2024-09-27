@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_setters_without_getters
-
 import 'package:catalyst_voices_blocs/src/registration/controllers/keychain_creation_controller.dart';
 import 'package:catalyst_voices_blocs/src/registration/controllers/wallet_link_controller.dart';
 import 'package:catalyst_voices_blocs/src/registration/registration_event.dart';
@@ -9,20 +7,21 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Manages the registration state.
-final class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState>
-    implements WalletLinkController {
+final class RegistrationBloc
+    extends Bloc<RegistrationEvent, RegistrationState> {
   final KeychainCreationController _keychainCreationController;
-  final RegistrationWalletLinkController _walletLinkController;
+  final WalletLinkController _walletLinkController;
 
   RegistrationBloc()
       : _keychainCreationController = KeychainCreationController(),
-        _walletLinkController = RegistrationWalletLinkController(),
-        super(const GetStarted()) {
+        _walletLinkController = WalletLinkController(),
+        super(const WalletLink()) {
     _keychainCreationController.addListener(_onKeychainControllerChanged);
     _walletLinkController.addListener(_onWalletLinkControllerChanged);
 
     on<RegistrationNavigationEvent>(_handleNavigationEvent);
     on<KeychainCreationEvent>(_handleKeychainCreationEvent);
+    on<WalletLinkEvent>(_handleWalletLinkingEvent);
     on<RebuildStateEvent>(_handleRebuildStateEvent);
   }
 
@@ -50,6 +49,14 @@ final class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState>
     Emitter<RegistrationState> emit,
   ) {
     _keychainCreationController.handleEvent(event);
+    emit(_buildState());
+  }
+
+  void _handleWalletLinkingEvent(
+    WalletLinkEvent event,
+    Emitter<RegistrationState> emit,
+  ) {
+    _walletLinkController.handleEvent(event);
     emit(_buildState());
   }
 
