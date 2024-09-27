@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use anyhow::{bail, Context};
+use anyhow::Context;
 use handlebars::Handlebars;
 use scylla::Session;
 use serde_json::json;
@@ -205,9 +205,7 @@ pub(crate) async fn create_schema(
         }
     }
 
-    if failed {
-        bail!("Failed to Create Schema");
-    }
+    anyhow::ensure!(!failed, "Failed to Create Schema");
 
     // Wait for the Schema to be ready.
     session.await_schema_agreement().await?;
