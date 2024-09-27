@@ -77,7 +77,8 @@ class _SeedPhraseStoredConfirmation extends StatelessWidget {
       value: isConfirmed,
       label: Text(context.l10n.createKeychainSeedPhraseStoreConfirmation),
       onChanged: (value) {
-        RegistrationBloc.of(context).confirmSeedPhraseStored(value);
+        final event = SeedPhraseStoreConfirmationEvent(value: value);
+        RegistrationBloc.of(context).add(event);
       },
     );
   }

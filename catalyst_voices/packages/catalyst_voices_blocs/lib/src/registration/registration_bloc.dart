@@ -10,18 +10,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Manages the registration state.
 final class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState>
-    implements KeychainCreationController, WalletLinkController {
-  final RegistrationKeychainCreationController _keychainCreationController;
+    implements WalletLinkController {
+  final KeychainCreationController _keychainCreationController;
   final RegistrationWalletLinkController _walletLinkController;
 
   RegistrationBloc()
-      : _keychainCreationController = RegistrationKeychainCreationController(),
+      : _keychainCreationController = KeychainCreationController(),
         _walletLinkController = RegistrationWalletLinkController(),
         super(const GetStarted()) {
     _keychainCreationController.addListener(_onKeychainControllerChanged);
     _walletLinkController.addListener(_onWalletLinkControllerChanged);
 
     on<RegistrationNavigationEvent>(_handleNavigationEvent);
+    on<KeychainCreationEvent>(_handleKeychainCreationEvent);
     on<RebuildStateEvent>(_handleRebuildStateEvent);
   }
 
@@ -37,14 +38,18 @@ final class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState>
     return context.watch<RegistrationBloc>();
   }
 
-  @override
-  void confirmSeedPhraseStored(bool isConfirmed) =>
-      _keychainCreationController.confirmSeedPhraseStored(isConfirmed);
-
   void _handleRebuildStateEvent(
     RebuildStateEvent event,
     Emitter<RegistrationState> emit,
   ) {
+    emit(_buildState());
+  }
+
+  void _handleKeychainCreationEvent(
+    KeychainCreationEvent event,
+    Emitter<RegistrationState> emit,
+  ) {
+    _keychainCreationController.handleEvent(event);
     emit(_buildState());
   }
 
