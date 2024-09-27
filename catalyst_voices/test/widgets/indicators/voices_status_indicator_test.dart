@@ -11,7 +11,7 @@ void main() {
         // Arrange
         const status = 'QR VERIFIED';
         const title = 'Your QR code verified successfully';
-        const body = 'You can now use your QR-code  to login into Catalyst.';
+        const body = 'You can now use your QR-code to login into Catalyst.';
 
         const colors = VoicesColorScheme.optional(
           successContainer: Colors.green,
