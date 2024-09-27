@@ -116,24 +116,7 @@ class _DeleteKeychainDialogState extends State<DeleteKeychainDialog> {
                     children: [
                       VoicesFilledButton(
                         backgroundColor: Theme.of(context).colors.iconsError,
-                        onTap: () async {
-                          if (_textEditingController.text ==
-                              context.l10n.deleteKeychainDialogRemovingPhrase) {
-                            // TODO(Jakub): remove keychain
-                            Navigator.of(context).pop();
-                            await VoicesDialog.show<void>(
-                              context: context,
-                              builder: (context) {
-                                return const KeychainDeletedDialog();
-                              },
-                            );
-                          } else {
-                            setState(() {
-                              _errorText =
-                                  context.l10n.deleteKeychainDialogErrorText;
-                            });
-                          }
-                        },
+                        onTap: () async => _onRemoveKeychainTap(),
                         child: Text(context.l10n.delete),
                       ),
                       const SizedBox(width: 8),
@@ -152,5 +135,23 @@ class _DeleteKeychainDialogState extends State<DeleteKeychainDialog> {
         ],
       ),
     );
+  }
+
+  Future<void> _onRemoveKeychainTap() async {
+    if (_textEditingController.text ==
+        context.l10n.deleteKeychainDialogRemovingPhrase) {
+      // TODO(Jakub): remove keychain
+      Navigator.of(context).pop();
+      await VoicesDialog.show<void>(
+        context: context,
+        builder: (context) {
+          return const KeychainDeletedDialog();
+        },
+      );
+    } else {
+      setState(() {
+        _errorText = context.l10n.deleteKeychainDialogErrorText;
+      });
+    }
   }
 }
