@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/pages/registration/information_panel.dart';
 import 'package:catalyst_voices/pages/registration/pictures/keychain_picture.dart';
+import 'package:catalyst_voices/pages/registration/pictures/seed_phrase_picture.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -110,7 +111,7 @@ class _RegistrationPicture extends StatelessWidget {
         CreateKeychainStage.checkSeedPhraseInstructions ||
         CreateKeychainStage.checkSeedPhrase ||
         CreateKeychainStage.checkSeedPhraseResult =>
-          const KeychainPicture(),
+          const SeedPhrasePicture(),
         CreateKeychainStage.unlockPasswordInstructions ||
         CreateKeychainStage.unlockPasswordCreate ||
         CreateKeychainStage.created =>

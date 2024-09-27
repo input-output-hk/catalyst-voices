@@ -15,7 +15,7 @@ class CreateKeychainPanel extends StatelessWidget {
     return switch (stage) {
       CreateKeychainStage.splash => const SplashPanel(),
       CreateKeychainStage.instructions => const InstructionsPanel(),
-      CreateKeychainStage.seedPhrase ||
+      CreateKeychainStage.seedPhrase => const SeedPhrasePanel(),
       CreateKeychainStage.checkSeedPhraseInstructions ||
       CreateKeychainStage.checkSeedPhrase ||
       CreateKeychainStage.checkSeedPhraseResult ||
