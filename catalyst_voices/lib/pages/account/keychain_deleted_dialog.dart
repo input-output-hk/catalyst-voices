@@ -40,7 +40,6 @@ We reverted this device to Catalyst first use.''',
                   ),
                   const SizedBox(height: 24),
                   VoicesFilledButton(
-                    //backgroundColor: Theme.of(context).colors.iconsError,
                     onTap: () => Navigator.of(context).pop(),
                     child: const Text('Close'),
                   ),
