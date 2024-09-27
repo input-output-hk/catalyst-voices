@@ -441,4 +441,16 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get delete => 'Delete';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get keychainDeletedDialogTitle => 'Catalyst keychain removed';
+
+  @override
+  String get keychainDeletedDialogSubtitle => 'Catalyst keychain removed';
+
+  @override
+  String get keychainDeletedDialogInfo => 'Catalyst keychain removed';
 }

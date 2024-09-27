@@ -855,6 +855,30 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Delete'**
   String get delete;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// A title on keychain deleted dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst keychain removed'**
+  String get keychainDeletedDialogTitle;
+
+  /// A subtitle on keychain deleted dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst keychain removed'**
+  String get keychainDeletedDialogSubtitle;
+
+  /// An info on keychain deleted dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst keychain removed'**
+  String get keychainDeletedDialogInfo;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/modals/voices_desktop_dialog.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class KeychainDeletedDialog extends StatelessWidget {
@@ -21,27 +22,25 @@ class KeychainDeletedDialog extends StatelessWidget {
                 children: [
                   const SizedBox(height: 24),
                   Text(
-                    'Catalyst keychain removed',
+                    context.l10n.keychainDeletedDialogTitle,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 48),
                   Text(
-                    '''
-Your Catalyst Keychain is removed successfully from this device.''',
+                    context.l10n.keychainDeletedDialogSubtitle,
                     style: Theme.of(context).textTheme.titleMedium,
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 32),
                   Text(
-                    '''
-We reverted this device to Catalyst first use.''',
+                    context.l10n.keychainDeletedDialogInfo,
                     style: Theme.of(context).textTheme.bodyMedium,
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 24),
                   VoicesFilledButton(
                     onTap: () => Navigator.of(context).pop(),
-                    child: const Text('Close'),
+                    child: Text(context.l10n.close),
                   ),
                 ],
               ),
