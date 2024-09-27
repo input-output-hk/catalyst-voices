@@ -24,9 +24,7 @@ class RegistrationDialog extends StatelessWidget {
     return BlocProvider(
       create: (context) => Dependencies.instance.get<RegistrationBloc>(),
       child: BlocBuilder<RegistrationBloc, RegistrationState>(
-        builder: (context, state) {
-          return _RegistrationDialog(state: state);
-        },
+        builder: (context, state) => _RegistrationDialog(state: state),
       ),
     );
   }
@@ -42,15 +40,18 @@ class _RegistrationDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesDesktopPanelsDialog(
-      left: RegistrationInfoPanel(
-        state: state,
-      ),
+      left: const RegistrationInfoPanel(),
       right: switch (state) {
         GetStarted() => const GetStartedPanel(),
         FinishAccountCreation() => const Placeholder(),
         Recover() => const Placeholder(),
-        CreateKeychain(:final stage) => CreateKeychainPanel(stage: stage),
+        CreateKeychain(:final stage, :final seedPhraseState) =>
+          CreateKeychainPanel(
+            stage: stage,
+            seedPhraseState: seedPhraseState,
+          ),
         WalletLink(:final stage) => WalletLinkPanel(stage: stage),
+        AccountCompleted() => const Placeholder(),
       },
     );
   }

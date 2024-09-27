@@ -1,60 +1,39 @@
-import 'package:catalyst_voices_blocs/src/registration/registration_navigator.dart';
 import 'package:catalyst_voices_blocs/src/registration/registration_state.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:flutter/foundation.dart';
 
 abstract interface class WalletLinkController {}
 
 final class RegistrationWalletLinkController
-    implements WalletLinkController, RegistrationNavigator<WalletLink> {
-  WalletLinkStage _stage;
+    with ChangeNotifier
+    implements WalletLinkController {
+  RegistrationWalletLinkController();
 
-  RegistrationWalletLinkController({
-    WalletLinkStage stage = WalletLinkStage.intro,
-  }) : _stage = stage;
-
-  @override
-  WalletLink? nextStep() {
-    final nextStep = switch (_stage) {
-      WalletLinkStage.intro =>
-        const WalletLink(stage: WalletLinkStage.selectWallet),
-      WalletLinkStage.selectWallet =>
-        const WalletLink(stage: WalletLinkStage.walletDetails),
-      WalletLinkStage.walletDetails =>
-        const WalletLink(stage: WalletLinkStage.rolesChooser),
-      WalletLinkStage.rolesChooser =>
-        const WalletLink(stage: WalletLinkStage.rolesSummary),
-      WalletLinkStage.rolesSummary =>
-        const WalletLink(stage: WalletLinkStage.rbacTransaction),
-      WalletLinkStage.rbacTransaction => null,
-    };
-
-    if (nextStep != null) {
-      _stage = nextStep.stage;
-    }
-
-    return nextStep;
+  WalletLink buildState(WalletLinkStage stage) {
+    return WalletLink(
+      stage: stage,
+    );
   }
 
-  @override
-  WalletLink? previousStep() {
-    final previousStep = switch (_stage) {
-      WalletLinkStage.intro => null,
-      WalletLinkStage.selectWallet =>
-        const WalletLink(stage: WalletLinkStage.intro),
-      WalletLinkStage.walletDetails =>
-        const WalletLink(stage: WalletLinkStage.selectWallet),
-      WalletLinkStage.rolesChooser =>
-        const WalletLink(stage: WalletLinkStage.walletDetails),
-      WalletLinkStage.rolesSummary =>
-        const WalletLink(stage: WalletLinkStage.rolesChooser),
-      WalletLinkStage.rbacTransaction =>
-        const WalletLink(stage: WalletLinkStage.rolesSummary),
-    };
-
-    if (previousStep != null) {
-      _stage = previousStep.stage;
+  WalletLinkStep? nextStep(WalletLinkStage stage) {
+    final currentStageIndex = WalletLinkStage.values.indexOf(stage);
+    final isLast = currentStageIndex == WalletLinkStage.values.length - 1;
+    if (isLast) {
+      return null;
     }
 
-    return previousStep;
+    final nextStage = WalletLinkStage.values[currentStageIndex + 1];
+    return WalletLinkStep(stage: nextStage);
+  }
+
+  WalletLinkStep? previousStep(WalletLinkStage stage) {
+    final currentStageIndex = WalletLinkStage.values.indexOf(stage);
+    final isFirst = currentStageIndex == 0;
+    if (isFirst) {
+      return null;
+    }
+
+    final previousStage = WalletLinkStage.values[currentStageIndex - 1];
+    return WalletLinkStep(stage: previousStage);
   }
 }

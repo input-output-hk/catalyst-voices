@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_blocs/src/registration/seed_phrase_state.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
@@ -10,8 +11,11 @@ import 'package:equatable/equatable.dart';
 ///   - [CreateNew] is entire flow in it self and has two distinguish sub-steps
 ///     - [CreateKeychain] where user is creating new keychain.
 ///     - [WalletLink] where user is linking Keychain with wallet.
+///   - [AccountCompleted] after all previous steps succeeded.
 sealed class RegistrationState extends Equatable {
   const RegistrationState();
+
+  RegistrationStep get step;
 
   double? get progress => null;
 
@@ -22,16 +26,25 @@ sealed class RegistrationState extends Equatable {
 /// User decides where to go here [CreateNew] or [Recover] route.
 final class GetStarted extends RegistrationState {
   const GetStarted();
+
+  @override
+  GetStartedStep get step => const GetStartedStep();
 }
 
 /// When [CreateKeychain] is completed but [WalletLink] not.
 final class FinishAccountCreation extends RegistrationState {
   const FinishAccountCreation();
+
+  @override
+  FinishAccountCreationStep get step => const FinishAccountCreationStep();
 }
 
 /// User enters existing seed phrase here.
 final class Recover extends RegistrationState {
   const Recover();
+
+  @override
+  RecoverStep get step => const RecoverStep();
 }
 
 /// Encapsulates entire process of registration.
@@ -42,10 +55,15 @@ sealed class CreateNew extends RegistrationState {
 /// Building up information for creating new Keychain.
 final class CreateKeychain extends CreateNew {
   final CreateKeychainStage stage;
+  final SeedPhraseState seedPhraseState;
 
   const CreateKeychain({
     this.stage = CreateKeychainStage.splash,
+    this.seedPhraseState = const SeedPhraseState(),
   });
+
+  @override
+  CreateKeychainStep get step => CreateKeychainStep(stage: stage);
 
   @override
   double get progress {
@@ -55,7 +73,12 @@ final class CreateKeychain extends CreateNew {
   }
 
   @override
-  List<Object?> get props => super.props + [stage];
+  List<Object?> get props =>
+      super.props +
+      [
+        stage,
+        seedPhraseState,
+      ];
 }
 
 /// Linking existing keychain with wallet.
@@ -67,6 +90,9 @@ final class WalletLink extends CreateNew {
   });
 
   @override
+  WalletLinkStep get step => WalletLinkStep(stage: stage);
+
+  @override
   double get progress {
     final current = WalletLinkStage.values.indexOf(stage);
     final total = WalletLinkStage.values.length;
@@ -75,4 +101,11 @@ final class WalletLink extends CreateNew {
 
   @override
   List<Object?> get props => super.props + [stage];
+}
+
+final class AccountCompleted extends RegistrationState {
+  const AccountCompleted();
+
+  @override
+  AccountCompletedStep get step => const AccountCompletedStep();
 }

@@ -1,10 +1,20 @@
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class SeedPhrasePanel extends StatelessWidget {
-  const SeedPhrasePanel({super.key});
+  final SeedPhrase? seedPhrase;
+  final bool isStoreSeedPhraseConfirmed;
+  final bool isNextEnabled;
+
+  const SeedPhrasePanel({
+    super.key,
+    required this.seedPhrase,
+    required this.isStoreSeedPhraseConfirmed,
+    required this.isNextEnabled,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -12,17 +22,19 @@ class SeedPhrasePanel extends StatelessWidget {
       children: [
         Expanded(
           child: _Body(
-            words: List.generate(12, (index) => 'word_$index'),
-            onDownloadTap: () {},
+            words: seedPhrase?.mnemonicWords ?? [],
+            onDownloadTap: _downloadSeedPhrase,
           ),
         ),
         const SizedBox(height: 10),
-        const _SeedPhraseStoredConfirmation(),
+        _SeedPhraseStoredConfirmation(isConfirmed: isStoreSeedPhraseConfirmed),
         const SizedBox(height: 10),
-        const _Navigation(),
+        _Navigation(isNextEnabled: isNextEnabled),
       ],
     );
   }
+
+  Future<void> _downloadSeedPhrase() async {}
 }
 
 class _Body extends StatelessWidget {
@@ -53,14 +65,20 @@ class _Body extends StatelessWidget {
 }
 
 class _SeedPhraseStoredConfirmation extends StatelessWidget {
-  const _SeedPhraseStoredConfirmation();
+  final bool isConfirmed;
+
+  const _SeedPhraseStoredConfirmation({
+    this.isConfirmed = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return VoicesCheckbox(
-      value: false,
+      value: isConfirmed,
       label: Text(context.l10n.createKeychainSeedPhraseStoreConfirmation),
-      onChanged: (value) {},
+      onChanged: (value) {
+        RegistrationBloc.of(context).confirmSeedPhraseStored(value);
+      },
     );
   }
 }

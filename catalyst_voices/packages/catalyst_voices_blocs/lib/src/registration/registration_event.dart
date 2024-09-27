@@ -6,7 +6,18 @@ sealed class RegistrationEvent extends Equatable {
   const RegistrationEvent();
 }
 
-final class CreateAccountTypeEvent extends RegistrationEvent {
+final class RebuildStateEvent extends RegistrationEvent {
+  const RebuildStateEvent();
+
+  @override
+  List<Object?> get props => [];
+}
+
+sealed class RegistrationNavigationEvent extends RegistrationEvent {
+  const RegistrationNavigationEvent();
+}
+
+final class CreateAccountTypeEvent extends RegistrationNavigationEvent {
   final CreateAccountType type;
 
   const CreateAccountTypeEvent({
@@ -17,14 +28,14 @@ final class CreateAccountTypeEvent extends RegistrationEvent {
   List<Object?> get props => [type];
 }
 
-final class NextStepEvent extends RegistrationEvent {
+final class NextStepEvent extends RegistrationNavigationEvent {
   const NextStepEvent();
 
   @override
   List<Object?> get props => [];
 }
 
-final class PreviousStepEvent extends RegistrationEvent {
+final class PreviousStepEvent extends RegistrationNavigationEvent {
   const PreviousStepEvent();
 
   @override

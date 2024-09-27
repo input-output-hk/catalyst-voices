@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_setters_without_getters
+
 import 'package:catalyst_voices_blocs/src/registration/controllers/keychain_creation_controller.dart';
 import 'package:catalyst_voices_blocs/src/registration/controllers/wallet_link_controller.dart';
 import 'package:catalyst_voices_blocs/src/registration/registration_event.dart';
@@ -16,7 +18,11 @@ final class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState>
       : _keychainCreationController = RegistrationKeychainCreationController(),
         _walletLinkController = RegistrationWalletLinkController(),
         super(const GetStarted()) {
-    on<RegistrationEvent>(_handleRegistrationEvent);
+    _keychainCreationController.addListener(_onKeychainControllerChanged);
+    _walletLinkController.addListener(_onWalletLinkControllerChanged);
+
+    on<RegistrationNavigationEvent>(_handleNavigationEvent);
+    on<RebuildStateEvent>(_handleRebuildStateEvent);
   }
 
   /// Returns [RegistrationBloc] if found in widget tree. Does not add
@@ -31,74 +37,119 @@ final class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState>
     return context.watch<RegistrationBloc>();
   }
 
-  void _handleRegistrationEvent(
-    RegistrationEvent event,
+  @override
+  void confirmSeedPhraseStored(bool isConfirmed) =>
+      _keychainCreationController.confirmSeedPhraseStored(isConfirmed);
+
+  void _handleRebuildStateEvent(
+    RebuildStateEvent event,
     Emitter<RegistrationState> emit,
   ) {
-    final nextState = switch (event) {
-      CreateAccountTypeEvent(:final type) => _createAccountNextStep(type),
+    emit(_buildState());
+  }
+
+  void _handleNavigationEvent(
+    RegistrationNavigationEvent event,
+    Emitter<RegistrationState> emit,
+  ) {
+    RegistrationStep? buildAccountNextStep(CreateAccountType type) {
+      return switch (type) {
+        CreateAccountType.createNew =>
+          _nextStep(from: const CreateKeychainStep()),
+        CreateAccountType.recover => _nextStep(from: const RecoverStep()),
+      };
+    }
+
+    final newStep = switch (event) {
+      CreateAccountTypeEvent(:final type) => buildAccountNextStep(type),
       NextStepEvent() => _nextStep(),
       PreviousStepEvent() => _previousStep(),
     };
 
-    emit(nextState);
+    if (newStep == null) {
+      return;
+    }
+
+    emit(_buildState(step: newStep));
   }
 
-  RegistrationState _createAccountNextStep(CreateAccountType type) {
-    return switch (type) {
-      CreateAccountType.createNew => const CreateKeychain(),
-      CreateAccountType.recover => const Recover(),
+  RegistrationStep? _nextStep({RegistrationStep? from}) {
+    final step = from ?? state.step;
+
+    RegistrationStep nextKeychainStep(CreateKeychainStage stage) {
+      final nextStep = _keychainCreationController.nextStep(stage);
+
+      // if there is no next step from keychain creation go to finish account.
+      return nextStep ?? const FinishAccountCreationStep();
+    }
+
+    RegistrationStep nextWalletLinkStep(WalletLinkStage stage) {
+      final nextStep = _walletLinkController.nextStep(stage);
+
+      // if there is no next step from wallet link go to account completed.
+      return nextStep ?? const AccountCompletedStep();
+    }
+
+    return switch (step) {
+      GetStartedStep() => null,
+      FinishAccountCreationStep() => nextWalletLinkStep(WalletLinkStage.intro),
+      RecoverStep() => throw UnimplementedError(),
+      CreateKeychainStep(:final stage) => nextKeychainStep(stage),
+      WalletLinkStep(:final stage) => nextWalletLinkStep(stage),
+      AccountCompletedStep() => null,
     };
   }
 
-  RegistrationState _nextStep() {
-    /// Nested function. Responsible only for keychain steps logic.
-    RegistrationState keychainNextStep() {
-      final nextStep = _keychainCreationController.nextStep();
+  RegistrationStep? _previousStep({RegistrationStep? from}) {
+    final step = from ?? state.step;
 
-      return nextStep ?? const FinishAccountCreation();
+    /// Nested function. Responsible only for keychain steps logic.
+    RegistrationStep previousKeychainStep(CreateKeychainStage stage) {
+      final previousStep = _keychainCreationController.previousStep(stage);
+
+      // if is at first step of keychain creation go to get started.
+      return previousStep ?? const GetStartedStep();
     }
 
     /// Nested function. Responsible only for wallet link steps logic.
-    RegistrationState walletLinkNextStep() {
-      final nextStep = _walletLinkController.nextStep();
+    RegistrationStep previousWalletLinkStep(WalletLinkStage stage) {
+      final previousStep = _walletLinkController.previousStep(stage);
 
-      return nextStep ?? state;
+      // if is at first step of wallet link go to finish account.
+      return previousStep ?? const FinishAccountCreationStep();
     }
 
-    return switch (state) {
-      GetStarted() => throw StateError(
-          'GetStarted has two routes that may go to. '
-          'NextStep is not valid here.',
-        ),
-      FinishAccountCreation() => throw UnimplementedError(),
-      Recover() => throw UnimplementedError(),
-      CreateKeychain() => keychainNextStep(),
-      WalletLink() => walletLinkNextStep(),
+    return switch (step) {
+      GetStartedStep() => null,
+      FinishAccountCreationStep() => null,
+      RecoverStep() => throw UnimplementedError(),
+      CreateKeychainStep(:final stage) => previousKeychainStep(stage),
+      WalletLinkStep(:final stage) => previousWalletLinkStep(stage),
+      AccountCompletedStep() => null,
     };
   }
 
-  RegistrationState _previousStep() {
-    /// Nested function. Responsible only for keychain steps logic.
-    RegistrationState keychainPreviousStep() {
-      final previousStep = _keychainCreationController.previousStep();
+  void _onKeychainControllerChanged() {
+    add(const RebuildStateEvent());
+  }
 
-      return previousStep ?? const GetStarted();
-    }
+  void _onWalletLinkControllerChanged() {
+    add(const RebuildStateEvent());
+  }
 
-    /// Nested function. Responsible only for wallet link steps logic.
-    RegistrationState walletLinkPreviousStep() {
-      final previousStep = _walletLinkController.previousStep();
+  RegistrationState _buildState({
+    RegistrationStep? step,
+  }) {
+    step ??= state.step;
 
-      return previousStep ?? const FinishAccountCreation();
-    }
-
-    return switch (state) {
-      GetStarted() => throw StateError('GetStarted is initial step.'),
-      FinishAccountCreation() => throw UnimplementedError(),
-      Recover() => throw UnimplementedError(),
-      CreateKeychain() => keychainPreviousStep(),
-      WalletLink() => walletLinkPreviousStep(),
+    return switch (step) {
+      GetStartedStep() => const GetStarted(),
+      FinishAccountCreationStep() => const FinishAccountCreation(),
+      RecoverStep() => const Recover(),
+      CreateKeychainStep(:final stage) =>
+        _keychainCreationController.buildState(stage),
+      WalletLinkStep(:final stage) => _walletLinkController.buildState(stage),
+      AccountCompletedStep() => const AccountCompleted(),
     };
   }
 }
