@@ -1,8 +1,6 @@
-import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
 import 'package:catalyst_voices/widgets/modals/voices_desktop_dialog.dart';
-import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -10,7 +8,12 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class DeleteKeychainDialog extends StatefulWidget {
-  const DeleteKeychainDialog({super.key});
+  final VoidCallback? onDeleteKeychain;
+
+  const DeleteKeychainDialog({
+    super.key,
+    this.onDeleteKeychain,
+  });
 
   @override
   State<DeleteKeychainDialog> createState() => _DeleteKeychainDialogState();
@@ -140,14 +143,7 @@ class _DeleteKeychainDialogState extends State<DeleteKeychainDialog> {
   Future<void> _onRemoveKeychainTap() async {
     if (_textEditingController.text ==
         context.l10n.deleteKeychainDialogRemovingPhrase) {
-      // TODO(Jakub): remove keychain
-      Navigator.of(context).pop();
-      await VoicesDialog.show<void>(
-        context: context,
-        builder: (context) {
-          return const KeychainDeletedDialog();
-        },
-      );
+      widget.onDeleteKeychain?.call();
     } else {
       setState(() {
         _errorText = context.l10n.deleteKeychainDialogErrorText;
