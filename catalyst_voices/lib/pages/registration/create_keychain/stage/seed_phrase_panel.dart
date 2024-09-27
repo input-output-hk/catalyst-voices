@@ -49,9 +49,11 @@ class _Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const SizedBox(height: 20),
           SeedPhrasesViewer(words: words),
           const SizedBox(height: 10),
           VoicesTextButton(
@@ -95,16 +97,20 @@ class _Navigation extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        VoicesBackButton(
-          onTap: () {
-            RegistrationBloc.of(context).add(const PreviousStepEvent());
-          },
+        Expanded(
+          child: VoicesBackButton(
+            onTap: () {
+              RegistrationBloc.of(context).add(const PreviousStepEvent());
+            },
+          ),
         ),
         const SizedBox(width: 10),
-        VoicesNextButton(
-          onTap: isNextEnabled
-              ? () => RegistrationBloc.of(context).add(const NextStepEvent())
-              : null,
+        Expanded(
+          child: VoicesNextButton(
+            onTap: isNextEnabled
+                ? () => RegistrationBloc.of(context).add(const NextStepEvent())
+                : null,
+          ),
         ),
       ],
     );

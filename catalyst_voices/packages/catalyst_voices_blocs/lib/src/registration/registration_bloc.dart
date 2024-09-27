@@ -15,7 +15,7 @@ final class RegistrationBloc
   RegistrationBloc()
       : _keychainCreationController = KeychainCreationController(),
         _walletLinkController = WalletLinkController(),
-        super(const WalletLink()) {
+        super(const GetStarted()) {
     _keychainCreationController.addListener(_onKeychainControllerChanged);
     _walletLinkController.addListener(_onWalletLinkControllerChanged);
 
