@@ -6,6 +6,7 @@ import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class DeleteKeychainDialog extends StatefulWidget {
@@ -50,13 +51,12 @@ class _DeleteKeychainDialogState extends State<DeleteKeychainDialog> {
                 children: [
                   const SizedBox(height: 24),
                   Text(
-                    'Delete Keychain?',
+                    context.l10n.deleteKeychainDialogTitle,
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 48),
                   Text(
-                    '''
-Are you sure you wants to delete your  Catalyst Keychain from this device?''',
+                    context.l10n.deleteKeychainDialogSubtitle,
                     style: Theme.of(context).textTheme.titleMedium,
                     textAlign: TextAlign.center,
                   ),
@@ -69,8 +69,7 @@ Are you sure you wants to delete your  Catalyst Keychain from this device?''',
                       Padding(
                         padding: const EdgeInsets.only(top: 2, left: 8),
                         child: Text(
-                          '''
-Make sure you have a working Catalyst 12-word seedphrase!''',
+                          context.l10n.deleteKeychainDialogWarning,
                           style: Theme.of(context).textTheme.titleSmall,
                         ),
                       ),
@@ -78,14 +77,13 @@ Make sure you have a working Catalyst 12-word seedphrase!''',
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '''
-Your Catalyst account will be removed, this action cannot be undone!''',
+                    context.l10n.deleteKeychainDialogWarningInfo,
                     style: Theme.of(context).textTheme.bodyMedium,
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 48),
                   Text(
-                    'To avoid mistakes, please type ‘Remove Keychain’ below.',
+                    context.l10n.deleteKeychainDialogTypingInfo,
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
                   const SizedBox(height: 24),
@@ -93,7 +91,7 @@ Your Catalyst account will be removed, this action cannot be undone!''',
                     direction: Axis.vertical,
                     children: [
                       Text(
-                        'Confirm removal',
+                        context.l10n.deleteKeychainDialogInputLabel,
                         style: Theme.of(context).textTheme.titleSmall,
                       ),
                       const SizedBox(height: 2),
@@ -103,6 +101,7 @@ Your Catalyst account will be removed, this action cannot be undone!''',
                           controller: _textEditingController,
                           decoration: VoicesTextFieldDecoration(
                             errorText: _errorText,
+                            errorMaxLines: 2,
                             filled: true,
                             fillColor: Theme.of(context)
                                 .colors
@@ -119,7 +118,7 @@ Your Catalyst account will be removed, this action cannot be undone!''',
                         backgroundColor: Theme.of(context).colors.iconsError,
                         onTap: () async {
                           if (_textEditingController.text ==
-                              'Remove Keychain') {
+                              context.l10n.deleteKeychainDialogRemovingPhrase) {
                             // TODO(Jakub): remove keychain
                             Navigator.of(context).pop();
                             await VoicesDialog.show<void>(
@@ -130,17 +129,18 @@ Your Catalyst account will be removed, this action cannot be undone!''',
                             );
                           } else {
                             setState(() {
-                              _errorText = 'Text incorrect';
+                              _errorText =
+                                  context.l10n.deleteKeychainDialogErrorText;
                             });
                           }
                         },
-                        child: const Text('Delete'),
+                        child: Text(context.l10n.delete),
                       ),
                       const SizedBox(width: 8),
                       VoicesTextButton.custom(
                         color: Theme.of(context).colors.iconsError,
                         onTap: () => Navigator.of(context).pop(),
-                        child: const Text('Cancel'),
+                        child: Text(context.l10n.cancelButtonText),
                       ),
                     ],
                   ),
