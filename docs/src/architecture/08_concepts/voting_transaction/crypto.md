@@ -117,21 +117,21 @@ components would be defined as follows:
 
 <!-- markdownlint-enable no-inline-html -->
 
-#### Vote encrypting
+#### Vote encryption
 
 <!-- markdownlint-disable no-inline-html -->
 
 After the choice is done (described in [section](#voting-choice)),
 vote **must** be encrypted using shared election public key $pk$.
 
-To achieve that, Lifted ElGamal encryption algorithm is used,
-noted as $ElGamalEnc(message, randomness, public \; key)$.
+To achieve that, Lifted ElGamal encryption algorithm is used `ElGamalEnc`,
+noted as $VoteEnc(message, randomness, public \; key)$.
 More detailed description of the lifted ElGamal algorithm
 you can find in the [appendix B](#b-lifted-elgamal-encryptiondecryption).
 <br/>
-$ElGamalEnc(message, randomness, public \; key)$ algorithm produces a ciphertext $c$ as a result.
+$VoteEnc(message, randomness, public \; key)$ algorithm produces a ciphertext $c$ as a result.
 \begin{equation}
-c = ElGamalEnc(message, randomness, public \; key)
+c = ElGamalEnc(message, randomness, public \; key) = VoteEnc(message, randomness, public \; key)
 \end{equation}
 
 To encrypt previously generated unit vector $\mathbf{e}_i$ ($i$ - voting choice identifier),
@@ -143,7 +143,7 @@ where $j$ is the same vector component's index $j$ value, $e_{i, j} => r_j$.
 Then, for each vector component $e_{i,j}$ with the corresponding randomness $r_j$,
 perform encryption algorithm applying shared election public key $pk$.
 \begin{equation}
-c_j = ElGamalEnc(e_{i,j}, r_j, pk)
+c_j = VoteEnc(e_{i,j}, r_j, pk)
 \end{equation}
 
 As a result getting a vector $\mathbf{c}$ of ciphertext values $c_f$,
@@ -151,7 +151,7 @@ with the size equals of the size $\mathbf{e}_t$ unit vector,
 equals to the amount of the voting options.
 Lets denote this vector as:
 \begin{equation}
-\mathbf{c} = (c_1, \ldots, c_{M}) = (ElGamalEnc(e_{i,j}, r_j, pk), \ldots,  ElGamalEnc(e_{i,M}, r_M, pk))
+\mathbf{c} = (c_1, \ldots, c_{M}) = (VoteEnc(e_{i,j}, r_j, pk), \ldots,  VoteEnc(e_{i,M}, r_M, pk))
 \end{equation}
 
 where $M$ is the voting options amount and $i$ is the index of the voting choice.
@@ -163,10 +163,10 @@ This is a first part of the published vote for a specific proposal.
 #### Voter's proof
 
 After the voter's choice is generated and encrypted,
-it is crucial to prove that [encoding](#voting-choice) and [encryption](#vote-encrypting) are formed correctly
+it is crucial to prove that [encoding](#voting-choice) and [encryption](#vote-encryption) are formed correctly
 (i.e. that the voter indeed encrypt a unit vector).
 
-Because by the definition of the encryption algorithm $ElGamalEnc(message, randomness, public \; key)$
+Because by the definition of the encryption algorithm $VoteEnc(message, randomness, public \; key)$
 it is possible to encrypt an any message value,
 it is not restricted for encryption only $0$ and $1$ values
 (as it was stated in the previous [section](#voting-choice),
@@ -180,7 +180,7 @@ noted as $VoteProof(\mathbf{c}, \mathbf{e}_i, \mathbf{r}, pk)$.
 It takes an encrypted vote vector $\mathbf{c}$,
 an original vote unit vector $\mathbf{e}_i$,
 a randomness vector $\mathbf{r}$,
-which was used during encryption algorithm $ElGamalEnc$
+which was used during encryption algorithm $VoteEnc$
 and an shared election public key $pk$.
 As a result it generates a proof value $\pi$.
 \begin{equation}
@@ -456,7 +456,7 @@ The prover algorithm takes as arguments:
 
 So basically here is the relation between all these values:
 \begin{equation}
-\mathbf{c} = (c_1, \ldots, c_M) = (ElGamalEnc(e_{i,1}, r_1, pk), \ldots, ElGamalEnc(e_{i,M}, r_M, pk))
+\mathbf{c} = (c_1, \ldots, c_M) = (VoteEnc(e_{i,1}, r_1, pk), \ldots, VoteEnc(e_{i,M}, r_M, pk))
 \end{equation}
 
 \begin{equation}
@@ -470,7 +470,7 @@ $\pi$ is the final proof.
 To compute it, prover needs to perform the next steps:
 
 1. If the number of voting options $M$ is not a perfect power of $2$,
-  extend the vector $\mathbf{c}$ with $c_j = ElGamalEnc(0, 0, pk)$,
+  extend the vector $\mathbf{c}$ with $c_j = VoteEnc(0, 0, pk)$,
   where $N$ is a perfect power of $2$, $j \in [M, \ldots, N - 1]$.
   So the resulted $\mathbf{c} = (c_1, \ldots, c_M, \{c_j\})$.
 2. Generate a commitment key $ck \in \mathbb{G}$.
@@ -498,7 +498,7 @@ To compute it, prover needs to perform the next steps:
     * Calculate the polynomial itself $p_j(x) = \prod_{l=0}^{log_2(N)-1} z_l^{j_l}$
 8. For $l \in [0, \ldots, log_2(N)-1]$ generate a random $R_l \in \mathbb{Z}_q$.
 9. For $l \in [0, \ldots, log_2(N)-1]$ compute
-  $D_l = ElGamalEnc(sum_l, R_l, pk)$,
+  $D_l = VoteEnc(sum_l, R_l, pk)$,
   where $sum_l = \sum_{j=0}^{N-1}(p_{j,l} * com_1^j)$
   and $p_{j,l}$ - corresponding coefficients of the polynomial $p_j(x)$ calculated on step `7`.
 10. Calculate a second verifier challenge
@@ -537,7 +537,7 @@ Knowing that $\pi$ equals to $(ck, \{I_l\}, \{B_l\}, \{A_l\}, \{D_l\}, \{z_l\}, 
 verifier needs to perform the next steps:
 
 1. If the number of voting options $M$ is not a perfect power of $2$,
-  extend the vector $\mathbf{c}$ with $c_j = ElGamalEnc(0, 0, pk)$,
+  extend the vector $\mathbf{c}$ with $c_j = VoteEnc(0, 0, pk)$,
   where $N$ is a perfect power of $2$, $j \in [M, \ldots, N - 1]$.
   So the resulted $\mathbf{c} = (c_1, \ldots, c_M, \{c_j\})$.
 2. Calculate the first verifier challenge
@@ -553,7 +553,7 @@ verifier needs to perform the next steps:
   where $g$ is the group generator:
     * $(I_l)^{com_2} \circ B_l == g^{z_l} \circ ck^{w_l}$.
     * $(I_l)^{com_2 - z_l} \circ A_l == g^{0} \circ ck^{v_l}$.
-5. Calculate the following $Left = ElGamalEnc(0, R, pk)$.
+5. Calculate the following $Left = VoteEnc(0, R, pk)$.
   Note that the $Left$ is a ciphertext, $Left = (Left_1, Left_2)$.
 6. Note that $D_l$ is a ciphertext,
   $D_l = (D_{l,1}, D_{l,2})$, for $l \in [0, \ldots, log_2(N)-1]$
@@ -566,7 +566,7 @@ verifier needs to perform the next steps:
     * $z_l^1 = z_j$.
     * $z_l^0 = com_2 - z_j^1$.
     * $p_j(com_2) = \prod_l^{log_2(N)-1} z_l^{j_l}$.
-8. For $j \in [0, \ldots, N-1]$ calculate the $P_j = ElGamalEnc(-p_j(com_2), 0, pk)$.
+8. For $j \in [0, \ldots, N-1]$ calculate the $P_j = VoteEnc(-p_j(com_2), 0, pk)$.
   Note that the $P_j$ is a ciphertext, $P_j = (P_{j,1}, P_{j,2})$.
 9. Note that $C_j$ is a ciphertext,
   $C_j = (C_{j,1}, C_{j,2})$, for $j \in [0, \ldots, N-1]$
