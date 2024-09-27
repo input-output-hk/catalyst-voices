@@ -6,7 +6,7 @@ import 'package:integration_test/integration_test.dart';
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  group('end-to-end test', () {
+  group('End to end tests', () {
     testWidgets('run app', (tester) async {
       final args = await bootstrap();
       await tester.pumpWidget(App(routerConfig: args.routerConfig));
@@ -15,9 +15,8 @@ void main() {
 
       // pump and settle every 100ms to simulate almost production-like FPS
       await tester.pumpAndSettle(const Duration(milliseconds: 100));
+      expect(find.text('Coming'), findsOneWidget);
 
-      // wait 10s until the test is finished
-      await Future<void>.delayed(const Duration(seconds: 10));
     });
   });
 }
