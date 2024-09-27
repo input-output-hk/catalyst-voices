@@ -17,7 +17,15 @@ final class RegistrationWalletLinkController
     final nextStep = switch (_stage) {
       WalletLinkStage.intro =>
         const WalletLink(stage: WalletLinkStage.selectWallet),
-      WalletLinkStage.selectWallet => null,
+      WalletLinkStage.selectWallet =>
+        const WalletLink(stage: WalletLinkStage.walletDetails),
+      WalletLinkStage.walletDetails =>
+        const WalletLink(stage: WalletLinkStage.rolesChooser),
+      WalletLinkStage.rolesChooser =>
+        const WalletLink(stage: WalletLinkStage.rolesSummary),
+      WalletLinkStage.rolesSummary =>
+        const WalletLink(stage: WalletLinkStage.rbacTransaction),
+      WalletLinkStage.rbacTransaction => null,
     };
 
     if (nextStep != null) {
@@ -33,6 +41,14 @@ final class RegistrationWalletLinkController
       WalletLinkStage.intro => null,
       WalletLinkStage.selectWallet =>
         const WalletLink(stage: WalletLinkStage.intro),
+      WalletLinkStage.walletDetails =>
+        const WalletLink(stage: WalletLinkStage.selectWallet),
+      WalletLinkStage.rolesChooser =>
+        const WalletLink(stage: WalletLinkStage.walletDetails),
+      WalletLinkStage.rolesSummary =>
+        const WalletLink(stage: WalletLinkStage.rolesChooser),
+      WalletLinkStage.rbacTransaction =>
+        const WalletLink(stage: WalletLinkStage.rolesSummary),
     };
 
     if (previousStep != null) {

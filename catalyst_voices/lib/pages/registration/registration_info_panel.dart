@@ -47,7 +47,7 @@ class RegistrationInfoPanel extends StatelessWidget {
         // TODO(damian-molinski): Extract to l10n in next step
         CreateKeychainStage.seedPhrase => _HeaderStrings(
             title: 'Catalyst Keychain',
-            subtitle: 'Write down your 12 Catalyst  security words',
+            subtitle: 'Write down your 12 Catalyst security words',
             body: 'Make sure you create an offline backup '
                 'of your recovery phrase as well.',
           ),
@@ -61,15 +61,24 @@ class RegistrationInfoPanel extends StatelessWidget {
       };
     }
 
-    _HeaderStrings buildWalletStageHeader(WalletLinkStage stage) {
+    _HeaderStrings buildWalletLinkStageHeader(WalletLinkStage stage) {
       return switch (stage) {
-        WalletLinkStage.intro => _HeaderStrings(
-            title: 'Link keys to your  Catalyst Keychain',
-            subtitle: 'Link your Cardano wallet',
+        WalletLinkStage.intro ||
+        WalletLinkStage.selectWallet ||
+        WalletLinkStage.walletDetails =>
+          _HeaderStrings(
+            title: context.l10n.walletLinkHeader,
+            subtitle: context.l10n.walletLinkWalletSubheader,
           ),
-        WalletLinkStage.selectWallet => _HeaderStrings(
-            title: 'Link keys to your  Catalyst Keychain',
-            subtitle: 'Link your Cardano wallet',
+        WalletLinkStage.rolesChooser ||
+        WalletLinkStage.rolesSummary =>
+          _HeaderStrings(
+            title: context.l10n.walletLinkHeader,
+            subtitle: context.l10n.walletLinkRolesSubheader,
+          ),
+        WalletLinkStage.rbacTransaction => _HeaderStrings(
+            title: context.l10n.walletLinkHeader,
+            subtitle: context.l10n.walletLinkTransactionSubheader,
           ),
       };
     }
@@ -79,7 +88,7 @@ class RegistrationInfoPanel extends StatelessWidget {
       FinishAccountCreation() => _HeaderStrings(title: 'TODO'),
       Recover() => _HeaderStrings(title: 'TODO'),
       CreateKeychain(:final stage) => buildKeychainStageHeader(stage),
-      WalletLink(:final stage) => buildWalletStageHeader(stage),
+      WalletLink(:final stage) => buildWalletLinkStageHeader(stage),
     };
   }
 }
