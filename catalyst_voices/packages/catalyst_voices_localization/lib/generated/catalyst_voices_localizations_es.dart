@@ -353,16 +353,31 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get learnMore => 'Learn More';
 
   @override
-  String get walletLink_header => 'Link keys to your Catalyst Keychain';
+  String get walletLinkHeader => 'Link keys to your Catalyst Keychain';
 
   @override
-  String get walletLink_subheader => 'Link your Cardano wallet';
+  String get walletLinkWalletSubheader => 'Link your Cardano wallet';
 
   @override
-  String get walletLink_intro_title => 'Link Cardano Wallet & Catalyst Roles to you Catalyst Keychain.';
+  String get walletLinkRolesSubheader => 'Select your Catalyst roles';
 
   @override
-  String get walletLink_intro_content => 'You\'re almost there! This is the final and most important step in your account setup.\n\nWe\'re going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.\n\nRole Keys allow you to enter new spaces, discover new ways to participate, and unlock new ways to earn rewards.\n\nWe\'ll start with your Voter Key by default. You can decide to add a Proposer Key and Drep key if you want, or you can always add them later.';
+  String get walletLinkTransactionSubheader => 'Sign your Catalyst roles to the\nCardano mainnet';
+
+  @override
+  String get walletLinkIntroTitle => 'Link Cardano Wallet & Catalyst Roles to you Catalyst Keychain.';
+
+  @override
+  String get walletLinkIntroContent => 'You\'re almost there! This is the final and most important step in your account setup.\n\nWe\'re going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.\n\nRole Keys allow you to enter new spaces, discover new ways to participate, and unlock new ways to earn rewards.\n\nWe\'ll start with your Voter Key by default. You can decide to add a Proposer Key and Drep key if you want, or you can always add them later.';
+
+  @override
+  String get walletLinkSelectWalletTitle => 'Select the Cardano wallet to link\nto your Catalyst Keychain.';
+
+  @override
+  String get walletLinkSelectWalletContent => 'To complete this action, you\'ll submit a signed transaction to Cardano. There will be an ADA transaction fee.';
+
+  @override
+  String get seeAllSupportedWallets => 'See all supported wallets';
 
   @override
   String get accountCreationCreate => 'Create a new  Catalyst Keychain';
@@ -392,9 +407,6 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get profileAndKeychain => 'Profile & Keychain';
 
   @override
-  String get catalystKeychain => 'Catalyst Keychain';
-
-  @override
   String get removeKeychain => 'Remove Keychain';
 
   @override
@@ -416,41 +428,35 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get defaultRole => 'Default';
 
   @override
-  String get deleteKeychainDialogTitle => 'Delete Keychain?';
+  String get catalystKeychain => 'Catalyst Keychain';
 
   @override
-  String get deleteKeychainDialogSubtitle => 'Are you sure you wants to delete your  Catalyst Keychain from this device?';
+  String get accountCreationSplashTitle => 'Create your Catalyst Keychain';
 
   @override
-  String get deleteKeychainDialogWarning => 'Make sure you have a working Catalyst 12-word seedphrase!';
+  String get accountCreationSplashMessage => 'Your keychain is your ticket to participate in  distributed innovation on the global stage.    Once you have it, you\'ll be able to enter different spaces, discover awesome ideas, and share your feedback to hep improve ideas.    As you add new keys to your keychain, you\'ll be able to enter new spaces, unlock new rewards opportunities, and have your voice heard in community decisions.';
 
   @override
-  String get deleteKeychainDialogWarningInfo => 'Your Catalyst account will be removed, this action cannot be undone!';
+  String get accountCreationSplashNextButton => 'Create your Keychain now';
 
   @override
-  String get deleteKeychainDialogTypingInfo => 'To avoid mistakes, please type ‘Remove Keychain’ below.';
+  String get accountInstructionsTitle => 'Great! Your Catalyst Keychain  has been created.';
 
   @override
-  String get deleteKeychainDialogInputLabel => 'Confirm removal';
+  String get accountInstructionsMessage => 'On the next screen, you\'re going to see 12 words.  This is called your \"seed phrase\".     It\'s like a super secure password that only you know,  that allows you to prove ownership of your keychain.    You\'ll use it to login and recover your account on  different devices, so be sure to put it somewhere safe!\n\nYou need to write this seed phrase down with pen and paper, so get this ready.';
 
   @override
-  String get deleteKeychainDialogErrorText => 'Error. Please type \'Remove keychain\' to remove your account from this device.';
+  String get next => 'Next';
 
   @override
-  String get deleteKeychainDialogRemovingPhrase => 'Remove Keychain';
+  String get back => 'Back';
 
   @override
-  String get delete => 'Delete';
+  String get retry => 'Retry';
 
   @override
-  String get close => 'Close';
+  String get somethingWentWrong => 'Something went wrong.';
 
   @override
-  String get keychainDeletedDialogTitle => 'Catalyst keychain removed';
-
-  @override
-  String get keychainDeletedDialogSubtitle => 'Catalyst keychain removed';
-
-  @override
-  String get keychainDeletedDialogInfo => 'Catalyst keychain removed';
+  String get noWalletFound => 'No wallet found.';
 }

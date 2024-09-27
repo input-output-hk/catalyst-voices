@@ -680,25 +680,55 @@ abstract class VoicesLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Link keys to your Catalyst Keychain'**
-  String get walletLink_header;
+  String get walletLinkHeader;
 
-  /// A subheader in link wallet flow in registration.
+  /// A subheader in link wallet flow in registration for wallet connection.
   ///
   /// In en, this message translates to:
   /// **'Link your Cardano wallet'**
-  String get walletLink_subheader;
+  String get walletLinkWalletSubheader;
+
+  /// A subheader in link wallet flow in registration for role chooser state.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your Catalyst roles'**
+  String get walletLinkRolesSubheader;
+
+  /// A subheader in link wallet flow in registration for RBAC transaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign your Catalyst roles to the\nCardano mainnet'**
+  String get walletLinkTransactionSubheader;
 
   /// A title in link wallet flow on intro screen.
   ///
   /// In en, this message translates to:
   /// **'Link Cardano Wallet & Catalyst Roles to you Catalyst Keychain.'**
-  String get walletLink_intro_title;
+  String get walletLinkIntroTitle;
 
   /// A message (content) in link wallet flow on intro screen.
   ///
   /// In en, this message translates to:
   /// **'You\'re almost there! This is the final and most important step in your account setup.\n\nWe\'re going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.\n\nRole Keys allow you to enter new spaces, discover new ways to participate, and unlock new ways to earn rewards.\n\nWe\'ll start with your Voter Key by default. You can decide to add a Proposer Key and Drep key if you want, or you can always add them later.'**
-  String get walletLink_intro_content;
+  String get walletLinkIntroContent;
+
+  /// A title in link wallet flow on select wallet screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Select the Cardano wallet to link\nto your Catalyst Keychain.'**
+  String get walletLinkSelectWalletTitle;
+
+  /// A message (content) in link wallet flow on select wallet screen.
+  ///
+  /// In en, this message translates to:
+  /// **'To complete this action, you\'ll submit a signed transaction to Cardano. There will be an ADA transaction fee.'**
+  String get walletLinkSelectWalletContent;
+
+  /// Message shown when redirecting to external content that describes which wallets are supported.
+  ///
+  /// In en, this message translates to:
+  /// **'See all supported wallets'**
+  String get seeAllSupportedWallets;
 
   /// No description provided for @accountCreationCreate.
   ///
@@ -754,12 +784,6 @@ abstract class VoicesLocalizations {
   /// **'Profile & Keychain'**
   String get profileAndKeychain;
 
-  /// Title of Catalyst Keychain card
-  ///
-  /// In en, this message translates to:
-  /// **'Catalyst Keychain'**
-  String get catalystKeychain;
-
   /// Action on Catalyst Keychain card
   ///
   /// In en, this message translates to:
@@ -802,83 +826,71 @@ abstract class VoicesLocalizations {
   /// **'Default'**
   String get defaultRole;
 
-  /// A title on delete keychain dialog
+  /// No description provided for @catalystKeychain.
   ///
   /// In en, this message translates to:
-  /// **'Delete Keychain?'**
-  String get deleteKeychainDialogTitle;
+  /// **'Catalyst Keychain'**
+  String get catalystKeychain;
 
-  /// A subtitle on delete keychain dialog
+  /// No description provided for @accountCreationSplashTitle.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you wants to delete your  Catalyst Keychain from this device?'**
-  String get deleteKeychainDialogSubtitle;
+  /// **'Create your Catalyst Keychain'**
+  String get accountCreationSplashTitle;
 
-  /// A warning on delete keychain dialog
+  /// No description provided for @accountCreationSplashMessage.
   ///
   /// In en, this message translates to:
-  /// **'Make sure you have a working Catalyst 12-word seedphrase!'**
-  String get deleteKeychainDialogWarning;
+  /// **'Your keychain is your ticket to participate in  distributed innovation on the global stage.    Once you have it, you\'ll be able to enter different spaces, discover awesome ideas, and share your feedback to hep improve ideas.    As you add new keys to your keychain, you\'ll be able to enter new spaces, unlock new rewards opportunities, and have your voice heard in community decisions.'**
+  String get accountCreationSplashMessage;
 
-  /// A warning info on delete keychain dialog
+  /// No description provided for @accountCreationSplashNextButton.
   ///
   /// In en, this message translates to:
-  /// **'Your Catalyst account will be removed, this action cannot be undone!'**
-  String get deleteKeychainDialogWarningInfo;
+  /// **'Create your Keychain now'**
+  String get accountCreationSplashNextButton;
 
-  /// A typing info on delete keychain dialog
+  /// No description provided for @accountInstructionsTitle.
   ///
   /// In en, this message translates to:
-  /// **'To avoid mistakes, please type ‘Remove Keychain’ below.'**
-  String get deleteKeychainDialogTypingInfo;
+  /// **'Great! Your Catalyst Keychain  has been created.'**
+  String get accountInstructionsTitle;
 
-  /// An input label on delete keychain dialog
+  /// No description provided for @accountInstructionsMessage.
   ///
   /// In en, this message translates to:
-  /// **'Confirm removal'**
-  String get deleteKeychainDialogInputLabel;
+  /// **'On the next screen, you\'re going to see 12 words.  This is called your \"seed phrase\".     It\'s like a super secure password that only you know,  that allows you to prove ownership of your keychain.    You\'ll use it to login and recover your account on  different devices, so be sure to put it somewhere safe!\n\nYou need to write this seed phrase down with pen and paper, so get this ready.'**
+  String get accountInstructionsMessage;
 
-  /// An error text on text field on delete keychain dialog
+  /// For example in button that goes to next stage of registration
   ///
   /// In en, this message translates to:
-  /// **'Error. Please type \'Remove keychain\' to remove your account from this device.'**
-  String get deleteKeychainDialogErrorText;
+  /// **'Next'**
+  String get next;
 
-  /// A removing phrase on delete keychain dialog
+  /// For example in button that goes to previous stage of registration
   ///
   /// In en, this message translates to:
-  /// **'Remove Keychain'**
-  String get deleteKeychainDialogRemovingPhrase;
+  /// **'Back'**
+  String get back;
 
-  /// No description provided for @delete.
+  /// Retry action when something goes wrong.
   ///
   /// In en, this message translates to:
-  /// **'Delete'**
-  String get delete;
+  /// **'Retry'**
+  String get retry;
 
-  /// No description provided for @close.
+  /// Error description when something goes wrong.
   ///
   /// In en, this message translates to:
-  /// **'Close'**
-  String get close;
+  /// **'Something went wrong.'**
+  String get somethingWentWrong;
 
-  /// A title on keychain deleted dialog
+  /// A description when no wallet extension was found.
   ///
   /// In en, this message translates to:
-  /// **'Catalyst keychain removed'**
-  String get keychainDeletedDialogTitle;
-
-  /// A subtitle on keychain deleted dialog
-  ///
-  /// In en, this message translates to:
-  /// **'Catalyst keychain removed'**
-  String get keychainDeletedDialogSubtitle;
-
-  /// An info on keychain deleted dialog
-  ///
-  /// In en, this message translates to:
-  /// **'Catalyst keychain removed'**
-  String get keychainDeletedDialogInfo;
+  /// **'No wallet found.'**
+  String get noWalletFound;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
