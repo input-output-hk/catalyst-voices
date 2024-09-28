@@ -144,6 +144,6 @@ impl CardanoApi {
     /// This endpoint gets the latest registraton
     #[allow(clippy::unused_async)]
     async fn latest_registration_cip36(&self) -> registration_get::AllResponses {
-        registration_get::latest_registration(true)
+        registration_get::latest_registration(true).await
     }
 }

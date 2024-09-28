@@ -13,40 +13,37 @@ use crate::db::index::{
     session::CassandraSession,
 };
 
-/// Get TXI query string.
+/// Get latest registration query string.
 const GET_LATEST_REGISTRATION_QUERY: &str =
     include_str!("../cql/get_latest_registration_w_stake_addr.cql");
 
-/// Get TXI query parameters.
+/// Get latest registration
 #[derive(SerializeRow)]
-pub(crate) struct GetLatestRegistration {
-    /// Transaction hashes.
-    txn_hashes: Vec<Vec<u8>>,
+pub(crate) struct GetLatestRegistrationParams {
+    /// Stake address.
+    stake_address: Vec<u8>,
 }
 
-impl GetLatestRegistration {
-    /// Create a new instance of [`GetTxiByTxnHashesQueryParams`]
-    pub(crate) fn new(txn_hashes: Vec<Vec<u8>>) -> Self {
-        Self { txn_hashes }
+impl GetLatestRegistrationParams {
+    /// Create a new instance of [`GetLatestRegistrationParams`]
+    pub(crate) fn new(stake_addr: Vec<u8>) -> GetLatestRegistrationParams {
+        Self {
+            stake_address: stake_addr,
+        }
     }
 }
 
-/// Get TXI Query Result
-// TODO: https://github.com/input-output-hk/catalyst-voices/issues/828
-// The macro uses expect to signal an error in deserializing values.
+/// A
 #[allow(clippy::expect_used)]
+#[allow(dead_code)]
 mod result {
     use scylla::FromRow;
 
     /// Get TXI query result.
     #[derive(FromRow)]
     pub(crate) struct GetLatestRegistrationQuery {
-        /// TXI transaction hash.
-        pub txn_hash: Vec<u8>,
-        /// TXI original TXO index.
-        pub txo: i16,
         /// TXI slot number.
-        pub slot_no: num_bigint::BigInt,
+        pub stake_address: Vec<u8>,
     }
 }
 /// Get latest registration query.
@@ -72,7 +69,7 @@ impl GetLatestRegistrationQuery {
 
     /// Executes a get txi by transaction hashes query.
     pub(crate) async fn execute(
-        session: &CassandraSession, params: GetLatestRegistration,
+        session: &CassandraSession, params: GetLatestRegistrationParams,
     ) -> anyhow::Result<TypedRowIterator<result::GetLatestRegistrationQuery>> {
         let iter = session
             .execute_iter(PreparedSelectQuery::GetLatestRegistration, params)

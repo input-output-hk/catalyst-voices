@@ -1,11 +1,17 @@
 //! Implementation of the GET `/registration` endpoint
 
+use futures::StreamExt;
 use poem_openapi::{payload::Json, types::Example, ApiResponse};
-use tracing::error;
+use tracing::{error, info};
 
 use super::types::SlotNumber;
 use crate::{
-    db::index::session::CassandraSession,
+    db::index::{
+        queries::registrations::get_latest_registration_w_stake_addr::{
+            GetLatestRegistrationParams, GetLatestRegistrationQuery,
+        },
+        session::CassandraSession,
+    },
     service::{
         common::{
             objects::cardano::{
@@ -49,13 +55,49 @@ pub(crate) async fn endpoint(
 }
 
 /// Get latest registration given a stake key hash or stake address
-pub(crate) fn latest_registration(persistent: bool) -> AllResponses {
-    let Some(_session) = CassandraSession::get(persistent) else {
+pub(crate) async fn latest_registration(persistent: bool) -> AllResponses {
+    let Some(session) = CassandraSession::get(persistent) else {
         error!("Failed to acquire db session");
         return Responses::NotFound.into();
     };
 
-    GetLatestRegistrationQuery::execute();
+    info!("here!!!!!!");
+
+    let stake_addr =
+        match hex::decode("0x12a5b7212903f01722323d229a08ad91e8b01659aad3284c0aad556cff992f93") {
+            Ok(k) => k,
+            Err(_err) => return Responses::NotFound.into(),
+        };
+
+    info!("here!2!!!!!");
+
+    let mut registrations_iter = match GetLatestRegistrationQuery::execute(
+        &session,
+        GetLatestRegistrationParams::new(stake_addr),
+    )
+    .await
+    {
+        Ok(latest) => latest,
+        Err(err) => {
+            error!("Failed to get latest registration {:?}", err);
+            return Responses::NotFound.into();
+        },
+    };
+
+    let Some(r) = registrations_iter.next().await else {
+        error!("Failed to get latest registration ");
+        return Responses::NotFound.into();
+    };
+
+    let row = match r {
+        Ok(row) => row,
+        Err(err) => {
+            error!("Failed to get latest registration {:?}", err);
+            return Responses::NotFound.into();
+        },
+    };
+
+    info!("got it {:?}", row.stake_address);
 
     let r = RegistrationInfo::example();
 
