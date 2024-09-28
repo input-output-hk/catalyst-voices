@@ -1,10 +1,13 @@
+import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices_blocs/src/registration/controllers/keychain_creation_controller.dart';
 import 'package:catalyst_voices_blocs/src/registration/controllers/wallet_link_controller.dart';
 import 'package:catalyst_voices_blocs/src/registration/registration_event.dart';
 import 'package:catalyst_voices_blocs/src/registration/registration_state.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:result_type/result_type.dart';
 
 /// Manages the registration state.
 final class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState>
@@ -101,4 +104,12 @@ final class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState>
       WalletLink() => walletLinkPreviousStep(),
     };
   }
+
+  @override
+  ValueListenable<Result<List<CardanoWallet>, Exception>?> get cardanoWallets =>
+      _walletLinkController.cardanoWallets;
+
+  @override
+  Future<void> refreshCardanoWallets() async =>
+      _walletLinkController.refreshCardanoWallets();
 }
