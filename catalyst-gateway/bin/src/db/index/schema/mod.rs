@@ -112,7 +112,16 @@ fn remove_comments_and_join_query_lines(text: &str) -> String {
     clean_lines.join("\n")
 }
 
-/// Comment
+/// Generates a unique schema version identifier based on the content of all CQL schemas.
+///
+/// This function processes each CQL schema, removes comments from its lines and joins them into a
+/// single string. It then sorts these processed strings to ensure consistency in schema versions
+/// regardless of their order in the list. Finally, it generates a UUID from a 127 bit hash of this
+/// sorted collection of schema contents, which serves as a unique identifier for the current
+/// version of all schemas.
+///
+/// # Returns
+///     A string representing the UUID derived from the concatenated and cleaned CQL schema contents.
 fn generate_cql_schema_version() -> String {
     // Where we will actually store the bytes we derive the UUID from.
     let mut clean_schemas: Vec<String> = Vec::new();
@@ -131,7 +140,7 @@ fn generate_cql_schema_version() -> String {
 
     // Generate a unique hash of the clean schemas,
     // and use it to form a UUID to identify the schema version.
-    generate_uuid_string_from_data("Catalyst-Gateway Index Database Schema", clean_schemas)
+    generate_uuid_string_from_data("Catalyst-Gateway Index Database Schema", &clean_schemas)
 }
 
 /// Get the namespace for a particular db configuration
