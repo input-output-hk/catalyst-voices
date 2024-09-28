@@ -11,7 +11,7 @@ use blake2b_simd::Params;
 ///
 /// # Returns
 /// A UUID string generated from the `BLAKE2b` hash of the concatenated data with the key.
-pub(crate) fn generate_uuid_string_from_data(key: &str, data: Vec<String>) -> String {
+pub(crate) fn generate_uuid_string_from_data(key: &str, data: &[String]) -> String {
     // Where we will actually store the bytes we derive the UUID from.
     let mut bytes: uuid::Bytes = uuid::Bytes::default();
 
@@ -102,7 +102,7 @@ mod tests {
         let data = vec!["test1".to_string(), "test2".to_string()];
 
         // Call the function under test
-        let uuid_str = generate_uuid_string_from_data(key, data);
+        let uuid_str = generate_uuid_string_from_data(key, &data);
 
         // Verify that the output is a valid UUID string
         assert!(uuid::Uuid::parse_str(&uuid_str).is_ok());
@@ -114,7 +114,7 @@ mod tests {
         let data: Vec<String> = vec![];
 
         // Call the function under test
-        let uuid_str = generate_uuid_string_from_data(key, data);
+        let uuid_str = generate_uuid_string_from_data(key, &data);
 
         // Verify that the output is a valid UUID string
         assert!(uuid::Uuid::parse_str(&uuid_str).is_ok());
@@ -126,7 +126,7 @@ mod tests {
         let data = vec!["test1".to_string(), "test2".to_string()];
 
         // Call the function under test
-        let uuid_str = generate_uuid_string_from_data(key, data);
+        let uuid_str = generate_uuid_string_from_data(key, &data);
 
         // Verify that the output is a valid UUID string
         assert!(uuid::Uuid::parse_str(&uuid_str).is_ok());

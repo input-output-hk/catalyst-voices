@@ -124,7 +124,7 @@ pub(crate) struct TracingEndpoint<E> {
 /// Given a Clients IP Address, return the anonymized version of it.
 fn anonymize_ip_address(remote_addr: &str) -> String {
     let addr: Vec<String> = vec![remote_addr.to_string()];
-    generate_uuid_string_from_data(Settings::client_id_key(), addr)
+    generate_uuid_string_from_data(Settings::client_id_key(), &addr)
 }
 
 /// Get an anonymized client ID from the request.
