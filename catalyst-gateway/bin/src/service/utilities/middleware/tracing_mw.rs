@@ -2,7 +2,6 @@
 use std::{sync::LazyLock, time::Instant};
 
 use cpu_time::ProcessTime; // ThreadTime doesn't work.
-use cryptoxide::{blake2b::Blake2b, digest::Digest};
 use poem::{
     http::{header, HeaderMap},
     web::RealIp,
@@ -17,7 +16,7 @@ use tracing::{error, field, Instrument, Level, Span};
 use ulid::Ulid;
 use uuid::Uuid;
 
-use crate::settings::Settings;
+use crate::{settings::Settings, utils::blake2b_hash::generate_uuid_string_from_data};
 
 /// Labels for the metrics
 const METRIC_LABELS: [&str; 3] = ["endpoint", "method", "status_code"];
@@ -124,20 +123,8 @@ pub(crate) struct TracingEndpoint<E> {
 
 /// Given a Clients IP Address, return the anonymized version of it.
 fn anonymize_ip_address(remote_addr: &str) -> String {
-    // We are going to represent it as a UUID.
-    let mut b2b = Blake2b::new_keyed(16, Settings::client_id_key().as_bytes());
-    let mut out = [0; 16];
-
-    b2b.input_str(Settings::client_id_key());
-    b2b.input_str(remote_addr);
-    b2b.result(&mut out);
-
-    uuid::Builder::from_bytes(out)
-        .with_version(uuid::Version::Random)
-        .with_variant(uuid::Variant::RFC4122)
-        .into_uuid()
-        .hyphenated()
-        .to_string()
+    let addr: Vec<String> = vec![remote_addr.to_string()];
+    generate_uuid_string_from_data(Settings::client_id_key(), &addr)
 }
 
 /// Get an anonymized client ID from the request.

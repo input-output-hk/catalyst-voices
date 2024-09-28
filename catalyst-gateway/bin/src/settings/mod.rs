@@ -9,7 +9,6 @@ use std::{
 
 use anyhow::anyhow;
 use clap::Args;
-use cryptoxide::{blake2b::Blake2b, mac::Mac};
 use dotenvy::dotenv;
 use duration_string::DurationString;
 use str_env_var::StringEnvVar;
@@ -20,6 +19,7 @@ use crate::{
     build_info::{log_build_info, BUILD_INFO},
     logger::{self, LogLevel, LOG_LEVEL_DEFAULT},
     service::utilities::net::{get_public_ipv4, get_public_ipv6},
+    utils::blake2b_hash::generate_uuid_string_from_data,
 };
 
 pub(crate) mod cassandra_db;
@@ -58,21 +58,9 @@ const EVENT_DB_URL_DEFAULT: &str =
 /// Hash the Public IPv4 and IPv6 address of the machine, and convert to a 128 bit V4
 /// UUID.
 fn calculate_service_uuid() -> String {
-    let mut hasher = Blake2b::new_keyed(16, "Catalyst-Gateway-Machine-UID".as_bytes());
+    let ip_addr: Vec<String> = vec![get_public_ipv4().to_string(), get_public_ipv6().to_string()];
 
-    let ipv4 = get_public_ipv4().to_string();
-    let ipv6 = get_public_ipv6().to_string();
-
-    hasher.input(ipv4.as_bytes());
-    hasher.input(ipv6.as_bytes());
-
-    let mut hash = [0u8; 16];
-
-    hasher.raw_result(&mut hash);
-    uuid::Builder::from_custom_bytes(hash)
-        .into_uuid()
-        .hyphenated()
-        .to_string()
+    generate_uuid_string_from_data("Catalyst-Gateway-Machine-UID", &ip_addr)
 }
 
 /// Settings for the application.
