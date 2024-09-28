@@ -8,6 +8,7 @@ mod db;
 mod logger;
 mod service;
 mod settings;
+mod utils;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {

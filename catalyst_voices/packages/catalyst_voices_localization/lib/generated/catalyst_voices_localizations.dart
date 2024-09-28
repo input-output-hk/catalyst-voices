@@ -712,6 +712,24 @@ abstract class VoicesLocalizations {
   /// **'You\'re almost there! This is the final and most important step in your account setup.\n\nWe\'re going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.\n\nRole Keys allow you to enter new spaces, discover new ways to participate, and unlock new ways to earn rewards.\n\nWe\'ll start with your Voter Key by default. You can decide to add a Proposer Key and Drep key if you want, or you can always add them later.'**
   String get walletLinkIntroContent;
 
+  /// A title in link wallet flow on select wallet screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Select the Cardano wallet to link\nto your Catalyst Keychain.'**
+  String get walletLinkSelectWalletTitle;
+
+  /// A message (content) in link wallet flow on select wallet screen.
+  ///
+  /// In en, this message translates to:
+  /// **'To complete this action, you\'ll submit a signed transaction to Cardano. There will be an ADA transaction fee.'**
+  String get walletLinkSelectWalletContent;
+
+  /// Message shown when redirecting to external content that describes which wallets are supported.
+  ///
+  /// In en, this message translates to:
+  /// **'See all supported wallets'**
+  String get seeAllSupportedWallets;
+
   /// No description provided for @accountCreationCreate.
   ///
   /// In en, this message translates to:
@@ -855,6 +873,24 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Back'**
   String get back;
+
+  /// Retry action when something goes wrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// Error description when something goes wrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong.'**
+  String get somethingWentWrong;
+
+  /// A description when no wallet extension was found.
+  ///
+  /// In en, this message translates to:
+  /// **'No wallet found.'**
+  String get noWalletFound;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
