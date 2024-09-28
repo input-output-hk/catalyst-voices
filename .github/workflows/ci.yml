@@ -13,6 +13,6 @@ permissions:
 
 jobs:
   ci:
-    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.0.0
+    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.0.1
     with:
       forge_version: latest
