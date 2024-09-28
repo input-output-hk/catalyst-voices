@@ -1,5 +1,5 @@
 import 'package:catalyst_voices/common/ext/ext.dart';
-import 'package:catalyst_voices/pages/account/creation/get_started/account_create_dialog.dart';
+import 'package:catalyst_voices/pages/registration/registration_dialog.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/spaces_drawer.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -63,7 +63,7 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
           automaticallyImplyLeading: false,
           actions: [
             SessionActionHeader(
-              onGetStartedTap: _showAccountGetStarted,
+              onGetStartedTap: _showAccountSetup,
             ),
             const SessionStateHeader(),
           ],
@@ -81,23 +81,7 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
     );
   }
 
-  Future<void> _showAccountGetStarted() async {
-    final type = await AccountCreateDialog.show(context);
-    if (type == null) {
-      return;
-    }
-
-    if (mounted) {
-      switch (type) {
-        case AccountCreateType.createNew:
-          _showCreateAccountFlow().ignore();
-        case AccountCreateType.recover:
-          _showRecoverAccountFlow().ignore();
-      }
-    }
+  Future<void> _showAccountSetup() async {
+    await RegistrationDialog.show(context);
   }
-
-  Future<void> _showCreateAccountFlow() async {}
-
-  Future<void> _showRecoverAccountFlow() async {}
 }

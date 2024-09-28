@@ -434,21 +434,41 @@
   "@learnMore": {
     "description": "A label on a clickable element that can show more content."
   },
-  "walletLink_header": "Link keys to your Catalyst Keychain",
-  "@walletLink_header": {
+  "walletLinkHeader": "Link keys to your Catalyst Keychain",
+  "@walletLinkHeader": {
     "description": "A header in link wallet flow in registration."
   },
-  "walletLink_subheader": "Link your Cardano wallet",
-  "@walletLink_subheader": {
-    "description": "A subheader in link wallet flow in registration."
+  "walletLinkWalletSubheader": "Link your Cardano wallet",
+  "@walletLinkWalletSubheader": {
+    "description": "A subheader in link wallet flow in registration for wallet connection."
   },
-  "walletLink_intro_title": "Link Cardano Wallet & Catalyst Roles to you Catalyst Keychain.",
-  "@walletLink_intro_title": {
+  "walletLinkRolesSubheader": "Select your Catalyst roles",
+  "@walletLinkRolesSubheader": {
+    "description": "A subheader in link wallet flow in registration for role chooser state."
+  },
+  "walletLinkTransactionSubheader": "Sign your Catalyst roles to the\nCardano mainnet",
+  "@walletLinkTransactionSubheader": {
+    "description": "A subheader in link wallet flow in registration for RBAC transaction."
+  },
+  "walletLinkIntroTitle": "Link Cardano Wallet & Catalyst Roles to you Catalyst Keychain.",
+  "@walletLinkIntroTitle": {
     "description": "A title in link wallet flow on intro screen."
   },
-  "walletLink_intro_content": "You're almost there! This is the final and most important step in your account setup.\n\nWe're going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.\n\nRole Keys allow you to enter new spaces, discover new ways to participate, and unlock new ways to earn rewards.\n\nWe'll start with your Voter Key by default. You can decide to add a Proposer Key and Drep key if you want, or you can always add them later.",
-  "@walletLink_intro_content": {
+  "walletLinkIntroContent": "You're almost there! This is the final and most important step in your account setup.\n\nWe're going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.\n\nRole Keys allow you to enter new spaces, discover new ways to participate, and unlock new ways to earn rewards.\n\nWe'll start with your Voter Key by default. You can decide to add a Proposer Key and Drep key if you want, or you can always add them later.",
+  "@walletLinkIntroContent": {
     "description": "A message (content) in link wallet flow on intro screen."
+  },
+  "walletLinkSelectWalletTitle": "Select the Cardano wallet to link\nto your Catalyst Keychain.",
+  "@walletLinkSelectWalletTitle": {
+    "description": "A title in link wallet flow on select wallet screen."
+  },
+  "walletLinkSelectWalletContent": "To complete this action, you'll submit a signed transaction to Cardano. There will be an ADA transaction fee.",
+  "@walletLinkSelectWalletContent": {
+    "description": "A message (content) in link wallet flow on select wallet screen."
+  },
+  "seeAllSupportedWallets": "See all supported wallets",
+  "@seeAllSupportedWallets": {
+    "description": "Message shown when redirecting to external content that describes which wallets are supported."
   },
   "accountCreationCreate": "Create a new \u2028Catalyst Keychain",
   "accountCreationRecover": "Recover your\u2028Catalyst Keychain",
@@ -459,7 +479,7 @@
   "accountCreationGetStartedTitle": "Welcome to Catalyst",
   "accountCreationGetStatedDesc": "If you already have a Catalyst keychain you can restore it on this device, or you can create a new Catalyst Keychain.",
   "accountCreationGetStatedWhatNext": "What do you want to do?",
- "myAccountProfileKeychain": "My Account / Profile & Keychain",
+  "myAccountProfileKeychain": "My Account / Profile & Keychain",
   "@myAccountProfileKeychain": {
     "description": "Title of My Account page"
   },
@@ -470,10 +490,6 @@
   "profileAndKeychain": "Profile & Keychain",
   "@profileAndKeychain": {
     "description": "Tab on My Account page"
-  },
-  "catalystKeychain": "Catalyst Keychain",
-  "@catalystKeychain": {
-    "description": "Title of Catalyst Keychain card"
   },
   "removeKeychain": "Remove Keychain",
   "@removeKeychain": {
@@ -502,5 +518,31 @@
   "defaultRole": "Default",
   "@defaultRole": {
     "description": "Related to account role"
+  },
+  "catalystKeychain": "Catalyst Keychain",
+  "accountCreationSplashTitle": "Create your Catalyst Keychain",
+  "accountCreationSplashMessage": "Your keychain is your ticket to participate in \u2028distributed innovation on the global stage.  \u2028\u2028Once you have it, you'll be able to enter different spaces, discover awesome ideas, and share your feedback to hep improve ideas.  \u2028\u2028As you add new keys to your keychain, you'll be able to enter new spaces, unlock new rewards opportunities, and have your voice heard in community decisions.",
+  "accountCreationSplashNextButton": "Create your Keychain now",
+  "accountInstructionsTitle": "Great! Your Catalyst Keychain \u2028has been created.",
+  "accountInstructionsMessage": "On the next screen, you're going to see 12 words. \u2028This is called your \"seed phrase\".   \u2028\u2028It's like a super secure password that only you know, \u2028that allows you to prove ownership of your keychain.  \u2028\u2028You'll use it to login and recover your account on \u2028different devices, so be sure to put it somewhere safe!\n\nYou need to write this seed phrase down with pen and paper, so get this ready.",
+  "next": "Next",
+  "@next": {
+    "description": "For example in button that goes to next stage of registration"
+  },
+  "back": "Back",
+  "@back": {
+    "description": "For example in button that goes to previous stage of registration"
+  },
+  "retry": "Retry",
+  "@retry": {
+    "description": "Retry action when something goes wrong."
+  },
+  "somethingWentWrong": "Something went wrong.",
+  "@somethingWentWrong": {
+    "description": "Error description when something goes wrong."
+  },
+  "noWalletFound": "No wallet found.",
+  "@noWalletFound": {
+    "description": "A description when no wallet extension was found."
   }
 }

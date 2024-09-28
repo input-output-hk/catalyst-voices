@@ -4,8 +4,9 @@
 //! Event DB logic for chain-sync.  They should be replaced with proper types in a better
 //! place.
 
-use cryptoxide::{blake2b::Blake2b, digest::Digest};
 use serde::{Deserialize, Serialize};
+
+use crate::utils::blake2b_hash::blake2b_224;
 
 /// Pub key
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -15,11 +16,7 @@ impl PubKey {
     /// Get credentials, a blake2b 28 bytes hash of the pub key
     #[allow(dead_code)]
     pub(crate) fn get_credentials(&self) -> [u8; 28] {
-        let mut digest = [0u8; 28];
-        let mut context = Blake2b::new(28);
-        context.input(&self.0);
-        context.result(&mut digest);
-        digest
+        blake2b_224(&self.0)
     }
 
     /// Get bytes
