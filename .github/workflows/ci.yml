@@ -2,14 +2,17 @@ name: CI
 
 on:
   push:
+    branches: [main]
+  pull_request:
 
 permissions:
   id-token: write
   contents: write
   packages: write
+  pull-requests: write
 
 jobs:
   ci:
-    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@master
+    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.0.1
     with:
       forge_version: latest
