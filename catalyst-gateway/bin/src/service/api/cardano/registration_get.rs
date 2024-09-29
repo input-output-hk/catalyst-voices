@@ -1,26 +1,16 @@
 //! Implementation of the GET `/registration` endpoint
 
-use futures::StreamExt;
-use poem_openapi::{payload::Json, types::Example, ApiResponse};
-use tracing::{error, info};
+use poem_openapi::{payload::Json, ApiResponse};
 
 use super::types::SlotNumber;
-use crate::{
-    db::index::{
-        queries::registrations::get_latest_registration_w_stake_addr::{
-            GetLatestRegistrationParams, GetLatestRegistrationQuery,
+use crate::service::{
+    common::{
+        objects::cardano::{
+            network::Network, registration_info::RegistrationInfo, stake_address::StakeAddress,
         },
-        session::CassandraSession,
+        responses::WithErrorResponses,
     },
-    service::{
-        common::{
-            objects::cardano::{
-                network::Network, registration_info::RegistrationInfo, stake_address::StakeAddress,
-            },
-            responses::WithErrorResponses,
-        },
-        utilities::check_network,
-    },
+    utilities::check_network,
 };
 
 /// Endpoint responses
@@ -52,50 +42,4 @@ pub(crate) async fn endpoint(
     };
 
     Responses::NotFound.into()
-}
-
-/// Get latest registration given a stake key hash or stake address
-pub(crate) async fn latest_registration(persistent: bool) -> AllResponses {
-    let Some(session) = CassandraSession::get(persistent) else {
-        error!("Failed to acquire db session");
-        return Responses::NotFound.into();
-    };
-
-    info!("here!!!!!!");
-
-    let stake_addr =
-        match hex::decode("76e7ac0e460b6cdecea4be70479dab13c4adbd117421259a9b36caac007394de") {
-            Ok(k) => k,
-            Err(_err) => return Responses::NotFound.into(),
-        };
-
-    let mut registrations_iter = match GetLatestRegistrationQuery::execute(
-        &session,
-        GetLatestRegistrationParams::new(stake_addr),
-    )
-    .await
-    {
-        Ok(latest) => latest,
-        Err(err) => {
-            error!("Failed to get latest registration {:?}", err);
-            return Responses::NotFound.into();
-        },
-    };
-
-    while let Some(row_res) = registrations_iter.next().await {
-        info!("made!");
-        let row = match row_res {
-            Ok(r) => r,
-            Err(err) => {
-                error!("Failed to get latest registration {:?}", err);
-                return Responses::NotFound.into();
-            },
-        };
-
-        info!("are! {:?}", row.stake_address);
-    }
-
-    let r = RegistrationInfo::example();
-
-    Responses::Ok(Json(r)).into()
 }

@@ -13,6 +13,7 @@ use crate::service::{
     utilities::middleware::schema_validation::schema_version_validation,
 };
 
+mod cip36;
 mod date_time_to_slot_number_get;
 mod registration_get;
 mod staked_ada_get;
@@ -143,7 +144,7 @@ impl CardanoApi {
     ///
     /// This endpoint gets the latest registraton
     #[allow(clippy::unused_async)]
-    async fn latest_registration_cip36(&self) -> registration_get::AllResponses {
-        registration_get::latest_registration(true).await
+    async fn latest_registration_cip36(&self) -> cip36::AllResponses {
+        cip36::latest_registration(true).await
     }
 }
