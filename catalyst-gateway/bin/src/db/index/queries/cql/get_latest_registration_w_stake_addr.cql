@@ -1,5 +1,5 @@
-SELECT *
+SELECT stake_address
 FROM   cip36_registration
 WHERE  stake_address = :stake_address
 ORDER  BY nonce DESC
-LIMIT  1;  
+LIMIT  1; 

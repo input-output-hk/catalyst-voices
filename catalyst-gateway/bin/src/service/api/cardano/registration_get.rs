@@ -64,12 +64,10 @@ pub(crate) async fn latest_registration(persistent: bool) -> AllResponses {
     info!("here!!!!!!");
 
     let stake_addr =
-        match hex::decode("0x12a5b7212903f01722323d229a08ad91e8b01659aad3284c0aad556cff992f93") {
+        match hex::decode("76e7ac0e460b6cdecea4be70479dab13c4adbd117421259a9b36caac007394de") {
             Ok(k) => k,
             Err(_err) => return Responses::NotFound.into(),
         };
-
-    info!("here!2!!!!!");
 
     let mut registrations_iter = match GetLatestRegistrationQuery::execute(
         &session,
@@ -84,20 +82,18 @@ pub(crate) async fn latest_registration(persistent: bool) -> AllResponses {
         },
     };
 
-    let Some(r) = registrations_iter.next().await else {
-        error!("Failed to get latest registration ");
-        return Responses::NotFound.into();
-    };
+    while let Some(row_res) = registrations_iter.next().await {
+        info!("made!");
+        let row = match row_res {
+            Ok(r) => r,
+            Err(err) => {
+                error!("Failed to get latest registration {:?}", err);
+                return Responses::NotFound.into();
+            },
+        };
 
-    let row = match r {
-        Ok(row) => row,
-        Err(err) => {
-            error!("Failed to get latest registration {:?}", err);
-            return Responses::NotFound.into();
-        },
-    };
-
-    info!("got it {:?}", row.stake_address);
+        info!("are! {:?}", row.stake_address);
+    }
 
     let r = RegistrationInfo::example();
 

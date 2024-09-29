@@ -21,7 +21,7 @@ const GET_LATEST_REGISTRATION_QUERY: &str =
 #[derive(SerializeRow)]
 pub(crate) struct GetLatestRegistrationParams {
     /// Stake address.
-    stake_address: Vec<u8>,
+    pub stake_address: Vec<u8>,
 }
 
 impl GetLatestRegistrationParams {
@@ -42,7 +42,7 @@ mod result {
     /// Get TXI query result.
     #[derive(FromRow)]
     pub(crate) struct GetLatestRegistrationQuery {
-        /// TXI slot number.
+        /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
         pub stake_address: Vec<u8>,
     }
 }
