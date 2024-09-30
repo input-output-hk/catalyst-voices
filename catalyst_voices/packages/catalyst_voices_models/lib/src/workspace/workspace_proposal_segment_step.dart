@@ -1,21 +1,20 @@
 import 'package:equatable/equatable.dart';
-import 'package:flutter_quill/flutter_quill.dart';
 
 class WorkspaceProposalSegmentStep extends Equatable {
   final int id;
   final String title;
   final String? description;
-  final Document? document;
+  final List<dynamic>? jsonData;
   final bool isEditable;
 
   const WorkspaceProposalSegmentStep({
     required this.id,
     required this.title,
     this.description,
-    this.document,
+    this.jsonData,
     this.isEditable = false,
   }) : assert(
-          description != null || document != null,
+          description != null || jsonData != null,
           'Make sure description or document are provided',
         );
 
@@ -24,7 +23,7 @@ class WorkspaceProposalSegmentStep extends Equatable {
         id,
         title,
         description,
-        document,
+        jsonData,
         isEditable,
       ];
 }

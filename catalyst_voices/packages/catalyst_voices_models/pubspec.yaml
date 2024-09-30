@@ -12,7 +12,6 @@ dependencies:
   convert: ^3.1.1
   ed25519_hd_key: ^2.3.0
   equatable: ^2.0.5
-  flutter_quill: ^10.5.13
   meta: ^1.10.0
   password_strength: ^0.2.0
 
