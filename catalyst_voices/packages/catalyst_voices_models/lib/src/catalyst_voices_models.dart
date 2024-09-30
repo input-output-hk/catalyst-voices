@@ -9,7 +9,7 @@ export 'proposal/funded_proposal.dart';
 export 'proposal/pending_proposal.dart';
 export 'proposal/proposal_status.dart';
 export 'registration/registration.dart';
-export 'document_json.dart';
+export 'document/document_json.dart';
 export 'seed_phrase.dart';
 export 'session_data.dart';
 export 'space.dart';

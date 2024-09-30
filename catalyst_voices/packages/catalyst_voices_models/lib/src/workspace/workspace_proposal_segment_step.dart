@@ -1,4 +1,4 @@
-import 'package:catalyst_voices_models/src/document_json.dart';
+import 'package:catalyst_voices_models/src/document/document_json.dart';
 import 'package:equatable/equatable.dart';
 
 class WorkspaceProposalSegmentStep extends Equatable {
