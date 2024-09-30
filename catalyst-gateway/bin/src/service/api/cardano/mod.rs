@@ -136,15 +136,30 @@ impl CardanoApi {
     }
 
     #[oai(
-        path = "/cip36/latest_registration",
+        path = "/cip36/latest_registration/stake_addr",
         method = "get",
-        operation_id = "latestRegistration"
+        operation_id = "latestRegistrationGivenStakeAddr"
     )]
     /// Cip36 registrations
     ///
-    /// This endpoint gets the latest registraton
-    #[allow(clippy::unused_async)]
-    async fn latest_registration_cip36(&self) -> cip36::AllResponses {
-        cip36::latest_registration(true).await
+    /// This endpoint gets the latest registraton given a stake addr
+    async fn latest_registration_cip36_given_stake_addr(
+        &self, stake_addr: Query<String>,
+    ) -> cip36::AllResponses {
+        cip36::get_latest_registration_from_stake_addr(stake_addr.0, true).await
+    }
+
+    #[oai(
+        path = "/cip36/latest_registration/stake_hash",
+        method = "get",
+        operation_id = "latestRegistrationGivenStakeHash"
+    )]
+    /// Cip36 registrations
+    ///
+    /// This endpoint gets the latest registraton given a stake key hash
+    async fn latest_registration_cip36_given_stake_key_hash(
+        &self, stake_key_hash: Query<String>,
+    ) -> cip36::AllResponses {
+        cip36::get_latest_registration_from_stake_key_hash(stake_key_hash.0, true).await
     }
 }
