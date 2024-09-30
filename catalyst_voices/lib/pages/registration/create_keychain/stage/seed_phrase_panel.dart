@@ -23,8 +23,8 @@ class SeedPhrasePanel extends StatefulWidget {
 class _SeedPhrasePanelState extends State<SeedPhrasePanel> {
   @override
   void initState() {
-    RegistrationCubit.of(context).buildSeedPhrase();
     super.initState();
+    RegistrationCubit.of(context).buildSeedPhrase();
   }
 
   @override
@@ -142,7 +142,7 @@ class _Navigation extends StatelessWidget {
         Expanded(
           child: VoicesNextButton(
             onTap: isNextEnabled
-                ? () => RegistrationCubit.of(context).nextStep
+                ? () => RegistrationCubit.of(context).nextStep()
                 : null,
           ),
         ),

@@ -10,12 +10,12 @@ import 'package:flutter/material.dart';
 
 class WalletLinkPanel extends StatelessWidget {
   final WalletLinkStage stage;
-  final WalletLinkStateData state;
+  final WalletLinkStateData stateData;
 
   const WalletLinkPanel({
     super.key,
     required this.stage,
-    required this.state,
+    required this.stateData,
   });
 
   @override
@@ -23,7 +23,7 @@ class WalletLinkPanel extends StatelessWidget {
     return switch (stage) {
       WalletLinkStage.intro => const IntroPanel(),
       WalletLinkStage.selectWallet => SelectWalletPanel(
-          walletsResult: state.wallets,
+          walletsResult: stateData.wallets,
         ),
       WalletLinkStage.walletDetails => const WalletDetailsPanel(),
       WalletLinkStage.rolesChooser => const RolesChooserPanel(),

@@ -80,16 +80,26 @@ final class CreateKeychain extends CreateNew {
         stage,
         seedPhraseState,
       ];
+
+  CreateKeychain copyWith({
+    CreateKeychainStage? stage,
+    SeedPhraseState? seedPhraseState,
+  }) {
+    return CreateKeychain(
+      stage: stage ?? this.stage,
+      seedPhraseState: seedPhraseState ?? this.seedPhraseState,
+    );
+  }
 }
 
 /// Linking existing keychain with wallet.
 final class WalletLink extends CreateNew {
   final WalletLinkStage stage;
-  final WalletLinkStateData state;
+  final WalletLinkStateData stateData;
 
   const WalletLink({
     this.stage = WalletLinkStage.intro,
-    this.state = const WalletLinkStateData(),
+    this.stateData = const WalletLinkStateData(),
   });
 
   @override
@@ -107,8 +117,18 @@ final class WalletLink extends CreateNew {
       super.props +
       [
         stage,
-        state,
+        stateData,
       ];
+
+  WalletLink copyWith({
+    WalletLinkStage? stage,
+    WalletLinkStateData? stateData,
+  }) {
+    return WalletLink(
+      stage: stage ?? this.stage,
+      stateData: stateData ?? this.stateData,
+    );
+  }
 }
 
 final class AccountCompleted extends RegistrationState {

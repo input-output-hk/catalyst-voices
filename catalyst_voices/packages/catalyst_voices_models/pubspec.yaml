@@ -21,6 +21,6 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-# Delete this once flutter_quill is deleted from this package
+# TODO(damian-molinski): Delete this once flutter_quill is deleted from this package
 flutter:
   uses-material-design: true

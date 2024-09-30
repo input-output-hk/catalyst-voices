@@ -5,41 +5,41 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 final class KeychainCreationCubit extends Cubit<CreateKeychain> {
-  CreateKeychainStage _stage;
-  SeedPhrase? _seedPhrase;
-  bool _isSeedPhraseStoredConfirmed = false;
+  KeychainCreationCubit() : super(const CreateKeychain());
 
-  KeychainCreationCubit()
-      : _stage = CreateKeychainStage.splash,
-        super(const CreateKeychain());
+  set _seedPhraseState(SeedPhraseState newValue) {
+    emit(state.copyWith(seedPhraseState: newValue));
+  }
+
+  SeedPhraseState get _seedPhraseState => state.seedPhraseState;
 
   void changeStage(CreateKeychainStage newValue) {
-    if (_stage != newValue) {
-      _stage = newValue;
-      emit(_buildState());
+    if (state.stage != newValue) {
+      emit(state.copyWith(stage: newValue));
     }
   }
 
   void buildSeedPhrase() {
-    _seedPhrase = SeedPhrase();
-    emit(_buildState());
+    final seedPhrase = SeedPhrase();
+    _seedPhraseState = _seedPhraseState.copyWith(
+      seedPhrase: Optional.of(seedPhrase),
+    );
   }
 
   void ensureSeedPhraseCreated() {
-    if (_seedPhrase == null) {
+    if (_seedPhraseState.seedPhrase == null) {
       buildSeedPhrase();
     }
   }
 
   void setSeedPhraseStoredConfirmed(bool newValue) {
-    if (_isSeedPhraseStoredConfirmed != newValue) {
-      _isSeedPhraseStoredConfirmed = newValue;
-      emit(_buildState());
+    if (_seedPhraseState.isStoredConfirmed != newValue) {
+      _seedPhraseState = _seedPhraseState.copyWith(isStoredConfirmed: newValue);
     }
   }
 
   CreateKeychainStep? nextStep() {
-    final currentStageIndex = CreateKeychainStage.values.indexOf(_stage);
+    final currentStageIndex = CreateKeychainStage.values.indexOf(state.stage);
     final isLast = currentStageIndex == CreateKeychainStage.values.length - 1;
     if (isLast) {
       return null;
@@ -50,7 +50,7 @@ final class KeychainCreationCubit extends Cubit<CreateKeychain> {
   }
 
   CreateKeychainStep? previousStep() {
-    final currentStageIndex = CreateKeychainStage.values.indexOf(_stage);
+    final currentStageIndex = CreateKeychainStage.values.indexOf(state.stage);
     final isFirst = currentStageIndex == 0;
     if (isFirst) {
       return null;
@@ -58,15 +58,5 @@ final class KeychainCreationCubit extends Cubit<CreateKeychain> {
 
     final previousStage = CreateKeychainStage.values[currentStageIndex - 1];
     return CreateKeychainStep(stage: previousStage);
-  }
-
-  CreateKeychain _buildState() {
-    return CreateKeychain(
-      stage: _stage,
-      seedPhraseState: SeedPhraseState(
-        seedPhrase: _seedPhrase,
-        isStoredConfirmed: _isSeedPhraseStoredConfirmed,
-      ),
-    );
   }
 }

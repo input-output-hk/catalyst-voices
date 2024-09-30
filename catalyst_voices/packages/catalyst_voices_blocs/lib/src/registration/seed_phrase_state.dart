@@ -10,6 +10,16 @@ final class SeedPhraseState extends Equatable {
     this.isStoredConfirmed = false,
   });
 
+  SeedPhraseState copyWith({
+    Optional<SeedPhrase>? seedPhrase,
+    bool? isStoredConfirmed,
+  }) {
+    return SeedPhraseState(
+      seedPhrase: seedPhrase != null ? seedPhrase.data : this.seedPhrase,
+      isStoredConfirmed: isStoredConfirmed ?? this.isStoredConfirmed,
+    );
+  }
+
   @override
   List<Object?> get props => [
         seedPhrase,

@@ -8,37 +8,35 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:result_type/result_type.dart';
 
 final class WalletLinkCubit extends Cubit<WalletLink> {
-  WalletLinkStage _stage;
-  Result<List<CardanoWallet>, Exception>? _wallets;
+  WalletLinkCubit() : super(const WalletLink());
 
-  WalletLinkCubit()
-      : _stage = WalletLinkStage.intro,
-        super(const WalletLink());
+  set _stateData(WalletLinkStateData newValue) {
+    emit(state.copyWith(stateData: newValue));
+  }
+
+  WalletLinkStateData get _stateData => state.stateData;
 
   void changeStage(WalletLinkStage newValue) {
-    if (_stage != newValue) {
-      _stage = newValue;
-      emit(_buildState());
+    if (state.stage != newValue) {
+      emit(state.copyWith(stage: newValue));
     }
   }
 
   Future<void> refreshCardanoWallets() async {
     try {
-      _wallets = null;
-      emit(_buildState());
+      _stateData = _stateData.copyWith(wallets: const Optional.empty());
 
       final wallets =
           await CatalystCardano.instance.getWallets().withMinimumDelay();
-      _wallets = Success(wallets);
-      emit(_buildState());
+
+      _stateData = _stateData.copyWith(wallets: Optional(Success(wallets)));
     } on Exception catch (error) {
-      _wallets = Failure(error);
-      emit(_buildState());
+      _stateData = _stateData.copyWith(wallets: Optional(Failure(error)));
     }
   }
 
   WalletLinkStep? nextStep() {
-    final currentStageIndex = WalletLinkStage.values.indexOf(_stage);
+    final currentStageIndex = WalletLinkStage.values.indexOf(state.stage);
     final isLast = currentStageIndex == WalletLinkStage.values.length - 1;
     if (isLast) {
       return null;
@@ -49,7 +47,7 @@ final class WalletLinkCubit extends Cubit<WalletLink> {
   }
 
   WalletLinkStep? previousStep() {
-    final currentStageIndex = WalletLinkStage.values.indexOf(_stage);
+    final currentStageIndex = WalletLinkStage.values.indexOf(state.stage);
     final isFirst = currentStageIndex == 0;
     if (isFirst) {
       return null;
@@ -57,14 +55,5 @@ final class WalletLinkCubit extends Cubit<WalletLink> {
 
     final previousStage = WalletLinkStage.values[currentStageIndex - 1];
     return WalletLinkStep(stage: previousStage);
-  }
-
-  WalletLink _buildState() {
-    return WalletLink(
-      stage: _stage,
-      state: WalletLinkStateData(
-        wallets: _wallets,
-      ),
-    );
   }
 }
