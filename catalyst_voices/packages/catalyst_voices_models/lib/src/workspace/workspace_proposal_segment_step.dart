@@ -1,21 +1,21 @@
-import 'package:catalyst_voices_models/src/rich_text_json_data.dart';
+import 'package:catalyst_voices_models/src/document_json.dart';
 import 'package:equatable/equatable.dart';
 
 class WorkspaceProposalSegmentStep extends Equatable {
   final int id;
   final String title;
   final String? description;
-  final RichTextJsonData? jsonData;
+  final DocumentJson? documentJson;
   final bool isEditable;
 
   const WorkspaceProposalSegmentStep({
     required this.id,
     required this.title,
     this.description,
-    this.jsonData,
+    this.documentJson,
     this.isEditable = false,
   }) : assert(
-          description != null || jsonData != null,
+          description != null || documentJson != null,
           'Make sure description or document are provided',
         );
 
@@ -24,7 +24,7 @@ class WorkspaceProposalSegmentStep extends Equatable {
         id,
         title,
         description,
-        jsonData,
+        documentJson,
         isEditable,
       ];
 }
