@@ -426,6 +426,18 @@ $er_i$ noted as encrypted tally result for the provided $i$-th voting choice.
 As it is not an open decrypted value yet,
 it needs a decryption procedure corresponded for which encryption one was made.
 
+Important to note that the resulted value $er_i$ is a ciphertext, the same as $c_{j, i}$.
+So $er_i = (er_{i, 1}, er_{i, 2})$ consists of elements $er_{i, 1}, er_{i, 2} \in \mathbb{G}$.
+Operations which are applied for pair $c_{j, i} \circ c_{j+1, i}$, actually means the following:
+
+\begin{equation}
+c_{j, i} \circ c_{j+1, i} = (c_{j, i, 1} \circ c_{j+1, i, 1},\quad c_{j, i, 2} \circ c_{j+1, i, 2})
+\end{equation}
+
+So $\circ$ operation applied separately for each corresponding items of the ciphertexts $c_{j, i}, c_{j+1, i}$
+and in the result we are getting a new ciphertext.
+
+
 <!-- markdownlint-enable no-inline-html -->
 
 ## D: Non-Interactive ZK Vote Proof
