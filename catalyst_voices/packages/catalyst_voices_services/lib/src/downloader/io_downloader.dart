@@ -1,5 +1,7 @@
 import 'package:catalyst_voices_services/src/downloader/downloader.dart';
 
+Downloader getDownloader() => const IODownloader();
+
 final class IODownloader implements Downloader {
   const IODownloader();
 

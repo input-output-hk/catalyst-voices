@@ -2,6 +2,8 @@ import 'package:catalyst_voices_services/src/downloader/downloader.dart';
 import 'package:path/path.dart' as p;
 import 'package:web/web.dart' as web;
 
+Downloader getDownloader() => const WebDownloader();
+
 /// Web only implementation of [Downloader].
 final class WebDownloader implements Downloader {
   const WebDownloader();
