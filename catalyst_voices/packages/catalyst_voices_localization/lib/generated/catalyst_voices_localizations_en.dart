@@ -498,4 +498,16 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get keychainDeletedDialogInfo => 'Catalyst keychain removed';
+
+  @override
+  String get createKeychainSeedPhraseSubtitle => 'Write down your 12 Catalyst  security words';
+
+  @override
+  String get createKeychainSeedPhraseBody => 'Make sure you create an offline backup of your recovery phrase as well.';
+
+  @override
+  String get createKeychainSeedPhraseDownload => 'Download Catalyst key';
+
+  @override
+  String get createKeychainSeedPhraseStoreConfirmation => 'I have written down/downloaded my 12 words';
 }

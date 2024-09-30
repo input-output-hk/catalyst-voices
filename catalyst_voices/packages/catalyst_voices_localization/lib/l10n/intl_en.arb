@@ -590,5 +590,9 @@
   "keychainDeletedDialogInfo": "Catalyst keychain removed",
   "@keychainDeletedDialogInfo": {
     "description": "An info on keychain deleted dialog"
-  }
+  },
+  "createKeychainSeedPhraseSubtitle": "Write down your 12 Catalyst \u2028security words",
+  "createKeychainSeedPhraseBody": "Make sure you create an offline backup of your recovery phrase as well.",
+  "createKeychainSeedPhraseDownload": "Download Catalyst key",
+  "createKeychainSeedPhraseStoreConfirmation": "I have written down/downloaded my 12 words"
 }

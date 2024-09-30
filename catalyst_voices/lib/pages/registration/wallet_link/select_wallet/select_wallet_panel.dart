@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -8,8 +6,24 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:result_type/result_type.dart';
 
-class SelectWalletPanel extends StatelessWidget {
-  const SelectWalletPanel({super.key});
+class SelectWalletPanel extends StatefulWidget {
+  final Result<List<CardanoWallet>, Exception>? walletsResult;
+
+  const SelectWalletPanel({
+    super.key,
+    this.walletsResult,
+  });
+
+  @override
+  State<SelectWalletPanel> createState() => _SelectWalletPanelState();
+}
+
+class _SelectWalletPanelState extends State<SelectWalletPanel> {
+  @override
+  void initState() {
+    super.initState();
+    _sendRefreshEvent();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,11 +41,16 @@ class SelectWalletPanel extends StatelessWidget {
           style: Theme.of(context).textTheme.bodyMedium,
         ),
         const SizedBox(height: 40),
-        const Expanded(child: _Wallets()),
+        Expanded(
+          child: _Wallets(
+            result: widget.walletsResult,
+            onRefreshTap: _sendRefreshEvent,
+          ),
+        ),
         const SizedBox(height: 24),
         VoicesBackButton(
           onTap: () {
-            RegistrationBloc.of(context).add(const PreviousStepEvent());
+            RegistrationCubit.of(context).previousStep();
           },
         ),
         const SizedBox(height: 10),
@@ -43,44 +62,30 @@ class SelectWalletPanel extends StatelessWidget {
       ],
     );
   }
-}
 
-class _Wallets extends StatefulWidget {
-  const _Wallets();
-
-  @override
-  State<_Wallets> createState() => _WalletsState();
-}
-
-class _WalletsState extends State<_Wallets> {
-  @override
-  void initState() {
-    super.initState();
-
-    final bloc = RegistrationBloc.of(context);
-    if (bloc.cardanoWallets.value == null) {
-      unawaited(bloc.refreshCardanoWallets());
-    }
+  void _sendRefreshEvent() {
+    RegistrationCubit.of(context).refreshCardanoWallets();
   }
+}
+
+class _Wallets extends StatelessWidget {
+  final Result<List<CardanoWallet>, Exception>? result;
+  final VoidCallback onRefreshTap;
+
+  const _Wallets({
+    this.result,
+    required this.onRefreshTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: RegistrationBloc.of(context).cardanoWallets,
-      builder: (context, result, _) {
-        return switch (result) {
-          Success(:final value) => value.isNotEmpty
-              ? _WalletsList(wallets: value)
-              : _WalletsEmpty(onRetry: _onRetry),
-          Failure() => _WalletsError(onRetry: _onRetry),
-          _ => const Center(child: VoicesCircularProgressIndicator()),
-        };
-      },
-    );
-  }
-
-  void _onRetry() {
-    unawaited(RegistrationBloc.of(context).refreshCardanoWallets());
+    return switch (result) {
+      Success(:final value) => value.isNotEmpty
+          ? _WalletsList(wallets: value)
+          : _WalletsEmpty(onRetry: onRefreshTap),
+      Failure() => _WalletsError(onRetry: onRefreshTap),
+      _ => const Center(child: VoicesCircularProgressIndicator()),
+    };
   }
 }
 
@@ -99,7 +104,7 @@ class _WalletsList extends StatelessWidget {
           iconSrc: wallet.icon,
           name: Text(wallet.name),
           onTap: () {
-            RegistrationBloc.of(context).add(const NextStepEvent());
+            RegistrationCubit.of(context).nextStep();
           },
         );
       },

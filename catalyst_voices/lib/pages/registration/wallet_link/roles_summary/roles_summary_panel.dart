@@ -16,7 +16,7 @@ class RolesSummaryPanel extends StatelessWidget {
         VoicesFilledButton(
           leading: VoicesAssets.icons.wallet.buildIcon(),
           onTap: () {
-            RegistrationBloc.of(context).add(const PreviousStepEvent());
+            RegistrationCubit.of(context).previousStep();
           },
           child: const Text('Previous'),
         ),
@@ -24,7 +24,7 @@ class RolesSummaryPanel extends StatelessWidget {
         VoicesFilledButton(
           leading: VoicesAssets.icons.wallet.buildIcon(),
           onTap: () {
-            RegistrationBloc.of(context).add(const NextStepEvent());
+            RegistrationCubit.of(context).nextStep();
           },
           child: const Text('Next'),
         ),
