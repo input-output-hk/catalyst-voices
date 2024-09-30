@@ -27,9 +27,7 @@ class SplashPanel extends StatelessWidget {
         const Spacer(),
         VoicesFilledButton(
           child: Text(context.l10n.accountCreationSplashNextButton),
-          onTap: () {
-            RegistrationBloc.of(context).add(const NextStepEvent());
-          },
+          onTap: () => RegistrationCubit.of(context).nextStep(),
         ),
       ],
     );

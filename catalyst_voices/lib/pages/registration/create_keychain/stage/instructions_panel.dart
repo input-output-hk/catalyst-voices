@@ -40,17 +40,13 @@ class _Navigation extends StatelessWidget {
       children: [
         Expanded(
           child: VoicesBackButton(
-            onTap: () {
-              RegistrationBloc.of(context).add(const PreviousStepEvent());
-            },
+            onTap: () => RegistrationCubit.of(context).previousStep(),
           ),
         ),
         const SizedBox(width: 10),
         Expanded(
           child: VoicesNextButton(
-            onTap: () {
-              RegistrationBloc.of(context).add(const NextStepEvent());
-            },
+            onTap: () => RegistrationCubit.of(context).nextStep(),
           ),
         ),
       ],

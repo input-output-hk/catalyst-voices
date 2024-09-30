@@ -29,7 +29,7 @@ final class Dependencies extends DependencyProvider {
       )
       ..registerLazySingleton<SessionBloc>(SessionBloc.new)
       // Factory will rebuild it each time needed
-      ..registerFactory<RegistrationBloc>(RegistrationBloc.new);
+      ..registerFactory<RegistrationCubit>(RegistrationCubit.new);
   }
 
   void _registerRepositories() {
