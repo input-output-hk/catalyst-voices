@@ -39,7 +39,7 @@ class _RegistrationDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesDesktopPanelsDialog(
+    return VoicesTwoPaneDialog(
       left: const RegistrationInfoPanel(),
       right: switch (state) {
         GetStarted() => const GetStartedPanel(),
