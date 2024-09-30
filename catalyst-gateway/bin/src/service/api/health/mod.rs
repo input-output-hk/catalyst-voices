@@ -4,7 +4,7 @@ use poem_openapi::{param::Query, OpenApi};
 use crate::service::common::tags::ApiTags;
 
 mod inspection_get;
-pub mod live_get;
+mod live_get;
 mod ready_get;
 mod started_get;
 pub(crate) use started_get::started;
@@ -51,7 +51,7 @@ impl HealthApi {
     ///
     /// *This endpoint is for internal use of the service deployment infrastructure.
     /// It may not be exposed publicly. Refer to []*
-    pub async fn live_get(&self) -> live_get::AllResponses {
+    async fn live_get(&self) -> live_get::AllResponses {
         live_get::endpoint().await
     }
 
