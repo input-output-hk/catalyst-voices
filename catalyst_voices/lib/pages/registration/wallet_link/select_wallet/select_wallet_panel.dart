@@ -22,7 +22,7 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
   @override
   void initState() {
     super.initState();
-    _sendRefreshEvent();
+    _refreshWallets();
   }
 
   @override
@@ -44,7 +44,8 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
         Expanded(
           child: _Wallets(
             result: widget.walletsResult,
-            onRefreshTap: _sendRefreshEvent,
+            onRefreshTap: _refreshWallets,
+            onSelectWallet: _onSelectWallet,
           ),
         ),
         const SizedBox(height: 24),
@@ -63,17 +64,23 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
     );
   }
 
-  void _sendRefreshEvent() {
-    RegistrationCubit.of(context).refreshCardanoWallets();
+  void _refreshWallets() {
+    RegistrationCubit.of(context).refreshWallets();
+  }
+
+  void _onSelectWallet(CardanoWallet wallet) {
+    RegistrationCubit.of(context).selectWallet(wallet);
   }
 }
 
 class _Wallets extends StatelessWidget {
   final Result<List<CardanoWallet>, Exception>? result;
+  final ValueChanged<CardanoWallet> onSelectWallet;
   final VoidCallback onRefreshTap;
 
   const _Wallets({
     this.result,
+    required this.onSelectWallet,
     required this.onRefreshTap,
   });
 
@@ -81,7 +88,7 @@ class _Wallets extends StatelessWidget {
   Widget build(BuildContext context) {
     return switch (result) {
       Success(:final value) => value.isNotEmpty
-          ? _WalletsList(wallets: value)
+          ? _WalletsList(wallets: value, onSelectWallet: onSelectWallet)
           : _WalletsEmpty(onRetry: onRefreshTap),
       Failure() => _WalletsError(onRetry: onRefreshTap),
       _ => const Center(child: VoicesCircularProgressIndicator()),
@@ -91,8 +98,12 @@ class _Wallets extends StatelessWidget {
 
 class _WalletsList extends StatelessWidget {
   final List<CardanoWallet> wallets;
+  final ValueChanged<CardanoWallet> onSelectWallet;
 
-  const _WalletsList({required this.wallets});
+  const _WalletsList({
+    required this.wallets,
+    required this.onSelectWallet,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -103,9 +114,7 @@ class _WalletsList extends StatelessWidget {
         return VoicesWalletTile(
           iconSrc: wallet.icon,
           name: Text(wallet.name),
-          onTap: () {
-            RegistrationCubit.of(context).nextStep();
-          },
+          onTap: () => onSelectWallet(wallet),
         );
       },
     );

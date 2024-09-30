@@ -16,6 +16,7 @@ export 'treasury/treasury_campaign_builder.dart';
 export 'treasury/treasury_campaign_segment.dart';
 export 'treasury/treasury_campaign_segment_step.dart';
 export 'user/user.dart';
+export 'wallet/cardano_wallet_details.dart';
 export 'workspace/workspace_proposal_navigation.dart';
 export 'workspace/workspace_proposal_segment.dart';
 export 'workspace/workspace_proposal_segment_step.dart';

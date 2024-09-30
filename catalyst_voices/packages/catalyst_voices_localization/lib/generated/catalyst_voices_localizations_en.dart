@@ -377,7 +377,24 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get walletLinkSelectWalletContent => 'To complete this action, you\'ll submit a signed transaction to Cardano. There will be an ADA transaction fee.';
 
   @override
+  String get walletLinkWalletDetailsTitle => 'Cardano wallet detection';
+
+  @override
+  String walletLinkWalletDetailsContent(String wallet) {
+    return '$wallet connected successfully!';
+  }
+
+  @override
   String get seeAllSupportedWallets => 'See all supported wallets';
+
+  @override
+  String get walletDetectionSummary => 'See all supported wallets';
+
+  @override
+  String get walletBalance => 'Wallet balance';
+
+  @override
+  String get walletAddress => 'Wallet address';
 
   @override
   String get accountCreationCreate => 'Create a new  Catalyst Keychain';
@@ -464,13 +481,13 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get deleteKeychainDialogTitle => 'Delete Keychain?';
 
   @override
-  String get deleteKeychainDialogSubtitle => 'Are you sure you wants to delete your  Catalyst Keychain from this device?';
+  String get deleteKeychainDialogSubtitle => 'Are you sure you wants to delete your Catalyst Keychain from this device?';
 
   @override
   String get deleteKeychainDialogWarning => 'Make sure you have a working Catalyst 12-word seedphrase!';
 
   @override
-  String get deleteKeychainDialogWarningInfo => 'Your Catalyst account will be removed, this action cannot be undone!';
+  String get deleteKeychainDialogWarningInfo => 'Your Catalyst account will be removed,this action cannot be undone!';
 
   @override
   String get deleteKeychainDialogTypingInfo => 'To avoid mistakes, please type ‘Remove Keychain’ below.';

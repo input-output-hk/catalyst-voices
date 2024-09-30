@@ -466,9 +466,34 @@
   "@walletLinkSelectWalletContent": {
     "description": "A message (content) in link wallet flow on select wallet screen."
   },
+  "walletLinkWalletDetailsTitle": "Cardano wallet detection",
+  "@walletLinkWalletDetailsTitle": {
+    "description": "A title in link wallet flow on wallet details screen."
+  },
+  "walletLinkWalletDetailsContent": "{wallet} connected successfully!",
+  "@walletLinkWalletDetailsContent": {
+    "description": "A message in link wallet flow on wallet details screen.",
+    "placeholders": {
+      "wallet": {
+        "type": "String"
+      }
+    }
+  },
   "seeAllSupportedWallets": "See all supported wallets",
   "@seeAllSupportedWallets": {
     "description": "Message shown when redirecting to external content that describes which wallets are supported."
+  },
+  "walletDetectionSummary": "See all supported wallets",
+  "@walletDetectionSummary": {
+    "description": "Message shown when redirecting to external content that describes which wallets are supported."
+  },
+  "walletBalance": "Wallet balance",
+  "@walletBalance": {
+    "description": "The wallet balance in terms of Ada."
+  },
+  "walletAddress": "Wallet address",
+  "@walletAddress": {
+    "description": "A cardano wallet address"
   },
   "accountCreationCreate": "Create a new \u2028Catalyst Keychain",
   "accountCreationRecover": "Recover your\u2028Catalyst Keychain",
@@ -549,7 +574,7 @@
   "@deleteKeychainDialogTitle": {
     "description": "A title on delete keychain dialog"
   },
-  "deleteKeychainDialogSubtitle": "Are you sure you wants to delete your  Catalyst Keychain from this device?",
+  "deleteKeychainDialogSubtitle": "Are you sure you wants to delete your\nCatalyst Keychain from this device?",
   "@deleteKeychainDialogSubtitle": {
     "description": "A subtitle on delete keychain dialog"
   },
@@ -557,7 +582,7 @@
   "@deleteKeychainDialogWarning": {
     "description": "A warning on delete keychain dialog"
   },
-  "deleteKeychainDialogWarningInfo": "Your Catalyst account will be removed, this action cannot be undone!",
+  "deleteKeychainDialogWarningInfo": "Your Catalyst account will be removed,\nthis action cannot be undone!",
   "@deleteKeychainDialogWarningInfo": {
     "description": "A warning info on delete keychain dialog"
   },
