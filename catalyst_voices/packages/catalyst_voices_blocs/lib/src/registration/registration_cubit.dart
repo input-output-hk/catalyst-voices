@@ -4,6 +4,7 @@ import 'package:catalyst_voices_blocs/src/registration/cubits/keychain_creation_
 import 'package:catalyst_voices_blocs/src/registration/cubits/wallet_link_cubit.dart';
 import 'package:catalyst_voices_blocs/src/registration/registration_state.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -12,8 +13,11 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
   final KeychainCreationCubit _keychainCreationCubit;
   final WalletLinkCubit _walletLinkCubit;
 
-  RegistrationCubit()
-      : _keychainCreationCubit = KeychainCreationCubit(),
+  RegistrationCubit({
+    required Downloader downloader,
+  })  : _keychainCreationCubit = KeychainCreationCubit(
+          downloader: downloader,
+        ),
         _walletLinkCubit = WalletLinkCubit(),
         super(const GetStarted()) {
     _keychainCreationCubit.stream.listen(emit);
@@ -81,6 +85,10 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     required bool confirmed,
   }) {
     _keychainCreationCubit.setSeedPhraseStoredConfirmed(confirmed);
+  }
+
+  Future<void> downloadSeedPhrase() {
+    return _keychainCreationCubit.downloadSeedPhrase();
   }
 
   void refreshCardanoWallets() {
