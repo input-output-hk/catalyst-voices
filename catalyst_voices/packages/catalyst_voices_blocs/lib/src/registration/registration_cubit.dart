@@ -16,7 +16,7 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
   RegistrationCubit()
       : _keychainCreationCubit = KeychainCreationCubit(),
         _walletLinkCubit = WalletLinkCubit(),
-        super(const WalletLink()) {
+        super(const GetStarted()) {
     _keychainCreationCubit.stream.listen(emit);
     _walletLinkCubit.stream.listen(emit);
   }
