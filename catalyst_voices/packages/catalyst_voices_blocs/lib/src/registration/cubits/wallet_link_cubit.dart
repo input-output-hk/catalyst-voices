@@ -7,6 +7,8 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:result_type/result_type.dart';
 
+final _logger = Logger('WalletLinkCubit');
+
 final class WalletLinkCubit extends Cubit<WalletLink> {
   WalletLinkCubit() : super(const WalletLink());
 
@@ -22,7 +24,7 @@ final class WalletLinkCubit extends Cubit<WalletLink> {
     }
   }
 
-  Future<void> refreshCardanoWallets() async {
+  Future<void> refreshWallets() async {
     try {
       _stateData = _stateData.copyWith(wallets: const Optional.empty());
 
@@ -30,8 +32,34 @@ final class WalletLinkCubit extends Cubit<WalletLink> {
           await CatalystCardano.instance.getWallets().withMinimumDelay();
 
       _stateData = _stateData.copyWith(wallets: Optional(Success(wallets)));
-    } on Exception catch (error) {
+    } on Exception catch (error, stackTrace) {
+      _logger.severe(error, stackTrace);
       _stateData = _stateData.copyWith(wallets: Optional(Failure(error)));
+    }
+  }
+
+  Future<void> selectWallet(CardanoWallet wallet) async {
+    try {
+      final enabledWallet = await wallet.enable();
+      final balance = await enabledWallet.getBalance();
+      final address = await enabledWallet.getChangeAddress();
+
+      final walletDetails = CardanoWalletDetails(
+        wallet: wallet,
+        balance: balance.coin,
+        address: address,
+      );
+
+      final nextState = state.copyWith(
+        stage: WalletLinkStage.walletDetails,
+        stateData: _stateData.copyWith(
+          selectedWallet: Optional(walletDetails),
+        ),
+      );
+
+      emit(nextState);
+    } catch (error, stackTrace) {
+      _logger.severe(error, stackTrace);
     }
   }
 
