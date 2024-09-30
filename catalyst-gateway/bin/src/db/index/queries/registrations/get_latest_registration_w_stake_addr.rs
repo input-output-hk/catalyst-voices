@@ -35,7 +35,6 @@ impl GetLatestRegistrationParams {
 
 /// Get latest registration given stake addr or vote key
 #[allow(clippy::expect_used)]
-#[allow(dead_code)]
 mod result {
     use scylla::FromRow;
 
@@ -56,8 +55,6 @@ mod result {
         pub payment_address: Vec<u8>,
         /// Is the stake address a script or not.
         pub is_payable: bool,
-        /// Raw nonce value.
-        pub raw_nonce: num_bigint::BigInt,
         /// Is the Registration CIP36 format, or CIP15
         pub cip36: bool,
     }
@@ -88,7 +85,7 @@ impl GetLatestRegistrationQuery {
         session: &CassandraSession, params: GetLatestRegistrationParams,
     ) -> anyhow::Result<TypedRowIterator<result::GetLatestRegistrationQuery>> {
         let iter = session
-            .execute_iter(PreparedSelectQuery::GetLatestRegistration, params)
+            .execute_iter(PreparedSelectQuery::LatestRegistration, params)
             .await?
             .into_typed::<result::GetLatestRegistrationQuery>();
 

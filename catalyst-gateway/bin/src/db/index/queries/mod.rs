@@ -56,11 +56,11 @@ pub(crate) enum PreparedQuery {
 /// All prepared SELECT query statements.
 pub(crate) enum PreparedSelectQuery {
     /// Get TXO by stake address query.
-    GetTxoByStakeAddress,
+    TxoByStakeAddress,
     /// Get TXI by transaction hash query.
-    GetTxiByTransactionHash,
+    TxiByTransactionHash,
     /// Get latest Registration
-    GetLatestRegistration,
+    LatestRegistration,
 }
 
 /// All prepared queries for a session.
@@ -198,13 +198,11 @@ impl PreparedQueries {
     pub(crate) async fn execute_iter<P>(
         &self, session: Arc<Session>, select_query: PreparedSelectQuery, params: P,
     ) -> anyhow::Result<RowIterator>
-    where
-        P: SerializeRow,
-    {
+    where P: SerializeRow {
         let prepared_stmt = match select_query {
-            PreparedSelectQuery::GetTxoByStakeAddress => &self.txo_by_stake_address_query,
-            PreparedSelectQuery::GetTxiByTransactionHash => &self.txi_by_txn_hash_query,
-            PreparedSelectQuery::GetLatestRegistration => &self.latest_registration_query,
+            PreparedSelectQuery::TxoByStakeAddress => &self.txo_by_stake_address_query,
+            PreparedSelectQuery::TxiByTransactionHash => &self.txi_by_txn_hash_query,
+            PreparedSelectQuery::LatestRegistration => &self.latest_registration_query,
         };
 
         session

@@ -31,9 +31,9 @@ pub(crate) struct Cip36Info {
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
     pub stake_address: Vec<u8>,
     /// Nonce value after normalization.
-    pub nonce: i64,
+    pub nonce: u64,
     /// Slot Number the cert is in.
-    pub slot_no: i64,
+    pub slot_no: u64,
     /// Transaction Index.
     pub txn: i16,
     /// Voting Public Key
@@ -42,8 +42,6 @@ pub(crate) struct Cip36Info {
     pub payment_address: Vec<u8>,
     /// Is the stake address a script or not.
     pub is_payable: bool,
-    /// Raw nonce value.
-    pub raw_nonce: i64,
     /// Is the Registration CIP36 format, or CIP15
     pub cip36: bool,
 }
@@ -90,15 +88,28 @@ pub(crate) async fn get_latest_registration_from_stake_addr(
             },
         };
 
+        let nonce = if let Some(nonce) = row.nonce.into_parts().1.to_u64_digits().first() {
+            *nonce
+        } else {
+            error!("Issue downcasting nonce");
+            return Responses::NotFound.into();
+        };
+
+        let slot_no = if let Some(slot_no) = row.slot_no.into_parts().1.to_u64_digits().first() {
+            *slot_no
+        } else {
+            error!("Issue downcasting slot no");
+            return Responses::NotFound.into();
+        };
+
         let cip36 = Cip36Info {
             stake_address: row.stake_address,
-            nonce: 1,
-            slot_no: 1,
+            nonce,
+            slot_no,
             txn: row.txn,
             vote_key: row.vote_key,
             payment_address: row.payment_address,
             is_payable: row.is_payable,
-            raw_nonce: 1,
             cip36: row.cip36,
         };
 
@@ -147,15 +158,29 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
             },
         };
 
+        let nonce = if let Some(nonce) = row.nonce.into_parts().1.to_u64_digits().first() {
+            *nonce
+        } else {
+            error!("Issue downcasting nonce");
+            return Responses::NotFound.into();
+        };
+
+        let slot_no = if let Some(slot_no) = row.slot_no.into_parts().1.to_u64_digits().first() {
+            *slot_no
+        } else {
+            error!("Issue downcasting slot no");
+            return Responses::NotFound.into();
+        };
+
         let cip36 = Cip36Info {
             stake_address: row.stake_address,
-            nonce: 1,
-            slot_no: 1,
+            nonce,
+            slot_no,
             txn: row.txn,
             vote_key: row.vote_key,
             payment_address: row.payment_address,
             is_payable: row.is_payable,
-            raw_nonce: 1,
+
             cip36: row.cip36,
         };
 

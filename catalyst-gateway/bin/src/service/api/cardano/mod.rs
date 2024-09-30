@@ -150,7 +150,7 @@ impl CardanoApi {
     }
 
     #[oai(
-        path = "/cip36/latest_registration/stake_hash",
+        path = "/cip36/latest_registration/stake_key_hash",
         method = "get",
         operation_id = "latestRegistrationGivenStakeHash"
     )]
