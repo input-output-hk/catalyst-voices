@@ -670,6 +670,12 @@ abstract class VoicesLocalizations {
   /// **'Choose Cardano Wallet'**
   String get chooseCardanoWallet;
 
+  /// A button label to select another cardano wallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose other wallet'**
+  String get chooseOtherWallet;
+
   /// A label on a clickable element that can show more content.
   ///
   /// In en, this message translates to:
@@ -735,6 +741,24 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'{wallet} connected successfully!'**
   String walletLinkWalletDetailsContent(String wallet);
+
+  /// A message in link wallet flow on wallet details screen when a user wallet doesn't have enough balance.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet and role registrations require a minimal transaction fee. You can setup your default dApp connector wallet in your browser extension settings.'**
+  String get walletLinkWalletDetailsNotice;
+
+  /// A message recommending the user to top up ADA in wallet link on wallet details screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Top up ADA'**
+  String get walletLinkWalletDetailsNoticeTopUp;
+
+  /// A link to top-up provide when the user doesn't have enough balance on wallet link screen
+  ///
+  /// In en, this message translates to:
+  /// **'• Link to top-up provider'**
+  String get walletLinkWalletDetailsNoticeTopUpLink;
 
   /// Message shown when redirecting to external content that describes which wallets are supported.
   ///
@@ -981,6 +1005,12 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Close'**
   String get close;
+
+  /// No description provided for @notice.
+  ///
+  /// In en, this message translates to:
+  /// **'Notice'**
+  String get notice;
 
   /// A title on keychain deleted dialog
   ///
