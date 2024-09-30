@@ -3,8 +3,12 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:result_type/result_type.dart';
+
+/// Callback called when a [wallet] is selected.
+typedef _OnSelectWallet = Future<void> Function(CardanoWallet wallet);
 
 class SelectWalletPanel extends StatefulWidget {
   final Result<List<CardanoWallet>, Exception>? walletsResult;
@@ -22,7 +26,7 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
   @override
   void initState() {
     super.initState();
-    _sendRefreshEvent();
+    _refreshWallets();
   }
 
   @override
@@ -44,7 +48,8 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
         Expanded(
           child: _Wallets(
             result: widget.walletsResult,
-            onRefreshTap: _sendRefreshEvent,
+            onRefreshTap: _refreshWallets,
+            onSelectWallet: _onSelectWallet,
           ),
         ),
         const SizedBox(height: 24),
@@ -63,17 +68,23 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
     );
   }
 
-  void _sendRefreshEvent() {
-    RegistrationCubit.of(context).refreshCardanoWallets();
+  void _refreshWallets() {
+    RegistrationCubit.of(context).refreshWallets();
+  }
+
+  Future<void> _onSelectWallet(CardanoWallet wallet) async {
+    return RegistrationCubit.of(context).selectWallet(wallet);
   }
 }
 
 class _Wallets extends StatelessWidget {
   final Result<List<CardanoWallet>, Exception>? result;
+  final _OnSelectWallet onSelectWallet;
   final VoidCallback onRefreshTap;
 
   const _Wallets({
     this.result,
+    required this.onSelectWallet,
     required this.onRefreshTap,
   });
 
@@ -81,7 +92,7 @@ class _Wallets extends StatelessWidget {
   Widget build(BuildContext context) {
     return switch (result) {
       Success(:final value) => value.isNotEmpty
-          ? _WalletsList(wallets: value)
+          ? _WalletsList(wallets: value, onSelectWallet: onSelectWallet)
           : _WalletsEmpty(onRetry: onRefreshTap),
       Failure() => _WalletsError(onRetry: onRefreshTap),
       _ => const Center(child: VoicesCircularProgressIndicator()),
@@ -91,24 +102,67 @@ class _Wallets extends StatelessWidget {
 
 class _WalletsList extends StatelessWidget {
   final List<CardanoWallet> wallets;
+  final _OnSelectWallet onSelectWallet;
 
-  const _WalletsList({required this.wallets});
+  const _WalletsList({
+    required this.wallets,
+    required this.onSelectWallet,
+  });
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
       itemCount: wallets.length,
       itemBuilder: (context, index) {
-        final wallet = wallets[index];
-        return VoicesWalletTile(
-          iconSrc: wallet.icon,
-          name: Text(wallet.name),
-          onTap: () {
-            RegistrationCubit.of(context).nextStep();
-          },
+        return _WalletTile(
+          wallet: wallets[index],
+          onSelectWallet: onSelectWallet,
         );
       },
     );
+  }
+}
+
+class _WalletTile extends StatefulWidget {
+  final CardanoWallet wallet;
+  final _OnSelectWallet onSelectWallet;
+
+  const _WalletTile({
+    required this.wallet,
+    required this.onSelectWallet,
+  });
+
+  @override
+  State<_WalletTile> createState() => _WalletTileState();
+}
+
+class _WalletTileState extends State<_WalletTile> {
+  bool _isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesWalletTile(
+      iconSrc: widget.wallet.icon,
+      name: Text(widget.wallet.name),
+      isLoading: _isLoading,
+      onTap: _onSelectWallet,
+    );
+  }
+
+  Future<void> _onSelectWallet() async {
+    try {
+      setState(() {
+        _isLoading = true;
+      });
+
+      await widget.onSelectWallet(widget.wallet).withMinimumDelay();
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 }
 

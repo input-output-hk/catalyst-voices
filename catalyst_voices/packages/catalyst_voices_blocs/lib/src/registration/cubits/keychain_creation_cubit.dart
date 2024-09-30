@@ -8,6 +8,8 @@ import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+final _logger = Logger('KeychainCreationCubit');
+
 final class KeychainCreationCubit extends Cubit<CreateKeychain> {
   final Downloader _downloader;
 
@@ -73,7 +75,8 @@ final class KeychainCreationCubit extends Cubit<CreateKeychain> {
 
     try {
       await _downloader.download(uri, path: path);
-    } catch (error) {
+    } catch (error, stackTrace) {
+      _logger.severe(error, stackTrace);
       // TODO(damian-molinski): Show snack bar
     }
   }

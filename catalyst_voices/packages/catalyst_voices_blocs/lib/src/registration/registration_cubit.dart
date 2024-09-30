@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/keychain_creation_cubit.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/wallet_link_cubit.dart';
 import 'package:catalyst_voices_blocs/src/registration/registration_state.dart';
@@ -87,12 +88,16 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     _keychainCreationCubit.setSeedPhraseStoredConfirmed(confirmed);
   }
 
-  Future<void> downloadSeedPhrase() {
-    return _keychainCreationCubit.downloadSeedPhrase();
+  void refreshWallets() {
+    unawaited(_walletLinkCubit.refreshWallets());
   }
 
-  void refreshCardanoWallets() {
-    unawaited(_walletLinkCubit.refreshCardanoWallets());
+  Future<void> selectWallet(CardanoWallet wallet) {
+    return _walletLinkCubit.selectWallet(wallet);
+  }
+
+  Future<void> downloadSeedPhrase() {
+    return _keychainCreationCubit.downloadSeedPhrase();
   }
 
   RegistrationStep? _nextStep({RegistrationStep? from}) {
