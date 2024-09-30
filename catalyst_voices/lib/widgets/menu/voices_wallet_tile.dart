@@ -24,21 +24,13 @@ class VoicesWalletTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final icon = iconSrc;
     final name = this.name;
 
     return ListTile(
       leading: SizedBox(
         width: 40,
         height: 40,
-        child: icon == null
-            ? const _IconPlaceholder()
-            : Image.network(
-                icon,
-                errorBuilder: (context, error, stackTrace) {
-                  return const _IconPlaceholder();
-                },
-              ),
+        child: VoicesWalletTileIcon(iconSrc: iconSrc),
       ),
       horizontalTitleGap: 16,
       title: name == null
@@ -52,6 +44,28 @@ class VoicesWalletTile extends StatelessWidget {
       trailing: VoicesAssets.icons.chevronRight.buildIcon(size: 24),
       onTap: onTap,
     );
+  }
+}
+
+class VoicesWalletTileIcon extends StatelessWidget {
+  final String? iconSrc;
+
+  const VoicesWalletTileIcon({
+    super.key,
+    required this.iconSrc,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final iconSrc = this.iconSrc;
+    return iconSrc == null
+        ? const _IconPlaceholder()
+        : Image.network(
+            iconSrc,
+            errorBuilder: (context, error, stackTrace) {
+              return const _IconPlaceholder();
+            },
+          );
   }
 }
 

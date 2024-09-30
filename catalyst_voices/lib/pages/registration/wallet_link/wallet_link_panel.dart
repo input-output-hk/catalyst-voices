@@ -1,9 +1,9 @@
-import 'package:catalyst_voices/pages/registration/wallet_link/intro/intro_panel.dart';
-import 'package:catalyst_voices/pages/registration/wallet_link/rbac_transaction/rbac_transaction_panel.dart';
-import 'package:catalyst_voices/pages/registration/wallet_link/roles_chooser/roles_chooser_panel.dart';
-import 'package:catalyst_voices/pages/registration/wallet_link/roles_summary/roles_summary_panel.dart';
-import 'package:catalyst_voices/pages/registration/wallet_link/select_wallet/select_wallet_panel.dart';
-import 'package:catalyst_voices/pages/registration/wallet_link/wallet_details/wallet_details_panel.dart';
+import 'package:catalyst_voices/pages/registration/wallet_link/stage/intro_panel.dart';
+import 'package:catalyst_voices/pages/registration/wallet_link/stage/rbac_transaction_panel.dart';
+import 'package:catalyst_voices/pages/registration/wallet_link/stage/roles_chooser_panel.dart';
+import 'package:catalyst_voices/pages/registration/wallet_link/stage/roles_summary_panel.dart';
+import 'package:catalyst_voices/pages/registration/wallet_link/stage/select_wallet_panel.dart';
+import 'package:catalyst_voices/pages/registration/wallet_link/stage/wallet_details_panel.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +25,8 @@ class WalletLinkPanel extends StatelessWidget {
       WalletLinkStage.selectWallet => SelectWalletPanel(
           walletsResult: stateData.wallets,
         ),
-      WalletLinkStage.walletDetails => const WalletDetailsPanel(),
+      WalletLinkStage.walletDetails =>
+        WalletDetailsPanel(details: stateData.selectedWallet!),
       WalletLinkStage.rolesChooser => const RolesChooserPanel(),
       WalletLinkStage.rolesSummary => const RolesSummaryPanel(),
       WalletLinkStage.rbacTransaction => const RbacTransactionPanel(),
