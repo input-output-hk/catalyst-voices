@@ -39,23 +39,17 @@ final class AccountPage extends StatelessWidget {
                     ],
                     defaultRole: AccountRole.voter,
                     onRemoveKeychain: () async {
-                      await VoicesDialog.show<void>(
-                        context: context,
-                        builder: (context) {
-                          return DeleteKeychainDialog(
-                            onRemoveKeychainConfirmed: () async {
-                              // TODO(Jakub): remove keychain
-                              Navigator.of(context).pop();
-                              await VoicesDialog.show<void>(
-                                context: context,
-                                builder: (context) {
-                                  return const KeychainDeletedDialog();
-                                },
-                              );
-                            },
-                          );
-                        },
-                      );
+                      final confirmed =
+                          await DeleteKeychainDialog.show(context);
+                      if (confirmed && context.mounted) {
+                        // TODO(Jakub): remove keychain
+                        await VoicesDialog.show<void>(
+                          context: context,
+                          builder: (context) {
+                            return const KeychainDeletedDialog();
+                          },
+                        );
+                      }
                     },
                   ),
                 ],
