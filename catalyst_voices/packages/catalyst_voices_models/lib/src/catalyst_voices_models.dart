@@ -3,6 +3,7 @@ library catalyst_voices_models;
 export 'account/account_role.dart';
 export 'auth/authentication_status.dart';
 export 'auth/password_strength.dart';
+export 'document/document_json.dart';
 export 'errors/errors.dart';
 export 'optional.dart';
 export 'proposal/funded_proposal.dart';
