@@ -891,6 +891,84 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'No wallet found.'**
   String get noWalletFound;
+
+  /// A title on delete keychain dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Keychain?'**
+  String get deleteKeychainDialogTitle;
+
+  /// A subtitle on delete keychain dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you wants to delete your  Catalyst Keychain from this device?'**
+  String get deleteKeychainDialogSubtitle;
+
+  /// A warning on delete keychain dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Make sure you have a working Catalyst 12-word seedphrase!'**
+  String get deleteKeychainDialogWarning;
+
+  /// A warning info on delete keychain dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Your Catalyst account will be removed, this action cannot be undone!'**
+  String get deleteKeychainDialogWarningInfo;
+
+  /// A typing info on delete keychain dialog
+  ///
+  /// In en, this message translates to:
+  /// **'To avoid mistakes, please type ‘Remove Keychain’ below.'**
+  String get deleteKeychainDialogTypingInfo;
+
+  /// An input label on delete keychain dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm removal'**
+  String get deleteKeychainDialogInputLabel;
+
+  /// An error text on text field on delete keychain dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Error. Please type \'Remove keychain\' to remove your account from this device.'**
+  String get deleteKeychainDialogErrorText;
+
+  /// A removing phrase on delete keychain dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Keychain'**
+  String get deleteKeychainDialogRemovingPhrase;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// A title on keychain deleted dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst keychain removed'**
+  String get keychainDeletedDialogTitle;
+
+  /// A subtitle on keychain deleted dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst keychain removed'**
+  String get keychainDeletedDialogSubtitle;
+
+  /// An info on keychain deleted dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst keychain removed'**
+  String get keychainDeletedDialogInfo;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

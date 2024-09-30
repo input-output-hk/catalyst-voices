@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 /// Opinionated, two panels, dialog that is tailored for desktop
 /// form factors.
 ///
-/// Uses [VoicesDesktopPanelsDialog] for base structure.
+/// Uses [VoicesTwoPaneDialog] for base structure.
 ///
 /// Call [VoicesDialog.show] with [VoicesDesktopInfoDialog] in order
 /// to show it.
@@ -22,7 +22,7 @@ class VoicesDesktopInfoDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return VoicesDesktopPanelsDialog(
+    return VoicesTwoPaneDialog(
       left: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
