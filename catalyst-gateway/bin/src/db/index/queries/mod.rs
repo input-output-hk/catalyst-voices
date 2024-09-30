@@ -54,7 +54,6 @@ pub(crate) enum PreparedQuery {
 }
 
 /// All prepared SELECT query statements.
-#[allow(clippy::enum_variant_names)]
 pub(crate) enum PreparedSelectQuery {
     /// Get TXO by stake address query.
     GetTxoByStakeAddress,
@@ -199,7 +198,9 @@ impl PreparedQueries {
     pub(crate) async fn execute_iter<P>(
         &self, session: Arc<Session>, select_query: PreparedSelectQuery, params: P,
     ) -> anyhow::Result<RowIterator>
-    where P: SerializeRow {
+    where
+        P: SerializeRow,
+    {
         let prepared_stmt = match select_query {
             PreparedSelectQuery::GetTxoByStakeAddress => &self.txo_by_stake_address_query,
             PreparedSelectQuery::GetTxiByTransactionHash => &self.txi_by_txn_hash_query,
