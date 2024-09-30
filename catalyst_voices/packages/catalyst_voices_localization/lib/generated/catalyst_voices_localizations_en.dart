@@ -459,4 +459,55 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get noWalletFound => 'No wallet found.';
+
+  @override
+  String get deleteKeychainDialogTitle => 'Delete Keychain?';
+
+  @override
+  String get deleteKeychainDialogSubtitle => 'Are you sure you wants to delete your  Catalyst Keychain from this device?';
+
+  @override
+  String get deleteKeychainDialogWarning => 'Make sure you have a working Catalyst 12-word seedphrase!';
+
+  @override
+  String get deleteKeychainDialogWarningInfo => 'Your Catalyst account will be removed, this action cannot be undone!';
+
+  @override
+  String get deleteKeychainDialogTypingInfo => 'To avoid mistakes, please type ‘Remove Keychain’ below.';
+
+  @override
+  String get deleteKeychainDialogInputLabel => 'Confirm removal';
+
+  @override
+  String get deleteKeychainDialogErrorText => 'Error. Please type \'Remove keychain\' to remove your account from this device.';
+
+  @override
+  String get deleteKeychainDialogRemovingPhrase => 'Remove Keychain';
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get keychainDeletedDialogTitle => 'Catalyst keychain removed';
+
+  @override
+  String get keychainDeletedDialogSubtitle => 'Catalyst keychain removed';
+
+  @override
+  String get keychainDeletedDialogInfo => 'Catalyst keychain removed';
+
+  @override
+  String get createKeychainSeedPhraseSubtitle => 'Write down your 12 Catalyst  security words';
+
+  @override
+  String get createKeychainSeedPhraseBody => 'Make sure you create an offline backup of your recovery phrase as well.';
+
+  @override
+  String get createKeychainSeedPhraseDownload => 'Download Catalyst key';
+
+  @override
+  String get createKeychainSeedPhraseStoreConfirmation => 'I have written down/downloaded my 12 words';
 }

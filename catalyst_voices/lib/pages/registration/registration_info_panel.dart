@@ -1,9 +1,11 @@
 import 'package:catalyst_voices/pages/registration/information_panel.dart';
-import 'package:catalyst_voices/pages/registration/task_picture.dart';
+import 'package:catalyst_voices/pages/registration/pictures/keychain_picture.dart';
+import 'package:catalyst_voices/pages/registration/pictures/seed_phrase_picture.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class _HeaderStrings {
   final String title;
@@ -18,38 +20,44 @@ class _HeaderStrings {
 }
 
 class RegistrationInfoPanel extends StatelessWidget {
-  final RegistrationState state;
-
   const RegistrationInfoPanel({
     super.key,
-    required this.state,
   });
 
   @override
   Widget build(BuildContext context) {
-    final headerStrings = _buildHeaderStrings(context);
+    return BlocBuilder<RegistrationCubit, RegistrationState>(
+      builder: (context, state) {
+        final headerStrings = _buildHeaderStrings(
+          context,
+          step: state.step,
+        );
 
-    return InformationPanel(
-      title: headerStrings.title,
-      subtitle: headerStrings.subtitle,
-      body: headerStrings.body,
-      picture: const TaskKeychainPicture(),
+        return InformationPanel(
+          title: headerStrings.title,
+          subtitle: headerStrings.subtitle,
+          body: headerStrings.body,
+          picture: _RegistrationPicture(step: state.step),
+          progress: state.progress,
+        );
+      },
+      buildWhen: (previous, current) => previous.step != current.step,
     );
   }
 
-  _HeaderStrings _buildHeaderStrings(BuildContext context) {
+  _HeaderStrings _buildHeaderStrings(
+    BuildContext context, {
+    required RegistrationStep step,
+  }) {
     _HeaderStrings buildKeychainStageHeader(CreateKeychainStage stage) {
       return switch (stage) {
         CreateKeychainStage.splash ||
         CreateKeychainStage.instructions =>
           _HeaderStrings(title: context.l10n.catalystKeychain),
-
-        // TODO(damian-molinski): Extract to l10n in next step
         CreateKeychainStage.seedPhrase => _HeaderStrings(
-            title: 'Catalyst Keychain',
-            subtitle: 'Write down your 12 Catalyst security words',
-            body: 'Make sure you create an offline backup '
-                'of your recovery phrase as well.',
+            title: context.l10n.catalystKeychain,
+            subtitle: context.l10n.createKeychainSeedPhraseSubtitle,
+            body: context.l10n.createKeychainSeedPhraseBody,
           ),
         CreateKeychainStage.checkSeedPhraseInstructions ||
         CreateKeychainStage.checkSeedPhrase ||
@@ -83,12 +91,62 @@ class RegistrationInfoPanel extends StatelessWidget {
       };
     }
 
-    return switch (state) {
-      GetStarted() => _HeaderStrings(title: context.l10n.getStarted),
-      FinishAccountCreation() => _HeaderStrings(title: 'TODO'),
-      Recover() => _HeaderStrings(title: 'TODO'),
-      CreateKeychain(:final stage) => buildKeychainStageHeader(stage),
-      WalletLink(:final stage) => buildWalletLinkStageHeader(stage),
+    return switch (step) {
+      GetStartedStep() => _HeaderStrings(title: context.l10n.getStarted),
+      FinishAccountCreationStep() => _HeaderStrings(title: 'TODO'),
+      RecoverStep() => _HeaderStrings(title: 'TODO'),
+      CreateKeychainStep(:final stage) => buildKeychainStageHeader(stage),
+      WalletLinkStep(:final stage) => buildWalletLinkStageHeader(stage),
+      AccountCompletedStep() => _HeaderStrings(title: 'TODO'),
+    };
+  }
+}
+
+class _RegistrationPicture extends StatelessWidget {
+  final RegistrationStep step;
+
+  const _RegistrationPicture({
+    required this.step,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    Widget buildKeychainStagePicture(CreateKeychainStage stage) {
+      return switch (stage) {
+        CreateKeychainStage.splash ||
+        CreateKeychainStage.instructions =>
+          const KeychainPicture(),
+        CreateKeychainStage.seedPhrase ||
+        CreateKeychainStage.checkSeedPhraseInstructions ||
+        CreateKeychainStage.checkSeedPhrase ||
+        CreateKeychainStage.checkSeedPhraseResult =>
+          const SeedPhrasePicture(),
+        CreateKeychainStage.unlockPasswordInstructions ||
+        CreateKeychainStage.unlockPasswordCreate ||
+        CreateKeychainStage.created =>
+          const KeychainPicture(),
+      };
+    }
+
+    Widget buildWalletLinkStagePicture(WalletLinkStage stage) {
+      return switch (stage) {
+        WalletLinkStage.intro ||
+        WalletLinkStage.selectWallet ||
+        WalletLinkStage.walletDetails ||
+        WalletLinkStage.rolesChooser ||
+        WalletLinkStage.rolesSummary ||
+        WalletLinkStage.rbacTransaction =>
+          const KeychainPicture(),
+      };
+    }
+
+    return switch (step) {
+      GetStartedStep() => const KeychainPicture(),
+      FinishAccountCreationStep() => const KeychainPicture(),
+      RecoverStep() => const KeychainPicture(),
+      CreateKeychainStep(:final stage) => buildKeychainStagePicture(stage),
+      WalletLinkStep(:final stage) => buildWalletLinkStagePicture(stage),
+      AccountCompletedStep() => const KeychainPicture(),
     };
   }
 }

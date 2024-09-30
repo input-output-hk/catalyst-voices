@@ -4,22 +4,27 @@ import 'package:catalyst_voices/pages/registration/wallet_link/roles_chooser/rol
 import 'package:catalyst_voices/pages/registration/wallet_link/roles_summary/roles_summary_panel.dart';
 import 'package:catalyst_voices/pages/registration/wallet_link/select_wallet/select_wallet_panel.dart';
 import 'package:catalyst_voices/pages/registration/wallet_link/wallet_details/wallet_details_panel.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class WalletLinkPanel extends StatelessWidget {
   final WalletLinkStage stage;
+  final WalletLinkStateData stateData;
 
   const WalletLinkPanel({
     super.key,
     required this.stage,
+    required this.stateData,
   });
 
   @override
   Widget build(BuildContext context) {
     return switch (stage) {
       WalletLinkStage.intro => const IntroPanel(),
-      WalletLinkStage.selectWallet => const SelectWalletPanel(),
+      WalletLinkStage.selectWallet => SelectWalletPanel(
+          walletsResult: stateData.wallets,
+        ),
       WalletLinkStage.walletDetails => const WalletDetailsPanel(),
       WalletLinkStage.rolesChooser => const RolesChooserPanel(),
       WalletLinkStage.rolesSummary => const RolesSummaryPanel(),
