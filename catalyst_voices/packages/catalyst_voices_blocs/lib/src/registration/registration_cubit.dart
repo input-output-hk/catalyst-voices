@@ -21,14 +21,16 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     _walletLinkCubit.stream.listen(emit);
   }
 
-  void buildSeedPhrase({
-    bool forceRefresh = false,
-  }) {
-    if (forceRefresh) {
-      _keychainCreationCubit.buildSeedPhrase();
-    } else {
-      _keychainCreationCubit.ensureSeedPhraseCreated();
-    }
+  /// Returns [RegistrationCubit] if found in widget tree. Does not add
+  /// rebuild dependency when called.
+  static RegistrationCubit of(BuildContext context) {
+    return context.read<RegistrationCubit>();
+  }
+
+  /// Returns [RegistrationCubit] if found in widget tree. Adds rebuild
+  /// dependency when called so you can not call it in initState.
+  static RegistrationCubit watch(BuildContext context) {
+    return context.watch<RegistrationCubit>();
   }
 
   @override
@@ -38,14 +40,15 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     return super.close();
   }
 
-  void confirmSeedPhraseStored({
-    required bool confirmed,
-  }) {
-    _keychainCreationCubit.setSeedPhraseStoredConfirmed(confirmed);
-  }
-
   void createNewKeychain() {
     final nextStep = _nextStep(from: const CreateKeychainStep());
+    if (nextStep != null) {
+      _goToStep(nextStep);
+    }
+  }
+
+  void recoverKeychain() {
+    final nextStep = _nextStep(from: const RecoverStep());
     if (nextStep != null) {
       _goToStep(nextStep);
     }
@@ -65,11 +68,20 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     }
   }
 
-  void recoverKeychain() {
-    final nextStep = _nextStep(from: const RecoverStep());
-    if (nextStep != null) {
-      _goToStep(nextStep);
+  void buildSeedPhrase({
+    bool forceRefresh = false,
+  }) {
+    if (forceRefresh) {
+      _keychainCreationCubit.buildSeedPhrase();
+    } else {
+      _keychainCreationCubit.ensureSeedPhraseCreated();
     }
+  }
+
+  void confirmSeedPhraseStored({
+    required bool confirmed,
+  }) {
+    _keychainCreationCubit.setSeedPhraseStoredConfirmed(confirmed);
   }
 
   void refreshWallets() {
@@ -78,33 +90,6 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
 
   Future<void> selectWallet(CardanoWallet wallet) {
     return _walletLinkCubit.selectWallet(wallet);
-  }
-
-  RegistrationState _buildState({
-    RegistrationStep? step,
-  }) {
-    step ??= state.step;
-
-    return switch (step) {
-      GetStartedStep() => const GetStarted(),
-      FinishAccountCreationStep() => const FinishAccountCreation(),
-      RecoverStep() => const Recover(),
-      CreateKeychainStep() => _keychainCreationCubit.state,
-      WalletLinkStep() => _walletLinkCubit.state,
-      AccountCompletedStep() => const AccountCompleted(),
-    };
-  }
-
-  void _goToStep(RegistrationStep step) {
-    if (step is CreateKeychainStep) {
-      _keychainCreationCubit.changeStage(step.stage);
-      emit(_keychainCreationCubit.state);
-    } else if (step is WalletLinkStep) {
-      _walletLinkCubit.changeStage(step.stage);
-      emit(_walletLinkCubit.state);
-    } else {
-      emit(_buildState(step: step));
-    }
   }
 
   RegistrationStep? _nextStep({RegistrationStep? from}) {
@@ -163,15 +148,30 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     };
   }
 
-  /// Returns [RegistrationCubit] if found in widget tree. Does not add
-  /// rebuild dependency when called.
-  static RegistrationCubit of(BuildContext context) {
-    return context.read<RegistrationCubit>();
+  void _goToStep(RegistrationStep step) {
+    if (step is CreateKeychainStep) {
+      _keychainCreationCubit.changeStage(step.stage);
+      emit(_keychainCreationCubit.state);
+    } else if (step is WalletLinkStep) {
+      _walletLinkCubit.changeStage(step.stage);
+      emit(_walletLinkCubit.state);
+    } else {
+      emit(_buildState(step: step));
+    }
   }
 
-  /// Returns [RegistrationCubit] if found in widget tree. Adds rebuild
-  /// dependency when called so you can not call it in initState.
-  static RegistrationCubit watch(BuildContext context) {
-    return context.watch<RegistrationCubit>();
+  RegistrationState _buildState({
+    RegistrationStep? step,
+  }) {
+    step ??= state.step;
+
+    return switch (step) {
+      GetStartedStep() => const GetStarted(),
+      FinishAccountCreationStep() => const FinishAccountCreation(),
+      RecoverStep() => const Recover(),
+      CreateKeychainStep() => _keychainCreationCubit.state,
+      WalletLinkStep() => _walletLinkCubit.state,
+      AccountCompletedStep() => const AccountCompleted(),
+    };
   }
 }
