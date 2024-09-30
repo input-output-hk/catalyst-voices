@@ -104,7 +104,7 @@ class _SegmentDetails extends StatelessWidget {
                 name: step.title,
                 desc: step.description,
                 doc: (step.jsonData != null)
-                    ? Document.fromJson(step.jsonData!)
+                    ? Document.fromJson(step.jsonData!.value)
                     : null,
                 isSelected: step.id == selected,
                 isEditable: step.isEditable,

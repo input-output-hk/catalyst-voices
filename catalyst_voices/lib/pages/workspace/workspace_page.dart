@@ -17,7 +17,7 @@ const _proposalNavigation = WorkspaceProposalNavigation(
         WorkspaceProposalSegmentStep(
           id: 0,
           title: 'Rich text',
-          jsonData: sampleRichText,
+          jsonData: RichTextJsonData(sampleRichText),
           isEditable: true,
         ),
       ],

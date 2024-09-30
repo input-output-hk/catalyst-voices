@@ -1,10 +1,11 @@
+import 'package:catalyst_voices_models/src/rich_text_json_data.dart';
 import 'package:equatable/equatable.dart';
 
 class WorkspaceProposalSegmentStep extends Equatable {
   final int id;
   final String title;
   final String? description;
-  final List<dynamic>? jsonData;
+  final RichTextJsonData? jsonData;
   final bool isEditable;
 
   const WorkspaceProposalSegmentStep({
