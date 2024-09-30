@@ -66,13 +66,8 @@ impl HealthApi {
         &self, log_level: Query<Option<inspection_get::LogLevel>>,
         query_inspection: Query<Option<inspection_get::DeepQueryInspectionFlag>>,
     ) -> inspection_get::AllResponses {
-        info!("deep!");
-
         match CassandraSession::get(true) {
-            Some(_s) => {
-                info!("it worked ");
-                inspection_get::endpoint(log_level.0, query_inspection.0).await
-            },
+            Some(_s) => inspection_get::endpoint(log_level.0, query_inspection.0).await,
             None => inspection_get::endpoint(log_level.0, query_inspection.0).await,
         }
     }
