@@ -88,5 +88,14 @@ void main() {
         );
       }
     });
+
+    test('toString should return hashed mnemonic', () {
+      final seedPhrase = SeedPhrase();
+      final mnemonic = seedPhrase.mnemonic;
+
+      final asString = seedPhrase.toString();
+
+      expect(asString, isNot(contains(mnemonic)));
+    });
   });
 }

@@ -107,7 +107,7 @@ final class SeedPhrase extends Equatable {
   }
 
   @override
-  String toString() => 'SeedPhrase(****)';
+  String toString() => 'SeedPhrase(${mnemonic.hashCode})';
 
   @override
   List<Object?> get props => [mnemonic];
