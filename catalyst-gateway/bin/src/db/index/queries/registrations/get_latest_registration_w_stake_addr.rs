@@ -63,7 +63,7 @@ mod result {
 pub(crate) struct GetLatestRegistrationQuery;
 
 impl GetLatestRegistrationQuery {
-    /// Prepares a get txi query.
+    /// Prepares a get latest registration query.
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
         let get_latest_registration_query = PreparedQueries::prepare(
             session,

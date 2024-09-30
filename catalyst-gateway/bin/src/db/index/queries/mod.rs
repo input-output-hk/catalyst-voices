@@ -9,7 +9,10 @@ use std::{fmt::Debug, sync::Arc};
 
 use anyhow::{bail, Context};
 use crossbeam_skiplist::SkipMap;
-use registrations::get_latest_registration_w_stake_addr::GetLatestRegistrationQuery;
+use registrations::{
+    get_latest_registration_w_stake_addr::GetLatestRegistrationQuery,
+    get_latest_registration_w_stake_hash::GetStakeAddrQuery,
+};
 use scylla::{
     batch::Batch, prepared_statement::PreparedStatement, serialize::row::SerializeRow,
     transport::iterator::RowIterator, QueryResult, Session,
@@ -61,6 +64,8 @@ pub(crate) enum PreparedSelectQuery {
     TxiByTransactionHash,
     /// Get latest Registration
     LatestRegistration,
+    /// Get latest Registration
+    StakeAddrFromStakeHash,
 }
 
 /// All prepared queries for a session.
@@ -92,6 +97,8 @@ pub(crate) struct PreparedQueries {
     txi_by_txn_hash_query: PreparedStatement,
     /// Get latest registration
     latest_registration_query: PreparedStatement,
+    /// stake addr
+    stake_addr_query: PreparedStatement,
 }
 
 /// An individual query response that can fail
@@ -117,6 +124,7 @@ impl PreparedQueries {
         let txo_by_stake_address_query = GetTxoByStakeAddressQuery::prepare(session.clone()).await;
         let txi_by_txn_hash_query = GetTxiByTxnHashesQuery::prepare(session.clone()).await;
         let latest_registration_query = GetLatestRegistrationQuery::prepare(session.clone()).await;
+        let stake_addr = GetStakeAddrQuery::prepare(session.clone()).await;
 
         let (
             txo_insert_queries,
@@ -145,6 +153,7 @@ impl PreparedQueries {
             txo_by_stake_address_query: txo_by_stake_address_query?,
             txi_by_txn_hash_query: txi_by_txn_hash_query?,
             latest_registration_query: latest_registration_query?,
+            stake_addr_query: stake_addr?,
         })
     }
 
@@ -203,6 +212,7 @@ impl PreparedQueries {
             PreparedSelectQuery::TxoByStakeAddress => &self.txo_by_stake_address_query,
             PreparedSelectQuery::TxiByTransactionHash => &self.txi_by_txn_hash_query,
             PreparedSelectQuery::LatestRegistration => &self.latest_registration_query,
+            PreparedSelectQuery::StakeAddrFromStakeHash => &self.stake_addr_query,
         };
 
         session
