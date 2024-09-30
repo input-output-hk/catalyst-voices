@@ -69,7 +69,7 @@ final class KeychainCreationCubit extends Cubit<CreateKeychain> {
         ? await buildWebMnemonicDownloadUri()
         : await buildIOMnemonicDownloadUri();
 
-    final path = Uri(path: 'seed_phrase.txt');
+    final path = Uri(path: 'catalyst_seed_phrase.txt');
 
     try {
       await _downloader.download(uri, path: path);
