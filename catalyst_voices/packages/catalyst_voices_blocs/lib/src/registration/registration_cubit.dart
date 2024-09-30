@@ -76,8 +76,8 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     unawaited(_walletLinkCubit.refreshWallets());
   }
 
-  void selectWallet(CardanoWallet wallet) {
-    unawaited(_walletLinkCubit.selectWallet(wallet));
+  Future<void> selectWallet(CardanoWallet wallet) {
+    return _walletLinkCubit.selectWallet(wallet);
   }
 
   RegistrationState _buildState({
