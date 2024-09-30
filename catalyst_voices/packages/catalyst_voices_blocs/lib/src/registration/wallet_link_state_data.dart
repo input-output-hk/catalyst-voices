@@ -24,5 +24,5 @@ final class WalletLinkStateData extends Equatable {
   }
 
   @override
-  List<Object?> get props => [wallets, selectedWallet, selectedWallet];
+  List<Object?> get props => [wallets, selectedWallet];
 }
