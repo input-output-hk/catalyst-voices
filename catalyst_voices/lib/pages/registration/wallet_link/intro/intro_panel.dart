@@ -26,7 +26,7 @@ class IntroPanel extends StatelessWidget {
         VoicesFilledButton(
           leading: VoicesAssets.icons.wallet.buildIcon(),
           onTap: () {
-            RegistrationBloc.of(context).add(const NextStepEvent());
+            RegistrationCubit.of(context).nextStep();
           },
           child: Text(context.l10n.chooseCardanoWallet),
         ),

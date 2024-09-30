@@ -22,8 +22,8 @@ class RegistrationDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => Dependencies.instance.get<RegistrationBloc>(),
-      child: BlocBuilder<RegistrationBloc, RegistrationState>(
+      create: (context) => Dependencies.instance.get<RegistrationCubit>(),
+      child: BlocBuilder<RegistrationCubit, RegistrationState>(
         builder: (context, state) => _RegistrationDialog(state: state),
       ),
     );

@@ -50,7 +50,7 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
         const SizedBox(height: 24),
         VoicesBackButton(
           onTap: () {
-            RegistrationBloc.of(context).add(const PreviousStepEvent());
+            RegistrationCubit.of(context).previousStep();
           },
         ),
         const SizedBox(height: 10),
@@ -64,8 +64,7 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
   }
 
   void _sendRefreshEvent() {
-    const event = RefreshCardanoWalletsEvent();
-    RegistrationBloc.of(context).add(event);
+    RegistrationCubit.of(context).refreshCardanoWallets();
   }
 }
 
@@ -105,7 +104,7 @@ class _WalletsList extends StatelessWidget {
           iconSrc: wallet.icon,
           name: Text(wallet.name),
           onTap: () {
-            RegistrationBloc.of(context).add(const NextStepEvent());
+            RegistrationCubit.of(context).nextStep();
           },
         );
       },

@@ -26,7 +26,7 @@ class RegistrationInfoPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RegistrationBloc, RegistrationState>(
+    return BlocBuilder<RegistrationCubit, RegistrationState>(
       builder: (context, state) {
         final headerStrings = _buildHeaderStrings(
           context,

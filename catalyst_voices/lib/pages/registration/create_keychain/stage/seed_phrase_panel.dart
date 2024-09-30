@@ -4,17 +4,28 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
-class SeedPhrasePanel extends StatelessWidget {
+class SeedPhrasePanel extends StatefulWidget {
   final SeedPhrase? seedPhrase;
   final bool isStoreSeedPhraseConfirmed;
   final bool isNextEnabled;
 
   const SeedPhrasePanel({
     super.key,
-    required this.seedPhrase,
+    this.seedPhrase,
     required this.isStoreSeedPhraseConfirmed,
     required this.isNextEnabled,
   });
+
+  @override
+  State<SeedPhrasePanel> createState() => _SeedPhrasePanelState();
+}
+
+class _SeedPhrasePanelState extends State<SeedPhrasePanel> {
+  @override
+  void initState() {
+    RegistrationCubit.of(context).buildSeedPhrase();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,14 +33,16 @@ class SeedPhrasePanel extends StatelessWidget {
       children: [
         Expanded(
           child: _Body(
-            words: seedPhrase?.mnemonicWords ?? [],
+            words: widget.seedPhrase?.mnemonicWords,
             onDownloadTap: _downloadSeedPhrase,
           ),
         ),
         const SizedBox(height: 10),
-        _SeedPhraseStoredConfirmation(isConfirmed: isStoreSeedPhraseConfirmed),
+        _SeedPhraseStoredConfirmation(
+          isConfirmed: widget.isStoreSeedPhraseConfirmed,
+        ),
         const SizedBox(height: 10),
-        _Navigation(isNextEnabled: isNextEnabled),
+        _Navigation(isNextEnabled: widget.isNextEnabled),
       ],
     );
   }
@@ -38,10 +51,34 @@ class SeedPhrasePanel extends StatelessWidget {
 }
 
 class _Body extends StatelessWidget {
-  final List<String> words;
+  final List<String>? words;
   final VoidCallback? onDownloadTap;
 
   const _Body({
+    this.words,
+    this.onDownloadTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final words = this.words;
+
+    if (words == null || words.isEmpty) {
+      return const Center(child: VoicesCircularProgressIndicator());
+    } else {
+      return _SeedPhraseWords(
+        words: words,
+        onDownloadTap: onDownloadTap,
+      );
+    }
+  }
+}
+
+class _SeedPhraseWords extends StatelessWidget {
+  final List<String> words;
+  final VoidCallback? onDownloadTap;
+
+  const _SeedPhraseWords({
     required this.words,
     this.onDownloadTap,
   });
@@ -79,8 +116,7 @@ class _SeedPhraseStoredConfirmation extends StatelessWidget {
       value: isConfirmed,
       label: Text(context.l10n.createKeychainSeedPhraseStoreConfirmation),
       onChanged: (value) {
-        final event = SeedPhraseStoreConfirmationEvent(value: value);
-        RegistrationBloc.of(context).add(event);
+        RegistrationCubit.of(context).confirmSeedPhraseStored(confirmed: value);
       },
     );
   }
@@ -99,16 +135,14 @@ class _Navigation extends StatelessWidget {
       children: [
         Expanded(
           child: VoicesBackButton(
-            onTap: () {
-              RegistrationBloc.of(context).add(const PreviousStepEvent());
-            },
+            onTap: () => RegistrationCubit.of(context).previousStep(),
           ),
         ),
         const SizedBox(width: 10),
         Expanded(
           child: VoicesNextButton(
             onTap: isNextEnabled
-                ? () => RegistrationBloc.of(context).add(const NextStepEvent())
+                ? () => RegistrationCubit.of(context).nextStep
                 : null,
           ),
         ),
