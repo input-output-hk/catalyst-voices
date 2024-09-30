@@ -1,8 +1,8 @@
 import 'package:catalyst_cardano/catalyst_cardano.dart';
-import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
-import 'package:catalyst_voices/widgets/menu/voices_wallet_tile.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -27,7 +27,7 @@ class WalletDetailsPanel extends StatelessWidget {
           context.l10n.walletLinkWalletDetailsTitle,
           style: Theme.of(context).textTheme.titleMedium,
         ),
-        const SizedBox(height: 40),
+        const SizedBox(height: 32),
         _WalletExtension(wallet: details.wallet),
         const SizedBox(height: 16),
         Text(
@@ -54,8 +54,16 @@ class _WalletExtension extends StatelessWidget {
       children: [
         const SizedBox(width: 8),
         VoicesWalletTileIcon(iconSrc: wallet.icon),
-        const SizedBox(width: 16),
+        const SizedBox(width: 12),
         Text(wallet.name, style: Theme.of(context).textTheme.bodyLarge),
+        const SizedBox(width: 8),
+        VoicesAvatar(
+          radius: 10,
+          padding: const EdgeInsets.all(4),
+          icon: VoicesAssets.icons.check.buildIcon(),
+          foregroundColor: Theme.of(context).colors.success,
+          backgroundColor: Theme.of(context).colors.successContainer,
+        ),
       ],
     );
   }
@@ -70,13 +78,21 @@ class _WalletSummary extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          width: 1.5,
+          color: Theme.of(context).colors.outlineBorderVariant!,
+        ),
+      ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             context.l10n.walletDetectionSummary,
             style: Theme.of(context).textTheme.titleSmall,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
           _WalletSummaryItem(
             label: Text(context.l10n.walletBalance),
             value: Text(CryptocurrencyFormatter.formatAmount(details.balance)),
@@ -94,7 +110,7 @@ class _WalletSummary extends StatelessWidget {
                       ClipboardData(text: details.address.toBech32()),
                     );
                   },
-                  child: VoicesAssets.icons.clipboardCopy.buildIcon(),
+                  child: VoicesAssets.icons.clipboardCopy.buildIcon(size: 16),
                 ),
               ],
             ),
@@ -120,16 +136,18 @@ class _WalletSummaryItem extends StatelessWidget {
       children: [
         Expanded(
           child: DefaultTextStyle(
-            style: Theme.of(context)
-                .textTheme
-                .bodySmall!
-                .copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                  fontWeight: FontWeight.bold,
+                  height: 1,
+                ),
             child: label,
           ),
         ),
         Expanded(
           child: DefaultTextStyle(
-            style: Theme.of(context).textTheme.bodySmall!,
+            style: Theme.of(context).textTheme.bodySmall!.copyWith(
+                  height: 1,
+                ),
             child: value,
           ),
         ),

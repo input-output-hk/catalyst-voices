@@ -483,9 +483,9 @@
   "@seeAllSupportedWallets": {
     "description": "Message shown when redirecting to external content that describes which wallets are supported."
   },
-  "walletDetectionSummary": "See all supported wallets",
+  "walletDetectionSummary": "Wallet detection summary",
   "@walletDetectionSummary": {
-    "description": "Message shown when redirecting to external content that describes which wallets are supported."
+    "description": "Message shown when presenting the details of a connected wallet."
   },
   "walletBalance": "Wallet balance",
   "@walletBalance": {

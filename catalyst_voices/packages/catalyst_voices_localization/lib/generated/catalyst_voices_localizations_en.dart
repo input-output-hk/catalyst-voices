@@ -388,7 +388,7 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get seeAllSupportedWallets => 'See all supported wallets';
 
   @override
-  String get walletDetectionSummary => 'See all supported wallets';
+  String get walletDetectionSummary => 'Wallet detection summary';
 
   @override
   String get walletBalance => 'Wallet balance';
@@ -481,13 +481,13 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get deleteKeychainDialogTitle => 'Delete Keychain?';
 
   @override
-  String get deleteKeychainDialogSubtitle => 'Are you sure you wants to delete your Catalyst Keychain from this device?';
+  String get deleteKeychainDialogSubtitle => 'Are you sure you wants to delete your\nCatalyst Keychain from this device?';
 
   @override
   String get deleteKeychainDialogWarning => 'Make sure you have a working Catalyst 12-word seedphrase!';
 
   @override
-  String get deleteKeychainDialogWarningInfo => 'Your Catalyst account will be removed,this action cannot be undone!';
+  String get deleteKeychainDialogWarningInfo => 'Your Catalyst account will be removed,\nthis action cannot be undone!';
 
   @override
   String get deleteKeychainDialogTypingInfo => 'To avoid mistakes, please type ‘Remove Keychain’ below.';
