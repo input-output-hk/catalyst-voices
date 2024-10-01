@@ -23,8 +23,8 @@ class VoicesSinglePaneDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return _VoicesDesktopDialog(
-      backgroundColor: Theme.of(context).colors.iconsBackground,
-      showBorder: true,
+      backgroundColor: backgroundColor,
+      showBorder: showBorder,
       constraints: constraints,
       child: Stack(
         children: [
