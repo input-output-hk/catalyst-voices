@@ -1,5 +1,7 @@
 import 'package:catalyst_voices/widgets/cards/role_chooser_card.dart';
+import 'package:catalyst_voices/widgets/containers/roles_chooser_panel.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class VoicesCardsExample extends StatefulWidget {
@@ -15,6 +17,11 @@ class VoicesCardsExample extends StatefulWidget {
 
 class _VoicesCardsExampleState extends State<VoicesCardsExample> {
   bool _roleChooserCardState1 = true;
+  Map<AccountRole, bool> _rolesChooserPanelState1 = {
+    AccountRole.voter: true,
+    AccountRole.proposer: true,
+    AccountRole.drep: false,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -36,13 +43,25 @@ class _VoicesCardsExampleState extends State<VoicesCardsExample> {
             },
           ),
           const SizedBox(height: 16),
-          const Text('Role Chooser Card (Locked Value)'),
+          const Text('Role Chooser Card (Locked Value, Without View More URL)'),
           RoleChooserCard(
             imageUrl: VoicesAssets.images.dummyCatalystVoices.path,
             value: true,
             label: 'label',
-            learnMoreUrl: 'learnMoreUrl2',
             lockValueAsDefault: true,
+          ),
+          const SizedBox(height: 16),
+          const Text('Roles Chooser Panel'),
+            RolesChooserPanel(
+            value: _rolesChooserPanelState1,
+            lockedValuesAsDefault: const {
+              AccountRole.voter: true,
+            },
+            onChanged: (newValue) => {
+              setState(() {
+                _rolesChooserPanelState1 = newValue;
+              }),
+            },
           ),
         ],
       ),
