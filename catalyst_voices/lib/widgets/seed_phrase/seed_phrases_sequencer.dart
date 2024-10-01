@@ -55,7 +55,7 @@ class SeedPhrasesSequencer extends StatelessWidget {
   }
 
   void _selectWord(String word) {
-    final words = [...selectedWords]..add(word);
+    final words = [...selectedWords, word];
 
     onChanged(words);
   }
