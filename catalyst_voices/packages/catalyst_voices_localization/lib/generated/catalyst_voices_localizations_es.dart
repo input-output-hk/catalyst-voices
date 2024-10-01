@@ -350,6 +350,9 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get chooseCardanoWallet => 'Choose Cardano Wallet';
 
   @override
+  String get chooseOtherWallet => 'Choose other wallet';
+
+  @override
   String get learnMore => 'Learn More';
 
   @override
@@ -383,6 +386,15 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String walletLinkWalletDetailsContent(String wallet) {
     return '$wallet connected successfully!';
   }
+
+  @override
+  String get walletLinkWalletDetailsNotice => 'Wallet and role registrations require a minimal transaction fee. You can setup your default dApp connector wallet in your browser extension settings.';
+
+  @override
+  String get walletLinkWalletDetailsNoticeTopUp => 'Top up ADA';
+
+  @override
+  String get walletLinkWalletDetailsNoticeTopUpLink => '• Link to top-up provider';
 
   @override
   String get seeAllSupportedWallets => 'See all supported wallets';
@@ -506,6 +518,9 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get close => 'Close';
+
+  @override
+  String get notice => 'Notice';
 
   @override
   String get keychainDeletedDialogTitle => 'Catalyst keychain removed';

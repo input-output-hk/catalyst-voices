@@ -430,6 +430,10 @@
   "@chooseCardanoWallet": {
     "description": "A button label to select a cardano wallet."
   },
+  "chooseOtherWallet": "Choose other wallet",
+  "@chooseOtherWallet": {
+    "description": "A button label to select another cardano wallet."
+  },
   "learnMore": "Learn More",
   "@learnMore": {
     "description": "A label on a clickable element that can show more content."
@@ -478,6 +482,18 @@
         "type": "String"
       }
     }
+  },
+  "walletLinkWalletDetailsNotice": "Wallet and role registrations require a minimal transaction fee. You can setup your default dApp connector wallet in your browser extension settings.",
+  "@walletLinkWalletDetailsNotice": {
+    "description": "A message in link wallet flow on wallet details screen when a user wallet doesn't have enough balance."
+  },
+  "walletLinkWalletDetailsNoticeTopUp": "Top up ADA",
+  "@walletLinkWalletDetailsNoticeTopUp": {
+    "description": "A message recommending the user to top up ADA in wallet link on wallet details screen."
+  },
+  "walletLinkWalletDetailsNoticeTopUpLink": "• Link to top-up provider",
+  "@walletLinkWalletDetailsNoticeTopUpLink": {
+    "description": "A link to top-up provide when the user doesn't have enough balance on wallet link screen"
   },
   "seeAllSupportedWallets": "See all supported wallets",
   "@seeAllSupportedWallets": {
@@ -604,6 +620,7 @@
   },
   "delete": "Delete",
   "close": "Close",
+  "notice": "Notice",
   "keychainDeletedDialogTitle": "Catalyst keychain removed",
   "@keychainDeletedDialogTitle": {
     "description": "A title on keychain deleted dialog"

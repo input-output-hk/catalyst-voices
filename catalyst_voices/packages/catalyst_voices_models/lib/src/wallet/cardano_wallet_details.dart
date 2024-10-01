@@ -4,6 +4,10 @@ import 'package:equatable/equatable.dart';
 
 /// Describes the details of an enabled wallet.
 final class CardanoWalletDetails extends Equatable {
+  /// The minimum amount of ADA the user
+  /// must posses to proceed with the registration.
+  static final Coin minAdaForRegistration = Coin.fromAda(1);
+
   final CardanoWallet wallet;
   final Coin balance;
   final ShelleyAddress address;
