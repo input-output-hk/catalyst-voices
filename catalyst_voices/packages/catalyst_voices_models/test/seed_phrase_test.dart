@@ -70,5 +70,32 @@ void main() {
       final expectedWords = mnemonic.split(' ');
       expect(seedPhrase.mnemonicWords, expectedWords);
     });
+
+    test('should generate key pair with different valid offsets', () async {
+      for (final offset in [0, 4, 28, 32, 64]) {
+        final keyPair = await SeedPhrase().deriveKeyPair(offset);
+
+        expect(keyPair, isNotNull);
+      }
+    });
+
+    test('should throw an error for key pair with out of range offset',
+        () async {
+      for (final offset in [-1, 65]) {
+        expect(
+          () async => SeedPhrase().deriveKeyPair(offset),
+          throwsA(isA<RangeError>()),
+        );
+      }
+    });
+
+    test('toString should return hashed mnemonic', () {
+      final seedPhrase = SeedPhrase();
+      final mnemonic = seedPhrase.mnemonic;
+
+      final asString = seedPhrase.toString();
+
+      expect(asString, isNot(contains(mnemonic)));
+    });
   });
 }

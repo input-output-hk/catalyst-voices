@@ -189,6 +189,7 @@ Precertificate
 preprod
 projectcatalyst
 Prokhorenko
+proptest
 psql
 Ptarget
 pubkey
@@ -222,6 +223,7 @@ Scripthash
 ScyllaDB
 seckey
 Seedable
+seedphrase
 sendfile
 servernum
 serviceworker
