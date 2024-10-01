@@ -102,6 +102,7 @@ command:
       bip32_ed25519: ^0.6.0
       cbor: ^6.2.0
       convert: ^3.1.1
+      path: ^1.9.0
       pinenacl: ^0.6.0
       ulid: ^2.0.0
       sentry_flutter: ^8.8.0
