@@ -1065,6 +1065,54 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Next, we\'re going to make sure that you\'ve written down your words correctly.     We don\'t save your seed phrase, so it\'s important  to make sure you have it right. That\'s why we do this confirmation before continuing.     It\'s also good practice to get familiar with using a seed phrase if you\'re new to crypto.'**
   String get createKeychainSeedPhraseCheckInstructionsSubtitle;
+
+  /// No description provided for @createKeychainSeedPhraseCheckSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Input your Catalyst security keys'**
+  String get createKeychainSeedPhraseCheckSubtitle;
+
+  /// No description provided for @createKeychainSeedPhraseCheckBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your 12 written down words in  the correct order.'**
+  String get createKeychainSeedPhraseCheckBody;
+
+  /// When user checks correct seed phrase words order he can upload it too
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Catalyst Key'**
+  String get uploadCatalystKey;
+
+  /// No description provided for @reset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get reset;
+
+  /// No description provided for @createKeychainSeedPhraseCheckSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nice job! You\'ve successfully verified the seed phrase for your keychain.'**
+  String get createKeychainSeedPhraseCheckSuccessTitle;
+
+  /// No description provided for @createKeychainSeedPhraseCheckSuccessSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your seed phrase to recover your Catalyst Keychain on any device.  It\'s kinda like your email and password all rolled into one, so keep it somewhere safe!  In the next step we’ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.'**
+  String get createKeychainSeedPhraseCheckSuccessSubtitle;
+
+  /// No description provided for @yourNextStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Your next step'**
+  String get yourNextStep;
+
+  /// No description provided for @createKeychainSeedPhraseCheckSuccessNextStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Now let’s set your Unlock password for this device!'**
+  String get createKeychainSeedPhraseCheckSuccessNextStep;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
