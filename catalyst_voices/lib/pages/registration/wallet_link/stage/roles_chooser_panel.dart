@@ -4,8 +4,8 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
 
 // TODO(dtscalac): define content
-class RbacTransactionPanel extends StatelessWidget {
-  const RbacTransactionPanel({super.key});
+class RolesChooserPanel extends StatelessWidget {
+  const RolesChooserPanel({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +16,7 @@ class RbacTransactionPanel extends StatelessWidget {
         VoicesFilledButton(
           leading: VoicesAssets.icons.wallet.buildIcon(),
           onTap: () {
-            RegistrationBloc.of(context).add(const PreviousStepEvent());
+            RegistrationCubit.of(context).previousStep();
           },
           child: const Text('Previous'),
         ),
@@ -24,7 +24,7 @@ class RbacTransactionPanel extends StatelessWidget {
         VoicesFilledButton(
           leading: VoicesAssets.icons.wallet.buildIcon(),
           onTap: () {
-            RegistrationBloc.of(context).add(const NextStepEvent());
+            RegistrationCubit.of(context).nextStep();
           },
           child: const Text('Next'),
         ),

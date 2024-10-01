@@ -46,8 +46,12 @@ class GetStartedPanel extends StatelessWidget {
                   key: ValueKey(type),
                   type: type,
                   onTap: () {
-                    final event = CreateAccountTypeEvent(type: type);
-                    RegistrationBloc.of(context).add(event);
+                    switch (type) {
+                      case CreateAccountType.createNew:
+                        RegistrationCubit.of(context).createNewKeychain();
+                      case CreateAccountType.recover:
+                        RegistrationCubit.of(context).recoverKeychain();
+                    }
                   },
                 );
               })

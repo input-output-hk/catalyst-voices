@@ -466,9 +466,34 @@
   "@walletLinkSelectWalletContent": {
     "description": "A message (content) in link wallet flow on select wallet screen."
   },
+  "walletLinkWalletDetailsTitle": "Cardano wallet detection",
+  "@walletLinkWalletDetailsTitle": {
+    "description": "A title in link wallet flow on wallet details screen."
+  },
+  "walletLinkWalletDetailsContent": "{wallet} connected successfully!",
+  "@walletLinkWalletDetailsContent": {
+    "description": "A message in link wallet flow on wallet details screen.",
+    "placeholders": {
+      "wallet": {
+        "type": "String"
+      }
+    }
+  },
   "seeAllSupportedWallets": "See all supported wallets",
   "@seeAllSupportedWallets": {
     "description": "Message shown when redirecting to external content that describes which wallets are supported."
+  },
+  "walletDetectionSummary": "Wallet detection summary",
+  "@walletDetectionSummary": {
+    "description": "Message shown when presenting the details of a connected wallet."
+  },
+  "walletBalance": "Wallet balance",
+  "@walletBalance": {
+    "description": "The wallet balance in terms of Ada."
+  },
+  "walletAddress": "Wallet address",
+  "@walletAddress": {
+    "description": "A cardano wallet address"
   },
   "accountCreationCreate": "Create a new \u2028Catalyst Keychain",
   "accountCreationRecover": "Recover your\u2028Catalyst Keychain",
@@ -544,5 +569,55 @@
   "noWalletFound": "No wallet found.",
   "@noWalletFound": {
     "description": "A description when no wallet extension was found."
-  }
+  },
+  "deleteKeychainDialogTitle": "Delete Keychain?",
+  "@deleteKeychainDialogTitle": {
+    "description": "A title on delete keychain dialog"
+  },
+  "deleteKeychainDialogSubtitle": "Are you sure you wants to delete your\nCatalyst Keychain from this device?",
+  "@deleteKeychainDialogSubtitle": {
+    "description": "A subtitle on delete keychain dialog"
+  },
+  "deleteKeychainDialogWarning": "Make sure you have a working Catalyst 12-word seedphrase!",
+  "@deleteKeychainDialogWarning": {
+    "description": "A warning on delete keychain dialog"
+  },
+  "deleteKeychainDialogWarningInfo": "Your Catalyst account will be removed,\nthis action cannot be undone!",
+  "@deleteKeychainDialogWarningInfo": {
+    "description": "A warning info on delete keychain dialog"
+  },
+  "deleteKeychainDialogTypingInfo": "To avoid mistakes, please type ‘Remove Keychain’ below.",
+  "@deleteKeychainDialogTypingInfo": {
+    "description": "A typing info on delete keychain dialog"
+  },
+  "deleteKeychainDialogInputLabel": "Confirm removal",
+  "@deleteKeychainDialogInputLabel": {
+    "description": "An input label on delete keychain dialog"
+  },
+  "deleteKeychainDialogErrorText": "Error. Please type 'Remove keychain' to remove your account from this device.",
+  "@deleteKeychainDialogErrorText": {
+    "description": "An error text on text field on delete keychain dialog"
+  },
+  "deleteKeychainDialogRemovingPhrase": "Remove Keychain",
+  "@deleteKeychainDialogRemovingPhrase": {
+    "description": "A removing phrase on delete keychain dialog"
+  },
+  "delete": "Delete",
+  "close": "Close",
+  "keychainDeletedDialogTitle": "Catalyst keychain removed",
+  "@keychainDeletedDialogTitle": {
+    "description": "A title on keychain deleted dialog"
+  },
+  "keychainDeletedDialogSubtitle": "Catalyst keychain removed",
+  "@keychainDeletedDialogSubtitle": {
+    "description": "A subtitle on keychain deleted dialog"
+  },
+  "keychainDeletedDialogInfo": "Catalyst keychain removed",
+  "@keychainDeletedDialogInfo": {
+    "description": "An info on keychain deleted dialog"
+  },
+  "createKeychainSeedPhraseSubtitle": "Write down your 12 Catalyst \u2028security words",
+  "createKeychainSeedPhraseBody": "Make sure you create an offline backup of your recovery phrase as well.",
+  "createKeychainSeedPhraseDownload": "Download Catalyst key",
+  "createKeychainSeedPhraseStoreConfirmation": "I have written down/downloaded my 12 words"
 }
