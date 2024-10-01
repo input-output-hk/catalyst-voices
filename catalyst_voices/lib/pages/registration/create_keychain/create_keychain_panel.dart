@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/registration/create_keychain/stage/check_seed_phrase_instructions_panel.dart';
 import 'package:catalyst_voices/pages/registration/create_keychain/stage/stages.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -23,7 +24,8 @@ class CreateKeychainPanel extends StatelessWidget {
           isStoreSeedPhraseConfirmed: seedPhraseState.isStoredConfirmed,
           isNextEnabled: seedPhraseState.isStoredConfirmed,
         ),
-      CreateKeychainStage.checkSeedPhraseInstructions ||
+      CreateKeychainStage.checkSeedPhraseInstructions =>
+        const CheckSeedPhraseInstructionsPanel(),
       CreateKeychainStage.checkSeedPhrase ||
       CreateKeychainStage.checkSeedPhraseResult ||
       CreateKeychainStage.unlockPasswordInstructions ||
