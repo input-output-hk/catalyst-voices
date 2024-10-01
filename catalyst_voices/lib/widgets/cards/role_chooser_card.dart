@@ -5,8 +5,8 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class RoleChooserCard extends StatelessWidget {
-  final String imageUrl;
   final bool value;
+  final String imageUrl;
   final String label;
   final bool lockValueAsDefault;
   final bool isLearnMoreHidden;
@@ -15,8 +15,8 @@ class RoleChooserCard extends StatelessWidget {
 
   const RoleChooserCard({
     super.key,
-    required this.imageUrl,
     required this.value,
+    required this.imageUrl,
     required this.label,
     this.lockValueAsDefault = false,
     this.isLearnMoreHidden = false,
