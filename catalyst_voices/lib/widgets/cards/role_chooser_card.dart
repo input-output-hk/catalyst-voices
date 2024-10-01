@@ -1,17 +1,17 @@
-import 'package:catalyst_voices/widgets/buttons/voices_segmented_button.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 class RoleChooserCard extends StatelessWidget {
   final String imageUrl;
   final bool value;
   final String label;
   final bool lockValueAsDefault;
-  final String? learnMoreUrl;
+  final bool isLearnMoreHidden;
   final ValueChanged<bool>? onChanged;
+  final VoidCallback? onLearnMore;
 
   const RoleChooserCard({
     super.key,
@@ -19,8 +19,9 @@ class RoleChooserCard extends StatelessWidget {
     required this.value,
     required this.label,
     this.lockValueAsDefault = false,
-    this.learnMoreUrl,
+    this.isLearnMoreHidden = false,
     this.onChanged,
+    this.onLearnMore,
   });
 
   @override
@@ -62,18 +63,22 @@ class RoleChooserCard extends StatelessWidget {
                           style: Theme.of(context).textTheme.titleSmall,
                         ),
                       ),
-                      if (learnMoreUrl != null) ...[
+                      if (!isLearnMoreHidden) ...[
                         const SizedBox(width: 10),
                         GestureDetector(
-                          onTap: () async => launchUrlString(learnMoreUrl!),
-                          child: Text(
-                            context.l10n.learnMore,
-                            style: Theme.of(context)
-                                .textTheme
-                                .labelMedium!
-                                .copyWith(
-                                  color: Theme.of(context).colors.iconsPrimary,
-                                ),
+                          onTap: onLearnMore,
+                          child: FocusableActionDetector(
+                            mouseCursor: SystemMouseCursors.click,
+                            child: Text(
+                              context.l10n.learnMore,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .labelMedium!
+                                  .copyWith(
+                                    color:
+                                        Theme.of(context).colors.iconsPrimary,
+                                  ),
+                            ),
                           ),
                         ),
                       ],

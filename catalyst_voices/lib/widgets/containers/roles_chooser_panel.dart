@@ -8,12 +8,14 @@ class RolesChooserPanel extends StatelessWidget {
   final Map<AccountRole, bool> value;
   final Map<AccountRole, bool>? lockedValuesAsDefault;
   final ValueChanged<Map<AccountRole, bool>>? onChanged;
+  final void Function(AccountRole)? onLearnMore;
 
   const RolesChooserPanel({
     super.key,
     required this.value,
     this.lockedValuesAsDefault,
     this.onChanged,
+    this.onLearnMore,
   });
 
   @override
@@ -24,11 +26,13 @@ class RolesChooserPanel extends StatelessWidget {
           imageUrl: VoicesAssets.images.roleVoter.path,
           value: value[AccountRole.voter] ?? false,
           label: context.l10n.voter,
-          learnMoreUrl: 'tmp',
           lockValueAsDefault:
               lockedValuesAsDefault?[AccountRole.voter] ?? false,
           onChanged: (newValue) {
             onChanged?.call({...value, AccountRole.voter: newValue});
+          },
+          onLearnMore: () {
+            onLearnMore?.call(AccountRole.voter);
           },
         ),
         const SizedBox(height: 12),
@@ -36,11 +40,13 @@ class RolesChooserPanel extends StatelessWidget {
           imageUrl: VoicesAssets.images.roleProposer.path,
           value: value[AccountRole.proposer] ?? false,
           label: context.l10n.proposer,
-          learnMoreUrl: 'tmp',
           lockValueAsDefault:
               lockedValuesAsDefault?[AccountRole.proposer] ?? false,
           onChanged: (newValue) {
             onChanged?.call({...value, AccountRole.proposer: newValue});
+          },
+          onLearnMore: () {
+            onLearnMore?.call(AccountRole.proposer);
           },
         ),
         const SizedBox(height: 12),
@@ -48,10 +54,12 @@ class RolesChooserPanel extends StatelessWidget {
           imageUrl: VoicesAssets.images.roleDrep.path,
           value: value[AccountRole.drep] ?? false,
           label: context.l10n.drep,
-          learnMoreUrl: 'tmp',
           lockValueAsDefault: lockedValuesAsDefault?[AccountRole.drep] ?? false,
           onChanged: (newValue) {
             onChanged?.call({...value, AccountRole.drep: newValue});
+          },
+          onLearnMore: () {
+            onLearnMore?.call(AccountRole.drep);
           },
         ),
       ],

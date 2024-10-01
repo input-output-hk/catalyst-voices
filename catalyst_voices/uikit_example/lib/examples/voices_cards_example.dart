@@ -35,7 +35,6 @@ class _VoicesCardsExampleState extends State<VoicesCardsExample> {
             imageUrl: VoicesAssets.images.dummyCatalystVoices.path,
             value: _roleChooserCardState1,
             label: 'label',
-            learnMoreUrl: 'learnMoreUrl1',
             onChanged: (changedValue) => {
               setState(() {
                 _roleChooserCardState1 = changedValue;
@@ -43,11 +42,12 @@ class _VoicesCardsExampleState extends State<VoicesCardsExample> {
             },
           ),
           const SizedBox(height: 16),
-          const Text('Role Chooser Card (Locked Value, Without View More URL)'),
+          const Text('Role Chooser Card (Locked Value, Hidden View More)'),
           RoleChooserCard(
             imageUrl: VoicesAssets.images.dummyCatalystVoices.path,
             value: true,
             label: 'label',
+            isLearnMoreHidden: true,
             lockValueAsDefault: true,
           ),
           const SizedBox(height: 16),
