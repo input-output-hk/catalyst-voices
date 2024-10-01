@@ -127,9 +127,9 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
 
     return switch (step) {
       GetStartedStep() => null,
-      FinishAccountCreationStep() => nextWalletLinkStep(),
       RecoverStep() => throw UnimplementedError(),
       CreateKeychainStep() => nextKeychainStep(),
+      FinishAccountCreationStep() => const WalletLinkStep(),
       WalletLinkStep() => nextWalletLinkStep(),
       AccountCompletedStep() => null,
     };
@@ -156,9 +156,9 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
 
     return switch (step) {
       GetStartedStep() => null,
-      FinishAccountCreationStep() => null,
       RecoverStep() => throw UnimplementedError(),
       CreateKeychainStep() => previousKeychainStep(),
+      FinishAccountCreationStep() => null,
       WalletLinkStep() => previousWalletLinkStep(),
       AccountCompletedStep() => null,
     };

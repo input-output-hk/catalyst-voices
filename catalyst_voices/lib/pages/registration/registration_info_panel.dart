@@ -69,8 +69,7 @@ class RegistrationInfoPanel extends StatelessWidget {
         CreateKeychainStage.checkSeedPhraseResult =>
           _HeaderStrings(title: context.l10n.catalystKeychain),
         CreateKeychainStage.unlockPasswordInstructions ||
-        CreateKeychainStage.unlockPasswordCreate ||
-        CreateKeychainStage.created =>
+        CreateKeychainStage.unlockPasswordCreate =>
           _HeaderStrings(title: 'TODO'),
       };
     }
@@ -138,8 +137,7 @@ class _RegistrationPicture extends StatelessWidget {
             indicateSelection: true,
           ),
         CreateKeychainStage.unlockPasswordInstructions ||
-        CreateKeychainStage.unlockPasswordCreate ||
-        CreateKeychainStage.created =>
+        CreateKeychainStage.unlockPasswordCreate =>
           const KeychainPicture(),
       };
     }
