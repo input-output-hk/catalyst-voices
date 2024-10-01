@@ -1,3 +1,4 @@
+export 'downloader/downloader.dart';
 export 'storage/dummy_auth_storage.dart';
 export 'storage/secure_storage.dart';
 export 'storage/storage.dart';
