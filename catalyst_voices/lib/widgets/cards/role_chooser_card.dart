@@ -4,13 +4,52 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
+/// A constant grayscale [ColorFilter] used to desaturate an image.
+const _grayscaleFilter = ColorFilter.matrix([
+  0.2126,
+  0.7152,
+  0.0722,
+  0,
+  0,
+  0.2126,
+  0.7152,
+  0.0722,
+  0,
+  0,
+  0.2126,
+  0.7152,
+  0.0722,
+  0,
+  0,
+  0,
+  0,
+  0,
+  1,
+  0,
+]);
+
+/// A card that is used for role selection and acts as a building block
+/// for any role selection.
 class RoleChooserCard extends StatelessWidget {
+  /// The current displaying value.
   final bool value;
+
+  /// Needs to be a rasterized image.
   final String imageUrl;
+
+  /// The text label displaying on the card.
   final String label;
+
+  /// Locks the value and shows it as default, only the selected value appears.
   final bool lockValueAsDefault;
+
+  /// Hides the "Learn More" link.
   final bool isLearnMoreHidden;
+
+  /// A callback triggered when the role selection changes.
   final ValueChanged<bool>? onChanged;
+
+  /// A callback triggered when the "Learn More" link is clicked.
   final VoidCallback? onLearnMore;
 
   const RoleChooserCard({
@@ -41,11 +80,14 @@ class RoleChooserCard extends StatelessWidget {
           children: [
             Column(
               children: [
-                CatalystImage.asset(
-                  imageUrl,
-                  width: 70,
-                  height: 70,
-                  fit: BoxFit.cover,
+                ColorFiltered(
+                  colorFilter: _grayscaleFilter,
+                  child: CatalystImage.asset(
+                    imageUrl,
+                    width: 70,
+                    height: 70,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ],
             ),
@@ -67,18 +109,14 @@ class RoleChooserCard extends StatelessWidget {
                         const SizedBox(width: 10),
                         GestureDetector(
                           onTap: onLearnMore,
-                          child: FocusableActionDetector(
-                            mouseCursor: SystemMouseCursors.click,
-                            child: Text(
-                              context.l10n.learnMore,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .labelMedium!
-                                  .copyWith(
-                                    color:
-                                        Theme.of(context).colors.iconsPrimary,
-                                  ),
-                            ),
+                          child: Text(
+                            context.l10n.learnMore,
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelMedium!
+                                .copyWith(
+                                  color: Theme.of(context).colors.iconsPrimary,
+                                ),
                           ),
                         ),
                       ],

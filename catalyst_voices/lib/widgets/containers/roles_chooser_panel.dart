@@ -4,10 +4,23 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/widgets.dart';
 
+/// A panel that displays a series of [RoleChooserCard] widgets for selecting
+/// various account roles (e.g., voter, proposer, drep).
 class RolesChooserPanel extends StatelessWidget {
+  /// A map where keys are [AccountRole] enums and values are booleans
+  /// representing whether the corresponding role is selected.
   final Map<AccountRole, bool> value;
+
+  /// A map similar to [value], indicating which roles
+  /// should be locked in their default state.
   final Map<AccountRole, bool>? lockedValuesAsDefault;
+
+  /// A callback triggered when any role selection changes, passing
+  ///   the updated map of role values.
   final ValueChanged<Map<AccountRole, bool>>? onChanged;
+
+  /// A callback triggered when the user taps "Learn More" for a
+  /// specific role.
   final void Function(AccountRole)? onLearnMore;
 
   const RolesChooserPanel({
