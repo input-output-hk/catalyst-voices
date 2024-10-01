@@ -3,18 +3,19 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
-class VoicesCardsExample extends StatefulWidget {
-  static const String route = '/cards-example';
+class VoicesRolePanelsExample extends StatefulWidget {
+  static const String title = 'Voices Role Panels';
+  static const String route = '/role-panels-example';
 
-  const VoicesCardsExample({super.key});
+  const VoicesRolePanelsExample({super.key});
 
   @override
-  State<VoicesCardsExample> createState() {
-    return _VoicesCardsExampleState();
+  State<VoicesRolePanelsExample> createState() {
+    return _VoicesRolePanelsExampleState();
   }
 }
 
-class _VoicesCardsExampleState extends State<VoicesCardsExample> {
+class _VoicesRolePanelsExampleState extends State<VoicesRolePanelsExample> {
   bool _roleChooserCardState1 = true;
   Map<AccountRole, bool> _rolesChooserPanelState1 = {
     AccountRole.voter: true,
@@ -25,7 +26,7 @@ class _VoicesCardsExampleState extends State<VoicesCardsExample> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Voices Cards')),
+      appBar: AppBar(title: const Text(VoicesRolePanelsExample.title)),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 42, vertical: 24),
         children: [

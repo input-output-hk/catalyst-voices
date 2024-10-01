@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:uikit_example/examples/voices_avatar_example.dart';
 import 'package:uikit_example/examples/voices_badge_example.dart';
 import 'package:uikit_example/examples/voices_buttons_example.dart';
-import 'package:uikit_example/examples/voices_cards_example.dart';
 import 'package:uikit_example/examples/voices_checkbox_example.dart';
 import 'package:uikit_example/examples/voices_chip_example.dart';
 import 'package:uikit_example/examples/voices_fab_example.dart';
@@ -20,6 +19,7 @@ import 'package:uikit_example/examples/voices_navigation_example.dart';
 import 'package:uikit_example/examples/voices_proposal_card_example.dart';
 import 'package:uikit_example/examples/voices_radio_example.dart';
 import 'package:uikit_example/examples/voices_rich_text_example.dart';
+import 'package:uikit_example/examples/voices_role_panels_example.dart';
 import 'package:uikit_example/examples/voices_seed_phrase_example.dart';
 import 'package:uikit_example/examples/voices_segmented_button_example.dart';
 import 'package:uikit_example/examples/voices_separators_example.dart';
@@ -63,11 +63,6 @@ class ExamplesListPage extends StatelessWidget {
         title: 'Voices SegmentedButton',
         route: VoicesSegmentedButtonExample.route,
         page: VoicesSegmentedButtonExample(),
-      ),
-      ExampleTile(
-        title: 'Voices Cards',
-        route: VoicesCardsExample.route,
-        page: VoicesCardsExample(),
       ),
       ExampleTile(
         title: 'Voices Buttons',
@@ -168,6 +163,11 @@ class ExamplesListPage extends StatelessWidget {
         title: 'Voices Proposal Card',
         route: VoicesProposalCardExample.route,
         page: VoicesProposalCardExample(),
+      ),
+      ExampleTile(
+        title: VoicesRolePanelsExample.title,
+        route: VoicesRolePanelsExample.route,
+        page: VoicesRolePanelsExample(),
       ),
     ];
   }
