@@ -1,13 +1,13 @@
+import 'package:catalyst_voices/widgets/buttons/voices_segmented_button.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:catalyst_voices/widgets/buttons/voices_segmented_button.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class RoleChooserCard extends StatelessWidget {
   final String imageUrl;
   final bool value;
+  final bool shouldLockValueAsDefault;
   final String label;
   final String viewMoreUrl;
   final ValueChanged<bool>? onChanged;
@@ -18,6 +18,7 @@ class RoleChooserCard extends StatelessWidget {
     required this.value,
     required this.label,
     required this.viewMoreUrl,
+    this.shouldLockValueAsDefault = false,
     this.onChanged,
   });
 
@@ -52,9 +53,12 @@ class RoleChooserCard extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        label,
-                        style: Theme.of(context).textTheme.titleSmall,
+                      Expanded(
+                        child: Text(
+                          overflow: TextOverflow.ellipsis,
+                          label,
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
                       ),
                       const SizedBox(width: 10),
                       GestureDetector(
@@ -74,27 +78,53 @@ class RoleChooserCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: VoicesSegmentedButton<bool>(
-                          segments: [
-                            ButtonSegment(
-                              value: true,
-                              label: const Text('Yes'),
-                              icon: value ? const Icon(Icons.check) : null,
-                            ),
-                            ButtonSegment(
-                              value: false,
-                              label: const Text('No'),
-                              icon: !value ? const Icon(Icons.block) : null,
-                            ),
-                          ],
+                          segments: shouldLockValueAsDefault
+                              ? [
+                                  ButtonSegment(
+                                    value: true,
+                                    label: value
+                                        ? const Text('Yes (Default)')
+                                        : const Text('No (Default)'),
+                                    icon: value
+                                        ? const Icon(Icons.check)
+                                        : const Icon(Icons.block),
+                                  ),
+                                ]
+                              : [
+                                  ButtonSegment(
+                                    value: true,
+                                    label: const Text('Yes'),
+                                    icon:
+                                        value ? const Icon(Icons.check) : null,
+                                  ),
+                                  ButtonSegment(
+                                    value: false,
+                                    label: const Text('No'),
+                                    icon:
+                                        !value ? const Icon(Icons.block) : null,
+                                  ),
+                                ],
+                          style: SegmentedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            foregroundColor:
+                                Theme.of(context).colors.textOnPrimary,
+                            selectedForegroundColor: value
+                                ? Theme.of(context).colors.successContainer
+                                : Theme.of(context).colors.errorContainer,
+                            selectedBackgroundColor: value
+                                ? Theme.of(context).colors.success
+                                : Theme.of(context).colors.iconsError,
+                          ),
                           selected: {value},
-                          onChanged: (selected) => onChanged?.call(!value),
+                          onChanged: (selected) => onChanged
+                              ?.call(shouldLockValueAsDefault ? value : !value),
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ],
               ),
-            )
+            ),
           ],
         ),
       ),
