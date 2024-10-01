@@ -14,10 +14,6 @@ final class GetStartedStep extends RegistrationStep {
   const GetStartedStep();
 }
 
-final class FinishAccountCreationStep extends RegistrationStep {
-  const FinishAccountCreationStep();
-}
-
 final class RecoverStep extends RegistrationStep {
   const RecoverStep();
 }
@@ -31,6 +27,10 @@ final class CreateKeychainStep extends RegistrationStep {
 
   @override
   List<Object?> get props => [stage];
+}
+
+final class FinishAccountCreationStep extends RegistrationStep {
+  const FinishAccountCreationStep();
 }
 
 final class WalletLinkStep extends RegistrationStep {
