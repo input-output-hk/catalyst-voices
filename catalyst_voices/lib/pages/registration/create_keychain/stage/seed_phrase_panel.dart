@@ -47,7 +47,9 @@ class _SeedPhrasePanelState extends State<SeedPhrasePanel> {
     );
   }
 
-  Future<void> _downloadSeedPhrase() async {}
+  Future<void> _downloadSeedPhrase() async {
+    await RegistrationCubit.of(context).downloadSeedPhrase();
+  }
 }
 
 class _Body extends StatelessWidget {

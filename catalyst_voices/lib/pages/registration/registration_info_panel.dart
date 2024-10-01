@@ -59,12 +59,12 @@ class RegistrationInfoPanel extends StatelessWidget {
             subtitle: context.l10n.createKeychainSeedPhraseSubtitle,
             body: context.l10n.createKeychainSeedPhraseBody,
           ),
-        CreateKeychainStage.checkSeedPhraseInstructions ||
+        CreateKeychainStage.checkSeedPhraseInstructions =>
+          _HeaderStrings(title: context.l10n.catalystKeychain),
         CreateKeychainStage.checkSeedPhrase ||
         CreateKeychainStage.checkSeedPhraseResult ||
         CreateKeychainStage.unlockPasswordInstructions ||
-        CreateKeychainStage.unlockPasswordCreate ||
-        CreateKeychainStage.created =>
+        CreateKeychainStage.unlockPasswordCreate =>
           _HeaderStrings(title: 'TODO'),
       };
     }
@@ -122,8 +122,7 @@ class _RegistrationPicture extends StatelessWidget {
         CreateKeychainStage.checkSeedPhraseResult =>
           const SeedPhrasePicture(),
         CreateKeychainStage.unlockPasswordInstructions ||
-        CreateKeychainStage.unlockPasswordCreate ||
-        CreateKeychainStage.created =>
+        CreateKeychainStage.unlockPasswordCreate =>
           const KeychainPicture(),
       };
     }
