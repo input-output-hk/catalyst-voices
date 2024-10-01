@@ -21,6 +21,18 @@ class VoicesModalsExample extends StatelessWidget {
           runSpacing: 16,
           children: [
             VoicesFilledButton(
+              child: const Text('Upload file dialog'),
+              onTap: () async {
+                await VoicesDialog.show<void>(
+                  context: context,
+                  builder: (context) {
+                    return const VoicesUploadFileDialog(
+                    );
+                  },
+                );
+              },
+            ),
+            VoicesFilledButton(
               child: const Text('Desktop info dialog'),
               onTap: () async {
                 await VoicesDialog.show<void>(
