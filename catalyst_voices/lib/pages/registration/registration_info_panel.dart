@@ -64,8 +64,7 @@ class RegistrationInfoPanel extends StatelessWidget {
         CreateKeychainStage.checkSeedPhrase ||
         CreateKeychainStage.checkSeedPhraseResult ||
         CreateKeychainStage.unlockPasswordInstructions ||
-        CreateKeychainStage.unlockPasswordCreate ||
-        CreateKeychainStage.created =>
+        CreateKeychainStage.unlockPasswordCreate =>
           _HeaderStrings(title: 'TODO'),
       };
     }
@@ -123,8 +122,7 @@ class _RegistrationPicture extends StatelessWidget {
         CreateKeychainStage.checkSeedPhraseResult =>
           const SeedPhrasePicture(),
         CreateKeychainStage.unlockPasswordInstructions ||
-        CreateKeychainStage.unlockPasswordCreate ||
-        CreateKeychainStage.created =>
+        CreateKeychainStage.unlockPasswordCreate =>
           const KeychainPicture(),
       };
     }
