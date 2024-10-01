@@ -523,6 +523,12 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get notice => 'Notice';
 
   @override
+  String get yes => 'Yes';
+
+  @override
+  String get no => 'No';
+
+  @override
   String get keychainDeletedDialogTitle => 'Catalyst keychain removed';
 
   @override
@@ -544,10 +550,6 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get createKeychainSeedPhraseStoreConfirmation => 'I have written down/downloaded my 12 words';
 
   @override
-  String get yes => 'Yes';
-
-  @override
-  String get no => 'No';
   String get createKeychainSeedPhraseCheckInstructionsTitle => 'Check your Catalyst security keys';
 
   @override

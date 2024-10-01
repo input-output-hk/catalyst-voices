@@ -1012,6 +1012,18 @@ abstract class VoicesLocalizations {
   /// **'Notice'**
   String get notice;
 
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
+
+  /// No description provided for @no.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no;
+
   /// A title on keychain deleted dialog
   ///
   /// In en, this message translates to:
@@ -1054,17 +1066,6 @@ abstract class VoicesLocalizations {
   /// **'I have written down/downloaded my 12 words'**
   String get createKeychainSeedPhraseStoreConfirmation;
 
-  /// No description provided for @yes.
-  ///
-  /// In en, this message translates to:
-  /// **'Yes'**
-  String get yes;
-
-  /// No description provided for @no.
-  ///
-  /// In en, this message translates to:
-  /// **'No'**
-  String get no;
   /// No description provided for @createKeychainSeedPhraseCheckInstructionsTitle.
   ///
   /// In en, this message translates to:
