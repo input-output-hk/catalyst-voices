@@ -99,8 +99,6 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
     _shuffledSeedPhraseWords
       ..clear()
       ..addAll(shuffledWords);
-
-    debugPrint('seedPhraseWords: $_seedPhraseWords');
   }
 
   void _updateUserWords([
