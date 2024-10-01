@@ -28,11 +28,11 @@ class _VoicesCardsExampleState extends State<VoicesCardsExample> {
             imageUrl: VoicesAssets.images.dummyCatalystVoices.path,
             value: _roleChooserCardState1,
             label: 'label',
-            viewMoreUrl: 'viewMoreUrl',
+            learnMoreUrl: 'learnMoreUrl1',
             onChanged: (changedValue) => {
               setState(() {
                 _roleChooserCardState1 = changedValue;
-              })
+              }),
             },
           ),
           const SizedBox(height: 16),
@@ -41,8 +41,8 @@ class _VoicesCardsExampleState extends State<VoicesCardsExample> {
             imageUrl: VoicesAssets.images.dummyCatalystVoices.path,
             value: true,
             label: 'label',
-            viewMoreUrl: 'viewMoreUrl',
-            shouldLockValueAsDefault: true,
+            learnMoreUrl: 'learnMoreUrl2',
+            lockValueAsDefault: true,
           ),
         ],
       ),

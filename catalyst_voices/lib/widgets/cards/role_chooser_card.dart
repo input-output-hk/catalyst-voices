@@ -7,9 +7,9 @@ import 'package:url_launcher/url_launcher_string.dart';
 class RoleChooserCard extends StatelessWidget {
   final String imageUrl;
   final bool value;
-  final bool shouldLockValueAsDefault;
   final String label;
-  final String viewMoreUrl;
+  final bool lockValueAsDefault;
+  final String? learnMoreUrl;
   final ValueChanged<bool>? onChanged;
 
   const RoleChooserCard({
@@ -17,8 +17,8 @@ class RoleChooserCard extends StatelessWidget {
     required this.imageUrl,
     required this.value,
     required this.label,
-    required this.viewMoreUrl,
-    this.shouldLockValueAsDefault = false,
+    this.lockValueAsDefault = false,
+    this.learnMoreUrl,
     this.onChanged,
   });
 
@@ -60,17 +60,21 @@ class RoleChooserCard extends StatelessWidget {
                           style: Theme.of(context).textTheme.titleSmall,
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      GestureDetector(
-                        onTap: () async => launchUrlString(viewMoreUrl),
-                        child: Text(
-                          'Learn more',
-                          style: TextStyle(
-                            color: Theme.of(context).colors.textPrimary,
-                            decoration: TextDecoration.underline,
+                      if (learnMoreUrl != null) ...[
+                        const SizedBox(width: 10),
+                        GestureDetector(
+                          onTap: () async => launchUrlString(learnMoreUrl!),
+                          child: Text(
+                            'Learn more',
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelMedium!
+                                .copyWith(
+                                  color: Theme.of(context).colors.iconsPrimary,
+                                ),
                           ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -78,10 +82,10 @@ class RoleChooserCard extends StatelessWidget {
                     children: [
                       Expanded(
                         child: VoicesSegmentedButton<bool>(
-                          segments: shouldLockValueAsDefault
+                          segments: lockValueAsDefault
                               ? [
                                   ButtonSegment(
-                                    value: true,
+                                    value: value,
                                     label: value
                                         ? const Text('Yes (Default)')
                                         : const Text('No (Default)'),
@@ -115,9 +119,10 @@ class RoleChooserCard extends StatelessWidget {
                                 ? Theme.of(context).colors.success
                                 : Theme.of(context).colors.iconsError,
                           ),
+                          showSelectedIcon: false,
                           selected: {value},
                           onChanged: (selected) => onChanged
-                              ?.call(shouldLockValueAsDefault ? value : !value),
+                              ?.call(lockValueAsDefault ? value : !value),
                         ),
                       ),
                     ],
