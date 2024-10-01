@@ -76,7 +76,7 @@ final class KeychainCreationCubit extends Cubit<CreateKeychain> {
     try {
       await _downloader.download(uri, path: path);
     } catch (error, stackTrace) {
-      _logger.severe(error, stackTrace);
+      _logger.severe('Downloading keychain failed', error, stackTrace);
       // TODO(damian-molinski): Show snack bar
     }
   }
