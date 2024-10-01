@@ -350,6 +350,9 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get chooseCardanoWallet => 'Choose Cardano Wallet';
 
   @override
+  String get chooseOtherWallet => 'Choose other wallet';
+
+  @override
   String get learnMore => 'Learn More';
 
   @override
@@ -377,7 +380,33 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get walletLinkSelectWalletContent => 'To complete this action, you\'ll submit a signed transaction to Cardano. There will be an ADA transaction fee.';
 
   @override
+  String get walletLinkWalletDetailsTitle => 'Cardano wallet detection';
+
+  @override
+  String walletLinkWalletDetailsContent(String wallet) {
+    return '$wallet connected successfully!';
+  }
+
+  @override
+  String get walletLinkWalletDetailsNotice => 'Wallet and role registrations require a minimal transaction fee. You can setup your default dApp connector wallet in your browser extension settings.';
+
+  @override
+  String get walletLinkWalletDetailsNoticeTopUp => 'Top up ADA';
+
+  @override
+  String get walletLinkWalletDetailsNoticeTopUpLink => '• Link to top-up provider';
+
+  @override
   String get seeAllSupportedWallets => 'See all supported wallets';
+
+  @override
+  String get walletDetectionSummary => 'Wallet detection summary';
+
+  @override
+  String get walletBalance => 'Wallet balance';
+
+  @override
+  String get walletAddress => 'Wallet address';
 
   @override
   String get accountCreationCreate => 'Create a new  Catalyst Keychain';
@@ -459,4 +488,64 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get noWalletFound => 'No wallet found.';
+
+  @override
+  String get deleteKeychainDialogTitle => 'Delete Keychain?';
+
+  @override
+  String get deleteKeychainDialogSubtitle => 'Are you sure you wants to delete your\nCatalyst Keychain from this device?';
+
+  @override
+  String get deleteKeychainDialogWarning => 'Make sure you have a working Catalyst 12-word seedphrase!';
+
+  @override
+  String get deleteKeychainDialogWarningInfo => 'Your Catalyst account will be removed,\nthis action cannot be undone!';
+
+  @override
+  String get deleteKeychainDialogTypingInfo => 'To avoid mistakes, please type ‘Remove Keychain’ below.';
+
+  @override
+  String get deleteKeychainDialogInputLabel => 'Confirm removal';
+
+  @override
+  String get deleteKeychainDialogErrorText => 'Error. Please type \'Remove keychain\' to remove your account from this device.';
+
+  @override
+  String get deleteKeychainDialogRemovingPhrase => 'Remove Keychain';
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get notice => 'Notice';
+
+  @override
+  String get keychainDeletedDialogTitle => 'Catalyst keychain removed';
+
+  @override
+  String get keychainDeletedDialogSubtitle => 'Catalyst keychain removed';
+
+  @override
+  String get keychainDeletedDialogInfo => 'Catalyst keychain removed';
+
+  @override
+  String get createKeychainSeedPhraseSubtitle => 'Write down your 12 Catalyst  security words';
+
+  @override
+  String get createKeychainSeedPhraseBody => 'Make sure you create an offline backup of your recovery phrase as well.';
+
+  @override
+  String get createKeychainSeedPhraseDownload => 'Download Catalyst key';
+
+  @override
+  String get createKeychainSeedPhraseStoreConfirmation => 'I have written down/downloaded my 12 words';
+
+  @override
+  String get createKeychainSeedPhraseCheckInstructionsTitle => 'Check your Catalyst security keys';
+
+  @override
+  String get createKeychainSeedPhraseCheckInstructionsSubtitle => 'Next, we\'re going to make sure that you\'ve written down your words correctly.     We don\'t save your seed phrase, so it\'s important  to make sure you have it right. That\'s why we do this confirmation before continuing.     It\'s also good practice to get familiar with using a seed phrase if you\'re new to crypto.';
 }

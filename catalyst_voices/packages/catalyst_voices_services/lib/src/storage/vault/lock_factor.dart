@@ -83,5 +83,5 @@ final class PasswordLockFactor implements LockFactor {
   }
 
   @override
-  String toString() => 'PasswordLockFactor(data=****)';
+  String toString() => 'PasswordLockFactor(${_data.hashCode})';
 }

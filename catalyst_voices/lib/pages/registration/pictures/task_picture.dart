@@ -1,5 +1,4 @@
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
-import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
 enum TaskPictureType {
@@ -7,41 +6,28 @@ enum TaskPictureType {
   success,
   error;
 
-  Color _foregroundColor(ThemeData theme) {
+  // TODO(damian-molinski): Color should come from colors scheme
+  Color foregroundColor(
+    ThemeData theme, {
+    bool isHighlight = false,
+  }) {
     return switch (this) {
-      // TODO(damian-molinski): Color should come from colors scheme
+      TaskPictureType.normal when isHighlight => const Color(0xFF728EF3),
       TaskPictureType.normal => const Color(0xFF0C288D),
-      TaskPictureType.success => theme.colors.successContainer!,
-      TaskPictureType.error => theme.colors.errorContainer!,
+      TaskPictureType.success when isHighlight => const Color(0xFFF2F4F8),
+      TaskPictureType.success => const Color(0xFF1D722A),
+      TaskPictureType.error when isHighlight => const Color(0xFFF2F4F8),
+      TaskPictureType.error => const Color(0xFFAD0000),
     };
   }
 
+  // TODO(damian-molinski): Color should come from colors scheme
   Color _backgroundColor(ThemeData theme) {
     return switch (this) {
-      // TODO(damian-molinski): Color should come from colors scheme
       TaskPictureType.normal => const Color(0xFFCCE2FF),
-      TaskPictureType.success => theme.colors.success!,
-      TaskPictureType.error => theme.colorScheme.error,
+      TaskPictureType.success => const Color(0xFFBAEDC2),
+      TaskPictureType.error => const Color(0xFFFF9999),
     };
-  }
-}
-
-class TaskKeychainPicture extends StatelessWidget {
-  final TaskPictureType type;
-
-  const TaskKeychainPicture({
-    super.key,
-    this.type = TaskPictureType.normal,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return TaskPicture(
-      child: TaskPictureIconBox(
-        type: type,
-        child: VoicesAssets.images.keychain.buildIcon(allowSize: false),
-      ),
-    );
   }
 }
 
@@ -103,14 +89,15 @@ class TaskPictureIconBox extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final foregroundColor = type._foregroundColor(theme);
+    final foregroundColor = type.foregroundColor(theme);
     final backgroundColor = type._backgroundColor(theme);
 
     final iconThemeData = IconThemeData(color: foregroundColor);
 
     return IconTheme(
       data: iconThemeData,
-      child: Container(
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
         decoration: BoxDecoration(
           color: backgroundColor,
           shape: BoxShape.circle,

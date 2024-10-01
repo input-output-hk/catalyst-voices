@@ -97,9 +97,9 @@ class _Footer extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Offstage(
-          offstage: progress == null,
-          child: VoicesLinearProgressIndicator(value: progress ?? 0),
+        Visibility.maintain(
+          visible: progress != null,
+          child: AnimatedVoicesLinearProgressIndicator(value: progress ?? 0),
         ),
         const SizedBox(height: 10),
         VoicesLearnMoreButton(onTap: () {}),

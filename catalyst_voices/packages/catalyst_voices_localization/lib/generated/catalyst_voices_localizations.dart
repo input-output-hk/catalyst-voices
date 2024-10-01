@@ -670,6 +670,12 @@ abstract class VoicesLocalizations {
   /// **'Choose Cardano Wallet'**
   String get chooseCardanoWallet;
 
+  /// A button label to select another cardano wallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose other wallet'**
+  String get chooseOtherWallet;
+
   /// A label on a clickable element that can show more content.
   ///
   /// In en, this message translates to:
@@ -724,11 +730,59 @@ abstract class VoicesLocalizations {
   /// **'To complete this action, you\'ll submit a signed transaction to Cardano. There will be an ADA transaction fee.'**
   String get walletLinkSelectWalletContent;
 
+  /// A title in link wallet flow on wallet details screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Cardano wallet detection'**
+  String get walletLinkWalletDetailsTitle;
+
+  /// A message in link wallet flow on wallet details screen.
+  ///
+  /// In en, this message translates to:
+  /// **'{wallet} connected successfully!'**
+  String walletLinkWalletDetailsContent(String wallet);
+
+  /// A message in link wallet flow on wallet details screen when a user wallet doesn't have enough balance.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet and role registrations require a minimal transaction fee. You can setup your default dApp connector wallet in your browser extension settings.'**
+  String get walletLinkWalletDetailsNotice;
+
+  /// A message recommending the user to top up ADA in wallet link on wallet details screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Top up ADA'**
+  String get walletLinkWalletDetailsNoticeTopUp;
+
+  /// A link to top-up provide when the user doesn't have enough balance on wallet link screen
+  ///
+  /// In en, this message translates to:
+  /// **'• Link to top-up provider'**
+  String get walletLinkWalletDetailsNoticeTopUpLink;
+
   /// Message shown when redirecting to external content that describes which wallets are supported.
   ///
   /// In en, this message translates to:
   /// **'See all supported wallets'**
   String get seeAllSupportedWallets;
+
+  /// Message shown when presenting the details of a connected wallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet detection summary'**
+  String get walletDetectionSummary;
+
+  /// The wallet balance in terms of Ada.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet balance'**
+  String get walletBalance;
+
+  /// A cardano wallet address
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet address'**
+  String get walletAddress;
 
   /// No description provided for @accountCreationCreate.
   ///
@@ -891,6 +945,126 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'No wallet found.'**
   String get noWalletFound;
+
+  /// A title on delete keychain dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Keychain?'**
+  String get deleteKeychainDialogTitle;
+
+  /// A subtitle on delete keychain dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you wants to delete your\nCatalyst Keychain from this device?'**
+  String get deleteKeychainDialogSubtitle;
+
+  /// A warning on delete keychain dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Make sure you have a working Catalyst 12-word seedphrase!'**
+  String get deleteKeychainDialogWarning;
+
+  /// A warning info on delete keychain dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Your Catalyst account will be removed,\nthis action cannot be undone!'**
+  String get deleteKeychainDialogWarningInfo;
+
+  /// A typing info on delete keychain dialog
+  ///
+  /// In en, this message translates to:
+  /// **'To avoid mistakes, please type ‘Remove Keychain’ below.'**
+  String get deleteKeychainDialogTypingInfo;
+
+  /// An input label on delete keychain dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm removal'**
+  String get deleteKeychainDialogInputLabel;
+
+  /// An error text on text field on delete keychain dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Error. Please type \'Remove keychain\' to remove your account from this device.'**
+  String get deleteKeychainDialogErrorText;
+
+  /// A removing phrase on delete keychain dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Keychain'**
+  String get deleteKeychainDialogRemovingPhrase;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// No description provided for @notice.
+  ///
+  /// In en, this message translates to:
+  /// **'Notice'**
+  String get notice;
+
+  /// A title on keychain deleted dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst keychain removed'**
+  String get keychainDeletedDialogTitle;
+
+  /// A subtitle on keychain deleted dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst keychain removed'**
+  String get keychainDeletedDialogSubtitle;
+
+  /// An info on keychain deleted dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst keychain removed'**
+  String get keychainDeletedDialogInfo;
+
+  /// No description provided for @createKeychainSeedPhraseSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Write down your 12 Catalyst  security words'**
+  String get createKeychainSeedPhraseSubtitle;
+
+  /// No description provided for @createKeychainSeedPhraseBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Make sure you create an offline backup of your recovery phrase as well.'**
+  String get createKeychainSeedPhraseBody;
+
+  /// No description provided for @createKeychainSeedPhraseDownload.
+  ///
+  /// In en, this message translates to:
+  /// **'Download Catalyst key'**
+  String get createKeychainSeedPhraseDownload;
+
+  /// No description provided for @createKeychainSeedPhraseStoreConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'I have written down/downloaded my 12 words'**
+  String get createKeychainSeedPhraseStoreConfirmation;
+
+  /// No description provided for @createKeychainSeedPhraseCheckInstructionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your Catalyst security keys'**
+  String get createKeychainSeedPhraseCheckInstructionsTitle;
+
+  /// No description provided for @createKeychainSeedPhraseCheckInstructionsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Next, we\'re going to make sure that you\'ve written down your words correctly.     We don\'t save your seed phrase, so it\'s important  to make sure you have it right. That\'s why we do this confirmation before continuing.     It\'s also good practice to get familiar with using a seed phrase if you\'re new to crypto.'**
+  String get createKeychainSeedPhraseCheckInstructionsSubtitle;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

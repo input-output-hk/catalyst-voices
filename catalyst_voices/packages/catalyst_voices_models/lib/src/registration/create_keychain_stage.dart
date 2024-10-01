@@ -8,5 +8,4 @@ enum CreateKeychainStage {
   checkSeedPhraseResult,
   unlockPasswordInstructions,
   unlockPasswordCreate,
-  created,
 }
