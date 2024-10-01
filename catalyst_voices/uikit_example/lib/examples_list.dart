@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:uikit_example/examples/voices_avatar_example.dart';
 import 'package:uikit_example/examples/voices_badge_example.dart';
 import 'package:uikit_example/examples/voices_buttons_example.dart';
+import 'package:uikit_example/examples/voices_cards_example.dart';
 import 'package:uikit_example/examples/voices_checkbox_example.dart';
 import 'package:uikit_example/examples/voices_chip_example.dart';
 import 'package:uikit_example/examples/voices_fab_example.dart';
@@ -62,6 +63,11 @@ class ExamplesListPage extends StatelessWidget {
         title: 'Voices SegmentedButton',
         route: VoicesSegmentedButtonExample.route,
         page: VoicesSegmentedButtonExample(),
+      ),
+      ExampleTile(
+        title: 'Voices Cards',
+        route: VoicesCardsExample.route,
+        page: VoicesCardsExample(),
       ),
       ExampleTile(
         title: 'Voices Buttons',
