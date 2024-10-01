@@ -1,4 +1,5 @@
 import 'package:catalyst_cardano/catalyst_cardano.dart';
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -10,17 +11,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class WalletDetailsPanel extends StatelessWidget {
+  final Coin minAdaForRegistration;
   final CardanoWalletDetails details;
 
   const WalletDetailsPanel({
     super.key,
+    required this.minAdaForRegistration,
     required this.details,
   });
 
   @override
   Widget build(BuildContext context) {
-    final hasEnoughBalance =
-        details.balance >= CardanoWalletDetails.minAdaForRegistration;
+    final hasEnoughBalance = details.balance >= minAdaForRegistration;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
