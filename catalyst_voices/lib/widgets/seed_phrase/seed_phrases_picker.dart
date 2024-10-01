@@ -14,7 +14,7 @@ class SeedPhrasesPicker extends StatelessWidget {
   /// The list of seed phrases to be displayed.
   final List<String> words;
 
-  /// A set of currently selected seed phrases. Defaults to an empty set.
+  /// A list of currently selected seed phrases. Defaults to empty list.
   final List<String> selectedWords;
 
   /// A callback function triggered when a non-selected seed phrase is tapped.
