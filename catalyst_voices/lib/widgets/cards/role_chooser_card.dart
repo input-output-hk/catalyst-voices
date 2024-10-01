@@ -46,6 +46,9 @@ class RoleChooserCard extends StatelessWidget {
   /// Hides the "Learn More" link.
   final bool isLearnMoreHidden;
 
+  /// Toggles view-only mode.
+  final bool isViewOnly;
+
   /// A callback triggered when the role selection changes.
   final ValueChanged<bool>? onChanged;
 
@@ -59,6 +62,7 @@ class RoleChooserCard extends StatelessWidget {
     required this.label,
     this.lockValueAsDefault = false,
     this.isLearnMoreHidden = false,
+    this.isViewOnly = false,
     this.onChanged,
     this.onLearnMore,
   });
@@ -125,61 +129,102 @@ class RoleChooserCard extends StatelessWidget {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Expanded(
-                        child: VoicesSegmentedButton<bool>(
-                          segments: lockValueAsDefault
-                              ? [
-                                  ButtonSegment(
-                                    value: value,
-                                    label: value
-                                        ? Text(
-                                            [
-                                              context.l10n.yes,
-                                              '(${context.l10n.defaultRole})',
-                                            ].join(' '),
-                                          )
-                                        : Text(
-                                            [
-                                              context.l10n.no,
-                                              '(${context.l10n.defaultRole})',
-                                            ].join(' '),
-                                          ),
-                                    icon: value
-                                        ? const Icon(Icons.check)
-                                        : const Icon(Icons.block),
+                      if (isViewOnly)
+                        Wrap(
+                          spacing: 5,
+                          runSpacing: 5,
+                          children: [
+                            VoicesChip.round(
+                              content: Text(
+                                value ? context.l10n.yes : context.l10n.no,
+                                style: TextStyle(
+                                  color: value
+                                      ? Theme.of(context)
+                                          .colors
+                                          .successContainer
+                                      : Theme.of(context).colors.errorContainer,
+                                ),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 4,
+                              ),
+                              backgroundColor: value
+                                  ? Theme.of(context).colors.success
+                                  : Theme.of(context).colors.iconsError,
+                            ),
+                            if (lockValueAsDefault)
+                              VoicesChip.round(
+                                content: Text(
+                                  context.l10n.defaultRole,
+                                  style: TextStyle(
+                                    color:
+                                        Theme.of(context).colors.iconsPrimary,
                                   ),
-                                ]
-                              : [
-                                  ButtonSegment(
-                                    value: true,
-                                    label: Text(context.l10n.yes),
-                                    icon:
-                                        value ? const Icon(Icons.check) : null,
-                                  ),
-                                  ButtonSegment(
-                                    value: false,
-                                    label: Text(context.l10n.no),
-                                    icon:
-                                        !value ? const Icon(Icons.block) : null,
-                                  ),
-                                ],
-                          style: SegmentedButton.styleFrom(
-                            backgroundColor: Colors.transparent,
-                            foregroundColor:
-                                Theme.of(context).colors.textOnPrimary,
-                            selectedForegroundColor: value
-                                ? Theme.of(context).colors.successContainer
-                                : Theme.of(context).colors.errorContainer,
-                            selectedBackgroundColor: value
-                                ? Theme.of(context).colors.success
-                                : Theme.of(context).colors.iconsError,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 4,
+                                ),
+                                backgroundColor:
+                                    Theme.of(context).colors.iconsForeground,
+                              ),
+                          ],
+                        )
+                      else
+                        Expanded(
+                          child: VoicesSegmentedButton<bool>(
+                            segments: lockValueAsDefault
+                                ? [
+                                    ButtonSegment(
+                                      value: value,
+                                      label: Text(
+                                        [
+                                          if (value)
+                                            context.l10n.yes
+                                          else
+                                            context.l10n.no,
+                                          '(${context.l10n.defaultRole})',
+                                        ].join(' '),
+                                      ),
+                                      icon: Icon(
+                                        value ? Icons.check : Icons.block,
+                                      ),
+                                    ),
+                                  ]
+                                : [
+                                    ButtonSegment(
+                                      value: true,
+                                      label: Text(context.l10n.yes),
+                                      icon: value
+                                          ? const Icon(Icons.check)
+                                          : null,
+                                    ),
+                                    ButtonSegment(
+                                      value: false,
+                                      label: Text(context.l10n.no),
+                                      icon: !value
+                                          ? const Icon(Icons.block)
+                                          : null,
+                                    ),
+                                  ],
+                            style: SegmentedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              foregroundColor:
+                                  Theme.of(context).colors.textOnPrimary,
+                              selectedForegroundColor: value
+                                  ? Theme.of(context).colors.successContainer
+                                  : Theme.of(context).colors.errorContainer,
+                              selectedBackgroundColor: value
+                                  ? Theme.of(context).colors.success
+                                  : Theme.of(context).colors.iconsError,
+                            ),
+                            showSelectedIcon: false,
+                            selected: {value},
+                            onChanged: (selected) => onChanged
+                                ?.call(lockValueAsDefault ? value : !value),
                           ),
-                          showSelectedIcon: false,
-                          selected: {value},
-                          onChanged: (selected) => onChanged
-                              ?.call(lockValueAsDefault ? value : !value),
                         ),
-                      ),
                     ],
                   ),
                 ],

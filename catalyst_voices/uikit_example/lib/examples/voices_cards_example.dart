@@ -30,7 +30,7 @@ class _VoicesCardsExampleState extends State<VoicesCardsExample> {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 42, vertical: 24),
         children: [
-          const Text('Role Chooser Card'),
+          const Text('Role Chooser Card (State #1)'),
           RoleChooserCard(
             imageUrl: VoicesAssets.images.dummyCatalystVoices.path,
             value: _roleChooserCardState1,
@@ -49,6 +49,28 @@ class _VoicesCardsExampleState extends State<VoicesCardsExample> {
             label: 'label',
             isLearnMoreHidden: true,
             lockValueAsDefault: true,
+          ),
+          const SizedBox(height: 16),
+          const Text('Role Chooser Card (State #1, View Only)'),
+          RoleChooserCard(
+            imageUrl: VoicesAssets.images.dummyCatalystVoices.path,
+            value: _roleChooserCardState1,
+            label: 'label',
+            isViewOnly: true,
+            onChanged: (changedValue) => {
+              setState(() {
+                _roleChooserCardState1 = changedValue;
+              }),
+            },
+          ),
+          const SizedBox(height: 16),
+          const Text('Role Chooser Card (Locked Value, View Only)'),
+          RoleChooserCard(
+            imageUrl: VoicesAssets.images.dummyCatalystVoices.path,
+            value: true,
+            label: 'very long label, ' * 20,
+            lockValueAsDefault: true,
+            isViewOnly: true,
           ),
           const SizedBox(height: 16),
           const Text('Roles Chooser Panel'),
