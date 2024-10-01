@@ -134,6 +134,7 @@ class _SeedPhraseWords extends StatelessWidget {
             selectedWords: userWords,
             onChanged: onUserWordsChanged,
           ),
+          const SizedBox(height: 10),
           _WordsActions(
             onUploadKeyTap: onUploadTap,
             onResetTap: onResetTap,
