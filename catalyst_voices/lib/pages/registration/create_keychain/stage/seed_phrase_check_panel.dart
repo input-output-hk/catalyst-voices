@@ -34,7 +34,8 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
   void initState() {
     super.initState();
 
-    _updateWords();
+    _updateSeedPhraseWords();
+    _updateUserWords();
   }
 
   @override
@@ -42,7 +43,8 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.seedPhrase != oldWidget.seedPhrase) {
-      _updateWords();
+      _updateSeedPhraseWords();
+      _updateUserWords();
     }
   }
 
@@ -76,18 +78,16 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
   }
 
   void _clearUserWords() {
-    setState(_userWords.clear);
+    setState(_updateUserWords);
   }
 
   void _onWordsSequenceChanged(List<String> words) {
     setState(() {
-      _userWords
-        ..clear()
-        ..addAll(words);
+      _updateUserWords(words);
     });
   }
 
-  void _updateWords() {
+  void _updateSeedPhraseWords() {
     final seedPhrase = widget.seedPhrase;
     final words = seedPhrase?.mnemonicWords ?? <String>[];
     final shuffledWords = seedPhrase?.shuffledMnemonicWords ?? <String>[];
@@ -100,9 +100,17 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
       ..clear()
       ..addAll(shuffledWords);
 
-    _userWords.clear();
-
     debugPrint('seedPhraseWords: $_seedPhraseWords');
+  }
+
+  void _updateUserWords([
+    List<String> words = const [],
+  ]) {
+    _userWords
+      ..clear()
+      ..addAll(words);
+
+    RegistrationCubit.of(context).setSeedPhraseCheck(isChecked: _isStageValid);
   }
 }
 
