@@ -13,6 +13,7 @@ use scylla::{
     transport::iterator::RowIterator, QueryResult, Session,
 };
 use staked_ada::{
+    get_assets_by_stake_address::GetAssetsByStakeAddressQuery,
     get_txi_by_txn_hash::GetTxiByTxnHashesQuery,
     get_txo_by_stake_address::GetTxoByStakeAddressQuery, update_txo_spent::UpdateTxoSpentQuery,
 };
@@ -54,9 +55,11 @@ pub(crate) enum PreparedQuery {
 /// All prepared SELECT query statements.
 pub(crate) enum PreparedSelectQuery {
     /// Get TXO by stake address query.
-    GetTxoByStakeAddress,
+    TxoByStakeAddress,
     /// Get TXI by transaction hash query.
-    GetTxiByTransactionHash,
+    TxiByTransactionHash,
+    /// Get native assets by stake address query.
+    AssetsByStakeAddress,
 }
 
 /// All prepared queries for a session.
@@ -86,6 +89,8 @@ pub(crate) struct PreparedQueries {
     txo_by_stake_address_query: PreparedStatement,
     /// Get TXI by transaction hash.
     txi_by_txn_hash_query: PreparedStatement,
+    /// Get native assets by stake address query.
+    native_assets_by_stake_address_query: PreparedStatement,
 }
 
 /// An individual query response that can fail
@@ -110,6 +115,8 @@ impl PreparedQueries {
             UpdateTxoSpentQuery::prepare_batch(session.clone(), cfg).await;
         let txo_by_stake_address_query = GetTxoByStakeAddressQuery::prepare(session.clone()).await;
         let txi_by_txn_hash_query = GetTxiByTxnHashesQuery::prepare(session.clone()).await;
+        let native_assets_by_stake_address_query =
+            GetAssetsByStakeAddressQuery::prepare(session.clone()).await;
 
         let (
             txo_insert_queries,
@@ -137,6 +144,7 @@ impl PreparedQueries {
             txo_spent_update_queries: txo_spent_update_queries?,
             txo_by_stake_address_query: txo_by_stake_address_query?,
             txi_by_txn_hash_query: txi_by_txn_hash_query?,
+            native_assets_by_stake_address_query: native_assets_by_stake_address_query?,
         })
     }
 
@@ -192,8 +200,9 @@ impl PreparedQueries {
     ) -> anyhow::Result<RowIterator>
     where P: SerializeRow {
         let prepared_stmt = match select_query {
-            PreparedSelectQuery::GetTxoByStakeAddress => &self.txo_by_stake_address_query,
-            PreparedSelectQuery::GetTxiByTransactionHash => &self.txi_by_txn_hash_query,
+            PreparedSelectQuery::TxoByStakeAddress => &self.txo_by_stake_address_query,
+            PreparedSelectQuery::TxiByTransactionHash => &self.txi_by_txn_hash_query,
+            PreparedSelectQuery::AssetsByStakeAddress => &self.native_assets_by_stake_address_query,
         };
 
         session

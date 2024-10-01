@@ -85,7 +85,7 @@ impl GetTxoByStakeAddressQuery {
         session: &CassandraSession, params: GetTxoByStakeAddressQueryParams,
     ) -> anyhow::Result<TypedRowIterator<result::GetTxoByStakeAddressQuery>> {
         let iter = session
-            .execute_iter(PreparedSelectQuery::GetTxoByStakeAddress, params)
+            .execute_iter(PreparedSelectQuery::TxoByStakeAddress, params)
             .await?
             .into_typed::<result::GetTxoByStakeAddressQuery>();
 
