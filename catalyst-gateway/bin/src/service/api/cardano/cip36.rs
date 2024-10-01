@@ -19,9 +19,20 @@ use crate::{
 /// Endpoint responses
 #[derive(ApiResponse)]
 pub(crate) enum Responses {
-    /// The registration information for the stake address or stake key hashqueried.
+    /// Cip36 registration
     #[oai(status = 200)]
     Ok(Json<Cip36Info>),
+    /// No valid registration found for the provided stake address or stake key hash
+    #[oai(status = 404)]
+    NotFound,
+}
+
+/// Endpoint responses
+#[derive(ApiResponse)]
+pub(crate) enum ResponsesVoteKey {
+    /// Cip36 registration
+    #[oai(status = 200)]
+    Ok(Json<Vec<Cip36Info>>),
     /// No valid registration found for the provided stake address or stake key hash
     #[oai(status = 404)]
     NotFound,
@@ -50,6 +61,8 @@ pub(crate) struct Cip36Info {
 
 /// All responses
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
+/// All response vote key
+pub(crate) type AllResponsesVoteKey = WithErrorResponses<ResponsesVoteKey>;
 
 /// Get latest registration given stake address
 pub(crate) async fn get_latest_registration_from_stake_addr(
@@ -215,18 +228,18 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
 /// Get latest registration given vote key
 pub(crate) async fn get_latest_registration_from_vote_key(
     vote_key: String, persistent: bool,
-) -> AllResponses {
+) -> AllResponsesVoteKey {
     let vote_key = match hex::decode(vote_key) {
         Ok(vote_key) => vote_key,
         Err(err) => {
             error!("Failed to decode vote key {:?}", err);
-            return Responses::NotFound.into();
+            return ResponsesVoteKey::NotFound.into();
         },
     };
 
     let Some(session) = CassandraSession::get(persistent) else {
         error!("Failed to acquire db session");
-        return Responses::NotFound.into();
+        return ResponsesVoteKey::NotFound.into();
     };
 
     let mut stake_addr_iter = match GetStakeAddrFromVoteKeyQuery::execute(
@@ -238,7 +251,7 @@ pub(crate) async fn get_latest_registration_from_vote_key(
         Ok(latest) => latest,
         Err(err) => {
             error!("Failed to query stake addr from vote key {:?}", err);
-            return Responses::NotFound.into();
+            return ResponsesVoteKey::NotFound.into();
         },
     };
 
@@ -247,7 +260,7 @@ pub(crate) async fn get_latest_registration_from_vote_key(
             Ok(r) => r,
             Err(err) => {
                 error!("Failed to get latest registration {:?}", err);
-                return Responses::NotFound.into();
+                return ResponsesVoteKey::NotFound.into();
             },
         };
 
@@ -260,16 +273,18 @@ pub(crate) async fn get_latest_registration_from_vote_key(
             Ok(latest) => latest,
             Err(err) => {
                 error!("Failed to query latest registration {:?}", err);
-                return Responses::NotFound.into();
+                return ResponsesVoteKey::NotFound.into();
             },
         };
 
-        if let Some(row_latest_registration) = registrations_iter.next().await {
+        // list of stake address registrations currently associated with a given voting key
+        let mut stake_addrs = Vec::new();
+        while let Some(row_latest_registration) = registrations_iter.next().await {
             let row = match row_latest_registration {
                 Ok(r) => r,
                 Err(err) => {
                     error!("Failed to get latest registration {:?}", err);
-                    return Responses::NotFound.into();
+                    return ResponsesVoteKey::NotFound.into();
                 },
             };
 
@@ -277,7 +292,7 @@ pub(crate) async fn get_latest_registration_from_vote_key(
                 *nonce
             } else {
                 error!("Issue downcasting nonce");
-                return Responses::NotFound.into();
+                return ResponsesVoteKey::NotFound.into();
             };
 
             let slot_no = if let Some(slot_no) = row.slot_no.into_parts().1.to_u64_digits().first()
@@ -285,7 +300,7 @@ pub(crate) async fn get_latest_registration_from_vote_key(
                 *slot_no
             } else {
                 error!("Issue downcasting slot no");
-                return Responses::NotFound.into();
+                return ResponsesVoteKey::NotFound.into();
             };
 
             let cip36 = Cip36Info {
@@ -300,9 +315,11 @@ pub(crate) async fn get_latest_registration_from_vote_key(
                 cip36: row.cip36,
             };
 
-            return Responses::Ok(Json(cip36)).into();
+            stake_addrs.push(cip36);
         }
+
+        return ResponsesVoteKey::Ok(Json(stake_addrs)).into();
     }
 
-    Responses::NotFound.into()
+    ResponsesVoteKey::NotFound.into()
 }
