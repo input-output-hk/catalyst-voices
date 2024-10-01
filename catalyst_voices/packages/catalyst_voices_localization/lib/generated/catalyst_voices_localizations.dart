@@ -993,6 +993,18 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'I have written down/downloaded my 12 words'**
   String get createKeychainSeedPhraseStoreConfirmation;
+
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
+
+  /// No description provided for @no.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

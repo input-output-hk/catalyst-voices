@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/cards/role_chooser_card.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/widgets.dart';
 
@@ -22,44 +23,38 @@ class RolesChooserPanel extends StatelessWidget {
         RoleChooserCard(
           imageUrl: VoicesAssets.images.dummyCatalystVoices.path,
           value: value[AccountRole.voter] ?? false,
-          label: 'Voter',
-          lockValueAsDefault: lockedValuesAsDefault?[AccountRole.voter] ?? false,
-          onChanged: (value) {
-            onChanged?.call(_createModifiedValue(AccountRole.voter, value));
+          label: context.l10n.voter,
+          learnMoreUrl: 'tmp',
+          lockValueAsDefault:
+              lockedValuesAsDefault?[AccountRole.voter] ?? false,
+          onChanged: (newValue) {
+            onChanged?.call({...value, AccountRole.voter: newValue});
           },
         ),
         const SizedBox(height: 12),
         RoleChooserCard(
           imageUrl: VoicesAssets.images.dummyCatalystVoices.path,
           value: value[AccountRole.proposer] ?? false,
-          label: 'Main Proposer',
+          label: context.l10n.proposer,
+          learnMoreUrl: 'tmp',
           lockValueAsDefault:
               lockedValuesAsDefault?[AccountRole.proposer] ?? false,
-          onChanged: (value) {
-            onChanged?.call(_createModifiedValue(AccountRole.proposer, value));
+          onChanged: (newValue) {
+            onChanged?.call({...value, AccountRole.proposer: newValue});
           },
         ),
         const SizedBox(height: 12),
         RoleChooserCard(
           imageUrl: VoicesAssets.images.dummyCatalystVoices.path,
           value: value[AccountRole.drep] ?? false,
-          label: 'Drep',
+          label: context.l10n.drep,
+          learnMoreUrl: 'tmp',
           lockValueAsDefault: lockedValuesAsDefault?[AccountRole.drep] ?? false,
-          onChanged: (value) {
-            onChanged?.call(_createModifiedValue(AccountRole.drep, value));
+          onChanged: (newValue) {
+            onChanged?.call({...value, AccountRole.drep: newValue});
           },
         ),
       ],
     );
-  }
-
-  Map<AccountRole, bool> _createModifiedValue(
-    AccountRole field,
-    bool newValue,
-  ) {
-    final out = Map<AccountRole, bool>.from(value);
-    out[field] = newValue;
-
-    return out;
   }
 }

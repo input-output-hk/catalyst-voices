@@ -510,4 +510,10 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get createKeychainSeedPhraseStoreConfirmation => 'I have written down/downloaded my 12 words';
+
+  @override
+  String get yes => 'Yes';
+
+  @override
+  String get no => 'No';
 }

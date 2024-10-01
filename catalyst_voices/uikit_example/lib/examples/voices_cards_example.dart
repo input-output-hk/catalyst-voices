@@ -57,9 +57,9 @@ class _VoicesCardsExampleState extends State<VoicesCardsExample> {
             lockedValuesAsDefault: const {
               AccountRole.voter: true,
             },
-            onChanged: (newValue) => {
+            onChanged: (changedValue) => {
               setState(() {
-                _rolesChooserPanelState1 = newValue;
+                _rolesChooserPanelState1 = changedValue;
               }),
             },
           ),

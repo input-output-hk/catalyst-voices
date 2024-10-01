@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/widgets/buttons/voices_segmented_button.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -65,7 +66,7 @@ class RoleChooserCard extends StatelessWidget {
                         GestureDetector(
                           onTap: () async => launchUrlString(learnMoreUrl!),
                           child: Text(
-                            'Learn more',
+                            context.l10n.learnMore,
                             style: Theme.of(context)
                                 .textTheme
                                 .labelMedium!
@@ -87,8 +88,18 @@ class RoleChooserCard extends StatelessWidget {
                                   ButtonSegment(
                                     value: value,
                                     label: value
-                                        ? const Text('Yes (Default)')
-                                        : const Text('No (Default)'),
+                                        ? Text(
+                                            [
+                                              context.l10n.yes,
+                                              '(${context.l10n.defaultRole})',
+                                            ].join(' '),
+                                          )
+                                        : Text(
+                                            [
+                                              context.l10n.no,
+                                              '(${context.l10n.defaultRole})',
+                                            ].join(' '),
+                                          ),
                                     icon: value
                                         ? const Icon(Icons.check)
                                         : const Icon(Icons.block),
@@ -97,13 +108,13 @@ class RoleChooserCard extends StatelessWidget {
                               : [
                                   ButtonSegment(
                                     value: true,
-                                    label: const Text('Yes'),
+                                    label: Text(context.l10n.yes),
                                     icon:
                                         value ? const Icon(Icons.check) : null,
                                   ),
                                   ButtonSegment(
                                     value: false,
-                                    label: const Text('No'),
+                                    label: Text(context.l10n.no),
                                     icon:
                                         !value ? const Icon(Icons.block) : null,
                                   ),
