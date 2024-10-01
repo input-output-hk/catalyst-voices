@@ -1,5 +1,3 @@
-import 'package:catalyst_voices/widgets/cards/role_chooser_card.dart';
-import 'package:catalyst_voices/widgets/containers/roles_chooser_panel.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
