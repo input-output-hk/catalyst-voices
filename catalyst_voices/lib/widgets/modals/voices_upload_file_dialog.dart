@@ -104,44 +104,56 @@ class _UploadContainer extends StatelessWidget {
           radius: const Radius.circular(12),
           dashPattern: const [8, 6],
           color: Theme.of(context).colors.iconsPrimary!,
-          child: Container(
-            width: double.infinity,
-            height: double.infinity,
-            alignment: Alignment.center,
-            child: Wrap(
-              direction: Axis.vertical,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
+          child: InkWell(
+            onTap: () {},
+            child: Container(
+              width: double.infinity,
+              height: double.infinity,
+              alignment: Alignment.center,
+              child: Wrap(
+                direction: Axis.vertical,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Container(
+                    width: 80,
+                    height: 80,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Theme.of(context).colors.iconsPrimary!,
+                        width: 3,
+                      ),
+                    ),
+                    child: VoicesAssets.icons.upload.buildIcon(
                       color: Theme.of(context).colors.iconsPrimary!,
-                      width: 3,
                     ),
                   ),
-                  child: VoicesAssets.icons.upload.buildIcon(
-                    color: Theme.of(context).colors.iconsPrimary!,
+                  RichText(
+                    text: TextSpan(
+                        text: 'Drop your key here or ',
+                        style: Theme.of(context).textTheme.titleSmall,
+                        children: <TextSpan>[
+                          TextSpan(
+                            text: 'browse',
+                            style: TextStyle(
+                              color: Theme.of(context).colors.iconsPrimary!,
+                            ),
+                          ),
+                        ]),
                   ),
-                ),
-                Text(
-                  'Drop your key here or browse',
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-                Text(
-                  "Make sure it's a correct Catalyst keychain file.",
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-              ]
-                  .separatedBy(
-                    Container(
-                      height: 12,
-                    ),
-                  )
-                  .toList(),
+                  Text(
+                    "Make sure it's a correct Catalyst keychain file.",
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ]
+                    .separatedBy(
+                      Container(
+                        height: 12,
+                      ),
+                    )
+                    .toList(),
+              ),
             ),
           ),
         ),
