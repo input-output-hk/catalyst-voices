@@ -419,7 +419,7 @@ Tally(i, [\mathbf{c_1}, \mathbf{c_2}, \ldots, \mathbf{c_N}], [\alpha_1, \alpha_2
 \end{equation}
 
 Where $c_{j, i}$ - an encrypted corresponded $i$-th vector's component of the encrypted vote $\mathbf{c_j}$.
-As it was stated in this [section](#vote-encrypting) each encrypted vote is a vector
+As it was stated in this [section](#vote-encryption) each encrypted vote is a vector
 $\mathbf{c_j} = (c_{j, 1}, \ldots, c_{j, M})$, $M$ - number of voting choices.
 
 $er_i$ noted as encrypted tally result for the provided $i$-th voting choice.
@@ -436,7 +436,6 @@ c_{j, i} \circ c_{j+1, i} = (c_{j, i, 1} \circ c_{j+1, i, 1},\quad c_{j, i, 2} \
 
 So $\circ$ operation applied separately for each corresponding items of the ciphertexts $c_{j, i}, c_{j+1, i}$
 and in the result we are getting a new ciphertext.
-
 
 <!-- markdownlint-enable no-inline-html -->
 
