@@ -49,6 +49,15 @@ final class KeychainCreationCubit extends Cubit<CreateKeychain> {
     }
   }
 
+  void setSeedPhraseCheckConfirmed({
+    required bool isConfirmed,
+  }) {
+    if (_seedPhraseState.isCheckConfirmed != isConfirmed) {
+      _seedPhraseState =
+          _seedPhraseState.copyWith(isCheckConfirmed: isConfirmed);
+    }
+  }
+
   Future<void> downloadSeedPhrase() async {
     final mnemonic = _seedPhraseState.seedPhrase?.mnemonic;
     if (mnemonic == null) {
