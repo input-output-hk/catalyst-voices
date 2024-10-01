@@ -3,7 +3,6 @@ use poem_openapi::{
     param::{Path, Query},
     OpenApi,
 };
-use tracing::error;
 use types::{DateTime, SlotNumber};
 
 use crate::service::{
@@ -147,8 +146,6 @@ impl CardanoApi {
     async fn latest_registration_cip36_given_stake_addr(
         &self, stake_addr: Query<String>,
     ) -> cip36::AllResponses {
-        error!("zzz!");
-
         cip36::get_latest_registration_from_stake_addr(stake_addr.0, true).await
     }
 
@@ -164,5 +161,19 @@ impl CardanoApi {
         &self, stake_key_hash: Query<String>,
     ) -> cip36::AllResponses {
         cip36::get_latest_registration_from_stake_key_hash(stake_key_hash.0, true).await
+    }
+
+    #[oai(
+        path = "/cip36/latest_registration/vote_key",
+        method = "get",
+        operation_id = "latestRegistrationGivenVoteKey"
+    )]
+    /// Cip36 registrations
+    ///
+    /// This endpoint gets the latest registraton given a vote key
+    async fn latest_registration_cip36_given_vote_key(
+        &self, vote_key: Query<String>,
+    ) -> cip36::AllResponses {
+        cip36::get_latest_registration_from_vote_key(vote_key.0, true).await
     }
 }

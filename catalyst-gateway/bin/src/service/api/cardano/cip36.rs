@@ -7,10 +7,9 @@ use tracing::error;
 use crate::{
     db::index::{
         queries::registrations::{
-            get_latest_registration_w_stake_addr::{
-                GetLatestRegistrationParams, GetLatestRegistrationQuery,
-            },
-            get_latest_registration_w_stake_hash::{GetStakeAddrParams, GetStakeAddrQuery},
+            get_latest_w_stake_addr::{GetLatestRegistrationParams, GetLatestRegistrationQuery},
+            get_latest_w_stake_hash::{GetStakeAddrParams, GetStakeAddrQuery},
+            get_latest_w_vote_key::{GetStakeAddrFromVoteKeyParams, GetStakeAddrFromVoteKeyQuery},
         },
         session::CassandraSession,
     },
@@ -63,8 +62,6 @@ pub(crate) async fn get_latest_registration_from_stake_addr(
             return Responses::NotFound.into();
         },
     };
-
-    error!("go on!");
 
     let Some(session) = CassandraSession::get(persistent) else {
         error!("Failed to acquire db session");
@@ -149,6 +146,101 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
                 return Responses::NotFound.into();
             },
         };
+
+    if let Some(row_stake_addr) = stake_addr_iter.next().await {
+        let row = match row_stake_addr {
+            Ok(r) => r,
+            Err(err) => {
+                error!("Failed to get latest registration {:?}", err);
+                return Responses::NotFound.into();
+            },
+        };
+
+        let mut registrations_iter = match GetLatestRegistrationQuery::execute(
+            &session,
+            GetLatestRegistrationParams::new(row.stake_address),
+        )
+        .await
+        {
+            Ok(latest) => latest,
+            Err(err) => {
+                error!("Failed to query latest registration {:?}", err);
+                return Responses::NotFound.into();
+            },
+        };
+
+        if let Some(row_latest_registration) = registrations_iter.next().await {
+            let row = match row_latest_registration {
+                Ok(r) => r,
+                Err(err) => {
+                    error!("Failed to get latest registration {:?}", err);
+                    return Responses::NotFound.into();
+                },
+            };
+
+            let nonce = if let Some(nonce) = row.nonce.into_parts().1.to_u64_digits().first() {
+                *nonce
+            } else {
+                error!("Issue downcasting nonce");
+                return Responses::NotFound.into();
+            };
+
+            let slot_no = if let Some(slot_no) = row.slot_no.into_parts().1.to_u64_digits().first()
+            {
+                *slot_no
+            } else {
+                error!("Issue downcasting slot no");
+                return Responses::NotFound.into();
+            };
+
+            let cip36 = Cip36Info {
+                stake_address: row.stake_address,
+                nonce,
+                slot_no,
+                txn: row.txn,
+                vote_key: row.vote_key,
+                payment_address: row.payment_address,
+                is_payable: row.is_payable,
+
+                cip36: row.cip36,
+            };
+
+            return Responses::Ok(Json(cip36)).into();
+        }
+    }
+
+    Responses::NotFound.into()
+}
+
+/// Get latest registration given vote key
+pub(crate) async fn get_latest_registration_from_vote_key(
+    vote_key: String, persistent: bool,
+) -> AllResponses {
+    let vote_key = match hex::decode(vote_key) {
+        Ok(vote_key) => vote_key,
+        Err(err) => {
+            error!("Failed to decode vote key {:?}", err);
+            return Responses::NotFound.into();
+        },
+    };
+
+    let Some(session) = CassandraSession::get(persistent) else {
+        error!("Failed to acquire db session");
+        return Responses::NotFound.into();
+    };
+
+    let mut stake_addr_iter = match GetStakeAddrFromVoteKeyQuery::execute(
+        &session,
+        GetStakeAddrFromVoteKeyParams::new(vote_key),
+    )
+    .await
+    {
+        Ok(latest) => latest,
+        Err(err) => {
+            error!("Failed to query stake addr from vote key {:?}", err);
+            return Responses::NotFound.into();
+        },
+    };
 
     if let Some(row_stake_addr) = stake_addr_iter.next().await {
         let row = match row_stake_addr {
