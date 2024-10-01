@@ -1053,6 +1053,30 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'I have written down/downloaded my 12 words'**
   String get createKeychainSeedPhraseStoreConfirmation;
+
+  /// No description provided for @createKeychainSeedPhraseCheckSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Input your Catalyst security keys'**
+  String get createKeychainSeedPhraseCheckSubtitle;
+
+  /// No description provided for @createKeychainSeedPhraseCheckBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your 12 written down words in  the correct order.'**
+  String get createKeychainSeedPhraseCheckBody;
+
+  /// When user checks correct seed phrase words order he can upload it too
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Catalyst Key'**
+  String get uploadCatalystKey;
+
+  /// No description provided for @reset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get reset;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

@@ -542,4 +542,16 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get createKeychainSeedPhraseStoreConfirmation => 'I have written down/downloaded my 12 words';
+
+  @override
+  String get createKeychainSeedPhraseCheckSubtitle => 'Input your Catalyst security keys';
+
+  @override
+  String get createKeychainSeedPhraseCheckBody => 'Select your 12 written down words in  the correct order.';
+
+  @override
+  String get uploadCatalystKey => 'Upload Catalyst Key';
+
+  @override
+  String get reset => 'Reset';
 }

@@ -82,6 +82,10 @@ final class KeychainCreationCubit extends Cubit<CreateKeychain> {
   }
 
   CreateKeychainStep? nextStep() {
+    if (state.stage == CreateKeychainStage.seedPhrase) {
+      return CreateKeychainStep(stage: CreateKeychainStage.checkSeedPhrase);
+    }
+
     final currentStageIndex = CreateKeychainStage.values.indexOf(state.stage);
     final isLast = currentStageIndex == CreateKeychainStage.values.length - 1;
     if (isLast) {
@@ -93,6 +97,10 @@ final class KeychainCreationCubit extends Cubit<CreateKeychain> {
   }
 
   CreateKeychainStep? previousStep() {
+    if (state.stage == CreateKeychainStage.checkSeedPhrase) {
+      return CreateKeychainStep(stage: CreateKeychainStage.seedPhrase);
+    }
+
     final currentStageIndex = CreateKeychainStage.values.indexOf(state.stage);
     final isFirst = currentStageIndex == 0;
     if (isFirst) {

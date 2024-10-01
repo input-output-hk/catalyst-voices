@@ -14,17 +14,25 @@ class SeedPhrasesPicker extends StatelessWidget {
   final List<String> words;
 
   /// A set of currently selected seed phrases. Defaults to an empty set.
-  final Set<String> selectedWords;
+  final List<String> selectedWords;
 
   /// A callback function triggered when a non-selected seed phrase is tapped.
   final ValueChanged<String>? onWordTap;
+
+  /// See [ColumnsRow.mainAxisSpacing].
+  final double mainAxisSpacing;
+
+  /// See [ColumnsRow.crossAxisSpacing].
+  final double crossAxisSpacing;
 
   const SeedPhrasesPicker({
     super.key,
     this.columnsCount = 2,
     required this.words,
-    this.selectedWords = const <String>{},
+    this.selectedWords = const <String>[],
     this.onWordTap,
+    this.mainAxisSpacing = 10,
+    this.crossAxisSpacing = 4,
   });
 
   @override
@@ -34,8 +42,8 @@ class SeedPhrasesPicker extends StatelessWidget {
     return MediaQuery.withNoTextScaling(
       child: ColumnsRow(
         columnsCount: 2,
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 6,
+        mainAxisSpacing: mainAxisSpacing,
+        crossAxisSpacing: crossAxisSpacing,
         children: words.map((word) {
           final isSelected = selectedWords.contains(word);
 

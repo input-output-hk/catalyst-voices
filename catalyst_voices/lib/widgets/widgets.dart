@@ -13,6 +13,7 @@ export 'buttons/voices_segmented_button.dart';
 export 'buttons/voices_text_button.dart';
 export 'cards/funded_proposal_card.dart';
 export 'chips/voices_chip.dart';
+export 'common/infrastructure/voices_loadable.dart';
 export 'common/link_text.dart';
 export 'common/navigation_location.dart';
 export 'common/shortcut_activator_view.dart';
