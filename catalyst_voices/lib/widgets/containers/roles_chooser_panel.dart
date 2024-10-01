@@ -21,7 +21,7 @@ class RolesChooserPanel extends StatelessWidget {
     return Column(
       children: [
         RoleChooserCard(
-          imageUrl: VoicesAssets.images.dummyCatalystVoices.path,
+          imageUrl: VoicesAssets.images.roleVoter.path,
           value: value[AccountRole.voter] ?? false,
           label: context.l10n.voter,
           learnMoreUrl: 'tmp',
@@ -33,7 +33,7 @@ class RolesChooserPanel extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         RoleChooserCard(
-          imageUrl: VoicesAssets.images.dummyCatalystVoices.path,
+          imageUrl: VoicesAssets.images.roleProposer.path,
           value: value[AccountRole.proposer] ?? false,
           label: context.l10n.proposer,
           learnMoreUrl: 'tmp',
@@ -45,7 +45,7 @@ class RolesChooserPanel extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         RoleChooserCard(
-          imageUrl: VoicesAssets.images.dummyCatalystVoices.path,
+          imageUrl: VoicesAssets.images.roleDrep.path,
           value: value[AccountRole.drep] ?? false,
           label: context.l10n.drep,
           learnMoreUrl: 'tmp',
