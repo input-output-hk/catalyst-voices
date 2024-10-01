@@ -29,7 +29,7 @@ class SeedPhrasesViewer extends StatelessWidget {
         children: words.mapIndexed((index, word) {
           return _WordCell(
             word,
-            key: ValueKey('SeedPhrase${word}CellKey'),
+            key: ValueKey('SeedPhrase${index}CellKey'),
             number: index + 1,
           );
         }).toList(),
