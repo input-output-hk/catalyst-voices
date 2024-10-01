@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/cards/role_chooser_card.dart';
 import 'package:catalyst_voices/widgets/containers/roles_chooser_panel.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
@@ -73,8 +74,8 @@ class _VoicesCardsExampleState extends State<VoicesCardsExample> {
             isViewOnly: true,
           ),
           const SizedBox(height: 16),
-          const Text('Roles Chooser Panel'),
-            RolesChooserPanel(
+          const Text('Roles Chooser Panel (State #1)'),
+          RolesChooserPanel(
             value: _rolesChooserPanelState1,
             lockedValuesAsDefault: const {
               AccountRole.voter: true,
@@ -83,6 +84,14 @@ class _VoicesCardsExampleState extends State<VoicesCardsExample> {
               setState(() {
                 _rolesChooserPanelState1 = changedValue;
               }),
+            },
+          ),
+          const SizedBox(height: 16),
+          const Text('Roles Summary Panel (State #1)'),
+          RolesSummaryPanel(
+            value: _rolesChooserPanelState1,
+            lockedValuesAsDefault: const {
+              AccountRole.voter: true,
             },
           ),
         ],

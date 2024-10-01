@@ -71,15 +71,17 @@ class RoleChooserCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 100,
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: Theme.of(context).colors.outlineBorderVariant!,
-          width: 1,
-        ),
-        borderRadius: BorderRadius.circular(8),
-      ),
+      decoration: isViewOnly
+          ? null
+          : BoxDecoration(
+              border: Border.all(
+                color: Theme.of(context).colors.outlineBorderVariant!,
+                width: 1,
+              ),
+              borderRadius: BorderRadius.circular(8),
+            ),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: EdgeInsets.all(isViewOnly ? 8 : 12),
         child: Row(
           children: [
             Column(
