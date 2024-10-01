@@ -49,12 +49,12 @@ final class KeychainCreationCubit extends Cubit<CreateKeychain> {
     }
   }
 
-  void setSeedPhraseCheck({
-    required bool isChecked,
+  void setSeedPhraseCheckConfirmed({
+    required bool isConfirmed,
   }) {
-    if (_seedPhraseState.isSeedPhraseChecked != isChecked) {
+    if (_seedPhraseState.isCheckConfirmed != isConfirmed) {
       _seedPhraseState =
-          _seedPhraseState.copyWith(isSeedPhraseChecked: isChecked);
+          _seedPhraseState.copyWith(isCheckConfirmed: isConfirmed);
     }
   }
 

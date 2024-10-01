@@ -35,7 +35,7 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
     super.initState();
 
     _updateSeedPhraseWords();
-    _updateUserWords();
+    _updateUserWords(_seedPhraseWords);
   }
 
   @override
@@ -44,7 +44,7 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
 
     if (widget.seedPhrase != oldWidget.seedPhrase) {
       _updateSeedPhraseWords();
-      _updateUserWords();
+      _updateUserWords(_seedPhraseWords);
     }
   }
 
@@ -110,7 +110,9 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
       ..clear()
       ..addAll(words);
 
-    RegistrationCubit.of(context).setSeedPhraseCheck(isChecked: _isStageValid);
+    RegistrationCubit.of(context).setSeedPhraseCheckConfirmed(
+      isConfirmed: _isStageValid,
+    );
   }
 }
 

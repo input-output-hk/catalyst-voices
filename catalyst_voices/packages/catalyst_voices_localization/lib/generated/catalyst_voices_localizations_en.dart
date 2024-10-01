@@ -560,4 +560,16 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get reset => 'Reset';
+
+  @override
+  String get createKeychainSeedPhraseCheckSuccessTitle => 'Nice job! You\'ve successfully verified the seed phrase for your keychain.';
+
+  @override
+  String get createKeychainSeedPhraseCheckSuccessSubtitle => 'Enter your seed phrase to recover your Catalyst Keychain on any device.  It\'s kinda like your email and password all rolled into one, so keep it somewhere safe!  In the next step we’ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.';
+
+  @override
+  String get yourNextStep => 'Your next step';
+
+  @override
+  String get createKeychainSeedPhraseCheckSuccessNextStep => 'Now let’s set your Unlock password for this device!';
 }

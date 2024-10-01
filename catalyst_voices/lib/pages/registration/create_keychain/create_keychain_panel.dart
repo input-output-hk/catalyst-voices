@@ -1,6 +1,9 @@
 import 'package:catalyst_voices/pages/registration/create_keychain/stage/check_seed_phrase_instructions_panel.dart';
+import 'package:catalyst_voices/pages/registration/create_keychain/stage/instructions_panel.dart';
 import 'package:catalyst_voices/pages/registration/create_keychain/stage/seed_phrase_check_panel.dart';
-import 'package:catalyst_voices/pages/registration/create_keychain/stage/stages.dart';
+import 'package:catalyst_voices/pages/registration/create_keychain/stage/seed_phrase_check_result_panel.dart';
+import 'package:catalyst_voices/pages/registration/create_keychain/stage/seed_phrase_panel.dart';
+import 'package:catalyst_voices/pages/registration/create_keychain/stage/splash_panel.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
@@ -30,7 +33,9 @@ class CreateKeychainPanel extends StatelessWidget {
       CreateKeychainStage.checkSeedPhrase => SeedPhraseCheckPanel(
           seedPhrase: seedPhraseState.seedPhrase,
         ),
-      CreateKeychainStage.checkSeedPhraseResult ||
+      CreateKeychainStage.checkSeedPhraseResult => SeedPhraseCheckResultPanel(
+          isCheckConfirmed: seedPhraseState.isCheckConfirmed,
+        ),
       CreateKeychainStage.unlockPasswordInstructions ||
       CreateKeychainStage.unlockPasswordCreate ||
       CreateKeychainStage.created =>

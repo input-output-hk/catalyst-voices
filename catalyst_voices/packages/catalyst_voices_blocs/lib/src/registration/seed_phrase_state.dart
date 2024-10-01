@@ -4,23 +4,23 @@ import 'package:equatable/equatable.dart';
 final class SeedPhraseState extends Equatable {
   final SeedPhrase? seedPhrase;
   final bool isStoredConfirmed;
-  final bool isSeedPhraseChecked;
+  final bool isCheckConfirmed;
 
   const SeedPhraseState({
     this.seedPhrase,
     this.isStoredConfirmed = false,
-    this.isSeedPhraseChecked = false,
+    this.isCheckConfirmed = false,
   });
 
   SeedPhraseState copyWith({
     Optional<SeedPhrase>? seedPhrase,
     bool? isStoredConfirmed,
-    bool? isSeedPhraseChecked,
+    bool? isCheckConfirmed,
   }) {
     return SeedPhraseState(
       seedPhrase: seedPhrase != null ? seedPhrase.data : this.seedPhrase,
       isStoredConfirmed: isStoredConfirmed ?? this.isStoredConfirmed,
-      isSeedPhraseChecked: isSeedPhraseChecked ?? this.isSeedPhraseChecked,
+      isCheckConfirmed: isCheckConfirmed ?? this.isCheckConfirmed,
     );
   }
 
@@ -28,6 +28,6 @@ final class SeedPhraseState extends Equatable {
   List<Object?> get props => [
         seedPhrase,
         isStoredConfirmed,
-        isSeedPhraseChecked,
+        isCheckConfirmed,
       ];
 }

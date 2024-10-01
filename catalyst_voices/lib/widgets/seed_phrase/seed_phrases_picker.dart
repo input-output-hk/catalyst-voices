@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/common/columns_row.dart';
 import 'package:catalyst_voices/widgets/seed_phrase/seed_phrases_completer.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 /// A widget that displays a grid of seed phrases with selection functionality.
@@ -44,12 +45,12 @@ class SeedPhrasesPicker extends StatelessWidget {
         columnsCount: 2,
         mainAxisSpacing: mainAxisSpacing,
         crossAxisSpacing: crossAxisSpacing,
-        children: words.map((word) {
+        children: words.mapIndexed((index, word) {
           final isSelected = selectedWords.contains(word);
 
           return _WordCell(
             word,
-            key: ValueKey('PickerSeedPhrase${word}CellKey'),
+            key: ValueKey('PickerSeedPhrase${index}CellKey'),
             isSelected: isSelected,
             onTap: isSelected || onWordTap == null
                 ? null

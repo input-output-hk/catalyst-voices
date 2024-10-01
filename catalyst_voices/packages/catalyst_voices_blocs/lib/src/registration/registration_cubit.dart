@@ -100,10 +100,12 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     return _keychainCreationCubit.downloadSeedPhrase();
   }
 
-  void setSeedPhraseCheck({
-    required bool isChecked,
+  void setSeedPhraseCheckConfirmed({
+    required bool isConfirmed,
   }) {
-    _keychainCreationCubit.setSeedPhraseCheck(isChecked: isChecked);
+    _keychainCreationCubit.setSeedPhraseCheckConfirmed(
+      isConfirmed: isConfirmed,
+    );
   }
 
   RegistrationStep? _nextStep({RegistrationStep? from}) {

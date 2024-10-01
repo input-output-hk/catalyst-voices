@@ -1089,6 +1089,30 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Reset'**
   String get reset;
+
+  /// No description provided for @createKeychainSeedPhraseCheckSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nice job! You\'ve successfully verified the seed phrase for your keychain.'**
+  String get createKeychainSeedPhraseCheckSuccessTitle;
+
+  /// No description provided for @createKeychainSeedPhraseCheckSuccessSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your seed phrase to recover your Catalyst Keychain on any device.  It\'s kinda like your email and password all rolled into one, so keep it somewhere safe!  In the next step we’ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.'**
+  String get createKeychainSeedPhraseCheckSuccessSubtitle;
+
+  /// No description provided for @yourNextStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Your next step'**
+  String get yourNextStep;
+
+  /// No description provided for @createKeychainSeedPhraseCheckSuccessNextStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Now let’s set your Unlock password for this device!'**
+  String get createKeychainSeedPhraseCheckSuccessNextStep;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
