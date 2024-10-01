@@ -16,7 +16,7 @@ class RolesChooserPanel extends StatelessWidget {
   final Map<AccountRole, bool>? lockedValuesAsDefault;
 
   /// A callback triggered when any role selection changes, passing
-  ///   the updated map of role values.
+  /// the updated map of role values.
   final ValueChanged<Map<AccountRole, bool>>? onChanged;
 
   /// A callback triggered when the user taps "Learn More" for a
