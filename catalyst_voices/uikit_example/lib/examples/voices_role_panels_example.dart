@@ -46,7 +46,7 @@ class _VoicesRolePanelsExampleState extends State<VoicesRolePanelsExample> {
           RoleChooserCard(
             imageUrl: VoicesAssets.images.dummyCatalystVoices.path,
             value: true,
-            label: 'label',
+            label: 'very long label, ' * 20,
             isLearnMoreHidden: true,
             lockValueAsDefault: true,
           ),
