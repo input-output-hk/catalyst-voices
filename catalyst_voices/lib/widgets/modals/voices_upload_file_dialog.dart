@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
 import 'package:catalyst_voices/widgets/modals/voices_desktop_dialog.dart';
@@ -6,6 +8,7 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 class VoicesUploadFileDialog extends StatelessWidget {
@@ -105,7 +108,15 @@ class _UploadContainer extends StatelessWidget {
           dashPattern: const [8, 6],
           color: Theme.of(context).colors.iconsPrimary!,
           child: InkWell(
-            onTap: () {},
+            onTap: () async {
+              final result = await FilePicker.platform.pickFiles();
+
+              if (result != null) {
+                final file = File(result.files.single.path!);
+              } else {
+                // User canceled the picker
+              }
+            },
             child: Container(
               width: double.infinity,
               height: double.infinity,
