@@ -1054,6 +1054,18 @@ abstract class VoicesLocalizations {
   /// **'I have written down/downloaded my 12 words'**
   String get createKeychainSeedPhraseStoreConfirmation;
 
+  /// No description provided for @createKeychainSeedPhraseCheckInstructionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your Catalyst security keys'**
+  String get createKeychainSeedPhraseCheckInstructionsTitle;
+
+  /// No description provided for @createKeychainSeedPhraseCheckInstructionsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Next, we\'re going to make sure that you\'ve written down your words correctly.     We don\'t save your seed phrase, so it\'s important  to make sure you have it right. That\'s why we do this confirmation before continuing.     It\'s also good practice to get familiar with using a seed phrase if you\'re new to crypto.'**
+  String get createKeychainSeedPhraseCheckInstructionsSubtitle;
+
   /// No description provided for @createKeychainSeedPhraseCheckSubtitle.
   ///
   /// In en, this message translates to:

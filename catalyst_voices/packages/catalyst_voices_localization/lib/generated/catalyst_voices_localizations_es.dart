@@ -544,6 +544,12 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get createKeychainSeedPhraseStoreConfirmation => 'I have written down/downloaded my 12 words';
 
   @override
+  String get createKeychainSeedPhraseCheckInstructionsTitle => 'Check your Catalyst security keys';
+
+  @override
+  String get createKeychainSeedPhraseCheckInstructionsSubtitle => 'Next, we\'re going to make sure that you\'ve written down your words correctly.     We don\'t save your seed phrase, so it\'s important  to make sure you have it right. That\'s why we do this confirmation before continuing.     It\'s also good practice to get familiar with using a seed phrase if you\'re new to crypto.';
+
+  @override
   String get createKeychainSeedPhraseCheckSubtitle => 'Input your Catalyst security keys';
 
   @override
