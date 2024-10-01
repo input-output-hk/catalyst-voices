@@ -33,7 +33,7 @@ final class WalletLinkCubit extends Cubit<WalletLink> {
 
       _stateData = _stateData.copyWith(wallets: Optional(Success(wallets)));
     } on Exception catch (error, stackTrace) {
-      _logger.severe(error, stackTrace);
+      _logger.severe('refreshWallets', error, stackTrace);
       _stateData = _stateData.copyWith(wallets: Optional(Failure(error)));
     }
   }
@@ -59,7 +59,7 @@ final class WalletLinkCubit extends Cubit<WalletLink> {
 
       emit(nextState);
     } catch (error, stackTrace) {
-      _logger.severe(error, stackTrace);
+      _logger.severe('selectWallet', error, stackTrace);
     }
   }
 
