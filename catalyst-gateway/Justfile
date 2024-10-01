@@ -50,6 +50,8 @@ run-cat-gateway: build-cat-gateway
 
 # Run cat-gateway natively on mainnet
 run-cat-gateway-mainnet: build-cat-gateway
-    CHAIN_FOLLOWER_SYNC_TASKS="1" \
+    CHAIN_FOLLOWER_SYNC_TASKS="32" \
+    CHAIN_FOLLOWER_DL_CONNECTIONS="64" \
+    CHAIN_FOLLOWER_DL_CHUNK_SIZE="4" \
     RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug" \
     ./target/release/cat-gateway run --log-level debug
