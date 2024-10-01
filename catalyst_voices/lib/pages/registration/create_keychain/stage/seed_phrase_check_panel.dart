@@ -74,7 +74,7 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
   }
 
   Future<void> _uploadSeedPhrase() async {
-    //
+    // TODO(damian-molinski): open upload dialog
   }
 
   void _clearUserWords() {
