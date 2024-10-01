@@ -4,7 +4,7 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
-/// A constant grayscale [ColorFilter] used to desaturate an image.
+/// A constant grayscale [ColorFilter] used to de-saturate an image.
 const _grayscaleFilter = ColorFilter.matrix([
   0.2126,
   0.7152,
