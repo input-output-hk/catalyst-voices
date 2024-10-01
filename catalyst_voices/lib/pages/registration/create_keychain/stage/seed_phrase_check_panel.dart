@@ -35,7 +35,7 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
     super.initState();
 
     _updateSeedPhraseWords();
-    _updateUserWords(_seedPhraseWords);
+    _updateUserWords();
   }
 
   @override
@@ -44,7 +44,7 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
 
     if (widget.seedPhrase != oldWidget.seedPhrase) {
       _updateSeedPhraseWords();
-      _updateUserWords(_seedPhraseWords);
+      _updateUserWords();
     }
   }
 
