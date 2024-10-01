@@ -670,6 +670,12 @@ abstract class VoicesLocalizations {
   /// **'Choose Cardano Wallet'**
   String get chooseCardanoWallet;
 
+  /// A button label to select another cardano wallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose other wallet'**
+  String get chooseOtherWallet;
+
   /// A label on a clickable element that can show more content.
   ///
   /// In en, this message translates to:
@@ -735,6 +741,24 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'{wallet} connected successfully!'**
   String walletLinkWalletDetailsContent(String wallet);
+
+  /// A message in link wallet flow on wallet details screen when a user wallet doesn't have enough balance.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet and role registrations require a minimal transaction fee. You can setup your default dApp connector wallet in your browser extension settings.'**
+  String get walletLinkWalletDetailsNotice;
+
+  /// A message recommending the user to top up ADA in wallet link on wallet details screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Top up ADA'**
+  String get walletLinkWalletDetailsNoticeTopUp;
+
+  /// A link to top-up provide when the user doesn't have enough balance on wallet link screen
+  ///
+  /// In en, this message translates to:
+  /// **'• Link to top-up provider'**
+  String get walletLinkWalletDetailsNoticeTopUpLink;
 
   /// Message shown when redirecting to external content that describes which wallets are supported.
   ///
@@ -982,6 +1006,12 @@ abstract class VoicesLocalizations {
   /// **'Close'**
   String get close;
 
+  /// No description provided for @notice.
+  ///
+  /// In en, this message translates to:
+  /// **'Notice'**
+  String get notice;
+
   /// A title on keychain deleted dialog
   ///
   /// In en, this message translates to:
@@ -1023,6 +1053,66 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'I have written down/downloaded my 12 words'**
   String get createKeychainSeedPhraseStoreConfirmation;
+
+  /// No description provided for @createKeychainSeedPhraseCheckInstructionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your Catalyst security keys'**
+  String get createKeychainSeedPhraseCheckInstructionsTitle;
+
+  /// No description provided for @createKeychainSeedPhraseCheckInstructionsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Next, we\'re going to make sure that you\'ve written down your words correctly.     We don\'t save your seed phrase, so it\'s important  to make sure you have it right. That\'s why we do this confirmation before continuing.     It\'s also good practice to get familiar with using a seed phrase if you\'re new to crypto.'**
+  String get createKeychainSeedPhraseCheckInstructionsSubtitle;
+
+  /// No description provided for @createKeychainSeedPhraseCheckSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Input your Catalyst security keys'**
+  String get createKeychainSeedPhraseCheckSubtitle;
+
+  /// No description provided for @createKeychainSeedPhraseCheckBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your 12 written down words in  the correct order.'**
+  String get createKeychainSeedPhraseCheckBody;
+
+  /// When user checks correct seed phrase words order he can upload it too
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Catalyst Key'**
+  String get uploadCatalystKey;
+
+  /// No description provided for @reset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get reset;
+
+  /// No description provided for @createKeychainSeedPhraseCheckSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nice job! You\'ve successfully verified the seed phrase for your keychain.'**
+  String get createKeychainSeedPhraseCheckSuccessTitle;
+
+  /// No description provided for @createKeychainSeedPhraseCheckSuccessSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your seed phrase to recover your Catalyst Keychain on any device.  It\'s kinda like your email and password all rolled into one, so keep it somewhere safe!  In the next step we’ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.'**
+  String get createKeychainSeedPhraseCheckSuccessSubtitle;
+
+  /// No description provided for @yourNextStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Your next step'**
+  String get yourNextStep;
+
+  /// No description provided for @createKeychainSeedPhraseCheckSuccessNextStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Now let’s set your Unlock password for this device!'**
+  String get createKeychainSeedPhraseCheckSuccessNextStep;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

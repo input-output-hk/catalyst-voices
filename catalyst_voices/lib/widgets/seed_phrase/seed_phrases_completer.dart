@@ -18,19 +18,27 @@ class SeedPhrasesCompleter extends StatelessWidget {
   final int slotsCount;
 
   /// A set of currently selected seed phrases. Defaults to an empty set.
-  final Set<String> words;
+  final List<String> words;
 
   /// A callback function triggered when a non-filled slot or a filled but only
   /// for previous selection.
   final ValueChanged<String>? onWordTap;
+
+  /// See [ColumnsRow.mainAxisSpacing].
+  final double mainAxisSpacing;
+
+  /// See [ColumnsRow.crossAxisSpacing].
+  final double crossAxisSpacing;
 
   /// Creates a [SeedPhrasesCompleter] widget.
   const SeedPhrasesCompleter({
     super.key,
     this.columnsCount = 2,
     required this.slotsCount,
-    this.words = const <String>{},
+    this.words = const <String>[],
     this.onWordTap,
+    this.mainAxisSpacing = 10,
+    this.crossAxisSpacing = 4,
   });
 
   @override
@@ -45,8 +53,8 @@ class SeedPhrasesCompleter extends StatelessWidget {
     return MediaQuery.withNoTextScaling(
       child: ColumnsRow(
         columnsCount: 2,
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 6,
+        mainAxisSpacing: mainAxisSpacing,
+        crossAxisSpacing: crossAxisSpacing,
         children: slots.mapIndexed((index, element) {
           final isCurrent = index == currentIndex;
           final isPrevious = currentIndex != null

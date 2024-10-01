@@ -430,6 +430,10 @@
   "@chooseCardanoWallet": {
     "description": "A button label to select a cardano wallet."
   },
+  "chooseOtherWallet": "Choose other wallet",
+  "@chooseOtherWallet": {
+    "description": "A button label to select another cardano wallet."
+  },
   "learnMore": "Learn More",
   "@learnMore": {
     "description": "A label on a clickable element that can show more content."
@@ -478,6 +482,18 @@
         "type": "String"
       }
     }
+  },
+  "walletLinkWalletDetailsNotice": "Wallet and role registrations require a minimal transaction fee. You can setup your default dApp connector wallet in your browser extension settings.",
+  "@walletLinkWalletDetailsNotice": {
+    "description": "A message in link wallet flow on wallet details screen when a user wallet doesn't have enough balance."
+  },
+  "walletLinkWalletDetailsNoticeTopUp": "Top up ADA",
+  "@walletLinkWalletDetailsNoticeTopUp": {
+    "description": "A message recommending the user to top up ADA in wallet link on wallet details screen."
+  },
+  "walletLinkWalletDetailsNoticeTopUpLink": "• Link to top-up provider",
+  "@walletLinkWalletDetailsNoticeTopUpLink": {
+    "description": "A link to top-up provide when the user doesn't have enough balance on wallet link screen"
   },
   "seeAllSupportedWallets": "See all supported wallets",
   "@seeAllSupportedWallets": {
@@ -604,6 +620,7 @@
   },
   "delete": "Delete",
   "close": "Close",
+  "notice": "Notice",
   "keychainDeletedDialogTitle": "Catalyst keychain removed",
   "@keychainDeletedDialogTitle": {
     "description": "A title on keychain deleted dialog"
@@ -619,5 +636,18 @@
   "createKeychainSeedPhraseSubtitle": "Write down your 12 Catalyst \u2028security words",
   "createKeychainSeedPhraseBody": "Make sure you create an offline backup of your recovery phrase as well.",
   "createKeychainSeedPhraseDownload": "Download Catalyst key",
-  "createKeychainSeedPhraseStoreConfirmation": "I have written down/downloaded my 12 words"
+  "createKeychainSeedPhraseStoreConfirmation": "I have written down/downloaded my 12 words",
+  "createKeychainSeedPhraseCheckInstructionsTitle": "Check your Catalyst security keys",
+  "createKeychainSeedPhraseCheckInstructionsSubtitle": "Next, we're going to make sure that you've written down your words correctly.   \u2028\u2028We don't save your seed phrase, so it's important \u2028to make sure you have it right. That's why we do this confirmation before continuing.   \u2028\u2028It's also good practice to get familiar with using a seed phrase if you're new to crypto.",
+  "createKeychainSeedPhraseCheckSubtitle": "Input your Catalyst security keys",
+  "createKeychainSeedPhraseCheckBody": "Select your 12 written down words in \u2028the correct order.",
+  "uploadCatalystKey": "Upload Catalyst Key",
+  "@uploadCatalystKey": {
+    "description": "When user checks correct seed phrase words order he can upload it too"
+  },
+  "reset": "Reset",
+  "createKeychainSeedPhraseCheckSuccessTitle": "Nice job! You've successfully verified the seed phrase for your keychain.",
+  "createKeychainSeedPhraseCheckSuccessSubtitle": "Enter your seed phrase to recover your Catalyst Keychain on any device.\u2028\u2028It's kinda like your email and password all rolled into one, so keep it somewhere safe!\u2028\u2028In the next step we’ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.",
+  "yourNextStep": "Your next step",
+  "createKeychainSeedPhraseCheckSuccessNextStep": "Now let’s set your Unlock password for this device!"
 }

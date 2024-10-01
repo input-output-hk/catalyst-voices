@@ -24,7 +24,7 @@ void main() {
               ..addAll(value);
           },
         );
-        final wordPickerKey = ValueKey('PickerSeedPhrase${word}CellKey');
+        const wordPickerKey = ValueKey('PickerSeedPhrase${0}CellKey');
 
         // When
         await tester.pumpApp(sequencer);
@@ -40,11 +40,15 @@ void main() {
       'clicking last word in completer removes word from list',
       (tester) async {
         // Given
-        final selectedWords = <String>{};
+        final selectedWords = <String>[
+          words[0],
+          words[1],
+        ];
         final expectedWords = {words[0]};
 
         final sequencer = SeedPhrasesSequencer(
           words: words,
+          selectedWords: selectedWords,
           onChanged: (value) {
             selectedWords
               ..clear()
@@ -52,23 +56,12 @@ void main() {
           },
         );
 
-        final pickerKeys = <ValueKey<String>>[
-          ValueKey('PickerSeedPhrase${words[0]}CellKey'),
-          ValueKey('PickerSeedPhrase${words[1]}CellKey'),
-        ];
         final completerKeys = <ValueKey<String>>[
           const ValueKey('CompleterSeedPhrase${1}CellKey'),
         ];
 
         // When
         await tester.pumpApp(sequencer);
-        await tester.pumpAndSettle();
-
-        // Adds items to selectedWords
-        for (final key in pickerKeys) {
-          await tester.tap(find.byKey(key));
-        }
-
         await tester.pumpAndSettle();
 
         // Removes from selectedWords

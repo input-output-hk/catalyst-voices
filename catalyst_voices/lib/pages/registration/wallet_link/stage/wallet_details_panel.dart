@@ -1,4 +1,5 @@
 import 'package:catalyst_cardano/catalyst_cardano.dart';
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -10,15 +11,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class WalletDetailsPanel extends StatelessWidget {
+  final Coin minAdaForRegistration;
   final CardanoWalletDetails details;
 
   const WalletDetailsPanel({
     super.key,
+    required this.minAdaForRegistration,
     required this.details,
   });
 
   @override
   Widget build(BuildContext context) {
+    final hasEnoughBalance = details.balance >= minAdaForRegistration;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -35,9 +40,12 @@ class WalletDetailsPanel extends StatelessWidget {
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: 24),
-        _WalletSummary(details: details),
+        _WalletSummary(details: details, hasEnoughBalance: hasEnoughBalance),
         const Spacer(),
-        const _Navigation(),
+        if (hasEnoughBalance)
+          const _Navigation()
+        else
+          const _NotEnoughBalanceNavigation(),
       ],
     );
   }
@@ -71,8 +79,12 @@ class _WalletExtension extends StatelessWidget {
 
 class _WalletSummary extends StatelessWidget {
   final CardanoWalletDetails details;
+  final bool hasEnoughBalance;
 
-  const _WalletSummary({required this.details});
+  const _WalletSummary({
+    required this.details,
+    required this.hasEnoughBalance,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -92,27 +104,106 @@ class _WalletSummary extends StatelessWidget {
             context.l10n.walletDetectionSummary,
             style: Theme.of(context).textTheme.titleSmall,
           ),
-          const SizedBox(height: 16),
-          _WalletSummaryItem(
-            label: Text(context.l10n.walletBalance),
-            value: Text(CryptocurrencyFormatter.formatAmount(details.balance)),
+          const SizedBox(height: 12),
+          _WalletSummaryBalance(
+            details: details,
+            hasEnoughBalance: hasEnoughBalance,
           ),
           const SizedBox(height: 12),
-          _WalletSummaryItem(
-            label: Text(context.l10n.walletAddress),
-            value: Row(
-              children: [
-                Text(WalletAddressFormatter.formatShort(details.address)),
-                const SizedBox(width: 6),
-                InkWell(
-                  onTap: () async {
-                    await Clipboard.setData(
-                      ClipboardData(text: details.address.toBech32()),
-                    );
-                  },
-                  child: VoicesAssets.icons.clipboardCopy.buildIcon(size: 16),
-                ),
-              ],
+          _WalletSummaryAddress(details: details),
+          if (!hasEnoughBalance) ...[
+            const SizedBox(height: 12),
+            Text(
+              context.l10n.notice,
+              style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              context.l10n.walletLinkWalletDetailsNotice,
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              context.l10n.walletLinkWalletDetailsNoticeTopUp,
+              style: Theme.of(context).textTheme.labelSmall!.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              context.l10n.walletLinkWalletDetailsNoticeTopUpLink,
+              style: Theme.of(context).textTheme.labelSmall,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _WalletSummaryBalance extends StatelessWidget {
+  final CardanoWalletDetails details;
+  final bool hasEnoughBalance;
+
+  const _WalletSummaryBalance({
+    required this.details,
+    required this.hasEnoughBalance,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return _WalletSummaryItem(
+      label: Text(context.l10n.walletBalance),
+      value: Row(
+        children: [
+          Text(
+            CryptocurrencyFormatter.formatAmount(details.balance),
+            style: hasEnoughBalance
+                ? null
+                : TextStyle(color: Theme.of(context).colors.iconsError),
+          ),
+          if (!hasEnoughBalance) ...[
+            const SizedBox(width: 4),
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: VoicesAssets.icons.exclamation.buildIcon(
+                color: Theme.of(context).colors.iconsError,
+                size: 16,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _WalletSummaryAddress extends StatelessWidget {
+  final CardanoWalletDetails details;
+
+  const _WalletSummaryAddress({
+    required this.details,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return _WalletSummaryItem(
+      label: Text(context.l10n.walletAddress),
+      value: Row(
+        children: [
+          Text(WalletAddressFormatter.formatShort(details.address)),
+          const SizedBox(width: 4),
+          InkWell(
+            onTap: () async {
+              await Clipboard.setData(
+                ClipboardData(text: details.address.toBech32()),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child: VoicesAssets.icons.clipboardCopy.buildIcon(size: 16),
             ),
           ),
         ],
@@ -136,22 +227,32 @@ class _WalletSummaryItem extends StatelessWidget {
       children: [
         Expanded(
           child: DefaultTextStyle(
-            style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                  fontWeight: FontWeight.bold,
-                  height: 1,
+            style: Theme.of(context).textTheme.labelMedium!.copyWith(
+                  fontWeight: FontWeight.w800,
                 ),
             child: label,
           ),
         ),
         Expanded(
           child: DefaultTextStyle(
-            style: Theme.of(context).textTheme.bodySmall!.copyWith(
-                  height: 1,
-                ),
+            style: Theme.of(context).textTheme.labelMedium!,
             child: value,
           ),
         ),
       ],
+    );
+  }
+}
+
+class _NotEnoughBalanceNavigation extends StatelessWidget {
+  const _NotEnoughBalanceNavigation();
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesTextButton(
+      leading: VoicesAssets.icons.wallet.buildIcon(),
+      onTap: () => RegistrationCubit.of(context).previousStep(),
+      child: Text(context.l10n.chooseOtherWallet),
     );
   }
 }

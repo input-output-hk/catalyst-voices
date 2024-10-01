@@ -25,8 +25,10 @@ class WalletLinkPanel extends StatelessWidget {
       WalletLinkStage.selectWallet => SelectWalletPanel(
           walletsResult: stateData.wallets,
         ),
-      WalletLinkStage.walletDetails =>
-        WalletDetailsPanel(details: stateData.selectedWallet!),
+      WalletLinkStage.walletDetails => WalletDetailsPanel(
+          minAdaForRegistration: stateData.minAdaForRegistration,
+          details: stateData.selectedWallet!,
+        ),
       WalletLinkStage.rolesChooser => const RolesChooserPanel(),
       WalletLinkStage.rolesSummary => const RolesSummaryPanel(),
       WalletLinkStage.rbacTransaction => const RbacTransactionPanel(),

@@ -350,6 +350,9 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get chooseCardanoWallet => 'Choose Cardano Wallet';
 
   @override
+  String get chooseOtherWallet => 'Choose other wallet';
+
+  @override
   String get learnMore => 'Learn More';
 
   @override
@@ -383,6 +386,15 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String walletLinkWalletDetailsContent(String wallet) {
     return '$wallet connected successfully!';
   }
+
+  @override
+  String get walletLinkWalletDetailsNotice => 'Wallet and role registrations require a minimal transaction fee. You can setup your default dApp connector wallet in your browser extension settings.';
+
+  @override
+  String get walletLinkWalletDetailsNoticeTopUp => 'Top up ADA';
+
+  @override
+  String get walletLinkWalletDetailsNoticeTopUpLink => '• Link to top-up provider';
 
   @override
   String get seeAllSupportedWallets => 'See all supported wallets';
@@ -508,6 +520,9 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get close => 'Close';
 
   @override
+  String get notice => 'Notice';
+
+  @override
   String get keychainDeletedDialogTitle => 'Catalyst keychain removed';
 
   @override
@@ -527,4 +542,34 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get createKeychainSeedPhraseStoreConfirmation => 'I have written down/downloaded my 12 words';
+
+  @override
+  String get createKeychainSeedPhraseCheckInstructionsTitle => 'Check your Catalyst security keys';
+
+  @override
+  String get createKeychainSeedPhraseCheckInstructionsSubtitle => 'Next, we\'re going to make sure that you\'ve written down your words correctly.     We don\'t save your seed phrase, so it\'s important  to make sure you have it right. That\'s why we do this confirmation before continuing.     It\'s also good practice to get familiar with using a seed phrase if you\'re new to crypto.';
+
+  @override
+  String get createKeychainSeedPhraseCheckSubtitle => 'Input your Catalyst security keys';
+
+  @override
+  String get createKeychainSeedPhraseCheckBody => 'Select your 12 written down words in  the correct order.';
+
+  @override
+  String get uploadCatalystKey => 'Upload Catalyst Key';
+
+  @override
+  String get reset => 'Reset';
+
+  @override
+  String get createKeychainSeedPhraseCheckSuccessTitle => 'Nice job! You\'ve successfully verified the seed phrase for your keychain.';
+
+  @override
+  String get createKeychainSeedPhraseCheckSuccessSubtitle => 'Enter your seed phrase to recover your Catalyst Keychain on any device.  It\'s kinda like your email and password all rolled into one, so keep it somewhere safe!  In the next step we’ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.';
+
+  @override
+  String get yourNextStep => 'Your next step';
+
+  @override
+  String get createKeychainSeedPhraseCheckSuccessNextStep => 'Now let’s set your Unlock password for this device!';
 }
