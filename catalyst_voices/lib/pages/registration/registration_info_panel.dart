@@ -121,11 +121,13 @@ class _RegistrationPicture extends StatelessWidget {
         CreateKeychainStage.splash ||
         CreateKeychainStage.instructions =>
           const KeychainPicture(),
-        CreateKeychainStage.seedPhrase ||
+        CreateKeychainStage.seedPhrase => const SeedPhrasePicture(),
         CreateKeychainStage.checkSeedPhraseInstructions ||
-        CreateKeychainStage.checkSeedPhrase ||
-        CreateKeychainStage.checkSeedPhraseResult =>
-          const SeedPhrasePicture(),
+        CreateKeychainStage.checkSeedPhrase =>
+          const SeedPhrasePicture(
+            indicateSelection: true,
+          ),
+        CreateKeychainStage.checkSeedPhraseResult => const SeedPhrasePicture(),
         CreateKeychainStage.unlockPasswordInstructions ||
         CreateKeychainStage.unlockPasswordCreate ||
         CreateKeychainStage.created =>
