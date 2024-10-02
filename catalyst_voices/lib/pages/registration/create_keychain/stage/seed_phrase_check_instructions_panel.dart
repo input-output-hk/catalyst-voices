@@ -3,23 +3,28 @@ import 'package:catalyst_voices/pages/registration/registration_stage_navigation
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
-class CheckSeedPhraseInstructionsPanel extends StatelessWidget {
-  const CheckSeedPhraseInstructionsPanel({
+class SeedPhraseCheckInstructionsPanel extends StatelessWidget {
+  const SeedPhraseCheckInstructionsPanel({
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 24),
-        RegistrationStageMessage(
-          title: context.l10n.createKeychainSeedPhraseCheckInstructionsTitle,
-          subtitle:
-              context.l10n.createKeychainSeedPhraseCheckInstructionsSubtitle,
+        Expanded(
+          child: SingleChildScrollView(
+            child: RegistrationStageMessage(
+              title: l10n.createKeychainSeedPhraseCheckInstructionsTitle,
+              subtitle: l10n.createKeychainSeedPhraseCheckInstructionsSubtitle,
+            ),
+          ),
         ),
-        const Spacer(),
+        const SizedBox(height: 10),
         const RegistrationBackNextNavigation(),
       ],
     );
