@@ -654,7 +654,7 @@ verifier needs to perform the next steps:
 
 1. Take the first and second elements $enc_1, enc_2$
   of the ciphertext $enc = (enc_1, enc_2)$.
-2. Calculate $d = g^{dec} \circ (-enc_2), \quad d \in \mathbb{G}$.
+2. Calculate $d = enc_2 \circ g^{-dec}, \quad d \in \mathbb{G}$.
 3. Calculate $A_1 = g^{z} \circ pk^{-c}, \quad A_1 \in \mathbb{G}$.
 4. Calculate $A_2 = enc_1^{z} \circ d^{-c}, \quad A_2 \in \mathbb{G}$.
 5. Compute $с2 = H(pk, d, g, enc_1, A_1, A_2)$, where $g$ is the group generator.
