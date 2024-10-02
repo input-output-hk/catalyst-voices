@@ -18,15 +18,22 @@ class SeedPhraseCheckResultPanel extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 24),
+        // TODO(damian-molinski): use correct strings when available.
         RegistrationStageMessage(
-          title: context.l10n.createKeychainSeedPhraseCheckSuccessTitle,
-          subtitle: context.l10n.createKeychainSeedPhraseCheckSuccessSubtitle,
+          title: isCheckConfirmed
+              ? context.l10n.createKeychainSeedPhraseCheckSuccessTitle
+              : 'Seed phrase words does not match!',
+          subtitle: isCheckConfirmed
+              ? context.l10n.createKeychainSeedPhraseCheckSuccessSubtitle
+              : 'Go back ana make sure order is correct',
         ),
         const Spacer(),
-        NextStep(
-          context.l10n.createKeychainSeedPhraseCheckSuccessNextStep,
-        ),
-        const SizedBox(height: 10),
+        if (isCheckConfirmed) ...[
+          NextStep(
+            context.l10n.createKeychainSeedPhraseCheckSuccessNextStep,
+          ),
+          const SizedBox(height: 10),
+        ],
         RegistrationBackNextNavigation(isNextEnabled: isCheckConfirmed),
       ],
     );
