@@ -17,6 +17,7 @@ class RegistrationDialog extends StatelessWidget {
       context: context,
       routeSettings: const RouteSettings(name: '/registration'),
       builder: (context) => const RegistrationDialog._(),
+      barrierDismissible: false,
     );
   }
 
