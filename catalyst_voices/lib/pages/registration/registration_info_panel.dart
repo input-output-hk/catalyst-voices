@@ -162,7 +162,7 @@ class _RegistrationPicture extends StatelessWidget {
       GetStarted() => const KeychainPicture(),
       FinishAccountCreation() => const KeychainPicture(),
       Recover() => const KeychainPicture(),
-      CreateKeychain(:final stage, :final seedPhraseState) =>
+      CreateKeychain(:final stage, seedPhrase: final seedPhraseState) =>
         buildKeychainStagePicture(
           stage,
           isSeedPhraseCheckConfirmed: seedPhraseState.isCheckConfirmed,

@@ -13,11 +13,13 @@ import 'package:flutter/material.dart';
 class CreateKeychainPanel extends StatelessWidget {
   final CreateKeychainStage stage;
   final SeedPhraseState seedPhraseState;
+  final UnlockPasswordState unlockPasswordState;
 
   const CreateKeychainPanel({
     super.key,
     required this.stage,
     required this.seedPhraseState,
+    required this.unlockPasswordState,
   });
 
   @override
@@ -40,7 +42,9 @@ class CreateKeychainPanel extends StatelessWidget {
         ),
       CreateKeychainStage.unlockPasswordInstructions =>
         const UnlockPasswordInstructionsPanel(),
-      CreateKeychainStage.unlockPasswordCreate => const UnlockPasswordPanel(),
+      CreateKeychainStage.unlockPasswordCreate => UnlockPasswordPanel(
+          data: unlockPasswordState,
+        ),
     };
   }
 }

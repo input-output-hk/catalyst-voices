@@ -13,16 +13,25 @@ final _logger = Logger('KeychainCreationCubit');
 final class KeychainCreationCubit extends Cubit<CreateKeychain> {
   final Downloader _downloader;
 
+  String _password = '';
+  String _confirmPassword = '';
+
   KeychainCreationCubit({
     required Downloader downloader,
   })  : _downloader = downloader,
         super(const CreateKeychain());
 
-  set _seedPhraseState(SeedPhraseState newValue) {
-    emit(state.copyWith(seedPhraseState: newValue));
+  set _seedPhrase(SeedPhraseState newValue) {
+    emit(state.copyWith(seedPhrase: newValue));
   }
 
-  SeedPhraseState get _seedPhraseState => state.seedPhraseState;
+  SeedPhraseState get _seedPhrase => state.seedPhrase;
+
+  set _unlockPassword(UnlockPasswordState newValue) {
+    emit(state.copyWith(unlockPassword: newValue));
+  }
+
+  UnlockPasswordState get _unlockPassword => state.unlockPassword;
 
   void changeStage(CreateKeychainStage newValue) {
     if (state.stage != newValue) {
@@ -32,34 +41,33 @@ final class KeychainCreationCubit extends Cubit<CreateKeychain> {
 
   void buildSeedPhrase() {
     final seedPhrase = SeedPhrase();
-    _seedPhraseState = _seedPhraseState.copyWith(
+    _seedPhrase = _seedPhrase.copyWith(
       seedPhrase: Optional.of(seedPhrase),
     );
   }
 
   void ensureSeedPhraseCreated() {
-    if (_seedPhraseState.seedPhrase == null) {
+    if (_seedPhrase.seedPhrase == null) {
       buildSeedPhrase();
     }
   }
 
   void setSeedPhraseStoredConfirmed(bool newValue) {
-    if (_seedPhraseState.isStoredConfirmed != newValue) {
-      _seedPhraseState = _seedPhraseState.copyWith(isStoredConfirmed: newValue);
+    if (_seedPhrase.isStoredConfirmed != newValue) {
+      _seedPhrase = _seedPhrase.copyWith(isStoredConfirmed: newValue);
     }
   }
 
   void setSeedPhraseCheckConfirmed({
     required bool isConfirmed,
   }) {
-    if (_seedPhraseState.isCheckConfirmed != isConfirmed) {
-      _seedPhraseState =
-          _seedPhraseState.copyWith(isCheckConfirmed: isConfirmed);
+    if (_seedPhrase.isCheckConfirmed != isConfirmed) {
+      _seedPhrase = _seedPhrase.copyWith(isCheckConfirmed: isConfirmed);
     }
   }
 
   Future<void> downloadSeedPhrase() async {
-    final mnemonic = _seedPhraseState.seedPhrase?.mnemonic;
+    final mnemonic = _seedPhrase.seedPhrase?.mnemonic;
     if (mnemonic == null) {
       throw StateError('SeedPhrase is not generated. Make sure it exits first');
     }
@@ -88,6 +96,40 @@ final class KeychainCreationCubit extends Cubit<CreateKeychain> {
       _logger.severe('Downloading keychain failed', error, stackTrace);
       // TODO(damian-molinski): Show snack bar
     }
+  }
+
+  void setPassword(String newValue) {
+    if (_password != newValue) {
+      _password = newValue;
+      _updateUnlockPasswordState();
+    }
+  }
+
+  void setConfirmPassword(String newValue) {
+    if (_confirmPassword != newValue) {
+      _confirmPassword = newValue;
+      _updateUnlockPasswordState();
+    }
+  }
+
+  void _updateUnlockPasswordState() {
+    final password = _password;
+    final confirmPassword = _confirmPassword;
+
+    const minimumLength = PasswordStrength.minimumLength;
+
+    final passwordStrength = PasswordStrength.calculate(password);
+    final correctLength = password.length >= minimumLength;
+    final matching = password == confirmPassword;
+    final hasConfirmPassword = confirmPassword.isNotEmpty;
+
+    _unlockPassword = _unlockPassword.copyWith(
+      passwordStrength: passwordStrength,
+      showPasswordStrength: password.isNotEmpty,
+      minPasswordLength: minimumLength,
+      showPasswordMisMatch: correctLength && hasConfirmPassword && !matching,
+      isNextEnabled: correctLength && matching,
+    );
   }
 
   CreateKeychainStep? nextStep() {

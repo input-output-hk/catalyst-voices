@@ -88,6 +88,14 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     _keychainCreationCubit.setSeedPhraseStoredConfirmed(confirmed);
   }
 
+  void setPassword(String newValue) {
+    _keychainCreationCubit.setPassword(newValue);
+  }
+
+  void setConfirmPassword(String newValue) {
+    _keychainCreationCubit.setConfirmPassword(newValue);
+  }
+
   void refreshWallets() {
     unawaited(_walletLinkCubit.refreshWallets());
   }

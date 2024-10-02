@@ -584,4 +584,18 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get createKeychainUnlockPasswordIntoBody => 'Please provide a password for your Catalyst Keychain.';
+
+  @override
+  String get enterPassword => 'Enter password';
+
+  @override
+  String get confirmPassword => 'Confirm password';
+
+  @override
+  String xCharactersMinimum(int number) {
+    return '$number characters minimum length';
+  }
+
+  @override
+  String get passwordDoNotMatch => 'Passwords do not match, please correct';
 }
