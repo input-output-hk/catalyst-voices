@@ -21,7 +21,7 @@ scylla-dev-db-stop:
 # Local scylla dev DB CLUSTER - Starts with pre-existing data.
 scylla-dev-db-cluster:
     HOST_IP="{{host_ip}}" \
-    docker compose up -d
+    docker compose up
 
 # Stop the scylla development DB CLUSTER
 scylla-dev-db-stop-cluster:
