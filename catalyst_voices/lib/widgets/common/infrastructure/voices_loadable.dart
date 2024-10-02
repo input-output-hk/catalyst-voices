@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/common/delayed_widget.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_circular_progress_indicator.dart';
 import 'package:flutter/material.dart';
 
@@ -24,5 +25,9 @@ class VoicesLoadable extends StatelessWidget {
 }
 
 Widget _defaultLoaderBuilder(BuildContext context) {
-  return const Center(child: VoicesCircularProgressIndicator());
+  return const Center(
+    child: DelayedWidget(
+      child: VoicesCircularProgressIndicator(),
+    ),
+  );
 }

@@ -54,6 +54,9 @@ class VoicesSegmentedButton<T extends Object> extends StatelessWidget {
   /// Should insert leading check icon into selected [segments].
   final bool showSelectedIcon;
 
+  /// Customizes this button's appearance.
+  final ButtonStyle? style;
+
   /// Default constructor.
   const VoicesSegmentedButton({
     super.key,
@@ -63,6 +66,7 @@ class VoicesSegmentedButton<T extends Object> extends StatelessWidget {
     this.multiSelectionEnabled = false,
     this.emptySelectionAllowed = false,
     this.showSelectedIcon = true,
+    this.style,
   });
 
   @override
@@ -74,6 +78,7 @@ class VoicesSegmentedButton<T extends Object> extends StatelessWidget {
       multiSelectionEnabled: multiSelectionEnabled,
       emptySelectionAllowed: emptySelectionAllowed,
       showSelectedIcon: showSelectedIcon,
+      style: style,
     );
   }
 }
