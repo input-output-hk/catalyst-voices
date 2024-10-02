@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
+import 'package:catalyst_voices/widgets/indicators/voices_linear_progress_indicator.dart';
 import 'package:catalyst_voices/widgets/modals/voices_desktop_dialog.dart';
 import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -53,6 +54,7 @@ class VoicesUploadFileDialog extends StatefulWidget {
 
 class _VoicesUploadFileDialogState extends State<VoicesUploadFileDialog> {
   VoicesFile? _selectedFile;
+  bool _isUploading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -75,11 +77,19 @@ class _VoicesUploadFileDialogState extends State<VoicesUploadFileDialog> {
               },
             ),
             if (_selectedFile != null)
-              _SelectedFileContainer(filename: _selectedFile!.name),
+              _InfoContainer(
+                selectedFilename: _selectedFile!.name,
+                isUploading: _isUploading,
+              ),
             const SizedBox(height: 24),
             _Buttons(
               selectedFile: _selectedFile,
-              onUpload: widget.onUpload,
+              onUpload: (file) async {
+                setState(() {
+                  _isUploading = true;
+                });
+                await widget.onUpload?.call(file);
+              },
               onCancel: widget.onCancel,
             ),
           ],
@@ -89,7 +99,7 @@ class _VoicesUploadFileDialogState extends State<VoicesUploadFileDialog> {
   }
 }
 
-class _Buttons extends StatelessWidget {
+class _Buttons extends StatefulWidget {
   final VoicesFile? selectedFile;
   final Future<dynamic> Function(VoicesFile value)? onUpload;
   final VoidCallback? onCancel;
@@ -101,43 +111,56 @@ class _Buttons extends StatelessWidget {
   });
 
   @override
+  State<_Buttons> createState() => _ButtonsState();
+}
+
+class _ButtonsState extends State<_Buttons> {
+  bool _isUploading = false;
+
+  @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         Expanded(
           child: VoicesOutlinedButton(
             onTap: () {
-              onCancel?.call();
+              widget.onCancel?.call();
               Navigator.of(context).pop();
             },
             child: Text(context.l10n.cancelButtonText),
           ),
         ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: VoicesFilledButton(
-            onTap: (selectedFile != null)
-                ? () async {
-                    await onUpload?.call(selectedFile!);
+        if (!_isUploading) const SizedBox(width: 8),
+        if (!_isUploading)
+          Expanded(
+            child: VoicesFilledButton(
+              onTap: (widget.selectedFile != null)
+                  ? () async {
+                      setState(() {
+                        _isUploading = true;
+                      });
+                      await widget.onUpload?.call(widget.selectedFile!);
 
-                    if (context.mounted) {
-                      Navigator.pop(context, selectedFile);
+                      if (context.mounted) {
+                        Navigator.pop(context, widget.selectedFile);
+                      }
                     }
-                  }
-                : null,
-            child: const Text('Upload'),
+                  : null,
+              child: const Text('Upload'),
+            ),
           ),
-        ),
       ],
     );
   }
 }
 
-class _SelectedFileContainer extends StatelessWidget {
-  final String filename;
+class _InfoContainer extends StatelessWidget {
+  final String selectedFilename;
+  final bool isUploading;
 
-  const _SelectedFileContainer({
-    required this.filename,
+  const _InfoContainer({
+    required this.selectedFilename,
+    required this.isUploading,
   });
 
   @override
@@ -160,10 +183,21 @@ class _SelectedFileContainer extends StatelessWidget {
               size: 30,
             ),
           ),
-          Text(
-            filename,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
+          if (isUploading)
+            Column(
+              children: [
+                Text(
+                  selectedFilename,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const VoicesLinearProgressIndicator()
+              ],
+            )
+          else
+            Text(
+              selectedFilename,
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
         ],
       ),
     );
