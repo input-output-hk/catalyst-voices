@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
@@ -10,25 +10,41 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dropzone/flutter_dropzone.dart';
+import 'package:web/web.dart' as web;
 
-class VoicesUploadFileDialog extends StatelessWidget {
+class VoicesUploadFileDialog extends StatefulWidget {
   const VoicesUploadFileDialog({super.key});
 
   @override
+  State<VoicesUploadFileDialog> createState() => _VoicesUploadFileDialogState();
+}
+
+class _VoicesUploadFileDialogState extends State<VoicesUploadFileDialog> {
+  VoicesFile? _selectedFile;
+
+  @override
   Widget build(BuildContext context) {
-    return const VoicesSinglePaneDialog(
-      constraints: BoxConstraints(maxWidth: 600, maxHeight: 450),
+    return VoicesSinglePaneDialog(
+      constraints: const BoxConstraints(maxWidth: 600, maxHeight: 450),
       child: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _Title(),
-            SizedBox(height: 24),
-            _UploadContainer(),
-            _ChosenFileContainer(),
-            SizedBox(height: 24),
-            _Buttons(),
+            const _Title(),
+            const SizedBox(height: 24),
+            _UploadContainer(
+              onFileSelected: (file) {
+                setState(() {
+                  _selectedFile = file;
+                });
+              },
+            ),
+            if (_selectedFile != null)
+              _SelectedFileContainer(filename: _selectedFile!.name),
+            const SizedBox(height: 24),
+            const _Buttons(),
           ],
         ),
       ),
@@ -61,8 +77,12 @@ class _Buttons extends StatelessWidget {
   }
 }
 
-class _ChosenFileContainer extends StatelessWidget {
-  const _ChosenFileContainer();
+class _SelectedFileContainer extends StatelessWidget {
+  final String filename;
+
+  const _SelectedFileContainer({
+    required this.filename,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -78,14 +98,14 @@ class _ChosenFileContainer extends StatelessWidget {
       child: Row(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             child: VoicesAssets.icons.documentAdd.buildIcon(
-              color: Theme.of(context).colors.iconsPrimary!,
+              color: Theme.of(context).colors.iconsPrimary,
               size: 30,
             ),
           ),
           Text(
-            'Catalyst_Keychain_10Sept2024-15:15.ckf',
+            filename,
             style: Theme.of(context).textTheme.bodyMedium,
           ),
         ],
@@ -94,8 +114,19 @@ class _ChosenFileContainer extends StatelessWidget {
   }
 }
 
-class _UploadContainer extends StatelessWidget {
-  const _UploadContainer();
+class _UploadContainer extends StatefulWidget {
+  final ValueChanged<VoicesFile>? onFileSelected;
+
+  const _UploadContainer({
+    this.onFileSelected,
+  });
+
+  @override
+  State<_UploadContainer> createState() => _UploadContainerState();
+}
+
+class _UploadContainerState extends State<_UploadContainer> {
+  late DropzoneViewController _dropzoneController;
 
   @override
   Widget build(BuildContext context) {
@@ -107,65 +138,95 @@ class _UploadContainer extends StatelessWidget {
           radius: const Radius.circular(12),
           dashPattern: const [8, 6],
           color: Theme.of(context).colors.iconsPrimary!,
-          child: InkWell(
-            onTap: () async {
-              final result = await FilePicker.platform.pickFiles();
-
-              if (result != null) {
-                final file = File(result.files.single.path!);
-              } else {
-                // User canceled the picker
-              }
-            },
-            child: Container(
-              width: double.infinity,
-              height: double.infinity,
-              alignment: Alignment.center,
-              child: Wrap(
-                direction: Axis.vertical,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  Container(
-                    width: 80,
-                    height: 80,
-                    padding: const EdgeInsets.all(20),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: Theme.of(context).colors.iconsPrimary!,
-                        width: 3,
+          child: Stack(
+            children: [
+              DropzoneView(
+                operation: DragOperation.copy,
+                cursor: CursorType.grab,
+                onCreated: (DropzoneViewController ctrl) => setState(() {
+                  _dropzoneController = ctrl;
+                }),
+                onDrop: (ev) async {
+                  if (ev is web.File) {
+                    final bytes = await _dropzoneController.getFileData(ev);
+                    final name = await _dropzoneController.getFilename(ev);
+                    widget.onFileSelected?.call(
+                      VoicesFile(
+                        name: name,
+                        bytes: bytes,
                       ),
-                    ),
-                    child: VoicesAssets.icons.upload.buildIcon(
-                      color: Theme.of(context).colors.iconsPrimary!,
-                    ),
-                  ),
-                  RichText(
-                    text: TextSpan(
-                        text: 'Drop your key here or ',
-                        style: Theme.of(context).textTheme.titleSmall,
-                        children: <TextSpan>[
-                          TextSpan(
-                            text: 'browse',
-                            style: TextStyle(
-                              color: Theme.of(context).colors.iconsPrimary!,
-                            ),
-                          ),
-                        ]),
-                  ),
-                  Text(
-                    "Make sure it's a correct Catalyst keychain file.",
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ]
-                    .separatedBy(
-                      Container(
-                        height: 12,
-                      ),
-                    )
-                    .toList(),
+                    );
+                  }
+                },
               ),
-            ),
+              InkWell(
+                onTap: () async {
+                  final result = await FilePicker.platform.pickFiles();
+                  final file = result?.files.first;
+                  final name = file?.name;
+                  final bytes = file?.bytes;
+
+                  if (name != null && bytes != null) {
+                    widget.onFileSelected?.call(
+                      VoicesFile(
+                        name: name,
+                        bytes: bytes,
+                      ),
+                    );
+                  }
+                },
+                child: Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  alignment: Alignment.center,
+                  child: Wrap(
+                    direction: Axis.vertical,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Container(
+                        width: 80,
+                        height: 80,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Theme.of(context).colors.iconsPrimary!,
+                            width: 3,
+                          ),
+                        ),
+                        child: VoicesAssets.icons.upload.buildIcon(
+                          color: Theme.of(context).colors.iconsPrimary,
+                        ),
+                      ),
+                      RichText(
+                        text: TextSpan(
+                          text: 'Drop your key here or ',
+                          style: Theme.of(context).textTheme.titleSmall,
+                          children: <TextSpan>[
+                            TextSpan(
+                              text: 'browse',
+                              style: TextStyle(
+                                color: Theme.of(context).colors.iconsPrimary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Text(
+                        "Make sure it's a correct Catalyst keychain file.",
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ]
+                        .separatedBy(
+                          Container(
+                            height: 12,
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -183,4 +244,14 @@ class _Title extends StatelessWidget {
       style: Theme.of(context).textTheme.titleLarge,
     );
   }
+}
+
+class VoicesFile {
+  final String name;
+  final Uint8List bytes;
+
+  VoicesFile({
+    required this.name,
+    required this.bytes,
+  });
 }
