@@ -170,7 +170,8 @@ impl CardanoApi {
     )]
     /// Cip36 registrations
     ///
-    /// This endpoint returns the list of stake address registrations currently associated with a given voting key.
+    /// This endpoint returns the list of stake address registrations currently associated
+    /// with a given voting key.
     async fn latest_registration_cip36_given_vote_key(
         &self, vote_key: Query<String>,
     ) -> cip36::AllResponsesVotingKey {

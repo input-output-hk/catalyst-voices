@@ -65,7 +65,7 @@ pub(crate) struct GetRegistrationQuery;
 impl GetRegistrationQuery {
     /// Prepares a get registration query.
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
-        let get_latest_registration_query = PreparedQueries::prepare(
+        let get_registrations_query = PreparedQueries::prepare(
             session,
             GET_REGISTRATIONS_FROM_STAKE_ADDR_QUERY,
             scylla::statement::Consistency::All,
@@ -73,11 +73,11 @@ impl GetRegistrationQuery {
         )
         .await;
 
-        if let Err(ref error) = get_latest_registration_query {
+        if let Err(ref error) = get_registrations_query {
             error!(error=%error, "Failed to prepare get registration query.");
         };
 
-        get_latest_registration_query
+        get_registrations_query
     }
 
     /// Executes get registration info for given stake addr query.

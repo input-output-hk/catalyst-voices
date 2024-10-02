@@ -10,8 +10,8 @@ use std::{fmt::Debug, sync::Arc};
 use anyhow::{bail, Context};
 use crossbeam_skiplist::SkipMap;
 use registrations::{
-    get_latest_w_stake_addr::GetRegistrationQuery, get_latest_w_stake_hash::GetStakeAddrQuery,
-    get_latest_w_vote_key::GetStakeAddrFromVoteKeyQuery,
+    get_from_stake_addr::GetRegistrationQuery, get_from_stake_hash::GetStakeAddrQuery,
+    get_from_vote_key::GetStakeAddrFromVoteKeyQuery, get_invalid::GetInvalidRegistrationQuery,
 };
 use scylla::{
     batch::Batch, prepared_statement::PreparedStatement, serialize::row::SerializeRow,
@@ -62,8 +62,10 @@ pub(crate) enum PreparedSelectQuery {
     TxoByStakeAddress,
     /// Get TXI by transaction hash query.
     TxiByTransactionHash,
-    /// Get Registration
+    /// Get Registrations
     RegistrationFromStakeAddr,
+    /// Get invalid Registration
+    InvalidRegistrationsFromStakeAddr,
     /// Get stake addr from stake hash
     StakeAddrFromStakeHash,
     /// Get stake addr from vote key
@@ -103,6 +105,8 @@ pub(crate) struct PreparedQueries {
     stake_addr_from_stake_hash_query: PreparedStatement,
     /// stake addr from vote key
     stake_addr_from_vote_key_query: PreparedStatement,
+    /// Get invalid registrations
+    invalid_registrations_from_stake_addr_query: PreparedStatement,
 }
 
 /// An individual query response that can fail
@@ -131,6 +135,7 @@ impl PreparedQueries {
             GetRegistrationQuery::prepare(session.clone()).await;
         let stake_addr_from_stake_hash = GetStakeAddrQuery::prepare(session.clone()).await;
         let stake_addr_from_vote_key = GetStakeAddrFromVoteKeyQuery::prepare(session.clone()).await;
+        let invalid_registrations = GetInvalidRegistrationQuery::prepare(session.clone()).await;
 
         let (
             txo_insert_queries,
@@ -161,6 +166,7 @@ impl PreparedQueries {
             registration_from_stake_addr_query: registration_from_stake_addr_query?,
             stake_addr_from_stake_hash_query: stake_addr_from_stake_hash?,
             stake_addr_from_vote_key_query: stake_addr_from_vote_key?,
+            invalid_registrations_from_stake_addr_query: invalid_registrations?,
         })
     }
 
@@ -223,6 +229,9 @@ impl PreparedQueries {
             },
             PreparedSelectQuery::StakeAddrFromStakeHash => &self.stake_addr_from_stake_hash_query,
             PreparedSelectQuery::StakeAddrFromVoteKey => &self.stake_addr_from_vote_key_query,
+            PreparedSelectQuery::InvalidRegistrationsFromStakeAddr => {
+                &self.invalid_registrations_from_stake_addr_query
+            },
         };
 
         session
