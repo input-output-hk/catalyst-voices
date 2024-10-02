@@ -1,11 +1,10 @@
-import 'dart:typed_data';
-
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
 import 'package:catalyst_voices/widgets/modals/voices_desktop_dialog.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
@@ -244,14 +243,4 @@ class _Title extends StatelessWidget {
       style: Theme.of(context).textTheme.titleLarge,
     );
   }
-}
-
-class VoicesFile {
-  final String name;
-  final Uint8List bytes;
-
-  VoicesFile({
-    required this.name,
-    required this.bytes,
-  });
 }
