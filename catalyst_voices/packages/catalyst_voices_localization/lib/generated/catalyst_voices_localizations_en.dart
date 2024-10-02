@@ -431,6 +431,12 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   }
 
   @override
+  String get walletLinkRoleChooserTitle => 'How do you want to participate in Catalyst?';
+
+  @override
+  String get walletLinkRoleChooserContent => 'In Catalyst you can take on different roles, learn more below and choose your additional roles now.';
+
+  @override
   String get seeAllSupportedWallets => 'See all supported wallets';
 
   @override
