@@ -1,7 +1,5 @@
-import 'package:catalyst_voices/widgets/app_bar/voices_app_bar.dart';
+import 'package:catalyst_voices/common/ext/account_role_ext.dart';
 import 'package:catalyst_voices/widgets/cards/role_chooser_card.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
-import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/widgets.dart';
@@ -35,38 +33,20 @@ class RolesChooserContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final roles = [
-      (
-        AccountRole.voter,
-        context.l10n.voter,
-        VoicesAssets.images.roleVoter.path,
-      ),
-      (
-        AccountRole.proposer,
-        context.l10n.proposer,
-        VoicesAssets.images.roleProposer.path,
-      ),
-      (
-        AccountRole.drep,
-        context.l10n.drep,
-        VoicesAssets.images.roleDrep.path,
-      ),
-    ];
-
     return Column(
-      children: roles
-          .map<Widget>((item) {
+      children: AccountRole.values
+          .map<Widget>((role) {
             return RoleChooserCard(
-              imageUrl: item.$3,
-              value: selected.contains(item.$1),
-              label: item.$2,
+              imageUrl: role.icon,
+              value: selected.contains(role),
+              label: role.getName(context),
               lockValueAsDefault:
-                  lockedValuesAsDefault?.contains(item.$1) ?? false,
+                  lockedValuesAsDefault?.contains(role) ?? false,
               onChanged: (newValue) {
-                onChanged?.call(_createNewValue(item.$1, newValue));
+                onChanged?.call(_createNewValue(role, newValue));
               },
               onLearnMore: () {
-                onLearnMore?.call(item.$1);
+                onLearnMore?.call(role);
               },
             );
           })

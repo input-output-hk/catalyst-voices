@@ -1,7 +1,6 @@
+import 'package:catalyst_voices/common/ext/account_role_ext.dart';
 import 'package:catalyst_voices/widgets/cards/role_chooser_card.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
-import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
@@ -24,24 +23,6 @@ class RolesSummaryContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final roles = [
-      (
-        AccountRole.voter,
-        context.l10n.voter,
-        VoicesAssets.images.roleVoter.path,
-      ),
-      (
-        AccountRole.proposer,
-        context.l10n.proposer,
-        VoicesAssets.images.roleProposer.path,
-      ),
-      (
-        AccountRole.drep,
-        context.l10n.drep,
-        VoicesAssets.images.roleDrep.path,
-      ),
-    ];
-
     return DecoratedBox(
       decoration: BoxDecoration(
         border: Border.all(
@@ -53,13 +34,13 @@ class RolesSummaryContainer extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
-          children: roles.map<Widget>((item) {
+          children: AccountRole.values.map<Widget>((role) {
             return RoleChooserCard(
-              imageUrl: item.$3,
-              value: selected.contains(item.$1),
-              label: item.$2,
+              imageUrl: role.icon,
+              value: selected.contains(role),
+              label: role.getName(context),
               lockValueAsDefault:
-                  lockedValuesAsDefault?.contains(item.$1) ?? false,
+                  lockedValuesAsDefault?.contains(role) ?? false,
               isLearnMoreHidden: true,
               isViewOnly: true,
             );
