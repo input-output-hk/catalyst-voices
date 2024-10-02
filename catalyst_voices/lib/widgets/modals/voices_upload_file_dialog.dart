@@ -17,12 +17,14 @@ class VoicesUploadFileDialog extends StatefulWidget {
   final String title;
   final List<String>? allowedExtensions;
   final Future<dynamic> Function(VoicesFile value)? onUpload;
+  final VoidCallback? onCancel;
 
   const VoicesUploadFileDialog({
     super.key,
     required this.title,
     this.allowedExtensions,
     this.onUpload,
+    this.onCancel,
   });
 
   static Future<VoicesFile?> show(
@@ -30,14 +32,16 @@ class VoicesUploadFileDialog extends StatefulWidget {
     required String title,
     List<String>? allowedExtensions,
     Future<dynamic> Function(VoicesFile value)? onUpload,
+    VoidCallback? onCancel,
   }) {
     return VoicesDialog.show<VoicesFile?>(
       context: context,
       builder: (context) {
         return VoicesUploadFileDialog(
-          onUpload: onUpload,
           title: title,
           allowedExtensions: allowedExtensions,
+          onUpload: onUpload,
+          onCancel: onCancel,
         );
       },
     );
@@ -54,6 +58,7 @@ class _VoicesUploadFileDialogState extends State<VoicesUploadFileDialog> {
   Widget build(BuildContext context) {
     return VoicesSinglePaneDialog(
       constraints: const BoxConstraints(maxWidth: 600, maxHeight: 450),
+      onCancel: widget.onCancel,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -75,6 +80,7 @@ class _VoicesUploadFileDialogState extends State<VoicesUploadFileDialog> {
             _Buttons(
               selectedFile: _selectedFile,
               onUpload: widget.onUpload,
+              onCancel: widget.onCancel,
             ),
           ],
         ),
@@ -86,10 +92,12 @@ class _VoicesUploadFileDialogState extends State<VoicesUploadFileDialog> {
 class _Buttons extends StatelessWidget {
   final VoicesFile? selectedFile;
   final Future<dynamic> Function(VoicesFile value)? onUpload;
+  final VoidCallback? onCancel;
 
   const _Buttons({
     this.selectedFile,
     this.onUpload,
+    this.onCancel,
   });
 
   @override
@@ -98,7 +106,10 @@ class _Buttons extends StatelessWidget {
       children: [
         Expanded(
           child: VoicesOutlinedButton(
-            onTap: () => Navigator.of(context).pop(),
+            onTap: () {
+              onCancel?.call();
+              Navigator.of(context).pop();
+            },
             child: Text(context.l10n.cancelButtonText),
           ),
         ),
