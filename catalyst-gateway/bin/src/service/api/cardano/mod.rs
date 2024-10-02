@@ -173,7 +173,7 @@ impl CardanoApi {
     /// This endpoint gets the latest registraton given a vote key
     async fn latest_registration_cip36_given_vote_key(
         &self, vote_key: Query<String>,
-    ) -> cip36::AllResponsesVoteKey {
+    ) -> cip36::AllResponses {
         cip36::get_latest_registration_from_vote_key(vote_key.0, true).await
     }
 }

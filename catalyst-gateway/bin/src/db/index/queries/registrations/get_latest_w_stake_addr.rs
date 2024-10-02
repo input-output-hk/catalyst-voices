@@ -80,7 +80,7 @@ impl GetLatestRegistrationQuery {
         get_latest_registration_query
     }
 
-    /// Executes a get txi by transaction hashes query.
+    /// Executes get registration info for given stake addr query.
     pub(crate) async fn execute(
         session: &CassandraSession, params: GetLatestRegistrationParams,
     ) -> anyhow::Result<TypedRowIterator<result::GetLatestRegistrationQuery>> {

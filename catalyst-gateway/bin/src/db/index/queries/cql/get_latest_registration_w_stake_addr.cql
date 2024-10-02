@@ -8,4 +8,3 @@ SELECT stake_address,
        cip36
 FROM   cip36_registration
 WHERE  stake_address = :stake_address
-LIMIT  1;
