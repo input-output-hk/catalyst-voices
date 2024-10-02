@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/common/columns_row.dart';
 import 'package:catalyst_voices/widgets/seed_phrase/seed_phrases_completer.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 /// A widget that displays a grid of seed phrases with selection functionality.
@@ -13,18 +14,26 @@ class SeedPhrasesPicker extends StatelessWidget {
   /// The list of seed phrases to be displayed.
   final List<String> words;
 
-  /// A set of currently selected seed phrases. Defaults to an empty set.
-  final Set<String> selectedWords;
+  /// A list of currently selected seed phrases. Defaults to empty list.
+  final List<String> selectedWords;
 
   /// A callback function triggered when a non-selected seed phrase is tapped.
   final ValueChanged<String>? onWordTap;
+
+  /// See [ColumnsRow.mainAxisSpacing].
+  final double mainAxisSpacing;
+
+  /// See [ColumnsRow.crossAxisSpacing].
+  final double crossAxisSpacing;
 
   const SeedPhrasesPicker({
     super.key,
     this.columnsCount = 2,
     required this.words,
-    this.selectedWords = const <String>{},
+    this.selectedWords = const <String>[],
     this.onWordTap,
+    this.mainAxisSpacing = 10,
+    this.crossAxisSpacing = 4,
   });
 
   @override
@@ -34,14 +43,14 @@ class SeedPhrasesPicker extends StatelessWidget {
     return MediaQuery.withNoTextScaling(
       child: ColumnsRow(
         columnsCount: 2,
-        mainAxisSpacing: 10,
-        crossAxisSpacing: 6,
-        children: words.map((word) {
+        mainAxisSpacing: mainAxisSpacing,
+        crossAxisSpacing: crossAxisSpacing,
+        children: words.mapIndexed((index, word) {
           final isSelected = selectedWords.contains(word);
 
           return _WordCell(
             word,
-            key: ValueKey('PickerSeedPhrase${word}CellKey'),
+            key: ValueKey('PickerSeedPhrase${index}CellKey'),
             isSelected: isSelected,
             onTap: isSelected || onWordTap == null
                 ? null

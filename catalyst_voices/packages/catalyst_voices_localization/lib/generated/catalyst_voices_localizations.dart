@@ -757,8 +757,68 @@ abstract class VoicesLocalizations {
   /// A link to top-up provide when the user doesn't have enough balance on wallet link screen
   ///
   /// In en, this message translates to:
-  /// **'• Link to top-up provider'**
+  /// **'Link to top-up provider'**
   String get walletLinkWalletDetailsNoticeTopUpLink;
+
+  /// A title in link wallet flow on transaction screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s make sure everything looks right.'**
+  String get walletLinkTransactionTitle;
+
+  /// A subtitle in link wallet flow on transaction screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Account completion for Catalyst'**
+  String get walletLinkTransactionAccountCompletion;
+
+  /// An item in the transaction summary for the wallet link.
+  ///
+  /// In en, this message translates to:
+  /// **'1 Link {wallet} to Catalyst Keychain'**
+  String walletLinkTransactionLinkItem(String wallet);
+
+  /// A side note on transaction summary in the wallet link explaining the positives about the registration.
+  ///
+  /// In en, this message translates to:
+  /// **'Positive small print'**
+  String get walletLinkTransactionPositiveSmallPrint;
+
+  /// The first item for the positive small print message.
+  ///
+  /// In en, this message translates to:
+  /// **'Your registration is a one time event, cost will not renew periodically.'**
+  String get walletLinkTransactionPositiveSmallPrintItem1;
+
+  /// The second item for the positive small print message.
+  ///
+  /// In en, this message translates to:
+  /// **'Your registrations can be found under your account profile after completion.'**
+  String get walletLinkTransactionPositiveSmallPrintItem2;
+
+  /// The third item for the positive small print message.
+  ///
+  /// In en, this message translates to:
+  /// **'All registration fees go into the Cardano Treasury.'**
+  String get walletLinkTransactionPositiveSmallPrintItem3;
+
+  /// The primary button label to sign a transaction on transaction summary screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign transaction with wallet'**
+  String get walletLinkTransactionSign;
+
+  /// The secondary button label to change the roles on transaction summary screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Change role setup'**
+  String get walletLinkTransactionChangeRoles;
+
+  /// An item in the transaction summary for the role registration
+  ///
+  /// In en, this message translates to:
+  /// **'1 {role} registration to Catalyst Keychain'**
+  String walletLinkTransactionRoleItem(String role);
 
   /// Message shown when redirecting to external content that describes which wallets are supported.
   ///
@@ -1012,6 +1072,24 @@ abstract class VoicesLocalizations {
   /// **'Notice'**
   String get notice;
 
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
+
+  /// No description provided for @no.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no;
+
+  /// No description provided for @total.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get total;
+
   /// A title on keychain deleted dialog
   ///
   /// In en, this message translates to:
@@ -1065,6 +1143,66 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Next, we\'re going to make sure that you\'ve written down your words correctly.     We don\'t save your seed phrase, so it\'s important  to make sure you have it right. That\'s why we do this confirmation before continuing.     It\'s also good practice to get familiar with using a seed phrase if you\'re new to crypto.'**
   String get createKeychainSeedPhraseCheckInstructionsSubtitle;
+
+  /// No description provided for @createKeychainSeedPhraseCheckSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Input your Catalyst security keys'**
+  String get createKeychainSeedPhraseCheckSubtitle;
+
+  /// No description provided for @createKeychainSeedPhraseCheckBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your 12 written down words in  the correct order.'**
+  String get createKeychainSeedPhraseCheckBody;
+
+  /// When user checks correct seed phrase words order he can upload it too
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Catalyst Key'**
+  String get uploadCatalystKey;
+
+  /// No description provided for @reset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get reset;
+
+  /// No description provided for @createKeychainSeedPhraseCheckSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nice job! You\'ve successfully verified the seed phrase for your keychain.'**
+  String get createKeychainSeedPhraseCheckSuccessTitle;
+
+  /// No description provided for @createKeychainSeedPhraseCheckSuccessSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your seed phrase to recover your Catalyst Keychain on any device.  It\'s kinda like your email and password all rolled into one, so keep it somewhere safe!  In the next step we’ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.'**
+  String get createKeychainSeedPhraseCheckSuccessSubtitle;
+
+  /// No description provided for @yourNextStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Your next step'**
+  String get yourNextStep;
+
+  /// No description provided for @createKeychainSeedPhraseCheckSuccessNextStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Now let’s set your Unlock password for this device!'**
+  String get createKeychainSeedPhraseCheckSuccessNextStep;
+
+  /// No description provided for @createKeychainUnlockPasswordInstructionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set your Catalyst unlock password  for this device'**
+  String get createKeychainUnlockPasswordInstructionsTitle;
+
+  /// No description provided for @createKeychainUnlockPasswordInstructionsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.    But it can be a bit tedious to enter every single time you want to use the app.    In this next step, you\'ll set your Unlock Password for your current device. It\'s like a shortcut for proving ownership of your Keychain.    Whenever you recover your account for the first time on a new device, you\'ll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.'**
+  String get createKeychainUnlockPasswordInstructionsSubtitle;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
