@@ -16,8 +16,8 @@ extension AccountRoleExt on AccountRole {
   }
 
   String get icon => switch (this) {
-    AccountRole.voter => VoicesAssets.images.roleVoter.path,
-    AccountRole.proposer => VoicesAssets.images.roleProposer.path,
-    AccountRole.drep => VoicesAssets.images.roleDrep.path,
-  };
+        AccountRole.voter => VoicesAssets.images.roleVoter.path,
+        AccountRole.proposer => VoicesAssets.images.roleProposer.path,
+        AccountRole.drep => VoicesAssets.images.roleDrep.path,
+      };
 }
