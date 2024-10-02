@@ -24,6 +24,24 @@ class RolesSummaryContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final roles = [
+      (
+        AccountRole.voter,
+        context.l10n.voter,
+        VoicesAssets.images.roleVoter.path,
+      ),
+      (
+        AccountRole.proposer,
+        context.l10n.proposer,
+        VoicesAssets.images.roleProposer.path,
+      ),
+      (
+        AccountRole.drep,
+        context.l10n.drep,
+        VoicesAssets.images.roleDrep.path,
+      ),
+    ];
+
     return DecoratedBox(
       decoration: BoxDecoration(
         border: Border.all(
@@ -35,35 +53,17 @@ class RolesSummaryContainer extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
-          children: [
-            RoleChooserCard(
-              imageUrl: VoicesAssets.images.roleVoter.path,
-              value: selected.contains(AccountRole.voter),
-              label: context.l10n.voter,
+          children: roles.map<Widget>((item) {
+            return RoleChooserCard(
+              imageUrl: item.$3,
+              value: selected.contains(item.$1),
+              label: item.$2,
               lockValueAsDefault:
-                  lockedValuesAsDefault?.contains(AccountRole.voter) ?? false,
+                  lockedValuesAsDefault?.contains(item.$1) ?? false,
               isLearnMoreHidden: true,
               isViewOnly: true,
-            ),
-            RoleChooserCard(
-              imageUrl: VoicesAssets.images.roleProposer.path,
-              value: selected.contains(AccountRole.proposer),
-              label: context.l10n.proposer,
-              lockValueAsDefault:
-                  lockedValuesAsDefault?.contains(AccountRole.proposer) ?? false,
-              isLearnMoreHidden: true,
-              isViewOnly: true,
-            ),
-            RoleChooserCard(
-              imageUrl: VoicesAssets.images.roleDrep.path,
-              value: selected.contains(AccountRole.drep),
-              label: context.l10n.drep,
-              lockValueAsDefault:
-                  lockedValuesAsDefault?.contains(AccountRole.drep) ?? false,
-              isLearnMoreHidden: true,
-              isViewOnly: true,
-            ),
-          ],
+            );
+          }).toList(),
         ),
       ),
     );

@@ -1,7 +1,9 @@
+import 'package:catalyst_voices/widgets/app_bar/voices_app_bar.dart';
 import 'package:catalyst_voices/widgets/cards/role_chooser_card.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/widgets.dart';
 
 /// A panel that displays a series of [RoleChooserCard] widgets for selecting
@@ -33,50 +35,43 @@ class RolesChooserContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final roles = [
+      (
+        AccountRole.voter,
+        context.l10n.voter,
+        VoicesAssets.images.roleVoter.path,
+      ),
+      (
+        AccountRole.proposer,
+        context.l10n.proposer,
+        VoicesAssets.images.roleProposer.path,
+      ),
+      (
+        AccountRole.drep,
+        context.l10n.drep,
+        VoicesAssets.images.roleDrep.path,
+      ),
+    ];
+
     return Column(
-      children: [
-        RoleChooserCard(
-          imageUrl: VoicesAssets.images.roleVoter.path,
-          value: selected.contains(AccountRole.voter),
-          label: context.l10n.voter,
-          lockValueAsDefault:
-              lockedValuesAsDefault?.contains(AccountRole.voter) ?? false,
-          onChanged: (newValue) {
-            onChanged?.call(_createNewValue(AccountRole.voter, newValue));
-          },
-          onLearnMore: () {
-            onLearnMore?.call(AccountRole.voter);
-          },
-        ),
-        const SizedBox(height: 12),
-        RoleChooserCard(
-          imageUrl: VoicesAssets.images.roleProposer.path,
-          value: selected.contains(AccountRole.proposer),
-          label: context.l10n.proposer,
-          lockValueAsDefault:
-              lockedValuesAsDefault?.contains(AccountRole.proposer) ?? false,
-          onChanged: (newValue) {
-            onChanged?.call(_createNewValue(AccountRole.proposer, newValue));
-          },
-          onLearnMore: () {
-            onLearnMore?.call(AccountRole.proposer);
-          },
-        ),
-        const SizedBox(height: 12),
-        RoleChooserCard(
-          imageUrl: VoicesAssets.images.roleDrep.path,
-          value: selected.contains(AccountRole.drep),
-          label: context.l10n.drep,
-          lockValueAsDefault:
-              lockedValuesAsDefault?.contains(AccountRole.drep) ?? false,
-          onChanged: (newValue) {
-            onChanged?.call(_createNewValue(AccountRole.drep, newValue));
-          },
-          onLearnMore: () {
-            onLearnMore?.call(AccountRole.drep);
-          },
-        ),
-      ],
+      children: roles
+          .map<Widget>((item) {
+            return RoleChooserCard(
+              imageUrl: item.$3,
+              value: selected.contains(item.$1),
+              label: item.$2,
+              lockValueAsDefault:
+                  lockedValuesAsDefault?.contains(item.$1) ?? false,
+              onChanged: (newValue) {
+                onChanged?.call(_createNewValue(item.$1, newValue));
+              },
+              onLearnMore: () {
+                onLearnMore?.call(item.$1);
+              },
+            );
+          })
+          .separatedBy(const SizedBox(height: 12))
+          .toList(),
     );
   }
 
