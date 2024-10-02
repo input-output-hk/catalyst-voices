@@ -1,4 +1,4 @@
-//! TODO: DOCS
+//! Get assets by stake address.
 use std::sync::Arc;
 
 use scylla::{
@@ -12,11 +12,11 @@ use crate::db::index::{
     session::CassandraSession,
 };
 
-/// TODO: DOCS
+/// Get assets by stake address query string.
 const GET_ASSETS_BY_STAKE_ADDRESS_QUERY: &str =
     include_str!("../cql/get_assets_by_stake_address.cql");
 
-/// TODO: DOCS
+/// Get assets by stake address query parameters.
 #[derive(SerializeRow)]
 pub(crate) struct GetAssetsByStakeAddressParams {
     /// Stake address.
@@ -35,7 +35,7 @@ impl GetAssetsByStakeAddressParams {
     }
 }
 
-/// TODO: DOCS
+/// Get assets by stake address query row result
 // TODO: https://github.com/input-output-hk/catalyst-voices/issues/828
 // The macro uses expect to signal an error in deserializing values.
 #[allow(clippy::expect_used)]
@@ -60,11 +60,11 @@ mod result {
     }
 }
 
-/// TODO: DOCS
+/// Get assets by stake address query.
 pub(crate) struct GetAssetsByStakeAddressQuery;
 
 impl GetAssetsByStakeAddressQuery {
-    /// TODO: DOCS
+    /// Prepares a get assets by stake address query.
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
         let get_assets_by_stake_address_query = PreparedQueries::prepare(
             session,
@@ -81,7 +81,7 @@ impl GetAssetsByStakeAddressQuery {
         get_assets_by_stake_address_query
     }
 
-    /// TODO: DOCS
+    /// Executes a get assets by stake address query.
     pub(crate) async fn execute(
         session: &CassandraSession, params: GetAssetsByStakeAddressParams,
     ) -> anyhow::Result<TypedRowIterator<result::GetAssetsByStakeAddressQuery>> {

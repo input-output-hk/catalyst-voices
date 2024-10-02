@@ -4,14 +4,14 @@ use poem_openapi::{types::Example, Object};
 
 use crate::service::api::cardano::types::{SlotNumber, StakeAmount};
 
-/// TODO: DOCS
+/// User's staked native token info.
 #[derive(Object)]
 pub(crate) struct StakedNativeTokenInfo {
-    /// TODO: DOCS
+    /// Token policy hash.
     pub(crate) policy_hash: String,
-    /// TODO: DOCS
+    /// Token policy name.
     pub(crate) policy_name: String,
-    /// TODO: DOCS
+    /// Token amount.
     pub(crate) amount: StakeAmount,
 }
 
@@ -29,7 +29,7 @@ pub(crate) struct StakeInfo {
     #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
     pub(crate) slot_number: SlotNumber,
 
-    /// TODO: DOCS
+    /// Native token infos.
     pub(crate) native_tokens: Vec<StakedNativeTokenInfo>,
 }
 
