@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 class VoicesRoleContainersExample extends StatefulWidget {
   static const String title = 'Voices Role Containers';
-  static const String route = '/role-panels-example';
+  static const String route = '/role-containers-example';
 
   const VoicesRoleContainersExample({super.key});
 
