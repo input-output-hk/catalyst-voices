@@ -85,6 +85,10 @@ final class SeedPhrase extends Equatable {
   /// The mnemonic phrase as a list of individual words.
   List<String> get mnemonicWords => mnemonic.split(' ');
 
+  /// Version of [mnemonicWords] but in random order. Each call will generate
+  /// new random order.
+  List<String> get shuffledMnemonicWords => [...mnemonicWords]..shuffle();
+
   /// Derives an Ed25519 key pair from a seed.
   ///
   /// Throws a [RangeError] If the provided [offset] is negative or exceeds
