@@ -15,20 +15,20 @@ import 'package:web/web.dart' as web;
 
 class VoicesUploadFileDialog extends StatefulWidget {
   final String title;
-  final String? mimeType;
+  final List<String>? allowedExtensions;
   final Future<dynamic> Function(VoicesFile value)? onUpload;
 
   const VoicesUploadFileDialog({
     super.key,
     required this.title,
-    this.mimeType,
+    this.allowedExtensions,
     this.onUpload,
   });
 
   static Future<VoicesFile?> show(
     BuildContext context, {
     required String title,
-    String? mimeType,
+    List<String>? allowedExtensions,
     Future<dynamic> Function(VoicesFile value)? onUpload,
   }) {
     return VoicesDialog.show<VoicesFile?>(
@@ -37,7 +37,7 @@ class VoicesUploadFileDialog extends StatefulWidget {
         return VoicesUploadFileDialog(
           onUpload: onUpload,
           title: title,
-          mimeType: mimeType,
+          allowedExtensions: allowedExtensions,
         );
       },
     );
@@ -62,6 +62,7 @@ class _VoicesUploadFileDialogState extends State<VoicesUploadFileDialog> {
             _Title(widget.title),
             const SizedBox(height: 24),
             _UploadContainer(
+              allowedExtensions: widget.allowedExtensions,
               onFileSelected: (file) {
                 setState(() {
                   _selectedFile = file;
@@ -159,9 +160,11 @@ class _SelectedFileContainer extends StatelessWidget {
 }
 
 class _UploadContainer extends StatefulWidget {
+  final List<String>? allowedExtensions;
   final ValueChanged<VoicesFile>? onFileSelected;
 
   const _UploadContainer({
+    this.allowedExtensions,
     this.onFileSelected,
   });
 
@@ -205,7 +208,14 @@ class _UploadContainerState extends State<_UploadContainer> {
               ),
               InkWell(
                 onTap: () async {
-                  final result = await FilePicker.platform.pickFiles();
+                  final result = await FilePicker.platform.pickFiles(
+                    type: (widget.allowedExtensions != null)
+                        ? FileType.custom
+                        : FileType.any,
+                    allowedExtensions: (widget.allowedExtensions != null)
+                        ? widget.allowedExtensions!
+                        : null,
+                  );
                   final file = result?.files.first;
                   final name = file?.name;
                   final bytes = file?.bytes;
