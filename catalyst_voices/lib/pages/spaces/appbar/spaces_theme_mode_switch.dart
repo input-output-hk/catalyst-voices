@@ -9,9 +9,7 @@ class SpacesThemeModeSwitch extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return VoicesThemeModeSwitch(
-      onChanged: (themeMode) {
-        AppContent.of(context).updateThemeMode(themeMode);
-      },
+      onChanged: AppContent.of(context).updateThemeMode,
     );
   }
 }
