@@ -25,6 +25,7 @@ class VoicesModalsExample extends StatelessWidget {
               onTap: () async {
                 final file = await VoicesUploadFileDialog.show(
                   context,
+                  title: 'Upload Catalyst Keychain',
                   onUpload: (_) async {
                     await Future<dynamic>.delayed(const Duration(seconds: 2));
                   },

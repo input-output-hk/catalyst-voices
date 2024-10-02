@@ -14,15 +14,21 @@ import 'package:flutter_dropzone/flutter_dropzone.dart';
 import 'package:web/web.dart' as web;
 
 class VoicesUploadFileDialog extends StatefulWidget {
+  final String title;
+  final String? mimeType;
   final Future<dynamic> Function(VoicesFile value)? onUpload;
 
   const VoicesUploadFileDialog({
     super.key,
+    required this.title,
+    this.mimeType,
     this.onUpload,
   });
 
   static Future<VoicesFile?> show(
     BuildContext context, {
+    required String title,
+    String? mimeType,
     Future<dynamic> Function(VoicesFile value)? onUpload,
   }) {
     return VoicesDialog.show<VoicesFile?>(
@@ -30,6 +36,8 @@ class VoicesUploadFileDialog extends StatefulWidget {
       builder: (context) {
         return VoicesUploadFileDialog(
           onUpload: onUpload,
+          title: title,
+          mimeType: mimeType,
         );
       },
     );
@@ -51,7 +59,7 @@ class _VoicesUploadFileDialogState extends State<VoicesUploadFileDialog> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const _Title(),
+            _Title(widget.title),
             const SizedBox(height: 24),
             _UploadContainer(
               onFileSelected: (file) {
@@ -100,7 +108,7 @@ class _Buttons extends StatelessWidget {
                 ? () async {
                     await onUpload?.call(selectedFile!);
 
-                    if(context.mounted) {
+                    if (context.mounted) {
                       Navigator.pop(context, selectedFile);
                     }
                   }
@@ -271,12 +279,14 @@ class _UploadContainerState extends State<_UploadContainer> {
 }
 
 class _Title extends StatelessWidget {
-  const _Title();
+  final String title;
+
+  const _Title(this.title);
 
   @override
   Widget build(BuildContext context) {
     return Text(
-      'Upload Catalyst Keychain'.toUpperCase(),
+      title.toUpperCase(),
       style: Theme.of(context).textTheme.titleLarge,
     );
   }
