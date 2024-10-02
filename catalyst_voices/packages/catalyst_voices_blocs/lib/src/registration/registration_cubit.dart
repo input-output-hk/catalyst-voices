@@ -58,6 +58,10 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     }
   }
 
+  void chooseOtherWallet() {
+    _goToStep(const WalletLinkStep(stage: WalletLinkStage.selectWallet));
+  }
+
   void changeRoleSetup() {
     _goToStep(const WalletLinkStep(stage: WalletLinkStage.rolesChooser));
   }
@@ -110,6 +114,10 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
 
   Future<void> selectWallet(CardanoWallet wallet) {
     return _walletLinkCubit.selectWallet(wallet);
+  }
+
+  void selectRoles(Set<AccountRole> roles) {
+    _walletLinkCubit.selectRoles(roles);
   }
 
   void submitRegistration() {

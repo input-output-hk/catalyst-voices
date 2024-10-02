@@ -820,6 +820,18 @@ abstract class VoicesLocalizations {
   /// **'1 {role} registration to Catalyst Keychain'**
   String walletLinkTransactionRoleItem(String role);
 
+  /// A title on the role chooser screen in registration.
+  ///
+  /// In en, this message translates to:
+  /// **'How do you want to participate in Catalyst?'**
+  String get walletLinkRoleChooserTitle;
+
+  /// A message on the role chooser screen in registration.
+  ///
+  /// In en, this message translates to:
+  /// **'In Catalyst you can take on different roles, learn more below and choose your additional roles now.'**
+  String get walletLinkRoleChooserContent;
+
   /// Message shown when redirecting to external content that describes which wallets are supported.
   ///
   /// In en, this message translates to:

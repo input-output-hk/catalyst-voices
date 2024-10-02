@@ -545,6 +545,14 @@
       }
     }
   },
+  "walletLinkRoleChooserTitle": "How do you want to participate in Catalyst?",
+  "@walletLinkRoleChooserTitle": {
+    "description": "A title on the role chooser screen in registration."
+  },
+  "walletLinkRoleChooserContent": "In Catalyst you can take on different roles, learn more below and choose your additional roles now.",
+  "@walletLinkRoleChooserContent": {
+    "description": "A message on the role chooser screen in registration."
+  },
   "seeAllSupportedWallets": "See all supported wallets",
   "@seeAllSupportedWallets": {
     "description": "Message shown when redirecting to external content that describes which wallets are supported."

@@ -28,13 +28,17 @@ class WalletLinkPanel extends StatelessWidget {
         ),
       WalletLinkStage.walletDetails => WalletDetailsPanel(
           minAdaForRegistration: stateData.minAdaForRegistration,
-          details: stateData.selectedWallet!,
+          walletDetails: stateData.selectedWallet!,
         ),
-      WalletLinkStage.rolesChooser => const RolesChooserPanel(),
+      WalletLinkStage.rolesChooser => RolesChooserPanel(
+          defaultRoles: stateData.defaultRoles,
+          selectedRoles: stateData.selectedRoles ?? stateData.defaultRoles,
+        ),
       WalletLinkStage.rolesSummary => const RolesSummaryPanel(),
-      // TODO(dtscalac): pass valid parameters
       WalletLinkStage.rbacTransaction => RbacTransactionPanel(
-          roles: AccountRole.values,
+          roles: stateData.selectedRoles ?? stateData.defaultRoles,
+          walletDetails: stateData.selectedWallet!,
+          // TODO(dtscalac): pass valid fee
           transactionFee: Coin.fromAda(0.9438),
         ),
     };
