@@ -679,6 +679,8 @@
   "delete": "Delete",
   "close": "Close",
   "notice": "Notice",
+  "yes": "Yes",
+  "no": "No",
   "total": "Total",
   "keychainDeletedDialogTitle": "Catalyst keychain removed",
   "@keychainDeletedDialogTitle": {
