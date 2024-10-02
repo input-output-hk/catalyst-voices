@@ -10,7 +10,7 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class RbacTransactionPanel extends StatelessWidget {
-  final List<AccountRole> roles;
+  final Set<AccountRole> roles;
   final CardanoWalletDetails walletDetails;
   final Coin transactionFee;
 
@@ -47,7 +47,7 @@ class RbacTransactionPanel extends StatelessWidget {
 }
 
 class _Summary extends StatelessWidget {
-  final List<AccountRole> roles;
+  final Set<AccountRole> roles;
   final CardanoWalletDetails walletDetails;
   final Coin transactionFee;
 
