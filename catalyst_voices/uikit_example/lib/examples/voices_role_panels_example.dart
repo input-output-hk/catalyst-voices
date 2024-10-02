@@ -3,19 +3,20 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
-class VoicesRolePanelsExample extends StatefulWidget {
-  static const String title = 'Voices Role Panels';
+class VoicesRoleContainersExample extends StatefulWidget {
+  static const String title = 'Voices Role Containers';
   static const String route = '/role-panels-example';
 
-  const VoicesRolePanelsExample({super.key});
+  const VoicesRoleContainersExample({super.key});
 
   @override
-  State<VoicesRolePanelsExample> createState() {
-    return _VoicesRolePanelsExampleState();
+  State<VoicesRoleContainersExample> createState() {
+    return _VoicesRoleContainersExampleState();
   }
 }
 
-class _VoicesRolePanelsExampleState extends State<VoicesRolePanelsExample> {
+class _VoicesRoleContainersExampleState
+    extends State<VoicesRoleContainersExample> {
   bool _roleChooserCardState1 = true;
   Set<AccountRole> _rolesChooserPanelState1 = {
     AccountRole.voter,
@@ -25,7 +26,7 @@ class _VoicesRolePanelsExampleState extends State<VoicesRolePanelsExample> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text(VoicesRolePanelsExample.title)),
+      appBar: AppBar(title: const Text(VoicesRoleContainersExample.title)),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 42, vertical: 24),
         children: [
@@ -72,8 +73,8 @@ class _VoicesRolePanelsExampleState extends State<VoicesRolePanelsExample> {
             isViewOnly: true,
           ),
           const SizedBox(height: 16),
-          const Text('Roles Chooser Panel (State #1)'),
-          RolesChooserPanel(
+          const Text('Roles Chooser Container (State #1)'),
+          RolesChooserContainer(
             selected: _rolesChooserPanelState1,
             lockedValuesAsDefault: const {
               AccountRole.voter,
@@ -85,8 +86,8 @@ class _VoicesRolePanelsExampleState extends State<VoicesRolePanelsExample> {
             },
           ),
           const SizedBox(height: 16),
-          const Text('Roles Summary Panel (State #1)'),
-          RolesSummaryPanel(
+          const Text('Roles Summary Container (State #1)'),
+          RolesSummaryContainer(
             selected: _rolesChooserPanelState1,
             lockedValuesAsDefault: const {
               AccountRole.voter,

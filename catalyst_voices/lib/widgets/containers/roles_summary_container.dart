@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 
 /// A panel that displays a series of [RoleChooserCard] widgets for selecting
 /// various account roles (e.g., voter, proposer, drep) in summary.
-class RolesSummaryPanel extends StatelessWidget {
+class RolesSummaryContainer extends StatelessWidget {
   /// A map where keys are [AccountRole] enums and values are booleans
   /// representing whether the corresponding role is selected.
   final Set<AccountRole> selected;
@@ -16,7 +16,7 @@ class RolesSummaryPanel extends StatelessWidget {
   /// should be locked in their default state.
   final Set<AccountRole>? lockedValuesAsDefault;
 
-  const RolesSummaryPanel({
+  const RolesSummaryContainer({
     super.key,
     required this.selected,
     this.lockedValuesAsDefault,

@@ -165,9 +165,9 @@ class ExamplesListPage extends StatelessWidget {
         page: VoicesProposalCardExample(),
       ),
       ExampleTile(
-        title: VoicesRolePanelsExample.title,
-        route: VoicesRolePanelsExample.route,
-        page: VoicesRolePanelsExample(),
+        title: VoicesRoleContainersExample.title,
+        route: VoicesRoleContainersExample.route,
+        page: VoicesRoleContainersExample(),
       ),
     ];
   }
