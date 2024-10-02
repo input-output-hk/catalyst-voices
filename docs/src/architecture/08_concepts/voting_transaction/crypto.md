@@ -49,7 +49,7 @@ The protocol is based around the following entities:
   Or it could be defined based on their stake in the blockchain,
   which is more appropriate for web3 systems.
 
-Important to note that the protocol defined for some **one** proposal.
+Important to note that the protocol defined for **single** proposal.
 Obviously, it could be easily scaled for a set of proposals,
 performing protocol steps in parallel.
 
@@ -167,7 +167,7 @@ it is crucial to prove that [encoding](#voting-choice) and [encryption](#vote-en
 (i.e. that the voter indeed encrypt a unit vector).
 
 Because by the definition of the encryption algorithm $VoteEnc(message, randomness, public \; key)$
-it is possible to encrypt an any message value,
+encrypts any message value,
 it is not restricted for encryption only $0$ and $1$ values
 (as it was stated in the previous [section](#voting-choice),
 unit vector components only could be $0$ or $1$).
