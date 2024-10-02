@@ -10,16 +10,21 @@ class SeedPhraseCheckInstructionsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 24),
-        RegistrationStageMessage(
-          title: context.l10n.createKeychainSeedPhraseCheckInstructionsTitle,
-          subtitle:
-              context.l10n.createKeychainSeedPhraseCheckInstructionsSubtitle,
+        Expanded(
+          child: SingleChildScrollView(
+            child: RegistrationStageMessage(
+              title: l10n.createKeychainSeedPhraseCheckInstructionsTitle,
+              subtitle: l10n.createKeychainSeedPhraseCheckInstructionsSubtitle,
+            ),
+          ),
         ),
-        const Spacer(),
+        const SizedBox(height: 10),
         const RegistrationBackNextNavigation(),
       ],
     );

@@ -14,26 +14,28 @@ class SeedPhraseCheckResultPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 24),
         // TODO(damian-molinski): use correct strings when available.
-        RegistrationStageMessage(
-          title: isCheckConfirmed
-              ? context.l10n.createKeychainSeedPhraseCheckSuccessTitle
-              : 'Seed phrase words does not match!',
-          subtitle: isCheckConfirmed
-              ? context.l10n.createKeychainSeedPhraseCheckSuccessSubtitle
-              : 'Go back ana make sure order is correct',
-        ),
-        const Spacer(),
-        if (isCheckConfirmed) ...[
-          NextStep(
-            context.l10n.createKeychainSeedPhraseCheckSuccessNextStep,
+        Expanded(
+          child: SingleChildScrollView(
+            child: RegistrationStageMessage(
+              title: isCheckConfirmed
+                  ? l10n.createKeychainSeedPhraseCheckSuccessTitle
+                  : 'Seed phrase words does not match!',
+              subtitle: isCheckConfirmed
+                  ? l10n.createKeychainSeedPhraseCheckSuccessSubtitle
+                  : 'Go back ana make sure order is correct',
+            ),
           ),
-          const SizedBox(height: 10),
-        ],
+        ),
+        if (isCheckConfirmed)
+          NextStep(l10n.createKeychainSeedPhraseCheckSuccessNextStep),
+        const SizedBox(height: 10),
         RegistrationBackNextNavigation(isNextEnabled: isCheckConfirmed),
       ],
     );
