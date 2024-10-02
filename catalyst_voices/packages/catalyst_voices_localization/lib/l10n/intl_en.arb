@@ -491,7 +491,7 @@
   "@walletLinkWalletDetailsNoticeTopUp": {
     "description": "A message recommending the user to top up ADA in wallet link on wallet details screen."
   },
-  "walletLinkWalletDetailsNoticeTopUpLink": "• Link to top-up provider",
+  "walletLinkWalletDetailsNoticeTopUpLink": "Link to top-up provider",
   "@walletLinkWalletDetailsNoticeTopUpLink": {
     "description": "A link to top-up provide when the user doesn't have enough balance on wallet link screen"
   },

@@ -757,7 +757,7 @@ abstract class VoicesLocalizations {
   /// A link to top-up provide when the user doesn't have enough balance on wallet link screen
   ///
   /// In en, this message translates to:
-  /// **'• Link to top-up provider'**
+  /// **'Link to top-up provider'**
   String get walletLinkWalletDetailsNoticeTopUpLink;
 
   /// A title in link wallet flow on transaction screen.

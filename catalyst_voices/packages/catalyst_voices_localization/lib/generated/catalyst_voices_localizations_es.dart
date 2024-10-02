@@ -394,7 +394,7 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get walletLinkWalletDetailsNoticeTopUp => 'Top up ADA';
 
   @override
-  String get walletLinkWalletDetailsNoticeTopUpLink => '• Link to top-up provider';
+  String get walletLinkWalletDetailsNoticeTopUpLink => 'Link to top-up provider';
 
   @override
   String get walletLinkTransactionTitle => 'Let\'s make sure everything looks right.';

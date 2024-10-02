@@ -133,8 +133,10 @@ class _WalletSummary extends StatelessWidget {
                   ),
             ),
             const SizedBox(height: 6),
-            Text(
-              context.l10n.walletLinkWalletDetailsNoticeTopUpLink,
+            BulletList(
+              items: [
+                context.l10n.walletLinkWalletDetailsNoticeTopUpLink,
+              ],
               style: Theme.of(context).textTheme.labelSmall,
             ),
           ],
