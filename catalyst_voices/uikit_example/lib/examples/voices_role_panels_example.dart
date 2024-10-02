@@ -17,10 +17,9 @@ class VoicesRolePanelsExample extends StatefulWidget {
 
 class _VoicesRolePanelsExampleState extends State<VoicesRolePanelsExample> {
   bool _roleChooserCardState1 = true;
-  Map<AccountRole, bool> _rolesChooserPanelState1 = {
-    AccountRole.voter: true,
-    AccountRole.proposer: true,
-    AccountRole.drep: false,
+  Set<AccountRole> _rolesChooserPanelState1 = {
+    AccountRole.voter,
+    AccountRole.proposer,
   };
 
   @override
@@ -75,9 +74,9 @@ class _VoicesRolePanelsExampleState extends State<VoicesRolePanelsExample> {
           const SizedBox(height: 16),
           const Text('Roles Chooser Panel (State #1)'),
           RolesChooserPanel(
-            value: _rolesChooserPanelState1,
+            selected: _rolesChooserPanelState1,
             lockedValuesAsDefault: const {
-              AccountRole.voter: true,
+              AccountRole.voter,
             },
             onChanged: (changedValue) => {
               setState(() {
@@ -88,9 +87,9 @@ class _VoicesRolePanelsExampleState extends State<VoicesRolePanelsExample> {
           const SizedBox(height: 16),
           const Text('Roles Summary Panel (State #1)'),
           RolesSummaryPanel(
-            value: _rolesChooserPanelState1,
+            selected: _rolesChooserPanelState1,
             lockedValuesAsDefault: const {
-              AccountRole.voter: true,
+              AccountRole.voter,
             },
           ),
         ],

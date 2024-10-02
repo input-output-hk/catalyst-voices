@@ -10,15 +10,15 @@ import 'package:flutter/material.dart';
 class RolesSummaryPanel extends StatelessWidget {
   /// A map where keys are [AccountRole] enums and values are booleans
   /// representing whether the corresponding role is selected.
-  final Map<AccountRole, bool> value;
+  final Set<AccountRole> selected;
 
-  /// A map similar to [value], indicating which roles
+  /// A map similar to [selected], indicating which roles
   /// should be locked in their default state.
-  final Map<AccountRole, bool>? lockedValuesAsDefault;
+  final Set<AccountRole>? lockedValuesAsDefault;
 
   const RolesSummaryPanel({
     super.key,
-    required this.value,
+    required this.selected,
     this.lockedValuesAsDefault,
   });
 
@@ -38,28 +38,28 @@ class RolesSummaryPanel extends StatelessWidget {
           children: [
             RoleChooserCard(
               imageUrl: VoicesAssets.images.roleVoter.path,
-              value: value[AccountRole.voter] ?? false,
+              value: selected.contains(AccountRole.voter),
               label: context.l10n.voter,
               lockValueAsDefault:
-                  lockedValuesAsDefault?[AccountRole.voter] ?? false,
+                  lockedValuesAsDefault?.contains(AccountRole.voter) ?? false,
               isLearnMoreHidden: true,
               isViewOnly: true,
             ),
             RoleChooserCard(
               imageUrl: VoicesAssets.images.roleProposer.path,
-              value: value[AccountRole.proposer] ?? false,
+              value: selected.contains(AccountRole.proposer),
               label: context.l10n.proposer,
               lockValueAsDefault:
-                  lockedValuesAsDefault?[AccountRole.proposer] ?? false,
+                  lockedValuesAsDefault?.contains(AccountRole.proposer) ?? false,
               isLearnMoreHidden: true,
               isViewOnly: true,
             ),
             RoleChooserCard(
               imageUrl: VoicesAssets.images.roleDrep.path,
-              value: value[AccountRole.drep] ?? false,
+              value: selected.contains(AccountRole.drep),
               label: context.l10n.drep,
               lockValueAsDefault:
-                  lockedValuesAsDefault?[AccountRole.drep] ?? false,
+                  lockedValuesAsDefault?.contains(AccountRole.drep) ?? false,
               isLearnMoreHidden: true,
               isViewOnly: true,
             ),

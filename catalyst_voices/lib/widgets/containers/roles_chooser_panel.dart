@@ -9,15 +9,15 @@ import 'package:flutter/widgets.dart';
 class RolesChooserPanel extends StatelessWidget {
   /// A map where keys are [AccountRole] enums and values are booleans
   /// representing whether the corresponding role is selected.
-  final Map<AccountRole, bool> value;
+  final Set<AccountRole> selected;
 
-  /// A map similar to [value], indicating which roles
+  /// A map similar to [selected], indicating which roles
   /// should be locked in their default state.
-  final Map<AccountRole, bool>? lockedValuesAsDefault;
+  final Set<AccountRole>? lockedValuesAsDefault;
 
   /// A callback triggered when any role selection changes, passing
   /// the updated map of role values.
-  final ValueChanged<Map<AccountRole, bool>>? onChanged;
+  final ValueChanged<Set<AccountRole>>? onChanged;
 
   /// A callback triggered when the user taps "Learn More" for a
   /// specific role.
@@ -25,7 +25,7 @@ class RolesChooserPanel extends StatelessWidget {
 
   const RolesChooserPanel({
     super.key,
-    required this.value,
+    required this.selected,
     this.lockedValuesAsDefault,
     this.onChanged,
     this.onLearnMore,
@@ -37,12 +37,12 @@ class RolesChooserPanel extends StatelessWidget {
       children: [
         RoleChooserCard(
           imageUrl: VoicesAssets.images.roleVoter.path,
-          value: value[AccountRole.voter] ?? false,
+          value: selected.contains(AccountRole.voter),
           label: context.l10n.voter,
           lockValueAsDefault:
-              lockedValuesAsDefault?[AccountRole.voter] ?? false,
+              lockedValuesAsDefault?.contains(AccountRole.voter) ?? false,
           onChanged: (newValue) {
-            onChanged?.call({...value, AccountRole.voter: newValue});
+            onChanged?.call(_createNewValue(AccountRole.voter, newValue));
           },
           onLearnMore: () {
             onLearnMore?.call(AccountRole.voter);
@@ -51,12 +51,12 @@ class RolesChooserPanel extends StatelessWidget {
         const SizedBox(height: 12),
         RoleChooserCard(
           imageUrl: VoicesAssets.images.roleProposer.path,
-          value: value[AccountRole.proposer] ?? false,
+          value: selected.contains(AccountRole.proposer),
           label: context.l10n.proposer,
           lockValueAsDefault:
-              lockedValuesAsDefault?[AccountRole.proposer] ?? false,
+              lockedValuesAsDefault?.contains(AccountRole.proposer) ?? false,
           onChanged: (newValue) {
-            onChanged?.call({...value, AccountRole.proposer: newValue});
+            onChanged?.call(_createNewValue(AccountRole.proposer, newValue));
           },
           onLearnMore: () {
             onLearnMore?.call(AccountRole.proposer);
@@ -65,11 +65,12 @@ class RolesChooserPanel extends StatelessWidget {
         const SizedBox(height: 12),
         RoleChooserCard(
           imageUrl: VoicesAssets.images.roleDrep.path,
-          value: value[AccountRole.drep] ?? false,
+          value: selected.contains(AccountRole.drep),
           label: context.l10n.drep,
-          lockValueAsDefault: lockedValuesAsDefault?[AccountRole.drep] ?? false,
+          lockValueAsDefault:
+              lockedValuesAsDefault?.contains(AccountRole.drep) ?? false,
           onChanged: (newValue) {
-            onChanged?.call({...value, AccountRole.drep: newValue});
+            onChanged?.call(_createNewValue(AccountRole.drep, newValue));
           },
           onLearnMore: () {
             onLearnMore?.call(AccountRole.drep);
@@ -77,5 +78,16 @@ class RolesChooserPanel extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Set<AccountRole> _createNewValue(AccountRole role, bool newValue) {
+    final val = {...selected};
+    if (newValue) {
+      val.add(role);
+    } else {
+      val.remove(role);
+    }
+
+    return val;
   }
 }
