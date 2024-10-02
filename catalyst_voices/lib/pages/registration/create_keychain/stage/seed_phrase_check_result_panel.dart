@@ -27,7 +27,7 @@ class SeedPhraseCheckResultPanel extends StatelessWidget {
           context.l10n.createKeychainSeedPhraseCheckSuccessNextStep,
         ),
         const SizedBox(height: 10),
-        BackNextNavigation(isNextEnabled: isCheckConfirmed),
+        RegistrationBackNextNavigation(isNextEnabled: isCheckConfirmed),
       ],
     );
   }

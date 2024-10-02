@@ -3,11 +3,11 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
-class BackNextNavigation extends StatelessWidget {
+class RegistrationBackNextNavigation extends StatelessWidget {
   final bool isBackEnabled;
   final bool isNextEnabled;
 
-  const BackNextNavigation({
+  const RegistrationBackNextNavigation({
     super.key,
     this.isBackEnabled = true,
     this.isNextEnabled = true,

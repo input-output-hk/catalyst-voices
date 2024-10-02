@@ -11,7 +11,7 @@ class PlaceholderPanel extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Spacer(),
-        BackNextNavigation(),
+        RegistrationBackNextNavigation(),
       ],
     );
   }

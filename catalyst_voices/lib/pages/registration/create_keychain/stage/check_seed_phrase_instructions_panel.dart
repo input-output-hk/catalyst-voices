@@ -20,7 +20,7 @@ class CheckSeedPhraseInstructionsPanel extends StatelessWidget {
               context.l10n.createKeychainSeedPhraseCheckInstructionsSubtitle,
         ),
         const Spacer(),
-        const BackNextNavigation(),
+        const RegistrationBackNextNavigation(),
       ],
     );
   }

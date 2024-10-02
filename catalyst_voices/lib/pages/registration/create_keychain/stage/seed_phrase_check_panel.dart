@@ -69,7 +69,7 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
           ),
         ),
         const SizedBox(height: 10),
-        BackNextNavigation(isNextEnabled: _isStageValid),
+        RegistrationBackNextNavigation(isNextEnabled: _isStageValid),
       ],
     );
   }

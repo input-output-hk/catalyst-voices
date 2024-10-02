@@ -61,7 +61,7 @@ class _SeedPhrasePanelState extends State<SeedPhrasePanel> {
           isConfirmed: widget.isStoreSeedPhraseConfirmed,
         ),
         const SizedBox(height: 10),
-        BackNextNavigation(isNextEnabled: widget.isNextEnabled),
+        RegistrationBackNextNavigation(isNextEnabled: widget.isNextEnabled),
       ],
     );
   }

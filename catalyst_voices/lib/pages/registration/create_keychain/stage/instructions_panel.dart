@@ -17,7 +17,7 @@ class InstructionsPanel extends StatelessWidget {
           subtitle: context.l10n.accountInstructionsMessage,
         ),
         const Spacer(),
-        const BackNextNavigation(),
+        const RegistrationBackNextNavigation(),
       ],
     );
   }

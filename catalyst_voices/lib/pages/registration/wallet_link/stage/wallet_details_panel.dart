@@ -44,7 +44,7 @@ class WalletDetailsPanel extends StatelessWidget {
         _WalletSummary(details: details, hasEnoughBalance: hasEnoughBalance),
         const Spacer(),
         if (hasEnoughBalance)
-          const BackNextNavigation()
+          const RegistrationBackNextNavigation()
         else
           const _NotEnoughBalanceNavigation(),
       ],
