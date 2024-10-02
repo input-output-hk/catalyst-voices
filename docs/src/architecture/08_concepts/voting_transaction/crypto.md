@@ -600,7 +600,8 @@ using exactly that secret key,
 which is corresponds to the some shared public key.
 
 <!-- markdownlint-disable max-one-sentence-per-line -->
-It is a slightly modified version of the algorith described the sections *Fig. 10* and *2.1.5* of this [paper][treasury_system_spec].
+It is a slightly modified version of the algorithm described in the sections
+*Fig. 10* and *2.1.5* of this [paper][treasury_system_spec].
 <!-- markdownlint-enable max-one-sentence-per-line -->
 
 It is assumed that the original encryption and decryption is performing by ElGamal scheme.
