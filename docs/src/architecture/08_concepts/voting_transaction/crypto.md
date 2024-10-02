@@ -600,8 +600,7 @@ using exactly that secret key,
 which is corresponds to the some shared public key.
 
 <!-- markdownlint-disable max-one-sentence-per-line -->
-A more detailed and formal description
-you can find in the sections *Fig. 10* and *2.1.5* of this [paper][treasury_system_spec].
+It is a slightly modified version of the algorith described the sections *Fig. 10* and *2.1.5* of this [paper][treasury_system_spec].
 <!-- markdownlint-enable max-one-sentence-per-line -->
 
 It is assumed that the original encryption and decryption is performing by ElGamal scheme.
@@ -622,16 +621,16 @@ TallyProof(enc, sk) = \pi
 $\pi$ is the final proof.
 To compute it, prover needs to perform the next steps:
 
-1. Take the first element of the ciphertext $enc = (enc_1, enc_2)$
-  and calculate $d = enc_1^{sk}$.
-2. Generate a random value $\mu, \quad \mu \in \mathbb{Z}_q$.
-3. Compute $A_1 = g^{\mu}$, where $g$ is the group generator ($A_1 \in \mathbb{G}$).
-4. Compute $A_2 = (enc_1)^{\mu}, \quad A_2 \in \mathbb{G}$.
-5. Compute $e = H(pk, d, g, enc_1, A_1, A_2 )$,
+1. Take the first element of the ciphertext $enc = (enc_1, enc_2)$.
+2. Calculate $d = enc_1^{sk}, \quad d \in \mathbb{G}$.
+3. Generate a random value $\mu, \quad \mu \in \mathbb{Z}_q$.
+4. Compute $A_1 = g^{\mu}$, where $g$ is the group generator ($A_1 \in \mathbb{G}$).
+5. Compute $A_2 = (enc_1)^{\mu}, \quad A_2 \in \mathbb{G}$.
+6. Compute $с = H(pk, d, g, enc_1, A_1, A_2)$,
   where $pk$ is a corresponding public key of $sk$, $H$ is a hash function.
-6. Compute $z = sk * e + \mu, \quad z \in \mathbb{Z}_q$.
+7. Compute $z = sk * с + \mu, \quad z \in \mathbb{Z}_q$.
 
-Finally, the proof is $\pi = (A_1, A_2, z)$.
+Finally, the proof is $\pi = (с, z)$.
 
 ### Verifier
 
@@ -650,17 +649,18 @@ TallyCheck(enc, dec, pk, \pi) = true | false
 As a result algorithm will return `true` or `false`,
 is the verification was succeeded or not respectively.
 
-Knowing that $\pi$ equals to $(A_1, A_2, z)$,
+Knowing that $\pi$ equals to $(с, z)$,
 verifier needs to perform the next steps:
 
 1. Take the first and second elements $enc_1, enc_2$
   of the ciphertext $enc = (enc_1, enc_2)$.
 2. Calculate $d = g^{dec} \circ (-enc_2), \quad d \in \mathbb{G}$.
-3. Compute $e = H(pk, d, g, enc_1, A_1, A_2 )$, where $g$ is the group generator.
-4. Verify $g^z == pk^e \circ A_1$.
-5. Verify $enc_1^z == d^e \circ A_2$.
+3. Calculate $A_1 = g^{z} \circ pk^{-c}, \quad A_1 \in \mathbb{G}$.
+4. Calculate $A_2 = enc_1^{z} \circ d^{-c}, \quad A_2 \in \mathbb{G}$.
+5. Compute $с2 = H(pk, d, g, enc_1, A_1, A_2)$, where $g$ is the group generator.
+6. Verify $с == с2$.
 
-If step `3` and `4` returns `true` so the final result is `true` otherwise return `false`.
+If step `6` returns `true` so the final result is `true` otherwise return `false`.
 
 ## Rationale
 
