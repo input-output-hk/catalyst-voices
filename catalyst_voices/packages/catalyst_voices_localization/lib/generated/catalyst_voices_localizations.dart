@@ -757,8 +757,68 @@ abstract class VoicesLocalizations {
   /// A link to top-up provide when the user doesn't have enough balance on wallet link screen
   ///
   /// In en, this message translates to:
-  /// **'• Link to top-up provider'**
+  /// **'Link to top-up provider'**
   String get walletLinkWalletDetailsNoticeTopUpLink;
+
+  /// A title in link wallet flow on transaction screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s make sure everything looks right.'**
+  String get walletLinkTransactionTitle;
+
+  /// A subtitle in link wallet flow on transaction screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Account completion for Catalyst'**
+  String get walletLinkTransactionAccountCompletion;
+
+  /// An item in the transaction summary for the wallet link.
+  ///
+  /// In en, this message translates to:
+  /// **'1 Link {wallet} to Catalyst Keychain'**
+  String walletLinkTransactionLinkItem(String wallet);
+
+  /// A side note on transaction summary in the wallet link explaining the positives about the registration.
+  ///
+  /// In en, this message translates to:
+  /// **'Positive small print'**
+  String get walletLinkTransactionPositiveSmallPrint;
+
+  /// The first item for the positive small print message.
+  ///
+  /// In en, this message translates to:
+  /// **'Your registration is a one time event, cost will not renew periodically.'**
+  String get walletLinkTransactionPositiveSmallPrintItem1;
+
+  /// The second item for the positive small print message.
+  ///
+  /// In en, this message translates to:
+  /// **'Your registrations can be found under your account profile after completion.'**
+  String get walletLinkTransactionPositiveSmallPrintItem2;
+
+  /// The third item for the positive small print message.
+  ///
+  /// In en, this message translates to:
+  /// **'All registration fees go into the Cardano Treasury.'**
+  String get walletLinkTransactionPositiveSmallPrintItem3;
+
+  /// The primary button label to sign a transaction on transaction summary screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign transaction with wallet'**
+  String get walletLinkTransactionSign;
+
+  /// The secondary button label to change the roles on transaction summary screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Change role setup'**
+  String get walletLinkTransactionChangeRoles;
+
+  /// An item in the transaction summary for the role registration
+  ///
+  /// In en, this message translates to:
+  /// **'1 {role} registration to Catalyst Keychain'**
+  String walletLinkTransactionRoleItem(String role);
 
   /// Message shown when redirecting to external content that describes which wallets are supported.
   ///
@@ -1023,6 +1083,11 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'No'**
   String get no;
+  /// No description provided for @total.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get total;
 
   /// A title on keychain deleted dialog
   ///

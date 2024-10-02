@@ -58,6 +58,10 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     }
   }
 
+  void changeRoleSetup() {
+    _goToStep(const WalletLinkStep(stage: WalletLinkStage.rolesChooser));
+  }
+
   void nextStep() {
     final nextStep = _nextStep();
     if (nextStep != null) {
@@ -88,14 +92,6 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     _keychainCreationCubit.setSeedPhraseStoredConfirmed(confirmed);
   }
 
-  void refreshWallets() {
-    unawaited(_walletLinkCubit.refreshWallets());
-  }
-
-  Future<void> selectWallet(CardanoWallet wallet) {
-    return _walletLinkCubit.selectWallet(wallet);
-  }
-
   Future<void> downloadSeedPhrase() {
     return _keychainCreationCubit.downloadSeedPhrase();
   }
@@ -106,6 +102,18 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     _keychainCreationCubit.setSeedPhraseCheckConfirmed(
       isConfirmed: isConfirmed,
     );
+  }
+
+  void refreshWallets() {
+    unawaited(_walletLinkCubit.refreshWallets());
+  }
+
+  Future<void> selectWallet(CardanoWallet wallet) {
+    return _walletLinkCubit.selectWallet(wallet);
+  }
+
+  void submitRegistration() {
+    // TODO(dtscalac): submit RBAC transaction
   }
 
   RegistrationStep? _nextStep({RegistrationStep? from}) {
