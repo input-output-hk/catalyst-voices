@@ -557,6 +557,12 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get notice => 'Notice';
 
   @override
+  String get yes => 'Yes';
+
+  @override
+  String get no => 'No';
+
+  @override
   String get total => 'Total';
 
   @override
