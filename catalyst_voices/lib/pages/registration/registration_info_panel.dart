@@ -70,8 +70,11 @@ class RegistrationInfoPanel extends StatelessWidget {
         CreateKeychainStage.checkSeedPhraseResult ||
         CreateKeychainStage.unlockPasswordInstructions =>
           _HeaderStrings(title: context.l10n.catalystKeychain),
-        CreateKeychainStage.unlockPasswordCreate =>
-          _HeaderStrings(title: 'TODO'),
+        CreateKeychainStage.unlockPasswordCreate => _HeaderStrings(
+            title: context.l10n.catalystKeychain,
+            subtitle: context.l10n.createKeychainUnlockPasswordIntoSubtitle,
+            body: context.l10n.createKeychainUnlockPasswordIntoBody,
+          ),
       };
     }
 

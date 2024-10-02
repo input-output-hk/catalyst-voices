@@ -38,7 +38,7 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
     super.initState();
 
     _updateSeedPhraseWords();
-    _updateUserWords();
+    _updateUserWords(_seedPhraseWords);
   }
 
   @override
