@@ -2,7 +2,8 @@
 
 use std::{sync::Arc, time::SystemTime};
 
-use scylla::{prepared_statement::PreparedStatement, SerializeRow, Session};
+use row::SyncStatusQueryParams;
+use scylla::{frame::value::CqlTimestamp, prepared_statement::PreparedStatement, Session};
 use tokio::task;
 use tracing::{error, warn};
 
@@ -11,23 +12,30 @@ use crate::{
         queries::{PreparedQueries, PreparedUpsertQuery},
         session::CassandraSession,
     },
+    service::utilities::convert::from_saturating,
     settings::Settings,
 };
 
-/// Get TXI query string.
+/// Insert Sync Status query string.
 const INSERT_SYNC_STATUS_QUERY: &str = include_str!("../cql/insert_sync_status.cql");
 
-/// Get TXI query parameters.
-#[derive(SerializeRow, Debug)]
-pub(crate) struct SyncStatusQueryParams {
-    /// End Slot.
-    end_slot: num_bigint::BigInt,
-    /// Start Slot.
-    start_slot: num_bigint::BigInt,
-    /// Sync Time.
-    sync_time: num_bigint::BigInt,
-    /// Node ID
-    node_id: String,
+/// Sync Status Row Record Module
+#[allow(clippy::expect_used)]
+pub(super) mod row {
+    use scylla::{frame::value::CqlTimestamp, FromRow, SerializeRow};
+
+    /// Sync Status Record Row (used for both Insert and Query response)
+    #[derive(SerializeRow, FromRow, Debug)]
+    pub(crate) struct SyncStatusQueryParams {
+        /// End Slot.
+        pub(crate) end_slot: num_bigint::BigInt,
+        /// Start Slot.
+        pub(crate) start_slot: num_bigint::BigInt,
+        /// Sync Time.
+        pub(crate) sync_time: CqlTimestamp,
+        /// Node ID
+        pub(crate) node_id: String,
+    }
 }
 
 impl SyncStatusQueryParams {
@@ -35,13 +43,13 @@ impl SyncStatusQueryParams {
     pub(crate) fn new(end_slot: u64, start_slot: u64) -> Self {
         let sync_time = match SystemTime::now().duration_since(SystemTime::UNIX_EPOCH) {
             Ok(now) => now.as_millis(),
-            Err(_) => 0, // Shouldn;t actually happen.
+            Err(_) => 0, // Shouldn't actually happen.
         };
 
         Self {
             end_slot: end_slot.into(),
             start_slot: start_slot.into(),
-            sync_time: sync_time.into(),
+            sync_time: CqlTimestamp(from_saturating(sync_time)),
             node_id: Settings::service_id().to_owned(),
         }
     }

@@ -2,7 +2,7 @@
 INSERT INTO sync_status (
     end_slot,
     start_slot,
-    sync_time.
+    sync_time,
     node_id
 ) VALUES (
     :end_slot, 

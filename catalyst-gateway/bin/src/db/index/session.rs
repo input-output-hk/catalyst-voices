@@ -146,6 +146,11 @@ impl CassandraSession {
 
         queries.execute_upsert(session, query, value).await
     }
+
+    /// Get underlying Raw Cassandra Session.
+    pub(crate) fn get_raw_session(&self) -> Arc<Session> {
+        self.session.clone()
+    }
 }
 
 /// Create a new execution profile based on the given configuration.

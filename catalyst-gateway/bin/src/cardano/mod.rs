@@ -8,11 +8,12 @@ use cardano_chain_follower::{
 use duration_string::DurationString;
 use futures::{stream::FuturesUnordered, StreamExt};
 use rand::{Rng, SeedableRng};
-use tracing::{error, info, warn};
+use tracing::{debug, error, info, warn};
 
 use crate::{
     db::index::{
-        block::index_block, queries::sync_status::update::update_sync_status,
+        block::index_block,
+        queries::sync_status::{get::get_sync_status, update::update_sync_status},
         session::CassandraSession,
     },
     settings::{chain_follower, Settings},
@@ -318,6 +319,14 @@ pub(crate) async fn start_followers() -> anyhow::Result<()> {
         let immutable_tip_slot = tips.0.slot_or_default();
         let live_tip_slot = tips.1.slot_or_default();
         info!(chain=%cfg.chain, immutable_tip=immutable_tip_slot, live_tip=live_tip_slot, "Blockchain ready to sync from.");
+
+        // Wait for indexing DB to be ready before continuing.
+        // We do this after the above, because other nodes may have finished already, and we don't
+        // want to wait do any work they already completed while we were fetching the blockchain.
+        CassandraSession::wait_is_ready(INDEXING_DB_READY_WAIT_INTERVAL).await;
+        info!(chain=%cfg.chain, "Indexing DB is ready - Getting recovery state");
+        let sync_status = get_sync_status().await;
+        debug!(chain=%cfg.chain, "Sync Status: {:?}", sync_status);
 
         let mut sync_tasks: FuturesUnordered<tokio::task::JoinHandle<SyncParams>> =
             FuturesUnordered::new();
