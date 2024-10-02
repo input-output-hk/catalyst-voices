@@ -81,13 +81,8 @@ class RolesChooserPanel extends StatelessWidget {
   }
 
   Set<AccountRole> _createNewValue(AccountRole role, bool newValue) {
-    final val = {...selected};
-    if (newValue) {
-      val.add(role);
-    } else {
-      val.remove(role);
-    }
-
-    return val;
+    return newValue
+        ? ({...selected}..add(role))
+        : ({...selected}..remove(role));
   }
 }
