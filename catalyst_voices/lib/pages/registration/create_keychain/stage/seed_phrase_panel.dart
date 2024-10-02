@@ -21,10 +21,23 @@ class SeedPhrasePanel extends StatefulWidget {
 }
 
 class _SeedPhrasePanelState extends State<SeedPhrasePanel> {
+  final _seedPhraseWords = <String>[];
+
   @override
   void initState() {
     super.initState();
     RegistrationCubit.of(context).buildSeedPhrase();
+
+    _updateWords();
+  }
+
+  @override
+  void didUpdateWidget(covariant SeedPhrasePanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (widget.seedPhrase != oldWidget.seedPhrase) {
+      _updateWords();
+    }
   }
 
   @override
@@ -32,9 +45,14 @@ class _SeedPhrasePanelState extends State<SeedPhrasePanel> {
     return Column(
       children: [
         Expanded(
-          child: _Body(
-            words: widget.seedPhrase?.mnemonicWords,
-            onDownloadTap: _downloadSeedPhrase,
+          child: VoicesLoadable(
+            isLoading: _seedPhraseWords.isEmpty,
+            builder: (context) {
+              return _SeedPhraseWords(
+                words: _seedPhraseWords,
+                onDownloadTap: _downloadSeedPhrase,
+              );
+            },
           ),
         ),
         const SizedBox(height: 10),
@@ -50,29 +68,11 @@ class _SeedPhrasePanelState extends State<SeedPhrasePanel> {
   Future<void> _downloadSeedPhrase() async {
     await RegistrationCubit.of(context).downloadSeedPhrase();
   }
-}
 
-class _Body extends StatelessWidget {
-  final List<String>? words;
-  final VoidCallback? onDownloadTap;
-
-  const _Body({
-    this.words,
-    this.onDownloadTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final words = this.words;
-
-    if (words == null || words.isEmpty) {
-      return const Center(child: VoicesCircularProgressIndicator());
-    } else {
-      return _SeedPhraseWords(
-        words: words,
-        onDownloadTap: onDownloadTap,
-      );
-    }
+  void _updateWords() {
+    _seedPhraseWords
+      ..clear()
+      ..addAll(widget.seedPhrase?.mnemonicWords ?? []);
   }
 }
 
