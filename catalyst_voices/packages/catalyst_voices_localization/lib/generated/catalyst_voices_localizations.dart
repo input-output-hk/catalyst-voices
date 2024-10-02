@@ -1083,6 +1083,7 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'No'**
   String get no;
+
   /// No description provided for @total.
   ///
   /// In en, this message translates to:
