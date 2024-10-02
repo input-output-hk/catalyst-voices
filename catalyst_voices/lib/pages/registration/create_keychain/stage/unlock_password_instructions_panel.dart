@@ -3,8 +3,10 @@ import 'package:catalyst_voices/pages/registration/registration_stage_navigation
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
-class InstructionsPanel extends StatelessWidget {
-  const InstructionsPanel({super.key});
+class UnlockPasswordInstructionsPanel extends StatelessWidget {
+  const UnlockPasswordInstructionsPanel({
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,8 +19,8 @@ class InstructionsPanel extends StatelessWidget {
         Expanded(
           child: SingleChildScrollView(
             child: RegistrationStageMessage(
-              title: l10n.accountInstructionsTitle,
-              subtitle: l10n.accountInstructionsMessage,
+              title: l10n.createKeychainUnlockPasswordInstructionsTitle,
+              subtitle: l10n.createKeychainUnlockPasswordInstructionsSubtitle,
             ),
           ),
         ),
