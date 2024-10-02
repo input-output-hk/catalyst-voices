@@ -35,14 +35,14 @@ impl GetStakeAddrFromVoteKeyParams {
 mod result {
     use scylla::FromRow;
 
-    /// Get Latest registration query result.
+    /// Get stake addr from vote key query result.
     #[derive(FromRow)]
     pub(crate) struct GetStakeAddrFromVoteKeyQuery {
         /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
         pub stake_address: Vec<u8>,
     }
 }
-/// Get latest registration query.
+/// Get stake addr from vote key query.
 pub(crate) struct GetStakeAddrFromVoteKeyQuery;
 
 impl GetStakeAddrFromVoteKeyQuery {

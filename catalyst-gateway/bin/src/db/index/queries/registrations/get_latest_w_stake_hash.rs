@@ -13,7 +13,7 @@ use crate::db::index::{
     session::CassandraSession,
 };
 
-/// Get latest registration query string.
+/// Get stake addr from stake hash query string.
 const GET_STAKE_ADDR_FROM_STAKE_HASH: &str =
     include_str!("../cql/get_stake_addr_w_stake_key_hash.cql");
 
@@ -31,19 +31,19 @@ impl GetStakeAddrParams {
     }
 }
 
-/// Get latest registration given stake addr or vote key
+/// Get stake addr from stake hash query string.
 #[allow(clippy::expect_used)]
 mod result {
     use scylla::FromRow;
 
-    /// Get Latest registration query result.
+    /// Get stake addr from stake hash query result.
     #[derive(FromRow)]
     pub(crate) struct GetStakeAddrQuery {
         /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
         pub stake_address: Vec<u8>,
     }
 }
-/// Get latest registration query.
+/// Get registration query.
 pub(crate) struct GetStakeAddrQuery;
 
 impl GetStakeAddrQuery {

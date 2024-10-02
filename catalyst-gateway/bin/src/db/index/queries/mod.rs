@@ -10,8 +10,7 @@ use std::{fmt::Debug, sync::Arc};
 use anyhow::{bail, Context};
 use crossbeam_skiplist::SkipMap;
 use registrations::{
-    get_latest_w_stake_addr::GetLatestRegistrationQuery,
-    get_latest_w_stake_hash::GetStakeAddrQuery,
+    get_latest_w_stake_addr::GetRegistrationQuery, get_latest_w_stake_hash::GetStakeAddrQuery,
     get_latest_w_vote_key::GetStakeAddrFromVoteKeyQuery,
 };
 use scylla::{
@@ -63,8 +62,8 @@ pub(crate) enum PreparedSelectQuery {
     TxoByStakeAddress,
     /// Get TXI by transaction hash query.
     TxiByTransactionHash,
-    /// Get latest Registration
-    LatestRegistration,
+    /// Get Registration
+    RegistrationFromStakeAddr,
     /// Get stake addr from stake hash
     StakeAddrFromStakeHash,
     /// Get stake addr from vote key
@@ -98,8 +97,8 @@ pub(crate) struct PreparedQueries {
     txo_by_stake_address_query: PreparedStatement,
     /// Get TXI by transaction hash.
     txi_by_txn_hash_query: PreparedStatement,
-    /// Get latest registration
-    latest_registration_query: PreparedStatement,
+    /// Get registrations
+    registration_from_stake_addr_query: PreparedStatement,
     /// stake addr from stake hash
     stake_addr_from_stake_hash_query: PreparedStatement,
     /// stake addr from vote key
@@ -128,7 +127,8 @@ impl PreparedQueries {
             UpdateTxoSpentQuery::prepare_batch(session.clone(), cfg).await;
         let txo_by_stake_address_query = GetTxoByStakeAddressQuery::prepare(session.clone()).await;
         let txi_by_txn_hash_query = GetTxiByTxnHashesQuery::prepare(session.clone()).await;
-        let latest_registration_query = GetLatestRegistrationQuery::prepare(session.clone()).await;
+        let registration_from_stake_addr_query =
+            GetRegistrationQuery::prepare(session.clone()).await;
         let stake_addr_from_stake_hash = GetStakeAddrQuery::prepare(session.clone()).await;
         let stake_addr_from_vote_key = GetStakeAddrFromVoteKeyQuery::prepare(session.clone()).await;
 
@@ -158,7 +158,7 @@ impl PreparedQueries {
             txo_spent_update_queries: txo_spent_update_queries?,
             txo_by_stake_address_query: txo_by_stake_address_query?,
             txi_by_txn_hash_query: txi_by_txn_hash_query?,
-            latest_registration_query: latest_registration_query?,
+            registration_from_stake_addr_query: registration_from_stake_addr_query?,
             stake_addr_from_stake_hash_query: stake_addr_from_stake_hash?,
             stake_addr_from_vote_key_query: stake_addr_from_vote_key?,
         })
@@ -214,11 +214,15 @@ impl PreparedQueries {
     pub(crate) async fn execute_iter<P>(
         &self, session: Arc<Session>, select_query: PreparedSelectQuery, params: P,
     ) -> anyhow::Result<RowIterator>
-    where P: SerializeRow {
+    where
+        P: SerializeRow,
+    {
         let prepared_stmt = match select_query {
             PreparedSelectQuery::TxoByStakeAddress => &self.txo_by_stake_address_query,
             PreparedSelectQuery::TxiByTransactionHash => &self.txi_by_txn_hash_query,
-            PreparedSelectQuery::LatestRegistration => &self.latest_registration_query,
+            PreparedSelectQuery::RegistrationFromStakeAddr => {
+                &self.registration_from_stake_addr_query
+            },
             PreparedSelectQuery::StakeAddrFromStakeHash => &self.stake_addr_from_stake_hash_query,
             PreparedSelectQuery::StakeAddrFromVoteKey => &self.stake_addr_from_vote_key_query,
         };

@@ -13,34 +13,34 @@ use crate::db::index::{
     session::CassandraSession,
 };
 
-/// Get latest registration query string.
-const GET_LATEST_REGISTRATION_QUERY: &str =
-    include_str!("../cql/get_latest_registration_w_stake_addr.cql");
+/// Get registrations from stake addr query.
+const GET_REGISTRATIONS_FROM_STAKE_ADDR_QUERY: &str =
+    include_str!("../cql/get_registrations_w_stake_addr.cql");
 
-/// Get latest registration
+/// Get registration
 #[derive(SerializeRow)]
-pub(crate) struct GetLatestRegistrationParams {
+pub(crate) struct GetRegistrationParams {
     /// Stake address.
     pub stake_address: Vec<u8>,
 }
 
-impl GetLatestRegistrationParams {
+impl GetRegistrationParams {
     /// Create a new instance of [`GetLatestRegistrationParams`]
-    pub(crate) fn new(stake_addr: Vec<u8>) -> GetLatestRegistrationParams {
+    pub(crate) fn new(stake_addr: Vec<u8>) -> GetRegistrationParams {
         Self {
             stake_address: stake_addr,
         }
     }
 }
 
-/// Get latest registration given stake addr or vote key
+/// Get registration given stake addr or vote key
 #[allow(clippy::expect_used)]
 mod result {
     use scylla::FromRow;
 
-    /// Get Latest registration query result.
+    /// Get registration query result.
     #[derive(FromRow)]
-    pub(crate) struct GetLatestRegistrationQuery {
+    pub(crate) struct GetRegistrationQuery {
         /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
         pub stake_address: Vec<u8>,
         /// Nonce value after normalization.
@@ -59,22 +59,22 @@ mod result {
         pub cip36: bool,
     }
 }
-/// Get latest registration query.
-pub(crate) struct GetLatestRegistrationQuery;
+/// Get registration query.
+pub(crate) struct GetRegistrationQuery;
 
-impl GetLatestRegistrationQuery {
-    /// Prepares a get latest registration query.
+impl GetRegistrationQuery {
+    /// Prepares a get registration query.
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
         let get_latest_registration_query = PreparedQueries::prepare(
             session,
-            GET_LATEST_REGISTRATION_QUERY,
+            GET_REGISTRATIONS_FROM_STAKE_ADDR_QUERY,
             scylla::statement::Consistency::All,
             true,
         )
         .await;
 
         if let Err(ref error) = get_latest_registration_query {
-            error!(error=%error, "Failed to prepare get latest registration query.");
+            error!(error=%error, "Failed to prepare get registration query.");
         };
 
         get_latest_registration_query
@@ -82,12 +82,12 @@ impl GetLatestRegistrationQuery {
 
     /// Executes get registration info for given stake addr query.
     pub(crate) async fn execute(
-        session: &CassandraSession, params: GetLatestRegistrationParams,
-    ) -> anyhow::Result<TypedRowIterator<result::GetLatestRegistrationQuery>> {
+        session: &CassandraSession, params: GetRegistrationParams,
+    ) -> anyhow::Result<TypedRowIterator<result::GetRegistrationQuery>> {
         let iter = session
-            .execute_iter(PreparedSelectQuery::LatestRegistration, params)
+            .execute_iter(PreparedSelectQuery::RegistrationFromStakeAddr, params)
             .await?
-            .into_typed::<result::GetLatestRegistrationQuery>();
+            .into_typed::<result::GetRegistrationQuery>();
 
         Ok(iter)
     }

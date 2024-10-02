@@ -9,7 +9,7 @@ use tracing::error;
 use crate::{
     db::index::{
         queries::registrations::{
-            get_latest_w_stake_addr::{GetLatestRegistrationParams, GetLatestRegistrationQuery},
+            get_latest_w_stake_addr::{GetRegistrationParams, GetRegistrationQuery},
             get_latest_w_stake_hash::{GetStakeAddrParams, GetStakeAddrQuery},
             get_latest_w_vote_key::{GetStakeAddrFromVoteKeyParams, GetStakeAddrFromVoteKeyQuery},
         },
@@ -91,8 +91,7 @@ async fn latest_registration_from_stake_addr(
     stake_addr: Vec<u8>, session: Arc<CassandraSession>,
 ) -> anyhow::Result<Cip36Info> {
     let mut registrations_iter =
-        GetLatestRegistrationQuery::execute(&session, GetLatestRegistrationParams::new(stake_addr))
-            .await?;
+        GetRegistrationQuery::execute(&session, GetRegistrationParams::new(stake_addr)).await?;
 
     let mut registrations = Vec::new();
     while let Some(row) = registrations_iter.next().await {
