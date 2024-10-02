@@ -184,14 +184,21 @@ class _InfoContainer extends StatelessWidget {
             ),
           ),
           if (isUploading)
-            Column(
-              children: [
-                Text(
-                  selectedFilename,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                const VoicesLinearProgressIndicator()
-              ],
+            Flexible(
+              child: Wrap(
+                direction: Axis.vertical,
+                children: [
+                  Text(
+                    'Upload in progress',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: 8),
+                  const SizedBox(
+                    width: 480,
+                    child: VoicesLinearProgressIndicator(),
+                  ),
+                ],
+              ),
             )
           else
             Text(
