@@ -28,8 +28,9 @@ const _grayscaleFilter = ColorFilter.matrix([
   0,
 ]);
 
-/// A card that is used for role selection and acts as a building block
-/// for any role selection.
+/// A role chooser card, responsible as a building block
+/// for any role selection. Supports in both
+/// interactive and view-only mode.
 class RoleChooserCard extends StatelessWidget {
   /// The current displaying value.
   final bool value;
@@ -223,8 +224,8 @@ class RoleChooserCard extends StatelessWidget {
                             ),
                             showSelectedIcon: false,
                             selected: {value},
-                            onChanged: (selected) => onChanged
-                                ?.call(lockValueAsDefault ? value : !value),
+                            onChanged: (selected) =>
+                                onChanged?.call(selected.first),
                           ),
                         ),
                     ],
