@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/pages/registration/information_panel.dart';
 import 'package:catalyst_voices/pages/registration/pictures/keychain_picture.dart';
+import 'package:catalyst_voices/pages/registration/pictures/password_picture.dart';
 import 'package:catalyst_voices/pages/registration/pictures/seed_phrase_picture.dart';
 import 'package:catalyst_voices/pages/registration/pictures/task_picture.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -66,9 +67,9 @@ class RegistrationInfoPanel extends StatelessWidget {
             subtitle: context.l10n.createKeychainSeedPhraseCheckSubtitle,
             body: context.l10n.createKeychainSeedPhraseCheckBody,
           ),
-        CreateKeychainStage.checkSeedPhraseResult =>
+        CreateKeychainStage.checkSeedPhraseResult ||
+        CreateKeychainStage.unlockPasswordInstructions =>
           _HeaderStrings(title: context.l10n.catalystKeychain),
-        CreateKeychainStage.unlockPasswordInstructions ||
         CreateKeychainStage.unlockPasswordCreate =>
           _HeaderStrings(title: 'TODO'),
       };
@@ -138,7 +139,7 @@ class _RegistrationPicture extends StatelessWidget {
           ),
         CreateKeychainStage.unlockPasswordInstructions ||
         CreateKeychainStage.unlockPasswordCreate =>
-          const KeychainPicture(),
+          const PasswordPicture(),
       };
     }
 
