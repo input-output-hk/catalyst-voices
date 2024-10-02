@@ -22,12 +22,14 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
   final _shuffledSeedPhraseWords = <String>[];
   final _userWords = <String>[];
 
-  bool get _isStageValid {
-    if (_seedPhraseWords.isEmpty) {
-      return false;
-    }
+  bool get _hasSeedPhraseWords => _seedPhraseWords.isNotEmpty;
 
-    return listEquals(_seedPhraseWords, _userWords);
+  bool get _completedWordsSequence {
+    return _hasSeedPhraseWords && _userWords.length == _seedPhraseWords.length;
+  }
+
+  bool get _completedCorrectlyWordsSequence {
+    return _hasSeedPhraseWords && listEquals(_userWords, _seedPhraseWords);
   }
 
   @override
@@ -68,7 +70,9 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
           ),
         ),
         const SizedBox(height: 10),
-        _Navigation(isNextEnabled: _isStageValid),
+        _Navigation(
+          isNextEnabled: _completedWordsSequence,
+        ),
       ],
     );
   }
@@ -108,9 +112,10 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
       ..clear()
       ..addAll(words);
 
-    RegistrationCubit.of(context).setSeedPhraseCheckConfirmed(
-      isConfirmed: _isStageValid,
-    );
+    final isConfirmed = _completedCorrectlyWordsSequence;
+
+    RegistrationCubit.of(context)
+        .setSeedPhraseCheckConfirmed(isConfirmed: isConfirmed);
   }
 }
 
