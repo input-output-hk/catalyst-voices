@@ -23,13 +23,15 @@ class VoicesModalsExample extends StatelessWidget {
             VoicesFilledButton(
               child: const Text('Upload file dialog'),
               onTap: () async {
-                await VoicesDialog.show<void>(
-                  context: context,
-                  builder: (context) {
-                    return const VoicesUploadFileDialog(
-                    );
+                final file = await VoicesUploadFileDialog.show(
+                  context,
+                  onUpload: (_) async {
+                    await Future<dynamic>.delayed(const Duration(seconds: 2));
                   },
                 );
+                if (file != null) {
+                  debugPrint('uploaded file: ${file.name}');
+                }
               },
             ),
             VoicesFilledButton(

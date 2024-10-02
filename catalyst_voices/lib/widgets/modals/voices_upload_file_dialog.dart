@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_outlined_button.dart';
 import 'package:catalyst_voices/widgets/modals/voices_desktop_dialog.dart';
+import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -13,7 +14,26 @@ import 'package:flutter_dropzone/flutter_dropzone.dart';
 import 'package:web/web.dart' as web;
 
 class VoicesUploadFileDialog extends StatefulWidget {
-  const VoicesUploadFileDialog({super.key});
+  final Future<dynamic> Function(VoicesFile value)? onUpload;
+
+  const VoicesUploadFileDialog({
+    super.key,
+    this.onUpload,
+  });
+
+  static Future<VoicesFile?> show(
+    BuildContext context, {
+    Future<dynamic> Function(VoicesFile value)? onUpload,
+  }) {
+    return VoicesDialog.show<VoicesFile?>(
+      context: context,
+      builder: (context) {
+        return VoicesUploadFileDialog(
+          onUpload: onUpload,
+        );
+      },
+    );
+  }
 
   @override
   State<VoicesUploadFileDialog> createState() => _VoicesUploadFileDialogState();
@@ -43,7 +63,10 @@ class _VoicesUploadFileDialogState extends State<VoicesUploadFileDialog> {
             if (_selectedFile != null)
               _SelectedFileContainer(filename: _selectedFile!.name),
             const SizedBox(height: 24),
-            const _Buttons(),
+            _Buttons(
+              selectedFile: _selectedFile,
+              onUpload: widget.onUpload,
+            ),
           ],
         ),
       ),
@@ -52,7 +75,13 @@ class _VoicesUploadFileDialogState extends State<VoicesUploadFileDialog> {
 }
 
 class _Buttons extends StatelessWidget {
-  const _Buttons();
+  final VoicesFile? selectedFile;
+  final Future<dynamic> Function(VoicesFile value)? onUpload;
+
+  const _Buttons({
+    this.selectedFile,
+    this.onUpload,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +96,15 @@ class _Buttons extends StatelessWidget {
         const SizedBox(width: 8),
         Expanded(
           child: VoicesFilledButton(
-            onTap: () {},
+            onTap: (selectedFile != null)
+                ? () async {
+                    await onUpload?.call(selectedFile!);
+
+                    if(context.mounted) {
+                      Navigator.pop(context, selectedFile);
+                    }
+                  }
+                : null,
             child: const Text('Upload'),
           ),
         ),
