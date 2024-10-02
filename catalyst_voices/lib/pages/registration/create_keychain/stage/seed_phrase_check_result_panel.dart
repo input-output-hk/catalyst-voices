@@ -24,12 +24,16 @@ class SeedPhraseCheckResultPanel extends StatelessWidget {
         Expanded(
           child: SingleChildScrollView(
             child: RegistrationStageMessage(
-              title: isCheckConfirmed
-                  ? l10n.createKeychainSeedPhraseCheckSuccessTitle
-                  : 'Seed phrase words does not match!',
-              subtitle: isCheckConfirmed
-                  ? l10n.createKeychainSeedPhraseCheckSuccessSubtitle
-                  : 'Go back ana make sure order is correct',
+              title: Text(
+                isCheckConfirmed
+                    ? l10n.createKeychainSeedPhraseCheckSuccessTitle
+                    : 'Seed phrase words does not match!',
+              ),
+              subtitle: Text(
+                isCheckConfirmed
+                    ? l10n.createKeychainSeedPhraseCheckSuccessSubtitle
+                    : 'Go back ana make sure order is correct',
+              ),
             ),
           ),
         ),
