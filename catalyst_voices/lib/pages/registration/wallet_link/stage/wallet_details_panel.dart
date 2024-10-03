@@ -13,17 +13,17 @@ import 'package:flutter/services.dart';
 
 class WalletDetailsPanel extends StatelessWidget {
   final Coin minAdaForRegistration;
-  final CardanoWalletDetails details;
+  final CardanoWalletDetails walletDetails;
 
   const WalletDetailsPanel({
     super.key,
     required this.minAdaForRegistration,
-    required this.details,
+    required this.walletDetails,
   });
 
   @override
   Widget build(BuildContext context) {
-    final hasEnoughBalance = details.balance >= minAdaForRegistration;
+    final hasEnoughBalance = walletDetails.balance >= minAdaForRegistration;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -34,14 +34,18 @@ class WalletDetailsPanel extends StatelessWidget {
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: 32),
-        _WalletExtension(wallet: details.wallet),
+        _WalletExtension(wallet: walletDetails.wallet),
         const SizedBox(height: 16),
         Text(
-          context.l10n.walletLinkWalletDetailsContent(details.wallet.name),
+          context.l10n
+              .walletLinkWalletDetailsContent(walletDetails.wallet.name),
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: 24),
-        _WalletSummary(details: details, hasEnoughBalance: hasEnoughBalance),
+        _WalletSummary(
+          details: walletDetails,
+          hasEnoughBalance: hasEnoughBalance,
+        ),
         const Spacer(),
         if (hasEnoughBalance)
           const RegistrationBackNextNavigation()
@@ -133,8 +137,10 @@ class _WalletSummary extends StatelessWidget {
                   ),
             ),
             const SizedBox(height: 6),
-            Text(
-              context.l10n.walletLinkWalletDetailsNoticeTopUpLink,
+            BulletList(
+              items: [
+                context.l10n.walletLinkWalletDetailsNoticeTopUpLink,
+              ],
               style: Theme.of(context).textTheme.labelSmall,
             ),
           ],

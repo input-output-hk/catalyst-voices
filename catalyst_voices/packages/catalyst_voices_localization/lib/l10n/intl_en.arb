@@ -491,9 +491,67 @@
   "@walletLinkWalletDetailsNoticeTopUp": {
     "description": "A message recommending the user to top up ADA in wallet link on wallet details screen."
   },
-  "walletLinkWalletDetailsNoticeTopUpLink": "• Link to top-up provider",
+  "walletLinkWalletDetailsNoticeTopUpLink": "Link to top-up provider",
   "@walletLinkWalletDetailsNoticeTopUpLink": {
     "description": "A link to top-up provide when the user doesn't have enough balance on wallet link screen"
+  },
+  "walletLinkTransactionTitle": "Let's make sure everything looks right.",
+  "@walletLinkTransactionTitle": {
+    "description": "A title in link wallet flow on transaction screen."
+  },
+  "walletLinkTransactionAccountCompletion": "Account completion for Catalyst",
+  "@walletLinkTransactionAccountCompletion": {
+    "description": "A subtitle in link wallet flow on transaction screen."
+  },
+  "walletLinkTransactionLinkItem": "1 Link {wallet} to Catalyst Keychain",
+  "@walletLinkTransactionLinkItem": {
+    "description": "An item in the transaction summary for the wallet link.",
+    "placeholders": {
+      "wallet": {
+        "type": "String"
+      }
+    }
+  },
+  "walletLinkTransactionPositiveSmallPrint": "Positive small print",
+  "@walletLinkTransactionPositiveSmallPrint": {
+    "description": "A side note on transaction summary in the wallet link explaining the positives about the registration."
+  },
+  "walletLinkTransactionPositiveSmallPrintItem1": "Your registration is a one time event, cost will not renew periodically.",
+  "@walletLinkTransactionPositiveSmallPrintItem1": {
+    "description": "The first item for the positive small print message."
+  },
+  "walletLinkTransactionPositiveSmallPrintItem2": "Your registrations can be found under your account profile after completion.",
+  "@walletLinkTransactionPositiveSmallPrintItem2": {
+    "description": "The second item for the positive small print message."
+  },
+  "walletLinkTransactionPositiveSmallPrintItem3": "All registration fees go into the Cardano Treasury.",
+  "@walletLinkTransactionPositiveSmallPrintItem3": {
+    "description": "The third item for the positive small print message."
+  },
+  "walletLinkTransactionSign": "Sign transaction with wallet",
+  "@walletLinkTransactionSign": {
+    "description": "The primary button label to sign a transaction on transaction summary screen."
+  },
+  "walletLinkTransactionChangeRoles": "Change role setup",
+  "@walletLinkTransactionChangeRoles": {
+    "description": "The secondary button label to change the roles on transaction summary screen."
+  },
+  "walletLinkTransactionRoleItem": "1 {role} registration to Catalyst Keychain",
+  "@walletLinkTransactionRoleItem": {
+    "description": "An item in the transaction summary for the role registration",
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "walletLinkRoleChooserTitle": "How do you want to participate in Catalyst?",
+  "@walletLinkRoleChooserTitle": {
+    "description": "A title on the role chooser screen in registration."
+  },
+  "walletLinkRoleChooserContent": "In Catalyst you can take on different roles, learn more below and choose your additional roles now.",
+  "@walletLinkRoleChooserContent": {
+    "description": "A message on the role chooser screen in registration."
   },
   "seeAllSupportedWallets": "See all supported wallets",
   "@seeAllSupportedWallets": {
@@ -621,6 +679,9 @@
   "delete": "Delete",
   "close": "Close",
   "notice": "Notice",
+  "yes": "Yes",
+  "no": "No",
+  "total": "Total",
   "keychainDeletedDialogTitle": "Catalyst keychain removed",
   "@keychainDeletedDialogTitle": {
     "description": "A title on keychain deleted dialog"

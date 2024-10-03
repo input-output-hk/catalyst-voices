@@ -394,7 +394,47 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get walletLinkWalletDetailsNoticeTopUp => 'Top up ADA';
 
   @override
-  String get walletLinkWalletDetailsNoticeTopUpLink => '• Link to top-up provider';
+  String get walletLinkWalletDetailsNoticeTopUpLink => 'Link to top-up provider';
+
+  @override
+  String get walletLinkTransactionTitle => 'Let\'s make sure everything looks right.';
+
+  @override
+  String get walletLinkTransactionAccountCompletion => 'Account completion for Catalyst';
+
+  @override
+  String walletLinkTransactionLinkItem(String wallet) {
+    return '1 Link $wallet to Catalyst Keychain';
+  }
+
+  @override
+  String get walletLinkTransactionPositiveSmallPrint => 'Positive small print';
+
+  @override
+  String get walletLinkTransactionPositiveSmallPrintItem1 => 'Your registration is a one time event, cost will not renew periodically.';
+
+  @override
+  String get walletLinkTransactionPositiveSmallPrintItem2 => 'Your registrations can be found under your account profile after completion.';
+
+  @override
+  String get walletLinkTransactionPositiveSmallPrintItem3 => 'All registration fees go into the Cardano Treasury.';
+
+  @override
+  String get walletLinkTransactionSign => 'Sign transaction with wallet';
+
+  @override
+  String get walletLinkTransactionChangeRoles => 'Change role setup';
+
+  @override
+  String walletLinkTransactionRoleItem(String role) {
+    return '1 $role registration to Catalyst Keychain';
+  }
+
+  @override
+  String get walletLinkRoleChooserTitle => 'How do you want to participate in Catalyst?';
+
+  @override
+  String get walletLinkRoleChooserContent => 'In Catalyst you can take on different roles, learn more below and choose your additional roles now.';
 
   @override
   String get seeAllSupportedWallets => 'See all supported wallets';
@@ -521,6 +561,15 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get notice => 'Notice';
+
+  @override
+  String get yes => 'Yes';
+
+  @override
+  String get no => 'No';
+
+  @override
+  String get total => 'Total';
 
   @override
   String get keychainDeletedDialogTitle => 'Catalyst keychain removed';

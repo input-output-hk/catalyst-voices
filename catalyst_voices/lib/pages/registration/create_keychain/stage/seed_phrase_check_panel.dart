@@ -38,7 +38,9 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
     super.initState();
 
     _updateSeedPhraseWords();
-    _updateUserWords(_seedPhraseWords);
+    // Note. In debug mode we're prefilling correct seed phrase words
+    // so its faster to test screens
+    _updateUserWords(kDebugMode ? _seedPhraseWords : const []);
   }
 
   @override
@@ -47,7 +49,9 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
 
     if (widget.seedPhrase != oldWidget.seedPhrase) {
       _updateSeedPhraseWords();
-      _updateUserWords();
+      // Note. In debug mode we're prefilling correct seed phrase words
+      // so its faster to test screens
+      _updateUserWords(kDebugMode ? _seedPhraseWords : const []);
     }
   }
 
