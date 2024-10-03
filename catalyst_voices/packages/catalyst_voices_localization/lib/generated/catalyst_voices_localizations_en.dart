@@ -437,6 +437,36 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get walletLinkRoleChooserContent => 'In Catalyst you can take on different roles, learn more below and choose your additional roles now.';
 
   @override
+  String get walletLinkRoleSummaryTitle => 'Is this your correct Catalyst role setup?';
+
+  @override
+  String get walletLinkRoleSummaryContent1 => 'You would like to register ';
+
+  @override
+  String walletLinkRoleSummaryContent2(num count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.compact(
+      locale: localeName,
+      
+    );
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'roles',
+      one: 'role',
+      zero: 'roles',
+    );
+    return '$countString active $_temp0';
+  }
+
+  @override
+  String get walletLinkRoleSummaryContent3 => ' in Catalyst.';
+
+  @override
+  String get walletLinkRoleSummaryButton => 'Confirm & Sign with wallet';
+
+  @override
   String get seeAllSupportedWallets => 'See all supported wallets';
 
   @override
