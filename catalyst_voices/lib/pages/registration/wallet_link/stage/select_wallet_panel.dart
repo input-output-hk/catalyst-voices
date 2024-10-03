@@ -37,8 +37,8 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
       children: [
         const SizedBox(height: 24),
         RegistrationStageMessage(
-          title: context.l10n.walletLinkSelectWalletTitle,
-          subtitle: context.l10n.walletLinkSelectWalletContent,
+          title: Text(context.l10n.walletLinkSelectWalletTitle),
+          subtitle: Text(context.l10n.walletLinkSelectWalletContent),
         ),
         const SizedBox(height: 40),
         Expanded(

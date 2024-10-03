@@ -99,7 +99,8 @@ class RegistrationInfoPanel extends StatelessWidget {
 
     return switch (step) {
       GetStartedStep() => _HeaderStrings(title: context.l10n.getStarted),
-      FinishAccountCreationStep() => _HeaderStrings(title: 'TODO'),
+      FinishAccountCreationStep() =>
+        _HeaderStrings(title: context.l10n.catalystKeychain),
       RecoverStep() => _HeaderStrings(title: 'TODO'),
       CreateKeychainStep(:final stage) => buildKeychainStageHeader(stage),
       WalletLinkStep(:final stage) => buildWalletLinkStageHeader(stage),

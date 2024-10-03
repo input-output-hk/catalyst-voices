@@ -25,8 +25,8 @@ class RolesChooserPanel extends StatelessWidget {
       children: [
         const SizedBox(height: 24),
         RegistrationStageMessage(
-          title: context.l10n.walletLinkRoleChooserTitle,
-          subtitle: context.l10n.walletLinkRoleChooserContent,
+          title: Text(context.l10n.walletLinkRoleChooserTitle),
+          subtitle: Text(context.l10n.walletLinkRoleChooserContent),
           spacing: 12,
         ),
         const SizedBox(height: 12),

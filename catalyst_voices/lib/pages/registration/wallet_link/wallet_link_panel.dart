@@ -34,7 +34,10 @@ class WalletLinkPanel extends StatelessWidget {
           defaultRoles: stateData.defaultRoles,
           selectedRoles: stateData.selectedRoles ?? stateData.defaultRoles,
         ),
-      WalletLinkStage.rolesSummary => const RolesSummaryPanel(),
+      WalletLinkStage.rolesSummary => RolesSummaryPanel(
+          defaultRoles: stateData.defaultRoles,
+          selectedRoles: stateData.selectedRoles ?? stateData.defaultRoles,
+        ),
       WalletLinkStage.rbacTransaction => RbacTransactionPanel(
           roles: stateData.selectedRoles ?? stateData.defaultRoles,
           walletDetails: stateData.selectedWallet!,

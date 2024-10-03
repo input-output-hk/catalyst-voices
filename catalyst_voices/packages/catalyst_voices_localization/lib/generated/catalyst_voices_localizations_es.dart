@@ -437,6 +437,36 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get walletLinkRoleChooserContent => 'In Catalyst you can take on different roles, learn more below and choose your additional roles now.';
 
   @override
+  String get walletLinkRoleSummaryTitle => 'Is this your correct Catalyst role setup?';
+
+  @override
+  String get walletLinkRoleSummaryContent1 => 'You would like to register ';
+
+  @override
+  String walletLinkRoleSummaryContent2(num count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.compact(
+      locale: localeName,
+      
+    );
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'roles',
+      one: 'role',
+      zero: 'roles',
+    );
+    return '$countString active $_temp0';
+  }
+
+  @override
+  String get walletLinkRoleSummaryContent3 => ' in Catalyst.';
+
+  @override
+  String get walletLinkRoleSummaryButton => 'Confirm & Sign with wallet';
+
+  @override
   String get seeAllSupportedWallets => 'See all supported wallets';
 
   @override
@@ -572,6 +602,12 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get total => 'Total';
 
   @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeDark => 'Dark';
+
+  @override
   String get keychainDeletedDialogTitle => 'Catalyst keychain removed';
 
   @override
@@ -627,4 +663,22 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get createKeychainUnlockPasswordInstructionsSubtitle => 'With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.    But it can be a bit tedious to enter every single time you want to use the app.    In this next step, you\'ll set your Unlock Password for your current device. It\'s like a shortcut for proving ownership of your Keychain.    Whenever you recover your account for the first time on a new device, you\'ll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.';
+
+  @override
+  String get createKeychainCreatedTitle => 'Congratulations your Catalyst  Keychain is created!';
+
+  @override
+  String get createKeychainCreatedNextStep => 'In the next step you write your Catalyst roles and  account to the Cardano Mainnet.';
+
+  @override
+  String get createKeychainLinkWalletAndRoles => 'Link your Cardano Wallet & Roles';
+
+  @override
+  String get registrationCreateKeychainStepGroup => 'Catalyst Keychain created';
+
+  @override
+  String get registrationLinkWalletStepGroup => 'Link Cardano Wallet & Roles';
+
+  @override
+  String get registrationCompletedStepGroup => 'Catalyst account creation completed!';
 }
