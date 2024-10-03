@@ -774,5 +774,21 @@
   "createKeychainLinkWalletAndRoles": "Link your Cardano Wallet & Roles",
   "registrationCreateKeychainStepGroup": "Catalyst Keychain created",
   "registrationLinkWalletStepGroup": "Link Cardano Wallet & Roles",
-  "registrationCompletedStepGroup": "Catalyst account creation completed!"
+  "registrationCompletedStepGroup": "Catalyst account creation completed!",
+  "createKeychainUnlockPasswordIntoSubtitle": "Catalyst unlock password",
+  "createKeychainUnlockPasswordIntoBody": "Please provide a password for your Catalyst Keychain.",
+  "enterPassword": "Enter password",
+  "confirmPassword": "Confirm password",
+  "xCharactersMinimum": "{number} characters minimum length",
+  "@xCharactersMinimum": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "passwordDoNotMatch": "Passwords do not match, please correct",
+  "@passwordDoNotMatch": {
+    "description": "When user confirms password but it does not match original one."
+  }
 }
