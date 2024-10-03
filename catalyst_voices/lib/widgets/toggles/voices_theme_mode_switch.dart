@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/toggles/voices_switch.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +18,7 @@ class VoicesThemeModeSwitch extends StatelessWidget {
       children: [
         Text('${context.l10n.themeLight} / ${context.l10n.themeDark}'),
         const SizedBox(width: 8),
-        Switch(
+        VoicesSwitch(
           value: Theme.of(context).brightness == Brightness.dark,
           onChanged: (value) {
             onChanged(
