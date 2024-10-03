@@ -16,6 +16,8 @@ import 'package:web/web.dart' as web;
 
 class VoicesUploadFileDialog extends StatefulWidget {
   final String title;
+  final String itemNameToUpload;
+  final String? info;
   final List<String>? allowedExtensions;
   final Future<dynamic> Function(VoicesFile value)? onUpload;
   final VoidCallback? onCancel;
@@ -23,6 +25,8 @@ class VoicesUploadFileDialog extends StatefulWidget {
   const VoicesUploadFileDialog({
     super.key,
     required this.title,
+    required this.itemNameToUpload,
+    this.info,
     this.allowedExtensions,
     this.onUpload,
     this.onCancel,
@@ -31,6 +35,8 @@ class VoicesUploadFileDialog extends StatefulWidget {
   static Future<VoicesFile?> show(
     BuildContext context, {
     required String title,
+    String? itemNameToUpload,
+    String? info,
     List<String>? allowedExtensions,
     Future<dynamic> Function(VoicesFile value)? onUpload,
     VoidCallback? onCancel,
@@ -40,6 +46,8 @@ class VoicesUploadFileDialog extends StatefulWidget {
       builder: (context) {
         return VoicesUploadFileDialog(
           title: title,
+          itemNameToUpload: itemNameToUpload ?? 'file',
+          info: info,
           allowedExtensions: allowedExtensions,
           onUpload: onUpload,
           onCancel: onCancel,
@@ -69,6 +77,8 @@ class _VoicesUploadFileDialogState extends State<VoicesUploadFileDialog> {
             _Title(widget.title),
             const SizedBox(height: 24),
             _UploadContainer(
+              itemNameToUpload: widget.itemNameToUpload,
+              info: widget.info,
               allowedExtensions: widget.allowedExtensions,
               onFileSelected: (file) {
                 setState(() {
@@ -212,10 +222,14 @@ class _InfoContainer extends StatelessWidget {
 }
 
 class _UploadContainer extends StatefulWidget {
+  final String itemNameToUpload;
+  final String? info;
   final List<String>? allowedExtensions;
   final ValueChanged<VoicesFile>? onFileSelected;
 
   const _UploadContainer({
+    required this.itemNameToUpload,
+    this.info,
     this.allowedExtensions,
     this.onFileSelected,
   });
@@ -306,7 +320,7 @@ class _UploadContainerState extends State<_UploadContainer> {
                       ),
                       RichText(
                         text: TextSpan(
-                          text: 'Drop your key here or ',
+                          text: 'Drop your ${widget.itemNameToUpload} here or ',
                           style: Theme.of(context).textTheme.titleSmall,
                           children: <TextSpan>[
                             TextSpan(
@@ -318,10 +332,11 @@ class _UploadContainerState extends State<_UploadContainer> {
                           ],
                         ),
                       ),
-                      Text(
-                        "Make sure it's a correct Catalyst keychain file.",
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
+                      if (widget.info != null)
+                        Text(
+                          widget.info!,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
                     ]
                         .separatedBy(
                           Container(
