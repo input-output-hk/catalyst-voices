@@ -602,6 +602,32 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get total => 'Total';
 
   @override
+  String get file => 'file';
+
+  @override
+  String get key => 'key';
+
+  @override
+  String get upload => 'Upload';
+
+  @override
+  String get browse => 'browse';
+
+  @override
+  String uploadDropInfo(Object itemNameToUpload) {
+    return 'Drop your $itemNameToUpload here or ';
+  }
+
+  @override
+  String get uploadProgressInfo => 'Upload in progress';
+
+  @override
+  String get uploadKeychainTitle => 'Upload Catalyst Keychain';
+
+  @override
+  String get uploadKeychainInfo => 'Upload Catalyst Keychain';
+
+  @override
   String get keychainDeletedDialogTitle => 'Catalyst keychain removed';
 
   @override

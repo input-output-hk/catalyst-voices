@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class VoicesModalsExample extends StatelessWidget {
@@ -25,9 +26,9 @@ class VoicesModalsExample extends StatelessWidget {
               onTap: () async {
                 final file = await VoicesUploadFileDialog.show(
                   context,
-                  title: 'Upload Catalyst Keychain',
-                  itemNameToUpload: 'key',
-                  info: "Make sure it's a correct Catalyst keychain file.",
+                  title: context.l10n.uploadKeychainTitle,
+                  itemNameToUpload: context.l10n.key,
+                  info: context.l10n.uploadKeychainInfo,
                   allowedExtensions: ['ckf', 'log'],
                   onUpload: (_) async {
                     await Future<dynamic>.delayed(const Duration(seconds: 2));

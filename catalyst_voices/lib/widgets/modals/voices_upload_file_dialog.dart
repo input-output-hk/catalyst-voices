@@ -46,7 +46,7 @@ class VoicesUploadFileDialog extends StatefulWidget {
       builder: (context) {
         return VoicesUploadFileDialog(
           title: title,
-          itemNameToUpload: itemNameToUpload ?? 'file',
+          itemNameToUpload: itemNameToUpload ?? context.l10n.file,
           info: info,
           allowedExtensions: allowedExtensions,
           onUpload: onUpload,
@@ -156,7 +156,7 @@ class _ButtonsState extends State<_Buttons> {
                       }
                     }
                   : null,
-              child: const Text('Upload'),
+              child: Text(context.l10n.upload),
             ),
           ),
       ],
@@ -199,7 +199,7 @@ class _InfoContainer extends StatelessWidget {
                 direction: Axis.vertical,
                 children: [
                   Text(
-                    'Upload in progress',
+                    context.l10n.uploadProgressInfo,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   const SizedBox(height: 8),
@@ -320,11 +320,12 @@ class _UploadContainerState extends State<_UploadContainer> {
                       ),
                       RichText(
                         text: TextSpan(
-                          text: 'Drop your ${widget.itemNameToUpload} here or ',
+                          text: context.l10n
+                              .uploadDropInfo(widget.itemNameToUpload),
                           style: Theme.of(context).textTheme.titleSmall,
                           children: <TextSpan>[
                             TextSpan(
-                              text: 'browse',
+                              text: context.l10n.browse,
                               style: TextStyle(
                                 color: Theme.of(context).colors.iconsPrimary,
                               ),

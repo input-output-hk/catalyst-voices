@@ -1132,6 +1132,54 @@ abstract class VoicesLocalizations {
   /// **'Total'**
   String get total;
 
+  /// No description provided for @file.
+  ///
+  /// In en, this message translates to:
+  /// **'file'**
+  String get file;
+
+  /// No description provided for @key.
+  ///
+  /// In en, this message translates to:
+  /// **'key'**
+  String get key;
+
+  /// No description provided for @upload.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload'**
+  String get upload;
+
+  /// No description provided for @browse.
+  ///
+  /// In en, this message translates to:
+  /// **'browse'**
+  String get browse;
+
+  /// No description provided for @uploadDropInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Drop your {itemNameToUpload} here or '**
+  String uploadDropInfo(Object itemNameToUpload);
+
+  /// No description provided for @uploadProgressInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload in progress'**
+  String get uploadProgressInfo;
+
+  /// Make sure it's a correct Catalyst keychain file.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Catalyst Keychain'**
+  String get uploadKeychainTitle;
+
+  /// No description provided for @uploadKeychainInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Catalyst Keychain'**
+  String get uploadKeychainInfo;
+
   /// A title on keychain deleted dialog
   ///
   /// In en, this message translates to:

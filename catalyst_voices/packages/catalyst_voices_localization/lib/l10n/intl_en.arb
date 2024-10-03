@@ -708,6 +708,20 @@
   "yes": "Yes",
   "no": "No",
   "total": "Total",
+  "file": "file",
+  "key": "key",
+  "upload": "Upload",
+  "browse": "browse",
+  "uploadDropInfo": "Drop your {itemNameToUpload} here or ",
+  "uploadProgressInfo": "Upload in progress",
+  "uploadKeychainTitle": "Upload Catalyst Keychain",
+  "@uploadKeychainTitle": {
+    "description": "A title on keychain upload dialog"
+  },
+  "uploadKeychainInfo": "Upload Catalyst Keychain",
+  "@uploadKeychainTitle": {
+    "description": "Make sure it's a correct Catalyst keychain file."
+  },
   "keychainDeletedDialogTitle": "Catalyst keychain removed",
   "@keychainDeletedDialogTitle": {
     "description": "A title on keychain deleted dialog"
