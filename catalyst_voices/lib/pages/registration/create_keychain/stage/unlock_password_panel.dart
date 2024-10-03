@@ -41,35 +41,32 @@ class _UnlockPasswordPanelState extends State<UnlockPasswordPanel> {
 
   @override
   Widget build(BuildContext context) {
-    return AutofillGroup(
-      onDisposeAction: AutofillContextAction.cancel,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(height: 24),
-          const SizedBox(height: 12),
-          _EnterPasswordTextField(
-            controller: _passwordController,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(height: 24),
+        const SizedBox(height: 12),
+        _EnterPasswordTextField(
+          controller: _passwordController,
+        ),
+        const SizedBox(height: 12),
+        _ConfirmPasswordTextField(
+          controller: _confirmPasswordController,
+          showError: widget.data.showPasswordMisMatch,
+          minimumLength: widget.data.minPasswordLength,
+        ),
+        const Spacer(),
+        const SizedBox(height: 22),
+        if (widget.data.showPasswordStrength)
+          VoicesPasswordStrengthIndicator(
+            passwordStrength: widget.data.passwordStrength,
           ),
-          const SizedBox(height: 12),
-          _ConfirmPasswordTextField(
-            controller: _confirmPasswordController,
-            showError: widget.data.showPasswordMisMatch,
-            minimumLength: widget.data.minPasswordLength,
-          ),
-          const Spacer(),
-          const SizedBox(height: 22),
-          if (widget.data.showPasswordStrength)
-            VoicesPasswordStrengthIndicator(
-              passwordStrength: widget.data.passwordStrength,
-            ),
-          const SizedBox(height: 22),
-          RegistrationBackNextNavigation(
-            isNextEnabled: widget.data.isNextEnabled,
-            onNextTap: _createKeychain,
-          ),
-        ],
-      ),
+        const SizedBox(height: 22),
+        RegistrationBackNextNavigation(
+          isNextEnabled: widget.data.isNextEnabled,
+          onNextTap: _createKeychain,
+        ),
+      ],
     );
   }
 
