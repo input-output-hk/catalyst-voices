@@ -166,9 +166,11 @@ class _RegistrationPicture extends StatelessWidget {
       FinishAccountCreation() => const KeychainPicture(),
       Recover() => const KeychainPicture(),
       CreateKeychain(:final stage, :final seedPhrase, :final unlockPassword) =>
-        buildKeychainStagePicture(stage,
-            isSeedPhraseCheckConfirmed: seedPhrase.isCheckConfirmed,
-            unlockPassword: unlockPassword),
+        buildKeychainStagePicture(
+          stage,
+          isSeedPhraseCheckConfirmed: seedPhrase.isCheckConfirmed,
+          unlockPassword: unlockPassword,
+        ),
       WalletLink(:final stage) => buildWalletLinkStagePicture(stage),
       AccountCompleted() => const KeychainPicture(),
     };
