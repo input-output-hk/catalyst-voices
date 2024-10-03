@@ -190,6 +190,7 @@ class _BlocPasswordPicture extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocUnlockPasswordBuilder<TaskPictureType>(
       selector: (state) => state.pictureType,
+      buildWhen: (previous, current) => previous != current,
       builder: (context, state) => PasswordPicture(type: state),
     );
   }
