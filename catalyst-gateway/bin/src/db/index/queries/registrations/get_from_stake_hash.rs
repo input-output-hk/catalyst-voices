@@ -47,7 +47,7 @@ mod result {
 pub(crate) struct GetStakeAddrQuery;
 
 impl GetStakeAddrQuery {
-    /// Prepares a get txi query.
+    /// Prepares a get get stake addr from stake hash query.
     pub(crate) async fn prepare(session: Arc<Session>) -> anyhow::Result<PreparedStatement> {
         let get_stake_addr_query = PreparedQueries::prepare(
             session,
