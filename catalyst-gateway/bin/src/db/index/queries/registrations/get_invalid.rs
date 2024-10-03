@@ -22,13 +22,18 @@ const GET_INVALID_REGISTRATIONS_FROM_STAKE_ADDR_QUERY: &str =
 pub(crate) struct GetInvalidRegistrationParams {
     /// Stake address.
     pub stake_address: Vec<u8>,
+    /// Block Slot Number when spend occurred.
+    slot_no: num_bigint::BigInt,
 }
 
 impl GetInvalidRegistrationParams {
     /// Create a new instance of [`GetInvalidRegistrationParams`]
-    pub(crate) fn new(stake_addr: Vec<u8>) -> GetInvalidRegistrationParams {
+    pub(crate) fn new(
+        stake_address: Vec<u8>, slot_no: num_bigint::BigInt,
+    ) -> GetInvalidRegistrationParams {
         Self {
-            stake_address: stake_addr,
+            stake_address,
+            slot_no,
         }
     }
 }
@@ -43,6 +48,10 @@ mod result {
     pub(crate) struct GetInvalidRegistrationQuery {
         /// Error report
         pub error_report: Vec<String>,
+        /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
+        pub stake_address: Vec<u8>,
+        /// Voting Public Key
+        pub vote_key: Vec<u8>,
     }
 }
 /// Get invalid registration query.

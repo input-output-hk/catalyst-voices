@@ -54,7 +54,7 @@ pub(crate) struct Cip36Reporting {
 #[derive(Object, Default)]
 pub(crate) struct Cip36Info {
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
-    pub stake_address: Vec<u8>,
+    pub stake_address: String,
     /// Nonce value after normalization.
     pub nonce: u64,
     /// Slot Number the cert is in.
@@ -76,6 +76,10 @@ pub(crate) struct Cip36Info {
 pub(crate) struct InvalidRegistrationsReport {
     /// Error report
     pub error_report: Vec<String>,
+    /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
+    pub stake_address: String,
+    /// Voting Public Key
+    pub vote_key: String,
 }
 
 /// All responses
@@ -113,18 +117,23 @@ pub(crate) async fn get_latest_registration_from_stake_addr(
             },
         };
 
-    let invalids_report =
-        match get_invalid_registrations(registration.stake_address.clone(), session).await {
-            Ok(invalids) => invalids,
-            Err(err) => {
-                error!(
-                    "Failed to obtain invalid registrations for given stake addr:{:?} {:?}",
-                    hex::encode(stake_addr),
-                    err
-                );
-                return Responses::NotFound.into();
-            },
-        };
+    let invalids_report = match get_invalid_registrations(
+        registration.stake_address.clone(),
+        registration.slot_no.into(),
+        session,
+    )
+    .await
+    {
+        Ok(invalids) => invalids,
+        Err(err) => {
+            error!(
+                "Failed to obtain invalid registrations for given stake addr:{:?} {:?}",
+                hex::encode(stake_addr),
+                err
+            );
+            return Responses::NotFound.into();
+        },
+    };
 
     let report = Cip36Reporting {
         cip36: vec![registration],
@@ -164,7 +173,7 @@ async fn get_all_registrations_from_stake_addr(
         };
 
         let cip36 = Cip36Info {
-            stake_address: row.stake_address,
+            stake_address: hex::encode(row.stake_address),
             nonce,
             slot_no,
             txn: row.txn,
@@ -189,11 +198,13 @@ fn sort_latest_registration(mut registrations: Vec<Cip36Info>) -> anyhow::Result
 
 /// Get invalid registrations for stake addr after given slot no
 async fn get_invalid_registrations(
-    stake_addr: Vec<u8>, session: Arc<CassandraSession>,
+    stake_addr: String, slot_no: num_bigint::BigInt, session: Arc<CassandraSession>,
 ) -> anyhow::Result<Vec<InvalidRegistrationsReport>> {
+    let stake_addr = hex::decode(stake_addr)?;
+
     let mut invalid_registrations_iter = GetInvalidRegistrationQuery::execute(
         &session,
-        GetInvalidRegistrationParams::new(stake_addr),
+        GetInvalidRegistrationParams::new(stake_addr, slot_no),
     )
     .await?;
     let mut invalid_registrations = Vec::new();
@@ -202,6 +213,8 @@ async fn get_invalid_registrations(
 
         invalid_registrations.push(InvalidRegistrationsReport {
             error_report: row.error_report,
+            stake_address: hex::encode(row.stake_address),
+            vote_key: hex::encode(row.vote_key),
         });
     }
 
@@ -270,18 +283,25 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
                 },
             };
 
-        let invalids_report =
-            match get_invalid_registrations(registration.stake_address.clone(), session).await {
-                Ok(invalids) => invalids,
-                Err(err) => {
-                    error!(
-                        "Failed to obtain invalid registrations for given stake addr:{:?} {:?}",
-                        hex::encode(registration.stake_address.clone()),
-                        err
-                    );
-                    return Responses::NotFound.into();
-                },
-            };
+        // include any erroneous registrations which occur AFTER the slot# of the last valid
+        // registration
+        let invalids_report = match get_invalid_registrations(
+            registration.stake_address.clone(),
+            registration.slot_no.into(),
+            session,
+        )
+        .await
+        {
+            Ok(invalids) => invalids,
+            Err(err) => {
+                error!(
+                    "Failed to obtain invalid registrations for given stake addr:{:?} {:?}",
+                    hex::encode(registration.stake_address.clone()),
+                    err
+                );
+                return Responses::NotFound.into();
+            },
+        };
 
         let report = Cip36Reporting {
             cip36: vec![registration],
