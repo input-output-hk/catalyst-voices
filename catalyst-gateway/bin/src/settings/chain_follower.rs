@@ -17,12 +17,13 @@ const DEFAULT_SYNC_TASKS: u16 = 16;
 const MAX_SYNC_TASKS: u16 = 256;
 
 /// Default number of slots each sync task will process at one time.
-const DEFAULT_SYNC_MAX_SLOTS: u64 = 100_000;
+/// This default is just over one week worth of data where 1 slot == 1 second.
+const DEFAULT_SYNC_MAX_SLOTS: u64 = 700_000;
 /// Minimum the number of slots each sync task will process at one time can be set to.
 /// Note: This is just the setting minimum, a sync task may sync as few as a 1 slot.
 const MIN_SYNC_MAX_SLOTS: u64 = 10_000;
 /// Maximum the number of slots each sync task will process at one time can be set to.
-const MAX_SYNC_MAX_SLOTS: u64 = 1_000_000;
+const MAX_SYNC_MAX_SLOTS: u64 = 100_000_000;
 
 /// Maximum number of DL Connections (must be in the range 1 to 256 inclusive.)
 const MAX_DL_CONNECTIONS: usize = 256;
