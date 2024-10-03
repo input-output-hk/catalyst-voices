@@ -113,7 +113,7 @@ command:
       # but here we import it explicitly to make sure the latest version is used which addresses
       # the problem from here: https://github.com/jonataslaw/get_cli/issues/263
       win32: ^5.5.4
-      web: ^1.0.0
+      web: ^1.1.0
     dev_dependencies:
       test: ^1.24.9
       build_runner: ^2.4.12
