@@ -708,6 +708,14 @@
   "yes": "Yes",
   "no": "No",
   "total": "Total",
+  "themeLight": "Light",
+  "@themeLight": {
+    "description": "Refers to a light theme mode."
+  },
+  "themeDark": "Dark",
+  "@themeDark": {
+    "description": "Refers to a dark theme mode."
+  },
   "keychainDeletedDialogTitle": "Catalyst keychain removed",
   "@keychainDeletedDialogTitle": {
     "description": "A title on keychain deleted dialog"

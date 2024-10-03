@@ -602,6 +602,12 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get total => 'Total';
 
   @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeDark => 'Dark';
+
+  @override
   String get keychainDeletedDialogTitle => 'Catalyst keychain removed';
 
   @override
