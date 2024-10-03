@@ -37,5 +37,17 @@ void main() {
       expect(optional.isEmpty, isFalse);
       expect(optional.data, data);
     });
+
+    test(
+      'dataOr returns optional data when not null',
+      () {},
+      skip: true,
+    );
+
+    test(
+      'dataOr returns fallback when called on null Optional',
+      () {},
+      skip: true,
+    );
   });
 }

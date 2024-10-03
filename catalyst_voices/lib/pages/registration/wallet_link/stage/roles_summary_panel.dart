@@ -4,16 +4,13 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class RolesSummaryPanel extends StatelessWidget {
-  final Set<AccountRole> defaultRoles;
-  final Set<AccountRole> selectedRoles;
-
   const RolesSummaryPanel({
     super.key,
-    required this.defaultRoles,
-    required this.selectedRoles,
   });
 
   @override
@@ -24,14 +21,11 @@ class RolesSummaryPanel extends StatelessWidget {
         const SizedBox(height: 24),
         RegistrationStageMessage(
           title: Text(context.l10n.walletLinkRoleSummaryTitle),
-          subtitle: _Subtitle(selectedRoles: selectedRoles),
+          subtitle: const _BlocSubtitle(),
           spacing: 12,
         ),
         const SizedBox(height: 12),
-        RolesSummaryContainer(
-          selected: selectedRoles,
-          lockedValuesAsDefault: defaultRoles,
-        ),
+        const _BlocRolesSummaryContainer(),
         const Spacer(),
         VoicesFilledButton(
           leading: VoicesAssets.icons.wallet.buildIcon(),
@@ -48,6 +42,22 @@ class RolesSummaryPanel extends StatelessWidget {
           child: Text(context.l10n.walletLinkTransactionChangeRoles),
         ),
       ],
+    );
+  }
+}
+
+class _BlocSubtitle extends StatelessWidget {
+  const _BlocSubtitle();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<RegistrationCubit, RegistrationState>(
+      builder: (context, state) {
+        final selectedRoles = state.walletLinkStateData.selectedRoles ??
+            state.walletLinkStateData.defaultRoles;
+
+        return _Subtitle(selectedRoles: selectedRoles);
+      },
     );
   }
 }
@@ -75,6 +85,38 @@ class _Subtitle extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _BlocRolesSummaryContainer extends StatelessWidget {
+  const _BlocRolesSummaryContainer();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<RegistrationCubit, RegistrationState>(
+      buildWhen: (previous, current) {
+        final areDefaultRolesSame = setEquals(
+          previous.walletLinkStateData.defaultRoles,
+          current.walletLinkStateData.defaultRoles,
+        );
+
+        final areSelectedRolesSame = setEquals(
+          previous.walletLinkStateData.selectedRoles,
+          current.walletLinkStateData.selectedRoles,
+        );
+
+        return !areDefaultRolesSame || !areSelectedRolesSame;
+      },
+      builder: (context, state) {
+        final defaultRoles = state.walletLinkStateData.defaultRoles;
+        final selectedRoles = state.walletLinkStateData.selectedRoles;
+
+        return RolesSummaryContainer(
+          selected: selectedRoles ?? defaultRoles,
+          lockedValuesAsDefault: defaultRoles,
+        );
+      },
     );
   }
 }

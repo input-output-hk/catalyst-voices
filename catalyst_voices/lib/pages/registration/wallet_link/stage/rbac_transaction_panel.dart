@@ -8,17 +8,11 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class RbacTransactionPanel extends StatelessWidget {
-  final Set<AccountRole> roles;
-  final CardanoWalletDetails walletDetails;
-  final Coin transactionFee;
-
   const RbacTransactionPanel({
     super.key,
-    required this.roles,
-    required this.walletDetails,
-    required this.transactionFee,
   });
 
   @override
@@ -32,16 +26,41 @@ class RbacTransactionPanel extends StatelessWidget {
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: 12),
-        _Summary(
-          roles: roles,
-          walletDetails: walletDetails,
-          transactionFee: transactionFee,
-        ),
+        const _BlocSummary(),
         const SizedBox(height: 18),
         const _PositiveSmallPrint(),
         const Spacer(),
         const _Navigation(),
       ],
+    );
+  }
+}
+
+class _BlocSummary extends StatelessWidget {
+  const _BlocSummary();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<RegistrationCubit, RegistrationState>(
+      buildWhen: (previous, current) {
+        return previous.walletLinkStateData != current.walletLinkStateData;
+      },
+      builder: (context, state) {
+        final roles = state.walletLinkStateData.selectedRoles ??
+            state.walletLinkStateData.defaultRoles;
+        final selectedWallet = state.walletLinkStateData.selectedWallet;
+        final transactionFee = state.walletLinkStateData.transactionFee;
+
+        if (selectedWallet == null) {
+          return const Offstage();
+        }
+
+        return _Summary(
+          roles: roles,
+          walletDetails: selectedWallet,
+          transactionFee: transactionFee,
+        );
+      },
     );
   }
 }

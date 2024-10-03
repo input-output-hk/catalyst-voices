@@ -2,16 +2,13 @@ import 'package:catalyst_voices/pages/registration/registration_stage_navigation
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SeedPhraseCheckPanel extends StatefulWidget {
-  final SeedPhrase? seedPhrase;
-
   const SeedPhraseCheckPanel({
     super.key,
-    this.seedPhrase,
   });
 
   @override
@@ -19,63 +16,23 @@ class SeedPhraseCheckPanel extends StatefulWidget {
 }
 
 class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
-  final _seedPhraseWords = <String>[];
-  final _shuffledSeedPhraseWords = <String>[];
-  final _userWords = <String>[];
-
-  bool get _hasSeedPhraseWords => _seedPhraseWords.isNotEmpty;
-
-  bool get _completedWordsSequence {
-    return _hasSeedPhraseWords && _userWords.length == _seedPhraseWords.length;
-  }
-
-  bool get _completedCorrectlyWordsSequence {
-    return _hasSeedPhraseWords && listEquals(_userWords, _seedPhraseWords);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    _updateSeedPhraseWords();
-    // Note. In debug mode we're prefilling correct seed phrase words
-    // so its faster to test screens
-    _updateUserWords(kDebugMode ? _seedPhraseWords : const []);
-  }
-
-  @override
-  void didUpdateWidget(covariant SeedPhraseCheckPanel oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (widget.seedPhrase != oldWidget.seedPhrase) {
-      _updateSeedPhraseWords();
-      // Note. In debug mode we're prefilling correct seed phrase words
-      // so its faster to test screens
-      _updateUserWords(kDebugMode ? _seedPhraseWords : const []);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Expanded(
-          child: VoicesLoadable(
-            isLoading: _seedPhraseWords.isEmpty,
+          child: _BlocLoadable(
             builder: (context) {
-              return _SeedPhraseWords(
-                words: _shuffledSeedPhraseWords,
-                userWords: _userWords,
+              return _BlocSeedPhraseWords(
                 onUserWordsChanged: _onWordsSequenceChanged,
                 onUploadTap: _uploadSeedPhrase,
                 onResetTap: _clearUserWords,
-                isResetEnabled: _userWords.isNotEmpty,
               );
             },
           ),
         ),
         const SizedBox(height: 10),
-        RegistrationBackNextNavigation(isNextEnabled: _completedWordsSequence),
+        const _BlocNavigation(),
       ],
     );
   }
@@ -85,40 +42,84 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
   }
 
   void _clearUserWords() {
-    setState(_updateUserWords);
+    RegistrationCubit.of(context).keychainCreation.setUserSeedPhraseWords([]);
   }
 
   void _onWordsSequenceChanged(List<String> words) {
-    setState(() {
-      _updateUserWords(words);
-    });
-  }
-
-  void _updateSeedPhraseWords() {
-    final seedPhrase = widget.seedPhrase;
-    final words = seedPhrase?.mnemonicWords ?? <String>[];
-    final shuffledWords = seedPhrase?.shuffledMnemonicWords ?? <String>[];
-
-    _seedPhraseWords
-      ..clear()
-      ..addAll(words);
-
-    _shuffledSeedPhraseWords
-      ..clear()
-      ..addAll(shuffledWords);
-  }
-
-  void _updateUserWords([
-    List<String> words = const [],
-  ]) {
-    _userWords
-      ..clear()
-      ..addAll(words);
-
-    final isConfirmed = _completedCorrectlyWordsSequence;
-
     RegistrationCubit.of(context)
-        .setSeedPhraseCheckConfirmed(isConfirmed: isConfirmed);
+        .keychainCreation
+        .setUserSeedPhraseWords(words);
+  }
+}
+
+class _BlocLoadable extends StatelessWidget {
+  final WidgetBuilder builder;
+
+  const _BlocLoadable({
+    required this.builder,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<RegistrationCubit, RegistrationState>(
+      buildWhen: (previous, current) {
+        return previous.keychainStateData.seedPhraseStateData.isLoading !=
+            current.keychainStateData.seedPhraseStateData.isLoading;
+      },
+      builder: (context, state) {
+        return VoicesLoadable(
+          isLoading: state.keychainStateData.seedPhraseStateData.isLoading,
+          builder: builder,
+        );
+      },
+    );
+  }
+}
+
+class _BlocSeedPhraseWords extends StatelessWidget {
+  const _BlocSeedPhraseWords({
+    required this.onUserWordsChanged,
+    this.onUploadTap,
+    this.onResetTap,
+  });
+
+  final ValueChanged<List<String>> onUserWordsChanged;
+  final VoidCallback? onUploadTap;
+  final VoidCallback? onResetTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<RegistrationCubit, RegistrationState>(
+      buildWhen: (previous, current) {
+        final previousState = previous.keychainStateData.seedPhraseStateData;
+        final currentState = current.keychainStateData.seedPhraseStateData;
+
+        final sameShuffledWords = listEquals(
+          previousState.shuffledWords,
+          currentState.shuffledWords,
+        );
+        final sameUserWords = listEquals(
+          previousState.userWords,
+          currentState.userWords,
+        );
+        final sameIsResetWordsEnabled = previousState.isResetWordsEnabled ==
+            currentState.isResetWordsEnabled;
+
+        return !sameShuffledWords || !sameUserWords || !sameIsResetWordsEnabled;
+      },
+      builder: (context, state) {
+        final stateData = state.keychainStateData.seedPhraseStateData;
+
+        return _SeedPhraseWords(
+          words: stateData.shuffledWords,
+          userWords: stateData.userWords,
+          onUserWordsChanged: onUserWordsChanged,
+          onUploadTap: onUploadTap,
+          onResetTap: onResetTap,
+          isResetEnabled: stateData.isResetWordsEnabled,
+        );
+      },
+    );
   }
 }
 
@@ -190,6 +191,27 @@ class _WordsActions extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _BlocNavigation extends StatelessWidget {
+  const _BlocNavigation();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<RegistrationCubit, RegistrationState>(
+      buildWhen: (previous, current) {
+        return previous
+                .keychainStateData.seedPhraseStateData.areUserWordsCorrect !=
+            current.keychainStateData.seedPhraseStateData.areUserWordsCorrect;
+      },
+      builder: (context, state) {
+        return RegistrationBackNextNavigation(
+          isNextEnabled:
+              state.keychainStateData.seedPhraseStateData.areUserWordsCorrect,
+        );
+      },
     );
   }
 }

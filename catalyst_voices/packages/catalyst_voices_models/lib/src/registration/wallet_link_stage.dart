@@ -16,5 +16,25 @@ enum WalletLinkStage {
   rolesSummary,
 
   /// The user submits an RBAC transaction to finish the registration.
-  rbacTransaction,
+  rbacTransaction;
+
+  WalletLinkStage? get next {
+    final index = WalletLinkStage.values.indexOf(this);
+    final isLast = index == WalletLinkStage.values.length - 1;
+    if (isLast) {
+      return null;
+    }
+
+    return WalletLinkStage.values[index + 1];
+  }
+
+  WalletLinkStage? get previous {
+    final index = WalletLinkStage.values.indexOf(this);
+    final isFirst = index == 0;
+    if (isFirst) {
+      return null;
+    }
+
+    return WalletLinkStage.values[index - 1];
+  }
 }

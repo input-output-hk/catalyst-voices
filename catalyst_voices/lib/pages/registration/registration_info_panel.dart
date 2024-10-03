@@ -29,6 +29,7 @@ class RegistrationInfoPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<RegistrationCubit, RegistrationState>(
+      buildWhen: (previous, current) => previous.step != current.step,
       builder: (context, state) {
         final headerStrings = _buildHeaderStrings(
           context,
@@ -39,7 +40,7 @@ class RegistrationInfoPanel extends StatelessWidget {
           title: headerStrings.title,
           subtitle: headerStrings.subtitle,
           body: headerStrings.body,
-          picture: _RegistrationPicture(state: state),
+          picture: _RegistrationPicture(step: state.step),
           progress: state.progress,
         );
       },
@@ -110,18 +111,15 @@ class RegistrationInfoPanel extends StatelessWidget {
 }
 
 class _RegistrationPicture extends StatelessWidget {
-  final RegistrationState state;
+  final RegistrationStep step;
 
   const _RegistrationPicture({
-    required this.state,
+    required this.step,
   });
 
   @override
   Widget build(BuildContext context) {
-    Widget buildKeychainStagePicture(
-      CreateKeychainStage stage, {
-      required bool isSeedPhraseCheckConfirmed,
-    }) {
+    Widget buildKeychainStagePicture(CreateKeychainStage stage) {
       return switch (stage) {
         CreateKeychainStage.splash ||
         CreateKeychainStage.instructions =>
@@ -129,15 +127,9 @@ class _RegistrationPicture extends StatelessWidget {
         CreateKeychainStage.seedPhrase => const SeedPhrasePicture(),
         CreateKeychainStage.checkSeedPhraseInstructions ||
         CreateKeychainStage.checkSeedPhrase =>
-          const SeedPhrasePicture(
-            indicateSelection: true,
-          ),
-        CreateKeychainStage.checkSeedPhraseResult => SeedPhrasePicture(
-            type: isSeedPhraseCheckConfirmed
-                ? TaskPictureType.success
-                : TaskPictureType.error,
-            indicateSelection: true,
-          ),
+          const SeedPhrasePicture(indicateSelection: true),
+        CreateKeychainStage.checkSeedPhraseResult =>
+          const _BlocSeedPhraseResultPicture(),
         CreateKeychainStage.unlockPasswordInstructions ||
         CreateKeychainStage.unlockPasswordCreate =>
           const PasswordPicture(),
@@ -156,17 +148,38 @@ class _RegistrationPicture extends StatelessWidget {
       };
     }
 
-    return switch (state) {
-      GetStarted() => const KeychainPicture(),
-      FinishAccountCreation() => const KeychainPicture(),
-      Recover() => const KeychainPicture(),
-      CreateKeychain(:final stage, :final seedPhraseState) =>
-        buildKeychainStagePicture(
-          stage,
-          isSeedPhraseCheckConfirmed: seedPhraseState.isCheckConfirmed,
-        ),
-      WalletLink(:final stage) => buildWalletLinkStagePicture(stage),
-      AccountCompleted() => const KeychainPicture(),
+    return switch (step) {
+      GetStartedStep() => const KeychainPicture(),
+      RecoverStep() => const KeychainPicture(),
+      CreateKeychainStep(:final stage) => buildKeychainStagePicture(stage),
+      FinishAccountCreationStep() => const KeychainPicture(),
+      WalletLinkStep(:final stage) => buildWalletLinkStagePicture(stage),
+      AccountCompletedStep() => const KeychainPicture(),
     };
+  }
+}
+
+class _BlocSeedPhraseResultPicture extends StatelessWidget {
+  const _BlocSeedPhraseResultPicture();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<RegistrationCubit, RegistrationState>(
+      buildWhen: (previous, current) {
+        return previous
+                .keychainStateData.seedPhraseStateData.areUserWordsCorrect !=
+            current.keychainStateData.seedPhraseStateData.areUserWordsCorrect;
+      },
+      builder: (context, state) {
+        final areUserWordsCorrect =
+            state.keychainStateData.seedPhraseStateData.areUserWordsCorrect;
+        return SeedPhrasePicture(
+          type: areUserWordsCorrect
+              ? TaskPictureType.success
+              : TaskPictureType.error,
+          indicateSelection: true,
+        );
+      },
+    );
   }
 }

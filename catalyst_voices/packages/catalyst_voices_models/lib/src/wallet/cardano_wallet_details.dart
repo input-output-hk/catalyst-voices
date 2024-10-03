@@ -12,6 +12,8 @@ final class CardanoWalletDetails extends Equatable {
   final Coin balance;
   final ShelleyAddress address;
 
+  bool get hasEnoughBalance => balance >= minAdaForRegistration;
+
   const CardanoWalletDetails({
     required this.wallet,
     required this.balance,

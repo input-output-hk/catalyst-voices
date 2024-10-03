@@ -5,17 +5,13 @@ import 'package:catalyst_voices/widgets/containers/roles_chooser_container.dart'
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class RolesChooserPanel extends StatelessWidget {
-  final Set<AccountRole> defaultRoles;
-  final Set<AccountRole> selectedRoles;
-
   const RolesChooserPanel({
     super.key,
-    required this.defaultRoles,
-    required this.selectedRoles,
   });
 
   @override
@@ -30,11 +26,7 @@ class RolesChooserPanel extends StatelessWidget {
           spacing: 12,
         ),
         const SizedBox(height: 12),
-        RolesChooserContainer(
-          selected: selectedRoles,
-          lockedValuesAsDefault: defaultRoles,
-          onChanged: RegistrationCubit.of(context).selectRoles,
-        ),
+        const _BlocRolesChooserContainer(),
         const Spacer(),
         const RegistrationBackNextNavigation(),
         const SizedBox(height: 10),
@@ -46,6 +38,39 @@ class RolesChooserPanel extends StatelessWidget {
           child: Text(context.l10n.chooseOtherWallet),
         ),
       ],
+    );
+  }
+}
+
+class _BlocRolesChooserContainer extends StatelessWidget {
+  const _BlocRolesChooserContainer();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<RegistrationCubit, RegistrationState>(
+      buildWhen: (previous, current) {
+        final areDefaultRolesSame = setEquals(
+          previous.walletLinkStateData.defaultRoles,
+          current.walletLinkStateData.defaultRoles,
+        );
+
+        final areSelectedRolesSame = setEquals(
+          previous.walletLinkStateData.selectedRoles,
+          current.walletLinkStateData.selectedRoles,
+        );
+
+        return !areDefaultRolesSame || !areSelectedRolesSame;
+      },
+      builder: (context, state) {
+        final defaultRoles = state.walletLinkStateData.defaultRoles;
+        final selectedRoles = state.walletLinkStateData.selectedRoles;
+
+        return RolesChooserContainer(
+          selected: selectedRoles ?? defaultRoles,
+          lockedValuesAsDefault: defaultRoles,
+          onChanged: RegistrationCubit.of(context).selectRoles,
+        );
+      },
     );
   }
 }

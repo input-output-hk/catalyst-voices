@@ -6,25 +6,18 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class WalletDetailsPanel extends StatelessWidget {
-  final Coin minAdaForRegistration;
-  final CardanoWalletDetails walletDetails;
-
   const WalletDetailsPanel({
     super.key,
-    required this.minAdaForRegistration,
-    required this.walletDetails,
   });
 
   @override
   Widget build(BuildContext context) {
-    final hasEnoughBalance = walletDetails.balance >= minAdaForRegistration;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -34,24 +27,37 @@ class WalletDetailsPanel extends StatelessWidget {
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: 32),
-        _WalletExtension(wallet: walletDetails.wallet),
+        const _BlocWalletExtension(),
         const SizedBox(height: 16),
-        Text(
-          context.l10n
-              .walletLinkWalletDetailsContent(walletDetails.wallet.name),
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
+        const _BlocWalletDetailsText(),
         const SizedBox(height: 24),
-        _WalletSummary(
-          details: walletDetails,
-          hasEnoughBalance: hasEnoughBalance,
-        ),
+        const _BlocWalletSummary(),
         const Spacer(),
-        if (hasEnoughBalance)
-          const RegistrationBackNextNavigation()
-        else
-          const _NotEnoughBalanceNavigation(),
+        const _BlocNavigation(),
       ],
+    );
+  }
+}
+
+class _BlocWalletExtension extends StatelessWidget {
+  const _BlocWalletExtension();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<RegistrationCubit, RegistrationState>(
+      buildWhen: (previous, current) {
+        return previous.walletLinkStateData.selectedWallet?.wallet !=
+            current.walletLinkStateData.selectedWallet?.wallet;
+      },
+      builder: (context, state) {
+        final wallet = state.walletLinkStateData.selectedWallet?.wallet;
+
+        if (wallet != null) {
+          return _WalletExtension(wallet: wallet);
+        } else {
+          return const Offstage();
+        }
+      },
     );
   }
 }
@@ -82,12 +88,62 @@ class _WalletExtension extends StatelessWidget {
   }
 }
 
+class _BlocWalletDetailsText extends StatelessWidget {
+  const _BlocWalletDetailsText();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<RegistrationCubit, RegistrationState>(
+      buildWhen: (previous, current) {
+        return previous.walletLinkStateData.selectedWallet?.wallet.name !=
+            current.walletLinkStateData.selectedWallet?.wallet.name;
+      },
+      builder: (context, state) {
+        final name = state.walletLinkStateData.selectedWallet?.wallet.name;
+        return Text(
+          context.l10n.walletLinkWalletDetailsContent(name ?? ''),
+          style: Theme.of(context).textTheme.titleMedium,
+        );
+      },
+    );
+  }
+}
+
+class _BlocWalletSummary extends StatelessWidget {
+  const _BlocWalletSummary();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<RegistrationCubit, RegistrationState>(
+      buildWhen: (previous, current) {
+        return previous.walletLinkStateData.selectedWallet !=
+            current.walletLinkStateData.selectedWallet;
+      },
+      builder: (context, state) {
+        final walletDetails = state.walletLinkStateData.selectedWallet;
+
+        if (walletDetails != null) {
+          return _WalletSummary(
+            balance: walletDetails.balance,
+            address: walletDetails.address,
+            hasEnoughBalance: walletDetails.hasEnoughBalance,
+          );
+        } else {
+          return const Offstage();
+        }
+      },
+    );
+  }
+}
+
 class _WalletSummary extends StatelessWidget {
-  final CardanoWalletDetails details;
+  final Coin balance;
+  final ShelleyAddress address;
   final bool hasEnoughBalance;
 
   const _WalletSummary({
-    required this.details,
+    required this.balance,
+    required this.address,
     required this.hasEnoughBalance,
   });
 
@@ -111,11 +167,11 @@ class _WalletSummary extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           _WalletSummaryBalance(
-            details: details,
+            balance: balance,
             hasEnoughBalance: hasEnoughBalance,
           ),
           const SizedBox(height: 12),
-          _WalletSummaryAddress(details: details),
+          _WalletSummaryAddress(address: address),
           if (!hasEnoughBalance) ...[
             const SizedBox(height: 12),
             Text(
@@ -151,11 +207,11 @@ class _WalletSummary extends StatelessWidget {
 }
 
 class _WalletSummaryBalance extends StatelessWidget {
-  final CardanoWalletDetails details;
+  final Coin balance;
   final bool hasEnoughBalance;
 
   const _WalletSummaryBalance({
-    required this.details,
+    required this.balance,
     required this.hasEnoughBalance,
   });
 
@@ -166,7 +222,7 @@ class _WalletSummaryBalance extends StatelessWidget {
       value: Row(
         children: [
           Text(
-            CryptocurrencyFormatter.formatAmount(details.balance),
+            CryptocurrencyFormatter.formatAmount(balance),
             style: hasEnoughBalance
                 ? null
                 : TextStyle(color: Theme.of(context).colors.iconsError),
@@ -188,10 +244,10 @@ class _WalletSummaryBalance extends StatelessWidget {
 }
 
 class _WalletSummaryAddress extends StatelessWidget {
-  final CardanoWalletDetails details;
+  final ShelleyAddress address;
 
   const _WalletSummaryAddress({
-    required this.details,
+    required this.address,
   });
 
   @override
@@ -200,12 +256,12 @@ class _WalletSummaryAddress extends StatelessWidget {
       label: Text(context.l10n.walletAddress),
       value: Row(
         children: [
-          Text(WalletAddressFormatter.formatShort(details.address)),
+          Text(WalletAddressFormatter.formatShort(address)),
           const SizedBox(width: 4),
           InkWell(
             onTap: () async {
               await Clipboard.setData(
-                ClipboardData(text: details.address.toBech32()),
+                ClipboardData(text: address.toBech32()),
               );
             },
             child: Padding(
@@ -247,6 +303,28 @@ class _WalletSummaryItem extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _BlocNavigation extends StatelessWidget {
+  const _BlocNavigation();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<RegistrationCubit, RegistrationState>(
+      buildWhen: (previous, current) {
+        return previous.walletLinkStateData.selectedWallet?.hasEnoughBalance !=
+            current.walletLinkStateData.selectedWallet?.hasEnoughBalance;
+      },
+      builder: (context, state) {
+        if (state.walletLinkStateData.selectedWallet?.hasEnoughBalance ??
+            false) {
+          return const RegistrationBackNextNavigation();
+        } else {
+          return const _NotEnoughBalanceNavigation();
+        }
+      },
     );
   }
 }

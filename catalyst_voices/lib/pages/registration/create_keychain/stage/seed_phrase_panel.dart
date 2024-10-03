@@ -1,20 +1,15 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/pages/registration/registration_stage_navigation.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SeedPhrasePanel extends StatefulWidget {
-  final SeedPhrase? seedPhrase;
-  final bool isStoreSeedPhraseConfirmed;
-  final bool isNextEnabled;
-
   const SeedPhrasePanel({
     super.key,
-    this.seedPhrase,
-    required this.isStoreSeedPhraseConfirmed,
-    required this.isNextEnabled,
   });
 
   @override
@@ -22,23 +17,10 @@ class SeedPhrasePanel extends StatefulWidget {
 }
 
 class _SeedPhrasePanelState extends State<SeedPhrasePanel> {
-  final _seedPhraseWords = <String>[];
-
   @override
   void initState() {
     super.initState();
-    RegistrationCubit.of(context).buildSeedPhrase();
-
-    _updateWords();
-  }
-
-  @override
-  void didUpdateWidget(covariant SeedPhrasePanel oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (widget.seedPhrase != oldWidget.seedPhrase) {
-      _updateWords();
-    }
+    RegistrationCubit.of(context).keychainCreation.buildSeedPhrase();
   }
 
   @override
@@ -46,45 +28,69 @@ class _SeedPhrasePanelState extends State<SeedPhrasePanel> {
     return Column(
       children: [
         Expanded(
-          child: VoicesLoadable(
-            isLoading: _seedPhraseWords.isEmpty,
-            builder: (context) {
-              return _SeedPhraseWords(
-                words: _seedPhraseWords,
-                onDownloadTap: _downloadSeedPhrase,
-              );
-            },
+          child: _BlocLoadable(
+            builder: (context) => const _BlocSeedPhraseWords(),
           ),
         ),
         const SizedBox(height: 10),
-        _SeedPhraseStoredConfirmation(
-          isConfirmed: widget.isStoreSeedPhraseConfirmed,
-        ),
+        const _BlocStoredCheckbox(),
         const SizedBox(height: 10),
-        RegistrationBackNextNavigation(isNextEnabled: widget.isNextEnabled),
+        const _BlocNavigation(),
       ],
     );
   }
+}
 
-  Future<void> _downloadSeedPhrase() async {
-    await RegistrationCubit.of(context).downloadSeedPhrase();
+class _BlocLoadable extends StatelessWidget {
+  final WidgetBuilder builder;
+
+  const _BlocLoadable({
+    required this.builder,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<RegistrationCubit, RegistrationState>(
+      buildWhen: (previous, current) {
+        return previous.keychainStateData.seedPhraseStateData.isLoading !=
+            current.keychainStateData.seedPhraseStateData.isLoading;
+      },
+      builder: (context, state) {
+        return VoicesLoadable(
+          isLoading: state.keychainStateData.seedPhraseStateData.isLoading,
+          builder: builder,
+        );
+      },
+    );
   }
+}
 
-  void _updateWords() {
-    _seedPhraseWords
-      ..clear()
-      ..addAll(widget.seedPhrase?.mnemonicWords ?? []);
+class _BlocSeedPhraseWords extends StatelessWidget {
+  const _BlocSeedPhraseWords();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<RegistrationCubit, RegistrationState>(
+      buildWhen: (previous, current) {
+        return previous.keychainStateData.seedPhraseStateData.seedPhrase !=
+            current.keychainStateData.seedPhraseStateData.seedPhrase;
+      },
+      builder: (context, state) {
+        final seedPhrase =
+            state.keychainStateData.seedPhraseStateData.seedPhrase;
+
+        final words = seedPhrase?.mnemonicWords ?? [];
+
+        return _SeedPhraseWords(words);
+      },
+    );
   }
 }
 
 class _SeedPhraseWords extends StatelessWidget {
   final List<String> words;
-  final VoidCallback? onDownloadTap;
 
-  const _SeedPhraseWords({
-    required this.words,
-    this.onDownloadTap,
-  });
+  const _SeedPhraseWords(this.words);
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +103,13 @@ class _SeedPhraseWords extends StatelessWidget {
           SeedPhrasesViewer(words: words),
           const SizedBox(height: 10),
           VoicesTextButton(
-            onTap: onDownloadTap,
+            onTap: () {
+              unawaited(
+                RegistrationCubit.of(context)
+                    .keychainCreation
+                    .downloadSeedPhrase(),
+              );
+            },
             child: Text(context.l10n.createKeychainSeedPhraseDownload),
           ),
         ],
@@ -106,10 +118,31 @@ class _SeedPhraseWords extends StatelessWidget {
   }
 }
 
-class _SeedPhraseStoredConfirmation extends StatelessWidget {
+class _BlocStoredCheckbox extends StatelessWidget {
+  const _BlocStoredCheckbox();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<RegistrationCubit, RegistrationState>(
+      buildWhen: (previous, current) {
+        return previous
+                .keychainStateData.seedPhraseStateData.isStoredConfirmed !=
+            current.keychainStateData.seedPhraseStateData.isStoredConfirmed;
+      },
+      builder: (context, state) {
+        return _StoredCheckbox(
+          isConfirmed:
+              state.keychainStateData.seedPhraseStateData.isStoredConfirmed,
+        );
+      },
+    );
+  }
+}
+
+class _StoredCheckbox extends StatelessWidget {
   final bool isConfirmed;
 
-  const _SeedPhraseStoredConfirmation({
+  const _StoredCheckbox({
     this.isConfirmed = false,
   });
 
@@ -119,7 +152,30 @@ class _SeedPhraseStoredConfirmation extends StatelessWidget {
       value: isConfirmed,
       label: Text(context.l10n.createKeychainSeedPhraseStoreConfirmation),
       onChanged: (value) {
-        RegistrationCubit.of(context).confirmSeedPhraseStored(confirmed: value);
+        RegistrationCubit.of(context)
+            .keychainCreation
+            .setSeedPhraseStored(value);
+      },
+    );
+  }
+}
+
+class _BlocNavigation extends StatelessWidget {
+  const _BlocNavigation();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<RegistrationCubit, RegistrationState>(
+      buildWhen: (previous, current) {
+        return previous
+                .keychainStateData.seedPhraseStateData.isStoredConfirmed !=
+            current.keychainStateData.seedPhraseStateData.isStoredConfirmed;
+      },
+      builder: (context, state) {
+        return RegistrationBackNextNavigation(
+          isNextEnabled:
+              state.keychainStateData.seedPhraseStateData.isStoredConfirmed,
+        );
       },
     );
   }

@@ -21,17 +21,18 @@ final class WalletLinkStateData extends Equatable {
   /// Returns the default roles every account will have.
   Set<AccountRole> get defaultRoles => {AccountRole.voter};
 
+  // TODO(dtscalac): pass valid fee
+  Coin get transactionFee => Coin.fromAda(0.9438);
+
   WalletLinkStateData copyWith({
     Optional<Result<List<CardanoWallet>, Exception>>? wallets,
     Optional<CardanoWalletDetails>? selectedWallet,
     Optional<Set<AccountRole>>? selectedRoles,
   }) {
     return WalletLinkStateData(
-      wallets: wallets != null ? wallets.data : this.wallets,
-      selectedWallet:
-          selectedWallet != null ? selectedWallet.data : this.selectedWallet,
-      selectedRoles:
-          selectedRoles != null ? selectedRoles.data : this.selectedRoles,
+      wallets: wallets.dataOr(this.wallets),
+      selectedWallet: selectedWallet.dataOr(this.selectedWallet),
+      selectedRoles: selectedRoles.dataOr(this.selectedRoles),
     );
   }
 

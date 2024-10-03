@@ -37,3 +37,14 @@ final class Optional<T extends Object> extends Equatable {
   @override
   List<Object?> get props => [data];
 }
+
+extension NullableOptionalExt<T extends Object> on Optional<T>? {
+  /// Returns [data] from [Optional] if not null.
+  /// [fallback] is returned otherwise.
+  ///
+  /// Useful when working with copyWith pattern.
+  T? dataOr(T? fallback) {
+    final instance = this;
+    return instance != null ? instance.data : fallback;
+  }
+}

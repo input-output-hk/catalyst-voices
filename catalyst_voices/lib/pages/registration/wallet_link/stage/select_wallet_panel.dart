@@ -6,17 +6,15 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:result_type/result_type.dart';
 
 /// Callback called when a [wallet] is selected.
 typedef _OnSelectWallet = Future<void> Function(CardanoWallet wallet);
 
 class SelectWalletPanel extends StatefulWidget {
-  final Result<List<CardanoWallet>, Exception>? walletsResult;
-
   const SelectWalletPanel({
     super.key,
-    this.walletsResult,
   });
 
   @override
@@ -42,8 +40,7 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
         ),
         const SizedBox(height: 40),
         Expanded(
-          child: _Wallets(
-            result: widget.walletsResult,
+          child: _BlocWallets(
             onRefreshTap: _refreshWallets,
             onSelectWallet: _onSelectWallet,
           ),
@@ -70,6 +67,33 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
 
   Future<void> _onSelectWallet(CardanoWallet wallet) async {
     return RegistrationCubit.of(context).selectWallet(wallet);
+  }
+}
+
+class _BlocWallets extends StatelessWidget {
+  final _OnSelectWallet onSelectWallet;
+  final VoidCallback onRefreshTap;
+
+  const _BlocWallets({
+    required this.onSelectWallet,
+    required this.onRefreshTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<RegistrationCubit, RegistrationState>(
+      buildWhen: (previous, current) {
+        return previous.walletLinkStateData.wallets !=
+            current.walletLinkStateData.wallets;
+      },
+      builder: (context, state) {
+        return _Wallets(
+          result: state.walletLinkStateData.wallets,
+          onRefreshTap: onRefreshTap,
+          onSelectWallet: onSelectWallet,
+        );
+      },
+    );
   }
 }
 
