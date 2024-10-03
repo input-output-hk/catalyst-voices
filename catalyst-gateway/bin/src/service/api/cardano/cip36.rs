@@ -35,7 +35,7 @@ pub(crate) enum ResponseSingleRegistration {
 pub(crate) enum ResponseMultipleRegistrations {
     /// Cip36 registration
     #[oai(status = 200)]
-    Ok(Json<Vec<Cip36Info>>),
+    Ok(Json<Vec<Cip36Reporting>>),
     /// No valid registration
     #[oai(status = 404)]
     NotFound,
@@ -88,15 +88,15 @@ pub(crate) struct InvalidRegistrationsReport {
     pub cip36: bool,
 }
 
-/// All responses
-pub(crate) type AllResponses = WithErrorResponses<ResponseSingleRegistration>;
+/// Single registration response
+pub(crate) type SingleRegistrationResponse = WithErrorResponses<ResponseSingleRegistration>;
 /// All responses voting key
-pub(crate) type AllResponsesVotingKey = WithErrorResponses<ResponseMultipleRegistrations>;
+pub(crate) type MultipleRegistrationResponse = WithErrorResponses<ResponseMultipleRegistrations>;
 
 /// Get latest registration given a stake address
 pub(crate) async fn get_latest_registration_from_stake_addr(
     stake_addr: String, persistent: bool,
-) -> AllResponses {
+) -> SingleRegistrationResponse {
     let stake_addr = match hex::decode(stake_addr) {
         Ok(stake_addr) => stake_addr,
         Err(err) => {
@@ -244,7 +244,7 @@ fn check_stake_addr_voting_key_association(
 /// Get latest registration given a stake key hash.
 pub(crate) async fn get_latest_registration_from_stake_key_hash(
     stake_hash: String, persistent: bool,
-) -> AllResponses {
+) -> SingleRegistrationResponse {
     let stake_hash = match hex::decode(stake_hash) {
         Ok(stake_hash) => stake_hash,
         Err(err) => {
@@ -324,10 +324,11 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
 }
 
 /// Returns the list of stake address registrations currently associated with a given
-/// voting key.
+/// voting key and returns any erroneous registrations which occur AFTER the slot# of the
+/// last valid registration.
 pub(crate) async fn get_asscociated_vote_key_registrations(
     vote_key: String, persistent: bool,
-) -> AllResponsesVotingKey {
+) -> MultipleRegistrationResponse {
     let vote_key = match hex::decode(vote_key) {
         Ok(vote_key) => vote_key,
         Err(err) => {
@@ -363,8 +364,11 @@ pub(crate) async fn get_asscociated_vote_key_registrations(
             },
         };
 
+        // We have obtained all the stake addresses associated with the vote key.
         let registrations =
-            match get_all_registrations_from_stake_addr(session, row.stake_address.clone()).await {
+            match get_all_registrations_from_stake_addr(session.clone(), row.stake_address.clone())
+                .await
+            {
                 Ok(registration) => registration,
                 Err(err) => {
                     error!(
@@ -376,11 +380,43 @@ pub(crate) async fn get_asscociated_vote_key_registrations(
                 },
             };
 
-        return ResponseMultipleRegistrations::Ok(Json(check_stake_addr_voting_key_association(
-            registrations,
-            &hex::encode(vote_key),
-        )))
-        .into();
+        // check stake addrs are still actively associated with the voting key, and have not been
+        // registered to another voting key.
+        let redacted_registrations =
+            check_stake_addr_voting_key_association(registrations, &hex::encode(vote_key));
+
+        // Report includes registration info and  any erroneous registrations which occur AFTER
+        // the slot# of the last valid registration
+        let mut reports = Vec::new();
+
+        for registration in redacted_registrations {
+            let invalids_report = match get_invalid_registrations(
+                registration.stake_address.clone(),
+                registration.slot_no.into(),
+                session.clone(),
+            )
+            .await
+            {
+                Ok(invalids) => invalids,
+                Err(err) => {
+                    error!(
+                        "Failed to obtain invalid registrations for given stake addr:{:?} {:?}",
+                        hex::encode(registration.stake_address.clone()),
+                        err
+                    );
+                    continue;
+                },
+            };
+
+            let report = Cip36Reporting {
+                cip36: vec![registration],
+                invalids: invalids_report,
+            };
+
+            reports.push(report);
+        }
+
+        return ResponseMultipleRegistrations::Ok(Json(reports)).into();
     }
 
     ResponseMultipleRegistrations::NotFound.into()
