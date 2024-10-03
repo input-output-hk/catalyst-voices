@@ -1156,11 +1156,11 @@ abstract class VoicesLocalizations {
   /// **'browse'**
   String get browse;
 
-  /// No description provided for @uploadDropInfo.
+  /// An info on upload dialog
   ///
   /// In en, this message translates to:
   /// **'Drop your {itemNameToUpload} here or '**
-  String uploadDropInfo(Object itemNameToUpload);
+  String uploadDropInfo(String itemNameToUpload);
 
   /// No description provided for @uploadProgressInfo.
   ///
@@ -1168,16 +1168,16 @@ abstract class VoicesLocalizations {
   /// **'Upload in progress'**
   String get uploadProgressInfo;
 
-  /// Make sure it's a correct Catalyst keychain file.
+  /// A title on keychain upload dialog
   ///
   /// In en, this message translates to:
   /// **'Upload Catalyst Keychain'**
   String get uploadKeychainTitle;
 
-  /// No description provided for @uploadKeychainInfo.
+  /// An info on keychain upload dialog
   ///
   /// In en, this message translates to:
-  /// **'Upload Catalyst Keychain'**
+  /// **'Make sure it\'s a correct Catalyst keychain file.'**
   String get uploadKeychainInfo;
 
   /// A title on keychain deleted dialog

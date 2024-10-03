@@ -713,14 +713,22 @@
   "upload": "Upload",
   "browse": "browse",
   "uploadDropInfo": "Drop your {itemNameToUpload} here or ",
+  "@uploadDropInfo": {
+    "description": "An info on upload dialog",
+    "placeholders": {
+      "itemNameToUpload": {
+        "type": "String"
+      }
+    }
+  },
   "uploadProgressInfo": "Upload in progress",
   "uploadKeychainTitle": "Upload Catalyst Keychain",
   "@uploadKeychainTitle": {
     "description": "A title on keychain upload dialog"
   },
-  "uploadKeychainInfo": "Upload Catalyst Keychain",
-  "@uploadKeychainTitle": {
-    "description": "Make sure it's a correct Catalyst keychain file."
+  "uploadKeychainInfo": "Make sure it's a correct Catalyst keychain file.",
+  "@uploadKeychainInfo": {
+    "description": "An info on keychain upload dialog"
   },
   "keychainDeletedDialogTitle": "Catalyst keychain removed",
   "@keychainDeletedDialogTitle": {

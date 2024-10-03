@@ -614,7 +614,7 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get browse => 'browse';
 
   @override
-  String uploadDropInfo(Object itemNameToUpload) {
+  String uploadDropInfo(String itemNameToUpload) {
     return 'Drop your $itemNameToUpload here or ';
   }
 
@@ -625,7 +625,7 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get uploadKeychainTitle => 'Upload Catalyst Keychain';
 
   @override
-  String get uploadKeychainInfo => 'Upload Catalyst Keychain';
+  String get uploadKeychainInfo => 'Make sure it\'s a correct Catalyst keychain file.';
 
   @override
   String get keychainDeletedDialogTitle => 'Catalyst keychain removed';
