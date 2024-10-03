@@ -1132,6 +1132,18 @@ abstract class VoicesLocalizations {
   /// **'Total'**
   String get total;
 
+  /// Refers to a light theme mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeLight;
+
+  /// Refers to a dark theme mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeDark;
+
   /// A title on keychain deleted dialog
   ///
   /// In en, this message translates to:
