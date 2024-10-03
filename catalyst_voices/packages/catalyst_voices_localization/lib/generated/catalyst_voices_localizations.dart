@@ -1132,53 +1132,17 @@ abstract class VoicesLocalizations {
   /// **'Total'**
   String get total;
 
-  /// No description provided for @file.
+  /// Refers to a light theme mode.
   ///
   /// In en, this message translates to:
-  /// **'file'**
-  String get file;
+  /// **'Light'**
+  String get themeLight;
 
-  /// No description provided for @key.
+  /// Refers to a dark theme mode.
   ///
   /// In en, this message translates to:
-  /// **'key'**
-  String get key;
-
-  /// No description provided for @upload.
-  ///
-  /// In en, this message translates to:
-  /// **'Upload'**
-  String get upload;
-
-  /// No description provided for @browse.
-  ///
-  /// In en, this message translates to:
-  /// **'browse'**
-  String get browse;
-
-  /// An info on upload dialog
-  ///
-  /// In en, this message translates to:
-  /// **'Drop your {itemNameToUpload} here or '**
-  String uploadDropInfo(String itemNameToUpload);
-
-  /// No description provided for @uploadProgressInfo.
-  ///
-  /// In en, this message translates to:
-  /// **'Upload in progress'**
-  String get uploadProgressInfo;
-
-  /// A title on keychain upload dialog
-  ///
-  /// In en, this message translates to:
-  /// **'Upload Catalyst Keychain'**
-  String get uploadKeychainTitle;
-
-  /// An info on keychain upload dialog
-  ///
-  /// In en, this message translates to:
-  /// **'Make sure it\'s a correct Catalyst keychain file.'**
-  String get uploadKeychainInfo;
+  /// **'Dark'**
+  String get themeDark;
 
   /// A title on keychain deleted dialog
   ///
@@ -1293,6 +1257,42 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.    But it can be a bit tedious to enter every single time you want to use the app.    In this next step, you\'ll set your Unlock Password for your current device. It\'s like a shortcut for proving ownership of your Keychain.    Whenever you recover your account for the first time on a new device, you\'ll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.'**
   String get createKeychainUnlockPasswordInstructionsSubtitle;
+
+  /// No description provided for @createKeychainCreatedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Congratulations your Catalyst  Keychain is created!'**
+  String get createKeychainCreatedTitle;
+
+  /// No description provided for @createKeychainCreatedNextStep.
+  ///
+  /// In en, this message translates to:
+  /// **'In the next step you write your Catalyst roles and  account to the Cardano Mainnet.'**
+  String get createKeychainCreatedNextStep;
+
+  /// No description provided for @createKeychainLinkWalletAndRoles.
+  ///
+  /// In en, this message translates to:
+  /// **'Link your Cardano Wallet & Roles'**
+  String get createKeychainLinkWalletAndRoles;
+
+  /// No description provided for @registrationCreateKeychainStepGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst Keychain created'**
+  String get registrationCreateKeychainStepGroup;
+
+  /// No description provided for @registrationLinkWalletStepGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Link Cardano Wallet & Roles'**
+  String get registrationLinkWalletStepGroup;
+
+  /// No description provided for @registrationCompletedStepGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst account creation completed!'**
+  String get registrationCompletedStepGroup;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

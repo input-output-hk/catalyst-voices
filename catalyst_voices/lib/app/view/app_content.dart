@@ -6,7 +6,7 @@ import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 
 const _restorationScopeId = 'rootVoices';
 
-final class AppContent extends StatelessWidget {
+final class AppContent extends StatefulWidget {
   final RouterConfig<Object> routerConfig;
 
   const AppContent({
@@ -14,11 +14,22 @@ final class AppContent extends StatelessWidget {
     required this.routerConfig,
   });
 
-  List<LocalizationsDelegate<dynamic>> get _localizationsDelegates {
-    return const [
-      ...VoicesLocalizations.localizationsDelegates,
-      LocaleNamesLocalizationsDelegate(),
-    ];
+  @override
+  State<AppContent> createState() => AppContentState();
+
+  /// Returns the state associated with the [AppContent].
+  static AppContentState of(BuildContext context) {
+    return context.findAncestorStateOfType<AppContentState>()!;
+  }
+}
+
+class AppContentState extends State<AppContent> {
+  ThemeMode _themeMode = ThemeMode.light;
+
+  void updateThemeMode(ThemeMode themeMode) {
+    setState(() {
+      _themeMode = themeMode;
+    });
   }
 
   @override
@@ -28,9 +39,8 @@ final class AppContent extends StatelessWidget {
       localizationsDelegates: _localizationsDelegates,
       supportedLocales: VoicesLocalizations.supportedLocales,
       localeListResolutionCallback: basicLocaleListResolution,
-      routerConfig: routerConfig,
-      // Light mode is "go to" for now.
-      themeMode: ThemeMode.light,
+      routerConfig: widget.routerConfig,
+      themeMode: _themeMode,
       theme: ThemeBuilder.buildTheme(
         brand: Brand.catalyst,
         brightness: Brightness.light,
@@ -45,5 +55,12 @@ final class AppContent extends StatelessWidget {
         );
       },
     );
+  }
+
+  List<LocalizationsDelegate<dynamic>> get _localizationsDelegates {
+    return const [
+      ...VoicesLocalizations.localizationsDelegates,
+      LocaleNamesLocalizationsDelegate(),
+    ];
   }
 }
