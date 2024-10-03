@@ -44,14 +44,14 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     return super.close();
   }
 
-  void createNewKeychain() {
+  void createNewKeychainStep() {
     final nextStep = _nextStep(from: const CreateKeychainStep());
     if (nextStep != null) {
       _goToStep(nextStep);
     }
   }
 
-  void recoverKeychain() {
+  void recoverKeychainStep() {
     final nextStep = _nextStep(from: const RecoverStep());
     if (nextStep != null) {
       _goToStep(nextStep);
@@ -107,6 +107,16 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
       isConfirmed: isConfirmed,
     );
   }
+
+  void setPassword(String newValue) {
+    _keychainCreationCubit.setPassword(newValue);
+  }
+
+  void setConfirmPassword(String newValue) {
+    _keychainCreationCubit.setConfirmPassword(newValue);
+  }
+
+  Future<void> createKeychain() => _keychainCreationCubit.createKeychain();
 
   void refreshWallets() {
     unawaited(_walletLinkCubit.refreshWallets());
