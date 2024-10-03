@@ -24,7 +24,7 @@ class FinishAccountCreationPanel extends StatelessWidget {
               children: [
                 _TitleText(),
                 SizedBox(height: 24),
-                RegistrationProgressKeychainCompleted()
+                RegistrationProgressKeychainCompleted(),
               ],
             ),
           ),
