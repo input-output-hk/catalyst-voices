@@ -70,8 +70,11 @@ class RegistrationInfoPanel extends StatelessWidget {
         CreateKeychainStage.checkSeedPhraseResult ||
         CreateKeychainStage.unlockPasswordInstructions =>
           _HeaderStrings(title: context.l10n.catalystKeychain),
-        CreateKeychainStage.unlockPasswordCreate =>
-          _HeaderStrings(title: 'TODO'),
+        CreateKeychainStage.unlockPasswordCreate => _HeaderStrings(
+            title: context.l10n.catalystKeychain,
+            subtitle: context.l10n.createKeychainUnlockPasswordIntoSubtitle,
+            body: context.l10n.createKeychainUnlockPasswordIntoBody,
+          ),
       };
     }
 
@@ -99,7 +102,8 @@ class RegistrationInfoPanel extends StatelessWidget {
 
     return switch (step) {
       GetStartedStep() => _HeaderStrings(title: context.l10n.getStarted),
-      FinishAccountCreationStep() => _HeaderStrings(title: 'TODO'),
+      FinishAccountCreationStep() =>
+        _HeaderStrings(title: context.l10n.catalystKeychain),
       RecoverStep() => _HeaderStrings(title: 'TODO'),
       CreateKeychainStep(:final stage) => buildKeychainStageHeader(stage),
       WalletLinkStep(:final stage) => buildWalletLinkStageHeader(stage),
@@ -120,6 +124,7 @@ class _RegistrationPicture extends StatelessWidget {
     Widget buildKeychainStagePicture(
       CreateKeychainStage stage, {
       required bool isSeedPhraseCheckConfirmed,
+      required UnlockPasswordState unlockPassword,
     }) {
       return switch (stage) {
         CreateKeychainStage.splash ||
@@ -139,7 +144,9 @@ class _RegistrationPicture extends StatelessWidget {
           ),
         CreateKeychainStage.unlockPasswordInstructions ||
         CreateKeychainStage.unlockPasswordCreate =>
-          const PasswordPicture(),
+          PasswordPicture(
+            type: unlockPassword.pictureType,
+          ),
       };
     }
 
@@ -159,13 +166,26 @@ class _RegistrationPicture extends StatelessWidget {
       GetStarted() => const KeychainPicture(),
       FinishAccountCreation() => const KeychainPicture(),
       Recover() => const KeychainPicture(),
-      CreateKeychain(:final stage, :final seedPhraseState) =>
+      CreateKeychain(:final stage, :final seedPhrase, :final unlockPassword) =>
         buildKeychainStagePicture(
           stage,
-          isSeedPhraseCheckConfirmed: seedPhraseState.isCheckConfirmed,
+          isSeedPhraseCheckConfirmed: seedPhrase.isCheckConfirmed,
+          unlockPassword: unlockPassword,
         ),
       WalletLink(:final stage) => buildWalletLinkStagePicture(stage),
       AccountCompleted() => const KeychainPicture(),
     };
+  }
+}
+
+extension _UnlockPasswordStateExt on UnlockPasswordState {
+  TaskPictureType get pictureType {
+    if (showPasswordMisMatch) {
+      return TaskPictureType.error;
+    }
+    if (isNextEnabled) {
+      return TaskPictureType.success;
+    }
+    return TaskPictureType.normal;
   }
 }

@@ -832,6 +832,36 @@ abstract class VoicesLocalizations {
   /// **'In Catalyst you can take on different roles, learn more below and choose your additional roles now.'**
   String get walletLinkRoleChooserContent;
 
+  /// A title on the role summary screen in registration.
+  ///
+  /// In en, this message translates to:
+  /// **'Is this your correct Catalyst role setup?'**
+  String get walletLinkRoleSummaryTitle;
+
+  /// The first part of the message on the role summary screen in registration.
+  ///
+  /// In en, this message translates to:
+  /// **'You would like to register '**
+  String get walletLinkRoleSummaryContent1;
+
+  /// The middle (bold) part of the message on the role summary screen in registration.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} active {count, plural, =0{roles} =1{role} other{roles}}'**
+  String walletLinkRoleSummaryContent2(num count);
+
+  /// The last part of the message on the role summary screen in registration.
+  ///
+  /// In en, this message translates to:
+  /// **' in Catalyst.'**
+  String get walletLinkRoleSummaryContent3;
+
+  /// A button label on the role summary screen in registration for the next step.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm & Sign with wallet'**
+  String get walletLinkRoleSummaryButton;
+
   /// Message shown when redirecting to external content that describes which wallets are supported.
   ///
   /// In en, this message translates to:
@@ -1102,6 +1132,18 @@ abstract class VoicesLocalizations {
   /// **'Total'**
   String get total;
 
+  /// Refers to a light theme mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeLight;
+
+  /// Refers to a dark theme mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeDark;
+
   /// A title on keychain deleted dialog
   ///
   /// In en, this message translates to:
@@ -1215,6 +1257,78 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.    But it can be a bit tedious to enter every single time you want to use the app.    In this next step, you\'ll set your Unlock Password for your current device. It\'s like a shortcut for proving ownership of your Keychain.    Whenever you recover your account for the first time on a new device, you\'ll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.'**
   String get createKeychainUnlockPasswordInstructionsSubtitle;
+
+  /// No description provided for @createKeychainCreatedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Congratulations your Catalyst  Keychain is created!'**
+  String get createKeychainCreatedTitle;
+
+  /// No description provided for @createKeychainCreatedNextStep.
+  ///
+  /// In en, this message translates to:
+  /// **'In the next step you write your Catalyst roles and  account to the Cardano Mainnet.'**
+  String get createKeychainCreatedNextStep;
+
+  /// No description provided for @createKeychainLinkWalletAndRoles.
+  ///
+  /// In en, this message translates to:
+  /// **'Link your Cardano Wallet & Roles'**
+  String get createKeychainLinkWalletAndRoles;
+
+  /// No description provided for @registrationCreateKeychainStepGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst Keychain created'**
+  String get registrationCreateKeychainStepGroup;
+
+  /// No description provided for @registrationLinkWalletStepGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Link Cardano Wallet & Roles'**
+  String get registrationLinkWalletStepGroup;
+
+  /// No description provided for @registrationCompletedStepGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst account creation completed!'**
+  String get registrationCompletedStepGroup;
+
+  /// No description provided for @createKeychainUnlockPasswordIntoSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst unlock password'**
+  String get createKeychainUnlockPasswordIntoSubtitle;
+
+  /// No description provided for @createKeychainUnlockPasswordIntoBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Please provide a password for your Catalyst Keychain.'**
+  String get createKeychainUnlockPasswordIntoBody;
+
+  /// No description provided for @enterPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter password'**
+  String get enterPassword;
+
+  /// No description provided for @confirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm password'**
+  String get confirmPassword;
+
+  /// No description provided for @xCharactersMinimum.
+  ///
+  /// In en, this message translates to:
+  /// **'{number} characters minimum length'**
+  String xCharactersMinimum(int number);
+
+  /// When user confirms password but it does not match original one.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match, please correct'**
+  String get passwordDoNotMatch;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

@@ -44,14 +44,14 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     return super.close();
   }
 
-  void createNewKeychain() {
+  void createNewKeychainStep() {
     final nextStep = _nextStep(from: const CreateKeychainStep());
     if (nextStep != null) {
       _goToStep(nextStep);
     }
   }
 
-  void recoverKeychain() {
+  void recoverKeychainStep() {
     final nextStep = _nextStep(from: const RecoverStep());
     if (nextStep != null) {
       _goToStep(nextStep);
@@ -108,6 +108,16 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     );
   }
 
+  void setPassword(String newValue) {
+    _keychainCreationCubit.setPassword(newValue);
+  }
+
+  void setConfirmPassword(String newValue) {
+    _keychainCreationCubit.setConfirmPassword(newValue);
+  }
+
+  Future<void> createKeychain() => _keychainCreationCubit.createKeychain();
+
   void refreshWallets() {
     unawaited(_walletLinkCubit.refreshWallets());
   }
@@ -128,6 +138,11 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     final step = from ?? state.step;
 
     RegistrationStep nextKeychainStep() {
+      // if current step is not from create keychain just return current one
+      if (state.step is! CreateKeychainStep) {
+        return _keychainCreationCubit.state.step;
+      }
+
       final nextStep = _keychainCreationCubit.nextStep();
 
       // if there is no next step from keychain creation go to finish account.
@@ -135,6 +150,11 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     }
 
     RegistrationStep nextWalletLinkStep() {
+      // if current step is not from create WalletLink just return current one
+      if (state.step is! WalletLinkStep) {
+        return _walletLinkCubit.state.step;
+      }
+
       final nextStep = _walletLinkCubit.nextStep();
 
       // if there is no next step from wallet link go to account completed.
