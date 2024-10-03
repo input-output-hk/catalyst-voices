@@ -63,6 +63,10 @@ final class WalletLinkCubit extends Cubit<WalletLink> {
     }
   }
 
+  void selectRoles(Set<AccountRole> roles) {
+    _stateData = _stateData.copyWith(selectedRoles: Optional(roles));
+  }
+
   WalletLinkStep? nextStep() {
     final currentStageIndex = WalletLinkStage.values.indexOf(state.stage);
     final isLast = currentStageIndex == WalletLinkStage.values.length - 1;

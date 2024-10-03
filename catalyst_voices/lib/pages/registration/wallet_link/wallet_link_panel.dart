@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/pages/registration/wallet_link/stage/intro_panel.dart';
 import 'package:catalyst_voices/pages/registration/wallet_link/stage/rbac_transaction_panel.dart';
 import 'package:catalyst_voices/pages/registration/wallet_link/stage/roles_chooser_panel.dart';
@@ -27,11 +28,22 @@ class WalletLinkPanel extends StatelessWidget {
         ),
       WalletLinkStage.walletDetails => WalletDetailsPanel(
           minAdaForRegistration: stateData.minAdaForRegistration,
-          details: stateData.selectedWallet!,
+          walletDetails: stateData.selectedWallet!,
         ),
-      WalletLinkStage.rolesChooser => const RolesChooserPanel(),
-      WalletLinkStage.rolesSummary => const RolesSummaryPanel(),
-      WalletLinkStage.rbacTransaction => const RbacTransactionPanel(),
+      WalletLinkStage.rolesChooser => RolesChooserPanel(
+          defaultRoles: stateData.defaultRoles,
+          selectedRoles: stateData.selectedRoles ?? stateData.defaultRoles,
+        ),
+      WalletLinkStage.rolesSummary => RolesSummaryPanel(
+          defaultRoles: stateData.defaultRoles,
+          selectedRoles: stateData.selectedRoles ?? stateData.defaultRoles,
+        ),
+      WalletLinkStage.rbacTransaction => RbacTransactionPanel(
+          roles: stateData.selectedRoles ?? stateData.defaultRoles,
+          walletDetails: stateData.selectedWallet!,
+          // TODO(dtscalac): pass valid fee
+          transactionFee: Coin.fromAda(0.9438),
+        ),
     };
   }
 }

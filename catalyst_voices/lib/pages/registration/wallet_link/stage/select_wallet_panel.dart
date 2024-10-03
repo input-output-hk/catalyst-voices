@@ -1,4 +1,5 @@
 import 'package:catalyst_cardano/catalyst_cardano.dart';
+import 'package:catalyst_voices/pages/registration/registration_stage_message.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -35,14 +36,9 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 24),
-        Text(
-          context.l10n.walletLinkSelectWalletTitle,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: 24),
-        Text(
-          context.l10n.walletLinkSelectWalletContent,
-          style: Theme.of(context).textTheme.bodyMedium,
+        RegistrationStageMessage(
+          title: Text(context.l10n.walletLinkSelectWalletTitle),
+          subtitle: Text(context.l10n.walletLinkSelectWalletContent),
         ),
         const SizedBox(height: 40),
         Expanded(

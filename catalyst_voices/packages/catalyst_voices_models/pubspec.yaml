@@ -21,7 +21,3 @@ dev_dependencies:
   catalyst_analysis: ^2.0.0
   flutter_test:
     sdk: flutter
-
-# TODO(damian-molinski): Delete this once flutter_quill is deleted from this package
-flutter:
-  uses-material-design: true

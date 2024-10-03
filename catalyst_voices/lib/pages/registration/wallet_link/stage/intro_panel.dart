@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/registration/registration_stage_message.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -13,14 +14,9 @@ class IntroPanel extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 24),
-        Text(
-          context.l10n.walletLinkIntroTitle,
-          style: Theme.of(context).textTheme.titleMedium,
-        ),
-        const SizedBox(height: 24),
-        Text(
-          context.l10n.walletLinkIntroContent,
-          style: Theme.of(context).textTheme.bodyMedium,
+        RegistrationStageMessage(
+          title: Text(context.l10n.walletLinkIntroTitle),
+          subtitle: Text(context.l10n.walletLinkIntroContent),
         ),
         const Spacer(),
         VoicesFilledButton(

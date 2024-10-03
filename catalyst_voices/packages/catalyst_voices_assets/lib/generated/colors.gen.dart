@@ -49,6 +49,9 @@ class VoicesColors {
   /// Color: #212A3D
   static const Color darkIconsBackground = Color(0xFF212A3D);
 
+  /// Color: #F2F4F8
+  static const Color darkIconsBackgroundVariant = Color(0xFFF2F4F8);
+
   /// Color: #61BFC8D9
   static const Color darkIconsDisabled = Color(0x61BFC8D9);
 
@@ -247,6 +250,9 @@ class VoicesColors {
 
   /// Color: #FFFFFF
   static const Color lightIconsBackground = Color(0xFFFFFFFF);
+
+  /// Color: #F2F4F8
+  static const Color lightIconsBackgroundVariant = Color(0xFFF2F4F8);
 
   /// Color: #61212A3D
   static const Color lightIconsDisabled = Color(0x61212A3D);

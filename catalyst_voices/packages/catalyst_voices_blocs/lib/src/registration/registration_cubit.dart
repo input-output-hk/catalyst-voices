@@ -58,6 +58,14 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     }
   }
 
+  void chooseOtherWallet() {
+    _goToStep(const WalletLinkStep(stage: WalletLinkStage.selectWallet));
+  }
+
+  void changeRoleSetup() {
+    _goToStep(const WalletLinkStep(stage: WalletLinkStage.rolesChooser));
+  }
+
   void nextStep() {
     final nextStep = _nextStep();
     if (nextStep != null) {
@@ -88,6 +96,18 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     _keychainCreationCubit.setSeedPhraseStoredConfirmed(confirmed);
   }
 
+  Future<void> downloadSeedPhrase() {
+    return _keychainCreationCubit.downloadSeedPhrase();
+  }
+
+  void setSeedPhraseCheckConfirmed({
+    required bool isConfirmed,
+  }) {
+    _keychainCreationCubit.setSeedPhraseCheckConfirmed(
+      isConfirmed: isConfirmed,
+    );
+  }
+
   void refreshWallets() {
     unawaited(_walletLinkCubit.refreshWallets());
   }
@@ -96,8 +116,12 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     return _walletLinkCubit.selectWallet(wallet);
   }
 
-  Future<void> downloadSeedPhrase() {
-    return _keychainCreationCubit.downloadSeedPhrase();
+  void selectRoles(Set<AccountRole> roles) {
+    _walletLinkCubit.selectRoles(roles);
+  }
+
+  void submitRegistration() {
+    // TODO(dtscalac): submit RBAC transaction
   }
 
   RegistrationStep? _nextStep({RegistrationStep? from}) {
@@ -119,9 +143,9 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
 
     return switch (step) {
       GetStartedStep() => null,
-      FinishAccountCreationStep() => nextWalletLinkStep(),
       RecoverStep() => throw UnimplementedError(),
       CreateKeychainStep() => nextKeychainStep(),
+      FinishAccountCreationStep() => const WalletLinkStep(),
       WalletLinkStep() => nextWalletLinkStep(),
       AccountCompletedStep() => null,
     };
@@ -148,9 +172,9 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
 
     return switch (step) {
       GetStartedStep() => null,
-      FinishAccountCreationStep() => null,
       RecoverStep() => throw UnimplementedError(),
       CreateKeychainStep() => previousKeychainStep(),
+      FinishAccountCreationStep() => null,
       WalletLinkStep() => previousWalletLinkStep(),
       AccountCompletedStep() => null,
     };
