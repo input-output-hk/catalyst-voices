@@ -1,4 +1,4 @@
-//! Get TXI by Transaction hash query
+//! Get invalid registrations for stake addr after given slot no.
 
 use std::sync::Arc;
 

@@ -1,4 +1,4 @@
-//! Get TXI by Transaction hash query
+//! Get stake addr registrations
 
 use std::sync::Arc;
 

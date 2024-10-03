@@ -1,5 +1,4 @@
-//! Get TXI by Transaction hash query
-
+//! get stake addr from vote key
 use std::sync::Arc;
 
 use scylla::{
