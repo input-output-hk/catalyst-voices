@@ -19,8 +19,8 @@ class GetStartedPanel extends StatelessWidget {
       children: [
         const SizedBox(height: 24),
         RegistrationStageMessage(
-          title: context.l10n.accountCreationGetStartedTitle,
-          subtitle: context.l10n.accountCreationGetStatedDesc,
+          title: Text(context.l10n.accountCreationGetStartedTitle),
+          subtitle: Text(context.l10n.accountCreationGetStatedDesc),
           spacing: 12,
           textColor: theme.colors.textOnPrimaryLevel1,
         ),

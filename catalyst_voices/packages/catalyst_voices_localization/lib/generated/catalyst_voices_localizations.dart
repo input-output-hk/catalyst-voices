@@ -832,6 +832,36 @@ abstract class VoicesLocalizations {
   /// **'In Catalyst you can take on different roles, learn more below and choose your additional roles now.'**
   String get walletLinkRoleChooserContent;
 
+  /// A title on the role summary screen in registration.
+  ///
+  /// In en, this message translates to:
+  /// **'Is this your correct Catalyst role setup?'**
+  String get walletLinkRoleSummaryTitle;
+
+  /// The first part of the message on the role summary screen in registration.
+  ///
+  /// In en, this message translates to:
+  /// **'You would like to register '**
+  String get walletLinkRoleSummaryContent1;
+
+  /// The middle (bold) part of the message on the role summary screen in registration.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} active {count, plural, =0{roles} =1{role} other{roles}}'**
+  String walletLinkRoleSummaryContent2(num count);
+
+  /// The last part of the message on the role summary screen in registration.
+  ///
+  /// In en, this message translates to:
+  /// **' in Catalyst.'**
+  String get walletLinkRoleSummaryContent3;
+
+  /// A button label on the role summary screen in registration for the next step.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm & Sign with wallet'**
+  String get walletLinkRoleSummaryButton;
+
   /// Message shown when redirecting to external content that describes which wallets are supported.
   ///
   /// In en, this message translates to:

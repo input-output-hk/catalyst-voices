@@ -2,8 +2,8 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
 class RegistrationStageMessage extends StatelessWidget {
-  final String title;
-  final String subtitle;
+  final Widget title;
+  final Widget subtitle;
   final double spacing;
   final Color? textColor;
 
@@ -24,14 +24,14 @@ class RegistrationStageMessage extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          title,
-          style: theme.textTheme.titleMedium?.copyWith(color: textColor),
+        DefaultTextStyle(
+          style: theme.textTheme.titleMedium!.copyWith(color: textColor),
+          child: title,
         ),
         SizedBox(height: spacing),
-        Text(
-          subtitle,
-          style: theme.textTheme.bodyMedium?.copyWith(color: textColor),
+        DefaultTextStyle(
+          style: theme.textTheme.bodyMedium!.copyWith(color: textColor),
+          child: subtitle,
         ),
       ],
     );
