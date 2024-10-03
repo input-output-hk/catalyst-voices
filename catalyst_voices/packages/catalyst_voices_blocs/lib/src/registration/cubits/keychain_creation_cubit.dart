@@ -13,9 +13,6 @@ final _logger = Logger('KeychainCreationCubit');
 final class KeychainCreationCubit extends Cubit<CreateKeychain> {
   final Downloader _downloader;
 
-  String _password = '';
-  String _confirmPassword = '';
-
   KeychainCreationCubit({
     required Downloader downloader,
   })  : _downloader = downloader,
@@ -99,25 +96,26 @@ final class KeychainCreationCubit extends Cubit<CreateKeychain> {
   }
 
   void setPassword(String newValue) {
-    if (_password != newValue) {
-      _password = newValue;
-      _updateUnlockPasswordState();
+    if (_unlockPassword.password != newValue) {
+      _updateUnlockPasswordState(password: newValue);
     }
   }
 
   void setConfirmPassword(String newValue) {
-    if (_confirmPassword != newValue) {
-      _confirmPassword = newValue;
-      _updateUnlockPasswordState();
+    if (_unlockPassword.confirmPassword != newValue) {
+      _updateUnlockPasswordState(confirmPassword: newValue);
     }
   }
 
   // TODO(damian-molinski): implement
   Future<void> createKeychain() async {}
 
-  void _updateUnlockPasswordState() {
-    final password = _password;
-    final confirmPassword = _confirmPassword;
+  void _updateUnlockPasswordState({
+    String? password,
+    String? confirmPassword,
+  }) {
+    password ??= _unlockPassword.password;
+    confirmPassword ??= _unlockPassword.confirmPassword;
 
     const minimumLength = PasswordStrength.minimumLength;
 
@@ -127,6 +125,8 @@ final class KeychainCreationCubit extends Cubit<CreateKeychain> {
     final hasConfirmPassword = confirmPassword.isNotEmpty;
 
     _unlockPassword = _unlockPassword.copyWith(
+      password: password,
+      confirmPassword: confirmPassword,
       passwordStrength: passwordStrength,
       showPasswordStrength: password.isNotEmpty,
       minPasswordLength: minimumLength,

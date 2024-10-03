@@ -26,9 +26,18 @@ class _UnlockPasswordPanelState extends State<UnlockPasswordPanel> {
   void initState() {
     super.initState();
 
-    _passwordController = TextEditingController()
+    final registrationState = RegistrationCubit.of(context).state;
+    final createKeychain =
+        registrationState is CreateKeychain ? registrationState : null;
+
+    final unlockPassword = createKeychain?.unlockPassword;
+
+    final password = unlockPassword?.password;
+    final confirmPassword = unlockPassword?.confirmPassword;
+
+    _passwordController = TextEditingController(text: password)
       ..addListener(_onPasswordChanged);
-    _confirmPasswordController = TextEditingController()
+    _confirmPasswordController = TextEditingController(text: confirmPassword)
       ..addListener(_onConfirmPasswordChanged);
   }
 
@@ -65,6 +74,7 @@ class _UnlockPasswordPanelState extends State<UnlockPasswordPanel> {
         RegistrationBackNextNavigation(
           isNextEnabled: widget.data.isNextEnabled,
           onNextTap: _createKeychain,
+          onBackTap: _clearPasswordAndGoBack,
         ),
       ],
     );
@@ -78,6 +88,13 @@ class _UnlockPasswordPanelState extends State<UnlockPasswordPanel> {
   void _onConfirmPasswordChanged() {
     final confirmPassword = _confirmPasswordController.text;
     RegistrationCubit.of(context).setConfirmPassword(confirmPassword);
+  }
+
+  void _clearPasswordAndGoBack() {
+    RegistrationCubit.of(context)
+      ..setPassword('')
+      ..setConfirmPassword('')
+      ..previousStep();
   }
 
   Future<void> _createKeychain() async {

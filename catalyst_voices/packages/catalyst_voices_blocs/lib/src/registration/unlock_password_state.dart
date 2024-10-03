@@ -2,6 +2,8 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class UnlockPasswordState extends Equatable {
+  final String password;
+  final String confirmPassword;
   final PasswordStrength passwordStrength;
   final bool showPasswordStrength;
   final int minPasswordLength;
@@ -9,6 +11,8 @@ final class UnlockPasswordState extends Equatable {
   final bool isNextEnabled;
 
   const UnlockPasswordState({
+    this.password = '',
+    this.confirmPassword = '',
     this.passwordStrength = PasswordStrength.weak,
     this.showPasswordStrength = false,
     this.minPasswordLength = PasswordStrength.minimumLength,
@@ -17,6 +21,8 @@ final class UnlockPasswordState extends Equatable {
   });
 
   UnlockPasswordState copyWith({
+    String? password,
+    String? confirmPassword,
     PasswordStrength? passwordStrength,
     bool? showPasswordStrength,
     int? minPasswordLength,
@@ -24,6 +30,8 @@ final class UnlockPasswordState extends Equatable {
     bool? isNextEnabled,
   }) {
     return UnlockPasswordState(
+      password: password ?? this.password,
+      confirmPassword: confirmPassword ?? this.confirmPassword,
       passwordStrength: passwordStrength ?? this.passwordStrength,
       showPasswordStrength: showPasswordStrength ?? this.showPasswordStrength,
       minPasswordLength: minPasswordLength ?? this.minPasswordLength,
@@ -34,6 +42,8 @@ final class UnlockPasswordState extends Equatable {
 
   @override
   List<Object?> get props => [
+        password,
+        confirmPassword,
         passwordStrength,
         showPasswordStrength,
         minPasswordLength,
