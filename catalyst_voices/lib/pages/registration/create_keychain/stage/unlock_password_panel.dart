@@ -26,14 +26,8 @@ class _UnlockPasswordPanelState extends State<UnlockPasswordPanel> {
   void initState() {
     super.initState();
 
-    final registrationState = RegistrationCubit.of(context).state;
-    final createKeychain =
-        registrationState is CreateKeychain ? registrationState : null;
-
-    final unlockPassword = createKeychain?.unlockPassword;
-
-    final password = unlockPassword?.password;
-    final confirmPassword = unlockPassword?.confirmPassword;
+    final password = widget.data.password;
+    final confirmPassword = widget.data.confirmPassword;
 
     _passwordController = TextEditingController(text: password)
       ..addListener(_onPasswordChanged);
