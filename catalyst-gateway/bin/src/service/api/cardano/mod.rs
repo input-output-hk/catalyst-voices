@@ -142,7 +142,7 @@ impl CardanoApi {
     )]
     /// Cip36 registrations
     ///
-    /// This endpoint gets the latest registraton given a stake addr
+    /// This endpoint gets the latest registration given a stake addr
     async fn latest_registration_cip36_given_stake_addr(
         &self, stake_addr: Query<String>,
     ) -> cip36::SingleRegistrationResponse {
@@ -156,7 +156,7 @@ impl CardanoApi {
     )]
     /// Cip36 registrations
     ///
-    /// This endpoint gets the latest registraton given a stake key hash
+    /// This endpoint gets the latest registration given a stake key hash
     async fn latest_registration_cip36_given_stake_key_hash(
         &self, stake_key_hash: Query<String>,
     ) -> cip36::SingleRegistrationResponse {
@@ -175,6 +175,6 @@ impl CardanoApi {
     async fn latest_registration_cip36_given_vote_key(
         &self, vote_key: Query<String>,
     ) -> cip36::MultipleRegistrationResponse {
-        cip36::get_asscociated_vote_key_registrations(vote_key.0, true).await
+        cip36::get_associated_vote_key_registrations(vote_key.0, true).await
     }
 }

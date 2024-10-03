@@ -46,7 +46,7 @@ pub(crate) enum ResponseMultipleRegistrations {
 pub(crate) struct Cip36Reporting {
     /// List of registrations
     cip36: Vec<Cip36Info>,
-    /// Invald registration reporting
+    /// Invalid registration reporting
     invalids: Vec<InvalidRegistrationsReport>,
 }
 
@@ -258,7 +258,7 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
         return ResponseSingleRegistration::NotFound.into();
     };
 
-    // Get stake addr assosciated with give stake hash
+    // Get stake addr associated with give stake hash
     let mut stake_addr_iter =
         match GetStakeAddrQuery::execute(&session, GetStakeAddrParams::new(stake_hash)).await {
             Ok(latest) => latest,
@@ -326,7 +326,7 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
 /// Returns the list of stake address registrations currently associated with a given
 /// voting key and returns any erroneous registrations which occur AFTER the slot# of the
 /// last valid registration.
-pub(crate) async fn get_asscociated_vote_key_registrations(
+pub(crate) async fn get_associated_vote_key_registrations(
     vote_key: String, persistent: bool,
 ) -> MultipleRegistrationResponse {
     let vote_key = match hex::decode(vote_key) {
