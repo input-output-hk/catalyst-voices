@@ -112,6 +112,9 @@ final class KeychainCreationCubit extends Cubit<CreateKeychain> {
     }
   }
 
+  // TODO(damian-molinski): implement
+  Future<void> createKeychain() async {}
+
   void _updateUnlockPasswordState() {
     final password = _password;
     final confirmPassword = _confirmPassword;

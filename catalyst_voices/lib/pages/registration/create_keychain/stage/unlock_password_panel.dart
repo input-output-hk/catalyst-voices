@@ -66,6 +66,7 @@ class _UnlockPasswordPanelState extends State<UnlockPasswordPanel> {
           const SizedBox(height: 22),
           RegistrationBackNextNavigation(
             isNextEnabled: widget.data.isNextEnabled,
+            onNextTap: _createKeychain,
           ),
         ],
       ),
@@ -80,6 +81,13 @@ class _UnlockPasswordPanelState extends State<UnlockPasswordPanel> {
   void _onConfirmPasswordChanged() {
     final confirmPassword = _confirmPasswordController.text;
     RegistrationCubit.of(context).setConfirmPassword(confirmPassword);
+  }
+
+  Future<void> _createKeychain() async {
+    final registrationCubit = RegistrationCubit.of(context);
+
+    await registrationCubit.createKeychain();
+    registrationCubit.nextStep();
   }
 }
 

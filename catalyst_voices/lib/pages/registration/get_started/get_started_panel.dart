@@ -42,9 +42,9 @@ class GetStartedPanel extends StatelessWidget {
                   onTap: () {
                     switch (type) {
                       case CreateAccountType.createNew:
-                        RegistrationCubit.of(context).createNewKeychain();
+                        RegistrationCubit.of(context).createNewKeychainStep();
                       case CreateAccountType.recover:
-                        RegistrationCubit.of(context).recoverKeychain();
+                        RegistrationCubit.of(context).recoverKeychainStep();
                     }
                   },
                 );
