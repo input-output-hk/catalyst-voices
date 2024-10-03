@@ -553,6 +553,32 @@
   "@walletLinkRoleChooserContent": {
     "description": "A message on the role chooser screen in registration."
   },
+  "walletLinkRoleSummaryTitle": "Is this your correct Catalyst role setup?",
+  "@walletLinkRoleSummaryTitle": {
+    "description": "A title on the role summary screen in registration."
+  },
+  "walletLinkRoleSummaryContent1": "You would like to register ",
+  "@walletLinkRoleSummaryContent1": {
+    "description": "The first part of the message on the role summary screen in registration."
+  },
+  "walletLinkRoleSummaryContent2": "{count} active {count, plural, =0{roles} =1{role} other{roles}}",
+  "@walletLinkRoleSummaryContent2": {
+    "description": "The middle (bold) part of the message on the role summary screen in registration.",
+    "placeholders": {
+      "count": {
+        "type": "num",
+        "format": "compact"
+      }
+    }
+  },
+  "walletLinkRoleSummaryContent3": " in Catalyst.",
+  "@walletLinkRoleSummaryContent3": {
+    "description": "The last part of the message on the role summary screen in registration."
+  },
+  "walletLinkRoleSummaryButton": "Confirm & Sign with wallet",
+  "@walletLinkRoleSummaryButton": {
+    "description": "A button label on the role summary screen in registration for the next step."
+  },
   "seeAllSupportedWallets": "See all supported wallets",
   "@seeAllSupportedWallets": {
     "description": "Message shown when redirecting to external content that describes which wallets are supported."

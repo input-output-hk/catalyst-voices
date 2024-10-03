@@ -14,8 +14,8 @@ class SplashPanel extends StatelessWidget {
       children: [
         const SizedBox(height: 24),
         RegistrationStageMessage(
-          title: context.l10n.accountCreationSplashTitle,
-          subtitle: context.l10n.accountCreationSplashMessage,
+          title: Text(context.l10n.accountCreationSplashTitle),
+          subtitle: Text(context.l10n.accountCreationSplashMessage),
         ),
         const Spacer(),
         VoicesFilledButton(
