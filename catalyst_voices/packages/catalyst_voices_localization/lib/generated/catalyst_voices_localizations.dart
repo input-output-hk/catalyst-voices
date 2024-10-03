@@ -1258,6 +1258,42 @@ abstract class VoicesLocalizations {
   /// **'With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.    But it can be a bit tedious to enter every single time you want to use the app.    In this next step, you\'ll set your Unlock Password for your current device. It\'s like a shortcut for proving ownership of your Keychain.    Whenever you recover your account for the first time on a new device, you\'ll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.'**
   String get createKeychainUnlockPasswordInstructionsSubtitle;
 
+  /// No description provided for @createKeychainCreatedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Congratulations your Catalyst  Keychain is created!'**
+  String get createKeychainCreatedTitle;
+
+  /// No description provided for @createKeychainCreatedNextStep.
+  ///
+  /// In en, this message translates to:
+  /// **'In the next step you write your Catalyst roles and  account to the Cardano Mainnet.'**
+  String get createKeychainCreatedNextStep;
+
+  /// No description provided for @createKeychainLinkWalletAndRoles.
+  ///
+  /// In en, this message translates to:
+  /// **'Link your Cardano Wallet & Roles'**
+  String get createKeychainLinkWalletAndRoles;
+
+  /// No description provided for @registrationCreateKeychainStepGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst Keychain created'**
+  String get registrationCreateKeychainStepGroup;
+
+  /// No description provided for @registrationLinkWalletStepGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Link Cardano Wallet & Roles'**
+  String get registrationLinkWalletStepGroup;
+
+  /// No description provided for @registrationCompletedStepGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst account creation completed!'**
+  String get registrationCompletedStepGroup;
+
   /// No description provided for @createKeychainUnlockPasswordIntoSubtitle.
   ///
   /// In en, this message translates to:
