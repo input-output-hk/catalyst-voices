@@ -79,6 +79,11 @@ class _StatusContainer extends StatelessWidget {
     final theme = Theme.of(context);
 
     final backgroundColor = switch (type) {
+      VoicesStatusIndicatorType.success => theme.colors.success,
+      VoicesStatusIndicatorType.error => theme.colorScheme.error,
+    };
+
+    final foregroundColor = switch (type) {
       VoicesStatusIndicatorType.success => theme.colors.successContainer,
       VoicesStatusIndicatorType.error => theme.colors.errorContainer,
     };
@@ -92,11 +97,11 @@ class _StatusContainer extends StatelessWidget {
       alignment: Alignment.center,
       child: DefaultTextStyle(
         style: (theme.textTheme.titleLarge ?? const TextStyle())
-            .copyWith(color: theme.colors.textPrimary),
+            .copyWith(color: foregroundColor),
         child: IconTheme(
           data: IconThemeData(
             size: 24,
-            color: theme.colors.textPrimary,
+            color: foregroundColor,
           ),
           child: child,
         ),

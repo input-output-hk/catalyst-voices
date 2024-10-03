@@ -5,6 +5,7 @@ export 'auth/authentication_status.dart';
 export 'auth/password_strength.dart';
 export 'document/document_json.dart';
 export 'errors/errors.dart';
+export 'file/voices_file.dart';
 export 'optional.dart';
 export 'proposal/funded_proposal.dart';
 export 'proposal/pending_proposal.dart';
