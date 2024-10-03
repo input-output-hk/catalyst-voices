@@ -1,6 +1,10 @@
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
+import 'package:catalyst_voices/pages/account/delete_keychain_dialog.dart';
+import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
+import 'package:catalyst_voices/widgets/list/bullet_list.dart';
+import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -35,7 +39,19 @@ final class AccountPage extends StatelessWidget {
                       AccountRole.drep,
                     ],
                     defaultRole: AccountRole.voter,
-                    onRemoveKeychain: () => debugPrint('Keychain removed'),
+                    onRemoveKeychain: () async {
+                      final confirmed =
+                          await DeleteKeychainDialog.show(context);
+                      if (confirmed && context.mounted) {
+                        // TODO(Jakub): remove keychain
+                        await VoicesDialog.show<void>(
+                          context: context,
+                          builder: (context) {
+                            return const KeychainDeletedDialog();
+                          },
+                        );
+                      }
+                    },
                   ),
                 ],
               ),
@@ -224,11 +240,14 @@ class _KeychainCard extends StatelessWidget {
               ),
             ),
           if (roles.isNotEmpty)
-            Text(
-              roles
-                  .map((e) => _formatRoleBullet(e, defaultRole, context))
-                  .join('\n'),
-              style: Theme.of(context).textTheme.bodyLarge,
+            Padding(
+              padding: const EdgeInsets.only(left: 4),
+              child: BulletList(
+                items: roles
+                    .map((e) => _formatRoleBullet(e, defaultRole, context))
+                    .toList(),
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
             ),
         ],
       ),
@@ -240,12 +259,10 @@ class _KeychainCard extends StatelessWidget {
     AccountRole? defaultRole,
     BuildContext context,
   ) {
-    String label;
     if (role == defaultRole) {
-      label = '${role.getName(context)} (${context.l10n.defaultRole})';
+      return '${role.getName(context)} (${context.l10n.defaultRole})';
     } else {
-      label = role.getName(context);
+      return role.getName(context);
     }
-    return ' • $label';
   }
 }

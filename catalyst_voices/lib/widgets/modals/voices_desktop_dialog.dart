@@ -2,24 +2,35 @@ import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
-class VoicesDesktopDialog extends StatelessWidget {
+/// Commonly used structure for desktop dialogs.
+///
+/// Keep in mind that this dialog has fixed size of 900x600 and
+/// is always adding close button in top right corner.
+class VoicesSinglePaneDialog extends StatelessWidget {
   final BoxConstraints constraints;
+  final Color? backgroundColor;
+  final bool showBorder;
   final Widget child;
 
-  const VoicesDesktopDialog({
+  const VoicesSinglePaneDialog({
     super.key,
     this.constraints = const BoxConstraints(minWidth: 900, minHeight: 600),
+    this.backgroundColor,
+    this.showBorder = false,
     required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      alignment: Alignment.topCenter,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 90),
-      child: ConstrainedBox(
-        constraints: constraints,
-        child: child,
+    return _VoicesDesktopDialog(
+      backgroundColor: Theme.of(context).colors.iconsBackground,
+      showBorder: true,
+      constraints: constraints,
+      child: Stack(
+        children: [
+          child,
+          const _DialogCloseButton(),
+        ],
       ),
     );
   }
@@ -29,11 +40,11 @@ class VoicesDesktopDialog extends StatelessWidget {
 ///
 /// Keep in mind that this dialog has fixed size of 900x600 and
 /// is always adding close button in top right corner.
-class VoicesDesktopPanelsDialog extends StatelessWidget {
+class VoicesTwoPaneDialog extends StatelessWidget {
   final Widget left;
   final Widget right;
 
-  const VoicesDesktopPanelsDialog({
+  const VoicesTwoPaneDialog({
     super.key,
     required this.left,
     required this.right,
@@ -43,7 +54,7 @@ class VoicesDesktopPanelsDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return VoicesDesktopDialog(
+    return _VoicesDesktopDialog(
       constraints: const BoxConstraints.tightFor(width: 900, height: 600),
       child: Stack(
         children: [
@@ -69,6 +80,41 @@ class VoicesDesktopPanelsDialog extends StatelessWidget {
           ),
           const _DialogCloseButton(),
         ],
+      ),
+    );
+  }
+}
+
+class _VoicesDesktopDialog extends StatelessWidget {
+  final BoxConstraints constraints;
+  final Color? backgroundColor;
+  final bool showBorder;
+  final Widget child;
+
+  const _VoicesDesktopDialog({
+    this.constraints = const BoxConstraints(minWidth: 900, minHeight: 600),
+    this.backgroundColor,
+    this.showBorder = false,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: showBorder
+          ? RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(
+                color: Theme.of(context).colors.outlineBorderVariant!,
+              ),
+            )
+          : Theme.of(context).dialogTheme.shape,
+      backgroundColor: backgroundColor,
+      alignment: Alignment.topCenter,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 90),
+      child: ConstrainedBox(
+        constraints: constraints,
+        child: child,
       ),
     );
   }

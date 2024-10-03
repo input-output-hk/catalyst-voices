@@ -2,11 +2,13 @@
 // ignore_for_file: implementation_imports
 
 import 'dart:typed_data';
+
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:bip39/src/wordlists/english.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:convert/convert.dart';
 import 'package:ed25519_hd_key/ed25519_hd_key.dart';
+import 'package:equatable/equatable.dart';
 
 /// Represents a seed phrase consisting of a mnemonic and provides methods for
 /// generating and deriving cryptographic data from the mnemonic.
@@ -14,7 +16,7 @@ import 'package:ed25519_hd_key/ed25519_hd_key.dart';
 /// The `SeedPhrase` class allows creation of a seed phrase either randomly,
 /// from a given mnemonic, or from entropy data. It supports converting between
 /// different formats, including Uint8List and hex strings.
-class SeedPhrase {
+final class SeedPhrase extends Equatable {
   /// The mnemonic phrase
   final String mnemonic;
 
@@ -25,32 +27,48 @@ class SeedPhrase {
   /// [wordCount]: The number of words in the mnemonic.
   /// The default word count is 12, but can specify 12, 15, 18, 21, or 24 words.
   /// with a higher word count providing greater entropy and security.
-  SeedPhrase({int wordCount = 12})
-      : this.fromMnemonic(
-          bip39.generateMnemonic(
-            strength: (wordCount * 32) ~/ 3,
-          ),
-        );
+  factory SeedPhrase({int wordCount = 12}) {
+    final mnemonic = bip39.generateMnemonic(
+      strength: (wordCount * 32) ~/ 3,
+    );
+
+    return SeedPhrase.fromMnemonic(mnemonic);
+  }
+
+  /// Private const constructor
+  const SeedPhrase._({
+    required this.mnemonic,
+  });
 
   /// Creates a SeedPhrase from an existing [Uint8List] entropy.
   ///
   /// [encodedData]: The entropy data as a Uint8List.
-  SeedPhrase.fromUint8ListEntropy(Uint8List encodedData)
-      : this.fromHexEntropy(hex.encode(encodedData));
+  factory SeedPhrase.fromUint8ListEntropy(Uint8List encodedData) {
+    final hexEncodedData = hex.encode(encodedData);
+    return SeedPhrase.fromHexEntropy(hexEncodedData);
+  }
 
   /// Creates a SeedPhrase from an existing hex-encoded entropy.
   ///
   /// [encodedData]: The entropy data as a hex string.
-  SeedPhrase.fromHexEntropy(String encodedData)
-      : this.fromMnemonic(bip39.entropyToMnemonic(encodedData));
+  factory SeedPhrase.fromHexEntropy(String encodedData) {
+    final mnemonic = bip39.entropyToMnemonic(encodedData);
+    return SeedPhrase.fromMnemonic(mnemonic);
+  }
 
   /// Creates a SeedPhrase from an existing [mnemonic].
   ///
   /// Throws an [ArgumentError] if the mnemonic is invalid.
   ///
   /// [mnemonic]: The mnemonic to derive the seed from.
-  SeedPhrase.fromMnemonic(this.mnemonic)
-      : assert(bip39.validateMnemonic(mnemonic), 'Invalid mnemonic phrase');
+  factory SeedPhrase.fromMnemonic(String mnemonic) {
+    assert(bip39.validateMnemonic(mnemonic), 'Invalid mnemonic phrase');
+
+    return SeedPhrase._(mnemonic: mnemonic);
+  }
+
+  /// The full list of BIP-39 mnemonic words in English.
+  static List<String> get wordList => WORDLIST;
 
   /// The seed derived from the mnemonic as a Uint8List.
   Uint8List get uint8ListSeed => bip39.mnemonicToSeed(mnemonic);
@@ -66,6 +84,10 @@ class SeedPhrase {
 
   /// The mnemonic phrase as a list of individual words.
   List<String> get mnemonicWords => mnemonic.split(' ');
+
+  /// Version of [mnemonicWords] but in random order. Each call will generate
+  /// new random order.
+  List<String> get shuffledMnemonicWords => [...mnemonicWords]..shuffle();
 
   /// Derives an Ed25519 key pair from a seed.
   ///
@@ -88,6 +110,9 @@ class SeedPhrase {
     );
   }
 
-  /// The full list of BIP-39 mnemonic words in English.
-  static List<String> get wordList => WORDLIST;
+  @override
+  String toString() => 'SeedPhrase(${mnemonic.hashCode})';
+
+  @override
+  List<Object?> get props => [mnemonic];
 }

@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/pages/registration/create_keychain/create_keychain_panel.dart';
+import 'package:catalyst_voices/pages/registration/finish_account/finish_account_creation_panel.dart';
 import 'package:catalyst_voices/pages/registration/get_started/get_started_panel.dart';
 import 'package:catalyst_voices/pages/registration/registration_info_panel.dart';
 import 'package:catalyst_voices/pages/registration/wallet_link/wallet_link_panel.dart';
@@ -16,17 +17,16 @@ class RegistrationDialog extends StatelessWidget {
       context: context,
       routeSettings: const RouteSettings(name: '/registration'),
       builder: (context) => const RegistrationDialog._(),
+      barrierDismissible: false,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => Dependencies.instance.get<RegistrationBloc>(),
-      child: BlocBuilder<RegistrationBloc, RegistrationState>(
-        builder: (context, state) {
-          return _RegistrationDialog(state: state);
-        },
+      create: (context) => Dependencies.instance.get<RegistrationCubit>(),
+      child: BlocBuilder<RegistrationCubit, RegistrationState>(
+        builder: (context, state) => _RegistrationDialog(state: state),
       ),
     );
   }
@@ -41,16 +41,22 @@ class _RegistrationDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return VoicesDesktopPanelsDialog(
-      left: RegistrationInfoPanel(
-        state: state,
-      ),
+    return VoicesTwoPaneDialog(
+      left: const RegistrationInfoPanel(),
       right: switch (state) {
         GetStarted() => const GetStartedPanel(),
-        FinishAccountCreation() => const Placeholder(),
+        FinishAccountCreation() => const FinishAccountCreationPanel(),
         Recover() => const Placeholder(),
-        CreateKeychain(:final stage) => CreateKeychainPanel(stage: stage),
-        WalletLink(:final stage) => WalletLinkPanel(stage: stage),
+        CreateKeychain(:final stage, :final seedPhraseState) =>
+          CreateKeychainPanel(
+            stage: stage,
+            seedPhraseState: seedPhraseState,
+          ),
+        WalletLink(:final stage, :final stateData) => WalletLinkPanel(
+            stage: stage,
+            stateData: stateData,
+          ),
+        AccountCompleted() => const Placeholder(),
       },
     );
   }

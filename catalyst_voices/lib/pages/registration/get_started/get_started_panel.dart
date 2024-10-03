@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/registration/registration_stage_message.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -17,18 +18,11 @@ class GetStartedPanel extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 24),
-        Text(
-          context.l10n.accountCreationGetStartedTitle,
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: theme.colors.textOnPrimaryLevel1,
-          ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          context.l10n.accountCreationGetStatedDesc,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colors.textOnPrimaryLevel1,
-          ),
+        RegistrationStageMessage(
+          title: Text(context.l10n.accountCreationGetStartedTitle),
+          subtitle: Text(context.l10n.accountCreationGetStatedDesc),
+          spacing: 12,
+          textColor: theme.colors.textOnPrimaryLevel1,
         ),
         const SizedBox(height: 32),
         Text(
@@ -46,8 +40,12 @@ class GetStartedPanel extends StatelessWidget {
                   key: ValueKey(type),
                   type: type,
                   onTap: () {
-                    final event = CreateAccountTypeEvent(type: type);
-                    RegistrationBloc.of(context).add(event);
+                    switch (type) {
+                      case CreateAccountType.createNew:
+                        RegistrationCubit.of(context).createNewKeychain();
+                      case CreateAccountType.recover:
+                        RegistrationCubit.of(context).recoverKeychain();
+                    }
                   },
                 );
               })
