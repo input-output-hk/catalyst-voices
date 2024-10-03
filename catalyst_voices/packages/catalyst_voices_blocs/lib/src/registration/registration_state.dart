@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_blocs/src/registration/seed_phrase_state.dart';
+import 'package:catalyst_voices_blocs/src/registration/unlock_password_state.dart';
 import 'package:catalyst_voices_blocs/src/registration/wallet_link_state_data.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
@@ -56,11 +57,13 @@ sealed class CreateNew extends RegistrationState {
 /// Building up information for creating new Keychain.
 final class CreateKeychain extends CreateNew {
   final CreateKeychainStage stage;
-  final SeedPhraseState seedPhraseState;
+  final SeedPhraseState seedPhrase;
+  final UnlockPasswordState unlockPassword;
 
   const CreateKeychain({
     this.stage = CreateKeychainStage.splash,
-    this.seedPhraseState = const SeedPhraseState(),
+    this.seedPhrase = const SeedPhraseState(),
+    this.unlockPassword = const UnlockPasswordState(),
   });
 
   @override
@@ -78,16 +81,19 @@ final class CreateKeychain extends CreateNew {
       super.props +
       [
         stage,
-        seedPhraseState,
+        seedPhrase,
+        unlockPassword,
       ];
 
   CreateKeychain copyWith({
     CreateKeychainStage? stage,
-    SeedPhraseState? seedPhraseState,
+    SeedPhraseState? seedPhrase,
+    UnlockPasswordState? unlockPassword,
   }) {
     return CreateKeychain(
       stage: stage ?? this.stage,
-      seedPhraseState: seedPhraseState ?? this.seedPhraseState,
+      seedPhrase: seedPhrase ?? this.seedPhrase,
+      unlockPassword: unlockPassword ?? this.unlockPassword,
     );
   }
 }

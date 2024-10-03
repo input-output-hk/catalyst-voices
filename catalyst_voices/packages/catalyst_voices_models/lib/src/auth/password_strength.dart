@@ -14,10 +14,10 @@ enum PasswordStrength {
   strong;
 
   /// The minimum length of accepted password.
-  static const int minimumPasswordLength = 8;
+  static const int minimumLength = 8;
 
   factory PasswordStrength.calculate(String text) {
-    if (text.length < minimumPasswordLength) return PasswordStrength.weak;
+    if (text.length < minimumLength) return PasswordStrength.weak;
 
     final strength = ps.estimatePasswordStrength(text);
     if (strength <= 0.33) return PasswordStrength.weak;
