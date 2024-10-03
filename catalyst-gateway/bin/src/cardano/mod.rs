@@ -468,34 +468,37 @@ impl SyncTask {
         // We will start at most the number of configured sync tasks.
         // The live chain sync task is not counted as a sync task for this config value.
 
-        // Will also break if there are no more slots left to sync.
-        while self.current_sync_tasks < self.cfg.sync_tasks {
-            let end_slot = self
-                .immutable_tip_slot
-                .min(self.start_slot + self.cfg.sync_chunk_max_slots);
+        // Nothing to do if the start_slot is not less than the end of the immutable chain.
+        if self.start_slot < self.immutable_tip_slot {
+            // Will also break if there are no more slots left to sync.
+            while self.current_sync_tasks < self.cfg.sync_tasks {
+                let end_slot = self
+                    .immutable_tip_slot
+                    .min(self.start_slot + self.cfg.sync_chunk_max_slots);
 
-            if let Some((first_point, last_point)) =
-                self.get_syncable_range(self.start_slot, end_slot)
-            {
-                self.sync_tasks.push(sync_subchain(SyncParams::new(
-                    self.cfg.chain,
-                    first_point,
-                    last_point.clone(),
-                )));
-                self.current_sync_tasks += 1;
+                if let Some((first_point, last_point)) =
+                    self.get_syncable_range(self.start_slot, end_slot)
+                {
+                    self.sync_tasks.push(sync_subchain(SyncParams::new(
+                        self.cfg.chain,
+                        first_point,
+                        last_point.clone(),
+                    )));
+                    self.current_sync_tasks += 1;
+                }
+
+                // The one slot overlap is deliberate, it doesn't hurt anything and prevents all off
+                // by one problems that may occur otherwise.
+                self.start_slot = end_slot;
+
+                if end_slot == self.immutable_tip_slot {
+                    break;
+                }
             }
-
-            if end_slot == self.immutable_tip_slot {
-                break;
-            }
-
-            // The one slot overlap is deliberate, it doesn't hurt anything and prevents all off by
-            // one problems that may occur otherwise.
-            self.start_slot = end_slot;
+            // `start_slot` is still used, because it is used to keep syncing chunks as required
+            // while each immutable sync task finishes.
+            info!(chain=%self.cfg.chain, tasks=self.current_sync_tasks, until=self.start_slot, "Persistent Indexing DB tasks started");
         }
-        // `start_slot` is still used, because it is used to keep syncing chunks as required while
-        // each immutable sync task finishes.
-        info!(chain=%self.cfg.chain, tasks=self.current_sync_tasks, until=self.start_slot, "Persistent Indexing DB tasks started");
     }
 
     /// Check if the requested range has already been indexed.
