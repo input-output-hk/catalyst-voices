@@ -1,10 +1,9 @@
+import 'package:catalyst_voices/pages/registration/create_keychain/bloc_seed_phrase_builder.dart';
 import 'package:catalyst_voices/pages/registration/next_step.dart';
 import 'package:catalyst_voices/pages/registration/registration_stage_message.dart';
 import 'package:catalyst_voices/pages/registration/registration_stage_navigation.dart';
-import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SeedPhraseCheckResultPanel extends StatelessWidget {
   const SeedPhraseCheckResultPanel({
@@ -35,25 +34,19 @@ class _BlocRegistrationStageMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RegistrationCubit, RegistrationState>(
-      buildWhen: (previous, current) {
-        return previous
-                .keychainStateData.seedPhraseStateData.areUserWordsCorrect !=
-            current.keychainStateData.seedPhraseStateData.areUserWordsCorrect;
-      },
+    return BlocSeedPhraseBuilder<bool>(
+      selector: (state) => state.areUserWordsCorrect,
+      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
-        final areUserWordsCorrect =
-            state.keychainStateData.seedPhraseStateData.areUserWordsCorrect;
-
         // TODO(damian-molinski): use correct strings when available.
         return RegistrationStageMessage(
           title: Text(
-            areUserWordsCorrect
+            state
                 ? context.l10n.createKeychainSeedPhraseCheckSuccessTitle
                 : 'Seed phrase words does not match!',
           ),
           subtitle: Text(
-            areUserWordsCorrect
+            state
                 ? context.l10n.createKeychainSeedPhraseCheckSuccessSubtitle
                 : 'Go back ana make sure order is correct',
           ),
@@ -68,16 +61,12 @@ class _BlocNextStep extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RegistrationCubit, RegistrationState>(
-      buildWhen: (previous, current) {
-        return previous
-                .keychainStateData.seedPhraseStateData.areUserWordsCorrect !=
-            current.keychainStateData.seedPhraseStateData.areUserWordsCorrect;
-      },
+    return BlocSeedPhraseBuilder<bool>(
+      selector: (state) => state.areUserWordsCorrect,
+      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
         return Offstage(
-          offstage:
-              !state.keychainStateData.seedPhraseStateData.areUserWordsCorrect,
+          offstage: !state,
           child: NextStep(
             context.l10n.createKeychainSeedPhraseCheckSuccessNextStep,
           ),
@@ -92,16 +81,12 @@ class _BlocNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RegistrationCubit, RegistrationState>(
-      buildWhen: (previous, current) {
-        return previous
-                .keychainStateData.seedPhraseStateData.areUserWordsCorrect !=
-            current.keychainStateData.seedPhraseStateData.areUserWordsCorrect;
-      },
+    return BlocSeedPhraseBuilder<bool>(
+      selector: (state) => state.areUserWordsCorrect,
+      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
         return RegistrationBackNextNavigation(
-          isNextEnabled:
-              state.keychainStateData.seedPhraseStateData.areUserWordsCorrect,
+          isNextEnabled: state,
         );
       },
     );

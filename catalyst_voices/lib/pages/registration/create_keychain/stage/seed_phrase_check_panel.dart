@@ -1,10 +1,10 @@
+import 'package:catalyst_voices/pages/registration/create_keychain/bloc_seed_phrase_builder.dart';
 import 'package:catalyst_voices/pages/registration/registration_stage_navigation.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class SeedPhraseCheckPanel extends StatefulWidget {
   const SeedPhraseCheckPanel({
@@ -61,14 +61,12 @@ class _BlocLoadable extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RegistrationCubit, RegistrationState>(
-      buildWhen: (previous, current) {
-        return previous.keychainStateData.seedPhraseStateData.isLoading !=
-            current.keychainStateData.seedPhraseStateData.isLoading;
-      },
+    return BlocSeedPhraseBuilder<bool>(
+      selector: (state) => state.isLoading,
+      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
         return VoicesLoadable(
-          isLoading: state.keychainStateData.seedPhraseStateData.isLoading,
+          isLoading: state,
           builder: builder,
         );
       },
@@ -89,34 +87,30 @@ class _BlocSeedPhraseWords extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RegistrationCubit, RegistrationState>(
+    return BlocSeedPhraseBuilder<
+        (
+          List<String> shuffledWords,
+          List<String> words,
+          bool isResetWordsEnabled,
+        )>(
+      selector: (state) => (
+        state.shuffledWords,
+        state.userWords,
+        state.isResetWordsEnabled,
+      ),
       buildWhen: (previous, current) {
-        final previousState = previous.keychainStateData.seedPhraseStateData;
-        final currentState = current.keychainStateData.seedPhraseStateData;
-
-        final sameShuffledWords = listEquals(
-          previousState.shuffledWords,
-          currentState.shuffledWords,
-        );
-        final sameUserWords = listEquals(
-          previousState.userWords,
-          currentState.userWords,
-        );
-        final sameIsResetWordsEnabled = previousState.isResetWordsEnabled ==
-            currentState.isResetWordsEnabled;
-
-        return !sameShuffledWords || !sameUserWords || !sameIsResetWordsEnabled;
+        return !listEquals(previous.$1, current.$1) ||
+            !listEquals(previous.$2, current.$2) ||
+            previous.$3 != current.$3;
       },
       builder: (context, state) {
-        final stateData = state.keychainStateData.seedPhraseStateData;
-
         return _SeedPhraseWords(
-          words: stateData.shuffledWords,
-          userWords: stateData.userWords,
+          words: state.$1,
+          userWords: state.$2,
           onUserWordsChanged: onUserWordsChanged,
           onUploadTap: onUploadTap,
           onResetTap: onResetTap,
-          isResetEnabled: stateData.isResetWordsEnabled,
+          isResetEnabled: state.$3,
         );
       },
     );
@@ -200,16 +194,12 @@ class _BlocNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RegistrationCubit, RegistrationState>(
-      buildWhen: (previous, current) {
-        return previous
-                .keychainStateData.seedPhraseStateData.areUserWordsCorrect !=
-            current.keychainStateData.seedPhraseStateData.areUserWordsCorrect;
-      },
+    return BlocSeedPhraseBuilder<bool>(
+      selector: (state) => state.areUserWordsCorrect,
+      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
         return RegistrationBackNextNavigation(
-          isNextEnabled:
-              state.keychainStateData.seedPhraseStateData.areUserWordsCorrect,
+          isNextEnabled: state,
         );
       },
     );

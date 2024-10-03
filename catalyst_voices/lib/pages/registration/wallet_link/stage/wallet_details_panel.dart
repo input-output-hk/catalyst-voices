@@ -1,6 +1,6 @@
-import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/pages/registration/registration_stage_navigation.dart';
+import 'package:catalyst_voices/pages/registration/wallet_link/bloc_wallet_link_builder.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -9,7 +9,6 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class WalletDetailsPanel extends StatelessWidget {
   const WalletDetailsPanel({
@@ -44,16 +43,18 @@ class _BlocWalletExtension extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RegistrationCubit, RegistrationState>(
-      buildWhen: (previous, current) {
-        return previous.walletLinkStateData.selectedWallet?.wallet !=
-            current.walletLinkStateData.selectedWallet?.wallet;
+    return BlocWalletLinkBuilder<({String icon, String name})?>(
+      selector: (state) {
+        final wallet = state.selectedWallet?.wallet;
+        return wallet != null ? (icon: wallet.icon, name: wallet.name) : null;
       },
+      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
-        final wallet = state.walletLinkStateData.selectedWallet?.wallet;
-
-        if (wallet != null) {
-          return _WalletExtension(wallet: wallet);
+        if (state != null) {
+          return _WalletExtension(
+            icon: state.icon,
+            name: state.name,
+          );
         } else {
           return const Offstage();
         }
@@ -63,18 +64,22 @@ class _BlocWalletExtension extends StatelessWidget {
 }
 
 class _WalletExtension extends StatelessWidget {
-  final CardanoWallet wallet;
+  final String icon;
+  final String name;
 
-  const _WalletExtension({required this.wallet});
+  const _WalletExtension({
+    required this.icon,
+    required this.name,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         const SizedBox(width: 8),
-        VoicesWalletTileIcon(iconSrc: wallet.icon),
+        VoicesWalletTileIcon(iconSrc: icon),
         const SizedBox(width: 12),
-        Text(wallet.name, style: Theme.of(context).textTheme.bodyLarge),
+        Text(name, style: Theme.of(context).textTheme.bodyLarge),
         const SizedBox(width: 8),
         VoicesAvatar(
           radius: 10,
@@ -93,15 +98,12 @@ class _BlocWalletDetailsText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RegistrationCubit, RegistrationState>(
-      buildWhen: (previous, current) {
-        return previous.walletLinkStateData.selectedWallet?.wallet.name !=
-            current.walletLinkStateData.selectedWallet?.wallet.name;
-      },
+    return BlocWalletLinkBuilder<String?>(
+      selector: (state) => state.selectedWallet?.wallet.name,
+      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
-        final name = state.walletLinkStateData.selectedWallet?.wallet.name;
         return Text(
-          context.l10n.walletLinkWalletDetailsContent(name ?? ''),
+          context.l10n.walletLinkWalletDetailsContent(state ?? ''),
           style: Theme.of(context).textTheme.titleMedium,
         );
       },
@@ -114,19 +116,29 @@ class _BlocWalletSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RegistrationCubit, RegistrationState>(
-      buildWhen: (previous, current) {
-        return previous.walletLinkStateData.selectedWallet !=
-            current.walletLinkStateData.selectedWallet;
+    return BlocWalletLinkBuilder<
+        ({
+          Coin balance,
+          ShelleyAddress address,
+          bool hasEnoughBalance,
+        })?>(
+      selector: (state) {
+        final walletDetails = state.selectedWallet;
+        return walletDetails != null
+            ? (
+                balance: walletDetails.balance,
+                address: walletDetails.address,
+                hasEnoughBalance: walletDetails.hasEnoughBalance,
+              )
+            : null;
       },
+      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
-        final walletDetails = state.walletLinkStateData.selectedWallet;
-
-        if (walletDetails != null) {
+        if (state != null) {
           return _WalletSummary(
-            balance: walletDetails.balance,
-            address: walletDetails.address,
-            hasEnoughBalance: walletDetails.hasEnoughBalance,
+            balance: state.balance,
+            address: state.address,
+            hasEnoughBalance: state.hasEnoughBalance,
           );
         } else {
           return const Offstage();
@@ -312,14 +324,11 @@ class _BlocNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RegistrationCubit, RegistrationState>(
-      buildWhen: (previous, current) {
-        return previous.walletLinkStateData.selectedWallet?.hasEnoughBalance !=
-            current.walletLinkStateData.selectedWallet?.hasEnoughBalance;
-      },
+    return BlocWalletLinkBuilder<bool>(
+      selector: (state) => state.selectedWallet?.hasEnoughBalance ?? false,
+      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
-        if (state.walletLinkStateData.selectedWallet?.hasEnoughBalance ??
-            false) {
+        if (state) {
           return const RegistrationBackNextNavigation();
         } else {
           return const _NotEnoughBalanceNavigation();

@@ -1,5 +1,6 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
+import 'package:catalyst_voices/pages/registration/wallet_link/bloc_wallet_link_builder.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -8,7 +9,6 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class RbacTransactionPanel extends StatelessWidget {
   const RbacTransactionPanel({
@@ -41,24 +41,34 @@ class _BlocSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RegistrationCubit, RegistrationState>(
-      buildWhen: (previous, current) {
-        return previous.walletLinkStateData != current.walletLinkStateData;
-      },
-      builder: (context, state) {
-        final roles = state.walletLinkStateData.selectedRoles ??
-            state.walletLinkStateData.defaultRoles;
-        final selectedWallet = state.walletLinkStateData.selectedWallet;
-        final transactionFee = state.walletLinkStateData.transactionFee;
-
+    return BlocWalletLinkBuilder<
+        ({
+          Set<AccountRole> roles,
+          CardanoWalletDetails selectedWallet,
+          Coin transactionFee,
+        })?>(
+      selector: (state) {
+        final selectedWallet = state.selectedWallet;
         if (selectedWallet == null) {
+          return null;
+        }
+
+        return (
+          roles: state.selectedRoles ?? state.defaultRoles,
+          selectedWallet: selectedWallet,
+          transactionFee: state.transactionFee,
+        );
+      },
+      buildWhen: (previous, current) => previous != current,
+      builder: (context, state) {
+        if (state == null) {
           return const Offstage();
         }
 
         return _Summary(
-          roles: roles,
-          walletDetails: selectedWallet,
-          transactionFee: transactionFee,
+          roles: state.roles,
+          walletDetails: state.selectedWallet,
+          transactionFee: state.transactionFee,
         );
       },
     );

@@ -1,12 +1,12 @@
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices/pages/registration/registration_stage_message.dart';
+import 'package:catalyst_voices/pages/registration/wallet_link/bloc_wallet_link_builder.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:result_type/result_type.dart';
 
 /// Callback called when a [wallet] is selected.
@@ -81,14 +81,12 @@ class _BlocWallets extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RegistrationCubit, RegistrationState>(
-      buildWhen: (previous, current) {
-        return previous.walletLinkStateData.wallets !=
-            current.walletLinkStateData.wallets;
-      },
+    return BlocWalletLinkBuilder<Result<List<CardanoWallet>, Exception>?>(
+      selector: (state) => state.wallets,
+      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
         return _Wallets(
-          result: state.walletLinkStateData.wallets,
+          result: state,
           onRefreshTap: onRefreshTap,
           onSelectWallet: onSelectWallet,
         );
