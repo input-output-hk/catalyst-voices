@@ -657,4 +657,22 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get createKeychainUnlockPasswordInstructionsSubtitle => 'With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.    But it can be a bit tedious to enter every single time you want to use the app.    In this next step, you\'ll set your Unlock Password for your current device. It\'s like a shortcut for proving ownership of your Keychain.    Whenever you recover your account for the first time on a new device, you\'ll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.';
+
+  @override
+  String get createKeychainCreatedTitle => 'Congratulations your Catalyst  Keychain is created!';
+
+  @override
+  String get createKeychainCreatedNextStep => 'In the next step you write your Catalyst roles and  account to the Cardano Mainnet.';
+
+  @override
+  String get createKeychainLinkWalletAndRoles => 'Link your Cardano Wallet & Roles';
+
+  @override
+  String get registrationCreateKeychainStepGroup => 'Catalyst Keychain created';
+
+  @override
+  String get registrationLinkWalletStepGroup => 'Link Cardano Wallet & Roles';
+
+  @override
+  String get registrationCompletedStepGroup => 'Catalyst account creation completed!';
 }
