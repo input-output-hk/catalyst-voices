@@ -30,7 +30,7 @@ class CreateKeychainPanel extends StatelessWidget {
         const SeedPhraseCheckResultPanel(),
       CreateKeychainStage.unlockPasswordInstructions =>
         const UnlockPasswordInstructionsPanel(),
-      CreateKeychainStage.unlockPasswordCreate => UnlockPasswordPanel(),
+      CreateKeychainStage.unlockPasswordCreate => const UnlockPasswordPanel(),
     };
   }
 }
