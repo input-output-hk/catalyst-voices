@@ -181,7 +181,7 @@ class _DisplayingValueAsChips extends StatelessWidget {
               horizontal: 20,
               vertical: 4,
             ),
-            backgroundColor: Theme.of(context).colors.iconsForeground,
+            backgroundColor: Theme.of(context).colors.iconsBackgroundVariant,
           ),
       ],
     );

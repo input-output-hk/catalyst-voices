@@ -10,12 +10,14 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class RbacTransactionPanel extends StatelessWidget {
-  final List<AccountRole> roles;
+  final Set<AccountRole> roles;
+  final CardanoWalletDetails walletDetails;
   final Coin transactionFee;
 
   const RbacTransactionPanel({
     super.key,
     required this.roles,
+    required this.walletDetails,
     required this.transactionFee,
   });
 
@@ -32,6 +34,7 @@ class RbacTransactionPanel extends StatelessWidget {
         const SizedBox(height: 12),
         _Summary(
           roles: roles,
+          walletDetails: walletDetails,
           transactionFee: transactionFee,
         ),
         const SizedBox(height: 18),
@@ -44,11 +47,13 @@ class RbacTransactionPanel extends StatelessWidget {
 }
 
 class _Summary extends StatelessWidget {
-  final List<AccountRole> roles;
+  final Set<AccountRole> roles;
+  final CardanoWalletDetails walletDetails;
   final Coin transactionFee;
 
   const _Summary({
     required this.roles,
+    required this.walletDetails,
     required this.transactionFee,
   });
 
@@ -69,6 +74,12 @@ class _Summary extends StatelessWidget {
           Text(
             context.l10n.walletLinkTransactionAccountCompletion,
             style: Theme.of(context).textTheme.titleSmall,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            context.l10n
+                .walletLinkTransactionLinkItem(walletDetails.wallet.name),
+            style: Theme.of(context).textTheme.bodySmall,
           ),
           for (final role in roles) ...[
             const SizedBox(height: 12),

@@ -17,8 +17,8 @@ class InstructionsPanel extends StatelessWidget {
         Expanded(
           child: SingleChildScrollView(
             child: RegistrationStageMessage(
-              title: l10n.accountInstructionsTitle,
-              subtitle: l10n.accountInstructionsMessage,
+              title: Text(l10n.accountInstructionsTitle),
+              subtitle: Text(l10n.accountInstructionsMessage),
             ),
           ),
         ),

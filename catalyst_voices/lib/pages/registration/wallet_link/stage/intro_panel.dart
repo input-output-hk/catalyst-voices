@@ -15,8 +15,8 @@ class IntroPanel extends StatelessWidget {
       children: [
         const SizedBox(height: 24),
         RegistrationStageMessage(
-          title: context.l10n.walletLinkIntroTitle,
-          subtitle: context.l10n.walletLinkIntroContent,
+          title: Text(context.l10n.walletLinkIntroTitle),
+          subtitle: Text(context.l10n.walletLinkIntroContent),
         ),
         const Spacer(),
         VoicesFilledButton(

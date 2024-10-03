@@ -19,8 +19,9 @@ class SeedPhraseCheckInstructionsPanel extends StatelessWidget {
         Expanded(
           child: SingleChildScrollView(
             child: RegistrationStageMessage(
-              title: l10n.createKeychainSeedPhraseCheckInstructionsTitle,
-              subtitle: l10n.createKeychainSeedPhraseCheckInstructionsSubtitle,
+              title: Text(l10n.createKeychainSeedPhraseCheckInstructionsTitle),
+              subtitle:
+                  Text(l10n.createKeychainSeedPhraseCheckInstructionsSubtitle),
             ),
           ),
         ),

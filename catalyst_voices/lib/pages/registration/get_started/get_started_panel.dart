@@ -19,8 +19,8 @@ class GetStartedPanel extends StatelessWidget {
       children: [
         const SizedBox(height: 24),
         RegistrationStageMessage(
-          title: context.l10n.accountCreationGetStartedTitle,
-          subtitle: context.l10n.accountCreationGetStatedDesc,
+          title: Text(context.l10n.accountCreationGetStartedTitle),
+          subtitle: Text(context.l10n.accountCreationGetStatedDesc),
           spacing: 12,
           textColor: theme.colors.textOnPrimaryLevel1,
         ),
@@ -42,9 +42,9 @@ class GetStartedPanel extends StatelessWidget {
                   onTap: () {
                     switch (type) {
                       case CreateAccountType.createNew:
-                        RegistrationCubit.of(context).createNewKeychain();
+                        RegistrationCubit.of(context).createNewKeychainStep();
                       case CreateAccountType.recover:
-                        RegistrationCubit.of(context).recoverKeychain();
+                        RegistrationCubit.of(context).recoverKeychainStep();
                     }
                   },
                 );
