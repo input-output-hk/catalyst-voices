@@ -40,14 +40,32 @@ void main() {
 
     test(
       'dataOr returns optional data when not null',
-      () {},
-      skip: true,
+      () {
+        // Given
+        const data = 'username';
+        const optional = Optional(data) as Optional<String>?;
+
+        // When
+        final optionalData = optional.dataOr('fallback');
+
+        // Then
+        expect(optionalData, data);
+      },
     );
 
     test(
       'dataOr returns fallback when called on null Optional',
-      () {},
-      skip: true,
+      () {
+        // Given
+        const fallbackData = 'fallback';
+        const Optional<String>? optional = null;
+
+        // When
+        final optionalData = optional.dataOr(fallbackData);
+
+        // Then
+        expect(optionalData, fallbackData);
+      },
     );
   });
 }
