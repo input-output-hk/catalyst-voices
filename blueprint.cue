@@ -24,6 +24,11 @@ global: {
 				path:     "global/ci/docker"
 			}
 
+			git: credentials: {
+				provider: "aws"
+				path:     "global/ci/deploy"
+			}
+
 			earthly: {
 				credentials: {
 					provider: "aws"
@@ -47,5 +52,13 @@ global: {
 		tagging: {
 			strategy: "commit"
 		}
+	}
+	deployment: {
+		registry: ci.providers.aws.registry
+		repo: {
+			url: "https://github.com/input-output-hk/catalyst-world"
+			ref: "master"
+		}
+		root: "k8s"
 	}
 }
