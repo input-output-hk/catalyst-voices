@@ -21,7 +21,7 @@ use crate::{
 
 /// Endpoint responses
 #[derive(ApiResponse)]
-pub(crate) enum Responses {
+pub(crate) enum ResponseSingleRegistration {
     /// Cip36 registration
     #[oai(status = 200)]
     Ok(Json<Cip36Reporting>),
@@ -32,7 +32,7 @@ pub(crate) enum Responses {
 
 /// Endpoint responses
 #[derive(ApiResponse)]
-pub(crate) enum ResponsesVotingKey {
+pub(crate) enum ResponseMultipleRegistrations {
     /// Cip36 registration
     #[oai(status = 200)]
     Ok(Json<Vec<Cip36Info>>),
@@ -44,7 +44,7 @@ pub(crate) enum ResponsesVotingKey {
 /// Cip36 info + invalid reporting
 #[derive(Object, Default)]
 pub(crate) struct Cip36Reporting {
-    /// Cip36 info
+    /// List of registrations
     cip36: Vec<Cip36Info>,
     /// Invald registration reporting
     invalids: Vec<InvalidRegistrationsReport>,
@@ -89,9 +89,9 @@ pub(crate) struct InvalidRegistrationsReport {
 }
 
 /// All responses
-pub(crate) type AllResponses = WithErrorResponses<Responses>;
+pub(crate) type AllResponses = WithErrorResponses<ResponseSingleRegistration>;
 /// All responses voting key
-pub(crate) type AllResponsesVotingKey = WithErrorResponses<ResponsesVotingKey>;
+pub(crate) type AllResponsesVotingKey = WithErrorResponses<ResponseMultipleRegistrations>;
 
 /// Get latest registration given a stake address
 pub(crate) async fn get_latest_registration_from_stake_addr(
@@ -101,13 +101,13 @@ pub(crate) async fn get_latest_registration_from_stake_addr(
         Ok(stake_addr) => stake_addr,
         Err(err) => {
             error!("Failed to decode stake addr {:?}", err);
-            return Responses::NotFound.into();
+            return ResponseSingleRegistration::NotFound.into();
         },
     };
 
     let Some(session) = CassandraSession::get(persistent) else {
         error!("Failed to acquire db session");
-        return Responses::NotFound.into();
+        return ResponseSingleRegistration::NotFound.into();
     };
 
     let registration =
@@ -119,7 +119,7 @@ pub(crate) async fn get_latest_registration_from_stake_addr(
                     hex::encode(stake_addr),
                     err
                 );
-                return Responses::NotFound.into();
+                return ResponseSingleRegistration::NotFound.into();
             },
         };
 
@@ -137,7 +137,7 @@ pub(crate) async fn get_latest_registration_from_stake_addr(
                 hex::encode(stake_addr),
                 err
             );
-            return Responses::NotFound.into();
+            return ResponseSingleRegistration::NotFound.into();
         },
     };
 
@@ -146,7 +146,7 @@ pub(crate) async fn get_latest_registration_from_stake_addr(
         invalids: invalids_report,
     };
 
-    Responses::Ok(Json(report)).into()
+    ResponseSingleRegistration::Ok(Json(report)).into()
 }
 
 /// Get latest registration given a stake addr
@@ -249,13 +249,13 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
         Ok(stake_hash) => stake_hash,
         Err(err) => {
             error!("Failed to decode stake addr {:?}", err);
-            return Responses::NotFound.into();
+            return ResponseSingleRegistration::NotFound.into();
         },
     };
 
     let Some(session) = CassandraSession::get(persistent) else {
         error!("Failed to acquire db session");
-        return Responses::NotFound.into();
+        return ResponseSingleRegistration::NotFound.into();
     };
 
     // Get stake addr assosciated with give stake hash
@@ -264,7 +264,7 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
             Ok(latest) => latest,
             Err(err) => {
                 error!("Failed to query stake addr from stake hash {:?}", err);
-                return Responses::NotFound.into();
+                return ResponseSingleRegistration::NotFound.into();
             },
         };
 
@@ -273,7 +273,7 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
             Ok(r) => r,
             Err(err) => {
                 error!("Failed to get latest registration {:?}", err);
-                return Responses::NotFound.into();
+                return ResponseSingleRegistration::NotFound.into();
             },
         };
 
@@ -288,7 +288,7 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
                         hex::encode(row.stake_address),
                         err
                     );
-                    return Responses::NotFound.into();
+                    return ResponseSingleRegistration::NotFound.into();
                 },
             };
 
@@ -308,7 +308,7 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
                     hex::encode(registration.stake_address.clone()),
                     err
                 );
-                return Responses::NotFound.into();
+                return ResponseSingleRegistration::NotFound.into();
             },
         };
 
@@ -317,10 +317,10 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
             invalids: invalids_report,
         };
 
-        return Responses::Ok(Json(report)).into();
+        return ResponseSingleRegistration::Ok(Json(report)).into();
     }
 
-    Responses::NotFound.into()
+    ResponseSingleRegistration::NotFound.into()
 }
 
 /// Returns the list of stake address registrations currently associated with a given
@@ -332,13 +332,13 @@ pub(crate) async fn get_asscociated_vote_key_registrations(
         Ok(vote_key) => vote_key,
         Err(err) => {
             error!("Failed to decode vote key {:?}", err);
-            return ResponsesVotingKey::NotFound.into();
+            return ResponseMultipleRegistrations::NotFound.into();
         },
     };
 
     let Some(session) = CassandraSession::get(persistent) else {
         error!("Failed to acquire db session");
-        return ResponsesVotingKey::NotFound.into();
+        return ResponseMultipleRegistrations::NotFound.into();
     };
 
     let mut stake_addr_iter = match GetStakeAddrFromVoteKeyQuery::execute(
@@ -350,7 +350,7 @@ pub(crate) async fn get_asscociated_vote_key_registrations(
         Ok(latest) => latest,
         Err(err) => {
             error!("Failed to query stake addr from vote key {:?}", err);
-            return ResponsesVotingKey::NotFound.into();
+            return ResponseMultipleRegistrations::NotFound.into();
         },
     };
 
@@ -359,7 +359,7 @@ pub(crate) async fn get_asscociated_vote_key_registrations(
             Ok(r) => r,
             Err(err) => {
                 error!("Failed to get latest registration {:?}", err);
-                return ResponsesVotingKey::NotFound.into();
+                return ResponseMultipleRegistrations::NotFound.into();
             },
         };
 
@@ -372,16 +372,16 @@ pub(crate) async fn get_asscociated_vote_key_registrations(
                         hex::encode(row.stake_address),
                         err
                     );
-                    return ResponsesVotingKey::NotFound.into();
+                    return ResponseMultipleRegistrations::NotFound.into();
                 },
             };
 
-        return ResponsesVotingKey::Ok(Json(check_stake_addr_voting_key_association(
+        return ResponseMultipleRegistrations::Ok(Json(check_stake_addr_voting_key_association(
             registrations,
             &hex::encode(vote_key),
         )))
         .into();
     }
 
-    ResponsesVotingKey::NotFound.into()
+    ResponseMultipleRegistrations::NotFound.into()
 }
