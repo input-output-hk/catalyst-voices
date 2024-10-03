@@ -1132,6 +1132,54 @@ abstract class VoicesLocalizations {
   /// **'Total'**
   String get total;
 
+  /// No description provided for @file.
+  ///
+  /// In en, this message translates to:
+  /// **'file'**
+  String get file;
+
+  /// No description provided for @key.
+  ///
+  /// In en, this message translates to:
+  /// **'key'**
+  String get key;
+
+  /// No description provided for @upload.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload'**
+  String get upload;
+
+  /// No description provided for @browse.
+  ///
+  /// In en, this message translates to:
+  /// **'browse'**
+  String get browse;
+
+  /// An info on upload dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Drop your {itemNameToUpload} here or '**
+  String uploadDropInfo(String itemNameToUpload);
+
+  /// No description provided for @uploadProgressInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload in progress'**
+  String get uploadProgressInfo;
+
+  /// A title on keychain upload dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Catalyst Keychain'**
+  String get uploadKeychainTitle;
+
+  /// An info on keychain upload dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Make sure it\'s a correct Catalyst keychain file.'**
+  String get uploadKeychainInfo;
+
   /// Refers to a light theme mode.
   ///
   /// In en, this message translates to:
@@ -1293,6 +1341,42 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Catalyst account creation completed!'**
   String get registrationCompletedStepGroup;
+
+  /// No description provided for @createKeychainUnlockPasswordIntoSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst unlock password'**
+  String get createKeychainUnlockPasswordIntoSubtitle;
+
+  /// No description provided for @createKeychainUnlockPasswordIntoBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Please provide a password for your Catalyst Keychain.'**
+  String get createKeychainUnlockPasswordIntoBody;
+
+  /// No description provided for @enterPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter password'**
+  String get enterPassword;
+
+  /// No description provided for @confirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm password'**
+  String get confirmPassword;
+
+  /// No description provided for @xCharactersMinimum.
+  ///
+  /// In en, this message translates to:
+  /// **'{number} characters minimum length'**
+  String xCharactersMinimum(int number);
+
+  /// When user confirms password but it does not match original one.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match, please correct'**
+  String get passwordDoNotMatch;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

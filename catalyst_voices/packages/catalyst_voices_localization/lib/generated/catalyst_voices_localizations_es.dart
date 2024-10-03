@@ -602,6 +602,32 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get total => 'Total';
 
   @override
+  String get file => 'file';
+
+  @override
+  String get key => 'key';
+
+  @override
+  String get upload => 'Upload';
+
+  @override
+  String get browse => 'browse';
+
+  @override
+  String uploadDropInfo(String itemNameToUpload) {
+    return 'Drop your $itemNameToUpload here or ';
+  }
+
+  @override
+  String get uploadProgressInfo => 'Upload in progress';
+
+  @override
+  String get uploadKeychainTitle => 'Upload Catalyst Keychain';
+
+  @override
+  String get uploadKeychainInfo => 'Make sure it\'s a correct Catalyst keychain file.';
+
+  @override
   String get themeLight => 'Light';
 
   @override
@@ -681,4 +707,24 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get registrationCompletedStepGroup => 'Catalyst account creation completed!';
+
+  @override
+  String get createKeychainUnlockPasswordIntoSubtitle => 'Catalyst unlock password';
+
+  @override
+  String get createKeychainUnlockPasswordIntoBody => 'Please provide a password for your Catalyst Keychain.';
+
+  @override
+  String get enterPassword => 'Enter password';
+
+  @override
+  String get confirmPassword => 'Confirm password';
+
+  @override
+  String xCharactersMinimum(int number) {
+    return '$number characters minimum length';
+  }
+
+  @override
+  String get passwordDoNotMatch => 'Passwords do not match, please correct';
 }

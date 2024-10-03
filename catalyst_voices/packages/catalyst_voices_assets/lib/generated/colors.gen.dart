@@ -82,6 +82,9 @@ class VoicesColors {
   /// Color: #FFD1D1
   static const Color darkOnErrorContainer = Color(0xFFFFD1D1);
 
+  /// Color: #FFFFFF
+  static const Color darkOnErrorVariant = Color(0xFFFFFFFF);
+
   /// Color: #0C288D
   static const Color darkOnPrimary = Color(0xFF0C288D);
 
@@ -283,6 +286,9 @@ class VoicesColors {
 
   /// Color: #700000
   static const Color lightOnErrorContainer = Color(0xFF700000);
+
+  /// Color: #FFFFFF
+  static const Color lightOnErrorVariant = Color(0xFFFFFFFF);
 
   /// Color: #FFFFFF
   static const Color lightOnPrimary = Color(0xFFFFFFFF);
