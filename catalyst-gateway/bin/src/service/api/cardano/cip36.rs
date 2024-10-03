@@ -364,7 +364,8 @@ pub(crate) async fn get_asscociated_vote_key_registrations(
             },
         };
 
-        // We have the stake addr associated with vote key, now get all registrations with the stake addr.
+        // We have the stake addr associated with vote key, now get all registrations with the
+        // stake addr.
         let registrations =
             match get_all_registrations_from_stake_addr(session.clone(), row.stake_address.clone())
                 .await
@@ -380,8 +381,8 @@ pub(crate) async fn get_asscociated_vote_key_registrations(
                 },
             };
 
-        // check registrations (stake addrs) are still actively associated with the voting key, and have not been
-        // registered to another voting key.
+        // check registrations (stake addrs) are still actively associated with the voting key,
+        // and have not been registered to another voting key.
         let redacted_registrations =
             check_stake_addr_voting_key_association(registrations, &hex::encode(vote_key));
 
