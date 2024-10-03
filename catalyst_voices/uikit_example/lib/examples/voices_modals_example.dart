@@ -31,7 +31,7 @@ class VoicesModalsExample extends StatelessWidget {
                   info: context.l10n.uploadKeychainInfo,
                   allowedExtensions: ['ckf', 'log'],
                   onUpload: (_) async {
-                    await Future<dynamic>.delayed(const Duration(seconds: 2));
+                    await Future<void>.delayed(const Duration(seconds: 2));
                   },
                   onCancel: () => debugPrint(
                     'onCancel, we can cancel upload here',

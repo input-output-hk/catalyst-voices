@@ -19,7 +19,7 @@ class VoicesUploadFileDialog extends StatefulWidget {
   final String itemNameToUpload;
   final String? info;
   final List<String>? allowedExtensions;
-  final Future<dynamic> Function(VoicesFile value)? onUpload;
+  final Future<void> Function(VoicesFile value)? onUpload;
   final VoidCallback? onCancel;
 
   const VoicesUploadFileDialog({
@@ -38,7 +38,7 @@ class VoicesUploadFileDialog extends StatefulWidget {
     String? itemNameToUpload,
     String? info,
     List<String>? allowedExtensions,
-    Future<dynamic> Function(VoicesFile value)? onUpload,
+    Future<void> Function(VoicesFile value)? onUpload,
     VoidCallback? onCancel,
   }) {
     return VoicesDialog.show<VoicesFile?>(
@@ -111,7 +111,7 @@ class _VoicesUploadFileDialogState extends State<VoicesUploadFileDialog> {
 
 class _Buttons extends StatefulWidget {
   final VoicesFile? selectedFile;
-  final Future<dynamic> Function(VoicesFile value)? onUpload;
+  final Future<void> Function(VoicesFile value)? onUpload;
   final VoidCallback? onCancel;
 
   const _Buttons({
@@ -340,7 +340,7 @@ class _UploadContainerState extends State<_UploadContainer> {
                         ),
                     ]
                         .separatedBy(
-                          Container(
+                          const SizedBox(
                             height: 12,
                           ),
                         )
