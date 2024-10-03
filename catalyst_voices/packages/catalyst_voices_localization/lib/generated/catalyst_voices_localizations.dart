@@ -1293,6 +1293,42 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Catalyst account creation completed!'**
   String get registrationCompletedStepGroup;
+
+  /// No description provided for @createKeychainUnlockPasswordIntoSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst unlock password'**
+  String get createKeychainUnlockPasswordIntoSubtitle;
+
+  /// No description provided for @createKeychainUnlockPasswordIntoBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Please provide a password for your Catalyst Keychain.'**
+  String get createKeychainUnlockPasswordIntoBody;
+
+  /// No description provided for @enterPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter password'**
+  String get enterPassword;
+
+  /// No description provided for @confirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm password'**
+  String get confirmPassword;
+
+  /// No description provided for @xCharactersMinimum.
+  ///
+  /// In en, this message translates to:
+  /// **'{number} characters minimum length'**
+  String xCharactersMinimum(int number);
+
+  /// When user confirms password but it does not match original one.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match, please correct'**
+  String get passwordDoNotMatch;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

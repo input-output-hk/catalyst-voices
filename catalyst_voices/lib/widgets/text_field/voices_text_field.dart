@@ -4,6 +4,7 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// A replacement for [TextField] and [TextFormField]
 /// that is pre-configured to use Project Catalyst theming.
@@ -58,6 +59,15 @@ class VoicesTextField extends StatefulWidget {
   /// [TextField.onChanged]
   final ValueChanged<String>? onChanged;
 
+  /// [TextField.onSubmitted]
+  final ValueChanged<String>? onFieldSubmitted;
+
+  /// [FormField.onSaved]
+  final FormFieldSetter<String>? onSaved;
+
+  /// [TextField.inputFormatters]
+  final List<TextInputFormatter>? inputFormatters;
+
   const VoicesTextField({
     super.key,
     this.controller,
@@ -75,6 +85,9 @@ class VoicesTextField extends StatefulWidget {
     this.validator,
     this.onChanged,
     this.resizable,
+    this.onFieldSubmitted,
+    this.onSaved,
+    this.inputFormatters,
   });
 
   @override
@@ -163,6 +176,9 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
             expands: resizable,
             controller: _obtainController(),
             focusNode: widget.focusNode,
+            onFieldSubmitted: widget.onFieldSubmitted,
+            onSaved: widget.onSaved,
+            inputFormatters: widget.inputFormatters,
             decoration: InputDecoration(
               filled: widget.decoration?.filled,
               fillColor: widget.decoration?.fillColor,
