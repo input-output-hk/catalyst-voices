@@ -12,9 +12,11 @@ final _logger = Logger('WalletLinkCubit');
 abstract interface class WalletLinkManager {
   Future<void> refreshWallets();
 
-  Future<void> selectWallet(CardanoWallet wallet);
+  Future<bool> selectWallet(CardanoWallet wallet);
 
   void selectRoles(Set<AccountRole> roles);
+
+  void submitRegistration();
 }
 
 final class WalletLinkCubit extends Cubit<WalletLinkStateData>
@@ -36,9 +38,8 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
     }
   }
 
-  // TODO(damian): make sure next stage is selected
   @override
-  Future<void> selectWallet(CardanoWallet wallet) async {
+  Future<bool> selectWallet(CardanoWallet wallet) async {
     try {
       final enabledWallet = await wallet.enable();
       final balance = await enabledWallet.getBalance();
@@ -51,13 +52,21 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
       );
 
       emit(state.copyWith(selectedWallet: Optional(walletDetails)));
+
+      return true;
     } catch (error, stackTrace) {
       _logger.severe('selectWallet', error, stackTrace);
+      return false;
     }
   }
 
   @override
   void selectRoles(Set<AccountRole> roles) {
     emit(state.copyWith(selectedRoles: Optional(roles)));
+  }
+
+  @override
+  void submitRegistration() {
+    // TODO(dtscalac): submit RBAC transaction
   }
 }

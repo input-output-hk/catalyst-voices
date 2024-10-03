@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/keychain_creation_cubit.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/wallet_link_cubit.dart';
@@ -77,22 +76,6 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     if (previousStep != null) {
       _goToStep(previousStep);
     }
-  }
-
-  void refreshWallets() {
-    unawaited(_walletLinkCubit.refreshWallets());
-  }
-
-  Future<void> selectWallet(CardanoWallet wallet) {
-    return _walletLinkCubit.selectWallet(wallet);
-  }
-
-  void selectRoles(Set<AccountRole> roles) {
-    _walletLinkCubit.selectRoles(roles);
-  }
-
-  void submitRegistration() {
-    // TODO(dtscalac): submit RBAC transaction
   }
 
   RegistrationStep? _nextStep({RegistrationStep? from}) {

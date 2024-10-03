@@ -65,7 +65,7 @@ class _BlocRolesChooserContainer extends StatelessWidget {
         return RolesChooserContainer(
           selected: state.selected,
           lockedValuesAsDefault: state.defaultRoles,
-          onChanged: RegistrationCubit.of(context).selectRoles,
+          onChanged: RegistrationCubit.of(context).walletLink.selectRoles,
         );
       },
     );

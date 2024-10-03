@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices/pages/registration/registration_stage_message.dart';
 import 'package:catalyst_voices/pages/registration/wallet_link/bloc_wallet_link_builder.dart';
@@ -62,11 +64,16 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
   }
 
   void _refreshWallets() {
-    RegistrationCubit.of(context).refreshWallets();
+    unawaited(RegistrationCubit.of(context).walletLink.refreshWallets());
   }
 
   Future<void> _onSelectWallet(CardanoWallet wallet) async {
-    return RegistrationCubit.of(context).selectWallet(wallet);
+    final registration = RegistrationCubit.of(context);
+
+    final success = await registration.walletLink.selectWallet(wallet);
+    if (success) {
+      registration.nextStep();
+    }
   }
 }
 

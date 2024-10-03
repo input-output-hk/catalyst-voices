@@ -185,7 +185,7 @@ class _Navigation extends StatelessWidget {
         VoicesFilledButton(
           leading: VoicesAssets.icons.wallet.buildIcon(),
           onTap: () {
-            RegistrationCubit.of(context).submitRegistration();
+            RegistrationCubit.of(context).walletLink.submitRegistration();
           },
           child: Text(context.l10n.walletLinkTransactionSign),
         ),
