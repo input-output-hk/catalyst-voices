@@ -47,10 +47,15 @@ class _RegistrationDialog extends StatelessWidget {
         GetStarted() => const GetStartedPanel(),
         FinishAccountCreation() => const FinishAccountCreationPanel(),
         Recover() => const Placeholder(),
-        CreateKeychain(:final stage, :final seedPhraseState) =>
+        CreateKeychain(
+          :final stage,
+          :final seedPhrase,
+          :final unlockPassword,
+        ) =>
           CreateKeychainPanel(
             stage: stage,
-            seedPhraseState: seedPhraseState,
+            seedPhraseState: seedPhrase,
+            unlockPasswordState: unlockPassword,
           ),
         WalletLink(:final stage, :final stateData) => WalletLinkPanel(
             stage: stage,
