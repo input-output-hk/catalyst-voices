@@ -8,8 +8,8 @@ class BlocBuilderSelector<B extends StateStreamable<S>, S, T>
     extends BlocBuilder<B, S> {
   BlocBuilderSelector({
     super.key,
-    required BlocWidgetBuilder<T> builder,
     required BlocValueSelector<T, S> selector,
+    required BlocWidgetBuilder<T> builder,
     super.bloc,
     BlocBuilderCondition<T>? buildWhen,
   }) : super(

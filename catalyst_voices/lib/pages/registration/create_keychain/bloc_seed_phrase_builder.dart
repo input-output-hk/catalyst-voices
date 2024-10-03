@@ -4,8 +4,8 @@ class BlocSeedPhraseBuilder<T>
     extends BlocBuilderSelector<RegistrationCubit, RegistrationState, T> {
   BlocSeedPhraseBuilder({
     super.key,
-    required super.builder,
     required BlocValueSelector<T, SeedPhraseStateData> selector,
+    required super.builder,
     super.bloc,
     super.buildWhen,
   }) : super(

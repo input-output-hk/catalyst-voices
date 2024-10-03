@@ -42,14 +42,14 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     return super.close();
   }
 
-  void createNewKeychain() {
+  void createNewKeychainStep() {
     final nextStep = _nextStep(from: const CreateKeychainStep());
     if (nextStep != null) {
       _goToStep(nextStep);
     }
   }
 
-  void recoverKeychain() {
+  void recoverKeychainStep() {
     final nextStep = _nextStep(from: const RecoverStep());
     if (nextStep != null) {
       _goToStep(nextStep);

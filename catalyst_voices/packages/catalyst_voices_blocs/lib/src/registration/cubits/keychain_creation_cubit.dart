@@ -22,6 +22,12 @@ abstract interface class KeychainCreationManager {
   void setUserSeedPhraseWords(List<String> words);
 
   Future<void> downloadSeedPhrase();
+
+  void setPassword(String value);
+
+  void setConfirmPassword(String value);
+
+  Future<void> createKeychain();
 }
 
 final class KeychainCreationCubit extends Cubit<KeychainStateData>
@@ -40,6 +46,16 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
   set _seedPhraseStateData(SeedPhraseStateData newValue) {
     if (state.seedPhraseStateData != newValue) {
       emit(state.copyWith(seedPhraseStateData: newValue));
+    }
+  }
+
+  UnlockPasswordState get _unlockPasswordState {
+    return state.unlockPasswordState;
+  }
+
+  set _unlockPasswordState(UnlockPasswordState newValue) {
+    if (state.unlockPasswordState != newValue) {
+      emit(state.copyWith(unlockPasswordState: newValue));
     }
   }
 
@@ -106,6 +122,46 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
       _logger.severe('Downloading keychain failed', error, stackTrace);
       // TODO(damian-molinski): Show snack bar
     }
+  }
+
+  @override
+  void setPassword(String value) {
+    _updateUnlockPasswordState(password: value);
+  }
+
+  @override
+  void setConfirmPassword(String value) {
+    _updateUnlockPasswordState(confirmPassword: value);
+  }
+
+  @override
+  Future<void> createKeychain() async {
+    // TODO(damian-molinski): implement
+  }
+
+  void _updateUnlockPasswordState({
+    String? password,
+    String? confirmPassword,
+  }) {
+    password ??= _unlockPasswordState.password;
+    confirmPassword ??= _unlockPasswordState.confirmPassword;
+
+    const minimumLength = PasswordStrength.minimumLength;
+
+    final passwordStrength = PasswordStrength.calculate(password);
+    final correctLength = password.length >= minimumLength;
+    final matching = password == confirmPassword;
+    final hasConfirmPassword = confirmPassword.isNotEmpty;
+
+    _unlockPasswordState = _unlockPasswordState.copyWith(
+      password: password,
+      confirmPassword: confirmPassword,
+      passwordStrength: passwordStrength,
+      showPasswordStrength: password.isNotEmpty,
+      minPasswordLength: minimumLength,
+      showPasswordMisMatch: correctLength && hasConfirmPassword && !matching,
+      isNextEnabled: correctLength && matching,
+    );
   }
 
   void _buildSeedPhrase() {

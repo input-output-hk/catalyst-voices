@@ -5,7 +5,7 @@ import 'package:catalyst_voices/pages/registration/create_keychain/stage/seed_ph
 import 'package:catalyst_voices/pages/registration/create_keychain/stage/seed_phrase_panel.dart';
 import 'package:catalyst_voices/pages/registration/create_keychain/stage/splash_panel.dart';
 import 'package:catalyst_voices/pages/registration/create_keychain/stage/unlock_password_instructions_panel.dart';
-import 'package:catalyst_voices/pages/registration/placeholder_panel.dart';
+import 'package:catalyst_voices/pages/registration/create_keychain/stage/unlock_password_panel.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
@@ -30,7 +30,7 @@ class CreateKeychainPanel extends StatelessWidget {
         const SeedPhraseCheckResultPanel(),
       CreateKeychainStage.unlockPasswordInstructions =>
         const UnlockPasswordInstructionsPanel(),
-      CreateKeychainStage.unlockPasswordCreate => const PlaceholderPanel(),
+      CreateKeychainStage.unlockPasswordCreate => UnlockPasswordPanel(),
     };
   }
 }
