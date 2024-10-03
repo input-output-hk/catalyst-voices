@@ -62,9 +62,9 @@ pub(crate) struct Cip36Info {
     /// Transaction Index.
     pub txn: i16,
     /// Voting Public Key
-    pub vote_key: Vec<u8>,
+    pub vote_key: String,
     /// Full Payment Address (not hashed, 32 byte ED25519 Public key).
-    pub payment_address: Vec<u8>,
+    pub payment_address: String,
     /// Is the stake address a script or not.
     pub is_payable: bool,
     /// Is the Registration CIP36 format, or CIP15
@@ -80,6 +80,12 @@ pub(crate) struct InvalidRegistrationsReport {
     pub stake_address: String,
     /// Voting Public Key
     pub vote_key: String,
+    /// Full Payment Address (not hashed, 32 byte ED25519 Public key).
+    pub payment_address: String,
+    /// Is the stake address a script or not.
+    pub is_payable: bool,
+    /// Is the Registration CIP36 format, or CIP15
+    pub cip36: bool,
 }
 
 /// All responses
@@ -177,8 +183,8 @@ async fn get_all_registrations_from_stake_addr(
             nonce,
             slot_no,
             txn: row.txn,
-            vote_key: row.vote_key,
-            payment_address: row.payment_address,
+            vote_key: hex::encode(row.vote_key),
+            payment_address: hex::encode(row.payment_address),
             is_payable: row.is_payable,
             cip36: row.cip36,
         };
@@ -215,6 +221,9 @@ async fn get_invalid_registrations(
             error_report: row.error_report,
             stake_address: hex::encode(row.stake_address),
             vote_key: hex::encode(row.vote_key),
+            payment_address: hex::encode(row.payment_address),
+            is_payable: row.is_payable,
+            cip36: row.cip36,
         });
     }
 
@@ -224,7 +233,7 @@ async fn get_invalid_registrations(
 /// Stake addresses need to be individually checked to make sure they are still actively
 /// associated with the voting key, and have not been registered to another voting key.
 fn check_stake_addr_voting_key_association(
-    registrations: Vec<Cip36Info>, associated_voting_key: &[u8],
+    registrations: Vec<Cip36Info>, associated_voting_key: &str,
 ) -> Vec<Cip36Info> {
     registrations
         .into_iter()
@@ -367,8 +376,11 @@ pub(crate) async fn get_asscociated_vote_key_registrations(
                 },
             };
 
-        let registrations = check_stake_addr_voting_key_association(registrations, &vote_key);
-        return ResponsesVotingKey::Ok(Json(registrations)).into();
+        return ResponsesVotingKey::Ok(Json(check_stake_addr_voting_key_association(
+            registrations,
+            &hex::encode(vote_key),
+        )))
+        .into();
     }
 
     ResponsesVotingKey::NotFound.into()
