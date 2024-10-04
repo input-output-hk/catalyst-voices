@@ -23,7 +23,7 @@ pub(crate) struct GetStakeAddrFromVoteKeyParams {
 }
 
 impl GetStakeAddrFromVoteKeyParams {
-    /// Create a new instance of [`GetStakeAddrParams`]
+    /// Create a new instance of [`GetStakeAddrFromVoteKeyParams`]
     pub(crate) fn new(vote_key: Vec<u8>) -> GetStakeAddrFromVoteKeyParams {
         Self { vote_key }
     }
