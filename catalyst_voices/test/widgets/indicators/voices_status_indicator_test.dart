@@ -14,7 +14,8 @@ void main() {
         const body = 'You can now use your QR-code to login into Catalyst.';
 
         const colors = VoicesColorScheme.optional(
-          successContainer: Colors.green,
+          success: Colors.green,
+          successContainer: Colors.greenAccent,
         );
 
         // Act
@@ -38,7 +39,7 @@ void main() {
             tester.firstWidget(find.byType(Container)) as Container;
         expect(
           (container.decoration! as BoxDecoration).color,
-          equals(colors.successContainer),
+          equals(colors.success),
         );
       },
     );
@@ -52,13 +53,21 @@ void main() {
         const body = 'Please try again later.';
 
         const colors = VoicesColorScheme.optional(
-          errorContainer: Colors.red,
+          errorContainer: Colors.redAccent,
+        );
+
+        final colorScheme = ColorScheme.fromSeed(
+          seedColor: Colors.transparent,
+          error: Colors.red,
         );
 
         // Act
         await tester.pumpWidget(
           MaterialApp(
-            theme: ThemeData(extensions: const [colors]),
+            theme: ThemeData(
+              extensions: const [colors],
+              colorScheme: colorScheme,
+            ),
             home: const VoicesStatusIndicator(
               status: Text(status),
               title: Text(title),
@@ -76,7 +85,7 @@ void main() {
             tester.firstWidget(find.byType(Container)) as Container;
         expect(
           (container.decoration! as BoxDecoration).color,
-          equals(colors.errorContainer),
+          equals(colorScheme.error),
         );
       },
     );
