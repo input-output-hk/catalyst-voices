@@ -85,11 +85,11 @@ class VoicesQuestionDialog extends StatelessWidget {
       icon: icon,
       subtitle: subtitle,
       content: content,
-      buttons: actions.map((e) => buildItem(context, item: e)).toList(),
+      buttons: actions.map((e) => _buildItem(context, item: e)).toList(),
     );
   }
 
-  Widget buildItem(
+  Widget _buildItem(
     BuildContext context, {
     required VoicesQuestionActionItem item,
   }) {
