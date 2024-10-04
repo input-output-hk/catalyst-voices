@@ -19,7 +19,7 @@ final class TransactionBuilder extends Equatable {
   ///
   /// Enough [inputs] must be provided to be greater or equal
   /// the amount of [outputs] + [fee].
-  final List<TransactionUnspentOutput> inputs;
+  final Set<TransactionUnspentOutput> inputs;
 
   /// The list of transaction outputs which describes which address
   /// will receive what amount of [Coin].
@@ -38,12 +38,33 @@ final class TransactionBuilder extends Equatable {
   /// The transaction metadata as a list of key-value pairs (a map).
   final AuxiliaryData? auxiliaryData;
 
-  /// The list of public key hashes of addresses
-  /// that are required to sign the transaction.
+  /// Validity interval start as integer.
+  final SlotBigNum? validityStart;
+
+  /// Mint as a non-zero uint64 multiasset.
+  final MultiAsset? mint;
+
+  /// The transaction metadata as a list of key-value pairs (a map).
+  final ScriptData? scriptData;
+
+  /// Collateral inputs as nonempty set.
+  final Set<TransactionInput>? collateralInputs;
+
+  /// The list of public key hashes of addresses that are required to sign the
+  /// transaction. A nonempty set of addr key hashes.
   final Set<Ed25519PublicKeyHash>? requiredSigners;
 
   /// Specifies on which network the code will run.
   final NetworkId? networkId;
+
+  /// Collateral return's transaction output.
+  final ShelleyMultiAssetTransactionOutput? collateralReturn;
+
+  /// Total collateral as coin (uint64).
+  final Coin? totalCollateral;
+
+  /// Reference inputs as nonempty set of transaction inputs.
+  final Set<TransactionUnspentOutput>? referenceInputs;
 
   /// The builder that builds the witness set of the transaction.
   ///
@@ -60,8 +81,15 @@ final class TransactionBuilder extends Equatable {
     this.fee,
     this.ttl,
     this.auxiliaryData,
+    this.validityStart,
+    this.mint,
+    this.scriptData,
+    this.collateralInputs,
     this.requiredSigners,
     this.networkId,
+    this.collateralReturn,
+    this.totalCollateral,
+    this.referenceInputs,
     this.witnessBuilder = const TransactionWitnessSetBuilder(
       vkeys: {},
       vkeysCount: 1,
@@ -221,7 +249,7 @@ final class TransactionBuilder extends Equatable {
   Coin minFee() {
     final txBody = _copyWith(fee: const Coin(Numbers.intMaxValue)).buildBody();
     final fullTx = buildFakeTransaction(txBody);
-    return config.feeAlgo.minNoScriptFee(fullTx);
+    return config.feeAlgo.minFee(fullTx, {...inputs, ...?referenceInputs});
   }
 
   @override
@@ -232,8 +260,15 @@ final class TransactionBuilder extends Equatable {
         fee,
         ttl,
         auxiliaryData,
+        validityStart,
+        mint,
+        scriptData,
+        collateralInputs,
         requiredSigners,
         networkId,
+        collateralReturn,
+        totalCollateral,
+        referenceInputs,
         witnessBuilder,
       ];
 
@@ -476,8 +511,17 @@ final class TransactionBuilder extends Equatable {
       auxiliaryDataHash: auxiliaryData != null
           ? AuxiliaryDataHash.fromAuxiliaryData(auxiliaryData!)
           : null,
+      validityStart: validityStart,
+      mint: mint,
+      scriptDataHash: scriptData != null
+          ? ScriptDataHash.fromScriptData(scriptData!)
+          : null,
+      collateralInputs: collateralInputs,
       requiredSigners: requiredSigners,
       networkId: networkId,
+      collateralReturn: collateralReturn,
+      totalCollateral: totalCollateral,
+      referenceInputs: referenceInputs?.map((utxo) => utxo.input).toSet(),
     );
   }
 
@@ -493,8 +537,15 @@ final class TransactionBuilder extends Equatable {
       fee: fee ?? this.fee,
       ttl: ttl,
       auxiliaryData: auxiliaryData,
+      validityStart: validityStart,
+      mint: mint,
+      scriptData: scriptData,
+      collateralInputs: collateralInputs,
       requiredSigners: requiredSigners,
       networkId: networkId,
+      collateralReturn: collateralReturn,
+      totalCollateral: totalCollateral,
+      referenceInputs: referenceInputs,
       witnessBuilder: witnessBuilder ?? this.witnessBuilder,
     );
   }
@@ -504,7 +555,7 @@ final class TransactionBuilder extends Equatable {
 /// protocol parameters and other constants.
 final class TransactionBuilderConfig extends Equatable {
   /// The protocol parameter which describes the transaction fee algorithm.
-  final LinearFee feeAlgo;
+  final TieredFee feeAlgo;
 
   /// The protocol parameter which limits the maximum transaction size in bytes.
   final int maxTxSize;

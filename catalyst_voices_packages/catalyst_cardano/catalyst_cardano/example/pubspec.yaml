@@ -9,19 +9,20 @@ environment:
   flutter: ">=3.24.1"
 
 dependencies:
-  catalyst_cardano: ^0.2.0+1
-  catalyst_cardano_serialization: ^0.3.0
-  catalyst_cardano_web: ^0.2.0+1
-  catalyst_compression: ^0.2.0
-  catalyst_compression_web: ^0.2.0
+  catalyst_cardano: ^0.3.0
+  catalyst_cardano_serialization: ^0.4.0
+  catalyst_cardano_web: ^0.3.0
+  catalyst_compression: ^0.3.0
+  catalyst_compression_web: ^0.3.0
   cbor: ^6.2.0
   convert: ^3.1.1
   cupertino_icons: ^1.0.6
+  equatable: ^2.0.5
   flutter:
     sdk: flutter
 
 dev_dependencies:
-  catalyst_analysis: ^1.2.0
+  catalyst_analysis: ^2.0.0
   flutter_test:
     sdk: flutter
 

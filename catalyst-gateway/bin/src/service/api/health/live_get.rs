@@ -4,7 +4,7 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 use poem_openapi::ApiResponse;
 
-use crate::service::common::responses::WithErrorResponses;
+use crate::{db::index::session::CassandraSession, service::common::responses::WithErrorResponses};
 
 /// Flag to determine if the service has started
 static IS_LIVE: AtomicBool = AtomicBool::new(true);
@@ -17,7 +17,7 @@ pub(crate) fn set_live(flag: bool) {
 /// Get the started flag
 #[allow(dead_code)]
 fn is_live() -> bool {
-    IS_LIVE.load(Ordering::Acquire)
+    IS_LIVE.load(Ordering::Acquire) && CassandraSession::is_ready()
 }
 
 /// Endpoint responses.

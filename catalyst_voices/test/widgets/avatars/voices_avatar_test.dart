@@ -4,8 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group(VoicesAvatar, () {
-    testWidgets('VoicesAvatar renders with default properties',
-        (WidgetTester tester) async {
+    testWidgets('VoicesAvatar renders with default properties', (tester) async {
       // Create the widget by wrapping it in a MaterialApp for theme access.
       await tester.pumpWidget(
         const MaterialApp(
@@ -15,20 +14,19 @@ void main() {
         ),
       );
 
-      // Verify if CircleAvatar is rendered with the correct default radius.
-      final circleAvatarFinder = find.byType(CircleAvatar);
-      expect(circleAvatarFinder, findsOneWidget);
+      // Verify if Container is rendered with the correct default radius.
+      final containerFinder = find.byType(Container);
+      expect(containerFinder, findsOneWidget);
 
-      final circleAvatarWidget =
-          tester.widget<CircleAvatar>(circleAvatarFinder);
-      expect(circleAvatarWidget.radius, 20);
+      final containerWidget = tester.widget<Container>(containerFinder);
+      expect(containerWidget.constraints?.maxWidth, 40);
 
       // Verify the icon is rendered.
       expect(find.byIcon(Icons.person), findsOneWidget);
     });
 
     testWidgets('VoicesAvatar applies custom radius and padding',
-        (WidgetTester tester) async {
+        (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
@@ -41,11 +39,10 @@ void main() {
         ),
       );
 
-      // Verify if CircleAvatar is rendered with the correct custom radius.
-      final circleAvatarFinder = find.byType(CircleAvatar);
-      final circleAvatarWidget =
-          tester.widget<CircleAvatar>(circleAvatarFinder);
-      expect(circleAvatarWidget.radius, 30);
+      // Verify if Container is rendered with the correct custom radius.
+      final containerFinder = find.byType(Container);
+      final containerWidget = tester.widget<Container>(containerFinder);
+      expect(containerWidget.constraints?.maxWidth, 60);
 
       // Verify the Padding is applied correctly.
       final paddingFinder = find.ancestor(
@@ -57,7 +54,7 @@ void main() {
     });
 
     testWidgets('VoicesAvatar uses custom foreground and background colors',
-        (WidgetTester tester) async {
+        (tester) async {
       const foregroundColor = Colors.red;
       const backgroundColor = Colors.green;
 
@@ -74,10 +71,12 @@ void main() {
       );
 
       // Verify the background color is correctly applied.
-      final circleAvatarFinder = find.byType(CircleAvatar);
-      final circleAvatarWidget =
-          tester.widget<CircleAvatar>(circleAvatarFinder);
-      expect(circleAvatarWidget.backgroundColor, backgroundColor);
+      final containerFinder = find.byType(Container);
+      final containerWidget = tester.widget<Container>(containerFinder);
+      expect(
+        (containerWidget.decoration! as BoxDecoration).color,
+        backgroundColor,
+      );
 
       // Verify the foreground color is correctly applied to the icon.
       final iconThemeFinder = find.ancestor(
@@ -89,8 +88,7 @@ void main() {
       expect(iconThemeWidget.data.color, foregroundColor);
     });
 
-    testWidgets('VoicesAvatar calls onTap when tapped',
-        (WidgetTester tester) async {
+    testWidgets('VoicesAvatar calls onTap when tapped', (tester) async {
       var tapped = false;
 
       await tester.pumpWidget(
@@ -114,8 +112,7 @@ void main() {
       expect(tapped, true);
     });
 
-    testWidgets('VoicesAvatar applies theme colors by default',
-        (WidgetTester tester) async {
+    testWidgets('VoicesAvatar applies theme colors by default', (tester) async {
       final customTheme = ThemeData(
         colorScheme: const ColorScheme.light(
           primary: Colors.blue,
@@ -135,10 +132,12 @@ void main() {
       );
 
       // Verify the background color is from the theme's primaryContainer.
-      final circleAvatarFinder = find.byType(CircleAvatar);
-      final circleAvatarWidget =
-          tester.widget<CircleAvatar>(circleAvatarFinder);
-      expect(circleAvatarWidget.backgroundColor, Colors.blueGrey);
+      final containerFinder = find.byType(Container);
+      final containerWidget = tester.widget<Container>(containerFinder);
+      expect(
+        (containerWidget.decoration! as BoxDecoration).color,
+        Colors.blueGrey,
+      );
 
       // Verify the foreground color is from the theme's primary.
       final iconThemeFinder = find.byType(IconTheme);

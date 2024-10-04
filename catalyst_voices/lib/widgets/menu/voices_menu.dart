@@ -64,7 +64,7 @@ class _MenuButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    final icon = (menuItem.icon != null) ? Icon(menuItem.icon, size: 24) : null;
+    final icon = menuItem.icon;
 
     final textStyle = textTheme.bodyMedium?.copyWith(
       color:
@@ -82,23 +82,25 @@ class _MenuButton extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: Padding(
                     padding: const EdgeInsets.only(left: 10),
-                    child: Icon(
-                      icon.icon,
-                      size: icon.size,
-                      color: menuItem.enabled
-                          ? textTheme.bodySmall?.color
-                          : theme.disabledColor,
+                    child: IconTheme(
+                      data: IconThemeData(
+                        size: 24,
+                        color: menuItem.enabled
+                            ? textTheme.bodySmall?.color
+                            : theme.disabledColor,
+                      ),
+                      child: icon,
                     ),
                   ),
                 ),
               ),
             if (children != null)
-              const Positioned.fill(
+              Positioned.fill(
                 child: Align(
                   alignment: Alignment.centerRight,
                   child: Padding(
-                    padding: EdgeInsets.only(right: 6),
-                    child: Icon(CatalystVoicesIcons.chevron_right, size: 20),
+                    padding: const EdgeInsets.only(right: 6),
+                    child: VoicesAssets.icons.chevronRight.buildIcon(size: 20),
                   ),
                 ),
               ),
@@ -139,7 +141,7 @@ class _MenuButton extends StatelessWidget {
 class MenuItem {
   final int id;
   final String label;
-  final IconData? icon;
+  final Widget? icon;
   final bool showDivider;
   final bool enabled;
 

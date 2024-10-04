@@ -6,73 +6,147 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 
 final class VoicesNodeMenuItem extends Equatable {
+  final int id;
+  final String label;
+  final bool isEnabled;
+
   const VoicesNodeMenuItem({
     required this.id,
     required this.label,
+    this.isEnabled = true,
   });
 
-  final int id;
-  final String label;
-
   @override
-  List<Object?> get props => [id, label];
+  List<Object?> get props => [
+        id,
+        label,
+        isEnabled,
+      ];
 }
 
-class VoicesNodeMenu extends StatelessWidget {
-  final String name;
+class VoicesNodeMenuStateData extends Equatable {
+  final int? selectedItemId;
   final bool isExpanded;
-  final int? selected;
+
+  const VoicesNodeMenuStateData({
+    this.selectedItemId,
+    this.isExpanded = false,
+  });
+
+  VoicesNodeMenuStateData copyWith({
+    int? selectedItemId,
+    bool? isExpanded,
+  }) {
+    return VoicesNodeMenuStateData(
+      selectedItemId: selectedItemId ?? this.selectedItemId,
+      isExpanded: isExpanded ?? this.isExpanded,
+    );
+  }
+
+  VoicesNodeMenuStateData clearSelection() {
+    return VoicesNodeMenuStateData(
+      selectedItemId: null,
+      isExpanded: isExpanded,
+    );
+  }
+
+  @override
+  List<Object?> get props => [
+        selectedItemId,
+        isExpanded,
+      ];
+}
+
+class VoicesNodeMenuController extends ValueNotifier<VoicesNodeMenuStateData> {
+  VoicesNodeMenuController([
+    super._value = const VoicesNodeMenuStateData(),
+  ]);
+
+  int? get selected => value.selectedItemId;
+
+  set selected(int? newValue) {
+    value = newValue != null
+        ? value.copyWith(selectedItemId: newValue)
+        : value.clearSelection();
+  }
+
+  bool get isExpanded => value.isExpanded;
+
+  set isExpanded(bool newValue) {
+    value = value.copyWith(isExpanded: newValue);
+  }
+}
+
+class VoicesNodeMenu extends StatefulWidget {
+  final String name;
+  final VoicesNodeMenuController? controller;
   final List<VoicesNodeMenuItem> items;
-  final ValueChanged<int?>? onSelectionChanged;
-  final ValueChanged<bool>? onExpandChanged;
-
-  bool get _canTapItem => onSelectionChanged != null;
-
-  bool get _canToggleExpand => onExpandChanged != null;
+  final bool isExpandable;
 
   const VoicesNodeMenu({
     super.key,
     required this.name,
-    this.isExpanded = true,
-    this.selected,
+    this.controller,
     required this.items,
-    required this.onSelectionChanged,
-    required this.onExpandChanged,
+    this.isExpandable = true,
   });
 
   @override
+  State<VoicesNodeMenu> createState() => _VoicesNodeMenuState();
+}
+
+class _VoicesNodeMenuState extends State<VoicesNodeMenu> {
+  VoicesNodeMenuController? _controller;
+
+  VoicesNodeMenuController get _effectiveController =>
+      widget.controller ?? (_controller ??= VoicesNodeMenuController());
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    _controller = null;
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SimpleTreeView(
-      isExpanded: isExpanded,
-      root: SimpleTreeViewRootRow(
-        onTap: _canToggleExpand ? _onRootTap : null,
-        leading: [
-          _NodeIcon(isOpen: isExpanded),
-          VoicesAssets.images.viewGrid.buildIcon(),
-        ],
-        child: Text(name),
-      ),
-      children: items.mapIndexed(
-        (index, item) {
-          return SimpleTreeViewChildRow(
-            key: ValueKey('NodeMenu${item.id}RowKey'),
-            hasNext: index < items.length - 1,
-            isSelected: item.id == selected,
-            onTap: _canTapItem ? () => _onMenuItemTap(item) : null,
-            child: Text(item.label),
-          );
-        },
-      ).toList(),
+    return ValueListenableBuilder(
+      valueListenable: _effectiveController,
+      builder: (context, value, _) {
+        return SimpleTreeView(
+          isExpanded: value.isExpanded,
+          root: SimpleTreeViewRootRow(
+            onTap: widget.isExpandable ? _onRootTap : null,
+            leading: [
+              _NodeIcon(isOpen: value.isExpanded),
+              VoicesAssets.icons.viewGrid.buildIcon(),
+            ],
+            child: Text(widget.name),
+          ),
+          children: widget.items.mapIndexed(
+            (index, item) {
+              return SimpleTreeViewChildRow(
+                key: ValueKey('NodeMenu${item.id}RowKey'),
+                hasNext: index < widget.items.length - 1,
+                isSelected: item.id == value.selectedItemId,
+                onTap: item.isEnabled ? () => _onMenuItemTap(item) : null,
+                child: Text(item.label),
+              );
+            },
+          ).toList(),
+        );
+      },
     );
   }
 
   void _onRootTap() {
-    onExpandChanged?.call(!isExpanded);
+    _effectiveController.isExpanded = !_effectiveController.isExpanded;
   }
 
   void _onMenuItemTap(VoicesNodeMenuItem item) {
-    final id = item.id != selected ? item.id : null;
-    onSelectionChanged?.call(id);
+    final id = item.id != _effectiveController.selected ? item.id : null;
+
+    _effectiveController.selected = id;
   }
 }
 
@@ -88,8 +162,8 @@ class _NodeIcon extends StatelessWidget {
     return IconTheme(
       data: IconThemeData(color: Theme.of(context).colors.iconsForeground),
       child: isOpen
-          ? VoicesAssets.images.nodeOpen.buildIcon()
-          : VoicesAssets.images.nodeClosed.buildIcon(),
+          ? VoicesAssets.icons.nodeOpen.buildIcon()
+          : VoicesAssets.icons.nodeClosed.buildIcon(),
     );
   }
 }

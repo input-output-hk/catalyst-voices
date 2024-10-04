@@ -81,7 +81,7 @@ final class CatalystDataGatewayRepository {
     }
   }
 
-  Future<Result<StakeInfo, NetworkErrors>> getCardanoStakedAdaStakeAddress({
+  Future<Result<FullStakeInfo, NetworkErrors>> getCardanoStakedAdaStakeAddress({
     required String stakeAddress,
     enums.Network network = enums.Network.mainnet,
     int? slotNumber,

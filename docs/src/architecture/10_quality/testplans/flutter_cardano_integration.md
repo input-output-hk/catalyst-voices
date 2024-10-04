@@ -44,29 +44,29 @@ These actions are namely retrieving wallet details, signing data/transactions an
 
 ### Requirements
 
-[EPIC](https://github.com/input-output-hk/catalyst-voices/issues/399)  
-[CIP-30](https://cips.cardano.org/cip/CIP-30)  
-[CIP-95](https://cips.cardano.org/cip/CIP-95)  
+[EPIC](https://github.com/input-output-hk/catalyst-voices/issues/399)
+[CIP-30](https://cips.cardano.org/cip/CIP-30)
+[CIP-95](https://cips.cardano.org/cip/CIP-95)
 Testing will be focused only on web applications for the time being.
 Focus needs to be on compliance with CIP-30 and CIP-95 specs, reliability and security.
 This is especially needed when handling wallet interactions and message signing.
-UI testing is out of scope, the web application will be used only for setup purpose.  
+UI testing is out of scope, the web application will be used only for setup purpose.
 
 ### Acceptance criteria
 
-* The package must comply with CIP-30 and CIP-95 specifications, focusing on the web.  
-* High unit test coverage to ensure reliability and security.  
-* Clear and comprehensive documentation for developers.  
-* An example web application that effectively demonstrates the package's functionalities.  
+* The package must comply with CIP-30 and CIP-95 specifications, focusing on the web.
+* High unit test coverage to ensure reliability and security.
+* Clear and comprehensive documentation for developers.
+* An example web application that effectively demonstrates the package's functionalities.
+* The web application needs to support Lace, Nami, Eternl, and Vespr
 
 ### Risks
 
-Documentation is not complete yet, integration dart package might be not enough  
+Documentation is not complete yet, integration dart package might be not enough
 
 ### Tools
 
-The main tool we will use is dart integration test package.
-We still need to investigate if the testing can be achieved only with dart or if we need to use playwright for the web UI part.
+The main tool we will use is Playwright
 
 ## ACC framework
 
@@ -79,14 +79,14 @@ Secure, comply with CIP-30 and CIP-95, reliable
 
 ### Components
 
-Web application  
+Web application
 
 ### Capabilities
 
-User can retrieve his wallet details  
-User can sign data  
-User can sign transactions  
-User submit transactions  
+User can retrieve his wallet details
+User can sign data
+User can sign transactions
+User submit transactions
 
 ## Integration tests
 
@@ -100,15 +100,15 @@ User submit transactions
 
 | \#  | OBJECTIVE | STEPS | EXPECTED RESULTS | TO BE AUTOMATED |
 | --- | --------- | ----- | ---------------- | --------------- |
-| 1   | Eternl extension installation success |  Start application, Download wallet chrome extention  | Displays message when Eternl extension is successfully installed | YES  |
-| 2   | Eternl extension installation failure |  Start application, Download wallet chrome extention  | Displays error message handling when Eternl extension installation fails | YES  |
-| 3   | Eternl extension detection |  Start application, Download wallet chrome extention | Displays message when the app correctly detects the presence of the Eternl extension | YES  |
+| 1   | Wallet extension installation success |  Start application, Download wallet chrome extension  | Displays message when Wallet extension is successfully installed | YES  |
+| 2   | Wallet extension installation failure |  Start application, Download wallet chrome extension  | Displays error message handling when Wallet extension installation fails | YES  |
+| 3   | Wallet extension detection |  Start application, Download wallet chrome extension | Displays message when the app correctly detects the presence of the Wallet extension | YES  |
 
 ## User actions
 
 | \#  | OBJECTIVE | STEPS | EXPECTED RESULTS | TO BE AUTOMATED |
 | --- | --------- | ----- | ---------------- | --------------- |
-| 1   | User can retrieve his wallet details |  Start application, Download wallet chrome extention, Connect wallet extention in the application, Enable wallet  | Wallet details (balance, addresses, etc.) is correctly returned | YES  |
+| 1   | User can retrieve his wallet details |  Start application, Download wallet chrome extension, Connect wallet extension in the application, Enable wallet  | Wallet details (balance, addresses, etc.) is correctly returned | YES  |
 | 2   | User can sign data | Connect the wallet as #1, sign data | No exceptions are thrown, VkeyWitness is valid | YES |
 | 3   | User can sign transactions | Connect the wallet as #1, sign transaction data | No exceptions are thrown, and in TransactionWitnessSet, atleast one VkeyWitness is present | YES |
 | 4   | User can submit transactions | Connect the wallet as #1, submit transaction | No exceptions are thrown, Returned TransactionHash is not empty, Metadata is not included| YES |
@@ -120,9 +120,9 @@ User submit transactions
 
 | \#  | OBJECTIVE | STEPS | EXPECTED RESULTS | TO BE AUTOMATED |
 | --- | --------- | ----- | ---------------- | --------------- |
-| 1   | Empty wallet list |  Start application, Download wallet chrome extention, Connect wallet extention in the application  | Displays empty message when no wallets are available | YES  |
-| 2   | Wallet enabling success |  Start application, Download wallet chrome extention, Connect wallet extention in the application, Enable wallet  | Displays message is displayed when enabling wallet success | YES  |
-| 3  | Wallet enabling failure |  Start application, Download wallet chrome extention, Connect wallet extention in the application, Enable wallet  | Error message is displayed when enabling wallet fails | YES  |
+| 1   | Empty wallet list |  Start application, Download wallet chrome extension, Connect wallet extension in the application  | Displays empty message when no wallets are available | YES  |
+| 2   | Wallet enabling success |  Start application, Download wallet chrome extension, Connect wallet extension in the application, Enable wallet  | Displays message is displayed when enabling wallet success | YES  |
+| 3  | Wallet enabling failure |  Start application, Download wallet chrome extension, Connect wallet extension in the application, Enable wallet  | Error message is displayed when enabling wallet fails | YES  |
 | 4   | Error while loading wallet details |  Connect the wallet as #1  | Error message is displayed when loading wallet details fails | YES  |
 | 5   | Sign data failure |  Connect the wallet as #1, sign data  | Error message is displayed when signing data fails | YES  |
 | 6   | Sign and submit transaction failure |  Connect the wallet as #1, sign data, submit data  | Error message is displayed when signing and submitting transaction fails | YES  |

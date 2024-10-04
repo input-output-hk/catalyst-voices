@@ -16,10 +16,7 @@ class SearchButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextButton.icon(
       onPressed: onPressed,
-      icon: const Icon(
-        CatalystVoicesIcons.search,
-        size: 18,
-      ),
+      icon: VoicesAssets.icons.search.buildIcon(size: 18),
       label: Text(context.l10n.searchButtonLabelText),
     );
   }

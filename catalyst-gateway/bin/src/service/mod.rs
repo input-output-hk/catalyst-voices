@@ -1,15 +1,13 @@
 //! Main entrypoint to the service
-use std::sync::Arc;
-
-use crate::{settings::DocsSettings, state::State};
 
 // These Modules contain endpoints
 mod api;
+
 mod docs;
 // These modules are utility or common types/functions
 mod common;
 mod poem_service;
-mod utilities;
+pub(crate) mod utilities;
 
 pub(crate) use api::started;
 pub(crate) use poem_service::get_app_docs;
@@ -28,6 +26,6 @@ pub(crate) use poem_service::get_app_docs;
 /// `Error::CannotRunService` - cannot run the service
 /// `Error::EventDbError` - cannot connect to the event db
 /// `Error::IoError` - An IO error has occurred.
-pub(crate) async fn run(settings: &DocsSettings, state: Arc<State>) -> anyhow::Result<()> {
-    poem_service::run(settings, state).await
+pub(crate) async fn run() -> anyhow::Result<()> {
+    poem_service::run().await
 }

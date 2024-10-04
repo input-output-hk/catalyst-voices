@@ -13,8 +13,13 @@ class VoicesMenuExample extends StatefulWidget {
 }
 
 class _VoicesMenuExampleState extends State<VoicesMenuExample> {
-  int? _selected = 0;
-  bool _isExpanded = true;
+  final _problemSensingController = VoicesNodeMenuController();
+
+  @override
+  void dispose() {
+    _problemSensingController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,23 +35,12 @@ class _VoicesMenuExampleState extends State<VoicesMenuExample> {
                 const _MenuExample2(),
                 VoicesNodeMenu(
                   name: 'Problem-sensing stage',
-                  isExpanded: _isExpanded,
-                  selected: _selected,
+                  controller: _problemSensingController,
                   items: const [
                     VoicesNodeMenuItem(id: 0, label: 'Start'),
                     VoicesNodeMenuItem(id: 1, label: 'Vote'),
                     VoicesNodeMenuItem(id: 2, label: 'Results'),
                   ],
-                  onSelectionChanged: (value) {
-                    setState(() {
-                      _selected = value;
-                    });
-                  },
-                  onExpandChanged: (value) {
-                    setState(() {
-                      _isExpanded = value;
-                    });
-                  },
                 ),
               ].separatedBy(const SizedBox(height: 12)).toList(),
             ),
@@ -71,12 +65,12 @@ class _MenuExample1 extends StatelessWidget {
         MenuItem(
           id: 1,
           label: 'Rename',
-          icon: CatalystVoicesIcons.pencil,
+          icon: VoicesAssets.icons.pencil.buildIcon(),
         ),
         SubMenuItem(
           id: 4,
           label: 'Move Private Team',
-          icon: CatalystVoicesIcons.switch_horizontal,
+          icon: VoicesAssets.icons.switchHorizontal.buildIcon(),
           children: [
             MenuItem(id: 5, label: 'Team 1: The Vikings'),
             MenuItem(id: 6, label: 'Team 2: Pure Hearts'),
@@ -85,14 +79,14 @@ class _MenuExample1 extends StatelessWidget {
         MenuItem(
           id: 2,
           label: 'Move to public',
-          icon: CatalystVoicesIcons.switch_horizontal,
+          icon: VoicesAssets.icons.switchHorizontal.buildIcon(),
           showDivider: true,
           enabled: false,
         ),
         MenuItem(
           id: 3,
           label: 'Delete',
-          icon: CatalystVoicesIcons.trash,
+          icon: VoicesAssets.icons.trash.buildIcon(),
         ),
       ],
       child: const SizedBox(
@@ -118,12 +112,12 @@ class _MenuExample2 extends StatelessWidget {
         MenuItem(
           id: 1,
           label: 'Rename',
-          icon: CatalystVoicesIcons.pencil,
+          icon: VoicesAssets.icons.pencil.buildIcon(),
         ),
         SubMenuItem(
           id: 4,
           label: 'Move Private Team',
-          icon: CatalystVoicesIcons.switch_horizontal,
+          icon: VoicesAssets.icons.switchHorizontal.buildIcon(),
           children: [
             MenuItem(id: 5, label: 'Team 1: The Vikings'),
             MenuItem(id: 6, label: 'Team 2: Pure Hearts'),
@@ -132,13 +126,13 @@ class _MenuExample2 extends StatelessWidget {
         MenuItem(
           id: 2,
           label: 'Move to public',
-          icon: CatalystVoicesIcons.switch_horizontal,
+          icon: VoicesAssets.icons.switchHorizontal.buildIcon(),
           showDivider: true,
         ),
         MenuItem(
           id: 3,
           label: 'Delete',
-          icon: CatalystVoicesIcons.trash,
+          icon: VoicesAssets.icons.trash.buildIcon(),
         ),
       ],
       child: const SizedBox(

@@ -19,15 +19,23 @@ class VoicesAvatarExample extends StatelessWidget {
           spacing: 16,
           runSpacing: 16,
           children: [
-            const VoicesAvatar(
-              icon: Icon(CatalystVoicesIcons.check),
+            VoicesAvatar(
+              icon: VoicesAssets.icons.check.buildIcon(),
+            ),
+            VoicesAvatar(
+              backgroundColor: Colors.transparent,
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary,
+                width: 2,
+              ),
+              icon: VoicesAssets.icons.check.buildIcon(),
             ),
             VoicesAvatar(
               icon: const Text('A'),
               onTap: () {},
             ),
             VoicesAvatar(
-              icon: const Icon(CatalystVoicesIcons.light_bulb),
+              icon: VoicesAssets.icons.lightBulb.buildIcon(),
               foregroundColor: Theme.of(context).colors.iconsSecondary,
               backgroundColor:
                   Theme.of(context).colors.iconsSecondary?.withOpacity(0.16),

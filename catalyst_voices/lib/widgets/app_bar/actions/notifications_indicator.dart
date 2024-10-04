@@ -34,7 +34,7 @@ class _IconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton.outlined(
-      icon: const Icon(CatalystVoicesIcons.bell),
+      icon: VoicesAssets.icons.bell.buildIcon(),
       onPressed: onPressed,
     );
   }

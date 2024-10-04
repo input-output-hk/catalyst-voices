@@ -22,7 +22,7 @@ abstract base class BaseHash extends Equatable implements CborEncodable {
   /// Constructs the [BaseHash] from raw [bytes].
   BaseHash.fromBytes({required this.bytes}) {
     if (bytes.length != length) {
-      throw const HashFormatException();
+      throw HashFormatException('Expected $length bytes, got: ${bytes.length}');
     }
   }
 
@@ -94,7 +94,7 @@ final class TransactionInputsHash extends BaseHash {
 
   /// Constructs the [TransactionInputsHash] from a [TransactionBody].
   TransactionInputsHash.fromTransactionInputs(
-    List<TransactionUnspentOutput> utxos,
+    Set<TransactionUnspentOutput> utxos,
   ) : super.fromBytes(
           bytes: Hash.blake2b(
             Uint8List.fromList(

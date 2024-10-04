@@ -22,10 +22,7 @@ class RolePicker extends StatelessWidget {
         ),
       ),
       onPressed: onPressed,
-      icon: const Icon(
-        CatalystVoicesIcons.chevron_down,
-        size: 18,
-      ),
+      icon: VoicesAssets.icons.chevronDown.buildIcon(size: 18),
       label: Text(currentRole),
       iconAlignment: IconAlignment.end,
     );

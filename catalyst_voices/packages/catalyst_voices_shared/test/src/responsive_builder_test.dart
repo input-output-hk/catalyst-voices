@@ -37,7 +37,7 @@ void main() {
               md: 'Medium device',
               lg: 'Large device',
               other: 'Other device',
-              builder: (context, data) => Text(data!),
+              builder: (context, data) => Text(data),
             ),
           ),
         );
@@ -73,7 +73,7 @@ void main() {
               lg: const EdgeInsets.all(16),
               other: const EdgeInsets.all(32),
               builder: (context, padding) => Padding(
-                padding: padding!,
+                padding: padding,
                 child: const Text('Test'),
               ),
             ),

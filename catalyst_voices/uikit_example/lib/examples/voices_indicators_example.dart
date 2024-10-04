@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
@@ -16,9 +17,9 @@ class VoicesIndicatorsExample extends StatelessWidget {
       appBar: AppBar(title: const Text('Voices Indicators')),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 42, vertical: 24),
-        children: const [
-          Text('Status Indicator'),
-          Row(
+        children: [
+          const Text('Status Indicator'),
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -30,7 +31,7 @@ class VoicesIndicatorsExample extends StatelessWidget {
                   ),
                   title: Text('Your QR code verified successfully'),
                   body: Text(
-                    'You can now use your QR-code  to login into Catalyst.',
+                    'You can now use your QR-code to login into Catalyst.',
                   ),
                   type: VoicesStatusIndicatorType.success,
                 ),
@@ -45,24 +46,24 @@ class VoicesIndicatorsExample extends StatelessWidget {
                   title: Text('Upload failed or QR code not recognized!'),
                   body: Text(
                     'Are you sure your upload didn’t get interrupted or that '
-                    'you provided  a Catalyst QR code? '
-                    '  Please try again.',
+                    'you provided a Catalyst QR code? '
+                    'Please try again.',
                   ),
                   type: VoicesStatusIndicatorType.error,
                 ),
               ),
             ],
           ),
-          Text('Process Stepper Indicator'),
-          _Steps(),
-          Text('Linear - Indeterminate'),
-          VoicesLinearProgressIndicator(),
-          VoicesLinearProgressIndicator(showTrack: false),
-          Text('Linear - Fixed'),
-          VoicesLinearProgressIndicator(value: 0.25),
-          VoicesLinearProgressIndicator(value: 0.25, showTrack: false),
-          Text('Circular - Indeterminate'),
-          Row(
+          const Text('Process Stepper Indicator'),
+          const _Steps(),
+          const Text('Linear - Indeterminate'),
+          const VoicesLinearProgressIndicator(),
+          const VoicesLinearProgressIndicator(showTrack: false),
+          const Text('Linear - Fixed'),
+          const VoicesLinearProgressIndicator(value: 0.25),
+          const VoicesLinearProgressIndicator(value: 0.25, showTrack: false),
+          const Text('Circular - Indeterminate'),
+          const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               VoicesCircularProgressIndicator(),
@@ -70,8 +71,8 @@ class VoicesIndicatorsExample extends StatelessWidget {
               VoicesCircularProgressIndicator(showTrack: false),
             ],
           ),
-          Text('Circular - Fixed'),
-          Row(
+          const Text('Circular - Fixed'),
+          const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               VoicesCircularProgressIndicator(value: 0.75),
@@ -79,6 +80,32 @@ class VoicesIndicatorsExample extends StatelessWidget {
               VoicesCircularProgressIndicator(value: 0.75, showTrack: false),
             ],
           ),
+          const Text('Generic error indicator'),
+          Row(
+            children: [
+              VoicesErrorIndicator(
+                message: 'Something went wrong',
+                onRetry: () {},
+              ),
+              const SizedBox(width: 16),
+              const VoicesErrorIndicator(
+                message: 'Something went wrong',
+              ),
+            ],
+          ),
+          const Text('No Internet Connection Banner'),
+          const NoInternetConnectionBanner(),
+          const Text('Password strength indicator'),
+          for (final passwordStrength in PasswordStrength.values)
+            Align(
+              alignment: Alignment.topLeft,
+              child: SizedBox(
+                width: 400,
+                child: VoicesPasswordStrengthIndicator(
+                  passwordStrength: passwordStrength,
+                ),
+              ),
+            ),
         ].separatedByIndexed(
           (index, value) {
             return switch (value.runtimeType) {

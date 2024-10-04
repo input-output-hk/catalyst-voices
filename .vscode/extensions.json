@@ -14,11 +14,12 @@
         "tamasfe.even-better-toml",
         "rust-lang.rust-analyzer",
         "JScearcy.rust-doc-viewer",
-        "serayuzgur.crates",
         "anweiss.cddl-languageserver",
         "tintinweb.graphviz-interactive-preview",
         "terrastruct.d2",
         "bbenoist.vagrant",
-        "ms-kubernetes-tools.vscode-kubernetes-tools"
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "fill-labs.dependi",
+        "lawrencegrant.cql"
     ]
 }

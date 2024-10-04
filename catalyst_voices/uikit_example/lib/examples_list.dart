@@ -12,14 +12,18 @@ import 'package:uikit_example/examples/voices_chip_example.dart';
 import 'package:uikit_example/examples/voices_fab_example.dart';
 import 'package:uikit_example/examples/voices_headers_examples.dart';
 import 'package:uikit_example/examples/voices_indicators_example.dart';
+import 'package:uikit_example/examples/voices_list_tile_example.dart';
 import 'package:uikit_example/examples/voices_menu_example.dart';
+import 'package:uikit_example/examples/voices_modals_example.dart';
 import 'package:uikit_example/examples/voices_navigation_example.dart';
+import 'package:uikit_example/examples/voices_proposal_card_example.dart';
 import 'package:uikit_example/examples/voices_radio_example.dart';
+import 'package:uikit_example/examples/voices_rich_text_example.dart';
+import 'package:uikit_example/examples/voices_role_panels_example.dart';
 import 'package:uikit_example/examples/voices_seed_phrase_example.dart';
 import 'package:uikit_example/examples/voices_segmented_button_example.dart';
 import 'package:uikit_example/examples/voices_separators_example.dart';
 import 'package:uikit_example/examples/voices_snackbar_example.dart';
-import 'package:uikit_example/examples/voices_spaces_example.dart';
 import 'package:uikit_example/examples/voices_switch_example.dart';
 import 'package:uikit_example/examples/voices_tabs_example.dart';
 import 'package:uikit_example/examples/voices_text_field_example.dart';
@@ -35,13 +39,7 @@ class ExamplesListPage extends StatelessWidget {
   }
 
   static List<ExampleTile> get screens {
-    return const [
-      ExampleTile(
-        title: 'VoicesDiscoverySpaces',
-        route: VoicesSpacesExample.route,
-        page: VoicesSpacesExample(),
-      ),
-    ];
+    return const [];
   }
 
   static List<ExampleTile> get uiKit {
@@ -97,6 +95,11 @@ class ExamplesListPage extends StatelessWidget {
         page: VoicesIndicatorsExample(),
       ),
       ExampleTile(
+        title: 'Voices List Tile',
+        route: VoicesListTileExample.route,
+        page: VoicesListTileExample(),
+      ),
+      ExampleTile(
         title: 'Voices Avatars',
         route: VoicesAvatarExample.route,
         page: VoicesAvatarExample(),
@@ -145,6 +148,26 @@ class ExamplesListPage extends StatelessWidget {
         title: 'Voices TreeView',
         route: VoicesTreeViewExample.route,
         page: VoicesTreeViewExample(),
+      ),
+      ExampleTile(
+        title: 'Voices Modals',
+        route: VoicesModalsExample.route,
+        page: VoicesModalsExample(),
+      ),
+      ExampleTile(
+        title: 'Voices Rich Text',
+        route: VoicesRichTextExample.route,
+        page: VoicesRichTextExample(),
+      ),
+      ExampleTile(
+        title: 'Voices Proposal Card',
+        route: VoicesProposalCardExample.route,
+        page: VoicesProposalCardExample(),
+      ),
+      ExampleTile(
+        title: VoicesRoleContainersExample.title,
+        route: VoicesRoleContainersExample.route,
+        page: VoicesRoleContainersExample(),
       ),
     ];
   }

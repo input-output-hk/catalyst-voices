@@ -13,8 +13,8 @@ impl Example for EventId {
     }
 }
 
-impl From<EventId> for crate::event_db::legacy::types::event::EventId {
+impl From<EventId> for crate::db::event::legacy::types::event::EventId {
     fn from(event_id: EventId) -> Self {
-        crate::event_db::legacy::types::event::EventId(event_id.0)
+        crate::db::event::legacy::types::event::EventId(event_id.0)
     }
 }

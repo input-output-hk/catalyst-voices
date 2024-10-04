@@ -14,21 +14,19 @@ dependencies:
 
 dev_dependencies:
   build_runner: ^2.4.12
-  catalyst_analysis: ^1.2.0
+  catalyst_analysis: ^2.0.0
   flutter_gen_runner: ^5.3.2
 
 flutter:
   generate: true
   assets:
     - assets/images/
+    - assets/icons/
   fonts:
     - family: SF-Pro
       fonts:
         - asset: assets/fonts/SF-Pro-Rounded-Regular.ttf
           weight: 600
-    - family: CatalystVoicesIcons
-      fonts:
-        - asset: internal_resources/fonts/CatalystVoicesIcons.ttf
 
 flutter_gen:
   output: lib/generated/

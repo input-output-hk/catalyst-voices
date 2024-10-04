@@ -1,17 +1,22 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:cbor/cbor.dart';
 import 'package:convert/convert.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 
 part 'sign_and_submit_rbac_tx.dart';
 part 'sign_and_submit_tx.dart';
 part 'sign_data.dart';
 
 void main() {
+  EquatableConfig.stringify = true;
   runApp(const MyApp());
+  SemanticsBinding.instance.ensureSemantics();
 }
 
 class MyApp extends StatelessWidget {
@@ -233,7 +238,7 @@ class _WalletDetailsState extends State<_WalletDetails> {
   List<ShelleyAddress>? _rewardAddresses;
   List<ShelleyAddress>? _unusedAddresses;
   List<ShelleyAddress>? _usedAddresses;
-  List<TransactionUnspentOutput>? _utxos;
+  Set<TransactionUnspentOutput>? _utxos;
   PubDRepKey? _pubDRepKey;
   List<PubStakeKey>? _registeredPubStakeKeys;
   List<PubStakeKey>? _unregisteredPubStakeKeys;
@@ -309,65 +314,70 @@ class _WalletDetailsState extends State<_WalletDetails> {
       child: Card(
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text('Balance: ${_formatBalance(_balance)}\n'),
-              Text('Extensions: ${_formatExtensions(_extensions)}\n'),
-              Text('Network ID: $_networkId\n'),
-              Text('Change address:\n${_changeAddress?.toBech32() ?? '---'}\n'),
-              Text(
-                'Reward addresses:\n${_formatAddresses(_rewardAddresses)}\n',
-              ),
-              Text(
-                'Unused addresses:\n${_formatAddresses(_unusedAddresses)}\n',
-              ),
-              Text('Used addresses:\n${_formatAddresses(_usedAddresses)}\n'),
-              Text('UTXOs:\n${_formatUtxos(_utxos)}\n'),
-              Text('Public DRep Key: ${_pubDRepKey?.value ?? '---'}\n'),
-              Text(
-                'Registered Public Stake Keys: '
-                '${_registeredPubStakeKeys?.map((e) => e.value) ?? '---'}\n',
-              ),
-              Text(
-                'Unregistered Public Stake Keys: '
-                '${_unregisteredPubStakeKeys?.map((e) => e.value) ?? '---'}\n',
-              ),
-              Row(
-                children: [
-                  ElevatedButton(
-                    onPressed: () => unawaited(
-                      _signData(
-                        context: context,
-                        api: widget.api,
+          child: Semantics(
+            explicitChildNodes: true,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text('Balance: ${_formatBalance(_balance)}\n'),
+                Text('Extensions: ${_formatExtensions(_extensions)}\n'),
+                Text('Network ID: $_networkId\n'),
+                Text(
+                  'Change address:\n${_changeAddress?.toBech32() ?? '---'}\n',
+                ),
+                Text(
+                  'Reward addresses:\n${_formatAddresses(_rewardAddresses)}\n',
+                ),
+                Text(
+                  'Unused addresses:\n${_formatAddresses(_unusedAddresses)}\n',
+                ),
+                Text('Used addresses:\n${_formatAddresses(_usedAddresses)}\n'),
+                Text('UTXOs:\n${_formatUtxos(_utxos)}\n'),
+                Text('Public DRep Key: ${_pubDRepKey?.value ?? '---'}\n'),
+                Text(
+                  'Registered Public Stake Keys: '
+                  '${_formatPubStakeKeys(_registeredPubStakeKeys)}\n',
+                ),
+                Text(
+                  'Unregistered Public Stake Keys: '
+                  '${_formatPubStakeKeys(_unregisteredPubStakeKeys)}\n',
+                ),
+                Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: () => unawaited(
+                        _signData(
+                          context: context,
+                          api: widget.api,
+                        ),
                       ),
+                      child: const Text('Sign data'),
                     ),
-                    child: const Text('Sign data'),
-                  ),
-                  const SizedBox(width: 16),
-                  ElevatedButton(
-                    onPressed: () => unawaited(
-                      _signAndSubmitTx(
-                        context: context,
-                        api: widget.api,
+                    const SizedBox(width: 16),
+                    ElevatedButton(
+                      onPressed: () => unawaited(
+                        _signAndSubmitTx(
+                          context: context,
+                          api: widget.api,
+                        ),
                       ),
+                      child: const Text('Sign & submit tx'),
                     ),
-                    child: const Text('Sign & submit tx'),
-                  ),
-                  const SizedBox(width: 16),
-                  ElevatedButton(
-                    onPressed: () => unawaited(
-                      _signAndSubmitRbacTx(
-                        context: context,
-                        api: widget.api,
+                    const SizedBox(width: 16),
+                    ElevatedButton(
+                      onPressed: () => unawaited(
+                        _signAndSubmitRbacTx(
+                          context: context,
+                          api: widget.api,
+                        ),
                       ),
+                      child: const Text('Sign & submit RBAC tx'),
                     ),
-                    child: const Text('Sign & submit RBAC tx'),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -413,6 +423,14 @@ String _formatAddresses(List<ShelleyAddress>? addresses) {
   return addresses.map((e) => e.toBech32()).join('\n');
 }
 
+String _formatPubStakeKeys(List<PubStakeKey>? keys) {
+  if (keys == null) {
+    return '---';
+  }
+
+  return keys.map((e) => e.value).join(', ');
+}
+
 String _formatBalance(Balance? balance) {
   if (balance == null) {
     return '---';
@@ -432,7 +450,7 @@ String _formatBalance(Balance? balance) {
   return buffer.toString();
 }
 
-String _formatUtxos(List<TransactionUnspentOutput>? utxos) {
+String _formatUtxos(Set<TransactionUnspentOutput>? utxos) {
   if (utxos == null) {
     return '---';
   }

@@ -6,8 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('VoicesTextField Widget Tests', () {
-    testWidgets('renders correctly with default parameters',
-        (WidgetTester tester) async {
+    testWidgets('renders correctly with default parameters', (tester) async {
       await tester.pumpWidget(
         const _MaterialApp(
           child: VoicesTextField(),
@@ -18,8 +17,7 @@ void main() {
       expect(find.byType(TextFormField), findsOneWidget);
     });
 
-    testWidgets('displays label text when provided',
-        (WidgetTester tester) async {
+    testWidgets('displays label text when provided', (tester) async {
       const labelText = 'Test Label';
 
       await tester.pumpWidget(
@@ -34,8 +32,7 @@ void main() {
       expect(find.text(labelText), findsOneWidget);
     });
 
-    testWidgets('handles text input and updates controller',
-        (WidgetTester tester) async {
+    testWidgets('handles text input and updates controller', (tester) async {
       final controller = TextEditingController();
 
       await tester.pumpWidget(
@@ -53,8 +50,7 @@ void main() {
       expect(controller.text, 'Hello World');
     });
 
-    testWidgets('applies custom decorations correctly',
-        (WidgetTester tester) async {
+    testWidgets('applies custom decorations correctly', (tester) async {
       const hintText = 'Enter your text here';
       const errorText = 'Error message';
 
@@ -74,8 +70,7 @@ void main() {
       expect(find.text(errorText), findsOneWidget);
     });
 
-    testWidgets('validates input and displays error correctly',
-        (WidgetTester tester) async {
+    testWidgets('validates input and displays error correctly', (tester) async {
       const errorText = 'Invalid input';
 
       await tester.pumpWidget(
@@ -101,7 +96,7 @@ void main() {
     });
 
     testWidgets('displays correct suffix icon based on validation result',
-        (WidgetTester tester) async {
+        (tester) async {
       await tester.pumpWidget(
         _MaterialApp(
           child: VoicesTextField(
@@ -115,10 +110,13 @@ void main() {
       await tester.pump();
 
       // Verify that the success icon is displayed
-      expect(find.byIcon(CatalystVoicesIcons.check_circle), findsOneWidget);
+      expect(
+        find.byType(CatalystSvgIcon),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('renders correctly when disabled', (WidgetTester tester) async {
+    testWidgets('renders correctly when disabled', (tester) async {
       await tester.pumpWidget(
         const _MaterialApp(
           child: VoicesTextField(
@@ -137,8 +135,7 @@ void main() {
   });
 
   group('VoicesTextField Validator Logic Tests', () {
-    testWidgets('displays error when validation fails',
-        (WidgetTester tester) async {
+    testWidgets('displays error when validation fails', (tester) async {
       const errorMessage = 'This field is required';
 
       // Define a validator that returns an error if the input is empty
@@ -177,8 +174,7 @@ void main() {
       expect(find.text(errorMessage), findsNothing);
     });
 
-    testWidgets('displays success when validation passes',
-        (WidgetTester tester) async {
+    testWidgets('displays success when validation passes', (tester) async {
       // Define a validator that always returns success
       VoicesTextFieldValidationResult validator(value) {
         return const VoicesTextFieldValidationResult(
@@ -199,11 +195,14 @@ void main() {
       await tester.pump();
 
       // Verify that the success icon is displayed
-      expect(find.byIcon(CatalystVoicesIcons.check_circle), findsOneWidget);
+      expect(
+        find.byType(CatalystSvgIcon),
+        findsOneWidget,
+      );
     });
 
     testWidgets('displays warning when validation returns warning',
-        (WidgetTester tester) async {
+        (tester) async {
       const warningMessage = 'This is a warning';
 
       // Define a validator that returns a warning for specific input
@@ -248,7 +247,7 @@ class _MaterialApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeBuilder.buildTheme(BrandKey.catalyst),
+      theme: ThemeBuilder.buildTheme(brand: Brand.catalyst),
       home: Scaffold(body: child),
     );
   }

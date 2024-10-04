@@ -3,7 +3,7 @@ description: A dart plugin implementing CBOR Object Signing and Encryption (RFC 
 repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices_packages/catalyst_cose
 issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
 topics: [cryptography, encryption, codec]
-version: 0.2.0
+version: 0.3.0
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
@@ -14,5 +14,5 @@ dependencies:
   cryptography: ^2.7.0
 
 dev_dependencies:
-  catalyst_analysis: ^1.2.0
+  catalyst_analysis: ^2.0.0
   test: ^1.24.9

@@ -34,11 +34,11 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
               width: 200,
               child: VoicesTextField(
                 controller: _controller,
-                decoration: const VoicesTextFieldDecoration(
+                decoration: VoicesTextFieldDecoration(
                   labelText: 'Regular',
                   helperText: 'Supporting text',
                   hintText: 'Hint text',
-                  suffixIcon: Icon(CatalystVoicesIcons.chevron_down),
+                  suffixIcon: VoicesAssets.icons.chevronDown.buildIcon(),
                 ),
                 maxLength: 200,
               ),
@@ -47,11 +47,11 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
               width: 200,
               child: VoicesTextField(
                 controller: _controller,
-                decoration: const VoicesTextFieldDecoration(
+                decoration: VoicesTextFieldDecoration(
                   labelText: 'Disabled',
                   helperText: 'Supporting text',
                   hintText: 'Hint text',
-                  suffixIcon: Icon(CatalystVoicesIcons.chevron_down),
+                  suffixIcon: VoicesAssets.icons.chevronDown.buildIcon(),
                 ),
                 maxLength: 200,
                 enabled: false,

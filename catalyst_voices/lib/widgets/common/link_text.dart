@@ -11,6 +11,9 @@ class LinkText extends StatelessWidget {
   /// The text to be displayed.
   final String data;
 
+  /// Displays the text with underline.
+  final bool underline;
+
   /// An optional TextStyle to customize the appearance of the text.
   final TextStyle? style;
 
@@ -21,6 +24,7 @@ class LinkText extends StatelessWidget {
   const LinkText(
     this.data, {
     super.key,
+    this.underline = true,
     this.style,
     this.onTap,
   });
@@ -32,9 +36,9 @@ class LinkText extends StatelessWidget {
 
     final effectiveStyle = (style ?? const TextStyle()).copyWith(
       color: color,
-      decoration: TextDecoration.underline,
-      decorationColor: color,
-      decorationStyle: TextDecorationStyle.solid,
+      decoration: underline ? TextDecoration.underline : null,
+      decorationColor: underline ? color : null,
+      decorationStyle: underline ? TextDecorationStyle.solid : null,
     );
 
     return GestureDetector(

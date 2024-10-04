@@ -3,7 +3,7 @@ description: Web platform implementation of catalyst_compression. Exposes a JS w
 repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices_packages/catalyst_compression/catalyst_compression_web
 issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
 topics: [compression, codec]
-version: 0.2.0
+version: 0.3.0
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
@@ -21,15 +21,15 @@ flutter:
     - assets/js/
 
 dependencies:
-  catalyst_compression_platform_interface: ^0.1.1
+  catalyst_compression_platform_interface: ^0.2.0
   convert: ^3.1.1
   flutter:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter
-  web: ^0.5.0
+  web: ^1.1.0
 
 dev_dependencies:
-  catalyst_analysis: ^1.2.0
+  catalyst_analysis: ^2.0.0
   flutter_test:
     sdk: flutter

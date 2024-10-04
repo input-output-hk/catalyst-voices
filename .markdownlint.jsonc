@@ -1,7 +1,7 @@
 {
     // markdownlint JSON(C) configuration for Catalyst Standards
     // Do not individually set markdown lint rules in documents.
-    // It is permissable to disable a rule in a document if it is a false positive.
+    // It is permissible to disable a rule in a document if it is a false positive.
     // Keep the scope of the lint disable to as small as possible.
     // See: https://github.com/DavidAnson/markdownlint/blob/main/doc/Rules.md
     // Default state for all rules
@@ -211,7 +211,7 @@
     "MD045": true,
     // MD046/code-block-style - Code block style
     // Code Blocks are used by Admonitions and need to be indented.
-    // Actual code should be fenced, this can;t be enforced by mdlint.
+    // Actual code should be fenced, this can't be enforced by mdlint.
     "MD046": {
         // Block style
         "style": "consistent"

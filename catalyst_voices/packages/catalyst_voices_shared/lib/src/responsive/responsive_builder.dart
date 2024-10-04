@@ -1,4 +1,6 @@
 import 'package:catalyst_voices_shared/src/responsive/responsive_breakpoint_key.dart';
+import 'package:catalyst_voices_shared/src/utils/typedefs.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/widgets.dart';
 
 // A [ResponsiveBuilder] is a StatelessWidget that is aware about the current
@@ -44,9 +46,16 @@ import 'package:flutter/widgets.dart';
 // );
 // ```
 
+const Map<ResponsiveBreakpointKey, ({int min, int max})> _breakpoints = {
+  ResponsiveBreakpointKey.xs: (min: 0, max: 599),
+  ResponsiveBreakpointKey.sm: (min: 600, max: 1239),
+  ResponsiveBreakpointKey.md: (min: 1240, max: 1439),
+  ResponsiveBreakpointKey.lg: (min: 1440, max: 2048),
+};
+
 class ResponsiveBuilder<T extends Object> extends StatelessWidget {
-  final Widget Function(BuildContext context, T? data) builder;
-  final Map<ResponsiveBreakpointKey, T?> _responsiveData;
+  final DataWidgetBuilder<T> builder;
+  final Map<ResponsiveBreakpointKey, T> _responsiveData;
 
   ResponsiveBuilder({
     super.key,
@@ -57,10 +66,10 @@ class ResponsiveBuilder<T extends Object> extends StatelessWidget {
     T? lg,
     required T other,
   }) : _responsiveData = {
-          ResponsiveBreakpointKey.xs: xs,
-          ResponsiveBreakpointKey.sm: sm,
-          ResponsiveBreakpointKey.md: md,
-          ResponsiveBreakpointKey.lg: lg,
+          if (xs != null) ResponsiveBreakpointKey.xs: xs,
+          if (sm != null) ResponsiveBreakpointKey.sm: sm,
+          if (md != null) ResponsiveBreakpointKey.md: md,
+          if (lg != null) ResponsiveBreakpointKey.lg: lg,
           ResponsiveBreakpointKey.other: other,
         };
 
@@ -73,23 +82,21 @@ class ResponsiveBuilder<T extends Object> extends StatelessWidget {
     final screenWidth = MediaQuery.sizeOf(context).width;
 
     final breakpointKey = _breakpoints.entries
-        .firstWhere(
-          (entry) => (screenWidth >= entry.value.min &&
-              screenWidth <= entry.value.max &&
-              _responsiveData[entry.key] != null),
-          orElse: () => const MapEntry(
-            ResponsiveBreakpointKey.other,
-            (min: 0, max: 0),
-          ),
-        )
-        .key;
+            .where((entry) => _responsiveData.containsKey(entry.key))
+            .firstWhereOrNull((entry) => entry.value.contains(screenWidth))
+            ?.key ??
+        ResponsiveBreakpointKey.other;
+
+    assert(
+      _responsiveData.containsKey(breakpointKey),
+      'Selected key[$breakpointKey] data is not defined. '
+      'Make sure at least .other is not null',
+    );
+
     return _responsiveData[breakpointKey]!;
   }
+}
 
-  final Map<ResponsiveBreakpointKey, ({int min, int max})> _breakpoints = {
-    ResponsiveBreakpointKey.xs: (min: 0, max: 599),
-    ResponsiveBreakpointKey.sm: (min: 600, max: 1239),
-    ResponsiveBreakpointKey.md: (min: 1240, max: 1439),
-    ResponsiveBreakpointKey.lg: (min: 1440, max: 2048),
-  };
+extension _RangeExt on ({int min, int max}) {
+  bool contains(double value) => value >= min && value <= max;
 }

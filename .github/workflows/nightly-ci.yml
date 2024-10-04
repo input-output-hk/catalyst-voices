@@ -63,6 +63,18 @@ jobs:
             runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
             artifact: "false"
 
+      - name: Get cardano wallet integration test report
+        uses: input-output-hk/catalyst-ci/actions/run@master
+        if: always()
+        continue-on-error: true
+        with:
+            earthfile: ./catalyst_voices_packages/catalyst_cardano/catalyst_cardano/wallet-automation/
+            flags: --allow-privileged
+            targets: nightly-test
+            target_flags:
+            runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+            artifact: "false"
+
       - name: Collect and upload test reports
         uses: actions/upload-artifact@v4
         if: always()

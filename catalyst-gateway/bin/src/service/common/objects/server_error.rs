@@ -6,7 +6,7 @@ use uuid::Uuid;
 
 /// While using macro-vis lib, you will get the `uncommon_codepoints` warning, so you will
 /// probably want to place this in your crate root
-use crate::settings::generate_github_issue_url;
+use crate::settings::Settings;
 
 #[derive(Debug, Object)]
 #[oai(example, skip_serializing_if_is_none)]
@@ -33,7 +33,7 @@ impl ServerError {
         );
         let id = Uuid::new_v4();
         let issue_title = format!("Internal Server Error - {id}");
-        let issue = generate_github_issue_url(&issue_title);
+        let issue = Settings::generate_github_issue_url(&issue_title);
 
         Self { id, msg, issue }
     }

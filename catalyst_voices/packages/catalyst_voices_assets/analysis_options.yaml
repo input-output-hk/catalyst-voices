@@ -8,7 +8,5 @@ analyzer:
       lib/generated/**,
       lib/src/catalyst_voices_icons.dart,
     ]
-
-linter:
-  rules:
-    public_member_api_docs: false
+  errors:
+    public_member_api_docs: ignore

@@ -2,9 +2,9 @@
 
 use poem_openapi::{types::Example, Object};
 
-use crate::{
-    event_db::cardano::chain_state::{DateTime, SlotNumber},
-    service::common::objects::cardano::hash::Hash,
+use crate::service::{
+    api::cardano::types::{DateTime, SlotNumber},
+    common::objects::cardano::hash::Hash,
 };
 
 /// Cardano follower's sync state info.

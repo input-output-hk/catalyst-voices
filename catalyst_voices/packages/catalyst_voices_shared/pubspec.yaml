@@ -8,13 +8,17 @@ environment:
   flutter: ">=3.24.1"
 
 dependencies:
+  catalyst_cardano_serialization: ^0.4.0
+  collection: ^1.18.0
   flutter:
     sdk: flutter
   get_it: ^7.6.7
-  web: ^0.5.0
+  intl: ^0.19.0
+  logging: ^1.2.0
+  web: ^1.1.0
 
 dev_dependencies:
-  catalyst_analysis: ^1.2.0
+  catalyst_analysis: ^2.0.0
   flutter_test:
     sdk: flutter
   test: ^1.24.9

@@ -188,6 +188,8 @@ Vagrant.configure("2") do |config|
     control.vm.provision "shell", inline: helm_install_script
     control.vm.provision "shell", inline: control_plane_script
     control.vm.provision "shell", inline: cert_manager_install_script
+    # We use longhorn, so don't setup the local-path-provisioner
+    # control.vm.provision "shell", inline: local_path_provisioner_script
     control.vm.provision "shell", inline: longhorn_install_script
     control.vm.provision "shell", inline: monitoring_install_script
     control.vm.provision "shell", inline: registry_script

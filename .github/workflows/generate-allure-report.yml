@@ -3,26 +3,26 @@ name: Allure Report Generation
 on:
   pull_request:
   push:
-    branches: 'main'
+    branches: "main"
 
 permissions:
-    contents: write
-    pull-requests: write
-    id-token: write
+  contents: write
+  pull-requests: write
+  id-token: write
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
 env:
-    AWS_REGION: eu-central-1
-    AWS_ROLE_ARN: arn:aws:iam::332405224602:role/ci
-    EARTHLY_TARGET: docker
-    ECR_REGISTRY: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
-    ALLURE_REPORT_PATH: allure-report
-    COVERAGE_REPORT_PATH: coverage-report
-    REPORT_EXT: .junit-report.xml
-    COVERAGE_EXT: .info
+  AWS_REGION: eu-central-1
+  AWS_ROLE_ARN: arn:aws:iam::332405224602:role/ci
+  EARTHLY_TARGET: docker
+  ECR_REGISTRY: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
+  ALLURE_REPORT_PATH: allure-report
+  COVERAGE_REPORT_PATH: coverage-report
+  REPORT_EXT: .junit-report.xml
+  COVERAGE_EXT: .info
 
 jobs:
   generate-test-reports:
@@ -34,21 +34,21 @@ jobs:
       - name: Setup CI
         uses: input-output-hk/catalyst-ci/actions/setup@master
         with:
-            aws_role_arn: ${{ env.AWS_ROLE_ARN }}
-            aws_region: ${{ env.AWS_REGION }}
-            earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
+          aws_role_arn: ${{ env.AWS_ROLE_ARN }}
+          aws_region: ${{ env.AWS_REGION }}
+          earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
 
       - name: Get catalyst gateway unit test report
         uses: input-output-hk/catalyst-ci/actions/run@master
         if: always()
         continue-on-error: true
         with:
-            earthfile: ./catalyst-gateway/
-            flags:
-            targets: build
-            target_flags:
-            runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-            artifact: "false"
+          earthfile: ./catalyst-gateway/
+          flags:
+          targets: build
+          target_flags:
+          runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+          artifact: "false"
 
       - name: Get schemathesis test report
         uses: input-output-hk/catalyst-ci/actions/run@master
@@ -67,42 +67,42 @@ jobs:
         if: always()
         continue-on-error: true
         with:
-            earthfile: ./catalyst_voices/
-            flags:
-            targets: test-unit
-            target_flags:
-            runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-            artifact: "false"
+          earthfile: ./catalyst_voices/
+          flags:
+          targets: test-unit
+          target_flags:
+          runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+          artifact: "false"
 
       - name: Get python api test report
         uses: input-output-hk/catalyst-ci/actions/run@master
         if: always()
         continue-on-error: true
         with:
-            earthfile: ./catalyst-gateway/tests/api_tests/
-            flags: --allow-privileged
-            targets: test
-            target_flags:
-            runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-            artifact: "false"
+          earthfile: ./catalyst-gateway/tests/api_tests/
+          flags: --allow-privileged
+          targets: test
+          target_flags:
+          runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+          artifact: "false"
 
       - name: Collect and upload test reports
         uses: actions/upload-artifact@v4
         if: always()
         with:
-            name: test-reports
-            path: '**/*${{ env.REPORT_EXT }}'
-            if-no-files-found: error
-            retention-days: 1
+          name: test-reports
+          path: "**/*${{ env.REPORT_EXT }}"
+          if-no-files-found: error
+          retention-days: 1
 
       - name: Collect and upload test coverage
         uses: actions/upload-artifact@v4
         if: always()
         with:
-            name: coverage-reports
-            path: '**/*${{ env.COVERAGE_EXT }}'
-            if-no-files-found: error
-            retention-days: 1
+          name: coverage-reports
+          path: "**/*${{ env.COVERAGE_EXT }}"
+          if-no-files-found: error
+          retention-days: 1
 
   generate-allure-report:
     name: Generate allure report
@@ -117,10 +117,10 @@ jobs:
 
       - name: Setup Allure report
         run: |
-              mkdir -p ${{ env.ALLURE_REPORT_PATH }}
-              shopt -s globstar
-              cp **/*${{ env.REPORT_EXT }} ${{ env.ALLURE_REPORT_PATH }}
-              ls ${{ env.ALLURE_REPORT_PATH }}
+          mkdir -p ${{ env.ALLURE_REPORT_PATH }}
+          shopt -s globstar
+          cp **/*${{ env.REPORT_EXT }} ${{ env.ALLURE_REPORT_PATH }}
+          ls ${{ env.ALLURE_REPORT_PATH }}
 
       - name: Checkout gh-pages
         uses: actions/checkout@v4
@@ -132,8 +132,8 @@ jobs:
         uses: mgrybyk/allure-report-branch-action@v1
         id: allure
         with:
-          report_id: 'test-report'
-          gh_pages: 'gh-pages-dir'
+          report_id: "test-report"
+          gh_pages: "gh-pages-dir"
           report_dir: ${{ env.ALLURE_REPORT_PATH }}
 
       - name: Git push to gh-pages
@@ -165,15 +165,15 @@ jobs:
 
       - name: Collect coverage report
         run: |
-            mkdir -p ${{ env.COVERAGE_REPORT_PATH }}
-            shopt -s globstar
-            cp **/*${{ env.COVERAGE_EXT }} ${{ env.COVERAGE_REPORT_PATH }}
-            ls ${{ env.COVERAGE_REPORT_PATH }}
+          mkdir -p ${{ env.COVERAGE_REPORT_PATH }}
+          shopt -s globstar
+          cp **/*${{ env.COVERAGE_EXT }} ${{ env.COVERAGE_REPORT_PATH }}
+          ls ${{ env.COVERAGE_REPORT_PATH }}
 
       - name: Normalize coverage report paths
         run: |
-            sed -i -e 's/SF:\/root/SF:catalyst-gateway/g' ${{ env.COVERAGE_REPORT_PATH }}/cat-gateway.coverage.info
-            sed -i -e 's/SF:/SF:catalyst-gateway\/tests\/api_tests\//g' ${{ env.COVERAGE_REPORT_PATH }}/api-tests.coverage.info
+          sed -i -e 's/SF:\/root/SF:catalyst-gateway/g' ${{ env.COVERAGE_REPORT_PATH }}/cat-gateway.coverage.info
+          # sed -i -e 's/SF:/SF:catalyst-gateway\/tests\/api_tests\//g' ${{ env.COVERAGE_REPORT_PATH }}/api-tests.coverage.info
 
       - name: Coveralls
         env:
@@ -188,6 +188,7 @@ jobs:
           parallel: true
 
       - name: Coveralls
+        if: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         uses: coverallsapp/github-action@v2
@@ -211,15 +212,14 @@ jobs:
           base-path: "/home/runner/work/catalyst-voices/catalyst-voices/"
           parallel: true
 
-
   upload-coverage-report:
     name: Upload coverage report
     needs: [generate-coverage-report]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
-    - name: Coveralls Finished
-      uses: coverallsapp/github-action@v2
-      with:
-        parallel-finished: true
-        carryforward: "rust-unit-test,flutter-test"
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@v2
+        with:
+          parallel-finished: true
+          carryforward: "rust-unit-test,flutter-test"

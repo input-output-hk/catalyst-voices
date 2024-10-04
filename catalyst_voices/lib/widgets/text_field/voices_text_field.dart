@@ -1,10 +1,10 @@
-import 'dart:math';
-
+import 'package:catalyst_voices/widgets/common/resizable_box_parent.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// A replacement for [TextField] and [TextFormField]
 /// that is pre-configured to use Project Catalyst theming.
@@ -59,6 +59,15 @@ class VoicesTextField extends StatefulWidget {
   /// [TextField.onChanged]
   final ValueChanged<String>? onChanged;
 
+  /// [TextField.onSubmitted]
+  final ValueChanged<String>? onFieldSubmitted;
+
+  /// [FormField.onSaved]
+  final FormFieldSetter<String>? onSaved;
+
+  /// [TextField.inputFormatters]
+  final List<TextInputFormatter>? inputFormatters;
+
   const VoicesTextField({
     super.key,
     this.controller,
@@ -76,6 +85,9 @@ class VoicesTextField extends StatefulWidget {
     this.validator,
     this.onChanged,
     this.resizable,
+    this.onFieldSubmitted,
+    this.onSaved,
+    this.inputFormatters,
   });
 
   @override
@@ -156,14 +168,20 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
           ),
           const SizedBox(height: 4),
         ],
-        _ResizableBoxParent(
-          resizable: resizable,
+        ResizableBoxParent(
+          resizableHorizontally: resizable,
+          resizableVertically: resizable,
           child: TextFormField(
             textAlignVertical: TextAlignVertical.top,
             expands: resizable,
             controller: _obtainController(),
             focusNode: widget.focusNode,
+            onFieldSubmitted: widget.onFieldSubmitted,
+            onSaved: widget.onSaved,
+            inputFormatters: widget.inputFormatters,
             decoration: InputDecoration(
+              filled: widget.decoration?.filled,
+              fillColor: widget.decoration?.fillColor,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,
                 vertical: 12,
@@ -234,10 +252,15 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
                   ? textTheme.bodySmall
                   : textTheme.bodySmall!
                       .copyWith(color: theme.colors.textDisabled),
-              prefixIcon: widget.decoration?.prefixIcon,
+              prefixIcon: _wrapIconIfExists(
+                widget.decoration?.prefixIcon,
+                const EdgeInsetsDirectional.only(start: 8, end: 4),
+              ),
               prefixText: widget.decoration?.prefixText,
-              suffixIcon:
-                  widget.decoration?.suffixIcon ?? _getStatusSuffixWidget(),
+              suffixIcon: _wrapIconIfExists(
+                widget.decoration?.suffixIcon ?? _getStatusSuffixWidget(),
+                const EdgeInsetsDirectional.only(start: 4, end: 8),
+              ),
               suffixText: widget.decoration?.suffixText,
               counterText: widget.decoration?.counterText,
               counterStyle: widget.enabled
@@ -297,33 +320,43 @@ class _VoicesTextFieldState extends State<VoicesTextField> {
       return null;
     }
 
-    final icon = getStatusSuffixIcon();
-    if (icon == null) {
-      return null;
-    }
-
-    return Padding(
-      padding: const EdgeInsetsDirectional.only(start: 4, end: 8),
-      child: Icon(
-        getStatusSuffixIcon(),
-        color: _getStatusColor(orDefault: Colors.transparent),
-      ),
+    return getStatusSuffixIcon(
+      color: _getStatusColor(orDefault: Colors.transparent),
     );
   }
 
-  IconData? getStatusSuffixIcon() {
+  Widget? getStatusSuffixIcon({required Color color}) {
     switch (_validation.status) {
       case VoicesTextFieldStatus.none:
         return null;
       case VoicesTextFieldStatus.success:
-        return CatalystVoicesIcons.check_circle;
+        return VoicesAssets.icons.checkCircle.buildIcon(color: color);
       case VoicesTextFieldStatus.warning:
         // TODO(dtscalac): this is not the right icon, it should be outlined
         // & rounded, ask designers to provide it and update it
-        return Icons.warning_outlined;
+        return Icon(Icons.warning_outlined, color: color);
       case VoicesTextFieldStatus.error:
-        return Icons.error_outline;
+        return Icon(Icons.error_outline, color: color);
     }
+  }
+
+  Widget? _wrapIconIfExists(Widget? child, EdgeInsetsDirectional padding) {
+    if (child == null) return null;
+
+    return IconTheme(
+      data: IconThemeData(
+        size: 24,
+        color: Theme.of(context).colors.iconsForeground,
+      ),
+      child: Padding(
+        padding: padding,
+        child: Align(
+          widthFactor: 1,
+          heightFactor: 1,
+          child: child,
+        ),
+      ),
+    );
   }
 
   Color _getStatusColor({required Color orDefault}) {
@@ -549,6 +582,12 @@ class VoicesTextFieldDecoration {
   /// add a status [suffixIcon] based on the results of the validation.
   final bool showStatusSuffixIcon;
 
+  /// [InputDecoration.filled].
+  final bool? filled;
+
+  /// [InputDecoration.fillColor].
+  final Color? fillColor;
+
   /// Creates a new text field decoration.
   const VoicesTextFieldDecoration({
     this.border,
@@ -568,99 +607,7 @@ class VoicesTextFieldDecoration {
     this.suffixText,
     this.counterText,
     this.showStatusSuffixIcon = true,
+    this.filled = false,
+    this.fillColor,
   });
-}
-
-class _ResizableBoxParent extends StatelessWidget {
-  final bool resizable;
-  final Widget child;
-
-  const _ResizableBoxParent({
-    required this.resizable,
-    required this.child,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    if (!resizable) {
-      return child;
-    }
-
-    return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) {
-        return _ResizableBox(
-          constraints: constraints,
-          child: child,
-        );
-      },
-    );
-  }
-}
-
-class _ResizableBox extends StatefulWidget {
-  final BoxConstraints constraints;
-  final Widget child;
-
-  const _ResizableBox({
-    required this.constraints,
-    required this.child,
-  });
-
-  @override
-  State<_ResizableBox> createState() => _ResizableBoxState();
-}
-
-class _ResizableBoxState extends State<_ResizableBox> {
-  static const double _minWidth = 40;
-  static const double _minHeight = 40;
-
-  late double _width;
-  late double _height;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _width = widget.constraints.maxWidth != double.infinity
-        ? widget.constraints.maxWidth
-        : widget.constraints.constrainWidth(_minWidth);
-
-    _height = max(widget.constraints.minHeight, _minHeight);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        SizedBox(
-          width: _width,
-          height: _height,
-          child: widget.child,
-        ),
-        Positioned(
-          bottom: 0,
-          right: 0,
-          child: MouseRegion(
-            cursor: SystemMouseCursors.resizeDownRight,
-            child: GestureDetector(
-              onPanUpdate: (details) {
-                setState(() {
-                  _width = (_width + details.delta.dx).clamp(
-                    _minWidth,
-                    widget.constraints.maxWidth,
-                  );
-
-                  _height = (_height + details.delta.dy).clamp(
-                    _minHeight,
-                    widget.constraints.maxHeight,
-                  );
-                });
-              },
-              child: VoicesAssets.images.dragger.buildIcon(size: 15),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
 }

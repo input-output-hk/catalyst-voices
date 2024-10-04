@@ -7,6 +7,8 @@ import 'package:intl/intl.dart' as intl;
 import 'catalyst_voices_localizations_en.dart' deferred as catalyst_voices_localizations_en;
 import 'catalyst_voices_localizations_es.dart' deferred as catalyst_voices_localizations_es;
 
+// ignore_for_file: type=lint
+
 /// Callers can lookup localized strings with an instance of VoicesLocalizations
 /// returned by `VoicesLocalizations.of(context)`.
 ///
@@ -109,6 +111,42 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'mail@example.com'**
   String get emailErrorText;
+
+  /// Text shown in cancel button
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancelButtonText;
+
+  /// Text shown in edit button
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get editButtonText;
+
+  /// Text shown in header tooltip
+  ///
+  /// In en, this message translates to:
+  /// **'Header'**
+  String get headerTooltipText;
+
+  /// Text shown as placeholder in rich text editor
+  ///
+  /// In en, this message translates to:
+  /// **'Start writing your text...'**
+  String get placeholderRichText;
+
+  /// Text shown as placeholder in rich text editor
+  ///
+  /// In en, this message translates to:
+  /// **'Supporting text'**
+  String get supportingTextLabelText;
+
+  /// Text shown in save button
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get saveButtonText;
 
   /// Text shown in password field
   ///
@@ -283,6 +321,1062 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Slot {nr}'**
   String seedPhraseSlotNr(int nr);
+
+  /// Indicates to user that status is in ready mode
+  ///
+  /// In en, this message translates to:
+  /// **'Ready'**
+  String get proposalStatusReady;
+
+  /// Indicates to user that status is in draft mode
+  ///
+  /// In en, this message translates to:
+  /// **'Draft'**
+  String get proposalStatusDraft;
+
+  /// Indicates to user that status is in progress
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
+  String get proposalStatusInProgress;
+
+  /// Indicates to user that status is in private mode
+  ///
+  /// In en, this message translates to:
+  /// **'Private'**
+  String get proposalStatusPrivate;
+
+  /// Indicates to user that status is in live mode
+  ///
+  /// In en, this message translates to:
+  /// **'LIVE'**
+  String get proposalStatusLive;
+
+  /// Indicates to user that status is completed
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get proposalStatusCompleted;
+
+  /// Indicates to user that status is in open mode
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get proposalStatusOpen;
+
+  /// Label shown on a proposal card indicating that the proposal is funded.
+  ///
+  /// In en, this message translates to:
+  /// **'Funded proposal'**
+  String get fundedProposal;
+
+  /// Label shown on a proposal card indicating that the proposal is not yet funded.
+  ///
+  /// In en, this message translates to:
+  /// **'Published proposal'**
+  String get publishedProposal;
+
+  /// Indicates date of funding (a proposal).
+  ///
+  /// In en, this message translates to:
+  /// **'Funded {date}'**
+  String fundedProposalDate(DateTime date);
+
+  /// Indicates a last update date.
+  ///
+  /// In en, this message translates to:
+  /// **'Last update: {date}.'**
+  String lastUpdateDate(String date);
+
+  /// Indicates the amount of ADA requested in a fund on a proposal card.
+  ///
+  /// In en, this message translates to:
+  /// **'Funds requested'**
+  String get fundsRequested;
+
+  /// Indicates the amount of comments on a proposal card.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} {count, plural, =0{comments} =1{comment} other{comments}}'**
+  String noOfComments(num count);
+
+  /// Indicates the amount of comments on a proposal card.
+  ///
+  /// In en, this message translates to:
+  /// **'{completed} of {total} ({percentage}%) {total, plural, =0{segments} =1{segment} other{segments}} completed'**
+  String noOfSegmentsCompleted(num completed, num total, num percentage);
+
+  /// Refers to date which is today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// Refers to date which is yesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get yesterday;
+
+  /// Refers to date which is two days ago.
+  ///
+  /// In en, this message translates to:
+  /// **'2 days ago'**
+  String get twoDaysAgo;
+
+  /// Refers to date which is tomorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'Tomorrow'**
+  String get tomorrow;
+
+  /// Title of the voting space.
+  ///
+  /// In en, this message translates to:
+  /// **'Active voting round 14'**
+  String get activeVotingRound;
+
+  /// Tab label for all proposals in voting space
+  ///
+  /// In en, this message translates to:
+  /// **'All proposals ({count})'**
+  String noOfAllProposals(int count);
+
+  /// Refers to a list of favorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Favorites'**
+  String get favorites;
+
+  /// Left panel name in treasury space
+  ///
+  /// In en, this message translates to:
+  /// **'Campaign builder'**
+  String get treasuryCampaignBuilder;
+
+  /// Tab name in campaign builder panel
+  ///
+  /// In en, this message translates to:
+  /// **'Segments'**
+  String get treasuryCampaignBuilderSegments;
+
+  /// Segment name
+  ///
+  /// In en, this message translates to:
+  /// **'Setup Campaign'**
+  String get treasuryCampaignSetup;
+
+  /// Campaign title
+  ///
+  /// In en, this message translates to:
+  /// **'Campaign title'**
+  String get treasuryCampaignTitle;
+
+  /// Button name in step
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get stepEdit;
+
+  /// Left panel name in workspace
+  ///
+  /// In en, this message translates to:
+  /// **'Proposal navigation'**
+  String get workspaceProposalNavigation;
+
+  /// Tab name in proposal setup panel
+  ///
+  /// In en, this message translates to:
+  /// **'Segments'**
+  String get workspaceProposalNavigationSegments;
+
+  /// Segment name
+  ///
+  /// In en, this message translates to:
+  /// **'Proposal setup'**
+  String get workspaceProposalSetup;
+
+  /// Name shown in spaces shell drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Treasury'**
+  String get drawerSpaceTreasury;
+
+  /// Name shown in spaces shell drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Discovery'**
+  String get drawerSpaceDiscovery;
+
+  /// Name shown in spaces shell drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Workspace'**
+  String get drawerSpaceWorkspace;
+
+  /// Name shown in spaces shell drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Voting'**
+  String get drawerSpaceVoting;
+
+  /// Name shown in spaces shell drawer
+  ///
+  /// In en, this message translates to:
+  /// **'Funded projects'**
+  String get drawerSpaceFundedProjects;
+
+  /// Title of the funded project space
+  ///
+  /// In en, this message translates to:
+  /// **'Funded project space'**
+  String get fundedProjectSpace;
+
+  /// Tab label for funded proposals in funded projects space
+  ///
+  /// In en, this message translates to:
+  /// **'Funded proposals ({count})'**
+  String noOfFundedProposals(int count);
+
+  /// Refers to a list of followed items.
+  ///
+  /// In en, this message translates to:
+  /// **'Followed'**
+  String get followed;
+
+  /// Overall spaces search brands tile name
+  ///
+  /// In en, this message translates to:
+  /// **'Search Brands'**
+  String get overallSpacesSearchBrands;
+
+  /// Overall spaces tasks tile name
+  ///
+  /// In en, this message translates to:
+  /// **'Tasks'**
+  String get overallSpacesTasks;
+
+  /// In different places update popup title
+  ///
+  /// In en, this message translates to:
+  /// **'Voices update ready'**
+  String get voicesUpdateReady;
+
+  /// In different places update popup body
+  ///
+  /// In en, this message translates to:
+  /// **'Click to restart'**
+  String get clickToRestart;
+
+  /// Name of space shown in different spaces that indicates its origin
+  ///
+  /// In en, this message translates to:
+  /// **'Treasury space'**
+  String get spaceTreasuryName;
+
+  /// Name of space shown in different spaces that indicates its origin
+  ///
+  /// In en, this message translates to:
+  /// **'Discovery space'**
+  String get spaceDiscoveryName;
+
+  /// Name of space shown in different spaces that indicates its origin
+  ///
+  /// In en, this message translates to:
+  /// **'Workspace'**
+  String get spaceWorkspaceName;
+
+  /// Name of space shown in different spaces that indicates its origin
+  ///
+  /// In en, this message translates to:
+  /// **'Voting space'**
+  String get spaceVotingName;
+
+  /// Name of space shown in different spaces that indicates its origin
+  ///
+  /// In en, this message translates to:
+  /// **'Funded project space'**
+  String get spaceFundedProjects;
+
+  /// Refers to a lock action, i.e. to lock the session.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock'**
+  String get lock;
+
+  /// Refers to a unlock action, i.e. to unlock the session.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock'**
+  String get unlock;
+
+  /// Refers to a get started action, i.e. to register.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get getStarted;
+
+  /// Refers to guest user.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest'**
+  String get guest;
+
+  /// Refers to user that created keychain but is locked
+  ///
+  /// In en, this message translates to:
+  /// **'Visitor'**
+  String get visitor;
+
+  /// Text shown in the No Internet Connection Banner widget for the refresh button.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get noConnectionBannerRefreshButtonText;
+
+  /// Text shown in the No Internet Connection Banner widget for the title.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection'**
+  String get noConnectionBannerTitle;
+
+  /// Text shown in the No Internet Connection Banner widget for the description below the title.
+  ///
+  /// In en, this message translates to:
+  /// **'Your internet is playing hide and seek. Check your internet connection, or try again in a moment.'**
+  String get noConnectionBannerDescription;
+
+  /// Describes a password that is weak
+  ///
+  /// In en, this message translates to:
+  /// **'Weak password strength'**
+  String get weakPasswordStrength;
+
+  /// Describes a password that has medium strength.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal password strength'**
+  String get normalPasswordStrength;
+
+  /// Describes a password that is strong.
+  ///
+  /// In en, this message translates to:
+  /// **'Good password strength'**
+  String get goodPasswordStrength;
+
+  /// A button label to select a cardano wallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Cardano Wallet'**
+  String get chooseCardanoWallet;
+
+  /// A button label to select another cardano wallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose other wallet'**
+  String get chooseOtherWallet;
+
+  /// A label on a clickable element that can show more content.
+  ///
+  /// In en, this message translates to:
+  /// **'Learn More'**
+  String get learnMore;
+
+  /// A header in link wallet flow in registration.
+  ///
+  /// In en, this message translates to:
+  /// **'Link keys to your Catalyst Keychain'**
+  String get walletLinkHeader;
+
+  /// A subheader in link wallet flow in registration for wallet connection.
+  ///
+  /// In en, this message translates to:
+  /// **'Link your Cardano wallet'**
+  String get walletLinkWalletSubheader;
+
+  /// A subheader in link wallet flow in registration for role chooser state.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your Catalyst roles'**
+  String get walletLinkRolesSubheader;
+
+  /// A subheader in link wallet flow in registration for RBAC transaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign your Catalyst roles to the\nCardano mainnet'**
+  String get walletLinkTransactionSubheader;
+
+  /// A title in link wallet flow on intro screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Link Cardano Wallet & Catalyst Roles to you Catalyst Keychain.'**
+  String get walletLinkIntroTitle;
+
+  /// A message (content) in link wallet flow on intro screen.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re almost there! This is the final and most important step in your account setup.\n\nWe\'re going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.\n\nRole Keys allow you to enter new spaces, discover new ways to participate, and unlock new ways to earn rewards.\n\nWe\'ll start with your Voter Key by default. You can decide to add a Proposer Key and Drep key if you want, or you can always add them later.'**
+  String get walletLinkIntroContent;
+
+  /// A title in link wallet flow on select wallet screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Select the Cardano wallet to link\nto your Catalyst Keychain.'**
+  String get walletLinkSelectWalletTitle;
+
+  /// A message (content) in link wallet flow on select wallet screen.
+  ///
+  /// In en, this message translates to:
+  /// **'To complete this action, you\'ll submit a signed transaction to Cardano. There will be an ADA transaction fee.'**
+  String get walletLinkSelectWalletContent;
+
+  /// A title in link wallet flow on wallet details screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Cardano wallet detection'**
+  String get walletLinkWalletDetailsTitle;
+
+  /// A message in link wallet flow on wallet details screen.
+  ///
+  /// In en, this message translates to:
+  /// **'{wallet} connected successfully!'**
+  String walletLinkWalletDetailsContent(String wallet);
+
+  /// A message in link wallet flow on wallet details screen when a user wallet doesn't have enough balance.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet and role registrations require a minimal transaction fee. You can setup your default dApp connector wallet in your browser extension settings.'**
+  String get walletLinkWalletDetailsNotice;
+
+  /// A message recommending the user to top up ADA in wallet link on wallet details screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Top up ADA'**
+  String get walletLinkWalletDetailsNoticeTopUp;
+
+  /// A link to top-up provide when the user doesn't have enough balance on wallet link screen
+  ///
+  /// In en, this message translates to:
+  /// **'Link to top-up provider'**
+  String get walletLinkWalletDetailsNoticeTopUpLink;
+
+  /// A title in link wallet flow on transaction screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Let\'s make sure everything looks right.'**
+  String get walletLinkTransactionTitle;
+
+  /// A subtitle in link wallet flow on transaction screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Account completion for Catalyst'**
+  String get walletLinkTransactionAccountCompletion;
+
+  /// An item in the transaction summary for the wallet link.
+  ///
+  /// In en, this message translates to:
+  /// **'1 Link {wallet} to Catalyst Keychain'**
+  String walletLinkTransactionLinkItem(String wallet);
+
+  /// A side note on transaction summary in the wallet link explaining the positives about the registration.
+  ///
+  /// In en, this message translates to:
+  /// **'Positive small print'**
+  String get walletLinkTransactionPositiveSmallPrint;
+
+  /// The first item for the positive small print message.
+  ///
+  /// In en, this message translates to:
+  /// **'Your registration is a one time event, cost will not renew periodically.'**
+  String get walletLinkTransactionPositiveSmallPrintItem1;
+
+  /// The second item for the positive small print message.
+  ///
+  /// In en, this message translates to:
+  /// **'Your registrations can be found under your account profile after completion.'**
+  String get walletLinkTransactionPositiveSmallPrintItem2;
+
+  /// The third item for the positive small print message.
+  ///
+  /// In en, this message translates to:
+  /// **'All registration fees go into the Cardano Treasury.'**
+  String get walletLinkTransactionPositiveSmallPrintItem3;
+
+  /// The primary button label to sign a transaction on transaction summary screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign transaction with wallet'**
+  String get walletLinkTransactionSign;
+
+  /// The secondary button label to change the roles on transaction summary screen.
+  ///
+  /// In en, this message translates to:
+  /// **'Change role setup'**
+  String get walletLinkTransactionChangeRoles;
+
+  /// An item in the transaction summary for the role registration
+  ///
+  /// In en, this message translates to:
+  /// **'1 {role} registration to Catalyst Keychain'**
+  String walletLinkTransactionRoleItem(String role);
+
+  /// A title on the role chooser screen in registration.
+  ///
+  /// In en, this message translates to:
+  /// **'How do you want to participate in Catalyst?'**
+  String get walletLinkRoleChooserTitle;
+
+  /// A message on the role chooser screen in registration.
+  ///
+  /// In en, this message translates to:
+  /// **'In Catalyst you can take on different roles, learn more below and choose your additional roles now.'**
+  String get walletLinkRoleChooserContent;
+
+  /// A title on the role summary screen in registration.
+  ///
+  /// In en, this message translates to:
+  /// **'Is this your correct Catalyst role setup?'**
+  String get walletLinkRoleSummaryTitle;
+
+  /// The first part of the message on the role summary screen in registration.
+  ///
+  /// In en, this message translates to:
+  /// **'You would like to register '**
+  String get walletLinkRoleSummaryContent1;
+
+  /// The middle (bold) part of the message on the role summary screen in registration.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} active {count, plural, =0{roles} =1{role} other{roles}}'**
+  String walletLinkRoleSummaryContent2(num count);
+
+  /// The last part of the message on the role summary screen in registration.
+  ///
+  /// In en, this message translates to:
+  /// **' in Catalyst.'**
+  String get walletLinkRoleSummaryContent3;
+
+  /// A button label on the role summary screen in registration for the next step.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm & Sign with wallet'**
+  String get walletLinkRoleSummaryButton;
+
+  /// Message shown when redirecting to external content that describes which wallets are supported.
+  ///
+  /// In en, this message translates to:
+  /// **'See all supported wallets'**
+  String get seeAllSupportedWallets;
+
+  /// Message shown when presenting the details of a connected wallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet detection summary'**
+  String get walletDetectionSummary;
+
+  /// The wallet balance in terms of Ada.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet balance'**
+  String get walletBalance;
+
+  /// A cardano wallet address
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet address'**
+  String get walletAddress;
+
+  /// No description provided for @accountCreationCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a new  Catalyst Keychain'**
+  String get accountCreationCreate;
+
+  /// No description provided for @accountCreationRecover.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover your Catalyst Keychain'**
+  String get accountCreationRecover;
+
+  /// Indicates that created keychain will be stored in this device only
+  ///
+  /// In en, this message translates to:
+  /// **'On this device'**
+  String get accountCreationOnThisDevice;
+
+  /// No description provided for @accountCreationGetStartedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Catalyst'**
+  String get accountCreationGetStartedTitle;
+
+  /// No description provided for @accountCreationGetStatedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'If you already have a Catalyst keychain you can restore it on this device, or you can create a new Catalyst Keychain.'**
+  String get accountCreationGetStatedDesc;
+
+  /// No description provided for @accountCreationGetStatedWhatNext.
+  ///
+  /// In en, this message translates to:
+  /// **'What do you want to do?'**
+  String get accountCreationGetStatedWhatNext;
+
+  /// Title of My Account page
+  ///
+  /// In en, this message translates to:
+  /// **'My Account / Profile & Keychain'**
+  String get myAccountProfileKeychain;
+
+  /// Subtitle of My Account page
+  ///
+  /// In en, this message translates to:
+  /// **'Your Catalyst keychain & role registration'**
+  String get yourCatalystKeychainAndRoleRegistration;
+
+  /// Tab on My Account page
+  ///
+  /// In en, this message translates to:
+  /// **'Profile & Keychain'**
+  String get profileAndKeychain;
+
+  /// Action on Catalyst Keychain card
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Keychain'**
+  String get removeKeychain;
+
+  /// Describes that wallet is connected on Catalyst Keychain card
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet connected'**
+  String get walletConnected;
+
+  /// Describes roles on Catalyst Keychain card
+  ///
+  /// In en, this message translates to:
+  /// **'Current Role registrations'**
+  String get currentRoleRegistrations;
+
+  /// Account role
+  ///
+  /// In en, this message translates to:
+  /// **'Voter'**
+  String get voter;
+
+  /// Account role
+  ///
+  /// In en, this message translates to:
+  /// **'Proposer'**
+  String get proposer;
+
+  /// Account role
+  ///
+  /// In en, this message translates to:
+  /// **'Drep'**
+  String get drep;
+
+  /// Related to account role
+  ///
+  /// In en, this message translates to:
+  /// **'Default'**
+  String get defaultRole;
+
+  /// No description provided for @catalystKeychain.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst Keychain'**
+  String get catalystKeychain;
+
+  /// No description provided for @accountCreationSplashTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your Catalyst Keychain'**
+  String get accountCreationSplashTitle;
+
+  /// No description provided for @accountCreationSplashMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Your keychain is your ticket to participate in  distributed innovation on the global stage.    Once you have it, you\'ll be able to enter different spaces, discover awesome ideas, and share your feedback to hep improve ideas.    As you add new keys to your keychain, you\'ll be able to enter new spaces, unlock new rewards opportunities, and have your voice heard in community decisions.'**
+  String get accountCreationSplashMessage;
+
+  /// No description provided for @accountCreationSplashNextButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your Keychain now'**
+  String get accountCreationSplashNextButton;
+
+  /// No description provided for @accountInstructionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Great! Your Catalyst Keychain  has been created.'**
+  String get accountInstructionsTitle;
+
+  /// No description provided for @accountInstructionsMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'On the next screen, you\'re going to see 12 words.  This is called your \"seed phrase\".     It\'s like a super secure password that only you know,  that allows you to prove ownership of your keychain.    You\'ll use it to login and recover your account on  different devices, so be sure to put it somewhere safe!\n\nYou need to write this seed phrase down with pen and paper, so get this ready.'**
+  String get accountInstructionsMessage;
+
+  /// For example in button that goes to next stage of registration
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get next;
+
+  /// For example in button that goes to previous stage of registration
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back;
+
+  /// Retry action when something goes wrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// Error description when something goes wrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong.'**
+  String get somethingWentWrong;
+
+  /// A description when no wallet extension was found.
+  ///
+  /// In en, this message translates to:
+  /// **'No wallet found.'**
+  String get noWalletFound;
+
+  /// A title on delete keychain dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Keychain?'**
+  String get deleteKeychainDialogTitle;
+
+  /// A subtitle on delete keychain dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you wants to delete your\nCatalyst Keychain from this device?'**
+  String get deleteKeychainDialogSubtitle;
+
+  /// A warning on delete keychain dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Make sure you have a working Catalyst 12-word seedphrase!'**
+  String get deleteKeychainDialogWarning;
+
+  /// A warning info on delete keychain dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Your Catalyst account will be removed,\nthis action cannot be undone!'**
+  String get deleteKeychainDialogWarningInfo;
+
+  /// A typing info on delete keychain dialog
+  ///
+  /// In en, this message translates to:
+  /// **'To avoid mistakes, please type ‘Remove Keychain’ below.'**
+  String get deleteKeychainDialogTypingInfo;
+
+  /// An input label on delete keychain dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm removal'**
+  String get deleteKeychainDialogInputLabel;
+
+  /// An error text on text field on delete keychain dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Error. Please type \'Remove keychain\' to remove your account from this device.'**
+  String get deleteKeychainDialogErrorText;
+
+  /// A removing phrase on delete keychain dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Remove Keychain'**
+  String get deleteKeychainDialogRemovingPhrase;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// No description provided for @notice.
+  ///
+  /// In en, this message translates to:
+  /// **'Notice'**
+  String get notice;
+
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
+
+  /// No description provided for @no.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no;
+
+  /// No description provided for @total.
+  ///
+  /// In en, this message translates to:
+  /// **'Total'**
+  String get total;
+
+  /// No description provided for @file.
+  ///
+  /// In en, this message translates to:
+  /// **'file'**
+  String get file;
+
+  /// No description provided for @key.
+  ///
+  /// In en, this message translates to:
+  /// **'key'**
+  String get key;
+
+  /// No description provided for @upload.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload'**
+  String get upload;
+
+  /// No description provided for @browse.
+  ///
+  /// In en, this message translates to:
+  /// **'browse'**
+  String get browse;
+
+  /// An info on upload dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Drop your {itemNameToUpload} here or '**
+  String uploadDropInfo(String itemNameToUpload);
+
+  /// No description provided for @uploadProgressInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload in progress'**
+  String get uploadProgressInfo;
+
+  /// A title on keychain upload dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Catalyst Keychain'**
+  String get uploadKeychainTitle;
+
+  /// An info on keychain upload dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Make sure it\'s a correct Catalyst keychain file.'**
+  String get uploadKeychainInfo;
+
+  /// Refers to a light theme mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeLight;
+
+  /// Refers to a dark theme mode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeDark;
+
+  /// A title on keychain deleted dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst keychain removed'**
+  String get keychainDeletedDialogTitle;
+
+  /// A subtitle on keychain deleted dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst keychain removed'**
+  String get keychainDeletedDialogSubtitle;
+
+  /// An info on keychain deleted dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst keychain removed'**
+  String get keychainDeletedDialogInfo;
+
+  /// No description provided for @createKeychainSeedPhraseSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Write down your 12 Catalyst  security words'**
+  String get createKeychainSeedPhraseSubtitle;
+
+  /// No description provided for @createKeychainSeedPhraseBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Make sure you create an offline backup of your recovery phrase as well.'**
+  String get createKeychainSeedPhraseBody;
+
+  /// No description provided for @createKeychainSeedPhraseDownload.
+  ///
+  /// In en, this message translates to:
+  /// **'Download Catalyst key'**
+  String get createKeychainSeedPhraseDownload;
+
+  /// No description provided for @createKeychainSeedPhraseStoreConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'I have written down/downloaded my 12 words'**
+  String get createKeychainSeedPhraseStoreConfirmation;
+
+  /// No description provided for @createKeychainSeedPhraseCheckInstructionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check your Catalyst security keys'**
+  String get createKeychainSeedPhraseCheckInstructionsTitle;
+
+  /// No description provided for @createKeychainSeedPhraseCheckInstructionsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Next, we\'re going to make sure that you\'ve written down your words correctly.     We don\'t save your seed phrase, so it\'s important  to make sure you have it right. That\'s why we do this confirmation before continuing.     It\'s also good practice to get familiar with using a seed phrase if you\'re new to crypto.'**
+  String get createKeychainSeedPhraseCheckInstructionsSubtitle;
+
+  /// No description provided for @createKeychainSeedPhraseCheckSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Input your Catalyst security keys'**
+  String get createKeychainSeedPhraseCheckSubtitle;
+
+  /// No description provided for @createKeychainSeedPhraseCheckBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your 12 written down words in  the correct order.'**
+  String get createKeychainSeedPhraseCheckBody;
+
+  /// When user checks correct seed phrase words order he can upload it too
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Catalyst Key'**
+  String get uploadCatalystKey;
+
+  /// No description provided for @reset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset'**
+  String get reset;
+
+  /// No description provided for @createKeychainSeedPhraseCheckSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nice job! You\'ve successfully verified the seed phrase for your keychain.'**
+  String get createKeychainSeedPhraseCheckSuccessTitle;
+
+  /// No description provided for @createKeychainSeedPhraseCheckSuccessSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your seed phrase to recover your Catalyst Keychain on any device.  It\'s kinda like your email and password all rolled into one, so keep it somewhere safe!  In the next step we’ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.'**
+  String get createKeychainSeedPhraseCheckSuccessSubtitle;
+
+  /// No description provided for @yourNextStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Your next step'**
+  String get yourNextStep;
+
+  /// No description provided for @createKeychainSeedPhraseCheckSuccessNextStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Now let’s set your Unlock password for this device!'**
+  String get createKeychainSeedPhraseCheckSuccessNextStep;
+
+  /// No description provided for @createKeychainUnlockPasswordInstructionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set your Catalyst unlock password  for this device'**
+  String get createKeychainUnlockPasswordInstructionsTitle;
+
+  /// No description provided for @createKeychainUnlockPasswordInstructionsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.    But it can be a bit tedious to enter every single time you want to use the app.    In this next step, you\'ll set your Unlock Password for your current device. It\'s like a shortcut for proving ownership of your Keychain.    Whenever you recover your account for the first time on a new device, you\'ll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.'**
+  String get createKeychainUnlockPasswordInstructionsSubtitle;
+
+  /// No description provided for @createKeychainCreatedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Congratulations your Catalyst  Keychain is created!'**
+  String get createKeychainCreatedTitle;
+
+  /// No description provided for @createKeychainCreatedNextStep.
+  ///
+  /// In en, this message translates to:
+  /// **'In the next step you write your Catalyst roles and  account to the Cardano Mainnet.'**
+  String get createKeychainCreatedNextStep;
+
+  /// No description provided for @createKeychainLinkWalletAndRoles.
+  ///
+  /// In en, this message translates to:
+  /// **'Link your Cardano Wallet & Roles'**
+  String get createKeychainLinkWalletAndRoles;
+
+  /// No description provided for @registrationCreateKeychainStepGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst Keychain created'**
+  String get registrationCreateKeychainStepGroup;
+
+  /// No description provided for @registrationLinkWalletStepGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Link Cardano Wallet & Roles'**
+  String get registrationLinkWalletStepGroup;
+
+  /// No description provided for @registrationCompletedStepGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst account creation completed!'**
+  String get registrationCompletedStepGroup;
+
+  /// No description provided for @createKeychainUnlockPasswordIntoSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst unlock password'**
+  String get createKeychainUnlockPasswordIntoSubtitle;
+
+  /// No description provided for @createKeychainUnlockPasswordIntoBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Please provide a password for your Catalyst Keychain.'**
+  String get createKeychainUnlockPasswordIntoBody;
+
+  /// No description provided for @enterPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter password'**
+  String get enterPassword;
+
+  /// No description provided for @confirmPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm password'**
+  String get confirmPassword;
+
+  /// No description provided for @xCharactersMinimum.
+  ///
+  /// In en, this message translates to:
+  /// **'{number} characters minimum length'**
+  String xCharactersMinimum(int number);
+
+  /// When user confirms password but it does not match original one.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match, please correct'**
+  String get passwordDoNotMatch;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

@@ -31,6 +31,15 @@ class VoicesColors {
   /// Color: #121721
   static const Color darkElevationsOnSurfaceNeutralLv0 = Color(0xFF121721);
 
+  /// Color: #212A3D
+  static const Color darkElevationsOnSurfaceNeutralLv1Grey = Color(0xFF212A3D);
+
+  /// Color: #2D3953
+  static const Color darkElevationsOnSurfaceNeutralLv1White = Color(0xFF2D3953);
+
+  /// Color: #212A3D
+  static const Color darkElevationsOnSurfaceNeutralLv2 = Color(0xFF212A3D);
+
   /// Color: #FF9999
   static const Color darkError = Color(0xFFFF9999);
 
@@ -40,6 +49,9 @@ class VoicesColors {
   /// Color: #212A3D
   static const Color darkIconsBackground = Color(0xFF212A3D);
 
+  /// Color: #F2F4F8
+  static const Color darkIconsBackgroundVariant = Color(0xFFF2F4F8);
+
   /// Color: #61BFC8D9
   static const Color darkIconsDisabled = Color(0x61BFC8D9);
 
@@ -48,6 +60,9 @@ class VoicesColors {
 
   /// Color: #F2F4F8
   static const Color darkIconsForeground = Color(0xFFF2F4F8);
+
+  /// Color: #FFFFFF
+  static const Color darkIconsOnImage = Color(0xFFFFFFFF);
 
   /// Color: #728EF3
   static const Color darkIconsPrimary = Color(0xFF728EF3);
@@ -66,6 +81,9 @@ class VoicesColors {
 
   /// Color: #FFD1D1
   static const Color darkOnErrorContainer = Color(0xFFFFD1D1);
+
+  /// Color: #FFFFFF
+  static const Color darkOnErrorVariant = Color(0xFFFFFFFF);
 
   /// Color: #0C288D
   static const Color darkOnPrimary = Color(0xFF0C288D);
@@ -154,6 +172,9 @@ class VoicesColors {
   /// Color: #728EF3
   static const Color darkPrimary = Color(0xFF728EF3);
 
+  /// Color: #364463
+  static const Color darkPrimary98 = Color(0xFF364463);
+
   /// Color: #1035BC
   static const Color darkPrimaryContainer = Color(0xFF1035BC);
 
@@ -177,6 +198,15 @@ class VoicesColors {
 
   /// Color: #0C288D
   static const Color darkTextOnPrimaryContainer = Color(0xFF0C288D);
+
+  /// Color: #FFFFFF
+  static const Color darkTextOnPrimaryLevel0 = Color(0xFFFFFFFF);
+
+  /// Color: #E6E9F0
+  static const Color darkTextOnPrimaryLevel1 = Color(0xFFE6E9F0);
+
+  /// Color: #0C288D
+  static const Color darkTextOnPrimaryWhite = Color(0xFF0C288D);
 
   /// Color: #FFFFFF
   static const Color darkTextPrimary = Color(0xFFFFFFFF);
@@ -205,6 +235,16 @@ class VoicesColors {
   /// Color: #FFFFFF
   static const Color lightElevationsOnSurfaceNeutralLv0 = Color(0xFFFFFFFF);
 
+  /// Color: #F2F4F8
+  static const Color lightElevationsOnSurfaceNeutralLv1Grey = Color(0xFFF2F4F8);
+
+  /// Color: #FFFFFF
+  static const Color lightElevationsOnSurfaceNeutralLv1White =
+      Color(0xFFFFFFFF);
+
+  /// Color: #E6E9F0
+  static const Color lightElevationsOnSurfaceNeutralLv2 = Color(0xFFE6E9F0);
+
   /// Color: #CC0000
   static const Color lightError = Color(0xFFCC0000);
 
@@ -214,6 +254,9 @@ class VoicesColors {
   /// Color: #FFFFFF
   static const Color lightIconsBackground = Color(0xFFFFFFFF);
 
+  /// Color: #F2F4F8
+  static const Color lightIconsBackgroundVariant = Color(0xFFF2F4F8);
+
   /// Color: #61212A3D
   static const Color lightIconsDisabled = Color(0x61212A3D);
 
@@ -222,6 +265,9 @@ class VoicesColors {
 
   /// Color: #212A3D
   static const Color lightIconsForeground = Color(0xFF212A3D);
+
+  /// Color: #FFFFFF
+  static const Color lightIconsOnImage = Color(0xFFFFFFFF);
 
   /// Color: #123CD3
   static const Color lightIconsPrimary = Color(0xFF123CD3);
@@ -240,6 +286,9 @@ class VoicesColors {
 
   /// Color: #700000
   static const Color lightOnErrorContainer = Color(0xFF700000);
+
+  /// Color: #FFFFFF
+  static const Color lightOnErrorVariant = Color(0xFFFFFFFF);
 
   /// Color: #FFFFFF
   static const Color lightOnPrimary = Color(0xFFFFFFFF);
@@ -328,6 +377,9 @@ class VoicesColors {
   /// Color: #123CD3
   static const Color lightPrimary = Color(0xFF123CD3);
 
+  /// Color: #E8ECFD
+  static const Color lightPrimary98 = Color(0xFFE8ECFD);
+
   /// Color: #A1B4F7
   static const Color lightPrimaryContainer = Color(0xFFA1B4F7);
 
@@ -351,6 +403,15 @@ class VoicesColors {
 
   /// Color: #FFFFFF
   static const Color lightTextOnPrimaryContainer = Color(0xFFFFFFFF);
+
+  /// Color: #212A3D
+  static const Color lightTextOnPrimaryLevel0 = Color(0xFF212A3D);
+
+  /// Color: #506288
+  static const Color lightTextOnPrimaryLevel1 = Color(0xFF506288);
+
+  /// Color: #FFFFFF
+  static const Color lightTextOnPrimaryWhite = Color(0xFFFFFFFF);
 
   /// Color: #212A3D
   static const Color lightTextPrimary = Color(0xFF212A3D);

@@ -157,6 +157,7 @@
         ".config/dictionaries/cspell/markdown/cspell-ext.json"
     ],
     "ignorePaths": [
+        "*.excalidraw",
         ".config/dictionaries/**",
         "tmp/**",
         "cspell.json",
@@ -174,6 +175,7 @@
         "styles.min.css",
         "web-components.min.js",
         "**/generated/**",
+        "**/GeneratedPluginRegistrant.swift",
         "utilities/catalyst_voices_remote_widgets/example/**/**",
         "utilities/poc_local_storage/**/**",
         "**/*.svg"

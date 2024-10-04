@@ -18,17 +18,21 @@ targets = [
 version = 2
 ignore = [
     { id = "RUSTSEC-2020-0168", reason = "`mach` is used by wasmtime and we have no control over that." },
-    { id = "RUSTSEC-2021-0145", reason = "we don't target windows, and don;t use a custom global allocator." },
+    { id = "RUSTSEC-2021-0145", reason = "we don't target windows, and don't use a custom global allocator." },
+    { id = "RUSTSEC-2024-0370", reason = "`proc-macro-error` is used by crates we rely on, we can't control what they use."},
 ]
 
 [bans]
 multiple-versions = "warn"
 wildcards = 'deny'
 deny = [
-    # { crate = "git2", use-instead = "gix" },
-    { crate = "openssl", use-instead = "rustls" },
-    { crate = "openssl-sys", use-instead = "rustls" },
+    # Scylla DB Drivers currently require OpenSSL.  Its unavoidable.
+    # However, there is movement to enable support for Rustls. 
+    # So, for now, allow open-ssl but it needs to be disabled as soon as Scylla DB enables Rustls.
+    #{ crate = "openssl", use-instead = "rustls" },
+    #{ crate = "openssl-sys", use-instead = "rustls" },
     "libssh2-sys",
+    # { crate = "git2", use-instead = "gix" },
     # { crate = "cmake", use-instead = "cc" },
     # { crate = "windows", reason = "bloated and unnecessary", use-instead = "ideally inline bindings, practically, windows-sys" },
 ]
@@ -49,8 +53,9 @@ unknown-git = "deny"
 
 # List of URLs for allowed Git repositories
 allow-git = [
-    "https://github.com/input-output-hk/hermes.git",
+    "https://github.com/input-output-hk/catalyst-libs.git",
     "https://github.com/input-output-hk/catalyst-pallas.git",
+    "https://github.com/input-output-hk/catalyst-mithril.git",
     "https://github.com/bytecodealliance/wasmtime",
     "https://github.com/aldanor/hdf5-rust",
 ]
@@ -73,6 +78,7 @@ allow = [
     "ISC",
     "Unicode-3.0",
     "MPL-2.0",
+    "Zlib",
 ]
 exceptions = [
     #{ allow = ["Zlib"], crate = "tinyvec" },
@@ -94,6 +100,7 @@ license-files = [{ path = "../LICENSE-MIT", hash = 0x001c7e6c }]
 crate = "ring"
 expression = "MIT"
 license-files = [{ path = "LICENSE", hash = 0xbd0eed23 }]
+
 # SPDX considers OpenSSL to encompass both the OpenSSL and SSLeay licenses
 # https://spdx.org/licenses/OpenSSL.html
 # ISC - Both BoringSSL and ring use this for their new files

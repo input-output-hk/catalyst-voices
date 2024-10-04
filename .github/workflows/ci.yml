@@ -2,21 +2,18 @@ name: CI
 
 on:
   push:
+    branches: [main]
+    tags: ['*']
+  pull_request:
 
 permissions:
   id-token: write
   contents: write
   packages: write
+  pull-requests: write
 
 jobs:
   ci:
-    uses: input-output-hk/catalyst-ci/.github/workflows/ci.yml@master
+    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.1.0
     with:
-      aws_ecr_registry: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
-      aws_role_arn: arn:aws:iam::332405224602:role/ci
-      aws_region: eu-central-1
-    secrets:
-      dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
-      dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
-      earthly_runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-      earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
+      forge_version: 0.2.1

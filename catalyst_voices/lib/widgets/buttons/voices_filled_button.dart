@@ -16,6 +16,9 @@ class VoicesFilledButton extends StatelessWidget {
   /// The widget to be displayed after the button's main content.
   final Widget? trailing;
 
+  /// The optional button's background color.
+  final Color? backgroundColor;
+
   /// The main content of the button.
   final Widget child;
 
@@ -24,12 +27,16 @@ class VoicesFilledButton extends StatelessWidget {
     this.onTap,
     this.leading,
     this.trailing,
+    this.backgroundColor,
     required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
     return FilledButton(
+      style: FilledButton.styleFrom(
+        backgroundColor: backgroundColor,
+      ),
       onPressed: onTap,
       child: VoicesButtonAffixDecoration(
         leading: leading,

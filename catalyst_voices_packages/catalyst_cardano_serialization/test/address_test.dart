@@ -1,5 +1,4 @@
-import 'package:catalyst_cardano_serialization/src/address.dart';
-import 'package:catalyst_cardano_serialization/src/types.dart';
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:test/test.dart';
 
 import 'test_utils/test_data.dart';
@@ -62,6 +61,25 @@ void main() {
       expect(testnetAddr.network, equals(NetworkId.testnet));
       expect(mainnetStakeAddr.network, equals(NetworkId.mainnet));
       expect(testnetStakeAddr.network, equals(NetworkId.testnet));
+    });
+
+    test('publicKeyHash from stake address', () {
+      expect(
+        mainnetStakeAddr.publicKeyHash,
+        equals(
+          Ed25519PublicKeyHash.fromHex(
+            '337b62cfff6403a06a3acbc34f8c46003c69fe79a3628cefa9c47251',
+          ),
+        ),
+      );
+      expect(
+        testnetStakeAddr.publicKeyHash,
+        equals(
+          Ed25519PublicKeyHash.fromHex(
+            '337b62cfff6403a06a3acbc34f8c46003c69fe79a3628cefa9c47251',
+          ),
+        ),
+      );
     });
 
     test('toString returns bech32', () {

@@ -1,11 +1,12 @@
 part of 'brand_bloc.dart';
 
 final class BrandState extends Equatable {
-  final BrandKey? brandKey;
+  final Brand brand;
 
-  const BrandState({BrandKey? brandKey})
-      : brandKey = brandKey ?? BrandKey.catalyst;
+  const BrandState({
+    this.brand = Brand.catalyst,
+  });
 
   @override
-  List<Object> get props => [brandKey ?? ''];
+  List<Object> get props => [brand];
 }

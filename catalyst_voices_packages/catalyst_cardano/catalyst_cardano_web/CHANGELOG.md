@@ -1,3 +1,10 @@
+## 0.3.0
+
+> Note: This release has breaking changes.
+
+ - **FIX**: catalyst cardano null utxos ([#746](https://github.com/input-output-hk/catalyst-voices/issues/746)). ([3f2f5925](https://github.com/input-output-hk/catalyst-voices/commit/3f2f592593efe306f85fb0e81ce07aa1ea90b7b6))
+ - **BREAKING** **CHORE**: upgrade flutter to 3.24.1 and dart to 3.5.0 ([#725](https://github.com/input-output-hk/catalyst-voices/issues/725)). ([eb8a516e](https://github.com/input-output-hk/catalyst-voices/commit/eb8a516edbd25386c0fbe41501285870abf82543))
+
 ## 0.2.0+1
 
  - Update a dependency to the latest release.

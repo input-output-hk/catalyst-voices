@@ -1,9 +1,7 @@
 //! Full Tracing and metrics middleware.
-use std::time::Instant;
+use std::{sync::LazyLock, time::Instant};
 
 use cpu_time::ProcessTime; // ThreadTime doesn't work.
-use cryptoxide::{blake2b::Blake2b, digest::Digest};
-use lazy_static::lazy_static;
 use poem::{
     http::{header, HeaderMap},
     web::RealIp,
@@ -18,7 +16,7 @@ use tracing::{error, field, Instrument, Level, Span};
 use ulid::Ulid;
 use uuid::Uuid;
 
-use crate::settings::CLIENT_ID_KEY;
+use crate::{settings::Settings, utils::blake2b_hash::generate_uuid_string_from_data};
 
 /// Labels for the metrics
 const METRIC_LABELS: [&str; 3] = ["endpoint", "method", "status_code"];
@@ -26,78 +24,84 @@ const METRIC_LABELS: [&str; 3] = ["endpoint", "method", "status_code"];
 const CLIENT_METRIC_LABELS: [&str; 2] = ["client", "status_code"];
 
 // Prometheus Metrics maintained by the service
-lazy_static! {
-    static ref HTTP_REQ_DURATION_MS: HistogramVec =
+
+/// HTTP Request duration histogram.
+static HTTP_REQ_DURATION_MS: LazyLock<HistogramVec> = LazyLock::new(|| {
     #[allow(clippy::ignored_unit_patterns)]
     register_histogram_vec!(
         "http_request_duration_ms",
         "Duration of HTTP requests in milliseconds",
         &METRIC_LABELS
     )
-    .unwrap();
+    .unwrap()
+});
 
-    static ref HTTP_REQ_CPU_TIME_MS: HistogramVec =
+/// HTTP Request CPU Time histogram.
+static HTTP_REQ_CPU_TIME_MS: LazyLock<HistogramVec> = LazyLock::new(|| {
     #[allow(clippy::ignored_unit_patterns)]
     register_histogram_vec!(
         "http_request_cpu_time_ms",
         "CPU Time of HTTP requests in milliseconds",
         &METRIC_LABELS
     )
-    .unwrap();
+    .unwrap()
+});
 
-    // No Tacho implemented to enable this.
-    /*
-    static ref HTTP_REQUEST_RATE: GaugeVec = register_gauge_vec!(
-        "http_request_rate",
-        "Rate of HTTP requests per second",
-        &METRIC_LABELS
-    )
-    .unwrap();
-    */
+// No Tacho implemented to enable this.
+// static ref HTTP_REQUEST_RATE: GaugeVec = register_gauge_vec!(
+// "http_request_rate",
+// "Rate of HTTP requests per second",
+// &METRIC_LABELS
+// )
+// .unwrap();
 
-    static ref HTTP_REQUEST_COUNT: IntCounterVec =
+/// HTTP Request count histogram.
+static HTTP_REQUEST_COUNT: LazyLock<IntCounterVec> = LazyLock::new(|| {
     #[allow(clippy::ignored_unit_patterns)]
     register_int_counter_vec!(
         "http_request_count",
         "Number of HTTP requests",
         &METRIC_LABELS
     )
-    .unwrap();
+    .unwrap()
+});
 
-    static ref CLIENT_REQUEST_COUNT: IntCounterVec =
+/// Client Request Count histogram.
+static CLIENT_REQUEST_COUNT: LazyLock<IntCounterVec> = LazyLock::new(|| {
     #[allow(clippy::ignored_unit_patterns)]
     register_int_counter_vec!(
         "client_request_count",
         "Number of HTTP requests per client",
         &CLIENT_METRIC_LABELS
     )
-    .unwrap();
+    .unwrap()
+});
 
-    static ref PANIC_REQUEST_COUNT: IntCounterVec =
-    #[allow(clippy::ignored_unit_patterns)]
-    register_int_counter_vec!(
-        "panic_request_count",
-        "Number of HTTP requests that panicked",
-        &METRIC_LABELS
-    )
-    .unwrap();
+// Currently no way to get these values. TODO.
+// Panic Request Count histogram.
+// static PANIC_REQUEST_COUNT: LazyLock<IntCounterVec> = LazyLock::new(|| {
+// #[allow(clippy::ignored_unit_patterns)]
+// register_int_counter_vec!(
+// "panic_request_count",
+// "Number of HTTP requests that panicked",
+// &METRIC_LABELS
+// )
+// .unwrap()
+// });
 
-    // Currently no way to get these values without reading the whole response which is BAD.
-    /*
-    static ref HTTP_REQUEST_SIZE_BYTES: HistogramVec = register_histogram_vec!(
-        "http_request_size_bytes",
-        "Size of HTTP requests in bytes",
-        &METRIC_LABELS
-    )
-    .unwrap();
-    static ref HTTP_RESPONSE_SIZE_BYTES: HistogramVec = register_histogram_vec!(
-        "http_response_size_bytes",
-        "Size of HTTP responses in bytes",
-        &METRIC_LABELS
-    )
-    .unwrap();
-    */
-}
+// Currently no way to get these values without reading the whole response which is BAD.
+// static ref HTTP_REQUEST_SIZE_BYTES: HistogramVec = register_histogram_vec!(
+// "http_request_size_bytes",
+// "Size of HTTP requests in bytes",
+// &METRIC_LABELS
+// )
+// .unwrap();
+// static ref HTTP_RESPONSE_SIZE_BYTES: HistogramVec = register_histogram_vec!(
+// "http_response_size_bytes",
+// "Size of HTTP responses in bytes",
+// &METRIC_LABELS
+// )
+// .unwrap();
 
 /// Middleware for [`tracing`](https://crates.io/crates/tracing).
 #[derive(Default)]
@@ -117,6 +121,12 @@ pub(crate) struct TracingEndpoint<E> {
     inner: E,
 }
 
+/// Given a Clients IP Address, return the anonymized version of it.
+fn anonymize_ip_address(remote_addr: &str) -> String {
+    let addr: Vec<String> = vec![remote_addr.to_string()];
+    generate_uuid_string_from_data(Settings::client_id_key(), &addr)
+}
+
 /// Get an anonymized client ID from the request.
 ///
 /// This simply takes the clients IP address,
@@ -125,31 +135,13 @@ pub(crate) struct TracingEndpoint<E> {
 /// The Hash is unique per client IP, but not able to
 /// be reversed or analyzed without both the client IP and the key.
 async fn anonymous_client_id(req: &Request) -> String {
-    let mut b2b = Blake2b::new(16); // We are going to represent it as a UUID.
-    let mut out = [0; 16];
-
     let remote_addr = RealIp::from_request_without_body(req)
         .await
         .ok()
         .and_then(|real_ip| real_ip.0)
         .map_or_else(|| req.remote_addr().to_string(), |addr| addr.to_string());
 
-    b2b.input_str(CLIENT_ID_KEY.as_str());
-    b2b.input_str(&remote_addr);
-    b2b.result(&mut out);
-
-    // Note: This will only panic if the `out` is not 16 bytes long.
-    // Which it is.
-    // Therefore the `unwrap()` is safe and will not cause a panic here under any
-    // circumstances.
-    #[allow(clippy::unwrap_used)]
-    uuid::Builder::from_slice(&out)
-        .unwrap()
-        .with_version(uuid::Version::Random)
-        .with_variant(uuid::Variant::RFC4122)
-        .into_uuid()
-        .hyphenated()
-        .to_string()
+    anonymize_ip_address(&remote_addr)
 }
 
 /// Data we collected about the response

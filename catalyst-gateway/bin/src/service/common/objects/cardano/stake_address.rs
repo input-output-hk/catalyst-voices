@@ -10,7 +10,7 @@ use poem_openapi::{
 
 /// Cardano stake address of the user.
 /// Should a valid Bech32 encoded stake address followed by the `https://cips.cardano.org/cip/CIP-19/#stake-addresses.`
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct StakeAddress(StakeAddressPallas);
 
 impl StakeAddress {

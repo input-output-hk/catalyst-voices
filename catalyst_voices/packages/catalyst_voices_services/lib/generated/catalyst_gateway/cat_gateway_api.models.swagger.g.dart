@@ -113,6 +113,19 @@ Map<String, dynamic> _$FragmentsProcessingSummaryToJson(
       'rejected': instance.rejected.map((e) => e.toJson()).toList(),
     };
 
+FullStakeInfo _$FullStakeInfoFromJson(Map<String, dynamic> json) =>
+    FullStakeInfo(
+      volatile: StakeInfo.fromJson(json['volatile'] as Map<String, dynamic>),
+      persistent:
+          StakeInfo.fromJson(json['persistent'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$FullStakeInfoToJson(FullStakeInfo instance) =>
+    <String, dynamic>{
+      'volatile': instance.volatile.toJson(),
+      'persistent': instance.persistent.toJson(),
+    };
+
 Hash _$HashFromJson(Map<String, dynamic> json) => Hash(
       hash: json['hash'] as String,
     );

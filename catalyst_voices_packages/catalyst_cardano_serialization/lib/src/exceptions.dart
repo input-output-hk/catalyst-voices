@@ -116,14 +116,17 @@ final class TxValueSizeExceededException extends Equatable
 
 /// Exception thrown when parsing a hash that has incorrect length.
 final class HashFormatException extends Equatable implements Exception {
+  /// Exception details.
+  final String? message;
+
   /// The default constructor for [HashFormatException].
-  const HashFormatException();
+  const HashFormatException([this.message]);
 
   @override
-  String toString() => 'HashFormatException';
+  String toString() => 'HashFormatException: $message';
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [message];
 }
 
 /// Exception thrown if the address doesn't match the bech32 specification
@@ -186,4 +189,22 @@ final class InsufficientAdaForAssetsException extends Equatable
 
   @override
   List<Object?> get props => [];
+}
+
+/// Exception thrown when the total size of reference scripts exceeds the limit.
+final class ReferenceScriptSizeLimitExceededException extends Equatable
+    implements Exception {
+  /// The maximum size of reference scripts allowed per transaction.
+  final int maxRefScriptSize;
+
+  /// The default constructor for [ReferenceScriptSizeLimitExceededException].
+  const ReferenceScriptSizeLimitExceededException(this.maxRefScriptSize);
+
+  @override
+  String toString() =>
+      'Total size of reference scripts exceeds the limit of $maxRefScriptSize '
+      'bytes';
+
+  @override
+  List<Object?> get props => [maxRefScriptSize];
 }

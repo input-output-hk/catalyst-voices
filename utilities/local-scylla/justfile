@@ -1,0 +1,58 @@
+# use with https://github.com/casey/just
+#
+
+host_ip := `hostname -i | cut -d " " -f 1`
+
+default:
+    @just --list --unsorted
+
+# Local scylla dev DB (Developer Mode) - Starts with pre-existing data.
+scylla-dev-db:
+    docker run --name scylla-node1 --volume /var/lib/scylla/1:/var/lib/scylla -d scylladb/scylla --developer-mode=1  --smp 1
+
+# Local scylla dev DB Logs (Developer Mode) - Follow the running scylla DB logs.
+scylla-dev-db-logs:
+    docker logs scylla-node1 -f
+
+# Local scylla dev DB Logs (Developer Mode) - Follow the running scylla DB logs.
+scylla-dev-db-stop:
+    docker stop scylla-node1
+
+# Local scylla dev DB CLUSTER - Starts with pre-existing data.
+scylla-dev-db-cluster:
+    HOST_IP="{{host_ip}}" \
+    docker compose up
+
+# Stop the scylla development DB CLUSTER
+scylla-dev-db-stop-cluster:
+    HOST_IP="{{host_ip}}" \
+    docker compose down
+
+# Reset the dev mode scylla instance and start a new dev scylla dev instance
+scylla-dev-db-reset: scylla-dev-db-purge scylla-dev-db
+
+# Reset the cluster storage and start a new dev scylla cluster
+scylla-dev-db-reset-cluster: scylla-dev-db-purge scylla-dev-db-cluster
+
+# Run CQLSH on the dev Scylla cluster
+scylla-dev-db-cqlsh:
+    docker run --rm -it scylladb/scylla-cqlsh "{{host_ip}}" 9042
+
+# Run Nodetool on the dev Scylla cluster to dump status info.
+scylla-dev-db-nodetool:
+    docker exec -it scylla-node1 nodetool status
+    docker exec -it scylla-node1 nodetool info    
+    docker exec -it scylla-node1 nodetool tablestats
+    docker exec -it scylla-node1 nodetool sstableinfo    
+
+# Shell into running node 1.
+scylla-dev-db-shell:
+    docker exec -it scylla-node1 sh
+
+# Purge the storage used by the local test scylla cluster
+scylla-dev-db-purge:
+    sudo rm -rf /var/lib/scylla/*
+    mkdir -p /var/lib/scylla/1/data /var/lib/scylla/1/commitlog /var/lib/scylla/1/hints /var/lib/scylla/1/view_hints
+    mkdir -p /var/lib/scylla/2/data /var/lib/scylla/2/commitlog /var/lib/scylla/2/hints /var/lib/scylla/2/view_hints
+    mkdir -p /var/lib/scylla/3/data /var/lib/scylla/3/commitlog /var/lib/scylla/3/hints /var/lib/scylla/3/view_hints
+    mkdir -p /var/lib/scylla/4/data /var/lib/scylla/4/commitlog /var/lib/scylla/4/hints /var/lib/scylla/4/view_hints

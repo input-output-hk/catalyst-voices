@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 enum VoicesSnackBarType { info, success, warning, error }
 
 class _SnackBarData {
-  final IconData icon;
+  final SvgGenImage icon;
   final ColorResolver iconColor;
   final ColorResolver titleColor;
   final ColorResolver backgroundColor;
@@ -31,7 +31,7 @@ class _SnackBarData {
 extension VoicesSnackBarTypeExtension on VoicesSnackBarType {
   static final Map<VoicesSnackBarType, _SnackBarData> _data = {
     VoicesSnackBarType.info: _SnackBarData(
-      icon: CatalystVoicesIcons.information_circle,
+      icon: VoicesAssets.icons.informationCircle,
       iconColor: (colors) => colors.iconsPrimary,
       titleColor: (colors) => colors.onPrimaryContainer,
       backgroundColor: (colors) => colors.primaryContainer,
@@ -39,7 +39,7 @@ extension VoicesSnackBarTypeExtension on VoicesSnackBarType {
       title: (l10n) => l10n.snackbarInfoLabelText,
     ),
     VoicesSnackBarType.success: _SnackBarData(
-      icon: CatalystVoicesIcons.check_circle,
+      icon: VoicesAssets.icons.checkCircle,
       iconColor: (colors) => colors.iconsSuccess,
       titleColor: (colors) => colors.onSuccessContainer,
       backgroundColor: (colors) => colors.successContainer,
@@ -47,7 +47,7 @@ extension VoicesSnackBarTypeExtension on VoicesSnackBarType {
       title: (l10n) => l10n.snackbarSuccessLabelText,
     ),
     VoicesSnackBarType.warning: _SnackBarData(
-      icon: CatalystVoicesIcons.exclamation,
+      icon: VoicesAssets.icons.exclamation,
       iconColor: (colors) => colors.iconsWarning,
       titleColor: (colors) => colors.onWarningContainer,
       backgroundColor: (colors) => colors.warningContainer,
@@ -55,7 +55,7 @@ extension VoicesSnackBarTypeExtension on VoicesSnackBarType {
       title: (l10n) => l10n.snackbarWarningLabelText,
     ),
     VoicesSnackBarType.error: _SnackBarData(
-      icon: CatalystVoicesIcons.exclamation_circle,
+      icon: VoicesAssets.icons.exclamationCircle,
       iconColor: (colors) => colors.iconsError,
       titleColor: (colors) => colors.onErrorContainer,
       backgroundColor: (colors) => colors.errorContainer,
@@ -69,7 +69,7 @@ extension VoicesSnackBarTypeExtension on VoicesSnackBarType {
   Color? backgroundColor(BuildContext context) =>
       _snackBarData.backgroundColor(Theme.of(context).colors);
 
-  IconData icon(BuildContext context) => _snackBarData.icon;
+  SvgGenImage icon() => _snackBarData.icon;
 
   Color? iconColor(BuildContext context) =>
       _snackBarData.iconColor(Theme.of(context).colors);

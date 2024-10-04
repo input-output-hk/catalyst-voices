@@ -1,8 +1,6 @@
 //! Block stream parsing and filtering utils
-
-use cryptoxide::{blake2b::Blake2b, digest::Digest};
 use pallas::ledger::{
-    primitives::conway::{StakeCredential, VKeyWitness},
+    primitives::conway::StakeCredential,
     traverse::{Era, MultiEraAsset, MultiEraCert, MultiEraPolicyAssets},
 };
 use serde::Serialize;
@@ -18,19 +16,6 @@ pub type StakeCredentialHash = String;
 
 /// Correct stake credential key in hex
 pub type StakeCredentialKey = String;
-
-/// Hash size
-pub(crate) const BLAKE_2B_256_HASH_SIZE: usize = 256 / 8;
-
-/// Helper function to generate the `blake2b_256` hash of a byte slice
-pub(crate) fn hash(bytes: &[u8]) -> [u8; BLAKE_2B_256_HASH_SIZE] {
-    let mut digest = [0u8; BLAKE_2B_256_HASH_SIZE];
-    let mut context = Blake2b::new(BLAKE_2B_256_HASH_SIZE);
-    context.input(bytes);
-    context.result(&mut digest);
-
-    digest
-}
 
 #[derive(Default, Debug, Serialize)]
 /// Assets
@@ -53,6 +38,7 @@ pub struct PolicyAsset {
 }
 
 /// Extract assets
+#[allow(dead_code)]
 pub(crate) fn parse_policy_assets(assets: &[MultiEraPolicyAssets<'_>]) -> Vec<PolicyAsset> {
     assets
         .iter()
@@ -66,6 +52,7 @@ pub(crate) fn parse_policy_assets(assets: &[MultiEraPolicyAssets<'_>]) -> Vec<Po
 }
 
 /// Parse child assets
+#[allow(dead_code)]
 fn parse_child_assets(assets: &[MultiEraAsset]) -> Vec<Asset> {
     assets
         .iter()
@@ -93,6 +80,7 @@ fn parse_child_assets(assets: &[MultiEraAsset]) -> Vec<Asset> {
 }
 
 /// Eras before staking should be ignored
+#[allow(dead_code)]
 pub fn valid_era(era: Era) -> bool {
     !matches!(era, Era::Byron)
 }
@@ -125,29 +113,6 @@ pub fn extract_stake_credentials_from_certs(
     }
 
     stake_credentials
-}
-
-/// Extract witness pub keys and pair with blake2b hash of the pub key.
-/// Hashes are generally 32-byte long on Cardano (or 256 bits),
-/// except for credentials (i.e. keys or scripts) which are 28-byte long (or 224 bits)
-#[allow(dead_code)]
-pub fn extract_hashed_witnesses(
-    witnesses: &[VKeyWitness],
-) -> anyhow::Result<Vec<(WitnessPubKey, WitnessHash)>> {
-    let mut hashed_witnesses = Vec::new();
-    for witness in witnesses {
-        let pub_key_bytes: [u8; 32] = witness.vkey.as_slice().try_into()?;
-
-        let pub_key_hex = hex::encode(pub_key_bytes);
-
-        let mut digest = [0u8; 28];
-        let mut context = Blake2b::new(28);
-        context.input(&pub_key_bytes);
-        context.result(&mut digest);
-        hashed_witnesses.push((pub_key_hex, hex::encode(digest)));
-    }
-
-    Ok(hashed_witnesses)
 }
 
 /// Match hashed witness pub keys with hashed stake credentials from the TX certificates

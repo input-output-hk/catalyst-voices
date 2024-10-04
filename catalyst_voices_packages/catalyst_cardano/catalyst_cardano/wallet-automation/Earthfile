@@ -1,0 +1,63 @@
+VERSION 0.8
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.14 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:v3.2.14 AS playwright-ci
+
+deps:
+    DO playwright-ci+SETUP --workdir=/wallet-automation
+
+    COPY package.json .
+    COPY package-lock.json .
+
+    RUN npm install
+    ENV PATH "/wallet-automation/node_modules/.bin:$PATH"
+
+src:
+    FROM +deps
+    COPY keys.txt .
+    COPY playwright.config.ts .
+    COPY global-setup.ts .
+    COPY wallet-tests.spec.ts .
+    COPY utils.ts .
+
+package-test:
+    FROM +src
+    ENV APP_URL http://app:80
+    RUN mkdir /results
+    VOLUME /results
+    ENTRYPOINT ["/bin/sh", "-c", "/usr/bin/xvfb-run --auto-servernum npm test", ""]
+    ARG tag='latest'
+    SAVE IMAGE test:$tag
+
+builder:
+    DO flutter-ci+SETUP
+    COPY ../../../../+repo-catalyst-voices-all/repo .
+    DO flutter-ci+BOOTSTRAP
+
+build-web:
+    FROM +builder
+    ARG WORKDIR=/frontend/catalyst_voices_packages/catalyst_cardano/catalyst_cardano/example
+    DO flutter-ci+BUILD_WEB --TARGET=lib/main.dart --WORKDIR=$WORKDIR
+    SAVE ARTIFACT web
+
+package-app:
+    FROM nginx:alpine3.20-slim
+    ARG tag='latest'
+    COPY +build-web/web /usr/share/nginx/html/
+    SAVE IMAGE test-app:$tag
+
+nightly-test:
+    FROM earthly/dind:alpine-3.20-docker-26.1.5-r0
+    COPY compose.yml .
+    WITH DOCKER \
+        --compose compose.yml \
+        --load test-app:latest=(+package-app) \
+        --load test:latest=(+package-test) \
+        --service app \
+        --allow-privileged
+
+        RUN docker run --network=default_default --name=test test:latest && \
+            docker cp test:/results/cardano-wallet.junit-report.xml cardano-wallet.junit-report.xml
+    END
+    WAIT
+        SAVE ARTIFACT cardano-wallet.junit-report.xml AS LOCAL cardano-wallet.junit-report.xml
+    END

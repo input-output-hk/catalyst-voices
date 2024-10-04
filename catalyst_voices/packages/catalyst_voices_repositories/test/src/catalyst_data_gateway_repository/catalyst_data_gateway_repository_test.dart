@@ -30,12 +30,12 @@ class FakeCatGatewayApi<T> extends Fake implements CatGatewayApi {
   Future<chopper.Response<dynamic>> apiHealthLiveGet() async => response;
 
   @override
-  Future<chopper.Response<StakeInfo>> apiCardanoStakedAdaStakeAddressGet({
+  Future<chopper.Response<FullStakeInfo>> apiCardanoStakedAdaStakeAddressGet({
     required String? stakeAddress,
     enums.Network? network,
     int? slotNumber,
   }) async =>
-      response as chopper.Response<StakeInfo>;
+      response as chopper.Response<FullStakeInfo>;
 
   @override
   Future<chopper.Response<SyncState>> apiCardanoSyncStateGet({
@@ -155,17 +155,22 @@ void main() {
         amount: 1,
         slotNumber: 5,
       );
-      final repository = setupRepository<StakeInfo>(
-        chopper.Response(http.Response('', HttpStatus.ok), stakeInfo),
+      const fullStakeInfo = FullStakeInfo(
+        volatile: stakeInfo,
+        persistent: stakeInfo,
+      );
+
+      final repository = setupRepository<FullStakeInfo>(
+        chopper.Response(http.Response('', HttpStatus.ok), fullStakeInfo),
       );
       final result = await repository.getCardanoStakedAdaStakeAddress(
         stakeAddress: validStakeAddress,
       );
       expect(result.isSuccess, true);
-      expect(result.success, equals(stakeInfo));
+      expect(result.success, equals(fullStakeInfo));
     });
     test('getCardanoStakedAdaStakeAddress Bad request', () async {
-      final repository = setupRepository<StakeInfo>(
+      final repository = setupRepository<FullStakeInfo>(
         chopper.Response(http.Response('', HttpStatus.badRequest), null),
       );
       final result = await repository.getCardanoStakedAdaStakeAddress(
@@ -176,7 +181,7 @@ void main() {
     });
 
     test('getCardanoStakedAdaStakeAddress Not found', () async {
-      final repository = setupRepository<StakeInfo>(
+      final repository = setupRepository<FullStakeInfo>(
         chopper.Response(http.Response('', HttpStatus.notFound), null),
       );
       final result = await repository.getCardanoStakedAdaStakeAddress(
@@ -186,7 +191,7 @@ void main() {
       expect(result.failure, equals(NetworkErrors.notFound));
     });
     test('getCardanoStakedAdaStakeAddress Server Error', () async {
-      final repository = setupRepository<StakeInfo>(
+      final repository = setupRepository<FullStakeInfo>(
         chopper.Response(
           http.Response('', HttpStatus.internalServerError),
           null,
@@ -200,7 +205,7 @@ void main() {
     });
 
     test('getCardanoStakedAdaStakeAddress Service Unavailable', () async {
-      final repository = setupRepository<StakeInfo>(
+      final repository = setupRepository<FullStakeInfo>(
         chopper.Response(
           http.Response('', HttpStatus.serviceUnavailable),
           null,

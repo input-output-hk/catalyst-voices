@@ -433,6 +433,62 @@ extension $FragmentsProcessingSummaryExtension on FragmentsProcessingSummary {
 }
 
 @JsonSerializable(explicitToJson: true)
+class FullStakeInfo {
+  const FullStakeInfo({
+    required this.volatile,
+    required this.persistent,
+  });
+
+  factory FullStakeInfo.fromJson(Map<String, dynamic> json) =>
+      _$FullStakeInfoFromJson(json);
+
+  static const toJsonFactory = _$FullStakeInfoToJson;
+  Map<String, dynamic> toJson() => _$FullStakeInfoToJson(this);
+
+  @JsonKey(name: 'volatile')
+  final StakeInfo volatile;
+  @JsonKey(name: 'persistent')
+  final StakeInfo persistent;
+  static const fromJsonFactory = _$FullStakeInfoFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is FullStakeInfo &&
+            (identical(other.volatile, volatile) ||
+                const DeepCollectionEquality()
+                    .equals(other.volatile, volatile)) &&
+            (identical(other.persistent, persistent) ||
+                const DeepCollectionEquality()
+                    .equals(other.persistent, persistent)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(volatile) ^
+      const DeepCollectionEquality().hash(persistent) ^
+      runtimeType.hashCode;
+}
+
+extension $FullStakeInfoExtension on FullStakeInfo {
+  FullStakeInfo copyWith({StakeInfo? volatile, StakeInfo? persistent}) {
+    return FullStakeInfo(
+        volatile: volatile ?? this.volatile,
+        persistent: persistent ?? this.persistent);
+  }
+
+  FullStakeInfo copyWithWrapped(
+      {Wrapped<StakeInfo>? volatile, Wrapped<StakeInfo>? persistent}) {
+    return FullStakeInfo(
+        volatile: (volatile != null ? volatile.value : this.volatile),
+        persistent: (persistent != null ? persistent.value : this.persistent));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
 class Hash {
   const Hash({
     required this.hash,

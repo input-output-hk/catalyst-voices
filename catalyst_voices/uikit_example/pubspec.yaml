@@ -7,25 +7,32 @@ environment:
   flutter: ">=3.24.1"
 
 dependencies:
+  catalyst_cardano_serialization: ^0.4.0
   catalyst_voices:
     path: ../
   catalyst_voices_assets:
     path: ../packages/catalyst_voices_assets
+  catalyst_voices_blocs:
+    path: ../packages/catalyst_voices_blocs
   catalyst_voices_brands:
     path: ../packages/catalyst_voices_brands
   catalyst_voices_localization:
     path: ../packages/catalyst_voices_localization
+  catalyst_voices_models:
+    path: ../packages/catalyst_voices_models
   catalyst_voices_shared:
     path: ../packages/catalyst_voices_shared
   collection: ^1.18.0
   cupertino_icons: ^1.0.6
   flutter:
     sdk: flutter
+  flutter_bloc: ^8.1.5
   flutter_localized_locales: ^2.0.5
+  flutter_quill: ^10.8.2
 
 dev_dependencies:
   build_runner: ^2.4.12
-  catalyst_analysis: ^1.2.0
+  catalyst_analysis: ^2.0.0
   flutter_gen_runner: ^5.3.2
   flutter_test:
     sdk: flutter

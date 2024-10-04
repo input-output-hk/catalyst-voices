@@ -1,7 +1,7 @@
 VERSION 0.8
 
 IMPORT ../catalyst-gateway AS catalyst-gateway
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.1.26 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.14 AS flutter-ci
 
 # Copy all the necessary files and running bootstrap
 builder:
@@ -52,6 +52,11 @@ check-package-publishing:
     FROM +builder
     DO flutter-ci+PUBLISH_DRY_RUN
 
+# Runs the license checks for Catalyst Voices.
+check-license:
+    FROM +builder
+    RUN melos run license-check
+
 # Run unit tests
 test-unit:
     FROM +builder
@@ -72,7 +77,7 @@ build-web:
     END
 
 package:
-    FROM nginx:alpine3.18
+    FROM nginx:alpine3.20-slim
     ARG tag='latest'
 
     COPY +build-web/web /app
@@ -83,6 +88,8 @@ package:
 
 publish:
    FROM +package
-   ARG tag='latest'
 
-   SAVE IMAGE voices-frontend:$tag
+   ARG container="voices"
+   ARG tag="latest"
+
+   SAVE IMAGE ${container}:${tag}

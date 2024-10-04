@@ -3,11 +3,11 @@ name = "cat-gateway"
 description = "The Catalyst Data Gateway"
 keywords = ["cardano", "catalyst", "gateway"]
 categories = ["command-line-utilities"]
-version.workspace = true
-authors.workspace = true
-edition.workspace = true
-license.workspace = true
-repository.workspace = true
+version = "0.1.0"
+authors.workspace =  true
+edition.workspace =  true
+license.workspace =  true
+repository.workspace =  true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -15,31 +15,62 @@ repository.workspace = true
 workspace = true
 
 [dependencies]
-bb8 = { workspace = true }
-bb8-postgres = { workspace = true }
-tokio-postgres = { workspace = true, features = [
+cardano-chain-follower = { version = "0.0.2", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "v0.0.2" }
+
+pallas = { version = "0.30.1", git = "https://github.com/input-output-hk/catalyst-pallas.git", rev = "9b5183c8b90b90fe2cc319d986e933e9518957b3" }
+pallas-traverse = { version = "0.30.1", git = "https://github.com/input-output-hk/catalyst-pallas.git", rev = "9b5183c8b90b90fe2cc319d986e933e9518957b3" }
+#pallas-crypto = { version = "0.30.1", git = "https://github.com/input-output-hk/catalyst-pallas.git", rev = "9b5183c8b90b90fe2cc319d986e933e9518957b3" }
+
+clap = { version = "4.5.18", features = ["derive", "env"] }
+tracing = { version = "0.1.40", features = ["log"] }
+tracing-subscriber = { version = "0.3.18", features = [
+    "fmt",
+    "json",
+    "registry",
+    "std",
+    "time",
+    "env-filter",
+] }
+serde = { version = "1.0.210", features = ["derive"] }
+serde_json = "1.0.128"
+thiserror = "1.0.64"
+chrono = "0.4.38"
+# async-trait = "0.1.82"
+bb8 = "0.8.5"
+bb8-postgres = "0.8.1"
+tokio-postgres = { version = "0.7.12", features = [
     "with-chrono-0_4",
     "with-serde_json-1",
     "with-time-0_3",
 ] }
-clap = { workspace = true, features = ["derive", "env"] }
-tracing = { workspace = true, features = ["log"] }
-tracing-subscriber = { workspace = true, features = ["fmt", "json", "registry", "std", "time"] }
-serde = { workspace = true, features = ["derive"] }
-serde_json = { workspace = true }
-tokio = { workspace = true, features = ["rt", "macros", "rt-multi-thread"] }
-thiserror = { workspace = true }
-rust_decimal = { workspace = true, features = [
+tokio = { version = "1.40.0", features = ["rt", "macros", "rt-multi-thread"] }
+dotenvy = "0.15.7"
+local-ip-address = "0.6.3"
+gethostname = "0.5.0"
+hex = "0.4.3"
+handlebars = "6.1.0"
+anyhow = "1.0.89"
+#cddl = "0.9.4"
+#ciborium = "0.2.2"
+# stringzilla = "3.9.3"
+duration-string = "0.4.0"
+build-info = "0.0.38"
+ed25519-dalek = "2.1.1"
+scylla = { version = "0.14.0", features = ["cloud", "full-serialization"] }
+strum = { version = "0.26.3", features = ["derive"] }
+strum_macros = "0.26.4"
+openssl = { version = "0.10.66", features = ["vendored"] }
+num-bigint = "0.4.6"
+futures = "0.3.30"
+rand = "0.8.5"
+moka = { version = "0.12.8", features = ["future"] }
+crossbeam-skiplist = "0.1.3"
+rust_decimal = { version = "1.36.0", features = [
     "serde-with-float",
     "db-tokio-postgres",
 ] }
-chrono = { workspace = true }
-poem = { workspace = true, features = [
-    "embed",
-    "prometheus",
-    "compression",
-] }
-poem-openapi = { workspace = true, features = [
+poem = { version = "3.1.0", features = ["embed", "prometheus", "compression"] }
+poem-openapi = { version = "5.1.1", features = [
     "openapi-explorer",
     "rapidoc",
     "redoc",
@@ -48,24 +79,20 @@ poem-openapi = { workspace = true, features = [
     "url",
     "chrono",
 ] }
-prometheus = { workspace = true }
-cryptoxide = { workspace = true }
-uuid = { workspace = true, features = ["v4", "serde"] }
-lazy_static = { workspace = true }
-url = { workspace = true }
-dotenvy = { workspace = true }
-panic-message = { workspace = true }
-cpu-time = { workspace = true }
-ulid = { workspace = true, features = ["serde", "uuid"] }
-rust-embed = { workspace = true }
-local-ip-address = { workspace = true }
-gethostname = { workspace = true }
-hex = { workspace = true }
-pallas = { workspace = true }
-cardano-chain-follower= { workspace = true }
-anyhow = { workspace = true }
-handlebars = { workspace = true }
-cddl = { workspace = true }
-ciborium = { workspace = true }
-ed25519-dalek = "2.1.1"
-stringzilla = { workspace = true }
+uuid = { version = "1.10.0", features = ["v4", "serde"] }
+ulid = { version = "1.1.3", features = ["serde", "uuid"] }
+blake2b_simd = "1.0.2"
+url = "2.5.2"
+panic-message = "0.3.0"
+cpu-time = "1.0.0"
+prometheus = "0.13.4"
+rust-embed = "8.5.0"
+num-traits = "0.2.19"
+base64 = "0.22.1"
+dashmap = "6.1.0"
+
+[dev-dependencies]
+proptest = "1.5.0"
+
+[build-dependencies]
+build-info-build = "0.0.38"

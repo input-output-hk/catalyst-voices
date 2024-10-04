@@ -1,3 +1,9 @@
+## 2.0.0
+
+> Note: This release has breaking changes.
+
+ - **BREAKING** **CHORE**: upgrade flutter to 3.24.1 and dart to 3.5.0 ([#725](https://github.com/input-output-hk/catalyst-voices/issues/725)). ([eb8a516e](https://github.com/input-output-hk/catalyst-voices/commit/eb8a516edbd25386c0fbe41501285870abf82543))
+
 ## 1.2.0
 
  - **FIX**: readme versioning for catalyst packages ([#585](https://github.com/input-output-hk/catalyst-voices/issues/585)). ([e433b2db](https://github.com/input-output-hk/catalyst-voices/commit/e433b2dbba7a43c50f4411ea5279a623c221b66b))

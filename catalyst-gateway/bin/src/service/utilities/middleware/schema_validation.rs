@@ -7,11 +7,9 @@
 //! This middleware checks the `State.schema_version_status` value, if it is Ok,
 //! the wrapped endpoint is called and its response is returned.
 
-use std::sync::Arc;
+use poem::{http::StatusCode, Endpoint, EndpointExt, Middleware, Request, Result};
 
-use poem::{http::StatusCode, web::Data, Endpoint, EndpointExt, Middleware, Request, Result};
-
-use crate::state::State;
+use crate::db::event::EventDB;
 
 /// A middleware that raises an error  with `ServiceUnavailable` and 503 status code
 /// if a DB schema version mismatch is found the existing `State`.
@@ -35,12 +33,10 @@ impl<E: Endpoint> Endpoint for SchemaVersionValidationImpl<E> {
     type Output = E::Output;
 
     async fn call(&self, req: Request) -> Result<Self::Output> {
-        if let Some(state) = req.data::<Data<&Arc<State>>>() {
-            // Check if the inner schema version status is set to `Mismatch`,
-            // if so, return the `StatusCode::SERVICE_UNAVAILABLE` code.
-            if state.event_db().schema_version_check().await.is_err() {
-                return Err(StatusCode::SERVICE_UNAVAILABLE.into());
-            }
+        // Check if the inner schema version status is set to `Mismatch`,
+        // if so, return the `StatusCode::SERVICE_UNAVAILABLE` code.
+        if EventDB::schema_version_check().await.is_err() {
+            return Err(StatusCode::SERVICE_UNAVAILABLE.into());
         }
         // Calls the endpoint with the request, and returns the response.
         self.ep.call(req).await

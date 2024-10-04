@@ -66,7 +66,7 @@ void main() {
     });
 
     test('from transaction inputs', () {
-      final hash = TransactionInputsHash.fromTransactionInputs([testUtxo()]);
+      final hash = TransactionInputsHash.fromTransactionInputs({testUtxo()});
       expect(
         hash,
         equals(

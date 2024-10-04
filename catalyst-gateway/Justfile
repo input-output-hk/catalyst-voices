@@ -1,0 +1,57 @@
+# use with https://github.com/casey/just
+#
+# Hermes developer convenience functions
+
+# cspell: words prereqs, commitlog, rustls, nocapture
+
+default:
+    @just --list --unsorted
+
+# Show the dependency tree and all enabled feature flags of every crate.
+cargo-tree:
+    cargo tree -e features,normal,build -f "{p}[{f}]" --workspace --frozen
+
+# Check Dependency licenses and CVE's
+license-check:
+    cargo deny check --exclude-dev
+
+# Format the rust code
+code-format:
+    cargo +nightly fmtfix
+    cargo +nightly fmtchk
+
+# Lint the rust code
+code-lint:
+    cargo lintfix -r
+    cargo lint -r
+
+# Synchronize Rust Configs
+sync-cfg:
+    cd .. && earthly ./catalyst-gateway+sync-cfg
+
+# Pre Push Checks
+pre-push: sync-cfg code-format code-lint license-check
+    # Make sure we can actually build inside Earthly which needs to happen in CI.
+    cd .. && earthly ./catalyst-gateway+check
+    cd .. && earthly ./catalyst-gateway+build
+    cd .. && earthly ./catalyst-gateway+package-cat-gateway
+
+# Build Local release build of catalyst gateway
+build-cat-gateway: code-format code-lint
+    cargo update
+    cargo build -r 
+
+# Run cat-gateway natively on preprod
+run-cat-gateway: build-cat-gateway
+    CHAIN_FOLLOWER_SYNC_TASKS="16" \
+    RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug" \
+    CHAIN_NETWORK="Preprod" \
+    ./target/release/cat-gateway run --log-level debug
+
+# Run cat-gateway natively on mainnet
+run-cat-gateway-mainnet: build-cat-gateway
+    CHAIN_FOLLOWER_SYNC_TASKS="32" \
+    CHAIN_FOLLOWER_DL_CONNECTIONS="64" \
+    CHAIN_FOLLOWER_DL_CHUNK_SIZE="4" \
+    RUST_LOG="error,cat_gateway=debug,cardano_chain_follower=debug,mithril-client=debug" \
+    ./target/release/cat-gateway run --log-level debug
