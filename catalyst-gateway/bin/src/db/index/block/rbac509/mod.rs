@@ -26,7 +26,7 @@ use cardano_chain_follower::{
     },
     MultiEraBlock,
 };
-use der_parser::{asn1_rs::oid, der::parse_der_sequence, Oid};
+use der_parser::der::parse_der_sequence;
 use moka::{policy::EvictionPolicy, sync::Cache};
 use scylla::Session;
 use tracing::debug;
@@ -364,8 +364,7 @@ fn extract_role0_data(
                         key_offset,
                     )
                     .map(|cert| {
-                        // WIP: Get stake address from cert
-                        let stake_addresses = None;
+                        let stake_addresses = extract_stake_addresses_from_c509(cert);
                         Role0CertificateData {
                             role0_key: cert.get_tbs_cert().get_subject_public_key().to_vec(),
                             stake_addresses,
@@ -428,4 +427,9 @@ fn extract_stake_addresses_from_x509(der_cert: &CertificateInner<Rfc5280>) -> Op
             }
             stake_addresses
         })
+}
+
+/// Extract Stake Address from C509 Certificate
+fn extract_stake_addresses_from_c509(_cert: &C509) -> Option<Vec<Vec<u8>>> {
+    None
 }
