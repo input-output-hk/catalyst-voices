@@ -1,5 +1,6 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
+import 'package:catalyst_voices/pages/registration/wallet_link/bloc_wallet_link_builder.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -10,15 +11,8 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 class RbacTransactionPanel extends StatelessWidget {
-  final Set<AccountRole> roles;
-  final CardanoWalletDetails walletDetails;
-  final Coin transactionFee;
-
   const RbacTransactionPanel({
     super.key,
-    required this.roles,
-    required this.walletDetails,
-    required this.transactionFee,
   });
 
   @override
@@ -32,16 +26,50 @@ class RbacTransactionPanel extends StatelessWidget {
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: 12),
-        _Summary(
-          roles: roles,
-          walletDetails: walletDetails,
-          transactionFee: transactionFee,
-        ),
+        const _BlocSummary(),
         const SizedBox(height: 18),
         const _PositiveSmallPrint(),
         const Spacer(),
         const _Navigation(),
       ],
+    );
+  }
+}
+
+class _BlocSummary extends StatelessWidget {
+  const _BlocSummary();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocWalletLinkBuilder<
+        ({
+          Set<AccountRole> roles,
+          CardanoWalletDetails selectedWallet,
+          Coin transactionFee,
+        })?>(
+      selector: (state) {
+        final selectedWallet = state.selectedWallet;
+        if (selectedWallet == null) {
+          return null;
+        }
+
+        return (
+          roles: state.selectedRoles ?? state.defaultRoles,
+          selectedWallet: selectedWallet,
+          transactionFee: state.transactionFee,
+        );
+      },
+      builder: (context, state) {
+        if (state == null) {
+          return const Offstage();
+        }
+
+        return _Summary(
+          roles: state.roles,
+          walletDetails: state.selectedWallet,
+          transactionFee: state.transactionFee,
+        );
+      },
     );
   }
 }
@@ -156,7 +184,7 @@ class _Navigation extends StatelessWidget {
         VoicesFilledButton(
           leading: VoicesAssets.icons.wallet.buildIcon(),
           onTap: () {
-            RegistrationCubit.of(context).submitRegistration();
+            RegistrationCubit.of(context).walletLink.submitRegistration();
           },
           child: Text(context.l10n.walletLinkTransactionSign),
         ),
