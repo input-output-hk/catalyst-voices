@@ -1,6 +1,6 @@
 //! Implementation of the GET `/registration/cip36` endpoint
 
-use std::sync::Arc;
+use std::{cmp::Reverse, sync::Arc};
 
 use futures::StreamExt;
 use poem_openapi::{payload::Json, ApiResponse, Object};
@@ -196,7 +196,7 @@ async fn get_all_registrations_from_stake_addr(
 
 /// Sort latest registrations for a given stake address sorting by slot no
 fn sort_latest_registration(mut registrations: Vec<Cip36Info>) -> anyhow::Result<Cip36Info> {
-    registrations.sort_by_key(|k| k.slot_no);
+    registrations.sort_by_key(|k| Reverse(k.slot_no));
     registrations.into_iter().next().ok_or(anyhow::anyhow!(
         "Can't sort latest registrations by slot no"
     ))
