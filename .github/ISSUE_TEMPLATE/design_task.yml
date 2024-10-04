@@ -1,0 +1,37 @@
+name: "🎨 Design Task"
+description: Create a new design task.
+title: "🎨 [Design] : <title>"
+labels: ["design"]
+projects: ["/input-output-hk/102"]
+
+body:
+  - type: input
+    id: summary
+    attributes:
+      label: "Summary"
+      description: "Short Summary of the Task"
+      placeholder: "Short Summary"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: "Description"
+      description: "Extended Description of the Task"
+      placeholder: |
+        Explicit extended description of the task...
+
+        ### Subtask List (Optional)
+
+        - [ ] Check dark/light colors
+        - [ ] Subtask placeholder waiting for an issue.
+    validations:
+      required: true
+
+  - type: markdown
+    attributes:
+      value: |
+        - [ ] Check dark/light colors
+        - [ ] Check responsive behaviour of components
+        - [ ] Double check UI Kit component availability
