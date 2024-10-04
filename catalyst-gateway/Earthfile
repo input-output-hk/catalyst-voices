@@ -1,19 +1,42 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.2.10 AS rust-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.2.14 AS rust-ci
 
 #cspell: words rustfmt toolsets USERARCH stdcfgs
 
-# sync-cfg: Synchronize local config with CI version.
-# Must be run by the developer manually.
-sync-cfg:
-    DO rust-ci+SYNC_STD_CFG
+# COPY_SRC:
+#   Copies the source code into the builder.
+COPY_SRC:
+    FUNCTION
+
+    COPY --keep-ts --dir \
+        .cargo .config Cargo.toml clippy.toml deny.toml rustfmt.toml \
+        bin \
+        .
 
 # builder : Set up our target toolchains, and copy our files.
 builder:
     DO rust-ci+SETUP
 
-    COPY --dir .cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml bin .
+# sync-cfg: Synchronize local config with CI version.
+# Must be run by the developer manually.
+sync-cfg:
+    FROM +builder
+    DO rust-ci+SYNC_STD_CFG
+
+builder-src:
+    FROM +builder
+
+    # Don't build the src in the home directory itself, because it contains stuff.
+    WORKDIR $HOME/build
+    RUN rm -rf *
+
+    # Cached copy of the source we build.
+    DO +COPY_SRC
+
+    # Generate Checksums of the source
+    DO rust-ci+FINGERPRINT_SRC
+    SAVE ARTIFACT ../src_fingerprint.txt 
 
 ## -----------------------------------------------------------------------------
 ##
@@ -24,7 +47,7 @@ builder:
 # check : Run check using the most efficient host tooling
 # CI Automated Entry point.
 check:
-    FROM +builder
+    FROM +builder-src
 
     DO rust-ci+EXECUTE --cmd="/scripts/std_checks.py"
 
@@ -36,12 +59,12 @@ all-hosts-check:
 # build : Build the catalyst-gateway service
 build:
     # Build the service
-    FROM +builder
+    FROM +builder-src
 
     DO rust-ci+EXECUTE \
         --cmd="/scripts/std_build.py" \
         --args1="--bins=cat-gateway/cat-gateway" \
-        --args2="--cov_report=$HOME/coverage-report.info" \
+        --args2="--cov_report=$HOME/build/coverage-report.info" \
         --output="release/cat-gateway" \
         --junit="cat-gateway.junit-report.xml" \
         --coverage="cat-gateway.coverage.info" \
@@ -82,3 +105,25 @@ get-api-locally:
     FROM scratch
     COPY +build/doc/cat-gateway-api.json cat-gateway-api.json
     SAVE ARTIFACT cat-gateway-api.json AS LOCAL cat-gateway-api.json
+
+# build-src-check: Check for any caching issues with the source we are building against.
+check-builder-src-cache:
+    FROM +builder
+
+    # Don't build the src in the home directory itself, because it contains stuff.
+    WORKDIR $HOME/build
+    RUN rm -rf *    
+
+    COPY +builder-src/src_fingerprint.txt ..
+
+    RUN --no-cache echo "Cache Disabled"
+
+    # Uncached copy of the source we build.
+    DO +COPY_SRC
+
+    # Generate Checksums of the source
+    DO rust-ci+FINGERPRINT_SRC --FINGERPRINT=src_fingerprint_uncached.txt
+
+    RUN diff ../src_fingerprint.txt ../src_fingerprint_uncached.txt \
+        || (echo "ERROR: Source fingerprints do not match. Caching Error Detected!!" && exit 1) \
+        && echo "Source fingerprints match. Caching OK."

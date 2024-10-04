@@ -81,6 +81,7 @@ const VoicesColorScheme darkVoicesColorScheme = VoicesColorScheme(
   primary98: VoicesColors.darkPrimary98,
   primaryContainer: VoicesColors.darkPrimaryContainer,
   onPrimaryContainer: VoicesColors.darkOnPrimaryContainer,
+  onErrorVariant: VoicesColors.darkOnErrorVariant,
   errorContainer: VoicesColors.darkErrorContainer,
   onErrorContainer: VoicesColors.darkOnErrorContainer,
 );
@@ -162,6 +163,7 @@ const VoicesColorScheme lightVoicesColorScheme = VoicesColorScheme(
   primary98: VoicesColors.lightPrimary98,
   primaryContainer: VoicesColors.lightPrimaryContainer,
   onPrimaryContainer: VoicesColors.lightOnPrimaryContainer,
+  onErrorVariant: VoicesColors.lightOnErrorVariant,
   errorContainer: VoicesColors.lightErrorContainer,
   onErrorContainer: VoicesColors.lightOnErrorContainer,
 );
