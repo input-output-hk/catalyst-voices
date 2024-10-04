@@ -708,28 +708,28 @@
   "yes": "Yes",
   "no": "No",
   "total": "Total",
-    "file": "file",
-    "key": "key",
-    "upload": "Upload",
-    "browse": "browse",
-    "uploadDropInfo": "Drop your {itemNameToUpload} here or ",
-    "@uploadDropInfo": {
-      "description": "An info on upload dialog",
-      "placeholders": {
-        "itemNameToUpload": {
-          "type": "String"
-        }
+  "file": "file",
+  "key": "key",
+  "upload": "Upload",
+  "browse": "browse",
+  "uploadDropInfo": "Drop your {itemNameToUpload} here or ",
+  "@uploadDropInfo": {
+    "description": "An info on upload dialog",
+    "placeholders": {
+      "itemNameToUpload": {
+        "type": "String"
       }
-    },
-    "uploadProgressInfo": "Upload in progress",
-    "uploadKeychainTitle": "Upload Catalyst Keychain",
-    "@uploadKeychainTitle": {
-      "description": "A title on keychain upload dialog"
-    },
-    "uploadKeychainInfo": "Make sure it's a correct Catalyst keychain file.",
-    "@uploadKeychainInfo": {
-      "description": "An info on keychain upload dialog"
-    },
+    }
+  },
+  "uploadProgressInfo": "Upload in progress",
+  "uploadKeychainTitle": "Upload Catalyst Keychain",
+  "@uploadKeychainTitle": {
+    "description": "A title on keychain upload dialog"
+  },
+  "uploadKeychainInfo": "Make sure it's a correct Catalyst keychain file.",
+  "@uploadKeychainInfo": {
+    "description": "An info on keychain upload dialog"
+  },
   "themeLight": "Light",
   "@themeLight": {
     "description": "Refers to a light theme mode."
@@ -790,5 +790,6 @@
   "passwordDoNotMatch": "Passwords do not match, please correct",
   "@passwordDoNotMatch": {
     "description": "When user confirms password but it does not match original one."
-  }
+  },
+  "recoverCatalystKeychain": "Restore Catalyst keychain"
 }

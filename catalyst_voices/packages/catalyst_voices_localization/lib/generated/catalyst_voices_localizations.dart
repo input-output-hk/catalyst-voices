@@ -1377,6 +1377,12 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Passwords do not match, please correct'**
   String get passwordDoNotMatch;
+
+  /// No description provided for @recoverCatalystKeychain.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Catalyst keychain'**
+  String get recoverCatalystKeychain;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

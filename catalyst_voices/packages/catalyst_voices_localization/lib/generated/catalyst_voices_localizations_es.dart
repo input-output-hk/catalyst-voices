@@ -727,4 +727,7 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get passwordDoNotMatch => 'Passwords do not match, please correct';
+
+  @override
+  String get recoverCatalystKeychain => 'Restore Catalyst keychain';
 }

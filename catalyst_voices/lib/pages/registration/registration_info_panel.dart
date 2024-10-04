@@ -67,14 +67,17 @@ class RegistrationInfoPanel extends StatelessWidget {
       return switch (stage) {
         CreateKeychainStage.splash ||
         CreateKeychainStage.instructions =>
-          _HeaderStrings(title: context.l10n.catalystKeychain),
+          _HeaderStrings(
+            title: context.l10n.catalystKeychain,
+          ),
         CreateKeychainStage.seedPhrase => _HeaderStrings(
             title: context.l10n.catalystKeychain,
             subtitle: context.l10n.createKeychainSeedPhraseSubtitle,
             body: context.l10n.createKeychainSeedPhraseBody,
           ),
-        CreateKeychainStage.checkSeedPhraseInstructions =>
-          _HeaderStrings(title: context.l10n.catalystKeychain),
+        CreateKeychainStage.checkSeedPhraseInstructions => _HeaderStrings(
+            title: context.l10n.catalystKeychain,
+          ),
         CreateKeychainStage.checkSeedPhrase => _HeaderStrings(
             title: context.l10n.catalystKeychain,
             subtitle: context.l10n.createKeychainSeedPhraseCheckSubtitle,
@@ -82,7 +85,9 @@ class RegistrationInfoPanel extends StatelessWidget {
           ),
         CreateKeychainStage.checkSeedPhraseResult ||
         CreateKeychainStage.unlockPasswordInstructions =>
-          _HeaderStrings(title: context.l10n.catalystKeychain),
+          _HeaderStrings(
+            title: context.l10n.catalystKeychain,
+          ),
         CreateKeychainStage.unlockPasswordCreate => _HeaderStrings(
             title: context.l10n.catalystKeychain,
             subtitle: context.l10n.createKeychainUnlockPasswordIntoSubtitle,
@@ -115,9 +120,15 @@ class RegistrationInfoPanel extends StatelessWidget {
 
     return switch (step) {
       GetStartedStep() => _HeaderStrings(title: context.l10n.getStarted),
-      FinishAccountCreationStep() =>
-        _HeaderStrings(title: context.l10n.catalystKeychain),
-      RecoverMethodStep() => _HeaderStrings(title: 'TODO'),
+      FinishAccountCreationStep() => _HeaderStrings(
+          title: context.l10n.catalystKeychain,
+        ),
+      RecoverMethodStep() => _HeaderStrings(
+          title: context.l10n.recoverCatalystKeychain,
+        ),
+      SeedPhraseRecoverStep() => _HeaderStrings(
+          title: context.l10n.recoverCatalystKeychain,
+        ),
       CreateKeychainStep(:final stage) => buildKeychainStageHeader(stage),
       WalletLinkStep(:final stage) => buildWalletLinkStageHeader(stage),
       AccountCompletedStep() => _HeaderStrings(title: 'TODO'),
@@ -163,9 +174,23 @@ class _RegistrationPicture extends StatelessWidget {
       };
     }
 
+    Widget buildRecoverSeedPhrase(RecoverSeedPhraseStage stage) {
+      return switch (stage) {
+        RecoverSeedPhraseStage.seedPhraseInstructions ||
+        RecoverSeedPhraseStage.seedPhrase ||
+        RecoverSeedPhraseStage.linkedWallet =>
+          const KeychainPicture(),
+        RecoverSeedPhraseStage.unlockPasswordInstructions ||
+        RecoverSeedPhraseStage.unlockPassword =>
+          const PasswordPicture(),
+        RecoverSeedPhraseStage.success => const KeychainWithPasswordPicture(),
+      };
+    }
+
     return switch (step) {
       GetStartedStep() => const KeychainPicture(),
       RecoverMethodStep() => const KeychainPicture(),
+      SeedPhraseRecoverStep(:final stage) => buildRecoverSeedPhrase(stage),
       CreateKeychainStep(:final stage) => buildKeychainStagePicture(stage),
       FinishAccountCreationStep() => const KeychainWithPasswordPicture(),
       WalletLinkStep(:final stage) => buildWalletLinkStagePicture(stage),
