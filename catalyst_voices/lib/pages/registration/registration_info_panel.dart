@@ -172,7 +172,6 @@ class _BlocSeedPhraseResultPicture extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSeedPhraseBuilder<bool>(
       selector: (state) => state.areUserWordsCorrect,
-      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
         return SeedPhrasePicture(
           type: state ? TaskPictureType.success : TaskPictureType.error,
@@ -190,7 +189,6 @@ class _BlocPasswordPicture extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocUnlockPasswordBuilder<TaskPictureType>(
       selector: (state) => state.pictureType,
-      buildWhen: (previous, current) => previous != current,
       builder: (context, state) => PasswordPicture(type: state),
     );
   }

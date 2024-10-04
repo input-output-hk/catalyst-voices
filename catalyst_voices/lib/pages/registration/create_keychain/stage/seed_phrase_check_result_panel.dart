@@ -36,7 +36,6 @@ class _BlocRegistrationStageMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSeedPhraseBuilder<bool>(
       selector: (state) => state.areUserWordsCorrect,
-      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
         // TODO(damian-molinski): use correct strings when available.
         return RegistrationStageMessage(
@@ -63,7 +62,6 @@ class _BlocNextStep extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSeedPhraseBuilder<bool>(
       selector: (state) => state.areUserWordsCorrect,
-      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
         return Offstage(
           offstage: !state,
@@ -83,7 +81,6 @@ class _BlocNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSeedPhraseBuilder<bool>(
       selector: (state) => state.areUserWordsCorrect,
-      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
         return RegistrationBackNextNavigation(
           isNextEnabled: state,

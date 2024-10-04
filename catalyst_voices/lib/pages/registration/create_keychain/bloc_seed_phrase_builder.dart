@@ -1,13 +1,13 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class BlocSeedPhraseBuilder<T>
-    extends BlocBuilderSelector<RegistrationCubit, RegistrationState, T> {
+    extends BlocSelector<RegistrationCubit, RegistrationState, T> {
   BlocSeedPhraseBuilder({
     super.key,
-    required BlocValueSelector<T, SeedPhraseStateData> selector,
+    required BlocWidgetSelector<SeedPhraseStateData, T> selector,
     required super.builder,
     super.bloc,
-    super.buildWhen,
   }) : super(
           selector: (state) {
             return selector(state.keychainStateData.seedPhraseStateData);

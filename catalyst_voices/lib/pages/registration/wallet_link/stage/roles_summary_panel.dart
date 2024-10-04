@@ -5,7 +5,6 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class RolesSummaryPanel extends StatelessWidget {
@@ -53,7 +52,6 @@ class _BlocSubtitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocWalletLinkBuilder<Set<AccountRole>>(
       selector: (state) => state.selectedRoles ?? state.defaultRoles,
-      buildWhen: (previous, current) => !setEquals(previous, current),
       builder: (context, state) {
         return _Subtitle(selectedRoles: state);
       },
@@ -102,10 +100,6 @@ class _BlocRolesSummaryContainer extends StatelessWidget {
         selected: state.selectedRoles ?? state.defaultRoles,
         defaultRoles: state.defaultRoles,
       ),
-      buildWhen: (previous, current) {
-        return !setEquals(previous.selected, current.selected) ||
-            !setEquals(previous.defaultRoles, current.defaultRoles);
-      },
       builder: (context, state) {
         return RolesSummaryContainer(
           selected: state.selected,

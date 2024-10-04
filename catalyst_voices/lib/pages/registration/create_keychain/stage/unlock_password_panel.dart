@@ -138,7 +138,6 @@ class _BlocConfirmPasswordTextField extends StatelessWidget {
         showError: state.showPasswordMisMatch,
         minimumLength: state.minPasswordLength,
       ),
-      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
         return _ConfirmPasswordTextField(
           controller: controller,
@@ -184,7 +183,6 @@ class _BlocPasswordStrength extends StatelessWidget {
         show: state.showPasswordStrength,
         strength: state.passwordStrength,
       ),
-      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
         return Offstage(
           offstage: !state.show,
@@ -210,7 +208,6 @@ class _BlocNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocUnlockPasswordBuilder<bool>(
       selector: (state) => state.isNextEnabled,
-      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
         return RegistrationBackNextNavigation(
           isNextEnabled: state,

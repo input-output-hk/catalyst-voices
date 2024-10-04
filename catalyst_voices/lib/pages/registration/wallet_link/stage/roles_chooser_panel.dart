@@ -7,7 +7,6 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class RolesChooserPanel extends StatelessWidget {
@@ -57,10 +56,6 @@ class _BlocRolesChooserContainer extends StatelessWidget {
         selected: state.selectedRoles ?? state.defaultRoles,
         defaultRoles: state.defaultRoles,
       ),
-      buildWhen: (previous, current) {
-        return !setEquals(previous.selected, current.selected) ||
-            !setEquals(previous.defaultRoles, current.defaultRoles);
-      },
       builder: (context, state) {
         return RolesChooserContainer(
           selected: state.selected,

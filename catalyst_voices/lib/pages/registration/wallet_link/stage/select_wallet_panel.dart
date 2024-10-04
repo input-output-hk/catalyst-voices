@@ -90,7 +90,6 @@ class _BlocWallets extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocWalletLinkBuilder<Result<List<CardanoWallet>, Exception>?>(
       selector: (state) => state.wallets,
-      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
         return _Wallets(
           result: state,

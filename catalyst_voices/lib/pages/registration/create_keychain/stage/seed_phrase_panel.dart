@@ -53,7 +53,6 @@ class _BlocLoadable extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSeedPhraseBuilder<bool>(
       selector: (state) => state.isLoading,
-      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
         return VoicesLoadable(
           isLoading: state,
@@ -71,7 +70,6 @@ class _BlocSeedPhraseWords extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSeedPhraseBuilder<SeedPhrase?>(
       selector: (state) => state.seedPhrase,
-      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
         final words = state?.mnemonicWords ?? [];
 
@@ -117,7 +115,6 @@ class _BlocStoredCheckbox extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSeedPhraseBuilder<bool>(
       selector: (state) => state.isStoredConfirmed,
-      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
         return _StoredCheckbox(
           isConfirmed: state,
@@ -155,7 +152,6 @@ class _BlocNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSeedPhraseBuilder<bool>(
       selector: (state) => state.isStoredConfirmed,
-      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
         return RegistrationBackNextNavigation(
           isNextEnabled: state,

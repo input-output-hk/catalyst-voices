@@ -3,7 +3,6 @@ import 'package:catalyst_voices/pages/registration/registration_stage_navigation
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class SeedPhraseCheckPanel extends StatefulWidget {
@@ -63,7 +62,6 @@ class _BlocLoadable extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSeedPhraseBuilder<bool>(
       selector: (state) => state.isLoading,
-      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
         return VoicesLoadable(
           isLoading: state,
@@ -98,11 +96,6 @@ class _BlocSeedPhraseWords extends StatelessWidget {
         state.userWords,
         state.isResetWordsEnabled,
       ),
-      buildWhen: (previous, current) {
-        return !listEquals(previous.$1, current.$1) ||
-            !listEquals(previous.$2, current.$2) ||
-            previous.$3 != current.$3;
-      },
       builder: (context, state) {
         return _SeedPhraseWords(
           words: state.$1,
@@ -196,7 +189,6 @@ class _BlocNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSeedPhraseBuilder<bool>(
       selector: (state) => state.areUserWordsCorrect,
-      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
         return RegistrationBackNextNavigation(
           isNextEnabled: state,

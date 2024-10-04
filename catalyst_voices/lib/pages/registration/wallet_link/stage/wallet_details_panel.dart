@@ -48,7 +48,6 @@ class _BlocWalletExtension extends StatelessWidget {
         final wallet = state.selectedWallet?.wallet;
         return wallet != null ? (icon: wallet.icon, name: wallet.name) : null;
       },
-      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
         if (state != null) {
           return _WalletExtension(
@@ -100,7 +99,6 @@ class _BlocWalletDetailsText extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocWalletLinkBuilder<String?>(
       selector: (state) => state.selectedWallet?.wallet.name,
-      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
         return Text(
           context.l10n.walletLinkWalletDetailsContent(state ?? ''),
@@ -132,7 +130,6 @@ class _BlocWalletSummary extends StatelessWidget {
               )
             : null;
       },
-      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
         if (state != null) {
           return _WalletSummary(
@@ -326,7 +323,6 @@ class _BlocNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocWalletLinkBuilder<bool>(
       selector: (state) => state.selectedWallet?.hasEnoughBalance ?? false,
-      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
         if (state) {
           return const RegistrationBackNextNavigation();

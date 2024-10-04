@@ -59,7 +59,6 @@ class _BlocSummary extends StatelessWidget {
           transactionFee: state.transactionFee,
         );
       },
-      buildWhen: (previous, current) => previous != current,
       builder: (context, state) {
         if (state == null) {
           return const Offstage();
