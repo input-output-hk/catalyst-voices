@@ -2,12 +2,18 @@
 //!
 //! This improves query execution time.
 
+pub(crate) mod registrations;
 pub(crate) mod staked_ada;
+pub(crate) mod sync_status;
 
 use std::{fmt::Debug, sync::Arc};
 
 use anyhow::{bail, Context};
 use crossbeam_skiplist::SkipMap;
+use registrations::{
+    get_from_stake_addr::GetRegistrationQuery, get_from_stake_hash::GetStakeAddrQuery,
+    get_from_vote_key::GetStakeAddrFromVoteKeyQuery, get_invalid::GetInvalidRegistrationQuery,
+};
 use scylla::{
     batch::Batch, prepared_statement::PreparedStatement, serialize::row::SerializeRow,
     transport::iterator::RowIterator, QueryResult, Session,
@@ -17,6 +23,7 @@ use staked_ada::{
     get_txi_by_txn_hash::GetTxiByTxnHashesQuery,
     get_txo_by_stake_address::GetTxoByStakeAddressQuery, update_txo_spent::UpdateTxoSpentQuery,
 };
+use sync_status::update::SyncStatusInsertQuery;
 
 use super::block::{
     certs::CertInsertQuery, cip36::Cip36InsertQuery, txi::TxiInsertQuery, txo::TxoInsertQuery,
@@ -52,7 +59,7 @@ pub(crate) enum PreparedQuery {
     TxoSpentUpdateQuery,
 }
 
-/// All prepared SELECT query statements.
+/// All prepared SELECT query statements (return data).
 pub(crate) enum PreparedSelectQuery {
     /// Get TXO by stake address query.
     TxoByStakeAddress,
@@ -60,6 +67,20 @@ pub(crate) enum PreparedSelectQuery {
     TxiByTransactionHash,
     /// Get native assets by stake address query.
     AssetsByStakeAddress,
+    /// Get Registrations
+    RegistrationFromStakeAddr,
+    /// Get invalid Registration
+    InvalidRegistrationsFromStakeAddr,
+    /// Get stake addr from stake hash
+    StakeAddrFromStakeHash,
+    /// Get stake addr from vote key
+    StakeAddrFromVoteKey,
+}
+
+/// All prepared UPSERT query statements (inserts/updates a single value of data).
+pub(crate) enum PreparedUpsertQuery {
+    /// Sync Status Insert
+    SyncStatusInsert,
 }
 
 /// All prepared queries for a session.
@@ -91,6 +112,16 @@ pub(crate) struct PreparedQueries {
     txi_by_txn_hash_query: PreparedStatement,
     /// Get native assets by stake address query.
     native_assets_by_stake_address_query: PreparedStatement,
+    /// Get registrations
+    registration_from_stake_addr_query: PreparedStatement,
+    /// stake addr from stake hash
+    stake_addr_from_stake_hash_query: PreparedStatement,
+    /// stake addr from vote key
+    stake_addr_from_vote_key_query: PreparedStatement,
+    /// Get invalid registrations
+    invalid_registrations_from_stake_addr_query: PreparedStatement,
+    /// Insert Sync Status update.
+    sync_status_insert: PreparedStatement,
 }
 
 /// An individual query response that can fail
@@ -117,6 +148,12 @@ impl PreparedQueries {
         let txi_by_txn_hash_query = GetTxiByTxnHashesQuery::prepare(session.clone()).await;
         let native_assets_by_stake_address_query =
             GetAssetsByStakeAddressQuery::prepare(session.clone()).await;
+        let registration_from_stake_addr_query =
+            GetRegistrationQuery::prepare(session.clone()).await;
+        let stake_addr_from_stake_hash = GetStakeAddrQuery::prepare(session.clone()).await;
+        let stake_addr_from_vote_key = GetStakeAddrFromVoteKeyQuery::prepare(session.clone()).await;
+        let invalid_registrations = GetInvalidRegistrationQuery::prepare(session.clone()).await;
+        let sync_status_insert = SyncStatusInsertQuery::prepare(session).await;
 
         let (
             txo_insert_queries,
@@ -145,6 +182,11 @@ impl PreparedQueries {
             txo_by_stake_address_query: txo_by_stake_address_query?,
             txi_by_txn_hash_query: txi_by_txn_hash_query?,
             native_assets_by_stake_address_query: native_assets_by_stake_address_query?,
+            registration_from_stake_addr_query: registration_from_stake_addr_query?,
+            stake_addr_from_stake_hash_query: stake_addr_from_stake_hash?,
+            stake_addr_from_vote_key_query: stake_addr_from_vote_key?,
+            invalid_registrations_from_stake_addr_query: invalid_registrations?,
+            sync_status_insert: sync_status_insert?,
         })
     }
 
@@ -191,6 +233,25 @@ impl PreparedQueries {
         Ok(sized_batches)
     }
 
+    /// Executes a single query with the given parameters.
+    ///
+    /// Returns no data, and an error if the query fails.
+    pub(crate) async fn execute_upsert<P>(
+        &self, session: Arc<Session>, upsert_query: PreparedUpsertQuery, params: P,
+    ) -> anyhow::Result<()>
+    where P: SerializeRow {
+        let prepared_stmt = match upsert_query {
+            PreparedUpsertQuery::SyncStatusInsert => &self.sync_status_insert,
+        };
+
+        session
+            .execute_unpaged(prepared_stmt, params)
+            .await
+            .map_err(|e| anyhow::anyhow!(e))?;
+
+        Ok(())
+    }
+
     /// Executes a select query with the given parameters.
     ///
     /// Returns an iterator that iterates over all the result pages that the query
@@ -203,6 +264,14 @@ impl PreparedQueries {
             PreparedSelectQuery::TxoByStakeAddress => &self.txo_by_stake_address_query,
             PreparedSelectQuery::TxiByTransactionHash => &self.txi_by_txn_hash_query,
             PreparedSelectQuery::AssetsByStakeAddress => &self.native_assets_by_stake_address_query,
+            PreparedSelectQuery::RegistrationFromStakeAddr => {
+                &self.registration_from_stake_addr_query
+            },
+            PreparedSelectQuery::StakeAddrFromStakeHash => &self.stake_addr_from_stake_hash_query,
+            PreparedSelectQuery::StakeAddrFromVoteKey => &self.stake_addr_from_vote_key_query,
+            PreparedSelectQuery::InvalidRegistrationsFromStakeAddr => {
+                &self.invalid_registrations_from_stake_addr_query
+            },
         };
 
         session

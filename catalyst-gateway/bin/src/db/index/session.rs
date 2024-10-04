@@ -16,7 +16,10 @@ use tokio::fs;
 use tracing::{error, info};
 
 use super::{
-    queries::{FallibleQueryResults, PreparedQueries, PreparedQuery, PreparedSelectQuery},
+    queries::{
+        FallibleQueryResults, PreparedQueries, PreparedQuery, PreparedSelectQuery,
+        PreparedUpsertQuery,
+    },
     schema::create_schema,
 };
 use crate::{
@@ -131,6 +134,22 @@ impl CassandraSession {
         let queries = self.queries.clone();
 
         queries.execute_batch(session, cfg, query, values).await
+    }
+
+    /// Execute a query which returns no results, except an error if it fails.
+    /// Can not be batched, takes a single set of parameters.
+    pub(crate) async fn execute_upsert<T: SerializeRow + Debug>(
+        &self, query: PreparedUpsertQuery, value: T,
+    ) -> anyhow::Result<()> {
+        let session = self.session.clone();
+        let queries = self.queries.clone();
+
+        queries.execute_upsert(session, query, value).await
+    }
+
+    /// Get underlying Raw Cassandra Session.
+    pub(crate) fn get_raw_session(&self) -> Arc<Session> {
+        self.session.clone()
     }
 }
 
