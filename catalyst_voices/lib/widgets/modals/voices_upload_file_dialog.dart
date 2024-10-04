@@ -253,6 +253,7 @@ class _UploadContainerState extends State<_UploadContainer> {
           color: Theme.of(context).colors.iconsPrimary!,
           child: Stack(
             children: [
+              // We allow drag&drop only on web
               if (kIsWeb)
                 DropzoneView(
                   operation: DragOperation.copy,
