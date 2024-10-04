@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices/pages/registration/registration_stage_message.dart';
+import 'package:catalyst_voices/pages/registration/wallet_link/bloc_wallet_link_builder.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -12,11 +15,8 @@ import 'package:result_type/result_type.dart';
 typedef _OnSelectWallet = Future<void> Function(CardanoWallet wallet);
 
 class SelectWalletPanel extends StatefulWidget {
-  final Result<List<CardanoWallet>, Exception>? walletsResult;
-
   const SelectWalletPanel({
     super.key,
-    this.walletsResult,
   });
 
   @override
@@ -42,8 +42,7 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
         ),
         const SizedBox(height: 40),
         Expanded(
-          child: _Wallets(
-            result: widget.walletsResult,
+          child: _BlocWallets(
             onRefreshTap: _refreshWallets,
             onSelectWallet: _onSelectWallet,
           ),
@@ -65,11 +64,40 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
   }
 
   void _refreshWallets() {
-    RegistrationCubit.of(context).refreshWallets();
+    unawaited(RegistrationCubit.of(context).walletLink.refreshWallets());
   }
 
   Future<void> _onSelectWallet(CardanoWallet wallet) async {
-    return RegistrationCubit.of(context).selectWallet(wallet);
+    final registration = RegistrationCubit.of(context);
+
+    final success = await registration.walletLink.selectWallet(wallet);
+    if (success) {
+      registration.nextStep();
+    }
+  }
+}
+
+class _BlocWallets extends StatelessWidget {
+  final _OnSelectWallet onSelectWallet;
+  final VoidCallback onRefreshTap;
+
+  const _BlocWallets({
+    required this.onSelectWallet,
+    required this.onRefreshTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocWalletLinkBuilder<Result<List<CardanoWallet>, Exception>?>(
+      selector: (state) => state.wallets,
+      builder: (context, state) {
+        return _Wallets(
+          result: state,
+          onRefreshTap: onRefreshTap,
+          onSelectWallet: onSelectWallet,
+        );
+      },
+    );
   }
 }
 
