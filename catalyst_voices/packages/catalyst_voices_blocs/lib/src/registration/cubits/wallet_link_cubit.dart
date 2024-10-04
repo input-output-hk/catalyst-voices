@@ -9,36 +9,37 @@ import 'package:result_type/result_type.dart';
 
 final _logger = Logger('WalletLinkCubit');
 
-final class WalletLinkCubit extends Cubit<WalletLink> {
-  WalletLinkCubit() : super(const WalletLink());
+abstract interface class WalletLinkManager {
+  Future<void> refreshWallets();
 
-  set _stateData(WalletLinkStateData newValue) {
-    emit(state.copyWith(stateData: newValue));
-  }
+  Future<bool> selectWallet(CardanoWallet wallet);
 
-  WalletLinkStateData get _stateData => state.stateData;
+  void selectRoles(Set<AccountRole> roles);
 
-  void changeStage(WalletLinkStage newValue) {
-    if (state.stage != newValue) {
-      emit(state.copyWith(stage: newValue));
-    }
-  }
+  void submitRegistration();
+}
 
+final class WalletLinkCubit extends Cubit<WalletLinkStateData>
+    implements WalletLinkManager {
+  WalletLinkCubit() : super(const WalletLinkStateData());
+
+  @override
   Future<void> refreshWallets() async {
     try {
-      _stateData = _stateData.copyWith(wallets: const Optional.empty());
+      emit(state.copyWith(wallets: const Optional.empty()));
 
       final wallets =
           await CatalystCardano.instance.getWallets().withMinimumDelay();
 
-      _stateData = _stateData.copyWith(wallets: Optional(Success(wallets)));
+      emit(state.copyWith(wallets: Optional(Success(wallets))));
     } on Exception catch (error, stackTrace) {
       _logger.severe('refreshWallets', error, stackTrace);
-      _stateData = _stateData.copyWith(wallets: Optional(Failure(error)));
+      emit(state.copyWith(wallets: Optional(Failure(error))));
     }
   }
 
-  Future<void> selectWallet(CardanoWallet wallet) async {
+  @override
+  Future<bool> selectWallet(CardanoWallet wallet) async {
     try {
       final enabledWallet = await wallet.enable();
       final balance = await enabledWallet.getBalance();
@@ -50,42 +51,22 @@ final class WalletLinkCubit extends Cubit<WalletLink> {
         address: address,
       );
 
-      final nextState = state.copyWith(
-        stage: WalletLinkStage.walletDetails,
-        stateData: _stateData.copyWith(
-          selectedWallet: Optional(walletDetails),
-        ),
-      );
+      emit(state.copyWith(selectedWallet: Optional(walletDetails)));
 
-      emit(nextState);
+      return true;
     } catch (error, stackTrace) {
       _logger.severe('selectWallet', error, stackTrace);
+      return false;
     }
   }
 
+  @override
   void selectRoles(Set<AccountRole> roles) {
-    _stateData = _stateData.copyWith(selectedRoles: Optional(roles));
+    emit(state.copyWith(selectedRoles: Optional(roles)));
   }
 
-  WalletLinkStep? nextStep() {
-    final currentStageIndex = WalletLinkStage.values.indexOf(state.stage);
-    final isLast = currentStageIndex == WalletLinkStage.values.length - 1;
-    if (isLast) {
-      return null;
-    }
-
-    final nextStage = WalletLinkStage.values[currentStageIndex + 1];
-    return WalletLinkStep(stage: nextStage);
-  }
-
-  WalletLinkStep? previousStep() {
-    final currentStageIndex = WalletLinkStage.values.indexOf(state.stage);
-    final isFirst = currentStageIndex == 0;
-    if (isFirst) {
-      return null;
-    }
-
-    final previousStage = WalletLinkStage.values[currentStageIndex - 1];
-    return WalletLinkStep(stage: previousStage);
+  @override
+  void submitRegistration() {
+    // TODO(dtscalac): submit RBAC transaction
   }
 }
