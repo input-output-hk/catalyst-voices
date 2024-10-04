@@ -67,6 +67,14 @@ final class SeedPhrase extends Equatable {
     return SeedPhrase._(mnemonic: mnemonic);
   }
 
+  /// Builds [mnemonic] from [words] and calls [SeedPhrase.fromMnemonic]
+  /// with result.
+  factory SeedPhrase.fromWords(List<String> words) {
+    final mnemonic = words.join(' ');
+
+    return SeedPhrase.fromMnemonic(mnemonic);
+  }
+
   /// The full list of BIP-39 mnemonic words in English.
   static List<String> get wordList => WORDLIST;
 

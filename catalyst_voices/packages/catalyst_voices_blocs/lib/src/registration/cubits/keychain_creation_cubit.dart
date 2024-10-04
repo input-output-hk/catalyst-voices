@@ -3,68 +3,97 @@ import 'dart:async';
 import 'dart:convert' show utf8;
 
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_blocs/src/registration/state_data/keychain_state_data.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 final _logger = Logger('KeychainCreationCubit');
 
-final class KeychainCreationCubit extends Cubit<CreateKeychain> {
+abstract interface class KeychainCreationManager {
+  void buildSeedPhrase({
+    bool forceRefresh = false,
+  });
+
+  void setSeedPhraseStored(bool value);
+
+  void setUserSeedPhraseWords(List<String> words);
+
+  Future<void> downloadSeedPhrase();
+
+  void setPassword(String value);
+
+  void setConfirmPassword(String value);
+
+  Future<void> createKeychain();
+}
+
+final class KeychainCreationCubit extends Cubit<KeychainStateData>
+    implements KeychainCreationManager {
   final Downloader _downloader;
 
   KeychainCreationCubit({
     required Downloader downloader,
   })  : _downloader = downloader,
-        super(const CreateKeychain());
+        super(const KeychainStateData());
 
-  set _seedPhrase(SeedPhraseState newValue) {
-    emit(state.copyWith(seedPhrase: newValue));
+  SeedPhraseStateData get _seedPhraseStateData {
+    return state.seedPhraseStateData;
   }
 
-  SeedPhraseState get _seedPhrase => state.seedPhrase;
-
-  set _unlockPassword(UnlockPasswordState newValue) {
-    emit(state.copyWith(unlockPassword: newValue));
-  }
-
-  UnlockPasswordState get _unlockPassword => state.unlockPassword;
-
-  void changeStage(CreateKeychainStage newValue) {
-    if (state.stage != newValue) {
-      emit(state.copyWith(stage: newValue));
+  set _seedPhraseStateData(SeedPhraseStateData newValue) {
+    if (state.seedPhraseStateData != newValue) {
+      emit(state.copyWith(seedPhraseStateData: newValue));
     }
   }
 
-  void buildSeedPhrase() {
-    final seedPhrase = SeedPhrase();
-    _seedPhrase = _seedPhrase.copyWith(
-      seedPhrase: Optional.of(seedPhrase),
+  UnlockPasswordState get _unlockPasswordState {
+    return state.unlockPasswordState;
+  }
+
+  set _unlockPasswordState(UnlockPasswordState newValue) {
+    if (state.unlockPasswordState != newValue) {
+      emit(state.copyWith(unlockPasswordState: newValue));
+    }
+  }
+
+  @override
+  void buildSeedPhrase({
+    bool forceRefresh = false,
+  }) {
+    if (forceRefresh) {
+      _buildSeedPhrase();
+    } else {
+      _ensureSeedPhraseCreated();
+    }
+  }
+
+  @override
+  void setSeedPhraseStored(bool value) {
+    _seedPhraseStateData = _seedPhraseStateData.copyWith(
+      isStoredConfirmed: value,
     );
   }
 
-  void ensureSeedPhraseCreated() {
-    if (_seedPhrase.seedPhrase == null) {
-      buildSeedPhrase();
-    }
+  @override
+  void setUserSeedPhraseWords(List<String> words) {
+    final seedPhrase = _seedPhraseStateData.seedPhrase;
+    final seedPhraseWords = seedPhrase?.mnemonicWords;
+
+    final areUserWordsCorrect =
+        seedPhraseWords != null && listEquals(seedPhraseWords, words);
+
+    _seedPhraseStateData = _seedPhraseStateData.copyWith(
+      userWords: words,
+      areUserWordsCorrect: areUserWordsCorrect,
+    );
   }
 
-  void setSeedPhraseStoredConfirmed(bool newValue) {
-    if (_seedPhrase.isStoredConfirmed != newValue) {
-      _seedPhrase = _seedPhrase.copyWith(isStoredConfirmed: newValue);
-    }
-  }
-
-  void setSeedPhraseCheckConfirmed({
-    required bool isConfirmed,
-  }) {
-    if (_seedPhrase.isCheckConfirmed != isConfirmed) {
-      _seedPhrase = _seedPhrase.copyWith(isCheckConfirmed: isConfirmed);
-    }
-  }
-
+  @override
   Future<void> downloadSeedPhrase() async {
-    final mnemonic = _seedPhrase.seedPhrase?.mnemonic;
+    final mnemonic = _seedPhraseStateData.seedPhrase?.mnemonic;
     if (mnemonic == null) {
       throw StateError('SeedPhrase is not generated. Make sure it exits first');
     }
@@ -95,27 +124,27 @@ final class KeychainCreationCubit extends Cubit<CreateKeychain> {
     }
   }
 
-  void setPassword(String newValue) {
-    if (_unlockPassword.password != newValue) {
-      _updateUnlockPasswordState(password: newValue);
-    }
+  @override
+  void setPassword(String value) {
+    _updateUnlockPasswordState(password: value);
   }
 
-  void setConfirmPassword(String newValue) {
-    if (_unlockPassword.confirmPassword != newValue) {
-      _updateUnlockPasswordState(confirmPassword: newValue);
-    }
+  @override
+  void setConfirmPassword(String value) {
+    _updateUnlockPasswordState(confirmPassword: value);
   }
 
-  // TODO(damian-molinski): implement
-  Future<void> createKeychain() async {}
+  @override
+  Future<void> createKeychain() async {
+    // TODO(damian-molinski): implement
+  }
 
   void _updateUnlockPasswordState({
     String? password,
     String? confirmPassword,
   }) {
-    password ??= _unlockPassword.password;
-    confirmPassword ??= _unlockPassword.confirmPassword;
+    password ??= _unlockPasswordState.password;
+    confirmPassword ??= _unlockPasswordState.confirmPassword;
 
     const minimumLength = PasswordStrength.minimumLength;
 
@@ -124,7 +153,7 @@ final class KeychainCreationCubit extends Cubit<CreateKeychain> {
     final matching = password == confirmPassword;
     final hasConfirmPassword = confirmPassword.isNotEmpty;
 
-    _unlockPassword = _unlockPassword.copyWith(
+    _unlockPasswordState = _unlockPasswordState.copyWith(
       password: password,
       confirmPassword: confirmPassword,
       passwordStrength: passwordStrength,
@@ -135,25 +164,22 @@ final class KeychainCreationCubit extends Cubit<CreateKeychain> {
     );
   }
 
-  CreateKeychainStep? nextStep() {
-    final currentStageIndex = CreateKeychainStage.values.indexOf(state.stage);
-    final isLast = currentStageIndex == CreateKeychainStage.values.length - 1;
-    if (isLast) {
-      return null;
-    }
+  void _buildSeedPhrase() {
+    final seedPhrase = SeedPhrase();
 
-    final nextStage = CreateKeychainStage.values[currentStageIndex + 1];
-    return CreateKeychainStep(stage: nextStage);
+    _seedPhraseStateData = _seedPhraseStateData.copyWith(
+      seedPhrase: Optional(seedPhrase),
+      shuffledWords: seedPhrase.shuffledMnemonicWords,
+      // Note. In debug mode we're prefilling correct seed phrase words
+      // so its faster to test screens
+      userWords: kDebugMode ? seedPhrase.mnemonicWords : const [],
+      areUserWordsCorrect: kDebugMode,
+    );
   }
 
-  CreateKeychainStep? previousStep() {
-    final currentStageIndex = CreateKeychainStage.values.indexOf(state.stage);
-    final isFirst = currentStageIndex == 0;
-    if (isFirst) {
-      return null;
+  void _ensureSeedPhraseCreated() {
+    if (state.seedPhraseStateData.seedPhrase == null) {
+      _buildSeedPhrase();
     }
-
-    final previousStage = CreateKeychainStage.values[currentStageIndex - 1];
-    return CreateKeychainStep(stage: previousStage);
   }
 }

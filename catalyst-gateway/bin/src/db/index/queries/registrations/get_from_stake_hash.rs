@@ -25,7 +25,7 @@ pub(crate) struct GetStakeAddrParams {
 }
 
 impl GetStakeAddrParams {
-    /// Create a new instance of [`GetStakeAddrParams`]
+    /// Create a new instance of [`GetStakeAddrFromStakeHashParams`]
     pub(crate) fn new(stake_hash: Vec<u8>) -> GetStakeAddrParams {
         Self { stake_hash }
     }
