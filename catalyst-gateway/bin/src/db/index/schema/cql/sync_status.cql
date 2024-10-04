@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS sync_status (
     end_slot        varint,    -- The slot that has been indexed up-to (inclusive).
     start_slot      varint,    -- The slot the sync block started at (inclusive).
     sync_time       timestamp, -- The time we finished the sync.
-    node_id         uuid,      -- The node that synced this data.
+    node_id         text,      -- The node that synced this data.
 
     PRIMARY KEY (end_slot, start_slot, sync_time, node_id)
 );

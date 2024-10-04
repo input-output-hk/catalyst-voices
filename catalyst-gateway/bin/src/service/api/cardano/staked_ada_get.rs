@@ -103,6 +103,9 @@ async fn calculate_stake_info(
     }
 
     check_and_set_spent(&session, &mut txos_by_txn).await?;
+    // TODO: This could be executed in the background, it does not actually matter if it
+    // succeeds. This is just an optimization step to reduce the need to query spent
+    // TXO's.
     update_spent(&session, stake_address_bytes, &txos_by_txn).await?;
 
     let stake_info = build_stake_info(txos_by_txn)?;

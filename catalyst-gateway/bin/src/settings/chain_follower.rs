@@ -16,6 +16,15 @@ const DEFAULT_SYNC_TASKS: u16 = 16;
 /// Maximum number of sync tasks (must be in the range 1 to 256 inclusive.)
 const MAX_SYNC_TASKS: u16 = 256;
 
+/// Default number of slots each sync task will process at one time.
+/// This default is just over one week worth of data where 1 slot == 1 second.
+const DEFAULT_SYNC_MAX_SLOTS: u64 = 700_000;
+/// Minimum the number of slots each sync task will process at one time can be set to.
+/// Note: This is just the setting minimum, a sync task may sync as few as a 1 slot.
+const MIN_SYNC_MAX_SLOTS: u64 = 10_000;
+/// Maximum the number of slots each sync task will process at one time can be set to.
+const MAX_SYNC_MAX_SLOTS: u64 = 100_000_000;
+
 /// Maximum number of DL Connections (must be in the range 1 to 256 inclusive.)
 const MAX_DL_CONNECTIONS: usize = 256;
 
@@ -40,6 +49,9 @@ pub(crate) struct EnvVars {
     /// The maximum number of sync tasks.
     pub(crate) sync_tasks: u16,
 
+    /// The maximum number of slots a sync task will process at once.
+    pub(crate) sync_chunk_max_slots: u64,
+
     /// The Mithril Downloader Configuration.
     pub(crate) dl_config: DlConfig,
 }
@@ -53,6 +65,13 @@ impl EnvVars {
             DEFAULT_SYNC_TASKS,
             1,
             MAX_SYNC_TASKS,
+        );
+
+        let sync_slots: u64 = StringEnvVar::new_as(
+            "CHAIN_FOLLOWER_SYNC_MAX_SLOTS",
+            DEFAULT_SYNC_MAX_SLOTS,
+            MIN_SYNC_MAX_SLOTS,
+            MAX_SYNC_MAX_SLOTS,
         );
 
         let cfg = ChainSyncConfig::default_for(chain);
@@ -119,6 +138,7 @@ impl EnvVars {
         Self {
             chain,
             sync_tasks,
+            sync_chunk_max_slots: sync_slots,
             dl_config,
         }
     }
