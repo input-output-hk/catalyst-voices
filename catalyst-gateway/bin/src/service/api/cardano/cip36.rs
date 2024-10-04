@@ -45,8 +45,10 @@ pub(crate) enum ResponseMultipleRegistrations {
 #[derive(Object, Default)]
 pub(crate) struct Cip36Reporting {
     /// List of registrations
+    #[oai(validator(max_items = "100000"))]
     cip36: Vec<Cip36Info>,
     /// Invalid registration reporting
+    #[oai(validator(max_items = "100000"))]
     invalids: Vec<InvalidRegistrationsReport>,
 }
 
@@ -54,16 +56,22 @@ pub(crate) struct Cip36Reporting {
 #[derive(Object, Default)]
 pub(crate) struct Cip36Info {
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
+    #[oai(validator(max_length = 66, min_length = 66, pattern = "0x[0-9a-f]{64}"))]
     pub stake_address: String,
     /// Nonce value after normalization.
+    #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
     pub nonce: u64,
     /// Slot Number the cert is in.
+    #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
     pub slot_no: u64,
     /// Transaction Index.
+    #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
     pub txn: i16,
     /// Voting Public Key
+    #[oai(validator(max_length = 66, min_length = 66, pattern = "0x[0-9a-f]{64}"))]
     pub vote_key: String,
     /// Full Payment Address (not hashed, 32 byte ED25519 Public key).
+    #[oai(validator(max_length = 66, min_length = 66, pattern = "0x[0-9a-f]{64}"))]
     pub payment_address: String,
     /// Is the stake address a script or not.
     pub is_payable: bool,
