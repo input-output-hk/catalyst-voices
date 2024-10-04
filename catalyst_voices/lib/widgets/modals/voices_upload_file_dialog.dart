@@ -10,9 +10,9 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
-import 'package:web/web.dart' as web;
 
 class VoicesUploadFileDialog extends StatefulWidget {
   final String title;
@@ -253,14 +253,14 @@ class _UploadContainerState extends State<_UploadContainer> {
           color: Theme.of(context).colors.iconsPrimary!,
           child: Stack(
             children: [
-              DropzoneView(
-                operation: DragOperation.copy,
-                cursor: CursorType.grab,
-                onCreated: (DropzoneViewController ctrl) => setState(() {
-                  _dropzoneController = ctrl;
-                }),
-                onDrop: (ev) async {
-                  if (ev is web.File) {
+              if (kIsWeb)
+                DropzoneView(
+                  operation: DragOperation.copy,
+                  cursor: CursorType.grab,
+                  onCreated: (DropzoneViewController ctrl) => setState(() {
+                    _dropzoneController = ctrl;
+                  }),
+                  onDrop: (ev) async {
                     final bytes = await _dropzoneController.getFileData(ev);
                     final name = await _dropzoneController.getFilename(ev);
                     widget.onFileSelected?.call(
@@ -269,9 +269,8 @@ class _UploadContainerState extends State<_UploadContainer> {
                         bytes: bytes,
                       ),
                     );
-                  }
-                },
-              ),
+                  },
+                ),
               InkWell(
                 onTap: () async {
                   final result = await FilePicker.platform.pickFiles(
