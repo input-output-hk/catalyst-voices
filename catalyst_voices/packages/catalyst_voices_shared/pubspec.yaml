@@ -15,7 +15,7 @@ dependencies:
   get_it: ^7.6.7
   intl: ^0.19.0
   logging: ^1.2.0
-  web: ^1.0.0
+  web: ^1.1.0
 
 dev_dependencies:
   catalyst_analysis: ^2.0.0
