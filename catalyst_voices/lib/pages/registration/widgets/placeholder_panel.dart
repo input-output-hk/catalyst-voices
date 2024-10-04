@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/pages/registration/registration_stage_navigation.dart';
+import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:flutter/material.dart';
 
 /// Temporary panel with next/back buttons.

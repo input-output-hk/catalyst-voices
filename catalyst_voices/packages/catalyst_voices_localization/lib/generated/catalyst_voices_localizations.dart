@@ -1383,6 +1383,36 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Restore Catalyst keychain'**
   String get recoverCatalystKeychain;
+
+  /// No description provided for @recoverKeychainMethodsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore your Catalyst Keychain'**
+  String get recoverKeychainMethodsTitle;
+
+  /// No description provided for @recoverKeychainMethodsNoKeychainFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No Catalyst Keychain found on this device.'**
+  String get recoverKeychainMethodsNoKeychainFound;
+
+  /// No description provided for @recoverKeychainMethodsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Not to worry, in the next step you can choose the recovery option that applies to you for this device!'**
+  String get recoverKeychainMethodsSubtitle;
+
+  /// No description provided for @recoverKeychainMethodsListTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How do you want Restore your Catalyst Keychain?'**
+  String get recoverKeychainMethodsListTitle;
+
+  /// No description provided for @seedPhrase12Words.
+  ///
+  /// In en, this message translates to:
+  /// **'12 security words'**
+  String get seedPhrase12Words;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

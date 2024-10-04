@@ -791,5 +791,10 @@
   "@passwordDoNotMatch": {
     "description": "When user confirms password but it does not match original one."
   },
-  "recoverCatalystKeychain": "Restore Catalyst keychain"
+  "recoverCatalystKeychain": "Restore Catalyst keychain",
+  "recoverKeychainMethodsTitle": "Restore your Catalyst Keychain",
+  "recoverKeychainMethodsNoKeychainFound": "No Catalyst Keychain found on this device.",
+  "recoverKeychainMethodsSubtitle": "Not to worry, in the next step you can choose the recovery option that applies to you for this device!",
+  "recoverKeychainMethodsListTitle": "How do you want Restore your Catalyst Keychain?",
+  "seedPhrase12Words": "12 security words"
 }

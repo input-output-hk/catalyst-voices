@@ -1,11 +1,11 @@
 import 'package:catalyst_voices/pages/registration/create_keychain/bloc_seed_phrase_builder.dart';
 import 'package:catalyst_voices/pages/registration/create_keychain/bloc_unlock_password_builder.dart';
-import 'package:catalyst_voices/pages/registration/information_panel.dart';
 import 'package:catalyst_voices/pages/registration/pictures/keychain_picture.dart';
 import 'package:catalyst_voices/pages/registration/pictures/keychain_with_password_picture.dart';
 import 'package:catalyst_voices/pages/registration/pictures/password_picture.dart';
 import 'package:catalyst_voices/pages/registration/pictures/seed_phrase_picture.dart';
 import 'package:catalyst_voices/pages/registration/pictures/task_picture.dart';
+import 'package:catalyst_voices/pages/registration/widgets/information_panel.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
