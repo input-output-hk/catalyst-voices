@@ -25,7 +25,7 @@ pub(crate) struct GetRegistrationParams {
 }
 
 impl GetRegistrationParams {
-    /// Create a new instance of [`GetLatestRegistrationParams`]
+    /// Create a new instance of [`GetRegistrationParams`]
     pub(crate) fn new(stake_addr: Vec<u8>) -> GetRegistrationParams {
         Self {
             stake_address: stake_addr,
