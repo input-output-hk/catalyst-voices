@@ -117,7 +117,7 @@ class RegistrationInfoPanel extends StatelessWidget {
       GetStartedStep() => _HeaderStrings(title: context.l10n.getStarted),
       FinishAccountCreationStep() =>
         _HeaderStrings(title: context.l10n.catalystKeychain),
-      RecoverStep() => _HeaderStrings(title: 'TODO'),
+      RecoverMethodStep() => _HeaderStrings(title: 'TODO'),
       CreateKeychainStep(:final stage) => buildKeychainStageHeader(stage),
       WalletLinkStep(:final stage) => buildWalletLinkStageHeader(stage),
       AccountCompletedStep() => _HeaderStrings(title: 'TODO'),
@@ -165,7 +165,7 @@ class _RegistrationPicture extends StatelessWidget {
 
     return switch (step) {
       GetStartedStep() => const KeychainPicture(),
-      RecoverStep() => const KeychainPicture(),
+      RecoverMethodStep() => const KeychainPicture(),
       CreateKeychainStep(:final stage) => buildKeychainStagePicture(stage),
       FinishAccountCreationStep() => const KeychainWithPasswordPicture(),
       WalletLinkStep(:final stage) => buildWalletLinkStagePicture(stage),

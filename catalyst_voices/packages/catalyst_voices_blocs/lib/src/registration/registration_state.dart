@@ -29,7 +29,7 @@ final class RegistrationState extends Equatable {
 
     return switch (step) {
       GetStartedStep() => null,
-      RecoverStep() => null,
+      RecoverMethodStep() => null,
       CreateKeychainStep(:final stage) => getCreateKeychainProgress(stage),
       FinishAccountCreationStep() => 1.0,
       WalletLinkStep(:final stage) => getWalletLinkProgress(stage),

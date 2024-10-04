@@ -17,7 +17,7 @@ class RegistrationDetailsPanel extends StatelessWidget {
       builder: (context, state) {
         return switch (state) {
           GetStartedStep() => const GetStartedPanel(),
-          RecoverStep() => const Placeholder(),
+          RecoverMethodStep() => const Placeholder(),
           CreateKeychainStep(:final stage) => CreateKeychainPanel(stage: stage),
           FinishAccountCreationStep() => const FinishAccountCreationPanel(),
           WalletLinkStep(:final stage) => WalletLinkPanel(stage: stage),
