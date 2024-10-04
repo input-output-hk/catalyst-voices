@@ -74,7 +74,7 @@ impl GetTxiByTxnHashesQuery {
         session: &CassandraSession, params: GetTxiByTxnHashesQueryParams,
     ) -> anyhow::Result<TypedRowIterator<result::GetTxiByTxnHashesQuery>> {
         let iter = session
-            .execute_iter(PreparedSelectQuery::GetTxiByTransactionHash, params)
+            .execute_iter(PreparedSelectQuery::TxiByTransactionHash, params)
             .await?
             .into_typed::<result::GetTxiByTxnHashesQuery>();
 
