@@ -21,6 +21,7 @@
   - [Debugging the cluster](#debugging-the-cluster)
     - [SSH into a running VM](#ssh-into-a-running-vm)
   - [Local UI to access ScyllaDB](#local-ui-to-access-scylladb)
+  - [Troubleshooting](#troubleshooting)
 
 
 ## Requirements
@@ -232,3 +233,12 @@ Found (and tested) description how to connect using only open-source via DBeaver
 9. click Find Class to make sure the Class Name is found okay
 10. click OK
 11. Create New Connection, selecting the database driver you just added
+
+## Troubleshooting
+
+If you encounter any weird issues with the Vagrant, you can try the following:
+
+```sh
+rm -rf .vagrant
+```
+and then restart the cluster.

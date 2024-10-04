@@ -24,10 +24,9 @@ _check-cluster-prereqs:
 start-cluster: _check-cluster-prereqs
     vagrant up
 
-# Start the development cluster - only on a aarch64 macos machine
 start-cluster-aarch64-macos: _check-cluster-prereqs
-    VAGRANT_LOG=debug VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 vagrant plugin install vagrant-vmware-desktop
-    vagrant up control --provider=vmware_fusion
+    VAGRANT_LOG=debug VAGRANT_DISABLE_STRICT_DEPENDENCY_ENFORCEMENT=1 vagrant plugin install vagrant-qemu
+    vagrant up control --provider=qemu
 
 # Pause the development cluster - does not destroy it
 suspend-cluster:
