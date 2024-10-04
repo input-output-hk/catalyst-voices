@@ -12,10 +12,10 @@ class RegistrationDetailsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RegistrationCubit, RegistrationState>(
-      buildWhen: (previous, current) => previous.step != current.step,
+    return BlocSelector<RegistrationCubit, RegistrationState, RegistrationStep>(
+      selector: (state) => state.step,
       builder: (context, state) {
-        return switch (state.step) {
+        return switch (state) {
           GetStartedStep() => const GetStartedPanel(),
           RecoverStep() => const Placeholder(),
           CreateKeychainStep(:final stage) => CreateKeychainPanel(stage: stage),

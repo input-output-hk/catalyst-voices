@@ -86,24 +86,24 @@ class _BlocSeedPhraseWords extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocSeedPhraseBuilder<
-        (
+        ({
           List<String> shuffledWords,
           List<String> words,
           bool isResetWordsEnabled,
-        )>(
+        })>(
       selector: (state) => (
-        state.shuffledWords,
-        state.userWords,
-        state.isResetWordsEnabled,
+        shuffledWords: state.shuffledWords,
+        words: state.userWords,
+        isResetWordsEnabled: state.isResetWordsEnabled,
       ),
       builder: (context, state) {
         return _SeedPhraseWords(
-          words: state.$1,
-          userWords: state.$2,
+          words: state.shuffledWords,
+          userWords: state.words,
           onUserWordsChanged: onUserWordsChanged,
           onUploadTap: onUploadTap,
           onResetTap: onResetTap,
-          isResetEnabled: state.$3,
+          isResetEnabled: state.isResetWordsEnabled,
         );
       },
     );

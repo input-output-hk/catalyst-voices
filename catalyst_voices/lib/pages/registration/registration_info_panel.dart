@@ -31,8 +31,17 @@ class RegistrationInfoPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RegistrationCubit, RegistrationState>(
-      buildWhen: (previous, current) => previous.step != current.step,
+    return BlocSelector<
+        RegistrationCubit,
+        RegistrationState,
+        ({
+          RegistrationStep step,
+          double? progress,
+        })>(
+      selector: (state) => (
+        step: state.step,
+        progress: state.progress,
+      ),
       builder: (context, state) {
         final headerStrings = _buildHeaderStrings(
           context,
