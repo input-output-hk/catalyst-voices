@@ -2,6 +2,7 @@
 //!
 //! This improves query execution time.
 
+pub(crate) mod registrations;
 pub(crate) mod staked_ada;
 pub(crate) mod sync_status;
 
@@ -9,6 +10,10 @@ use std::{fmt::Debug, sync::Arc};
 
 use anyhow::{bail, Context};
 use crossbeam_skiplist::SkipMap;
+use registrations::{
+    get_from_stake_addr::GetRegistrationQuery, get_from_stake_hash::GetStakeAddrQuery,
+    get_from_vote_key::GetStakeAddrFromVoteKeyQuery, get_invalid::GetInvalidRegistrationQuery,
+};
 use scylla::{
     batch::Batch, prepared_statement::PreparedStatement, serialize::row::SerializeRow,
     transport::iterator::RowIterator, QueryResult, Session,
@@ -65,9 +70,17 @@ pub(crate) enum PreparedQuery {
 /// All prepared SELECT query statements (return data).
 pub(crate) enum PreparedSelectQuery {
     /// Get TXO by stake address query.
-    GetTxoByStakeAddress,
+    TxoByStakeAddress,
     /// Get TXI by transaction hash query.
-    GetTxiByTransactionHash,
+    TxiByTransactionHash,
+    /// Get Registrations
+    RegistrationFromStakeAddr,
+    /// Get invalid Registration
+    InvalidRegistrationsFromStakeAddr,
+    /// Get stake addr from stake hash
+    StakeAddrFromStakeHash,
+    /// Get stake addr from vote key
+    StakeAddrFromVoteKey,
 }
 
 /// All prepared UPSERT query statements (inserts/updates a single value of data).
@@ -111,6 +124,14 @@ pub(crate) struct PreparedQueries {
     chain_root_for_role0_key_insert_queries: SizedBatch,
     /// Chain Root for Stake Address Insert Query..
     chain_root_for_stake_address_insert_queries: SizedBatch,
+    /// Get registrations
+    registration_from_stake_addr_query: PreparedStatement,
+    /// stake addr from stake hash
+    stake_addr_from_stake_hash_query: PreparedStatement,
+    /// stake addr from vote key
+    stake_addr_from_vote_key_query: PreparedStatement,
+    /// Get invalid registrations
+    invalid_registrations_from_stake_addr_query: PreparedStatement,
     /// Insert Sync Status update.
     sync_status_insert: PreparedStatement,
 }
@@ -138,6 +159,11 @@ impl PreparedQueries {
         let txo_by_stake_address_query = GetTxoByStakeAddressQuery::prepare(session.clone()).await;
         let txi_by_txn_hash_query = GetTxiByTxnHashesQuery::prepare(session.clone()).await;
         let all_rbac_queries = Rbac509InsertQuery::prepare_batch(&session, cfg).await;
+        let registration_from_stake_addr_query =
+            GetRegistrationQuery::prepare(session.clone()).await;
+        let stake_addr_from_stake_hash = GetStakeAddrQuery::prepare(session.clone()).await;
+        let stake_addr_from_vote_key = GetStakeAddrFromVoteKeyQuery::prepare(session.clone()).await;
+        let invalid_registrations = GetInvalidRegistrationQuery::prepare(session.clone()).await;
         let sync_status_insert = SyncStatusInsertQuery::prepare(session).await;
 
         let (
@@ -177,6 +203,10 @@ impl PreparedQueries {
             chain_root_for_txn_id_insert_queries,
             chain_root_for_role0_key_insert_queries,
             chain_root_for_stake_address_insert_queries,
+            registration_from_stake_addr_query: registration_from_stake_addr_query?,
+            stake_addr_from_stake_hash_query: stake_addr_from_stake_hash?,
+            stake_addr_from_vote_key_query: stake_addr_from_vote_key?,
+            invalid_registrations_from_stake_addr_query: invalid_registrations?,
             sync_status_insert: sync_status_insert?,
         })
     }
@@ -252,8 +282,16 @@ impl PreparedQueries {
     ) -> anyhow::Result<RowIterator>
     where P: SerializeRow {
         let prepared_stmt = match select_query {
-            PreparedSelectQuery::GetTxoByStakeAddress => &self.txo_by_stake_address_query,
-            PreparedSelectQuery::GetTxiByTransactionHash => &self.txi_by_txn_hash_query,
+            PreparedSelectQuery::TxoByStakeAddress => &self.txo_by_stake_address_query,
+            PreparedSelectQuery::TxiByTransactionHash => &self.txi_by_txn_hash_query,
+            PreparedSelectQuery::RegistrationFromStakeAddr => {
+                &self.registration_from_stake_addr_query
+            },
+            PreparedSelectQuery::StakeAddrFromStakeHash => &self.stake_addr_from_stake_hash_query,
+            PreparedSelectQuery::StakeAddrFromVoteKey => &self.stake_addr_from_vote_key_query,
+            PreparedSelectQuery::InvalidRegistrationsFromStakeAddr => {
+                &self.invalid_registrations_from_stake_addr_query
+            },
         };
 
         session
