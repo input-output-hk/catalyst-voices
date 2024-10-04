@@ -3,6 +3,7 @@
 //! This improves query execution time.
 
 pub(crate) mod staked_ada;
+pub(crate) mod sync_status;
 
 use std::{fmt::Debug, sync::Arc};
 
@@ -16,6 +17,7 @@ use staked_ada::{
     get_txi_by_txn_hash::GetTxiByTxnHashesQuery,
     get_txo_by_stake_address::GetTxoByStakeAddressQuery, update_txo_spent::UpdateTxoSpentQuery,
 };
+use sync_status::update::SyncStatusInsertQuery;
 
 use super::block::{
     certs::CertInsertQuery, cip36::Cip36InsertQuery, rbac509::Rbac509InsertQuery,
@@ -60,12 +62,18 @@ pub(crate) enum PreparedQuery {
     ChainRootForStakeAddressInsertQuery,
 }
 
-/// All prepared SELECT query statements.
+/// All prepared SELECT query statements (return data).
 pub(crate) enum PreparedSelectQuery {
     /// Get TXO by stake address query.
     GetTxoByStakeAddress,
     /// Get TXI by transaction hash query.
     GetTxiByTransactionHash,
+}
+
+/// All prepared UPSERT query statements (inserts/updates a single value of data).
+pub(crate) enum PreparedUpsertQuery {
+    /// Sync Status Insert
+    SyncStatusInsert,
 }
 
 /// All prepared queries for a session.
@@ -103,6 +111,8 @@ pub(crate) struct PreparedQueries {
     chain_root_for_role0_key_insert_queries: SizedBatch,
     /// Chain Root for Stake Address Insert Query..
     chain_root_for_stake_address_insert_queries: SizedBatch,
+    /// Insert Sync Status update.
+    sync_status_insert: PreparedStatement,
 }
 
 /// An individual query response that can fail
@@ -128,6 +138,7 @@ impl PreparedQueries {
         let txo_by_stake_address_query = GetTxoByStakeAddressQuery::prepare(session.clone()).await;
         let txi_by_txn_hash_query = GetTxiByTxnHashesQuery::prepare(session.clone()).await;
         let all_rbac_queries = Rbac509InsertQuery::prepare_batch(&session, cfg).await;
+        let sync_status_insert = SyncStatusInsertQuery::prepare(session).await;
 
         let (
             txo_insert_queries,
@@ -166,6 +177,7 @@ impl PreparedQueries {
             chain_root_for_txn_id_insert_queries,
             chain_root_for_role0_key_insert_queries,
             chain_root_for_stake_address_insert_queries,
+            sync_status_insert: sync_status_insert?,
         })
     }
 
@@ -210,6 +222,25 @@ impl PreparedQueries {
         }
 
         Ok(sized_batches)
+    }
+
+    /// Executes a single query with the given parameters.
+    ///
+    /// Returns no data, and an error if the query fails.
+    pub(crate) async fn execute_upsert<P>(
+        &self, session: Arc<Session>, upsert_query: PreparedUpsertQuery, params: P,
+    ) -> anyhow::Result<()>
+    where P: SerializeRow {
+        let prepared_stmt = match upsert_query {
+            PreparedUpsertQuery::SyncStatusInsert => &self.sync_status_insert,
+        };
+
+        session
+            .execute_unpaged(prepared_stmt, params)
+            .await
+            .map_err(|e| anyhow::anyhow!(e))?;
+
+        Ok(())
     }
 
     /// Executes a select query with the given parameters.
