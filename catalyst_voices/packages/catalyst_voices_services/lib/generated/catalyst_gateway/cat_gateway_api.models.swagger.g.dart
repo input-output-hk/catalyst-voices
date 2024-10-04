@@ -30,6 +30,47 @@ Map<String, dynamic> _$BlockDateToJson(BlockDate instance) => <String, dynamic>{
       'slot_id': instance.slotId,
     };
 
+Cip36Info _$Cip36InfoFromJson(Map<String, dynamic> json) => Cip36Info(
+      stakeAddress: json['stake_address'] as String,
+      nonce: (json['nonce'] as num).toInt(),
+      slotNo: (json['slot_no'] as num).toInt(),
+      txn: (json['txn'] as num).toInt(),
+      voteKey: json['vote_key'] as String,
+      paymentAddress: json['payment_address'] as String,
+      isPayable: json['is_payable'] as bool,
+      cip36: json['cip36'] as bool,
+    );
+
+Map<String, dynamic> _$Cip36InfoToJson(Cip36Info instance) => <String, dynamic>{
+      'stake_address': instance.stakeAddress,
+      'nonce': instance.nonce,
+      'slot_no': instance.slotNo,
+      'txn': instance.txn,
+      'vote_key': instance.voteKey,
+      'payment_address': instance.paymentAddress,
+      'is_payable': instance.isPayable,
+      'cip36': instance.cip36,
+    };
+
+Cip36Reporting _$Cip36ReportingFromJson(Map<String, dynamic> json) =>
+    Cip36Reporting(
+      cip36: (json['cip36'] as List<dynamic>?)
+              ?.map((e) => Cip36Info.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      invalids: (json['invalids'] as List<dynamic>?)
+              ?.map((e) => InvalidRegistrationsReport.fromJson(
+                  e as Map<String, dynamic>))
+              .toList() ??
+          [],
+    );
+
+Map<String, dynamic> _$Cip36ReportingToJson(Cip36Reporting instance) =>
+    <String, dynamic>{
+      'cip36': instance.cip36.map((e) => e.toJson()).toList(),
+      'invalids': instance.invalids.map((e) => e.toJson()).toList(),
+    };
+
 DelegatePublicKey _$DelegatePublicKeyFromJson(Map<String, dynamic> json) =>
     DelegatePublicKey(
       address: json['address'] as String,
@@ -132,6 +173,31 @@ Hash _$HashFromJson(Map<String, dynamic> json) => Hash(
 
 Map<String, dynamic> _$HashToJson(Hash instance) => <String, dynamic>{
       'hash': instance.hash,
+    };
+
+InvalidRegistrationsReport _$InvalidRegistrationsReportFromJson(
+        Map<String, dynamic> json) =>
+    InvalidRegistrationsReport(
+      errorReport: (json['error_report'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
+      stakeAddress: json['stake_address'] as String,
+      voteKey: json['vote_key'] as String,
+      paymentAddress: json['payment_address'] as String,
+      isPayable: json['is_payable'] as bool,
+      cip36: json['cip36'] as bool,
+    );
+
+Map<String, dynamic> _$InvalidRegistrationsReportToJson(
+        InvalidRegistrationsReport instance) =>
+    <String, dynamic>{
+      'error_report': instance.errorReport,
+      'stake_address': instance.stakeAddress,
+      'vote_key': instance.voteKey,
+      'payment_address': instance.paymentAddress,
+      'is_payable': instance.isPayable,
+      'cip36': instance.cip36,
     };
 
 RegistrationInfo _$RegistrationInfoFromJson(Map<String, dynamic> json) =>

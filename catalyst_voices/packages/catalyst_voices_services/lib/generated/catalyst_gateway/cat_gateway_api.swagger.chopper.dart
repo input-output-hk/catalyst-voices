@@ -142,6 +142,57 @@ final class _$CatGatewayApi extends CatGatewayApi {
   }
 
   @override
+  Future<Response<Cip36Reporting>>
+      _apiCardanoCip36LatestRegistrationStakeAddrGet(
+          {required String? stakeAddr}) {
+    final Uri $url =
+        Uri.parse('/api/cardano/cip36/latest_registration/stake_addr');
+    final Map<String, dynamic> $params = <String, dynamic>{
+      'stake_addr': stakeAddr
+    };
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+      parameters: $params,
+    );
+    return client.send<Cip36Reporting, Cip36Reporting>($request);
+  }
+
+  @override
+  Future<Response<Cip36Reporting>>
+      _apiCardanoCip36LatestRegistrationStakeKeyHashGet(
+          {required String? stakeKeyHash}) {
+    final Uri $url =
+        Uri.parse('/api/cardano/cip36/latest_registration/stake_key_hash');
+    final Map<String, dynamic> $params = <String, dynamic>{
+      'stake_key_hash': stakeKeyHash
+    };
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+      parameters: $params,
+    );
+    return client.send<Cip36Reporting, Cip36Reporting>($request);
+  }
+
+  @override
+  Future<Response<List<Cip36Reporting>>>
+      _apiCardanoCip36LatestRegistrationVoteKeyGet({required String? voteKey}) {
+    final Uri $url =
+        Uri.parse('/api/cardano/cip36/latest_registration/vote_key');
+    final Map<String, dynamic> $params = <String, dynamic>{'vote_key': voteKey};
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+      parameters: $params,
+    );
+    return client.send<List<Cip36Reporting>, Cip36Reporting>($request);
+  }
+
+  @override
   Future<Response<VoterRegistration>> _apiRegistrationVoterVotingKeyGet({
     required String? votingKey,
     int? eventId,
