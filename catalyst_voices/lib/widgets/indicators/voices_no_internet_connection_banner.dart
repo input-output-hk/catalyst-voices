@@ -35,12 +35,13 @@ class NoInternetConnectionBanner extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final shouldButtonDisplay = constraints.maxWidth > 744;
+        final foregroundColor = Theme.of(context).colorScheme.errorContainer;
 
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           margin: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Theme.of(context).colors.avatarsError,
+            color: Theme.of(context).colorScheme.error,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
@@ -56,20 +57,26 @@ class NoInternetConnectionBanner extends StatelessWidget {
                       children: [
                         CatalystSvgIcon.asset(
                           VoicesAssets.icons.wifi.path,
-                          color: Theme.of(context).colors.iconsForeground,
+                          color: foregroundColor,
                         ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             context.l10n.noConnectionBannerTitle,
-                            style: Theme.of(context).textTheme.titleLarge,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge
+                                ?.copyWith(color: foregroundColor),
                           ),
                         ),
                       ],
                     ),
                     Text(
                       context.l10n.noConnectionBannerDescription,
-                      style: Theme.of(context).textTheme.bodySmall,
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.copyWith(color: foregroundColor),
                       softWrap: true,
                     ),
                   ],
@@ -81,7 +88,9 @@ class NoInternetConnectionBanner extends StatelessWidget {
                   onTap: onRefresh,
                   child: Text(
                     context.l10n.noConnectionBannerRefreshButtonText,
-                    style: Theme.of(context).textTheme.labelLarge,
+                    style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: Theme.of(context).colors.onErrorVariant,
+                        ),
                   ),
                 ),
               ],

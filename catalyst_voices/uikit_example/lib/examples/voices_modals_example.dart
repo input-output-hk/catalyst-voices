@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class VoicesModalsExample extends StatelessWidget {
@@ -20,6 +21,27 @@ class VoicesModalsExample extends StatelessWidget {
           spacing: 16,
           runSpacing: 16,
           children: [
+            VoicesFilledButton(
+              child: const Text('Upload file dialog'),
+              onTap: () async {
+                final file = await VoicesUploadFileDialog.show(
+                  context,
+                  title: context.l10n.uploadKeychainTitle,
+                  itemNameToUpload: context.l10n.key,
+                  info: context.l10n.uploadKeychainInfo,
+                  allowedExtensions: ['ckf', 'log'],
+                  onUpload: (_) async {
+                    await Future<void>.delayed(const Duration(seconds: 2));
+                  },
+                  onCancel: () => debugPrint(
+                    'onCancel, we can cancel upload here',
+                  ),
+                );
+                if (file != null) {
+                  debugPrint('uploaded file: ${file.name}');
+                }
+              },
+            ),
             VoicesFilledButton(
               child: const Text('Desktop info dialog'),
               onTap: () async {
