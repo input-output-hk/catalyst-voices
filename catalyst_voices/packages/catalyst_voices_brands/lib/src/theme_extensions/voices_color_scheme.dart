@@ -62,6 +62,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
   final Color? primary98;
   final Color? primaryContainer;
   final Color? onPrimaryContainer;
+  final Color? onErrorVariant;
   final Color? errorContainer;
   final Color? onErrorContainer;
 
@@ -121,6 +122,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     required this.primary98,
     required this.primaryContainer,
     required this.onPrimaryContainer,
+    required this.onErrorVariant,
     required this.errorContainer,
     required this.onErrorContainer,
   });
@@ -182,6 +184,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     this.primary98,
     this.primaryContainer,
     this.onPrimaryContainer,
+    this.onErrorVariant,
     this.errorContainer,
     this.onErrorContainer,
   });
@@ -243,6 +246,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     Color? primary98,
     Color? primaryContainer,
     Color? onPrimaryContainer,
+    Color? onErrorVariant,
     Color? errorContainer,
     Color? onErrorContainer,
   }) {
@@ -314,6 +318,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       primary98: primary98 ?? this.primary98,
       primaryContainer: primaryContainer ?? this.primaryContainer,
       onPrimaryContainer: onPrimaryContainer ?? this.onPrimaryContainer,
+      onErrorVariant: onErrorVariant ?? this.onErrorVariant,
       errorContainer: errorContainer ?? this.errorContainer,
       onErrorContainer: onErrorContainer ?? this.onErrorContainer,
     );
@@ -447,6 +452,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       primaryContainer: Color.lerp(primaryContainer, other.primaryContainer, t),
       onPrimaryContainer:
           Color.lerp(onPrimaryContainer, other.onPrimaryContainer, t),
+      onErrorVariant: Color.lerp(onErrorVariant, other.onErrorVariant, t),
       errorContainer: Color.lerp(errorContainer, other.errorContainer, t),
       onErrorContainer: Color.lerp(onErrorContainer, other.onErrorContainer, t),
     );

@@ -32,11 +32,14 @@ dependencies:
   catalyst_voices_view_models:
     path: ./packages/catalyst_voices_view_models
   collection: ^1.18.0
+  dotted_border: ^2.1.0
   equatable: ^2.0.5
+  file_picker: ^8.0.7
   flutter:
     sdk: flutter
   flutter_adaptive_scaffold: ^0.2.4
   flutter_bloc: ^8.1.5
+  flutter_dropzone: ^4.0.3
   flutter_localized_locales: ^2.0.5
   flutter_quill: ^10.8.2
   flutter_quill_extensions: ^10.8.2
@@ -50,6 +53,7 @@ dependencies:
   sentry_flutter: ^8.8.0
   url_launcher: ^6.2.2
   url_strategy: ^0.3.0
+  web: ^1.1.0
   # TODO(dtscalac): win32 dependency is just a transitive dependency and shouldn't be imported
   # but here we import it explicitly to make sure the latest version is used which addresses
   # the problem from here: https://github.com/jonataslaw/get_cli/issues/263

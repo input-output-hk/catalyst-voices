@@ -20,6 +20,7 @@
     <color name="light_outline_variant">#61BFC8D9</color>
     <color name="light_error">#CC0000</color>
     <color name="light_on_error">#FFFFFF</color>
+    <color name="light_on_error_variant">#FFFFFF</color>
     <color name="light_error_container">#FFD1D1</color>
     <color name="light_on_error_container">#700000</color>
     <color name="light_success">#218230</color>
@@ -87,6 +88,7 @@
     <color name="dark_outline_variant">#364463</color>
     <color name="dark_error">#FF9999</color>
     <color name="dark_on_error">#380000</color>
+    <color name="dark_on_error_variant">#FFFFFF</color>
     <color name="dark_error_container">#AD0000</color>
     <color name="dark_on_error_container">#FFD1D1</color>
     <color name="dark_success">#BAEDC2</color>
