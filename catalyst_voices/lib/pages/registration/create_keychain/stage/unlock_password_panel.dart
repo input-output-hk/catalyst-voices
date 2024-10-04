@@ -1,17 +1,16 @@
+import 'package:catalyst_voices/pages/registration/create_keychain/bloc_unlock_password_builder.dart';
 import 'package:catalyst_voices/pages/registration/registration_stage_navigation.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_password_strength_indicator.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_password_text_field.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class UnlockPasswordPanel extends StatefulWidget {
-  final UnlockPasswordState data;
-
   const UnlockPasswordPanel({
     super.key,
-    required this.data,
   });
 
   @override
@@ -26,8 +25,13 @@ class _UnlockPasswordPanelState extends State<UnlockPasswordPanel> {
   void initState() {
     super.initState();
 
-    final password = widget.data.password;
-    final confirmPassword = widget.data.confirmPassword;
+    final unlockPasswordState = RegistrationCubit.of(context)
+        .state
+        .keychainStateData
+        .unlockPasswordState;
+
+    final password = unlockPasswordState.password;
+    final confirmPassword = unlockPasswordState.confirmPassword;
 
     _passwordController = TextEditingController(text: password)
       ..addListener(_onPasswordChanged);
@@ -53,20 +57,14 @@ class _UnlockPasswordPanelState extends State<UnlockPasswordPanel> {
           controller: _passwordController,
         ),
         const SizedBox(height: 12),
-        _ConfirmPasswordTextField(
+        _BlocConfirmPasswordTextField(
           controller: _confirmPasswordController,
-          showError: widget.data.showPasswordMisMatch,
-          minimumLength: widget.data.minPasswordLength,
         ),
         const Spacer(),
         const SizedBox(height: 22),
-        if (widget.data.showPasswordStrength)
-          VoicesPasswordStrengthIndicator(
-            passwordStrength: widget.data.passwordStrength,
-          ),
+        const _BlocPasswordStrength(),
         const SizedBox(height: 22),
-        RegistrationBackNextNavigation(
-          isNextEnabled: widget.data.isNextEnabled,
+        _BlocNavigation(
           onNextTap: _createKeychain,
           onBackTap: _clearPasswordAndGoBack,
         ),
@@ -76,25 +74,33 @@ class _UnlockPasswordPanelState extends State<UnlockPasswordPanel> {
 
   void _onPasswordChanged() {
     final password = _passwordController.text;
-    RegistrationCubit.of(context).setPassword(password);
+
+    RegistrationCubit.of(context).keychainCreation.setPassword(password);
   }
 
   void _onConfirmPasswordChanged() {
     final confirmPassword = _confirmPasswordController.text;
-    RegistrationCubit.of(context).setConfirmPassword(confirmPassword);
+
+    RegistrationCubit.of(context)
+        .keychainCreation
+        .setConfirmPassword(confirmPassword);
   }
 
   void _clearPasswordAndGoBack() {
-    RegistrationCubit.of(context)
+    final registration = RegistrationCubit.of(context);
+
+    registration.keychainCreation
       ..setPassword('')
-      ..setConfirmPassword('')
-      ..previousStep();
+      ..setConfirmPassword('');
+
+    registration.previousStep();
   }
 
   Future<void> _createKeychain() async {
     final registrationCubit = RegistrationCubit.of(context);
 
-    await registrationCubit.createKeychain();
+    await registrationCubit.keychainCreation.createKeychain();
+
     registrationCubit.nextStep();
   }
 }
@@ -114,6 +120,31 @@ class _EnterPasswordTextField extends StatelessWidget {
       decoration: VoicesTextFieldDecoration(
         labelText: context.l10n.enterPassword,
       ),
+    );
+  }
+}
+
+class _BlocConfirmPasswordTextField extends StatelessWidget {
+  final TextEditingController controller;
+
+  const _BlocConfirmPasswordTextField({
+    required this.controller,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocUnlockPasswordBuilder<({bool showError, int minimumLength})>(
+      selector: (state) => (
+        showError: state.showPasswordMisMatch,
+        minimumLength: state.minPasswordLength,
+      ),
+      builder: (context, state) {
+        return _ConfirmPasswordTextField(
+          controller: controller,
+          showError: state.showError,
+          minimumLength: state.minimumLength,
+        );
+      },
     );
   }
 }
@@ -138,6 +169,52 @@ class _ConfirmPasswordTextField extends StatelessWidget {
         helperText: context.l10n.xCharactersMinimum(minimumLength),
         errorText: showError ? context.l10n.passwordDoNotMatch : null,
       ),
+    );
+  }
+}
+
+class _BlocPasswordStrength extends StatelessWidget {
+  const _BlocPasswordStrength();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocUnlockPasswordBuilder<({bool show, PasswordStrength strength})>(
+      selector: (state) => (
+        show: state.showPasswordStrength,
+        strength: state.passwordStrength,
+      ),
+      builder: (context, state) {
+        return Offstage(
+          offstage: !state.show,
+          child: VoicesPasswordStrengthIndicator(
+            passwordStrength: state.strength,
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _BlocNavigation extends StatelessWidget {
+  final VoidCallback onNextTap;
+  final VoidCallback onBackTap;
+
+  const _BlocNavigation({
+    required this.onNextTap,
+    required this.onBackTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocUnlockPasswordBuilder<bool>(
+      selector: (state) => state.isNextEnabled,
+      builder: (context, state) {
+        return RegistrationBackNextNavigation(
+          isNextEnabled: state,
+          onNextTap: onNextTap,
+          onBackTap: onBackTap,
+        );
+      },
     );
   }
 }
