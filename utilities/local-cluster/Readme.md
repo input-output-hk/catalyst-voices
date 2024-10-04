@@ -22,20 +22,11 @@
     - [SSH into a running VM](#ssh-into-a-running-vm)
   - [Local UI to access ScyllaDB](#local-ui-to-access-scylladb)
   - [Troubleshooting](#troubleshooting)
-
+    - [Issues with Vagrant configurations](#issues-with-vagrant-configurations)
+    - [Issues with running command with just](#issues-with-running-command-with-just)
+    - [Vagrant cannot forward the specified ports on a VM](#vagrant-cannot-forward-the-specified-ports-on-a-vm)
 
 ## Requirements
-
-https://github.com/casey/just
-
-config.vm.forward_port 80, 5656
-
-
-### macOS
-
-
-https://www.virtualbox.org/wiki/Testbuilds
-https://www.virtualbox.org/wiki/Testbuilds
 
 Integration Tests and local testing will require a running local cluster.
 To eliminate variability and simplify local deployment, we have standardized the local cluster around:
@@ -44,6 +35,11 @@ To eliminate variability and simplify local deployment, we have standardized the
 * [Vagrant](https://developer.hashicorp.com/vagrant/install?product_intent=vagrant)
 * [kubectl](https://kubernetes.io/docs/tasks/tools/)
 * [helm](https://helm.sh/docs/intro/install/)
+* [just](https://github.com/casey/just)
+
+### macOS
+
+https://www.virtualbox.org/wiki/Testbuilds
 
 These tools allow us to define VMs that are consistent and provide a uniform Kubernetes environment
 for local testing.
@@ -213,13 +209,13 @@ vagrant ssh agent99
 
 Found (and tested) description how to connect using only open-source via DBeaver:
 
-1. Download dbeaver (Community Edition) https://dbeaver.io/download/
-2. Download cassandra jdbc jar files: http://www.dbschema.com/cassandra-jdbc-driver.html
+1. Download dbeaver (Community Edition) [dbeaver](https://dbeaver.io/download)
+2. Download cassandra jdbc jar files: [cassandra-jdbc-drive](http://www.dbschema.com/cassandra-jdbc-driver.html)
    (Downloading and Testing the Driver Binaries section have links to binary and source)
-3. extract Cassandra JDBC zip
-4. run DBeaver
-5. go to Database > Driver Manager
-6. click New
+3. Extract Cassandra JDBC zip
+4. Run DBeaver
+5. Go to `Database` > `Driver Manager`
+6. Click `New`
 7. Fill in details as follows:
    * Driver Name: `Cassandra` (or whatever you want it to say)
    * Driver Type: `Generic`
@@ -229,12 +225,14 @@ Found (and tested) description how to connect using only open-source via DBeaver
    * Embedded: `no`
    * Category:
    * Description: `Cassandra` (or whatever you want it to say)
-8. click Add File and add all the jars in the Cassandra JDBC zip file.
-9. click Find Class to make sure the Class Name is found okay
-10. click OK
-11. Create New Connection, selecting the database driver you just added
+8. Click Add File and add all the jars in the Cassandra JDBC zip file.
+9. Click Find Class to make sure the Class Name is found okay.
+10. Click `OK`.
+11. Create `New Connection`, selecting the database driver you just added.
 
 ## Troubleshooting
+
+### Issues with Vagrant configurations
 
 If you encounter any weird issues with the Vagrant, you can try the following:
 
@@ -242,3 +240,94 @@ If you encounter any weird issues with the Vagrant, you can try the following:
 rm -rf .vagrant
 ```
 and then restart the cluster.
+
+### Issues with running command with just
+
+If you encounter any issues with running the commands with `just`,
+you can try running the commands directly.
+
+Instead of:
+
+```sh
+just stop-cluster
+```
+
+run:
+
+```sh
+vagrant destroy -f
+```
+For more see [justfile](./justfile)
+
+### Vagrant cannot forward the specified ports on a VM
+
+1. Check if Port 6443 is in Use:
+
+```sh
+sudo lsof -i :6443
+```
+You can see the output like this:
+
+```sh
+COMMAND     PID    USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+qemu-syst 42886 username   19u  IPv4 0x9af1245915ca3e76      0t0  TCP *:sun-sr-https (LISTEN)
+```
+
+The process qemu-syst (which stands for qemu-system), with PID 42886, is listening on port 6443.
+This means that a QEMU virtual machine is currently running and using port 6443 on your host machine.
+
+Since you’re using the QEMU provider with Vagrant, it’s likely that an existing VM is still running and occupying port 6443.
+This is preventing your new Vagrant VM from forwarding port 6443, resulting in the error
+
+2. List all running Vagrant VMs to see if any are currently active:
+
+```sh
+vagrant global-status
+```
+
+This command will list all Vagrant environments on your system. Look for any VMs that are in the running state.
+
+```sh
+id       name    provider   state   directory
+--------------------------------------------------------------------------------------
+abcd123  control qemu       running /path/to/your/project
+efgh456  othervm qemu       running /another/project
+```
+3.  Halt or Destroy the Existing VM
+
+If you find that a VM is running that you no longer need, you can halt or destroy it.
+
+**To halt the VM:**
+
+```sh
+vagrant halt <id>
+```
+
+**To destroy the VM:**
+
+```sh
+vagrant destroy <id>
+```
+
+Replace <id> with the ID of the VM from the vagrant global-status output.
+For example: `vagrant halt abcd123`
+
+4. Kill the QEMU Process Manually (If Necessary)
+
+If the VM is not managed by Vagrant, or if it did not shut down properly,
+you may need to kill the QEMU process manually.
+
+```sh
+kill 42886
+```
+
+Replace 42886 with the PID from your lsof output.
+
+5. Confirm the Process is Terminated:
+
+```sh
+sudo lsof -i :6443
+```
+This should return no output, indicating that no process is listening on port 6443.
+
+6. Retry Bringing Up the Vagrant VM.
