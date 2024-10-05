@@ -35,6 +35,7 @@ pre-push: sync-cfg code-format code-lint license-check
     cd .. && earthly ./catalyst-gateway+check
     cd .. && earthly ./catalyst-gateway+build
     cd .. && earthly ./catalyst-gateway+package-cat-gateway
+    cd .. && earthly ./catalyst-gateway/tests+test-lint-openapi
 
 # Build Local release build of catalyst gateway
 build-cat-gateway: code-format code-lint
