@@ -178,7 +178,7 @@ final class _$CatGatewayApi extends CatGatewayApi {
   }
 
   @override
-  Future<Response<List<Cip36Reporting>>>
+  Future<Response<Cip36ReportingList>>
       _apiCardanoCip36LatestRegistrationVoteKeyGet({required String? voteKey}) {
     final Uri $url =
         Uri.parse('/api/cardano/cip36/latest_registration/vote_key');
@@ -189,7 +189,7 @@ final class _$CatGatewayApi extends CatGatewayApi {
       client.baseUrl,
       parameters: $params,
     );
-    return client.send<List<Cip36Reporting>, Cip36Reporting>($request);
+    return client.send<Cip36ReportingList, Cip36ReportingList>($request);
   }
 
   @override

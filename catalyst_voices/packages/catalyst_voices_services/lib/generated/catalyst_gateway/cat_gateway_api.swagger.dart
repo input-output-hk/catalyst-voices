@@ -232,10 +232,10 @@ abstract class CatGatewayApi extends ChopperService {
 
   ///Cip36 registrations
   ///@param vote_key
-  Future<chopper.Response<List<Cip36Reporting>>>
+  Future<chopper.Response<Cip36ReportingList>>
       apiCardanoCip36LatestRegistrationVoteKeyGet({required String? voteKey}) {
     generatedMapping.putIfAbsent(
-        Cip36Reporting, () => Cip36Reporting.fromJsonFactory);
+        Cip36ReportingList, () => Cip36ReportingList.fromJsonFactory);
 
     return _apiCardanoCip36LatestRegistrationVoteKeyGet(voteKey: voteKey);
   }
@@ -243,7 +243,7 @@ abstract class CatGatewayApi extends ChopperService {
   ///Cip36 registrations
   ///@param vote_key
   @Get(path: '/api/cardano/cip36/latest_registration/vote_key')
-  Future<chopper.Response<List<Cip36Reporting>>>
+  Future<chopper.Response<Cip36ReportingList>>
       _apiCardanoCip36LatestRegistrationVoteKeyGet(
           {@Query('vote_key') required String? voteKey});
 
