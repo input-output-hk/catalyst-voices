@@ -275,13 +275,35 @@ Map<String, dynamic> _$SlotInfoToJson(SlotInfo instance) => <String, dynamic>{
     };
 
 StakeInfo _$StakeInfoFromJson(Map<String, dynamic> json) => StakeInfo(
-      amount: (json['amount'] as num).toInt(),
+      adaAmount: (json['ada_amount'] as num).toInt(),
       slotNumber: (json['slot_number'] as num).toInt(),
+      nativeTokens: (json['native_tokens'] as List<dynamic>?)
+              ?.map((e) =>
+                  StakedNativeTokenInfo.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
 
 Map<String, dynamic> _$StakeInfoToJson(StakeInfo instance) => <String, dynamic>{
-      'amount': instance.amount,
+      'ada_amount': instance.adaAmount,
       'slot_number': instance.slotNumber,
+      'native_tokens': instance.nativeTokens.map((e) => e.toJson()).toList(),
+    };
+
+StakedNativeTokenInfo _$StakedNativeTokenInfoFromJson(
+        Map<String, dynamic> json) =>
+    StakedNativeTokenInfo(
+      policyHash: json['policy_hash'] as String,
+      policyName: json['policy_name'] as String,
+      amount: (json['amount'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$StakedNativeTokenInfoToJson(
+        StakedNativeTokenInfo instance) =>
+    <String, dynamic>{
+      'policy_hash': instance.policyHash,
+      'policy_name': instance.policyName,
+      'amount': instance.amount,
     };
 
 StatusInABlock _$StatusInABlockFromJson(Map<String, dynamic> json) =>
