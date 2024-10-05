@@ -294,6 +294,49 @@ extension $Cip36ReportingExtension on Cip36Reporting {
 }
 
 @JsonSerializable(explicitToJson: true)
+class Cip36ReportingList {
+  const Cip36ReportingList({
+    required this.cip36,
+  });
+
+  factory Cip36ReportingList.fromJson(Map<String, dynamic> json) =>
+      _$Cip36ReportingListFromJson(json);
+
+  static const toJsonFactory = _$Cip36ReportingListToJson;
+  Map<String, dynamic> toJson() => _$Cip36ReportingListToJson(this);
+
+  @JsonKey(name: 'cip36', defaultValue: <Cip36Reporting>[])
+  final List<Cip36Reporting> cip36;
+  static const fromJsonFactory = _$Cip36ReportingListFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is Cip36ReportingList &&
+            (identical(other.cip36, cip36) ||
+                const DeepCollectionEquality().equals(other.cip36, cip36)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(cip36) ^ runtimeType.hashCode;
+}
+
+extension $Cip36ReportingListExtension on Cip36ReportingList {
+  Cip36ReportingList copyWith({List<Cip36Reporting>? cip36}) {
+    return Cip36ReportingList(cip36: cip36 ?? this.cip36);
+  }
+
+  Cip36ReportingList copyWithWrapped({Wrapped<List<Cip36Reporting>>? cip36}) {
+    return Cip36ReportingList(
+        cip36: (cip36 != null ? cip36.value : this.cip36));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
 class DelegatePublicKey {
   const DelegatePublicKey({
     required this.address,

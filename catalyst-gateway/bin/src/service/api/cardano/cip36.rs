@@ -35,10 +35,18 @@ pub(crate) enum ResponseSingleRegistration {
 pub(crate) enum ResponseMultipleRegistrations {
     /// Cip36 registration
     #[oai(status = 200)]
-    Ok(Json<Vec<Cip36Reporting>>),
+    Ok(Json<Cip36ReportingList>),
     /// No valid registration
     #[oai(status = 404)]
     NotFound,
+}
+
+/// Cip36 info list
+#[derive(Object, Default)]
+pub(crate) struct Cip36ReportingList {
+    /// List of registrations
+    #[oai(validator(max_items = "100000"))]
+    cip36: Vec<Cip36Reporting>,
 }
 
 /// Cip36 info + invalid reporting
@@ -400,7 +408,7 @@ pub(crate) async fn get_associated_vote_key_registrations(
 
         // Report includes registration info and  any erroneous registrations which occur AFTER
         // the slot# of the last valid registration
-        let mut reports = Vec::new();
+        let mut reports = Cip36ReportingList { cip36: Vec::new() };
 
         for registration in redacted_registrations {
             let invalids_report = match get_invalid_registrations(
@@ -426,7 +434,7 @@ pub(crate) async fn get_associated_vote_key_registrations(
                 invalids: invalids_report,
             };
 
-            reports.push(report);
+            reports.cip36.push(report);
         }
 
         return ResponseMultipleRegistrations::Ok(Json(reports)).into();

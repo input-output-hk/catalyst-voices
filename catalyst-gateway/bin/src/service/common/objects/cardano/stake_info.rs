@@ -12,6 +12,7 @@ pub(crate) struct StakedNativeTokenInfo {
     /// Token policy name.
     pub(crate) policy_name: String,
     /// Token amount.
+    #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
     pub(crate) amount: StakeAmount,
 }
 
@@ -30,6 +31,7 @@ pub(crate) struct StakeInfo {
     pub(crate) slot_number: SlotNumber,
 
     /// Native token infos.
+    #[oai(validator(max_items = "1000"))]
     pub(crate) native_tokens: Vec<StakedNativeTokenInfo>,
 }
 
