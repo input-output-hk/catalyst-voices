@@ -147,10 +147,6 @@ scripts:
 
   format-apply:
     run: |
-      # The set -o pipefail option ensures that a pipeline returns the exit
-      # status of the first command that fails, instead of the last command.
-      set -o pipefail
-
       melos exec -c 1 --dir-exists="lib" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --fix" &&
       melos exec -c 1 --dir-exists="test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --fix" &&
       melos exec -c 1 --dir-exists="integration_test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --fix"
@@ -158,10 +154,6 @@ scripts:
 
   format-check:
     run: |
-      # The set -o pipefail option ensures that a pipeline returns the exit
-      # status of the first command that fails, instead of the last command.
-      set -o pipefail
-
       melos exec -c 1 --dir-exists="lib" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --output none --set-exit-if-changed" &&
       melos exec -c 1 --dir-exists="test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --output none --set-exit-if-changed" &&
       melos exec -c 1 --dir-exists="integration_test" -- "find . -name "*.dart" ! -name "*.g.dart" ! -path '*/generated/*' | tr '\n' ' ' | xargs dart format --output none --set-exit-if-changed"
@@ -184,18 +176,21 @@ scripts:
 
   test-report:
     run: |
-      # The set -o pipefail option ensures that a pipeline returns the exit
-      # status of the first command that fails, instead of the last command.
-      set -o pipefail
-
       # cleanup from previous build and create new folders
       rm -fR $MELOS_ROOT_PATH/test_reports
       mkdir $MELOS_ROOT_PATH/test_reports
 
       # run tests, generate junit reports in /test_reports/ & code coverage report
       melos exec -c 1 --dir-exists="test" -- \
-       "flutter test --reporter expanded --coverage --machine | tojunit --output $MELOS_ROOT_PATH/test_reports/MELOS_PACKAGE_NAME.junit-report.xml"
+          'OUTPUT=$(flutter test --reporter expanded --coverage --machine) ; \
+          EXIT_CODE=$? ; \
+          printf "%s" "$OUTPUT" | tojunit --output $MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.junit-report.xml ; \
+          exit $EXIT_CODE'
        
+      # store the exit code after running the tests,
+      # this is the exit code for the whole script
+      EXIT_CODE=$?
+
       # removes code coverage for generated code
       melos exec -c 1 --dir-exists="test" -- \
         lcov --remove coverage/lcov.info -o coverage/lcov.info --ignore-errors unused,unused \
@@ -206,6 +201,7 @@ scripts:
         'lib/generated/**'
 
       dart pub global run combine_coverage --repo-path=.
+      exit $EXIT_CODE
 
     description: |
       Run `flutter test` for all packages and generate junit and coverage reports.
