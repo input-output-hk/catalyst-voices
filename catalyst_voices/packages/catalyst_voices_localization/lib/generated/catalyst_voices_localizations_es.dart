@@ -727,4 +727,19 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get passwordDoNotMatch => 'Passwords do not match, please correct';
+
+  @override
+  String get warning => 'Warning';
+
+  @override
+  String get registrationExitConfirmDialogSubtitle => 'Account creation incomplete!';
+
+  @override
+  String get registrationExitConfirmDialogContent => 'If attempt to leave without creating your keychain - account creation will be incomplete.   You are not able to login without  completing your keychain.';
+
+  @override
+  String get registrationExitConfirmDialogContinue => 'Continue keychain creation';
+
+  @override
+  String get registrationExitConfirmDialogCancel => 'Cancel anyway';
 }

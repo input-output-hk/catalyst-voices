@@ -1377,6 +1377,36 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Passwords do not match, please correct'**
   String get passwordDoNotMatch;
+
+  /// No description provided for @warning.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning'**
+  String get warning;
+
+  /// No description provided for @registrationExitConfirmDialogSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Account creation incomplete!'**
+  String get registrationExitConfirmDialogSubtitle;
+
+  /// No description provided for @registrationExitConfirmDialogContent.
+  ///
+  /// In en, this message translates to:
+  /// **'If attempt to leave without creating your keychain - account creation will be incomplete.   You are not able to login without  completing your keychain.'**
+  String get registrationExitConfirmDialogContent;
+
+  /// No description provided for @registrationExitConfirmDialogContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue keychain creation'**
+  String get registrationExitConfirmDialogContinue;
+
+  /// No description provided for @registrationExitConfirmDialogCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel anyway'**
+  String get registrationExitConfirmDialogCancel;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

@@ -13,6 +13,7 @@ use crate::service::{
     utilities::middleware::schema_validation::schema_version_validation,
 };
 
+mod cip36;
 mod date_time_to_slot_number_get;
 mod registration_get;
 mod staked_ada_get;
@@ -132,5 +133,56 @@ impl CardanoApi {
         network: Query<Option<Network>>,
     ) -> date_time_to_slot_number_get::AllResponses {
         date_time_to_slot_number_get::endpoint(date_time.0, network.0).await
+    }
+
+    #[oai(
+        path = "/cip36/latest_registration/stake_addr",
+        method = "get",
+        operation_id = "latestRegistrationGivenStakeAddr"
+    )]
+    /// Cip36 registrations
+    ///
+    /// This endpoint gets the latest registration given a stake addr
+    async fn latest_registration_cip36_given_stake_addr(
+        &self,
+        #[oai(validator(max_length = 66, min_length = 0, pattern = "[0-9a-f]"))] stake_addr: Query<
+            String,
+        >,
+    ) -> cip36::SingleRegistrationResponse {
+        cip36::get_latest_registration_from_stake_addr(stake_addr.0, true).await
+    }
+
+    #[oai(
+        path = "/cip36/latest_registration/stake_key_hash",
+        method = "get",
+        operation_id = "latestRegistrationGivenStakeHash"
+    )]
+    /// Cip36 registrations
+    ///
+    /// This endpoint gets the latest registration given a stake key hash
+    async fn latest_registration_cip36_given_stake_key_hash(
+        &self,
+        #[oai(validator(max_length = 66, min_length = 0, pattern = "[0-9a-f]"))]
+        stake_key_hash: Query<String>,
+    ) -> cip36::SingleRegistrationResponse {
+        cip36::get_latest_registration_from_stake_key_hash(stake_key_hash.0, true).await
+    }
+
+    #[oai(
+        path = "/cip36/latest_registration/vote_key",
+        method = "get",
+        operation_id = "latestRegistrationGivenVoteKey"
+    )]
+    /// Cip36 registrations
+    ///
+    /// This endpoint returns the list of stake address registrations currently associated
+    /// with a given voting key.
+    async fn latest_registration_cip36_given_vote_key(
+        &self,
+        #[oai(validator(max_length = 66, min_length = 0, pattern = "[0-9a-f]"))] vote_key: Query<
+            String,
+        >,
+    ) -> cip36::MultipleRegistrationResponse {
+        cip36::get_associated_vote_key_registrations(vote_key.0, true).await
     }
 }

@@ -33,5 +33,5 @@ what should be committed.
 
 To ensure the consistency of the generated code (especially when backend changes
 occur) an earthly target is automatically executed on PR against main.
-This `+check-flutter-code-generator` generates the code on the CI and compares
+This `+test-flutter-code-generator` generates the code on the CI and compares
 it with the code currently in repo, failing if there is an inconsistency.
