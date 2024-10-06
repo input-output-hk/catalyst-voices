@@ -1,5 +1,5 @@
 VERSION 0.8
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.15 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:fix/make-sure-earthly-target-fails-when-flutter-tests-fail AS flutter-ci
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/playwright:v3.2.15 AS playwright-ci
 
 deps:
