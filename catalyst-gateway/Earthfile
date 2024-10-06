@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.2.14 AS rust-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.2.15 AS rust-ci
 
 #cspell: words rustfmt toolsets USERARCH stdcfgs
 
@@ -16,7 +16,7 @@ COPY_SRC:
 
 # builder : Set up our target toolchains, and copy our files.
 builder:
-    DO rust-ci+SETUP --CACHE_VERSION="00002"
+    DO rust-ci+SETUP 
 
 # sync-cfg: Synchronize local config with CI version.
 # Must be run by the developer manually.
