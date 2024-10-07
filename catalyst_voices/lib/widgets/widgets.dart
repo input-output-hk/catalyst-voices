@@ -38,6 +38,7 @@ export 'headers/segment_header.dart';
 export 'indicators/process_progress_indicator.dart';
 export 'indicators/voices_circular_progress_indicator.dart';
 export 'indicators/voices_error_indicator.dart';
+export 'indicators/voices_indicator.dart';
 export 'indicators/voices_linear_progress_indicator.dart';
 export 'indicators/voices_no_internet_connection_banner.dart';
 export 'indicators/voices_password_strength_indicator.dart';
