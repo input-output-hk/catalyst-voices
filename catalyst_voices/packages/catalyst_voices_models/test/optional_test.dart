@@ -37,5 +37,35 @@ void main() {
       expect(optional.isEmpty, isFalse);
       expect(optional.data, data);
     });
+
+    test(
+      'dataOr returns optional data when not null',
+      () {
+        // Given
+        const data = 'username';
+        const optional = Optional(data) as Optional<String>?;
+
+        // When
+        final optionalData = optional.dataOr('fallback');
+
+        // Then
+        expect(optionalData, data);
+      },
+    );
+
+    test(
+      'dataOr returns fallback when called on null Optional',
+      () {
+        // Given
+        const fallbackData = 'fallback';
+        const Optional<String>? optional = null;
+
+        // When
+        final optionalData = optional.dataOr(fallbackData);
+
+        // Then
+        expect(optionalData, fallbackData);
+      },
+    );
   });
 }

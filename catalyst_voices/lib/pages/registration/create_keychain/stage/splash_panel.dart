@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/pages/registration/registration_stage_message.dart';
+import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -14,8 +14,8 @@ class SplashPanel extends StatelessWidget {
       children: [
         const SizedBox(height: 24),
         RegistrationStageMessage(
-          title: context.l10n.accountCreationSplashTitle,
-          subtitle: context.l10n.accountCreationSplashMessage,
+          title: Text(context.l10n.accountCreationSplashTitle),
+          subtitle: Text(context.l10n.accountCreationSplashMessage),
         ),
         const Spacer(),
         VoicesFilledButton(

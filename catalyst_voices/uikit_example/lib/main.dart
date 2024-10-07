@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/widgets/toggles/voices_theme_mode_switch.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/generated/catalyst_voices_localizations.dart';
@@ -92,22 +93,11 @@ class _ThemeModeSwitcherWrapper extends StatelessWidget {
           color: Theme.of(context).colorScheme.surface,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                const Text('Light / Dark'),
-                Padding(
-                  padding: const EdgeInsets.only(left: 8),
-                  child: Switch(
-                    value: Theme.of(context).brightness == Brightness.dark,
-                    onChanged: (value) {
-                      onChanged(
-                        value ? ThemeMode.dark : ThemeMode.light,
-                      );
-                    },
-                  ),
-                ),
-              ],
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: VoicesThemeModeSwitch(
+                onChanged: onChanged,
+              ),
             ),
           ),
         ),

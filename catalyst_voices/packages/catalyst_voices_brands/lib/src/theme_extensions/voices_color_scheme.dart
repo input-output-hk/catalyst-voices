@@ -40,6 +40,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
   final Color? onSurfaceError016;
   final Color? iconsForeground;
   final Color? iconsBackground;
+  final Color? iconsBackgroundVariant;
   final Color? iconsOnImage;
   final Color? iconsDisabled;
   final Color? iconsPrimary;
@@ -61,6 +62,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
   final Color? primary98;
   final Color? primaryContainer;
   final Color? onPrimaryContainer;
+  final Color? onErrorVariant;
   final Color? errorContainer;
   final Color? onErrorContainer;
 
@@ -98,6 +100,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     required this.onSurfaceError016,
     required this.iconsForeground,
     required this.iconsBackground,
+    required this.iconsBackgroundVariant,
     required this.iconsOnImage,
     required this.iconsDisabled,
     required this.iconsPrimary,
@@ -119,6 +122,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     required this.primary98,
     required this.primaryContainer,
     required this.onPrimaryContainer,
+    required this.onErrorVariant,
     required this.errorContainer,
     required this.onErrorContainer,
   });
@@ -158,6 +162,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     this.onSurfaceError016,
     this.iconsForeground,
     this.iconsBackground,
+    this.iconsBackgroundVariant,
     this.iconsOnImage,
     this.iconsDisabled,
     this.iconsPrimary,
@@ -179,6 +184,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     this.primary98,
     this.primaryContainer,
     this.onPrimaryContainer,
+    this.onErrorVariant,
     this.errorContainer,
     this.onErrorContainer,
   });
@@ -218,6 +224,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     Color? onSurfaceError016,
     Color? iconsForeground,
     Color? iconsBackground,
+    Color? iconsBackgroundVariant,
     Color? iconsOnImage,
     Color? iconsDisabled,
     Color? iconsPrimary,
@@ -239,6 +246,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
     Color? primary98,
     Color? primaryContainer,
     Color? onPrimaryContainer,
+    Color? onErrorVariant,
     Color? errorContainer,
     Color? onErrorContainer,
   }) {
@@ -283,6 +291,8 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       onSurfaceError016: onSurfaceError016 ?? this.onSurfaceError016,
       iconsForeground: iconsForeground ?? this.iconsForeground,
       iconsBackground: iconsBackground ?? this.iconsBackground,
+      iconsBackgroundVariant:
+          iconsBackgroundVariant ?? this.iconsBackgroundVariant,
       iconsOnImage: iconsOnImage ?? this.iconsOnImage,
       iconsDisabled: iconsDisabled ?? this.iconsDisabled,
       iconsPrimary: iconsPrimary ?? this.iconsPrimary,
@@ -308,6 +318,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       primary98: primary98 ?? this.primary98,
       primaryContainer: primaryContainer ?? this.primaryContainer,
       onPrimaryContainer: onPrimaryContainer ?? this.onPrimaryContainer,
+      onErrorVariant: onErrorVariant ?? this.onErrorVariant,
       errorContainer: errorContainer ?? this.errorContainer,
       onErrorContainer: onErrorContainer ?? this.onErrorContainer,
     );
@@ -400,6 +411,8 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
           Color.lerp(onSurfaceError016, other.onSurfaceError016, t),
       iconsForeground: Color.lerp(iconsForeground, other.iconsForeground, t),
       iconsBackground: Color.lerp(iconsBackground, other.iconsBackground, t),
+      iconsBackgroundVariant:
+          Color.lerp(iconsBackgroundVariant, other.iconsBackgroundVariant, t),
       iconsOnImage: Color.lerp(iconsOnImage, other.iconsOnImage, t),
       iconsDisabled: Color.lerp(iconsDisabled, other.iconsDisabled, t),
       iconsPrimary: Color.lerp(iconsPrimary, other.iconsPrimary, t),
@@ -439,6 +452,7 @@ class VoicesColorScheme extends ThemeExtension<VoicesColorScheme> {
       primaryContainer: Color.lerp(primaryContainer, other.primaryContainer, t),
       onPrimaryContainer:
           Color.lerp(onPrimaryContainer, other.onPrimaryContainer, t),
+      onErrorVariant: Color.lerp(onErrorVariant, other.onErrorVariant, t),
       errorContainer: Color.lerp(errorContainer, other.errorContainer, t),
       onErrorContainer: Color.lerp(onErrorContainer, other.onErrorContainer, t),
     );

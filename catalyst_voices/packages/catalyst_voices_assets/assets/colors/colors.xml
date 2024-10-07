@@ -20,6 +20,7 @@
     <color name="light_outline_variant">#61BFC8D9</color>
     <color name="light_error">#CC0000</color>
     <color name="light_on_error">#FFFFFF</color>
+    <color name="light_on_error_variant">#FFFFFF</color>
     <color name="light_error_container">#FFD1D1</color>
     <color name="light_on_error_container">#700000</color>
     <color name="light_success">#218230</color>
@@ -48,6 +49,7 @@
     <color name="light_on_surface_error_016">#29CC0000</color>
     <color name="light_icons_foreground">#212A3D</color>
     <color name="light_icons_background">#FFFFFF</color>
+    <color name="light_icons_background_variant">#F2F4F8</color>
     <color name="light_icons_on_image">#FFFFFF</color>
     <color name="light_icons_disabled">#61212A3D</color>
     <color name="light_icons_primary">#123CD3</color>
@@ -86,6 +88,7 @@
     <color name="dark_outline_variant">#364463</color>
     <color name="dark_error">#FF9999</color>
     <color name="dark_on_error">#380000</color>
+    <color name="dark_on_error_variant">#FFFFFF</color>
     <color name="dark_error_container">#AD0000</color>
     <color name="dark_on_error_container">#FFD1D1</color>
     <color name="dark_success">#BAEDC2</color>
@@ -114,6 +117,7 @@
     <color name="dark_on_surface_error_016">#29CC0000</color>
     <color name="dark_icons_foreground">#F2F4F8</color>
     <color name="dark_icons_background">#212A3D</color>
+    <color name="dark_icons_background_variant">#F2F4F8</color>
     <color name="dark_icons_on_image">#FFFFFF</color>
     <color name="dark_icons_disabled">#61BFC8D9</color>
     <color name="dark_icons_primary">#728EF3</color>

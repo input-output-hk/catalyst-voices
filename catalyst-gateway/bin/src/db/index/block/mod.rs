@@ -3,12 +3,14 @@
 
 pub(crate) mod certs;
 pub(crate) mod cip36;
+pub(crate) mod rbac509;
 pub(crate) mod txi;
 pub(crate) mod txo;
 
 use cardano_chain_follower::MultiEraBlock;
 use certs::CertInsertQuery;
 use cip36::Cip36InsertQuery;
+use rbac509::Rbac509InsertQuery;
 use tracing::error;
 use txi::TxiInsertQuery;
 use txo::TxoInsertQuery;
@@ -25,6 +27,7 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
 
     let mut cert_index = CertInsertQuery::new();
     let mut cip36_index = Cip36InsertQuery::new();
+    let mut rbac509_index = Rbac509InsertQuery::new();
 
     let mut txi_index = TxiInsertQuery::new();
     let mut txo_index = TxoInsertQuery::new();
@@ -52,6 +55,9 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
 
         // Index the TXOs.
         txo_index.index(txs, slot_no, &txn_hash, txn);
+
+        // Index RBAC 509 inside the transaction.
+        rbac509_index.index(&txn_hash, txn_index, txn, slot_no, block);
     }
 
     // We then execute each batch of data from the block.
@@ -62,6 +68,7 @@ pub(crate) async fn index_block(block: &MultiEraBlock) -> anyhow::Result<()> {
     query_handles.extend(txi_index.execute(&session));
     query_handles.extend(cert_index.execute(&session));
     query_handles.extend(cip36_index.execute(&session));
+    query_handles.extend(rbac509_index.execute(&session));
 
     let mut result: anyhow::Result<()> = Ok(());
 

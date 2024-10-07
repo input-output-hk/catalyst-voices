@@ -1,9 +1,9 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/dependency/dependencies.dart';
-import 'package:catalyst_voices/pages/registration/create_keychain/create_keychain_panel.dart';
-import 'package:catalyst_voices/pages/registration/get_started/get_started_panel.dart';
-import 'package:catalyst_voices/pages/registration/placeholder_panel.dart';
+import 'package:catalyst_voices/pages/registration/registration_details_panel.dart';
+import 'package:catalyst_voices/pages/registration/registration_exit_confirm_dialog.dart';
 import 'package:catalyst_voices/pages/registration/registration_info_panel.dart';
-import 'package:catalyst_voices/pages/registration/wallet_link/wallet_link_panel.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
@@ -25,39 +25,34 @@ class RegistrationDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => Dependencies.instance.get<RegistrationCubit>(),
-      child: BlocBuilder<RegistrationCubit, RegistrationState>(
-        builder: (context, state) => _RegistrationDialog(state: state),
+      child: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          unawaited(_confirmedExit(context, didPop: didPop));
+        },
+        child: const VoicesTwoPaneDialog(
+          left: RegistrationInfoPanel(),
+          right: RegistrationDetailsPanel(),
+        ),
       ),
     );
   }
-}
 
-class _RegistrationDialog extends StatelessWidget {
-  final RegistrationState state;
+  Future<void> _confirmedExit(
+    BuildContext context, {
+    required bool didPop,
+  }) async {
+    if (didPop) {
+      return;
+    }
 
-  const _RegistrationDialog({
-    required this.state,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return VoicesTwoPaneDialog(
-      left: const RegistrationInfoPanel(),
-      right: switch (state) {
-        GetStarted() => const GetStartedPanel(),
-        FinishAccountCreation() => const PlaceholderPanel(),
-        Recover() => const Placeholder(),
-        CreateKeychain(:final stage, :final seedPhraseState) =>
-          CreateKeychainPanel(
-            stage: stage,
-            seedPhraseState: seedPhraseState,
-          ),
-        WalletLink(:final stage, :final stateData) => WalletLinkPanel(
-            stage: stage,
-            stateData: stateData,
-          ),
-        AccountCompleted() => const Placeholder(),
-      },
+    final confirmed = await VoicesQuestionDialog.show(
+      context,
+      builder: (_) => const RegistrationExitConfirmDialog(),
     );
+
+    if (context.mounted && confirmed) {
+      Navigator.of(context).pop();
+    }
   }
 }

@@ -3,13 +3,18 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:flutter/material.dart';
 
 class PasswordPicture extends StatelessWidget {
-  const PasswordPicture({super.key});
+  final TaskPictureType type;
+
+  const PasswordPicture({
+    super.key,
+    this.type = TaskPictureType.normal,
+  });
 
   @override
   Widget build(BuildContext context) {
     return TaskPicture(
       child: TaskPictureIconBox(
-        type: TaskPictureType.error,
+        type: type,
         child: VoicesAssets.icons.lockClosed.buildIcon(size: 48),
       ),
     );

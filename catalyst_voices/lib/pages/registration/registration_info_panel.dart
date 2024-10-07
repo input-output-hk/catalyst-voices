@@ -1,8 +1,11 @@
-import 'package:catalyst_voices/pages/registration/information_panel.dart';
+import 'package:catalyst_voices/pages/registration/create_keychain/bloc_seed_phrase_builder.dart';
+import 'package:catalyst_voices/pages/registration/create_keychain/bloc_unlock_password_builder.dart';
 import 'package:catalyst_voices/pages/registration/pictures/keychain_picture.dart';
+import 'package:catalyst_voices/pages/registration/pictures/keychain_with_password_picture.dart';
 import 'package:catalyst_voices/pages/registration/pictures/password_picture.dart';
 import 'package:catalyst_voices/pages/registration/pictures/seed_phrase_picture.dart';
 import 'package:catalyst_voices/pages/registration/pictures/task_picture.dart';
+import 'package:catalyst_voices/pages/registration/widgets/information_panel.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -28,7 +31,17 @@ class RegistrationInfoPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<RegistrationCubit, RegistrationState>(
+    return BlocSelector<
+        RegistrationCubit,
+        RegistrationState,
+        ({
+          RegistrationStep step,
+          double? progress,
+        })>(
+      selector: (state) => (
+        step: state.step,
+        progress: state.progress,
+      ),
       builder: (context, state) {
         final headerStrings = _buildHeaderStrings(
           context,
@@ -39,7 +52,7 @@ class RegistrationInfoPanel extends StatelessWidget {
           title: headerStrings.title,
           subtitle: headerStrings.subtitle,
           body: headerStrings.body,
-          picture: _RegistrationPicture(state: state),
+          picture: _RegistrationPicture(step: state.step),
           progress: state.progress,
         );
       },
@@ -54,14 +67,17 @@ class RegistrationInfoPanel extends StatelessWidget {
       return switch (stage) {
         CreateKeychainStage.splash ||
         CreateKeychainStage.instructions =>
-          _HeaderStrings(title: context.l10n.catalystKeychain),
+          _HeaderStrings(
+            title: context.l10n.catalystKeychain,
+          ),
         CreateKeychainStage.seedPhrase => _HeaderStrings(
             title: context.l10n.catalystKeychain,
             subtitle: context.l10n.createKeychainSeedPhraseSubtitle,
             body: context.l10n.createKeychainSeedPhraseBody,
           ),
-        CreateKeychainStage.checkSeedPhraseInstructions =>
-          _HeaderStrings(title: context.l10n.catalystKeychain),
+        CreateKeychainStage.checkSeedPhraseInstructions => _HeaderStrings(
+            title: context.l10n.catalystKeychain,
+          ),
         CreateKeychainStage.checkSeedPhrase => _HeaderStrings(
             title: context.l10n.catalystKeychain,
             subtitle: context.l10n.createKeychainSeedPhraseCheckSubtitle,
@@ -69,9 +85,14 @@ class RegistrationInfoPanel extends StatelessWidget {
           ),
         CreateKeychainStage.checkSeedPhraseResult ||
         CreateKeychainStage.unlockPasswordInstructions =>
-          _HeaderStrings(title: context.l10n.catalystKeychain),
-        CreateKeychainStage.unlockPasswordCreate =>
-          _HeaderStrings(title: 'TODO'),
+          _HeaderStrings(
+            title: context.l10n.catalystKeychain,
+          ),
+        CreateKeychainStage.unlockPasswordCreate => _HeaderStrings(
+            title: context.l10n.catalystKeychain,
+            subtitle: context.l10n.createKeychainUnlockPasswordIntoSubtitle,
+            body: context.l10n.createKeychainUnlockPasswordIntoBody,
+          ),
       };
     }
 
@@ -99,8 +120,15 @@ class RegistrationInfoPanel extends StatelessWidget {
 
     return switch (step) {
       GetStartedStep() => _HeaderStrings(title: context.l10n.getStarted),
-      FinishAccountCreationStep() => _HeaderStrings(title: 'TODO'),
-      RecoverStep() => _HeaderStrings(title: 'TODO'),
+      FinishAccountCreationStep() => _HeaderStrings(
+          title: context.l10n.catalystKeychain,
+        ),
+      RecoverMethodStep() => _HeaderStrings(
+          title: context.l10n.recoverCatalystKeychain,
+        ),
+      SeedPhraseRecoverStep() => _HeaderStrings(
+          title: context.l10n.recoverCatalystKeychain,
+        ),
       CreateKeychainStep(:final stage) => buildKeychainStageHeader(stage),
       WalletLinkStep(:final stage) => buildWalletLinkStageHeader(stage),
       AccountCompletedStep() => _HeaderStrings(title: 'TODO'),
@@ -109,18 +137,15 @@ class RegistrationInfoPanel extends StatelessWidget {
 }
 
 class _RegistrationPicture extends StatelessWidget {
-  final RegistrationState state;
+  final RegistrationStep step;
 
   const _RegistrationPicture({
-    required this.state,
+    required this.step,
   });
 
   @override
   Widget build(BuildContext context) {
-    Widget buildKeychainStagePicture(
-      CreateKeychainStage stage, {
-      required bool isSeedPhraseCheckConfirmed,
-    }) {
+    Widget buildKeychainStagePicture(CreateKeychainStage stage) {
       return switch (stage) {
         CreateKeychainStage.splash ||
         CreateKeychainStage.instructions =>
@@ -128,18 +153,12 @@ class _RegistrationPicture extends StatelessWidget {
         CreateKeychainStage.seedPhrase => const SeedPhrasePicture(),
         CreateKeychainStage.checkSeedPhraseInstructions ||
         CreateKeychainStage.checkSeedPhrase =>
-          const SeedPhrasePicture(
-            indicateSelection: true,
-          ),
-        CreateKeychainStage.checkSeedPhraseResult => SeedPhrasePicture(
-            type: isSeedPhraseCheckConfirmed
-                ? TaskPictureType.success
-                : TaskPictureType.error,
-            indicateSelection: true,
-          ),
+          const SeedPhrasePicture(indicateSelection: true),
+        CreateKeychainStage.checkSeedPhraseResult =>
+          const _BlocSeedPhraseResultPicture(),
         CreateKeychainStage.unlockPasswordInstructions ||
         CreateKeychainStage.unlockPasswordCreate =>
-          const PasswordPicture(),
+          const _BlocPasswordPicture(),
       };
     }
 
@@ -155,17 +174,68 @@ class _RegistrationPicture extends StatelessWidget {
       };
     }
 
-    return switch (state) {
-      GetStarted() => const KeychainPicture(),
-      FinishAccountCreation() => const KeychainPicture(),
-      Recover() => const KeychainPicture(),
-      CreateKeychain(:final stage, :final seedPhraseState) =>
-        buildKeychainStagePicture(
-          stage,
-          isSeedPhraseCheckConfirmed: seedPhraseState.isCheckConfirmed,
-        ),
-      WalletLink(:final stage) => buildWalletLinkStagePicture(stage),
-      AccountCompleted() => const KeychainPicture(),
+    Widget buildRecoverSeedPhrase(RecoverSeedPhraseStage stage) {
+      return switch (stage) {
+        RecoverSeedPhraseStage.seedPhraseInstructions ||
+        RecoverSeedPhraseStage.seedPhrase ||
+        RecoverSeedPhraseStage.linkedWallet =>
+          const KeychainPicture(),
+        RecoverSeedPhraseStage.unlockPasswordInstructions ||
+        RecoverSeedPhraseStage.unlockPassword =>
+          const PasswordPicture(),
+        RecoverSeedPhraseStage.success => const KeychainWithPasswordPicture(),
+      };
+    }
+
+    return switch (step) {
+      GetStartedStep() => const KeychainPicture(),
+      RecoverMethodStep() => const KeychainPicture(),
+      SeedPhraseRecoverStep(:final stage) => buildRecoverSeedPhrase(stage),
+      CreateKeychainStep(:final stage) => buildKeychainStagePicture(stage),
+      FinishAccountCreationStep() => const KeychainWithPasswordPicture(),
+      WalletLinkStep(:final stage) => buildWalletLinkStagePicture(stage),
+      AccountCompletedStep() => const KeychainPicture(),
     };
+  }
+}
+
+class _BlocSeedPhraseResultPicture extends StatelessWidget {
+  const _BlocSeedPhraseResultPicture();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSeedPhraseBuilder<bool>(
+      selector: (state) => state.areUserWordsCorrect,
+      builder: (context, state) {
+        return SeedPhrasePicture(
+          type: state ? TaskPictureType.success : TaskPictureType.error,
+          indicateSelection: true,
+        );
+      },
+    );
+  }
+}
+
+class _BlocPasswordPicture extends StatelessWidget {
+  const _BlocPasswordPicture();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocUnlockPasswordBuilder<TaskPictureType>(
+      selector: (state) => state.pictureType,
+      builder: (context, state) => PasswordPicture(type: state),
+    );
+  }
+}
+
+extension _UnlockPasswordStateExt on UnlockPasswordState {
+  TaskPictureType get pictureType {
+    if (showPasswordMisMatch) {
+      return TaskPictureType.error;
+    }
+    if (isNextEnabled) {
+      return TaskPictureType.success;
+    }
+    return TaskPictureType.normal;
   }
 }

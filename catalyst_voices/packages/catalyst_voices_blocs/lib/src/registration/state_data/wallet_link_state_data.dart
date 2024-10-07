@@ -7,26 +7,35 @@ import 'package:result_type/result_type.dart';
 final class WalletLinkStateData extends Equatable {
   final Result<List<CardanoWallet>, Exception>? wallets;
   final CardanoWalletDetails? selectedWallet;
+  final Set<AccountRole>? selectedRoles;
 
   const WalletLinkStateData({
     this.wallets,
     this.selectedWallet,
+    this.selectedRoles,
   });
 
   /// Returns the minimum required ADA in user balance to register.
   Coin get minAdaForRegistration => CardanoWalletDetails.minAdaForRegistration;
 
+  /// Returns the default roles every account will have.
+  Set<AccountRole> get defaultRoles => {AccountRole.voter};
+
+  // TODO(dtscalac): pass valid fee
+  Coin get transactionFee => Coin.fromAda(0.9438);
+
   WalletLinkStateData copyWith({
     Optional<Result<List<CardanoWallet>, Exception>>? wallets,
     Optional<CardanoWalletDetails>? selectedWallet,
+    Optional<Set<AccountRole>>? selectedRoles,
   }) {
     return WalletLinkStateData(
-      wallets: wallets != null ? wallets.data : this.wallets,
-      selectedWallet:
-          selectedWallet != null ? selectedWallet.data : this.selectedWallet,
+      wallets: wallets.dataOr(this.wallets),
+      selectedWallet: selectedWallet.dataOr(this.selectedWallet),
+      selectedRoles: selectedRoles.dataOr(this.selectedRoles),
     );
   }
 
   @override
-  List<Object?> get props => [wallets, selectedWallet];
+  List<Object?> get props => [wallets, selectedWallet, selectedRoles];
 }

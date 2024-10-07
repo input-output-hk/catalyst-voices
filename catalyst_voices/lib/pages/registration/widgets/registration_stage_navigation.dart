@@ -6,11 +6,15 @@ import 'package:flutter/material.dart';
 class RegistrationBackNextNavigation extends StatelessWidget {
   final bool isBackEnabled;
   final bool isNextEnabled;
+  final VoidCallback? onNextTap;
+  final VoidCallback? onBackTap;
 
   const RegistrationBackNextNavigation({
     super.key,
     this.isBackEnabled = true,
     this.isNextEnabled = true,
+    this.onNextTap,
+    this.onBackTap,
   });
 
   @override
@@ -21,12 +25,12 @@ class RegistrationBackNextNavigation extends StatelessWidget {
       children: [
         VoicesBackButton(
           onTap: isBackEnabled
-              ? () => RegistrationCubit.of(context).previousStep()
+              ? onBackTap ?? () => RegistrationCubit.of(context).previousStep()
               : null,
         ),
         VoicesNextButton(
           onTap: isNextEnabled
-              ? () => RegistrationCubit.of(context).nextStep()
+              ? onNextTap ?? () => RegistrationCubit.of(context).nextStep()
               : null,
         ),
       ],

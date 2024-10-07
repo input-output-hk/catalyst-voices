@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
@@ -10,6 +12,7 @@ class VoicesSinglePaneDialog extends StatelessWidget {
   final BoxConstraints constraints;
   final Color? backgroundColor;
   final bool showBorder;
+  final VoidCallback? onCancel;
   final Widget child;
 
   const VoicesSinglePaneDialog({
@@ -17,19 +20,22 @@ class VoicesSinglePaneDialog extends StatelessWidget {
     this.constraints = const BoxConstraints(minWidth: 900, minHeight: 600),
     this.backgroundColor,
     this.showBorder = false,
+    this.onCancel,
     required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
     return _VoicesDesktopDialog(
-      backgroundColor: Theme.of(context).colors.iconsBackground,
-      showBorder: true,
+      backgroundColor: backgroundColor,
+      showBorder: showBorder,
       constraints: constraints,
       child: Stack(
         children: [
           child,
-          const _DialogCloseButton(),
+          _DialogCloseButton(
+            onCancel: onCancel,
+          ),
         ],
       ),
     );
@@ -121,7 +127,11 @@ class _VoicesDesktopDialog extends StatelessWidget {
 }
 
 class _DialogCloseButton extends StatelessWidget {
-  const _DialogCloseButton();
+  final VoidCallback? onCancel;
+
+  const _DialogCloseButton({
+    this.onCancel,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -134,7 +144,10 @@ class _DialogCloseButton extends StatelessWidget {
       child: IconButtonTheme(
         data: const IconButtonThemeData(style: buttonStyle),
         child: XButton(
-          onTap: () => Navigator.of(context).pop(),
+          onTap: () {
+            onCancel?.call();
+            unawaited(Navigator.of(context).maybePop());
+          },
         ),
       ),
     );

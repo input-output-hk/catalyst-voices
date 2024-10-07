@@ -57,6 +57,7 @@ const VoicesColorScheme darkVoicesColorScheme = VoicesColorScheme(
   onSurfaceError016: VoicesColors.darkOnSurfaceError016,
   iconsForeground: VoicesColors.darkIconsForeground,
   iconsBackground: VoicesColors.darkIconsBackground,
+  iconsBackgroundVariant: VoicesColors.darkIconsBackgroundVariant,
   iconsOnImage: VoicesColors.darkIconsOnImage,
   iconsDisabled: VoicesColors.darkIconsDisabled,
   iconsPrimary: VoicesColors.darkIconsPrimary,
@@ -80,6 +81,7 @@ const VoicesColorScheme darkVoicesColorScheme = VoicesColorScheme(
   primary98: VoicesColors.darkPrimary98,
   primaryContainer: VoicesColors.darkPrimaryContainer,
   onPrimaryContainer: VoicesColors.darkOnPrimaryContainer,
+  onErrorVariant: VoicesColors.darkOnErrorVariant,
   errorContainer: VoicesColors.darkErrorContainer,
   onErrorContainer: VoicesColors.darkOnErrorContainer,
 );
@@ -135,6 +137,7 @@ const VoicesColorScheme lightVoicesColorScheme = VoicesColorScheme(
   onSurfaceError016: VoicesColors.lightOnSurfaceError016,
   iconsForeground: VoicesColors.lightIconsForeground,
   iconsBackground: VoicesColors.lightIconsBackground,
+  iconsBackgroundVariant: VoicesColors.lightIconsBackgroundVariant,
   iconsOnImage: VoicesColors.lightIconsOnImage,
   iconsDisabled: VoicesColors.lightIconsDisabled,
   iconsPrimary: VoicesColors.lightIconsPrimary,
@@ -160,6 +163,7 @@ const VoicesColorScheme lightVoicesColorScheme = VoicesColorScheme(
   primary98: VoicesColors.lightPrimary98,
   primaryContainer: VoicesColors.lightPrimaryContainer,
   onPrimaryContainer: VoicesColors.lightOnPrimaryContainer,
+  onErrorVariant: VoicesColors.lightOnErrorVariant,
   errorContainer: VoicesColors.lightErrorContainer,
   onErrorContainer: VoicesColors.lightOnErrorContainer,
 );
