@@ -486,11 +486,11 @@ To compute it, prover needs to perform the next steps:
   where $N$ is a perfect power of $2$, $j \in [M, \ldots, N - 1]$.
   So the resulted $\mathbf{c} = (c_1, \ldots, c_M, \{c_j\})$.
 2. Generate a commitment key $ck \in \mathbb{G}$.
-3. Let $i_k$ is a bit value of the $i$-th binary representation,
+3. Let $i_k$ is a bit value of the $i$-th binary representation (little-endian order),
    where $k \in [0, log_2(N) - 1]$.
    E.g. $i=3$ and $N=8, log_2(N) = 3$,
    its binary representation $i=011$,
-   $i_0=0, i_1=1, i_2=1$.
+   $i_0=1, i_1=1, i_2=0$.
 4. For $l \in [0, \ldots, log_2(N)-1]$ generate a random values
   $\alpha_l, \beta_l, \gamma_l, \delta_l, \in \mathbb{Z}_q$.
 5. For $l \in [0, \ldots, log_2(N)-1]$ calculate, where $g$ is the group generator:
