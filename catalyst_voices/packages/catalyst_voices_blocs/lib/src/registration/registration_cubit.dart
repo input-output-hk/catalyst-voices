@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/keychain_creation_cubit.dart';
+import 'package:catalyst_voices_blocs/src/registration/cubits/recover_cubit.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/wallet_link_cubit.dart';
 import 'package:catalyst_voices_blocs/src/registration/state_data/keychain_state_data.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -13,6 +14,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 final class RegistrationCubit extends Cubit<RegistrationState> {
   final KeychainCreationCubit _keychainCreationCubit;
   final WalletLinkCubit _walletLinkCubit;
+  final RecoverCubit _recoverCubit;
 
   RegistrationCubit({
     required Downloader downloader,
@@ -20,14 +22,18 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
           downloader: downloader,
         ),
         _walletLinkCubit = WalletLinkCubit(),
+        _recoverCubit = RecoverCubit(),
         super(const RegistrationState()) {
     _keychainCreationCubit.stream.listen(_onKeychainStateDataChanged);
     _walletLinkCubit.stream.listen(_onWalletLinkStateDataChanged);
+    _recoverCubit.stream.listen(_onRecoverStateDataChanged);
   }
 
   KeychainCreationManager get keychainCreation => _keychainCreationCubit;
 
   WalletLinkManager get walletLink => _walletLinkCubit;
+
+  RecoverManager get recover => _recoverCubit;
 
   /// Returns [RegistrationCubit] if found in widget tree. Does not add
   /// rebuild dependency when called.
@@ -50,6 +56,8 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
   }
 
   void recoverKeychain() {
+    unawaited(recover.checkLocalKeychains());
+
     _goToStep(const RecoverMethodStep());
   }
 
@@ -198,5 +206,9 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
 
   void _onWalletLinkStateDataChanged(WalletLinkStateData data) {
     emit(state.copyWith(walletLinkStateData: data));
+  }
+
+  void _onRecoverStateDataChanged(RecoverStateData data) {
+    emit(state.copyWith(recoverStateData: data));
   }
 }
