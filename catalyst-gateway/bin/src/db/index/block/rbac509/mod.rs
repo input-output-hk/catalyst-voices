@@ -165,11 +165,8 @@ impl Rbac509InsertQuery {
                         debug!(prv_tx_id = hex::encode(tx_id), "RBAC looking for TX_ID");
                         CHAIN_ROOT_BY_TXN_ID_CACHE.get(&tx_id.to_vec()).or_else(|| {
                             // WIP: trace chain root by looking up previous transaction hashes from
-                            // DB
-                            let chain_root = tx_id.to_vec();
-                            CHAIN_ROOT_BY_TXN_ID_CACHE
-                                .insert(chain_root.clone(), chain_root.clone());
-                            Some(chain_root)
+                            // chain follower or DB
+                            Some(tx_id.to_vec())
                         })
                     })
                     .or(Some(transaction_id.clone()));
