@@ -7,7 +7,7 @@ class VoicesSuccessIndicator extends StatelessWidget {
   /// The description of the error.
   final String message;
 
-  /// Usually [VoicesTextButton]. Will be appended at the end of widget
+  /// Usually [VoicesTextButton]. Will be appended at the end of widget.
   final Widget? action;
 
   const VoicesSuccessIndicator({

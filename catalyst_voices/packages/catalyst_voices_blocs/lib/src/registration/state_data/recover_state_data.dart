@@ -1,11 +1,11 @@
 import 'package:equatable/equatable.dart';
 
 final class RecoverStateData extends Equatable {
+  final bool foundKeychain;
+
   const RecoverStateData({
     this.foundKeychain = false,
   });
-
-  final bool foundKeychain;
 
   RecoverStateData copyWith({
     bool? foundKeychain,
