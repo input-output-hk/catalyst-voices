@@ -173,8 +173,15 @@ class _PositiveSmallPrint extends StatelessWidget {
   }
 }
 
-class _Navigation extends StatelessWidget {
+class _Navigation extends StatefulWidget {
   const _Navigation();
+
+  @override
+  State<_Navigation> createState() => _NavigationState();
+}
+
+class _NavigationState extends State<_Navigation> {
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -183,9 +190,14 @@ class _Navigation extends StatelessWidget {
       children: [
         VoicesFilledButton(
           leading: VoicesAssets.icons.wallet.buildIcon(),
-          onTap: () {
-            RegistrationCubit.of(context).walletLink.submitRegistration();
-          },
+          onTap: _isLoading ? null : _submitRegistration,
+          trailing: _isLoading
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: VoicesCircularProgressIndicator(),
+                )
+              : null,
           child: Text(context.l10n.walletLinkTransactionSign),
         ),
         const SizedBox(height: 10),
@@ -198,5 +210,23 @@ class _Navigation extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Future<void> _submitRegistration() async {
+    try {
+      _updateLoading(true);
+
+      await RegistrationCubit.of(context).submitRegistration();
+    } finally {
+      _updateLoading(false);
+    }
+  }
+
+  void _updateLoading(bool isLoading) {
+    if (mounted) {
+      setState(() {
+        _isLoading = isLoading;
+      });
+    }
   }
 }
