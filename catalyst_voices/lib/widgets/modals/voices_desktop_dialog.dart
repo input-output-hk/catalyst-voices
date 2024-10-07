@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
@@ -144,7 +146,7 @@ class _DialogCloseButton extends StatelessWidget {
         child: XButton(
           onTap: () {
             onCancel?.call();
-            Navigator.of(context).pop();
+            unawaited(Navigator.of(context).maybePop());
           },
         ),
       ),

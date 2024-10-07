@@ -791,6 +791,11 @@
   "@passwordDoNotMatch": {
     "description": "When user confirms password but it does not match original one."
   },
+  "warning": "Warning",
+  "registrationExitConfirmDialogSubtitle": "Account creation incomplete!",
+  "registrationExitConfirmDialogContent": "If attempt to leave without creating your keychain - account creation will be incomplete. \u2028\u2028You are not able to login without \u2028completing your keychain.",
+  "registrationExitConfirmDialogContinue": "Continue keychain creation",
+  "registrationExitConfirmDialogCancel": "Cancel anyway",
   "recoverCatalystKeychain": "Restore Catalyst keychain",
   "recoverKeychainMethodsTitle": "Restore your Catalyst Keychain",
   "recoverKeychainMethodsNoKeychainFound": "No Catalyst Keychain found on this device.",

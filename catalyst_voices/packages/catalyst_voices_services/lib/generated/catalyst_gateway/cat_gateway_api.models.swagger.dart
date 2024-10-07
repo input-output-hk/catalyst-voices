@@ -114,6 +114,229 @@ extension $BlockDateExtension on BlockDate {
 }
 
 @JsonSerializable(explicitToJson: true)
+class Cip36Info {
+  const Cip36Info({
+    required this.stakeAddress,
+    required this.nonce,
+    required this.slotNo,
+    required this.txn,
+    required this.voteKey,
+    required this.paymentAddress,
+    required this.isPayable,
+    required this.cip36,
+  });
+
+  factory Cip36Info.fromJson(Map<String, dynamic> json) =>
+      _$Cip36InfoFromJson(json);
+
+  static const toJsonFactory = _$Cip36InfoToJson;
+  Map<String, dynamic> toJson() => _$Cip36InfoToJson(this);
+
+  @JsonKey(name: 'stake_address')
+  final String stakeAddress;
+  @JsonKey(name: 'nonce')
+  final int nonce;
+  @JsonKey(name: 'slot_no')
+  final int slotNo;
+  @JsonKey(name: 'txn')
+  final int txn;
+  @JsonKey(name: 'vote_key')
+  final String voteKey;
+  @JsonKey(name: 'payment_address')
+  final String paymentAddress;
+  @JsonKey(name: 'is_payable')
+  final bool isPayable;
+  @JsonKey(name: 'cip36')
+  final bool cip36;
+  static const fromJsonFactory = _$Cip36InfoFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is Cip36Info &&
+            (identical(other.stakeAddress, stakeAddress) ||
+                const DeepCollectionEquality()
+                    .equals(other.stakeAddress, stakeAddress)) &&
+            (identical(other.nonce, nonce) ||
+                const DeepCollectionEquality().equals(other.nonce, nonce)) &&
+            (identical(other.slotNo, slotNo) ||
+                const DeepCollectionEquality().equals(other.slotNo, slotNo)) &&
+            (identical(other.txn, txn) ||
+                const DeepCollectionEquality().equals(other.txn, txn)) &&
+            (identical(other.voteKey, voteKey) ||
+                const DeepCollectionEquality()
+                    .equals(other.voteKey, voteKey)) &&
+            (identical(other.paymentAddress, paymentAddress) ||
+                const DeepCollectionEquality()
+                    .equals(other.paymentAddress, paymentAddress)) &&
+            (identical(other.isPayable, isPayable) ||
+                const DeepCollectionEquality()
+                    .equals(other.isPayable, isPayable)) &&
+            (identical(other.cip36, cip36) ||
+                const DeepCollectionEquality().equals(other.cip36, cip36)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(stakeAddress) ^
+      const DeepCollectionEquality().hash(nonce) ^
+      const DeepCollectionEquality().hash(slotNo) ^
+      const DeepCollectionEquality().hash(txn) ^
+      const DeepCollectionEquality().hash(voteKey) ^
+      const DeepCollectionEquality().hash(paymentAddress) ^
+      const DeepCollectionEquality().hash(isPayable) ^
+      const DeepCollectionEquality().hash(cip36) ^
+      runtimeType.hashCode;
+}
+
+extension $Cip36InfoExtension on Cip36Info {
+  Cip36Info copyWith(
+      {String? stakeAddress,
+      int? nonce,
+      int? slotNo,
+      int? txn,
+      String? voteKey,
+      String? paymentAddress,
+      bool? isPayable,
+      bool? cip36}) {
+    return Cip36Info(
+        stakeAddress: stakeAddress ?? this.stakeAddress,
+        nonce: nonce ?? this.nonce,
+        slotNo: slotNo ?? this.slotNo,
+        txn: txn ?? this.txn,
+        voteKey: voteKey ?? this.voteKey,
+        paymentAddress: paymentAddress ?? this.paymentAddress,
+        isPayable: isPayable ?? this.isPayable,
+        cip36: cip36 ?? this.cip36);
+  }
+
+  Cip36Info copyWithWrapped(
+      {Wrapped<String>? stakeAddress,
+      Wrapped<int>? nonce,
+      Wrapped<int>? slotNo,
+      Wrapped<int>? txn,
+      Wrapped<String>? voteKey,
+      Wrapped<String>? paymentAddress,
+      Wrapped<bool>? isPayable,
+      Wrapped<bool>? cip36}) {
+    return Cip36Info(
+        stakeAddress:
+            (stakeAddress != null ? stakeAddress.value : this.stakeAddress),
+        nonce: (nonce != null ? nonce.value : this.nonce),
+        slotNo: (slotNo != null ? slotNo.value : this.slotNo),
+        txn: (txn != null ? txn.value : this.txn),
+        voteKey: (voteKey != null ? voteKey.value : this.voteKey),
+        paymentAddress: (paymentAddress != null
+            ? paymentAddress.value
+            : this.paymentAddress),
+        isPayable: (isPayable != null ? isPayable.value : this.isPayable),
+        cip36: (cip36 != null ? cip36.value : this.cip36));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class Cip36Reporting {
+  const Cip36Reporting({
+    required this.cip36,
+    required this.invalids,
+  });
+
+  factory Cip36Reporting.fromJson(Map<String, dynamic> json) =>
+      _$Cip36ReportingFromJson(json);
+
+  static const toJsonFactory = _$Cip36ReportingToJson;
+  Map<String, dynamic> toJson() => _$Cip36ReportingToJson(this);
+
+  @JsonKey(name: 'cip36', defaultValue: <Cip36Info>[])
+  final List<Cip36Info> cip36;
+  @JsonKey(name: 'invalids', defaultValue: <InvalidRegistrationsReport>[])
+  final List<InvalidRegistrationsReport> invalids;
+  static const fromJsonFactory = _$Cip36ReportingFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is Cip36Reporting &&
+            (identical(other.cip36, cip36) ||
+                const DeepCollectionEquality().equals(other.cip36, cip36)) &&
+            (identical(other.invalids, invalids) ||
+                const DeepCollectionEquality()
+                    .equals(other.invalids, invalids)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(cip36) ^
+      const DeepCollectionEquality().hash(invalids) ^
+      runtimeType.hashCode;
+}
+
+extension $Cip36ReportingExtension on Cip36Reporting {
+  Cip36Reporting copyWith(
+      {List<Cip36Info>? cip36, List<InvalidRegistrationsReport>? invalids}) {
+    return Cip36Reporting(
+        cip36: cip36 ?? this.cip36, invalids: invalids ?? this.invalids);
+  }
+
+  Cip36Reporting copyWithWrapped(
+      {Wrapped<List<Cip36Info>>? cip36,
+      Wrapped<List<InvalidRegistrationsReport>>? invalids}) {
+    return Cip36Reporting(
+        cip36: (cip36 != null ? cip36.value : this.cip36),
+        invalids: (invalids != null ? invalids.value : this.invalids));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class Cip36ReportingList {
+  const Cip36ReportingList({
+    required this.cip36,
+  });
+
+  factory Cip36ReportingList.fromJson(Map<String, dynamic> json) =>
+      _$Cip36ReportingListFromJson(json);
+
+  static const toJsonFactory = _$Cip36ReportingListToJson;
+  Map<String, dynamic> toJson() => _$Cip36ReportingListToJson(this);
+
+  @JsonKey(name: 'cip36', defaultValue: <Cip36Reporting>[])
+  final List<Cip36Reporting> cip36;
+  static const fromJsonFactory = _$Cip36ReportingListFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is Cip36ReportingList &&
+            (identical(other.cip36, cip36) ||
+                const DeepCollectionEquality().equals(other.cip36, cip36)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(cip36) ^ runtimeType.hashCode;
+}
+
+extension $Cip36ReportingListExtension on Cip36ReportingList {
+  Cip36ReportingList copyWith({List<Cip36Reporting>? cip36}) {
+    return Cip36ReportingList(cip36: cip36 ?? this.cip36);
+  }
+
+  Cip36ReportingList copyWithWrapped({Wrapped<List<Cip36Reporting>>? cip36}) {
+    return Cip36ReportingList(
+        cip36: (cip36 != null ? cip36.value : this.cip36));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
 class DelegatePublicKey {
   const DelegatePublicKey({
     required this.address,
@@ -530,6 +753,112 @@ extension $HashExtension on Hash {
 }
 
 @JsonSerializable(explicitToJson: true)
+class InvalidRegistrationsReport {
+  const InvalidRegistrationsReport({
+    required this.errorReport,
+    required this.stakeAddress,
+    required this.voteKey,
+    required this.paymentAddress,
+    required this.isPayable,
+    required this.cip36,
+  });
+
+  factory InvalidRegistrationsReport.fromJson(Map<String, dynamic> json) =>
+      _$InvalidRegistrationsReportFromJson(json);
+
+  static const toJsonFactory = _$InvalidRegistrationsReportToJson;
+  Map<String, dynamic> toJson() => _$InvalidRegistrationsReportToJson(this);
+
+  @JsonKey(name: 'error_report', defaultValue: <String>[])
+  final List<String> errorReport;
+  @JsonKey(name: 'stake_address')
+  final String stakeAddress;
+  @JsonKey(name: 'vote_key')
+  final String voteKey;
+  @JsonKey(name: 'payment_address')
+  final String paymentAddress;
+  @JsonKey(name: 'is_payable')
+  final bool isPayable;
+  @JsonKey(name: 'cip36')
+  final bool cip36;
+  static const fromJsonFactory = _$InvalidRegistrationsReportFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is InvalidRegistrationsReport &&
+            (identical(other.errorReport, errorReport) ||
+                const DeepCollectionEquality()
+                    .equals(other.errorReport, errorReport)) &&
+            (identical(other.stakeAddress, stakeAddress) ||
+                const DeepCollectionEquality()
+                    .equals(other.stakeAddress, stakeAddress)) &&
+            (identical(other.voteKey, voteKey) ||
+                const DeepCollectionEquality()
+                    .equals(other.voteKey, voteKey)) &&
+            (identical(other.paymentAddress, paymentAddress) ||
+                const DeepCollectionEquality()
+                    .equals(other.paymentAddress, paymentAddress)) &&
+            (identical(other.isPayable, isPayable) ||
+                const DeepCollectionEquality()
+                    .equals(other.isPayable, isPayable)) &&
+            (identical(other.cip36, cip36) ||
+                const DeepCollectionEquality().equals(other.cip36, cip36)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(errorReport) ^
+      const DeepCollectionEquality().hash(stakeAddress) ^
+      const DeepCollectionEquality().hash(voteKey) ^
+      const DeepCollectionEquality().hash(paymentAddress) ^
+      const DeepCollectionEquality().hash(isPayable) ^
+      const DeepCollectionEquality().hash(cip36) ^
+      runtimeType.hashCode;
+}
+
+extension $InvalidRegistrationsReportExtension on InvalidRegistrationsReport {
+  InvalidRegistrationsReport copyWith(
+      {List<String>? errorReport,
+      String? stakeAddress,
+      String? voteKey,
+      String? paymentAddress,
+      bool? isPayable,
+      bool? cip36}) {
+    return InvalidRegistrationsReport(
+        errorReport: errorReport ?? this.errorReport,
+        stakeAddress: stakeAddress ?? this.stakeAddress,
+        voteKey: voteKey ?? this.voteKey,
+        paymentAddress: paymentAddress ?? this.paymentAddress,
+        isPayable: isPayable ?? this.isPayable,
+        cip36: cip36 ?? this.cip36);
+  }
+
+  InvalidRegistrationsReport copyWithWrapped(
+      {Wrapped<List<String>>? errorReport,
+      Wrapped<String>? stakeAddress,
+      Wrapped<String>? voteKey,
+      Wrapped<String>? paymentAddress,
+      Wrapped<bool>? isPayable,
+      Wrapped<bool>? cip36}) {
+    return InvalidRegistrationsReport(
+        errorReport:
+            (errorReport != null ? errorReport.value : this.errorReport),
+        stakeAddress:
+            (stakeAddress != null ? stakeAddress.value : this.stakeAddress),
+        voteKey: (voteKey != null ? voteKey.value : this.voteKey),
+        paymentAddress: (paymentAddress != null
+            ? paymentAddress.value
+            : this.paymentAddress),
+        isPayable: (isPayable != null ? isPayable.value : this.isPayable),
+        cip36: (cip36 != null ? cip36.value : this.cip36));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
 class RegistrationInfo {
   const RegistrationInfo({
     required this.rewardsAddress,
@@ -875,8 +1204,9 @@ extension $SlotInfoExtension on SlotInfo {
 @JsonSerializable(explicitToJson: true)
 class StakeInfo {
   const StakeInfo({
-    required this.amount,
+    required this.adaAmount,
     required this.slotNumber,
+    required this.nativeTokens,
   });
 
   factory StakeInfo.fromJson(Map<String, dynamic> json) =>
@@ -885,21 +1215,27 @@ class StakeInfo {
   static const toJsonFactory = _$StakeInfoToJson;
   Map<String, dynamic> toJson() => _$StakeInfoToJson(this);
 
-  @JsonKey(name: 'amount')
-  final int amount;
+  @JsonKey(name: 'ada_amount')
+  final int adaAmount;
   @JsonKey(name: 'slot_number')
   final int slotNumber;
+  @JsonKey(name: 'native_tokens', defaultValue: <StakedNativeTokenInfo>[])
+  final List<StakedNativeTokenInfo> nativeTokens;
   static const fromJsonFactory = _$StakeInfoFromJson;
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other is StakeInfo &&
-            (identical(other.amount, amount) ||
-                const DeepCollectionEquality().equals(other.amount, amount)) &&
+            (identical(other.adaAmount, adaAmount) ||
+                const DeepCollectionEquality()
+                    .equals(other.adaAmount, adaAmount)) &&
             (identical(other.slotNumber, slotNumber) ||
                 const DeepCollectionEquality()
-                    .equals(other.slotNumber, slotNumber)));
+                    .equals(other.slotNumber, slotNumber)) &&
+            (identical(other.nativeTokens, nativeTokens) ||
+                const DeepCollectionEquality()
+                    .equals(other.nativeTokens, nativeTokens)));
   }
 
   @override
@@ -907,22 +1243,99 @@ class StakeInfo {
 
   @override
   int get hashCode =>
-      const DeepCollectionEquality().hash(amount) ^
+      const DeepCollectionEquality().hash(adaAmount) ^
       const DeepCollectionEquality().hash(slotNumber) ^
+      const DeepCollectionEquality().hash(nativeTokens) ^
       runtimeType.hashCode;
 }
 
 extension $StakeInfoExtension on StakeInfo {
-  StakeInfo copyWith({int? amount, int? slotNumber}) {
+  StakeInfo copyWith(
+      {int? adaAmount,
+      int? slotNumber,
+      List<StakedNativeTokenInfo>? nativeTokens}) {
     return StakeInfo(
-        amount: amount ?? this.amount,
-        slotNumber: slotNumber ?? this.slotNumber);
+        adaAmount: adaAmount ?? this.adaAmount,
+        slotNumber: slotNumber ?? this.slotNumber,
+        nativeTokens: nativeTokens ?? this.nativeTokens);
   }
 
-  StakeInfo copyWithWrapped({Wrapped<int>? amount, Wrapped<int>? slotNumber}) {
+  StakeInfo copyWithWrapped(
+      {Wrapped<int>? adaAmount,
+      Wrapped<int>? slotNumber,
+      Wrapped<List<StakedNativeTokenInfo>>? nativeTokens}) {
     return StakeInfo(
-        amount: (amount != null ? amount.value : this.amount),
-        slotNumber: (slotNumber != null ? slotNumber.value : this.slotNumber));
+        adaAmount: (adaAmount != null ? adaAmount.value : this.adaAmount),
+        slotNumber: (slotNumber != null ? slotNumber.value : this.slotNumber),
+        nativeTokens:
+            (nativeTokens != null ? nativeTokens.value : this.nativeTokens));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class StakedNativeTokenInfo {
+  const StakedNativeTokenInfo({
+    required this.policyHash,
+    required this.policyName,
+    required this.amount,
+  });
+
+  factory StakedNativeTokenInfo.fromJson(Map<String, dynamic> json) =>
+      _$StakedNativeTokenInfoFromJson(json);
+
+  static const toJsonFactory = _$StakedNativeTokenInfoToJson;
+  Map<String, dynamic> toJson() => _$StakedNativeTokenInfoToJson(this);
+
+  @JsonKey(name: 'policy_hash')
+  final String policyHash;
+  @JsonKey(name: 'policy_name')
+  final String policyName;
+  @JsonKey(name: 'amount')
+  final int amount;
+  static const fromJsonFactory = _$StakedNativeTokenInfoFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is StakedNativeTokenInfo &&
+            (identical(other.policyHash, policyHash) ||
+                const DeepCollectionEquality()
+                    .equals(other.policyHash, policyHash)) &&
+            (identical(other.policyName, policyName) ||
+                const DeepCollectionEquality()
+                    .equals(other.policyName, policyName)) &&
+            (identical(other.amount, amount) ||
+                const DeepCollectionEquality().equals(other.amount, amount)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(policyHash) ^
+      const DeepCollectionEquality().hash(policyName) ^
+      const DeepCollectionEquality().hash(amount) ^
+      runtimeType.hashCode;
+}
+
+extension $StakedNativeTokenInfoExtension on StakedNativeTokenInfo {
+  StakedNativeTokenInfo copyWith(
+      {String? policyHash, String? policyName, int? amount}) {
+    return StakedNativeTokenInfo(
+        policyHash: policyHash ?? this.policyHash,
+        policyName: policyName ?? this.policyName,
+        amount: amount ?? this.amount);
+  }
+
+  StakedNativeTokenInfo copyWithWrapped(
+      {Wrapped<String>? policyHash,
+      Wrapped<String>? policyName,
+      Wrapped<int>? amount}) {
+    return StakedNativeTokenInfo(
+        policyHash: (policyHash != null ? policyHash.value : this.policyHash),
+        policyName: (policyName != null ? policyName.value : this.policyName),
+        amount: (amount != null ? amount.value : this.amount));
   }
 }
 

@@ -7,6 +7,7 @@ adminer
 afinet
 androidx
 anypolicy
+appbar
 appspot
 Arbritrary
 ARGB
@@ -80,6 +81,7 @@ encryptor
 endfunction
 Eternl
 EUTXO
+extn
 fetchval
 fmtchk
 fmtfix
@@ -294,4 +296,3 @@ xctestrun
 xcworkspace
 xvfb
 yoroi
-appbar
