@@ -1,0 +1,1 @@
+enum RegistrationRecoverMethod { seedPhrase }

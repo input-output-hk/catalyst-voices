@@ -742,4 +742,34 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get registrationExitConfirmDialogCancel => 'Cancel anyway';
+
+  @override
+  String get recoverCatalystKeychain => 'Restore Catalyst keychain';
+
+  @override
+  String get recoverKeychainMethodsTitle => 'Restore your Catalyst Keychain';
+
+  @override
+  String get recoverKeychainMethodsNoKeychainFound => 'No Catalyst Keychain found on this device.';
+
+  @override
+  String get recoverKeychainMethodsSubtitle => 'Not to worry, in the next step you can choose the recovery option that applies to you for this device!';
+
+  @override
+  String get recoverKeychainMethodsListTitle => 'How do you want Restore your Catalyst Keychain?';
+
+  @override
+  String get recoverKeychainNonFound => 'No Catalyst Keychain found on this device.';
+
+  @override
+  String get recoverKeychainFound => 'Keychain found!   Please unlock your device.';
+
+  @override
+  String get seedPhrase12Words => '12 security words';
+
+  @override
+  String get recoverySeedPhraseInstructionsTitle => 'Restore your Catalyst Keychain with  your 12 security words.';
+
+  @override
+  String get recoverySeedPhraseInstructionsSubtitle => 'Enter your security words in the correct order, and sign into your Catalyst account on a new device.';
 }
