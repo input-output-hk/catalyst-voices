@@ -370,7 +370,7 @@ fn extract_role0_data(
                     .map(|cert| {
                         let stake_addresses = extract_stake_addresses_from_c509(cert);
                         Role0CertificateData {
-                            role0_key: cert.get_tbs_cert().get_subject_public_key().to_vec(),
+                            role0_key: cert.tbs_cert().subject_public_key().to_vec(),
                             stake_addresses,
                         }
                     })
@@ -442,14 +442,13 @@ fn extract_stake_addresses_from_x509(
 /// Extract Stake Address from C509 Certificate
 fn extract_stake_addresses_from_c509(c509: &C509) -> Option<Vec<StakeAddress>> {
     let mut stake_addresses = Vec::new();
-    for exts in c509.get_tbs_cert().get_extensions().get_inner() {
-        if exts.get_registered_oid().get_c509_oid().get_oid() == SUBJECT_ALT_NAME_OID {
-            if let ExtensionValue::AlternativeName(alt_name) = exts.get_value() {
-                if let GeneralNamesOrText::GeneralNames(gn) = alt_name.get_inner() {
-                    for name in gn.get_inner() {
-                        if name.get_gn_type() == &GeneralNameTypeRegistry::UniformResourceIdentifier
-                        {
-                            if let GeneralNameValue::Text(s) = name.get_gn_value() {
+    for exts in c509.tbs_cert().extensions().extensions() {
+        if *exts.registered_oid().c509_oid().oid() == SUBJECT_ALT_NAME_OID {
+            if let ExtensionValue::AlternativeName(alt_name) = exts.value() {
+                if let GeneralNamesOrText::GeneralNames(gn) = alt_name.general_name() {
+                    for name in gn.general_names() {
+                        if name.gn_type() == &GeneralNameTypeRegistry::UniformResourceIdentifier {
+                            if let GeneralNameValue::Text(s) = name.gn_value() {
                                 if let Some(h) = extract_cip19_hash(s, Some("stake")) {
                                     stake_addresses.push(h);
                                 }
