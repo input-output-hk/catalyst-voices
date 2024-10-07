@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:catalyst_cardano/catalyst_cardano.dart';
-import 'package:catalyst_voices/pages/registration/registration_stage_message.dart';
 import 'package:catalyst_voices/pages/registration/wallet_link/bloc_wallet_link_builder.dart';
+import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
