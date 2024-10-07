@@ -1413,6 +1413,18 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'12 security words'**
   String get seedPhrase12Words;
+
+  /// No description provided for @recoverySeedPhraseInstructionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore your Catalyst Keychain with  your 12 security words.'**
+  String get recoverySeedPhraseInstructionsTitle;
+
+  /// No description provided for @recoverySeedPhraseInstructionsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your security words in the correct order, and sign into your Catalyst account on a new device.'**
+  String get recoverySeedPhraseInstructionsSubtitle;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

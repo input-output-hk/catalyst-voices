@@ -26,17 +26,7 @@ class RecoverMethodPanel extends StatelessWidget {
             style: theme.textTheme.titleMedium?.copyWith(color: colorLvl1),
           ),
           const SizedBox(height: 12),
-          AffixDecorator(
-            iconTheme: IconThemeData(
-              size: 24,
-              color: colorLvl1,
-            ),
-            prefix: VoicesAssets.icons.exclamation.buildIcon(),
-            child: Text(
-              context.l10n.recoverKeychainMethodsNoKeychainFound,
-              style: theme.textTheme.titleSmall?.copyWith(color: colorLvl1),
-            ),
-          ),
+          const _OnDeviceKeychains(),
           const SizedBox(height: 12),
           Text(
             context.l10n.recoverKeychainMethodsSubtitle,
@@ -60,7 +50,10 @@ class RecoverMethodPanel extends StatelessWidget {
                         title: method._getTitle(context.l10n),
                         subtitle: method._getSubtitle(context.l10n),
                         onTap: () {
-                          //
+                          switch (method) {
+                            case RegistrationRecoverMethod.seedPhrase:
+                            // TODO: Handle this case.
+                          }
                         },
                       );
                     },
@@ -70,6 +63,31 @@ class RecoverMethodPanel extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// Note. We don't check keychains on device at this point (no design) but
+// if we're going to do it then this widget will show them.
+class _OnDeviceKeychains extends StatelessWidget {
+  const _OnDeviceKeychains();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    final colorLvl1 = theme.colors.textOnPrimaryLevel1;
+
+    return AffixDecorator(
+      iconTheme: IconThemeData(
+        size: 24,
+        color: colorLvl1,
+      ),
+      prefix: VoicesAssets.icons.exclamation.buildIcon(),
+      child: Text(
+        context.l10n.recoverKeychainMethodsNoKeychainFound,
+        style: theme.textTheme.titleSmall?.copyWith(color: colorLvl1),
       ),
     );
   }
