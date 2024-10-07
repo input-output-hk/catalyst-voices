@@ -86,14 +86,14 @@ the length of such vector **must** be equal to the amount of the voting options 
 $i$ corresponds to the proposal voting choice and
 defines that the $i$-th component of the unit vector equals to $1$
 and the rest components are equals to $0$.
-And it stands as an identifier of the unit vector and could varies $1 \le i \le M$,
+And it stands as an identifier of the unit vector and could varies $0 \le i \le M - 1$,
 $M$ - amount of the voting options.
 <br/>
 E.g. proposal has voting options $[Yes, No, Abstain]$:
 
-* $\mathbf{e}_1$ equals to $(1,0,0)$ corresponds to $Yes$
-* $\mathbf{e}_2$ equals to $(0,1,0)$ corresponds to $No$
-* $\mathbf{e}_3$ equals to $(0,0,1)$ corresponds to $Abstain$
+* $\mathbf{e}_0$ equals to $(1,0,0)$ corresponds to $Yes$
+* $\mathbf{e}_1$ equals to $(0,1,0)$ corresponds to $No$
+* $\mathbf{e}_2$ equals to $(0,0,1)$ corresponds to $Abstain$
 
 Lets $e_{i,j}$ denote as an each component value of the unit vector $\mathbf{e}_i$.
 Where $i$ is a unit vector's identifier as it was described before,
@@ -103,17 +103,17 @@ $M$ - amount of the voting options and equals to the length of the unit vector.
 Using such notation unit vector $\mathbf{e}_i$ could be defined as
 <!-- markdownlint-disable emphasis-style -->
 \begin{equation}
-\mathbf{e}_i = (e_{i,1}, \ldots, e_{i,M})
+\mathbf{e}_i = [e_{i,0}, \ldots, e_{i,M - 1}]
 \end{equation}
 <!-- markdownlint-enable emphasis-style -->
 
 E.g. for the unit vector
-$\mathbf{e}_1 = (1,0,0)$
+$\mathbf{e}_0 = [1,0,0]$
 components would be defined as follows:
 
-* $e_{1, 1}$ equals to $1$
-* $e_{1, 2}$ equals to $0$
-* $e_{1, 3}$ equals to $0$
+* $e_{0, 0}$ equals to $1$
+* $e_{0, 1}$ equals to $0$
+* $e_{0, 2}$ equals to $0$
 
 <!-- markdownlint-enable no-inline-html -->
 
@@ -129,9 +129,10 @@ noted as $VoteEnc(message, randomness, public \; key)$.
 More detailed description of the lifted ElGamal algorithm
 you can find in the [appendix B](#b-lifted-elgamal-encryptiondecryption).
 <br/>
-$VoteEnc(message, randomness, public \; key)$ algorithm produces a ciphertext $c$ as a result.
+$VoteEnc(message, randomness, public \; key)$ algorithm produces
+a ciphertext $c$ with the generated randomness $r$ as a result.
 \begin{equation}
-c = ElGamalEnc(message, randomness, public \; key) = VoteEnc(message, randomness, public \; key)
+c, r = VoteEnc(message, public \; key)
 \end{equation}
 
 To encrypt previously generated unit vector $\mathbf{e}_i$ ($i$ - voting choice identifier),
@@ -143,7 +144,7 @@ where $j$ is the same vector component's index $j$ value, $e_{i, j} => r_j$.
 Then, for each vector component $e_{i,j}$ with the corresponding randomness $r_j$,
 perform encryption algorithm applying shared election public key $pk$.
 \begin{equation}
-c_j = VoteEnc(e_{i,j}, r_j, pk)
+c_j, r_j = VoteEnc(e_{i,j}, pk)
 \end{equation}
 
 As a result getting a vector $\mathbf{c}$ of ciphertext values $c_f$,
@@ -151,7 +152,7 @@ with the size equals of the size $\mathbf{e}_t$ unit vector,
 equals to the amount of the voting options.
 Lets denote this vector as:
 \begin{equation}
-\mathbf{c} = (c_1, \ldots, c_{M}) = (VoteEnc(e_{i,j}, r_j, pk), \ldots,  VoteEnc(e_{i,M}, r_M, pk))
+\mathbf{c}, \mathbf{r} = [(c_0, r_0), \ldots, (c_{M-1}, r_{M-1})] = (VoteEnc(e_{i,j}, pk), \ldots,  VoteEnc(e_{i,M - 1}, pk))
 \end{equation}
 
 where $M$ is the voting options amount and $i$ is the index of the voting choice.
@@ -166,7 +167,7 @@ After the voter's choice is generated and encrypted,
 it is crucial to prove that [encoding](#voting-choice) and [encryption](#vote-encryption) are formed correctly
 (i.e. that the voter indeed encrypt a unit vector).
 
-Because by the definition of the encryption algorithm $VoteEnc(message, randomness, public \; key)$
+Because by the definition of the encryption algorithm $VoteEnc(message, public \; key)$
 encrypts any message value,
 it is not restricted for encryption only $0$ and $1$ values
 (as it was stated in the previous [section](#voting-choice),
@@ -497,7 +498,7 @@ To compute it, prover needs to perform the next steps:
     * $B_l = g^{\beta_l} \circ ck^{\gamma_l}, B_l \in \mathbb{G}$.
     * $A_l = g^{i_l * \beta_l} \circ ck^{\delta_l}, A_l \in \mathbb{G}$.
 6. Calculate a first verifier challenge
-  $com_1 = H(ck, pk, \{c_j\}, \{I_l\}, \{B_l\}, \{A_l\})$,
+  $ch_1 = H(ck, pk, \{c_j\}, \{I_l\}, \{B_l\}, \{A_l\})$,
   where $H$ is a hash function,
   $j \in [0, \ldots, N-1]$
   and $l \in [0, \ldots, log_2(N)-1]$.
@@ -510,18 +511,18 @@ To compute it, prover needs to perform the next steps:
 8. For $l \in [0, \ldots, log_2(N)-1]$ generate a random $R_l \in \mathbb{Z}_q$.
 9. For $l \in [0, \ldots, log_2(N)-1]$ compute
   $D_l = VoteEnc(sum_l, R_l, pk)$,
-  where $sum_l = \sum_{j=0}^{N-1}(p_{j,l} * com_1^j)$
+  where $sum_l = \sum_{j=0}^{N-1}(p_{j,l} * ch_1^j)$
   and $p_{j,l}$ - corresponding coefficients of the polynomial $p_j(x)$ calculated on step `7`.
 10. Calculate a second verifier challenge
-  $com_2 = H(com_1, \{D_l\})$,
+  $ch_2 = H(ch_1, \{D_l\})$,
   where $H$ is a hash function
   and $l \in [0, \ldots, log_2(N)-1]$.
 11. For $l \in [0, \ldots, log_2(N)-1]$ calculate:
-    * $z_l = i_l * com_2 + \beta_l, z_l \in \mathbb{Z}_q$.
-    * $w_l = \alpha_l * com_2 + \gamma_l, w_l \in \mathbb{Z}_q$.
-    * $v_l = \alpha_l * (com_2 - z_l) + \delta_l, v_l \in \mathbb{Z}_q$.
+    * $z_l = i_l * ch_2 + \beta_l, z_l \in \mathbb{Z}_q$.
+    * $w_l = \alpha_l * ch_2 + \gamma_l, w_l \in \mathbb{Z}_q$.
+    * $v_l = \alpha_l * (ch_2 - z_l) + \delta_l, v_l \in \mathbb{Z}_q$.
 12. Calculate
-  $R=\sum_{j=0}^{N-1}(r_j * (com_2)^{log_2(N)} * (com_1)^j) + \sum_{l=0}^{log_2(N)-1}(R_l * (com_2)^l)$,
+  $R=\sum_{j=0}^{N-1}(r_j * (ch_2)^{log_2(N)} * (ch_1)^j) + \sum_{l=0}^{log_2(N)-1}(R_l * (ch_2)^l)$,
   where $r_j$ original random values which was used to encrypt $c_j$
   and $R_l$ random values generated in step `8`.
 
@@ -552,38 +553,38 @@ verifier needs to perform the next steps:
   where $N$ is a perfect power of $2$, $j \in [M, \ldots, N - 1]$.
   So the resulted $\mathbf{c} = (c_1, \ldots, c_M, \{c_j\})$.
 2. Calculate the first verifier challenge
-  $com_1 = H(ck, pk, \{c_j\}, \{I_l\}, \{B_l\}, \{A_l\})$,
+  $ch_1 = H(ck, pk, \{c_j\}, \{I_l\}, \{B_l\}, \{A_l\})$,
   where $H$ is a hash function,
   $j \in [0, \ldots, N-1]$
   and $l \in [0, \ldots, log_2(N)-1]$.
 3. Calculate a second verifier challenge
-  $com_2 = H(com_1, \{D_l\})$,
+  $ch_2 = H(ch_1, \{D_l\})$,
   where $H$ is a hash function
   and $l \in [0, \ldots, log_2(N)-1]$.
 4. For $l \in [0, \ldots, log_2(N)-1]$ verify that the following statements are `true`,
   where $g$ is the group generator:
-    * $(I_l)^{com_2} \circ B_l == g^{z_l} \circ ck^{w_l}$.
-    * $(I_l)^{com_2 - z_l} \circ A_l == g^{0} \circ ck^{v_l}$.
+    * $(I_l)^{ch_2} \circ B_l == g^{z_l} \circ ck^{w_l}$.
+    * $(I_l)^{ch_2 - z_l} \circ A_l == g^{0} \circ ck^{v_l}$.
 5. Calculate the following $Left = VoteEnc(0, R, pk)$.
   Note that the $Left$ is a ciphertext, $Left = (Left_1, Left_2)$.
 6. Note that $D_l$ is a ciphertext,
   $D_l = (D_{l,1}, D_{l,2})$, for $l \in [0, \ldots, log_2(N)-1]$
   calculate the following:
-    * $Right2_1 = (D_{0,1})^{0} \circ \ldots \circ (D_{log_2(N) - 1,1})^{log_2(N) - 1}$.
-    * $Right2_2 = (D_{0,2})^{0} \circ \ldots \circ (D_{log_2(N) - 1,2})^{log_2(N) - 1}$.
-7. For $j \in [0, \ldots, N-1]$ calculate the $p_j(com_2)$,
+    * $Right2_1 = (D_{0,1})^{ch_2^{0}} \circ \ldots \circ (D_{log_2(N) - 1,1})^{ch_2^{log_2(N) - 1}}$.
+    * $Right2_2 = (D_{0,2})^{ch_2^{0}} \circ \ldots \circ (D_{log_2(N) - 1,2})^{ch_2^{log_2(N) - 1}}$.
+7. For $j \in [0, \ldots, N-1]$ calculate the $p_j(ch_2)$,
   where $p_j$ is a prover's defined polynomial defined in step `7`:
     * $j_l$ is a bit value of the $j$-th binary representation.
     * $z_l^1 = z_j$.
-    * $z_l^0 = com_2 - z_j^1$.
-    * $p_j(com_2) = \prod_l^{log_2(N)-1} z_l^{j_l}$.
-8. For $j \in [0, \ldots, N-1]$ calculate the $P_j = VoteEnc(-p_j(com_2), 0, pk)$.
+    * $z_l^0 = ch_2 - z_j^1$.
+    * $p_j(ch_2) = \prod_l^{log_2(N)-1} z_l^{j_l}$.
+8. For $j \in [0, \ldots, N-1]$ calculate the $P_j = VoteEnc(-p_j(ch_2), 0, pk)$.
   Note that the $P_j$ is a ciphertext, $P_j = (P_{j,1}, P_{j,2})$.
 9. Note that $C_j$ is a ciphertext,
   $C_j = (C_{j,1}, C_{j,2})$, for $j \in [0, \ldots, N-1]$
   calculate:
-    * $Right1_{j,1} = (C_{j,1})^{com_2^{log_2(N)}} \circ (P_{j,1})^{com_1^{j}}$.
-    * $Right1_{j,2} = (C_{j,2})^{com_2^{log_2(N)}} \circ (P_{j,2})^{com_1^{j}}$.
+    * $Right1_{j,1} = (C_{j,1})^{ch_2^{log_2(N)}} \circ (P_{j,1})^{ch_1^{j}}$.
+    * $Right1_{j,2} = (C_{j,2})^{ch_2^{log_2(N)}} \circ (P_{j,2})^{ch_1^{j}}$.
     * $Right1_{1} = Right1_{j,1} \circ \ldots \circ Right1_{N - 1, 1}$.
     * $Right1_{2} = Right1_{j,2} \circ \ldots \circ Right1_{N - 1, 2}$.
 10. Verify that the following statements are `true`:
