@@ -30,6 +30,60 @@ Map<String, dynamic> _$BlockDateToJson(BlockDate instance) => <String, dynamic>{
       'slot_id': instance.slotId,
     };
 
+Cip36Info _$Cip36InfoFromJson(Map<String, dynamic> json) => Cip36Info(
+      stakeAddress: json['stake_address'] as String,
+      nonce: (json['nonce'] as num).toInt(),
+      slotNo: (json['slot_no'] as num).toInt(),
+      txn: (json['txn'] as num).toInt(),
+      voteKey: json['vote_key'] as String,
+      paymentAddress: json['payment_address'] as String,
+      isPayable: json['is_payable'] as bool,
+      cip36: json['cip36'] as bool,
+    );
+
+Map<String, dynamic> _$Cip36InfoToJson(Cip36Info instance) => <String, dynamic>{
+      'stake_address': instance.stakeAddress,
+      'nonce': instance.nonce,
+      'slot_no': instance.slotNo,
+      'txn': instance.txn,
+      'vote_key': instance.voteKey,
+      'payment_address': instance.paymentAddress,
+      'is_payable': instance.isPayable,
+      'cip36': instance.cip36,
+    };
+
+Cip36Reporting _$Cip36ReportingFromJson(Map<String, dynamic> json) =>
+    Cip36Reporting(
+      cip36: (json['cip36'] as List<dynamic>?)
+              ?.map((e) => Cip36Info.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+      invalids: (json['invalids'] as List<dynamic>?)
+              ?.map((e) => InvalidRegistrationsReport.fromJson(
+                  e as Map<String, dynamic>))
+              .toList() ??
+          [],
+    );
+
+Map<String, dynamic> _$Cip36ReportingToJson(Cip36Reporting instance) =>
+    <String, dynamic>{
+      'cip36': instance.cip36.map((e) => e.toJson()).toList(),
+      'invalids': instance.invalids.map((e) => e.toJson()).toList(),
+    };
+
+Cip36ReportingList _$Cip36ReportingListFromJson(Map<String, dynamic> json) =>
+    Cip36ReportingList(
+      cip36: (json['cip36'] as List<dynamic>?)
+              ?.map((e) => Cip36Reporting.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+    );
+
+Map<String, dynamic> _$Cip36ReportingListToJson(Cip36ReportingList instance) =>
+    <String, dynamic>{
+      'cip36': instance.cip36.map((e) => e.toJson()).toList(),
+    };
+
 DelegatePublicKey _$DelegatePublicKeyFromJson(Map<String, dynamic> json) =>
     DelegatePublicKey(
       address: json['address'] as String,
@@ -134,6 +188,31 @@ Map<String, dynamic> _$HashToJson(Hash instance) => <String, dynamic>{
       'hash': instance.hash,
     };
 
+InvalidRegistrationsReport _$InvalidRegistrationsReportFromJson(
+        Map<String, dynamic> json) =>
+    InvalidRegistrationsReport(
+      errorReport: (json['error_report'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
+      stakeAddress: json['stake_address'] as String,
+      voteKey: json['vote_key'] as String,
+      paymentAddress: json['payment_address'] as String,
+      isPayable: json['is_payable'] as bool,
+      cip36: json['cip36'] as bool,
+    );
+
+Map<String, dynamic> _$InvalidRegistrationsReportToJson(
+        InvalidRegistrationsReport instance) =>
+    <String, dynamic>{
+      'error_report': instance.errorReport,
+      'stake_address': instance.stakeAddress,
+      'vote_key': instance.voteKey,
+      'payment_address': instance.paymentAddress,
+      'is_payable': instance.isPayable,
+      'cip36': instance.cip36,
+    };
+
 RegistrationInfo _$RegistrationInfoFromJson(Map<String, dynamic> json) =>
     RegistrationInfo(
       rewardsAddress: json['rewards_address'] as String,
@@ -209,13 +288,35 @@ Map<String, dynamic> _$SlotInfoToJson(SlotInfo instance) => <String, dynamic>{
     };
 
 StakeInfo _$StakeInfoFromJson(Map<String, dynamic> json) => StakeInfo(
-      amount: (json['amount'] as num).toInt(),
+      adaAmount: (json['ada_amount'] as num).toInt(),
       slotNumber: (json['slot_number'] as num).toInt(),
+      nativeTokens: (json['native_tokens'] as List<dynamic>?)
+              ?.map((e) =>
+                  StakedNativeTokenInfo.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
     );
 
 Map<String, dynamic> _$StakeInfoToJson(StakeInfo instance) => <String, dynamic>{
-      'amount': instance.amount,
+      'ada_amount': instance.adaAmount,
       'slot_number': instance.slotNumber,
+      'native_tokens': instance.nativeTokens.map((e) => e.toJson()).toList(),
+    };
+
+StakedNativeTokenInfo _$StakedNativeTokenInfoFromJson(
+        Map<String, dynamic> json) =>
+    StakedNativeTokenInfo(
+      policyHash: json['policy_hash'] as String,
+      policyName: json['policy_name'] as String,
+      amount: (json['amount'] as num).toInt(),
+    );
+
+Map<String, dynamic> _$StakedNativeTokenInfoToJson(
+        StakedNativeTokenInfo instance) =>
+    <String, dynamic>{
+      'policy_hash': instance.policyHash,
+      'policy_name': instance.policyName,
+      'amount': instance.amount,
     };
 
 StatusInABlock _$StatusInABlockFromJson(Map<String, dynamic> json) =>

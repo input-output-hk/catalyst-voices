@@ -2,6 +2,7 @@
 //!
 //! This improves query execution time.
 
+pub(crate) mod registrations;
 pub(crate) mod staked_ada;
 pub(crate) mod sync_status;
 
@@ -9,18 +10,24 @@ use std::{fmt::Debug, sync::Arc};
 
 use anyhow::{bail, Context};
 use crossbeam_skiplist::SkipMap;
+use registrations::{
+    get_from_stake_addr::GetRegistrationQuery, get_from_stake_hash::GetStakeAddrQuery,
+    get_from_vote_key::GetStakeAddrFromVoteKeyQuery, get_invalid::GetInvalidRegistrationQuery,
+};
 use scylla::{
     batch::Batch, prepared_statement::PreparedStatement, serialize::row::SerializeRow,
     transport::iterator::RowIterator, QueryResult, Session,
 };
 use staked_ada::{
+    get_assets_by_stake_address::GetAssetsByStakeAddressQuery,
     get_txi_by_txn_hash::GetTxiByTxnHashesQuery,
     get_txo_by_stake_address::GetTxoByStakeAddressQuery, update_txo_spent::UpdateTxoSpentQuery,
 };
 use sync_status::update::SyncStatusInsertQuery;
 
 use super::block::{
-    certs::CertInsertQuery, cip36::Cip36InsertQuery, txi::TxiInsertQuery, txo::TxoInsertQuery,
+    certs::CertInsertQuery, cip36::Cip36InsertQuery, rbac509::Rbac509InsertQuery,
+    txi::TxiInsertQuery, txo::TxoInsertQuery,
 };
 use crate::settings::cassandra_db;
 
@@ -51,14 +58,32 @@ pub(crate) enum PreparedQuery {
     Cip36RegistrationForStakeAddrInsertQuery,
     /// TXO spent Update query.
     TxoSpentUpdateQuery,
+    /// RBAC 509 Registration Insert query.
+    Rbac509InsertQuery,
+    /// Chain Root For Transaction ID Insert query.
+    ChainRootForTxnIdInsertQuery,
+    /// Chain Root For Role0 Key Insert query.
+    ChainRootForRole0KeyInsertQuery,
+    /// Chain Root For Stake Address Insert query.
+    ChainRootForStakeAddressInsertQuery,
 }
 
 /// All prepared SELECT query statements (return data).
 pub(crate) enum PreparedSelectQuery {
     /// Get TXO by stake address query.
-    GetTxoByStakeAddress,
+    TxoByStakeAddress,
     /// Get TXI by transaction hash query.
-    GetTxiByTransactionHash,
+    TxiByTransactionHash,
+    /// Get native assets by stake address query.
+    AssetsByStakeAddress,
+    /// Get Registrations
+    RegistrationFromStakeAddr,
+    /// Get invalid Registration
+    InvalidRegistrationsFromStakeAddr,
+    /// Get stake addr from stake hash
+    StakeAddrFromStakeHash,
+    /// Get stake addr from vote key
+    StakeAddrFromVoteKey,
 }
 
 /// All prepared UPSERT query statements (inserts/updates a single value of data).
@@ -94,6 +119,24 @@ pub(crate) struct PreparedQueries {
     txo_by_stake_address_query: PreparedStatement,
     /// Get TXI by transaction hash.
     txi_by_txn_hash_query: PreparedStatement,
+    /// RBAC 509 Registrations.
+    rbac509_registration_insert_queries: SizedBatch,
+    /// Chain Root for TX ID Insert Query..
+    chain_root_for_txn_id_insert_queries: SizedBatch,
+    /// Chain Root for Role 0 Key Insert Query..
+    chain_root_for_role0_key_insert_queries: SizedBatch,
+    /// Chain Root for Stake Address Insert Query..
+    chain_root_for_stake_address_insert_queries: SizedBatch,
+    /// Get native assets by stake address query.
+    native_assets_by_stake_address_query: PreparedStatement,
+    /// Get registrations
+    registration_from_stake_addr_query: PreparedStatement,
+    /// stake addr from stake hash
+    stake_addr_from_stake_hash_query: PreparedStatement,
+    /// stake addr from vote key
+    stake_addr_from_vote_key_query: PreparedStatement,
+    /// Get invalid registrations
+    invalid_registrations_from_stake_addr_query: PreparedStatement,
     /// Insert Sync Status update.
     sync_status_insert: PreparedStatement,
 }
@@ -120,6 +163,14 @@ impl PreparedQueries {
             UpdateTxoSpentQuery::prepare_batch(session.clone(), cfg).await;
         let txo_by_stake_address_query = GetTxoByStakeAddressQuery::prepare(session.clone()).await;
         let txi_by_txn_hash_query = GetTxiByTxnHashesQuery::prepare(session.clone()).await;
+        let all_rbac_queries = Rbac509InsertQuery::prepare_batch(&session, cfg).await;
+        let native_assets_by_stake_address_query =
+            GetAssetsByStakeAddressQuery::prepare(session.clone()).await;
+        let registration_from_stake_addr_query =
+            GetRegistrationQuery::prepare(session.clone()).await;
+        let stake_addr_from_stake_hash = GetStakeAddrQuery::prepare(session.clone()).await;
+        let stake_addr_from_vote_key = GetStakeAddrFromVoteKeyQuery::prepare(session.clone()).await;
+        let invalid_registrations = GetInvalidRegistrationQuery::prepare(session.clone()).await;
         let sync_status_insert = SyncStatusInsertQuery::prepare(session).await;
 
         let (
@@ -135,6 +186,13 @@ impl PreparedQueries {
             cip36_registration_for_stake_address_insert_queries,
         ) = all_cip36_queries?;
 
+        let (
+            rbac509_registration_insert_queries,
+            chain_root_for_txn_id_insert_queries,
+            chain_root_for_role0_key_insert_queries,
+            chain_root_for_stake_address_insert_queries,
+        ) = all_rbac_queries?;
+
         Ok(Self {
             txo_insert_queries,
             txo_asset_insert_queries,
@@ -148,6 +206,15 @@ impl PreparedQueries {
             txo_spent_update_queries: txo_spent_update_queries?,
             txo_by_stake_address_query: txo_by_stake_address_query?,
             txi_by_txn_hash_query: txi_by_txn_hash_query?,
+            rbac509_registration_insert_queries,
+            chain_root_for_txn_id_insert_queries,
+            chain_root_for_role0_key_insert_queries,
+            chain_root_for_stake_address_insert_queries,
+            native_assets_by_stake_address_query: native_assets_by_stake_address_query?,
+            registration_from_stake_addr_query: registration_from_stake_addr_query?,
+            stake_addr_from_stake_hash_query: stake_addr_from_stake_hash?,
+            stake_addr_from_vote_key_query: stake_addr_from_vote_key?,
+            invalid_registrations_from_stake_addr_query: invalid_registrations?,
             sync_status_insert: sync_status_insert?,
         })
     }
@@ -223,8 +290,17 @@ impl PreparedQueries {
     ) -> anyhow::Result<RowIterator>
     where P: SerializeRow {
         let prepared_stmt = match select_query {
-            PreparedSelectQuery::GetTxoByStakeAddress => &self.txo_by_stake_address_query,
-            PreparedSelectQuery::GetTxiByTransactionHash => &self.txi_by_txn_hash_query,
+            PreparedSelectQuery::TxoByStakeAddress => &self.txo_by_stake_address_query,
+            PreparedSelectQuery::TxiByTransactionHash => &self.txi_by_txn_hash_query,
+            PreparedSelectQuery::AssetsByStakeAddress => &self.native_assets_by_stake_address_query,
+            PreparedSelectQuery::RegistrationFromStakeAddr => {
+                &self.registration_from_stake_addr_query
+            },
+            PreparedSelectQuery::StakeAddrFromStakeHash => &self.stake_addr_from_stake_hash_query,
+            PreparedSelectQuery::StakeAddrFromVoteKey => &self.stake_addr_from_vote_key_query,
+            PreparedSelectQuery::InvalidRegistrationsFromStakeAddr => {
+                &self.invalid_registrations_from_stake_addr_query
+            },
         };
 
         session
@@ -259,6 +335,16 @@ impl PreparedQueries {
                 &self.cip36_registration_for_stake_address_insert_queries
             },
             PreparedQuery::TxoSpentUpdateQuery => &self.txo_spent_update_queries,
+            PreparedQuery::Rbac509InsertQuery => &self.rbac509_registration_insert_queries,
+            PreparedQuery::ChainRootForTxnIdInsertQuery => {
+                &self.chain_root_for_txn_id_insert_queries
+            },
+            PreparedQuery::ChainRootForRole0KeyInsertQuery => {
+                &self.chain_root_for_role0_key_insert_queries
+            },
+            PreparedQuery::ChainRootForStakeAddressInsertQuery => {
+                &self.chain_root_for_stake_address_insert_queries
+            },
         };
 
         let mut results: Vec<QueryResult> = Vec::new();

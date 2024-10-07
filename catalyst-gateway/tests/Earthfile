@@ -1,5 +1,5 @@
 VERSION 0.8
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.2.14 AS spectral-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.2.15 AS spectral-ci
 
 # test-lint-openapi - OpenAPI linting from an artifact
 # testing whether the OpenAPI generated during build stage follows good practice.
