@@ -9,7 +9,7 @@ body:
     id: summary
     attributes:
       label: "Summary"
-      description: "Short Summary of the Task"
+      description: "Design task."
       placeholder: "Short Summary"
     validations:
       required: true
@@ -18,9 +18,9 @@ body:
     id: description
     attributes:
       label: "Description"
-      description: "Extended Description of the Task"
+      description: Design task."
       placeholder: |
-        Explicit extended description of the task...
+        Design task.
 
         ### Subtask List (Optional)
 
@@ -32,6 +32,8 @@ body:
   - type: markdown
     attributes:
       value: |
+        - [ ] Label what UI components are used below screens.
         - [ ] Check dark/light colors
         - [ ] Check responsive behaviour of components
         - [ ] Double check UI Kit component availability
+        - [ ] User Test of product segment positive.
