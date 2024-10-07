@@ -1408,6 +1408,18 @@ abstract class VoicesLocalizations {
   /// **'How do you want Restore your Catalyst Keychain?'**
   String get recoverKeychainMethodsListTitle;
 
+  /// No description provided for @recoverKeychainNonFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No Catalyst Keychain found on this device.'**
+  String get recoverKeychainNonFound;
+
+  /// No description provided for @recoverKeychainFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Keychain found!   Please unlock your device.'**
+  String get recoverKeychainFound;
+
   /// No description provided for @seedPhrase12Words.
   ///
   /// In en, this message translates to:

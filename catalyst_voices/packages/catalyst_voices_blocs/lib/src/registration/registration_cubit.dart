@@ -42,15 +42,19 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     return super.close();
   }
 
-  void createNewKeychainStep() {
+  void createNewKeychain() {
     final nextStep = _nextStep(from: const CreateKeychainStep());
     if (nextStep != null) {
       _goToStep(nextStep);
     }
   }
 
-  void recoverKeychainStep() {
-    final nextStep = _nextStep(from: const RecoverMethodStep());
+  void recoverKeychain() {
+    _goToStep(const RecoverMethodStep());
+  }
+
+  void recoverWithSeedPhrase() {
+    final nextStep = _nextStep(from: const SeedPhraseRecoverStep());
     if (nextStep != null) {
       _goToStep(nextStep);
     }
@@ -111,9 +115,24 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
           : const AccountCompletedStep();
     }
 
+    RegistrationStep? nextRecoverWithSeedPhraseStep() {
+      final step = state.step;
+
+      // if current step is not from create SeedPhraseRecoverStep
+      // just return current one
+      if (step is! SeedPhraseRecoverStep) {
+        return const SeedPhraseRecoverStep();
+      }
+
+      final nextStage = step.stage.next;
+
+      return nextStage != null ? SeedPhraseRecoverStep(stage: nextStage) : null;
+    }
+
     return switch (step) {
       GetStartedStep() => null,
-      RecoverMethodStep() => throw UnimplementedError(),
+      RecoverMethodStep() => null,
+      SeedPhraseRecoverStep() => nextRecoverWithSeedPhraseStep(),
       CreateKeychainStep() => nextKeychainStep(),
       FinishAccountCreationStep() => const WalletLinkStep(),
       WalletLinkStep() => nextWalletLinkStep(),
@@ -147,9 +166,21 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
           : const FinishAccountCreationStep();
     }
 
+    RegistrationStep previousRecoverWithSeedPhraseStep() {
+      final step = state.step;
+
+      final previousStep =
+          step is SeedPhraseRecoverStep ? step.stage.previous : null;
+
+      return previousStep != null
+          ? SeedPhraseRecoverStep(stage: previousStep)
+          : const RecoverMethodStep();
+    }
+
     return switch (step) {
       GetStartedStep() => null,
-      RecoverMethodStep() => null,
+      RecoverMethodStep() => const GetStartedStep(),
+      SeedPhraseRecoverStep() => previousRecoverWithSeedPhraseStep(),
       CreateKeychainStep() => previousKeychainStep(),
       FinishAccountCreationStep() => null,
       WalletLinkStep() => previousWalletLinkStep(),

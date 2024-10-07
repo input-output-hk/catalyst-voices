@@ -744,6 +744,12 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get recoverKeychainMethodsListTitle => 'How do you want Restore your Catalyst Keychain?';
 
   @override
+  String get recoverKeychainNonFound => 'No Catalyst Keychain found on this device.';
+
+  @override
+  String get recoverKeychainFound => 'Keychain found!   Please unlock your device.';
+
+  @override
   String get seedPhrase12Words => '12 security words';
 
   @override

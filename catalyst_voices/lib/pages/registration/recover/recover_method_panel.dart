@@ -1,6 +1,7 @@
 import 'package:catalyst_voices/pages/registration/widgets/registration_tile.dart';
-import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
+import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -19,6 +20,7 @@ class RecoverMethodPanel extends StatelessWidget {
 
     return SingleChildScrollView(
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: 24),
           Text(
@@ -26,7 +28,7 @@ class RecoverMethodPanel extends StatelessWidget {
             style: theme.textTheme.titleMedium?.copyWith(color: colorLvl1),
           ),
           const SizedBox(height: 12),
-          const _OnDeviceKeychains(),
+          _OnDeviceKeychains(onUnlockTap: _unlockKeychain),
           const SizedBox(height: 12),
           Text(
             context.l10n.recoverKeychainMethodsSubtitle,
@@ -52,7 +54,8 @@ class RecoverMethodPanel extends StatelessWidget {
                         onTap: () {
                           switch (method) {
                             case RegistrationRecoverMethod.seedPhrase:
-                            // TODO: Handle this case.
+                              RegistrationCubit.of(context)
+                                  .recoverWithSeedPhrase();
                           }
                         },
                       );
@@ -66,28 +69,68 @@ class RecoverMethodPanel extends StatelessWidget {
       ),
     );
   }
+
+  void _unlockKeychain() {
+    //
+  }
 }
 
-// Note. We don't check keychains on device at this point (no design) but
-// if we're going to do it then this widget will show them.
 class _OnDeviceKeychains extends StatelessWidget {
-  const _OnDeviceKeychains();
+  final bool foundKeychain;
+  final VoidCallback onUnlockTap;
+
+  const _OnDeviceKeychains({
+    this.foundKeychain = false,
+    required this.onUnlockTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    return DefaultTextStyle(
+      style: TextStyle(color: Theme.of(context).colors.textOnPrimaryLevel1),
+      child: foundKeychain
+          ? _KeychainFoundIndicator(onUnlockTap: onUnlockTap)
+          : const _KeychainNotFoundIndicator(),
+    );
+  }
+}
 
-    final colorLvl1 = theme.colors.textOnPrimaryLevel1;
+class _KeychainFoundIndicator extends StatelessWidget {
+  final VoidCallback onUnlockTap;
 
-    return AffixDecorator(
-      iconTheme: IconThemeData(
-        size: 24,
-        color: colorLvl1,
+  const _KeychainFoundIndicator({
+    required this.onUnlockTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesIndicator(
+      type: VoicesIndicatorType.success,
+      icon: VoicesAssets.icons.check,
+      message: Text(
+        context.l10n.recoverKeychainFound,
+        style: DefaultTextStyle.of(context).style,
       ),
-      prefix: VoicesAssets.icons.exclamation.buildIcon(),
-      child: Text(
-        context.l10n.recoverKeychainMethodsNoKeychainFound,
-        style: theme.textTheme.titleSmall?.copyWith(color: colorLvl1),
+      action: VoicesTextButton(
+        onTap: onUnlockTap,
+        leading: VoicesAssets.icons.lockOpen.buildIcon(),
+        child: Text(context.l10n.unlock),
+      ),
+    );
+  }
+}
+
+class _KeychainNotFoundIndicator extends StatelessWidget {
+  const _KeychainNotFoundIndicator();
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesIndicator(
+      type: VoicesIndicatorType.error,
+      icon: VoicesAssets.icons.exclamation,
+      message: Text(
+        context.l10n.recoverKeychainNonFound,
+        style: DefaultTextStyle.of(context).style,
       ),
     );
   }

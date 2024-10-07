@@ -17,5 +17,25 @@ enum RecoverSeedPhraseStage {
   unlockPassword,
 
   /// Confirmation screen.
-  success,
+  success;
+
+  RecoverSeedPhraseStage? get next {
+    final index = RecoverSeedPhraseStage.values.indexOf(this);
+    final isLast = index == RecoverSeedPhraseStage.values.length - 1;
+    if (isLast) {
+      return null;
+    }
+
+    return RecoverSeedPhraseStage.values[index + 1];
+  }
+
+  RecoverSeedPhraseStage? get previous {
+    final index = RecoverSeedPhraseStage.values.indexOf(this);
+    final isFirst = index == 0;
+    if (isFirst) {
+      return null;
+    }
+
+    return RecoverSeedPhraseStage.values[index - 1];
+  }
 }

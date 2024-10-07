@@ -1,5 +1,6 @@
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_blocs/src/registration/state_data/keychain_state_data.dart';
+import 'package:catalyst_voices_blocs/src/registration/state_data/recover_state_data.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
@@ -7,11 +8,13 @@ final class RegistrationState extends Equatable {
   final RegistrationStep step;
   final KeychainStateData keychainStateData;
   final WalletLinkStateData walletLinkStateData;
+  final RecoverStateData recoverStateData;
 
   const RegistrationState({
     this.step = const GetStartedStep(),
     this.keychainStateData = const KeychainStateData(),
     this.walletLinkStateData = const WalletLinkStateData(),
+    this.recoverStateData = const RecoverStateData(),
   });
 
   double? get progress {
@@ -27,9 +30,16 @@ final class RegistrationState extends Equatable {
       return current / total;
     }
 
+    double getRecoverSeedProgress(RecoverSeedPhraseStage stage) {
+      final current = RecoverSeedPhraseStage.values.indexOf(stage) + 1;
+      final total = RecoverSeedPhraseStage.values.length;
+      return current / total;
+    }
+
     return switch (step) {
       GetStartedStep() => null,
       RecoverMethodStep() => null,
+      SeedPhraseRecoverStep(:final stage) => getRecoverSeedProgress(stage),
       CreateKeychainStep(:final stage) => getCreateKeychainProgress(stage),
       FinishAccountCreationStep() => 1.0,
       WalletLinkStep(:final stage) => getWalletLinkProgress(stage),
@@ -41,11 +51,13 @@ final class RegistrationState extends Equatable {
     RegistrationStep? step,
     KeychainStateData? keychainStateData,
     WalletLinkStateData? walletLinkStateData,
+    RecoverStateData? recoverStateData,
   }) {
     return RegistrationState(
       step: step ?? this.step,
       keychainStateData: keychainStateData ?? this.keychainStateData,
       walletLinkStateData: walletLinkStateData ?? this.walletLinkStateData,
+      recoverStateData: recoverStateData ?? this.recoverStateData,
     );
   }
 
@@ -54,5 +66,6 @@ final class RegistrationState extends Equatable {
         step,
         keychainStateData,
         walletLinkStateData,
+        recoverStateData,
       ];
 }
