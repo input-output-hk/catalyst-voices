@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/registration/recover/bloc_recover_builder.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_tile.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -28,7 +29,7 @@ class RecoverMethodPanel extends StatelessWidget {
             style: theme.textTheme.titleMedium?.copyWith(color: colorLvl1),
           ),
           const SizedBox(height: 12),
-          _OnDeviceKeychains(onUnlockTap: _unlockKeychain),
+          _BlocOnDeviceKeychains(onUnlockTap: _unlockKeychain),
           const SizedBox(height: 12),
           Text(
             context.l10n.recoverKeychainMethodsSubtitle,
@@ -72,6 +73,27 @@ class RecoverMethodPanel extends StatelessWidget {
 
   void _unlockKeychain() {
     //
+  }
+}
+
+class _BlocOnDeviceKeychains extends StatelessWidget {
+  final VoidCallback onUnlockTap;
+
+  const _BlocOnDeviceKeychains({
+    required this.onUnlockTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocRecoverBuilder<bool>(
+      selector: (state) => state.foundKeychain,
+      builder: (context, state) {
+        return _OnDeviceKeychains(
+          foundKeychain: state,
+          onUnlockTap: onUnlockTap,
+        );
+      },
+    );
   }
 }
 
