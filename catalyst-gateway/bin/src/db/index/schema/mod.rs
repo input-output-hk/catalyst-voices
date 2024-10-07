@@ -17,7 +17,7 @@ use crate::{settings::cassandra_db, utils::blake2b_hash::generate_uuid_string_fr
 /// change accidentally, and is NOT to be used directly to set the schema version of the
 /// table namespaces.
 #[allow(dead_code)]
-const SCHEMA_VERSION: &str = "10463640-3b7b-8a25-9d42-5eb64e44bd62";
+const SCHEMA_VERSION: &str = "08193dfe-698a-8177-bdf8-20c5691a06e7";
 
 /// Keyspace Create (Templated)
 const CREATE_NAMESPACE_CQL: &str = include_str!("./cql/namespace.cql");
