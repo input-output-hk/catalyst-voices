@@ -1,7 +1,7 @@
 # use with https://github.com/casey/just
 #
 
-host_ip := `hostname -i | cut -d " " -f 1`
+host_ip := `ifconfig $(route -n | grep ^0.0.0.0 | awk '{print $NF}') | grep inet | grep -v inet6 | awk '{print $2}'`
 
 default:
     @just --list --unsorted
@@ -18,21 +18,21 @@ scylla-dev-db-logs:
 scylla-dev-db-stop:
     docker stop scylla-node1
 
-# Local scylla dev DB CLUSTER - Starts with pre-existing data.
-scylla-dev-db-cluster:
-    HOST_IP="{{host_ip}}" \
-    docker compose up
-
-# Stop the scylla development DB CLUSTER
-scylla-dev-db-stop-cluster:
-    HOST_IP="{{host_ip}}" \
-    docker compose down
-
 # Reset the dev mode scylla instance and start a new dev scylla dev instance
 scylla-dev-db-reset: scylla-dev-db-purge scylla-dev-db
 
+# Bring the scylla dev DB CLUSTER up. Starts in daemon mode with pre-existing data.
+scylla-dev-db-cluster-up:
+    HOST_IP="{{host_ip}}" \
+    docker compose up -d
+
+# Bring the scylla development DB CLUSTER down.
+scylla-dev-db-cluster-down:
+    HOST_IP="{{host_ip}}" \
+    docker compose down
+
 # Reset the cluster storage and start a new dev scylla cluster
-scylla-dev-db-reset-cluster: scylla-dev-db-purge scylla-dev-db-cluster
+scylla-dev-db-cluster-reset: scylla-dev-db-cluster-down scylla-dev-db-purge scylla-dev-db-cluster-up
 
 # Run CQLSH on the dev Scylla cluster
 scylla-dev-db-cqlsh:

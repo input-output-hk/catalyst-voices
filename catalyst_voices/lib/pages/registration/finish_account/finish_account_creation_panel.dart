@@ -1,5 +1,5 @@
-import 'package:catalyst_voices/pages/registration/next_step.dart';
-import 'package:catalyst_voices/pages/registration/registration_progress.dart';
+import 'package:catalyst_voices/pages/registration/widgets/next_step.dart';
+import 'package:catalyst_voices/pages/registration/widgets/registration_progress.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
