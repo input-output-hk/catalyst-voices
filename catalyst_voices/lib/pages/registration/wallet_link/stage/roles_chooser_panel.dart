@@ -1,6 +1,6 @@
-import 'package:catalyst_voices/pages/registration/registration_stage_message.dart';
-import 'package:catalyst_voices/pages/registration/registration_stage_navigation.dart';
 import 'package:catalyst_voices/pages/registration/wallet_link/bloc_wallet_link_builder.dart';
+import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
+import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
 import 'package:catalyst_voices/widgets/containers/roles_chooser_container.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';

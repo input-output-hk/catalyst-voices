@@ -1,5 +1,5 @@
 import 'package:catalyst_voices/pages/registration/create_keychain/bloc_unlock_password_builder.dart';
-import 'package:catalyst_voices/pages/registration/registration_stage_navigation.dart';
+import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/widgets/indicators/voices_password_strength_indicator.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_password_text_field.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
