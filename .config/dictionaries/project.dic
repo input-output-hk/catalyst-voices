@@ -81,6 +81,7 @@ encryptor
 endfunction
 Eternl
 EUTXO
+extn
 fetchval
 fmtchk
 fmtfix
