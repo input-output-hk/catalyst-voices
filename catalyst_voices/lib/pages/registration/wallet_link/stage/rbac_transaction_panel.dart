@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
 import 'package:catalyst_voices/pages/registration/wallet_link/bloc_wallet_link_builder.dart';
@@ -9,11 +11,21 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:result_type/result_type.dart';
 
-class RbacTransactionPanel extends StatelessWidget {
-  const RbacTransactionPanel({
-    super.key,
-  });
+class RbacTransactionPanel extends StatefulWidget {
+  const RbacTransactionPanel({super.key});
+
+  @override
+  State<RbacTransactionPanel> createState() => _RbacTransactionPanelState();
+}
+
+class _RbacTransactionPanelState extends State<RbacTransactionPanel> {
+  @override
+  void initState() {
+    super.initState();
+    unawaited(RegistrationCubit.of(context).prepareRegistration());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,11 +38,50 @@ class RbacTransactionPanel extends StatelessWidget {
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: 12),
-        const _BlocSummary(),
-        const SizedBox(height: 18),
-        const _PositiveSmallPrint(),
-        const Spacer(),
-        const _Navigation(),
+        Expanded(
+          child: _BlocTransactionDetails(onRefreshTap: _onRefresh),
+        ),
+        const _BlocNavigation(),
+      ],
+    );
+  }
+
+  void _onRefresh() {
+    unawaited(RegistrationCubit.of(context).prepareRegistration());
+  }
+}
+
+class _BlocTransactionDetails extends StatelessWidget {
+  final VoidCallback onRefreshTap;
+
+  const _BlocTransactionDetails({required this.onRefreshTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocWalletLinkBuilder(
+      selector: (state) => state.unsignedTx,
+      builder: (context, result) {
+        return switch (result) {
+          Success() => const _TransactionDetails(),
+          Failure() => _TransactionDetailsError(onRetry: onRefreshTap),
+          _ => const Center(child: VoicesCircularProgressIndicator()),
+        };
+      },
+    );
+  }
+}
+
+class _TransactionDetails extends StatelessWidget {
+  const _TransactionDetails();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _BlocSummary(),
+        SizedBox(height: 18),
+        _PositiveSmallPrint(),
       ],
     );
   }
@@ -49,14 +100,16 @@ class _BlocSummary extends StatelessWidget {
         })?>(
       selector: (state) {
         final selectedWallet = state.selectedWallet;
-        if (selectedWallet == null) {
+        final fee = state.transactionFee;
+
+        if (selectedWallet == null || fee == null) {
           return null;
         }
 
         return (
           roles: state.selectedRoles ?? state.defaultRoles,
           selectedWallet: selectedWallet,
-          transactionFee: state.transactionFee,
+          transactionFee: fee,
         );
       },
       builder: (context, state) {
@@ -141,6 +194,26 @@ class _Summary extends StatelessWidget {
   }
 }
 
+class _TransactionDetailsError extends StatelessWidget {
+  final VoidCallback onRetry;
+
+  const _TransactionDetailsError({required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: SizedBox(
+        width: double.infinity,
+        child: VoicesErrorIndicator(
+          message: context.l10n.somethingWentWrong,
+          onRetry: onRetry,
+        ),
+      ),
+    );
+  }
+}
+
 class _PositiveSmallPrint extends StatelessWidget {
   const _PositiveSmallPrint();
 
@@ -173,8 +246,27 @@ class _PositiveSmallPrint extends StatelessWidget {
   }
 }
 
+class _BlocNavigation extends StatelessWidget {
+  const _BlocNavigation();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocWalletLinkBuilder(
+      selector: (state) => state.unsignedTx,
+      builder: (context, result) {
+        return switch (result) {
+          Success() => const _Navigation(canSubmitTx: true),
+          _ => const _Navigation(canSubmitTx: false),
+        };
+      },
+    );
+  }
+}
+
 class _Navigation extends StatefulWidget {
-  const _Navigation();
+  final bool canSubmitTx;
+
+  const _Navigation({required this.canSubmitTx});
 
   @override
   State<_Navigation> createState() => _NavigationState();
@@ -190,7 +282,7 @@ class _NavigationState extends State<_Navigation> {
       children: [
         VoicesFilledButton(
           leading: VoicesAssets.icons.wallet.buildIcon(),
-          onTap: _isLoading ? null : _submitRegistration,
+          onTap: widget.canSubmitTx && !_isLoading ? _submitRegistration : null,
           trailing: _isLoading
               ? const SizedBox(
                   width: 16,
@@ -215,8 +307,7 @@ class _NavigationState extends State<_Navigation> {
   Future<void> _submitRegistration() async {
     try {
       _updateLoading(true);
-
-      await RegistrationCubit.of(context).submitRegistration();
+      await RegistrationCubit.of(context).walletLink.submitRegistration();
     } finally {
       _updateLoading(false);
     }

@@ -6,6 +6,7 @@ import 'package:catalyst_voices_blocs/src/registration/cubits/recover_cubit.dart
 import 'package:catalyst_voices_blocs/src/registration/cubits/wallet_link_cubit.dart';
 import 'package:catalyst_voices_blocs/src/registration/state_data/keychain_state_data.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,10 +19,13 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
 
   RegistrationCubit({
     required Downloader downloader,
+    required TransactionConfigRepository txConfigRepository,
   })  : _keychainCreationCubit = KeychainCreationCubit(
           downloader: downloader,
         ),
-        _walletLinkCubit = WalletLinkCubit(),
+        _walletLinkCubit = WalletLinkCubit(
+          txConfigRepository: txConfigRepository,
+        ),
         _recoverCubit = RecoverCubit(),
         super(const RegistrationState()) {
     _keychainCreationCubit.stream.listen(_onKeychainStateDataChanged);
@@ -88,6 +92,12 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     if (previousStep != null) {
       _goToStep(previousStep);
     }
+  }
+
+  Future<void> prepareRegistration() {
+    return _walletLinkCubit.prepareRegistration(
+      _keychainCreationCubit.state.seedPhraseStateData.seedPhrase!,
+    );
   }
 
   RegistrationStep? _nextStep({RegistrationStep? from}) {
