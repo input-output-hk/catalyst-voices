@@ -545,6 +545,10 @@
       }
     }
   },
+  "walletLinkTransactionFailed": "Transaction failed",
+  "@walletLinkTransactionFailed": {
+    "description": "Indicates an error when submitting a registration transaction failed."
+  },
   "walletLinkRoleChooserTitle": "How do you want to participate in Catalyst?",
   "@walletLinkRoleChooserTitle": {
     "description": "A title on the role chooser screen in registration."

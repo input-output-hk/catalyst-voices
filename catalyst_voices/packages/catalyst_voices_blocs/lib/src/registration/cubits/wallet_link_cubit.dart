@@ -76,7 +76,13 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
   @override
   Future<void> prepareRegistration(SeedPhrase seedPhrase) async {
     try {
-      emit(state.copyWith(unsignedTx: const Optional(null)));
+      emit(
+        state.copyWith(
+          unsignedTx: const Optional(null),
+          submittedTx: const Optional(null),
+          isSubmittingTx: false,
+        ),
+      );
 
       final walletApi = await state.selectedWallet!.wallet.enable();
 
@@ -107,6 +113,13 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
   @override
   Future<void> submitRegistration() async {
     try {
+      emit(
+        state.copyWith(
+          submittedTx: const Optional(null),
+          isSubmittingTx: true,
+        ),
+      );
+
       final walletApi = await state.selectedWallet!.wallet.enable();
       final unsignedTx = state.unsignedTx!.success;
       final witnessSet = await walletApi.signTx(transaction: unsignedTx);
@@ -119,9 +132,21 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
       );
 
       await walletApi.submitTx(transaction: signedTx);
+
+      emit(
+        state.copyWith(
+          submittedTx: Optional(Success(signedTx)),
+          isSubmittingTx: false,
+        ),
+      );
     } on Exception catch (error, stackTrace) {
       _logger.severe('submitRegistration', error, stackTrace);
-      emit(state.copyWith(unsignedTx: Optional(Failure(error))));
+      emit(
+        state.copyWith(
+          submittedTx: Optional(Failure(error)),
+          isSubmittingTx: false,
+        ),
+      );
       rethrow;
     }
   }

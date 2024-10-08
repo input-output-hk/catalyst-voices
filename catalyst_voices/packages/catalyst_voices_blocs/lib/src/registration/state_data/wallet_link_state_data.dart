@@ -9,12 +9,16 @@ final class WalletLinkStateData extends Equatable {
   final CardanoWalletDetails? selectedWallet;
   final Set<AccountRole>? selectedRoles;
   final Result<Transaction, Exception>? unsignedTx;
+  final Result<Transaction, Exception>? submittedTx;
+  final bool isSubmittingTx;
 
   const WalletLinkStateData({
     this.wallets,
     this.selectedWallet,
     this.selectedRoles,
     this.unsignedTx,
+    this.submittedTx,
+    this.isSubmittingTx = false,
   });
 
   /// Returns the minimum required ADA in user balance to register.
@@ -37,12 +41,16 @@ final class WalletLinkStateData extends Equatable {
     Optional<CardanoWalletDetails>? selectedWallet,
     Optional<Set<AccountRole>>? selectedRoles,
     Optional<Result<Transaction, Exception>>? unsignedTx,
+    Optional<Result<Transaction, Exception>>? submittedTx,
+    bool? isSubmittingTx,
   }) {
     return WalletLinkStateData(
       wallets: wallets.dataOr(this.wallets),
       selectedWallet: selectedWallet.dataOr(this.selectedWallet),
       selectedRoles: selectedRoles.dataOr(this.selectedRoles),
       unsignedTx: unsignedTx.dataOr(this.unsignedTx),
+      submittedTx: submittedTx.dataOr(this.submittedTx),
+      isSubmittingTx: isSubmittingTx ?? this.isSubmittingTx,
     );
   }
 
@@ -52,5 +60,7 @@ final class WalletLinkStateData extends Equatable {
         selectedWallet,
         selectedRoles,
         unsignedTx,
+        submittedTx,
+        isSubmittingTx,
       ];
 }
