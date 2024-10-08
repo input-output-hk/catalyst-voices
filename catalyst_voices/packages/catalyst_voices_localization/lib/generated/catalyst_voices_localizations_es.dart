@@ -590,7 +590,9 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get accountRoleDialogButton => 'Continue Role setup';
 
   @override
-  String get accountRoleDialogRoleSummaryTitle => 'Voter role summary';
+  String accountRoleDialogRoleSummaryTitle(String role) {
+    return '$role role summary';
+  }
 
   @override
   String get voterVerboseName => 'Treasury guardian';

@@ -710,9 +710,14 @@
   "@accountRoleDialogButton": {
     "description": "A label on account role dialog's button"
   },
-  "accountRoleDialogRoleSummaryTitle": "Voter role summary",
+  "accountRoleDialogRoleSummaryTitle": "{role} role summary",
   "@accountRoleDialogRoleSummaryTitle": {
-    "description": "A title for role summary on account role dialog"
+    "description": "A title for role summary on account role dialog",
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
   },
   "voterVerboseName": "Treasury guardian",
   "@voterVerboseName": {

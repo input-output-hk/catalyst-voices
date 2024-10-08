@@ -1108,11 +1108,11 @@ abstract class VoicesLocalizations {
   /// **'Continue Role setup'**
   String get accountRoleDialogButton;
 
-  /// A title for voter role summary on account role dialog
+  /// A title for role summary on account role dialog
   ///
   /// In en, this message translates to:
-  /// **'Voter role summary'**
-  String get accountRoleDialogRoleSummaryTitle;
+  /// **'{role} role summary'**
+  String accountRoleDialogRoleSummaryTitle(String role);
 
   /// A verbose name for voter
   ///
