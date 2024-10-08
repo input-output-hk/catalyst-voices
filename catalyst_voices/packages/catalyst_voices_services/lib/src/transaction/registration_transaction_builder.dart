@@ -128,7 +128,7 @@ class RegistrationTransactionBuilder {
   Future<X509Certificate> _generateX509Certificate({
     required Ed25519KeyPair keyPair,
   }) async {
-    // TODO(dtscalac): once serial number generation is defined developed
+    // TODO(dtscalac): once serial number generation is defined come up with
     // a better solution than assigning a random number
     // as certificate serial number
     const maxInt = 4294967296;
