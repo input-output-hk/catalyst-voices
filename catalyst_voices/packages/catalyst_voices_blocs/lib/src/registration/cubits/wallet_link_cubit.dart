@@ -100,6 +100,7 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
     } on Exception catch (error, stackTrace) {
       _logger.severe('prepareRegistration', error, stackTrace);
       emit(state.copyWith(unsignedTx: Optional(Failure(error))));
+      rethrow;
     }
   }
 
@@ -121,6 +122,7 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
     } on Exception catch (error, stackTrace) {
       _logger.severe('submitRegistration', error, stackTrace);
       emit(state.copyWith(unsignedTx: Optional(Failure(error))));
+      rethrow;
     }
   }
 }

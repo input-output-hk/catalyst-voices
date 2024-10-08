@@ -308,7 +308,9 @@ class _NavigationState extends State<_Navigation> {
   Future<void> _submitRegistration() async {
     try {
       _updateLoading(true);
-      await RegistrationCubit.of(context).walletLink.submitRegistration();
+      final cubit = RegistrationCubit.of(context);
+      await cubit.walletLink.submitRegistration();
+      cubit.nextStep();
     } finally {
       _updateLoading(false);
     }
