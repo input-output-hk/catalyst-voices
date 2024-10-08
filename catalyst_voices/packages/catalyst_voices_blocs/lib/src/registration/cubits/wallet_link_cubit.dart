@@ -120,6 +120,7 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
       await walletApi.submitTx(transaction: signedTx);
     } on Exception catch (error, stackTrace) {
       _logger.severe('submitRegistration', error, stackTrace);
+      emit(state.copyWith(unsignedTx: Optional(Failure(error))));
     }
   }
 }
