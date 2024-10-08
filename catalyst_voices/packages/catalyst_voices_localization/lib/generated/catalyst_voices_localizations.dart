@@ -1114,6 +1114,42 @@ abstract class VoicesLocalizations {
   /// **'Voter role summary'**
   String get accountRoleDialogRoleSummaryTitle;
 
+  /// A verbose name for voter
+  ///
+  /// In en, this message translates to:
+  /// **'Treasury guardian'**
+  String get voterVerboseName;
+
+  /// A verbose name for proposer
+  ///
+  /// In en, this message translates to:
+  /// **'Main proposer'**
+  String get proposerVerboseName;
+
+  /// A verbose name for drep
+  ///
+  /// In en, this message translates to:
+  /// **'Community expert'**
+  String get drepVerboseName;
+
+  /// A description for voter
+  ///
+  /// In en, this message translates to:
+  /// **'The Voters are the guardians of Cardano treasury. They vote in projects for the growth of the Cardano Ecosystem.'**
+  String get voterDescription;
+
+  /// A description for proposer
+  ///
+  /// In en, this message translates to:
+  /// **'The Main Proposers are the Innovators in Project Catalyst, they are the shapers of the future.'**
+  String get proposerDescription;
+
+  /// A description for drep
+  ///
+  /// In en, this message translates to:
+  /// **'The dRep has an Expert Role in the Cardano/Catalyst as people can delegate their vote to Cardano Experts.'**
+  String get drepDescription;
+
   /// No description provided for @delete.
   ///
   /// In en, this message translates to:

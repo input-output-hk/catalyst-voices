@@ -712,7 +712,31 @@
   },
   "accountRoleDialogRoleSummaryTitle": "Voter role summary",
   "@accountRoleDialogRoleSummaryTitle": {
-    "description": "A title for voter role summary on account role dialog"
+    "description": "A title for role summary on account role dialog"
+  },
+  "voterVerboseName": "Treasury guardian",
+  "@voterVerboseName": {
+    "description": "A verbose name for voter"
+  },
+  "proposerVerboseName": "Main proposer",
+  "@proposerVerboseName": {
+    "description": "A verbose name for proposer"
+  },
+  "drepVerboseName": "Community expert",
+  "@drepVerboseName": {
+    "description": "A verbose name for drep"
+  },
+  "voterDescription": "The Voters are the guardians of Cardano treasury. They vote in projects for the growth of the Cardano Ecosystem.",
+  "@voterDescription": {
+    "description": "A description for voter"
+  },
+  "proposerDescription": "The Main Proposers are the Innovators in Project Catalyst, they are the shapers of the future.",
+  "@proposerDescription": {
+    "description": "A description for proposer"
+  },
+  "drepDescription": "The dRep has an Expert Role in the Cardano/Catalyst as people can delegate their vote to Cardano Experts.",
+  "@drepDescription": {
+    "description": "A description for drep"
   },
   "delete": "Delete",
   "close": "Close",

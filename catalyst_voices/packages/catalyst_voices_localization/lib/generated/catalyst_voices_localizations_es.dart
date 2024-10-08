@@ -593,6 +593,24 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get accountRoleDialogRoleSummaryTitle => 'Voter role summary';
 
   @override
+  String get voterVerboseName => 'Treasury guardian';
+
+  @override
+  String get proposerVerboseName => 'Main proposer';
+
+  @override
+  String get drepVerboseName => 'Community expert';
+
+  @override
+  String get voterDescription => 'The Voters are the guardians of Cardano treasury. They vote in projects for the growth of the Cardano Ecosystem.';
+
+  @override
+  String get proposerDescription => 'The Main Proposers are the Innovators in Project Catalyst, they are the shapers of the future.';
+
+  @override
+  String get drepDescription => 'The dRep has an Expert Role in the Cardano/Catalyst as people can delegate their vote to Cardano Experts.';
+
+  @override
   String get delete => 'Delete';
 
   @override

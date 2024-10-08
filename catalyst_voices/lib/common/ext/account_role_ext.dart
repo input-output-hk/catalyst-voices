@@ -18,22 +18,22 @@ extension AccountRoleExt on AccountRole {
   String getVerboseName(BuildContext context) {
     switch (this) {
       case AccountRole.voter:
-        return 'Treasury guardian';
+        return context.l10n.voterVerboseName;
       case AccountRole.proposer:
-        return 'Main Proposer';
+        return context.l10n.proposerVerboseName;
       case AccountRole.drep:
-        return 'Community expert';
+        return context.l10n.drepVerboseName;
     }
   }
 
   String getDescription(BuildContext context) {
     switch (this) {
       case AccountRole.voter:
-        return 'The Voters are the guardians of Cardano treasury. They vote in projects for the growth of the Cardano Ecosystem.';
+        return context.l10n.voterDescription;
       case AccountRole.proposer:
-        return 'The Main Proposers are the Innovators in Project Catalyst, they are the shapers of the future.';
+        return context.l10n.proposerDescription;
       case AccountRole.drep:
-        return 'The dRep has an Expert Role in the Cardano/Catalyst as people can delegate their vote to Cardano Experts.';
+        return context.l10n.drepDescription;
     }
   }
 
