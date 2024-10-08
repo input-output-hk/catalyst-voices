@@ -183,7 +183,7 @@ class _Summary extends StatelessWidget {
                     ?.copyWith(fontWeight: FontWeight.bold),
               ),
               Text(
-                CryptocurrencyFormatter.formatAmount(transactionFee),
+                CryptocurrencyFormatter.formatExactAmount(transactionFee),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
@@ -203,7 +203,8 @@ class _TransactionDetailsError extends StatelessWidget {
   Widget build(BuildContext context) {
     return Align(
       alignment: Alignment.topCenter,
-      child: SizedBox(
+      child: Container(
+        padding: const EdgeInsets.only(top: 20),
         width: double.infinity,
         child: VoicesErrorIndicator(
           message: context.l10n.somethingWentWrong,
