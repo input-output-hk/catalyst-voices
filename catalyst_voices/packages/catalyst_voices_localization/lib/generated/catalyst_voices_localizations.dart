@@ -1096,6 +1096,132 @@ abstract class VoicesLocalizations {
   /// **'Remove Keychain'**
   String get deleteKeychainDialogRemovingPhrase;
 
+  /// A title on account role dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Learn about Catalyst Roles'**
+  String get accountRoleDialogTitle;
+
+  /// A label on account role dialog's button
+  ///
+  /// In en, this message translates to:
+  /// **'Continue Role setup'**
+  String get accountRoleDialogButton;
+
+  /// A title for role summary on account role dialog
+  ///
+  /// In en, this message translates to:
+  /// **'{role} role summary'**
+  String accountRoleDialogRoleSummaryTitle(String role);
+
+  /// A verbose name for voter
+  ///
+  /// In en, this message translates to:
+  /// **'Treasury guardian'**
+  String get voterVerboseName;
+
+  /// A verbose name for proposer
+  ///
+  /// In en, this message translates to:
+  /// **'Main proposer'**
+  String get proposerVerboseName;
+
+  /// A verbose name for drep
+  ///
+  /// In en, this message translates to:
+  /// **'Community expert'**
+  String get drepVerboseName;
+
+  /// A description for voter
+  ///
+  /// In en, this message translates to:
+  /// **'The Voters are the guardians of Cardano treasury. They vote in projects for the growth of the Cardano Ecosystem.'**
+  String get voterDescription;
+
+  /// A description for proposer
+  ///
+  /// In en, this message translates to:
+  /// **'The Main Proposers are the Innovators in Project Catalyst, they are the shapers of the future.'**
+  String get proposerDescription;
+
+  /// A description for drep
+  ///
+  /// In en, this message translates to:
+  /// **'The dRep has an Expert Role in the Cardano/Catalyst as people can delegate their vote to Cardano Experts.'**
+  String get drepDescription;
+
+  /// No description provided for @voterSummarySelectFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Select favorites'**
+  String get voterSummarySelectFavorites;
+
+  /// No description provided for @voterSummaryComment.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment/Vote on Proposals'**
+  String get voterSummaryComment;
+
+  /// No description provided for @voterSummaryCastVotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Cast your votes'**
+  String get voterSummaryCastVotes;
+
+  /// No description provided for @voterSummaryVoterRewards.
+  ///
+  /// In en, this message translates to:
+  /// **'Voter rewards'**
+  String get voterSummaryVoterRewards;
+
+  /// No description provided for @proposerSummaryWriteEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Write/edit functionality'**
+  String get proposerSummaryWriteEdit;
+
+  /// No description provided for @proposerSummarySubmitToFund.
+  ///
+  /// In en, this message translates to:
+  /// **'Rights to Submit to Fund'**
+  String get proposerSummarySubmitToFund;
+
+  /// No description provided for @proposerSummaryInviteTeamMembers.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite Team Members'**
+  String get proposerSummaryInviteTeamMembers;
+
+  /// No description provided for @proposerSummaryComment.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment functionality'**
+  String get proposerSummaryComment;
+
+  /// No description provided for @drepSummaryDelegatedVotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Delegated Votes'**
+  String get drepSummaryDelegatedVotes;
+
+  /// No description provided for @drepSummaryRewards.
+  ///
+  /// In en, this message translates to:
+  /// **'dRep rewards'**
+  String get drepSummaryRewards;
+
+  /// No description provided for @drepSummaryCastVotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Cast delegated votes'**
+  String get drepSummaryCastVotes;
+
+  /// No description provided for @drepSummaryComment.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment Functionality'**
+  String get drepSummaryComment;
+
   /// No description provided for @delete.
   ///
   /// In en, this message translates to:
