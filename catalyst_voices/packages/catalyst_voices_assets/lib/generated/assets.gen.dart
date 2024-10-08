@@ -1225,6 +1225,18 @@ class $AssetsImagesGen {
   AssetGenImage get roleDrep =>
       const AssetGenImage('assets/images/role_drep.webp');
 
+  /// File path: assets/images/role_info_drep.png
+  AssetGenImage get roleInfoDrep =>
+      const AssetGenImage('assets/images/role_info_drep.png');
+
+  /// File path: assets/images/role_info_proposer.png
+  AssetGenImage get roleInfoProposer =>
+      const AssetGenImage('assets/images/role_info_proposer.png');
+
+  /// File path: assets/images/role_info_voter.png
+  AssetGenImage get roleInfoVoter =>
+      const AssetGenImage('assets/images/role_info_voter.png');
+
   /// File path: assets/images/role_proposer.webp
   AssetGenImage get roleProposer =>
       const AssetGenImage('assets/images/role_proposer.webp');
@@ -1263,6 +1275,9 @@ class $AssetsImagesGen {
         proposalBackground1,
         proposalBackground2,
         roleDrep,
+        roleInfoDrep,
+        roleInfoProposer,
+        roleInfoVoter,
         roleProposer,
         roleVoter,
         taskIllustration,
