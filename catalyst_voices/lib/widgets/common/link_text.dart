@@ -41,13 +41,16 @@ class LinkText extends StatelessWidget {
       decorationStyle: underline ? TextDecorationStyle.solid : null,
     );
 
-    return GestureDetector(
-      onTap: onTap,
-      child: DefaultTextStyle.merge(
-        style: style,
-        child: Text(
-          data,
-          style: effectiveStyle,
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: onTap,
+        child: DefaultTextStyle.merge(
+          style: style,
+          child: Text(
+            data,
+            style: effectiveStyle,
+          ),
         ),
       ),
     );
