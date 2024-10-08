@@ -13,7 +13,7 @@ abstract interface class RecoverManager {
 final class RecoverCubit extends Cubit<RecoverStateData>
     implements RecoverManager {
   RecoverCubit() : super(const RecoverStateData()) {
-    /// Prepopulate all available words
+    /// pre-populate all available words
     emit(state.copyWith(seedPhraseWords: SeedPhrase.wordList));
   }
 
