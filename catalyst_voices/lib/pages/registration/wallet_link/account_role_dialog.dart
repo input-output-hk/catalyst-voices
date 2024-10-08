@@ -90,24 +90,7 @@ class AccountRoleDialog extends StatelessWidget {
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                           ...role.getSummary(context).map(
-                                (e) => Row(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 8,
-                                      ),
-                                      child: VoicesAssets.icons.check.buildIcon(
-                                        color: Theme.of(context).colors.success,
-                                      ),
-                                    ),
-                                    Text(
-                                      e,
-                                      style:
-                                          Theme.of(context).textTheme.bodyLarge,
-                                    ),
-                                  ],
-                                ),
+                                _SummaryItem.new,
                               ),
                         ],
                       ),
@@ -153,6 +136,35 @@ class _InfoContainer extends StatelessWidget {
         ),
         child: child,
       ),
+    );
+  }
+}
+
+class _SummaryItem extends StatelessWidget {
+  final String text;
+
+  const _SummaryItem(
+    this.text,
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 8,
+          ),
+          child: VoicesAssets.icons.check.buildIcon(
+            color: Theme.of(context).colors.success,
+          ),
+        ),
+        Text(
+          text,
+          style: Theme.of(context).textTheme.bodyLarge,
+        ),
+      ],
     );
   }
 }
