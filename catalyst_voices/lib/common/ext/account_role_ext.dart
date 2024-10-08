@@ -41,24 +41,24 @@ extension AccountRoleExt on AccountRole {
     switch (this) {
       case AccountRole.voter:
         return [
-          'Select favorites',
-          'Comment/Vote on Proposals',
-          'Cast your votes',
-          'Voter rewards',
+          context.l10n.voterSummarySelectFavorites,
+          context.l10n.voterSummaryComment,
+          context.l10n.voterSummaryCastVotes,
+          context.l10n.voterSummaryVoterRewards,
         ];
       case AccountRole.proposer:
         return [
-          'Write/edit functionality',
-          'Rights to Submit to Fund',
-          'Invite Team Members',
-          'Comment functionality',
+          context.l10n.proposerSummaryWriteEdit,
+          context.l10n.proposerSummarySubmitToFund,
+          context.l10n.proposerSummaryInviteTeamMembers,
+          context.l10n.proposerSummaryComment,
         ];
       case AccountRole.drep:
         return [
-          'Delegated Votes',
-          'dRep rewards',
-          'Cast delegated votes',
-          'Comment Functionality',
+          context.l10n.drepSummaryDelegatedVotes,
+          context.l10n.drepSummaryRewards,
+          context.l10n.drepSummaryCastVotes,
+          context.l10n.drepSummaryComment,
         ];
     }
   }

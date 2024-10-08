@@ -743,6 +743,18 @@
   "@drepDescription": {
     "description": "A description for drep"
   },
+  "voterSummarySelectFavorites": "Select favorites",
+  "voterSummaryComment": "Comment/Vote on Proposals",
+  "voterSummaryCastVotes": "Cast your votes",
+  "voterSummaryVoterRewards": "Voter rewards",
+  "proposerSummaryWriteEdit": "Write/edit functionality",
+  "proposerSummarySubmitToFund": "Rights to Submit to Fund",
+  "proposerSummaryInviteTeamMembers": "Invite Team Members",
+  "proposerSummaryComment": "Comment functionality",
+  "drepSummaryDelegatedVotes": "Delegated Votes",
+  "drepSummaryRewards": "dRep rewards",
+  "drepSummaryCastVotes": "Cast delegated votes",
+  "drepSummaryComment": "Comment Functionality",
   "delete": "Delete",
   "close": "Close",
   "notice": "Notice",

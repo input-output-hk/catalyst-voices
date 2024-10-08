@@ -613,6 +613,42 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get drepDescription => 'The dRep has an Expert Role in the Cardano/Catalyst as people can delegate their vote to Cardano Experts.';
 
   @override
+  String get voterSummarySelectFavorites => 'Select favorites';
+
+  @override
+  String get voterSummaryComment => 'Comment/Vote on Proposals';
+
+  @override
+  String get voterSummaryCastVotes => 'Cast your votes';
+
+  @override
+  String get voterSummaryVoterRewards => 'Voter rewards';
+
+  @override
+  String get proposerSummaryWriteEdit => 'Write/edit functionality';
+
+  @override
+  String get proposerSummarySubmitToFund => 'Rights to Submit to Fund';
+
+  @override
+  String get proposerSummaryInviteTeamMembers => 'Invite Team Members';
+
+  @override
+  String get proposerSummaryComment => 'Comment functionality';
+
+  @override
+  String get drepSummaryDelegatedVotes => 'Delegated Votes';
+
+  @override
+  String get drepSummaryRewards => 'dRep rewards';
+
+  @override
+  String get drepSummaryCastVotes => 'Cast delegated votes';
+
+  @override
+  String get drepSummaryComment => 'Comment Functionality';
+
+  @override
   String get delete => 'Delete';
 
   @override

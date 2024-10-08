@@ -1150,6 +1150,78 @@ abstract class VoicesLocalizations {
   /// **'The dRep has an Expert Role in the Cardano/Catalyst as people can delegate their vote to Cardano Experts.'**
   String get drepDescription;
 
+  /// No description provided for @voterSummarySelectFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Select favorites'**
+  String get voterSummarySelectFavorites;
+
+  /// No description provided for @voterSummaryComment.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment/Vote on Proposals'**
+  String get voterSummaryComment;
+
+  /// No description provided for @voterSummaryCastVotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Cast your votes'**
+  String get voterSummaryCastVotes;
+
+  /// No description provided for @voterSummaryVoterRewards.
+  ///
+  /// In en, this message translates to:
+  /// **'Voter rewards'**
+  String get voterSummaryVoterRewards;
+
+  /// No description provided for @proposerSummaryWriteEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Write/edit functionality'**
+  String get proposerSummaryWriteEdit;
+
+  /// No description provided for @proposerSummarySubmitToFund.
+  ///
+  /// In en, this message translates to:
+  /// **'Rights to Submit to Fund'**
+  String get proposerSummarySubmitToFund;
+
+  /// No description provided for @proposerSummaryInviteTeamMembers.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite Team Members'**
+  String get proposerSummaryInviteTeamMembers;
+
+  /// No description provided for @proposerSummaryComment.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment functionality'**
+  String get proposerSummaryComment;
+
+  /// No description provided for @drepSummaryDelegatedVotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Delegated Votes'**
+  String get drepSummaryDelegatedVotes;
+
+  /// No description provided for @drepSummaryRewards.
+  ///
+  /// In en, this message translates to:
+  /// **'dRep rewards'**
+  String get drepSummaryRewards;
+
+  /// No description provided for @drepSummaryCastVotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Cast delegated votes'**
+  String get drepSummaryCastVotes;
+
+  /// No description provided for @drepSummaryComment.
+  ///
+  /// In en, this message translates to:
+  /// **'Comment Functionality'**
+  String get drepSummaryComment;
+
   /// No description provided for @delete.
   ///
   /// In en, this message translates to:
