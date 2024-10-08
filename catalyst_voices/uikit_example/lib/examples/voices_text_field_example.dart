@@ -23,20 +23,6 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      appBar: AppBar(title: const Text('Voices Text Field')),
-      body: const Center(
-        child: Padding(
-          padding: EdgeInsets.all(26),
-          child: AspectRatio(
-            aspectRatio: 1,
-            child: SeedPhraseField(),
-          ),
-        ),
-      ),
-    );
-
-    return Scaffold(
       appBar: AppBar(title: const Text('Voices Text Field')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),

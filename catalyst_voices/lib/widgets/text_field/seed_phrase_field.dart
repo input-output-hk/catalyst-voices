@@ -1,6 +1,6 @@
+import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_autocomplete.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
@@ -9,11 +9,15 @@ final class SeedPhraseFieldController extends ValueNotifier<List<String>> {
 }
 
 class SeedPhraseField extends StatefulWidget {
+  final int wordsCount;
+  final List<String> wordList;
   final SeedPhraseFieldController? controller;
   final ValueChanged<List<String>>? onChanged;
 
   const SeedPhraseField({
     super.key,
+    this.wordsCount = 12,
+    this.wordList = const [],
     this.controller,
     this.onChanged,
   });
@@ -30,6 +34,10 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
 
   SeedPhraseFieldController get _effectiveController {
     return widget.controller ?? (_controller ??= SeedPhraseFieldController());
+  }
+
+  bool get _isCompleted {
+    return _effectiveController.value.length == widget.wordsCount;
   }
 
   @override
@@ -67,19 +75,24 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
               children: [
                 ...value.mapIndexed(
                   (index, element) {
+                    final isLast = index == value.length - 1;
+
                     return _WordCell(
                       key: ValueKey('Word${index}CellKey'),
                       nr: index + 1,
                       data: element,
+                      onDeleteTap: isLast ? () => _deleteAt(index) : null,
                     );
                   },
                 ),
-                // TODO(damian): if not finished
-                // TODO(damian): handle deleting words
-                _WordField(
-                  controller: _textEditingController,
-                  focusNode: _focusNode,
-                  onSelected: _appendWord,
+                Offstage(
+                  offstage: _isCompleted,
+                  child: _WordField(
+                    words: widget.wordList,
+                    controller: _textEditingController,
+                    focusNode: _focusNode,
+                    onSelected: _appendWord,
+                  ),
                 ),
               ],
             );
@@ -90,27 +103,44 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
   }
 
   void _appendWord(String data) {
-    _textEditingController.clear();
-    // TODO(damian): if not finished
-    _focusNode.requestFocus();
-
-    _effectiveController.value = [
+    final words = [
       ..._effectiveController.value,
       data,
     ];
 
-    widget.onChanged?.call(_effectiveController.value);
+    _textEditingController.clear();
+
+    if (words.length != widget.wordsCount) {
+      _focusNode.requestFocus();
+    }
+
+    _effectiveController.value = words;
+    widget.onChanged?.call(words);
+  }
+
+  void _deleteAt(int index) {
+    final words = [..._effectiveController.value]..removeAt(index);
+
+    if (words.length == widget.wordsCount - 1) {
+      _textEditingController.clear();
+      _focusNode.requestFocus();
+    }
+
+    _effectiveController.value = words;
+    widget.onChanged?.call(words);
   }
 }
 
 class _WordCell extends StatelessWidget {
   final int nr;
   final String data;
+  final VoidCallback? onDeleteTap;
 
   const _WordCell({
     super.key,
     required this.nr,
     required this.data,
+    this.onDeleteTap,
   });
 
   @override
@@ -120,18 +150,23 @@ class _WordCell extends StatelessWidget {
     final backgroundColor = theme.colors.onSurfaceNeutralOpaqueLv1;
     final foregroundColor = theme.colors.textOnPrimaryLevel0;
 
-    return Material(
-      color: backgroundColor,
-      borderRadius: BorderRadius.circular(4),
-      textStyle: theme.textTheme.bodyLarge?.copyWith(color: foregroundColor),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+    return ConstrainedBox(
+      constraints: const BoxConstraints.tightFor(height: 56),
+      child: Material(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(4),
+        textStyle: theme.textTheme.bodyLarge?.copyWith(color: foregroundColor),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
+            const SizedBox(width: 16),
             Text('${nr.toString().padLeft(2, '0')}.'),
             const SizedBox(width: 6),
             Text(data),
+            if (onDeleteTap != null)
+              XButton(onTap: onDeleteTap)
+            else
+              const SizedBox(width: 16),
           ],
         ),
       ),
@@ -140,11 +175,13 @@ class _WordCell extends StatelessWidget {
 }
 
 class _WordField extends StatelessWidget {
+  final List<String> words;
   final TextEditingController controller;
   final FocusNode focusNode;
   final AutocompleteOnSelected<String> onSelected;
 
   const _WordField({
+    required this.words,
     required this.controller,
     required this.focusNode,
     required this.onSelected,
@@ -164,7 +201,7 @@ class _WordField extends StatelessWidget {
             return const [];
           }
 
-          return SeedPhrase.wordList
+          return words
               .where((element) => element.startsWith(textEditingValue.text))
               .take(10);
         },
