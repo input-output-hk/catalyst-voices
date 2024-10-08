@@ -182,7 +182,14 @@ scripts:
 
       # run tests, generate junit reports in /test_reports/ & code coverage report
       melos exec -c 1 --dir-exists="test" -- \
-       "flutter test --reporter expanded --coverage --machine | tojunit --output $MELOS_ROOT_PATH/test_reports/MELOS_PACKAGE_NAME.junit-report.xml"
+          'OUTPUT=$(flutter test --reporter expanded --coverage --machine) ; \
+          EXIT_CODE=$? ; \
+          printf "%s" "$OUTPUT" | tojunit --output $MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.junit-report.xml ; \
+          exit $EXIT_CODE'
+       
+      # store the exit code after running the tests,
+      # this is the exit code for the whole script
+      EXIT_CODE=$?
 
       # removes code coverage for generated code
       melos exec -c 1 --dir-exists="test" -- \
@@ -194,6 +201,7 @@ scripts:
         'lib/generated/**'
 
       dart pub global run combine_coverage --repo-path=.
+      exit $EXIT_CODE
 
     description: |
       Run `flutter test` for all packages and generate junit and coverage reports.
