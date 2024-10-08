@@ -82,23 +82,26 @@ all-hosts-build:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +build
 
 # package-cat-gateway : Create a deployable container for catalyst-gateway
-package-cat-gateway:
-    ARG tag="latest"
+package:
+    FROM debian:12.7-slim
 
-    FROM alpine:3.20.3
     WORKDIR /cat-gateway
 
-    RUN apk add --no-cache gcc bash
+    # RUN apk add gcc bash
 
     COPY +build/cat-gateway .
     COPY ./scripts/entry.sh .
 
     ENTRYPOINT ./entry.sh
-    SAVE IMAGE cat-gateway:$tag
 
-# Publish packages if all integration tests have passed. (Failure to pass tests will prevent packages being published.)
-# publish:
-#    FROM scratch
+# Publish cat-gateway
+publish:
+   FROM +package
+
+   ARG container="cat-gateway"
+   ARG tag="latest"
+
+   SAVE IMAGE ${container}:${tag}
 
 # get-api-locally : Get a copy of the OpenAPI json document locally.
 get-api-locally:
