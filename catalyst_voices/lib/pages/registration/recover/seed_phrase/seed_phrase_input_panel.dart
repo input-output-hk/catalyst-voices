@@ -16,6 +16,7 @@ class SeedPhraseInputPanel extends StatefulWidget {
 
 class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel> {
   late final SeedPhraseFieldController _controller;
+  final _focusNode = FocusNode();
 
   @override
   void initState() {
@@ -30,6 +31,7 @@ class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel> {
   @override
   void dispose() {
     _controller.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -48,6 +50,7 @@ class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel> {
         Expanded(
           child: _BlocSeedPhraseField(
             controller: _controller,
+            focusNode: _focusNode,
           ),
         ),
         const SizedBox(height: 12),
@@ -67,6 +70,7 @@ class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel> {
 
   void _resetControllerWords() {
     _controller.clear();
+    _focusNode.requestFocus();
   }
 
   void _onWordsChanged() {
@@ -78,9 +82,11 @@ class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel> {
 
 class _BlocSeedPhraseField extends StatelessWidget {
   final SeedPhraseFieldController controller;
+  final FocusNode focusNode;
 
   const _BlocSeedPhraseField({
     required this.controller,
+    required this.focusNode,
   });
 
   @override
@@ -88,9 +94,9 @@ class _BlocSeedPhraseField extends StatelessWidget {
     return BlocRecoverBuilder<List<String>>(
       selector: (state) => state.seedPhraseWords,
       builder: (context, state) {
-        print('words count [${state.length}]');
         return SeedPhraseField(
           controller: controller,
+          focusNode: focusNode,
           wordList: state,
         );
       },

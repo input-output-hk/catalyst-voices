@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_autocomplete.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -18,6 +20,7 @@ class SeedPhraseField extends StatefulWidget {
   final int wordsCount;
   final List<String> wordList;
   final SeedPhraseFieldController? controller;
+  final FocusNode? focusNode;
   final ValueChanged<List<String>>? onChanged;
 
   const SeedPhraseField({
@@ -25,6 +28,7 @@ class SeedPhraseField extends StatefulWidget {
     this.wordsCount = 12,
     this.wordList = const [],
     this.controller,
+    this.focusNode,
     this.onChanged,
   });
 
@@ -34,7 +38,14 @@ class SeedPhraseField extends StatefulWidget {
 
 class _SeedPhraseFieldState extends State<SeedPhraseField> {
   final _textEditingController = TextEditingController();
-  final _focusNode = FocusNode();
+
+  final _wordFieldKey = GlobalKey();
+
+  FocusNode? _focusNode;
+
+  FocusNode get _effectiveFocusNode {
+    return widget.focusNode ?? (_focusNode ??= FocusNode());
+  }
 
   SeedPhraseFieldController? _controller;
 
@@ -49,7 +60,9 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
   @override
   void dispose() {
     _textEditingController.dispose();
-    _focusNode.dispose();
+
+    _focusNode?.dispose();
+    _focusNode = null;
 
     _controller?.dispose();
     _controller = null;
@@ -73,6 +86,7 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
           ),
           borderRadius: BorderRadius.circular(12),
         ),
+        position: DecorationPosition.foreground,
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: ValueListenableBuilder(
@@ -89,15 +103,18 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
                         key: ValueKey('Word${index}CellKey'),
                         nr: index + 1,
                         data: element,
+                        // disabled always for now.
+                        onDeleteTap: null,
                       );
                     },
                   ),
                   Offstage(
                     offstage: _isCompleted,
                     child: _WordField(
+                      key: _wordFieldKey,
                       words: widget.wordList,
                       controller: _textEditingController,
-                      focusNode: _focusNode,
+                      focusNode: _effectiveFocusNode,
                       onSelected: _appendWord,
                     ),
                   ),
@@ -119,11 +136,14 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
     _textEditingController.clear();
 
     if (words.length != widget.wordsCount) {
-      _focusNode.requestFocus();
+      _effectiveFocusNode.requestFocus();
     }
 
     _effectiveController.value = words;
     widget.onChanged?.call(words);
+
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _ensureWordFieldVisible());
   }
 
   void _deleteLastWord() {
@@ -135,11 +155,18 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
 
     if (words.length == widget.wordsCount - 1) {
       _textEditingController.clear();
-      _focusNode.requestFocus();
+      _effectiveFocusNode.requestFocus();
     }
 
     _effectiveController.value = words;
     widget.onChanged?.call(words);
+  }
+
+  void _ensureWordFieldVisible() {
+    final fieldContext = _wordFieldKey.currentContext;
+    if (fieldContext != null) {
+      unawaited(Scrollable.ensureVisible(fieldContext));
+    }
   }
 }
 
@@ -227,6 +254,7 @@ class _WordField extends StatelessWidget {
   final AutocompleteOnSelected<String> onSelected;
 
   const _WordField({
+    super.key,
     required this.words,
     required this.controller,
     required this.focusNode,
