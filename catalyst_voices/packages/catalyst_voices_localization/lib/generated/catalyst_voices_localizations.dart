@@ -1096,6 +1096,24 @@ abstract class VoicesLocalizations {
   /// **'Remove Keychain'**
   String get deleteKeychainDialogRemovingPhrase;
 
+  /// A title on account role dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Learn about Catalyst Roles'**
+  String get accountRoleDialogTitle;
+
+  /// A label on account role dialog's button
+  ///
+  /// In en, this message translates to:
+  /// **'Continue Role setup'**
+  String get accountRoleDialogButton;
+
+  /// A title for voter role summary on account role dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Voter role summary'**
+  String get accountRoleDialogRoleSummaryTitle;
+
   /// No description provided for @delete.
   ///
   /// In en, this message translates to:

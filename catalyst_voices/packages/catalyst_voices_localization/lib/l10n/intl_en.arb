@@ -702,6 +702,18 @@
   "@deleteKeychainDialogRemovingPhrase": {
     "description": "A removing phrase on delete keychain dialog"
   },
+  "accountRoleDialogTitle": "Learn about Catalyst Roles",
+  "@accountRoleDialogTitle": {
+    "description": "A title on account role dialog"
+  },
+  "accountRoleDialogButton": "Continue Role setup",
+  "@accountRoleDialogButton": {
+    "description": "A label on account role dialog's button"
+  },
+  "accountRoleDialogRoleSummaryTitle": "Voter role summary",
+  "@accountRoleDialogRoleSummaryTitle": {
+    "description": "A title for voter role summary on account role dialog"
+  },
   "delete": "Delete",
   "close": "Close",
   "notice": "Notice",

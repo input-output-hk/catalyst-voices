@@ -6,6 +6,7 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 
 class AccountRoleDialog extends StatelessWidget {
   final AccountRole role;
@@ -39,7 +40,7 @@ class AccountRoleDialog extends StatelessWidget {
             children: [
               const SizedBox(height: 16),
               Text(
-                'Learn about Catalyst Roles',
+                context.l10n.accountRoleDialogTitle,
                 style: Theme.of(context).textTheme.titleLarge,
               ),
               const SizedBox(height: 28),
@@ -83,7 +84,7 @@ class AccountRoleDialog extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Voter role summary',
+                            context.l10n.accountRoleDialogRoleSummaryTitle,
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                           ...role.getSummary(context).map(
@@ -117,7 +118,7 @@ class AccountRoleDialog extends StatelessWidget {
                 width: double.infinity,
                 child: VoicesFilledButton(
                   onTap: () => Navigator.of(context).pop(),
-                  child: Text('Continue Role setup'),
+                  child: Text(context.l10n.accountRoleDialogButton),
                 ),
               ),
               const SizedBox(height: 16),

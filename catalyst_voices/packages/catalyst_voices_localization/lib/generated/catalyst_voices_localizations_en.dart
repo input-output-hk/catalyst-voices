@@ -584,6 +584,15 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get deleteKeychainDialogRemovingPhrase => 'Remove Keychain';
 
   @override
+  String get accountRoleDialogTitle => 'Learn about Catalyst Roles';
+
+  @override
+  String get accountRoleDialogButton => 'Continue Role setup';
+
+  @override
+  String get accountRoleDialogRoleSummaryTitle => 'Voter role summary';
+
+  @override
   String get delete => 'Delete';
 
   @override
