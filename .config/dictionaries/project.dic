@@ -43,6 +43,7 @@ Chotivichit
 chromedriver
 chrono
 ciphertext
+ciphertexts
 CIPs
 COCOAPODS
 codegen
@@ -81,6 +82,7 @@ encryptor
 endfunction
 Eternl
 EUTXO
+extn
 fetchval
 fmtchk
 fmtfix

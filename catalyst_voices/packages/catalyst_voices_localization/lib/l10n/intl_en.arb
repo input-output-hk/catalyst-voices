@@ -708,28 +708,28 @@
   "yes": "Yes",
   "no": "No",
   "total": "Total",
-    "file": "file",
-    "key": "key",
-    "upload": "Upload",
-    "browse": "browse",
-    "uploadDropInfo": "Drop your {itemNameToUpload} here or ",
-    "@uploadDropInfo": {
-      "description": "An info on upload dialog",
-      "placeholders": {
-        "itemNameToUpload": {
-          "type": "String"
-        }
+  "file": "file",
+  "key": "key",
+  "upload": "Upload",
+  "browse": "browse",
+  "uploadDropInfo": "Drop your {itemNameToUpload} here or ",
+  "@uploadDropInfo": {
+    "description": "An info on upload dialog",
+    "placeholders": {
+      "itemNameToUpload": {
+        "type": "String"
       }
-    },
-    "uploadProgressInfo": "Upload in progress",
-    "uploadKeychainTitle": "Upload Catalyst Keychain",
-    "@uploadKeychainTitle": {
-      "description": "A title on keychain upload dialog"
-    },
-    "uploadKeychainInfo": "Make sure it's a correct Catalyst keychain file.",
-    "@uploadKeychainInfo": {
-      "description": "An info on keychain upload dialog"
-    },
+    }
+  },
+  "uploadProgressInfo": "Upload in progress",
+  "uploadKeychainTitle": "Upload Catalyst Keychain",
+  "@uploadKeychainTitle": {
+    "description": "A title on keychain upload dialog"
+  },
+  "uploadKeychainInfo": "Make sure it's a correct Catalyst keychain file.",
+  "@uploadKeychainInfo": {
+    "description": "An info on keychain upload dialog"
+  },
   "themeLight": "Light",
   "@themeLight": {
     "description": "Refers to a light theme mode."
@@ -790,5 +790,20 @@
   "passwordDoNotMatch": "Passwords do not match, please correct",
   "@passwordDoNotMatch": {
     "description": "When user confirms password but it does not match original one."
-  }
+  },
+  "warning": "Warning",
+  "registrationExitConfirmDialogSubtitle": "Account creation incomplete!",
+  "registrationExitConfirmDialogContent": "If attempt to leave without creating your keychain - account creation will be incomplete. \u2028\u2028You are not able to login without \u2028completing your keychain.",
+  "registrationExitConfirmDialogContinue": "Continue keychain creation",
+  "registrationExitConfirmDialogCancel": "Cancel anyway",
+  "recoverCatalystKeychain": "Restore Catalyst keychain",
+  "recoverKeychainMethodsTitle": "Restore your Catalyst Keychain",
+  "recoverKeychainMethodsNoKeychainFound": "No Catalyst Keychain found on this device.",
+  "recoverKeychainMethodsSubtitle": "Not to worry, in the next step you can choose the recovery option that applies to you for this device!",
+  "recoverKeychainMethodsListTitle": "How do you want Restore your Catalyst Keychain?",
+  "recoverKeychainNonFound": "No Catalyst Keychain found\u2028on this device.",
+  "recoverKeychainFound": "Keychain found!  \u2028Please unlock your device.",
+  "seedPhrase12Words": "12 security words",
+  "recoverySeedPhraseInstructionsTitle": "Restore your Catalyst Keychain with \u2028your 12 security words.",
+  "recoverySeedPhraseInstructionsSubtitle": "Enter your security words in the correct order, and sign into your Catalyst account on a new device."
 }

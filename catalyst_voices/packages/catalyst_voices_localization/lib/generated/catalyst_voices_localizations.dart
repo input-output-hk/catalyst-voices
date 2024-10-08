@@ -1377,6 +1377,96 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Passwords do not match, please correct'**
   String get passwordDoNotMatch;
+
+  /// No description provided for @warning.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning'**
+  String get warning;
+
+  /// No description provided for @registrationExitConfirmDialogSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Account creation incomplete!'**
+  String get registrationExitConfirmDialogSubtitle;
+
+  /// No description provided for @registrationExitConfirmDialogContent.
+  ///
+  /// In en, this message translates to:
+  /// **'If attempt to leave without creating your keychain - account creation will be incomplete.   You are not able to login without  completing your keychain.'**
+  String get registrationExitConfirmDialogContent;
+
+  /// No description provided for @registrationExitConfirmDialogContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue keychain creation'**
+  String get registrationExitConfirmDialogContinue;
+
+  /// No description provided for @registrationExitConfirmDialogCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel anyway'**
+  String get registrationExitConfirmDialogCancel;
+
+  /// No description provided for @recoverCatalystKeychain.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Catalyst keychain'**
+  String get recoverCatalystKeychain;
+
+  /// No description provided for @recoverKeychainMethodsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore your Catalyst Keychain'**
+  String get recoverKeychainMethodsTitle;
+
+  /// No description provided for @recoverKeychainMethodsNoKeychainFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No Catalyst Keychain found on this device.'**
+  String get recoverKeychainMethodsNoKeychainFound;
+
+  /// No description provided for @recoverKeychainMethodsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Not to worry, in the next step you can choose the recovery option that applies to you for this device!'**
+  String get recoverKeychainMethodsSubtitle;
+
+  /// No description provided for @recoverKeychainMethodsListTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How do you want Restore your Catalyst Keychain?'**
+  String get recoverKeychainMethodsListTitle;
+
+  /// No description provided for @recoverKeychainNonFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No Catalyst Keychain found on this device.'**
+  String get recoverKeychainNonFound;
+
+  /// No description provided for @recoverKeychainFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Keychain found!   Please unlock your device.'**
+  String get recoverKeychainFound;
+
+  /// No description provided for @seedPhrase12Words.
+  ///
+  /// In en, this message translates to:
+  /// **'12 security words'**
+  String get seedPhrase12Words;
+
+  /// No description provided for @recoverySeedPhraseInstructionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore your Catalyst Keychain with  your 12 security words.'**
+  String get recoverySeedPhraseInstructionsTitle;
+
+  /// No description provided for @recoverySeedPhraseInstructionsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your security words in the correct order, and sign into your Catalyst account on a new device.'**
+  String get recoverySeedPhraseInstructionsSubtitle;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

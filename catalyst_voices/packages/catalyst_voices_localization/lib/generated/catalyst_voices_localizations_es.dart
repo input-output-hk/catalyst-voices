@@ -727,4 +727,49 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get passwordDoNotMatch => 'Passwords do not match, please correct';
+
+  @override
+  String get warning => 'Warning';
+
+  @override
+  String get registrationExitConfirmDialogSubtitle => 'Account creation incomplete!';
+
+  @override
+  String get registrationExitConfirmDialogContent => 'If attempt to leave without creating your keychain - account creation will be incomplete.   You are not able to login without  completing your keychain.';
+
+  @override
+  String get registrationExitConfirmDialogContinue => 'Continue keychain creation';
+
+  @override
+  String get registrationExitConfirmDialogCancel => 'Cancel anyway';
+
+  @override
+  String get recoverCatalystKeychain => 'Restore Catalyst keychain';
+
+  @override
+  String get recoverKeychainMethodsTitle => 'Restore your Catalyst Keychain';
+
+  @override
+  String get recoverKeychainMethodsNoKeychainFound => 'No Catalyst Keychain found on this device.';
+
+  @override
+  String get recoverKeychainMethodsSubtitle => 'Not to worry, in the next step you can choose the recovery option that applies to you for this device!';
+
+  @override
+  String get recoverKeychainMethodsListTitle => 'How do you want Restore your Catalyst Keychain?';
+
+  @override
+  String get recoverKeychainNonFound => 'No Catalyst Keychain found on this device.';
+
+  @override
+  String get recoverKeychainFound => 'Keychain found!   Please unlock your device.';
+
+  @override
+  String get seedPhrase12Words => '12 security words';
+
+  @override
+  String get recoverySeedPhraseInstructionsTitle => 'Restore your Catalyst Keychain with  your 12 security words.';
+
+  @override
+  String get recoverySeedPhraseInstructionsSubtitle => 'Enter your security words in the correct order, and sign into your Catalyst account on a new device.';
 }

@@ -35,10 +35,18 @@ pub(crate) enum ResponseSingleRegistration {
 pub(crate) enum ResponseMultipleRegistrations {
     /// Cip36 registration
     #[oai(status = 200)]
-    Ok(Json<Vec<Cip36Reporting>>),
+    Ok(Json<Cip36ReportingList>),
     /// No valid registration
     #[oai(status = 404)]
     NotFound,
+}
+
+/// Cip36 info list
+#[derive(Object, Default)]
+pub(crate) struct Cip36ReportingList {
+    /// List of registrations
+    #[oai(validator(max_items = "100000"))]
+    cip36: Vec<Cip36Reporting>,
 }
 
 /// Cip36 info + invalid reporting
@@ -83,12 +91,16 @@ pub(crate) struct Cip36Info {
 #[derive(Object, Default)]
 pub(crate) struct InvalidRegistrationsReport {
     /// Error report
+    #[oai(validator(max_items = "100000"))]
     pub error_report: Vec<String>,
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
+    #[oai(validator(max_length = 66, min_length = 66, pattern = "0x[0-9a-f]{64}"))]
     pub stake_address: String,
     /// Voting Public Key
+    #[oai(validator(max_length = 66, min_length = 0, pattern = "[0-9a-f]"))]
     pub vote_key: String,
     /// Full Payment Address (not hashed, 32 byte ED25519 Public key).
+    #[oai(validator(max_length = 66, min_length = 0, pattern = "[0-9a-f]"))]
     pub payment_address: String,
     /// Is the stake address a script or not.
     pub is_payable: bool,
@@ -396,7 +408,7 @@ pub(crate) async fn get_associated_vote_key_registrations(
 
         // Report includes registration info and  any erroneous registrations which occur AFTER
         // the slot# of the last valid registration
-        let mut reports = Vec::new();
+        let mut reports = Cip36ReportingList { cip36: Vec::new() };
 
         for registration in redacted_registrations {
             let invalids_report = match get_invalid_registrations(
@@ -422,7 +434,7 @@ pub(crate) async fn get_associated_vote_key_registrations(
                 invalids: invalids_report,
             };
 
-            reports.push(report);
+            reports.cip36.push(report);
         }
 
         return ResponseMultipleRegistrations::Ok(Json(reports)).into();
