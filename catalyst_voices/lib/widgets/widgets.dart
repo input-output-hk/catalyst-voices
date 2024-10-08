@@ -62,6 +62,7 @@ export 'seed_phrase/seed_phrases_viewer.dart';
 export 'separators/voices_divider.dart';
 export 'separators/voices_text_divider.dart';
 export 'separators/voices_vertical_divider.dart';
+export 'text_field/seed_phrase_field.dart';
 export 'text_field/voices_autocomplete.dart';
 export 'text_field/voices_email_text_field.dart';
 export 'text_field/voices_password_text_field.dart';

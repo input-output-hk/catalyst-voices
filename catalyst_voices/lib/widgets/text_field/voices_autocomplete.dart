@@ -4,33 +4,38 @@ import 'package:flutter/material.dart';
 
 /// Voices implementation of material [Autocomplete] widget.
 class VoicesAutocomplete<T extends Object> extends StatelessWidget {
-  /// [Autocomplete.optionsBuilder].
+  /// [RawAutocomplete.optionsBuilder].
   final AutocompleteOptionsBuilder<T> optionsBuilder;
 
-  /// [Autocomplete.onSelected]
+  /// [RawAutocomplete.onSelected]
   final AutocompleteOnSelected<T>? onSelected;
 
-  /// [Autocomplete.displayStringForOption].
+  /// [RawAutocomplete.displayStringForOption].
   final AutocompleteOptionToString<T> displayStringForOption;
 
-  /// [Autocomplete.initialValue]
-  final TextEditingValue? initialValue;
+  /// [RawAutocomplete.textEditingController]
+  final TextEditingController? textEditingController;
+
+  /// [RawAutocomplete.focusNode]
+  final FocusNode? focusNode;
 
   const VoicesAutocomplete({
     super.key,
     required this.optionsBuilder,
     this.onSelected,
     this.displayStringForOption = RawAutocomplete.defaultStringForOption,
-    this.initialValue,
+    this.textEditingController,
+    this.focusNode,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Autocomplete<T>(
+    return RawAutocomplete<T>(
       optionsBuilder: optionsBuilder,
       onSelected: onSelected,
       displayStringForOption: displayStringForOption,
-      initialValue: initialValue,
+      textEditingController: textEditingController,
+      focusNode: focusNode,
       fieldViewBuilder: (
         context,
         textEditingController,
@@ -40,6 +45,7 @@ class VoicesAutocomplete<T extends Object> extends StatelessWidget {
         return VoicesTextField(
           controller: textEditingController,
           focusNode: focusNode,
+          maxLines: 1,
           onFieldSubmitted: (value) {
             onFieldSubmitted();
           },
