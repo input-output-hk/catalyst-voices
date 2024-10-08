@@ -15,7 +15,6 @@ final class SeedPhraseFieldController extends ValueNotifier<List<String>> {
   }
 }
 
-// TODO(damian): when adding words make sure input is always visible
 class SeedPhraseField extends StatefulWidget {
   final int wordsCount;
   final List<String> wordList;
