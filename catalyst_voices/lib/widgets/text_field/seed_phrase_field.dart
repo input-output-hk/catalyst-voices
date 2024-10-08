@@ -7,8 +7,13 @@ import 'package:flutter/services.dart';
 
 final class SeedPhraseFieldController extends ValueNotifier<List<String>> {
   SeedPhraseFieldController([super._value = const <String>[]]);
+
+  void clear() {
+    value = const [];
+  }
 }
 
+// TODO(damian): when adding words make sure input is always visible
 class SeedPhraseField extends StatefulWidget {
   final int wordsCount;
   final List<String> wordList;
@@ -80,13 +85,10 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
                 children: [
                   ...value.mapIndexed(
                     (index, element) {
-                      final isLast = index == value.length - 1;
-
                       return _WordCell(
                         key: ValueKey('Word${index}CellKey'),
                         nr: index + 1,
                         data: element,
-                        onDeleteTap: isLast ? () => _deleteAt(index) : null,
                       );
                     },
                   ),

@@ -1467,6 +1467,18 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Enter your security words in the correct order, and sign into your Catalyst account on a new device.'**
   String get recoverySeedPhraseInstructionsSubtitle;
+
+  /// No description provided for @recoverySeedPhraseInputTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore your Catalyst Keychain with  your 12 security words'**
+  String get recoverySeedPhraseInputTitle;
+
+  /// No description provided for @recoverySeedPhraseInputSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter each word of your Catalyst Key in the right order  to bring your Catalyst account to this device.'**
+  String get recoverySeedPhraseInputSubtitle;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
