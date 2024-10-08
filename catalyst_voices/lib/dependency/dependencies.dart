@@ -41,6 +41,9 @@ final class Dependencies extends DependencyProvider {
       )
       ..registerSingleton<AuthenticationRepository>(
         AuthenticationRepository(credentialsStorageRepository: get()),
+      )
+      ..registerSingleton<TransactionConfigRepository>(
+        TransactionConfigRepository(),
       );
   }
 
