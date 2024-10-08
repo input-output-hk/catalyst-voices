@@ -3,6 +3,7 @@ import 'package:catalyst_voices/widgets/text_field/voices_autocomplete.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 final class SeedPhraseFieldController extends ValueNotifier<List<String>> {
   SeedPhraseFieldController([super._value = const <String>[]]);
@@ -55,48 +56,53 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: theme.colors.outlineBorder!,
-          width: 1.5,
+    return _DeleteShortcut(
+      onDeleteLastWord: _deleteLastWord,
+      controller: _textEditingController,
+      seedPhraseFieldController: _effectiveController,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: theme.colors.outlineBorder!,
+            width: 1.5,
+          ),
+          borderRadius: BorderRadius.circular(12),
         ),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
-        child: ValueListenableBuilder(
-          valueListenable: _effectiveController,
-          builder: (context, value, _) {
-            return Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              crossAxisAlignment: WrapCrossAlignment.center,
-              children: [
-                ...value.mapIndexed(
-                  (index, element) {
-                    final isLast = index == value.length - 1;
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: ValueListenableBuilder(
+            valueListenable: _effectiveController,
+            builder: (context, value, _) {
+              return Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  ...value.mapIndexed(
+                    (index, element) {
+                      final isLast = index == value.length - 1;
 
-                    return _WordCell(
-                      key: ValueKey('Word${index}CellKey'),
-                      nr: index + 1,
-                      data: element,
-                      onDeleteTap: isLast ? () => _deleteAt(index) : null,
-                    );
-                  },
-                ),
-                Offstage(
-                  offstage: _isCompleted,
-                  child: _WordField(
-                    words: widget.wordList,
-                    controller: _textEditingController,
-                    focusNode: _focusNode,
-                    onSelected: _appendWord,
+                      return _WordCell(
+                        key: ValueKey('Word${index}CellKey'),
+                        nr: index + 1,
+                        data: element,
+                        onDeleteTap: isLast ? () => _deleteAt(index) : null,
+                      );
+                    },
                   ),
-                ),
-              ],
-            );
-          },
+                  Offstage(
+                    offstage: _isCompleted,
+                    child: _WordField(
+                      words: widget.wordList,
+                      controller: _textEditingController,
+                      focusNode: _focusNode,
+                      onSelected: _appendWord,
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
@@ -118,6 +124,10 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
     widget.onChanged?.call(words);
   }
 
+  void _deleteLastWord() {
+    _deleteAt(_effectiveController.value.length - 1);
+  }
+
   void _deleteAt(int index) {
     final words = [..._effectiveController.value]..removeAt(index);
 
@@ -128,6 +138,40 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
 
     _effectiveController.value = words;
     widget.onChanged?.call(words);
+  }
+}
+
+class _DeleteShortcut extends StatelessWidget {
+  final VoidCallback onDeleteLastWord;
+  final TextEditingController controller;
+  final SeedPhraseFieldController seedPhraseFieldController;
+  final Widget child;
+
+  const _DeleteShortcut({
+    required this.onDeleteLastWord,
+    required this.controller,
+    required this.seedPhraseFieldController,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Shortcuts(
+      shortcuts: <LogicalKeySet, Intent>{
+        LogicalKeySet(LogicalKeyboardKey.backspace):
+            const _DeleteLastWordIntent(),
+      },
+      child: Actions(
+        actions: <Type, Action<Intent>>{
+          _DeleteLastWordIntent: _DeleteLastWordAction(
+            onInvoke: onDeleteLastWord,
+            textEditingController: controller,
+            seedPhraseFieldController: seedPhraseFieldController,
+          ),
+        },
+        child: child,
+      ),
+    );
   }
 }
 
@@ -208,5 +252,40 @@ class _WordField extends StatelessWidget {
         onSelected: onSelected,
       ),
     );
+  }
+}
+
+class _DeleteLastWordIntent extends Intent {
+  const _DeleteLastWordIntent();
+}
+
+class _DeleteLastWordAction extends Action<_DeleteLastWordIntent> {
+  final VoidCallback onInvoke;
+  final TextEditingController textEditingController;
+  final SeedPhraseFieldController seedPhraseFieldController;
+
+  _DeleteLastWordAction({
+    required this.onInvoke,
+    required this.textEditingController,
+    required this.seedPhraseFieldController,
+  });
+
+  @override
+  bool isEnabled(_DeleteLastWordIntent intent) {
+    if (textEditingController.text.isNotEmpty) {
+      return false;
+    }
+
+    if (seedPhraseFieldController.value.isEmpty) {
+      return false;
+    }
+
+    return true;
+  }
+
+  @override
+  Object? invoke(_DeleteLastWordIntent intent) {
+    onInvoke();
+    return null;
   }
 }
