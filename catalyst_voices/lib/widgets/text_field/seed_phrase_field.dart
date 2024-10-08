@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
+import 'package:catalyst_voices/widgets/scrollbar/voices_scrollbar.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_autocomplete.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:collection/collection.dart';
@@ -86,40 +87,43 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
           borderRadius: BorderRadius.circular(12),
         ),
         position: DecorationPosition.foreground,
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: ValueListenableBuilder(
-            valueListenable: _effectiveController,
-            builder: (context, value, _) {
-              return Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                crossAxisAlignment: WrapCrossAlignment.center,
-                children: [
-                  ...value.mapIndexed(
-                    (index, element) {
-                      return _WordCell(
-                        key: ValueKey('Word${index}CellKey'),
-                        nr: index + 1,
-                        data: element,
-                        // disabled always for now.
-                        onDeleteTap: null,
-                      );
-                    },
-                  ),
-                  Offstage(
-                    offstage: _isCompleted,
-                    child: _WordField(
-                      key: _wordFieldKey,
-                      words: widget.wordList,
-                      controller: _textEditingController,
-                      focusNode: _effectiveFocusNode,
-                      onSelected: _appendWord,
+        child: VoicesScrollbar(
+          mainAxisMargin: 16,
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: ValueListenableBuilder(
+              valueListenable: _effectiveController,
+              builder: (context, value, _) {
+                return Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    ...value.mapIndexed(
+                      (index, element) {
+                        return _WordCell(
+                          key: ValueKey('Word${index}CellKey'),
+                          nr: index + 1,
+                          data: element,
+                          // disabled always for now.
+                          onDeleteTap: null,
+                        );
+                      },
                     ),
-                  ),
-                ],
-              );
-            },
+                    Offstage(
+                      offstage: _isCompleted,
+                      child: _WordField(
+                        key: _wordFieldKey,
+                        words: widget.wordList,
+                        controller: _textEditingController,
+                        focusNode: _effectiveFocusNode,
+                        onSelected: _appendWord,
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
         ),
       ),
