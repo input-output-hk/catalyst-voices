@@ -1,6 +1,5 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-# cspell: words vcpu, noninteractive, iscsi, preconfiguration, inotify, jetstack
 
 # These variables are kept for reference in scripts, but we're not using them for network configuration
 control_ip = "192.168.58.10"

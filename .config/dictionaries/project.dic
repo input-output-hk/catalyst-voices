@@ -51,6 +51,7 @@ codepoints
 commitlog
 coti
 coverallsapp
+cpu
 CQLSH
 cryptoxide
 Cunego
@@ -113,6 +114,7 @@ interps
 inversed
 iohk
 iphoneos
+iscsi
 jdbc
 jetbrains
 Joaquín
@@ -170,6 +172,7 @@ netifas
 netkey
 nextest
 Nodetool
+noninteractive
 OCSP
 Oleksandr
 onboarded
