@@ -19,7 +19,7 @@ abstract interface class KeychainCreationManager {
 
   void setSeedPhraseStored(bool value);
 
-  void setUserSeedPhraseWords(List<String> words);
+  void setUserSeedPhraseWords(List<SeedPhraseWord> words);
 
   Future<void> downloadSeedPhrase();
 
@@ -78,7 +78,7 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
   }
 
   @override
-  void setUserSeedPhraseWords(List<String> words) {
+  void setUserSeedPhraseWords(List<SeedPhraseWord> words) {
     final seedPhrase = _seedPhraseStateData.seedPhrase;
     final seedPhraseWords = seedPhrase?.mnemonicWords;
 

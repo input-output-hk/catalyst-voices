@@ -11,6 +11,7 @@ dependencies:
   catalyst_cardano: ^0.3.0
   catalyst_cardano_serialization: ^0.4.0
   catalyst_cardano_web: ^0.3.0
+  collection: ^1.18.0
   convert: ^3.1.1
   ed25519_hd_key: ^2.3.0
   equatable: ^2.0.5
@@ -19,5 +20,4 @@ dependencies:
 
 dev_dependencies:
   catalyst_analysis: ^2.0.0
-  flutter_test:
-    sdk: flutter
+  test: ^1.24.9
