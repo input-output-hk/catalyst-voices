@@ -1,30 +1,30 @@
 # Local Cluster
 
-- [Local Cluster](#local-cluster)
-  - [Requirements](#requirements)
-    - [macOS](#macos)
-  - [Cluster Architecture](#cluster-architecture)
-  - [Default Services](#default-services)
-    - [Scylla DB](#scylla-db)
-  - [Deploying the Cluster](#deploying-the-cluster)
-    - [Setup hosts on Windows](#setup-hosts-on-windows)
-    - [Startup](#startup)
-      - [Linux/Windows](#linuxwindows)
-      - [macOS](#macos-1)
-    - [Getting Basic Cluster details](#getting-basic-cluster-details)
-    - [Suspending the Cluster](#suspending-the-cluster)
-    - [Resuming a suspended the Cluster](#resuming-a-suspended-the-cluster)
-    - [Stopping the Cluster](#stopping-the-cluster)
-  - [Catalyst Voices Services](#catalyst-voices-services)
-    - [Deploying Catalyst Voices Frontend and Backend Services](#deploying-catalyst-voices-frontend-and-backend-services)
-    - [Deploying Catalyst Voices Documentation Service](#deploying-catalyst-voices-documentation-service)
-  - [Debugging the cluster](#debugging-the-cluster)
-    - [SSH into a running VM](#ssh-into-a-running-vm)
-  - [Local UI to access ScyllaDB](#local-ui-to-access-scylladb)
-  - [Troubleshooting](#troubleshooting)
-    - [Issues with Vagrant configurations](#issues-with-vagrant-configurations)
-    - [Issues with running command with just](#issues-with-running-command-with-just)
-    - [Vagrant cannot forward the specified ports on a VM](#vagrant-cannot-forward-the-specified-ports-on-a-vm)
+* [Local Cluster](#local-cluster)
+  * [Requirements](#requirements)
+    * [macOS](#macos)
+  * [Cluster Architecture](#cluster-architecture)
+  * [Default Services](#default-services)
+    * [Scylla DB](#scylla-db)
+  * [Deploying the Cluster](#deploying-the-cluster)
+    * [Setup hosts on Windows](#setup-hosts-on-windows)
+    * [Startup](#startup)
+      * [Linux/Windows](#linuxwindows)
+      * [macOS](#macos-1)
+    * [Getting Basic Cluster details](#getting-basic-cluster-details)
+    * [Suspending the Cluster](#suspending-the-cluster)
+    * [Resuming a suspended the Cluster](#resuming-a-suspended-the-cluster)
+    * [Stopping the Cluster](#stopping-the-cluster)
+  * [Catalyst Voices Services](#catalyst-voices-services)
+    * [Deploying Catalyst Voices Frontend and Backend Services](#deploying-catalyst-voices-frontend-and-backend-services)
+    * [Deploying Catalyst Voices Documentation Service](#deploying-catalyst-voices-documentation-service)
+  * [Debugging the cluster](#debugging-the-cluster)
+    * [SSH into a running VM](#ssh-into-a-running-vm)
+  * [Local UI to access ScyllaDB](#local-ui-to-access-scylladb)
+  * [Troubleshooting](#troubleshooting)
+    * [Issues with Vagrant configurations](#issues-with-vagrant-configurations)
+    * [Issues with running command with just](#issues-with-running-command-with-just)
+    * [Vagrant cannot forward the specified ports on a VM](#vagrant-cannot-forward-the-specified-ports-on-a-vm)
 
 ## Requirements
 
@@ -291,7 +291,7 @@ This command will list all Vagrant environments on your system. Look for any VMs
 id       name    provider   state   directory
 --------------------------------------------------------------------------------------
 abcd123  control qemu       running /path/to/your/project
-efgh456  othervm qemu       running /another/project
+abcd456  other qemu       running /another/project
 ```
 3.  Halt or Destroy the Existing VM
 

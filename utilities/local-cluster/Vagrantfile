@@ -9,7 +9,7 @@ control_ip = "192.168.58.10"
 agents = { "agent86" => "192.168.58.86",
            "agent99" => "192.168.58.99" }
 
-# This is sized so that a machine with 16 threads and 16GB will allocate at most 
+# This is sized so that a machine with 16 threads and 16GB will allocate at most
 # ~3/4 of its resources to the cluster.
 control_vcpu = "4" # Number of vCPUs in the VM
 control_memory = "5192" # 5G of Memory (An extra gig because its the control-plane node)
@@ -157,12 +157,13 @@ update_sysctl_limits = <<-SHELL
 Vagrant.configure("2") do |config|
   if is_darwin_arm64
     config.vm.box = "generic/debian12"
-    config.ssh.insert_key = false
-    config.ssh.username = "vagrant"
+    config.vm.boot_timeout = 600
+    # config.ssh.insert_key = false
+    # config.ssh.username = "vagrant"
     config.ssh.password = "vagrant"
     config.ssh.private_key_path = ["~/.vagrant.d/insecure_private_key"]
-    config.ssh.forward_agent = false
-    config.ssh.forward_x11 = false
+    # config.ssh.forward_agent = false
+    # config.ssh.forward_x11 = false
     config.ssh.keep_alive = true
   else
     config.vm.box = "bento/debian-12"
@@ -177,9 +178,14 @@ Vagrant.configure("2") do |config|
     if is_darwin_arm64
       control.vm.synced_folder "./shared", "/vagrant_shared", type: "rsync"
       control.vm.provider "qemu" do |qe|
-        qe.cpus = control_vcpu
-        qe.memory = control_memory
-        qe.gui = true
+        qe.arch = "aarch64"
+        qe.machine = "virt"
+        qe.cpu = "cortex-a72"
+        qe.memory = "1G"
+        qe.qemu_dir = "/opt/homebrew/share/qemu"
+        # qe.cpus = control_vcpu
+        # qe.memory = control_memory
+        # qe.gui = true
       end
     else
       control.vm.network "private_network", ip: control_ip
