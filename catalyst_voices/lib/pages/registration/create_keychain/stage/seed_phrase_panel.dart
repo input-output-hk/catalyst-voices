@@ -80,7 +80,7 @@ class _BlocSeedPhraseWords extends StatelessWidget {
 }
 
 class _SeedPhraseWords extends StatelessWidget {
-  final List<String> words;
+  final List<SeedPhraseWord> words;
 
   const _SeedPhraseWords(this.words);
 

@@ -7,7 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 abstract interface class RecoverManager {
   Future<void> checkLocalKeychains();
 
-  void setSeedPhraseWords(List<String> words);
+  void setSeedPhraseWords(List<SeedPhraseWord> words);
 }
 
 final class RecoverCubit extends Cubit<RecoverStateData>
@@ -23,7 +23,7 @@ final class RecoverCubit extends Cubit<RecoverStateData>
   }
 
   @override
-  void setSeedPhraseWords(List<String> words) {
+  void setSeedPhraseWords(List<SeedPhraseWord> words) {
     final newState = state.copyWith(
       userSeedPhraseWords: words,
       isSeedPhraseValid: SeedPhrase.isValid(words: words),
