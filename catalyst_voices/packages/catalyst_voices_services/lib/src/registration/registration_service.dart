@@ -76,7 +76,7 @@ final class RegistrationService {
   /// the user must agree to sign the transaction.
   ///
   /// The transaction must be prepared earlier via [prepareRegistration].
-  /// 
+  ///
   /// Throws a subclass of [RegistrationException] in case of a failure.
   Future<Transaction> submitRegistration({
     required CardanoWallet wallet,
