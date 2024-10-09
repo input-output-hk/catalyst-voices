@@ -2,7 +2,6 @@
 
 * [Local Cluster](#local-cluster)
   * [Requirements](#requirements)
-    * [macOS](#macos)
   * [Cluster Architecture](#cluster-architecture)
   * [Default Services](#default-services)
     * [Scylla DB](#scylla-db)
@@ -10,7 +9,7 @@
     * [Setup hosts on Windows](#setup-hosts-on-windows)
     * [Startup](#startup)
       * [Linux/Windows](#linuxwindows)
-      * [macOS](#macos-1)
+      * [macOS](#macos)
     * [Getting Basic Cluster details](#getting-basic-cluster-details)
     * [Suspending the Cluster](#suspending-the-cluster)
     * [Resuming a suspended the Cluster](#resuming-a-suspended-the-cluster)
@@ -31,18 +30,12 @@
 Integration Tests and local testing will require a running local cluster.
 To eliminate variability and simplify local deployment, we have standardized the local cluster around:
 
-* [VirtualBox](https://www.virtualbox.org/)
+* [VirtualBox](https://www.virtualbox.org/) for Linux or [Parallels](https://www.parallels.com/) for macOS
 * [Vagrant](https://developer.hashicorp.com/vagrant/install?product_intent=vagrant)
 * [kubectl](https://kubernetes.io/docs/tasks/tools/)
 * [helm](https://helm.sh/docs/intro/install/)
 * [just](https://github.com/casey/just)
 
-### macOS
-
-https://www.virtualbox.org/wiki/Testbuilds
-
-These tools allow us to define VMs that are consistent and provide a uniform Kubernetes environment
-for local testing.
 
 ## Cluster Architecture
 
@@ -330,4 +323,4 @@ sudo lsof -i :6443
 ```
 This should return no output, indicating that no process is listening on port 6443.
 
-6. Retry Bringing Up the Vagrant VM.
+6. Retry bringing up the Vagrant VM.
