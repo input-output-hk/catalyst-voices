@@ -39,24 +39,26 @@ final class Dependencies extends DependencyProvider {
 
   void _registerRepositories() {
     this
-      ..registerSingleton<CredentialsStorageRepository>(
-        CredentialsStorageRepository(storage: get()),
+      ..registerLazySingleton<CredentialsStorageRepository>(
+        () => CredentialsStorageRepository(storage: get()),
       )
-      ..registerSingleton<AuthenticationRepository>(
-        AuthenticationRepository(credentialsStorageRepository: get()),
+      ..registerLazySingleton<AuthenticationRepository>(
+        () => AuthenticationRepository(credentialsStorageRepository: get()),
       )
-      ..registerSingleton<TransactionConfigRepository>(
-        TransactionConfigRepository(),
+      ..registerLazySingleton<TransactionConfigRepository>(
+        TransactionConfigRepository.new,
       );
   }
 
   void _registerServices() {
-    registerSingleton<Storage>(const SecureStorage());
-    registerSingleton<Vault>(const SecureStorageVault());
-    registerSingleton<DummyAuthStorage>(const SecureDummyAuthStorage());
-    registerSingleton<Downloader>(Downloader());
-    registerSingleton<RegistrationService>(
-      RegistrationService(get<TransactionConfigRepository>()),
+    registerLazySingleton<Storage>(() => const SecureStorage());
+    registerLazySingleton<Vault>(() => const SecureStorageVault());
+    registerLazySingleton<DummyAuthStorage>(
+      () => const SecureDummyAuthStorage(),
+    );
+    registerLazySingleton<Downloader>(Downloader.new);
+    registerLazySingleton<RegistrationService>(
+      () => RegistrationService(get<TransactionConfigRepository>()),
     );
   }
 }
