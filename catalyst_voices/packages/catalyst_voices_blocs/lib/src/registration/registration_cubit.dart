@@ -35,6 +35,15 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     _keychainCreationCubit.stream.listen(_onKeychainStateDataChanged);
     _walletLinkCubit.stream.listen(_onWalletLinkStateDataChanged);
     _recoverCubit.stream.listen(_onRecoverStateDataChanged);
+
+    // Emits initialization state
+    emit(
+      state.copyWith(
+        keychainStateData: _keychainCreationCubit.state,
+        walletLinkStateData: _walletLinkCubit.state,
+        recoverStateData: _recoverCubit.state,
+      ),
+    );
   }
 
   KeychainCreationManager get keychainCreation => _keychainCreationCubit;

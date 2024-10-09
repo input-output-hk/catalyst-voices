@@ -30,6 +30,7 @@ class _VoicesTextFieldExampleState extends State<VoicesTextFieldExample> {
           spacing: 24,
           runSpacing: 24,
           children: [
+            const SizedBox(height: 20),
             SizedBox(
               width: 200,
               child: VoicesTextField(

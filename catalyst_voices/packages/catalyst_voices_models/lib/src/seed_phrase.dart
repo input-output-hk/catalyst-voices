@@ -78,6 +78,14 @@ final class SeedPhrase extends Equatable {
   /// The full list of BIP-39 mnemonic words in English.
   static List<String> get wordList => WORDLIST;
 
+  /// Utility method that validates given [words] as [SeedPhrase] data.
+  static bool isValid({
+    required List<String> words,
+  }) {
+    final mnemonic = words.join(' ');
+    return bip39.validateMnemonic(mnemonic);
+  }
+
   /// The seed derived from the mnemonic as a Uint8List.
   Uint8List get uint8ListSeed => bip39.mnemonicToSeed(mnemonic);
 
