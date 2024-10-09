@@ -6,9 +6,35 @@ import 'dart:typed_data';
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:bip39/src/wordlists/english.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:collection/collection.dart';
 import 'package:convert/convert.dart';
 import 'package:ed25519_hd_key/ed25519_hd_key.dart';
 import 'package:equatable/equatable.dart';
+
+/// Represent singular mnemonic words which keeps data as well as index of
+/// this word.
+///
+/// This is useful because seed phrase may have duplicate words. With this
+/// structure we can distinguish which word is which.
+final class SeedPhraseWord extends Equatable
+    implements Comparable<SeedPhraseWord> {
+  /// Word value.
+  final String data;
+
+  /// Number of this word in [SeedPhrase].
+  final int nr;
+
+  const SeedPhraseWord(
+    this.data, {
+    required this.nr,
+  });
+
+  @override
+  List<Object?> get props => [data, nr];
+
+  @override
+  int compareTo(SeedPhraseWord other) => nr.compareTo(other.nr);
+}
 
 /// Represents a seed phrase consisting of a mnemonic and provides methods for
 /// generating and deriving cryptographic data from the mnemonic.
@@ -69,8 +95,10 @@ final class SeedPhrase extends Equatable {
 
   /// Builds [mnemonic] from [words] and calls [SeedPhrase.fromMnemonic]
   /// with result.
-  factory SeedPhrase.fromWords(List<String> words) {
-    final mnemonic = words.join(' ');
+  factory SeedPhrase.fromWords(List<SeedPhraseWord> words) {
+    assert(words.isSorted(), 'words list has incorrect order');
+
+    final mnemonic = words.map((e) => e.data).join(' ');
 
     return SeedPhrase.fromMnemonic(mnemonic);
   }
@@ -91,11 +119,16 @@ final class SeedPhrase extends Equatable {
   String get hexEntropy => bip39.mnemonicToEntropy(mnemonic);
 
   /// The mnemonic phrase as a list of individual words.
-  List<String> get mnemonicWords => mnemonic.split(' ');
+  List<SeedPhraseWord> get mnemonicWords => mnemonic
+      .split(' ')
+      .mapIndexed((index, element) => SeedPhraseWord(element, nr: index + 1))
+      .toList();
 
   /// Version of [mnemonicWords] but in random order. Each call will generate
   /// new random order.
-  List<String> get shuffledMnemonicWords => [...mnemonicWords]..shuffle();
+  List<SeedPhraseWord> get shuffledMnemonicWords {
+    return [...mnemonicWords]..shuffle();
+  }
 
   /// Derives an Ed25519 key pair from a seed.
   ///

@@ -3,8 +3,8 @@ import 'package:equatable/equatable.dart';
 
 final class SeedPhraseStateData extends Equatable {
   final SeedPhrase? seedPhrase;
-  final List<String> shuffledWords;
-  final List<String> userWords;
+  final List<SeedPhraseWord> shuffledWords;
+  final List<SeedPhraseWord> userWords;
   final bool isStoredConfirmed;
   final bool areUserWordsCorrect;
 
@@ -22,8 +22,8 @@ final class SeedPhraseStateData extends Equatable {
 
   SeedPhraseStateData copyWith({
     Optional<SeedPhrase>? seedPhrase,
-    List<String>? shuffledWords,
-    List<String>? userWords,
+    List<SeedPhraseWord>? shuffledWords,
+    List<SeedPhraseWord>? userWords,
     bool? isStoredConfirmed,
     bool? areUserWordsCorrect,
   }) {
