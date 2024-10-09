@@ -14,6 +14,8 @@ abstract base class LocalizedRegistrationException extends LocalizedException {
   ) {
     if (exception is RegistrationInsufficientBalanceException) {
       return const LocalizedRegistrationInsufficientBalanceException();
+    } else if (exception is RegistrationTransactionException) {
+      return const LocalizedRegistrationTransactionException();
     }
 
     return const LocalizedRegistrationUnknownException();
@@ -32,7 +34,7 @@ final class LocalizedRegistrationInsufficientBalanceException
 
 /// An exception thrown when submitting a registration transaction fails.
 final class LocalizedRegistrationTransactionException
-    extends LocalizedException {
+    extends LocalizedRegistrationException {
   const LocalizedRegistrationTransactionException();
 
   @override
