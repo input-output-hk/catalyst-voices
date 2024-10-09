@@ -36,7 +36,6 @@ To eliminate variability and simplify local deployment, we have standardized the
 * [helm](https://helm.sh/docs/intro/install/)
 * [just](https://github.com/casey/just)
 
-
 ## Cluster Architecture
 
 The Cluster is based on [K3s](https://k3s.io/), which is a lightweight version of Kubernetes.
@@ -232,6 +231,7 @@ If you encounter any weird issues with the Vagrant, you can try the following:
 ```sh
 rm -rf .vagrant
 ```
+
 and then restart the cluster.
 
 ### Issues with running command with just
@@ -250,6 +250,7 @@ run:
 ```sh
 vagrant destroy -f
 ```
+
 For more see [justfile](./justfile)
 
 ### Vagrant cannot forward the specified ports on a VM
@@ -259,6 +260,7 @@ For more see [justfile](./justfile)
 ```sh
 sudo lsof -i :6443
 ```
+
 You can see the output like this:
 
 ```sh
@@ -278,7 +280,8 @@ This is preventing your new Vagrant VM from forwarding port 6443, resulting in t
 vagrant global-status
 ```
 
-This command will list all Vagrant environments on your system. Look for any VMs that are in the running state.
+This command will list all Vagrant environments on your system.
+Look for any VMs that are in the running state.
 
 ```sh
 id       name    provider   state   directory
@@ -286,7 +289,8 @@ id       name    provider   state   directory
 abcd123  control qemu       running /path/to/your/project
 abcd456  other qemu       running /another/project
 ```
-3.  Halt or Destroy the Existing VM
+
+3. Halt or Destroy the Existing VM
 
 If you find that a VM is running that you no longer need, you can halt or destroy it.
 
@@ -321,6 +325,7 @@ Replace 42886 with the PID from your lsof output.
 ```sh
 sudo lsof -i :6443
 ```
+
 This should return no output, indicating that no process is listening on port 6443.
 
 6. Retry bringing up the Vagrant VM.
