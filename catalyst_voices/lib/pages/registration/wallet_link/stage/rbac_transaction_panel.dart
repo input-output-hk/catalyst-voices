@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
 import 'package:catalyst_voices/pages/registration/bloc_registration_builder.dart';
@@ -11,6 +10,7 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:result_type/result_type.dart';
@@ -257,7 +257,7 @@ class _BlocTxSubmitError extends StatelessWidget {
 }
 
 class _Error extends StatelessWidget {
-  final Object error;
+  final LocalizedException error;
   final VoidCallback onRetry;
 
   const _Error({
@@ -273,9 +273,7 @@ class _Error extends StatelessWidget {
         padding: const EdgeInsets.only(top: 20),
         width: double.infinity,
         child: VoicesErrorIndicator(
-          message: error is WalletApiException
-              ? context.l10n.walletLinkTransactionFailed
-              : context.l10n.somethingWentWrong,
+          message: error.message(context),
           onRetry: onRetry,
         ),
       ),

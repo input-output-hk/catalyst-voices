@@ -824,7 +824,7 @@ abstract class VoicesLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Transaction failed'**
-  String get walletLinkTransactionFailed;
+  String get registrationTransactionFailed;
 
   /// A title on the role chooser screen in registration.
   ///

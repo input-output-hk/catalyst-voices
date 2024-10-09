@@ -1,11 +1,12 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:result_type/result_type.dart';
 
 final class RegistrationStateData extends Equatable {
-  final Result<Transaction, Exception>? unsignedTx;
-  final Result<Transaction, Exception>? submittedTx;
+  final Result<Transaction, LocalizedException>? unsignedTx;
+  final Result<Transaction, LocalizedException>? submittedTx;
   final bool isSubmittingTx;
 
   const RegistrationStateData({
@@ -27,8 +28,8 @@ final class RegistrationStateData extends Equatable {
   bool get canSubmitTx => (unsignedTx?.isSuccess ?? false) && (!isSubmittingTx);
 
   RegistrationStateData copyWith({
-    Optional<Result<Transaction, Exception>>? unsignedTx,
-    Optional<Result<Transaction, Exception>>? submittedTx,
+    Optional<Result<Transaction, LocalizedException>>? unsignedTx,
+    Optional<Result<Transaction, LocalizedException>>? submittedTx,
     bool? isSubmittingTx,
   }) {
     return RegistrationStateData(
