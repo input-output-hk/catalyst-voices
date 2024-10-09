@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/registration/wallet_link/account_role_dialog.dart';
 import 'package:catalyst_voices/pages/registration/wallet_link/bloc_wallet_link_builder.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
@@ -61,6 +62,12 @@ class _BlocRolesChooserContainer extends StatelessWidget {
           selected: state.selected,
           lockedValuesAsDefault: state.defaultRoles,
           onChanged: RegistrationCubit.of(context).walletLink.selectRoles,
+          onLearnMore: (role) async {
+            await AccountRoleDialog.show(
+              context,
+              role,
+            );
+          },
         );
       },
     );
