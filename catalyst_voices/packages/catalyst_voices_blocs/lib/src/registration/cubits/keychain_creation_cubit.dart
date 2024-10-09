@@ -165,23 +165,7 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
   }
 
   void _buildSeedPhrase() {
-    // final seedPhrase = SeedPhrase();
-    final seedPhrase = SeedPhrase.fromWords(
-      const [
-        SeedPhraseWord('broken', nr: 1),
-        SeedPhraseWord('member', nr: 2),
-        SeedPhraseWord('repeat', nr: 3),
-        SeedPhraseWord('liquid', nr: 4),
-        SeedPhraseWord('barely', nr: 5),
-        SeedPhraseWord('electric', nr: 6),
-        SeedPhraseWord('theory', nr: 7),
-        SeedPhraseWord('paddle', nr: 8),
-        SeedPhraseWord('coyote', nr: 9),
-        SeedPhraseWord('behind', nr: 10),
-        SeedPhraseWord('unique', nr: 11),
-        SeedPhraseWord('member', nr: 12),
-      ],
-    );
+    final seedPhrase = SeedPhrase();
 
     _seedPhraseStateData = _seedPhraseStateData.copyWith(
       seedPhrase: Optional(seedPhrase),
