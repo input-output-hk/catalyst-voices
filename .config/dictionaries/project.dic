@@ -21,6 +21,8 @@ autorecalculates
 autoresizing
 backendpython
 bech
+bento
+bento
 bimap
 bindgen
 bkioshn
@@ -117,12 +119,14 @@ iphoneos
 iscsi
 jdbc
 jetbrains
+jetstack
 Joaquín
 jorm
 jormungandr
 Jörmungandr
 junitreport
 junitxml
+justfile
 Keyhash
 keyserver
 keyspace
@@ -192,6 +196,7 @@ postcss
 Pozhylenkov
 Precache
 Precertificate
+preconfiguration
 preprod
 projectcatalyst
 Prokhorenko
@@ -274,6 +279,7 @@ Unstaked
 UTXO
 Utxos
 varint
+vcpu
 Vespr
 vite
 vitss
