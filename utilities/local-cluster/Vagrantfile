@@ -201,10 +201,9 @@ Vagrant.configure("2") do |config|
 
       if is_darwin_arm64
         agent.vm.synced_folder "./shared", "/vagrant_shared", type: "rsync"
-        agent.vm.provider "qemu" do |qe|
-          qe.cpus = agent_vcpu
-          qe.memory = agent_memory
-          qe.gui = false
+        agent.vm.provider "parallels" do |p|
+          p.cpus = agent_vcpu
+          p.memory = agent_memory
         end
       else
         agent.vm.synced_folder "./shared", "/vagrant_shared"
