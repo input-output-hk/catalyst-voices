@@ -35,7 +35,7 @@ final class RegistrationService {
 
   /// Builds an unsigned registration transaction from given parameters.
   ///
-  /// Throws a subclass of [RegistrationException] in case a failure.
+  /// Throws a subclass of [RegistrationException] in case of a failure.
   Future<Transaction> prepareRegistration({
     required CardanoWallet wallet,
     required NetworkId networkId,
@@ -76,6 +76,8 @@ final class RegistrationService {
   /// the user must agree to sign the transaction.
   ///
   /// The transaction must be prepared earlier via [prepareRegistration].
+  /// 
+  /// Throws a subclass of [RegistrationException] in case of a failure.
   Future<Transaction> submitRegistration({
     required CardanoWallet wallet,
     required Transaction unsignedTx,
