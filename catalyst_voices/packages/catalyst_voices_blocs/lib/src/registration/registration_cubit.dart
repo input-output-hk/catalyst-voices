@@ -132,11 +132,13 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
           unsignedTx: Optional(Success(unsignedTx)),
         ),
       );
-    } on Exception catch (error, stackTrace) {
+    } on RegistrationException catch (error, stackTrace) {
       _logger.severe('prepareRegistration', error, stackTrace);
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
-          unsignedTx: Optional(Failure(const LocalizedUnknownException())),
+          unsignedTx: Optional(
+            Failure(LocalizedRegistrationException.from(error)),
+          ),
         ),
       );
     }
@@ -163,12 +165,12 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
         ),
       );
       nextStep();
-    } on Exception catch (error, stackTrace) {
+    } on RegistrationException catch (error, stackTrace) {
       _logger.severe('submitRegistration', error, stackTrace);
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
           submittedTx: Optional(
-            Failure(const LocalizedRegistrationTransactionException()),
+            Failure(LocalizedRegistrationException.from(error)),
           ),
           isSubmittingTx: false,
         ),

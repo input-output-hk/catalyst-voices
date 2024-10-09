@@ -34,29 +34,39 @@ final class RegistrationService {
   }
 
   /// Builds an unsigned registration transaction from given parameters.
+  ///
+  /// Throws a subclass of [RegistrationException] in case a failure.
   Future<Transaction> prepareRegistration({
     required CardanoWallet wallet,
     required NetworkId networkId,
     required SeedPhrase seedPhrase,
     required Set<AccountRole> roles,
   }) async {
-    final walletApi = await wallet.enable();
+    try {
+      final walletApi = await wallet.enable();
 
-    final registrationBuilder = RegistrationTransactionBuilder(
-      transactionConfig: await _configRepository.fetch(networkId),
-      networkId: networkId,
-      seedPhrase: seedPhrase,
-      roles: roles,
-      changeAddress: await walletApi.getChangeAddress(),
-      rewardAddresses: await walletApi.getRewardAddresses(),
-      utxos: await walletApi.getUtxos(
-        amount: Balance(
-          coin: CardanoWalletDetails.minAdaForRegistration,
+      final registrationBuilder = RegistrationTransactionBuilder(
+        transactionConfig: await _configRepository.fetch(networkId),
+        networkId: networkId,
+        seedPhrase: seedPhrase,
+        roles: roles,
+        changeAddress: await walletApi.getChangeAddress(),
+        rewardAddresses: await walletApi.getRewardAddresses(),
+        utxos: await walletApi.getUtxos(
+          amount: Balance(
+            coin: CardanoWalletDetails.minAdaForRegistration,
+          ),
         ),
-      ),
-    );
+      );
 
-    return registrationBuilder.build();
+      return registrationBuilder.build();
+    } catch (error) {
+      if (error is RegistrationException) {
+        rethrow;
+      }
+
+      throw const RegistrationUnknownException();
+    }
   }
 
   /// Requests the user to sign the registration transaction
@@ -70,18 +80,26 @@ final class RegistrationService {
     required CardanoWallet wallet,
     required Transaction unsignedTx,
   }) async {
-    final walletApi = await wallet.enable();
-    final witnessSet = await walletApi.signTx(transaction: unsignedTx);
+    try {
+      final walletApi = await wallet.enable();
+      final witnessSet = await walletApi.signTx(transaction: unsignedTx);
 
-    final signedTx = Transaction(
-      body: unsignedTx.body,
-      isValid: true,
-      witnessSet: witnessSet,
-      auxiliaryData: unsignedTx.auxiliaryData,
-    );
+      final signedTx = Transaction(
+        body: unsignedTx.body,
+        isValid: true,
+        witnessSet: witnessSet,
+        auxiliaryData: unsignedTx.auxiliaryData,
+      );
 
-    await walletApi.submitTx(transaction: signedTx);
+      await walletApi.submitTx(transaction: signedTx);
 
-    return signedTx;
+      return signedTx;
+    } catch (error) {
+      if (error is RegistrationException) {
+        rethrow;
+      }
+
+      throw const RegistrationTransactionException();
+    }
   }
 }

@@ -549,6 +549,10 @@
   "@registrationTransactionFailed": {
     "description": "Indicates an error when submitting a registration transaction failed."
   },
+  "registrationInsufficientBalance": "Insufficient balance, please top up your wallet.",
+  "@registrationInsufficientBalance": {
+    "description": "Indicates an error when preparing a transaction has failed due to low wallet balance."
+  },
   "walletLinkRoleChooserTitle": "How do you want to participate in Catalyst?",
   "@walletLinkRoleChooserTitle": {
     "description": "A title on the role chooser screen in registration."
