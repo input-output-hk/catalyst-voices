@@ -858,5 +858,7 @@
   "recoverKeychainFound": "Keychain found!  \u2028Please unlock your device.",
   "seedPhrase12Words": "12 security words",
   "recoverySeedPhraseInstructionsTitle": "Restore your Catalyst Keychain with \u2028your 12 security words.",
-  "recoverySeedPhraseInstructionsSubtitle": "Enter your security words in the correct order, and sign into your Catalyst account on a new device."
+  "recoverySeedPhraseInstructionsSubtitle": "Enter your security words in the correct order, and sign into your Catalyst account on a new device.",
+  "recoverySeedPhraseInputTitle": "Restore your Catalyst Keychain with \u2028your 12 security words",
+  "recoverySeedPhraseInputSubtitle": "Enter each word of your Catalyst Key in the right order \u2028to bring your Catalyst account to this device."
 }

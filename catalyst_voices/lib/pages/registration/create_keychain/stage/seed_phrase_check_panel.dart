@@ -1,8 +1,8 @@
 import 'package:catalyst_voices/pages/registration/create_keychain/bloc_seed_phrase_builder.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
+import 'package:catalyst_voices/pages/registration/widgets/seed_phrase_actions.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class SeedPhraseCheckPanel extends StatefulWidget {
@@ -139,45 +139,12 @@ class _SeedPhraseWords extends StatelessWidget {
             onChanged: onUserWordsChanged,
           ),
           const SizedBox(height: 10),
-          _WordsActions(
+          SeedPhraseActions(
             onUploadKeyTap: onUploadTap,
-            onResetTap: onResetTap,
-            isResetOffstage: !isResetEnabled,
+            onResetTap: isResetEnabled ? onResetTap : null,
           ),
         ],
       ),
-    );
-  }
-}
-
-class _WordsActions extends StatelessWidget {
-  final VoidCallback? onUploadKeyTap;
-  final VoidCallback? onResetTap;
-  final bool isResetOffstage;
-
-  const _WordsActions({
-    this.onUploadKeyTap,
-    this.onResetTap,
-    this.isResetOffstage = true,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        VoicesTextButton(
-          onTap: onUploadKeyTap,
-          child: Text(context.l10n.uploadCatalystKey),
-        ),
-        const Spacer(),
-        Offstage(
-          offstage: isResetOffstage,
-          child: VoicesTextButton(
-            onTap: onResetTap,
-            child: Text(context.l10n.reset),
-          ),
-        ),
-      ],
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/registration/recover/seed_phrase/seed_phrase_input_panel.dart';
 import 'package:catalyst_voices/pages/registration/recover/seed_phrase/seed_phrase_instructions_panel.dart';
 import 'package:catalyst_voices/pages/registration/widgets/placeholder_panel.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -16,7 +17,7 @@ class RecoverSeedPhrasePanel extends StatelessWidget {
     return switch (stage) {
       RecoverSeedPhraseStage.seedPhraseInstructions =>
         const SeedPhraseInstructionsPanel(),
-      RecoverSeedPhraseStage.seedPhrase => const PlaceholderPanel(),
+      RecoverSeedPhraseStage.seedPhrase => const SeedPhraseInputPanel(),
       RecoverSeedPhraseStage.linkedWallet => const PlaceholderPanel(),
       RecoverSeedPhraseStage.unlockPasswordInstructions =>
         const PlaceholderPanel(),
