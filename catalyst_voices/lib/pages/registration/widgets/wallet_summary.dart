@@ -16,7 +16,7 @@ class WalletSummary extends StatelessWidget {
     super.key,
     required this.balance,
     required this.address,
-    required this.showLowBalance,
+    this.showLowBalance = false,
   });
 
   @override

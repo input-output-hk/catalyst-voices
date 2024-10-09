@@ -843,4 +843,10 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get recoverySeedPhraseInputSubtitle => 'Enter each word of your Catalyst Key in the right order  to bring your Catalyst account to this device.';
+
+  @override
+  String get recoveryAccountTitle => 'Catalyst account recovery';
+
+  @override
+  String get recoveryAccountDetailsAction => 'Set unlock password for this device';
 }

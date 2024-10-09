@@ -4,7 +4,7 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:flutter/material.dart';
 
 class WalletConnectionStatus extends StatelessWidget {
-  final String icon;
+  final String? icon;
   final String name;
 
   const WalletConnectionStatus({

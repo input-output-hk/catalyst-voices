@@ -1605,6 +1605,18 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Enter each word of your Catalyst Key in the right order  to bring your Catalyst account to this device.'**
   String get recoverySeedPhraseInputSubtitle;
+
+  /// No description provided for @recoveryAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst account recovery'**
+  String get recoveryAccountTitle;
+
+  /// No description provided for @recoveryAccountDetailsAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Set unlock password for this device'**
+  String get recoveryAccountDetailsAction;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

@@ -71,6 +71,9 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
   }
 
   void recoverWithSeedPhrase() {
+    _goToStep(
+        SeedPhraseRecoverStep(stage: RecoverSeedPhraseStage.accountDetails));
+    return;
     final nextStep = _nextStep(from: const SeedPhraseRecoverStep());
     if (nextStep != null) {
       _goToStep(nextStep);
