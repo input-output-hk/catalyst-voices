@@ -7,12 +7,14 @@ final class RegistrationState extends Equatable {
   final RegistrationStep step;
   final KeychainStateData keychainStateData;
   final WalletLinkStateData walletLinkStateData;
+  final RegistrationStateData registrationStateData;
   final RecoverStateData recoverStateData;
 
   const RegistrationState({
     this.step = const GetStartedStep(),
     this.keychainStateData = const KeychainStateData(),
     this.walletLinkStateData = const WalletLinkStateData(),
+    this.registrationStateData = const RegistrationStateData(),
     this.recoverStateData = const RecoverStateData(),
   });
 
@@ -50,12 +52,15 @@ final class RegistrationState extends Equatable {
     RegistrationStep? step,
     KeychainStateData? keychainStateData,
     WalletLinkStateData? walletLinkStateData,
+    RegistrationStateData? registrationStateData,
     RecoverStateData? recoverStateData,
   }) {
     return RegistrationState(
       step: step ?? this.step,
       keychainStateData: keychainStateData ?? this.keychainStateData,
       walletLinkStateData: walletLinkStateData ?? this.walletLinkStateData,
+      registrationStateData:
+          registrationStateData ?? this.registrationStateData,
       recoverStateData: recoverStateData ?? this.recoverStateData,
     );
   }
@@ -65,6 +70,7 @@ final class RegistrationState extends Equatable {
         step,
         keychainStateData,
         walletLinkStateData,
+        registrationStateData,
         recoverStateData,
       ];
 }

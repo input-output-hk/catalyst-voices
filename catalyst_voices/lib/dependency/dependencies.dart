@@ -30,7 +30,10 @@ final class Dependencies extends DependencyProvider {
       ..registerLazySingleton<SessionBloc>(SessionBloc.new)
       // Factory will rebuild it each time needed
       ..registerFactory<RegistrationCubit>(() {
-        return RegistrationCubit(downloader: get());
+        return RegistrationCubit(
+          downloader: get(),
+          transactionConfigRepository: get(),
+        );
       });
   }
 
@@ -41,6 +44,9 @@ final class Dependencies extends DependencyProvider {
       )
       ..registerSingleton<AuthenticationRepository>(
         AuthenticationRepository(credentialsStorageRepository: get()),
+      )
+      ..registerSingleton<TransactionConfigRepository>(
+        TransactionConfigRepository(),
       );
   }
 

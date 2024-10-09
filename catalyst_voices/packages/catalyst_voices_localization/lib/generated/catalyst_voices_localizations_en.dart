@@ -431,6 +431,9 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   }
 
   @override
+  String get registrationTransactionFailed => 'Transaction failed';
+
+  @override
   String get walletLinkRoleChooserTitle => 'How do you want to participate in Catalyst?';
 
   @override
