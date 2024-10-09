@@ -1,5 +1,6 @@
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:catalyst_voices_models/src/seed_phrase.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
@@ -68,7 +69,8 @@ void main() {
       final mnemonic = bip39.generateMnemonic();
       final seedPhrase = SeedPhrase.fromMnemonic(mnemonic);
       final expectedWords = mnemonic.split(' ');
-      expect(seedPhrase.mnemonicWords, expectedWords);
+      final words = seedPhrase.mnemonicWords.map((e) => e.data).toList();
+      expect(words, expectedWords);
     });
 
     test('should generate key pair with different valid offsets', () async {
@@ -96,6 +98,45 @@ void main() {
       final asString = seedPhrase.toString();
 
       expect(asString, isNot(contains(mnemonic)));
+    });
+
+    test('mnemonic words should be sorted', () {
+      final mnemonic = bip39.generateMnemonic();
+      final seedPhrase = SeedPhrase.fromMnemonic(mnemonic);
+      expect(seedPhrase.mnemonicWords.isSorted(), isTrue);
+    });
+  });
+
+  group(SeedPhraseWord, () {
+    test('same word with different numbers are not equal', () {
+      // Given
+      const wordOne = SeedPhraseWord('member', nr: 1);
+      const wordTwo = SeedPhraseWord('member', nr: 2);
+
+      // When
+      final areSame = wordOne == wordTwo;
+
+      // Then
+      expect(areSame, isFalse);
+    });
+
+    test('sorting list of words works base on nr', () {
+      // Given
+      const words = [
+        SeedPhraseWord('parrot', nr: 2),
+        SeedPhraseWord('member', nr: 1),
+      ];
+
+      const expectedWords = [
+        SeedPhraseWord('member', nr: 1),
+        SeedPhraseWord('parrot', nr: 2),
+      ];
+
+      // When
+      final sortedList = [...words]..sort();
+
+      // Then
+      expect(sortedList, expectedWords);
     });
   });
 }

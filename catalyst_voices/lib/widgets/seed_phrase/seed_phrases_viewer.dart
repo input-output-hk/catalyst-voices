@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/common/columns_row.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
@@ -11,7 +12,7 @@ class SeedPhrasesViewer extends StatelessWidget {
   final int columnsCount;
 
   /// The list of seed phrases to be displayed.
-  final List<String> words;
+  final List<SeedPhraseWord> words;
 
   const SeedPhrasesViewer({
     super.key,
@@ -28,9 +29,9 @@ class SeedPhrasesViewer extends StatelessWidget {
         crossAxisSpacing: 12,
         children: words.mapIndexed((index, word) {
           return _WordCell(
-            word,
+            word.data,
             key: ValueKey('SeedPhrase${index}CellKey'),
-            number: index + 1,
+            number: word.nr,
           );
         }).toList(),
       ),

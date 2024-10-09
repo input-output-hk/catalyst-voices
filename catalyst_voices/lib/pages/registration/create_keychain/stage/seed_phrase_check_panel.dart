@@ -3,6 +3,7 @@ import 'package:catalyst_voices/pages/registration/widgets/registration_stage_na
 import 'package:catalyst_voices/pages/registration/widgets/seed_phrase_actions.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class SeedPhraseCheckPanel extends StatefulWidget {
@@ -44,7 +45,7 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
     RegistrationCubit.of(context).keychainCreation.setUserSeedPhraseWords([]);
   }
 
-  void _onWordsSequenceChanged(List<String> words) {
+  void _onWordsSequenceChanged(List<SeedPhraseWord> words) {
     RegistrationCubit.of(context)
         .keychainCreation
         .setUserSeedPhraseWords(words);
@@ -79,7 +80,7 @@ class _BlocSeedPhraseWords extends StatelessWidget {
     this.onResetTap,
   });
 
-  final ValueChanged<List<String>> onUserWordsChanged;
+  final ValueChanged<List<SeedPhraseWord>> onUserWordsChanged;
   final VoidCallback? onUploadTap;
   final VoidCallback? onResetTap;
 
@@ -87,8 +88,8 @@ class _BlocSeedPhraseWords extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocSeedPhraseBuilder<
         ({
-          List<String> shuffledWords,
-          List<String> words,
+          List<SeedPhraseWord> shuffledWords,
+          List<SeedPhraseWord> words,
           bool isResetWordsEnabled,
         })>(
       selector: (state) => (
@@ -111,9 +112,9 @@ class _BlocSeedPhraseWords extends StatelessWidget {
 }
 
 class _SeedPhraseWords extends StatelessWidget {
-  final List<String> words;
-  final List<String> userWords;
-  final ValueChanged<List<String>> onUserWordsChanged;
+  final List<SeedPhraseWord> words;
+  final List<SeedPhraseWord> userWords;
+  final ValueChanged<List<SeedPhraseWord>> onUserWordsChanged;
   final VoidCallback? onUploadTap;
   final VoidCallback? onResetTap;
   final bool isResetEnabled;

@@ -4,12 +4,13 @@ import 'package:catalyst_voices/widgets/buttons/voices_buttons.dart';
 import 'package:catalyst_voices/widgets/scrollbar/voices_scrollbar.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_autocomplete.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
-import 'package:collection/collection.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-final class SeedPhraseFieldController extends ValueNotifier<List<String>> {
-  SeedPhraseFieldController([super._value = const <String>[]]);
+final class SeedPhraseFieldController
+    extends ValueNotifier<List<SeedPhraseWord>> {
+  SeedPhraseFieldController([super._value = const <SeedPhraseWord>[]]);
 
   void clear() {
     value = const [];
@@ -21,7 +22,7 @@ class SeedPhraseField extends StatefulWidget {
   final List<String> wordList;
   final SeedPhraseFieldController? controller;
   final FocusNode? focusNode;
-  final ValueChanged<List<String>>? onChanged;
+  final ValueChanged<List<SeedPhraseWord>>? onChanged;
 
   const SeedPhraseField({
     super.key,
@@ -99,12 +100,12 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
                   runSpacing: 12,
                   crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    ...value.mapIndexed(
-                      (index, element) {
+                    ...value.map(
+                      (element) {
                         return _WordCell(
-                          key: ValueKey('Word${index}CellKey'),
-                          nr: index + 1,
-                          data: element,
+                          key: ValueKey('Word${element.nr}CellKey'),
+                          nr: element.nr,
+                          data: element.data,
                           // disabled always for now.
                           onDeleteTap: null,
                         );
@@ -131,9 +132,11 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
   }
 
   void _appendWord(String data) {
+    final nextNr = _effectiveController.value.length + 1;
+    final word = SeedPhraseWord(data, nr: nextNr);
     final words = [
       ..._effectiveController.value,
-      data,
+      word,
     ];
 
     _textEditingController.clear();
