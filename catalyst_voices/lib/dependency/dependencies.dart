@@ -32,7 +32,7 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<RegistrationCubit>(() {
         return RegistrationCubit(
           downloader: get(),
-          transactionConfigRepository: get(),
+          registrationService: get(),
         );
       });
   }
@@ -55,5 +55,8 @@ final class Dependencies extends DependencyProvider {
     registerSingleton<Vault>(const SecureStorageVault());
     registerSingleton<DummyAuthStorage>(const SecureDummyAuthStorage());
     registerSingleton<Downloader>(Downloader());
+    registerSingleton<RegistrationService>(
+      RegistrationService(get<TransactionConfigRepository>()),
+    );
   }
 }
