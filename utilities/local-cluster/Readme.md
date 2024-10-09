@@ -29,7 +29,6 @@
       * [Halt or Destroy the Existing VM](#halt-or-destroy-the-existing-vm)
       * [Kill the VM Process Manually (If Necessary)](#kill-the-vm-process-manually-if-necessary)
       * [Confirm the Process is Terminated](#confirm-the-process-is-terminated)
-      * [Retry bringing up the Vagrant VM](#retry-bringing-up-the-vagrant-vm)
 
 ## Requirements
 
@@ -334,5 +333,4 @@ sudo lsof -i :6443
 ```
 
 This should return no output, indicating that no process is listening on port 6443.
-
-#### Retry bringing up the Vagrant VM
+Retry bringing up the Vagrant VM
