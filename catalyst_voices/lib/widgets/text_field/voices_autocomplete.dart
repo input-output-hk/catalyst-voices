@@ -85,20 +85,17 @@ class _VoicesAutocompletionOptions<T extends Object> extends StatelessWidget {
             color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
             elevation: 2,
             borderRadius: BorderRadius.circular(4),
-            // Clip is here for InkWell border radius.
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: Wrap(
-                children: options.map(
-                  (option) {
-                    return _VoicesAutocompletionOption<T>(
-                      option: option,
-                      onSelected: onSelected,
-                      displayStringForOption: displayStringForOption,
-                    );
-                  },
-                ).toList(),
-              ),
+            clipBehavior: Clip.antiAlias,
+            child: Wrap(
+              children: options.map(
+                (option) {
+                  return _VoicesAutocompletionOption<T>(
+                    option: option,
+                    onSelected: onSelected,
+                    displayStringForOption: displayStringForOption,
+                  );
+                },
+              ).toList(),
             ),
           ),
         ),
