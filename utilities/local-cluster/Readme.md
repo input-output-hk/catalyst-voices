@@ -24,6 +24,12 @@
     * [Issues with Vagrant configurations](#issues-with-vagrant-configurations)
     * [Issues with running command with just](#issues-with-running-command-with-just)
     * [Vagrant cannot forward the specified ports on a VM](#vagrant-cannot-forward-the-specified-ports-on-a-vm)
+      * [Check if Port 6443 is in Use](#check-if-port-6443-is-in-use)
+      * [List all running Vagrant VMs to see if any are currently active](#list-all-running-vagrant-vms-to-see-if-any-are-currently-active)
+      * [Halt or Destroy the Existing VM](#halt-or-destroy-the-existing-vm)
+      * [Kill the VM Process Manually (If Necessary)](#kill-the-vm-process-manually-if-necessary)
+      * [Confirm the Process is Terminated](#confirm-the-process-is-terminated)
+      * [Retry bringing up the Vagrant VM](#retry-bringing-up-the-vagrant-vm)
 
 ## Requirements
 
@@ -255,7 +261,7 @@ For more see [justfile](./justfile)
 
 ### Vagrant cannot forward the specified ports on a VM
 
-1. Check if Port 6443 is in Use:
+#### Check if Port 6443 is in Use
 
 ```sh
 sudo lsof -i :6443
@@ -265,16 +271,17 @@ You can see the output like this:
 
 ```sh
 COMMAND     PID    USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
-qemu-syst 42886 username   19u  IPv4 0x9af1245915ca3e76      0t0  TCP *:sun-sr-https (LISTEN)
+parallels-syst 42886 username   19u  IPv4 0x9af1245915ca3e76      0t0  TCP *:sun-sr-https (LISTEN)
 ```
 
-The process qemu-syst (which stands for qemu-system), with PID 42886, is listening on port 6443.
-This means that a QEMU virtual machine is currently running and using port 6443 on your host machine.
+The process parallels-syst, with PID 42886, is listening on port 6443.
+This means that a parallels virtual machine (can be VirtualBox) is currently running and using port 6443 on your host machine.
 
-Since you’re using the QEMU provider with Vagrant, it’s likely that an existing VM is still running and occupying port 6443.
+Since you’re using the VirtualBox/Parallels provider with Vagrant
+it’s likely that an existing VM is still running and occupying port 6443.
 This is preventing your new Vagrant VM from forwarding port 6443, resulting in the error
 
-2. List all running Vagrant VMs to see if any are currently active:
+#### List all running Vagrant VMs to see if any are currently active
 
 ```sh
 vagrant global-status
@@ -286,11 +293,11 @@ Look for any VMs that are in the running state.
 ```sh
 id       name    provider   state   directory
 --------------------------------------------------------------------------------------
-abcd123  control qemu       running /path/to/your/project
-abcd456  other qemu       running /another/project
+abcd123  control parallels       running /path/to/your/project
+abcd456  other parallels       running /another/project
 ```
 
-3. Halt or Destroy the Existing VM
+#### Halt or Destroy the Existing VM
 
 If you find that a VM is running that you no longer need, you can halt or destroy it.
 
@@ -306,13 +313,13 @@ vagrant halt <id>
 vagrant destroy <id>
 ```
 
-Replace <id> with the ID of the VM from the vagrant global-status output.
+Replace ID with the ID of the VM from the vagrant global-status output.
 For example: `vagrant halt abcd123`
 
-4. Kill the QEMU Process Manually (If Necessary)
+#### Kill the VM Process Manually (If Necessary)
 
 If the VM is not managed by Vagrant, or if it did not shut down properly,
-you may need to kill the QEMU process manually.
+you may need to kill the VM process manually.
 
 ```sh
 kill 42886
@@ -320,7 +327,7 @@ kill 42886
 
 Replace 42886 with the PID from your lsof output.
 
-5. Confirm the Process is Terminated:
+#### Confirm the Process is Terminated
 
 ```sh
 sudo lsof -i :6443
@@ -328,4 +335,4 @@ sudo lsof -i :6443
 
 This should return no output, indicating that no process is listening on port 6443.
 
-6. Retry bringing up the Vagrant VM.
+#### Retry bringing up the Vagrant VM
