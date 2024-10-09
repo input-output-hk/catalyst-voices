@@ -21,6 +21,7 @@ import 'package:uikit_example/examples/voices_radio_example.dart';
 import 'package:uikit_example/examples/voices_rich_text_example.dart';
 import 'package:uikit_example/examples/voices_role_panels_example.dart';
 import 'package:uikit_example/examples/voices_seed_phrase_example.dart';
+import 'package:uikit_example/examples/voices_seed_phrase_field_example.dart';
 import 'package:uikit_example/examples/voices_segmented_button_example.dart';
 import 'package:uikit_example/examples/voices_separators_example.dart';
 import 'package:uikit_example/examples/voices_snackbar_example.dart';
@@ -103,6 +104,11 @@ class ExamplesListPage extends StatelessWidget {
         title: 'Voices Avatars',
         route: VoicesAvatarExample.route,
         page: VoicesAvatarExample(),
+      ),
+      ExampleTile(
+        title: 'Voices SeedPhrase Field',
+        route: VoicesSeedPhraseFieldExample.route,
+        page: VoicesSeedPhraseFieldExample(),
       ),
       ExampleTile(
         title: 'Voices Text Field',
