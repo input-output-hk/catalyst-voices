@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
-import 'package:catalyst_voices/pages/registration/wallet_link/bloc_wallet_link_builder.dart';
+import 'package:catalyst_voices/pages/registration/bloc_registration_builder.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -12,6 +12,7 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:result_type/result_type.dart';
 
 class RbacTransactionPanel extends StatefulWidget {
@@ -59,7 +60,7 @@ class _BlocTransactionDetails extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocWalletLinkBuilder(
+    return BlocRegistrationBuilder(
       selector: (state) => state.unsignedTx,
       builder: (context, result) {
         return switch (result) {
@@ -94,24 +95,27 @@ class _BlocSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocWalletLinkBuilder<
+    return BlocSelector<
+        RegistrationCubit,
+        RegistrationState,
         ({
           Set<AccountRole> roles,
           CardanoWalletDetails selectedWallet,
           Coin transactionFee,
         })?>(
       selector: (state) {
-        final selectedWallet = state.selectedWallet;
-        final fee = state.transactionFee;
-
-        if (selectedWallet == null || fee == null) {
+        final selectedWallet = state.walletLinkStateData.selectedWallet;
+        final transactionFee = state.registrationStateData.transactionFee;
+        final selectedRoles = state.walletLinkStateData.selectedRoles;
+        final defaultRoles = state.walletLinkStateData.defaultRoles;
+        if (selectedWallet == null || transactionFee == null) {
           return null;
         }
 
         return (
-          roles: state.selectedRoles ?? state.defaultRoles,
+          roles: selectedRoles ?? defaultRoles,
           selectedWallet: selectedWallet,
-          transactionFee: fee,
+          transactionFee: transactionFee,
         );
       },
       builder: (context, state) {
@@ -233,7 +237,7 @@ class _BlocTxSubmitError extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocWalletLinkBuilder(
+    return BlocRegistrationBuilder(
       selector: (state) => state.submittedTx,
       builder: (context, result) {
         return switch (result) {
@@ -248,7 +252,7 @@ class _BlocTxSubmitError extends StatelessWidget {
   }
 
   void _onRetry(BuildContext context) {
-    unawaited(RegistrationCubit.of(context).walletLink.submitRegistration());
+    unawaited(RegistrationCubit.of(context).submitRegistration());
   }
 }
 
@@ -288,7 +292,7 @@ class _Navigation extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _BlocSubmitTxButton(
-          onSubmit: () => unawaited(_submitRegistration(context)),
+          onSubmit: () => _submitRegistration(context),
         ),
         const SizedBox(height: 10),
         VoicesTextButton(
@@ -302,10 +306,8 @@ class _Navigation extends StatelessWidget {
     );
   }
 
-  Future<void> _submitRegistration(BuildContext context) async {
-    final cubit = RegistrationCubit.of(context);
-    await cubit.walletLink.submitRegistration();
-    cubit.nextStep();
+  void _submitRegistration(BuildContext context) {
+    unawaited(RegistrationCubit.of(context).submitRegistration());
   }
 }
 
@@ -316,15 +318,14 @@ class _BlocSubmitTxButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocWalletLinkBuilder<
+    return BlocRegistrationBuilder<
         ({
           bool isLoading,
           bool canSubmitTx,
         })>(
       selector: (state) => (
         isLoading: state.isSubmittingTx,
-        canSubmitTx:
-            (state.unsignedTx?.isSuccess ?? false) && (!state.isSubmittingTx),
+        canSubmitTx: state.canSubmitTx,
       ),
       builder: (context, state) {
         return VoicesFilledButton(

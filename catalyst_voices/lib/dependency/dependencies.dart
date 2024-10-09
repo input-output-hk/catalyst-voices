@@ -32,7 +32,7 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<RegistrationCubit>(() {
         return RegistrationCubit(
           downloader: get(),
-          txConfigRepository: get(),
+          transactionConfigRepository: get(),
         );
       });
   }

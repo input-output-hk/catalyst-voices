@@ -3,6 +3,9 @@ import 'dart:math';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 
+/// The transaction metadata used for registration.
+typedef RegistrationMetadata = X509MetadataEnvelope<RegistrationData>;
+
 /// A builder that builds a Catalyst user registration transaction
 /// using RBAC specification.
 class RegistrationTransactionBuilder {
@@ -59,8 +62,7 @@ class RegistrationTransactionBuilder {
     );
   }
 
-  Future<X509MetadataEnvelope<RegistrationData>>
-      _buildMetadataEnvelope() async {
+  Future<RegistrationMetadata> _buildMetadataEnvelope() async {
     final keyPair = await seedPhrase.deriveKeyPair();
     final cert = await _generateX509Certificate(keyPair: keyPair);
     final derCert = cert.toDer();
