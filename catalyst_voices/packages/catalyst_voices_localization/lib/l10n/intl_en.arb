@@ -706,6 +706,59 @@
   "@deleteKeychainDialogRemovingPhrase": {
     "description": "A removing phrase on delete keychain dialog"
   },
+  "accountRoleDialogTitle": "Learn about Catalyst Roles",
+  "@accountRoleDialogTitle": {
+    "description": "A title on account role dialog"
+  },
+  "accountRoleDialogButton": "Continue Role setup",
+  "@accountRoleDialogButton": {
+    "description": "A label on account role dialog's button"
+  },
+  "accountRoleDialogRoleSummaryTitle": "{role} role summary",
+  "@accountRoleDialogRoleSummaryTitle": {
+    "description": "A title for role summary on account role dialog",
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "voterVerboseName": "Treasury guardian",
+  "@voterVerboseName": {
+    "description": "A verbose name for voter"
+  },
+  "proposerVerboseName": "Main proposer",
+  "@proposerVerboseName": {
+    "description": "A verbose name for proposer"
+  },
+  "drepVerboseName": "Community expert",
+  "@drepVerboseName": {
+    "description": "A verbose name for drep"
+  },
+  "voterDescription": "The Voters are the guardians of Cardano treasury. They vote in projects for the growth of the Cardano Ecosystem.",
+  "@voterDescription": {
+    "description": "A description for voter"
+  },
+  "proposerDescription": "The Main Proposers are the Innovators in Project Catalyst, they are the shapers of the future.",
+  "@proposerDescription": {
+    "description": "A description for proposer"
+  },
+  "drepDescription": "The dRep has an Expert Role in the Cardano/Catalyst as people can delegate their vote to Cardano Experts.",
+  "@drepDescription": {
+    "description": "A description for drep"
+  },
+  "voterSummarySelectFavorites": "Select favorites",
+  "voterSummaryComment": "Comment/Vote on Proposals",
+  "voterSummaryCastVotes": "Cast your votes",
+  "voterSummaryVoterRewards": "Voter rewards",
+  "proposerSummaryWriteEdit": "Write/edit functionality",
+  "proposerSummarySubmitToFund": "Rights to Submit to Fund",
+  "proposerSummaryInviteTeamMembers": "Invite Team Members",
+  "proposerSummaryComment": "Comment functionality",
+  "drepSummaryDelegatedVotes": "Delegated Votes",
+  "drepSummaryRewards": "dRep rewards",
+  "drepSummaryCastVotes": "Cast delegated votes",
+  "drepSummaryComment": "Comment Functionality",
   "delete": "Delete",
   "close": "Close",
   "notice": "Notice",

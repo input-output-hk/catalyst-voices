@@ -587,6 +587,71 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get deleteKeychainDialogRemovingPhrase => 'Remove Keychain';
 
   @override
+  String get accountRoleDialogTitle => 'Learn about Catalyst Roles';
+
+  @override
+  String get accountRoleDialogButton => 'Continue Role setup';
+
+  @override
+  String accountRoleDialogRoleSummaryTitle(String role) {
+    return '$role role summary';
+  }
+
+  @override
+  String get voterVerboseName => 'Treasury guardian';
+
+  @override
+  String get proposerVerboseName => 'Main proposer';
+
+  @override
+  String get drepVerboseName => 'Community expert';
+
+  @override
+  String get voterDescription => 'The Voters are the guardians of Cardano treasury. They vote in projects for the growth of the Cardano Ecosystem.';
+
+  @override
+  String get proposerDescription => 'The Main Proposers are the Innovators in Project Catalyst, they are the shapers of the future.';
+
+  @override
+  String get drepDescription => 'The dRep has an Expert Role in the Cardano/Catalyst as people can delegate their vote to Cardano Experts.';
+
+  @override
+  String get voterSummarySelectFavorites => 'Select favorites';
+
+  @override
+  String get voterSummaryComment => 'Comment/Vote on Proposals';
+
+  @override
+  String get voterSummaryCastVotes => 'Cast your votes';
+
+  @override
+  String get voterSummaryVoterRewards => 'Voter rewards';
+
+  @override
+  String get proposerSummaryWriteEdit => 'Write/edit functionality';
+
+  @override
+  String get proposerSummarySubmitToFund => 'Rights to Submit to Fund';
+
+  @override
+  String get proposerSummaryInviteTeamMembers => 'Invite Team Members';
+
+  @override
+  String get proposerSummaryComment => 'Comment functionality';
+
+  @override
+  String get drepSummaryDelegatedVotes => 'Delegated Votes';
+
+  @override
+  String get drepSummaryRewards => 'dRep rewards';
+
+  @override
+  String get drepSummaryCastVotes => 'Cast delegated votes';
+
+  @override
+  String get drepSummaryComment => 'Comment Functionality';
+
+  @override
   String get delete => 'Delete';
 
   @override
