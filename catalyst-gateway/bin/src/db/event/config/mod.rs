@@ -10,10 +10,10 @@ pub(crate) mod key;
 /// Configuration struct
 pub(crate) struct Config {}
 
-/// SQL get configuration
+/// SQL get configuration.
 const GET_CONFIG: &str = include_str!("sql/get.sql");
-/// SQL insert configuration
-const INSERT_CONFIG: &str = include_str!("sql/insert.sql");
+/// SQL update if exist or else insert configuration.
+const UPSERT_CONFIG: &str = include_str!("sql/upsert.sql");
 
 impl Config {
     /// Retrieve configuration based on the given `ConfigKey`.
@@ -32,16 +32,19 @@ impl Config {
         }
 
         // If data not found return default config value
-        id.default()
+        match id.default() {
+            Some(default) => Ok(default),
+            None => Err(anyhow::anyhow!("Default value not found for {:?}", id)),
+        }
     }
 
-    /// Insert configuration for the given `ConfigKey`.
-    pub(crate) async fn insert(id: ConfigKey, value: Value) -> anyhow::Result<()> {
-        // Validate the value before inserting
+    /// Update or insert (upsert) configuration for the given `ConfigKey`.
+    pub(crate) async fn upsert(id: ConfigKey, value: Value) -> anyhow::Result<()> {
+        // Validate the value
         id.validate(&value)?;
 
         let (id1, id2, id3) = id.to_id();
-        EventDB::query(INSERT_CONFIG, &[&id1, &id2, &id3, &value]).await?;
+        EventDB::query(UPSERT_CONFIG, &[&id1, &id2, &id3, &value]).await?;
 
         Ok(())
     }
