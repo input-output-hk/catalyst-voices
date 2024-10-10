@@ -93,7 +93,7 @@ package:
     # COPY ./scripts/entry.sh .
 
     # ENTRYPOINT ./entry.sh
-    ENTRYPOINT ./cat-gateway
+    ENTRYPOINT [ "./cat-gateway", "run" ]
 
 # Publish cat-gateway
 publish:
