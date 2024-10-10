@@ -11,11 +11,15 @@ dependencies:
   catalyst_cardano: ^0.3.0
   catalyst_cardano_serialization: ^0.4.0
   catalyst_cardano_web: ^0.3.0
+  catalyst_voices_localization:
+    path: ../catalyst_voices_localization
+  catalyst_voices_models:
+    path: ../catalyst_voices_models
   equatable: ^2.0.5
   flutter:
     sdk: flutter
   formz: ^0.7.0
 
 dev_dependencies:
-   catalyst_analysis: ^2.0.0
-   test: ^1.24.9
+  catalyst_analysis: ^2.0.0
+  test: ^1.24.9

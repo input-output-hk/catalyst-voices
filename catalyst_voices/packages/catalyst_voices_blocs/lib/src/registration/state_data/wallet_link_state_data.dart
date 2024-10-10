@@ -26,8 +26,8 @@ final class WalletLinkStateData extends Equatable {
   /// Returns the default roles every account will have.
   Set<AccountRole> get defaultRoles => {AccountRole.voter};
 
-  // TODO(dtscalac): pass valid fee
-  Coin get transactionFee => Coin.fromAda(0.9438);
+  /// Returns the selected & enabled cardano wallet.
+  CardanoWallet? get selectedCardanoWallet => selectedWallet?.wallet;
 
   WalletLinkStateData copyWith({
     Optional<Result<List<CardanoWallet>, Exception>>? wallets,

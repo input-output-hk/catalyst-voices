@@ -820,6 +820,18 @@ abstract class VoicesLocalizations {
   /// **'1 {role} registration to Catalyst Keychain'**
   String walletLinkTransactionRoleItem(String role);
 
+  /// Indicates an error when submitting a registration transaction failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction failed'**
+  String get registrationTransactionFailed;
+
+  /// Indicates an error when preparing a transaction has failed due to low wallet balance.
+  ///
+  /// In en, this message translates to:
+  /// **'Insufficient balance, please top up your wallet.'**
+  String get registrationInsufficientBalance;
+
   /// A title on the role chooser screen in registration.
   ///
   /// In en, this message translates to:

@@ -28,4 +28,16 @@ abstract class CryptocurrencyFormatter {
       return adaSymbol + numberFormat.format(ada);
     }
   }
+
+  /// Formats the exact [amount] of ADA cryptocurrency
+  /// to the latest cent (=1 lovelace precision).
+  ///
+  /// Examples:
+  /// - ₳1000000 = 1000000₳
+  /// - ₳1000000.123456 = 1000000.123456₳
+  /// - ₳0.123 = 0.123₳
+  static String formatExactAmount(Coin amount) {
+    final numberFormat = NumberFormat('#.######');
+    return numberFormat.format(amount.ada) + adaSymbol;
+  }
 }

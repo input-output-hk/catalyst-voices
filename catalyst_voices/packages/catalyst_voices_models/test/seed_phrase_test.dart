@@ -1,7 +1,7 @@
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:catalyst_voices_models/src/seed_phrase.dart';
 import 'package:collection/collection.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 
 void main() {
   group(SeedPhrase, () {
