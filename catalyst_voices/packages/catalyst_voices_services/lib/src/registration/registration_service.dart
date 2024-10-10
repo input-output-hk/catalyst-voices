@@ -6,10 +6,13 @@ import 'package:catalyst_voices_services/src/registration/registration_transacti
 
 /// Manages the user registration.
 final class RegistrationService {
-  final TransactionConfigRepository _configRepository;
+  final TransactionConfigRepository _transactionConfigRepository;
   final CatalystCardano _cardano;
 
-  const RegistrationService(this._configRepository, this._cardano);
+  const RegistrationService(
+    this._transactionConfigRepository,
+    this._cardano,
+  );
 
   /// Returns the available cardano wallet extensions.
   Future<List<CardanoWallet>> getCardanoWallets() {
@@ -47,7 +50,7 @@ final class RegistrationService {
       final walletApi = await wallet.enable();
 
       final registrationBuilder = RegistrationTransactionBuilder(
-        transactionConfig: await _configRepository.fetch(networkId),
+        transactionConfig: await _transactionConfigRepository.fetch(networkId),
         networkId: networkId,
         seedPhrase: seedPhrase,
         roles: roles,
@@ -61,11 +64,9 @@ final class RegistrationService {
       );
 
       return registrationBuilder.build();
+    } on RegistrationException {
+      rethrow;
     } catch (error) {
-      if (error is RegistrationException) {
-        rethrow;
-      }
-
       throw const RegistrationUnknownException();
     }
   }
@@ -97,11 +98,9 @@ final class RegistrationService {
       await walletApi.submitTx(transaction: signedTx);
 
       return signedTx;
+    } on RegistrationException {
+      rethrow;
     } catch (error) {
-      if (error is RegistrationException) {
-        rethrow;
-      }
-
       throw const RegistrationTransactionException();
     }
   }
