@@ -1,34 +1,42 @@
 //! Configuration Key
 
-use std::net::IpAddr;
+use std::{net::IpAddr, sync::LazyLock};
 
 use serde_json::Value;
+use tracing::error;
 
 /// Configuration key
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) enum ConfigKey {
-    /// Frontend general configuration
+    /// Frontend general configuration.
     Frontend,
-    /// Frontend configuration for a specific IP address
+    /// Frontend configuration for a specific IP address.
     FrontendForIp(IpAddr),
 }
 
-/// Frontend JSON schema
-const FRONTEND_JSON_SCHEMA: &str = include_str!("jsonschema/frontend.json");
-/// Default frontend configuration
-const FRONTEND_DEFAULT: &str = include_str!("default/frontend.json");
+/// Frontend schema configuration.
+static FRONTEND_SCHEMA: LazyLock<Option<Value>> =
+    LazyLock::new(|| load_json_lazy(include_str!("jsonschema/frontend.json")));
+
+/// Frontend default configuration.
+static FRONTEND_DEFAULT: LazyLock<Option<Value>> =
+    LazyLock::new(|| load_json_lazy(include_str!("default/frontend.json")));
+
+/// Helper function to convert a JSON string to a JSON value.
+fn load_json_lazy(data: &str) -> Option<Value> {
+    let json = serde_json::from_str(data);
+
+    match json {
+        Ok(value) => Some(value),
+        Err(err) => {
+            error!("Error parsing JSON : {:?}", err);
+            None
+        },
+    }
+}
 
 impl ConfigKey {
-    /// Create a `ConfigKey` from ids.
-    pub(crate) fn from_id(id1: &str, id2: &str, id3: &str) -> Option<Self> {
-        match (id1, id2, id3) {
-            ("frontend", "", "") => Some(ConfigKey::Frontend),
-            ("frontend", "ip", ip) => ip.parse().ok().map(ConfigKey::FrontendForIp),
-            _ => None,
-        }
-    }
-
-    /// Convert a `ConfigKey` to its ids.
+    /// Convert a `ConfigKey` to its corresponding IDs.
     pub(super) fn to_id(&self) -> (String, String, String) {
         match self {
             ConfigKey::Frontend => ("frontend".to_string(), String::new(), String::new()),
@@ -40,30 +48,38 @@ impl ConfigKey {
 
     /// Validate the provided value against the JSON schema.
     pub(super) fn validate(&self, value: &Value) -> anyhow::Result<()> {
-        let schema: Value = serde_json::from_str(FRONTEND_JSON_SCHEMA)
-            .map_err(|e| anyhow::anyhow!("Failed to parse JSON schema: {:?}", e))?;
+        // Retrieve the schema based on ConfigKey
+        #[allow(clippy::match_same_arms)]
+        let schema = match self {
+            ConfigKey::Frontend => &*FRONTEND_SCHEMA,
+            ConfigKey::FrontendForIp(_) => &*FRONTEND_SCHEMA,
+        };
 
-        let validator = jsonschema::validator_for(&schema)
-            .map_err(|e| anyhow::anyhow!("Failed to create JSON validator: {:?}", e))?;
+        let validator = match schema {
+            Some(s) => {
+                jsonschema::validator_for(s)
+                    .map_err(|e| anyhow::anyhow!("Failed to create JSON validator: {:?}", e))?
+            },
+            None => return Err(anyhow::anyhow!("Failed to retrieve JSON schema")),
+        };
 
+        // Validate the value against the schema
         if validator.is_valid(value) {
-            Ok(())
-        } else {
-            Err(anyhow::anyhow!(
-                "Provided JSON value does not match the schema for {:?}.",
-                self
-            ))
+            return Ok(());
         }
+        Err(anyhow::anyhow!("Invalid configuration"))
     }
 
     /// Retrieve the default configuration value.
-    pub(super) fn default(&self) -> anyhow::Result<Value> {
-        let default_value: Value = serde_json::from_str(FRONTEND_DEFAULT)
-            .map_err(|e| anyhow::anyhow!("Failed to parse default JSON: {:?}", e))?;
+    pub(super) fn default(&self) -> Option<Value> {
+        // Retrieve the default value based on the ConfigKey
+        #[allow(clippy::match_same_arms)]
+        let default = match self {
+            ConfigKey::Frontend => &*FRONTEND_DEFAULT,
+            ConfigKey::FrontendForIp(_) => &*FRONTEND_DEFAULT,
+        };
 
-        match self {
-            ConfigKey::Frontend | ConfigKey::FrontendForIp(_) => Ok(default_value),
-        }
+        default.clone()
     }
 }
 
@@ -85,6 +101,6 @@ mod tests {
     #[test]
     fn test_default() {
         let result = ConfigKey::Frontend.default();
-        assert!(result.is_ok());
+        assert!(result.is_some());
     }
 }
