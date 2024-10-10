@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:catalyst_voices/pages/registration/create_keychain/bloc_seed_phrase_builder.dart';
+import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -5,15 +9,8 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class SeedPhrasePanel extends StatefulWidget {
-  final SeedPhrase? seedPhrase;
-  final bool isStoreSeedPhraseConfirmed;
-  final bool isNextEnabled;
-
   const SeedPhrasePanel({
     super.key,
-    this.seedPhrase,
-    required this.isStoreSeedPhraseConfirmed,
-    required this.isNextEnabled,
   });
 
   @override
@@ -24,7 +21,7 @@ class _SeedPhrasePanelState extends State<SeedPhrasePanel> {
   @override
   void initState() {
     super.initState();
-    RegistrationCubit.of(context).buildSeedPhrase();
+    RegistrationCubit.of(context).keychainCreation.buildSeedPhrase();
   }
 
   @override
@@ -32,56 +29,60 @@ class _SeedPhrasePanelState extends State<SeedPhrasePanel> {
     return Column(
       children: [
         Expanded(
-          child: _Body(
-            words: widget.seedPhrase?.mnemonicWords,
-            onDownloadTap: _downloadSeedPhrase,
+          child: _BlocLoadable(
+            builder: (context) => const _BlocSeedPhraseWords(),
           ),
         ),
         const SizedBox(height: 10),
-        _SeedPhraseStoredConfirmation(
-          isConfirmed: widget.isStoreSeedPhraseConfirmed,
-        ),
+        const _BlocStoredCheckbox(),
         const SizedBox(height: 10),
-        _Navigation(isNextEnabled: widget.isNextEnabled),
+        const _BlocNavigation(),
       ],
     );
   }
-
-  Future<void> _downloadSeedPhrase() async {}
 }
 
-class _Body extends StatelessWidget {
-  final List<String>? words;
-  final VoidCallback? onDownloadTap;
+class _BlocLoadable extends StatelessWidget {
+  final WidgetBuilder builder;
 
-  const _Body({
-    this.words,
-    this.onDownloadTap,
+  const _BlocLoadable({
+    required this.builder,
   });
 
   @override
   Widget build(BuildContext context) {
-    final words = this.words;
+    return BlocSeedPhraseBuilder<bool>(
+      selector: (state) => state.isLoading,
+      builder: (context, state) {
+        return VoicesLoadable(
+          isLoading: state,
+          builder: builder,
+        );
+      },
+    );
+  }
+}
 
-    if (words == null || words.isEmpty) {
-      return const Center(child: VoicesCircularProgressIndicator());
-    } else {
-      return _SeedPhraseWords(
-        words: words,
-        onDownloadTap: onDownloadTap,
-      );
-    }
+class _BlocSeedPhraseWords extends StatelessWidget {
+  const _BlocSeedPhraseWords();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSeedPhraseBuilder<SeedPhrase?>(
+      selector: (state) => state.seedPhrase,
+      builder: (context, state) {
+        final words = state?.mnemonicWords ?? [];
+
+        return _SeedPhraseWords(words);
+      },
+    );
   }
 }
 
 class _SeedPhraseWords extends StatelessWidget {
-  final List<String> words;
-  final VoidCallback? onDownloadTap;
+  final List<SeedPhraseWord> words;
 
-  const _SeedPhraseWords({
-    required this.words,
-    this.onDownloadTap,
-  });
+  const _SeedPhraseWords(this.words);
 
   @override
   Widget build(BuildContext context) {
@@ -94,19 +95,39 @@ class _SeedPhraseWords extends StatelessWidget {
           SeedPhrasesViewer(words: words),
           const SizedBox(height: 10),
           VoicesTextButton(
-            onTap: onDownloadTap,
+            onTap: () => unawaited(_downloadSeedPhrase(context)),
             child: Text(context.l10n.createKeychainSeedPhraseDownload),
           ),
         ],
       ),
     );
   }
+
+  Future<void> _downloadSeedPhrase(BuildContext context) async {
+    await RegistrationCubit.of(context).keychainCreation.downloadSeedPhrase();
+  }
 }
 
-class _SeedPhraseStoredConfirmation extends StatelessWidget {
+class _BlocStoredCheckbox extends StatelessWidget {
+  const _BlocStoredCheckbox();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSeedPhraseBuilder<bool>(
+      selector: (state) => state.isStoredConfirmed,
+      builder: (context, state) {
+        return _StoredCheckbox(
+          isConfirmed: state,
+        );
+      },
+    );
+  }
+}
+
+class _StoredCheckbox extends StatelessWidget {
   final bool isConfirmed;
 
-  const _SeedPhraseStoredConfirmation({
+  const _StoredCheckbox({
     this.isConfirmed = false,
   });
 
@@ -116,37 +137,26 @@ class _SeedPhraseStoredConfirmation extends StatelessWidget {
       value: isConfirmed,
       label: Text(context.l10n.createKeychainSeedPhraseStoreConfirmation),
       onChanged: (value) {
-        RegistrationCubit.of(context).confirmSeedPhraseStored(confirmed: value);
+        RegistrationCubit.of(context)
+            .keychainCreation
+            .setSeedPhraseStored(value);
       },
     );
   }
 }
 
-class _Navigation extends StatelessWidget {
-  final bool isNextEnabled;
-
-  const _Navigation({
-    this.isNextEnabled = false,
-  });
+class _BlocNavigation extends StatelessWidget {
+  const _BlocNavigation();
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: VoicesBackButton(
-            onTap: () => RegistrationCubit.of(context).previousStep(),
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: VoicesNextButton(
-            onTap: isNextEnabled
-                ? () => RegistrationCubit.of(context).nextStep()
-                : null,
-          ),
-        ),
-      ],
+    return BlocSeedPhraseBuilder<bool>(
+      selector: (state) => state.isStoredConfirmed,
+      builder: (context, state) {
+        return RegistrationBackNextNavigation(
+          isNextEnabled: state,
+        );
+      },
     );
   }
 }

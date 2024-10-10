@@ -193,6 +193,60 @@ abstract class CatGatewayApi extends ChopperService {
     @Query('network') String? network,
   });
 
+  ///Cip36 registrations
+  ///@param stake_addr
+  Future<chopper.Response<Cip36Reporting>>
+      apiCardanoCip36LatestRegistrationStakeAddrGet(
+          {required String? stakeAddr}) {
+    generatedMapping.putIfAbsent(
+        Cip36Reporting, () => Cip36Reporting.fromJsonFactory);
+
+    return _apiCardanoCip36LatestRegistrationStakeAddrGet(stakeAddr: stakeAddr);
+  }
+
+  ///Cip36 registrations
+  ///@param stake_addr
+  @Get(path: '/api/cardano/cip36/latest_registration/stake_addr')
+  Future<chopper.Response<Cip36Reporting>>
+      _apiCardanoCip36LatestRegistrationStakeAddrGet(
+          {@Query('stake_addr') required String? stakeAddr});
+
+  ///Cip36 registrations
+  ///@param stake_key_hash
+  Future<chopper.Response<Cip36Reporting>>
+      apiCardanoCip36LatestRegistrationStakeKeyHashGet(
+          {required String? stakeKeyHash}) {
+    generatedMapping.putIfAbsent(
+        Cip36Reporting, () => Cip36Reporting.fromJsonFactory);
+
+    return _apiCardanoCip36LatestRegistrationStakeKeyHashGet(
+        stakeKeyHash: stakeKeyHash);
+  }
+
+  ///Cip36 registrations
+  ///@param stake_key_hash
+  @Get(path: '/api/cardano/cip36/latest_registration/stake_key_hash')
+  Future<chopper.Response<Cip36Reporting>>
+      _apiCardanoCip36LatestRegistrationStakeKeyHashGet(
+          {@Query('stake_key_hash') required String? stakeKeyHash});
+
+  ///Cip36 registrations
+  ///@param vote_key
+  Future<chopper.Response<Cip36ReportingList>>
+      apiCardanoCip36LatestRegistrationVoteKeyGet({required String? voteKey}) {
+    generatedMapping.putIfAbsent(
+        Cip36ReportingList, () => Cip36ReportingList.fromJsonFactory);
+
+    return _apiCardanoCip36LatestRegistrationVoteKeyGet(voteKey: voteKey);
+  }
+
+  ///Cip36 registrations
+  ///@param vote_key
+  @Get(path: '/api/cardano/cip36/latest_registration/vote_key')
+  Future<chopper.Response<Cip36ReportingList>>
+      _apiCardanoCip36LatestRegistrationVoteKeyGet(
+          {@Query('vote_key') required String? voteKey});
+
   ///Voter's info
   ///@param voting_key A Voters Public ED25519 Key (as registered in their most recent valid [CIP-15](https://cips.cardano.org/cips/cip15) or [CIP-36](https://cips.cardano.org/cips/cip36) registration).
   ///@param event_id The Event ID to return results for. See [GET Events](Link to events endpoint) for details on retrieving all valid event IDs.

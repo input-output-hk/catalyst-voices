@@ -42,7 +42,9 @@ class _Label extends StatelessWidget {
         PasswordStrength.normal => context.l10n.normalPasswordStrength,
         PasswordStrength.strong => context.l10n.goodPasswordStrength,
       },
-      style: Theme.of(context).textTheme.bodySmall,
+      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            fontWeight: FontWeight.w700,
+          ),
     );
   }
 }

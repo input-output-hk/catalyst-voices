@@ -17,7 +17,7 @@ use crate::{settings::cassandra_db, utils::blake2b_hash::generate_uuid_string_fr
 /// change accidentally, and is NOT to be used directly to set the schema version of the
 /// table namespaces.
 #[allow(dead_code)]
-const SCHEMA_VERSION: &str = "a0e54866-1f30-8ad2-9ac7-df1cfaf9c634";
+const SCHEMA_VERSION: &str = "08193dfe-698a-8177-bdf8-20c5691a06e7";
 
 /// Keyspace Create (Templated)
 const CREATE_NAMESPACE_CQL: &str = include_str!("./cql/namespace.cql");
@@ -73,6 +73,26 @@ const SCHEMAS: &[(&str, &str)] = &[
         // CIP-36 Registration Table Schema
         include_str!("./cql/cip36_registration_for_vote_key.cql"),
         "Create Table CIP-36 Registration For a stake address",
+    ),
+    (
+        // RBAC 509 Registration Table Schema
+        include_str!("./cql/rbac509_registration.cql"),
+        "Create Table RBAC 509 Registration",
+    ),
+    (
+        // RBAC 509. Chain Root For TX ID Registration Table Schema
+        include_str!("./cql/chain_root_for_txn_id.cql"),
+        "Create Table Chain Root For TX ID Registration",
+    ),
+    (
+        // RBAC 509. Chain Root For Role 0 Key Registration Table Schema
+        include_str!("./cql/chain_root_for_role0_key.cql"),
+        "Create Table Chain Root For Role 0 Key Registration",
+    ),
+    (
+        // RBAC 509. Chain Root For Stake Address Registration Table Schema
+        include_str!("./cql/chain_root_for_stake_addr.cql"),
+        "Create Table Chain Root For Stake Address Registration",
     ),
 ];
 

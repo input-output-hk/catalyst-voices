@@ -6,11 +6,10 @@ import 'package:catalyst_voices/pages/workspace/sample_rich_text.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_quill/flutter_quill.dart';
 
 const _setupSegmentId = 'setup';
 
-final _proposalNavigation = WorkspaceProposalNavigation(
+const _proposalNavigation = WorkspaceProposalNavigation(
   segments: [
     WorkspaceProposalSetup(
       id: _setupSegmentId,
@@ -18,7 +17,7 @@ final _proposalNavigation = WorkspaceProposalNavigation(
         WorkspaceProposalSegmentStep(
           id: 0,
           title: 'Rich text',
-          document: Document.fromJson(sampleRichText),
+          documentJson: DocumentJson(sampleRichText),
           isEditable: true,
         ),
       ],
@@ -47,7 +46,7 @@ class _WorkspacePageState extends State<WorkspacePage> {
     return ProposalControllerScope(
       builder: _buildSegmentController,
       child: SpaceScaffold(
-        left: ProposalNavigationPanel(
+        left: const ProposalNavigationPanel(
           navigation: _proposalNavigation,
         ),
         right: const ProposalSetupPanel(),
@@ -58,7 +57,7 @@ class _WorkspacePageState extends State<WorkspacePage> {
               return const SizedBox.shrink();
             }
 
-            return ProposalDetails(
+            return const ProposalDetails(
               navigation: _proposalNavigation,
             );
           },

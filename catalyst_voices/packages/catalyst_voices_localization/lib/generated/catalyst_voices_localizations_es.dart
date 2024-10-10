@@ -350,6 +350,9 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get chooseCardanoWallet => 'Choose Cardano Wallet';
 
   @override
+  String get chooseOtherWallet => 'Choose other wallet';
+
+  @override
   String get learnMore => 'Learn More';
 
   @override
@@ -377,7 +380,106 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get walletLinkSelectWalletContent => 'To complete this action, you\'ll submit a signed transaction to Cardano. There will be an ADA transaction fee.';
 
   @override
+  String get walletLinkWalletDetailsTitle => 'Cardano wallet detection';
+
+  @override
+  String walletLinkWalletDetailsContent(String wallet) {
+    return '$wallet connected successfully!';
+  }
+
+  @override
+  String get walletLinkWalletDetailsNotice => 'Wallet and role registrations require a minimal transaction fee. You can setup your default dApp connector wallet in your browser extension settings.';
+
+  @override
+  String get walletLinkWalletDetailsNoticeTopUp => 'Top up ADA';
+
+  @override
+  String get walletLinkWalletDetailsNoticeTopUpLink => 'Link to top-up provider';
+
+  @override
+  String get walletLinkTransactionTitle => 'Let\'s make sure everything looks right.';
+
+  @override
+  String get walletLinkTransactionAccountCompletion => 'Account completion for Catalyst';
+
+  @override
+  String walletLinkTransactionLinkItem(String wallet) {
+    return '1 Link $wallet to Catalyst Keychain';
+  }
+
+  @override
+  String get walletLinkTransactionPositiveSmallPrint => 'Positive small print';
+
+  @override
+  String get walletLinkTransactionPositiveSmallPrintItem1 => 'Your registration is a one time event, cost will not renew periodically.';
+
+  @override
+  String get walletLinkTransactionPositiveSmallPrintItem2 => 'Your registrations can be found under your account profile after completion.';
+
+  @override
+  String get walletLinkTransactionPositiveSmallPrintItem3 => 'All registration fees go into the Cardano Treasury.';
+
+  @override
+  String get walletLinkTransactionSign => 'Sign transaction with wallet';
+
+  @override
+  String get walletLinkTransactionChangeRoles => 'Change role setup';
+
+  @override
+  String walletLinkTransactionRoleItem(String role) {
+    return '1 $role registration to Catalyst Keychain';
+  }
+
+  @override
+  String get registrationTransactionFailed => 'Transaction failed';
+
+  @override
+  String get walletLinkRoleChooserTitle => 'How do you want to participate in Catalyst?';
+
+  @override
+  String get walletLinkRoleChooserContent => 'In Catalyst you can take on different roles, learn more below and choose your additional roles now.';
+
+  @override
+  String get walletLinkRoleSummaryTitle => 'Is this your correct Catalyst role setup?';
+
+  @override
+  String get walletLinkRoleSummaryContent1 => 'You would like to register ';
+
+  @override
+  String walletLinkRoleSummaryContent2(num count) {
+    final intl.NumberFormat countNumberFormat = intl.NumberFormat.compact(
+      locale: localeName,
+      
+    );
+    final String countString = countNumberFormat.format(count);
+
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'roles',
+      one: 'role',
+      zero: 'roles',
+    );
+    return '$countString active $_temp0';
+  }
+
+  @override
+  String get walletLinkRoleSummaryContent3 => ' in Catalyst.';
+
+  @override
+  String get walletLinkRoleSummaryButton => 'Confirm & Sign with wallet';
+
+  @override
   String get seeAllSupportedWallets => 'See all supported wallets';
+
+  @override
+  String get walletDetectionSummary => 'Wallet detection summary';
+
+  @override
+  String get walletBalance => 'Wallet balance';
+
+  @override
+  String get walletAddress => 'Wallet address';
 
   @override
   String get accountCreationCreate => 'Create a new  Catalyst Keychain';
@@ -464,13 +566,13 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get deleteKeychainDialogTitle => 'Delete Keychain?';
 
   @override
-  String get deleteKeychainDialogSubtitle => 'Are you sure you wants to delete your  Catalyst Keychain from this device?';
+  String get deleteKeychainDialogSubtitle => 'Are you sure you wants to delete your\nCatalyst Keychain from this device?';
 
   @override
   String get deleteKeychainDialogWarning => 'Make sure you have a working Catalyst 12-word seedphrase!';
 
   @override
-  String get deleteKeychainDialogWarningInfo => 'Your Catalyst account will be removed, this action cannot be undone!';
+  String get deleteKeychainDialogWarningInfo => 'Your Catalyst account will be removed,\nthis action cannot be undone!';
 
   @override
   String get deleteKeychainDialogTypingInfo => 'To avoid mistakes, please type ‘Remove Keychain’ below.';
@@ -485,10 +587,119 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get deleteKeychainDialogRemovingPhrase => 'Remove Keychain';
 
   @override
+  String get accountRoleDialogTitle => 'Learn about Catalyst Roles';
+
+  @override
+  String get accountRoleDialogButton => 'Continue Role setup';
+
+  @override
+  String accountRoleDialogRoleSummaryTitle(String role) {
+    return '$role role summary';
+  }
+
+  @override
+  String get voterVerboseName => 'Treasury guardian';
+
+  @override
+  String get proposerVerboseName => 'Main proposer';
+
+  @override
+  String get drepVerboseName => 'Community expert';
+
+  @override
+  String get voterDescription => 'The Voters are the guardians of Cardano treasury. They vote in projects for the growth of the Cardano Ecosystem.';
+
+  @override
+  String get proposerDescription => 'The Main Proposers are the Innovators in Project Catalyst, they are the shapers of the future.';
+
+  @override
+  String get drepDescription => 'The dRep has an Expert Role in the Cardano/Catalyst as people can delegate their vote to Cardano Experts.';
+
+  @override
+  String get voterSummarySelectFavorites => 'Select favorites';
+
+  @override
+  String get voterSummaryComment => 'Comment/Vote on Proposals';
+
+  @override
+  String get voterSummaryCastVotes => 'Cast your votes';
+
+  @override
+  String get voterSummaryVoterRewards => 'Voter rewards';
+
+  @override
+  String get proposerSummaryWriteEdit => 'Write/edit functionality';
+
+  @override
+  String get proposerSummarySubmitToFund => 'Rights to Submit to Fund';
+
+  @override
+  String get proposerSummaryInviteTeamMembers => 'Invite Team Members';
+
+  @override
+  String get proposerSummaryComment => 'Comment functionality';
+
+  @override
+  String get drepSummaryDelegatedVotes => 'Delegated Votes';
+
+  @override
+  String get drepSummaryRewards => 'dRep rewards';
+
+  @override
+  String get drepSummaryCastVotes => 'Cast delegated votes';
+
+  @override
+  String get drepSummaryComment => 'Comment Functionality';
+
+  @override
   String get delete => 'Delete';
 
   @override
   String get close => 'Close';
+
+  @override
+  String get notice => 'Notice';
+
+  @override
+  String get yes => 'Yes';
+
+  @override
+  String get no => 'No';
+
+  @override
+  String get total => 'Total';
+
+  @override
+  String get file => 'file';
+
+  @override
+  String get key => 'key';
+
+  @override
+  String get upload => 'Upload';
+
+  @override
+  String get browse => 'browse';
+
+  @override
+  String uploadDropInfo(String itemNameToUpload) {
+    return 'Drop your $itemNameToUpload here or ';
+  }
+
+  @override
+  String get uploadProgressInfo => 'Upload in progress';
+
+  @override
+  String get uploadKeychainTitle => 'Upload Catalyst Keychain';
+
+  @override
+  String get uploadKeychainInfo => 'Make sure it\'s a correct Catalyst keychain file.';
+
+  @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeDark => 'Dark';
 
   @override
   String get keychainDeletedDialogTitle => 'Catalyst keychain removed';
@@ -510,4 +721,129 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get createKeychainSeedPhraseStoreConfirmation => 'I have written down/downloaded my 12 words';
+
+  @override
+  String get createKeychainSeedPhraseCheckInstructionsTitle => 'Check your Catalyst security keys';
+
+  @override
+  String get createKeychainSeedPhraseCheckInstructionsSubtitle => 'Next, we\'re going to make sure that you\'ve written down your words correctly.     We don\'t save your seed phrase, so it\'s important  to make sure you have it right. That\'s why we do this confirmation before continuing.     It\'s also good practice to get familiar with using a seed phrase if you\'re new to crypto.';
+
+  @override
+  String get createKeychainSeedPhraseCheckSubtitle => 'Input your Catalyst security keys';
+
+  @override
+  String get createKeychainSeedPhraseCheckBody => 'Select your 12 written down words in  the correct order.';
+
+  @override
+  String get uploadCatalystKey => 'Upload Catalyst Key';
+
+  @override
+  String get reset => 'Reset';
+
+  @override
+  String get createKeychainSeedPhraseCheckSuccessTitle => 'Nice job! You\'ve successfully verified the seed phrase for your keychain.';
+
+  @override
+  String get createKeychainSeedPhraseCheckSuccessSubtitle => 'Enter your seed phrase to recover your Catalyst Keychain on any device.  It\'s kinda like your email and password all rolled into one, so keep it somewhere safe!  In the next step we’ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.';
+
+  @override
+  String get yourNextStep => 'Your next step';
+
+  @override
+  String get createKeychainSeedPhraseCheckSuccessNextStep => 'Now let’s set your Unlock password for this device!';
+
+  @override
+  String get createKeychainUnlockPasswordInstructionsTitle => 'Set your Catalyst unlock password  for this device';
+
+  @override
+  String get createKeychainUnlockPasswordInstructionsSubtitle => 'With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.    But it can be a bit tedious to enter every single time you want to use the app.    In this next step, you\'ll set your Unlock Password for your current device. It\'s like a shortcut for proving ownership of your Keychain.    Whenever you recover your account for the first time on a new device, you\'ll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.';
+
+  @override
+  String get createKeychainCreatedTitle => 'Congratulations your Catalyst  Keychain is created!';
+
+  @override
+  String get createKeychainCreatedNextStep => 'In the next step you write your Catalyst roles and  account to the Cardano Mainnet.';
+
+  @override
+  String get createKeychainLinkWalletAndRoles => 'Link your Cardano Wallet & Roles';
+
+  @override
+  String get registrationCreateKeychainStepGroup => 'Catalyst Keychain created';
+
+  @override
+  String get registrationLinkWalletStepGroup => 'Link Cardano Wallet & Roles';
+
+  @override
+  String get registrationCompletedStepGroup => 'Catalyst account creation completed!';
+
+  @override
+  String get createKeychainUnlockPasswordIntoSubtitle => 'Catalyst unlock password';
+
+  @override
+  String get createKeychainUnlockPasswordIntoBody => 'Please provide a password for your Catalyst Keychain.';
+
+  @override
+  String get enterPassword => 'Enter password';
+
+  @override
+  String get confirmPassword => 'Confirm password';
+
+  @override
+  String xCharactersMinimum(int number) {
+    return '$number characters minimum length';
+  }
+
+  @override
+  String get passwordDoNotMatch => 'Passwords do not match, please correct';
+
+  @override
+  String get warning => 'Warning';
+
+  @override
+  String get registrationExitConfirmDialogSubtitle => 'Account creation incomplete!';
+
+  @override
+  String get registrationExitConfirmDialogContent => 'If attempt to leave without creating your keychain - account creation will be incomplete.   You are not able to login without  completing your keychain.';
+
+  @override
+  String get registrationExitConfirmDialogContinue => 'Continue keychain creation';
+
+  @override
+  String get registrationExitConfirmDialogCancel => 'Cancel anyway';
+
+  @override
+  String get recoverCatalystKeychain => 'Restore Catalyst keychain';
+
+  @override
+  String get recoverKeychainMethodsTitle => 'Restore your Catalyst Keychain';
+
+  @override
+  String get recoverKeychainMethodsNoKeychainFound => 'No Catalyst Keychain found on this device.';
+
+  @override
+  String get recoverKeychainMethodsSubtitle => 'Not to worry, in the next step you can choose the recovery option that applies to you for this device!';
+
+  @override
+  String get recoverKeychainMethodsListTitle => 'How do you want Restore your Catalyst Keychain?';
+
+  @override
+  String get recoverKeychainNonFound => 'No Catalyst Keychain found on this device.';
+
+  @override
+  String get recoverKeychainFound => 'Keychain found!   Please unlock your device.';
+
+  @override
+  String get seedPhrase12Words => '12 security words';
+
+  @override
+  String get recoverySeedPhraseInstructionsTitle => 'Restore your Catalyst Keychain with  your 12 security words.';
+
+  @override
+  String get recoverySeedPhraseInstructionsSubtitle => 'Enter your security words in the correct order, and sign into your Catalyst account on a new device.';
+
+  @override
+  String get recoverySeedPhraseInputTitle => 'Restore your Catalyst Keychain with  your 12 security words';
+
+  @override
+  String get recoverySeedPhraseInputSubtitle => 'Enter each word of your Catalyst Key in the right order  to bring your Catalyst account to this device.';
 }

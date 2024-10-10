@@ -29,7 +29,12 @@ final class Dependencies extends DependencyProvider {
       )
       ..registerLazySingleton<SessionBloc>(SessionBloc.new)
       // Factory will rebuild it each time needed
-      ..registerFactory<RegistrationCubit>(RegistrationCubit.new);
+      ..registerFactory<RegistrationCubit>(() {
+        return RegistrationCubit(
+          downloader: get(),
+          transactionConfigRepository: get(),
+        );
+      });
   }
 
   void _registerRepositories() {
@@ -39,6 +44,9 @@ final class Dependencies extends DependencyProvider {
       )
       ..registerSingleton<AuthenticationRepository>(
         AuthenticationRepository(credentialsStorageRepository: get()),
+      )
+      ..registerSingleton<TransactionConfigRepository>(
+        TransactionConfigRepository(),
       );
   }
 
@@ -46,5 +54,6 @@ final class Dependencies extends DependencyProvider {
     registerSingleton<Storage>(const SecureStorage());
     registerSingleton<Vault>(const SecureStorageVault());
     registerSingleton<DummyAuthStorage>(const SecureDummyAuthStorage());
+    registerSingleton<Downloader>(Downloader());
   }
 }

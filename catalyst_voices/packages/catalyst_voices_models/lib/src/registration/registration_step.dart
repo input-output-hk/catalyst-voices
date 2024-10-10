@@ -1,4 +1,5 @@
 import 'package:catalyst_voices_models/src/registration/create_keychain_stage.dart';
+import 'package:catalyst_voices_models/src/registration/recover_seed_phrase_stage.dart';
 import 'package:catalyst_voices_models/src/registration/wallet_link_stage.dart';
 import 'package:equatable/equatable.dart';
 
@@ -14,12 +15,19 @@ final class GetStartedStep extends RegistrationStep {
   const GetStartedStep();
 }
 
-final class FinishAccountCreationStep extends RegistrationStep {
-  const FinishAccountCreationStep();
+final class RecoverMethodStep extends RegistrationStep {
+  const RecoverMethodStep();
 }
 
-final class RecoverStep extends RegistrationStep {
-  const RecoverStep();
+final class SeedPhraseRecoverStep extends RegistrationStep {
+  final RecoverSeedPhraseStage stage;
+
+  const SeedPhraseRecoverStep({
+    this.stage = RecoverSeedPhraseStage.seedPhraseInstructions,
+  });
+
+  @override
+  List<Object?> get props => [stage];
 }
 
 final class CreateKeychainStep extends RegistrationStep {
@@ -31,6 +39,10 @@ final class CreateKeychainStep extends RegistrationStep {
 
   @override
   List<Object?> get props => [stage];
+}
+
+final class FinishAccountCreationStep extends RegistrationStep {
+  const FinishAccountCreationStep();
 }
 
 final class WalletLinkStep extends RegistrationStep {

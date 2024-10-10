@@ -1,35 +1,62 @@
 import 'dart:async';
 
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/keychain_creation_cubit.dart';
+import 'package:catalyst_voices_blocs/src/registration/cubits/recover_cubit.dart';
 import 'package:catalyst_voices_blocs/src/registration/cubits/wallet_link_cubit.dart';
-import 'package:catalyst_voices_blocs/src/registration/registration_state.dart';
+import 'package:catalyst_voices_blocs/src/registration/state_data/keychain_state_data.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:result_type/result_type.dart';
+
+final _logger = Logger('RegistrationCubit');
 
 /// Manages the registration state.
 final class RegistrationCubit extends Cubit<RegistrationState> {
   final KeychainCreationCubit _keychainCreationCubit;
   final WalletLinkCubit _walletLinkCubit;
+  final RecoverCubit _recoverCubit;
+  final TransactionConfigRepository transactionConfigRepository;
 
-  RegistrationCubit()
-      : _keychainCreationCubit = KeychainCreationCubit(),
+  RegistrationCubit({
+    required Downloader downloader,
+    required this.transactionConfigRepository,
+  })  : _keychainCreationCubit = KeychainCreationCubit(
+          downloader: downloader,
+        ),
         _walletLinkCubit = WalletLinkCubit(),
-        super(const GetStarted()) {
-    _keychainCreationCubit.stream.listen(emit);
-    _walletLinkCubit.stream.listen(emit);
+        _recoverCubit = RecoverCubit(),
+        super(const RegistrationState()) {
+    _keychainCreationCubit.stream.listen(_onKeychainStateDataChanged);
+    _walletLinkCubit.stream.listen(_onWalletLinkStateDataChanged);
+    _recoverCubit.stream.listen(_onRecoverStateDataChanged);
+
+    // Emits initialization state
+    emit(
+      state.copyWith(
+        keychainStateData: _keychainCreationCubit.state,
+        walletLinkStateData: _walletLinkCubit.state,
+        recoverStateData: _recoverCubit.state,
+      ),
+    );
   }
+
+  KeychainCreationManager get keychainCreation => _keychainCreationCubit;
+
+  WalletLinkManager get walletLink => _walletLinkCubit;
+
+  RecoverManager get recover => _recoverCubit;
 
   /// Returns [RegistrationCubit] if found in widget tree. Does not add
   /// rebuild dependency when called.
   static RegistrationCubit of(BuildContext context) {
     return context.read<RegistrationCubit>();
-  }
-
-  /// Returns [RegistrationCubit] if found in widget tree. Adds rebuild
-  /// dependency when called so you can not call it in initState.
-  static RegistrationCubit watch(BuildContext context) {
-    return context.watch<RegistrationCubit>();
   }
 
   @override
@@ -47,10 +74,24 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
   }
 
   void recoverKeychain() {
-    final nextStep = _nextStep(from: const RecoverStep());
+    unawaited(recover.checkLocalKeychains());
+
+    _goToStep(const RecoverMethodStep());
+  }
+
+  void recoverWithSeedPhrase() {
+    final nextStep = _nextStep(from: const SeedPhraseRecoverStep());
     if (nextStep != null) {
       _goToStep(nextStep);
     }
+  }
+
+  void chooseOtherWallet() {
+    _goToStep(const WalletLinkStep(stage: WalletLinkStage.selectWallet));
+  }
+
+  void changeRoleSetup() {
+    _goToStep(const WalletLinkStep(stage: WalletLinkStage.rolesChooser));
   }
 
   void nextStep() {
@@ -67,48 +108,145 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     }
   }
 
-  void buildSeedPhrase({
-    bool forceRefresh = false,
-  }) {
-    if (forceRefresh) {
-      _keychainCreationCubit.buildSeedPhrase();
-    } else {
-      _keychainCreationCubit.ensureSeedPhraseCreated();
+  Future<void> prepareRegistration() async {
+    try {
+      _onRegistrationStateDataChanged(
+        _registrationState.copyWith(
+          unsignedTx: const Optional(null),
+          submittedTx: const Optional(null),
+          isSubmittingTx: false,
+        ),
+      );
+
+      // TODO(dtscalac): inject the networkId
+      const networkId = NetworkId.testnet;
+      final walletApi = await _walletLinkState.selectedCardanoWallet!.enable();
+
+      final registrationBuilder = RegistrationTransactionBuilder(
+        transactionConfig: await transactionConfigRepository.fetch(networkId),
+        networkId: networkId,
+        seedPhrase: _keychainState.seedPhrase!,
+        roles: _walletLinkState.selectedRoles ?? _walletLinkState.defaultRoles,
+        changeAddress: await walletApi.getChangeAddress(),
+        rewardAddresses: await walletApi.getRewardAddresses(),
+        utxos: await walletApi.getUtxos(
+          amount: Balance(
+            coin: CardanoWalletDetails.minAdaForRegistration,
+          ),
+        ),
+      );
+
+      final tx = await registrationBuilder.build();
+      _onRegistrationStateDataChanged(
+        _registrationState.copyWith(
+          unsignedTx: Optional(Success(tx)),
+        ),
+      );
+    } on Exception catch (error, stackTrace) {
+      _logger.severe('prepareRegistration', error, stackTrace);
+      _onRegistrationStateDataChanged(
+        _registrationState.copyWith(
+          unsignedTx: Optional(Failure(const LocalizedUnknownException())),
+        ),
+      );
     }
   }
 
-  void confirmSeedPhraseStored({
-    required bool confirmed,
-  }) {
-    _keychainCreationCubit.setSeedPhraseStoredConfirmed(confirmed);
-  }
+  Future<void> submitRegistration() async {
+    try {
+      _onRegistrationStateDataChanged(
+        _registrationState.copyWith(
+          submittedTx: const Optional(null),
+          isSubmittingTx: true,
+        ),
+      );
 
-  void refreshCardanoWallets() {
-    unawaited(_walletLinkCubit.refreshCardanoWallets());
+      final walletApi = await _walletLinkState.selectedCardanoWallet!.enable();
+      final unsignedTx = _registrationState.unsignedTx!.success;
+      final witnessSet = await walletApi.signTx(transaction: unsignedTx);
+
+      final signedTx = Transaction(
+        body: unsignedTx.body,
+        isValid: true,
+        witnessSet: witnessSet,
+        auxiliaryData: unsignedTx.auxiliaryData,
+      );
+
+      await walletApi.submitTx(transaction: signedTx);
+
+      _onRegistrationStateDataChanged(
+        _registrationState.copyWith(
+          submittedTx: Optional(Success(signedTx)),
+          isSubmittingTx: false,
+        ),
+      );
+      nextStep();
+    } on Exception catch (error, stackTrace) {
+      _logger.severe('submitRegistration', error, stackTrace);
+      _onRegistrationStateDataChanged(
+        _registrationState.copyWith(
+          submittedTx: Optional(
+            Failure(const LocalizedRegistrationTransactionException()),
+          ),
+          isSubmittingTx: false,
+        ),
+      );
+    }
   }
 
   RegistrationStep? _nextStep({RegistrationStep? from}) {
     final step = from ?? state.step;
 
     RegistrationStep nextKeychainStep() {
-      final nextStep = _keychainCreationCubit.nextStep();
+      final step = state.step;
+
+      // if current step is not from create keychain just return current one
+      if (step is! CreateKeychainStep) {
+        return const CreateKeychainStep();
+      }
 
       // if there is no next step from keychain creation go to finish account.
-      return nextStep ?? const FinishAccountCreationStep();
+      final nextStage = step.stage.next;
+      return nextStage != null
+          ? CreateKeychainStep(stage: nextStage)
+          : const FinishAccountCreationStep();
     }
 
     RegistrationStep nextWalletLinkStep() {
-      final nextStep = _walletLinkCubit.nextStep();
+      final step = state.step;
+
+      // if current step is not from create WalletLink just return current one
+      if (step is! WalletLinkStep) {
+        return const WalletLinkStep();
+      }
 
       // if there is no next step from wallet link go to account completed.
-      return nextStep ?? const AccountCompletedStep();
+      final nextStage = step.stage.next;
+      return nextStage != null
+          ? WalletLinkStep(stage: nextStage)
+          : const AccountCompletedStep();
+    }
+
+    RegistrationStep? nextRecoverWithSeedPhraseStep() {
+      final step = state.step;
+
+      // if current step is not from create SeedPhraseRecoverStep
+      // just return current one
+      if (step is! SeedPhraseRecoverStep) {
+        return const SeedPhraseRecoverStep();
+      }
+
+      final nextStage = step.stage.next;
+
+      return nextStage != null ? SeedPhraseRecoverStep(stage: nextStage) : null;
     }
 
     return switch (step) {
       GetStartedStep() => null,
-      FinishAccountCreationStep() => nextWalletLinkStep(),
-      RecoverStep() => throw UnimplementedError(),
+      RecoverMethodStep() => null,
+      SeedPhraseRecoverStep() => nextRecoverWithSeedPhraseStep(),
       CreateKeychainStep() => nextKeychainStep(),
+      FinishAccountCreationStep() => const WalletLinkStep(),
       WalletLinkStep() => nextWalletLinkStep(),
       AccountCompletedStep() => null,
     };
@@ -119,54 +257,72 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
 
     /// Nested function. Responsible only for keychain steps logic.
     RegistrationStep previousKeychainStep() {
-      final previousStep = _keychainCreationCubit.previousStep();
+      final step = state.step;
 
-      // if is at first step of keychain creation go to get started.
-      return previousStep ?? const GetStartedStep();
+      final previousStep =
+          step is CreateKeychainStep ? step.stage.previous : null;
+
+      return previousStep != null
+          ? CreateKeychainStep(stage: previousStep)
+          : const GetStartedStep();
     }
 
     /// Nested function. Responsible only for wallet link steps logic.
     RegistrationStep previousWalletLinkStep() {
-      final previousStep = _walletLinkCubit.previousStep();
+      final step = state.step;
 
-      // if is at first step of wallet link go to finish account.
-      return previousStep ?? const FinishAccountCreationStep();
+      final previousStep = step is WalletLinkStep ? step.stage.previous : null;
+
+      return previousStep != null
+          ? WalletLinkStep(stage: previousStep)
+          : const FinishAccountCreationStep();
+    }
+
+    RegistrationStep previousRecoverWithSeedPhraseStep() {
+      final step = state.step;
+
+      final previousStep =
+          step is SeedPhraseRecoverStep ? step.stage.previous : null;
+
+      return previousStep != null
+          ? SeedPhraseRecoverStep(stage: previousStep)
+          : const RecoverMethodStep();
     }
 
     return switch (step) {
       GetStartedStep() => null,
-      FinishAccountCreationStep() => null,
-      RecoverStep() => throw UnimplementedError(),
+      RecoverMethodStep() => const GetStartedStep(),
+      SeedPhraseRecoverStep() => previousRecoverWithSeedPhraseStep(),
       CreateKeychainStep() => previousKeychainStep(),
+      FinishAccountCreationStep() => null,
       WalletLinkStep() => previousWalletLinkStep(),
       AccountCompletedStep() => null,
     };
   }
 
   void _goToStep(RegistrationStep step) {
-    if (step is CreateKeychainStep) {
-      _keychainCreationCubit.changeStage(step.stage);
-      emit(_keychainCreationCubit.state);
-    } else if (step is WalletLinkStep) {
-      _walletLinkCubit.changeStage(step.stage);
-      emit(_walletLinkCubit.state);
-    } else {
-      emit(_buildState(step: step));
-    }
+    emit(state.copyWith(step: step));
   }
 
-  RegistrationState _buildState({
-    RegistrationStep? step,
-  }) {
-    step ??= state.step;
+  KeychainStateData get _keychainState => state.keychainStateData;
 
-    return switch (step) {
-      GetStartedStep() => const GetStarted(),
-      FinishAccountCreationStep() => const FinishAccountCreation(),
-      RecoverStep() => const Recover(),
-      CreateKeychainStep() => _keychainCreationCubit.state,
-      WalletLinkStep() => _walletLinkCubit.state,
-      AccountCompletedStep() => const AccountCompleted(),
-    };
+  WalletLinkStateData get _walletLinkState => state.walletLinkStateData;
+
+  RegistrationStateData get _registrationState => state.registrationStateData;
+
+  void _onKeychainStateDataChanged(KeychainStateData data) {
+    emit(state.copyWith(keychainStateData: data));
+  }
+
+  void _onWalletLinkStateDataChanged(WalletLinkStateData data) {
+    emit(state.copyWith(walletLinkStateData: data));
+  }
+
+  void _onRegistrationStateDataChanged(RegistrationStateData data) {
+    emit(state.copyWith(registrationStateData: data));
+  }
+
+  void _onRecoverStateDataChanged(RecoverStateData data) {
+    emit(state.copyWith(recoverStateData: data));
   }
 }

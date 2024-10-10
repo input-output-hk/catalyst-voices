@@ -7,53 +7,59 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:result_type/result_type.dart';
 
-final class WalletLinkCubit extends Cubit<WalletLink> {
-  WalletLinkCubit() : super(const WalletLink());
+final _logger = Logger('WalletLinkCubit');
 
-  set _stateData(WalletLinkStateData newValue) {
-    emit(state.copyWith(stateData: newValue));
-  }
+abstract interface class WalletLinkManager {
+  Future<void> refreshWallets();
 
-  WalletLinkStateData get _stateData => state.stateData;
+  Future<bool> selectWallet(CardanoWallet wallet);
 
-  void changeStage(WalletLinkStage newValue) {
-    if (state.stage != newValue) {
-      emit(state.copyWith(stage: newValue));
-    }
-  }
+  void selectRoles(Set<AccountRole> roles);
+}
 
-  Future<void> refreshCardanoWallets() async {
+final class WalletLinkCubit extends Cubit<WalletLinkStateData>
+    implements WalletLinkManager {
+  WalletLinkCubit() : super(const WalletLinkStateData());
+
+  @override
+  Future<void> refreshWallets() async {
     try {
-      _stateData = _stateData.copyWith(wallets: const Optional.empty());
+      emit(state.copyWith(wallets: const Optional.empty()));
 
       final wallets =
           await CatalystCardano.instance.getWallets().withMinimumDelay();
 
-      _stateData = _stateData.copyWith(wallets: Optional(Success(wallets)));
-    } on Exception catch (error) {
-      _stateData = _stateData.copyWith(wallets: Optional(Failure(error)));
+      emit(state.copyWith(wallets: Optional(Success(wallets))));
+    } on Exception catch (error, stackTrace) {
+      _logger.severe('refreshWallets', error, stackTrace);
+      emit(state.copyWith(wallets: Optional(Failure(error))));
     }
   }
 
-  WalletLinkStep? nextStep() {
-    final currentStageIndex = WalletLinkStage.values.indexOf(state.stage);
-    final isLast = currentStageIndex == WalletLinkStage.values.length - 1;
-    if (isLast) {
-      return null;
-    }
+  @override
+  Future<bool> selectWallet(CardanoWallet wallet) async {
+    try {
+      final enabledWallet = await wallet.enable();
+      final balance = await enabledWallet.getBalance();
+      final address = await enabledWallet.getChangeAddress();
 
-    final nextStage = WalletLinkStage.values[currentStageIndex + 1];
-    return WalletLinkStep(stage: nextStage);
+      final walletDetails = CardanoWalletDetails(
+        wallet: wallet,
+        balance: balance.coin,
+        address: address,
+      );
+
+      emit(state.copyWith(selectedWallet: Optional(walletDetails)));
+
+      return true;
+    } catch (error, stackTrace) {
+      _logger.severe('selectWallet', error, stackTrace);
+      return false;
+    }
   }
 
-  WalletLinkStep? previousStep() {
-    final currentStageIndex = WalletLinkStage.values.indexOf(state.stage);
-    final isFirst = currentStageIndex == 0;
-    if (isFirst) {
-      return null;
-    }
-
-    final previousStage = WalletLinkStage.values[currentStageIndex - 1];
-    return WalletLinkStep(stage: previousStage);
+  @override
+  void selectRoles(Set<AccountRole> roles) {
+    emit(state.copyWith(selectedRoles: Optional(roles)));
   }
 }

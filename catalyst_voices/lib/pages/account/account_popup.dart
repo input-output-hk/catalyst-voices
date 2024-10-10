@@ -1,6 +1,8 @@
+import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -41,7 +43,12 @@ class AccountPopup extends StatelessWidget {
               walletName: 'Wallet name',
               walletBalance: '₳ 1,750,000',
               accountType: 'Basis',
-              walletAddress: 'addr1_H4543...45GH',
+              /* cSpell:disable */
+              walletAddress: ShelleyAddress.fromBech32(
+                'addr_test1vzpwq95z3xyum8vqndgdd'
+                '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
+              ),
+              /* cSpell:enable */
             ),
           ),
           const PopupMenuItem(
@@ -85,7 +92,7 @@ class _Header extends StatelessWidget {
   final String walletName;
   final String walletBalance;
   final String accountType;
-  final String walletAddress;
+  final ShelleyAddress walletAddress;
 
   const _Header({
     required this.accountLetter,
@@ -146,14 +153,14 @@ class _Header extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  walletAddress,
+                  WalletAddressFormatter.formatShort(walletAddress),
                   style: Theme.of(context).textTheme.bodyLarge,
                 ),
               ),
               InkWell(
                 onTap: () async {
                   await Clipboard.setData(
-                    ClipboardData(text: walletAddress),
+                    ClipboardData(text: walletAddress.toBech32()),
                   );
                 },
                 child: VoicesAssets.icons.clipboardCopy.buildIcon(),

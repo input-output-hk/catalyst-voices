@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/common/ext/ext.dart';
 import 'package:catalyst_voices/pages/registration/registration_dialog.dart';
+import 'package:catalyst_voices/pages/spaces/appbar/spaces_theme_mode_switch.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/spaces_drawer.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -62,6 +63,7 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
           leading: isVisitor ? null : const DrawerToggleButton(),
           automaticallyImplyLeading: false,
           actions: [
+            const SpacesThemeModeSwitch(),
             SessionActionHeader(
               onGetStartedTap: _showAccountSetup,
             ),

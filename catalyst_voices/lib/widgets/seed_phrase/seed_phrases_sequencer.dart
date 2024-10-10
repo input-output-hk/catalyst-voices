@@ -1,7 +1,6 @@
 import 'package:catalyst_voices/widgets/seed_phrase/seed_phrases_completer.dart';
 import 'package:catalyst_voices/widgets/seed_phrase/seed_phrases_picker.dart';
-import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
-import 'package:flutter/foundation.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 /// A widget that allows users to sequence a set of seed phrases.
@@ -12,97 +11,53 @@ import 'package:flutter/material.dart';
 ///
 /// The selected phrases are managed internally and updated through the
 /// [onChanged] callback.
-class SeedPhrasesSequencer extends StatefulWidget {
+class SeedPhrasesSequencer extends StatelessWidget {
   /// The list of available seed phrases.
-  final List<String> words;
+  final List<SeedPhraseWord> words;
+
+  /// The list of words selected by user.
+  final List<SeedPhraseWord> selectedWords;
 
   /// A callback function triggered when the set of selected phrases changes.
-  final ValueChanged<Set<String>> onChanged;
+  final ValueChanged<List<SeedPhraseWord>> onChanged;
 
   /// Creates a [SeedPhrasesSequencer] widget.
   const SeedPhrasesSequencer({
     super.key,
     required this.words,
+    this.selectedWords = const [],
     required this.onChanged,
   });
-
-  @override
-  State<SeedPhrasesSequencer> createState() => _SeedPhrasesSequencerState();
-}
-
-class _SeedPhrasesSequencerState extends State<SeedPhrasesSequencer> {
-  final _selected = <String>{};
-
-  @override
-  void didUpdateWidget(covariant SeedPhrasesSequencer oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (!listEquals(widget.words, oldWidget.words)) {
-      _selected.clear();
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _BorderDecorator(
-          child: SeedPhrasesCompleter(
-            slotsCount: widget.words.length,
-            words: _selected,
-            onWordTap: _removeWord,
-          ),
+        SeedPhrasesCompleter(
+          slotsCount: words.length,
+          words: selectedWords,
+          onWordTap: _removeWord,
         ),
-        const SizedBox(height: 12),
-        _BorderDecorator(
-          child: SeedPhrasesPicker(
-            words: widget.words,
-            selectedWords: _selected,
-            onWordTap: _selectWord,
-          ),
+        const SizedBox(height: 10),
+        SeedPhrasesPicker(
+          words: words,
+          selectedWords: selectedWords,
+          onWordTap: _selectWord,
         ),
       ],
     );
   }
 
-  void _removeWord(String word) {
-    setState(() {
-      _selected.remove(word);
-      widget.onChanged(Set.of(_selected));
-    });
+  void _removeWord(SeedPhraseWord word) {
+    final words = [...selectedWords]..remove(word);
+
+    onChanged(words);
   }
 
-  void _selectWord(String word) {
-    setState(() {
-      _selected.add(word);
-      widget.onChanged(Set.of(_selected));
-    });
-  }
-}
+  void _selectWord(SeedPhraseWord word) {
+    final words = [...selectedWords, word];
 
-class _BorderDecorator extends StatelessWidget {
-  final Widget child;
-
-  const _BorderDecorator({
-    required this.child,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        border: Border.all(
-          color: Theme.of(context).colors.outlineBorderVariant ??
-              Theme.of(context).colorScheme.outlineVariant,
-          width: 1.5,
-        ),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: child,
-      ),
-    );
+    onChanged(words);
   }
 }

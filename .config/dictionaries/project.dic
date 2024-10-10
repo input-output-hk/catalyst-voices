@@ -7,6 +7,7 @@ adminer
 afinet
 androidx
 anypolicy
+appbar
 appspot
 Arbritrary
 ARGB
@@ -42,6 +43,7 @@ Chotivichit
 chromedriver
 chrono
 ciphertext
+ciphertexts
 CIPs
 COCOAPODS
 codegen
@@ -80,6 +82,7 @@ encryptor
 endfunction
 Eternl
 EUTXO
+extn
 fetchval
 fmtchk
 fmtfix
@@ -119,6 +122,7 @@ Jörmungandr
 junitreport
 junitxml
 Keyhash
+keychains
 keyserver
 keyspace
 KUBECONFIG
@@ -239,6 +243,7 @@ Subkey
 submiting
 subosito
 svgs
+syncable
 SYSROOT
 tablestats
 tacho

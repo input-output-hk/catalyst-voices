@@ -1,33 +1,42 @@
+import 'package:catalyst_voices/common/formatters/input_formatters.dart';
 import 'package:catalyst_voices/widgets/text_field/voices_text_field.dart';
-import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 final class VoicesPasswordTextField extends StatelessWidget {
-  /// Emits new value when widget input changes
+  /// [VoicesTextField.controller].
+  final TextEditingController? controller;
+
+  /// [VoicesTextField.textInputAction].
+  final TextInputAction textInputAction;
+
+  /// Emits new value when widget input changes.
   final ValueChanged<String>? onChanged;
+
+  /// Optional decoration. See [VoicesTextField] for more details.
+  final VoicesTextFieldDecoration? decoration;
 
   const VoicesPasswordTextField({
     super.key,
+    this.controller,
+    this.textInputAction = TextInputAction.done,
     this.onChanged,
+    this.decoration,
   });
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
     return VoicesTextField(
-      keyboardType: TextInputType.multiline,
+      controller: controller,
+      keyboardType: TextInputType.visiblePassword,
       obscureText: true,
-      textInputAction: TextInputAction.done,
+      textInputAction: textInputAction,
       onChanged: onChanged,
-      decoration: VoicesTextFieldDecoration(
-        errorMaxLines: 2,
-        labelText: l10n.passwordLabelText,
-        hintText: l10n.passwordHintText,
-        errorText: l10n.passwordErrorText,
-      ),
-      style: const TextStyle(
-        fontWeight: FontWeight.w500,
-      ),
+      decoration: decoration,
+      inputFormatters: [
+        FilteringTextInputFormatter.singleLineFormatter,
+        NoWhitespacesFormatter(),
+      ],
     );
   }
 }

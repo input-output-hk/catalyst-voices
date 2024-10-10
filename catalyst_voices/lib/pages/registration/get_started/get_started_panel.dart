@@ -1,3 +1,5 @@
+import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
+import 'package:catalyst_voices/pages/registration/widgets/registration_tile.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
@@ -17,18 +19,11 @@ class GetStartedPanel extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 24),
-        Text(
-          context.l10n.accountCreationGetStartedTitle,
-          style: theme.textTheme.titleMedium?.copyWith(
-            color: theme.colors.textOnPrimaryLevel1,
-          ),
-        ),
-        const SizedBox(height: 12),
-        Text(
-          context.l10n.accountCreationGetStatedDesc,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: theme.colors.textOnPrimaryLevel1,
-          ),
+        RegistrationStageMessage(
+          title: Text(context.l10n.accountCreationGetStartedTitle),
+          subtitle: Text(context.l10n.accountCreationGetStatedDesc),
+          spacing: 12,
+          textColor: theme.colors.textOnPrimaryLevel1,
         ),
         const SizedBox(height: 32),
         Text(
@@ -37,92 +32,32 @@ class GetStartedPanel extends StatelessWidget {
             color: theme.colors.textOnPrimaryLevel0,
           ),
         ),
-        const SizedBox(height: 24),
-        Column(
-          mainAxisSize: MainAxisSize.min,
-          children: CreateAccountType.values
-              .map<Widget>((type) {
-                return _CreateAccountTypeTile(
-                  key: ValueKey(type),
-                  type: type,
-                  onTap: () {
-                    switch (type) {
-                      case CreateAccountType.createNew:
-                        RegistrationCubit.of(context).createNewKeychain();
-                      case CreateAccountType.recover:
-                        RegistrationCubit.of(context).recoverKeychain();
-                    }
-                  },
-                );
-              })
-              .separatedBy(const SizedBox(height: 12))
-              .toList(),
-        ),
-      ],
-    );
-  }
-}
-
-class _CreateAccountTypeTile extends StatelessWidget {
-  final CreateAccountType type;
-  final VoidCallback? onTap;
-
-  const _CreateAccountTypeTile({
-    super.key,
-    required this.type,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return ConstrainedBox(
-      constraints: const BoxConstraints.tightFor(height: 80),
-      child: Material(
-        color: theme.colorScheme.primary,
-        borderRadius: BorderRadius.circular(12),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              children: [
-                type._icon.buildIcon(
-                  size: 48,
-                  color: theme.colorScheme.onPrimary,
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        type._getTitle(context.l10n),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          color: theme.colorScheme.onPrimary,
-                        ),
-                      ),
-                      Text(
-                        type._getSubtitle(context.l10n),
-                        maxLines: 1,
-                        overflow: TextOverflow.clip,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onPrimary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: CreateAccountType.values
+                .map<Widget>((type) {
+                  return RegistrationTile(
+                    key: ValueKey(type),
+                    icon: type._icon,
+                    title: type._getTitle(context.l10n),
+                    subtitle: type._getSubtitle(context.l10n),
+                    onTap: () {
+                      switch (type) {
+                        case CreateAccountType.createNew:
+                          RegistrationCubit.of(context).createNewKeychain();
+                        case CreateAccountType.recover:
+                          RegistrationCubit.of(context).recoverKeychain();
+                      }
+                    },
+                  );
+                })
+                .separatedBy(const SizedBox(height: 12))
+                .toList(),
           ),
         ),
-      ),
+      ],
     );
   }
 }

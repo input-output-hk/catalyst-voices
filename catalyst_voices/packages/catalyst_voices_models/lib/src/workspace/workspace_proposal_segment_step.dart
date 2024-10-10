@@ -1,21 +1,21 @@
+import 'package:catalyst_voices_models/src/document/document_json.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter_quill/flutter_quill.dart';
 
 class WorkspaceProposalSegmentStep extends Equatable {
   final int id;
   final String title;
   final String? description;
-  final Document? document;
+  final DocumentJson? documentJson;
   final bool isEditable;
 
   const WorkspaceProposalSegmentStep({
     required this.id,
     required this.title,
     this.description,
-    this.document,
+    this.documentJson,
     this.isEditable = false,
   }) : assert(
-          description != null || document != null,
+          description != null || documentJson != null,
           'Make sure description or document are provided',
         );
 
@@ -24,7 +24,7 @@ class WorkspaceProposalSegmentStep extends Equatable {
         id,
         title,
         description,
-        document,
+        documentJson,
         isEditable,
       ];
 }
