@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -57,8 +58,12 @@ final class Dependencies extends DependencyProvider {
       () => const SecureDummyAuthStorage(),
     );
     registerLazySingleton<Downloader>(Downloader.new);
+    registerLazySingleton<CatalystCardano>(() => CatalystCardano.instance);
     registerLazySingleton<RegistrationService>(
-      () => RegistrationService(get<TransactionConfigRepository>()),
+      () => RegistrationService(
+        get<TransactionConfigRepository>(),
+        get<CatalystCardano>(),
+      ),
     );
   }
 }

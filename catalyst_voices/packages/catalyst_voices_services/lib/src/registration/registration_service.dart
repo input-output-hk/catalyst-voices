@@ -7,12 +7,13 @@ import 'package:catalyst_voices_services/src/registration/registration_transacti
 /// Manages the user registration.
 final class RegistrationService {
   final TransactionConfigRepository _configRepository;
+  final CatalystCardano _cardano;
 
-  const RegistrationService(this._configRepository);
+  const RegistrationService(this._configRepository, this._cardano);
 
   /// Returns the available cardano wallet extensions.
   Future<List<CardanoWallet>> getCardanoWallets() {
-    return CatalystCardano.instance.getWallets();
+    return _cardano.getWallets();
   }
 
   /// Returns the details of a [wallet].
