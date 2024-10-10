@@ -153,17 +153,6 @@ jobs:
           comment_tag: allure_report
           mode: upsert
 
-      - name: Send Slack notification
-        if: ${{ always() && steps.allure.outputs.report_url }}
-        uses: slackapi/slack-github-action@v1.23.0
-        with:
-          payload: |
-            {
-              "text": ":rocket: *Test Report*\n<${{ steps.allure.outputs.report_url }}|Click here to view the Allure report>\n*Passed:* ${{ steps.allure.outputs.test_result_passed }}/ ${{ steps.allure.outputs.test_result_total }}\n*Failed:* ${{ steps.allure.outputs.test_result_failed }}/ ${{ steps.allure.outputs.test_result_total }}"
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-
   generate-coverage-report:
     name: Generate coverage report
     runs-on: ubuntu-latest

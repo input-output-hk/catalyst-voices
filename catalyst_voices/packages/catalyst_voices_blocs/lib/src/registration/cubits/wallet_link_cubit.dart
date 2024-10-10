@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:result_type/result_type.dart';
@@ -15,13 +16,14 @@ abstract interface class WalletLinkManager {
   Future<bool> selectWallet(CardanoWallet wallet);
 
   void selectRoles(Set<AccountRole> roles);
-
-  void submitRegistration();
 }
 
 final class WalletLinkCubit extends Cubit<WalletLinkStateData>
     implements WalletLinkManager {
-  WalletLinkCubit() : super(const WalletLinkStateData());
+  final RegistrationService registrationService;
+
+  WalletLinkCubit({required this.registrationService})
+      : super(const WalletLinkStateData());
 
   @override
   Future<void> refreshWallets() async {
@@ -29,7 +31,7 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
       emit(state.copyWith(wallets: const Optional.empty()));
 
       final wallets =
-          await CatalystCardano.instance.getWallets().withMinimumDelay();
+          await registrationService.getCardanoWallets().withMinimumDelay();
 
       emit(state.copyWith(wallets: Optional(Success(wallets))));
     } on Exception catch (error, stackTrace) {
@@ -41,15 +43,8 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
   @override
   Future<bool> selectWallet(CardanoWallet wallet) async {
     try {
-      final enabledWallet = await wallet.enable();
-      final balance = await enabledWallet.getBalance();
-      final address = await enabledWallet.getChangeAddress();
-
-      final walletDetails = CardanoWalletDetails(
-        wallet: wallet,
-        balance: balance.coin,
-        address: address,
-      );
+      final walletDetails =
+          await registrationService.getCardanoWalletDetails(wallet);
 
       emit(state.copyWith(selectedWallet: Optional(walletDetails)));
 
@@ -63,10 +58,5 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
   @override
   void selectRoles(Set<AccountRole> roles) {
     emit(state.copyWith(selectedRoles: Optional(roles)));
-  }
-
-  @override
-  void submitRegistration() {
-    // TODO(dtscalac): submit RBAC transaction
   }
 }

@@ -4,8 +4,7 @@ on:
   schedule:
     - cron: '0 0 * * *' # Runs every day at 00:00
   workflow_dispatch:
-    branches:
-      - main
+
 
 permissions:
   id-token: write
