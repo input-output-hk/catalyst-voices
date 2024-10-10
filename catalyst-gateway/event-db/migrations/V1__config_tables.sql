@@ -96,12 +96,12 @@ COMMENT ON COLUMN config.row_id IS
 'Synthetic unique key. 
 Always lookup using `cardano.follower.preview`';
 COMMENT ON COLUMN config.id1 IS
-'The name/id1 of the general config value/variable';
+'The primary ID of the config.';
 COMMENT ON COLUMN config.id2 IS
-'2nd ID of the general config value. 
+'The secondary ID of the config.
 Must be defined, use "" if not required.';
 COMMENT ON COLUMN config.id3 IS
-'3rd ID of the general config value.
+'The tertiary ID of the config.
 Must be defined, use "" if not required.';
 COMMENT ON COLUMN config.value IS
 'The configuration value in JSON format.';
