@@ -431,6 +431,9 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   }
 
   @override
+  String get registrationTransactionFailed => 'Transaction failed';
+
+  @override
   String get walletLinkRoleChooserTitle => 'How do you want to participate in Catalyst?';
 
   @override
@@ -837,4 +840,10 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get recoverySeedPhraseInstructionsSubtitle => 'Enter your security words in the correct order, and sign into your Catalyst account on a new device.';
+
+  @override
+  String get recoverySeedPhraseInputTitle => 'Restore your Catalyst Keychain with  your 12 security words';
+
+  @override
+  String get recoverySeedPhraseInputSubtitle => 'Enter each word of your Catalyst Key in the right order  to bring your Catalyst account to this device.';
 }

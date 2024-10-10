@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/widgets/seed_phrase/seed_phrases_completer.dart';
 import 'package:catalyst_voices/widgets/seed_phrase/seed_phrases_picker.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 /// A widget that allows users to sequence a set of seed phrases.
@@ -12,13 +13,13 @@ import 'package:flutter/material.dart';
 /// [onChanged] callback.
 class SeedPhrasesSequencer extends StatelessWidget {
   /// The list of available seed phrases.
-  final List<String> words;
+  final List<SeedPhraseWord> words;
 
   /// The list of words selected by user.
-  final List<String> selectedWords;
+  final List<SeedPhraseWord> selectedWords;
 
   /// A callback function triggered when the set of selected phrases changes.
-  final ValueChanged<List<String>> onChanged;
+  final ValueChanged<List<SeedPhraseWord>> onChanged;
 
   /// Creates a [SeedPhrasesSequencer] widget.
   const SeedPhrasesSequencer({
@@ -48,13 +49,13 @@ class SeedPhrasesSequencer extends StatelessWidget {
     );
   }
 
-  void _removeWord(String word) {
+  void _removeWord(SeedPhraseWord word) {
     final words = [...selectedWords]..remove(word);
 
     onChanged(words);
   }
 
-  void _selectWord(String word) {
+  void _selectWord(SeedPhraseWord word) {
     final words = [...selectedWords, word];
 
     onChanged(words);

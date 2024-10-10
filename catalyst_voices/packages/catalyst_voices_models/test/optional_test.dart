@@ -1,5 +1,5 @@
 import 'package:catalyst_voices_models/src/optional.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:test/test.dart';
 
 void main() {
   group(Optional, () {

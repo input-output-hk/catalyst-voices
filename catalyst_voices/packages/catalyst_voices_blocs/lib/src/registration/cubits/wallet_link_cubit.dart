@@ -15,8 +15,6 @@ abstract interface class WalletLinkManager {
   Future<bool> selectWallet(CardanoWallet wallet);
 
   void selectRoles(Set<AccountRole> roles);
-
-  void submitRegistration();
 }
 
 final class WalletLinkCubit extends Cubit<WalletLinkStateData>
@@ -63,10 +61,5 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
   @override
   void selectRoles(Set<AccountRole> roles) {
     emit(state.copyWith(selectedRoles: Optional(roles)));
-  }
-
-  @override
-  void submitRegistration() {
-    // TODO(dtscalac): submit RBAC transaction
   }
 }

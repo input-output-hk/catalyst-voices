@@ -6,3 +6,4 @@ export 'storage/vault/lock_factor.dart';
 export 'storage/vault/lock_factor_codec.dart' show LockFactorCodec;
 export 'storage/vault/secure_storage_vault.dart';
 export 'storage/vault/vault.dart';
+export 'transaction/registration_transaction_builder.dart';

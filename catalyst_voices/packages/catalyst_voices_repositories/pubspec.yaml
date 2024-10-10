@@ -8,6 +8,7 @@ environment:
   flutter: ">=3.24.1"
 
 dependencies:
+  catalyst_cardano_serialization: ^0.4.0
   catalyst_voices_models:
     path: ../catalyst_voices_models
   catalyst_voices_services:
