@@ -1,15 +1,45 @@
 # Local Cluster
 
+* [Local Cluster](#local-cluster)
+  * [Requirements](#requirements)
+  * [Cluster Architecture](#cluster-architecture)
+  * [Default Services](#default-services)
+    * [Scylla DB](#scylla-db)
+  * [Deploying the Cluster](#deploying-the-cluster)
+    * [Setup hosts on Windows](#setup-hosts-on-windows)
+    * [Startup](#startup)
+      * [Linux/Windows](#linuxwindows)
+      * [macOS](#macos)
+    * [Getting Basic Cluster details](#getting-basic-cluster-details)
+    * [Suspending the Cluster](#suspending-the-cluster)
+    * [Resuming a suspended the Cluster](#resuming-a-suspended-the-cluster)
+    * [Stopping the Cluster](#stopping-the-cluster)
+  * [Catalyst Voices Services](#catalyst-voices-services)
+    * [Deploying Catalyst Voices Frontend and Backend Services](#deploying-catalyst-voices-frontend-and-backend-services)
+    * [Deploying Catalyst Voices Documentation Service](#deploying-catalyst-voices-documentation-service)
+  * [Debugging the cluster](#debugging-the-cluster)
+    * [SSH into a running VM](#ssh-into-a-running-vm)
+  * [Local UI to access ScyllaDB](#local-ui-to-access-scylladb)
+  * [Troubleshooting](#troubleshooting)
+    * [Issues with Vagrant configurations](#issues-with-vagrant-configurations)
+    * [Issues with running command with just](#issues-with-running-command-with-just)
+    * [Vagrant cannot forward the specified ports on a VM](#vagrant-cannot-forward-the-specified-ports-on-a-vm)
+      * [Check if Port 6443 is in Use](#check-if-port-6443-is-in-use)
+      * [List all running Vagrant VMs to see if any are currently active](#list-all-running-vagrant-vms-to-see-if-any-are-currently-active)
+      * [Halt or Destroy the Existing VM](#halt-or-destroy-the-existing-vm)
+      * [Kill the VM Process Manually (If Necessary)](#kill-the-vm-process-manually-if-necessary)
+      * [Confirm the Process is Terminated](#confirm-the-process-is-terminated)
+
+## Requirements
+
 Integration Tests and local testing will require a running local cluster.
 To eliminate variability and simplify local deployment, we have standardized the local cluster around:
 
-* [VirtualBox](https://www.virtualbox.org/)
+* [VirtualBox](https://www.virtualbox.org/) for Linux or [Parallels](https://www.parallels.com/) for macOS
 * [Vagrant](https://developer.hashicorp.com/vagrant/install?product_intent=vagrant)
 * [kubectl](https://kubernetes.io/docs/tasks/tools/)
 * [helm](https://helm.sh/docs/intro/install/)
-
-These tools allow us to define VMs that are consistent and provide a uniform Kubernetes environment
-for local testing.
+* [just](https://github.com/casey/just)
 
 ## Cluster Architecture
 
@@ -56,14 +86,14 @@ For testing purposes, the ScyllaDB is accessible on the Cluster IP Address: `192
 
 ### Setup hosts on Windows
 
-On Windows, you need to set up the hosts before starting the cluster  
-From the Windows terminal to open the hosts file:  
+On Windows you need to setup the hosts before starting the cluster
+From Windows terminal open the hosts file:
 
 ```sh
-notepad %SystemRoot%\System32\drivers\etc\hosts  
-```  
+notepad %SystemRoot%\System32\drivers\etc\hosts
+```
 
-and copy the hosts from `./shared/extra.hosts` into the Windows host file  
+and copy the hosts from `./shared/extra.hosts` into the Windows host file
 
 ### Startup
 
@@ -176,13 +206,13 @@ vagrant ssh agent99
 
 Found (and tested) description how to connect using only open-source via DBeaver:
 
-1. Download DBeaver (Community Edition)
-2. Download Cassandra JDBC jar files: <http://www.dbschema.com/cassandra-jdbc-driver.html>
+1. Download dbeaver (Community Edition) [dbeaver](https://dbeaver.io/download)
+2. Download cassandra jdbc jar files: [cassandra-jdbc-drive](http://www.dbschema.com/cassandra-jdbc-driver.html)
    (Downloading and Testing the Driver Binaries section have links to binary and source)
-3. extract Cassandra JDBC zip
-4. run DBeaver
-5. go to Database > Driver Manager
-6. click New
+3. Extract Cassandra JDBC zip
+4. Run DBeaver
+5. Go to `Database` > `Driver Manager`
+6. Click `New`
 7. Fill in details as follows:
    * Driver Name: `Cassandra` (or whatever you want it to say)
    * Driver Type: `Generic`
@@ -192,7 +222,115 @@ Found (and tested) description how to connect using only open-source via DBeaver
    * Embedded: `no`
    * Category:
    * Description: `Cassandra` (or whatever you want it to say)
-8. click Add File and add all the jars in the Cassandra JDBC zip file.
-9. click Find Class to make sure the Class Name is found okay
-10. click OK
-11. Create New Connection, selecting the database driver you just added
+8. Click Add File and add all the jars in the Cassandra JDBC zip file.
+9. Click Find Class to make sure the Class Name is found okay.
+10. Click `OK`.
+11. Create `New Connection`, selecting the database driver you just added.
+
+## Troubleshooting
+
+### Issues with Vagrant configurations
+
+If you encounter any weird issues with the Vagrant, you can try the following:
+
+```sh
+rm -rf .vagrant
+```
+
+and then restart the cluster.
+
+### Issues with running command with just
+
+If you encounter any issues with running the commands with `just`,
+you can try running the commands directly.
+
+Instead of:
+
+```sh
+just stop-cluster
+```
+
+run:
+
+```sh
+vagrant destroy -f
+```
+
+For more see [justfile](./justfile)
+
+### Vagrant cannot forward the specified ports on a VM
+
+#### Check if Port 6443 is in Use
+
+```sh
+sudo lsof -i :6443
+```
+
+You can see the output like this:
+
+```sh
+COMMAND     PID    USER   FD   TYPE             DEVICE SIZE/OFF NODE NAME
+parallels-syst 42886 username   19u  IPv4 0x9af1245915ca3e76      0t0  TCP *:sun-sr-https (LISTEN)
+```
+
+The process parallels-syst, with PID 42886, is listening on port 6443.
+This means that a parallels virtual machine (can be VirtualBox) is currently running and using port 6443 on your host machine.
+
+Since you’re using the VirtualBox/Parallels provider with Vagrant
+it’s likely that an existing VM is still running and occupying port 6443.
+This is preventing your new Vagrant VM from forwarding port 6443, resulting in the error
+
+#### List all running Vagrant VMs to see if any are currently active
+
+```sh
+vagrant global-status
+```
+
+This command will list all Vagrant environments on your system.
+Look for any VMs that are in the running state.
+
+```sh
+id       name    provider   state   directory
+--------------------------------------------------------------------------------------
+abcd123  control parallels       running /path/to/your/project
+abcd456  other parallels       running /another/project
+```
+
+#### Halt or Destroy the Existing VM
+
+If you find that a VM is running that you no longer need, you can halt or destroy it.
+
+**To halt the VM:**
+
+```sh
+vagrant halt <id>
+```
+
+**To destroy the VM:**
+
+```sh
+vagrant destroy <id>
+```
+
+Replace ID with the ID of the VM from the vagrant global-status output.
+For example: `vagrant halt abcd123`
+
+#### Kill the VM Process Manually (If Necessary)
+
+If the VM is not managed by Vagrant, or if it did not shut down properly,
+you may need to kill the VM process manually.
+
+```sh
+kill 42886
+```
+
+Replace 42886 with the PID from your lsof output.
+
+#### Confirm the Process is Terminated
+
+```sh
+sudo lsof -i :6443
+```
+
+This should return no output, indicating that no process is listening on port 6443.
+Retry bringing up the Vagrant VM

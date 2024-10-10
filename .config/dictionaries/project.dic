@@ -21,6 +21,7 @@ autorecalculates
 autoresizing
 backendpython
 bech
+bento
 bimap
 bindgen
 bkioshn
@@ -51,6 +52,7 @@ codepoints
 commitlog
 coti
 coverallsapp
+cpu
 CQLSH
 cryptoxide
 Cunego
@@ -106,6 +108,7 @@ icudtl
 ideascale
 idents
 ilap
+inotify
 Instantitation
 integ
 Intellij
@@ -113,14 +116,17 @@ interps
 inversed
 iohk
 iphoneos
+iscsi
 jdbc
 jetbrains
+jetstack
 Joaquín
 jorm
 jormungandr
 Jörmungandr
 junitreport
 junitxml
+justfile
 Keyhash
 keychains
 keyserver
@@ -171,6 +177,7 @@ netifas
 netkey
 nextest
 Nodetool
+noninteractive
 OCSP
 Oleksandr
 onboarded
@@ -190,6 +197,7 @@ postcss
 Pozhylenkov
 Precache
 Precertificate
+preconfiguration
 preprod
 projectcatalyst
 Prokhorenko
@@ -272,6 +280,7 @@ Unstaked
 UTXO
 Utxos
 varint
+vcpu
 Vespr
 vite
 vitss
