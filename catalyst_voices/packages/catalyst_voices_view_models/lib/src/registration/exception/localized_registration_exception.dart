@@ -5,20 +5,21 @@ import 'package:catalyst_voices_view_models/src/exception/localized_exception.da
 import 'package:flutter/widgets.dart';
 
 /// A [LocalizedException] describing an error during a user registration.
-abstract base class LocalizedRegistrationException extends LocalizedException {
+sealed class LocalizedRegistrationException extends LocalizedException {
   const LocalizedRegistrationException();
 
   /// Creates a subclass of [LocalizedException] matching the [exception].
   factory LocalizedRegistrationException.from(
     RegistrationException exception,
   ) {
-    if (exception is RegistrationInsufficientBalanceException) {
-      return const LocalizedRegistrationInsufficientBalanceException();
-    } else if (exception is RegistrationTransactionException) {
-      return const LocalizedRegistrationTransactionException();
-    }
-
-    return const LocalizedRegistrationUnknownException();
+    return switch (exception) {
+      RegistrationInsufficientBalanceException() =>
+        const LocalizedRegistrationInsufficientBalanceException(),
+      RegistrationTransactionException() =>
+        const LocalizedRegistrationTransactionException(),
+      RegistrationUnknownException() =>
+        const LocalizedRegistrationUnknownException(),
+    };
   }
 }
 

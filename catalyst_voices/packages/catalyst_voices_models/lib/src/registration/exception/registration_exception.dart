@@ -1,9 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 /// A base exception thrown during user registration.
-abstract base class RegistrationException
-    with EquatableMixin
-    implements Exception {
+sealed class RegistrationException with EquatableMixin implements Exception {
   const RegistrationException();
 
   @override
