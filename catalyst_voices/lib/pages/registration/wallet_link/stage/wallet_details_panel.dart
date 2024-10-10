@@ -1,4 +1,3 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/pages/registration/wallet_link/bloc_wallet_link_builder.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/pages/registration/widgets/wallet_connection_status.dart';
@@ -7,6 +6,7 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 
 class WalletDetailsPanel extends StatelessWidget {
@@ -42,20 +42,14 @@ class _BlocWalletConnectionStatus extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocWalletLinkBuilder<({String icon, String name})?>(
-      selector: (state) {
-        final wallet = state.selectedWallet?.wallet;
-        return wallet != null ? (icon: wallet.icon, name: wallet.name) : null;
-      },
+    return BlocWalletLinkBuilder<WalletConnectionData?>(
+      selector: (state) => state.walletConnection,
       builder: (context, state) {
-        if (state != null) {
-          return WalletConnectionStatus(
-            icon: state.icon,
-            name: state.name,
-          );
-        } else {
-          return const Offstage();
-        }
+        return WalletConnectionStatus(
+          icon: state?.icon,
+          name: state?.name ?? '',
+          isConnected: state?.isConnected ?? false,
+        );
       },
     );
   }
@@ -83,28 +77,15 @@ class _BlocWalletSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocWalletLinkBuilder<
-        ({
-          Coin balance,
-          ShelleyAddress address,
-          bool hasEnoughBalance,
-        })?>(
-      selector: (state) {
-        final walletDetails = state.selectedWallet;
-        return walletDetails != null
-            ? (
-                balance: walletDetails.balance,
-                address: walletDetails.address,
-                hasEnoughBalance: walletDetails.hasEnoughBalance,
-              )
-            : null;
-      },
+    return BlocWalletLinkBuilder<WalletSummaryData?>(
+      selector: (state) => state.walletSummary,
       builder: (context, state) {
         if (state != null) {
           return WalletSummary(
             balance: state.balance,
             address: state.address,
-            showLowBalance: !state.hasEnoughBalance,
+            clipboardAddress: state.clipboardAddress,
+            showLowBalance: state.showLowBalance,
           );
         } else {
           return const Offstage();

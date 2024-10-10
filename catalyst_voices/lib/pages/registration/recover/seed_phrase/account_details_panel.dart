@@ -1,10 +1,18 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
+import 'dart:async';
+
+import 'package:catalyst_voices/pages/registration/recover/bloc_recover_builder.dart';
 import 'package:catalyst_voices/pages/registration/widgets/wallet_connection_status.dart';
 import 'package:catalyst_voices/pages/registration/widgets/wallet_summary.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
+import 'package:catalyst_voices/widgets/indicators/voices_circular_progress_indicator.dart';
+import 'package:catalyst_voices/widgets/indicators/voices_error_indicator.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
+import 'package:result_type/result_type.dart';
 
 class AccountDetailsPanel extends StatelessWidget {
   const AccountDetailsPanel({
@@ -13,57 +21,76 @@ class AccountDetailsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colors.textOnPrimaryLevel1;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 24),
-        Text(context.l10n.recoveryAccountTitle),
+        Text(
+          context.l10n.recoveryAccountTitle,
+          style: theme.textTheme.titleMedium?.copyWith(color: textColor),
+        ),
         const SizedBox(height: 24),
-        const Expanded(
+        Expanded(
           child: SingleChildScrollView(
-            child: _BlocAccountSummery(),
+            child: _BlocAccountSummery(
+              onRetry: () => unawaited(retryAccountRestore(context)),
+            ),
           ),
         ),
         const SizedBox(height: 24),
-        VoicesFilledButton(
-          onTap: () {},
-          child: Text(context.l10n.recoveryAccountDetailsAction),
-        ),
-        const SizedBox(height: 10),
-        VoicesTextButton(
-          onTap: () {},
-          child: Text(context.l10n.back),
-        ),
+        const _BlocNavigation(),
       ],
     );
+  }
+
+  Future<void> retryAccountRestore(BuildContext context) async {
+    final recover = RegistrationCubit.of(context).recover;
+    await recover.recoverAccount();
   }
 }
 
 class _BlocAccountSummery extends StatelessWidget {
-  const _BlocAccountSummery();
+  final VoidCallback? onRetry;
+
+  const _BlocAccountSummery({
+    this.onRetry,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return _RecoveredAccountSummary(
-      walletIcon: null,
-      walletName: 'Testing',
-      balance: const Coin(10),
-      address: ShelleyAddress(const [0]),
+    return BlocRecoverBuilder<Result<AccountSummaryData, Exception>?>(
+      selector: (state) => state.accountDetails,
+      builder: (context, state) {
+        print('state: $state');
+        return switch (state) {
+          Success<AccountSummaryData, Exception>(:final value) =>
+            _RecoveredAccountSummary(
+              walletConnection: value.walletConnection,
+              walletSummary: value.walletSummary,
+            ),
+          Failure<AccountSummaryData, Exception>(:final value) =>
+            VoicesErrorIndicator(
+              // TODO(damian): localized message
+              message: value.toString(),
+              onRetry: onRetry,
+            ),
+          _ => const Center(child: VoicesCircularProgressIndicator()),
+        };
+      },
     );
   }
 }
 
 class _RecoveredAccountSummary extends StatelessWidget {
-  final String? walletIcon;
-  final String walletName;
-  final Coin balance;
-  final ShelleyAddress address;
+  final WalletConnectionData walletConnection;
+  final WalletSummaryData walletSummary;
 
   const _RecoveredAccountSummary({
-    this.walletIcon,
-    required this.walletName,
-    required this.balance,
-    required this.address,
+    required this.walletConnection,
+    required this.walletSummary,
   });
 
   @override
@@ -71,14 +98,61 @@ class _RecoveredAccountSummary extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const WalletConnectionStatus(
-          icon: null,
-          name: 'Testing',
+        WalletConnectionStatus(
+          icon: walletConnection.icon,
+          name: walletConnection.name,
+          isConnected: walletConnection.isConnected,
         ),
         const SizedBox(height: 24),
         WalletSummary(
-          balance: const Coin(10),
-          address: ShelleyAddress([0]),
+          balance: walletSummary.balance,
+          address: walletSummary.address,
+          clipboardAddress: walletSummary.clipboardAddress,
+        ),
+      ],
+    );
+  }
+}
+
+class _BlocNavigation extends StatelessWidget {
+  const _BlocNavigation();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocRecoverBuilder<bool>(
+      selector: (state) => state.isAccountSummaryNextEnabled,
+      builder: (context, state) {
+        return _Navigation(
+          isNextEnabled: state,
+        );
+      },
+    );
+  }
+}
+
+class _Navigation extends StatelessWidget {
+  final bool isNextEnabled;
+
+  const _Navigation({
+    this.isNextEnabled = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        VoicesFilledButton(
+          onTap: isNextEnabled
+              ? () => RegistrationCubit.of(context).nextStep()
+              : null,
+          child: Text(context.l10n.recoveryAccountDetailsAction),
+        ),
+        const SizedBox(height: 10),
+        VoicesTextButton(
+          onTap: () => RegistrationCubit.of(context).previousStep(),
+          child: Text(context.l10n.back),
         ),
       ],
     );

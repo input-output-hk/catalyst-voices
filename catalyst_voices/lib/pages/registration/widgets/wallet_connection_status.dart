@@ -6,11 +6,13 @@ import 'package:flutter/material.dart';
 class WalletConnectionStatus extends StatelessWidget {
   final String? icon;
   final String name;
+  final bool isConnected;
 
   const WalletConnectionStatus({
     super.key,
     required this.icon,
     required this.name,
+    required this.isConnected,
   });
 
   @override
@@ -21,14 +23,16 @@ class WalletConnectionStatus extends StatelessWidget {
         VoicesWalletTileIcon(iconSrc: icon),
         const SizedBox(width: 12),
         Text(name, style: Theme.of(context).textTheme.bodyLarge),
-        const SizedBox(width: 8),
-        VoicesAvatar(
-          radius: 10,
-          padding: const EdgeInsets.all(4),
-          icon: VoicesAssets.icons.check.buildIcon(),
-          foregroundColor: Theme.of(context).colors.success,
-          backgroundColor: Theme.of(context).colors.successContainer,
-        ),
+        if (isConnected) ...[
+          const SizedBox(width: 8),
+          VoicesAvatar(
+            radius: 10,
+            padding: const EdgeInsets.all(4),
+            icon: VoicesAssets.icons.check.buildIcon(),
+            foregroundColor: Theme.of(context).colors.success,
+            backgroundColor: Theme.of(context).colors.successContainer,
+          ),
+        ],
       ],
     );
   }

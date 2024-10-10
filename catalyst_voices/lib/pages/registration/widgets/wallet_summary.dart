@@ -1,21 +1,21 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class WalletSummary extends StatelessWidget {
-  final Coin balance;
-  final ShelleyAddress address;
+  final String balance;
+  final String address;
+  final String clipboardAddress;
   final bool showLowBalance;
 
   const WalletSummary({
     super.key,
     required this.balance,
     required this.address,
+    required this.clipboardAddress,
     this.showLowBalance = false,
   });
 
@@ -43,7 +43,10 @@ class WalletSummary extends StatelessWidget {
             showLowBalance: showLowBalance,
           ),
           const SizedBox(height: 12),
-          _WalletSummaryAddress(address: address),
+          _WalletSummaryAddress(
+            address: address,
+            clipboardAddress: clipboardAddress,
+          ),
           if (showLowBalance) ...[
             const SizedBox(height: 12),
             Text(
@@ -79,7 +82,7 @@ class WalletSummary extends StatelessWidget {
 }
 
 class _WalletSummaryBalance extends StatelessWidget {
-  final Coin balance;
+  final String balance;
   final bool showLowBalance;
 
   const _WalletSummaryBalance({
@@ -94,7 +97,7 @@ class _WalletSummaryBalance extends StatelessWidget {
       value: Row(
         children: [
           Text(
-            CryptocurrencyFormatter.formatAmount(balance),
+            balance,
             style: showLowBalance
                 ? TextStyle(color: Theme.of(context).colors.iconsError)
                 : null,
@@ -116,10 +119,12 @@ class _WalletSummaryBalance extends StatelessWidget {
 }
 
 class _WalletSummaryAddress extends StatelessWidget {
-  final ShelleyAddress address;
+  final String address;
+  final String clipboardAddress;
 
   const _WalletSummaryAddress({
     required this.address,
+    required this.clipboardAddress,
   });
 
   @override
@@ -128,12 +133,12 @@ class _WalletSummaryAddress extends StatelessWidget {
       label: Text(context.l10n.walletAddress),
       value: Row(
         children: [
-          Text(WalletAddressFormatter.formatShort(address)),
+          Text(address),
           const SizedBox(width: 4),
           InkWell(
             onTap: () async {
               await Clipboard.setData(
-                ClipboardData(text: address.toBech32()),
+                ClipboardData(text: clipboardAddress),
               );
             },
             child: Padding(
