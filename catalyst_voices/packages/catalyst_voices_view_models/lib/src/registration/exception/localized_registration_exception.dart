@@ -43,6 +43,16 @@ final class LocalizedRegistrationTransactionException
       context.l10n.registrationTransactionFailed;
 }
 
+/// An exception thrown when submitting a registration transaction fails.
+final class LocalizedRegistrationSeedPhraseNotFoundException
+    extends LocalizedRegistrationException {
+  const LocalizedRegistrationSeedPhraseNotFoundException();
+
+  @override
+  String message(BuildContext context) =>
+      context.l10n.registrationSeedPhraseNotFound;
+}
+
 /// A generic error for describing a failure during user registration.
 final class LocalizedRegistrationUnknownException
     extends LocalizedRegistrationException {

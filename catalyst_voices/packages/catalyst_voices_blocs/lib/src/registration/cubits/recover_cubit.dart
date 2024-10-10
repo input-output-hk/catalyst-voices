@@ -1,15 +1,15 @@
 // ignore_for_file: one_member_abstracts
 
-import 'dart:math';
-
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:result_type/result_type.dart';
+
+final _logger = Logger('RecoverCubit');
 
 abstract interface class RecoverManager {
   Future<void> checkLocalKeychains();
@@ -21,9 +21,14 @@ abstract interface class RecoverManager {
 
 final class RecoverCubit extends Cubit<RecoverStateData>
     implements RecoverManager {
+  final RegistrationService _registrationService;
+
   SeedPhrase? _seedPhrase;
 
-  RecoverCubit() : super(const RecoverStateData()) {
+  RecoverCubit({
+    required RegistrationService registrationService,
+  })  : _registrationService = registrationService,
+        super(const RecoverStateData()) {
     /// pre-populate all available words
     emit(state.copyWith(seedPhraseWords: SeedPhrase.wordList));
 
@@ -54,34 +59,44 @@ final class RecoverCubit extends Cubit<RecoverStateData>
 
   @override
   Future<void> recoverAccount() async {
-    emit(state.copyWith(accountDetails: const Optional.empty()));
+    try {
+      emit(state.copyWith(accountDetails: const Optional.empty()));
 
-    await Future<void>.delayed(const Duration(milliseconds: 200));
+      final seedPhrase = _seedPhrase;
+      if (seedPhrase == null) {
+        const exception = LocalizedRegistrationSeedPhraseNotFoundException();
+        emit(state.copyWith(accountDetails: Optional(Failure(exception))));
+        return;
+      }
 
-    final seedPhrase = _seedPhrase;
-    // TODO(damian-molinski): to be implemented
-    final isSuccess = seedPhrase != null && Random().nextBool();
+      final walletDetails =
+          await _registrationService.recoverCardanoWalletDetails(seedPhrase);
 
-    final coin = Coin.fromAda(10);
-    final address = ShelleyAddress(const [0]);
+      final accountDetails = AccountSummaryData(
+        walletConnection: WalletConnectionData(
+          name: walletDetails.wallet.name,
+          icon: walletDetails.wallet.icon,
+        ),
+        walletSummary: WalletSummaryData(
+          balance: CryptocurrencyFormatter.formatAmount(walletDetails.balance),
+          address: WalletAddressFormatter.formatShort(walletDetails.address),
+          clipboardAddress: walletDetails.address.toBech32(),
+          showLowBalance: false,
+        ),
+      );
 
-    final accountDetails = isSuccess
-        ? Success<AccountSummaryData, Exception>(
-            AccountSummaryData(
-              walletConnection: const WalletConnectionData(
-                name: 'Test Wallet',
-              ),
-              walletSummary: WalletSummaryData(
-                balance: CryptocurrencyFormatter.formatAmount(coin),
-                address: WalletAddressFormatter.formatShort(address),
-                clipboardAddress: address.toBech32(),
-                showLowBalance: false,
-              ),
-            ),
-          )
-        : Failure<AccountSummaryData, Exception>(Exception());
+      emit(state.copyWith(accountDetails: Optional(Success(accountDetails))));
+    } on RegistrationException catch (error, stack) {
+      _logger.severe('recover account', error, stack);
 
-    emit(state.copyWith(accountDetails: Optional(accountDetails)));
+      final exception = LocalizedRegistrationException.from(error);
+      emit(state.copyWith(accountDetails: Optional(Failure(exception))));
+    } catch (error, stack) {
+      _logger.severe('recover account', error, stack);
+
+      const exception = LocalizedUnknownException();
+      emit(state.copyWith(accountDetails: Optional(Failure(exception))));
+    }
   }
 }
 

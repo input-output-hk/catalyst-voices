@@ -8,7 +8,7 @@ final class RecoverStateData extends Equatable {
   final List<SeedPhraseWord> userSeedPhraseWords;
   final List<String> seedPhraseWords;
   final bool isSeedPhraseValid;
-  final Result<AccountSummaryData, Exception>? accountDetails;
+  final Result<AccountSummaryData, LocalizedException>? accountDetails;
 
   bool get isAccountSummaryNextEnabled => accountDetails?.isSuccess ?? false;
 
@@ -25,7 +25,7 @@ final class RecoverStateData extends Equatable {
     List<SeedPhraseWord>? userSeedPhraseWords,
     List<String>? seedPhraseWords,
     bool? isSeedPhraseValid,
-    Optional<Result<AccountSummaryData, Exception>>? accountDetails,
+    Optional<Result<AccountSummaryData, LocalizedException>>? accountDetails,
   }) {
     return RecoverStateData(
       foundKeychain: foundKeychain ?? this.foundKeychain,

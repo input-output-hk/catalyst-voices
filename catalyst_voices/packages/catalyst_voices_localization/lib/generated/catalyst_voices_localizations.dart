@@ -832,6 +832,12 @@ abstract class VoicesLocalizations {
   /// **'Insufficient balance, please top up your wallet.'**
   String get registrationInsufficientBalance;
 
+  /// Error message shown when attempting to register or recover account but seed phrase was not found
+  ///
+  /// In en, this message translates to:
+  /// **'Seed phrase was not found. Make sure correct words are correct.'**
+  String get registrationSeedPhraseNotFound;
+
   /// A title on the role chooser screen in registration.
   ///
   /// In en, this message translates to:
@@ -1623,6 +1629,12 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Catalyst account recovery'**
   String get recoveryAccountTitle;
+
+  /// No description provided for @recoveryAccountSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Keychain recovered successfully!'**
+  String get recoveryAccountSuccessTitle;
 
   /// No description provided for @recoveryAccountDetailsAction.
   ///

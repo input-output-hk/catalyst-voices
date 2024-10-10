@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -33,6 +35,33 @@ final class RegistrationService {
     return CardanoWalletDetails(
       wallet: wallet,
       balance: balance.coin,
+      address: address,
+    );
+  }
+
+  // TODO(damian-molinski): to be implemented
+  Future<CardanoWalletDetails> recoverCardanoWalletDetails(
+    SeedPhrase seedPhrase,
+  ) async {
+    await Future<void>.delayed(const Duration(milliseconds: 200));
+
+    final isSuccess = Random().nextBool();
+    if (!isSuccess) {
+      throw const RegistrationUnknownException();
+    }
+
+    final wallet = DummyCardanoWallet(
+      name: 'Dummy Wallet',
+      icon: '',
+    );
+    final balance = Coin.fromAda(10);
+    final address = ShelleyAddress.fromBech32(
+      'addr_test1vzpwq95z3xyum8vqndgdd9mdnmafh3djcxnc6jemlgdmswcve6tkw',
+    );
+
+    return CardanoWalletDetails(
+      wallet: wallet,
+      balance: balance,
       address: address,
     );
   }

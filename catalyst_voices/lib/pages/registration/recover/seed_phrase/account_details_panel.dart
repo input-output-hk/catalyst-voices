@@ -61,20 +61,18 @@ class _BlocAccountSummery extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocRecoverBuilder<Result<AccountSummaryData, Exception>?>(
+    return BlocRecoverBuilder<Result<AccountSummaryData, LocalizedException>?>(
       selector: (state) => state.accountDetails,
       builder: (context, state) {
-        print('state: $state');
         return switch (state) {
-          Success<AccountSummaryData, Exception>(:final value) =>
+          Success<AccountSummaryData, LocalizedException>(:final value) =>
             _RecoveredAccountSummary(
               walletConnection: value.walletConnection,
               walletSummary: value.walletSummary,
             ),
-          Failure<AccountSummaryData, Exception>(:final value) =>
-            VoicesErrorIndicator(
-              // TODO(damian): localized message
-              message: value.toString(),
+          Failure<AccountSummaryData, LocalizedException>(:final value) =>
+            _RecoverAccountFailure(
+              exception: value,
               onRetry: onRetry,
             ),
           _ => const Center(child: VoicesCircularProgressIndicator()),
@@ -97,12 +95,15 @@ class _RecoveredAccountSummary extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         WalletConnectionStatus(
           icon: walletConnection.icon,
           name: walletConnection.name,
           isConnected: walletConnection.isConnected,
         ),
+        const SizedBox(height: 8),
+        const _RecoverStatusText(),
         const SizedBox(height: 24),
         WalletSummary(
           balance: walletSummary.balance,
@@ -110,6 +111,45 @@ class _RecoveredAccountSummary extends StatelessWidget {
           clipboardAddress: walletSummary.clipboardAddress,
         ),
       ],
+    );
+  }
+}
+
+class _RecoverAccountFailure extends StatelessWidget {
+  final LocalizedException exception;
+  final VoidCallback? onRetry;
+
+  const _RecoverAccountFailure({
+    required this.exception,
+    this.onRetry,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        VoicesErrorIndicator(
+          message: exception.message(context),
+          onRetry: onRetry,
+        ),
+      ],
+    );
+  }
+}
+
+class _RecoverStatusText extends StatelessWidget {
+  const _RecoverStatusText();
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final textColor = theme.colors.textOnPrimaryLevel1;
+
+    return Text(
+      context.l10n.recoveryAccountSuccessTitle,
+      style: theme.textTheme.titleMedium?.copyWith(color: textColor),
     );
   }
 }
