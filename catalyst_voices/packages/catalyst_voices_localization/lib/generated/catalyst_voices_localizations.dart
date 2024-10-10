@@ -826,6 +826,12 @@ abstract class VoicesLocalizations {
   /// **'Transaction failed'**
   String get registrationTransactionFailed;
 
+  /// Indicates an error when preparing a transaction has failed due to low wallet balance.
+  ///
+  /// In en, this message translates to:
+  /// **'Insufficient balance, please top up your wallet.'**
+  String get registrationInsufficientBalance;
+
   /// A title on the role chooser screen in registration.
   ///
   /// In en, this message translates to:

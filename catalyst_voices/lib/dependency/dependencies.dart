@@ -1,3 +1,4 @@
+import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -32,28 +33,37 @@ final class Dependencies extends DependencyProvider {
       ..registerFactory<RegistrationCubit>(() {
         return RegistrationCubit(
           downloader: get(),
-          transactionConfigRepository: get(),
+          registrationService: get(),
         );
       });
   }
 
   void _registerRepositories() {
     this
-      ..registerSingleton<CredentialsStorageRepository>(
-        CredentialsStorageRepository(storage: get()),
+      ..registerLazySingleton<CredentialsStorageRepository>(
+        () => CredentialsStorageRepository(storage: get()),
       )
-      ..registerSingleton<AuthenticationRepository>(
-        AuthenticationRepository(credentialsStorageRepository: get()),
+      ..registerLazySingleton<AuthenticationRepository>(
+        () => AuthenticationRepository(credentialsStorageRepository: get()),
       )
-      ..registerSingleton<TransactionConfigRepository>(
-        TransactionConfigRepository(),
+      ..registerLazySingleton<TransactionConfigRepository>(
+        TransactionConfigRepository.new,
       );
   }
 
   void _registerServices() {
-    registerSingleton<Storage>(const SecureStorage());
-    registerSingleton<Vault>(const SecureStorageVault());
-    registerSingleton<DummyAuthStorage>(const SecureDummyAuthStorage());
-    registerSingleton<Downloader>(Downloader());
+    registerLazySingleton<Storage>(() => const SecureStorage());
+    registerLazySingleton<Vault>(() => const SecureStorageVault());
+    registerLazySingleton<DummyAuthStorage>(
+      () => const SecureDummyAuthStorage(),
+    );
+    registerLazySingleton<Downloader>(Downloader.new);
+    registerLazySingleton<CatalystCardano>(() => CatalystCardano.instance);
+    registerLazySingleton<RegistrationService>(
+      () => RegistrationService(
+        get<TransactionConfigRepository>(),
+        get<CatalystCardano>(),
+      ),
+    );
   }
 }

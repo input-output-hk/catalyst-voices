@@ -7,7 +7,6 @@ import 'package:catalyst_voices_blocs/src/registration/cubits/recover_cubit.dart
 import 'package:catalyst_voices_blocs/src/registration/cubits/wallet_link_cubit.dart';
 import 'package:catalyst_voices_blocs/src/registration/state_data/keychain_state_data.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -22,15 +21,17 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
   final KeychainCreationCubit _keychainCreationCubit;
   final WalletLinkCubit _walletLinkCubit;
   final RecoverCubit _recoverCubit;
-  final TransactionConfigRepository transactionConfigRepository;
+  final RegistrationService registrationService;
 
   RegistrationCubit({
     required Downloader downloader,
-    required this.transactionConfigRepository,
+    required this.registrationService,
   })  : _keychainCreationCubit = KeychainCreationCubit(
           downloader: downloader,
         ),
-        _walletLinkCubit = WalletLinkCubit(),
+        _walletLinkCubit = WalletLinkCubit(
+          registrationService: registrationService,
+        ),
         _recoverCubit = RecoverCubit(),
         super(const RegistrationState()) {
     _keychainCreationCubit.stream.listen(_onKeychainStateDataChanged);
@@ -118,35 +119,26 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
         ),
       );
 
-      // TODO(dtscalac): inject the networkId
-      const networkId = NetworkId.testnet;
-      final walletApi = await _walletLinkState.selectedCardanoWallet!.enable();
-
-      final registrationBuilder = RegistrationTransactionBuilder(
-        transactionConfig: await transactionConfigRepository.fetch(networkId),
-        networkId: networkId,
+      final unsignedTx = await registrationService.prepareRegistration(
+        wallet: _walletLinkState.selectedCardanoWallet!,
+        // TODO(dtscalac): inject the networkId
+        networkId: NetworkId.testnet,
         seedPhrase: _keychainState.seedPhrase!,
         roles: _walletLinkState.selectedRoles ?? _walletLinkState.defaultRoles,
-        changeAddress: await walletApi.getChangeAddress(),
-        rewardAddresses: await walletApi.getRewardAddresses(),
-        utxos: await walletApi.getUtxos(
-          amount: Balance(
-            coin: CardanoWalletDetails.minAdaForRegistration,
-          ),
-        ),
       );
 
-      final tx = await registrationBuilder.build();
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
-          unsignedTx: Optional(Success(tx)),
+          unsignedTx: Optional(Success(unsignedTx)),
         ),
       );
-    } on Exception catch (error, stackTrace) {
+    } on RegistrationException catch (error, stackTrace) {
       _logger.severe('prepareRegistration', error, stackTrace);
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
-          unsignedTx: Optional(Failure(const LocalizedUnknownException())),
+          unsignedTx: Optional(
+            Failure(LocalizedRegistrationException.from(error)),
+          ),
         ),
       );
     }
@@ -161,18 +153,10 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
         ),
       );
 
-      final walletApi = await _walletLinkState.selectedCardanoWallet!.enable();
-      final unsignedTx = _registrationState.unsignedTx!.success;
-      final witnessSet = await walletApi.signTx(transaction: unsignedTx);
-
-      final signedTx = Transaction(
-        body: unsignedTx.body,
-        isValid: true,
-        witnessSet: witnessSet,
-        auxiliaryData: unsignedTx.auxiliaryData,
+      final signedTx = await registrationService.submitRegistration(
+        wallet: _walletLinkState.selectedCardanoWallet!,
+        unsignedTx: _registrationState.unsignedTx!.success,
       );
-
-      await walletApi.submitTx(transaction: signedTx);
 
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
@@ -181,12 +165,12 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
         ),
       );
       nextStep();
-    } on Exception catch (error, stackTrace) {
+    } on RegistrationException catch (error, stackTrace) {
       _logger.severe('submitRegistration', error, stackTrace);
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
           submittedTx: Optional(
-            Failure(const LocalizedRegistrationTransactionException()),
+            Failure(LocalizedRegistrationException.from(error)),
           ),
           isSubmittingTx: false,
         ),
