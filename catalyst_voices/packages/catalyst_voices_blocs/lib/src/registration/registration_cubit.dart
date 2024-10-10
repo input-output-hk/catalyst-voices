@@ -32,7 +32,9 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
         _walletLinkCubit = WalletLinkCubit(
           registrationService: registrationService,
         ),
-        _recoverCubit = RecoverCubit(),
+        _recoverCubit = RecoverCubit(
+          registrationService: registrationService,
+        ),
         super(const RegistrationState()) {
     _keychainCreationCubit.stream.listen(_onKeychainStateDataChanged);
     _walletLinkCubit.stream.listen(_onWalletLinkStateDataChanged);

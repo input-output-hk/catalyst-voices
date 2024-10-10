@@ -1,8 +1,45 @@
+import 'dart:math';
+
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/registration/registration_transaction_builder.dart';
+
+// TODO(damian-molinski): remove once recover account is implemented
+final _testNetAddress = ShelleyAddress(
+  const [
+    96,
+    130,
+    224,
+    22,
+    130,
+    137,
+    137,
+    205,
+    157,
+    128,
+    155,
+    80,
+    214,
+    151,
+    109,
+    158,
+    250,
+    155,
+    197,
+    178,
+    193,
+    167,
+    141,
+    75,
+    59,
+    250,
+    27,
+    184,
+    59,
+  ],
+);
 
 /// Manages the user registration.
 final class RegistrationService {
@@ -33,6 +70,31 @@ final class RegistrationService {
     return CardanoWalletDetails(
       wallet: wallet,
       balance: balance.coin,
+      address: address,
+    );
+  }
+
+  // TODO(damian-molinski): to be implemented
+  Future<CardanoWalletDetails> recoverCardanoWalletDetails(
+    SeedPhrase seedPhrase,
+  ) async {
+    await Future<void>.delayed(const Duration(milliseconds: 200));
+
+    final isSuccess = Random().nextBool();
+    if (!isSuccess) {
+      throw const RegistrationUnknownException();
+    }
+
+    final wallet = DummyCardanoWallet(
+      name: 'Dummy Wallet',
+      icon: '',
+    );
+    final balance = Coin.fromAda(10);
+    final address = _testNetAddress;
+
+    return CardanoWalletDetails(
+      wallet: wallet,
+      balance: balance,
       address: address,
     );
   }
