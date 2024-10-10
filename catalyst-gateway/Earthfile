@@ -90,9 +90,10 @@ package:
     # RUN apk add gcc bash
 
     COPY +build/cat-gateway .
-    COPY ./scripts/entry.sh .
+    # COPY ./scripts/entry.sh .
 
-    ENTRYPOINT ./entry.sh
+    # ENTRYPOINT ./entry.sh
+    ENTRYPOINT ./cat-gateway
 
 # Publish cat-gateway
 publish:
