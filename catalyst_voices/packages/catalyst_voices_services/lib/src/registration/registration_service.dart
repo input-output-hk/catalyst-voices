@@ -6,6 +6,41 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/registration/registration_transaction_builder.dart';
 
+// TODO(damian-molinski): remove once recover account is implemented
+final _testNetAddress = ShelleyAddress(
+  const [
+    96,
+    130,
+    224,
+    22,
+    130,
+    137,
+    137,
+    205,
+    157,
+    128,
+    155,
+    80,
+    214,
+    151,
+    109,
+    158,
+    250,
+    155,
+    197,
+    178,
+    193,
+    167,
+    141,
+    75,
+    59,
+    250,
+    27,
+    184,
+    59,
+  ],
+);
+
 /// Manages the user registration.
 final class RegistrationService {
   final TransactionConfigRepository _transactionConfigRepository;
@@ -55,9 +90,7 @@ final class RegistrationService {
       icon: '',
     );
     final balance = Coin.fromAda(10);
-    final address = ShelleyAddress.fromBech32(
-      'addr_test1vzpwq95z3xyum8vqndgdd9mdnmafh3djcxnc6jemlgdmswcve6tkw',
-    );
+    final address = _testNetAddress;
 
     return CardanoWalletDetails(
       wallet: wallet,
