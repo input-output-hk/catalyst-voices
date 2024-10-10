@@ -2,7 +2,12 @@
 
 use std::{net::IpAddr, str::FromStr};
 
-use poem_openapi::{param::Path, payload::Json, ApiResponse, Multipart, OpenApi};
+use poem_openapi::{
+    param::{Header, Query},
+    payload::Json,
+    ApiResponse, OpenApi,
+};
+use serde_json::Value;
 
 use crate::{
     db::event::config::{key::ConfigKey, Config},
@@ -26,75 +31,103 @@ enum Responses {
     BadRequest(Json<String>),
 }
 
-/// Configuration insert request
-#[derive(Multipart)]
-struct ConfigInsertRequest {
-    /// ID1 of config table
-    id1: String,
-    /// ID2 of config table
-    id2: Option<String>,
-    /// ID3 of config table
-    id3: Option<String>,
-    /// Value of config table
-    value: String,
-}
-
-#[OpenApi(prefix_path = "/config", tag = "ApiTags::Config")]
+#[OpenApi(tag = "ApiTags::Config")]
 impl ConfigApi {
-    /// Get the general configuration
-    #[oai(path = "/", method = "get", operation_id = "get_general_config")]
-    async fn get_general(&self) -> Responses {
-        match Config::get(ConfigKey::Frontend).await {
-            Ok(config) => Responses::Ok(Json(config.to_string())),
+    /// Get the configuration for the frontend.
+    /// Retrieving IP from X-Forwarded-For header if provided.
+    /// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For
+    #[oai(
+        path = "/draft/config/frontend",
+        method = "get",
+        operation_id = "get_config_frontend"
+    )]
+    async fn get_frontend(
+        &self, #[oai(name = "X-Forwarded-For")] header: Header<Option<String>>,
+    ) -> Responses {
+        // Retrieve the IP address from the header
+        // According to the X-Forwarded-For header spec, the first value is the IP address
+        let ip_address = header
+            .0
+            .as_ref()
+            .and_then(|h| h.split(',').next())
+            .map(String::from);
+
+        // Fetch the general configuration
+        let general_config = Config::get(ConfigKey::Frontend).await;
+
+        // Attempt to fetch the IP configuration
+        let ip_config = if let Some(ip) = ip_address {
+            match IpAddr::from_str(&ip) {
+                Ok(parsed_ip) => Config::get(ConfigKey::FrontendForIp(parsed_ip)).await.ok(),
+                Err(_) => {
+                    return Responses::BadRequest(Json(format!("Invalid IP address: {ip}")));
+                },
+            }
+        } else {
+            None
+        };
+
+        // Handle the response
+        match general_config {
+            Ok(general) => {
+                // If there is IP specific config, replace any key in the general config with
+                // the keys from the IP specific config
+                let response_config = if let Some(ip_specific) = ip_config {
+                    merge_configs(&general, &ip_specific)
+                } else {
+                    general
+                };
+
+                Responses::Ok(Json(response_config.to_string()))
+            },
             Err(err) => Responses::NotFound(Json(err.to_string())),
         }
     }
 
-    /// Get configuration for a specific IP
-    #[oai(path = "/:ip", method = "get", operation_id = "get_ip_config")]
-    async fn get_with_ip(&self, ip: Path<String>) -> Responses {
-        match IpAddr::from_str(&ip.0) {
-            Ok(parsed_ip) => {
-                match Config::get(ConfigKey::FrontendForIp(parsed_ip)).await {
-                    Ok(config) => Responses::Ok(Json(config.to_string())),
-                    Err(err) => Responses::NotFound(Json(err.to_string())),
+    /// Insert or update the frontend configuration.
+    #[oai(
+        path = "/draft/config/frontend",
+        method = "put",
+        operation_id = "put_config_frontend"
+    )]
+    async fn put_frontend(&self, ip_query: Query<Option<String>>, body: Json<Value>) -> Responses {
+        let body_value = body.0;
+
+        match ip_query.0 {
+            Some(ip) => {
+                match IpAddr::from_str(&ip) {
+                    Ok(parsed_ip) => upsert(ConfigKey::FrontendForIp(parsed_ip), body_value).await,
+                    Err(err) => Responses::BadRequest(Json(format!("Invalid IP address: {err}"))),
                 }
             },
-            Err(err) => Responses::BadRequest(Json(format!("Invalid IP address: {err}"))),
+            None => upsert(ConfigKey::Frontend, body_value).await,
+        }
+    }
+}
+
+/// Helper function to merge two JSON values.
+fn merge_configs(general: &Value, ip_specific: &Value) -> Value {
+    let mut merged = general.clone();
+
+    if let Some(ip_specific_obj) = ip_specific.as_object() {
+        if let Some(merged_obj) = merged.as_object_mut() {
+            for (key, value) in ip_specific_obj {
+                if let Some(existing_value) = merged_obj.get_mut(key) {
+                    *existing_value = value.clone();
+                } else {
+                    merged_obj.insert(key.clone(), value.clone());
+                }
+            }
         }
     }
 
-    /// Insert configuration
-    #[oai(path = "/insert", method = "post", operation_id = "insert_config")]
-    async fn insert(&self, payload: ConfigInsertRequest) -> Responses {
-        let config_key = ConfigKey::from_id(
-            &payload.id1,
-            &payload.id2.unwrap_or_default(),
-            &payload.id3.unwrap_or_default(),
-        );
+    merged
+}
 
-        if let Some(config_key) = config_key {
-            match serde_json::from_str(&payload.value) {
-                Ok(parsed_value) => {
-                    match Config::insert(config_key, parsed_value).await {
-                        Ok(()) => {
-                            Responses::Ok(Json("Configuration inserted successfully.".to_string()))
-                        },
-                        Err(err) => {
-                            Responses::BadRequest(Json(format!(
-                                "Failed to insert configuration: {err}"
-                            )))
-                        },
-                    }
-                },
-                Err(err) => {
-                    Responses::BadRequest(Json(format!("Failed to parse JSON value: {err}")))
-                },
-            }
-        } else {
-            Responses::BadRequest(Json(
-                "Invalid configuration key derives from ids.".to_string(),
-            ))
-        }
+/// Helper function to handle upsert.
+async fn upsert(key: ConfigKey, value: Value) -> Responses {
+    match Config::upsert(key, value).await {
+        Ok(()) => Responses::Ok(Json("Configuration upsert successfully.".to_string())),
+        Err(err) => Responses::BadRequest(Json(format!("Failed to upsert configuration: {err}"))),
     }
 }
