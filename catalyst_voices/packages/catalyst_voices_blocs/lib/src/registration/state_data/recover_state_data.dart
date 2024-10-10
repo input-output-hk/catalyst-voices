@@ -41,7 +41,7 @@ final class RecoverStateData extends Equatable {
     return 'RecoverStateData('
         '$foundKeychain, '
         '$userSeedPhraseWords, '
-        // Note. do not print because this list is often very lage.
+        // Note. do not print because this list is often very large.
         '${seedPhraseWords.length}, '
         '$isSeedPhraseValid, '
         '$accountDetails, '
