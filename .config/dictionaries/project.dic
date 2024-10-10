@@ -128,6 +128,7 @@ junitreport
 junitxml
 justfile
 Keyhash
+keychains
 keyserver
 keyspace
 KUBECONFIG

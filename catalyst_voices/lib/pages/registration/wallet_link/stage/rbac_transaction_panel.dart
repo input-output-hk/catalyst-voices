@@ -1,6 +1,8 @@
+import 'dart:async';
+
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
-import 'package:catalyst_voices/pages/registration/wallet_link/bloc_wallet_link_builder.dart';
+import 'package:catalyst_voices/pages/registration/bloc_registration_builder.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -8,12 +10,24 @@ import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:result_type/result_type.dart';
 
-class RbacTransactionPanel extends StatelessWidget {
-  const RbacTransactionPanel({
-    super.key,
-  });
+class RbacTransactionPanel extends StatefulWidget {
+  const RbacTransactionPanel({super.key});
+
+  @override
+  State<RbacTransactionPanel> createState() => _RbacTransactionPanelState();
+}
+
+class _RbacTransactionPanelState extends State<RbacTransactionPanel> {
+  @override
+  void initState() {
+    super.initState();
+    unawaited(RegistrationCubit.of(context).prepareRegistration());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,11 +40,51 @@ class RbacTransactionPanel extends StatelessWidget {
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: 12),
-        const _BlocSummary(),
-        const SizedBox(height: 18),
-        const _PositiveSmallPrint(),
-        const Spacer(),
+        Expanded(
+          child: _BlocTransactionDetails(onRefreshTap: _onRefresh),
+        ),
         const _Navigation(),
+      ],
+    );
+  }
+
+  void _onRefresh() {
+    unawaited(RegistrationCubit.of(context).prepareRegistration());
+  }
+}
+
+class _BlocTransactionDetails extends StatelessWidget {
+  final VoidCallback onRefreshTap;
+
+  const _BlocTransactionDetails({required this.onRefreshTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocRegistrationBuilder(
+      selector: (state) => state.unsignedTx,
+      builder: (context, result) {
+        return switch (result) {
+          Success() => const _TransactionDetails(),
+          Failure(:final value) => _Error(error: value, onRetry: onRefreshTap),
+          _ => const Center(child: VoicesCircularProgressIndicator()),
+        };
+      },
+    );
+  }
+}
+
+class _TransactionDetails extends StatelessWidget {
+  const _TransactionDetails();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _BlocSummary(),
+        SizedBox(height: 18),
+        _PositiveSmallPrint(),
+        _BlocTxSubmitError(),
       ],
     );
   }
@@ -41,22 +95,27 @@ class _BlocSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocWalletLinkBuilder<
+    return BlocSelector<
+        RegistrationCubit,
+        RegistrationState,
         ({
           Set<AccountRole> roles,
           CardanoWalletDetails selectedWallet,
           Coin transactionFee,
         })?>(
       selector: (state) {
-        final selectedWallet = state.selectedWallet;
-        if (selectedWallet == null) {
+        final selectedWallet = state.walletLinkStateData.selectedWallet;
+        final transactionFee = state.registrationStateData.transactionFee;
+        final selectedRoles = state.walletLinkStateData.selectedRoles;
+        final defaultRoles = state.walletLinkStateData.defaultRoles;
+        if (selectedWallet == null || transactionFee == null) {
           return null;
         }
 
         return (
-          roles: state.selectedRoles ?? state.defaultRoles,
+          roles: selectedRoles ?? defaultRoles,
           selectedWallet: selectedWallet,
-          transactionFee: state.transactionFee,
+          transactionFee: transactionFee,
         );
       },
       builder: (context, state) {
@@ -130,7 +189,7 @@ class _Summary extends StatelessWidget {
                     ?.copyWith(fontWeight: FontWeight.bold),
               ),
               Text(
-                CryptocurrencyFormatter.formatAmount(transactionFee),
+                CryptocurrencyFormatter.formatExactAmount(transactionFee),
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
@@ -173,6 +232,55 @@ class _PositiveSmallPrint extends StatelessWidget {
   }
 }
 
+class _BlocTxSubmitError extends StatelessWidget {
+  const _BlocTxSubmitError();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocRegistrationBuilder(
+      selector: (state) => state.submittedTx,
+      builder: (context, result) {
+        return switch (result) {
+          Failure(:final value) => _Error(
+              error: value,
+              onRetry: () => _onRetry(context),
+            ),
+          _ => const Offstage(),
+        };
+      },
+    );
+  }
+
+  void _onRetry(BuildContext context) {
+    unawaited(RegistrationCubit.of(context).submitRegistration());
+  }
+}
+
+class _Error extends StatelessWidget {
+  final LocalizedException error;
+  final VoidCallback onRetry;
+
+  const _Error({
+    required this.error,
+    required this.onRetry,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.topCenter,
+      child: Container(
+        padding: const EdgeInsets.only(top: 20),
+        width: double.infinity,
+        child: VoicesErrorIndicator(
+          message: error.message(context),
+          onRetry: onRetry,
+        ),
+      ),
+    );
+  }
+}
+
 class _Navigation extends StatelessWidget {
   const _Navigation();
 
@@ -181,12 +289,8 @@ class _Navigation extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        VoicesFilledButton(
-          leading: VoicesAssets.icons.wallet.buildIcon(),
-          onTap: () {
-            RegistrationCubit.of(context).walletLink.submitRegistration();
-          },
-          child: Text(context.l10n.walletLinkTransactionSign),
+        _BlocSubmitTxButton(
+          onSubmit: () => _submitRegistration(context),
         ),
         const SizedBox(height: 10),
         VoicesTextButton(
@@ -197,6 +301,44 @@ class _Navigation extends StatelessWidget {
           child: Text(context.l10n.walletLinkTransactionChangeRoles),
         ),
       ],
+    );
+  }
+
+  void _submitRegistration(BuildContext context) {
+    unawaited(RegistrationCubit.of(context).submitRegistration());
+  }
+}
+
+class _BlocSubmitTxButton extends StatelessWidget {
+  final VoidCallback onSubmit;
+
+  const _BlocSubmitTxButton({required this.onSubmit});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocRegistrationBuilder<
+        ({
+          bool isLoading,
+          bool canSubmitTx,
+        })>(
+      selector: (state) => (
+        isLoading: state.isSubmittingTx,
+        canSubmitTx: state.canSubmitTx,
+      ),
+      builder: (context, state) {
+        return VoicesFilledButton(
+          leading: VoicesAssets.icons.wallet.buildIcon(),
+          onTap: state.canSubmitTx ? onSubmit : null,
+          trailing: state.isLoading
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: VoicesCircularProgressIndicator(),
+                )
+              : null,
+          child: Text(context.l10n.walletLinkTransactionSign),
+        );
+      },
     );
   }
 }
