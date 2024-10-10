@@ -8,9 +8,13 @@ environment:
   flutter: ">=3.24.1"
 
 dependencies:
+  catalyst_cardano: ^0.3.0
   catalyst_cardano_serialization: ^0.4.0
+  catalyst_cardano_web: ^0.3.0
   catalyst_voices_models:
     path: ../catalyst_voices_models
+  catalyst_voices_repositories:
+    path: ../catalyst_voices_repositories
   chopper: ^7.2.0
   flutter:
     sdk: flutter

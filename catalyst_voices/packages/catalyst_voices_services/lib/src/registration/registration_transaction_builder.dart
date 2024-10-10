@@ -48,9 +48,12 @@ class RegistrationTransactionBuilder {
   });
 
   /// Builds the unsigned registration transaction.
+  ///
+  /// Throws [RegistrationInsufficientBalanceException] in case the
+  /// user doesn't have enough balance to pay for the registration transaction.
   Future<Transaction> build() async {
     if (utxos.isEmpty) {
-      throw Exception('Insufficient balance, please top up your wallet');
+      throw const RegistrationInsufficientBalanceException();
     }
 
     final x509Envelope = await _buildMetadataEnvelope();
