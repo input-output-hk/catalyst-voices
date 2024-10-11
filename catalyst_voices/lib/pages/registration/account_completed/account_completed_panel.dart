@@ -2,10 +2,12 @@ import 'package:catalyst_voices/common/ext/account_role_ext.dart';
 import 'package:catalyst_voices/pages/registration/widgets/next_step.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AccountCompletedPanel extends StatelessWidget {
   const AccountCompletedPanel({super.key});
@@ -23,31 +25,39 @@ class AccountCompletedPanel extends StatelessWidget {
               children: [
                 const _TitleText(),
                 const SizedBox(height: 10),
-                Column(
-                  children: <Widget>[
-                    _SummaryItem(
-                      image: VoicesAssets.images.registrationSummaryKeychain,
-                      title: 'Catalyst Keychain created',
-                      info:
-                          'You created a Catalyst Keychain, backed up its seed phrase and set an unlock password.',
-                    ),
-                    _SummaryItem(
-                      image: VoicesAssets.images.registrationSummaryWallet,
-                      title: 'Cardano Lace wallet selected',
-                      info:
-                          'You selected your Lace wallet as primary wallet for your voting power.',
-                    ),
-                    _SummaryItem(
-                      image: VoicesAssets.images.registrationSummaryRoles,
-                      title: 'Catalyst roles selected',
-                      info:
-                          'You linked your Cardano wallet and selected  Catalyst roles via a signed transaction.',
-                      footer: const _RolesFooter([
-                        AccountRole.voter,
-                        AccountRole.proposer,
-                      ]),
-                    ),
-                  ].separatedBy(const SizedBox(height: 10)).toList(),
+                BlocBuilder<RegistrationCubit, RegistrationState>(
+                  builder: (context, state) {
+                    final roles =
+                        state.walletLinkStateData.selectedRoles?.toList() ?? [];
+                    final walletName = state
+                            .walletLinkStateData.selectedWallet?.wallet.name ??
+                        '';
+
+                    return Column(
+                      children: <Widget>[
+                        _SummaryItem(
+                          image:
+                              VoicesAssets.images.registrationSummaryKeychain,
+                          title: 'Catalyst Keychain created',
+                          info:
+                              'You created a Catalyst Keychain, backed up its seed phrase and set an unlock password.',
+                        ),
+                        _SummaryItem(
+                          image: VoicesAssets.images.registrationSummaryWallet,
+                          title: 'Cardano Lace wallet selected',
+                          info:
+                              'You selected your $walletName wallet as primary wallet for your voting power.',
+                        ),
+                        _SummaryItem(
+                          image: VoicesAssets.images.registrationSummaryRoles,
+                          title: 'Catalyst roles selected',
+                          info:
+                              'You linked your Cardano wallet and selected  Catalyst roles via a signed transaction.',
+                          footer: _RolesFooter(roles),
+                        ),
+                      ].separatedBy(const SizedBox(height: 10)).toList(),
+                    );
+                  },
                 )
               ],
             ),
