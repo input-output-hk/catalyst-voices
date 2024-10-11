@@ -11,6 +11,7 @@ abstract interface class RecoverManager {
 }
 
 final class RecoverCubit extends Cubit<RecoverStateData>
+    with BlocErrorEmitterMixin
     implements RecoverManager {
   RecoverCubit() : super(const RecoverStateData()) {
     /// pre-populate all available words

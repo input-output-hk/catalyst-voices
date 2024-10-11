@@ -19,6 +19,7 @@ abstract interface class WalletLinkManager {
 }
 
 final class WalletLinkCubit extends Cubit<WalletLinkStateData>
+    with BlocErrorEmitterMixin
     implements WalletLinkManager {
   final RegistrationService registrationService;
 
