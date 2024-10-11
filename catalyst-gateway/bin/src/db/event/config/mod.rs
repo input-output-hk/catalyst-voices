@@ -28,13 +28,11 @@ impl Config {
         if let Some(row) = rows.first() {
             let value: Value = row.get(0);
             id.validate(&value).map_err(|e| anyhow::anyhow!(e))?;
-            return Ok(value);
-        }
-
-        // If data not found return default config value
-        match id.default() {
-            Some(default) => Ok(default),
-            None => Err(anyhow::anyhow!("Default value not found for {:?}", id)),
+            Ok(value)
+        } else {
+            // If data not found return default config value
+            id.default()
+                .ok_or(anyhow::anyhow!("Default value not found for {:?}", id))
         }
     }
 

@@ -90,7 +90,9 @@ impl ConfigApi {
         method = "put",
         operation_id = "put_config_frontend"
     )]
-    async fn put_frontend(&self, ip_query: Query<Option<String>>, body: Json<Value>) -> Responses {
+    async fn put_frontend(
+        &self, #[oai(name = "IP")] ip_query: Query<Option<String>>, body: Json<Value>,
+    ) -> Responses {
         let body_value = body.0;
 
         match ip_query.0 {

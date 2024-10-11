@@ -26,13 +26,8 @@ static FRONTEND_DEFAULT: LazyLock<Option<Value>> =
 fn load_json_lazy(data: &str) -> Option<Value> {
     let json = serde_json::from_str(data);
 
-    match json {
-        Ok(value) => Some(value),
-        Err(err) => {
-            error!("Error parsing JSON : {:?}", err);
-            None
-        },
-    }
+    json.inspect_err(|e| error!("Error parsing JSON : {e}"))
+        .ok()
 }
 
 impl ConfigKey {
@@ -49,34 +44,26 @@ impl ConfigKey {
     /// Validate the provided value against the JSON schema.
     pub(super) fn validate(&self, value: &Value) -> anyhow::Result<()> {
         // Retrieve the schema based on ConfigKey
-        #[allow(clippy::match_same_arms)]
         let schema = match self {
-            ConfigKey::Frontend => &*FRONTEND_SCHEMA,
-            ConfigKey::FrontendForIp(_) => &*FRONTEND_SCHEMA,
+            ConfigKey::Frontend | ConfigKey::FrontendForIp(_) => &*FRONTEND_SCHEMA,
         };
 
-        let validator = match schema {
-            Some(s) => {
-                jsonschema::validator_for(s)
-                    .map_err(|e| anyhow::anyhow!("Failed to create JSON validator: {:?}", e))?
-            },
-            None => return Err(anyhow::anyhow!("Failed to retrieve JSON schema")),
+        let Some(schema) = schema else {
+            return Err(anyhow::anyhow!("Failed to retrieve JSON schema"));
         };
+        let validator = jsonschema::validator_for(schema)
+            .map_err(|e| anyhow::anyhow!("Failed to create JSON validator: {:?}", e))?;
 
         // Validate the value against the schema
-        if validator.is_valid(value) {
-            return Ok(());
-        }
-        Err(anyhow::anyhow!("Invalid configuration"))
+        anyhow::ensure!(validator.is_valid(value), "Invalid configuration");
+        Ok(())
     }
 
     /// Retrieve the default configuration value.
     pub(super) fn default(&self) -> Option<Value> {
         // Retrieve the default value based on the ConfigKey
-        #[allow(clippy::match_same_arms)]
         let default = match self {
-            ConfigKey::Frontend => &*FRONTEND_DEFAULT,
-            ConfigKey::FrontendForIp(_) => &*FRONTEND_DEFAULT,
+            ConfigKey::Frontend | ConfigKey::FrontendForIp(_) => &*FRONTEND_DEFAULT,
         };
 
         default.clone()
