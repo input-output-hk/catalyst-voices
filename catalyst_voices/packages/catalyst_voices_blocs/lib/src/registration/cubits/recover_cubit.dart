@@ -18,6 +18,8 @@ abstract interface class RecoverManager implements UnlockPasswordManager {
   void setSeedPhraseWords(List<SeedPhraseWord> words);
 
   Future<void> recoverAccount();
+
+  Future<bool> createKeychain();
 }
 
 final class RecoverCubit extends Cubit<RecoverStateData>
@@ -98,6 +100,34 @@ final class RecoverCubit extends Cubit<RecoverStateData>
 
       const exception = LocalizedUnknownException();
       emit(state.copyWith(accountDetails: Optional(Failure(exception))));
+    }
+  }
+
+  @override
+  Future<bool> createKeychain() async {
+    try {
+      final seedPhrase = _seedPhrase;
+      final password = this.password;
+
+      if (seedPhrase == null) {
+        throw const LocalizedRegistrationSeedPhraseNotFoundException();
+      }
+      if (password.isNotValid) {
+        throw const LocalizedRegistrationUnlockPasswordNotFoundException();
+      }
+
+      await _registrationService.createKeychain(
+        seedPhrase: seedPhrase,
+        unlockPassword: password.value,
+      );
+
+      return true;
+    } catch (error, stack) {
+      _logger.severe('Create keychain', error, stack);
+
+      emitError(error);
+
+      return false;
     }
   }
 
