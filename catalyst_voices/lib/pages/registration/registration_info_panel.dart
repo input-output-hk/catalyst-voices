@@ -178,7 +178,7 @@ class _RegistrationPicture extends StatelessWidget {
       return switch (stage) {
         RecoverSeedPhraseStage.seedPhraseInstructions ||
         RecoverSeedPhraseStage.seedPhrase ||
-        RecoverSeedPhraseStage.linkedWallet =>
+        RecoverSeedPhraseStage.accountDetails =>
           const KeychainPicture(),
         RecoverSeedPhraseStage.unlockPasswordInstructions ||
         RecoverSeedPhraseStage.unlockPassword =>
