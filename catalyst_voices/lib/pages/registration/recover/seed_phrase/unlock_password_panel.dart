@@ -1,4 +1,4 @@
-import 'package:catalyst_voices/pages/registration/recover/bloc_recover_builder.dart';
+import 'package:catalyst_voices/pages/registration/bloc_unlock_password_builder.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/pages/registration/widgets/unlock_password_form.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -101,18 +101,18 @@ class _BlocUnlockPasswordForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocRecoverBuilder<
+    return BlocUnlockPasswordBuilder<
         ({
           bool showError,
           PasswordStrength passwordStrength,
           bool showPasswordStrength,
         })>(
+      stateSelector: (state) => state.recoverStateData.unlockPasswordState,
       selector: (state) {
-        final unlockPasswordState = state.unlockPasswordState;
         return (
-          showError: unlockPasswordState.showPasswordMisMatch,
-          passwordStrength: unlockPasswordState.passwordStrength,
-          showPasswordStrength: unlockPasswordState.showPasswordStrength,
+          showError: state.showPasswordMisMatch,
+          passwordStrength: state.passwordStrength,
+          showPasswordStrength: state.showPasswordStrength,
         );
       },
       builder: (context, state) {
@@ -139,8 +139,9 @@ class _BlocNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocRecoverBuilder<bool>(
-      selector: (state) => state.unlockPasswordState.isNextEnabled,
+    return BlocUnlockPasswordBuilder<bool>(
+      stateSelector: (state) => state.recoverStateData.unlockPasswordState,
+      selector: (state) => state.isNextEnabled,
       builder: (context, state) {
         return RegistrationBackNextNavigation(
           isNextEnabled: state,
