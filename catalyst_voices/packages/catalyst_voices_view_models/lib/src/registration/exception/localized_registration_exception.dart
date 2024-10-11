@@ -43,6 +43,17 @@ final class LocalizedRegistrationTransactionException
       context.l10n.registrationTransactionFailed;
 }
 
+/// Localized exception thrown when attempting to execute register operation
+/// which requires seed phrase but non was found.
+final class LocalizedRegistrationSeedPhraseNotFoundException
+    extends LocalizedRegistrationException {
+  const LocalizedRegistrationSeedPhraseNotFoundException();
+
+  @override
+  String message(BuildContext context) =>
+      context.l10n.registrationSeedPhraseNotFound;
+}
+
 /// A generic error for describing a failure during user registration.
 final class LocalizedRegistrationUnknownException
     extends LocalizedRegistrationException {

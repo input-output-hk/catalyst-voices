@@ -437,6 +437,9 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get registrationInsufficientBalance => 'Insufficient balance, please top up your wallet.';
 
   @override
+  String get registrationSeedPhraseNotFound => 'Seed phrase was not found. Make sure correct words are correct.';
+
+  @override
   String get walletLinkRoleChooserTitle => 'How do you want to participate in Catalyst?';
 
   @override
@@ -849,4 +852,13 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get recoverySeedPhraseInputSubtitle => 'Enter each word of your Catalyst Key in the right order  to bring your Catalyst account to this device.';
+
+  @override
+  String get recoveryAccountTitle => 'Catalyst account recovery';
+
+  @override
+  String get recoveryAccountSuccessTitle => 'Keychain recovered successfully!';
+
+  @override
+  String get recoveryAccountDetailsAction => 'Set unlock password for this device';
 }

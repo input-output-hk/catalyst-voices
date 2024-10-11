@@ -1,14 +1,13 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/pages/registration/wallet_link/bloc_wallet_link_builder.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
+import 'package:catalyst_voices/pages/registration/widgets/wallet_connection_status.dart';
+import 'package:catalyst_voices/pages/registration/widgets/wallet_summary.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 class WalletDetailsPanel extends StatelessWidget {
   const WalletDetailsPanel({
@@ -26,7 +25,7 @@ class WalletDetailsPanel extends StatelessWidget {
           style: Theme.of(context).textTheme.titleMedium,
         ),
         const SizedBox(height: 32),
-        const _BlocWalletExtension(),
+        const _BlocWalletConnectionStatus(),
         const SizedBox(height: 16),
         const _BlocWalletDetailsText(),
         const SizedBox(height: 24),
@@ -38,56 +37,20 @@ class WalletDetailsPanel extends StatelessWidget {
   }
 }
 
-class _BlocWalletExtension extends StatelessWidget {
-  const _BlocWalletExtension();
+class _BlocWalletConnectionStatus extends StatelessWidget {
+  const _BlocWalletConnectionStatus();
 
   @override
   Widget build(BuildContext context) {
-    return BlocWalletLinkBuilder<({String icon, String name})?>(
-      selector: (state) {
-        final wallet = state.selectedWallet?.wallet;
-        return wallet != null ? (icon: wallet.icon, name: wallet.name) : null;
-      },
+    return BlocWalletLinkBuilder<WalletConnectionData?>(
+      selector: (state) => state.walletConnection,
       builder: (context, state) {
-        if (state != null) {
-          return _WalletExtension(
-            icon: state.icon,
-            name: state.name,
-          );
-        } else {
-          return const Offstage();
-        }
+        return WalletConnectionStatus(
+          icon: state?.icon,
+          name: state?.name ?? '',
+          isConnected: state?.isConnected ?? false,
+        );
       },
-    );
-  }
-}
-
-class _WalletExtension extends StatelessWidget {
-  final String icon;
-  final String name;
-
-  const _WalletExtension({
-    required this.icon,
-    required this.name,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        const SizedBox(width: 8),
-        VoicesWalletTileIcon(iconSrc: icon),
-        const SizedBox(width: 12),
-        Text(name, style: Theme.of(context).textTheme.bodyLarge),
-        const SizedBox(width: 8),
-        VoicesAvatar(
-          radius: 10,
-          padding: const EdgeInsets.all(4),
-          icon: VoicesAssets.icons.check.buildIcon(),
-          foregroundColor: Theme.of(context).colors.success,
-          backgroundColor: Theme.of(context).colors.successContainer,
-        ),
-      ],
     );
   }
 }
@@ -114,204 +77,20 @@ class _BlocWalletSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocWalletLinkBuilder<
-        ({
-          Coin balance,
-          ShelleyAddress address,
-          bool hasEnoughBalance,
-        })?>(
-      selector: (state) {
-        final walletDetails = state.selectedWallet;
-        return walletDetails != null
-            ? (
-                balance: walletDetails.balance,
-                address: walletDetails.address,
-                hasEnoughBalance: walletDetails.hasEnoughBalance,
-              )
-            : null;
-      },
+    return BlocWalletLinkBuilder<WalletSummaryData?>(
+      selector: (state) => state.walletSummary,
       builder: (context, state) {
         if (state != null) {
-          return _WalletSummary(
+          return WalletSummary(
             balance: state.balance,
             address: state.address,
-            hasEnoughBalance: state.hasEnoughBalance,
+            clipboardAddress: state.clipboardAddress,
+            showLowBalance: state.showLowBalance,
           );
         } else {
           return const Offstage();
         }
       },
-    );
-  }
-}
-
-class _WalletSummary extends StatelessWidget {
-  final Coin balance;
-  final ShelleyAddress address;
-  final bool hasEnoughBalance;
-
-  const _WalletSummary({
-    required this.balance,
-    required this.address,
-    required this.hasEnoughBalance,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          width: 1.5,
-          color: Theme.of(context).colors.outlineBorderVariant!,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            context.l10n.walletDetectionSummary,
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
-          const SizedBox(height: 12),
-          _WalletSummaryBalance(
-            balance: balance,
-            hasEnoughBalance: hasEnoughBalance,
-          ),
-          const SizedBox(height: 12),
-          _WalletSummaryAddress(address: address),
-          if (!hasEnoughBalance) ...[
-            const SizedBox(height: 12),
-            Text(
-              context.l10n.notice,
-              style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              context.l10n.walletLinkWalletDetailsNotice,
-              style: Theme.of(context).textTheme.labelSmall,
-            ),
-            const SizedBox(height: 6),
-            Text(
-              context.l10n.walletLinkWalletDetailsNoticeTopUp,
-              style: Theme.of(context).textTheme.labelSmall!.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-            ),
-            const SizedBox(height: 6),
-            BulletList(
-              items: [
-                context.l10n.walletLinkWalletDetailsNoticeTopUpLink,
-              ],
-              style: Theme.of(context).textTheme.labelSmall,
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _WalletSummaryBalance extends StatelessWidget {
-  final Coin balance;
-  final bool hasEnoughBalance;
-
-  const _WalletSummaryBalance({
-    required this.balance,
-    required this.hasEnoughBalance,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return _WalletSummaryItem(
-      label: Text(context.l10n.walletBalance),
-      value: Row(
-        children: [
-          Text(
-            CryptocurrencyFormatter.formatAmount(balance),
-            style: hasEnoughBalance
-                ? null
-                : TextStyle(color: Theme.of(context).colors.iconsError),
-          ),
-          if (!hasEnoughBalance) ...[
-            const SizedBox(width: 4),
-            Padding(
-              padding: const EdgeInsets.only(top: 2),
-              child: VoicesAssets.icons.exclamation.buildIcon(
-                color: Theme.of(context).colors.iconsError,
-                size: 16,
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
-
-class _WalletSummaryAddress extends StatelessWidget {
-  final ShelleyAddress address;
-
-  const _WalletSummaryAddress({
-    required this.address,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return _WalletSummaryItem(
-      label: Text(context.l10n.walletAddress),
-      value: Row(
-        children: [
-          Text(WalletAddressFormatter.formatShort(address)),
-          const SizedBox(width: 4),
-          InkWell(
-            onTap: () async {
-              await Clipboard.setData(
-                ClipboardData(text: address.toBech32()),
-              );
-            },
-            child: Padding(
-              padding: const EdgeInsets.only(top: 2),
-              child: VoicesAssets.icons.clipboardCopy.buildIcon(size: 16),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _WalletSummaryItem extends StatelessWidget {
-  final Widget label;
-  final Widget value;
-
-  const _WalletSummaryItem({
-    required this.label,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: DefaultTextStyle(
-            style: Theme.of(context).textTheme.labelMedium!.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-            child: label,
-          ),
-        ),
-        Expanded(
-          child: DefaultTextStyle(
-            style: Theme.of(context).textTheme.labelMedium!,
-            child: value,
-          ),
-        ),
-      ],
     );
   }
 }
