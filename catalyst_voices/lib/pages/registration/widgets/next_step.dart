@@ -4,7 +4,7 @@ import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 
 class NextStep extends StatelessWidget {
-  final String data;
+  final String? data;
 
   const NextStep(
     this.data, {
@@ -22,12 +22,13 @@ class NextStep extends StatelessWidget {
         const SizedBox(height: 8),
         VoicesTextDivider(child: Text(context.l10n.yourNextStep)),
         const SizedBox(height: 12),
-        Text(
-          data,
-          style: theme.textTheme.bodySmall?.copyWith(color: textColor),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 12),
+        if (data != null)
+          Text(
+            data!,
+            style: theme.textTheme.bodySmall?.copyWith(color: textColor),
+            textAlign: TextAlign.center,
+          ),
+        if (data != null) const SizedBox(height: 12),
       ],
     );
   }
