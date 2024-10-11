@@ -8,6 +8,7 @@ import 'package:catalyst_voices_blocs/src/registration/state_data/keychain_state
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -25,17 +26,20 @@ abstract interface class KeychainCreationManager
 
   Future<void> downloadSeedPhrase();
 
-  Future<void> createKeychain();
+  Future<bool> createKeychain();
 }
 
 final class KeychainCreationCubit extends Cubit<KeychainStateData>
-    with UnlockPasswordMixin
+    with BlocErrorEmitterMixin, UnlockPasswordMixin
     implements KeychainCreationManager {
   final Downloader _downloader;
+  final RegistrationService _registrationService;
 
   KeychainCreationCubit({
     required Downloader downloader,
+    required RegistrationService registrationService,
   })  : _downloader = downloader,
+        _registrationService = registrationService,
         super(const KeychainStateData());
 
   SeedPhraseStateData get _seedPhraseStateData {
@@ -84,7 +88,8 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
   Future<void> downloadSeedPhrase() async {
     final mnemonic = _seedPhraseStateData.seedPhrase?.mnemonic;
     if (mnemonic == null) {
-      throw StateError('SeedPhrase is not generated. Make sure it exits first');
+      emitError(const LocalizedRegistrationSeedPhraseNotFoundException());
+      return;
     }
 
     FutureOr<Uri> buildWebMnemonicDownloadUri() {
@@ -109,7 +114,7 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
       await _downloader.download(uri, path: path);
     } catch (error, stackTrace) {
       _logger.severe('Downloading keychain failed', error, stackTrace);
-      // TODO(damian-molinski): Show snack bar
+      emitError(const LocalizedUnknownException());
     }
   }
 
@@ -119,8 +124,31 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
   }
 
   @override
-  Future<void> createKeychain() async {
-    // TODO(damian-molinski): implement
+  Future<bool> createKeychain() async {
+    try {
+      final seedPhrase = _seedPhraseStateData.seedPhrase;
+      final password = this.password;
+
+      if (seedPhrase == null) {
+        throw const LocalizedRegistrationSeedPhraseNotFoundException();
+      }
+      if (password.isNotValid) {
+        throw const LocalizedRegistrationUnlockPasswordNotFoundException();
+      }
+
+      await _registrationService.createKeychain(
+        seedPhrase: seedPhrase,
+        unlockPassword: password.value,
+      );
+
+      return true;
+    } catch (error, stack) {
+      _logger.severe('Create keychain', error, stack);
+
+      emitError(error);
+
+      return false;
+    }
   }
 
   void _buildSeedPhrase() {

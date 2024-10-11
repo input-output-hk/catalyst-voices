@@ -440,6 +440,9 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get registrationSeedPhraseNotFound => 'Seed phrase was not found. Make sure correct words are correct.';
 
   @override
+  String get registrationUnlockPasswordNotFound => 'Password was not found. Make sure valid password was created.';
+
+  @override
   String get walletLinkRoleChooserTitle => 'How do you want to participate in Catalyst?';
 
   @override

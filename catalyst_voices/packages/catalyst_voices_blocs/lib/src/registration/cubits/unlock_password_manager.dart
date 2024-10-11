@@ -9,6 +9,8 @@ abstract interface class UnlockPasswordManager {
 }
 
 mixin UnlockPasswordMixin implements UnlockPasswordManager {
+  UnlockPassword get password => _state.password;
+
   UnlockPasswordState _state = const UnlockPasswordState();
 
   void onUnlockPasswordStateChanged(UnlockPasswordState data);

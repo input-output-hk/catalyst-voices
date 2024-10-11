@@ -21,7 +21,7 @@ abstract interface class RecoverManager implements UnlockPasswordManager {
 }
 
 final class RecoverCubit extends Cubit<RecoverStateData>
-    with UnlockPasswordMixin
+    with BlocErrorEmitterMixin, UnlockPasswordMixin
     implements RecoverManager {
   final RegistrationService _registrationService;
 

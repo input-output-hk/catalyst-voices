@@ -54,6 +54,17 @@ final class LocalizedRegistrationSeedPhraseNotFoundException
       context.l10n.registrationSeedPhraseNotFound;
 }
 
+/// Localized exception thrown when attempting to execute register operation
+/// which requires unlock password but non was found.
+final class LocalizedRegistrationUnlockPasswordNotFoundException
+    extends LocalizedRegistrationException {
+  const LocalizedRegistrationUnlockPasswordNotFoundException();
+
+  @override
+  String message(BuildContext context) =>
+      context.l10n.registrationUnlockPasswordNotFound;
+}
+
 /// A generic error for describing a failure during user registration.
 final class LocalizedRegistrationUnknownException
     extends LocalizedRegistrationException {

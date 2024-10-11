@@ -17,7 +17,8 @@ import 'package:result_type/result_type.dart';
 final _logger = Logger('RegistrationCubit');
 
 /// Manages the registration state.
-final class RegistrationCubit extends Cubit<RegistrationState> {
+final class RegistrationCubit extends Cubit<RegistrationState>
+    with BlocErrorEmitterMixin {
   final KeychainCreationCubit _keychainCreationCubit;
   final WalletLinkCubit _walletLinkCubit;
   final RecoverCubit _recoverCubit;
@@ -28,6 +29,7 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     required this.registrationService,
   })  : _keychainCreationCubit = KeychainCreationCubit(
           downloader: downloader,
+          registrationService: registrationService,
         ),
         _walletLinkCubit = WalletLinkCubit(
           registrationService: registrationService,
@@ -39,6 +41,10 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     _keychainCreationCubit.stream.listen(_onKeychainStateDataChanged);
     _walletLinkCubit.stream.listen(_onWalletLinkStateDataChanged);
     _recoverCubit.stream.listen(_onRecoverStateDataChanged);
+
+    _keychainCreationCubit.errorStream.listen(emitError);
+    _walletLinkCubit.errorStream.listen(emitError);
+    _recoverCubit.errorStream.listen(emitError);
 
     // Emits initialization state
     emit(
@@ -66,6 +72,7 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
   Future<void> close() {
     _keychainCreationCubit.close();
     _walletLinkCubit.close();
+    _recoverCubit.close();
     return super.close();
   }
 
