@@ -6,6 +6,7 @@ import 'package:catalyst_voices/pages/registration/registration_exit_confirm_dia
 import 'package:catalyst_voices/pages/registration/registration_info_panel.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -30,9 +31,14 @@ class RegistrationDialog extends StatelessWidget {
         onPopInvokedWithResult: (didPop, result) {
           unawaited(_confirmedExit(context, didPop: didPop));
         },
-        child: const VoicesTwoPaneDialog(
-          left: RegistrationInfoPanel(),
-          right: RegistrationDetailsPanel(),
+        child: BlocBuilder<RegistrationCubit, RegistrationState>(
+          builder: (context, state) {
+            return VoicesTwoPaneDialog(
+              left: const RegistrationInfoPanel(),
+              right: const RegistrationDetailsPanel(),
+              showCloseButton: state.step is! AccountCompletedStep,
+            );
+          },
         ),
       ),
     );
