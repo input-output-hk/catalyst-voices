@@ -1,6 +1,7 @@
 // ignore_for_file: one_member_abstracts
 
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_blocs/src/registration/cubits/unlock_password_manager.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
@@ -11,7 +12,7 @@ import 'package:result_type/result_type.dart';
 
 final _logger = Logger('RecoverCubit');
 
-abstract interface class RecoverManager {
+abstract interface class RecoverManager implements UnlockPasswordManager {
   Future<void> checkLocalKeychains();
 
   void setSeedPhraseWords(List<SeedPhraseWord> words);
@@ -20,6 +21,7 @@ abstract interface class RecoverManager {
 }
 
 final class RecoverCubit extends Cubit<RecoverStateData>
+    with UnlockPasswordMixin
     implements RecoverManager {
   final RegistrationService _registrationService;
 
@@ -97,6 +99,11 @@ final class RecoverCubit extends Cubit<RecoverStateData>
       const exception = LocalizedUnknownException();
       emit(state.copyWith(accountDetails: Optional(Failure(exception))));
     }
+  }
+
+  @override
+  void onUnlockPasswordStateChanged(UnlockPasswordState data) {
+    emit(state.copyWith(unlockPasswordState: data));
   }
 }
 

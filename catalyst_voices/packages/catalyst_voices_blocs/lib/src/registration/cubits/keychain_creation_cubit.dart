@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:convert' show utf8;
 
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_blocs/src/registration/cubits/unlock_password_manager.dart';
 import 'package:catalyst_voices_blocs/src/registration/state_data/keychain_state_data.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -12,7 +13,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 final _logger = Logger('KeychainCreationCubit');
 
-abstract interface class KeychainCreationManager {
+abstract interface class KeychainCreationManager
+    implements UnlockPasswordManager {
   void buildSeedPhrase({
     bool forceRefresh = false,
   });
@@ -23,14 +25,11 @@ abstract interface class KeychainCreationManager {
 
   Future<void> downloadSeedPhrase();
 
-  void setPassword(String value);
-
-  void setConfirmPassword(String value);
-
   Future<void> createKeychain();
 }
 
 final class KeychainCreationCubit extends Cubit<KeychainStateData>
+    with UnlockPasswordMixin
     implements KeychainCreationManager {
   final Downloader _downloader;
 
@@ -46,16 +45,6 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
   set _seedPhraseStateData(SeedPhraseStateData newValue) {
     if (state.seedPhraseStateData != newValue) {
       emit(state.copyWith(seedPhraseStateData: newValue));
-    }
-  }
-
-  UnlockPasswordState get _unlockPasswordState {
-    return state.unlockPasswordState;
-  }
-
-  set _unlockPasswordState(UnlockPasswordState newValue) {
-    if (state.unlockPasswordState != newValue) {
-      emit(state.copyWith(unlockPasswordState: newValue));
     }
   }
 
@@ -125,43 +114,13 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
   }
 
   @override
-  void setPassword(String value) {
-    _updateUnlockPasswordState(password: value);
-  }
-
-  @override
-  void setConfirmPassword(String value) {
-    _updateUnlockPasswordState(confirmPassword: value);
+  void onUnlockPasswordStateChanged(UnlockPasswordState data) {
+    emit(state.copyWith(unlockPasswordState: data));
   }
 
   @override
   Future<void> createKeychain() async {
     // TODO(damian-molinski): implement
-  }
-
-  void _updateUnlockPasswordState({
-    String? password,
-    String? confirmPassword,
-  }) {
-    password ??= _unlockPasswordState.password;
-    confirmPassword ??= _unlockPasswordState.confirmPassword;
-
-    const minimumLength = PasswordStrength.minimumLength;
-
-    final passwordStrength = PasswordStrength.calculate(password);
-    final correctLength = password.length >= minimumLength;
-    final matching = password == confirmPassword;
-    final hasConfirmPassword = confirmPassword.isNotEmpty;
-
-    _unlockPasswordState = _unlockPasswordState.copyWith(
-      password: password,
-      confirmPassword: confirmPassword,
-      passwordStrength: passwordStrength,
-      showPasswordStrength: password.isNotEmpty,
-      minPasswordLength: minimumLength,
-      showPasswordMisMatch: correctLength && hasConfirmPassword && !matching,
-      isNextEnabled: correctLength && matching,
-    );
   }
 
   void _buildSeedPhrase() {
