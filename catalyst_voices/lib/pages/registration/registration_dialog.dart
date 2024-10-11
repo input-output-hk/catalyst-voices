@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices/pages/registration/registration_details_panel.dart';
 import 'package:catalyst_voices/pages/registration/registration_exit_confirm_dialog.dart';
@@ -9,7 +10,7 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class RegistrationDialog extends StatelessWidget {
+class RegistrationDialog extends StatefulWidget {
   const RegistrationDialog._();
 
   static Future<void> show(BuildContext context) {
@@ -22,9 +23,34 @@ class RegistrationDialog extends StatelessWidget {
   }
 
   @override
+  State<RegistrationDialog> createState() => _RegistrationDialogState();
+}
+
+class _RegistrationDialogState extends State<RegistrationDialog>
+    with ErrorHandlerStateMixin {
+  late final RegistrationCubit _cubit;
+  StreamSubscription<Object>? _errorSub;
+
+  @override
+  void initState() {
+    super.initState();
+    _cubit = Dependencies.instance.get<RegistrationCubit>();
+    _errorSub = _cubit.errorStream.listen(handleError);
+  }
+
+  @override
+  void dispose() {
+    unawaited(_errorSub?.cancel());
+    _errorSub = null;
+
+    unawaited(_cubit.close());
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => Dependencies.instance.get<RegistrationCubit>(),
+    return BlocProvider.value(
+      value: _cubit,
       child: PopScope(
         canPop: false,
         onPopInvokedWithResult: (didPop, result) {
