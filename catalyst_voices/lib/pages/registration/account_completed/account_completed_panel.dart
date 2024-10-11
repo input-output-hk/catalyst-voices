@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
 import 'package:catalyst_voices/pages/registration/widgets/next_step.dart';
+import 'package:catalyst_voices/routes/routing/account_route.dart';
 import 'package:catalyst_voices/routes/routing/spaces_route.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -71,7 +72,10 @@ class AccountCompletedPanel extends StatelessWidget {
           const DiscoveryRoute().go(context);
         }),
         const SizedBox(height: 10),
-        _ReviewMyAccountButton(onTap: () {}),
+        _ReviewMyAccountButton(onTap: () {
+          Navigator.pop(context);
+          const AccountRoute().go(context);
+        }),
       ],
     );
   }
