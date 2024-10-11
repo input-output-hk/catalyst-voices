@@ -6,8 +6,8 @@ enum RecoverSeedPhraseStage {
   /// Where user enters 12 words for seed phrase.
   seedPhrase,
 
-  /// Shows details about linked wallet to the account.
-  linkedWallet,
+  /// Shows details about restored account.
+  accountDetails,
 
   /// Explains why need unlock password and where it can be used. This
   /// device only.
