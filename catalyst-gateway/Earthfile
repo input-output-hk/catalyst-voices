@@ -84,15 +84,8 @@ all-hosts-build:
 # package-cat-gateway : Create a deployable container for catalyst-gateway
 package:
     FROM debian:12.7-slim
-
     WORKDIR /cat-gateway
-
-    # RUN apk add gcc bash
-
     COPY +build/cat-gateway .
-    # COPY ./scripts/entry.sh .
-
-    # ENTRYPOINT ./entry.sh
     ENTRYPOINT [ "./cat-gateway", "run" ]
 
 # Publish cat-gateway
