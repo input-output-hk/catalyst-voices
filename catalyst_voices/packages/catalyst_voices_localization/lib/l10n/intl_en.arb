@@ -557,6 +557,10 @@
   "@registrationSeedPhraseNotFound": {
     "description": "Error message shown when attempting to register or recover account but seed phrase was not found"
   },
+  "registrationUnlockPasswordNotFound": "Password was not found. Make sure valid password was created.",
+  "@registrationUnlockPasswordNotFound": {
+    "description": "Error message shown when attempting to register or recover account but password was not found"
+  },
   "walletLinkRoleChooserTitle": "How do you want to participate in Catalyst?",
   "@walletLinkRoleChooserTitle": {
     "description": "A title on the role chooser screen in registration."

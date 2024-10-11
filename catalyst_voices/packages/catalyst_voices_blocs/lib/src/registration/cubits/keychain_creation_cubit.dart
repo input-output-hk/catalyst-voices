@@ -100,8 +100,7 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
   Future<void> downloadSeedPhrase() async {
     final mnemonic = _seedPhraseStateData.seedPhrase?.mnemonic;
     if (mnemonic == null) {
-      // TODO(damian-molinski): Use better exception
-      emitError(const LocalizedUnknownException());
+      emitError(const LocalizedRegistrationSeedPhraseNotFoundException());
       return;
     }
 
@@ -148,10 +147,10 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
       final password = _unlockPasswordState.password;
 
       if (seedPhrase == null) {
-        throw const LocalizedUnknownException();
+        throw const LocalizedRegistrationSeedPhraseNotFoundException();
       }
       if (password.isEmpty) {
-        throw const LocalizedUnknownException();
+        throw const LocalizedRegistrationUnlockPasswordNotFoundException();
       }
 
       await _registrationService.createKeychain(
