@@ -7,39 +7,12 @@ import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/src/registration/registration_transaction_builder.dart';
 
 // TODO(damian-molinski): remove once recover account is implemented
-final _testNetAddress = ShelleyAddress(
-  const [
-    96,
-    130,
-    224,
-    22,
-    130,
-    137,
-    137,
-    205,
-    157,
-    128,
-    155,
-    80,
-    214,
-    151,
-    109,
-    158,
-    250,
-    155,
-    197,
-    178,
-    193,
-    167,
-    141,
-    75,
-    59,
-    250,
-    27,
-    184,
-    59,
-  ],
+/* cSpell:disable */
+final _testNetAddress = ShelleyAddress.fromBech32(
+  'addr_test1vzpwq95z3xyum8vqndgdd'
+  '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
 );
+/* cSpell:enable */
 
 /// Manages the user registration.
 final class RegistrationService {
