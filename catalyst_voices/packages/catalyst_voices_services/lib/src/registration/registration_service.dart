@@ -75,6 +75,9 @@ final class RegistrationService {
   }
 
   // TODO(damian-molinski): to be implemented
+  // Note. Returned type will be changed because we'll not be able to
+  // get a wallet from backend just from seed phrase.
+  // To be decided what data can we get from backend.
   Future<CardanoWalletDetails> recoverCardanoWalletDetails(
     SeedPhrase seedPhrase,
   ) async {
