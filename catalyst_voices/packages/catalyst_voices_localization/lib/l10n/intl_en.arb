@@ -545,6 +545,22 @@
       }
     }
   },
+  "registrationTransactionFailed": "Transaction failed",
+  "@registrationTransactionFailed": {
+    "description": "Indicates an error when submitting a registration transaction failed."
+  },
+  "registrationInsufficientBalance": "Insufficient balance, please top up your wallet.",
+  "@registrationInsufficientBalance": {
+    "description": "Indicates an error when preparing a transaction has failed due to low wallet balance."
+  },
+  "registrationSeedPhraseNotFound": "Seed phrase was not found. Make sure correct words are correct.",
+  "@registrationSeedPhraseNotFound": {
+    "description": "Error message shown when attempting to register or recover account but seed phrase was not found"
+  },
+  "registrationUnlockPasswordNotFound": "Password was not found. Make sure valid password was created.",
+  "@registrationUnlockPasswordNotFound": {
+    "description": "Error message shown when attempting to register or recover account but password was not found"
+  },
   "walletLinkRoleChooserTitle": "How do you want to participate in Catalyst?",
   "@walletLinkRoleChooserTitle": {
     "description": "A title on the role chooser screen in registration."
@@ -860,5 +876,8 @@
   "recoverySeedPhraseInstructionsTitle": "Restore your Catalyst Keychain with \u2028your 12 security words.",
   "recoverySeedPhraseInstructionsSubtitle": "Enter your security words in the correct order, and sign into your Catalyst account on a new device.",
   "recoverySeedPhraseInputTitle": "Restore your Catalyst Keychain with \u2028your 12 security words",
-  "recoverySeedPhraseInputSubtitle": "Enter each word of your Catalyst Key in the right order \u2028to bring your Catalyst account to this device."
+  "recoverySeedPhraseInputSubtitle": "Enter each word of your Catalyst Key in the right order \u2028to bring your Catalyst account to this device.",
+  "recoveryAccountTitle": "Catalyst account recovery",
+  "recoveryAccountSuccessTitle": "Keychain recovered successfully!",
+  "recoveryAccountDetailsAction": "Set unlock password for this device"
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/pages/registration/recover/bloc_recover_builder.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
@@ -59,9 +61,20 @@ class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel> {
           onResetTap: _resetControllerWords,
         ),
         const SizedBox(height: 12),
-        const _BlocNavigation(),
+        _BlocNavigation(
+          onNextTap: _recoverAccountAndGoNextStage,
+        ),
       ],
     );
+  }
+
+  void _recoverAccountAndGoNextStage() {
+    final registration = RegistrationCubit.of(context);
+
+    // Note. success or failure will be shown in next stage
+    unawaited(registration.recover.recoverAccount());
+
+    registration.nextStep();
   }
 
   Future<void> _uploadSeedPhrase() async {
@@ -105,7 +118,11 @@ class _BlocSeedPhraseField extends StatelessWidget {
 }
 
 class _BlocNavigation extends StatelessWidget {
-  const _BlocNavigation();
+  final VoidCallback onNextTap;
+
+  const _BlocNavigation({
+    required this.onNextTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -113,6 +130,7 @@ class _BlocNavigation extends StatelessWidget {
       selector: (state) => state.isSeedPhraseValid,
       builder: (context, state) {
         return RegistrationBackNextNavigation(
+          onNextTap: onNextTap,
           isNextEnabled: state,
         );
       },

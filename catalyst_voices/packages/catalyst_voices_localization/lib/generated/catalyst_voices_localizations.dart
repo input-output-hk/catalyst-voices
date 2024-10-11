@@ -820,6 +820,30 @@ abstract class VoicesLocalizations {
   /// **'1 {role} registration to Catalyst Keychain'**
   String walletLinkTransactionRoleItem(String role);
 
+  /// Indicates an error when submitting a registration transaction failed.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction failed'**
+  String get registrationTransactionFailed;
+
+  /// Indicates an error when preparing a transaction has failed due to low wallet balance.
+  ///
+  /// In en, this message translates to:
+  /// **'Insufficient balance, please top up your wallet.'**
+  String get registrationInsufficientBalance;
+
+  /// Error message shown when attempting to register or recover account but seed phrase was not found
+  ///
+  /// In en, this message translates to:
+  /// **'Seed phrase was not found. Make sure correct words are correct.'**
+  String get registrationSeedPhraseNotFound;
+
+  /// Error message shown when attempting to register or recover account but password was not found
+  ///
+  /// In en, this message translates to:
+  /// **'Password was not found. Make sure valid password was created.'**
+  String get registrationUnlockPasswordNotFound;
+
   /// A title on the role chooser screen in registration.
   ///
   /// In en, this message translates to:
@@ -1605,6 +1629,24 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Enter each word of your Catalyst Key in the right order  to bring your Catalyst account to this device.'**
   String get recoverySeedPhraseInputSubtitle;
+
+  /// No description provided for @recoveryAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst account recovery'**
+  String get recoveryAccountTitle;
+
+  /// No description provided for @recoveryAccountSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Keychain recovered successfully!'**
+  String get recoveryAccountSuccessTitle;
+
+  /// No description provided for @recoveryAccountDetailsAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Set unlock password for this device'**
+  String get recoveryAccountDetailsAction;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

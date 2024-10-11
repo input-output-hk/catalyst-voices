@@ -1,4 +1,6 @@
 export 'downloader/downloader.dart';
+export 'registration/registration_service.dart';
+export 'registration/registration_transaction_builder.dart';
 export 'storage/dummy_auth_storage.dart';
 export 'storage/secure_storage.dart';
 export 'storage/storage.dart';
