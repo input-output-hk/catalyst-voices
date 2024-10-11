@@ -20,6 +20,7 @@ abstract interface class RecoverManager {
 }
 
 final class RecoverCubit extends Cubit<RecoverStateData>
+    with BlocErrorEmitterMixin
     implements RecoverManager {
   final RegistrationService _registrationService;
 

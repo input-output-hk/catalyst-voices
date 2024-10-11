@@ -24,6 +24,13 @@ final class RegistrationService {
     this._cardano,
   );
 
+  Future<void> createKeychain({
+    required SeedPhrase seedPhrase,
+    required String unlockPassword,
+  }) async {
+    // TODO(damian-molinski): To be implemented
+  }
+
   /// Returns the available cardano wallet extensions.
   Future<List<CardanoWallet>> getCardanoWallets() {
     return _cardano.getWallets();

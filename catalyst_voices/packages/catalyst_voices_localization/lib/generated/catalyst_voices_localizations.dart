@@ -838,6 +838,12 @@ abstract class VoicesLocalizations {
   /// **'Seed phrase was not found. Make sure correct words are correct.'**
   String get registrationSeedPhraseNotFound;
 
+  /// Error message shown when attempting to register or recover account but password was not found
+  ///
+  /// In en, this message translates to:
+  /// **'Password was not found. Make sure valid password was created.'**
+  String get registrationUnlockPasswordNotFound;
+
   /// A title on the role chooser screen in registration.
   ///
   /// In en, this message translates to:
