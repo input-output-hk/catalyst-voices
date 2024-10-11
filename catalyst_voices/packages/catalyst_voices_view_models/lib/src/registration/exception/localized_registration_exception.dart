@@ -43,7 +43,8 @@ final class LocalizedRegistrationTransactionException
       context.l10n.registrationTransactionFailed;
 }
 
-/// An exception thrown when submitting a registration transaction fails.
+/// Localized exception thrown when attempting to execute register operation
+/// which requires seed phrase but non was found.
 final class LocalizedRegistrationSeedPhraseNotFoundException
     extends LocalizedRegistrationException {
   const LocalizedRegistrationSeedPhraseNotFoundException();

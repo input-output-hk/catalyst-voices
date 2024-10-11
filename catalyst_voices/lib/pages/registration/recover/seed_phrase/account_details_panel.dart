@@ -36,7 +36,7 @@ class AccountDetailsPanel extends StatelessWidget {
         Expanded(
           child: SingleChildScrollView(
             child: _BlocAccountSummery(
-              onRetry: () => unawaited(retryAccountRestore(context)),
+              onRetry: () => unawaited(_retryAccountRestore(context)),
             ),
           ),
         ),
@@ -46,7 +46,7 @@ class AccountDetailsPanel extends StatelessWidget {
     );
   }
 
-  Future<void> retryAccountRestore(BuildContext context) async {
+  Future<void> _retryAccountRestore(BuildContext context) async {
     final recover = RegistrationCubit.of(context).recover;
     await recover.recoverAccount();
   }
@@ -126,15 +126,9 @@ class _RecoverAccountFailure extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        VoicesErrorIndicator(
-          message: exception.message(context),
-          onRetry: onRetry,
-        ),
-      ],
+    return VoicesErrorIndicator(
+      message: exception.message(context),
+      onRetry: onRetry,
     );
   }
 }
