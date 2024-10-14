@@ -16,11 +16,11 @@ class RegistrationTransactionBuilder {
   /// The transaction config with current network parameters.
   final TransactionBuilderConfig transactionConfig;
 
+  /// The key pair used to sign the user registration certificate.
+  final Ed25519KeyPair keyPair;
+
   /// The network ID where the transaction will be submitted.
   final NetworkId networkId;
-
-  /// The catalyst user seed phrase from which role specific keys are derived.
-  final SeedPhrase seedPhrase;
 
   /// The user selected roles for which the user is registering.
   final Set<AccountRole> roles;
@@ -39,8 +39,8 @@ class RegistrationTransactionBuilder {
 
   const RegistrationTransactionBuilder({
     required this.transactionConfig,
+    required this.keyPair,
     required this.networkId,
-    required this.seedPhrase,
     required this.roles,
     required this.changeAddress,
     required this.rewardAddresses,
@@ -66,7 +66,6 @@ class RegistrationTransactionBuilder {
   }
 
   Future<RegistrationMetadata> _buildMetadataEnvelope() async {
-    final keyPair = await seedPhrase.deriveKeyPair();
     final cert = await _generateX509Certificate(keyPair: keyPair);
     final derCert = cert.toDer();
 
@@ -82,7 +81,7 @@ class RegistrationTransactionBuilder {
           // TODO(dtscalac): when RBAC specification will define other roles
           // they should be registered here
           RoleData(
-            roleNumber: 0,
+            roleNumber: AccountRole.root.roleNumber,
             roleSigningKey: KeyReference(
               localRef: const LocalKeyReference(
                 keyType: LocalKeyReferenceType.x509Certs,
