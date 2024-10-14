@@ -55,7 +55,7 @@ class AccountCompletedPanel extends StatelessWidget {
                         List<AccountRole>>(
                       selector: (state) =>
                           state.walletLinkStateData.selectedRoles?.toList() ??
-                          [],
+                          state.walletLinkStateData.defaultRoles,
                       builder: (context, roles) {
                         return _SummaryItem(
                           image: VoicesAssets.images.registrationSummaryRoles,
