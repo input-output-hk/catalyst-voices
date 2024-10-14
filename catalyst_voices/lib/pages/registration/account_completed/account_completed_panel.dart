@@ -197,16 +197,16 @@ class _SummaryItem extends StatelessWidget {
               ),
             ],
           ),
-          if (footer != null)
+          if (footer != null) ...[
             const VoicesDivider(
               indent: 70,
               endIndent: 0,
             ),
-          if (footer != null)
             Padding(
               padding: const EdgeInsets.only(left: 70),
               child: footer,
             ),
+          ],
         ],
       ),
     );

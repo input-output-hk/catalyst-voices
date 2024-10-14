@@ -15,6 +15,7 @@ class NextStep extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textColor = theme.colors.textOnPrimaryLevel0;
+    final data = this.data;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -22,13 +23,14 @@ class NextStep extends StatelessWidget {
         const SizedBox(height: 8),
         VoicesTextDivider(child: Text(context.l10n.yourNextStep)),
         const SizedBox(height: 12),
-        if (data != null)
+        if (data != null) ...[
           Text(
-            data!,
+            data,
             style: theme.textTheme.bodySmall?.copyWith(color: textColor),
             textAlign: TextAlign.center,
           ),
-        if (data != null) const SizedBox(height: 12),
+          const SizedBox(height: 12),
+        ],
       ],
     );
   }
