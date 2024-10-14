@@ -561,6 +561,10 @@
   "@registrationUnlockPasswordNotFound": {
     "description": "Error message shown when attempting to register or recover account but password was not found"
   },
+  "registrationWalletNotFound": "Wallet not found",
+  "@registrationWalletNotFound": {
+    "description": "Error message shown when connect wallet but matching was not found"
+  },
   "walletLinkRoleChooserTitle": "How do you want to participate in Catalyst?",
   "@walletLinkRoleChooserTitle": {
     "description": "A title on the role chooser screen in registration."

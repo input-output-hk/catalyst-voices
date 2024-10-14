@@ -73,18 +73,18 @@ final class RecoverCubit extends Cubit<RecoverStateData>
         return;
       }
 
-      final walletDetails =
+      final walletHeader =
           await _registrationService.recoverCardanoWalletDetails(seedPhrase);
 
       final accountDetails = AccountSummaryData(
         walletConnection: WalletConnectionData(
-          name: walletDetails.wallet.name,
-          icon: walletDetails.wallet.icon,
+          name: walletHeader.meta.name,
+          icon: walletHeader.meta.icon,
         ),
         walletSummary: WalletSummaryData(
-          balance: CryptocurrencyFormatter.formatAmount(walletDetails.balance),
-          address: WalletAddressFormatter.formatShort(walletDetails.address),
-          clipboardAddress: walletDetails.address.toBech32(),
+          balance: CryptocurrencyFormatter.formatAmount(walletHeader.balance),
+          address: WalletAddressFormatter.formatShort(walletHeader.address),
+          clipboardAddress: walletHeader.address.toBech32(),
           showLowBalance: false,
         ),
       );
