@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
+import 'package:catalyst_voices/common/ext/ext.dart';
 import 'package:catalyst_voices/pages/registration/widgets/next_step.dart';
 import 'package:catalyst_voices/routes/routing/account_route.dart';
 import 'package:catalyst_voices/routes/routing/spaces_route.dart';
@@ -37,8 +38,8 @@ class AccountCompletedPanel extends StatelessWidget {
                     ),
                     BlocSelector<RegistrationCubit, RegistrationState, String>(
                       selector: (state) =>
-                          state.walletLinkStateData.selectedWallet?.wallet
-                              .name ??
+                          state.walletLinkStateData.selectedWallet?.wallet.name
+                              .capitalize() ??
                           '',
                       builder: (context, walletName) {
                         return _SummaryItem(
