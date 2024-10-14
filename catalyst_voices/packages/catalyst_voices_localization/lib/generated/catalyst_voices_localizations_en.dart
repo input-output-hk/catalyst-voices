@@ -590,7 +590,7 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get deleteKeychainDialogInputLabel => 'Confirm removal';
 
   @override
-  String get deleteKeychainDialogErrorText => 'Error. Please type \'Remove keychain\' to remove your account from this device.';
+  String get deleteKeychainDialogErrorText => 'Error. Please type \'Remove Keychain\' to remove your account from this device.';
 
   @override
   String get deleteKeychainDialogRemovingPhrase => 'Remove Keychain';

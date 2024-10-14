@@ -1111,7 +1111,7 @@ abstract class VoicesLocalizations {
   /// An error text on text field on delete keychain dialog
   ///
   /// In en, this message translates to:
-  /// **'Error. Please type \'Remove keychain\' to remove your account from this device.'**
+  /// **'Error. Please type \'Remove Keychain\' to remove your account from this device.'**
   String get deleteKeychainDialogErrorText;
 
   /// A removing phrase on delete keychain dialog
