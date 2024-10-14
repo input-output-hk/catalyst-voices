@@ -7,6 +7,7 @@ import 'package:catalyst_voices/pages/registration/registration_exit_confirm_dia
 import 'package:catalyst_voices/pages/registration/registration_info_panel.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -56,9 +57,15 @@ class _RegistrationDialogState extends State<RegistrationDialog>
         onPopInvokedWithResult: (didPop, result) {
           unawaited(_confirmedExit(context, didPop: didPop));
         },
-        child: const VoicesTwoPaneDialog(
-          left: RegistrationInfoPanel(),
-          right: RegistrationDetailsPanel(),
+        child: BlocSelector<RegistrationCubit, RegistrationState, bool>(
+          selector: (state) => state.step is! AccountCompletedStep,
+          builder: (context, showCloseButton) {
+            return VoicesTwoPaneDialog(
+              left: const RegistrationInfoPanel(),
+              right: const RegistrationDetailsPanel(),
+              showCloseButton: showCloseButton,
+            );
+          },
         ),
       ),
     );

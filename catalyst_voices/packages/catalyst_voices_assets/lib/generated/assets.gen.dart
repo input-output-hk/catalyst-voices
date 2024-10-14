@@ -1221,6 +1221,18 @@ class $AssetsImagesGen {
   AssetGenImage get proposalBackground2 =>
       const AssetGenImage('assets/images/proposal_background_2.webp');
 
+  /// File path: assets/images/registration_summary_keychain.png
+  AssetGenImage get registrationSummaryKeychain =>
+      const AssetGenImage('assets/images/registration_summary_keychain.png');
+
+  /// File path: assets/images/registration_summary_roles.png
+  AssetGenImage get registrationSummaryRoles =>
+      const AssetGenImage('assets/images/registration_summary_roles.png');
+
+  /// File path: assets/images/registration_summary_wallet.png
+  AssetGenImage get registrationSummaryWallet =>
+      const AssetGenImage('assets/images/registration_summary_wallet.png');
+
   /// File path: assets/images/role_drep.webp
   AssetGenImage get roleDrep =>
       const AssetGenImage('assets/images/role_drep.webp');
@@ -1249,6 +1261,10 @@ class $AssetsImagesGen {
   AssetGenImage get taskIllustration =>
       const AssetGenImage('assets/images/task_illustration.webp');
 
+  /// File path: assets/images/welcome_illustration.webp
+  AssetGenImage get welcomeIllustration =>
+      const AssetGenImage('assets/images/welcome_illustration.webp');
+
   /// File path: assets/images/x.svg
   SvgGenImage get x => const SvgGenImage('assets/images/x.svg');
 
@@ -1274,6 +1290,9 @@ class $AssetsImagesGen {
         linkedinMono,
         proposalBackground1,
         proposalBackground2,
+        registrationSummaryKeychain,
+        registrationSummaryRoles,
+        registrationSummaryWallet,
         roleDrep,
         roleInfoDrep,
         roleInfoProposer,
@@ -1281,6 +1300,7 @@ class $AssetsImagesGen {
         roleProposer,
         roleVoter,
         taskIllustration,
+        welcomeIllustration,
         x,
         xMono
       ];
