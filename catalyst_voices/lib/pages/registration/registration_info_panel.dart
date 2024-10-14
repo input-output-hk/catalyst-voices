@@ -131,7 +131,9 @@ class RegistrationInfoPanel extends StatelessWidget {
         ),
       CreateKeychainStep(:final stage) => buildKeychainStageHeader(stage),
       WalletLinkStep(:final stage) => buildWalletLinkStageHeader(stage),
-      AccountCompletedStep() => _HeaderStrings(title: 'TODO'),
+      AccountCompletedStep() => _HeaderStrings(
+          title: context.l10n.recoverCatalystKeychain,
+        ),
     };
   }
 }

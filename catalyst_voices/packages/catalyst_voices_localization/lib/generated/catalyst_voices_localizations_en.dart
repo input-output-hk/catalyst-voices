@@ -870,4 +870,16 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get recoveryUnlockPasswordInstructionsSubtitle => 'With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.    But it can be a bit tedious to enter every single time you want to use the app.    In this next step, you\'ll set your Unlock Password for your current device. It\'s like a shortcut for proving ownership of your Keychain.    Whenever you recover your account for the first time on a new device, you\'ll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.';
+
+  @override
+  String get recoverySuccessTitle => 'Congratulations your Catalyst  Keychain is restored!';
+
+  @override
+  String get recoverySuccessSubtitle => 'You have successfully restored your Catalyst Keychain, and unlocked Catalyst Voices on this device.';
+
+  @override
+  String get recoverySuccessGoToDashboard => 'Jump into the Discovery space / Dashboard';
+
+  @override
+  String get recoverySuccessGoAccount => 'Check my account';
 }
