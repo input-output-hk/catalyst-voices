@@ -1,4 +1,6 @@
 export 'downloader/downloader.dart';
+export 'keychain/key_derivation_service.dart';
+export 'keychain/keychain_service.dart';
 export 'registration/registration_service.dart';
 export 'registration/registration_transaction_builder.dart';
 export 'storage/dummy_auth_storage.dart';

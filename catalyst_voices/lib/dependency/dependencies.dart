@@ -28,7 +28,9 @@ final class Dependencies extends DependencyProvider {
           authenticationRepository: get(),
         ),
       )
-      ..registerLazySingleton<SessionBloc>(SessionBloc.new)
+      ..registerLazySingleton<SessionBloc>(
+        () => SessionBloc(get<KeychainService>()),
+      )
       // Factory will rebuild it each time needed
       ..registerFactory<RegistrationCubit>(() {
         return RegistrationCubit(
@@ -59,9 +61,19 @@ final class Dependencies extends DependencyProvider {
     );
     registerLazySingleton<Downloader>(Downloader.new);
     registerLazySingleton<CatalystCardano>(() => CatalystCardano.instance);
+
+    registerLazySingleton<KeyDerivationService>(KeyDerivationService.new);
+    registerLazySingleton<KeychainService>(
+      () => KeychainService(
+        get<KeyDerivationService>(),
+        get<Vault>(),
+      ),
+    );
     registerLazySingleton<RegistrationService>(
       () => RegistrationService(
         get<TransactionConfigRepository>(),
+        get<KeychainService>(),
+        get<KeyDerivationService>(),
         get<CatalystCardano>(),
       ),
     );

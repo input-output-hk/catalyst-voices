@@ -4,7 +4,7 @@ import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
-import 'package:catalyst_voices_services/src/registration/registration_transaction_builder.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 
 // TODO(damian-molinski): remove once recover account is implemented
 /* cSpell:disable */
@@ -17,18 +17,26 @@ final _testNetAddress = ShelleyAddress.fromBech32(
 /// Manages the user registration.
 final class RegistrationService {
   final TransactionConfigRepository _transactionConfigRepository;
+  final KeychainService _keychainService;
+  final KeyDerivationService _keyDerivationService;
   final CatalystCardano _cardano;
 
   const RegistrationService(
     this._transactionConfigRepository,
+    this._keychainService,
+    this._keyDerivationService,
     this._cardano,
   );
 
+  /// Initializes the keychain to store user registration data.
   Future<void> createKeychain({
     required SeedPhrase seedPhrase,
     required String unlockPassword,
   }) async {
-    // TODO(damian-molinski): To be implemented
+    await _keychainService.init(
+      seedPhrase: seedPhrase,
+      unlockFactor: PasswordLockFactor(unlockPassword),
+    );
   }
 
   /// Returns the available cardano wallet extensions.
@@ -94,10 +102,15 @@ final class RegistrationService {
     try {
       final walletApi = await wallet.enable();
 
+      final keyPair = await _keyDerivationService.deriveAccountRoleKeyPair(
+        seedPhrase: seedPhrase,
+        role: AccountRole.root,
+      );
+
       final registrationBuilder = RegistrationTransactionBuilder(
         transactionConfig: await _transactionConfigRepository.fetch(networkId),
+        keyPair: keyPair,
         networkId: networkId,
-        seedPhrase: seedPhrase,
         roles: roles,
         changeAddress: await walletApi.getChangeAddress(),
         rewardAddresses: await walletApi.getRewardAddresses(),
@@ -108,7 +121,7 @@ final class RegistrationService {
         ),
       );
 
-      return registrationBuilder.build();
+      return await registrationBuilder.build();
     } on RegistrationException {
       rethrow;
     } catch (error) {

@@ -31,7 +31,8 @@ final class App extends StatelessWidget {
         create: (_) => Dependencies.instance.get<LoginBloc>(),
       ),
       BlocProvider<SessionBloc>(
-        create: (_) => Dependencies.instance.get<SessionBloc>(),
+        create: (_) => Dependencies.instance.get<SessionBloc>()
+          ..add(const RestoreSessionEvent()),
       ),
     ];
   }

@@ -146,6 +146,11 @@ class _TestStorage with StorageAsStringMixin implements Storage {
   }
 
   @override
+  Future<bool> containsString({required String key}) async {
+    return _data[key] != null;
+  }
+
+  @override
   FutureOr<String?> readString({required String key}) => _data[key];
 
   @override

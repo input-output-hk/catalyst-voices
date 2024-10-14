@@ -16,10 +16,13 @@ dependencies:
   catalyst_voices_repositories:
     path: ../catalyst_voices_repositories
   chopper: ^7.2.0
+  convert: ^3.1.1
+  ed25519_hd_key: ^2.3.0
   flutter:
     sdk: flutter
   flutter_secure_storage: ^9.2.2
   json_annotation: ^4.8.1
+  logging: ^1.2.0
   path: ^1.9.0
   rxdart: ^0.27.7
   web: ^1.1.0
