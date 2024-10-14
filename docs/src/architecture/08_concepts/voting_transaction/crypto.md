@@ -67,7 +67,7 @@ Before any voting will start an initial setup procedure should be performed.
   it is needed to specifically define which cryptographically secure group would be used.
 * Define a hash function which will be used by the underlying crypto algorithms.
 * Define a commitment key $ck$,
-  which will be used during the voter proof generation and verification prodecures.
+  which will be used during the voter proof generation and verification procedures.
 
 ### Vote
 
