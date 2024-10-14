@@ -61,22 +61,26 @@ class AccountCompletedPanel extends StatelessWidget {
                       ].separatedBy(const SizedBox(height: 10)).toList(),
                     );
                   },
-                )
+                ),
               ],
             ),
           ),
         ),
         const _NextStep(),
         const SizedBox(height: 10),
-        _OpenDiscoveryButton(onTap: () {
-          Navigator.pop(context);
-          const DiscoveryRoute().go(context);
-        }),
+        _OpenDiscoveryButton(
+          onTap: () {
+            Navigator.pop(context);
+            const DiscoveryRoute().go(context);
+          },
+        ),
         const SizedBox(height: 10),
-        _ReviewMyAccountButton(onTap: () {
-          Navigator.pop(context);
-          const AccountRoute().go(context);
-        }),
+        _ReviewMyAccountButton(
+          onTap: () {
+            Navigator.pop(context);
+            const AccountRoute().go(context);
+          },
+        ),
       ],
     );
   }
@@ -125,10 +129,10 @@ class _RolesFooter extends StatelessWidget {
               ),
             ],
           ),
-        )
+        ),
       ]
           .separatedBy(
-            SizedBox(height: 6),
+            const SizedBox(height: 6),
           )
           .toList(),
     );
@@ -156,52 +160,55 @@ class _SummaryItem extends StatelessWidget {
         color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv1Grey,
         borderRadius: BorderRadius.circular(20),
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            CatalystImage.asset(
-              image.path,
-              width: 52,
-              height: 52,
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  Text(
-                    info,
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              CatalystImage.asset(
+                image.path,
+                width: 52,
+                height: 52,
               ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleSmall,
+                    ),
+                    Text(
+                      info,
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
+                ),
+              ),
+              VoicesAvatar(
+                icon: VoicesAssets.icons.check.buildIcon(),
+                radius: 18,
+                padding: EdgeInsets.zero,
+                foregroundColor: Theme.of(context).colors.iconsPrimary,
+                backgroundColor:
+                    Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
+              ),
+            ],
+          ),
+          if (footer != null)
+            const VoicesDivider(
+              indent: 70,
+              endIndent: 0,
             ),
-            VoicesAvatar(
-              icon: VoicesAssets.icons.check.buildIcon(),
-              radius: 18,
-              padding: EdgeInsets.zero,
-              foregroundColor: Theme.of(context).colors.iconsPrimary,
-              backgroundColor:
-                  Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
-            )
-          ],
-        ),
-        if (footer != null)
-          const VoicesDivider(
-            indent: 70,
-            endIndent: 0,
-          ),
-        if (footer != null)
-          Padding(
-            padding: const EdgeInsets.only(left: 70),
-            child: footer!,
-          ),
-      ]),
+          if (footer != null)
+            Padding(
+              padding: const EdgeInsets.only(left: 70),
+              child: footer,
+            ),
+        ],
+      ),
     );
   }
 }
