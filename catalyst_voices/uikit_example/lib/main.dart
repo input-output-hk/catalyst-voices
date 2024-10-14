@@ -1,9 +1,7 @@
 import 'package:catalyst_voices/widgets/toggles/voices_theme_mode_switch.dart';
-import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/generated/catalyst_voices_localizations.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localized_locales/flutter_localized_locales.dart';
 import 'package:uikit_example/examples_list.dart';
 
@@ -19,32 +17,25 @@ class UIKitExampleApp extends StatefulWidget {
 }
 
 class _UIKitExampleAppState extends State<UIKitExampleApp> {
-  final SessionBloc _sessionBloc = SessionBloc();
-
   ThemeMode _themeMode = ThemeMode.system;
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider.value(value: _sessionBloc),
+    return MaterialApp(
+      title: 'UI kit examples',
+      supportedLocales: VoicesLocalizations.supportedLocales,
+      localizationsDelegates: const [
+        ...VoicesLocalizations.localizationsDelegates,
+        LocaleNamesLocalizationsDelegate(),
       ],
-      child: MaterialApp(
-        title: 'UI kit examples',
-        supportedLocales: VoicesLocalizations.supportedLocales,
-        localizationsDelegates: const [
-          ...VoicesLocalizations.localizationsDelegates,
-          LocaleNamesLocalizationsDelegate(),
-        ],
-        localeListResolutionCallback: basicLocaleListResolution,
-        theme: ThemeBuilder.buildTheme(brand: Brand.catalyst),
-        darkTheme: ThemeBuilder.buildTheme(
-          brand: Brand.catalyst,
-          brightness: Brightness.dark,
-        ),
-        themeMode: _themeMode,
-        onGenerateRoute: _onGenerateRoute,
+      localeListResolutionCallback: basicLocaleListResolution,
+      theme: ThemeBuilder.buildTheme(brand: Brand.catalyst),
+      darkTheme: ThemeBuilder.buildTheme(
+        brand: Brand.catalyst,
+        brightness: Brightness.dark,
       ),
+      themeMode: _themeMode,
+      onGenerateRoute: _onGenerateRoute,
     );
   }
 

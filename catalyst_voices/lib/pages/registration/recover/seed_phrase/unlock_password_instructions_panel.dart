@@ -19,9 +19,9 @@ class UnlockPasswordInstructionsPanel extends StatelessWidget {
         Expanded(
           child: SingleChildScrollView(
             child: RegistrationStageMessage(
-              title: Text(l10n.createKeychainUnlockPasswordInstructionsTitle),
+              title: Text(l10n.recoveryUnlockPasswordInstructionsTitle),
               subtitle: Text(
-                l10n.createKeychainUnlockPasswordInstructionsSubtitle,
+                l10n.recoveryUnlockPasswordInstructionsSubtitle,
               ),
             ),
           ),
