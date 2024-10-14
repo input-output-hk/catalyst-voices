@@ -101,7 +101,7 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
 
   /// Allows operation only when [isUnlocked] it true, otherwise returns null.
   ///
-  /// Returns value assigned to [key]. May return null if non found for [key].
+  /// Returns value assigned to [key]. May return null if not found for [key].
   Future<String?> _guardedRead({
     required String key,
     bool requireUnlocked = true,
