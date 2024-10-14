@@ -65,6 +65,9 @@ Before any voting will start an initial setup procedure should be performed.
 * As most of the crypto algorithms are group dependent
   (more about this you can read in [appendix A](#a-group-definition)),
   it is needed to specifically define which cryptographically secure group would be used.
+* Define a hash function which will be used by the underlying crypto algorithms.
+* Define a commitment key $ck$,
+  which will be used during the voter proof generation and verification procedures.
 
 ### Vote
 
@@ -177,24 +180,24 @@ so everyone could validate a correctness of the encrypted vote data,
 without revealing a voting choice itself.
 
 To achieve that a some sophisticated ZK (Zero Knowledge) algorithm is used,
-noted as $VoteProof(\mathbf{c}, \mathbf{e}_i, \mathbf{r}, pk)$.
+noted as $VoteProof(\mathbf{c}, \mathbf{e}_i, \mathbf{r}, pk, ck)$.
 It takes an encrypted vote vector $\mathbf{c}$,
 an original vote unit vector $\mathbf{e}_i$,
 a randomness vector $\mathbf{r}$,
 which was used during encryption algorithm $VoteEnc$
-and an shared election public key $pk$.
+a shared election public key $pk$ and a commitment key $ck$.
 As a result it generates a proof value $\pi$.
 \begin{equation}
-\pi = VoteProof(\mathbf{c}, \mathbf{e}_i, \mathbf{r}, pk)
+\pi = VoteProof(\mathbf{c}, \mathbf{e}_i, \mathbf{r}, pk, ck)
 \end{equation}
 
-So to validate a $VoteCheck(\mathbf{c}, \pi, pk)$ procedure should be used,
-which takes an encrypted vote $\mathbf{c}$, corresponded proof $\pi$
-and the same hared election public key $pk$
+So to validate a $VoteCheck(\mathbf{c}, \pi, pk, ck)$ procedure should be used,
+which takes an encrypted vote $\mathbf{c}$, corresponded proof $\pi$,
+the same shared election public key $pk$ and a commitment key $ck$
 as arguments and returns `true` or `false`,
 is it valid or not.
 \begin{equation}
-true | false = VoteCheck(\mathbf{c}, \pi, pk)
+true | false = VoteCheck(\mathbf{c}, \pi, pk, ck)
 \end{equation}
 
 A more detailed description of how $VoteProof$, $VoteCheck$ work
@@ -465,6 +468,7 @@ The prover algorithm takes as arguments:
 * $\mathbf{r} = (r_0, \ldots, r_{M-1})$ - a vector of randomnesses,
   which was used during encryption.
 * $pk$ - is a public key, which was used to encrypt a unit vector.
+* $ck \in \mathbb{G}$ - a commitment key.
 
 So basically here is the relation between all these values:
 \begin{equation}
@@ -472,7 +476,7 @@ So basically here is the relation between all these values:
 \end{equation}
 
 \begin{equation}
-VoteProof(\mathbf{c}, \mathbf{e}_i, \mathbf{r}, pk) = \pi
+VoteProof(\mathbf{c}, \mathbf{e}_i, \mathbf{r}, pk, ck) = \pi
 \end{equation}
 
 Important to note that the following notation would be used
@@ -485,48 +489,47 @@ To compute it, prover needs to perform the next steps:
   extend the vector $\mathbf{c}$ with $c_j = VoteEnc(0, 0, pk)$,
   where $N$ is a perfect power of $2$, $j \in [M, \ldots, N - 1]$.
   So the resulted $\mathbf{c} = (c_1, \ldots, c_M, \{c_j\})$.
-2. Generate a commitment key $ck \in \mathbb{G}$.
-3. Let $i_k$ is a bit value of the $i$-th binary representation (little-endian order),
+2. Let $i_k$ is a bit value of the $i$-th binary representation (little-endian order),
    where $k \in [0, log_2(N) - 1]$.
    E.g. $i=3$ and $N=8, log_2(N) = 3$,
    its binary representation $i=011$,
    $i_0=1, i_1=1, i_2=0$.
-4. For $l \in [0, \ldots, log_2(N)-1]$ generate a random values
+3. For $l \in [0, \ldots, log_2(N)-1]$ generate a random values
   $\alpha_l, \beta_l, \gamma_l, \delta_l, \in \mathbb{Z}_q$.
-5. For $l \in [0, \ldots, log_2(N)-1]$ calculate, where $g$ is the group generator:
+4. For $l \in [0, \ldots, log_2(N)-1]$ calculate, where $g$ is the group generator:
     * $I_l = g^{i_l} \circ ck^{\alpha_l}, I_l \in \mathbb{G}$.
     * $B_l = g^{\beta_l} \circ ck^{\gamma_l}, B_l \in \mathbb{G}$.
     * $A_l = g^{i_l * \beta_l} \circ ck^{\delta_l}, A_l \in \mathbb{G}$.
-6. Calculate a first verifier challenge
+5. Calculate a first verifier challenge
   $ch_1 = H(ck, pk, \{c_j\}, \{I_l\}, \{B_l\}, \{A_l\})$,
   where $H$ is a hash function,
   $j \in [0, \ldots, N-1]$
   and $l \in [0, \ldots, log_2(N)-1]$.
-7. For $j \in [0, \ldots, N-1]$ calculate polynomials
+6. For $j \in [0, \ldots, N-1]$ calculate polynomials
   in the following form $p_j(x) = e_{i, j}*x^{log_2(N)} + \sum_{l=0}^{log_2(N)-1} p_{j,l} * x^l$:
-    * $j_l$ is a bit value of the $j$-th binary representation (same as was described in step `3`).
+    * $j_l$ is a bit value of the $j$-th binary representation (same as was described in step `2`).
     * $z_l^{1} = i_l * x + \beta_l$.
     * $z_l^{0} = x - z_l^{1} = (1 - i_l)*x - \beta_l$.
     * Calculate the polynomial itself $p_j(x) = \prod_{l=0}^{log_2(N)-1} z_l^{j_l}$
-8. For $l \in [0, \ldots, log_2(N)-1]$ generate a random $R_l \in \mathbb{Z}_q$.
-9. For $l \in [0, \ldots, log_2(N)-1]$ compute
+7. For $l \in [0, \ldots, log_2(N)-1]$ generate a random $R_l \in \mathbb{Z}_q$.
+8. For $l \in [0, \ldots, log_2(N)-1]$ compute
   $D_l = VoteEnc(sum_l, R_l, pk)$,
   where $sum_l = \sum_{j=0}^{N-1}(p_{j,l} * ch_1^j)$
   and $p_{j,l}$ - corresponding coefficients of the polynomial $p_j(x)$ calculated on step `7`.
-10. Calculate a second verifier challenge
+9. Calculate a second verifier challenge
   $ch_2 = H(ch_1, \{D_l\})$,
   where $H$ is a hash function
   and $l \in [0, \ldots, log_2(N)-1]$.
-11. For $l \in [0, \ldots, log_2(N)-1]$ calculate:
+10. For $l \in [0, \ldots, log_2(N)-1]$ calculate:
     * $z_l = i_l * ch_2 + \beta_l, z_l \in \mathbb{Z}_q$.
     * $w_l = \alpha_l * ch_2 + \gamma_l, w_l \in \mathbb{Z}_q$.
     * $v_l = \alpha_l * (ch_2 - z_l) + \delta_l, v_l \in \mathbb{Z}_q$.
-12. Calculate
+11. Calculate
   $R=\sum_{j=0}^{N-1}(r_j * (ch_2)^{log_2(N)} * (ch_1)^j) + \sum_{l=0}^{log_2(N)-1}(R_l * (ch_2)^l)$,
   where $r_j$ original random values which was used to encrypt $c_j$
   and $R_l$ random values generated in step `8`.
 
-Finally, the proof is $\pi = (ck, \{I_l\}, \{B_l\}, \{A_l\}, \{D_l\}, \{z_l\}, \{w_l\}, \{v_l\}, R)$,
+Finally, the proof is $\pi = (\{I_l\}, \{B_l\}, \{A_l\}, \{D_l\}, \{z_l\}, \{w_l\}, \{v_l\}, R)$,
 where $l \in [0, \ldots, log_2(N)-1]$.
 
 ### Verifier
@@ -537,15 +540,16 @@ The verifier algorithm takes as arguments:
   where $M$ is amount of voting options.
 * $\pi$ - a prover's proof generated on the [previous step](#prover)
 * $pk$ - is a public key, which was used to encrypt a unit vector.
+* $ck \in \mathbb{G}$ - a commitment key, same which was used by the prover.
 
 \begin{equation}
-VoteCheck(\mathbf{c}, \pi, pk) = true | false
+VoteCheck(\mathbf{c}, \pi, pk, ck) = true | false
 \end{equation}
 
 As a result algorithm will return `true` or `false`,
 is the verification was succeeded or not respectively.
 
-Knowing that $\pi$ equals to $(ck, \{I_l\}, \{B_l\}, \{A_l\}, \{D_l\}, \{z_l\}, \{w_l\}, \{v_l\}, R)$,
+Knowing that $\pi$ equals to $(\{I_l\}, \{B_l\}, \{A_l\}, \{D_l\}, \{z_l\}, \{w_l\}, \{v_l\}, R)$,
 verifier needs to perform the next steps:
 
 1. If the number of voting options $M$ is not a perfect power of $2$,
