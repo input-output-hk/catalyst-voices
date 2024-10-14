@@ -57,12 +57,13 @@ class _RegistrationDialogState extends State<RegistrationDialog>
         onPopInvokedWithResult: (didPop, result) {
           unawaited(_confirmedExit(context, didPop: didPop));
         },
-        child: BlocBuilder<RegistrationCubit, RegistrationState>(
-          builder: (context, state) {
+        child: BlocSelector<RegistrationCubit, RegistrationState, bool>(
+          selector: (state) => state.step is! AccountCompletedStep,
+          builder: (context, showCloseButton) {
             return VoicesTwoPaneDialog(
               left: const RegistrationInfoPanel(),
               right: const RegistrationDetailsPanel(),
-              showCloseButton: state.step is! AccountCompletedStep,
+              showCloseButton: showCloseButton,
             );
           },
         ),
