@@ -7,9 +7,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 // TODO(dtscalac): unlock session
 /// Manages the user session.
 final class SessionBloc extends Bloc<SessionEvent, SessionState> {
-  final KeychainService _keychainService;
+  final Keychain _keychain;
 
-  SessionBloc(this._keychainService) : super(const VisitorSessionState()) {
+  SessionBloc(this._keychain) : super(const VisitorSessionState()) {
     on<RestoreSessionEvent>(_onRestoreSessionEvent);
     on<NextStateSessionEvent>(_onNextStateEvent);
     on<VisitorSessionEvent>(_onVisitorEvent);
@@ -22,9 +22,9 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState> {
     RestoreSessionEvent event,
     Emitter<SessionState> emit,
   ) async {
-    if (!await _keychainService.hasSeedPhrase) {
+    if (!await _keychain.hasSeedPhrase) {
       emit(const VisitorSessionState());
-    } else if (await _keychainService.isUnlocked) {
+    } else if (await _keychain.isUnlocked) {
       emit(ActiveUserSessionState(user: _dummyUser));
     } else {
       emit(const GuestSessionState());
@@ -37,9 +37,7 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState> {
   ) {
     final nextState = switch (state) {
       VisitorSessionState() => const GuestSessionState(),
-      GuestSessionState() => const ActiveUserSessionState(
-          user: User(name: 'Account'),
-        ),
+      GuestSessionState() => ActiveUserSessionState(user: _dummyUser),
       ActiveUserSessionState() => const VisitorSessionState(),
     };
 
@@ -50,7 +48,7 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState> {
     VisitorSessionEvent event,
     Emitter<SessionState> emit,
   ) async {
-    await _keychainService.remove();
+    await _keychain.remove();
 
     emit(const VisitorSessionState());
   }
@@ -59,7 +57,7 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState> {
     GuestSessionEvent event,
     Emitter<SessionState> emit,
   ) async {
-    await _keychainService.init(
+    await _keychain.init(
       seedPhrase: _dummySeedPhrase,
       unlockFactor: _dummyUnlockFactor,
     );
@@ -71,12 +69,12 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState> {
     ActiveUserSessionEvent event,
     Emitter<SessionState> emit,
   ) async {
-    await _keychainService.init(
+    await _keychain.init(
       seedPhrase: _dummySeedPhrase,
       unlockFactor: _dummyUnlockFactor,
     );
 
-    await _keychainService.unlock(_dummyUnlockFactor);
+    await _keychain.unlock(_dummyUnlockFactor);
 
     emit(ActiveUserSessionState(user: _dummyUser));
   }
@@ -85,7 +83,7 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState> {
     RemoveKeychainSessionEvent event,
     Emitter<SessionState> emit,
   ) async {
-    await _keychainService.remove();
+    await _keychain.remove();
     emit(const VisitorSessionState());
   }
 

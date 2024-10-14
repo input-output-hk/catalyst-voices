@@ -1,6 +1,6 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_services/src/keychain/key_derivation_service.dart';
+import 'package:catalyst_voices_services/src/keychain/key_derivation.dart';
 import 'package:catalyst_voices_services/src/storage/vault/lock_factor.dart';
 import 'package:catalyst_voices_services/src/storage/vault/vault.dart';
 import 'package:logging/logging.dart';
@@ -13,13 +13,13 @@ const _seedPhraseKey = 'keychain_seed_phrase';
 // TODO(dtscalac): in the future when key derivation algorithm spec
 // will become stable consider to store derived keys instead of deriving
 // them each time they are needed.
-class KeychainService {
-  final _logger = Logger('KeychainService');
+class Keychain {
+  final _logger = Logger('Keychain');
 
-  final KeyDerivationService _keyDerivationService;
+  final KeyDerivation _keyDerivation;
   final Vault _vault;
 
-  KeychainService(this._keyDerivationService, this._vault);
+  Keychain(this._keyDerivation, this._vault);
 
   /// Returns true if the keychain is unlocked, false otherwise.
   Future<bool> get isUnlocked => _vault.isUnlocked;
@@ -77,7 +77,7 @@ class KeychainService {
 
     final seedPhrase = await _readSeedPhrase();
     if (seedPhrase != null) {
-      return _keyDerivationService.deriveAccountRoleKeyPair(
+      return _keyDerivation.deriveAccountRoleKeyPair(
         seedPhrase: seedPhrase,
         role: role,
       );

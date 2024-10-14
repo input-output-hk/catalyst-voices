@@ -1,14 +1,14 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_services/src/keychain/key_derivation_service.dart';
+import 'package:catalyst_voices_services/src/keychain/key_derivation.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group(KeyDerivationService, () {
-    late KeyDerivationService service;
+  group(KeyDerivation, () {
+    late KeyDerivation service;
     late SeedPhrase seedPhrase;
 
     setUp(() {
-      service = KeyDerivationService();
+      service = KeyDerivation();
       seedPhrase = SeedPhrase.fromMnemonic(
         'few loyal swift champion rug peace dinosaur'
         ' erase bacon tone install universe',

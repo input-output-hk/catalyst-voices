@@ -17,14 +17,14 @@ final _testNetAddress = ShelleyAddress.fromBech32(
 /// Manages the user registration.
 final class RegistrationService {
   final TransactionConfigRepository _transactionConfigRepository;
-  final KeychainService _keychainService;
-  final KeyDerivationService _keyDerivationService;
+  final Keychain _keychain;
+  final KeyDerivation _keyDerivation;
   final CatalystCardano _cardano;
 
   const RegistrationService(
     this._transactionConfigRepository,
-    this._keychainService,
-    this._keyDerivationService,
+    this._keychain,
+    this._keyDerivation,
     this._cardano,
   );
 
@@ -33,7 +33,7 @@ final class RegistrationService {
     required SeedPhrase seedPhrase,
     required String unlockPassword,
   }) async {
-    await _keychainService.init(
+    await _keychain.init(
       seedPhrase: seedPhrase,
       unlockFactor: PasswordLockFactor(unlockPassword),
     );
@@ -102,7 +102,7 @@ final class RegistrationService {
     try {
       final walletApi = await wallet.enable();
 
-      final keyPair = await _keyDerivationService.deriveAccountRoleKeyPair(
+      final keyPair = await _keyDerivation.deriveAccountRoleKeyPair(
         seedPhrase: seedPhrase,
         role: AccountRole.root,
       );

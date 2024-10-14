@@ -3,7 +3,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:ed25519_hd_key/ed25519_hd_key.dart';
 
 /// Derives key pairs from a seed phrase.
-class KeyDerivationService {
+class KeyDerivation {
   /// Derives an [Ed25519KeyPair] from a [seedPhrase] and [path].
   ///
   /// Example [path]: m/0'/2147483647'
@@ -40,7 +40,7 @@ class KeyDerivationService {
   /// to generate a key pair from a seed phrase.
   ///
   // TODO(dtscalac): update when RBAC specifies it
-  static String _roleKeyDerivationPath(AccountRole role) {
+  String _roleKeyDerivationPath(AccountRole role) {
     return "m/${role.roleNumber}'/1234'";
   }
 }
