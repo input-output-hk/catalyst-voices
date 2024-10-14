@@ -1725,6 +1725,18 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Set unlock password for this device'**
   String get recoveryAccountDetailsAction;
+
+  /// No description provided for @recoveryUnlockPasswordInstructionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set your Catalyst unlock password f or this device'**
+  String get recoveryUnlockPasswordInstructionsTitle;
+
+  /// No description provided for @recoveryUnlockPasswordInstructionsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.    But it can be a bit tedious to enter every single time you want to use the app.    In this next step, you\'ll set your Unlock Password for your current device. It\'s like a shortcut for proving ownership of your Keychain.    Whenever you recover your account for the first time on a new device, you\'ll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.'**
+  String get recoveryUnlockPasswordInstructionsSubtitle;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
