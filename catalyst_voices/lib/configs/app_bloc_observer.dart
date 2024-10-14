@@ -2,9 +2,9 @@ import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 final class AppBlocObserver extends BlocObserver {
-  AppBlocObserver();
-
   final _logger = Logger('AppBlocObserver');
+
+  AppBlocObserver();
 
   @override
   void onChange(

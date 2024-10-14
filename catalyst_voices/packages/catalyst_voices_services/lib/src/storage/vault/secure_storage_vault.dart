@@ -55,6 +55,11 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   }
 
   @override
+  Future<bool> contains({required String key}) async {
+    return await _guardedRead(key: key, requireUnlocked: false) != null;
+  }
+
+  @override
   Future<String?> readString({required String key}) => _guardedRead(key: key);
 
   @override
@@ -75,6 +80,12 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     }
   }
 
+  Future<LockFactor> _readLock(String key) async {
+    final value = await _guardedRead(key: key, requireUnlocked: false);
+
+    return value != null ? _lockCodec.decode(value) : const VoidLockFactor();
+  }
+
   Future<void> _writeLock(
     LockFactor? lock, {
     required String key,
@@ -88,10 +99,21 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     );
   }
 
-  Future<LockFactor> _readLock(String key) async {
-    final value = await _guardedRead(key: key, requireUnlocked: false);
+  /// Allows operation only when [isUnlocked] it true, otherwise returns null.
+  ///
+  /// Returns value assigned to [key]. May return null if not found for [key].
+  Future<String?> _guardedRead({
+    required String key,
+    bool requireUnlocked = true,
+  }) async {
+    final hasAccess = !requireUnlocked || await isUnlocked;
+    if (!hasAccess) {
+      return null;
+    }
 
-    return value != null ? _lockCodec.decode(value) : const VoidLockFactor();
+    final effectiveKey = _buildVaultKey(key);
+
+    return _secureStorage.read(key: effectiveKey);
   }
 
   /// Allows operation only when [isUnlocked] it true, otherwise non op.
@@ -115,23 +137,6 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     } else {
       await _secureStorage.delete(key: effectiveKey);
     }
-  }
-
-  /// Allows operation only when [isUnlocked] it true, otherwise returns null.
-  ///
-  /// Returns value assigned to [key]. May return null if non found for [key].
-  Future<String?> _guardedRead({
-    required String key,
-    bool requireUnlocked = true,
-  }) async {
-    final hasAccess = !requireUnlocked || await isUnlocked;
-    if (!hasAccess) {
-      return null;
-    }
-
-    final effectiveKey = _buildVaultKey(key);
-
-    return _secureStorage.read(key: effectiveKey);
   }
 
   String _buildVaultKey(String key) {
