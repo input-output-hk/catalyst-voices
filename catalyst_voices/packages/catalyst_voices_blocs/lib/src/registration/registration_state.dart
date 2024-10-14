@@ -44,7 +44,7 @@ final class RegistrationState extends Equatable {
       CreateKeychainStep(:final stage) => getCreateKeychainProgress(stage),
       FinishAccountCreationStep() => 1.0,
       WalletLinkStep(:final stage) => getWalletLinkProgress(stage),
-      AccountCompletedStep() => null,
+      AccountCompletedStep() => 1.0,
     };
   }
 

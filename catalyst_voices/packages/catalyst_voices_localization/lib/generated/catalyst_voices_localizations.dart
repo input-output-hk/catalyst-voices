@@ -1111,7 +1111,7 @@ abstract class VoicesLocalizations {
   /// An error text on text field on delete keychain dialog
   ///
   /// In en, this message translates to:
-  /// **'Error. Please type \'Remove keychain\' to remove your account from this device.'**
+  /// **'Error. Please type \'Remove Keychain\' to remove your account from this device.'**
   String get deleteKeychainDialogErrorText;
 
   /// A removing phrase on delete keychain dialog
@@ -1359,6 +1359,78 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Catalyst keychain removed'**
   String get keychainDeletedDialogInfo;
+
+  /// No description provided for @registrationCompletedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst account setup'**
+  String get registrationCompletedTitle;
+
+  /// No description provided for @registrationCompletedSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed!'**
+  String get registrationCompletedSubtitle;
+
+  /// No description provided for @registrationCompletedSummaryHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Summary'**
+  String get registrationCompletedSummaryHeader;
+
+  /// No description provided for @registrationCompletedKeychainTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst Keychain created'**
+  String get registrationCompletedKeychainTitle;
+
+  /// No description provided for @registrationCompletedKeychainInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'You created a Catalyst Keychain, backed up its seed phrase and set an unlock password.'**
+  String get registrationCompletedKeychainInfo;
+
+  /// No description provided for @registrationCompletedWalletTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cardano {walletName} wallet selected'**
+  String registrationCompletedWalletTitle(String walletName);
+
+  /// No description provided for @registrationCompletedWalletInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'You selected your {walletName} wallet as primary wallet for your voting power.'**
+  String registrationCompletedWalletInfo(String walletName);
+
+  /// No description provided for @registrationCompletedRolesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst roles selected'**
+  String get registrationCompletedRolesTitle;
+
+  /// No description provided for @registrationCompletedRolesInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'You linked your Cardano wallet and selected  Catalyst roles via a signed transaction.'**
+  String get registrationCompletedRolesInfo;
+
+  /// No description provided for @registrationCompletedRoleRegistration.
+  ///
+  /// In en, this message translates to:
+  /// **'role registration'**
+  String get registrationCompletedRoleRegistration;
+
+  /// No description provided for @registrationCompletedDiscoveryButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Discovery Dashboard'**
+  String get registrationCompletedDiscoveryButton;
+
+  /// No description provided for @registrationCompletedAccountButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Review my account'**
+  String get registrationCompletedAccountButton;
 
   /// No description provided for @createKeychainSeedPhraseSubtitle.
   ///

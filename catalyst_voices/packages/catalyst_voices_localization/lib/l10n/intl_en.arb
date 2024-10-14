@@ -710,7 +710,7 @@
   "@deleteKeychainDialogInputLabel": {
     "description": "An input label on delete keychain dialog"
   },
-  "deleteKeychainDialogErrorText": "Error. Please type 'Remove keychain' to remove your account from this device.",
+  "deleteKeychainDialogErrorText": "Error. Please type 'Remove Keychain' to remove your account from this device.",
   "@deleteKeychainDialogErrorText": {
     "description": "An error text on text field on delete keychain dialog"
   },
@@ -819,6 +819,32 @@
   "@keychainDeletedDialogInfo": {
     "description": "An info on keychain deleted dialog"
   },
+  "registrationCompletedTitle": "Catalyst account setup",
+  "registrationCompletedSubtitle": "Completed!",
+  "registrationCompletedSummaryHeader": "Summary",
+  "registrationCompletedKeychainTitle": "Catalyst Keychain created",
+  "registrationCompletedKeychainInfo": "You created a Catalyst Keychain, backed up its seed phrase and set an unlock password.",
+  "registrationCompletedWalletTitle": "Cardano {walletName} wallet selected",
+  "@registrationCompletedWalletTitle": {
+    "placeholders": {
+      "walletName": {
+        "type": "String"
+      }
+    }
+  },
+  "registrationCompletedWalletInfo": "You selected your {walletName} wallet as primary wallet for your voting power.",
+  "@registrationCompletedWalletInfo": {
+    "placeholders": {
+      "walletName": {
+        "type": "String"
+      }
+    }
+  },
+  "registrationCompletedRolesTitle": "Catalyst roles selected",
+  "registrationCompletedRolesInfo": "You linked your Cardano wallet and selected  Catalyst roles via a signed transaction.",
+  "registrationCompletedRoleRegistration": "role registration",
+  "registrationCompletedDiscoveryButton": "Open Discovery Dashboard",
+  "registrationCompletedAccountButton": "Review my account",
   "createKeychainSeedPhraseSubtitle": "Write down your 12 Catalyst \u2028security words",
   "createKeychainSeedPhraseBody": "Make sure you create an offline backup of your recovery phrase as well.",
   "createKeychainSeedPhraseDownload": "Download Catalyst key",

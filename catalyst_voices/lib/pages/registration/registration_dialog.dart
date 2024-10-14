@@ -62,9 +62,15 @@ class _RegistrationDialogState extends State<RegistrationDialog>
             ),
           );
         },
-        child: const VoicesTwoPaneDialog(
-          left: RegistrationInfoPanel(),
-          right: RegistrationDetailsPanel(),
+        child: BlocSelector<RegistrationCubit, RegistrationState, bool>(
+          selector: (state) => state.step is! AccountCompletedStep,
+          builder: (context, showCloseButton) {
+            return VoicesTwoPaneDialog(
+              left: const RegistrationInfoPanel(),
+              right: const RegistrationDetailsPanel(),
+              showCloseButton: showCloseButton,
+            );
+          },
         ),
       ),
     );
