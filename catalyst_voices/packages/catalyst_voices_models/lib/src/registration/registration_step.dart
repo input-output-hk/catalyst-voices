@@ -7,6 +7,10 @@ import 'package:equatable/equatable.dart';
 sealed class RegistrationStep extends Equatable {
   const RegistrationStep();
 
+  bool get isRegistrationFlow => false;
+
+  bool get isRecoverFlow => false;
+
   @override
   List<Object?> get props => [];
 }
@@ -27,6 +31,9 @@ final class SeedPhraseRecoverStep extends RegistrationStep {
   });
 
   @override
+  bool get isRecoverFlow => true;
+
+  @override
   List<Object?> get props => [stage];
 }
 
@@ -38,11 +45,17 @@ final class CreateKeychainStep extends RegistrationStep {
   });
 
   @override
+  bool get isRegistrationFlow => true;
+
+  @override
   List<Object?> get props => [stage];
 }
 
 final class FinishAccountCreationStep extends RegistrationStep {
   const FinishAccountCreationStep();
+
+  @override
+  bool get isRegistrationFlow => true;
 }
 
 final class WalletLinkStep extends RegistrationStep {
@@ -51,6 +64,9 @@ final class WalletLinkStep extends RegistrationStep {
   const WalletLinkStep({
     this.stage = WalletLinkStage.intro,
   });
+
+  @override
+  bool get isRegistrationFlow => true;
 
   @override
   List<Object?> get props => [stage];
