@@ -17,6 +17,7 @@ final class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
+  /// A singleton bloc that manages the user session.
   final SessionBloc _sessionBloc = Dependencies.instance.get();
 
   @override
@@ -43,9 +44,7 @@ class _AppState extends State<App> {
       BlocProvider<LoginBloc>(
         create: (_) => Dependencies.instance.get<LoginBloc>(),
       ),
-      BlocProvider<SessionBloc>(
-        create: (_) => _sessionBloc,
-      ),
+      BlocProvider<SessionBloc>.value(value: _sessionBloc),
     ];
   }
 }
