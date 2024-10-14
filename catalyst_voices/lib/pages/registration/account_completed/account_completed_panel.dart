@@ -28,39 +28,43 @@ class AccountCompletedPanel extends StatelessWidget {
               children: [
                 const _TitleText(),
                 const SizedBox(height: 10),
-                BlocBuilder<RegistrationCubit, RegistrationState>(
-                  builder: (context, state) {
-                    final roles =
-                        state.walletLinkStateData.selectedRoles?.toList() ?? [];
-                    final walletName =
-                        state.walletLinkStateData.selectedWallet?.wallet.name ??
-                            '';
-
-                    return Column(
-                      children: <Widget>[
-                        _SummaryItem(
-                          image:
-                              VoicesAssets.images.registrationSummaryKeychain,
-                          title:
-                              context.l10n.registrationCompletedKeychainTitle,
-                          info: context.l10n.registrationCompletedKeychainInfo,
-                        ),
-                        _SummaryItem(
+                Column(
+                  children: <Widget>[
+                    _SummaryItem(
+                      image: VoicesAssets.images.registrationSummaryKeychain,
+                      title: context.l10n.registrationCompletedKeychainTitle,
+                      info: context.l10n.registrationCompletedKeychainInfo,
+                    ),
+                    BlocSelector<RegistrationCubit, RegistrationState, String>(
+                      selector: (state) =>
+                          state.walletLinkStateData.selectedWallet?.wallet
+                              .name ??
+                          '',
+                      builder: (context, walletName) {
+                        return _SummaryItem(
                           image: VoicesAssets.images.registrationSummaryWallet,
                           title: context.l10n
                               .registrationCompletedWalletTitle(walletName),
                           info: context.l10n
                               .registrationCompletedWalletInfo(walletName),
-                        ),
-                        _SummaryItem(
+                        );
+                      },
+                    ),
+                    BlocSelector<RegistrationCubit, RegistrationState,
+                        List<AccountRole>>(
+                      selector: (state) =>
+                          state.walletLinkStateData.selectedRoles?.toList() ??
+                          [],
+                      builder: (context, roles) {
+                        return _SummaryItem(
                           image: VoicesAssets.images.registrationSummaryRoles,
                           title: context.l10n.registrationCompletedRolesTitle,
                           info: context.l10n.registrationCompletedRolesInfo,
                           footer: _RolesFooter(roles),
-                        ),
-                      ].separatedBy(const SizedBox(height: 10)).toList(),
-                    );
-                  },
+                        );
+                      },
+                    ),
+                  ].separatedBy(const SizedBox(height: 10)).toList(),
                 ),
               ],
             ),
