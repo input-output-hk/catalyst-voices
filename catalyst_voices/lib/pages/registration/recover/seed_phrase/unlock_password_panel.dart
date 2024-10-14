@@ -6,9 +6,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class UnlockPasswordPanel extends StatefulWidget {
-  const UnlockPasswordPanel({
-    super.key,
-  });
+  const UnlockPasswordPanel({super.key});
 
   @override
   State<UnlockPasswordPanel> createState() => _UnlockPasswordPanelState();
@@ -24,7 +22,7 @@ class _UnlockPasswordPanelState extends State<UnlockPasswordPanel> {
 
     final unlockPasswordState = RegistrationCubit.of(context)
         .state
-        .keychainStateData
+        .recoverStateData
         .unlockPasswordState;
 
     final password = unlockPasswordState.password.value;
@@ -68,21 +66,19 @@ class _UnlockPasswordPanelState extends State<UnlockPasswordPanel> {
   void _onPasswordChanged() {
     final password = _passwordController.text;
 
-    RegistrationCubit.of(context).keychainCreation.setPassword(password);
+    RegistrationCubit.of(context).recover.setPassword(password);
   }
 
   void _onConfirmPasswordChanged() {
     final confirmPassword = _confirmPasswordController.text;
 
-    RegistrationCubit.of(context)
-        .keychainCreation
-        .setConfirmPassword(confirmPassword);
+    RegistrationCubit.of(context).recover.setConfirmPassword(confirmPassword);
   }
 
   void _clearPasswordAndGoBack() {
     final registration = RegistrationCubit.of(context);
 
-    registration.keychainCreation
+    registration.recover
       ..setPassword('')
       ..setConfirmPassword('');
 
@@ -92,7 +88,7 @@ class _UnlockPasswordPanelState extends State<UnlockPasswordPanel> {
   Future<void> _createKeychain() async {
     final registrationCubit = RegistrationCubit.of(context);
 
-    final isSuccess = await registrationCubit.keychainCreation.createKeychain();
+    final isSuccess = await registrationCubit.recover.createKeychain();
 
     if (isSuccess) {
       registrationCubit.nextStep();
@@ -117,7 +113,7 @@ class _BlocUnlockPasswordForm extends StatelessWidget {
           PasswordStrength passwordStrength,
           bool showPasswordStrength,
         })>(
-      stateSelector: (state) => state.keychainStateData.unlockPasswordState,
+      stateSelector: (state) => state.recoverStateData.unlockPasswordState,
       selector: (state) {
         return (
           showError: state.showPasswordMisMatch,
@@ -150,7 +146,7 @@ class _BlocNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocUnlockPasswordBuilder<bool>(
-      stateSelector: (state) => state.keychainStateData.unlockPasswordState,
+      stateSelector: (state) => state.recoverStateData.unlockPasswordState,
       selector: (state) => state.isNextEnabled,
       builder: (context, state) {
         return RegistrationBackNextNavigation(
