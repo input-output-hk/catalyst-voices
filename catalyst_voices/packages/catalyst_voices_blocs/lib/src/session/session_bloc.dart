@@ -60,6 +60,7 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState> {
     await _keychain.setLockAndBeginWith(
       seedPhrase: _dummySeedPhrase,
       unlockFactor: _dummyUnlockFactor,
+      unlocked: false,
     );
 
     emit(const GuestSessionState());
@@ -72,9 +73,8 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState> {
     await _keychain.setLockAndBeginWith(
       seedPhrase: _dummySeedPhrase,
       unlockFactor: _dummyUnlockFactor,
+      unlocked: true,
     );
-
-    await _keychain.unlock(_dummyUnlockFactor);
 
     emit(ActiveUserSessionState(user: _dummyUser));
   }
