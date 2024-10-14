@@ -1,3 +1,4 @@
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
@@ -9,6 +10,7 @@ final class RecoverStateData extends Equatable {
   final List<String> seedPhraseWords;
   final bool isSeedPhraseValid;
   final Result<AccountSummaryData, LocalizedException>? accountDetails;
+  final UnlockPasswordState unlockPasswordState;
 
   bool get isAccountSummaryNextEnabled => accountDetails?.isSuccess ?? false;
 
@@ -18,6 +20,7 @@ final class RecoverStateData extends Equatable {
     this.seedPhraseWords = const [],
     this.isSeedPhraseValid = false,
     this.accountDetails,
+    this.unlockPasswordState = const UnlockPasswordState(),
   });
 
   RecoverStateData copyWith({
@@ -26,6 +29,7 @@ final class RecoverStateData extends Equatable {
     List<String>? seedPhraseWords,
     bool? isSeedPhraseValid,
     Optional<Result<AccountSummaryData, LocalizedException>>? accountDetails,
+    UnlockPasswordState? unlockPasswordState,
   }) {
     return RecoverStateData(
       foundKeychain: foundKeychain ?? this.foundKeychain,
@@ -33,6 +37,7 @@ final class RecoverStateData extends Equatable {
       seedPhraseWords: seedPhraseWords ?? this.seedPhraseWords,
       isSeedPhraseValid: isSeedPhraseValid ?? this.isSeedPhraseValid,
       accountDetails: accountDetails.dataOr(this.accountDetails),
+      unlockPasswordState: unlockPasswordState ?? this.unlockPasswordState,
     );
   }
 
@@ -45,6 +50,7 @@ final class RecoverStateData extends Equatable {
         '${seedPhraseWords.length}, '
         '$isSeedPhraseValid, '
         '$accountDetails, '
+        '$unlockPasswordState, '
         ')';
   }
 
@@ -55,6 +61,7 @@ final class RecoverStateData extends Equatable {
         seedPhraseWords,
         isSeedPhraseValid,
         accountDetails,
+        unlockPasswordState,
       ];
 }
 
