@@ -49,11 +49,13 @@ class VoicesSinglePaneDialog extends StatelessWidget {
 class VoicesTwoPaneDialog extends StatelessWidget {
   final Widget left;
   final Widget right;
+  final bool showCloseButton;
 
   const VoicesTwoPaneDialog({
     super.key,
     required this.left,
     required this.right,
+    this.showCloseButton = true,
   });
 
   @override
@@ -84,7 +86,7 @@ class VoicesTwoPaneDialog extends StatelessWidget {
               ),
             ],
           ),
-          const _DialogCloseButton(),
+          if (showCloseButton) const _DialogCloseButton(),
         ],
       ),
     );

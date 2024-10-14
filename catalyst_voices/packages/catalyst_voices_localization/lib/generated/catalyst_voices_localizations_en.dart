@@ -590,7 +590,7 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get deleteKeychainDialogInputLabel => 'Confirm removal';
 
   @override
-  String get deleteKeychainDialogErrorText => 'Error. Please type \'Remove keychain\' to remove your account from this device.';
+  String get deleteKeychainDialogErrorText => 'Error. Please type \'Remove Keychain\' to remove your account from this device.';
 
   @override
   String get deleteKeychainDialogRemovingPhrase => 'Remove Keychain';
@@ -718,6 +718,46 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get keychainDeletedDialogInfo => 'Catalyst keychain removed';
+
+  @override
+  String get registrationCompletedTitle => 'Catalyst account setup';
+
+  @override
+  String get registrationCompletedSubtitle => 'Completed!';
+
+  @override
+  String get registrationCompletedSummaryHeader => 'Summary';
+
+  @override
+  String get registrationCompletedKeychainTitle => 'Catalyst Keychain created';
+
+  @override
+  String get registrationCompletedKeychainInfo => 'You created a Catalyst Keychain, backed up its seed phrase and set an unlock password.';
+
+  @override
+  String registrationCompletedWalletTitle(String walletName) {
+    return 'Cardano $walletName wallet selected';
+  }
+
+  @override
+  String registrationCompletedWalletInfo(String walletName) {
+    return 'You selected your $walletName wallet as primary wallet for your voting power.';
+  }
+
+  @override
+  String get registrationCompletedRolesTitle => 'Catalyst roles selected';
+
+  @override
+  String get registrationCompletedRolesInfo => 'You linked your Cardano wallet and selected  Catalyst roles via a signed transaction.';
+
+  @override
+  String get registrationCompletedRoleRegistration => 'role registration';
+
+  @override
+  String get registrationCompletedDiscoveryButton => 'Open Discovery Dashboard';
+
+  @override
+  String get registrationCompletedAccountButton => 'Review my account';
 
   @override
   String get createKeychainSeedPhraseSubtitle => 'Write down your 12 Catalyst  security words';
