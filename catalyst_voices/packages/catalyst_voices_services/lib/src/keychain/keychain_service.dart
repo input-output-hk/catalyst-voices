@@ -46,6 +46,8 @@ class KeychainService {
     _logger.info('remove');
     await _ensureUnlocked();
     await _vault.delete(key: _seedPhraseKey);
+    await _vault.setLock(const VoidLockFactor());
+    await _vault.lock();
   }
 
   /// Unlocks the keychain.

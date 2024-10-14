@@ -25,7 +25,7 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState> {
     if (!await _keychainService.hasSeedPhrase) {
       emit(const VisitorSessionState());
     } else if (await _keychainService.isUnlocked) {
-      emit(ActiveUserSessionState(user: _user));
+      emit(ActiveUserSessionState(user: _dummyUser));
     } else {
       emit(const GuestSessionState());
     }
@@ -46,25 +46,39 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState> {
     emit(nextState);
   }
 
-  void _onVisitorEvent(
+  Future<void> _onVisitorEvent(
     VisitorSessionEvent event,
     Emitter<SessionState> emit,
-  ) {
+  ) async {
+    await _keychainService.remove();
+
     emit(const VisitorSessionState());
   }
 
-  void _onGuestEvent(
+  Future<void> _onGuestEvent(
     GuestSessionEvent event,
     Emitter<SessionState> emit,
-  ) {
+  ) async {
+    await _keychainService.init(
+      seedPhrase: _dummySeedPhrase,
+      unlockFactor: _dummyUnlockFactor,
+    );
+
     emit(const GuestSessionState());
   }
 
-  void _onActiveUserEvent(
+  Future<void> _onActiveUserEvent(
     ActiveUserSessionEvent event,
     Emitter<SessionState> emit,
-  ) {
-    emit(ActiveUserSessionState(user: _user));
+  ) async {
+    await _keychainService.init(
+      seedPhrase: _dummySeedPhrase,
+      unlockFactor: _dummyUnlockFactor,
+    );
+
+    await _keychainService.unlock(_dummyUnlockFactor);
+
+    emit(ActiveUserSessionState(user: _dummyUser));
   }
 
   Future<void> _onRemoveKeychainEvent(
@@ -75,6 +89,15 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState> {
     emit(const VisitorSessionState());
   }
 
-  /// A dummy user.
-  User get _user => const User(name: 'Account');
+  /// Temporary implementation for testing purposes.
+  User get _dummyUser => const User(name: 'Account');
+
+  /// Temporary implementation for testing purposes.
+  SeedPhrase get _dummySeedPhrase => SeedPhrase.fromMnemonic(
+        'few loyal swift champion rug peace dinosaur'
+        ' erase bacon tone install universe',
+      );
+
+  /// Temporary implementation for testing purposes.
+  LockFactor get _dummyUnlockFactor => const PasswordLockFactor('Test1234');
 }
