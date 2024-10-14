@@ -6,6 +6,7 @@ import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
+import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
@@ -31,30 +32,30 @@ class AccountCompletedPanel extends StatelessWidget {
                   builder: (context, state) {
                     final roles =
                         state.walletLinkStateData.selectedRoles?.toList() ?? [];
-                    final walletName = state
-                            .walletLinkStateData.selectedWallet?.wallet.name ??
-                        '';
+                    final walletName =
+                        state.walletLinkStateData.selectedWallet?.wallet.name ??
+                            '';
 
                     return Column(
                       children: <Widget>[
                         _SummaryItem(
                           image:
                               VoicesAssets.images.registrationSummaryKeychain,
-                          title: 'Catalyst Keychain created',
-                          info:
-                              'You created a Catalyst Keychain, backed up its seed phrase and set an unlock password.',
+                          title:
+                              context.l10n.registrationCompletedKeychainTitle,
+                          info: context.l10n.registrationCompletedKeychainInfo,
                         ),
                         _SummaryItem(
                           image: VoicesAssets.images.registrationSummaryWallet,
-                          title: 'Cardano Lace wallet selected',
-                          info:
-                              'You selected your $walletName wallet as primary wallet for your voting power.',
+                          title: context.l10n
+                              .registrationCompletedWalletTitle(walletName),
+                          info: context.l10n
+                              .registrationCompletedWalletInfo(walletName),
                         ),
                         _SummaryItem(
                           image: VoicesAssets.images.registrationSummaryRoles,
-                          title: 'Catalyst roles selected',
-                          info:
-                              'You linked your Cardano wallet and selected  Catalyst roles via a signed transaction.',
+                          title: context.l10n.registrationCompletedRolesTitle,
+                          info: context.l10n.registrationCompletedRolesInfo,
                           footer: _RolesFooter(roles),
                         ),
                       ].separatedBy(const SizedBox(height: 10)).toList(),
@@ -95,7 +96,7 @@ class _RolesFooter extends StatelessWidget {
           (role) => Row(
             children: [
               Text(
-                '1x',
+                context.l10n.registrationCompletedRole1x,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               Padding(
@@ -119,7 +120,7 @@ class _RolesFooter extends StatelessWidget {
                 ),
               ),
               Text(
-                'role registration',
+                context.l10n.registrationCompletedRoleRegistration,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
@@ -214,7 +215,7 @@ class _TitleText extends StatelessWidget {
     final color = theme.colors.textOnPrimaryLevel1;
 
     return Text(
-      'Summary',
+      context.l10n.registrationCompletedSummaryHeader,
       style: theme.textTheme.titleMedium?.copyWith(color: color),
     );
   }
@@ -240,7 +241,7 @@ class _OpenDiscoveryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesFilledButton(
       onTap: onTap,
-      child: Text('Open Discovery Dashboard'),
+      child: Text(context.l10n.registrationCompletedDiscoveryButton),
     );
   }
 }
@@ -256,7 +257,7 @@ class _ReviewMyAccountButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesTextButton(
       onTap: onTap,
-      child: Text('Review my account'),
+      child: Text(context.l10n.registrationCompletedAccountButton),
     );
   }
 }

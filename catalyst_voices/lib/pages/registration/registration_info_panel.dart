@@ -133,8 +133,8 @@ class RegistrationInfoPanel extends StatelessWidget {
       CreateKeychainStep(:final stage) => buildKeychainStageHeader(stage),
       WalletLinkStep(:final stage) => buildWalletLinkStageHeader(stage),
       AccountCompletedStep() => _HeaderStrings(
-          title: 'Catalyst account setup',
-          subtitle: 'Completed!',
+          title: context.l10n.registrationCompletedTitle,
+          subtitle: context.l10n.registrationCompletedSubtitle,
         ),
     };
   }
