@@ -751,9 +751,6 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get registrationCompletedRolesInfo => 'You linked your Cardano wallet and selected  Catalyst roles via a signed transaction.';
 
   @override
-  String get registrationCompletedRole1x => '1x';
-
-  @override
   String get registrationCompletedRoleRegistration => 'role registration';
 
   @override

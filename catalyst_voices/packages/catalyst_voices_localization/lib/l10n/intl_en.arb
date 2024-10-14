@@ -842,7 +842,6 @@
   },
   "registrationCompletedRolesTitle": "Catalyst roles selected",
   "registrationCompletedRolesInfo": "You linked your Cardano wallet and selected  Catalyst roles via a signed transaction.",
-  "registrationCompletedRole1x": "1x",
   "registrationCompletedRoleRegistration": "role registration",
   "registrationCompletedDiscoveryButton": "Open Discovery Dashboard",
   "registrationCompletedAccountButton": "Review my account",

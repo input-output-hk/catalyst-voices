@@ -100,7 +100,7 @@ class _RolesFooter extends StatelessWidget {
           (role) => Row(
             children: [
               Text(
-                context.l10n.registrationCompletedRole1x,
+                '1x',
                 style: Theme.of(context).textTheme.bodySmall,
               ),
               Padding(

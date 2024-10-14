@@ -1414,12 +1414,6 @@ abstract class VoicesLocalizations {
   /// **'You linked your Cardano wallet and selected  Catalyst roles via a signed transaction.'**
   String get registrationCompletedRolesInfo;
 
-  /// No description provided for @registrationCompletedRole1x.
-  ///
-  /// In en, this message translates to:
-  /// **'1x'**
-  String get registrationCompletedRole1x;
-
   /// No description provided for @registrationCompletedRoleRegistration.
   ///
   /// In en, this message translates to:
