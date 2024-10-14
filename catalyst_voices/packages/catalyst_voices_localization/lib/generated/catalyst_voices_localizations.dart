@@ -1552,11 +1552,11 @@ abstract class VoicesLocalizations {
   /// **'Continue keychain creation'**
   String get registrationExitConfirmDialogContinue;
 
-  /// No description provided for @registrationExitConfirmDialogCancel.
+  /// No description provided for @cancelAnyways.
   ///
   /// In en, this message translates to:
   /// **'Cancel anyway'**
-  String get registrationExitConfirmDialogCancel;
+  String get cancelAnyways;
 
   /// No description provided for @recoverCatalystKeychain.
   ///
@@ -1683,6 +1683,24 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Check my account'**
   String get recoverySuccessGoAccount;
+
+  /// No description provided for @recoveryExitConfirmDialogSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'12 word keychain restoration incomplete'**
+  String get recoveryExitConfirmDialogSubtitle;
+
+  /// No description provided for @recoveryExitConfirmDialogContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Please continue your Catalyst Keychain restoration, if you cancel all input will be lost.'**
+  String get recoveryExitConfirmDialogContent;
+
+  /// No description provided for @recoveryExitConfirmDialogContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue recovery process'**
+  String get recoveryExitConfirmDialogContinue;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

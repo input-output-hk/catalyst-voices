@@ -818,7 +818,7 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get registrationExitConfirmDialogContinue => 'Continue keychain creation';
 
   @override
-  String get registrationExitConfirmDialogCancel => 'Cancel anyway';
+  String get cancelAnyways => 'Cancel anyway';
 
   @override
   String get recoverCatalystKeychain => 'Restore Catalyst keychain';
@@ -882,4 +882,13 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get recoverySuccessGoAccount => 'Check my account';
+
+  @override
+  String get recoveryExitConfirmDialogSubtitle => '12 word keychain restoration incomplete';
+
+  @override
+  String get recoveryExitConfirmDialogContent => 'Please continue your Catalyst Keychain restoration, if you cancel all input will be lost.';
+
+  @override
+  String get recoveryExitConfirmDialogContinue => 'Continue recovery process';
 }
