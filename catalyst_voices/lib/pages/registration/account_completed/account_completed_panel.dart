@@ -171,7 +171,7 @@ class _SummaryItem extends StatelessWidget {
                 width: 52,
                 height: 52,
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,7 +189,7 @@ class _SummaryItem extends StatelessWidget {
               ),
               VoicesAvatar(
                 icon: VoicesAssets.icons.check.buildIcon(),
-                radius: 18,
+                radius: 14,
                 padding: EdgeInsets.zero,
                 foregroundColor: Theme.of(context).colors.iconsPrimary,
                 backgroundColor:
