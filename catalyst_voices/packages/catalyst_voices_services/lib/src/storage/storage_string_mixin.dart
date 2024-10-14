@@ -13,11 +13,6 @@ import 'package:flutter/foundation.dart';
 /// See [SecureStorageVault] as example.
 mixin StorageAsStringMixin implements Storage {
   @override
-  Future<bool> containsInt({required String key}) {
-    return containsString(key: key);
-  }
-
-  @override
   FutureOr<int?> readInt({required String key}) async {
     final value = await readString(key: key);
     return value != null ? int.parse(value) : null;
@@ -29,11 +24,6 @@ mixin StorageAsStringMixin implements Storage {
     required String key,
   }) {
     return writeString(value?.toString(), key: key);
-  }
-
-  @override
-  Future<bool> containsBool({required String key}) {
-    return containsString(key: key);
   }
 
   @override
@@ -59,11 +49,6 @@ mixin StorageAsStringMixin implements Storage {
         : null;
 
     return writeInt(asInt, key: key);
-  }
-
-  @override
-  Future<bool> containsBytes({required String key}) {
-    return containsString(key: key);
   }
 
   @override

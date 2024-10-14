@@ -48,7 +48,7 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState> {
     VisitorSessionEvent event,
     Emitter<SessionState> emit,
   ) async {
-    await _keychain.remove();
+    await _keychain.clearAndLock();
 
     emit(const VisitorSessionState());
   }
@@ -57,7 +57,7 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState> {
     GuestSessionEvent event,
     Emitter<SessionState> emit,
   ) async {
-    await _keychain.init(
+    await _keychain.setLockAndBeginWith(
       seedPhrase: _dummySeedPhrase,
       unlockFactor: _dummyUnlockFactor,
     );
@@ -69,7 +69,7 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState> {
     ActiveUserSessionEvent event,
     Emitter<SessionState> emit,
   ) async {
-    await _keychain.init(
+    await _keychain.setLockAndBeginWith(
       seedPhrase: _dummySeedPhrase,
       unlockFactor: _dummyUnlockFactor,
     );
@@ -83,7 +83,7 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState> {
     RemoveKeychainSessionEvent event,
     Emitter<SessionState> emit,
   ) async {
-    await _keychain.remove();
+    await _keychain.clearAndLock();
     emit(const VisitorSessionState());
   }
 

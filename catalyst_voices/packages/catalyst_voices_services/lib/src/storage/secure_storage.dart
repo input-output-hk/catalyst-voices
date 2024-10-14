@@ -14,7 +14,7 @@ base class SecureStorage with StorageAsStringMixin implements Storage {
   }) : _secureStorage = secureStorage;
 
   @override
-  Future<bool> containsString({required String key}) async {
+  Future<bool> contains({required String key}) async {
     return await readString(key: key) != null;
   }
 

@@ -31,19 +31,22 @@ class Keychain {
   ///
   /// In most cases the [unlockFactor] is going to be
   /// an instance of a [PasswordLockFactor].
-  Future<void> init({
+  Future<void> setLockAndBeginWith({
     required SeedPhrase seedPhrase,
     required LockFactor unlockFactor,
+    bool unlocked = true,
   }) async {
-    _logger.info('init');
-    await _vault.setLock(unlockFactor);
-    await _vault.unlock(unlockFactor);
-    await _writeSeedPhrase(seedPhrase);
+    _logger.info('setLockAndBeginWith, unlocked: $unlocked');
+    await _changeLock(unlockFactor, unlocked: unlocked);
+    await _beginWith(seedPhrase: seedPhrase);
   }
 
-  /// Removes the keychain and all associated data.
-  Future<void> remove() async {
-    _logger.info('remove');
+  /// Clears the keychain and all associated data.
+  ///
+  /// Locks the keychain and removes the lock factor
+  /// from the underlying storage.
+  Future<void> clearAndLock() async {
+    _logger.info('clearAndLock');
     await _ensureUnlocked();
     await _vault.delete(key: _seedPhraseKey);
     await _vault.setLock(const VoidLockFactor());
@@ -53,7 +56,7 @@ class Keychain {
   /// Unlocks the keychain.
   ///
   /// The [unlock] factor must be the same [LockFactor]
-  /// as provided to the [init].
+  /// as provided to the [setLockAndBeginWith].
   ///
   /// In most cases the [unlock] is going to be
   /// an instance of a [PasswordLockFactor].
@@ -92,8 +95,26 @@ class Keychain {
     }
   }
 
+  Future<void> _changeLock(
+    LockFactor lockFactor, {
+    bool unlocked = false,
+  }) async {
+    await _vault.setLock(lockFactor);
+    if (unlocked) {
+      await _vault.unlock(lockFactor);
+    } else {
+      await _vault.lock();
+    }
+  }
+
+  Future<void> _beginWith({
+    required SeedPhrase seedPhrase,
+  }) async {
+    await _writeSeedPhrase(seedPhrase);
+  }
+
   Future<bool> get _hasSeedPhrase async {
-    return _vault.containsString(key: _seedPhraseKey);
+    return _vault.contains(key: _seedPhraseKey);
   }
 
   Future<SeedPhrase?> _readSeedPhrase() async {
@@ -105,6 +126,9 @@ class Keychain {
     }
   }
 
+  // TODO(dtscalac): in the future when key derivation spec is more stable
+  // the seed phrase should not be stored but only the master key that
+  // is derived from the seed phrase
   Future<void> _writeSeedPhrase(SeedPhrase seedPhrase) async {
     await _vault.writeString(seedPhrase.hexEntropy, key: _seedPhraseKey);
   }

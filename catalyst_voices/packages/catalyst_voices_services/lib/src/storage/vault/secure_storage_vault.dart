@@ -55,7 +55,7 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   }
 
   @override
-  Future<bool> containsString({required String key}) async {
+  Future<bool> contains({required String key}) async {
     return await _guardedRead(key: key, requireUnlocked: false) != null;
   }
 
