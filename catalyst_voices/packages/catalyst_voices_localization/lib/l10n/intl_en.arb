@@ -894,7 +894,7 @@
   "registrationExitConfirmDialogSubtitle": "Account creation incomplete!",
   "registrationExitConfirmDialogContent": "If attempt to leave without creating your keychain - account creation will be incomplete. \u2028\u2028You are not able to login without \u2028completing your keychain.",
   "registrationExitConfirmDialogContinue": "Continue keychain creation",
-  "registrationExitConfirmDialogCancel": "Cancel anyway",
+  "cancelAnyways": "Cancel anyway",
   "recoverCatalystKeychain": "Restore Catalyst keychain",
   "recoverKeychainMethodsTitle": "Restore your Catalyst Keychain",
   "recoverKeychainMethodsNoKeychainFound": "No Catalyst Keychain found on this device.",
@@ -911,5 +911,12 @@
   "recoveryAccountSuccessTitle": "Keychain recovered successfully!",
   "recoveryAccountDetailsAction": "Set unlock password for this device",
   "recoveryUnlockPasswordInstructionsTitle": "Set your Catalyst unlock password f\u2028or this device",
-  "recoveryUnlockPasswordInstructionsSubtitle": "With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.  \u2028\u2028But it can be a bit tedious to enter every single time you want to use the app.  \u2028\u2028In this next step, you'll set your Unlock Password for your current device. It's like a shortcut for proving ownership of your Keychain.  \u2028\u2028Whenever you recover your account for the first time on a new device, you'll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access."
+  "recoveryUnlockPasswordInstructionsSubtitle": "With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.  \u2028\u2028But it can be a bit tedious to enter every single time you want to use the app.  \u2028\u2028In this next step, you'll set your Unlock Password for your current device. It's like a shortcut for proving ownership of your Keychain.  \u2028\u2028Whenever you recover your account for the first time on a new device, you'll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.",
+  "recoverySuccessTitle": "Congratulations your Catalyst \u2028Keychain is restored!",
+  "recoverySuccessSubtitle": "You have successfully restored your Catalyst Keychain, and unlocked Catalyst Voices on this device.",
+  "recoverySuccessGoToDashboard": "Jump into the Discovery space / Dashboard",
+  "recoverySuccessGoAccount": "Check my account",
+  "recoveryExitConfirmDialogSubtitle": "12 word keychain restoration incomplete",
+  "recoveryExitConfirmDialogContent": "Please continue your Catalyst Keychain restoration, if you cancel all input will be lost.",
+  "recoveryExitConfirmDialogContinue": "Continue recovery process"
 }
