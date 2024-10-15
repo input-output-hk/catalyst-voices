@@ -129,7 +129,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       );
 
       final unsignedTx = await registrationService.prepareRegistration(
-        wallet: _walletLinkState.selectedCardanoWallet!,
+        wallet: _walletLinkCubit.selectedWallet!,
         // TODO(dtscalac): inject the networkId
         networkId: NetworkId.testnet,
         seedPhrase: _keychainState.seedPhrase!,
@@ -163,7 +163,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       );
 
       final signedTx = await registrationService.submitRegistration(
-        wallet: _walletLinkState.selectedCardanoWallet!,
+        wallet: _walletLinkCubit.selectedWallet!,
         unsignedTx: _registrationState.unsignedTx!.success,
       );
 

@@ -20,7 +20,7 @@ class SessionStateHeader extends StatelessWidget {
           VisitorSessionState() => const _VisitorButton(),
           GuestSessionState() => const _GuestButton(),
           ActiveUserSessionState(:final user) => AccountPopup(
-              avatarLetter: user.acronym ?? 'A',
+              avatarLetter: user.acronym,
               onLockAccountTap: () => _onLockAccount(context),
               onProfileKeychainTap: () => _onSeeProfile(context),
             ),

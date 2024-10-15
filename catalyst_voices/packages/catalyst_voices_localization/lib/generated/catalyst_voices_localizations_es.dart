@@ -443,6 +443,9 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get registrationUnlockPasswordNotFound => 'Password was not found. Make sure valid password was created.';
 
   @override
+  String get registrationWalletNotFound => 'Wallet not found';
+
+  @override
   String get walletLinkRoleChooserTitle => 'How do you want to participate in Catalyst?';
 
   @override
