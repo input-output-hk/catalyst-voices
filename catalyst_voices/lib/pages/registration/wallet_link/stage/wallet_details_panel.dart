@@ -61,7 +61,7 @@ class _BlocWalletDetailsText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocWalletLinkBuilder<String?>(
-      selector: (state) => state.selectedWallet?.meta.name,
+      selector: (state) => state.selectedWallet?.metadata.name,
       builder: (context, state) {
         return Text(
           context.l10n.walletLinkWalletDetailsContent(state ?? ''),

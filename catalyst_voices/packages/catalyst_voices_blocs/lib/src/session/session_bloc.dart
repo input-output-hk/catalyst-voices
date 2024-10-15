@@ -93,8 +93,8 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState> {
     /* cSpell:disable */
     return User(
       profile: Profile(
-        walletHeader: WalletHeader(
-          meta: const WalletMetadata(
+        walletInfo: WalletInfo(
+          metadata: const WalletMetadata(
             name: 'Dummy Wallet',
             icon: null,
           ),

@@ -20,7 +20,7 @@ export 'user/account_role.dart';
 export 'user/profile.dart';
 export 'user/user.dart';
 export 'wallet/cardano_wallet_details.dart';
-export 'wallet/wallet_header.dart';
+export 'wallet/wallet_info.dart';
 export 'wallet/wallet_metadata.dart';
 export 'workspace/workspace_proposal_navigation.dart';
 export 'workspace/workspace_proposal_segment.dart';

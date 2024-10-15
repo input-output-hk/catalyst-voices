@@ -81,8 +81,8 @@ final class RecoverCubit extends Cubit<RecoverStateData>
 
       final accountDetails = AccountSummaryData(
         walletConnection: WalletConnectionData(
-          name: walletHeader.meta.name,
-          icon: walletHeader.meta.icon,
+          name: walletHeader.metadata.name,
+          icon: walletHeader.metadata.icon,
         ),
         walletSummary: WalletSummaryData(
           balance: CryptocurrencyFormatter.formatAmount(walletHeader.balance),

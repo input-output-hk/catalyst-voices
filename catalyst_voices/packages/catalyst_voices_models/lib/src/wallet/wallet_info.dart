@@ -9,20 +9,20 @@ import 'package:equatable/equatable.dart';
 ///
 /// Instance of this class can come from different places like backend
 /// or user interacting with wallet extension.
-final class WalletHeader extends Equatable {
-  final WalletMetadata meta;
+final class WalletInfo extends Equatable {
+  final WalletMetadata metadata;
   final Coin balance;
   final ShelleyAddress address;
 
-  const WalletHeader({
-    required this.meta,
+  const WalletInfo({
+    required this.metadata,
     required this.balance,
     required this.address,
   });
 
   @override
   List<Object?> get props => [
-        meta,
+        metadata,
         balance.value,
         address,
       ];

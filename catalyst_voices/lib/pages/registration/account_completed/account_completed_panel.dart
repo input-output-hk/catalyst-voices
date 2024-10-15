@@ -39,7 +39,7 @@ class AccountCompletedPanel extends StatelessWidget {
                     BlocSelector<RegistrationCubit, RegistrationState, String>(
                       selector: (state) {
                         final wallet = state.walletLinkStateData.selectedWallet;
-                        final name = wallet?.meta.name ?? '';
+                        final name = wallet?.metadata.name ?? '';
                         return name.capitalize();
                       },
                       builder: (context, walletName) {
