@@ -14,6 +14,12 @@ class VoicesSnackBar extends StatelessWidget {
   /// which determines its appearance and behavior.
   final VoicesSnackBarType type;
 
+  /// A custom title. Overrides the default one specified by [type].
+  final String? title;
+
+  /// A custom message. Overrides the default one specified by [type].
+  final String? message;
+
   /// Function to be executed when the primary action button is pressed.
   final VoidCallback? onPrimaryPressed;
 
@@ -36,6 +42,8 @@ class VoicesSnackBar extends StatelessWidget {
   const VoicesSnackBar({
     super.key,
     required this.type,
+    this.title,
+    this.message,
     this.onPrimaryPressed,
     this.onSecondaryPressed,
     this.onClosePressed,
@@ -81,7 +89,7 @@ class VoicesSnackBar extends StatelessWidget {
                         ),
                     const SizedBox(width: 16),
                     Text(
-                      type.title(context),
+                      title ?? type.title(context),
                       style: TextStyle(
                         color: type.titleColor(context),
                         fontSize: textTheme.titleMedium?.fontSize,
@@ -99,7 +107,7 @@ class VoicesSnackBar extends StatelessWidget {
                 child: Row(
                   children: [
                     Text(
-                      type.message(context),
+                      message ?? type.message(context),
                       style: textTheme.bodyMedium,
                     ),
                   ],
