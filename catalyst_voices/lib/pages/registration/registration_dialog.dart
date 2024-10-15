@@ -28,25 +28,23 @@ class RegistrationDialog extends StatefulWidget {
 }
 
 class _RegistrationDialogState extends State<RegistrationDialog>
-    with ErrorHandlerStateMixin {
+    with ErrorHandlerStateMixin<RegistrationCubit, RegistrationDialog> {
   late final RegistrationCubit _cubit;
-  StreamSubscription<Object>? _errorSub;
 
   @override
   void initState() {
     super.initState();
     _cubit = Dependencies.instance.get<RegistrationCubit>();
-    _errorSub = _cubit.errorStream.listen(handleError);
   }
 
   @override
   void dispose() {
-    unawaited(_errorSub?.cancel());
-    _errorSub = null;
-
     unawaited(_cubit.close());
     super.dispose();
   }
+
+  @override
+  RegistrationCubit get errorEmitter => _cubit;
 
   @override
   Widget build(BuildContext context) {

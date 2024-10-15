@@ -1,16 +1,42 @@
 //ignore_for_file: one_member_abstracts
 
+import 'dart:async';
+
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+/// An interface of an abstract error handler.
 abstract interface class ErrorHandler {
   void handleError(Object error);
 }
 
-mixin ErrorHandlerStateMixin<T extends StatefulWidget> on State<T>
-    implements ErrorHandler {
+/// A convenient mixin that subscribes to the [ErrorEmitter]
+/// obtained from the [getErrorEmitter] and calls the [handleError].
+///
+/// After the widget is disposed the error stream is disposed too.
+mixin ErrorHandlerStateMixin<E extends ErrorEmitter, T extends StatefulWidget>
+    on State<T> implements ErrorHandler {
+  StreamSubscription<Object>? _errorSub;
+
+  @override
+  void initState() {
+    super.initState();
+    _errorSub = errorEmitter.errorStream.listen(handleError);
+  }
+
+  @override
+  void dispose() {
+    unawaited(_errorSub?.cancel());
+    _errorSub = null;
+    super.dispose();
+  }
+
+  E get errorEmitter => context.read<E>();
+
   @override
   void handleError(Object error) {
     if (error is LocalizedException) {

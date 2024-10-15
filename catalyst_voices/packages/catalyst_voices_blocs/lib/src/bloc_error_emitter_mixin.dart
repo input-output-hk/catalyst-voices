@@ -2,9 +2,16 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-mixin BlocErrorEmitterMixin<State> on BlocBase<State> {
+/// An interface of an abstract error emitter.
+abstract interface class ErrorEmitter {
+  /// The asynchronous error stream that can be listened by error handlers.
+  Stream<Object> get errorStream;
+}
+
+mixin BlocErrorEmitterMixin<State> on BlocBase<State> implements ErrorEmitter {
   late final _errorController = StreamController<Object>.broadcast();
 
+  @override
   Stream<Object> get errorStream => _errorController.stream;
 
   void emitError(Object error) {

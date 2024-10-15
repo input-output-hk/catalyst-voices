@@ -42,12 +42,9 @@ class _UnlockPasswordPanel extends StatefulWidget {
 }
 
 class _UnlockPasswordPanelState extends State<_UnlockPasswordPanel>
-    with ErrorHandlerStateMixin {
+    with ErrorHandlerStateMixin<SessionBloc, _UnlockPasswordPanel> {
   final TextEditingController _passwordController = TextEditingController();
-
-  // TODO(dtscalac): handle errors from ErrorHandlerStateMixin
-  // and update this field
-  final bool _showError = false;
+  bool _showError = false;
 
   @override
   void dispose() {
@@ -56,29 +53,49 @@ class _UnlockPasswordPanelState extends State<_UnlockPasswordPanel>
   }
 
   @override
+  void handleError(Object error) {
+    setState(() {
+      _showError = true;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const SizedBox(height: 24),
-        RegistrationStageMessage(
-          title: Text(context.l10n.unlockDialogTitle),
-          subtitle: Text(context.l10n.unlockDialogContent),
-        ),
-        const SizedBox(height: 24),
-        _UnlockPassword(
-          controller: _passwordController,
-          showError: _showError,
-        ),
-        const Spacer(),
-        _Navigation(
-          onUnlock: _onUnlock,
-        ),
-      ],
+    return BlocListener<SessionBloc, SessionState>(
+      listener: (context, state) {
+        if (state is ActiveUserSessionState) {
+          // TODO: show snackbar
+          // TODO show snackbar when locking
+          Navigator.of(context).pop();
+        }
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const SizedBox(height: 24),
+          RegistrationStageMessage(
+            title: Text(context.l10n.unlockDialogTitle),
+            subtitle: Text(context.l10n.unlockDialogContent),
+          ),
+          const SizedBox(height: 24),
+          _UnlockPassword(
+            controller: _passwordController,
+            showError: _showError,
+          ),
+          const Spacer(),
+          _Navigation(
+            onUnlock: _onUnlock,
+          ),
+        ],
+      ),
     );
   }
 
   void _onUnlock() {
+    setState(() {
+      _showError = false;
+    });
+
     final password = _passwordController.text;
     final unlockFactor = PasswordLockFactor(password);
     context
