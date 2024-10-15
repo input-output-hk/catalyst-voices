@@ -25,7 +25,7 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
     implements WalletLinkManager {
   final RegistrationService registrationService;
 
-  final _wallets = const <CardanoWallet>[];
+  final _wallets = <CardanoWallet>[];
   CardanoWallet? _selectedWallet;
 
   WalletLinkCubit({required this.registrationService})
@@ -36,6 +36,7 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
   @override
   Future<void> refreshWallets() async {
     try {
+      _wallets.clear();
       emit(state.copyWith(wallets: const Optional.empty()));
 
       final wallets =
