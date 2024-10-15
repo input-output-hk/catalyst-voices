@@ -15,7 +15,7 @@ final _logger = Logger('WalletLinkCubit');
 abstract interface class WalletLinkManager {
   Future<void> refreshWallets();
 
-  Future<bool> selectWallet(WalletMetadata mete);
+  Future<bool> selectWallet(WalletMetadata meta);
 
   void selectRoles(Set<AccountRole> roles);
 }
