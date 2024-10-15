@@ -1,4 +1,27 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "type": "object"
+	"$id": "https://www.stephenlewis.me/sentry-schema.json",
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"type": "object",
+	"properties": {
+		"sentry_dsn": {
+			"$ref": "#/definitions/saneUrl",
+			"description": "The Data Source Name (DSN) for Sentry."
+		},
+		"sentry_release": {
+			"type": "string",
+            "description": "A version of the code deployed to an environment"
+		},
+		"sentry_environment": {
+			"type": "string",
+			"description": "The environment in which the application is running, e.g., 'dev', 'qa'."
+		}
+	},
+	"additionalProperties": true,
+	"definitions": {
+		"saneUrl": {
+			"type": "string",
+			"format": "uri",
+			"pattern": "^https?://"
+		}
+	}
 }
