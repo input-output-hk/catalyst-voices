@@ -14,12 +14,14 @@ mixin ErrorHandlerStateMixin<T extends StatefulWidget> on State<T>
   @override
   void handleError(Object error) {
     if (error is LocalizedException) {
-      handleLocalizedException(error);
+      _handleLocalizedException(error);
     }
   }
 
-  void handleLocalizedException(LocalizedException exception) {
-    // TODO(damian-molinski): VoicesSnackBar does not support custom text yet.
-    const VoicesSnackBar(type: VoicesSnackBarType.error).show(context);
+  void _handleLocalizedException(LocalizedException exception) {
+    VoicesSnackBar(
+      type: VoicesSnackBarType.error,
+      message: exception.message(context),
+    ).show(context);
   }
 }
