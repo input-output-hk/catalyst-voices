@@ -118,7 +118,7 @@ class VoicesSnackBar extends StatelessWidget {
                 size: 24,
                 color: theme.colors.iconsForeground,
               ),
-              onPressed: onClosePressed,
+              onPressed: onClosePressed ?? () => hideCurrent(context),
             ),
           ),
         ],

@@ -37,6 +37,7 @@ class SessionStateHeader extends StatelessWidget {
 
     VoicesSnackBar(
       type: VoicesSnackBarType.error,
+      behavior: SnackBarBehavior.floating,
       icon: VoicesAssets.icons.lockClosed.buildIcon(),
       title: context.l10n.lockSnackbarTitle,
       message: context.l10n.lockSnackbarMessage,

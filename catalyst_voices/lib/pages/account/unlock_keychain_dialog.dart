@@ -67,13 +67,14 @@ class _UnlockPasswordPanelState extends State<_UnlockPasswordPanel>
     return BlocListener<SessionBloc, SessionState>(
       listener: (context, state) {
         if (state is ActiveUserSessionState) {
-           VoicesSnackBar(
+          VoicesSnackBar(
             type: VoicesSnackBarType.success,
+            behavior: SnackBarBehavior.floating,
             icon: VoicesAssets.icons.lockOpen.buildIcon(),
             title: context.l10n.unlockSnackbarTitle,
             message: context.l10n.unlockSnackbarMessage,
           ).show(context);
-          
+
           Navigator.of(context).pop();
         }
       },
@@ -129,7 +130,7 @@ class _UnlockPassword extends StatelessWidget {
         labelText: context.l10n.unlockDialogHint,
         errorText:
             showError ? context.l10n.unlockDialogIncorrectPassword : null,
-        hintText: '***********',
+        hintText: context.l10n.passwordLabelText,
       ),
     );
   }
@@ -152,6 +153,7 @@ class _Navigation extends StatelessWidget {
             child: Text(context.l10n.continueAsGuest),
           ),
         ),
+        const SizedBox(width: 10),
         Expanded(
           child: VoicesFilledButton(
             onTap: onUnlock,
