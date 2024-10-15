@@ -31,8 +31,7 @@ impl Config {
             Ok(value)
         } else {
             // If data not found return default config value
-            id.default()
-                .ok_or(anyhow::anyhow!("Default value not found for {:?}", id))
+            Ok(id.default())
         }
     }
 

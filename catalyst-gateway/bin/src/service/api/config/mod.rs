@@ -2,12 +2,10 @@
 
 use std::{net::IpAddr, str::FromStr};
 
-use poem_openapi::{
-    param::{Header, Query},
-    payload::Json,
-    ApiResponse, OpenApi,
-};
+use poem::web::RealIp;
+use poem_openapi::{param::Query, payload::Json, ApiResponse, OpenApi};
 use serde_json::Value;
+use tracing::info;
 
 use crate::{
     db::event::config::{key::ConfigKey, Config},
@@ -34,35 +32,22 @@ enum Responses {
 #[OpenApi(tag = "ApiTags::Config")]
 impl ConfigApi {
     /// Get the configuration for the frontend.
-    /// Retrieving IP from X-Forwarded-For header if provided.
-    /// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Forwarded-For
+    ///
+    /// Retrieving IP from X-Real-IP, Forwarded, X-Forwarded-For or Remote Address.
     #[oai(
         path = "/draft/config/frontend",
         method = "get",
         operation_id = "get_config_frontend"
     )]
-    async fn get_frontend(
-        &self, #[oai(name = "X-Forwarded-For")] header: Header<Option<String>>,
-    ) -> Responses {
-        // Retrieve the IP address from the header
-        // According to the X-Forwarded-For header spec, the first value is the IP address
-        let ip_address = header
-            .0
-            .as_ref()
-            .and_then(|h| h.split(',').next())
-            .map(String::from);
+    async fn get_frontend(&self, ip_address: RealIp) -> Responses {
+        info!("IP Address: {:?}", ip_address.0);
 
         // Fetch the general configuration
         let general_config = Config::get(ConfigKey::Frontend).await;
 
         // Attempt to fetch the IP configuration
-        let ip_config = if let Some(ip) = ip_address {
-            match IpAddr::from_str(&ip) {
-                Ok(parsed_ip) => Config::get(ConfigKey::FrontendForIp(parsed_ip)).await.ok(),
-                Err(_) => {
-                    return Responses::BadRequest(Json(format!("Invalid IP address: {ip}")));
-                },
-            }
+        let ip_config = if let Some(ip) = ip_address.0 {
+            Config::get(ConfigKey::FrontendForIp(ip)).await.ok()
         } else {
             None
         };
@@ -84,7 +69,7 @@ impl ConfigApi {
         }
     }
 
-    /// Insert or update the frontend configuration.
+    /// Set the frontend configuration.
     #[oai(
         path = "/draft/config/frontend",
         method = "put",
