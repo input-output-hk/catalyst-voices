@@ -29,13 +29,7 @@ class RegistrationDialog extends StatefulWidget {
 
 class _RegistrationDialogState extends State<RegistrationDialog>
     with ErrorHandlerStateMixin<RegistrationCubit, RegistrationDialog> {
-  late final RegistrationCubit _cubit;
-
-  @override
-  void initState() {
-    super.initState();
-    _cubit = Dependencies.instance.get<RegistrationCubit>();
-  }
+  late final RegistrationCubit _cubit = Dependencies.instance.get();
 
   @override
   void dispose() {

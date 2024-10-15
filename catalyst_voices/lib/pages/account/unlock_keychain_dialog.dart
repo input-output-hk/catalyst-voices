@@ -2,6 +2,8 @@ import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/pages/registration/pictures/unlock_keychain_picture.dart';
 import 'package:catalyst_voices/pages/registration/widgets/information_panel.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
+import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
+import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -64,8 +66,12 @@ class _UnlockPasswordPanelState extends State<_UnlockPasswordPanel>
     return BlocListener<SessionBloc, SessionState>(
       listener: (context, state) {
         if (state is ActiveUserSessionState) {
-          // TODO: show snackbar
-          // TODO show snackbar when locking
+           VoicesSnackBar(
+            type: VoicesSnackBarType.success,
+            title: context.l10n.unlockSnackbarTitle,
+            message: context.l10n.unlockSnackbarMessage,
+          ).show(context);
+          
           Navigator.of(context).pop();
         }
       },

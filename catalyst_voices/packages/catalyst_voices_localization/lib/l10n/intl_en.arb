@@ -936,6 +936,22 @@
   "@continueAsGuest": {
     "description": "The message shown when asking the user to login/unlock and the user wants to cancel the process."
   },
+  "unlockSnackbarTitle": "Catalyst unlocked!",
+  "@unlockSnackbarTitle": {
+    "description": "The title shown in confirmation snackbar after unlocking the keychain."
+  },
+  "unlockSnackbarMessage": "You can now fully use the application.",
+  "@unlockSnackbarMessage": {
+    "description": "The message shown below the title in confirmation snackbar after unlocking the keychain."
+  },
+  "lockSnackbarTitle": "Catalyst locked",
+  "@lockSnackbarTitle": {
+    "description": "The title shown in confirmation snackbar after locking the keychain."
+  },
+  "lockSnackbarMessage": "Catalyst is now in guest/locked mode.",
+  "@lockSnackbarMessage": {
+    "description": "The message shown below the title in confirmation snackbar after locking the keychain."
+  },
   "recoverySuccessTitle": "Congratulations your Catalyst \u2028Keychain is restored!",
   "recoverySuccessSubtitle": "You have successfully restored your Catalyst Keychain, and unlocked Catalyst Voices on this device.",
   "recoverySuccessGoToDashboard": "Jump into the Discovery space / Dashboard",

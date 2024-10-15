@@ -1774,6 +1774,30 @@ abstract class VoicesLocalizations {
   /// **'Continue as guest'**
   String get continueAsGuest;
 
+  /// The title shown in confirmation snackbar after unlocking the keychain.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst unlocked!'**
+  String get unlockSnackbarTitle;
+
+  /// The message shown below the title in confirmation snackbar after unlocking the keychain.
+  ///
+  /// In en, this message translates to:
+  /// **'You can now fully use the application.'**
+  String get unlockSnackbarMessage;
+
+  /// The title shown in confirmation snackbar after locking the keychain.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst locked'**
+  String get lockSnackbarTitle;
+
+  /// The message shown below the title in confirmation snackbar after locking the keychain.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst is now in guest/locked mode.'**
+  String get lockSnackbarMessage;
+
   /// No description provided for @recoverySuccessTitle.
   ///
   /// In en, this message translates to:

@@ -933,6 +933,18 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get continueAsGuest => 'Continue as guest';
 
   @override
+  String get unlockSnackbarTitle => 'Catalyst unlocked!';
+
+  @override
+  String get unlockSnackbarMessage => 'You can now fully use the application.';
+
+  @override
+  String get lockSnackbarTitle => 'Catalyst locked';
+
+  @override
+  String get lockSnackbarMessage => 'Catalyst is now in guest/locked mode.';
+
+  @override
   String get recoverySuccessTitle => 'Congratulations your Catalyst  Keychain is restored!';
 
   @override
