@@ -94,7 +94,7 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState> {
     return User(
       profile: Profile(
         walletHeader: WalletHeader(
-          meta: const WalletMeta(
+          meta: const WalletMetadata(
             name: 'Dummy Wallet',
             icon: null,
           ),

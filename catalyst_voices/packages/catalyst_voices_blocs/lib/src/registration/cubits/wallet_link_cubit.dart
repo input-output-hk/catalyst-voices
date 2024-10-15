@@ -15,7 +15,7 @@ final _logger = Logger('WalletLinkCubit');
 abstract interface class WalletLinkManager {
   Future<void> refreshWallets();
 
-  Future<bool> selectWallet(WalletMeta mete);
+  Future<bool> selectWallet(WalletMetadata mete);
 
   void selectRoles(Set<AccountRole> roles);
 }
@@ -47,7 +47,7 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
         ..addAll(wallets);
 
       final walletsMetaList =
-          wallets.map(WalletMeta.fromCardanoWallet).toList();
+          wallets.map(WalletMetadata.fromCardanoWallet).toList();
 
       emit(state.copyWith(wallets: Optional(Success(walletsMetaList))));
     } on Exception catch (error, stackTrace) {
@@ -60,7 +60,7 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
   }
 
   @override
-  Future<bool> selectWallet(WalletMeta meta) async {
+  Future<bool> selectWallet(WalletMetadata meta) async {
     try {
       final wallet =
           _wallets.firstWhereOrNull((wallet) => wallet.name == meta.name);

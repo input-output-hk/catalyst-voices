@@ -56,7 +56,7 @@ final class RegistrationService {
     final address = await enabledWallet.getChangeAddress();
 
     return WalletHeader(
-      meta: WalletMeta.fromCardanoWallet(wallet),
+      meta: WalletMetadata.fromCardanoWallet(wallet),
       balance: balance.coin,
       address: address,
     );
@@ -77,7 +77,7 @@ final class RegistrationService {
     }
 
     return WalletHeader(
-      meta: const WalletMeta(name: 'Dummy Wallet'),
+      meta: const WalletMetadata(name: 'Dummy Wallet'),
       balance: Coin.fromAda(10),
       address: _testNetAddress,
     );

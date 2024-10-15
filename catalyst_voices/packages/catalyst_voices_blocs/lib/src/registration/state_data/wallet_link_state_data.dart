@@ -5,7 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:result_type/result_type.dart';
 
 final class WalletLinkStateData extends Equatable {
-  final Result<List<WalletMeta>, Exception>? wallets;
+  final Result<List<WalletMetadata>, Exception>? wallets;
   final WalletHeader? selectedWallet;
   final bool hasEnoughBalance;
   final WalletConnectionData? walletConnection;
@@ -28,7 +28,7 @@ final class WalletLinkStateData extends Equatable {
   Set<AccountRole> get defaultRoles => {AccountRole.voter};
 
   WalletLinkStateData copyWith({
-    Optional<Result<List<WalletMeta>, Exception>>? wallets,
+    Optional<Result<List<WalletMetadata>, Exception>>? wallets,
     Optional<WalletHeader>? selectedWallet,
     bool? hasEnoughBalance,
     Optional<WalletConnectionData>? walletConnection,

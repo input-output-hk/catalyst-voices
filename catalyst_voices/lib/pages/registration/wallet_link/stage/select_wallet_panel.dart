@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:result_type/result_type.dart';
 
 /// Callback called when a [wallet] is selected.
-typedef _OnSelectWallet = Future<void> Function(WalletMeta wallet);
+typedef _OnSelectWallet = Future<void> Function(WalletMetadata wallet);
 
 class SelectWalletPanel extends StatefulWidget {
   const SelectWalletPanel({
@@ -67,7 +67,7 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
     unawaited(RegistrationCubit.of(context).walletLink.refreshWallets());
   }
 
-  Future<void> _onSelectWallet(WalletMeta wallet) async {
+  Future<void> _onSelectWallet(WalletMetadata wallet) async {
     final registration = RegistrationCubit.of(context);
 
     final success = await registration.walletLink.selectWallet(wallet);
@@ -88,7 +88,7 @@ class _BlocWallets extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocWalletLinkBuilder<Result<List<WalletMeta>, Exception>?>(
+    return BlocWalletLinkBuilder<Result<List<WalletMetadata>, Exception>?>(
       selector: (state) => state.wallets,
       builder: (context, state) {
         return _Wallets(
@@ -102,7 +102,7 @@ class _BlocWallets extends StatelessWidget {
 }
 
 class _Wallets extends StatelessWidget {
-  final Result<List<WalletMeta>, Exception>? result;
+  final Result<List<WalletMetadata>, Exception>? result;
   final _OnSelectWallet onSelectWallet;
   final VoidCallback onRefreshTap;
 
@@ -127,7 +127,7 @@ class _Wallets extends StatelessWidget {
 }
 
 class _WalletsList extends StatelessWidget {
-  final List<WalletMeta> wallets;
+  final List<WalletMetadata> wallets;
   final _OnSelectWallet onSelectWallet;
 
   const _WalletsList({
@@ -150,7 +150,7 @@ class _WalletsList extends StatelessWidget {
 }
 
 class _WalletTile extends StatefulWidget {
-  final WalletMeta wallet;
+  final WalletMetadata wallet;
   final _OnSelectWallet onSelectWallet;
 
   const _WalletTile({
