@@ -82,8 +82,13 @@ V1 transaction representation in hex:
 
 To generate a cryptographically secured `ENCRYPTED-VOTE` and `PROOF-VOTE` parts you can follow this [spec](./crypto.md#vote).
 Important to note,
-that as part of [*initial setup*](./crypto.md#initial-setup) of the voting procedure
-a `3` voting choices was choosen and as a backend cryptographic group the [ristretto255] is used.
+that as part of [*initial setup*](./crypto.md#initial-setup) of the voting procedure,
+the following properties are used:
+
+1. Each proposal, defined by the "Vote plan id" and "Proposal index", defines a number of possible options.
+2. [ristretto255] as a backend cryptographic group.
+3. [BLAKE2b-512] hash function.
+4. A commitment key $ck$ defined as a [BLAKE2b-512] hash of the "Vote plan id" bytes.
 
 #### Transaction signing (witness generation)
 
@@ -127,4 +132,5 @@ Expected witness (includes signature)
 <!-- OPTIONAL SECTIONS: see CIP-0001 > Document > Structure table -->
 
 [BLAKE2b-256]: https://www.blake2.net/blake2.pdf\
+[BLAKE2b-512]: https://www.blake2.net/blake2.pdf\
 [ristretto255]: https://ristretto.group

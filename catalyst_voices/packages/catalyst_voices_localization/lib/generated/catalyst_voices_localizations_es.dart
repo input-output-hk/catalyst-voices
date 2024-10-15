@@ -590,7 +590,7 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get deleteKeychainDialogInputLabel => 'Confirm removal';
 
   @override
-  String get deleteKeychainDialogErrorText => 'Error. Please type \'Remove keychain\' to remove your account from this device.';
+  String get deleteKeychainDialogErrorText => 'Error. Please type \'Remove Keychain\' to remove your account from this device.';
 
   @override
   String get deleteKeychainDialogRemovingPhrase => 'Remove Keychain';
@@ -720,6 +720,46 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get keychainDeletedDialogInfo => 'Catalyst keychain removed';
 
   @override
+  String get registrationCompletedTitle => 'Catalyst account setup';
+
+  @override
+  String get registrationCompletedSubtitle => 'Completed!';
+
+  @override
+  String get registrationCompletedSummaryHeader => 'Summary';
+
+  @override
+  String get registrationCompletedKeychainTitle => 'Catalyst Keychain created';
+
+  @override
+  String get registrationCompletedKeychainInfo => 'You created a Catalyst Keychain, backed up its seed phrase and set an unlock password.';
+
+  @override
+  String registrationCompletedWalletTitle(String walletName) {
+    return 'Cardano $walletName wallet selected';
+  }
+
+  @override
+  String registrationCompletedWalletInfo(String walletName) {
+    return 'You selected your $walletName wallet as primary wallet for your voting power.';
+  }
+
+  @override
+  String get registrationCompletedRolesTitle => 'Catalyst roles selected';
+
+  @override
+  String get registrationCompletedRolesInfo => 'You linked your Cardano wallet and selected  Catalyst roles via a signed transaction.';
+
+  @override
+  String get registrationCompletedRoleRegistration => 'role registration';
+
+  @override
+  String get registrationCompletedDiscoveryButton => 'Open Discovery Dashboard';
+
+  @override
+  String get registrationCompletedAccountButton => 'Review my account';
+
+  @override
   String get createKeychainSeedPhraseSubtitle => 'Write down your 12 Catalyst  security words';
 
   @override
@@ -818,7 +858,7 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get registrationExitConfirmDialogContinue => 'Continue keychain creation';
 
   @override
-  String get registrationExitConfirmDialogCancel => 'Cancel anyway';
+  String get cancelAnyways => 'Cancel anyway';
 
   @override
   String get recoverCatalystKeychain => 'Restore Catalyst keychain';
@@ -888,4 +928,25 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get continueAsGuest => 'Continue as guest';
+
+  @override
+  String get recoverySuccessTitle => 'Congratulations your Catalyst  Keychain is restored!';
+
+  @override
+  String get recoverySuccessSubtitle => 'You have successfully restored your Catalyst Keychain, and unlocked Catalyst Voices on this device.';
+
+  @override
+  String get recoverySuccessGoToDashboard => 'Jump into the Discovery space / Dashboard';
+
+  @override
+  String get recoverySuccessGoAccount => 'Check my account';
+
+  @override
+  String get recoveryExitConfirmDialogSubtitle => '12 word keychain restoration incomplete';
+
+  @override
+  String get recoveryExitConfirmDialogContent => 'Please continue your Catalyst Keychain restoration, if you cancel all input will be lost.';
+
+  @override
+  String get recoveryExitConfirmDialogContinue => 'Continue recovery process';
 }

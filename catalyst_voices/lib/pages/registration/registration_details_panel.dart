@@ -1,3 +1,4 @@
+import 'package:catalyst_voices/pages/registration/account_completed/account_completed_panel.dart';
 import 'package:catalyst_voices/pages/registration/create_keychain/create_keychain_panel.dart';
 import 'package:catalyst_voices/pages/registration/finish_account/finish_account_creation_panel.dart';
 import 'package:catalyst_voices/pages/registration/get_started/get_started_panel.dart';
@@ -26,7 +27,7 @@ class RegistrationDetailsPanel extends StatelessWidget {
           CreateKeychainStep(:final stage) => CreateKeychainPanel(stage: stage),
           FinishAccountCreationStep() => const FinishAccountCreationPanel(),
           WalletLinkStep(:final stage) => WalletLinkPanel(stage: stage),
-          AccountCompletedStep() => const Placeholder(),
+          AccountCompletedStep() => const AccountCompletedPanel(),
         };
       },
     );

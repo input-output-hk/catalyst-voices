@@ -710,7 +710,7 @@
   "@deleteKeychainDialogInputLabel": {
     "description": "An input label on delete keychain dialog"
   },
-  "deleteKeychainDialogErrorText": "Error. Please type 'Remove keychain' to remove your account from this device.",
+  "deleteKeychainDialogErrorText": "Error. Please type 'Remove Keychain' to remove your account from this device.",
   "@deleteKeychainDialogErrorText": {
     "description": "An error text on text field on delete keychain dialog"
   },
@@ -819,6 +819,32 @@
   "@keychainDeletedDialogInfo": {
     "description": "An info on keychain deleted dialog"
   },
+  "registrationCompletedTitle": "Catalyst account setup",
+  "registrationCompletedSubtitle": "Completed!",
+  "registrationCompletedSummaryHeader": "Summary",
+  "registrationCompletedKeychainTitle": "Catalyst Keychain created",
+  "registrationCompletedKeychainInfo": "You created a Catalyst Keychain, backed up its seed phrase and set an unlock password.",
+  "registrationCompletedWalletTitle": "Cardano {walletName} wallet selected",
+  "@registrationCompletedWalletTitle": {
+    "placeholders": {
+      "walletName": {
+        "type": "String"
+      }
+    }
+  },
+  "registrationCompletedWalletInfo": "You selected your {walletName} wallet as primary wallet for your voting power.",
+  "@registrationCompletedWalletInfo": {
+    "placeholders": {
+      "walletName": {
+        "type": "String"
+      }
+    }
+  },
+  "registrationCompletedRolesTitle": "Catalyst roles selected",
+  "registrationCompletedRolesInfo": "You linked your Cardano wallet and selected  Catalyst roles via a signed transaction.",
+  "registrationCompletedRoleRegistration": "role registration",
+  "registrationCompletedDiscoveryButton": "Open Discovery Dashboard",
+  "registrationCompletedAccountButton": "Review my account",
   "createKeychainSeedPhraseSubtitle": "Write down your 12 Catalyst \u2028security words",
   "createKeychainSeedPhraseBody": "Make sure you create an offline backup of your recovery phrase as well.",
   "createKeychainSeedPhraseDownload": "Download Catalyst key",
@@ -864,7 +890,7 @@
   "registrationExitConfirmDialogSubtitle": "Account creation incomplete!",
   "registrationExitConfirmDialogContent": "If attempt to leave without creating your keychain - account creation will be incomplete. \u2028\u2028You are not able to login without \u2028completing your keychain.",
   "registrationExitConfirmDialogContinue": "Continue keychain creation",
-  "registrationExitConfirmDialogCancel": "Cancel anyway",
+  "cancelAnyways": "Cancel anyway",
   "recoverCatalystKeychain": "Restore Catalyst keychain",
   "recoverKeychainMethodsTitle": "Restore your Catalyst Keychain",
   "recoverKeychainMethodsNoKeychainFound": "No Catalyst Keychain found on this device.",
@@ -905,5 +931,12 @@
   "continueAsGuest": "Continue as guest",
   "@continueAsGuest": {
     "description": "The message shown when asking the user to login/unlock and the user wants to cancel the process."
-  }
+  },
+  "recoverySuccessTitle": "Congratulations your Catalyst \u2028Keychain is restored!",
+  "recoverySuccessSubtitle": "You have successfully restored your Catalyst Keychain, and unlocked Catalyst Voices on this device.",
+  "recoverySuccessGoToDashboard": "Jump into the Discovery space / Dashboard",
+  "recoverySuccessGoAccount": "Check my account",
+  "recoveryExitConfirmDialogSubtitle": "12 word keychain restoration incomplete",
+  "recoveryExitConfirmDialogContent": "Please continue your Catalyst Keychain restoration, if you cancel all input will be lost.",
+  "recoveryExitConfirmDialogContinue": "Continue recovery process"
 }

@@ -41,6 +41,9 @@ final class RecoverCubit extends Cubit<RecoverStateData>
     }
   }
 
+  // Note. this function will have more sense when we'll implement
+  // multi account feature. Then we can have multiple keychains and lookup
+  // those already stored locally.
   @override
   Future<void> checkLocalKeychains() async {
     // TODO(damian-molinski): to be implemented
