@@ -5,6 +5,7 @@ import 'package:catalyst_voices/pages/registration/widgets/registration_stage_me
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
+import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -68,6 +69,7 @@ class _UnlockPasswordPanelState extends State<_UnlockPasswordPanel>
         if (state is ActiveUserSessionState) {
            VoicesSnackBar(
             type: VoicesSnackBarType.success,
+            icon: VoicesAssets.icons.lockOpen.buildIcon(),
             title: context.l10n.unlockSnackbarTitle,
             message: context.l10n.unlockSnackbarMessage,
           ).show(context);
