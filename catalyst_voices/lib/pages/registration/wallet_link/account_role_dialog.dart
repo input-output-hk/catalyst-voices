@@ -16,7 +16,10 @@ class AccountRoleDialog extends StatelessWidget {
     super.key,
   });
 
-  static Future<void> show(BuildContext context, AccountRole role) async {
+  static Future<void> show(
+    BuildContext context, {
+    required AccountRole role,
+  }) async {
     return VoicesDialog.show<void>(
       context: context,
       builder: (context) {

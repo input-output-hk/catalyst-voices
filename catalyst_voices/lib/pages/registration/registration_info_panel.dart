@@ -1,5 +1,6 @@
 import 'package:catalyst_voices/pages/registration/bloc_unlock_password_builder.dart';
 import 'package:catalyst_voices/pages/registration/create_keychain/bloc_seed_phrase_builder.dart';
+import 'package:catalyst_voices/pages/registration/pictures/account_completed_picture.dart';
 import 'package:catalyst_voices/pages/registration/pictures/keychain_picture.dart';
 import 'package:catalyst_voices/pages/registration/pictures/keychain_with_password_picture.dart';
 import 'package:catalyst_voices/pages/registration/pictures/password_picture.dart';
@@ -131,7 +132,10 @@ class RegistrationInfoPanel extends StatelessWidget {
         ),
       CreateKeychainStep(:final stage) => buildKeychainStageHeader(stage),
       WalletLinkStep(:final stage) => buildWalletLinkStageHeader(stage),
-      AccountCompletedStep() => _HeaderStrings(title: 'TODO'),
+      AccountCompletedStep() => _HeaderStrings(
+          title: context.l10n.registrationCompletedTitle,
+          subtitle: context.l10n.registrationCompletedSubtitle,
+        ),
     };
   }
 }
@@ -194,7 +198,7 @@ class _RegistrationPicture extends StatelessWidget {
       CreateKeychainStep(:final stage) => buildKeychainStagePicture(stage),
       FinishAccountCreationStep() => const KeychainWithPasswordPicture(),
       WalletLinkStep(:final stage) => buildWalletLinkStagePicture(stage),
-      AccountCompletedStep() => const KeychainPicture(),
+      AccountCompletedStep() => const AccountCompletedPicture(),
     };
   }
 }

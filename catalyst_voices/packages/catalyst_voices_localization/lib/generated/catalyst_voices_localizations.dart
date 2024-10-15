@@ -1111,7 +1111,7 @@ abstract class VoicesLocalizations {
   /// An error text on text field on delete keychain dialog
   ///
   /// In en, this message translates to:
-  /// **'Error. Please type \'Remove keychain\' to remove your account from this device.'**
+  /// **'Error. Please type \'Remove Keychain\' to remove your account from this device.'**
   String get deleteKeychainDialogErrorText;
 
   /// A removing phrase on delete keychain dialog
@@ -1360,6 +1360,78 @@ abstract class VoicesLocalizations {
   /// **'Catalyst keychain removed'**
   String get keychainDeletedDialogInfo;
 
+  /// No description provided for @registrationCompletedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst account setup'**
+  String get registrationCompletedTitle;
+
+  /// No description provided for @registrationCompletedSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed!'**
+  String get registrationCompletedSubtitle;
+
+  /// No description provided for @registrationCompletedSummaryHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Summary'**
+  String get registrationCompletedSummaryHeader;
+
+  /// No description provided for @registrationCompletedKeychainTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst Keychain created'**
+  String get registrationCompletedKeychainTitle;
+
+  /// No description provided for @registrationCompletedKeychainInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'You created a Catalyst Keychain, backed up its seed phrase and set an unlock password.'**
+  String get registrationCompletedKeychainInfo;
+
+  /// No description provided for @registrationCompletedWalletTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cardano {walletName} wallet selected'**
+  String registrationCompletedWalletTitle(String walletName);
+
+  /// No description provided for @registrationCompletedWalletInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'You selected your {walletName} wallet as primary wallet for your voting power.'**
+  String registrationCompletedWalletInfo(String walletName);
+
+  /// No description provided for @registrationCompletedRolesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst roles selected'**
+  String get registrationCompletedRolesTitle;
+
+  /// No description provided for @registrationCompletedRolesInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'You linked your Cardano wallet and selected  Catalyst roles via a signed transaction.'**
+  String get registrationCompletedRolesInfo;
+
+  /// No description provided for @registrationCompletedRoleRegistration.
+  ///
+  /// In en, this message translates to:
+  /// **'role registration'**
+  String get registrationCompletedRoleRegistration;
+
+  /// No description provided for @registrationCompletedDiscoveryButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Discovery Dashboard'**
+  String get registrationCompletedDiscoveryButton;
+
+  /// No description provided for @registrationCompletedAccountButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Review my account'**
+  String get registrationCompletedAccountButton;
+
   /// No description provided for @createKeychainSeedPhraseSubtitle.
   ///
   /// In en, this message translates to:
@@ -1552,11 +1624,11 @@ abstract class VoicesLocalizations {
   /// **'Continue keychain creation'**
   String get registrationExitConfirmDialogContinue;
 
-  /// No description provided for @registrationExitConfirmDialogCancel.
+  /// No description provided for @cancelAnyways.
   ///
   /// In en, this message translates to:
   /// **'Cancel anyway'**
-  String get registrationExitConfirmDialogCancel;
+  String get cancelAnyways;
 
   /// No description provided for @recoverCatalystKeychain.
   ///
@@ -1659,6 +1731,48 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.    But it can be a bit tedious to enter every single time you want to use the app.    In this next step, you\'ll set your Unlock Password for your current device. It\'s like a shortcut for proving ownership of your Keychain.    Whenever you recover your account for the first time on a new device, you\'ll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.'**
   String get recoveryUnlockPasswordInstructionsSubtitle;
+
+  /// No description provided for @recoverySuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Congratulations your Catalyst  Keychain is restored!'**
+  String get recoverySuccessTitle;
+
+  /// No description provided for @recoverySuccessSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You have successfully restored your Catalyst Keychain, and unlocked Catalyst Voices on this device.'**
+  String get recoverySuccessSubtitle;
+
+  /// No description provided for @recoverySuccessGoToDashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Jump into the Discovery space / Dashboard'**
+  String get recoverySuccessGoToDashboard;
+
+  /// No description provided for @recoverySuccessGoAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Check my account'**
+  String get recoverySuccessGoAccount;
+
+  /// No description provided for @recoveryExitConfirmDialogSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'12 word keychain restoration incomplete'**
+  String get recoveryExitConfirmDialogSubtitle;
+
+  /// No description provided for @recoveryExitConfirmDialogContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Please continue your Catalyst Keychain restoration, if you cancel all input will be lost.'**
+  String get recoveryExitConfirmDialogContent;
+
+  /// No description provided for @recoveryExitConfirmDialogContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue recovery process'**
+  String get recoveryExitConfirmDialogContinue;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
