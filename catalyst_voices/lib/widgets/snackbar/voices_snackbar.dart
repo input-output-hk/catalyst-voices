@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_action.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -14,6 +16,9 @@ class VoicesSnackBar extends StatelessWidget {
   /// The type of the [VoicesSnackBar],
   /// which determines its appearance and behavior.
   final VoicesSnackBarType type;
+
+  /// A custom icon. Overrides the default one specified by [type].
+  final Widget? icon;
 
   /// A custom title. Overrides the default one specified by [type].
   final String? title;
@@ -36,11 +41,17 @@ class VoicesSnackBar extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
 
   /// The width of the [VoicesSnackBar].
+  ///
+  /// If null and [behavior] is [SnackBarBehavior.floating] then snackbar
+  /// will calculate it's size using the following formula:
+  /// - max(screenWidth * 0.4, 300)
+  /// but no more than the screenWidth.
   final double? width;
 
   const VoicesSnackBar({
     super.key,
     required this.type,
+    this.icon,
     this.title,
     this.message,
     this.actions = const [],
@@ -61,9 +72,10 @@ class VoicesSnackBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
+          Flexible(
             child: Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 16,
@@ -74,10 +86,7 @@ class VoicesSnackBar extends StatelessWidget {
                 children: [
                   _IconAndTitle(
                     type: type,
-                    icon: type.icon().buildIcon(
-                          size: 20,
-                          color: type.iconColor(context),
-                        ),
+                    icon: icon ?? type.icon().buildIcon(),
                     title: title ?? type.title(context),
                   ),
                   Padding(
@@ -122,12 +131,25 @@ class VoicesSnackBar extends StatelessWidget {
       SnackBar(
         content: this,
         behavior: behavior,
-        width: behavior == SnackBarBehavior.floating ? width : null,
+        width: _calculateSnackBarWidth(
+          screenWidth: MediaQuery.sizeOf(context).width,
+        ),
         padding: padding,
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),
     );
+  }
+
+  double? _calculateSnackBarWidth({required double screenWidth}) {
+    switch (behavior) {
+      case null:
+      case SnackBarBehavior.fixed:
+        // custom width not supported
+        return null;
+      case SnackBarBehavior.floating:
+        return max(screenWidth * 0.4, 300).clamp(0.0, screenWidth).toDouble();
+    }
   }
 
   static void hideCurrent(BuildContext context) =>
@@ -150,10 +172,17 @@ class _IconAndTitle extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        icon,
+        IconTheme(
+          data: IconThemeData(
+            size: 20,
+            color: type.iconColor(context),
+          ),
+          child: icon,
+        ),
         const SizedBox(width: 8),
-        Expanded(
+        Flexible(
           child: Text(
             title,
             style: TextStyle(

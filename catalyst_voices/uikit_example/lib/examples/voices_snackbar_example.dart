@@ -35,22 +35,26 @@ class VoicesSnackbarExample extends StatelessWidget {
           children: [
             for (final type in VoicesSnackBarType.values)
               for (final actions in actionsList)
-                OutlinedButton(
-                  onPressed: () {
-                    VoicesSnackBar(
-                      type: type,
-                      onClosePressed: () => VoicesSnackBar.hideCurrent(context),
-                      actions: actions,
-                    ).show(context);
-                  },
-                  child: Text(
-                    '${type.toString().split('.').last}'
-                    '${actions.isEmpty ? '' : ' with actions'}',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface,
+                for (final behavior in SnackBarBehavior.values)
+                  OutlinedButton(
+                    onPressed: () {
+                      VoicesSnackBar(
+                        type: type,
+                        behavior: behavior,
+                        onClosePressed: () =>
+                            VoicesSnackBar.hideCurrent(context),
+                        actions: actions,
+                      ).show(context);
+                    },
+                    child: Text(
+                      '${behavior.toString().split('.').last}'
+                      ' ${type.toString().split('.').last}'
+                      '${actions.isEmpty ? '' : ' with actions'}',
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface,
+                      ),
                     ),
                   ),
-                ),
           ],
         ),
       ),
