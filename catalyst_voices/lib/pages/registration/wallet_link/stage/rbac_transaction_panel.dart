@@ -100,7 +100,7 @@ class _BlocSummary extends StatelessWidget {
         RegistrationState,
         ({
           Set<AccountRole> roles,
-          CardanoWalletDetails selectedWallet,
+          WalletHeader selectedWallet,
           Coin transactionFee,
         })?>(
       selector: (state) {
@@ -135,7 +135,7 @@ class _BlocSummary extends StatelessWidget {
 
 class _Summary extends StatelessWidget {
   final Set<AccountRole> roles;
-  final CardanoWalletDetails walletDetails;
+  final WalletHeader walletDetails;
   final Coin transactionFee;
 
   const _Summary({
@@ -164,8 +164,7 @@ class _Summary extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            context.l10n
-                .walletLinkTransactionLinkItem(walletDetails.wallet.name),
+            context.l10n.walletLinkTransactionLinkItem(walletDetails.meta.name),
             style: Theme.of(context).textTheme.bodySmall,
           ),
           for (final role in roles) ...[

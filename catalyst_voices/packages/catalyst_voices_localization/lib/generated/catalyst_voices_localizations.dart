@@ -844,6 +844,12 @@ abstract class VoicesLocalizations {
   /// **'Password was not found. Make sure valid password was created.'**
   String get registrationUnlockPasswordNotFound;
 
+  /// Error message shown when connect wallet but matching was not found
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet not found'**
+  String get registrationWalletNotFound;
+
   /// A title on the role chooser screen in registration.
   ///
   /// In en, this message translates to:

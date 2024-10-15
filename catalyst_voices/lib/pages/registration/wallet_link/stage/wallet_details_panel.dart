@@ -61,7 +61,7 @@ class _BlocWalletDetailsText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocWalletLinkBuilder<String?>(
-      selector: (state) => state.selectedWallet?.wallet.name,
+      selector: (state) => state.selectedWallet?.meta.name,
       builder: (context, state) {
         return Text(
           context.l10n.walletLinkWalletDetailsContent(state ?? ''),
@@ -101,7 +101,7 @@ class _BlocNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocWalletLinkBuilder<bool>(
-      selector: (state) => state.selectedWallet?.hasEnoughBalance ?? false,
+      selector: (state) => state.hasEnoughBalance,
       builder: (context, state) {
         if (state) {
           return const RegistrationBackNextNavigation();

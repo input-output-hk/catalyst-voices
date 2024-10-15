@@ -88,6 +88,8 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
 
       final newState = state.copyWith(
         selectedWallet: Optional(walletHeader),
+        hasEnoughBalance:
+            walletHeader.balance >= CardanoWalletDetails.minAdaForRegistration,
         walletConnection: Optional(walletConnection),
         walletSummary: Optional(walletSummary),
       );

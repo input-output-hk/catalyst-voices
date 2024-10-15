@@ -37,10 +37,11 @@ class AccountCompletedPanel extends StatelessWidget {
                       info: context.l10n.registrationCompletedKeychainInfo,
                     ),
                     BlocSelector<RegistrationCubit, RegistrationState, String>(
-                      selector: (state) =>
-                          state.walletLinkStateData.selectedWallet?.wallet.name
-                              .capitalize() ??
-                          '',
+                      selector: (state) {
+                        final wallet = state.walletLinkStateData.selectedWallet;
+                        final name = wallet?.meta.name ?? '';
+                        return name.capitalize();
+                      },
                       builder: (context, walletName) {
                         return _SummaryItem(
                           image: VoicesAssets.images.registrationSummaryWallet,

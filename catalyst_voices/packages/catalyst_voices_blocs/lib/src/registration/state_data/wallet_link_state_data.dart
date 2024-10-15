@@ -7,6 +7,7 @@ import 'package:result_type/result_type.dart';
 final class WalletLinkStateData extends Equatable {
   final Result<List<WalletMeta>, Exception>? wallets;
   final WalletHeader? selectedWallet;
+  final bool hasEnoughBalance;
   final WalletConnectionData? walletConnection;
   final WalletSummaryData? walletSummary;
   final Set<AccountRole>? selectedRoles;
@@ -14,6 +15,7 @@ final class WalletLinkStateData extends Equatable {
   const WalletLinkStateData({
     this.wallets,
     this.selectedWallet,
+    this.hasEnoughBalance = false,
     this.walletConnection,
     this.walletSummary,
     this.selectedRoles,
@@ -28,6 +30,7 @@ final class WalletLinkStateData extends Equatable {
   WalletLinkStateData copyWith({
     Optional<Result<List<WalletMeta>, Exception>>? wallets,
     Optional<WalletHeader>? selectedWallet,
+    bool? hasEnoughBalance,
     Optional<WalletConnectionData>? walletConnection,
     Optional<WalletSummaryData>? walletSummary,
     Optional<Set<AccountRole>>? selectedRoles,
@@ -35,6 +38,7 @@ final class WalletLinkStateData extends Equatable {
     return WalletLinkStateData(
       wallets: wallets.dataOr(this.wallets),
       selectedWallet: selectedWallet.dataOr(this.selectedWallet),
+      hasEnoughBalance: hasEnoughBalance ?? this.hasEnoughBalance,
       walletConnection: walletConnection.dataOr(this.walletConnection),
       walletSummary: walletSummary.dataOr(this.walletSummary),
       selectedRoles: selectedRoles.dataOr(this.selectedRoles),
@@ -45,6 +49,7 @@ final class WalletLinkStateData extends Equatable {
   List<Object?> get props => [
         wallets,
         selectedWallet,
+        hasEnoughBalance,
         walletConnection,
         walletSummary,
         selectedRoles,
