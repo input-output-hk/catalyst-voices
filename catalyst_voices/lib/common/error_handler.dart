@@ -36,7 +36,7 @@ mixin ErrorHandlerStateMixin<E extends ErrorEmitter, T extends StatefulWidget>
   }
 
   /// A method that can be overridden to provide a custom error emitter.
-  /// 
+  ///
   /// If this method is not overriden then the emitter of type [E]
   /// must be provided in a widget tree so that context.read can find it.
   E get errorEmitter => context.read<E>();
