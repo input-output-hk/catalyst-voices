@@ -35,8 +35,8 @@ impl Config {
         }
     }
 
-    /// Update or insert (upsert) configuration for the given `ConfigKey`.
-    pub(crate) async fn upsert(id: ConfigKey, value: Value) -> anyhow::Result<()> {
+    /// Set the configuration for the given `ConfigKey`.
+    pub(crate) async fn set(id: ConfigKey, value: Value) -> anyhow::Result<()> {
         // Validate the value
         id.validate(&value)?;
 

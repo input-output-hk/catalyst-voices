@@ -83,11 +83,11 @@ impl ConfigApi {
         match ip_query.0 {
             Some(ip) => {
                 match IpAddr::from_str(&ip) {
-                    Ok(parsed_ip) => upsert(ConfigKey::FrontendForIp(parsed_ip), body_value).await,
+                    Ok(parsed_ip) => set(ConfigKey::FrontendForIp(parsed_ip), body_value).await,
                     Err(err) => Responses::BadRequest(Json(format!("Invalid IP address: {err}"))),
                 }
             },
-            None => upsert(ConfigKey::Frontend, body_value).await,
+            None => set(ConfigKey::Frontend, body_value).await,
         }
     }
 }
@@ -111,10 +111,10 @@ fn merge_configs(general: &Value, ip_specific: &Value) -> Value {
     merged
 }
 
-/// Helper function to handle upsert.
-async fn upsert(key: ConfigKey, value: Value) -> Responses {
-    match Config::upsert(key, value).await {
-        Ok(()) => Responses::Ok(Json("Configuration upsert successfully.".to_string())),
-        Err(err) => Responses::BadRequest(Json(format!("Failed to upsert configuration: {err}"))),
+/// Helper function to handle set.
+async fn set(key: ConfigKey, value: Value) -> Responses {
+    match Config::set(key, value).await {
+        Ok(()) => Responses::Ok(Json("Configuration successfully set.".to_string())),
+        Err(err) => Responses::BadRequest(Json(format!("Failed to set configuration: {err}"))),
     }
 }
