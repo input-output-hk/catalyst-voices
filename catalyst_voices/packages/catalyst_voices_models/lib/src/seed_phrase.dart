@@ -5,10 +5,8 @@ import 'dart:typed_data';
 
 import 'package:bip39/bip39.dart' as bip39;
 import 'package:bip39/src/wordlists/english.dart';
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:collection/collection.dart';
 import 'package:convert/convert.dart';
-import 'package:ed25519_hd_key/ed25519_hd_key.dart';
 import 'package:equatable/equatable.dart';
 
 /// Represent singular mnemonic words which keeps data as well as index of
@@ -136,27 +134,6 @@ final class SeedPhrase extends Equatable {
   /// new random order.
   List<SeedPhraseWord> get shuffledMnemonicWords {
     return [...mnemonicWords]..shuffle();
-  }
-
-  /// Derives an Ed25519 key pair from a seed.
-  ///
-  /// Throws a [RangeError] If the provided [offset] is negative or exceeds
-  /// the length of the seed (64).
-  ///
-  /// [offset]: The offset is applied
-  /// to the seed to adjust where key derivation starts. It defaults to 0.
-  Future<Ed25519KeyPair> deriveKeyPair([int offset = 0]) async {
-    final modifiedSeed = uint8ListSeed.sublist(offset);
-
-    final masterKey = await ED25519_HD_KEY.getMasterKeyFromSeed(modifiedSeed);
-    final privateKey = masterKey.key;
-
-    final publicKey = await ED25519_HD_KEY.getPublicKey(privateKey, false);
-
-    return Ed25519KeyPair(
-      publicKey: Ed25519PublicKey.fromBytes(publicKey),
-      privateKey: Ed25519PrivateKey.fromBytes(privateKey),
-    );
   }
 
   @override

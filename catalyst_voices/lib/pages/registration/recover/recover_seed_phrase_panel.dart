@@ -1,7 +1,9 @@
 import 'package:catalyst_voices/pages/registration/recover/seed_phrase/account_details_panel.dart';
+import 'package:catalyst_voices/pages/registration/recover/seed_phrase/restored_panel.dart';
 import 'package:catalyst_voices/pages/registration/recover/seed_phrase/seed_phrase_input_panel.dart';
 import 'package:catalyst_voices/pages/registration/recover/seed_phrase/seed_phrase_instructions_panel.dart';
-import 'package:catalyst_voices/pages/registration/widgets/placeholder_panel.dart';
+import 'package:catalyst_voices/pages/registration/recover/seed_phrase/unlock_password_instructions_panel.dart';
+import 'package:catalyst_voices/pages/registration/recover/seed_phrase/unlock_password_panel.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
@@ -21,9 +23,9 @@ class RecoverSeedPhrasePanel extends StatelessWidget {
       RecoverSeedPhraseStage.seedPhrase => const SeedPhraseInputPanel(),
       RecoverSeedPhraseStage.accountDetails => const AccountDetailsPanel(),
       RecoverSeedPhraseStage.unlockPasswordInstructions =>
-        const PlaceholderPanel(),
-      RecoverSeedPhraseStage.unlockPassword => const PlaceholderPanel(),
-      RecoverSeedPhraseStage.success => const PlaceholderPanel(),
+        const UnlockPasswordInstructionsPanel(),
+      RecoverSeedPhraseStage.unlockPassword => const UnlockPasswordPanel(),
+      RecoverSeedPhraseStage.success => const RestoredPanel(),
     };
   }
 }
