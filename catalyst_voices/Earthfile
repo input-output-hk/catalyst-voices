@@ -1,7 +1,7 @@
 VERSION 0.8
 
 IMPORT ../catalyst-gateway AS catalyst-gateway
-IMPORT ../../catalyst-ci/earthly/flutter AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:fix-remove-broken-edge AS flutter-ci
 
 # Copy all the necessary files and running bootstrap
 builder:
