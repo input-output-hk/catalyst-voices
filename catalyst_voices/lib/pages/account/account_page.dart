@@ -54,21 +54,21 @@ final class AccountPage extends StatelessWidget {
       ),
     );
   }
-}
 
-// Note. probably should redirect somewhere.
-Future<void> _removeKeychain(BuildContext context) async {
-  final confirmed = await DeleteKeychainDialog.show(context);
+  // Note. probably should redirect somewhere.
+  Future<void> _removeKeychain(BuildContext context) async {
+    final confirmed = await DeleteKeychainDialog.show(context);
 
-  if (confirmed && context.mounted) {
-    context.read<SessionBloc>().add(const RemoveKeychainSessionEvent());
+    if (confirmed && context.mounted) {
+      context.read<SessionBloc>().add(const RemoveKeychainSessionEvent());
 
-    await VoicesDialog.show<void>(
-      context: context,
-      builder: (context) {
-        return const KeychainDeletedDialog();
-      },
-    );
+      await VoicesDialog.show<void>(
+        context: context,
+        builder: (context) {
+          return const KeychainDeletedDialog();
+        },
+      );
+    }
   }
 }
 

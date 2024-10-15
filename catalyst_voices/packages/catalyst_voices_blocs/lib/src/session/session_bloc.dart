@@ -4,6 +4,7 @@ import 'package:catalyst_voices_blocs/src/session/session_event.dart';
 import 'package:catalyst_voices_blocs/src/session/session_state.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Manages the user session.
@@ -47,8 +48,7 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState>
     if (unlocked) {
       emit(ActiveUserSessionState(user: _dummyUser));
     } else {
-      // TODO(dtscalac): add error handler and custom exception
-      emitError(Exception('Failed to unlock the session'));
+      emitError(const LocalizedUnlockPasswordException());
     }
   }
 

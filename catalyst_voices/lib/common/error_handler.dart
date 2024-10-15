@@ -15,7 +15,7 @@ abstract interface class ErrorHandler {
 }
 
 /// A convenient mixin that subscribes to the [ErrorEmitter]
-/// obtained from the [getErrorEmitter] and calls the [handleError].
+/// obtained from the [errorEmitter] and calls the [handleError].
 ///
 /// After the widget is disposed the error stream is disposed too.
 mixin ErrorHandlerStateMixin<E extends ErrorEmitter, T extends StatefulWidget>
@@ -35,6 +35,7 @@ mixin ErrorHandlerStateMixin<E extends ErrorEmitter, T extends StatefulWidget>
     super.dispose();
   }
 
+  /// A method that can be overridden to provide a custom error emitter.
   E get errorEmitter => context.read<E>();
 
   @override

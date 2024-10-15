@@ -9,6 +9,7 @@ import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -47,7 +48,7 @@ class _UnlockPasswordPanel extends StatefulWidget {
 class _UnlockPasswordPanelState extends State<_UnlockPasswordPanel>
     with ErrorHandlerStateMixin<SessionBloc, _UnlockPasswordPanel> {
   final TextEditingController _passwordController = TextEditingController();
-  bool _showError = false;
+  LocalizedException? _error;
 
   @override
   void dispose() {
@@ -58,7 +59,9 @@ class _UnlockPasswordPanelState extends State<_UnlockPasswordPanel>
   @override
   void handleError(Object error) {
     setState(() {
-      _showError = true;
+      _error = error is LocalizedException
+          ? error
+          : const LocalizedUnlockPasswordException();
     });
   }
 
@@ -89,7 +92,7 @@ class _UnlockPasswordPanelState extends State<_UnlockPasswordPanel>
           const SizedBox(height: 24),
           _UnlockPassword(
             controller: _passwordController,
-            showError: _showError,
+            error: _error,
           ),
           const Spacer(),
           _Navigation(
@@ -102,7 +105,7 @@ class _UnlockPasswordPanelState extends State<_UnlockPasswordPanel>
 
   void _onUnlock() {
     setState(() {
-      _showError = false;
+      _error = null;
     });
 
     final password = _passwordController.text;
@@ -115,11 +118,11 @@ class _UnlockPasswordPanelState extends State<_UnlockPasswordPanel>
 
 class _UnlockPassword extends StatelessWidget {
   final TextEditingController controller;
-  final bool showError;
+  final LocalizedException? error;
 
   const _UnlockPassword({
     required this.controller,
-    required this.showError,
+    required this.error,
   });
 
   @override
@@ -128,8 +131,7 @@ class _UnlockPassword extends StatelessWidget {
       controller: controller,
       decoration: VoicesTextFieldDecoration(
         labelText: context.l10n.unlockDialogHint,
-        errorText:
-            showError ? context.l10n.unlockDialogIncorrectPassword : null,
+        errorText: error?.message(context),
         hintText: context.l10n.passwordLabelText,
       ),
     );
