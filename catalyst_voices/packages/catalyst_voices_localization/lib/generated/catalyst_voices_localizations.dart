@@ -913,13 +913,13 @@ abstract class VoicesLocalizations {
   /// No description provided for @accountCreationCreate.
   ///
   /// In en, this message translates to:
-  /// **'Create a new  Catalyst Keychain'**
+  /// **'Create a new Catalyst Keychain'**
   String get accountCreationCreate;
 
   /// No description provided for @accountCreationRecover.
   ///
   /// In en, this message translates to:
-  /// **'Recover your Catalyst Keychain'**
+  /// **'Recover yourCatalyst Keychain'**
   String get accountCreationRecover;
 
   /// Indicates that created keychain will be stored in this device only
@@ -1021,7 +1021,7 @@ abstract class VoicesLocalizations {
   /// No description provided for @accountCreationSplashMessage.
   ///
   /// In en, this message translates to:
-  /// **'Your keychain is your ticket to participate in  distributed innovation on the global stage.    Once you have it, you\'ll be able to enter different spaces, discover awesome ideas, and share your feedback to hep improve ideas.    As you add new keys to your keychain, you\'ll be able to enter new spaces, unlock new rewards opportunities, and have your voice heard in community decisions.'**
+  /// **'Your keychain is your ticket to participate in distributed innovation on the global stage.  Once you have it, you\'ll be able to enter different spaces, discover awesome ideas, and share your feedback to hep improve ideas.  As you add new keys to your keychain, you\'ll be able to enter new spaces, unlock new rewards opportunities, and have your voice heard in community decisions.'**
   String get accountCreationSplashMessage;
 
   /// No description provided for @accountCreationSplashNextButton.
@@ -1033,13 +1033,13 @@ abstract class VoicesLocalizations {
   /// No description provided for @accountInstructionsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Great! Your Catalyst Keychain  has been created.'**
+  /// **'Great! Your Catalyst Keychain has been created.'**
   String get accountInstructionsTitle;
 
   /// No description provided for @accountInstructionsMessage.
   ///
   /// In en, this message translates to:
-  /// **'On the next screen, you\'re going to see 12 words.  This is called your \"seed phrase\".     It\'s like a super secure password that only you know,  that allows you to prove ownership of your keychain.    You\'ll use it to login and recover your account on  different devices, so be sure to put it somewhere safe!\n\nYou need to write this seed phrase down with pen and paper, so get this ready.'**
+  /// **'On the next screen, you\'re going to see 12 words. This is called your \"seed phrase\".   It\'s like a super secure password that only you know, that allows you to prove ownership of your keychain.  You\'ll use it to login and recover your account on different devices, so be sure to put it somewhere safe!\n\nYou need to write this seed phrase down with pen and paper, so get this ready.'**
   String get accountInstructionsMessage;
 
   /// For example in button that goes to next stage of registration
@@ -1363,7 +1363,7 @@ abstract class VoicesLocalizations {
   /// No description provided for @createKeychainSeedPhraseSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Write down your 12 Catalyst  security words'**
+  /// **'Write down your 12 Catalyst security words'**
   String get createKeychainSeedPhraseSubtitle;
 
   /// No description provided for @createKeychainSeedPhraseBody.
@@ -1393,7 +1393,7 @@ abstract class VoicesLocalizations {
   /// No description provided for @createKeychainSeedPhraseCheckInstructionsSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Next, we\'re going to make sure that you\'ve written down your words correctly.     We don\'t save your seed phrase, so it\'s important  to make sure you have it right. That\'s why we do this confirmation before continuing.     It\'s also good practice to get familiar with using a seed phrase if you\'re new to crypto.'**
+  /// **'Next, we\'re going to make sure that you\'ve written down your words correctly.   We don\'t save your seed phrase, so it\'s important to make sure you have it right. That\'s why we do this confirmation before continuing.   It\'s also good practice to get familiar with using a seed phrase if you\'re new to crypto.'**
   String get createKeychainSeedPhraseCheckInstructionsSubtitle;
 
   /// No description provided for @createKeychainSeedPhraseCheckSubtitle.
@@ -1405,7 +1405,7 @@ abstract class VoicesLocalizations {
   /// No description provided for @createKeychainSeedPhraseCheckBody.
   ///
   /// In en, this message translates to:
-  /// **'Select your 12 written down words in  the correct order.'**
+  /// **'Select your 12 written down words in the correct order.'**
   String get createKeychainSeedPhraseCheckBody;
 
   /// When user checks correct seed phrase words order he can upload it too
@@ -1429,7 +1429,7 @@ abstract class VoicesLocalizations {
   /// No description provided for @createKeychainSeedPhraseCheckSuccessSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Enter your seed phrase to recover your Catalyst Keychain on any device.  It\'s kinda like your email and password all rolled into one, so keep it somewhere safe!  In the next step we’ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.'**
+  /// **'Enter your seed phrase to recover your Catalyst Keychain on any device.It\'s kinda like your email and password all rolled into one, so keep it somewhere safe!In the next step we’ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.'**
   String get createKeychainSeedPhraseCheckSuccessSubtitle;
 
   /// No description provided for @yourNextStep.
@@ -1447,25 +1447,25 @@ abstract class VoicesLocalizations {
   /// No description provided for @createKeychainUnlockPasswordInstructionsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Set your Catalyst unlock password  for this device'**
+  /// **'Set your Catalyst unlock password for this device'**
   String get createKeychainUnlockPasswordInstructionsTitle;
 
   /// No description provided for @createKeychainUnlockPasswordInstructionsSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.    But it can be a bit tedious to enter every single time you want to use the app.    In this next step, you\'ll set your Unlock Password for your current device. It\'s like a shortcut for proving ownership of your Keychain.    Whenever you recover your account for the first time on a new device, you\'ll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.'**
+  /// **'With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.  But it can be a bit tedious to enter every single time you want to use the app.  In this next step, you\'ll set your Unlock Password for your current device. It\'s like a shortcut for proving ownership of your Keychain.  Whenever you recover your account for the first time on a new device, you\'ll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.'**
   String get createKeychainUnlockPasswordInstructionsSubtitle;
 
   /// No description provided for @createKeychainCreatedTitle.
   ///
   /// In en, this message translates to:
-  /// **'Congratulations your Catalyst  Keychain is created!'**
+  /// **'Congratulations your Catalyst Keychain is created!'**
   String get createKeychainCreatedTitle;
 
   /// No description provided for @createKeychainCreatedNextStep.
   ///
   /// In en, this message translates to:
-  /// **'In the next step you write your Catalyst roles and  account to the Cardano Mainnet.'**
+  /// **'In the next step you write your Catalyst roles and account to the Cardano Mainnet.'**
   String get createKeychainCreatedNextStep;
 
   /// No description provided for @createKeychainLinkWalletAndRoles.
@@ -1543,7 +1543,7 @@ abstract class VoicesLocalizations {
   /// No description provided for @registrationExitConfirmDialogContent.
   ///
   /// In en, this message translates to:
-  /// **'If attempt to leave without creating your keychain - account creation will be incomplete.   You are not able to login without  completing your keychain.'**
+  /// **'If attempt to leave without creating your keychain - account creation will be incomplete. You are not able to login without completing your keychain.'**
   String get registrationExitConfirmDialogContent;
 
   /// No description provided for @registrationExitConfirmDialogContinue.
@@ -1591,13 +1591,13 @@ abstract class VoicesLocalizations {
   /// No description provided for @recoverKeychainNonFound.
   ///
   /// In en, this message translates to:
-  /// **'No Catalyst Keychain found on this device.'**
+  /// **'No Catalyst Keychain foundon this device.'**
   String get recoverKeychainNonFound;
 
   /// No description provided for @recoverKeychainFound.
   ///
   /// In en, this message translates to:
-  /// **'Keychain found!   Please unlock your device.'**
+  /// **'Keychain found!  Please unlock your device.'**
   String get recoverKeychainFound;
 
   /// No description provided for @seedPhrase12Words.
@@ -1609,7 +1609,7 @@ abstract class VoicesLocalizations {
   /// No description provided for @recoverySeedPhraseInstructionsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Restore your Catalyst Keychain with  your 12 security words.'**
+  /// **'Restore your Catalyst Keychain with your 12 security words.'**
   String get recoverySeedPhraseInstructionsTitle;
 
   /// No description provided for @recoverySeedPhraseInstructionsSubtitle.
@@ -1621,13 +1621,13 @@ abstract class VoicesLocalizations {
   /// No description provided for @recoverySeedPhraseInputTitle.
   ///
   /// In en, this message translates to:
-  /// **'Restore your Catalyst Keychain with  your 12 security words'**
+  /// **'Restore your Catalyst Keychain with your 12 security words'**
   String get recoverySeedPhraseInputTitle;
 
   /// No description provided for @recoverySeedPhraseInputSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Enter each word of your Catalyst Key in the right order  to bring your Catalyst account to this device.'**
+  /// **'Enter each word of your Catalyst Key in the right order to bring your Catalyst account to this device.'**
   String get recoverySeedPhraseInputSubtitle;
 
   /// No description provided for @recoveryAccountTitle.
@@ -1651,14 +1651,50 @@ abstract class VoicesLocalizations {
   /// No description provided for @recoveryUnlockPasswordInstructionsTitle.
   ///
   /// In en, this message translates to:
-  /// **'Set your Catalyst unlock password f or this device'**
+  /// **'Set your Catalyst unlock password for this device'**
   String get recoveryUnlockPasswordInstructionsTitle;
 
   /// No description provided for @recoveryUnlockPasswordInstructionsSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.    But it can be a bit tedious to enter every single time you want to use the app.    In this next step, you\'ll set your Unlock Password for your current device. It\'s like a shortcut for proving ownership of your Keychain.    Whenever you recover your account for the first time on a new device, you\'ll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.'**
+  /// **'With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.  But it can be a bit tedious to enter every single time you want to use the app.  In this next step, you\'ll set your Unlock Password for your current device. It\'s like a shortcut for proving ownership of your Keychain.  Whenever you recover your account for the first time on a new device, you\'ll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.'**
   String get recoveryUnlockPasswordInstructionsSubtitle;
+
+  /// The header label in unlock dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock Catalyst'**
+  String get unlockDialogHeader;
+
+  /// The title label in unlock dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back!'**
+  String get unlockDialogTitle;
+
+  /// The content (body) in unlock dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your device specific unlock password\nto unlock Catalyst Voices.'**
+  String get unlockDialogContent;
+
+  /// The hint for the unlock password field.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your Unlock password'**
+  String get unlockDialogHint;
+
+  /// An error message shown below the password field when the password is incorrect.
+  ///
+  /// In en, this message translates to:
+  /// **'Password is incorrect, try again.'**
+  String get unlockDialogIncorrectPassword;
+
+  /// The message shown when asking the user to login/unlock and the user wants to cancel the process.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue as guest'**
+  String get continueAsGuest;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

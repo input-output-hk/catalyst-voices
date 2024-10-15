@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
 import 'package:catalyst_voices/pages/account/delete_keychain_dialog.dart';
 import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
@@ -41,22 +43,8 @@ final class AccountPage extends StatelessWidget {
                       AccountRole.drep,
                     ],
                     defaultRole: AccountRole.voter,
-                    onRemoveKeychain: () async {
-                      final confirmed =
-                          await DeleteKeychainDialog.show(context);
-                      if (confirmed && context.mounted) {
-                        context
-                            .read<SessionBloc>()
-                            .add(const RemoveKeychainSessionEvent());
-
-                        await VoicesDialog.show<void>(
-                          context: context,
-                          builder: (context) {
-                            return const KeychainDeletedDialog();
-                          },
-                        );
-                      }
-                    },
+                    onRemoveKeychain: () =>
+                        unawaited(_onRemoveKeychain(context)),
                   ),
                 ],
               ),
@@ -65,6 +53,20 @@ final class AccountPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _onRemoveKeychain(BuildContext context) async {
+    final confirmed = await DeleteKeychainDialog.show(context);
+    if (confirmed && context.mounted) {
+      context.read<SessionBloc>().add(const RemoveKeychainSessionEvent());
+
+      await VoicesDialog.show<void>(
+        context: context,
+        builder: (context) {
+          return const KeychainDeletedDialog();
+        },
+      );
+    }
   }
 }
 
