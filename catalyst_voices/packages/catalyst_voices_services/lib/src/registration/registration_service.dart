@@ -48,15 +48,15 @@ final class RegistrationService {
   ///
   /// This will trigger a permission popup from the wallet extension.
   /// Afterwards the user must grant a permission inside the wallet extension.
-  Future<CardanoWalletDetails> getCardanoWalletDetails(
+  Future<WalletInfo> getCardanoWalletDetails(
     CardanoWallet wallet,
   ) async {
     final enabledWallet = await wallet.enable();
     final balance = await enabledWallet.getBalance();
     final address = await enabledWallet.getChangeAddress();
 
-    return CardanoWalletDetails(
-      wallet: wallet,
+    return WalletInfo(
+      metadata: WalletMetadata.fromCardanoWallet(wallet),
       balance: balance.coin,
       address: address,
     );
@@ -66,7 +66,7 @@ final class RegistrationService {
   // Note. Returned type will be changed because we'll not be able to
   // get a wallet from backend just from seed phrase.
   // To be decided what data can we get from backend.
-  Future<CardanoWalletDetails> recoverCardanoWalletDetails(
+  Future<WalletInfo> recoverCardanoWalletDetails(
     SeedPhrase seedPhrase,
   ) async {
     await Future<void>.delayed(const Duration(milliseconds: 200));
@@ -76,17 +76,10 @@ final class RegistrationService {
       throw const RegistrationUnknownException();
     }
 
-    final wallet = DummyCardanoWallet(
-      name: 'Dummy Wallet',
-      icon: '',
-    );
-    final balance = Coin.fromAda(10);
-    final address = _testNetAddress;
-
-    return CardanoWalletDetails(
-      wallet: wallet,
-      balance: balance,
-      address: address,
+    return WalletInfo(
+      metadata: const WalletMetadata(name: 'Dummy Wallet'),
+      balance: Coin.fromAda(10),
+      address: _testNetAddress,
     );
   }
 
