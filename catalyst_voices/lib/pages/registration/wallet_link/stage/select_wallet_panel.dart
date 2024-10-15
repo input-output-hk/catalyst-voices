@@ -119,7 +119,9 @@ class _Wallets extends StatelessWidget {
           ? _WalletsList(wallets: value, onSelectWallet: onSelectWallet)
           : _WalletsEmpty(onRetry: onRefreshTap),
       Failure() => _WalletsError(onRetry: onRefreshTap),
-      _ => const Center(child: VoicesCircularProgressIndicator()),
+      _ => const Center(
+          child: DelayedWidget(child: VoicesCircularProgressIndicator()),
+        ),
     };
   }
 }
