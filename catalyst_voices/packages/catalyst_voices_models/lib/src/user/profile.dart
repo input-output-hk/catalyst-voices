@@ -5,11 +5,11 @@ import 'package:equatable/equatable.dart';
 /// Defines singular profile used by [User]. One [User] may have multiple
 /// [Profile]'s.
 final class Profile extends Equatable {
+  final WalletHeader walletHeader;
+
   const Profile({
     required this.walletHeader,
   });
-
-  final WalletHeader walletHeader;
 
   @override
   List<Object?> get props => [
