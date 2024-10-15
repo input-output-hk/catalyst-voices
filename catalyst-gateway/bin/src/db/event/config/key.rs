@@ -67,7 +67,10 @@ impl ConfigKey {
         };
 
         // Validate the value against the schema
-        anyhow::ensure!(validator.is_valid(value), "Invalid JSON, Failed schema validation");
+        anyhow::ensure!(
+            validator.is_valid(value),
+            "Invalid JSON, Failed schema validation"
+        );
         Ok(())
     }
 

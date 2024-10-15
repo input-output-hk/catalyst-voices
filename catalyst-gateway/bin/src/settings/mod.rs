@@ -53,7 +53,8 @@ const CHECK_CONFIG_TICK_DEFAULT: &str = "5s";
 
 /// Default Event DB URL.
 const EVENT_DB_URL_DEFAULT: &str =
-    "postgresql://postgres:postgres@localhost/catalyst_events?sslmode=disable";
+    // "postgresql://postgres:postgres@localhost/catalyst_events?sslmode=disable";
+    "postgres://catalyst-event-dev:12341234@localhost:5432/CatalystEventDev?sslmode=disable";
 
 /// Hash the Public IPv4 and IPv6 address of the machine, and convert to a 128 bit V4
 /// UUID.
