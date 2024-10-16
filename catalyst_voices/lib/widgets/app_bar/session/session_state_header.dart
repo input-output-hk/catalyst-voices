@@ -21,13 +21,21 @@ class SessionStateHeader extends StatelessWidget {
           GuestSessionState() => const _GuestButton(),
           ActiveUserSessionState(:final user) => AccountPopup(
               avatarLetter: user.acronym,
-              onLockAccountTap: () => debugPrint('Lock account'),
-              onProfileKeychainTap: () => unawaited(
-                const AccountRoute().push<void>(context),
-              ),
+              onLockAccountTap: () => _onLockAccount(context),
+              onProfileKeychainTap: () => _onSeeProfile(context),
             ),
         };
       },
+    );
+  }
+
+  void _onLockAccount(BuildContext context) {
+    context.read<SessionBloc>().add(const LockSessionEvent());
+  }
+
+  void _onSeeProfile(BuildContext context) {
+    unawaited(
+      const AccountRoute().push<void>(context),
     );
   }
 }
