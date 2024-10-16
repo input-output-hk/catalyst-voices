@@ -19,7 +19,7 @@
 	},
 	"additionalProperties": true,
 	"definitions": {
-		"saneUrl": {
+		"httpsUrl": {
 			"type": "string",
 			"format": "uri",
 			"pattern": "^https?://"
