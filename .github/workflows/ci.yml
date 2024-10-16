@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, 974-task-make-the-allure-report-workflow-run-after-the-normal-ci-run]
+    branches: [main]
     tags: ['*']
   pull_request:
 
@@ -19,4 +19,4 @@ jobs:
       forge_version: 0.2.1
 
   allure:
-    uses: input-output-hk/catalyst-voices/.github/workflows/generate-allure-report.yml@ci/v0.2.0
+    uses: input-output-hk/catalyst-voices/.github/workflows/generate-allure-report.yml@main
