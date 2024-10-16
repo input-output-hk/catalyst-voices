@@ -21,8 +21,11 @@ final class Keychain {
 
   Keychain(this._keyDerivation, this._vault);
 
-  /// Returns true if the keychain is unlocked, false otherwise.
+  /// See [Vault.isUnlocked].
   Future<bool> get isUnlocked => _vault.isUnlocked;
+
+  /// See [Vault.hasLock].
+  Future<bool> get hasLock => _vault.hasLock;
 
   /// Returns true if the keychain contains the seed phrase, false otherwise.
   Future<bool> get hasSeedPhrase async => _hasSeedPhrase;
@@ -37,8 +40,14 @@ final class Keychain {
     bool unlocked = true,
   }) async {
     _logger.info('setLockAndBeginWith, unlocked: $unlocked');
-    await _changeLock(unlockFactor, unlocked: unlocked);
+
+    await _changeLock(unlockFactor);
+    await _vault.unlock(unlockFactor);
     await _beginWith(seedPhrase: seedPhrase);
+
+    if (!unlocked) {
+      await _vault.lock();
+    }
   }
 
   /// Clears the keychain and all associated data.
@@ -47,8 +56,8 @@ final class Keychain {
   /// from the underlying storage.
   Future<void> clearAndLock() async {
     _logger.info('clearAndLock');
-    await _ensureUnlocked();
     await _vault.clear();
+    await _vault.lock();
   }
 
   /// Unlocks the keychain.
@@ -93,16 +102,8 @@ final class Keychain {
     }
   }
 
-  Future<void> _changeLock(
-    LockFactor lockFactor, {
-    bool unlocked = false,
-  }) async {
+  Future<void> _changeLock(LockFactor lockFactor) async {
     await _vault.setLock(lockFactor);
-    if (unlocked) {
-      await _vault.unlock(lockFactor);
-    } else {
-      await _vault.lock();
-    }
   }
 
   Future<void> _beginWith({

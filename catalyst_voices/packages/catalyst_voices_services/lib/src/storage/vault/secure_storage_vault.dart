@@ -27,11 +27,6 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   })  : _secureStorage = secureStorage,
         _cryptoService = cryptoService ?? VaultCryptoService();
 
-  Future<bool> get _hasLock {
-    final effectiveKey = _buildVaultKey(_lockKey);
-    return _secureStorage.containsKey(key: effectiveKey);
-  }
-
   Future<Uint8List?> get _lock async {
     final effectiveKey = _buildVaultKey(_lockKey);
     final encodedLock = await _secureStorage.read(key: effectiveKey);
@@ -50,13 +45,19 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   Future<bool> get isUnlocked => Future(() => _isUnlocked);
 
   @override
+  Future<bool> get hasLock async {
+    final effectiveKey = _buildVaultKey(_lockKey);
+    return _secureStorage.containsKey(key: effectiveKey);
+  }
+
+  @override
   Future<void> lock() async {
     _isUnlocked = false;
   }
 
   @override
   Future<bool> unlock(LockFactor unlock) async {
-    if (!await _hasLock) {
+    if (!await hasLock) {
       throw const LockNotFoundException('Set lock before unlocking Vault');
     }
 
@@ -72,7 +73,7 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
 
   @override
   Future<void> setLock(LockFactor lock) async {
-    if (await _hasLock && !await isUnlocked) {
+    if (await hasLock && !await isUnlocked) {
       throw const VaultLockedException();
     }
 
