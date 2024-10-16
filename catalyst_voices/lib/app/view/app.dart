@@ -30,8 +30,8 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: _multiBlocProviders(),
-      child:  AppContent(
-          routerConfig: widget.routerConfig,
+      child: AppContent(
+        routerConfig: widget.routerConfig,
       ),
     );
   }
@@ -47,5 +47,4 @@ class _AppState extends State<App> {
       BlocProvider<SessionBloc>.value(value: _sessionBloc),
     ];
   }
-
 }
