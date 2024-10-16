@@ -47,7 +47,7 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   }
 
   @override
-  Future<bool> get isUnlocked => SynchronousFuture(_isUnlocked);
+  Future<bool> get isUnlocked => Future(() => _isUnlocked);
 
   @override
   Future<void> lock() async {
@@ -118,7 +118,8 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   Future<String?> _guardedRead({
     required String key,
   }) async {
-    if (!await isUnlocked) {
+    final isUnlocked = await this.isUnlocked;
+    if (!isUnlocked) {
       throw const VaultLockedException();
     }
 
@@ -144,7 +145,8 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     String? value, {
     required String key,
   }) async {
-    if (!await isUnlocked) {
+    final isUnlocked = await this.isUnlocked;
+    if (!isUnlocked) {
       throw const VaultLockedException();
     }
 
