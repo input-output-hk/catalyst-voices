@@ -21,7 +21,7 @@ Future<void> showUploadConfirmationDialog(
     context: rootContext,
     builder: (context) {
       return VoicesAlertDialog(
-        title: const Text('ALERT'),
+        title: Text(context.l10n.alert.toUpperCase()),
         icon: VoicesAvatar(
           radius: 40,
           backgroundColor: Colors.transparent,
@@ -34,20 +34,18 @@ Future<void> showUploadConfirmationDialog(
             width: 3,
           ),
         ),
-        subtitle: const Text('SWITCH TO FILE UPLOAD'),
-        content: const Text(
-          'Do you want to cancel manual input, and switch to Catalyst key upload?',
-        ),
+        subtitle: Text(context.l10n.uploadConfirmDialogSubtitle),
+        content: Text(context.l10n.uploadConfirmDialogContent),
         buttons: [
           VoicesFilledButton(
-            child: const Text('Yes, switch to Catalyst key upload'),
+            child: Text(context.l10n.uploadConfirmDialogYesButton),
             onTap: () async {
               Navigator.of(context).pop();
               await _showUploadDialog(rootContext, onUploadSuccessful);
             },
           ),
           VoicesTextButton(
-            child: const Text('Resume manual input'),
+            child: Text(context.l10n.uploadConfirmDialogResumeButton),
             onTap: () => Navigator.of(context).pop(),
           ),
         ],
@@ -87,9 +85,6 @@ Future<void> _showUploadDialog(
         );
       }
     },
-    onCancel: () => debugPrint(
-      'onCancel, we can cancel upload here',
-    ),
   );
 }
 
@@ -101,19 +96,19 @@ Future<void> _showIncorrectUploadDialog(
     context: rootContext,
     builder: (context) {
       return VoicesAlertDialog(
-        title: const Text('WARNING'),
+        title: Text(context.l10n.warning.toUpperCase()),
         icon: CatalystImage.asset(
           VoicesAssets.images.keyIncorrect.path,
           width: 80,
           height: 80,
         ),
-        subtitle: const Text('CATALYST KEY INCORRECT'),
-        content: const Text(
-          'The Catalyst keychain that you entered or uploaded is incorrect, please try again.',
+        subtitle: Text(context.l10n.incorrectUploadDialogSubtitle),
+        content: Text(
+          context.l10n.incorrectUploadDialogContent,
         ),
         buttons: [
           VoicesFilledButton(
-            child: const Text('Try again'),
+            child: Text(context.l10n.incorrectUploadDialogTryAgainButton),
             onTap: () async {
               Navigator.of(context).pop();
               await _showUploadDialog(
@@ -123,7 +118,7 @@ Future<void> _showIncorrectUploadDialog(
             },
           ),
           VoicesTextButton(
-            child: const Text('Cancel'),
+            child: Text(context.l10n.cancelButtonText),
             onTap: () => Navigator.of(context).pop(),
           ),
         ],

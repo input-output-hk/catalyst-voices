@@ -1606,6 +1606,12 @@ abstract class VoicesLocalizations {
   /// **'Warning'**
   String get warning;
 
+  /// No description provided for @alert.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert'**
+  String get alert;
+
   /// No description provided for @registrationExitConfirmDialogSubtitle.
   ///
   /// In en, this message translates to:
@@ -1773,6 +1779,48 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Continue recovery process'**
   String get recoveryExitConfirmDialogContinue;
+
+  /// No description provided for @uploadConfirmDialogSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'SWITCH TO FILE UPLOAD'**
+  String get uploadConfirmDialogSubtitle;
+
+  /// No description provided for @uploadConfirmDialogContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you want to cancel manual input, and switch to Catalyst key upload?'**
+  String get uploadConfirmDialogContent;
+
+  /// No description provided for @uploadConfirmDialogYesButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, switch to Catalyst key upload'**
+  String get uploadConfirmDialogYesButton;
+
+  /// No description provided for @uploadConfirmDialogResumeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume manual inputs'**
+  String get uploadConfirmDialogResumeButton;
+
+  /// No description provided for @incorrectUploadDialogSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'CATALYST KEY INCORRECT'**
+  String get incorrectUploadDialogSubtitle;
+
+  /// No description provided for @incorrectUploadDialogContent.
+  ///
+  /// In en, this message translates to:
+  /// **'The Catalyst keychain that you entered or uploaded is incorrect, please try again.'**
+  String get incorrectUploadDialogContent;
+
+  /// No description provided for @incorrectUploadDialogTryAgainButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get incorrectUploadDialogTryAgainButton;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {
