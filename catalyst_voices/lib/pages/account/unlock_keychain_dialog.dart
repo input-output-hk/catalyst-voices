@@ -14,19 +14,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// A dialog which allows to unlock the session (keychain).
-class UnlockKeychainDialog extends StatelessWidget {
+class UnlockKeychainDialog extends StatefulWidget {
   const UnlockKeychainDialog({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return VoicesTwoPaneDialog(
-      left: InformationPanel(
-        title: context.l10n.unlockDialogHeader,
-        picture: const UnlockKeychainPicture(),
-      ),
-      right: const _UnlockPasswordPanel(),
-    );
-  }
 
   static Future<void> show(BuildContext context) {
     return VoicesDialog.show(
@@ -36,17 +25,13 @@ class UnlockKeychainDialog extends StatelessWidget {
       barrierDismissible: false,
     );
   }
-}
-
-class _UnlockPasswordPanel extends StatefulWidget {
-  const _UnlockPasswordPanel();
 
   @override
-  State<_UnlockPasswordPanel> createState() => _UnlockPasswordPanelState();
+  State<UnlockKeychainDialog> createState() => _UnlockKeychainDialogState();
 }
 
-class _UnlockPasswordPanelState extends State<_UnlockPasswordPanel>
-    with ErrorHandlerStateMixin<SessionBloc, _UnlockPasswordPanel> {
+class _UnlockKeychainDialogState extends State<UnlockKeychainDialog>
+    with ErrorHandlerStateMixin<SessionBloc, UnlockKeychainDialog> {
   final TextEditingController _passwordController = TextEditingController();
   LocalizedException? _error;
 
@@ -68,39 +53,33 @@ class _UnlockPasswordPanelState extends State<_UnlockPasswordPanel>
   @override
   Widget build(BuildContext context) {
     return BlocListener<SessionBloc, SessionState>(
-      listener: (context, state) {
-        if (state is ActiveUserSessionState) {
-          VoicesSnackBar(
-            type: VoicesSnackBarType.success,
-            behavior: SnackBarBehavior.floating,
-            icon: VoicesAssets.icons.lockOpen.buildIcon(),
-            title: context.l10n.unlockSnackbarTitle,
-            message: context.l10n.unlockSnackbarMessage,
-          ).show(context);
-
-          Navigator.of(context).pop();
-        }
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SizedBox(height: 24),
-          RegistrationStageMessage(
-            title: Text(context.l10n.unlockDialogTitle),
-            subtitle: Text(context.l10n.unlockDialogContent),
-          ),
-          const SizedBox(height: 24),
-          _UnlockPassword(
-            controller: _passwordController,
-            error: _error,
-          ),
-          const Spacer(),
-          _Navigation(
-            onUnlock: _onUnlock,
-          ),
-        ],
+      listener: _handleStateChange,
+      child: VoicesTwoPaneDialog(
+        left: InformationPanel(
+          title: context.l10n.unlockDialogHeader,
+          picture: const UnlockKeychainPicture(),
+        ),
+        right: _UnlockPasswordPanel(
+          controller: _passwordController,
+          error: _error,
+          onUnlock: _onUnlock,
+        ),
       ),
     );
+  }
+
+  void _handleStateChange(BuildContext context, SessionState state) {
+    if (state is ActiveUserSessionState) {
+      VoicesSnackBar(
+        type: VoicesSnackBarType.success,
+        behavior: SnackBarBehavior.floating,
+        icon: VoicesAssets.icons.lockOpen.buildIcon(),
+        title: context.l10n.unlockSnackbarTitle,
+        message: context.l10n.unlockSnackbarMessage,
+      ).show(context);
+
+      Navigator.of(context).pop();
+    }
   }
 
   void _onUnlock() {
@@ -113,6 +92,41 @@ class _UnlockPasswordPanelState extends State<_UnlockPasswordPanel>
     context
         .read<SessionBloc>()
         .add(UnlockSessionEvent(unlockFactor: unlockFactor));
+  }
+}
+
+class _UnlockPasswordPanel extends StatelessWidget {
+  final TextEditingController controller;
+  final LocalizedException? error;
+  final VoidCallback onUnlock;
+
+  const _UnlockPasswordPanel({
+    required this.controller,
+    required this.error,
+    required this.onUnlock,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        const SizedBox(height: 24),
+        RegistrationStageMessage(
+          title: Text(context.l10n.unlockDialogTitle),
+          subtitle: Text(context.l10n.unlockDialogContent),
+        ),
+        const SizedBox(height: 24),
+        _UnlockPassword(
+          controller: controller,
+          error: error,
+        ),
+        const Spacer(),
+        _Navigation(
+          onUnlock: onUnlock,
+        ),
+      ],
+    );
   }
 }
 

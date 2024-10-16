@@ -9,10 +9,15 @@ class UnlockKeychainPicture extends StatelessWidget {
   Widget build(BuildContext context) {
     return TaskPicture(
       child: TaskPictureIconBox(
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv0,
-            borderRadius: BorderRadius.circular(8),
+        child: AspectRatio(
+          aspectRatio: 101 / 42,
+          child: Container(
+            height: double.infinity,
+            margin: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colors.elevationsOnSurfaceNeutralLv0,
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
         ),
       ),

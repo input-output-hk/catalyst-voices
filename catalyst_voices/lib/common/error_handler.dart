@@ -44,11 +44,11 @@ mixin ErrorHandlerStateMixin<E extends ErrorEmitter, T extends StatefulWidget>
   @override
   void handleError(Object error) {
     if (error is LocalizedException) {
-      _handleLocalizedException(error);
+      handleLocalizedException(error);
     }
   }
 
-  void _handleLocalizedException(LocalizedException exception) {
+  void handleLocalizedException(LocalizedException exception) {
     VoicesSnackBar(
       type: VoicesSnackBarType.error,
       message: exception.message(context),

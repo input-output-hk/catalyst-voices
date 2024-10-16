@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_action.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -171,29 +172,23 @@ class _IconAndTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        IconTheme(
-          data: IconThemeData(
-            size: 20,
-            color: type.iconColor(context),
-          ),
-          child: icon,
+    return AffixDecorator(
+      prefix: IconTheme(
+        data: IconThemeData(
+          size: 20,
+          color: type.iconColor(context),
         ),
-        const SizedBox(width: 8),
-        Flexible(
-          child: Text(
-            title,
-            style: TextStyle(
-              color: type.titleColor(context),
-              fontSize: textTheme.titleMedium?.fontSize,
-              fontWeight: textTheme.titleMedium?.fontWeight,
-              fontFamily: textTheme.titleMedium?.fontFamily,
-            ),
-          ),
+        child: icon,
+      ),
+      child: Text(
+        title,
+        style: TextStyle(
+          color: type.titleColor(context),
+          fontSize: textTheme.titleMedium?.fontSize,
+          fontWeight: textTheme.titleMedium?.fontWeight,
+          fontFamily: textTheme.titleMedium?.fontFamily,
         ),
-      ],
+      ),
     );
   }
 }
