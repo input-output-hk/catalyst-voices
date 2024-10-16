@@ -34,7 +34,7 @@ Future<void> _signAndSubmitRbacTx({
     );
 
     final auxiliaryData = AuxiliaryData.fromCbor(
-      x509Envelope.toCbor(serializer: (e) => e.toCbor()),
+      await x509Envelope.toCbor(serializer: (e) => e.toCbor()),
     );
 
     final unsignedTx = _buildUnsignedRbacTx(
@@ -122,7 +122,9 @@ Future<X509MetadataEnvelope<RegistrationData>> _buildMetadataEnvelope({
 
   print('unsigned x509 envelope:');
   print(
-    hex.encode(cbor.encode(x509Envelope.toCbor(serializer: (e) => e.toCbor()))),
+    hex.encode(
+      cbor.encode(await x509Envelope.toCbor(serializer: (e) => e.toCbor())),
+    ),
   );
 
   final signedX509Envelope = await x509Envelope.sign(
@@ -133,7 +135,9 @@ Future<X509MetadataEnvelope<RegistrationData>> _buildMetadataEnvelope({
   print('signed x509 envelope:');
   print(
     hex.encode(
-      cbor.encode(signedX509Envelope.toCbor(serializer: (e) => e.toCbor())),
+      cbor.encode(
+        await signedX509Envelope.toCbor(serializer: (e) => e.toCbor()),
+      ),
     ),
   );
 
