@@ -3,10 +3,10 @@ import 'dart:convert';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/crypto/crypto_service.dart';
+import 'package:catalyst_voices_services/src/crypto/vault_crypto_service.dart';
 import 'package:catalyst_voices_services/src/storage/storage_string_mixin.dart';
 import 'package:catalyst_voices_services/src/storage/vault/lock_factor.dart';
 import 'package:catalyst_voices_services/src/storage/vault/vault.dart';
-import 'package:catalyst_voices_services/src/storage/vault/vault_crypto_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
