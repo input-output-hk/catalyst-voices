@@ -17,7 +17,6 @@ const _lockKey = 'LockKey';
 /// facade for read/write operations.
 base class SecureStorageVault with StorageAsStringMixin implements Vault {
   final FlutterSecureStorage _secureStorage;
-
   final CryptoService _cryptoService;
 
   bool _isUnlocked = false;
