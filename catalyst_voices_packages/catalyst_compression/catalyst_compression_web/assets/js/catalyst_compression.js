@@ -17,48 +17,55 @@ function generateId() {
     return id;
 }
 
+function registerWorkerEventHandler(worker, handleMessage, handleError) {
+    const wrappedHandleMessage = (event) => handleMessage(event, complete);
+    const wrappedHandleError = (error) => handleError(error, complete);
+
+    function complete() {
+        worker.removeEventListener("message", wrappedHandleMessage);
+        worker.removeEventListener("error", wrappedHandleError)
+    }
+
+    worker.addEventListener("message", wrappedHandleMessage)
+    worker.addEventListener("error", wrappedHandleError)
+}
+
 // A function to create a compression function according to its name.
 function runCompressionInWorker(fnName) {
     return (data) => {
         return new Promise((resolve, reject) => {
             const id = generateId();
 
-            const handleMessage = (event) => {
-                const {
-                    id: responseId,
-                    result,
-                    error,
-                    initialized
-                } = event.data;
-
-                // skip the initializing completion event,
-                // and the id that is not itself.
-                if (initialized || responseId !== id) {
-                    return;
+            registerWorkerEventHandler(
+                compressionWorker,
+                (event, complete) => {
+                    const {
+                        id: responseId,
+                        result,
+                        error,
+                        initialized
+                    } = event.data;
+    
+                    // skip the initializing completion event,
+                    // and the id that is not itself.
+                    if (initialized || responseId !== id) {
+                        return;
+                    }
+    
+                    if (result) {
+                        complete(resolve(result));
+                    } else {
+                        complete(reject(error || 'Unexpected error'));
+                    }
+    
+                    processingIdsPool.delete(id);
+                },
+                (error, complete) => {
+                    complete(reject(error));
+    
+                    processingIdsPool.clear();
                 }
-
-                if (result) {
-                    resolve(result);
-                } else {
-                    reject(error || null);
-                }
-
-                processingIdsPool.delete(id);
-
-                compressionWorker.removeEventListener("message", handleMessage);
-                compressionWorker.removeEventListener("error", handleError);
-            };
-            const handleError = (error) => {
-                reject(error);
-
-                processingIdsPool.clear();
-
-                compressionWorker.removeEventListener("message", handleMessage);
-                compressionWorker.removeEventListener("error", handleError);
-            };
-
-            compressionWorker.addEventListener("message", handleMessage);
-            compressionWorker.addEventListener("error", handleError);
+            );
 
             compressionWorker.postMessage({ id, action: fnName, bytesHex: data });
         });
