@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices/pages/registration/recover/bloc_recover_builder.dart';
+import 'package:catalyst_voices/pages/registration/show_upload_confirmation_dialog.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/pages/registration/widgets/seed_phrase_actions.dart';
@@ -78,7 +79,12 @@ class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel> {
   }
 
   Future<void> _uploadSeedPhrase() async {
-    // TODO(damian-molinski): Import implementation for KeychainCreation
+    await showUploadConfirmationDialog(
+      context,
+      onUploadSuccessful: (words) {
+        RegistrationCubit.of(context).recover.setSeedPhraseWords(words);
+      },
+    );
   }
 
   void _resetControllerWords() {
