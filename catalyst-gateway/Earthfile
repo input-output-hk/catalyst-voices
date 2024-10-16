@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:fix/mit-0-license AS rust-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.2.17 AS rust-ci
 
 #cspell: words rustfmt toolsets USERARCH stdcfgs
 
