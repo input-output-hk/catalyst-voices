@@ -42,15 +42,17 @@ class JSBrotliCompressor implements CatalystCompressor {
 
   @override
   Future<List<int>> compress(List<int> bytes) async {
-    final data =
-        await promiseToFuture<JSString>(brotliCompress(hex.encode(bytes).toJS));
+    final data = await promiseToFuture<JSString>(
+      brotliCompress(hex.encode(bytes).toJS),
+    );
     return hex.decode(data.toDart);
   }
 
   @override
   Future<List<int>> decompress(List<int> bytes) async {
-    final data =
-        await promiseToFuture<JSString>(brotliDecompress(hex.encode(bytes).toJS));
+    final data = await promiseToFuture<JSString>(
+      brotliDecompress(hex.encode(bytes).toJS),
+    );
     return hex.decode(data.toDart);
   }
 }
@@ -75,15 +77,17 @@ class JSZstdCompressor implements CatalystCompressor {
       );
     }
 
-    final data =
-        await promiseToFuture<JSString>(zstdCompress(hex.encode(bytes).toJS));
+    final data = await promiseToFuture<JSString>(
+      zstdCompress(hex.encode(bytes).toJS),
+    );
     return hex.decode(data.toDart);
   }
 
   @override
   Future<List<int>> decompress(List<int> bytes) async {
-    final data =
-        await promiseToFuture<JSString>(zstdDecompress(hex.encode(bytes).toJS));
+    final data = await promiseToFuture<JSString>(
+      zstdDecompress(hex.encode(bytes).toJS),
+    );
     return hex.decode(data.toDart);
   }
 }
