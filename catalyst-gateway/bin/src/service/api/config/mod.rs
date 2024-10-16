@@ -2,9 +2,10 @@
 
 use std::{net::IpAddr, str::FromStr};
 
+use jsonschema::BasicOutput;
 use poem::web::RealIp;
 use poem_openapi::{param::Query, payload::Json, ApiResponse, OpenApi};
-use serde_json::Value;
+use serde_json::{json, Value};
 use tracing::info;
 
 use crate::{
@@ -20,13 +21,13 @@ pub(crate) struct ConfigApi;
 enum Responses {
     /// Configuration result
     #[oai(status = 200)]
-    Ok(Json<String>),
-    /// Configuration not found
-    #[oai(status = 404)]
-    NotFound(Json<String>),
+    Ok(Json<Value>),
     /// Bad request
     #[oai(status = 400)]
-    BadRequest(Json<String>),
+    BadRequest(Json<Value>),
+    /// Internal server error
+    #[oai(status = 500)]
+    ServerError(Json<String>),
 }
 
 #[OpenApi(tag = "ApiTags::Config")]
@@ -47,7 +48,12 @@ impl ConfigApi {
 
         // Attempt to fetch the IP configuration
         let ip_config = if let Some(ip) = ip_address.0 {
-            Config::get(ConfigKey::FrontendForIp(ip)).await.ok()
+            match Config::get(ConfigKey::FrontendForIp(ip)).await {
+                Ok(value) => Some(value),
+                Err(_) => {
+                    return Responses::ServerError(Json("Failed to get configuration".to_string()))
+                },
+            }
         } else {
             None
         };
@@ -63,9 +69,34 @@ impl ConfigApi {
                     general
                 };
 
-                Responses::Ok(Json(response_config.to_string()))
+                Responses::Ok(Json(response_config))
             },
-            Err(err) => Responses::NotFound(Json(err.to_string())),
+            Err(err) => Responses::ServerError(Json(err.to_string())),
+        }
+    }
+
+    /// Get the frontend JSON schema.
+    #[oai(
+        path = "/draft/config/frontend/schema",
+        method = "get",
+        operation_id = "get_config_frontend_schema"
+    )]
+    #[allow(clippy::unused_async)]
+    async fn get_frontend_schema(
+        &self, #[oai(name = "IP")] ip_query: Query<Option<String>>,
+    ) -> Responses {
+        match ip_query.0 {
+            Some(ip) => {
+                match IpAddr::from_str(&ip) {
+                    Ok(parsed_ip) => {
+                        Responses::Ok(Json(ConfigKey::FrontendForIp(parsed_ip).schema().clone()))
+                    },
+                    Err(err) => {
+                        Responses::BadRequest(Json(json!(format!("Invalid IP address: {err}"))))
+                    },
+                }
+            },
+            None => Responses::Ok(Json(ConfigKey::Frontend.schema().clone())),
         }
     }
 
@@ -84,7 +115,9 @@ impl ConfigApi {
             Some(ip) => {
                 match IpAddr::from_str(&ip) {
                     Ok(parsed_ip) => set(ConfigKey::FrontendForIp(parsed_ip), body_value).await,
-                    Err(err) => Responses::BadRequest(Json(format!("Invalid IP address: {err}"))),
+                    Err(err) => {
+                        Responses::BadRequest(Json(json!(format!("Invalid IP address: {err}"))))
+                    },
                 }
             },
             None => set(ConfigKey::Frontend, body_value).await,
@@ -114,7 +147,20 @@ fn merge_configs(general: &Value, ip_specific: &Value) -> Value {
 /// Helper function to handle set.
 async fn set(key: ConfigKey, value: Value) -> Responses {
     match Config::set(key, value).await {
-        Ok(()) => Responses::Ok(Json("Configuration successfully set.".to_string())),
-        Err(err) => Responses::BadRequest(Json(format!("Failed to set configuration: {err}"))),
+        Ok(validate) => {
+            match validate {
+                BasicOutput::Valid(_) => {
+                    Responses::Ok(Json(json!("Configuration successfully set.")))
+                },
+                BasicOutput::Invalid(errors) => {
+                    let mut e = vec![];
+                    for error in errors {
+                        e.push(error.error_description().to_string());
+                    }
+                    Responses::BadRequest(Json(json!({"errors": e})))
+                },
+            }
+        },
+        Err(err) => Responses::ServerError(Json(format!("Failed to set configuration: {err}"))),
     }
 }

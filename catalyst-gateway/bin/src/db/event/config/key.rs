@@ -2,7 +2,7 @@
 
 use std::{net::IpAddr, sync::LazyLock};
 
-use jsonschema::Validator;
+use jsonschema::{BasicOutput, Validator};
 use serde_json::{json, Value};
 use tracing::error;
 
@@ -15,13 +15,20 @@ pub(crate) enum ConfigKey {
     FrontendForIp(IpAddr),
 }
 
+static FRONTEND_SCHEMA: LazyLock<Value> =
+    LazyLock::new(|| load_json_lazy(include_str!("jsonschema/frontend.json")));
+
 /// Frontend schema validator.
 static FRONTEND_SCHEMA_VALIDATOR: LazyLock<Validator> =
-    LazyLock::new(|| schema_validator(&load_json_lazy(include_str!("jsonschema/frontend.json"))));
+    LazyLock::new(|| schema_validator(&FRONTEND_SCHEMA));
 
 /// Frontend default configuration.
 static FRONTEND_DEFAULT: LazyLock<Value> =
     LazyLock::new(|| load_json_lazy(include_str!("default/frontend.json")));
+
+/// Frontend specific configuration.
+static FRONTEND_IP_DEFAULT: LazyLock<Value> =
+    LazyLock::new(|| load_json_lazy(include_str!("default/frontend_ip.json")));
 
 /// Helper function to create a JSON validator from a JSON schema.
 /// If the schema is invalid, a default JSON validator is created.
@@ -60,25 +67,29 @@ impl ConfigKey {
     }
 
     /// Validate the provided value against the JSON schema.
-    pub(super) fn validate(&self, value: &Value) -> anyhow::Result<()> {
+    pub(super) fn validate(&self, value: &Value) -> BasicOutput<'static> {
         // Retrieve the validator based on ConfigKey
         let validator = match self {
             ConfigKey::Frontend | ConfigKey::FrontendForIp(_) => &*FRONTEND_SCHEMA_VALIDATOR,
         };
 
         // Validate the value against the schema
-        anyhow::ensure!(
-            validator.is_valid(value),
-            "Invalid JSON, Failed schema validation"
-        );
-        Ok(())
+        validator.apply(value).basic()
     }
 
     /// Retrieve the default configuration value.
     pub(super) fn default(&self) -> Value {
         // Retrieve the default value based on the ConfigKey
         match self {
-            ConfigKey::Frontend | ConfigKey::FrontendForIp(_) => FRONTEND_DEFAULT.clone(),
+            ConfigKey::Frontend => FRONTEND_DEFAULT.clone(),
+            ConfigKey::FrontendForIp(_) => FRONTEND_IP_DEFAULT.clone(),
+        }
+    }
+
+    /// Retrieve the JSON schema.
+    pub(crate) fn schema(&self) -> &Value {
+        match self {
+            ConfigKey::Frontend | ConfigKey::FrontendForIp(_) => &FRONTEND_SCHEMA,
         }
     }
 }
@@ -90,12 +101,21 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_validate() {
+    fn test_valid_validate() {
         let value = json!({
             "test": "test"
         });
         let result = ConfigKey::Frontend.validate(&value);
-        assert!(result.is_ok());
+        assert!(result.is_valid());
+        println!("{:?}", serde_json::to_value(result).unwrap());
+    }
+
+    #[test]
+    fn test_invalid_validate() {
+        let value = json!([]);
+        let result = ConfigKey::Frontend.validate(&value);
+        assert!(!result.is_valid());
+        println!("{:?}", serde_json::to_value(result).unwrap());
     }
 
     #[test]
