@@ -247,6 +247,35 @@ abstract class CatGatewayApi extends ChopperService {
       _apiCardanoCip36LatestRegistrationVoteKeyGet(
           {@Query('vote_key') required String? voteKey});
 
+  ///Get the configuration for the frontend.
+  Future<chopper.Response<String>> apiDraftConfigFrontendGet() {
+    return _apiDraftConfigFrontendGet();
+  }
+
+  ///Get the configuration for the frontend.
+  @Get(path: '/api/draft/config/frontend')
+  Future<chopper.Response<String>> _apiDraftConfigFrontendGet();
+
+  ///Set the frontend configuration.
+  ///@param IP
+  Future<chopper.Response<String>> apiDraftConfigFrontendPut({
+    String? ip,
+    required Object? body,
+  }) {
+    return _apiDraftConfigFrontendPut(ip: ip, body: body);
+  }
+
+  ///Set the frontend configuration.
+  ///@param IP
+  @Put(
+    path: '/api/draft/config/frontend',
+    optionalBody: true,
+  )
+  Future<chopper.Response<String>> _apiDraftConfigFrontendPut({
+    @Query('IP') String? ip,
+    @Body() required Object? body,
+  });
+
   ///Voter's info
   ///@param voting_key A Voters Public ED25519 Key (as registered in their most recent valid [CIP-15](https://cips.cardano.org/cips/cip15) or [CIP-36](https://cips.cardano.org/cips/cip36) registration).
   ///@param event_id The Event ID to return results for. See [GET Events](Link to events endpoint) for details on retrieving all valid event IDs.
