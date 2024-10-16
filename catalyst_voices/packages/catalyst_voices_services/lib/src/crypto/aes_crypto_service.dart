@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/crypto/crypto_service.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter/foundation.dart';
@@ -67,28 +68,20 @@ final class AesCryptoService implements CryptoService {
     required Uint8List key,
   }) async {
     final algorithm = AesGcm.with256bits(nonceLength: _viLength);
-
     final secretKey = SecretKey(key);
 
-    try {
-      final secretBox = SecretBox.fromConcatenation(
-        data,
-        nonceLength: _viLength,
-        macLength: algorithm.macAlgorithm.macLength,
-      );
+    final secretBox = SecretBox.fromConcatenation(
+      data,
+      nonceLength: _viLength,
+      macLength: algorithm.macAlgorithm.macLength,
+    );
 
-      await secretBox.checkMac(
-        macAlgorithm: algorithm.macAlgorithm,
-        secretKey: secretKey,
-        aad: [],
-      );
-
-      return algorithm
-          .decrypt(secretBox, secretKey: secretKey)
-          .then(Uint8List.fromList);
-    } finally {
-      secretKey.destroy();
-    }
+    return algorithm
+        .decrypt(secretBox, secretKey: secretKey)
+        .then(Uint8List.fromList)
+        .onError<SecretBoxAuthenticationError>(
+          (_, __) => throw const CryptoAuthenticationException(),
+        );
   }
 
   @override
@@ -99,19 +92,15 @@ final class AesCryptoService implements CryptoService {
     final algorithm = AesGcm.with256bits(nonceLength: _viLength);
     final secretKey = SecretKey(key);
 
-    try {
-      final secretBox = await algorithm.encrypt(
-        data,
-        secretKey: secretKey,
-        nonce: null,
-        aad: [],
-        possibleBuffer: null,
-      );
+    final secretBox = await algorithm.encrypt(
+      data,
+      secretKey: secretKey,
+      nonce: null,
+      aad: [],
+      possibleBuffer: null,
+    );
 
-      return secretBox.concatenation();
-    } finally {
-      secretKey.destroy();
-    }
+    return secretBox.concatenation();
   }
 
   /// Builds list with [length] and random bytes in it.
