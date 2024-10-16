@@ -5,7 +5,7 @@
 	"type": "object",
 	"properties": {
 		"sentry_dsn": {
-			"$ref": "#/definitions/saneUrl",
+			"$ref": "#/definitions/httpsUrl",
 			"description": "The Data Source Name (DSN) for Sentry."
 		},
 		"sentry_release": {
