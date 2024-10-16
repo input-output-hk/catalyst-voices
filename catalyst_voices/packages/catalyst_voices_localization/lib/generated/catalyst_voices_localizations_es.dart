@@ -443,6 +443,9 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get registrationUnlockPasswordNotFound => 'Password was not found. Make sure valid password was created.';
 
   @override
+  String get registrationWalletNotFound => 'Wallet not found';
+
+  @override
   String get walletLinkRoleChooserTitle => 'How do you want to participate in Catalyst?';
 
   @override
@@ -910,6 +913,36 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get recoveryUnlockPasswordInstructionsSubtitle => 'With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.    But it can be a bit tedious to enter every single time you want to use the app.    In this next step, you\'ll set your Unlock Password for your current device. It\'s like a shortcut for proving ownership of your Keychain.    Whenever you recover your account for the first time on a new device, you\'ll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.';
+
+  @override
+  String get unlockDialogHeader => 'Unlock Catalyst';
+
+  @override
+  String get unlockDialogTitle => 'Welcome back!';
+
+  @override
+  String get unlockDialogContent => 'Please enter your device specific unlock password\nto unlock Catalyst Voices.';
+
+  @override
+  String get unlockDialogHint => 'Enter your Unlock password';
+
+  @override
+  String get unlockDialogIncorrectPassword => 'Password is incorrect, try again.';
+
+  @override
+  String get continueAsGuest => 'Continue as guest';
+
+  @override
+  String get unlockSnackbarTitle => 'Catalyst unlocked!';
+
+  @override
+  String get unlockSnackbarMessage => 'You can now fully use the application.';
+
+  @override
+  String get lockSnackbarTitle => 'Catalyst locked';
+
+  @override
+  String get lockSnackbarMessage => 'Catalyst is now in guest/locked mode.';
 
   @override
   String get recoverySuccessTitle => 'Congratulations your Catalyst  Keychain is restored!';

@@ -100,7 +100,7 @@ class _BlocSummary extends StatelessWidget {
         RegistrationState,
         ({
           Set<AccountRole> roles,
-          CardanoWalletDetails selectedWallet,
+          WalletInfo selectedWallet,
           Coin transactionFee,
         })?>(
       selector: (state) {
@@ -125,7 +125,7 @@ class _BlocSummary extends StatelessWidget {
 
         return _Summary(
           roles: state.roles,
-          walletDetails: state.selectedWallet,
+          walletInfo: state.selectedWallet,
           transactionFee: state.transactionFee,
         );
       },
@@ -135,17 +135,19 @@ class _BlocSummary extends StatelessWidget {
 
 class _Summary extends StatelessWidget {
   final Set<AccountRole> roles;
-  final CardanoWalletDetails walletDetails;
+  final WalletInfo walletInfo;
   final Coin transactionFee;
 
   const _Summary({
     required this.roles,
-    required this.walletDetails,
+    required this.walletInfo,
     required this.transactionFee,
   });
 
   @override
   Widget build(BuildContext context) {
+    final name = walletInfo.metadata.name;
+
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -164,8 +166,7 @@ class _Summary extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            context.l10n
-                .walletLinkTransactionLinkItem(walletDetails.wallet.name),
+            context.l10n.walletLinkTransactionLinkItem(name),
             style: Theme.of(context).textTheme.bodySmall,
           ),
           for (final role in roles) ...[

@@ -8,7 +8,7 @@ typedef RegistrationMetadata = X509MetadataEnvelope<RegistrationData>;
 
 /// A builder that builds a Catalyst user registration transaction
 /// using RBAC specification.
-class RegistrationTransactionBuilder {
+final class RegistrationTransactionBuilder {
   /// The RBAC registration purpose for the Catalyst Project.
   static const _catalystUserRoleRegistrationPurpose =
       'ca7a1457-ef9f-4c7f-9c74-7f8c4a4cfa6c';

@@ -65,6 +65,15 @@ final class LocalizedRegistrationUnlockPasswordNotFoundException
       context.l10n.registrationUnlockPasswordNotFound;
 }
 
+final class LocalizedRegistrationWalletNotFoundException
+    extends LocalizedRegistrationException {
+  const LocalizedRegistrationWalletNotFoundException();
+
+  @override
+  String message(BuildContext context) =>
+      context.l10n.registrationWalletNotFound;
+}
+
 /// A generic error for describing a failure during user registration.
 final class LocalizedRegistrationUnknownException
     extends LocalizedRegistrationException {
