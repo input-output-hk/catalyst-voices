@@ -48,9 +48,7 @@ class Keychain {
   Future<void> clearAndLock() async {
     _logger.info('clearAndLock');
     await _ensureUnlocked();
-    await _vault.delete(key: _seedPhraseKey);
-    await _vault.setLock(const VoidLockFactor());
-    await _vault.lock();
+    await _vault.clear();
   }
 
   /// Unlocks the keychain.
