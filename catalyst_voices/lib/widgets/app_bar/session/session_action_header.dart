@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:catalyst_voices/pages/account/unlock_keychain_dialog.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
-import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
-import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -57,17 +55,7 @@ class _LockButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesIconButton.filled(
       style: const ButtonStyle(shape: WidgetStatePropertyAll(CircleBorder())),
-      onTap: () {
-        context.read<SessionBloc>().add(const LockSessionEvent());
-
-        VoicesSnackBar(
-          type: VoicesSnackBarType.error,
-          behavior: SnackBarBehavior.floating,
-          icon: VoicesAssets.icons.lockClosed.buildIcon(),
-          title: context.l10n.lockSnackbarTitle,
-          message: context.l10n.lockSnackbarMessage,
-        ).show(context);
-      },
+      onTap: () => context.read<SessionBloc>().add(const LockSessionEvent()),
       child: VoicesAssets.icons.lockClosed.buildIcon(),
     );
   }

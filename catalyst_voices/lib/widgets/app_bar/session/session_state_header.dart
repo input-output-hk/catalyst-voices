@@ -2,10 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices/pages/account/account_popup.dart';
 import 'package:catalyst_voices/routes/routing/account_route.dart';
-import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
-import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
@@ -34,14 +31,6 @@ class SessionStateHeader extends StatelessWidget {
 
   void _onLockAccount(BuildContext context) {
     context.read<SessionBloc>().add(const LockSessionEvent());
-
-    VoicesSnackBar(
-      type: VoicesSnackBarType.error,
-      behavior: SnackBarBehavior.floating,
-      icon: VoicesAssets.icons.lockClosed.buildIcon(),
-      title: context.l10n.lockSnackbarTitle,
-      message: context.l10n.lockSnackbarMessage,
-    ).show(context);
   }
 
   void _onSeeProfile(BuildContext context) {

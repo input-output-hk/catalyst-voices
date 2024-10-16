@@ -2,10 +2,7 @@ import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/pages/registration/pictures/unlock_keychain_picture.dart';
 import 'package:catalyst_voices/pages/registration/widgets/information_panel.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
-import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
-import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
@@ -53,7 +50,7 @@ class _UnlockKeychainDialogState extends State<UnlockKeychainDialog>
   @override
   Widget build(BuildContext context) {
     return BlocListener<SessionBloc, SessionState>(
-      listener: _handleStateChange,
+      listener: _handleSessionChange,
       child: VoicesTwoPaneDialog(
         left: InformationPanel(
           title: context.l10n.unlockDialogHeader,
@@ -68,16 +65,8 @@ class _UnlockKeychainDialogState extends State<UnlockKeychainDialog>
     );
   }
 
-  void _handleStateChange(BuildContext context, SessionState state) {
+  void _handleSessionChange(BuildContext context, SessionState state) {
     if (state is ActiveUserSessionState) {
-      VoicesSnackBar(
-        type: VoicesSnackBarType.success,
-        behavior: SnackBarBehavior.floating,
-        icon: VoicesAssets.icons.lockOpen.buildIcon(),
-        title: context.l10n.unlockSnackbarTitle,
-        message: context.l10n.unlockSnackbarMessage,
-      ).show(context);
-
       Navigator.of(context).pop();
     }
   }
