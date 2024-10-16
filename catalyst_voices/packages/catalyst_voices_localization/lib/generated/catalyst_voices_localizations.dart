@@ -211,7 +211,7 @@ abstract class VoicesLocalizations {
   /// Text shown as description in coming soon page
   ///
   /// In en, this message translates to:
-  /// **'Project Catalyst is the world\'\'s largest decentralized innovation engine for solving real-world challenges.'**
+  /// **'Project Catalyst is the world\'s largest decentralized innovation engine for solving real-world challenges.'**
   String get comingSoonDescription;
 
   /// Label text shown in the ConnectingStatus widget during re-connection.
@@ -715,7 +715,7 @@ abstract class VoicesLocalizations {
   /// A message (content) in link wallet flow on intro screen.
   ///
   /// In en, this message translates to:
-  /// **'You\'\'re almost there! This is the final and most important step in your account setup.\n\nWe\'\'re going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.\n\nRole Keys allow you to enter new spaces, discover new ways to participate, and unlock new ways to earn rewards.\n\nWe\'\'ll start with your Voter Key by default. You can decide to add a Proposer Key and Drep key if you want, or you can always add them later.'**
+  /// **'You\'re almost there! This is the final and most important step in your account setup.\n\nWe\'re going to link a Cardano Wallet to your Catalyst Keychain, so you can start collecting Role Keys.\n\nRole Keys allow you to enter new spaces, discover new ways to participate, and unlock new ways to earn rewards.\n\nWe\'ll start with your Voter Key by default. You can decide to add a Proposer Key and Drep key if you want, or you can always add them later.'**
   String get walletLinkIntroContent;
 
   /// A title in link wallet flow on select wallet screen.
@@ -727,7 +727,7 @@ abstract class VoicesLocalizations {
   /// A message (content) in link wallet flow on select wallet screen.
   ///
   /// In en, this message translates to:
-  /// **'To complete this action, you\'\'ll submit a signed transaction to Cardano. There will be an ADA transaction fee.'**
+  /// **'To complete this action, you\'ll submit a signed transaction to Cardano. There will be an ADA transaction fee.'**
   String get walletLinkSelectWalletContent;
 
   /// A title in link wallet flow on wallet details screen.
@@ -742,7 +742,7 @@ abstract class VoicesLocalizations {
   /// **'{wallet} connected successfully!'**
   String walletLinkWalletDetailsContent(String wallet);
 
-  /// A message in link wallet flow on wallet details screen when a user wallet doesn''t have enough balance.
+  /// A message in link wallet flow on wallet details screen when a user wallet doesn't have enough balance.
   ///
   /// In en, this message translates to:
   /// **'Wallet and role registrations require a minimal transaction fee. You can setup your default dApp connector wallet in your browser extension settings.'**
@@ -754,7 +754,7 @@ abstract class VoicesLocalizations {
   /// **'Top up ADA'**
   String get walletLinkWalletDetailsNoticeTopUp;
 
-  /// A link to top-up provide when the user doesn''t have enough balance on wallet link screen
+  /// A link to top-up provide when the user doesn't have enough balance on wallet link screen
   ///
   /// In en, this message translates to:
   /// **'Link to top-up provider'**
@@ -763,7 +763,7 @@ abstract class VoicesLocalizations {
   /// A title in link wallet flow on transaction screen.
   ///
   /// In en, this message translates to:
-  /// **'Let\'\'s make sure everything looks right.'**
+  /// **'Let\'s make sure everything looks right.'**
   String get walletLinkTransactionTitle;
 
   /// A subtitle in link wallet flow on transaction screen.
@@ -1027,7 +1027,7 @@ abstract class VoicesLocalizations {
   /// No description provided for @accountCreationSplashMessage.
   ///
   /// In en, this message translates to:
-  /// **'Your keychain is your ticket to participate in  distributed innovation on the global stage.    Once you have it, you\'\'ll be able to enter different spaces, discover awesome ideas, and share your feedback to hep improve ideas.    As you add new keys to your keychain, you\'\'ll be able to enter new spaces, unlock new rewards opportunities, and have your voice heard in community decisions.'**
+  /// **'Your keychain is your ticket to participate in  distributed innovation on the global stage.    Once you have it, you\'ll be able to enter different spaces, discover awesome ideas, and share your feedback to hep improve ideas.    As you add new keys to your keychain, you\'ll be able to enter new spaces, unlock new rewards opportunities, and have your voice heard in community decisions.'**
   String get accountCreationSplashMessage;
 
   /// No description provided for @accountCreationSplashNextButton.
@@ -1045,7 +1045,7 @@ abstract class VoicesLocalizations {
   /// No description provided for @accountInstructionsMessage.
   ///
   /// In en, this message translates to:
-  /// **'On the next screen, you\'\'re going to see 12 words.  This is called your \"seed phrase\".     It\'\'s like a super secure password that only you know,  that allows you to prove ownership of your keychain.    You\'\'ll use it to login and recover your account on  different devices, so be sure to put it somewhere safe!\n\nYou need to write this seed phrase down with pen and paper, so get this ready.'**
+  /// **'On the next screen, you\'re going to see 12 words.  This is called your \"seed phrase\".     It\'s like a super secure password that only you know,  that allows you to prove ownership of your keychain.    You\'ll use it to login and recover your account on  different devices, so be sure to put it somewhere safe!\n\nYou need to write this seed phrase down with pen and paper, so get this ready.'**
   String get accountInstructionsMessage;
 
   /// For example in button that goes to next stage of registration
@@ -1117,7 +1117,7 @@ abstract class VoicesLocalizations {
   /// An error text on text field on delete keychain dialog
   ///
   /// In en, this message translates to:
-  /// **'Error. Please type \'\'Remove Keychain\'\' to remove your account from this device.'**
+  /// **'Error. Please type \'Remove Keychain\' to remove your account from this device.'**
   String get deleteKeychainDialogErrorText;
 
   /// A removing phrase on delete keychain dialog
@@ -1132,7 +1132,7 @@ abstract class VoicesLocalizations {
   /// **'Learn about Catalyst Roles'**
   String get accountRoleDialogTitle;
 
-  /// A label on account role dialog''s button
+  /// A label on account role dialog's button
   ///
   /// In en, this message translates to:
   /// **'Continue Role setup'**
@@ -1333,7 +1333,7 @@ abstract class VoicesLocalizations {
   /// An info on keychain upload dialog
   ///
   /// In en, this message translates to:
-  /// **'Make sure it\'\'s a correct Catalyst keychain file.'**
+  /// **'Make sure it\'s a correct Catalyst keychain file.'**
   String get uploadKeychainInfo;
 
   /// Refers to a light theme mode.
@@ -1471,7 +1471,7 @@ abstract class VoicesLocalizations {
   /// No description provided for @createKeychainSeedPhraseCheckInstructionsSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Next, we\'\'re going to make sure that you\'\'ve written down your words correctly.     We don\'\'t save your seed phrase, so it\'\'s important  to make sure you have it right. That\'\'s why we do this confirmation before continuing.     It\'\'s also good practice to get familiar with using a seed phrase if you\'\'re new to crypto.'**
+  /// **'Next, we\'re going to make sure that you\'ve written down your words correctly.     We don\'t save your seed phrase, so it\'s important  to make sure you have it right. That\'s why we do this confirmation before continuing.     It\'s also good practice to get familiar with using a seed phrase if you\'re new to crypto.'**
   String get createKeychainSeedPhraseCheckInstructionsSubtitle;
 
   /// No description provided for @createKeychainSeedPhraseCheckSubtitle.
@@ -1501,13 +1501,13 @@ abstract class VoicesLocalizations {
   /// No description provided for @createKeychainSeedPhraseCheckSuccessTitle.
   ///
   /// In en, this message translates to:
-  /// **'Nice job! You\'\'ve successfully verified the seed phrase for your keychain.'**
+  /// **'Nice job! You\'ve successfully verified the seed phrase for your keychain.'**
   String get createKeychainSeedPhraseCheckSuccessTitle;
 
   /// No description provided for @createKeychainSeedPhraseCheckSuccessSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Enter your seed phrase to recover your Catalyst Keychain on any device.  It\'\'s kinda like your email and password all rolled into one, so keep it somewhere safe!  In the next step we\'\'ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.'**
+  /// **'Enter your seed phrase to recover your Catalyst Keychain on any device.  It\'s kinda like your email and password all rolled into one, so keep it somewhere safe!  In the next step we\'ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.'**
   String get createKeychainSeedPhraseCheckSuccessSubtitle;
 
   /// No description provided for @yourNextStep.
@@ -1531,7 +1531,7 @@ abstract class VoicesLocalizations {
   /// No description provided for @createKeychainUnlockPasswordInstructionsSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.    But it can be a bit tedious to enter every single time you want to use the app.    In this next step, you\'\'ll set your Unlock Password for your current device. It\'\'s like a shortcut for proving ownership of your Keychain.    Whenever you recover your account for the first time on a new device, you\'\'ll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.'**
+  /// **'With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.    But it can be a bit tedious to enter every single time you want to use the app.    In this next step, you\'ll set your Unlock Password for your current device. It\'s like a shortcut for proving ownership of your Keychain.    Whenever you recover your account for the first time on a new device, you\'ll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.'**
   String get createKeychainUnlockPasswordInstructionsSubtitle;
 
   /// No description provided for @createKeychainCreatedTitle.
@@ -1735,7 +1735,7 @@ abstract class VoicesLocalizations {
   /// No description provided for @recoveryUnlockPasswordInstructionsSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.    But it can be a bit tedious to enter every single time you want to use the app.    In this next step, you\'\'ll set your Unlock Password for your current device. It\'\'s like a shortcut for proving ownership of your Keychain.    Whenever you recover your account for the first time on a new device, you\'\'ll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.'**
+  /// **'With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.    But it can be a bit tedious to enter every single time you want to use the app.    In this next step, you\'ll set your Unlock Password for your current device. It\'s like a shortcut for proving ownership of your Keychain.    Whenever you recover your account for the first time on a new device, you\'ll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.'**
   String get recoveryUnlockPasswordInstructionsSubtitle;
 
   /// The header label in unlock dialog.
