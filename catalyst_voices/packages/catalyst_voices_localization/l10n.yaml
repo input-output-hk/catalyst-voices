@@ -7,3 +7,4 @@ preferred-supported-locales:
   - en
 use-deferred-loading: true
 synthetic-package: false
+use-escaping: true
