@@ -248,17 +248,17 @@ abstract class CatGatewayApi extends ChopperService {
           {@Query('vote_key') required String? voteKey});
 
   ///Get the configuration for the frontend.
-  Future<chopper.Response<String>> apiDraftConfigFrontendGet() {
+  Future<chopper.Response> apiDraftConfigFrontendGet() {
     return _apiDraftConfigFrontendGet();
   }
 
   ///Get the configuration for the frontend.
   @Get(path: '/api/draft/config/frontend')
-  Future<chopper.Response<String>> _apiDraftConfigFrontendGet();
+  Future<chopper.Response> _apiDraftConfigFrontendGet();
 
   ///Set the frontend configuration.
   ///@param IP
-  Future<chopper.Response<String>> apiDraftConfigFrontendPut({
+  Future<chopper.Response> apiDraftConfigFrontendPut({
     String? ip,
     required Object? body,
   }) {
@@ -271,10 +271,22 @@ abstract class CatGatewayApi extends ChopperService {
     path: '/api/draft/config/frontend',
     optionalBody: true,
   )
-  Future<chopper.Response<String>> _apiDraftConfigFrontendPut({
+  Future<chopper.Response> _apiDraftConfigFrontendPut({
     @Query('IP') String? ip,
     @Body() required Object? body,
   });
+
+  ///Get the frontend JSON schema.
+  ///@param IP
+  Future<chopper.Response> apiDraftConfigFrontendSchemaGet({String? ip}) {
+    return _apiDraftConfigFrontendSchemaGet(ip: ip);
+  }
+
+  ///Get the frontend JSON schema.
+  ///@param IP
+  @Get(path: '/api/draft/config/frontend/schema')
+  Future<chopper.Response> _apiDraftConfigFrontendSchemaGet(
+      {@Query('IP') String? ip});
 
   ///Voter's info
   ///@param voting_key A Voters Public ED25519 Key (as registered in their most recent valid [CIP-15](https://cips.cardano.org/cips/cip15) or [CIP-36](https://cips.cardano.org/cips/cip36) registration).

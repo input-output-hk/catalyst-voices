@@ -193,18 +193,18 @@ final class _$CatGatewayApi extends CatGatewayApi {
   }
 
   @override
-  Future<Response<String>> _apiDraftConfigFrontendGet() {
+  Future<Response<dynamic>> _apiDraftConfigFrontendGet() {
     final Uri $url = Uri.parse('/api/draft/config/frontend');
     final Request $request = Request(
       'GET',
       $url,
       client.baseUrl,
     );
-    return client.send<String, String>($request);
+    return client.send<dynamic, dynamic>($request);
   }
 
   @override
-  Future<Response<String>> _apiDraftConfigFrontendPut({
+  Future<Response<dynamic>> _apiDraftConfigFrontendPut({
     String? ip,
     required Object? body,
   }) {
@@ -218,7 +218,20 @@ final class _$CatGatewayApi extends CatGatewayApi {
       body: $body,
       parameters: $params,
     );
-    return client.send<String, String>($request);
+    return client.send<dynamic, dynamic>($request);
+  }
+
+  @override
+  Future<Response<dynamic>> _apiDraftConfigFrontendSchemaGet({String? ip}) {
+    final Uri $url = Uri.parse('/api/draft/config/frontend/schema');
+    final Map<String, dynamic> $params = <String, dynamic>{'IP': ip};
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+      parameters: $params,
+    );
+    return client.send<dynamic, dynamic>($request);
   }
 
   @override
