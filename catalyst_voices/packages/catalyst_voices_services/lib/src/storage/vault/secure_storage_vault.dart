@@ -2,11 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_services/src/crypto/aes_crypto_service.dart';
 import 'package:catalyst_voices_services/src/crypto/crypto_service.dart';
 import 'package:catalyst_voices_services/src/storage/storage_string_mixin.dart';
 import 'package:catalyst_voices_services/src/storage/vault/lock_factor.dart';
 import 'package:catalyst_voices_services/src/storage/vault/vault.dart';
+import 'package:catalyst_voices_services/src/storage/vault/vault_crypto_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -25,7 +25,7 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     FlutterSecureStorage secureStorage = const FlutterSecureStorage(),
     CryptoService? cryptoService,
   })  : _secureStorage = secureStorage,
-        _cryptoService = cryptoService ?? AesCryptoService();
+        _cryptoService = cryptoService ?? VaultCryptoService();
 
   Future<bool> get _hasLock {
     final effectiveKey = _buildVaultKey(_lockKey);

@@ -6,7 +6,7 @@ import 'package:catalyst_voices_services/src/crypto/crypto_service.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter/foundation.dart';
 
-final class AesCryptoService implements CryptoService {
+final class VaultCryptoService implements CryptoService {
   /// Salt length for Argon2 key derivation.
   static const int _saltLength = 16;
 
@@ -17,11 +17,15 @@ final class AesCryptoService implements CryptoService {
   static const int _keyLength = 16;
 
   /// Versioning for future improvements
-  static const int _version = 1;
+  static const int _currentVersion = 1;
+
+  /// Algorithm id for future improvements
+  /// AES-GCM
+  static const int _currentAlgorithmId = 1;
 
   final Random _random;
 
-  AesCryptoService({
+  VaultCryptoService({
     Random? random,
   }) : _random = random ?? Random.secure();
 
@@ -74,21 +78,54 @@ final class AesCryptoService implements CryptoService {
     Uint8List data, {
     required Uint8List key,
   }) async {
+    if (data.length < 2) {
+      throw const CryptoDataMalformed();
+    }
+
+    // Extract the version, algorithm ID
+    final version = data[0];
+    final algorithmId = data[1];
+
+    if (version != _currentVersion) {
+      throw CryptoVersionUnsupported('Version $version');
+    }
+
+    if (algorithmId != _currentAlgorithmId) {
+      throw CryptoAlgorithmUnsupported('Algorithm $version');
+    }
+
     final algorithm = AesGcm.with256bits(nonceLength: _viLength);
     final secretKey = SecretKey(key);
 
+    final encryptedData = data.sublist(2);
+
     final secretBox = SecretBox.fromConcatenation(
-      data,
+      encryptedData,
       nonceLength: _viLength,
       macLength: algorithm.macAlgorithm.macLength,
     );
 
-    return algorithm
+    final decryptedData = await algorithm
         .decrypt(secretBox, secretKey: secretKey)
         .then(Uint8List.fromList)
         .onError<SecretBoxAuthenticationError>(
           (_, __) => throw const CryptoAuthenticationException(),
         );
+
+    // Verify checksum/marker
+    final checksum = _checksum;
+    if (decryptedData.length < checksum.length) {
+      throw const CryptoDataMalformed('Data is too short');
+    }
+    final originalDataLength = decryptedData.length - checksum.length;
+    final originalData = decryptedData.sublist(0, originalDataLength);
+    final extractedChecksum = decryptedData.sublist(originalDataLength);
+
+    if (!listEquals(checksum, extractedChecksum)) {
+      throw const CryptoDataMalformed('Checksum mismatch');
+    }
+
+    return originalData;
   }
 
   @override
@@ -112,9 +149,7 @@ final class AesCryptoService implements CryptoService {
 
     final concatenation = secretBox.concatenation();
 
-    // Combine version, salt, IV, and encrypted data
-    // Version 1, Algorithm ID 1 (AES-GCM)
-    final metadata = Uint8List.fromList([_version, 0x01]);
+    final metadata = Uint8List.fromList([_currentVersion, _currentAlgorithmId]);
 
     final result = Uint8List.fromList([
       ...metadata,

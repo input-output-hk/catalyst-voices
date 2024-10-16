@@ -2,14 +2,14 @@ import 'dart:convert';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
-import 'package:catalyst_voices_services/src/crypto/aes_crypto_service.dart';
+import 'package:catalyst_voices_services/src/storage/vault/vault_crypto_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:test/test.dart';
 
 void main() {
-  final cryptoService = AesCryptoService();
+  final cryptoService = VaultCryptoService();
 
-  group('AesCryptoService key derivation', () {
+  group('key derivation', () {
     test(
       'derived key matches when verifying with same seed',
       () async {
@@ -66,7 +66,7 @@ void main() {
     );
   });
 
-  group('AesCryptoService crypto', () {
+  group('crypto', () {
     test('encrypted and later decrypted data with same key matches', () async {
       // Given
       const lockFactor = PasswordLockFactor('admin');
