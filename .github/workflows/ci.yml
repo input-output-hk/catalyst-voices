@@ -17,3 +17,6 @@ jobs:
     uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.1.0
     with:
       forge_version: 0.2.1
+
+  allure:
+    uses: input-output-hk/catalyst-voices/.github/workflows/generate-allure-report.yml@ci/v0.2.0
