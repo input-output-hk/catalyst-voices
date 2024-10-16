@@ -1,3 +1,9 @@
+// initial message handler from the main thread.
+self.onmessage = (event) => {
+    const { id } = event.data;
+    self.postMessage({ id, error: 'Worker is not ready' });
+};
+
 Promise.all([
     import('https://unpkg.com/brotli-wasm@3.0.0/index.web.js?module').then(m => m.default),
     import('https://unpkg.com/@oneidentity/zstd-js@1.0.3/wasm/index.js?module')
@@ -65,6 +71,7 @@ Promise.all([
         zstdDecompress: _zstdDecompress,
     };
 
+    // replace the initial handler with the actual handler.
     self.onmessage = (event) => {
         const { id, action, bytesHex } = event.data;
         if (catalyst_compression[action]) {
@@ -79,6 +86,7 @@ Promise.all([
         }
     };
 
+    // send an event to notify the main thread that the worker is ready.
     self.postMessage({ initialized: true });
 }).catch(error => {
     self.postMessage({ error: `Failed to load modules: ${error.message}` });

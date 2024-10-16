@@ -17,11 +17,6 @@ function generateId() {
     return id;
 }
 
-function removeWorkerListener(onMessage, onError) {
-    compressionWorker.removeEventListener("message", onMessage);
-    compressionWorker.removeEventListener("error", onError);
-}
-
 // A function to create a compression function according to its name.
 function runCompressionInWorker(fnName) {
     return (data) => {
@@ -36,7 +31,7 @@ function runCompressionInWorker(fnName) {
                     initialized
                 } = event.data;
 
-                // skip the initialized completion event,
+                // skip the initializing completion event,
                 // and the id that is not itself.
                 if (initialized || responseId !== id) {
                     return;
@@ -50,14 +45,16 @@ function runCompressionInWorker(fnName) {
 
                 processingIdsPool.delete(id);
 
-                removeWorkerListener(handleMessage, handleError);
+                compressionWorker.removeEventListener("message", handleMessage);
+                compressionWorker.removeEventListener("error", handleError);
             };
             const handleError = (error) => {
                 reject(error);
 
                 processingIdsPool.clear();
 
-                removeWorkerListener(handleMessage, handleError);
+                compressionWorker.removeEventListener("message", handleMessage);
+                compressionWorker.removeEventListener("error", handleError);
             };
 
             compressionWorker.addEventListener("message", handleMessage);
