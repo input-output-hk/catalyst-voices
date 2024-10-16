@@ -12,28 +12,28 @@ import 'package:convert/convert.dart';
 /// The bytes are transferred as hex string due to
 /// raw bytes not being supported by the js_interop.
 @JS()
-external Object brotliCompress(JSString bytes);
+external JSPromise<JSString> brotliCompress(JSString bytes);
 
 /// Decompresses the [bytes] using brotli algorithm.
 ///
 /// The bytes are transferred as hex string due to
 /// raw bytes not being supported by the js_interop.
 @JS()
-external Object brotliDecompress(JSString bytes);
+external JSPromise<JSString> brotliDecompress(JSString bytes);
 
 /// Compresses the [bytes] using zstd algorithm.
 ///
 /// The bytes are transferred as hex string due to
 /// raw bytes not being supported by the js_interop.
 @JS()
-external Object zstdCompress(JSString bytes);
+external JSPromise<JSString> zstdCompress(JSString bytes);
 
 /// Decompresses the [bytes] using zstd algorithm.
 ///
 /// The bytes are transferred as hex string due to
 /// raw bytes not being supported by the js_interop.
 @JS()
-external Object zstdDecompress(JSString bytes);
+external JSPromise<JSString> zstdDecompress(JSString bytes);
 
 /// The JS implementation of brotli compressor.
 class JSBrotliCompressor implements CatalystCompressor {

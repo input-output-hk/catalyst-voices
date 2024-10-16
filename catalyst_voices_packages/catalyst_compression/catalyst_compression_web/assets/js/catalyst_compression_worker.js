@@ -66,16 +66,16 @@ Promise.all([
     };
 
     self.onmessage = (event) => {
-        const { action, bytesHex } = event.data;
+        const { id, action, bytesHex } = event.data;
         if (catalyst_compression[action]) {
             try {
                 const result = catalyst_compression[action](bytesHex);
-                self.postMessage({ result });
+                self.postMessage({ id, result });
             } catch (error) {
-                self.postMessage({ error: error.message });
+                self.postMessage({ id, error: error.message });
             }
         } else {
-            self.postMessage({ error: 'Unknown action' });
+            self.postMessage({ id, error: 'Unknown action' });
         }
     };
 
