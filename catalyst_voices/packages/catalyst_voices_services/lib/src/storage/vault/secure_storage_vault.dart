@@ -65,6 +65,8 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
 
     _isUnlocked = await _cryptoService.verifyKey(seed, key: lock);
 
+    // TODO(damian-molinski): Erase lock;
+
     return isUnlocked;
   }
 
@@ -127,8 +129,11 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     }
 
     final lock = await _requireLock;
+    final decrypted = await _decrypt(encryptedData, key: lock);
 
-    return _decrypt(encryptedData, key: lock);
+    // TODO(damian-molinski): Erase lock;
+
+    return decrypted;
   }
 
   /// Allows operation only when [isUnlocked] it true, otherwise non op.
@@ -152,6 +157,8 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
 
     final lock = await _requireLock;
     final encryptedData = await _encrypt(value, key: lock);
+
+    // TODO(damian-molinski): Erase lock;
 
     await _secureStorage.write(key: effectiveKey, value: encryptedData);
   }

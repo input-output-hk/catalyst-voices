@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -15,11 +16,17 @@ final class AesCryptoService implements CryptoService {
   /// Derived key hash length.
   static const int _keyLength = 16;
 
+  /// Versioning for future improvements
+  static const int _version = 1;
+
   final Random _random;
 
   AesCryptoService({
     Random? random,
   }) : _random = random ?? Random.secure();
+
+  /// 3-byte marker attached at the end of encrypted data.
+  Uint8List get _checksum => utf8.encode('CHK');
 
   @override
   Future<Uint8List> deriveKey(
@@ -92,15 +99,29 @@ final class AesCryptoService implements CryptoService {
     final algorithm = AesGcm.with256bits(nonceLength: _viLength);
     final secretKey = SecretKey(key);
 
+    final checksum = _checksum;
+    final combinedData = Uint8List.fromList([...data, ...checksum]);
+
     final secretBox = await algorithm.encrypt(
-      data,
+      combinedData,
       secretKey: secretKey,
       nonce: null,
       aad: [],
       possibleBuffer: null,
     );
 
-    return secretBox.concatenation();
+    final concatenation = secretBox.concatenation();
+
+    // Combine version, salt, IV, and encrypted data
+    // Version 1, Algorithm ID 1 (AES-GCM)
+    final metadata = Uint8List.fromList([_version, 0x01]);
+
+    final result = Uint8List.fromList([
+      ...metadata,
+      ...concatenation,
+    ]);
+
+    return result;
   }
 
   /// Builds list with [length] and random bytes in it.
