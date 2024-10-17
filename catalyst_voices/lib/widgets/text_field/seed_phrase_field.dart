@@ -12,6 +12,14 @@ final class SeedPhraseFieldController
     extends ValueNotifier<List<SeedPhraseWord>> {
   SeedPhraseFieldController([super._value = const <SeedPhraseWord>[]]);
 
+  set words(List<SeedPhraseWord> words) {
+    value = words;
+  }
+
+  List<SeedPhraseWord> get words {
+    return value;
+  }
+
   void clear() {
     value = const [];
   }

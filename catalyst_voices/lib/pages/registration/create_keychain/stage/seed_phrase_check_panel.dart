@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/pages/registration/create_keychain/bloc_seed_phrase_builder.dart';
+import 'package:catalyst_voices/pages/registration/show_upload_confirmation_dialog.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/pages/registration/widgets/seed_phrase_actions.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -38,7 +39,20 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
   }
 
   Future<void> _uploadSeedPhrase() async {
-    // TODO(damian-molinski): open upload dialog
+    await showUploadConfirmationDialog(
+      context,
+      onUploadSuccessful: _onWordsSequenceChanged,
+      onValidate: (words) {
+        final areWordsMatching = RegistrationCubit.of(context)
+            .keychainCreation
+            .areWordsMatching(words);
+
+        return areWordsMatching &&
+            SeedPhrase.isValid(
+              words: words,
+            );
+      },
+    );
   }
 
   void _clearUserWords() {
