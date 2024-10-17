@@ -43,13 +43,11 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
       context,
       onUploadSuccessful: _onWordsSequenceChanged,
       onValidate: (words) {
-        final shuffledWords =
-            RegistrationCubit.of(context).keychainCreation.getShuffledWords();
-        final mappedWords = words.map((e) => e.data).toList()..sort();
-        final mappedShuffledWords = shuffledWords.map((e) => e.data).toList()
-          ..sort();
+        final areWordsMatching = RegistrationCubit.of(context)
+            .keychainCreation
+            .areWordsMatching(words);
 
-        return (mappedWords.toString() == mappedShuffledWords.toString()) &&
+        return areWordsMatching &&
             SeedPhrase.isValid(
               words: words,
             );
