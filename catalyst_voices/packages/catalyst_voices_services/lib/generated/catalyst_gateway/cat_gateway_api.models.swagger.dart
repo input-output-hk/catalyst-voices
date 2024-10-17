@@ -65,7 +65,8 @@ extension $AccountVoteExtension on AccountVote {
 @JsonSerializable(explicitToJson: true)
 class BadRequestError {
   const BadRequestError({
-    required this.errors,
+    required this.error,
+    this.schemaValidationErrors,
   });
 
   factory BadRequestError.fromJson(Map<String, dynamic> json) =>
@@ -74,16 +75,21 @@ class BadRequestError {
   static const toJsonFactory = _$BadRequestErrorToJson;
   Map<String, dynamic> toJson() => _$BadRequestErrorToJson(this);
 
-  @JsonKey(name: 'errors', defaultValue: <String>[])
-  final List<String> errors;
+  @JsonKey(name: 'error')
+  final String error;
+  @JsonKey(name: 'schema_validation_errors', defaultValue: <String>[])
+  final List<String>? schemaValidationErrors;
   static const fromJsonFactory = _$BadRequestErrorFromJson;
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
         (other is BadRequestError &&
-            (identical(other.errors, errors) ||
-                const DeepCollectionEquality().equals(other.errors, errors)));
+            (identical(other.error, error) ||
+                const DeepCollectionEquality().equals(other.error, error)) &&
+            (identical(other.schemaValidationErrors, schemaValidationErrors) ||
+                const DeepCollectionEquality().equals(
+                    other.schemaValidationErrors, schemaValidationErrors)));
   }
 
   @override
@@ -91,17 +97,28 @@ class BadRequestError {
 
   @override
   int get hashCode =>
-      const DeepCollectionEquality().hash(errors) ^ runtimeType.hashCode;
+      const DeepCollectionEquality().hash(error) ^
+      const DeepCollectionEquality().hash(schemaValidationErrors) ^
+      runtimeType.hashCode;
 }
 
 extension $BadRequestErrorExtension on BadRequestError {
-  BadRequestError copyWith({List<String>? errors}) {
-    return BadRequestError(errors: errors ?? this.errors);
+  BadRequestError copyWith(
+      {String? error, List<String>? schemaValidationErrors}) {
+    return BadRequestError(
+        error: error ?? this.error,
+        schemaValidationErrors:
+            schemaValidationErrors ?? this.schemaValidationErrors);
   }
 
-  BadRequestError copyWithWrapped({Wrapped<List<String>>? errors}) {
+  BadRequestError copyWithWrapped(
+      {Wrapped<String>? error,
+      Wrapped<List<String>?>? schemaValidationErrors}) {
     return BadRequestError(
-        errors: (errors != null ? errors.value : this.errors));
+        error: (error != null ? error.value : this.error),
+        schemaValidationErrors: (schemaValidationErrors != null
+            ? schemaValidationErrors.value
+            : this.schemaValidationErrors));
   }
 }
 
