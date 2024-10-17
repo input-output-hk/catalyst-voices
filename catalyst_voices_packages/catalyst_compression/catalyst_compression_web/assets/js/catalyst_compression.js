@@ -53,17 +53,19 @@ function runCompressionInWorker(fnName) {
                     }
     
                     if (result) {
-                        complete(resolve(result));
+                        resolve(result);
                     } else {
-                        complete(reject(error || 'Unexpected error'));
+                        reject(error || 'Unexpected error');
                     }
     
                     processingIdsPool.delete(id);
+                    complete();
                 },
                 (error, complete) => {
-                    complete(reject(error));
+                    reject(error);
     
                     processingIdsPool.clear();
+                    complete();
                 }
             );
 
