@@ -43,8 +43,12 @@ static FRONTEND_IP_DEFAULT: LazyLock<Value> =
 /// Helper function to create a JSON validator from a JSON schema.
 /// If the schema is invalid, a default JSON validator is created.
 fn schema_validator(schema: &Value) -> Validator {
-    jsonschema::validator_for(schema).unwrap_or_else(|e| {
-        error!("Error creating JSON validator: {}", e);
+    jsonschema::validator_for(schema).unwrap_or_else(|err| {
+        error!(
+            id = "schema_validator",
+            errors=?err,
+            "Error creating JSON validator"
+        );
 
         // Create a default JSON validator as a fallback
         // This should not fail since it is hard coded
@@ -59,8 +63,8 @@ fn schema_validator(schema: &Value) -> Validator {
 
 /// Helper function to convert a JSON string to a JSON value.
 fn load_json_lazy(data: &str) -> Value {
-    serde_json::from_str(data).unwrap_or_else(|e| {
-        error!("Error parsing JSON: {}", e);
+    serde_json::from_str(data).unwrap_or_else(|err| {
+        error!(id = "load_json_lazy", errors=?err, "Error parsing JSON");
         json!({})
     })
 }

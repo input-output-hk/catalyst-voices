@@ -30,9 +30,12 @@ enum Responses {
 /// Bad request errors
 #[derive(Object, Default)]
 struct BadRequestError {
-    /// List of errors
+    /// Error messages.
+    #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
+    error: String,
+    /// Optional schema validation errors.
     #[oai(validator(max_items = "1000", max_length = "9999", pattern = "^[0-9a-zA-Z].*$"))]
-    errors: Vec<String>,
+    schema_validation_errors: Option<Vec<String>>,
 }
 
 /// All responses.
@@ -116,7 +119,8 @@ impl ConfigApi {
                     Ok(parsed_ip) => set(ConfigKey::FrontendForIp(parsed_ip), body_value).await,
                     Err(err) => {
                         Responses::BadRequest(Json(BadRequestError {
-                            errors: vec![format!("Invalid IP address: {err}")],
+                            error: format!("Invalid IP address: {err}"),
+                            schema_validation_errors: None,
                         }))
                         .into()
                     },
@@ -153,12 +157,13 @@ async fn set(key: ConfigKey, value: Value) -> AllResponses {
             match validate {
                 BasicOutput::Valid(_) => Responses::Ok(Json(json!(null))).into(),
                 BasicOutput::Invalid(errors) => {
-                    let error_descriptions: Vec<String> = errors
+                    let schema_errors: Vec<String> = errors
                         .iter()
                         .map(|error| error.error_description().clone().into_inner())
                         .collect();
                     Responses::BadRequest(Json(BadRequestError {
-                        errors: error_descriptions,
+                        error: "Invalid JSON data validating against JSON schema".to_string(),
+                        schema_validation_errors: Some(schema_errors),
                     }))
                     .into()
                 },
