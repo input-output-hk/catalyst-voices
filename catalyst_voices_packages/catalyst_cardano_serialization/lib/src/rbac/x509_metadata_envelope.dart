@@ -278,7 +278,7 @@ final class X509MetadataEnvelope<T> extends Equatable {
 
   static Future<List<int>?> _compressZstd(List<int> bytes) async {
     try {
-      return CatalystCompression.instance.zstd.compress(bytes);
+      return await CatalystCompression.instance.zstd.compress(bytes);
     } on CompressionNotSupportedException {
       return null;
     }
