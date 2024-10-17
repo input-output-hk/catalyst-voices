@@ -45,7 +45,6 @@ jobs:
         continue-on-error: true
         with:
           path: ./catalyst-gateway/tests/schemathesis_tests+test-fuzzer-api
-          target_args: --allow-privileged
 
       - name: Get flutter unit test report
         uses: input-output-hk/catalyst-forge/actions/run@master
@@ -60,7 +59,6 @@ jobs:
         continue-on-error: true
         with:
           path: ./catalyst-gateway/tests/api_tests+test
-          target_args: --allow-privileged
 
       - name: Collect and upload test reports
         uses: actions/upload-artifact@v4
