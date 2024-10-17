@@ -69,7 +69,7 @@ Future<void> _showUploadDialog(
       final decodedText = utf8.decode(bytes);
       final words = decodedText
           .split(' ')
-          .mapIndexed((i, e) => SeedPhraseWord(e, nr: i))
+          .mapIndexed((i, e) => SeedPhraseWord(e, nr: i + 1))
           .toList();
       final isValid = SeedPhrase.isValid(
         words: words,
