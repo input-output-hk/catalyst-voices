@@ -31,6 +31,7 @@ enum Responses {
 #[derive(Object, Default)]
 struct BadRequestError {
     /// List of errors
+    #[oai(validator(max_items = "1000", max_length = "9999", pattern = "^[0-9a-zA-Z].*$"))]
     errors: Vec<String>,
 }
 
