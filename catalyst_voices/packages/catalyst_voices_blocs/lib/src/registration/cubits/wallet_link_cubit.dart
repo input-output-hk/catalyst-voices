@@ -40,7 +40,7 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
       emit(state.copyWith(wallets: const Optional.empty()));
 
       final wallets =
-          await registrationService.getCardanoWallets();
+          await registrationService.getCardanoWallets().withMinimumDelay();
 
       _wallets
         ..clear()
