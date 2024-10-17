@@ -18,7 +18,7 @@ jobs:
     with:
       forge_version: 0.2.1
 
-  allure:
+  test_reporting:
     if: always()
     needs: ci
     uses: input-output-hk/catalyst-voices/.github/workflows/generate-allure-report.yml@main
