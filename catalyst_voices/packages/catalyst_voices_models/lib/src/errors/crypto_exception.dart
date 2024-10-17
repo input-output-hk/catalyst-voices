@@ -26,6 +26,9 @@ final class CryptoDataMalformed extends CryptoException {
     if (message != null) return 'CryptoDataMalformed: $message';
     return 'CryptoDataMalformed';
   }
+
+  @override
+  List<Object?> get props => [message];
 }
 
 final class CryptoVersionUnsupported extends CryptoException {
@@ -38,6 +41,9 @@ final class CryptoVersionUnsupported extends CryptoException {
     if (message != null) return 'CryptoVersionUnsupported: $message';
     return 'CryptoVersionUnsupported';
   }
+
+  @override
+  List<Object?> get props => [message];
 }
 
 final class CryptoAlgorithmUnsupported extends CryptoException {
@@ -50,4 +56,7 @@ final class CryptoAlgorithmUnsupported extends CryptoException {
     if (message != null) return 'CryptoAlgorithmUnsupported: $message';
     return 'CryptoAlgorithmUnsupported';
   }
+
+  @override
+  List<Object?> get props => [message];
 }

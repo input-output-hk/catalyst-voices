@@ -17,6 +17,9 @@ final class LockNotFoundException extends VaultException {
     if (message != null) return 'LockNotFoundException: $message';
     return 'LockNotFoundException';
   }
+
+  @override
+  List<Object?> get props => [message];
 }
 
 final class VaultLockedException extends VaultException {
