@@ -10,19 +10,16 @@ import 'package:logging/logging.dart';
 final _logger = Logger('VaultCryptoService');
 
 final class VaultCryptoService implements CryptoService {
-  /// Salt length for Argon2 key derivation.
+  /// Salt length for key derivation.
   static const int _saltLength = 16;
 
   /// Salt length for AesGcm data encryption.
   static const int _viLength = 12;
 
-  /// Derived key hash length.
-  static const int _keyLength = 16;
-
-  /// Versioning for future improvements
+  /// Versioning for future improvements.
   static const int _currentVersion = 1;
 
-  /// Algorithm id for future improvements
+  /// Algorithm id for future improvements.
   /// AES-GCM
   static const int _currentAlgorithmId = 1;
 
@@ -35,25 +32,19 @@ final class VaultCryptoService implements CryptoService {
   /// 3-byte marker attached at the end of encrypted data.
   Uint8List get _checksum => utf8.encode('CHK');
 
-  // Note. Argon2id has no browser implementation and is slow > 1s.
+  // Note. Argon2id has no native browser implementation and dart one is
+  // slow > 1s. That's why Pbkdf2 is used.
   @override
   Future<Uint8List> deriveKey(
     Uint8List seed, {
     Uint8List? salt,
   }) {
     Future<Uint8List> run() async {
-      final algorithm = Argon2id(
-        parallelism: 4,
-        memory: 10000, // 10 000 x 1kB block = 10 MB
-        iterations: 1,
-        hashLength: _keyLength,
+      final algorithm = Pbkdf2(
+        macAlgorithm: Hmac.sha256(),
+        iterations: 10000, // 20k iterations
+        bits: 256, // 256 bits = 32 bytes output
       );
-
-      // final algorithm = Pbkdf2(
-      //   macAlgorithm: Hmac.sha256(),
-      //   iterations: 10000, // 20k iterations
-      //   bits: 256, // 256 bits = 32 bytes output
-      // );
 
       final keySalt = salt ?? _generateRandomList(length: _saltLength);
 
@@ -122,7 +113,7 @@ final class VaultCryptoService implements CryptoService {
       }
 
       final algorithm = AesGcm.with256bits(nonceLength: _viLength);
-      final secretKey = SecretKey(key);
+      final secretKey = SecretKey(key.sublist(_saltLength));
 
       final encryptedData = data.sublist(2);
 
@@ -169,7 +160,7 @@ final class VaultCryptoService implements CryptoService {
   }) {
     Future<Uint8List> run() async {
       final algorithm = AesGcm.with256bits(nonceLength: _viLength);
-      final secretKey = SecretKey(key);
+      final secretKey = SecretKey(key.sublist(_saltLength));
 
       final checksum = _checksum;
       final combinedData = Uint8List.fromList([...data, ...checksum]);

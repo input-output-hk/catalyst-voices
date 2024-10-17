@@ -52,7 +52,7 @@ void main() {
       () async {
         // Given
         const lockFactor = PasswordLockFactor('admin');
-        final invalidSeed = Uint8List.fromList([]);
+        final invalidSeed = Uint8List.fromList([0, 0, 0]);
 
         // When
         final seed = lockFactor.seed;
