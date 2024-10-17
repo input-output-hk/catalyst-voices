@@ -75,6 +75,15 @@ class _ResultBuilderState<S, F> extends State<ResultBuilder<S, F>> {
     super.dispose();
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return switch (_result) {
+      Success(:final value) => widget.successBuilder(context, value),
+      Failure(:final value) => widget.failureBuilder(context, value),
+      _ => widget.loadingBuilder(context),
+    };
+  }
+
   bool _wasLoadingShownLongEnough() {
     final now = DateTimeExt.now();
     final duration = now.difference(_resultUpdatedAt);
@@ -87,10 +96,11 @@ class _ResultBuilderState<S, F> extends State<ResultBuilder<S, F>> {
     if (duration >= widget.minLoadingDuration) {
       _updateResult(widget.result);
     } else {
-      _updateResultTimer = Timer(
-        duration,
-        () => _updateResult(widget.result),
-      );
+      _updateResultTimer = Timer(duration, () {
+        setState(() {
+          _updateResult(widget.result);
+        });
+      });
     }
   }
 
@@ -100,20 +110,7 @@ class _ResultBuilderState<S, F> extends State<ResultBuilder<S, F>> {
   }
 
   void _updateResult(Result<S, F>? result) {
-    if (mounted) {
-      setState(() {
-        _result = result;
-        _resultUpdatedAt = DateTimeExt.now();
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return switch (_result) {
-      Success(:final value) => widget.successBuilder(context, value),
-      Failure(:final value) => widget.failureBuilder(context, value),
-      _ => widget.loadingBuilder(context),
-    };
+    _result = result;
+    _resultUpdatedAt = DateTimeExt.now();
   }
 }
