@@ -21,5 +21,5 @@ jobs:
   allure:
     needs: ci
     uses: input-output-hk/catalyst-voices/.github/workflows/generate-allure-report.yml@974-task-make-the-allure-report-workflow-run-after-the-normal-ci-run
-    with:
-      forge_version: 0.2.1
+#    with:
+#      forge_version: 0.2.1
