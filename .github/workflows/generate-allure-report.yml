@@ -2,13 +2,6 @@ name: Allure Report Generation
 
 on:
   workflow_call:
-    inputs:
-      forge_version:
-        description: |
-          The version of the forge CLI to install (use 'local' for testing)
-        type: string
-        required: false
-        default: latest
 
 permissions:
   contents: write
@@ -38,15 +31,7 @@ jobs:
 
       - name: Install Forge
         uses: input-output-hk/catalyst-forge/actions/install@ci/v1.1.0
-        if: ${{ inputs.forge_version != 'local' }}
-        with:
-          version: ${{ inputs.forge_version }}
-
-      - name: Install Local Forge
-        uses: input-output-hk/catalyst-forge/actions/install-local@ci/v1.1.0
-        if: ${{ inputs.forge_version == 'local' }}
-        with:
-          earthly_token: ${{ secrets.earthly_token }}
+        if: always()
 
       - name: Setup CI
         uses: input-output-hk/catalyst-forge/actions/setup@master
