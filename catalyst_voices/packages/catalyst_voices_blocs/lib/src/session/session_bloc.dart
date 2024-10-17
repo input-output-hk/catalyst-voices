@@ -29,12 +29,6 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState>
   ) async {
     if (!await _keychain.hasSeedPhrase) {
       emit(const VisitorSessionState());
-    } else if (await _keychain.isUnlocked) {
-      // TODO(damian-molinski): we shouldn't keep the keychain unlocked
-      // after leaving the app. In the future once keychain stays locked
-      // when leaving the app the logic here is not needed.
-      await _keychain.lock();
-      emit(const GuestSessionState());
     } else {
       emit(const GuestSessionState());
     }
@@ -56,7 +50,9 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState>
     LockSessionEvent event,
     Emitter<SessionState> emit,
   ) async {
-    await _keychain.lock();
+    if (await _keychain.hasLock) {
+      await _keychain.lock();
+    }
     emit(const GuestSessionState());
   }
 
@@ -88,6 +84,10 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState>
     GuestSessionEvent event,
     Emitter<SessionState> emit,
   ) async {
+    if (await _keychain.hasLock && !await _keychain.isUnlocked) {
+      await _keychain.unlock(_dummyUnlockFactor);
+    }
+
     await _keychain.setLockAndBeginWith(
       seedPhrase: _dummySeedPhrase,
       unlockFactor: _dummyUnlockFactor,
@@ -101,6 +101,10 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState>
     ActiveUserSessionEvent event,
     Emitter<SessionState> emit,
   ) async {
+    if (await _keychain.hasLock && !await _keychain.isUnlocked) {
+      await _keychain.unlock(_dummyUnlockFactor);
+    }
+
     await _keychain.setLockAndBeginWith(
       seedPhrase: _dummySeedPhrase,
       unlockFactor: _dummyUnlockFactor,
