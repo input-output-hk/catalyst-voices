@@ -7,13 +7,13 @@ abstract class CatalystCompressor {
   ///
   /// Compressing and then decompressing the [bytes]
   /// should yield the original [bytes].
-  List<int> compress(List<int> bytes);
+  Future<List<int>> compress(List<int> bytes);
 
   /// Returns the list of decompressed [bytes].
   ///
   /// Compressing and then decompressing the [bytes]
   /// should yield the original [bytes].
-  List<int> decompress(List<int> bytes);
+  Future<List<int>> decompress(List<int> bytes);
 }
 
 /// Exception thrown when [CatalystCompressor.compress] can't compress
