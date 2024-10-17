@@ -126,7 +126,6 @@ class _Wallets extends StatelessWidget {
   }
 }
 
-
 class _WalletsList extends StatelessWidget {
   final List<WalletMetadata> wallets;
   final _OnSelectWallet onSelectWallet;
