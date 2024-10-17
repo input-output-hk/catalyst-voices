@@ -2,6 +2,8 @@ import 'package:flutter/foundation.dart';
 
 /// An abstract interface that defines cryptographic operations such as
 /// key derivation, encryption, decryption, and key verification.
+// TODO(damian-molinski): Expose KeyDerivation interface and have it
+//  delegate implementation
 abstract interface class CryptoService {
   /// Derives a cryptographic key from a given seed, with an optional salt.
   ///
