@@ -6,6 +6,17 @@ on:
     branches: "main"
     tags: ["*"]
   workflow_call:
+    inputs:
+      forge_version:
+        description: |
+          The version of the forge CLI to install (use 'local' for testing)
+        type: string
+        required: false
+        default: latest
+    secrets:
+      earthly_token:
+        description: Optional Earthly token used to login to Earthly cloud during local builds of Forge CLI
+        required: false
 
 permissions:
   contents: write
@@ -33,19 +44,43 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@master
+      - name: Install Forge
+        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.1.0
+        if: ${{ inputs.forge_version != 'local' }}
         with:
-          aws_role_arn: ${{ env.AWS_ROLE_ARN }}
-          aws_region: ${{ env.AWS_REGION }}
-          earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
+          version: ${{ inputs.forge_version }}
+
+      - name: Install Local Forge
+        uses: input-output-hk/catalyst-forge/actions/install-local@ci/v1.1.0
+        if: ${{ inputs.forge_version == 'local' }}
+        with:
+          earthly_token: ${{ secrets.earthly_token }}
+
+      - name: Check forge version
+        id: local
+        run: |
+          forge version
+
+          if [[ "${{ inputs.forge_version }}" == "local" ]]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup CI
+        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.1.0
+        with:
+          skip_docker: 'true'
+          skip_github: 'true'
+          skip_earthly: ${{ steps.local.outputs.skip }}
 
       - name: Get catalyst gateway unit test report
-        uses: input-output-hk/catalyst-ci/actions/run@master
+        uses: input-output-hk/catalyst-forge/.github/workflows/run.yml@ci/v1.1.0
         if: always()
         continue-on-error: true
         with:
-          earthfile: ./catalyst-gateway/
+          earthfiles: ./catalyst-gateway/
+          forge_version: 0.2.1
           flags:
           targets: build
           target_flags:
@@ -53,11 +88,12 @@ jobs:
           artifact: "false"
 
       - name: Get schemathesis test report
-        uses: input-output-hk/catalyst-ci/actions/run@master
+        uses: input-output-hk/catalyst-forge/.github/workflows/run.yml@ci/v1.1.0
         if: always()
         continue-on-error: true
         with:
-          earthfile: ./catalyst-gateway/tests/schemathesis_tests
+          earthfiles: ./catalyst-gateway/tests/schemathesis_tests
+          forge_version: 0.2.1
           flags: --allow-privileged
           targets: test-fuzzer-api
           target_flags:
@@ -65,11 +101,12 @@ jobs:
           artifact: "false"
 
       - name: Get flutter unit test report
-        uses: input-output-hk/catalyst-ci/actions/run@master
+        uses: input-output-hk/catalyst-forge/.github/workflows/run.yml@ci/v1.1.0
         if: always()
         continue-on-error: true
         with:
-          earthfile: ./catalyst_voices/
+          earthfiles: ./catalyst_voices/
+          forge_version: 0.2.1
           flags:
           targets: test-unit
           target_flags:
@@ -77,11 +114,12 @@ jobs:
           artifact: "false"
 
       - name: Get python api test report
-        uses: input-output-hk/catalyst-ci/actions/run@master
+        uses: input-output-hk/catalyst-forge/.github/workflows/run.yml@ci/v1.1.0
         if: always()
         continue-on-error: true
         with:
-          earthfile: ./catalyst-gateway/tests/api_tests/
+          earthfiles: ./catalyst-gateway/tests/api_tests/
+          forge_version: 0.2.1
           flags: --allow-privileged
           targets: test
           target_flags:
