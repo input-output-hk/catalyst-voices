@@ -17,11 +17,19 @@ const STOPLIGHT_UI_TEMPLATE: &str = r#"
     <style charset="UTF-8">{:style}</style>
     <script charset="UTF-8">{:script}</script>
   </head>
-  <body>
+  <body style="margin: 0; overflow: hidden;">
+            <nav style="display: flex;
+    justify-content: space-around;
+    background-color: #f8f9fa;
+    padding: 10px;
+    position: relative;
+    z-index: 100000000;
+    top: 0px;">
 
-    <elements-api id="docs"
+<elements-api id="docs"
         router="hash"
-        layout="sidebar">
+    
+        style="width: 100%; height: calc(100vh - 50px); position: absolute; top: 30px; left: 0;     background: white;">
     </elements-api>
 
     <script>
