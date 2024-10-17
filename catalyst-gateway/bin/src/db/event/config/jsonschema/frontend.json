@@ -3,10 +3,12 @@
 	"$schema": "http://json-schema.org/draft-07/schema#",
 	"title": "Frontend JSON schema",
 	"type": "object",
-	"properties": {
-		"sentry": {
+	"sentry": {
+		"type": "object",
+		"description": "Configuration for Sentry.",
+		"properties": {
 			"dsn": {
-				"$ref": "#/definitions/saneUrl",
+				"$ref": "#/definitions/httpsUrl",
 				"description": "The Data Source Name (DSN) for Sentry."
 			},
 			"release": {
@@ -20,7 +22,7 @@
 		}
 	},
 	"definitions": {
-		"saneUrl": {
+		"httpsUrl": {
 			"type": "string",
 			"format": "uri",
 			"pattern": "^https?://"
