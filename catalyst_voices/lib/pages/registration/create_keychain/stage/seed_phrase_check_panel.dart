@@ -41,8 +41,18 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
   Future<void> _uploadSeedPhrase() async {
     await showUploadConfirmationDialog(
       context,
-      onUploadSuccessful: (words) {
-        _onWordsSequenceChanged(words);
+      onUploadSuccessful: _onWordsSequenceChanged,
+      onValidate: (words) {
+        final shuffledWords =
+            RegistrationCubit.of(context).keychainCreation.getShuffledWords();
+        final mappedWords = words.map((e) => e.data).toList()..sort();
+        final mappedShuffledWords = shuffledWords.map((e) => e.data).toList()
+          ..sort();
+
+        return (mappedWords.toString() == mappedShuffledWords.toString()) &&
+            SeedPhrase.isValid(
+              words: words,
+            );
       },
     );
   }

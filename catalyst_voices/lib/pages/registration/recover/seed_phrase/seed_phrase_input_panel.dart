@@ -8,6 +8,7 @@ import 'package:catalyst_voices/pages/registration/widgets/seed_phrase_actions.d
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class SeedPhraseInputPanel extends StatefulWidget {
@@ -83,6 +84,11 @@ class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel> {
       context,
       onUploadSuccessful: (words) {
         _controller.words = words;
+      },
+      onValidate: (words) {
+        return SeedPhrase.isValid(
+          words: words,
+        );
       },
     );
   }

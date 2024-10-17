@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 Future<void> showUploadConfirmationDialog(
   BuildContext rootContext, {
   ValueChanged<List<SeedPhraseWord>>? onUploadSuccessful,
+  bool Function(List<SeedPhraseWord> value)? onValidate,
 }) async {
   await VoicesDialog.show<void>(
     context: rootContext,
@@ -41,7 +42,11 @@ Future<void> showUploadConfirmationDialog(
             child: Text(context.l10n.uploadConfirmDialogYesButton),
             onTap: () async {
               Navigator.of(context).pop();
-              await _showUploadDialog(rootContext, onUploadSuccessful);
+              await _showUploadDialog(
+                rootContext,
+                onUploadSuccessful,
+                onValidate,
+              );
             },
           ),
           VoicesTextButton(
@@ -57,6 +62,7 @@ Future<void> showUploadConfirmationDialog(
 Future<void> _showUploadDialog(
   BuildContext rootContext,
   ValueChanged<List<SeedPhraseWord>>? onUploadSuccessful,
+  bool Function(List<SeedPhraseWord> value)? onValidate,
 ) async {
   await VoicesUploadFileDialog.show(
     rootContext,
@@ -71,9 +77,7 @@ Future<void> _showUploadDialog(
           .split(' ')
           .mapIndexed((i, e) => SeedPhraseWord(e, nr: i + 1))
           .toList();
-      final isValid = SeedPhrase.isValid(
-        words: words,
-      );
+      final isValid = onValidate?.call(words) ?? false;
 
       if (isValid) {
         onUploadSuccessful?.call(words);
@@ -82,6 +86,7 @@ Future<void> _showUploadDialog(
         await _showIncorrectUploadDialog(
           rootContext,
           onUploadSuccessful,
+          onValidate,
         );
       }
     },
@@ -91,6 +96,7 @@ Future<void> _showUploadDialog(
 Future<void> _showIncorrectUploadDialog(
   BuildContext rootContext,
   ValueChanged<List<SeedPhraseWord>>? onUploadSuccessful,
+  bool Function(List<SeedPhraseWord> value)? onValidate,
 ) async {
   await VoicesDialog.show<void>(
     context: rootContext,
@@ -114,6 +120,7 @@ Future<void> _showIncorrectUploadDialog(
               await _showUploadDialog(
                 rootContext,
                 onUploadSuccessful,
+                onValidate,
               );
             },
           ),

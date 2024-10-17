@@ -26,6 +26,8 @@ abstract interface class KeychainCreationManager
 
   Future<void> downloadSeedPhrase();
 
+  List<SeedPhraseWord> getShuffledWords();
+
   Future<bool> createKeychain();
 }
 
@@ -168,5 +170,10 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
     if (state.seedPhraseStateData.seedPhrase == null) {
       _buildSeedPhrase();
     }
+  }
+
+  @override
+  List<SeedPhraseWord> getShuffledWords() {
+    return state.seedPhraseStateData.shuffledWords;
   }
 }
