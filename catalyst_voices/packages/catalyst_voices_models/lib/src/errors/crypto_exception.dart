@@ -15,7 +15,7 @@ final class CryptoAuthenticationException extends CryptoException {
   String toString() => 'CryptoAuthenticationException';
 }
 
-/// Thrown when data trying to decrypt was tempted with
+/// Thrown when trying to decrypt tampered data
 final class CryptoDataMalformed extends CryptoException {
   final String? message;
 
