@@ -63,6 +63,49 @@ extension $AccountVoteExtension on AccountVote {
 }
 
 @JsonSerializable(explicitToJson: true)
+class BadRequestError {
+  const BadRequestError({
+    required this.errors,
+  });
+
+  factory BadRequestError.fromJson(Map<String, dynamic> json) =>
+      _$BadRequestErrorFromJson(json);
+
+  static const toJsonFactory = _$BadRequestErrorToJson;
+  Map<String, dynamic> toJson() => _$BadRequestErrorToJson(this);
+
+  @JsonKey(name: 'errors', defaultValue: <String>[])
+  final List<String> errors;
+  static const fromJsonFactory = _$BadRequestErrorFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is BadRequestError &&
+            (identical(other.errors, errors) ||
+                const DeepCollectionEquality().equals(other.errors, errors)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(errors) ^ runtimeType.hashCode;
+}
+
+extension $BadRequestErrorExtension on BadRequestError {
+  BadRequestError copyWith({List<String>? errors}) {
+    return BadRequestError(errors: errors ?? this.errors);
+  }
+
+  BadRequestError copyWithWrapped({Wrapped<List<String>>? errors}) {
+    return BadRequestError(
+        errors: (errors != null ? errors.value : this.errors));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
 class BlockDate {
   const BlockDate({
     required this.epoch,

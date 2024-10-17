@@ -222,14 +222,12 @@ final class _$CatGatewayApi extends CatGatewayApi {
   }
 
   @override
-  Future<Response<dynamic>> _apiDraftConfigFrontendSchemaGet({String? ip}) {
+  Future<Response<dynamic>> _apiDraftConfigFrontendSchemaGet() {
     final Uri $url = Uri.parse('/api/draft/config/frontend/schema');
-    final Map<String, dynamic> $params = <String, dynamic>{'IP': ip};
     final Request $request = Request(
       'GET',
       $url,
       client.baseUrl,
-      parameters: $params,
     );
     return client.send<dynamic, dynamic>($request);
   }

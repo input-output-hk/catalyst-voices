@@ -277,16 +277,13 @@ abstract class CatGatewayApi extends ChopperService {
   });
 
   ///Get the frontend JSON schema.
-  ///@param IP
-  Future<chopper.Response> apiDraftConfigFrontendSchemaGet({String? ip}) {
-    return _apiDraftConfigFrontendSchemaGet(ip: ip);
+  Future<chopper.Response> apiDraftConfigFrontendSchemaGet() {
+    return _apiDraftConfigFrontendSchemaGet();
   }
 
   ///Get the frontend JSON schema.
-  ///@param IP
   @Get(path: '/api/draft/config/frontend/schema')
-  Future<chopper.Response> _apiDraftConfigFrontendSchemaGet(
-      {@Query('IP') String? ip});
+  Future<chopper.Response> _apiDraftConfigFrontendSchemaGet();
 
   ///Voter's info
   ///@param voting_key A Voters Public ED25519 Key (as registered in their most recent valid [CIP-15](https://cips.cardano.org/cips/cip15) or [CIP-36](https://cips.cardano.org/cips/cip36) registration).
