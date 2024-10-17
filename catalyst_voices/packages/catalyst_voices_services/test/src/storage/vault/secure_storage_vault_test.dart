@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/storage/vault/lock_factor.dart';
 import 'package:catalyst_voices_services/src/storage/vault/secure_storage_vault.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -28,31 +31,34 @@ void main() {
     expect(isUnlocked, isFalse);
   });
 
-  test('read returns null when not unlocked', () async {
+  test('read when not unlocked throws exception', () async {
     // Given
     const key = 'SecureStorageVault.key';
     const value = 'username';
 
     // When
     await flutterSecureStorage.write(key: key, value: value);
-    final readValue = await vault.readString(key: key);
 
     // Then
-    expect(readValue, isNull);
+    expect(
+      () => vault.readString(key: key),
+      throwsA(isA<VaultLockedException>()),
+    );
   });
 
-  test('write wont happen when is locked', () async {
+  test('write throws exception when is locked', () async {
     // Given
     const key = 'key';
-    const fKey = 'SecureStorageVault.$key';
     const value = 'username';
 
     // When
-    await vault.writeString(value, key: key);
-    final readValue = await flutterSecureStorage.read(key: fKey);
+    await vault.lock();
 
     // Then
-    expect(readValue, isNull);
+    expect(
+      () => vault.writeString(value, key: key),
+      throwsA(isA<VaultLockedException>()),
+    );
   });
 
   test('unlock update lock and returns null when locked', () async {
@@ -90,9 +96,9 @@ void main() {
   test('clear removes all vault keys', () async {
     // Given
     const lock = PasswordLockFactor('pass1234');
-    const vaultKeyValues = <String, String>{
-      'one': 'qqq',
-      'two': 'qqq',
+    final vaultKeyValues = <String, String>{
+      'one': utf8.fuse(base64).encode('qqq'),
+      'two': utf8.fuse(base64).encode('qqq'),
     };
     const nonVaultKeyValues = <String, String>{
       'three': 'qqq',
