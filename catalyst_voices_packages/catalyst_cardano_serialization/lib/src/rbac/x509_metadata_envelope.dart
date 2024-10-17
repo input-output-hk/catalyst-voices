@@ -270,7 +270,7 @@ final class X509MetadataEnvelope<T> extends Equatable {
 
   static Future<List<int>?> _compressBrotli(List<int> bytes) async {
     try {
-      return CatalystCompression.instance.brotli.compress(bytes);
+      return await CatalystCompression.instance.brotli.compress(bytes);
     } on CompressionNotSupportedException {
       return null;
     }
