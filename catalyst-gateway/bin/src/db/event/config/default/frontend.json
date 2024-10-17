@@ -1,3 +1,5 @@
 {
-	"sentry_environment": "dev"
+	"sentry": {
+		"environment": "dev"
+	}
 }

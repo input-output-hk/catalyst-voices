@@ -4,22 +4,23 @@
 	"title": "Frontend JSON schema",
 	"type": "object",
 	"properties": {
-		"sentry_dsn": {
-			"$ref": "#/definitions/httpsUrl",
-			"description": "The Data Source Name (DSN) for Sentry."
-		},
-		"sentry_release": {
-			"type": "string",
-            "description": "A version of the code deployed to an environment"
-		},
-		"sentry_environment": {
-			"type": "string",
-			"description": "The environment in which the application is running, e.g., 'dev', 'qa'."
+		"sentry": {
+			"dsn": {
+				"$ref": "#/definitions/saneUrl",
+				"description": "The Data Source Name (DSN) for Sentry."
+			},
+			"release": {
+				"type": "string",
+				"description": "A version of the code deployed to an environment"
+			},
+			"environment": {
+				"type": "string",
+				"description": "The environment in which the application is running, e.g., 'dev', 'qa'."
+			}
 		}
 	},
-	"additionalProperties": true,
 	"definitions": {
-		"httpsUrl": {
+		"saneUrl": {
 			"type": "string",
 			"format": "uri",
 			"pattern": "^https?://"
