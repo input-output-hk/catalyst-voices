@@ -1507,7 +1507,7 @@ abstract class VoicesLocalizations {
   /// No description provided for @createKeychainSeedPhraseCheckSuccessSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Enter your seed phrase to recover your Catalyst Keychain on any device.  It\'s kinda like your email and password all rolled into one, so keep it somewhere safe!  In the next step we’ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.'**
+  /// **'Enter your seed phrase to recover your Catalyst Keychain on any device.  It\'s kinda like your email and password all rolled into one, so keep it somewhere safe!  In the next step we\'ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.'**
   String get createKeychainSeedPhraseCheckSuccessSubtitle;
 
   /// No description provided for @yourNextStep.
