@@ -1,13 +1,14 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-# cspell: words vcpu, noninteractive, iscsi, preconfiguration, inotify, jetstack
+
+# These variables are kept for reference in scripts, but we're not using them for network configuration
 control_ip = "192.168.58.10"
 
 # Determine the maximum number of agents, and set their IP addresses
 agents = { "agent86" => "192.168.58.86",
            "agent99" => "192.168.58.99" }
 
-# This is sized so that a machine with 16 threads and 16GB will allocate at most 
+# This is sized so that a machine with 16 threads and 16GB will allocate at most
 # ~3/4 of its resources to the cluster.
 control_vcpu = "4" # Number of vCPUs in the VM
 control_memory = "5192" # 5G of Memory (An extra gig because its the control-plane node)
@@ -42,7 +43,7 @@ helm_install_script = <<-SHELL
     curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | tee /etc/apt/sources.list.d/helm-stable-debian.list
     apt-get update
-    apt-get install helm    
+    apt-get install helm
     SHELL
 
 control_plane_script = <<-SHELL
@@ -101,7 +102,7 @@ longhorn_install_script = <<-SHELL
     helm repo update
     helm install longhorn longhorn/longhorn --namespace longhorn-system --create-namespace --version 1.6.2
     kubectl apply -f /vagrant_shared/k3s/longhorn/storage-classes.yaml
-    kubectl apply -f /vagrant_shared/k3s/longhorn/ingress.yaml     
+    kubectl apply -f /vagrant_shared/k3s/longhorn/ingress.yaml
     SHELL
 
 local_path_provisioner_script = <<-SHELL
@@ -123,7 +124,7 @@ monitoring_install_script = <<-SHELL
     export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
     helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
     helm repo add grafana https://grafana.github.io/helm-charts
-    helm repo update    
+    helm repo update
     helm install prometheus-stack --version 58.6.0 -f /vagrant_shared/k3s/grafana-prometheus/prometheus-values.yaml prometheus-community/kube-prometheus-stack --create-namespace --namespace monitoring --wait
     kubectl apply -f /vagrant_shared/k3s/grafana-prometheus/alert-manager-ingress.yaml
     kubectl apply -f /vagrant_shared/k3s/grafana-prometheus/prometheus-ingress.yaml
@@ -153,27 +154,33 @@ update_sysctl_limits = <<-SHELL
     SHELL
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "generic/debian12"
+  if is_darwin_arm64
+    config.vm.box = "bento/ubuntu-20.04-arm64"
+  else
+    config.vm.box = "bento/debian-12"
+  end
+
+  config.vm.network "forwarded_port", guest: 6443, host: 6443
 
   config.vm.define "control", primary: true do |control|
     control.vm.network "private_network", ip: control_ip
     control.vm.hostname = "control"
 
-    if !is_darwin_arm64
-      # x86 anything should work with this
-      control.vm.synced_folder "./shared", "/vagrant_shared"
-      control.vm.provider "virtualbox" do |vb|
-        vb.memory = control_memory
-        vb.cpus = control_vcpu
+    if is_darwin_arm64
+      control.vm.synced_folder "./shared", "/vagrant_shared", type: "rsync"
+      control.vm.provider "parallels" do |p|
+        p.cpus = control_vcpu
+        p.memory = control_memory
       end
     else
-      # Specific config just for Arm Macs.
-      control.vm.synced_folder "./shared", "/vagrant_shared", type: "smb"
-      control.vm.provider "qemu" do |qe|
-        qe.memory = control_memory
-        qe.smp = control_vcpu
+      control.vm.network "private_network", ip: control_ip
+      control.vm.synced_folder "./shared", "/vagrant_shared"
+      control.vm.provider "virtualbox" do |vb|
+        vb.cpus = control_vcpu
+        vb.memory = control_memory
       end
     end
+
     control.vm.provision "shell", inline: update_sysctl_limits
     control.vm.provision "shell", inline: static_ips
     control.vm.provision "shell", inline: debian_packages
@@ -190,21 +197,22 @@ Vagrant.configure("2") do |config|
 
   agents.each do |agent_name, agent_ip|
     config.vm.define agent_name do |agent|
-      agent.vm.network "private_network", ip: agent_ip
       agent.vm.hostname = agent_name
-      if !is_darwin_arm64
-        agent.vm.synced_folder "./shared", "/vagrant_shared"
-        agent.vm.provider "virtualbox" do |vb|
-          vb.memory = agent_memory
-          vb.cpus = agent_vcpu
+
+      if is_darwin_arm64
+        agent.vm.synced_folder "./shared", "/vagrant_shared", type: "rsync"
+        agent.vm.provider "parallels" do |p|
+          p.cpus = agent_vcpu
+          p.memory = agent_memory
         end
       else
-        agent.vm.synced_folder "./shared", "/vagrant_shared", type: "smb"
-        agent.vm.provider "qemu" do |qe|
-          qe.memory = agent_memory
-          qe.smp = agent_vcpu
+        agent.vm.synced_folder "./shared", "/vagrant_shared"
+        agent.vm.provider "virtualbox" do |vb|
+          vb.cpus = agent_vcpu
+          vb.memory = agent_memory
         end
       end
+
       agent.vm.provision "shell", inline: update_sysctl_limits
       agent.vm.provision "shell", inline: static_ips
       agent.vm.provision "shell", inline: debian_packages
