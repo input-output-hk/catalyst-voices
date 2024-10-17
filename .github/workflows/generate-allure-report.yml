@@ -33,57 +33,38 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup CI
+        uses: input-output-hk/catalyst-forge/actions/setup@master
+
       - name: Get catalyst gateway unit test report
-        uses: input-output-hk/catalyst-forge/.github/workflows/run.yml@ci/v1.1.0
+        uses: input-output-hk/catalyst-forge/actions/run@master
         if: always()
         continue-on-error: true
         with:
-          earthfiles: ./catalyst-gateway/
-          forge_version: 0.2.1
-          flags:
-          targets: build
-          target_flags:
-          runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-          artifact: "false"
+          path: ./catalyst-gateway+build
 
       - name: Get schemathesis test report
-        uses: input-output-hk/catalyst-forge/.github/workflows/run.yml@ci/v1.1.0
+        uses: input-output-hk/catalyst-forge/actions/run@master
         if: always()
         continue-on-error: true
         with:
-          earthfiles: ./catalyst-gateway/tests/schemathesis_tests
-          forge_version: 0.2.1
-          flags: --allow-privileged
-          targets: test-fuzzer-api
-          target_flags:
-          runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-          artifact: "false"
+          path: ./catalyst-gateway/tests/schemathesis_tests+test-fuzzer-api
+          target_args: --allow-privileged
 
       - name: Get flutter unit test report
-        uses: input-output-hk/catalyst-forge/.github/workflows/run.yml@ci/v1.1.0
+        uses: input-output-hk/catalyst-forge/actions/run@master
         if: always()
         continue-on-error: true
         with:
-          earthfiles: ./catalyst_voices/
-          forge_version: 0.2.1
-          flags:
-          targets: test-unit
-          target_flags:
-          runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-          artifact: "false"
+          path: ./catalyst_voices+test-unit
 
       - name: Get python api test report
-        uses: input-output-hk/catalyst-forge/.github/workflows/run.yml@ci/v1.1.0
+        uses: input-output-hk/catalyst-forge/actions/run@master
         if: always()
         continue-on-error: true
         with:
-          earthfiles: ./catalyst-gateway/tests/api_tests/
-          forge_version: 0.2.1
-          flags: --allow-privileged
-          targets: test
-          target_flags:
-          runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-          artifact: "false"
+          path: ./catalyst-gateway/tests/api_tests+test
+          target_args: --allow-privileged
 
       - name: Collect and upload test reports
         uses: actions/upload-artifact@v4
