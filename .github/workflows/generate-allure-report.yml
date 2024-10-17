@@ -13,10 +13,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  AWS_REGION: eu-central-1
-  AWS_ROLE_ARN: arn:aws:iam::332405224602:role/ci
-  EARTHLY_TARGET: docker
-  ECR_REGISTRY: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
   ALLURE_REPORT_PATH: allure-report
   COVERAGE_REPORT_PATH: coverage-report
   REPORT_EXT: .junit-report.xml
