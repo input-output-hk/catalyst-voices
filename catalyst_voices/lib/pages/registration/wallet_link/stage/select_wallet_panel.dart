@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:catalyst_voices/pages/registration/wallet_link/bloc_wallet_link_builder.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
+import 'package:catalyst_voices/widgets/common/infrastructure/voices_result_builder.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
@@ -114,17 +115,17 @@ class _Wallets extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return switch (result) {
-      Success(:final value) => value.isNotEmpty
-          ? _WalletsList(wallets: value, onSelectWallet: onSelectWallet)
+    return ResultBuilder(
+      result: result,
+      successBuilder: (context, wallets) => wallets.isNotEmpty
+          ? _WalletsList(wallets: wallets, onSelectWallet: onSelectWallet)
           : _WalletsEmpty(onRetry: onRefreshTap),
-      Failure() => _WalletsError(onRetry: onRefreshTap),
-      _ => const Center(
-          child: DelayedWidget(child: VoicesCircularProgressIndicator()),
-        ),
-    };
+      failureBuilder: (context, error) => _WalletsError(onRetry: onRefreshTap),
+      loadingBuilder: (context) => const _WalletsLoading(),
+    );
   }
 }
+
 
 class _WalletsList extends StatelessWidget {
   final List<WalletMetadata> wallets;
@@ -228,6 +229,17 @@ class _WalletsError extends StatelessWidget {
           onRetry: onRetry,
         ),
       ),
+    );
+  }
+}
+
+class _WalletsLoading extends StatelessWidget {
+  const _WalletsLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: VoicesCircularProgressIndicator(),
     );
   }
 }
