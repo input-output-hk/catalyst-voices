@@ -82,7 +82,7 @@ class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel> {
     await showUploadConfirmationDialog(
       context,
       onUploadSuccessful: (words) {
-        RegistrationCubit.of(context).recover.setSeedPhraseWords(words);
+        _controller.words = words;
       },
     );
   }
