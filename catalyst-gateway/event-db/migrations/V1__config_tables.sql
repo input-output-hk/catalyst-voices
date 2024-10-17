@@ -71,10 +71,10 @@ Must match the `name` component of the $id URI inside the schema.';
 -- -------------------------------------------------------------------------------------------------
 
 -- Config Table
--- This table is looked up with three keys, `id`, `id2` and `id3`
+-- This table is looked up with three keys, `id1`, `id2` and `id3`
 CREATE TABLE config (
   row_id SERIAL PRIMARY KEY,
-  id VARCHAR NOT NULL,
+  id1 VARCHAR NOT NULL,
   id2 VARCHAR NOT NULL,
   id3 VARCHAR NOT NULL,
   value JSONB NULL,
@@ -84,7 +84,7 @@ CREATE TABLE config (
 );
 
 -- cardano+follower+preview must be unique, they are a combined key.
-CREATE UNIQUE INDEX config_idx ON config (id, id2, id3);
+CREATE UNIQUE INDEX config_idx ON config (id1, id2, id3);
 
 COMMENT ON TABLE config IS
 'General JSON Configuration and Data Values.
@@ -95,17 +95,16 @@ Defined  Data Formats:
 COMMENT ON COLUMN config.row_id IS
 'Synthetic unique key. 
 Always lookup using `cardano.follower.preview`';
-COMMENT ON COLUMN config.id IS
-'The name/id of the general config value/variable';
+COMMENT ON COLUMN config.id1 IS
+'The primary ID of the config.';
 COMMENT ON COLUMN config.id2 IS
-'2nd ID of the general config value. 
+'The secondary ID of the config.
 Must be defined, use "" if not required.';
-
 COMMENT ON COLUMN config.id3 IS
-'3rd ID of the general config value.
+'The tertiary ID of the config.
 Must be defined, use "" if not required.';
 COMMENT ON COLUMN config.value IS
-'The JSON value of the system variable `cardano.follower.preview`';
+'The configuration value in JSON format.';
 COMMENT ON COLUMN config.value_schema IS
 'The Schema the Config Value conforms to.
 The `value` field must conform to this schema.';
@@ -113,48 +112,6 @@ The `value` field must conform to this schema.';
 COMMENT ON INDEX config_idx IS
 'We use three keys combined uniquely rather than forcing string concatenation 
 at the app level to allow for querying groups of data.';
-
-
-INSERT INTO config (id, id2, id3, value)
-VALUES
--- (
---   'cardano',
---   'follower',
---   'mainnet',
---   '{
---     "relay": "relays-new.cardano-mainnet.iohk.io:3001",
---     "mithril_snapshot": {
---       "path": "/tmp/mainnet/immutable",
---       "timing_pattern": 25
---     }
---   }'
--- ),
--- (
---   'cardano',
---   'follower',
---   'preview',
---   '{
---     "relay": "preview-node.play.dev.cardano.org:3001",
---     "mithril_snapshot": {
---       "path": "/tmp/preview/immutable",
---       "timing_pattern": 25
---     }
---   }'
--- ),
-(
-  'cardano',
-  'follower',
-  'preprod',
-  '{
-    "relay": "preprod-node.play.dev.cardano.org:3001",
-    "mithril_snapshot": {
-      "path": "/tmp/preprod/immutable",
-      "timing_pattern": 25
-    }
-  }'
-);
-
-
 
 -- -------------------------------------------------------------------------------------------------
 

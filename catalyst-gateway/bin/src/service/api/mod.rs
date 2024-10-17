@@ -4,6 +4,7 @@
 //! It however does NOT contain any processing for them, that is defined elsewhere.
 use std::net::IpAddr;
 
+use config::ConfigApi;
 use gethostname::gethostname;
 use health::HealthApi;
 use legacy::LegacyApi;
@@ -15,6 +16,7 @@ use crate::settings::Settings;
 /// Auth
 mod auth;
 pub(crate) mod cardano;
+mod config;
 mod health;
 mod legacy;
 
@@ -59,11 +61,12 @@ const TERMS_OF_SERVICE: &str =
     "https://github.com/input-output-hk/catalyst-voices/blob/main/CODE_OF_CONDUCT.md";
 
 /// Create the `OpenAPI` definition
-pub(crate) fn mk_api() -> OpenApiService<(HealthApi, CardanoApi, LegacyApi), ()> {
+pub(crate) fn mk_api() -> OpenApiService<(HealthApi, CardanoApi, ConfigApi, LegacyApi), ()> {
     let mut service = OpenApiService::new(
         (
             HealthApi,
             CardanoApi,
+            ConfigApi,
             (legacy::RegistrationApi, legacy::V0Api, legacy::V1Api),
         ),
         API_TITLE,

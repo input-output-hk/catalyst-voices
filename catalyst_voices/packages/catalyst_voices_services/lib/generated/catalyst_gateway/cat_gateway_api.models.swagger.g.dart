@@ -20,6 +20,22 @@ Map<String, dynamic> _$AccountVoteToJson(AccountVote instance) =>
       'votes': instance.votes,
     };
 
+BadRequestError _$BadRequestErrorFromJson(Map<String, dynamic> json) =>
+    BadRequestError(
+      error: json['error'] as String,
+      schemaValidationErrors:
+          (json['schema_validation_errors'] as List<dynamic>?)
+                  ?.map((e) => e as String)
+                  .toList() ??
+              [],
+    );
+
+Map<String, dynamic> _$BadRequestErrorToJson(BadRequestError instance) =>
+    <String, dynamic>{
+      'error': instance.error,
+      'schema_validation_errors': instance.schemaValidationErrors,
+    };
+
 BlockDate _$BlockDateFromJson(Map<String, dynamic> json) => BlockDate(
       epoch: (json['epoch'] as num).toInt(),
       slotId: (json['slot_id'] as num).toInt(),
