@@ -55,7 +55,7 @@ final class Dependencies extends DependencyProvider {
 
   void _registerServices() {
     registerLazySingleton<Storage>(() => const SecureStorage());
-    registerLazySingleton<Vault>(() => const SecureStorageVault());
+    registerLazySingleton<Vault>(SecureStorageVault.new);
     registerLazySingleton<DummyAuthStorage>(
       () => const SecureDummyAuthStorage(),
     );
