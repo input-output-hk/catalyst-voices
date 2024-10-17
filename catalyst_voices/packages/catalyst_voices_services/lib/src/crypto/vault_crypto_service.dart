@@ -211,7 +211,7 @@ final class VaultCryptoService implements CryptoService {
     final list = Uint8List(length);
 
     for (var i = 0; i < length; i++) {
-      list[i] = _random.nextInt(256);
+      list[i] = _random.nextInt(255);
     }
 
     return list;
