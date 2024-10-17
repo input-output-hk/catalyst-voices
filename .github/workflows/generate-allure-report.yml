@@ -1,10 +1,6 @@
 name: Allure Report Generation
 
 on:
-  pull_request:
-  push:
-    branches: "main"
-    tags: ["*"]
   workflow_call:
     inputs:
       forge_version:
