@@ -1,6 +1,6 @@
 //! Configuration Key
 
-use std::{net::IpAddr, sync::LazyLock};
+use std::{fmt::Display, net::IpAddr, sync::LazyLock};
 
 use jsonschema::{BasicOutput, Validator};
 use serde_json::{json, Value};
@@ -15,6 +15,16 @@ pub(crate) enum ConfigKey {
     FrontendForIp(IpAddr),
 }
 
+impl Display for ConfigKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ConfigKey::Frontend => write!(f, "Frontend configuration"),
+            ConfigKey::FrontendForIp(_) => write!(f, "Frontend configuration for IP"),
+        }
+    }
+}
+
+/// Frontend schema.
 static FRONTEND_SCHEMA: LazyLock<Value> =
     LazyLock::new(|| load_json_lazy(include_str!("jsonschema/frontend.json")));
 

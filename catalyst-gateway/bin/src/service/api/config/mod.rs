@@ -4,13 +4,13 @@ use std::{net::IpAddr, str::FromStr};
 
 use jsonschema::BasicOutput;
 use poem::web::RealIp;
-use poem_openapi::{param::Query, payload::Json, ApiResponse, OpenApi};
+use poem_openapi::{param::Query, payload::Json, ApiResponse, Object, OpenApi};
 use serde_json::{json, Value};
-use tracing::info;
+use tracing::{error, info};
 
 use crate::{
     db::event::config::{key::ConfigKey, Config},
-    service::common::tags::ApiTags,
+    service::common::{responses::WithErrorResponses, tags::ApiTags},
 };
 
 /// Configuration API struct
@@ -24,11 +24,18 @@ enum Responses {
     Ok(Json<Value>),
     /// Bad request
     #[oai(status = 400)]
-    BadRequest(Json<Value>),
-    /// Internal server error
-    #[oai(status = 500)]
-    ServerError(Json<String>),
+    BadRequest(Json<BadRequestError>),
 }
+
+/// Bad request errors
+#[derive(Object, Default)]
+struct BadRequestError {
+    /// List of errors
+    errors: Vec<String>,
+}
+
+/// All responses.
+type AllResponses = WithErrorResponses<Responses>;
 
 #[OpenApi(tag = "ApiTags::Config")]
 impl ConfigApi {
@@ -40,8 +47,8 @@ impl ConfigApi {
         method = "get",
         operation_id = "get_config_frontend"
     )]
-    async fn get_frontend(&self, ip_address: RealIp) -> Responses {
-        info!("IP Address: {:?}", ip_address.0);
+    async fn get_frontend(&self, ip_address: RealIp) -> AllResponses {
+        info!(id = "get_config_frontend", "IP Address: {:?}", ip_address.0);
 
         // Fetch the general configuration
         let general_config = Config::get(ConfigKey::Frontend).await;
@@ -50,8 +57,9 @@ impl ConfigApi {
         let ip_config = if let Some(ip) = ip_address.0 {
             match Config::get(ConfigKey::FrontendForIp(ip)).await {
                 Ok(value) => Some(value),
-                Err(_) => {
-                    return Responses::ServerError(Json("Failed to get configuration".to_string()))
+                Err(err) => {
+                    error!(id="get_config_frontend", errors=?err, "Failed to get configuration for IP");
+                    return AllResponses::handle_error(&err);
                 },
             }
         } else {
@@ -69,9 +77,12 @@ impl ConfigApi {
                     general
                 };
 
-                Responses::Ok(Json(response_config))
+                Responses::Ok(Json(response_config)).into()
             },
-            Err(err) => Responses::ServerError(Json(err.to_string())),
+            Err(err) => {
+                error!(id="get_config_frontend", errors=?err, "Failed to get general configuration");
+                AllResponses::handle_error(&err)
+            },
         }
     }
 
@@ -82,22 +93,9 @@ impl ConfigApi {
         operation_id = "get_config_frontend_schema"
     )]
     #[allow(clippy::unused_async)]
-    async fn get_frontend_schema(
-        &self, #[oai(name = "IP")] ip_query: Query<Option<String>>,
-    ) -> Responses {
-        match ip_query.0 {
-            Some(ip) => {
-                match IpAddr::from_str(&ip) {
-                    Ok(parsed_ip) => {
-                        Responses::Ok(Json(ConfigKey::FrontendForIp(parsed_ip).schema().clone()))
-                    },
-                    Err(err) => {
-                        Responses::BadRequest(Json(json!(format!("Invalid IP address: {err}"))))
-                    },
-                }
-            },
-            None => Responses::Ok(Json(ConfigKey::Frontend.schema().clone())),
-        }
+    async fn get_frontend_schema(&self) -> AllResponses {
+        // Schema for both IP specific and general are identical
+        Responses::Ok(Json(ConfigKey::Frontend.schema().clone())).into()
     }
 
     /// Set the frontend configuration.
@@ -108,7 +106,7 @@ impl ConfigApi {
     )]
     async fn put_frontend(
         &self, #[oai(name = "IP")] ip_query: Query<Option<String>>, body: Json<Value>,
-    ) -> Responses {
+    ) -> AllResponses {
         let body_value = body.0;
 
         match ip_query.0 {
@@ -116,7 +114,10 @@ impl ConfigApi {
                 match IpAddr::from_str(&ip) {
                     Ok(parsed_ip) => set(ConfigKey::FrontendForIp(parsed_ip), body_value).await,
                     Err(err) => {
-                        Responses::BadRequest(Json(json!(format!("Invalid IP address: {err}"))))
+                        Responses::BadRequest(Json(BadRequestError {
+                            errors: vec![format!("Invalid IP address: {err}")],
+                        }))
+                        .into()
                     },
                 }
             },
@@ -145,22 +146,26 @@ fn merge_configs(general: &Value, ip_specific: &Value) -> Value {
 }
 
 /// Helper function to handle set.
-async fn set(key: ConfigKey, value: Value) -> Responses {
+async fn set(key: ConfigKey, value: Value) -> AllResponses {
     match Config::set(key, value).await {
         Ok(validate) => {
             match validate {
-                BasicOutput::Valid(_) => {
-                    Responses::Ok(Json(json!("Configuration successfully set.")))
-                },
+                BasicOutput::Valid(_) => Responses::Ok(Json(json!(null))).into(),
                 BasicOutput::Invalid(errors) => {
-                    let mut e = vec![];
-                    for error in errors {
-                        e.push(error.error_description().to_string());
-                    }
-                    Responses::BadRequest(Json(json!({"errors": e})))
+                    let error_descriptions: Vec<String> = errors
+                        .iter()
+                        .map(|error| error.error_description().clone().into_inner())
+                        .collect();
+                    Responses::BadRequest(Json(BadRequestError {
+                        errors: error_descriptions,
+                    }))
+                    .into()
                 },
             }
         },
-        Err(err) => Responses::ServerError(Json(format!("Failed to set configuration: {err}"))),
+        Err(err) => {
+            error!(id="put_config_frontend", errors=?err, "Failed to set configuration");
+            AllResponses::handle_error(&err)
+        },
     }
 }

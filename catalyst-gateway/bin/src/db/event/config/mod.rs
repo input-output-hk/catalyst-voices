@@ -22,7 +22,8 @@ impl Config {
     ///
     /// # Returns
     ///
-    /// - A JSON value of the configuration, if not found, returns the default value.
+    /// - A JSON value of the configuration, if not found or error, returns the default
+    ///   value.
     /// - Error if the query fails.
     pub(crate) async fn get(id: ConfigKey) -> anyhow::Result<Value> {
         let (id1, id2, id3) = id.to_id();
@@ -31,17 +32,15 @@ impl Config {
         if let Some(row) = rows.first() {
             let value: Value = row.get(0);
             match id.validate(&value) {
-                BasicOutput::Valid(_) => Ok(value),
+                BasicOutput::Valid(_) => return Ok(value),
                 BasicOutput::Invalid(errors) => {
-                    // This should not happen; expecting the schema to be valid
-                    error!("Validate schema failed: {:?}", errors);
-                    Err(anyhow::anyhow!("Validate schema failed"))
+                    // This should not happen, expecting the schema to be valid
+                    error!(id=%id, errors=?errors, "Get Config, Schema validation failed, defaulting.");
                 },
             }
-        } else {
-            // If data is not found, return the default config value
-            Ok(id.default())
         }
+        // Return the default config value as a fallback
+        Ok(id.default())
     }
 
     /// Set the configuration for the given `ConfigKey`.
