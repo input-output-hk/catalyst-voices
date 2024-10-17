@@ -3,12 +3,23 @@ import 'dart:math';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/crypto/crypto_service.dart';
+import 'package:catalyst_voices_services/src/storage/vault/vault.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 
 final _logger = Logger('VaultCryptoService');
 
+/// [CryptoService] implementation used by default in [Vault].
+///
+/// It uses Pbkdf2 for key derivation as well as
+/// AesGcm for encryption/decryption.
+///
+/// Only keys build by [VaultCryptoService.deriveKey] should be used
+/// for crypto operations are we're adding [VaultCryptoService] specific
+/// metadata to them.
+///
+/// Supports version for future changes.
 final class VaultCryptoService implements CryptoService {
   /// Salt length for key derivation.
   static const int _saltLength = 16;

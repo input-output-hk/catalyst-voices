@@ -13,6 +13,9 @@ const _seedPhraseKey = 'keychain_seed_phrase';
 // TODO(dtscalac): in the future when key derivation algorithm spec
 // will become stable consider to store derived keys instead of deriving
 // them each time they are needed.
+
+// TODO(damian-molinski): because we have dummy lock factors vault unlocking
+// is dummy too. Any operation on vault require correct lock factor input.
 final class Keychain {
   final _logger = Logger('Keychain');
 
