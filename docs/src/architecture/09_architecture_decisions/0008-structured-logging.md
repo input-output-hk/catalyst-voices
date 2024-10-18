@@ -30,7 +30,7 @@ That both the Frontend and Backend are using logging libraries capable of struct
 * Log text messages should be specific enough to identify the actual log messages when searching or summarizing logs.
   * Avoid using the same log message multiple times in the same code.
 * As far as we are able, we should be consistent with field names.
-  * For example, we always use "error" for error values, not "error" or "err" or "e".
+  * For example, we always use "error" for error values, not "Error" or "err" or "e".
   * Fields do not need to have the same name as the variable, what is important is the field name be unambiguous and consistent.
 * Logs *MUST* include the date and time of the event being logged.
   * Date and Time *MUST* always be referenced to UTC, and not Local Time.
