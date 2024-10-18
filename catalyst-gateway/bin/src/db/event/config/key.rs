@@ -18,8 +18,8 @@ pub(crate) enum ConfigKey {
 impl Display for ConfigKey {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ConfigKey::Frontend => write!(f, "Frontend configuration"),
-            ConfigKey::FrontendForIp(_) => write!(f, "Frontend configuration for IP"),
+            ConfigKey::Frontend => write!(f, "config_key_frontend"),
+            ConfigKey::FrontendForIp(_) => write!(f, "config_key_frontend_ip"),
         }
     }
 }
@@ -46,7 +46,7 @@ fn schema_validator(schema: &Value) -> Validator {
     jsonschema::validator_for(schema).unwrap_or_else(|err| {
         error!(
             id = "schema_validator",
-            errors=?err,
+            error=?err,
             "Error creating JSON validator"
         );
 
@@ -64,7 +64,7 @@ fn schema_validator(schema: &Value) -> Validator {
 /// Helper function to convert a JSON string to a JSON value.
 fn load_json_lazy(data: &str) -> Value {
     serde_json::from_str(data).unwrap_or_else(|err| {
-        error!(id = "load_json_lazy", errors=?err, "Error parsing JSON");
+        error!(id = "load_json_lazy", error=?err, "Error parsing JSON");
         json!({})
     })
 }

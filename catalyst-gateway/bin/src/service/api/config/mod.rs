@@ -6,7 +6,7 @@ use jsonschema::BasicOutput;
 use poem::web::RealIp;
 use poem_openapi::{param::Query, payload::Json, ApiResponse, Object, OpenApi};
 use serde_json::{json, Value};
-use tracing::{error, info};
+use tracing::error;
 
 use crate::{
     db::event::config::{key::ConfigKey, Config},
@@ -52,8 +52,6 @@ impl ConfigApi {
         operation_id = "get_config_frontend"
     )]
     async fn get_frontend(&self, ip_address: RealIp) -> AllResponses {
-        info!(id = "get_config_frontend", "IP Address: {:?}", ip_address.0);
-
         // Fetch the general configuration
         let general_config = Config::get(ConfigKey::Frontend).await;
 
@@ -62,7 +60,7 @@ impl ConfigApi {
             match Config::get(ConfigKey::FrontendForIp(ip)).await {
                 Ok(value) => Some(value),
                 Err(err) => {
-                    error!(id="get_config_frontend", errors=?err, "Failed to get configuration for IP");
+                    error!(id="get_config_frontend_ip", error=?err, "Failed to get frontend configuration for IP");
                     return AllResponses::handle_error(&err);
                 },
             }
@@ -84,7 +82,7 @@ impl ConfigApi {
                 Responses::Ok(Json(response_config)).into()
             },
             Err(err) => {
-                error!(id="get_config_frontend", errors=?err, "Failed to get general configuration");
+                error!(id="get_config_frontend_general", error=?err, "Failed to get general frontend configuration");
                 AllResponses::handle_error(&err)
             },
         }
@@ -170,7 +168,7 @@ async fn set(key: ConfigKey, value: Value) -> AllResponses {
             }
         },
         Err(err) => {
-            error!(id="put_config_frontend", errors=?err, "Failed to set configuration");
+            error!(id="put_config_frontend", error=?err, "Failed to set frontend configuration");
             AllResponses::handle_error(&err)
         },
     }

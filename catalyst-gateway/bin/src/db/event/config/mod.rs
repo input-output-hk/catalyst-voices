@@ -35,7 +35,7 @@ impl Config {
                 BasicOutput::Valid(_) => return Ok(value),
                 BasicOutput::Invalid(errors) => {
                     // This should not happen, expecting the schema to be valid
-                    error!(id=%id, errors=?errors, "Get Config, Schema validation failed, defaulting.");
+                    error!(id=%id, error=?errors, "Get Config, schema validation failed, defaulting.");
                 },
             }
         }
