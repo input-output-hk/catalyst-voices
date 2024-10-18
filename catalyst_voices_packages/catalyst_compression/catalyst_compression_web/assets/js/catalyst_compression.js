@@ -4,7 +4,7 @@ const compressionWorker = new Worker(new URL('./catalyst_compression_worker.js',
 
 let idCounter = 0;
 
-// A simple id generator function. The generated id must be unique across all the processing ids.
+// A simple id generator function.
 function generateId() {
     const thisId = idCounter;
     const nextId = idCounter + 1;
