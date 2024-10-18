@@ -12,8 +12,20 @@
 
 <body>
 
-  <elements-api apiDescriptionUrl="./rust-docs/cat-gateway-api.json" router="memory" layout="sidebar"
-    hideInternal="true" />
+  <nav style="display: flex;
+  justify-content: space-around;
+  background-color: #f8f9fa;
+  padding: 10px;
+  position: relative;
+  z-index: 100000000;
+  top: 0px;">
+    <a href="../cat-gateway/index.html">Catalyst Gateway</a>
+    <a href="../cat-gateway/rust.html">Rust Docs</a>
+  </nav>
+  <elements-api apiDescriptionUrl="./rust-docs/cat-gateway-api.json" router="memory"
+    hideInternal="true" style="width: 100%; height: calc(100vh - 50px); position: absolute; top: 30px; left: 0;     background: white;" >
+   
+  </elements-api>
 
 </body>
 
