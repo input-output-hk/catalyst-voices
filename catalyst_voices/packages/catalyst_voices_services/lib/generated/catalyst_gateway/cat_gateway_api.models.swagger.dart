@@ -63,6 +63,66 @@ extension $AccountVoteExtension on AccountVote {
 }
 
 @JsonSerializable(explicitToJson: true)
+class BadRequestError {
+  const BadRequestError({
+    required this.error,
+    this.schemaValidationErrors,
+  });
+
+  factory BadRequestError.fromJson(Map<String, dynamic> json) =>
+      _$BadRequestErrorFromJson(json);
+
+  static const toJsonFactory = _$BadRequestErrorToJson;
+  Map<String, dynamic> toJson() => _$BadRequestErrorToJson(this);
+
+  @JsonKey(name: 'error')
+  final String error;
+  @JsonKey(name: 'schema_validation_errors', defaultValue: <String>[])
+  final List<String>? schemaValidationErrors;
+  static const fromJsonFactory = _$BadRequestErrorFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is BadRequestError &&
+            (identical(other.error, error) ||
+                const DeepCollectionEquality().equals(other.error, error)) &&
+            (identical(other.schemaValidationErrors, schemaValidationErrors) ||
+                const DeepCollectionEquality().equals(
+                    other.schemaValidationErrors, schemaValidationErrors)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(error) ^
+      const DeepCollectionEquality().hash(schemaValidationErrors) ^
+      runtimeType.hashCode;
+}
+
+extension $BadRequestErrorExtension on BadRequestError {
+  BadRequestError copyWith(
+      {String? error, List<String>? schemaValidationErrors}) {
+    return BadRequestError(
+        error: error ?? this.error,
+        schemaValidationErrors:
+            schemaValidationErrors ?? this.schemaValidationErrors);
+  }
+
+  BadRequestError copyWithWrapped(
+      {Wrapped<String>? error,
+      Wrapped<List<String>?>? schemaValidationErrors}) {
+    return BadRequestError(
+        error: (error != null ? error.value : this.error),
+        schemaValidationErrors: (schemaValidationErrors != null
+            ? schemaValidationErrors.value
+            : this.schemaValidationErrors));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
 class BlockDate {
   const BlockDate({
     required this.epoch,
