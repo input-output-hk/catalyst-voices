@@ -1,5 +1,7 @@
 import 'package:catalyst_voices/pages/registration/create_keychain/bloc_seed_phrase_builder.dart';
-import 'package:catalyst_voices/pages/registration/show_upload_confirmation_dialog.dart';
+import 'package:catalyst_voices/pages/registration/incorrect_seedphrase_dialog.dart';
+import 'package:catalyst_voices/pages/registration/upload_seedphrase_confirmation_dialog.dart';
+import 'package:catalyst_voices/pages/registration/upload_seedphrase_dialog.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/pages/registration/widgets/seed_phrase_actions.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -39,20 +41,33 @@ class _SeedPhraseCheckPanelState extends State<SeedPhraseCheckPanel> {
   }
 
   Future<void> _uploadSeedPhrase() async {
-    await showUploadConfirmationDialog(
-      context,
-      onUploadSuccessful: _onWordsSequenceChanged,
-      onValidate: (words) {
-        final areWordsMatching = RegistrationCubit.of(context)
-            .keychainCreation
-            .areWordsMatching(words);
+    final showUpload = await UploadSeedphraseConfirmationDialog.show(context);
+    if (showUpload) {
+      await _showUploadDialog();
+    }
+  }
 
-        return areWordsMatching &&
-            SeedPhrase.isValid(
-              words: words,
-            );
-      },
-    );
+  Future<void> _showUploadDialog() async {
+    final words = await UploadSeedphraseDialog.show(context);
+
+    if (!mounted) return;
+
+    final areWordsMatching =
+        RegistrationCubit.of(context).keychainCreation.areWordsMatching(words);
+
+    final isValid = areWordsMatching &&
+        SeedPhrase.isValid(
+          words: words,
+        );
+
+    if (isValid) {
+      _onWordsSequenceChanged(words);
+    } else {
+      final showUpload = await IncorrectSeedphraseDialog.show(context);
+      if (showUpload) {
+        await _showUploadDialog();
+      }
+    }
   }
 
   void _clearUserWords() {
