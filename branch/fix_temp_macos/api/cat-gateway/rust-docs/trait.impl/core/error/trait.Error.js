@@ -1,0 +1,9 @@
+(function() {
+    var implementors = Object.fromEntries([["cat_gateway",[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/error/trait.Error.html\" title=\"trait core::error::Error\">Error</a> for <a class=\"enum\" href=\"cat_gateway/db/event/enum.Error.html\" title=\"enum cat_gateway::db::event::Error\">Error</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/error/trait.Error.html\" title=\"trait core::error::Error\">Error</a> for <a class=\"enum\" href=\"cat_gateway/service/utilities/enum.NetworkValidationError.html\" title=\"enum cat_gateway::service::utilities::NetworkValidationError\">NetworkValidationError</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/error/trait.Error.html\" title=\"trait core::error::Error\">Error</a> for <a class=\"struct\" href=\"cat_gateway/db/event/error/struct.NotFoundError.html\" title=\"struct cat_gateway::db::event::error::NotFoundError\">NotFoundError</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/error/trait.Error.html\" title=\"trait core::error::Error\">Error</a> for <a class=\"struct\" href=\"cat_gateway/db/event/schema_check/struct.MismatchedSchemaError.html\" title=\"struct cat_gateway::db::event::schema_check::MismatchedSchemaError\">MismatchedSchemaError</a>"],["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/error/trait.Error.html\" title=\"trait core::error::Error\">Error</a> for <a class=\"struct\" href=\"cat_gateway/service/api/auth/endpoint/struct.AuthTokenError.html\" title=\"struct cat_gateway::service::api::auth::endpoint::AuthTokenError\">AuthTokenError</a>"]]]]);
+    if (window.register_implementors) {
+        window.register_implementors(implementors);
+    } else {
+        window.pending_implementors = implementors;
+    }
+})()
+//{"start":57,"fragment_lengths":[1614]}
