@@ -1,5 +1,5 @@
-// initialize a web worker for compression works.
-// this is a persistent worker, will last for life of the app.
+// Initialize a web worker for compression works.
+// This is a persistent worker, will last for life of the app.
 const compressionWorker = new Worker(new URL('./catalyst_compression_worker.js', import.meta.url));
 
 const processingIdsPool = new Set();
