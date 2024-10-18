@@ -33,6 +33,7 @@ final class RegistrationService {
     required SeedPhrase seedPhrase,
     required String unlockPassword,
   }) async {
+    await _keychain.clearAndLock();
     await _keychain.setLockAndBeginWith(
       seedPhrase: seedPhrase,
       unlockFactor: PasswordLockFactor(unlockPassword),

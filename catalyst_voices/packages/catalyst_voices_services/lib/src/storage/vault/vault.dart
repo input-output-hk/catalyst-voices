@@ -6,11 +6,12 @@ import 'package:catalyst_voices_services/src/storage/vault/lock_factor.dart';
 ///
 /// In order to unlock [Vault] sufficient [LockFactor] have to be
 /// set via [unlock] that can unlock [LockFactor] from [setLock].
-///
-/// See [LockFactor.unlocks] for more details.
 abstract interface class Vault implements Storage {
   /// Returns true when have sufficient [LockFactor] from [unlock].
   Future<bool> get isUnlocked;
+
+  /// Returns whether currently have active lock from [setLock].
+  Future<bool> get hasLock;
 
   /// Deletes unlockFactor if have any.
   Future<void> lock();
