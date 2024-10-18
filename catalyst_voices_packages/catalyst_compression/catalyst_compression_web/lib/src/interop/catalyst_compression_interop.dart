@@ -2,7 +2,6 @@
 library catalyst_compression_interop;
 
 import 'dart:js_interop';
-import 'dart:js_util';
 
 import 'package:catalyst_compression_platform_interface/catalyst_compression_platform_interface.dart';
 import 'package:convert/convert.dart';
@@ -42,17 +41,13 @@ class JSBrotliCompressor implements CatalystCompressor {
 
   @override
   Future<List<int>> compress(List<int> bytes) async {
-    final data = await promiseToFuture<JSString>(
-      brotliCompress(hex.encode(bytes).toJS),
-    );
+    final data = await brotliCompress(hex.encode(bytes).toJS).toDart;
     return hex.decode(data.toDart);
   }
 
   @override
   Future<List<int>> decompress(List<int> bytes) async {
-    final data = await promiseToFuture<JSString>(
-      brotliDecompress(hex.encode(bytes).toJS),
-    );
+    final data = await brotliDecompress(hex.encode(bytes).toJS).toDart;
     return hex.decode(data.toDart);
   }
 }
@@ -77,17 +72,13 @@ class JSZstdCompressor implements CatalystCompressor {
       );
     }
 
-    final data = await promiseToFuture<JSString>(
-      zstdCompress(hex.encode(bytes).toJS),
-    );
+    final data = await zstdCompress(hex.encode(bytes).toJS).toDart;
     return hex.decode(data.toDart);
   }
 
   @override
   Future<List<int>> decompress(List<int> bytes) async {
-    final data = await promiseToFuture<JSString>(
-      zstdDecompress(hex.encode(bytes).toJS),
-    );
+    final data = await zstdDecompress(hex.encode(bytes).toJS).toDart;
     return hex.decode(data.toDart);
   }
 }
