@@ -21,14 +21,30 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState>
     on<GuestSessionEvent>(_onGuestEvent);
     on<ActiveUserSessionEvent>(_onActiveUserEvent);
     on<RemoveKeychainSessionEvent>(_onRemoveKeychainEvent);
+
+    _keychain.addListener(_onKeychainChanged);
+  }
+
+  @override
+  Future<void> close() {
+    _keychain.removeListener(_onKeychainChanged);
+    return super.close();
+  }
+
+  Future<void> _onKeychainChanged() async {
+    add(const RestoreSessionEvent());
   }
 
   Future<void> _onRestoreSessionEvent(
     RestoreSessionEvent event,
     Emitter<SessionState> emit,
   ) async {
+    // TODO(dtscalac): if there's a keychain but there's no profile
+    // the app should show state to complete the registration
     if (!await _keychain.hasSeedPhrase) {
       emit(const VisitorSessionState());
+    } else if (await _keychain.isUnlocked) {
+      emit(ActiveUserSessionState(user: _dummyUser));
     } else {
       emit(const GuestSessionState());
     }

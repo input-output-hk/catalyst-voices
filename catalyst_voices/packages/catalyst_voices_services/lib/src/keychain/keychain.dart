@@ -3,6 +3,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/keychain/key_derivation.dart';
 import 'package:catalyst_voices_services/src/storage/vault/lock_factor.dart';
 import 'package:catalyst_voices_services/src/storage/vault/vault.dart';
+import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 
 const _seedPhraseKey = 'keychain_seed_phrase';
@@ -16,7 +17,7 @@ const _seedPhraseKey = 'keychain_seed_phrase';
 
 // TODO(damian-molinski): because we have dummy lock factors vault unlocking
 // is dummy too. Any operation on vault require correct lock factor input.
-final class Keychain {
+final class Keychain extends ChangeNotifier {
   final _logger = Logger('Keychain');
 
   final KeyDerivation _keyDerivation;
@@ -51,6 +52,8 @@ final class Keychain {
     if (!unlocked) {
       await _vault.lock();
     }
+
+    notifyListeners();
   }
 
   /// Clears the keychain and all associated data.
@@ -61,6 +64,7 @@ final class Keychain {
     _logger.info('clearAndLock');
     await _vault.clear();
     await _vault.lock();
+    notifyListeners();
   }
 
   /// Unlocks the keychain.
@@ -72,13 +76,16 @@ final class Keychain {
   /// an instance of a [PasswordLockFactor].
   Future<bool> unlock(LockFactor unlock) async {
     _logger.info('unlock');
-    return _vault.unlock(unlock);
+    final result = await _vault.unlock(unlock);
+    notifyListeners();
+    return result;
   }
 
   /// Locks the keychain.
   Future<void> lock() async {
     _logger.info('lock');
     await _vault.lock();
+    notifyListeners();
   }
 
   /// Derives an [Ed25519KeyPair] related to the [role].
