@@ -1,4 +1,5 @@
 import 'package:catalyst_voices/app/view/app_precache_image_assets.dart';
+import 'package:catalyst_voices/app/view/app_session_listener.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
@@ -51,7 +52,9 @@ class AppContentState extends State<AppContent> {
       ),
       builder: (context, child) {
         return GlobalPrecacheImages(
-          child: child ?? const SizedBox.shrink(),
+          child: GlobalSessionListener(
+            child: child ?? const SizedBox.shrink(),
+          ),
         );
       },
     );
