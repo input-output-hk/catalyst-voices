@@ -1,0 +1,30 @@
+{
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "Frontend JSON schema",
+	"type": "object",
+	"sentry": {
+		"type": "object",
+		"description": "Configuration for Sentry.",
+		"properties": {
+			"dsn": {
+				"$ref": "#/definitions/httpsUrl",
+				"description": "The Data Source Name (DSN) for Sentry."
+			},
+			"release": {
+				"type": "string",
+				"description": "A version of the code deployed to an environment"
+			},
+			"environment": {
+				"type": "string",
+				"description": "The environment in which the application is running, e.g., 'dev', 'qa'."
+			}
+		}
+	},
+	"definitions": {
+		"httpsUrl": {
+			"type": "string",
+			"format": "uri",
+			"pattern": "^https?://"
+		}
+	}
+}
