@@ -1,10 +1,14 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/pages/registration/pictures/unlock_keychain_picture.dart';
+import 'package:catalyst_voices/pages/registration/registration_dialog.dart';
 import 'package:catalyst_voices/pages/registration/widgets/information_panel.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
@@ -60,6 +64,7 @@ class _UnlockKeychainDialogState extends State<UnlockKeychainDialog>
           controller: _passwordController,
           error: _error,
           onUnlock: _onUnlock,
+          onRecover: _onRecover,
         ),
       ),
     );
@@ -82,17 +87,30 @@ class _UnlockKeychainDialogState extends State<UnlockKeychainDialog>
         .read<SessionBloc>()
         .add(UnlockSessionEvent(unlockFactor: unlockFactor));
   }
+
+  void _onRecover() {
+    Navigator.of(context).pop();
+
+    unawaited(
+      RegistrationDialog.show(
+        context,
+        step: const RecoverMethodStep(),
+      ),
+    );
+  }
 }
 
 class _UnlockPasswordPanel extends StatelessWidget {
   final TextEditingController controller;
   final LocalizedException? error;
   final VoidCallback onUnlock;
+  final VoidCallback onRecover;
 
   const _UnlockPasswordPanel({
     required this.controller,
     required this.error,
     required this.onUnlock,
+    required this.onRecover,
   });
 
   @override
@@ -113,6 +131,7 @@ class _UnlockPasswordPanel extends StatelessWidget {
         const Spacer(),
         _Navigation(
           onUnlock: onUnlock,
+          onRecover: onRecover,
         ),
       ],
     );
@@ -143,27 +162,39 @@ class _UnlockPassword extends StatelessWidget {
 
 class _Navigation extends StatelessWidget {
   final VoidCallback onUnlock;
+  final VoidCallback onRecover;
 
   const _Navigation({
     required this.onUnlock,
+    required this.onRecover,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Expanded(
-          child: VoicesOutlinedButton(
-            onTap: () => Navigator.of(context).pop(),
-            child: Text(context.l10n.continueAsGuest),
-          ),
+        VoicesFilledButton(
+          onTap: onUnlock,
+          child: Text(context.l10n.confirmPassword),
         ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: VoicesFilledButton(
-            onTap: onUnlock,
-            child: Text(context.l10n.confirmPassword),
-          ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            Expanded(
+              child: VoicesOutlinedButton(
+                onTap: onRecover,
+                child: Text(context.l10n.recoverAccount),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: VoicesTextButton(
+                onTap: () => Navigator.of(context).pop(),
+                child: Text(context.l10n.continueAsGuest),
+              ),
+            ),
+          ],
         ),
       ],
     );

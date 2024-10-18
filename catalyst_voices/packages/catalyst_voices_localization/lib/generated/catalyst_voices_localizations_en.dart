@@ -964,4 +964,7 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get recoveryExitConfirmDialogContinue => 'Continue recovery process';
+
+  @override
+  String get recoverAccount => 'Recover account';
 }
