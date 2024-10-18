@@ -119,6 +119,7 @@ Joaquín
 jorm
 jormungandr
 Jörmungandr
+jsonschema
 junitreport
 junitxml
 Keyhash
@@ -298,3 +299,4 @@ xctestrun
 xcworkspace
 xvfb
 yoroi
+Pbkdf2
