@@ -16,19 +16,34 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState>
     on<RestoreSessionEvent>(_onRestoreSessionEvent);
     on<UnlockSessionEvent>(_onUnlockSessionEvent);
     on<LockSessionEvent>(_onLockSessionEvent);
-    on<NextStateSessionEvent>(_onNextStateEvent);
     on<VisitorSessionEvent>(_onVisitorEvent);
     on<GuestSessionEvent>(_onGuestEvent);
     on<ActiveUserSessionEvent>(_onActiveUserEvent);
     on<RemoveKeychainSessionEvent>(_onRemoveKeychainEvent);
+
+    _keychain.addListener(_onKeychainChanged);
+  }
+
+  @override
+  Future<void> close() {
+    _keychain.removeListener(_onKeychainChanged);
+    return super.close();
+  }
+
+  Future<void> _onKeychainChanged() async {
+    add(const RestoreSessionEvent());
   }
 
   Future<void> _onRestoreSessionEvent(
     RestoreSessionEvent event,
     Emitter<SessionState> emit,
   ) async {
+    // TODO(dtscalac): if there's a keychain but there's no profile
+    // the app should show state to complete the registration
     if (!await _keychain.hasSeedPhrase) {
       emit(const VisitorSessionState());
+    } else if (await _keychain.isUnlocked) {
+      emit(ActiveUserSessionState(user: _dummyUser));
     } else {
       emit(const GuestSessionState());
     }
@@ -39,9 +54,7 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState>
     Emitter<SessionState> emit,
   ) async {
     final unlocked = await _keychain.unlock(event.unlockFactor);
-    if (unlocked) {
-      emit(ActiveUserSessionState(user: _dummyUser));
-    } else {
+    if (!unlocked) {
       emitError(const LocalizedUnlockPasswordException());
     }
   }
@@ -53,20 +66,6 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState>
     if (await _keychain.hasLock) {
       await _keychain.lock();
     }
-    emit(const GuestSessionState());
-  }
-
-  void _onNextStateEvent(
-    NextStateSessionEvent event,
-    Emitter<SessionState> emit,
-  ) {
-    final nextState = switch (state) {
-      VisitorSessionState() => const GuestSessionState(),
-      GuestSessionState() => ActiveUserSessionState(user: _dummyUser),
-      ActiveUserSessionState() => const VisitorSessionState(),
-    };
-
-    emit(nextState);
   }
 
   Future<void> _onVisitorEvent(
@@ -76,8 +75,6 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState>
     if (await _keychain.hasSeedPhrase) {
       await _keychain.clearAndLock();
     }
-
-    emit(const VisitorSessionState());
   }
 
   Future<void> _onGuestEvent(
@@ -93,8 +90,6 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState>
       unlockFactor: _dummyUnlockFactor,
       unlocked: false,
     );
-
-    emit(const GuestSessionState());
   }
 
   Future<void> _onActiveUserEvent(
@@ -110,8 +105,6 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState>
       unlockFactor: _dummyUnlockFactor,
       unlocked: true,
     );
-
-    emit(ActiveUserSessionState(user: _dummyUser));
   }
 
   Future<void> _onRemoveKeychainEvent(
@@ -119,7 +112,6 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState>
     Emitter<SessionState> emit,
   ) async {
     await _keychain.clearAndLock();
-    emit(const VisitorSessionState());
   }
 
   /// Temporary implementation for testing purposes.
