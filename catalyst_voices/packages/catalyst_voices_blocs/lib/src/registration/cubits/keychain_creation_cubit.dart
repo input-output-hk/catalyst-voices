@@ -26,6 +26,8 @@ abstract interface class KeychainCreationManager
 
   Future<void> downloadSeedPhrase();
 
+  bool areWordsMatching(List<SeedPhraseWord> words);
+
   Future<bool> createKeychain();
 }
 
@@ -168,5 +170,14 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
     if (state.seedPhraseStateData.seedPhrase == null) {
       _buildSeedPhrase();
     }
+  }
+
+  @override
+  bool areWordsMatching(List<SeedPhraseWord> words) {
+    final mappedWords = words.map((e) => e.data).toList()..sort();
+    final mappedShuffledWords =
+        _seedPhraseStateData.shuffledWords.map((e) => e.data).toList()..sort();
+
+    return listEquals(mappedWords, mappedShuffledWords);
   }
 }
