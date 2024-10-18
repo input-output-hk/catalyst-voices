@@ -13,7 +13,10 @@ const _seedPhraseKey = 'keychain_seed_phrase';
 // TODO(dtscalac): in the future when key derivation algorithm spec
 // will become stable consider to store derived keys instead of deriving
 // them each time they are needed.
-class Keychain {
+
+// TODO(damian-molinski): because we have dummy lock factors vault unlocking
+// is dummy too. Any operation on vault require correct lock factor input.
+final class Keychain {
   final _logger = Logger('Keychain');
 
   final KeyDerivation _keyDerivation;
@@ -21,8 +24,11 @@ class Keychain {
 
   Keychain(this._keyDerivation, this._vault);
 
-  /// Returns true if the keychain is unlocked, false otherwise.
+  /// See [Vault.isUnlocked].
   Future<bool> get isUnlocked => _vault.isUnlocked;
+
+  /// See [Vault.hasLock].
+  Future<bool> get hasLock => _vault.hasLock;
 
   /// Returns true if the keychain contains the seed phrase, false otherwise.
   Future<bool> get hasSeedPhrase async => _hasSeedPhrase;
@@ -37,8 +43,14 @@ class Keychain {
     bool unlocked = true,
   }) async {
     _logger.info('setLockAndBeginWith, unlocked: $unlocked');
-    await _changeLock(unlockFactor, unlocked: unlocked);
+
+    await _changeLock(unlockFactor);
+    await _vault.unlock(unlockFactor);
     await _beginWith(seedPhrase: seedPhrase);
+
+    if (!unlocked) {
+      await _vault.lock();
+    }
   }
 
   /// Clears the keychain and all associated data.
@@ -47,9 +59,7 @@ class Keychain {
   /// from the underlying storage.
   Future<void> clearAndLock() async {
     _logger.info('clearAndLock');
-    await _ensureUnlocked();
-    await _vault.delete(key: _seedPhraseKey);
-    await _vault.setLock(const VoidLockFactor());
+    await _vault.clear();
     await _vault.lock();
   }
 
@@ -60,9 +70,9 @@ class Keychain {
   ///
   /// In most cases the [unlock] is going to be
   /// an instance of a [PasswordLockFactor].
-  Future<void> unlock(LockFactor unlock) async {
+  Future<bool> unlock(LockFactor unlock) async {
     _logger.info('unlock');
-    await _vault.unlock(unlock);
+    return _vault.unlock(unlock);
   }
 
   /// Locks the keychain.
@@ -95,16 +105,8 @@ class Keychain {
     }
   }
 
-  Future<void> _changeLock(
-    LockFactor lockFactor, {
-    bool unlocked = false,
-  }) async {
+  Future<void> _changeLock(LockFactor lockFactor) async {
     await _vault.setLock(lockFactor);
-    if (unlocked) {
-      await _vault.unlock(lockFactor);
-    } else {
-      await _vault.lock();
-    }
   }
 
   Future<void> _beginWith({
