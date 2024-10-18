@@ -1,71 +1,82 @@
-const brotli = await import("https://unpkg.com/brotli-wasm@3.0.0/index.web.js?module").then(m => m.default);
-const zstd = await import("https://unpkg.com/@oneidentity/zstd-js@1.0.3/wasm/index.js?module");
+// Initialize a web worker for compression works.
+// This is a persistent worker, will last for life of the app.
+const compressionWorker = new Worker(new URL('./catalyst_compression_worker.js', import.meta.url));
 
-// Initializes the zstd module, must be called before it can be used.
-await zstd.ZstdInit();
+let idCounter = 0;
 
-/// Compresses hex bytes using brotli compression algorithm and returns compressed hex bytes.
-function _brotliCompress(bytesHex) {
-    const bytes = _hexStringToUint8Array(bytesHex);
-    const compressedBytes = brotli.compress(bytes);
-    return _uint8ArrayToHexString(compressedBytes);
+// A simple id generator function.
+function generateId() {
+    const thisId = idCounter;
+    const nextId = idCounter + 1;
+
+    idCounter = nextId >= Number.MAX_SAFE_INTEGER ? 0 : nextId;
+
+    return thisId;
 }
 
-/// Decompresses hex bytes using brotli compression algorithm and returns decompressed hex bytes.
-function _brotliDecompress(bytesHex) {
-    const bytes = _hexStringToUint8Array(bytesHex);
-    const decompressedBytes = brotli.decompress(bytes);
-    return _uint8ArrayToHexString(decompressedBytes);
-}
+function registerWorkerEventHandler(worker, handleMessage, handleError) {
+    const wrappedHandleMessage = (event) => handleMessage(event, complete);
+    const wrappedHandleError = (error) => handleError(error, complete);
 
-/// Compresses hex bytes using zstd compression algorithm and returns compressed hex bytes.
-function _zstdCompress(bytesHex) {
-    const bytes = _hexStringToUint8Array(bytesHex);
-    const compressedBytes = zstd.ZstdSimple.compress(bytes);
-    return _uint8ArrayToHexString(compressedBytes);
-}
-
-/// Decompresses hex bytes using zstd compression algorithm and returns decompressed hex bytes.
-function _zstdDecompress(bytesHex) {
-    const bytes = _hexStringToUint8Array(bytesHex);
-    const decompressedBytes = zstd.ZstdSimple.decompress(bytes);
-    return _uint8ArrayToHexString(decompressedBytes);
-}
-
-// Converts a hex string into a byte array.
-function _hexStringToUint8Array(hexString) {
-    // Ensure the hex string length is even
-    if (hexString.length % 2 !== 0) {
-        throw new Error('Invalid hex string');
+    function complete() {
+        worker.removeEventListener("message", wrappedHandleMessage);
+        worker.removeEventListener("error", wrappedHandleError);
     }
 
-    // Create a Uint8Array
-    const byteArray = new Uint8Array(hexString.length / 2);
+    worker.addEventListener("message", wrappedHandleMessage);
+    worker.addEventListener("error", wrappedHandleError);
+}
 
-    // Parse the hex string into byte values
-    for (let i = 0; i < hexString.length; i += 2) {
-        byteArray[i / 2] = parseInt(hexString.substr(i, 2), 16);
+// A function to create a compression function according to its name.
+function runCompressionInWorker(fnName) {
+    return (data) => {
+        return new Promise((resolve, reject) => {
+            const id = generateId();
+
+            registerWorkerEventHandler(
+                compressionWorker,
+                (event, complete) => {
+                    const {
+                        id: responseId,
+                        result,
+                        error,
+                        initialized
+                    } = event.data;
+    
+                    // skip the initializing completion event,
+                    // and the id that is not itself.
+                    if (initialized || responseId !== id) {
+                        return;
+                    }
+    
+                    if (result) {
+                        resolve(result);
+                    } else {
+                        reject(error || 'Unexpected error');
+                    }
+
+                    complete();
+                },
+                (error, complete) => {
+                    reject(error);
+
+                    complete();
+                }
+            );
+
+            compressionWorker.postMessage({ id, action: fnName, bytesHex: data });
+        });
     }
-
-    return byteArray;
 }
-
-// Converts a byte array into a hex string.
-function _uint8ArrayToHexString(uint8Array) {
-    return Array.from(uint8Array)
-        .map(byte => byte.toString(16).padStart(2, '0'))
-        .join('');
-}
-
 
 // A namespace containing the JS functions that
 // can be executed from dart side
 const catalyst_compression = {
-    brotliCompress: _brotliCompress,
-    brotliDecompress: _brotliDecompress,
-    zstdCompress: _zstdCompress,
-    zstdDecompress: _zstdDecompress,
-}
+    brotliCompress: runCompressionInWorker("brotliCompress"),
+    brotliDecompress: runCompressionInWorker("brotliDecompress"),
+    zstdCompress: runCompressionInWorker("zstdCompress"),
+    zstdDecompress: runCompressionInWorker("zstdDecompress"),
+};
 
 // Expose catalyst compression as globally accessible
 // so that we can call it via catalyst_compression.function_name() from

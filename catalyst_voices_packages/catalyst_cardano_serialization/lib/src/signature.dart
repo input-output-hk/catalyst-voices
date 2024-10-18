@@ -116,6 +116,9 @@ extension type Ed25519PrivateKey._(List<int> bytes) {
   String toHex() => hex.encode(bytes);
 
   /// Signs the [message] with the private key and returns the signature.
+  //
+  // TODO(dtscalac): it takes 200-300ms to execute, optimize it
+  // or move to a JS web worker
   Future<Ed25519Signature> sign(List<int> message) async {
     final algorithm = Ed25519();
     final keyPair = await algorithm.newKeyPairFromSeed(bytes);

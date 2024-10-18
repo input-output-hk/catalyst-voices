@@ -129,16 +129,16 @@ final class X509MetadataEnvelope<T> extends Equatable {
   ///
   /// The [deserializer] in most cases is going
   /// to be [RegistrationData.fromCbor].
-  factory X509MetadataEnvelope.fromCbor(
+  static Future<X509MetadataEnvelope<T>> fromCbor<T>(
     CborValue value, {
     required ChunkedDataDeserializer<T> deserializer,
-  }) {
+  }) async {
     final metadata = value as CborMap;
     final envelope = metadata[const CborSmallInt(509)]! as CborMap;
     final purpose = envelope[const CborSmallInt(0)]! as CborBytes;
     final txInputsHash = envelope[const CborSmallInt(1)]!;
     final previousTransactionId = envelope[const CborSmallInt(2)];
-    final chunkedData = _deserializeChunkedData(envelope);
+    final chunkedData = await _deserializeChunkedData(envelope);
     final validationSignature = envelope[const CborSmallInt(99)]!;
 
     return X509MetadataEnvelope(
@@ -155,10 +155,12 @@ final class X509MetadataEnvelope<T> extends Equatable {
   /// Serializes the type as cbor.
   ///
   /// The [serializer] in most cases is going to be [RegistrationData.toCbor].
-  CborValue toCbor({required ChunkedDataSerializer<T> serializer}) {
+  Future<CborValue> toCbor({
+    required ChunkedDataSerializer<T> serializer,
+  }) async {
     final chunkedData = this.chunkedData;
     final metadata = chunkedData != null
-        ? _serializeChunkedData(serializer(chunkedData))
+        ? await _serializeChunkedData(serializer(chunkedData))
         : null;
 
     return CborMap({
@@ -182,7 +184,7 @@ final class X509MetadataEnvelope<T> extends Equatable {
     required Ed25519PrivateKey privateKey,
     required ChunkedDataSerializer<T> serializer,
   }) async {
-    final bytes = cbor.encode(toCbor(serializer: serializer));
+    final bytes = cbor.encode(await toCbor(serializer: serializer));
     final signature = await privateKey.sign(bytes);
     return withValidationSignature(signature);
   }
@@ -197,7 +199,7 @@ final class X509MetadataEnvelope<T> extends Equatable {
     required ChunkedDataSerializer<T> serializer,
   }) async {
     final envelope = withValidationSignature(Ed25519Signature.seeded(0));
-    final bytes = cbor.encode(envelope.toCbor(serializer: serializer));
+    final bytes = cbor.encode(await envelope.toCbor(serializer: serializer));
     return signature.verify(bytes, publicKey: publicKey);
   }
 
@@ -215,7 +217,7 @@ final class X509MetadataEnvelope<T> extends Equatable {
     );
   }
 
-  static CborValue? _deserializeChunkedData(CborMap map) {
+  static Future<CborValue?> _deserializeChunkedData(CborMap map) async {
     final rawCbor = map[const CborSmallInt(10)] as CborList?;
     if (rawCbor != null) {
       final bytes = _unchunkCborBytes(rawCbor);
@@ -226,7 +228,7 @@ final class X509MetadataEnvelope<T> extends Equatable {
     if (brotliCbor != null) {
       final bytes = _unchunkCborBytes(brotliCbor);
       final uncompressedBytes =
-          CatalystCompression.instance.brotli.decompress(bytes);
+          await CatalystCompression.instance.brotli.decompress(bytes);
       return cbor.decode(uncompressedBytes);
     }
 
@@ -234,19 +236,19 @@ final class X509MetadataEnvelope<T> extends Equatable {
     if (zstdCbor != null) {
       final bytes = _unchunkCborBytes(zstdCbor);
       final uncompressedBytes =
-          CatalystCompression.instance.zstd.decompress(bytes);
+          await CatalystCompression.instance.zstd.decompress(bytes);
       return cbor.decode(uncompressedBytes);
     }
 
     return null;
   }
 
-  static MapEntry<CborSmallInt, CborList> _serializeChunkedData(
+  static Future<MapEntry<CborSmallInt, CborList>> _serializeChunkedData(
     CborValue value,
-  ) {
+  ) async {
     final rawBytes = cbor.encode(value);
-    final brotliBytes = _compressBrotli(rawBytes);
-    final zstdBytes = _compressZstd(rawBytes);
+    final brotliBytes = await _compressBrotli(rawBytes);
+    final zstdBytes = await _compressZstd(rawBytes);
 
     final bytesByKey = {
       10: rawBytes,
@@ -266,17 +268,17 @@ final class X509MetadataEnvelope<T> extends Equatable {
     );
   }
 
-  static List<int>? _compressBrotli(List<int> bytes) {
+  static Future<List<int>?> _compressBrotli(List<int> bytes) async {
     try {
-      return CatalystCompression.instance.brotli.compress(bytes);
+      return await CatalystCompression.instance.brotli.compress(bytes);
     } on CompressionNotSupportedException {
       return null;
     }
   }
 
-  static List<int>? _compressZstd(List<int> bytes) {
+  static Future<List<int>?> _compressZstd(List<int> bytes) async {
     try {
-      return CatalystCompression.instance.zstd.compress(bytes);
+      return await CatalystCompression.instance.zstd.compress(bytes);
     } on CompressionNotSupportedException {
       return null;
     }
