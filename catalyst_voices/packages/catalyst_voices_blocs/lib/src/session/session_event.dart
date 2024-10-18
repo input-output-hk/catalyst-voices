@@ -37,15 +37,6 @@ final class LockSessionEvent extends SessionEvent {
   List<Object?> get props => [];
 }
 
-/// Dummy implementation of session management,
-/// just toggles the next session state or reset to the initial one.
-final class NextStateSessionEvent extends SessionEvent {
-  const NextStateSessionEvent();
-
-  @override
-  List<Object?> get props => [];
-}
-
 /// Dummy implementation of session management.
 final class VisitorSessionEvent extends SessionEvent {
   const VisitorSessionEvent();
