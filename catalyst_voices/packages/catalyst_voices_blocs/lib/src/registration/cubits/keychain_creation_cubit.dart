@@ -178,6 +178,6 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
     final mappedShuffledWords =
         _seedPhraseStateData.shuffledWords.map((e) => e.data).toList()..sort();
 
-    return mappedWords.toString() == mappedShuffledWords.toString();
+    return listEquals(mappedWords, mappedShuffledWords);
   }
 }
