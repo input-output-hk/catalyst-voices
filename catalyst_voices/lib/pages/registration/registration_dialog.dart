@@ -12,13 +12,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class RegistrationDialog extends StatefulWidget {
-  const RegistrationDialog._();
+  final RegistrationStep? step;
 
-  static Future<void> show(BuildContext context) {
+  const RegistrationDialog._({required this.step});
+
+  static Future<void> show(
+    BuildContext context, {
+    RegistrationStep? step,
+  }) {
     return VoicesDialog.show(
       context: context,
       routeSettings: const RouteSettings(name: '/registration'),
-      builder: (context) => const RegistrationDialog._(),
+      builder: (context) => RegistrationDialog._(step: step),
       barrierDismissible: false,
     );
   }
@@ -30,6 +35,16 @@ class RegistrationDialog extends StatefulWidget {
 class _RegistrationDialogState extends State<RegistrationDialog>
     with ErrorHandlerStateMixin<RegistrationCubit, RegistrationDialog> {
   late final RegistrationCubit _cubit = Dependencies.instance.get();
+
+  @override
+  void initState() {
+    super.initState();
+
+    final step = widget.step;
+    if (step != null) {
+      _cubit.goToStep(step);
+    }
+  }
 
   @override
   void dispose() {
