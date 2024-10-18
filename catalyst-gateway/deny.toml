@@ -79,6 +79,7 @@ allow = [
     "Unicode-3.0",
     "MPL-2.0",
     "Zlib",
+    "MIT-0",
 ]
 exceptions = [
     #{ allow = ["Zlib"], crate = "tinyvec" },

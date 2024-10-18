@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.2.16 AS python-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.2.18 AS python-ci
 
 builder:
     FROM python-ci+python-base

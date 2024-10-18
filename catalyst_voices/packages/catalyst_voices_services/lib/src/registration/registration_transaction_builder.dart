@@ -60,7 +60,7 @@ final class RegistrationTransactionBuilder {
 
     return _buildUnsignedRbacTx(
       auxiliaryData: AuxiliaryData.fromCbor(
-        x509Envelope.toCbor(serializer: (e) => e.toCbor()),
+        await x509Envelope.toCbor(serializer: (e) => e.toCbor()),
       ),
     );
   }

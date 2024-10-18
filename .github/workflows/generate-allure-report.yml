@@ -30,31 +30,31 @@ jobs:
         if: always()
 
       - name: Setup CI
-        uses: input-output-hk/catalyst-forge/actions/setup@master
+        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.1.0
 
       - name: Get catalyst gateway unit test report
-        uses: input-output-hk/catalyst-forge/actions/run@master
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.1.0
         if: always()
         continue-on-error: true
         with:
           path: ./catalyst-gateway+build
 
       - name: Get schemathesis test report
-        uses: input-output-hk/catalyst-forge/actions/run@master
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.1.0
         if: always()
         continue-on-error: true
         with:
           path: ./catalyst-gateway/tests/schemathesis_tests+test-fuzzer-api
 
       - name: Get flutter unit test report
-        uses: input-output-hk/catalyst-forge/actions/run@master
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.1.0
         if: always()
         continue-on-error: true
         with:
           path: ./catalyst_voices+test-unit
 
       - name: Get python api test report
-        uses: input-output-hk/catalyst-forge/actions/run@master
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.1.0
         if: always()
         continue-on-error: true
         with:
