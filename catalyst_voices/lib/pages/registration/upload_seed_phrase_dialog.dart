@@ -6,13 +6,13 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
-class UploadSeedphraseDialog {
-  static Future<List<SeedPhraseWord>> show(BuildContext rootContext) async {
+class UploadSeedPhraseDialog {
+  static Future<List<SeedPhraseWord>> show(BuildContext context) async {
     final file = await VoicesUploadFileDialog.show(
-      rootContext,
-      title: rootContext.l10n.uploadKeychainTitle,
-      itemNameToUpload: rootContext.l10n.key,
-      info: rootContext.l10n.uploadKeychainInfo,
+      context,
+      title: context.l10n.uploadKeychainTitle,
+      itemNameToUpload: context.l10n.key,
+      info: context.l10n.uploadKeychainInfo,
       allowedExtensions: ['txt'],
     );
 

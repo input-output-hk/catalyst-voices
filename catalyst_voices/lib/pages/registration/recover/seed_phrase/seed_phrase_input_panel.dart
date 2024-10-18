@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:catalyst_voices/pages/registration/incorrect_seedphrase_dialog.dart';
+import 'package:catalyst_voices/pages/registration/incorrect_seed_phrase_dialog.dart';
 import 'package:catalyst_voices/pages/registration/recover/bloc_recover_builder.dart';
-import 'package:catalyst_voices/pages/registration/upload_seedphrase_confirmation_dialog.dart';
-import 'package:catalyst_voices/pages/registration/upload_seedphrase_dialog.dart';
+import 'package:catalyst_voices/pages/registration/upload_seed_phrase_confirmation_dialog.dart';
+import 'package:catalyst_voices/pages/registration/upload_seed_phrase_dialog.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/pages/registration/widgets/seed_phrase_actions.dart';
@@ -82,14 +82,14 @@ class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel> {
   }
 
   Future<void> _uploadSeedPhrase() async {
-    final showUpload = await UploadSeedphraseConfirmationDialog.show(context);
+    final showUpload = await UploadSeedPhraseConfirmationDialog.show(context);
     if (showUpload) {
       await _showUploadDialog();
     }
   }
 
   Future<void> _showUploadDialog() async {
-    final words = await UploadSeedphraseDialog.show(context);
+    final words = await UploadSeedPhraseDialog.show(context);
 
     final isValid = SeedPhrase.isValid(
       words: words,
@@ -100,7 +100,7 @@ class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel> {
     } else {
       if (!mounted) return;
 
-      final showUpload = await IncorrectSeedphraseDialog.show(context);
+      final showUpload = await IncorrectSeedPhraseDialog.show(context);
       if (showUpload) {
         await _showUploadDialog();
       }
