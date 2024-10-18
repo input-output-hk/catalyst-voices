@@ -65,16 +65,85 @@ This **MUST** occur in the same PR as the PR that moves the endpoint from `draft
 21. PRs which version a `draft` endpoint **SHOULD ONLY** include the following.
 There can be no other changes to the logic in an API versioning PR.
     * The change from `draft` to the required version;
-    * If it is supersedes an existing endpoint version, marking that endpoint as `deprecated`.
-    * Updating any draft integration tests to match the new version of the endpoint, and ensure they will Fail CI, if they fail.
+    * If it supersedes an existing endpoint version, marking that endpoint as `deprecated`.
+    See: [Deprecating Endpoints in OpenAPI]
+    * Updating any draft integration tests to match the new version of the endpoint, and ensure they will Fail CI if they fail.
+22. There is no requirement that `draft` endpoints must enter production.
+    * Endpoints can go from `draft` to a versioned endpoint during the development of a single release.
+    * Conversely, there is no problem with `draft` endpoints entering production if they are not stable at the time of a release.
+23. `draft` endpoints have the same security requirements as versioned endpoints.
+    * The only difference is the query parameters, path or responses are not stable and can change.
 
 The purpose of these rules is to allow us to iterate quickly and implement new API endpoints.
-And remove unnecessary risks of breaking the front end, or CI while adding new endpoints.
+And remove unnecessary risks of breaking the front end, or CI, while adding new endpoints.
 
 Currently, the API is mostly unstable.  
 We also do not have any external consumers of the API to consider.
 However, once we enter production with the API we will need a strategy for deprecating and removing obsolete API endpoints.
 That will be the subject of a further ADR related specifically to that topic.
+
+### Example - adding a new endpoint
+
+New endpoints always start as drafts.
+
+Initial PR commits the following endpoint, to get a voters voting power:
+
+```url
+https://dev.catvoices.io/api/draft/voter/power
+```
+
+After the endpoint is considered stable,
+A subsequent PR will make a single change to update the version, starting at `v1`.
+
+```url
+https://dev.catvoices.io/api/v1/voter/power
+```
+
+### Example - updating an existing new endpoint
+
+An existing endpoint at V2:
+
+```url
+https://dev.catvoices.io/api/v2/voter/registration
+```
+
+#### PR to add make breaking change to that endpoint
+
+A PR is raised with a breaking change to that endpoint.
+It adds a required query parameter.
+This endpoint once stable will become v3.
+
+```url
+https://dev.catvoices.io/api/draft/voter/registration?requiredParam=true
+```
+
+#### PR Merged, and new draft endpoint exposed
+
+Once merged, the service will expose these two endpoints.
+
+```url
+https://dev.catvoices.io/api/v2/voter/registration
+https://dev.catvoices.io/api/draft/voter/registration?requiredParam=true
+```
+
+#### PR to set version
+
+When the new draft endpoint is stable, a new PR is raised to change it from `draft` to `v3`.
+The `v2` endpoint will be marked [deprecated][Deprecating Endpoints in OpenAPI].
+
+```url
+https://dev.catvoices.io/api/v2/voter/registration <- deprecate
+https://dev.catvoices.io/api/v3/voter/registration?requiredParam=true
+```
+
+#### v2 and v3 endpoints exposed
+
+After merge the service will expose these two endpoints.
+
+```url
+DEPRECATED: https://dev.catvoices.io/api/v2/voter/registration
+https://dev.catvoices.io/api/v3/voter/registration?requiredParam=true
+```
 
 ## Risks
 
@@ -88,6 +157,9 @@ If we do not do this, change management of the API will quickly become difficult
 
 * [Free Code Camp - How to Version a REST API](https://www.freecodecamp.org/news/how-to-version-a-rest-api/)
 * [Postman - API Versioning](https://www.postman.com/api-platform/api-versioning/)
+* [Deprecating Endpoints in OpenAPI]
+
+[Deprecating Endpoints in OpenAPI]: <https://openapispec.com/docs/how/how-does-openapi-handle-api-deprecation/)>
 
 [^1]: `^` asserts the position at the start of the string.</br>
 `v` matches the character `v`.</br>
