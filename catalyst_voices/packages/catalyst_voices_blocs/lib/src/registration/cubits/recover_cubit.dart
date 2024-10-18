@@ -28,6 +28,7 @@ final class RecoverCubit extends Cubit<RecoverStateData>
   final RegistrationService _registrationService;
 
   SeedPhrase? _seedPhrase;
+  Keychain? _keychain;
 
   RecoverCubit({
     required RegistrationService registrationService,
@@ -70,24 +71,30 @@ final class RecoverCubit extends Cubit<RecoverStateData>
       emit(state.copyWith(accountDetails: const Optional.empty()));
 
       final seedPhrase = _seedPhrase;
-      if (seedPhrase == null) {
+      final keychain = _keychain;
+
+      if (seedPhrase == null || keychain == null) {
         const exception = LocalizedRegistrationSeedPhraseNotFoundException();
         emit(state.copyWith(accountDetails: Optional(Failure(exception))));
         return;
       }
 
-      final walletHeader =
-          await _registrationService.recoverCardanoWalletDetails(seedPhrase);
+      final data = await _registrationService.recoverAccount(seedPhrase);
+
+      final walletInfo = data.walletInfo;
+      final profile = data.profile;
+
+      await keychain.setProfile(profile);
 
       final accountDetails = AccountSummaryData(
         walletConnection: WalletConnectionData(
-          name: walletHeader.metadata.name,
-          icon: walletHeader.metadata.icon,
+          name: walletInfo.metadata.name,
+          icon: walletInfo.metadata.icon,
         ),
         walletSummary: WalletSummaryData(
-          balance: CryptocurrencyFormatter.formatAmount(walletHeader.balance),
-          address: WalletAddressFormatter.formatShort(walletHeader.address),
-          clipboardAddress: walletHeader.address.toBech32(),
+          balance: CryptocurrencyFormatter.formatAmount(walletInfo.balance),
+          address: WalletAddressFormatter.formatShort(walletInfo.address),
+          clipboardAddress: walletInfo.address.toBech32(),
           showLowBalance: false,
         ),
       );
@@ -119,14 +126,20 @@ final class RecoverCubit extends Cubit<RecoverStateData>
         throw const LocalizedRegistrationUnlockPasswordNotFoundException();
       }
 
-      await _registrationService.createKeychain(
+      final lockFactor = PasswordLockFactor(password.value);
+      final keychain = await _registrationService.createKeychain(
         seedPhrase: seedPhrase,
-        unlockPassword: password.value,
+        lockFactor: lockFactor,
       );
+      await keychain.unlock(lockFactor);
+
+      _keychain = keychain;
 
       return true;
     } catch (error, stack) {
       _logger.severe('Create keychain', error, stack);
+
+      _keychain = null;
 
       emitError(error);
 

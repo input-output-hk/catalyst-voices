@@ -1,5 +1,5 @@
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_services/src/keychain/key_derivation.dart';
+import 'package:catalyst_voices_services/src/crypto/key_derivation.dart';
 import 'package:test/test.dart';
 
 void main() {

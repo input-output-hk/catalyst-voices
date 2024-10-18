@@ -1,4 +1,3 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_blocs/src/bloc_error_emitter_mixin.dart';
 import 'package:catalyst_voices_blocs/src/session/session_event.dart';
 import 'package:catalyst_voices_blocs/src/session/session_state.dart';
@@ -127,17 +126,20 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState>
     /* cSpell:disable */
     return User(
       profile: Profile(
-        walletInfo: WalletInfo(
-          metadata: const WalletMetadata(
-            name: 'Dummy Wallet',
-            icon: null,
-          ),
-          balance: Coin.fromAda(10),
-          address: ShelleyAddress.fromBech32(
-            'addr_test1vzpwq95z3xyum8vqndgdd'
-            '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
-          ),
-        ),
+        // walletInfo: WalletInfo(
+        //   metadata: const WalletMetadata(
+        //     name: 'Dummy Wallet',
+        //     icon: null,
+        //   ),
+        //   balance: Coin.fromAda(10),
+        //   address: ShelleyAddress.fromBech32(
+        //     'addr_test1vzpwq95z3xyum8vqndgdd'
+        //     '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
+        //   ),
+        // ),
+        roles: {
+          AccountRole.root,
+        },
       ),
     );
     /* cSpell:enable */

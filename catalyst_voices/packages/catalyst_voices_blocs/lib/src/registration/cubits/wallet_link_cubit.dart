@@ -31,6 +31,10 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
   WalletLinkCubit({required this.registrationService})
       : super(const WalletLinkStateData());
 
+  Set<AccountRole> get roles {
+    return state.selectedRoles ?? state.defaultRoles;
+  }
+
   CardanoWallet? get selectedWallet => _selectedWallet;
 
   @override

@@ -2,21 +2,21 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:equatable/equatable.dart';
 
 final class SeedPhraseStateData extends Equatable {
-  final SeedPhrase? seedPhrase;
+  // final SeedPhrase? seedPhrase;
   final List<SeedPhraseWord> shuffledWords;
   final List<SeedPhraseWord> userWords;
   final bool isStoredConfirmed;
   final bool areUserWordsCorrect;
 
   const SeedPhraseStateData({
-    this.seedPhrase,
+    // this.seedPhrase,
     this.shuffledWords = const [],
     this.userWords = const [],
     this.isStoredConfirmed = false,
     this.areUserWordsCorrect = false,
   });
 
-  bool get isLoading => seedPhrase == null;
+  bool get isLoading => false; //seedPhrase == null;
 
   bool get isResetWordsEnabled => userWords.isNotEmpty;
 
@@ -28,7 +28,7 @@ final class SeedPhraseStateData extends Equatable {
     bool? areUserWordsCorrect,
   }) {
     return SeedPhraseStateData(
-      seedPhrase: seedPhrase.dataOr(this.seedPhrase),
+      // seedPhrase: seedPhrase.dataOr(this.seedPhrase),
       shuffledWords: shuffledWords ?? this.shuffledWords,
       userWords: userWords ?? this.userWords,
       isStoredConfirmed: isStoredConfirmed ?? this.isStoredConfirmed,
@@ -38,7 +38,7 @@ final class SeedPhraseStateData extends Equatable {
 
   @override
   List<Object?> get props => [
-        seedPhrase,
+        // seedPhrase,
         shuffledWords,
         userWords,
         isStoredConfirmed,

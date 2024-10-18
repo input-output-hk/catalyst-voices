@@ -10,22 +10,64 @@ import 'package:catalyst_voices_services/src/storage/vault/vault.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-const _keyPrefix = 'SecureStorageVault';
 const _lockKey = 'LockKey';
+final _keyRegExp = RegExp(r'(\w+)\.(\w+)\.(\w+)');
 
 /// Implementation of [Vault] that uses [FlutterSecureStorage] as
 /// facade for read/write operations.
 base class SecureStorageVault with StorageAsStringMixin implements Vault {
+  final String id;
   final FlutterSecureStorage _secureStorage;
   final CryptoService _cryptoService;
 
   bool _isUnlocked = false;
 
+  /// Check if given [value] belongs to any [SecureStorageVault].
+  static bool isStorageKey(String value) {
+    try {
+      getStorageId(value);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Check [value] against value key pattern for this storage.
+  ///
+  /// Throws [ArgumentError] if [value] does not match.
+  ///
+  /// See [isStorageKey] to make sure key is valid before
+  /// calling [getStorageId].
+  static String getStorageId(String value) {
+    final match = _keyRegExp.firstMatch(value);
+    if (match == null) {
+      throw ArgumentError('Key does not match storage vault key pattern');
+    }
+
+    if (match.groupCount != 3) {
+      throw ArgumentError('Key sections count is invalid');
+    }
+
+    final prefix = match.group(1)!;
+    final id = match.group(2)!;
+
+    if (prefix != _keyPrefix) {
+      throw ArgumentError('Key prefix does not match');
+    }
+
+    return id;
+  }
+
+  static const _keyPrefix = 'SecureStorageVault';
+
   SecureStorageVault({
+    required this.id,
     FlutterSecureStorage secureStorage = const FlutterSecureStorage(),
     CryptoService? cryptoService,
   })  : _secureStorage = secureStorage,
         _cryptoService = cryptoService ?? VaultCryptoService();
+
+  String get _instanceKeyPrefix => '$_keyPrefix.$id';
 
   Future<Uint8List?> get _lock async {
     final effectiveKey = _buildVaultKey(_lockKey);
@@ -106,7 +148,8 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   @override
   Future<void> clear() async {
     final all = await _secureStorage.readAll();
-    final vaultKeys = List.of(all.keys).where((e) => e.startsWith(_keyPrefix));
+    final vaultKeys =
+        List.of(all.keys).where((key) => key.startsWith(_instanceKeyPrefix));
 
     for (final key in vaultKeys) {
       await _secureStorage.delete(key: key);
@@ -184,7 +227,5 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
     return base64.encode(decryptedData);
   }
 
-  String _buildVaultKey(String key) {
-    return '$_keyPrefix.$key';
-  }
+  String _buildVaultKey(String key) => '$_instanceKeyPrefix.$key';
 }

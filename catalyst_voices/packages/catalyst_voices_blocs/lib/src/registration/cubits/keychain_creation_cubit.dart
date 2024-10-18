@@ -35,12 +35,19 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
   final Downloader _downloader;
   final RegistrationService _registrationService;
 
+  SeedPhrase? _seedPhrase;
+  Keychain? _keychain;
+
   KeychainCreationCubit({
     required Downloader downloader,
     required RegistrationService registrationService,
   })  : _downloader = downloader,
         _registrationService = registrationService,
         super(const KeychainStateData());
+
+  SeedPhrase? get seedPhrase => _seedPhrase;
+
+  Keychain? get keychain => _keychain;
 
   SeedPhraseStateData get _seedPhraseStateData {
     return state.seedPhraseStateData;
@@ -72,7 +79,7 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
 
   @override
   void setUserSeedPhraseWords(List<SeedPhraseWord> words) {
-    final seedPhrase = _seedPhraseStateData.seedPhrase;
+    final seedPhrase = _seedPhrase;
     final seedPhraseWords = seedPhrase?.mnemonicWords;
 
     final areUserWordsCorrect =
@@ -86,7 +93,7 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
 
   @override
   Future<void> downloadSeedPhrase() async {
-    final mnemonic = _seedPhraseStateData.seedPhrase?.mnemonic;
+    final mnemonic = _seedPhrase?.mnemonic;
     if (mnemonic == null) {
       emitError(const LocalizedRegistrationSeedPhraseNotFoundException());
       return;
@@ -126,7 +133,7 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
   @override
   Future<bool> createKeychain() async {
     try {
-      final seedPhrase = _seedPhraseStateData.seedPhrase;
+      final seedPhrase = _seedPhrase;
       final password = this.password;
 
       if (seedPhrase == null) {
@@ -136,14 +143,20 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
         throw const LocalizedRegistrationUnlockPasswordNotFoundException();
       }
 
-      await _registrationService.createKeychain(
+      final lockFactor = PasswordLockFactor(password.value);
+      final keychain = await _registrationService.createKeychain(
         seedPhrase: seedPhrase,
-        unlockPassword: password.value,
+        lockFactor: lockFactor,
       );
+      await keychain.unlock(lockFactor);
+
+      _keychain = keychain;
 
       return true;
     } catch (error, stack) {
       _logger.severe('Create keychain', error, stack);
+
+      _keychain = null;
 
       emitError(error);
 
@@ -153,6 +166,7 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
 
   void _buildSeedPhrase() {
     final seedPhrase = SeedPhrase();
+    _seedPhrase = seedPhrase;
 
     _seedPhraseStateData = _seedPhraseStateData.copyWith(
       seedPhrase: Optional(seedPhrase),
@@ -165,7 +179,7 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
   }
 
   void _ensureSeedPhraseCreated() {
-    if (state.seedPhraseStateData.seedPhrase == null) {
+    if (_seedPhrase == null) {
       _buildSeedPhrase();
     }
   }

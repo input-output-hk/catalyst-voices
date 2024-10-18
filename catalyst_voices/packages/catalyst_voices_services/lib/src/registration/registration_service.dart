@@ -5,6 +5,7 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:uuid/uuid.dart';
 
 // TODO(damian-molinski): remove once recover account is implemented
 /* cSpell:disable */
@@ -17,26 +18,28 @@ final _testNetAddress = ShelleyAddress.fromBech32(
 /// Manages the user registration.
 final class RegistrationService {
   final TransactionConfigRepository _transactionConfigRepository;
-  final Keychain _keychain;
-  final KeyDerivation _keyDerivation;
+  final KeychainProvider _keychainProvider;
+
+  // final KeyDerivation _keyDerivation;
   final CatalystCardano _cardano;
 
   const RegistrationService(
     this._transactionConfigRepository,
-    this._keychain,
-    this._keyDerivation,
+    this._keychainProvider,
     this._cardano,
   );
 
   /// Initializes the keychain to store user registration data.
-  Future<void> createKeychain({
+  Future<Keychain> createKeychain({
     required SeedPhrase seedPhrase,
-    required String unlockPassword,
+    required LockFactor lockFactor,
   }) async {
-    await _keychain.clearAndLock();
-    await _keychain.setLockAndBeginWith(
+    final id = const Uuid().v4();
+
+    return _keychainProvider.create(
+      id,
       seedPhrase: seedPhrase,
-      unlockFactor: PasswordLockFactor(unlockPassword),
+      lockFactor: lockFactor,
     );
   }
 
@@ -67,7 +70,11 @@ final class RegistrationService {
   // Note. Returned type will be changed because we'll not be able to
   // get a wallet from backend just from seed phrase.
   // To be decided what data can we get from backend.
-  Future<WalletInfo> recoverCardanoWalletDetails(
+  Future<
+      ({
+        Profile profile,
+        WalletInfo walletInfo,
+      })> recoverAccount(
     SeedPhrase seedPhrase,
   ) async {
     await Future<void>.delayed(const Duration(milliseconds: 200));
@@ -77,10 +84,16 @@ final class RegistrationService {
       throw const RegistrationUnknownException();
     }
 
-    return WalletInfo(
+    final profile = Profile(roles: {AccountRole.root});
+    final walletInfo = WalletInfo(
       metadata: const WalletMetadata(name: 'Dummy Wallet'),
       balance: Coin.fromAda(10),
       address: _testNetAddress,
+    );
+
+    return (
+      profile: profile,
+      walletInfo: walletInfo,
     );
   }
 
@@ -90,16 +103,11 @@ final class RegistrationService {
   Future<Transaction> prepareRegistration({
     required CardanoWallet wallet,
     required NetworkId networkId,
-    required SeedPhrase seedPhrase,
+    required Ed25519KeyPair keyPair,
     required Set<AccountRole> roles,
   }) async {
     try {
       final walletApi = await wallet.enable();
-
-      final keyPair = await _keyDerivation.deriveAccountRoleKeyPair(
-        seedPhrase: seedPhrase,
-        role: AccountRole.root,
-      );
 
       final registrationBuilder = RegistrationTransactionBuilder(
         transactionConfig: await _transactionConfigRepository.fetch(networkId),

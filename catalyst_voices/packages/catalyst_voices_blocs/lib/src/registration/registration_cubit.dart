@@ -128,12 +128,20 @@ final class RegistrationCubit extends Cubit<RegistrationState>
         ),
       );
 
+      final keychain = _keychainCreationCubit.keychain!;
+      final roles = _walletLinkCubit.roles;
+
+      final profile = Profile(roles: roles);
+
+      await keychain.setProfile(profile);
+      final key = await keychain.key();
+
       final unsignedTx = await registrationService.prepareRegistration(
         wallet: _walletLinkCubit.selectedWallet!,
         // TODO(dtscalac): inject the networkId
         networkId: NetworkId.testnet,
-        seedPhrase: _keychainState.seedPhrase!,
-        roles: _walletLinkState.selectedRoles ?? _walletLinkState.defaultRoles,
+        keyPair: key,
+        roles: profile.roles,
       );
 
       _onRegistrationStateDataChanged(
@@ -296,10 +304,6 @@ final class RegistrationCubit extends Cubit<RegistrationState>
   void _goToStep(RegistrationStep step) {
     emit(state.copyWith(step: step));
   }
-
-  KeychainStateData get _keychainState => state.keychainStateData;
-
-  WalletLinkStateData get _walletLinkState => state.walletLinkStateData;
 
   RegistrationStateData get _registrationState => state.registrationStateData;
 

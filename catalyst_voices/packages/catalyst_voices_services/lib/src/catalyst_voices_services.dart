@@ -1,6 +1,9 @@
+export 'crypto/key_derivation.dart';
 export 'downloader/downloader.dart';
-export 'keychain/key_derivation.dart';
 export 'keychain/keychain.dart';
+export 'keychain/keychain_provider.dart';
+export 'keychain/vault_keychain.dart';
+export 'keychain/vault_keychain_provider.dart';
 export 'registration/registration_service.dart';
 export 'registration/registration_transaction_builder.dart';
 export 'storage/dummy_auth_storage.dart';
