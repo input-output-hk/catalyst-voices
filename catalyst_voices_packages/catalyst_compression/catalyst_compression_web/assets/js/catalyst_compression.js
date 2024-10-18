@@ -2,19 +2,16 @@
 // This is a persistent worker, will last for life of the app.
 const compressionWorker = new Worker(new URL('./catalyst_compression_worker.js', import.meta.url));
 
-const processingIdsPool = new Set();
+let idCounter = 0;
 
 // A simple id generator function. The generated id must be unique across all the processing ids.
 function generateId() {
-    let id
-    do {
-        const timestamp = Date.now().toString(36);
-        const randomNum = Math.random().toString(36).substring(2, 8);
-        id = `${timestamp}-${randomNum}`;
-    } while (processingIdsPool.has(id));
-    processingIdsPool.add(id);
+    const thisId = idCounter;
+    const nextId = idCounter + 1;
 
-    return id;
+    idCounter = nextId >= Number.MAX_SAFE_INTEGER ? 0 : nextId;
+
+    return thisId;
 }
 
 function registerWorkerEventHandler(worker, handleMessage, handleError) {
@@ -23,11 +20,11 @@ function registerWorkerEventHandler(worker, handleMessage, handleError) {
 
     function complete() {
         worker.removeEventListener("message", wrappedHandleMessage);
-        worker.removeEventListener("error", wrappedHandleError)
+        worker.removeEventListener("error", wrappedHandleError);
     }
 
-    worker.addEventListener("message", wrappedHandleMessage)
-    worker.addEventListener("error", wrappedHandleError)
+    worker.addEventListener("message", wrappedHandleMessage);
+    worker.addEventListener("error", wrappedHandleError);
 }
 
 // A function to create a compression function according to its name.
@@ -57,14 +54,12 @@ function runCompressionInWorker(fnName) {
                     } else {
                         reject(error || 'Unexpected error');
                     }
-    
-                    processingIdsPool.delete(id);
+
                     complete();
                 },
                 (error, complete) => {
                     reject(error);
-    
-                    processingIdsPool.clear();
+
                     complete();
                 }
             );
@@ -81,7 +76,7 @@ const catalyst_compression = {
     brotliDecompress: runCompressionInWorker("brotliDecompress"),
     zstdCompress: runCompressionInWorker("zstdCompress"),
     zstdDecompress: runCompressionInWorker("zstdDecompress"),
-}
+};
 
 // Expose catalyst compression as globally accessible
 // so that we can call it via catalyst_compression.function_name() from
