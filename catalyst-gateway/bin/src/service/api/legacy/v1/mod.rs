@@ -25,6 +25,10 @@ pub(crate) struct V1Api;
 
 #[OpenApi(prefix_path = "/v1", tag = "ApiTags::V1")]
 impl V1Api {
+    /// Get Account Votes
+    ///
+    /// Get from all active vote plans, the index of the voted proposals
+    /// by the given account ID.
     #[oai(
         path = "/votes/plan/account-votes/:account_id",
         method = "get",
@@ -32,11 +36,6 @@ impl V1Api {
         transform = "schema_version_validation",
         deprecated = true
     )]
-
-    /// Get Account Votes
-    ///
-    /// Get from all active vote plans, the index of the voted proposals
-    /// by the given account ID.
     async fn get_account_votes(
         &self, /// A account ID to get the votes for.
         account_id: Path<AccountId>,
