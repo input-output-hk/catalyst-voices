@@ -1,5 +1,4 @@
 import 'package:catalyst_voices/common/ext/ext.dart';
-import 'package:catalyst_voices/pages/registration/registration_dialog.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/spaces_theme_mode_switch.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/spaces_drawer.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -84,6 +83,10 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
   }
 
   Future<void> _showAccountSetup() async {
-    await RegistrationDialog.show(context);
+    // Note. Out of scope for MVE1
+    // await RegistrationDialog.show(context);
+
+    // Temp. shortcut for just MVE1
+    context.read<SessionBloc>().add(const ActiveUserSessionEvent());
   }
 }

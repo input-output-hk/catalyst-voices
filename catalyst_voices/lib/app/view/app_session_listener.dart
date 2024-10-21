@@ -38,6 +38,8 @@ class GlobalSessionListener extends StatelessWidget {
   }
 
   void _onSessionChanged(BuildContext context, SessionState state) {
+    // Note. Out of scope for MVE1
+    return;
     if (state is ActiveUserSessionState) {
       _onUnlockedKeychain(context);
     } else if (state is GuestSessionState) {
