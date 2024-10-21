@@ -18,8 +18,6 @@ abstract interface class RecoverManager implements UnlockPasswordManager {
   void setSeedPhraseWords(List<SeedPhraseWord> words);
 
   Future<void> recoverAccount();
-
-  Future<bool> createKeychain();
 }
 
 final class RecoverCubit extends Cubit<RecoverStateData>
@@ -28,7 +26,6 @@ final class RecoverCubit extends Cubit<RecoverStateData>
   final RegistrationService _registrationService;
 
   SeedPhrase? _seedPhrase;
-  Keychain? _keychain;
 
   RecoverCubit({
     required RegistrationService registrationService,
@@ -71,20 +68,20 @@ final class RecoverCubit extends Cubit<RecoverStateData>
       emit(state.copyWith(accountDetails: const Optional.empty()));
 
       final seedPhrase = _seedPhrase;
-      final keychain = _keychain;
+      final lockFactor = PasswordLockFactor(password.value);
 
-      if (seedPhrase == null || keychain == null) {
+      if (seedPhrase == null) {
         const exception = LocalizedRegistrationSeedPhraseNotFoundException();
         emit(state.copyWith(accountDetails: Optional(Failure(exception))));
         return;
       }
 
-      final data = await _registrationService.recoverAccount(seedPhrase);
+      final account = await _registrationService.recoverAccount(
+        seedPhrase: seedPhrase,
+        lockFactor: lockFactor,
+      );
 
-      final walletInfo = data.walletInfo;
-      final profile = data.profile;
-
-      await keychain.setProfile(profile);
+      final walletInfo = account.walletInfo;
 
       final accountDetails = AccountSummaryData(
         walletConnection: WalletConnectionData(
@@ -110,40 +107,6 @@ final class RecoverCubit extends Cubit<RecoverStateData>
 
       const exception = LocalizedUnknownException();
       emit(state.copyWith(accountDetails: Optional(Failure(exception))));
-    }
-  }
-
-  @override
-  Future<bool> createKeychain() async {
-    try {
-      final seedPhrase = _seedPhrase;
-      final password = this.password;
-
-      if (seedPhrase == null) {
-        throw const LocalizedRegistrationSeedPhraseNotFoundException();
-      }
-      if (password.isNotValid) {
-        throw const LocalizedRegistrationUnlockPasswordNotFoundException();
-      }
-
-      final lockFactor = PasswordLockFactor(password.value);
-      final keychain = await _registrationService.createKeychain(
-        seedPhrase: seedPhrase,
-        lockFactor: lockFactor,
-      );
-      await keychain.unlock(lockFactor);
-
-      _keychain = keychain;
-
-      return true;
-    } catch (error, stack) {
-      _logger.severe('Create keychain', error, stack);
-
-      _keychain = null;
-
-      emitError(error);
-
-      return false;
     }
   }
 

@@ -26,11 +26,11 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState>
     RestoreSessionEvent event,
     Emitter<SessionState> emit,
   ) async {
-    if (!await _keychain.hasSeedPhrase) {
-      emit(const VisitorSessionState());
-    } else {
-      emit(const GuestSessionState());
-    }
+    // if (!await _keychain.hasSeedPhrase) {
+    //   emit(const VisitorSessionState());
+    // } else {
+    //   emit(const GuestSessionState());
+    // }
   }
 
   Future<void> _onUnlockSessionEvent(
@@ -49,9 +49,9 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState>
     LockSessionEvent event,
     Emitter<SessionState> emit,
   ) async {
-    if (await _keychain._hasLock) {
-      await _keychain.lock();
-    }
+    // if (await _keychain._hasLock) {
+    //   await _keychain.lock();
+    // }
     emit(const GuestSessionState());
   }
 
@@ -72,9 +72,9 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState>
     VisitorSessionEvent event,
     Emitter<SessionState> emit,
   ) async {
-    if (await _keychain.hasSeedPhrase) {
-      await _keychain.clearAndLock();
-    }
+    // if (await _keychain.hasSeedPhrase) {
+    //   await _keychain.clearAndLock();
+    // }
 
     emit(const VisitorSessionState());
   }
@@ -83,15 +83,15 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState>
     GuestSessionEvent event,
     Emitter<SessionState> emit,
   ) async {
-    if (await _keychain._hasLock && !await _keychain.isUnlocked) {
-      await _keychain.unlock(_dummyUnlockFactor);
-    }
-
-    await _keychain.setLockAndBeginWith(
-      seedPhrase: _dummySeedPhrase,
-      unlockFactor: _dummyUnlockFactor,
-      unlocked: false,
-    );
+    // if (await _keychain._hasLock && !await _keychain.isUnlocked) {
+    //   await _keychain.unlock(_dummyUnlockFactor);
+    // }
+    //
+    // await _keychain.setLockAndBeginWith(
+    //   seedPhrase: _dummySeedPhrase,
+    //   unlockFactor: _dummyUnlockFactor,
+    //   unlocked: false,
+    // );
 
     emit(const GuestSessionState());
   }
@@ -104,11 +104,11 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState>
       await _keychain.unlock(_dummyUnlockFactor);
     }
 
-    await _keychain.setLockAndBeginWith(
-      seedPhrase: _dummySeedPhrase,
-      unlockFactor: _dummyUnlockFactor,
-      unlocked: true,
-    );
+    // await _keychain.setLockAndBeginWith(
+    //   seedPhrase: _dummySeedPhrase,
+    //   unlockFactor: _dummyUnlockFactor,
+    //   unlocked: true,
+    // );
 
     emit(ActiveUserSessionState(user: _dummyUser));
   }
@@ -125,21 +125,21 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState>
   User get _dummyUser {
     /* cSpell:disable */
     return User(
-      profile: Account(
-        // walletInfo: WalletInfo(
-        //   metadata: const WalletMetadata(
-        //     name: 'Dummy Wallet',
-        //     icon: null,
-        //   ),
-        //   balance: Coin.fromAda(10),
-        //   address: ShelleyAddress.fromBech32(
-        //     'addr_test1vzpwq95z3xyum8vqndgdd'
-        //     '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
-        //   ),
-        // ),
+      account: Account(
         roles: {
           AccountRole.root,
         },
+        walletInfo: WalletInfo(
+          metadata: const WalletMetadata(
+            name: 'Dummy Wallet',
+            icon: null,
+          ),
+          balance: Coin.fromAda(10),
+          address: ShelleyAddress.fromBech32(
+            'addr_test1vzpwq95z3xyum8vqndgdd'
+            '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
+          ),
+        ),
       ),
     );
     /* cSpell:enable */

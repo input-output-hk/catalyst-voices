@@ -56,22 +56,17 @@ final class Dependencies extends DependencyProvider {
   void _registerServices() {
     registerLazySingleton<Storage>(() => const SecureStorage());
     registerLazySingleton<KeyDerivation>(KeyDerivation.new);
-    registerLazySingleton<KeychainProvider>(() {
-      return VaultKeychainProvider(
-        keyDerivation: get<KeyDerivation>(),
-      );
-    });
-    registerLazySingleton<DummyAuthStorage>(
-      () => const SecureDummyAuthStorage(),
-    );
+    registerLazySingleton<KeychainProvider>(VaultKeychainProvider.new);
+    registerLazySingleton<DummyAuthStorage>(SecureDummyAuthStorage.new);
     registerLazySingleton<Downloader>(Downloader.new);
     registerLazySingleton<CatalystCardano>(() => CatalystCardano.instance);
-    registerLazySingleton<RegistrationService>(
-      () => RegistrationService(
+    registerLazySingleton<RegistrationService>(() {
+      return RegistrationService(
         get<TransactionConfigRepository>(),
         get<KeychainProvider>(),
         get<CatalystCardano>(),
-      ),
-    );
+        get<KeyDerivation>(),
+      );
+    });
   }
 }

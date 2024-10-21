@@ -6,6 +6,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:flutter/foundation.dart';
+import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
 
 // TODO(damian-molinski): remove once recover account is implemented
@@ -15,6 +16,8 @@ final _testNetAddress = ShelleyAddress.fromBech32(
   '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
 );
 /* cSpell:enable */
+
+final _logger = Logger('RegistrationService');
 
 /// Manages the user registration.
 final class RegistrationService {
@@ -29,40 +32,6 @@ final class RegistrationService {
     this._cardano,
     this._keyDerivation,
   );
-
-  /// Note. user is registered when transaction is beaning sent, here
-  /// we're saving data locally.
-  ///
-  /// We may save account after successful recovery.
-  Future<Account> saveAccount({
-    required SeedPhrase seedPhrase,
-    required LockFactor lockFactor,
-    required Set<AccountRole> roles,
-    required WalletInfo walletInfo,
-  }) async {
-    final keychainId = const Uuid().v4();
-    final rootKey = await _keyDerivation.deriveAccountRoleKeyPair(
-      seedPhrase: seedPhrase,
-      // TODO(dtscalac): Only one roles is supported atm.
-      role: AccountRole.root,
-    );
-
-    final keychain = await _keychainProvider.create(keychainId);
-    await keychain.setLock(lockFactor);
-    await keychain.unlock(lockFactor);
-
-    // TODO(dtscalac): Update key value when derivation is final.
-    await keychain.setRootKey(Uint8List.fromList(rootKey.privateKey.bytes));
-
-    final account = Account(
-      roles: roles,
-      walletInfo: walletInfo,
-    );
-
-    // TODO(damian-molinski): save account somewhere where session has access.
-
-    return account;
-  }
 
   /// Returns the available cardano wallet extensions.
   Future<List<CardanoWallet>> getCardanoWallets() {
@@ -87,6 +56,18 @@ final class RegistrationService {
     );
   }
 
+  /// See [KeyDerivation.deriveAccountRoleKeyPair].
+  Future<Ed25519KeyPair> deriveAccountRoleKeyPair({
+    required SeedPhrase seedPhrase,
+    required Set<AccountRole> roles,
+  }) {
+    return _keyDerivation.deriveAccountRoleKeyPair(
+      seedPhrase: seedPhrase,
+      // TODO(dtscalac): Only one roles is supported atm.
+      role: AccountRole.root,
+    );
+  }
+
   // TODO(damian-molinski): to be implemented
   // Note. Returned type will be changed because we'll not be able to
   // get a wallet from backend just from seed phrase.
@@ -102,23 +83,31 @@ final class RegistrationService {
       throw const RegistrationUnknownException();
     }
 
-    final walletInfo = WalletInfo(
-      metadata: const WalletMetadata(name: 'Dummy Wallet'),
-      balance: Coin.fromAda(10),
-      address: _testNetAddress,
-    );
-
-    final account = Account(
-      roles: {AccountRole.root},
-      walletInfo: walletInfo,
-    );
-
-    await saveAccount(
+    final roles = {AccountRole.root};
+    final keyPair = await deriveAccountRoleKeyPair(
       seedPhrase: seedPhrase,
-      lockFactor: lockFactor,
-      roles: account.roles,
-      walletInfo: walletInfo,
+      roles: roles,
     );
+    // TODO(dtscalac): Update key value when derivation is final.
+    final rootKey = Uint8List.fromList(keyPair.privateKey.bytes);
+
+    final keychainId = const Uuid().v4();
+    final keychain = await _keychainProvider.create(keychainId);
+    await keychain.setLock(lockFactor);
+    await keychain.unlock(lockFactor);
+    await keychain.setRootKey(rootKey);
+
+    // Note. with rootKey query backend for account details.
+    final account = Account(
+      roles: roles,
+      walletInfo: WalletInfo(
+        metadata: const WalletMetadata(name: 'Dummy Wallet'),
+        balance: Coin.fromAda(10),
+        address: _testNetAddress,
+      ),
+    );
+
+    // TODO(damian-molinski): save account somewhere where session has access.
 
     return account;
   }
@@ -133,20 +122,25 @@ final class RegistrationService {
     required Set<AccountRole> roles,
   }) async {
     try {
-      final walletApi = await wallet.enable();
+      final config = await _transactionConfigRepository.fetch(networkId);
+
+      final enabledWallet = await wallet.enable();
+      final changeAddress = await enabledWallet.getChangeAddress();
+      final rewardAddresses = await enabledWallet.getRewardAddresses();
+      final utxos = await enabledWallet.getUtxos(
+        amount: Balance(
+          coin: CardanoWalletDetails.minAdaForRegistration,
+        ),
+      );
 
       final registrationBuilder = RegistrationTransactionBuilder(
-        transactionConfig: await _transactionConfigRepository.fetch(networkId),
+        transactionConfig: config,
         keyPair: keyPair,
         networkId: networkId,
         roles: roles,
-        changeAddress: await walletApi.getChangeAddress(),
-        rewardAddresses: await walletApi.getRewardAddresses(),
-        utxos: await walletApi.getUtxos(
-          amount: Balance(
-            coin: CardanoWalletDetails.minAdaForRegistration,
-          ),
-        ),
+        changeAddress: changeAddress,
+        rewardAddresses: rewardAddresses,
+        utxos: utxos,
       );
 
       return await registrationBuilder.build();
@@ -166,13 +160,16 @@ final class RegistrationService {
   /// The transaction must be prepared earlier via [prepareRegistration].
   ///
   /// Throws a subclass of [RegistrationException] in case of a failure.
-  Future<Transaction> submitRegistration({
+  Future<Account> register({
     required CardanoWallet wallet,
     required Transaction unsignedTx,
+    required Set<AccountRole> roles,
+    required LockFactor lockFactor,
+    required Uint8List rootKey,
   }) async {
     try {
-      final walletApi = await wallet.enable();
-      final witnessSet = await walletApi.signTx(transaction: unsignedTx);
+      final enabledWallet = await wallet.enable();
+      final witnessSet = await enabledWallet.signTx(transaction: unsignedTx);
 
       final signedTx = Transaction(
         body: unsignedTx.body,
@@ -181,9 +178,29 @@ final class RegistrationService {
         auxiliaryData: unsignedTx.auxiliaryData,
       );
 
-      await walletApi.submitTx(transaction: signedTx);
+      final txHash = await enabledWallet.submitTx(transaction: signedTx);
 
-      return signedTx;
+      _logger.info('Registration transaction submitted [$txHash]');
+
+      final keychainId = const Uuid().v4();
+      final keychain = await _keychainProvider.create(keychainId);
+      await keychain.setLock(lockFactor);
+      await keychain.unlock(lockFactor);
+      await keychain.setRootKey(rootKey);
+
+      final balance = await enabledWallet.getBalance();
+      final address = await enabledWallet.getChangeAddress();
+
+      final account = Account(
+        roles: roles,
+        walletInfo: WalletInfo(
+          metadata: WalletMetadata.fromCardanoWallet(wallet),
+          balance: balance.coin,
+          address: address,
+        ),
+      );
+
+      return account;
     } on RegistrationException {
       rethrow;
     } catch (error) {

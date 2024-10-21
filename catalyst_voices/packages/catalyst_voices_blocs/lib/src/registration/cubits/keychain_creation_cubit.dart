@@ -25,29 +25,21 @@ abstract interface class KeychainCreationManager
   void setUserSeedPhraseWords(List<SeedPhraseWord> words);
 
   Future<void> downloadSeedPhrase();
-
-  Future<bool> createKeychain();
 }
 
 final class KeychainCreationCubit extends Cubit<KeychainStateData>
     with BlocErrorEmitterMixin, UnlockPasswordMixin
     implements KeychainCreationManager {
   final Downloader _downloader;
-  final RegistrationService _registrationService;
 
   SeedPhrase? _seedPhrase;
-  Keychain? _keychain;
 
   KeychainCreationCubit({
     required Downloader downloader,
-    required RegistrationService registrationService,
   })  : _downloader = downloader,
-        _registrationService = registrationService,
         super(const KeychainStateData());
 
   SeedPhrase? get seedPhrase => _seedPhrase;
-
-  Keychain? get keychain => _keychain;
 
   SeedPhraseStateData get _seedPhraseStateData {
     return state.seedPhraseStateData;
@@ -130,46 +122,12 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
     emit(state.copyWith(unlockPasswordState: data));
   }
 
-  @override
-  Future<bool> createKeychain() async {
-    try {
-      final seedPhrase = _seedPhrase;
-      final password = this.password;
-
-      if (seedPhrase == null) {
-        throw const LocalizedRegistrationSeedPhraseNotFoundException();
-      }
-      if (password.isNotValid) {
-        throw const LocalizedRegistrationUnlockPasswordNotFoundException();
-      }
-
-      final lockFactor = PasswordLockFactor(password.value);
-      final keychain = await _registrationService.createKeychain(
-        seedPhrase: seedPhrase,
-        lockFactor: lockFactor,
-      );
-      await keychain.unlock(lockFactor);
-
-      _keychain = keychain;
-
-      return true;
-    } catch (error, stack) {
-      _logger.severe('Create keychain', error, stack);
-
-      _keychain = null;
-
-      emitError(error);
-
-      return false;
-    }
-  }
-
   void _buildSeedPhrase() {
     final seedPhrase = SeedPhrase();
     _seedPhrase = seedPhrase;
 
     _seedPhraseStateData = _seedPhraseStateData.copyWith(
-      seedPhrase: Optional(seedPhrase),
+      seedPhraseWords: seedPhrase.mnemonicWords,
       shuffledWords: seedPhrase.shuffledMnemonicWords,
       // Note. In debug mode we're prefilling correct seed phrase words
       // so its faster to test screens

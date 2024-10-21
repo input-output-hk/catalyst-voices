@@ -4,20 +4,21 @@ import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:result_type/result_type.dart';
 
+// TODO(damian-molinski): refactor have less logic and no raw models.
 final class RegistrationStateData extends Equatable {
-  final Result<Transaction, LocalizedException>? unsignedTx;
-  final Result<Transaction, LocalizedException>? submittedTx;
+  final Result<Transaction, LocalizedException>? registrationTx;
+  final Result<Account, LocalizedException>? account;
   final bool isSubmittingTx;
 
   const RegistrationStateData({
-    this.unsignedTx,
-    this.submittedTx,
+    this.registrationTx,
+    this.account,
     this.isSubmittingTx = false,
   });
 
   /// Returns the registration transaction fee.
   Coin? get transactionFee {
-    final result = unsignedTx;
+    final result = registrationTx;
     if (result == null) return null;
 
     final tx = result.isSuccess ? result.success : null;
@@ -25,24 +26,26 @@ final class RegistrationStateData extends Equatable {
   }
 
   /// Whether the button to submit the transaction should be enabled.
-  bool get canSubmitTx => (unsignedTx?.isSuccess ?? false) && (!isSubmittingTx);
+  bool get canSubmitTx {
+    return (registrationTx?.isSuccess ?? false) && (!isSubmittingTx);
+  }
 
   RegistrationStateData copyWith({
-    Optional<Result<Transaction, LocalizedException>>? unsignedTx,
-    Optional<Result<Transaction, LocalizedException>>? submittedTx,
+    Optional<Result<Transaction, LocalizedException>>? registrationTx,
+    Optional<Result<Account, LocalizedException>>? account,
     bool? isSubmittingTx,
   }) {
     return RegistrationStateData(
-      unsignedTx: unsignedTx.dataOr(this.unsignedTx),
-      submittedTx: submittedTx.dataOr(this.submittedTx),
+      registrationTx: registrationTx.dataOr(this.registrationTx),
       isSubmittingTx: isSubmittingTx ?? this.isSubmittingTx,
+      account: account.dataOr(this.account),
     );
   }
 
   @override
   List<Object?> get props => [
-        unsignedTx,
-        submittedTx,
+        registrationTx,
         isSubmittingTx,
+        account,
       ];
 }

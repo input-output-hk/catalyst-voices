@@ -61,7 +61,7 @@ class _BlocTransactionDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocRegistrationBuilder(
-      selector: (state) => state.unsignedTx,
+      selector: (state) => state.registrationTx,
       builder: (context, result) {
         return switch (result) {
           Success() => const _TransactionDetails(),
@@ -239,7 +239,7 @@ class _BlocTxSubmitError extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocRegistrationBuilder(
-      selector: (state) => state.submittedTx,
+      selector: (state) => state.registrationTx,
       builder: (context, result) {
         return switch (result) {
           Failure(:final value) => _Error(

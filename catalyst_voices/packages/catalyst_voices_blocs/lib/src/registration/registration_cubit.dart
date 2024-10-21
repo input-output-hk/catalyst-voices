@@ -10,6 +10,7 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:result_type/result_type.dart';
@@ -24,12 +25,14 @@ final class RegistrationCubit extends Cubit<RegistrationState>
   final RecoverCubit _recoverCubit;
   final RegistrationService registrationService;
 
+  Ed25519KeyPair? _keyPair;
+  Transaction? _transaction;
+
   RegistrationCubit({
     required Downloader downloader,
     required this.registrationService,
   })  : _keychainCreationCubit = KeychainCreationCubit(
           downloader: downloader,
-          registrationService: registrationService,
         ),
         _walletLinkCubit = WalletLinkCubit(
           registrationService: registrationService,
@@ -61,6 +64,8 @@ final class RegistrationCubit extends Cubit<RegistrationState>
   WalletLinkManager get walletLink => _walletLinkCubit;
 
   RecoverManager get recover => _recoverCubit;
+
+  RegistrationStateData get _registrationState => state.registrationStateData;
 
   /// Returns [RegistrationCubit] if found in widget tree. Does not add
   /// rebuild dependency when called.
@@ -122,40 +127,48 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     try {
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
-          unsignedTx: const Optional(null),
-          submittedTx: const Optional(null),
+          registrationTx: const Optional.empty(),
+          account: const Optional.empty(),
           isSubmittingTx: false,
         ),
       );
 
-      final keychain = _keychainCreationCubit.keychain!;
+      final seedPhrase = _keychainCreationCubit.seedPhrase!;
+      final wallet = _walletLinkCubit.selectedWallet!;
       final roles = _walletLinkCubit.roles;
 
-      final profile = Account(roles: roles);
+      final keyPair = await registrationService.deriveAccountRoleKeyPair(
+        seedPhrase: seedPhrase,
+        roles: roles,
+      );
 
-      await keychain.setProfile(profile);
-      final key = await keychain.key();
-
-      final unsignedTx = await registrationService.prepareRegistration(
-        wallet: _walletLinkCubit.selectedWallet!,
+      final transaction = await registrationService.prepareRegistration(
+        wallet: wallet,
         // TODO(dtscalac): inject the networkId
         networkId: NetworkId.testnet,
-        keyPair: key,
-        roles: profile.roles,
+        keyPair: keyPair,
+        roles: roles,
       );
+
+      _keyPair = keyPair;
+      _transaction = transaction;
 
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
-          unsignedTx: Optional(Success(unsignedTx)),
+          registrationTx: Optional(Success(transaction)),
         ),
       );
     } on RegistrationException catch (error, stackTrace) {
-      _logger.severe('prepareRegistration', error, stackTrace);
+      _logger.severe('Prepare registration', error, stackTrace);
+
+      _keyPair = null;
+      _transaction = null;
+
+      final exception = LocalizedRegistrationException.from(error);
+
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
-          unsignedTx: Optional(
-            Failure(LocalizedRegistrationException.from(error)),
-          ),
+          registrationTx: Optional(Failure(exception)),
         ),
       );
     }
@@ -165,30 +178,45 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     try {
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
-          submittedTx: const Optional(null),
+          account: const Optional.empty(),
           isSubmittingTx: true,
         ),
       );
 
-      final signedTx = await registrationService.submitRegistration(
-        wallet: _walletLinkCubit.selectedWallet!,
-        unsignedTx: _registrationState.unsignedTx!.success,
+      final keyPair = _keyPair!;
+      final transaction = _transaction!;
+
+      final password = _keychainCreationCubit.password;
+      final lockFactor = PasswordLockFactor(password.value);
+
+      final wallet = _walletLinkCubit.selectedWallet!;
+      final roles = _walletLinkCubit.roles;
+
+      final account = await registrationService.register(
+        wallet: wallet,
+        unsignedTx: transaction,
+        roles: roles,
+        lockFactor: lockFactor,
+        // TODO(dtscalac): Update key value when derivation is final.
+        rootKey: Uint8List.fromList(keyPair.privateKey.bytes),
       );
 
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
-          submittedTx: Optional(Success(signedTx)),
+          account: Optional(Success(account)),
           isSubmittingTx: false,
         ),
       );
+
       nextStep();
     } on RegistrationException catch (error, stackTrace) {
-      _logger.severe('submitRegistration', error, stackTrace);
+      _logger.severe('Submit registration', error, stackTrace);
+
+      final exception = LocalizedRegistrationException.from(error);
+
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
-          submittedTx: Optional(
-            Failure(LocalizedRegistrationException.from(error)),
-          ),
+          account: Optional(Failure(exception)),
           isSubmittingTx: false,
         ),
       );
@@ -304,8 +332,6 @@ final class RegistrationCubit extends Cubit<RegistrationState>
   void _goToStep(RegistrationStep step) {
     emit(state.copyWith(step: step));
   }
-
-  RegistrationStateData get _registrationState => state.registrationStateData;
 
   void _onKeychainStateDataChanged(KeychainStateData data) {
     emit(state.copyWith(keychainStateData: data));

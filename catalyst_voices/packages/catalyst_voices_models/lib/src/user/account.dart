@@ -12,6 +12,9 @@ final class Account extends Equatable {
   final Set<AccountRole> roles;
   final WalletInfo walletInfo;
 
+  // Note. this is not defined yet what we will show here.
+  String get acronym => 'A';
+
   @override
   List<Object?> get props => [
         roles,
