@@ -44,12 +44,9 @@ pub(crate) async fn endpoint(stake_address: StakeAddress) -> AllResponses {
         return Responses::InternalServerError.into();
     };
 
-    let query_res = GetChainRootQuery::execute(
-        &session,
-        GetChainRootQueryParams {
-            stake_address: stake_address.to_vec(),
-        },
-    )
+    let query_res = GetChainRootQuery::execute(&session, GetChainRootQueryParams {
+        stake_address: stake_address.to_vec(),
+    })
     .await;
 
     match query_res {

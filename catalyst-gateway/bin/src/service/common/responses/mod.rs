@@ -54,9 +54,11 @@ impl<T> WithErrorResponses<T> {
     /// Returns a Server Error, a Bad Request or a Service Unavailable response.
     pub(crate) fn handle_error(err: &anyhow::Error) -> Self {
         match err {
-            err if err.is::<NetworkValidationError>() => WithErrorResponses::Error(
-                ErrorResponses::BadRequest(Json(ValidationError::new(err.to_string()))),
-            ),
+            err if err.is::<NetworkValidationError>() => {
+                WithErrorResponses::Error(ErrorResponses::BadRequest(Json(ValidationError::new(
+                    err.to_string(),
+                ))))
+            },
             err if err.is::<bb8::RunError<tokio_postgres::Error>>() => {
                 WithErrorResponses::Error(ErrorResponses::ServiceUnavailable)
             },
