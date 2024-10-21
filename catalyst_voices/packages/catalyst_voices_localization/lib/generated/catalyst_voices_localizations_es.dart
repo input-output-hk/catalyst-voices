@@ -852,6 +852,9 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get warning => 'Warning';
 
   @override
+  String get alert => 'Alert';
+
+  @override
   String get registrationExitConfirmDialogSubtitle => 'Account creation incomplete!';
 
   @override
@@ -967,4 +970,25 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get recoverAccount => 'Recover account';
+
+  @override
+  String get uploadConfirmDialogSubtitle => 'SWITCH TO FILE UPLOAD';
+
+  @override
+  String get uploadConfirmDialogContent => 'Do you want to cancel manual input, and switch to Catalyst key upload?';
+
+  @override
+  String get uploadConfirmDialogYesButton => 'Yes, switch to Catalyst key upload';
+
+  @override
+  String get uploadConfirmDialogResumeButton => 'Resume manual inputs';
+
+  @override
+  String get incorrectUploadDialogSubtitle => 'CATALYST KEY INCORRECT';
+
+  @override
+  String get incorrectUploadDialogContent => 'The Catalyst keychain that you entered or uploaded is incorrect, please try again.';
+
+  @override
+  String get incorrectUploadDialogTryAgainButton => 'Try again';
 }
