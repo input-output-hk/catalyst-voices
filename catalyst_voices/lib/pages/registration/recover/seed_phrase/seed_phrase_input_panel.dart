@@ -95,11 +95,11 @@ class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel> {
       words: words,
     );
 
-    if (isValid) {
+    if (!mounted) {
+      return;
+    } else if (isValid) {
       _controller.words = words;
     } else {
-      if (!mounted) return;
-
       final showUpload = await IncorrectSeedPhraseDialog.show(context);
       if (showUpload) {
         await _showUploadDialog();
