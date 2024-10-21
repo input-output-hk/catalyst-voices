@@ -1,8 +1,4 @@
-import 'package:catalyst_voices/widgets/snackbar/voices_snackbar.dart';
-import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
-import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
-import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -38,14 +34,15 @@ class GlobalSessionListener extends StatelessWidget {
   }
 
   void _onSessionChanged(BuildContext context, SessionState state) {
-    if (state is ActiveUserSessionState) {
+    // Note. Out of scope for MVE1
+    /*if (state is ActiveUserSessionState) {
       _onUnlockedKeychain(context);
     } else if (state is GuestSessionState) {
       _onLockedKeychain(context);
-    }
+    }*/
   }
 
-  void _onUnlockedKeychain(BuildContext context) {
+  /*void _onUnlockedKeychain(BuildContext context) {
     VoicesSnackBar(
       type: VoicesSnackBarType.success,
       behavior: SnackBarBehavior.floating,
@@ -63,5 +60,5 @@ class GlobalSessionListener extends StatelessWidget {
       title: context.l10n.lockSnackbarTitle,
       message: context.l10n.lockSnackbarMessage,
     ).show(context);
-  }
+  }*/
 }

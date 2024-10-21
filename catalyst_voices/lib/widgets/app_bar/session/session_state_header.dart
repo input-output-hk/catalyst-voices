@@ -1,7 +1,4 @@
-import 'dart:async';
-
 import 'package:catalyst_voices/pages/account/account_popup.dart';
-import 'package:catalyst_voices/routes/routing/account_route.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -19,10 +16,12 @@ class SessionStateHeader extends StatelessWidget {
         return switch (state) {
           VisitorSessionState() => const _VisitorButton(),
           GuestSessionState() => const _GuestButton(),
-          ActiveUserSessionState(:final user) => AccountPopup(
-              avatarLetter: user.acronym,
-              onLockAccountTap: () => _onLockAccount(context),
-              onProfileKeychainTap: () => _onSeeProfile(context),
+          ActiveUserSessionState(:final user) => IgnorePointer(
+              child: AccountPopup(
+                avatarLetter: user.acronym,
+                onLockAccountTap: () => _onLockAccount(context),
+                onProfileKeychainTap: () => _onSeeProfile(context),
+              ),
             ),
         };
       },
@@ -34,9 +33,10 @@ class SessionStateHeader extends StatelessWidget {
   }
 
   void _onSeeProfile(BuildContext context) {
-    unawaited(
-      const AccountRoute().push<void>(context),
-    );
+    // Note. Out of scope for MVE1
+    // unawaited(
+    //   const AccountRoute().push<void>(context),
+    // );
   }
 }
 

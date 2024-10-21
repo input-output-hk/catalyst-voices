@@ -1,6 +1,3 @@
-import 'dart:async';
-
-import 'package:catalyst_voices/pages/account/unlock_keychain_dialog.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
@@ -68,7 +65,10 @@ class _UnlockButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesFilledButton(
       trailing: VoicesAssets.icons.lockOpen.buildIcon(),
-      onTap: () => unawaited(UnlockKeychainDialog.show(context)),
+      onTap: () =>
+          context.read<SessionBloc>().add(const ActiveUserSessionEvent()),
+      // Note. Out of scope for MVE1
+      // onTap: () => unawaited(UnlockKeychainDialog.show(context)),
       child: Text(context.l10n.unlock),
     );
   }
