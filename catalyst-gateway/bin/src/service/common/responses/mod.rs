@@ -12,18 +12,12 @@ use poem_openapi::{
     ApiResponse,
 };
 
-use super::objects::{server_error::ServerError, validation_error::ValidationError};
-use crate::service::utilities::NetworkValidationError;
+use tracing::error;
+use super::objects::server_error::ServerError;
 
 /// Default error responses
 #[derive(ApiResponse)]
 pub(crate) enum ErrorResponses {
-    /// ## Content validation error.
-    ///
-    /// This error means that the request was malformed.
-    /// It has failed to pass validation, as specified by the `OpenAPI` schema.
-    #[oai(status = 400)]
-    BadRequest(Json<ValidationError>),
     /// ## Internal Server Error.
     ///
     /// An internal server error occurred.
@@ -50,22 +44,16 @@ pub(crate) enum WithErrorResponses<T> {
 }
 
 impl<T> WithErrorResponses<T> {
-    /// Handle a 5xx or 4xx response.
-    /// Returns a Server Error, a Bad Request or a Service Unavailable response.
+    /// Handle a 5xx response.
+    /// Returns a Server Error or a Service Unavailable response.
     pub(crate) fn handle_error(err: &anyhow::Error) -> Self {
         match err {
-            err if err.is::<NetworkValidationError>() => {
-                WithErrorResponses::Error(ErrorResponses::BadRequest(Json(ValidationError::new(
-                    err.to_string(),
-                ))))
-            },
             err if err.is::<bb8::RunError<tokio_postgres::Error>>() => {
                 WithErrorResponses::Error(ErrorResponses::ServiceUnavailable)
             },
             err => {
                 let error = crate::service::common::objects::server_error::ServerError::new(None);
-                let id = error.id();
-                tracing::error!(id = format!("{id}"), "{}", err);
+                error!(id=%error.id(), error=?err);
                 WithErrorResponses::Error(ErrorResponses::ServerError(Json(error)))
             },
         }
@@ -79,8 +67,6 @@ impl<T: ApiResponse> From<T> for WithErrorResponses<T> {
 }
 
 impl<T: ApiResponse> ApiResponse for WithErrorResponses<T> {
-    const BAD_REQUEST_HANDLER: bool = true;
-
     fn meta() -> MetaResponses {
         let t_meta = T::meta();
         let default_meta = ErrorResponses::meta();
@@ -106,12 +92,6 @@ impl<T: ApiResponse> ApiResponse for WithErrorResponses<T> {
     fn register(registry: &mut Registry) {
         ErrorResponses::register(registry);
         T::register(registry);
-    }
-
-    fn from_parse_request_error(err: poem::Error) -> Self {
-        Self::Error(ErrorResponses::BadRequest(Json(ValidationError::new(
-            err.to_string(),
-        ))))
     }
 }
 
