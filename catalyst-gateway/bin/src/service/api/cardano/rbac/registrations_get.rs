@@ -1,7 +1,7 @@
 //! Implementation of the GET `/rbac/registrations` endpoint.
-use anyhow::anyhow;
 use futures::StreamExt as _;
-use poem_openapi::{payload::Json, ApiResponse};
+use poem_openapi::{payload::Json, ApiResponse, Object};
+use tracing::error;
 
 use crate::{
     db::index::{
@@ -10,15 +10,28 @@ use crate::{
         },
         session::CassandraSession,
     },
-    service::common::responses::WithErrorResponses,
+    service::common::{
+        objects::{cardano::hash::Hash, validation_error::ValidationError},
+        responses::{ErrorResponses, WithErrorResponses},
+    },
 };
+
+/// GET RBAC registrations by chain root response list item.
+#[derive(Object)]
+pub(crate) struct ResponseItem {
+    /// Registration transaction hash.
+    tx_hash: Hash,
+}
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
 pub(crate) enum Responses {
     /// Success returns a list of registration transaction ids.
     #[oai(status = 200)]
-    Ok(Json<Vec<String>>),
+    Ok(Json<Vec<ResponseItem>>),
+    /// Internal server error.
+    #[oai(status = 500)]
+    InternalServerError,
 }
 
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
@@ -26,12 +39,14 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// Get chain root endpoint.
 pub(crate) async fn endpoint(chain_root: String) -> AllResponses {
     let Some(session) = CassandraSession::get(true) else {
-        return AllResponses::handle_error(&anyhow!("Failed to connect to database"));
+        error!("Failed to acquire db session");
+        return Responses::InternalServerError.into();
     };
 
-    let decoded_chain_root = match hex::decode(chain_root) {
-        Ok(s) => s,
-        Err(err) => return AllResponses::handle_error(&anyhow!(err)),
+    let Ok(decoded_chain_root) = hex::decode(chain_root) else {
+        return WithErrorResponses::Error(ErrorResponses::BadRequest(Json(ValidationError::new(
+            "bad chain root value".to_string(),
+        ))));
     };
 
     let query_res = GetRegistrationsByChainRootQuery::execute(
@@ -44,18 +59,29 @@ pub(crate) async fn endpoint(chain_root: String) -> AllResponses {
 
     let mut row_iter = match query_res {
         Ok(row_iter) => row_iter,
-        Err(err) => return AllResponses::handle_error(&anyhow!(err)),
+        Err(err) => {
+            error!(
+                error = ?err,
+                "Failed to execute get registrations by chain root query"
+            );
+            return Responses::InternalServerError.into();
+        },
     };
 
     let mut registrations = Vec::new();
     while let Some(row_res) = row_iter.next().await {
         let row = match row_res {
             Ok(row) => row,
-            Err(err) => return AllResponses::handle_error(&anyhow!(err)),
+            Err(err) => {
+                error!(error = ?err, "Failed to parse get registrations by chain root query row");
+                return Responses::InternalServerError.into();
+            },
         };
 
-        let tx_id = hex::encode(row.transaction_id);
-        registrations.push(tx_id);
+        let item = ResponseItem {
+            tx_hash: row.transaction_id.into(),
+        };
+        registrations.push(item);
     }
 
     Responses::Ok(Json(registrations)).into()

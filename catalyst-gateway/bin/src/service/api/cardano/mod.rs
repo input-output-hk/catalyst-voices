@@ -188,7 +188,7 @@ impl CardanoApi {
     }
 
     #[oai(
-        path = "/rbac/chain_root/:stake_address",
+        path = "/draft/rbac/chain_root/:stake_address",
         method = "get",
         operation_id = "rbacChainRootGet"
     )]
@@ -202,7 +202,7 @@ impl CardanoApi {
     }
 
     #[oai(
-        path = "/rbac/registrations/:chain_root",
+        path = "/draft/rbac/registrations/:chain_root",
         method = "get",
         operation_id = "rbacRegistrations"
     )]
@@ -210,13 +210,15 @@ impl CardanoApi {
     ///
     /// This endpoint returns the registrations for a given chain root
     async fn rbac_registrations_get(
-        &self, Path(chain_root): Path<String>,
+        &self,
+        #[oai(validator(max_length = 66, min_length = 64, pattern = "0x[0-9a-f]{64}"))]
+        Path(chain_root): Path<String>,
     ) -> rbac::registrations_get::AllResponses {
         rbac::registrations_get::endpoint(chain_root).await
     }
 
     #[oai(
-        path = "/rbac/role0_chain_root/:role0_key",
+        path = "/draft/rbac/role0_chain_root/:role0_key",
         method = "get",
         operation_id = "rbacRole0KeyChainRoot"
     )]
@@ -224,7 +226,9 @@ impl CardanoApi {
     ///
     /// This endpoint returns the RBAC certificate chain root for a given role 0 key.
     async fn rbac_role0_key_chain_root(
-        &self, Path(role0_key): Path<String>,
+        &self,
+        #[oai(validator(min_length = 34, max_length = 34, pattern = "0x[0-9a-f]{32}"))]
+        Path(role0_key): Path<String>,
     ) -> rbac::role0_chain_root_get::AllResponses {
         rbac::role0_chain_root_get::endpoint(role0_key).await
     }

@@ -1,7 +1,7 @@
 //! Implementation of the GET `/rbac/role0_chain_root` endpoint.
-use anyhow::anyhow;
 use futures::StreamExt as _;
-use poem_openapi::{payload::Json, ApiResponse};
+use poem_openapi::{payload::Json, ApiResponse, Object};
+use tracing::error;
 
 use crate::{
     db::index::{
@@ -10,18 +10,32 @@ use crate::{
         },
         session::CassandraSession,
     },
-    service::common::responses::WithErrorResponses,
+    service::common::{
+        objects::validation_error::ValidationError,
+        responses::{ErrorResponses, WithErrorResponses},
+    },
 };
+
+/// GET RBAC chain root response.
+#[derive(Object)]
+pub(crate) struct Response {
+    /// RBAC certificate chain root.
+    #[oai(validator(max_length = 66, min_length = 64, pattern = "0x[0-9a-f]{64}"))]
+    chain_root: String,
+}
 
 /// Endpoint responses.
 #[derive(ApiResponse)]
 pub(crate) enum Responses {
     /// Success returns the chain root hash.
     #[oai(status = 200)]
-    Ok(Json<String>),
+    Ok(Json<Response>),
     /// No chain root found for the given stake address.
     #[oai(status = 404)]
     NotFound,
+    /// Internal server error
+    #[oai(status = 500)]
+    InternalServerError,
 }
 
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
@@ -29,17 +43,22 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// Get chain root for role0 key endpoint.
 pub(crate) async fn endpoint(role0_key: String) -> AllResponses {
     let Some(session) = CassandraSession::get(true) else {
-        return AllResponses::handle_error(&anyhow!("Failed to connect to database"));
+        error!("Failed to acquire db session");
+        return Responses::InternalServerError.into();
     };
 
-    let decoded_role0_key = match hex::decode(role0_key) {
-        Ok(s) => s,
-        Err(err) => return AllResponses::handle_error(&anyhow!(err)),
+    let Ok(decoded_role0_key) = hex::decode(role0_key) else {
+        return WithErrorResponses::Error(ErrorResponses::BadRequest(Json(ValidationError::new(
+            "bad role0 key value".to_string(),
+        ))));
     };
 
-    let query_res = GetRole0ChainRootQuery::execute(&session, GetRole0ChainRootQueryParams {
-        role0_key: decoded_role0_key,
-    })
+    let query_res = GetRole0ChainRootQuery::execute(
+        &session,
+        GetRole0ChainRootQueryParams {
+            role0_key: decoded_role0_key,
+        },
+    )
     .await;
 
     match query_res {
@@ -47,15 +66,24 @@ pub(crate) async fn endpoint(role0_key: String) -> AllResponses {
             if let Some(row_res) = row_iter.next().await {
                 let row = match row_res {
                     Ok(row) => row,
-                    Err(err) => return AllResponses::handle_error(&anyhow!(err)),
+                    Err(err) => {
+                        error!(error = ?err, "Failed to parse get chain root by role0 key query row");
+                        return Responses::InternalServerError.into();
+                    },
                 };
 
-                let chain_root_hex = hex::encode(row.chain_root);
-                Responses::Ok(Json(chain_root_hex)).into()
+                let res = Response {
+                    chain_root: format!("0x{}", hex::encode(row.chain_root)),
+                };
+
+                Responses::Ok(Json(res)).into()
             } else {
                 Responses::NotFound.into()
             }
         },
-        Err(err) => AllResponses::handle_error(&err),
+        Err(err) => {
+            error!(error = ?err, "Failed to execute get chain root by role0 key query");
+            Responses::InternalServerError.into()
+        },
     }
 }
