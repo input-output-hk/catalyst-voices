@@ -891,6 +891,7 @@
     "description": "When user confirms password but it does not match original one."
   },
   "warning": "Warning",
+  "alert": "Alert",
   "registrationExitConfirmDialogSubtitle": "Account creation incomplete!",
   "registrationExitConfirmDialogContent": "If attempt to leave without creating your keychain - account creation will be incomplete. \u2028\u2028You are not able to login without \u2028completing your keychain.",
   "registrationExitConfirmDialogContinue": "Continue keychain creation",
@@ -958,5 +959,12 @@
   "recoverySuccessGoAccount": "Check my account",
   "recoveryExitConfirmDialogSubtitle": "12 word keychain restoration incomplete",
   "recoveryExitConfirmDialogContent": "Please continue your Catalyst Keychain restoration, if you cancel all input will be lost.",
-  "recoveryExitConfirmDialogContinue": "Continue recovery process"
+  "recoveryExitConfirmDialogContinue": "Continue recovery process",
+  "uploadConfirmDialogSubtitle": "SWITCH TO FILE UPLOAD",
+  "uploadConfirmDialogContent": "Do you want to cancel manual input, and switch to Catalyst key upload?",
+  "uploadConfirmDialogYesButton": "Yes, switch to Catalyst key upload",
+  "uploadConfirmDialogResumeButton": "Resume manual inputs",
+  "incorrectUploadDialogSubtitle": "CATALYST KEY INCORRECT",
+  "incorrectUploadDialogContent": "The Catalyst keychain that you entered or uploaded is incorrect, please try again.",
+  "incorrectUploadDialogTryAgainButton": "Try again"
 }
