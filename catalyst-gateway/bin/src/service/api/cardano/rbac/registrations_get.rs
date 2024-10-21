@@ -18,9 +18,17 @@ use crate::{
 
 /// GET RBAC registrations by chain root response list item.
 #[derive(Object)]
-pub(crate) struct ResponseItem {
+pub(crate) struct RbacRegistration {
     /// Registration transaction hash.
     tx_hash: Hash,
+}
+
+/// GET RBAC registrations by chain root response.
+#[derive(Object)]
+pub(crate) struct RbacRegistrationsResponse {
+    /// Registrations by RBAC chain root.
+    #[oai(validator(max_items = "100000"))]
+    registrations: Vec<RbacRegistration>,
 }
 
 /// Endpoint responses.
@@ -28,7 +36,7 @@ pub(crate) struct ResponseItem {
 pub(crate) enum Responses {
     /// Success returns a list of registration transaction ids.
     #[oai(status = 200)]
-    Ok(Json<Vec<ResponseItem>>),
+    Ok(Json<RbacRegistrationsResponse>),
     /// Internal server error.
     #[oai(status = 500)]
     InternalServerError,
@@ -78,11 +86,11 @@ pub(crate) async fn endpoint(chain_root: String) -> AllResponses {
             },
         };
 
-        let item = ResponseItem {
+        let item = RbacRegistration {
             tx_hash: row.transaction_id.into(),
         };
         registrations.push(item);
     }
 
-    Responses::Ok(Json(registrations)).into()
+    Responses::Ok(Json(RbacRegistrationsResponse { registrations })).into()
 }
