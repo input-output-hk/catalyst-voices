@@ -106,6 +106,7 @@ icudtl
 ideascale
 idents
 ilap
+IMEI
 Instantitation
 integ
 Intellij
@@ -122,8 +123,8 @@ Jörmungandr
 jsonschema
 junitreport
 junitxml
-Keyhash
 keychains
+Keyhash
 keyserver
 keyspace
 KUBECONFIG
