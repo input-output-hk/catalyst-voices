@@ -1,6 +1,6 @@
 //! Implementation of the GET `/registration` endpoint
 
-use poem_openapi::{payload::Json, ApiResponse};
+use poem_openapi::{payload::Json, ApiResponse, Object};
 
 use super::types::SlotNumber;
 use crate::service::{
@@ -16,7 +16,7 @@ use crate::service::{
 /// Endpoint responses
 #[derive(ApiResponse)]
 #[allow(dead_code)]
-pub(crate) enum Responses {
+enum Responses {
     /// The registration information for the stake address queried.
     #[oai(status = 200)]
     Ok(Json<RegistrationInfo>),
@@ -24,10 +24,21 @@ pub(crate) enum Responses {
     /// and provided slot number.
     #[oai(status = 404)]
     NotFound,
+    /// Bad request error
+    /// Network validation error
+    #[oai(status = 400)]
+    BadRequest(Json<BadRequestError>),
+}
+
+#[derive(Object, Default)]
+struct BadRequestError {
+    /// Error messages.
+    #[oai(validator(max_length = "999", pattern = "^[0-9a-zA-Z].*$"))]
+    error: String,
 }
 
 /// All responses
-pub(crate) type AllResponses = WithErrorResponses<Responses>;
+type AllResponses = WithErrorResponses<Responses>;
 
 /// # GET `/registration`
 #[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
@@ -38,7 +49,12 @@ pub(crate) async fn endpoint(
     let _stake_credential = stake_address.payload().as_hash().to_vec();
     let _network = match check_network(stake_address.network(), provided_network) {
         Ok(network) => network,
-        Err(err) => return AllResponses::handle_error(&err),
+        Err(err) => {
+            return Responses::BadRequest(Json(BadRequestError {
+                error: err.to_string(),
+            }))
+            .into();
+        },
     };
 
     let _unused = "
