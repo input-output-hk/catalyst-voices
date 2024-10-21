@@ -844,6 +844,12 @@ abstract class VoicesLocalizations {
   /// **'Password was not found. Make sure valid password was created.'**
   String get registrationUnlockPasswordNotFound;
 
+  /// Error message shown when connect wallet but matching was not found
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet not found'**
+  String get registrationWalletNotFound;
+
   /// A title on the role chooser screen in registration.
   ///
   /// In en, this message translates to:
@@ -1501,7 +1507,7 @@ abstract class VoicesLocalizations {
   /// No description provided for @createKeychainSeedPhraseCheckSuccessSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Enter your seed phrase to recover your Catalyst Keychain on any device.  It\'s kinda like your email and password all rolled into one, so keep it somewhere safe!  In the next step we’ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.'**
+  /// **'Enter your seed phrase to recover your Catalyst Keychain on any device.  It\'s kinda like your email and password all rolled into one, so keep it somewhere safe!  In the next step we\'ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.'**
   String get createKeychainSeedPhraseCheckSuccessSubtitle;
 
   /// No description provided for @yourNextStep.
@@ -1737,6 +1743,66 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.    But it can be a bit tedious to enter every single time you want to use the app.    In this next step, you\'ll set your Unlock Password for your current device. It\'s like a shortcut for proving ownership of your Keychain.    Whenever you recover your account for the first time on a new device, you\'ll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.'**
   String get recoveryUnlockPasswordInstructionsSubtitle;
+
+  /// The header label in unlock dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock Catalyst'**
+  String get unlockDialogHeader;
+
+  /// The title label in unlock dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back!'**
+  String get unlockDialogTitle;
+
+  /// The content (body) in unlock dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your device specific unlock password\nto unlock Catalyst Voices.'**
+  String get unlockDialogContent;
+
+  /// The hint for the unlock password field.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your Unlock password'**
+  String get unlockDialogHint;
+
+  /// An error message shown below the password field when the password is incorrect.
+  ///
+  /// In en, this message translates to:
+  /// **'Password is incorrect, try again.'**
+  String get unlockDialogIncorrectPassword;
+
+  /// The message shown when asking the user to login/unlock and the user wants to cancel the process.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue as guest'**
+  String get continueAsGuest;
+
+  /// The title shown in confirmation snackbar after unlocking the keychain.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst unlocked!'**
+  String get unlockSnackbarTitle;
+
+  /// The message shown below the title in confirmation snackbar after unlocking the keychain.
+  ///
+  /// In en, this message translates to:
+  /// **'You can now fully use the application.'**
+  String get unlockSnackbarMessage;
+
+  /// The title shown in confirmation snackbar after locking the keychain.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst locked'**
+  String get lockSnackbarTitle;
+
+  /// The message shown below the title in confirmation snackbar after locking the keychain.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst is now in guest/locked mode.'**
+  String get lockSnackbarMessage;
 
   /// No description provided for @recoverySuccessTitle.
   ///

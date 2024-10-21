@@ -42,13 +42,13 @@ E61E8EE7D77E9F7F9804E03EBC31B458
 '''
     .replaceAll('\n', '');
 
-void main() {
+Future<void> main() async {
   final rawBytes = hex.decode(derCertHex);
 
   // brotli
   final brotli = CatalystCompression.instance.brotli;
-  final brotliCompressed = brotli.compress(rawBytes);
-  final brotliDecompressed = brotli.decompress(brotliCompressed);
+  final brotliCompressed = await brotli.compress(rawBytes);
+  final brotliDecompressed = await brotli.decompress(brotliCompressed);
 
   assert(
     listEquals(rawBytes, brotliDecompressed),
@@ -57,8 +57,8 @@ void main() {
 
   // zstd
   final zstd = CatalystCompression.instance.zstd;
-  final zstdCompressed = zstd.compress(rawBytes);
-  final zstdDecompressed = zstd.decompress(zstdCompressed);
+  final zstdCompressed = await zstd.compress(rawBytes);
+  final zstdDecompressed = await zstd.decompress(zstdCompressed);
 
   assert(
     listEquals(rawBytes, zstdDecompressed),

@@ -1,18 +1,19 @@
 import 'dart:async';
 
-import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices/pages/registration/wallet_link/bloc_wallet_link_builder.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
+import 'package:catalyst_voices/widgets/common/infrastructure/voices_result_builder.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 import 'package:result_type/result_type.dart';
 
 /// Callback called when a [wallet] is selected.
-typedef _OnSelectWallet = Future<void> Function(CardanoWallet wallet);
+typedef _OnSelectWallet = Future<void> Function(WalletMetadata wallet);
 
 class SelectWalletPanel extends StatefulWidget {
   const SelectWalletPanel({
@@ -67,7 +68,7 @@ class _SelectWalletPanelState extends State<SelectWalletPanel> {
     unawaited(RegistrationCubit.of(context).walletLink.refreshWallets());
   }
 
-  Future<void> _onSelectWallet(CardanoWallet wallet) async {
+  Future<void> _onSelectWallet(WalletMetadata wallet) async {
     final registration = RegistrationCubit.of(context);
 
     final success = await registration.walletLink.selectWallet(wallet);
@@ -88,7 +89,7 @@ class _BlocWallets extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocWalletLinkBuilder<Result<List<CardanoWallet>, Exception>?>(
+    return BlocWalletLinkBuilder<Result<List<WalletMetadata>, Exception>?>(
       selector: (state) => state.wallets,
       builder: (context, state) {
         return _Wallets(
@@ -102,7 +103,7 @@ class _BlocWallets extends StatelessWidget {
 }
 
 class _Wallets extends StatelessWidget {
-  final Result<List<CardanoWallet>, Exception>? result;
+  final Result<List<WalletMetadata>, Exception>? result;
   final _OnSelectWallet onSelectWallet;
   final VoidCallback onRefreshTap;
 
@@ -114,18 +115,19 @@ class _Wallets extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return switch (result) {
-      Success(:final value) => value.isNotEmpty
-          ? _WalletsList(wallets: value, onSelectWallet: onSelectWallet)
+    return ResultBuilder(
+      result: result,
+      successBuilder: (context, wallets) => wallets.isNotEmpty
+          ? _WalletsList(wallets: wallets, onSelectWallet: onSelectWallet)
           : _WalletsEmpty(onRetry: onRefreshTap),
-      Failure() => _WalletsError(onRetry: onRefreshTap),
-      _ => const Center(child: VoicesCircularProgressIndicator()),
-    };
+      failureBuilder: (context, error) => _WalletsError(onRetry: onRefreshTap),
+      loadingBuilder: (context) => const _WalletsLoading(),
+    );
   }
 }
 
 class _WalletsList extends StatelessWidget {
-  final List<CardanoWallet> wallets;
+  final List<WalletMetadata> wallets;
   final _OnSelectWallet onSelectWallet;
 
   const _WalletsList({
@@ -148,7 +150,7 @@ class _WalletsList extends StatelessWidget {
 }
 
 class _WalletTile extends StatefulWidget {
-  final CardanoWallet wallet;
+  final WalletMetadata wallet;
   final _OnSelectWallet onSelectWallet;
 
   const _WalletTile({
@@ -226,6 +228,17 @@ class _WalletsError extends StatelessWidget {
           onRetry: onRetry,
         ),
       ),
+    );
+  }
+}
+
+class _WalletsLoading extends StatelessWidget {
+  const _WalletsLoading();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: VoicesCircularProgressIndicator(),
     );
   }
 }

@@ -1,6 +1,5 @@
 library catalyst_voices_models;
 
-export 'account/account_role.dart';
 export 'auth/authentication_status.dart';
 export 'auth/password_strength.dart';
 export 'document/document_json.dart';
@@ -17,9 +16,12 @@ export 'space.dart';
 export 'treasury/treasury_campaign_builder.dart';
 export 'treasury/treasury_campaign_segment.dart';
 export 'treasury/treasury_campaign_segment_step.dart';
+export 'user/account_role.dart';
+export 'user/profile.dart';
 export 'user/user.dart';
 export 'wallet/cardano_wallet_details.dart';
-export 'wallet/dummy_cardano_wallet.dart';
+export 'wallet/wallet_info.dart';
+export 'wallet/wallet_metadata.dart';
 export 'workspace/workspace_proposal_navigation.dart';
 export 'workspace/workspace_proposal_segment.dart';
 export 'workspace/workspace_proposal_segment_step.dart';

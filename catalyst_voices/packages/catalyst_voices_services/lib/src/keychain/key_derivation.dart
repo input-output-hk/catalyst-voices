@@ -3,10 +3,13 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:ed25519_hd_key/ed25519_hd_key.dart';
 
 /// Derives key pairs from a seed phrase.
-class KeyDerivation {
+final class KeyDerivation {
   /// Derives an [Ed25519KeyPair] from a [seedPhrase] and [path].
   ///
   /// Example [path]: m/0'/2147483647'
+  ///
+  // TODO(dtscalac): this takes around 2.5s to execute, optimize it
+  // or move to a JS web worker.
   Future<Ed25519KeyPair> deriveKeyPair({
     required SeedPhrase seedPhrase,
     required String path,
