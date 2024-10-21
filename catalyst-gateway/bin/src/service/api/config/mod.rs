@@ -60,7 +60,7 @@ impl ConfigApi {
             match Config::get(ConfigKey::FrontendForIp(ip)).await {
                 Ok(value) => Some(value),
                 Err(err) => {
-                    error!(id="get_config_frontend_ip", error=?err, "Failed to get frontend configuration for IP");
+                    error!(id="get_frontend_config_ip", error=?err, "Failed to get frontend configuration for IP");
                     return AllResponses::handle_error(&err);
                 },
             }
@@ -82,7 +82,7 @@ impl ConfigApi {
                 Responses::Ok(Json(response_config)).into()
             },
             Err(err) => {
-                error!(id="get_config_frontend_general", error=?err, "Failed to get general frontend configuration");
+                error!(id="get_frontend_config_general", error=?err, "Failed to get general frontend configuration");
                 AllResponses::handle_error(&err)
             },
         }
@@ -168,7 +168,7 @@ async fn set(key: ConfigKey, value: Value) -> AllResponses {
             }
         },
         Err(err) => {
-            error!(id="put_config_frontend", error=?err, "Failed to set frontend configuration");
+            error!(id="set_config_frontend", error=?err, "Failed to set frontend configuration");
             AllResponses::handle_error(&err)
         },
     }
