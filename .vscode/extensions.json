@@ -20,6 +20,8 @@
         "bbenoist.vagrant",
         "ms-kubernetes-tools.vscode-kubernetes-tools",
         "fill-labs.dependi",
-        "lawrencegrant.cql"
+        "lawrencegrant.cql",
+        "ldez.ignore-files",
+        "davidlday.languagetool-linter"
     ]
 }
