@@ -76,7 +76,7 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
       _selectedWallet = wallet;
 
       final walletHeader =
-          await registrationService.getCardanoWalletDetails(wallet);
+          await registrationService.getCardanoWalletInfo(wallet);
 
       final walletConnection = WalletConnectionData(
         name: walletHeader.metadata.name,

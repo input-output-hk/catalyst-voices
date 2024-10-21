@@ -49,7 +49,7 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState>
     LockSessionEvent event,
     Emitter<SessionState> emit,
   ) async {
-    if (await _keychain.hasLock) {
+    if (await _keychain._hasLock) {
       await _keychain.lock();
     }
     emit(const GuestSessionState());
@@ -83,7 +83,7 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState>
     GuestSessionEvent event,
     Emitter<SessionState> emit,
   ) async {
-    if (await _keychain.hasLock && !await _keychain.isUnlocked) {
+    if (await _keychain._hasLock && !await _keychain.isUnlocked) {
       await _keychain.unlock(_dummyUnlockFactor);
     }
 
@@ -100,7 +100,7 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState>
     ActiveUserSessionEvent event,
     Emitter<SessionState> emit,
   ) async {
-    if (await _keychain.hasLock && !await _keychain.isUnlocked) {
+    if (await _keychain._hasLock && !await _keychain.isUnlocked) {
       await _keychain.unlock(_dummyUnlockFactor);
     }
 
@@ -125,7 +125,7 @@ final class SessionBloc extends Bloc<SessionEvent, SessionState>
   User get _dummyUser {
     /* cSpell:disable */
     return User(
-      profile: Profile(
+      profile: Account(
         // walletInfo: WalletInfo(
         //   metadata: const WalletMetadata(
         //     name: 'Dummy Wallet',

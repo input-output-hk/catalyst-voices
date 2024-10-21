@@ -1,12 +1,7 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
-import 'package:catalyst_voices_services/src/storage/vault/vault.dart';
-import 'package:flutter/foundation.dart';
-
-// Note.
-// In future we may add MultiLockFactor for bio and password unlock factors
-
-/// Abstract representation of different factors that can lock [Vault] with.
+/// Abstract representation of different factors that can lock secure data.
 ///
 /// Most common is [PasswordLockFactor] which can be use as standalone factor.
 abstract interface class LockFactor {

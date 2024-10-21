@@ -131,7 +131,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       final keychain = _keychainCreationCubit.keychain!;
       final roles = _walletLinkCubit.roles;
 
-      final profile = Profile(roles: roles);
+      final profile = Account(roles: roles);
 
       await keychain.setProfile(profile);
       final key = await keychain.key();

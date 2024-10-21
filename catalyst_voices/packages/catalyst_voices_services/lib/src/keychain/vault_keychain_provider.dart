@@ -1,4 +1,3 @@
-import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/catalyst_voices_services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:logging/logging.dart';
@@ -7,36 +6,23 @@ final _logger = Logger('VaultKeychainProvider');
 
 final class VaultKeychainProvider implements KeychainProvider {
   final FlutterSecureStorage _secureStorage;
-  final KeyDerivation _keyDerivation;
 
   VaultKeychainProvider({
     FlutterSecureStorage secureStorage = const FlutterSecureStorage(),
-    required KeyDerivation keyDerivation,
-  })  : _secureStorage = secureStorage,
-        _keyDerivation = keyDerivation;
+  }) : _secureStorage = secureStorage;
 
   @override
-  Future<Keychain> create(
-    String id, {
-    required SeedPhrase seedPhrase,
-    required LockFactor lockFactor,
-  }) async {
+  Future<Keychain> create(String id) async {
     try {
       final Keychain keychain = VaultKeychain(
         id: id,
         secureStorage: _secureStorage,
-        keyDerivation: _keyDerivation,
       );
 
-      if (await keychain.hasSeed) {
-        _logger.warning('Overriding keychain[$id]');
+      if (!await keychain.isEmpty) {
+        _logger.warning('Overriding existing keychain[$id]');
         await keychain.clear();
       }
-
-      await keychain.setLock(lockFactor);
-      await keychain.unlock(lockFactor);
-      await keychain.seed(seedPhrase);
-      await keychain.lock();
 
       return keychain;
     } catch (_) {
@@ -58,12 +44,7 @@ final class VaultKeychainProvider implements KeychainProvider {
     final Keychain keychain = VaultKeychain(
       id: id,
       secureStorage: _secureStorage,
-      keyDerivation: _keyDerivation,
     );
-
-    if (!await keychain.hasSeed) {
-      throw StateError('$keychain does not have a seed');
-    }
 
     return keychain;
   }
@@ -76,19 +57,10 @@ final class VaultKeychainProvider implements KeychainProvider {
         .then((keys) => keys.where(VaultKeychain.isKeychainKey))
         .then((keys) => keys.map(VaultKeychain.getStorageId).toSet());
 
-    final keychains = keychainsIds.map((id) {
-      return VaultKeychain(
-        id: id,
-        secureStorage: _secureStorage,
-        keyDerivation: _keyDerivation,
-      );
-    }).toList();
-
-    for (final keychain in keychains) {
-      if (!await keychain.hasSeed) {
-        throw StateError('$keychain does not have a seed');
-      }
-    }
+    final keychains = keychainsIds
+        .map((id) => VaultKeychain(id: id, secureStorage: _secureStorage))
+        .cast<Keychain>()
+        .toList();
 
     return keychains;
   }

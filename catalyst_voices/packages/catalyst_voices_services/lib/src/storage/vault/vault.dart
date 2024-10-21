@@ -1,5 +1,5 @@
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/storage/storage.dart';
-import 'package:catalyst_voices_services/src/storage/vault/lock_factor.dart';
 
 /// Secure version of [Storage] where any read/write methods can take
 /// effect only when [isUnlocked] returns true.
@@ -10,8 +10,8 @@ abstract interface class Vault implements Storage {
   /// Returns true when have sufficient [LockFactor] from [unlock].
   Future<bool> get isUnlocked;
 
-  /// Returns whether currently have active lock from [setLock].
-  Future<bool> get hasLock;
+  // /// Returns whether currently have active lock from [setLock].
+  // Future<bool> get hasLock;
 
   /// Deletes unlockFactor if have any.
   Future<void> lock();

@@ -5,6 +5,7 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 
 // TODO(damian-molinski): remove once recover account is implemented
@@ -19,28 +20,48 @@ final _testNetAddress = ShelleyAddress.fromBech32(
 final class RegistrationService {
   final TransactionConfigRepository _transactionConfigRepository;
   final KeychainProvider _keychainProvider;
-
-  // final KeyDerivation _keyDerivation;
   final CatalystCardano _cardano;
+  final KeyDerivation _keyDerivation;
 
   const RegistrationService(
     this._transactionConfigRepository,
     this._keychainProvider,
     this._cardano,
+    this._keyDerivation,
   );
 
-  /// Initializes the keychain to store user registration data.
-  Future<Keychain> createKeychain({
+  /// Note. user is registered when transaction is beaning sent, here
+  /// we're saving data locally.
+  ///
+  /// We may save account after successful recovery.
+  Future<Account> saveAccount({
     required SeedPhrase seedPhrase,
     required LockFactor lockFactor,
+    required Set<AccountRole> roles,
+    required WalletInfo walletInfo,
   }) async {
-    final id = const Uuid().v4();
-
-    return _keychainProvider.create(
-      id,
+    final keychainId = const Uuid().v4();
+    final rootKey = await _keyDerivation.deriveAccountRoleKeyPair(
       seedPhrase: seedPhrase,
-      lockFactor: lockFactor,
+      // TODO(dtscalac): Only one roles is supported atm.
+      role: AccountRole.root,
     );
+
+    final keychain = await _keychainProvider.create(keychainId);
+    await keychain.setLock(lockFactor);
+    await keychain.unlock(lockFactor);
+
+    // TODO(dtscalac): Update key value when derivation is final.
+    await keychain.setRootKey(Uint8List.fromList(rootKey.privateKey.bytes));
+
+    final account = Account(
+      roles: roles,
+      walletInfo: walletInfo,
+    );
+
+    // TODO(damian-molinski): save account somewhere where session has access.
+
+    return account;
   }
 
   /// Returns the available cardano wallet extensions.
@@ -52,7 +73,7 @@ final class RegistrationService {
   ///
   /// This will trigger a permission popup from the wallet extension.
   /// Afterwards the user must grant a permission inside the wallet extension.
-  Future<WalletInfo> getCardanoWalletDetails(
+  Future<WalletInfo> getCardanoWalletInfo(
     CardanoWallet wallet,
   ) async {
     final enabledWallet = await wallet.enable();
@@ -70,13 +91,10 @@ final class RegistrationService {
   // Note. Returned type will be changed because we'll not be able to
   // get a wallet from backend just from seed phrase.
   // To be decided what data can we get from backend.
-  Future<
-      ({
-        Profile profile,
-        WalletInfo walletInfo,
-      })> recoverAccount(
-    SeedPhrase seedPhrase,
-  ) async {
+  Future<Account> recoverAccount({
+    required SeedPhrase seedPhrase,
+    required LockFactor lockFactor,
+  }) async {
     await Future<void>.delayed(const Duration(milliseconds: 200));
 
     final isSuccess = Random().nextBool();
@@ -84,17 +102,25 @@ final class RegistrationService {
       throw const RegistrationUnknownException();
     }
 
-    final profile = Profile(roles: {AccountRole.root});
     final walletInfo = WalletInfo(
       metadata: const WalletMetadata(name: 'Dummy Wallet'),
       balance: Coin.fromAda(10),
       address: _testNetAddress,
     );
 
-    return (
-      profile: profile,
+    final account = Account(
+      roles: {AccountRole.root},
       walletInfo: walletInfo,
     );
+
+    await saveAccount(
+      seedPhrase: seedPhrase,
+      lockFactor: lockFactor,
+      roles: account.roles,
+      walletInfo: walletInfo,
+    );
+
+    return account;
   }
 
   /// Builds an unsigned registration transaction from given parameters.
