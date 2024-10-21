@@ -18,7 +18,7 @@ use crate::{
 
 /// GET RBAC chain root response.
 #[derive(Object)]
-pub(crate) struct Response {
+pub(crate) struct RbacRole0ChainRootResponse {
     /// RBAC certificate chain root.
     #[oai(validator(max_length = 66, min_length = 64, pattern = "0x[0-9a-f]{64}"))]
     chain_root: String,
@@ -29,7 +29,7 @@ pub(crate) struct Response {
 pub(crate) enum Responses {
     /// Success returns the chain root hash.
     #[oai(status = 200)]
-    Ok(Json<Response>),
+    Ok(Json<RbacRole0ChainRootResponse>),
     /// No chain root found for the given stake address.
     #[oai(status = 404)]
     NotFound,
@@ -69,7 +69,7 @@ pub(crate) async fn endpoint(role0_key: String) -> AllResponses {
                     },
                 };
 
-                let res = Response {
+                let res = RbacRole0ChainRootResponse {
                     chain_root: format!("0x{}", hex::encode(row.chain_root)),
                 };
 
