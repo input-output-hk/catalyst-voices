@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_services/generated/catalyst_gateway/cat_gateway_api.enums.swagger.dart' as enums;
+import 'package:catalyst_voices_services/generated/catalyst_gateway/cat_gateway_api.enums.swagger.dart'
+    as enums;
 import 'package:catalyst_voices_services/generated/catalyst_gateway/cat_gateway_api.swagger.dart';
 import 'package:chopper/chopper.dart';
 import 'package:result_type/result_type.dart';
@@ -50,8 +51,10 @@ final class CatalystDataGatewayRepository {
   CatalystDataGatewayRepository(
     Uri baseUrl, {
     CatGatewayApi? catGatewayApiInstance,
-  }) : _catGatewayApi = catGatewayApiInstance ?? CatGatewayApi.create(
-    baseUrl: baseUrl,);
+  }) : _catGatewayApi = catGatewayApiInstance ??
+            CatGatewayApi.create(
+              baseUrl: baseUrl,
+            );
 
   Future<Result<void, NetworkErrors>> getHealthStarted() async {
     try {
@@ -86,8 +89,8 @@ final class CatalystDataGatewayRepository {
     int? slotNumber,
   }) async {
     try {
-      final stakeInfo = await _catGatewayApi.
-        apiDraftCardanoStakedAdaStakeAddressGet(
+      final stakeInfo =
+          await _catGatewayApi.apiDraftCardanoStakedAdaStakeAddressGet(
         stakeAddress: stakeAddress,
         network: network,
         slotNumber: slotNumber,
