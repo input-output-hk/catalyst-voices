@@ -16,7 +16,7 @@ use crate::service::{
 /// Endpoint responses
 #[derive(ApiResponse)]
 #[allow(dead_code)]
-enum Responses {
+pub(super) enum Responses {
     /// The registration information for the stake address queried.
     #[oai(status = 200)]
     Ok(Json<RegistrationInfo>),
@@ -27,18 +27,18 @@ enum Responses {
     /// Bad request error
     /// Network validation error
     #[oai(status = 400)]
-    BadRequest(Json<BadRequestError>),
+    BadRequest(Json<RegistrationGetBadRequest>),
 }
 
 #[derive(Object, Default)]
-struct BadRequestError {
+pub(super) struct RegistrationGetBadRequest {
     /// Error messages.
     #[oai(validator(max_length = "999", pattern = "^[0-9a-zA-Z].*$"))]
     error: String,
 }
 
 /// All responses
-type AllResponses = WithErrorResponses<Responses>;
+pub(super) type AllResponses = WithErrorResponses<Responses>;
 
 /// # GET `/registration`
 #[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
@@ -50,7 +50,7 @@ pub(crate) async fn endpoint(
     let _network = match check_network(stake_address.network(), provided_network) {
         Ok(network) => network,
         Err(err) => {
-            return Responses::BadRequest(Json(BadRequestError {
+            return Responses::BadRequest(Json(RegistrationGetBadRequest {
                 error: err.to_string(),
             }))
             .into();
