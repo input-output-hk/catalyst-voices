@@ -20,6 +20,7 @@ wallets.forEach(({ name, id, url }) => {
         test.beforeAll(async () => {
             // Download extension and import wallet into wallet extension
             test.setTimeout(300000);
+            
             extensionPath = await downloadExtension(id);
             browser = await chromium.launchPersistentContext('', {
                 headless: false, // extensions only work in headful mode
