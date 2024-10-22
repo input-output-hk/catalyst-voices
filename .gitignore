@@ -122,3 +122,4 @@ test-results/
 /blob-report/
 /playwright/.cache/
 extensions/
+catalyst_voices_packages/catalyst_cardano/catalyst_cardano/wallet-automation/.env

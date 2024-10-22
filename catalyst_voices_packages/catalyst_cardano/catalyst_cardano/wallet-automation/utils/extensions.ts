@@ -1,20 +1,32 @@
-export interface Extension {
-  Name: string,
+export interface BrowserExtension {
+  Name: BrowserExtensionName,
   Id: string
+  HomeUrl: string
 }
 
-export enum ExtensionName {
+export enum BrowserExtensionName {
   Lace = 'Lace',
   Typhon = 'Typhon'
 }
 
-const extensions: Extension[] = [
+export const browserExtensions: BrowserExtension[] = [
   { 
-    Name: ExtensionName.Lace,
-    Id: 'lace-id'
+    Name: BrowserExtensionName.Lace,
+    Id: 'gafhhkghbfjjkeiendhlofajokpaflmk',
+    HomeUrl: 'chrome-extension://gafhhkghbfjjkeiendhlofajokpaflmk/app.html#/setup'
+
   },
   {
-    Name: ExtensionName.Typhon,
-    Id: 'typhon-id'
+    Name: BrowserExtensionName.Typhon,
+    Id: 'kfdniefadaanbjodldohaedphafoffoh',
+    HomeUrl: 'chrome-extension://kfdniefadaanbjodldohaedphafoffoh/tab.html#/wallet/access/'
   }
 ];
+
+export const getBrowserExtension = (name: BrowserExtensionName): BrowserExtension => {
+  const extension = browserExtensions.find(extension => extension.Name === name);
+  if (!extension) {
+    throw new Error(`Browser extension with name ${name} not found`);
+  }
+  return extension;
+}

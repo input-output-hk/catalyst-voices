@@ -1,5 +1,0 @@
-# .txt file
-//WALLET1
-WALLET1_USERNAME=test123
-WALLET1_PASSWORD=test12345678@
-WALLET1_SEED_WORD=stomach,horn,rail,afraid,flip,also,abandon,speed,chaos,daring,soon,soft,okay,online,benefit

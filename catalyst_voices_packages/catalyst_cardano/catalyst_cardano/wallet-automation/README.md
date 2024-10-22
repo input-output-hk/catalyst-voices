@@ -1,6 +1,7 @@
 ## Introduction
 
-Wallet automation is a testing package in Playwright that automates the wallet creation process for the Catalyst project. It is a part of the Catalyst Voices ecosystem.
+Wallet automation is a testing package in Playwright that automates the wallet creation process for the Catalyst project. 
+It is a part of the Catalyst Voices ecosystem.
 
 ## Getting Started
 
@@ -32,8 +33,12 @@ earthly +package-app
 5. Use docker compose to run the app:
 
 ```sh
-docker-compose up
+docker compose up
 ```
 The app should be running on `localhost:8000`.
 
-6. You can now 
+6. You can now run tests with the following command:
+
+```sh
+npx playwright test
+```
