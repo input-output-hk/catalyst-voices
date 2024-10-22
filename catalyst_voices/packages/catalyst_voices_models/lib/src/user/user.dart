@@ -10,7 +10,7 @@ final class User extends Equatable {
   }) : accounts = [account];
 
   /// Just syntax sugar for [activeAccount].
-  Account get profile => activeAccount;
+  Account get account => activeAccount;
 
   // Note. At the moment we support only single profile Users but later
   // this may change and this implementation with it.

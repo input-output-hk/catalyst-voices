@@ -17,7 +17,7 @@ class CurrentUserStatusText extends StatelessWidget {
     final stateDesc = switch (sessionBloc.state) {
       VisitorSessionState() => 'visitor',
       GuestSessionState() => 'guest',
-      ActiveUserSessionState() => 'user',
+      ActiveAccountSessionState() => 'user',
     };
 
     return Text(

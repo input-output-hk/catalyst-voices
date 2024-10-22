@@ -23,15 +23,18 @@ final class GuestSessionState extends SessionState {
 }
 
 /// The user has registered and unlocked the keychain.
-final class ActiveUserSessionState extends SessionState {
-  const ActiveUserSessionState({
-    required this.user,
+final class ActiveAccountSessionState extends SessionState {
+  const ActiveAccountSessionState({
+    this.account,
+    required this.isDummyAccount,
   });
 
-  final User user;
+  final Account? account;
+  final bool isDummyAccount;
 
   @override
   List<Object?> get props => [
-        user,
+        account,
+        isDummyAccount,
       ];
 }

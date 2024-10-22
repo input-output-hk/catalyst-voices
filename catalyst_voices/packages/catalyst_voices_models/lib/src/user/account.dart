@@ -4,19 +4,22 @@ import 'package:equatable/equatable.dart';
 /// Defines singular account used by [User] (physical person).
 /// One [User] may have multiple [Account]'s.
 final class Account extends Equatable {
+  final String keychainId;
+  final Set<AccountRole> roles;
+  final WalletInfo walletInfo;
+
   const Account({
+    required this.keychainId,
     required this.roles,
     required this.walletInfo,
   });
-
-  final Set<AccountRole> roles;
-  final WalletInfo walletInfo;
 
   // Note. this is not defined yet what we will show here.
   String get acronym => 'A';
 
   @override
   List<Object?> get props => [
+        keychainId,
         roles,
         walletInfo,
       ];

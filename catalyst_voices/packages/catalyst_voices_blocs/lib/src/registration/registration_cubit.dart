@@ -23,15 +23,20 @@ final class RegistrationCubit extends Cubit<RegistrationState>
   final KeychainCreationCubit _keychainCreationCubit;
   final WalletLinkCubit _walletLinkCubit;
   final RecoverCubit _recoverCubit;
-  final RegistrationService registrationService;
+
+  final RegistrationService _registrationService;
+  final UserService _userService;
 
   Ed25519KeyPair? _keyPair;
   Transaction? _transaction;
 
   RegistrationCubit({
     required Downloader downloader,
-    required this.registrationService,
-  })  : _keychainCreationCubit = KeychainCreationCubit(
+    required RegistrationService registrationService,
+    required UserService userService,
+  })  : _registrationService = registrationService,
+        _userService = userService,
+        _keychainCreationCubit = KeychainCreationCubit(
           downloader: downloader,
         ),
         _walletLinkCubit = WalletLinkCubit(
@@ -137,12 +142,12 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       final wallet = _walletLinkCubit.selectedWallet!;
       final roles = _walletLinkCubit.roles;
 
-      final keyPair = await registrationService.deriveAccountRoleKeyPair(
+      final keyPair = await _registrationService.deriveAccountRoleKeyPair(
         seedPhrase: seedPhrase,
         roles: roles,
       );
 
-      final transaction = await registrationService.prepareRegistration(
+      final transaction = await _registrationService.prepareRegistration(
         wallet: wallet,
         // TODO(dtscalac): inject the networkId
         networkId: NetworkId.testnet,
@@ -192,7 +197,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       final wallet = _walletLinkCubit.selectedWallet!;
       final roles = _walletLinkCubit.roles;
 
-      final account = await registrationService.register(
+      final account = await _registrationService.register(
         wallet: wallet,
         unsignedTx: transaction,
         roles: roles,
@@ -200,6 +205,8 @@ final class RegistrationCubit extends Cubit<RegistrationState>
         // TODO(dtscalac): Update key value when derivation is final.
         rootKey: Uint8List.fromList(keyPair.privateKey.bytes),
       );
+
+      await _userService.switchTo(account: account);
 
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(

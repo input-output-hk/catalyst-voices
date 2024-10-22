@@ -66,7 +66,7 @@ class _UnlockKeychainDialogState extends State<UnlockKeychainDialog>
   }
 
   void _handleSessionChange(BuildContext context, SessionState state) {
-    if (state is ActiveUserSessionState) {
+    if (state is ActiveAccountSessionState) {
       Navigator.of(context).pop();
     }
   }

@@ -25,7 +25,7 @@ class SessionActionHeader extends StatelessWidget {
         return switch (state) {
           VisitorSessionState() => _GetStartedButton(onTap: onGetStartedTap),
           GuestSessionState() => const _UnlockButton(),
-          ActiveUserSessionState() => const _LockButton(),
+          ActiveAccountSessionState() => const _LockButton(),
         };
       },
     );

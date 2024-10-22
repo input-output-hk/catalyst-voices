@@ -17,6 +17,7 @@ dependencies:
     path: ../catalyst_voices_repositories
   chopper: ^7.2.0
   convert: ^3.1.1
+  equatable: ^2.0.5
   cryptography: ^2.7.0
   ed25519_hd_key: ^2.3.0
   flutter:

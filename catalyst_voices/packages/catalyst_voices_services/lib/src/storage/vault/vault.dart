@@ -10,8 +10,7 @@ abstract interface class Vault implements Storage {
   /// Returns true when have sufficient [LockFactor] from [unlock].
   Future<bool> get isUnlocked;
 
-  // /// Returns whether currently have active lock from [setLock].
-  // Future<bool> get hasLock;
+  Stream<bool> get watchIsUnlocked;
 
   /// Deletes unlockFactor if have any.
   Future<void> lock();

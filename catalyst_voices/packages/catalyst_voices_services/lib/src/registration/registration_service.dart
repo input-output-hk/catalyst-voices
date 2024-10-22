@@ -99,6 +99,7 @@ final class RegistrationService {
 
     // Note. with rootKey query backend for account details.
     final account = Account(
+      keychainId: keychainId,
       roles: roles,
       walletInfo: WalletInfo(
         metadata: const WalletMetadata(name: 'Dummy Wallet'),
@@ -192,6 +193,7 @@ final class RegistrationService {
       final address = await enabledWallet.getChangeAddress();
 
       final account = Account(
+        keychainId: keychainId,
         roles: roles,
         walletInfo: WalletInfo(
           metadata: WalletMetadata.fromCardanoWallet(wallet),

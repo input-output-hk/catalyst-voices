@@ -51,7 +51,7 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
   Widget build(BuildContext context) {
     final sessionBloc = context.watch<SessionBloc>();
     final isVisitor = sessionBloc.state is VisitorSessionState;
-    final isUnlocked = sessionBloc.state is ActiveUserSessionState;
+    final isUnlocked = sessionBloc.state is ActiveAccountSessionState;
 
     return CallbackShortcuts(
       bindings: <ShortcutActivator, VoidCallback>{

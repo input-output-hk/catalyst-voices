@@ -6,6 +6,7 @@ import 'package:catalyst_voices_services/src/crypto/crypto_service.dart';
 import 'package:catalyst_voices_services/src/crypto/vault_crypto_service.dart';
 import 'package:catalyst_voices_services/src/storage/storage_string_mixin.dart';
 import 'package:catalyst_voices_services/src/storage/vault/vault.dart';
+import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -14,12 +15,15 @@ final _keyRegExp = RegExp(r'(\w+)\.(\w+)\.(\w+)');
 
 /// Implementation of [Vault] that uses [FlutterSecureStorage] as
 /// facade for read/write operations.
-base class SecureStorageVault with StorageAsStringMixin implements Vault {
+base class SecureStorageVault
+    with StorageAsStringMixin, EquatableMixin
+    implements Vault {
   final String id;
   final FlutterSecureStorage _secureStorage;
   final CryptoService _cryptoService;
 
-  bool _isUnlocked = false;
+  final _isUnlockedSC = StreamController<bool>.broadcast();
+  bool __isUnlocked = false;
 
   /// Check if given [value] belongs to any [SecureStorageVault].
   static bool isStorageKey(String value) {
@@ -68,6 +72,15 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
 
   String get _instanceKeyPrefix => '$_keyPrefix.$id';
 
+  bool get _isUnlocked => __isUnlocked;
+
+  set _isUnlocked(bool value) {
+    if (__isUnlocked != value) {
+      __isUnlocked = value;
+      _isUnlockedSC.add(value);
+    }
+  }
+
   Future<Uint8List?> get _lock async {
     final effectiveKey = buildKey(_lockKey);
     final encodedLock = await _secureStorage.read(key: effectiveKey);
@@ -89,6 +102,12 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
 
   @override
   Future<bool> get isUnlocked => Future(() => _isUnlocked);
+
+  @override
+  Stream<bool> get watchIsUnlocked async* {
+    yield _isUnlocked;
+    yield* _isUnlockedSC.stream;
+  }
 
   @override
   Future<void> lock() async {
@@ -243,4 +262,7 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   void _erase(Uint8List list) {
     list.fillRange(0, list.length, 0);
   }
+
+  @override
+  List<Object?> get props => [id];
 }

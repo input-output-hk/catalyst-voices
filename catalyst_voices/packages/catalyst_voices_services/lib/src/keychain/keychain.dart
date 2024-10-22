@@ -2,14 +2,14 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/foundation.dart';
 
 // TODO(damian-molinski): Extract lockable interface.
-// TODO(damian-molinski): UserService / UserStorage.
-// TODO(damian-molinski): RegistrationProgressStorage.
 abstract interface class Keychain {
   String get id;
 
   Future<bool> get isEmpty;
 
   Future<bool> get isUnlocked;
+
+  Stream<bool> get watchIsUnlocked;
 
   Future<KeychainMetadata> get metadata;
 
