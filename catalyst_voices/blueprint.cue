@@ -9,8 +9,19 @@ project: {
 			values: {
 				environment: name: "dev"
 				frontend: image: {
-					tag: _ @env(name="GIT_IMAGE_TAG",type="string")
+					tag: _ @forge(name="GIT_COMMIT_HASH")
 				}
+			}
+		}
+	}
+	release: {
+		docker: {
+			on: {
+				merge: {}
+				tag: {}
+			}
+			config: {
+				tag: _ @forge(name="GIT_COMMIT_HASH")
 			}
 		}
 	}
