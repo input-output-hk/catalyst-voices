@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches: [main]
-    tags: ['*']
+    tags: ['**']
   pull_request:
 
 permissions:
@@ -14,11 +14,11 @@ permissions:
 
 jobs:
   ci:
-    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.1.0
+    uses: input-output-hk/catalyst-forge/.github/workflows/ci.yml@ci/v1.2.1
     with:
-      forge_version: 0.2.1
+      forge_version: 0.4.0
 
   test_reporting:
     if: always()
     needs: ci
-    uses: input-output-hk/catalyst-voices/.github/workflows/generate-allure-report.yml@main
+    uses: ./.github/workflows/generate-allure-report.yml
