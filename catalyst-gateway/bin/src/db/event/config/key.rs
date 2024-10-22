@@ -6,6 +6,8 @@ use jsonschema::{BasicOutput, Validator};
 use serde_json::{json, Value};
 use tracing::error;
 
+use crate::{db::utilities::update_refs, service::api_spec};
+
 /// Configuration key
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) enum ConfigKey {
@@ -24,9 +26,18 @@ impl Display for ConfigKey {
     }
 }
 
-/// Frontend schema.
-static FRONTEND_SCHEMA: LazyLock<Value> =
-    LazyLock::new(|| load_json_lazy(include_str!("jsonschema/frontend.json")));
+/// Frontend schema from API specification.
+pub(crate) static FRONTEND_SCHEMA: LazyLock<Value> = LazyLock::new(|| {
+    let base_json = api_spec();
+    let config_json = api_spec()
+        .get("components")
+        .and_then(|components| components.get("schemas"))
+        .and_then(|schemas| schemas.get("FrontendConfig"))
+        .cloned()
+        .unwrap_or_default();
+
+    update_refs(&config_json, &base_json)
+});
 
 /// Frontend schema validator.
 static FRONTEND_SCHEMA_VALIDATOR: LazyLock<Validator> =
