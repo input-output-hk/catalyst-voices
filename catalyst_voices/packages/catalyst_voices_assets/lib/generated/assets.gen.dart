@@ -1203,6 +1203,10 @@ class $AssetsImagesGen {
   SvgGenImage get fallbackLogoIcon =>
       const SvgGenImage('assets/images/fallback_logo_icon.svg');
 
+  /// File path: assets/images/key_incorrect.webp
+  AssetGenImage get keyIncorrect =>
+      const AssetGenImage('assets/images/key_incorrect.webp');
+
   /// File path: assets/images/keychain.svg
   SvgGenImage get keychain => const SvgGenImage('assets/images/keychain.svg');
 
@@ -1285,6 +1289,7 @@ class $AssetsImagesGen {
         facebookMono,
         fallbackLogo,
         fallbackLogoIcon,
+        keyIncorrect,
         keychain,
         linkedin,
         linkedinMono,
