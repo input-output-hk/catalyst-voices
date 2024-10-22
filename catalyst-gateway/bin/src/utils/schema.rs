@@ -1,5 +1,32 @@
-//! Utility functions
+//! Utility functions for JSON schema processing
+
+use std::sync::LazyLock;
+
 use serde_json::{json, Value};
+
+use crate::service::api_spec;
+
+/// JSON schema version
+pub(crate) const SCHEMA_VERSION: &str = "https://json-schema.org/draft/2020-12/schema";
+
+/// Get the `OpenAPI` specification
+pub(crate) static OPENAPI_SPEC: LazyLock<Value> = LazyLock::new(api_spec);
+
+/// Extract a JSON schema from `schema_name`
+pub(crate) fn extract_json_schema_for(schema_name: &str) -> Value {
+    let schema = OPENAPI_SPEC
+        .get("components")
+        .and_then(|components| components.get("schemas"))
+        .and_then(|schemas| schemas.get(schema_name))
+        .cloned()
+        .unwrap_or_default();
+
+    // JSON schema not found, return an empty JSON object
+    if schema.is_null() {
+        return json!({});
+    }
+    update_refs(&schema, &OPENAPI_SPEC)
+}
 
 /// Function to resolve a `$ref` in the JSON schema
 pub(crate) fn update_refs(example: &Value, base: &Value) -> Value {
@@ -74,7 +101,11 @@ pub(crate) fn update_refs(example: &Value, base: &Value) -> Value {
             }
         }
     }
-    json!(merge_json(&updated_schema, &definitions))
+
+    // Add schema version
+    let j = merge_json(&updated_schema, &json!( { "$schema": SCHEMA_VERSION } ));
+    // Merge the definitions with the updated schema
+    json!(merge_json(&j, &definitions))
 }
 
 /// Merge 2 JSON objects.
@@ -129,7 +160,7 @@ fn extract_ref(ref_str: &str) -> Vec<String> {
 mod test {
     use serde_json::{json, Value};
 
-    use crate::db::utilities::update_refs;
+    use crate::utils::schema::{extract_json_schema_for, update_refs};
 
     #[test]
     fn test_update_refs() {
@@ -189,7 +220,23 @@ mod test {
         });
 
         let schema = update_refs(&example_json, &base_json);
-        println!("{schema:?}");
         assert!(schema.get("definitions").unwrap().get("Props").is_some());
+    }
+
+    #[test]
+    fn test_extract_json_schema_for_frontend_config() {
+        let schema = extract_json_schema_for("FrontendConfig");
+        println!("{schema}");
+        assert!(schema.get("type").is_some());
+        assert!(schema.get("properties").is_some());
+        assert!(schema.get("description").is_some());
+        assert!(schema.get("definitions").is_some());
+        assert!(schema.get("$schema").is_some());
+    }
+
+    #[test]
+    fn test_extract_json_schema_for_frontend_config_no_data() {
+        let schema = extract_json_schema_for("test");
+        assert!(schema.is_object());
     }
 }
