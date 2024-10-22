@@ -20,7 +20,7 @@ pub(crate) struct ConfigApi;
 #[derive(Object, Default, serde::Deserialize)]
 struct FrontendConfig {
     /// Sentry properties.
-    sentry: Sentry,
+    sentry: Option<Sentry>,
 }
 
 /// Frontend configuration for Sentry
@@ -31,10 +31,10 @@ struct Sentry {
     dsn: String,
     /// A version of the code deployed to an environment.
     #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
-    release: String,
+    release: Option<String>,
     /// The environment in which the application is running, e.g., 'dev', 'qa'.
     #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
-    environment: String,
+    environment: Option<String>,
 }
 
 /// Get configuration endpoint responses.
