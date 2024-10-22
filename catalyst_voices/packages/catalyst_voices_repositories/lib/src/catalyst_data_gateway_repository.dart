@@ -1,8 +1,7 @@
 import 'dart:async';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_services/generated/catalyst_gateway/cat_gateway_api.enums.swagger.dart'
-    as enums;
+import 'package:catalyst_voices_services/generated/catalyst_gateway/cat_gateway_api.enums.swagger.dart' as enums;
 import 'package:catalyst_voices_services/generated/catalyst_gateway/cat_gateway_api.swagger.dart';
 import 'package:chopper/chopper.dart';
 import 'package:result_type/result_type.dart';
@@ -51,12 +50,12 @@ final class CatalystDataGatewayRepository {
   CatalystDataGatewayRepository(
     Uri baseUrl, {
     CatGatewayApi? catGatewayApiInstance,
-  }) : _catGatewayApi =
-            catGatewayApiInstance ?? CatGatewayApi.create(baseUrl: baseUrl);
+  }) : _catGatewayApi = catGatewayApiInstance ?? CatGatewayApi.create(
+    baseUrl: baseUrl,);
 
   Future<Result<void, NetworkErrors>> getHealthStarted() async {
     try {
-      final heathStarted = await _catGatewayApi.apiHealthStartedGet();
+      final heathStarted = await _catGatewayApi.apiV1HealthStartedGet();
       return _emptyBodyOrThrow(heathStarted);
     } on ChopperHttpException catch (error) {
       return Failure(_getNetworkError(error.response.statusCode));
@@ -65,7 +64,7 @@ final class CatalystDataGatewayRepository {
 
   Future<Result<void, NetworkErrors>> getHealthReady() async {
     try {
-      final heathReady = await _catGatewayApi.apiHealthReadyGet();
+      final heathReady = await _catGatewayApi.apiV1HealthReadyGet();
       return _emptyBodyOrThrow(heathReady);
     } on ChopperHttpException catch (error) {
       return Failure(_getNetworkError(error.response.statusCode));
@@ -74,7 +73,7 @@ final class CatalystDataGatewayRepository {
 
   Future<Result<void, NetworkErrors>> getHealthLive() async {
     try {
-      final healthLive = await _catGatewayApi.apiHealthLiveGet();
+      final healthLive = await _catGatewayApi.apiV1HealthLiveGet();
       return _emptyBodyOrThrow(healthLive);
     } on ChopperHttpException catch (error) {
       return Failure(_getNetworkError(error.response.statusCode));
@@ -87,7 +86,8 @@ final class CatalystDataGatewayRepository {
     int? slotNumber,
   }) async {
     try {
-      final stakeInfo = await _catGatewayApi.apiCardanoStakedAdaStakeAddressGet(
+      final stakeInfo = await _catGatewayApi.
+        apiDraftCardanoStakedAdaStakeAddressGet(
         stakeAddress: stakeAddress,
         network: network,
         slotNumber: slotNumber,
@@ -102,7 +102,7 @@ final class CatalystDataGatewayRepository {
     enums.Network network = enums.Network.mainnet,
   }) async {
     try {
-      final syncState = await _catGatewayApi.apiCardanoSyncStateGet(
+      final syncState = await _catGatewayApi.apiDraftCardanoSyncStateGet(
         network: network,
       );
       return Success(syncState.bodyOrThrow);

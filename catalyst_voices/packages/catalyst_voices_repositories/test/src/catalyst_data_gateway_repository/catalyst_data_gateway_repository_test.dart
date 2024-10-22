@@ -2,8 +2,7 @@ import 'dart:io';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/src/catalyst_data_gateway_repository.dart';
-import 'package:catalyst_voices_services/generated/catalyst_gateway/cat_gateway_api.enums.swagger.dart'
-    as enums;
+import 'package:catalyst_voices_services/generated/catalyst_gateway/cat_gateway_api.enums.swagger.dart' as enums;
 import 'package:catalyst_voices_services/generated/catalyst_gateway/cat_gateway_api.swagger.dart';
 import 'package:chopper/chopper.dart' as chopper;
 import 'package:http/http.dart' as http;
@@ -21,16 +20,17 @@ class FakeCatGatewayApi<T> extends Fake implements CatGatewayApi {
   FakeCatGatewayApi(this.response);
 
   @override
-  Future<chopper.Response<dynamic>> apiHealthStartedGet() async => response;
+  Future<chopper.Response<dynamic>> apiV1HealthStartedGet() async => response;
 
   @override
-  Future<chopper.Response<dynamic>> apiHealthReadyGet() async => response;
+  Future<chopper.Response<dynamic>> apiV1HealthReadyGet() async => response;
 
   @override
-  Future<chopper.Response<dynamic>> apiHealthLiveGet() async => response;
+  Future<chopper.Response<dynamic>> apiV1HealthLiveGet() async => response;
 
   @override
-  Future<chopper.Response<FullStakeInfo>> apiCardanoStakedAdaStakeAddressGet({
+  Future<chopper.Response<FullStakeInfo>> 
+    apiDraftCardanoStakedAdaStakeAddressGet({
     required String? stakeAddress,
     enums.Network? network,
     int? slotNumber,
@@ -38,7 +38,7 @@ class FakeCatGatewayApi<T> extends Fake implements CatGatewayApi {
       response as chopper.Response<FullStakeInfo>;
 
   @override
-  Future<chopper.Response<SyncState>> apiCardanoSyncStateGet({
+  Future<chopper.Response<SyncState>> apiDraftCardanoSyncStateGet({
     enums.Network? network,
   }) async =>
       response as chopper.Response<SyncState>;
@@ -145,8 +145,8 @@ void main() {
     });
 
     // cspell: disable
-    const validStakeAddress =
-        'stake1uyehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gh6ffgw';
+    const validStakeAddress = 
+      'stake1uyehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gh6ffgw';
     // cspell: enable
     const notValidStakeAddress = 'stake1wrong1stake';
 
@@ -222,8 +222,8 @@ void main() {
     });
 
     test('getCardanoSyncState success', () async {
-      const blockHash =
-          '0x0000000000000000000000000000000000000000000000000000000000000000';
+      const blockHash = 
+        '0x0000000000000000000000000000000000000000000000000000000000000000';
 
       final syncState = SyncState(
         slotNumber: 5,
