@@ -11,8 +11,8 @@ use poem_openapi::{
     registry::{MetaResponse, MetaResponses, Registry},
     ApiResponse,
 };
-
 use tracing::error;
+
 use super::objects::server_error::ServerError;
 
 /// Default error responses
