@@ -127,7 +127,7 @@ pub(crate) async fn get_latest_registration_from_stake_addr(
 
     let Some(session) = CassandraSession::get(persistent) else {
         error!(
-            id="get_latest_registration_from_stake_addr",
+            id = "get_latest_registration_from_stake_addr",
             "Failed to acquire db session"
         );
         return ResponseSingleRegistration::NotFound.into();
@@ -278,7 +278,7 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
 
     let Some(session) = CassandraSession::get(persistent) else {
         error!(
-            id="get_latest_registration_from_stake_key_hash_db_session",
+            id = "get_latest_registration_from_stake_key_hash_db_session",
             "Failed to acquire db session"
         );
         return ResponseSingleRegistration::NotFound.into();
@@ -379,7 +379,7 @@ pub(crate) async fn get_associated_vote_key_registrations(
 
     let Some(session) = CassandraSession::get(persistent) else {
         error!(
-            id="get_associated_vote_key_registrations_db_session",
+            id = "get_associated_vote_key_registrations_db_session",
             "Failed to acquire db session"
         );
         return ResponseMultipleRegistrations::NotFound.into();
@@ -417,22 +417,20 @@ pub(crate) async fn get_associated_vote_key_registrations(
 
         // We have the stake addr associated with vote key, now get all registrations with the
         // stake addr.
-        let registrations = match get_all_registrations_from_stake_addr(
-            session.clone(),
-            row.stake_address.clone(),
-        )
-        .await
-        {
-            Ok(registration) => registration,
-            Err(err) => {
-                error!(
-                    id="get_associated_vote_key_registrations_get_registrations_for_stake_addr",
-                    error=?err,
-                    "Failed to obtain registrations for given stake addr",
-                );
-                return ResponseMultipleRegistrations::NotFound.into();
-            },
-        };
+        let registrations =
+            match get_all_registrations_from_stake_addr(session.clone(), row.stake_address.clone())
+                .await
+            {
+                Ok(registration) => registration,
+                Err(err) => {
+                    error!(
+                        id="get_associated_vote_key_registrations_get_registrations_for_stake_addr",
+                        error=?err,
+                        "Failed to obtain registrations for given stake addr",
+                    );
+                    return ResponseMultipleRegistrations::NotFound.into();
+                },
+            };
 
         // check registrations (stake addrs) are still actively associated with the voting key,
         // and have not been registered to another voting key.
