@@ -38,8 +38,6 @@ Add the following line at the end of `<head>` section in web/index.html:
 
 TODO(dtscalac): update example
 
-```
-
 ## Support
 
 Post issues and feature requests on the GitHub [issue tracker](https://github.com/input-output-hk/catalyst-voices/issues).
