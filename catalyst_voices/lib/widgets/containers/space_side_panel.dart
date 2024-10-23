@@ -24,7 +24,7 @@ class SpaceSidePanelTab {
 /// be used together with [SpaceScaffold].
 ///
 /// Always have [name], [tabs] and tabs content [SpaceSidePanelTab.body].
-class SpaceSidePanel extends StatelessWidget {
+class SpaceSidePanel extends StatefulWidget {
   final bool isLeft;
   final String name;
   final VoidCallback? onCollapseTap;
@@ -43,35 +43,100 @@ class SpaceSidePanel extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    return _Container(
-      margin: margin,
-      borderRadius: isLeft
-          ? const BorderRadius.horizontal(right: Radius.circular(16))
-          : const BorderRadius.horizontal(left: Radius.circular(16)),
-      child: DefaultTabController(
-        length: tabs.length,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _Header(
-              name: name,
-              onCollapseTap: onCollapseTap,
-              isLeft: isLeft,
-            ),
-            _Tabs(
-              tabs,
-              controller: tabController,
-            ),
-            const SizedBox(height: 12),
-            TabBarStackView(
-              controller: tabController,
-              children: tabs.map((e) => e.body).toList(),
-            ),
-            const SizedBox(height: 12),
-          ],
-        ),
+  State<SpaceSidePanel> createState() => _SpaceSidePanelState();
+}
+
+class _SpaceSidePanelState extends State<SpaceSidePanel>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<Offset> _offsetAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+
+    _offsetAnimation = Tween<Offset>(
+      begin: Offset.zero,
+      end: widget.isLeft ? const Offset(-1, 0) : const Offset(1, 0),
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOut,
       ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        if (widget.isLeft)
+          Positioned(
+            top: 28,
+            left: 24,
+            child: RightArrowButton(
+              onTap: () {
+                _controller.reverse();
+              },
+            ),
+          )
+        else
+          Positioned(
+            top: 28,
+            right: 16,
+            child: LeftArrowButton(
+              onTap: () {
+                _controller.reverse();
+              },
+            ),
+          ),
+        SlideTransition(
+          position: _offsetAnimation,
+          child: _Container(
+            margin: widget.margin,
+            borderRadius: widget.isLeft
+                ? const BorderRadius.horizontal(right: Radius.circular(16))
+                : const BorderRadius.horizontal(left: Radius.circular(16)),
+            child: DefaultTabController(
+              length: widget.tabs.length,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _Header(
+                    name: widget.name,
+                    onCollapseTap: () {
+                      _controller.forward();
+                      widget.onCollapseTap?.call();
+                    },
+                    isLeft: widget.isLeft,
+                  ),
+                  _Tabs(
+                    widget.tabs,
+                    controller: widget.tabController,
+                  ),
+                  const SizedBox(height: 12),
+                  TabBarStackView(
+                    controller: widget.tabController,
+                    children: widget.tabs.map((e) => e.body).toList(),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
