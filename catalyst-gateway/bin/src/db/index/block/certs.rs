@@ -251,7 +251,7 @@ impl CertInsertQuery {
 
     /// Index the certificates in a transaction.
     pub(crate) fn index(
-        &mut self, txs: &pallas::ledger::traverse::MultiEraTx<'_>, slot_no: u64, txn: i16,
+        &mut self, txs: &pallas::ledger::traverse::MultiEraTxWithRawAuxiliary<'_>, slot_no: u64, txn: i16,
         block: &MultiEraBlock,
     ) {
         #[allow(clippy::match_same_arms)]
