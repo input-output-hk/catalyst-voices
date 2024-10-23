@@ -7,7 +7,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Manages the user session.
-final class SessionBloc extends Cubit<SessionState> with BlocErrorEmitterMixin {
+final class SessionCubit extends Cubit<SessionState>
+    with BlocErrorEmitterMixin {
   final UserService _userService;
   final RegistrationService _registrationService;
   final RegistrationProgressNotifier _registrationProgressNotifier;
@@ -25,7 +26,7 @@ final class SessionBloc extends Cubit<SessionState> with BlocErrorEmitterMixin {
     'erase bacon tone install universe',
   );
 
-  SessionBloc(
+  SessionCubit(
     this._userService,
     this._registrationService,
     this._registrationProgressNotifier,

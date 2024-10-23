@@ -30,8 +30,8 @@ final class Dependencies extends DependencyProvider {
           authenticationRepository: get(),
         ),
       )
-      ..registerLazySingleton<SessionBloc>(() {
-        return SessionBloc(
+      ..registerLazySingleton<SessionCubit>(() {
+        return SessionCubit(
           get<UserService>(),
           get<RegistrationService>(),
           get<RegistrationProgressNotifier>(),

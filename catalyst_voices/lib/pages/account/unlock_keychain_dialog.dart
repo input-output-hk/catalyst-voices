@@ -30,7 +30,7 @@ class UnlockKeychainDialog extends StatefulWidget {
 }
 
 class _UnlockKeychainDialogState extends State<UnlockKeychainDialog>
-    with ErrorHandlerStateMixin<SessionBloc, UnlockKeychainDialog> {
+    with ErrorHandlerStateMixin<SessionCubit, UnlockKeychainDialog> {
   final TextEditingController _passwordController = TextEditingController();
   LocalizedException? _error;
 
@@ -72,7 +72,7 @@ class _UnlockKeychainDialogState extends State<UnlockKeychainDialog>
     final password = _passwordController.text;
     final unlockFactor = PasswordLockFactor(password);
 
-    final unlocked = await context.read<SessionBloc>().unlock(unlockFactor);
+    final unlocked = await context.read<SessionCubit>().unlock(unlockFactor);
 
     if (unlocked && mounted) {
       Navigator.of(context).pop();

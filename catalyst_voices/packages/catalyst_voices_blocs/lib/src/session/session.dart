@@ -1,2 +1,2 @@
-export 'session_bloc.dart';
+export 'session_cubit.dart';
 export 'session_state.dart';

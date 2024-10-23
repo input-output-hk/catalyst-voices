@@ -48,7 +48,7 @@ class SpacesShellPage extends StatefulWidget {
 class _SpacesShellPageState extends State<SpacesShellPage> {
   @override
   Widget build(BuildContext context) {
-    final sessionBloc = context.watch<SessionBloc>();
+    final sessionBloc = context.watch<SessionCubit>();
     final isVisitor = sessionBloc.state is VisitorSessionState;
     final isUnlocked = sessionBloc.state is ActiveAccountSessionState;
 

@@ -18,7 +18,7 @@ class GlobalSessionListener extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<SessionBloc, SessionState>(
+    return BlocListener<SessionCubit, SessionState>(
       listenWhen: _listenToSessionChangesWhen,
       listener: _onSessionChanged,
       child: child,

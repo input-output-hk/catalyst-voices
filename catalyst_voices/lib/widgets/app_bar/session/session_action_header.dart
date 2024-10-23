@@ -18,7 +18,7 @@ class SessionActionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SessionBloc, SessionState>(
+    return BlocBuilder<SessionCubit, SessionState>(
       builder: (context, state) {
         return switch (state) {
           VisitorSessionState(:final isRegistrationInProgress) =>
@@ -64,7 +64,7 @@ class _LockButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return VoicesIconButton.filled(
       style: const ButtonStyle(shape: WidgetStatePropertyAll(CircleBorder())),
-      onTap: () => unawaited(context.read<SessionBloc>().lock()),
+      onTap: () => unawaited(context.read<SessionCubit>().lock()),
       child: VoicesAssets.icons.lockClosed.buildIcon(),
     );
   }

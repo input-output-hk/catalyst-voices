@@ -14,7 +14,7 @@ class SessionStateHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SessionBloc, SessionState>(
+    return BlocBuilder<SessionCubit, SessionState>(
       builder: (context, state) {
         return switch (state) {
           VisitorSessionState() => const _VisitorButton(),
@@ -30,7 +30,7 @@ class SessionStateHeader extends StatelessWidget {
   }
 
   void _onLockAccount(BuildContext context) {
-    unawaited(context.read<SessionBloc>().lock());
+    unawaited(context.read<SessionCubit>().lock());
   }
 
   void _onSeeProfile(BuildContext context) {

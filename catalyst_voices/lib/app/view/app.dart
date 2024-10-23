@@ -44,7 +44,7 @@ class _AppState extends State<App> {
       BlocProvider<LoginBloc>(
         create: (_) => Dependencies.instance.get<LoginBloc>(),
       ),
-      BlocProvider<SessionBloc>(
+      BlocProvider<SessionCubit>(
         create: (_) => Dependencies.instance.get(),
       ),
     ];
