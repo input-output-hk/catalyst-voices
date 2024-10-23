@@ -209,4 +209,35 @@ final class RegistrationService {
       throw const RegistrationTransactionException();
     }
   }
+
+  Future<Account> registerTestAccount({
+    required String keychainId,
+    required SeedPhrase seedPhrase,
+    required LockFactor lockFactor,
+  }) async {
+    final roles = {AccountRole.root};
+    final keyPair = await deriveAccountRoleKeyPair(
+      seedPhrase: seedPhrase,
+      roles: roles,
+    );
+    // TODO(dtscalac): Update key value when derivation is final.
+    final rootKey = Uint8List.fromList(keyPair.privateKey.bytes);
+
+    final keychain = await _keychainProvider.create(keychainId);
+    await keychain.setLock(lockFactor);
+    await keychain.unlock(lockFactor);
+    await keychain.setRootKey(rootKey);
+
+    final account = Account(
+      keychainId: keychainId,
+      roles: roles,
+      walletInfo: WalletInfo(
+        metadata: const WalletMetadata(name: 'Dummy Wallet'),
+        balance: Coin.fromAda(10),
+        address: _testNetAddress,
+      ),
+    );
+
+    return account;
+  }
 }

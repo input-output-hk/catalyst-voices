@@ -8,6 +8,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 /// Manages the user session.
 final class SessionBloc extends Cubit<SessionState> with BlocErrorEmitterMixin {
   final UserService _userService;
+  final RegistrationService _registrationService;
 
   final _logger = Logger('SessionBloc');
 
@@ -15,15 +16,16 @@ final class SessionBloc extends Cubit<SessionState> with BlocErrorEmitterMixin {
   bool _isUnlocked = false;
   Account? _account;
 
-  static const String dummyKeychainId = 'TestUserKeychainID';
+  final String _dummyKeychainId = 'TestUserKeychainID';
   static const LockFactor dummyUnlockFactor = PasswordLockFactor('Test1234');
-  static final dummySeedPhrase = SeedPhrase.fromMnemonic(
+  final _dummySeedPhrase = SeedPhrase.fromMnemonic(
     'few loyal swift champion rug peace dinosaur '
     'erase bacon tone install universe',
   );
 
   SessionBloc(
     this._userService,
+    this._registrationService,
   ) : super(const VisitorSessionState()) {
     _userService.watchKeychain
         .map((keychain) => keychain != null)
@@ -44,6 +46,16 @@ final class SessionBloc extends Cubit<SessionState> with BlocErrorEmitterMixin {
 
   Future<void> lock() async {
     await _userService.keychain!.lock();
+  }
+
+  Future<void> switchToDummyUser() async {
+    final account = await _registrationService.registerTestAccount(
+      keychainId: _dummyKeychainId,
+      seedPhrase: _dummySeedPhrase,
+      lockFactor: dummyUnlockFactor,
+    );
+
+    await _userService.switchTo(account: account);
   }
 
   void _onHasKeychainChanged(bool hasKeychain) {
@@ -85,7 +97,7 @@ final class SessionBloc extends Cubit<SessionState> with BlocErrorEmitterMixin {
     emit(
       ActiveAccountSessionState(
         account: account,
-        isDummyAccount: account?.keychainId == dummyKeychainId,
+        isDummyAccount: account?.keychainId == _dummyKeychainId,
       ),
     );
   }
