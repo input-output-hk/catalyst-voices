@@ -78,7 +78,8 @@ final class VaultKeychain extends SecureStorageVault implements Keychain {
   }
 
   Future<KeychainMetadata?> _readMetadata() async {
-    final encoded = await readUnguarded(key: _metadataKey);
+    final key = buildKey(_metadataKey);
+    final encoded = await secureStorage.read(key: key);
     if (encoded == null) {
       return null;
     }
@@ -88,10 +89,11 @@ final class VaultKeychain extends SecureStorageVault implements Keychain {
   }
 
   Future<void> _writeMetadata(KeychainMetadata value) async {
+    final key = buildKey(_metadataKey);
     final decoded = value.toJson();
     final encoded = json.encode(decoded);
 
-    await writeUnguarded(encoded, key: _metadataKey);
+    await secureStorage.write(key: key, value: encoded);
   }
 
   KeychainMetadata _newMetadata() {

@@ -19,7 +19,8 @@ base class SecureStorageVault
     with StorageAsStringMixin, EquatableMixin
     implements Vault {
   final String id;
-  final FlutterSecureStorage _secureStorage;
+  @protected
+  final FlutterSecureStorage secureStorage;
   final CryptoService _cryptoService;
 
   final _isUnlockedSC = StreamController<bool>.broadcast();
@@ -65,10 +66,9 @@ base class SecureStorageVault
 
   SecureStorageVault({
     required this.id,
-    FlutterSecureStorage secureStorage = const FlutterSecureStorage(),
+    this.secureStorage = const FlutterSecureStorage(),
     CryptoService? cryptoService,
-  })  : _secureStorage = secureStorage,
-        _cryptoService = cryptoService ?? VaultCryptoService();
+  }) : _cryptoService = cryptoService ?? VaultCryptoService();
 
   String get _instanceKeyPrefix => '$_keyPrefix.$id';
 
@@ -83,7 +83,7 @@ base class SecureStorageVault
 
   Future<Uint8List?> get _lock async {
     final effectiveKey = buildKey(_lockKey);
-    final encodedLock = await _secureStorage.read(key: effectiveKey);
+    final encodedLock = await secureStorage.read(key: effectiveKey);
     return encodedLock != null ? base64.decode(encodedLock) : null;
   }
 
@@ -97,7 +97,7 @@ base class SecureStorageVault
 
   Future<bool> get _hasLock {
     final effectiveKey = buildKey(_lockKey);
-    return _secureStorage.containsKey(key: effectiveKey);
+    return secureStorage.containsKey(key: effectiveKey);
   }
 
   @override
@@ -142,7 +142,7 @@ base class SecureStorageVault
 
     final effectiveLockKey = buildKey(_lockKey);
 
-    await _secureStorage.write(key: effectiveLockKey, value: encodedKey);
+    await secureStorage.write(key: effectiveLockKey, value: encodedKey);
   }
 
   @protected
@@ -151,7 +151,7 @@ base class SecureStorageVault
   @override
   Future<bool> contains({required String key}) async {
     final effectiveKey = buildKey(key);
-    return _secureStorage.containsKey(key: effectiveKey);
+    return secureStorage.containsKey(key: effectiveKey);
   }
 
   @override
@@ -167,12 +167,12 @@ base class SecureStorageVault
 
   @override
   Future<void> clear() async {
-    final all = await _secureStorage.readAll();
+    final all = await secureStorage.readAll();
     final vaultKeys =
         List.of(all.keys).where((key) => key.startsWith(_instanceKeyPrefix));
 
     for (final key in vaultKeys) {
-      await _secureStorage.delete(key: key);
+      await secureStorage.delete(key: key);
     }
   }
 
@@ -181,27 +181,11 @@ base class SecureStorageVault
   /// Returns value assigned to [key]. May return null if not found for [key].
   Future<String?> _guardedRead({
     required String key,
-  }) {
-    return _ensureUnlocked().then((_) => readUnguarded(key: key));
-  }
-
-  /// Allows operation only when [isUnlocked] it true, otherwise non op.
-  ///
-  ///   * When [value] is non null writes it to [key].
-  ///   * When [value] is null then [key] value is deleted.
-  Future<void> _guardedWrite(
-    String? value, {
-    required String key,
-  }) {
-    return _ensureUnlocked().then((_) => writeUnguarded(value, key: key));
-  }
-
-  @protected
-  Future<String?> readUnguarded({
-    required String key,
   }) async {
+    await _ensureUnlocked();
+
     final effectiveKey = buildKey(key);
-    final encryptedData = await _secureStorage.read(key: effectiveKey);
+    final encryptedData = await secureStorage.read(key: effectiveKey);
     if (encryptedData == null) {
       return null;
     }
@@ -214,15 +198,20 @@ base class SecureStorageVault
     return decrypted;
   }
 
-  @protected
-  Future<void> writeUnguarded(
+  /// Allows operation only when [isUnlocked] it true, otherwise non op.
+  ///
+  ///   * When [value] is non null writes it to [key].
+  ///   * When [value] is null then [key] value is deleted.
+  Future<void> _guardedWrite(
     String? value, {
     required String key,
   }) async {
+    await _ensureUnlocked();
+
     final effectiveKey = buildKey(key);
 
     if (value == null) {
-      await _secureStorage.delete(key: effectiveKey);
+      await secureStorage.delete(key: effectiveKey);
       return;
     }
 
@@ -231,7 +220,7 @@ base class SecureStorageVault
 
     _erase(lock);
 
-    await _secureStorage.write(key: effectiveKey, value: encryptedData);
+    await secureStorage.write(key: effectiveKey, value: encryptedData);
   }
 
   Future<void> _ensureUnlocked() async {
