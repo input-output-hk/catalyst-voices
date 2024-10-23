@@ -10,6 +10,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 final class SessionBloc extends Cubit<SessionState> with BlocErrorEmitterMixin {
   final UserService _userService;
   final RegistrationService _registrationService;
+  final RegistrationProgressNotifier _registrationProgressNotifier;
 
   final _logger = Logger('SessionBloc');
 
@@ -27,7 +28,8 @@ final class SessionBloc extends Cubit<SessionState> with BlocErrorEmitterMixin {
   SessionBloc(
     this._userService,
     this._registrationService,
-  ) : super(const VisitorSessionState()) {
+    this._registrationProgressNotifier,
+  ) : super(const VisitorSessionState(isRegistrationInProgress: false)) {
     _userService.watchKeychain
         .map((keychain) => keychain != null)
         .distinct()
@@ -37,6 +39,8 @@ final class SessionBloc extends Cubit<SessionState> with BlocErrorEmitterMixin {
         .transform(KeychainToUnlockTransformer())
         .distinct()
         .listen(_onActiveKeychainUnlockChanged);
+
+    _registrationProgressNotifier.addListener(_onRegistrationProgressChanged);
 
     _userService.watchAccount.listen(_onActiveAccountChanged);
   }
@@ -92,13 +96,18 @@ final class SessionBloc extends Cubit<SessionState> with BlocErrorEmitterMixin {
     _updateState();
   }
 
+  void _onRegistrationProgressChanged() {
+    _updateState();
+  }
+
   void _updateState() {
     final hasKeychain = _hasKeychain;
     final isUnlocked = _isUnlocked;
     final account = _account;
 
     if (!hasKeychain) {
-      emit(const VisitorSessionState());
+      final isEmpty = _registrationProgressNotifier.value.isEmpty;
+      emit(VisitorSessionState(isRegistrationInProgress: !isEmpty));
       return;
     }
 

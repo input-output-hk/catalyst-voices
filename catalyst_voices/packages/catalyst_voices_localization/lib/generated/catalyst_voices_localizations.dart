@@ -1839,6 +1839,12 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Continue recovery process'**
   String get recoveryExitConfirmDialogContinue;
+
+  /// No description provided for @finishAccountCreation.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish account creation'**
+  String get finishAccountCreation;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

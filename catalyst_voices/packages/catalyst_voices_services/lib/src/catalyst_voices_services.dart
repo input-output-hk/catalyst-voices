@@ -5,6 +5,7 @@ export 'keychain/keychain_provider.dart';
 export 'keychain/keychain_transformers.dart';
 export 'keychain/vault_keychain.dart';
 export 'keychain/vault_keychain_provider.dart';
+export 'registration/registration_progress_notifier.dart';
 export 'registration/registration_service.dart';
 export 'registration/registration_transaction_builder.dart';
 export 'storage/dummy_auth_storage.dart';

@@ -34,6 +34,7 @@ final class Dependencies extends DependencyProvider {
         return SessionBloc(
           get<UserService>(),
           get<RegistrationService>(),
+          get<RegistrationProgressNotifier>(),
         );
       })
       // Factory will rebuild it each time needed
@@ -42,6 +43,7 @@ final class Dependencies extends DependencyProvider {
           downloader: get<Downloader>(),
           userService: get<UserService>(),
           registrationService: get<RegistrationService>(),
+          progressNotifier: get<RegistrationProgressNotifier>(),
         );
       });
   }
@@ -67,6 +69,9 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<Downloader>(Downloader.new);
     registerLazySingleton<CatalystCardano>(() => CatalystCardano.instance);
     registerLazySingleton<UserStorage>(SecureUserStorage.new);
+    registerLazySingleton<RegistrationProgressNotifier>(
+      RegistrationProgressNotifier.new,
+    );
     registerLazySingleton<RegistrationService>(() {
       return RegistrationService(
         get<TransactionConfigRepository>(),

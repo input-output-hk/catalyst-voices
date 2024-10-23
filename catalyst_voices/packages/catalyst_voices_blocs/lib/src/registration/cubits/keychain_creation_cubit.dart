@@ -31,12 +31,15 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
     with BlocErrorEmitterMixin, UnlockPasswordMixin
     implements KeychainCreationManager {
   final Downloader _downloader;
+  final RegistrationProgressNotifier _progressNotifier;
 
   SeedPhrase? _seedPhrase;
 
   KeychainCreationCubit({
     required Downloader downloader,
+    required RegistrationProgressNotifier progressNotifier,
   })  : _downloader = downloader,
+        _progressNotifier = progressNotifier,
         super(const KeychainStateData());
 
   SeedPhrase? get seedPhrase => _seedPhrase;
@@ -49,6 +52,12 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
     if (state.seedPhraseStateData != newValue) {
       emit(state.copyWith(seedPhraseStateData: newValue));
     }
+  }
+
+  void recoverSeedPhrase(SeedPhrase value) {
+    _seedPhrase = value;
+    setSeedPhraseStored(true);
+    setUserSeedPhraseWords(value.mnemonicWords);
   }
 
   @override
@@ -74,12 +83,15 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
     final seedPhrase = _seedPhrase;
     final seedPhraseWords = seedPhrase?.mnemonicWords;
 
-    final areUserWordsCorrect =
-        seedPhraseWords != null && listEquals(seedPhraseWords, words);
+    final matches = listEquals(seedPhraseWords, words);
+
+    _progressNotifier.value = _progressNotifier.value.copyWith(
+      seedPhrase: matches ? Optional(seedPhrase) : const Optional.empty(),
+    );
 
     _seedPhraseStateData = _seedPhraseStateData.copyWith(
       userWords: words,
-      areUserWordsCorrect: areUserWordsCorrect,
+      areUserWordsCorrect: matches,
     );
   }
 
@@ -119,12 +131,21 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
 
   @override
   void onUnlockPasswordStateChanged(UnlockPasswordState data) {
+    _progressNotifier.value = _progressNotifier.value.copyWith(
+      password: data.isNextEnabled
+          ? Optional(data.password.value)
+          : const Optional.empty(),
+    );
     emit(state.copyWith(unlockPasswordState: data));
   }
 
   void _buildSeedPhrase() {
     final seedPhrase = SeedPhrase();
     _seedPhrase = seedPhrase;
+
+    _progressNotifier.value = _progressNotifier.value.copyWith(
+      seedPhrase: kDebugMode ? Optional(seedPhrase) : const Optional.empty(),
+    );
 
     _seedPhraseStateData = _seedPhraseStateData.copyWith(
       seedPhraseWords: seedPhrase.mnemonicWords,

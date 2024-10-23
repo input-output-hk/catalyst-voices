@@ -8,10 +8,16 @@ sealed class SessionState extends Equatable {
 
 /// The user hasn't registered yet nor setup the keychain.
 final class VisitorSessionState extends SessionState {
-  const VisitorSessionState();
+  final bool isRegistrationInProgress;
+
+  const VisitorSessionState({
+    required this.isRegistrationInProgress,
+  });
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [
+        isRegistrationInProgress,
+      ];
 }
 
 /// The user has registered the keychain but it's locked.
@@ -24,11 +30,11 @@ final class GuestSessionState extends SessionState {
 
 /// The user has registered and unlocked the keychain.
 final class ActiveAccountSessionState extends SessionState {
+  final Account? account;
+
   const ActiveAccountSessionState({
     this.account,
   });
-
-  final Account? account;
 
   @override
   List<Object?> get props => [

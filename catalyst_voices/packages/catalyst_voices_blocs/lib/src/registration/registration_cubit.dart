@@ -26,18 +26,28 @@ final class RegistrationCubit extends Cubit<RegistrationState>
 
   final UserService _userService;
   final RegistrationService _registrationService;
+  final RegistrationProgressNotifier _progressNotifier;
 
   Ed25519KeyPair? _keyPair;
   Transaction? _transaction;
+
+  /// Returns [RegistrationCubit] if found in widget tree. Does not add
+  /// rebuild dependency when called.
+  static RegistrationCubit of(BuildContext context) {
+    return context.read<RegistrationCubit>();
+  }
 
   RegistrationCubit({
     required Downloader downloader,
     required UserService userService,
     required RegistrationService registrationService,
+    required RegistrationProgressNotifier progressNotifier,
   })  : _registrationService = registrationService,
         _userService = userService,
+        _progressNotifier = progressNotifier,
         _keychainCreationCubit = KeychainCreationCubit(
           downloader: downloader,
+          progressNotifier: progressNotifier,
         ),
         _walletLinkCubit = WalletLinkCubit(
           registrationService: registrationService,
@@ -73,18 +83,35 @@ final class RegistrationCubit extends Cubit<RegistrationState>
 
   RegistrationStateData get _registrationState => state.registrationStateData;
 
-  /// Returns [RegistrationCubit] if found in widget tree. Does not add
-  /// rebuild dependency when called.
-  static RegistrationCubit of(BuildContext context) {
-    return context.read<RegistrationCubit>();
-  }
-
   @override
   Future<void> close() {
     _keychainCreationCubit.close();
     _walletLinkCubit.close();
     _recoverCubit.close();
     return super.close();
+  }
+
+  void recoverProgress() {
+    final progress = _progressNotifier.value;
+    final seedPhrase = progress.seedPhrase;
+    final password = progress.password;
+
+    if (seedPhrase != null) {
+      _keychainCreationCubit.recoverSeedPhrase(seedPhrase);
+    }
+
+    if (password != null) {
+      _keychainCreationCubit.recoverPassword(password);
+    }
+
+    if (seedPhrase != null && password == null) {
+      const stage = CreateKeychainStage.unlockPasswordInstructions;
+      _goToStep(const CreateKeychainStep(stage: stage));
+    }
+
+    if (seedPhrase != null && password != null) {
+      _goToStep(const FinishAccountCreationStep());
+    }
   }
 
   void createNewKeychain() {
@@ -95,6 +122,8 @@ final class RegistrationCubit extends Cubit<RegistrationState>
   }
 
   void recoverKeychain() {
+    _progressNotifier.clear();
+
     unawaited(recover.checkLocalKeychains());
 
     _goToStep(const RecoverMethodStep());
@@ -208,6 +237,8 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       );
 
       await _userService.switchToAccount(account);
+
+      _progressNotifier.clear();
 
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(

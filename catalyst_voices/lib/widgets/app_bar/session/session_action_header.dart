@@ -21,7 +21,10 @@ class SessionActionHeader extends StatelessWidget {
     return BlocBuilder<SessionBloc, SessionState>(
       builder: (context, state) {
         return switch (state) {
-          VisitorSessionState() => const _GetStartedButton(),
+          VisitorSessionState(:final isRegistrationInProgress) =>
+            isRegistrationInProgress
+                ? const _FinishRegistrationButton()
+                : const _GetStartedButton(),
           GuestSessionState() => const _UnlockButton(),
           ActiveAccountSessionState() => const _LockButton(),
         };
@@ -38,6 +41,18 @@ class _GetStartedButton extends StatelessWidget {
     return VoicesFilledButton(
       onTap: () => unawaited(RegistrationDialog.show(context)),
       child: Text(context.l10n.getStarted),
+    );
+  }
+}
+
+class _FinishRegistrationButton extends StatelessWidget {
+  const _FinishRegistrationButton();
+
+  @override
+  Widget build(BuildContext context) {
+    return VoicesFilledButton(
+      onTap: () => unawaited(RegistrationDialog.show(context)),
+      child: Text(context.l10n.finishAccountCreation),
     );
   }
 }
