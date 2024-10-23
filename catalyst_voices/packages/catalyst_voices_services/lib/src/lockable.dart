@@ -14,7 +14,7 @@ abstract interface class Lockable {
   /// from [setLock].
   Future<bool> unlock(LockFactor unlock);
 
-  /// Sets [LockFactor] that which prevents read/write on this [Vault]
+  /// Sets [LockFactor] that which prevents read/write on this [Lockable]
   /// unless unlocked with matching [LockFactor] via [unlock].
   Future<void> setLock(LockFactor lock);
 }
