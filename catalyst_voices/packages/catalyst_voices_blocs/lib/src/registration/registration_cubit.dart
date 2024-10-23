@@ -43,6 +43,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
           registrationService: registrationService,
         ),
         _recoverCubit = RecoverCubit(
+          userService: userService,
           registrationService: registrationService,
         ),
         super(const RegistrationState()) {
@@ -206,7 +207,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
         rootKey: Uint8List.fromList(keyPair.privateKey.bytes),
       );
 
-      await _userService.switchTo(account: account);
+      await _userService.switchToAccount(account);
 
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(

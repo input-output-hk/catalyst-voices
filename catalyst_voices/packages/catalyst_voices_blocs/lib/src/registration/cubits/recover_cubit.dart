@@ -23,13 +23,16 @@ abstract interface class RecoverManager implements UnlockPasswordManager {
 final class RecoverCubit extends Cubit<RecoverStateData>
     with BlocErrorEmitterMixin, UnlockPasswordMixin
     implements RecoverManager {
+  final UserService _userService;
   final RegistrationService _registrationService;
 
   SeedPhrase? _seedPhrase;
 
   RecoverCubit({
+    required UserService userService,
     required RegistrationService registrationService,
-  })  : _registrationService = registrationService,
+  })  : _userService = userService,
+        _registrationService = registrationService,
         super(const RecoverStateData()) {
     /// pre-populate all available words
     emit(state.copyWith(seedPhraseWords: SeedPhrase.wordList));
@@ -80,6 +83,8 @@ final class RecoverCubit extends Cubit<RecoverStateData>
         seedPhrase: seedPhrase,
         lockFactor: lockFactor,
       );
+
+      await _userService.switchToAccount(account);
 
       final walletInfo = account.walletInfo;
 

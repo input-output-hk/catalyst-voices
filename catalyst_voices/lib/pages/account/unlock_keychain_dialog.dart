@@ -51,36 +51,38 @@ class _UnlockKeychainDialogState extends State<UnlockKeychainDialog>
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<SessionBloc, SessionState>(
-      listener: _handleSessionChange,
-      child: VoicesTwoPaneDialog(
-        left: InformationPanel(
-          title: context.l10n.unlockDialogHeader,
-          picture: const UnlockKeychainPicture(),
-        ),
-        right: _UnlockPasswordPanel(
-          controller: _passwordController,
-          error: _error,
-          onUnlock: _onUnlock,
-        ),
+    return VoicesTwoPaneDialog(
+      left: InformationPanel(
+        title: context.l10n.unlockDialogHeader,
+        picture: const UnlockKeychainPicture(),
+      ),
+      right: _UnlockPasswordPanel(
+        controller: _passwordController,
+        error: _error,
+        onUnlock: _onUnlock,
       ),
     );
   }
 
-  void _handleSessionChange(BuildContext context, SessionState state) {
-    if (state is ActiveAccountSessionState) {
-      Navigator.of(context).pop();
-    }
-  }
-
-  void _onUnlock() {
+  Future<void> _onUnlock() async {
     setState(() {
       _error = null;
     });
 
     final password = _passwordController.text;
     final unlockFactor = PasswordLockFactor(password);
-    unawaited(context.read<SessionBloc>().unlock(unlockFactor));
+
+    final unlocked = await context.read<SessionBloc>().unlock(unlockFactor);
+
+    if (unlocked && mounted) {
+      Navigator.of(context).pop();
+    }
+
+    if (!unlocked && mounted) {
+      setState(() {
+        _error = const LocalizedUnlockPasswordException();
+      });
+    }
   }
 }
 

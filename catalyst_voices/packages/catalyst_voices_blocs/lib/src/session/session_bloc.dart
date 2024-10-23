@@ -3,6 +3,7 @@ import 'package:catalyst_voices_blocs/src/session/session_state.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 /// Manages the user session.
@@ -40,8 +41,8 @@ final class SessionBloc extends Cubit<SessionState> with BlocErrorEmitterMixin {
     _userService.watchAccount.listen(_onActiveAccountChanged);
   }
 
-  Future<void> unlock(LockFactor lockFactor) async {
-    await _userService.keychain!.unlock(lockFactor);
+  Future<bool> unlock(LockFactor lockFactor) {
+    return _userService.keychain!.unlock(lockFactor);
   }
 
   Future<void> lock() async {
@@ -53,13 +54,21 @@ final class SessionBloc extends Cubit<SessionState> with BlocErrorEmitterMixin {
   }
 
   Future<void> switchToDummyAccount() async {
+    final keychains = await _userService.keychains;
+    final dummyKeychain = keychains
+        .firstWhereOrNull((keychain) => keychain.id == _dummyKeychainId);
+    if (dummyKeychain != null) {
+      await _userService.switchToKeychain(dummyKeychain.id);
+      return;
+    }
+
     final account = await _registrationService.registerTestAccount(
       keychainId: _dummyKeychainId,
       seedPhrase: _dummySeedPhrase,
       lockFactor: dummyUnlockFactor,
     );
 
-    await _userService.switchTo(account: account);
+    await _userService.switchToAccount(account);
   }
 
   void _onHasKeychainChanged(bool hasKeychain) {

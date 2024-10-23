@@ -12,15 +12,17 @@ abstract interface class UserService {
 
   Keychain? get keychain;
 
+  Future<List<Keychain>> get keychains;
+
   Stream<Keychain?> get watchKeychain;
 
   Future<void> useActiveAccount();
 
   Future<void> removeActiveAccount();
 
-  Future<void> switchTo({
-    required Account account,
-  });
+  Future<void> switchToAccount(Account account);
+
+  Future<void> switchToKeychain(String id);
 
   Future<void> dispose();
 }
@@ -54,6 +56,9 @@ final class UserServiceImpl implements UserService {
 
   @override
   Keychain? get keychain => _keychain;
+
+  @override
+  Future<List<Keychain>> get keychains => _keychainProvider.findAll();
 
   @override
   Stream<Keychain?> get watchKeychain async* {
@@ -93,16 +98,18 @@ final class UserServiceImpl implements UserService {
   }
 
   @override
-  Future<void> switchTo({
-    required Account account,
-  }) async {
-    final keychain = await _findKeychain(account.keychainId);
-    if (keychain == null) {
-      _logger.severe('Account keychain[${account.keychainId}] was not found!');
-    }
-
-    await _useKeychain(keychain);
+  Future<void> switchToAccount(Account account) async {
+    await switchToKeychain(account.keychainId);
     _updateUser(User(account: account));
+  }
+
+  @override
+  Future<void> switchToKeychain(String id) async {
+    final keychain = await _findKeychain(id);
+    if (keychain == null) {
+      _logger.severe('Account keychain[$id] was not found!');
+    }
+    await _useKeychain(keychain);
   }
 
   @override
@@ -154,7 +161,9 @@ final class UserServiceImpl implements UserService {
   Future<void> _fetchUserDetails(Keychain keychain) async {
     await Future<void>.delayed(const Duration(milliseconds: 100));
 
-    final user = _dummyUser(keychainId: keychain.id);
+    final user = _user?.account.keychainId == keychain.id
+        ? _user
+        : _dummyUser(keychainId: keychain.id);
 
     _updateUser(user);
   }

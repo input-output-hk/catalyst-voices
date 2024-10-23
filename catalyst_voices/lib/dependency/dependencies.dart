@@ -66,6 +66,7 @@ final class Dependencies extends DependencyProvider {
     registerLazySingleton<DummyAuthStorage>(SecureDummyAuthStorage.new);
     registerLazySingleton<Downloader>(Downloader.new);
     registerLazySingleton<CatalystCardano>(() => CatalystCardano.instance);
+    registerLazySingleton<UserStorage>(SecureUserStorage.new);
     registerLazySingleton<RegistrationService>(() {
       return RegistrationService(
         get<TransactionConfigRepository>(),
