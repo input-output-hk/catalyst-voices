@@ -1,5 +1,4 @@
 version: "1.0"
-project: name: "root",
 global: {
 	ci: {
 		local: [
