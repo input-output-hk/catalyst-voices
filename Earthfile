@@ -3,7 +3,7 @@ VERSION 0.8
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/mdlint:v3.2.18 AS mdlint-ci
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/cspell:v3.2.18 AS cspell-ci
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/postgresql:v3.2.18 AS postgresql-ci
-IMPORT github.com/input-output-hk/catalyst-ci/utilities:feat/validate-project-fields-in-prs-and-issues AS utils-ci
+IMPORT github.com/input-output-hk/catalyst-ci/utilities/project-fields-validator:feat/validate-project-fields-in-prs-and-issues AS utils-ci
 
 FROM debian:stable-slim
 
