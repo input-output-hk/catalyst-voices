@@ -1,7 +1,7 @@
 VERSION 0.8
 
 IMPORT ../catalyst-gateway AS catalyst-gateway
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.16 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.18 AS flutter-ci
 
 # Copy all the necessary files and running bootstrap
 builder:
@@ -87,7 +87,7 @@ package:
 
     SAVE IMAGE voices-frontend:$tag
 
-publish:
+docker:
    FROM +package
 
    ARG container="voices"

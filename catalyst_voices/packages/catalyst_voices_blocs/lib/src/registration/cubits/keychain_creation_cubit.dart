@@ -25,6 +25,8 @@ abstract interface class KeychainCreationManager
   void setUserSeedPhraseWords(List<SeedPhraseWord> words);
 
   Future<void> downloadSeedPhrase();
+
+  bool areWordsMatching(List<SeedPhraseWord> words);
 }
 
 final class KeychainCreationCubit extends Cubit<KeychainStateData>
@@ -76,6 +78,16 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
     _seedPhraseStateData = _seedPhraseStateData.copyWith(
       isStoredConfirmed: value,
     );
+  }
+
+  @override
+  bool areWordsMatching(List<SeedPhraseWord> words) {
+    final seedPhrase = _seedPhrase;
+    final seedPhraseWords = seedPhrase?.mnemonicWords;
+
+    final sortedWords = [...words]..sort();
+
+    return listEquals(seedPhraseWords, sortedWords);
   }
 
   @override

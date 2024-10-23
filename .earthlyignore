@@ -1,4 +1,5 @@
 # Files and directories created by pub
+
 **/.dart_tool/
 **/.packages
 **/build/
@@ -11,4 +12,9 @@
 **/Earthfile
 
 # node related
+
 **/node_modules/
+
+# Rust related
+
+**/target

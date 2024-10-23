@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.2.16 AS rust-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.2.18 AS rust-ci
 
 #cspell: words rustfmt toolsets USERARCH stdcfgs
 
@@ -16,7 +16,7 @@ COPY_SRC:
 
 # builder : Set up our target toolchains, and copy our files.
 builder:
-    DO rust-ci+SETUP 
+    DO rust-ci+SETUP
 
 # sync-cfg: Synchronize local config with CI version.
 # Must be run by the developer manually.
@@ -36,7 +36,7 @@ builder-src:
 
     # Generate Checksums of the source
     DO rust-ci+FINGERPRINT_SRC
-    SAVE ARTIFACT ../src_fingerprint.txt 
+    SAVE ARTIFACT ../src_fingerprint.txt
 
 ## -----------------------------------------------------------------------------
 ##
@@ -89,7 +89,7 @@ package:
     ENTRYPOINT [ "./cat-gateway", "run" ]
 
 # Publish cat-gateway
-publish:
+docker:
    FROM +package
 
    ARG container="cat-gateway"
@@ -109,7 +109,7 @@ check-builder-src-cache:
 
     # Don't build the src in the home directory itself, because it contains stuff.
     WORKDIR $HOME/build
-    RUN rm -rf *    
+    RUN rm -rf *
 
     COPY +builder-src/src_fingerprint.txt ..
 
