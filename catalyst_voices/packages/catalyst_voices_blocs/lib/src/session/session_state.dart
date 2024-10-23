@@ -26,15 +26,15 @@ final class GuestSessionState extends SessionState {
 final class ActiveAccountSessionState extends SessionState {
   const ActiveAccountSessionState({
     this.account,
-    required this.isDummyAccount,
+    required this.isDummy,
   });
 
   final Account? account;
-  final bool isDummyAccount;
+  final bool isDummy;
 
   @override
   List<Object?> get props => [
         account,
-        isDummyAccount,
+        isDummy,
       ];
 }

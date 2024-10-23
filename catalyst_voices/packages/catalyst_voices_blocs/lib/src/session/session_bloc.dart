@@ -48,7 +48,7 @@ final class SessionBloc extends Cubit<SessionState> with BlocErrorEmitterMixin {
     await _userService.keychain!.lock();
   }
 
-  Future<void> switchToDummyUser() async {
+  Future<void> switchToDummyAccount() async {
     final account = await _registrationService.registerTestAccount(
       keychainId: _dummyKeychainId,
       seedPhrase: _dummySeedPhrase,
@@ -97,7 +97,7 @@ final class SessionBloc extends Cubit<SessionState> with BlocErrorEmitterMixin {
     emit(
       ActiveAccountSessionState(
         account: account,
-        isDummyAccount: account?.keychainId == _dummyKeychainId,
+        isDummy: account?.keychainId == _dummyKeychainId,
       ),
     );
   }
