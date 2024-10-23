@@ -19,8 +19,8 @@ class SessionStateHeader extends StatelessWidget {
         return switch (state) {
           VisitorSessionState() => const _VisitorButton(),
           GuestSessionState() => const _GuestButton(),
-          ActiveAccountSessionState(account: final user) => AccountPopup(
-              avatarLetter: user.acronym,
+          ActiveAccountSessionState(:final account) => AccountPopup(
+              avatarLetter: account?.acronym ?? '',
               onLockAccountTap: () => _onLockAccount(context),
               onProfileKeychainTap: () => _onSeeProfile(context),
             ),
@@ -30,7 +30,7 @@ class SessionStateHeader extends StatelessWidget {
   }
 
   void _onLockAccount(BuildContext context) {
-    context.read<SessionBloc>().add(const LockSessionEvent());
+    unawaited(context.read<SessionBloc>().lock());
   }
 
   void _onSeeProfile(BuildContext context) {

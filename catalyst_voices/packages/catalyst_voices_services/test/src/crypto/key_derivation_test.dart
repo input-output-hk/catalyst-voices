@@ -8,7 +8,7 @@ void main() {
     late SeedPhrase seedPhrase;
 
     setUp(() {
-      keyDerivation = KeyDerivation();
+      keyDerivation = const KeyDerivation();
       seedPhrase = SeedPhrase.fromMnemonic(
         'few loyal swift champion rug peace dinosaur'
         ' erase bacon tone install universe',

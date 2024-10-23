@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/pages/registration/pictures/unlock_keychain_picture.dart';
 import 'package:catalyst_voices/pages/registration/widgets/information_panel.dart';
@@ -78,9 +80,7 @@ class _UnlockKeychainDialogState extends State<UnlockKeychainDialog>
 
     final password = _passwordController.text;
     final unlockFactor = PasswordLockFactor(password);
-    context
-        .read<SessionBloc>()
-        .add(UnlockSessionEvent(unlockFactor: unlockFactor));
+    unawaited(context.read<SessionBloc>().unlock(unlockFactor));
   }
 }
 

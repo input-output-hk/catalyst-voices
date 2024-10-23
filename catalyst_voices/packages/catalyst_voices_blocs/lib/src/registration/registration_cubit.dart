@@ -24,16 +24,16 @@ final class RegistrationCubit extends Cubit<RegistrationState>
   final WalletLinkCubit _walletLinkCubit;
   final RecoverCubit _recoverCubit;
 
-  final RegistrationService _registrationService;
   final UserService _userService;
+  final RegistrationService _registrationService;
 
   Ed25519KeyPair? _keyPair;
   Transaction? _transaction;
 
   RegistrationCubit({
     required Downloader downloader,
-    required RegistrationService registrationService,
     required UserService userService,
+    required RegistrationService registrationService,
   })  : _registrationService = registrationService,
         _userService = userService,
         _keychainCreationCubit = KeychainCreationCubit(

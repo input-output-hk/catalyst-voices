@@ -48,6 +48,10 @@ final class SessionBloc extends Cubit<SessionState> with BlocErrorEmitterMixin {
     await _userService.keychain!.lock();
   }
 
+  Future<void> removeKeychain() {
+    return _userService.removeActiveAccount();
+  }
+
   Future<void> switchToDummyAccount() async {
     final account = await _registrationService.registerTestAccount(
       keychainId: _dummyKeychainId,
@@ -94,11 +98,6 @@ final class SessionBloc extends Cubit<SessionState> with BlocErrorEmitterMixin {
       return;
     }
 
-    emit(
-      ActiveAccountSessionState(
-        account: account,
-        isDummy: account?.keychainId == _dummyKeychainId,
-      ),
-    );
+    emit(ActiveAccountSessionState(account: account));
   }
 }

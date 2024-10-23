@@ -83,6 +83,7 @@ final class UserServiceImpl implements UserService {
   Future<void> removeActiveAccount() async {
     final keychain = _keychain;
     if (keychain == null) {
+      _logger.warning('Called remove account but no active keychain found');
       return;
     }
 

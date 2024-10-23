@@ -22,14 +22,28 @@ class _ToggleStateTextState extends State<ToggleStateText> {
   @override
   void initState() {
     super.initState();
-    _tapVisitor.onTap = () {
-      context.read<SessionBloc>().add(const VisitorSessionEvent());
+    _tapVisitor.onTap = () async {
+      await context.read<SessionBloc>().removeKeychain();
     };
-    _tapGuest.onTap = () {
-      context.read<SessionBloc>().add(const GuestSessionEvent());
+    _tapGuest.onTap = () async {
+      final sessionBloc = context.read<SessionBloc>();
+
+      if (sessionBloc.state is ActiveAccountSessionState) {
+        await sessionBloc.lock();
+      }
+
+      if (sessionBloc.state is VisitorSessionState) {
+        await sessionBloc
+            .switchToDummyAccount()
+            .then((_) => sessionBloc.lock());
+      }
     };
-    _tapActiveUser.onTap = () {
-      context.read<SessionBloc>().add(const ActiveUserSessionEvent());
+    _tapActiveUser.onTap = () async {
+      final sessionBloc = context.read<SessionBloc>();
+
+      await sessionBloc
+          .switchToDummyAccount()
+          .then((_) => sessionBloc.unlock(SessionBloc.dummyUnlockFactor));
     };
   }
 

@@ -1,5 +1,7 @@
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 
+const _activeKeychainIdKey = 'activeKeychainId';
+
 abstract interface class UserStorage {
   Future<String?> getActiveKeychainId();
 
@@ -15,19 +17,16 @@ final class SecureUserStorage extends SecureStorage implements UserStorage {
 
   @override
   Future<String?> getActiveKeychainId() {
-    // TODO: implement activeKeychainId
-    throw UnimplementedError();
+    return readString(key: _activeKeychainIdKey);
   }
 
   @override
   Future<void> changeActiveKeychainId(String id) {
-    // TODO: implement changeActiveKeychainId
-    throw UnimplementedError();
+    return writeString(id, key: _activeKeychainIdKey);
   }
 
   @override
   Future<void> clearActiveKeychain() {
-    // TODO: implement clearActiveKeychain
-    throw UnimplementedError();
+    return writeString(null, key: _activeKeychainIdKey);
   }
 }

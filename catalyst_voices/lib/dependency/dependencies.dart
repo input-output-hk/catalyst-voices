@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
@@ -28,14 +30,18 @@ final class Dependencies extends DependencyProvider {
           authenticationRepository: get(),
         ),
       )
-      ..registerLazySingleton<SessionBloc>(
-        () => SessionBloc(),
-      )
+      ..registerLazySingleton<SessionBloc>(() {
+        return SessionBloc(
+          get<UserService>(),
+          get<RegistrationService>(),
+        );
+      })
       // Factory will rebuild it each time needed
       ..registerFactory<RegistrationCubit>(() {
         return RegistrationCubit(
-          downloader: get(),
-          registrationService: get(),
+          downloader: get<Downloader>(),
+          userService: get<UserService>(),
+          registrationService: get<RegistrationService>(),
         );
       });
   }
@@ -68,5 +74,14 @@ final class Dependencies extends DependencyProvider {
         get<KeyDerivation>(),
       );
     });
+    registerLazySingleton<UserService>(
+      () {
+        return UserServiceImpl(
+          get<KeychainProvider>(),
+          get<UserStorage>(),
+        );
+      },
+      dispose: (service) => unawaited(service.dispose()),
+    );
   }
 }
