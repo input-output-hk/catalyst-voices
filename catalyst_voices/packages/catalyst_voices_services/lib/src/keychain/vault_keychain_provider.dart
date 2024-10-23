@@ -41,12 +41,10 @@ final class VaultKeychainProvider implements KeychainProvider {
 
   @override
   Future<Keychain> get(String id) async {
-    final Keychain keychain = VaultKeychain(
+    return VaultKeychain(
       id: id,
       secureStorage: _secureStorage,
     );
-
-    return keychain;
   }
 
   @override

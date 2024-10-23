@@ -75,26 +75,25 @@ final class WalletLinkCubit extends Cubit<WalletLinkStateData>
 
       _selectedWallet = wallet;
 
-      final walletHeader =
-          await registrationService.getCardanoWalletInfo(wallet);
+      final walletInfo = await registrationService.getCardanoWalletInfo(wallet);
 
       final walletConnection = WalletConnectionData(
-        name: walletHeader.metadata.name,
-        icon: walletHeader.metadata.icon,
+        name: walletInfo.metadata.name,
+        icon: walletInfo.metadata.icon,
         isConnected: true,
       );
       final walletSummary = WalletSummaryData(
-        balance: CryptocurrencyFormatter.formatAmount(walletHeader.balance),
-        address: WalletAddressFormatter.formatShort(walletHeader.address),
-        clipboardAddress: walletHeader.address.toBech32(),
+        balance: CryptocurrencyFormatter.formatAmount(walletInfo.balance),
+        address: WalletAddressFormatter.formatShort(walletInfo.address),
+        clipboardAddress: walletInfo.address.toBech32(),
         showLowBalance:
-            walletHeader.balance < CardanoWalletDetails.minAdaForRegistration,
+            walletInfo.balance < CardanoWalletDetails.minAdaForRegistration,
       );
 
       final newState = state.copyWith(
-        selectedWallet: Optional(walletHeader),
+        selectedWallet: Optional(walletInfo),
         hasEnoughBalance:
-            walletHeader.balance >= CardanoWalletDetails.minAdaForRegistration,
+            walletInfo.balance >= CardanoWalletDetails.minAdaForRegistration,
         walletConnection: Optional(walletConnection),
         walletSummary: Optional(walletSummary),
       );

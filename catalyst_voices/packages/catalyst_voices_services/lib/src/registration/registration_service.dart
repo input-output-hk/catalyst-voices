@@ -98,7 +98,7 @@ final class RegistrationService {
     await keychain.setRootKey(rootKey);
 
     // Note. with rootKey query backend for account details.
-    final account = Account(
+    return Account(
       keychainId: keychainId,
       roles: roles,
       walletInfo: WalletInfo(
@@ -107,10 +107,6 @@ final class RegistrationService {
         address: _testNetAddress,
       ),
     );
-
-    // TODO(damian-molinski): save account somewhere where session has access.
-
-    return account;
   }
 
   /// Builds an unsigned registration transaction from given parameters.
@@ -192,7 +188,7 @@ final class RegistrationService {
       final balance = await enabledWallet.getBalance();
       final address = await enabledWallet.getChangeAddress();
 
-      final account = Account(
+      return Account(
         keychainId: keychainId,
         roles: roles,
         walletInfo: WalletInfo(
@@ -201,8 +197,6 @@ final class RegistrationService {
           address: address,
         ),
       );
-
-      return account;
     } on RegistrationException {
       rethrow;
     } catch (error) {
@@ -228,7 +222,7 @@ final class RegistrationService {
     await keychain.unlock(lockFactor);
     await keychain.setRootKey(rootKey);
 
-    final account = Account(
+    return Account(
       keychainId: keychainId,
       roles: roles,
       walletInfo: WalletInfo(
@@ -237,7 +231,5 @@ final class RegistrationService {
         address: _testNetAddress,
       ),
     );
-
-    return account;
   }
 }

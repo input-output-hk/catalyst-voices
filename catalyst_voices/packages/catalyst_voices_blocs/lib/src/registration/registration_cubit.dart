@@ -115,6 +115,8 @@ final class RegistrationCubit extends Cubit<RegistrationState>
   }
 
   void createNewKeychain() {
+    _progressNotifier.clear();
+
     final nextStep = _nextStep(from: const CreateKeychainStep());
     if (nextStep != null) {
       _goToStep(nextStep);

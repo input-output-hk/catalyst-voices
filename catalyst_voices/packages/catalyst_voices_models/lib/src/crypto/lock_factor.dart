@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:equatable/equatable.dart';
+import 'package:meta/meta.dart';
 
 /// Abstract representation of different factors that can lock secure data.
 ///
@@ -14,7 +14,8 @@ abstract interface class LockFactor {
 ///
 /// Only unlocks other [PasswordLockFactor] with matching
 /// [PasswordLockFactor._data].
-final class PasswordLockFactor extends Equatable implements LockFactor {
+@immutable
+final class PasswordLockFactor implements LockFactor {
   final String _data;
 
   const PasswordLockFactor(this._data);
@@ -23,8 +24,17 @@ final class PasswordLockFactor extends Equatable implements LockFactor {
   Uint8List get seed => utf8.encode(_data);
 
   @override
-  List<Object?> get props => [_data];
+  String toString() => 'PasswordLockFactor(${_data.hashCode})';
+
+  // Note. normal equals hash implementation because don't want to expose
+  // password data.
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PasswordLockFactor &&
+          runtimeType == other.runtimeType &&
+          _data == other._data;
 
   @override
-  String toString() => 'PasswordLockFactor(${_data.hashCode})';
+  int get hashCode => _data.hashCode;
 }
