@@ -74,7 +74,9 @@ impl TxiInsertQuery {
     }
 
     /// Index the transaction Inputs.
-    pub(crate) fn index(&mut self, txs: &pallas_traverse::MultiEraTxWithRawAuxiliary<'_>, slot_no: u64) {
+    pub(crate) fn index(
+        &mut self, txs: &pallas_traverse::MultiEraTxWithRawAuxiliary<'_>, slot_no: u64,
+    ) {
         // Index the TXI's.
         for txi in txs.inputs() {
             let txn_hash = txi.hash().to_vec();
