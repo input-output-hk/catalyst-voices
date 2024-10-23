@@ -50,7 +50,7 @@ fn schema_validator(schema: &Value) -> Validator {
         .build(schema)
         .unwrap_or_else(|err| {
             error!(
-                id = "schema_validator",
+                id="schema_validator",
                 error=?err,
                 "Error creating JSON validator"
             );
@@ -69,7 +69,7 @@ fn schema_validator(schema: &Value) -> Validator {
 /// Helper function to convert a JSON string to a JSON value.
 fn load_json_lazy(data: &str) -> Value {
     serde_json::from_str(data).unwrap_or_else(|err| {
-        error!(id = "load_json_lazy", error=?err, "Error parsing JSON");
+        error!(id="load_json_lazy", error=?err, "Error parsing JSON");
         json!({})
     })
 }

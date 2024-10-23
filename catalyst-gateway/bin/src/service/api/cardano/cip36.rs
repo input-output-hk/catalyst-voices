@@ -127,7 +127,7 @@ pub(crate) async fn get_latest_registration_from_stake_addr(
 
     let Some(session) = CassandraSession::get(persistent) else {
         error!(
-            id = "get_latest_registration_from_stake_addr",
+            id="get_latest_registration_from_stake_addr",
             "Failed to acquire db session"
         );
         return ResponseSingleRegistration::NotFound.into();
@@ -278,7 +278,7 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
 
     let Some(session) = CassandraSession::get(persistent) else {
         error!(
-            id = "get_latest_registration_from_stake_key_hash_db_session",
+            id="get_latest_registration_from_stake_key_hash_db_session",
             "Failed to acquire db session"
         );
         return ResponseSingleRegistration::NotFound.into();
@@ -290,7 +290,7 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
             Ok(latest) => latest,
             Err(err) => {
                 error!(
-                    id = "get_latest_registration_from_stake_key_hash_query_stake_addr",
+                    id="get_latest_registration_from_stake_key_hash_query_stake_addr",
                     error=?err,
                     "Failed to query stake addr from stake hash"
                 );
@@ -303,7 +303,7 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
             Ok(r) => r,
             Err(err) => {
                 error!(
-                    id = "get_latest_registration_from_stake_key_hash_latest_registration",
+                    id="get_latest_registration_from_stake_key_hash_latest_registration",
                     error=?err,
                     "Failed to get latest registration"
                 );
@@ -320,7 +320,7 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
             Ok(registration) => registration,
             Err(err) => {
                 error!(
-                    id = "get_latest_registration_from_stake_key_hash_registration_for_stake_addr",
+                    id="get_latest_registration_from_stake_key_hash_registration_for_stake_addr",
                     error=?err,
                     "Failed to obtain registration for given stake addr",
                 );
@@ -340,7 +340,7 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
             Ok(invalids) => invalids,
             Err(err) => {
                 error!(
-                    id = "get_latest_registration_from_stake_key_hash_invalid_registrations_for_stake_addr",
+                    id="get_latest_registration_from_stake_key_hash_invalid_registrations_for_stake_addr",
                     error=?err,
                     "Failed to obtain invalid registrations for given stake addr",
                 );
@@ -369,7 +369,7 @@ pub(crate) async fn get_associated_vote_key_registrations(
         Ok(vote_key) => vote_key,
         Err(err) => {
             error!(
-                id = "get_associated_vote_key_registrations_vote_key",
+                id="get_associated_vote_key_registrations_vote_key",
                 error=?err,
                 "Failed to decode vote key"
             );
@@ -379,7 +379,7 @@ pub(crate) async fn get_associated_vote_key_registrations(
 
     let Some(session) = CassandraSession::get(persistent) else {
         error!(
-            id = "get_associated_vote_key_registrations_db_session",
+            id="get_associated_vote_key_registrations_db_session",
             "Failed to acquire db session"
         );
         return ResponseMultipleRegistrations::NotFound.into();
@@ -394,7 +394,7 @@ pub(crate) async fn get_associated_vote_key_registrations(
         Ok(latest) => latest,
         Err(err) => {
             error!(
-                id = "get_associated_vote_key_registrations_query_stake_addr_from_vote_key",
+                id="get_associated_vote_key_registrations_query_stake_addr_from_vote_key",
                 error=?err,
                 "Failed to query stake addr from vote key"
             );
@@ -407,7 +407,7 @@ pub(crate) async fn get_associated_vote_key_registrations(
             Ok(r) => r,
             Err(err) => {
                 error!(
-                    id = "get_associated_vote_key_registrations_latest_registration",
+                    id="get_associated_vote_key_registrations_latest_registration",
                     error=?err,
                     "Failed to get latest registration"
                 );
@@ -426,7 +426,7 @@ pub(crate) async fn get_associated_vote_key_registrations(
             Ok(registration) => registration,
             Err(err) => {
                 error!(
-                    id = "get_associated_vote_key_registrations_get_registrations_for_stake_addr",
+                    id="get_associated_vote_key_registrations_get_registrations_for_stake_addr",
                     error=?err,
                     "Failed to obtain registrations for given stake addr",
                 );

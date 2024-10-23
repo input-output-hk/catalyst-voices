@@ -36,7 +36,7 @@ pub(crate) async fn run() -> anyhow::Result<()> {
 /// Retrieve the API specification in JSON format.
 pub(crate) fn api_spec() -> Value {
     serde_json::from_str(&mk_api().spec()).unwrap_or_else(|err| {
-        error!(id = "api_spec", error=?err, "Failed to parse API spec");
+        error!(id="api_spec", error=?err, "Failed to parse API spec");
         json!({})
     })
 }
