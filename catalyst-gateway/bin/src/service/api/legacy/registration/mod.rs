@@ -32,15 +32,8 @@ enum Responses {
 /// All responses
 type AllResponses = WithErrorResponses<Responses>;
 
-#[OpenApi(prefix_path = "/registration", tag = "ApiTags::Registration")]
+#[OpenApi(tag = "ApiTags::Registration")]
 impl RegistrationApi {
-    #[oai(
-        path = "/voter/:voting_key",
-        method = "get",
-        operation_id = "getVoterInfo",
-        transform = "schema_version_validation",
-        deprecated = true
-    )]
     /// Voter's info
     ///
     /// Get the voter's registration and voting power by their Public Voting Key.
@@ -51,6 +44,13 @@ impl RegistrationApi {
     /// `delegator_addresses` field of `VoterInfo` type does not provided.
     #[allow(clippy::unused_async)]
     #[allow(unused_variables)]
+    #[oai(
+        path = "/draft/registration/voter/:voting_key",
+        method = "get",
+        operation_id = "getVoterInfo",
+        transform = "schema_version_validation",
+        deprecated = true
+    )]
     async fn get_voter_info(
         &self,
         /// A Voters Public ED25519 Key (as registered in their most recent valid

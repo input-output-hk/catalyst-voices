@@ -63,66 +63,6 @@ extension $AccountVoteExtension on AccountVote {
 }
 
 @JsonSerializable(explicitToJson: true)
-class BadRequestError {
-  const BadRequestError({
-    required this.error,
-    this.schemaValidationErrors,
-  });
-
-  factory BadRequestError.fromJson(Map<String, dynamic> json) =>
-      _$BadRequestErrorFromJson(json);
-
-  static const toJsonFactory = _$BadRequestErrorToJson;
-  Map<String, dynamic> toJson() => _$BadRequestErrorToJson(this);
-
-  @JsonKey(name: 'error')
-  final String error;
-  @JsonKey(name: 'schema_validation_errors', defaultValue: <String>[])
-  final List<String>? schemaValidationErrors;
-  static const fromJsonFactory = _$BadRequestErrorFromJson;
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other is BadRequestError &&
-            (identical(other.error, error) ||
-                const DeepCollectionEquality().equals(other.error, error)) &&
-            (identical(other.schemaValidationErrors, schemaValidationErrors) ||
-                const DeepCollectionEquality().equals(
-                    other.schemaValidationErrors, schemaValidationErrors)));
-  }
-
-  @override
-  String toString() => jsonEncode(this);
-
-  @override
-  int get hashCode =>
-      const DeepCollectionEquality().hash(error) ^
-      const DeepCollectionEquality().hash(schemaValidationErrors) ^
-      runtimeType.hashCode;
-}
-
-extension $BadRequestErrorExtension on BadRequestError {
-  BadRequestError copyWith(
-      {String? error, List<String>? schemaValidationErrors}) {
-    return BadRequestError(
-        error: error ?? this.error,
-        schemaValidationErrors:
-            schemaValidationErrors ?? this.schemaValidationErrors);
-  }
-
-  BadRequestError copyWithWrapped(
-      {Wrapped<String>? error,
-      Wrapped<List<String>?>? schemaValidationErrors}) {
-    return BadRequestError(
-        error: (error != null ? error.value : this.error),
-        schemaValidationErrors: (schemaValidationErrors != null
-            ? schemaValidationErrors.value
-            : this.schemaValidationErrors));
-  }
-}
-
-@JsonSerializable(explicitToJson: true)
 class BlockDate {
   const BlockDate({
     required this.epoch,
@@ -393,6 +333,66 @@ extension $Cip36ReportingListExtension on Cip36ReportingList {
   Cip36ReportingList copyWithWrapped({Wrapped<List<Cip36Reporting>>? cip36}) {
     return Cip36ReportingList(
         cip36: (cip36 != null ? cip36.value : this.cip36));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class ConfigBadRequest {
+  const ConfigBadRequest({
+    required this.error,
+    this.schemaValidationErrors,
+  });
+
+  factory ConfigBadRequest.fromJson(Map<String, dynamic> json) =>
+      _$ConfigBadRequestFromJson(json);
+
+  static const toJsonFactory = _$ConfigBadRequestToJson;
+  Map<String, dynamic> toJson() => _$ConfigBadRequestToJson(this);
+
+  @JsonKey(name: 'error')
+  final String error;
+  @JsonKey(name: 'schema_validation_errors', defaultValue: <String>[])
+  final List<String>? schemaValidationErrors;
+  static const fromJsonFactory = _$ConfigBadRequestFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is ConfigBadRequest &&
+            (identical(other.error, error) ||
+                const DeepCollectionEquality().equals(other.error, error)) &&
+            (identical(other.schemaValidationErrors, schemaValidationErrors) ||
+                const DeepCollectionEquality().equals(
+                    other.schemaValidationErrors, schemaValidationErrors)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(error) ^
+      const DeepCollectionEquality().hash(schemaValidationErrors) ^
+      runtimeType.hashCode;
+}
+
+extension $ConfigBadRequestExtension on ConfigBadRequest {
+  ConfigBadRequest copyWith(
+      {String? error, List<String>? schemaValidationErrors}) {
+    return ConfigBadRequest(
+        error: error ?? this.error,
+        schemaValidationErrors:
+            schemaValidationErrors ?? this.schemaValidationErrors);
+  }
+
+  ConfigBadRequest copyWithWrapped(
+      {Wrapped<String>? error,
+      Wrapped<List<String>?>? schemaValidationErrors}) {
+    return ConfigBadRequest(
+        error: (error != null ? error.value : this.error),
+        schemaValidationErrors: (schemaValidationErrors != null
+            ? schemaValidationErrors.value
+            : this.schemaValidationErrors));
   }
 }
 
@@ -716,6 +716,49 @@ extension $FragmentsProcessingSummaryExtension on FragmentsProcessingSummary {
 }
 
 @JsonSerializable(explicitToJson: true)
+class FrontendConfig {
+  const FrontendConfig({
+    this.sentry,
+  });
+
+  factory FrontendConfig.fromJson(Map<String, dynamic> json) =>
+      _$FrontendConfigFromJson(json);
+
+  static const toJsonFactory = _$FrontendConfigToJson;
+  Map<String, dynamic> toJson() => _$FrontendConfigToJson(this);
+
+  @JsonKey(name: 'sentry')
+  final Sentry? sentry;
+  static const fromJsonFactory = _$FrontendConfigFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is FrontendConfig &&
+            (identical(other.sentry, sentry) ||
+                const DeepCollectionEquality().equals(other.sentry, sentry)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(sentry) ^ runtimeType.hashCode;
+}
+
+extension $FrontendConfigExtension on FrontendConfig {
+  FrontendConfig copyWith({Sentry? sentry}) {
+    return FrontendConfig(sentry: sentry ?? this.sentry);
+  }
+
+  FrontendConfig copyWithWrapped({Wrapped<Sentry?>? sentry}) {
+    return FrontendConfig(
+        sentry: (sentry != null ? sentry.value : this.sentry));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
 class FullStakeInfo {
   const FullStakeInfo({
     required this.volatile,
@@ -919,6 +962,49 @@ extension $InvalidRegistrationsReportExtension on InvalidRegistrationsReport {
 }
 
 @JsonSerializable(explicitToJson: true)
+class RegistrationGetBadRequest {
+  const RegistrationGetBadRequest({
+    required this.error,
+  });
+
+  factory RegistrationGetBadRequest.fromJson(Map<String, dynamic> json) =>
+      _$RegistrationGetBadRequestFromJson(json);
+
+  static const toJsonFactory = _$RegistrationGetBadRequestToJson;
+  Map<String, dynamic> toJson() => _$RegistrationGetBadRequestToJson(this);
+
+  @JsonKey(name: 'error')
+  final String error;
+  static const fromJsonFactory = _$RegistrationGetBadRequestFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is RegistrationGetBadRequest &&
+            (identical(other.error, error) ||
+                const DeepCollectionEquality().equals(other.error, error)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(error) ^ runtimeType.hashCode;
+}
+
+extension $RegistrationGetBadRequestExtension on RegistrationGetBadRequest {
+  RegistrationGetBadRequest copyWith({String? error}) {
+    return RegistrationGetBadRequest(error: error ?? this.error);
+  }
+
+  RegistrationGetBadRequest copyWithWrapped({Wrapped<String>? error}) {
+    return RegistrationGetBadRequest(
+        error: (error != null ? error.value : this.error));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
 class RegistrationInfo {
   const RegistrationInfo({
     required this.rewardsAddress,
@@ -1066,6 +1152,72 @@ extension $RejectedFragmentExtension on RejectedFragment {
         id: (id != null ? id.value : this.id),
         poolNumber: (poolNumber != null ? poolNumber.value : this.poolNumber),
         reason: (reason != null ? reason.value : this.reason));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class Sentry {
+  const Sentry({
+    required this.dsn,
+    this.release,
+    this.environment,
+  });
+
+  factory Sentry.fromJson(Map<String, dynamic> json) => _$SentryFromJson(json);
+
+  static const toJsonFactory = _$SentryToJson;
+  Map<String, dynamic> toJson() => _$SentryToJson(this);
+
+  @JsonKey(name: 'dsn')
+  final String dsn;
+  @JsonKey(name: 'release')
+  final String? release;
+  @JsonKey(name: 'environment')
+  final String? environment;
+  static const fromJsonFactory = _$SentryFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is Sentry &&
+            (identical(other.dsn, dsn) ||
+                const DeepCollectionEquality().equals(other.dsn, dsn)) &&
+            (identical(other.release, release) ||
+                const DeepCollectionEquality()
+                    .equals(other.release, release)) &&
+            (identical(other.environment, environment) ||
+                const DeepCollectionEquality()
+                    .equals(other.environment, environment)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(dsn) ^
+      const DeepCollectionEquality().hash(release) ^
+      const DeepCollectionEquality().hash(environment) ^
+      runtimeType.hashCode;
+}
+
+extension $SentryExtension on Sentry {
+  Sentry copyWith({String? dsn, String? release, String? environment}) {
+    return Sentry(
+        dsn: dsn ?? this.dsn,
+        release: release ?? this.release,
+        environment: environment ?? this.environment);
+  }
+
+  Sentry copyWithWrapped(
+      {Wrapped<String>? dsn,
+      Wrapped<String?>? release,
+      Wrapped<String?>? environment}) {
+    return Sentry(
+        dsn: (dsn != null ? dsn.value : this.dsn),
+        release: (release != null ? release.value : this.release),
+        environment:
+            (environment != null ? environment.value : this.environment));
   }
 }
 
@@ -1579,49 +1731,6 @@ extension $SyncStateExtension on SyncState {
         blockHash: (blockHash != null ? blockHash.value : this.blockHash),
         lastUpdated:
             (lastUpdated != null ? lastUpdated.value : this.lastUpdated));
-  }
-}
-
-@JsonSerializable(explicitToJson: true)
-class ValidationError {
-  const ValidationError({
-    required this.message,
-  });
-
-  factory ValidationError.fromJson(Map<String, dynamic> json) =>
-      _$ValidationErrorFromJson(json);
-
-  static const toJsonFactory = _$ValidationErrorToJson;
-  Map<String, dynamic> toJson() => _$ValidationErrorToJson(this);
-
-  @JsonKey(name: 'message')
-  final String message;
-  static const fromJsonFactory = _$ValidationErrorFromJson;
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other is ValidationError &&
-            (identical(other.message, message) ||
-                const DeepCollectionEquality().equals(other.message, message)));
-  }
-
-  @override
-  String toString() => jsonEncode(this);
-
-  @override
-  int get hashCode =>
-      const DeepCollectionEquality().hash(message) ^ runtimeType.hashCode;
-}
-
-extension $ValidationErrorExtension on ValidationError {
-  ValidationError copyWith({String? message}) {
-    return ValidationError(message: message ?? this.message);
-  }
-
-  ValidationError copyWithWrapped({Wrapped<String>? message}) {
-    return ValidationError(
-        message: (message != null ? message.value : this.message));
   }
 }
 

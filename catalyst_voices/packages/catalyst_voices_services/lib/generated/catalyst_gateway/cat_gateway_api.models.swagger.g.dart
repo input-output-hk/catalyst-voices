@@ -20,22 +20,6 @@ Map<String, dynamic> _$AccountVoteToJson(AccountVote instance) =>
       'votes': instance.votes,
     };
 
-BadRequestError _$BadRequestErrorFromJson(Map<String, dynamic> json) =>
-    BadRequestError(
-      error: json['error'] as String,
-      schemaValidationErrors:
-          (json['schema_validation_errors'] as List<dynamic>?)
-                  ?.map((e) => e as String)
-                  .toList() ??
-              [],
-    );
-
-Map<String, dynamic> _$BadRequestErrorToJson(BadRequestError instance) =>
-    <String, dynamic>{
-      'error': instance.error,
-      'schema_validation_errors': instance.schemaValidationErrors,
-    };
-
 BlockDate _$BlockDateFromJson(Map<String, dynamic> json) => BlockDate(
       epoch: (json['epoch'] as num).toInt(),
       slotId: (json['slot_id'] as num).toInt(),
@@ -98,6 +82,22 @@ Cip36ReportingList _$Cip36ReportingListFromJson(Map<String, dynamic> json) =>
 Map<String, dynamic> _$Cip36ReportingListToJson(Cip36ReportingList instance) =>
     <String, dynamic>{
       'cip36': instance.cip36.map((e) => e.toJson()).toList(),
+    };
+
+ConfigBadRequest _$ConfigBadRequestFromJson(Map<String, dynamic> json) =>
+    ConfigBadRequest(
+      error: json['error'] as String,
+      schemaValidationErrors:
+          (json['schema_validation_errors'] as List<dynamic>?)
+                  ?.map((e) => e as String)
+                  .toList() ??
+              [],
+    );
+
+Map<String, dynamic> _$ConfigBadRequestToJson(ConfigBadRequest instance) =>
+    <String, dynamic>{
+      'error': instance.error,
+      'schema_validation_errors': instance.schemaValidationErrors,
     };
 
 DelegatePublicKey _$DelegatePublicKeyFromJson(Map<String, dynamic> json) =>
@@ -183,6 +183,18 @@ Map<String, dynamic> _$FragmentsProcessingSummaryToJson(
       'rejected': instance.rejected.map((e) => e.toJson()).toList(),
     };
 
+FrontendConfig _$FrontendConfigFromJson(Map<String, dynamic> json) =>
+    FrontendConfig(
+      sentry: json['sentry'] == null
+          ? null
+          : Sentry.fromJson(json['sentry'] as Map<String, dynamic>),
+    );
+
+Map<String, dynamic> _$FrontendConfigToJson(FrontendConfig instance) =>
+    <String, dynamic>{
+      'sentry': instance.sentry?.toJson(),
+    };
+
 FullStakeInfo _$FullStakeInfoFromJson(Map<String, dynamic> json) =>
     FullStakeInfo(
       volatile: StakeInfo.fromJson(json['volatile'] as Map<String, dynamic>),
@@ -229,6 +241,18 @@ Map<String, dynamic> _$InvalidRegistrationsReportToJson(
       'cip36': instance.cip36,
     };
 
+RegistrationGetBadRequest _$RegistrationGetBadRequestFromJson(
+        Map<String, dynamic> json) =>
+    RegistrationGetBadRequest(
+      error: json['error'] as String,
+    );
+
+Map<String, dynamic> _$RegistrationGetBadRequestToJson(
+        RegistrationGetBadRequest instance) =>
+    <String, dynamic>{
+      'error': instance.error,
+    };
+
 RegistrationInfo _$RegistrationInfoFromJson(Map<String, dynamic> json) =>
     RegistrationInfo(
       rewardsAddress: json['rewards_address'] as String,
@@ -258,6 +282,18 @@ Map<String, dynamic> _$RejectedFragmentToJson(RejectedFragment instance) =>
       'id': instance.id,
       'pool_number': instance.poolNumber,
       'reason': reasonRejectedToJson(instance.reason),
+    };
+
+Sentry _$SentryFromJson(Map<String, dynamic> json) => Sentry(
+      dsn: json['dsn'] as String,
+      release: json['release'] as String?,
+      environment: json['environment'] as String?,
+    );
+
+Map<String, dynamic> _$SentryToJson(Sentry instance) => <String, dynamic>{
+      'dsn': instance.dsn,
+      'release': instance.release,
+      'environment': instance.environment,
     };
 
 ServerError _$ServerErrorFromJson(Map<String, dynamic> json) => ServerError(
@@ -373,16 +409,6 @@ Map<String, dynamic> _$SyncStateToJson(SyncState instance) => <String, dynamic>{
       'slot_number': instance.slotNumber,
       'block_hash': instance.blockHash,
       'last_updated': instance.lastUpdated.toIso8601String(),
-    };
-
-ValidationError _$ValidationErrorFromJson(Map<String, dynamic> json) =>
-    ValidationError(
-      message: json['message'] as String,
-    );
-
-Map<String, dynamic> _$ValidationErrorToJson(ValidationError instance) =>
-    <String, dynamic>{
-      'message': instance.message,
     };
 
 VotePlan _$VotePlanFromJson(Map<String, dynamic> json) => VotePlan(

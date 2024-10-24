@@ -21,24 +21,25 @@ class FakeCatGatewayApi<T> extends Fake implements CatGatewayApi {
   FakeCatGatewayApi(this.response);
 
   @override
-  Future<chopper.Response<dynamic>> apiHealthStartedGet() async => response;
+  Future<chopper.Response<dynamic>> apiV1HealthStartedGet() async => response;
 
   @override
-  Future<chopper.Response<dynamic>> apiHealthReadyGet() async => response;
+  Future<chopper.Response<dynamic>> apiV1HealthReadyGet() async => response;
 
   @override
-  Future<chopper.Response<dynamic>> apiHealthLiveGet() async => response;
+  Future<chopper.Response<dynamic>> apiV1HealthLiveGet() async => response;
 
   @override
-  Future<chopper.Response<FullStakeInfo>> apiCardanoStakedAdaStakeAddressGet({
+  Future<chopper.Response<FullStakeInfo>>
+      apiDraftCardanoStakedAdaStakeAddressGet({
     required String? stakeAddress,
     enums.Network? network,
     int? slotNumber,
   }) async =>
-      response as chopper.Response<FullStakeInfo>;
+          response as chopper.Response<FullStakeInfo>;
 
   @override
-  Future<chopper.Response<SyncState>> apiCardanoSyncStateGet({
+  Future<chopper.Response<SyncState>> apiDraftCardanoSyncStateGet({
     enums.Network? network,
   }) async =>
       response as chopper.Response<SyncState>;

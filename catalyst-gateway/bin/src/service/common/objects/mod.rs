@@ -3,4 +3,3 @@
 pub(crate) mod cardano;
 pub(crate) mod legacy;
 pub(crate) mod server_error;
-pub(crate) mod validation_error;
