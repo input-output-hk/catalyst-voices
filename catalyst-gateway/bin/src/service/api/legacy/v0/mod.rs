@@ -57,7 +57,7 @@ impl V0Api {
     }
 
     #[oai(
-        path = "/fund",
+        path = "/fund/",
         method = "get",
         operation_id = "GetFund",
         deprecated = true
