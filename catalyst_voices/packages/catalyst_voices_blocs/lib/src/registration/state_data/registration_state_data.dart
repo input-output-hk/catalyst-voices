@@ -1,42 +1,30 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:result_type/result_type.dart';
 
-// TODO(damian-molinski): refactor have less logic and no raw models.
 final class RegistrationStateData extends Equatable {
-  final Result<Transaction, LocalizedException>? registrationTx;
-  final Result<Account, LocalizedException>? account;
+  final Result<bool, LocalizedException>? canSubmitTx;
+  final String? transactionFee;
   final bool isSubmittingTx;
+  final Result<Account, LocalizedException>? account;
 
   const RegistrationStateData({
-    this.registrationTx,
-    this.account,
+    this.canSubmitTx,
+    this.transactionFee,
     this.isSubmittingTx = false,
+    this.account,
   });
 
-  /// Returns the registration transaction fee.
-  Coin? get transactionFee {
-    final result = registrationTx;
-    if (result == null) return null;
-
-    final tx = result.isSuccess ? result.success : null;
-    return tx?.body.fee;
-  }
-
-  /// Whether the button to submit the transaction should be enabled.
-  bool get canSubmitTx {
-    return (registrationTx?.isSuccess ?? false) && (!isSubmittingTx);
-  }
-
   RegistrationStateData copyWith({
-    Optional<Result<Transaction, LocalizedException>>? registrationTx,
-    Optional<Result<Account, LocalizedException>>? account,
+    Optional<Result<bool, LocalizedException>>? canSubmitTx,
+    Optional<String>? transactionFee,
     bool? isSubmittingTx,
+    Optional<Result<Account, LocalizedException>>? account,
   }) {
     return RegistrationStateData(
-      registrationTx: registrationTx.dataOr(this.registrationTx),
+      canSubmitTx: canSubmitTx.dataOr(this.canSubmitTx),
+      transactionFee: transactionFee.dataOr(this.transactionFee),
       isSubmittingTx: isSubmittingTx ?? this.isSubmittingTx,
       account: account.dataOr(this.account),
     );
@@ -44,7 +32,8 @@ final class RegistrationStateData extends Equatable {
 
   @override
   List<Object?> get props => [
-        registrationTx,
+        canSubmitTx,
+        transactionFee,
         isSubmittingTx,
         account,
       ];

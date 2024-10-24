@@ -163,9 +163,10 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     try {
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
-          registrationTx: const Optional.empty(),
-          account: const Optional.empty(),
+          canSubmitTx: Optional.of(Success(false)),
+          transactionFee: const Optional.empty(),
           isSubmittingTx: false,
+          account: const Optional.empty(),
         ),
       );
 
@@ -189,9 +190,14 @@ final class RegistrationCubit extends Cubit<RegistrationState>
       _keyPair = keyPair;
       _transaction = transaction;
 
+      final fee = transaction.body.fee;
+
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
-          registrationTx: Optional(Success(transaction)),
+          canSubmitTx: Optional.of(Success(true)),
+          transactionFee: Optional.of(
+            CryptocurrencyFormatter.formatExactAmount(fee),
+          ),
         ),
       );
     } on RegistrationException catch (error, stackTrace) {
@@ -204,7 +210,8 @@ final class RegistrationCubit extends Cubit<RegistrationState>
 
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
-          registrationTx: Optional(Failure(exception)),
+          canSubmitTx: Optional.of(Failure(exception)),
+          transactionFee: const Optional.empty(),
         ),
       );
     }
