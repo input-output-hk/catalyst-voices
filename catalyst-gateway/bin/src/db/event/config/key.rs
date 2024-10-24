@@ -55,15 +55,19 @@ fn schema_validator(schema: &Value) -> Validator {
                 "Error creating JSON validator"
             );
 
-            // Create a default JSON validator as a fallback
-            // This should not fail since it is hard coded
-            #[allow(clippy::expect_used)]
-            Validator::new(&json!({
-                "$schema": SCHEMA_VERSION,
-                "type": "object"
-            }))
-            .expect("Failed to create default JSON validator")
+            default_validator()
         })
+}
+
+/// Create a default JSON validator as a fallback
+/// This should not fail since it is hard coded
+fn default_validator() -> Validator {
+    #[allow(clippy::expect_used)]
+    Validator::new(&json!({
+        "$schema": SCHEMA_VERSION,
+        "type": "object"
+    }))
+    .expect("Failed to create default JSON validator")
 }
 
 /// Helper function to convert a JSON string to a JSON value.
@@ -169,5 +173,14 @@ mod tests {
     fn test_default() {
         let result = ConfigKey::Frontend.default();
         assert!(result.is_object());
+    }
+
+    #[test]
+    fn test_default_validator() {
+        let result = std::panic::catch_unwind(|| {
+            default_validator();
+        });
+        // Assert that no panic occurred
+        assert!(result.is_ok(), "default_validator panicked");
     }
 }
