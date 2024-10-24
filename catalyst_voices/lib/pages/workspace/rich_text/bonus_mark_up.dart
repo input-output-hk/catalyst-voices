@@ -1,4 +1,4 @@
-const sampleRichText = [
+const bonusMarkUp = [
   {
     'insert': {
       'image':

@@ -5,6 +5,10 @@ extension WorkspaceProposalSegmentExt on WorkspaceProposalSegment {
   String localizedName(VoicesLocalizations localizations) {
     return switch (this) {
       WorkspaceProposalSetup() => localizations.workspaceProposalSetup,
+      WorkspaceProposalSummary() => 'Proposal summary',
+      WorkspaceProposalSolution() => 'Proposal solution',
+      WorkspaceProposalImpact() => 'Proposal Impact',
+      WorkspaceProposalCapabilityAndFeasibility() => 'Capability & Feasibility',
     };
   }
 }
