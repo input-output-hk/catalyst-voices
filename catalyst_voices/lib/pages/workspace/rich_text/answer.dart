@@ -1,5 +1,3 @@
 const answer = [
-  {
-    "insert": "Answer\n"
-  }
+  {"insert": "Answer\n"}
 ];

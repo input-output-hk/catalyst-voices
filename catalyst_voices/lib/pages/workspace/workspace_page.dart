@@ -136,9 +136,9 @@ class _WorkspacePageState extends State<WorkspacePage> {
   ProposalController _buildSegmentController(Object segmentId) {
     final value = segmentId == _setupSegmentId
         ? const ProposalControllerStateData(
-      selectedItemId: 0,
-      isExpanded: true,
-    )
+            selectedItemId: 0,
+            isExpanded: true,
+          )
         : const ProposalControllerStateData();
 
     return ProposalController(value);
