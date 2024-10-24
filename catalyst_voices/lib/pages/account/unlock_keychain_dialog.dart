@@ -73,12 +73,14 @@ class _UnlockKeychainDialogState extends State<UnlockKeychainDialog>
     final unlockFactor = PasswordLockFactor(password);
 
     final unlocked = await context.read<SessionCubit>().unlock(unlockFactor);
+    
+    if (!mounted) {
+      return;
+     }
 
-    if (unlocked && mounted) {
+    if (unlocked) {
       Navigator.of(context).pop();
-    }
-
-    if (!unlocked && mounted) {
+    } else {
       setState(() {
         _error = const LocalizedUnlockPasswordException();
       });
