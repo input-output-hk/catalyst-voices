@@ -1,17 +1,23 @@
+import 'package:catalyst_voices_models/src/user/account.dart';
 import 'package:equatable/equatable.dart';
 
-/// Defines the profile of the app user.
+/// Defines user or the app.
 final class User extends Equatable {
-  final String name;
+  final List<Account> accounts;
 
   const User({
-    required this.name,
+    required this.accounts,
   });
 
-  String? get acronym {
-    return name.isNotEmpty ? name.substring(0, 1).toUpperCase() : null;
-  }
+  /// Just syntax sugar for [activeAccount].
+  Account get account => activeAccount;
+
+  // Note. At the moment we support only single profile Users but later
+  // this may change and this implementation with it.
+  Account get activeAccount => accounts.single;
 
   @override
-  List<Object?> get props => [name];
+  List<Object?> get props => [
+        accounts,
+      ];
 }

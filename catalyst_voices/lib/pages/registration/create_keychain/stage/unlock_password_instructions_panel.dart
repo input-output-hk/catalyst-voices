@@ -20,8 +20,9 @@ class UnlockPasswordInstructionsPanel extends StatelessWidget {
           child: SingleChildScrollView(
             child: RegistrationStageMessage(
               title: Text(l10n.createKeychainUnlockPasswordInstructionsTitle),
-              subtitle:
-                  Text(l10n.createKeychainUnlockPasswordInstructionsSubtitle),
+              subtitle: Text(
+                l10n.createKeychainUnlockPasswordInstructionsSubtitle,
+              ),
             ),
           ),
         ),

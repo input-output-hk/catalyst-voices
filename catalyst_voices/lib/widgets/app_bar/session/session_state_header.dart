@@ -14,20 +14,28 @@ class SessionStateHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SessionBloc, SessionState>(
+    return BlocBuilder<SessionCubit, SessionState>(
       builder: (context, state) {
         return switch (state) {
           VisitorSessionState() => const _VisitorButton(),
           GuestSessionState() => const _GuestButton(),
-          ActiveUserSessionState(:final user) => AccountPopup(
-              avatarLetter: user.acronym ?? 'A',
-              onLockAccountTap: () => debugPrint('Lock account'),
-              onProfileKeychainTap: () => unawaited(
-                const AccountRoute().push<void>(context),
-              ),
+          ActiveAccountSessionState(:final account) => AccountPopup(
+              avatarLetter: account?.acronym ?? '',
+              onLockAccountTap: () => _onLockAccount(context),
+              onProfileKeychainTap: () => _onSeeProfile(context),
             ),
         };
       },
+    );
+  }
+
+  void _onLockAccount(BuildContext context) {
+    unawaited(context.read<SessionCubit>().lock());
+  }
+
+  void _onSeeProfile(BuildContext context) {
+    unawaited(
+      const AccountRoute().push<void>(context),
     );
   }
 }

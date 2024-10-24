@@ -1203,6 +1203,10 @@ class $AssetsImagesGen {
   SvgGenImage get fallbackLogoIcon =>
       const SvgGenImage('assets/images/fallback_logo_icon.svg');
 
+  /// File path: assets/images/key_incorrect.webp
+  AssetGenImage get keyIncorrect =>
+      const AssetGenImage('assets/images/key_incorrect.webp');
+
   /// File path: assets/images/keychain.svg
   SvgGenImage get keychain => const SvgGenImage('assets/images/keychain.svg');
 
@@ -1220,6 +1224,18 @@ class $AssetsImagesGen {
   /// File path: assets/images/proposal_background_2.webp
   AssetGenImage get proposalBackground2 =>
       const AssetGenImage('assets/images/proposal_background_2.webp');
+
+  /// File path: assets/images/registration_summary_keychain.png
+  AssetGenImage get registrationSummaryKeychain =>
+      const AssetGenImage('assets/images/registration_summary_keychain.png');
+
+  /// File path: assets/images/registration_summary_roles.png
+  AssetGenImage get registrationSummaryRoles =>
+      const AssetGenImage('assets/images/registration_summary_roles.png');
+
+  /// File path: assets/images/registration_summary_wallet.png
+  AssetGenImage get registrationSummaryWallet =>
+      const AssetGenImage('assets/images/registration_summary_wallet.png');
 
   /// File path: assets/images/role_drep.webp
   AssetGenImage get roleDrep =>
@@ -1249,6 +1265,10 @@ class $AssetsImagesGen {
   AssetGenImage get taskIllustration =>
       const AssetGenImage('assets/images/task_illustration.webp');
 
+  /// File path: assets/images/welcome_illustration.webp
+  AssetGenImage get welcomeIllustration =>
+      const AssetGenImage('assets/images/welcome_illustration.webp');
+
   /// File path: assets/images/x.svg
   SvgGenImage get x => const SvgGenImage('assets/images/x.svg');
 
@@ -1269,11 +1289,15 @@ class $AssetsImagesGen {
         facebookMono,
         fallbackLogo,
         fallbackLogoIcon,
+        keyIncorrect,
         keychain,
         linkedin,
         linkedinMono,
         proposalBackground1,
         proposalBackground2,
+        registrationSummaryKeychain,
+        registrationSummaryRoles,
+        registrationSummaryWallet,
         roleDrep,
         roleInfoDrep,
         roleInfoProposer,
@@ -1281,6 +1305,7 @@ class $AssetsImagesGen {
         roleProposer,
         roleVoter,
         taskIllustration,
+        welcomeIllustration,
         x,
         xMono
       ];

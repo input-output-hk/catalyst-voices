@@ -1,5 +1,6 @@
+import 'package:catalyst_voices/pages/registration/bloc_unlock_password_builder.dart';
 import 'package:catalyst_voices/pages/registration/create_keychain/bloc_seed_phrase_builder.dart';
-import 'package:catalyst_voices/pages/registration/create_keychain/bloc_unlock_password_builder.dart';
+import 'package:catalyst_voices/pages/registration/pictures/account_completed_picture.dart';
 import 'package:catalyst_voices/pages/registration/pictures/keychain_picture.dart';
 import 'package:catalyst_voices/pages/registration/pictures/keychain_with_password_picture.dart';
 import 'package:catalyst_voices/pages/registration/pictures/password_picture.dart';
@@ -131,7 +132,10 @@ class RegistrationInfoPanel extends StatelessWidget {
         ),
       CreateKeychainStep(:final stage) => buildKeychainStageHeader(stage),
       WalletLinkStep(:final stage) => buildWalletLinkStageHeader(stage),
-      AccountCompletedStep() => _HeaderStrings(title: 'TODO'),
+      AccountCompletedStep() => _HeaderStrings(
+          title: context.l10n.registrationCompletedTitle,
+          subtitle: context.l10n.registrationCompletedSubtitle,
+        ),
     };
   }
 }
@@ -158,7 +162,7 @@ class _RegistrationPicture extends StatelessWidget {
           const _BlocSeedPhraseResultPicture(),
         CreateKeychainStage.unlockPasswordInstructions ||
         CreateKeychainStage.unlockPasswordCreate =>
-          const _BlocPasswordPicture(),
+          const _BlocCreationPasswordPicture(),
       };
     }
 
@@ -178,11 +182,11 @@ class _RegistrationPicture extends StatelessWidget {
       return switch (stage) {
         RecoverSeedPhraseStage.seedPhraseInstructions ||
         RecoverSeedPhraseStage.seedPhrase ||
-        RecoverSeedPhraseStage.linkedWallet =>
+        RecoverSeedPhraseStage.accountDetails =>
           const KeychainPicture(),
         RecoverSeedPhraseStage.unlockPasswordInstructions ||
         RecoverSeedPhraseStage.unlockPassword =>
-          const PasswordPicture(),
+          const _BlocRecoveryPasswordPicture(),
         RecoverSeedPhraseStage.success => const KeychainWithPasswordPicture(),
       };
     }
@@ -194,7 +198,7 @@ class _RegistrationPicture extends StatelessWidget {
       CreateKeychainStep(:final stage) => buildKeychainStagePicture(stage),
       FinishAccountCreationStep() => const KeychainWithPasswordPicture(),
       WalletLinkStep(:final stage) => buildWalletLinkStagePicture(stage),
-      AccountCompletedStep() => const KeychainPicture(),
+      AccountCompletedStep() => const AccountCompletedPicture(),
     };
   }
 }
@@ -216,12 +220,26 @@ class _BlocSeedPhraseResultPicture extends StatelessWidget {
   }
 }
 
-class _BlocPasswordPicture extends StatelessWidget {
-  const _BlocPasswordPicture();
+class _BlocCreationPasswordPicture extends StatelessWidget {
+  const _BlocCreationPasswordPicture();
 
   @override
   Widget build(BuildContext context) {
     return BlocUnlockPasswordBuilder<TaskPictureType>(
+      stateSelector: (state) => state.keychainStateData.unlockPasswordState,
+      selector: (state) => state.pictureType,
+      builder: (context, state) => PasswordPicture(type: state),
+    );
+  }
+}
+
+class _BlocRecoveryPasswordPicture extends StatelessWidget {
+  const _BlocRecoveryPasswordPicture();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocUnlockPasswordBuilder<TaskPictureType>(
+      stateSelector: (state) => state.recoverStateData.unlockPasswordState,
       selector: (state) => state.pictureType,
       builder: (context, state) => PasswordPicture(type: state),
     );

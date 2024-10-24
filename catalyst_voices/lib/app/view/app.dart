@@ -1,10 +1,13 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/app/view/app_content.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-final class App extends StatelessWidget {
+final class App extends StatefulWidget {
   final RouterConfig<Object> routerConfig;
 
   const App({
@@ -13,11 +16,22 @@ final class App extends StatelessWidget {
   });
 
   @override
+  State<App> createState() => _AppState();
+}
+
+class _AppState extends State<App> {
+  @override
+  void initState() {
+    super.initState();
+    unawaited(Dependencies.instance.get<UserService>().useLastAccount());
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: _multiBlocProviders(),
       child: AppContent(
-        routerConfig: routerConfig,
+        routerConfig: widget.routerConfig,
       ),
     );
   }
@@ -30,8 +44,8 @@ final class App extends StatelessWidget {
       BlocProvider<LoginBloc>(
         create: (_) => Dependencies.instance.get<LoginBloc>(),
       ),
-      BlocProvider<SessionBloc>(
-        create: (_) => Dependencies.instance.get<SessionBloc>(),
+      BlocProvider<SessionCubit>(
+        create: (_) => Dependencies.instance.get(),
       ),
     ];
   }

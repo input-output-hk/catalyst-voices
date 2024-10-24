@@ -1,10 +1,7 @@
 name: Allure Report Generation
 
 on:
-  pull_request:
-  push:
-    branches: "main"
-    tags: ["*"]
+  workflow_call:
 
 permissions:
   contents: write
@@ -16,10 +13,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  AWS_REGION: eu-central-1
-  AWS_ROLE_ARN: arn:aws:iam::332405224602:role/ci
-  EARTHLY_TARGET: docker
-  ECR_REGISTRY: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
   ALLURE_REPORT_PATH: allure-report
   COVERAGE_REPORT_PATH: coverage-report
   REPORT_EXT: .junit-report.xml
@@ -32,60 +25,46 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@master
+      - name: Install Forge
+        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.2.1
         with:
-          aws_role_arn: ${{ env.AWS_ROLE_ARN }}
-          aws_region: ${{ env.AWS_REGION }}
-          earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
+          version: 0.5.0
+        if: always()
+
+      - name: Setup CI
+        uses: input-output-hk/catalyst-forge/actions/setup@ci/v1.2.1
 
       - name: Get catalyst gateway unit test report
-        uses: input-output-hk/catalyst-ci/actions/run@master
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.2.1
         if: always()
         continue-on-error: true
         with:
-          earthfile: ./catalyst-gateway/
-          flags:
-          targets: build
-          target_flags:
-          runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-          artifact: "false"
+          command: run
+          args: ./catalyst-gateway+build
 
       - name: Get schemathesis test report
-        uses: input-output-hk/catalyst-ci/actions/run@master
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.2.1
         if: always()
         continue-on-error: true
         with:
-          earthfile: ./catalyst-gateway/tests/schemathesis_tests
-          flags: --allow-privileged
-          targets: test-fuzzer-api
-          target_flags:
-          runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-          artifact: "false"
+          command: run
+          args: ./catalyst-gateway/tests/schemathesis_tests+test-fuzzer-api
 
       - name: Get flutter unit test report
-        uses: input-output-hk/catalyst-ci/actions/run@master
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.2.1
         if: always()
         continue-on-error: true
         with:
-          earthfile: ./catalyst_voices/
-          flags:
-          targets: test-unit
-          target_flags:
-          runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-          artifact: "false"
+          command: run
+          args: ./catalyst_voices+test-unit
 
       - name: Get python api test report
-        uses: input-output-hk/catalyst-ci/actions/run@master
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.2.1
         if: always()
         continue-on-error: true
         with:
-          earthfile: ./catalyst-gateway/tests/api_tests/
-          flags: --allow-privileged
-          targets: test
-          target_flags:
-          runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-          artifact: "false"
+          command: run
+          args: ./catalyst-gateway/tests/api_tests+test
 
       - name: Collect and upload test reports
         uses: actions/upload-artifact@v4

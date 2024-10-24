@@ -43,6 +43,7 @@
     "flutter",
     "flutter/catalyst_cardano",
     "flutter/catalyst_compression",
+    "flutter/catalyst_key_derivation",
     "utils",
     "docs",
     "general"
@@ -52,7 +53,9 @@
   "cSpell.autoFormatConfigFile": true,
   "cSpell.language": "en,en-US",
   "files.associations": {
-    "Earthfile": "earthfile"
+    "Earthfile": "earthfile",
+    ".pages": "yaml",
+    ".earthlyignore": "ignore"
   },
   "rust-analyzer.linkedProjects": [
     "./catalyst-gateway/Cargo.toml"
@@ -95,5 +98,11 @@
   "rust-analyzer.lens.enable": true,
   "vs-kubernetes": {
     "vs-kubernetes.kubeconfig": "utilities/local-cluster/shared/k3s.yaml"
-  }
+  },
+  "dependi.rust.informPatchUpdates": true,
+  "dependi.decoration.compatible.style": null,
+  "git.enableCommitSigning": true,
+  "languageToolLinter.external.url": "https://api.languagetoolplus.com",
+  "languageToolLinter.languageTool.language": "en-US",
+  "languageToolLinter.languageTool.motherTongue": "en-US"
 }

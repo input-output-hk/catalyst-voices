@@ -3,7 +3,10 @@ import 'dart:async';
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:result_type/result_type.dart';
 
@@ -12,48 +15,107 @@ final _logger = Logger('WalletLinkCubit');
 abstract interface class WalletLinkManager {
   Future<void> refreshWallets();
 
-  Future<bool> selectWallet(CardanoWallet wallet);
+  Future<bool> selectWallet(WalletMetadata meta);
 
   void selectRoles(Set<AccountRole> roles);
 }
 
 final class WalletLinkCubit extends Cubit<WalletLinkStateData>
+    with BlocErrorEmitterMixin
     implements WalletLinkManager {
-  WalletLinkCubit() : super(const WalletLinkStateData());
+  final RegistrationService registrationService;
+
+  final _wallets = <CardanoWallet>[];
+  CardanoWallet? _selectedWallet;
+
+  WalletLinkCubit({required this.registrationService})
+      : super(const WalletLinkStateData());
+
+  Set<AccountRole> get roles {
+    return state.selectedRoles ?? state.defaultRoles;
+  }
+
+  CardanoWallet? get selectedWallet => _selectedWallet;
 
   @override
   Future<void> refreshWallets() async {
     try {
+      _wallets.clear();
       emit(state.copyWith(wallets: const Optional.empty()));
 
       final wallets =
-          await CatalystCardano.instance.getWallets().withMinimumDelay();
+          await registrationService.getCardanoWallets().withMinimumDelay();
 
-      emit(state.copyWith(wallets: Optional(Success(wallets))));
+      _wallets
+        ..clear()
+        ..addAll(wallets);
+
+      final walletsMetaList =
+          wallets.map(WalletMetadata.fromCardanoWallet).toList();
+
+      emit(state.copyWith(wallets: Optional(Success(walletsMetaList))));
     } on Exception catch (error, stackTrace) {
       _logger.severe('refreshWallets', error, stackTrace);
+
+      _wallets.clear();
+
       emit(state.copyWith(wallets: Optional(Failure(error))));
     }
   }
 
   @override
-  Future<bool> selectWallet(CardanoWallet wallet) async {
+  Future<bool> selectWallet(WalletMetadata meta) async {
     try {
-      final enabledWallet = await wallet.enable();
-      final balance = await enabledWallet.getBalance();
-      final address = await enabledWallet.getChangeAddress();
+      final wallet =
+          _wallets.firstWhereOrNull((wallet) => wallet.name == meta.name);
 
-      final walletDetails = CardanoWalletDetails(
-        wallet: wallet,
-        balance: balance.coin,
-        address: address,
+      if (wallet == null) {
+        throw const LocalizedRegistrationWalletNotFoundException();
+      }
+
+      _selectedWallet = wallet;
+
+      final walletInfo = await registrationService.getCardanoWalletInfo(wallet);
+
+      final walletConnection = WalletConnectionData(
+        name: walletInfo.metadata.name,
+        icon: walletInfo.metadata.icon,
+        isConnected: true,
+      );
+      final walletSummary = WalletSummaryData(
+        balance: CryptocurrencyFormatter.formatAmount(walletInfo.balance),
+        address: WalletAddressFormatter.formatShort(walletInfo.address),
+        clipboardAddress: walletInfo.address.toBech32(),
+        showLowBalance:
+            walletInfo.balance < CardanoWalletDetails.minAdaForRegistration,
       );
 
-      emit(state.copyWith(selectedWallet: Optional(walletDetails)));
+      final newState = state.copyWith(
+        selectedWallet: Optional(walletInfo),
+        hasEnoughBalance:
+            walletInfo.balance >= CardanoWalletDetails.minAdaForRegistration,
+        walletConnection: Optional(walletConnection),
+        walletSummary: Optional(walletSummary),
+      );
+
+      emit(newState);
 
       return true;
     } catch (error, stackTrace) {
       _logger.severe('selectWallet', error, stackTrace);
+
+      _selectedWallet = null;
+
+      emit(
+        state.copyWith(
+          selectedWallet: const Optional.empty(),
+          walletConnection: const Optional.empty(),
+          walletSummary: const Optional.empty(),
+        ),
+      );
+
+      emitError(error);
+
       return false;
     }
   }

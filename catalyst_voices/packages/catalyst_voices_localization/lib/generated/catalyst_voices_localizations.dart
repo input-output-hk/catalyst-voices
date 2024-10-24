@@ -826,6 +826,30 @@ abstract class VoicesLocalizations {
   /// **'Transaction failed'**
   String get registrationTransactionFailed;
 
+  /// Indicates an error when preparing a transaction has failed due to low wallet balance.
+  ///
+  /// In en, this message translates to:
+  /// **'Insufficient balance, please top up your wallet.'**
+  String get registrationInsufficientBalance;
+
+  /// Error message shown when attempting to register or recover account but seed phrase was not found
+  ///
+  /// In en, this message translates to:
+  /// **'Seed phrase was not found. Make sure correct words are correct.'**
+  String get registrationSeedPhraseNotFound;
+
+  /// Error message shown when attempting to register or recover account but password was not found
+  ///
+  /// In en, this message translates to:
+  /// **'Password was not found. Make sure valid password was created.'**
+  String get registrationUnlockPasswordNotFound;
+
+  /// Error message shown when connect wallet but matching was not found
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet not found'**
+  String get registrationWalletNotFound;
+
   /// A title on the role chooser screen in registration.
   ///
   /// In en, this message translates to:
@@ -1093,7 +1117,7 @@ abstract class VoicesLocalizations {
   /// An error text on text field on delete keychain dialog
   ///
   /// In en, this message translates to:
-  /// **'Error. Please type \'Remove keychain\' to remove your account from this device.'**
+  /// **'Error. Please type \'Remove Keychain\' to remove your account from this device.'**
   String get deleteKeychainDialogErrorText;
 
   /// A removing phrase on delete keychain dialog
@@ -1342,6 +1366,78 @@ abstract class VoicesLocalizations {
   /// **'Catalyst keychain removed'**
   String get keychainDeletedDialogInfo;
 
+  /// No description provided for @registrationCompletedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst account setup'**
+  String get registrationCompletedTitle;
+
+  /// No description provided for @registrationCompletedSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed!'**
+  String get registrationCompletedSubtitle;
+
+  /// No description provided for @registrationCompletedSummaryHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Summary'**
+  String get registrationCompletedSummaryHeader;
+
+  /// No description provided for @registrationCompletedKeychainTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst Keychain created'**
+  String get registrationCompletedKeychainTitle;
+
+  /// No description provided for @registrationCompletedKeychainInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'You created a Catalyst Keychain, backed up its seed phrase and set an unlock password.'**
+  String get registrationCompletedKeychainInfo;
+
+  /// No description provided for @registrationCompletedWalletTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Cardano {walletName} wallet selected'**
+  String registrationCompletedWalletTitle(String walletName);
+
+  /// No description provided for @registrationCompletedWalletInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'You selected your {walletName} wallet as primary wallet for your voting power.'**
+  String registrationCompletedWalletInfo(String walletName);
+
+  /// No description provided for @registrationCompletedRolesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst roles selected'**
+  String get registrationCompletedRolesTitle;
+
+  /// No description provided for @registrationCompletedRolesInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'You linked your Cardano wallet and selected  Catalyst roles via a signed transaction.'**
+  String get registrationCompletedRolesInfo;
+
+  /// No description provided for @registrationCompletedRoleRegistration.
+  ///
+  /// In en, this message translates to:
+  /// **'role registration'**
+  String get registrationCompletedRoleRegistration;
+
+  /// No description provided for @registrationCompletedDiscoveryButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Discovery Dashboard'**
+  String get registrationCompletedDiscoveryButton;
+
+  /// No description provided for @registrationCompletedAccountButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Review my account'**
+  String get registrationCompletedAccountButton;
+
   /// No description provided for @createKeychainSeedPhraseSubtitle.
   ///
   /// In en, this message translates to:
@@ -1411,7 +1507,7 @@ abstract class VoicesLocalizations {
   /// No description provided for @createKeychainSeedPhraseCheckSuccessSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Enter your seed phrase to recover your Catalyst Keychain on any device.  It\'s kinda like your email and password all rolled into one, so keep it somewhere safe!  In the next step we’ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.'**
+  /// **'Enter your seed phrase to recover your Catalyst Keychain on any device.  It\'s kinda like your email and password all rolled into one, so keep it somewhere safe!  In the next step we\'ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.'**
   String get createKeychainSeedPhraseCheckSuccessSubtitle;
 
   /// No description provided for @yourNextStep.
@@ -1516,6 +1612,12 @@ abstract class VoicesLocalizations {
   /// **'Warning'**
   String get warning;
 
+  /// No description provided for @alert.
+  ///
+  /// In en, this message translates to:
+  /// **'Alert'**
+  String get alert;
+
   /// No description provided for @registrationExitConfirmDialogSubtitle.
   ///
   /// In en, this message translates to:
@@ -1534,11 +1636,11 @@ abstract class VoicesLocalizations {
   /// **'Continue keychain creation'**
   String get registrationExitConfirmDialogContinue;
 
-  /// No description provided for @registrationExitConfirmDialogCancel.
+  /// No description provided for @cancelAnyways.
   ///
   /// In en, this message translates to:
   /// **'Cancel anyway'**
-  String get registrationExitConfirmDialogCancel;
+  String get cancelAnyways;
 
   /// No description provided for @recoverCatalystKeychain.
   ///
@@ -1611,6 +1713,186 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Enter each word of your Catalyst Key in the right order  to bring your Catalyst account to this device.'**
   String get recoverySeedPhraseInputSubtitle;
+
+  /// No description provided for @recoveryAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst account recovery'**
+  String get recoveryAccountTitle;
+
+  /// No description provided for @recoveryAccountSuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Keychain recovered successfully!'**
+  String get recoveryAccountSuccessTitle;
+
+  /// No description provided for @recoveryAccountDetailsAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Set unlock password for this device'**
+  String get recoveryAccountDetailsAction;
+
+  /// No description provided for @recoveryUnlockPasswordInstructionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set your Catalyst unlock password f or this device'**
+  String get recoveryUnlockPasswordInstructionsTitle;
+
+  /// No description provided for @recoveryUnlockPasswordInstructionsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.    But it can be a bit tedious to enter every single time you want to use the app.    In this next step, you\'ll set your Unlock Password for your current device. It\'s like a shortcut for proving ownership of your Keychain.    Whenever you recover your account for the first time on a new device, you\'ll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.'**
+  String get recoveryUnlockPasswordInstructionsSubtitle;
+
+  /// The header label in unlock dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock Catalyst'**
+  String get unlockDialogHeader;
+
+  /// The title label in unlock dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back!'**
+  String get unlockDialogTitle;
+
+  /// The content (body) in unlock dialog.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your device specific unlock password\nto unlock Catalyst Voices.'**
+  String get unlockDialogContent;
+
+  /// The hint for the unlock password field.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your Unlock password'**
+  String get unlockDialogHint;
+
+  /// An error message shown below the password field when the password is incorrect.
+  ///
+  /// In en, this message translates to:
+  /// **'Password is incorrect, try again.'**
+  String get unlockDialogIncorrectPassword;
+
+  /// The message shown when asking the user to login/unlock and the user wants to cancel the process.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue as guest'**
+  String get continueAsGuest;
+
+  /// The title shown in confirmation snackbar after unlocking the keychain.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst unlocked!'**
+  String get unlockSnackbarTitle;
+
+  /// The message shown below the title in confirmation snackbar after unlocking the keychain.
+  ///
+  /// In en, this message translates to:
+  /// **'You can now fully use the application.'**
+  String get unlockSnackbarMessage;
+
+  /// The title shown in confirmation snackbar after locking the keychain.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst locked'**
+  String get lockSnackbarTitle;
+
+  /// The message shown below the title in confirmation snackbar after locking the keychain.
+  ///
+  /// In en, this message translates to:
+  /// **'Catalyst is now in guest/locked mode.'**
+  String get lockSnackbarMessage;
+
+  /// No description provided for @recoverySuccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Congratulations your Catalyst  Keychain is restored!'**
+  String get recoverySuccessTitle;
+
+  /// No description provided for @recoverySuccessSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'You have successfully restored your Catalyst Keychain, and unlocked Catalyst Voices on this device.'**
+  String get recoverySuccessSubtitle;
+
+  /// No description provided for @recoverySuccessGoToDashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Jump into the Discovery space / Dashboard'**
+  String get recoverySuccessGoToDashboard;
+
+  /// No description provided for @recoverySuccessGoAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Check my account'**
+  String get recoverySuccessGoAccount;
+
+  /// No description provided for @recoveryExitConfirmDialogSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'12 word keychain restoration incomplete'**
+  String get recoveryExitConfirmDialogSubtitle;
+
+  /// No description provided for @recoveryExitConfirmDialogContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Please continue your Catalyst Keychain restoration, if you cancel all input will be lost.'**
+  String get recoveryExitConfirmDialogContent;
+
+  /// No description provided for @recoveryExitConfirmDialogContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue recovery process'**
+  String get recoveryExitConfirmDialogContinue;
+
+  /// No description provided for @uploadConfirmDialogSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'SWITCH TO FILE UPLOAD'**
+  String get uploadConfirmDialogSubtitle;
+
+  /// No description provided for @uploadConfirmDialogContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Do you want to cancel manual input, and switch to Catalyst key upload?'**
+  String get uploadConfirmDialogContent;
+
+  /// No description provided for @uploadConfirmDialogYesButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, switch to Catalyst key upload'**
+  String get uploadConfirmDialogYesButton;
+
+  /// No description provided for @uploadConfirmDialogResumeButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Resume manual inputs'**
+  String get uploadConfirmDialogResumeButton;
+
+  /// No description provided for @incorrectUploadDialogSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'CATALYST KEY INCORRECT'**
+  String get incorrectUploadDialogSubtitle;
+
+  /// No description provided for @incorrectUploadDialogContent.
+  ///
+  /// In en, this message translates to:
+  /// **'The Catalyst keychain that you entered or uploaded is incorrect, please try again.'**
+  String get incorrectUploadDialogContent;
+
+  /// No description provided for @incorrectUploadDialogTryAgainButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get incorrectUploadDialogTryAgainButton;
+
+  /// No description provided for @finishAccountCreation.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish account creation'**
+  String get finishAccountCreation;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

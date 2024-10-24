@@ -87,7 +87,7 @@ package:
 
     SAVE IMAGE voices-frontend:$tag
 
-publish:
+docker:
    FROM +package
 
    ARG container="voices"

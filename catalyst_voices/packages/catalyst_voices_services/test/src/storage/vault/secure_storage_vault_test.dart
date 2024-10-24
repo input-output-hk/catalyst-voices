@@ -1,4 +1,6 @@
-import 'package:catalyst_voices_services/src/storage/vault/lock_factor.dart';
+import 'dart:convert';
+
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/src/storage/vault/secure_storage_vault.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:test/test.dart';
@@ -11,7 +13,10 @@ void main() {
     FlutterSecureStorage.setMockInitialValues({});
 
     flutterSecureStorage = const FlutterSecureStorage();
-    vault = SecureStorageVault(secureStorage: flutterSecureStorage);
+    vault = SecureStorageVault(
+      id: 'id',
+      secureStorage: flutterSecureStorage,
+    );
   });
 
   tearDown(() async {
@@ -28,31 +33,34 @@ void main() {
     expect(isUnlocked, isFalse);
   });
 
-  test('read returns null when not unlocked', () async {
+  test('read when not unlocked throws exception', () async {
     // Given
     const key = 'SecureStorageVault.key';
     const value = 'username';
 
     // When
     await flutterSecureStorage.write(key: key, value: value);
-    final readValue = await vault.readString(key: key);
 
     // Then
-    expect(readValue, isNull);
+    expect(
+      () => vault.readString(key: key),
+      throwsA(isA<VaultLockedException>()),
+    );
   });
 
-  test('write wont happen when is locked', () async {
+  test('write throws exception when is locked', () async {
     // Given
     const key = 'key';
-    const fKey = 'SecureStorageVault.$key';
     const value = 'username';
 
     // When
-    await vault.writeString(value, key: key);
-    final readValue = await flutterSecureStorage.read(key: fKey);
+    await vault.lock();
 
     // Then
-    expect(readValue, isNull);
+    expect(
+      () => vault.writeString(value, key: key),
+      throwsA(isA<VaultLockedException>()),
+    );
   });
 
   test('unlock update lock and returns null when locked', () async {
@@ -90,9 +98,9 @@ void main() {
   test('clear removes all vault keys', () async {
     // Given
     const lock = PasswordLockFactor('pass1234');
-    const vaultKeyValues = <String, String>{
-      'one': 'qqq',
-      'two': 'qqq',
+    final vaultKeyValues = <String, String>{
+      'one': utf8.fuse(base64).encode('qqq'),
+      'two': utf8.fuse(base64).encode('qqq'),
     };
     const nonVaultKeyValues = <String, String>{
       'three': 'qqq',
@@ -121,5 +129,84 @@ void main() {
     // Then
     expect(values, everyElement(isNull));
     expect(fValues, nonVaultKeyValues);
+  });
+
+  group('Get storage id', () {
+    test('returns correctly extracted value', () {
+      // Given
+      const storageId = 'UUID';
+      const key = 'SecureStorageVault.$storageId.rootKey';
+
+      // When
+      final id = SecureStorageVault.getStorageId(key);
+
+      // Then
+      expect(id, storageId);
+    });
+
+    test('throws exception when too many dots', () {
+      // Given
+      const storageId = 'UUID';
+      const key = 'Secure.Storage.Vault.$storageId.rootKey';
+
+      // When
+
+      // Then
+      expect(
+        () => SecureStorageVault.getStorageId(key),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test('throws exception when empty', () {
+      // Given
+      const key = '';
+
+      // When
+
+      // Then
+      expect(
+        () => SecureStorageVault.getStorageId(key),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test('throws exception when invalid value', () {
+      // Given
+      const key = 'Secure.rootKey';
+
+      // When
+
+      // Then
+      expect(
+        () => SecureStorageVault.getStorageId(key),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+  });
+
+  group('Is storage key', () {
+    test('returns true for valid key', () {
+      // Given
+      const storageId = 'UUID';
+      const key = 'SecureStorageVault.$storageId.rootKey';
+
+      // When
+      final isValid = SecureStorageVault.isStorageKey(key);
+
+      // Then
+      expect(isValid, isTrue);
+    });
+
+    test('returns false for invalid key', () {
+      // Given
+      const key = 'SecureStorageVault.rootKey';
+
+      // When
+      final isValid = SecureStorageVault.isStorageKey(key);
+
+      // Then
+      expect(isValid, isFalse);
+    });
   });
 }

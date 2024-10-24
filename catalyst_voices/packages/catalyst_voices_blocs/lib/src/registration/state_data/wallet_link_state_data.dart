@@ -1,17 +1,23 @@
-import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:result_type/result_type.dart';
 
 final class WalletLinkStateData extends Equatable {
-  final Result<List<CardanoWallet>, Exception>? wallets;
-  final CardanoWalletDetails? selectedWallet;
+  final Result<List<WalletMetadata>, Exception>? wallets;
+  final WalletInfo? selectedWallet;
+  final bool hasEnoughBalance;
+  final WalletConnectionData? walletConnection;
+  final WalletSummaryData? walletSummary;
   final Set<AccountRole>? selectedRoles;
 
   const WalletLinkStateData({
     this.wallets,
     this.selectedWallet,
+    this.hasEnoughBalance = false,
+    this.walletConnection,
+    this.walletSummary,
     this.selectedRoles,
   });
 
@@ -21,17 +27,20 @@ final class WalletLinkStateData extends Equatable {
   /// Returns the default roles every account will have.
   Set<AccountRole> get defaultRoles => {AccountRole.voter};
 
-  /// Returns the selected & enabled cardano wallet.
-  CardanoWallet? get selectedCardanoWallet => selectedWallet?.wallet;
-
   WalletLinkStateData copyWith({
-    Optional<Result<List<CardanoWallet>, Exception>>? wallets,
-    Optional<CardanoWalletDetails>? selectedWallet,
+    Optional<Result<List<WalletMetadata>, Exception>>? wallets,
+    Optional<WalletInfo>? selectedWallet,
+    bool? hasEnoughBalance,
+    Optional<WalletConnectionData>? walletConnection,
+    Optional<WalletSummaryData>? walletSummary,
     Optional<Set<AccountRole>>? selectedRoles,
   }) {
     return WalletLinkStateData(
       wallets: wallets.dataOr(this.wallets),
       selectedWallet: selectedWallet.dataOr(this.selectedWallet),
+      hasEnoughBalance: hasEnoughBalance ?? this.hasEnoughBalance,
+      walletConnection: walletConnection.dataOr(this.walletConnection),
+      walletSummary: walletSummary.dataOr(this.walletSummary),
       selectedRoles: selectedRoles.dataOr(this.selectedRoles),
     );
   }
@@ -40,6 +49,9 @@ final class WalletLinkStateData extends Equatable {
   List<Object?> get props => [
         wallets,
         selectedWallet,
+        hasEnoughBalance,
+        walletConnection,
+        walletSummary,
         selectedRoles,
       ];
 }

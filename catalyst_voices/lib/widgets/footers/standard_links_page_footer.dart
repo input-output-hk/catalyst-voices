@@ -9,7 +9,7 @@ class StandardLinksPageFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // TODO(damian): implement proper routing actions once we have them
+    // TODO(damian-molinski): implement proper routing actions once we have them
     return LinksPageFooter(
       upperChildren: [
         LinkText(

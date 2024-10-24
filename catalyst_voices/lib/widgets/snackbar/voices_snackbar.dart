@@ -1,7 +1,11 @@
+import 'dart:math';
+
+import 'package:catalyst_voices/widgets/common/affix_decorator.dart';
+import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_action.dart';
 import 'package:catalyst_voices/widgets/snackbar/voices_snackbar_type.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
-import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:flutter/material.dart';
 
 /// [VoicesSnackBar] is a custom [SnackBar] widget that displays messages with
@@ -14,12 +18,19 @@ class VoicesSnackBar extends StatelessWidget {
   /// which determines its appearance and behavior.
   final VoicesSnackBarType type;
 
-  /// Function to be executed when the primary action button is pressed.
-  final VoidCallback? onPrimaryPressed;
+  /// A custom icon. Overrides the default one specified by [type].
+  final Widget? icon;
 
-  /// Callback function to be executed when the secondary action button is
-  /// pressed.
-  final VoidCallback? onSecondaryPressed;
+  /// A custom title. Overrides the default one specified by [type].
+  final String? title;
+
+  /// A custom message. Overrides the default one specified by [type].
+  final String? message;
+
+  /// The list of actions attached to the bottom of the snackBar.
+  ///
+  /// See [VoicesSnackBarPrimaryAction] and [VoicesSnackBarSecondaryAction].
+  final List<Widget> actions;
 
   /// Callback function to be executed when the close button is pressed.
   final VoidCallback? onClosePressed;
@@ -27,17 +38,24 @@ class VoicesSnackBar extends StatelessWidget {
   /// The behavior of the [VoicesSnackBar], which can be fixed or floating.
   final SnackBarBehavior? behavior;
 
-  /// The padding around the content of the [VoicesSnackBar].
+  /// The padding around the the [VoicesSnackBar].
   final EdgeInsetsGeometry? padding;
 
   /// The width of the [VoicesSnackBar].
+  ///
+  /// If null and [behavior] is [SnackBarBehavior.floating] then snackbar
+  /// will calculate it's size using the following formula:
+  /// - max(screenWidth * 0.4, 300)
+  /// but no more than the screenWidth.
   final double? width;
 
   const VoicesSnackBar({
     super.key,
     required this.type,
-    this.onPrimaryPressed,
-    this.onSecondaryPressed,
+    this.icon,
+    this.title,
+    this.message,
+    this.actions = const [],
     this.onClosePressed,
     this.width,
     this.behavior = SnackBarBehavior.fixed,
@@ -48,97 +66,61 @@ class VoicesSnackBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final textTheme = theme.textTheme;
-    final l10n = context.l10n;
 
     return DecoratedBox(
       decoration: BoxDecoration(
         color: type.backgroundColor(context),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Stack(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Positioned(
-            top: 12,
-            right: 12,
+          Flexible(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 8,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  _IconAndTitle(
+                    type: type,
+                    icon: icon ?? type.icon().buildIcon(),
+                    title: title ?? type.title(context),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 28),
+                    child: Text(
+                      message ?? type.message(context),
+                      style: textTheme.bodyMedium,
+                    ),
+                  ),
+                  if (actions.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16),
+                      child: Row(
+                        children: actions
+                            .separatedBy(const SizedBox(width: 8))
+                            .toList(),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 8, right: 4),
             child: IconButton(
               icon: VoicesAssets.icons.x.buildIcon(
                 size: 24,
                 color: theme.colors.iconsForeground,
               ),
-              onPressed: onClosePressed,
+              onPressed: onClosePressed ?? () => hideCurrent(context),
             ),
-          ),
-          Column(
-            children: [
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Row(
-                  children: [
-                    type.icon().buildIcon(
-                          size: 20,
-                          color: type.iconColor(context),
-                        ),
-                    const SizedBox(width: 16),
-                    Text(
-                      type.title(context),
-                      style: TextStyle(
-                        color: type.titleColor(context),
-                        fontSize: textTheme.titleMedium?.fontSize,
-                        fontWeight: textTheme.titleMedium?.fontWeight,
-                        fontFamily: textTheme.titleMedium?.fontFamily,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(
-                  left: 48,
-                ),
-                child: Row(
-                  children: [
-                    Text(
-                      type.message(context),
-                      style: textTheme.bodyMedium,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 18),
-              Padding(
-                padding: const EdgeInsets.only(
-                  left: 36,
-                ),
-                child: Row(
-                  children: [
-                    TextButton(
-                      onPressed: onPrimaryPressed,
-                      child: Text(
-                        type == VoicesSnackBarType.success
-                            ? l10n.snackbarOkButtonText
-                            : l10n.snackbarRefreshButtonText,
-                        style: TextStyle(
-                          color: theme.colors.textPrimary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    TextButton(
-                      onPressed: onSecondaryPressed,
-                      child: Text(
-                        l10n.snackbarMoreButtonText,
-                        style: TextStyle(
-                          color: theme.colors.textPrimary,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 18),
-            ],
           ),
         ],
       ),
@@ -150,7 +132,9 @@ class VoicesSnackBar extends StatelessWidget {
       SnackBar(
         content: this,
         behavior: behavior,
-        width: behavior == SnackBarBehavior.floating ? width : null,
+        width: _calculateSnackBarWidth(
+          screenWidth: MediaQuery.sizeOf(context).width,
+        ),
         padding: padding,
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -158,6 +142,53 @@ class VoicesSnackBar extends StatelessWidget {
     );
   }
 
+  double? _calculateSnackBarWidth({required double screenWidth}) {
+    switch (behavior) {
+      case null:
+      case SnackBarBehavior.fixed:
+        // custom width not supported
+        return null;
+      case SnackBarBehavior.floating:
+        return max(screenWidth * 0.4, 300).clamp(0.0, screenWidth).toDouble();
+    }
+  }
+
   static void hideCurrent(BuildContext context) =>
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
+}
+
+class _IconAndTitle extends StatelessWidget {
+  final VoicesSnackBarType type;
+  final Widget icon;
+  final String title;
+
+  const _IconAndTitle({
+    required this.type,
+    required this.icon,
+    required this.title,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return AffixDecorator(
+      prefix: IconTheme(
+        data: IconThemeData(
+          size: 20,
+          color: type.iconColor(context),
+        ),
+        child: icon,
+      ),
+      child: Text(
+        title,
+        style: TextStyle(
+          color: type.titleColor(context),
+          fontSize: textTheme.titleMedium?.fontSize,
+          fontWeight: textTheme.titleMedium?.fontWeight,
+          fontFamily: textTheme.titleMedium?.fontFamily,
+        ),
+      ),
+    );
+  }
 }

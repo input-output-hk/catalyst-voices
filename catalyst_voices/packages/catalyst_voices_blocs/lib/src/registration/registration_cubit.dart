@@ -7,7 +7,6 @@ import 'package:catalyst_voices_blocs/src/registration/cubits/recover_cubit.dart
 import 'package:catalyst_voices_blocs/src/registration/cubits/wallet_link_cubit.dart';
 import 'package:catalyst_voices_blocs/src/registration/state_data/keychain_state_data.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
@@ -18,24 +17,52 @@ import 'package:result_type/result_type.dart';
 final _logger = Logger('RegistrationCubit');
 
 /// Manages the registration state.
-final class RegistrationCubit extends Cubit<RegistrationState> {
+final class RegistrationCubit extends Cubit<RegistrationState>
+    with BlocErrorEmitterMixin {
   final KeychainCreationCubit _keychainCreationCubit;
   final WalletLinkCubit _walletLinkCubit;
   final RecoverCubit _recoverCubit;
-  final TransactionConfigRepository transactionConfigRepository;
+
+  final UserService _userService;
+  final RegistrationService _registrationService;
+  final RegistrationProgressNotifier _progressNotifier;
+
+  Ed25519KeyPair? _keyPair;
+  Transaction? _transaction;
+
+  /// Returns [RegistrationCubit] if found in widget tree. Does not add
+  /// rebuild dependency when called.
+  static RegistrationCubit of(BuildContext context) {
+    return context.read<RegistrationCubit>();
+  }
 
   RegistrationCubit({
     required Downloader downloader,
-    required this.transactionConfigRepository,
-  })  : _keychainCreationCubit = KeychainCreationCubit(
+    required UserService userService,
+    required RegistrationService registrationService,
+    required RegistrationProgressNotifier progressNotifier,
+  })  : _registrationService = registrationService,
+        _userService = userService,
+        _progressNotifier = progressNotifier,
+        _keychainCreationCubit = KeychainCreationCubit(
           downloader: downloader,
+          progressNotifier: progressNotifier,
         ),
-        _walletLinkCubit = WalletLinkCubit(),
-        _recoverCubit = RecoverCubit(),
+        _walletLinkCubit = WalletLinkCubit(
+          registrationService: registrationService,
+        ),
+        _recoverCubit = RecoverCubit(
+          userService: userService,
+          registrationService: registrationService,
+        ),
         super(const RegistrationState()) {
     _keychainCreationCubit.stream.listen(_onKeychainStateDataChanged);
     _walletLinkCubit.stream.listen(_onWalletLinkStateDataChanged);
     _recoverCubit.stream.listen(_onRecoverStateDataChanged);
+
+    _keychainCreationCubit.errorStream.listen(emitError);
+    _walletLinkCubit.errorStream.listen(emitError);
+    _recoverCubit.errorStream.listen(emitError);
 
     // Emits initialization state
     emit(
@@ -53,20 +80,32 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
 
   RecoverManager get recover => _recoverCubit;
 
-  /// Returns [RegistrationCubit] if found in widget tree. Does not add
-  /// rebuild dependency when called.
-  static RegistrationCubit of(BuildContext context) {
-    return context.read<RegistrationCubit>();
-  }
+  RegistrationStateData get _registrationState => state.registrationStateData;
 
   @override
   Future<void> close() {
     _keychainCreationCubit.close();
     _walletLinkCubit.close();
+    _recoverCubit.close();
     return super.close();
   }
 
+  void recoverProgress() {
+    final progress = _progressNotifier.value;
+    final keychainProgress = progress.keychainProgress;
+
+    if (keychainProgress != null) {
+      _keychainCreationCubit
+        ..recoverSeedPhrase(keychainProgress.seedPhrase)
+        ..recoverPassword(keychainProgress.password);
+
+      _goToStep(const FinishAccountCreationStep());
+    }
+  }
+
   void createNewKeychain() {
+    _progressNotifier.clear();
+
     final nextStep = _nextStep(from: const CreateKeychainStep());
     if (nextStep != null) {
       _goToStep(nextStep);
@@ -74,6 +113,8 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
   }
 
   void recoverKeychain() {
+    _progressNotifier.clear();
+
     unawaited(recover.checkLocalKeychains());
 
     _goToStep(const RecoverMethodStep());
@@ -112,41 +153,55 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     try {
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
-          unsignedTx: const Optional(null),
-          submittedTx: const Optional(null),
+          canSubmitTx: Optional.of(Success(false)),
+          transactionFee: const Optional.empty(),
           isSubmittingTx: false,
+          account: const Optional.empty(),
         ),
       );
 
-      // TODO(dtscalac): inject the networkId
-      const networkId = NetworkId.testnet;
-      final walletApi = await _walletLinkState.selectedCardanoWallet!.enable();
+      final seedPhrase = _keychainCreationCubit.seedPhrase!;
+      final wallet = _walletLinkCubit.selectedWallet!;
+      final roles = _walletLinkCubit.roles;
 
-      final registrationBuilder = RegistrationTransactionBuilder(
-        transactionConfig: await transactionConfigRepository.fetch(networkId),
-        networkId: networkId,
-        seedPhrase: _keychainState.seedPhrase!,
-        roles: _walletLinkState.selectedRoles ?? _walletLinkState.defaultRoles,
-        changeAddress: await walletApi.getChangeAddress(),
-        rewardAddresses: await walletApi.getRewardAddresses(),
-        utxos: await walletApi.getUtxos(
-          amount: Balance(
-            coin: CardanoWalletDetails.minAdaForRegistration,
+      final keyPair = await _registrationService.deriveAccountRoleKeyPair(
+        seedPhrase: seedPhrase,
+        roles: roles,
+      );
+
+      final transaction = await _registrationService.prepareRegistration(
+        wallet: wallet,
+        // TODO(dtscalac): inject the networkId
+        networkId: NetworkId.testnet,
+        keyPair: keyPair,
+        roles: roles,
+      );
+
+      _keyPair = keyPair;
+      _transaction = transaction;
+
+      final fee = transaction.body.fee;
+
+      _onRegistrationStateDataChanged(
+        _registrationState.copyWith(
+          canSubmitTx: Optional.of(Success(true)),
+          transactionFee: Optional.of(
+            CryptocurrencyFormatter.formatExactAmount(fee),
           ),
         ),
       );
+    } on RegistrationException catch (error, stackTrace) {
+      _logger.severe('Prepare registration', error, stackTrace);
 
-      final tx = await registrationBuilder.build();
+      _keyPair = null;
+      _transaction = null;
+
+      final exception = LocalizedRegistrationException.from(error);
+
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
-          unsignedTx: Optional(Success(tx)),
-        ),
-      );
-    } on Exception catch (error, stackTrace) {
-      _logger.severe('prepareRegistration', error, stackTrace);
-      _onRegistrationStateDataChanged(
-        _registrationState.copyWith(
-          unsignedTx: Optional(Failure(const LocalizedUnknownException())),
+          canSubmitTx: Optional.of(Failure(exception)),
+          transactionFee: const Optional.empty(),
         ),
       );
     }
@@ -156,38 +211,49 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
     try {
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
-          submittedTx: const Optional(null),
+          account: const Optional.empty(),
           isSubmittingTx: true,
         ),
       );
 
-      final walletApi = await _walletLinkState.selectedCardanoWallet!.enable();
-      final unsignedTx = _registrationState.unsignedTx!.success;
-      final witnessSet = await walletApi.signTx(transaction: unsignedTx);
+      final keyPair = _keyPair!;
+      final transaction = _transaction!;
 
-      final signedTx = Transaction(
-        body: unsignedTx.body,
-        isValid: true,
-        witnessSet: witnessSet,
-        auxiliaryData: unsignedTx.auxiliaryData,
+      final password = _keychainCreationCubit.password;
+      final lockFactor = PasswordLockFactor(password.value);
+
+      final wallet = _walletLinkCubit.selectedWallet!;
+      final roles = _walletLinkCubit.roles;
+
+      final account = await _registrationService.register(
+        wallet: wallet,
+        unsignedTx: transaction,
+        roles: roles,
+        lockFactor: lockFactor,
+        // TODO(dtscalac): Update key value when derivation is final.
+        keyPair: keyPair,
       );
 
-      await walletApi.submitTx(transaction: signedTx);
+      await _userService.useAccount(account);
+
+      _progressNotifier.clear();
 
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
-          submittedTx: Optional(Success(signedTx)),
+          account: Optional(Success(account)),
           isSubmittingTx: false,
         ),
       );
+
       nextStep();
-    } on Exception catch (error, stackTrace) {
-      _logger.severe('submitRegistration', error, stackTrace);
+    } on RegistrationException catch (error, stackTrace) {
+      _logger.severe('Submit registration', error, stackTrace);
+
+      final exception = LocalizedRegistrationException.from(error);
+
       _onRegistrationStateDataChanged(
         _registrationState.copyWith(
-          submittedTx: Optional(
-            Failure(const LocalizedRegistrationTransactionException()),
-          ),
+          account: Optional(Failure(exception)),
           isSubmittingTx: false,
         ),
       );
@@ -303,12 +369,6 @@ final class RegistrationCubit extends Cubit<RegistrationState> {
   void _goToStep(RegistrationStep step) {
     emit(state.copyWith(step: step));
   }
-
-  KeychainStateData get _keychainState => state.keychainStateData;
-
-  WalletLinkStateData get _walletLinkState => state.walletLinkStateData;
-
-  RegistrationStateData get _registrationState => state.registrationStateData;
 
   void _onKeychainStateDataChanged(KeychainStateData data) {
     emit(state.copyWith(keychainStateData: data));

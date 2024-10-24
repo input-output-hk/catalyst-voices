@@ -12,6 +12,14 @@ final class SeedPhraseFieldController
     extends ValueNotifier<List<SeedPhraseWord>> {
   SeedPhraseFieldController([super._value = const <SeedPhraseWord>[]]);
 
+  set words(List<SeedPhraseWord> words) {
+    value = words;
+  }
+
+  List<SeedPhraseWord> get words {
+    return value;
+  }
+
   void clear() {
     value = const [];
   }
@@ -39,6 +47,7 @@ class SeedPhraseField extends StatefulWidget {
 
 class _SeedPhraseFieldState extends State<SeedPhraseField> {
   final _textEditingController = TextEditingController();
+  final _scrollController = ScrollController();
 
   final _wordFieldKey = GlobalKey();
 
@@ -61,6 +70,7 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
   @override
   void dispose() {
     _textEditingController.dispose();
+    _scrollController.dispose();
 
     _focusNode?.dispose();
     _focusNode = null;
@@ -90,8 +100,10 @@ class _SeedPhraseFieldState extends State<SeedPhraseField> {
         position: DecorationPosition.foreground,
         child: VoicesScrollbar(
           mainAxisMargin: 16,
+          controller: _scrollController,
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(20),
+            controller: _scrollController,
             child: ValueListenableBuilder(
               valueListenable: _effectiveController,
               builder: (context, value, _) {

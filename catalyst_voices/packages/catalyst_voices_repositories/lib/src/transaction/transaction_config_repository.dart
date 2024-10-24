@@ -1,7 +1,7 @@
 import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 
 /// Manages the [TransactionBuilderConfig].
-class TransactionConfigRepository {
+final class TransactionConfigRepository {
   /// Returns the current [TransactionBuilderConfig] for given [network].
   ///
   /// In the future this might communicate with a blockchain

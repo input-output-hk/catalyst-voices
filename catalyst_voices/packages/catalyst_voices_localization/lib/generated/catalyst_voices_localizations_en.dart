@@ -434,6 +434,18 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get registrationTransactionFailed => 'Transaction failed';
 
   @override
+  String get registrationInsufficientBalance => 'Insufficient balance, please top up your wallet.';
+
+  @override
+  String get registrationSeedPhraseNotFound => 'Seed phrase was not found. Make sure correct words are correct.';
+
+  @override
+  String get registrationUnlockPasswordNotFound => 'Password was not found. Make sure valid password was created.';
+
+  @override
+  String get registrationWalletNotFound => 'Wallet not found';
+
+  @override
   String get walletLinkRoleChooserTitle => 'How do you want to participate in Catalyst?';
 
   @override
@@ -581,7 +593,7 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get deleteKeychainDialogInputLabel => 'Confirm removal';
 
   @override
-  String get deleteKeychainDialogErrorText => 'Error. Please type \'Remove keychain\' to remove your account from this device.';
+  String get deleteKeychainDialogErrorText => 'Error. Please type \'Remove Keychain\' to remove your account from this device.';
 
   @override
   String get deleteKeychainDialogRemovingPhrase => 'Remove Keychain';
@@ -711,6 +723,46 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get keychainDeletedDialogInfo => 'Catalyst keychain removed';
 
   @override
+  String get registrationCompletedTitle => 'Catalyst account setup';
+
+  @override
+  String get registrationCompletedSubtitle => 'Completed!';
+
+  @override
+  String get registrationCompletedSummaryHeader => 'Summary';
+
+  @override
+  String get registrationCompletedKeychainTitle => 'Catalyst Keychain created';
+
+  @override
+  String get registrationCompletedKeychainInfo => 'You created a Catalyst Keychain, backed up its seed phrase and set an unlock password.';
+
+  @override
+  String registrationCompletedWalletTitle(String walletName) {
+    return 'Cardano $walletName wallet selected';
+  }
+
+  @override
+  String registrationCompletedWalletInfo(String walletName) {
+    return 'You selected your $walletName wallet as primary wallet for your voting power.';
+  }
+
+  @override
+  String get registrationCompletedRolesTitle => 'Catalyst roles selected';
+
+  @override
+  String get registrationCompletedRolesInfo => 'You linked your Cardano wallet and selected  Catalyst roles via a signed transaction.';
+
+  @override
+  String get registrationCompletedRoleRegistration => 'role registration';
+
+  @override
+  String get registrationCompletedDiscoveryButton => 'Open Discovery Dashboard';
+
+  @override
+  String get registrationCompletedAccountButton => 'Review my account';
+
+  @override
   String get createKeychainSeedPhraseSubtitle => 'Write down your 12 Catalyst  security words';
 
   @override
@@ -744,7 +796,7 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get createKeychainSeedPhraseCheckSuccessTitle => 'Nice job! You\'ve successfully verified the seed phrase for your keychain.';
 
   @override
-  String get createKeychainSeedPhraseCheckSuccessSubtitle => 'Enter your seed phrase to recover your Catalyst Keychain on any device.  It\'s kinda like your email and password all rolled into one, so keep it somewhere safe!  In the next step we’ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.';
+  String get createKeychainSeedPhraseCheckSuccessSubtitle => 'Enter your seed phrase to recover your Catalyst Keychain on any device.  It\'s kinda like your email and password all rolled into one, so keep it somewhere safe!  In the next step we\'ll add a password to your Catalyst Keychain, so you can lock/unlock access to Voices.';
 
   @override
   String get yourNextStep => 'Your next step';
@@ -800,6 +852,9 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get warning => 'Warning';
 
   @override
+  String get alert => 'Alert';
+
+  @override
   String get registrationExitConfirmDialogSubtitle => 'Account creation incomplete!';
 
   @override
@@ -809,7 +864,7 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
   String get registrationExitConfirmDialogContinue => 'Continue keychain creation';
 
   @override
-  String get registrationExitConfirmDialogCancel => 'Cancel anyway';
+  String get cancelAnyways => 'Cancel anyway';
 
   @override
   String get recoverCatalystKeychain => 'Restore Catalyst keychain';
@@ -846,4 +901,94 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get recoverySeedPhraseInputSubtitle => 'Enter each word of your Catalyst Key in the right order  to bring your Catalyst account to this device.';
+
+  @override
+  String get recoveryAccountTitle => 'Catalyst account recovery';
+
+  @override
+  String get recoveryAccountSuccessTitle => 'Keychain recovered successfully!';
+
+  @override
+  String get recoveryAccountDetailsAction => 'Set unlock password for this device';
+
+  @override
+  String get recoveryUnlockPasswordInstructionsTitle => 'Set your Catalyst unlock password f or this device';
+
+  @override
+  String get recoveryUnlockPasswordInstructionsSubtitle => 'With over 300 trillion possible combinations, your 12 word seed phrase is great for keeping your account safe.    But it can be a bit tedious to enter every single time you want to use the app.    In this next step, you\'ll set your Unlock Password for your current device. It\'s like a shortcut for proving ownership of your Keychain.    Whenever you recover your account for the first time on a new device, you\'ll need to use your Catalyst Keychain to get started. Every time after that, you can use your Unlock Password to quickly regain access.';
+
+  @override
+  String get unlockDialogHeader => 'Unlock Catalyst';
+
+  @override
+  String get unlockDialogTitle => 'Welcome back!';
+
+  @override
+  String get unlockDialogContent => 'Please enter your device specific unlock password\nto unlock Catalyst Voices.';
+
+  @override
+  String get unlockDialogHint => 'Enter your Unlock password';
+
+  @override
+  String get unlockDialogIncorrectPassword => 'Password is incorrect, try again.';
+
+  @override
+  String get continueAsGuest => 'Continue as guest';
+
+  @override
+  String get unlockSnackbarTitle => 'Catalyst unlocked!';
+
+  @override
+  String get unlockSnackbarMessage => 'You can now fully use the application.';
+
+  @override
+  String get lockSnackbarTitle => 'Catalyst locked';
+
+  @override
+  String get lockSnackbarMessage => 'Catalyst is now in guest/locked mode.';
+
+  @override
+  String get recoverySuccessTitle => 'Congratulations your Catalyst  Keychain is restored!';
+
+  @override
+  String get recoverySuccessSubtitle => 'You have successfully restored your Catalyst Keychain, and unlocked Catalyst Voices on this device.';
+
+  @override
+  String get recoverySuccessGoToDashboard => 'Jump into the Discovery space / Dashboard';
+
+  @override
+  String get recoverySuccessGoAccount => 'Check my account';
+
+  @override
+  String get recoveryExitConfirmDialogSubtitle => '12 word keychain restoration incomplete';
+
+  @override
+  String get recoveryExitConfirmDialogContent => 'Please continue your Catalyst Keychain restoration, if you cancel all input will be lost.';
+
+  @override
+  String get recoveryExitConfirmDialogContinue => 'Continue recovery process';
+
+  @override
+  String get uploadConfirmDialogSubtitle => 'SWITCH TO FILE UPLOAD';
+
+  @override
+  String get uploadConfirmDialogContent => 'Do you want to cancel manual input, and switch to Catalyst key upload?';
+
+  @override
+  String get uploadConfirmDialogYesButton => 'Yes, switch to Catalyst key upload';
+
+  @override
+  String get uploadConfirmDialogResumeButton => 'Resume manual inputs';
+
+  @override
+  String get incorrectUploadDialogSubtitle => 'CATALYST KEY INCORRECT';
+
+  @override
+  String get incorrectUploadDialogContent => 'The Catalyst keychain that you entered or uploaded is incorrect, please try again.';
+
+  @override
+  String get incorrectUploadDialogTryAgainButton => 'Try again';
+
+  @override
+  String get finishAccountCreation => 'Finish account creation';
 }

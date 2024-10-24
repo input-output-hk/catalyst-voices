@@ -1,57 +1,157 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
+import 'package:catalyst_voices_services/src/crypto/crypto_service.dart';
+import 'package:catalyst_voices_services/src/crypto/vault_crypto_service.dart';
 import 'package:catalyst_voices_services/src/storage/storage_string_mixin.dart';
-import 'package:catalyst_voices_services/src/storage/vault/lock_factor.dart';
-import 'package:catalyst_voices_services/src/storage/vault/lock_factor_codec.dart';
 import 'package:catalyst_voices_services/src/storage/vault/vault.dart';
+import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-const _keyPrefix = 'SecureStorageVault';
-const _lockKey = 'LockFactorKey';
-const _unlockKey = 'UnlockFactorKey';
+const _lockKey = 'LockKey';
+final _keyRegExp = RegExp(r'(\w+)\.(\w+)\.(\w+)');
 
-// TODO(damian-molinski): Maybe we'll need to encrypt data with LockFactor
 /// Implementation of [Vault] that uses [FlutterSecureStorage] as
 /// facade for read/write operations.
-base class SecureStorageVault with StorageAsStringMixin implements Vault {
-  final FlutterSecureStorage _secureStorage;
-  final LockFactorCodec _lockCodec;
+base class SecureStorageVault
+    with StorageAsStringMixin, EquatableMixin
+    implements Vault {
+  final String id;
+  @protected
+  final FlutterSecureStorage secureStorage;
+  final CryptoService _cryptoService;
 
-  const SecureStorageVault({
-    FlutterSecureStorage secureStorage = const FlutterSecureStorage(),
-    LockFactorCodec lockCodec = const DefaultLockFactorCodec(),
-  })  : _secureStorage = secureStorage,
-        _lockCodec = lockCodec;
+  final _isUnlockedSC = StreamController<bool>.broadcast();
+  bool __isUnlocked = false;
 
-  /// If storage does not have [LockFactor] this getter will
-  /// return [VoidLockFactor] as fallback.
-  Future<LockFactor> get _lock => _readLock(_lockKey);
+  /// Check if given [value] belongs to any [SecureStorageVault].
+  static bool isStorageKey(String value) {
+    try {
+      getStorageId(value);
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
 
-  /// If storage does not have [LockFactor] this getter will
-  /// return [VoidLockFactor] as fallback.
-  Future<LockFactor> get _unlock => _readLock(_unlockKey);
+  /// Check [value] against value key pattern for this storage.
+  ///
+  /// Throws [ArgumentError] if [value] does not match.
+  ///
+  /// See [isStorageKey] to make sure key is valid before
+  /// calling [getStorageId].
+  static String getStorageId(String value) {
+    final match = _keyRegExp.firstMatch(value);
+    if (match == null) {
+      throw ArgumentError('Key does not match storage vault key pattern');
+    }
 
-  @override
-  Future<bool> get isUnlocked async {
+    if (match.groupCount != 3) {
+      throw ArgumentError('Key sections count is invalid');
+    }
+
+    final prefix = match.group(1)!;
+    final id = match.group(2)!;
+
+    if (prefix != _keyPrefix) {
+      throw ArgumentError('Key prefix does not match');
+    }
+
+    return id;
+  }
+
+  static const _keyPrefix = 'SecureStorageVault';
+
+  SecureStorageVault({
+    required this.id,
+    this.secureStorage = const FlutterSecureStorage(),
+    CryptoService? cryptoService,
+  }) : _cryptoService = cryptoService ?? VaultCryptoService();
+
+  String get _instanceKeyPrefix => '$_keyPrefix.$id';
+
+  bool get _isUnlocked => __isUnlocked;
+
+  set _isUnlocked(bool value) {
+    if (__isUnlocked != value) {
+      __isUnlocked = value;
+      _isUnlockedSC.add(value);
+    }
+  }
+
+  Future<Uint8List?> get _lock async {
+    final effectiveKey = buildKey(_lockKey);
+    final encodedLock = await secureStorage.read(key: effectiveKey);
+    return encodedLock != null ? base64.decode(encodedLock) : null;
+  }
+
+  Future<Uint8List> get _requireLock async {
     final lock = await _lock;
-    final unlock = await _unlock;
+    if (lock == null) {
+      throw const LockNotFoundException();
+    }
+    return lock;
+  }
 
-    return unlock.unlocks(lock);
+  Future<bool> get _hasLock {
+    final effectiveKey = buildKey(_lockKey);
+    return secureStorage.containsKey(key: effectiveKey);
   }
 
   @override
-  Future<void> lock() => _writeLock(null, key: _unlockKey);
+  Future<bool> get isUnlocked => Future(() => _isUnlocked);
+
+  @override
+  Stream<bool> get watchIsUnlocked async* {
+    yield _isUnlocked;
+    yield* _isUnlockedSC.stream;
+  }
+
+  @override
+  Future<void> lock() async {
+    _isUnlocked = false;
+  }
 
   @override
   Future<bool> unlock(LockFactor unlock) async {
-    await _writeLock(unlock, key: _unlockKey);
+    if (!await _hasLock) {
+      throw const LockNotFoundException('Set lock before unlocking Vault');
+    }
+
+    final seed = unlock.seed;
+    final lock = await _requireLock;
+
+    _isUnlocked = await _cryptoService.verifyKey(seed, key: lock);
+
+    _erase(lock);
 
     return isUnlocked;
   }
 
   @override
-  Future<void> setLock(LockFactor lock) {
-    return _writeLock(lock, key: _lockKey);
+  Future<void> setLock(LockFactor lock) async {
+    if (await _hasLock && !await isUnlocked) {
+      throw const VaultLockedException();
+    }
+
+    final seed = lock.seed;
+    final key = await _cryptoService.deriveKey(seed);
+    final encodedKey = base64.encode(key);
+
+    final effectiveLockKey = buildKey(_lockKey);
+
+    await secureStorage.write(key: effectiveLockKey, value: encodedKey);
+  }
+
+  @protected
+  String buildKey(String key) => '$_instanceKeyPrefix.$key';
+
+  @override
+  Future<bool> contains({required String key}) async {
+    final effectiveKey = buildKey(key);
+    return secureStorage.containsKey(key: effectiveKey);
   }
 
   @override
@@ -67,31 +167,35 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
 
   @override
   Future<void> clear() async {
-    final all = await _secureStorage.readAll();
-    final vaultKeys = List.of(all.keys).where((e) => e.startsWith(_keyPrefix));
+    final all = await secureStorage.readAll();
+    final vaultKeys =
+        List.of(all.keys).where((key) => key.startsWith(_instanceKeyPrefix));
 
     for (final key in vaultKeys) {
-      await _secureStorage.delete(key: key);
+      await secureStorage.delete(key: key);
     }
   }
 
-  Future<void> _writeLock(
-    LockFactor? lock, {
+  /// Allows operation only when [isUnlocked] it true, otherwise returns null.
+  ///
+  /// Returns value assigned to [key]. May return null if not found for [key].
+  Future<String?> _guardedRead({
     required String key,
-  }) {
-    final encodedLock = lock != null ? _lockCodec.encode(lock) : null;
+  }) async {
+    await _ensureUnlocked();
 
-    return _guardedWrite(
-      encodedLock,
-      key: key,
-      requireUnlocked: false,
-    );
-  }
+    final effectiveKey = buildKey(key);
+    final encryptedData = await secureStorage.read(key: effectiveKey);
+    if (encryptedData == null) {
+      return null;
+    }
 
-  Future<LockFactor> _readLock(String key) async {
-    final value = await _guardedRead(key: key, requireUnlocked: false);
+    final lock = await _requireLock;
+    final decrypted = await _decrypt(encryptedData, key: lock);
 
-    return value != null ? _lockCodec.decode(value) : const VoidLockFactor();
+    _erase(lock);
+
+    return decrypted;
   }
 
   /// Allows operation only when [isUnlocked] it true, otherwise non op.
@@ -101,40 +205,53 @@ base class SecureStorageVault with StorageAsStringMixin implements Vault {
   Future<void> _guardedWrite(
     String? value, {
     required String key,
-    bool requireUnlocked = true,
   }) async {
-    final hasAccess = !requireUnlocked || await isUnlocked;
-    if (!hasAccess) {
+    await _ensureUnlocked();
+
+    final effectiveKey = buildKey(key);
+
+    if (value == null) {
+      await secureStorage.delete(key: effectiveKey);
       return;
     }
 
-    final effectiveKey = _buildVaultKey(key);
+    final lock = await _requireLock;
+    final encryptedData = await _encrypt(value, key: lock);
 
-    if (value != null) {
-      await _secureStorage.write(key: effectiveKey, value: value);
-    } else {
-      await _secureStorage.delete(key: effectiveKey);
+    _erase(lock);
+
+    await secureStorage.write(key: effectiveKey, value: encryptedData);
+  }
+
+  Future<void> _ensureUnlocked() async {
+    final isUnlocked = await this.isUnlocked;
+    if (!isUnlocked) {
+      throw const VaultLockedException();
     }
   }
 
-  /// Allows operation only when [isUnlocked] it true, otherwise returns null.
-  ///
-  /// Returns value assigned to [key]. May return null if non found for [key].
-  Future<String?> _guardedRead({
-    required String key,
-    bool requireUnlocked = true,
+  Future<String> _encrypt(
+    String data, {
+    required Uint8List key,
   }) async {
-    final hasAccess = !requireUnlocked || await isUnlocked;
-    if (!hasAccess) {
-      return null;
-    }
-
-    final effectiveKey = _buildVaultKey(key);
-
-    return _secureStorage.read(key: effectiveKey);
+    final decodedData = base64.decode(data);
+    final encryptedData = await _cryptoService.encrypt(decodedData, key: key);
+    return base64.encode(encryptedData);
   }
 
-  String _buildVaultKey(String key) {
-    return '$_keyPrefix.$key';
+  Future<String> _decrypt(
+    String data, {
+    required Uint8List key,
+  }) async {
+    final decodedData = base64.decode(data);
+    final decryptedData = await _cryptoService.decrypt(decodedData, key: key);
+    return base64.encode(decryptedData);
   }
+
+  void _erase(Uint8List list) {
+    list.fillRange(0, list.length, 0);
+  }
+
+  @override
+  List<Object?> get props => [id];
 }

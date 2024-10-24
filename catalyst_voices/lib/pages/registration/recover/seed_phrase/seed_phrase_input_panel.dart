@@ -1,10 +1,16 @@
+import 'dart:async';
+
+import 'package:catalyst_voices/pages/registration/incorrect_seed_phrase_dialog.dart';
 import 'package:catalyst_voices/pages/registration/recover/bloc_recover_builder.dart';
+import 'package:catalyst_voices/pages/registration/upload_seed_phrase_confirmation_dialog.dart';
+import 'package:catalyst_voices/pages/registration/upload_seed_phrase_dialog.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_message.dart';
 import 'package:catalyst_voices/pages/registration/widgets/registration_stage_navigation.dart';
 import 'package:catalyst_voices/pages/registration/widgets/seed_phrase_actions.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
 
 class SeedPhraseInputPanel extends StatefulWidget {
@@ -59,13 +65,46 @@ class _SeedPhraseInputPanelState extends State<SeedPhraseInputPanel> {
           onResetTap: _resetControllerWords,
         ),
         const SizedBox(height: 12),
-        const _BlocNavigation(),
+        _BlocNavigation(
+          onNextTap: _recoverAccountAndGoNextStage,
+        ),
       ],
     );
   }
 
+  void _recoverAccountAndGoNextStage() {
+    final registration = RegistrationCubit.of(context);
+
+    // Note. success or failure will be shown in next stage
+    unawaited(registration.recover.recoverAccount());
+
+    registration.nextStep();
+  }
+
   Future<void> _uploadSeedPhrase() async {
-    // TODO(damian-molinski): Import implementation for KeychainCreation
+    final showUpload = await UploadSeedPhraseConfirmationDialog.show(context);
+    if (showUpload) {
+      await _showUploadDialog();
+    }
+  }
+
+  Future<void> _showUploadDialog() async {
+    final words = await UploadSeedPhraseDialog.show(context);
+
+    final isValid = SeedPhrase.isValid(
+      words: words,
+    );
+
+    if (!mounted) {
+      return;
+    } else if (isValid) {
+      _controller.words = words;
+    } else {
+      final showUpload = await IncorrectSeedPhraseDialog.show(context);
+      if (showUpload) {
+        await _showUploadDialog();
+      }
+    }
   }
 
   void _resetControllerWords() {
@@ -105,7 +144,11 @@ class _BlocSeedPhraseField extends StatelessWidget {
 }
 
 class _BlocNavigation extends StatelessWidget {
-  const _BlocNavigation();
+  final VoidCallback onNextTap;
+
+  const _BlocNavigation({
+    required this.onNextTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -113,6 +156,7 @@ class _BlocNavigation extends StatelessWidget {
       selector: (state) => state.isSeedPhraseValid,
       builder: (context, state) {
         return RegistrationBackNextNavigation(
+          onNextTap: onNextTap,
           isNextEnabled: state,
         );
       },

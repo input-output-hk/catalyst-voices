@@ -65,7 +65,7 @@ class _BlocRolesChooserContainer extends StatelessWidget {
           onLearnMore: (role) async {
             await AccountRoleDialog.show(
               context,
-              role,
+              role: role,
             );
           },
         );

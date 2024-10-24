@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
+import 'package:catalyst_voices/pages/account/account_page_header.dart';
 import 'package:catalyst_voices/pages/account/delete_keychain_dialog.dart';
 import 'package:catalyst_voices/pages/account/keychain_deleted_dialog.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_icon_button.dart';
@@ -6,11 +9,12 @@ import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
 import 'package:catalyst_voices/widgets/list/bullet_list.dart';
 import 'package:catalyst_voices/widgets/modals/voices_dialog.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
+import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 final class AccountPage extends StatelessWidget {
   const AccountPage({super.key});
@@ -21,8 +25,9 @@ final class AccountPage extends StatelessWidget {
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(32),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const _Header(),
+            const AccountPageHeader(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
@@ -39,19 +44,7 @@ final class AccountPage extends StatelessWidget {
                       AccountRole.drep,
                     ],
                     defaultRole: AccountRole.voter,
-                    onRemoveKeychain: () async {
-                      final confirmed =
-                          await DeleteKeychainDialog.show(context);
-                      if (confirmed && context.mounted) {
-                        // TODO(Jakub): remove keychain
-                        await VoicesDialog.show<void>(
-                          context: context,
-                          builder: (context) {
-                            return const KeychainDeletedDialog();
-                          },
-                        );
-                      }
-                    },
+                    onRemoveKeychain: () => unawaited(_removeKeychain(context)),
                   ),
                 ],
               ),
@@ -61,73 +54,21 @@ final class AccountPage extends StatelessWidget {
       ),
     );
   }
-}
 
-class _Header extends StatelessWidget {
-  const _Header();
+  // Note. probably should redirect somewhere.
+  Future<void> _removeKeychain(BuildContext context) async {
+    final confirmed = await DeleteKeychainDialog.show(context);
 
-  @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: CatalystImage.asset(
-            VoicesAssets.images.accountBg.path,
-          ).image,
-          fit: BoxFit.cover,
-        ),
-      ),
-      child: SizedBox(
-        width: double.infinity,
-        height: 350,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(
-                top: 24,
-                left: 8,
-              ),
-              child: VoicesIconButton.filled(
-                onTap: () {
-                  GoRouter.of(context).pop();
-                },
-                style: ButtonStyle(
-                  backgroundColor: WidgetStateProperty.all(
-                    Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
-                  ),
-                  foregroundColor: WidgetStateProperty.all(
-                    Theme.of(context).colors.iconsForeground,
-                  ),
-                ),
-                child: VoicesAssets.icons.arrowNarrowLeft.buildIcon(),
-              ),
-            ),
-            const Spacer(),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
-              child: Text(
-                context.l10n.myAccountProfileKeychain,
-                style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                      color: Colors.white,
-                    ),
-              ),
-            ),
-            const SizedBox(height: 4),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
-              child: Text(
-                context.l10n.yourCatalystKeychainAndRoleRegistration,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Colors.white,
-                    ),
-              ),
-            ),
-            const SizedBox(height: 48),
-          ],
-        ),
-      ),
-    );
+    if (confirmed && context.mounted) {
+      unawaited(context.read<SessionCubit>().removeKeychain());
+
+      await VoicesDialog.show<void>(
+        context: context,
+        builder: (context) {
+          return const KeychainDeletedDialog();
+        },
+      );
+    }
   }
 }
 
