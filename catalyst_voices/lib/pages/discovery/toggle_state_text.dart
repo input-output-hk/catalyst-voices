@@ -30,9 +30,7 @@ class _ToggleStateTextState extends State<ToggleStateText> {
 
       if (sessionBloc.state is ActiveAccountSessionState) {
         await sessionBloc.lock();
-      }
-
-      if (sessionBloc.state is VisitorSessionState) {
+      } else if (sessionBloc.state is VisitorSessionState) {
         await sessionBloc
             .switchToDummyAccount()
             .then((_) => sessionBloc.lock());
