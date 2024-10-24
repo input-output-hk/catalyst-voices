@@ -36,7 +36,7 @@ integration-test-web:
                     --target=integration_test/app_test.dart \
                     -d web-server --driver-port=$driver_port  \
                     # https://github.com/flutter/flutter/issues/154727
-                    --web-browser-flag=--headless=old --web-browser-flag=--disable-search-engine-choice-screen || echo fail > fail
+                    --web-browser-flag=--disable-gpu --web-browser-flag=--headless=old --web-browser-flag=--disable-search-engine-choice-screen || echo fail > fail
     # Using WAIT instead of TRY because TRY/CATCH/FINALLY does not (currently) support expanding args for SAVE ARTIFACT paths
     WAIT
         SAVE ARTIFACT $driver.log AS LOCAL $driver.log
