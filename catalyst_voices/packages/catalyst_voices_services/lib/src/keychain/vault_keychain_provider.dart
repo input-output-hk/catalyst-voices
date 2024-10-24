@@ -32,7 +32,7 @@ final class VaultKeychainProvider implements KeychainProvider {
   }
 
   @override
-  Future<bool> exits(String id) {
+  Future<bool> exists(String id) {
     return _secureStorage
         .readAll()
         .then((value) => value.keys)

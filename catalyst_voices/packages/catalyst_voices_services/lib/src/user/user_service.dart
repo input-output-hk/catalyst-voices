@@ -31,14 +31,14 @@ final class UserServiceImpl implements UserService {
   final KeychainProvider _keychainProvider;
   final UserStorage _userStorage;
 
+  final _logger = Logger('UserService');
+
   User? _user;
   final _userSC = StreamController<User?>.broadcast();
 
   Keychain? _keychain;
   final _keychainSC = StreamController<Keychain?>.broadcast();
   StreamSubscription<bool>? _keychainUnlockSub;
-
-  final _logger = Logger('UserService');
 
   UserServiceImpl(
     this._keychainProvider,
@@ -173,7 +173,7 @@ final class UserServiceImpl implements UserService {
   }
 
   Future<Keychain?> _findKeychain(String id) async {
-    final exists = await _keychainProvider.exits(id);
+    final exists = await _keychainProvider.exists(id);
 
     return exists ? await _keychainProvider.get(id) : null;
   }
