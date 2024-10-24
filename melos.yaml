@@ -38,6 +38,9 @@ packageLicenseOverride:
   catalyst_compression_web: Apache-2.0
   catalyst_cardano_web: Apache-2.0
   catalyst_compression_platform_interface: Apache-2.0
+  catalyst_key_derivation: Apache-2.0
+  catalyst_key_derivation_web: Apache-2.0
+  catalyst_key_derivation_platform_interface: Apache-2.0
   catalyst_voices_assets: Apache-2.0
   catalyst_voices_assets_example: Apache-2.0
   catalyst_cardano: Apache-2.0
