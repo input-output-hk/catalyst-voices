@@ -1,18 +1,18 @@
 //! `v0` Endpoints
-use poem_openapi::{payload::Binary, param::Path, OpenApi};
+use poem_openapi::{param::Path, payload::Binary, OpenApi};
 
 use crate::service::{
     common::tags::ApiTags, utilities::middleware::schema_validation::schema_version_validation,
 };
 
+mod fund_get;
 mod message_post;
 mod plans_get;
-mod settings_get;
-mod fund_get;
+mod proposal_by_id_get;
 mod proposals_get;
 mod proposals_post;
-mod proposal_by_id_get;
 mod review_by_proposal_id_get;
+mod settings_get;
 
 /// `v0` API Endpoints
 pub(crate) struct V0Api;
@@ -106,7 +106,9 @@ impl V0Api {
         operation_id = "GetReviewByProposalId",
         deprecated = true
     )]
-    async fn review_by_proposal_id_get(&self, proposal_id: Path<String>) -> review_by_proposal_id_get::AllResponses {
+    async fn review_by_proposal_id_get(
+        &self, proposal_id: Path<String>,
+    ) -> review_by_proposal_id_get::AllResponses {
         let id = proposal_id.0;
 
         review_by_proposal_id_get::endpoint(id).await
