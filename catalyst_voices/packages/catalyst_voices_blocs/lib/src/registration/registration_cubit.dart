@@ -10,7 +10,6 @@ import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:result_type/result_type.dart';
@@ -235,7 +234,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
         roles: roles,
         lockFactor: lockFactor,
         // TODO(dtscalac): Update key value when derivation is final.
-        rootKey: Uint8List.fromList(keyPair.privateKey.bytes),
+        keyPair: keyPair,
       );
 
       await _userService.useAccount(account);

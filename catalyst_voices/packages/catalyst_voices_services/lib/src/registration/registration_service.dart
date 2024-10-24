@@ -5,7 +5,6 @@ import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.da
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
 import 'package:catalyst_voices_services/catalyst_voices_services.dart';
-import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:uuid/uuid.dart';
 
@@ -84,18 +83,17 @@ final class RegistrationService {
     }
 
     final roles = {AccountRole.root};
+    // TODO(dtscalac): Update key value when derivation is final.
     final keyPair = await deriveAccountRoleKeyPair(
       seedPhrase: seedPhrase,
       roles: roles,
     );
-    // TODO(dtscalac): Update key value when derivation is final.
-    final rootKey = Uint8List.fromList(keyPair.privateKey.bytes);
 
     final keychainId = const Uuid().v4();
     final keychain = await _keychainProvider.create(keychainId);
     await keychain.setLock(lockFactor);
     await keychain.unlock(lockFactor);
-    await keychain.setRootKey(rootKey);
+    await keychain.setMasterKey(keyPair.privateKey);
 
     // Note. with rootKey query backend for account details.
     return Account(
@@ -162,7 +160,7 @@ final class RegistrationService {
     required Transaction unsignedTx,
     required Set<AccountRole> roles,
     required LockFactor lockFactor,
-    required Uint8List rootKey,
+    required Ed25519KeyPair keyPair,
   }) async {
     try {
       final enabledWallet = await wallet.enable();
@@ -183,7 +181,7 @@ final class RegistrationService {
       final keychain = await _keychainProvider.create(keychainId);
       await keychain.setLock(lockFactor);
       await keychain.unlock(lockFactor);
-      await keychain.setRootKey(rootKey);
+      await keychain.setMasterKey(keyPair.privateKey);
 
       final balance = await enabledWallet.getBalance();
       final address = await enabledWallet.getChangeAddress();
@@ -210,17 +208,16 @@ final class RegistrationService {
     required LockFactor lockFactor,
   }) async {
     final roles = {AccountRole.root};
+    // TODO(dtscalac): Update key value when derivation is final.
     final keyPair = await deriveAccountRoleKeyPair(
       seedPhrase: seedPhrase,
       roles: roles,
     );
-    // TODO(dtscalac): Update key value when derivation is final.
-    final rootKey = Uint8List.fromList(keyPair.privateKey.bytes);
 
     final keychain = await _keychainProvider.create(keychainId);
     await keychain.setLock(lockFactor);
     await keychain.unlock(lockFactor);
-    await keychain.setRootKey(rootKey);
+    await keychain.setMasterKey(keyPair.privateKey);
 
     return Account(
       keychainId: keychainId,
