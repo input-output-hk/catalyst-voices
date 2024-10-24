@@ -1,48 +1,40 @@
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:equatable/equatable.dart';
 import 'package:result_type/result_type.dart';
 
 final class RegistrationStateData extends Equatable {
-  final Result<Transaction, LocalizedException>? unsignedTx;
-  final Result<Transaction, LocalizedException>? submittedTx;
+  final Result<bool, LocalizedException>? canSubmitTx;
+  final String? transactionFee;
   final bool isSubmittingTx;
+  final Result<Account, LocalizedException>? account;
 
   const RegistrationStateData({
-    this.unsignedTx,
-    this.submittedTx,
+    this.canSubmitTx,
+    this.transactionFee,
     this.isSubmittingTx = false,
+    this.account,
   });
 
-  /// Returns the registration transaction fee.
-  Coin? get transactionFee {
-    final result = unsignedTx;
-    if (result == null) return null;
-
-    final tx = result.isSuccess ? result.success : null;
-    return tx?.body.fee;
-  }
-
-  /// Whether the button to submit the transaction should be enabled.
-  bool get canSubmitTx => (unsignedTx?.isSuccess ?? false) && (!isSubmittingTx);
-
   RegistrationStateData copyWith({
-    Optional<Result<Transaction, LocalizedException>>? unsignedTx,
-    Optional<Result<Transaction, LocalizedException>>? submittedTx,
+    Optional<Result<bool, LocalizedException>>? canSubmitTx,
+    Optional<String>? transactionFee,
     bool? isSubmittingTx,
+    Optional<Result<Account, LocalizedException>>? account,
   }) {
     return RegistrationStateData(
-      unsignedTx: unsignedTx.dataOr(this.unsignedTx),
-      submittedTx: submittedTx.dataOr(this.submittedTx),
+      canSubmitTx: canSubmitTx.dataOr(this.canSubmitTx),
+      transactionFee: transactionFee.dataOr(this.transactionFee),
       isSubmittingTx: isSubmittingTx ?? this.isSubmittingTx,
+      account: account.dataOr(this.account),
     );
   }
 
   @override
   List<Object?> get props => [
-        unsignedTx,
-        submittedTx,
+        canSubmitTx,
+        transactionFee,
         isSubmittingTx,
+        account,
       ];
 }

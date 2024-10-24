@@ -18,7 +18,7 @@ class GlobalSessionListener extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<SessionBloc, SessionState>(
+    return BlocListener<SessionCubit, SessionState>(
       listenWhen: _listenToSessionChangesWhen,
       listener: _onSessionChanged,
       child: child,
@@ -29,16 +29,16 @@ class GlobalSessionListener extends StatelessWidget {
     // We deliberately check if previous was guest because we don't
     // want to show the snackbar after the registration is completed.
     final keychainUnlocked =
-        prev is GuestSessionState && next is ActiveUserSessionState;
+        prev is GuestSessionState && next is ActiveAccountSessionState;
 
     final keychainLocked =
-        prev is ActiveUserSessionState && next is GuestSessionState;
+        prev is ActiveAccountSessionState && next is GuestSessionState;
 
     return keychainUnlocked || keychainLocked;
   }
 
   void _onSessionChanged(BuildContext context, SessionState state) {
-    if (state is ActiveUserSessionState) {
+    if (state is ActiveAccountSessionState) {
       _onUnlockedKeychain(context);
     } else if (state is GuestSessionState) {
       _onLockedKeychain(context);

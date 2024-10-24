@@ -82,7 +82,7 @@ Future<void> _doBootstrapAndRun(BootstrapWidgetBuilder builder) async {
 /// only should be added to [_doBootstrapAndRun], not here.
 Future<BootstrapArgs> bootstrap() async {
   _loggingService
-    ..level = kDebugMode ? Level.ALL : Level.OFF
+    ..level = kDebugMode ? Level.FINER : Level.OFF
     ..printLogs = kDebugMode;
 
   GoRouter.optionURLReflectsImperativeAPIs = true;
