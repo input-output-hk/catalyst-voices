@@ -970,5 +970,6 @@
   "uploadConfirmDialogResumeButton": "Resume manual inputs",
   "incorrectUploadDialogSubtitle": "CATALYST KEY INCORRECT",
   "incorrectUploadDialogContent": "The Catalyst keychain that you entered or uploaded is incorrect, please try again.",
-  "incorrectUploadDialogTryAgainButton": "Try again"
+  "incorrectUploadDialogTryAgainButton": "Try again",
+  "finishAccountCreation": "Finish account creation"
 }

@@ -38,6 +38,9 @@ packageLicenseOverride:
   catalyst_compression_web: Apache-2.0
   catalyst_cardano_web: Apache-2.0
   catalyst_compression_platform_interface: Apache-2.0
+  catalyst_key_derivation: Apache-2.0
+  catalyst_key_derivation_web: Apache-2.0
+  catalyst_key_derivation_platform_interface: Apache-2.0
   catalyst_voices_assets: Apache-2.0
   catalyst_voices_assets_example: Apache-2.0
   catalyst_cardano: Apache-2.0
@@ -108,6 +111,7 @@ command:
       path: ^1.9.0
       pinenacl: ^0.6.0
       ulid: ^2.0.0
+      uuid: ^4.5.1
       sentry_flutter: ^8.8.0
       # TODO(dtscalac): win32 dependency is just a transitive dependency and shouldn't be imported
       # but here we import it explicitly to make sure the latest version is used which addresses

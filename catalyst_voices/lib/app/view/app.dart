@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/app/view/app_content.dart';
 import 'package:catalyst_voices/dependency/dependencies.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
+import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -17,13 +20,10 @@ final class App extends StatefulWidget {
 }
 
 class _AppState extends State<App> {
-  /// A singleton bloc that manages the user session.
-  final SessionBloc _sessionBloc = Dependencies.instance.get();
-
   @override
   void initState() {
     super.initState();
-    _sessionBloc.add(const RestoreSessionEvent());
+    unawaited(Dependencies.instance.get<UserService>().useLastAccount());
   }
 
   @override
@@ -44,7 +44,9 @@ class _AppState extends State<App> {
       BlocProvider<LoginBloc>(
         create: (_) => Dependencies.instance.get<LoginBloc>(),
       ),
-      BlocProvider<SessionBloc>.value(value: _sessionBloc),
+      BlocProvider<SessionCubit>(
+        create: (_) => Dependencies.instance.get(),
+      ),
     ];
   }
 }

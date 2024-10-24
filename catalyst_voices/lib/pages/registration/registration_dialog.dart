@@ -14,7 +14,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class RegistrationDialog extends StatefulWidget {
   final RegistrationStep? step;
 
-  const RegistrationDialog._({required this.step});
+  const RegistrationDialog._({
+    required this.step,
+  });
 
   static Future<void> show(
     BuildContext context, {
@@ -43,6 +45,8 @@ class _RegistrationDialogState extends State<RegistrationDialog>
     final step = widget.step;
     if (step != null) {
       _cubit.goToStep(step);
+    } else {
+      _cubit.recoverProgress();
     }
   }
 

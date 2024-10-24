@@ -991,4 +991,7 @@ class VoicesLocalizationsEn extends VoicesLocalizations {
 
   @override
   String get incorrectUploadDialogTryAgainButton => 'Try again';
+
+  @override
+  String get finishAccountCreation => 'Finish account creation';
 }

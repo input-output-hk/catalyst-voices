@@ -1893,6 +1893,12 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Try again'**
   String get incorrectUploadDialogTryAgainButton;
+
+  /// No description provided for @finishAccountCreation.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish account creation'**
+  String get finishAccountCreation;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

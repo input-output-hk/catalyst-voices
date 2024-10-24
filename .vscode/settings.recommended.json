@@ -43,6 +43,7 @@
     "flutter",
     "flutter/catalyst_cardano",
     "flutter/catalyst_compression",
+    "flutter/catalyst_key_derivation",
     "utils",
     "docs",
     "general"
