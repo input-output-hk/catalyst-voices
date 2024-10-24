@@ -17,6 +17,6 @@ pub(crate) enum ApiTags {
     V0,
     /// API Version 1 Endpoints
     V1,
-    /// Config
+    /// Configuration Endpoints
     Config,
 }
