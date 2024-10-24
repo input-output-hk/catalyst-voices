@@ -960,6 +960,10 @@
   "recoveryExitConfirmDialogSubtitle": "12 word keychain restoration incomplete",
   "recoveryExitConfirmDialogContent": "Please continue your Catalyst Keychain restoration, if you cancel all input will be lost.",
   "recoveryExitConfirmDialogContinue": "Continue recovery process",
+  "recoverAccount": "Recover account",
+  "@recoverAccount": {
+    "description": "Refers to the action label for recovering the user account."
+  },
   "uploadConfirmDialogSubtitle": "SWITCH TO FILE UPLOAD",
   "uploadConfirmDialogContent": "Do you want to cancel manual input, and switch to Catalyst key upload?",
   "uploadConfirmDialogYesButton": "Yes, switch to Catalyst key upload",

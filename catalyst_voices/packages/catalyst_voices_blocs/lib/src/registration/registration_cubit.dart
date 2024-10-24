@@ -90,6 +90,10 @@ final class RegistrationCubit extends Cubit<RegistrationState>
     return super.close();
   }
 
+  void goToStep(RegistrationStep step) {
+    _goToStep(step);
+  }
+
   void recoverProgress() {
     final progress = _progressNotifier.value;
     final keychainProgress = progress.keychainProgress;
