@@ -56,7 +56,6 @@ class _UnlockPasswordPanelState extends State<UnlockPasswordPanel> {
         ),
         const SizedBox(height: 22),
         _BlocNavigation(
-          onNextTap: _createKeychain,
           onBackTap: _clearPasswordAndGoBack,
         ),
       ],
@@ -83,16 +82,6 @@ class _UnlockPasswordPanelState extends State<UnlockPasswordPanel> {
       ..setConfirmPassword('');
 
     registration.previousStep();
-  }
-
-  Future<void> _createKeychain() async {
-    final registrationCubit = RegistrationCubit.of(context);
-
-    final isSuccess = await registrationCubit.recover.createKeychain();
-
-    if (isSuccess) {
-      registrationCubit.nextStep();
-    }
   }
 }
 
@@ -135,11 +124,9 @@ class _BlocUnlockPasswordForm extends StatelessWidget {
 }
 
 class _BlocNavigation extends StatelessWidget {
-  final VoidCallback onNextTap;
   final VoidCallback onBackTap;
 
   const _BlocNavigation({
-    required this.onNextTap,
     required this.onBackTap,
   });
 
@@ -151,7 +138,6 @@ class _BlocNavigation extends StatelessWidget {
       builder: (context, state) {
         return RegistrationBackNextNavigation(
           isNextEnabled: state,
-          onNextTap: onNextTap,
           onBackTap: onBackTap,
         );
       },

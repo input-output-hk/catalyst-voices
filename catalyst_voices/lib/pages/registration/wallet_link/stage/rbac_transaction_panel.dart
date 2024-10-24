@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:catalyst_cardano_serialization/catalyst_cardano_serialization.dart';
 import 'package:catalyst_voices/common/ext/account_role_ext.dart';
 import 'package:catalyst_voices/pages/registration/bloc_registration_builder.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -9,7 +8,6 @@ import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_shared/catalyst_voices_shared.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -61,7 +59,7 @@ class _BlocTransactionDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocRegistrationBuilder(
-      selector: (state) => state.unsignedTx,
+      selector: (state) => state.canSubmitTx,
       builder: (context, result) {
         return switch (result) {
           Success() => const _TransactionDetails(),
@@ -101,7 +99,7 @@ class _BlocSummary extends StatelessWidget {
         ({
           Set<AccountRole> roles,
           WalletInfo selectedWallet,
-          Coin transactionFee,
+          String transactionFee,
         })?>(
       selector: (state) {
         final selectedWallet = state.walletLinkStateData.selectedWallet;
@@ -136,7 +134,7 @@ class _BlocSummary extends StatelessWidget {
 class _Summary extends StatelessWidget {
   final Set<AccountRole> roles;
   final WalletInfo walletInfo;
-  final Coin transactionFee;
+  final String transactionFee;
 
   const _Summary({
     required this.roles,
@@ -190,7 +188,7 @@ class _Summary extends StatelessWidget {
                     ?.copyWith(fontWeight: FontWeight.bold),
               ),
               Text(
-                CryptocurrencyFormatter.formatExactAmount(transactionFee),
+                transactionFee,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
@@ -239,7 +237,7 @@ class _BlocTxSubmitError extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocRegistrationBuilder(
-      selector: (state) => state.submittedTx,
+      selector: (state) => state.canSubmitTx,
       builder: (context, result) {
         return switch (result) {
           Failure(:final value) => _Error(
@@ -324,7 +322,7 @@ class _BlocSubmitTxButton extends StatelessWidget {
         })>(
       selector: (state) => (
         isLoading: state.isSubmittingTx,
-        canSubmitTx: state.canSubmitTx,
+        canSubmitTx: state.canSubmitTx?.isSuccess ?? false,
       ),
       builder: (context, state) {
         return VoicesFilledButton(

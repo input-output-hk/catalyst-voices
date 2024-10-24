@@ -1846,6 +1846,12 @@ abstract class VoicesLocalizations {
   /// **'Continue recovery process'**
   String get recoveryExitConfirmDialogContinue;
 
+  /// Refers to the action label for recovering the user account.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover account'**
+  String get recoverAccount;
+
   /// No description provided for @uploadConfirmDialogSubtitle.
   ///
   /// In en, this message translates to:
@@ -1887,6 +1893,12 @@ abstract class VoicesLocalizations {
   /// In en, this message translates to:
   /// **'Try again'**
   String get incorrectUploadDialogTryAgainButton;
+
+  /// No description provided for @finishAccountCreation.
+  ///
+  /// In en, this message translates to:
+  /// **'Finish account creation'**
+  String get finishAccountCreation;
 }
 
 class _VoicesLocalizationsDelegate extends LocalizationsDelegate<VoicesLocalizations> {

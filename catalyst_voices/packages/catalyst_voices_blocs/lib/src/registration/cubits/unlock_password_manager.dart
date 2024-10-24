@@ -15,6 +15,11 @@ mixin UnlockPasswordMixin implements UnlockPasswordManager {
 
   void onUnlockPasswordStateChanged(UnlockPasswordState data);
 
+  void recoverPassword(String value) {
+    setPassword(value);
+    setConfirmPassword(value);
+  }
+
   @override
   void setPassword(String value) {
     final password = UnlockPassword.dirty(value);

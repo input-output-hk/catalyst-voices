@@ -68,13 +68,9 @@ class _BlocSeedPhraseWords extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocSeedPhraseBuilder<SeedPhrase?>(
-      selector: (state) => state.seedPhrase,
-      builder: (context, state) {
-        final words = state?.mnemonicWords ?? [];
-
-        return _SeedPhraseWords(words);
-      },
+    return BlocSeedPhraseBuilder<List<SeedPhraseWord>>(
+      selector: (state) => state.userWords,
+      builder: (context, state) => _SeedPhraseWords(state),
     );
   }
 }
