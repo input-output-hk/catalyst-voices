@@ -32,6 +32,12 @@ class _RegistrationDialogState extends State<RegistrationDialog>
   late final RegistrationCubit _cubit = Dependencies.instance.get();
 
   @override
+  void initState() {
+    super.initState();
+    _cubit.recoverProgress();
+  }
+
+  @override
   void dispose() {
     unawaited(_cubit.close());
     super.dispose();

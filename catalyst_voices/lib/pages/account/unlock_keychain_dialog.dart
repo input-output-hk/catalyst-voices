@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices/common/error_handler.dart';
 import 'package:catalyst_voices/pages/registration/pictures/unlock_keychain_picture.dart';
 import 'package:catalyst_voices/pages/registration/widgets/information_panel.dart';
@@ -5,7 +7,7 @@ import 'package:catalyst_voices/pages/registration/widgets/registration_stage_me
 import 'package:catalyst_voices/widgets/widgets.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
-import 'package:catalyst_voices_services/catalyst_voices_services.dart';
+import 'package:catalyst_voices_models/catalyst_voices_models.dart';
 import 'package:catalyst_voices_view_models/catalyst_voices_view_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,7 +30,7 @@ class UnlockKeychainDialog extends StatefulWidget {
 }
 
 class _UnlockKeychainDialogState extends State<UnlockKeychainDialog>
-    with ErrorHandlerStateMixin<SessionBloc, UnlockKeychainDialog> {
+    with ErrorHandlerStateMixin<SessionCubit, UnlockKeychainDialog> {
   final TextEditingController _passwordController = TextEditingController();
   LocalizedException? _error;
 
@@ -49,38 +51,40 @@ class _UnlockKeychainDialogState extends State<UnlockKeychainDialog>
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<SessionBloc, SessionState>(
-      listener: _handleSessionChange,
-      child: VoicesTwoPaneDialog(
-        left: InformationPanel(
-          title: context.l10n.unlockDialogHeader,
-          picture: const UnlockKeychainPicture(),
-        ),
-        right: _UnlockPasswordPanel(
-          controller: _passwordController,
-          error: _error,
-          onUnlock: _onUnlock,
-        ),
+    return VoicesTwoPaneDialog(
+      left: InformationPanel(
+        title: context.l10n.unlockDialogHeader,
+        picture: const UnlockKeychainPicture(),
+      ),
+      right: _UnlockPasswordPanel(
+        controller: _passwordController,
+        error: _error,
+        onUnlock: _onUnlock,
       ),
     );
   }
 
-  void _handleSessionChange(BuildContext context, SessionState state) {
-    if (state is ActiveUserSessionState) {
-      Navigator.of(context).pop();
-    }
-  }
-
-  void _onUnlock() {
+  Future<void> _onUnlock() async {
     setState(() {
       _error = null;
     });
 
     final password = _passwordController.text;
     final unlockFactor = PasswordLockFactor(password);
-    context
-        .read<SessionBloc>()
-        .add(UnlockSessionEvent(unlockFactor: unlockFactor));
+
+    final unlocked = await context.read<SessionCubit>().unlock(unlockFactor);
+
+    if (!mounted) {
+      return;
+    }
+
+    if (unlocked) {
+      Navigator.of(context).pop();
+    } else {
+      setState(() {
+        _error = const LocalizedUnlockPasswordException();
+      });
+    }
   }
 }
 

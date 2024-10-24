@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_cardano/catalyst_cardano.dart';
 import 'package:catalyst_voices_blocs/catalyst_voices_blocs.dart';
 import 'package:catalyst_voices_repositories/catalyst_voices_repositories.dart';
@@ -28,14 +30,20 @@ final class Dependencies extends DependencyProvider {
           authenticationRepository: get(),
         ),
       )
-      ..registerLazySingleton<SessionBloc>(
-        () => SessionBloc(get<Keychain>()),
-      )
+      ..registerLazySingleton<SessionCubit>(() {
+        return SessionCubit(
+          get<UserService>(),
+          get<RegistrationService>(),
+          get<RegistrationProgressNotifier>(),
+        );
+      })
       // Factory will rebuild it each time needed
       ..registerFactory<RegistrationCubit>(() {
         return RegistrationCubit(
-          downloader: get(),
-          registrationService: get(),
+          downloader: get<Downloader>(),
+          userService: get<UserService>(),
+          registrationService: get<RegistrationService>(),
+          progressNotifier: get<RegistrationProgressNotifier>(),
         );
       });
   }
@@ -55,27 +63,31 @@ final class Dependencies extends DependencyProvider {
 
   void _registerServices() {
     registerLazySingleton<Storage>(() => const SecureStorage());
-    registerLazySingleton<Vault>(SecureStorageVault.new);
-    registerLazySingleton<DummyAuthStorage>(
-      () => const SecureDummyAuthStorage(),
-    );
+    registerLazySingleton<KeyDerivation>(KeyDerivation.new);
+    registerLazySingleton<KeychainProvider>(VaultKeychainProvider.new);
+    registerLazySingleton<DummyAuthStorage>(SecureDummyAuthStorage.new);
     registerLazySingleton<Downloader>(Downloader.new);
     registerLazySingleton<CatalystCardano>(() => CatalystCardano.instance);
-
-    registerLazySingleton<KeyDerivation>(KeyDerivation.new);
-    registerLazySingleton<Keychain>(
-      () => Keychain(
-        get<KeyDerivation>(),
-        get<Vault>(),
-      ),
+    registerLazySingleton<UserStorage>(SecureUserStorage.new);
+    registerLazySingleton<RegistrationProgressNotifier>(
+      RegistrationProgressNotifier.new,
     );
-    registerLazySingleton<RegistrationService>(
-      () => RegistrationService(
+    registerLazySingleton<RegistrationService>(() {
+      return RegistrationService(
         get<TransactionConfigRepository>(),
-        get<Keychain>(),
-        get<KeyDerivation>(),
+        get<KeychainProvider>(),
         get<CatalystCardano>(),
-      ),
+        get<KeyDerivation>(),
+      );
+    });
+    registerLazySingleton<UserService>(
+      () {
+        return UserServiceImpl(
+          get<KeychainProvider>(),
+          get<UserStorage>(),
+        );
+      },
+      dispose: (service) => unawaited(service.dispose()),
     );
   }
 }
