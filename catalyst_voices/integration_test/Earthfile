@@ -7,6 +7,7 @@ integration-test-web:
     ARG TARGETARCH
     ARG browser
     LET driver_port = 4444
+    COPY chrome_box.sh /usr/bin/chrome_box.sh
 
     IF [ $browser = "chrome" ]
         LET driver = "chromedriver"
@@ -21,17 +22,25 @@ integration-test-web:
     IF [ $browser = "edge" && $TARGETARCH = "amd64" ]]
     #    LET driver = "msedgedriver"
     END
-    RUN ($driver --port=$driver_port > $driver.log &) && \
-            flutter drive --driver=test_driver/integration_tests.dart \
-                --target=integration_test/app_test.dart \
-                    --flavor development -d web-server --profile \
-                        --browser-name=$browser --driver-port=$driver_port || echo fail > fail
+    # RUN apt-get install -y xvfb x11-apps x11-xkb-utils libx11-6
+    RUN --no-cache \
+    #\ (Xvfb -ac :99 -screen 0 1280x1024x16 &) && \
+    #export DISPLAY=:99 && \
+    # export DISPLAY=$(route.exe print | grep 0.0.0.0 | head -1 | awk '{print $4}'):0.0 && \
+    # chmod +x /usr/bin/chrome_box.sh && \
+       #export CHROME_EXECUTABLE="/usr/bin/chrome_box.sh" && \
+        # export DBUS_SESSION_BUS_ADDRESS="autolaunch:" && \
+            ($driver --port=$driver_port --enable-chrome-logs > $driver.log &) && \
+               #xvfb-run \
+                flutter drive --verbose --driver=test_driver/integration_tests.dart \
+                    --target=integration_test/app_test.dart \
+                        -d web-server --driver-port=$driver_port || echo fail > fail
     # Using WAIT instead of TRY because TRY/CATCH/FINALLY does not (currently) support expanding args for SAVE ARTIFACT paths
     WAIT
         SAVE ARTIFACT $driver.log AS LOCAL $driver.log
     END
     IF [ -f fail ]
-        RUN echo ""$browser" integration test failed" && \
+        RUN --no-cache echo ""$browser" integration test failed" && \
             echo "Printing "$driver" logs..." && \
             cat $driver.log && \
             exit 1
