@@ -92,23 +92,13 @@ final class RegistrationCubit extends Cubit<RegistrationState>
 
   void recoverProgress() {
     final progress = _progressNotifier.value;
-    final seedPhrase = progress.seedPhrase;
-    final password = progress.password;
+    final keychainProgress = progress.keychainProgress;
 
-    if (seedPhrase != null) {
-      _keychainCreationCubit.recoverSeedPhrase(seedPhrase);
-    }
+    if (keychainProgress != null) {
+      _keychainCreationCubit
+        ..recoverSeedPhrase(keychainProgress.seedPhrase)
+        ..recoverPassword(keychainProgress.password);
 
-    if (password != null) {
-      _keychainCreationCubit.recoverPassword(password);
-    }
-
-    if (seedPhrase != null && password == null) {
-      const stage = CreateKeychainStage.unlockPasswordInstructions;
-      _goToStep(const CreateKeychainStep(stage: stage));
-    }
-
-    if (seedPhrase != null && password != null) {
       _goToStep(const FinishAccountCreationStep());
     }
   }

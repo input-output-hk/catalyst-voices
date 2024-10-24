@@ -97,10 +97,6 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
 
     final matches = listEquals(seedPhraseWords, words);
 
-    _progressNotifier.value = _progressNotifier.value.copyWith(
-      seedPhrase: matches ? Optional(seedPhrase) : const Optional.empty(),
-    );
-
     _seedPhraseStateData = _seedPhraseStateData.copyWith(
       userWords: words,
       areUserWordsCorrect: matches,
@@ -143,21 +139,24 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
 
   @override
   void onUnlockPasswordStateChanged(UnlockPasswordState data) {
+    final isPasswordCorrect = data.isNextEnabled;
+    final keychainProgress = isPasswordCorrect
+        ? KeychainProgress(
+            seedPhrase: _seedPhrase!,
+            password: password.value,
+          )
+        : null;
+
     _progressNotifier.value = _progressNotifier.value.copyWith(
-      password: data.isNextEnabled
-          ? Optional(data.password.value)
-          : const Optional.empty(),
+      keychainProgress: Optional(keychainProgress),
     );
+
     emit(state.copyWith(unlockPasswordState: data));
   }
 
   void _buildSeedPhrase() {
     final seedPhrase = SeedPhrase();
     _seedPhrase = seedPhrase;
-
-    _progressNotifier.value = _progressNotifier.value.copyWith(
-      seedPhrase: kDebugMode ? Optional(seedPhrase) : const Optional.empty(),
-    );
 
     _seedPhraseStateData = _seedPhraseStateData.copyWith(
       seedPhraseWords: seedPhrase.mnemonicWords,
