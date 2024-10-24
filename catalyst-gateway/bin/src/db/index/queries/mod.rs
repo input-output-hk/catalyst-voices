@@ -2,6 +2,7 @@
 //!
 //! This improves query execution time.
 
+pub(crate) mod rbac;
 pub(crate) mod registrations;
 pub(crate) mod staked_ada;
 pub(crate) mod sync_status;
@@ -10,6 +11,10 @@ use std::{fmt::Debug, sync::Arc};
 
 use anyhow::{bail, Context};
 use crossbeam_skiplist::SkipMap;
+use rbac::{
+    get_chain_root::GetChainRootQuery, get_registrations::GetRegistrationsByChainRootQuery,
+    get_role0_chain_root::GetRole0ChainRootQuery,
+};
 use registrations::{
     get_from_stake_addr::GetRegistrationQuery, get_from_stake_hash::GetStakeAddrQuery,
     get_from_vote_key::GetStakeAddrFromVoteKeyQuery, get_invalid::GetInvalidRegistrationQuery,
@@ -84,6 +89,12 @@ pub(crate) enum PreparedSelectQuery {
     StakeAddrFromStakeHash,
     /// Get stake addr from vote key
     StakeAddrFromVoteKey,
+    /// Get chain root by stake address
+    ChainRootByStakeAddress,
+    /// Get registrations by chain root
+    RegistrationsByChainRoot,
+    /// Get chain root by role0 key
+    ChainRootByRole0Key,
 }
 
 /// All prepared UPSERT query statements (inserts/updates a single value of data).
@@ -139,6 +150,12 @@ pub(crate) struct PreparedQueries {
     invalid_registrations_from_stake_addr_query: PreparedStatement,
     /// Insert Sync Status update.
     sync_status_insert: PreparedStatement,
+    /// Get chain root by stake address
+    chain_root_by_stake_address_query: PreparedStatement,
+    /// Get registrations by chain root
+    registrations_by_chain_root_query: PreparedStatement,
+    /// Get chain root by role0 key
+    chain_root_by_role0_key_query: PreparedStatement,
 }
 
 /// An individual query response that can fail
@@ -171,7 +188,11 @@ impl PreparedQueries {
         let stake_addr_from_stake_hash = GetStakeAddrQuery::prepare(session.clone()).await;
         let stake_addr_from_vote_key = GetStakeAddrFromVoteKeyQuery::prepare(session.clone()).await;
         let invalid_registrations = GetInvalidRegistrationQuery::prepare(session.clone()).await;
-        let sync_status_insert = SyncStatusInsertQuery::prepare(session).await;
+        let sync_status_insert = SyncStatusInsertQuery::prepare(session.clone()).await;
+        let chain_root_by_stake_address = GetChainRootQuery::prepare(session.clone()).await;
+        let registrations_by_chain_root =
+            GetRegistrationsByChainRootQuery::prepare(session.clone()).await;
+        let chain_root_by_role0_key = GetRole0ChainRootQuery::prepare(session).await;
 
         let (
             txo_insert_queries,
@@ -216,6 +237,9 @@ impl PreparedQueries {
             stake_addr_from_vote_key_query: stake_addr_from_vote_key?,
             invalid_registrations_from_stake_addr_query: invalid_registrations?,
             sync_status_insert: sync_status_insert?,
+            chain_root_by_stake_address_query: chain_root_by_stake_address?,
+            registrations_by_chain_root_query: registrations_by_chain_root?,
+            chain_root_by_role0_key_query: chain_root_by_role0_key?,
         })
     }
 
@@ -301,6 +325,11 @@ impl PreparedQueries {
             PreparedSelectQuery::InvalidRegistrationsFromStakeAddr => {
                 &self.invalid_registrations_from_stake_addr_query
             },
+            PreparedSelectQuery::ChainRootByStakeAddress => &self.chain_root_by_stake_address_query,
+            PreparedSelectQuery::RegistrationsByChainRoot => {
+                &self.registrations_by_chain_root_query
+            },
+            PreparedSelectQuery::ChainRootByRole0Key => &self.chain_root_by_role0_key_query,
         };
 
         session
