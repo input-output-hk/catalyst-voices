@@ -48,7 +48,7 @@ final class VaultKeychainProvider implements KeychainProvider {
   }
 
   @override
-  Future<List<Keychain>> findAll() async {
+  Future<List<Keychain>> getAll() async {
     final keychainsIds = await _secureStorage
         .readAll()
         .then((value) => value.keys)

@@ -7,5 +7,5 @@ abstract interface class KeychainProvider {
 
   Future<Keychain> get(String id);
 
-  Future<List<Keychain>> findAll();
+  Future<List<Keychain>> getAll();
 }

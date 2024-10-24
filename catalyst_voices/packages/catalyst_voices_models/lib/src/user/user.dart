@@ -5,9 +5,9 @@ import 'package:equatable/equatable.dart';
 final class User extends Equatable {
   final List<Account> accounts;
 
-  User({
-    required Account account,
-  }) : accounts = [account];
+  const User({
+    required this.accounts,
+  });
 
   /// Just syntax sugar for [activeAccount].
   Account get account => activeAccount;

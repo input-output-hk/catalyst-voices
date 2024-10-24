@@ -58,7 +58,7 @@ final class UserServiceImpl implements UserService {
   Keychain? get keychain => _keychain;
 
   @override
-  Future<List<Keychain>> get keychains => _keychainProvider.findAll();
+  Future<List<Keychain>> get keychains => _keychainProvider.getAll();
 
   @override
   Stream<Keychain?> get watchKeychain async* {
@@ -100,7 +100,7 @@ final class UserServiceImpl implements UserService {
   @override
   Future<void> switchToAccount(Account account) async {
     await switchToKeychain(account.keychainId);
-    _updateUser(User(account: account));
+    _updateUser(User(accounts: [account]));
   }
 
   @override
@@ -200,24 +200,24 @@ User _dummyUser({
   required String keychainId,
 }) {
   /* cSpell:disable */
-  return User(
-    account: Account(
-      keychainId: keychainId,
-      roles: {
-        AccountRole.root,
-      },
-      walletInfo: WalletInfo(
-        metadata: const WalletMetadata(
-          name: 'Dummy Wallet',
-          icon: null,
-        ),
-        balance: Coin.fromAda(10),
-        address: ShelleyAddress.fromBech32(
-          'addr_test1vzpwq95z3xyum8vqndgdd'
-          '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
-        ),
+  final account = Account(
+    keychainId: keychainId,
+    roles: {
+      AccountRole.root,
+    },
+    walletInfo: WalletInfo(
+      metadata: const WalletMetadata(
+        name: 'Dummy Wallet',
+        icon: null,
+      ),
+      balance: Coin.fromAda(10),
+      address: ShelleyAddress.fromBech32(
+        'addr_test1vzpwq95z3xyum8vqndgdd'
+        '9mdnmafh3djcxnc6jemlgdmswcve6tkw',
       ),
     ),
   );
+
+  return User(accounts: [account]);
   /* cSpell:enable */
 }
