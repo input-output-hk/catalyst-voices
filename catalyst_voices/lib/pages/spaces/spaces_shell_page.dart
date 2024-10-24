@@ -1,5 +1,4 @@
 import 'package:catalyst_voices/common/ext/ext.dart';
-import 'package:catalyst_voices/pages/registration/registration_dialog.dart';
 import 'package:catalyst_voices/pages/spaces/appbar/spaces_theme_mode_switch.dart';
 import 'package:catalyst_voices/pages/spaces/drawer/spaces_drawer.dart';
 import 'package:catalyst_voices/widgets/widgets.dart';
@@ -49,9 +48,9 @@ class SpacesShellPage extends StatefulWidget {
 class _SpacesShellPageState extends State<SpacesShellPage> {
   @override
   Widget build(BuildContext context) {
-    final sessionBloc = context.watch<SessionBloc>();
+    final sessionBloc = context.watch<SessionCubit>();
     final isVisitor = sessionBloc.state is VisitorSessionState;
-    final isUnlocked = sessionBloc.state is ActiveUserSessionState;
+    final isUnlocked = sessionBloc.state is ActiveAccountSessionState;
 
     return CallbackShortcuts(
       bindings: <ShortcutActivator, VoidCallback>{
@@ -62,12 +61,10 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
         appBar: VoicesAppBar(
           leading: isVisitor ? null : const DrawerToggleButton(),
           automaticallyImplyLeading: false,
-          actions: [
-            const SpacesThemeModeSwitch(),
-            SessionActionHeader(
-              onGetStartedTap: _showAccountSetup,
-            ),
-            const SessionStateHeader(),
+          actions: const [
+            SpacesThemeModeSwitch(),
+            SessionActionHeader(),
+            SessionStateHeader(),
           ],
         ),
         drawer: isVisitor
@@ -81,9 +78,5 @@ class _SpacesShellPageState extends State<SpacesShellPage> {
         body: widget.child,
       ),
     );
-  }
-
-  Future<void> _showAccountSetup() async {
-    await RegistrationDialog.show(context);
   }
 }

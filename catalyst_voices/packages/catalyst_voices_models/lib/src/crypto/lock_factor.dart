@@ -1,12 +1,9 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
-import 'package:catalyst_voices_services/src/storage/vault/vault.dart';
-import 'package:flutter/foundation.dart';
+import 'package:meta/meta.dart';
 
-// Note.
-// In future we may add MultiLockFactor for bio and password unlock factors
-
-/// Abstract representation of different factors that can lock [Vault] with.
+/// Abstract representation of different factors that can lock secure data.
 ///
 /// Most common is [PasswordLockFactor] which can be use as standalone factor.
 abstract interface class LockFactor {
@@ -17,6 +14,7 @@ abstract interface class LockFactor {
 ///
 /// Only unlocks other [PasswordLockFactor] with matching
 /// [PasswordLockFactor._data].
+@immutable
 final class PasswordLockFactor implements LockFactor {
   final String _data;
 
@@ -27,4 +25,16 @@ final class PasswordLockFactor implements LockFactor {
 
   @override
   String toString() => 'PasswordLockFactor(${_data.hashCode})';
+
+  // Note. normal equals hash implementation because don't want to expose
+  // password data.
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is PasswordLockFactor &&
+          runtimeType == other.runtimeType &&
+          _data == other._data;
+
+  @override
+  int get hashCode => _data.hashCode;
 }
