@@ -1,5 +1,5 @@
 import { test, chromium, expect, BrowserContext, Page } from '@playwright/test';
-import { allowExtension, downloadExtension, getWalletCredentials, importWallet, signData, signDataBadPwd} from './utils';
+import { allowExtension, downloadExtension, getWalletCredentials, importWallet, signData, signDataBadPwd} from '../utils';
 
 let browser: BrowserContext;
 let extensionPath: string;
@@ -13,13 +13,14 @@ let wallets =
 wallets.forEach(({ name, id, url }) => {
     test.describe(`Testing with ${name}`,() => {
         test.skip(name === 'Typhon', 'https://github.com/input-output-hk/catalyst-voices/issues/753');
-        test.afterAll(async () => {
-            browser.close()
-         });
+        // test.afterAll(async () => {
+        //     browser.close()
+        // });
 
         test.beforeAll(async () => {
             // Download extension and import wallet into wallet extension
             test.setTimeout(300000);
+            
             extensionPath = await downloadExtension(id);
             browser = await chromium.launchPersistentContext('', {
                 headless: false, // extensions only work in headful mode

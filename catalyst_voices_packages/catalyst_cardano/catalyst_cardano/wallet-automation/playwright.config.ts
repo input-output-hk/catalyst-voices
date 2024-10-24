@@ -1,11 +1,14 @@
 import { defineConfig, devices } from '@playwright/test';
+import dotenv from 'dotenv';
+import path from 'path';
 
-if (process.env.APP_URL == undefined){
-  throw new Error("APP_URL env variable undefined");
-}
+dotenv.config({ path: path.resolve(__dirname, '.env') });
+// if (process.env.APP_URL == undefined){
+//   throw new Error("APP_URL env variable undefined");
+// }
 
 export default defineConfig({
-  testDir: '.',
+  testDir: './tests',
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 1,
@@ -19,14 +22,18 @@ export default defineConfig({
   reporter: [['junit', { outputFile: '/results/cardano-wallet.junit-report.xml' }]],
   timeout: 60 * 1000,
   projects: [
-    {
-      name: 'setup',
-      testMatch: /global-setup\.ts/,
-    },
+    // {
+    //   name: 'setup',
+    //   testMatch: /global-setup\.ts/,
+    // },
+    // {
+    //   name: 'chromium',
+    //   use: { ...devices['Desktop Chrome'] },
+    //   dependencies: ['setup']
+    // },
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-      dependencies: ['setup']
+      use: { ...devices['Desktop Chrome'] }
     },
   ]
 });

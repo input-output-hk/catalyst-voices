@@ -3,6 +3,8 @@ import * as fsi from 'fs';
 import path from 'path';
 import nodeFetch from "node-fetch";
 import { expect, Page } from '@playwright/test';
+import { ExtensionDownloader } from './utils/extensionDownloader';
+import { BrowserExtensionName } from './utils/extensions';
 
 interface WalletCredentials {
   username: string;
@@ -30,7 +32,7 @@ export { getSeedPhrase };
 
 const downloadExtension = async (extID: string): Promise<string> => {
     const unzip = require("unzip-crx-3");
-    const url = `https://clients2.google.com/service/update2/crx?response=redirect&os=win&arch=x64&os_arch=x86_64&nacl_arch=x86-64&prod=chromiumcrx&prodchannel=beta&prodversion=79.0.3945.53&lang=ru&acceptformat=crx3&x=id%3D${extID}%26installsource%3Dondemand%26uc`;
+    const url = new ExtensionDownloader().getCrxUrl(BrowserExtensionName.Lace);
     const downloadPath = path.resolve(__dirname, 'extensions');
     await fs.mkdir(downloadPath, { recursive: true });
     const filePath = path.join(downloadPath, extID + '.crx');

@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "es2018",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "types": ["node"],  // Add this line
+    "typeRoots": ["./node_modules/@types"]
+  },
+  "exclude": ["node_modules", "dist"]
+}
