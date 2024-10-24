@@ -1,5 +1,5 @@
 //! `v0` Endpoints
-use poem_openapi::{payload::Binary, OpenApi};
+use poem_openapi::{payload::Binary, param::Path, OpenApi};
 
 use crate::service::{
     common::tags::ApiTags, utilities::middleware::schema_validation::schema_version_validation,
@@ -7,6 +7,12 @@ use crate::service::{
 
 mod message_post;
 mod plans_get;
+mod settings_get;
+mod fund_get;
+mod proposals_get;
+mod proposals_post;
+mod proposal_by_id_get;
+mod review_by_proposal_id_get;
 
 /// `v0` API Endpoints
 pub(crate) struct V0Api;
@@ -38,5 +44,71 @@ impl V0Api {
     )]
     async fn plans_get(&self) -> plans_get::AllResponses {
         plans_get::endpoint().await
+    }
+
+    #[oai(
+        path = "/settings",
+        method = "get",
+        operation_id = "GetSettings",
+        deprecated = true
+    )]
+    async fn settings_get(&self) -> settings_get::AllResponses {
+        settings_get::endpoint().await
+    }
+
+    #[oai(
+        path = "/fund",
+        method = "get",
+        operation_id = "GetFund",
+        deprecated = true
+    )]
+    async fn fund_get(&self) -> fund_get::AllResponses {
+        fund_get::endpoint().await
+    }
+
+    #[oai(
+        path = "/proposals",
+        method = "get",
+        operation_id = "GetProposals",
+        deprecated = true
+    )]
+    async fn proposals_get(&self) -> proposals_get::AllResponses {
+        proposals_get::endpoint().await
+    }
+
+    #[oai(
+        path = "/proposals",
+        method = "post",
+        operation_id = "CreateProposal",
+        deprecated = true
+    )]
+    async fn proposals_post(&self, message: Binary<Vec<u8>>) -> proposals_post::AllResponses {
+        let message = message.0;
+
+        proposals_post::endpoint(message).await
+    }
+
+    #[oai(
+        path = "/proposals/:id",
+        method = "get",
+        operation_id = "GetProposalById",
+        deprecated = true
+    )]
+    async fn proposal_by_id_get(&self, id: Path<String>) -> proposal_by_id_get::AllResponses {
+        let id = id.0;
+
+        proposal_by_id_get::endpoint(id).await
+    }
+
+    #[oai(
+        path = "/reviews/:proposal_id",
+        method = "get",
+        operation_id = "GetReviewByProposalId",
+        deprecated = true
+    )]
+    async fn review_by_proposal_id_get(&self, proposal_id: Path<String>) -> review_by_proposal_id_get::AllResponses {
+        let id = proposal_id.0;
+
+        review_by_proposal_id_get::endpoint(id).await
     }
 }
