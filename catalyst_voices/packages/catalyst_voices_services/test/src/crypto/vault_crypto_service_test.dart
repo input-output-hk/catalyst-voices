@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
-import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:catalyst_voices_services/src/crypto/vault_crypto_service.dart';
 import 'package:flutter/foundation.dart';
 import 'package:test/test.dart';
