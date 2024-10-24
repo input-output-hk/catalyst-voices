@@ -3,11 +3,9 @@ import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 const _activeKeychainIdKey = 'activeKeychainId';
 
 abstract interface class UserStorage {
-  Future<String?> getActiveKeychainId();
+  Future<String?> getLastKeychainId();
 
-  Future<void> changeActiveKeychainId(String id);
-
-  Future<void> clearActiveKeychain();
+  Future<void> setUsedKeychainId(String? id);
 }
 
 final class SecureUserStorage extends SecureStorage implements UserStorage {
@@ -16,17 +14,12 @@ final class SecureUserStorage extends SecureStorage implements UserStorage {
   });
 
   @override
-  Future<String?> getActiveKeychainId() {
+  Future<String?> getLastKeychainId() {
     return readString(key: _activeKeychainIdKey);
   }
 
   @override
-  Future<void> changeActiveKeychainId(String id) {
+  Future<void> setUsedKeychainId(String? id) {
     return writeString(id, key: _activeKeychainIdKey);
-  }
-
-  @override
-  Future<void> clearActiveKeychain() {
-    return writeString(null, key: _activeKeychainIdKey);
   }
 }

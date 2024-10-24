@@ -55,7 +55,7 @@ final class SessionCubit extends Cubit<SessionState>
   }
 
   Future<void> removeKeychain() {
-    return _userService.removeActiveAccount();
+    return _userService.removeCurrentAccount();
   }
 
   Future<void> switchToDummyAccount() async {
@@ -63,7 +63,7 @@ final class SessionCubit extends Cubit<SessionState>
     final dummyKeychain = keychains
         .firstWhereOrNull((keychain) => keychain.id == _dummyKeychainId);
     if (dummyKeychain != null) {
-      await _userService.switchToKeychain(dummyKeychain.id);
+      await _userService.useKeychain(dummyKeychain.id);
       return;
     }
 
@@ -73,7 +73,7 @@ final class SessionCubit extends Cubit<SessionState>
       lockFactor: dummyUnlockFactor,
     );
 
-    await _userService.switchToAccount(account);
+    await _userService.useAccount(account);
   }
 
   void _onHasKeychainChanged(bool hasKeychain) {

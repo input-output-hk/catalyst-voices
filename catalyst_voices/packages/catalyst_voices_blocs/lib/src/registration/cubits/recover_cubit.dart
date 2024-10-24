@@ -84,7 +84,7 @@ final class RecoverCubit extends Cubit<RecoverStateData>
         lockFactor: lockFactor,
       );
 
-      await _userService.switchToAccount(account);
+      await _userService.useAccount(account);
 
       final walletInfo = account.walletInfo;
 

@@ -16,13 +16,13 @@ abstract interface class UserService {
 
   Stream<Keychain?> get watchKeychain;
 
-  Future<void> useActiveAccount();
+  Future<void> useLastAccount();
 
-  Future<void> removeActiveAccount();
+  Future<void> useAccount(Account account);
 
-  Future<void> switchToAccount(Account account);
+  Future<void> useKeychain(String id);
 
-  Future<void> switchToKeychain(String id);
+  Future<void> removeCurrentAccount();
 
   Future<void> dispose();
 }
@@ -67,8 +67,8 @@ final class UserServiceImpl implements UserService {
   }
 
   @override
-  Future<void> useActiveAccount() async {
-    final keychainId = await _userStorage.getActiveKeychainId();
+  Future<void> useLastAccount() async {
+    final keychainId = await _userStorage.getLastKeychainId();
     if (keychainId == null) {
       await _clearUser();
       await _useKeychain(null);
@@ -85,7 +85,22 @@ final class UserServiceImpl implements UserService {
   }
 
   @override
-  Future<void> removeActiveAccount() async {
+  Future<void> useAccount(Account account) async {
+    await useKeychain(account.keychainId);
+    _updateUser(User(accounts: [account]));
+  }
+
+  @override
+  Future<void> useKeychain(String id) async {
+    final keychain = await _findKeychain(id);
+    if (keychain == null) {
+      _logger.severe('Account keychain[$id] was not found!');
+    }
+    await _useKeychain(keychain);
+  }
+
+  @override
+  Future<void> removeCurrentAccount() async {
     final keychain = _keychain;
     if (keychain == null) {
       _logger.warning('Called remove account but no active keychain found');
@@ -98,21 +113,6 @@ final class UserServiceImpl implements UserService {
   }
 
   @override
-  Future<void> switchToAccount(Account account) async {
-    await switchToKeychain(account.keychainId);
-    _updateUser(User(accounts: [account]));
-  }
-
-  @override
-  Future<void> switchToKeychain(String id) async {
-    final keychain = await _findKeychain(id);
-    if (keychain == null) {
-      _logger.severe('Account keychain[$id] was not found!');
-    }
-    await _useKeychain(keychain);
-  }
-
-  @override
   Future<void> dispose() async {
     await _keychainUnlockSub?.cancel();
     _keychainUnlockSub = null;
@@ -122,11 +122,7 @@ final class UserServiceImpl implements UserService {
   }
 
   Future<void> _useKeychain(Keychain? keychain) async {
-    if (keychain == null) {
-      await _userStorage.clearActiveKeychain();
-    } else {
-      await _userStorage.changeActiveKeychainId(keychain.id);
-    }
+    await _userStorage.setUsedKeychainId(keychain?.id);
 
     await _keychainUnlockSub?.cancel();
     _keychainUnlockSub = null;

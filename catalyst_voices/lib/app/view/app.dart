@@ -23,7 +23,7 @@ class _AppState extends State<App> {
   @override
   void initState() {
     super.initState();
-    unawaited(Dependencies.instance.get<UserService>().useActiveAccount());
+    unawaited(Dependencies.instance.get<UserService>().useLastAccount());
   }
 
   @override

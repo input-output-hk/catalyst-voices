@@ -238,7 +238,7 @@ final class RegistrationCubit extends Cubit<RegistrationState>
         rootKey: Uint8List.fromList(keyPair.privateKey.bytes),
       );
 
-      await _userService.switchToAccount(account);
+      await _userService.useAccount(account);
 
       _progressNotifier.clear();
 
