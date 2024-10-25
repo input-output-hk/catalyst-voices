@@ -32,7 +32,7 @@ enum Responses {
 /// All responses
 type AllResponses = WithErrorResponses<Responses>;
 
-#[OpenApi(tag = "ApiTags::Registration")]
+#[OpenApi(tag = "ApiTags::Legacy")]
 impl RegistrationApi {
     /// Voter's info
     ///

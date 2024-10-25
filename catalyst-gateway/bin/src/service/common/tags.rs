@@ -8,8 +8,8 @@ pub(crate) enum ApiTags {
     Health,
     /// General Cardano Blockchain Information
     Cardano,
-    /// Registration and Role Based Access Control (RBAC) Operations.
-    Registration,
+    // Registration and Role Based Access Control (RBAC) Operations.
+    // Registration,
     /// Legacy Mobile App Support
     Legacy,
     /// Service Configuration and Status
