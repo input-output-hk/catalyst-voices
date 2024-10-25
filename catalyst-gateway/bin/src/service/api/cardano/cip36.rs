@@ -22,7 +22,7 @@ use crate::{
 /// Endpoint responses
 #[derive(ApiResponse)]
 pub(crate) enum ResponseSingleRegistration {
-    /// Cip36 registration
+    /// A Cip36 registration report
     #[oai(status = 200)]
     Ok(Json<Cip36Reporting>),
     /// No valid registration

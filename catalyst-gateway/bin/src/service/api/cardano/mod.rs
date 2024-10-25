@@ -145,9 +145,9 @@ impl CardanoApi {
     )]
     async fn latest_registration_cip36_given_stake_addr(
         &self,
-        #[oai(validator(max_length = 66, min_length = 0, pattern = "[0-9a-f]"))] stake_addr: Query<
-            String,
-        >,
+        /// Stake Address to find the latest registration for.
+        #[oai(validator(max_length = 66, min_length = 0, pattern = "[0-9a-f]"))]
+        stake_addr: Query<String>,
     ) -> cip36::SingleRegistrationResponse {
         cip36::get_latest_registration_from_stake_addr(stake_addr.0, true).await
     }
