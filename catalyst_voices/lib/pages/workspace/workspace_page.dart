@@ -21,7 +21,7 @@ const _solutionSegmentId = 'solution';
 const _impactSegmentId = 'impact';
 const _capabilityAndFeasibilitySegmentId = 'capabilityAndFeasibility';
 
-var _proposalNavigation = WorkspaceProposalNavigation(
+final _proposalNavigation = WorkspaceProposalNavigation(
   segments: [
     WorkspaceProposalSetup(
       id: _setupSegmentId,
