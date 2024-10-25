@@ -22,21 +22,23 @@ integration-test-web:
     IF [ $browser = "edge" && $TARGETARCH = "amd64" ]]
     #    LET driver = "msedgedriver"
     END
-    # RUN apt-get install -y xvfb x11-apps x11-xkb-utils libx11-6
-    RUN --no-cache \
+    #RUN apt-get update && apt-get install -y dbus-x11 && dbus-uuidgen > /var/lib/dbus/machine-id && mkdir -p /var/run/dbus && dbus-daemon --config-file=/usr/share/dbus-1/system.conf --print-address
+    RUN apt-get install -y xvfb x11-apps x11-xkb-utils libx11-6
+    #RUN --no-cache \
     #\ (Xvfb -ac :99 -screen 0 1280x1024x16 &) && \
     #export DISPLAY=:99 && \
     # export DISPLAY=$(route.exe print | grep 0.0.0.0 | head -1 | awk '{print $4}'):0.0 && \
     # chmod +x /usr/bin/chrome_box.sh && \
-       #export CHROME_EXECUTABLE="/usr/bin/chrome_box.sh" && \
+       # export CHROME_EXECUTABLE="/usr/bin/chrome_box.sh" && \
         # export DBUS_SESSION_BUS_ADDRESS="autolaunch:" && \
-            ($driver --port=$driver_port --enable-chrome-logs > $driver.log &) && \
+          #  ($driver --port=$driver_port --enable-chrome-logs > $driver.log &) && \
                #xvfb-run \
-                flutter drive --verbose --driver=test_driver/integration_tests.dart \
-                    --target=integration_test/app_test.dart \
-                    -d web-server --driver-port=$driver_port  \
+           #     flutter drive --verbose --driver=test_driver/integration_tests.dart \
+           #         --target=integration_test/app_test.dart \
+           #         -d web-server --driver-port=$driver_port \
                     # https://github.com/flutter/flutter/issues/154727
-                    --web-browser-flag=--disable-gpu --web-browser-flag=--headless=old --web-browser-flag=--disable-search-engine-choice-screen || echo fail > fail
+           #         --web-browser-flag=--disable-web-security --web-browser-flag=--remote-debugging-port=9222 --web-browser-flag=--disable-gpu --web-browser-flag=--headless=old --web-browser-flag=--disable-search-engine-choice-screen || echo fail > fail
+    RUN --no-cache google-chrome --no-sandbox --headless
     # Using WAIT instead of TRY because TRY/CATCH/FINALLY does not (currently) support expanding args for SAVE ARTIFACT paths
     WAIT
         SAVE ARTIFACT $driver.log AS LOCAL $driver.log
