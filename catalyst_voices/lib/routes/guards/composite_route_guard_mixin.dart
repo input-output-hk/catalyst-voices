@@ -7,7 +7,7 @@ import 'package:go_router/go_router.dart';
 /// A default implementation for [redirect]
 /// that can handle multiple [routeGuards].
 mixin CompositeRouteGuardMixin on GoRouteData {
-  /// An abstract getter to be overriden all [RouteGuard]'s
+  /// An abstract getter to be overriden by all [RouteGuard]'s
   /// that a given route will have.
   ///
   /// The guards are called in the order they are returned
