@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Responses"],"fn":["merge_configs","set"],"struct":["BadRequestError","ConfigApi"],"type":["AllResponses"]};
