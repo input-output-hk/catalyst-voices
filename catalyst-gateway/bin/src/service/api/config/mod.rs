@@ -70,7 +70,7 @@ enum SetConfigResponse {
 /// Set configuration all responses.
 type SetConfigAllResponses = WithErrorResponses<SetConfigResponse>;
 
-/// Bad request errors
+/// Configuration Data Validation Error
 #[derive(Object, Default)]
 struct ConfigBadRequest {
     /// Error messages.

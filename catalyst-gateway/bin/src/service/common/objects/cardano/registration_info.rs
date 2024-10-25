@@ -8,7 +8,7 @@ use crate::service::{
     utilities::to_hex_with_prefix,
 };
 
-/// Delegation type
+/// The Voting power and voting key of a Delegated voter.
 #[derive(Object)]
 struct Delegation {
     /// Voting key.
@@ -16,7 +16,6 @@ struct Delegation {
     voting_key: String,
 
     /// Delegation power assigned to the voting key.
-    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
     #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
     power: i64,
 }
@@ -29,7 +28,7 @@ struct Delegations {
     delegations: Vec<Delegation>,
 }
 
-/// Direct voter type
+/// Voting `KLye` for a direct voter (not delegated)
 #[derive(Object)]
 struct DirectVoter {
     /// Voting key.
@@ -37,7 +36,7 @@ struct DirectVoter {
     voting_key: String,
 }
 
-/// Voting key type
+/// The type of the Voting Key
 #[derive(Union)]
 #[oai(discriminator_name = "type", one_of = true)]
 enum VotingInfo {

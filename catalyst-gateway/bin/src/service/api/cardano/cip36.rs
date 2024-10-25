@@ -41,7 +41,7 @@ pub(crate) enum ResponseMultipleRegistrations {
     NotFound,
 }
 
-/// Cip36 info list
+/// List of Cip36 Registration Data as found on-chain.
 #[derive(Object, Default)]
 pub(crate) struct Cip36ReportingList {
     /// List of registrations associated with the same Voting Key
@@ -60,7 +60,7 @@ pub(crate) struct Cip36Reporting {
     invalids: Vec<InvalidRegistrationsReport>,
 }
 
-/// Cip36 info
+/// Cip36 Registration Data as found on-chain.
 #[derive(Object, Default)]
 pub(crate) struct Cip36Info {
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).

@@ -3,7 +3,7 @@ use poem_openapi::{types::Example, Object};
 
 use super::{delegate_public_key::DelegatePublicKey, voter_group_id::VoterGroupId};
 
-/// Voter Info
+/// An individual voters information
 #[derive(Object)]
 #[oai(example = true)]
 pub(crate) struct VoterInfo {

@@ -2,7 +2,7 @@
 
 use poem_openapi::{types::Example, Object};
 
-/// Voting Plan
+/// Voting Plan Information
 #[derive(Object)]
 #[oai(example = true)]
 pub(crate) struct VotePlan {
