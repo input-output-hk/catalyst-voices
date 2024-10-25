@@ -1,0 +1,32 @@
+name: catalyst_key_derivation
+description: "A new Flutter FFI plugin project."
+version: 0.0.1
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+  flutter: ">=3.24.1"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_rust_bridge: 2.5.1
+  plugin_platform_interface: ^2.1.7
+
+dev_dependencies:
+  catalyst_analysis: ^2.0.0
+  ffi: ^2.1.0
+  ffigen: ^11.0.0
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        ffiPlugin: true
+      ios:
+        ffiPlugin: true
+      macos:
+        ffiPlugin: true
