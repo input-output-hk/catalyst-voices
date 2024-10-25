@@ -63,14 +63,25 @@ impl HealthApi {
         live_get::endpoint().await
     }
 
-    /// Options for service inspection.
+    /// Service Inspection Control.
+    ///
+    /// This endpoint is used to control internal service inspection features.
+    ///
+    /// ## Note
+    ///
+    /// *This endpoint is for internal use of the service deployment infrastructure.
+    /// It may not be exposed publicly.*
     #[oai(
         path = "/v1/health/inspection",
         method = "get",
         operation_id = "healthInspection"
     )]
     async fn inspection(
-        &self, log_level: Query<Option<inspection_get::LogLevel>>,
+        &self,
+        /// The log level to use for the service.  Controls what detail gets logged.
+        log_level: Query<Option<inspection_get::LogLevel>>,
+        /// Enable or disable Verbose Query inspection in the logs.  Used to find query
+        /// performance issues.
         query_inspection: Query<Option<inspection_get::DeepQueryInspectionFlag>>,
     ) -> inspection_get::AllResponses {
         inspection_get::endpoint(log_level.0, query_inspection.0).await
