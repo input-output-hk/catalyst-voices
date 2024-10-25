@@ -391,7 +391,7 @@ class _TopBar extends StatelessWidget {
             style: Theme.of(context).textTheme.labelSmall,
           ),
         ),
-        const SizedBox(width: 24),
+        const SizedBox(width: 16),
       ],
     );
   }
