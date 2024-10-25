@@ -83,9 +83,7 @@ impl V0Api {
         deprecated = true
     )]
     async fn proposals_post(&self, message: Binary<Vec<u8>>) -> proposals_post::AllResponses {
-        let message = message.0;
-
-        proposals_post::endpoint(message).await
+        proposals_post::endpoint(message.0).await
     }
 
     #[oai(
@@ -95,9 +93,7 @@ impl V0Api {
         deprecated = true
     )]
     async fn proposal_by_id_get(&self, id: Path<String>) -> proposal_by_id_get::AllResponses {
-        let id = id.0;
-
-        proposal_by_id_get::endpoint(id).await
+        proposal_by_id_get::endpoint(id.0).await
     }
 
     #[oai(
@@ -109,8 +105,6 @@ impl V0Api {
     async fn review_by_proposal_id_get(
         &self, proposal_id: Path<String>,
     ) -> review_by_proposal_id_get::AllResponses {
-        let id = proposal_id.0;
-
-        review_by_proposal_id_get::endpoint(id).await
+        review_by_proposal_id_get::endpoint(proposal_id.0).await
     }
 }
