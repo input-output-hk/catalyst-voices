@@ -133,6 +133,9 @@ impl ConfigApi {
     }
 
     /// Get the frontend JSON schema.
+    ///
+    /// Returns the JSON schema which defines the data which can be read or written for
+    /// the frontend configuration.
     #[oai(
         path = "/draft/config/frontend/schema",
         method = "get",
