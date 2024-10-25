@@ -33,7 +33,7 @@ pub(crate) enum ResponseSingleRegistration {
 /// Endpoint responses
 #[derive(ApiResponse)]
 pub(crate) enum ResponseMultipleRegistrations {
-    /// Cip36 registration
+    /// All Cip36 registrations associated with the same Voting Key
     #[oai(status = 200)]
     Ok(Json<Cip36ReportingList>),
     /// No valid registration
@@ -44,7 +44,7 @@ pub(crate) enum ResponseMultipleRegistrations {
 /// Cip36 info list
 #[derive(Object, Default)]
 pub(crate) struct Cip36ReportingList {
-    /// List of registrations
+    /// List of registrations associated with the same Voting Key
     #[oai(validator(max_items = "100000"))]
     cip36: Vec<Cip36Reporting>,
 }

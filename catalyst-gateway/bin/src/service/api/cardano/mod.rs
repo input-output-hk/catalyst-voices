@@ -162,6 +162,7 @@ impl CardanoApi {
     )]
     async fn latest_registration_cip36_given_stake_key_hash(
         &self,
+        /// Stake Key Hash to find the latest registration for.
         #[oai(validator(max_length = 66, min_length = 0, pattern = "[0-9a-f]"))]
         stake_key_hash: Query<String>,
     ) -> cip36::SingleRegistrationResponse {
@@ -179,9 +180,9 @@ impl CardanoApi {
     )]
     async fn latest_registration_cip36_given_vote_key(
         &self,
-        #[oai(validator(max_length = 66, min_length = 0, pattern = "[0-9a-f]"))] vote_key: Query<
-            String,
-        >,
+        /// Voting Key to find CIP36 registrations for
+        #[oai(validator(max_length = 66, min_length = 0, pattern = "[0-9a-f]"))]
+        vote_key: Query<String>,
     ) -> cip36::MultipleRegistrationResponse {
         cip36::get_associated_vote_key_registrations(vote_key.0, true).await
     }
