@@ -87,7 +87,7 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<SessionBloc, SessionState>(
+    return BlocBuilder<SessionCubit, SessionState>(
       builder: (context, state) {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -96,7 +96,8 @@ class _Header extends StatelessWidget {
               context.l10n.activeVotingRound,
               style: Theme.of(context).textTheme.headlineLarge,
             ),
-            if (state is ActiveUserSessionState) const _UnlockedHeaderActions(),
+            if (state is ActiveAccountSessionState)
+              const _UnlockedHeaderActions(),
           ],
         );
       },

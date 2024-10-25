@@ -18,20 +18,21 @@ abstract interface class RecoverManager implements UnlockPasswordManager {
   void setSeedPhraseWords(List<SeedPhraseWord> words);
 
   Future<void> recoverAccount();
-
-  Future<bool> createKeychain();
 }
 
 final class RecoverCubit extends Cubit<RecoverStateData>
     with BlocErrorEmitterMixin, UnlockPasswordMixin
     implements RecoverManager {
+  final UserService _userService;
   final RegistrationService _registrationService;
 
   SeedPhrase? _seedPhrase;
 
   RecoverCubit({
+    required UserService userService,
     required RegistrationService registrationService,
-  })  : _registrationService = registrationService,
+  })  : _userService = userService,
+        _registrationService = registrationService,
         super(const RecoverStateData()) {
     /// pre-populate all available words
     emit(state.copyWith(seedPhraseWords: SeedPhrase.wordList));
@@ -70,24 +71,32 @@ final class RecoverCubit extends Cubit<RecoverStateData>
       emit(state.copyWith(accountDetails: const Optional.empty()));
 
       final seedPhrase = _seedPhrase;
+      final lockFactor = PasswordLockFactor(password.value);
+
       if (seedPhrase == null) {
         const exception = LocalizedRegistrationSeedPhraseNotFoundException();
         emit(state.copyWith(accountDetails: Optional(Failure(exception))));
         return;
       }
 
-      final walletHeader =
-          await _registrationService.recoverCardanoWalletDetails(seedPhrase);
+      final account = await _registrationService.recoverAccount(
+        seedPhrase: seedPhrase,
+        lockFactor: lockFactor,
+      );
+
+      await _userService.useAccount(account);
+
+      final walletInfo = account.walletInfo;
 
       final accountDetails = AccountSummaryData(
         walletConnection: WalletConnectionData(
-          name: walletHeader.metadata.name,
-          icon: walletHeader.metadata.icon,
+          name: walletInfo.metadata.name,
+          icon: walletInfo.metadata.icon,
         ),
         walletSummary: WalletSummaryData(
-          balance: CryptocurrencyFormatter.formatAmount(walletHeader.balance),
-          address: WalletAddressFormatter.formatShort(walletHeader.address),
-          clipboardAddress: walletHeader.address.toBech32(),
+          balance: CryptocurrencyFormatter.formatAmount(walletInfo.balance),
+          address: WalletAddressFormatter.formatShort(walletInfo.address),
+          clipboardAddress: walletInfo.address.toBech32(),
           showLowBalance: false,
         ),
       );
@@ -103,34 +112,6 @@ final class RecoverCubit extends Cubit<RecoverStateData>
 
       const exception = LocalizedUnknownException();
       emit(state.copyWith(accountDetails: Optional(Failure(exception))));
-    }
-  }
-
-  @override
-  Future<bool> createKeychain() async {
-    try {
-      final seedPhrase = _seedPhrase;
-      final password = this.password;
-
-      if (seedPhrase == null) {
-        throw const LocalizedRegistrationSeedPhraseNotFoundException();
-      }
-      if (password.isNotValid) {
-        throw const LocalizedRegistrationUnlockPasswordNotFoundException();
-      }
-
-      await _registrationService.createKeychain(
-        seedPhrase: seedPhrase,
-        unlockPassword: password.value,
-      );
-
-      return true;
-    } catch (error, stack) {
-      _logger.severe('Create keychain', error, stack);
-
-      emitError(error);
-
-      return false;
     }
   }
 

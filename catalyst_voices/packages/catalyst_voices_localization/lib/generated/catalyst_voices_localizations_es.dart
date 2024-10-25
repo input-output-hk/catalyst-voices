@@ -969,6 +969,9 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
   String get recoveryExitConfirmDialogContinue => 'Continue recovery process';
 
   @override
+  String get recoverAccount => 'Recover account';
+
+  @override
   String get uploadConfirmDialogSubtitle => 'SWITCH TO FILE UPLOAD';
 
   @override
@@ -988,4 +991,7 @@ class VoicesLocalizationsEs extends VoicesLocalizations {
 
   @override
   String get incorrectUploadDialogTryAgainButton => 'Try again';
+
+  @override
+  String get finishAccountCreation => 'Finish account creation';
 }

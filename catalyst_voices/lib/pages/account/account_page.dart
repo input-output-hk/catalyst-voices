@@ -60,7 +60,7 @@ final class AccountPage extends StatelessWidget {
     final confirmed = await DeleteKeychainDialog.show(context);
 
     if (confirmed && context.mounted) {
-      context.read<SessionBloc>().add(const RemoveKeychainSessionEvent());
+      unawaited(context.read<SessionCubit>().removeKeychain());
 
       await VoicesDialog.show<void>(
         context: context,
