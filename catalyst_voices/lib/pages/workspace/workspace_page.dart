@@ -21,7 +21,7 @@ const _solutionSegmentId = 'solution';
 const _impactSegmentId = 'impact';
 const _capabilityAndFeasibilitySegmentId = 'capabilityAndFeasibility';
 
-var _proposalNavigation = const WorkspaceProposalNavigation(
+var _proposalNavigation = WorkspaceProposalNavigation(
   segments: [
     WorkspaceProposalSetup(
       id: _setupSegmentId,
@@ -29,7 +29,9 @@ var _proposalNavigation = const WorkspaceProposalNavigation(
         WorkspaceProposalSegmentStep(
           id: 0,
           title: 'Title',
-          documentJson: DocumentJson(title),
+          richTextParams: RichTextParams(
+            documentJson: const DocumentJson(title),
+          ),
         ),
       ],
     ),
@@ -39,17 +41,26 @@ var _proposalNavigation = const WorkspaceProposalNavigation(
         WorkspaceProposalSegmentStep(
           id: 0,
           title: 'Problem statement',
-          documentJson: DocumentJson(problemStatement),
+          richTextParams: RichTextParams(
+            documentJson: const DocumentJson(problemStatement),
+            charsLimit: 200,
+          ),
         ),
         WorkspaceProposalSegmentStep(
           id: 1,
           title: 'Solution statement',
-          documentJson: DocumentJson(solutionStatement),
+          richTextParams: RichTextParams(
+            documentJson: const DocumentJson(solutionStatement),
+            charsLimit: 200,
+          ),
         ),
         WorkspaceProposalSegmentStep(
           id: 2,
           title: 'Public description',
-          documentJson: DocumentJson(publicDescription),
+          richTextParams: RichTextParams(
+            documentJson: const DocumentJson(publicDescription),
+            charsLimit: 3000,
+          ),
         ),
       ],
     ),
@@ -59,17 +70,30 @@ var _proposalNavigation = const WorkspaceProposalNavigation(
         WorkspaceProposalSegmentStep(
           id: 0,
           title: 'Problem perspective',
-          documentJson: DocumentJson(answer),
+          titleInDetails:
+              "What is your perspective on the problem you're solving?",
+          richTextParams: RichTextParams(
+            documentJson: const DocumentJson(answer),
+            charsLimit: 200,
+          ),
         ),
         WorkspaceProposalSegmentStep(
           id: 1,
           title: 'Perspective rationale',
-          documentJson: DocumentJson(answer),
+          titleInDetails: 'Why did you choose this perspective?',
+          richTextParams: RichTextParams(
+            documentJson: const DocumentJson(answer),
+            charsLimit: 200,
+          ),
         ),
         WorkspaceProposalSegmentStep(
           id: 2,
           title: 'Project engagement',
-          documentJson: DocumentJson(answer),
+          titleInDetails: 'Who will your project engage?',
+          richTextParams: RichTextParams(
+            documentJson: const DocumentJson(answer),
+            charsLimit: 200,
+          ),
         ),
       ],
     ),
@@ -79,12 +103,18 @@ var _proposalNavigation = const WorkspaceProposalNavigation(
         WorkspaceProposalSegmentStep(
           id: 0,
           title: 'Bonus mark-up',
-          documentJson: DocumentJson(bonusMarkUp),
+          richTextParams: RichTextParams(
+            documentJson: const DocumentJson(bonusMarkUp),
+            charsLimit: 900,
+          ),
         ),
         WorkspaceProposalSegmentStep(
           id: 1,
           title: 'Value for Money',
-          documentJson: DocumentJson(valueForMoney),
+          richTextParams: RichTextParams(
+            documentJson: const DocumentJson(valueForMoney),
+            charsLimit: 2600,
+          ),
         ),
       ],
     ),
@@ -94,12 +124,19 @@ var _proposalNavigation = const WorkspaceProposalNavigation(
         WorkspaceProposalSegmentStep(
           id: 0,
           title: 'Delivery & Accountability',
-          documentJson: DocumentJson(deliveryAndAccountability),
+          titleInDetails:
+              'How do you proof trust and accountability for your project?',
+          richTextParams: RichTextParams(
+            documentJson: const DocumentJson(deliveryAndAccountability),
+          ),
         ),
         WorkspaceProposalSegmentStep(
           id: 1,
           title: 'Feasibility checks',
-          documentJson: DocumentJson(feasibilityChecks),
+          titleInDetails: 'How will you check if your approach will work?',
+          richTextParams: RichTextParams(
+            documentJson: const DocumentJson(feasibilityChecks),
+          ),
         ),
       ],
     ),

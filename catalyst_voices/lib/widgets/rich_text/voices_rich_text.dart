@@ -1,6 +1,5 @@
 import 'package:catalyst_voices/widgets/buttons/voices_filled_button.dart';
 import 'package:catalyst_voices/widgets/buttons/voices_text_button.dart';
-import 'package:catalyst_voices/widgets/common/resizable_box_parent.dart';
 import 'package:catalyst_voices_assets/catalyst_voices_assets.dart';
 import 'package:catalyst_voices_brands/catalyst_voices_brands.dart';
 import 'package:catalyst_voices_localization/catalyst_voices_localization.dart';
@@ -149,36 +148,37 @@ class _Editor extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: ResizableBoxParent(
-        minHeight: 470,
-        resizableVertically: true,
-        resizableHorizontally: false,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            color: editMode
-                ? Theme.of(context).colors.onSurfaceNeutralOpaqueLv1
-                : Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
-            border: Border.all(
-              color: Theme.of(context).colorScheme.outlineVariant,
-            ),
-            borderRadius: BorderRadius.circular(8),
+      // TODO(jakub): enable after implementing https://github.com/input-output-hk/catalyst-voices/issues/846
+      // child: ResizableBoxParent(
+      //   minHeight: 470,
+      //   resizableVertically: true,
+      //   resizableHorizontally: false,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          color: editMode
+              ? Theme.of(context).colors.onSurfaceNeutralOpaqueLv1
+              : Theme.of(context).colors.elevationsOnSurfaceNeutralLv1White,
+          border: Border.all(
+            color: Theme.of(context).colorScheme.outlineVariant,
           ),
-          child: IgnorePointer(
-            ignoring: !editMode,
-            child: QuillEditor.basic(
-              controller: controller,
-              focusNode: focusNode,
-              configurations: QuillEditorConfigurations(
-                padding: const EdgeInsets.all(16),
-                placeholder: context.l10n.placeholderRichText,
-                embedBuilders: CatalystPlatform.isWeb
-                    ? FlutterQuillEmbeds.editorWebBuilders()
-                    : FlutterQuillEmbeds.editorBuilders(),
-              ),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: IgnorePointer(
+          ignoring: !editMode,
+          child: QuillEditor.basic(
+            controller: controller,
+            focusNode: focusNode,
+            configurations: QuillEditorConfigurations(
+              padding: const EdgeInsets.all(16),
+              placeholder: context.l10n.placeholderRichText,
+              embedBuilders: CatalystPlatform.isWeb
+                  ? FlutterQuillEmbeds.editorWebBuilders()
+                  : FlutterQuillEmbeds.editorBuilders(),
             ),
           ),
         ),
       ),
+      // ),
     );
   }
 }
