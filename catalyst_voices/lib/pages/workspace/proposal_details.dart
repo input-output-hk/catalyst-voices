@@ -101,8 +101,9 @@ class _SegmentDetails extends StatelessWidget {
               return _StepDetails(
                 key: ValueKey('WorkspaceStep${step.id}TileKey'),
                 id: step.id,
-                title: step.title,
-                titleInDetails: step.titleInDetails,
+                title: step.titleInDetails != null
+                    ? step.titleInDetails!
+                    : step.title,
                 desc: step.description,
                 richTextParams: step.richTextParams,
                 isSelected: step.id == selected,
@@ -121,7 +122,6 @@ class _StepDetails extends StatelessWidget {
     super.key,
     required this.id,
     required this.title,
-    this.titleInDetails,
     this.desc,
     this.richTextParams,
     this.isSelected = false,
@@ -130,7 +130,6 @@ class _StepDetails extends StatelessWidget {
 
   final int id;
   final String title;
-  final String? titleInDetails;
   final String? desc;
   final RichTextParams? richTextParams;
   final bool isSelected;
@@ -140,7 +139,7 @@ class _StepDetails extends StatelessWidget {
   Widget build(BuildContext context) {
     if (desc != null) {
       return WorkspaceTextTileContainer(
-        name: titleInDetails != null ? titleInDetails! : title,
+        name: title,
         isSelected: isSelected,
         headerActions: [
           TextButton(
@@ -157,7 +156,7 @@ class _StepDetails extends StatelessWidget {
       return WorkspaceTileContainer(
         isSelected: isSelected,
         content: VoicesRichText(
-          title: titleInDetails != null ? titleInDetails! : title,
+          title: title,
           document: Document.fromJson(richTextParams!.documentJson.value),
           charsLimit: richTextParams!.charsLimit,
         ),
