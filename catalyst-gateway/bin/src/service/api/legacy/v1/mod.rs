@@ -23,7 +23,7 @@ mod fragments_statuses;
 /// V1 API Endpoints
 pub(crate) struct V1Api;
 
-#[OpenApi(prefix_path = "/v1", tag = "ApiTags::V1")]
+#[OpenApi(prefix_path = "/v1", tag = "ApiTags::Legacy")]
 impl V1Api {
     /// Get Account Votes
     ///
@@ -50,7 +50,6 @@ impl V1Api {
         path = "/fragments",
         method = "post",
         operation_id = "fragments",
-        tag = "ApiTags::Fragments",
         transform = "schema_version_validation",
         deprecated = true
     )]
@@ -69,7 +68,6 @@ impl V1Api {
         path = "/fragments/statuses",
         method = "get",
         operation_id = "fragmentsStatuses",
-        tag = "ApiTags::Fragments",
         transform = "schema_version_validation",
         deprecated = true
     )]
