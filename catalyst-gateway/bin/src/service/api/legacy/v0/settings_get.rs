@@ -7,7 +7,7 @@ use crate::service::common::responses::WithErrorResponses;
 #[derive(ApiResponse)]
 pub(crate) enum Responses {
     #[oai(status = 200)]
-    Ok(Json<dto::SettingsInfoDto>),
+    Ok(Json<dto::SettingsDto>),
 }
 
 /// All responses
@@ -15,14 +15,14 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 #[allow(clippy::unused_async)]
 pub(crate) async fn endpoint() -> AllResponses {
-    Responses::Ok(Json(dto::SettingsInfoDto::default())).into()
+    Responses::Ok(Json(dto::SettingsDto::default())).into()
 }
 
 pub(crate) mod dto {
     use poem_openapi::Object;
 
     #[derive(Object, Default)]
-    pub(crate) struct SettingsInfoDto {
+    pub(crate) struct SettingsDto {
         #[oai(
             rename = "block0Hash",
             validator(max_length = 66, min_length = 0, pattern = "[0-9a-f]")
