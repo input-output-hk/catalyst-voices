@@ -20,7 +20,7 @@ class WorkspaceProposalSegmentStep extends Equatable {
     this.isEditable = false,
   }) : assert(
           description != null || richTextParams != null,
-          'Make sure description or document are provided',
+          'Make sure description or richTextParams are provided',
         );
 
   @override
