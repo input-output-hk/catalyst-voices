@@ -60,8 +60,8 @@ type GetConfigSchemaAllResponses = WithErrorResponses<GetConfigSchemaResponses>;
 /// Set configuration endpoint responses.
 #[derive(ApiResponse)]
 enum SetConfigResponse {
-    /// Empty response.
-    #[oai(status = 200)]
+    /// Configuration Update Successful.
+    #[oai(status = 204)]
     Ok,
     /// Set configuration bad request.
     #[oai(status = 400)]
@@ -145,13 +145,20 @@ impl ConfigApi {
     }
 
     /// Set the frontend configuration.
+    ///
+    /// Store the given config as either global front end configuration, or configuration
+    /// for a client at a specific IP address.
     #[oai(
         path = "/draft/config/frontend",
         method = "put",
         operation_id = "put_config_frontend"
     )]
     async fn put_frontend(
-        &self, #[oai(name = "IP")] ip_query: Query<Option<String>>, body: Json<Value>,
+        &self,
+        /// *OPTIONAL* The IP Address to set the configuration for.
+        #[oai(name = "IP")]
+        ip_query: Query<Option<String>>,
+        body: Json<Value>,
     ) -> SetConfigAllResponses {
         let body_value = body.0;
 
