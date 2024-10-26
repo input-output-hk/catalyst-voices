@@ -3,7 +3,7 @@
 use std::{cmp::Reverse, sync::Arc};
 
 use futures::StreamExt;
-use poem_openapi::{payload::Json, ApiResponse, Object};
+use poem_openapi::{payload::Json, types::Example, ApiResponse, Object};
 use tracing::error;
 
 use crate::{
@@ -22,7 +22,7 @@ use crate::{
 /// Endpoint responses
 #[derive(ApiResponse)]
 pub(crate) enum ResponseSingleRegistration {
-    /// A Cip36 registration report
+    /// A CIP36 registration report
     #[oai(status = 200)]
     Ok(Json<Cip36Reporting>),
     /// No valid registration
@@ -33,7 +33,7 @@ pub(crate) enum ResponseSingleRegistration {
 /// Endpoint responses
 #[derive(ApiResponse)]
 pub(crate) enum ResponseMultipleRegistrations {
-    /// All Cip36 registrations associated with the same Voting Key
+    /// All CIP36 registrations associated with the same Voting Key
     #[oai(status = 200)]
     Ok(Json<Cip36ReportingList>),
     /// No valid registration
@@ -41,16 +41,26 @@ pub(crate) enum ResponseMultipleRegistrations {
     NotFound,
 }
 
-/// List of Cip36 Registration Data as found on-chain.
+/// List of CIP36 Registration Data as found on-chain.
 #[derive(Object, Default)]
+#[oai(example = true)]
 pub(crate) struct Cip36ReportingList {
     /// List of registrations associated with the same Voting Key
     #[oai(validator(max_items = "100000"))]
     cip36: Vec<Cip36Reporting>,
 }
 
-/// Cip36 info + invalid reporting
+impl Example for Cip36ReportingList {
+    fn example() -> Self {
+        Self {
+            cip36: vec![Cip36Reporting::example()],
+        }
+    }
+}
+
+/// CIP36 info + invalid reporting
 #[derive(Object, Default)]
+#[oai(example = true)]
 pub(crate) struct Cip36Reporting {
     /// List of registrations
     #[oai(validator(max_items = "100000"))]
@@ -60,8 +70,18 @@ pub(crate) struct Cip36Reporting {
     invalids: Vec<InvalidRegistrationsReport>,
 }
 
-/// Cip36 Registration Data as found on-chain.
+impl Example for Cip36Reporting {
+    fn example() -> Self {
+        Self {
+            cip36: vec![Cip36Info::example()],
+            invalids: vec![InvalidRegistrationsReport::example()],
+        }
+    }
+}
+
+/// CIP36 Registration Data as found on-chain.
 #[derive(Object, Default)]
+#[oai(example = true)]
 pub(crate) struct Cip36Info {
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
     #[oai(validator(max_length = 66, min_length = 66, pattern = "0x[0-9a-f]{64}"))]
@@ -87,8 +107,26 @@ pub(crate) struct Cip36Info {
     pub cip36: bool,
 }
 
+impl Example for Cip36Info {
+    fn example() -> Self {
+        Self {
+            stake_address: "0xad4b948699193634a39dd56f779a2951a24779ad52aa7916f6912b8ec4702cee"
+                .to_string(),
+            nonce: 0,
+            slot_no: 12345,
+            txn: 0,
+            vote_key: "0xa6a3c0447aeb9cc54cf6422ba32b294e5e1c3ef6d782f2acff4a70694c4d1663"
+                .to_string(),
+            payment_address: "0x00588e8e1d18cba576a4d35758069fe94e53f638b6faf7c07b8abd2bc5c5cdee47b60edc7772855324c85033c638364214cbfc6627889f81c4".to_string(),
+            is_payable: false,
+            cip36: true,
+        }
+    }
+}
+
 /// Invalid registration error reporting
 #[derive(Object, Default)]
+#[oai(example = true)]
 pub(crate) struct InvalidRegistrationsReport {
     /// Error report
     #[oai(validator(max_items = "100000", max_length = "100", pattern = ".*"))]
@@ -106,6 +144,19 @@ pub(crate) struct InvalidRegistrationsReport {
     pub is_payable: bool,
     /// Is the Registration CIP36 format, or CIP15
     pub cip36: bool,
+}
+
+impl Example for InvalidRegistrationsReport {
+    fn example() -> Self {
+        Self {
+            error_report: vec!["Invalid registration".to_string()],
+            stake_address: "0xad4b948699193634a39dd56f779a2951a24779ad52aa7916f6912b8ec4702cee".to_string(),
+            vote_key: "0xa6a3c0447aeb9cc54cf6422ba32b294e5e1c3ef6d782f2acff4a70694c4d1663".to_string(),
+            payment_address: "0x00588e8e1d18cba576a4d35758069fe94e53f638b6faf7c07b8abd2bc5c5cdee47b60edc7772855324c85033c638364214cbfc6627889f81c4".to_string(),
+            is_payable: false,
+            cip36: true,
+        }
+    }
 }
 
 /// Single registration response

@@ -25,9 +25,9 @@ pub(crate) struct CardanoApi;
 
 #[OpenApi(tag = "ApiTags::Cardano")]
 impl CardanoApi {
-    /// Get staked ada amount.
+    /// Get staked ADA amount.
     ///
-    /// This endpoint returns the total Cardano's staked ada amount to the corresponded
+    /// This endpoint returns the total Cardano's staked ADA amount to the corresponded
     /// user's stake address.
     #[oai(
         path = "/draft/cardano/staked_ada/:stake_address",
@@ -38,7 +38,7 @@ impl CardanoApi {
     async fn staked_ada_get(
         &self,
         /// The stake address of the user.
-        /// Should a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
+        /// Should be a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
         stake_address: Path<StakeAddress>,
         /// Cardano network type.
         /// If omitted network type is identified from the stake address.
@@ -48,7 +48,7 @@ impl CardanoApi {
         /// `testnet`, to specify `preprod` or `preview` network type use this
         /// query parameter.
         network: Query<Option<Network>>,
-        /// Slot number at which the staked ada amount should be calculated.
+        /// Slot number at which the staked ADA amount should be calculated.
         /// If omitted latest slot number is used.
         // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
         #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
@@ -70,7 +70,7 @@ impl CardanoApi {
     async fn registration_get(
         &self,
         /// The stake address of the user.
-        /// Should a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
+        /// Should be a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
         stake_address: Path<StakeAddress>,
         /// Cardano network type.
         /// If omitted network type is identified from the stake address.
@@ -80,7 +80,7 @@ impl CardanoApi {
         /// `testnet`, to specify `preprod` or `preview` network type use this
         /// query parameter.
         network: Query<Option<Network>>,
-        /// Slot number at which the staked ada amount should be calculated.
+        /// Slot number at which the staked ADA amount should be calculated.
         /// If omitted latest slot number is used.
         // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
         #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
@@ -135,9 +135,9 @@ impl CardanoApi {
         date_time_to_slot_number_get::endpoint(date_time.0, network.0).await
     }
 
-    /// Cip36 registrations
+    /// Get latest CIP36 registrations from stake address.
     ///
-    /// This endpoint gets the latest registration given a stake addr
+    /// This endpoint gets the latest registration given a stake address.
     #[oai(
         path = "/draft/cardano/cip36/latest_registration/stake_addr",
         method = "get",
@@ -152,9 +152,9 @@ impl CardanoApi {
         cip36::get_latest_registration_from_stake_addr(stake_addr.0, true).await
     }
 
-    /// Cip36 registrations
+    /// Get latest CIP36 registrations from a stake key hash.
     ///
-    /// This endpoint gets the latest registration given a stake key hash
+    /// This endpoint gets the latest registration given a stake key hash.
     #[oai(
         path = "/draft/cardano/cip36/latest_registration/stake_key_hash",
         method = "get",
@@ -169,7 +169,7 @@ impl CardanoApi {
         cip36::get_latest_registration_from_stake_key_hash(stake_key_hash.0, true).await
     }
 
-    /// Cip36 registrations
+    /// Get latest CIP36 registrations from voting key.
     ///
     /// This endpoint returns the list of stake address registrations currently associated
     /// with a given voting key.
