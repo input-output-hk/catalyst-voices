@@ -10,4 +10,4 @@ test-lint-openapi:
     # Copy the spectral configuration file.
     COPY ./.spectral.yml .
     # Scan the doc directory where type of file is JSON.
-    DO spectral-ci+BUILD_SPECTRAL --dir=./doc 
+    DO spectral-ci+LINT --dir=./doc 
