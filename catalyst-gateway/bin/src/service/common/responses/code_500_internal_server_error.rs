@@ -11,7 +11,7 @@ use crate::settings::Settings;
 #[derive(Debug, Object)]
 #[oai(example, skip_serializing_if_is_none)]
 /// Server Error response to a Bad request.
-pub(crate) struct ServerError {
+pub(crate) struct InternalServerError {
     /// Unique ID of this Server Error so that it can be located easily for debugging.
     id: Uuid,
     /// *Optional* SHORT Error message.
@@ -25,7 +25,7 @@ pub(crate) struct ServerError {
     issue: Option<Url>,
 }
 
-impl ServerError {
+impl InternalServerError {
     /// Create a new Server Error Response Payload.
     pub(crate) fn new(msg: Option<String>) -> Self {
         let msg = msg.unwrap_or(
@@ -44,9 +44,9 @@ impl ServerError {
     }
 }
 
-impl Example for ServerError {
+impl Example for InternalServerError {
     /// Example for the Server Error Payload.
     fn example() -> Self {
-        Self::new(Some("Server Error".to_string()))
+        Self::new(None)
     }
 }
