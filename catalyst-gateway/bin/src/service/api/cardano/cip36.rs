@@ -91,7 +91,7 @@ pub(crate) struct Cip36Info {
 #[derive(Object, Default)]
 pub(crate) struct InvalidRegistrationsReport {
     /// Error report
-    #[oai(validator(max_items = "100000"))]
+    #[oai(validator(max_items = "100000", max_length = "100", pattern = ".*"))]
     pub error_report: Vec<String>,
     /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
     #[oai(validator(max_length = 66, min_length = 66, pattern = "0x[0-9a-f]{64}"))]

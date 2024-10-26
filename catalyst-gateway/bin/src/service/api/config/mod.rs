@@ -1,6 +1,6 @@
 //! Configuration Endpoints
 
-use std::{net::IpAddr, str::FromStr};
+use std::net::IpAddr;
 
 use jsonschema::BasicOutput;
 use poem::web::RealIp;
@@ -160,24 +160,13 @@ impl ConfigApi {
         &self,
         /// *OPTIONAL* The IP Address to set the configuration for.
         #[oai(name = "IP")]
-        ip_query: Query<Option<String>>,
+        ip_query: Query<Option<IpAddr>>,
         body: Json<Value>,
     ) -> SetConfigAllResponses {
         let body_value = body.0;
 
         match ip_query.0 {
-            Some(ip) => {
-                match IpAddr::from_str(&ip) {
-                    Ok(parsed_ip) => set(ConfigKey::FrontendForIp(parsed_ip), body_value).await,
-                    Err(err) => {
-                        SetConfigResponse::BadRequest(Json(ConfigBadRequest {
-                            error: format!("Invalid IP address: {err}"),
-                            schema_validation_errors: None,
-                        }))
-                        .into()
-                    },
-                }
-            },
+            Some(ip) => set(ConfigKey::FrontendForIp(ip), body_value).await,
             None => set(ConfigKey::Frontend, body_value).await,
         }
     }

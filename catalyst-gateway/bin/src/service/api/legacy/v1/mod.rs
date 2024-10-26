@@ -37,7 +37,9 @@ impl V1Api {
         deprecated = true
     )]
     async fn get_account_votes(
-        &self, /// A account ID to get the votes for.
+        &self,
+        /// A account ID to get the votes for.
+        #[oai(validator(max_length = "100", pattern = "^0x[a-f0-9]+$"))]
         account_id: Path<AccountId>,
     ) -> account_votes_get::AllResponses {
         account_votes_get::endpoint(account_id).await

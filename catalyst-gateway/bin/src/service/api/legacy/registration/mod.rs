@@ -32,7 +32,7 @@ enum Responses {
 /// All responses
 type AllResponses = WithErrorResponses<Responses>;
 
-#[OpenApi(tag = "ApiTags::Legacy")]
+#[OpenApi(tag = "ApiTags::Registration")]
 impl RegistrationApi {
     /// Voter's info
     ///
@@ -57,12 +57,11 @@ impl RegistrationApi {
         /// [CIP-15](https://cips.cardano.org/cips/cip15) or [CIP-36](https://cips.cardano.org/cips/cip36) registration).
         #[oai(validator(max_length = 66, min_length = 66, pattern = "0x[0-9a-f]{64}"))]
         voting_key: Path<VotingPublicKey>,
-        /// The Event ID to return results for.
+        /// The Event Index to return results for.
         /// See [GET Events](Link to events endpoint) for details on retrieving all valid
         /// event IDs.
-        // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
         #[oai(validator(minimum(value = "0"), maximum(value = "2147483647")))]
-        event_id: Query<Option<EventId>>,
+        event_index: Query<Option<EventId>>,
         /// If this optional flag is set, the response will include the delegator's list
         /// in the response. Otherwise, it will be omitted.
         #[oai(default)]
