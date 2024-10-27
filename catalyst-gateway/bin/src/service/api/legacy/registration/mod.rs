@@ -45,7 +45,7 @@ impl RegistrationApi {
     #[allow(clippy::unused_async)]
     #[allow(unused_variables)]
     #[oai(
-        path = "/draft/registration/voter/:voting_key",
+        path = "/v1/registration/voter/:voting_key",
         method = "get",
         operation_id = "getVoterInfo",
         transform = "schema_version_validation",

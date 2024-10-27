@@ -4,14 +4,14 @@ use poem_openapi::Tags;
 /// `OpenAPI` Tags
 #[derive(Tags)]
 pub(crate) enum ApiTags {
-    /// Service Health and Readiness
+    /// Service Health and Readiness.
     Health,
-    /// General Cardano Blockchain Information
+    /// General Cardano Blockchain Information.
     Cardano,
     /// Registration and Role Based Access Control (RBAC) Operations.
     Registration,
-    /// Legacy Mobile App Support
-    Legacy,
-    /// Service Configuration and Status
+    /// Service Configuration and Status.
     Config,
+    /// Legacy Mobile App Support.
+    Legacy,
 }

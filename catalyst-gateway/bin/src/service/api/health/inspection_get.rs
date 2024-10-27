@@ -29,7 +29,7 @@ impl From<LogLevel> for logger::LogLevel {
     }
 }
 
-/// Enable or Disable Deep Database Query Inspection
+/// Enable or Disable Deep Database Query Inspection.
 #[derive(Debug, Clone, Copy, Enum)]
 #[oai(rename_all = "lowercase")]
 pub(crate) enum DeepQueryInspectionFlag {

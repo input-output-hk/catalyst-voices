@@ -16,14 +16,14 @@ use crate::{
 /// Configuration API struct
 pub(crate) struct ConfigApi;
 
-/// Frontend JSON schema
+/// Frontend JSON schema.
 #[derive(Object, Default, serde::Deserialize)]
 struct FrontendConfig {
     /// Sentry properties.
     sentry: Option<Sentry>,
 }
 
-/// Frontend configuration for Sentry
+/// Frontend configuration for Sentry.
 #[derive(Object, Default, serde::Deserialize)]
 struct Sentry {
     /// The Data Source Name (DSN) for Sentry.
@@ -70,7 +70,7 @@ enum SetConfigResponse {
 /// Set configuration all responses.
 type SetConfigAllResponses = WithErrorResponses<SetConfigResponse>;
 
-/// Configuration Data Validation Error
+/// Configuration Data Validation Error.
 #[derive(Object, Default)]
 struct ConfigBadRequest {
     /// Error messages.

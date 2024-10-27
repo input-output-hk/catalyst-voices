@@ -4,7 +4,6 @@ use poem_openapi::{payload::Binary, OpenApi};
 use crate::service::{
     common::tags::ApiTags, utilities::middleware::schema_validation::schema_version_validation,
 };
-
 mod message_post;
 mod plans_get;
 

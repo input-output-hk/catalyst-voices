@@ -39,17 +39,7 @@ fn get_api_contact() -> ContactObject {
 /// A long description of the API. Markdown is supported
 const API_DESCRIPTION: &str = "# Catalyst Gateway API.
 
-The Catalyst Gateway API provides realtime data for all prior, current and future Catalyst voting events.
-
-TODO:
-
-* Implement Permissionless Auth.
-* Implement Replacement Functionality for GVC.
-* Implement representative registration on main-chain, distinct from voter registration.
-* Implement Voting API abstracting the Jormungandr API from public exposure.
-* Implement Audit API's (Retrieve voting blockchain records,  registration/voting power audit and private tally audit.
-* Implement API's needed to support posting Ideas/Proposals etc.Catalyst Gateway
-";
+The Catalyst Gateway API provides realtime data for all prior, current and future Catalyst Voices voting events.";
 
 /// Get the license details for the API
 fn get_api_license() -> LicenseObject {
@@ -86,7 +76,7 @@ pub(crate) fn mk_api() -> OpenApiService<(HealthApi, CardanoApi, ConfigApi, Lega
 
     // Add server name if it is set
     if let Some(name) = Settings::server_name() {
-        service = service.server(ServerObject::new(name).description("Server at server name"));
+        service = service.server(ServerObject::new(name).description("Server at server name."));
     }
 
     let port = Settings::bound_address().port();
@@ -95,7 +85,7 @@ pub(crate) fn mk_api() -> OpenApiService<(HealthApi, CardanoApi, ConfigApi, Lega
     if let Ok(hostname) = gethostname().into_string() {
         let hostname_address = format!("http://{hostname}:{port}",);
         service = service
-            .server(ServerObject::new(hostname_address).description("Server at localhost name"));
+            .server(ServerObject::new(hostname_address).description("Server at localhost name."));
     }
 
     // Get local IP address v4 and v6
@@ -106,13 +96,13 @@ pub(crate) fn mk_api() -> OpenApiService<(HealthApi, CardanoApi, ConfigApi, Lega
                     IpAddr::V4(_) => {
                         (
                             format!("http://{ip}:{port}"),
-                            "Server at local IPv4 address",
+                            "Server at local IPv4 address.",
                         )
                     },
                     IpAddr::V6(_) => {
                         (
                             format!("http://[{ip}]:{port}"),
-                            "Server at local IPv6 address",
+                            "Server at local IPv6 address.",
                         )
                     },
                 };
