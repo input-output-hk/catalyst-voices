@@ -40,15 +40,6 @@ fn get_api_contact() -> ContactObject {
 const API_DESCRIPTION: &str = "# Catalyst Gateway API.
 
 The Catalyst Gateway API provides realtime data for all prior, current and future Catalyst voting events.
-
-TODO:
-
-* Implement Permissionless Auth.
-* Implement Replacement Functionality for GVC.
-* Implement representative registration on main-chain, distinct from voter registration.
-* Implement Voting API abstracting the Jormungandr API from public exposure.
-* Implement Audit API's (Retrieve voting blockchain records,  registration/voting power audit and private tally audit.
-* Implement API's needed to support posting Ideas/Proposals etc.Catalyst Gateway
 ";
 
 /// Get the license details for the API
