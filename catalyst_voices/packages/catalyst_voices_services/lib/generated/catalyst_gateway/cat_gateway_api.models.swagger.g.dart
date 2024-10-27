@@ -216,6 +216,21 @@ Map<String, dynamic> _$HashToJson(Hash instance) => <String, dynamic>{
       'hash': instance.hash,
     };
 
+InternalServerError _$InternalServerErrorFromJson(Map<String, dynamic> json) =>
+    InternalServerError(
+      id: json['id'] as String,
+      msg: json['msg'] as String,
+      issue: json['issue'] as String?,
+    );
+
+Map<String, dynamic> _$InternalServerErrorToJson(
+        InternalServerError instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'msg': instance.msg,
+      'issue': instance.issue,
+    };
+
 InvalidRegistrationsReport _$InvalidRegistrationsReportFromJson(
         Map<String, dynamic> json) =>
     InvalidRegistrationsReport(
@@ -239,18 +254,6 @@ Map<String, dynamic> _$InvalidRegistrationsReportToJson(
       'payment_address': instance.paymentAddress,
       'is_payable': instance.isPayable,
       'cip36': instance.cip36,
-    };
-
-RegistrationGetBadRequest _$RegistrationGetBadRequestFromJson(
-        Map<String, dynamic> json) =>
-    RegistrationGetBadRequest(
-      error: json['error'] as String,
-    );
-
-Map<String, dynamic> _$RegistrationGetBadRequestToJson(
-        RegistrationGetBadRequest instance) =>
-    <String, dynamic>{
-      'error': instance.error,
     };
 
 RegistrationInfo _$RegistrationInfoFromJson(Map<String, dynamic> json) =>
@@ -296,17 +299,16 @@ Map<String, dynamic> _$SentryToJson(Sentry instance) => <String, dynamic>{
       'environment': instance.environment,
     };
 
-ServerError _$ServerErrorFromJson(Map<String, dynamic> json) => ServerError(
+ServiceUnavailable _$ServiceUnavailableFromJson(Map<String, dynamic> json) =>
+    ServiceUnavailable(
       id: json['id'] as String,
       msg: json['msg'] as String,
-      issue: json['issue'] as String?,
     );
 
-Map<String, dynamic> _$ServerErrorToJson(ServerError instance) =>
+Map<String, dynamic> _$ServiceUnavailableToJson(ServiceUnavailable instance) =>
     <String, dynamic>{
       'id': instance.id,
       'msg': instance.msg,
-      'issue': instance.issue,
     };
 
 Slot _$SlotFromJson(Map<String, dynamic> json) => Slot(
@@ -409,6 +411,18 @@ Map<String, dynamic> _$SyncStateToJson(SyncState instance) => <String, dynamic>{
       'slot_number': instance.slotNumber,
       'block_hash': instance.blockHash,
       'last_updated': instance.lastUpdated.toIso8601String(),
+    };
+
+TooManyRequests _$TooManyRequestsFromJson(Map<String, dynamic> json) =>
+    TooManyRequests(
+      id: json['id'] as String,
+      msg: json['msg'] as String,
+    );
+
+Map<String, dynamic> _$TooManyRequestsToJson(TooManyRequests instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'msg': instance.msg,
     };
 
 VotePlan _$VotePlanFromJson(Map<String, dynamic> json) => VotePlan(

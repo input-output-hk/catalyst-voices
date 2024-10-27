@@ -75,9 +75,9 @@ abstract class CatGatewayApi extends ChopperService {
   @Get(path: '/api/v1/health/live')
   Future<chopper.Response> _apiV1HealthLiveGet();
 
-  ///Options for service inspection.
-  ///@param log_level
-  ///@param query_inspection
+  ///Service Inspection Control.
+  ///@param log_level The log level to use for the service.  Controls what detail gets logged.
+  ///@param query_inspection Enable or disable Verbose Query inspection in the logs.  Used to find query performance issues.
   Future<chopper.Response> apiV1HealthInspectionGet({
     enums.LogLevel? logLevel,
     enums.DeepQueryInspectionFlag? queryInspection,
@@ -87,19 +87,19 @@ abstract class CatGatewayApi extends ChopperService {
         queryInspection: queryInspection?.value?.toString());
   }
 
-  ///Options for service inspection.
-  ///@param log_level
-  ///@param query_inspection
+  ///Service Inspection Control.
+  ///@param log_level The log level to use for the service.  Controls what detail gets logged.
+  ///@param query_inspection Enable or disable Verbose Query inspection in the logs.  Used to find query performance issues.
   @Get(path: '/api/v1/health/inspection')
   Future<chopper.Response> _apiV1HealthInspectionGet({
     @Query('log_level') String? logLevel,
     @Query('query_inspection') String? queryInspection,
   });
 
-  ///Get staked ada amount.
-  ///@param stake_address The stake address of the user. Should a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
+  ///Get staked ADA amount.
+  ///@param stake_address The stake address of the user. Should be a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
   ///@param network Cardano network type. If omitted network type is identified from the stake address. If specified it must be correspondent to the network type encoded in the stake address. As `preprod` and `preview` network types in the stake address encoded as a `testnet`, to specify `preprod` or `preview` network type use this query parameter.
-  ///@param slot_number Slot number at which the staked ada amount should be calculated. If omitted latest slot number is used.
+  ///@param slot_number Slot number at which the staked ADA amount should be calculated. If omitted latest slot number is used.
   Future<chopper.Response<FullStakeInfo>>
       apiDraftCardanoStakedAdaStakeAddressGet({
     required String? stakeAddress,
@@ -115,10 +115,10 @@ abstract class CatGatewayApi extends ChopperService {
         slotNumber: slotNumber);
   }
 
-  ///Get staked ada amount.
-  ///@param stake_address The stake address of the user. Should a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
+  ///Get staked ADA amount.
+  ///@param stake_address The stake address of the user. Should be a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
   ///@param network Cardano network type. If omitted network type is identified from the stake address. If specified it must be correspondent to the network type encoded in the stake address. As `preprod` and `preview` network types in the stake address encoded as a `testnet`, to specify `preprod` or `preview` network type use this query parameter.
-  ///@param slot_number Slot number at which the staked ada amount should be calculated. If omitted latest slot number is used.
+  ///@param slot_number Slot number at which the staked ADA amount should be calculated. If omitted latest slot number is used.
   @Get(path: '/api/draft/cardano/staked_ada/{stake_address}')
   Future<chopper.Response<FullStakeInfo>>
       _apiDraftCardanoStakedAdaStakeAddressGet({
@@ -128,9 +128,9 @@ abstract class CatGatewayApi extends ChopperService {
   });
 
   ///Get registration info.
-  ///@param stake_address The stake address of the user. Should a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
+  ///@param stake_address The stake address of the user. Should be a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
   ///@param network Cardano network type. If omitted network type is identified from the stake address. If specified it must be correspondent to the network type encoded in the stake address. As `preprod` and `preview` network types in the stake address encoded as a `testnet`, to specify `preprod` or `preview` network type use this query parameter.
-  ///@param slot_number Slot number at which the staked ada amount should be calculated. If omitted latest slot number is used.
+  ///@param slot_number Slot number at which the staked ADA amount should be calculated. If omitted latest slot number is used.
   Future<chopper.Response<RegistrationInfo>>
       apiDraftCardanoRegistrationStakeAddressGet({
     required String? stakeAddress,
@@ -147,9 +147,9 @@ abstract class CatGatewayApi extends ChopperService {
   }
 
   ///Get registration info.
-  ///@param stake_address The stake address of the user. Should a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
+  ///@param stake_address The stake address of the user. Should be a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
   ///@param network Cardano network type. If omitted network type is identified from the stake address. If specified it must be correspondent to the network type encoded in the stake address. As `preprod` and `preview` network types in the stake address encoded as a `testnet`, to specify `preprod` or `preview` network type use this query parameter.
-  ///@param slot_number Slot number at which the staked ada amount should be calculated. If omitted latest slot number is used.
+  ///@param slot_number Slot number at which the staked ADA amount should be calculated. If omitted latest slot number is used.
   @Get(path: '/api/draft/cardano/registration/{stake_address}')
   Future<chopper.Response<RegistrationInfo>>
       _apiDraftCardanoRegistrationStakeAddressGet({
@@ -195,8 +195,8 @@ abstract class CatGatewayApi extends ChopperService {
     @Query('network') String? network,
   });
 
-  ///Cip36 registrations
-  ///@param stake_addr
+  ///Get latest CIP36 registrations from stake address.
+  ///@param stake_addr Stake Address to find the latest registration for.
   Future<chopper.Response<Cip36Reporting>>
       apiDraftCardanoCip36LatestRegistrationStakeAddrGet(
           {required String? stakeAddr}) {
@@ -207,15 +207,15 @@ abstract class CatGatewayApi extends ChopperService {
         stakeAddr: stakeAddr);
   }
 
-  ///Cip36 registrations
-  ///@param stake_addr
+  ///Get latest CIP36 registrations from stake address.
+  ///@param stake_addr Stake Address to find the latest registration for.
   @Get(path: '/api/draft/cardano/cip36/latest_registration/stake_addr')
   Future<chopper.Response<Cip36Reporting>>
       _apiDraftCardanoCip36LatestRegistrationStakeAddrGet(
           {@Query('stake_addr') required String? stakeAddr});
 
-  ///Cip36 registrations
-  ///@param stake_key_hash
+  ///Get latest CIP36 registrations from a stake key hash.
+  ///@param stake_key_hash Stake Key Hash to find the latest registration for.
   Future<chopper.Response<Cip36Reporting>>
       apiDraftCardanoCip36LatestRegistrationStakeKeyHashGet(
           {required String? stakeKeyHash}) {
@@ -226,15 +226,15 @@ abstract class CatGatewayApi extends ChopperService {
         stakeKeyHash: stakeKeyHash);
   }
 
-  ///Cip36 registrations
-  ///@param stake_key_hash
+  ///Get latest CIP36 registrations from a stake key hash.
+  ///@param stake_key_hash Stake Key Hash to find the latest registration for.
   @Get(path: '/api/draft/cardano/cip36/latest_registration/stake_key_hash')
   Future<chopper.Response<Cip36Reporting>>
       _apiDraftCardanoCip36LatestRegistrationStakeKeyHashGet(
           {@Query('stake_key_hash') required String? stakeKeyHash});
 
-  ///Cip36 registrations
-  ///@param vote_key
+  ///Get latest CIP36 registrations from voting key.
+  ///@param vote_key Voting Key to find CIP36 registrations for.
   Future<chopper.Response<Cip36ReportingList>>
       apiDraftCardanoCip36LatestRegistrationVoteKeyGet(
           {required String? voteKey}) {
@@ -244,8 +244,8 @@ abstract class CatGatewayApi extends ChopperService {
     return _apiDraftCardanoCip36LatestRegistrationVoteKeyGet(voteKey: voteKey);
   }
 
-  ///Cip36 registrations
-  ///@param vote_key
+  ///Get latest CIP36 registrations from voting key.
+  ///@param vote_key Voting Key to find CIP36 registrations for.
   @Get(path: '/api/draft/cardano/cip36/latest_registration/vote_key')
   Future<chopper.Response<Cip36ReportingList>>
       _apiDraftCardanoCip36LatestRegistrationVoteKeyGet(
@@ -264,62 +264,67 @@ abstract class CatGatewayApi extends ChopperService {
   Future<chopper.Response<FrontendConfig>> _apiDraftConfigFrontendGet();
 
   ///Set the frontend configuration.
-  ///@param IP
+  ///@param IP *OPTIONAL* The IP Address to set the configuration for.
   Future<chopper.Response> apiDraftConfigFrontendPut({
-    String? ip,
-    required Object? body,
+    Object? ip,
+    required FrontendConfig? body,
   }) {
     return _apiDraftConfigFrontendPut(ip: ip, body: body);
   }
 
   ///Set the frontend configuration.
-  ///@param IP
+  ///@param IP *OPTIONAL* The IP Address to set the configuration for.
   @Put(
     path: '/api/draft/config/frontend',
     optionalBody: true,
   )
   Future<chopper.Response> _apiDraftConfigFrontendPut({
-    @Query('IP') String? ip,
-    @Body() required Object? body,
+    @Query('IP') Object? ip,
+    @Body() required FrontendConfig? body,
   });
 
-  ///Get the frontend JSON schema.
-  Future<chopper.Response> apiDraftConfigFrontendSchemaGet() {
+  ///Get the frontend configuration JSON schema.
+  Future<chopper.Response<FrontendConfig>> apiDraftConfigFrontendSchemaGet() {
+    generatedMapping.putIfAbsent(
+        FrontendConfig, () => FrontendConfig.fromJsonFactory);
+
     return _apiDraftConfigFrontendSchemaGet();
   }
 
-  ///Get the frontend JSON schema.
+  ///Get the frontend configuration JSON schema.
   @Get(path: '/api/draft/config/frontend/schema')
-  Future<chopper.Response> _apiDraftConfigFrontendSchemaGet();
+  Future<chopper.Response<FrontendConfig>> _apiDraftConfigFrontendSchemaGet();
 
   ///Voter's info
   ///@param voting_key A Voters Public ED25519 Key (as registered in their most recent valid [CIP-15](https://cips.cardano.org/cips/cip15) or [CIP-36](https://cips.cardano.org/cips/cip36) registration).
-  ///@param event_id The Event ID to return results for. See [GET Events](Link to events endpoint) for details on retrieving all valid event IDs.
+  ///@param event_index The Event Index to return results for. See [GET Events](Link to events endpoint) for details on retrieving all valid event IDs.
   ///@param with_delegators If this optional flag is set, the response will include the delegator's list in the response. Otherwise, it will be omitted.
   @deprecated
   Future<chopper.Response<VoterRegistration>>
-      apiDraftRegistrationVoterVotingKeyGet({
+      apiV1RegistrationVoterVotingKeyGet({
     required String? votingKey,
-    int? eventId,
+    int? eventIndex,
     bool? withDelegators,
   }) {
     generatedMapping.putIfAbsent(
         VoterRegistration, () => VoterRegistration.fromJsonFactory);
 
-    return _apiDraftRegistrationVoterVotingKeyGet(
-        votingKey: votingKey, eventId: eventId, withDelegators: withDelegators);
+    return _apiV1RegistrationVoterVotingKeyGet(
+        votingKey: votingKey,
+        eventIndex: eventIndex,
+        withDelegators: withDelegators);
   }
 
   ///Voter's info
   ///@param voting_key A Voters Public ED25519 Key (as registered in their most recent valid [CIP-15](https://cips.cardano.org/cips/cip15) or [CIP-36](https://cips.cardano.org/cips/cip36) registration).
-  ///@param event_id The Event ID to return results for. See [GET Events](Link to events endpoint) for details on retrieving all valid event IDs.
+  ///@param event_index The Event Index to return results for. See [GET Events](Link to events endpoint) for details on retrieving all valid event IDs.
   ///@param with_delegators If this optional flag is set, the response will include the delegator's list in the response. Otherwise, it will be omitted.
   @deprecated
-  @Get(path: '/api/draft/registration/voter/{voting_key}')
+  @Get(path: '/api/v1/registration/voter/{voting_key}')
   Future<chopper.Response<VoterRegistration>>
-      _apiDraftRegistrationVoterVotingKeyGet({
+      _apiV1RegistrationVoterVotingKeyGet({
     @Path('voting_key') required String? votingKey,
-    @Query('event_id') int? eventId,
+    @Query('event_index') int? eventIndex,
     @Query('with_delegators') bool? withDelegators,
   });
 

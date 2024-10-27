@@ -208,8 +208,8 @@ final class _$CatGatewayApi extends CatGatewayApi {
 
   @override
   Future<Response<dynamic>> _apiDraftConfigFrontendPut({
-    String? ip,
-    required Object? body,
+    Object? ip,
+    required FrontendConfig? body,
   }) {
     final Uri $url = Uri.parse('/api/draft/config/frontend');
     final Map<String, dynamic> $params = <String, dynamic>{'IP': ip};
@@ -225,25 +225,25 @@ final class _$CatGatewayApi extends CatGatewayApi {
   }
 
   @override
-  Future<Response<dynamic>> _apiDraftConfigFrontendSchemaGet() {
+  Future<Response<FrontendConfig>> _apiDraftConfigFrontendSchemaGet() {
     final Uri $url = Uri.parse('/api/draft/config/frontend/schema');
     final Request $request = Request(
       'GET',
       $url,
       client.baseUrl,
     );
-    return client.send<dynamic, dynamic>($request);
+    return client.send<FrontendConfig, FrontendConfig>($request);
   }
 
   @override
-  Future<Response<VoterRegistration>> _apiDraftRegistrationVoterVotingKeyGet({
+  Future<Response<VoterRegistration>> _apiV1RegistrationVoterVotingKeyGet({
     required String? votingKey,
-    int? eventId,
+    int? eventIndex,
     bool? withDelegators,
   }) {
-    final Uri $url = Uri.parse('/api/draft/registration/voter/${votingKey}');
+    final Uri $url = Uri.parse('/api/v1/registration/voter/${votingKey}');
     final Map<String, dynamic> $params = <String, dynamic>{
-      'event_id': eventId,
+      'event_index': eventIndex,
       'with_delegators': withDelegators,
     };
     final Request $request = Request(

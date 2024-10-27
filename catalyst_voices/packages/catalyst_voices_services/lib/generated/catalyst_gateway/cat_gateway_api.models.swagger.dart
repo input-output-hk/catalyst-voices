@@ -856,6 +856,66 @@ extension $HashExtension on Hash {
 }
 
 @JsonSerializable(explicitToJson: true)
+class InternalServerError {
+  const InternalServerError({
+    required this.id,
+    required this.msg,
+    this.issue,
+  });
+
+  factory InternalServerError.fromJson(Map<String, dynamic> json) =>
+      _$InternalServerErrorFromJson(json);
+
+  static const toJsonFactory = _$InternalServerErrorToJson;
+  Map<String, dynamic> toJson() => _$InternalServerErrorToJson(this);
+
+  @JsonKey(name: 'id')
+  final String id;
+  @JsonKey(name: 'msg')
+  final String msg;
+  @JsonKey(name: 'issue')
+  final String? issue;
+  static const fromJsonFactory = _$InternalServerErrorFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is InternalServerError &&
+            (identical(other.id, id) ||
+                const DeepCollectionEquality().equals(other.id, id)) &&
+            (identical(other.msg, msg) ||
+                const DeepCollectionEquality().equals(other.msg, msg)) &&
+            (identical(other.issue, issue) ||
+                const DeepCollectionEquality().equals(other.issue, issue)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(id) ^
+      const DeepCollectionEquality().hash(msg) ^
+      const DeepCollectionEquality().hash(issue) ^
+      runtimeType.hashCode;
+}
+
+extension $InternalServerErrorExtension on InternalServerError {
+  InternalServerError copyWith({String? id, String? msg, String? issue}) {
+    return InternalServerError(
+        id: id ?? this.id, msg: msg ?? this.msg, issue: issue ?? this.issue);
+  }
+
+  InternalServerError copyWithWrapped(
+      {Wrapped<String>? id, Wrapped<String>? msg, Wrapped<String?>? issue}) {
+    return InternalServerError(
+        id: (id != null ? id.value : this.id),
+        msg: (msg != null ? msg.value : this.msg),
+        issue: (issue != null ? issue.value : this.issue));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
 class InvalidRegistrationsReport {
   const InvalidRegistrationsReport({
     required this.errorReport,
@@ -958,49 +1018,6 @@ extension $InvalidRegistrationsReportExtension on InvalidRegistrationsReport {
             : this.paymentAddress),
         isPayable: (isPayable != null ? isPayable.value : this.isPayable),
         cip36: (cip36 != null ? cip36.value : this.cip36));
-  }
-}
-
-@JsonSerializable(explicitToJson: true)
-class RegistrationGetBadRequest {
-  const RegistrationGetBadRequest({
-    required this.error,
-  });
-
-  factory RegistrationGetBadRequest.fromJson(Map<String, dynamic> json) =>
-      _$RegistrationGetBadRequestFromJson(json);
-
-  static const toJsonFactory = _$RegistrationGetBadRequestToJson;
-  Map<String, dynamic> toJson() => _$RegistrationGetBadRequestToJson(this);
-
-  @JsonKey(name: 'error')
-  final String error;
-  static const fromJsonFactory = _$RegistrationGetBadRequestFromJson;
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other is RegistrationGetBadRequest &&
-            (identical(other.error, error) ||
-                const DeepCollectionEquality().equals(other.error, error)));
-  }
-
-  @override
-  String toString() => jsonEncode(this);
-
-  @override
-  int get hashCode =>
-      const DeepCollectionEquality().hash(error) ^ runtimeType.hashCode;
-}
-
-extension $RegistrationGetBadRequestExtension on RegistrationGetBadRequest {
-  RegistrationGetBadRequest copyWith({String? error}) {
-    return RegistrationGetBadRequest(error: error ?? this.error);
-  }
-
-  RegistrationGetBadRequest copyWithWrapped({Wrapped<String>? error}) {
-    return RegistrationGetBadRequest(
-        error: (error != null ? error.value : this.error));
   }
 }
 
@@ -1222,37 +1239,32 @@ extension $SentryExtension on Sentry {
 }
 
 @JsonSerializable(explicitToJson: true)
-class ServerError {
-  const ServerError({
+class ServiceUnavailable {
+  const ServiceUnavailable({
     required this.id,
     required this.msg,
-    this.issue,
   });
 
-  factory ServerError.fromJson(Map<String, dynamic> json) =>
-      _$ServerErrorFromJson(json);
+  factory ServiceUnavailable.fromJson(Map<String, dynamic> json) =>
+      _$ServiceUnavailableFromJson(json);
 
-  static const toJsonFactory = _$ServerErrorToJson;
-  Map<String, dynamic> toJson() => _$ServerErrorToJson(this);
+  static const toJsonFactory = _$ServiceUnavailableToJson;
+  Map<String, dynamic> toJson() => _$ServiceUnavailableToJson(this);
 
   @JsonKey(name: 'id')
   final String id;
   @JsonKey(name: 'msg')
   final String msg;
-  @JsonKey(name: 'issue')
-  final String? issue;
-  static const fromJsonFactory = _$ServerErrorFromJson;
+  static const fromJsonFactory = _$ServiceUnavailableFromJson;
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other is ServerError &&
+        (other is ServiceUnavailable &&
             (identical(other.id, id) ||
                 const DeepCollectionEquality().equals(other.id, id)) &&
             (identical(other.msg, msg) ||
-                const DeepCollectionEquality().equals(other.msg, msg)) &&
-            (identical(other.issue, issue) ||
-                const DeepCollectionEquality().equals(other.issue, issue)));
+                const DeepCollectionEquality().equals(other.msg, msg)));
   }
 
   @override
@@ -1262,22 +1274,19 @@ class ServerError {
   int get hashCode =>
       const DeepCollectionEquality().hash(id) ^
       const DeepCollectionEquality().hash(msg) ^
-      const DeepCollectionEquality().hash(issue) ^
       runtimeType.hashCode;
 }
 
-extension $ServerErrorExtension on ServerError {
-  ServerError copyWith({String? id, String? msg, String? issue}) {
-    return ServerError(
-        id: id ?? this.id, msg: msg ?? this.msg, issue: issue ?? this.issue);
+extension $ServiceUnavailableExtension on ServiceUnavailable {
+  ServiceUnavailable copyWith({String? id, String? msg}) {
+    return ServiceUnavailable(id: id ?? this.id, msg: msg ?? this.msg);
   }
 
-  ServerError copyWithWrapped(
-      {Wrapped<String>? id, Wrapped<String>? msg, Wrapped<String?>? issue}) {
-    return ServerError(
+  ServiceUnavailable copyWithWrapped(
+      {Wrapped<String>? id, Wrapped<String>? msg}) {
+    return ServiceUnavailable(
         id: (id != null ? id.value : this.id),
-        msg: (msg != null ? msg.value : this.msg),
-        issue: (issue != null ? issue.value : this.issue));
+        msg: (msg != null ? msg.value : this.msg));
   }
 }
 
@@ -1731,6 +1740,57 @@ extension $SyncStateExtension on SyncState {
         blockHash: (blockHash != null ? blockHash.value : this.blockHash),
         lastUpdated:
             (lastUpdated != null ? lastUpdated.value : this.lastUpdated));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class TooManyRequests {
+  const TooManyRequests({
+    required this.id,
+    required this.msg,
+  });
+
+  factory TooManyRequests.fromJson(Map<String, dynamic> json) =>
+      _$TooManyRequestsFromJson(json);
+
+  static const toJsonFactory = _$TooManyRequestsToJson;
+  Map<String, dynamic> toJson() => _$TooManyRequestsToJson(this);
+
+  @JsonKey(name: 'id')
+  final String id;
+  @JsonKey(name: 'msg')
+  final String msg;
+  static const fromJsonFactory = _$TooManyRequestsFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is TooManyRequests &&
+            (identical(other.id, id) ||
+                const DeepCollectionEquality().equals(other.id, id)) &&
+            (identical(other.msg, msg) ||
+                const DeepCollectionEquality().equals(other.msg, msg)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(id) ^
+      const DeepCollectionEquality().hash(msg) ^
+      runtimeType.hashCode;
+}
+
+extension $TooManyRequestsExtension on TooManyRequests {
+  TooManyRequests copyWith({String? id, String? msg}) {
+    return TooManyRequests(id: id ?? this.id, msg: msg ?? this.msg);
+  }
+
+  TooManyRequests copyWithWrapped({Wrapped<String>? id, Wrapped<String>? msg}) {
+    return TooManyRequests(
+        id: (id != null ? id.value : this.id),
+        msg: (msg != null ? msg.value : this.msg));
   }
 }
 
