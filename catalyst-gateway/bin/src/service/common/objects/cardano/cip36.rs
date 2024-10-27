@@ -31,14 +31,14 @@ impl Example for Cip36ReportingList {
     }
 }
 
-/// CIP36 info + invalid reporting
+/// CIP36 info + invalid reporting.
 #[derive(Object, Default)]
 #[oai(example = true)]
 pub(crate) struct Cip36Reporting {
-    /// List of registrations
+    /// List of registrations.
     #[oai(validator(max_items = "100000"))]
     cip36: Vec<Cip36Info>,
-    /// Invalid registration reporting
+    /// Invalid registration reporting.
     #[oai(validator(max_items = "100000"))]
     invalids: Vec<InvalidRegistrationsReport>,
 }
@@ -79,7 +79,7 @@ pub(crate) struct Cip36Info {
     #[oai(validator(max_length = 66, min_length = 66, pattern = "0x[0-9a-f]{64}"))]
     pub vote_key: String,
     /// Full Payment Address (not hashed, 32 byte ED25519 Public key).
-    #[oai(validator(max_length = 66, min_length = 66, pattern = "0x[0-9a-f]{64}"))]
+    #[oai(validator(max_length = 116, min_length = 66, pattern = "0x[0-9a-f]{64}"))]
     pub payment_address: String,
     /// Is the stake address a script or not.
     pub is_payable: bool,
@@ -104,7 +104,7 @@ impl Example for Cip36Info {
     }
 }
 
-/// Invalid registration error reporting
+/// Invalid registration error reporting.
 #[derive(Object, Default)]
 #[oai(example = true)]
 pub(crate) struct InvalidRegistrationsReport {
@@ -118,7 +118,7 @@ pub(crate) struct InvalidRegistrationsReport {
     #[oai(validator(max_length = 66, min_length = 0, pattern = "[0-9a-f]"))]
     pub vote_key: String,
     /// Full Payment Address (not hashed, 32 byte ED25519 Public key).
-    #[oai(validator(max_length = 66, min_length = 0, pattern = "[0-9a-f]"))]
+    #[oai(validator(max_length = 116, min_length = 0, pattern = "[0-9a-f]"))]
     pub payment_address: String,
     /// Is the stake address a script or not.
     pub is_payable: bool,

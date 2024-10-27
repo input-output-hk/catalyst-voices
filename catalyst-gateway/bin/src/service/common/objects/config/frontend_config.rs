@@ -2,7 +2,7 @@
 
 use poem_openapi::{types::Example, Object};
 
-/// Frontend JSON schema
+/// Frontend JSON schema.
 #[derive(Object, Default, serde::Deserialize)]
 #[oai(example = true)]
 pub(crate) struct FrontendConfig {
@@ -18,7 +18,7 @@ impl Example for FrontendConfig {
     }
 }
 
-/// Frontend configuration for Sentry
+/// Frontend configuration for Sentry.
 #[derive(Object, Default, serde::Deserialize)]
 #[oai(example = true)]
 pub(crate) struct Sentry {

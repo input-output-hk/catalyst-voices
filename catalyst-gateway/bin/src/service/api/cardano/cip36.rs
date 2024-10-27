@@ -24,24 +24,24 @@ use crate::{
     },
 };
 
-/// Endpoint responses
+/// Endpoint responses.
 #[derive(ApiResponse)]
 pub(crate) enum ResponseSingleRegistration {
-    /// A CIP36 registration report
+    /// A CIP36 registration report.
     #[oai(status = 200)]
     Ok(Json<Cip36Reporting>),
-    /// No valid registration
+    /// No valid registration.
     #[oai(status = 404)]
     NotFound,
 }
 
-/// Endpoint responses
+/// Endpoint responses.
 #[derive(ApiResponse)]
 pub(crate) enum ResponseMultipleRegistrations {
-    /// All CIP36 registrations associated with the same Voting Key
+    /// All CIP36 registrations associated with the same Voting Key.
     #[oai(status = 200)]
     Ok(Json<Cip36ReportingList>),
-    /// No valid registration
+    /// No valid registration.
     #[oai(status = 404)]
     NotFound,
 }

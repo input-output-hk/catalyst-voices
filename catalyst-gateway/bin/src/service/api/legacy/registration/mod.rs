@@ -24,7 +24,7 @@ pub(crate) struct RegistrationApi;
 /// Endpoint responses
 #[derive(ApiResponse)]
 enum Responses {
-    /// Voter's registration info
+    /// Voter's registration info.
     #[oai(status = 200)]
     Ok(Json<VoterRegistration>),
 }

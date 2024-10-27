@@ -180,7 +180,7 @@ impl CardanoApi {
     )]
     async fn latest_registration_cip36_given_vote_key(
         &self,
-        /// Voting Key to find CIP36 registrations for
+        /// Voting Key to find CIP36 registrations for.
         #[oai(validator(max_length = 66, min_length = 0, pattern = "[0-9a-f]"))]
         vote_key: Query<String>,
     ) -> cip36::MultipleRegistrationResponse {

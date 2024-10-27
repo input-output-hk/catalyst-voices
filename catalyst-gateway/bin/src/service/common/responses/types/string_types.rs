@@ -63,27 +63,6 @@ macro_rules! impl_string_types {
                 } else {
                     schema_ref
                 }
-
-
-                /*
-                <RetryAfter as poem_openapi::types::Type>::schema_ref()
-                .merge(poem_openapi::registry::MetaSchema {
-                    title: ::std::option::Option::Some(
-                        ::std::string::ToString::to_string(
-                            "Http Date or Interval in seconds.",
-                        ),
-                    ),
-                    description: ::std::option::Option::Some(
-                        "Valid formats:\n\n* `Retry-After: <http-date>`\n* `Retry-After: <delay-seconds>`\n\nSee: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After>",
-                    ),
-                    external_docs: ::std::option::Option::None,
-                    example: {
-                        let value = <Self as poem_openapi::types::Example>::example();
-                        <Self as poem_openapi::types::ToJSON>::to_json(&value)
-                    },
-                    ..poem_openapi::registry::MetaSchema::ANY
-                })
-                */
             }
 
             fn as_raw_value(&self) -> Option<&Self::RawValueType> {
@@ -171,9 +150,15 @@ impl_string_types!(
     /// Indicates how the request rate should be limited by the caller.
     ///
     /// See: <https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/>
-    /// "\"default\";q=100;w=10"
     RateLimitHeader,
     "string",
     "rate-limit",
-    None
+    Some(MetaSchema {
+        title: Some("RateLimit Header".to_owned()),
+        description: Some("Indicates how the request rate should be limited by the caller.
+
+See: <https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/>"),
+        example: Some(Value::String("\"default\";q=100;w=10".to_string())),
+        ..poem_openapi::registry::MetaSchema::ANY
+    })
 );

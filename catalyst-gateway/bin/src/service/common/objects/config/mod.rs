@@ -4,7 +4,7 @@ pub(crate) mod frontend_config;
 
 use poem_openapi::{types::Example, Object};
 
-/// Configuration Data Validation Error
+/// Configuration Data Validation Error.
 #[derive(Object, Default)]
 #[oai(example = true)]
 pub(crate) struct ConfigBadRequest {
