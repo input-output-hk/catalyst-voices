@@ -4,38 +4,21 @@ use std::net::IpAddr;
 
 use jsonschema::BasicOutput;
 use poem::web::RealIp;
-use poem_openapi::{param::Query, payload::Json, ApiResponse, Object, OpenApi};
+use poem_openapi::{param::Query, payload::Json, types::ToJSON, ApiResponse, OpenApi};
 use serde_json::Value;
 use tracing::error;
 
 use crate::{
     db::event::config::{key::ConfigKey, Config},
-    service::common::{responses::WithErrorResponses, tags::ApiTags},
+    service::common::{
+        objects::config::{frontend_config::FrontendConfig, ConfigBadRequest},
+        responses::WithErrorResponses,
+        tags::ApiTags,
+    },
 };
 
 /// Configuration API struct
 pub(crate) struct ConfigApi;
-
-/// Frontend JSON schema.
-#[derive(Object, Default, serde::Deserialize)]
-struct FrontendConfig {
-    /// Sentry properties.
-    sentry: Option<Sentry>,
-}
-
-/// Frontend configuration for Sentry.
-#[derive(Object, Default, serde::Deserialize)]
-struct Sentry {
-    /// The Data Source Name (DSN) for Sentry.
-    #[oai(validator(max_length = "100", pattern = "^https?://"))]
-    dsn: String,
-    /// A version of the code deployed to an environment.
-    #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
-    release: Option<String>,
-    /// The environment in which the application is running, e.g., 'dev', 'qa'.
-    #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
-    environment: Option<String>,
-}
 
 /// Get configuration endpoint responses.
 #[derive(ApiResponse)]
@@ -52,7 +35,7 @@ type GetConfigAllResponses = WithErrorResponses<GetConfigResponses>;
 enum GetConfigSchemaResponses {
     /// Configuration result.
     #[oai(status = 200)]
-    Ok(Json<Value>),
+    Ok(Json<FrontendConfig>),
 }
 /// Get configuration schema all responses.
 type GetConfigSchemaAllResponses = WithErrorResponses<GetConfigSchemaResponses>;
@@ -70,22 +53,11 @@ enum SetConfigResponse {
 /// Set configuration all responses.
 type SetConfigAllResponses = WithErrorResponses<SetConfigResponse>;
 
-/// Configuration Data Validation Error.
-#[derive(Object, Default)]
-struct ConfigBadRequest {
-    /// Error messages.
-    #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
-    error: String,
-    /// Optional schema validation errors.
-    #[oai(validator(max_items = "1000", max_length = "9999", pattern = "^[0-9a-zA-Z].*$"))]
-    schema_validation_errors: Option<Vec<String>>,
-}
-
 #[OpenApi(tag = "ApiTags::Config")]
 impl ConfigApi {
     /// Get the configuration for the frontend.
     ///
-    /// Retrieving IP from X-Real-IP, Forwarded, X-Forwarded-For or Remote Address.
+    /// Get the frontend configuration for the requesting client.
     #[oai(
         path = "/draft/config/frontend",
         method = "get",
@@ -132,7 +104,7 @@ impl ConfigApi {
         }
     }
 
-    /// Get the frontend JSON schema.
+    /// Get the frontend configuration JSON schema.
     ///
     /// Returns the JSON schema which defines the data which can be read or written for
     /// the frontend configuration.
@@ -144,7 +116,10 @@ impl ConfigApi {
     #[allow(clippy::unused_async)]
     async fn get_frontend_schema(&self) -> GetConfigSchemaAllResponses {
         // Schema for both IP specific and general are identical
-        GetConfigSchemaResponses::Ok(Json(ConfigKey::Frontend.schema().clone())).into()
+        let schema_value = ConfigKey::Frontend.schema().clone();
+        let frontend_config: FrontendConfig =
+            serde_json::from_value(schema_value).unwrap_or_default();
+        GetConfigSchemaResponses::Ok(Json(frontend_config)).into()
     }
 
     /// Set the frontend configuration.
@@ -161,13 +136,24 @@ impl ConfigApi {
         /// *OPTIONAL* The IP Address to set the configuration for.
         #[oai(name = "IP")]
         ip_query: Query<Option<IpAddr>>,
-        body: Json<Value>,
+        body: Json<FrontendConfig>,
     ) -> SetConfigAllResponses {
-        let body_value = body.0;
+        let body_value = body.0.to_json();
 
-        match ip_query.0 {
-            Some(ip) => set(ConfigKey::FrontendForIp(ip), body_value).await,
-            None => set(ConfigKey::Frontend, body_value).await,
+        match body_value {
+            Some(value) => {
+                match ip_query.0 {
+                    Some(ip) => set(ConfigKey::FrontendForIp(ip), value).await,
+                    None => set(ConfigKey::Frontend, value).await,
+                }
+            },
+            None => {
+                SetConfigResponse::BadRequest(Json(ConfigBadRequest::new(
+                    "Invalid JSON data".to_string(),
+                    None,
+                )))
+                .into()
+            },
         }
     }
 }
@@ -202,10 +188,10 @@ async fn set(key: ConfigKey, value: Value) -> SetConfigAllResponses {
                         .iter()
                         .map(|error| error.error_description().clone().into_inner())
                         .collect();
-                    SetConfigResponse::BadRequest(Json(ConfigBadRequest {
-                        error: "Invalid JSON data validating against JSON schema".to_string(),
-                        schema_validation_errors: Some(schema_errors),
-                    }))
+                    SetConfigResponse::BadRequest(Json(ConfigBadRequest::new(
+                        "Invalid JSON data validating against JSON schema".to_string(),
+                        Some(schema_errors),
+                    )))
                     .into()
                 },
             }
