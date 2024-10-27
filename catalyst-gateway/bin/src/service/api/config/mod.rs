@@ -4,63 +4,21 @@ use std::net::IpAddr;
 
 use jsonschema::BasicOutput;
 use poem::web::RealIp;
-use poem_openapi::{
-    param::Query,
-    payload::Json,
-    types::{Example, ToJSON},
-    ApiResponse, Object, OpenApi,
-};
+use poem_openapi::{param::Query, payload::Json, types::ToJSON, ApiResponse, OpenApi};
 use serde_json::Value;
 use tracing::error;
 
 use crate::{
     db::event::config::{key::ConfigKey, Config},
-    service::common::{responses::WithErrorResponses, tags::ApiTags},
+    service::common::{
+        objects::config::{frontend_config::FrontendConfig, ConfigBadRequest},
+        responses::WithErrorResponses,
+        tags::ApiTags,
+    },
 };
 
 /// Configuration API struct
 pub(crate) struct ConfigApi;
-
-/// Frontend JSON schema
-#[derive(Object, Default, serde::Deserialize)]
-#[oai(example = true)]
-struct FrontendConfig {
-    /// Sentry properties.
-    sentry: Option<Sentry>,
-}
-
-impl Example for FrontendConfig {
-    fn example() -> Self {
-        FrontendConfig {
-            sentry: Some(Sentry::example()),
-        }
-    }
-}
-
-/// Frontend configuration for Sentry
-#[derive(Object, Default, serde::Deserialize)]
-#[oai(example = true)]
-struct Sentry {
-    /// The Data Source Name (DSN) for Sentry.
-    #[oai(validator(max_length = "100", pattern = "^https?://"))]
-    dsn: String,
-    /// A version of the code deployed to an environment.
-    #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
-    release: Option<String>,
-    /// The environment in which the application is running, e.g., 'dev', 'qa'.
-    #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
-    environment: Option<String>,
-}
-
-impl Example for Sentry {
-    fn example() -> Self {
-        Sentry {
-            dsn: "https://example.com".to_string(),
-            release: Some("1.0.0".to_string()),
-            environment: Some("dev".to_string()),
-        }
-    }
-}
 
 /// Get configuration endpoint responses.
 #[derive(ApiResponse)]
@@ -94,27 +52,6 @@ enum SetConfigResponse {
 }
 /// Set configuration all responses.
 type SetConfigAllResponses = WithErrorResponses<SetConfigResponse>;
-
-/// Configuration Data Validation Error
-#[derive(Object, Default)]
-#[oai(example = true)]
-struct ConfigBadRequest {
-    /// Error messages.
-    #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
-    error: String,
-    /// Optional schema validation errors.
-    #[oai(validator(max_items = "1000", max_length = "9999", pattern = "^[0-9a-zA-Z].*$"))]
-    schema_validation_errors: Option<Vec<String>>,
-}
-
-impl Example for ConfigBadRequest {
-    fn example() -> Self {
-        ConfigBadRequest {
-            error: "Invalid Data".to_string(),
-            schema_validation_errors: Some(vec!["Error message".to_string()]),
-        }
-    }
-}
 
 #[OpenApi(tag = "ApiTags::Config")]
 impl ConfigApi {
@@ -211,10 +148,10 @@ impl ConfigApi {
                 }
             },
             None => {
-                SetConfigResponse::BadRequest(Json(ConfigBadRequest {
-                    error: "Invalid JSON data".to_string(),
-                    schema_validation_errors: None,
-                }))
+                SetConfigResponse::BadRequest(Json(ConfigBadRequest::new(
+                    "Invalid JSON data".to_string(),
+                    None,
+                )))
                 .into()
             },
         }
@@ -251,10 +188,10 @@ async fn set(key: ConfigKey, value: Value) -> SetConfigAllResponses {
                         .iter()
                         .map(|error| error.error_description().clone().into_inner())
                         .collect();
-                    SetConfigResponse::BadRequest(Json(ConfigBadRequest {
-                        error: "Invalid JSON data validating against JSON schema".to_string(),
-                        schema_validation_errors: Some(schema_errors),
-                    }))
+                    SetConfigResponse::BadRequest(Json(ConfigBadRequest::new(
+                        "Invalid JSON data validating against JSON schema".to_string(),
+                        Some(schema_errors),
+                    )))
                     .into()
                 },
             }
