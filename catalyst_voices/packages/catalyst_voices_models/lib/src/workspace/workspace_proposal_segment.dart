@@ -23,3 +23,32 @@ final class WorkspaceProposalSetup extends WorkspaceProposalSegment {
     required super.steps,
   });
 }
+
+final class WorkspaceProposalSummary extends WorkspaceProposalSegment {
+  const WorkspaceProposalSummary({
+    required super.id,
+    required super.steps,
+  });
+}
+
+final class WorkspaceProposalSolution extends WorkspaceProposalSegment {
+  const WorkspaceProposalSolution({
+    required super.id,
+    required super.steps,
+  });
+}
+
+final class WorkspaceProposalImpact extends WorkspaceProposalSegment {
+  const WorkspaceProposalImpact({
+    required super.id,
+    required super.steps,
+  });
+}
+
+final class WorkspaceProposalCapabilityAndFeasibility
+    extends WorkspaceProposalSegment {
+  const WorkspaceProposalCapabilityAndFeasibility({
+    required super.id,
+    required super.steps,
+  });
+}

@@ -103,35 +103,37 @@ class _SpaceSidePanelState extends State<SpaceSidePanel>
           ),
         SlideTransition(
           position: _offsetAnimation,
-          child: _Container(
-            margin: widget.margin,
-            borderRadius: widget.isLeft
-                ? const BorderRadius.horizontal(right: Radius.circular(16))
-                : const BorderRadius.horizontal(left: Radius.circular(16)),
-            child: DefaultTabController(
-              length: widget.tabs.length,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _Header(
-                    name: widget.name,
-                    onCollapseTap: () {
-                      _controller.forward();
-                      widget.onCollapseTap?.call();
-                    },
-                    isLeft: widget.isLeft,
-                  ),
-                  _Tabs(
-                    widget.tabs,
-                    controller: widget.tabController,
-                  ),
-                  const SizedBox(height: 12),
-                  TabBarStackView(
-                    controller: widget.tabController,
-                    children: widget.tabs.map((e) => e.body).toList(),
-                  ),
-                  const SizedBox(height: 12),
-                ],
+          child: SingleChildScrollView(
+            child: _Container(
+              margin: widget.margin,
+              borderRadius: widget.isLeft
+                  ? const BorderRadius.horizontal(right: Radius.circular(16))
+                  : const BorderRadius.horizontal(left: Radius.circular(16)),
+              child: DefaultTabController(
+                length: widget.tabs.length,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _Header(
+                      name: widget.name,
+                      onCollapseTap: () {
+                        _controller.forward();
+                        widget.onCollapseTap?.call();
+                      },
+                      isLeft: widget.isLeft,
+                    ),
+                    _Tabs(
+                      widget.tabs,
+                      controller: widget.tabController,
+                    ),
+                    const SizedBox(height: 12),
+                    TabBarStackView(
+                      controller: widget.tabController,
+                      children: widget.tabs.map((e) => e.body).toList(),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                ),
               ),
             ),
           ),
