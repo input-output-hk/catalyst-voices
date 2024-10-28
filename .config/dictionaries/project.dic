@@ -305,3 +305,16 @@ xctestrun
 xcworkspace
 xvfb
 yoroi
+Pbkdf2
+Embedder
+Podspec
+podspec
+ARCHS
+iphonesimulator
+cargokit
+SRCROOT
+libcatalyst
+staticlib
+addrof
+Lifetimeable
+cbindgen
