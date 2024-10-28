@@ -26,7 +26,7 @@ use crate::{
             stake_info::{FullStakeInfo, StakeInfo, StakedNativeTokenInfo},
         },
         responses::WithErrorResponses,
-        types::cardano::address::StakeAddress,
+        types::cardano::address::Cip19StakeAddress,
     },
 };
 
@@ -47,7 +47,7 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// # GET `/staked_ada`
 #[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
 pub(crate) async fn endpoint(
-    stake_address: StakeAddress, _provided_network: Option<Network>, slot_num: Option<SlotNumber>,
+    stake_address: Cip19StakeAddress, _provided_network: Option<Network>, slot_num: Option<SlotNumber>,
 ) -> AllResponses {
     let persistent_res = calculate_stake_info(true, stake_address.clone(), slot_num).await;
     let persistent_stake_info = match persistent_res {
@@ -105,7 +105,7 @@ struct TxoInfo {
 /// This function also updates the spent column if it detects that a TXO was spent
 /// between lookups.
 async fn calculate_stake_info(
-    persistent: bool, stake_address: StakeAddress, slot_num: Option<SlotNumber>,
+    persistent: bool, stake_address: Cip19StakeAddress, slot_num: Option<SlotNumber>,
 ) -> anyhow::Result<Option<StakeInfo>> {
     let Some(session) = CassandraSession::get(persistent) else {
         anyhow::bail!("Failed to acquire db session");

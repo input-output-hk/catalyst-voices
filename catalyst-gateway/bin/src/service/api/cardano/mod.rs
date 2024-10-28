@@ -7,7 +7,7 @@ use types::{DateTime, SlotNumber};
 
 use crate::service::{
     common::{
-        objects::cardano::network::Network, tags::ApiTags, types::cardano::address::StakeAddress,
+        objects::cardano::network::Network, tags::ApiTags, types::cardano::address::Cip19StakeAddress,
     },
     utilities::middleware::schema_validation::schema_version_validation,
 };
@@ -38,7 +38,7 @@ impl CardanoApi {
         &self,
         /// The stake address of the user.
         /// Should be a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
-        stake_address: Path<StakeAddress>,
+        stake_address: Path<Cip19StakeAddress>,
         /// Cardano network type.
         /// If omitted network type is identified from the stake address.
         /// If specified it must be correspondent to the network type encoded in the stake
@@ -70,7 +70,7 @@ impl CardanoApi {
         &self,
         /// The stake address of the user.
         /// Should be a valid Bech32 encoded address followed by the https://cips.cardano.org/cip/CIP-19/#stake-addresses.
-        stake_address: Path<StakeAddress>,
+        stake_address: Path<Cip19StakeAddress>,
         /// Cardano network type.
         /// If omitted network type is identified from the stake address.
         /// If specified it must be correspondent to the network type encoded in the stake

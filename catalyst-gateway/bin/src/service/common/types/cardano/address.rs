@@ -8,7 +8,7 @@ use std::{
     sync::LazyLock,
 };
 
-use pallas::ledger::addresses::{Address, StakeAddress as StakeAddressPallas};
+use pallas::ledger::addresses::{Address, StakeAddress};
 use poem_openapi::{
     registry::{MetaExternalDocument, MetaSchema, MetaSchemaRef},
     types::{ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
@@ -45,21 +45,21 @@ static STAKE_SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| MetaSchema {
 });
 
 impl_string_types!(
-    StakeAddress,
+    Cip19StakeAddress,
     "string",
     "cardano:cip19-address",
     Some(STAKE_SCHEMA.clone())
 );
 
-impl StakeAddress {
+impl Cip19StakeAddress {
     /// Create a new `StakeAddress`.
     #[allow(dead_code)]
     pub fn new(address: String) -> Self {
-        StakeAddress(address)
+        Cip19StakeAddress(address)
     }
 
     /// Convert a `StakeAddress` string to a `StakeAddress`.
-    pub fn to_stake_address(&self) -> anyhow::Result<StakeAddressPallas> {
+    pub fn to_stake_address(&self) -> anyhow::Result<StakeAddress> {
         let address_str = &self.0;
         let address = Address::from_bech32(address_str)?;
         match address {
@@ -70,7 +70,7 @@ impl StakeAddress {
 
     /// Convert a `StakeAddress` to a `StakeAddress` string.
     #[allow(dead_code)]
-    pub fn from_stake_address(addr: &StakeAddressPallas) -> anyhow::Result<Self> {
+    pub fn from_stake_address(addr: &StakeAddress) -> anyhow::Result<Self> {
         let addr_str = addr
             .to_bech32()
             .map_err(|e| anyhow::anyhow!(format!("Invalid stake address {e}")))?;

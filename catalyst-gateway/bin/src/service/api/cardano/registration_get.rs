@@ -7,7 +7,7 @@ use crate::service::{
     common::{
         objects::cardano::{network::Network, registration_info::RegistrationInfo},
         responses::WithErrorResponses,
-        types::cardano::address::StakeAddress,
+        types::cardano::address::Cip19StakeAddress,
     },
     utilities::check_network,
 };
@@ -31,7 +31,7 @@ pub(super) type AllResponses = WithErrorResponses<Responses>;
 /// # GET `/registration`
 #[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
 pub(crate) async fn endpoint(
-    stake_address: StakeAddress, provided_network: Option<Network>, slot_num: Option<SlotNumber>,
+    stake_address: Cip19StakeAddress, provided_network: Option<Network>, slot_num: Option<SlotNumber>,
 ) -> AllResponses {
     let _date_time = slot_num.unwrap_or(SlotNumber::MAX);
     // TODO - handle appropriate response
