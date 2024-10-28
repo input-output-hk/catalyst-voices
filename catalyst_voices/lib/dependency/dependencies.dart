@@ -30,13 +30,16 @@ final class Dependencies extends DependencyProvider {
           authenticationRepository: get(),
         ),
       )
-      ..registerLazySingleton<SessionCubit>(() {
-        return SessionCubit(
-          get<UserService>(),
-          get<RegistrationService>(),
-          get<RegistrationProgressNotifier>(),
-        );
-      })
+      ..registerLazySingleton<SessionCubit>(
+        () {
+          return SessionCubit(
+            get<UserService>(),
+            get<RegistrationService>(),
+            get<RegistrationProgressNotifier>(),
+          );
+        },
+        dispose: (cubit) async => cubit.close(),
+      )
       // Factory will rebuild it each time needed
       ..registerFactory<RegistrationCubit>(() {
         return RegistrationCubit(
@@ -73,7 +76,7 @@ final class Dependencies extends DependencyProvider {
       RegistrationProgressNotifier.new,
     );
     registerLazySingleton<RegistrationService>(() {
-      return RegistrationService(
+      return RegistrationServiceImpl(
         get<TransactionConfigRepository>(),
         get<KeychainProvider>(),
         get<CatalystCardano>(),

@@ -18,32 +18,82 @@ final _testNetAddress = ShelleyAddress.fromBech32(
 
 final _logger = Logger('RegistrationService');
 
+abstract interface class RegistrationService {
+  /// Returns the available cardano wallet extensions.
+  Future<List<CardanoWallet>> getCardanoWallets();
+
+  /// Returns the details of a [wallet].
+  ///
+  /// This will trigger a permission popup from the wallet extension.
+  /// Afterwards the user must grant a permission inside the wallet extension.
+  Future<WalletInfo> getCardanoWalletInfo(CardanoWallet wallet);
+
+  /// See [KeyDerivation.deriveAccountRoleKeyPair].
+  Future<Ed25519KeyPair> deriveAccountRoleKeyPair({
+    required SeedPhrase seedPhrase,
+    required Set<AccountRole> roles,
+  });
+
+  Future<Account> recoverAccount({
+    required SeedPhrase seedPhrase,
+    required LockFactor lockFactor,
+  });
+
+  /// Builds an unsigned registration transaction from given parameters.
+  ///
+  /// Throws a subclass of [RegistrationException] in case of a failure.
+  Future<Transaction> prepareRegistration({
+    required CardanoWallet wallet,
+    required NetworkId networkId,
+    required Ed25519KeyPair keyPair,
+    required Set<AccountRole> roles,
+  });
+
+  /// Requests the user to sign the registration transaction
+  /// and submits it to the blockchain.
+  ///
+  /// This triggers the permission popup from the wallet extension,
+  /// the user must agree to sign the transaction.
+  ///
+  /// The transaction must be prepared earlier via [prepareRegistration].
+  ///
+  /// Throws a subclass of [RegistrationException] in case of a failure.
+  Future<Account> register({
+    required CardanoWallet wallet,
+    required Transaction unsignedTx,
+    required Set<AccountRole> roles,
+    required LockFactor lockFactor,
+    required Ed25519KeyPair keyPair,
+  });
+
+  Future<Account> registerTestAccount({
+    required String keychainId,
+    required SeedPhrase seedPhrase,
+    required LockFactor lockFactor,
+  });
+}
+
 /// Manages the user registration.
-final class RegistrationService {
+final class RegistrationServiceImpl implements RegistrationService {
   final TransactionConfigRepository _transactionConfigRepository;
   final KeychainProvider _keychainProvider;
   final CatalystCardano _cardano;
   final KeyDerivation _keyDerivation;
 
-  const RegistrationService(
+  const RegistrationServiceImpl(
     this._transactionConfigRepository,
     this._keychainProvider,
     this._cardano,
     this._keyDerivation,
   );
 
-  /// Returns the available cardano wallet extensions.
+  @override
   Future<List<CardanoWallet>> getCardanoWallets() {
     return _cardano.getWallets();
   }
 
-  /// Returns the details of a [wallet].
-  ///
-  /// This will trigger a permission popup from the wallet extension.
-  /// Afterwards the user must grant a permission inside the wallet extension.
-  Future<WalletInfo> getCardanoWalletInfo(
-    CardanoWallet wallet,
-  ) async {
+  @override
+  Future<WalletInfo> getCardanoWalletInfo(CardanoWallet wallet) async {
     final enabledWallet = await wallet.enable();
     final balance = await enabledWallet.getBalance();
     final address = await enabledWallet.getChangeAddress();
@@ -55,7 +105,7 @@ final class RegistrationService {
     );
   }
 
-  /// See [KeyDerivation.deriveAccountRoleKeyPair].
+  @override
   Future<Ed25519KeyPair> deriveAccountRoleKeyPair({
     required SeedPhrase seedPhrase,
     required Set<AccountRole> roles,
@@ -71,6 +121,7 @@ final class RegistrationService {
   // Note. Returned type will be changed because we'll not be able to
   // get a wallet from backend just from seed phrase.
   // To be decided what data can we get from backend.
+  @override
   Future<Account> recoverAccount({
     required SeedPhrase seedPhrase,
     required LockFactor lockFactor,
@@ -107,9 +158,7 @@ final class RegistrationService {
     );
   }
 
-  /// Builds an unsigned registration transaction from given parameters.
-  ///
-  /// Throws a subclass of [RegistrationException] in case of a failure.
+  @override
   Future<Transaction> prepareRegistration({
     required CardanoWallet wallet,
     required NetworkId networkId,
@@ -146,15 +195,7 @@ final class RegistrationService {
     }
   }
 
-  /// Requests the user to sign the registration transaction
-  /// and submits it to the blockchain.
-  ///
-  /// This triggers the permission popup from the wallet extension,
-  /// the user must agree to sign the transaction.
-  ///
-  /// The transaction must be prepared earlier via [prepareRegistration].
-  ///
-  /// Throws a subclass of [RegistrationException] in case of a failure.
+  @override
   Future<Account> register({
     required CardanoWallet wallet,
     required Transaction unsignedTx,
@@ -202,6 +243,7 @@ final class RegistrationService {
     }
   }
 
+  @override
   Future<Account> registerTestAccount({
     required String keychainId,
     required SeedPhrase seedPhrase,
