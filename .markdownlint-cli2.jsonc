@@ -12,6 +12,7 @@
     "catalyst-gateway/target/**",
     "CHANGELOG.md",
     "catalyst_voices_packages/**/CHANGELOG.md",
+    "catalyst_voices_packages/**/cargokit/**",
     "catalyst_voices/macos/Pods/**",
     "**/node_modules/**",
     "**/.dart_tool/**"

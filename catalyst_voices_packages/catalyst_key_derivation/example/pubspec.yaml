@@ -1,0 +1,24 @@
+name: catalyst_key_derivation_example
+description: "Demonstrates how to use the catalyst_key_derivation plugin."
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  catalyst_key_derivation:
+    path: ../
+  cupertino_icons: ^1.0.8
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  catalyst_analysis: ^2.0.0
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
