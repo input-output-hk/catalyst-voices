@@ -27,7 +27,6 @@ dependencies:
 
 ## How to run
 
-To run the project:
 1. cd catalyst_key_derivation
 2. ./run.sh
 
