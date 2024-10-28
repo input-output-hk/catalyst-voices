@@ -1,13 +1,10 @@
-#[flutter_rust_bridge::frb(sync)] // Synchronous mode for simplicity of the demo
-pub fn greet(name: String) -> String {
+pub async fn greet(name: String) -> String {
     let iterations = 5000;
+    let mut result = 0.0;
     for i in 0..iterations {
-        let mut result = 0.0;
-        for j in 1..1_000_000 {
-            result += (j as f64).sqrt();
-        }
+        result += (i as f64).sqrt();
     }
-    format!("Hello, {name}!")
+    format!("Hello, {name} {result}!")
 }
 
 #[flutter_rust_bridge::frb(init)]
