@@ -11,7 +11,7 @@ use tracing::error;
 use crate::{
     db::event::config::{key::ConfigKey, Config},
     service::common::{
-        auth::scheme::CatalystSecurityScheme,
+        auth::rbac::scheme::CatalystRBACSecurityScheme,
         objects::config::{frontend_config::FrontendConfig, ConfigBadRequest},
         responses::WithErrorResponses,
         tags::ApiTags,
@@ -149,7 +149,7 @@ impl ConfigApi {
         /// *OPTIONAL* The IP Address to set the configuration for.
         #[oai(name = "IP")]
         ip_query: Query<Option<IpAddr>>,
-        _auth: CatalystSecurityScheme, body: Json<FrontendConfig>,
+        _auth: CatalystRBACSecurityScheme, body: Json<FrontendConfig>,
     ) -> SetConfigAllResponses {
         let body_value = body.0.to_json();
 
