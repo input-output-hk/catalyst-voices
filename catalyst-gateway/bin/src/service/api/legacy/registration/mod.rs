@@ -24,7 +24,7 @@ pub(crate) struct RegistrationApi;
 /// Endpoint responses
 #[derive(ApiResponse)]
 enum Responses {
-    /// Voter's registration info
+    /// Voter's registration info.
     #[oai(status = 200)]
     Ok(Json<VoterRegistration>),
 }
@@ -32,15 +32,8 @@ enum Responses {
 /// All responses
 type AllResponses = WithErrorResponses<Responses>;
 
-#[OpenApi(prefix_path = "/registration", tag = "ApiTags::Registration")]
+#[OpenApi(tag = "ApiTags::Registration")]
 impl RegistrationApi {
-    #[oai(
-        path = "/voter/:voting_key",
-        method = "get",
-        operation_id = "getVoterInfo",
-        transform = "schema_version_validation",
-        deprecated = true
-    )]
     /// Voter's info
     ///
     /// Get the voter's registration and voting power by their Public Voting Key.
@@ -51,18 +44,24 @@ impl RegistrationApi {
     /// `delegator_addresses` field of `VoterInfo` type does not provided.
     #[allow(clippy::unused_async)]
     #[allow(unused_variables)]
+    #[oai(
+        path = "/v1/registration/voter/:voting_key",
+        method = "get",
+        operation_id = "getVoterInfo",
+        transform = "schema_version_validation",
+        deprecated = true
+    )]
     async fn get_voter_info(
         &self,
         /// A Voters Public ED25519 Key (as registered in their most recent valid
         /// [CIP-15](https://cips.cardano.org/cips/cip15) or [CIP-36](https://cips.cardano.org/cips/cip36) registration).
         #[oai(validator(max_length = 66, min_length = 66, pattern = "0x[0-9a-f]{64}"))]
         voting_key: Path<VotingPublicKey>,
-        /// The Event ID to return results for.
+        /// The Event Index to return results for.
         /// See [GET Events](Link to events endpoint) for details on retrieving all valid
         /// event IDs.
-        // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
         #[oai(validator(minimum(value = "0"), maximum(value = "2147483647")))]
-        event_id: Query<Option<EventId>>,
+        event_index: Query<Option<EventId>>,
         /// If this optional flag is set, the response will include the delegator's list
         /// in the response. Otherwise, it will be omitted.
         #[oai(default)]
