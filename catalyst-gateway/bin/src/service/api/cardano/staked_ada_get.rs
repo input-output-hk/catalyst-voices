@@ -23,10 +23,10 @@ use crate::{
     service::common::{
         objects::cardano::{
             network::Network,
-            stake_address::StakeAddress,
             stake_info::{FullStakeInfo, StakeInfo, StakedNativeTokenInfo},
         },
         responses::WithErrorResponses,
+        types::cardano::address::StakeAddress,
     },
 };
 
@@ -111,7 +111,8 @@ async fn calculate_stake_info(
         anyhow::bail!("Failed to acquire db session");
     };
 
-    let stake_address_bytes = stake_address.payload().as_hash().to_vec();
+    let address = stake_address.to_stake_address()?;
+    let stake_address_bytes = address.payload().as_hash().to_vec();
 
     let mut txos_by_txn = get_txo_by_txn(&session, stake_address_bytes.clone(), slot_num).await?;
     if txos_by_txn.is_empty() {
@@ -152,15 +153,18 @@ async fn get_txo_by_txn(
         }
 
         let key = (row.slot_no.clone(), row.txn, row.txo);
-        txo_map.insert(key, TxoInfo {
-            value: row.value,
-            txn_hash: row.txn_hash,
-            txn: row.txn,
-            txo: row.txo,
-            slot_no: row.slot_no,
-            spent_slot_no: None,
-            assets: HashMap::new(),
-        });
+        txo_map.insert(
+            key,
+            TxoInfo {
+                value: row.value,
+                txn_hash: row.txn_hash,
+                txn: row.txn,
+                txo: row.txo,
+                slot_no: row.slot_no,
+                spent_slot_no: None,
+                assets: HashMap::new(),
+            },
+        );
     }
 
     // Augment TXO info with asset info.
