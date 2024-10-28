@@ -38,102 +38,104 @@ void main() {
     reset(registrationService);
   });
 
-  test('when no keychain is found session is in Visitor state', () async {
-    // Given
+  group(SessionCubit, () {
+    test('when no keychain is found session is in Visitor state', () async {
+      // Given
 
-    // When
-    await userService.removeCurrentAccount();
+      // When
+      await userService.removeCurrentAccount();
 
-    // Then
-    expect(userService.keychain, isNull);
-    expect(sessionCubit.state, isA<VisitorSessionState>());
-  });
+      // Then
+      expect(userService.keychain, isNull);
+      expect(sessionCubit.state, isA<VisitorSessionState>());
+    });
 
-  test('when no keychain is found session is in Visitor state', () async {
-    // Given
+    test('when no keychain is found session is in Visitor state', () async {
+      // Given
 
-    // When
-    await userService.removeCurrentAccount();
+      // When
+      await userService.removeCurrentAccount();
 
-    // Gives time for stream to emit.
-    await Future<void>.delayed(const Duration(milliseconds: 100));
+      // Gives time for stream to emit.
+      await Future<void>.delayed(const Duration(milliseconds: 100));
 
-    // Then
-    expect(userService.keychain, isNull);
-    expect(sessionCubit.state, isA<VisitorSessionState>());
-    expect(
-      sessionCubit.state,
-      const VisitorSessionState(isRegistrationInProgress: false),
-    );
-  });
+      // Then
+      expect(userService.keychain, isNull);
+      expect(sessionCubit.state, isA<VisitorSessionState>());
+      expect(
+        sessionCubit.state,
+        const VisitorSessionState(isRegistrationInProgress: false),
+      );
+    });
 
-  test(
-      'when no keychain is found but there is a registration progress '
-      'session is in Visitor state with correct flag', () async {
-    // Given
-    final keychainProgress = KeychainProgress(
-      seedPhrase: SeedPhrase(),
-      password: 'Test1234',
-    );
+    test(
+        'when no keychain is found but there is a registration progress '
+        'session is in Visitor state with correct flag', () async {
+      // Given
+      final keychainProgress = KeychainProgress(
+        seedPhrase: SeedPhrase(),
+        password: 'Test1234',
+      );
 
-    // When
-    notifier.value = RegistrationProgress(keychainProgress: keychainProgress);
+      // When
+      notifier.value = RegistrationProgress(keychainProgress: keychainProgress);
 
-    await userService.removeCurrentAccount();
+      await userService.removeCurrentAccount();
 
-    // Gives time for stream to emit.
-    await Future<void>.delayed(const Duration(milliseconds: 100));
+      // Gives time for stream to emit.
+      await Future<void>.delayed(const Duration(milliseconds: 100));
 
-    // Then
-    expect(userService.keychain, isNull);
-    expect(sessionCubit.state, isA<VisitorSessionState>());
-    expect(
-      sessionCubit.state,
-      const VisitorSessionState(isRegistrationInProgress: true),
-    );
-  });
+      // Then
+      expect(userService.keychain, isNull);
+      expect(sessionCubit.state, isA<VisitorSessionState>());
+      expect(
+        sessionCubit.state,
+        const VisitorSessionState(isRegistrationInProgress: true),
+      );
+    });
 
-  test('when keychain is locked session is in Guest state', () async {
-    // Given
-    const keychainId = 'id';
-    const lockFactor = PasswordLockFactor('Test1234');
+    test('when keychain is locked session is in Guest state', () async {
+      // Given
+      const keychainId = 'id';
+      const lockFactor = PasswordLockFactor('Test1234');
 
-    // When
-    final keychain = await keychainProvider.create(keychainId);
-    await keychain.setLock(lockFactor);
-    await keychain.lock();
+      // When
+      final keychain = await keychainProvider.create(keychainId);
+      await keychain.setLock(lockFactor);
+      await keychain.lock();
 
-    await userService.useKeychain(keychainId);
+      await userService.useKeychain(keychainId);
 
-    // Gives time for stream to emit.
-    await Future<void>.delayed(const Duration(milliseconds: 100));
+      // Gives time for stream to emit.
+      await Future<void>.delayed(const Duration(milliseconds: 100));
 
-    // Then
-    expect(userService.keychain, isNotNull);
-    expect(sessionCubit.state, isNot(isA<VisitorSessionState>()));
-    expect(sessionCubit.state, isA<GuestSessionState>());
-  });
+      // Then
+      expect(userService.keychain, isNotNull);
+      expect(sessionCubit.state, isNot(isA<VisitorSessionState>()));
+      expect(sessionCubit.state, isA<GuestSessionState>());
+    });
 
-  test('when keychain is unlocked session is in Active state', () async {
-    // Given
-    const keychainId = 'id';
-    const lockFactor = PasswordLockFactor('Test1234');
+    test('when keychain is unlocked session is in Active state', () async {
+      // Given
+      const keychainId = 'id';
+      const lockFactor = PasswordLockFactor('Test1234');
 
-    // When
-    final keychain = await keychainProvider.create(keychainId);
-    await keychain.setLock(lockFactor);
+      // When
+      final keychain = await keychainProvider.create(keychainId);
+      await keychain.setLock(lockFactor);
 
-    await userService.useKeychain(keychainId);
-    await userService.keychain?.unlock(lockFactor);
+      await userService.useKeychain(keychainId);
+      await userService.keychain?.unlock(lockFactor);
 
-    // Gives time for stream to emit.
-    await Future<void>.delayed(const Duration(milliseconds: 100));
+      // Gives time for stream to emit.
+      await Future<void>.delayed(const Duration(milliseconds: 100));
 
-    // Then
-    expect(userService.keychain, isNotNull);
-    expect(sessionCubit.state, isNot(isA<VisitorSessionState>()));
-    expect(sessionCubit.state, isNot(isA<GuestSessionState>()));
-    expect(sessionCubit.state, isA<ActiveAccountSessionState>());
+      // Then
+      expect(userService.keychain, isNotNull);
+      expect(sessionCubit.state, isNot(isA<VisitorSessionState>()));
+      expect(sessionCubit.state, isNot(isA<GuestSessionState>()));
+      expect(sessionCubit.state, isA<ActiveAccountSessionState>());
+    });
   });
 }
 
