@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  void _doMagic() {
-    print(greet(name: 'Tom'));
+  Future<void> _doMagic() async {
+    print(await greet(name: 'Tom'));
   }
 }

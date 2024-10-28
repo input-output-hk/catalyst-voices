@@ -1,8 +1,10 @@
 pub async fn greet(name: String) -> String {
-    let iterations = 5000;
+    let iterations = 50000000;
     let mut result = 0.0;
     for i in 0..iterations {
-        result += (i as f64).sqrt();
+        for j in 0..iterations {
+            result += (i as f64).sqrt();
+        }
     }
     format!("Hello, {name} {result}!")
 }
