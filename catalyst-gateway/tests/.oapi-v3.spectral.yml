@@ -224,3 +224,17 @@ rules:
       functionOptions:
         # Match content type application/json should be object
         match: "object"
+  api-example-schema:
+      message: "Schema should contain example"
+      given: "$..schema"
+      severity: warn
+      then:
+          field: "example"
+          function: truthy
+  api-example-properties:
+      message: "Property should contain example"
+      given: "$..properties.*"
+      severity: warn
+      then:
+        field: "example"
+        function: truthy
