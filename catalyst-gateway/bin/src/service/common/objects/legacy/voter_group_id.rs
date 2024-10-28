@@ -1,7 +1,7 @@
 //! Defines the allowable groups for a Voter
 use poem_openapi::{types::Example, Enum};
 
-/// Voter Group ID.
+/// The kind of voter group foes the voter belong.
 #[derive(Enum)]
 pub(crate) enum VoterGroupId {
     /// Delegated Representative.

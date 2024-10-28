@@ -2,7 +2,7 @@
 use poem_openapi::{types::Example, NewType};
 use serde::Deserialize;
 
-/// The Numeric ID of a Voting Event
+/// The Numeric Index of a Voting Event
 #[derive(NewType, Deserialize)]
 #[oai(example = true)]
 pub(crate) struct EventId(pub(crate) i32);

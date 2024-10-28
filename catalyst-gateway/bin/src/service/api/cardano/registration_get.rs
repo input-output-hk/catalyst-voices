@@ -5,10 +5,9 @@ use poem_openapi::{payload::Json, ApiResponse};
 use super::types::SlotNumber;
 use crate::service::{
     common::{
-        objects::cardano::{
-            network::Network, registration_info::RegistrationInfo, stake_address::StakeAddress,
-        },
+        objects::cardano::{network::Network, registration_info::RegistrationInfo},
         responses::WithErrorResponses,
+        types::cardano::address::Cip19StakeAddress,
     },
     utilities::check_network,
 };
@@ -16,7 +15,7 @@ use crate::service::{
 /// Endpoint responses
 #[derive(ApiResponse)]
 #[allow(dead_code)]
-pub(crate) enum Responses {
+pub(super) enum Responses {
     /// The registration information for the stake address queried.
     #[oai(status = 200)]
     Ok(Json<RegistrationInfo>),
@@ -27,36 +26,40 @@ pub(crate) enum Responses {
 }
 
 /// All responses
-pub(crate) type AllResponses = WithErrorResponses<Responses>;
+pub(super) type AllResponses = WithErrorResponses<Responses>;
 
 /// # GET `/registration`
 #[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
 pub(crate) async fn endpoint(
-    stake_address: StakeAddress, provided_network: Option<Network>, slot_num: Option<SlotNumber>,
+    stake_address: Cip19StakeAddress, provided_network: Option<Network>,
+    slot_num: Option<SlotNumber>,
 ) -> AllResponses {
     let _date_time = slot_num.unwrap_or(SlotNumber::MAX);
-    let _stake_credential = stake_address.payload().as_hash().to_vec();
-    let _network = match check_network(stake_address.network(), provided_network) {
-        Ok(network) => network,
-        Err(err) => return AllResponses::handle_error(&err),
+    // TODO - handle appropriate response
+    let Ok(address) = stake_address.to_stake_address() else {
+        return Responses::NotFound.into();
     };
+    let _stake_credential = address.payload().as_hash().to_vec();
 
-    let _unused = "
-    // get the total utxo amount from the database
-    match EventDB::get_registration_info(stake_credential, network.into(), date_time).await {
-        Ok((tx_id, payment_address, voting_info, nonce)) => {
-            Responses::Ok(Json(RegistrationInfo::new(
-                tx_id,
-                &payment_address,
-                voting_info,
-                nonce,
-            )))
-            .into()
-        },
-        Err(err) if err.is::<NotFoundError>() => Responses::NotFound.into(),
-        Err(err) => AllResponses::handle_error(&err),
+    // If the network is not valid, just say NotFound.
+    if let Ok(_network) = check_network(address.network(), provided_network) {
+        let _unused = "
+        // get the total utxo amount from the database
+        match EventDB::get_registration_info(stake_credential, network.into(), date_time).await {
+            Ok((tx_id, payment_address, voting_info, nonce)) => {
+                Responses::Ok(Json(RegistrationInfo::new(
+                    tx_id,
+                    &payment_address,
+                    voting_info,
+                    nonce,
+                )))
+                .into()
+            },
+            Err(err) if err.is::<NotFoundError>() => Responses::NotFound.into(),
+            Err(err) => AllResponses::handle_error(&err),
+        }
+        ";
     }
-    ";
 
     Responses::NotFound.into()
 }

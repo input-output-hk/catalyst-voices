@@ -1,9 +1,9 @@
-//! Implementation of the GET `/registration/cip36` endpoint
+//! Implementation of the GET `/cardano/cip36` endpoint
 
 use std::{cmp::Reverse, sync::Arc};
 
 use futures::StreamExt;
-use poem_openapi::{payload::Json, ApiResponse, Object};
+use poem_openapi::{payload::Json, ApiResponse};
 use tracing::error;
 
 use crate::{
@@ -16,96 +16,34 @@ use crate::{
         },
         session::CassandraSession,
     },
-    service::common::responses::WithErrorResponses,
+    service::common::{
+        objects::cardano::cip36::{
+            Cip36Info, Cip36Reporting, Cip36ReportingList, InvalidRegistrationsReport,
+        },
+        responses::WithErrorResponses,
+    },
 };
 
-/// Endpoint responses
+/// Endpoint responses.
 #[derive(ApiResponse)]
 pub(crate) enum ResponseSingleRegistration {
-    /// Cip36 registration
+    /// A CIP36 registration report.
     #[oai(status = 200)]
     Ok(Json<Cip36Reporting>),
-    /// No valid registration
+    /// No valid registration.
     #[oai(status = 404)]
     NotFound,
 }
 
-/// Endpoint responses
+/// Endpoint responses.
 #[derive(ApiResponse)]
 pub(crate) enum ResponseMultipleRegistrations {
-    /// Cip36 registration
+    /// All CIP36 registrations associated with the same Voting Key.
     #[oai(status = 200)]
     Ok(Json<Cip36ReportingList>),
-    /// No valid registration
+    /// No valid registration.
     #[oai(status = 404)]
     NotFound,
-}
-
-/// Cip36 info list
-#[derive(Object, Default)]
-pub(crate) struct Cip36ReportingList {
-    /// List of registrations
-    #[oai(validator(max_items = "100000"))]
-    cip36: Vec<Cip36Reporting>,
-}
-
-/// Cip36 info + invalid reporting
-#[derive(Object, Default)]
-pub(crate) struct Cip36Reporting {
-    /// List of registrations
-    #[oai(validator(max_items = "100000"))]
-    cip36: Vec<Cip36Info>,
-    /// Invalid registration reporting
-    #[oai(validator(max_items = "100000"))]
-    invalids: Vec<InvalidRegistrationsReport>,
-}
-
-/// Cip36 info
-#[derive(Object, Default)]
-pub(crate) struct Cip36Info {
-    /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
-    #[oai(validator(max_length = 66, min_length = 66, pattern = "0x[0-9a-f]{64}"))]
-    pub stake_address: String,
-    /// Nonce value after normalization.
-    #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
-    pub nonce: u64,
-    /// Slot Number the cert is in.
-    #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
-    pub slot_no: u64,
-    /// Transaction Index.
-    #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
-    pub txn: i16,
-    /// Voting Public Key
-    #[oai(validator(max_length = 66, min_length = 66, pattern = "0x[0-9a-f]{64}"))]
-    pub vote_key: String,
-    /// Full Payment Address (not hashed, 32 byte ED25519 Public key).
-    #[oai(validator(max_length = 66, min_length = 66, pattern = "0x[0-9a-f]{64}"))]
-    pub payment_address: String,
-    /// Is the stake address a script or not.
-    pub is_payable: bool,
-    /// Is the Registration CIP36 format, or CIP15
-    pub cip36: bool,
-}
-
-/// Invalid registration error reporting
-#[derive(Object, Default)]
-pub(crate) struct InvalidRegistrationsReport {
-    /// Error report
-    #[oai(validator(max_items = "100000"))]
-    pub error_report: Vec<String>,
-    /// Full Stake Address (not hashed, 32 byte ED25519 Public key).
-    #[oai(validator(max_length = 66, min_length = 66, pattern = "0x[0-9a-f]{64}"))]
-    pub stake_address: String,
-    /// Voting Public Key
-    #[oai(validator(max_length = 66, min_length = 0, pattern = "[0-9a-f]"))]
-    pub vote_key: String,
-    /// Full Payment Address (not hashed, 32 byte ED25519 Public key).
-    #[oai(validator(max_length = 66, min_length = 0, pattern = "[0-9a-f]"))]
-    pub payment_address: String,
-    /// Is the stake address a script or not.
-    pub is_payable: bool,
-    /// Is the Registration CIP36 format, or CIP15
-    pub cip36: bool,
 }
 
 /// Single registration response
@@ -120,13 +58,16 @@ pub(crate) async fn get_latest_registration_from_stake_addr(
     let stake_addr = match hex::decode(stake_addr) {
         Ok(stake_addr) => stake_addr,
         Err(err) => {
-            error!("Failed to decode stake addr {:?}", err);
+            error!(id="get_latest_registration_from_stake_addr", error=?err, "Failed to decode stake addr");
             return ResponseSingleRegistration::NotFound.into();
         },
     };
 
     let Some(session) = CassandraSession::get(persistent) else {
-        error!("Failed to acquire db session");
+        error!(
+            id = "get_latest_registration_from_stake_addr",
+            "Failed to acquire db session"
+        );
         return ResponseSingleRegistration::NotFound.into();
     };
 
@@ -135,9 +76,9 @@ pub(crate) async fn get_latest_registration_from_stake_addr(
             Ok(registrations) => registrations,
             Err(err) => {
                 error!(
-                    "Failed to obtain registrations for given stake addr:{:?} {:?}",
-                    hex::encode(stake_addr),
-                    err
+                    id="get_latest_registration_from_stake_addr",
+                    error=?err,
+                    "Failed to obtain registrations for given stake addr",
                 );
                 return ResponseSingleRegistration::NotFound.into();
             },
@@ -153,18 +94,15 @@ pub(crate) async fn get_latest_registration_from_stake_addr(
         Ok(invalids) => invalids,
         Err(err) => {
             error!(
-                "Failed to obtain invalid registrations for given stake addr:{:?} {:?}",
-                hex::encode(stake_addr),
-                err
+                id="get_latest_registration_from_stake_addr",
+                error=?err,
+                "Failed to obtain invalid registrations for given stake addr",
             );
             return ResponseSingleRegistration::NotFound.into();
         },
     };
 
-    let report = Cip36Reporting {
-        cip36: vec![registration],
-        invalids: invalids_report,
-    };
+    let report = Cip36Reporting::new(vec![registration], invalids_report);
 
     ResponseSingleRegistration::Ok(Json(report)).into()
 }
@@ -268,13 +206,16 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
     let stake_hash = match hex::decode(stake_hash) {
         Ok(stake_hash) => stake_hash,
         Err(err) => {
-            error!("Failed to decode stake addr {:?}", err);
+            error!(id="get_latest_registration_from_stake_key_hash_stake_hash",error=?err, "Failed to decode stake hash");
             return ResponseSingleRegistration::NotFound.into();
         },
     };
 
     let Some(session) = CassandraSession::get(persistent) else {
-        error!("Failed to acquire db session");
+        error!(
+            id = "get_latest_registration_from_stake_key_hash_db_session",
+            "Failed to acquire db session"
+        );
         return ResponseSingleRegistration::NotFound.into();
     };
 
@@ -283,7 +224,11 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
         match GetStakeAddrQuery::execute(&session, GetStakeAddrParams::new(stake_hash)).await {
             Ok(latest) => latest,
             Err(err) => {
-                error!("Failed to query stake addr from stake hash {:?}", err);
+                error!(
+                    id="get_latest_registration_from_stake_key_hash_query_stake_addr",
+                    error=?err,
+                    "Failed to query stake addr from stake hash"
+                );
                 return ResponseSingleRegistration::NotFound.into();
             },
         };
@@ -292,25 +237,31 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
         let row = match row_stake_addr {
             Ok(r) => r,
             Err(err) => {
-                error!("Failed to get latest registration {:?}", err);
+                error!(
+                    id="get_latest_registration_from_stake_key_hash_latest_registration",
+                    error=?err,
+                    "Failed to get latest registration"
+                );
                 return ResponseSingleRegistration::NotFound.into();
             },
         };
 
-        let registration =
-            match latest_registration_from_stake_addr(row.stake_address.clone(), session.clone())
-                .await
-            {
-                Ok(registration) => registration,
-                Err(err) => {
-                    error!(
-                        "Failed to obtain registration for given stake addr:{:?} {:?}",
-                        hex::encode(row.stake_address),
-                        err
-                    );
-                    return ResponseSingleRegistration::NotFound.into();
-                },
-            };
+        let registration = match latest_registration_from_stake_addr(
+            row.stake_address.clone(),
+            session.clone(),
+        )
+        .await
+        {
+            Ok(registration) => registration,
+            Err(err) => {
+                error!(
+                    id="get_latest_registration_from_stake_key_hash_registration_for_stake_addr",
+                    error=?err,
+                    "Failed to obtain registration for given stake addr",
+                );
+                return ResponseSingleRegistration::NotFound.into();
+            },
+        };
 
         // include any erroneous registrations which occur AFTER the slot# of the last valid
         // registration
@@ -324,18 +275,15 @@ pub(crate) async fn get_latest_registration_from_stake_key_hash(
             Ok(invalids) => invalids,
             Err(err) => {
                 error!(
-                    "Failed to obtain invalid registrations for given stake addr:{:?} {:?}",
-                    hex::encode(registration.stake_address.clone()),
-                    err
+                    id="get_latest_registration_from_stake_key_hash_invalid_registrations_for_stake_addr",
+                    error=?err,
+                    "Failed to obtain invalid registrations for given stake addr",
                 );
                 return ResponseSingleRegistration::NotFound.into();
             },
         };
 
-        let report = Cip36Reporting {
-            cip36: vec![registration],
-            invalids: invalids_report,
-        };
+        let report = Cip36Reporting::new(vec![registration], invalids_report);
 
         return ResponseSingleRegistration::Ok(Json(report)).into();
     }
@@ -352,13 +300,20 @@ pub(crate) async fn get_associated_vote_key_registrations(
     let vote_key = match hex::decode(vote_key) {
         Ok(vote_key) => vote_key,
         Err(err) => {
-            error!("Failed to decode vote key {:?}", err);
+            error!(
+                id="get_associated_vote_key_registrations_vote_key",
+                error=?err,
+                "Failed to decode vote key"
+            );
             return ResponseMultipleRegistrations::NotFound.into();
         },
     };
 
     let Some(session) = CassandraSession::get(persistent) else {
-        error!("Failed to acquire db session");
+        error!(
+            id = "get_associated_vote_key_registrations_db_session",
+            "Failed to acquire db session"
+        );
         return ResponseMultipleRegistrations::NotFound.into();
     };
 
@@ -370,7 +325,11 @@ pub(crate) async fn get_associated_vote_key_registrations(
     {
         Ok(latest) => latest,
         Err(err) => {
-            error!("Failed to query stake addr from vote key {:?}", err);
+            error!(
+                id="get_associated_vote_key_registrations_query_stake_addr_from_vote_key",
+                error=?err,
+                "Failed to query stake addr from vote key"
+            );
             return ResponseMultipleRegistrations::NotFound.into();
         },
     };
@@ -379,7 +338,11 @@ pub(crate) async fn get_associated_vote_key_registrations(
         let row = match row_stake_addr {
             Ok(r) => r,
             Err(err) => {
-                error!("Failed to get latest registration {:?}", err);
+                error!(
+                    id="get_associated_vote_key_registrations_latest_registration",
+                    error=?err,
+                    "Failed to get latest registration"
+                );
                 return ResponseMultipleRegistrations::NotFound.into();
             },
         };
@@ -393,9 +356,9 @@ pub(crate) async fn get_associated_vote_key_registrations(
                 Ok(registration) => registration,
                 Err(err) => {
                     error!(
-                        "Failed to obtain registrations for given stake addr:{:?} {:?}",
-                        hex::encode(row.stake_address),
-                        err
+                        id="get_associated_vote_key_registrations_get_registrations_for_stake_addr",
+                        error=?err,
+                        "Failed to obtain registrations for given stake addr",
                     );
                     return ResponseMultipleRegistrations::NotFound.into();
                 },
@@ -408,7 +371,7 @@ pub(crate) async fn get_associated_vote_key_registrations(
 
         // Report includes registration info and  any erroneous registrations which occur AFTER
         // the slot# of the last valid registration
-        let mut reports = Cip36ReportingList { cip36: Vec::new() };
+        let mut reports = Cip36ReportingList::new();
 
         for registration in redacted_registrations {
             let invalids_report = match get_invalid_registrations(
@@ -421,20 +384,15 @@ pub(crate) async fn get_associated_vote_key_registrations(
                 Ok(invalids) => invalids,
                 Err(err) => {
                     error!(
-                        "Failed to obtain invalid registrations for given stake addr:{:?} {:?}",
-                        hex::encode(registration.stake_address.clone()),
-                        err
+                        id="get_associated_vote_key_registrations_invalid_registrations_for_stake_addr",
+                        error=?err,
+                        "Failed to obtain invalid registrations for given stake addr",
                     );
                     continue;
                 },
             };
 
-            let report = Cip36Reporting {
-                cip36: vec![registration],
-                invalids: invalids_report,
-            };
-
-            reports.cip36.push(report);
+            reports.add(Cip36Reporting::new(vec![registration], invalids_report));
         }
 
         return ResponseMultipleRegistrations::Ok(Json(reports)).into();

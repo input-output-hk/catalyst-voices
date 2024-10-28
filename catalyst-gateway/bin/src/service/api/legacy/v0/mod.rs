@@ -4,14 +4,13 @@ use poem_openapi::{payload::Binary, OpenApi};
 use crate::service::{
     common::tags::ApiTags, utilities::middleware::schema_validation::schema_version_validation,
 };
-
 mod message_post;
 mod plans_get;
 
 /// `v0` API Endpoints
 pub(crate) struct V0Api;
 
-#[OpenApi(prefix_path = "/v0", tag = "ApiTags::V0")]
+#[OpenApi(prefix_path = "/v0", tag = "ApiTags::Legacy")]
 impl V0Api {
     /// Posts a signed transaction.
     ///
