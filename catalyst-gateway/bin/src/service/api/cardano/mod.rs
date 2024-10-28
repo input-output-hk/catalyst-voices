@@ -7,8 +7,7 @@ use types::{DateTime, SlotNumber};
 
 use crate::service::{
     common::{
-        objects::cardano::{network::Network, stake_address::StakeAddress},
-        tags::ApiTags,
+        objects::cardano::network::Network, tags::ApiTags, types::cardano::address::StakeAddress,
     },
     utilities::middleware::schema_validation::schema_version_validation,
 };

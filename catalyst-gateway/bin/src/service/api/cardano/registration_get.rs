@@ -5,10 +5,9 @@ use poem_openapi::{payload::Json, ApiResponse};
 use super::types::SlotNumber;
 use crate::service::{
     common::{
-        objects::cardano::{
-            network::Network, registration_info::RegistrationInfo, stake_address::StakeAddress,
-        },
+        objects::cardano::{network::Network, registration_info::RegistrationInfo},
         responses::WithErrorResponses,
+        types::cardano::address::StakeAddress,
     },
     utilities::check_network,
 };
@@ -35,10 +34,14 @@ pub(crate) async fn endpoint(
     stake_address: StakeAddress, provided_network: Option<Network>, slot_num: Option<SlotNumber>,
 ) -> AllResponses {
     let _date_time = slot_num.unwrap_or(SlotNumber::MAX);
-    let _stake_credential = stake_address.payload().as_hash().to_vec();
+    // TODO - handle appropriate response
+    let Ok(address) = stake_address.to_stake_address() else {
+        return Responses::NotFound.into();
+    };
+    let _stake_credential = address.payload().as_hash().to_vec();
 
     // If the network is not valid, just say NotFound.
-    if let Ok(_network) = check_network(stake_address.network(), provided_network) {
+    if let Ok(_network) = check_network(address.network(), provided_network) {
         let _unused = "
         // get the total utxo amount from the database
         match EventDB::get_registration_info(stake_credential, network.into(), date_time).await {
