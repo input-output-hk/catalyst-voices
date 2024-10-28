@@ -31,7 +31,8 @@ pub(super) type AllResponses = WithErrorResponses<Responses>;
 /// # GET `/registration`
 #[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
 pub(crate) async fn endpoint(
-    stake_address: Cip19StakeAddress, provided_network: Option<Network>, slot_num: Option<SlotNumber>,
+    stake_address: Cip19StakeAddress, provided_network: Option<Network>,
+    slot_num: Option<SlotNumber>,
 ) -> AllResponses {
     let _date_time = slot_num.unwrap_or(SlotNumber::MAX);
     // TODO - handle appropriate response
