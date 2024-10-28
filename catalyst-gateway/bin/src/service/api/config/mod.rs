@@ -11,6 +11,7 @@ use tracing::error;
 use crate::{
     db::event::config::{key::ConfigKey, Config},
     service::common::{
+        auth::scheme::CatalystSecurityScheme,
         objects::config::{frontend_config::FrontendConfig, ConfigBadRequest},
         responses::WithErrorResponses,
         tags::ApiTags,
@@ -58,6 +59,10 @@ impl ConfigApi {
     /// Get the configuration for the frontend.
     ///
     /// Get the frontend configuration for the requesting client.
+    ///
+    /// ### Security
+    ///
+    /// Does not require any Catalyst RBAC Token to access.
     #[oai(
         path = "/draft/config/frontend",
         method = "get",
@@ -108,6 +113,10 @@ impl ConfigApi {
     ///
     /// Returns the JSON schema which defines the data which can be read or written for
     /// the frontend configuration.
+    ///
+    /// ### Security
+    ///
+    /// Does not require any Catalyst RBAC Token to access.
     #[oai(
         path = "/draft/config/frontend/schema",
         method = "get",
@@ -126,6 +135,10 @@ impl ConfigApi {
     ///
     /// Store the given config as either global front end configuration, or configuration
     /// for a client at a specific IP address.
+    ///
+    /// ### Security
+    ///
+    /// Requires Admin Authoritative RBAC Token.
     #[oai(
         path = "/draft/config/frontend",
         method = "put",
@@ -136,7 +149,7 @@ impl ConfigApi {
         /// *OPTIONAL* The IP Address to set the configuration for.
         #[oai(name = "IP")]
         ip_query: Query<Option<IpAddr>>,
-        body: Json<FrontendConfig>,
+        _auth: CatalystSecurityScheme, body: Json<FrontendConfig>,
     ) -> SetConfigAllResponses {
         let body_value = body.0.to_json();
 

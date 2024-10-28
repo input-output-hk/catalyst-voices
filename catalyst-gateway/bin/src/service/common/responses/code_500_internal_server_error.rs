@@ -14,13 +14,11 @@ use crate::settings::Settings;
 pub(crate) struct InternalServerError {
     /// Unique ID of this Server Error so that it can be located easily for debugging.
     id: Uuid,
-    /// *Optional* SHORT Error message.
-    /// Will not contain sensitive information, internal details or backtraces.
-    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
+    /// Error message.
+    // Will not contain sensitive information, internal details or backtraces.
     #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
     msg: String,
     /// A URL to report an issue.
-    // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
     #[oai(validator(max_length = "1000"))]
     issue: Option<Url>,
 }

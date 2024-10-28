@@ -141,6 +141,9 @@ struct EnvVars {
     /// The Chain Follower configuration
     chain_follower: chain_follower::EnvVars,
 
+    /// Internal API Access API Key
+    internal_api_key: Option<StringEnvVar>,
+
     /// Tick every N seconds until config exists in db
     #[allow(unused)]
     check_config_tick: Duration,
@@ -193,6 +196,7 @@ static ENV_VARS: LazyLock<EnvVars> = LazyLock::new(|| {
             cassandra_db::VOLATILE_NAMESPACE_DEFAULT,
         ),
         chain_follower: chain_follower::EnvVars::new(),
+        internal_api_key: StringEnvVar::new_optional("INTERNAL_API_KEY", true),
         check_config_tick,
     }
 });
@@ -277,7 +281,6 @@ impl Settings {
     }
 
     /// The Service UUID
-    #[allow(unused)]
     pub(crate) fn service_id() -> &'static str {
         ENV_VARS.service_id.as_str()
     }
@@ -353,6 +356,15 @@ impl Settings {
                 error!("Failed to generate github issue url {:?}", e.to_string());
                 None
             },
+        }
+    }
+
+    /// Check a given key matches the internal API Key
+    pub(crate) fn check_internal_api_key(value: &str) -> bool {
+        if let Some(required_key) = ENV_VARS.internal_api_key.as_ref().map(StringEnvVar::as_str) {
+            value == required_key
+        } else {
+            false
         }
     }
 }

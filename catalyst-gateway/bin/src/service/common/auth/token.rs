@@ -109,7 +109,7 @@ mod tests {
     use rand::rngs::OsRng;
 
     use super::{encode_auth_token_ed25519, Kid, UlidBytes};
-    use crate::service::api::auth::token::decode_auth_token_ed25519;
+    use crate::service::common::auth::token::decode_auth_token_ed25519;
 
     #[test]
     fn test_token_generation_and_decoding() {

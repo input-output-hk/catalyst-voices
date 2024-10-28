@@ -7,8 +7,7 @@ use poem::{error::ResponseError, http::StatusCode, Request};
 use poem_openapi::{auth::Bearer, SecurityScheme};
 use tracing::error;
 
-use super::token::{Kid, SignatureEd25519, UlidBytes};
-use crate::service::api::auth::token::decode_auth_token_ed25519;
+use super::token::{decode_auth_token_ed25519, Kid, SignatureEd25519, UlidBytes};
 
 /// Decoded token consists of a Kid, Ulid and Signature
 pub type DecodedAuthToken = (Kid, UlidBytes, SignatureEd25519);
@@ -47,13 +46,12 @@ static CERTS: LazyLock<DashMap<String, [u8; PUBLIC_KEY_LENGTH]>> = LazyLock::new
 #[oai(
     rename = "CatalystSecurityScheme",
     ty = "bearer",
-    key_in = "header",
-    key_name = "Bearer",
+    bearer_format = "catalyst-rbac-token",
     checker = "checker_api_catalyst_auth"
 )]
+/// Catalyst RBAC Access Token
+#[allow(clippy::module_name_repetitions)]
 #[allow(dead_code)]
-/// Auth token security scheme
-/// Add to endpoint params e.g async fn endpoint(&self, auth: `CatalystSecurityScheme`)
 pub struct CatalystSecurityScheme(pub DecodedAuthToken);
 
 #[derive(Debug, thiserror::Error)]

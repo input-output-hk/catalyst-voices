@@ -9,8 +9,8 @@ use uuid::Uuid;
 pub(crate) struct ServiceUnavailable {
     /// Unique ID of this Server Error so that it can be located easily for debugging.
     id: Uuid,
-    /// *Optional* SHORT Error message.
-    /// Will not contain sensitive information, internal details or backtraces.
+    /// Error message.
+    // Will not contain sensitive information, internal details or backtraces.
     #[oai(validator(max_length = "100", pattern = "^[0-9a-zA-Z].*$"))]
     msg: String,
 }

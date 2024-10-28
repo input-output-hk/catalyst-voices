@@ -78,9 +78,6 @@ overrides:
       # Can't add custom properties to server list.
       owasp:api9:2023-inventory-access: off
 
-      # Temporarily reduce this to a warning.
-      # Remove as soon as security details added to the API.
-      owasp:api2:2023-write-restricted: warn
 
   # Legacy Endpoints that have strange unioned properties.
   # These can not be documented
