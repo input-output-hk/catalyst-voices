@@ -7,7 +7,8 @@ use types::{DateTime, SlotNumber};
 
 use crate::service::{
     common::{
-        objects::cardano::network::Network, tags::ApiTags, types::cardano::address::StakeAddress,
+        auth::none_or_rbac::NoneOrRBAC, objects::cardano::network::Network, tags::ApiTags,
+        types::cardano::address::StakeAddress,
     },
     utilities::middleware::schema_validation::schema_version_validation,
 };
@@ -52,6 +53,8 @@ impl CardanoApi {
         // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
         #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
         slot_number: Query<Option<SlotNumber>>,
+        /// No Authorization required, but Token permitted.
+        _auth: NoneOrRBAC,
     ) -> staked_ada_get::AllResponses {
         staked_ada_get::endpoint(stake_address.0, network.0, slot_number.0).await
     }

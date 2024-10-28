@@ -8,6 +8,6 @@
 //! Simple types can be enums, if the intended underlying type is simple, such as a string
 //! or integer.
 
-pub(crate) mod headers;
 pub(crate) mod cardano;
+pub(crate) mod headers;
 pub(crate) mod string_types;

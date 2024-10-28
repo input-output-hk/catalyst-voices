@@ -153,18 +153,15 @@ async fn get_txo_by_txn(
         }
 
         let key = (row.slot_no.clone(), row.txn, row.txo);
-        txo_map.insert(
-            key,
-            TxoInfo {
-                value: row.value,
-                txn_hash: row.txn_hash,
-                txn: row.txn,
-                txo: row.txo,
-                slot_no: row.slot_no,
-                spent_slot_no: None,
-                assets: HashMap::new(),
-            },
-        );
+        txo_map.insert(key, TxoInfo {
+            value: row.value,
+            txn_hash: row.txn_hash,
+            txn: row.txn,
+            txo: row.txo,
+            slot_no: row.slot_no,
+            spent_slot_no: None,
+            assets: HashMap::new(),
+        });
     }
 
     // Augment TXO info with asset info.

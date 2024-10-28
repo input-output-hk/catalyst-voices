@@ -26,22 +26,25 @@ const STAKE_DESCRIPTION: &str = "Cardano stake address, also known as a reward a
 const STAKE_EXAMPLE: &str = "stake_vk1px4j0r2fk7ux5p23shz8f3y5y2qam7s954rgf3lg5merqcj6aetsft99wu";
 // cSpell:enable
 
-
 /// External document for Cardano addresses.
-static EXTERNAL_DOCS: LazyLock<MetaExternalDocument> = LazyLock::new(|| MetaExternalDocument {
-    url: "https://cips.cardano.org/cip/CIP-19".to_owned(),
-    description: Some("CIP-19 - Cardano Addresses".to_owned()),
+static EXTERNAL_DOCS: LazyLock<MetaExternalDocument> = LazyLock::new(|| {
+    MetaExternalDocument {
+        url: "https://cips.cardano.org/cip/CIP-19".to_owned(),
+        description: Some("CIP-19 - Cardano Addresses".to_owned()),
+    }
 });
 
 /// Schema for `StakeAddress`.
-static STAKE_SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| MetaSchema {
-    title: Some(STAKE_TITLE.to_owned()),
-    description: Some(STAKE_DESCRIPTION),
-    example: Some(Value::String(STAKE_EXAMPLE.to_string())),
-    external_docs: Some(EXTERNAL_DOCS.clone()),
-    max_length: Some(64),
-    pattern: Some("(stake|stake_test)1[a,c-h,j-n,p-z,0,2-9]{53}".to_string()),
-    ..poem_openapi::registry::MetaSchema::ANY
+static STAKE_SCHEMA: LazyLock<MetaSchema> = LazyLock::new(|| {
+    MetaSchema {
+        title: Some(STAKE_TITLE.to_owned()),
+        description: Some(STAKE_DESCRIPTION),
+        example: Some(Value::String(STAKE_EXAMPLE.to_string())),
+        external_docs: Some(EXTERNAL_DOCS.clone()),
+        max_length: Some(64),
+        pattern: Some("(stake|stake_test)1[a,c-h,j-n,p-z,0,2-9]{53}".to_string()),
+        ..poem_openapi::registry::MetaSchema::ANY
+    }
 });
 
 impl_string_types!(

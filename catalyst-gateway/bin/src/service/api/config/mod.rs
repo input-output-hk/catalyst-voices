@@ -11,7 +11,7 @@ use tracing::error;
 use crate::{
     db::event::config::{key::ConfigKey, Config},
     service::common::{
-        auth::rbac::scheme::CatalystRBACSecurityScheme,
+        auth::{none_or_rbac::NoneOrRBAC, rbac::scheme::CatalystRBACSecurityScheme},
         objects::config::{frontend_config::FrontendConfig, ConfigBadRequest},
         responses::WithErrorResponses,
         tags::ApiTags,
@@ -68,7 +68,7 @@ impl ConfigApi {
         method = "get",
         operation_id = "get_config_frontend"
     )]
-    async fn get_frontend(&self, ip_address: RealIp) -> GetConfigAllResponses {
+    async fn get_frontend(&self, ip_address: RealIp, _auth: NoneOrRBAC) -> GetConfigAllResponses {
         // Fetch the general configuration
         let general_config = Config::get(ConfigKey::Frontend).await;
 
@@ -123,7 +123,7 @@ impl ConfigApi {
         operation_id = "get_config_frontend_schema"
     )]
     #[allow(clippy::unused_async)]
-    async fn get_frontend_schema(&self) -> GetConfigSchemaAllResponses {
+    async fn get_frontend_schema(&self, _auth: NoneOrRBAC) -> GetConfigSchemaAllResponses {
         // Schema for both IP specific and general are identical
         let schema_value = ConfigKey::Frontend.schema().clone();
         let frontend_config: FrontendConfig =
