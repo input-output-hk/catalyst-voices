@@ -12,7 +12,7 @@ use crate::service::common::{
 /// Endpoint responses
 #[derive(ApiResponse)]
 pub(crate) enum Responses {
-    /// Fragments processing summary
+    /// Fragments processing summary.
     #[oai(status = 200)]
     Ok(Json<FragmentsProcessingSummary>),
 }

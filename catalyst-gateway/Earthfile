@@ -81,7 +81,7 @@ build:
 all-hosts-build:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +build
 
-# package-cat-gateway : Create a deployable container for catalyst-gateway
+# package : Create a deployable container for catalyst-gateway
 package:
     FROM debian:12.7-slim
     WORKDIR /cat-gateway

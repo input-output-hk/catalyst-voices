@@ -1,5 +1,6 @@
 //! Implementation of the GET /health/ready endpoint
 use poem_openapi::ApiResponse;
+use tracing::{debug, error};
 
 use crate::{
     db::event::{schema_check::MismatchedSchemaError, EventDB},
@@ -40,11 +41,11 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 pub(crate) async fn endpoint() -> AllResponses {
     match EventDB::schema_version_check().await {
         Ok(_) => {
-            tracing::debug!("DB schema version status ok");
+            debug!("DB schema version status ok");
             Responses::NoContent.into()
         },
         Err(err) if err.is::<MismatchedSchemaError>() => {
-            tracing::error!("{err}");
+            error!(id="health_ready_mismatch_schema", error=?err, "DB schema version mismatch");
             Responses::ServiceUnavailable.into()
         },
         Err(err) => AllResponses::handle_error(&err),

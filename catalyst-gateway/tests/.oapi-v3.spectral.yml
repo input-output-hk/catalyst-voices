@@ -1,0 +1,240 @@
+# References to the rules
+# OpenAPI: https://docs.stoplight.io/docs/spectral/4dec24461f3af-open-api-rules#openapi-rules
+# OWASP Top 10: https://github.com/stoplightio/spectral-owasp-ruleset/blob/v1.4.3/src/ruleset.ts
+# Documentations: https://github.com/stoplightio/spectral-documentation/blob/v2.0.1/src/ruleset.ts
+
+# cspell: words OWASP owasp Baction Baccount Bvoting unioned
+
+# Use CDN hosted version for spectral-documentation and spectral-owasp
+extends:
+  - ["spectral:oas", all]
+  - "https://unpkg.com/@stoplight/spectral-documentation@1.3.1/dist/ruleset.mjs"
+  - "https://unpkg.com/@stoplight/spectral-owasp-ruleset@2.0.1/dist/ruleset.mjs"
+
+formats: ["oas3"]
+
+aliases:
+  # From: https://github.com/stoplightio/spectral-owasp-ruleset/blob/26819e80e5ac4571b6271834fc97f0a1b66110bd/src/ruleset.ts#L60
+  StringProperties:
+    description: "String Properties"
+    targets:
+      - formats:
+          - oas2
+          - oas3_0
+        given:
+          - $..[?(@ && @.type=="string")]
+      - formats:
+          - oas3_1
+        given:
+          - $..[?(@ && @.type=="string")]
+          - $..[?(@ && @.type && @.type.constructor.name === "Array" && @.type.includes("string"))]
+  # From: https://github.com/stoplightio/spectral-documentation/blob/a34ca1b49cbd1ac5a75cfcb93c69d1d77bde341e/src/ruleset.ts#L19C1-L20C1
+  PathItem:
+    - "$.paths[*]"
+  # From: https://github.com/stoplightio/spectral-documentation/blob/a34ca1b49cbd1ac5a75cfcb93c69d1d77bde341e/src/ruleset.ts#L20C1-L23C1
+  OperationObject:
+    - "#PathItem[get,put,post,delete,options,head,patch,trace]"
+  # From: https://github.com/stoplightio/spectral-documentation/blob/a34ca1b49cbd1ac5a75cfcb93c69d1d77bde341e/src/ruleset.ts#L26
+  DescribableObjects:
+    description: "All objects that should be described."
+    targets:
+      - formats:
+          - oas2
+        given:
+          - "$.info"
+          - "$.tags[*]"
+          - "#OperationObject"
+          - "#OperationObject.responses[*]"
+          - "#PathItem.parameters[?(@ && @.in)]"
+          - "#OperationObject.parameters[?(@ && @.in)]"
+          - "$.definitions[*]"
+      - formats:
+          - oas3
+        given:
+          - "$.info"
+          - "$.tags[*]"
+          - "#OperationObject"
+          - "#OperationObject.responses[*]"
+          - "#PathItem.parameters[?(@ && @.in)]"
+          - "#OperationObject.parameters[?(@ && @.in)]"
+          - "$.components.schemas[*]"
+          - "$.servers[*]"
+
+overrides:
+  - files: ["*"]
+    rules:
+      # Severity
+      # warn: Should be implemented, but is blocked by a technical issue.
+      # info: Good to be implemented.
+      # error: Must be implemented.
+      # off: Not applicable - check comment to see if its replaced with a custom rule.
+
+      docs-description: error
+      owasp:api4:2023-string-restricted: error
+      owasp:api3:2023-no-additionalProperties: error
+      owasp:api3:2023-constrained-additionalProperties: error
+      # Not enforced at OpenAPI level.  Production URL's will always be https.
+      owasp:api8:2023-no-server-http: off
+      # Can't add custom properties to server list.
+      owasp:api9:2023-inventory-access: off
+
+
+  # Legacy Endpoints that have strange unioned properties.
+  # These can not be documented
+  # ONLY Legacy endpoints may be added to this override.
+  - files:
+      - "**#/components/schemas/VotingInfo_Delegations"
+      - "**#/components/schemas/VotingInfo_DirectVoter"
+    rules:
+      docs-description: off
+
+  # Legacy Endpoints that use additionalProperties other than setting to False.
+  # ONLY Legacy endpoints may be added to this override.
+  - files:
+      - "**#/components/schemas/FragmentStatus"
+    rules:
+      # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L678
+      owasp:api3:2023-no-additionalProperties: off
+
+  # Legacy Endpoints that have direct json arrays in response, which Poem can not annotate with validation constraints.
+  # ONLY Legacy endpoints may be added to this override.
+  - files:
+      - "**#/paths/~1api~1v0~1vote~1active~1plans/get/responses"
+      - "**#/paths/~1api~1v1~1votes~1plan~1account-votes~1%7Baccount_id%7D/get/responses"
+    rules:
+      # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L506
+      owasp:api4:2023-array-limit: off
+
+  # Legacy Endpoints that use additionalProperties other than setting to False.
+  # ONLY Legacy endpoints may be added to this override.
+  - files:
+      - "**#/paths/~1api~1v1~1fragments~1statuses/get/responses"
+    rules:
+      # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L678
+      owasp:api3:2023-constrained-additionalProperties: off
+
+  # Can't put limits or validation on array query parameters. See: https://github.com/poem-web/poem/issues/907
+  # This should be removed if these limits can be applied, or this endpoint is eliminated.
+  # To be used for Legacy endpoints only. Array query parameters not permitted in new endpoints.
+  - files:
+      - "**#/paths/~1api~1v1~1fragments~1statuses/get/parameters/0/schema/items"
+    rules:
+      owasp:api4:2023-string-limit: off
+      owasp:api4:2023-string-restricted: off
+
+  # Disable security details from legacy endpoints
+  # This override can ONLY be used by legacy endpoints.
+  - files:
+      - "**#/paths/~1api~1v1~1registration~1voter~1%7Bvoting_key%7D/get"
+      - "**#/paths/~1api~1v0~1message"
+      - "**#/paths/~1api~1v0~1vote~1active~1plans"
+      - "**#/paths/~1api~1v1~1votes~1plan~1account-votes~1%7Baccount_id%7D/get"
+      - "**#/paths/~1api~1v1~1fragments~1statuses"
+      - "**#/paths/~1api~1v1~1fragments/post"
+    rules:
+      owasp:api2:2023-read-restricted: off
+      owasp:api8:2023-define-error-responses-401: off
+      owasp:api8:2023-define-error-validation: off
+      owasp:api2:2023-write-restricted: off
+
+rules:
+  # A version of owasp:api4:2019-string-limit which accepts `format` without length as defining a string limit.
+  owasp:api4:2023-string-limit:
+    message: "Schema of type string must specify format, maxLength, enum, or const."
+    description: "String size should be limited to mitigate resource exhaustion attacks. This can be done using `format`, `maxLength`, `enum` or `const`."
+    severity: error
+    given: "#StringProperties"
+    then:
+      function: schema
+      functionOptions:
+        schema:
+          type: "object"
+          oneOf:
+            - anyOf:
+                - required: ["format"]
+                - required: ["maxLength"]
+            - required: ["enum"]
+            - required: ["const"]
+
+  # A version of owasp:api4:2019-rate-limit-retry-after which accepts the header name in upper case.
+  owasp:api4:2023-rate-limit-retry-after:
+    message: "A 429 response should define a Retry-After header."
+    description: "Define proper rate limiting to avoid attackers overloading the API. Part of that involves setting a Retry-After header so well meaning consumers are not polling and potentially exacerbating problems."
+    severity: error
+    given: "$..responses[429].headers"
+    then:
+      field: "RETRY-AFTER"
+      function: defined
+
+  # Override document description rule
+  # - No limitations on the characters that can start or end a sentence.
+  # - Length should be >= 20 characters
+  # Ref: https://github.com/stoplightio/spectral-documentation/blob/a34ca1b49cbd1ac5a75cfcb93c69d1d77bde341e/src/ruleset.ts#L173
+  docs-description:
+    description: "Documentation tools use description to provide more context to users of the API who are not as familiar with the concepts as the API designers are."
+    message: "{{error}}."
+    severity: error
+    given: "#DescribableObjects"
+    then:
+      - field: "description"
+        function: "truthy"
+      - field: "description"
+        function: "length"
+        functionOptions:
+          min: 20
+      - field: "description"
+        function: "pattern"
+        functionOptions:
+          # Matches any character that is #, *, uppercase or lowercase letters from A to Z, or digits from 0 to 9 at the beginning of the string.
+          # with zero or more occurrences of any character except newline.
+          match: "^[#*A-Za-z0-9].*"
+      - field: "description"
+        function: pattern
+        functionOptions:
+          # Matches against a full stop or a literal `*` at the end of a description.
+          match: "[\\.\\*]$"
+
+  api-path:
+    message: "Invalid API path - should be /api/draft/* or /api/v<number>/*"
+    given: "$.paths"
+    severity: error
+    then:
+      field: "@key"
+      function: pattern
+      functionOptions:
+        # Match paths that start with /api/draft/* or /api/v<number>/*
+        match: "^/api/(draft|v\\d+)/.*$"
+  api-content-type:
+    message: "Content type must not be text/plain"
+    given: "$.paths[*][*].responses[*].content"
+    severity: error
+    then:
+      field: "@key"
+      function: pattern
+      functionOptions:
+        # Match content type that is not text/plain
+        match: "^(?!text/plain).*"
+  api-content-type-json-object:
+    message: "Content type application/json must be object"
+    given: "$.paths[*][*].responses[*].content['application/json'].schema.type"
+    severity: error
+    then:
+      field: "@value"
+      function: pattern
+      functionOptions:
+        # Match content type application/json should be object
+        match: "object"
+  api-example-schema:
+      message: "Schema should contain example"
+      given: "$..schema"
+      severity: warn
+      then:
+          field: "example"
+          function: truthy
+  api-example-properties:
+      message: "Property should contain example"
+      given: "$..properties.*"
+      severity: warn
+      then:
+        field: "example"
+        function: truthy
