@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catalyst_voices_blocs/src/bloc_error_emitter_mixin.dart';
 import 'package:catalyst_voices_blocs/src/session/session_state.dart';
 import 'package:catalyst_voices_models/catalyst_voices_models.dart';
@@ -13,11 +15,15 @@ final class SessionCubit extends Cubit<SessionState>
   final RegistrationService _registrationService;
   final RegistrationProgressNotifier _registrationProgressNotifier;
 
-  final _logger = Logger('SessionBloc');
+  final _logger = Logger('SessionCubit');
 
   bool _hasKeychain = false;
   bool _isUnlocked = false;
   Account? _account;
+
+  StreamSubscription<bool>? _keychainSub;
+  StreamSubscription<bool>? _keychainUnlockedSub;
+  StreamSubscription<Account?>? _accountSub;
 
   final String _dummyKeychainId = 'TestUserKeychainID';
   static const LockFactor dummyUnlockFactor = PasswordLockFactor('Test1234');
@@ -31,19 +37,19 @@ final class SessionCubit extends Cubit<SessionState>
     this._registrationService,
     this._registrationProgressNotifier,
   ) : super(const VisitorSessionState(isRegistrationInProgress: false)) {
-    _userService.watchKeychain
+    _keychainSub = _userService.watchKeychain
         .map((keychain) => keychain != null)
         .distinct()
         .listen(_onHasKeychainChanged);
 
-    _userService.watchKeychain
+    _keychainUnlockedSub = _userService.watchKeychain
         .transform(KeychainToUnlockTransformer())
         .distinct()
         .listen(_onActiveKeychainUnlockChanged);
 
     _registrationProgressNotifier.addListener(_onRegistrationProgressChanged);
 
-    _userService.watchAccount.listen(_onActiveAccountChanged);
+    _accountSub = _userService.watchAccount.listen(_onActiveAccountChanged);
   }
 
   Future<bool> unlock(LockFactor lockFactor) {
@@ -74,6 +80,23 @@ final class SessionCubit extends Cubit<SessionState>
     );
 
     await _userService.useAccount(account);
+  }
+
+  @override
+  Future<void> close() async {
+    await _keychainSub?.cancel();
+    _keychainSub = null;
+
+    await _keychainUnlockedSub?.cancel();
+    _keychainUnlockedSub = null;
+
+    _registrationProgressNotifier
+        .removeListener(_onRegistrationProgressChanged);
+
+    await _accountSub?.cancel();
+    _accountSub = null;
+
+    return super.close();
   }
 
   void _onHasKeychainChanged(bool hasKeychain) {

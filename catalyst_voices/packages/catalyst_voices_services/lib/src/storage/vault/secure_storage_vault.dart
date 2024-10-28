@@ -11,7 +11,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 const _lockKey = 'LockKey';
-final _keyRegExp = RegExp(r'(\w+)\.(\w+)\.(\w+)');
 
 /// Implementation of [Vault] that uses [FlutterSecureStorage] as
 /// facade for read/write operations.
@@ -31,7 +30,7 @@ base class SecureStorageVault
     try {
       getStorageId(value);
       return true;
-    } catch (_) {
+    } catch (e) {
       return false;
     }
   }
@@ -43,17 +42,13 @@ base class SecureStorageVault
   /// See [isStorageKey] to make sure key is valid before
   /// calling [getStorageId].
   static String getStorageId(String value) {
-    final match = _keyRegExp.firstMatch(value);
-    if (match == null) {
-      throw ArgumentError('Key does not match storage vault key pattern');
-    }
-
-    if (match.groupCount != 3) {
+    final parts = value.split('.');
+    if (parts.length != 3) {
       throw ArgumentError('Key sections count is invalid');
     }
 
-    final prefix = match.group(1)!;
-    final id = match.group(2)!;
+    final prefix = parts[0];
+    final id = parts[1];
 
     if (prefix != _keyPrefix) {
       throw ArgumentError('Key prefix does not match');

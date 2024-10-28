@@ -318,3 +318,4 @@ staticlib
 addrof
 Lifetimeable
 cbindgen
+mocktail
