@@ -19,7 +19,10 @@ void main() {
     keychainProvider = VaultKeychainProvider();
     userStorage = SecureUserStorage();
 
-    userService = UserServiceImpl(keychainProvider, userStorage);
+    userService = UserService(
+      keychainProvider: keychainProvider,
+      userStorage: userStorage,
+    );
     registrationService = _MockRegistrationService();
     notifier = RegistrationProgressNotifier();
   });

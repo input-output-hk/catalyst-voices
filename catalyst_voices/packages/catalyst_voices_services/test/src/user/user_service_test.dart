@@ -13,7 +13,7 @@ void main() {
   setUp(() {
     FlutterSecureStorage.setMockInitialValues({});
 
-    service = UserServiceImpl(provider, storage);
+    service = UserService(keychainProvider: provider, userStorage: storage);
   });
 
   group('Keychain', () {
