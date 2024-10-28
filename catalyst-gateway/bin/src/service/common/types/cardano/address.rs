@@ -23,7 +23,7 @@ const STAKE_TITLE: &str = "Cardano stake address";
 const STAKE_DESCRIPTION: &str = "Cardano stake address, also known as a reward address.";
 /// Stake address example.
 // cSpell:disable
-const STAKE_EXAMPLE: &str = "stake_vk1px4j0r2fk7ux5p23shz8f3y5y2qam7s954rgf3lg5merqcj6aetsft99wu";
+const STAKE_EXAMPLE: &str = "stake_test1uqehkck0lajq8gr28t9uxnuvgcqrc6070x3k9r8048z8y5gssrtvn";
 // cSpell:enable
 
 /// External document for Cardano addresses.
