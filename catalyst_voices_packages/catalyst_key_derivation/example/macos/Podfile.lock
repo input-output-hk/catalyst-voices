@@ -1,0 +1,22 @@
+PODS:
+  - catalyst_key_derivation (0.0.1):
+    - FlutterMacOS
+  - FlutterMacOS (1.0.0)
+
+DEPENDENCIES:
+  - catalyst_key_derivation (from `Flutter/ephemeral/.symlinks/plugins/catalyst_key_derivation/macos`)
+  - FlutterMacOS (from `Flutter/ephemeral`)
+
+EXTERNAL SOURCES:
+  catalyst_key_derivation:
+    :path: Flutter/ephemeral/.symlinks/plugins/catalyst_key_derivation/macos
+  FlutterMacOS:
+    :path: Flutter/ephemeral
+
+SPEC CHECKSUMS:
+  catalyst_key_derivation: d1be2ebb47752c4c733f45ff618265d793fc7fdd
+  FlutterMacOS: 8f6f14fa908a6fb3fba0cd85dbd81ec4b251fb24
+
+PODFILE CHECKSUM: 236401fc2c932af29a9fcf0e97baeeb2d750d367
+
+COCOAPODS: 1.15.2

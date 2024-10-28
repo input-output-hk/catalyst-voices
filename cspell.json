@@ -176,6 +176,7 @@
         "web-components.min.js",
         "**/generated/**",
         "**/GeneratedPluginRegistrant.swift",
+        "catalyst_voices_packages/catalyst_key_derivation/cargokit/**",
         "utilities/catalyst_voices_remote_widgets/example/**/**",
         "utilities/poc_local_storage/**/**",
         "**/*.svg"
