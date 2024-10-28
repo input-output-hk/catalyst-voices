@@ -34,6 +34,7 @@ class MyApp extends StatelessWidget {
   }
 
   Future<void> _doMagic() async {
+    // ignore: avoid_print
     print(await greet(name: 'Tom'));
   }
 }

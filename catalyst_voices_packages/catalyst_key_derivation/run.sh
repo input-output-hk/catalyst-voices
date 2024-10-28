@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/bin/sh
+# Builds and rust the example for the catalyst_key_derivation.
 
 flutter_rust_bridge_codegen generate
 flutter_rust_bridge_codegen build-web
