@@ -4,6 +4,7 @@ repository: https://github.com/input-output-hk/catalyst-voices/tree/main/catalys
 issue_tracker: https://github.com/input-output-hk/catalyst-voices/issues
 topics: [cryptography, encryption, codec]
 version: 0.1.0
+publish_to: none
 
 environment:
   sdk: ">=3.5.0 <4.0.0"
