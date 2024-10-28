@@ -47,7 +47,8 @@ pub(crate) type AllResponses = WithErrorResponses<Responses>;
 /// # GET `/staked_ada`
 #[allow(clippy::unused_async, clippy::no_effect_underscore_binding)]
 pub(crate) async fn endpoint(
-    stake_address: Cip19StakeAddress, _provided_network: Option<Network>, slot_num: Option<SlotNumber>,
+    stake_address: Cip19StakeAddress, _provided_network: Option<Network>,
+    slot_num: Option<SlotNumber>,
 ) -> AllResponses {
     let persistent_res = calculate_stake_info(true, stake_address.clone(), slot_num).await;
     let persistent_stake_info = match persistent_res {
