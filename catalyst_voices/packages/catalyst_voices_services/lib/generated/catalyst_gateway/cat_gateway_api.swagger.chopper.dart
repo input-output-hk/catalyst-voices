@@ -51,7 +51,7 @@ final class _$CatGatewayApi extends CatGatewayApi {
   }
 
   @override
-  Future<Response<dynamic>> _apiV1HealthInspectionGet({
+  Future<Response<dynamic>> _apiV1HealthInspectionPut({
     String? logLevel,
     String? queryInspection,
   }) {
@@ -61,7 +61,7 @@ final class _$CatGatewayApi extends CatGatewayApi {
       'query_inspection': queryInspection,
     };
     final Request $request = Request(
-      'GET',
+      'PUT',
       $url,
       client.baseUrl,
       parameters: $params,

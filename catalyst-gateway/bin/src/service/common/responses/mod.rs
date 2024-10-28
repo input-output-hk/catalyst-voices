@@ -7,6 +7,7 @@ use std::{
 
 use code_401_unauthorized::Unauthorized;
 use code_403_forbidden::Forbidden;
+use code_422_unprocessable_content::UnprocessableContent;
 use code_429_too_many_requests::TooManyRequests;
 use code_503_service_unavailable::ServiceUnavailable;
 use poem::IntoResponse;
@@ -19,6 +20,7 @@ use tracing::error;
 
 mod code_401_unauthorized;
 mod code_403_forbidden;
+mod code_422_unprocessable_content;
 mod code_429_too_many_requests;
 pub(crate) mod code_500_internal_server_error;
 mod code_503_service_unavailable;
@@ -46,6 +48,12 @@ pub(crate) enum ErrorResponses {
     /// resource.
     #[oai(status = 403)]
     Forbidden(Json<Forbidden>),
+
+    /// ## Unprocessable Content
+    ///
+    /// The client has not sent valid data in its request, headers, parameters or body.
+    #[oai(status = 422)]
+    UnprocessableContent(Json<UnprocessableContent>),
 
     /// ## Too Many Requests
     ///
@@ -127,6 +135,14 @@ impl<T> WithErrorResponses<T> {
         WithErrorResponses::Error(ErrorResponses::Forbidden(Json(error)))
     }
 
+    /// Handle a 422 unprocessable content response.
+    ///
+    /// Returns a 422 unprocessable content response.
+    pub(crate) fn unprocessable_content(errors: Vec<poem::Error>) -> Self {
+        let error = UnprocessableContent::new(errors);
+        WithErrorResponses::Error(ErrorResponses::UnprocessableContent(Json(error)))
+    }
+
     /// Handle a 429 rate limiting response.
     ///
     /// Returns a 429 Rate limit response.
@@ -147,6 +163,8 @@ impl<T: ApiResponse> From<T> for WithErrorResponses<T> {
 }
 
 impl<T: ApiResponse> ApiResponse for WithErrorResponses<T> {
+    const BAD_REQUEST_HANDLER: bool = true;
+
     fn meta() -> MetaResponses {
         let t_meta = T::meta();
         let default_meta = ErrorResponses::meta();
@@ -208,6 +226,10 @@ impl<T: ApiResponse> ApiResponse for WithErrorResponses<T> {
     fn register(registry: &mut Registry) {
         ErrorResponses::register(registry);
         T::register(registry);
+    }
+
+    fn from_parse_request_error(err: poem_openapi::__private::poem::Error) -> Self {
+        WithErrorResponses::unprocessable_content(vec![err])
     }
 }
 

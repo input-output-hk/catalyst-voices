@@ -78,11 +78,11 @@ abstract class CatGatewayApi extends ChopperService {
   ///Service Inspection Control.
   ///@param log_level The log level to use for the service.  Controls what detail gets logged.
   ///@param query_inspection Enable or disable Verbose Query inspection in the logs.  Used to find query performance issues.
-  Future<chopper.Response> apiV1HealthInspectionGet({
+  Future<chopper.Response> apiV1HealthInspectionPut({
     enums.LogLevel? logLevel,
     enums.DeepQueryInspectionFlag? queryInspection,
   }) {
-    return _apiV1HealthInspectionGet(
+    return _apiV1HealthInspectionPut(
         logLevel: logLevel?.value?.toString(),
         queryInspection: queryInspection?.value?.toString());
   }
@@ -90,8 +90,11 @@ abstract class CatGatewayApi extends ChopperService {
   ///Service Inspection Control.
   ///@param log_level The log level to use for the service.  Controls what detail gets logged.
   ///@param query_inspection Enable or disable Verbose Query inspection in the logs.  Used to find query performance issues.
-  @Get(path: '/api/v1/health/inspection')
-  Future<chopper.Response> _apiV1HealthInspectionGet({
+  @Put(
+    path: '/api/v1/health/inspection',
+    optionalBody: true,
+  )
+  Future<chopper.Response> _apiV1HealthInspectionPut({
     @Query('log_level') String? logLevel,
     @Query('query_inspection') String? queryInspection,
   });

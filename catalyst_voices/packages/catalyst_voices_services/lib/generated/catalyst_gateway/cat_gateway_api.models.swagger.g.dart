@@ -100,6 +100,21 @@ Map<String, dynamic> _$ConfigBadRequestToJson(ConfigBadRequest instance) =>
       'schema_validation_errors': instance.schemaValidationErrors,
     };
 
+ContentErrorDetail _$ContentErrorDetailFromJson(Map<String, dynamic> json) =>
+    ContentErrorDetail(
+      loc: (json['loc'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+          [],
+      msg: json['msg'] as String?,
+      type: json['type'] as String?,
+    );
+
+Map<String, dynamic> _$ContentErrorDetailToJson(ContentErrorDetail instance) =>
+    <String, dynamic>{
+      'loc': instance.loc,
+      'msg': instance.msg,
+      'type': instance.type,
+    };
+
 DelegatePublicKey _$DelegatePublicKeyFromJson(Map<String, dynamic> json) =>
     DelegatePublicKey(
       address: json['address'] as String,
@@ -140,6 +155,21 @@ DirectVoter _$DirectVoterFromJson(Map<String, dynamic> json) => DirectVoter(
 Map<String, dynamic> _$DirectVoterToJson(DirectVoter instance) =>
     <String, dynamic>{
       'voting_key': instance.votingKey,
+    };
+
+Forbidden _$ForbiddenFromJson(Map<String, dynamic> json) => Forbidden(
+      id: json['id'] as String,
+      msg: json['msg'] as String,
+      required: (json['required'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
+    );
+
+Map<String, dynamic> _$ForbiddenToJson(Forbidden instance) => <String, dynamic>{
+      'id': instance.id,
+      'msg': instance.msg,
+      'required': instance.required,
     };
 
 FragmentStatus _$FragmentStatusFromJson(Map<String, dynamic> json) =>
@@ -423,6 +453,33 @@ Map<String, dynamic> _$TooManyRequestsToJson(TooManyRequests instance) =>
     <String, dynamic>{
       'id': instance.id,
       'msg': instance.msg,
+    };
+
+Unauthorized _$UnauthorizedFromJson(Map<String, dynamic> json) => Unauthorized(
+      id: json['id'] as String,
+      msg: json['msg'] as String,
+    );
+
+Map<String, dynamic> _$UnauthorizedToJson(Unauthorized instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'msg': instance.msg,
+    };
+
+UnprocessableContent _$UnprocessableContentFromJson(
+        Map<String, dynamic> json) =>
+    UnprocessableContent(
+      detail: (json['detail'] as List<dynamic>?)
+              ?.map(
+                  (e) => ContentErrorDetail.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+    );
+
+Map<String, dynamic> _$UnprocessableContentToJson(
+        UnprocessableContent instance) =>
+    <String, dynamic>{
+      'detail': instance.detail.map((e) => e.toJson()).toList(),
     };
 
 VotePlan _$VotePlanFromJson(Map<String, dynamic> json) => VotePlan(

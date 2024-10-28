@@ -397,6 +397,68 @@ extension $ConfigBadRequestExtension on ConfigBadRequest {
 }
 
 @JsonSerializable(explicitToJson: true)
+class ContentErrorDetail {
+  const ContentErrorDetail({
+    this.loc,
+    this.msg,
+    this.type,
+  });
+
+  factory ContentErrorDetail.fromJson(Map<String, dynamic> json) =>
+      _$ContentErrorDetailFromJson(json);
+
+  static const toJsonFactory = _$ContentErrorDetailToJson;
+  Map<String, dynamic> toJson() => _$ContentErrorDetailToJson(this);
+
+  @JsonKey(name: 'loc', defaultValue: <String>[])
+  final List<String>? loc;
+  @JsonKey(name: 'msg')
+  final String? msg;
+  @JsonKey(name: 'type')
+  final String? type;
+  static const fromJsonFactory = _$ContentErrorDetailFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is ContentErrorDetail &&
+            (identical(other.loc, loc) ||
+                const DeepCollectionEquality().equals(other.loc, loc)) &&
+            (identical(other.msg, msg) ||
+                const DeepCollectionEquality().equals(other.msg, msg)) &&
+            (identical(other.type, type) ||
+                const DeepCollectionEquality().equals(other.type, type)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(loc) ^
+      const DeepCollectionEquality().hash(msg) ^
+      const DeepCollectionEquality().hash(type) ^
+      runtimeType.hashCode;
+}
+
+extension $ContentErrorDetailExtension on ContentErrorDetail {
+  ContentErrorDetail copyWith({List<String>? loc, String? msg, String? type}) {
+    return ContentErrorDetail(
+        loc: loc ?? this.loc, msg: msg ?? this.msg, type: type ?? this.type);
+  }
+
+  ContentErrorDetail copyWithWrapped(
+      {Wrapped<List<String>?>? loc,
+      Wrapped<String?>? msg,
+      Wrapped<String?>? type}) {
+    return ContentErrorDetail(
+        loc: (loc != null ? loc.value : this.loc),
+        msg: (msg != null ? msg.value : this.msg),
+        type: (type != null ? type.value : this.type));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
 class DelegatePublicKey {
   const DelegatePublicKey({
     required this.address,
@@ -579,6 +641,71 @@ extension $DirectVoterExtension on DirectVoter {
   DirectVoter copyWithWrapped({Wrapped<String>? votingKey}) {
     return DirectVoter(
         votingKey: (votingKey != null ? votingKey.value : this.votingKey));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class Forbidden {
+  const Forbidden({
+    required this.id,
+    required this.msg,
+    this.required,
+  });
+
+  factory Forbidden.fromJson(Map<String, dynamic> json) =>
+      _$ForbiddenFromJson(json);
+
+  static const toJsonFactory = _$ForbiddenToJson;
+  Map<String, dynamic> toJson() => _$ForbiddenToJson(this);
+
+  @JsonKey(name: 'id')
+  final String id;
+  @JsonKey(name: 'msg')
+  final String msg;
+  @JsonKey(name: 'required', defaultValue: <String>[])
+  final List<String>? required;
+  static const fromJsonFactory = _$ForbiddenFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is Forbidden &&
+            (identical(other.id, id) ||
+                const DeepCollectionEquality().equals(other.id, id)) &&
+            (identical(other.msg, msg) ||
+                const DeepCollectionEquality().equals(other.msg, msg)) &&
+            (identical(other.required, required) ||
+                const DeepCollectionEquality()
+                    .equals(other.required, required)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(id) ^
+      const DeepCollectionEquality().hash(msg) ^
+      const DeepCollectionEquality().hash(required) ^
+      runtimeType.hashCode;
+}
+
+extension $ForbiddenExtension on Forbidden {
+  Forbidden copyWith({String? id, String? msg, List<String>? required}) {
+    return Forbidden(
+        id: id ?? this.id,
+        msg: msg ?? this.msg,
+        required: required ?? this.required);
+  }
+
+  Forbidden copyWithWrapped(
+      {Wrapped<String>? id,
+      Wrapped<String>? msg,
+      Wrapped<List<String>?>? required}) {
+    return Forbidden(
+        id: (id != null ? id.value : this.id),
+        msg: (msg != null ? msg.value : this.msg),
+        required: (required != null ? required.value : this.required));
   }
 }
 
@@ -1791,6 +1918,101 @@ extension $TooManyRequestsExtension on TooManyRequests {
     return TooManyRequests(
         id: (id != null ? id.value : this.id),
         msg: (msg != null ? msg.value : this.msg));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class Unauthorized {
+  const Unauthorized({
+    required this.id,
+    required this.msg,
+  });
+
+  factory Unauthorized.fromJson(Map<String, dynamic> json) =>
+      _$UnauthorizedFromJson(json);
+
+  static const toJsonFactory = _$UnauthorizedToJson;
+  Map<String, dynamic> toJson() => _$UnauthorizedToJson(this);
+
+  @JsonKey(name: 'id')
+  final String id;
+  @JsonKey(name: 'msg')
+  final String msg;
+  static const fromJsonFactory = _$UnauthorizedFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is Unauthorized &&
+            (identical(other.id, id) ||
+                const DeepCollectionEquality().equals(other.id, id)) &&
+            (identical(other.msg, msg) ||
+                const DeepCollectionEquality().equals(other.msg, msg)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(id) ^
+      const DeepCollectionEquality().hash(msg) ^
+      runtimeType.hashCode;
+}
+
+extension $UnauthorizedExtension on Unauthorized {
+  Unauthorized copyWith({String? id, String? msg}) {
+    return Unauthorized(id: id ?? this.id, msg: msg ?? this.msg);
+  }
+
+  Unauthorized copyWithWrapped({Wrapped<String>? id, Wrapped<String>? msg}) {
+    return Unauthorized(
+        id: (id != null ? id.value : this.id),
+        msg: (msg != null ? msg.value : this.msg));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class UnprocessableContent {
+  const UnprocessableContent({
+    required this.detail,
+  });
+
+  factory UnprocessableContent.fromJson(Map<String, dynamic> json) =>
+      _$UnprocessableContentFromJson(json);
+
+  static const toJsonFactory = _$UnprocessableContentToJson;
+  Map<String, dynamic> toJson() => _$UnprocessableContentToJson(this);
+
+  @JsonKey(name: 'detail', defaultValue: <ContentErrorDetail>[])
+  final List<ContentErrorDetail> detail;
+  static const fromJsonFactory = _$UnprocessableContentFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is UnprocessableContent &&
+            (identical(other.detail, detail) ||
+                const DeepCollectionEquality().equals(other.detail, detail)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(detail) ^ runtimeType.hashCode;
+}
+
+extension $UnprocessableContentExtension on UnprocessableContent {
+  UnprocessableContent copyWith({List<ContentErrorDetail>? detail}) {
+    return UnprocessableContent(detail: detail ?? this.detail);
+  }
+
+  UnprocessableContent copyWithWrapped(
+      {Wrapped<List<ContentErrorDetail>>? detail}) {
+    return UnprocessableContent(
+        detail: (detail != null ? detail.value : this.detail));
   }
 }
 
