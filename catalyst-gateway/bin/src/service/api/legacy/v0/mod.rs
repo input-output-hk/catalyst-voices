@@ -1,5 +1,9 @@
 //! `v0` Endpoints
-use poem_openapi::{param::Path, payload::Binary, OpenApi};
+use poem_openapi::{
+    param::Path,
+    payload::{Binary, Json},
+    OpenApi,
+};
 
 use crate::service::{
     common::tags::ApiTags, utilities::middleware::schema_validation::schema_version_validation,
@@ -79,17 +83,19 @@ impl V0Api {
     #[oai(
         path = "/proposals",
         method = "post",
-        operation_id = "CreateProposal",
+        operation_id = "GetProposalById",
         deprecated = true
     )]
-    async fn proposals_post(&self, message: Binary<Vec<u8>>) -> proposals_post::AllResponses {
+    async fn proposals_post(
+        &self, message: Json<Vec<proposals_post::dto::VotingHistoryItem>>,
+    ) -> proposals_post::AllResponses {
         proposals_post::endpoint(message.0).await
     }
 
     #[oai(
         path = "/proposals/:id",
         method = "get",
-        operation_id = "GetProposalById",
+        operation_id = "ShowProposalById",
         deprecated = true
     )]
     async fn proposal_by_id_get(&self, id: Path<String>) -> proposal_by_id_get::AllResponses {

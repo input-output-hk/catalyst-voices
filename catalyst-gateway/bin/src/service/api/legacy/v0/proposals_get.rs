@@ -32,5 +32,20 @@ pub(crate) mod dto {
         chain_voteplan_payload: String,
         chain_vote_options: HashMap<String, String>,
         proposal_public_key: String,
+        fund_id: String,
+        proposal_summary: String,
+        proposal_importance: String,
+        proposal_title: String,
+        proposal_goal: String,
+        proposal_url: String,
+        proposal_funds: u32,
+        reviews_count: u32,
+        proposal_impact_score: u32,
+        proposer: Option<Proposer>,
+    }
+
+    #[derive(Object, Default)]
+    pub(crate) struct Proposer {
+        proposer_name: String,
     }
 }
