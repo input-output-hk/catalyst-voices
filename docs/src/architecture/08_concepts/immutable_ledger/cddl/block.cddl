@@ -26,6 +26,6 @@ hash_bytes = (
 kid = hash_bytes ; hash of the x509/c509 certificate
 
 validator = (kid / [2* kid])
-metadata = [ *Any ]
+metadata = [ *any ]
 
 validator_signature = (bytes / [2* bytes])
