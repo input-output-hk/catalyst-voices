@@ -101,11 +101,11 @@ class _SegmentDetails extends StatelessWidget {
               return _StepDetails(
                 key: ValueKey('WorkspaceStep${step.id}TileKey'),
                 id: step.id,
-                name: step.title,
+                title: step.titleInDetails != null
+                    ? step.titleInDetails!
+                    : step.title,
                 desc: step.description,
-                doc: (step.documentJson != null)
-                    ? Document.fromJson(step.documentJson!.value)
-                    : null,
+                richTextParams: step.richTextParams,
                 isSelected: step.id == selected,
                 isEditable: step.isEditable,
               );
@@ -121,43 +121,48 @@ class _StepDetails extends StatelessWidget {
   const _StepDetails({
     super.key,
     required this.id,
-    required this.name,
+    required this.title,
     this.desc,
-    this.doc,
+    this.richTextParams,
     this.isSelected = false,
     this.isEditable = false,
   });
 
   final int id;
-  final String name;
+  final String title;
   final String? desc;
-  final Document? doc;
+  final RichTextParams? richTextParams;
   final bool isSelected;
   final bool isEditable;
 
   @override
   Widget build(BuildContext context) {
-    return (desc != null)
-        ? WorkspaceTextTileContainer(
-            name: name,
-            isSelected: isSelected,
-            headerActions: [
-              TextButton(
-                onPressed: isEditable ? () {} : null,
-                child: Text(
-                  context.l10n.stepEdit,
-                  style: Theme.of(context).textTheme.labelSmall,
-                ),
-              ),
-            ],
-            content: desc!,
-          )
-        : WorkspaceTileContainer(
-            isSelected: isSelected,
-            content: VoicesRichText(
-              title: name,
-              document: doc,
+    if (desc != null) {
+      return WorkspaceTextTileContainer(
+        name: title,
+        isSelected: isSelected,
+        headerActions: [
+          TextButton(
+            onPressed: isEditable ? () {} : null,
+            child: Text(
+              context.l10n.stepEdit,
+              style: Theme.of(context).textTheme.labelSmall,
             ),
-          );
+          ),
+        ],
+        content: desc!,
+      );
+    } else if (richTextParams != null) {
+      return WorkspaceTileContainer(
+        isSelected: isSelected,
+        content: VoicesRichText(
+          title: title,
+          document: Document.fromJson(richTextParams!.documentJson.value),
+          charsLimit: richTextParams!.charsLimit,
+        ),
+      );
+    } else {
+      return const SizedBox();
+    }
   }
 }
