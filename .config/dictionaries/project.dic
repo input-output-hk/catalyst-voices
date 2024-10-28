@@ -64,6 +64,7 @@ dbschema
 dbsync
 Deleg
 delegators
+devnet
 DIND
 dockerhub
 Dominik
@@ -271,6 +272,7 @@ unchunk
 Unlogged
 unmanaged
 Unstaked
+upskilling
 UTXO
 Utxos
 varint
@@ -287,6 +289,7 @@ wallclock
 wasmtime
 Wconditional
 Werror
+Wireframes
 Wmissing
 Wnullable
 Woverlength
@@ -301,3 +304,15 @@ xcworkspace
 xvfb
 yoroi
 Pbkdf2
+Embedder
+Podspec
+podspec
+ARCHS
+iphonesimulator
+cargokit
+SRCROOT
+libcatalyst
+staticlib
+addrof
+Lifetimeable
+cbindgen
