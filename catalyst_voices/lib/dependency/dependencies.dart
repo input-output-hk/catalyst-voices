@@ -76,18 +76,18 @@ final class Dependencies extends DependencyProvider {
       RegistrationProgressNotifier.new,
     );
     registerLazySingleton<RegistrationService>(() {
-      return RegistrationServiceImpl(
-        get<TransactionConfigRepository>(),
-        get<KeychainProvider>(),
-        get<CatalystCardano>(),
-        get<KeyDerivation>(),
+      return RegistrationService(
+        transactionConfigRepository: get<TransactionConfigRepository>(),
+        keychainProvider: get<KeychainProvider>(),
+        cardano: get<CatalystCardano>(),
+        keyDerivation: get<KeyDerivation>(),
       );
     });
     registerLazySingleton<UserService>(
       () {
-        return UserServiceImpl(
-          get<KeychainProvider>(),
-          get<UserStorage>(),
+        return UserService(
+          keychainProvider: get<KeychainProvider>(),
+          userStorage: get<UserStorage>(),
         );
       },
       dispose: (service) => unawaited(service.dispose()),
