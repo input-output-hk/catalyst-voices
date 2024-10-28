@@ -73,11 +73,11 @@ overrides:
       owasp:api4:2023-string-restricted: error
       owasp:api3:2023-no-additionalProperties: error
       owasp:api3:2023-constrained-additionalProperties: error
+      owasp:api2:2023-read-restricted: error
       # Not enforced at OpenAPI level.  Production URL's will always be https.
       owasp:api8:2023-no-server-http: off
       # Can't add custom properties to server list.
       owasp:api9:2023-inventory-access: off
-
 
   # Legacy Endpoints that have strange unioned properties.
   # These can not be documented
@@ -121,21 +121,6 @@ overrides:
     rules:
       owasp:api4:2023-string-limit: off
       owasp:api4:2023-string-restricted: off
-
-  # Disable security details from legacy endpoints
-  # This override can ONLY be used by legacy endpoints.
-  - files:
-      - "**#/paths/~1api~1v1~1registration~1voter~1%7Bvoting_key%7D/get"
-      - "**#/paths/~1api~1v0~1message"
-      - "**#/paths/~1api~1v0~1vote~1active~1plans"
-      - "**#/paths/~1api~1v1~1votes~1plan~1account-votes~1%7Baccount_id%7D/get"
-      - "**#/paths/~1api~1v1~1fragments~1statuses"
-      - "**#/paths/~1api~1v1~1fragments/post"
-    rules:
-      owasp:api2:2023-read-restricted: off
-      owasp:api8:2023-define-error-responses-401: off
-      owasp:api8:2023-define-error-validation: off
-      owasp:api2:2023-write-restricted: off
 
 rules:
   # A version of owasp:api4:2019-string-limit which accepts `format` without length as defining a string limit.

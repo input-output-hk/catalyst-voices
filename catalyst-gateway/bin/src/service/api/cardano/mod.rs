@@ -87,6 +87,8 @@ impl CardanoApi {
         // TODO(bkioshn): https://github.com/input-output-hk/catalyst-voices/issues/239
         #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
         slot_number: Query<Option<SlotNumber>>,
+        /// No Authorization required, but Token permitted.
+        _auth: NoneOrRBAC,
     ) -> registration_get::AllResponses {
         registration_get::endpoint(stake_address.0, network.0, slot_number.0).await
     }
@@ -108,6 +110,8 @@ impl CardanoApi {
         /// `testnet`, to specify `preprod` or `preview` network type use this
         /// query parameter.
         network: Query<Option<Network>>,
+        /// No Authorization required, but Token permitted.
+        _auth: NoneOrRBAC,
     ) -> sync_state_get::AllResponses {
         sync_state_get::endpoint(network.0).await
     }
@@ -133,6 +137,8 @@ impl CardanoApi {
         /// `testnet`, to specify `preprod` or `preview` network type use this
         /// query parameter.
         network: Query<Option<Network>>,
+        /// No Authorization required, but Token permitted.
+        _auth: NoneOrRBAC,
     ) -> date_time_to_slot_number_get::AllResponses {
         date_time_to_slot_number_get::endpoint(date_time.0, network.0).await
     }
@@ -150,6 +156,8 @@ impl CardanoApi {
         /// Stake Address to find the latest registration for.
         #[oai(validator(max_length = 66, min_length = 0, pattern = "[0-9a-f]"))]
         stake_addr: Query<String>,
+        /// No Authorization required, but Token permitted.
+        _auth: NoneOrRBAC,
     ) -> cip36::SingleRegistrationResponse {
         cip36::get_latest_registration_from_stake_addr(stake_addr.0, true).await
     }
@@ -167,6 +175,8 @@ impl CardanoApi {
         /// Stake Key Hash to find the latest registration for.
         #[oai(validator(max_length = 66, min_length = 0, pattern = "[0-9a-f]"))]
         stake_key_hash: Query<String>,
+        /// No Authorization required, but Token permitted.
+        _auth: NoneOrRBAC,
     ) -> cip36::SingleRegistrationResponse {
         cip36::get_latest_registration_from_stake_key_hash(stake_key_hash.0, true).await
     }
@@ -185,6 +195,8 @@ impl CardanoApi {
         /// Voting Key to find CIP36 registrations for.
         #[oai(validator(max_length = 66, min_length = 0, pattern = "[0-9a-f]"))]
         vote_key: Query<String>,
+        /// No Authorization required, but Token permitted.
+        _auth: NoneOrRBAC,
     ) -> cip36::MultipleRegistrationResponse {
         cip36::get_associated_vote_key_registrations(vote_key.0, true).await
     }
