@@ -1,4 +1,6 @@
-//! Retry After type
+//! Retry After header type
+//!
+//! This is an active header which expects to be provided in a response.
 
 use std::{borrow::Cow, fmt::Display};
 

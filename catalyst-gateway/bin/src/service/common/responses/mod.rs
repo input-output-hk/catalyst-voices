@@ -18,12 +18,12 @@ use tracing::error;
 mod code_429_too_many_requests;
 pub(crate) mod code_500_internal_server_error;
 mod code_503_service_unavailable;
-pub(crate) mod types;
 
 use code_500_internal_server_error::InternalServerError;
-use types::{
+
+use super::types::headers::{
+    access_control_allow_origin::AccessControlAllowOriginHeader, ratelimit::RateLimitHeader,
     retry_after::RetryAfterHeader,
-    string_types::{AccessControlAllowOriginHeader, RateLimitHeader},
 };
 
 /// Default error responses

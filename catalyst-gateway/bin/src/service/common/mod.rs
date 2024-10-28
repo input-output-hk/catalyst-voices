@@ -3,3 +3,4 @@
 pub(crate) mod objects;
 pub(crate) mod responses;
 pub(crate) mod tags;
+pub(crate) mod types;

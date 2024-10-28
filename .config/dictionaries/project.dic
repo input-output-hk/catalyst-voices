@@ -206,6 +206,7 @@ pubspec
 pytest
 qrcode
 rapidoc
+ratelimit
 redoc
 reloadable
 Replayability

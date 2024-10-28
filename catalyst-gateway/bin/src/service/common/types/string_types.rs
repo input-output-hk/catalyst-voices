@@ -3,18 +3,34 @@
 //! This code comes from Poem, but it is not exported by Poem, so replicated here.
 //!
 //! Original Source: <https://raw.githubusercontent.com/poem-web/poem/refs/heads/master/poem-openapi/src/types/string_types.rs>
-use std::{
-    borrow::Cow,
-    ops::{Deref, DerefMut},
-};
-
-use poem_openapi::{
-    registry::{MetaSchema, MetaSchemaRef},
-    types::{ParseError, ParseFromJSON, ParseFromParameter, ParseResult, ToJSON, Type},
-};
-use serde_json::Value;
 
 /// Macro to make creating validated and documented string types much easier.
+///
+/// ## Parameters
+///
+/// * `$ty` - The Type name to create. Example `MyNewType`.
+/// * `$type_name` - The `OpenAPI` name for the type. Almost always going to be `string`.
+/// * `$format` - The `OpenAPI` format for the type. Where possible use a defined
+///   `OpenAPI` or `JsonSchema` format.
+/// * `$schema` - A Poem `MetaSchema` which defines all the schema parameters for the
+///   type.
+/// * `$validation` - *OPTIONAL* Validation function to apply to the string value.
+///
+///
+/// ## Example
+///
+/// ```ignore
+/// impl_string_types!(MyNewType, "string", "date", MyNewTypeSchema, SomeValidationFunction);
+/// ```
+///
+/// Is the equivalent of:
+///
+/// ```ignore
+/// #[derive(Debug, Clone, Eq, PartialEq, Hash)]
+/// pub(crate) struct MyNewType(pub String);
+///
+/// impl <stuff> for MyNewType { ... }
+/// ```
 macro_rules! impl_string_types {
     ($(#[$docs:meta])* $ty:ident, $type_name:literal, $format:literal, $schema:expr ) => {
         impl_string_types!($(#[$docs])* $ty, $type_name, $format, $schema, |_| true);
@@ -23,7 +39,7 @@ macro_rules! impl_string_types {
     ($(#[$docs:meta])* $ty:ident, $type_name:literal, $format:literal, $schema:expr, $validator:expr) => {
         $(#[$docs])*
         #[derive(Debug, Clone, Eq, PartialEq, Hash)]
-        pub struct $ty(pub String);
+        pub(crate) struct $ty(pub String);
 
         impl Deref for $ty {
             type Target = String;
@@ -113,52 +129,4 @@ macro_rules! impl_string_types {
         }
     };
 }
-
-// Note: Docs don't get applied to ExtraHeaders, only headers specifically defined for a
-// response/request.
-
-// Access-Control-Allow-Origin Header String Type
-impl_string_types!(
-    /// Indicates whether the response can be shared with requesting code from the given origin.
-    ///
-    /// Valid formats:
-    ///
-    /// * `Access-Control-Allow-Origin: *`
-    /// * `Access-Control-Allow-Origin: <origin>`
-    /// * `Access-Control-Allow-Origin: null`
-    ///
-    /// See: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin>
-    AccessControlAllowOriginHeader,
-    "string",
-    "origin",
-    Some(MetaSchema {
-        title: Some("Access-Control-Allow-Origin Header".to_owned()),
-        description: Some("Valid formats:
-
-* `Access-Control-Allow-Origin: *`
-* `Access-Control-Allow-Origin: <origin>`
-* `Access-Control-Allow-Origin: null`
-
-See: <https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Origin>"),
-        example: Some(Value::String("*".to_string())),
-        ..poem_openapi::registry::MetaSchema::ANY
-    })
-);
-
-// RateLimit Header String Type
-impl_string_types!(
-    /// Indicates how the request rate should be limited by the caller.
-    ///
-    /// See: <https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/>
-    RateLimitHeader,
-    "string",
-    "rate-limit",
-    Some(MetaSchema {
-        title: Some("RateLimit Header".to_owned()),
-        description: Some("Indicates how the request rate should be limited by the caller.
-
-See: <https://datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers/>"),
-        example: Some(Value::String("\"default\";q=100;w=10".to_string())),
-        ..poem_openapi::registry::MetaSchema::ANY
-    })
-);
+pub(crate) use impl_string_types;
