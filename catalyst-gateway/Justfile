@@ -34,7 +34,7 @@ pre-push: sync-cfg code-format code-lint license-check
     # Make sure we can actually build inside Earthly which needs to happen in CI.
     cd .. && earthly ./catalyst-gateway+check
     cd .. && earthly ./catalyst-gateway+build
-    cd .. && earthly ./catalyst-gateway+package-cat-gateway
+    cd .. && earthly ./catalyst-gateway+package
     cd .. && earthly ./catalyst-gateway/tests+test-lint-openapi
 
 # Build Local release build of catalyst gateway

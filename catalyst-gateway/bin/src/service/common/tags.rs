@@ -4,19 +4,14 @@ use poem_openapi::Tags;
 /// `OpenAPI` Tags
 #[derive(Tags)]
 pub(crate) enum ApiTags {
-    /// Fragment endpoints
-    Fragments,
-    /// Health Endpoints
+    /// Service Health and Readiness.
     Health,
-    /// Cardano Endpoints
+    /// General Cardano Blockchain Information.
     Cardano,
-    /// Information relating to Voter Registration, Delegations and Calculated Voting
-    /// Power.
+    /// Registration and Role Based Access Control (RBAC) Operations.
     Registration,
-    /// API Version 0 Endpoints
-    V0,
-    /// API Version 1 Endpoints
-    V1,
-    /// Config
+    /// Service Configuration and Status.
     Config,
+    /// Legacy Mobile App Support.
+    Legacy,
 }

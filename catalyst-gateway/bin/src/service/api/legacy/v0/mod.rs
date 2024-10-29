@@ -21,7 +21,7 @@ mod settings_get;
 /// `v0` API Endpoints
 pub(crate) struct V0Api;
 
-#[OpenApi(prefix_path = "/v0", tag = "ApiTags::V0")]
+#[OpenApi(prefix_path = "/v0", tag = "ApiTags::Legacy")]
 impl V0Api {
     /// Posts a signed transaction.
     ///

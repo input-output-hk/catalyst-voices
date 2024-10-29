@@ -4,7 +4,7 @@ use tracing::debug;
 
 use crate::{db::event::EventDB, logger, service::common::responses::WithErrorResponses};
 
-/// `LogLevel` Open API definition.
+/// Set of all log levels which can be selected.
 #[derive(Debug, Clone, Copy, Enum)]
 #[oai(rename_all = "lowercase")]
 pub(crate) enum LogLevel {
@@ -29,7 +29,7 @@ impl From<LogLevel> for logger::LogLevel {
     }
 }
 
-/// `DeepQueryInspectionFlag` Open API definition.
+/// Enable or Disable Deep Database Query Inspection.
 #[derive(Debug, Clone, Copy, Enum)]
 #[oai(rename_all = "lowercase")]
 pub(crate) enum DeepQueryInspectionFlag {

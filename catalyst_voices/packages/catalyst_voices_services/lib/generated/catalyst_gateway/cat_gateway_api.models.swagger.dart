@@ -63,66 +63,6 @@ extension $AccountVoteExtension on AccountVote {
 }
 
 @JsonSerializable(explicitToJson: true)
-class BadRequestError {
-  const BadRequestError({
-    required this.error,
-    this.schemaValidationErrors,
-  });
-
-  factory BadRequestError.fromJson(Map<String, dynamic> json) =>
-      _$BadRequestErrorFromJson(json);
-
-  static const toJsonFactory = _$BadRequestErrorToJson;
-  Map<String, dynamic> toJson() => _$BadRequestErrorToJson(this);
-
-  @JsonKey(name: 'error')
-  final String error;
-  @JsonKey(name: 'schema_validation_errors', defaultValue: <String>[])
-  final List<String>? schemaValidationErrors;
-  static const fromJsonFactory = _$BadRequestErrorFromJson;
-
-  @override
-  bool operator ==(Object other) {
-    return identical(this, other) ||
-        (other is BadRequestError &&
-            (identical(other.error, error) ||
-                const DeepCollectionEquality().equals(other.error, error)) &&
-            (identical(other.schemaValidationErrors, schemaValidationErrors) ||
-                const DeepCollectionEquality().equals(
-                    other.schemaValidationErrors, schemaValidationErrors)));
-  }
-
-  @override
-  String toString() => jsonEncode(this);
-
-  @override
-  int get hashCode =>
-      const DeepCollectionEquality().hash(error) ^
-      const DeepCollectionEquality().hash(schemaValidationErrors) ^
-      runtimeType.hashCode;
-}
-
-extension $BadRequestErrorExtension on BadRequestError {
-  BadRequestError copyWith(
-      {String? error, List<String>? schemaValidationErrors}) {
-    return BadRequestError(
-        error: error ?? this.error,
-        schemaValidationErrors:
-            schemaValidationErrors ?? this.schemaValidationErrors);
-  }
-
-  BadRequestError copyWithWrapped(
-      {Wrapped<String>? error,
-      Wrapped<List<String>?>? schemaValidationErrors}) {
-    return BadRequestError(
-        error: (error != null ? error.value : this.error),
-        schemaValidationErrors: (schemaValidationErrors != null
-            ? schemaValidationErrors.value
-            : this.schemaValidationErrors));
-  }
-}
-
-@JsonSerializable(explicitToJson: true)
 class BlockDate {
   const BlockDate({
     required this.epoch,
@@ -397,6 +337,128 @@ extension $Cip36ReportingListExtension on Cip36ReportingList {
 }
 
 @JsonSerializable(explicitToJson: true)
+class ConfigBadRequest {
+  const ConfigBadRequest({
+    required this.error,
+    this.schemaValidationErrors,
+  });
+
+  factory ConfigBadRequest.fromJson(Map<String, dynamic> json) =>
+      _$ConfigBadRequestFromJson(json);
+
+  static const toJsonFactory = _$ConfigBadRequestToJson;
+  Map<String, dynamic> toJson() => _$ConfigBadRequestToJson(this);
+
+  @JsonKey(name: 'error')
+  final String error;
+  @JsonKey(name: 'schema_validation_errors', defaultValue: <String>[])
+  final List<String>? schemaValidationErrors;
+  static const fromJsonFactory = _$ConfigBadRequestFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is ConfigBadRequest &&
+            (identical(other.error, error) ||
+                const DeepCollectionEquality().equals(other.error, error)) &&
+            (identical(other.schemaValidationErrors, schemaValidationErrors) ||
+                const DeepCollectionEquality().equals(
+                    other.schemaValidationErrors, schemaValidationErrors)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(error) ^
+      const DeepCollectionEquality().hash(schemaValidationErrors) ^
+      runtimeType.hashCode;
+}
+
+extension $ConfigBadRequestExtension on ConfigBadRequest {
+  ConfigBadRequest copyWith(
+      {String? error, List<String>? schemaValidationErrors}) {
+    return ConfigBadRequest(
+        error: error ?? this.error,
+        schemaValidationErrors:
+            schemaValidationErrors ?? this.schemaValidationErrors);
+  }
+
+  ConfigBadRequest copyWithWrapped(
+      {Wrapped<String>? error,
+      Wrapped<List<String>?>? schemaValidationErrors}) {
+    return ConfigBadRequest(
+        error: (error != null ? error.value : this.error),
+        schemaValidationErrors: (schemaValidationErrors != null
+            ? schemaValidationErrors.value
+            : this.schemaValidationErrors));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class ContentErrorDetail {
+  const ContentErrorDetail({
+    this.loc,
+    this.msg,
+    this.type,
+  });
+
+  factory ContentErrorDetail.fromJson(Map<String, dynamic> json) =>
+      _$ContentErrorDetailFromJson(json);
+
+  static const toJsonFactory = _$ContentErrorDetailToJson;
+  Map<String, dynamic> toJson() => _$ContentErrorDetailToJson(this);
+
+  @JsonKey(name: 'loc', defaultValue: <String>[])
+  final List<String>? loc;
+  @JsonKey(name: 'msg')
+  final String? msg;
+  @JsonKey(name: 'type')
+  final String? type;
+  static const fromJsonFactory = _$ContentErrorDetailFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is ContentErrorDetail &&
+            (identical(other.loc, loc) ||
+                const DeepCollectionEquality().equals(other.loc, loc)) &&
+            (identical(other.msg, msg) ||
+                const DeepCollectionEquality().equals(other.msg, msg)) &&
+            (identical(other.type, type) ||
+                const DeepCollectionEquality().equals(other.type, type)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(loc) ^
+      const DeepCollectionEquality().hash(msg) ^
+      const DeepCollectionEquality().hash(type) ^
+      runtimeType.hashCode;
+}
+
+extension $ContentErrorDetailExtension on ContentErrorDetail {
+  ContentErrorDetail copyWith({List<String>? loc, String? msg, String? type}) {
+    return ContentErrorDetail(
+        loc: loc ?? this.loc, msg: msg ?? this.msg, type: type ?? this.type);
+  }
+
+  ContentErrorDetail copyWithWrapped(
+      {Wrapped<List<String>?>? loc,
+      Wrapped<String?>? msg,
+      Wrapped<String?>? type}) {
+    return ContentErrorDetail(
+        loc: (loc != null ? loc.value : this.loc),
+        msg: (msg != null ? msg.value : this.msg),
+        type: (type != null ? type.value : this.type));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
 class DelegatePublicKey {
   const DelegatePublicKey({
     required this.address,
@@ -583,6 +645,71 @@ extension $DirectVoterExtension on DirectVoter {
 }
 
 @JsonSerializable(explicitToJson: true)
+class Forbidden {
+  const Forbidden({
+    required this.id,
+    required this.msg,
+    this.required,
+  });
+
+  factory Forbidden.fromJson(Map<String, dynamic> json) =>
+      _$ForbiddenFromJson(json);
+
+  static const toJsonFactory = _$ForbiddenToJson;
+  Map<String, dynamic> toJson() => _$ForbiddenToJson(this);
+
+  @JsonKey(name: 'id')
+  final String id;
+  @JsonKey(name: 'msg')
+  final String msg;
+  @JsonKey(name: 'required', defaultValue: <String>[])
+  final List<String>? required;
+  static const fromJsonFactory = _$ForbiddenFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is Forbidden &&
+            (identical(other.id, id) ||
+                const DeepCollectionEquality().equals(other.id, id)) &&
+            (identical(other.msg, msg) ||
+                const DeepCollectionEquality().equals(other.msg, msg)) &&
+            (identical(other.required, required) ||
+                const DeepCollectionEquality()
+                    .equals(other.required, required)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(id) ^
+      const DeepCollectionEquality().hash(msg) ^
+      const DeepCollectionEquality().hash(required) ^
+      runtimeType.hashCode;
+}
+
+extension $ForbiddenExtension on Forbidden {
+  Forbidden copyWith({String? id, String? msg, List<String>? required}) {
+    return Forbidden(
+        id: id ?? this.id,
+        msg: msg ?? this.msg,
+        required: required ?? this.required);
+  }
+
+  Forbidden copyWithWrapped(
+      {Wrapped<String>? id,
+      Wrapped<String>? msg,
+      Wrapped<List<String>?>? required}) {
+    return Forbidden(
+        id: (id != null ? id.value : this.id),
+        msg: (msg != null ? msg.value : this.msg),
+        required: (required != null ? required.value : this.required));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
 class FragmentStatus {
   const FragmentStatus();
 
@@ -716,6 +843,49 @@ extension $FragmentsProcessingSummaryExtension on FragmentsProcessingSummary {
 }
 
 @JsonSerializable(explicitToJson: true)
+class FrontendConfig {
+  const FrontendConfig({
+    this.sentry,
+  });
+
+  factory FrontendConfig.fromJson(Map<String, dynamic> json) =>
+      _$FrontendConfigFromJson(json);
+
+  static const toJsonFactory = _$FrontendConfigToJson;
+  Map<String, dynamic> toJson() => _$FrontendConfigToJson(this);
+
+  @JsonKey(name: 'sentry')
+  final Sentry? sentry;
+  static const fromJsonFactory = _$FrontendConfigFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is FrontendConfig &&
+            (identical(other.sentry, sentry) ||
+                const DeepCollectionEquality().equals(other.sentry, sentry)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(sentry) ^ runtimeType.hashCode;
+}
+
+extension $FrontendConfigExtension on FrontendConfig {
+  FrontendConfig copyWith({Sentry? sentry}) {
+    return FrontendConfig(sentry: sentry ?? this.sentry);
+  }
+
+  FrontendConfig copyWithWrapped({Wrapped<Sentry?>? sentry}) {
+    return FrontendConfig(
+        sentry: (sentry != null ? sentry.value : this.sentry));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
 class FullStakeInfo {
   const FullStakeInfo({
     required this.volatile,
@@ -809,6 +979,66 @@ extension $HashExtension on Hash {
 
   Hash copyWithWrapped({Wrapped<String>? hash}) {
     return Hash(hash: (hash != null ? hash.value : this.hash));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class InternalServerError {
+  const InternalServerError({
+    required this.id,
+    required this.msg,
+    this.issue,
+  });
+
+  factory InternalServerError.fromJson(Map<String, dynamic> json) =>
+      _$InternalServerErrorFromJson(json);
+
+  static const toJsonFactory = _$InternalServerErrorToJson;
+  Map<String, dynamic> toJson() => _$InternalServerErrorToJson(this);
+
+  @JsonKey(name: 'id')
+  final String id;
+  @JsonKey(name: 'msg')
+  final String msg;
+  @JsonKey(name: 'issue')
+  final String? issue;
+  static const fromJsonFactory = _$InternalServerErrorFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is InternalServerError &&
+            (identical(other.id, id) ||
+                const DeepCollectionEquality().equals(other.id, id)) &&
+            (identical(other.msg, msg) ||
+                const DeepCollectionEquality().equals(other.msg, msg)) &&
+            (identical(other.issue, issue) ||
+                const DeepCollectionEquality().equals(other.issue, issue)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(id) ^
+      const DeepCollectionEquality().hash(msg) ^
+      const DeepCollectionEquality().hash(issue) ^
+      runtimeType.hashCode;
+}
+
+extension $InternalServerErrorExtension on InternalServerError {
+  InternalServerError copyWith({String? id, String? msg, String? issue}) {
+    return InternalServerError(
+        id: id ?? this.id, msg: msg ?? this.msg, issue: issue ?? this.issue);
+  }
+
+  InternalServerError copyWithWrapped(
+      {Wrapped<String>? id, Wrapped<String>? msg, Wrapped<String?>? issue}) {
+    return InternalServerError(
+        id: (id != null ? id.value : this.id),
+        msg: (msg != null ? msg.value : this.msg),
+        issue: (issue != null ? issue.value : this.issue));
   }
 }
 
@@ -1070,37 +1300,98 @@ extension $RejectedFragmentExtension on RejectedFragment {
 }
 
 @JsonSerializable(explicitToJson: true)
-class ServerError {
-  const ServerError({
-    required this.id,
-    required this.msg,
-    this.issue,
+class Sentry {
+  const Sentry({
+    required this.dsn,
+    this.release,
+    this.environment,
   });
 
-  factory ServerError.fromJson(Map<String, dynamic> json) =>
-      _$ServerErrorFromJson(json);
+  factory Sentry.fromJson(Map<String, dynamic> json) => _$SentryFromJson(json);
 
-  static const toJsonFactory = _$ServerErrorToJson;
-  Map<String, dynamic> toJson() => _$ServerErrorToJson(this);
+  static const toJsonFactory = _$SentryToJson;
+  Map<String, dynamic> toJson() => _$SentryToJson(this);
+
+  @JsonKey(name: 'dsn')
+  final String dsn;
+  @JsonKey(name: 'release')
+  final String? release;
+  @JsonKey(name: 'environment')
+  final String? environment;
+  static const fromJsonFactory = _$SentryFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is Sentry &&
+            (identical(other.dsn, dsn) ||
+                const DeepCollectionEquality().equals(other.dsn, dsn)) &&
+            (identical(other.release, release) ||
+                const DeepCollectionEquality()
+                    .equals(other.release, release)) &&
+            (identical(other.environment, environment) ||
+                const DeepCollectionEquality()
+                    .equals(other.environment, environment)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(dsn) ^
+      const DeepCollectionEquality().hash(release) ^
+      const DeepCollectionEquality().hash(environment) ^
+      runtimeType.hashCode;
+}
+
+extension $SentryExtension on Sentry {
+  Sentry copyWith({String? dsn, String? release, String? environment}) {
+    return Sentry(
+        dsn: dsn ?? this.dsn,
+        release: release ?? this.release,
+        environment: environment ?? this.environment);
+  }
+
+  Sentry copyWithWrapped(
+      {Wrapped<String>? dsn,
+      Wrapped<String?>? release,
+      Wrapped<String?>? environment}) {
+    return Sentry(
+        dsn: (dsn != null ? dsn.value : this.dsn),
+        release: (release != null ? release.value : this.release),
+        environment:
+            (environment != null ? environment.value : this.environment));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class ServiceUnavailable {
+  const ServiceUnavailable({
+    required this.id,
+    required this.msg,
+  });
+
+  factory ServiceUnavailable.fromJson(Map<String, dynamic> json) =>
+      _$ServiceUnavailableFromJson(json);
+
+  static const toJsonFactory = _$ServiceUnavailableToJson;
+  Map<String, dynamic> toJson() => _$ServiceUnavailableToJson(this);
 
   @JsonKey(name: 'id')
   final String id;
   @JsonKey(name: 'msg')
   final String msg;
-  @JsonKey(name: 'issue')
-  final String? issue;
-  static const fromJsonFactory = _$ServerErrorFromJson;
+  static const fromJsonFactory = _$ServiceUnavailableFromJson;
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other is ServerError &&
+        (other is ServiceUnavailable &&
             (identical(other.id, id) ||
                 const DeepCollectionEquality().equals(other.id, id)) &&
             (identical(other.msg, msg) ||
-                const DeepCollectionEquality().equals(other.msg, msg)) &&
-            (identical(other.issue, issue) ||
-                const DeepCollectionEquality().equals(other.issue, issue)));
+                const DeepCollectionEquality().equals(other.msg, msg)));
   }
 
   @override
@@ -1110,22 +1401,19 @@ class ServerError {
   int get hashCode =>
       const DeepCollectionEquality().hash(id) ^
       const DeepCollectionEquality().hash(msg) ^
-      const DeepCollectionEquality().hash(issue) ^
       runtimeType.hashCode;
 }
 
-extension $ServerErrorExtension on ServerError {
-  ServerError copyWith({String? id, String? msg, String? issue}) {
-    return ServerError(
-        id: id ?? this.id, msg: msg ?? this.msg, issue: issue ?? this.issue);
+extension $ServiceUnavailableExtension on ServiceUnavailable {
+  ServiceUnavailable copyWith({String? id, String? msg}) {
+    return ServiceUnavailable(id: id ?? this.id, msg: msg ?? this.msg);
   }
 
-  ServerError copyWithWrapped(
-      {Wrapped<String>? id, Wrapped<String>? msg, Wrapped<String?>? issue}) {
-    return ServerError(
+  ServiceUnavailable copyWithWrapped(
+      {Wrapped<String>? id, Wrapped<String>? msg}) {
+    return ServiceUnavailable(
         id: (id != null ? id.value : this.id),
-        msg: (msg != null ? msg.value : this.msg),
-        issue: (issue != null ? issue.value : this.issue));
+        msg: (msg != null ? msg.value : this.msg));
   }
 }
 
@@ -1583,27 +1871,32 @@ extension $SyncStateExtension on SyncState {
 }
 
 @JsonSerializable(explicitToJson: true)
-class ValidationError {
-  const ValidationError({
-    required this.message,
+class TooManyRequests {
+  const TooManyRequests({
+    required this.id,
+    required this.msg,
   });
 
-  factory ValidationError.fromJson(Map<String, dynamic> json) =>
-      _$ValidationErrorFromJson(json);
+  factory TooManyRequests.fromJson(Map<String, dynamic> json) =>
+      _$TooManyRequestsFromJson(json);
 
-  static const toJsonFactory = _$ValidationErrorToJson;
-  Map<String, dynamic> toJson() => _$ValidationErrorToJson(this);
+  static const toJsonFactory = _$TooManyRequestsToJson;
+  Map<String, dynamic> toJson() => _$TooManyRequestsToJson(this);
 
-  @JsonKey(name: 'message')
-  final String message;
-  static const fromJsonFactory = _$ValidationErrorFromJson;
+  @JsonKey(name: 'id')
+  final String id;
+  @JsonKey(name: 'msg')
+  final String msg;
+  static const fromJsonFactory = _$TooManyRequestsFromJson;
 
   @override
   bool operator ==(Object other) {
     return identical(this, other) ||
-        (other is ValidationError &&
-            (identical(other.message, message) ||
-                const DeepCollectionEquality().equals(other.message, message)));
+        (other is TooManyRequests &&
+            (identical(other.id, id) ||
+                const DeepCollectionEquality().equals(other.id, id)) &&
+            (identical(other.msg, msg) ||
+                const DeepCollectionEquality().equals(other.msg, msg)));
   }
 
   @override
@@ -1611,17 +1904,115 @@ class ValidationError {
 
   @override
   int get hashCode =>
-      const DeepCollectionEquality().hash(message) ^ runtimeType.hashCode;
+      const DeepCollectionEquality().hash(id) ^
+      const DeepCollectionEquality().hash(msg) ^
+      runtimeType.hashCode;
 }
 
-extension $ValidationErrorExtension on ValidationError {
-  ValidationError copyWith({String? message}) {
-    return ValidationError(message: message ?? this.message);
+extension $TooManyRequestsExtension on TooManyRequests {
+  TooManyRequests copyWith({String? id, String? msg}) {
+    return TooManyRequests(id: id ?? this.id, msg: msg ?? this.msg);
   }
 
-  ValidationError copyWithWrapped({Wrapped<String>? message}) {
-    return ValidationError(
-        message: (message != null ? message.value : this.message));
+  TooManyRequests copyWithWrapped({Wrapped<String>? id, Wrapped<String>? msg}) {
+    return TooManyRequests(
+        id: (id != null ? id.value : this.id),
+        msg: (msg != null ? msg.value : this.msg));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class Unauthorized {
+  const Unauthorized({
+    required this.id,
+    required this.msg,
+  });
+
+  factory Unauthorized.fromJson(Map<String, dynamic> json) =>
+      _$UnauthorizedFromJson(json);
+
+  static const toJsonFactory = _$UnauthorizedToJson;
+  Map<String, dynamic> toJson() => _$UnauthorizedToJson(this);
+
+  @JsonKey(name: 'id')
+  final String id;
+  @JsonKey(name: 'msg')
+  final String msg;
+  static const fromJsonFactory = _$UnauthorizedFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is Unauthorized &&
+            (identical(other.id, id) ||
+                const DeepCollectionEquality().equals(other.id, id)) &&
+            (identical(other.msg, msg) ||
+                const DeepCollectionEquality().equals(other.msg, msg)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(id) ^
+      const DeepCollectionEquality().hash(msg) ^
+      runtimeType.hashCode;
+}
+
+extension $UnauthorizedExtension on Unauthorized {
+  Unauthorized copyWith({String? id, String? msg}) {
+    return Unauthorized(id: id ?? this.id, msg: msg ?? this.msg);
+  }
+
+  Unauthorized copyWithWrapped({Wrapped<String>? id, Wrapped<String>? msg}) {
+    return Unauthorized(
+        id: (id != null ? id.value : this.id),
+        msg: (msg != null ? msg.value : this.msg));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class UnprocessableContent {
+  const UnprocessableContent({
+    required this.detail,
+  });
+
+  factory UnprocessableContent.fromJson(Map<String, dynamic> json) =>
+      _$UnprocessableContentFromJson(json);
+
+  static const toJsonFactory = _$UnprocessableContentToJson;
+  Map<String, dynamic> toJson() => _$UnprocessableContentToJson(this);
+
+  @JsonKey(name: 'detail', defaultValue: <ContentErrorDetail>[])
+  final List<ContentErrorDetail> detail;
+  static const fromJsonFactory = _$UnprocessableContentFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is UnprocessableContent &&
+            (identical(other.detail, detail) ||
+                const DeepCollectionEquality().equals(other.detail, detail)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(detail) ^ runtimeType.hashCode;
+}
+
+extension $UnprocessableContentExtension on UnprocessableContent {
+  UnprocessableContent copyWith({List<ContentErrorDetail>? detail}) {
+    return UnprocessableContent(detail: detail ?? this.detail);
+  }
+
+  UnprocessableContent copyWithWrapped(
+      {Wrapped<List<ContentErrorDetail>>? detail}) {
+    return UnprocessableContent(
+        detail: (detail != null ? detail.value : this.detail));
   }
 }
 

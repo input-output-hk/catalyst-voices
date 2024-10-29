@@ -15,6 +15,7 @@ impl Example for FragmentId {
         Self("0x7db6f91f3c92c0aef7b3dd497e9ea275229d2ab4dba6a1b30ce6b32db9c9c3b2".into())
     }
 }
+
 #[derive(Enum)]
 /// The reason for which a fragment was rejected.
 pub(crate) enum ReasonRejected {

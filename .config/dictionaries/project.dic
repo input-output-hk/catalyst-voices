@@ -181,6 +181,7 @@ oneshot
 openapi
 opentelemetry
 overprovisioned
+Pbkdf2
 pbxproj
 Pdart
 permissionless
@@ -205,6 +206,7 @@ pubspec
 pytest
 qrcode
 rapidoc
+ratelimit
 redoc
 reloadable
 Replayability
@@ -316,3 +318,4 @@ staticlib
 addrof
 Lifetimeable
 cbindgen
+mocktail
