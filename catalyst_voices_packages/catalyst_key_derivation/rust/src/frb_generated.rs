@@ -67,14 +67,14 @@ fn wire__crate__api__key_derivation__derive_xprivate_key_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_xprivate_key = <[u8; 96]>::sse_decode(&mut deserializer);
+            let api_xprivate_key_bytes = <[u8; 96]>::sse_decode(&mut deserializer);
             let api_path = <String>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| {
                 transform_result_sse::<_, flutter_rust_bridge::for_generated::anyhow::Error>(
                     (move || {
                         let output_ok = crate::api::key_derivation::derive_xprivate_key(
-                            api_xprivate_key,
+                            api_xprivate_key_bytes,
                             api_path,
                         )?;
                         Ok(output_ok)

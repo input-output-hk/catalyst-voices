@@ -35,7 +35,7 @@ Future<U8Array96> mnemonicToXprv(
 ///
 /// # Arguments
 ///
-/// - `xprivate_key`: An extended private key of type `XPrv`.
+/// - `xprivate_key_bytes`: An extended private key of type `XPrvBytes`.
 /// - `path`: Derivation path. eg. m/0/2'/3 where ' represents hardened derivation.
 ///
 /// # Returns
@@ -44,9 +44,9 @@ Future<U8Array96> mnemonicToXprv(
 /// If the derivation path is successful, it returns `Ok` with the extended private key
 /// (`XPrv`).
 Future<U8Array96> deriveXprivateKey(
-        {required U8Array96 xprivateKey, required String path}) =>
+        {required U8Array96 xprivateKeyBytes, required String path}) =>
     RustLib.instance.api.crateApiKeyDerivationDeriveXprivateKey(
-        xprivateKey: xprivateKey, path: path);
+        xprivateKeyBytes: xprivateKeyBytes, path: path);
 
 class U8Array96 extends NonGrowableListView<int> {
   static const arraySize = 96;

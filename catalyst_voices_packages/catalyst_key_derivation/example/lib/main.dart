@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
     U8Array96 xprv = await mnemonicToXprv(
         mnemonic: "prevent company field green slot measure chief hero apple task eagle sunset endorse dress seed");
     print(xprv);
-    U8Array96 derive_xprv = await deriveXprivateKey(xprivateKey: xprv, path: "m/1852'/1815'/0'/2/0");
+    U8Array96 derive_xprv = await deriveXprivateKey(xprivateKeyBytes: xprv, path: "m/1852'/1815'/0'/2/0");
     print(derive_xprv);
   }
 }

@@ -81,7 +81,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 
 abstract class RustLibApi extends BaseApi {
   Future<U8Array96> crateApiKeyDerivationDeriveXprivateKey(
-      {required U8Array96 xprivateKey, required String path});
+      {required U8Array96 xprivateKeyBytes, required String path});
 
   Future<U8Array96> crateApiKeyDerivationMnemonicToXprv(
       {required String mnemonic, String? passphrase});
@@ -101,11 +101,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Future<U8Array96> crateApiKeyDerivationDeriveXprivateKey(
-      {required U8Array96 xprivateKey, required String path}) {
+      {required U8Array96 xprivateKeyBytes, required String path}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_u_8_array_96(xprivateKey, serializer);
+        sse_encode_u_8_array_96(xprivateKeyBytes, serializer);
         sse_encode_String(path, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 1, port: port_);
@@ -115,7 +115,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_AnyhowException,
       ),
       constMeta: kCrateApiKeyDerivationDeriveXprivateKeyConstMeta,
-      argValues: [xprivateKey, path],
+      argValues: [xprivateKeyBytes, path],
       apiImpl: this,
     ));
   }
@@ -123,7 +123,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiKeyDerivationDeriveXprivateKeyConstMeta =>
       const TaskConstMeta(
         debugName: "derive_xprivate_key",
-        argNames: ["xprivateKey", "path"],
+        argNames: ["xprivateKeyBytes", "path"],
       );
 
   @override
