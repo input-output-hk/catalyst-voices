@@ -8,3 +8,10 @@ crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
 flutter_rust_bridge = "=2.5.1"
+ed25519-bip32 = "0.4.1"
+hmac = "0.12.1"
+pbkdf2 = "0.12.2"
+anyhow = "1.0.91"
+bip39 = "2.0.0"
+sha2 = "0.10"
+bip32 = "0.5.1"

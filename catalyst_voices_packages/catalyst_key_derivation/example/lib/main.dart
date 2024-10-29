@@ -1,3 +1,5 @@
+import 'dart:js_interop';
+
 import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:flutter/material.dart';
 
@@ -35,6 +37,9 @@ class MyApp extends StatelessWidget {
 
   Future<void> _doMagic() async {
     // ignore: avoid_print
-    print(await greet(name: 'Tom'));
+    U8Array96 x = await mnemonicToXprv(
+        mnemonic: "prevent company field green slot measure chief hero apple task eagle sunset endorse dress seed");
+    print(x);
+    // deriveXprivateKey(xprivateKey: x, path: "m/1852'/1815'/0'/2/0");
   }
 }
