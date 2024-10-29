@@ -77,8 +77,8 @@ lint-vscode = "clippy --message-format=json-diagnostic-rendered-ansi --all-targe
 
 docs = "doc --release --no-deps --document-private-items --bins --lib --examples"
 # nightly docs build broken... when they are'nt we can enable these docs... --unit-graph --timings=html,json -Z unstable-options"
-testunit = "nextest run --release --bins --lib --tests --benches --no-fail-fast -P ci"
-testcov = "llvm-cov nextest --release --bins --lib --tests --benches --no-fail-fast -P ci"
+testunit = "nextest run --release --bins --lib --tests --no-fail-fast -P ci"
+testcov = "llvm-cov nextest --release --bins --lib --tests --no-fail-fast -P ci"
 testdocs = "test --doc --release"
 
 # Rust formatting, MUST be run with +nightly
