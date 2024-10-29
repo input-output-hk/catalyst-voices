@@ -3,7 +3,7 @@ repository: https://github.com/input-output-hk/catalyst-voices
 
 packages:
   - catalyst_voices
-  - catalyst_voices/uikit_example
+  - catalyst_voices/utilities/uikit_example
   - catalyst_voices/packages/**
   - catalyst_voices_packages/**
   - utilities/**
