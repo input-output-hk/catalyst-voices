@@ -14,17 +14,7 @@ final class VaultKeychainProvider implements KeychainProvider {
   @override
   Future<Keychain> create(String id) async {
     try {
-      final Keychain keychain = VaultKeychain(
-        id: id,
-        secureStorage: _secureStorage,
-      );
-
-      if (!await keychain.isEmpty) {
-        _logger.warning('Overriding existing keychain[$id]');
-        await keychain.clear();
-      }
-
-      return keychain;
+      return _buildKeychain(id);
     } catch (_) {
       await _deleteKeychain(id);
       rethrow;
@@ -36,7 +26,9 @@ final class VaultKeychainProvider implements KeychainProvider {
     return _secureStorage
         .readAll()
         .then((value) => value.keys)
-        .then((keys) => keys.any(VaultKeychain.isKeychainKey));
+        .then((keys) => keys.where(VaultKeychain.isKeychainKey))
+        .then((keys) => keys.map(VaultKeychain.getStorageId).toSet())
+        .then((ids) => ids.contains(id));
   }
 
   @override
@@ -61,6 +53,21 @@ final class VaultKeychainProvider implements KeychainProvider {
         .toList();
 
     return keychains;
+  }
+
+  Future<Keychain> _buildKeychain(String id) async {
+    final Keychain keychain = VaultKeychain(
+      id: id,
+      secureStorage: _secureStorage,
+    );
+
+    if (!await keychain.isEmpty) {
+      _logger.warning('Overriding existing keychain[$id]');
+      await keychain.clear();
+      return _buildKeychain(id);
+    }
+
+    return keychain;
   }
 
   Future<void> _deleteKeychain(String id) async {

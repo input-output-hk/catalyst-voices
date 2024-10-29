@@ -8,8 +8,10 @@ use crate::service::api::cardano::types::{SlotNumber, StakeAmount};
 #[derive(Object)]
 pub(crate) struct StakedNativeTokenInfo {
     /// Token policy hash.
+    #[oai(validator(max_length = "256", pattern = "^0x[a-f0-9]+$"))]
     pub(crate) policy_hash: String,
     /// Token policy name.
+    #[oai(validator(max_length = "256", pattern = ".*"))]
     pub(crate) policy_name: String,
     /// Token amount.
     #[oai(validator(minimum(value = "0"), maximum(value = "9223372036854775807")))]
