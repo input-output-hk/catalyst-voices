@@ -6,7 +6,7 @@ use crate::service::common::responses::WithErrorResponses;
 /// Endpoint responses
 #[derive(ApiResponse)]
 pub(crate) enum Responses {
-    /// The default success resposne.
+    /// The default success response.
     #[oai(status = 200)]
     Ok(Json<Vec<dto::Proposal>>),
 }

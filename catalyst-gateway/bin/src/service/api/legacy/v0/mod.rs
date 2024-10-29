@@ -107,7 +107,7 @@ impl V0Api {
         proposal_by_id_get::endpoint(id.0).await
     }
 
-    /// Get proprosal reviews by proposal ID.
+    /// Get proposal reviews by proposal ID.
     #[oai(
         path = "/reviews/:proposal_id",
         method = "get",
