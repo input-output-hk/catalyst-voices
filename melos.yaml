@@ -11,6 +11,9 @@ packages:
 ignore:
   # ignores flutter_rust_bridge packages that are non-conformant with melos
   - catalyst_voices_packages/catalyst_key_derivation/example/**
+  # ignore examples
+  - catalyst_voices/packages/**/example
+  - catalyst_voices_packages/**/example
 
 permittedLicenses:
   - MIT
@@ -197,7 +200,7 @@ scripts:
           EXIT_CODE=$? ; \
           printf "%s" "$OUTPUT" | tojunit --output $MELOS_ROOT_PATH/test_reports/$MELOS_PACKAGE_NAME.junit-report.xml ; \
           exit $EXIT_CODE'
-       
+      
       # store the exit code after running the tests,
       # this is the exit code for the whole script
       EXIT_CODE=$?
