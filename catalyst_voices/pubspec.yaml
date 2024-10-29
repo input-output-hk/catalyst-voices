@@ -67,6 +67,7 @@ dev_dependencies:
   go_router_builder: ^2.4.1
   integration_test:
     sdk: flutter
+  melos: ^6.1.0
   mockito: ^5.4.4
   mocktail: ^1.0.1
   sentry_dart_plugin: ^2.1.0

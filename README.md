@@ -62,7 +62,7 @@ The backend services for Catalyst Voices.
 
 Shared Flutter and Dart packages used across the Catalyst.
 
-* **Directory**: [catalyst_voices_packages](https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices_packages)
+* **Directory**: [catalyst_voices_packages](https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices/packages/external)
 * **Setup**: Navigate to ./catalyst_voices_packages.
 * **Documentation**: [Link to detailed documentation or Wiki]
 
