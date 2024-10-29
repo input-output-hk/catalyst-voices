@@ -50,6 +50,7 @@ impl V0Api {
         plans_get::endpoint().await
     }
 
+    /// Get settings.
     #[oai(
         path = "/settings",
         method = "get",
@@ -60,6 +61,7 @@ impl V0Api {
         settings_get::endpoint().await
     }
 
+    /// Get fund.
     #[oai(
         path = "/fund/",
         method = "get",
@@ -70,6 +72,7 @@ impl V0Api {
         fund_get::endpoint().await
     }
 
+    /// Get list of proposals.
     #[oai(
         path = "/proposals",
         method = "get",
@@ -80,6 +83,7 @@ impl V0Api {
         proposals_get::endpoint().await
     }
 
+    /// Get list of proposals according to the filter options.
     #[oai(
         path = "/proposals",
         method = "post",
@@ -92,6 +96,7 @@ impl V0Api {
         proposals_post::endpoint(message.0).await
     }
 
+    /// Get a proposal by its ID.
     #[oai(
         path = "/proposals/:id",
         method = "get",
@@ -102,6 +107,7 @@ impl V0Api {
         proposal_by_id_get::endpoint(id.0).await
     }
 
+    /// Get proprosal reviews by proposal ID.
     #[oai(
         path = "/reviews/:proposal_id",
         method = "get",
