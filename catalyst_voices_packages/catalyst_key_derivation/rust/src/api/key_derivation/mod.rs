@@ -5,13 +5,12 @@ use bip39::Mnemonic;
 pub use ed25519_bip32::DerivationIndex;
 pub use ed25519_bip32::DerivationScheme;
 pub use ed25519_bip32::XPrv;
-use ed25519_bip32::XPRV_SIZE;
-use flutter_rust_bridge::frb;
 use hmac::Hmac;
 use pbkdf2::pbkdf2;
 use sha2::Sha512;
 
-
+/// Extended private key bytes type
+pub type XPrvBytes = [u8; 96];
 
 /// Generate a new extended private key (`XPrv`) from a mnemonic and passphrase.
 /// This function works with BIP-0039 mnemonics.
@@ -28,11 +27,9 @@ use sha2::Sha512;
 /// Returns the `XPrv` extended private key as a `Result`.
 /// If the conversion is successful, it returns `Ok` with the extended private key
 /// (`XPrv`).
-pub fn mnemonic_to_xprv(mnemonic: String, passphrase: Option<String>) -> anyhow::Result<[u8; XPRV_SIZE]> {
-    match mnemonic_to_xprv_helper(mnemonic, passphrase) {
-        Ok(xprv) => Ok(xprv.into()),
-        Err(e) => Err(e),
-    }
+pub fn mnemonic_to_xprv(mnemonic: String, passphrase: Option<String>) -> anyhow::Result<XPrvBytes> {
+    let xprv = mnemonic_to_xprv_helper(mnemonic, passphrase)?;
+    Ok(xprv.into())
 }
 
 /// Helper function for mnemonic_to_xprv.
@@ -64,7 +61,7 @@ fn mnemonic_to_xprv_helper(mnemonic: String, passphrase: Option<String>) -> anyh
 ///  
 /// # Arguments
 ///
-/// - `xprivate_key`: An extended private key of type `XPrv`.
+/// - `xprivate_key_bytes`: An extended private key of type `XPrvBytes`.
 /// - `path`: Derivation path. eg. m/0/2'/3 where ' represents hardened derivation.
 ///
 /// # Returns
@@ -72,11 +69,10 @@ fn mnemonic_to_xprv_helper(mnemonic: String, passphrase: Option<String>) -> anyh
 /// Returns the `XPrv` extended private key as a `Result`.
 /// If the derivation path is successful, it returns `Ok` with the extended private key
 /// (`XPrv`).
-pub fn derive_xprivate_key(xprivate_key: XPrv, path: String) -> anyhow::Result<[u8; XPRV_SIZE]> {
-    match derive_xprivate_key_helper(xprivate_key, path) {
-        Ok(xprv) => Ok(xprv.into()),
-        Err(e) => Err(e),
-    }
+pub fn derive_xprivate_key(xprivate_key_bytes: XPrvBytes, path: String) -> anyhow::Result<XPrvBytes> {
+    let xprv = XPrv::from_bytes_verified(xprivate_key_bytes)?;
+    let derive_xprv = derive_xprivate_key_helper(xprv, path)?;
+    Ok(derive_xprv.into())
 }
 
 /// Helper function for `derive_xprivate_key``.
@@ -111,7 +107,7 @@ mod test {
     // Test vector from https://cips.cardano.org/cip/CIP-0011
     #[test]
     fn test_key_derivation() {
-        let xprv = XPrv::from_bytes_verified(mnemonic_to_xprv(MNEMONIC.to_string(), None).unwrap()).unwrap();
+        let xprv = mnemonic_to_xprv(MNEMONIC.to_string(), None).unwrap();
         let path = "m/1852'/1815'/0'/2/0".to_string();
         let derive_xprv = XPrv::from_bytes_verified(derive_xprivate_key(xprv, path).unwrap()).unwrap();
         assert_eq!(derive_xprv.to_string(), 
