@@ -14,23 +14,23 @@ dependencies:
   catalyst_cardano_serialization: ^0.4.0
   catalyst_cardano_web: ^0.3.0
   catalyst_voices_assets:
-    path: ./packages/catalyst_voices_assets
+    path: ./packages/internal/catalyst_voices_assets
   catalyst_voices_blocs:
-    path: ./packages/catalyst_voices_blocs
+    path: ./packages/internal/catalyst_voices_blocs
   catalyst_voices_brands:
-    path: ./packages/catalyst_voices_brands
+    path: ./packages/internal/catalyst_voices_brands
   catalyst_voices_localization:
-    path: ./packages/catalyst_voices_localization
+    path: ./packages/internal/catalyst_voices_localization
   catalyst_voices_models:
-    path: ./packages/catalyst_voices_models
+    path: ./packages/internal/catalyst_voices_models
   catalyst_voices_repositories:
-    path: ./packages/catalyst_voices_repositories
+    path: ./packages/internal/catalyst_voices_repositories
   catalyst_voices_services:
-    path: ./packages/catalyst_voices_services
+    path: ./packages/internal/catalyst_voices_services
   catalyst_voices_shared:
-    path: ./packages/catalyst_voices_shared
+    path: ./packages/internal/catalyst_voices_shared
   catalyst_voices_view_models:
-    path: ./packages/catalyst_voices_view_models
+    path: ./packages/internal/catalyst_voices_view_models
   collection: ^1.18.0
   dotted_border: ^2.1.0
   equatable: ^2.0.5
