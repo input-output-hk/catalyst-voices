@@ -6,7 +6,6 @@ packages:
   - catalyst_voices/utilities/**
   - catalyst_voices/packages/**
   - catalyst_voices_packages/**
-  - utilities/**
 
 ignore:
   # ignores flutter_rust_bridge packages that are non-conformant with melos
