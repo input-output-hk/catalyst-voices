@@ -11,17 +11,17 @@ dependencies:
   catalyst_voices:
     path: ../../
   catalyst_voices_assets:
-    path: ../../packages/catalyst_voices_assets
+    path: ../../packages/internal/catalyst_voices_assets
   catalyst_voices_blocs:
-    path: ../../packages/catalyst_voices_blocs
+    path: ../../packages/internal/catalyst_voices_blocs
   catalyst_voices_brands:
-    path: ../../packages/catalyst_voices_brands
+    path: ../../packages/internal/catalyst_voices_brands
   catalyst_voices_localization:
-    path: ../../packages/catalyst_voices_localization
+    path: ../../packages/internal/catalyst_voices_localization
   catalyst_voices_models:
-    path: ../../packages/catalyst_voices_models
+    path: ../../packages/internal/catalyst_voices_models
   catalyst_voices_shared:
-    path: ../../packages/catalyst_voices_shared
+    path: ../../packages/internal/catalyst_voices_shared
   collection: ^1.18.0
   cupertino_icons: ^1.0.6
   flutter:

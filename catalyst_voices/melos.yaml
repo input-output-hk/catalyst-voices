@@ -8,8 +8,6 @@ packages:
   - utilities/**
 
 ignore:
-  - packages/internal/**/example
-  - packages/libs/**/example
   # ignores flutter_rust_bridge packages that are non-conformant with melos
   - packages/libs/catalyst_key_derivation/example/**
 
