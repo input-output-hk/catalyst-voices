@@ -19,7 +19,8 @@ Welcome to the Catalyst Voices mono repo, where we manage and maintain the inter
 ## Overview
 
 This monorepo serves as a unified codebase for the Catalyst Voices ecosystem projects.
-Using a monorepo simplifies our dependency management, streamlines testing, and fosters code sharing.
+Using a monorepo simplifies our dependency management, streamlines testing, and fosters code
+sharing.
 
 ## Getting Started
 
@@ -46,7 +47,8 @@ Athena is our [brief description of what Athena does].
 
 Catalyst Voices frontend.
 
-* **Directory**: [catalyst_voices](https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices)
+* **Directory
+  **: [catalyst_voices](https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices)
 * **Setup**: Navigate to ./catalyst_voices.
 * **Documentation**: [Link to detailed documentation or Wiki]
 
@@ -54,7 +56,8 @@ Catalyst Voices frontend.
 
 The backend services for Catalyst Voices.
 
-* **Directory**: [catalyst-voices-backend](https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst-gateway)
+* **Directory
+  **: [catalyst-voices-backend](https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst-gateway)
 * **Setup**: Navigate to ./catalyst-gateway.
 * **Documentation**: [Link to detailed documentation or Wiki]
 
@@ -62,7 +65,8 @@ The backend services for Catalyst Voices.
 
 Shared Flutter and Dart packages used across the Catalyst.
 
-* **Directory**: [catalyst_voices_packages](https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices/packages/libs)
+* **Directory
+  **: [catalyst_voices_packages](https://github.com/input-output-hk/catalyst-voices/tree/main/catalyst_voices/packages/libs)
 * **Setup**: Navigate to ./catalyst_voices/packages/libs.
 * **Documentation**: [Link to detailed documentation or Wiki]
 
@@ -79,7 +83,8 @@ Please read our [CONTRIBUTING](CONTRIBUTING.md) for guidelines on how to contrib
 
 ## License
 
-Licensed under either of [Apache License, Version 2.0](LICENSE-APACHE) or [MIT license](LICENSE-MIT) at your option.
+Licensed under either of [Apache License, Version 2.0](LICENSE-APACHE) or [MIT license](LICENSE-MIT)
+at your option.
 
 Unless you explicitly state otherwise, any contribution intentionally submitted
 for inclusion in this crate by you, as defined in the Apache-2.0 license, shall
