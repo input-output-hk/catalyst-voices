@@ -19,10 +19,10 @@ code-generator:
     ARG save_locally=false
 
     LET gen_code_path  = lib/generated/catalyst_gateway
-    LET local_gen_code_path = packages/catalyst_voices_services/lib/generated/catalyst_gateway/
+    LET local_gen_code_path = packages/internal/catalyst_voices_services/lib/generated/catalyst_gateway/
 
     FROM +builder
-    WORKDIR catalyst_voices/packages/catalyst_voices_services
+    WORKDIR catalyst_voices/packages/internal/catalyst_voices_services
     COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
     DO flutter-ci+OPENAPI_CODE_GEN \
         --SAVE_LOCALLY=$save_locally \
@@ -35,7 +35,7 @@ code-generator:
 test-flutter-code-generator:
     FROM +code-generator
     # Copy generated files in the local file tree to a temporary folder
-    COPY packages/catalyst_voices_services/lib/generated/catalyst_gateway /tmp/repo_generated
+    COPY packages/internal/catalyst_voices_services/lib/generated/catalyst_gateway /tmp/repo_generated
     # Check diff between local code and earthly artifacts
     RUN diff /tmp/repo_generated lib/generated/catalyst_gateway
 
@@ -72,9 +72,9 @@ build-web:
 
     ARG WORKDIR=/frontend/catalyst_voices
     IF [ $RUN_ON_PR = true ]
-        DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --BUILD_MODE='--profile' --TARGET=lib/configs/main_web.dart
+        DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --BUILD_MODE='--profile' --TARGET=apps/voices/lib/configs/main_web.dart
     ELSE
-        DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --TARGET=lib/configs/main_web.dart --SENTRY_DSN=$SENTRY_DSN
+        DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --TARGET=apps/voices/lib/configs/main_web.dart --SENTRY_DSN=$SENTRY_DSN
         SAVE ARTIFACT web
     END
 
