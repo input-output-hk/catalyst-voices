@@ -10,20 +10,18 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 // These functions are ignored because they are not marked as `pub`: `derive_xprivate_key_helper`, `mnemonic_to_xprv_helper`
 
 /// Generate a new extended private key (`XPrv`) from a mnemonic and passphrase.
-/// This function works with BIP-0039 mnemonics.
+/// Note that this function only works with BIP-0039 mnemonics.
 /// For more information: Cardano Icarus master node derivation
 /// https://github.com/satoshilabs/slips/blob/master/slip-0023.md
 ///
 /// # Arguments
 ///
 /// - `mnemonic`: A string representing the mnemonic.
-/// - `passphrase`: An optional string representing the passphrase.
+/// - `passphrase`: An optional string representing the passphrase (aka. password).
 ///
 /// # Returns
 ///
-/// Returns the `XPrv` extended private key as a `Result`.
-/// If the conversion is successful, it returns `Ok` with the extended private key
-/// (`XPrv`).
+/// Returns a bytes of extended private key as a `Result`.
 Future<U8Array96> mnemonicToXprv(
         {required String mnemonic, String? passphrase}) =>
     RustLib.instance.api.crateApiKeyDerivationMnemonicToXprv(
@@ -35,14 +33,12 @@ Future<U8Array96> mnemonicToXprv(
 ///
 /// # Arguments
 ///
-/// - `xprivate_key_bytes`: An extended private key of type `XPrvBytes`.
+/// - `xprivate_key_bytes`: An extended private key bytes of type `XPrvBytes`.
 /// - `path`: Derivation path. eg. m/0/2'/3 where ' represents hardened derivation.
 ///
 /// # Returns
 ///
-/// Returns the `XPrv` extended private key as a `Result`.
-/// If the derivation path is successful, it returns `Ok` with the extended private key
-/// (`XPrv`).
+/// Returns a bytes of extended private key as a `Result`.
 Future<U8Array96> deriveXprivateKey(
         {required U8Array96 xprivateKeyBytes, required String path}) =>
     RustLib.instance.api.crateApiKeyDerivationDeriveXprivateKey(
