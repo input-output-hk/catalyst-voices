@@ -3,16 +3,15 @@ repository: https://github.com/input-output-hk/catalyst-voices
 
 packages:
   - apps/**
-  - packages/external/**
   - packages/internal/**
+  - packages/libs/**
   - utilities/**
 
 ignore:
-  # ignores flutter_rust_bridge packages that are non-conformant with melos
-  - packages/external/catalyst_key_derivation/example/**
-  # ignore examples
-  - packages/external/**/example
   - packages/internal/**/example
+  - packages/libs/**/example
+  # ignores flutter_rust_bridge packages that are non-conformant with melos
+  - packages/libs/catalyst_key_derivation/example/**
 
 permittedLicenses:
   - MIT
