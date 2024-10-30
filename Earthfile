@@ -43,22 +43,12 @@ repo-docs:
 
     SAVE ARTIFACT /repo repo
 
-# repo-catalyst-voices-packages - Create artifacts of catalyst_voices_packages
-# we need to refer to in other earthly targets.
-repo-catalyst-voices-packages:
-    FROM scratch
-
-    WORKDIR /repo
-    COPY --dir catalyst_voices_packages .
-
-    SAVE ARTIFACT /repo repo
-
 # repo-catalyst-voices-all - Creates artifacts of all configuration files,
 # packages and folders related to catalyst_voices frontend.
-repo-catalyst-voices-all:
+repo-catalyst-voices:
     FROM scratch
 
     WORKDIR /repo
-    COPY --dir catalyst_voices catalyst_voices_packages utilities melos.yaml pubspec.yaml  .
+    COPY --dir catalyst_voices .
 
     SAVE ARTIFACT /repo repo

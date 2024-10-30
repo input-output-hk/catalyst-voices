@@ -6,7 +6,8 @@ IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.18 AS flutter
 # Copy all the necessary files and running bootstrap
 builder:
     DO flutter-ci+SETUP
-    COPY ../+repo-catalyst-voices-all/repo .
+    COPY ../+repo-catalyst-voices/repo .
+    WORKDIR catalyst_voices
     DO flutter-ci+BOOTSTRAP
 
 # Generates flutter code.
