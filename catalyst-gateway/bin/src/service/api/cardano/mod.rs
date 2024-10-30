@@ -199,7 +199,7 @@ impl CardanoApi {
     ///
     /// This endpoint returns the RBAC certificate chain root for a given stake address.
     async fn rbac_chain_root_get(
-        &self, Path(stake_address): Path<StakeAddress>,
+        &self, Path(stake_address): Path<Cip19StakeAddress>,
     ) -> rbac::chain_root_get::AllResponses {
         rbac::chain_root_get::endpoint(stake_address).await
     }

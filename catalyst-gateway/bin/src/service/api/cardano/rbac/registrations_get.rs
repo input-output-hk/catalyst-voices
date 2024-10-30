@@ -10,10 +10,7 @@ use crate::{
         },
         session::CassandraSession,
     },
-    service::common::{
-        objects::{cardano::hash::Hash, validation_error::ValidationError},
-        responses::{ErrorResponses, WithErrorResponses},
-    },
+    service::common::{objects::cardano::hash::Hash, responses::WithErrorResponses},
 };
 
 /// GET RBAC registrations by chain root response list item.
@@ -37,6 +34,9 @@ pub(crate) enum Responses {
     /// Success returns a list of registration transaction ids.
     #[oai(status = 200)]
     Ok(Json<RbacRegistrationsResponse>),
+    /// Bad request.
+    #[oai(status = 400)]
+    BadRequest,
     /// Internal server error.
     #[oai(status = 500)]
     InternalServerError,
@@ -52,9 +52,7 @@ pub(crate) async fn endpoint(chain_root: String) -> AllResponses {
     };
 
     let Ok(decoded_chain_root) = hex::decode(chain_root) else {
-        return WithErrorResponses::Error(ErrorResponses::BadRequest(Json(ValidationError::new(
-            "bad chain root value".to_string(),
-        ))));
+        return Responses::BadRequest.into();
     };
 
     let query_res = GetRegistrationsByChainRootQuery::execute(

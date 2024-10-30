@@ -1,4 +1,5 @@
 //! Implementation of the GET `/rbac/chain_root` endpoint.
+use der_parser::asn1_rs::ToDer;
 use futures::StreamExt as _;
 use poem_openapi::{payload::Json, ApiResponse, Object};
 use tracing::error;
@@ -8,9 +9,7 @@ use crate::{
         queries::rbac::get_chain_root::{GetChainRootQuery, GetChainRootQueryParams},
         session::CassandraSession,
     },
-    service::common::{
-        objects::cardano::stake_address::StakeAddress, responses::WithErrorResponses,
-    },
+    service::common::{responses::WithErrorResponses, types::cardano::address::Cip19StakeAddress},
 };
 
 /// GET RBAC chain root response.
@@ -38,16 +37,19 @@ pub(crate) enum Responses {
 pub(crate) type AllResponses = WithErrorResponses<Responses>;
 
 /// Get chain root endpoint.
-pub(crate) async fn endpoint(stake_address: StakeAddress) -> AllResponses {
+pub(crate) async fn endpoint(stake_address: Cip19StakeAddress) -> AllResponses {
     let Some(session) = CassandraSession::get(true) else {
         error!("Failed to acquire db session");
         return Responses::InternalServerError.into();
     };
 
-    let query_res = GetChainRootQuery::execute(&session, GetChainRootQueryParams {
-        stake_address: stake_address.to_vec(),
-    })
-    .await;
+    let Ok(stake_address) = stake_address.to_der_vec() else {
+        error!("Failed to create stake address vec");
+        return Responses::InternalServerError.into();
+    };
+
+    let query_res =
+        GetChainRootQuery::execute(&session, GetChainRootQueryParams { stake_address }).await;
 
     match query_res {
         Ok(mut row_iter) => {

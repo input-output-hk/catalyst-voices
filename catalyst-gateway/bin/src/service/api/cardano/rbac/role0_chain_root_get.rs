@@ -10,10 +10,7 @@ use crate::{
         },
         session::CassandraSession,
     },
-    service::common::{
-        objects::validation_error::ValidationError,
-        responses::{ErrorResponses, WithErrorResponses},
-    },
+    service::common::responses::WithErrorResponses,
 };
 
 /// GET RBAC chain root response.
@@ -33,6 +30,9 @@ pub(crate) enum Responses {
     /// No chain root found for the given stake address.
     #[oai(status = 404)]
     NotFound,
+    /// Bad requests.
+    #[oai(status = 400)]
+    BadRequest,
     /// Internal server error
     #[oai(status = 500)]
     InternalServerError,
@@ -48,14 +48,15 @@ pub(crate) async fn endpoint(role0_key: String) -> AllResponses {
     };
 
     let Ok(decoded_role0_key) = hex::decode(role0_key) else {
-        return WithErrorResponses::Error(ErrorResponses::BadRequest(Json(ValidationError::new(
-            "bad role0 key value".to_string(),
-        ))));
+        return Responses::BadRequest.into();
     };
 
-    let query_res = GetRole0ChainRootQuery::execute(&session, GetRole0ChainRootQueryParams {
-        role0_key: decoded_role0_key,
-    })
+    let query_res = GetRole0ChainRootQuery::execute(
+        &session,
+        GetRole0ChainRootQueryParams {
+            role0_key: decoded_role0_key,
+        },
+    )
     .await;
 
     match query_res {
