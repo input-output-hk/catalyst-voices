@@ -30,12 +30,12 @@ package-test:
 
 builder:
     DO flutter-ci+SETUP
-    COPY ../../../../+repo-catalyst-voices/repo .
+    COPY ../../../../../+repo-catalyst-voices/repo .
     DO flutter-ci+BOOTSTRAP
 
 build-web:
     FROM +builder
-    ARG WORKDIR=/frontend/catalyst_voices_packages/catalyst_cardano/catalyst_cardano/example
+    ARG WORKDIR=/frontend/catalyst_voices/packages/libs/catalyst_cardano/catalyst_cardano/example
     DO flutter-ci+BUILD_WEB --TARGET=lib/main.dart --WORKDIR=$WORKDIR
     SAVE ARTIFACT web
 
