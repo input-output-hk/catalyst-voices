@@ -30,7 +30,7 @@ package-test:
 
 builder:
     DO flutter-ci+SETUP
-    COPY ../../../../+repo-catalyst-voices-all/repo .
+    COPY ../../../../+repo-catalyst-voices/repo .
     DO flutter-ci+BOOTSTRAP
 
 build-web:

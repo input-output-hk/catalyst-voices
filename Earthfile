@@ -43,7 +43,7 @@ repo-docs:
 
     SAVE ARTIFACT /repo repo
 
-# repo-catalyst-voices-all - Creates artifacts of all configuration files,
+# repo-catalyst-voices - Creates artifacts of all configuration files,
 # packages and folders related to catalyst_voices frontend.
 repo-catalyst-voices:
     FROM scratch

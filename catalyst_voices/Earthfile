@@ -70,11 +70,11 @@ build-web:
     ARG RUN_ON_PR=true
     ARG SENTRY_DSN
 
-    ARG WORKDIR=/frontend/catalyst_voices
+    ARG WORKDIR=/frontend/catalyst_voices/apps/voices/
     IF [ $RUN_ON_PR = true ]
-        DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --BUILD_MODE='--profile' --TARGET=apps/voices/lib/configs/main_web.dart
+        DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --BUILD_MODE='--profile' --TARGET=lib/configs/main_web.dart
     ELSE
-        DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --TARGET=apps/voices/lib/configs/main_web.dart --SENTRY_DSN=$SENTRY_DSN
+        DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --TARGET=lib/configs/main_web.dart --SENTRY_DSN=$SENTRY_DSN
         SAVE ARTIFACT web
     END
 
