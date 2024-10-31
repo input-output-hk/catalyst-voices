@@ -1,4 +1,4 @@
-name: catalyst_voices_remote_widgets
+name: remote_widgets
 description: Catalyst remote widgets.
 version: 0.1.0+1
 publish_to: none

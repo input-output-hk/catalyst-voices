@@ -22,14 +22,14 @@
       <module fileurl="file://$PROJECT_DIR$/packages/internal/catalyst_voices_brands/melos_catalyst_voices_brands.iml" filepath="$PROJECT_DIR$/packages/internal/catalyst_voices_brands/melos_catalyst_voices_brands.iml" />
       <module fileurl="file://$PROJECT_DIR$/packages/internal/catalyst_voices_localization/melos_catalyst_voices_localization.iml" filepath="$PROJECT_DIR$/packages/internal/catalyst_voices_localization/melos_catalyst_voices_localization.iml" />
       <module fileurl="file://$PROJECT_DIR$/packages/internal/catalyst_voices_models/melos_catalyst_voices_models.iml" filepath="$PROJECT_DIR$/packages/internal/catalyst_voices_models/melos_catalyst_voices_models.iml" />
-      <module fileurl="file://$PROJECT_DIR$/utilities/catalyst_voices_remote_widgets/melos_catalyst_voices_remote_widgets.iml" filepath="$PROJECT_DIR$/utilities/catalyst_voices_remote_widgets/melos_catalyst_voices_remote_widgets.iml" />
       <module fileurl="file://$PROJECT_DIR$/packages/internal/catalyst_voices_repositories/melos_catalyst_voices_repositories.iml" filepath="$PROJECT_DIR$/packages/internal/catalyst_voices_repositories/melos_catalyst_voices_repositories.iml" />
       <module fileurl="file://$PROJECT_DIR$/packages/internal/catalyst_voices_services/melos_catalyst_voices_services.iml" filepath="$PROJECT_DIR$/packages/internal/catalyst_voices_services/melos_catalyst_voices_services.iml" />
       <module fileurl="file://$PROJECT_DIR$/packages/internal/catalyst_voices_shared/melos_catalyst_voices_shared.iml" filepath="$PROJECT_DIR$/packages/internal/catalyst_voices_shared/melos_catalyst_voices_shared.iml" />
       <module fileurl="file://$PROJECT_DIR$/packages/internal/catalyst_voices_view_models/melos_catalyst_voices_view_models.iml" filepath="$PROJECT_DIR$/packages/internal/catalyst_voices_view_models/melos_catalyst_voices_view_models.iml" />
       <module fileurl="file://$PROJECT_DIR$/packages/libs/catalyst_analysis/example/melos_example.iml" filepath="$PROJECT_DIR$/packages/libs/catalyst_analysis/example/melos_example.iml" />
       <module fileurl="file://$PROJECT_DIR$/utilities/poc_local_storage/melos_poc_local_storage.iml" filepath="$PROJECT_DIR$/utilities/poc_local_storage/melos_poc_local_storage.iml" />
-      <module fileurl="file://$PROJECT_DIR$/utilities/catalyst_voices_remote_widgets/example/melos_remote_widgets_example.iml" filepath="$PROJECT_DIR$/utilities/catalyst_voices_remote_widgets/example/melos_remote_widgets_example.iml" />
+      <module fileurl="file://$PROJECT_DIR$/utilities/remote_widgets/melos_remote_widgets.iml" filepath="$PROJECT_DIR$/utilities/remote_widgets/melos_remote_widgets.iml" />
+      <module fileurl="file://$PROJECT_DIR$/utilities/remote_widgets/example/melos_remote_widgets_example.iml" filepath="$PROJECT_DIR$/utilities/remote_widgets/example/melos_remote_widgets_example.iml" />
       <module fileurl="file://$PROJECT_DIR$/utilities/uikit_example/melos_uikit_example.iml" filepath="$PROJECT_DIR$/utilities/uikit_example/melos_uikit_example.iml" />
       <module fileurl="file://$PROJECT_DIR$/melos_catalyst_voices.iml" filepath="$PROJECT_DIR$/melos_catalyst_voices.iml" />
     </modules>

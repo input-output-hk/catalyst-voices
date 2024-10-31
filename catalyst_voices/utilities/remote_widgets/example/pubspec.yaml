@@ -7,7 +7,7 @@ environment:
   sdk: ">=3.5.0 <4.0.0"
 
 dependencies:
-  catalyst_voices_remote_widgets:
+  remote_widgets:
     path: ../
   flutter:
     sdk: flutter
