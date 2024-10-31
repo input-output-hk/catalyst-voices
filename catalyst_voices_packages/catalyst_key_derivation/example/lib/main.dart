@@ -40,11 +40,24 @@ class MyApp extends StatelessWidget {
       mnemonic: 'prevent company field green slot measure chief'
           ' hero apple task eagle sunset endorse dress seed',
     );
-    print(xprv);
-    final deriveXprv = await deriveXprivateKey(
-      xprivateKeyBytes: xprv,
-      path: "m/1852'/1815'/0'/2/0",
-    );
-    print(deriveXprv);
+    print('Master xprv $xprv');
+
+    final xpub = await xpublicKey(xprvBytes: xprv);
+    print('Master xpub $xpub');
+
+    final data = [1, 2, 3, 4];
+    final sig = await signData(xprvBytes: xprv, data: data);
+
+    final checkXprvSig =
+        await checkSignatureXprv(xprvBytes: xprv, data: data, signature: sig);
+    print('Check signature by using xprv $checkXprvSig');
+
+    final checkXpubSig =
+        await checkSignatureXpub(xpubBytes: xpub, data: data, signature: sig);
+    print('Check signature by using xpub $checkXpubSig');
+
+    const path = "m/1852'/1815'/0'/2/0";
+    final childXprv = await deriveXprv(xprvBytes: xprv, path: path);
+    print('Derive xprv with $path: $childXprv');
   }
 }
