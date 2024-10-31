@@ -3,11 +3,20 @@ VERSION 0.8
 IMPORT ../catalyst-gateway AS catalyst-gateway
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:v3.2.21 AS flutter-ci
 
+# repo-catalyst-voices - Creates artifacts of all configuration files,
+# packages and folders related to catalyst_voices frontend.
+repo-catalyst-voices:
+    FROM scratch
+
+    WORKDIR /repo
+    COPY --dir . .
+
+    SAVE ARTIFACT /repo repo
+
 # Copy all the necessary files and running bootstrap
 builder:
     DO flutter-ci+SETUP
-    COPY ../+repo-catalyst-voices/repo .
-    WORKDIR catalyst_voices
+    COPY +repo-catalyst-voices/repo .
     DO flutter-ci+BOOTSTRAP
 
 # Generates flutter code.
@@ -70,7 +79,7 @@ build-web:
     ARG RUN_ON_PR=true
     ARG SENTRY_DSN
 
-    ARG WORKDIR=/frontend/catalyst_voices/apps/voices
+    ARG WORKDIR=/frontend/apps/voices
     IF [ $RUN_ON_PR = true ]
         DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --BUILD_MODE='--profile' --TARGET=lib/configs/main_web.dart
     ELSE

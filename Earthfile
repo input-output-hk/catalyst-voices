@@ -42,13 +42,3 @@ repo-docs:
     COPY --dir *.md LICENSE-APACHE LICENSE-MIT .
 
     SAVE ARTIFACT /repo repo
-
-# repo-catalyst-voices - Creates artifacts of all configuration files,
-# packages and folders related to catalyst_voices frontend.
-repo-catalyst-voices:
-    FROM scratch
-
-    WORKDIR /repo
-    COPY --dir catalyst_voices .
-
-    SAVE ARTIFACT /repo repo
