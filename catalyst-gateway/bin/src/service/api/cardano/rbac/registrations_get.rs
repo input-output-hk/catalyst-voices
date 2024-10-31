@@ -34,7 +34,7 @@ pub(crate) enum Responses {
     /// Success returns a list of registration transaction ids.
     #[oai(status = 200)]
     Ok(Json<RbacRegistrationsResponse>),
-    /// Bad request.
+    /// Response for bad requests.
     #[oai(status = 400)]
     BadRequest,
     /// Internal server error.

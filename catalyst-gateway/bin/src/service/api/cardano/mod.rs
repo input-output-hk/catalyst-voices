@@ -199,7 +199,9 @@ impl CardanoApi {
     ///
     /// This endpoint returns the RBAC certificate chain root for a given stake address.
     async fn rbac_chain_root_get(
-        &self, Path(stake_address): Path<Cip19StakeAddress>,
+        &self,
+        /// Stake address to get the chain root for.
+        Path(stake_address): Path<Cip19StakeAddress>,
     ) -> rbac::chain_root_get::AllResponses {
         rbac::chain_root_get::endpoint(stake_address).await
     }
@@ -211,9 +213,10 @@ impl CardanoApi {
     )]
     /// Get registrations by RBAC chain root
     ///
-    /// This endpoint returns the registrations for a given chain root
+    /// This endpoint returns the registrations for a given chain root.
     async fn rbac_registrations_get(
         &self,
+        /// Chain root to get the registrations for.
         #[oai(validator(max_length = 66, min_length = 64, pattern = "0x[0-9a-f]{64}"))]
         Path(chain_root): Path<String>,
     ) -> rbac::registrations_get::AllResponses {
@@ -230,6 +233,7 @@ impl CardanoApi {
     /// This endpoint returns the RBAC certificate chain root for a given role 0 key.
     async fn rbac_role0_key_chain_root(
         &self,
+        /// Role0 key to get the chain root for.
         #[oai(validator(min_length = 34, max_length = 34, pattern = "0x[0-9a-f]{32}"))]
         Path(role0_key): Path<String>,
     ) -> rbac::role0_chain_root_get::AllResponses {

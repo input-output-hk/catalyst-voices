@@ -30,10 +30,10 @@ pub(crate) enum Responses {
     /// No chain root found for the given stake address.
     #[oai(status = 404)]
     NotFound,
-    /// Bad requests.
+    /// Response for bad requests.
     #[oai(status = 400)]
     BadRequest,
-    /// Internal server error
+    /// Internal server error.
     #[oai(status = 500)]
     InternalServerError,
 }
