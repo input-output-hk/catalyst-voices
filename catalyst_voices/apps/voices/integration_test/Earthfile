@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT ../ AS catalyst-voices
+IMPORT ../../.. AS catalyst-voices
 
 integration-test-web:
     FROM catalyst-voices+build-web
