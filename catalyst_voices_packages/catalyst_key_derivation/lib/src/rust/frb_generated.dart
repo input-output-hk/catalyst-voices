@@ -66,7 +66,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.5.1';
 
   @override
-  int get rustContentHash => -1269238771;
+  int get rustContentHash => -541330839;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -77,11 +77,27 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
-  Future<U8Array96> crateApiKeyDerivationDeriveXprivateKey(
-      {required U8Array96 xprivateKeyBytes, required String path});
+  Future<bool> crateApiKeyDerivationCheckSignatureXprv(
+      {required U8Array96 xprvBytes,
+      required List<int> data,
+      required U8Array64 signature});
+
+  Future<bool> crateApiKeyDerivationCheckSignatureXpub(
+      {required U8Array64 xpubBytes,
+      required List<int> data,
+      required U8Array64 signature});
+
+  Future<U8Array96> crateApiKeyDerivationDeriveXprv(
+      {required U8Array96 xprvBytes, required String path});
 
   Future<U8Array96> crateApiKeyDerivationMnemonicToXprv(
       {required String mnemonic, String? passphrase});
+
+  Future<U8Array64> crateApiKeyDerivationSignData(
+      {required U8Array96 xprvBytes, required List<int> data});
+
+  Future<U8Array64> crateApiKeyDerivationXpublicKey(
+      {required U8Array96 xprvBytes});
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -93,30 +109,90 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
-  Future<U8Array96> crateApiKeyDerivationDeriveXprivateKey(
-      {required U8Array96 xprivateKeyBytes, required String path}) {
+  Future<bool> crateApiKeyDerivationCheckSignatureXprv(
+      {required U8Array96 xprvBytes,
+      required List<int> data,
+      required U8Array64 signature}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_u_8_array_96(xprivateKeyBytes, serializer);
-        sse_encode_String(path, serializer);
+        sse_encode_u_8_array_96(xprvBytes, serializer);
+        sse_encode_list_prim_u_8_loose(data, serializer);
+        sse_encode_u_8_array_64(signature, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 1, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiKeyDerivationCheckSignatureXprvConstMeta,
+      argValues: [xprvBytes, data, signature],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiKeyDerivationCheckSignatureXprvConstMeta =>
+      const TaskConstMeta(
+        debugName: "check_signature_xprv",
+        argNames: ["xprvBytes", "data", "signature"],
+      );
+
+  @override
+  Future<bool> crateApiKeyDerivationCheckSignatureXpub(
+      {required U8Array64 xpubBytes,
+      required List<int> data,
+      required U8Array64 signature}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_u_8_array_64(xpubBytes, serializer);
+        sse_encode_list_prim_u_8_loose(data, serializer);
+        sse_encode_u_8_array_64(signature, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 2, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiKeyDerivationCheckSignatureXpubConstMeta,
+      argValues: [xpubBytes, data, signature],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiKeyDerivationCheckSignatureXpubConstMeta =>
+      const TaskConstMeta(
+        debugName: "check_signature_xpub",
+        argNames: ["xpubBytes", "data", "signature"],
+      );
+
+  @override
+  Future<U8Array96> crateApiKeyDerivationDeriveXprv(
+      {required U8Array96 xprvBytes, required String path}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_u_8_array_96(xprvBytes, serializer);
+        sse_encode_String(path, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 3, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_u_8_array_96,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiKeyDerivationDeriveXprivateKeyConstMeta,
-      argValues: [xprivateKeyBytes, path],
+      constMeta: kCrateApiKeyDerivationDeriveXprvConstMeta,
+      argValues: [xprvBytes, path],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiKeyDerivationDeriveXprivateKeyConstMeta =>
+  TaskConstMeta get kCrateApiKeyDerivationDeriveXprvConstMeta =>
       const TaskConstMeta(
-        debugName: "derive_xprivate_key",
-        argNames: ["xprivateKeyBytes", "path"],
+        debugName: "derive_xprv",
+        argNames: ["xprvBytes", "path"],
       );
 
   @override
@@ -128,7 +204,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(mnemonic, serializer);
         sse_encode_opt_String(passphrase, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 2, port: port_);
+            funcId: 4, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_u_8_array_96,
@@ -146,6 +222,59 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         argNames: ["mnemonic", "passphrase"],
       );
 
+  @override
+  Future<U8Array64> crateApiKeyDerivationSignData(
+      {required U8Array96 xprvBytes, required List<int> data}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_u_8_array_96(xprvBytes, serializer);
+        sse_encode_list_prim_u_8_loose(data, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 5, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_u_8_array_64,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiKeyDerivationSignDataConstMeta,
+      argValues: [xprvBytes, data],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiKeyDerivationSignDataConstMeta =>
+      const TaskConstMeta(
+        debugName: "sign_data",
+        argNames: ["xprvBytes", "data"],
+      );
+
+  @override
+  Future<U8Array64> crateApiKeyDerivationXpublicKey(
+      {required U8Array96 xprvBytes}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_u_8_array_96(xprvBytes, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 6, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_u_8_array_64,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiKeyDerivationXpublicKeyConstMeta,
+      argValues: [xprvBytes],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiKeyDerivationXpublicKeyConstMeta =>
+      const TaskConstMeta(
+        debugName: "xpublic_key",
+        argNames: ["xprvBytes"],
+      );
+
   @protected
   AnyhowException dco_decode_AnyhowException(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
@@ -156,6 +285,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   String dco_decode_String(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as String;
+  }
+
+  @protected
+  bool dco_decode_bool(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as bool;
+  }
+
+  @protected
+  List<int> dco_decode_list_prim_u_8_loose(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as List<int>;
   }
 
   @protected
@@ -177,6 +318,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  U8Array64 dco_decode_u_8_array_64(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return U8Array64(dco_decode_list_prim_u_8_strict(raw));
+  }
+
+  @protected
   U8Array96 dco_decode_u_8_array_96(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return U8Array96(dco_decode_list_prim_u_8_strict(raw));
@@ -194,6 +341,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_list_prim_u_8_strict(deserializer);
     return utf8.decoder.convert(inner);
+  }
+
+  @protected
+  bool sse_decode_bool(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getUint8() != 0;
+  }
+
+  @protected
+  List<int> sse_decode_list_prim_u_8_loose(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var len_ = sse_decode_i_32(deserializer);
+    return deserializer.buffer.getUint8List(len_);
   }
 
   @protected
@@ -221,6 +381,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  U8Array64 sse_decode_u_8_array_64(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_list_prim_u_8_strict(deserializer);
+    return U8Array64(inner);
+  }
+
+  @protected
   U8Array96 sse_decode_u_8_array_96(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_list_prim_u_8_strict(deserializer);
@@ -234,12 +401,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  bool sse_decode_bool(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return deserializer.buffer.getUint8() != 0;
-  }
-
-  @protected
   void sse_encode_AnyhowException(
       AnyhowException self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -250,6 +411,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_String(String self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_prim_u_8_strict(utf8.encoder.convert(self), serializer);
+  }
+
+  @protected
+  void sse_encode_bool(bool self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putUint8(self ? 1 : 0);
+  }
+
+  @protected
+  void sse_encode_list_prim_u_8_loose(
+      List<int> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    serializer.buffer
+        .putUint8List(self is Uint8List ? self : Uint8List.fromList(self));
   }
 
   @protected
@@ -277,6 +453,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_u_8_array_64(U8Array64 self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_prim_u_8_strict(self.inner, serializer);
+  }
+
+  @protected
   void sse_encode_u_8_array_96(U8Array96 self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_prim_u_8_strict(self.inner, serializer);
@@ -286,11 +468,5 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_i_32(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putInt32(self);
-  }
-
-  @protected
-  void sse_encode_bool(bool self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    serializer.buffer.putUint8(self ? 1 : 0);
   }
 }

@@ -7,12 +7,12 @@ import '../frb_generated.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `derive_xprivate_key_helper`, `mnemonic_to_xprv_helper`
+// These functions are ignored because they are not marked as `pub`: `check_signature_xprv_helper`, `check_signature_xpub_helper`, `derive_xprv_helper`, `mnemonic_to_xprv_helper`, `sign_data_helper`, `xpublic_key_helper`
 
 /// Generate a new extended private key (`XPrv`) from a mnemonic and passphrase.
 /// Note that this function only works with BIP-0039 mnemonics.
 /// For more information: Cardano Icarus master node derivation
-/// https://github.com/satoshilabs/slips/blob/master/slip-0023.md
+/// <https://github.com/satoshilabs/slips/blob/master/slip-0023.md>
 ///
 /// # Arguments
 ///
@@ -22,6 +22,10 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 /// # Returns
 ///
 /// Returns a bytes of extended private key as a `Result`.
+///
+/// # Errors
+///
+/// Returns an error if the mnemonic is invalid.
 Future<U8Array96> mnemonicToXprv(
         {required String mnemonic, String? passphrase}) =>
     RustLib.instance.api.crateApiKeyDerivationMnemonicToXprv(
@@ -33,16 +37,112 @@ Future<U8Array96> mnemonicToXprv(
 ///
 /// # Arguments
 ///
-/// - `xprivate_key_bytes`: An extended private key bytes of type `XPrvBytes`.
+/// - `xprv_bytes`: An extended private key bytes of type `XPrvBytes`.
 /// - `path`: Derivation path. eg. m/0/2'/3 where ' represents hardened derivation.
 ///
 /// # Returns
 ///
 /// Returns a bytes of extended private key as a `Result`.
-Future<U8Array96> deriveXprivateKey(
-        {required U8Array96 xprivateKeyBytes, required String path}) =>
-    RustLib.instance.api.crateApiKeyDerivationDeriveXprivateKey(
-        xprivateKeyBytes: xprivateKeyBytes, path: path);
+///
+/// # Errors
+///
+/// Returns an error if the derivation path is invalid.
+Future<U8Array96> deriveXprv(
+        {required U8Array96 xprvBytes, required String path}) =>
+    RustLib.instance.api
+        .crateApiKeyDerivationDeriveXprv(xprvBytes: xprvBytes, path: path);
+
+/// Get public key from the given extended private key.
+///
+/// # Arguments
+///
+/// - `xprv_bytes`: An extended private key bytes of type `XPrvBytes`.
+///
+/// # Returns
+///
+/// Returns a 64 length bytes `XPubBytes` representing the public key.
+///
+/// # Errors
+///
+/// Returns an error if the private key is invalid.
+Future<U8Array64> xpublicKey({required U8Array96 xprvBytes}) =>
+    RustLib.instance.api.crateApiKeyDerivationXpublicKey(xprvBytes: xprvBytes);
+
+/// Sign data with the given extended private key.
+///
+/// # Arguments
+///
+/// - `xprv_bytes`: An extended private key bytes of type `XPrvBytes`.
+/// - `data`: The data to sign.
+///
+/// # Returns
+/// Returns a 64 length bytes `SignatureBytes` representing the signature.
+///
+/// # Errors
+///
+/// Returns an error if the private key is invalid.
+Future<U8Array64> signData(
+        {required U8Array96 xprvBytes, required List<int> data}) =>
+    RustLib.instance.api
+        .crateApiKeyDerivationSignData(xprvBytes: xprvBytes, data: data);
+
+/// Check the signature on the given data using extended private key.
+///
+/// # Arguments
+///
+/// - `xprv_bytes`: An extended private key bytes of type `XPrvBytes`.
+/// - `data`: The data to sign.
+/// - `signature`: The signature to check.
+///
+/// # Returns
+/// Returns a boolean value indicating if the signature match the sign data
+/// True if the signature is valid and match the sign data, false otherwise.
+///
+/// # Errors
+///
+/// Returns an error if the private key or signature is invalid.
+Future<bool> checkSignatureXprv(
+        {required U8Array96 xprvBytes,
+        required List<int> data,
+        required U8Array64 signature}) =>
+    RustLib.instance.api.crateApiKeyDerivationCheckSignatureXprv(
+        xprvBytes: xprvBytes, data: data, signature: signature);
+
+/// Check the signature on the given data using extended public key.
+///
+/// # Arguments
+///
+/// - `xpub_bytes`: An extended public key bytes of type `XPubBytes`.
+/// - `data`: The data to sign.
+/// - `signature`: The signature to check.
+///
+/// # Returns
+/// Returns a boolean value indicating if the signature match the sign data
+/// True if the signature is valid and match the sign data, false otherwise.
+///
+/// # Errors
+///
+/// Returns an error if the public key or signature is invalid.
+Future<bool> checkSignatureXpub(
+        {required U8Array64 xpubBytes,
+        required List<int> data,
+        required U8Array64 signature}) =>
+    RustLib.instance.api.crateApiKeyDerivationCheckSignatureXpub(
+        xpubBytes: xpubBytes, data: data, signature: signature);
+
+class U8Array64 extends NonGrowableListView<int> {
+  static const arraySize = 64;
+
+  @internal
+  Uint8List get inner => _inner;
+  final Uint8List _inner;
+
+  U8Array64(this._inner)
+      : assert(_inner.length == arraySize),
+        super(_inner);
+
+  U8Array64.init() : this(Uint8List(arraySize));
+}
 
 class U8Array96 extends NonGrowableListView<int> {
   static const arraySize = 96;
