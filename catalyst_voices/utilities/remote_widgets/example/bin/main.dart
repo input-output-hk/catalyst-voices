@@ -2,7 +2,7 @@
 
 import 'dart:async';
 
-import 'package:catalyst_voices_remote_widgets/formats.dart';
+import 'package:remote_widgets/formats.dart';
 
 Future<void> main() async {
   await RemoteWidgetEncoder.rfwTxtToRfw(

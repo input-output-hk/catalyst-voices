@@ -7,11 +7,11 @@ environment:
   sdk: ">=3.5.0 <4.0.0"
 
 dependencies:
-  remote_widgets:
-    path: ../
   flutter:
     sdk: flutter
   http: ^1.2.1
+  remote_widgets:
+    path: ../
   rfw: ^1.0.26
 
 dev_dependencies:
