@@ -52,7 +52,7 @@ Future<U8Array96> deriveXprv(
     RustLib.instance.api
         .crateApiKeyDerivationDeriveXprv(xprvBytes: xprvBytes, path: path);
 
-/// Get public key from the given extended private key.
+/// Get extended public key from the given extended private key.
 ///
 /// # Arguments
 ///
@@ -60,15 +60,15 @@ Future<U8Array96> deriveXprv(
 ///
 /// # Returns
 ///
-/// Returns a 64 length bytes `XPubBytes` representing the public key.
+/// Returns a 64 length bytes `XPubBytes` representing the extended public key.
 ///
 /// # Errors
 ///
-/// Returns an error if the private key is invalid.
+/// Returns an error if the extended private key is invalid.
 Future<U8Array64> xpublicKey({required U8Array96 xprvBytes}) =>
     RustLib.instance.api.crateApiKeyDerivationXpublicKey(xprvBytes: xprvBytes);
 
-/// Sign data with the given extended private key.
+/// Sign the given data with the given extended private key.
 ///
 /// # Arguments
 ///
@@ -80,7 +80,7 @@ Future<U8Array64> xpublicKey({required U8Array96 xprvBytes}) =>
 ///
 /// # Errors
 ///
-/// Returns an error if the private key is invalid.
+/// Returns an error if the extended private key is invalid.
 Future<U8Array64> signData(
         {required U8Array96 xprvBytes, required List<int> data}) =>
     RustLib.instance.api
@@ -100,7 +100,7 @@ Future<U8Array64> signData(
 ///
 /// # Errors
 ///
-/// Returns an error if the private key or signature is invalid.
+/// Returns an error if the extended private key or signature is invalid.
 Future<bool> checkSignatureXprv(
         {required U8Array96 xprvBytes,
         required List<int> data,
@@ -122,7 +122,7 @@ Future<bool> checkSignatureXprv(
 ///
 /// # Errors
 ///
-/// Returns an error if the public key or signature is invalid.
+/// Returns an error if the extended public key or signature is invalid.
 Future<bool> checkSignatureXpub(
         {required U8Array64 xpubBytes,
         required List<int> data,

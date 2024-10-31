@@ -140,7 +140,7 @@ fn derive_xprv_helper(xprv: XPrv, path: &str) -> anyhow::Result<XPrv> {
     Ok(key)
 }
 
-/// Get public key from the given extended private key.
+/// Get extended public key from the given extended private key.
 ///
 /// # Arguments
 ///
@@ -148,13 +148,13 @@ fn derive_xprv_helper(xprv: XPrv, path: &str) -> anyhow::Result<XPrv> {
 ///
 /// # Returns
 ///
-/// Returns a 64 length bytes `XPubBytes` representing the public key.
+/// Returns a 64 length bytes `XPubBytes` representing the extended public key.
 ///
 /// # Errors
 ///
-/// Returns an error if the private key is invalid.
+/// Returns an error if the extended private key is invalid.
 pub async fn xpublic_key(xprv_bytes: XPrvBytes) -> anyhow::Result<XPubBytes> {
-    let xpublic_key = spawn_blocking_with(
+    let xpub = spawn_blocking_with(
         move || {
             let xprv = match XPrv::from_bytes_verified(xprv_bytes) {
                 Ok(xprv) => xprv,
@@ -166,15 +166,15 @@ pub async fn xpublic_key(xprv_bytes: XPrvBytes) -> anyhow::Result<XPubBytes> {
     )
     .await??;
 
-    Ok(Into::<[u8; 64]>::into(xpublic_key))
+    Ok(Into::<[u8; 64]>::into(xpub))
 }
 
-/// Helper function for `xpublic_key`.
+/// Helper function for `xpub`.
 fn xpublic_key_helper(xprv: &XPrv) -> XPub {
     xprv.public()
 }
 
-/// Sign data with the given extended private key.
+/// Sign the given data with the given extended private key.
 ///
 /// # Arguments
 ///
@@ -186,7 +186,7 @@ fn xpublic_key_helper(xprv: &XPrv) -> XPub {
 ///
 /// # Errors
 ///
-/// Returns an error if the private key is invalid.
+/// Returns an error if the extended private key is invalid.
 pub async fn sign_data(xprv_bytes: XPrvBytes, data: Vec<u8>) -> anyhow::Result<SignatureBytes> {
     let signature = spawn_blocking_with(
         move || {
@@ -222,7 +222,7 @@ fn sign_data_helper(xprv: &XPrv, data: &[u8]) -> Signature<SignatureBytes> {
 ///
 /// # Errors
 ///
-/// Returns an error if the private key or signature is invalid.
+/// Returns an error if the extended private key or signature is invalid.
 pub async fn check_signature_xprv(
     xprv_bytes: XPrvBytes, data: Vec<u8>, signature: SignatureBytes,
 ) -> anyhow::Result<bool> {
@@ -265,7 +265,7 @@ pub(crate) fn check_signature_xprv_helper(
 ///
 /// # Errors
 ///
-/// Returns an error if the public key or signature is invalid.
+/// Returns an error if the extended public key or signature is invalid.
 pub async fn check_signature_xpub(
     xpub_bytes: XPubBytes, data: Vec<u8>, signature: SignatureBytes,
 ) -> anyhow::Result<bool> {
@@ -276,8 +276,8 @@ pub async fn check_signature_xpub(
                 // Invalid signature, force return false.
                 Err(_) => return Ok(false),
             };
-            let xprv = XPub::from_bytes(xpub_bytes);
-            Ok(check_signature_xpub_helper(&xprv, &data, verified_sig))
+            let xpub = XPub::from_bytes(xpub_bytes);
+            Ok(check_signature_xpub_helper(&xpub, &data, verified_sig))
         },
         FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
     )
@@ -288,9 +288,9 @@ pub async fn check_signature_xpub(
 
 /// Helper function for `check_signature`.
 pub(crate) fn check_signature_xpub_helper(
-    xpublic_key: &XPub, data: &[u8], signature: Signature<SignatureBytes>,
+    xpub: &XPub, data: &[u8], signature: Signature<SignatureBytes>,
 ) -> bool {
-    xpublic_key.verify(data, &signature)
+    xpub.verify(data, &signature)
 }
 
 #[cfg(test)]
