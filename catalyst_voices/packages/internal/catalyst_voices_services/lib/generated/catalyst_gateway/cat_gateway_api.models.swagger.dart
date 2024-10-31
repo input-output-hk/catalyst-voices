@@ -1149,6 +1149,140 @@ extension $InvalidRegistrationsReportExtension on InvalidRegistrationsReport {
 }
 
 @JsonSerializable(explicitToJson: true)
+class RbacRegistration {
+  const RbacRegistration({
+    required this.txHash,
+  });
+
+  factory RbacRegistration.fromJson(Map<String, dynamic> json) =>
+      _$RbacRegistrationFromJson(json);
+
+  static const toJsonFactory = _$RbacRegistrationToJson;
+  Map<String, dynamic> toJson() => _$RbacRegistrationToJson(this);
+
+  @JsonKey(name: 'tx_hash')
+  final String txHash;
+  static const fromJsonFactory = _$RbacRegistrationFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is RbacRegistration &&
+            (identical(other.txHash, txHash) ||
+                const DeepCollectionEquality().equals(other.txHash, txHash)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(txHash) ^ runtimeType.hashCode;
+}
+
+extension $RbacRegistrationExtension on RbacRegistration {
+  RbacRegistration copyWith({String? txHash}) {
+    return RbacRegistration(txHash: txHash ?? this.txHash);
+  }
+
+  RbacRegistration copyWithWrapped({Wrapped<String>? txHash}) {
+    return RbacRegistration(
+        txHash: (txHash != null ? txHash.value : this.txHash));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class RbacRegistrationsResponse {
+  const RbacRegistrationsResponse({
+    required this.registrations,
+  });
+
+  factory RbacRegistrationsResponse.fromJson(Map<String, dynamic> json) =>
+      _$RbacRegistrationsResponseFromJson(json);
+
+  static const toJsonFactory = _$RbacRegistrationsResponseToJson;
+  Map<String, dynamic> toJson() => _$RbacRegistrationsResponseToJson(this);
+
+  @JsonKey(name: 'registrations', defaultValue: <RbacRegistration>[])
+  final List<RbacRegistration> registrations;
+  static const fromJsonFactory = _$RbacRegistrationsResponseFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is RbacRegistrationsResponse &&
+            (identical(other.registrations, registrations) ||
+                const DeepCollectionEquality()
+                    .equals(other.registrations, registrations)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(registrations) ^ runtimeType.hashCode;
+}
+
+extension $RbacRegistrationsResponseExtension on RbacRegistrationsResponse {
+  RbacRegistrationsResponse copyWith({List<RbacRegistration>? registrations}) {
+    return RbacRegistrationsResponse(
+        registrations: registrations ?? this.registrations);
+  }
+
+  RbacRegistrationsResponse copyWithWrapped(
+      {Wrapped<List<RbacRegistration>>? registrations}) {
+    return RbacRegistrationsResponse(
+        registrations:
+            (registrations != null ? registrations.value : this.registrations));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class RbacRole0ChainRootResponse {
+  const RbacRole0ChainRootResponse({
+    required this.chainRoot,
+  });
+
+  factory RbacRole0ChainRootResponse.fromJson(Map<String, dynamic> json) =>
+      _$RbacRole0ChainRootResponseFromJson(json);
+
+  static const toJsonFactory = _$RbacRole0ChainRootResponseToJson;
+  Map<String, dynamic> toJson() => _$RbacRole0ChainRootResponseToJson(this);
+
+  @JsonKey(name: 'chain_root')
+  final String chainRoot;
+  static const fromJsonFactory = _$RbacRole0ChainRootResponseFromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is RbacRole0ChainRootResponse &&
+            (identical(other.chainRoot, chainRoot) ||
+                const DeepCollectionEquality()
+                    .equals(other.chainRoot, chainRoot)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(chainRoot) ^ runtimeType.hashCode;
+}
+
+extension $RbacRole0ChainRootResponseExtension on RbacRole0ChainRootResponse {
+  RbacRole0ChainRootResponse copyWith({String? chainRoot}) {
+    return RbacRole0ChainRootResponse(chainRoot: chainRoot ?? this.chainRoot);
+  }
+
+  RbacRole0ChainRootResponse copyWithWrapped({Wrapped<String>? chainRoot}) {
+    return RbacRole0ChainRootResponse(
+        chainRoot: (chainRoot != null ? chainRoot.value : this.chainRoot));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
 class RegistrationInfo {
   const RegistrationInfo({
     required this.rewardsAddress,
@@ -1296,6 +1430,50 @@ extension $RejectedFragmentExtension on RejectedFragment {
         id: (id != null ? id.value : this.id),
         poolNumber: (poolNumber != null ? poolNumber.value : this.poolNumber),
         reason: (reason != null ? reason.value : this.reason));
+  }
+}
+
+@JsonSerializable(explicitToJson: true)
+class Response$ {
+  const Response$({
+    required this.chainRoot,
+  });
+
+  factory Response$.fromJson(Map<String, dynamic> json) =>
+      _$Response$FromJson(json);
+
+  static const toJsonFactory = _$Response$ToJson;
+  Map<String, dynamic> toJson() => _$Response$ToJson(this);
+
+  @JsonKey(name: 'chain_root')
+  final String chainRoot;
+  static const fromJsonFactory = _$Response$FromJson;
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other is Response$ &&
+            (identical(other.chainRoot, chainRoot) ||
+                const DeepCollectionEquality()
+                    .equals(other.chainRoot, chainRoot)));
+  }
+
+  @override
+  String toString() => jsonEncode(this);
+
+  @override
+  int get hashCode =>
+      const DeepCollectionEquality().hash(chainRoot) ^ runtimeType.hashCode;
+}
+
+extension $Response$Extension on Response$ {
+  Response$ copyWith({String? chainRoot}) {
+    return Response$(chainRoot: chainRoot ?? this.chainRoot);
+  }
+
+  Response$ copyWithWrapped({Wrapped<String>? chainRoot}) {
+    return Response$(
+        chainRoot: (chainRoot != null ? chainRoot.value : this.chainRoot));
   }
 }
 
