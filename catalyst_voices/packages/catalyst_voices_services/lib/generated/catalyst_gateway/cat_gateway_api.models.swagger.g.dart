@@ -286,6 +286,43 @@ Map<String, dynamic> _$InvalidRegistrationsReportToJson(
       'cip36': instance.cip36,
     };
 
+RbacRegistration _$RbacRegistrationFromJson(Map<String, dynamic> json) =>
+    RbacRegistration(
+      txHash: json['tx_hash'] as String,
+    );
+
+Map<String, dynamic> _$RbacRegistrationToJson(RbacRegistration instance) =>
+    <String, dynamic>{
+      'tx_hash': instance.txHash,
+    };
+
+RbacRegistrationsResponse _$RbacRegistrationsResponseFromJson(
+        Map<String, dynamic> json) =>
+    RbacRegistrationsResponse(
+      registrations: (json['registrations'] as List<dynamic>?)
+              ?.map((e) => RbacRegistration.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+    );
+
+Map<String, dynamic> _$RbacRegistrationsResponseToJson(
+        RbacRegistrationsResponse instance) =>
+    <String, dynamic>{
+      'registrations': instance.registrations.map((e) => e.toJson()).toList(),
+    };
+
+RbacRole0ChainRootResponse _$RbacRole0ChainRootResponseFromJson(
+        Map<String, dynamic> json) =>
+    RbacRole0ChainRootResponse(
+      chainRoot: json['chain_root'] as String,
+    );
+
+Map<String, dynamic> _$RbacRole0ChainRootResponseToJson(
+        RbacRole0ChainRootResponse instance) =>
+    <String, dynamic>{
+      'chain_root': instance.chainRoot,
+    };
+
 RegistrationInfo _$RegistrationInfoFromJson(Map<String, dynamic> json) =>
     RegistrationInfo(
       rewardsAddress: json['rewards_address'] as String,
@@ -315,6 +352,14 @@ Map<String, dynamic> _$RejectedFragmentToJson(RejectedFragment instance) =>
       'id': instance.id,
       'pool_number': instance.poolNumber,
       'reason': reasonRejectedToJson(instance.reason),
+    };
+
+Response$ _$Response$FromJson(Map<String, dynamic> json) => Response$(
+      chainRoot: json['chain_root'] as String,
+    );
+
+Map<String, dynamic> _$Response$ToJson(Response$ instance) => <String, dynamic>{
+      'chain_root': instance.chainRoot,
     };
 
 Sentry _$SentryFromJson(Map<String, dynamic> json) => Sentry(

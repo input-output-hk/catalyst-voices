@@ -254,6 +254,55 @@ abstract class CatGatewayApi extends ChopperService {
       _apiDraftCardanoCip36LatestRegistrationVoteKeyGet(
           {@Query('vote_key') required String? voteKey});
 
+  ///Get RBAC chain root
+  ///@param stake_address Stake address to get the chain root for.
+  Future<chopper.Response<Response$>> apiDraftRbacChainRootStakeAddressGet(
+      {required String? stakeAddress}) {
+    generatedMapping.putIfAbsent(Response$, () => Response$.fromJsonFactory);
+
+    return _apiDraftRbacChainRootStakeAddressGet(stakeAddress: stakeAddress);
+  }
+
+  ///Get RBAC chain root
+  ///@param stake_address Stake address to get the chain root for.
+  @Get(path: '/api/draft/rbac/chain_root/{stake_address}')
+  Future<chopper.Response<Response$>> _apiDraftRbacChainRootStakeAddressGet(
+      {@Path('stake_address') required String? stakeAddress});
+
+  ///Get registrations by RBAC chain root
+  ///@param chain_root Chain root to get the registrations for.
+  Future<chopper.Response<RbacRegistrationsResponse>>
+      apiDraftRbacRegistrationsChainRootGet({required String? chainRoot}) {
+    generatedMapping.putIfAbsent(RbacRegistrationsResponse,
+        () => RbacRegistrationsResponse.fromJsonFactory);
+
+    return _apiDraftRbacRegistrationsChainRootGet(chainRoot: chainRoot);
+  }
+
+  ///Get registrations by RBAC chain root
+  ///@param chain_root Chain root to get the registrations for.
+  @Get(path: '/api/draft/rbac/registrations/{chain_root}')
+  Future<chopper.Response<RbacRegistrationsResponse>>
+      _apiDraftRbacRegistrationsChainRootGet(
+          {@Path('chain_root') required String? chainRoot});
+
+  ///Get RBAC chain root for a given role0 key.
+  ///@param role0_key Role0 key to get the chain root for.
+  Future<chopper.Response<RbacRole0ChainRootResponse>>
+      apiDraftRbacRole0ChainRootRole0KeyGet({required String? role0Key}) {
+    generatedMapping.putIfAbsent(RbacRole0ChainRootResponse,
+        () => RbacRole0ChainRootResponse.fromJsonFactory);
+
+    return _apiDraftRbacRole0ChainRootRole0KeyGet(role0Key: role0Key);
+  }
+
+  ///Get RBAC chain root for a given role0 key.
+  ///@param role0_key Role0 key to get the chain root for.
+  @Get(path: '/api/draft/rbac/role0_chain_root/{role0_key}')
+  Future<chopper.Response<RbacRole0ChainRootResponse>>
+      _apiDraftRbacRole0ChainRootRole0KeyGet(
+          {@Path('role0_key') required String? role0Key});
+
   ///Get the configuration for the frontend.
   Future<chopper.Response<FrontendConfig>> apiDraftConfigFrontendGet() {
     generatedMapping.putIfAbsent(
