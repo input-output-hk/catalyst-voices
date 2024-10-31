@@ -22,7 +22,7 @@ code-generator:
     LET local_gen_code_path = packages/internal/catalyst_voices_services/lib/generated/catalyst_gateway/
 
     FROM +builder
-    WORKDIR catalyst_voices/packages/internal/catalyst_voices_services
+    WORKDIR packages/internal/catalyst_voices_services
     COPY catalyst-gateway+build/doc/cat-gateway-api.json openapi/cat-gateway-api.json
     DO flutter-ci+OPENAPI_CODE_GEN \
         --SAVE_LOCALLY=$save_locally \
