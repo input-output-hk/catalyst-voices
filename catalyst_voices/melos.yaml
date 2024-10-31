@@ -51,7 +51,7 @@ packageLicenseOverride:
   catalyst_voices_localization: Apache-2.0
   catalyst_voices_models: Apache-2.0
   example: Apache-2.0
-  catalyst_voices_remote_widgets: Apache-2.0
+  remote_widgets: Apache-2.0
   remote_widgets_example: Apache-2.0
   catalyst_voices_view_models: Apache-2.0
   catalyst_voices_blocs: Apache-2.0

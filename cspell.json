@@ -177,7 +177,7 @@
         "**/generated/**",
         "**/GeneratedPluginRegistrant.swift",
         "catalyst_voices/packages/libs/catalyst_key_derivation/cargokit/**",
-        "catalyst_voices/utilities/catalyst_voices_remote_widgets/example/**/**",
+        "catalyst_voices/utilities/remote_widgets/example/**/**",
         "catalyst_voices/utilities/poc_local_storage/**/**",
         "**/*.svg"
     ],
