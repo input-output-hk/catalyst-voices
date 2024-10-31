@@ -51,12 +51,9 @@ pub(crate) async fn endpoint(role0_key: String) -> AllResponses {
         return Responses::BadRequest.into();
     };
 
-    let query_res = GetRole0ChainRootQuery::execute(
-        &session,
-        GetRole0ChainRootQueryParams {
-            role0_key: decoded_role0_key,
-        },
-    )
+    let query_res = GetRole0ChainRootQuery::execute(&session, GetRole0ChainRootQueryParams {
+        role0_key: decoded_role0_key,
+    })
     .await;
 
     match query_res {
