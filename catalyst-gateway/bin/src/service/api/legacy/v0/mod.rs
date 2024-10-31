@@ -6,6 +6,7 @@ use crate::service::{
 };
 mod message_post;
 mod plans_get;
+mod search;
 
 /// `v0` API Endpoints
 pub(crate) struct V0Api;
@@ -38,4 +39,53 @@ impl V0Api {
     async fn plans_get(&self) -> plans_get::AllResponses {
         plans_get::endpoint().await
     }
+
+    /// Search various resources with various constraints
+    /// 
+    /// Search various resources especially challenges and proposals with various constraints like contains some string etc.
+    #[oai(
+        path = "/search",
+        method = "post",
+        operation_id = "PostSearch",
+        deprecated = true
+    )]
+    async fn search_post(&self) -> search::AllResponses {
+        search::endpoint().await
+    }
+
+    // POST /api/v0/search_count
+    #[oai(
+        path = "/search_count",
+        method = "post",
+        operation_id = "PostSearchCount",
+        deprecated = true
+    )]
+    // Get /api/v0/challenges/
+    #[oai(
+        path = "/challenges",
+        method = "get",
+        operation_id = "GetChallenges",
+        deprecated = true
+    )]
+    // Get /api/v0/challenges/{challenge_id}
+    #[oai(
+        path = "/challenges/{challenge_id}",
+        method = "get",
+        operation_id = "GetChallengeId",
+        deprecated = true
+    )]
+    // Get /api/v0/node/stats
+    #[oai(
+        path = "/node/stats",
+        method = "get",
+        operation_id = "NodeStats",
+        deprecated = true
+    )]
+    // Get /api/v0/account/{account_id} 
+    #[oai(
+        path = "/account/{account_id}",
+        method = "get",
+        operation_id = "GetAccountId",
+        deprecated = true
+    )]
 }
