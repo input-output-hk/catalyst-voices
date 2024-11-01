@@ -6,7 +6,7 @@
 use bip32::DerivationPath;
 use bip39::Mnemonic;
 pub use ed25519_bip32::{DerivationIndex, DerivationScheme, Signature, XPrv, XPub};
-use flutter_rust_bridge::spawn_blocking_with;
+use flutter_rust_bridge::{frb, spawn_blocking_with};
 use hmac::Hmac;
 use pbkdf2::pbkdf2;
 use sha2::Sha512;
@@ -17,13 +17,270 @@ use crate::frb_generated::FLUTTER_RUST_BRIDGE_HANDLER;
 /// Compose of:
 /// - 64 Bytes: extended Ed25519 secret key
 /// - 32 Bytes: chain code
-pub type XPrvBytes = [u8; 96];
+#[derive(Clone, Debug, PartialEq, Eq)]
+#[frb(opaque)]
+pub struct XPrvBytes([u8; 96]);
+
+impl From<XPrv> for XPrvBytes {
+    fn from(xprv: XPrv) -> Self {
+        XPrvBytes(xprv.into())
+    }
+}
+
+impl XPrvBytes {
+    /// Create a new `XPrvBytes` from the given bytes.
+    #[frb(sync)]
+    pub fn new(xprv_bytes: [u8; 96]) -> Self {
+        XPrvBytes(xprv_bytes)
+    }
+
+    /// Get the inner bytes.
+    #[frb(getter, sync)]
+    pub fn get_inner(&self) -> [u8; 96] {
+        self.0
+    }
+
+    /// Extract the chain code from the extended private key.
+    /// The chain code is the last 32 bytes of the extended private key.
+    ///
+    /// # Returns
+    ///
+    /// Returns a 32 length bytes representing the chain code.
+    #[frb(getter, sync)]
+    pub fn get_chain_code(&self) -> [u8; 32] {
+        let mut chain_code = [0; 32];
+        chain_code.copy_from_slice(&self.0[64..96]);
+        chain_code
+    }
+
+    /// Extract the extended secret key from the extended private key.
+    /// The extended secret key is the first 64 bytes of the extended private key.
+    ///
+    /// # Returns
+    ///
+    /// Returns a 64 length bytes representing the extended secret key.
+    #[frb(getter, sync)]
+    pub fn get_extended_secret_key(&self) -> [u8; 64] {
+        let mut x_secret = [0; 64];
+        x_secret.copy_from_slice(&self.0[0..64]);
+        x_secret
+    }
+
+    /// Derive a new extended private key from the given extended private key.
+    /// - V2 derivation scheme is used as it is mention in [SLIP-0023](https://github.com/satoshilabs/slips/blob/master/slip-0023.md).
+    /// - More information about child key derivation can be found in [BIP32-Ed25519](https://input-output-hk.github.io/adrestia/static/Ed25519_BIP.pdf).
+    ///  
+    /// # Arguments
+    ///
+    /// - `xprv_bytes`: An extended private key bytes of type `XPrvBytes`.
+    /// - `path`: Derivation path. eg. m/0/2'/3 where ' represents hardened derivation.
+    ///
+    /// # Returns
+    ///
+    /// Returns a bytes of extended private key as a `Result`.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the derivation path is invalid.
+    // &str is not supported in flutter_rust_bridge
+    #[allow(clippy::needless_pass_by_value)]
+    pub async fn derive_xprv(&self, path: String) -> anyhow::Result<Self> {
+        let xprv = XPrv::from_bytes_verified(self.0.clone())?;
+
+        let derive_xprv = spawn_blocking_with(
+            move || derive_xprv_helper(xprv, &path),
+            FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
+        )
+        .await??;
+
+        Ok(derive_xprv.into())
+    }
+
+    /// Get extended public key from the given extended private key.
+    ///
+    /// # Returns
+    ///
+    /// Returns a 64 length bytes `XPubBytes` representing the extended public key.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the extended private key is invalid.
+    pub async fn xpublic_key(&self) -> anyhow::Result<XPubBytes> {
+        let xprv = XPrv::from_bytes_verified(self.0.clone())?;
+
+        let xpub = spawn_blocking_with(
+            move || xpublic_key_helper(&xprv),
+            FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
+        )
+        .await?;
+
+        Ok(XPubBytes(xpub.into()))
+    }
+
+    /// Sign the given data with the given extended private key.
+    ///
+    /// # Arguments
+    ///
+    /// - `data`: The data to sign.
+    ///
+    /// # Returns
+    /// Returns a 64 length bytes `SignatureBytes` representing the signature.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the extended private key is invalid.
+    pub async fn sign_data(&self, data: Vec<u8>) -> anyhow::Result<SignatureBytes> {
+        let xprv = XPrv::from_bytes_verified(self.0.clone())?;
+
+        let signature = spawn_blocking_with(
+            move || sign_data_helper(&xprv, &data),
+            FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
+        )
+        .await?;
+
+        Ok(SignatureBytes(*signature.to_bytes()))
+    }
+
+    /// Verify the signature on the given data using extended private key.
+    ///
+    /// # Arguments
+    ///
+    /// - `data`: The data to sign.
+    /// - `signature`: The signature to check.
+    ///
+    /// # Returns
+    /// Returns a boolean value indicating if the signature match the sign data
+    /// True if the signature is valid and match the sign data, false otherwise.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the extended private key or signature is invalid.
+    pub async fn verify_signature(
+        &self, data: Vec<u8>, signature: &SignatureBytes,
+    ) -> anyhow::Result<bool> {
+        let xprv = XPrv::from_bytes_verified(self.0.clone())?;
+        let verified_sig = Signature::from_slice(&signature.0)
+            .map_err(|_| anyhow::anyhow!("Invalid signature"))?;
+
+        let result = spawn_blocking_with(
+            move || verify_signature_xprv_helper(&xprv, &data, verified_sig),
+            FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
+        )
+        .await?;
+
+        Ok(result)
+    }
+
+    /// Drop the extended private key.
+    #[frb(sync)]
+    pub fn drop(&mut self) {
+        // Zero out the private key bytes to improve security
+        for byte in &mut self.0 {
+            *byte = 0;
+        }
+    }
+}
 
 /// Extended public key bytes type.
-pub type XPubBytes = [u8; 64];
+#[derive(Clone, Debug, PartialEq, Eq)]
+#[frb(opaque)]
+pub struct XPubBytes([u8; 64]);
+
+impl From<XPub> for XPubBytes {
+    fn from(xpub: XPub) -> Self {
+        XPubBytes(xpub.into())
+    }
+}
+
+impl XPubBytes {
+    /// Create a new `XPubBytes` from the given bytes.
+    #[frb(sync)]
+    pub fn new(xpub_bytes: [u8; 64]) -> Self {
+        XPubBytes(xpub_bytes)
+    }
+
+    /// Get the inner bytes.
+    #[frb(getter, sync)]
+    pub fn get_inner(&self) -> [u8; 64] {
+        self.0
+    }
+
+    /// Extract the chain code from the extended public key.
+    /// The chain code is the last 32 bytes of the extended public key.
+    ///
+    /// # Returns
+    ///
+    /// Returns a 32 length bytes representing the chain code.
+    #[frb(getter, sync)]
+    pub fn get_chain_code(&self) -> [u8; 32] {
+        let mut chain_code = [0; 32];
+        chain_code.copy_from_slice(&self.0[32..64]);
+        chain_code
+    }
+
+    /// Extract the public key from the extended public key.
+    /// The public key is the first 32 bytes of the extended public key.
+    ///
+    /// # Returns
+    ///
+    /// Returns a 32 length bytes representing the public key.
+    #[frb(getter, sync)]
+
+    pub fn get_public_key(&self) -> [u8; 32] {
+        let mut public_key = [0; 32];
+        public_key.copy_from_slice(&self.0[0..32]);
+        public_key
+    }
+
+    /// Verify the signature on the given data using extended public key.
+    ///
+    /// # Arguments
+    ///
+    /// - `data`: The data to sign.
+    /// - `signature`: The signature to check.
+    ///
+    /// # Returns
+    /// Returns a boolean value indicating if the signature match the sign data
+    /// True if the signature is valid and match the sign data, false otherwise.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the extended public key or signature is invalid.
+    pub async fn verify_signature(
+        &self, data: Vec<u8>, signature: &SignatureBytes,
+    ) -> anyhow::Result<bool> {
+        let xpub = XPub::from_bytes(self.0.clone());
+        let verified_sig = Signature::from_slice(&signature.0)
+            .map_err(|_| anyhow::anyhow!("Invalid signature"))?;
+
+        let result = spawn_blocking_with(
+            move || verify_signature_xpub_helper(&xpub, &data, verified_sig),
+            FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
+        )
+        .await?;
+
+        Ok(result)
+    }
+}
 
 /// Signature bytes type.
-pub type SignatureBytes = [u8; 64];
+#[derive(Clone, Debug, PartialEq, Eq)]
+#[frb(opaque)]
+pub struct SignatureBytes([u8; 64]);
+
+impl SignatureBytes {
+    /// Create a new `SignatureBytes` from the given bytes.
+    #[frb(sync)]
+    pub fn new(sig_bytes: [u8; 64]) -> Self {
+        SignatureBytes(sig_bytes)
+    }
+
+    /// Get the inner bytes.
+    #[frb(getter, sync)]
+    pub fn get_inner(&self) -> [u8; 64] {
+        self.0
+    }
+}
 
 /// Generate a new extended private key (`XPrv`) from a mnemonic and passphrase.
 /// Note that this function only works with BIP-0039 mnemonics.
@@ -93,37 +350,6 @@ fn mnemonic_to_xprv_helper(mnemonic: String, passphrase: Option<String>) -> anyh
     Ok(XPrv::normalize_bytes_force3rd(pbkdf2_result))
 }
 
-/// Derive a new extended private key from the given extended private key.
-/// - V2 derivation scheme is used as it is mention in [SLIP-0023](https://github.com/satoshilabs/slips/blob/master/slip-0023.md).
-/// - More information about child key derivation can be found in [BIP32-Ed25519](https://input-output-hk.github.io/adrestia/static/Ed25519_BIP.pdf).
-///  
-/// # Arguments
-///
-/// - `xprv_bytes`: An extended private key bytes of type `XPrvBytes`.
-/// - `path`: Derivation path. eg. m/0/2'/3 where ' represents hardened derivation.
-///
-/// # Returns
-///
-/// Returns a bytes of extended private key as a `Result`.
-///
-/// # Errors
-///
-/// Returns an error if the derivation path is invalid.
-// &str is not supported in flutter_rust_bridge
-#[allow(clippy::needless_pass_by_value)]
-pub async fn derive_xprv(xprv_bytes: XPrvBytes, path: String) -> anyhow::Result<XPrvBytes> {
-    let derive_xprv = spawn_blocking_with(
-        move || {
-            let xprv = XPrv::from_bytes_verified(xprv_bytes)?;
-            derive_xprv_helper(xprv, &path)
-        },
-        FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
-    )
-    .await??;
-
-    Ok(derive_xprv.into())
-}
-
 /// Helper function for `derive_xprv`.
 fn derive_xprv_helper(xprv: XPrv, path: &str) -> anyhow::Result<XPrv> {
     let Ok(derivation_path) = path.parse::<DerivationPath>() else {
@@ -131,7 +357,11 @@ fn derive_xprv_helper(xprv: XPrv, path: &str) -> anyhow::Result<XPrv> {
     };
     let key = derivation_path.iter().fold(xprv, |xprv, child_num| {
         if child_num.is_hardened() {
-            // i >= 2^31 is a hardened derivation
+            // Hardened derivation is indicated by setting the highest bit (i >= 2^31).
+            // This modifies the child index by applying a mask to ensure it falls within the
+            // hardened range. Note that 0x80_00_00_00 is equivalent to 2^31.
+            // More about hardened, please visit
+            // <https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki>
             xprv.derive(DerivationScheme::V2, child_num.index() | 0x80_00_00_00)
         } else {
             xprv.derive(DerivationScheme::V2, child_num.index())
@@ -140,67 +370,9 @@ fn derive_xprv_helper(xprv: XPrv, path: &str) -> anyhow::Result<XPrv> {
     Ok(key)
 }
 
-/// Get extended public key from the given extended private key.
-///
-/// # Arguments
-///
-/// - `xprv_bytes`: An extended private key bytes of type `XPrvBytes`.
-///
-/// # Returns
-///
-/// Returns a 64 length bytes `XPubBytes` representing the extended public key.
-///
-/// # Errors
-///
-/// Returns an error if the extended private key is invalid.
-pub async fn xpublic_key(xprv_bytes: XPrvBytes) -> anyhow::Result<XPubBytes> {
-    let xpub = spawn_blocking_with(
-        move || {
-            let xprv = match XPrv::from_bytes_verified(xprv_bytes) {
-                Ok(xprv) => xprv,
-                Err(e) => return Err(anyhow::anyhow!(e)),
-            };
-            Ok(xpublic_key_helper(&xprv))
-        },
-        FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
-    )
-    .await??;
-
-    Ok(Into::<[u8; 64]>::into(xpub))
-}
-
 /// Helper function for `xpub`.
 fn xpublic_key_helper(xprv: &XPrv) -> XPub {
     xprv.public()
-}
-
-/// Sign the given data with the given extended private key.
-///
-/// # Arguments
-///
-/// - `xprv_bytes`: An extended private key bytes of type `XPrvBytes`.
-/// - `data`: The data to sign.
-///
-/// # Returns
-/// Returns a 64 length bytes `SignatureBytes` representing the signature.
-///
-/// # Errors
-///
-/// Returns an error if the extended private key is invalid.
-pub async fn sign_data(xprv_bytes: XPrvBytes, data: Vec<u8>) -> anyhow::Result<SignatureBytes> {
-    let signature = spawn_blocking_with(
-        move || {
-            let xprv = match XPrv::from_bytes_verified(xprv_bytes) {
-                Ok(xprv) => xprv,
-                Err(e) => return Err(anyhow::anyhow!(e)),
-            };
-            Ok(sign_data_helper(&xprv, &data))
-        },
-        FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
-    )
-    .await??;
-
-    Ok(*signature.to_bytes())
 }
 
 /// Helper function for `sign_data`.
@@ -208,86 +380,15 @@ fn sign_data_helper(xprv: &XPrv, data: &[u8]) -> Signature<SignatureBytes> {
     xprv.sign(data)
 }
 
-/// Check the signature on the given data using extended private key.
-///
-/// # Arguments
-///
-/// - `xprv_bytes`: An extended private key bytes of type `XPrvBytes`.
-/// - `data`: The data to sign.
-/// - `signature`: The signature to check.
-///
-/// # Returns
-/// Returns a boolean value indicating if the signature match the sign data
-/// True if the signature is valid and match the sign data, false otherwise.
-///
-/// # Errors
-///
-/// Returns an error if the extended private key or signature is invalid.
-pub async fn check_signature_xprv(
-    xprv_bytes: XPrvBytes, data: Vec<u8>, signature: SignatureBytes,
-) -> anyhow::Result<bool> {
-    let result = spawn_blocking_with(
-        move || -> anyhow::Result<bool> {
-            // Verify the signature.
-            let verified_sig: Signature<SignatureBytes> = match Signature::from_slice(&signature) {
-                Ok(sig) => sig,
-                // Invalid signature, force return false.
-                Err(_) => return Ok(false),
-            };
-            let xprv = XPrv::from_bytes_verified(xprv_bytes)?;
-            Ok(check_signature_xprv_helper(&xprv, &data, verified_sig))
-        },
-        FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
-    )
-    .await??;
-
-    Ok(result)
-}
-
-/// Helper function for `check_signature`.
-pub(crate) fn check_signature_xprv_helper(
+/// Helper function for `XPrvBytes` `verify_signature`.
+fn verify_signature_xprv_helper(
     xprv: &XPrv, data: &[u8], signature: Signature<SignatureBytes>,
 ) -> bool {
     xprv.verify(data, &signature)
 }
 
-/// Check the signature on the given data using extended public key.
-///
-/// # Arguments
-///
-/// - `xpub_bytes`: An extended public key bytes of type `XPubBytes`.
-/// - `data`: The data to sign.
-/// - `signature`: The signature to check.
-///
-/// # Returns
-/// Returns a boolean value indicating if the signature match the sign data
-/// True if the signature is valid and match the sign data, false otherwise.
-///
-/// # Errors
-///
-/// Returns an error if the extended public key or signature is invalid.
-pub async fn check_signature_xpub(
-    xpub_bytes: XPubBytes, data: Vec<u8>, signature: SignatureBytes,
-) -> anyhow::Result<bool> {
-    let result = spawn_blocking_with(
-        move || -> anyhow::Result<bool> {
-            let verified_sig: Signature<SignatureBytes> = match Signature::from_slice(&signature) {
-                Ok(sig) => sig,
-                // Invalid signature, force return false.
-                Err(_) => return Ok(false),
-            };
-            let xpub = XPub::from_bytes(xpub_bytes);
-            Ok(check_signature_xpub_helper(&xpub, &data, verified_sig))
-        },
-        FLUTTER_RUST_BRIDGE_HANDLER.thread_pool(),
-    )
-    .await??;
-
-    Ok(result)
-}
-
-/// Helper function for `check_signature`.
-pub(crate) fn check_signature_xpub_helper(
+/// Helper function for `XPubBytes` `verify_signature`.
+fn verify_signature_xpub_helper(
     xpub: &XPub, data: &[u8], signature: Signature<SignatureBytes>,
 ) -> bool {
     xpub.verify(data, &signature)
@@ -321,8 +422,12 @@ mod test {
         let data = vec![1, 2, 3];
         let xprv = mnemonic_to_xprv_helper(MNEMONIC.to_string(), None).unwrap();
         let sign_data = sign_data_helper(&xprv, &data);
-        assert!(check_signature_xprv_helper(&xprv, &data, sign_data.clone()));
+        assert!(verify_signature_xprv_helper(
+            &xprv,
+            &data,
+            sign_data.clone()
+        ));
         let xpub = xpublic_key_helper(&xprv);
-        assert!(check_signature_xpub_helper(&xpub, &data, sign_data));
+        assert!(verify_signature_xpub_helper(&xpub, &data, sign_data));
     }
 }
