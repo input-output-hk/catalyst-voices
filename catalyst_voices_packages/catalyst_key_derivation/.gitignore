@@ -28,3 +28,9 @@ migrate_working_dir/
 .dart_tool/
 build/
 /web/pkg
+
+# Ignore all auto generated file
+lib/src/rust/**
+lib/src/rust/src/frb_generated.rs
+# Allow catalyst_key_derivation.dart
+!lib/src/rust/catalyst_key_derivation.dart
