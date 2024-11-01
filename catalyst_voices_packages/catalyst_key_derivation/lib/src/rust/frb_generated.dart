@@ -66,7 +66,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.5.1';
 
   @override
-  int get rustContentHash => -541330839;
+  int get rustContentHash => -609775494;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -77,27 +77,80 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
-  Future<bool> crateApiKeyDerivationCheckSignatureXprv(
-      {required U8Array96 xprvBytes,
+  U8Array64 crateApiKeyDerivationSignatureBytesGetInner(
+      {required SignatureBytes that});
+
+  SignatureBytes crateApiKeyDerivationSignatureBytesNew(
+      {required U8Array64 sigBytes});
+
+  Future<XPrvBytes> crateApiKeyDerivationXPrvBytesDeriveXprv(
+      {required XPrvBytes that, required String path});
+
+  void crateApiKeyDerivationXPrvBytesDrop({required XPrvBytes that});
+
+  U8Array32 crateApiKeyDerivationXPrvBytesGetChainCode(
+      {required XPrvBytes that});
+
+  U8Array64 crateApiKeyDerivationXPrvBytesGetExtendedSecretKey(
+      {required XPrvBytes that});
+
+  U8Array96 crateApiKeyDerivationXPrvBytesGetInner({required XPrvBytes that});
+
+  XPrvBytes crateApiKeyDerivationXPrvBytesNew({required U8Array96 xprvBytes});
+
+  Future<SignatureBytes> crateApiKeyDerivationXPrvBytesSignData(
+      {required XPrvBytes that, required List<int> data});
+
+  Future<bool> crateApiKeyDerivationXPrvBytesVerifySignature(
+      {required XPrvBytes that,
       required List<int> data,
-      required U8Array64 signature});
+      required SignatureBytes signature});
 
-  Future<bool> crateApiKeyDerivationCheckSignatureXpub(
-      {required U8Array64 xpubBytes,
+  Future<XPubBytes> crateApiKeyDerivationXPrvBytesXpublicKey(
+      {required XPrvBytes that});
+
+  U8Array32 crateApiKeyDerivationXPubBytesGetChainCode(
+      {required XPubBytes that});
+
+  U8Array64 crateApiKeyDerivationXPubBytesGetInner({required XPubBytes that});
+
+  U8Array32 crateApiKeyDerivationXPubBytesGetPublicKey(
+      {required XPubBytes that});
+
+  XPubBytes crateApiKeyDerivationXPubBytesNew({required U8Array64 xpubBytes});
+
+  Future<bool> crateApiKeyDerivationXPubBytesVerifySignature(
+      {required XPubBytes that,
       required List<int> data,
-      required U8Array64 signature});
+      required SignatureBytes signature});
 
-  Future<U8Array96> crateApiKeyDerivationDeriveXprv(
-      {required U8Array96 xprvBytes, required String path});
-
-  Future<U8Array96> crateApiKeyDerivationMnemonicToXprv(
+  Future<XPrvBytes> crateApiKeyDerivationMnemonicToXprv(
       {required String mnemonic, String? passphrase});
 
-  Future<U8Array64> crateApiKeyDerivationSignData(
-      {required U8Array96 xprvBytes, required List<int> data});
+  RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_SignatureBytes;
 
-  Future<U8Array64> crateApiKeyDerivationXpublicKey(
-      {required U8Array96 xprvBytes});
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_SignatureBytes;
+
+  CrossPlatformFinalizerArg
+      get rust_arc_decrement_strong_count_SignatureBytesPtr;
+
+  RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_XPrvBytes;
+
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_XPrvBytes;
+
+  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_XPrvBytesPtr;
+
+  RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_XPubBytes;
+
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_XPubBytes;
+
+  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_XPubBytesPtr;
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -109,94 +162,439 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
-  Future<bool> crateApiKeyDerivationCheckSignatureXprv(
-      {required U8Array96 xprvBytes,
-      required List<int> data,
-      required U8Array64 signature}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
+  U8Array64 crateApiKeyDerivationSignatureBytesGetInner(
+      {required SignatureBytes that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_u_8_array_96(xprvBytes, serializer);
-        sse_encode_list_prim_u_8_loose(data, serializer);
-        sse_encode_u_8_array_64(signature, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 1, port: port_);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 1)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_bool,
-        decodeErrorData: sse_decode_AnyhowException,
+        decodeSuccessData: sse_decode_u_8_array_64,
+        decodeErrorData: null,
       ),
-      constMeta: kCrateApiKeyDerivationCheckSignatureXprvConstMeta,
-      argValues: [xprvBytes, data, signature],
+      constMeta: kCrateApiKeyDerivationSignatureBytesGetInnerConstMeta,
+      argValues: [that],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiKeyDerivationCheckSignatureXprvConstMeta =>
+  TaskConstMeta get kCrateApiKeyDerivationSignatureBytesGetInnerConstMeta =>
       const TaskConstMeta(
-        debugName: "check_signature_xprv",
-        argNames: ["xprvBytes", "data", "signature"],
+        debugName: "SignatureBytes_get_inner",
+        argNames: ["that"],
       );
 
   @override
-  Future<bool> crateApiKeyDerivationCheckSignatureXpub(
-      {required U8Array64 xpubBytes,
-      required List<int> data,
-      required U8Array64 signature}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
+  SignatureBytes crateApiKeyDerivationSignatureBytesNew(
+      {required U8Array64 sigBytes}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_u_8_array_64(xpubBytes, serializer);
-        sse_encode_list_prim_u_8_loose(data, serializer);
-        sse_encode_u_8_array_64(signature, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 2, port: port_);
+        sse_encode_u_8_array_64(sigBytes, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 2)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_bool,
-        decodeErrorData: sse_decode_AnyhowException,
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes,
+        decodeErrorData: null,
       ),
-      constMeta: kCrateApiKeyDerivationCheckSignatureXpubConstMeta,
-      argValues: [xpubBytes, data, signature],
+      constMeta: kCrateApiKeyDerivationSignatureBytesNewConstMeta,
+      argValues: [sigBytes],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiKeyDerivationCheckSignatureXpubConstMeta =>
+  TaskConstMeta get kCrateApiKeyDerivationSignatureBytesNewConstMeta =>
       const TaskConstMeta(
-        debugName: "check_signature_xpub",
-        argNames: ["xpubBytes", "data", "signature"],
+        debugName: "SignatureBytes_new",
+        argNames: ["sigBytes"],
       );
 
   @override
-  Future<U8Array96> crateApiKeyDerivationDeriveXprv(
-      {required U8Array96 xprvBytes, required String path}) {
+  Future<XPrvBytes> crateApiKeyDerivationXPrvBytesDeriveXprv(
+      {required XPrvBytes that, required String path}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_u_8_array_96(xprvBytes, serializer);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+            that, serializer);
         sse_encode_String(path, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 3, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_u_8_array_96,
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes,
         decodeErrorData: sse_decode_AnyhowException,
       ),
-      constMeta: kCrateApiKeyDerivationDeriveXprvConstMeta,
-      argValues: [xprvBytes, path],
+      constMeta: kCrateApiKeyDerivationXPrvBytesDeriveXprvConstMeta,
+      argValues: [that, path],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiKeyDerivationDeriveXprvConstMeta =>
+  TaskConstMeta get kCrateApiKeyDerivationXPrvBytesDeriveXprvConstMeta =>
       const TaskConstMeta(
-        debugName: "derive_xprv",
-        argNames: ["xprvBytes", "path"],
+        debugName: "XPrvBytes_derive_xprv",
+        argNames: ["that", "path"],
       );
 
   @override
-  Future<U8Array96> crateApiKeyDerivationMnemonicToXprv(
+  void crateApiKeyDerivationXPrvBytesDrop({required XPrvBytes that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 4)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiKeyDerivationXPrvBytesDropConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiKeyDerivationXPrvBytesDropConstMeta =>
+      const TaskConstMeta(
+        debugName: "XPrvBytes_drop",
+        argNames: ["that"],
+      );
+
+  @override
+  U8Array32 crateApiKeyDerivationXPrvBytesGetChainCode(
+      {required XPrvBytes that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_u_8_array_32,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiKeyDerivationXPrvBytesGetChainCodeConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiKeyDerivationXPrvBytesGetChainCodeConstMeta =>
+      const TaskConstMeta(
+        debugName: "XPrvBytes_get_chain_code",
+        argNames: ["that"],
+      );
+
+  @override
+  U8Array64 crateApiKeyDerivationXPrvBytesGetExtendedSecretKey(
+      {required XPrvBytes that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_u_8_array_64,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiKeyDerivationXPrvBytesGetExtendedSecretKeyConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta
+      get kCrateApiKeyDerivationXPrvBytesGetExtendedSecretKeyConstMeta =>
+          const TaskConstMeta(
+            debugName: "XPrvBytes_get_extended_secret_key",
+            argNames: ["that"],
+          );
+
+  @override
+  U8Array96 crateApiKeyDerivationXPrvBytesGetInner({required XPrvBytes that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_u_8_array_96,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiKeyDerivationXPrvBytesGetInnerConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiKeyDerivationXPrvBytesGetInnerConstMeta =>
+      const TaskConstMeta(
+        debugName: "XPrvBytes_get_inner",
+        argNames: ["that"],
+      );
+
+  @override
+  XPrvBytes crateApiKeyDerivationXPrvBytesNew({required U8Array96 xprvBytes}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_u_8_array_96(xprvBytes, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 8)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiKeyDerivationXPrvBytesNewConstMeta,
+      argValues: [xprvBytes],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiKeyDerivationXPrvBytesNewConstMeta =>
+      const TaskConstMeta(
+        debugName: "XPrvBytes_new",
+        argNames: ["xprvBytes"],
+      );
+
+  @override
+  Future<SignatureBytes> crateApiKeyDerivationXPrvBytesSignData(
+      {required XPrvBytes that, required List<int> data}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+            that, serializer);
+        sse_encode_list_prim_u_8_loose(data, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 9, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiKeyDerivationXPrvBytesSignDataConstMeta,
+      argValues: [that, data],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiKeyDerivationXPrvBytesSignDataConstMeta =>
+      const TaskConstMeta(
+        debugName: "XPrvBytes_sign_data",
+        argNames: ["that", "data"],
+      );
+
+  @override
+  Future<bool> crateApiKeyDerivationXPrvBytesVerifySignature(
+      {required XPrvBytes that,
+      required List<int> data,
+      required SignatureBytes signature}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+            that, serializer);
+        sse_encode_list_prim_u_8_loose(data, serializer);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes(
+            signature, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 10, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiKeyDerivationXPrvBytesVerifySignatureConstMeta,
+      argValues: [that, data, signature],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiKeyDerivationXPrvBytesVerifySignatureConstMeta =>
+      const TaskConstMeta(
+        debugName: "XPrvBytes_verify_signature",
+        argNames: ["that", "data", "signature"],
+      );
+
+  @override
+  Future<XPubBytes> crateApiKeyDerivationXPrvBytesXpublicKey(
+      {required XPrvBytes that}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+            that, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 11, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiKeyDerivationXPrvBytesXpublicKeyConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiKeyDerivationXPrvBytesXpublicKeyConstMeta =>
+      const TaskConstMeta(
+        debugName: "XPrvBytes_xpublic_key",
+        argNames: ["that"],
+      );
+
+  @override
+  U8Array32 crateApiKeyDerivationXPubBytesGetChainCode(
+      {required XPubBytes that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 12)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_u_8_array_32,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiKeyDerivationXPubBytesGetChainCodeConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiKeyDerivationXPubBytesGetChainCodeConstMeta =>
+      const TaskConstMeta(
+        debugName: "XPubBytes_get_chain_code",
+        argNames: ["that"],
+      );
+
+  @override
+  U8Array64 crateApiKeyDerivationXPubBytesGetInner({required XPubBytes that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 13)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_u_8_array_64,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiKeyDerivationXPubBytesGetInnerConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiKeyDerivationXPubBytesGetInnerConstMeta =>
+      const TaskConstMeta(
+        debugName: "XPubBytes_get_inner",
+        argNames: ["that"],
+      );
+
+  @override
+  U8Array32 crateApiKeyDerivationXPubBytesGetPublicKey(
+      {required XPubBytes that}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+            that, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_u_8_array_32,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiKeyDerivationXPubBytesGetPublicKeyConstMeta,
+      argValues: [that],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiKeyDerivationXPubBytesGetPublicKeyConstMeta =>
+      const TaskConstMeta(
+        debugName: "XPubBytes_get_public_key",
+        argNames: ["that"],
+      );
+
+  @override
+  XPubBytes crateApiKeyDerivationXPubBytesNew({required U8Array64 xpubBytes}) {
+    return handler.executeSync(SyncTask(
+      callFfi: () {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_u_8_array_64(xpubBytes, serializer);
+        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
+      },
+      codec: SseCodec(
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes,
+        decodeErrorData: null,
+      ),
+      constMeta: kCrateApiKeyDerivationXPubBytesNewConstMeta,
+      argValues: [xpubBytes],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiKeyDerivationXPubBytesNewConstMeta =>
+      const TaskConstMeta(
+        debugName: "XPubBytes_new",
+        argNames: ["xpubBytes"],
+      );
+
+  @override
+  Future<bool> crateApiKeyDerivationXPubBytesVerifySignature(
+      {required XPubBytes that,
+      required List<int> data,
+      required SignatureBytes signature}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+            that, serializer);
+        sse_encode_list_prim_u_8_loose(data, serializer);
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes(
+            signature, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 16, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: sse_decode_AnyhowException,
+      ),
+      constMeta: kCrateApiKeyDerivationXPubBytesVerifySignatureConstMeta,
+      argValues: [that, data, signature],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiKeyDerivationXPubBytesVerifySignatureConstMeta =>
+      const TaskConstMeta(
+        debugName: "XPubBytes_verify_signature",
+        argNames: ["that", "data", "signature"],
+      );
+
+  @override
+  Future<XPrvBytes> crateApiKeyDerivationMnemonicToXprv(
       {required String mnemonic, String? passphrase}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
@@ -204,10 +602,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(mnemonic, serializer);
         sse_encode_opt_String(passphrase, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 4, port: port_);
+            funcId: 17, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_u_8_array_96,
+        decodeSuccessData:
+            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes,
         decodeErrorData: sse_decode_AnyhowException,
       ),
       constMeta: kCrateApiKeyDerivationMnemonicToXprvConstMeta,
@@ -222,63 +621,114 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         argNames: ["mnemonic", "passphrase"],
       );
 
-  @override
-  Future<U8Array64> crateApiKeyDerivationSignData(
-      {required U8Array96 xprvBytes, required List<int> data}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_u_8_array_96(xprvBytes, serializer);
-        sse_encode_list_prim_u_8_loose(data, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 5, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_u_8_array_64,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiKeyDerivationSignDataConstMeta,
-      argValues: [xprvBytes, data],
-      apiImpl: this,
-    ));
-  }
+  RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_SignatureBytes => wire
+          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes;
 
-  TaskConstMeta get kCrateApiKeyDerivationSignDataConstMeta =>
-      const TaskConstMeta(
-        debugName: "sign_data",
-        argNames: ["xprvBytes", "data"],
-      );
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_SignatureBytes => wire
+          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes;
 
-  @override
-  Future<U8Array64> crateApiKeyDerivationXpublicKey(
-      {required U8Array96 xprvBytes}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_u_8_array_96(xprvBytes, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 6, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_u_8_array_64,
-        decodeErrorData: sse_decode_AnyhowException,
-      ),
-      constMeta: kCrateApiKeyDerivationXpublicKeyConstMeta,
-      argValues: [xprvBytes],
-      apiImpl: this,
-    ));
-  }
+  RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_XPrvBytes => wire
+          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes;
 
-  TaskConstMeta get kCrateApiKeyDerivationXpublicKeyConstMeta =>
-      const TaskConstMeta(
-        debugName: "xpublic_key",
-        argNames: ["xprvBytes"],
-      );
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_XPrvBytes => wire
+          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes;
+
+  RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_XPubBytes => wire
+          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes;
+
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_XPubBytes => wire
+          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes;
 
   @protected
   AnyhowException dco_decode_AnyhowException(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return AnyhowException(raw as String);
+  }
+
+  @protected
+  SignatureBytes
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return SignatureBytesImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  XPrvBytes
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return XPrvBytesImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  XPubBytes
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return XPubBytesImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  XPrvBytes
+      dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return XPrvBytesImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  SignatureBytes
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return SignatureBytesImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  XPrvBytes
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return XPrvBytesImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  XPubBytes
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return XPubBytesImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  SignatureBytes
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return SignatureBytesImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  XPrvBytes
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return XPrvBytesImpl.frbInternalDcoDecode(raw as List<dynamic>);
+  }
+
+  @protected
+  XPubBytes
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+          dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return XPubBytesImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -318,6 +768,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  U8Array32 dco_decode_u_8_array_32(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return U8Array32(dco_decode_list_prim_u_8_strict(raw));
+  }
+
+  @protected
   U8Array64 dco_decode_u_8_array_64(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return U8Array64(dco_decode_list_prim_u_8_strict(raw));
@@ -330,10 +786,112 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void dco_decode_unit(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return;
+  }
+
+  @protected
+  BigInt dco_decode_usize(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dcoDecodeU64(raw);
+  }
+
+  @protected
   AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_String(deserializer);
     return AnyhowException(inner);
+  }
+
+  @protected
+  SignatureBytes
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return SignatureBytesImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  XPrvBytes
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return XPrvBytesImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  XPubBytes
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return XPubBytesImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  XPrvBytes
+      sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return XPrvBytesImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  SignatureBytes
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return SignatureBytesImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  XPrvBytes
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return XPrvBytesImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  XPubBytes
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return XPubBytesImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  SignatureBytes
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return SignatureBytesImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  XPrvBytes
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return XPrvBytesImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
+  }
+
+  @protected
+  XPubBytes
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return XPubBytesImpl.frbInternalSseDecode(
+        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
   @protected
@@ -381,6 +939,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  U8Array32 sse_decode_u_8_array_32(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_list_prim_u_8_strict(deserializer);
+    return U8Array32(inner);
+  }
+
+  @protected
   U8Array64 sse_decode_u_8_array_64(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_list_prim_u_8_strict(deserializer);
@@ -395,6 +960,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_decode_unit(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+  }
+
+  @protected
+  BigInt sse_decode_usize(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return deserializer.buffer.getBigUint64();
+  }
+
+  @protected
   int sse_decode_i_32(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getInt32();
@@ -405,6 +981,99 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       AnyhowException self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.message, serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes(
+          SignatureBytes self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as SignatureBytesImpl).frbInternalSseEncode(move: true),
+        serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+          XPrvBytes self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as XPrvBytesImpl).frbInternalSseEncode(move: true), serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+          XPubBytes self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as XPubBytesImpl).frbInternalSseEncode(move: true), serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+          XPrvBytes self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as XPrvBytesImpl).frbInternalSseEncode(move: false), serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes(
+          SignatureBytes self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as SignatureBytesImpl).frbInternalSseEncode(move: false),
+        serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+          XPrvBytes self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as XPrvBytesImpl).frbInternalSseEncode(move: false), serializer);
+  }
+
+  @protected
+  void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+          XPubBytes self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as XPubBytesImpl).frbInternalSseEncode(move: false), serializer);
+  }
+
+  @protected
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes(
+          SignatureBytes self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as SignatureBytesImpl).frbInternalSseEncode(move: null),
+        serializer);
+  }
+
+  @protected
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+          XPrvBytes self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as XPrvBytesImpl).frbInternalSseEncode(move: null), serializer);
+  }
+
+  @protected
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+          XPubBytes self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(
+        (self as XPubBytesImpl).frbInternalSseEncode(move: null), serializer);
   }
 
   @protected
@@ -453,6 +1122,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_u_8_array_32(U8Array32 self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_prim_u_8_strict(self.inner, serializer);
+  }
+
+  @protected
   void sse_encode_u_8_array_64(U8Array64 self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_prim_u_8_strict(self.inner, serializer);
@@ -465,8 +1140,233 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_unit(void self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+  }
+
+  @protected
+  void sse_encode_usize(BigInt self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    serializer.buffer.putBigUint64(self);
+  }
+
+  @protected
   void sse_encode_i_32(int self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putInt32(self);
   }
+}
+
+@sealed
+class SignatureBytesImpl extends RustOpaque implements SignatureBytes {
+  // Not to be used by end users
+  SignatureBytesImpl.frbInternalDcoDecode(List<dynamic> wire)
+      : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  SignatureBytesImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_SignatureBytes,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_SignatureBytes,
+    rustArcDecrementStrongCountPtr:
+        RustLib.instance.api.rust_arc_decrement_strong_count_SignatureBytesPtr,
+  );
+
+  /// Get the inner bytes.
+  U8Array64 get inner =>
+      RustLib.instance.api.crateApiKeyDerivationSignatureBytesGetInner(
+        that: this,
+      );
+}
+
+@sealed
+class XPrvBytesImpl extends RustOpaque implements XPrvBytes {
+  // Not to be used by end users
+  XPrvBytesImpl.frbInternalDcoDecode(List<dynamic> wire)
+      : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  XPrvBytesImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_XPrvBytes,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_XPrvBytes,
+    rustArcDecrementStrongCountPtr:
+        RustLib.instance.api.rust_arc_decrement_strong_count_XPrvBytesPtr,
+  );
+
+  /// Derive a new extended private key from the given extended private key.
+  /// - V2 derivation scheme is used as it is mention in [SLIP-0023](https://github.com/satoshilabs/slips/blob/master/slip-0023.md).
+  /// - More information about child key derivation can be found in [BIP32-Ed25519](https://input-output-hk.github.io/adrestia/static/Ed25519_BIP.pdf).
+  ///
+  /// # Arguments
+  ///
+  /// - `xprv_bytes`: An extended private key bytes of type `XPrvBytes`.
+  /// - `path`: Derivation path. eg. m/0/2'/3 where ' represents hardened derivation.
+  ///
+  /// # Returns
+  ///
+  /// Returns a bytes of extended private key as a `Result`.
+  ///
+  /// # Errors
+  ///
+  /// Returns an error if the derivation path is invalid.
+  Future<XPrvBytes> deriveXprv({required String path}) => RustLib.instance.api
+      .crateApiKeyDerivationXPrvBytesDeriveXprv(that: this, path: path);
+
+  /// Drop the extended private key.
+  void drop() => RustLib.instance.api.crateApiKeyDerivationXPrvBytesDrop(
+        that: this,
+      );
+
+  /// Extract the chain code from the extended private key.
+  /// The chain code is the last 32 bytes of the extended private key.
+  ///
+  /// # Returns
+  ///
+  /// Returns a 32 length bytes representing the chain code.
+  U8Array32 get chainCode =>
+      RustLib.instance.api.crateApiKeyDerivationXPrvBytesGetChainCode(
+        that: this,
+      );
+
+  /// Extract the extended secret key from the extended private key.
+  /// The extended secret key is the first 64 bytes of the extended private key.
+  ///
+  /// # Returns
+  ///
+  /// Returns a 64 length bytes representing the extended secret key.
+  U8Array64 get extendedSecretKey =>
+      RustLib.instance.api.crateApiKeyDerivationXPrvBytesGetExtendedSecretKey(
+        that: this,
+      );
+
+  /// Get the inner bytes.
+  U8Array96 get inner =>
+      RustLib.instance.api.crateApiKeyDerivationXPrvBytesGetInner(
+        that: this,
+      );
+
+  /// Sign the given data with the given extended private key.
+  ///
+  /// # Arguments
+  ///
+  /// - `data`: The data to sign.
+  ///
+  /// # Returns
+  /// Returns a 64 length bytes `SignatureBytes` representing the signature.
+  ///
+  /// # Errors
+  ///
+  /// Returns an error if the extended private key is invalid.
+  Future<SignatureBytes> signData({required List<int> data}) =>
+      RustLib.instance.api
+          .crateApiKeyDerivationXPrvBytesSignData(that: this, data: data);
+
+  /// Verify the signature on the given data using extended private key.
+  ///
+  /// # Arguments
+  ///
+  /// - `data`: The data to sign.
+  /// - `signature`: The signature to check.
+  ///
+  /// # Returns
+  /// Returns a boolean value indicating if the signature match the sign data
+  /// True if the signature is valid and match the sign data, false otherwise.
+  ///
+  /// # Errors
+  ///
+  /// Returns an error if the extended private key or signature is invalid.
+  Future<bool> verifySignature(
+          {required List<int> data, required SignatureBytes signature}) =>
+      RustLib.instance.api.crateApiKeyDerivationXPrvBytesVerifySignature(
+          that: this, data: data, signature: signature);
+
+  /// Get extended public key from the given extended private key.
+  ///
+  /// # Returns
+  ///
+  /// Returns a 64 length bytes `XPubBytes` representing the extended public key.
+  ///
+  /// # Errors
+  ///
+  /// Returns an error if the extended private key is invalid.
+  Future<XPubBytes> xpublicKey() =>
+      RustLib.instance.api.crateApiKeyDerivationXPrvBytesXpublicKey(
+        that: this,
+      );
+}
+
+@sealed
+class XPubBytesImpl extends RustOpaque implements XPubBytes {
+  // Not to be used by end users
+  XPubBytesImpl.frbInternalDcoDecode(List<dynamic> wire)
+      : super.frbInternalDcoDecode(wire, _kStaticData);
+
+  // Not to be used by end users
+  XPubBytesImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
+
+  static final _kStaticData = RustArcStaticData(
+    rustArcIncrementStrongCount:
+        RustLib.instance.api.rust_arc_increment_strong_count_XPubBytes,
+    rustArcDecrementStrongCount:
+        RustLib.instance.api.rust_arc_decrement_strong_count_XPubBytes,
+    rustArcDecrementStrongCountPtr:
+        RustLib.instance.api.rust_arc_decrement_strong_count_XPubBytesPtr,
+  );
+
+  /// Extract the chain code from the extended public key.
+  /// The chain code is the last 32 bytes of the extended public key.
+  ///
+  /// # Returns
+  ///
+  /// Returns a 32 length bytes representing the chain code.
+  U8Array32 get chainCode =>
+      RustLib.instance.api.crateApiKeyDerivationXPubBytesGetChainCode(
+        that: this,
+      );
+
+  /// Get the inner bytes.
+  U8Array64 get inner =>
+      RustLib.instance.api.crateApiKeyDerivationXPubBytesGetInner(
+        that: this,
+      );
+
+  /// Extract the public key from the extended public key.
+  /// The public key is the first 32 bytes of the extended public key.
+  ///
+  /// # Returns
+  ///
+  /// Returns a 32 length bytes representing the public key.
+  U8Array32 get publicKey =>
+      RustLib.instance.api.crateApiKeyDerivationXPubBytesGetPublicKey(
+        that: this,
+      );
+
+  /// Verify the signature on the given data using extended public key.
+  ///
+  /// # Arguments
+  ///
+  /// - `data`: The data to sign.
+  /// - `signature`: The signature to check.
+  ///
+  /// # Returns
+  /// Returns a boolean value indicating if the signature match the sign data
+  /// True if the signature is valid and match the sign data, false otherwise.
+  ///
+  /// # Errors
+  ///
+  /// Returns an error if the extended public key or signature is invalid.
+  Future<bool> verifySignature(
+          {required List<int> data, required SignatureBytes signature}) =>
+      RustLib.instance.api.crateApiKeyDerivationXPubBytesVerifySignature(
+          that: this, data: data, signature: signature);
 }

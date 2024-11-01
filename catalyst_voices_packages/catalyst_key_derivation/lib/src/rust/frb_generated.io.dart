@@ -18,8 +18,68 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     required super.portManager,
   });
 
+  CrossPlatformFinalizerArg
+      get rust_arc_decrement_strong_count_SignatureBytesPtr => wire
+          ._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytesPtr;
+
+  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_XPrvBytesPtr =>
+      wire._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytesPtr;
+
+  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_XPubBytesPtr =>
+      wire._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytesPtr;
+
   @protected
   AnyhowException dco_decode_AnyhowException(dynamic raw);
+
+  @protected
+  SignatureBytes
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes(
+          dynamic raw);
+
+  @protected
+  XPrvBytes
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+          dynamic raw);
+
+  @protected
+  XPubBytes
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+          dynamic raw);
+
+  @protected
+  XPrvBytes
+      dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+          dynamic raw);
+
+  @protected
+  SignatureBytes
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes(
+          dynamic raw);
+
+  @protected
+  XPrvBytes
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+          dynamic raw);
+
+  @protected
+  XPubBytes
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+          dynamic raw);
+
+  @protected
+  SignatureBytes
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes(
+          dynamic raw);
+
+  @protected
+  XPrvBytes
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+          dynamic raw);
+
+  @protected
+  XPubBytes
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+          dynamic raw);
 
   @protected
   String dco_decode_String(dynamic raw);
@@ -40,13 +100,72 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int dco_decode_u_8(dynamic raw);
 
   @protected
+  U8Array32 dco_decode_u_8_array_32(dynamic raw);
+
+  @protected
   U8Array64 dco_decode_u_8_array_64(dynamic raw);
 
   @protected
   U8Array96 dco_decode_u_8_array_96(dynamic raw);
 
   @protected
+  void dco_decode_unit(dynamic raw);
+
+  @protected
+  BigInt dco_decode_usize(dynamic raw);
+
+  @protected
   AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
+
+  @protected
+  SignatureBytes
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes(
+          SseDeserializer deserializer);
+
+  @protected
+  XPrvBytes
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+          SseDeserializer deserializer);
+
+  @protected
+  XPubBytes
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+          SseDeserializer deserializer);
+
+  @protected
+  XPrvBytes
+      sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+          SseDeserializer deserializer);
+
+  @protected
+  SignatureBytes
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes(
+          SseDeserializer deserializer);
+
+  @protected
+  XPrvBytes
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+          SseDeserializer deserializer);
+
+  @protected
+  XPubBytes
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+          SseDeserializer deserializer);
+
+  @protected
+  SignatureBytes
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes(
+          SseDeserializer deserializer);
+
+  @protected
+  XPrvBytes
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+          SseDeserializer deserializer);
+
+  @protected
+  XPubBytes
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+          SseDeserializer deserializer);
 
   @protected
   String sse_decode_String(SseDeserializer deserializer);
@@ -67,10 +186,19 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   int sse_decode_u_8(SseDeserializer deserializer);
 
   @protected
+  U8Array32 sse_decode_u_8_array_32(SseDeserializer deserializer);
+
+  @protected
   U8Array64 sse_decode_u_8_array_64(SseDeserializer deserializer);
 
   @protected
   U8Array96 sse_decode_u_8_array_96(SseDeserializer deserializer);
+
+  @protected
+  void sse_decode_unit(SseDeserializer deserializer);
+
+  @protected
+  BigInt sse_decode_usize(SseDeserializer deserializer);
 
   @protected
   int sse_decode_i_32(SseDeserializer deserializer);
@@ -78,6 +206,56 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_AnyhowException(
       AnyhowException self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes(
+          SignatureBytes self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+          XPrvBytes self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+          XPubBytes self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+          XPrvBytes self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes(
+          SignatureBytes self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+          XPrvBytes self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+          XPubBytes self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes(
+          SignatureBytes self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+          XPrvBytes self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+          XPubBytes self, SseSerializer serializer);
 
   @protected
   void sse_encode_String(String self, SseSerializer serializer);
@@ -99,10 +277,19 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_u_8(int self, SseSerializer serializer);
 
   @protected
+  void sse_encode_u_8_array_32(U8Array32 self, SseSerializer serializer);
+
+  @protected
   void sse_encode_u_8_array_64(U8Array64 self, SseSerializer serializer);
 
   @protected
   void sse_encode_u_8_array_96(U8Array96 self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_unit(void self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_usize(BigInt self, SseSerializer serializer);
 
   @protected
   void sse_encode_i_32(int self, SseSerializer serializer);
@@ -121,4 +308,100 @@ class RustLibWire implements BaseWire {
   /// The symbols are looked up in [dynamicLibrary].
   RustLibWire(ffi.DynamicLibrary dynamicLibrary)
       : _lookup = dynamicLibrary.lookup;
+
+  void
+      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes(
+    ffi.Pointer<ffi.Void> ptr,
+  ) {
+    return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes(
+      ptr,
+    );
+  }
+
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytesPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
+          'frbgen_catalyst_key_derivation_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes');
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes =
+      _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytesPtr
+          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+
+  void
+      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes(
+    ffi.Pointer<ffi.Void> ptr,
+  ) {
+    return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes(
+      ptr,
+    );
+  }
+
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytesPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
+          'frbgen_catalyst_key_derivation_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes');
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytes =
+      _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSignatureBytesPtr
+          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+
+  void
+      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+    ffi.Pointer<ffi.Void> ptr,
+  ) {
+    return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+      ptr,
+    );
+  }
+
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytesPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
+          'frbgen_catalyst_key_derivation_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes');
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes =
+      _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytesPtr
+          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+
+  void
+      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+    ffi.Pointer<ffi.Void> ptr,
+  ) {
+    return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes(
+      ptr,
+    );
+  }
+
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytesPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
+          'frbgen_catalyst_key_derivation_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes');
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytes =
+      _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPrvBytesPtr
+          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+
+  void
+      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+    ffi.Pointer<ffi.Void> ptr,
+  ) {
+    return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+      ptr,
+    );
+  }
+
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytesPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
+          'frbgen_catalyst_key_derivation_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes');
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes =
+      _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytesPtr
+          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+
+  void
+      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+    ffi.Pointer<ffi.Void> ptr,
+  ) {
+    return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes(
+      ptr,
+    );
+  }
+
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytesPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
+          'frbgen_catalyst_key_derivation_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes');
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytes =
+      _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerXPubBytesPtr
+          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
 }
