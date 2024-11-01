@@ -168,7 +168,7 @@ impl CertInsertQuery {
                 // witnessed.
                 (cred.to_vec(), addr.clone(), false)
             },
-            pallas::ledger::primitives::conway::StakeCredential::Scripthash(script) => {
+            pallas::ledger::primitives::conway::StakeCredential::ScriptHash(script) => {
                 (script.to_vec(), default_addr, true)
             },
         };

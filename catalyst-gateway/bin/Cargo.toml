@@ -15,12 +15,12 @@ repository.workspace =  true
 workspace = true
 
 [dependencies]
-cardano-chain-follower = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", rev = "bb3b10e175114f7171a974809bf60ab6d7bc0a93"}
+cardano-chain-follower = { version = "0.0.4", git = "https://github.com/input-output-hk/catalyst-libs.git", rev = "39f7de8527b8d34c6ca6c1fbf2b06644af885547"}
 c509-certificate = { version = "0.0.3", git = "https://github.com/input-output-hk/catalyst-libs.git", tag = "v0.0.3" }
 
-pallas = { version = "0.30.1", git = "https://github.com/input-output-hk/catalyst-pallas.git", rev = "9b5183c8b90b90fe2cc319d986e933e9518957b3" }
-pallas-traverse = { version = "0.30.1", git = "https://github.com/input-output-hk/catalyst-pallas.git", rev = "9b5183c8b90b90fe2cc319d986e933e9518957b3" }
-#pallas-crypto = { version = "0.30.1", git = "https://github.com/input-output-hk/catalyst-pallas.git", rev = "9b5183c8b90b90fe2cc319d986e933e9518957b3" }
+pallas = { version = "0.30.1", git = "https://github.com/input-output-hk/catalyst-pallas.git", rev = "c66bb4f1bb38ace465f6d385c195f98f09043f48" }
+pallas-traverse = { version = "0.30.1", git = "https://github.com/input-output-hk/catalyst-pallas.git", rev = "c66bb4f1bb38ace465f6d385c195f98f09043f48" }
+#pallas-crypto = { version = "0.30.1", git = "https://github.com/input-output-hk/catalyst-pallas.git", rev = "c66bb4f1bb38ace465f6d385c195f98f09043f48" }
 
 clap = { version = "4.5.18", features = ["derive", "env"] }
 tracing = { version = "0.1.40", features = ["log"] }
