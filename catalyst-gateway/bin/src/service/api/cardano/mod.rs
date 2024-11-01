@@ -214,6 +214,8 @@ impl CardanoApi {
         &self,
         /// Stake address to get the chain root for.
         Path(stake_address): Path<Cip19StakeAddress>,
+        /// No Authorization required, but Token permitted.
+        _auth: NoneOrRBAC,
     ) -> rbac::chain_root_get::AllResponses {
         rbac::chain_root_get::endpoint(stake_address).await
     }
@@ -231,6 +233,8 @@ impl CardanoApi {
         /// Chain root to get the registrations for.
         #[oai(validator(max_length = 66, min_length = 64, pattern = "0x[0-9a-f]{64}"))]
         Path(chain_root): Path<String>,
+        /// No Authorization required, but Token permitted.
+        _auth: NoneOrRBAC,
     ) -> rbac::registrations_get::AllResponses {
         rbac::registrations_get::endpoint(chain_root).await
     }
@@ -248,6 +252,8 @@ impl CardanoApi {
         /// Role0 key to get the chain root for.
         #[oai(validator(min_length = 34, max_length = 34, pattern = "0x[0-9a-f]{32}"))]
         Path(role0_key): Path<String>,
+        /// No Authorization required, but Token permitted.
+        _auth: NoneOrRBAC,
     ) -> rbac::role0_chain_root_get::AllResponses {
         rbac::role0_chain_root_get::endpoint(role0_key).await
     }
