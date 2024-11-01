@@ -1,17 +1,24 @@
 # Content
 
-* [Content](#content)
-  * [Features](#features)
-  * [Requirements](#requirements)
-  * [Install](#install)
-  * [How to run](#how-to-run)
-  * [Example](#example)
-  * [Support](#support)
-  * [License](#license)
+- [Content](#content)
+  - [Features](#features)
+  - [References](#references)
+  - [Requirements](#requirements)
+  - [Install](#install)
+  - [How to run](#how-to-run)
+  - [Example](#example)
+  - [Support](#support)
+  - [License](#license)
 
 ## Features
 
-This package exposes a CIP-1852 Cardano HD Key Derivation.
+This package expose BIP32-Ed25519 and CIP-1852 Cardano HD Key Derivation.
+
+## References
+[BIP32-Ed25519](https://input-output-hk.github.io/adrestia/static/Ed25519_BIP.pdf)
+[SLIP-0023](https://github.com/satoshilabs/slips/blob/master/slip-0023.md)
+[CIP-1852](https://cips.cardano.org/cip/CIP-1852)
+[BIP-0032](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki)
 
 ## Requirements
 
@@ -27,8 +34,7 @@ dependencies:
 
 ## How to run
 
-1. cd catalyst_key_derivation
-2. ./run.sh
+1. just run-web
 
 ## Example
 
