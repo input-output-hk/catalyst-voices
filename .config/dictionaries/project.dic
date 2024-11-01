@@ -124,6 +124,7 @@ Jörmungandr
 jsonschema
 junitreport
 junitxml
+Justfile
 keychains
 Keyhash
 keyserver
