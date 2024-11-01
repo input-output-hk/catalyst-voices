@@ -27,22 +27,24 @@ abstract interface class KeychainCreationManager
   Future<void> downloadSeedPhrase();
 
   bool areWordsMatching(List<SeedPhraseWord> words);
-
-  Future<bool> createKeychain();
 }
 
 final class KeychainCreationCubit extends Cubit<KeychainStateData>
     with BlocErrorEmitterMixin, UnlockPasswordMixin
     implements KeychainCreationManager {
   final Downloader _downloader;
-  final RegistrationService _registrationService;
+  final RegistrationProgressNotifier _progressNotifier;
+
+  SeedPhrase? _seedPhrase;
 
   KeychainCreationCubit({
     required Downloader downloader,
-    required RegistrationService registrationService,
+    required RegistrationProgressNotifier progressNotifier,
   })  : _downloader = downloader,
-        _registrationService = registrationService,
+        _progressNotifier = progressNotifier,
         super(const KeychainStateData());
+
+  SeedPhrase? get seedPhrase => _seedPhrase;
 
   SeedPhraseStateData get _seedPhraseStateData {
     return state.seedPhraseStateData;
@@ -52,6 +54,12 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
     if (state.seedPhraseStateData != newValue) {
       emit(state.copyWith(seedPhraseStateData: newValue));
     }
+  }
+
+  void recoverSeedPhrase(SeedPhrase value) {
+    _seedPhrase = value;
+    setSeedPhraseStored(true);
+    setUserSeedPhraseWords(value.mnemonicWords);
   }
 
   @override
@@ -73,22 +81,31 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
   }
 
   @override
-  void setUserSeedPhraseWords(List<SeedPhraseWord> words) {
-    final seedPhrase = _seedPhraseStateData.seedPhrase;
+  bool areWordsMatching(List<SeedPhraseWord> words) {
+    final seedPhrase = _seedPhrase;
     final seedPhraseWords = seedPhrase?.mnemonicWords;
 
-    final areUserWordsCorrect =
-        seedPhraseWords != null && listEquals(seedPhraseWords, words);
+    final sortedWords = [...words]..sort();
+
+    return listEquals(seedPhraseWords, sortedWords);
+  }
+
+  @override
+  void setUserSeedPhraseWords(List<SeedPhraseWord> words) {
+    final seedPhrase = _seedPhrase;
+    final seedPhraseWords = seedPhrase?.mnemonicWords;
+
+    final matches = listEquals(seedPhraseWords, words);
 
     _seedPhraseStateData = _seedPhraseStateData.copyWith(
       userWords: words,
-      areUserWordsCorrect: areUserWordsCorrect,
+      areUserWordsCorrect: matches,
     );
   }
 
   @override
   Future<void> downloadSeedPhrase() async {
-    final mnemonic = _seedPhraseStateData.seedPhrase?.mnemonic;
+    final mnemonic = _seedPhrase?.mnemonic;
     if (mnemonic == null) {
       emitError(const LocalizedRegistrationSeedPhraseNotFoundException());
       return;
@@ -122,42 +139,27 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
 
   @override
   void onUnlockPasswordStateChanged(UnlockPasswordState data) {
+    final isPasswordCorrect = data.isNextEnabled;
+    final keychainProgress = isPasswordCorrect
+        ? KeychainProgress(
+            seedPhrase: _seedPhrase!,
+            password: password.value,
+          )
+        : null;
+
+    _progressNotifier.value = _progressNotifier.value.copyWith(
+      keychainProgress: Optional(keychainProgress),
+    );
+
     emit(state.copyWith(unlockPasswordState: data));
-  }
-
-  @override
-  Future<bool> createKeychain() async {
-    try {
-      final seedPhrase = _seedPhraseStateData.seedPhrase;
-      final password = this.password;
-
-      if (seedPhrase == null) {
-        throw const LocalizedRegistrationSeedPhraseNotFoundException();
-      }
-      if (password.isNotValid) {
-        throw const LocalizedRegistrationUnlockPasswordNotFoundException();
-      }
-
-      await _registrationService.createKeychain(
-        seedPhrase: seedPhrase,
-        unlockPassword: password.value,
-      );
-
-      return true;
-    } catch (error, stack) {
-      _logger.severe('Create keychain', error, stack);
-
-      emitError(error);
-
-      return false;
-    }
   }
 
   void _buildSeedPhrase() {
     final seedPhrase = SeedPhrase();
+    _seedPhrase = seedPhrase;
 
     _seedPhraseStateData = _seedPhraseStateData.copyWith(
-      seedPhrase: Optional(seedPhrase),
+      seedPhraseWords: seedPhrase.mnemonicWords,
       shuffledWords: seedPhrase.shuffledMnemonicWords,
       // Note. In debug mode we're prefilling correct seed phrase words
       // so its faster to test screens
@@ -167,17 +169,8 @@ final class KeychainCreationCubit extends Cubit<KeychainStateData>
   }
 
   void _ensureSeedPhraseCreated() {
-    if (state.seedPhraseStateData.seedPhrase == null) {
+    if (_seedPhrase == null) {
       _buildSeedPhrase();
     }
-  }
-
-  @override
-  bool areWordsMatching(List<SeedPhraseWord> words) {
-    final mappedWords = words.map((e) => e.data).toList()..sort();
-    final mappedShuffledWords =
-        _seedPhraseStateData.shuffledWords.map((e) => e.data).toList()..sort();
-
-    return listEquals(mappedWords, mappedShuffledWords);
   }
 }

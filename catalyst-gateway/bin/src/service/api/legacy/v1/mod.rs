@@ -23,8 +23,12 @@ mod fragments_statuses;
 /// V1 API Endpoints
 pub(crate) struct V1Api;
 
-#[OpenApi(prefix_path = "/v1", tag = "ApiTags::V1")]
+#[OpenApi(prefix_path = "/v1", tag = "ApiTags::Legacy")]
 impl V1Api {
+    /// Get Account Votes
+    ///
+    /// Get from all active vote plans, the index of the voted proposals
+    /// by the given account ID.
     #[oai(
         path = "/votes/plan/account-votes/:account_id",
         method = "get",
@@ -32,13 +36,10 @@ impl V1Api {
         transform = "schema_version_validation",
         deprecated = true
     )]
-
-    /// Get Account Votes
-    ///
-    /// Get from all active vote plans, the index of the voted proposals
-    /// by the given account ID.
     async fn get_account_votes(
-        &self, /// A account ID to get the votes for.
+        &self,
+        /// A account ID to get the votes for.
+        #[oai(validator(max_length = "100", pattern = "^0x[a-f0-9]+$"))]
         account_id: Path<AccountId>,
     ) -> account_votes_get::AllResponses {
         account_votes_get::endpoint(account_id).await
@@ -51,7 +52,6 @@ impl V1Api {
         path = "/fragments",
         method = "post",
         operation_id = "fragments",
-        tag = "ApiTags::Fragments",
         transform = "schema_version_validation",
         deprecated = true
     )]
@@ -70,7 +70,6 @@ impl V1Api {
         path = "/fragments/statuses",
         method = "get",
         operation_id = "fragmentsStatuses",
-        tag = "ApiTags::Fragments",
         transform = "schema_version_validation",
         deprecated = true
     )]

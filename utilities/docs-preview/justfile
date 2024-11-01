@@ -1,0 +1,20 @@
+# use with https://github.com/casey/just
+#
+# Catalyst Voices Documentation Local Preview Build
+
+# cspell: words prereqs, commitlog
+
+default:
+    @just --list --unsorted
+
+# Ensure we have the latest version of the dev docs script locally.
+update-docs-dev-script:
+    earthly +update-docs-dev-script
+
+# Live rebuilds and deploys the documentation locally.
+#
+# See root Justfile for full documentation.
+preview-docs: update-docs-dev-script
+    echo "Requires Python Installed. Version >= 3.11"
+    python --version
+    ./local.py --target "../../docs+local" --exposed-port 8280 cat-voices-docs:latest

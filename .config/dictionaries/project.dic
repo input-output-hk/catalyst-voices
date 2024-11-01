@@ -64,6 +64,7 @@ dbschema
 dbsync
 Deleg
 delegators
+devnet
 DIND
 dockerhub
 Dominik
@@ -123,6 +124,7 @@ Jörmungandr
 jsonschema
 junitreport
 junitxml
+Justfile
 keychains
 Keyhash
 keyserver
@@ -180,6 +182,7 @@ oneshot
 openapi
 opentelemetry
 overprovisioned
+Pbkdf2
 pbxproj
 Pdart
 permissionless
@@ -204,6 +207,7 @@ pubspec
 pytest
 qrcode
 rapidoc
+ratelimit
 redoc
 reloadable
 Replayability
@@ -271,6 +275,7 @@ unchunk
 Unlogged
 unmanaged
 Unstaked
+upskilling
 UTXO
 Utxos
 varint
@@ -287,6 +292,7 @@ wallclock
 wasmtime
 Wconditional
 Werror
+Wireframes
 Wmissing
 Wnullable
 Woverlength
@@ -301,3 +307,16 @@ xcworkspace
 xvfb
 yoroi
 Pbkdf2
+Embedder
+Podspec
+podspec
+ARCHS
+iphonesimulator
+cargokit
+SRCROOT
+libcatalyst
+staticlib
+addrof
+Lifetimeable
+cbindgen
+mocktail

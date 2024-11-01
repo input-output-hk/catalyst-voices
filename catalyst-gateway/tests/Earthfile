@@ -1,11 +1,14 @@
 VERSION 0.8
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.2.18 AS spectral-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/spectral:v3.2.22 AS spectral-ci
 
+# cspell: words oapi
 # test-lint-openapi - OpenAPI linting from an artifact
 # testing whether the OpenAPI generated during build stage follows good practice.
 test-lint-openapi:
     FROM spectral-ci+spectral-base
     # Copy the doc artifact.
-    COPY ../+build/doc ./doc
+    COPY --dir ../+build/doc .
+    # Copy the spectral configuration file.
+    COPY ./.oapi-v3.spectral.yml .spectral.yml
     # Scan the doc directory where type of file is JSON.
-    DO spectral-ci+BUILD_SPECTRAL --dir=./doc --file_type="json"
+    DO spectral-ci+LINT --dir=./doc

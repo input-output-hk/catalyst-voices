@@ -12,12 +12,12 @@ class CurrentUserStatusText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final sessionBloc = context.watch<SessionBloc>();
+    final sessionBloc = context.watch<SessionCubit>();
 
     final stateDesc = switch (sessionBloc.state) {
       VisitorSessionState() => 'visitor',
       GuestSessionState() => 'guest',
-      ActiveUserSessionState() => 'user',
+      ActiveAccountSessionState() => 'user',
     };
 
     return Text(

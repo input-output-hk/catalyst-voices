@@ -11,6 +11,8 @@ extends:
   - "https://unpkg.com/@stoplight/spectral-documentation@1.3.1/dist/ruleset.mjs"
   - "https://unpkg.com/@stoplight/spectral-owasp-ruleset@1.4.3/dist/ruleset.mjs"
 
+formats: ["oas3", "json-schema-2020-12"]
+
 aliases:
   PathItem:
     - $.paths[*]
@@ -126,3 +128,35 @@ overrides:
     rules:
       # Ref: https://github.com/stoplightio/spectral-owasp-ruleset/blob/2fd49c377794222352ff10dee99ed2a106c35199/src/ruleset.ts#L698
       owasp:api6:2019-constrained-additionalProperties: off
+
+rules: 
+  api-path:
+    message: "Invalid API path - should be /api/draft/* or /api/v<number>/*"
+    given: "$.paths"
+    severity: error
+    then:
+      field: "@key"
+      function: pattern
+      functionOptions:
+        # Match paths that start with /api/draft/* or /api/v<number>/*
+        match: "^/api/(draft|v\\d+)/.*$"
+  api-content-type:
+    message: "Content type must not be text/plain"
+    given: "$.paths[*][*].responses[*].content"
+    severity: error
+    then:
+      field: "@key"
+      function: pattern
+      functionOptions:
+        # Match content type that is not text/plain
+        match: "^(?!text/plain).*"
+  api-content-type-json-object:
+    message: "Content type application/json must be object"
+    given: "$.paths[*][*].responses[*].content['application/json'].schema.type"
+    severity: error
+    then:
+      field: "@value"
+      function: pattern
+      functionOptions:
+        # Match content type application/json should be object
+        match: "object"

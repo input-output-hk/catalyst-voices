@@ -18,8 +18,8 @@ final class _$CatGatewayApi extends CatGatewayApi {
   final Type definitionType = CatGatewayApi;
 
   @override
-  Future<Response<dynamic>> _apiHealthStartedGet() {
-    final Uri $url = Uri.parse('/api/health/started');
+  Future<Response<dynamic>> _apiV1HealthStartedGet() {
+    final Uri $url = Uri.parse('/api/v1/health/started');
     final Request $request = Request(
       'GET',
       $url,
@@ -29,8 +29,8 @@ final class _$CatGatewayApi extends CatGatewayApi {
   }
 
   @override
-  Future<Response<dynamic>> _apiHealthReadyGet() {
-    final Uri $url = Uri.parse('/api/health/ready');
+  Future<Response<dynamic>> _apiV1HealthReadyGet() {
+    final Uri $url = Uri.parse('/api/v1/health/ready');
     final Request $request = Request(
       'GET',
       $url,
@@ -40,8 +40,8 @@ final class _$CatGatewayApi extends CatGatewayApi {
   }
 
   @override
-  Future<Response<dynamic>> _apiHealthLiveGet() {
-    final Uri $url = Uri.parse('/api/health/live');
+  Future<Response<dynamic>> _apiV1HealthLiveGet() {
+    final Uri $url = Uri.parse('/api/v1/health/live');
     final Request $request = Request(
       'GET',
       $url,
@@ -51,17 +51,17 @@ final class _$CatGatewayApi extends CatGatewayApi {
   }
 
   @override
-  Future<Response<dynamic>> _apiHealthInspectionGet({
+  Future<Response<dynamic>> _apiV1HealthInspectionPut({
     String? logLevel,
     String? queryInspection,
   }) {
-    final Uri $url = Uri.parse('/api/health/inspection');
+    final Uri $url = Uri.parse('/api/v1/health/inspection');
     final Map<String, dynamic> $params = <String, dynamic>{
       'log_level': logLevel,
       'query_inspection': queryInspection,
     };
     final Request $request = Request(
-      'GET',
+      'PUT',
       $url,
       client.baseUrl,
       parameters: $params,
@@ -70,12 +70,12 @@ final class _$CatGatewayApi extends CatGatewayApi {
   }
 
   @override
-  Future<Response<FullStakeInfo>> _apiCardanoStakedAdaStakeAddressGet({
+  Future<Response<FullStakeInfo>> _apiDraftCardanoStakedAdaStakeAddressGet({
     required String? stakeAddress,
     String? network,
     int? slotNumber,
   }) {
-    final Uri $url = Uri.parse('/api/cardano/staked_ada/${stakeAddress}');
+    final Uri $url = Uri.parse('/api/draft/cardano/staked_ada/${stakeAddress}');
     final Map<String, dynamic> $params = <String, dynamic>{
       'network': network,
       'slot_number': slotNumber,
@@ -90,12 +90,14 @@ final class _$CatGatewayApi extends CatGatewayApi {
   }
 
   @override
-  Future<Response<RegistrationInfo>> _apiCardanoRegistrationStakeAddressGet({
+  Future<Response<RegistrationInfo>>
+      _apiDraftCardanoRegistrationStakeAddressGet({
     required String? stakeAddress,
     String? network,
     int? slotNumber,
   }) {
-    final Uri $url = Uri.parse('/api/cardano/registration/${stakeAddress}');
+    final Uri $url =
+        Uri.parse('/api/draft/cardano/registration/${stakeAddress}');
     final Map<String, dynamic> $params = <String, dynamic>{
       'network': network,
       'slot_number': slotNumber,
@@ -110,8 +112,8 @@ final class _$CatGatewayApi extends CatGatewayApi {
   }
 
   @override
-  Future<Response<SyncState>> _apiCardanoSyncStateGet({String? network}) {
-    final Uri $url = Uri.parse('/api/cardano/sync_state');
+  Future<Response<SyncState>> _apiDraftCardanoSyncStateGet({String? network}) {
+    final Uri $url = Uri.parse('/api/draft/cardano/sync_state');
     final Map<String, dynamic> $params = <String, dynamic>{'network': network};
     final Request $request = Request(
       'GET',
@@ -123,11 +125,11 @@ final class _$CatGatewayApi extends CatGatewayApi {
   }
 
   @override
-  Future<Response<SlotInfo>> _apiCardanoDateTimeToSlotNumberGet({
+  Future<Response<SlotInfo>> _apiDraftCardanoDateTimeToSlotNumberGet({
     DateTime? dateTime,
     String? network,
   }) {
-    final Uri $url = Uri.parse('/api/cardano/date_time_to_slot_number');
+    final Uri $url = Uri.parse('/api/draft/cardano/date_time_to_slot_number');
     final Map<String, dynamic> $params = <String, dynamic>{
       'date_time': dateTime,
       'network': network,
@@ -143,10 +145,10 @@ final class _$CatGatewayApi extends CatGatewayApi {
 
   @override
   Future<Response<Cip36Reporting>>
-      _apiCardanoCip36LatestRegistrationStakeAddrGet(
+      _apiDraftCardanoCip36LatestRegistrationStakeAddrGet(
           {required String? stakeAddr}) {
     final Uri $url =
-        Uri.parse('/api/cardano/cip36/latest_registration/stake_addr');
+        Uri.parse('/api/draft/cardano/cip36/latest_registration/stake_addr');
     final Map<String, dynamic> $params = <String, dynamic>{
       'stake_addr': stakeAddr
     };
@@ -161,10 +163,10 @@ final class _$CatGatewayApi extends CatGatewayApi {
 
   @override
   Future<Response<Cip36Reporting>>
-      _apiCardanoCip36LatestRegistrationStakeKeyHashGet(
+      _apiDraftCardanoCip36LatestRegistrationStakeKeyHashGet(
           {required String? stakeKeyHash}) {
-    final Uri $url =
-        Uri.parse('/api/cardano/cip36/latest_registration/stake_key_hash');
+    final Uri $url = Uri.parse(
+        '/api/draft/cardano/cip36/latest_registration/stake_key_hash');
     final Map<String, dynamic> $params = <String, dynamic>{
       'stake_key_hash': stakeKeyHash
     };
@@ -179,9 +181,10 @@ final class _$CatGatewayApi extends CatGatewayApi {
 
   @override
   Future<Response<Cip36ReportingList>>
-      _apiCardanoCip36LatestRegistrationVoteKeyGet({required String? voteKey}) {
+      _apiDraftCardanoCip36LatestRegistrationVoteKeyGet(
+          {required String? voteKey}) {
     final Uri $url =
-        Uri.parse('/api/cardano/cip36/latest_registration/vote_key');
+        Uri.parse('/api/draft/cardano/cip36/latest_registration/vote_key');
     final Map<String, dynamic> $params = <String, dynamic>{'vote_key': voteKey};
     final Request $request = Request(
       'GET',
@@ -193,20 +196,58 @@ final class _$CatGatewayApi extends CatGatewayApi {
   }
 
   @override
-  Future<Response<dynamic>> _apiDraftConfigFrontendGet() {
+  Future<Response<Response$>> _apiDraftRbacChainRootStakeAddressGet(
+      {required String? stakeAddress}) {
+    final Uri $url = Uri.parse('/api/draft/rbac/chain_root/${stakeAddress}');
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+    );
+    return client.send<Response$, Response$>($request);
+  }
+
+  @override
+  Future<Response<RbacRegistrationsResponse>>
+      _apiDraftRbacRegistrationsChainRootGet({required String? chainRoot}) {
+    final Uri $url = Uri.parse('/api/draft/rbac/registrations/${chainRoot}');
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+    );
+    return client
+        .send<RbacRegistrationsResponse, RbacRegistrationsResponse>($request);
+  }
+
+  @override
+  Future<Response<RbacRole0ChainRootResponse>>
+      _apiDraftRbacRole0ChainRootRole0KeyGet({required String? role0Key}) {
+    final Uri $url = Uri.parse('/api/draft/rbac/role0_chain_root/${role0Key}');
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+    );
+    return client
+        .send<RbacRole0ChainRootResponse, RbacRole0ChainRootResponse>($request);
+  }
+
+  @override
+  Future<Response<FrontendConfig>> _apiDraftConfigFrontendGet() {
     final Uri $url = Uri.parse('/api/draft/config/frontend');
     final Request $request = Request(
       'GET',
       $url,
       client.baseUrl,
     );
-    return client.send<dynamic, dynamic>($request);
+    return client.send<FrontendConfig, FrontendConfig>($request);
   }
 
   @override
   Future<Response<dynamic>> _apiDraftConfigFrontendPut({
-    String? ip,
-    required Object? body,
+    Object? ip,
+    required FrontendConfig? body,
   }) {
     final Uri $url = Uri.parse('/api/draft/config/frontend');
     final Map<String, dynamic> $params = <String, dynamic>{'IP': ip};
@@ -222,25 +263,25 @@ final class _$CatGatewayApi extends CatGatewayApi {
   }
 
   @override
-  Future<Response<dynamic>> _apiDraftConfigFrontendSchemaGet() {
+  Future<Response<FrontendConfig>> _apiDraftConfigFrontendSchemaGet() {
     final Uri $url = Uri.parse('/api/draft/config/frontend/schema');
     final Request $request = Request(
       'GET',
       $url,
       client.baseUrl,
     );
-    return client.send<dynamic, dynamic>($request);
+    return client.send<FrontendConfig, FrontendConfig>($request);
   }
 
   @override
-  Future<Response<VoterRegistration>> _apiRegistrationVoterVotingKeyGet({
+  Future<Response<VoterRegistration>> _apiV1RegistrationVoterVotingKeyGet({
     required String? votingKey,
-    int? eventId,
+    int? eventIndex,
     bool? withDelegators,
   }) {
-    final Uri $url = Uri.parse('/api/registration/voter/${votingKey}');
+    final Uri $url = Uri.parse('/api/v1/registration/voter/${votingKey}');
     final Map<String, dynamic> $params = <String, dynamic>{
-      'event_id': eventId,
+      'event_index': eventIndex,
       'with_delegators': withDelegators,
     };
     final Request $request = Request(

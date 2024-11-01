@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.2.18 AS rust-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.2.22 AS rust-ci
 
 #cspell: words rustfmt toolsets USERARCH stdcfgs
 
@@ -81,7 +81,7 @@ build:
 all-hosts-build:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +build
 
-# package-cat-gateway : Create a deployable container for catalyst-gateway
+# package : Create a deployable container for catalyst-gateway
 package:
     FROM debian:12.7-slim
     WORKDIR /cat-gateway

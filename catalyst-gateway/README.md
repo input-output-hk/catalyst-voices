@@ -40,13 +40,12 @@ or you can build a docker image and run everything with the `docker-compose`.
 
 To build and run docker images follow these steps:
 
-1. Run `earthly +package-cat-gateway` or `earthly +package-cat-gateway-with-preprod-snapshot`
-  to build a cat-gateway docker image without `preprod-snapshot` or with it.
+1. Run `earthly +package` to build a cat-gateway docker image.
 2. Run `earthly ./event-db+build` to build an event-db docker image.
 3. Run `docker-compose up cat-gateway` to spin up cat-gateway with event-db from already built images.
 
 Note that every time when you are building an image it obsoletes an old image but does not remove it,
-so dont forget to cleanup dangling images of the event-db and cat-gateway in your docker environment.
+so don't forget to clean up dangling images of the event-db and cat-gateway in your docker environment.
 
 ### Rust binary
 

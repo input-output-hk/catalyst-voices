@@ -1,6 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/docs:v3.2.18 AS docs-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/docs:v3.2.22 AS docs-ci
 
 IMPORT .. AS repo
 IMPORT ../catalyst-gateway AS catalyst-gateway
@@ -32,10 +32,7 @@ docs:
 #   --push will cause this image to be pushed to the local development cluster
 #   --local_registry : Set this to the hostname of your local registry or "" to inhibit.
 local:
-    # Change this to point to another local registry, OR set to "" to disable
-    # pushing to a local registry even if `--push` is passed.
-    # this should be "registry.cluster.test:5000" but Earthly can not reliably locate it in a hosts file.
-    ARG local_registry="192.168.58.10:5000"
+
     # ARG local_registry="registry.cluster.test"
     # Build a self contained service to show built docs locally.
     DO docs-ci+PACKAGE
@@ -45,8 +42,14 @@ local:
 
     # This is a local only image, we do not publish it.
     SAVE IMAGE cat-voices-docs:latest
+ 
+# registry-local: Local preview target - Pushed to a local registry
+registry-local:
+    FROM +local
 
-    # Publish to the local development cluster
-    IF [ "$local_registry" != "" ]
-        SAVE IMAGE --push --insecure $local_registry/cat-voices-docs:latest
-    END
+    # Change this to point to another local registry, OR set to "" to disable
+    # pushing to a local registry even if `--push` is passed.
+    # this should be "registry.cluster.test:5000" but Earthly can not reliably locate it in a hosts file.
+    ARG local_registry="192.168.58.10:5000"
+
+    SAVE IMAGE --push --insecure $local_registry/cat-voices-docs:latest
