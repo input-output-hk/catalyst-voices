@@ -15,6 +15,7 @@ use crate::service::{
 
 mod cip36;
 mod date_time_to_slot_number_get;
+mod rbac;
 mod registration_get;
 mod staked_ada_get;
 mod sync_state_get;
@@ -187,5 +188,55 @@ impl CardanoApi {
         vote_key: Query<String>,
     ) -> cip36::MultipleRegistrationResponse {
         cip36::get_associated_vote_key_registrations(vote_key.0, true).await
+    }
+
+    #[oai(
+        path = "/draft/rbac/chain_root/:stake_address",
+        method = "get",
+        operation_id = "rbacChainRootGet"
+    )]
+    /// Get RBAC chain root
+    ///
+    /// This endpoint returns the RBAC certificate chain root for a given stake address.
+    async fn rbac_chain_root_get(
+        &self,
+        /// Stake address to get the chain root for.
+        Path(stake_address): Path<Cip19StakeAddress>,
+    ) -> rbac::chain_root_get::AllResponses {
+        rbac::chain_root_get::endpoint(stake_address).await
+    }
+
+    #[oai(
+        path = "/draft/rbac/registrations/:chain_root",
+        method = "get",
+        operation_id = "rbacRegistrations"
+    )]
+    /// Get registrations by RBAC chain root
+    ///
+    /// This endpoint returns the registrations for a given chain root.
+    async fn rbac_registrations_get(
+        &self,
+        /// Chain root to get the registrations for.
+        #[oai(validator(max_length = 66, min_length = 64, pattern = "0x[0-9a-f]{64}"))]
+        Path(chain_root): Path<String>,
+    ) -> rbac::registrations_get::AllResponses {
+        rbac::registrations_get::endpoint(chain_root).await
+    }
+
+    #[oai(
+        path = "/draft/rbac/role0_chain_root/:role0_key",
+        method = "get",
+        operation_id = "rbacRole0KeyChainRoot"
+    )]
+    /// Get RBAC chain root for a given role0 key.
+    ///
+    /// This endpoint returns the RBAC certificate chain root for a given role 0 key.
+    async fn rbac_role0_key_chain_root(
+        &self,
+        /// Role0 key to get the chain root for.
+        #[oai(validator(min_length = 34, max_length = 34, pattern = "0x[0-9a-f]{32}"))]
+        Path(role0_key): Path<String>,
+    ) -> rbac::role0_chain_root_get::AllResponses {
+        rbac::role0_chain_root_get::endpoint(role0_key).await
     }
 }
