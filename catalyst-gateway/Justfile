@@ -1,6 +1,6 @@
 # use with https://github.com/casey/just
 #
-# Hermes developer convenience functions
+# Developer convenience functions
 
 # cspell: words prereqs, commitlog, rustls, nocapture
 
