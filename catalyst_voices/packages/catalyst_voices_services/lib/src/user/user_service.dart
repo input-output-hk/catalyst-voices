@@ -6,6 +6,16 @@ import 'package:catalyst_voices_services/catalyst_voices_services.dart';
 import 'package:logging/logging.dart';
 
 abstract interface class UserService {
+  factory UserService({
+    required KeychainProvider keychainProvider,
+    required UserStorage userStorage,
+  }) {
+    return UserServiceImpl(
+      keychainProvider,
+      userStorage,
+    );
+  }
+
   Account? get account;
 
   Stream<Account?> get watchAccount;

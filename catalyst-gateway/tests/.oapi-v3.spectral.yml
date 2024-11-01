@@ -79,6 +79,7 @@ overrides:
       # Can't add custom properties to server list.
       owasp:api9:2023-inventory-access: off
 
+
   # Legacy Endpoints that have strange unioned properties.
   # These can not be documented
   # ONLY Legacy endpoints may be added to this override.

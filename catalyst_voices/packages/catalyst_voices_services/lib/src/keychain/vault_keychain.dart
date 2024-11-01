@@ -23,15 +23,18 @@ final class VaultKeychain extends SecureStorageVault implements Keychain {
     return SecureStorageVault.getStorageId(value);
   }
 
+  final _initializationCompleter = Completer<void>();
+
   VaultKeychain({
     required super.id,
     super.secureStorage,
   }) {
-    unawaited(_ensureHasMetadata());
+    unawaited(_initialize());
   }
 
   @override
   Future<bool> get isEmpty async {
+    await _initializationCompleter.future;
     for (final key in _allKeys) {
       if (await contains(key: key)) {
         return false;
@@ -42,16 +45,26 @@ final class VaultKeychain extends SecureStorageVault implements Keychain {
   }
 
   @override
-  Future<KeychainMetadata> get metadata {
-    return _readMetadata().then((metadata) => metadata ?? _newMetadata());
+  Future<KeychainMetadata> get metadata async {
+    await _initializationCompleter.future;
+    final metadata = await _readMetadata();
+    assert(metadata != null, 'Keychain was not initialized correctly');
+    return metadata!;
   }
 
   @override
   Future<void> writeString(
     String? value, {
     required String key,
-  }) {
+  }) async {
+    await _initializationCompleter.future;
     return super.writeString(value, key: key).whenComplete(_updateUpdateAt);
+  }
+
+  @override
+  Future<String?> readString({required String key}) async {
+    await _initializationCompleter.future;
+    return super.readString(key: key);
   }
 
   @override
@@ -65,6 +78,12 @@ final class VaultKeychain extends SecureStorageVault implements Keychain {
   @override
   Future<void> setMasterKey(Ed25519PrivateKey data) async {
     await writeString(data.toHex(), key: _rootKey);
+  }
+
+  Future<void> _initialize() async {
+    await _ensureHasMetadata();
+
+    _initializationCompleter.complete();
   }
 
   Future<void> _ensureHasMetadata() async {
@@ -101,7 +120,7 @@ final class VaultKeychain extends SecureStorageVault implements Keychain {
 
   KeychainMetadata _newMetadata() {
     return KeychainMetadata(
-      createAt: DateTime.timestamp(),
+      createdAt: DateTime.timestamp(),
       updatedAt: DateTime.timestamp(),
     );
   }

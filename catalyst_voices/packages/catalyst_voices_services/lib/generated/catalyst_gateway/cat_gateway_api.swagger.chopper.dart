@@ -196,6 +196,44 @@ final class _$CatGatewayApi extends CatGatewayApi {
   }
 
   @override
+  Future<Response<Response$>> _apiDraftRbacChainRootStakeAddressGet(
+      {required String? stakeAddress}) {
+    final Uri $url = Uri.parse('/api/draft/rbac/chain_root/${stakeAddress}');
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+    );
+    return client.send<Response$, Response$>($request);
+  }
+
+  @override
+  Future<Response<RbacRegistrationsResponse>>
+      _apiDraftRbacRegistrationsChainRootGet({required String? chainRoot}) {
+    final Uri $url = Uri.parse('/api/draft/rbac/registrations/${chainRoot}');
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+    );
+    return client
+        .send<RbacRegistrationsResponse, RbacRegistrationsResponse>($request);
+  }
+
+  @override
+  Future<Response<RbacRole0ChainRootResponse>>
+      _apiDraftRbacRole0ChainRootRole0KeyGet({required String? role0Key}) {
+    final Uri $url = Uri.parse('/api/draft/rbac/role0_chain_root/${role0Key}');
+    final Request $request = Request(
+      'GET',
+      $url,
+      client.baseUrl,
+    );
+    return client
+        .send<RbacRole0ChainRootResponse, RbacRole0ChainRootResponse>($request);
+  }
+
+  @override
   Future<Response<FrontendConfig>> _apiDraftConfigFrontendGet() {
     final Uri $url = Uri.parse('/api/draft/config/frontend');
     final Request $request = Request(
