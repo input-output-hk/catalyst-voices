@@ -1,11 +1,8 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/docs:feat/easy-local-docs AS docs-ci
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/docs:v3.2.22 AS docs-ci
 
 
 # update-docs-dev-script: get the latest docs dev script from CI.
 update-docs-dev-script:
     DO docs-ci+SYNC_LOCAL_DOCS
-
-    # SAVE ARTIFACT /dev/local.py AS LOCAL local.py
-
