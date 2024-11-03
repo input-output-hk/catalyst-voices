@@ -1,6 +1,6 @@
 import 'package:catalyst_cardano_serialization/src/exceptions.dart';
-import 'package:catalyst_cardano_serialization/src/signature.dart';
 import 'package:catalyst_cardano_serialization/src/witness.dart';
+import 'package:catalyst_key_derivation/catalyst_key_derivation.dart';
 import 'package:equatable/equatable.dart';
 
 /// A builder that builds [TransactionWitnessSet].

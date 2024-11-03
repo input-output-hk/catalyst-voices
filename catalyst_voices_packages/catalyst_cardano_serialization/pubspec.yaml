@@ -15,6 +15,7 @@ dependencies:
   bip32_ed25519: ^0.6.0
   catalyst_compression: ^0.3.0
   catalyst_compression_web: ^0.3.0
+  catalyst_key_derivation: ^0.1.0
   cbor: ^6.2.0
   convert: ^3.1.1
   cryptography: ^2.7.0
