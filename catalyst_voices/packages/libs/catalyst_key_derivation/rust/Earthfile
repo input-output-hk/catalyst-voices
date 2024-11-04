@@ -14,7 +14,7 @@ builder:
 
 # check : Run check using the most efficient host tooling
 # CI Automated Entry point.
-check:
+check-code:
     FROM +builder
 
     DO rust-ci+EXECUTE --cmd="/scripts/std_checks.py"
