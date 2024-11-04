@@ -201,7 +201,6 @@ plpgsql
 podfile
 podhelper
 podspec
-Podspec
 postcss
 Pozhylenkov
 Precache
@@ -277,6 +276,7 @@ Toastify
 todos
 toggleable
 tojunit
+toolsets
 Traceback
 traefik
 trailings

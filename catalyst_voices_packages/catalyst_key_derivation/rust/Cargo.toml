@@ -2,6 +2,9 @@
 name = "catalyst_key_derivation"
 version = "0.1.0"
 edition = "2021"
+homepage = "https://input-output-hk.github.io/catalyst-voices"
+repository = "https://github.com/input-output-hk/catalyst-voices"
+license = "Apache-2.0"
 
 [lib]
 crate-type = ["cdylib", "staticlib"]
